@@ -89,11 +89,18 @@ function showTeilnehmer(pruefungstermin_id, lehrveranstaltung_id, lehrveranstalt
 		},
 		error: loadError
 	}).success(function(data){
-		data.result.forEach(function(d)
+		if(data.error != 'true')
 		{
-			noten += "<option value="+d.note+">"+d.bezeichnung+"</option>";
-		});
-		noten += "</select>";
+			data.result.forEach(function(d)
+			{
+				noten += "<option value="+d.note+">"+d.bezeichnung+"</option>";
+			});
+			noten += "</select>";
+		}
+		else
+		{
+			messageBox("message",data.errormsg, "red", "highlight", 1000);
+		}
 	}).complete(function(event, xhr, settings){
 		var notenSelect = noten;
 		$.ajax({
@@ -237,7 +244,16 @@ function updateBeurteilung(ele, pruefung_id)
 		},
 		error: loadError
 	}).success(function(data){
-		markAsSaved(ele);
+		if(data.error != 'true')
+		{
+			markAsSaved(ele);
+		}
+		else
+		{
+			messageBox("message",data.errormsg, "red", "highlight", 1000);
+		}
+		
+		
 	}).complete(function(event, xhr, settings){
 
 	});

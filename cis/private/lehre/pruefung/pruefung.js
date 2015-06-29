@@ -1693,6 +1693,10 @@ function deleteLehrveranstaltungFromPruefung(lvId, pruefung_id)
 		{
 			messageBox("message", "Lehrveranstaltung erfolgreich entfernt", "green", "highlight", 1000);
 		}
+		else
+		{
+			messageBox("message", data.errormsg, "red", "highlight", 1000);
+		}
 	}).complete(function(){
 		loadPruefungsDetails(pruefung_id);
 	});
@@ -1719,6 +1723,10 @@ function stornoPruefung(pruefung_id)
 		if(data.error === "false")
 		{
 			messageBox("message", "Prüfung storniert", "green", "highlight", 1000);
+		}
+		else
+		{
+			messageBox("message", data.errormsg, "red", "highlight", 1000);
 		}
 	}).complete(function(){
 		loadAllPruefungen();
@@ -1776,33 +1784,39 @@ function loadAllPruefungen()
 		},
 		error: loadError
 	}).success(function(data){
-		$("#prfTable tbody").first().html("");
-		var tableRow = "";
-		data.result.forEach(function(e){
-			if(e.storniert === false)
-			{
-				tableRow = "<tr><td><a href='#' onclick='loadPruefungsDetails(\""+e.pruefung_id+"\")'>"+e.titel+"</a></td>";
-				tableRow += "<td>"+e.studiensemester_kurzbz+"</td>";
-				tableRow += "<td>";
-				e.lehrveranstaltungen.forEach(function(f){
-					tableRow += f.bezeichnung+"<br/>";
-				});
-				tableRow+="</td>";
-				tableRow+="<td>";
-				e.termine.forEach(function(f){
-					tableRow += convertDateTime(f.von, "date")+" von "+convertDateTime(f.von, "time")+" bis "+convertDateTime(f.bis, "time")+"<br/>";
-				});
-				tableRow+="</td>";
-				tableRow += "<td>"+e.methode+"</td>";
-				tableRow += "<td>"+e.pruefungstyp_kurzbz+"</td>";
-				tableRow += "<td>"+e.einzeln+"</td>";
-				tableRow += "<td>"+e.mitarbeiter_uid+"</td>";
-				tableRow += "<td>"+e.storniert+"</td>";
-				tableRow += "</tr>";
-				$("#prfTable tbody").first().append(tableRow);
-			}
-			
-		});
+		if(data.error != 'true')
+		{
+			$("#prfTable tbody").first().html("");
+			var tableRow = "";
+			data.result.forEach(function(e){
+				if(e.storniert === false)
+				{
+					tableRow = "<tr><td><a href='#' onclick='loadPruefungsDetails(\""+e.pruefung_id+"\")'>"+e.titel+"</a></td>";
+					tableRow += "<td>"+e.studiensemester_kurzbz+"</td>";
+					tableRow += "<td>";
+					e.lehrveranstaltungen.forEach(function(f){
+						tableRow += f.bezeichnung+"<br/>";
+					});
+					tableRow+="</td>";
+					tableRow+="<td>";
+					e.termine.forEach(function(f){
+						tableRow += convertDateTime(f.von, "date")+" von "+convertDateTime(f.von, "time")+" bis "+convertDateTime(f.bis, "time")+"<br/>";
+					});
+					tableRow+="</td>";
+					tableRow += "<td>"+e.methode+"</td>";
+					tableRow += "<td>"+e.pruefungstyp_kurzbz+"</td>";
+					tableRow += "<td>"+e.einzeln+"</td>";
+					tableRow += "<td>"+e.mitarbeiter_uid+"</td>";
+					tableRow += "<td>"+e.storniert+"</td>";
+					tableRow += "</tr>";
+					$("#prfTable tbody").first().append(tableRow);
+				}
+			});
+		}
+		else
+		{
+			messageBox("message", data.errormsg, "red", "highlight", 1000);
+		}
 	}).complete(function(event, xhr, settings){
 		if($("#prfTable")[0].hasInitialized !== true)
 		{

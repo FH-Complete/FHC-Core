@@ -58,9 +58,16 @@ switch($method)
 	{
 	    $mitarbeiter_uid = $_REQUEST["mitarbeiter_uid"];
 	}
-	else
+	else if($rechte->isBerechtigt('lehre/pruefungstermin'))
 	{
 	    $mitarbeiter_uid = $uid;
+	}
+	else
+	{
+	    $data['result']='false';
+	    $data['error']='true';
+	    $data['errormsg']='Sie haben keine Berechtigung.';
+	    break;
 	}
 	$data = savePruefungstermin($mitarbeiter_uid, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $pruefungsintervall);
 	break;
@@ -90,22 +97,50 @@ switch($method)
 	{
 	    $mitarbeiter_uid = $_REQUEST["mitarbeiter_uid"];
 	}
-	else
+	else if($rechte->isBerechtigt('lehre/pruefungstermin'))
 	{
 	    $mitarbeiter_uid = $uid;
+	}
+	else
+	{
+	    $data['result']='false';
+	    $data['error']='true';
+	    $data['errormsg']='Sie haben keine Berechtigung.';
+	    break;
 	}
 	$data = updatePruefungstermin($mitarbeiter_uid, $pruefung_id, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $termineNeu, $pruefungsintervall);
 	break;
     case 'deleteLehrveranstaltungFromPruefung':
+	if(!($rechte->isBerechtigt('lehre/pruefungsterminAdmin')) && !($rechte->isBerechtigt('lehre/pruefungstermin')))
+	{
+	    $data['result']='false';
+	    $data['error']='true';
+	    $data['errormsg']='Sie haben keine Berechtigung.';
+	    break;
+	}
 	$lvId = $_POST["lehrveranstaltung_id"];
 	$pruefung_id = $_POST["pruefung_id"];
 	$data = deleteLehrveranstaltungFromPruefung($lvId, $pruefung_id);
 	break;
     case 'stornoPruefung':
+	if(!($rechte->isBerechtigt('lehre/pruefungsterminAdmin')) && !($rechte->isBerechtigt('lehre/pruefungstermin')))
+	{
+	    $data['result']='false';
+	    $data['error']='true';
+	    $data['errormsg']='Sie haben keine Berechtigung.';
+	    break;
+	}
 	$pruefung_id = $_REQUEST["pruefung_id"];
 	$data = stornoPruefung($pruefung_id);
 	break;
     case 'deleteTermin':
+	if(!($rechte->isBerechtigt('lehre/pruefungsterminAdmin')) && !($rechte->isBerechtigt('lehre/pruefungstermin')))
+	{
+	    $data['result']='false';
+	    $data['error']='true';
+	    $data['errormsg']='Sie haben keine Berechtigung.';
+	    break;
+	}
 	$pruefung_id = $_REQUEST["pruefung_id"];
 	$pruefungstermin_id = $_REQUEST["pruefungstermin_id"];
 	$data = deleteTermin($pruefung_id, $pruefungstermin_id);
@@ -115,9 +150,16 @@ switch($method)
 	{
 	    $data = getAllPruefungen($_REQUEST["uid"]);
 	}
-	else
+	else if($rechte->isBerechtigt('lehre/pruefungstermin'))
 	{
 	    $data = getAllPruefungen($uid);
+	}
+	else
+	{
+	    $data['result']='false';
+	    $data['error']='true';
+	    $data['errormsg']='Sie haben keine Berechtigung.';
+	    break;
 	}
 	break;
     default:

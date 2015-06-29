@@ -35,13 +35,27 @@ switch($method)
 	    {
 		$mitarbeiter_uid = filter_input(INPUT_POST, 'mitarbeiter_uid');
 	    }
-	    else
+	    else if($rechte->isBerechtigt('lehre/pruefungsbeurteilung'))
 	    {
 		$mitarbeiter_uid = $uid;
+	    }
+	    else
+	    {
+		$data['result']='false';
+		$data['error']='true';
+		$data['errormsg']='Sie haben keine Berechtigung.';
+		break;
 	    }
 	    $data = getPruefungMitarbeiter($mitarbeiter_uid);
 	    break;
 	case 'getNoten':
+	    if(!($rechte->isBerechtigt('lehre/pruefungsbeurteilungAdmin')) && !($rechte->isBerechtigt('lehre/pruefungsbeurteilung')))
+	    {
+		$data['result']='false';
+		$data['error']='true';
+		$data['errormsg']='Sie haben keine Berechtigung.';
+		break;
+	    }
 	    $data = getNoten();
 	    break;
 	case 'saveBeurteilung':
@@ -51,9 +65,16 @@ switch($method)
 	    {
 		$mitarbeiter_uid = filter_input(INPUT_POST, 'mitarbeiter_uid');
 	    }
-	    else
+	    else if($rechte->isBerechtigt('lehre/pruefungsbeurteilung'))
 	    {
 		$mitarbeiter_uid = $uid;
+	    }
+	    else
+	    {
+		$data['result']='false';
+		$data['error']='true';
+		$data['errormsg']='Sie haben keine Berechtigung.';
+		break;
 	    }
 	    $note = filter_input(INPUT_POST, 'note');
 	    $pruefung_id = filter_input(INPUT_POST, 'pruefung_id');
@@ -63,20 +84,56 @@ switch($method)
 	    $data = saveBeurteilung($lehrveranstaltung_id, $student_uid, $mitarbeiter_uid, $note, $pruefung_id, $datum, $anmerkung, $pruefungsanmeldung_id, $uid);
 	    break;
 	case 'updateBeurteilung':
+	    if($rechte->isBerechtigt('lehre/pruefungsbeurteilungAdmin'))
+	    {
+		$mitarbeiter_uid = filter_input(INPUT_POST, 'mitarbeiter_uid');
+	    }
+	    else if($rechte->isBerechtigt('lehre/pruefungsbeurteilung'))
+	    {
+		$mitarbeiter_uid = $uid;
+	    }
+	    else
+	    {
+		$data['result']='false';
+		$data['error']='true';
+		$data['errormsg']='Sie haben keine Berechtigung.';
+		break;
+	    }
 	    $pruefung_id = filter_input(INPUT_POST, 'pruefung_id');
 	    $note = filter_input(INPUT_POST, 'note');
 	    $anmerkung = filter_input(INPUT_POST, 'anmerkung');
-	    $data = updateBeurteilung($pruefung_id, $note, $uid, $anmerkung);
+	    $data = updateBeurteilung($pruefung_id, $note, $mitarbeiter_uid, $anmerkung);
 	    break;
 	case 'loadPruefung':
+	    if(!($rechte->isBerechtigt('lehre/pruefungsbeurteilungAdmin')) && ($rechte->isBerechtigt('lehre/pruefungsbeurteilung')))
+	    {
+		$data['result']='false';
+		$data['error']='true';
+		$data['errormsg']='Sie haben keine Berechtigung.';
+		break;
+	    }
 	    $pruefung_id = filter_input(INPUT_POST, 'pruefung_id');
 	    $data = loadPruefung($pruefung_id);
 	    break;
 	case 'getBeurteilung':
+	    if(!($rechte->isBerechtigt('lehre/pruefungsbeurteilungAdmin')) && !($rechte->isBerechtigt('lehre/pruefungsbeurteilung')))
+	    {
+		$data['result']='false';
+		$data['error']='true';
+		$data['errormsg']='Sie haben keine Berechtigung.';
+		break;
+	    }
 	    $pruefungsanmeldung_id = filter_input(INPUT_POST, 'pruefungsanmeldung_id');
 	    $data = getBeurteilung($pruefungsanmeldung_id);
 	    break;
 	case 'getAnmeldungenTermin':
+	    if(!($rechte->isBerechtigt('lehre/pruefungsbeurteilungAdmin')) && !($rechte->isBerechtigt('lehre/pruefungsbeurteilung')))
+	    {
+		$data['result']='false';
+		$data['error']='true';
+		$data['errormsg']='Sie haben keine Berechtigung.';
+		break;
+	    }
 	    $lehrveranstaltung_id = filter_input(INPUT_POST, 'lehrveranstaltung_id');
 	    $pruefungstermin_id = filter_input(INPUT_POST, 'pruefungstermin_id');
 	    $data = getAnmeldungenTermin($lehrveranstaltung_id, $pruefungstermin_id);
