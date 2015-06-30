@@ -339,7 +339,10 @@ foreach($noten_obj->result as $row)
 			            	{
 								notentd.removeChild(notentd.lastChild);
 			            	}
-							var notentext = noten_array[note]+' ('+punkte+')';
+							if(punkte!='')
+								var notentext = noten_array[note]+' ('+punkte+')';
+							else
+								var notentext = noten_array[note];
 			            	notenode = document.createTextNode(notentext);
 		                    notentd.appendChild(notenode);
 						}					
@@ -1138,7 +1141,7 @@ echo "
 				}
 				else
 				{
-					if (!is_null($note_lv))				
+					if (!is_null($note_lv) || !is_null($znote))				
 						echo "<td colspan='2'><span id='span_".$row_stud->uid."'><input type='button' name='anlegen' value='".$p->t('benotungstool/anlegen')."' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"\",\"\",\"\",\"\")'></span></td>";
 					else
 						echo "<td colspan='2'></td>";	
