@@ -1532,6 +1532,12 @@ function StudentAuswahl()
 			document.getElementById('student-termine').setAttribute('src','termine.xul.php?student_uid='+uid);
 		}
 
+		// ***** Anwesenheit *****
+		if(document.getElementById('student-content-tabs').selectedItem==document.getElementById('student-tab-anwesenheit'))
+		{
+			document.getElementById('student-anwesenheit').setAttribute('src','anwesenheit.xul.php?student_uid='+uid);
+		}
+
 	}
 
 	// Notizen laden
@@ -5306,6 +5312,19 @@ function StudentTermineIFrameLoad()
 	{
 		url = 'termine.xul.php?student_uid='+uid+'&ts='+gettimestamp();
 		document.getElementById('student-termine').setAttribute('src',url);
+	}
+}
+
+// ****
+// * Laedt den Anwesenheit IFrame
+// ****
+function StudentAnwesenheitIFrameLoad()
+{
+	uid = document.getElementById('student-detail-textbox-uid').value;
+	if(uid!='')
+	{
+		url = 'anwesenheit.xul.php?student_uid='+uid+'&ts='+gettimestamp();
+		document.getElementById('student-anwesenheit').setAttribute('src',url);
 	}
 }
 

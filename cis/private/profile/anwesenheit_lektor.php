@@ -173,7 +173,7 @@ if($lehreinheit_id)
 								<div style="display: none;">
 									<table>
 									<tr><td>'.$p->t('global/datum').'</td><td>'.$p->t('anwesenheitsliste/fehlstunden').'</td></tr>';
-						$abwesend_termine = $anwesenheit->getAbwesendTermine($student->uid, $le->lehreinheit_id);
+						$abwesend_termine = $anwesenheit->getAbwesendTermine($student->uid, $lehreinheit_id);
 
 						foreach($abwesend_termine as $termin)
 						{

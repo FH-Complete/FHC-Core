@@ -27,6 +27,12 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+$user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
@@ -249,6 +255,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 					<tab id="lehrveranstaltung-tab-notizen" label="Notizen" />
 					<tab id="lehrveranstaltung-tab-lvangebot" label="LV-Angebot" />
 					<tab id="lehrveranstaltung-tab-termine" label="Termine" onclick="LehrveranstaltungTermineIFrameLoad()"/>
+					<?php 
+                    if($rechte->isBerechtigt('student/anwesenheit'))
+						echo '<tab id="lehrveranstaltung-tab-anwesenheit" label="Anwesenheit" onclick="LehrveranstaltungAnwesenheitIFrameLoad();"/>';						
+					?>
+
 				</tabs>
 				<tabpanels id="lehrveranstaltung-tabpanels-main" flex="1">
 					<vbox id="lehrveranstaltung-detail" />
@@ -259,6 +270,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 					</vbox>
 					<vbox id="lehrveranstaltung-lvangebot" />
 					<iframe id="lehrveranstaltung-termine" src="" style="margin-top:10px;" />
+					<?php 
+                       if($rechte->isBerechtigt('student/anwesenheit'))
+							echo '<iframe id="lehrveranstaltung-anwesenheit" src="" style="margin-top:10px;" />';
+                     ?>
 				</tabpanels>
 			</tabbox>
 		</vbox>

@@ -306,6 +306,54 @@ class anwesenheit extends basis_db
 	}
 
 	/**
+	 * Liefert die Anwesenheiten/Abwesenheiten eines Studenten bei einer LV
+	 *
+	 * @param string $student_uid
+	 * @param int $lehrveranstaltung_id
+	 * @param string $studiensemester_kurzbz
+	 * @param boolean $anwesend
+	 * @return boolean
+	 */
+	public function getAnwesenheitLehrveranstaltung($student_uid, $lehrveranstaltung_id, $studiensemester_kurzbz, $anwesend=false)
+	{
+		$qry = 'SELECT 
+					distinct tbl_anwesenheit.* 
+				FROM 
+					campus.tbl_anwesenheit
+					JOIN campus.vw_student_lehrveranstaltung USING(uid)
+				WHERE 
+					uid='.$this->db_add_param($student_uid).'
+					AND lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).'
+					AND studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz).'
+					AND anwesend=' . $this->db_add_param($anwesend, FHC_BOOLEAN).'
+				ORDER BY datum';
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new anwesenheit();
+
+				$obj->anwesenheit_id = $row->anwesenheit_id;
+				$obj->uid = $row->uid;
+				$obj->einheiten = $row->einheiten;
+				$obj->datum = $row->datum;
+				$obj->anwesend = $this->db_parse_bool($row->anwesend);
+				$obj->lehreinheit_id = $row->lehreinheit_id;
+				$obj->anmerkung = $row->anmerkung;
+					
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
 	 * Liefert die Termine an denen eine Abwesenheit eingetragen ist.
 	 *
 	 * @param string $uid
@@ -381,6 +429,95 @@ class anwesenheit extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt die Anwesenheiten in Prozent von Studierenden bei Lehrveranstaltungen
+	 * Wenn die StudentUID uebergeben wird, werden alle Lehrveranstaltungen zu denen der Studierenden zugeteilt ist inkl Prozent der Anwesenheit
+	 * Wenn die LehrveranstaltungID uebergeben wird, werden alle Studierenden geholt die zugeteilt sind inkl Prozent der Anwesenheit
+	 * Es werden pro Student die Anwesenheiten berechnet aufgrund der Lehreinheit zu der sie zugeordnet sind
+	 * @param $studiensemester_kurzbz
+	 * @param $student_uid
+	 * @param $lehrveranstaltung_id
+	 * @return boolean true wenn ok, false im fehlerfall
+	 */
+	public function loadAnwesenheitStudiensemester($studiensemester_kurzbz, $student_uid=null, $lehrveranstaltung_id=null)
+	{
+		$qry = "SELECT lehrveranstaltung_id, bezeichnung, vorname, nachname, uid, sum(anwesend) as anwesend, sum(nichtanwesend) as nichtanwesend, sum(gesamtstunden) as gesamtstunden FROM (
+				SELECT 
+					lehrveranstaltung_id, bezeichnung, vorname, nachname, uid,
+					(
+					SELECT 
+						sum(einheiten) 
+					FROM 
+						campus.tbl_anwesenheit
+					WHERE
+						lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id
+						AND uid=vw_student_lehrveranstaltung.uid
+						AND anwesend
+					) as anwesend,
+					(
+					SELECT 
+						sum(einheiten) 
+					FROM 
+						campus.tbl_anwesenheit
+					WHERE
+						lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id
+						AND uid=vw_student_lehrveranstaltung.uid
+						AND NOT anwesend
+					) as nichtanwesend,
+					(
+					SELECT count(*) anzahl FROM 
+						(SELECT datum, stunde FROM campus.vw_stundenplan 
+						WHERE lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id GROUP BY datum, stunde) as a
+					) as gesamtstunden
+				FROM 
+					campus.vw_student_lehrveranstaltung
+					JOIN public.tbl_benutzer USING(uid)
+					JOIN public.tbl_person USING(person_id)
+				WHERE
+					studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+
+			if(!is_null($lehrveranstaltung_id))
+				$qry.="	AND lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id);
+			if(!is_null($student_uid))
+				$qry.=" AND uid=".$this->db_add_param($student_uid);
+
+			$qry.=") as b GROUP BY lehrveranstaltung_id, bezeichnung, vorname, nachname, uid";
+
+			if($lehrveranstaltung_id!='')
+				$qry.=" order by nachname, vorname ";
+			elseif($student_uid!='')
+				$qry.=" order by bezeichnung";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->anwesend = $row->anwesend;
+				$obj->nichtanwesend = $row->nichtanwesend;
+				$obj->gesamtstunden = $row->gesamtstunden;
+
+				$obj->erfassteanwesenheit = $row->anwesend+$row->nichtanwesend;
+				if($row->gesamtstunden=='' || $obj->erfassteanwesenheit=='')
+					$obj->prozent=100;
+				else
+					$obj->prozent = number_format(100-(100/$obj->gesamtstunden*$row->nichtanwesend),2);
+				$obj->vorname = $row->vorname;
+				$obj->nachname = $row->nachname;
+				$obj->uid = $row->uid;
+				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg='Fehler beim Laden der Daten';	
 			return false;
 		}
 	}

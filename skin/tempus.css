@@ -162,3 +162,16 @@ toolbarbutton.stplweekoverlay-toolbarbutton:hover
 	color: #AAAAAA;
 	visibility:hidden;
 }
+
+treechildren::-moz-tree-row(makeItred)
+{
+	background-color: #ff8989;
+}
+treechildren::-moz-tree-row(makeItgreen)
+{
+	background-color: #d8ffd8;
+}
+treechildren::-moz-tree-row(makeItyellow)
+{
+	background-color: #ffe6b5;
+}

@@ -370,6 +370,11 @@ else
 							<tab id="student-tab-funktionen" label="Funktionen" onclick="StudentFunktionIFrameLoad();"/>
 							<tab id="student-tab-notizen" label="Notizen"/>
 							<tab id="student-tab-termine" label="Termine" onclick="StudentTermineIFrameLoad();"/>
+							<?php 
+                            if($rechte->isBerechtigt('student/anwesenheit'))
+								echo '<tab id="student-tab-anwesenheit" label="Anwesenheit" onclick="StudentAnwesenheitIFrameLoad();"/>';						
+                            ?>
+
 						</tabs>
 						<tabpanels id="student-tabpanels-main" flex="1">
 							<vbox id="student-detail"  style="margin-top:10px;" />
@@ -394,6 +399,11 @@ else
 								<box class="Notiz" flex="1" id="student-box-notizen"/>
 							</vbox>
 							<iframe id="student-termine" src="" style="margin-top:10px;" />
+							<?php 
+                            if($rechte->isBerechtigt('student/anwesenheit'))
+								echo '<iframe id="student-anwesenheit" src="" style="margin-top:10px;" />';
+                            ?>
+
 						</tabpanels>
 					</tabbox>
 				</vbox>

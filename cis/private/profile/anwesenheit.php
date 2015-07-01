@@ -72,7 +72,7 @@ if(!$semester || !array_key_exists($semester, $alle_semester))
 	$semester = key($alle_semester);
 }
 
-$student->get_lv($uid, $semester);
+//$student->get_lv($uid, $semester);
 ?>
 <!DOCTYPE html>
 <html>
@@ -100,25 +100,24 @@ $student->get_lv($uid, $semester);
 				</select>
 			</form>';
 
-		if($student->result)
+		$anwesenheit = new anwesenheit();
+		$anwesenheit->loadAnwesenheitStudiensemester($semester, $uid);
+		if($anwesenheit->result)
 		{
 
-			foreach($student->result as $lv)
+			foreach($anwesenheit->result as $aw)
 			{
-
-				$stunden_gesamt = $stundenplan->getStunden($lv->lehreinheit_id);
-
-				if(!$stunden_gesamt)
+				if(!$aw->gesamtstunden)
 					continue;
 
-				$fehlstunden = $anwesenheit->getAnwesenheit($uid, $lv->lehreinheit_id);
-				$le_erledigt = $fehlstunden + $anwesenheit->getAnwesenheit($uid, $lv->lehreinheit_id, true);
-				$anwesenheit_relativ = ($stunden_gesamt - $fehlstunden) / $stunden_gesamt * 100;
+				$fehlstunden = $aw->nichtanwesend;
+				$le_erledigt = $aw->erfassteanwesenheit;
+				$anwesenheit_relativ = $aw->prozent;
 				
 				echo '
 				<div class="lv">
 					<div>
-						'.$db->convert_html_chars($lv->bezeichnung).' ('.$lv->lehrform_kurzbz.')
+						'.$db->convert_html_chars($aw->bezeichnung).'
 					</div>
 					<div>
 						<div class="progress-wrapper">
@@ -126,7 +125,7 @@ $student->get_lv($uid, $semester);
 							
 							</div>
 						</div>'.round($anwesenheit_relativ, 1).'%
-						'.$p->t('anwesenheitsliste/leAbgeschlossen').' ['.$le_erledigt.'/'.$stunden_gesamt.']';
+						'.$p->t('anwesenheitsliste/leAbgeschlossen').' ['.$le_erledigt.'/'.$aw->gesamtstunden.']';
 
 						if($fehlstunden)
 						{
@@ -134,8 +133,9 @@ $student->get_lv($uid, $semester);
 							<span class="fehlstunden-details" title="'.$p->t('anwesenheitsliste/fehlstunden').'">&gt;&gt;</span>
 							<div style="display: none;">
 							<table><tr><td>'.$p->t('global/datum').'</td><td>'.$p->t('anwesenheitsliste/fehlstunden').'</td></tr>';
-							$abwesend_termine = $anwesenheit->getAbwesendTermine($uid, $lv->lehreinheit_id);
-							foreach($abwesend_termine as $termin)
+							$anwesenheit_termine = new anwesenheit();
+							$anwesenheit_termine->getAnwesenheitLehrveranstaltung($uid, $aw->lehrveranstaltung_id, $semester, false);
+							foreach($anwesenheit_termine->result as $termin)
 							{
 								echo '	<tr>
 											<td>'.$datum_obj->formatDatum($termin->datum,'d.m.Y').'</td>

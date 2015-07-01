@@ -3568,6 +3568,7 @@ $berechtigungen = array(
 	array('soap/buchungen','Berechtigung für Buchungsabfrage Addon Kontoimport'),
 	array('student/bankdaten','Bankdaten des Studenten'),
     array('student/anrechnung','Anrechnungen des Studenten'),
+    array('student/anwesenheit','Anwesenheiten im FAS'),
 	array('student/dokumente','Wenn SUID dann dürfen Dokumente auch wieder entfernt werden'),
 	array('student/noten','Notenverwaltung'),
 	array('student/stammdaten','Stammdaten der Studenten'),

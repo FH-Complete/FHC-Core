@@ -104,13 +104,15 @@ class rdf
 	 * @param $value
 	 * @param $cdata
 	 */
-	public function setAttribut($name,$value,$cdata=true)
+	public function setAttribut($name,$value,$cdata=true, $parsetype=null)
 	{
 		if(!isset($this->attr[$this->counter]))
 			$this->attr[$this->counter] = new stdClass();
 		$this->attr[$this->counter]->name=$name;
 		$this->attr[$this->counter]->value=$value;
 		$this->attr[$this->counter]->cdata=$cdata;
+		if(!is_null($parsetype))
+			$this->attr[$this->counter]->parseType=$parsetype;
 		$this->counter++;
 		//var_dump($this->attr);
 		return true;
@@ -122,7 +124,7 @@ class rdf
 	public function createRdfHeader()
 	{
 		$this->rdf_text="\n".'<RDF:RDF'."\n\t"
-			.'xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"'."\n\t".'xmlns:'.$this->xml_ns.'="'.$this->rdf_url.'/rdf#"'."\n".'>'."\n\t";
+			.'xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"'."\n\t".'xmlns:nc="http://home.netscape.com/NC-rdf#"'."\n\t".'xmlns:'.$this->xml_ns.'="'.$this->rdf_url.'/rdf#"'."\n".'>'."\n\t";
 	}
 	
 	/**
@@ -134,7 +136,13 @@ class rdf
 		{		
 			$this->rdf_text.="\n\t\t".'<RDF:Description id="'.$obj->obj_id.'"  about="'.$this->rdf_url.'/'.$obj->obj_id.'" >';
 			foreach ($obj->attr as $attr)
-				$this->rdf_text.="\n\t\t\t<".$this->xml_ns.':'.$attr->name.'><![CDATA['.$attr->value.']]></'.$this->xml_ns.':'.$attr->name.'>';
+			{
+				if(isset($attr->parseType))
+					$parsetype = 'nc:parseType="'.$attr->parseType.'"';
+				else
+					$parsetype='';
+				$this->rdf_text.="\n\t\t\t<".$this->xml_ns.':'.$attr->name.' '.$parsetype.'><![CDATA['.$attr->value.']]></'.$this->xml_ns.':'.$attr->name.'>';
+			}
 			$this->rdf_text.="\n\t\t".'</RDF:Description>';
 		}
 	}

@@ -765,6 +765,12 @@ function LeAuswahl()
 				document.getElementById('lehrveranstaltung-termine').setAttribute('src','termine.xul.php?lehrveranstaltung_id='+lehrveranstaltung_id);
 			}
 
+			if(document.getElementById('lehrveranstaltung-tabs').selectedItem==document.getElementById('lehrveranstaltung-tab-anwesenheit'))
+			{
+				// Anwesenheit Laden
+				document.getElementById('lehrveranstaltung-anwesenheit').setAttribute('src','anwesenheit.xul.php?lehrveranstaltung_id='+lehrveranstaltung_id);
+			}
+
 			LeDetailDisableFields(true);
 			//Details zuruecksetzen
 			LeDetailReset();
@@ -2361,6 +2367,28 @@ function LehrveranstaltungTermineIFrameLoad()
 			document.getElementById('lehrveranstaltung-termine').setAttribute('src','termine.xul.php?lehreinheit_id='+lehreinheit_id);
 		else
 			document.getElementById('lehrveranstaltung-termine').setAttribute('src','termine.xul.php?lehrveranstaltung_id='+lehrveranstaltung_id);
+	}
+	catch(e)
+	{}
+}
+
+/**
+ * Laedt die Anwesenheiten einer Lehrveranstaltung wenn auf den Tab gewechselt wird
+ */
+function LehrveranstaltungTermineIFrameLoad()
+{
+	var tree = document.getElementById('lehrveranstaltung-tree');
+
+	if (tree.currentIndex==-1) 
+		return;
+	try
+	{
+		//Ausgewaehlte LV holen
+		var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
+		var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
+
+		if(lehrveranstaltung_id!='')
+			document.getElementById('lehrveranstaltung-anwesenheit').setAttribute('src','anwesenheit.xul.php?lehrveranstaltung_id='+lehrveranstaltung_id);
 	}
 	catch(e)
 	{}
