@@ -670,7 +670,8 @@ class lehrstunde extends basis_db
 				WHERE
 					tbl_stundenplandev.datum=".$this->db_add_param($this->datum)."
 					AND tbl_stundenplandev.stunde=".$this->db_add_param($this->stunde)."
-					AND betriebsmittel_id IN(SELECT betriebsmittel_id FROM lehre.tbl_stundenplan_betriebsmittel WHERE stundenplandev_id=".$this->db_add_param($this->stundenplan_id).")";
+					AND betriebsmittel_id IN(SELECT betriebsmittel_id FROM lehre.tbl_stundenplan_betriebsmittel WHERE stundenplandev_id=".$this->db_add_param($this->stundenplan_id).")
+					AND tbl_stundenplandev.stundenplandev_id<>".$this->db_add_param($this->stundenplan_id);
 
 		if($result = $this->db_query($qry))
 		{
