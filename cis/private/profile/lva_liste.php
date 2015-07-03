@@ -182,7 +182,7 @@ require_once('../../../include/lvangebot.class.php');
 			echo '</tr>
 			</thead><tbody>';
 		$stg_obj = new studiengang();
-		$stg_obj->getAll();
+		$stg_obj->getAll(null,null);
 		$summe_std=0;
 		
 		for ($i=0; $i<$num_rows; $i++)
@@ -279,7 +279,7 @@ require_once('../../../include/lvangebot.class.php');
 				tbl_projektbetreuer.person_id=".$db->db_add_param($mitarbeiter->person_id, FHC_INTEGER);
 	
 	$stg_obj = new studiengang();
-	$stg_obj->getAll();
+	$stg_obj->getAll(null,null);
 	
 	if($result = $db->db_query($qry))
 	{
