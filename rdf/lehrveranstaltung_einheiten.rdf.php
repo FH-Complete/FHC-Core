@@ -71,7 +71,7 @@ if($uid!='' && $stg_kz!=-1) // Alle LVs eines Mitarbeiters
 		        studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
 				AND mitarbeiter_uid=".$db->db_add_param($uid);
 	if($stg_kz!='')
-		$qry .=" AND studiengang_kz=".$db->db_add_param($stg_kz);
+		$qry .=" AND lv_studiengang_kz=".$db->db_add_param($stg_kz);
 
 }
 elseif($fachbereich_kurzbz!='') // Alle LVs eines Fachbereiches
