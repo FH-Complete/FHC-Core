@@ -78,7 +78,8 @@ if(strlen($gruppen)>50)
 	$linebreak="\n";
 else 
 	$linebreak=' ';
-$pdf->MultiCell(0,15,'Gruppe: '.$gruppen.$linebreak.'Studiensemester: '.$stsem);
+$semester = new studiensemester($stsem);
+$pdf->MultiCell(0,15,'Gruppe: '.$gruppen.$linebreak.'Studiensemester: '.(($semester->beschreibung != NULL) ? $semester->beschreibung : $stsem));
 	
 $maxY=$pdf->GetY();
 $maxY=getmax($maxY,$pdf->GetY());

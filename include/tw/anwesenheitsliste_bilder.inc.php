@@ -76,7 +76,8 @@ if($result = $db->db_query($qry))
 $gruppen=mb_convert_encoding($gruppen,'ISO-8859-15','UTF-8');
 
 $pdf->MultiCell(0,20,'Gruppe: '.$gruppen);
-$pdf->MultiCell(0,20,'Studiensemester: '.$stsem);
+$semester = new studiensemester($stsem);
+$pdf->MultiCell(0,20,'Studiensemester: '.(($semester->beschreibung != NULL) ? $semester->beschreibung : $stsem));
 	
 $maxY=$pdf->GetY();
 $maxY=getmax($maxY,$pdf->GetY());

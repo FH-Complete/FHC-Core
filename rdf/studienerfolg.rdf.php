@@ -77,6 +77,8 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	if($studiensemester_aktuell!=$prestudentstatus->studiensemester_kurzbz)
 		$studiensemester_aktuell = $prestudentstatus->studiensemester_kurzbz;
 	
+	$studiensemester->load($studiensemester_aktuell);
+	
 	$semester_aktuell='';
 	$qry_semester = "SELECT tbl_prestudentstatus.ausbildungssemester as semester FROM public.tbl_student, public.tbl_prestudentstatus 
 					WHERE tbl_student.prestudent_id=tbl_prestudentstatus.prestudent_id 
@@ -120,10 +122,13 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 		$stgl .= trim($stgl_ma->titelpre.' '.$stgl_ma->vorname.' '.$stgl_ma->nachname.' '.$stgl_ma->titelpost);
 	}
 	
+	$stdsem = new studiensemester($studiensemester_kurzbz);
+	
 	$xml .= "	<studienerfolg>";
 	$xml .= "		<logopath>".DOC_ROOT."skin/images/</logopath>";
 	$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";
 	$xml .= "		<studiensemester_aktuell>".$studiensemester_aktuell."</studiensemester_aktuell>";
+	$xml .= "		<studiensemester_aktuell_beschreibung>".(($studiensemester->beschreibung != NULL) ? $studiensemester->beschreibung : $studiensemester_aktuell)."</studiensemester_aktuell_beschreibung>";
 	$xml .=	"		<semester>".$row->semester."</semester>";
 	$xml .=	"		<semester_aktuell>".$semester_aktuell.($semester_aktuell!=''?'. Semester':'')."</semester_aktuell>";
 	$xml .=	"		<semester_aktuell_semester>".$semester_aktuell."</semester_aktuell_semester>";
@@ -137,7 +142,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 	$xml .= "		<gebdatum>".$gebdatum."</gebdatum>";
 	$xml .= "		<matrikelnr>".$row->matrikelnr."</matrikelnr>";
-	$xml .= "		<studiensemester_kurzbz>".$studiensemester_kurzbz."</studiensemester_kurzbz>";
+	$xml .= "		<studiensemester_kurzbz>".(($stdsem->beschreibung != NULL) ? $stdsem->beschreibung : $studiensemester_kurzbz)."</studiensemester_kurzbz>";
 	$datum_aktuell = date('d.m.Y');
 	$xml .= "		<datum>".$datum_aktuell."</datum>";
 	$xml .= "		<orgform>".$orgform."</orgform>";
