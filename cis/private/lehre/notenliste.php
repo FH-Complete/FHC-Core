@@ -47,6 +47,8 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="../../../include/js/jquery.js"></script>
+	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 	<title>'.$p->t('tools/leistungsbeurteilung').'</title>
 
 	<script language="JavaScript" type="text/javascript">
@@ -59,6 +61,15 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	  	selObj.selectedIndex = 0;
 	  }
 	}
+    
+    $(document).ready(function() 
+    { 
+        $("#notenliste").tablesorter(
+        {
+            sortList: [[3,1]],
+            widgets: ["zebra"]
+        }); 
+    });
 	</script>
 </head>
 
@@ -177,21 +188,24 @@ else
 	if($result=$db->db_query($qry))
 	{
 		//Tabelle anzeigen
-		$tbl= "<table>
-			<tr class='liste'>
-				<th>".$p->t('global/lehrveranstaltung')."</th>
-				<th>".$p->t('benotungstool/lvNote')."</th>";
-		if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
-			$tbl.="<th>".$p->t('benotungstool/punkte')."</th>";
+		$tbl= "<table class='tablesorter' id='notenliste' style='width: auto;'>
+			<thead>
+                <tr class='liste'>
+                    <th>".$p->t('global/lehrveranstaltung')."</th>
+                    <th>".$p->t('benotungstool/lvNote')."</th>";
+            if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+                $tbl.="<th>".$p->t('benotungstool/punkte')."</th>";
 
-		$tbl.="	<th>".$p->t('benotungstool/zeugnisnote')."</th>";
-		if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
-			$tbl.="<th>".$p->t('benotungstool/punkte')."</th>";
+            $tbl.="	<th>".$p->t('benotungstool/zeugnisnote')."</th>";
+            if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+                $tbl.="<th>".$p->t('benotungstool/punkte')."</th>";
 
-		$tbl.="
-				<th>".$p->t('tools/benotungsdatumDerZeugnisnote')."</th>
-				<th>".$p->t('benotungstool/pruefung')."</th>
-			</tr>";
+            $tbl.="
+                    <th>".$p->t('tools/benotungsdatumDerZeugnisnote')."</th>
+                    <th>".$p->t('benotungstool/pruefung')."</th>
+                </tr>
+            </thead>
+            <tbody>";
 		$i=0;
 		while($row=$db->db_fetch_object($result))
 		{
@@ -271,7 +285,7 @@ else
 		}
 		
 
-		$tbl.= "</table>";
+		$tbl.= "</tbody></table>";
 		if($i==0)
 			echo $p->t('tools/nochKeineBeurteilungEingetragen');
 		else
