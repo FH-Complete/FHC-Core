@@ -109,8 +109,7 @@ if(isset($_GET['show']))
 				JOIN testtool.tbl_frage_sprache USING(frage_id)
 				JOIN testtool.tbl_gebiet USING(gebiet_id)
 			WHERE 
-				demo=false
-				AND tbl_frage_sprache.sprache='German'";
+				demo=false";
 	if($stg_kz!='')
 		$qry.=" AND studiengang_kz='".addslashes($stg_kz)."'";
 	if($gebiet_id!='')
@@ -124,6 +123,8 @@ if(isset($_GET['show']))
 			if($row = $db->db_fetch_object($result,0))
 			{
 				echo '<br />
+					(!) Bei der Berechnung werden die Antworten aus allen verfügbaren Sprachen addiert.
+					<br /><br />
 					Bearbeitungszeit: '.$row->zeit.'<br>
 					Multipleresponse: '.($db->db_parse_bool($row->multipleresponse)==true?'Ja':'Nein').'<br>
 					Gestellte Fragen: '.$row->maxfragen.'<br>
