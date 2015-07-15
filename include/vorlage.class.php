@@ -235,6 +235,33 @@ class vorlage extends basis_db
 	}
 	
 	/**
+	 * Liefert alle OEs, welche die $vorlage_kurzbz verwenden
+	 * @param $vorlage_kurzbz Kurzbezeichnung der Vorlage
+	 */
+	public function getOEsFromVorlage($vorlage_kurzbz=null)
+	{
+		$qry ="SELECT 
+					oe_kurzbz 
+				FROM 
+					public.tbl_vorlagestudiengang 
+				WHERE
+					vorlage_kurzbz=".$this->db_add_param($vorlage_kurzbz);
+	
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new vorlage();
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				
+				$this->result[]= $obj;
+			}
+		}
+		else
+			return false;
+	}
+	
+	/**
 	 * Speichert die Vorlage zu einer OE
 	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
 	 * angelegt, ansonsten der Datensatz upgedated

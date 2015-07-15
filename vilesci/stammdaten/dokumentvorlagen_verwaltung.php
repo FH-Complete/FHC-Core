@@ -192,8 +192,8 @@ foreach ($vorlage->result as $row)
 echo '</SELECT>';
 
 //OE-Dropdown
-$organisationseinheit = new organisationseinheit();
-$organisationseinheit->getAll(true, true);
+$organisationseinheit = new vorlage();
+$organisationseinheit->getOEsFromVorlage($vorlage_kurzbz);
 
 echo "<SELECT name='oe_kurzbz' id='organisationseinheit' onchange='window.location.href=this.value'>";
 if($oe_kurzbz==$default_oe)
@@ -355,6 +355,7 @@ if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 		$oe->load($row->oe_kurzbz);
 		$vorlage->loadVorlage($row->vorlage_kurzbz);
 		$vorlage_bezeichnung = ($vorlage->bezeichnung==''?$vorlage->vorlage_kurzbz:$vorlage->bezeichnung);
+		
 		echo '
 			<tr>
 				<td>'.$db->convert_html_chars($vorlage_bezeichnung).'</td>
