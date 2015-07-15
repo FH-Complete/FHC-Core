@@ -645,7 +645,7 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 
 		if ($anmerkungen_en)
 		{
-			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/anmerkungeEN')."</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/anmerkungenEN')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($anmerkungen_en)."&nbsp;<br /></td></tr>";
 		}
 	}
