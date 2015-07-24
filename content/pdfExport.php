@@ -341,14 +341,24 @@ if (!isset($_REQUEST["archive"]))
 
 		// Wenn ein Style XSL uebergeben wurde wird ein zweites XML File erstellt mit den
 		// Styleanweisungen und ebenfalls zum Zip hinzugefuegt        
-		if(isset($_GET['style_xsl']))
+		if(isset($_GET['style_xsl']) || $vorlage->style!='')
 		{
-			$style_xsl=$_GET['style_xsl'];
-			$style_vorlage = new vorlage();
-			$style_vorlage->getAktuelleVorlage($xsl_stg_kz, $style_xsl, $version);
-	        $style_xsl_doc = new DOMDocument;
-			if(!$style_xsl_doc->loadXML($style_vorlage->text))
-				die('unable to load xsl');
+			//Wenn die Spalte style in der DB befuellt ist, wird dieses verwendet
+			if($vorlage->style!='')
+			{
+				$style_xsl_doc = new DOMDocument;
+				if(!$style_xsl_doc->loadXML($vorlage->style))
+					die('unable to load xsl from tbl_vorlagestudiengang');
+			}
+			else 
+			{
+				$style_xsl=$_GET['style_xsl'];
+				$style_vorlage = new vorlage();
+				$style_vorlage->getAktuelleVorlage($xsl_stg_kz, $style_xsl, $version);
+		        $style_xsl_doc = new DOMDocument;
+				if(!$style_xsl_doc->loadXML($style_vorlage->text))
+					die('unable to load xsl');
+			}
 		    
 			// Configure the transformer
 			$style_proc = new XSLTProcessor;
@@ -380,7 +390,7 @@ if (!isset($_REQUEST["archive"]))
 		if(copy($zipfile, $tempname_zip))
 		{
 			exec("zip $tempname_zip content.xml");
-			if(isset($_GET['style_xsl']))
+			if(isset($_GET['style_xsl']) || $vorlage->style!='')
 				exec("zip $tempname_zip styles.xml");
 
 			clearstatcache(); 
@@ -464,7 +474,7 @@ if (!isset($_REQUEST["archive"]))
 			fclose($handle);
 
 			unlink('content.xml');
-			if(isset($_GET['style_xsl']))
+			if(isset($_GET['style_xsl']) || $vorlage->style!='')
 				unlink('styles.xml');
 			unlink($tempname_zip);
             if($output=='pdf' || $output=='doc')
@@ -595,12 +605,22 @@ else
 			// Styleanweisungen und ebenfalls zum Zip hinzugefuegt        
 			if(isset($_GET['style_xsl']))
 			{
-				$style_xsl=$_GET['style_xsl'];
-				$style_vorlage = new vorlage();
-				$style_vorlage->getAktuelleVorlage($xsl_stg_kz, $style_xsl, $version);
-			    $style_xsl_doc = new DOMDocument;
-				if(!$style_xsl_doc->loadXML($style_vorlage->text))
-					die('unable to load xsl');
+				//Wenn die Spalte style in der DB befuellt ist, wird dieses verwendet
+				if($vorlage->style!='')
+				{
+					$style_xsl_doc = new DOMDocument;
+					if(!$style_xsl_doc->loadXML($vorlage->style))
+						die('unable to load xsl from tbl_vorlagestudiengang');
+				}
+				else 
+				{
+					$style_xsl=$_GET['style_xsl'];
+					$style_vorlage = new vorlage();
+					$style_vorlage->getAktuelleVorlage($xsl_stg_kz, $style_xsl, $version);
+			        $style_xsl_doc = new DOMDocument;
+					if(!$style_xsl_doc->loadXML($style_vorlage->text))
+						die('unable to load xsl');
+				}
 				
 				// Configure the transformer
 				$style_proc = new XSLTProcessor;
@@ -632,7 +652,7 @@ else
 			if(copy($zipfile, $tempname_zip))
 			{
 				exec("zip $tempname_zip content.xml");
-				if(isset($_GET['style_xsl']))
+				if(isset($_GET['style_xsl']) || $vorlage->style!='')
 					exec("zip $tempname_zip styles.xml");
 
 				clearstatcache(); 

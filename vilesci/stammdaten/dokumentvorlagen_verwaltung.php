@@ -195,6 +195,12 @@ echo '</SELECT>';
 $organisationseinheit = new vorlage();
 $organisationseinheit->getOEsFromVorlage($vorlage_kurzbz);
 
+if ($organisationseinheit->result=='')
+{
+	$organisationseinheit = new organisationseinheit();
+	$organisationseinheit->getAll();
+}
+
 echo "<SELECT name='oe_kurzbz' id='organisationseinheit' onchange='window.location.href=this.value'>";
 if($oe_kurzbz==$default_oe)
 	$selected='selected';

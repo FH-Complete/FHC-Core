@@ -240,12 +240,15 @@ class vorlage extends basis_db
 	 */
 	public function getOEsFromVorlage($vorlage_kurzbz=null)
 	{
-		$qry ="SELECT 
-					oe_kurzbz 
+		$qry ="SELECT DISTINCT
+					tbl_organisationseinheit.* 
 				FROM 
 					public.tbl_vorlagestudiengang 
+				JOIN 
+					public.tbl_organisationseinheit USING (oe_kurzbz)
 				WHERE
-					vorlage_kurzbz=".$this->db_add_param($vorlage_kurzbz);
+					vorlage_kurzbz=".$this->db_add_param($vorlage_kurzbz)."
+				ORDER BY oe_kurzbz";
 	
 		if($result = $this->db_query($qry))
 		{
@@ -253,6 +256,12 @@ class vorlage extends basis_db
 			{
 				$obj = new vorlage();
 				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->mailverteiler = $this->db_parse_bool($row->mailverteiler);
+				$obj->lehre = $this->db_parse_bool($row->lehre);
 				
 				$this->result[]= $obj;
 			}
@@ -428,6 +437,10 @@ class vorlage extends basis_db
 				$this->text = $row->text;
 				$this->mimetype = $row->mimetype;
 				$this->bezeichnung = $row->bezeichnung;
+				$this->style = $row->style;
+				$this->berechtigung = $row->berechtigung;
+				$this->anmerkung_vorlagestudiengang = $row->anmerkung_vorlagestudiengang;
+				
 				return true;
 			}
 			else 
