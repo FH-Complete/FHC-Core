@@ -149,6 +149,7 @@ echo '
 			<td>Name</td>
 			<td><input type="text" name="filter" value="'.$filter.'"></td>
 			<td><input type="submit" value="Anzeigen"/></td>
+			<td width="100%" align="right"><a href="incoming_lehrveranstaltungen.php?method=lehrveranstaltungen" target="incoming_detail">Übersicht Lehrveranstaltungen</a></td>
 		</tr>
 	</table>
 </form>

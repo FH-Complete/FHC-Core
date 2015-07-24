@@ -118,4 +118,6 @@ $this->phrasen['incoming/unitcode']='Unitcode';
 $this->phrasen['incoming/zurAnmeldung']='Registration';
 $this->phrasen['incoming/geaendertesLA']='Changed Learning Agreement';
 $this->phrasen['incoming/studienrichtungGastuniversitaet']= 'Program home university';
+$this->phrasen['incoming/orgform']='Org. structure';
+$this->phrasen['incoming/alleSprachen']='All languages';
 ?>
