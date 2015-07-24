@@ -3146,7 +3146,6 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
-
 // Spalte anrechnung_id fuer campus.tbl_pruefungsanmeldung
 if(!$result = @$db->db_query("SELECT anrechnung_id FROM campus.tbl_pruefungsanmeldung"))
 {
@@ -3171,6 +3170,74 @@ if(!$result = @$db->db_query("SELECT warn_semesterstunden_frei FROM public.tbl_o
 		echo '<strong>public.tbl_organisationseinheit '.$db->db_last_error().'</strong><br>';
 	else
 		echo ' public.tbl_organisationseinheit: neue Spalte warn_semesterstunden_frei, warn_semesterstunden_fix hinzugefuegt!<br>';
+}
+
+// Gruppe CMS_LOCK anlegen (benoetigt fuer das Sperren von CMS-Content)
+if($result = @$db->db_query("SELECT 1 FROM public.tbl_gruppe WHERE gruppe_kurzbz='CMS_LOCK' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO public.tbl_gruppe(gruppe_kurzbz,studiengang_kz,semester,bezeichnung,beschreibung,sichtbar,lehre,aktiv,sort,mailgrp,generiert,insertamum,insertvon,orgform_kurzbz,content_visible,gesperrt,zutrittssystem) VALUES('CMS_LOCK',0,NULL,'CMS_LOCK','Sperrgruppe CMS',FALSE,TRUE,TRUE,NULL,FALSE,FALSE,now(),'checksystem',NULL,WAHR,FALSE,FALSE);
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_gruppe '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' public.tbl_gruppe: Gruppe CMS_LOCK angelegt (benoetigt fuer das Sperren von CMS-Content)<br>';
+	}
+}
+
+// DMS-Kategorie Akte anlegen und mit CMS_LOCK sperren
+if($result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz='Akte' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO campus.tbl_dms_kategorie(kategorie_kurzbz,bezeichnung,beschreibung,parent_kategorie_kurzbz) VALUES('Akte','Akten','Akten zu Personen',NULL);
+		INSERT INTO campus.tbl_dms_kategorie_gruppe(kategorie_kurzbz,gruppe_kurzbz,insertamum,insertvon) VALUES('Akte','CMS_LOCK',now(),'checksystem');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_dms_kategorie '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' campus.tbl_dms_kategorie: Kategorie Akte angelegt und mit Gruppe CMS_LOCK gesperrt<br>';
+	}
+}
+
+// DMS-Kategorie notiz anlegen und mit CMS_LOCK sperren
+if($result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz='notiz' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO campus.tbl_dms_kategorie(kategorie_kurzbz,bezeichnung,beschreibung,parent_kategorie_kurzbz) VALUES('notiz','Notizen',NULL,NULL);
+		INSERT INTO campus.tbl_dms_kategorie_gruppe(kategorie_kurzbz,gruppe_kurzbz,insertamum,insertvon) VALUES('notiz','CMS_LOCK',now(),'checksystem');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_dms_kategorie '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' campus.tbl_dms_kategorie: Kategorie Notiz angelegt und mit Gruppe CMS_LOCK gesperrt<br>';
+	}
+}
+
+// Spalte style, berechtigung und anmerkung_vorlagestudiengang fuer public.tbl_vorlagestudiengang und neues Recht basis/dokumente fuer die Dokumentenverwaltung
+if(!$result = @$db->db_query("SELECT style FROM public.tbl_vorlagestudiengang"))
+{
+	$qry = "ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN style text;
+			ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN berechtigung varchar(32)[];
+			ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN anmerkung_vorlagestudiengang text;
+			
+			INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('basis/dokumente','Verwaltung der Dokumentvorlagen');
+			
+			GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_vorlagestudiengang TO vilesci;
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_vorlagestudiengang: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_vorlagestudiengang: Neue Spalten style, berechtigung und anmerkung_vorlagestudiengang hinzugefuegt. Neues Recht basis/dokumente angelegt';
 }
 
 echo '<br><br><br>';
@@ -3386,7 +3453,7 @@ $tabellen=array(
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype"),
-	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz"),
+	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz","style","berechtigung","anmerkung_vorlagestudiengang"),
 	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon","ablauf_vorgaben_id"),
 	"testtool.tbl_ablauf_vorgaben"  => array("ablauf_vorgaben_id","studiengang_kz","sprache","sprachwahl","content_id","insertamum","insertvon","updateamum", "updatevon"),		
 	"testtool.tbl_antwort"  => array("antwort_id","pruefling_id","vorschlag_id"),

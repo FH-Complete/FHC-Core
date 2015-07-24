@@ -203,7 +203,6 @@ class service extends basis_db
 					) AS a
 					GROUP BY service_id,oe_kurzbz,bezeichnung,beschreibung,ext_id,content_id
 					ORDER BY anzahl DESC,bezeichnung,oe_kurzbz";
-						   echo $qry;
 		
 		if($result = $this->db_query($qry))
 		{
