@@ -392,6 +392,34 @@ class gebiet extends basis_db
 			$this->errormsg = "Es wurden keine Maximalpunkte fuer dieses Gebiet eingetragen\n";
 		}
 		
+		// Pruefung, ob eine Frage mehrere gleiche Antworten oder gleiche Bilder hat
+		$qry = "SELECT text AS antwort, sprache, frage_id, tbl_frage.nummer, COUNT(text) AS Anz
+				FROM testtool.tbl_vorschlag_sprache 
+				JOIN testtool.tbl_vorschlag USING (vorschlag_id)
+				JOIN testtool.tbl_frage USING (frage_id)
+				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)."
+				AND (bild IS NULL AND audio IS NULL)
+				GROUP BY antwort,frage_id,tbl_frage.nummer,sprache
+				HAVING ( COUNT(text) > 1 )
+				
+				UNION
+				
+				SELECT bild AS antwort, sprache, frage_id, tbl_frage.nummer, COUNT(bild) AS Anz
+				FROM testtool.tbl_vorschlag_sprache 
+				JOIN testtool.tbl_vorschlag USING (vorschlag_id)
+				JOIN testtool.tbl_frage USING (frage_id)
+				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)."
+				AND ((text IS NULL OR text='' OR text=' ') AND audio IS NULL)
+				GROUP BY antwort,frage_id,tbl_frage.nummer,sprache
+				HAVING ( COUNT(bild) > 1 );";
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$this->errormsg .= "Frage Nummer $row->nummer (ID: $row->frage_id) Sprache $row->sprache hat mehrere gleiche Antworten.\n";
+			}
+		}
+		
 		if($this->errormsg=='')
 			return true;
 		else 
