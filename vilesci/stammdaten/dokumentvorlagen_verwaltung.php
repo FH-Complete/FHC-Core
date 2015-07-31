@@ -240,13 +240,123 @@ else
 //Formular zum Bearbeiten der Vorlage
 echo '
 <input type="button" value="Neue OE-Vorlage anlegen" onclick="window.location.href=\''.$_SERVER['PHP_SELF'].'?vorlage_kurzbz='.$vorlage_kurzbz.'&oe_kurzbz='.$oe_kurzbz.'&neu=true\'" >
-<hr>
-<form method="POST" action="'.$_SERVER['PHP_SELF'].'">
-	<table>
-		<tr>
-			<td>Vorlage</td>
-			<td>';
-			
+<input type="button" value="Neue Vorlage anlegen" onclick="window.location.href=\''.$_SERVER['PHP_SELF'].'?neueVorlage=true\'" >
+<input type="button" value="Vorlage bearbeiten" onclick="window.location.href=\''.$_SERVER['PHP_SELF'].'?vorlageBearbeiten='.$vorlage_kurzbz.'\'" >
+<hr>';
+if ((isset($_GET['neueVorlage']) && $_GET['neueVorlage'] == 'true'))
+{
+	echo'
+			<form action="'.$_SERVER['PHP_SELF'].'?neueVorlage=save" method="POST">
+				<table>
+					<tr>
+						<td>Vorlagenkurzbezeichnung</td>
+						<td>
+							<input type="text" size="64" maxlength="64" name="neueVorlage_vorlage_kurzbz">
+						</td>
+					</tr>
+					<tr>
+						<td>Bezeichnung</td>
+						<td>
+							<textarea cols="80" rows="4" name="neueVorlage_bezeichnung"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td>Anmerkung</td>
+						<td>
+							<textarea cols="80" rows="4" name="neueVorlage_anmerkung"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td>Mimetype</td>
+						<td>
+							<textarea cols="80" rows="4" name="neueVorlage_mimetype"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
+							<input type="submit" value="Neu anlegen">
+						</td>
+					</tr>
+				</table>
+			</form>
+		';
+}
+elseif (isset($_GET['vorlageBearbeiten']))
+{
+	$vorlage = new vorlage();
+	$vorlage->loadVorlage($_GET['vorlageBearbeiten']);
+	echo'
+			<form action="'.$_SERVER['PHP_SELF'].'?updateVorlage=true&vorlage_kurzbz='.$vorlage->vorlage_kurzbz.'" method="POST">
+				<table>
+					<tr>
+						<td>Vorlagenkurzbezeichnung</td>
+						<td>
+							<input type="text" size="64" maxlength="64" name="updateVorlage_vorlage_kurzbz" value="'.$db->convert_html_chars($vorlage->vorlage_kurzbz).'" disabled>
+						</td>
+					</tr>
+					<tr>
+						<td>Bezeichnung</td>
+						<td>
+							<textarea cols="80" rows="4" name="updateVorlage_bezeichnung">'.$db->convert_html_chars($vorlage->bezeichnung).'</textarea>
+						</td>
+					</tr>
+					<tr>
+						<td>Anmerkung</td>
+						<td>
+							<textarea cols="80" rows="4" name="updateVorlage_anmerkung">'.$db->convert_html_chars($vorlage->anmerkung).'</textarea>
+						</td>
+					</tr>
+					<tr>
+						<td>Mimetype</td>
+						<td>
+							<textarea cols="80" rows="4" name="updateVorlage_mimetype">'.$db->convert_html_chars($vorlage->mimetype).'</textarea>
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td>
+							<input type="submit" value="Änderungen speichern">
+						</td>
+					</tr>
+				</table>
+			</form>
+		';
+}
+else
+{
+	if ((isset($_GET['neueVorlage']) && $_GET['neueVorlage'] == 'save'))
+	{
+		$neuevorlage = new vorlage();
+		$neuevorlage->vorlage_kurzbz = htmlspecialchars($_POST['neueVorlage_vorlage_kurzbz']);
+		$neuevorlage->bezeichnung = htmlspecialchars($_POST['neueVorlage_bezeichnung']);
+		$neuevorlage->anmerkung = htmlspecialchars($_POST['neueVorlage_anmerkung']);
+		$neuevorlage->mimetype = htmlspecialchars($_POST['neueVorlage_mimetype']);
+		if (!($neuevorlage->saveVorlage(true)))
+		{
+			echo 'Fehler beim Speichern';
+		}
+	}
+	elseif (isset($_GET['updateVorlage']) && $_GET['updateVorlage'] == 'true')
+	{
+		$updatevorlage = new vorlage();
+		$updatevorlage->loadVorlage($_GET['vorlage_kurzbz']);
+		$updatevorlage->bezeichnung = htmlspecialchars($_POST['updateVorlage_bezeichnung']);
+		$updatevorlage->anmerkung = htmlspecialchars($_POST['updateVorlage_anmerkung']);
+		$updatevorlage->mimetype = htmlspecialchars($_POST['updateVorlage_mimetype']);
+		if (!($updatevorlage->saveVorlage()))
+		{
+			echo 'Fehler beim Speichern';
+		}
+	}
+	
+	echo '
+		<form method="POST" action="'.$_SERVER['PHP_SELF'].'">
+			<table>
+				<tr>
+					<td>Vorlage</td>
+					<td>';
+				
 			if($vorlageOE->oe_kurzbz!='')
 				$oe=$vorlageOE->oe_kurzbz;
 			elseif($oe_kurzbz!='')
@@ -256,9 +366,9 @@ echo '
 			//Vorlagen DropDown
 			$vorlage = new vorlage();
 			$vorlage->getAllVorlagen('bezeichnung');
-			
+				
 			echo '<SELECT name="vorlage_kurzbz" id="vorlage">';
-			foreach ($vorlage->result as $row) 
+			foreach ($vorlage->result as $row)
 			{
 				//if($reihungstest_id=='')
 				//	$reihungstest_id=$row->reihungstest_id;
@@ -266,22 +376,22 @@ echo '
 					$selected='selected';
 				else
 					$selected='';
-			
+					
 				echo '<OPTION value="'.$row->vorlage_kurzbz.'" '.$selected.'>'.$db->convert_html_chars(($row->bezeichnung==''?$row->vorlage_kurzbz:$row->bezeichnung)).'</OPTION>';
 				echo "\n";
 			}
 			echo '</SELECT>
-			
-			</td>		
-		<tr>
-			<td>Organisationseinheit</td>
-			<td>';
+				
+					</td>
+				<tr>
+					<td>Organisationseinheit</td>
+					<td>';
 			//OE-Dropdown
 			$organisationseinheit = new organisationseinheit();
 			$organisationseinheit->getAll(true, true);
-			
+				
 			echo "<SELECT name='oe_kurzbz'>";
-			
+				
 			foreach ($organisationseinheit->result as $row)
 			{
 				//Wenn keine OE uebergeben wurde, nimm die OE vom Studiengang 0
@@ -289,50 +399,51 @@ echo '
 					$selected='selected';
 				else
 					$selected='';
-			
+					
 				echo '<OPTION value="'.$row->oe_kurzbz.'" '.$selected.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</OPTION>';
 				echo "\n";
 			}
 			echo '</SELECT>
-			</td>
-		</tr>
-		<tr>
-			<td>Version</td>
-			<td><input type="text" size="4" maxlength="3" name="version" id="version" value="'.$db->convert_html_chars($vorlageOE->version).'"></td>
-		</tr>
-		<tr>
-			<td>Content (XML)</td>
-			<td><textarea cols="80" rows="8" name="content">'.$db->convert_html_chars($vorlageOE->text).'</textarea></td>
-		</tr>
-		<tr>
-			<td>Style (XML)</td>
-			<td><textarea cols="80" rows="8" name="style">'.$db->convert_html_chars($vorlageOE->style).'</textarea></td>
-		</tr>
-		<tr>
-			<td>Berechtigung</td>
-			<td><input type="text" size="64" maxlength="64" name="berechtigung" value="'.$db->convert_html_chars($vorlageOE->berechtigung).'"></td>
-		</tr>
-		<tr>
-			<td>Anmerkung</td>
-			<td><textarea cols="80" rows="2" name="anmerkung">'.$db->convert_html_chars($vorlageOE->anmerkung_vorlagestudiengang).'</textarea></td>
-		</tr>';
-		if(!$neu)
-			$val = 'Änderung Speichern';
-		else
-			$val = 'Neu anlegen';
-		
-		echo '<tr>
-			<td></td>
-			<td>
-				<input type="hidden" value="'.$vorlageOE->vorlagestudiengang_id.'" name="vorlagestudiengang_id" />
-				<input type="hidden" value="'.$vorlageOE->vorlage_kurzbz.'" name="vorlage_kurzbz" />
-				<input type="submit" name="speichern" value="'.$val.'">
-			</td>
-		</tr>
-	</table>
-</form>
+					</td>
+				</tr>
+				<tr>
+					<td>Version</td>
+					<td><input type="text" size="4" maxlength="3" name="version" id="version" value="'.$db->convert_html_chars($vorlageOE->version).'"></td>
+				</tr>
+				<tr>
+					<td>Content (XML)</td>
+					<td><textarea cols="80" rows="8" name="content">'.$db->convert_html_chars($vorlageOE->text).'</textarea></td>
+				</tr>
+				<tr>
+					<td>Style (XML)</td>
+					<td><textarea cols="80" rows="8" name="style">'.$db->convert_html_chars($vorlageOE->style).'</textarea></td>
+				</tr>
+				<tr>
+					<td>Berechtigung</td>
+					<td><input type="text" size="64" maxlength="64" name="berechtigung" value="'.$db->convert_html_chars($vorlageOE->berechtigung).'"></td>
+				</tr>
+				<tr>
+					<td>Anmerkung</td>
+					<td><textarea cols="80" rows="2" name="anmerkung">'.$db->convert_html_chars($vorlageOE->anmerkung_vorlagestudiengang).'</textarea></td>
+				</tr>';
+			if(!$neu)
+				$val = 'Änderung Speichern';
+			else
+				$val = 'Neu anlegen';
+			
+			echo '<tr>
+					<td></td>
+					<td>
+						<input type="hidden" value="'.$vorlageOE->vorlagestudiengang_id.'" name="vorlagestudiengang_id" />
+						<input type="hidden" value="'.$vorlageOE->vorlage_kurzbz.'" name="vorlage_kurzbz" />
+						<input type="submit" name="speichern" value="'.$val.'">
+					</td>
+				</tr>
+			</table>
+		</form>';
+}
 
-<hr>';
+echo '<hr>';
 
 if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 {

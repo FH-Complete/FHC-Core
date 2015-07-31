@@ -30,6 +30,7 @@ require_once('../../config/global.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/mail.class.php');
+require_once('../../include/datum.class.php');
 
 echo '<html>
 <head>
@@ -47,6 +48,10 @@ if (isset($_GET['sendmail']))
 }
 else
 	$sendmail=(boolean)true;
+
+$mailstudents=(boolean)true;
+
+$datum = new datum();
 
 $count_del=0;
 $count_ins=0;
@@ -81,11 +86,12 @@ $stgwheredev = '';
 if(isset($_GET['custom']))
 {
 	$sendmail = isset($_GET['mail']);
+	$mailstudents = (isset($_GET['nostudentmail'])?false:true);
 	$studiengang_kz=$_GET['studiengang_kz'];
 	$stgwhere = " AND studiengang_kz='".addslashes($studiengang_kz)."'";
 	$stgwheredev = " AND vw_stundenplandev.studiengang_kz='".addslashes($studiengang_kz)."'";
-	$datum_begin = $_GET['von'];
-	$datum_ende = $_GET['bis'];
+	$datum_begin = $datum->formatDatum($_GET['von'],'Y-m-d');
+	$datum_ende = $datum->formatDatum($_GET['bis'],'Y-m-d');
 }
 $db =new basis_db();
 // Beginnzeiten holen
@@ -264,29 +270,32 @@ else
 				$message[$row->uid]->message.='<TD>'.$row->titel.'</TD></TR>';
 			}
 			// Verband
-			$studenten = getStudentsFromGroup($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->gruppe_kurzbz, $ss->studiensemester_kurzbz);
-			
-			foreach ($studenten as $student)
+			if ($mailstudents)
 			{
-				if (!isset($message[$student]->isneu))
+				$studenten = getStudentsFromGroup($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->gruppe_kurzbz, $ss->studiensemester_kurzbz);
+				
+				foreach ($studenten as $student)
 				{
-					if(!isset($message[$student]))
-						$message[$student] = new stdClass();
-
-					$message[$student]->isneu=true;
-					$message[$student]->mailadress=$student.'@'.DOMAIN;
-					$message[$student]->message_begin=$message_begin.'<BR>';
-					$message[$student]->message='<font style="color:green"><strong>Neue Stunden:</strong></font><BR>
-							<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+					if (!isset($message[$student]->isneu))
+					{
+						if(!isset($message[$student]))
+							$message[$student] = new stdClass();
+	
+						$message[$student]->isneu=true;
+						$message[$student]->mailadress=$student.'@'.DOMAIN;
+						$message[$student]->message_begin=$message_begin.'<BR>';
+						$message[$student]->message='<font style="color:green"><strong>Neue Stunden:</strong></font><BR>
+								<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+					}
+					$message[$student]->message.="\n";
+					$message[$student]->message.='<TR><TD>'.$row->ort_kurzbz.'</TD>';
+					$message[$student]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
+					$message[$student]->message.='<TD>'.$row->lektor.'</TD>';
+					$message[$student]->message.='<TD>'.$row->datum.'</TD>';
+					$message[$student]->message.='<TD>'.$row->stunde.' ('.$beginnzeit_arr[$row->stunde].')</TD>';
+					$message[$student]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD>';
+					$message[$student]->message.='<TD>'.$row->titel.'</TD></TR>';
 				}
-				$message[$student]->message.="\n";
-				$message[$student]->message.='<TR><TD>'.$row->ort_kurzbz.'</TD>';
-				$message[$student]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
-				$message[$student]->message.='<TD>'.$row->lektor.'</TD>';
-				$message[$student]->message.='<TD>'.$row->datum.'</TD>';
-				$message[$student]->message.='<TD>'.$row->stunde.' ('.$beginnzeit_arr[$row->stunde].')</TD>';
-				$message[$student]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD>';
-				$message[$student]->message.='<TD>'.$row->titel.'</TD></TR>';
 			}
 		}
 	}
@@ -355,29 +364,32 @@ else
 				$message[$row->uid]->message.='<TD>'.$row->titel.'</TD></TR>';
 			}
 			// Verband
-			$studenten = getStudentsFromGroup($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->gruppe_kurzbz, $ss->studiensemester_kurzbz);
-			
-			foreach ($studenten as $student)
+			if ($mailstudents)
 			{
-				if (!isset($message[$student]->isalt))
+				$studenten = getStudentsFromGroup($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->gruppe_kurzbz, $ss->studiensemester_kurzbz);
+				
+				foreach ($studenten as $student)
 				{
-					if(!isset($message[$student]))
-						$message[$student] = new stdClass();
-
-					$message[$student]->isalt=true;
-					$message[$student]->mailadress=$student.'@'.DOMAIN;
-					$message[$student]->message_begin=$message_begin.'<BR>';
-					$message[$student]->message.='<font style="color:#FFA100"><strong>Gel&ouml;schte Stunden:</strong></font><BR>
-							<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+					if (!isset($message[$student]->isalt))
+					{
+						if(!isset($message[$student]))
+							$message[$student] = new stdClass();
+	
+						$message[$student]->isalt=true;
+						$message[$student]->mailadress=$student.'@'.DOMAIN;
+						$message[$student]->message_begin=$message_begin.'<BR>';
+						$message[$student]->message.='<font style="color:#FFA100"><strong>Gel&ouml;schte Stunden:</strong></font><BR>
+								<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+					}
+					$message[$student]->message.="\n";
+					$message[$student]->message.='<TR><TD>'.$row->ort_kurzbz.'</TD>';
+					$message[$student]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
+					$message[$student]->message.='<TD>'.$row->lektor.'</TD>';
+					$message[$student]->message.='<TD>'.$row->datum.'</TD>';
+					$message[$student]->message.='<TD>'.$row->stunde.' ('.$beginnzeit_arr[$row->stunde].')</TD>';
+					$message[$student]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD>';
+					$message[$student]->message.='<TD>'.$row->titel.'</TD></TR>';
 				}
-				$message[$student]->message.="\n";
-				$message[$student]->message.='<TR><TD>'.$row->ort_kurzbz.'</TD>';
-				$message[$student]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
-				$message[$student]->message.='<TD>'.$row->lektor.'</TD>';
-				$message[$student]->message.='<TD>'.$row->datum.'</TD>';
-				$message[$student]->message.='<TD>'.$row->stunde.' ('.$beginnzeit_arr[$row->stunde].')</TD>';
-				$message[$student]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD>';
-				$message[$student]->message.='<TD>'.$row->titel.'</TD></TR>';
 			}
 		}
 	}
@@ -573,47 +585,50 @@ else
 				}
 			}
 			// Verband
-			$studenten = getStudentsFromGroup($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->gruppe_kurzbz, $ss->studiensemester_kurzbz);
-			
-			foreach ($studenten as $student)
+			if ($mailstudents)
 			{
-				if (!isset($message[$student]->isset))
+				$studenten = getStudentsFromGroup($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->gruppe_kurzbz, $ss->studiensemester_kurzbz);
+				
+				foreach ($studenten as $student)
 				{
-					if(!isset($message[$student]))
-						$message[$student] = new stdClass();
-
-					$message[$student]->isset=true;
-					$message[$student]->mailadress=$student.'@'.DOMAIN;
-					$message[$student]->message_begin=$message_begin.'<BR>';
-					$message[$student]->message.='<font style="color:blue"><strong>Ge&auml;nderte Stunden:</strong></font><BR>
-							<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+					if (!isset($message[$student]->isset))
+					{
+						if(!isset($message[$student]))
+							$message[$student] = new stdClass();
+	
+						$message[$student]->isset=true;
+						$message[$student]->mailadress=$student.'@'.DOMAIN;
+						$message[$student]->message_begin=$message_begin.'<BR>';
+						$message[$student]->message.='<font style="color:blue"><strong>Ge&auml;nderte Stunden:</strong></font><BR>
+								<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+					}
+					$message[$student]->message.="\n";
+					$message[$student]->message.='<TR><TD>Vorher: </TD>';
+					$message[$student]->message.='<TD>'.$row->old_ort_kurzbz.'</TD>';
+					$message[$student]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
+					$message[$student]->message.='<TD>'.$row->old_lektor.'</TD>';
+					$message[$student]->message.='<TD>'.$row->old_datum.'</TD>';
+					$message[$student]->message.='<TD>'.$row->old_stunde.' ('.$beginnzeit_arr[$row->old_stunde].')</TD>';
+					$message[$student]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD>';
+					$message[$student]->message.='<TD>'.$row->old_titel.'</TD></TR>';
+	
+					$message[$student]->message.="\n";
+					$message[$student]->message.='<TR><TD>Jetzt: </TD>';
+					$myclass=($row->ort_kurzbz!=$row->old_ort_kurzbz?'marked':'unmarked');
+					$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->ort_kurzbz.'</span></TD>';
+					$myclass='unmarked';
+					$message[$student]->message.='<TD><span class="'.$myclass.'">'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</span></TD>';
+					$myclass=($row->lektor!=$row->old_lektor?'marked':'unmarked');
+					$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->lektor.'</span></TD>';
+					$myclass=(($row->datum!=$row->old_datum)?'marked':'unmarked');
+					$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->datum.'</span></TD>';
+					$myclass=(($row->stunde!=$row->old_stunde)?'marked':'unmarked');
+					$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->stunde.' ('.$beginnzeit_arr[$row->stunde].')</span></TD>';
+					$myclass='unmarked';
+					$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</span></TD>';
+					$myclass=($row->titel!=$row->old_titel?'marked':'unmarked');
+					$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->titel.'</span></TD></TR><TR><TD>----------------</TD></TR>';
 				}
-				$message[$student]->message.="\n";
-				$message[$student]->message.='<TR><TD>Vorher: </TD>';
-				$message[$student]->message.='<TD>'.$row->old_ort_kurzbz.'</TD>';
-				$message[$student]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
-				$message[$student]->message.='<TD>'.$row->old_lektor.'</TD>';
-				$message[$student]->message.='<TD>'.$row->old_datum.'</TD>';
-				$message[$student]->message.='<TD>'.$row->old_stunde.' ('.$beginnzeit_arr[$row->old_stunde].')</TD>';
-				$message[$student]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD>';
-				$message[$student]->message.='<TD>'.$row->old_titel.'</TD></TR>';
-
-				$message[$student]->message.="\n";
-				$message[$student]->message.='<TR><TD>Jetzt: </TD>';
-				$myclass=($row->ort_kurzbz!=$row->old_ort_kurzbz?'marked':'unmarked');
-				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->ort_kurzbz.'</span></TD>';
-				$myclass='unmarked';
-				$message[$student]->message.='<TD><span class="'.$myclass.'">'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</span></TD>';
-				$myclass=($row->lektor!=$row->old_lektor?'marked':'unmarked');
-				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->lektor.'</span></TD>';
-				$myclass=(($row->datum!=$row->old_datum)?'marked':'unmarked');
-				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->datum.'</span></TD>';
-				$myclass=(($row->stunde!=$row->old_stunde)?'marked':'unmarked');
-				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->stunde.' ('.$beginnzeit_arr[$row->stunde].')</span></TD>';
-				$myclass='unmarked';
-				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</span></TD>';
-				$myclass=($row->titel!=$row->old_titel?'marked':'unmarked');
-				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->titel.'</span></TD></TR><TR><TD>----------------</TD></TR>';
 			}
 		}
 	}

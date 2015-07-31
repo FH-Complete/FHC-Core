@@ -394,7 +394,7 @@ function StudentTreeKeyPress(event)
 // ****
 // * Erstellt das Zertifikat fuer die Freifaecher
 // ****
-function StudentFFZertifikatPrint()
+function StudentFFZertifikatPrint(event)
 {
 //	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-noten-tree');
@@ -411,7 +411,14 @@ function StudentFFZertifikatPrint()
 	col = tree.columns ? tree.columns["student-noten-tree-studiengang_kz"] : "student-noten-tree-studiengang_kz";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid=;'+uid+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
+	if (event.shiftKey) 
+	    var output='odt';
+	else if (event.ctrlKey)
+		var output='doc';
+	else
+		var output='pdf';
+
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid=;'+uid+'&output='+output+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
 	
 //	alert('url: '+url);
 	window.location.href = url;
@@ -420,7 +427,7 @@ function StudentFFZertifikatPrint()
 //****
 //* Erstellt ein Lehrveranstaltungszeugnis fuer die LV
 //****
-function StudentLVZeugnisPrint()
+function StudentLVZeugnisPrint(event)
 {
 //	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-noten-tree');
@@ -437,7 +444,15 @@ function StudentLVZeugnisPrint()
 	col = tree.columns ? tree.columns["student-noten-tree-studiengang_kz"] : "student-noten-tree-studiengang_kz";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl=LVZeugnis&stg_kz='+stg_kz+'&uid=;'+uid+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
+	if (event.shiftKey) 
+	    var output='odt';
+	else if (event.ctrlKey)
+		var output='doc';
+	else
+		var output='pdf';
+	
+
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl=LVZeugnis&stg_kz='+stg_kz+'&uid=;'+uid+'&output='+output+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
 	
 	window.location.href = url;
 }

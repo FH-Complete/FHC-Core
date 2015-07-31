@@ -110,7 +110,7 @@ class vorlage extends basis_db
 			$qry = 'UPDATE public.tbl_vorlage
 					SET 	bezeichnung='.$this->db_add_param($this->bezeichnung).',
 							anmerkung='.$this->db_add_param($this->anmerkung).',
-							mimetype='.$this->db_add_param($this->mimetype).',
+							mimetype='.$this->db_add_param($this->mimetype).'
 					WHERE vorlage_kurzbz='.$this->db_add_param($this->vorlage_kurzbz).';';
 		}
 	

@@ -26,6 +26,12 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+$user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 ?>
@@ -73,10 +79,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 
 			</row>
-			<row>
+			<!--<row>
 				<label value="Lehrveranstaltung" />
 	  			<textbox id="lehrveranstaltung-detail-textbox-lehrveranstaltung" maxlength="20" disabled="true"/>
-			</row>
+			</row>-->
 		</rows>
 		</grid>
 	</vbox>
@@ -95,6 +101,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<column style="min-width:240px" />
 		  	</columns>
 		  	<rows>
+				<row>
+					<label value="LV-ID" <?php echo ($rechte->isBerechtigt('lehre/lehrveranstaltung',null,'suid'))?'':'hidden="true"'; ?>/>
+		  			<textbox id="lehrveranstaltung-detail-textbox-lehrveranstaltung" disabled="true" maxlength="20" <?php echo ($rechte->isBerechtigt('lehre/lehrveranstaltung',null,'suid'))?'':'hidden="true"'; ?>/>
+				</row>				
 				<row>
 		  			<label value="Lehrfach" />
 					<menulist id="lehrveranstaltung-detail-menulist-lehrfach" disabled="true"

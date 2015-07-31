@@ -325,7 +325,7 @@ class lehreinheitmitarbeiter extends basis_db
 	 * @param $uid
 	 * @return true wenn die Zuteilung existiert sonst false
 	 */
-	public function existsLV($lehrveranstaltung_id, $studiensemester_kurzbz,  $uid)
+	public function existsLV($lehrveranstaltung_id, $studiensemester_kurzbz=NULL,  $uid)
 	{
 		if(!is_numeric($lehrveranstaltung_id))
 		{
@@ -340,8 +340,12 @@ class lehreinheitmitarbeiter extends basis_db
 					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 				WHERE
 					lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
-					AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
-					AND mitarbeiter_uid=".$this->db_add_param($uid).';';
+					AND mitarbeiter_uid=".$this->db_add_param($uid);
+		
+		if(!is_null($studiensemester_kurzbz))
+			$qry .= " AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+		
+		$qry .= ";";
 
 		if($this->db_query($qry))
 		{

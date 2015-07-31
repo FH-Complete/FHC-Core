@@ -288,26 +288,97 @@ if(isset($_POST['person_id']))
 		$error=true;
 	}
 }
-$qry_anzahl = "
-	SELECT 
+
+//je nach ansicht (mitarbeiter/student/beides) wird $qry veraendert
+if (isset($_GET['ansicht']))
+{
+	if ($_GET['ansicht'] == 'mitarbeiter')
+	{
+		$ansicht = 'AND uid IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)';
+		$mitarbeiterSubmit = '<input type="submit" name="MitarbeiterSubmit" sytle="background-color:#F5F5F5" value="Mitarbeiter" />';
+	}
+	if ($_GET['ansicht'] == 'studenten')
+		$ansicht = 'AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)';
+}
+else
+{
+	$ansicht = '';
+}
+
+//anzahl mitarbeiter
+$qry_anzahl_mitarbeiter = "
+	SELECT
 		count(*) as anzahl
-	FROM 
-		public.tbl_person 
+	FROM
+		public.tbl_person
 		JOIN public.tbl_benutzer USING(person_id)
-	WHERE 
+		LEFT JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid)
+	WHERE
 		foto is not NULL
 		AND tbl_benutzer.aktiv
-		AND 'akzeptiert' NOT IN(SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus 
+		AND 'akzeptiert' NOT IN(SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
+					WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
+		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
+						WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
+		AND uid IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)
+	";
+$anzahl = '';
+if($result_anzahl = $db->db_query($qry_anzahl_mitarbeiter))
+	if($row_anzahl = $db->db_fetch_object($result_anzahl))
+		$anzahl = $row_anzahl->anzahl;
+echo '<br>Mitarbeiter: '.$anzahl;
+
+//anzahl studenten
+$qry_anzahl_studenten = "
+	SELECT
+		count(*) as anzahl
+	FROM
+		public.tbl_person
+		JOIN public.tbl_benutzer USING(person_id)
+		LEFT JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid)
+	WHERE
+		foto is not NULL
+		AND tbl_benutzer.aktiv
+		AND 'akzeptiert' NOT IN(SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
+					WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
+		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
+						WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
+		AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)
+	";
+$anzahl = '';
+if($result_anzahl = $db->db_query($qry_anzahl_studenten))
+	if($row_anzahl = $db->db_fetch_object($result_anzahl))
+		$anzahl = $row_anzahl->anzahl;
+echo '<br>Studenten: '.$anzahl;
+
+//anzahl gesamt
+$qry_anzahl_gesamt = "
+	SELECT
+		count(*) as anzahl
+	FROM
+		public.tbl_person
+		JOIN public.tbl_benutzer USING(person_id)
+	WHERE
+		foto is not NULL
+		AND tbl_benutzer.aktiv
+		AND 'akzeptiert' NOT IN(SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
 					WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
 						WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 	";
 $anzahl = '';
-if($result_anzahl = $db->db_query($qry_anzahl))
+if($result_anzahl = $db->db_query($qry_anzahl_gesamt))
 	if($row_anzahl = $db->db_fetch_object($result_anzahl))
 		$anzahl = $row_anzahl->anzahl;
-		
-echo '<br>Gesamt: '.$anzahl;
+	echo '<br>Gesamt: '.$anzahl.'<br />';
+
+echo '<form action="'.$_SERVER['PHP_SELF'].'?ansicht=mitarbeiter" method="POST" style="float:left; margin-left:44%">
+		<input type="submit" name="MitarbeiterSubmit" id="MitarbeiterSubmit" value="Mitarbeiter" ';  if (isset($_GET['ansicht']) && $_GET['ansicht'] == 'mitarbeiter') echo 'disabled'; echo '/></form>';
+echo '<form action="'.$_SERVER['PHP_SELF'].'?ansicht=studenten" method="POST" style="float:left">
+		<input type="submit" name="StudentenSubmit" id="StudentenSubmit" value="Studenten" '; if (isset($_GET['ansicht']) && $_GET['ansicht'] == 'studenten') echo 'disabled'; echo '/></form>';
+echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" style="float:left">
+		<input type="submit" name="BeideGruppenSubmit" id="BeideGruppenSubmit" value="Beide Gruppen" '; if (!isset($_GET['ansicht'])) echo 'disabled'; echo '/></form>';
+	
 // Laden einer Person deren Profilfoto noch nicht akzeptiert wurde
 $qry = "
 	SELECT 
@@ -319,7 +390,10 @@ $qry = "
 		JOIN public.tbl_benutzer USING(person_id)
 	WHERE 
 		foto is not NULL
-		AND tbl_benutzer.aktiv";
+		AND tbl_benutzer.aktiv
+		".$ansicht;
+		
+
 if($error==true && $person_id!='')
 {
 	// Wenn ein Fehler auftritt oder Bestof geklickt wird, wird die Person erneut angezeigt
@@ -345,6 +419,8 @@ else
 }
 $qry.="	LIMIT 1";
 
+//echo $qry;
+
 if($result = $db->db_query($qry))
 {
 	if($row = $db->db_fetch_object($result))
@@ -368,7 +444,7 @@ if($result = $db->db_query($qry))
 		</table>';
 		
 		echo '<br><br>';
-		echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
+		echo '<form action="'.$_SERVER['PHP_SELF']; if (isset($_GET['ansicht'])) echo '?ansicht='.$_GET['ansicht']; echo '" method="POST">';
 		echo '<input type="hidden" name="person_id" value="'.$db->convert_html_chars($row->person_id).'" />';
 		echo '<input type="submit" name="akzeptieren" value="Akzeptieren" /> &nbsp;&nbsp;&nbsp;';
 		echo '<input type="submit" name="fehlerhaft" value="Fehlerhaft / Infomail" /> &nbsp;&nbsp;&nbsp;';
@@ -381,7 +457,18 @@ if($result = $db->db_query($qry))
 	}
 	else
 	{
-		echo 'Es sind keine ungeprüften Bilder vorhanden';
+		if (isset($_GET['ansicht']) && $_GET['ansicht'] == 'mitarbeiter')
+		{
+			echo '<br><br><br><span style="margin-left:40%">Es sind keine ungeprüften Bilder von Mitarbeitern vorhanden</span>';
+		}
+		elseif (isset($_GET['ansicht']) && $_GET['ansicht'] == 'studenten')
+		{
+			echo '<br><br><br><span style="margin-left:40%">Es sind keine ungeprüften Bilder von Studenten vorhanden</span>';
+		}
+		else 
+		{
+			echo '<br><br><br><span style="margin-left:42%">Es sind keine ungeprüften Bilder vorhanden</span>';
+		}
 	}
 }
 

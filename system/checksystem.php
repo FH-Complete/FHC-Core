@@ -3240,6 +3240,24 @@ if(!$result = @$db->db_query("SELECT style FROM public.tbl_vorlagestudiengang"))
 		echo '<br>public.tbl_vorlagestudiengang: Neue Spalten style, berechtigung und anmerkung_vorlagestudiengang hinzugefuegt. Neues Recht basis/dokumente angelegt';
 }
 
+// Eigene Berechtigung fuer LV-Info Freigabe
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='lehre/lvinfo_freigabe' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/lvinfo_freigabe','Freigaberecht für Lehrveranstaltungsinformationen');
+
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lehre/lvinfo_freigabe','admin','suid');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Eigene Berechtigung lehre/lvinfo_freigabe fuer die Freigabe von LV-Infos hinzugefuegt!<br>';
+	}
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(

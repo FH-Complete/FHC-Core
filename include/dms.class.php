@@ -614,16 +614,33 @@ class dms extends basis_db
 	 * Laedt die Dokumente einer Kategorie
 	 *
 	 * @param $kategorie_kurzbz
+	 * @param $dpp = Documents Per Page
 	 */
-	public function getDocuments($kategorie_kurzbz)
+	public function getDocuments($kategorie_kurzbz, $dpp=NULL, $page=NULL)
 	{
+		if (!is_null($dpp) && !is_null($page))
+		{
+			if ($page == 0)
+			{
+				$limit = '';
+				$offset = '';
+			}
+			else 
+			{
+				$limit = 'LIMIT '.$dpp;
+				$offset = ' OFFSET '.($page-1)*$dpp;
+			}
+		}
 		$qry = "SELECT * FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id) 
 				WHERE (dms_id, version) in(
 					SELECT dms_id, max(version)
 					FROM campus.tbl_dms_version 
 					GROUP BY dms_id)
 				AND kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz)."
-				ORDER BY name;";
+				ORDER BY name ";
+		if (isset($limit)) $qry .= $limit;
+		if (isset($offset)) $qry .= $offset;
+		$qry .= ";";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -660,16 +677,35 @@ class dms extends basis_db
 	 *
 	 * @param $kategorie_kurzbz
 	 */
-	public function search($suchstring)
+	public function search($suchstring, $dpp=NULL, $page=NULL)
 	{
+		if (!is_null($dpp) && !is_null($page))
+		{
+			if ($page == 0)
+			{
+				$limit = '';
+				$offset = '';
+			}
+			else
+			{
+				$limit = ' LIMIT '.$dpp;
+				$offset = ' OFFSET '.($page-1)*$dpp;
+			}
+		}
+		
 		$qry = "SELECT * FROM campus.tbl_dms  JOIN campus.tbl_dms_version USING(dms_id)
 				WHERE lower(name) like lower('%".$this->db_escape($suchstring)."%')
 				OR lower(beschreibung) like lower('%".$this->db_escape($suchstring)."%')
-				";
-		if (is_numeric($suchstring))
-			$qry.= "OR dms_id = ".$this->db_escape($suchstring)."";
+						";
 
-			$qry.=";";
+		
+		if (is_numeric($suchstring))
+			$qry.= " OR dms_id = ".$this->db_escape($suchstring)."";
+
+		if (isset($limit)) $qry .= $limit;
+		if (isset($offset)) $qry .= $offset;
+		
+		$qry.=";";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -701,7 +737,7 @@ class dms extends basis_db
 		}
 	}
 	
-/**
+	/**
 	 * Sucht nach Dokumenten (nur Spalte Beschreibung) mit der aktuellsten Version.
 	 * Optional kann die Anzahl an Suchergebnissen übergeben werden.
 	 *

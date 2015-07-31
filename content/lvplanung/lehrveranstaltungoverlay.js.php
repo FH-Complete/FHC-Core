@@ -610,6 +610,7 @@ function LeDetailDisableFields(val)
 	document.getElementById('lehrveranstaltung-detail-button-save').disabled=val;
 
 	document.getElementById('lehrveranstaltung-detail-textbox-unr').disabled=val;
+	document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').disabled=val;
 }
 
 // ****
@@ -1868,7 +1869,7 @@ function LehrveranstaltungNotenPunkteChange()
 // ****
 // * Erstellt das Zertifikat fuer die Freifaecher
 // ****
-function LehrveranstaltungFFZertifikatPrint()
+function LehrveranstaltungFFZertifikatPrint(event)
 {
 	tree = document.getElementById('lehrveranstaltung-noten-tree');
 	//Alle markierten Noten holen
@@ -1895,8 +1896,15 @@ function LehrveranstaltungFFZertifikatPrint()
 	var ss = getStudiensemester();
 	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiengang_kz"] : "lehrveranstaltung-noten-tree-studiengang_kz";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
+	
+	if (event.shiftKey) 
+	    var output='odt';
+	else if (event.ctrlKey)
+		var output='doc';
+	else
+		var output='pdf';
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid='+paramList+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid='+paramList+'&output='+output+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
 	window.location.href = url;
 	//prompt('test:',url);
 }
@@ -1904,7 +1912,7 @@ function LehrveranstaltungFFZertifikatPrint()
 // ****
 // * Erstellt ein Lehrveranstaltungszeugnis fuer die LV
 // ****
-function LehrveranstaltungLVZeugnisPrint()
+function LehrveranstaltungLVZeugnisPrint(event)
 {
 	tree = document.getElementById('lehrveranstaltung-noten-tree');
 	//Alle markierten Noten holen
@@ -1931,8 +1939,15 @@ function LehrveranstaltungLVZeugnisPrint()
 	var ss = getStudiensemester();
 	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiengang_kz"] : "lehrveranstaltung-noten-tree-studiengang_kz";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
+	
+	if (event.shiftKey) 
+	    var output='odt';
+	else if (event.ctrlKey)
+		var output='doc';
+	else
+		var output='pdf';
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl=LVZeugnis&stg_kz='+stg_kz+'&uid='+paramList+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl=LVZeugnis&stg_kz='+stg_kz+'&uid='+paramList+'&output='+output+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
 	window.location.href = url;
 	//prompt('test:',url);
 }

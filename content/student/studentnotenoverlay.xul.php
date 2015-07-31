@@ -46,8 +46,8 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 <popupset>
 	<menupopup id="student-noten-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentNotenDelete();" id="student-noten-tree-popup-delete" hidden="false"/>
-		<menuitem label="Zertifikat erstellen" oncommand="StudentFFZertifikatPrint();" id="student-noten-tree-popup-ffzertifikat" hidden="false"/>
-		<menuitem label="Lehrveranstaltungszeugnis erstellen" oncommand="StudentLVZeugnisPrint();" id="student-noten-tree-popup-lvzeugnis" hidden="false"/>
+		<menuitem label="Zertifikat erstellen" oncommand="StudentFFZertifikatPrint(event);" id="student-noten-tree-popup-ffzertifikat" hidden="false"/>
+		<menuitem label="Lehrveranstaltungszeugnis erstellen" oncommand="StudentLVZeugnisPrint(event);" id="student-noten-tree-popup-lvzeugnis" hidden="false"/>
 	</menupopup>
 </popupset>
 <hbox flex="1" style="margin-top: 10px;">
@@ -60,6 +60,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		flags="dont-build-content"
 	>	
 		<treecols>
+			<treecol id="student-noten-tree-zeugnis" label="Zeugnis" hidden="false" persist="hidden, width, ordinal"
+				class="sortDirectionIndicator" tooltiptext="Zeugnisoption deaktiviert"
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#Zeugnis"/>
+			<splitter class="tree-splitter"/>
 			<treecol id="student-noten-tree-lehrveranstaltung_bezeichnung" label="Lehrveranstaltung" flex="2" hidden="false" primary="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sortActive="true"
@@ -136,6 +140,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 			<treechildren flex="1" >
 					<treeitem uri="rdf:*">
 					<treerow>
+						<treecell src="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#zeugnis"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_bezeichnung"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#note_bezeichnung"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#uebernahmedatum"/>
