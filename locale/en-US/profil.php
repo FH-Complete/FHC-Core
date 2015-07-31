@@ -74,4 +74,5 @@ $this->phrasen['profil/fhausweisAbholbereitAmEmpfangAb']='UAS ID card will be re
 $this->phrasen['profil/fhausweisWurdeNochNichtGedruckt']='UAS ID card has not yet been printed';
 $this->phrasen['profil/ihrFotoWurdeNochNichtGeprueft']='Your photo has not yet been approved';
 $this->phrasen['profil/fotoAuswählen']='Click on the image below to upload a photo';
+$this->phrasen['profil/bildSpeichern']='Save image';
 ?>

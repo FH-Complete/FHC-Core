@@ -77,4 +77,5 @@ $this->phrasen['profil/fhausweisAbholbereitAmEmpfangAb']='FH-Ausweis abholbereit
 $this->phrasen['profil/fhausweisWurdeNochNichtGedruckt']='FH-Ausweis wurde noch nicht gedruckt';
 $this->phrasen['profil/ihrFotoWurdeNochNichtGeprueft']='Ihr Foto wurde noch nicht geprüft';
 $this->phrasen['profil/fotoAuswählen']='Klicken Sie auf das Bild um ein Foto hochzuladen';
+$this->phrasen['profil/bildSpeichern']='Bild speichern';
 ?>

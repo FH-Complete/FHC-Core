@@ -9,6 +9,7 @@ require_once('../../include/phrasen.class.php');
 require_once('../../include/fotostatus.class.php');
 
 $src = $_POST['src'];
+$user = get_uid();
 
 //kopiert von bildupload.php
 function resize($filename, $width, $height)
@@ -41,6 +42,21 @@ function resize($filename, $width, $height)
 	@imagedestroy($image_p);
 	@imagedestroy($image);
 }
+
+if(isset($_POST['person_idValue']))
+{
+	$benutzer = new benutzer();
+	$benutzer->load($user);
+
+	if($benutzer->person_id!=$_POST['person_idValue'])
+		die($p->t('global/keineBerechtigungFuerDieseSeite'));
+
+	$fs = new fotostatus();
+	if($fs->akzeptiert($benutzer->person_id))
+		die($p->t('profil/profilfotoUploadGesperrt'));
+}
+else
+	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 
 //file als png und jpg abspeichern
 file_put_contents('image.png', base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $src)));

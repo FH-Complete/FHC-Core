@@ -43,7 +43,6 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui.css">
-	<link rel="stylesheet" type="text/css" href="../../jquery.Jcrop.css">
 	<link rel="stylesheet" type="text/css" href="../../skin/simplecropper.css">'.
 	cropCss().'
 	<script type="text/javascript" src="../../include/js/jquery.js"></script>
@@ -107,20 +106,15 @@ else
 
 echo '<br>';
 echo $p->t('profil/BilduploadInfotext',array($p->t('dms_link/bildRichtlinien'))).'<br><br>';
-//<form accept-charset="UTF-8" method="POST" enctype="multipart/form-data" action="'.$_SERVER['PHP_SELF'].'?person_id='.$_GET['person_id'].'">
-//'.$p->t('profil/Bild').': <input type="file" name="bild" />
-//<input type="submit" id="uploadbutton" name="submitbild" value="Upload" />
-//<input type="submit" id="editbutton" name="submitbild" value="Bild bearbeiten" />
-//</form>
 echo '<div class="simple-cropper-images">
 	 '.$p->t('profil/fotoAuswählen').'
-      <div class="cropme" id="croppingdiv" style="width: 300px; height: 400px; background-image:url(photoupload.png); margin:10px; cursor:pointer;"></div>
+      <div class="cropme" id="croppingdiv" style="width: 300px; height: 400px; background-image:url(../../skin/images/photoupload.png); margin:10px; cursor:pointer;"></div>
 	  <script>
 		// Init Simple Cropper
 		$(".cropme").simpleCropper();
 	  </script>
       </div>
-	  <input type="button" name="submitbild" id="saveimgbutton" value="Bild speichern" style="margin-left:90px;"/>
+	  <input type="button" name="submitbild" id="saveimgbutton" value="'.$p->t('profil/bildSpeichern').'" style="margin-left:90px;"/>
  	  <input type="hidden" id="person_id" value="'.$_GET['person_id'].'" />';
 
 if (isset($_POST['src'])) {
@@ -311,7 +305,7 @@ function cropCss() {
 		}
 		
 		.cropme{
-		  background-image: url(photoupload.png);
+		  background-image: url(../../skin/images/photoupload.png);
 		}
 		
 		.cropme:hover{
@@ -372,130 +366,6 @@ function cropCss() {
 		}
 	</style>';
 }
-/*
-if (isset($_POST['submitbild']) && $_POST['submitbild'] == 'Upload') {
-	//Bei Upload des Bildes
-	if(isset($_POST['submitbild']))
-	{
-		if(isset($_FILES['bild']['tmp_name']))
-		{
-			//Extension herausfiltern
-	    	$ext = explode('.',$_FILES['bild']['name']);
-	        $ext = mb_strtolower($ext[count($ext)-1]);
-	
-	        $width=101;
-			$height=130;
-			
-	        //--check that it's a jpeg
-	        if ($ext=='jpg' || $ext=='jpeg')
-	        {
-				$filename = $_FILES['bild']['tmp_name'];
-				
-				//groesse auf maximal 827x1063 begrenzen
-				resize($filename, 827, 1063);
-				
-				$fp = fopen($filename,'r');
-				//auslesen
-				$content = fread($fp, filesize($filename));
-				fclose($fp);
-				
-				$akte = new akte();
-				
-				if($akte->getAkten($_GET['person_id'], 'Lichtbil'))
-				{
-					if(count($akte->result)>0)
-					{
-						$akte = $akte->result[0];
-						$akte->new = false;
-					}
-					else 
-						$akte->new = true;
-				}
-				else 
-				{
-					$akte->new = true;
-				}
-				
-				$akte->dokument_kurzbz = 'Lichtbil';
-				$akte->person_id = $_GET['person_id'];
-				$akte->inhalt = base64_encode($content);
-				$akte->mimetype = "image/jpg";
-				$akte->erstelltam = date('Y-m-d H:i:s');
-				$akte->gedruckt = false;
-				$akte->titel = "Lichtbild_".$_GET['person_id'].".jpg";
-				$akte->bezeichnung = "Lichtbild gross";
-				$akte->updateamum = date('Y-m-d H:i:s');
-				$akte->updatevon = $user;
-				$akte->insertamum = date('Y-m-d H:i:s');
-				$akte->insertvon = $user;
-				$akte->uid = '';
-				
-				if(!$akte->save())
-				{
-					echo "<b>Fehler: $akte->errormsg</b>";
-				}
-				
-				//groesse auf maximal 101x130 begrenzen
-				resize($filename, 101, 130);
-				
-				//in DB speichern           
-				//File oeffnen
-				$fp = fopen($filename,'r');
-				//auslesen
-				$content = fread($fp, filesize($filename));
-				fclose($fp);
-				//in base64-Werte umrechnen
-				$content = base64_encode($content);
-	
-				$person = new person();
-				if($person->load($_GET['person_id']))
-				{
-					//base64 Wert in die Datenbank speichern
-					$person->foto = $content;
-					$person->new = false;				
-					if($person->save())
-					{
-						$fs = new fotostatus();
-						$fs->person_id=$person->person_id;
-						$fs->fotostatus_kurzbz='hochgeladen';
-						$fs->datum = date('Y-m-d');
-						$fs->insertamum = date('Y-m-d H:i:s');
-						$fs->insertvon = $user;
-						$fs->updateamum = date('Y-m-d H:i:s');
-						$fs->updatevon = $user;
-						if(!$fs->save(true))
-							echo '<span class="error">Fehler beim Setzen des Bildstatus</span>';
-						else
-						{
-						
-						echo "<b>Bild wurde erfolgreich gespeichert</b>
-							<script language='Javascript'>
-								if(typeof(opener.StudentAuswahl) == 'function') 
-									opener.StudentAuswahl(); 
-								if(typeof(opener.MitarbeiterAuswahl) == 'function') 
-									opener.MitarbeiterAuswahl(); 
-								if(typeof(opener.RefreshImage) == 'function' ||
-								   typeof(opener.RefreshImage) == 'object') 
-								{
-									opener.RefreshImage(); 
-								}
-								window.close();
-							</script><br />";
-						}
-					}
-					else
-						echo '<b>'.$person->errormsg.'</b><br />';
-				}
-				else
-					echo '<b>'.$person->errormsg.'</b><br />';
-			}
-			else
-				echo '<b>'.$p->t('profil/nurJPGBilder').'</b><br />';
-		}
-	}
-}
-*/
-
 ?>
 </body>
 </html>
