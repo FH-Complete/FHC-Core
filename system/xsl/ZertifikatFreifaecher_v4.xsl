@@ -362,7 +362,28 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P22">Inhalte der Lehrveranstaltung:</text:p>
 			<text:p text:style-name="P22"/>
 			<text:p text:style-name="P22"/>
-			<text:p text:style-name="P22"><xsl:value-of select="lehrinhalte" /></text:p>
+			<text:p text:style-name="P22">
+
+				<xsl:call-template name="replace">
+					<xsl:with-param name="string" select="lehrinhalte"/>
+				</xsl:call-template>
+			</text:p>
 		</office:text>
 </xsl:template>
+<xsl:template name="replace">
+    <xsl:param name="string"/>
+    <xsl:choose>
+        <xsl:when test="contains($string,'\n')">
+            <xsl:value-of select="substring-before($string,'\n')"/>
+            <text:line-break/>
+            <xsl:call-template name="replace">
+                <xsl:with-param name="string" select="substring-after($string,'\n')"/>
+            </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:value-of select="$string"/>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template>
+
 </xsl:stylesheet>
