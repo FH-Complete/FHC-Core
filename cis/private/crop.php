@@ -15,7 +15,7 @@ $user = get_uid();
 function resize($filename, $width, $height)
 {
 	$ext = 'jpg';
-	
+
 	// Hoehe und Breite neu berechnen
 	list($width_orig, $height_orig) = getimagesize($filename);
 
@@ -36,9 +36,9 @@ function resize($filename, $width, $height)
 		imagecopyresampled($image_p, $image, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
 	else
 		$image_p = $image;
-		
+
 	imagejpeg($image_p, $filename, 80);
-		
+
 	@imagedestroy($image_p);
 	@imagedestroy($image);
 }
@@ -59,25 +59,25 @@ else
 	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 
 //file als png und jpg abspeichern
-file_put_contents('image.png', base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $src)));
-$imageTmp=imagecreatefrompng('image.png');
-imagejpeg($imageTmp, 'imagee.jpg', 100);
+$tmpfname = tempnam(sys_get_temp_dir(), 'FHC');
+file_put_contents($tmpfname, base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $src)));
+$imageTmp=imagecreatefrompng($tmpfname);
+imagejpeg($imageTmp, $tmpfname, 100);
 
 $person_id = $_POST['person_idValue'];
-$filename = 'imagee.jpg';
 
 //profilbild speichern
-if(file_exists($filename))
-{	
+if(file_exists($tmpfname))
+{
 	$width=101;
 	$height=130;
 
 	//groesse auf maximal 827x1063 begrenzen
-	resize($filename, 827, 1063);
+	resize($tmpfname, 827, 1063);
 
-	$fp = fopen($filename,'r');
+	$fp = fopen($tmpfname,'r');
 	//auslesen
-	$content = fread($fp, filesize($filename));
+	$content = fread($fp, filesize($tmpfname));
 	fclose($fp);
 
 	$akte = new akte();
@@ -117,13 +117,13 @@ if(file_exists($filename))
 	}
 
 	//groesse auf maximal 101x130 begrenzen
-	resize($filename, 101, 130);
+	resize($tmpfname, 101, 130);
 
 	//in DB speichern
 	//File oeffnen
-	$fp = fopen($filename,'r');
+	$fp = fopen($tmpfname,'r');
 	//auslesen
-	$content = fread($fp, filesize($filename));
+	$content = fread($fp, filesize($tmpfname));
 	fclose($fp);
 	//in base64-Werte umrechnen
 	$content = base64_encode($content);
@@ -158,6 +158,5 @@ if(file_exists($filename))
 }
 
 //temporäre files löschen
-unlink($filename);
-unlink('image.png');
+unlink($tmpfname);
 ?>
