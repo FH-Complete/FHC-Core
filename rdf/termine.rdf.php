@@ -27,6 +27,7 @@ require_once('../include/lehrstunde.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/stunde.class.php');
 require_once('../include/anwesenheit.class.php');
+require_once('../include/benutzer.class.php');
 
 $user = get_uid();
 
@@ -66,8 +67,9 @@ $lehrstunde->getStundenplanData('stundenplan', $lehrveranstaltung_id, $variable-
 $i=0;
 if(isset($lehrstunde->result) && is_array($lehrstunde->result))
 {
+	$lektoren_arr=array();
 	foreach($lehrstunde->result as $row)
-	{	
+	{
 		$i=$oRdf->newObjekt($i);
 		$oRdf->obj[$i]->setAttribut('datum',$datum_obj->formatDatum($row->datum,'d.m.Y'),true);
 		$oRdf->obj[$i]->setAttribut('stundevon',$row->stundevon,true);
@@ -75,7 +77,21 @@ if(isset($lehrstunde->result) && is_array($lehrstunde->result))
 		$oRdf->obj[$i]->setAttribut('uhrzeitvon',$stunden_arr[$row->stundevon]['beginn'],true);
 		$oRdf->obj[$i]->setAttribut('uhrzeitbis',$stunden_arr[$row->stundebis]['ende'],true);
 		$oRdf->obj[$i]->setAttribut('gruppen',implode(',',$row->gruppen),true);
-		$oRdf->obj[$i]->setAttribut('lektor',implode(',',$row->lektoren),true);
+
+		$lektoren='';
+		foreach($row->lektoren as $rowlkt)
+		{
+			if(!isset($lektoren_arr[$rowlkt]))
+			{
+				$lkt_obj = new benutzer();
+				$lkt_obj->load($rowlkt);
+				$lektoren_arr[$rowlkt]=$lkt_obj->nachname.' '.$lkt_obj->vorname;
+			}
+			$lektoren .=",".$lektoren_arr[$rowlkt];
+		}
+		$lektoren = mb_substr($lektoren,1);
+
+		$oRdf->obj[$i]->setAttribut('lektor',$lektoren,true);
 		$oRdf->obj[$i]->setAttribut('ort',implode(',',$row->orte),true);
 		$oRdf->obj[$i]->setAttribut('lehrfach',$row->lehrfach_bezeichnung,true);
 		$oRdf->obj[$i]->setAttribut('lehreinheit_id',$row->lehreinheit_id,true);
@@ -88,7 +104,7 @@ if(isset($lehrstunde->result) && is_array($lehrstunde->result))
 		$oRdf->obj[$i]->setAttribut('anwesend',$anwesend,true);
 		$oRdf->obj[$i]->setAttribut('datum_iso',$row->datum,true);
 
-	
+
 		$oRdf->addSequence($i);
 		$i++;
 	}
