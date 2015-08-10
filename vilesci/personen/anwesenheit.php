@@ -130,24 +130,30 @@ echo '<!DOCTYPE HTML>
 				document.getElementById("usercode").focus();
 			else
 				document.getElementById("lvcode").focus();
-		})
-
-		$(document).ready(function() 
-		{ 
-			$("#t1").tablesorter(
+		
+            // Tablesorter
+            $("#t1").tablesorter(
 			{
 				sortList: [[4,0]],
 				widgets: ["zebra"]
 			});
+            
+            // Enter-Taste beim Scannen abfangen
+            $("#usercode").keydown(function(event) {
+                if (event.which == 13) 
+                    event.preventDefault();
+            });
 		});
 		
 		function inputUsercode()
 		{
 			var usercode = $("#usercode").val();
-			if(usercode.length==13)
+			if(usercode.length==12)
 			{
 				var person_id = parseInt(usercode, 10);
-
+                person_id = person_id.toString();
+                person_id = person_id.substring(0, person_id.length - 1);
+                
 				$("#img_"+person_id).attr("src","../../skin/images/false.png");
 				var uid = $("#uid_"+person_id).val();
 				$("#anwesenheit_"+uid).val("false");
