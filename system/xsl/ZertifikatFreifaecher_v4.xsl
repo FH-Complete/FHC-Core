@@ -281,9 +281,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P2">Personenkennzeichen: <xsl:value-of select="matrikelnr" /></text:p>
 			<text:p text:style-name="P2"/>
 			<text:p text:style-name="P3"/>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"/>
 			<text:p text:style-name="P3"/>
 			<text:p text:style-name="P7"/>
