@@ -20,7 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /* Erstellt diverse Dokumente
- * 
+ *
  * Erstellt ein XML File Transformiert dieses mit
  * Hilfe der XSL-FO Vorlage aus der DB und generiert
  * daraus ein PDF mittels xslfo2pdf bzw unoconv
@@ -61,7 +61,7 @@ else
 // Studiengang ermitteln dessen Vorlage verwendet werden soll
 $xsl_stg_kz=0;
 // Direkte uebergabe des Studienganges dessen Vorlage verwendet werden soll
-if(isset($_GET['xsl_stg_kz'])) 
+if(isset($_GET['xsl_stg_kz']))
 	$xsl_stg_kz=$_GET['xsl_stg_kz'];
 else
 {
@@ -70,13 +70,13 @@ else
 		$xsl_stg_kz=$_GET['stg_kz'];
 	else
 	{
-		// Werden UIDs uebergeben, wird die Vorlage des Studiengangs genommen 
+		// Werden UIDs uebergeben, wird die Vorlage des Studiengangs genommen
 		// in dem der 1. Studierende in der Liste ist
 		if(isset($_GET['uid']) && $_GET['uid']!='')
 		{
 			if(strstr($_GET['uid'],';'))
 				$uids = explode(';',$_GET['uid']);
-			else 
+			else
 				$uids[1] = $_GET['uid'];
 
 			$student_obj = new student();
@@ -97,7 +97,7 @@ $params='?xmlformat=xml';
 if(isset($_GET['uid']))
 	$params.='&uid='.urlencode($_GET['uid']);
 if(isset($_GET['stg_kz']))
-	$params.='&stg_kz='.urlencode($_GET['stg_kz']); 
+	$params.='&stg_kz='.urlencode($_GET['stg_kz']);
 if(isset($_GET['person_id']))
 	$params.='&person_id='.urlencode($_GET['person_id']);
 if(isset($_GET['id']))
@@ -122,7 +122,7 @@ if(isset($_GET['projekt_kurzbz']))
 	$params.='&projekt_kurzbz='.urlencode($_GET['projekt_kurzbz']);
 if(isset($_GET['version']) && is_numeric($_GET['version']))
 	$version = $_GET['version'];
-else 
+else
 	$version ='';
 if(isset($_GET['von']))
 	$params.='&von='.urlencode($_GET['von']);
@@ -147,6 +147,11 @@ if(isset($_GET['vertrag_id']))
 }
 if(isset($_GET['studienordnung_id']))
 	$params.='&studienordnung_id='.urlencode($_GET['studienordnung_id']);
+if(isset($_GET['standort']))
+	$params.='&standort='.urlencode($_GET['standort']);
+if(isset($_GET['form']))
+	$params.='&form='.urlencode($_GET['form']);
+
 $output = (isset($_GET['output'])?$_GET['output']:'odt');
 
 $rechte = new benutzerberechtigung();
@@ -205,7 +210,7 @@ elseif(in_array($xsl,array('Lehrveranstaltungszeugnis','Zertifikat','Diplomurkun
 'DiplSupplement','Zutrittskarte','Projektbeschr','Ausbildungsver','AusbildStatus','PrProtBA','PrProtMA',
 'PrProtBAEng','PrProtMAEng','Studienordnung','Erfolgsnachweis','ErfolgsnwHead','Studienblatt','LV_Informationen',
 'LVZeugnis','AnwListBarcode','Honorarvertrag','AusbVerEng','AusbVerEngHead','Zeugnis','ErfolgsnachweisE','ErfolgsnwHeadE','Magisterurkunde','Masterurkunde',
-'Defensiourkunde','Magisterzeugnis','Laufzettel','StudienblattEng','Zahlung1')))
+'Defensiourkunde','Magisterzeugnis','Laufzettel','StudienblattEng','Zahlung1','Terminliste','Studienbuchblatt','Veranstaltungen')))
 {
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
 	{
@@ -267,8 +272,8 @@ foreach($addons->aktive_addons as $addon)
 }
 if(!$xml_found)
 	$xml_url=XML_ROOT.$xml.$params;
-			
-			
+
+
 // Load the XML source
 $xml_doc = new DOMDocument;
 
@@ -306,19 +311,19 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 $filename=$xsl.$nachname;
 
 if (!isset($_REQUEST["archive"]))
-{ 
+{
 	if(mb_strstr($vorlage->mimetype, 'application/vnd.oasis.opendocument'))
 	{
 		switch($vorlage->mimetype)
 		{
 			case 'application/vnd.oasis.opendocument.text':
 					$endung = 'odt';
-					break; 
+					break;
 			case 'application/vnd.oasis.opendocument.spreadsheet':
-					$endung = 'ods'; 
-					break;               
+					$endung = 'ods';
+					break;
 			default:
-					$endung = 'pdf'; 
+					$endung = 'pdf';
 		}
 
 		// Load the XSL source
@@ -326,11 +331,11 @@ if (!isset($_REQUEST["archive"]))
 
 		if(!$xsl_doc->loadXML($xsl_content))
 			die('unable to load xsl');
-		
+
 		// Configure the transformer
 		$proc = new XSLTProcessor;
 		$proc->importStyleSheet($xsl_doc); // attach the xsl rules
-		
+
 		$buffer = $proc->transformToXml($xml_doc);
 		//echo $buffer;
 		//exit;
@@ -340,7 +345,7 @@ if (!isset($_REQUEST["archive"]))
 		file_put_contents('content.xml', $buffer);
 
 		// Wenn ein Style XSL uebergeben wurde wird ein zweites XML File erstellt mit den
-		// Styleanweisungen und ebenfalls zum Zip hinzugefuegt        
+		// Styleanweisungen und ebenfalls zum Zip hinzugefuegt
 		if(isset($_GET['style_xsl']) || $vorlage->style!='')
 		{
 			//Wenn die Spalte style in der DB befuellt ist, wird dieses verwendet
@@ -350,7 +355,7 @@ if (!isset($_REQUEST["archive"]))
 				if(!$style_xsl_doc->loadXML($vorlage->style))
 					die('unable to load xsl from tbl_vorlagestudiengang');
 			}
-			else 
+			else
 			{
 				$style_xsl=$_GET['style_xsl'];
 				$style_vorlage = new vorlage();
@@ -359,11 +364,11 @@ if (!isset($_REQUEST["archive"]))
 				if(!$style_xsl_doc->loadXML($style_vorlage->text))
 					die('unable to load xsl');
 			}
-		    
+
 			// Configure the transformer
 			$style_proc = new XSLTProcessor;
 			$style_proc->importStyleSheet($style_xsl_doc); // attach the xsl rules
-		
+
 			$stylebuffer = $style_proc->transformToXml($xml_doc);
 
 			file_put_contents('styles.xml', $stylebuffer);
@@ -375,7 +380,7 @@ if (!isset($_REQUEST["archive"]))
 		foreach($addons->aktive_addons as $addon)
 		{
 			$zipfile = DOC_ROOT.'addons/'.$addon.'/system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
-			
+
 			if(file_exists($zipfile))
 			{
 				$vorlage_found=true;
@@ -384,8 +389,8 @@ if (!isset($_REQUEST["archive"]))
 		}
 		if(!$vorlage_found)
 			$zipfile = DOC_ROOT.'system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
-		
-		
+
+
 		$tempname_zip = 'out.zip';
 		if(copy($zipfile, $tempname_zip))
 		{
@@ -393,10 +398,10 @@ if (!isset($_REQUEST["archive"]))
 			if(isset($_GET['style_xsl']) || $vorlage->style!='')
 				exec("zip $tempname_zip styles.xml");
 
-			clearstatcache(); 
+			clearstatcache();
 			if($vorlage->bezeichnung!='')
 				$filename = $vorlage->bezeichnung.$nachname;
-			else 
+			else
 				$filename = $vorlage->vorlage_kurzbz.$nachname;
             if($output == 'pdf')
             {
@@ -425,12 +430,12 @@ if (!isset($_REQUEST["archive"]))
 				    $filename = $filename.'.pdf';
 				}
                 exec("unoconv -e IsSkipEmptyPages=false --stdout -f pdf $tempname_zip > $tempPdfName");
-                
-                $fsize = filesize($tempPdfName); 
+
+                $fsize = filesize($tempPdfName);
                 $handle = fopen($tempPdfName,'r');
                 header('Content-type: application/pdf');
                 header('Content-Disposition: attachment; filename="'.$filename.'"');
-                header('Content-Length: '.$fsize); 
+                header('Content-Length: '.$fsize);
             }
             else if($output =='odt')
             {
@@ -444,8 +449,8 @@ if (!isset($_REQUEST["archive"]))
                 $handle = fopen($tempname_zip,'r');
                 header('Content-type: '.$vorlage->mimetype);
                 header('Content-Disposition: attachment; filename="'.$filename.'.'.$endung.'"');
-                header('Content-Length: '.$fsize); 
-           } 
+                header('Content-Length: '.$fsize);
+           }
            else if($output =='doc')
            {
                 $tempPdfName = $vorlage->vorlage_kurzbz.'.doc';
@@ -455,19 +460,19 @@ if (!isset($_REQUEST["archive"]))
 					$studienordnung->loadStudienordnung($_GET['studienordnung_id']);
 					$filename = $filename.'_'.$studienordnung->studiengangkurzbzlang.'.doc';
 				}
-				else 
+				else
 				{
 					$filename = $filename.'.doc';
 				}
                 exec("unoconv -e IsSkipEmptyPages=false --stdout -f doc $tempname_zip > $tempPdfName");
-                
-                $fsize = filesize($tempPdfName); 
+
+                $fsize = filesize($tempPdfName);
                 $handle = fopen($tempPdfName,'r');
                 header('Content-type: application/vnd.ms-word');
                 header('Content-Disposition: attachment; filename="'.$filename.'"');
-                header('Content-Length: '.$fsize); 
+                header('Content-Length: '.$fsize);
            }
-		    while (!feof($handle)) 
+		    while (!feof($handle))
 		    {
 			  	echo fread($handle, 8192);
 			}
@@ -482,7 +487,7 @@ if (!isset($_REQUEST["archive"]))
 			rmdir($tempfolder);
 		}
 	}
-	else 
+	else
 	{
 		if(PDF_CREATE_FUNCTION=='FOP')
 		{
@@ -492,20 +497,20 @@ if (!isset($_REQUEST["archive"]))
 			//$xsl='foobar';
 			$fop->generatePdf($xml, $xsl_content, $filename, "D");
 		}
-		else 
+		else
 		{
 			$fo2pdf = new XslFo2Pdf();
-				
+
 			// Load the XSL source
 			$xsl_doc = new DOMDocument;
-			
+
 			if(!$xsl_doc->loadXML($xsl_content))
 				die('unable to load xsl');
-			
+
 			// Configure the transformer
 			$proc = new XSLTProcessor;
 			$proc->importStyleSheet($xsl_doc); // attach the xsl rules
-			
+
 			$buffer = $proc->transformToXml($xml_doc);
 			if (!$fo2pdf->generatePdf($buffer, $filename, "D"))
 			{
@@ -531,15 +536,15 @@ else
 		$prestudent->getLastStatus($student->prestudent_id,$ss);
 		$semester=$prestudent->ausbildungssemester;
 
-		$query = "SELECT 
-					tbl_studiengang.studiengang_kz, tbl_studentlehrverband.semester, tbl_studiengang.typ, 
-					tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer, 
-					tbl_studentlehrverband, tbl_studiengang 
-				WHERE 
-					tbl_studentlehrverband.student_uid = tbl_benutzer.uid 
-					AND tbl_benutzer.person_id = tbl_person.person_id 
-					AND tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz 
-					AND tbl_studentlehrverband.student_uid = ".$db->db_add_param($uid)." 
+		$query = "SELECT
+					tbl_studiengang.studiengang_kz, tbl_studentlehrverband.semester, tbl_studiengang.typ,
+					tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer,
+					tbl_studentlehrverband, tbl_studiengang
+				WHERE
+					tbl_studentlehrverband.student_uid = tbl_benutzer.uid
+					AND tbl_benutzer.person_id = tbl_person.person_id
+					AND tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz
+					AND tbl_studentlehrverband.student_uid = ".$db->db_add_param($uid)."
 					AND tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($ss);
 
 		if($result = $db->db_query($query))
@@ -575,12 +580,12 @@ else
 			{
 				case 'application/vnd.oasis.opendocument.text':
 						$endung = 'odt';
-						break; 
+						break;
 				case 'application/vnd.oasis.opendocument.spreadsheet':
-						$endung = 'ods'; 
-						break;               
+						$endung = 'ods';
+						break;
 				default:
-						$endung = 'pdf'; 
+						$endung = 'pdf';
 			}
 
 			// Load the XSL source
@@ -588,11 +593,11 @@ else
 
 			if(!$xsl_doc->loadXML($xsl_content))
 				die('unable to load xsl');
-		
+
 			// Configure the transformer
 			$proc = new XSLTProcessor;
 			$proc->importStyleSheet($xsl_doc); // attach the xsl rules
-		
+
 			$buffer = $proc->transformToXml($xml_doc);
 			//echo $buffer;
 			//exit;
@@ -602,7 +607,7 @@ else
 			file_put_contents('content.xml', $buffer);
 
 			// Wenn ein Style XSL uebergeben wurde wird ein zweites XML File erstellt mit den
-			// Styleanweisungen und ebenfalls zum Zip hinzugefuegt        
+			// Styleanweisungen und ebenfalls zum Zip hinzugefuegt
 			if(isset($_GET['style_xsl']))
 			{
 				//Wenn die Spalte style in der DB befuellt ist, wird dieses verwendet
@@ -612,7 +617,7 @@ else
 					if(!$style_xsl_doc->loadXML($vorlage->style))
 						die('unable to load xsl from tbl_vorlagestudiengang');
 				}
-				else 
+				else
 				{
 					$style_xsl=$_GET['style_xsl'];
 					$style_vorlage = new vorlage();
@@ -621,11 +626,11 @@ else
 					if(!$style_xsl_doc->loadXML($style_vorlage->text))
 						die('unable to load xsl');
 				}
-				
+
 				// Configure the transformer
 				$style_proc = new XSLTProcessor;
 				$style_proc->importStyleSheet($style_xsl_doc); // attach the xsl rules
-		
+
 				$stylebuffer = $style_proc->transformToXml($xml_doc);
 
 				file_put_contents('styles.xml', $stylebuffer);
@@ -637,7 +642,7 @@ else
 			foreach($addons->aktive_addons as $addon)
 			{
 				$zipfile = DOC_ROOT.'addons/'.$addon.'/system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
-			
+
 				if(file_exists($zipfile))
 				{
 					$vorlage_found=true;
@@ -646,8 +651,8 @@ else
 			}
 			if(!$vorlage_found)
 				$zipfile = DOC_ROOT.'system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
-		
-		
+
+
 			$tempname_zip = 'out.zip';
 			if(copy($zipfile, $tempname_zip))
 			{
@@ -655,10 +660,10 @@ else
 				if(isset($_GET['style_xsl']) || $vorlage->style!='')
 					exec("zip $tempname_zip styles.xml");
 
-				clearstatcache(); 
+				clearstatcache();
 
 				$tempPdfName = $vorlage->vorlage_kurzbz.'.pdf';
-	            exec("unoconv -e IsSkipEmptyPages=false --stdout -f pdf $tempname_zip > $tempPdfName");		            
+	            exec("unoconv -e IsSkipEmptyPages=false --stdout -f pdf $tempname_zip > $tempPdfName");
 			}
 			$file = $tempfolder.'/'.$tempPdfName;
 		}
@@ -669,23 +674,23 @@ else
 				$fop = new fop();
 				$file = $fop->generatePdf($xml_doc->saveXML(), $xsl_content, $filename, "F");
 			}
-			else 
+			else
 			{
 				$filename = $user;
 				$fo2pdf = new XslFo2Pdf();
-			
+
 				// Load the XSL source
 				$xsl_doc = new DOMDocument;
-			
+
 				if(!$xsl_doc->loadXML($xsl_content))
 					die('unable to load xsl');
-				
+
 				// Configure the transformer
 				$proc = new XSLTProcessor;
 				$proc->importStyleSheet($xsl_doc); // attach the xsl rules
-			
+
 				$buffer = $proc->transformToXml($xml_doc);
-			
+
 				if (!$fo2pdf->generatePdf($buffer, $filename, 'F'))
 				{
 					echo('Failed to generate PDF');
@@ -693,13 +698,13 @@ else
 				$file = "/tmp/".$filename.".pdf";
 			}
 		}
-	
+
 		$handle = fopen($file, "rb");
 		$string = fread($handle, filesize($file));
 		fclose($handle);
 		//$string = file_get_contents($file);
 		unlink($file);
-		
+
 		$hex="";
 		//for ($i=0;$i<mb_strlen($string);$i++)
 		//	$hex.=(mb_strlen(dechex(ord(mb_substr($string,$i,1)))<2)? "0".dechex(ord(mb_substr($string,$i,1))): dechex(ord(mb_substr($string,$i,1))));
