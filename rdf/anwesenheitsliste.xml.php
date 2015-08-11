@@ -35,6 +35,7 @@ isset($_GET['stundebis']) ? $stundebis = $_GET['stundebis'] : $stundebis = null;
 isset($_GET['stg_kz']) ? $studiengang = $_GET['stg_kz'] : $studiengang = NULL;
 isset($_GET['semester']) ? $semester = $_GET['semester'] : $semester = NULL;
 isset($_GET['lehreinheit']) ? $lehreinheit = $_GET['lehreinheit'] : $lehreinheit = NULL;
+isset($_GET['fixangestellt']) ? $fixangestellt = $_GET['fixangestellt'] : $fixangestellt = NULL;
 
 if($von)
 	$studiensemester = getStudiensemesterFromDatum($von);
@@ -85,8 +86,10 @@ if($db->db_query($qry))
 foreach($data as $key => $value)
 {
 	// Daten der Vortragenden ermitteln
-	$qry = "SELECT vorname, nachname, titelpre, titelpost "
+	$qry = "SELECT vorname, nachname, titelpre, titelpost, "
+        . "CASE WHEN fixangestellt IS TRUE THEN 'ja' ELSE 'nein' END AS fixangestellt "
 		. "FROM lehre.tbl_lehreinheitmitarbeiter lema "
+        . "JOIN public.tbl_mitarbeiter ma ON lema.mitarbeiter_uid = ma.mitarbeiter_uid "   
 		. "JOIN public.tbl_benutzer be ON be.uid = lema.mitarbeiter_uid "
 		. "JOIN public.tbl_person pe ON pe.person_id = be.person_id "
 		. "WHERE lehreinheit_id = " . $db->db_add_param($key);
@@ -127,7 +130,20 @@ echo "<anwesenheitslisten>";
 
 foreach($data as $lehreinheit_id => $value)
 {
-	foreach($value['tage'] as $tag)
+	// Anstellung der Vortragenden prüfen
+    if($fixangestellt != '')
+    {
+        $anstellungVortragende = array();
+        foreach($value['vortragende'] as $vortragender)
+        {
+            $anstellungVortragende[] = $vortragender->fixangestellt;
+        }
+
+        if(!in_array($fixangestellt, $anstellungVortragende))
+            continue;
+    }
+    
+    foreach($value['tage'] as $tag)
 	{
 		echo "<anwesenheitsliste>";
 
@@ -159,6 +175,7 @@ foreach($data as $lehreinheit_id => $value)
 			echo "\n			<nachname><![CDATA[".$vortragender->nachname."]]></nachname>";
 			echo "\n			<titelpre><![CDATA[".$vortragender->titelpre."]]></titelpre>";
 			echo "\n			<titelpost><![CDATA[".$vortragender->titelpost."]]></titelpost>";
+            echo "\n			<fixangestellt><![CDATA[".$vortragender->fixangestellt."]]></fixangestellt>";
 			echo "\n		</vortragender>";
 		}
 		echo "</vortragende>";

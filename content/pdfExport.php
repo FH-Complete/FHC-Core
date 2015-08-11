@@ -147,6 +147,8 @@ if(isset($_GET['vertrag_id']))
 }
 if(isset($_GET['studienordnung_id']))
 	$params.='&studienordnung_id='.urlencode($_GET['studienordnung_id']);
+if(isset($_GET['fixangestellt']))
+	$params.='&fixangestellt='.urlencode($_GET['fixangestellt']);
 $output = (isset($_GET['output'])?$_GET['output']:'odt');
 
 $rechte = new benutzerberechtigung();

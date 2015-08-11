@@ -137,6 +137,16 @@ $studiengang->getAll("typ, kurzbz");
 					</select>
 				</td>
 			</tr>
+            <tr>
+				<td>Anstellung der Vortragenden</td>
+				<td>
+					<select name="fixangestellt">
+						<option value=''>-- Alle --</option>
+						<option value='ja'>fix angestellt</option>
+                        <option value='nein'>nebenberuflich</option>
+					</select>
+				</td>
+			</tr>
 			<tr>
 				<td></td>
 				<td><input type="submit" value="Liste erstellen" /></td>
