@@ -56,7 +56,7 @@ class adresse extends basis_db
 	public function __construct($adresse_id=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($adresse_id))
 			$this->load($adresse_id);
 	}
@@ -160,13 +160,13 @@ class adresse extends basis_db
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Laedt alle Adressen zu der Firma die uebergeben wird
-	 * 
+	 *
 	 * ACHTUNG: Diese Funktion wird nur mehr fuer Lehrauftraege benoetigt.
 	 * Die Adresse zu einer Firma wird nun ueber die Tabelle Standort hergestellt!
-	 * 
+	 *
 	 * @deprec  2.0
 	 * @param $firma_id ID der Firma zu der die Adressen geladen werden sollen
 	 * @return true wenn ok, false im Fehlerfall
@@ -262,7 +262,7 @@ class adresse extends basis_db
 		$this->errormsg = '';
 		return true;
 	}
-	
+
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -319,7 +319,7 @@ class adresse extends basis_db
 		      	' zustelladresse='.$this->db_add_param($this->zustelladresse, FHC_BOOLEAN, false).' '.
 		      	'WHERE adresse_id='.$this->db_add_param($this->adresse_id, FHC_INTEGER, false).';';
 		}
-        
+
 		if($this->db_query($qry))
 		{
 			if($this->new)
@@ -383,6 +383,58 @@ class adresse extends basis_db
 			$this->errormsg = 'Fehler beim Löschen der Daten'."\n";
 			return false;
 		}
+	}
+
+	/**
+	 * Laedt die Zustell Adresse einer Person
+	 * @param  $person_id ID der Person
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function loadZustellAdresse($person_id)
+	{
+		//Pruefen ob person_id eine gueltige Zahl ist
+		if(!is_numeric($person_id) || $person_id == '')
+		{
+			$this->errormsg = 'PersonID muss eine Zahl sein';
+			return false;
+		}
+
+		//Daten aus der Datenbank lesen
+		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER, false)."
+			ORDER BY zustelladresse DESC LIMIT 1";
+
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+			return false;
+		}
+
+		if($row = $this->db_fetch_object())
+		{
+			$this->adresse_id		= $row->adresse_id;
+			$this->heimatadresse 	= $this->db_parse_bool($row->heimatadresse);
+			$this->zustelladresse	= $this->db_parse_bool($row->zustelladresse);
+			$this->gemeinde			= $row->gemeinde;
+			$this->name				= $row->name;
+			$this->nation			= $row->nation;
+			$this->ort				= $row->ort;
+			$this->person_id		= $row->person_id;
+			$this->plz				= $row->plz;
+			$this->strasse			= $row->strasse;
+			$this->typ				= $row->typ;
+			$this->updateamum		= $row->updateamum;
+			$this->updatevon		= $row->updatevon;
+			$this->insertamum		= $row->insertamum;
+			$this->insertvon		= $row->insertvon;
+			$this->firma_id			= $row->firma_id;
+		}
+		else
+		{
+			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
+			return false;
+		}
+
+		return true;
 	}
 }
 ?>
