@@ -22,9 +22,12 @@ require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/stunde.class.php');
+require_once('../../include/standort.class.php');
 
 $studiengang = new studiengang;
 $studiengang->getAll("typ, kurzbz");
+$standort = new standort;
+$standort->getAllStandorteWithOrt();
 
 ?>
 
@@ -144,6 +147,15 @@ $studiengang->getAll("typ, kurzbz");
 						<option value=''>-- Alle --</option>
 						<option value='ja'>fix angestellt</option>
                         <option value='nein'>nebenberuflich</option>
+					</select>
+				</td>
+			</tr>
+            <tr>
+				<td>Standort</td>
+				<td>
+					<select name="standort">
+						<option value=''>-- Alle --</option>
+						<?php foreach($standort->result as $value) echo "<option value='$value->standort_id'>$value->bezeichnung</option>\n"; ?>
 					</select>
 				</td>
 			</tr>

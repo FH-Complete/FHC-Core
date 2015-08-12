@@ -36,6 +36,7 @@ isset($_GET['stg_kz']) ? $studiengang = $_GET['stg_kz'] : $studiengang = NULL;
 isset($_GET['semester']) ? $semester = $_GET['semester'] : $semester = NULL;
 isset($_GET['lehreinheit']) ? $lehreinheit = $_GET['lehreinheit'] : $lehreinheit = NULL;
 isset($_GET['fixangestellt']) ? $fixangestellt = $_GET['fixangestellt'] : $fixangestellt = NULL;
+isset($_GET['standort']) ? $standort = $_GET['standort'] : $standort = NULL;
 
 if($von)
 	$studiensemester = getStudiensemesterFromDatum($von);
@@ -48,12 +49,14 @@ $data = array();
 */
 // Daten der Lehreinheiten ermitteln
 $qry = "SELECT le.lehreinheit_id, le.lehrveranstaltung_id, lv.lvnr, lv.bezeichnung AS lvbez, stg.bezeichnung AS stgbez, "
-	. "sp.ort_kurzbz, datum, beginn, ende "
+	. "sp.ort_kurzbz, datum, beginn, ende, sto.bezeichnung AS standort "
 	. "FROM lehre.tbl_lehreinheit le "
 	. "JOIN lehre.tbl_lehrveranstaltung lv ON lv.lehrveranstaltung_id = le.lehrveranstaltung_id "
 	. "JOIN public.tbl_studiengang stg ON stg.studiengang_kz = lv.studiengang_kz "
 	. "JOIN lehre.tbl_stundenplan sp ON (sp.lehreinheit_id=le.lehreinheit_id) "
 	. "JOIN lehre.tbl_stunde stu ON stu.stunde = sp.stunde "
+    . "JOIN public.tbl_ort ort ON sp.ort_kurzbz = ort.ort_kurzbz "
+    . "JOIN public.tbl_standort sto ON ort.standort_id = sto.standort_id "
 	. "WHERE 1=1";
 
 if($studiengang!='')
@@ -70,6 +73,8 @@ if(!is_null($stundevon))
 	$qry.=" AND stu.stunde>=".$db->db_add_param($stundevon);
 if(!is_null($stundebis))
 	$qry.=" AND stu.stunde<=".$db->db_add_param($stundebis);
+if($standort)
+	$qry.=" AND sto.standort_id=".$db->db_add_param($standort);
 $qry .= " ORDER BY datum, beginn";
 
 if($db->db_query($qry))
@@ -160,6 +165,7 @@ foreach($data as $lehreinheit_id => $value)
 		echo "\n			<barcode><![CDATA[".ean13($convertableString)."]]></barcode>";
 		echo "\n			<kuerzel><![CDATA[".$tag[0]->lvnr."]]></kuerzel>";
 		echo "\n			<einheiten><![CDATA[".count($tag)."]]></einheiten>";
+        echo "\n			<standort><![CDATA[".$tag[0]->standort."]]></standort>";
 		echo "\n			<ort><![CDATA[".$tag[0]->ort_kurzbz."]]></ort>";
 		echo "\n			<datum><![CDATA[".date('d.m.Y', strtotime($tag[0]->datum))."]]></datum>";
 		echo "\n			<beginn><![CDATA[".mb_substr($tag[0]->beginn, 0, 5)."]]></beginn>";

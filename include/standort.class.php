@@ -638,6 +638,46 @@ class standort extends basis_db
 		
 		
 	}
+    
+    /**
+     * Gibt alle Standorte zurück, die zumindest mit 1 Ort verknüpft sind
+     * @return true wenn ok, false im Fehlerfall
+     */
+    public function getAllStandorteWithOrt() 
+    {
+        $qry = "SELECT standort.* 
+                FROM public.tbl_firma AS firma, public.tbl_adresse AS adresse, public.tbl_standort AS standort 
+                WHERE firma.firma_id = standort.firma_id
+                AND standort.adresse_id = adresse.adresse_id
+                AND standort.standort_id IN 
+                    (SELECT DISTINCT standort_id FROM public.tbl_ort);";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$standort = new standort(); 
+
+				$standort->standort_id = $row->standort_id; 
+				$standort->firma_id = $row->firma_id; 
+				$standort->adresse_id = $row->adresse_id; 
+				$standort->kurzbz = $row->kurzbz; 
+				$standort->bezeichnung = $row->bezeichnung; 
+				$standort->insertvon = $row->insertvon; 
+				$standort->insertamum = $row->insertamum; 
+				$standort->updatevon = $row->updatevon; 
+				$standort->updateamum = $row->updateamum;
+
+				$this->result[] = $standort; 
+			}
+			return true; 
+		}
+		else
+		{
+			$this->errormsg="Fehler bei der Abfrage aufgetreten.";
+			return false; 
+		}
+    }
 	
 	
 }
