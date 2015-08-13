@@ -44,6 +44,31 @@ $standort->getAllStandorteWithOrt();
 	$(document).ready(function() 
 	{ 
 	    $(".datepicker").datepicker($.datepicker.regional['de']).datepicker("setDate", new Date());
+        
+        // Dropdown der Lehrveranstaltungen befüllen
+        $("#stg_kz, #sem").change(function() 
+        {
+            // alte Optionen entfernen
+            $("#lvid").empty();
+            $('#lvid')
+                .append($('<option>', {value : ''})
+                .text('-- Alle --'));
+        
+            var stg_kz = $("#stg_kz").val();
+            var sem = $("#sem").val();
+        
+            if(stg_kz != '' && sem != '')
+            {
+                // LVs ergänzen
+                $.getJSON("lehrveranstaltungen_json.php", {stg_kz: stg_kz, sem: sem}, function(data) {
+                    $.each(data, function(key, value) {
+                        $('#lvid')
+                            .append($('<option>', {value : key})
+                            .text(value)); 
+                    });
+                });
+            }
+        })
 	});
 	
 	function checkDates()
@@ -125,7 +150,7 @@ $standort->getAllStandorteWithOrt();
 			<tr>
 				<td>Studiengang</td>
 				<td>
-					<select name="stg_kz">
+                    <select name="stg_kz" id="stg_kz">
 						<option value=''>-- Alle --</option>
 						<?php foreach($studiengang->result as $value) echo "<option value='$value->studiengang_kz'>$value->kuerzel ($value->bezeichnung)</option>\n"; ?>
 					</select>
@@ -134,9 +159,18 @@ $standort->getAllStandorteWithOrt();
 			<tr>
 				<td>Ausbildungssemester</td>
 				<td>
-					<select name="sem">
+                    <select name="sem" id="sem">
 						<option value=''>-- Alle --</option>
 						<?php for($x = 1; $x <= 10; $x++) echo "<option value='$x'>$x</option>\n"; ?>
+					</select>
+				</td>
+			</tr>
+            <tr>
+				<td>Lehrveranstaltung</td>
+				<td>
+					<select name="lvid" id="lvid">
+						<option value=''>-- Alle --</option>
+						
 					</select>
 				</td>
 			</tr>

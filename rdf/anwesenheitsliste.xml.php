@@ -33,10 +33,11 @@ isset($_GET['bis']) ? $bis = date('Y-m-d', strtotime($_GET['bis'])) : $bis = $vo
 isset($_GET['stundevon']) ? $stundevon = $_GET['stundevon'] : $stundevon = null;
 isset($_GET['stundebis']) ? $stundebis = $_GET['stundebis'] : $stundebis = null;
 isset($_GET['stg_kz']) ? $studiengang = $_GET['stg_kz'] : $studiengang = NULL;
-isset($_GET['semester']) ? $semester = $_GET['semester'] : $semester = NULL;
+isset($_GET['sem']) ? $semester = $_GET['sem'] : $semester = NULL;
 isset($_GET['lehreinheit']) ? $lehreinheit = $_GET['lehreinheit'] : $lehreinheit = NULL;
 isset($_GET['fixangestellt']) ? $fixangestellt = $_GET['fixangestellt'] : $fixangestellt = NULL;
 isset($_GET['standort']) ? $standort = $_GET['standort'] : $standort = NULL;
+isset($_GET['lvid']) ? $lvid = $_GET['lvid'] : $lvid = NULL;
 
 if($von)
 	$studiensemester = getStudiensemesterFromDatum($von);
@@ -75,6 +76,8 @@ if(!is_null($stundebis))
 	$qry.=" AND stu.stunde<=".$db->db_add_param($stundebis);
 if($standort)
 	$qry.=" AND sto.standort_id=".$db->db_add_param($standort);
+if($lvid)
+	$qry .= " AND lv.lehrveranstaltung_id = " . $db->db_add_param($lvid);
 $qry .= " ORDER BY datum, beginn";
 
 if($db->db_query($qry))
