@@ -49,8 +49,8 @@ $standort->getAllStandorteWithOrt();
         $("#stg_kz, #sem").change(function() 
         {
             // alte Optionen entfernen
-            $("#lvid").empty();
-            $('#lvid')
+            $("#lvid")
+                .empty()
                 .append($('<option>', {value : ''})
                 .text('-- Alle --'));
         

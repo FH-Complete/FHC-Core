@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2014 Technikum-Wien
+/* Copyright (C) 2015 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ isset($_GET['stg_kz']) ? $stg_kz = $_GET['stg_kz'] : $stg_kz = NULL;
 isset($_GET['sem']) ? $sem = $_GET['sem'] : $sem = NULL;
 
 if(is_null($sem) || is_null($stg_kz))
-    die("Studiengangkennzahl und Semester müssen übergeben werden");
+    die("Studiengangskennzahl und Semester müssen übergeben werden");
 
 $lva = new lehrveranstaltung;
 $lva->load_lva($stg_kz, $sem, null, true, true, "bezeichnung");
@@ -39,7 +39,6 @@ if(is_array($lva->lehrveranstaltungen))
         $result[$value->lehrveranstaltung_id] = $value->bezeichnung . " (" . $value->lehrform_kurzbz . ")";
     }
     
-    natcasesort($result);
     echo json_encode($result);
 }
 else
