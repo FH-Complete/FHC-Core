@@ -66,7 +66,7 @@ if(!$error)
 	{
 		//Speichert die Mitarbeiterdaten
 		$mitarbeiter = new mitarbeiter();
-		
+
 		if($mitarbeiter->load($_POST['uid']))
 		{
 			//Werte zuweisen
@@ -116,46 +116,46 @@ if(!$error)
 				{
 					$resturlaub->new = false;
 				}
-				else 
+				else
 				{
 					$resturlaub->new = true;
 					$resturlaub->insertamum = date('Y-m-d H:i:s');
 					$resturlaub->insertvon = $user;
 					$resturlaub->mitarbeiter_uid = $_POST['uid'];
 				}
-				
+
 				$resturlaub->updateamum = date('Y-m-d H:i:s');
 				$resturlaub->updatevon = $user;
 				$resturlaub->urlaubstageprojahr = $_POST['urlaubsanspruch'];
 				$resturlaub->resturlaubstage = $_POST['resturlaubstage'];
-				
+
 				if($resturlaub->save())
 				{
 					$return = true;
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = 'Fehler beim Speichern der Resturlaubstage/Urlaubsanspruch'.$resturlaub->errormsg;
 				}
 			}
-			else 
+			else
 			{
 				$errormsg = $mitarbeiter->errormsg;
 				$return = false;
 			}
 		}
-		else 
+		else
 		{
 			$errormsg = $mitarbeiter->errormsg;
 			$return = false;
-		}	
+		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='verwendungsave')
 	{
 		//Speichert die BISVerwendung
 		$verwendung = new bisverwendung();
-		
+
 		if($_POST['neu']!='true')
 		{
 			if(!$verwendung->load($_POST['bisverwendung_id']))
@@ -166,13 +166,13 @@ if(!$error)
 			}
 			$verwendung->new = false;
 		}
-		else 
+		else
 		{
 			$verwendung->new = true;
 			$verwendung->insertamum = date('Y-m-d H:i:s');
 			$verwendung->insertvon = $user;
 		}
-		
+
 		if(!$error)
 		{
 			$verwendung->ba1code = $_POST['ba1code'];
@@ -185,22 +185,22 @@ if(!$error)
 				$verwendung->hauptberuflich = true;
 			elseif($_POST['hauptberuflich']=='false')
 				$verwendung->hauptberuflich = false;
-			else 
+			else
 				$verwendung->hauptberuflich = '';
 			$verwendung->habilitation = ($_POST['habilitation']=='true'?true:false);
 			$verwendung->beginn = $_POST['beginn'];
 			$verwendung->ende = $_POST['ende'];
 			$verwendung->vertragsstunden = str_replace(',','.',$_POST['vertragsstunden']);
 			$verwendung->updateamum = date('Y-m-d H:i:s');
-			$verwendung->updatevon = $user;		
-			$verwendung->dv_art = $_POST['dv_art'];		
-			
+			$verwendung->updatevon = $user;
+			$verwendung->dv_art = $_POST['dv_art'];
+
 			if($verwendung->save())
 			{
 				$return = true;
 				$data = $verwendung->bisverwendung_id;
 			}
-			else 
+			else
 			{
 				$errormsg = $verwendung->errormsg;
 				$return = false;
@@ -215,7 +215,7 @@ if(!$error)
 		{
 			$return = true;
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg = $verwendung->errormsg;
@@ -225,7 +225,7 @@ if(!$error)
 	{
 		//Speichert die BISFunktion
 		$funktion = new bisfunktion();
-		
+
 		if($_POST['neu']!='true')
 		{
 			if(!$funktion->load($_POST['bisverwendung_id'],$_POST['studiengang_kz_old']))
@@ -236,13 +236,13 @@ if(!$error)
 			}
 			$funktion->new = false;
 		}
-		else 
+		else
 		{
 			$funktion->new = true;
 			$funktion->insertamum = date('Y-m-d H:i:s');
 			$funktion->insertvon = $user;
 		}
-				
+
 		if(!$error)
 		{
 			$funktion->bisverwendung_id = $_POST['bisverwendung_id'];
@@ -250,13 +250,13 @@ if(!$error)
 			$funktion->studiengang_kz_old = $_POST['studiengang_kz_old'];
 			$funktion->sws = str_replace(',','.',$_POST['sws']);
 			$funktion->updateamum = date('Y-m-d H:i:s');
-			$funktion->updatevon = $user;				
-			
+			$funktion->updatevon = $user;
+
 			if($funktion->save())
 			{
 				$return = true;
 			}
-			else 
+			else
 			{
 				$errormsg = $funktion->errormsg;
 				$return = false;
@@ -271,7 +271,7 @@ if(!$error)
 		{
 			$return = true;
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg = $funktion->errormsg;
@@ -281,7 +281,7 @@ if(!$error)
 	{
 		//Speichert den Entwicklungsteameintrag
 		$entwt = new entwicklungsteam();
-		
+
 		if($_POST['neu']!='true')
 		{
 			if(!$entwt->load($_POST['mitarbeiter_uid'],$_POST['studiengang_kz_old']))
@@ -292,8 +292,8 @@ if(!$error)
 			}
 			$entwt->new = false;
 		}
-		else 
-		{			
+		else
+		{
 
 			if($entwt->exists($_POST['mitarbeiter_uid'],$_POST['studiengang_kz']))
 			{
@@ -305,7 +305,7 @@ if(!$error)
 			$entwt->insertamum = date('Y-m-d H:i:s');
 			$entwt->insertvon = $user;
 		}
-			
+
 		if(!$error)
 		{
 			$entwt->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
@@ -315,19 +315,19 @@ if(!$error)
 			$entwt->beginn = $_POST['beginn'];
 			$entwt->ende = $_POST['ende'];
 			$entwt->updateamum = date('Y-m-d H:i:s');
-			$entwt->updatevon = $user;				
-			
+			$entwt->updatevon = $user;
+
 			if($entwt->save())
 			{
 				$return = true;
 			}
-			else 
+			else
 			{
 				$errormsg = $entwt->errormsg;
 				$return = false;
 			}
 		}
-		
+
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='entwicklungsteamdelete')
 	{
@@ -337,7 +337,7 @@ if(!$error)
 		{
 			$return = true;
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg = $entwt->errormsg;
@@ -374,12 +374,12 @@ if(!$error)
 				$buchung->updateamum = date('Y-m-d H:i:s');
 				$buchung->updatevon = $user;
 			}
-			
+
 			if($buchung->save())
 			{
 				$return = true;
 			}
-			else 
+			else
 			{
 				$errormsg = $buchung->errormsg;
 				$return = false;
@@ -401,7 +401,7 @@ if(!$error)
 			{
 				$return = true;
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = $buchung->errormsg;
@@ -419,17 +419,29 @@ if(!$error)
 		{
 			$errormsg='';
 
-			$person_id = $_POST['person_id'];
+			if(isset($_POST['person_id']))
+				$person_id = $_POST['person_id'];
+			elseif(isset($_POST['mitarbeiter_uid']))
+			{
+				$ma = new mitarbeiter();
+				$ma->load($_POST['mitarbeiter_uid']);
+				$person_id=$ma->person_id;
+			}
+			else
+			{
+				$return = false;
+				$errormsg = 'Falsche Parameter';
+			}
 
 			$person = new person();
 			$person->load($person_id);
 
 			$vertrag = new vertrag();
 			$neu = false;
-			if($_POST['vertrag_id']!='')
+			if(isset($_POST['vertrag_id']) && $_POST['vertrag_id']!='')
 			{
 				// Bearbeiten eines Vertrags
-				$vertrag_id=$_POST['vertrag_id'];				
+				$vertrag_id=$_POST['vertrag_id'];
 
 				if($vertrag->load($vertrag_id))
 				{
@@ -523,12 +535,12 @@ if(!$error)
 					{
 						// Neu Status setzen
 						$vertrag = new vertrag();
-			
+
 						$vertrag->vertrag_id = $vertrag_id;
 						$vertrag->vertragsstatus_kurzbz = 'neu';
 						$vertrag->datum = date('Y-m-d H:i:s');
 						$vertrag->uid = $user;
-			
+
 						if(!$vertrag->saveVertragsstatus(true))
 							$errormsg.=$vertrag->erromsg;
 					}
@@ -537,11 +549,11 @@ if(!$error)
 						$return=true;
 					else
 						$return=false;
-				
+
 				}
 				else
 				{
-					$return = false; 
+					$return = false;
 					$errormsg = $vertrag->errormsg;
 				}
 			}
@@ -562,22 +574,22 @@ if(!$error)
 		{
 			$vertrag_id = $_POST['vertrag_id'];
 			$status = $_POST['status'];
-			
+
 			$vertrag = new vertrag();
-			
+
 			$vertrag->vertrag_id = $vertrag_id;
 			$vertrag->vertragsstatus_kurzbz = $status;
 			$vertrag->datum = date('Y-m-d H:i:s');
 			$vertrag->uid = $user;
 			$vertrag->insertvon = $user;
-			
+
 			if($vertrag->saveVertragsstatus(true))
 			{
-				$return=true;	
+				$return=true;
 			}
 			else
 			{
-				$return = false; 
+				$return = false;
 				$errormsg = $vertrag->errormsg;
 			}
 		}
@@ -598,21 +610,21 @@ if(!$error)
 			$time = explode(":",$time);
 			$datum = explode("-", $datum);
 			$datum = date('Y-m-d H:i:s', mktime($time[0],$time[1],0,$datum[1],$datum[2],$datum[0]));
-			
+
 			$vertrag = new vertrag($vertrag_id);
 			$vertrag->getStatus($vertrag_id,$status);
-			
+
 			$vertrag->datum = $datum;
 			$vertrag->updatevon = $user;
 			$vertrag->updateamum = date('Y-m-d H:i:s');
-			
+
 			if($vertrag->saveVertragsstatus(false))
 			{
-				$return=true; 
+				$return=true;
 			}
 			else
 			{
-				$return = false; 
+				$return = false;
 				$errormsg = $vertrag->errormsg;
 			}
 		}
@@ -633,11 +645,11 @@ if(!$error)
 
 			if($vertrag->deleteVertragsstatus($vertrag_id, $status))
 			{
-				$return=true; 
+				$return=true;
 			}
 			else
 			{
-				$return = false; 
+				$return = false;
 				$errormsg = 'Failed'.$vertrag->errormsg;
 			}
 		}
@@ -735,7 +747,7 @@ if(!$error)
 		$konto->beschreibung['German'] = $_POST['beschreibung'];
 		$konto->kurzbz = $_POST['kurzbz'];
 		$konto->person_id = isset($_POST['person_id']) ? $_POST['person_id'] : null;
-		
+
 		if (!$konto->save())
 		{
 			$error = true;

@@ -53,6 +53,10 @@ define('CIS_GESAMTNOTE_PUNKTE',false);
 // Gibt an ob der Lektor erneut eine LVNote eintragen kann wenn bereits eine Zeugnisnote vorhanden ist (true | false) DEFAULT true
 define('CIS_GESAMTNOTE_UEBERSCHREIBEN',true);
 
+// Gibt an ob im FAS bei den Lehrveranstaltungsnoten ein zusaetzliches Formular angezeigt wird um
+// Vertraege fuer Pruefungshonorare anzulegen
+define('FAS_GESAMTNOTE_PRUEFUNGSHONORAR',false);
+
 // Anzeigeoptionen für LV-Plan Menü
 define('CIS_LVPLAN_EXPORT_ANZEIGEN',true);
 define('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN',true);
@@ -89,7 +93,7 @@ define('VORRUECKUNG_LEHRVERBAND_MAX_SEMESTER','');
 define('VORRUECKUNG_STATUS_MAX_SEMESTER',true);
 
 // Bei Statuswechsel auf Bewerber -> soll Reihungstest brücksichtigt werden
-define('REIHUNGSTEST_CHECK', true); 
+define('REIHUNGSTEST_CHECK', true);
 
 /* Schema zur Erstellung der Kurs Kategorien im Moodle
  * Leer oder nicht gesetzt: STSEM -> STG -> Ausbsemester (WS2014 -> BEL -> 1)
@@ -98,7 +102,7 @@ define('REIHUNGSTEST_CHECK', true);
 define('MOODLE_COURSE_SCHEMA','');
 
 // Bei Statuswechsel auf Bewerber -> bei true wird email (INFOMAIL_BEWERBER) an den Bewerber geschickt
-define('SEND_BEWERBER_INFOMAIL', false); 
+define('SEND_BEWERBER_INFOMAIL', false);
 
 // Infotext der an Bewerber gesendet wird
 define('INFOMAIL_BEWERBER', 'Vielen Dank für Ihr Interesse an einem Studium
@@ -114,7 +118,7 @@ Mo-Fr 9:00-12:00 Uhr
 Mi 13:30-15:30 Uhr
 
 Mit freundlichen Grüßen,
-Ihre Fachhochschule'); 
+Ihre Fachhochschule');
 
 // Bei neuen Studierenden UID automatisch als Matrikelnummer setzen (true|false)
 define('SET_UID_AS_MATRIKELNUMMER',false);
@@ -160,7 +164,7 @@ define('BEWERBERTOOL_ZAHLUNGEN_ANZEIGEN', true);
 define('BEWERBERTOOL_DOKUMENTE_ANZEIGEN', true);
 define('BEWERBERTOOL_ZGV_ANZEIGEN', true);
 define('BEWERBERTOOL_BERUFSTAETIGKEIT_ANZEIGEN', true);
-// Wenn hier eine Mailadresse angegeben ist, werden die Bewerbungen aus der Onlinebwerbung an diese Adresse gesendet. 
+// Wenn hier eine Mailadresse angegeben ist, werden die Bewerbungen aus der Onlinebwerbung an diese Adresse gesendet.
 // Wenn leer dann wird an die Studiengangsadresse gesendet
 define('BEWERBERTOOL_MAILEMPFANG', '');
 

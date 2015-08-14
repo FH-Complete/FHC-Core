@@ -137,7 +137,7 @@ var LeDetailLehrfachSinkObserver =
 					//Vom Label des DropDowns den Fachbereich abschneiden
 					//der dahinter in Klammer steht
 					lflabel = items[i].label.substr(0, items[i].label.lastIndexOf('(')).trim();
-					
+
 					//Richtigen Eintrag suchen
 					if(lflabel==LeDetailLehrfach_label)
 					{
@@ -387,7 +387,7 @@ function LeNeu()
 
 	var stsem = getStudiensemester();
 	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=stsem;
-	
+
 	//Defaultwert fuer Anmerkung
 	document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value='<?php echo str_replace("'","\'",LEHREINHEIT_ANMERKUNG_DEFAULT);?>';
 }
@@ -432,7 +432,7 @@ function LeLektorTreeSelectLektor()
 // ****
 function LvAngebotTreeSelectGruppe()
 {
-	
+
 }
 
 // ****
@@ -724,7 +724,7 @@ function LeAuswahl()
 	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=false;
 	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=false;
 	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=false;
-	
+
 	lehrveranstaltungNotenTreeloaded=false;
 	lehrveranstaltungGesamtNotenTreeloaded=false;
 
@@ -755,7 +755,7 @@ function LeAuswahl()
 
 			//Notizen Tab ausblenden
 			//document.getElementById('lehrveranstaltung-tab-notizen').collapsed=true;
-			
+
 			//LV-Angebot Tab einblenden und Gruppen laden
 			document.getElementById('lehrveranstaltung-tab-lvangebot').collapsed=false;
 			LvAngebotLoad(lehrveranstaltung_id);
@@ -788,7 +788,7 @@ function LeAuswahl()
 
 			//Notizen Tab einblenden
 			//document.getElementById('lehrveranstaltung-tab-notizen').collapsed=false;
-			
+
 			//LV-Angebot Tab ausblenden
 			document.getElementById('lehrveranstaltung-tab-lvangebot').collapsed=true;
 
@@ -800,8 +800,8 @@ function LeAuswahl()
 
 			document.getElementById('lehrveranstaltung-toolbar-neu').disabled=true;
 			document.getElementById('lehrveranstaltung-toolbar-del').disabled=false;
-			
-			//Wenn ein Tab markiert ist der nun ausgeblendet wurde, 
+
+			//Wenn ein Tab markiert ist der nun ausgeblendet wurde,
 			//dann wird der Detail Tab markiert
 			if(document.getElementById('lehrveranstaltung-tabs').selectedItem.collapsed)
 			{
@@ -942,7 +942,7 @@ function LeAuswahl()
 	{
 		debug(e);
 	}
-	
+
 	//Lehreinheitgruppe tree setzen
 	url='<?php echo APP_ROOT; ?>rdf/lehreinheitgruppe.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
 
@@ -1232,7 +1232,7 @@ function LeMitarbeiterAuswahl()
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked=true;
 	else
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked=false;
-		
+
 	LeMitarbeiterGesamtkosten();
 }
 
@@ -1449,7 +1449,7 @@ function LehrveranstaltungGesamtNotenTreeSelectDifferent()
 	var zeugnistree = document.getElementById("lehrveranstaltung-noten-tree");
 	var lvgesamttree = document.getElementById("lehrveranstaltung-lvgesamtnoten-tree");
 	lvgesamttree.view.selection.clearSelection();
-	
+
 	if(lehrveranstaltungNotenTreeloaded && lehrveranstaltungGesamtNotenTreeloaded)
 	{
 		lvgesamttree.view.selection.clearSelection();
@@ -1483,14 +1483,14 @@ function LehrveranstaltungGesamtNotenTreeSelectDifferent()
 				var zeugnisnote=zeugnistree.view.getCellText(j,col);
 				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-benotungsdatum-iso"] : "lehrveranstaltung-noten-tree-benotungsdatum-iso";
 				var zeugnisbenotungsdatum=zeugnistree.view.getCellText(j,col);
-				
+
 				//debug(zeugnisuid+'=='+lvgesamtuid+' && '+zeugnisnote+'=='+lvgesamtnote);
 				if(zeugnisuid==lvgesamtuid && zeugnisnote==lvgesamtnote && zeugnisbenotungsdatum==lvgesamtbenotungsdatum)
 				{
 					found=true;
 					break;
 				}
-				
+
 				//Wenn die Noten unterschiedlich sind, aber das benotungsdatum im Zeugnis
 				//nach dem benotungsdatum des lektors liegt, dann wird die zeile auch nicht markiert.
 				//damit wird verhindert, dass pruefungsnoten die nur von der assistenz eingetragen wurden,
@@ -1842,22 +1842,22 @@ function LehrveranstaltungNotenPunkteChange()
 
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
-	
+
 		req.add('type', 'getnotenotenschluessel');
-	
+
 		req.add('lehrveranstaltung_id', lehrveranstaltung_id);
 		req.add('punkte', punkte);
-		
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-	
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
 				alert(response);
 			else
-				alert(val.dbdml_errormsg);				
+				alert(val.dbdml_errormsg);
 		}
 		else
 		{
@@ -1896,8 +1896,8 @@ function LehrveranstaltungFFZertifikatPrint(event)
 	var ss = getStudiensemester();
 	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiengang_kz"] : "lehrveranstaltung-noten-tree-studiengang_kz";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
-	
-	if (event.shiftKey) 
+
+	if (event.shiftKey)
 	    var output='odt';
 	else if (event.ctrlKey)
 		var output='doc';
@@ -1939,8 +1939,8 @@ function LehrveranstaltungLVZeugnisPrint(event)
 	var ss = getStudiensemester();
 	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiengang_kz"] : "lehrveranstaltung-noten-tree-studiengang_kz";
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
-	
-	if (event.shiftKey) 
+
+	if (event.shiftKey)
 	    var output='odt';
 	else if (event.ctrlKey)
 		var output='doc';
@@ -2007,14 +2007,14 @@ function LeMitarbeiterGesamtkosten()
 	semesterstunden = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').value
 	faktor = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor').value
 	stundensatz = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').value
-	
+
 	if(!isNaN(semesterstunden) && !isNaN(faktor) && !isNaN(stundensatz))
 		gesamtkosten = semesterstunden*faktor*stundensatz;
 	else
 		gesamtkosten = 0;
-	
+
 	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten').value=gesamtkosten.toFixed(2)+' €';
-	
+
 	if(gesamtkosten<=0)
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten').setAttribute("style",'color: red');
 	else
@@ -2096,7 +2096,7 @@ function LvAngebotGruppenLoad(menulist, filter)
 		{
 			menulist.database.RemoveDataSource(oldDatasources.getNext());
 		}
-		
+
 		//Refresh damit die entfernten DS auch wirklich entfernt werden
 		menulist.builder.rebuild();
 
@@ -2105,7 +2105,7 @@ function LvAngebotGruppenLoad(menulist, filter)
 			var datasource = rdfService.GetDataSource(url);
 		else
 			var datasource = rdfService.GetDataSourceBlocking(url);
-			
+
 		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 		menulist.database.AddDataSource(datasource);
@@ -2121,13 +2121,13 @@ function LvAngebotGruppeSave()
 {
 	var tree = document.getElementById('lehrveranstaltung-tree');
 	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
-	
+
 	if(tree.currentIndex == -1)
 	{
 		alert('Bitte zuerst eine Lehrveranstaltung auswaehlen');
 		return false;
 	}
-	
+
 	//Werte holen
 	var lehrveranstaltung_id = tree.view.getCellText(tree.currentIndex,col);
 	var neue_gruppe = document.getElementById('lehrveranstaltung-lvangebot-checkbox-gruppe').checked;
@@ -2136,16 +2136,16 @@ function LvAngebotGruppeSave()
 	var gesamtplaetze = document.getElementById('lehrveranstaltung-lvangebot-textbox-gesamt').value;
 	var anmeldefenster_start = document.getElementById('lehrveranstaltung-lvangebot-textbox-start').value;
 	var anmeldefenster_ende = document.getElementById('lehrveranstaltung-lvangebot-textbox-ende').value;
-	
+
 	//Eingaben validieren
 	if(neue_gruppe == false && gruppe == "")
 	{
 		alert('Es muss eine Gruppe ausgewaehlt werden');
 		return false;
 	}
-		
+
 	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
-	
+
 	//Wenn ein Angebot gewaehlt wurde dann ID fuer Update ermitteln
 	tree = document.getElementById('lehrveranstaltung-lvangebot-tree-gruppen');
 	var idx;
@@ -2155,8 +2155,8 @@ function LvAngebotGruppeSave()
 		var col = tree.columns ? tree.columns["lehrveranstaltung-lvangebot-treecol-lvangebot_id"] : "lehrveranstaltung-lvangebot-treecol-lvangebot_id";
 		var lvangebot_id = tree.view.getCellText(idx,col);
 		req.add('lvangebot_id', lvangebot_id);
-	}	
-	
+	}
+
 	req.add('type', 'lvangebot-gruppe-save');
 	req.add('neue_gruppe', neue_gruppe);
 	req.add('gruppe', gruppe);
@@ -2166,7 +2166,7 @@ function LvAngebotGruppeSave()
 	req.add('anmeldefenster_ende', anmeldefenster_ende);
 	req.add('lehrveranstaltung_id', lehrveranstaltung_id);
 	req.add('studiensemester_kurzbz', getStudiensemester());
-	
+
 	var response = req.executePOST();
 
 	var val = new ParseReturnValue(response)
@@ -2219,7 +2219,7 @@ function LvAngebotLoad(lehrveranstaltung_id)
 		LvAngebotGruppenDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 		lvangebottree.database.AddDataSource(LvAngebotGruppenDatasource);
 		lvangebottree.builder.addListener(LvAngebotTreeListener);
-		
+
 		//Eingefelder leeren
 		LvAngebotReset();
 	}
@@ -2257,12 +2257,12 @@ function LvAngebotGruppeDel()
 		alert(e);
 		return false;
 	}
-	
+
 	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
 
 	req.add('type', 'lvangebot_gruppe_del');
 	req.add('lvangebot_id', lvangebot_id);
-	
+
 	var response = req.executePOST();
 	var val =  new ParseReturnValue(response)
 
@@ -2368,7 +2368,7 @@ function LehrveranstaltungTermineIFrameLoad()
 {
 	var tree = document.getElementById('lehrveranstaltung-tree');
 
-	if (tree.currentIndex==-1) 
+	if (tree.currentIndex==-1)
 		return;
 	try
 	{
@@ -2394,7 +2394,7 @@ function LehrveranstaltungTermineIFrameLoad()
 {
 	var tree = document.getElementById('lehrveranstaltung-tree');
 
-	if (tree.currentIndex==-1) 
+	if (tree.currentIndex==-1)
 		return;
 	try
 	{
@@ -2407,4 +2407,73 @@ function LehrveranstaltungTermineIFrameLoad()
 	}
 	catch(e)
 	{}
+}
+
+/**
+ * Berechnet das Pruefungshonorar
+ */
+function LehrveranstaltungNotenPruefungCalculate()
+{
+	var satz = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-satz').value;
+	var anzahl = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anzahl').value;
+	satz = satz.replace(',','.');
+
+	var gesamt = satz*anzahl;
+	document.getElementById('lehrveranstaltung-noten-pruefung-label-gesamt').value=gesamt;
+}
+
+function LehrveranstaltungNotenPruefungSave()
+{
+	var mitarbeiter_uid = document.getElementById('lehrveranstaltung-noten-pruefung-menulist-mitarbeiter').value;
+	var satz = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-satz').value;
+	var anzahl = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anzahl').value;
+	satz = satz.replace(',','.');
+
+	var gesamt = satz*anzahl;
+
+	var tree = document.getElementById('lehrveranstaltung-tree');
+	if (tree.currentIndex==-1)
+		return;
+
+	//Ausgewaehlte LV holen
+    var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung-id";
+	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-bezeichnung"] : "lehrveranstaltung-treecol-bezeichnung";
+	var lv_bezeichnung=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-studiengang"] : "lehrveranstaltung-treecol-studiengang";
+	var lv_studiengang=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-semester"] : "lehrveranstaltung-treecol-semester";
+	var lv_semester=tree.view.getCellText(tree.currentIndex,col);
+
+	var req = new phpRequest('mitarbeiter/mitarbeiterDBDML.php','','');
+
+	var heute = new Date();
+	var datum = '';
+	datum = heute.getFullYear()+'-'+(heute.getMonth()+1)+'-'+heute.getDate();
+	req.add('type', 'vertraggenerate');
+	req.add('mitarbeiter_uid', mitarbeiter_uid);
+	req.add('vertragstyp_kurzbz', 'Pruefungshonorar');
+	req.add('betrag', gesamt);
+	req.add('bezeichnung', 'Pruefungshonorar '+lv_studiengang+' '+lv_semester+' '+lv_bezeichnung+' '+lehrveranstaltung_id);
+	req.add('anmerkung', satz+'€ * '+anzahl);
+	req.add('vertragsdatum', datum);
+
+	var response = req.executePOST();
+
+	var val = new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if (val.dbdml_errormsg == "")
+			alert('Es ist ein unbekannter Fehler aufgetreten');
+		else
+			alert(val.dbdml_errormsg);
+	}
+	else
+	{
+		SetStatusBarText('Daten wurden gespeichert');
+		document.getElementById('lehrveranstaltung-noten-pruefung-textbox-satz').value='';
+		document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anzahl').value='';
+		document.getElementById('lehrveranstaltung-noten-pruefung-label-gesamt').value='';
+	}
 }
