@@ -42,7 +42,7 @@ class mitarbeiter extends benutzer
 	public $stundensatz;
 	public $anmerkung;
 	public $bismelden;
-	public $kleriker; 
+	public $kleriker;
 	public $vorgesetzte=array();
 	public $untergebene=array();
 
@@ -53,7 +53,7 @@ class mitarbeiter extends benutzer
 	public function __construct($uid=null)
 	{
 		parent::__construct();
-		
+
 		//Mitarbeiter laden
 		if($uid!=null)
 			$this->load($uid);
@@ -70,9 +70,9 @@ class mitarbeiter extends benutzer
 		if(!benutzer::load($uid))
 			return false;
 
-		$qry = "SELECT * FROM public.tbl_mitarbeiter LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid) 
+		$qry = "SELECT * FROM public.tbl_mitarbeiter LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid)
 				WHERE mitarbeiter_uid=".$this->db_add_param($uid).";";
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -89,7 +89,7 @@ class mitarbeiter extends benutzer
 				$this->anmerkung = $row->anmerkung;
 				$this->ext_id_mitarbeiter = $row->ext_id;
 				$this->bismelden = $this->db_parse_bool($row->bismelden);
-				$this->kleriker = $this->db_parse_bool($row->kleriker); 
+				$this->kleriker = $this->db_parse_bool($row->kleriker);
 
 				$this->urlaubstageprojahr = $row->urlaubstageprojahr;
 				$this->resturlaubstage = $row->resturlaubstage;
@@ -317,7 +317,7 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 	}
-	
+
 	/**
 	 * gibt array mit allen Mitarbeitern zurueck
 	 * @return array mit Mitarbeitern
@@ -350,9 +350,9 @@ class mitarbeiter extends benutzer
 			$stg = new studiengang($stg_kz);
 			$sql_query.=" AND oe_kurzbz=".$this->db_add_param($stg->oe_kurzbz);
 		}
-		
+
 		$sql_query.=' ORDER BY nachname, vornamen, kurzbz;';
-	    
+
 		if(!$this->db_query($sql_query))
 		{
 			$this->errormsg=$this->db_last_error();
@@ -387,7 +387,7 @@ class mitarbeiter extends benutzer
 			$l->fixangestellt= $this->db_parse_bool($row->fixangestellt);
 			$l->standort_id = $row->standort_id;
 			$l->telefonklappe=$row->telefonklappe;
-			
+
 			// Lektor in Array speichern
 			$result[]=$l;
 		}
@@ -435,14 +435,14 @@ class mitarbeiter extends benutzer
 		{
 			if($datum_von=='')
 				$sql_query.=" AND (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now())";
-			else 
+			else
 				$sql_query.=" AND (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=".$this->db_add_param($datum_von).")";
 		}
 		if(!is_null($datum_bis))
 		{
 			if($datum_bis=='')
 				$sql_query.=" AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())";
-			else 
+			else
 				$sql_query.=" AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=".$this->db_add_param($datum_bis).")";
 		}
 		if ($stge!=null)
@@ -462,13 +462,13 @@ class mitarbeiter extends benutzer
 		}
 	    $sql_query.=' ORDER BY '.$order.';';
 	    //echo $sql_query;
-	
+
 		if(!$this->db_query($sql_query))
 		{
 			$this->errormsg=$this->db_last_error();
 			return false;
 		}
-		
+
 		$num_rows=$this->db_num_rows();
 		$result=array();
 		for($i=0;$i<$num_rows;$i++)
@@ -523,15 +523,15 @@ class mitarbeiter extends benutzer
 				WHERE ((".$this->db_add_param($von)."<=bisdatum AND ".$this->db_add_param($bis).">=bisdatum) OR (".$this->db_add_param($bis).">=vondatum AND ".$this->db_add_param($von)."<=vondatum))";
 	    if($uid!=null)
 			$sql_query .= " AND mitarbeiter_uid=".$this->db_add_param($uid);
-		
+
 		$sql_query .= " ORDER BY nachname;";
-			
+
 		if(!$this->db_query($sql_query))
 		{
 			$this->errormsg=$this->db_last_error();
 			return false;
 		}
-		
+
 		$num_rows=$this->db_num_rows();
 		$result=array();
 		for($i=0;$i<$num_rows;$i++)
@@ -545,7 +545,7 @@ class mitarbeiter extends benutzer
 			$l->vorname=$row->vorname;
 			$l->vornamen=$row->vornamen;
 			$l->nachname=$row->nachname;
-			
+
 			// Lektor in Array speichern
 			$result[]=$l;
 		}
@@ -645,7 +645,7 @@ class mitarbeiter extends benutzer
 	 * @param $verwendung wenn true werden alle geladen die eine BIS-Verwendung eingetragen haben
 	 * @return boolean
 	 */
-	public function getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $verwendung)
+	public function getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $verwendung, $vertragnochnichtretour=null)
 	{
 		$qry = "SELECT distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum, tbl_mitarbeiter.insertvon, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) LEFT JOIN public.tbl_benutzerfunktion USING(uid) LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid) WHERE true";
 
@@ -655,13 +655,13 @@ class mitarbeiter extends benutzer
 			$qry .= " AND fixangestellt=false";
 		if($stgl)
 		{
-			$qry .= " AND funktion_kurzbz='Leitung' AND EXISTS(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz) 
+			$qry .= " AND funktion_kurzbz='Leitung' AND EXISTS(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz)
 					  AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 						  (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 		}
 		if($fbl)
 		{
-			$qry .= " AND funktion_kurzbz='Leitung' AND EXISTS(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich fb WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz AND fb.aktiv) 
+			$qry .= " AND funktion_kurzbz='Leitung' AND EXISTS(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich fb WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz AND fb.aktiv)
 					  AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 						  (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 		}
@@ -679,7 +679,15 @@ class mitarbeiter extends benutzer
 		{
 			$qry.=" AND NOT EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE (ende>now() or ende is null) AND tbl_bisverwendung.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid)";
 		}
-		
+		if($vertragnochnichtretour=='true')
+		{
+			$qry.=" AND EXISTS(SELECT * FROM lehre.tbl_vertrag
+						WHERE person_id=tbl_benutzer.person_id
+						AND NOT EXISTS(SELECT 1 FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=tbl_vertrag.vertrag_id AND vertragsstatus_kurzbz='retour')
+						AND NOT EXISTS(SELECT 1 FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=tbl_vertrag.vertrag_id AND vertragsstatus_kurzbz='abgerechnet')
+						)";
+		}
+
         $qry.=';';
 		if($this->db_query($qry))
 		{
@@ -775,7 +783,7 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiterFilter($filter)
 	{
-		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE lower(nachname) ~* lower(".$this->db_add_param($filter).") OR uid ~* ".$this->db_add_param($filter).';'; 
+		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE lower(nachname) ~* lower(".$this->db_add_param($filter).") OR uid ~* ".$this->db_add_param($filter).';';
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -792,7 +800,7 @@ class mitarbeiter extends benutzer
 
 				$this->result[] = $obj;
 			}
-			
+
 			return true;
 		}
 		else
@@ -801,7 +809,7 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Sucht die Mitarbeiter deren
 	 * Nachname, Vorname, UID $filter enthaelt
@@ -810,8 +818,8 @@ class mitarbeiter extends benutzer
 	public function search($filter, $limit=null, $aktiv=true)
 	{
 		$qry = "SELECT vorname, nachname, titelpre, titelpost, kurzbz, vornamen, uid
-			FROM campus.vw_mitarbeiter 
-			WHERE 
+			FROM campus.vw_mitarbeiter
+			WHERE
 				lower(nachname) like lower('%".$this->db_escape($filter)."%')
 				OR lower(uid) like lower('%".$this->db_escape($filter)."%')
 				OR lower(vorname) like lower('%".$this->db_escape($filter)."%')
@@ -839,7 +847,7 @@ class mitarbeiter extends benutzer
 
 				$this->result[] = $obj;
 			}
-			
+
 			return true;
 		}
 		else
@@ -848,7 +856,7 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert die Personen die den Suchkriterien entsprechen
 	 *
@@ -993,24 +1001,24 @@ class mitarbeiter extends benutzer
 		$return=false;
 		if (is_null($uid))
 			$uid=$this->uid;
-		
-		$qry = "SELECT 
+
+		$qry = "SELECT
 					uid  as vorgesetzter
-				FROM 
+				FROM
 					public.tbl_benutzerfunktion
-				WHERE 
+				WHERE
 					funktion_kurzbz='Leitung' AND
 					(datum_von is null OR datum_von<=now()) AND
 					(datum_bis is null OR datum_bis>=now()) AND
-					oe_kurzbz in (SELECT oe_kurzbz 
-								  FROM public.tbl_benutzerfunktion 
-								  WHERE 
+					oe_kurzbz in (SELECT oe_kurzbz
+								  FROM public.tbl_benutzerfunktion
+								  WHERE
 									funktion_kurzbz='oezuordnung' AND uid=".$this->db_add_param($uid)." AND
 									(datum_von is null OR datum_von<=now()) AND
 									(datum_bis is null OR datum_bis>=now())
 								  );";
-		
-		
+
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -1021,16 +1029,16 @@ class mitarbeiter extends benutzer
 					$return=true;
 				}
 			}
-		
+
 			$this->vorgesetzte = array_unique($this->vorgesetzte);
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage!';
 		}
 		return $return;
 	}
-	
+
 	/**
 	 * Gibt ein Array mit den UIDs der Untergebenen zurueck
 	 */
@@ -1038,13 +1046,13 @@ class mitarbeiter extends benutzer
 	{
 		if (is_null($uid))
 			$uid=$this->uid;
-		
+
 		// Organisationseinheiten holen von denen die Person die Leitung hat
-		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
+		$qry = "SELECT * FROM public.tbl_benutzerfunktion
 				WHERE funktion_kurzbz='Leitung' AND uid=".$this->db_add_param($uid)." AND
 				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
-		
+
 		if($this->db_query($qry))
 		{
 			$oe='';
@@ -1055,21 +1063,21 @@ class mitarbeiter extends benutzer
 				$oe.=$this->db_add_param($row->oe_kurzbz);
 			}
 		}
-		
+
 		//Alle Personen holen die dieser Organisationseinheit untergeordnet sind
 		$qry = "SELECT distinct uid FROM public.tbl_benutzerfunktion WHERE ((funktion_kurzbz='oezuordnung' AND (false ";
-		
+
 		if($oe!='')
 			$qry.=" OR oe_kurzbz in($oe)";
-		
+
 		$qry.=")) ";
-		
+
 		if($oe!='')
 			$qry.=" OR (funktion_kurzbz='ass' AND oe_kurzbz in($oe))";
-		
+
 		$qry.= ") AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 					 (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now());";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -1078,12 +1086,12 @@ class mitarbeiter extends benutzer
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Ermitteln der Untergebenen';
 			return false;
 		}
-		
+
 	}
 
     /**
@@ -1091,53 +1099,53 @@ class mitarbeiter extends benutzer
      * @param $filter Buchstabe mit dem der Mitarbeiter beginnt
      * @param $fixangestellt false wenn externer mitarbeiter
      * @param $studSemArray Array mit Studiensemestern in denen der externe Lektor zumindest in einem Unterrichtet haben soll
-     * @return boolean 
+     * @return boolean
      */
     public function getMitarbeiterForZutrittskarte($filter, $fixangestellt=true, $studSemArray)
     {
-        $qry = "SELECT 
-                    vorname,nachname,gebdatum,uid,personalnummer,person_id 
-                FROM 
-                    campus.vw_mitarbeiter 
+        $qry = "SELECT
+                    vorname,nachname,gebdatum,uid,personalnummer,person_id
+                FROM
+                    campus.vw_mitarbeiter
                 WHERE
                 	aktiv='true'";
-        if($filter!='') 
-			$qry.=" AND UPPER(SUBSTRING(nachname,1,1))=".$this->db_add_param($filter,FHC_STRING); 
-                    
+        if($filter!='')
+			$qry.=" AND UPPER(SUBSTRING(nachname,1,1))=".$this->db_add_param($filter,FHC_STRING);
+
         if($fixangestellt)
             $qry.=" AND fixangestellt";
         else
-            $qry.=" AND NOT fixangestellt AND EXISTS 
-                (SELECT * FROM lehre.tbl_lehreinheitmitarbeiter 
-                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
-                WHERE tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid 
+            $qry.=" AND NOT fixangestellt AND EXISTS
+                (SELECT * FROM lehre.tbl_lehreinheitmitarbeiter
+                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+                WHERE tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid
                 AND tbl_lehreinheit.studiensemester_kurzbz in (".$this->implode4SQL($studSemArray).")) ";
         $qry.=" ORDER BY nachname, vorname";
         if($result = $this->db_query($qry))
         {
             while($row = $this->db_fetch_object($result))
             {
-                $mi = new mitarbeiter(); 
-                
-                $mi->vorname = $row->vorname; 
-                $mi->nachname = $row->nachname; 
-                $mi->gebdatum = $row->gebdatum; 
-                $mi->uid = $row->uid; 
-                $mi->personalnummer = $row->personalnummer; 
-                $mi->person_id = $row->person_id; 
-                
-                $this->result[] = $mi; 
+                $mi = new mitarbeiter();
+
+                $mi->vorname = $row->vorname;
+                $mi->nachname = $row->nachname;
+                $mi->gebdatum = $row->gebdatum;
+                $mi->uid = $row->uid;
+                $mi->personalnummer = $row->personalnummer;
+                $mi->person_id = $row->person_id;
+
+                $this->result[] = $mi;
             }
-            return true; 
+            return true;
         }
         else
         {
             $this->errormsg = "Fehler bei der Abfrage aufgetreten";
-            return false; 
+            return false;
         }
     }
-    
-    
+
+
     /**
      * Gibt alle Mitarbeiter während des Meldezeitraumes zurück
      * @param type $meldungBeginn Start des Meldezeitraumes
@@ -1147,20 +1155,20 @@ class mitarbeiter extends benutzer
     public function getMitarbeiterforMeldung($meldungBeginn, $meldungEnde)
     {
 
-	$qry='SELECT DISTINCT ON (UID) * 
-		FROM 
-			public.tbl_mitarbeiter 
+	$qry='SELECT DISTINCT ON (UID) *
+		FROM
+			public.tbl_mitarbeiter
 			JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
 			JOIN public.tbl_person USING(person_id)
 			JOIN bis.tbl_bisverwendung USING(mitarbeiter_uid)
 			JOIN bis.tbl_beschaeftigungsausmass USING(beschausmasscode)
-		WHERE 
-			bismelden 
-			AND personalnummer>0 
+		WHERE
+			bismelden
+			AND personalnummer>0
 			AND (tbl_bisverwendung.ende is NULL OR tbl_bisverwendung.ende>'.$this->db_add_param($meldungBeginn).')
 		ORDER BY uid, nachname,vorname
 		';
-	
+
 	if($result = $this->db_query($qry))
 	{
 	    while($row = $this->db_fetch_object($result))

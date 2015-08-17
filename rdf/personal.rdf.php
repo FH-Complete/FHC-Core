@@ -43,7 +43,7 @@ loadVariables($user);
 
 if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
-else 
+else
 	$uid=null;
 
 if (isset($_GET['fix']))
@@ -76,6 +76,11 @@ if (isset($_GET['verwendung']))
 else
 	$verwendung=null;
 
+if (isset($_GET['VertragNochNichtRetour']))
+	$vertragnochnichtretour = 'true';
+else
+	$vertragnochnichtretour=null;
+
 if(isset($_GET['filter']))
 	$filter = $_GET['filter'];
 else
@@ -101,12 +106,12 @@ if($uid==null)
 	if($filter!='')
 		$mitarbeiterDAO->searchPersonal($filter);
 	else
-		$mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $verwendung, $semester_aktuell);
-	
+		$mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $verwendung, $vertragnochnichtretour);
+
 	foreach ($mitarbeiterDAO->result as $mitarbeiter)
 		draw_row($mitarbeiter);
 }
-else 
+else
 {
 	$mitarbeiterDAO->load($uid);
 	draw_row($mitarbeiterDAO);

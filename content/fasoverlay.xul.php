@@ -125,7 +125,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 		     <splitter class="tree-splitter"/>
 		     <treecol id="fachbereich-treecol-uid" label="UID" flex="1" hidden="true"/>
 		</treecols>
-	
+
 		<template>
 		    <rule>
 		      <treechildren>
@@ -155,7 +155,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 		    <splitter class="tree-splitter"/>
 		    <treecol id="organisationseinheit-treecol-oe_kurzbz" label="oe_kurzbz" hidden="true" flex="1"/>
 		</treecols>
-	
+
 		<template>
 		    <rule>
 		      <treechildren>
@@ -303,6 +303,27 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 				</treeitem>
 			</treechildren>
 	    </treeitem>
+		<?php
+		if($rechte->isBerechtigt('vertrag/mitarbeiter'))
+		{
+			echo '
+			<treeitem container="true" open="true">
+				<treerow>
+				   	<treecell label="Vertrag"/>
+				   	<treecell label="Vertrag"/>
+				</treerow>
+				<treechildren>
+					<treeitem>
+						<treerow>
+						   	<treecell label="noch nicht retourniert"/>
+						   	<treecell label="VertragNochNichtRetour"/>
+						</treerow>
+					</treeitem>
+				</treechildren>
+		    </treeitem>
+			';
+		}
+		?>
 	</treechildren>
 </tree>
 
@@ -311,7 +332,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 		<menupopup id="fasoverlay-lektor-tree-popup">
 			<menuitem label="Mail senden" oncommand="LektorFunktionMail();" />
 			<menuseparator />
-			<menuitem label="Entfernen" oncommand="LektorFunktionDel();" />			
+			<menuitem label="Entfernen" oncommand="LektorFunktionDel();" />
 		</menupopup>
 </popupset>
 	<tabbox id="tabbox-main" flex="3" orient="vertical">
@@ -344,7 +365,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 			{
 				 echo '<vbox id="MitarbeiterEditor" />';
 			}
-			
+
 		?>
 		<vbox id="box-notiz">
 			<box class="Notiz" flex="1" id="box-notizen"/>
