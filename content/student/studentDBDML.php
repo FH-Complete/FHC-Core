@@ -2019,12 +2019,7 @@ if(!$error)
 								if($akte->delete($akte_id))
 								{
 									// Eintrag im DMS loeschen
-									if($dms->deleteDms($akte->dms_id))
-									{
-										// Datei im Filesystem loeschen
-										unlink(DMS_PATH.$dms->filename);
-									}
-									else
+									if(!$dms->deleteDms($akte->dms_id))
 									{
 										$error=true;
 										$errormsg='Fehler beim Loeschen des Dokuments';
