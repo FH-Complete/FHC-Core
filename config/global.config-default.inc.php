@@ -57,6 +57,13 @@ define('CIS_GESAMTNOTE_UEBERSCHREIBEN',true);
 // Vertraege fuer Pruefungshonorare anzulegen
 define('FAS_GESAMTNOTE_PRUEFUNGSHONORAR',false);
 
+// Grenzwerte für Anwesenheit
+define('FAS_ANWESENHEIT_ROT', 70);
+define('FAS_ANWESENHEIT_GELB', 90);
+
+// Legt einen Prüfungstermin an wenn eine neue Note erfasst wird
+define('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN',false);
+
 // Anzeigeoptionen für LV-Plan Menü
 define('CIS_LVPLAN_EXPORT_ANZEIGEN',true);
 define('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN',true);
