@@ -21,6 +21,7 @@
  * Klasse zur Verwaltung der Anwesenheiten der Studierenden
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/../config/global.config.inc.php');
 
 class anwesenheit extends basis_db
 {
@@ -384,11 +385,11 @@ class anwesenheit extends basis_db
 	public function getAmpel($anwesenheit_relativ)
 	{
 
-		if($anwesenheit_relativ < 70)
+		if($anwesenheit_relativ < FAS_ANWESENHEIT_ROT)
 		{
 			return 'red';
 		}
-		elseif($anwesenheit_relativ < 90)
+		elseif($anwesenheit_relativ < FAS_ANWESENHEIT_GELB)
 		{
 			return 'yellow';
 		}
