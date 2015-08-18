@@ -21,13 +21,14 @@
  * Synchronisiert die Lektoren und Studenten der aktuellen MoodleKurse
  * wenn kein aktuelles Studiensemester vorhanden ist, wird NICHT Synchronisiert
  */
-require_once('../../config/vilesci.config.inc.php');
-require_once('../../include/moodle24_course.class.php');
-require_once('../../include/moodle24_user.class.php');
-require_once('../../include/studiensemester.class.php');
-require_once('../../include/studiengang.class.php');
-require_once('../../include/mail.class.php');
-	
+require_once(dirname(__FILE__).'/../../config/vilesci.config.inc.php');
+require_once(dirname(__FILE__).'/../../config/global.config.inc.php');
+require_once(dirname(__FILE__).'/../../include/moodle24_course.class.php');
+require_once(dirname(__FILE__).'/../../include/moodle24_user.class.php');
+require_once(dirname(__FILE__).'/../../include/studiensemester.class.php');
+require_once(dirname(__FILE__).'/../../include/studiengang.class.php');
+require_once(dirname(__FILE__).'/../../include/mail.class.php');
+
 $db = new basis_db();
 $sync_lektoren_gesamt=0;
 $sync_studenten_gesamt=0;
@@ -42,13 +43,13 @@ $lektoren=array();
 
 echo "-- Start ".date('Y-m-d H:i:s')."--";
 
-//nur Synchronisieren wenn ein aktuelles Studiensemester existiert damit keine 
+//nur Synchronisieren wenn ein aktuelles Studiensemester existiert damit keine
 //Probleme durch die Vorrueckung entstehen
 $stsem = new studiensemester();
 if($stsem_kurzbz=$stsem->getakt())
 {
 	//nur die Eintraege des aktuellen Studiensemesters syncen
-	$qry = "SELECT distinct mdl_course_id FROM lehre.tbl_moodle 
+	$qry = "SELECT distinct mdl_course_id FROM lehre.tbl_moodle
 			WHERE studiensemester_kurzbz=".$db->db_add_param($stsem_kurzbz)."
 			AND moodle_version='2.4'";
 	if($result = $db->db_query($qry))
@@ -78,12 +79,37 @@ if($stsem_kurzbz=$stsem->getakt())
 						$message_lkt.="\nKurs: $course->mdl_fullname ($course->mdl_shortname) $course->mdl_course_id:\n".$mdluser->log_public."\n";
 					}
 				}
-				else 
+				else
 				{
 					$message.="\nFehler: $mdluser->errormsg";
 					$fehler++;
 				}
 				echo $mdluser->log;
+				//Lektoren
+				$mdluser = new moodle24_user();
+				$mitarbeiter = $mdluser->getMitarbeiter($row->mdl_course_id);
+
+				if(defined('MOODLE_SYNC_FACHBEREICHSLEITUNG') && MOODLE_SYNC_FACHBEREICHSLEITUNG)
+				{
+					echo "<br>\n-- Fachbereichsleitung --";
+					flush();
+					if($mdluser->sync_fachbereichsleitung($row->mdl_course_id))
+					{
+						$sync_lektoren_gesamt+=$mdluser->sync_create;
+						$group_updates+=$mdluser->group_update;
+						if($mdluser->sync_create>0 || $mdluser->group_update>0)
+						{
+							$message.="\nKurs: $course->mdl_fullname ($course->mdl_shortname) $course->mdl_course_id:\n".$mdluser->log."\n";
+							$message_lkt.="\nKurs: $course->mdl_fullname ($course->mdl_shortname) $course->mdl_course_id:\n".$mdluser->log_public."\n";
+						}
+					}
+					else
+					{
+						$message.="\nFehler: $mdluser->errormsg";
+						$fehler++;
+					}
+					echo $mdluser->log;
+				}
 				echo "<br>\n-- Studenten --";
 				flush();
 
@@ -104,7 +130,7 @@ if($stsem_kurzbz=$stsem->getakt())
 					$message.="\nFehler: $mdluser->errormsg";
 					$fehler++;
 				}
-				
+
 				echo $mdluser->log;
 				flush();
 				foreach ($mitarbeiter as $uid)
@@ -114,13 +140,13 @@ if($stsem_kurzbz=$stsem->getakt())
 					$lektoren[$uid].=$message_lkt;
 				}
 			}
-			else 
+			else
 			{
 				$message.="\nFehler: in der Tabelle lehre.tbl_moodle wird auf den Kurs $row->mdl_course_id verwiesen, dieser existiert jedoch nicht im Moodle!";
 				$fehler++;
 			}
 		}
-		
+
 		if($sync_lektoren_gesamt>0 || $sync_studenten_gesamt>0 || $fehler>0 || $group_updates>0)
 		{
 			//Mail an die Lektoren
@@ -130,14 +156,14 @@ if($stsem_kurzbz=$stsem->getakt())
 				{
 					$header = "Dies ist eine automatische Mail!\n";
 					$header.= "Es wurden folgende Aktualisierungen an Ihren Moodle-Kursen durchgeführt:\n\n";
-	
+
 					$to = "$uid@".DOMAIN;
 					//$to = 'oesi@technikum-wien.at';
-					
+
 					$mail = new mail($to, 'vilesci@'.DOMAIN,'Moodle - Aktualisierungen',$header.$message_lkt);
 					if($mail->send())
 						echo "Mail wurde an $to versandt<br>";
-					else 
+					else
 						echo "Fehler beim Senden des Mails an $to<br>";
 				}
 			}
@@ -147,27 +173,27 @@ if($stsem_kurzbz=$stsem->getakt())
 			$header.= "Anzahl der aktualisierten Lektoren: $sync_lektoren_gesamt\n";
 			$header.= "Anzahl der aktualisierten Studenten: $sync_studenten_gesamt\n";
 			$header.= "Anzahl der Fehler: $fehler\n";
-			
+
 			$to = MAIL_ADMIN;
 			//$to = 'oesi@technikum-wien.at';
-			
+
 			$mail = new mail($to, 'vilesci@'.DOMAIN,'Moodle Syncro',$header.$message);
 			if($mail->send())
 				echo "Mail wurde an $to versandt:<br>".nl2br($header.$message);
-			else 
+			else
 				echo "Fehler beim Senden des Mails an $to:<br>".nl2br($header.$message);
 		}
-		else 
+		else
 		{
-			echo 'Alle Zuteilungen sind auf dem neuesten Stand';
+			echo "\nAlle Zuteilungen sind auf dem neuesten Stand";
 		}
 	}
-	else 
+	else
 	{
 		echo 'Fehler bei Select:'.$qry;
 	}
 }
-else 
+else
 	echo "Kein aktuelles Studiensemester vorhanden->kein Syncro";
-echo "-- Ende ".date('d.m.Y H:i:s')." --";
+echo "<br>\n-- Ende ".date('Y-m-d H:i:s')." --\n";
 ?>

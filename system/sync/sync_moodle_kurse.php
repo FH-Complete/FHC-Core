@@ -23,13 +23,13 @@
  * und teilt Lektoren und Studierende zu dem Kurs zu
  * Aber nur wenn die Lehrform der Lehreinheit=Lehrform der LV
  */
-require_once('../../config/cis.config.inc.php');
-require_once('../../include/studiensemester.class.php');
-require_once('../../include/moodle.class.php');
-require_once('../../include/moodle24_course.class.php');
-require_once('../../include/moodle24_user.class.php');
-require_once('../../include/studiengang.class.php');
-require_once('../../include/benutzerberechtigung.class.php');
+require_once(dirname(__FILE__).'/../../config/cis.config.inc.php');
+require_once(dirname(__FILE__).'/../../include/studiensemester.class.php');
+require_once(dirname(__FILE__).'/../../include/moodle.class.php');
+require_once(dirname(__FILE__).'/../../include/moodle24_course.class.php');
+require_once(dirname(__FILE__).'/../../include/moodle24_user.class.php');
+require_once(dirname(__FILE__).'/../../include/studiengang.class.php');
+require_once(dirname(__FILE__).'/../../include/benutzerberechtigung.class.php');
 
 // Wenn das Script nicht ueber Commandline gestartet wird, muss eine
 // Authentifizierung stattfinden
@@ -40,7 +40,7 @@ if(php_sapi_name() != 'cli')
 	$rechte->getBerechtigungen($uid);
 
 	if(!$rechte->isBerechtigt('admin'))
-		die('Sie haben keine Berechtigung fuer diese Seite');	
+		die('Sie haben keine Berechtigung fuer diese Seite');
 }
 
 $db = new basis_db();
@@ -64,7 +64,7 @@ JOIN public.tbl_person USING (person_id)
                         AND semester is not null
                         AND semester!=0
                         AND tbl_lehreinheit.lehrform_kurzbz=tbl_lehrveranstaltung.lehrform_kurzbz
-
+						AND uid not like '_Dummy%'
 GROUP BY lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.kurzbz,
                         tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.orgform_kurzbz, tbl_lehrveranstaltung.semester,
                         tbl_lehreinheit.lehreinheit_id;";
@@ -92,7 +92,7 @@ if($result = $db->db_query($qry))
 			$mdl_course->insertamum = date('Y-m-d H:i:s');
 			$mdl_course->insertvon = 'auto';
 			$mdl_course->gruppen = true;
-			
+
 			echo "\nCreate Course: $bezeichnung";
 
 			//Moodlekurs anlegen
@@ -104,6 +104,11 @@ if($result = $db->db_query($qry))
 				$mdl_user = new moodle24_user();
 				//Lektoren Synchronisieren
 				if(!$mdl_user->sync_lektoren($mdl_course->mdl_course_id))
+					echo $mdl_user->errormsg;
+
+				$mdl_user = new moodle24_user();
+				//Fachbereichsleitung Synchronisieren
+				if(!$mdl_user->sync_fachbereichsleitung($mdl_course->mdl_course_id))
 					echo $mdl_user->errormsg;
 
 				$mdl_user = new moodle24_user();

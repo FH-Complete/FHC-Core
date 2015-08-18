@@ -101,6 +101,9 @@ define('REIHUNGSTEST_CHECK', true);
  */
 define('MOODLE_COURSE_SCHEMA','');
 
+// Legt fst ob Fachbereichsleiter zu Moodle Kursen zugeteilt werden (mit Benutzerdefinierter Rolle 11)
+define('MOODLE_SYNC_FACHBEREICHSLEITUNG',false);
+
 // Bei Statuswechsel auf Bewerber -> bei true wird email (INFOMAIL_BEWERBER) an den Bewerber geschickt
 define('SEND_BEWERBER_INFOMAIL', false);
 
