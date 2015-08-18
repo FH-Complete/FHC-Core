@@ -150,7 +150,7 @@ class dokument extends basis_db
 		if($new)
 		{
 			$qry = 'INSERT INTO public.tbl_dokumentprestudent(dokument_kurzbz, prestudent_id, mitarbeiter_uid, datum, updateamum,
-			        updatevon, insertamum, insertvon, ext_id) VALUES('.
+			        updatevon, insertamum, insertvon) VALUES('.
 			        $this->db_add_param($this->dokument_kurzbz).','.
 			        $this->db_add_param($this->prestudent_id, FHC_INTEGER).','.
 			        $this->db_add_param($this->mitarbeiter_uid).','.
@@ -158,8 +158,7 @@ class dokument extends basis_db
 			        $this->db_add_param($this->updateamum).','.
 			        $this->db_add_param($this->updatevon).','.
 			        $this->db_add_param($this->insertamum).','.
-			        $this->db_add_param($this->insertvon).','.
-			        $this->db_add_param($this->ext_id, FHC_INTEGER).');';
+			        $this->db_add_param($this->insertvon).');';
 		}
 		else
 		{
@@ -217,10 +216,9 @@ class dokument extends basis_db
 
 		if($new)
 		{
-			$qry = 'INSERT INTO public.tbl_dokument(dokument_kurzbz, bezeichnung, ext_id) VALUES('.
+			$qry = 'INSERT INTO public.tbl_dokument(dokument_kurzbz, bezeichnung) VALUES('.
 			        $this->db_add_param($this->dokument_kurzbz).','.
-			        $this->db_add_param($this->bezeichnung).','.
-			        $this->db_add_param($this->ext_id, FHC_INTEGER).');';
+			        $this->db_add_param($this->bezeichnung).');';
 		}
 		else
 		{
@@ -587,7 +585,7 @@ class dokument extends basis_db
     {
 		$sprache = new sprache();
 		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
-        $qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht, 
+        $qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht,
 			$bezeichnung_mehrsprachig
             FROM public.tbl_dokumentstudiengang
             JOIN public.tbl_prestudent using (studiengang_kz)
@@ -646,15 +644,15 @@ class dokument extends basis_db
 	 * @param $dokument_kurzbz
 	 * @param $person_id
 	 * @return boolean true wenn akzeptiert, false wenn noch nicht akzeptiert
-	 */ 
+	 */
 	function akzeptiert($dokument_kurzbz, $person_id)
 	{
-		$qry = "SELECT 
-					* 
-				FROM 
-					public.tbl_dokumentprestudent 
-					JOIN public.tbl_prestudent USING(prestudent_id) 
-				WHERE 
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_dokumentprestudent
+					JOIN public.tbl_prestudent USING(prestudent_id)
+				WHERE
 					dokument_kurzbz=".$this->db_add_param($dokument_kurzbz)."
 					AND tbl_prestudent.person_id=".$this->db_add_param($person_id);
 

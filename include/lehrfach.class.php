@@ -45,7 +45,7 @@ class lehrfach extends basis_db
 	public function __construct($lehrfach_id=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($lehrfach_id))
 			$this->load($lehrfach_id);
 	}
@@ -62,7 +62,7 @@ class lehrfach extends basis_db
 			$this->errormsg = 'Die lehrfach_nr muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM lehre.tbl_lehrfach WHERE lehrfach_id=".$this->db_add_param($lehrfach_id, FHC_INTEGER).';';
 
 		if(!$this->db_query($qry))
@@ -143,7 +143,7 @@ class lehrfach extends basis_db
 
 		return true;
 	}
-	
+
 	/**
 	 * Speichert das Lehrfach in die Datenbank
 	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
@@ -158,19 +158,17 @@ class lehrfach extends basis_db
 
 		if($this->new)
 		{
-			$qry = 'BEGIN;INSERT INTO lehre.tbl_lehrfach (lehrfach_id, studiengang_kz, fachbereich_kurzbz, kurzbz,
-			                                  bezeichnung, farbe, aktiv, semester, sprache, ext_id)
+			$qry = 'BEGIN;INSERT INTO lehre.tbl_lehrfach (studiengang_kz, fachbereich_kurzbz, kurzbz,
+			                                  bezeichnung, farbe, aktiv, semester, sprache)
 			        VALUES('.
-					($this->lehrfach_id!=''?$this->db_add_param($this->lehrfach_id, FHC_INTEGER):"nextval('lehre.tbl_lehrfach_lehrfach_id_seq')").','. // HuschPfusch 4 Syncro
 					$this->db_add_param($this->studiengang_kz, FHC_INTEGER).','.
 					$this->db_add_param($this->fachbereich_kurzbz).','.
 					$this->db_add_param($this->kurzbz).','.
-					$this->addslashes($this->bezeichnung).','.
-					$this->addslashes($this->farbe).','.
-					$this->addslashes($this->aktiv, FHC_BOOLEAN).','.
-					$this->addslashes($this->semester, FHC_INTEGER).','.
-					$this->addslashes($this->sprache).','.
-					$this->addslashes($this->ext_id, FHC_INTEGER).');';
+					$this->db_add_param($this->bezeichnung).','.
+					$this->db_add_param($this->farbe).','.
+					$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
+					$this->db_add_param($this->semester, FHC_INTEGER).','.
+					$this->db_add_param($this->sprache).');';
 		}
 		else
 		{
@@ -189,7 +187,6 @@ class lehrfach extends basis_db
 			       ' farbe='.$this->db_add_param($this->farbe).','.
 			       ' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
 			       ' semester='.$this->db_add_param($this->semester, FHC_INTEGER).','.
-			       ' ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).','.
 			       ' sprache='.$this->db_add_param($this->sprache).
 			       " WHERE lehrfach_id=".$this->db_add_param($this->lehrfach_id, FHC_INTEGER).';';
 		}
@@ -207,14 +204,14 @@ class lehrfach extends basis_db
 						{
 							$this->lehrfach_id = $row->id;
 						}
-						else 
+						else
 						{
 							$this->errormsg = 'Fehler beim Auslesen der Sequence';
 							$this->db_query('ROLLBACK;');
 							return false;
 						}
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						$this->db_query('ROLLBACK;');

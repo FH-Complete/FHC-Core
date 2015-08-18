@@ -15,17 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class bisfunktion extends basis_db 
+class bisfunktion extends basis_db
 {
 	public $new;      //  boolean
 	public $result = array(); //  email Objekt
-	
+
 	//Tabellenspalten
 	public $bisverwendung_id;
 	public $studiengang_kz;
@@ -36,7 +36,7 @@ class bisfunktion extends basis_db
 	public $insertvon;
 	public $ext_id;
 	public $studiengang_kz_old;
-	
+
 	/**
 	 * Konstruktor
 	 * @param bisverwendung_id ID des zu ladenden Datensatzes
@@ -44,11 +44,11 @@ class bisfunktion extends basis_db
 	public function __construct($bisverwendung_id=null, $studiengang_kz=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($bisverwendung_id) && !is_null($studiengang_kz))
 			$this->load($bisverwendung_id, $studiengang_kz);
 	}
-	
+
 	/**
 	 * Laedt einen Datensatz
 	 * @param bisverwendung_id ID des zu ladenden Datensatzes
@@ -67,10 +67,10 @@ class bisfunktion extends basis_db
 			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		//laden des Datensatzes
 		$qry = "SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id=".$this->db_add_param($bisverwendung_id, FHC_INTEGER)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -83,7 +83,7 @@ class bisfunktion extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
-				
+
 				return true;
 			}
 			else
@@ -98,7 +98,7 @@ class bisfunktion extends basis_db
 			return false;
 		}
 	}
-			
+
 	/**
 	 * Loescht einen Datensatz
 	 * @param bisverwendung_id ID des zu loeschenden Datensatzes
@@ -117,21 +117,21 @@ class bisfunktion extends basis_db
 			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "DELETE FROM bis.tbl_bisfunktion WHERE bisverwendung_id = ".$this->db_add_param($bisverwendung_id, FHC_INTEGER)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
-		
+
 		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Prueft die Variablen vor dem Speichern auf Gueltigkeit
 	 *
@@ -139,7 +139,7 @@ class bisfunktion extends basis_db
 	 */
 	protected function validate()
 	{
-		
+
 		if($this->sws!='' && !is_numeric($this->sws))
 		{
 			$this->errormsg = 'SWS muss eine gueltige Zahl sein';
@@ -147,7 +147,7 @@ class bisfunktion extends basis_db
 		}
 		return true;
 	}
-			
+
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -158,53 +158,51 @@ class bisfunktion extends basis_db
 	{
 		if(!$this->validate())
 			return false;
-		
+
 		if($new==null)
 			$new = $this->new;
-			
+
 		if($new)
 		{
-			//Neuen Datensatz anlegen	
+			//Neuen Datensatz anlegen
 			$qry = "INSERT INTO bis.tbl_bisfunktion (bisverwendung_id, studiengang_kz, sws,
-					updateamum, updatevon, insertamum, insertvon, ext_id) VALUES (".
+					updateamum, updatevon, insertamum, insertvon) VALUES (".
 			       $this->db_add_param($this->bisverwendung_id, FHC_INTEGER).', '.
 			       $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 			       $this->db_add_param($this->sws).', '.
 			       $this->db_add_param($this->updateamum).', '.
 			       $this->db_add_param($this->updatevon).', '.
 			       $this->db_add_param($this->insertamum).', '.
-			       $this->db_add_param($this->insertvon).', '.
-			       $this->db_add_param($this->ext_id).');';
-			       
+			       $this->db_add_param($this->insertvon).');';
+
 		}
-		else 
+		else
 		{
 			//Bei einem Update bei dem sich der Studiengang aendert muss der "Alte" Studiengang auch angegeben werden
 			//da der Studiengang teil des Primaerschluessels ist
 			if($this->studiengang_kz_old=='')
 				$this->studiengang_kz_old = $this->studiengang_kz;
-			
+
 			//Bestehenden Datensatz aktualisieren
 			$qry= "UPDATE bis.tbl_bisfunktion SET".
 				  " sws=".$this->db_add_param($this->sws).",".
 				  " studiengang_kz=".$this->db_add_param($this->studiengang_kz, FHC_INTEGER).",".
 				  " updateamum=".$this->db_add_param($this->updateamum).",".
-				  " updatevon=".$this->db_add_param($this->updatevon).",".
-				  " ext_id=".$this->db_add_param($this->ext_id).
+				  " updatevon=".$this->db_add_param($this->updatevon)." ".
 				  " WHERE bisverwendung_id=".$this->db_add_param($this->bisverwendung_id, FHC_INTEGER)." AND studiengang_kz=".$this->db_add_param($this->studiengang_kz_old, FHC_INTEGER);
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt alle Verwendungen eines Mitarbeiters
 	 * @param $uid UID des Mitarbeiters
@@ -214,18 +212,18 @@ class bisfunktion extends basis_db
 	{
 		//laden des Datensatzes
 		$qry = "SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id=".$this->db_add_param($bisverwendung_id, FHC_INTEGER);
-		
+
 		if($studiengang_kz!=null)
 			$qry.=" AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 
 		$qry.=" ORDER BY studiengang_kz;";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new bisfunktion();
-				
+
 				$obj->bisverwendung_id = $row->bisverwendung_id;
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->sws = $row->sws;
@@ -234,7 +232,7 @@ class bisfunktion extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -245,6 +243,6 @@ class bisfunktion extends basis_db
 			return false;
 		}
 	}
-	
+
 }
 ?>

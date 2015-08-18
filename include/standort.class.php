@@ -45,22 +45,22 @@ class standort extends basis_db
 
 	public $personfunktionstandort_id;	//  integer
 	public $person_id;			//  integer
-	public $funktion_kurzbz;	//  string	
-	public $position;			//  string	
+	public $funktion_kurzbz;	//  string
+	public $position;			//  string
 
-	public $person_anrede;		//  string	
-	public $titelpost;			//  string	
-	public $titelpre;			//  string	
-	public $nachname;			//  string	
-	public $vorname;			//  string	
-	public $vornamen;			//  string	
+	public $person_anrede;		//  string
+	public $titelpost;			//  string
+	public $titelpre;			//  string
+	public $nachname;			//  string
+	public $vorname;			//  string
+	public $vornamen;			//  string
 
-	
-	public $funktion_beschreibung;	//  string	
-	public $funktion_aktiv;			//  boolean	
-	public $funktion_fachbereich;	//  string	
-	public $funktion_semester;		//  string	
-	public $anrede;				//  string	
+
+	public $funktion_beschreibung;	//  string
+	public $funktion_aktiv;			//  boolean
+	public $funktion_fachbereich;	//  string
+	public $funktion_semester;		//  string
+	public $anrede;				//  string
 
 
 	/**
@@ -70,7 +70,7 @@ class standort extends basis_db
 	public function __construct($standort_id=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($standort_id))
 			$this->load($standort_id);
 	}
@@ -84,7 +84,7 @@ class standort extends basis_db
 	{
 		$this->result=array();
 		$this->errormsg = '';
-		
+
 		//Pruefen ob adress_id eine gueltige Zahl ist
 		if(!is_numeric($standort_id) || $standort_id == '')
 		{
@@ -132,7 +132,7 @@ class standort extends basis_db
 	{
 		$this->result=array();
 		$this->errormsg = '';
-	
+
 		//Pruefen ob pers_id eine gueltige Zahl ist
 		if(!is_numeric($adress_id) || $adress_id == '')
 		{
@@ -162,12 +162,12 @@ class standort extends basis_db
 			$this->ext_id			= $row->ext_id;
 			$this->firma_id			= $row->firma_id;
 			$this->result[] 		= $row;
-					
+
 
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Laedt alle standorte zu der Firma die uebergeben wird
 	 * @param $firma_id ID der Firma zu der die standorte geladen werden sollen
@@ -177,7 +177,7 @@ class standort extends basis_db
 	{
 		$this->result=array();
 		$this->errormsg = '';
-			
+
 		//Pruefen ob pers_id eine gueltige Zahl ist
 		if(!is_numeric($firma_id) || $firma_id == '')
 		{
@@ -215,8 +215,8 @@ class standort extends basis_db
 	}
 
 
-	
-	
+
+
 	/**
 	 * Prueft die Variablen auf Gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
@@ -233,12 +233,12 @@ class standort extends basis_db
 		{
 			$this->errormsg='Adresse_id enthaelt ungueltige Zeichen';
 			return false;
-		}		
+		}
 		if(!is_numeric($this->firma_id) && $this->firma_id!='')
 		{
 			$this->errormsg='Firma_id enthaelt ungueltige Zeichen';
 			return false;
-		}		
+		}
 
 		if(mb_strlen($this->kurzbz)>16)
 		{
@@ -253,7 +253,7 @@ class standort extends basis_db
 		$this->errormsg = '';
 		return true;
 	}
-	
+
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -272,14 +272,13 @@ class standort extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO public.tbl_standort (adresse_id,kurzbz,  bezeichnung, insertamum, insertvon
-			    , updateamum, updatevon, ext_id, firma_id) VALUES('.
+			    , updateamum, updatevon, firma_id) VALUES('.
 			      $this->db_add_param($this->adresse_id, FHC_INTEGER).', '.
 			      $this->db_add_param($this->kurzbz).', '.
 			      $this->db_add_param($this->bezeichnung).', now(), '.
 			      $this->db_add_param($this->insertvon).', now(), '.
 			      $this->db_add_param($this->updatevon).', '.
-			      $this->db_add_param($this->ext_id).', '.
-			      $this->db_add_param($this->firma_id).');'; 
+			      $this->db_add_param($this->firma_id).');';
 		}
 		else
 		{
@@ -291,7 +290,7 @@ class standort extends basis_db
 			}
 			$qry='UPDATE public.tbl_standort SET'.
 				' adresse_id='.$this->db_add_param($this->adresse_id).', '.
-				' kurzbz='.$this->db_add_param($this->kurzbz).', '.				
+				' kurzbz='.$this->db_add_param($this->kurzbz).', '.
 				' bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
 		      	' firma_id='.$this->db_add_param($this->firma_id).','.
 		      	' updateamum= now(), '.
@@ -327,7 +326,7 @@ class standort extends basis_db
 					return false;
 				}
 			}
-			else 
+			else
 				return true;
 		}
 		else
@@ -362,8 +361,8 @@ class standort extends basis_db
 			return false;
 		}
 	}
-	
-	
+
+
 
 	/**
 	 * Laedt alle Standort,Funktion zu der Adress ID  die uebergeben wird
@@ -374,7 +373,7 @@ class standort extends basis_db
 	{
 		$this->result=array();
 		$this->errormsg = '';
-	
+
 		//Pruefen ob xxx_ID  eine gueltige Zahl ist
 		if($firma_id!='' && !is_numeric($firma_id))
 		{
@@ -395,7 +394,7 @@ class standort extends basis_db
 		{
 			$this->errormsg = 'Person ID muss eine gültige Zahl sein';
 			return false;
-		}		
+		}
 
 		//Pruefen ob pers_id eine gueltige Zahl ist
 		if($personfunktionstandort_id!='' && !is_numeric($personfunktionstandort_id))
@@ -403,16 +402,16 @@ class standort extends basis_db
 			$this->errormsg = 'Personfunktionstandort ID muss eine gültige Zahl sein';
 			return false;
 		}
-		
+
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT tbl_standort.* 
+		$qry = "SELECT tbl_standort.*
 				, personfunktionstandort_id,funktion_kurzbz,position,tbl_personfunktionstandort.anrede
-				,tbl_person.person_id,tbl_person.anrede as person_anrede,tbl_person.titelpost,tbl_person.titelpre,tbl_person.nachname,tbl_person.vorname,tbl_person.vornamen				 
+				,tbl_person.person_id,tbl_person.anrede as person_anrede,tbl_person.titelpost,tbl_person.titelpre,tbl_person.nachname,tbl_person.vorname,tbl_person.vornamen
 				FROM public.tbl_standort ,public.tbl_personfunktionstandort,public.tbl_person
 				WHERE  tbl_personfunktionstandort.standort_id=tbl_standort.standort_id
 				AND tbl_person.person_id=tbl_personfunktionstandort.person_id
 			";
-			
+
 		if ($personfunktionstandort_id!='' && is_numeric($personfunktionstandort_id))
 			$qry.="	AND personfunktionstandort_id=".$this->db_add_param($personfunktionstandort_id, FHC_INTEGER);
 		if ($firma_id!='' && is_numeric($firma_id))
@@ -451,14 +450,14 @@ class standort extends basis_db
 			$adr_obj->anrede=$row->anrede;
 
 
-			
+
 			$adr_obj->person_id=$row->person_id;
 			$adr_obj->person_anrede=$row->person_anrede;
 			$adr_obj->titelpost=$row->titelpost;
 			$adr_obj->titelpre=$row->titelpre;
 			$adr_obj->nachname=$row->nachname;
 			$adr_obj->vorname=$row->vorname;
-			$adr_obj->vornamen=$row->vornamen;				
+			$adr_obj->vornamen=$row->vornamen;
 
 			$this->result[] = $adr_obj;
 		}
@@ -497,23 +496,23 @@ class standort extends basis_db
 				$this->errormsg = 'funktion_kurzbz muss eingegeben werden: '.$this->funktion_kurzbz."\n";
 				return false;
 			}
-			
+
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO public.tbl_personfunktionstandort (funktion_kurzbz,person_id,position,anrede,standort_id) 
+			$qry='BEGIN;INSERT INTO public.tbl_personfunktionstandort (funktion_kurzbz,person_id,position,anrede,standort_id)
 				VALUES('.
-			      $this->db_add_param($this->funktion_kurzbz).', '.				
-			      $this->db_add_param($this->person_id, FHC_INTEGER).', '.				
+			      $this->db_add_param($this->funktion_kurzbz).', '.
+			      $this->db_add_param($this->person_id, FHC_INTEGER).', '.
 			      $this->db_add_param($this->position).', '.
 			      $this->db_add_param($this->anrede).', '.
-			      $this->db_add_param($this->standort_id, FHC_INTEGER).');'; 
+			      $this->db_add_param($this->standort_id, FHC_INTEGER).');';
 		}
 		else
 		{
 			$qry='UPDATE public.tbl_personfunktionstandort SET'.
 				' funktion_kurzbz='.$this->db_add_param($this->funktion_kurzbz).', '.
-				' person_id='.$this->db_add_param($this->person_id, FHC_INTEGER).', '.				
+				' person_id='.$this->db_add_param($this->person_id, FHC_INTEGER).', '.
 				' position='.$this->db_add_param($this->position).', '.
 		      	' anrede='.$this->db_add_param($this->anrede).','.
 		      	' standort_id='.$this->db_add_param($this->standort_id, FHC_INTEGER).' '.
@@ -548,7 +547,7 @@ class standort extends basis_db
 					return false;
 				}
 			}
-			else 
+			else
 				return true;
 		}
 		else
@@ -576,7 +575,7 @@ class standort extends basis_db
 			$this->errormsg = 'standort_id muss eine gültige Zahl sein'."\n";
 			return false;
 		}
-		
+
 		if($personfunktionstandort_id != '')
 			$qry="DELETE FROM public.tbl_personfunktionstandort WHERE personfunktionstandort_id=".$this->db_add_param($personfunktionstandort_id, FHC_INTEGER).";";
 		else if($standort_id != '')
@@ -585,8 +584,8 @@ class standort extends basis_db
 		{
 			$this->errormsg = 'personfunktionstandort_id oder standort_id muss eingegeben werden'."\n";
 			return false;
-		}	
-		
+		}
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -597,88 +596,88 @@ class standort extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * gibt alle Standorte eines bestimmten Typs zurück
 	 * @param $typ
 	 */
 	public function getStandorteWithTyp($typ)
 	{
-		$qry ="select standort.* from public.tbl_firma as firma, public.tbl_adresse as adresse, public.tbl_standort as standort where 
-		firma.firma_id = standort.firma_id  and 
-		standort.adresse_id = adresse.adresse_id and 
+		$qry ="select standort.* from public.tbl_firma as firma, public.tbl_adresse as adresse, public.tbl_standort as standort where
+		firma.firma_id = standort.firma_id  and
+		standort.adresse_id = adresse.adresse_id and
 		firma.firmentyp_kurzbz = ".$this->db_add_param($typ).";";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
-				$standort = new standort(); 
+				$standort = new standort();
 
-				$standort->standort_id = $row->standort_id; 
-				$standort->firma_id = $row->firma_id; 
-				$standort->adresse_id = $row->adresse_id; 
-				$standort->kurzbz = $row->kurzbz; 
-				$standort->bezeichnung = $row->bezeichnung; 
-				$standort->insertvon = $row->insertvon; 
-				$standort->insertamum = $row->insertamum; 
-				$standort->updatevon = $row->updatevon; 
+				$standort->standort_id = $row->standort_id;
+				$standort->firma_id = $row->firma_id;
+				$standort->adresse_id = $row->adresse_id;
+				$standort->kurzbz = $row->kurzbz;
+				$standort->bezeichnung = $row->bezeichnung;
+				$standort->insertvon = $row->insertvon;
+				$standort->insertamum = $row->insertamum;
+				$standort->updatevon = $row->updatevon;
 				$standort->updateamum = $row->updateamum;
 
-				$this->result[] = $standort; 
+				$this->result[] = $standort;
 			}
-			return true; 
+			return true;
 		}
 		else
 		{
 			$this->errormsg="Fehler bei der Abfrage aufgetreten.";
-			return false; 
+			return false;
 		}
-		
-		
+
+
 	}
-    
+
     /**
      * Gibt alle Standorte zurück, die zumindest mit 1 Ort verknüpft sind
      * @return true wenn ok, false im Fehlerfall
      */
-    public function getAllStandorteWithOrt() 
+    public function getAllStandorteWithOrt()
     {
-        $qry = "SELECT standort.* 
-                FROM public.tbl_firma AS firma, public.tbl_adresse AS adresse, public.tbl_standort AS standort 
+        $qry = "SELECT standort.*
+                FROM public.tbl_firma AS firma, public.tbl_adresse AS adresse, public.tbl_standort AS standort
                 WHERE firma.firma_id = standort.firma_id
                 AND standort.adresse_id = adresse.adresse_id
-                AND standort.standort_id IN 
+                AND standort.standort_id IN
                     (SELECT DISTINCT standort_id FROM public.tbl_ort);";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
-				$standort = new standort(); 
+				$standort = new standort();
 
-				$standort->standort_id = $row->standort_id; 
-				$standort->firma_id = $row->firma_id; 
-				$standort->adresse_id = $row->adresse_id; 
-				$standort->kurzbz = $row->kurzbz; 
-				$standort->bezeichnung = $row->bezeichnung; 
-				$standort->insertvon = $row->insertvon; 
-				$standort->insertamum = $row->insertamum; 
-				$standort->updatevon = $row->updatevon; 
+				$standort->standort_id = $row->standort_id;
+				$standort->firma_id = $row->firma_id;
+				$standort->adresse_id = $row->adresse_id;
+				$standort->kurzbz = $row->kurzbz;
+				$standort->bezeichnung = $row->bezeichnung;
+				$standort->insertvon = $row->insertvon;
+				$standort->insertamum = $row->insertamum;
+				$standort->updatevon = $row->updatevon;
 				$standort->updateamum = $row->updateamum;
 
-				$this->result[] = $standort; 
+				$this->result[] = $standort;
 			}
-			return true; 
+			return true;
 		}
 		else
 		{
 			$this->errormsg="Fehler bei der Abfrage aufgetreten.";
-			return false; 
+			return false;
 		}
     }
-	
-	
+
+
 }
 ?>

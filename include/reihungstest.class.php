@@ -15,22 +15,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
- * Klasse Reihungstest 
+ * Klasse Reihungstest
  * @create 10-01-2007
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class reihungstest extends basis_db 
+class reihungstest extends basis_db
 {
 	public $new;			//  boolean
 	public $done=false;		//  boolean
 	public $result = array();
-	
+
 	//Tabellenspalten
 	public $reihungstest_id;//  integer
 	public $studiengang_kz;	//  integer
@@ -46,7 +46,7 @@ class reihungstest extends basis_db
 	public $freigeschaltet=false;	//  boolean
 	public $oeffentlich=false;	//  boolean
 	public $max_teilnehmer;	//  integer
-	
+
 	/**
 	 * Konstruktor
 	 * @param $reihungstest_id ID der Adresse die geladen werden soll (Default=null)
@@ -54,11 +54,11 @@ class reihungstest extends basis_db
 	public function __construct($reihungstest_id=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($reihungstest_id))
 			$this->load($reihungstest_id);
 	}
-	
+
 	/**
 	 * Laedt den Reihungstest mit der ID $reihungstest_id
 	 * @param  $reihungstest_id ID des zu ladenden Reihungstests
@@ -71,9 +71,9 @@ class reihungstest extends basis_db
 			$this->errormsg = 'Reihungstest_id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM public.tbl_reihungstest WHERE reihungstest_id=".$this->db_add_param($reihungstest_id, FHC_INTEGER, false);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -92,24 +92,24 @@ class reihungstest extends basis_db
 				$this->max_teilnehmer = $row->max_teilnehmer;
 				$this->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$this->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
-				return true;				
+				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Reihungstest existiert nicht';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Reihungstests';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert alle Reihungstests
-	 * wenn ein Datum uebergeben wird, dann werden alle Reihungstests ab diesem 
+	 * wenn ein Datum uebergeben wird, dann werden alle Reihungstests ab diesem
 	 * Datum zurueckgeliefert
 	 */
 	public function getAll($datum=null)
@@ -118,13 +118,13 @@ class reihungstest extends basis_db
 		if($datum!=null)
 			$qry.=" WHERE datum>=".$this->db_add_param($datum);
 		$qry.=" ORDER BY datum DESC, uhrzeit";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new reihungstest();
-				
+
 				$obj->reihungstest_id = $row->reihungstest_id;
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->ort_kurzbz = $row->ort_kurzbz;
@@ -139,24 +139,24 @@ class reihungstest extends basis_db
 				$obj->max_teilnehmer = $row->max_teilnehmer;
 				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Reihungstests';
 			return false;
 		}
 	}
-		
+
 	/**
 	 * Prueft die Variablen auf Gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	private function validate()
-	{		
+	{
 		//Zahlenfelder pruefen
 		if(!is_numeric($this->studiengang_kz))
 		{
@@ -174,13 +174,13 @@ class reihungstest extends basis_db
 			$this->errormsg = 'Anmerkung darf nicht länger als 64 Zeichen sein';
 			return false;
 		}
-				
+
 		$this->errormsg = '';
-		return true;		
+		return true;
 	}
-	
+
 	/**
-	 * Speichert den aktuellen Datensatz in die Datenbank	 
+	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	 * andernfalls wird der Datensatz mit der ID in $reihungstest_id aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
@@ -189,19 +189,18 @@ class reihungstest extends basis_db
 	{
 		if(!$this->validate())
 			return false;
-		
+
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-					
-			$qry='BEGIN; INSERT INTO public.tbl_reihungstest (studiengang_kz, ort_kurzbz, anmerkung, datum, uhrzeit, 
-				ext_id, insertamum, insertvon, updateamum, updatevon, max_teilnehmer, oeffentlich, freigeschaltet) VALUES('.
+
+			$qry='BEGIN; INSERT INTO public.tbl_reihungstest (studiengang_kz, ort_kurzbz, anmerkung, datum, uhrzeit,
+				 insertamum, insertvon, updateamum, updatevon, max_teilnehmer, oeffentlich, freigeschaltet) VALUES('.
 			     $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 			     $this->db_add_param($this->ort_kurzbz).', '.
 			     $this->db_add_param($this->anmerkung).', '.
 			     $this->db_add_param($this->datum).', '.
-			     $this->db_add_param($this->uhrzeit).', '.
-			     $this->db_add_param($this->ext_id, FHC_INTEGER).',  now(), '.
+			     $this->db_add_param($this->uhrzeit).', now(), '.
 			     $this->db_add_param($this->insertvon).', now(), '.
 			     $this->db_add_param($this->updatevon).','.
 			     $this->db_add_param($this->max_teilnehmer).','.
@@ -209,22 +208,21 @@ class reihungstest extends basis_db
 			     $this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).');';
 		}
 		else
-		{			
+		{
 			$qry='UPDATE public.tbl_reihungstest SET '.
-				'studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '. 
+				'studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 				'ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).', '.
-				'anmerkung='.$this->db_add_param($this->anmerkung).', '.  
-				'datum='.$this->db_add_param($this->datum).', '. 
+				'anmerkung='.$this->db_add_param($this->anmerkung).', '.
+				'datum='.$this->db_add_param($this->datum).', '.
 				'uhrzeit='.$this->db_add_param($this->uhrzeit).', '.
-				'ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).', '. 
 		     	'updateamum= now(), '.
 		     	'updatevon='.$this->db_add_param($this->updatevon).', '.
 		     	'max_teilnehmer='.$this->db_add_param($this->max_teilnehmer).', '.
 				'oeffentlich='.$this->db_add_param($this->oeffentlich, FHC_BOOLEAN).', '.
 				'freigeschaltet='.$this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).' '.
-				'WHERE reihungstest_id='.$this->db_add_param($this->reihungstest_id, FHC_INTEGER, false).';';					
+				'WHERE reihungstest_id='.$this->db_add_param($this->reihungstest_id, FHC_INTEGER, false).';';
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			if($this->new)
@@ -238,14 +236,14 @@ class reihungstest extends basis_db
 						$this->db_query('COMMIT');
 						return true;
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					$this->db_query('ROLLBACK');
@@ -260,7 +258,7 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
-		
+
 	/**
 	 * Liefert die Reihungstests eines Studienganges
 	 *
@@ -271,16 +269,16 @@ class reihungstest extends basis_db
 	public function getReihungstest($studiengang_kz,$order=null)
 	{
 		$qry = "SELECT * FROM public.tbl_reihungstest WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
-		
+
 		if ($order!=null)
 			$qry .=" ORDER BY ".$order.";";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new reihungstest();
-				
+
 				$obj->reihungstest_id = $row->reihungstest_id;
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->ort_kurzbz = $row->ort_kurzbz;
@@ -295,12 +293,12 @@ class reihungstest extends basis_db
 				$obj->max_teilnehmer = $row->max_teilnehmer;
 				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Reihungstests';
 			return false;
@@ -317,18 +315,18 @@ class reihungstest extends basis_db
 	public function getZukuenftige($include_id, $studiengang_kz)
 	{
 		$qry = "SELECT *, '1' as sortierung,(SELECT upper(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_reihungstest.studiengang_kz) as stg FROM public.tbl_reihungstest WHERE datum>=now()-'1 days'::interval AND studiengang_kz=".$this->db_add_param($studiengang_kz)."
-			UNION 
+			UNION
 			SELECT *, '2' as sortierung,(SELECT upper(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_reihungstest.studiengang_kz) as stg FROM public.tbl_reihungstest WHERE datum>=now()-'1 days'::interval AND studiengang_kz!=".$this->db_add_param($studiengang_kz)."
 			UNION
 			SELECT *, '0' as sortierung,(SELECT upper(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_reihungstest.studiengang_kz) as stg FROM public.tbl_reihungstest WHERE reihungstest_id=".$this->db_add_param($include_id)."
 			ORDER BY sortierung, stg, datum";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new reihungstest();
-				
+
 				$obj->reihungstest_id = $row->reihungstest_id;
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->ort_kurzbz = $row->ort_kurzbz;
@@ -343,32 +341,32 @@ class reihungstest extends basis_db
 				$obj->max_teilnehmer = $row->max_teilnehmer;
 				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Reihungstests';
 			return false;
 		}
 	}
-	
+
 	public function getStgZukuenftige($stg)
-	{	
+	{
 		$qry = "SELECT * "
 				. "FROM public.tbl_reihungstest "
 				. "WHERE studiengang_kz = ".$this->db_add_param($stg, FHC_INTEGER)." "
 				. "AND datum>=now()-'1 days'::interval "
 				. "AND oeffentlich;";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new reihungstest();
-				
+
 				$obj->reihungstest_id = $row->reihungstest_id;
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->ort_kurzbz = $row->ort_kurzbz;
@@ -383,13 +381,13 @@ class reihungstest extends basis_db
 				$obj->max_teilnehmer = $row->max_teilnehmer;
 				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
-				
+
 				$this->result[] = $obj;
 			}
-			return true; 
+			return true;
 		}
 		else
-			return false; 
+			return false;
 	}
 
 	public function getTeilnehmerAnzahl($reihungstest_id) {

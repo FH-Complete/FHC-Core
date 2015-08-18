@@ -279,7 +279,7 @@ class adresse extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO public.tbl_adresse (person_id, name, strasse, plz, typ, ort, nation, insertamum, insertvon,
-			     gemeinde, heimatadresse, zustelladresse, firma_id, updateamum, updatevon, ext_id) VALUES('.
+			     gemeinde, heimatadresse, zustelladresse, firma_id, updateamum, updatevon) VALUES('.
 			      $this->db_add_param($this->person_id, FHC_INTEGER).', '.
 			      $this->db_add_param($this->name).', '.
 			      $this->db_add_param($this->strasse).', '.
@@ -292,8 +292,7 @@ class adresse extends basis_db
 			      $this->db_add_param($this->heimatadresse,FHC_BOOLEAN, false).', '.
 			      $this->db_add_param($this->zustelladresse,FHC_BOOLEAN, false).', '.
 			      $this->db_add_param($this->firma_id, FHC_INTEGER).', now(), '.
-			      $this->db_add_param($this->updatevon).', '.
-			      $this->db_add_param($this->ext_id, FHC_INTEGER).');';
+			      $this->db_add_param($this->updatevon).');';
 		}
 		else
 		{

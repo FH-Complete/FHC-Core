@@ -24,7 +24,7 @@ require_once(dirname(__FILE__) . '/basis_db.class.php');
 require_once(dirname(__FILE__) . '/functions.inc.php');
 require_once(dirname(__FILE__) . '/studiengang.class.php');
 
-class lehrveranstaltung extends basis_db 
+class lehrveranstaltung extends basis_db
 {
 	public $new;	 // boolean
 	public $lehrveranstaltungen = array(); //  lehrveranstaltung Objekt
@@ -72,7 +72,7 @@ class lehrveranstaltung extends basis_db
 	public $stpllv_pflicht=true;
 	public $stpllv_koordinator;
 	public $stpllv_semester;
-	
+
 	public $sws;
 	public $lvs;
 	public $alvs;
@@ -83,7 +83,7 @@ class lehrveranstaltung extends basis_db
 	 * Konstruktor
 	 * @param $lehrveranstaltung_id ID der zu ladenden Lehrveranstaltung
 	 */
-	public function __construct($lehrveranstaltung_id = null) 
+	public function __construct($lehrveranstaltung_id = null)
 	{
 		parent::__construct();
 
@@ -96,9 +96,9 @@ class lehrveranstaltung extends basis_db
 	 * @param $lehrveranstaltung_id  ID des zu ladenden Datensatzes
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load($lehrveranstaltung_id) 
+	public function load($lehrveranstaltung_id)
 	{
-		if (!is_numeric($lehrveranstaltung_id)) 
+		if (!is_numeric($lehrveranstaltung_id))
 		{
 			$this->errormsg = 'Lehrveranstaltung_id muss eine gueltige Zahl sein';
 			return false;
@@ -148,13 +148,13 @@ class lehrveranstaltung extends basis_db
 			$this->lvnr = $row->lvnr;
 			$this->semester_alternativ = $row->semester_alternativ;
 			$this->farbe = $row->farbe;
-			
+
 			$this->sws = $row->sws;
 			$this->lvs = $row->lvs;
 			$this->alvs = $row->alvs;
 			$this->lvps = $row->lvps;
 			$this->las = $row->las;
-			
+
 			$this->bezeichnung_arr['German'] = $this->bezeichnung;
 			$this->bezeichnung_arr['English'] = $this->bezeichnung_english;
 			if ($this->bezeichnung_arr['English'] == '')
@@ -168,17 +168,17 @@ class lehrveranstaltung extends basis_db
 	 * Liefert alle Lehrveranstaltungen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getAll() 
+	public function getAll()
 	{
 		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung;";
 
-		if (!$this->db_query($qry)) 
+		if (!$this->db_query($qry))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
 
-		while ($row = $this->db_fetch_object()) 
+		while ($row = $this->db_fetch_object())
 		{
 			$lv_obj = new lehrveranstaltung();
 
@@ -237,31 +237,31 @@ class lehrveranstaltung extends basis_db
 	 * @param $semester
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_lva($studiengang_kz, $semester = null, $lehreverzeichnis = null, $lehre = null, $aktiv = null, $sort = null, $oe_kurzbz=null, $lehrtyp=null) 
+	public function load_lva($studiengang_kz, $semester = null, $lehreverzeichnis = null, $lehre = null, $aktiv = null, $sort = null, $oe_kurzbz=null, $lehrtyp=null)
 	{
 		//Variablen pruefen
 		if($semester == "null")
 			$semester = null;
-		
+
 		if($lehreverzeichnis == "null")
 			$lehreverzeichnis = null;
-		
-		if (!is_numeric($studiengang_kz) || $studiengang_kz == '') 
+
+		if (!is_numeric($studiengang_kz) || $studiengang_kz == '')
 		{
 			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		if (!is_null($semester) && (!is_numeric($semester) && $semester != '')) 
+		if (!is_null($semester) && (!is_numeric($semester) && $semester != ''))
 		{
 			$this->errormsg = 'Semester muss eine gueltige Zahl sein';
 			return false;
 		}
-		if (!is_null($aktiv) && !is_bool($aktiv)) 
+		if (!is_null($aktiv) && !is_bool($aktiv))
 		{
 			$this->errormsg = 'Aktivkz muss ein boolscher Wert sein';
 			return false;
 		}
-		if (!is_null($lehre) && !is_bool($lehre)) 
+		if (!is_null($lehre) && !is_bool($lehre))
 		{
 			$this->errormsg = 'Lehre muss ein boolscher Wert sein';
 			return false;
@@ -288,10 +288,10 @@ class lehrveranstaltung extends basis_db
 
 		if (!is_null($lehre) && $lehre)
 			$qry .= " AND lehre ";
-		
+
 		if(!is_null($oe_kurzbz))
 			$qry .= " AND oe_kurzbz=".$this->db_add_param($oe_kurzbz);
-		
+
 		if(!is_null($lehrtyp))
 			$qry .= " AND lehrtyp_kurzbz=".$this->db_add_param($lehrtyp);
 
@@ -299,15 +299,15 @@ class lehrveranstaltung extends basis_db
 			$qry .= " ORDER BY semester, bezeichnung";
 		else
 			$qry .= " ORDER BY $sort ";
-		
+
 		//Datensaetze laden
-		if (!$this->db_query($qry)) 
+		if (!$this->db_query($qry))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
 
-		while ($row = $this->db_fetch_object()) 
+		while ($row = $this->db_fetch_object())
 		{
 			$lv_obj = new lehrveranstaltung();
 
@@ -365,37 +365,37 @@ class lehrveranstaltung extends basis_db
 	 * @param $semester
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_lva_le($studiengang_kz, $studiensemester_kurzbz = null, $semester = null, $lehreverzeichnis = null, $lehre = null, $aktiv = null, $sort = null) 
+	public function load_lva_le($studiengang_kz, $studiensemester_kurzbz = null, $semester = null, $lehreverzeichnis = null, $lehre = null, $aktiv = null, $sort = null)
 	{
 		//Variablen pruefen
 
-		if (!is_numeric($studiengang_kz) || $studiengang_kz === '') 
+		if (!is_numeric($studiengang_kz) || $studiengang_kz === '')
 		{
 			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		if (!is_null($semester) && (!is_numeric($semester) && $semester != '')) 
+		if (!is_null($semester) && (!is_numeric($semester) && $semester != ''))
 		{
 			$this->errormsg = 'Semester muss eine gueltige Zahl sein';
 			return false;
 		}
-		if (!is_null($aktiv) && !is_bool($aktiv)) 
+		if (!is_null($aktiv) && !is_bool($aktiv))
 		{
 			$this->errormsg = 'Aktiv muss ein boolscher Wert sein';
 			return false;
 		}
-		if (!is_null($lehre) && !is_bool($lehre)) 
+		if (!is_null($lehre) && !is_bool($lehre))
 		{
 			$this->errormsg = 'Lehre muss ein boolscher Wert sein';
 			return false;
 		}
 
-		$qry = "SELECT 
-					distinct lehre.tbl_lehrveranstaltung.*, tbl_lehreinheit.studiensemester_kurzbz 
-				FROM 
-					lehre.tbl_lehrveranstaltung,lehre.tbl_lehreinheit  
+		$qry = "SELECT
+					distinct lehre.tbl_lehrveranstaltung.*, tbl_lehreinheit.studiensemester_kurzbz
+				FROM
+					lehre.tbl_lehrveranstaltung,lehre.tbl_lehreinheit
 				WHERE
-					tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id 
+					tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id
 					AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 
 		//Select Befehl zusammenbauen
@@ -428,13 +428,13 @@ class lehrveranstaltung extends basis_db
 			$qry .= " ORDER BY $sort ";
 
 		//Datensaetze laden
-		if (!$this->db_query($qry)) 
+		if (!$this->db_query($qry))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
 
-		while ($row = $this->db_fetch_object()) 
+		while ($row = $this->db_fetch_object())
 		{
 			$lv_obj = new lehrveranstaltung();
 
@@ -494,10 +494,10 @@ class lehrveranstaltung extends basis_db
 	 * @param $student_uid
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_lva_student($student_uid, $studiensemester_kurzbz=NULL) 
+	public function load_lva_student($student_uid, $studiensemester_kurzbz=NULL)
 	{
-		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung 
-				WHERE lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung 
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung
+				WHERE lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung
 											  WHERE uid=" . $this->db_add_param($student_uid);
 		if($studiensemester_kurzbz !== NULL)
 		    $qry .= " AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
@@ -507,12 +507,12 @@ class lehrveranstaltung extends basis_db
 		$qry .= ") ORDER BY semester, bezeichnung";
 
 		//Datensaetze laden
-		if (!$this->db_query($qry)) 
+		if (!$this->db_query($qry))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
-		while ($row = $this->db_fetch_object()) 
+		while ($row = $this->db_fetch_object())
 		{
 			$lv_obj = new lehrveranstaltung();
 
@@ -604,85 +604,85 @@ class lehrveranstaltung extends basis_db
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function validate() 
+	public function validate()
 	{
 		//Laenge Pruefen
-		if (mb_strlen($this->bezeichnung) > 128) 
+		if (mb_strlen($this->bezeichnung) > 128)
 		{
 			$this->errormsg = 'Bezeichnung darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}
-		if (mb_strlen($this->kurzbz) > 16) 
+		if (mb_strlen($this->kurzbz) > 16)
 		{
 			$this->errormsg = 'Kurzbez darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if (mb_strlen($this->anmerkung) > 64) 
+		if (mb_strlen($this->anmerkung) > 64)
 		{
 			$this->errormsg = 'Anmerkung darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
-		if (mb_strlen($this->lehreverzeichnis) > 16) 
+		if (mb_strlen($this->lehreverzeichnis) > 16)
 		{
 			$this->errormsg = 'Lehreverzeichnis darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if (mb_strlen($this->lvnr) > 32) 
+		if (mb_strlen($this->lvnr) > 32)
 		{
 			$this->errormsg = 'LVNR darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
-		if (!is_numeric($this->studiengang_kz)) 
+		if (!is_numeric($this->studiengang_kz))
 		{
 			$this->errormsg = 'Studiengang_kz ist ungueltig';
 			return false;
 		}
-		if ($this->semester != '' && !is_numeric($this->semester)) 
+		if ($this->semester != '' && !is_numeric($this->semester))
 		{
 			$this->errormsg = 'Semester ist ungueltig';
 			return false;
 		}
-		if ($this->planfaktor != '' && !is_numeric($this->planfaktor)) 
+		if ($this->planfaktor != '' && !is_numeric($this->planfaktor))
 		{
 			$this->errormsg = 'Planfaktor ist ungueltig';
 			return false;
 		}
-		if ($this->planlektoren != '' && !is_numeric($this->planlektoren)) 
+		if ($this->planlektoren != '' && !is_numeric($this->planlektoren))
 		{
 			$this->errormsg = 'Planlektoren ist ungueltig';
 			return false;
 		}
-		if ($this->ects != '' && !is_numeric($this->ects)) 
+		if ($this->ects != '' && !is_numeric($this->ects))
 		{
 			$this->errormsg = 'ECTS sind ungueltig';
 			return false;
 		}
-		if ($this->ects > 40) 
+		if ($this->ects > 40)
 		{
 			$this->errormsg = 'ECTS darf nicht groesser als 40 sein';
 			return false;
 		}
-		if ($this->semesterstunden != '' && !isint($this->semesterstunden)) 
+		if ($this->semesterstunden != '' && !isint($this->semesterstunden))
 		{
 			$this->errormsg = 'Semesterstunden muss ein eine gueltige ganze Zahl sein';
 			return false;
 		}
-		if ($this->sort != '' && !isint($this->sort)) 
+		if ($this->sort != '' && !isint($this->sort))
 		{
 			$this->errormsg = 'Sort muss ein eine gueltige ganze Zahl sein';
 			return false;
 		}
-		if ($this->incoming != '' && !isint($this->incoming)) 
+		if ($this->incoming != '' && !isint($this->incoming))
 		{
 			$this->errormsg = 'Sort muss ein eine gueltige ganze Zahl sein';
 			return false;
 		}
-		if ($this->anzahlsemester != '' && !isint($this->sort)) 
+		if ($this->anzahlsemester != '' && !isint($this->sort))
 		{
 			$this->errormsg = 'Anzahl Semester muss ein eine gueltige ganze Zahl sein';
 			return false;
 		}
-		if ($this->semesterwochen != '' && !isint($this->sort)) 
+		if ($this->semesterwochen != '' && !isint($this->sort))
 		{
 			$this->errormsg = 'Semesterwochen muss ein eine gueltige ganze Zahl sein';
 			return false;
@@ -695,7 +695,7 @@ class lehrveranstaltung extends basis_db
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function save($new = null) 
+	public function save($new = null)
 	{
 		if ($new == null)
 			$new = $this->new;
@@ -704,13 +704,13 @@ class lehrveranstaltung extends basis_db
 		if (!$this->validate())
 			return false;
 
-		if ($new) 
+		if ($new)
 		{
 			//Neuen Datensatz anlegen
 			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, lehrform_kurzbz,
-				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum,
+				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, insertamum,
 				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,
-				zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz, incoming, lehrtyp_kurzbz, oe_kurzbz, 
+				zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz, incoming, lehrtyp_kurzbz, oe_kurzbz,
 				raumtyp_kurzbz, anzahlsemester, semesterwochen, lvnr, semester_alternativ, farbe,sws,lvs,alvs,lvps,las) VALUES (' .
 					$this->db_add_param($this->studiengang_kz) . ', ' .
 					$this->db_add_param($this->bezeichnung) . ', ' .
@@ -723,7 +723,6 @@ class lehrveranstaltung extends basis_db
 					$this->db_add_param($this->lehre, FHC_BOOLEAN) . ',' .
 					$this->db_add_param($this->lehreverzeichnis) . ', ' .
 					$this->db_add_param($this->aktiv, FHC_BOOLEAN) . ', ' .
-					$this->db_add_param($this->ext_id) . ', ' .
 					$this->db_add_param($this->insertamum) . ', ' .
 					$this->db_add_param($this->insertvon) . ', ' .
 					$this->db_add_param($this->planfaktor) . ', ' .
@@ -744,7 +743,7 @@ class lehrveranstaltung extends basis_db
 					$this->db_add_param($this->oe_kurzbz) . ',' .
 					$this->db_add_param($this->raumtyp_kurzbz) . ',' .
 					$this->db_add_param($this->anzahlsemester) . ',' .
-					$this->db_add_param($this->semesterwochen) . ',' . 
+					$this->db_add_param($this->semesterwochen) . ',' .
 					$this->db_add_param($this->lvnr) .','.
 					$this->db_add_param($this->semester_alternativ).','.
 					$this->db_add_param($this->farbe).','.
@@ -753,12 +752,12 @@ class lehrveranstaltung extends basis_db
 					$this->db_add_param($this->alvs).','.
 					$this->db_add_param($this->lvps).','.
 					$this->db_add_param($this->las).');';
-		} 
-		else 
+		}
+		else
 		{
 			//bestehenden Datensatz akualisieren
 			//Pruefen ob lehrveranstaltung_id eine gueltige Zahl ist
-			if (!is_numeric($this->lehrveranstaltung_id) || $this->lehrveranstaltung_id == '') 
+			if (!is_numeric($this->lehrveranstaltung_id) || $this->lehrveranstaltung_id == '')
 			{
 				$this->errormsg = 'lehrveranstaltung_id muss eine gueltige Zahl sein';
 				return false;
@@ -776,7 +775,6 @@ class lehrveranstaltung extends basis_db
 					'lehre=' . $this->db_add_param($this->lehre, FHC_BOOLEAN) . ', ' .
 					'lehreverzeichnis=' . $this->db_add_param($this->lehreverzeichnis) . ', ' .
 					'aktiv=' . $this->db_add_param($this->aktiv, FHC_BOOLEAN) . ', ' .
-					'ext_id=' . $this->db_add_param($this->ext_id) . ', ' .
 					'planfaktor=' . $this->db_add_param($this->planfaktor) . ', ' .
 					'planlektoren=' . $this->db_add_param($this->planlektoren, FHC_INTEGER) . ', ' .
 					'planpersonalkosten=' . $this->db_add_param($this->planpersonalkosten) . ', ' .
@@ -807,19 +805,19 @@ class lehrveranstaltung extends basis_db
 					'WHERE lehrveranstaltung_id = ' . $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER, false) . ';';
 		}
 
-		if ($this->db_query($qry)) 
+		if ($this->db_query($qry))
 		{
-			if ($new) 
+			if ($new)
 			{
 				$qry = "SELECT currval('lehre.tbl_lehrveranstaltung_lehrveranstaltung_id_seq') as id";
-				if ($this->db_query($qry)) 
+				if ($this->db_query($qry))
 				{
-					if ($row = $this->db_fetch_object()) 
+					if ($row = $this->db_fetch_object())
 					{
 						$this->lehrveranstaltung_id = $row->id;
 						$this->db_query('COMMIT;');
 						return true;
-					} 
+					}
 					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
@@ -827,7 +825,7 @@ class lehrveranstaltung extends basis_db
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					$this->db_query('ROLLBACK');
@@ -850,9 +848,9 @@ class lehrveranstaltung extends basis_db
 	 * @param studiengang_kz, uid, studiensemester_kurzbz
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	public function loadLVAfromMitarbeiter($studiengang_kz, $uid, $studiensemester_kurzbz) 
+	public function loadLVAfromMitarbeiter($studiengang_kz, $uid, $studiensemester_kurzbz)
 	{
-		if (!is_numeric($studiengang_kz)) 
+		if (!is_numeric($studiengang_kz))
 		{
 			$this->errormsg = 'Studiengang_kz ist ungueltig';
 			return false;
@@ -866,9 +864,9 @@ class lehrveranstaltung extends basis_db
 				tbl_lehreinheitmitarbeiter.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
 				tbl_lehreinheit.studiensemester_kurzbz = " . $this->db_add_param($studiensemester_kurzbz) . " AND
 				tbl_lehreinheitmitarbeiter.mitarbeiter_uid=" . $this->db_add_param($uid) . ";";
-		if ($this->db_query($qry)) 
+		if ($this->db_query($qry))
 		{
-			while ($row = $this->db_fetch_object()) 
+			while ($row = $this->db_fetch_object())
 			{
 				$lv_obj = new lehrveranstaltung();
 
@@ -919,7 +917,7 @@ class lehrveranstaltung extends basis_db
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Lesen aus der Datenbank';
 			return false;
@@ -933,14 +931,14 @@ class lehrveranstaltung extends basis_db
 	 * 			$order Sortierkriterium
 	 * @return array mit Lehrferanstaltungen oder false=fehler
 	 */
-	public function getTab($stg = null, $sem = null, $order = 'lehrveranstaltung_id') 
+	public function getTab($stg = null, $sem = null, $order = 'lehrveranstaltung_id')
 	{
-		if ($stg != null && !is_numeric($stg)) 
+		if ($stg != null && !is_numeric($stg))
 		{
 			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		if ($sem != null && !is_numeric($sem)) 
+		if ($sem != null && !is_numeric($sem))
 		{
 			$this->errormsg = 'Semester muss eine gueltige Zahl sein';
 			return false;
@@ -958,9 +956,9 @@ class lehrveranstaltung extends basis_db
 
 		$sql_query .= " ORDER BY $order";
 
-		if ($this->db_query($sql_query)) 
+		if ($this->db_query($sql_query))
 		{
-			while ($row = $this->db_fetch_object()) 
+			while ($row = $this->db_fetch_object())
 			{
 				$l = new lehrveranstaltung();
 
@@ -1008,7 +1006,7 @@ class lehrveranstaltung extends basis_db
 				$this->lehrveranstaltungen[] = $l;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = $this->db_last_error();
 			return false;
@@ -1017,35 +1015,35 @@ class lehrveranstaltung extends basis_db
 	}
 
 	/**
-	 * Liefert alle Moodlekurs Ids 
+	 * Liefert alle Moodlekurs Ids
 	 * @param 	$lehrveranstaltung_id Id der Lehrveranstaltung
 	 * @param	$semester Semester
 	 * @return array mit Moodlekurs Ids oder false=fehler
 	 */
-	public function getMoodleKurse($lehrveranstaltung_id, $semester) 
+	public function getMoodleKurse($lehrveranstaltung_id, $semester)
 	{
-		if ($lehrveranstaltung_id == '' || $semester == '') 
+		if ($lehrveranstaltung_id == '' || $semester == '')
 		{
 			$this->errormsg = 'Id und Semester muss übergeben werden.';
 			return false;
 		}
 
-		$qry = "SELECT mdl_course_id FROM lehre.tbl_moodle 
-            WHERE studiensemester_kurzbz = " . $this->db_add_param($semester) . " 
-                AND (lehrveranstaltung_id = " . $this->db_add_param($lehrveranstaltung_id) . " 
+		$qry = "SELECT mdl_course_id FROM lehre.tbl_moodle
+            WHERE studiensemester_kurzbz = " . $this->db_add_param($semester) . "
+                AND (lehrveranstaltung_id = " . $this->db_add_param($lehrveranstaltung_id) . "
                     OR lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id = " . $this->db_add_param($lehrveranstaltung_id) . "));";
 
 		$moodleArray = array();
 
-		if ($result = $this->db_query($qry)) 
+		if ($result = $this->db_query($qry))
 		{
-			while ($row = $this->db_fetch_object($result)) 
+			while ($row = $this->db_fetch_object($result))
 			{
 				$moodleArray[] = $row->mdl_course_id;
 			}
 			return $moodleArray;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Moodlekurs konnte nicht geladen werden';
 			return false;
@@ -1057,7 +1055,7 @@ class lehrveranstaltung extends basis_db
 	 * @param $ids Array mit den LV ids
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function loadArray($ids) 
+	public function loadArray($ids)
 	{
 		if (count($ids) == 0)
 			return true;
@@ -1067,13 +1065,13 @@ class lehrveranstaltung extends basis_db
 		$qry = 'SELECT * FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id in(' . $ids . ')';
 		$qry .=" ORDER BY bezeichnung";
 
-		if (!$result = $this->db_query($qry)) 
+		if (!$result = $this->db_query($qry))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
 
-		while ($row = $this->db_fetch_object($result)) 
+		while ($row = $this->db_fetch_object($result))
 		{
 			$lv_obj = new lehrveranstaltung();
 
@@ -1128,40 +1126,40 @@ class lehrveranstaltung extends basis_db
 
 	/**
 	 * Laedt alle Lehrveranstaltungen eines Studienplans
-	 * 
+	 *
 	 * @param $studienplan_id ID des Studienplans
 	 * @param $semeser Semester optional
 	 * @return boolean true wenn ok, false im Fehlerfall
 	 */
-	public function loadLehrveranstaltungStudienplan($studienplan_id, $semester = null) 
+	public function loadLehrveranstaltungStudienplan($studienplan_id, $semester = null)
 	{
-		if (!is_numeric($studienplan_id) || $studienplan_id === '') 
+		if (!is_numeric($studienplan_id) || $studienplan_id === '')
 		{
 			$this->errormsg = 'StudienplanID ist ungueltig';
 			return false;
 		}
 
-		$qry = "SELECT tbl_lehrveranstaltung.*, 
-			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id, 
-			tbl_studienplan_lehrveranstaltung.semester as stpllv_semester, 
-			tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht, 
-			tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator, 
+		$qry = "SELECT tbl_lehrveranstaltung.*,
+			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
+			tbl_studienplan_lehrveranstaltung.semester as stpllv_semester,
+			tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht,
+			tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator,
 			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent,
 			tbl_studienplan_lehrveranstaltung.sort stpllv_sort
-		FROM lehre.tbl_lehrveranstaltung 
-		JOIN lehre.tbl_studienplan_lehrveranstaltung 
-		USING(lehrveranstaltung_id) 
+		FROM lehre.tbl_lehrveranstaltung
+		JOIN lehre.tbl_studienplan_lehrveranstaltung
+		USING(lehrveranstaltung_id)
 		WHERE tbl_studienplan_lehrveranstaltung.studienplan_id=" . $this->db_add_param($studienplan_id, FHC_INTEGER);
-		
-		if (!is_null($semester)) 
+
+		if (!is_null($semester))
 		{
 			$qry.=" AND tbl_studienplan_lehrveranstaltung.semester=" . $this->db_add_param($semester, FHC_INTEGER);
 		}
 		$qry.=" ORDER BY stpllv_sort, semester, sort";
 		$this->lehrveranstaltungen = array();
-		if ($result = $this->db_query($qry)) 
+		if ($result = $this->db_query($qry))
 		{
-			while ($row = $this->db_fetch_object($result)) 
+			while ($row = $this->db_fetch_object($result))
 			{
 				$obj = new lehrveranstaltung();
 
@@ -1220,7 +1218,7 @@ class lehrveranstaltung extends basis_db
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
@@ -1230,12 +1228,12 @@ class lehrveranstaltung extends basis_db
 	/**
 	 * Liefert die Lehrveranstaltungen als verschachtelten Tree
 	 */
-	public function getLehrveranstaltungTree() 
+	public function getLehrveranstaltungTree()
 	{
 		$tree = array();
-		foreach ($this->lehrveranstaltungen as $row) 
+		foreach ($this->lehrveranstaltungen as $row)
 		{
-			if ($row->studienplan_lehrveranstaltung_id_parent == '') 
+			if ($row->studienplan_lehrveranstaltung_id_parent == '')
 			{
 				$tree[$row->studienplan_lehrveranstaltung_id] = $row;
 				$tree[$row->studienplan_lehrveranstaltung_id]->childs = $this->getLehrveranstaltungTreeChilds($row->studienplan_lehrveranstaltung_id);
@@ -1247,12 +1245,12 @@ class lehrveranstaltung extends basis_db
 	/**
 	 * Generiert die Subtrees des Lehrveranstaltungstrees
 	 */
-	protected function getLehrveranstaltungTreeChilds($studienplan_lehrveranstaltung_id) 
+	protected function getLehrveranstaltungTreeChilds($studienplan_lehrveranstaltung_id)
 	{
 		$childs = array();
-		foreach ($this->lehrveranstaltungen as $row) 
+		foreach ($this->lehrveranstaltungen as $row)
 		{
-			if ($row->studienplan_lehrveranstaltung_id_parent === $studienplan_lehrveranstaltung_id) 
+			if ($row->studienplan_lehrveranstaltung_id_parent === $studienplan_lehrveranstaltung_id)
 			{
 				$childs[$row->studienplan_lehrveranstaltung_id] = $row;
 				$childs[$row->studienplan_lehrveranstaltung_id]->childs = $this->getLehrveranstaltungTreeChilds($row->studienplan_lehrveranstaltung_id);
@@ -1287,7 +1285,7 @@ class lehrveranstaltung extends basis_db
 				$obj->stpllv_koordinator = $lv->stpllv_koordinator;
 				$obj->oe_kurzbz = $lv->oe_kurzbz;
 				$obj->lvnr = $lv->lvnr;
-				
+
 				$values[] = $obj;
 
 			}
@@ -1308,12 +1306,12 @@ class lehrveranstaltung extends basis_db
 			$obj->stpllv_koordinator = $this->stpllv_koordinator;
 			$obj->oe_kurzbz = $this->oe_kurzbz;
 			$obj->lvnr = $this->lvnr;
-			
+
 			$values[] = $obj;
 		}
 		return $values;
 	}
-	
+
 	/**
 	 * Baut die Baumstruktur für jsTree in Studienordnung auf
 	 * @param $tree Array von Lehrveranstaltungen
@@ -1325,7 +1323,7 @@ class lehrveranstaltung extends basis_db
 		if (count($tree) > 0)
 		{
 			foreach ($tree as $lv)
-			{	
+			{
 				$obj = new stdClass();
 				$obj->lehrveranstaltung_id = $lv->lehrveranstaltung_id;
 				$obj->studiengang_kz = $lv->studiengang_kz;
@@ -1342,7 +1340,7 @@ class lehrveranstaltung extends basis_db
 				$obj->stpllv_koordinator = $lv->stpllv_koordinator;
 				$obj->lvnr = $lv->lvnr;
 				$obj->stpllv_sort = $lv->stpllv_sort;
-				
+
 				$obj->children = array();
 				if(count($lv->childs) > 0)
 				{
@@ -1372,7 +1370,7 @@ class lehrveranstaltung extends basis_db
 		}
 		return $values;
 	}
-	
+
 	/**
 	 * Baut die Datenstruktur für jsTree in Studienordnung auf
 	 * @param $studienplan_id ID des Studienpland
@@ -1387,7 +1385,7 @@ class lehrveranstaltung extends basis_db
 		$this->lehrveranstaltungen=array();
 		return $values;
 	}
-	
+
 	/**
 	 * Lädt alle kompatiblen LVs zu einer Lehrveranstaltung
 	 * @param $lehrveranstaltung_id ID der Lehrveranstaltung
@@ -1398,10 +1396,10 @@ class lehrveranstaltung extends basis_db
 			$this->errormsg = 'Lehrveranstaltung_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
-		$qry = "SELECT lehrveranstaltung_id_kompatibel FROM lehre.tbl_lehrveranstaltung_kompatibel 
+
+		$qry = "SELECT lehrveranstaltung_id_kompatibel FROM lehre.tbl_lehrveranstaltung_kompatibel
 			WHERE lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).";";
-		
+
 		if($this->db_query($qry))
 		{
 			$data = array();
@@ -1412,7 +1410,7 @@ class lehrveranstaltung extends basis_db
 			return $data;
 		}
 	}
-	
+
 	/**
 	 * Lädt alle kompatiblen LVs zu einer Lehrveranstaltung
 	 * @param $lehrveranstaltung_id ID der Lehrveranstaltung
@@ -1423,12 +1421,12 @@ class lehrveranstaltung extends basis_db
 			$this->errormsg = 'Lehrveranstaltung_id muss eine gueltige Zahl sein';
 			return false;
 		}
-	
+
 		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id IN (
-			SELECT lehrveranstaltung_id_kompatibel 
+			SELECT lehrveranstaltung_id_kompatibel
 			FROM lehre.tbl_lehrveranstaltung_kompatibel
 			WHERE lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).");";
-	
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -1466,18 +1464,18 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
 				$lv_obj->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
 				$lv_obj->farbe = $row->farbe;
-	
+
 				$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
 				if ($lv_obj->bezeichnung_arr['English'] == '')
 					$lv_obj->bezeichnung_arr['English'] = $lv_obj->bezeichnung_arr['German'];
-	
+
 				$this->lehrveranstaltungen[] = $lv_obj;
 			}
 			return true;
 		}
 	}
-	
+
 	/**
 	 * Speichert eine Kombination aus LV und ihrer kompatiblen Lehrveranstaltung
 	 * @param $lehrveranstaltung_id ID der Lehrveranstaltung
@@ -1485,14 +1483,14 @@ class lehrveranstaltung extends basis_db
 	 */
 	public function saveKompatibleLehrveranstaltung($lehrveranstaltung_id, $lehrveranstaltung_id_kompatibel)
 	{
-		$qry = 'SELECT 
-					* 
-				FROM 
-					lehre.tbl_lehrveranstaltung_kompatibel 
-				WHERE 
-					lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).' 
+		$qry = 'SELECT
+					*
+				FROM
+					lehre.tbl_lehrveranstaltung_kompatibel
+				WHERE
+					lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).'
 					AND lehrveranstaltung_id_kompatibel='.$this->db_add_param($lehrveranstaltung_id_kompatibel, FHC_INTEGER).';';
-		
+
 		if($this->db_query($qry))
 		{
 			if(!$this->db_fetch_object())
@@ -1504,8 +1502,8 @@ class lehrveranstaltung extends basis_db
 				if($this->db_query($qry))
 				{
 					return true;
-				} 
-				else 
+				}
+				else
 				{
 					$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 					return false;
@@ -1517,14 +1515,14 @@ class lehrveranstaltung extends basis_db
 				return false;
 			}
 
-		} 
-		else 
+		}
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Löscht eine kompatible Lehrveranstaltung
 	 * @param $lehrveranstaltung_id ID der Lehrveranstaltung
@@ -1532,21 +1530,21 @@ class lehrveranstaltung extends basis_db
 	 */
 	public function deleteKompatibleLehrveranstaltung($lehrveranstaltung_id, $lehrveranstaltung_id_kompatibel)
 	{
-		$qry = 'DELETE FROM lehre.tbl_lehrveranstaltung_kompatibel WHERE 
-			lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).' AND 
+		$qry = 'DELETE FROM lehre.tbl_lehrveranstaltung_kompatibel WHERE
+			lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).' AND
 			lehrveranstaltung_id_kompatibel='.$this->db_add_param($lehrveranstaltung_id_kompatibel, FHC_INTEGER).';';
-		
+
 		if($this->db_query($qry))
 		{
 			return true;
-		} 
-		else 
+		}
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Lädt Lehrveranstaltungen nach ihrer Organisationseinheit
 	 * @param $oe_kurzbz Kurzbezeichnung der Organisationseinheit
@@ -1555,7 +1553,7 @@ class lehrveranstaltung extends basis_db
 	 */
 	public function load_lva_oe($oe_kurzbz, $aktiv=null, $lehrtyp=null, $sort=null, $semester=null)
 	{
-		
+
 		if (is_null($oe_kurzbz)) {
 			$this->errormsg = 'OE KurzBz darf nicht null sein';
 			return false;
@@ -1568,13 +1566,13 @@ class lehrveranstaltung extends basis_db
 		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE oe_kurzbz=" . $this->db_add_param($oe_kurzbz, FHC_STRING);
 
 		//Select Befehl zusammenbauen
-		
+
 		if (!is_null($aktiv) && $aktiv)
 			$qry .= " AND aktiv ";
 
 		if(!is_null($lehrtyp))
 			$qry .= " AND lehrtyp_kurzbz=".$this->db_add_param($lehrtyp);
-		
+
 		if(!is_null($semester))
 			$qry .= " AND semester=".$this->db_add_param ($semester);
 
@@ -1583,15 +1581,15 @@ class lehrveranstaltung extends basis_db
 		else
 			$qry .= " ORDER BY $sort ";
 		$qry .= ";";
-		
+
 		//Datensaetze laden
-		if (!$this->db_query($qry)) 
+		if (!$this->db_query($qry))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
 
-		while ($row = $this->db_fetch_object()) 
+		while ($row = $this->db_fetch_object())
 		{
 			$lv_obj = new lehrveranstaltung();
 
@@ -1636,9 +1634,9 @@ class lehrveranstaltung extends basis_db
 
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
-		return true;	
+		return true;
 	}
-	
+
 
 	/**
 	 * Loescht den Datenensatz mit der ID die uebergeben wird
@@ -1701,10 +1699,10 @@ class lehrveranstaltung extends basis_db
 	 */
 	public function search($filter)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					tbl_lehrveranstaltung.*, tbl_studiengang.kurzbzlang as studiengang_kurzbzlang
-				FROM 
-					lehre.tbl_lehrveranstaltung 
+				FROM
+					lehre.tbl_lehrveranstaltung
 					JOIN public.tbl_studiengang USING(studiengang_kz)
 				WHERE
 					lower(tbl_lehrveranstaltung.bezeichnung || ' ' || tbl_studiengang.kurzbzlang || ' ' || tbl_lehrveranstaltung.semester) like lower('%".$this->db_escape($filter)."%')
@@ -1767,8 +1765,8 @@ class lehrveranstaltung extends basis_db
 		}
 	}
 
-	/** 
-	 * Liefert die Anzahl der ECTS Punkte die ein Student in einem Studiensemester 
+	/**
+	 * Liefert die Anzahl der ECTS Punkte die ein Student in einem Studiensemester
 	 * bereits verbraucht hat (fuer reduzierte Studiengebuehr)
 	 * @param $uid UID
 	 * @param $studiensemester_kurzbz
@@ -1778,15 +1776,15 @@ class lehrveranstaltung extends basis_db
 	{
 		$qry = "
 		SELECT sum(ects) as ectssumme FROM (
-			SELECT 
-				lehrveranstaltung_id, ects 
-			FROM 
+			SELECT
+				lehrveranstaltung_id, ects
+			FROM
 				campus.vw_student_lehrveranstaltung
-			WHERE		
+			WHERE
 				uid=".$this->db_add_param($uid)."
 				AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 			UNION
-			SELECT 
+			SELECT
 				lehrveranstaltung_id, ects
 			FROM
 				lehre.tbl_zeugnisnote
@@ -1814,7 +1812,7 @@ class lehrveranstaltung extends basis_db
 			return false;
 		}
 	}
-        
+
         /**
          * lädt die Lehrveranstaltungen zum zugehörigen Mitarbeiter
          * @param String $uid User ID des Mitarbeiters
@@ -1822,17 +1820,17 @@ class lehrveranstaltung extends basis_db
          */
         public function getLVByMitarbeiter($uid, $studiensemester_kurzbz = null)
         {
-            $qry = 'SELECT DISTINCT tbl_lehrveranstaltung.* FROM lehre.tbl_lehrveranstaltung 
-                        JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
-                        JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
-                    WHERE 
+            $qry = 'SELECT DISTINCT tbl_lehrveranstaltung.* FROM lehre.tbl_lehrveranstaltung
+                        JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
+                        JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+                    WHERE
                         mitarbeiter_uid='.$this->db_add_param($uid);
-            
+
             if($studiensemester_kurzbz != null)
             {
                 $qry .= ' AND tbl_lehreinheit.studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz).';';
             }
-            
+
             if($this->db_query($qry))
             {
                 while($row = $this->db_fetch_object())
@@ -1892,7 +1890,7 @@ class lehrveranstaltung extends basis_db
             }
 
         }
-        
+
         /**
          * Lädt alle Studenten UIDs die die angegebenen LV besuchen (optional mit Studiensemester)
          * @param integer $lehrveranstaltung_id ID der Lehrveranstaltung
@@ -1906,16 +1904,16 @@ class lehrveranstaltung extends basis_db
                 $this->errormsg = "Lehrveranstaltung ID muss eine gültige Zahl sein.";
                 return false;
             }
-            
+
             $qry = 'SELECT uid FROM campus.vw_student_lehrveranstaltung WHERE '
                     . 'lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id);
-            
+
             if(!is_null($studiensemester_kurzbz))
             {
                 $qry .= ' AND studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz);
             }
             $qry .= ';';
-            
+
             if($this->db_query($qry))
             {
                 $result = array();
@@ -1929,64 +1927,64 @@ class lehrveranstaltung extends basis_db
         }
 
 	/**
-	 * 
+	 *
 	 * @param type $lv_id
 	 * @param type $semester -> Ausbildungssemester
 	 * @return boolean
 	 */
 	public function getALVS($lv_id, $semester)
 	{
-		
+
 		if($semester=='')
 		{
-			$this->errormsg = "Kein Semester übergeben"; 
-			return false; 
+			$this->errormsg = "Kein Semester übergeben";
+			return false;
 		}
-		
-		$ss = ($semester%2==0)?'SS':'WS'; 
-		
-		$qry_ss = "SELECT studiensemester_kurzbz, start, ende 
-				FROM public.tbl_studiensemester 
-				WHERE substring(studiensemester_kurzbz from 1 for 2)='$ss' 
+
+		$ss = ($semester%2==0)?'SS':'WS';
+
+		$qry_ss = "SELECT studiensemester_kurzbz, start, ende
+				FROM public.tbl_studiensemester
+				WHERE substring(studiensemester_kurzbz from 1 for 2)='$ss'
 				AND start < now() ORDER BY start DESC LIMIT 1";
-		
+
 		if(!$result = $this->db_query($qry_ss))
 		{
-			$this->errormsg = "Fehler bei der Abfrage aufgetreten"; 
-			return false; 
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten";
+			return false;
 		}
-		
+
 		if(!$row= $this->db_fetch_object($result))
 		{
-			$this->errormsg = "Kein Semester gefunden"; 
-			return false; 
-			
+			$this->errormsg = "Kein Semester gefunden";
+			return false;
+
 		}
-			
+
 			$qry_alvs = "SELECT sum(lm.semesterstunden) as alvs
-				FROM lehre.tbl_lehrveranstaltung 
-				JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id) 
+				FROM lehre.tbl_lehrveranstaltung
+				JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
 				JOIN lehre.tbl_lehreinheitmitarbeiter lm USING (lehreinheit_id)
-				WHERE lehrveranstaltung_id = ".$this->db_add_param($lv_id, FHC_STRING)." 
+				WHERE lehrveranstaltung_id = ".$this->db_add_param($lv_id, FHC_STRING)."
 				AND studiensemester_kurzbz = ".$this->db_add_param($row->studiensemester_kurzbz).";";
-			
+
 		if(!$result_alvs=$this->db_query($qry_alvs))
 		{
-			$this->errormsg = "Fehler bei der Abfrage aufgetreten"; 
-			return false; 
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten";
+			return false;
 		}
-		
+
 		if($row_alvs = $this->db_fetch_object($result_alvs))
 		{
-			return $row_alvs->alvs; 
+			return $row_alvs->alvs;
 		}
 		else
 		{
-			$this->errormsg = $qry_alvs; 
-			return false; 
+			$this->errormsg = $qry_alvs;
+			return false;
 		}
 	}
-	
+
 	/**
 	 * Lädt alle Lehreinheit_IDs eine Lehrveranstaltung (optional mit Studiensemester)
 	 * @param integer $lehrveranstaltung_id ID der Lehrveranstaltung
@@ -2001,17 +1999,17 @@ class lehrveranstaltung extends basis_db
 			$this->errormsg = "Lehrveranstaltung ID muss eine gültige Zahl sein.";
 			return false;
 		}
-            
+
 		$qry = 'SELECT lehreinheit_id FROM campus.vw_student_lehrveranstaltung WHERE '
 			. 'lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id)
 			. ' AND uid='.$this->db_add_param($uid);
-            
+
 		if(!is_null($studiensemester_kurzbz))
 		{
 			$qry .= ' AND studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz);
 		}
 		$qry .= ' ORDER BY lehreinheit_id;';
-            
+
 		if($this->db_query($qry))
 		{
 			$result = array();
@@ -2023,7 +2021,7 @@ class lehrveranstaltung extends basis_db
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Prueft ob das Lehrverzeichnis bereits anderwertig verwendet wird
 	 * @param $lehreverzeichnis
@@ -2032,16 +2030,16 @@ class lehrveranstaltung extends basis_db
 	 */
 	public function lehreverzeichnisExists($lehreverzeichnis, $studiengang_kz, $semester)
 	{
-		$qry = 'SELECT 
-	    			1 
-	    		FROM 
-	    			lehre.tbl_lehrveranstaltung 
-	    		WHERE 
+		$qry = 'SELECT
+	    			1
+	    		FROM
+	    			lehre.tbl_lehrveranstaltung
+	    		WHERE
 	    			lehreverzeichnis='.$this->db_add_param($lehreverzeichnis).'
 	    			AND studiengang_kz='.$this->db_add_param($studiengang_kz).'
 	    			AND semester='.$this->db_add_param($semester).';';
-	    
-	    
+
+
 		if($this->db_query($qry))
 		{
 			if($this->db_num_rows() > 0)
@@ -2056,7 +2054,7 @@ class lehrveranstaltung extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Lädt alle Lehrveranstaltungen eine Studienplans
 	 * Optionale Filterung nach Lehrtyp und Semester
@@ -2067,33 +2065,33 @@ class lehrveranstaltung extends basis_db
 	 */
 	public function getLVFromStudienplanByLehrtyp($studienplan_id, $lehrtyp_kurzbz=NULL, $semester=NULL)
 	{
-	    if (!is_numeric($studienplan_id) || $studienplan_id === '') 
+	    if (!is_numeric($studienplan_id) || $studienplan_id === '')
 	    {
 		    $this->errormsg = 'StudienplanID ist ungueltig';
 		    return false;
 	    }
 
 	    $qry = "SELECT DISTINCT tbl_lehrveranstaltung.*
-		FROM lehre.tbl_lehrveranstaltung 
-		JOIN lehre.tbl_studienplan_lehrveranstaltung 
-		USING(lehrveranstaltung_id) 
+		FROM lehre.tbl_lehrveranstaltung
+		JOIN lehre.tbl_studienplan_lehrveranstaltung
+		USING(lehrveranstaltung_id)
 		WHERE tbl_studienplan_lehrveranstaltung.studienplan_id=" . $this->db_add_param($studienplan_id, FHC_INTEGER);
-	    
+
 	    if (!is_null($lehrtyp_kurzbz))
 	    {
 		$qry.=" AND tbl_lehrveranstaltung.lehrtyp_kurzbz=" . $this->db_add_param($lehrtyp_kurzbz, FHC_STRING);
 	    }
 
-	    if (!is_null($semester)) 
+	    if (!is_null($semester))
 	    {
 		$qry.=" AND tbl_studienplan_lehrveranstaltung.semester=" . $this->db_add_param($semester, FHC_INTEGER);
 	    }
 	    $qry.=" ORDER BY bezeichnung;";
 
 	    $this->lehrveranstaltungen = array();
-	    if ($result = $this->db_query($qry)) 
+	    if ($result = $this->db_query($qry))
 	    {
-		while ($row = $this->db_fetch_object($result)) 
+		while ($row = $this->db_fetch_object($result))
 		{
 		    $obj = new lehrveranstaltung();
 
@@ -2146,32 +2144,32 @@ class lehrveranstaltung extends basis_db
 		}
 		return true;
 	    }
-	    else 
+	    else
 	    {
 		$this->errormsg = 'Fehler beim Laden der Daten';
 		return false;
 	    }
 	}
-    
+
     /**
      * Gibt alle Organisationseinheiten der Studiengänge zurück, mit denen
      * die Lehrveranstaltung über Studienpläne verknüpft ist
      * @return boolean|array false im Fehlerfall, sonst ein Array
      */
-    public function getAllOe() 
+    public function getAllOe()
     {
         $oe = array();
-        
+
         $qry = 'SELECT DISTINCT oe_kurzbz
                 FROM lehre.tbl_studienplan_lehrveranstaltung
                 JOIN lehre.tbl_studienplan USING(studienplan_id)
                 JOIN lehre.tbl_studienordnung USING(studienordnung_id)
                 JOIN public.tbl_studiengang USING(studiengang_kz)
                 WHERE lehrveranstaltung_id = '.$this->db_add_param($this->lehrveranstaltung_id);
-	    
+
         if($result = $this->db_query($qry))
 		{
-			while ($row = $this->db_fetch_object($result)) 
+			while ($row = $this->db_fetch_object($result))
             {
                 $oe[] = $row->oe_kurzbz;
             }
@@ -2181,15 +2179,15 @@ class lehrveranstaltung extends basis_db
 			$this->errormsg = "Fehler beim Laden der Daten";
 			return false;
 		}
-        
+
         // oe_kurzbz des Studiengangs der LVA hinzufügen
         $stg = new studiengang($this->studiengang_kz);
-        
+
         if(!in_array($stg->oe_kurzbz, $oe))
         {
             $oe[] = $this->oe_kurzbz;
         }
-        
+
         return $oe;
     }
 }

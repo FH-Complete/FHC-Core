@@ -65,7 +65,7 @@ class projektarbeit extends basis_db
 	{
 		parent::__construct();
 
-		if($projektarbeit_id != null) 	
+		if($projektarbeit_id != null)
 			$this->load($projektarbeit_id);
 	}
 
@@ -81,11 +81,11 @@ class projektarbeit extends basis_db
 			$this->errormsg = 'Projektarbeit_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM lehre.tbl_projektarbeit "
 			. "JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz) "
 			. "WHERE projektarbeit_id=".$this->db_add_param($projektarbeit_id, FHC_INTEGER);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -116,13 +116,13 @@ class projektarbeit extends basis_db
 				$this->projekttyp_bezeichnung = $row->bezeichnung;
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Datensatz wurde nicht gefunden';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
@@ -204,7 +204,7 @@ class projektarbeit extends basis_db
 		$this->errormsg = '';
 		return true;
 	}
-	
+
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -219,14 +219,14 @@ class projektarbeit extends basis_db
 
 		if($new==null)
 			$new = $this->new;
-			
+
 		if($new)
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN; INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid, firma_id, note, punkte, 
-				beginn, ende, faktor, freigegeben, gesperrtbis, stundensatz, gesamtstunden, themenbereich, anmerkung, 
-				ext_id, insertamum, insertvon, updateamum, updatevon, titel_english) VALUES('.
+			$qry='BEGIN; INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid, firma_id, note, punkte,
+				beginn, ende, faktor, freigegeben, gesperrtbis, stundensatz, gesamtstunden, themenbereich, anmerkung,
+				insertamum, insertvon, updateamum, updatevon, titel_english) VALUES('.
 			     $this->db_add_param($this->projekttyp_kurzbz).', '.
 			     $this->db_add_param($this->titel).', '.
 			     $this->db_add_param($this->lehreinheit_id, FHC_INTEGER).', '.
@@ -242,8 +242,7 @@ class projektarbeit extends basis_db
 			     $this->db_add_param($this->stundensatz).', '.
 			     $this->db_add_param($this->gesamtstunden).', '.
 			     $this->db_add_param($this->themenbereich).', '.
-			     $this->db_add_param($this->anmerkung).', '.
-			     $this->db_add_param($this->ext_id).',  now(), '.
+			     $this->db_add_param($this->anmerkung).', now(), '.
 			     $this->db_add_param($this->insertvon).', now(), '.
 			     $this->db_add_param($this->updatevon).','.
 			     $this->db_add_param($this->titel_english).');';
@@ -281,7 +280,7 @@ class projektarbeit extends basis_db
 				'updatevon='.$this->db_add_param($this->updatevon).' '.
 				'WHERE projektarbeit_id='.$this->db_add_param($this->projektarbeit_id, FHC_INTEGER).';';
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			if($new)
@@ -296,21 +295,21 @@ class projektarbeit extends basis_db
 						$this->db_query('COMMIT');
 						return true;
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					$this->db_query('ROLLBACK;');
 					return false;
 				}
 			}
-					
+
 			return true;
 		}
 		else
@@ -332,20 +331,20 @@ class projektarbeit extends basis_db
 			$this->errormsg = 'Projektarbeit_id ist ungueltig';
 			return true;
 		}
-		
+
 		$qry = "DELETE FROM lehre.tbl_projektarbeit WHERE projektarbeit_id=".$this->db_add_param($projektarbeit_id, FHC_INTEGER);
-		
+
 		if($this->db_query($qry))
 		{
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen des Datensatzes';
 			return false;
-		}		
+		}
 	}
-	
+
 	/**
 	 * Laedt alle Projektarbeiten eines Studenten
 	 * @param student_uid
@@ -353,15 +352,15 @@ class projektarbeit extends basis_db
 	 */
 	public function getProjektarbeit($student_uid)
 	{
-		$qry = "SELECT * FROM lehre.tbl_projektarbeit JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz) 
+		$qry = "SELECT * FROM lehre.tbl_projektarbeit JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 				WHERE student_uid=".$this->db_add_param($student_uid);
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new projektarbeit();
-				
+
 				$obj->projektarbeit_id = $row->projektarbeit_id;
 				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
@@ -386,18 +385,18 @@ class projektarbeit extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt alle Projektarbeiten eines Studienganges/Studiensemesters
 	 * @param studiengang_kz, studiensemester_kurzbz
@@ -405,25 +404,25 @@ class projektarbeit extends basis_db
 	 */
 	public function getProjektarbeitStudiensemester($studiengang_kz, $studiensemester_kurzbz)
 	{
-		$qry = "SELECT 
-					tbl_projektarbeit.* , tbl_projekttyp.bezeichnung 
-				FROM 
+		$qry = "SELECT
+					tbl_projektarbeit.* , tbl_projekttyp.bezeichnung
+				FROM
 					lehre.tbl_projektarbeit
 				JOIN
 					lehre.tbl_projekttyp USING (projekttyp_kurzbz), lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
-				 
-				WHERE 
+
+				WHERE
 					tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
 					tbl_lehrveranstaltung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)." AND
 					tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new projektarbeit();
-				
+
 				$obj->projektarbeit_id = $row->projektarbeit_id;
 				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
@@ -448,12 +447,12 @@ class projektarbeit extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;

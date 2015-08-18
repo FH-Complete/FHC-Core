@@ -48,7 +48,7 @@ class zeitaufzeichnung extends basis_db
 	public $ext_id;					// bigint
 	public $service_id;				// integer
 	public $kunde_uid;				// varchar(32)
-	
+
 	/**
 	 * Konstruktor
 	 * @param $zeitaufzeichnung_id ID der Zeitaufzeichnung die geladen werden soll (Default=null)
@@ -137,8 +137,8 @@ class zeitaufzeichnung extends basis_db
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO campus.tbl_zeitaufzeichnung (uid, aktivitaet_kurzbz, start, ende, beschreibung, 
-			      oe_kurzbz_1, oe_kurzbz_2, insertamum, insertvon, updateamum, updatevon, projekt_kurzbz, ext_id, service_id, kunde_uid) VALUES('.
+			$qry='BEGIN;INSERT INTO campus.tbl_zeitaufzeichnung (uid, aktivitaet_kurzbz, start, ende, beschreibung,
+			      oe_kurzbz_1, oe_kurzbz_2, insertamum, insertvon, updateamum, updatevon, projekt_kurzbz, service_id, kunde_uid) VALUES('.
 			      $this->db_add_param($this->uid).', '.
 			      $this->db_add_param($this->aktivitaet_kurzbz).', '.
 			      $this->db_add_param($this->start).', '.
@@ -151,7 +151,6 @@ class zeitaufzeichnung extends basis_db
 			      $this->db_add_param($this->updateamum).', '.
 			      $this->db_add_param($this->updatevon).', '.
 			      $this->db_add_param($this->projekt_kurzbz).', '.
-			      $this->db_add_param($this->ext_id).', '.
 			      $this->db_add_param($this->service_id).', '.
 			      $this->db_add_param($this->kunde_uid).');';
 		}
@@ -165,7 +164,7 @@ class zeitaufzeichnung extends basis_db
 				$this->errormsg = 'zeitaufzeichnung_id muss eine gueltige Zahl sein';
 				return false;
 			}
-			
+
 			$qry='UPDATE campus.tbl_zeitaufzeichnung SET'.
 				' uid='.$this->db_add_param($this->uid).', '.
 				' aktivitaet_kurzbz='.$this->db_add_param($this->aktivitaet_kurzbz).', '.
@@ -177,12 +176,11 @@ class zeitaufzeichnung extends basis_db
 		      	' updateamum='.$this->db_add_param($this->updateamum).', '.
 		      	' updatevon='.$this->db_add_param($this->updatevon).', '.
 		      	' projekt_kurzbz='.$this->db_add_param($this->projekt_kurzbz).', '.
-				' ext_id='.$this->db_add_param($this->ext_id).', '.
 				' service_id='.$this->db_add_param($this->service_id).', '.
 				' kunde_uid='.$this->db_add_param($this->kunde_uid).' '.
 		      	'WHERE zeitaufzeichnung_id='.$this->db_add_param($this->zeitaufzeichnung_id, FHC_INTEGER, false);
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			if($this->new)
@@ -247,29 +245,29 @@ class zeitaufzeichnung extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt die Datensaetze eines Projektes
 	 * @param $projekt_kurzbz
 	 */
 	public function getListeProjekt($projekt_kurzbz)
-	{		 
+	{
 		$where = 'projekt_kurzbz='.$this->db_add_param($projekt_kurzbz);
 
-	    $qry = "SELECT 
-	    			*, to_char ((ende-start),'HH24:MI') as diff, 
+	    $qry = "SELECT
+	    			*, to_char ((ende-start),'HH24:MI') as diff,
 	    			(SELECT (to_char(sum(ende-start),'DD')::integer)*24+to_char(sum(ende-start),'HH24')::integer || ':' || to_char(sum(ende-start),'MI')
-	    			 FROM campus.tbl_zeitaufzeichnung 
-	    			 WHERE $where ) as summe 	    
+	    			 FROM campus.tbl_zeitaufzeichnung
+	    			 WHERE $where ) as summe
 	    		FROM campus.tbl_zeitaufzeichnung WHERE $where
 	    		ORDER BY start DESC";
-	    
+
 	    if($result = $this->db_query($qry))
 	    {
 	    	while($row = $this->db_fetch_object($result))
 	    	{
 	    		$obj = new zeitaufzeichnung();
-	    		
+
 	    		$obj->zeitaufzeichnung_id = $row->zeitaufzeichnung_id;
 				$obj->uid = $row->uid;
 				$obj->aktivitaet_kurzbz = $row->aktivitaet_kurzbz;
@@ -288,7 +286,7 @@ class zeitaufzeichnung extends basis_db
 				$obj->kunde_uid = $row->kunde_uid;
 				$obj->summe = $row->summe;
 				$obj->diff = $row->diff;
-				
+
 				$this->result[] = $obj;
 	    	}
 	    	return true;
@@ -299,23 +297,23 @@ class zeitaufzeichnung extends basis_db
 	    	return false;
 	    }
 	}
-	
+
 	/**
 	 * Laedt die Zeitaufzeichnungen eines Users. Default: Die letzten 40 Tage
 	 * @param string $user
 	 * @param integer $days deafult: 40 Tage
 	 */
 	public function getListeUser($user, $days='40')
-	{		 
+	{
 		$where = "uid=".$this->db_add_param($user);
 		if ($days!='')
 			$where.= " AND ende>(now() - INTERVAL '".$days." days')";
-		
-	   $qry = "SELECT 
-	    			*, to_char ((ende-start),'HH24:MI') as diff, 
+
+	   $qry = "SELECT
+	    			*, to_char ((ende-start),'HH24:MI') as diff,
 	    			(SELECT (to_char(sum(ende-start),'DD')::integer)*24+to_char(sum(ende-start),'HH24')::integer || ':' || to_char(sum(ende-start),'MI')
-	    			 FROM campus.tbl_zeitaufzeichnung 
-	    			 WHERE $where ) as summe 	    
+	    			 FROM campus.tbl_zeitaufzeichnung
+	    			 WHERE $where ) as summe
 	    		FROM campus.tbl_zeitaufzeichnung WHERE $where
 	    		ORDER BY start DESC";
 
@@ -324,7 +322,7 @@ class zeitaufzeichnung extends basis_db
 	    	while($row = $this->db_fetch_object($result))
 	    	{
 	    		$obj = new zeitaufzeichnung();
-	    		
+
 	    		$obj->zeitaufzeichnung_id = $row->zeitaufzeichnung_id;
 				$obj->uid = $row->uid;
 				$obj->aktivitaet_kurzbz = $row->aktivitaet_kurzbz;
@@ -344,7 +342,7 @@ class zeitaufzeichnung extends basis_db
 				$obj->summe = $row->summe;
 				$obj->diff = $row->diff;
 				$obj->datum = $row->start;
-				
+
 				$this->result[] = $obj;
 	    	}
 	    	return true;
@@ -357,13 +355,13 @@ class zeitaufzeichnung extends basis_db
 	}
 
 	/**
-	 * Laedt die Zeitaufzeichnungen eines Users aufgefüllt mit lehren Tagen. 
+	 * Laedt die Zeitaufzeichnungen eines Users aufgefüllt mit lehren Tagen.
 	 * Default: Die letzten 40 Tage
 	 * @param string $user
 	 * @param integer $days deafult: 40 Tage
 	 */
 	public function getListeUserFull($user, $days='40')
-	{		 
+	{
 		$where = "uid=".$this->db_add_param($user);
 		if ($days!='')
 			$where.= " AND ende>(now() - INTERVAL '".$days." days')";
@@ -372,13 +370,13 @@ class zeitaufzeichnung extends basis_db
 			$where_join.= " AND z.ende>(now() - INTERVAL '".$days." days')";
 		if ($days=='')
 			$max_anz = 180;
-		else 
+		else
 			$max_anz = $days;
-	   $qry = "SELECT 
-	    			d.dates, z.*, to_char ((z.ende-z.start),'HH24:MI') as diff, 
+	   $qry = "SELECT
+	    			d.dates, z.*, to_char ((z.ende-z.start),'HH24:MI') as diff,
 	    			(SELECT (to_char(sum(ende-start),'DD')::integer)*24+to_char(sum(ende-start),'HH24')::integer || ':' || to_char(sum(ende-start),'MI')
-	    			 FROM campus.tbl_zeitaufzeichnung 
-	    			 WHERE $where) as summe 	    
+	    			 FROM campus.tbl_zeitaufzeichnung
+	    			 WHERE $where) as summe
 	    		FROM campus.tbl_zeitaufzeichnung z
 	    		right join (select current_date - s.a as dates from generate_series(0,$max_anz,1) as s(a)) d on date(z.ende) = d.dates $where_join order by d.dates desc, z.start desc
 	    		";
@@ -388,7 +386,7 @@ class zeitaufzeichnung extends basis_db
 	    	while($row = $this->db_fetch_object($result))
 	    	{
 	    		$obj = new zeitaufzeichnung();
-	    		
+
 	    		$obj->zeitaufzeichnung_id = $row->zeitaufzeichnung_id;
 				$obj->uid = $row->uid;
 				$obj->aktivitaet_kurzbz = $row->aktivitaet_kurzbz;
@@ -408,7 +406,7 @@ class zeitaufzeichnung extends basis_db
 				$obj->summe = $row->summe;
 				$obj->diff = $row->diff;
 				$obj->datum = $row->dates;
-				
+
 				$this->result[] = $obj;
 	    	}
 	    	return true;

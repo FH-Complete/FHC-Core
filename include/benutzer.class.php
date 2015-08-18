@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -30,7 +30,7 @@ class benutzer extends person
 	public $bn_ext_id;
 	public $aktivierungscode;
 	public $result = array();
-		
+
 	/**
 	 * Konstruktor - Uebergibt die Connection und laedt optional einen Benutzer
 	 * @param $uid            Benutzer der geladen werden soll (default=null)
@@ -38,11 +38,11 @@ class benutzer extends person
 	public function __construct($uid=null)
 	{
 		parent::__construct();
-		
+
 		if($uid != null)
 			$this->load($uid);
 	}
-	
+
 	/**
 	 * Laedt Benutzer mit der uebergebenen ID
 	 * @param $uid ID der Person die geladen werden soll
@@ -50,7 +50,7 @@ class benutzer extends person
 	public function load($uid)
 	{
 		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid=".$this->db_add_param($uid);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -62,24 +62,24 @@ class benutzer extends person
 
 				if(!person::load($row->person_id))
 					return false;
-				else 
+				else
 					return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = "Benutzer nicht gefunden";
 				return false;
-			}				
+			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = "Fehler beim Laden der Benutzerdaten";
 			return false;
-		}		
+		}
 	}
-	
+
 	/**
-	 * Prueft die Variablen vor dem Speichern 
+	 * Prueft die Variablen vor dem Speichern
 	 * auf Gueltigkeit.
 	 * @return true wenn ok, false im Fehlerfall
 	 */
@@ -110,7 +110,7 @@ class benutzer extends person
 			$this->errormsg = 'aktiv muss ein boolscher wert sein';
 			return false;
 		}
-		
+
 		if($this->alias!='')
 		{
 			$qry = "SELECT * FROM public.tbl_benutzer WHERE alias=".$this->db_add_param($this->alias)." AND uid!=".$this->db_add_param($this->uid);
@@ -122,7 +122,7 @@ class benutzer extends person
 					return false;
 				}
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim Pruefen des Alias';
 				return false;
@@ -130,7 +130,7 @@ class benutzer extends person
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Speichert die Benutzerdaten in die Datenbank
 	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -145,17 +145,17 @@ class benutzer extends person
 			if(!person::save())
 				return false;
 		}
-		
+
 		if($new==null)
 			$new = $this->new;
-			
+
 		//Variablen auf Gueltigkeit pruefen
 		if(!benutzer::validate())
 			return false;
-		
+
 		if($new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'INSERT INTO public.tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon, ext_id, aktivierungscode) VALUES('.
+			$qry = 'INSERT INTO public.tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon, aktivierungscode) VALUES('.
 			       $this->db_add_param($this->uid).",".
 			       $this->db_add_param($this->bnaktiv,FHC_BOOLEAN).",".
 			       $this->db_add_param($this->alias).",".
@@ -164,11 +164,10 @@ class benutzer extends person
 			       $this->db_add_param($this->insertvon).",".
 			       $this->db_add_param($this->updateamum).",".
 			       $this->db_add_param($this->updatevon).",".
-			       $this->db_add_param($this->bn_ext_id).",".
 				   $this->db_add_param($this->aktivierungscode).");";
 		}
 		else
-		{			
+		{
 			//Wenn der Aktiv Status geaendert wurde, dann auch updateaktivamum und updateaktivvon setzen
 			$upd='';
 			$qry = "SELECT aktiv FROM public.tbl_benutzer WHERE uid=".$this->db_add_param($this->uid);
@@ -177,12 +176,12 @@ class benutzer extends person
 				if($row = $this->db_fetch_object())
 				{
 					$aktiv = $this->db_parse_bool($row->aktiv);
-					
+
 					if($aktiv!=$this->bnaktiv)
 						$upd =" updateaktivam=".$this->db_add_param($this->updateamum).", updateaktivvon=".$this->db_add_param($this->updatevon).",";
 				}
 			}
-					
+
 			$qry = 'UPDATE public.tbl_benutzer SET'.
 			       ' aktiv='.$this->db_add_param($this->bnaktiv, FHC_BOOLEAN).','.
 			       ' alias='.$this->db_add_param($this->alias).','.
@@ -191,45 +190,45 @@ class benutzer extends person
 			       ' updatevon='.$this->db_add_param($this->updatevon).
 			       ' WHERE uid='.$this->db_add_param($this->uid).';';
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
 		}
-		else 
-		{	
+		else
+		{
 			$this->errormsg = 'Fehler beim Speichern des Benutzer-Datensatzes';
 			return false;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Löscht den Benutzer mit der übergebenen uid. Da beim Speichern auch
-	 * eine Person angelegt wird, muss eventuell auch diese gelöscht werden. 
-	 * Das kann durch Aufruf der geerbten Methode {@link person::delete()}  
+	 * eine Person angelegt wird, muss eventuell auch diese gelöscht werden.
+	 * Das kann durch Aufruf der geerbten Methode {@link person::delete()}
 	 * erledigt werden. Damit die Klasse Abwärtskombatibel bleibt, wurde die
 	 * Methode delete() absichtlich nicht überschrieben.
 	 * @param $uid
 	 */
 	public function deleteBenutzer($uid)
-	{		
-		$qry = "DELETE from public.tbl_benutzer where uid = ".$this->db_add_param($uid).";"; 
-		
+	{
+		$qry = "DELETE from public.tbl_benutzer where uid = ".$this->db_add_param($uid).";";
+
 		if($this->db_query($qry))
 		{
-			return true; 
+			return true;
 		}
 		else
 		{
-			$this->errormsg = "Es ist ein Fehler beim Löschen des Benutzers aufgetreten"; 
-			return false; 
+			$this->errormsg = "Es ist ein Fehler beim Löschen des Benutzers aufgetreten";
+			return false;
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Prueft ob die UID bereits existiert
 	 * @param uid
@@ -237,7 +236,7 @@ class benutzer extends person
 	public function uid_exists($uid)
 	{
 		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid=".$this->db_add_param($uid);
-		
+
 		if($this->db_query($qry))
 		{
 			if($this->db_num_rows()>0)
@@ -245,21 +244,21 @@ class benutzer extends person
 				$this->errormsg = '';
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = '';
 				return false;
 			}
-				
+
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler bei DatenbankAbfrage';
 			return false;
 		}
-		
+
 	}
-	
+
 	/**
 	 * Prueft ob der alias bereits existiert
 	 * @param $alias
@@ -267,7 +266,7 @@ class benutzer extends person
 	public function alias_exists($alias)
 	{
 		$qry = "SELECT * FROM public.tbl_benutzer WHERE alias=".$this->db_add_param($alias);
-		
+
 		if($this->db_query($qry))
 		{
 			if($this->db_num_rows()>0)
@@ -275,23 +274,23 @@ class benutzer extends person
 				$this->errormsg = '';
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = '';
 				return false;
 			}
-				
+
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler bei DatenbankAbfrage';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Sucht nach Benutzern. Limit optional. Aktiv optional.
-	 * 
+	 *
 	 * @param $limit (optional)
 	 * @param $aktiv (optional). Default true. Wenn false werden nur inaktive benutzer geladen, wenn null dann alle
 	 */
@@ -299,29 +298,29 @@ class benutzer extends person
 	{
 		$qry = "SELECT * FROM (
 					SELECT
-						distinct on (uid) vorname, nachname, uid, mitarbeiter_uid, titelpre, titelpost, lektor, fixangestellt, alias, tbl_benutzer.aktiv, 
+						distinct on (uid) vorname, nachname, uid, mitarbeiter_uid, titelpre, titelpost, lektor, fixangestellt, alias, tbl_benutzer.aktiv,
 							(SELECT UPPER
 								(tbl_studiengang.typ || tbl_studiengang.kurzbz)
-					 		FROM public.tbl_student 
-					 		JOIN public.tbl_studiengang USING(studiengang_kz) 
+					 		FROM public.tbl_student
+					 		JOIN public.tbl_studiengang USING(studiengang_kz)
 							WHERE student_uid=tbl_benutzer.uid) as studiengang,
-							
-					 		(SELECT studiengang_kz FROM public.tbl_student 
+
+					 		(SELECT studiengang_kz FROM public.tbl_student
 							WHERE student_uid=tbl_benutzer.uid) as studiengang_kz,
-							
-							(SELECT tbl_kontakt.kontakt || ' - ' ||telefonklappe 
+
+							(SELECT tbl_kontakt.kontakt || ' - ' ||telefonklappe
 							FROM public.tbl_mitarbeiter
-							LEFT JOIN public.tbl_kontakt USING(standort_id) 
-							WHERE 
+							LEFT JOIN public.tbl_kontakt USING(standort_id)
+							WHERE
 								mitarbeiter_uid=tbl_benutzer.uid
 								AND (tbl_kontakt.kontakttyp='telefon' OR tbl_kontakt.kontakttyp is null)
 								limit 1) as klappe,
-								
+
 							(SELECT planbezeichnung FROM public.tbl_mitarbeiter
-							LEFT JOIN public.tbl_ort USING (ort_kurzbz) 
+							LEFT JOIN public.tbl_ort USING (ort_kurzbz)
 							WHERE mitarbeiter_uid=tbl_benutzer.uid) as raum
 				FROM
-					public.tbl_person 
+					public.tbl_person
 					JOIN public.tbl_benutzer USING(person_id)
 					LEFT JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
 				WHERE";
@@ -331,27 +330,27 @@ class benutzer extends person
 					$qry.=" tbl_benutzer.aktiv=true AND (";
 				elseif($aktiv==false)
 					$qry.=" tbl_benutzer.aktiv=false AND (";
-		
-		$qry.=" lower(vorname || ' ' || nachname) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')"; 
+
+		$qry.=" lower(vorname || ' ' || nachname) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
 		$qry.=" OR lower(nachname || ' ' || vorname) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
 		$qry.=" OR lower(uid) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
 		$qry.=" OR lower(telefonklappe) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
-		
+
 		foreach($searchItems as $value)
 		{
-			$qry.=" OR lower(uid) = lower(".$this->db_add_param($value).")"; 
+			$qry.=" OR lower(uid) = lower(".$this->db_add_param($value).")";
 		}
 		$qry.=")) a ORDER BY nachname, vorname";
-		
+
 		if(!is_null($limit) && is_numeric($limit))
 			$qry.=" LIMIT ".$limit;
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new benutzer();
-				
+
 				$obj->titelpre = $row->titelpre;
 				$obj->vorname  = $row->vorname;
 				$obj->nachname = $row->nachname;
@@ -366,7 +365,7 @@ class benutzer extends person
 				$obj->lektor = $row->lektor;
 				$obj->fixangestellt = $row->fixangestellt;
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
-				
+
 				$this->result[] = $obj;
 			}
 			$this->errormsg = $qry;
@@ -378,7 +377,7 @@ class benutzer extends person
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt alle Benutzer einer Person
 	 * @param $person_id
@@ -386,31 +385,31 @@ class benutzer extends person
 	 */
 	function getBenutzerFromPerson($person_id, $aktiv=true)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					person_id, titelpre, vorname, nachname, titelpost, uid
-				FROM 
+				FROM
 					public.tbl_benutzer
 					JOIN public.tbl_person USING(person_id)
 				WHERE
 					person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		if($aktiv)
 			$qry.=" AND tbl_benutzer.aktiv=true ";
-		
+
 		$qry .= "ORDER BY tbl_person.insertamum";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new benutzer();
-				
+
 				$obj->person_id = $row->person_id;
 				$obj->titelpre = $row->titelpre;
 				$obj->vorname  = $row->vorname;
 				$obj->nachname = $row->nachname;
 				$obj->titelpost = $row->titelpost;
 				$obj->uid = $row->uid;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -421,11 +420,11 @@ class benutzer extends person
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Entfernt den Aktivierungscode eines Users
 	 * @param $username
-	 */	
+	 */
 	public function DeleteAktivierungscode($username)
 	{
 		$qry = "UPDATE public.tbl_benutzer SET aktivierungscode=null WHERE uid=".$this->db_add_param($username);
@@ -437,7 +436,7 @@ class benutzer extends person
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Baut die Datenstruktur für senden als JSON Objekt auf
 	 */
@@ -474,7 +473,7 @@ class benutzer extends person
 	public function loadAlias($alias)
 	{
 		$qry = "SELECT * FROM public.tbl_benutzer WHERE alias=".$this->db_add_param($alias);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -486,20 +485,20 @@ class benutzer extends person
 
 				if(!person::load($row->person_id))
 					return false;
-				else 
+				else
 					return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = "Benutzer nicht gefunden";
 				return false;
-			}				
+			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = "Fehler beim Laden der Benutzerdaten";
 			return false;
-		}		
+		}
 	}
 }
 ?>

@@ -261,7 +261,7 @@ class mitarbeiter extends benutzer
 		    }
 			//Neuen Datensatz anlegen
 			$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
-			                    fixangestellt, standort_id, telefonklappe, anmerkung, stundensatz, updateamum, updatevon, insertamum, insertvon, ext_id, bismelden,kleriker)
+			                    fixangestellt, standort_id, telefonklappe, anmerkung, stundensatz, updateamum, updatevon, insertamum, insertvon, bismelden,kleriker)
 
 			        VALUES(".$this->db_add_param($this->uid).",".
 			 	 	$this->db_add_param($this->ausbildungcode, FHC_INTEGER).",".
@@ -278,7 +278,6 @@ class mitarbeiter extends benutzer
 					$this->db_add_param($this->updatevon).', '.
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).', '.
-					$this->db_add_param($this->ext_id_mitarbeiter, FHC_INTEGER).','.
 					$this->db_add_param($this->bismelden, FHC_BOOLEAN).','.
 					$this->db_add_param($this->kleriker, FHC_BOOLEAN).');';
 		}
@@ -299,8 +298,7 @@ class mitarbeiter extends benutzer
 			       ' anmerkung='.$this->db_add_param($this->anmerkung).','.
 			       ' stundensatz='.$this->db_add_param($this->stundensatz).','.
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
-			       ' updatevon='.$this->db_add_param($this->updatevon).','.
-			       ' ext_id='.$this->db_add_param($this->ext_id_mitarbeiter, FHC_INTEGER).
+			       ' updatevon='.$this->db_add_param($this->updatevon).
 			       " WHERE mitarbeiter_uid=".$this->db_add_param($this->uid).";";
 		}
 

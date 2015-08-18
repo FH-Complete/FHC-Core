@@ -15,17 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class bisverwendung extends basis_db 
+class bisverwendung extends basis_db
 {
 	public $new;
 	public $result = array();
-	
+
 	//Tabellenspalten
 	public $bisverwendung_id;
 	public $ba1code;
@@ -45,13 +45,13 @@ class bisverwendung extends basis_db
 	public $insertvon;
 	public $ext_id;	
 	public $dv_art;
-	
+
 	public $ba1bez;
 	public $ba2bez;
 	public $beschausmass;
 	public $verwendung;
 	public $hauptberuf;
-	
+
 	/**
 	 * Konstruktor
 	 * @param bisverwendung_id ID des zu ladenden Datensatzes
@@ -59,11 +59,11 @@ class bisverwendung extends basis_db
 	public function __construct($bisverwendung_id=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($bisverwendung_id))
 			$this->load($bisverwendung_id);
 	}
-	
+
 	/**
 	 * Laedt einen Datensatz
 	 * @param bisverwendung_id ID des zu ladenden Datensatzes
@@ -76,21 +76,21 @@ class bisverwendung extends basis_db
 			$this->errormsg = 'bisverwendung_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		//laden des Datensatzes
-		$qry = "SELECT 
-					* 
-				FROM 
-					bis.tbl_beschaeftigungsart1, bis.tbl_beschaeftigungsart2, 
-					bis.tbl_beschaeftigungsausmass, bis.tbl_verwendung, bis.tbl_bisverwendung 
-					LEFT JOIN bis.tbl_hauptberuf USING(hauptberufcode) 
-				WHERE 
+		$qry = "SELECT
+					*
+				FROM
+					bis.tbl_beschaeftigungsart1, bis.tbl_beschaeftigungsart2,
+					bis.tbl_beschaeftigungsausmass, bis.tbl_verwendung, bis.tbl_bisverwendung
+					LEFT JOIN bis.tbl_hauptberuf USING(hauptberufcode)
+				WHERE
 					tbl_bisverwendung.ba1code=tbl_beschaeftigungsart1.ba1code AND
 					tbl_bisverwendung.ba2code=tbl_beschaeftigungsart2.ba2code AND
 					tbl_bisverwendung.beschausmasscode=tbl_beschaeftigungsausmass.beschausmasscode AND
 					tbl_bisverwendung.verwendung_code=tbl_verwendung.verwendung_code AND
 					bisverwendung_id=".$this->db_add_param($bisverwendung_id, FHC_INTEGER).";";
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -103,7 +103,7 @@ class bisverwendung extends basis_db
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->hauptberufcode = $row->hauptberufcode;
                 $this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
-                $this->habilitation = $this->db_parse_bool($row->habilitation); 
+                $this->habilitation = $this->db_parse_bool($row->habilitation);
 				$this->beginn = $row->beginn;
 				$this->ende = $row->ende;
 				$this->updatevon = $row->updatevon;
@@ -118,9 +118,9 @@ class bisverwendung extends basis_db
 				$this->hauptberuf = $row->bezeichnung;
 				$this->vertragsstunden = $row->vertragsstunden;
 				$this->dv_art = $row->dv_art;
-				return true;		
+				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler bei der Datenbankabfrage';
 				return false;
@@ -132,7 +132,7 @@ class bisverwendung extends basis_db
 			return false;
 		}
 	}
-			
+
 	/**
 	 * Loescht einen Datensatz
 	 * @param bisverwendung_id ID des zu loeschenden Datensatzes
@@ -158,21 +158,21 @@ class bisverwendung extends basis_db
 				}
 			}
 		}
-		
+
 		$qry = "DELETE FROM bis.tbl_bisverwendung WHERE bisverwendung_id = ".$this->db_add_param($bisverwendung_id, FHC_INTEGER).";";
-		
+
 		if($this->db_query($qry))
 		{
 			//Log schreiben
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Prueft die Daten vor dem Speichern
 	 *
@@ -187,7 +187,7 @@ class bisverwendung extends basis_db
 		}
 		return true;
 	}
-		
+
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -200,17 +200,17 @@ class bisverwendung extends basis_db
 			return false;
 		if($new==null)
 			$new = $this->new;
-			
+
 		if(is_bool($this->hauptberuflich))
 			$hauptberuflich = $this->db_add_param($this->hauptberuflich, FHC_BOOLEAN);
-		else 
+		else
 			$hauptberuflich = 'null';
 		if($new)
 		{
-			//Neuen Datensatz anlegen	
-			$qry = "BEGIN;INSERT INTO bis.tbl_bisverwendung (ba1code, ba2code, beschausmasscode, 
-					verwendung_code, mitarbeiter_uid, hauptberufcode, hauptberuflich, habilitation, beginn, ende, vertragsstunden, 
-					updateamum, updatevon, insertamum, insertvon, ext_id, dv_art) VALUES (".
+			//Neuen Datensatz anlegen
+			$qry = "BEGIN;INSERT INTO bis.tbl_bisverwendung (ba1code, ba2code, beschausmasscode,
+					verwendung_code, mitarbeiter_uid, hauptberufcode, hauptberuflich, habilitation, beginn, ende, vertragsstunden,
+					updateamum, updatevon, insertamum, insertvon, dv_art) VALUES (".
 			       $this->db_add_param($this->ba1code, FHC_INTEGER).', '.
 			       $this->db_add_param($this->ba2code, FHC_INTEGER).', '.
 			       $this->db_add_param($this->beschausmasscode, FHC_INTEGER).', '.
@@ -226,11 +226,10 @@ class bisverwendung extends basis_db
 			       $this->db_add_param($this->updatevon).', '.
 			       $this->db_add_param($this->insertamum).', '.
 			       $this->db_add_param($this->insertvon).', '.
-			       $this->db_add_param($this->ext_id, FHC_INTEGER).','.
 				   $this->db_add_param($this->dv_art).');';
-			       
+
 		}
-		else 
+		else
 		{
 			//Bestehenden Datensatz aktualisieren
 			$qry= "UPDATE bis.tbl_bisverwendung SET".
@@ -249,11 +248,10 @@ class bisverwendung extends basis_db
 				  " updatevon=".$this->db_add_param($this->updatevon).",".
 				  " insertamum=".$this->db_add_param($this->insertamum).",".
 				  " insertvon=".$this->db_add_param($this->insertvon).",".
-				  " ext_id=".$this->db_add_param($this->ext_id, FHC_INTEGER).",".
 				  " dv_art=".$this->db_add_param($this->dv_art).
 				  " WHERE bisverwendung_id=".$this->db_add_param($this->bisverwendung_id, FHC_INTEGER);
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			if($new)
@@ -267,30 +265,30 @@ class bisverwendung extends basis_db
 						$this->db_query('COMMIT;');
 						return true;
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					$this->db_query('ROLLBACK;');
 					return false;
 				}
 			}
-			else 
+			else
 				return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt alle Verwendungen eines Mitarbeiters
 	 * @param $uid UID des Mitarbeiters
@@ -299,13 +297,13 @@ class bisverwendung extends basis_db
 	public function getVerwendung($uid)
 	{
 		//laden des Datensatzes
-		$qry = "SELECT 
-					* 
-				FROM 
-					bis.tbl_beschaeftigungsart1, bis.tbl_beschaeftigungsart2, 
-					bis.tbl_beschaeftigungsausmass, bis.tbl_verwendung, bis.tbl_bisverwendung 
-					LEFT JOIN bis.tbl_hauptberuf USING(hauptberufcode) 
-				WHERE 
+		$qry = "SELECT
+					*
+				FROM
+					bis.tbl_beschaeftigungsart1, bis.tbl_beschaeftigungsart2,
+					bis.tbl_beschaeftigungsausmass, bis.tbl_verwendung, bis.tbl_bisverwendung
+					LEFT JOIN bis.tbl_hauptberuf USING(hauptberufcode)
+				WHERE
 					tbl_bisverwendung.ba1code=tbl_beschaeftigungsart1.ba1code AND
 					tbl_bisverwendung.ba2code=tbl_beschaeftigungsart2.ba2code AND
 					tbl_bisverwendung.beschausmasscode=tbl_beschaeftigungsausmass.beschausmasscode AND
@@ -317,7 +315,7 @@ class bisverwendung extends basis_db
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new bisverwendung();
-				
+
 				$obj->bisverwendung_id = $row->bisverwendung_id;
 				$obj->ba1code = $row->ba1code;
 				$obj->ba2code = $row->ba2code;
@@ -325,7 +323,7 @@ class bisverwendung extends basis_db
 				$obj->verwendung_code = $row->verwendung_code;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->hauptberufcode = $row->hauptberufcode;
-                $obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);                
+                $obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
                 $obj->habilitation = $this->db_parse_bool($row->habilitation);
 				$obj->beginn = $row->beginn;
 				$obj->ende = $row->ende;
@@ -350,7 +348,7 @@ class bisverwendung extends basis_db
 		{
 			$this->errormsg = 'Fehler bei der Datenbankabfrage';
 			return false;
-		}			
+		}
 	}
 
 	/**
@@ -363,11 +361,11 @@ class bisverwendung extends basis_db
 	{
 		$datum_obj = new datum();
 		//laden des Datensatzes
-		$qry = "SELECT 
-					* 
-				FROM 
-					bis.tbl_bisverwendung 
-				WHERE 
+		$qry = "SELECT
+					*
+				FROM
+					bis.tbl_bisverwendung
+				WHERE
 					mitarbeiter_uid=".$this->db_add_param($uid)."
 					AND (beginn<=".$this->db_add_param($datum)." OR beginn is null)
 					AND (ende>=".$this->db_add_param($datum_obj->formatDatum($datum,'Y-m-01'))." OR ende is null)
@@ -378,7 +376,7 @@ class bisverwendung extends basis_db
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new bisverwendung();
-				
+
 				$obj->bisverwendung_id = $row->bisverwendung_id;
 				$obj->ba1code = $row->ba1code;
 				$obj->ba2code = $row->ba2code;
@@ -396,7 +394,7 @@ class bisverwendung extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->vertragsstunden = $row->vertragsstunden;
 				$obj->dv_art = $row->dv_art;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -405,7 +403,7 @@ class bisverwendung extends basis_db
 		{
 			$this->errormsg = 'Fehler bei der Datenbankabfrage';
 			return false;
-		}			
+		}
 	}
 
 	/**
@@ -416,16 +414,16 @@ class bisverwendung extends basis_db
 	public function getLastVerwendung($uid)
 	{
 		//laden des Datensatzes
-		$qry = "SELECT 
-					* 
-				FROM 
-					bis.tbl_bisverwendung 
-				WHERE 
-					mitarbeiter_uid=".$this->db_add_param($uid)." 
-				AND 
+		$qry = "SELECT
+					*
+				FROM
+					bis.tbl_bisverwendung
+				WHERE
+					mitarbeiter_uid=".$this->db_add_param($uid)."
+				AND
 					(beginn<=now() OR beginn IS NULL)
-				AND 
-					(ende>=now() OR ende IS NULL) 
+				AND
+					(ende>=now() OR ende IS NULL)
 				ORDER BY ende DESC NULLS LAST,beginn DESC NULLS LAST LIMIT 1;";
 
 		if($this->db_query($qry))
@@ -439,7 +437,7 @@ class bisverwendung extends basis_db
 				$this->verwendung_code = $row->verwendung_code;
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->hauptberufcode = $row->hauptberufcode;
-                $this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);                
+                $this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
                 $this->habilitation = $this->db_parse_bool($row->habilitation);
 				$this->beginn = $row->beginn;
 				$this->ende = $row->ende;
@@ -456,7 +454,7 @@ class bisverwendung extends basis_db
 		{
 			$this->errormsg = 'Fehler bei der Datenbankabfrage';
 			return false;
-		}			
+		}
 	}
 }
 ?>
