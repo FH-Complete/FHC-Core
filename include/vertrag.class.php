@@ -24,9 +24,9 @@ class vertrag extends basis_db
 {
 	public $new=true;
 	public $result = array();
-	
+
 	public $vertragstyp_bezeichnung;
-   
+
 	public $vertrag_id;			// bigint
 	public $bezeichnung;		// varchar(256)
 	public $person_id;			// bigint
@@ -36,8 +36,8 @@ class vertrag extends basis_db
 	public $insertvon;			// varchar(32)
 	public $updateamum;			// timestamp
 	public $updatevon;			// varchar(32)
-	public $ext_id; 			// bigint     
-	public $anmerkung; 			// text  
+	public $ext_id; 			// bigint
+	public $anmerkung; 			// text
 	public $vertragsdatum;		// date
 
     /**
@@ -85,17 +85,17 @@ class vertrag extends basis_db
 	 * Laedt die Verträge einer Person
 	 * @param $person_id
 	 * @return boolean true wenn ok ,false im Fehlerfall
-	 */	
+	 */
 	public function loadVertrag($person_id, $abgerechnet=null)
 	{
-		$qry = "SELECT 
-					*, 
+		$qry = "SELECT
+					*,
 					tbl_vertrag.bezeichnung as bezeichnung,
 					tbl_vertragstyp.bezeichnung as vertragstyp_bezeichnung,
-					(SELECT bezeichnung FROM lehre.tbl_vertragsstatus JOIN lehre.tbl_vertrag_vertragsstatus USING(vertragsstatus_kurzbz) 
+					(SELECT bezeichnung FROM lehre.tbl_vertragsstatus JOIN lehre.tbl_vertrag_vertragsstatus USING(vertragsstatus_kurzbz)
 						WHERE vertrag_id=tbl_vertrag.vertrag_id ORDER BY datum desc limit 1) as status
-				FROM 
-					lehre.tbl_vertrag 
+				FROM
+					lehre.tbl_vertrag
 					LEFT JOIN lehre.tbl_vertragstyp USING(vertragstyp_kurzbz)
 				WHERE person_id=".$this->db_add_param($person_id);
 
@@ -122,9 +122,9 @@ class vertrag extends basis_db
 				$obj->status = $row->status;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->vertragsdatum = $row->vertragsdatum;
-			
+
 				$obj->vertragstyp_bezeichnung = $row->vertragstyp_bezeichnung;
-		
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -146,7 +146,7 @@ class vertrag extends basis_db
 	{
 		if(is_null($new))
 			$new = $this->new;
-		
+
 		if($this->vertragstyp_kurzbz=='')
 		{
 			$this->errormsg = 'Vertragstyp_kurzbz muss angegeben werden';
@@ -185,7 +185,7 @@ class vertrag extends basis_db
 					'bezeichnung = '.$this->db_add_param($this->vertragstyp_bezeichnung).
 					'WHERE vertragstyp_kurzbz = '.$this->db_add_param($this->vertragstyp_kurzbz);
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -206,7 +206,7 @@ class vertrag extends basis_db
 		// prüfen ob Vertrag bereits verwendet wird
 		$qry = "SELECT vertragstyp_kurzbz FROM lehre.tbl_vertrag
 			WHERE vertragstyp_kurzbz = " . $this->db_add_param($vertragstyp_kurzbz);
-		
+
 		if($this->db_query($qry))
 		{
 			if($this->db_fetch_object())
@@ -220,25 +220,25 @@ class vertrag extends basis_db
 			$this->errormsg = "Fehler beim Durchführen der Datenbankabfrage";
 			return false;
 		}
-            
+
                 if(is_null($vertragstyp_kurzbz))
 		{
 			$this->errormsg = 'Vertragstyp_kurzbz darf nicht leer sein';
 			return false;
 		}
-		
-		$qry = "DELETE FROM lehre.tbl_vertragstyp 
+
+		$qry = "DELETE FROM lehre.tbl_vertragstyp
 				WHERE vertragstyp_kurzbz=".$this->db_add_param($vertragstyp_kurzbz).";";
-		
+
 		if($this->db_query($qry))
 			return true;
-		else 	
+		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen des Vertragstyps';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert alle Vertragsytpen
 	 * @return true wenn ok false im Fehlerfall
@@ -246,16 +246,16 @@ class vertrag extends basis_db
 	public function getAllVertragstypen()
 	{
 		$qry = "SELECT * FROM lehre.tbl_vertragstyp ORDER BY bezeichnung;";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$vertrag = new vertrag();
-				
+
 				$vertrag->vertragstyp_kurzbz = $row->vertragstyp_kurzbz;
 				$vertrag->vertragstyp_bezeichnung = $row->bezeichnung;
-				
+
 				$this->result[] = $vertrag;
 			}
 			return true;
@@ -266,7 +266,7 @@ class vertrag extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt einen Vertragstyp
 	 *
@@ -275,7 +275,7 @@ class vertrag extends basis_db
 	 */
 	public function loadVertragstyp($vertragstyp_kurzbz)
 	{
-		$qry="SELECT * FROM lehre.tbl_vertragstyp 
+		$qry="SELECT * FROM lehre.tbl_vertragstyp
 				WHERE
 					vertragstyp_kurzbz=".$this->db_add_param($vertragstyp_kurzbz);
 
@@ -297,14 +297,14 @@ class vertrag extends basis_db
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
-		}				
+		}
 	}
 
 	/**
 	 * Laedt die Vertragselemente die noch keinem Vertrag zugeordnet sind
 	 * @param $person_id
 	 * @return boolean true wenn ok ,false im Fehlerfall
-	 */	
+	 */
 	public function loadNichtZugeordnet($person_id)
 	{
 		/*
@@ -315,24 +315,24 @@ class vertrag extends basis_db
 			Pruefungen
 		*/
 		$qry = "
-		SELECT 
+		SELECT
 			'Lehrauftrag' as type,
-			lehreinheit_id, 
-			mitarbeiter_uid, 
-			null as pruefung_id, 
-			null as projektarbeit_id, 
-			(tbl_lehreinheitmitarbeiter.faktor*tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag, 
+			lehreinheit_id,
+			mitarbeiter_uid,
+			null as pruefung_id,
+			null as projektarbeit_id,
+			(tbl_lehreinheitmitarbeiter.faktor*tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			null as betreuerart_kurzbz,
-			(	SELECT 
+			(	SELECT
 					upper(tbl_studiengang.typ || tbl_studiengang.kurzbz) || tbl_lehrveranstaltung.semester  || '-' || tbl_lehrveranstaltung.kurzbz || '-' || tbl_lehreinheit.lehrform_kurzbz
-				FROM 
+				FROM
 					lehre.tbl_lehrveranstaltung
 					JOIN public.tbl_studiengang USING(studiengang_kz)
-				WHERE 
+				WHERE
 					lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id)
 			as bezeichnung
-		FROM 
+		FROM
 			lehre.tbl_lehreinheitmitarbeiter
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 		WHERE
@@ -341,11 +341,11 @@ class vertrag extends basis_db
 		UNION
 		SELECT
 			'Betreuung' as type,
-			tbl_projektarbeit.lehreinheit_id as lehreinheit_id, 
-			null as mitarbeiter_uid, 
-			null::integer as pruefung_id, 
-			projektarbeit_id, 
-			(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag, 
+			tbl_projektarbeit.lehreinheit_id as lehreinheit_id,
+			null as mitarbeiter_uid,
+			null::integer as pruefung_id,
+			projektarbeit_id,
+			(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
 			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
@@ -356,22 +356,23 @@ class vertrag extends basis_db
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 		WHERE
 			person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
-			AND vertrag_id IS NULL
+			AND vertrag_id IS NULL";
+			/*
 		UNION
 		SELECT
 			'Pruefung' as type,
-			lehreinheit_id, 
-			mitarbeiter_uid, 
-			pruefung_id, 
-			null as projektarbeit_id, 
-			'".PRUEFUNGSHONORAR."' as betrag, 
+			lehreinheit_id,
+			mitarbeiter_uid,
+			pruefung_id,
+			null as projektarbeit_id,
+			'".PRUEFUNGSHONORAR."' as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz AS studiensemester_kurzbz,
 			null as betreuerart_kurzbz,
-			(	SELECT 
+			(	SELECT
 					nachname || ' ' || vorname || ' ' || (SELECT kurzbz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id)
-				FROM 
-					public.tbl_person 
-					JOIN public.tbl_benutzer USING(person_id) 
+				FROM
+					public.tbl_person
+					JOIN public.tbl_benutzer USING(person_id)
 				WHERE uid=tbl_pruefung.student_uid)
 			as bezeichnung
 		FROM
@@ -380,7 +381,7 @@ class vertrag extends basis_db
 		WHERE
 			mitarbeiter_uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER).")
 			AND vertrag_id IS NULL
-		";
+		";*/
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -405,14 +406,72 @@ class vertrag extends basis_db
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
-	}  
+	}
 
+	/**
+	 * Laedt alle Personen die noch Lehraufträge haben die keinem
+	 * Vertrag zugeordnet sind
+	 * @param $studiensemester_kurzbz
+	 * @return boolean true wenn ok, false im Fehlerfall
+	 */
+	public function loadPersonenNichtZugeordnet($studiensemester_kurzbz)
+	{
+		$db = new basis_db();
+		// Alle Personen holen die Lehraufträge haben die noch keinen Verträge zugeordnet sind
+		$qry = "SELECT
+					distinct tbl_person.person_id, tbl_benutzer.uid, tbl_person.vorname, tbl_person.nachname,
+					tbl_person.svnr, tbl_person.titelpre, tbl_person.titelpost
+				FROM
+					public.tbl_mitarbeiter
+					JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
+					JOIN public.tbl_person USING(person_id)
+				WHERE
+					tbl_mitarbeiter.fixangestellt = false
+					AND EXISTS(SELECT 1 FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+						WHERE
+							tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid
+							AND tbl_lehreinheitmitarbeiter.vertrag_id IS NULL
+							AND tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+							)
+					OR
+					EXISTS (SELECT 1 FROM lehre.tbl_projektbetreuer
+								JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+								JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+							WHERE
+								tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+								AND tbl_projektbetreuer.person_id=tbl_person.person_id
+								AND tbl_projektbetreuer.vertrag_id IS NULL
+							)
+					";
+
+		if($result = $db->db_query($qry))
+		{
+			while($row = $db->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+				$obj->person_id = $row->person_id;
+				$obj->vorname = $row->vorname;
+				$obj->nachname = $row->nachname;
+				$obj->uid = $row->uid;
+				$obj->titelpre = $row->titelpre;
+				$obj->titelpost = $row->titelpost;
+				$obj->svnr = $row->svnr;
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 
 	/**
 	 * Laedt die Vertragselemente die einem Vertrag zugeordnet sind
 	 * @param $vertrag_id
 	 * @return boolean true wenn ok ,false im Fehlerfall
-	 */	
+	 */
 	public function loadZugeordnet($vertrag_id)
 	{
 		/*
@@ -423,24 +482,24 @@ class vertrag extends basis_db
 			Pruefungen
 		*/
 		$qry = "
-		SELECT 
+		SELECT
 			'Lehrauftrag' as type,
-			lehreinheit_id, 
-			mitarbeiter_uid, 
-			null as pruefung_id, 
-			null as projektarbeit_id, 
-			(tbl_lehreinheitmitarbeiter.faktor*tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag, 
+			lehreinheit_id,
+			mitarbeiter_uid,
+			null as pruefung_id,
+			null as projektarbeit_id,
+			(tbl_lehreinheitmitarbeiter.faktor*tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			null as betreuerart_kurzbz,
-			(	SELECT 
+			(	SELECT
 					upper(tbl_studiengang.typ || tbl_studiengang.kurzbz) || tbl_lehrveranstaltung.semester  || '-' || tbl_lehrveranstaltung.kurzbz || '-' || tbl_lehreinheit.lehrform_kurzbz
-				FROM 
+				FROM
 					lehre.tbl_lehrveranstaltung
 					JOIN public.tbl_studiengang USING(studiengang_kz)
-				WHERE 
+				WHERE
 					lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id)
 			as bezeichnung
-		FROM 
+		FROM
 			lehre.tbl_lehreinheitmitarbeiter
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 		WHERE
@@ -448,11 +507,11 @@ class vertrag extends basis_db
 		UNION
 		SELECT
 			'Betreuung' as type,
-			tbl_projektarbeit.lehreinheit_id as lehreinheit_id, 
-			null as mitarbeiter_uid, 
-			null::integer as pruefung_id, 
-			projektarbeit_id, 
-			(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag, 
+			tbl_projektarbeit.lehreinheit_id as lehreinheit_id,
+			null as mitarbeiter_uid,
+			null::integer as pruefung_id,
+			projektarbeit_id,
+			(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
 			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
@@ -462,22 +521,22 @@ class vertrag extends basis_db
 			JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 		WHERE
-			vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER)."
-		UNION
+			vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";";
+/*		UNION
 		SELECT
 			'Pruefung' as type,
-			lehreinheit_id, 
-			mitarbeiter_uid, 
-			pruefung_id, 
-			null as projektarbeit_id, 
-			'".PRUEFUNGSHONORAR."' as betrag, 
+			lehreinheit_id,
+			mitarbeiter_uid,
+			pruefung_id,
+			null as projektarbeit_id,
+			'".PRUEFUNGSHONORAR."' as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz AS studiensemester_kurzbz,
 			null as betreuerart_kurzbz,
-			(	SELECT 
+			(	SELECT
 					nachname || ' ' || vorname || ' ' || (SELECT kurzbz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id)
-				FROM 
-					public.tbl_person 
-					JOIN public.tbl_benutzer USING(person_id) 
+				FROM
+					public.tbl_person
+					JOIN public.tbl_benutzer USING(person_id)
 				WHERE uid=tbl_pruefung.student_uid)
 			as bezeichnung
 		FROM
@@ -485,7 +544,7 @@ class vertrag extends basis_db
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 		WHERE
 			vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER);
-
+*/
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -523,7 +582,7 @@ class vertrag extends basis_db
 
 		if($new)
 		{
-			$qry = "BEGIN;INSERT INTO lehre.tbl_vertrag(bezeichnung, person_id, vertragstyp_kurzbz, betrag, insertamum, insertvon, 
+			$qry = "BEGIN;INSERT INTO lehre.tbl_vertrag(bezeichnung, person_id, vertragstyp_kurzbz, betrag, insertamum, insertvon,
 					updateamum, updatevon, anmerkung, vertragsdatum) VALUES(".
 					$this->db_add_param($this->bezeichnung).','.
 					$this->db_add_param($this->person_id,FHC_INTEGER).','.
@@ -566,14 +625,14 @@ class vertrag extends basis_db
 						$this->db_query('COMMIT');
 						return true;
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					$this->db_query('ROLLBACK;');
@@ -600,7 +659,7 @@ class vertrag extends basis_db
 	{
 		$qry="SELECT
 					*
-			FROM 
+			FROM
 				lehre.tbl_vertrag_vertragsstatus
 				JOIN lehre.tbl_vertragsstatus USING(vertragsstatus_kurzbz)
 			WHERE
@@ -632,7 +691,7 @@ class vertrag extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt alle Stati eines Vertrags
 	 *
@@ -643,17 +702,17 @@ class vertrag extends basis_db
 	{
 		$qry="SELECT
 					*
-			FROM 
+			FROM
 				lehre.tbl_vertrag_vertragsstatus
 				JOIN lehre.tbl_vertragsstatus USING(vertragsstatus_kurzbz)
 			WHERE
 				tbl_vertrag_vertragsstatus.vertrag_id=".$this->db_add_param($vertrag_id);
-		
+
 		if(!is_null($status))
 		{
 		    $qry .= " AND tbl_vertrag_vertragsstatus.vertragsstatus_kurzbz=".$this->db_add_param($status);
 		}
-		
+
 		$qry .= " ORDER BY datum DESC;";
 
 		if($result = $this->db_query($qry))
@@ -689,7 +748,7 @@ class vertrag extends basis_db
 	{
 		if(is_null($new))
 			$new = $this->new;
-	
+
 		if($new)
 		{
 			$qry = "INSERT INTO lehre.tbl_vertrag_vertragsstatus(vertragsstatus_kurzbz, vertrag_id, uid, datum, insertvon, updatevon, updateamum) VALUES(".
@@ -710,8 +769,8 @@ class vertrag extends basis_db
 			    . " WHERE vertrag_id=".$this->db_add_param($this->vertrag_id)
 			    . " AND vertragsstatus_kurzbz=".$this->db_add_param($this->vertragsstatus_kurzbz).";";
 		}
-		
-		
+
+
 
 		if($this->db_query($qry))
 		{
@@ -800,10 +859,10 @@ class vertrag extends basis_db
 	{
 		// prüfen ob Vertrag bereits verwendet wird
 		$qry = "DELETE FROM lehre.tbl_vertrag_vertragsstatus
-			WHERE 
+			WHERE
 				vertragsstatus_kurzbz=".$this->db_add_param($vertragsstatus_kurzbz)."
 				AND vertrag_id=".$this->db_add_param($vertrag_id);
-		
+
 		if($this->db_query($qry))
 		{
 			return true;

@@ -42,7 +42,7 @@ class anwesenheit extends basis_db
 	public function __construct($anwesenheit_id=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($anwesenheit_id))
 			$this->load($anwesenheit_id);
 	}
@@ -113,7 +113,7 @@ class anwesenheit extends basis_db
 		$this->errormsg = '';
 		return true;
 	}
-	
+
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -154,7 +154,7 @@ class anwesenheit extends basis_db
 		      	' anmerkung='.$this->db_add_param($this->anmerkung).' '.
 		      	'WHERE anwesenheit_id='.$this->db_add_param($this->anwesenheit_id, FHC_INTEGER, false).';';
 		}
-        
+
 		if($this->db_query($qry))
 		{
 			if($this->new)
@@ -200,13 +200,13 @@ class anwesenheit extends basis_db
 	 */
 	public function getAnwesenheitLehreinheit($lehreinheit_id, $datum=null)
 	{
-		$qry = "SELECT * FROM campus.tbl_anwesenheit 
-			WHERE 
+		$qry = "SELECT * FROM campus.tbl_anwesenheit
+			WHERE
 				lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
 
 		if(!is_null($datum))
 			$qry.=" AND datum=".$this->db_add_param($datum);
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -220,7 +220,7 @@ class anwesenheit extends basis_db
 				$obj->anwesend = $this->db_parse_bool($row->anwesend);
 				$obj->lehreinheit_id = $row->lehreinheit_id;
 				$obj->anmerkung = $row->anmerkung;
-					
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -234,16 +234,16 @@ class anwesenheit extends basis_db
 
 	public function loadAnwesenheitMitarbeiter($mitarbeiter_uid, $lehreinheit_id)
 	{
-		$qry = "SELECT 
-					datum, a.einheiten, 
-					(SELECT true FROM campus.tbl_anwesenheit 
+		$qry = "SELECT
+					datum, a.einheiten,
+					(SELECT true FROM campus.tbl_anwesenheit
 					 WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id)." AND datum=a.datum LIMIT 1) as anwesend,
 					(SELECT stundensatz FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id)."
 					AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid).") as stundensatz
 				FROM
-					(SELECT datum, count(stunde) as einheiten FROM lehre.tbl_stundenplan
-					 WHERE 
-						lehreinheit_id=".$this->db_add_param($lehreinheit_id)." 
+					(SELECT datum, count(distinct stunde) as einheiten FROM lehre.tbl_stundenplan
+					 WHERE
+						lehreinheit_id=".$this->db_add_param($lehreinheit_id)."
 						AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)."
 					GROUP by datum) as a
 				";
@@ -277,7 +277,7 @@ class anwesenheit extends basis_db
 		}
 		else
 		{
-			$this->errormsg='Fehler beim Laden der Daten';	
+			$this->errormsg='Fehler beim Laden der Daten';
 			return false;
 		}
 	}
@@ -316,12 +316,12 @@ class anwesenheit extends basis_db
 	 */
 	public function getAnwesenheitLehrveranstaltung($student_uid, $lehrveranstaltung_id, $studiensemester_kurzbz, $anwesend=false)
 	{
-		$qry = 'SELECT 
-					distinct tbl_anwesenheit.* 
-				FROM 
+		$qry = 'SELECT
+					distinct tbl_anwesenheit.*
+				FROM
 					campus.tbl_anwesenheit
 					JOIN campus.vw_student_lehrveranstaltung USING(uid)
-				WHERE 
+				WHERE
 					uid='.$this->db_add_param($student_uid).'
 					AND lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).'
 					AND studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz).'
@@ -341,7 +341,7 @@ class anwesenheit extends basis_db
 				$obj->anwesend = $this->db_parse_bool($row->anwesend);
 				$obj->lehreinheit_id = $row->lehreinheit_id;
 				$obj->anmerkung = $row->anmerkung;
-					
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -372,7 +372,7 @@ class anwesenheit extends basis_db
 
 		$result = $this->db_query($qry);
 		$ret_obj = array();
-		
+
 		while($row = $this->db_fetch_object($result))
 		{
 			$ret_obj[] = $row;
@@ -407,13 +407,13 @@ class anwesenheit extends basis_db
 	 */
 	public function AnwesenheitExists($lehreinheit_id, $datum, $uid=null)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					1
-				FROM 
-					campus.tbl_anwesenheit 
-				WHERE 
+				FROM
+					campus.tbl_anwesenheit
+				WHERE
 					anwesend=true
-					AND lehreinheit_id=".$this->db_add_param($lehreinheit_id)." 
+					AND lehreinheit_id=".$this->db_add_param($lehreinheit_id)."
 					AND datum=".$this->db_add_param($datum);
 
 		if($uid!='')
@@ -446,12 +446,12 @@ class anwesenheit extends basis_db
 	public function loadAnwesenheitStudiensemester($studiensemester_kurzbz, $student_uid=null, $lehrveranstaltung_id=null)
 	{
 		$qry = "SELECT lehrveranstaltung_id, bezeichnung, vorname, nachname, uid, sum(anwesend) as anwesend, sum(nichtanwesend) as nichtanwesend, sum(gesamtstunden) as gesamtstunden FROM (
-				SELECT 
+				SELECT
 					lehrveranstaltung_id, bezeichnung, vorname, nachname, uid,
 					(
-					SELECT 
-						sum(einheiten) 
-					FROM 
+					SELECT
+						sum(einheiten)
+					FROM
 						campus.tbl_anwesenheit
 					WHERE
 						lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id
@@ -459,9 +459,9 @@ class anwesenheit extends basis_db
 						AND anwesend
 					) as anwesend,
 					(
-					SELECT 
-						sum(einheiten) 
-					FROM 
+					SELECT
+						sum(einheiten)
+					FROM
 						campus.tbl_anwesenheit
 					WHERE
 						lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id
@@ -469,11 +469,11 @@ class anwesenheit extends basis_db
 						AND NOT anwesend
 					) as nichtanwesend,
 					(
-					SELECT count(*) anzahl FROM 
-						(SELECT datum, stunde FROM campus.vw_stundenplan 
+					SELECT count(*) anzahl FROM
+						(SELECT datum, stunde FROM campus.vw_stundenplan
 						WHERE lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id GROUP BY datum, stunde) as a
 					) as gesamtstunden
-				FROM 
+				FROM
 					campus.vw_student_lehrveranstaltung
 					JOIN public.tbl_benutzer USING(uid)
 					JOIN public.tbl_person USING(person_id)
@@ -517,7 +517,7 @@ class anwesenheit extends basis_db
 		}
 		else
 		{
-			$this->errormsg='Fehler beim Laden der Daten';	
+			$this->errormsg='Fehler beim Laden der Daten';
 			return false;
 		}
 	}

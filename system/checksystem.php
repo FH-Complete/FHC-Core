@@ -85,7 +85,7 @@ if(!$result = @$db->db_query("SELECT scrumsprint_id FROM fue.tbl_projekttask LIM
 			';
 	if(!$db->db_query($qry))
 		echo '<strong>fue.tbl_projekttask: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' fue.tbl_projekttask: Spalte scrumsprint_id hinzugefuegt!<br>';
 }
 
@@ -93,10 +93,10 @@ if(!$result = @$db->db_query("SELECT scrumsprint_id FROM fue.tbl_projekttask LIM
 if(!$result = @$db->db_query("SELECT zutrittssystem from public.tbl_gruppe LIMIT 1;"))
 {
     $qry = "ALTER TABLE public.tbl_gruppe ADD COLUMN zutrittssystem boolean NOT NULL DEFAULT false;";
-    
+
     if(!$db->db_query($qry))
 		echo '<strong>public.tbl_gruppe: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'public.tbl_gruppe: Spalte zutrittssystem hinzugefuegt';
 }
 
@@ -144,7 +144,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienordnung LIMIT 1;"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_studienordnung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_studienordnung: Tabelle hinzugefuegt<br>';
 }
 
@@ -178,7 +178,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienordnung_semester LI
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_studienordnung_semester: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_studienordnung_semester: Tabelle hinzugefuegt<br>';
 }
 
@@ -223,7 +223,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienplan LIMIT 1;"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_studienplan: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_studienplan: Tabelle hinzugefuegt<br>';
 }
 
@@ -265,7 +265,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienplan_lehrveranstalt
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_studienplan_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_studienplan_lehrveranstaltung: Tabelle hinzugefuegt<br>';
 }
 
@@ -289,7 +289,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_lehrveranstaltung_kompatib
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_lehrveranstaltung_kompatibel: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_lehrveranstaltung_kompatibel: Tabelle hinzugefuegt<br>';
 }
 
@@ -310,7 +310,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_lvregeltyp LIMIT 1;"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_lvregeltyp: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_lvregeltyp: Tabelle hinzugefuegt<br>';
 }
 
@@ -358,7 +358,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_lvregel LIMIT 1;"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_lvregel: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_lvregel: Tabelle hinzugefuegt<br>';
 }
 
@@ -401,7 +401,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_lvangebot LIMIT 1;"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_lvangebot: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_lvangebot: Tabelle hinzugefuegt<br>';
 }
 
@@ -426,7 +426,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_lehrtyp LIMIT 1;"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_lehrtyp: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_lehrtyp: Tabelle hinzugefuegt<br>';
 }
 
@@ -454,7 +454,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp LIMIT 1;"
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_studiengangstyp: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_studiengangstyp: Tabelle hinzugefuegt<br>';
 }
 
@@ -476,7 +476,7 @@ if(!$result = @$db->db_query("SELECT lehrtyp_kurzbz FROM lehre.tbl_lehrveranstal
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_lehrveranstaltung: Spalten lehrtyp_kurzbz, oe_kurzbz, raumtyp_kurzbz, anzahlsemester hinzugefügt<br>';
 }
 
@@ -491,13 +491,13 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienplatz LIMIT 1;"))
 				orgform_kurzbz varchar(3),
 				ausbildungssemester smallint,
 				gpz integer,
-				npz integer,				
+				npz integer,
 				insertamum timestamp,
 				insertvon varchar(32),
 				updateamum timestamp,
 				updatevon varchar(32)
 			);
-		
+
 		CREATE SEQUENCE lehre.seq_studienplatz_studienplatz_id
 		 INCREMENT BY 1
 		 NO MAXVALUE
@@ -518,7 +518,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienplatz LIMIT 1;"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_studienplatz: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_studienplatz: Tabelle hinzugefügt<br>';
 }
 
@@ -540,7 +540,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_appdaten LIMIT 1;"))
 				updateamum timestamp,
 				updatevon varchar(32)
 			);
-		
+
 		CREATE SEQUENCE system.seq_appdaten_appdaten_id
 		 INCREMENT BY 1
 		 NO MAXVALUE
@@ -559,7 +559,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_appdaten LIMIT 1;"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>system.tbl_appdaten: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' system.tbl_appdaten: Tabelle hinzugefügt<br>';
 }
 
@@ -575,7 +575,7 @@ if($result = $db->db_query("SELECT character_maximum_length FROM information_sch
 			$qry = "ALTER TABLE system.tbl_benutzerrolle ALTER COLUMN uid TYPE varchar(32);";
 			if(!$db->db_query($qry))
 				echo '<strong>system.tbl_benutzerrolle: '.$db->db_last_error().'</strong><br>';
-			else 
+			else
 				echo 'system.tbl_benutzerrolle: Spalte uid auf 32 Zeichen verlaengert<br>';
 		}
 	}
@@ -586,10 +586,10 @@ if(!$result = @$db->db_query("SELECT nachgereicht FROM public.tbl_akte LIMIT 1;"
 {
 	$qry = "ALTER TABLE public.tbl_akte ADD COLUMN nachgereicht boolean DEFAULT false;
             ALTER TABLE public.tbl_akte ADD COLUMN anmerkung varchar(128)";
-			
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_akte: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'public.tbl_akte: Spalte nachgereicht hinzugefuegt!<br>
             public.tbl_akte: Spalte anmerkung hinzugefuegt!<br>';
 }
@@ -612,24 +612,24 @@ if(!$result = @$db->db_query("SELECT zgvdoktor_code FROM bis.tbl_zgvdoktor LIMIT
 
 	if(!$db->db_query($qry))
 		echo '<strong>bis.tbl_zgvdoktor: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' bis.tbl_zgvdoktor: Tabelle hinzugefügt<br>';
 }
 
 // prestudent zgvdoktor hinzufügen
 if(!$result = @$db->db_query("SELECT zgvdoktor_code from public.tbl_prestudent LIMIT 1;"))
 {
-    $qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN zgvdoktor_code integer; 
+    $qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN zgvdoktor_code integer;
             ALTER TABLE public.tbl_prestudent ADD COLUMN zgvdoktorort varchar(64);
             ALTER TABLE public.tbl_prestudent ADD COLUMN zgvdoktordatum date;
-            
-            
+
+
             ALTER TABLE public.tbl_prestudent ADD CONSTRAINT fk_zgvdoktor_code FOREIGN KEY (zgvdoktor_code) REFERENCES bis.tbl_zgvdoktor(zgvdoktor_code) ON DELETE RESTRICT ON UPDATE CASCADE;
             ";
-    
+
     if(!$db->db_query($qry))
 		echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'public.tbl_prestudent: Spalte zgvdoktor_code hinzugefuegt<br>
             public.tbl_prestudent: Spalte zgvdoktorort hinzugefuegt<br>
             public.tbl_prestudent: Spalte zgvdoktordatum hinzugefuegt<br>';
@@ -639,10 +639,10 @@ if(!$result = @$db->db_query("SELECT zgvdoktor_code from public.tbl_prestudent L
 if(!$result = @$db->db_query("SELECT zutrittssystem from public.tbl_gruppe LIMIT 1;"))
 {
     $qry = "ALTER TABLE public.tbl_gruppe ADD COLUMN zutrittssystem boolean NOT NULL DEFAULT false;";
-    
+
     if(!$db->db_query($qry))
 		echo '<strong>public.tbl_gruppe: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'public.tbl_gruppe: Spalte zutrittssystem hinzugefuegt';
 }
 
@@ -650,10 +650,10 @@ if(!$result = @$db->db_query("SELECT zutrittssystem from public.tbl_gruppe LIMIT
 if(!$result = @$db->db_query("SELECT klasse from system.tbl_webservicerecht LIMIT 1;"))
 {
     $qry = "ALTER TABLE system.tbl_webservicerecht ADD COLUMN klasse varchar(256);";
-    
+
     if(!$db->db_query($qry))
 		echo '<strong>system.tbl_webservicerecht: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'system.tbl_webservicerecht: Spalte klasse hinzugefügt';
 }
 
@@ -662,21 +662,21 @@ if(!$result = @$db->db_query("SELECT positiv from lehre.tbl_note LIMIT 1;"))
 {
     $qry = "ALTER TABLE lehre.tbl_note ADD COLUMN positiv boolean NOT NULL DEFAULT true;
 		UPDATE lehre.tbl_note SET positiv=false WHERE note in(0,5,7,9,13,14,15)";
-    
+
     if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'lehre.tbl_note: Spalte positiv hinzugefügt';
 }
 
 // Mitarbeiter-Attribut Kleriker hinzufügen
 if(!$result =@$db->db_query("SELECT kleriker from public.tbl_mitarbeiter LIMIT 1;"))
 {
-    $qry="ALTER TABLE public.tbl_mitarbeiter ADD COLUMN kleriker boolean NOT NULL DEFAULT false;"; 
-    
+    $qry="ALTER TABLE public.tbl_mitarbeiter ADD COLUMN kleriker boolean NOT NULL DEFAULT false;";
+
     if(!$db->db_query($qry))
 		echo '<strong>public.tbl_mitarbeiter: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'public.tbl_mitarbeiter: spalte kleriker hinzugefügt';
 }
 
@@ -684,9 +684,9 @@ if(!$result =@$db->db_query("SELECT kleriker from public.tbl_mitarbeiter LIMIT 1
 if(!$result = @$db->db_query("SELECT matr_nr from public.tbl_person LIMIT 1;"))
 {
 	$qry = "ALTER TABLE public.tbl_person ADD COLUMN matr_nr varchar(32);";
-	
+
 	if(!$db->db_query($qry))
-		echo '<strong>public.tbl_person: '.$db->db_last_error().'</strong><br>'; 
+		echo '<strong>public.tbl_person: '.$db->db_last_error().'</strong><br>';
 	else
 		echo 'public.tbl_person: Spalte matr_nr hinzugefügt';
 }
@@ -697,14 +697,14 @@ echo '<br>';
 if(!$result = @$db->db_query("SELECT lehre FROM public.tbl_organisationseinheit LIMIT 1;"))
 {
     $qry = "ALTER TABLE public.tbl_organisationseinheit ADD COLUMN lehre boolean NOT NULL DEFAULT true;
-		UPDATE public.tbl_organisationseinheit SET lehre=false WHERE 
+		UPDATE public.tbl_organisationseinheit SET lehre=false WHERE
 		NOT EXISTS(SELECT 1 FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_organisationseinheit.oe_kurzbz)
 		AND
 		NOT EXISTS(SELECT 1 FROM public.tbl_fachbereich WHERE oe_kurzbz=tbl_organisationseinheit.oe_kurzbz)";
-    
+
     if(!$db->db_query($qry))
 		echo '<strong>public.tbl_organisationseinheit: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'public.tbl_organisationseinheit: Spalte lehre hinzugefügt';
 }
 
@@ -712,10 +712,10 @@ if(!$result = @$db->db_query("SELECT lehre FROM public.tbl_organisationseinheit 
 if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_preinteressent LIMIT 1;"))
 {
     $qry = "ALTER TABLE public.tbl_preinteressent ADD COLUMN ext_id bigint;";
-    
+
     if(!$db->db_query($qry))
 		echo '<strong>public.tbl_preinteressent: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'public.tbl_preinteressent: Spalte ext_id hinzugefügt';
 }
 
@@ -723,10 +723,10 @@ if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_preinteressent LIMIT
 if(!$result = @$db->db_query("SELECT lvnr FROM lehre.tbl_lehrveranstaltung LIMIT 1;"))
 {
     $qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN lvnr varchar(32);";
-    
+
     if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'lehre.tbl_lehrveranstaltung: Spalte lvnr hinzugefügt';
 }
 
@@ -735,10 +735,10 @@ if(!$result = @$db->db_query("SELECT credit_points FROM public.tbl_konto LIMIT 1
 {
     $qry = "ALTER TABLE public.tbl_konto ADD COLUMN credit_points numeric(5,2);
     ALTER TABLE public.tbl_buchungstyp ADD COLUMN credit_points numeric(5,2);";
-    
+
     if(!$db->db_query($qry))
 		echo '<strong>public.tbl_konto: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'public.tbl_konto / tbl_buchungstyp: Spalte credit_points hinzugefügt';
 }
 
@@ -748,10 +748,10 @@ if(!$result = @$db->db_query("SELECT studienplan_id FROM public.tbl_prestudentst
     $qry = "ALTER TABLE public.tbl_prestudentstatus ADD COLUMN studienplan_id bigint;
 			ALTER TABLE public.tbl_prestudentstatus ADD CONSTRAINT fk_studienplan_prestudentstatus FOREIGN KEY (studienplan_id) REFERENCES lehre.tbl_studienplan(studienplan_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 			";
-    
+
     if(!$db->db_query($qry))
 		echo '<strong>public.tbl_prestudentstatus: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'public.tbl_prestudentstatus: Spalte studienplan_id hinzugefügt';
 }
 
@@ -765,11 +765,11 @@ if(!$result = @$db->db_query("SELECT farbe FROM lehre.tbl_lehrveranstaltung LIMI
 	-- Neue Spalte Farbe bei Lehrveranstaltung hinzufügen
 	ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN farbe varchar(6);
 	ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN old_lehrfach_id bigint;
-	
+
 	-- Alle Lehrfächer als Lehrveranstaltungen anlegen
-	INSERT INTO lehre.tbl_lehrveranstaltung(kurzbz, bezeichnung, semester, sprache, 
+	INSERT INTO lehre.tbl_lehrveranstaltung(kurzbz, bezeichnung, semester, sprache,
 	oe_kurzbz, lehrtyp_kurzbz,aktiv, studiengang_kz, projektarbeit, old_lehrfach_id, farbe, lehre)
-	SELECT kurzbz, bezeichnung, semester, sprache, 
+	SELECT kurzbz, bezeichnung, semester, sprache,
 		(select oe_kurzbz from public.tbl_fachbereich where fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz),
 		'lf',aktiv, studiengang_kz, false, lehrfach_id, farbe,false
 	FROM
@@ -784,24 +784,24 @@ if(!$result = @$db->db_query("SELECT farbe FROM lehre.tbl_lehrveranstaltung LIMI
 	ALTER TABLE lehre.tbl_lehreinheit ADD CONSTRAINT fk_lehreinheit_lehrveranstaltung_lehrfach FOREIGN KEY (lehrfach_id) REFERENCES lehre.tbl_lehrveranstaltung (lehrveranstaltung_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 	-- Neue ID auf LV setzen
-	UPDATE lehre.tbl_lehreinheit 
-	SET lehrfach_id=(SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung 
+	UPDATE lehre.tbl_lehreinheit
+	SET lehrfach_id=(SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung
 				WHERE lehrtyp_kurzbz='lf' AND tbl_lehrveranstaltung.old_lehrfach_id=tbl_lehreinheit.lehrfach_id_old);
 
 	-- VIEWS Korrigieren
 	DROP VIEW campus.vw_lehreinheit;
 	CREATE OR REPLACE VIEW campus.vw_lehreinheit as
-	SELECT 
-	tbl_lehrveranstaltung.studiengang_kz AS lv_studiengang_kz, tbl_lehrveranstaltung.semester AS lv_semester, tbl_lehrveranstaltung.kurzbz AS lv_kurzbz, tbl_lehrveranstaltung.bezeichnung AS lv_bezeichnung, tbl_lehrveranstaltung.ects AS lv_ects, tbl_lehrveranstaltung.lehreverzeichnis AS lv_lehreverzeichnis, 
-	tbl_lehrveranstaltung.planfaktor AS lv_planfaktor, tbl_lehrveranstaltung.planlektoren AS lv_planlektoren, tbl_lehrveranstaltung.planpersonalkosten AS lv_planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor AS lv_plankostenprolektor, tbl_lehrveranstaltung.orgform_kurzbz AS lv_orgform_kurzbz, 
-	tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, tbl_lehreinheit.lehre, 
-	tbl_lehreinheit.unr, tbl_lehreinheit.lvnr, tbl_lehreinheitmitarbeiter.lehrfunktion_kurzbz, tbl_lehreinheit.insertamum, tbl_lehreinheit.insertvon, tbl_lehreinheit.updateamum, tbl_lehreinheit.updatevon, 
-	lehrfach.lehrveranstaltung_id AS lehrfach_id, 
-	(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz, 
-	lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, lehrfach.farbe, 	
-	tbl_lehrveranstaltung.aktiv, lehrfach.sprache, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehreinheitmitarbeiter.semesterstunden, tbl_lehrveranstaltung.semesterstunden AS lv_semesterstunden, tbl_lehreinheitmitarbeiter.planstunden, tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.faktor, 
-	tbl_lehreinheit.anmerkung, tbl_mitarbeiter.kurzbz AS lektor, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe, tbl_lehreinheitgruppe.gruppe_kurzbz, 
-	tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bez, tbl_studiengang.typ AS stg_typ, tbl_lehreinheitmitarbeiter.anmerkung AS anmerkunglektor, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz, 
+	SELECT
+	tbl_lehrveranstaltung.studiengang_kz AS lv_studiengang_kz, tbl_lehrveranstaltung.semester AS lv_semester, tbl_lehrveranstaltung.kurzbz AS lv_kurzbz, tbl_lehrveranstaltung.bezeichnung AS lv_bezeichnung, tbl_lehrveranstaltung.ects AS lv_ects, tbl_lehrveranstaltung.lehreverzeichnis AS lv_lehreverzeichnis,
+	tbl_lehrveranstaltung.planfaktor AS lv_planfaktor, tbl_lehrveranstaltung.planlektoren AS lv_planlektoren, tbl_lehrveranstaltung.planpersonalkosten AS lv_planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor AS lv_plankostenprolektor, tbl_lehrveranstaltung.orgform_kurzbz AS lv_orgform_kurzbz,
+	tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, tbl_lehreinheit.lehre,
+	tbl_lehreinheit.unr, tbl_lehreinheit.lvnr, tbl_lehreinheitmitarbeiter.lehrfunktion_kurzbz, tbl_lehreinheit.insertamum, tbl_lehreinheit.insertvon, tbl_lehreinheit.updateamum, tbl_lehreinheit.updatevon,
+	lehrfach.lehrveranstaltung_id AS lehrfach_id,
+	(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz,
+	lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, lehrfach.farbe,
+	tbl_lehrveranstaltung.aktiv, lehrfach.sprache, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehreinheitmitarbeiter.semesterstunden, tbl_lehrveranstaltung.semesterstunden AS lv_semesterstunden, tbl_lehreinheitmitarbeiter.planstunden, tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.faktor,
+	tbl_lehreinheit.anmerkung, tbl_mitarbeiter.kurzbz AS lektor, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe, tbl_lehreinheitgruppe.gruppe_kurzbz,
+	tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bez, tbl_studiengang.typ AS stg_typ, tbl_lehreinheitmitarbeiter.anmerkung AS anmerkunglektor, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz,
 	tbl_lehrveranstaltung.bezeichnung_english AS lv_bezeichnung_english, tbl_lehrveranstaltung.lehrtyp_kurzbz
 	   FROM lehre.tbl_lehreinheit
 	   JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
@@ -818,46 +818,46 @@ if(!$result = @$db->db_query("SELECT farbe FROM lehre.tbl_lehrveranstaltung LIMI
 
 	DROP VIEW campus.vw_student_lehrveranstaltung;
 	CREATE OR REPLACE VIEW campus.vw_student_lehrveranstaltung AS
-	SELECT 
-		tbl_benutzergruppe.uid,	tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.lehrveranstaltung_id, 
-		tbl_lehrveranstaltung.kurzbz, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.bezeichnung_english, 
-		tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache, 
-		tbl_lehrveranstaltung.ects, tbl_lehrveranstaltung.semesterstunden, tbl_lehrveranstaltung.anmerkung, 
-		tbl_lehrveranstaltung.lehre, tbl_lehrveranstaltung.lehreverzeichnis, tbl_lehrveranstaltung.aktiv, 
-		tbl_lehrveranstaltung.planfaktor, tbl_lehrveranstaltung.planlektoren, tbl_lehrveranstaltung.planpersonalkosten, 
-		tbl_lehrveranstaltung.plankostenprolektor, tbl_lehrveranstaltung.updateamum, tbl_lehrveranstaltung.updatevon, 
-		tbl_lehrveranstaltung.insertamum, tbl_lehrveranstaltung.insertvon, tbl_lehrveranstaltung.ext_id, 
-		tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.studiensemester_kurzbz, 
-		tbl_lehreinheit.lehrfach_id AS lehrfach_id, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, 
-		tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, 
+	SELECT
+		tbl_benutzergruppe.uid,	tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.lehrveranstaltung_id,
+		tbl_lehrveranstaltung.kurzbz, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.bezeichnung_english,
+		tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache,
+		tbl_lehrveranstaltung.ects, tbl_lehrveranstaltung.semesterstunden, tbl_lehrveranstaltung.anmerkung,
+		tbl_lehrveranstaltung.lehre, tbl_lehrveranstaltung.lehreverzeichnis, tbl_lehrveranstaltung.aktiv,
+		tbl_lehrveranstaltung.planfaktor, tbl_lehrveranstaltung.planlektoren, tbl_lehrveranstaltung.planpersonalkosten,
+		tbl_lehrveranstaltung.plankostenprolektor, tbl_lehrveranstaltung.updateamum, tbl_lehrveranstaltung.updatevon,
+		tbl_lehrveranstaltung.insertamum, tbl_lehrveranstaltung.insertvon, tbl_lehrveranstaltung.ext_id,
+		tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.studiensemester_kurzbz,
+		tbl_lehreinheit.lehrfach_id AS lehrfach_id, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung,
+		tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp,
 		tbl_lehreinheit.raumtypalternativ, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz
-	FROM 
-		lehre.tbl_lehreinheitgruppe, 
-		public.tbl_benutzergruppe, 
-		lehre.tbl_lehreinheit, 
+	FROM
+		lehre.tbl_lehreinheitgruppe,
+		public.tbl_benutzergruppe,
+		lehre.tbl_lehreinheit,
 		lehre.tbl_lehrveranstaltung
-	WHERE 
+	WHERE
 		tbl_lehreinheitgruppe.gruppe_kurzbz::text = tbl_benutzergruppe.gruppe_kurzbz::text AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id AND tbl_lehreinheit.studiensemester_kurzbz::text = tbl_benutzergruppe.studiensemester_kurzbz::text
-	UNION 
-	SELECT 
-		tbl_studentlehrverband.student_uid AS uid, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.sort, 
-		tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.kurzbz, tbl_lehrveranstaltung.bezeichnung, 
-		tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, 
-		tbl_lehrveranstaltung.sprache, tbl_lehrveranstaltung.ects, tbl_lehrveranstaltung.semesterstunden, 
-		tbl_lehrveranstaltung.anmerkung, tbl_lehrveranstaltung.lehre, tbl_lehrveranstaltung.lehreverzeichnis, 
-		tbl_lehrveranstaltung.aktiv, tbl_lehrveranstaltung.planfaktor, tbl_lehrveranstaltung.planlektoren, 
-		tbl_lehrveranstaltung.planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor, tbl_lehrveranstaltung.updateamum, 
-		tbl_lehrveranstaltung.updatevon, tbl_lehrveranstaltung.insertamum, tbl_lehrveranstaltung.insertvon, 
-		tbl_lehrveranstaltung.ext_id, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.studiensemester_kurzbz, 
-		tbl_lehreinheit.lehrfach_id AS lehrfach_id, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, 
-		tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, 
+	UNION
+	SELECT
+		tbl_studentlehrverband.student_uid AS uid, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.sort,
+		tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.kurzbz, tbl_lehrveranstaltung.bezeichnung,
+		tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester,
+		tbl_lehrveranstaltung.sprache, tbl_lehrveranstaltung.ects, tbl_lehrveranstaltung.semesterstunden,
+		tbl_lehrveranstaltung.anmerkung, tbl_lehrveranstaltung.lehre, tbl_lehrveranstaltung.lehreverzeichnis,
+		tbl_lehrveranstaltung.aktiv, tbl_lehrveranstaltung.planfaktor, tbl_lehrveranstaltung.planlektoren,
+		tbl_lehrveranstaltung.planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor, tbl_lehrveranstaltung.updateamum,
+		tbl_lehrveranstaltung.updatevon, tbl_lehrveranstaltung.insertamum, tbl_lehrveranstaltung.insertvon,
+		tbl_lehrveranstaltung.ext_id, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.studiensemester_kurzbz,
+		tbl_lehreinheit.lehrfach_id AS lehrfach_id, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung,
+		tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ,
 		tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz
-	FROM 
-		lehre.tbl_lehreinheitgruppe, 
-		public.tbl_studentlehrverband, 
-		lehre.tbl_lehreinheit, 
+	FROM
+		lehre.tbl_lehreinheitgruppe,
+		public.tbl_studentlehrverband,
+		lehre.tbl_lehreinheit,
 		lehre.tbl_lehrveranstaltung
-	WHERE 
+	WHERE
 		tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id AND tbl_lehreinheit.studiensemester_kurzbz::text = tbl_studentlehrverband.studiensemester_kurzbz::text AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND tbl_studentlehrverband.studiengang_kz = tbl_lehreinheitgruppe.studiengang_kz AND tbl_studentlehrverband.semester = tbl_lehreinheitgruppe.semester AND (btrim(tbl_studentlehrverband.verband::text) = btrim(tbl_lehreinheitgruppe.verband::text) OR (tbl_lehreinheitgruppe.verband IS NULL OR btrim(tbl_lehreinheitgruppe.verband::text) = ''::text) AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL) AND (btrim(tbl_studentlehrverband.gruppe::text) = btrim(tbl_lehreinheitgruppe.gruppe::text) OR (tbl_lehreinheitgruppe.gruppe IS NULL OR btrim(tbl_lehreinheitgruppe.gruppe::text) = ''::text) AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL);
 	GRANT SELECT ON campus.vw_student_lehrveranstaltung TO admin;
 	GRANT SELECT ON campus.vw_student_lehrveranstaltung TO vilesci;
@@ -866,17 +866,17 @@ if(!$result = @$db->db_query("SELECT farbe FROM lehre.tbl_lehrveranstaltung LIMI
 	-- ==
 	DROP VIEW campus.vw_stundenplan;
 	CREATE OR REPLACE VIEW campus.vw_stundenplan AS
-	SELECT 
-		tbl_stundenplan.stundenplan_id, tbl_stundenplan.unr, tbl_stundenplan.mitarbeiter_uid AS uid, 
-		tbl_stundenplan.lehreinheit_id, tbl_lehreinheit.lehrfach_id AS lehrfach_id, 
-		tbl_stundenplan.datum, tbl_stundenplan.stunde, tbl_stundenplan.ort_kurzbz, tbl_stundenplan.studiengang_kz, 
-		tbl_stundenplan.semester, tbl_stundenplan.verband, tbl_stundenplan.gruppe, tbl_stundenplan.gruppe_kurzbz, 
-		tbl_stundenplan.titel, tbl_stundenplan.anmerkung, tbl_stundenplan.fix, tbl_lehreinheit.lehrveranstaltung_id, 
-		tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bezeichnung, 
-		tbl_studiengang.typ AS stg_typ, 
-		(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz, 
-		lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, 
-		lehrfach.farbe, tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor, 
+	SELECT
+		tbl_stundenplan.stundenplan_id, tbl_stundenplan.unr, tbl_stundenplan.mitarbeiter_uid AS uid,
+		tbl_stundenplan.lehreinheit_id, tbl_lehreinheit.lehrfach_id AS lehrfach_id,
+		tbl_stundenplan.datum, tbl_stundenplan.stunde, tbl_stundenplan.ort_kurzbz, tbl_stundenplan.studiengang_kz,
+		tbl_stundenplan.semester, tbl_stundenplan.verband, tbl_stundenplan.gruppe, tbl_stundenplan.gruppe_kurzbz,
+		tbl_stundenplan.titel, tbl_stundenplan.anmerkung, tbl_stundenplan.fix, tbl_lehreinheit.lehrveranstaltung_id,
+		tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bezeichnung,
+		tbl_studiengang.typ AS stg_typ,
+		(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz,
+		lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez,
+		lehrfach.farbe, tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor,
 		tbl_stundenplan.updateamum, tbl_stundenplan.updatevon, tbl_stundenplan.insertamum, tbl_stundenplan.insertvon
 	   FROM lehre.tbl_stundenplan
 	   JOIN public.tbl_studiengang USING (studiengang_kz)
@@ -890,15 +890,15 @@ if(!$result = @$db->db_query("SELECT farbe FROM lehre.tbl_lehrveranstaltung LIMI
 	-- ==
 	DROP VIEW lehre.vw_lva_stundenplan;
 	CREATE OR REPLACE VIEW lehre.vw_lva_stundenplan AS
-	SELECT 
-		le.lehreinheit_id, le.unr, le.lvnr, 
-		(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz, 
-		le.lehrfach_id AS lehrfach_id, lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, 
-		lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, 
-		ma.kurzbz AS lektor, tbl_studiengang.studiengang_kz, tbl_studiengang.kurzbz AS studiengang, 
-		lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, 
-		le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, 
-		le.studiensemester_kurzbz, 
+	SELECT
+		le.lehreinheit_id, le.unr, le.lvnr,
+		(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz,
+		le.lehrfach_id AS lehrfach_id, lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez,
+		lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid,
+		ma.kurzbz AS lektor, tbl_studiengang.studiengang_kz, tbl_studiengang.kurzbz AS studiengang,
+		lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ,
+		le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung,
+		le.studiensemester_kurzbz,
 		( SELECT count(*) AS count
 		       FROM lehre.tbl_stundenplan
 		      WHERE tbl_stundenplan.mitarbeiter_uid::text = lema.mitarbeiter_uid::text AND tbl_stundenplan.studiengang_kz = lvb.studiengang_kz AND tbl_stundenplan.semester = lvb.semester AND (tbl_stundenplan.verband = lvb.verband OR (tbl_stundenplan.verband IS NULL OR tbl_stundenplan.verband = ''::bpchar) AND lvb.verband IS NULL) AND (tbl_stundenplan.gruppe = lvb.gruppe OR (tbl_stundenplan.gruppe IS NULL OR tbl_stundenplan.gruppe = ''::bpchar) AND lvb.gruppe IS NULL) AND (tbl_stundenplan.gruppe_kurzbz::text = lvb.gruppe_kurzbz::text OR tbl_stundenplan.gruppe_kurzbz IS NULL AND lvb.gruppe_kurzbz IS NULL) AND tbl_stundenplan.lehreinheit_id = lvb.lehreinheit_id) AS verplant
@@ -915,15 +915,15 @@ if(!$result = @$db->db_query("SELECT farbe FROM lehre.tbl_lehrveranstaltung LIMI
 	-- ==
 	DROP VIEW lehre.vw_lva_stundenplandev;
 	CREATE OR REPLACE VIEW lehre.vw_lva_stundenplandev AS
-	SELECT 
-		le.lehreinheit_id, le.unr, le.lvnr, 
-		(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz, 
-		le.lehrfach_id AS lehrfach_id, lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, 
-		lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, 
-		tbl_mitarbeiter.kurzbz AS lektor, tbl_studiengang.studiengang_kz, upper(tbl_studiengang.typ::character varying::text || tbl_studiengang.kurzbz::text) AS studiengang, 
-		lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, 
-		le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, 
-		le.anmerkung, le.studiensemester_kurzbz, 
+	SELECT
+		le.lehreinheit_id, le.unr, le.lvnr,
+		(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz,
+		le.lehrfach_id AS lehrfach_id, lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez,
+		lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid,
+		tbl_mitarbeiter.kurzbz AS lektor, tbl_studiengang.studiengang_kz, upper(tbl_studiengang.typ::character varying::text || tbl_studiengang.kurzbz::text) AS studiengang,
+		lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ,
+		le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw,
+		le.anmerkung, le.studiensemester_kurzbz,
 		( SELECT count(*) AS count
 		       FROM lehre.tbl_stundenplandev
 		      WHERE tbl_stundenplandev.mitarbeiter_uid::text = lema.mitarbeiter_uid::text AND tbl_stundenplandev.studiengang_kz = lvb.studiengang_kz AND tbl_stundenplandev.semester = lvb.semester AND (tbl_stundenplandev.verband = lvb.verband OR (tbl_stundenplandev.verband IS NULL OR tbl_stundenplandev.verband = ''::bpchar) AND lvb.verband IS NULL) AND (tbl_stundenplandev.gruppe = lvb.gruppe OR (tbl_stundenplandev.gruppe IS NULL OR tbl_stundenplandev.gruppe = ''::bpchar) AND lvb.gruppe IS NULL) AND (tbl_stundenplandev.gruppe_kurzbz::text = lvb.gruppe_kurzbz::text OR tbl_stundenplandev.gruppe_kurzbz IS NULL AND lvb.gruppe_kurzbz IS NULL) AND tbl_stundenplandev.lehreinheit_id = lvb.lehreinheit_id) AS verplant
@@ -941,18 +941,18 @@ if(!$result = @$db->db_query("SELECT farbe FROM lehre.tbl_lehrveranstaltung LIMI
 
 	DROP VIEW lehre.vw_stundenplan;
 	CREATE OR REPLACE VIEW lehre.vw_stundenplan AS
-	SELECT 
-		tbl_stundenplan.stundenplan_id, tbl_stundenplan.unr, tbl_stundenplan.mitarbeiter_uid AS uid, 
-		tbl_stundenplan.lehreinheit_id, tbl_lehreinheit.lehrfach_id AS lehrfach_id, tbl_stundenplan.datum, 
-		tbl_stundenplan.stunde, tbl_stundenplan.ort_kurzbz, tbl_stundenplan.studiengang_kz, 
-		tbl_stundenplan.semester, tbl_stundenplan.verband, tbl_stundenplan.gruppe, tbl_stundenplan.gruppe_kurzbz, 
-		tbl_stundenplan.titel, tbl_stundenplan.anmerkung, tbl_stundenplan.fix, tbl_lehreinheit.lehrveranstaltung_id, 
-		tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, 
-		tbl_studiengang.bezeichnung AS stg_bezeichnung, tbl_studiengang.typ AS stg_typ, 
+	SELECT
+		tbl_stundenplan.stundenplan_id, tbl_stundenplan.unr, tbl_stundenplan.mitarbeiter_uid AS uid,
+		tbl_stundenplan.lehreinheit_id, tbl_lehreinheit.lehrfach_id AS lehrfach_id, tbl_stundenplan.datum,
+		tbl_stundenplan.stunde, tbl_stundenplan.ort_kurzbz, tbl_stundenplan.studiengang_kz,
+		tbl_stundenplan.semester, tbl_stundenplan.verband, tbl_stundenplan.gruppe, tbl_stundenplan.gruppe_kurzbz,
+		tbl_stundenplan.titel, tbl_stundenplan.anmerkung, tbl_stundenplan.fix, tbl_lehreinheit.lehrveranstaltung_id,
+		tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang,
+		tbl_studiengang.bezeichnung AS stg_bezeichnung, tbl_studiengang.typ AS stg_typ,
 		(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz,
-		lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, lehrfach.farbe, 
-		tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor, 
-		tbl_stundenplan.updateamum, tbl_stundenplan.updatevon, tbl_stundenplan.insertamum, 
+		lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, lehrfach.farbe,
+		tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor,
+		tbl_stundenplan.updateamum, tbl_stundenplan.updatevon, tbl_stundenplan.insertamum,
 		tbl_stundenplan.insertvon, tbl_lehreinheit.anmerkung AS anmerkung_lehreinheit
 	   FROM lehre.tbl_stundenplan
 	   JOIN public.tbl_studiengang USING (studiengang_kz)
@@ -967,19 +967,19 @@ if(!$result = @$db->db_query("SELECT farbe FROM lehre.tbl_lehrveranstaltung LIMI
 
 	DROP VIEW lehre.vw_stundenplandev;
 	CREATE OR REPLACE VIEW lehre.vw_stundenplandev AS
-	SELECT 
-		tbl_stundenplandev.stundenplandev_id, tbl_stundenplandev.unr, tbl_stundenplandev.mitarbeiter_uid AS uid, 
-		tbl_stundenplandev.lehreinheit_id, tbl_lehreinheit.lehrfach_id AS lehrfach_id, tbl_stundenplandev.datum, 
-		tbl_stundenplandev.stunde, tbl_stundenplandev.ort_kurzbz, tbl_stundenplandev.studiengang_kz, 
-		tbl_stundenplandev.semester, tbl_stundenplandev.verband, tbl_stundenplandev.gruppe, 
-		tbl_stundenplandev.gruppe_kurzbz, tbl_stundenplandev.titel, tbl_stundenplandev.anmerkung, 
-		tbl_stundenplandev.fix, tbl_lehreinheit.lehrveranstaltung_id, tbl_studiengang.kurzbz AS stg_kurzbz, 
-		tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bezeichnung, 
-		tbl_studiengang.typ AS stg_typ, 
-		(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz, 
-		lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, lehrfach.farbe, 
-		tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor, 
-		tbl_stundenplandev.updateamum, tbl_stundenplandev.updatevon, tbl_stundenplandev.insertamum, 
+	SELECT
+		tbl_stundenplandev.stundenplandev_id, tbl_stundenplandev.unr, tbl_stundenplandev.mitarbeiter_uid AS uid,
+		tbl_stundenplandev.lehreinheit_id, tbl_lehreinheit.lehrfach_id AS lehrfach_id, tbl_stundenplandev.datum,
+		tbl_stundenplandev.stunde, tbl_stundenplandev.ort_kurzbz, tbl_stundenplandev.studiengang_kz,
+		tbl_stundenplandev.semester, tbl_stundenplandev.verband, tbl_stundenplandev.gruppe,
+		tbl_stundenplandev.gruppe_kurzbz, tbl_stundenplandev.titel, tbl_stundenplandev.anmerkung,
+		tbl_stundenplandev.fix, tbl_lehreinheit.lehrveranstaltung_id, tbl_studiengang.kurzbz AS stg_kurzbz,
+		tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bezeichnung,
+		tbl_studiengang.typ AS stg_typ,
+		(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz,
+		lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, lehrfach.farbe,
+		tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor,
+		tbl_stundenplandev.updateamum, tbl_stundenplandev.updatevon, tbl_stundenplandev.insertamum,
 		tbl_stundenplandev.insertvon, tbl_lehreinheit.anmerkung AS anmerkung_lehreinheit
 	   FROM lehre.tbl_stundenplandev
 	   JOIN public.tbl_studiengang USING (studiengang_kz)
@@ -995,17 +995,17 @@ if(!$result = @$db->db_query("SELECT farbe FROM lehre.tbl_lehrveranstaltung LIMI
 
     if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 	{
-		// Lehrfaecher-LVs die gleich sind wie die Lehrveranstaltung 
+		// Lehrfaecher-LVs die gleich sind wie die Lehrveranstaltung
 		// werden mit der Lehrveranstaltung zusammengelegt und das LV-Lehrfach wird entfernt
 
 		$qry = "
-		SELECT 
-			distinct 
-			tbl_lehrveranstaltung.lehrveranstaltung_id as lvid, 
-			tbl_lehreinheit.lehreinheit_id, 
-			tbl_lehreinheit.lehrfach_id, 
+		SELECT
+			distinct
+			tbl_lehrveranstaltung.lehrveranstaltung_id as lvid,
+			tbl_lehreinheit.lehreinheit_id,
+			tbl_lehreinheit.lehrfach_id,
 			lehrfach.lehrveranstaltung_id as lfid,
 			lehrfach.farbe as lffarbe,
 			lehrfach.oe_kurzbz
@@ -1036,7 +1036,7 @@ if(!$result = @$db->db_query("SELECT farbe FROM lehre.tbl_lehrveranstaltung LIMI
 		$db->db_query($qry);
 
 		echo 'Alle Lehrfaecher wurden als Lehrveranstaltungen angelegt';
-	}	
+	}
 
 }
 
@@ -1044,10 +1044,10 @@ if(!$result = @$db->db_query("SELECT farbe FROM lehre.tbl_lehrveranstaltung LIMI
 if(!$result = @$db->db_query("SELECT zahlungsreferenz FROM public.tbl_konto LIMIT 1;"))
 {
     $qry = "ALTER TABLE public.tbl_konto ADD COLUMN zahlungsreferenz varchar(35);";
-    
+
     if(!$db->db_query($qry))
 		echo '<strong>public.tbl_konto: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'public.tbl_konto: Spalte zahlungsreferenz hinzugefügt';
 }
 
@@ -1055,10 +1055,10 @@ if(!$result = @$db->db_query("SELECT zahlungsreferenz FROM public.tbl_konto LIMI
 if(!$result = @$db->db_query("SELECT semester_alternativ FROM lehre.tbl_lehrveranstaltung LIMIT 1;"))
 {
     $qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN semester_alternativ smallint;";
-    
+
     if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'lehre.tbl_lehrveranstaltung: Spalte semester_alternativ hinzugefügt';
 }
 
@@ -1076,7 +1076,7 @@ if(!$result = @$db->db_query("SELECT bestaetigtam FROM public.tbl_prestudentstat
 		echo 'public.tbl_prestudentstatus: Spalte bestaetigtam und bestaetigtvon hinzugefügt';
 }
 
-// oe_kurzbz in Tabelle public.tbl_bankverbindung fuer das Abbilden von Kontodaten von Studiengaengen 
+// oe_kurzbz in Tabelle public.tbl_bankverbindung fuer das Abbilden von Kontodaten von Studiengaengen
 if(!$result = @$db->db_query("SELECT oe_kurzbz FROM public.tbl_bankverbindung LIMIT 1;"))
 {
 	$qry = "ALTER TABLE public.tbl_bankverbindung ADD COLUMN oe_kurzbz varchar(32);
@@ -1090,11 +1090,11 @@ if(!$result = @$db->db_query("SELECT oe_kurzbz FROM public.tbl_bankverbindung LI
 		echo 'public.tbl_bankverbindung: Spalte oe_kurzbz hinzugefügt';
 }
 
-// dokumentstudiengang boolean onlinebewerbung 
+// dokumentstudiengang boolean onlinebewerbung
 if(!$result = @$db->db_query("Select onlinebewerbung from public.tbl_dokumentstudiengang LIMIT 1;"))
 {
-	$qry = "ALTER TABLE public.tbl_dokumentstudiengang ADD COLUMN onlinebewerbung boolean NOT NULL DEFAULT true; "; 
-	
+	$qry = "ALTER TABLE public.tbl_dokumentstudiengang ADD COLUMN onlinebewerbung boolean NOT NULL DEFAULT true; ";
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_dokumentstudiengang: '.$db->db_last_error().'</strong><br>';
 	else
@@ -1104,15 +1104,15 @@ if(!$result = @$db->db_query("Select onlinebewerbung from public.tbl_dokumentstu
 // Akte titel_intern und anmerkung_intern hinzufügen für Dokumentupload aus FAS
 if(!$result = @$db->db_query("SELECT titel_intern from public.tbl_akte LIMIT 1"))
 {
-	
+
 	$qry = "ALTER TABLE public.tbl_akte ADD COLUMN titel_intern varchar(64);
-			ALTER TABLE public.tbl_akte ADD COLUMN anmerkung_intern text; "; 
-	
+			ALTER TABLE public.tbl_akte ADD COLUMN anmerkung_intern text; ";
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_akte: '.$db->db_last_error().'</strong><br>';
 	else
 		echo 'public.tbl_akte: Spalten titel_intern und anmerkung_intern hinzugefügt';
-			
+
 }
 
 // Pruefungsverwaltung
@@ -1127,7 +1127,7 @@ if(!$result = @$db->db_query("SELECT pruefung_id FROM campus.tbl_pruefung LIMIT 
 		start date,
 		ende date
 	);
-	
+
 	CREATE SEQUENCE campus.seq_pruefungsfenster_pruefungsfenster_id
 		 INCREMENT BY 1
 		 NO MAXVALUE
@@ -1143,7 +1143,7 @@ if(!$result = @$db->db_query("SELECT pruefung_id FROM campus.tbl_pruefung LIMIT 
 	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefungsfenster TO vilesci;
 	GRANT SELECT, UPDATE ON campus.seq_pruefungsfenster_pruefungsfenster_id TO vilesci;
 	GRANT SELECT, UPDATE ON campus.seq_pruefungsfenster_pruefungsfenster_id TO web;
-		
+
 	CREATE TABLE campus.tbl_pruefung
 	(
 		pruefung_id bigint NOT NULL,
@@ -1161,7 +1161,7 @@ if(!$result = @$db->db_query("SELECT pruefung_id FROM campus.tbl_pruefung LIMIT 
 		updatevon varchar(32),
 		updateamum timestamp
 	);
-		
+
 	CREATE SEQUENCE campus.seq_pruefung_pruefung_id
 		 INCREMENT BY 1
 		 NO MAXVALUE
@@ -1175,12 +1175,12 @@ if(!$result = @$db->db_query("SELECT pruefung_id FROM campus.tbl_pruefung LIMIT 
 	ALTER TABLE campus.tbl_pruefung ADD CONSTRAINT fk_pruefung_mitarbeiter_mitarbeiter_uid FOREIGN KEY (mitarbeiter_uid) REFERENCES public.tbl_mitarbeiter(mitarbeiter_uid) ON DELETE CASCADE ON UPDATE CASCADE;
 	ALTER TABLE campus.tbl_pruefung ADD CONSTRAINT fk_pruefung_pruefungsfenster_pruefungsfenster_id FOREIGN KEY (pruefungsfenster_id) REFERENCES campus.tbl_pruefungsfenster(pruefungsfenster_id) ON DELETE CASCADE ON UPDATE CASCADE;
 	ALTER TABLE campus.tbl_pruefung ADD CONSTRAINT fk_pruefung_pruefungstyp_pruefungstyp_kurzbz FOREIGN KEY (pruefungstyp_kurzbz) REFERENCES lehre.tbl_pruefungstyp(pruefungstyp_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
-	
+
 	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefung TO web;
 	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefung TO vilesci;
 	GRANT SELECT, UPDATE ON campus.seq_pruefung_pruefung_id TO web;
 	GRANT SELECT, UPDATE ON campus.seq_pruefung_pruefung_id TO vilesci;
-	
+
 	CREATE TABLE campus.tbl_pruefungstermin
 	(
 		pruefungstermin_id bigint NOT NULL,
@@ -1190,7 +1190,7 @@ if(!$result = @$db->db_query("SELECT pruefung_id FROM campus.tbl_pruefung LIMIT 
 		teilnehmer_max smallint,
 		teilnehmer_min smallint
 	);
-	
+
 	CREATE SEQUENCE campus.seq_pruefungstermin_pruefungstermin_id
 		 INCREMENT BY 1
 		 NO MAXVALUE
@@ -1200,25 +1200,25 @@ if(!$result = @$db->db_query("SELECT pruefung_id FROM campus.tbl_pruefung LIMIT 
 	ALTER TABLE campus.tbl_pruefungstermin ADD CONSTRAINT pk_pruefungstermin PRIMARY KEY (pruefungstermin_id);
 	ALTER TABLE campus.tbl_pruefungstermin ALTER COLUMN pruefungstermin_id SET DEFAULT nextval('campus.seq_pruefungstermin_pruefungstermin_id');
 	ALTER TABLE campus.tbl_pruefungstermin ADD CONSTRAINT fk_pruefungstermin_pruefung_pruefung_id FOREIGN KEY (pruefung_id) REFERENCES campus.tbl_pruefung(pruefung_id) ON DELETE CASCADE ON UPDATE CASCADE;
-	
+
 	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefungstermin TO web;
 	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefungstermin TO vilesci;
 	GRANT SELECT, UPDATE ON campus.seq_pruefungstermin_pruefungstermin_id TO web;
 	GRANT SELECT, UPDATE ON campus.seq_pruefungstermin_pruefungstermin_id TO vilesci;
-	
+
 	CREATE TABLE campus.tbl_lehrveranstaltung_pruefung
 	(
 		lehrveranstaltung_pruefung_id bigint NOT NULL,
 		lehrveranstaltung_id bigint NOT NULL,
 		pruefung_id bigint NOT NULL
 	);
-	
+
 	CREATE SEQUENCE campus.seq_lehrveranstaltung_pruefung_lehrveranstaltung_pruefung_id
 		 INCREMENT BY 1
 		 NO MAXVALUE
 		 NO MINVALUE
 		 CACHE 1;
-	
+
 	ALTER TABLE campus.tbl_lehrveranstaltung_pruefung ADD CONSTRAINT pk_lehrveranstaltung_pruefung PRIMARY KEY (lehrveranstaltung_pruefung_id);
 	ALTER TABLE campus.tbl_lehrveranstaltung_pruefung ALTER COLUMN lehrveranstaltung_pruefung_id SET DEFAULT nextval('campus.seq_lehrveranstaltung_pruefung_lehrveranstaltung_pruefung_id');
 	ALTER TABLE campus.tbl_lehrveranstaltung_pruefung ADD CONSTRAINT fk_lehrveranstaltung_pruefung_lehrveranstaltung_lehrveranstaltung_id FOREIGN KEY (lehrveranstaltung_id) REFERENCES lehre.tbl_lehrveranstaltung(lehrveranstaltung_id) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -1228,22 +1228,22 @@ if(!$result = @$db->db_query("SELECT pruefung_id FROM campus.tbl_pruefung LIMIT 
 	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_lehrveranstaltung_pruefung TO vilesci;
 	GRANT SELECT, UPDATE ON campus.seq_lehrveranstaltung_pruefung_lehrveranstaltung_pruefung_id TO web;
 	GRANT SELECT, UPDATE ON campus.seq_lehrveranstaltung_pruefung_lehrveranstaltung_pruefung_id TO vilesci;
-	
+
 	CREATE TABLE campus.tbl_pruefungsstatus
 	(
 		status_kurzbz varchar(32) NOT NULL,
 		bezeichnung varchar(64)
 	);
-	
+
 	GRANT SELECT ON campus.tbl_lehrveranstaltung_pruefung TO web;
 	GRANT SELECT ON campus.tbl_lehrveranstaltung_pruefung TO vilesci;
-	
+
 	ALTER TABLE campus.tbl_pruefungsstatus ADD CONSTRAINT pk_pruefungsstatus PRIMARY KEY (status_kurzbz);
-	
+
 	INSERT INTO campus.tbl_pruefungsstatus (status_kurzbz, bezeichnung) VALUES('angemeldet','angemeldet');
 	INSERT INTO campus.tbl_pruefungsstatus (status_kurzbz, bezeichnung) VALUES('bestaetigt','bestaetigt');
 	INSERT INTO campus.tbl_pruefungsstatus (status_kurzbz, bezeichnung) VALUES('storniert','storniert');
-	
+
 	CREATE TABLE campus.tbl_pruefungsanmeldung
 	(
 		pruefungsanmeldung_id bigint NOT NULL,
@@ -1255,19 +1255,19 @@ if(!$result = @$db->db_query("SELECT pruefung_id FROM campus.tbl_pruefung LIMIT 
 		reihung smallint,
 		kommentar text
 	);
-	
+
 	CREATE SEQUENCE campus.seq_pruefungsanmeldung_pruefungsanmeldung_id
 		 INCREMENT BY 1
 		 NO MAXVALUE
 		 NO MINVALUE
 		 CACHE 1;
-	
+
 	ALTER TABLE campus.tbl_pruefungsanmeldung ADD CONSTRAINT pk_pruefungsanmeldung PRIMARY KEY (pruefungsanmeldung_id);
 	ALTER TABLE campus.tbl_pruefungsanmeldung ALTER COLUMN pruefungsanmeldung_id SET DEFAULT nextval('campus.seq_pruefungsanmeldung_pruefungsanmeldung_id');
 	ALTER TABLE campus.tbl_pruefungsanmeldung ADD CONSTRAINT fk_pruefungsanmeldung_benutzer_uid FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON DELETE RESTRICT ON UPDATE CASCADE;
 	ALTER TABLE campus.tbl_pruefungsanmeldung ADD CONSTRAINT fk_pruefungsanmeldung_lehrveranstaltung_lehrveranstaltung_id FOREIGN KEY (lehrveranstaltung_id) REFERENCES lehre.tbl_lehrveranstaltung(lehrveranstaltung_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 	ALTER TABLE campus.tbl_pruefungsanmeldung ADD CONSTRAINT fk_pruefungsanmeldung_pruefungsstatus_status_kurzbz FOREIGN KEY (status_kurzbz) REFERENCES campus.tbl_pruefungsstatus(status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-	
+
 	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefungsanmeldung TO web;
 	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefungsanmeldung TO vilesci;
 	GRANT SELECT, UPDATE ON campus.seq_pruefungsanmeldung_pruefungsanmeldung_id TO web;
@@ -1288,12 +1288,12 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	{
 
 		$qry = "GRANT SELECT, INSERT, UPDATE ON public.tbl_prestudentstatus TO web;";
-	
+
 		if(!$db->db_query($qry))
 			echo '<strong>public.tbl_prestudentstatus: '.$db->db_last_error().'</strong><br>';
 		else
 			echo 'public.tbl_prestudentstatus: Schreibrechte fuer User web erteilt';
-	}		
+	}
 }
 
 // Berechtigungen fuer web User erteilen
@@ -1323,12 +1323,12 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 
 		$qry = "GRANT INSERT, UPDATE ON public.tbl_konto TO web;"
 		    . " GRANT SELECT, UPDATE on public.tbl_konto_buchungsnr_seq TO web;";
-	
+
 		if(!$db->db_query($qry))
 			echo '<strong>public.tbl_konto: '.$db->db_last_error().'</strong><br>';
 		else
 			echo 'public.tbl_konto: Schreibrechte fuer User web erteilt';
-	}		
+	}
 }
 
 // Anmeldefrist fuer Pruefungstermine
@@ -1398,7 +1398,7 @@ if($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_lehrverans
 		CREATE INDEX idx_studienplan_lehrveranstaltung_parent_id ON lehre.tbl_studienplan_lehrveranstaltung USING btree (studienplan_lehrveranstaltung_id_parent);
 		CREATE INDEX idx_lehreinheit_lehrfach_idLV ON lehre.tbl_lehreinheit USING btree (lehrfach_id)
 		";
-	
+
 		if(!$db->db_query($qry))
 			echo '<strong>Indizes: '.$db->db_last_error().'</strong><br>';
 		else
@@ -1411,20 +1411,57 @@ if($result = @$db->db_query("SELECT view_definition FROM information_schema.view
 {
 	if ($row = $db->db_fetch_object($result))
 	{
-		if($row->view_definition!="SELECT le.lehreinheit_id, le.unr, le.lvnr, (SELECT tbl_fachbereich.fachbereich_kurzbz FROM tbl_fachbereich WHERE ((tbl_fachbereich.oe_kurzbz)::text = (lehrfach.oe_kurzbz)::text)) AS fachbereich_kurzbz, le.lehrfach_id, lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, ma.kurzbz AS lektor, tbl_studiengang.studiengang_kz, tbl_studiengang.kurzbz AS studiengang, lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, le.studiensemester_kurzbz, (SELECT count(DISTINCT ROW(tbl_stundenplan.datum, tbl_stundenplan.stunde, tbl_stundenplan.mitarbeiter_uid, tbl_stundenplan.studiengang_kz, tbl_stundenplan.semester, tbl_stundenplan.verband, tbl_stundenplan.gruppe, tbl_stundenplan.gruppe_kurzbz, tbl_stundenplan.lehreinheit_id, tbl_stundenplan.unr)) AS count FROM lehre.tbl_stundenplan WHERE ((((((((tbl_stundenplan.mitarbeiter_uid)::text = (lema.mitarbeiter_uid)::text) AND (tbl_stundenplan.studiengang_kz = lvb.studiengang_kz)) AND (tbl_stundenplan.semester = lvb.semester)) AND ((tbl_stundenplan.verband = lvb.verband) OR (((tbl_stundenplan.verband IS NULL) OR (tbl_stundenplan.verband = ''::bpchar)) AND (lvb.verband IS NULL)))) AND ((tbl_stundenplan.gruppe = lvb.gruppe) OR (((tbl_stundenplan.gruppe IS NULL) OR (tbl_stundenplan.gruppe = ''::bpchar)) AND (lvb.gruppe IS NULL)))) AND (((tbl_stundenplan.gruppe_kurzbz)::text = (lvb.gruppe_kurzbz)::text) OR ((tbl_stundenplan.gruppe_kurzbz IS NULL) AND (lvb.gruppe_kurzbz IS NULL)))) AND (tbl_stundenplan.lehreinheit_id = lvb.lehreinheit_id))) AS verplant FROM (((((lehre.tbl_lehreinheit le JOIN lehre.tbl_lehreinheitgruppe lvb USING (lehreinheit_id)) JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)) JOIN tbl_studiengang USING (studiengang_kz)) JOIN lehre.tbl_lehrveranstaltung lehrfach ON ((le.lehrfach_id = lehrfach.lehrveranstaltung_id))) JOIN tbl_mitarbeiter ma USING (mitarbeiter_uid));")
+		$view_definition=" SELECT le.lehreinheit_id,
+    le.unr,
+    le.lvnr,
+    ( SELECT tbl_fachbereich.fachbereich_kurzbz
+           FROM tbl_fachbereich
+          WHERE ((tbl_fachbereich.oe_kurzbz)::text = (lehrfach.oe_kurzbz)::text)) AS fachbereich_kurzbz,
+    le.lehrfach_id,
+    lehrfach.kurzbz AS lehrfach,
+    lehrfach.bezeichnung AS lehrfach_bez,
+    lehrfach.farbe AS lehrfach_farbe,
+    le.lehrform_kurzbz AS lehrform,
+    lema.mitarbeiter_uid AS lektor_uid,
+    ma.kurzbz AS lektor,
+    tbl_studiengang.studiengang_kz,
+    tbl_studiengang.kurzbz AS studiengang,
+    lvb.semester,
+    lvb.verband,
+    lvb.gruppe,
+    lvb.gruppe_kurzbz,
+    le.raumtyp,
+    le.raumtypalternativ,
+    le.stundenblockung,
+    le.wochenrythmus,
+    lema.semesterstunden,
+    lema.planstunden,
+    le.start_kw,
+    le.anmerkung,
+    le.studiensemester_kurzbz,
+    ( SELECT count(DISTINCT ROW(tbl_stundenplan.datum, tbl_stundenplan.stunde, tbl_stundenplan.mitarbeiter_uid, tbl_stundenplan.studiengang_kz, tbl_stundenplan.semester, tbl_stundenplan.verband, tbl_stundenplan.gruppe, tbl_stundenplan.gruppe_kurzbz, tbl_stundenplan.lehreinheit_id, tbl_stundenplan.unr)) AS count
+           FROM lehre.tbl_stundenplan
+          WHERE ((((((((tbl_stundenplan.mitarbeiter_uid)::text = (lema.mitarbeiter_uid)::text) AND (tbl_stundenplan.studiengang_kz = lvb.studiengang_kz)) AND (tbl_stundenplan.semester = lvb.semester)) AND ((tbl_stundenplan.verband = lvb.verband) OR (((tbl_stundenplan.verband IS NULL) OR (tbl_stundenplan.verband = ''::bpchar)) AND (lvb.verband IS NULL)))) AND ((tbl_stundenplan.gruppe = lvb.gruppe) OR (((tbl_stundenplan.gruppe IS NULL) OR (tbl_stundenplan.gruppe = ''::bpchar)) AND (lvb.gruppe IS NULL)))) AND (((tbl_stundenplan.gruppe_kurzbz)::text = (lvb.gruppe_kurzbz)::text) OR ((tbl_stundenplan.gruppe_kurzbz IS NULL) AND (lvb.gruppe_kurzbz IS NULL)))) AND (tbl_stundenplan.lehreinheit_id = lvb.lehreinheit_id))) AS verplant
+   FROM (((((lehre.tbl_lehreinheit le
+     JOIN lehre.tbl_lehreinheitgruppe lvb USING (lehreinheit_id))
+     JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id))
+     JOIN tbl_studiengang USING (studiengang_kz))
+     JOIN lehre.tbl_lehrveranstaltung lehrfach ON ((le.lehrfach_id = lehrfach.lehrveranstaltung_id)))
+     JOIN tbl_mitarbeiter ma USING (mitarbeiter_uid));";
+		if($row->view_definition!=$view_definition)
 		{
 			$qry = "
 			DROP VIEW lehre.vw_lva_stundenplan;
 			CREATE OR REPLACE VIEW lehre.vw_lva_stundenplan AS
-			SELECT 
-				le.lehreinheit_id, le.unr, le.lvnr, 
-				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz, 
-				le.lehrfach_id AS lehrfach_id, lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, 
-				lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, 
-				ma.kurzbz AS lektor, tbl_studiengang.studiengang_kz, tbl_studiengang.kurzbz AS studiengang, 
-				lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, 
-				le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, 
-				le.studiensemester_kurzbz, 
+			SELECT
+				le.lehreinheit_id, le.unr, le.lvnr,
+				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz,
+				le.lehrfach_id AS lehrfach_id, lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez,
+				lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid,
+				ma.kurzbz AS lektor, tbl_studiengang.studiengang_kz, tbl_studiengang.kurzbz AS studiengang,
+				lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ,
+				le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung,
+				le.studiensemester_kurzbz,
 				( SELECT count (distinct (datum,stunde,mitarbeiter_uid,studiengang_kz,semester,verband,gruppe,gruppe_kurzbz,lehreinheit_id,unr)) AS count
 				       FROM lehre.tbl_stundenplan
 				      WHERE tbl_stundenplan.mitarbeiter_uid::text = lema.mitarbeiter_uid::text AND tbl_stundenplan.studiengang_kz = lvb.studiengang_kz AND tbl_stundenplan.semester = lvb.semester AND (tbl_stundenplan.verband = lvb.verband OR (tbl_stundenplan.verband IS NULL OR tbl_stundenplan.verband = ''::bpchar) AND lvb.verband IS NULL) AND (tbl_stundenplan.gruppe = lvb.gruppe OR (tbl_stundenplan.gruppe IS NULL OR tbl_stundenplan.gruppe = ''::bpchar) AND lvb.gruppe IS NULL) AND (tbl_stundenplan.gruppe_kurzbz::text = lvb.gruppe_kurzbz::text OR tbl_stundenplan.gruppe_kurzbz IS NULL AND lvb.gruppe_kurzbz IS NULL) AND tbl_stundenplan.lehreinheit_id = lvb.lehreinheit_id) AS verplant
@@ -1452,20 +1489,58 @@ if($result = @$db->db_query("SELECT view_definition FROM information_schema.view
 {
 	if ($row = $db->db_fetch_object($result))
 	{
-		if($row->view_definition!="SELECT le.lehreinheit_id, le.unr, le.lvnr, (SELECT tbl_fachbereich.fachbereich_kurzbz FROM tbl_fachbereich WHERE ((tbl_fachbereich.oe_kurzbz)::text = (lehrfach.oe_kurzbz)::text)) AS fachbereich_kurzbz, le.lehrfach_id, lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, tbl_mitarbeiter.kurzbz AS lektor, tbl_studiengang.studiengang_kz, upper((((tbl_studiengang.typ)::character varying)::text || (tbl_studiengang.kurzbz)::text)) AS studiengang, lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, le.studiensemester_kurzbz, (SELECT count(DISTINCT ROW(tbl_stundenplandev.datum, tbl_stundenplandev.stunde, tbl_stundenplandev.mitarbeiter_uid, tbl_stundenplandev.studiengang_kz, tbl_stundenplandev.semester, tbl_stundenplandev.verband, tbl_stundenplandev.gruppe, tbl_stundenplandev.gruppe_kurzbz, tbl_stundenplandev.lehreinheit_id, tbl_stundenplandev.unr)) AS count FROM lehre.tbl_stundenplandev WHERE ((((((((tbl_stundenplandev.mitarbeiter_uid)::text = (lema.mitarbeiter_uid)::text) AND (tbl_stundenplandev.studiengang_kz = lvb.studiengang_kz)) AND (tbl_stundenplandev.semester = lvb.semester)) AND ((tbl_stundenplandev.verband = lvb.verband) OR (((tbl_stundenplandev.verband IS NULL) OR (tbl_stundenplandev.verband = ''::bpchar)) AND (lvb.verband IS NULL)))) AND ((tbl_stundenplandev.gruppe = lvb.gruppe) OR (((tbl_stundenplandev.gruppe IS NULL) OR (tbl_stundenplandev.gruppe = ''::bpchar)) AND (lvb.gruppe IS NULL)))) AND (((tbl_stundenplandev.gruppe_kurzbz)::text = (lvb.gruppe_kurzbz)::text) OR ((tbl_stundenplandev.gruppe_kurzbz IS NULL) AND (lvb.gruppe_kurzbz IS NULL)))) AND (tbl_stundenplandev.lehreinheit_id = lvb.lehreinheit_id))) AS verplant FROM (((((lehre.tbl_lehreinheit le JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)) JOIN lehre.tbl_lehreinheitgruppe lvb USING (lehreinheit_id)) JOIN tbl_studiengang ON ((lvb.studiengang_kz = tbl_studiengang.studiengang_kz))) JOIN lehre.tbl_lehrveranstaltung lehrfach ON ((le.lehrfach_id = lehrfach.lehrveranstaltung_id))) JOIN tbl_mitarbeiter USING (mitarbeiter_uid));")
+		$view_definition=" SELECT le.lehreinheit_id,
+    le.unr,
+    le.lvnr,
+    ( SELECT tbl_fachbereich.fachbereich_kurzbz
+           FROM tbl_fachbereich
+          WHERE ((tbl_fachbereich.oe_kurzbz)::text = (lehrfach.oe_kurzbz)::text)) AS fachbereich_kurzbz,
+    le.lehrfach_id,
+    lehrfach.kurzbz AS lehrfach,
+    lehrfach.bezeichnung AS lehrfach_bez,
+    lehrfach.farbe AS lehrfach_farbe,
+    le.lehrform_kurzbz AS lehrform,
+    lema.mitarbeiter_uid AS lektor_uid,
+    tbl_mitarbeiter.kurzbz AS lektor,
+    tbl_studiengang.studiengang_kz,
+    upper((((tbl_studiengang.typ)::character varying)::text || (tbl_studiengang.kurzbz)::text)) AS studiengang,
+    lvb.semester,
+    lvb.verband,
+    lvb.gruppe,
+    lvb.gruppe_kurzbz,
+    le.raumtyp,
+    le.raumtypalternativ,
+    le.stundenblockung,
+    le.wochenrythmus,
+    lema.semesterstunden,
+    lema.planstunden,
+    le.start_kw,
+    le.anmerkung,
+    le.studiensemester_kurzbz,
+    ( SELECT count(DISTINCT ROW(tbl_stundenplandev.datum, tbl_stundenplandev.stunde, tbl_stundenplandev.mitarbeiter_uid, tbl_stundenplandev.studiengang_kz, tbl_stundenplandev.semester, tbl_stundenplandev.verband, tbl_stundenplandev.gruppe, tbl_stundenplandev.gruppe_kurzbz, tbl_stundenplandev.lehreinheit_id, tbl_stundenplandev.unr)) AS count
+           FROM lehre.tbl_stundenplandev
+          WHERE ((((((((tbl_stundenplandev.mitarbeiter_uid)::text = (lema.mitarbeiter_uid)::text) AND (tbl_stundenplandev.studiengang_kz = lvb.studiengang_kz)) AND (tbl_stundenplandev.semester = lvb.semester)) AND ((tbl_stundenplandev.verband = lvb.verband) OR (((tbl_stundenplandev.verband IS NULL) OR (tbl_stundenplandev.verband = ''::bpchar)) AND (lvb.verband IS NULL)))) AND ((tbl_stundenplandev.gruppe = lvb.gruppe) OR (((tbl_stundenplandev.gruppe IS NULL) OR (tbl_stundenplandev.gruppe = ''::bpchar)) AND (lvb.gruppe IS NULL)))) AND (((tbl_stundenplandev.gruppe_kurzbz)::text = (lvb.gruppe_kurzbz)::text) OR ((tbl_stundenplandev.gruppe_kurzbz IS NULL) AND (lvb.gruppe_kurzbz IS NULL)))) AND (tbl_stundenplandev.lehreinheit_id = lvb.lehreinheit_id))) AS verplant
+   FROM (((((lehre.tbl_lehreinheit le
+     JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id))
+     JOIN lehre.tbl_lehreinheitgruppe lvb USING (lehreinheit_id))
+     JOIN tbl_studiengang ON ((lvb.studiengang_kz = tbl_studiengang.studiengang_kz)))
+     JOIN lehre.tbl_lehrveranstaltung lehrfach ON ((le.lehrfach_id = lehrfach.lehrveranstaltung_id)))
+     JOIN tbl_mitarbeiter USING (mitarbeiter_uid));";
+
+		if($row->view_definition!=$view_definition)
 		{
 			$qry = "
 			DROP VIEW lehre.vw_lva_stundenplandev;
 			CREATE OR REPLACE VIEW lehre.vw_lva_stundenplandev AS
-			SELECT 
-				le.lehreinheit_id, le.unr, le.lvnr, 
-				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz, 
-				le.lehrfach_id AS lehrfach_id, lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, 
-				lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, 
-				tbl_mitarbeiter.kurzbz AS lektor, tbl_studiengang.studiengang_kz, upper(tbl_studiengang.typ::character varying::text || tbl_studiengang.kurzbz::text) AS studiengang, 
-				lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, 
-				le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, 
-				le.anmerkung, le.studiensemester_kurzbz, 
+			SELECT
+				le.lehreinheit_id, le.unr, le.lvnr,
+				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz,
+				le.lehrfach_id AS lehrfach_id, lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez,
+				lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid,
+				tbl_mitarbeiter.kurzbz AS lektor, tbl_studiengang.studiengang_kz, upper(tbl_studiengang.typ::character varying::text || tbl_studiengang.kurzbz::text) AS studiengang,
+				lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ,
+				le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw,
+				le.anmerkung, le.studiensemester_kurzbz,
 				( SELECT count (distinct (datum,stunde,mitarbeiter_uid,studiengang_kz,semester,verband,gruppe,gruppe_kurzbz,lehreinheit_id,unr)) AS count
 				       FROM lehre.tbl_stundenplandev
 				      WHERE tbl_stundenplandev.mitarbeiter_uid::text = lema.mitarbeiter_uid::text AND tbl_stundenplandev.studiengang_kz = lvb.studiengang_kz AND tbl_stundenplandev.semester = lvb.semester AND (tbl_stundenplandev.verband = lvb.verband OR (tbl_stundenplandev.verband IS NULL OR tbl_stundenplandev.verband = ''::bpchar) AND lvb.verband IS NULL) AND (tbl_stundenplandev.gruppe = lvb.gruppe OR (tbl_stundenplandev.gruppe IS NULL OR tbl_stundenplandev.gruppe = ''::bpchar) AND lvb.gruppe IS NULL) AND (tbl_stundenplandev.gruppe_kurzbz::text = lvb.gruppe_kurzbz::text OR tbl_stundenplandev.gruppe_kurzbz IS NULL AND lvb.gruppe_kurzbz IS NULL) AND tbl_stundenplandev.lehreinheit_id = lvb.lehreinheit_id) AS verplant
@@ -1479,7 +1554,7 @@ if($result = @$db->db_query("SELECT view_definition FROM information_schema.view
 			GRANT SELECT ON lehre.vw_lva_stundenplandev TO vilesci;
 			GRANT SELECT ON lehre.vw_lva_stundenplandev TO web;
 			";
-	
+
 			if(!$db->db_query($qry))
 				echo '<strong>vw_lva_stundenplandev: '.$db->db_last_error().'</strong><br>';
 			else
@@ -1495,12 +1570,12 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	{
 
 		$qry = "GRANT UPDATE ON public.tbl_benutzer TO web;";
-	
+
 		if(!$db->db_query($qry))
 			echo '<br><strong>public.tbl_benutzer: '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>public.tbl_benutzer: Update rechte fuer User web erteilt';
-	}		
+	}
 }
 
 // pruefungsanmeldung_id in lehre.tbl_pruefung
@@ -1557,7 +1632,7 @@ if($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_reservieru
 		$qry = "CREATE INDEX idx_reservierung_datum ON campus.tbl_reservierung USING btree (datum);
 				CREATE INDEX idx_reservierung_ort ON campus.tbl_reservierung USING btree (ort_kurzbz);
 				CREATE INDEX idx_reservierung_stunde ON campus.tbl_reservierung USING btree (stunde);";
-	
+
 		if(!$db->db_query($qry))
 			echo '<br><strong>Indizes: '.$db->db_last_error().'</strong><br>';
 		else
@@ -1569,16 +1644,16 @@ if($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_reservieru
 if(!$result = @$db->db_query("SELECT aktivierungscode FROM campus.vw_student"))
 {
 	$qry = "CREATE OR REPLACE VIEW campus.vw_student AS
-		SELECT 
-			tbl_benutzer.uid, tbl_student.matrikelnr, tbl_student.prestudent_id, tbl_student.studiengang_kz, tbl_student.semester, 
-			tbl_student.verband, tbl_student.gruppe, tbl_benutzer.person_id, tbl_benutzer.alias, tbl_person.geburtsnation, tbl_person.sprache, 
-			tbl_person.anrede, tbl_person.titelpost, tbl_person.titelpre, tbl_person.nachname, tbl_person.vorname, tbl_person.vornamen, tbl_person.gebdatum, 
-			tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_person.anmerkung, tbl_person.homepage, tbl_person.svnr, tbl_person.ersatzkennzeichen, 
-			tbl_person.geschlecht, tbl_person.familienstand, tbl_person.anzahlkinder, tbl_benutzer.aktiv, tbl_student.updateamum, tbl_student.updatevon, 
+		SELECT
+			tbl_benutzer.uid, tbl_student.matrikelnr, tbl_student.prestudent_id, tbl_student.studiengang_kz, tbl_student.semester,
+			tbl_student.verband, tbl_student.gruppe, tbl_benutzer.person_id, tbl_benutzer.alias, tbl_person.geburtsnation, tbl_person.sprache,
+			tbl_person.anrede, tbl_person.titelpost, tbl_person.titelpre, tbl_person.nachname, tbl_person.vorname, tbl_person.vornamen, tbl_person.gebdatum,
+			tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_person.anmerkung, tbl_person.homepage, tbl_person.svnr, tbl_person.ersatzkennzeichen,
+			tbl_person.geschlecht, tbl_person.familienstand, tbl_person.anzahlkinder, tbl_benutzer.aktiv, tbl_student.updateamum, tbl_student.updatevon,
 			tbl_student.insertamum, tbl_student.insertvon, tbl_student.ext_id, tbl_benutzer.updateaktivam, tbl_benutzer.updateaktivvon,
-			tbl_benutzer.aktivierungscode, 
+			tbl_benutzer.aktivierungscode,
 			(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=tbl_person.person_id AND kontakttyp='email' ORDER BY zustellung desc Limit 1) as email_privat
-		FROM 
+		FROM
 			public.tbl_student
 			JOIN public.tbl_benutzer ON tbl_student.student_uid::text = tbl_benutzer.uid::text
 			JOIN public.tbl_person USING (person_id);";
@@ -1593,15 +1668,15 @@ if(!$result = @$db->db_query("SELECT aktivierungscode FROM campus.vw_student"))
 if(!$result = @$db->db_query("SELECT aktivierungscode FROM campus.vw_mitarbeiter"))
 {
 	$qry = "CREATE OR REPLACE VIEW campus.vw_mitarbeiter AS
-	SELECT tbl_benutzer.uid, tbl_mitarbeiter.ausbildungcode, tbl_mitarbeiter.personalnummer, tbl_mitarbeiter.kurzbz, tbl_mitarbeiter.lektor, 
-			tbl_mitarbeiter.fixangestellt, tbl_mitarbeiter.telefonklappe, tbl_benutzer.person_id, tbl_benutzer.alias, tbl_person.geburtsnation, 
+	SELECT tbl_benutzer.uid, tbl_mitarbeiter.ausbildungcode, tbl_mitarbeiter.personalnummer, tbl_mitarbeiter.kurzbz, tbl_mitarbeiter.lektor,
+			tbl_mitarbeiter.fixangestellt, tbl_mitarbeiter.telefonklappe, tbl_benutzer.person_id, tbl_benutzer.alias, tbl_person.geburtsnation,
 			tbl_person.sprache, tbl_person.anrede, tbl_person.titelpost, tbl_person.titelpre, tbl_person.nachname, tbl_person.vorname, tbl_person.vornamen,
-			tbl_person.gebdatum, tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_mitarbeiter.anmerkung, tbl_person.homepage, tbl_person.svnr, 
-			tbl_person.ersatzkennzeichen, tbl_person.geschlecht, tbl_person.familienstand, tbl_person.anzahlkinder, tbl_mitarbeiter.ort_kurzbz, tbl_benutzer.aktiv, 
-			tbl_mitarbeiter.bismelden, tbl_mitarbeiter.standort_id, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon, tbl_mitarbeiter.insertamum, 
+			tbl_person.gebdatum, tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_mitarbeiter.anmerkung, tbl_person.homepage, tbl_person.svnr,
+			tbl_person.ersatzkennzeichen, tbl_person.geschlecht, tbl_person.familienstand, tbl_person.anzahlkinder, tbl_mitarbeiter.ort_kurzbz, tbl_benutzer.aktiv,
+			tbl_mitarbeiter.bismelden, tbl_mitarbeiter.standort_id, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon, tbl_mitarbeiter.insertamum,
 			tbl_mitarbeiter.insertvon, tbl_mitarbeiter.ext_id, tbl_benutzer.aktivierungscode,
 			(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=tbl_person.person_id AND kontakttyp='email' ORDER BY zustellung desc Limit 1) as email_privat
-			
+
 	FROM public.tbl_mitarbeiter
 	JOIN public.tbl_benutzer ON tbl_mitarbeiter.mitarbeiter_uid::text = tbl_benutzer.uid::text
 	JOIN public.tbl_person USING (person_id);";
@@ -1628,8 +1703,8 @@ if($result = @$db->db_query("SELECT * FROM information_schema.table_constraints 
 	if($db->db_num_rows($result)==0)
 	{
 		$qry = 'ALTER TABLE campus.tbl_pruefungsanmeldung ADD CONSTRAINT fk_pruefungsanmeldung_pruefungstermin_id FOREIGN KEY (pruefungstermin_id) REFERENCES campus.tbl_pruefungstermin(pruefungstermin_id) ON DELETE RESTRICT ON UPDATE CASCADE;';
-		
-	
+
+
 		if(!$db->db_query($qry))
 			echo '<strong>campus.tbl_pruefungsanmeldung: '.$db->db_last_error().'</strong><br>';
 		else
@@ -1657,18 +1732,18 @@ if(!$result = @$db->db_query("SELECT aufwandstyp_kurzbz FROM fue.tbl_projekt LIM
 		aufwandstyp_kurzbz varchar(32) NOT NULL,
 		bezeichnung varchar(255)
 	);
-	
+
 	ALTER TABLE fue.tbl_aufwandstyp ADD CONSTRAINT pk_aufwandstyp PRIMARY KEY (aufwandstyp_kurzbz);
 	INSERT INTO fue.tbl_aufwandstyp(aufwandstyp_kurzbz, bezeichnung) VALUES('schaetzpunkte','Schätzpunkte');
 	INSERT INTO fue.tbl_aufwandstyp(aufwandstyp_kurzbz, bezeichnung) VALUES('stunden','Stunden');
 	INSERT INTO fue.tbl_aufwandstyp(aufwandstyp_kurzbz, bezeichnung) VALUES('personentage','Personentage');
-	
+
 	ALTER TABLE fue.tbl_projekt ADD COLUMN aufwandstyp_kurzbz varchar(32);
 	ALTER TABLE fue.tbl_projekt ADD CONSTRAINT fk_projekt_aufwandstyp FOREIGN KEY (aufwandstyp_kurzbz) REFERENCES fue.tbl_aufwandstyp(aufwandstyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 	UPDATE fue.tbl_projekt SET aufwandstyp_kurzbz='schaetzpunkte' WHERE aufwandstyp_kurzbz is null;
-	
+
 	ALTER TABLE fue.tbl_projekt_ressource ADD COLUMN aufwand smallint;
-	
+
 	GRANT SELECT on fue.tbl_aufwandstyp TO vilesci;
 	";
 
@@ -1692,7 +1767,7 @@ if(!$result = @$db->db_query("SELECT lvs FROM lehre.tbl_lehrveranstaltung LIMIT 
 		COMMENT ON COLUMN lehre.tbl_lehrveranstaltung.alvs IS 'Angebotene Lehrveranstaltungsstunden';
 		COMMENT ON COLUMN lehre.tbl_lehrveranstaltung.lvps IS 'Lehrveranstaltungsplanstunden Summe';
 		COMMENT ON COLUMN lehre.tbl_lehrveranstaltung.las IS 'Lehrauftragsstunden Summe';
-		
+
 		UPDATE lehre.tbl_lehrveranstaltung SET las=semesterstunden;";
 
 	if(!$db->db_query($qry))
@@ -1739,9 +1814,9 @@ if(!$result = @$db->db_query("SELECT filter_id FROM public.tbl_filter LIMIT 1;")
 	NO MAXVALUE
 	NO MINVALUE
 	CACHE 1;
-		
+
 	ALTER TABLE public.tbl_filter ALTER COLUMN filter_id SET DEFAULT nextval('public.seq_filter_filter_id');
-	
+
 	GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_filter TO vilesci;
 	GRANT SELECT, UPDATE on public.seq_filter_filter_id TO vilesci;
 	";
@@ -1762,7 +1837,7 @@ if(!$result = @$db->db_query("SELECT vertrag_id FROM lehre.tbl_vertrag;"))
 	);
 
 	ALTER TABLE lehre.tbl_vertragstyp ADD CONSTRAINT pk_vertragstyp PRIMARY KEY (vertragstyp_kurzbz);
-	
+
 	CREATE TABLE lehre.tbl_vertragsstatus
 	(
 		vertragsstatus_kurzbz varchar(32) NOT NULL,
@@ -1770,7 +1845,7 @@ if(!$result = @$db->db_query("SELECT vertrag_id FROM lehre.tbl_vertrag;"))
 	);
 
 	ALTER TABLE lehre.tbl_vertragsstatus ADD CONSTRAINT pk_vertragstatus PRIMARY KEY (vertragsstatus_kurzbz);
-	
+
 	CREATE TABLE lehre.tbl_vertrag
 	(
 		vertrag_id bigint NOT NULL,
@@ -1784,20 +1859,20 @@ if(!$result = @$db->db_query("SELECT vertrag_id FROM lehre.tbl_vertrag;"))
 		updatevon varchar(32),
 		ext_id bigint
 	);
-	
+
 	ALTER TABLE lehre.tbl_vertrag ADD CONSTRAINT pk_vertrag PRIMARY KEY (vertrag_id);
-	
+
 	CREATE SEQUENCE lehre.seq_vertrag_vertrag_id
 		 INCREMENT BY 1
 		 NO MAXVALUE
 		 NO MINVALUE
 		 CACHE 1;
-		 
+
 	ALTER TABLE lehre.tbl_vertrag ALTER COLUMN vertrag_id SET DEFAULT nextval('lehre.seq_vertrag_vertrag_id');
 	ALTER TABLE lehre.tbl_vertrag ADD CONSTRAINT fk_person_vertrag FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 	ALTER TABLE lehre.tbl_vertrag ADD CONSTRAINT fk_vertragstyp_vertrag FOREIGN KEY (vertragstyp_kurzbz) REFERENCES lehre.tbl_vertragstyp(vertragstyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-	
-	
+
+
 	CREATE TABLE lehre.tbl_vertrag_vertragsstatus
 	(
 		vertragsstatus_kurzbz varchar(32) NOT NULL,
@@ -1806,29 +1881,29 @@ if(!$result = @$db->db_query("SELECT vertrag_id FROM lehre.tbl_vertrag;"))
 		datum timestamp NOT NULL,
 		ext_id bigint
 	);
-	
+
 	ALTER TABLE lehre.tbl_vertrag_vertragsstatus ADD CONSTRAINT pk_vertrag_vertragstatus PRIMARY KEY (vertragsstatus_kurzbz, vertrag_id);
 	ALTER TABLE lehre.tbl_vertrag_vertragsstatus ADD CONSTRAINT fk_vertrag_vertrag_vertragsstatus FOREIGN KEY (vertrag_id) REFERENCES lehre.tbl_vertrag(vertrag_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 	ALTER TABLE lehre.tbl_vertrag_vertragsstatus ADD CONSTRAINT fk_benutzer_vertrag_vertragsstatus FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON DELETE RESTRICT ON UPDATE CASCADE;
-	
-	
+
+
 	GRANT SELECT, UPDATE, INSERT, DELETE on lehre.tbl_vertrag TO vilesci;
 	GRANT SELECT, UPDATE, INSERT, DELETE on lehre.tbl_vertragstyp TO vilesci;
 	GRANT SELECT, UPDATE, INSERT, DELETE on lehre.tbl_vertragsstatus TO vilesci;
 	GRANT SELECT, UPDATE, INSERT, DELETE on lehre.tbl_vertrag_vertragsstatus TO vilesci;
 	GRANT SELECT, UPDATE ON lehre.seq_vertrag_vertrag_id TO vilesci;
-	
+
 	GRANT SELECT on lehre.tbl_vertrag TO web;
 	GRANT SELECT on lehre.tbl_vertragstyp TO web;
 	GRANT SELECT on lehre.tbl_vertragsstatus TO web;
 	GRANT SELECT, UPDATE, INSERT, DELETE on lehre.tbl_vertrag_vertragsstatus TO web;
-	
+
 	ALTER TABLE lehre.tbl_lehreinheitmitarbeiter ADD COLUMN vertrag_id bigint;
-	ALTER TABLE lehre.tbl_lehreinheitmitarbeiter ADD CONSTRAINT fk_vertrag_lehreinheitmitarbeiter FOREIGN KEY (vertrag_id) REFERENCES lehre.tbl_vertrag(vertrag_id) ON DELETE RESTRICT ON UPDATE CASCADE;	
+	ALTER TABLE lehre.tbl_lehreinheitmitarbeiter ADD CONSTRAINT fk_vertrag_lehreinheitmitarbeiter FOREIGN KEY (vertrag_id) REFERENCES lehre.tbl_vertrag(vertrag_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 	ALTER TABLE lehre.tbl_projektbetreuer ADD COLUMN vertrag_id bigint;
-	ALTER TABLE lehre.tbl_projektbetreuer ADD CONSTRAINT fk_vertrag_projektbetreuer FOREIGN KEY (vertrag_id) REFERENCES lehre.tbl_vertrag(vertrag_id) ON DELETE RESTRICT ON UPDATE CASCADE;	
-	
+	ALTER TABLE lehre.tbl_projektbetreuer ADD CONSTRAINT fk_vertrag_projektbetreuer FOREIGN KEY (vertrag_id) REFERENCES lehre.tbl_vertrag(vertrag_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
 	";
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_vertrag: '.$db->db_last_error().'</strong><br>';
@@ -1846,7 +1921,7 @@ if(!$result = @$db->db_query("SELECT buchung_id FROM wawi.tbl_buchung;"))
 	);
 
 	ALTER TABLE wawi.tbl_buchungstyp ADD CONSTRAINT pk_buchungstyp PRIMARY KEY (buchungstyp_kurzbz);
-	
+
 	CREATE TABLE wawi.tbl_buchung
 	(
 	buchung_id bigint NOT NULL,
@@ -1869,7 +1944,7 @@ if(!$result = @$db->db_query("SELECT buchung_id FROM wawi.tbl_buchung;"))
 	NO MAXVALUE
 	NO MINVALUE
 	CACHE 1;
-		
+
 	ALTER TABLE wawi.tbl_buchung ALTER COLUMN buchung_id SET DEFAULT nextval('wawi.seq_buchung_buchung_id');
 	ALTER TABLE wawi.tbl_buchung ADD CONSTRAINT fk_konto_buchung FOREIGN KEY (konto_id) REFERENCES wawi.tbl_konto(konto_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 	ALTER TABLE wawi.tbl_buchung ADD CONSTRAINT fk_kostenstelle_buchung FOREIGN KEY (kostenstelle_id) REFERENCES wawi.tbl_kostenstelle(kostenstelle_id) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -1879,7 +1954,7 @@ if(!$result = @$db->db_query("SELECT buchung_id FROM wawi.tbl_buchung;"))
 	GRANT SELECT, UPDATE, INSERT, DELETE on wawi.tbl_buchung TO vilesci;
 	GRANT SELECT, UPDATE ON wawi.seq_buchung_buchung_id TO vilesci;
 
-	
+
 	ALTER TABLE wawi.tbl_konto ADD COLUMN person_id bigint;
 	ALTER TABLE wawi.tbl_konto ADD CONSTRAINT fk_person_konto FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -1954,7 +2029,7 @@ if(!$result = @$db->db_query("SELECT publish FROM public.tbl_statistik LIMIT 1;"
 	$qry = 'ALTER TABLE public.tbl_statistik ADD COLUMN publish boolean DEFAULT false;';
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_statistik: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_statistik: Spalte publish hinzugefuegt!<br>';
 }
 
@@ -1968,7 +2043,7 @@ if(!$result = @$db->db_query("SELECT fgm FROM public.tbl_prestudentstatus LIMIT 
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_prestudentstatus: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_prestudentstatus: Spalte fgm und faktiv hinzugefuegt!<br>';
 }
 
@@ -1980,7 +2055,7 @@ if(!$result = @$db->db_query("SELECT type FROM public.tbl_filter LIMIT 1;"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_filter: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_filter: Spalte type und htmlattr hinzugefuegt!<br>';
 }
 
@@ -2031,7 +2106,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_aufnahmetermin LIMIT 1;")
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_aufnahmetermin: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_aufnahmetermin: Tabelle public.tbl_aufnahmetermin und public.tbl_aufnahmetermintyp hinzugefuegt!<br>';
 }
 
@@ -2042,7 +2117,7 @@ if(!$result = @$db->db_query("SELECT dv_art FROM bis.tbl_bisverwendung LIMIT 1;"
 
 	if(!$db->db_query($qry))
 		echo '<strong>bis.tbl_bisverwendung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' bis.tbl_bisverwendung: Spalte dv_art hinzugefuegt!<br>';
 }
 
@@ -2053,7 +2128,7 @@ if(!$result = @$db->db_query("SELECT mentor FROM public.tbl_prestudent LIMIT 1;"
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_prestudent: Spalte mentor hinzugefuegt!<br>';
 }
 
@@ -2064,7 +2139,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM lehre.tbl_stundenplandev LIMIT 
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_stundenplandev: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_stundenplandev: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2075,7 +2150,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_notiz LIMIT 1;"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_notiz: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_notiz: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2086,7 +2161,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_notizzuordnung LIMIT
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_notizzuordnung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_notizzuordnung: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2097,7 +2172,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM wawi.tbl_konto LIMIT 1;"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>wawi.tbl_konto: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' wawi.tbl_konto: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2109,7 +2184,7 @@ if(!$result = @$db->db_query("SELECT vertrag_id FROM lehre.tbl_pruefung LIMIT 1;
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_pruefung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_pruefung: Spalte vertrag_id hinzugefuegt!<br>';
 }
 
@@ -2120,7 +2195,7 @@ if(!$result = @$db->db_query("SELECT sort FROM lehre.tbl_studienplan_lehrveranst
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_studienplan_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_studienplan_lehrveranstaltung: Spalte sort hinzugefuegt!<br>';
 }
 
@@ -2130,7 +2205,7 @@ if(!$result = @$db->db_query("SELECT studienjahr_kurzbz FROM public.tbl_studiens
 	$qry = "ALTER TABLE public.tbl_studiensemester ADD COLUMN studienjahr_kurzbz varchar(16);";
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_studiensemester: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_studiensemester: Spalte studienjahr_kurzbz hinzugefuegt!<br>';
 }
 
@@ -2143,7 +2218,7 @@ if($result = $db->db_query("select * from information_schema.key_column_usage wh
 
 		if(!$db->db_query($qry))
 			echo '<strong>lehre.tbl_vertrag_vertragsstatus: '.$db->db_last_error().'</strong><br>';
-		else 
+		else
 			echo ' lehre.tbl_vertrag_vertragsstatus: fehlenden FK hinzugefuegt!<br>';
 	}
 }
@@ -2154,7 +2229,7 @@ if(!$result = @$db->db_query("SELECT sort FROM fue.tbl_aktivitaet LIMIT 1;"))
 	$qry = "ALTER TABLE fue.tbl_aktivitaet ADD COLUMN sort integer;";
 	if(!$db->db_query($qry))
 		echo '<strong>fue.tbl_aktivitaet: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' fue.tbl_aktivitaet: Spalte sort hinzugefuegt!<br>';
 }
 
@@ -2193,14 +2268,14 @@ if(!$result = @$db->db_query("SELECT 1 FROM testtool.tbl_ablauf_vorgaben LIMIT 1
 
 	GRANT SELECT, INSERT, UPDATE, DELETE ON testtool.tbl_ablauf_vorgaben TO vilesci;
 	GRANT SELECT, UPDATE ON testtool.tbl_ablauf_vorgaben_ablauf_vorgaben_id_seq TO vilesci;
-	
+
 	GRANT SELECT, INSERT, UPDATE, DELETE ON testtool.tbl_ablauf_vorgaben TO web;
 	GRANT SELECT, UPDATE ON testtool.tbl_ablauf_vorgaben_ablauf_vorgaben_id_seq TO web;
 	";
 
 	if(!$db->db_query($qry))
 		echo '<strong>testtool.tbl_ablauf_vorgaben: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'testtool.tbl_ablauf_vorgaben: Tabelle und Sequenz hinzugefuegt!<br>';
 }
 
@@ -2237,7 +2312,7 @@ if(!$result = @$db->db_query("SELECT anmerkung FROM lehre.tbl_vertrag LIMIT 1;")
 	$qry = "ALTER TABLE lehre.tbl_vertrag ADD COLUMN anmerkung text;";
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_vertrag: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_vertrag: Spalte anmerkung hinzugefuegt!<br>';
 }
 // Spalte vertragsdatum in lehre.tbl_vertrag
@@ -2246,7 +2321,7 @@ if(!$result = @$db->db_query("SELECT vertragsdatum FROM lehre.tbl_vertrag LIMIT 
 	$qry = "ALTER TABLE lehre.tbl_vertrag ADD COLUMN vertragsdatum date;";
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_vertrag: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_vertrag: Spalte vertragsdatum hinzugefuegt!<br>';
 }
 
@@ -2268,7 +2343,7 @@ if(!$result = @$db->db_query("SELECT anmerkung FROM lehre.tbl_pruefung LIMIT 1;"
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_pruefung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_pruefung: Spalte anmerkung hinzugefuegt!<br>';
 }
 
@@ -2404,17 +2479,17 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_notenschluessel LIMIT 1;")
 	GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_notenschluessel TO vilesci;
 	GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_notenschluesselzuordnung TO vilesci;
 	GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_notenschluesselaufteilung TO vilesci;
-	
+
 	GRANT SELECT ON lehre.tbl_notenschluessel TO web;
 	GRANT SELECT ON lehre.tbl_notenschluesselzuordnung TO web;
 	GRANT SELECT ON lehre.tbl_notenschluesselaufteilung TO web;
-	
+
 	GRANT SELECT, UPDATE ON lehre.seq_notenschluesselzuordnung_notenschluesselzuordnung_id TO vilesci;
 	GRANT SELECT, UPDATE ON lehre.seq_notenschluesselaufteilung_notenschluesselaufteilung_id TO vilesci;
 	";
 	if(!$db->db_query($qry))
 		echo '<strong>Noten: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' Tabellen fuer Notenspiegel hinzugefuegt!<br>';
 }
 
@@ -2477,21 +2552,21 @@ if(!$result = @$db->db_query("SELECT 1 FROM bis.tbl_archiv LIMIT 1;"))
 	NO MAXVALUE
 	NO MINVALUE
 	CACHE 1;
-	
+
 	ALTER TABLE bis.tbl_archiv ALTER COLUMN archiv_id SET DEFAULT nextval('bis.seq_archiv_archiv_id');
 	ALTER TABLE bis.tbl_archiv ADD CONSTRAINT fk_archiv_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 	ALTER TABLE bis.tbl_archiv ADD CONSTRAINT fk_archiv_studiengang_kz FOREIGN KEY (studiengang_kz) REFERENCES public.tbl_studiengang(studiengang_kz) ON DELETE RESTRICT ON UPDATE CASCADE;
 	ALTER TABLE bis.tbl_archiv ADD CONSTRAINT fk_benutzer_archiv FOREIGN KEY (insertvon) REFERENCES public.tbl_benutzer(uid) ON DELETE RESTRICT ON UPDATE CASCADE;
-	
+
 	GRANT SELECT, INSERT, UPDATE, DELETE ON bis.tbl_archiv TO vilesci;
 	GRANT SELECT, UPDATE ON bis.seq_archiv_archiv_id TO vilesci;
-	
+
 	GRANT SELECT, INSERT, UPDATE, DELETE ON bis.tbl_archiv TO web;
 	GRANT SELECT, UPDATE ON bis.seq_archiv_archiv_id TO web;
 	";
 	if(!$db->db_query($qry))
 		echo '<strong>BIS-Archiv: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' Tabellen fuer BIS-Archiv hinzugefuegt!<br>';
 }
 
@@ -2502,7 +2577,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM lehre.tbl_studienplan_lehrveran
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_studienplan_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_studienplan_lehrveranstaltung: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2513,7 +2588,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM lehre.tbl_studienordnung LIMIT 
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_studienordnung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_studienordnung: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2524,7 +2599,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM lehre.tbl_studienplan LIMIT 1;"
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_studienplan: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_studienplan: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2535,7 +2610,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM campus.tbl_lvgesamtnote LIMIT 1
 
 	if(!$db->db_query($qry))
 		echo '<strong>campus.tbl_lvgesamtnote: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' campus.tbl_lvgesamtnote: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2548,12 +2623,12 @@ if(!$result = @$db->db_query("SELECT oe_kurzbz FROM public.tbl_ort LIMIT 1;"))
 
 			COMMENT ON COLUMN public.tbl_ort.m2 IS 'Quadratmeter';
 			COMMENT ON COLUMN public.tbl_ort.m2 IS 'Gebaeudeteil';
-			ALTER TABLE public.tbl_ort ADD CONSTRAINT fk_ort_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;	
+			ALTER TABLE public.tbl_ort ADD CONSTRAINT fk_ort_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 			";
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_ort: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_ort: Spalte m2, gebteil, oe_kurzbz hinzugefuegt!<br>';
 }
 
@@ -2651,19 +2726,19 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung LIMIT 1;"))
 	NO MAXVALUE
 	NO MINVALUE
 	CACHE 1;
-	
+
 	ALTER TABLE lehre.tbl_anrechnung_begruendung ALTER COLUMN begruendung_id SET DEFAULT nextval('lehre.seq_anrechnung_begruendung_begruendung_id');
-	
+
     INSERT INTO lehre.tbl_anrechnung_begruendung(bezeichnung) VALUES('externes Zeugnis');
     INSERT INTO lehre.tbl_anrechnung_begruendung(bezeichnung) VALUES('kompatible Lehrveranstaltung');
     INSERT INTO lehre.tbl_anrechnung_begruendung(bezeichnung) VALUES('Prüfung');
-	
+
     GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_anrechnung_begruendung TO vilesci;
 	GRANT SELECT, UPDATE ON lehre.seq_anrechnung_begruendung_begruendung_id TO vilesci;
-	
+
 	GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_anrechnung_begruendung TO web;
 	GRANT SELECT, UPDATE ON lehre.seq_anrechnung_begruendung_begruendung_id TO web;
-    
+
     CREATE TABLE lehre.tbl_anrechnung
 	(
 		anrechnung_id integer NOT NULL,
@@ -2672,37 +2747,37 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung LIMIT 1;"))
         begruendung_id integer NOT NULL,
         lehrveranstaltung_id_kompatibel integer,
         genehmigt_von varchar(32) NOT NULL,
-        insertamum timestamp, 	
-        insertvon varchar(32), 	
+        insertamum timestamp,
+        insertvon varchar(32),
         updateamum timestamp,
         updatevon varchar(32)
 	);
-    
+
     ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT pk_anrechnung PRIMARY KEY (anrechnung_id);
-    
+
     CREATE SEQUENCE lehre.seq_anrechnung_anrechnung_id
 	INCREMENT BY 1
 	NO MAXVALUE
 	NO MINVALUE
 	CACHE 1;
-    
+
     ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN anrechnung_id SET DEFAULT nextval('lehre.seq_anrechnung_anrechnung_id');
     ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_anrechnung_begruendung FOREIGN KEY (begruendung_id) REFERENCES lehre.tbl_anrechnung_begruendung (begruendung_id) ON UPDATE CASCADE ON DELETE RESTRICT;
     ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_lehrveranstaltung FOREIGN KEY (lehrveranstaltung_id) REFERENCES lehre.tbl_lehrveranstaltung (lehrveranstaltung_id) ON UPDATE CASCADE ON DELETE RESTRICT;
     ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_lehrveranstaltung_kompatibel FOREIGN KEY (lehrveranstaltung_id_kompatibel) REFERENCES lehre.tbl_lehrveranstaltung (lehrveranstaltung_id) ON UPDATE CASCADE ON DELETE RESTRICT;
     ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_mitarbeiter FOREIGN KEY (genehmigt_von) REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) ON UPDATE CASCADE ON DELETE CASCADE;
     ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_prestudent FOREIGN KEY (prestudent_id) REFERENCES public.tbl_prestudent (prestudent_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-    
+
     GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_anrechnung TO vilesci;
 	GRANT SELECT, UPDATE ON lehre.seq_anrechnung_anrechnung_id TO vilesci;
-	
+
 	GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_anrechnung TO web;
 	GRANT SELECT, UPDATE ON lehre.seq_anrechnung_anrechnung_id TO web;
 	";
-    
+
 	if(!$db->db_query($qry))
 		echo '<strong>Anrechnungen: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' Tabellen fuer Anrechnungen hinzugefuegt!<br>';
 }
 
@@ -2738,7 +2813,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM wawi.tbl_buchung LIMIT 1;"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>wawi.tbl_buchung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' wawi.tbl_buchung: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2749,7 +2824,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_preoutgoing_firma LI
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_preoutgoing_firma: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_preoutgoing_firma: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2760,7 +2835,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_firma_mobilitaetspro
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_firma_mobilitaetsprogramm: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_firma_mobilitaetsprogramm: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2771,7 +2846,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM lehre.tbl_studienplatz LIMIT 1;
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_studienplatz: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_studienplatz: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2782,7 +2857,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM lehre.tbl_anrechnung LIMIT 1;")
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_anrechnung: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' lehre.tbl_anrechnung: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2793,7 +2868,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_preincoming LIMIT 1;
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_preincoming: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_preincoming: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2804,7 +2879,7 @@ if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_preoutgoing LIMIT 1;
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_preoutgoing: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_preoutgoing: Spalte ext_id hinzugefuegt!<br>';
 }
 
@@ -2818,12 +2893,12 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 				GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_notizzuordnung TO web;
 				GRANT SELECT, UPDATE ON public.seq_notiz_notiz_id TO web;
 				GRANT SELECT, UPDATE ON public.seq_notizzuordnung_notizzuordnung_id TO web;";
-	
+
 		if(!$db->db_query($qry))
 			echo '<strong>public.tbl_notiz: '.$db->db_last_error().'</strong><br>';
 		else
 			echo 'public.tbl_notiz / public.tbl_notizzuordnung: Schreibrechte fuer User web erteilt';
-	}		
+	}
 }
 
 // Dokumentenupload für Notizen
@@ -2836,19 +2911,19 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_notiz_dokument LIMIT 1;")
 		notiz_id integer NOT NULL,
         dms_id integer NOT NULL
 	);
-    
+
     ALTER TABLE public.tbl_notiz_dokument ADD CONSTRAINT pk_notiz_dokument PRIMARY KEY (notiz_id, dms_id);
 
 	ALTER TABLE public.tbl_notiz_dokument ADD CONSTRAINT fk_notiz_dokument_notiz FOREIGN KEY (notiz_id) REFERENCES public.tbl_notiz (notiz_id) ON UPDATE CASCADE ON DELETE CASCADE;
     ALTER TABLE public.tbl_notiz_dokument ADD CONSTRAINT fk_notiz_dokument_dms FOREIGN KEY (dms_id) REFERENCES campus.tbl_dms (dms_id) ON UPDATE CASCADE ON DELETE CASCADE;
-	
+
     GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_notiz_dokument TO vilesci;
 	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_notiz_dokument TO web;
 	";
-    
+
 	if(!$db->db_query($qry))
 		echo '<strong>Dokumentenupload fuer Notizen: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' Tabellen fuer Dokumentenupload fuer Notizen hinzugefuegt!<br>';
 }
 
@@ -2864,8 +2939,8 @@ if($result = @$db->db_query("SELECT * FROM information_schema.table_constraints 
 			UPDATE public.tbl_prestudent SET zgvnation=ausstellungsstaat WHERE zgvnation is null AND ausstellungsstaat is not null;
 			UPDATE public.tbl_prestudent SET zgvmanation=ausstellungsstaat WHERE zgvmanation is null AND ausstellungsstaat is not null AND zgvmas_code is not null;
 		';
-		
-	
+
+
 		if(!$db->db_query($qry))
 			echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
 		else
@@ -2883,8 +2958,8 @@ if(!$result = @$db->db_query("SELECT bezeichnung_kurz FROM lehre.tbl_lehrform"))
 	UPDATE lehre.tbl_lehrform SET bezeichnung_lang[1]=bezeichnung;
 	UPDATE lehre.tbl_lehrform SET bezeichnung_lang[2]=bezeichnung;
 	';
-		
-	
+
+
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_lehrform: '.$db->db_last_error().'</strong><br>';
 	else
@@ -2914,25 +2989,25 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 if(!$result = @$db->db_query("SELECT * FROM lehre.vw_studienplan LIMIT 1"))
 {
 	$qry = "CREATE VIEW lehre.vw_studienplan AS
-		SELECT 
-			organisationseinheittyp_kurzbz, oe_kurzbz, studiengang_kz, studienordnung_id, studienplan_id, 
-            tbl_studienplan.orgform_kurzbz, tbl_studienplan.version, tbl_studienplan.bezeichnung, regelstudiendauer, 
-            tbl_studienplan.sprache, tbl_studienplan.aktiv, semesterwochen, tbl_studienplan.testtool_sprachwahl, 
+		SELECT
+			organisationseinheittyp_kurzbz, oe_kurzbz, studiengang_kz, studienordnung_id, studienplan_id,
+            tbl_studienplan.orgform_kurzbz, tbl_studienplan.version, tbl_studienplan.bezeichnung, regelstudiendauer,
+            tbl_studienplan.sprache, tbl_studienplan.aktiv, semesterwochen, tbl_studienplan.testtool_sprachwahl,
             tbl_studienplan.insertamum, tbl_studienplan.insertvon, tbl_studienplan.updateamum, tbl_studienplan.updatevon,
-            gueltigvon, gueltigbis,  ects, studiengangbezeichnung, studiengangbezeichnung_englisch, studiengangkurzbzlang, 
-            akadgrad_id, kurzbz, kurzbzlang, typ, english, farbe, email, telefon, max_semester, max_verband, max_gruppe, 
-            erhalter_kz, bescheid, bescheidbgbl1, bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, zusatzinfo_html, 
-            moodle, studienplaetze, lgartcode, mischform, projektarbeit_note_anzeige, onlinebewerbung, oe_parent_kurzbz,  
-            mailverteiler, freigabegrenze, kurzzeichen, lehre,  beschreibung, studienordnung_semester_id, studiensemester_kurzbz, 
+            gueltigvon, gueltigbis,  ects, studiengangbezeichnung, studiengangbezeichnung_englisch, studiengangkurzbzlang,
+            akadgrad_id, kurzbz, kurzbzlang, typ, english, farbe, email, telefon, max_semester, max_verband, max_gruppe,
+            erhalter_kz, bescheid, bescheidbgbl1, bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, zusatzinfo_html,
+            moodle, studienplaetze, lgartcode, mischform, projektarbeit_note_anzeige, onlinebewerbung, oe_parent_kurzbz,
+            mailverteiler, freigabegrenze, kurzzeichen, lehre,  beschreibung, studienordnung_semester_id, studiensemester_kurzbz,
             semester
-		FROM 
-			lehre.tbl_studienplan 
-            JOIN lehre.tbl_studienordnung USING (studienordnung_id) 
-            JOIN tbl_studiengang USING (studiengang_kz) 
-            JOIN tbl_organisationseinheit USING (oe_kurzbz) 
+		FROM
+			lehre.tbl_studienplan
+            JOIN lehre.tbl_studienordnung USING (studienordnung_id)
+            JOIN tbl_studiengang USING (studiengang_kz)
+            JOIN tbl_organisationseinheit USING (oe_kurzbz)
             JOIN tbl_organisationseinheittyp USING (organisationseinheittyp_kurzbz)
             JOIN lehre.tbl_studienordnung_semester USING (studienordnung_id);
-            
+
         GRANT SELECT ON lehre.vw_studienplan TO admin;
 		GRANT SELECT ON lehre.vw_studienplan TO vilesci;
 		GRANT SELECT ON lehre.vw_studienplan TO web;";
@@ -2950,7 +3025,7 @@ if(!$result = @$db->db_query("SELECT beschreibung FROM public.tbl_studiensemeste
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_studiensemester: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' public.tbl_studiensemester: Spalte beschreibung hinzugefuegt!<br>';
 }
 
@@ -2961,8 +3036,8 @@ if(!$result = @$db->db_query("SELECT typ FROM fue.tbl_projektphase"))
 		UPDATE fue.tbl_projektphase SET typ='Projektphase';
 		ALTER TABLE fue.tbl_projektphase ALTER COLUMN typ SET NOT NULL;
 	";
-		
-	
+
+
 	if(!$db->db_query($qry))
 		echo '<strong>fue.tbl_projektphase: '.$db->db_last_error().'</strong><br>';
 	else
@@ -2978,12 +3053,12 @@ if(!$result = @$db->db_query("SELECT ressource_id FROM fue.tbl_projektphase"))
 				  REFERENCES fue.tbl_ressource (ressource_id) MATCH SIMPLE
 				  ON UPDATE CASCADE ON DELETE RESTRICT;
 	";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>fue.tbl_projektphase: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>fue.tbl_projektphase: neue Spalte ressource_id fuer Verantwortlichkeit hinzugefuegt';
-}			  
+}
 // Attribut typ bei Projekt fuer Verantwortliche Ressource
 if(!$result = @$db->db_query("SELECT ressource_id FROM fue.tbl_projekt"))
 {
@@ -2993,12 +3068,12 @@ if(!$result = @$db->db_query("SELECT ressource_id FROM fue.tbl_projekt"))
 				  REFERENCES fue.tbl_ressource (ressource_id) MATCH SIMPLE
 				  ON UPDATE CASCADE ON DELETE RESTRICT;
 	";
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>fue.tbl_projekt: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>fue.tbl_projekt: neue Spalte ressource_id fuer Verantwortlichkeit hinzugefuegt';
-}			  
+}
 
 // Eigene Berechtigung fuer Betriebsmittel Stundenplan
 if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_stundenplan_betriebsmittel LIMIT 1"))
@@ -3014,7 +3089,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_stundenplan_betriebsmittel
 	);
 
 	ALTER TABLE lehre.tbl_stundenplan_betriebsmittel ADD CONSTRAINT pk_stundenplan_betriebsmittel PRIMARY KEY (stundenplan_betriebsmittel_id);
-    
+
     CREATE SEQUENCE lehre.seq_stundenplan_betriebsmittel_id
 	INCREMENT BY 1
 	NO MAXVALUE
@@ -3022,11 +3097,11 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_stundenplan_betriebsmittel
 	CACHE 1;
 
 	ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN verplanen boolean NOT NULL default false;
-    
+
     ALTER TABLE lehre.tbl_stundenplan_betriebsmittel ALTER COLUMN stundenplan_betriebsmittel_id SET DEFAULT nextval('lehre.seq_stundenplan_betriebsmittel_id');
     ALTER TABLE lehre.tbl_stundenplan_betriebsmittel ADD CONSTRAINT fk_stundenplan_betriebsmittel_stundenplandev FOREIGN KEY (stundenplandev_id) REFERENCES lehre.tbl_stundenplandev (stundenplandev_id) ON UPDATE CASCADE ON DELETE CASCADE;
     ALTER TABLE lehre.tbl_stundenplan_betriebsmittel ADD CONSTRAINT fk_stundenplan_betriebsmittel_betriebsmittel FOREIGN KEY (betriebsmittel_id) REFERENCES wawi.tbl_betriebsmittel (betriebsmittel_id) ON UPDATE CASCADE ON DELETE CASCADE;
-    
+
     GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_stundenplan_betriebsmittel TO vilesci;
 	GRANT SELECT, UPDATE ON lehre.seq_stundenplan_betriebsmittel_id TO vilesci;
 	";
@@ -3045,7 +3120,7 @@ if(!$result = @$db->db_query("SELECT standort FROM public.tbl_organisationseinhe
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_organisationseinheit: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo 'public.tbl_organisationseinheit: Spalte standort hinzugefuegt!<br>';
 }
 
@@ -3053,22 +3128,22 @@ if(!$result = @$db->db_query("SELECT standort FROM public.tbl_organisationseinhe
 if(!$result = @$db->db_query("SELECT standort FROM lehre.vw_studienplan LIMIT 1"))
 {
 	$qry = "CREATE OR REPLACE VIEW lehre.vw_studienplan AS
-		SELECT 
-			organisationseinheittyp_kurzbz, oe_kurzbz, studiengang_kz, studienordnung_id, studienplan_id, 
-            tbl_studienplan.orgform_kurzbz, tbl_studienplan.version, tbl_studienplan.bezeichnung, regelstudiendauer, 
-            tbl_studienplan.sprache, tbl_studienplan.aktiv, semesterwochen, tbl_studienplan.testtool_sprachwahl, 
+		SELECT
+			organisationseinheittyp_kurzbz, oe_kurzbz, studiengang_kz, studienordnung_id, studienplan_id,
+            tbl_studienplan.orgform_kurzbz, tbl_studienplan.version, tbl_studienplan.bezeichnung, regelstudiendauer,
+            tbl_studienplan.sprache, tbl_studienplan.aktiv, semesterwochen, tbl_studienplan.testtool_sprachwahl,
             tbl_studienplan.insertamum, tbl_studienplan.insertvon, tbl_studienplan.updateamum, tbl_studienplan.updatevon,
-            gueltigvon, gueltigbis,  ects, studiengangbezeichnung, studiengangbezeichnung_englisch, studiengangkurzbzlang, 
-            akadgrad_id, kurzbz, kurzbzlang, typ, english, farbe, email, telefon, max_semester, max_verband, max_gruppe, 
-            erhalter_kz, bescheid, bescheidbgbl1, bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, zusatzinfo_html, 
-            moodle, studienplaetze, lgartcode, mischform, projektarbeit_note_anzeige, onlinebewerbung, oe_parent_kurzbz,  
-            mailverteiler, freigabegrenze, kurzzeichen, lehre,  beschreibung, studienordnung_semester_id, studiensemester_kurzbz, 
+            gueltigvon, gueltigbis,  ects, studiengangbezeichnung, studiengangbezeichnung_englisch, studiengangkurzbzlang,
+            akadgrad_id, kurzbz, kurzbzlang, typ, english, farbe, email, telefon, max_semester, max_verband, max_gruppe,
+            erhalter_kz, bescheid, bescheidbgbl1, bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, zusatzinfo_html,
+            moodle, studienplaetze, lgartcode, mischform, projektarbeit_note_anzeige, onlinebewerbung, oe_parent_kurzbz,
+            mailverteiler, freigabegrenze, kurzzeichen, lehre,  beschreibung, studienordnung_semester_id, studiensemester_kurzbz,
             semester, standort
-		FROM 
-			lehre.tbl_studienplan 
-            JOIN lehre.tbl_studienordnung USING (studienordnung_id) 
-            JOIN tbl_studiengang USING (studiengang_kz) 
-            JOIN tbl_organisationseinheit USING (oe_kurzbz) 
+		FROM
+			lehre.tbl_studienplan
+            JOIN lehre.tbl_studienordnung USING (studienordnung_id)
+            JOIN tbl_studiengang USING (studiengang_kz)
+            JOIN tbl_organisationseinheit USING (oe_kurzbz)
             JOIN tbl_organisationseinheittyp USING (organisationseinheittyp_kurzbz)
             JOIN lehre.tbl_studienordnung_semester USING (studienordnung_id);";
 
@@ -3085,8 +3160,8 @@ if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_do
 	UPDATE public.tbl_dokument SET bezeichnung_mehrsprachig[1]=bezeichnung;
 	UPDATE public.tbl_dokument SET bezeichnung_mehrsprachig[2]=bezeichnung;
 	';
-		
-	
+
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_dokument: '.$db->db_last_error().'</strong><br>';
 	else
@@ -3097,7 +3172,7 @@ if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_do
 if(!$result = @$db->db_query("SELECT kosten FROM public.tbl_raumtyp"))
 {
 	$qry = 'ALTER TABLE public.tbl_raumtyp ADD COLUMN kosten numeric(10,2);';
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_raumtyp: '.$db->db_last_error().'</strong><br>';
 	else
@@ -3108,7 +3183,7 @@ if(!$result = @$db->db_query("SELECT kosten FROM public.tbl_raumtyp"))
 if(!$result = @$db->db_query("SELECT onlinebewerbung FROM public.tbl_studiensemester"))
 {
 	$qry = 'ALTER TABLE public.tbl_studiensemester ADD COLUMN onlinebewerbung boolean NOT NULL default false;';
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_studiensemester: '.$db->db_last_error().'</strong><br>';
 	else
@@ -3119,7 +3194,7 @@ if(!$result = @$db->db_query("SELECT onlinebewerbung FROM public.tbl_studienseme
 if(!$result = @$db->db_query("SELECT exklusiv FROM campus.tbl_infoscreen_content"))
 {
 	$qry = 'ALTER TABLE campus.tbl_infoscreen_content ADD COLUMN exklusiv boolean NOT NULL default false;';
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>campus.tbl_infoscreen_content: '.$db->db_last_error().'</strong><br>';
 	else
@@ -3151,7 +3226,7 @@ if(!$result = @$db->db_query("SELECT anrechnung_id FROM campus.tbl_pruefungsanme
 {
 	$qry = 'ALTER TABLE campus.tbl_pruefungsanmeldung ADD COLUMN anrechnung_id integer;'
 	     . 'ALTER TABLE campus.tbl_pruefungsanmeldung ADD CONSTRAINT fk_pruefungsanmeldung_anrechnung FOREIGN KEY (anrechnung_id) REFERENCES lehre.tbl_anrechnung (anrechnung_id) ON UPDATE CASCADE ON DELETE CASCADE;';
-	
+
 	if(!$db->db_query($qry))
 		echo '<strong>campus.tbl_pruefungsanmeldung: '.$db->db_last_error().'</strong><br>';
 	else
@@ -3228,9 +3303,9 @@ if(!$result = @$db->db_query("SELECT style FROM public.tbl_vorlagestudiengang"))
 	$qry = "ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN style text;
 			ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN berechtigung varchar(32)[];
 			ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN anmerkung_vorlagestudiengang text;
-			
+
 			INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('basis/dokumente','Verwaltung der Dokumentvorlagen');
-			
+
 			GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_vorlagestudiengang TO vilesci;
 			";
 
@@ -3255,6 +3330,26 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
 			echo ' system.tbl_berechtigung: Eigene Berechtigung lehre/lvinfo_freigabe fuer die Freigabe von LV-Infos hinzugefuegt!<br>';
+	}
+}
+
+// Diverse neue Indizes
+if($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_lehreinheitmitarbeiter_vertrag_id'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "
+		CREATE INDEX idx_lehreinheitmitarbeiter_vertrag_id ON lehre.tbl_lehreinheitmitarbeiter USING btree (vertrag_id);
+		CREATE INDEX idx_vertrag_vertragsstatus_vertrag_id ON lehre.tbl_vertrag_vertragsstatus USING btree (vertrag_id);
+		CREATE INDEX idx_bisverwendung_mitarbeiter_uid ON bis.tbl_bisverwendung USING btree (mitarbeiter_uid);
+		CREATE INDEX idx_projektbetreuer_vertrag_id ON lehre.tbl_projektbetreuer USING btree (vertrag_id);
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Indizes: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Diverse Indizes fuer Vertraege hinzugefuegt';
 	}
 }
 
@@ -3473,7 +3568,7 @@ $tabellen=array(
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype"),
 	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz","style","berechtigung","anmerkung_vorlagestudiengang"),
 	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon","ablauf_vorgaben_id"),
-	"testtool.tbl_ablauf_vorgaben"  => array("ablauf_vorgaben_id","studiengang_kz","sprache","sprachwahl","content_id","insertamum","insertvon","updateamum", "updatevon"),		
+	"testtool.tbl_ablauf_vorgaben"  => array("ablauf_vorgaben_id","studiengang_kz","sprache","sprachwahl","content_id","insertamum","insertvon","updateamum", "updatevon"),
 	"testtool.tbl_antwort"  => array("antwort_id","pruefling_id","vorschlag_id"),
 	"testtool.tbl_frage"  => array("frage_id","kategorie_kurzbz","gebiet_id","level","nummer","demo","insertamum","insertvon","updateamum","updatevon"),
 	"testtool.tbl_gebiet"  => array("gebiet_id","kurzbz","bezeichnung","beschreibung","zeit","multipleresponse","kategorien","maxfragen","zufallfrage","zufallvorschlag","levelgleichverteilung","maxpunkte","insertamum", "insertvon", "updateamum", "updatevon", "level_start","level_sprung_auf","level_sprung_ab","antwortenprozeile"),
@@ -3700,41 +3795,41 @@ foreach($berechtigungen as $row)
 				echo '<br>'.$row[$berechtigung_kurzbz].'/'.$row[$beschreibung].' hinzugefügt';
 			else
 				echo '<br><span class="error">Fehler: '.$row[$berechtigung_kurzbz].'/'.$row[$beschreibung].' hinzufügen nicht möglich</span>';
-				
+
 			//Wenn das Recht basis/vilesci neu angelegt wurde, dann dieses Recht jedem geben, der bisher auch Zugriff auf Vilesci hatte.
 			if ($row[$berechtigung_kurzbz]=='basis/vilesci')
 			{
-				$qry_userrecht="SELECT DISTINCT uid, funktion_kurzbz 
-								FROM system.tbl_benutzerrolle 
-								LEFT JOIN public.tbl_benutzer USING (uid) 
-								WHERE berechtigung_kurzbz IN ('admin','support','preinteressent','lehre','basis/statistik','basis/fhausweis','wawi/inventar','assistenz','lv-plan') 
+				$qry_userrecht="SELECT DISTINCT uid, funktion_kurzbz
+								FROM system.tbl_benutzerrolle
+								LEFT JOIN public.tbl_benutzer USING (uid)
+								WHERE berechtigung_kurzbz IN ('admin','support','preinteressent','lehre','basis/statistik','basis/fhausweis','wawi/inventar','assistenz','lv-plan')
 								AND (tbl_benutzerrolle.ende>=now() OR tbl_benutzerrolle.ende IS NULL)
 								AND (tbl_benutzerrolle.start<=now() OR tbl_benutzerrolle.start IS NULL)
 								AND (tbl_benutzer.aktiv=true OR tbl_benutzerrolle.uid IS NULL)
 								UNION
-								SELECT DISTINCT uid, funktion_kurzbz 
-								FROM system.tbl_benutzerrolle 
+								SELECT DISTINCT uid, funktion_kurzbz
+								FROM system.tbl_benutzerrolle
 								JOIN system.tbl_rolleberechtigung USING(rolle_kurzbz)
-								LEFT JOIN public.tbl_benutzer USING (uid) 
-								WHERE tbl_rolleberechtigung.berechtigung_kurzbz IN ('admin','support','preinteressent','lehre','basis/statistik','basis/fhausweis','wawi/inventar','assistenz','lv-plan') 
+								LEFT JOIN public.tbl_benutzer USING (uid)
+								WHERE tbl_rolleberechtigung.berechtigung_kurzbz IN ('admin','support','preinteressent','lehre','basis/statistik','basis/fhausweis','wawi/inventar','assistenz','lv-plan')
 								AND (tbl_benutzerrolle.ende>=now() OR tbl_benutzerrolle.ende IS NULL)
 								AND (tbl_benutzerrolle.start<=now() OR tbl_benutzerrolle.start IS NULL)
 								AND (tbl_benutzer.aktiv=true OR tbl_benutzerrolle.uid IS NULL) ORDER BY uid";
-				
+
 				if($result_insert_userrecht = $db->db_query($qry_userrecht))
 				{
 					while ($row_user=$db->db_fetch_object($result_insert_userrecht))
 					{
 						$qry_insert_userrecht="	INSERT INTO system.tbl_benutzerrolle (rolle_kurzbz, berechtigung_kurzbz, uid, funktion_kurzbz, oe_kurzbz, art, studiensemester_kurzbz, start, ende, negativ, updateamum, updatevon, insertamum, insertvon, kostenstelle_id)
 												VALUES (NULL, 'basis/vilesci', ".($row_user->funktion_kurzbz!=""?"NULL,".$db->db_add_param($row_user->funktion_kurzbz):$db->db_add_param($row_user->uid).",NULL").", NULL, 's', NULL, NULL, NULL, FALSE, NULL, NULL, now(), 'checksystem', NULL)";
-						
+
 						if($db->db_query($qry_insert_userrecht))
 							echo '<br>Recht "basis/vilesci" an '.$row_user->uid.' '.($row_user->funktion_kurzbz!=''?'Funktion '.$row_user->funktion_kurzbz:'').' vergeben';
 						else
 							echo '<br><span class="error">Fehler: Recht "basis/vilesci" konnte nicht an '.$row_user->uid.' '.($row_user->funktion_kurzbz!=''?'Funktion '.$row_user->funktion_kurzbz:'').' vergeben werden</span>';
 					}
 				}
-				
+
 			}
 		}
 	}
@@ -3781,7 +3876,7 @@ $webservicerecht = array(
 
 foreach($webservicerecht as $row)
 {
-	$qry = "SELECT * FROM system.tbl_webservicerecht 
+	$qry = "SELECT * FROM system.tbl_webservicerecht
 			WHERE berechtigung_kurzbz=".$db->db_add_param($row[$berechtigung_kurzbz])."
 			AND methode=".$db->db_add_param($row[$methode])."
 			AND klasse=".$db->db_add_param($row[$klasse]);
