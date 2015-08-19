@@ -56,13 +56,16 @@ $lehrveranstaltung_id = filter_input(INPUT_GET, 'lehrveranstaltung_id');
 $lehreinheit_id = filter_input(INPUT_GET, 'lehreinheit_id');
 $mitarbeiter_uid = filter_input(INPUT_GET,'mitarbeiter_uid');
 $student_uid = filter_input(INPUT_GET,'student_uid');
+$db_stpl_table = filter_input(INPUT_GET,'db_stpl_table');
+if(!in_array($db_stpl_table,array('stundenplan','stundenplandev')))
+	$db_stpl_table='stundenplan';
 
 $oRdf->sendHeader();
 $db = new basis_db();
 
 $lehrstunde = new lehrstunde();
 //$variable->variable->db_stpl_table
-$lehrstunde->getStundenplanData('stundenplan', $lehrveranstaltung_id, $variable->variable->semester_aktuell, $lehreinheit_id, $mitarbeiter_uid, $student_uid);
+$lehrstunde->getStundenplanData($db_stpl_table, $lehrveranstaltung_id, $variable->variable->semester_aktuell, $lehreinheit_id, $mitarbeiter_uid, $student_uid);
 
 $i=0;
 if(isset($lehrstunde->result) && is_array($lehrstunde->result))
