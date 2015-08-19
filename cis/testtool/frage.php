@@ -506,9 +506,9 @@ if($frage->frage_id!='')
 			$antwort = new antwort();
 			$antwort->getAntwort($_SESSION['pruefling_id'],$row->frage_id);
 			if($row->frage_id==$frage_id)
-				echo " <a href='#' target='_self'><td style='width:12px; text-align:center; padding:2px; box-shadow: 0px 0px 3px 3px #888888;".(count($antwort->result)!=0?"background-color:lightgreen;":"")."'>".($row->nummer<10?" ":"")."$row->nummer</td></a>";
+				echo " <a href='#' target='_self'><td style='width:12px; text-align:center; padding:2px; box-shadow: 0px 0px 3px 3px #888888;".(count($antwort->result)!=0?"background-color:lightblue;":"")."'>".($row->nummer<10?" ":"")."$row->nummer</td></a>";
 			else
-				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$row->frage_id'><td style='width:12px; text-align:center; padding:2px; box-shadow: 0px 0px 3px 0px #888888;".(count($antwort->result)!=0?"background-color:lightgreen;":"")."'>$row->nummer</td></a>";
+				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$row->frage_id'><td style='width:12px; text-align:center; padding:2px; box-shadow: 0px 0px 3px 0px #888888;".(count($antwort->result)!=0?"background-color:lightblue;":"")."'>$row->nummer</td></a>";
 		}
 		//echo " </tr></table>";
 	}
