@@ -2596,10 +2596,10 @@ if(!$error)
                             $pruefung->student_uid = $student_uid;
                             $pruefung->lehreinheit_id = $lehreinheit_id;
                             $pruefung->datum = date("Y-m-d");
-
-                            if($anwesenheit->result[0]->prozent < FAS_ANWESENHEIT_ROT)
+                            
+                            if(isset($anwesenheit->result[0]) && $anwesenheit->result[0]->prozent < FAS_ANWESENHEIT_ROT)
                             {
-                                // 1. Termin mit "nicht angetreten" erstellen
+                                // 1. Termin mit "nicht beurteilt" erstellen
                                 $pruefung->pruefungstyp_kurzbz = "Termin1";
                                 $pruefung->note = 7;
                                 if($pruefung->save())
@@ -2886,6 +2886,91 @@ if(!$error)
 							{
 								$errormsg .= "\n".$zeugnisnote->errormsg;
 							}
+                            
+                            if(FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $errormsg == '' && $zeugnisnote->new == true)
+                            {
+                                $anwesenheit = new anwesenheit();
+                                $anwesenheit->loadAnwesenheitStudiensemester($semester_aktuell, $uid, $_POST['lehrveranstaltung_id']);
+
+                                // Lehreinheit ermitteln
+                                $error = false;
+                                $qry = "SELECT lehreinheit_id FROM campus.vw_student_lehrveranstaltung "
+                                     . "WHERE uid=".$db->db_add_param($uid)." AND lehrveranstaltung_id=".$db->db_add_param($_POST['lehrveranstaltung_id'])." "
+                                     . "ORDER BY lehreinheit_id ASC "
+                                     . "LIMIT 1";
+
+                                if($result = $db->db_query($qry))
+                                {
+                                    if($row = $db->db_fetch_object($result))
+                                    {
+                                        $lehreinheit_id = $row->lehreinheit_id;
+                                    }
+                                    else
+                                    {
+                                        $return = false;
+                                        $error = true;
+                                        $errormsg = 'Fehler beim Ermitteln der Lehreinheit ID';
+                                    }
+                                }
+                                else
+                                {
+                                    $return = false;
+                                    $error = true;
+                                    $errormsg = 'Fehler beim Ermitteln der Lehreinheit ID';
+                                }
+
+                                if(!$error)
+                                {
+                                    $pruefung = new pruefung;
+                                    $pruefung->new = true;
+                                    $pruefung->student_uid = $uid;
+                                    $pruefung->lehreinheit_id = $lehreinheit_id;
+                                    $pruefung->datum = date("Y-m-d");
+
+                                    if(isset($anwesenheit->result[0]) && $anwesenheit->result[0]->prozent < FAS_ANWESENHEIT_ROT)
+                                    {
+                                        // 1. Termin mit "nicht beurteilt" erstellen
+                                        $pruefung->pruefungstyp_kurzbz = "Termin1";
+                                        $pruefung->note = 7;
+                                        if($pruefung->save())
+                                        {
+                                            // 2. Termin mit Note erstellen
+                                            $pruefung->pruefungstyp_kurzbz = "Termin2";
+                                            $pruefung->note = $zeugnisnote->note;
+                                            if($pruefung->save())
+                                            {
+                                                $return = true;
+                                            }
+                                            else
+                                            {
+                                                $errormsg = $pruefung->errormsg;
+                                                $return = false;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            $errormsg = $pruefung->errormsg;
+                                            $return = false;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // 1. Termin mit Note erstellen
+                                        $pruefung->pruefungstyp_kurzbz = "Termin1";
+                                        $pruefung->note = $zeugnisnote->note;
+
+                                        if($pruefung->save())
+                                        {
+                                            $return = true;
+                                        }
+                                        else
+                                        {
+                                            $errormsg = $pruefung->errormsg;
+                                            $return = false;
+                                        }
+                                    }
+                                }
+                            }
 						}
 					}
 				}
