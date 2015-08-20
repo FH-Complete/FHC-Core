@@ -542,7 +542,7 @@ if(!$error)
 						$vertrag->uid = $user;
 
 						if(!$vertrag->saveVertragsstatus(true))
-							$errormsg.=$vertrag->erromsg;
+							$errormsg.=$vertrag->errormsg;
                         else if($_POST['vertragstyp_kurzbz'] == 'Pruefungshonorar')
                         {
                             // Retour Status setzen
@@ -550,7 +550,7 @@ if(!$error)
                             $vertrag->datum = date('Y-m-d H:i:s');
                             
                             if(!$vertrag->saveVertragsstatus(true))
-                                $errormsg.=$vertrag->erromsg;
+                                $errormsg.=$vertrag->errormsg;
                         }
 					}
 
