@@ -543,6 +543,15 @@ if(!$error)
 
 						if(!$vertrag->saveVertragsstatus(true))
 							$errormsg.=$vertrag->erromsg;
+                        else if($_POST['vertragstyp_kurzbz'] == 'Pruefungshonorar')
+                        {
+                            // Retour Status setzen
+                            $vertrag->vertragsstatus_kurzbz = 'retour';
+                            $vertrag->datum = date('Y-m-d H:i:s');
+                            
+                            if(!$vertrag->saveVertragsstatus(true))
+                                $errormsg.=$vertrag->erromsg;
+                        }
 					}
 
 					if($errormsg=='')
