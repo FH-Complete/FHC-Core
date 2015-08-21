@@ -276,13 +276,14 @@ if(defined('FAS_GESAMTNOTE_PRUEFUNGSHONORAR') && FAS_GESAMTNOTE_PRUEFUNGSHONORAR
 		<menulist id="lehrveranstaltung-noten-pruefung-menulist-mitarbeiter"
 		          datasources="'.APP_ROOT.'rdf/mitarbeiter.rdf.php" flex="1"
 		          ref="http://www.technikum-wien.at/mitarbeiter/_alle"
+                  minwidth="250"
 		          >
 			<template>
 				<menupopup>
-					<menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
+                    <menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
 		        		      label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname ( rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid )"
 					  		  uri="rdf:*"/>
-					</menupopup>
+				</menupopup>
 			</template>
 		</menulist>
 		<label value="Satz pro Prüfung" control="lehrveranstaltung-noten-pruefung-textbox-satz"/>

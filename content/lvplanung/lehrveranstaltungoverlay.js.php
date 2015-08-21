@@ -2428,12 +2428,21 @@ function LehrveranstaltungNotenPruefungSave()
 	var satz = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-satz').value;
 	var anzahl = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anzahl').value;
 	satz = satz.replace(',','.');
+    
+    if(mitarbeiter_uid == '' || satz == '' || anzahl == '')
+    {
+        alert('Bitte wählen Sie einen Mitarbeiter aus und geben Sie den Satz pro Prüfung sowie die Anzahl der Prüfungen an!');
+        return false;
+    }
 
 	var gesamt = satz*anzahl;
 
 	var tree = document.getElementById('lehrveranstaltung-tree');
 	if (tree.currentIndex==-1)
-		return;
+    {
+		alert('Bitte wählen Sie die gewünschte Lehrveranstaltung aus!');
+        return;
+    }
 
 	//Ausgewaehlte LV holen
     var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung-id";
