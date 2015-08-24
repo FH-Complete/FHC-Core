@@ -407,11 +407,58 @@ class bisverwendung extends basis_db
 	}
 
 	/**
-	 * Laedt die Letzte (aktuellste) Verwendungen eines Mitarbeiters
+	 * Laedt die Letzte eingetragene Verwendungen eines Mitarbeiters
 	 * @param $uid UID des Mitarbeiters
 	 * @return true wenn ok, false wenn Fehler
 	 */
 	public function getLastVerwendung($uid)
+	{
+		//laden des Datensatzes
+		$qry = "SELECT
+					*
+				FROM
+					bis.tbl_bisverwendung
+				WHERE
+					mitarbeiter_uid=".$this->db_add_param($uid)."
+				ORDER BY ende DESC NULLS LAST,beginn DESC NULLS LAST LIMIT 1;";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->bisverwendung_id = $row->bisverwendung_id;
+				$this->ba1code = $row->ba1code;
+				$this->ba2code = $row->ba2code;
+				$this->beschausmasscode = $row->beschausmasscode;
+				$this->verwendung_code = $row->verwendung_code;
+				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$this->hauptberufcode = $row->hauptberufcode;
+                $this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+                $this->habilitation = $this->db_parse_bool($row->habilitation);
+				$this->beginn = $row->beginn;
+				$this->ende = $row->ende;
+				$this->updatevon = $row->updatevon;
+				$this->updateamum = $row->updateamum;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->vertragsstunden = $row->vertragsstunden;
+				$this->dv_art = $row->dv_art;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt die Letzte (aktuellste) Verwendungen eines Mitarbeiters
+	 * @param $uid UID des Mitarbeiters
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getLastAktVerwendung($uid)
 	{
 		//laden des Datensatzes
 		$qry = "SELECT

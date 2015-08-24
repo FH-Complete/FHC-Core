@@ -142,7 +142,7 @@ function searchPerson($searchItems)
 		foreach($bn->result as $row)
 		{
 			$bisverwendung = new bisverwendung();
-			$bisverwendung->getLastVerwendung($row->uid);
+			$bisverwendung->getLastAktVerwendung($row->uid);
 			
 			echo '<tr>';
 			//echo '<td>',$row->titelpre,'</td>';
