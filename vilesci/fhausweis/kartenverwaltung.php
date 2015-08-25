@@ -28,6 +28,7 @@ require_once('../../include/betriebsmittel.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/studiensemester.class.php');
+require_once('../../include/variable.class.php');
 
 $uid = get_uid();
 
@@ -41,7 +42,11 @@ $studiengang = new studiengang();
 $studiengang->getAll('oe_kurzbz', true);
 
 $fotostatus = new fotostatus(); 
-$fotostatus->getAllStatusKurzbz(); 
+$fotostatus->getAllStatusKurzbz();
+
+$mails = array();
+$variable = new variable();
+$variable->loadVariables($uid);
 	
 $statusStudent=(isset($_REQUEST['select_statusStudent'])?$_REQUEST['select_statusStudent']:null);
 $statusMitarbeiter=(isset($_REQUEST['select_statusMitarbeiter'])?$_REQUEST['select_statusMitarbeiter']:null);
@@ -85,11 +90,11 @@ if (empty($studSemArray))
 
 		function showStudiensemester()
 		{
-			document.getElementById("studiensemester_dropdown").style.display = "inline";
+			document.getElementById("studiensemester_dropdown").style.display="inline";
 		}
 		function hideStudiensemester()
 		{
-			document.getElementById("studiensemester_dropdown").style.display = "none";
+			document.getElementById("studiensemester_dropdown").style.display="none";
 		}
 
 		</script>	
@@ -150,10 +155,10 @@ echo'			<option value="nichtGedrucktAkzept" '.($statusStudent=='nichtGedrucktAkz
 			<table style="vertical-align: top" border="0" >
 				<tr style="vertical-align: top">
 					<td>Typ:</td>
-					<td><select name="select_typ_mitarbeiter">
-					<option value="intern" '.($typMitarbeiter=='intern'?'selected':'').' onClick="hideStudiensemester()">Fixangestellte</option>
-					<option value="extern" '.($typMitarbeiter=='extern'?'selected':'').' onClick="showStudiensemester()">Externe mit Lehrauftrag</option>
-					<option value="extern_ohne" '.($typMitarbeiter=='extern_ohne'?'selected':'').' onClick="hideStudiensemester()">Externe ohne Lehrauftrag</option>
+					<td><select name="select_typ_mitarbeiter" onClick="this.options[this.selectedIndex].onclick()">
+					<option value="intern" '.($typMitarbeiter=='intern'?'selected':'').' onClick="hideStudiensemester();">Fixangestellte</option>
+					<option value="extern" '.($typMitarbeiter=='extern'?'selected':'').' onClick="showStudiensemester();">Externe mit Lehrauftrag</option>
+					<option value="extern_ohne" '.($typMitarbeiter=='extern_ohne'?'selected':'').' onClick="hideStudiensemester();">Externe ohne Lehrauftrag</option>
 					</select></td>
 					<td id="studiensemester_dropdown" style="display: '.($typMitarbeiter=='extern'?'inline':'none').'; vertical-align: top;"><span style="vertical-align: top">im</span>
 					<select name="select_studiensemester[]" multiple="multiple" size="7">';
@@ -242,7 +247,8 @@ if(isset($_REQUEST['btn_submitStudent']))
 				if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == true && $betriebsmittel->zutrittskarteAusgegeben($stud->uid) == false)
 				{
 					echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
-					$uids.=';'.$stud->uid;	 
+					$uids.=';'.$stud->uid;
+					$mails[]=$stud->uid.'@'.DOMAIN;
 				}
 			}
 			else if($statusStudent == 'nichtGedrucktAkzept')
@@ -256,7 +262,8 @@ if(isset($_REQUEST['btn_submitStudent']))
 				if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == false)
 				{
 					echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
-					$uids.=';'.$stud->uid;	 
+					$uids.=';'.$stud->uid;
+					$mails[]=$stud->uid.'@'.DOMAIN;
 				}
 			}
 			else if($statusStudent == 'nichtGedruckt')
@@ -270,7 +277,8 @@ if(isset($_REQUEST['btn_submitStudent']))
 				if($betriebsmittel->zutrittskartePrinted($stud->uid) == false)
 				{
 					echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.' ('.$fotostatus->fotostatus_kurzbz.')</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
-					$uids.=';'.$stud->uid;	 
+					$uids.=';'.$stud->uid;
+					$mails[]=$stud->uid.'@'.DOMAIN;
 				}
 			}
 			else
@@ -283,18 +291,66 @@ if(isset($_REQUEST['btn_submitStudent']))
 				if($fotostatus->fotostatus_kurzbz == $statusStudent)
 				{
 					echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
-					$uids.=';'.$stud->uid; 
+					$uids.=';'.$stud->uid;
+					$mails[]=$stud->uid.'@'.DOMAIN;
 				}
 			}
 		}
 	}
+	//Mail Zusammenfassen
+	$mails = array_unique($mails);
+	echo "
+		<script type=\"text/Javascript\">
+		var mails = '".implode($variable->variable->emailadressentrennzeichen,$mails)."';
+	
+		// ****
+		// * Teilt die Mailto Links auf kleinere Brocken auf, da der
+		// * Link nicht funktioniert wenn er zu lange ist
+		// * art = to | cc | bcc
+		// ****
+		function splitmailto(mails, art)
+		{
+			var splititem = '".$variable->variable->emailadressentrennzeichen."';
+			var splitposition=0;
+			var mailto='';
+			var loop=true;
+			if(mails.length>2048)
+				alert('Aufgrund der großen Anzahl an Empfängern, muss die Nachricht auf mehrere E-Mails aufgeteilt werden!');
+	
+			while(loop)
+			{
+				if(mails.length>2048)
+				{
+					splitposition=mails.indexOf(splititem,1900);
+					mailto = mails.substring(0,splitposition);
+					mails = mails.substring(splitposition);
+				}
+				else
+				{
+					loop=false;
+					mailto=mails;
+				}
+	
+				if(art=='to')
+					window.location.href='mailto:'+mailto;
+				else
+					window.location.href='mailto:?'+art+'='+mailto;
+			}
+		}
+		</script>";
 	echo '
 		</tbody>
 		</table>
 		<table>
 			<tr>
-				<td><input type="submit" value="Karten zuteilen" name="btn_kartezuteilenStudent" onclick="document.form_studentenkarten.action=\'kartezuweisen.php\'">
-				<input type="button" value="Karten drucken" onclick="document.form_studentenkarten.action=\'../../content/zutrittskarte.php\';document.form_studentenkarten.submit();"/></td>
+				<td>Anzahl: '.count($mails).'</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="button" value="Mail Senden" name="MailSenden" onclick="splitmailto(mails, \'bcc\'); return false;">&nbsp;
+					<input type="submit" value="Karten zuteilen" name="btn_kartezuteilenStudent" onclick="document.form_studentenkarten.action=\'kartezuweisen.php\'">&nbsp;
+					<input type="button" value="Karten drucken" onclick="document.form_studentenkarten.action=\'../../content/zutrittskarte.php\';document.form_studentenkarten.submit();"/>
+				</td>
 			</tr>
 		</table>
 		</form>';
@@ -344,7 +400,8 @@ if(isset($_REQUEST['btn_submitMitarbeiter']))
 				// status akzeptiert, gedruckt aber noch nicht ausgegeben
 				if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($mit->uid) == true && $betriebsmittel->zutrittskarteAusgegeben($mit->uid) == false)
 				{
-					$uids.=';'.$mit->uid; 
+					$uids.=';'.$mit->uid;
+					$mails[]=$mit->uid.'@'.DOMAIN;
 					echo '<tr><td>'.$mit->nachname.' '.$mit->vorname.'</td><td>'.$mit->gebdatum.'</td><td>'.$mit->personalnummer.'</td><td>'.$mit->uid.'</td><td>'.$mit->person_id.'<input type="hidden" name="users[]" value="'.$mit->uid.'"></td></tr>';
 				}
 			}
@@ -357,7 +414,8 @@ if(isset($_REQUEST['btn_submitMitarbeiter']))
 				// status akzeptiert und noch nicht gedruckt
 				if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($mit->uid) == false)
 				{
-					$uids.=';'.$mit->uid; 
+					$uids.=';'.$mit->uid;
+					$mails[]=$mit->uid.'@'.DOMAIN;
 					echo '<tr><td>'.$mit->nachname.' '.$mit->vorname.'</td><td>'.$mit->gebdatum.'</td><td>'.$mit->personalnummer.'</td><td>'.$mit->uid.'</td><td>'.$mit->person_id.'<input type="hidden" name="users[]" value="'.$mit->uid.'"></td></tr>';
 				}
 			}
@@ -369,22 +427,71 @@ if(isset($_REQUEST['btn_submitMitarbeiter']))
 				// überprüfen ob letzer Status der gesuchte ist
 				if($fotostatus->fotostatus_kurzbz == $statusMitarbeiter)
 				{
-					$uids.=';'.$mit->uid; 
+					$uids.=';'.$mit->uid;
+					$mails[]=$mit->uid.'@'.DOMAIN;
 					echo '<tr><td>'.$mit->nachname.' '.$mit->vorname.'</td><td>'.$mit->gebdatum.'</td><td>'.$mit->personalnummer.'</td><td>'.$mit->uid.'</td><td>'.$mit->person_id.'<input type="hidden" name="users[]" value="'.$mit->uid.'"></td></tr>';
 				}
 			}
 		}
+
+	//Mail Zusammenfassen
+	$mails = array_unique($mails);
+	echo "
+		<script type=\"text/Javascript\">
+		var mails = '".implode($variable->variable->emailadressentrennzeichen,$mails)."';
+	
+		// ****
+		// * Teilt die Mailto Links auf kleinere Brocken auf, da der
+		// * Link nicht funktioniert wenn er zu lange ist
+		// * art = to | cc | bcc
+		// ****
+		function splitmailto(mails, art)
+		{
+			var splititem = '".$variable->variable->emailadressentrennzeichen."';
+			var splitposition=0;
+			var mailto='';
+			var loop=true;
+			if(mails.length>2048)
+				alert('Aufgrund der großen Anzahl an Empfängern, muss die Nachricht auf mehrere E-Mails aufgeteilt werden!');
+	
+			while(loop)
+			{
+				if(mails.length>2048)
+				{
+					splitposition=mails.indexOf(splititem,1900);
+					mailto = mails.substring(0,splitposition);
+					mails = mails.substring(splitposition);
+				}
+				else
+				{
+					loop=false;
+					mailto=mails;
+				}
+	
+				if(art=='to')
+					window.location.href='mailto:'+mailto;
+				else
+					window.location.href='mailto:?'+art+'='+mailto;
+			}
+		}
+		</script>";
 	echo '
 		</tbody>
 		</table>
 		<table>
 			<tr>
-				<td><input type="submit" value="Karten zuteilen" name="btn_kartezuteilenMitarbeiter" onclick="document.form_mitarbeiterkarten.action=\'kartezuweisen.php\'">&nbsp;
-				<input type="button" value="Karten drucken" onclick="document.form_mitarbeiterkarten.action=\'../../content/zutrittskarte.php\';document.form_mitarbeiterkarten.submit();"/></td>
+				<td>Anzahl: '.count($mails).'</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="button" value="Mail Senden" name="MailSenden" onclick="splitmailto(mails, \'bcc\'); return false;">&nbsp;
+					<input type="submit" value="Karten zuteilen" name="btn_kartezuteilenMitarbeiter" onclick="document.form_mitarbeiterkarten.action=\'kartezuweisen.php\'">&nbsp;
+					<input type="button" value="Karten drucken" onclick="document.form_mitarbeiterkarten.action=\'../../content/zutrittskarte.php\';document.form_mitarbeiterkarten.submit();"/>
+				</td>
 			</tr>
 		</table>
 		</form>
-		</body></html>';
+		</body></html>';	
 	//<input type="button" value="Karten drucken" onclick=\'window.open("../../content/zutrittskarte.php?data='.$uids.'");\'>
 	}
 
