@@ -3353,6 +3353,89 @@ if($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_lehreinhei
 	}
 }
 
+// Vertragstyp Pruefungshonorar
+if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragstyp WHERE vertragstyp_kurzbz='Pruefungshonorar'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragstyp(vertragstyp_kurzbz, bezeichnung) VALUES('Pruefungshonorar','Pruefungshonorar');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Vertragstyp: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Vertragstyp Pruefungshonorar hinzugefuegt';
+	}
+}
+
+// Vertragstyp Lehrauftrag
+if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragstyp WHERE vertragstyp_kurzbz='Lehrauftrag'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragstyp(vertragstyp_kurzbz, bezeichnung) VALUES('Lehrauftrag','Lehrauftrag');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Vertragstyp: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Vertragstyp Lehrauftrag hinzugefuegt';
+	}
+}
+
+// Vertragsstatus NEU
+if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertragsstatus_kurzbz='neu'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragsstatus(vertragsstatus_kurzbz, bezeichnung) VALUES('neu','Neu');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Vertragsstatus: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Vertragsstatus Neu hinzugefuegt';
+	}
+}
+
+// Vertragsstatus abgerechnet
+if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertragsstatus_kurzbz='abgerechnet'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragsstatus(vertragsstatus_kurzbz, bezeichnung) VALUES('abgerechnet','Abgerechnet');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Vertragsstatus: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Vertragsstatus Abgerechnet hinzugefuegt';
+	}
+}
+
+// Vertragsstatus Retour
+if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertragsstatus_kurzbz='retour'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragsstatus(vertragsstatus_kurzbz, bezeichnung) VALUES('retour','Retour');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Vertragsstatus: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Vertragsstatus retour hinzugefuegt';
+	}
+}
+
+
+if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertragsstatus_kurzbz='storno'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragsstatus(vertragsstatus_kurzbz, bezeichnung) VALUES('storno','Storno');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Vertragsstatus: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Vertragsstatus Storno hinzugefuegt';
+	}
+}
 echo '<br><br><br>';
 
 $tabellen=array(
