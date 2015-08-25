@@ -109,7 +109,7 @@ $student_uid = filter_input(INPUT_GET,'student_uid');
 					<rule>
 						<treechildren>
 							<treeitem uri="rdf:*">
-								<treerow>
+								<treerow properties="rdf:http://www.technikum-wien.at/termine/rdf#kollision">
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#datum" />
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#stundevon" />
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#stundebis" />

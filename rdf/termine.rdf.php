@@ -49,6 +49,7 @@ foreach($stunde->stunden as $row)
 	$stunden_arr[$row->stunde]['ende']=$row->ende->format('H:i');
 }
 $datum_obj = new datum();
+$verplanteStunden = array();
 
 $oRdf = new rdf('TERMINE','http://www.technikum-wien.at/termine');
 
@@ -106,7 +107,27 @@ if(isset($lehrstunde->result) && is_array($lehrstunde->result))
 			$anwesend='Nein';
 		$oRdf->obj[$i]->setAttribut('anwesend',$anwesend,true);
 		$oRdf->obj[$i]->setAttribut('datum_iso',$row->datum,true);
+        
+        // Terminkollisionen prüfen
+        $kollision = "";
+        if($lehrveranstaltung_id == '')
+        {
+            for($x = $row->stundevon; $x <= $row->stundebis; $x++)
+            {
+                if(isset($verplanteStunden[$row->datum]) && in_array($x, $verplanteStunden[$row->datum]))
+                {
+                    if(!isset($verplanteStunden[implode(',',$row->orte)]) || !in_array($x, $verplanteStunden[implode(',',$row->orte)]))
+                    {
+                        $kollision = "makeItred";
+                        break;
+                    }
+                }
 
+                $verplanteStunden[$row->datum][] = $x;
+                $verplanteStunden[implode(',',$row->orte)][] = $x;
+            }
+        }
+        $oRdf->obj[$i]->setAttribut('kollision',$kollision,true);
 
 		$oRdf->addSequence($i);
 		$i++;
