@@ -28,7 +28,7 @@
 
 				<fo:block-container position="absolute" top="91mm" left="16mm" height="20mm">
 					<fo:block text-align="center" line-height="14pt" font-family="arial" font-size="10pt">
-						<xsl:text>Pursuant to section 5 subsection 1 of the Universities of Applied Sciences Studies Act\n
+						<xsl:text>Pursuant to paragraph 6 subsection 1 of the Universities of Applied Sciences Studies Act\n
 						(Austrian legal reference: Fachhochschul-Studiengesetz - FHStG, BGBl. Nr. </xsl:text>
 						<xsl:value-of select="bescheidbgbl1" />
 						<xsl:text> idgF)\n
@@ -91,14 +91,12 @@
 						<xsl:value-of select="datum" />
 						<xsl:text>\n
 						at the University of Applied Sciences Technikum Wien (Fachhochschule Technikum Wien)\n
-						in accordance with the directive of the FH Council (Fachhochschulrat) dated </xsl:text>
-						<xsl:value-of select="titelbescheidvom" />
-						<xsl:text>\n
+						in accordance with the directive of the Agency for Quality Assurance and Accreditation Austria dated 9.5.2012\n
 						the academic degree</xsl:text>
 					</fo:block>
 				</fo:block-container>
 
-				<fo:block-container position="absolute" top="185mm" left="16mm" height="30mm">
+				<fo:block-container position="absolute" top="188mm" left="16mm" height="30mm">
 					<fo:block text-align="center" line-height="16pt" font-family="arial" font-size="16pt">
 						<xsl:value-of select="titel" />
 					</fo:block>

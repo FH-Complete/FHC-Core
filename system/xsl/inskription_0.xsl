@@ -296,7 +296,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</table:table-row>
 			</table:table>
 			<text:p />
-			<text:p text:style-name="P4">------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
+			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
 			<text:p />
 			<text:p text:style-name="P9">Studienbestätigung Fachhochschule Technikum Wien</text:p>
 			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
@@ -345,7 +345,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</table:table-row>
 			</table:table>
 			<text:p />
-			<text:p text:style-name="P4">------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
+			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
 			<text:p />
 			<text:p text:style-name="P9">Studienbestätigung Fachhochschule Technikum Wien</text:p>
 			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
@@ -394,7 +394,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</table:table-row>
 			</table:table>
 			<text:p />
-			<text:p text:style-name="P4">------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
+			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
 			<text:p />
 			<text:p text:style-name="P9">Studienbestätigung Fachhochschule Technikum Wien</text:p>
 			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
@@ -443,7 +443,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</table:table-row>
 			</table:table>
 			<text:p />
-			<text:p text:style-name="P4">------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
+			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
 			<text:p />
 			<text:p text:style-name="P9">Studienbestätigung Fachhochschule Technikum Wien</text:p>
 			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
