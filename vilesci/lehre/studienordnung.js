@@ -35,6 +35,7 @@ var isLVFilterLoaded=false;
 /**
  * Error-Behandlung bei Ajax Requests
  */
+ 
 function loadError(xhr, textStatus, errorThrown)
 {
 	if(xhr.status==200)
@@ -133,7 +134,7 @@ function drawStudienordnungen(data)
 	{
 		if(data[i].studienordnung_id !== null)
 		{
-			obj=obj+'<li><a href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+',\''+data[i].bezeichnung+'\');return false;">'+data[i].bezeichnung+'</a>'
+			obj=obj+'<li><a style="white-space:nowrap" href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+',\''+data[i].bezeichnung+'\');return false;">'+data[i].bezeichnung+'</a>'
 				+' <a href="#Edit'+data[i].studienordnung_id+'" onclick="editStudienordnung('+data[i].studienordnung_id+');return false;"><img title="Bearbeiten" src="../../skin/images/edit.png"></a>'
 				+' <a href="#Copy'+data[i].studienordnung_id+'" onclick="copyStudienordnung('+data[i].studienordnung_id+');return false;"><img title="Studienordnung kopieren" src="../../skin/images/copy.png"></a>&nbsp;&nbsp;&nbsp;'
 				+' <a href="../../content/pdfExport.php?xml=studienordnung.rdf.php&xsl=Studienordnung&studienordnung_id='+data[i].studienordnung_id+'&stg_kz=0&output=doc"><img style="cursor:pointer; height: 16px;" title="Studienordnung als Word-Dokument exportieren" src="../../skin/images/doc_icon.png"></a>'
@@ -309,9 +310,10 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 			treeData.push(obj);
 		}
 
+				
 		// DIV fuer den Tree neu anlegen damit der alte Tree vollstaendig entfernt wird
 		$("#data").html("<div id='treeData'></div>");
-
+		
 		function searchChildren(element, matchingId, original)
 		{
 			var found = false;
@@ -482,9 +484,11 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 
 					// Studienplan_lehrveranstaltung_id ermitteln	
 					var studienplan_lehrveranstaltung_id='';
-					if(data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id)
+					if(data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id){
 						studienplan_lehrveranstaltung_id=data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id.value;
-
+						$("#treeData").jstree.refresh();
+					}
+					
 					// Aenderung speichern
 					saveJsondataFromTree(data.rslt.o[0].id, studienplan_id, studienplan_lehrveranstaltung_id);
 
@@ -626,6 +630,8 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 		}
 	});
 	$( "#tabs" ).show();
+
+
 }
 
 /**
@@ -877,6 +883,7 @@ function showLVTree(data)
 				"select_limit": 1,
 				"select_multiple_modifier": "ctrl"
 			},
+			
 			json_data: { 
 				data: TreeData,
 				progressive_render : true
@@ -922,6 +929,8 @@ function showLVTree(data)
 		{
 			$("#loadingGif").remove();
 			$("h3:contains('Daten werden geladen...')").remove();
+			$("#filteredLVs").height("auto");
+			$("#menueRechts").height("auto");
 			//hideAllTreeColumns();
 		}).bind("select_node.jstree", function(event, data)
 		{
@@ -938,6 +947,21 @@ function showLVTree(data)
 			if(lvid!==undefined)
 				loadLVKompatibilitaet(lvid);
 
+		}).bind("move_node.jstree", function(event, data)
+		{
+			var studienplan_lehrveranstaltung_id='';
+			if(data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id){
+				studienplan_lehrveranstaltung_id=data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id.value;
+				$("#treeData").jstree.refresh();
+			}
+			
+			// Aenderung speichern
+			saveJsondataFromTree(data.rslt.o[0].id, studienplan_id, studienplan_lehrveranstaltung_id);
+
+			// ECTS Summen neu berechnen				
+			
+			hideAllTreeColumns();
+			writeOverallSum(nodes);
 		});
 	} 
 	else 
@@ -950,6 +974,9 @@ function showLVTree(data)
 		$("h3:contains('')").remove();
 		$("#filteredLVs").append("<div id='lvListe'>Keine Einträge gefunden!</div>");
 	}
+	/*$("#filteredLVs").css(
+		max-width, $("#divLVuebersicht").width()
+	);*/
 }
 
 /*
