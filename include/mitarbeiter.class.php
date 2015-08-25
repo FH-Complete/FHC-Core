@@ -1093,10 +1093,11 @@ class mitarbeiter extends benutzer
 	}
 
     /**
-     *
+     * Liefert MitarbeiterInnen für die Verwaltung der Zutrittskarten
+     *  
      * @param $filter Buchstabe mit dem der Mitarbeiter beginnt
      * @param $fixangestellt false wenn externer mitarbeiter
-     * @param $studSemArray Array mit Studiensemestern in denen der externe Lektor zumindest in einem Unterrichtet haben soll
+     * @param $studSemArray Array mit Studiensemestern in denen der externe Lektor zumindest in einem Unterrichtet haben soll oder NULL. Wenn NULL werden nur externe Mitarbeiter ohne Lehrauftrag ausgegeben.
      * @return boolean
      */
     public function getMitarbeiterForZutrittskarte($filter, $fixangestellt=true, $studSemArray)
@@ -1113,11 +1114,19 @@ class mitarbeiter extends benutzer
         if($fixangestellt)
             $qry.=" AND fixangestellt";
         else
-            $qry.=" AND NOT fixangestellt AND EXISTS
-                (SELECT * FROM lehre.tbl_lehreinheitmitarbeiter
-                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-                WHERE tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid
-                AND tbl_lehreinheit.studiensemester_kurzbz in (".$this->implode4SQL($studSemArray).")) ";
+        {
+            if ($studSemArray==null)
+            	$qry.=" AND NOT fixangestellt AND personalnummer>0 AND NOT EXISTS
+	                (SELECT * FROM lehre.tbl_lehreinheitmitarbeiter
+	                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+	                WHERE tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid) ";
+            else 
+	        	$qry.=" AND NOT fixangestellt AND EXISTS
+	                (SELECT * FROM lehre.tbl_lehreinheitmitarbeiter
+	                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+	                WHERE tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid
+	                AND tbl_lehreinheit.studiensemester_kurzbz in (".$this->implode4SQL($studSemArray).")) ";
+        }
         $qry.=" ORDER BY nachname, vorname";
         if($result = $this->db_query($qry))
         {
