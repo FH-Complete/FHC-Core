@@ -897,6 +897,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 						<xsl:when test="orgform = 'VZ'" >
 							full-time course.
 						</xsl:when>
+						<xsl:when test="orgform = 'PT'" >
+							part time course.
+						</xsl:when>
 						<xsl:otherwise>
 							distance learning course.
 						</xsl:otherwise>
@@ -1132,7 +1135,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 					<text:span text:style-name="T8">6.2 Pflichten</text:span>
 				</text:p>
 				<text:p text:style-name="P48">6.2.1 Studienbeitrag </text:p>
-				<text:p text:style-name="P48">Die Studentin bzw. der Student ist verpflichtet, zwei Wochen vor Beginn jedes Semesters (StudienanfängerInnen: bis 20. August vor Studienbeginn) einen Studienbeitrag gemäß Fachhochschul-Studiengesetz (BGBl. Nr. 340/1993 idgF) in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Dies gilt auch in Semestern mit DiplomandInnenenstatus o.ä. Im Falle einer Erhöhung des gesetzlichen Studienbeitrags-satzes erhöht sich der angeführte Betrag entsprechend. Bei Nichtantritt des Studiums oder Abbruch zu Beginn oder während des Semesters verfällt der Studienbeitrag. </text:p>
+				<text:p text:style-name="P48">Die Studentin bzw. der Student ist verpflichtet, zwei Wochen vor Beginn jedes Semesters (StudienanfängerInnen: bis 20. August vor Studienbeginn) einen Studienbeitrag gemäß Fachhochschul-Studiengesetz (BGBl. Nr. 340/1993 idgF) in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Dies gilt auch in Semestern mit DiplomandInnenenstatus o.ä. Im Falle einer Erhöhung des gesetzlichen Studienbeitrags-satzes erhöht sich der angeführte Betrag entsprechend. Bei Nichtantritt des Studiums oder Abbruch zu Beginn oder während des Semesters verfällt der Studienbeitrag. </text:p>
 				<text:p text:style-name="P46">
 					<text:tab/>
 				</text:p>
@@ -1180,7 +1183,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 					<text:span text:style-name="T8">6.2 Duties</text:span>
 				</text:p>
 				<text:p text:style-name="P48">6.2.1 Tuition Fees </text:p>
-				<text:p text:style-name="P48">Two weeks before the beginning of each semester (new students: up to August 20 before taking up studies) the student undertakes to pay tuition fees according to the University of Applied Sciences Studies Act (Federal Law Gazette No 340/1993 as amended) currently to the sum of € 363.36 net payable per semester. This also applies in semesters with graduand status etc. In the event of an increase in the legal tuition fees rate, the amount quoted will increase accordingly. For non-commencement or termination of the study at the beginning or during the semester, the tuition fee is forfeited. </text:p>
+				<text:p text:style-name="P48">Two weeks before the beginning of each semester (new students: up to August 20 before taking up studies) the student undertakes to pay tuition fees according to the University of Applied Sciences Studies Act (Federal Law Gazette No 340/1993 as amended) currently to the sum of € 363.36 net payable per semester. This also applies in semesters with graduand status etc. In the event of an increase in the legal tuition fees rate, the amount quoted will increase accordingly. For non-commencement or termination of the study at the beginning or during the semester, the tuition fee is forfeited. </text:p>
 				<text:p text:style-name="P73"/>
 				<text:p text:style-name="P48">6.2.2 Studierendenbeitrag („ÖH-Beitrag“) </text:p>
 				<text:p text:style-name="P48">Gemäß § 4 Abs. 10 des Fachhochschul-Studiengesetzes (BGBl. Nr. 340/1993 idgF und der Bundesministeriengesetz-Novelle 2007, BGBl. I Nr. 6/2007) gehören <text:span text:style-name="T46">ordentliche und außerordentliche </text:span>Studierende an Fachhochschul-Studiengängen der Österreichischen HochschülerInnenschaft (ÖH) gemäß Hochschülerinnen- und Hochschülerschaftsgesetz (HSG 2014) an. Daraus resultiert die Verpflichtung der Studentin oder des Studenten zur Entrichtung des ÖH-Beitrags. Dies gilt auch in Semestern mit DiplomandInnenstatus. Der Studierendenbeitrag kann jährlich durch die ÖH indexiert werden; die genaue Höhe des Studierendenbeitrags wird von der ÖH jährlich für das folgende Studienjahr bekannt gegeben. </text:p>
@@ -1209,7 +1212,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P57">6.2.4 Unkostenbeitrag </text:p>
 				<text:p text:style-name="P78">Pro Semester ist ein Unkostenbeitrag zu entrichten, wobei es sich nicht um einen Pauschalbetrag handelt. Der Unkostenbeitrag stellt eine Abgeltung für über das Normalmaß hinausgehende Serviceleistungen der FH dar, z.B. Freifächer, Beratung/Info Auslands-studium, Sponsionsfeiern, Vorträge / Job-börse, Mensa etc. </text:p>
 				<text:p text:style-name="P78"/>
-				<text:p text:style-name="P50">Die Höhe des Unkostenbeitrages beträgt derzeit € 75,– pro Semester. Eine allfällige Anpassung wird durch Aushang bekannt gemacht. </text:p>
+				<text:p text:style-name="P50">Die Höhe des Unkostenbeitrages beträgt derzeit € 75,– pro Semester. Eine allfällige Anpassung wird durch Aushang bekannt gemacht. </text:p>
 				<text:p text:style-name="P48">Der Unkostenbeitrag ist 
 				<xsl:choose>
 						<xsl:when test="semesterStudent = 3" >
@@ -1230,7 +1233,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P52">6.2.4 Contribution towards Expenses </text:p>
 				<text:p text:style-name="P52">A contribution towards expenses, which is not a lump sum, is payable per semester. The contribution towards expenses represents compensation for the services provided by the UAS that go beyond the normal level, such as electives, counseling/ information about studying abroad, graduation ceremonies, lectures/job market, cafeteria, etc. </text:p>
 				<text:p text:style-name="P63"/>
-				<text:p text:style-name="P52">The amount of the contribution is currently <text:line-break/>€ 75,– per semester. Any possible adjustment is posted on the noticeboard. </text:p>
+				<text:p text:style-name="P52">The amount of the contribution is currently <text:line-break/>€ 75,– per semester. Any possible adjustment is posted on the noticeboard. </text:p>
 				<text:p text:style-name="P52">
 				<xsl:choose>
 					<xsl:when test="semesterStudent = 3" >
