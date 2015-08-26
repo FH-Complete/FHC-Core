@@ -77,9 +77,14 @@ else
 	$verwendung=null;
 
 if (isset($_GET['VertragNochNichtRetour']))
+{
+	// Vertraege muessen nur von externen Lektoren retourniert werden
+	$fix='false';
 	$vertragnochnichtretour = 'true';
+}
 else
 	$vertragnochnichtretour=null;
+
 
 if(isset($_GET['filter']))
 	$filter = $_GET['filter'];
