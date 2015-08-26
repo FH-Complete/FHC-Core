@@ -2390,7 +2390,7 @@ function LehrveranstaltungTermineIFrameLoad()
 /**
  * Laedt die Anwesenheiten einer Lehrveranstaltung wenn auf den Tab gewechselt wird
  */
-function LehrveranstaltungTermineIFrameLoad()
+function LehrveranstaltungAnwesenheitIFrameLoad()
 {
 	var tree = document.getElementById('lehrveranstaltung-tree');
 
