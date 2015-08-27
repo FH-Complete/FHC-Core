@@ -447,12 +447,12 @@ function drawTree($tree, $depth)
 			
 			$tdclass=array();
 			//Empfehlung holen
-			if(isset($lv_arr[$row_tree->lehrveranstaltung_id]))
-			{
-				$empfohlenesSemester = $lv_arr[$row_tree->lehrveranstaltung_id]->semester;
-				if($semester==$empfohlenesSemester)
-					$tdclass[]='empfehlung';
-			}
+//			if(isset($lv_arr[$row_tree->lehrveranstaltung_id]))
+//			{
+//				$empfohlenesSemester = $lv_arr[$row_tree->lehrveranstaltung_id]->semester;
+//				if($semester==$empfohlenesSemester)
+//					$tdclass[]='empfehlung';
+//			}
 
 			$tdinhalt='';
 
@@ -568,10 +568,10 @@ function drawTree($tree, $depth)
 echo '</table>';
 echo '<br><br>'.$p->t('studienplan/legende').':<br>
 <table>
-<tr>
+<!--<tr>
 	<td><span class="empfehlung">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
 	<td>'.$p->t('studienplan/legendeEmpfehlung').'</td>
-</tr>
+</tr>-->
 <tr>
 	<td></td>
 	<td></td>
