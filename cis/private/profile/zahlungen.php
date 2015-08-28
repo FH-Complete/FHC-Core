@@ -94,6 +94,7 @@
 				foreach ($row['childs'] as $row_child)
 				{
 					$betrag += $row_child->betrag;
+                    $betrag = round($betrag, 2);
 				}
 			}
 			
