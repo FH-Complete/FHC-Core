@@ -3808,6 +3808,7 @@ $berechtigungen = array(
 	array('lehre/studienordnung','Studienordnung'),
 	array('lehre/vorrueckung','Lehreinheitenvorrückung'),
 	array('lv-plan','Stundenplan'),
+	array('lv-plan/gruppenentfernen','erlaut das entfernen von Gruppen aus LVPlan vom FAS aus'),
 	array('mitarbeiter','FAS Mitarbeitermodul'),
 	array('mitarbeiter/bankdaten','Bankdaten für Mitarbeiter und Studierende anzeigen'),
 	array('mitarbeiter/personalnummer','Editieren der Personalnummer im FAS'),

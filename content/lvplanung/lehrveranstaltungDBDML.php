@@ -73,25 +73,26 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$r
 }
 
 
-function kollision($lehreinheit_id, $mitarbeiter_uid, $mitarbeiter_uid_old)
+function kollision($lehreinheit_id, $mitarbeiter_uid, $mitarbeiter_uid_old, $db_stpl_table)
 {
-	global $db_stpl_table,$errormsg;
-
 	//Lehrstunden laden
 	$lehrstunden=new lehrstunde();
 	$lehrstunde=new lehrstunde();
 	$lehrstunden->load_lehrstunden_le($lehreinheit_id,$mitarbeiter_uid_old);
 
+	$koll_arr=array();
 	foreach ($lehrstunden->lehrstunden as $ls)
 	{
 		$lehrstunde->load($ls->stundenplan_id);
 		$lehrstunde->lektor_uid=$mitarbeiter_uid;
 		if ($lehrstunde->kollision($db_stpl_table))
 		{
-			$errormsg=$lehrstunde->errormsg;
-			return true;
+			$koll_arr[]=$lehrstunde->errormsg;
 		}
 	}
+	if(count($koll_arr)>0)
+		return $koll_arr;
+
 	return false;
 }
 
@@ -104,9 +105,9 @@ function kollision($lehreinheit_id, $mitarbeiter_uid, $mitarbeiter_uid_old)
 function LehrauftragAufFirma($mitarbeiter_uid)
 {
 	global $db;
-	
+
 	$qry_firma = "
-				SELECT * FROM campus.vw_mitarbeiter LEFT JOIN public.tbl_adresse USING(person_id) 
+				SELECT * FROM campus.vw_mitarbeiter LEFT JOIN public.tbl_adresse USING(person_id)
 				WHERE uid=".$db->db_add_param($mitarbeiter_uid)."
 				ORDER BY zustelladresse DESC, firma_id LIMIT 1";
 	if($result_firma = $db->db_query($qry_firma))
@@ -115,15 +116,15 @@ function LehrauftragAufFirma($mitarbeiter_uid)
 		{
 			if($row_firma->firma_id=='')
 				return false;
-			else 
+			else
 				return true;
 		}
-		else 
+		else
 		{
 			return false;
 		}
 	}
-	else 
+	else
 	{
 		return false;
 	}
@@ -139,14 +140,14 @@ function LehrauftragAufFirma($mitarbeiter_uid)
 function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz, $oe_arr)
 {
 	global $db;
-	
+
 	$ret="Der Lektor ist in folgenden Organisationseinheiten zugeteilt:\n";
-	
+
 	//Liste mit den Stunden in den jeweiligen Instituten anzeigen
 	$qry = "SELECT sum(tbl_lehreinheitmitarbeiter.semesterstunden) as summe, tbl_studiengang.bezeichnung
 			FROM
-				lehre.tbl_lehreinheitmitarbeiter 
-				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+				lehre.tbl_lehreinheitmitarbeiter
+				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 				JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 				JOIN public.tbl_studiengang USING(studiengang_kz)
 			WHERE
@@ -157,7 +158,7 @@ function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz, $oe_ar
 				bismelden AND
 				tbl_studiengang.oe_kurzbz in(".$db->db_implode4SQL($oe_arr).")
 			GROUP BY tbl_studiengang.bezeichnung";
-	
+
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
@@ -172,7 +173,7 @@ if(!$error)
 {
     if(!empty($_POST['lehrveranstaltung']))
         $lva = new lehrveranstaltung($_POST['lehrveranstaltung']);
-    
+
 	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_save')
 	{
 		//Lehreinheitmitarbeiter Zuteilung
@@ -229,6 +230,8 @@ if(!$error)
 			$faktor_alt = $lem->faktor;
 			$stundensatz_alt = $lem->stundensatz;
 
+			$qry_lvplanaenderung='';
+
 			if(!$error)
 			{
 				$lem->lehreinheit_id = $_POST['lehreinheit_id'];
@@ -248,33 +251,31 @@ if(!$error)
 
 				//Wenn sich der Lektor aendert und keine Kollision dadurch entsteht, dann werden die
 				//Daten automatisch im Stundenplan geaendert
-				if($ignore_kollision=='false' && $lem->mitarbeiter_uid!=$lem->mitarbeiter_uid_old)
+				if($lem->mitarbeiter_uid!=$lem->mitarbeiter_uid_old)
 				{
+					$koll_arr = kollision($lem->lehreinheit_id, $lem->mitarbeiter_uid, $lem->mitarbeiter_uid_old, $db_stpl_table);
 					//check kollision
-					if(!kollision($lem->lehreinheit_id, $lem->mitarbeiter_uid, $lem->mitarbeiter_uid_old))
+					if($koll_arr===false || $ignore_kollision=='true')
 					{
 						//Update im Stundenplan
 						$stpl_table='lehre.tbl_stundenplandev';
-						$qry = "UPDATE $stpl_table SET mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." WHERE lehreinheit_id=".$db->db_add_param($lem->lehreinheit_id, FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid_old);
-						if($db->db_query($qry))
+						$qry_lvplanaenderung = "UPDATE $stpl_table SET mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid).", updateamum=now(), updatevon=".$db->db_add_param($user)." WHERE lehreinheit_id=".$db->db_add_param($lem->lehreinheit_id, FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid_old);
+						// Das Update wird erst weiter unten durchgefuehrt wenn die restlichen Checks erfolgreich sind da es sonst zu inkonsistenzen kommt
+						if(is_array($koll_arr))
 						{
-							$error = false;
-						}
-						else
-						{
-							$error = true;
-							$return = false;
-							$errormsg = 'Fehler beim Update im LV-Plan'.$qry;
+							$errormsg="Da Kollisionen deaktiviert sind, wird die Änderung durchgeführt obwohl dadurch kollisionen entstehen. Bitte korrigieren Sie folgende Kollisionen manuell:\n";
+							$errormsg.=implode("\n",$koll_arr);
 						}
 					}
 					else
 					{
 						$return = false;
-						$errormsg = "Fehler: Die Aenderung des Lektors fuehrt zu einer Kollision im LV-Plan!\n".$errormsg;
+						$errormsg = "Änderung fehlgeschlagen!\nDie Änderung des Lektors führt zu ".count($koll_arr)." Kollision(en) im LV-Plan. Deaktivieren Sie die Kollisionspruefung oder wenden Sie sich an die LV-Planung!\n";
+						$errormsg.= "zB:".$koll_arr[0];
 						$error = true;
 					}
 				}
-				
+
 				$fixangestellt=false;
 				if(!$error)
 				{
@@ -284,7 +285,7 @@ if(!$error)
 					$ma->load($lem->mitarbeiter_uid);
 					$fixangestellt=$ma->fixangestellt;
 
-					$oe_obj = new organisationseinheit();					
+					$oe_obj = new organisationseinheit();
 					$stunden_oe_kurzbz=null;
 
 					$stg_obj = new studiengang();
@@ -295,21 +296,21 @@ if(!$error)
 						list($stunden_oe_kurzbz, $max_stunden) = $oe_obj->getStundengrenze($stg_obj->oe_kurzbz, true);
 					else
 						list($stunden_oe_kurzbz, $max_stunden) = $oe_obj->getStundengrenze($stg_obj->oe_kurzbz, false);
-					
+
 					//Summe der Stunden ermitteln
 					$le = new lehreinheit();
 					$le->load($lem->lehreinheit_id);
-	
+
 					if($lem->stundensatz<=0 || $lem->faktor<=0 || $lem->bismelden==false)
 						$neue_stunden_eingerechnet=false;
 					else
 						$neue_stunden_eingerechnet=true;
-						
+
 					if(($stundensatz_alt<=0 || $faktor_alt<=0 || $bismelden_alt==false))
 						$alte_stunden_eingerechnet=false;
 					else
 						$alte_stunden_eingerechnet=true;
-					
+
 					//Stundenreduzierung immer moeglich
 					if(($lem->semesterstunden>$semesterstunden_alt) || $neue_stunden_eingerechnet)
 					{
@@ -325,7 +326,7 @@ if(!$error)
 						elseif(!$alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
 							$qry.=" (sum(tbl_lehreinheitmitarbeiter.semesterstunden)) as summe";
 						$qry.="	FROM
-									lehre.tbl_lehreinheitmitarbeiter 
+									lehre.tbl_lehreinheitmitarbeiter
 									JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 									JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 									JOIN public.tbl_studiengang USING(studiengang_kz)
@@ -338,7 +339,7 @@ if(!$error)
 
 						if(count($oe_arr)>0)
 							$qry.=" AND tbl_studiengang.oe_kurzbz in(".$db->db_implode4SQL($oe_arr).")";
-						
+
 						if($db->db_query($qry))
 						{
 							if($row = $db->db_fetch_object())
@@ -352,17 +353,17 @@ if(!$error)
 											//Warnung wenn die Stundenzahl ueberschritten wurde
 											$return = false;
 											$error = true;
-											$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden ($stunden_oe_kurzbz) wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";									
+											$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden ($stunden_oe_kurzbz) wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";
 										}
 									}
-									else 
+									else
 									{
 										$return = true;
 										$error = false;
 										$warnung = true;
 										$errormsg = "Hinweis: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden ($stunden_oe_kurzbz) wurde ueberschritten!\n Daten wurden gespeichert!\n\n";
-									}	
-									
+									}
+
 									$errormsg.=getStundenproInstitut($lem->mitarbeiter_uid, $le->studiensemester_kurzbz, $oe_arr);
 								}
 							}
@@ -372,17 +373,17 @@ if(!$error)
 								$error=true;
 								$errormsg='Fehler beim Ermitteln der Gesamtstunden';
 							}
-						
+
 						}
 						else
 						{
 							$return = false;
 							$error=true;
 							$errormsg='Fehler beim Ermitteln der Gesamtstunden';
-						}				
+						}
 					}
 				}
-				
+
 				if(!$error)
 				{
 					if($lem->save())
@@ -392,12 +393,38 @@ if(!$error)
 						if($warnung)
 						{
 							$return=false;
-							$error = true;							
+							$error = true;
 						}
-						else 
+						else
 						{
 							$return = true;
 							$error = false;
+						}
+
+						// Wenn eine LVPlan aenderung noetig ist, dann diese jetzt
+						// durchfuehrten
+						if($qry_lvplanaenderung!='')
+						{
+							if($db->db_query($qry_lvplanaenderung))
+							{
+								if($errormsg=='' || $errormsg=='unknown')
+								{
+									$error = false;
+									$return = true;
+								}
+								else
+								{
+									// Bei Kollisionen steht in errormsg die Kollisionsinformation
+									$error = true;
+									$return = false;
+								}
+							}
+							else
+							{
+								$error = true;
+								$return = false;
+								$errormsg = 'Fehler beim Update im LV-Plan'.$qry;
+							}
 						}
 					}
 					else
@@ -423,7 +450,7 @@ if(!$error)
 			if($row = $db->db_fetch_object())
 			{
 				$lva = new lehrveranstaltung($row->lehrveranstaltung_id);
-                
+
                 if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
 				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
 				   !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid') &&
@@ -493,10 +520,10 @@ if(!$error)
 					$return=false;
 					$errormsg='Fehler bei einer Datenbankabfrage:'.$db->db_last_error();
 				}
-				
+
 				$maxstunden=9999;
 
-				$oe_obj = new organisationseinheit();					
+				$oe_obj = new organisationseinheit();
 				$stunden_oe_kurzbz=null;
 
 				$stg_obj = new studiengang();
@@ -517,11 +544,11 @@ if(!$error)
 
 					$oe_obj = new organisationseinheit();
 					$oe_arr = $oe_obj->getChilds($stunden_oe_kurzbz);
-	
+
 					$qry = "SELECT
 								sum(tbl_lehreinheitmitarbeiter.semesterstunden) as summe
 							FROM
-								lehre.tbl_lehreinheitmitarbeiter 
+								lehre.tbl_lehreinheitmitarbeiter
 								JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 								JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 								JOIN public.tbl_studiengang USING(studiengang_kz)
@@ -555,7 +582,7 @@ if(!$error)
 						}
 					}
 				}
-				
+
 				if(!$error)
 				{
 					//Faktor und Semesterstunden aus tbl_lehrveranstaltung holen
@@ -568,7 +595,7 @@ if(!$error)
 								$lem->faktor = $row->planfaktor;
 							else
 								$lem->faktor = '1.0';
-							
+
 							if($row->semesterstunden!='')
 							{
 								//wenn es sich um einen freien Lektor handelt, und dieser nicht mehr die volle Stundenanzahl unterrichten
@@ -576,7 +603,7 @@ if(!$error)
 								$lem->semesterstunden = ($row->semesterstunden>$maxstunden?$maxstunden:$row->semesterstunden);
 								$lem->planstunden = ($row->semesterstunden>$maxstunden?$maxstunden:$row->semesterstunden);
 							}
-							else	
+							else
 							{
 								$lem->planstunden = '0';
 								$lem->semesterstunden = '0';
@@ -595,7 +622,7 @@ if(!$error)
 						$return = false;
 						$errormsg = 'Fehler in einer Datenbankabfrage:'.$db->db_last_error();
 					}
-	
+
 					if(!$error)
 					{
 						if($lem->save())
@@ -631,7 +658,7 @@ if(!$error)
 			if($row = $db->db_fetch_object())
 			{
 				$lva = new lehrveranstaltung($row->lehrveranstaltung_id);
-                
+
                 if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
 				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
 				   !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid') &&
@@ -712,7 +739,7 @@ if(!$error)
 			if($row = $db->db_fetch_object())
 			{
 				$lva = new lehrveranstaltung($row->lehrveranstaltung_id);
-                
+
                 if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
 				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
 				   !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid') &&
@@ -767,25 +794,14 @@ if(!$error)
 			//Pruefen ob diese Gruppe im Stundenplan schon verplant wurde
 			if(!$error)
 			{
-				$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev 
-						WHERE 
+				$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev
+						WHERE
 							(lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband,'')), trim(COALESCE(gruppe,'')), trim(COALESCE(gruppe_kurzbz,''))) =
-							(SELECT 
+							(SELECT
 								lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband,'')), trim(COALESCE(gruppe,'')), trim(COALESCE(gruppe_kurzbz,''))
-							 FROM 
-							 	lehre.tbl_lehreinheitgruppe 
-							WHERE 
-								lehreinheitgruppe_id=".$db->db_add_param($_POST['lehreinheitgruppe_id'], FHC_INTEGER)."
-							)
-						UNION
-						SELECT stundenplan_id as id FROM lehre.tbl_stundenplan 
-						WHERE 
-							(lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband,'')), trim(COALESCE(gruppe,'')), trim(COALESCE(gruppe_kurzbz,''))) =
-							(SELECT 
-								lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband,'')), trim(COALESCE(gruppe,'')), trim(COALESCE(gruppe_kurzbz,''))
-							 FROM 
-							 	lehre.tbl_lehreinheitgruppe 
-							WHERE 
+							 FROM
+							 	lehre.tbl_lehreinheitgruppe
+							WHERE
 								lehreinheitgruppe_id=".$db->db_add_param($_POST['lehreinheitgruppe_id'], FHC_INTEGER)."
 							)
 						";
@@ -798,7 +814,7 @@ if(!$error)
 						$errormsg = 'Diese Gruppe kann nicht geloescht werden, da sie bereits im LV-Plan verplant ist. Bitte wenden Sie sich an die LV-Planung';
 					}
 				}
-				else 
+				else
 				{
 					$errormsg = 'Fehler beim Pruefen des LV-Plans: '.$db->db_last_error();
 					$return = false;
@@ -806,7 +822,7 @@ if(!$error)
 				}
 
 			}
-			
+
 			if(!$error)
 			{
 				//Lehreinheitgruppezuteilung loeschen
@@ -831,6 +847,67 @@ if(!$error)
 			}
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_del_lvplan')
+	{
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.lehrveranstaltung_id,
+				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
+				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND lehreinheit_id=(SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id=".$db->db_add_param($_POST['lehreinheitgruppe_id'], FHC_INTEGER).")";
+		if($db->db_query($qry))
+		{
+			if($row = $db->db_fetch_object())
+			{
+				$lva = new lehrveranstaltung($row->lehrveranstaltung_id);
+
+                if(!$rechte->isBerechtigtMultipleOe('lv-plan/gruppenentfernen', $lva->getAllOe(), 'suid'))
+				{
+					$error = true;
+					$return = false;
+					$errormsg = 'Keine Berechtigung';
+				}
+			}
+			else
+			{
+				$error = true;
+				$return = false;
+				$errormsg = 'Lehreinheit wurde nicht gefunden';
+			}
+		}
+		else
+		{
+			$error = true;
+			$return = false;
+			$errormsg = 'Lehreinheit wurde nicht gefunden';
+		}
+
+		//Pruefen ob diese Gruppe im Stundenplan schon verplant wurde
+		if(!$error)
+		{
+			$qry = "DELETE FROM lehre.tbl_stundenplandev
+					WHERE
+						(lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband,'')), trim(COALESCE(gruppe,'')), trim(COALESCE(gruppe_kurzbz,''))) =
+						(SELECT
+							lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband,'')), trim(COALESCE(gruppe,'')), trim(COALESCE(gruppe_kurzbz,''))
+						 FROM
+						 	lehre.tbl_lehreinheitgruppe
+						WHERE
+							lehreinheitgruppe_id=".$db->db_add_param($_POST['lehreinheitgruppe_id'], FHC_INTEGER)."
+						)";
+
+			if($db->db_query($qry))
+			{
+				$error = false;
+				$return = true;
+			}
+			else
+			{
+				$errormsg = 'Fehler beim Entfernen des LV-Plans: '.$db->db_last_error();
+				$return = false;
+				$error = true;
+			}
+		}
+	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_add')
 	{
 		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.lehrveranstaltung_id,
@@ -843,7 +920,7 @@ if(!$error)
 			if($row = $db->db_fetch_object())
 			{
 				$lva = new lehrveranstaltung($row->lehrveranstaltung_id);
-                
+
                 if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
 				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
 				   !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid') &&
@@ -898,7 +975,7 @@ if(!$error)
 							$errormsg = $leg->errormsg;
 						}
 					}
-					else 
+					else
 					{
 						$return = false;
 						$errormsg=$leg->errormsg;
@@ -998,17 +1075,17 @@ if(!$error)
 					$leDAO->stundenblockung=$_POST['stundenblockung'];
 					$leDAO->wochenrythmus=$_POST['wochenrythmus'];
 
-					if (isset($_POST['start_kw'])) 
+					if (isset($_POST['start_kw']))
 						$leDAO->start_kw=$_POST['start_kw'];
 
 					$leDAO->raumtyp=$_POST['raumtyp'];
 					$leDAO->raumtypalternativ=$_POST['raumtypalternativ'];
 					$leDAO->sprache=$_POST['sprache'];
 
-					if (isset($_POST['lehre'])) 
+					if (isset($_POST['lehre']))
 						$leDAO->lehre=($_POST['lehre']=='true'?true:false);
 
-					if (isset($_POST['anmerkung'])) 
+					if (isset($_POST['anmerkung']))
 						$leDAO->anmerkung=$_POST['anmerkung'];
 
 					$leDAO->lvnr=(isset($_POST['lvnr'])?$_POST['lvnr']:'');
@@ -1068,8 +1145,8 @@ if(!$error)
 			}
 			else if ($_POST['do']=='delete') //Lehreinheit loeschen
 			{
-				if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') && 
-                   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') && 
+				if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
+                   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
                    !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid'))
 				{
 					$return = false;
@@ -1100,7 +1177,7 @@ if(!$error)
 									$return = false;
 									$errormsg = 'Lehreinheit kann nicht geloescht werden, da dazu bereits ein Moodle-Kurs angelegt wurde';
 								}
-								else 
+								else
 								{
 									if ($leDAO->delete($_POST['lehreinheit_id']))
 									{
@@ -1151,7 +1228,7 @@ if(!$error)
 		$lehrveranstaltung_obj = new lehrveranstaltung();
         if(!$lehrveranstaltung_obj->load($_POST['lehrveranstaltung_id']))
             $errormsg = 'Fehler beim Laden der Lehrveranstaltung';
-        
+
         if(!$rechte->isBerechtigtMultipleOe('admin', $lehrveranstaltung_obj->getAllOe(), 'suid') &&
            !$rechte->isBerechtigtMultipleOe('assistenz', $lehrveranstaltung_obj->getAllOe(), 'suid'))
         {
@@ -1159,7 +1236,7 @@ if(!$error)
             $return = false;
             $errormsg = 'Keine Berechtigung';
         }
-        
+
         if(!$error)
         {
             isset($_POST['lvangebot_id']) ? $lvangebot_id = $_POST['lvangebot_id'] : $lvangebot_id = null;
@@ -1240,7 +1317,7 @@ if(!$error)
 		$lvangebot = new lvangebot();
         $lvangebot->load($_POST['lvangebot_id']);
         $lva = new lehrveranstaltung($lvangebot->lehrveranstaltung_id);
-                
+
         if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
            !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
            !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz) &&
@@ -1250,7 +1327,7 @@ if(!$error)
             $return = false;
             $errormsg = 'Keine Berechtigung';
         }
-        
+
         if(!$error)
         {
             if(!$lvangebot->delete($_POST['lvangebot_id']))

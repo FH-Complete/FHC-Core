@@ -1308,6 +1308,59 @@ function LeGruppeDel()
 }
 
 // ****
+// * Loescht den LVPlan einer Gruppe zu einer aus dem LVPlan
+// ****
+function LeGruppeDelLVPlan()
+{
+	tree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe');
+
+	//Nachsehen ob Gruppe markiert wurde
+	var idx;
+	if(tree.currentIndex>=0)
+		idx = tree.currentIndex;
+	else
+	{
+		alert('Bitte zuerst eine Gruppe markieren');
+		return false;
+	}
+
+	try
+	{
+		//Lehreinheit_id holen
+		var col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitgruppe-treecol-lehreinheitgruppe_id"] : "lehrveranstaltung-lehreinheitgruppe-treecol-lehreinheitgruppe_id";
+		var lehreinheitgruppe_id=tree.view.getCellText(idx,col);
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+
+	if(!confirm("Sind Sie sicher dass Sie diese Gruppe aus dem LVPlan entfernen wollen?"))
+		return false;
+
+	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
+	neu = document.getElementById('lehrveranstaltung-detail-checkbox-new').checked;
+
+	req.add('type', 'lehreinheit_gruppe_del_lvplan');
+	req.add('lehreinheitgruppe_id', lehreinheitgruppe_id);
+
+	var response = req.executePOST();
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		//Refresh des Trees
+		LeDetailGruppeTreeRefresh();
+		LvTreeRefresh();
+	}
+}
+
+// ****
 // * Gruppen Tree Refreshen
 // ****
 function LeDetailGruppeTreeRefresh()
@@ -2428,7 +2481,7 @@ function LehrveranstaltungNotenPruefungSave()
 	var satz = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-satz').value;
 	var anzahl = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anzahl').value;
 	satz = satz.replace(',','.');
-    
+
     if(mitarbeiter_uid == '' || satz == '' || anzahl == '')
     {
         alert('Bitte wählen Sie einen Mitarbeiter aus und geben Sie den Satz pro Prüfung sowie die Anzahl der Prüfungen an!');
