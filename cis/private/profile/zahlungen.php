@@ -127,7 +127,7 @@
 			{
 				echo '<a onclick="window.open(';
 				echo "'zahlungen_details.php?buchungsnr=".$row['parent']->buchungsnr."','Zahlungsdetails','height=500,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');return false;";
-				echo '" href="#">'.$p->t('tools/offen').'</a>';
+				echo '" href="#">'.$p->t('tools/offen').'</a> ('.sprintf('%.2f',$betrag*-1).' €)';
 			}
 				echo '</td>';
 			}
