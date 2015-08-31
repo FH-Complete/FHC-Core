@@ -122,7 +122,6 @@ $( document ).ready(function()
 		for(i in addon)
 		{
 			addon[i].init("cis/private/tools/zeitaufzeichnung.php", {uid:\''.$user.'\'});
-			//addon[i].init("cis/private/tools/zeitaufzeichnung.php", {uid:\'foo\'});
 		}
 	}
 });
@@ -581,7 +580,15 @@ if($projekt->getProjekteMitarbeiter($user, true))
 				<tr>
 		      		<td>
 		      			<a href='".$_SERVER['PHP_SELF']."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/neu")."</a>
+		      			&nbsp;
+		      			<a href='".$_SERVER['PHP_SELF']."?csvimport=1' style='font-size: larger;'>CSV Import</a>
 		      		</td>
+		      		<td class='menubox' height='10px'>";
+		if ($p->t("dms_link/handbuchZeitaufzeichnung")!='')
+		{
+			echo '<p><a href="../../../cms/dms.php?id='.$p->t("dms_link/handbuchZeitaufzeichnung").'" target="_blank">'.$p->t("zeitaufzeichnung/handbuchZeitaufzeichnung").'</a></p>';
+		}
+		echo "</td>
 		      	</tr>
 		      </table>";
 		
@@ -750,10 +757,10 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		echo '
 		<tr>
 			<td>'.$p->t("global/von").' - '.$p->t("global/bis").'</td>
-			<td style="width:50px; white-space: nowrap">
+			<td>
 				<input type="text" class="datepicker_datum" id="von_datum" name="von_datum" value="'.$db->convert_html_chars($datum->formatDatum($von, $format='d.m.Y')).'" size="9">
 				<input type="text" class="timepicker" id="von_uhrzeit" name="von_uhrzeit" value="'.$db->convert_html_chars($datum->formatDatum($von, $format='H:i')).'" size="4">
-				</td>';		
+			</td>';		
 		if ($za_simple == 0)
 		{		
 			echo '
@@ -774,7 +781,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<td align="center">&nbsp;-&nbsp;</td>';
 		}
 		echo '
-			<td>				
+			<td align="right">				
 				<input type="text" class="datepicker_datum" id="bis_datum" name="bis_datum" value="'.$db->convert_html_chars($datum->formatDatum($bis, $format='d.m.Y')).'" size="9">
 				<input type="text" class="timepicker" id="bis_uhrzeit" name="bis_uhrzeit" value="'.$db->convert_html_chars($datum->formatDatum($bis, $format='H:i')).'" size="4">
 			</td>
@@ -791,8 +798,13 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<input type="submit" value="'.$p->t("global/aendern").'" name="edit">&nbsp;&nbsp;';
 			echo '<input type="submit" value="'.$p->t("zeitaufzeichnung/alsNeuenEintragSpeichern").'" name="save"></td></tr>';
 		}
-		echo '<tr><td colspan="4"><hr></td></tr>';		
-		echo '<tr><td>CSV-Import</td><td><input type="file" name="csv" value="" /></td><td></td><td align="right"><input type="submit" value="Import" name="import"></td></tr>';				
+		if (isset($_GET['csvimport']))
+		{		
+			echo '<tr><td colspan="4"><hr></td></tr>';		
+			echo '<tr><td>CSV-Import</td><td colspan="2"><input type="file" name="csv" value="" /></td><td align="right"><input type="submit" value="Import" name="import"></td></tr>';		
+		}	
+		else 
+			echo '<input type="file" name="csv" value="" style="visibility:hidden">';
 		echo '</table>';
 		echo '</td><td valign="top"><span id="zeitsaldo"></span></td></tr>
 			</table>';
