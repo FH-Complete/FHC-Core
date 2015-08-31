@@ -42,4 +42,5 @@ $this->phrasen['zeitaufzeichnung/summeEintraege']='Total';
 $this->phrasen['zeitaufzeichnung/arbeitszeit']='Working time';
 $this->phrasen['zeitaufzeichnung/pause']='Breaks';
 $this->phrasen['zeitaufzeichnung/inklusicePlichtpause']='incl. 30 min. lunch break';
+$this->phrasen['zeitaufzeichnung/handbuchZeitaufzeichnung']='Timesheet howto';
 ?>
