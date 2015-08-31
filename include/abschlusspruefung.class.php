@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -28,7 +28,7 @@ class abschlusspruefung extends basis_db
 {
 	public $new;
 	public $result = array();
-	
+
 	//Tabellenspalten
 	public $abschlusspruefung_id;
 	public $student_uid;
@@ -48,7 +48,7 @@ class abschlusspruefung extends basis_db
 	public $insertamum;
 	public $insertvon;
 	public $ext_id;
-		
+
 	/**
 	 * Konstruktor
 	 * @param abschlusspruefung_id ID des zu ladenden Datensatzes
@@ -56,11 +56,11 @@ class abschlusspruefung extends basis_db
 	public function __construct($abschlusspruefung_id=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($abschlusspruefung_id))
 			$this->load($abschlusspruefung_id);
 	}
-	
+
 	/**
 	 * Laedt einen Datensatz
 	 * @param abschlusspruefung_id ID des zu ladenden Datensatzes
@@ -73,15 +73,15 @@ class abschlusspruefung extends basis_db
 			$this->errormsg = 'abschlusspruefung_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		//laden des Datensatzes
-		$qry = "SELECT 
-					* 
-				FROM 
-					lehre.tbl_abschlusspruefung 
-					JOIN lehre.tbl_pruefungstyp USING (pruefungstyp_kurzbz) 
+		$qry = "SELECT
+					*
+				FROM
+					lehre.tbl_abschlusspruefung
+					JOIN lehre.tbl_pruefungstyp USING (pruefungstyp_kurzbz)
 				WHERE abschlusspruefung_id=".$this->db_add_param($abschlusspruefung_id, FHC_INTEGER, false).";";
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -105,9 +105,9 @@ class abschlusspruefung extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
-				return true;		
+				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler bei der Datenbankabfrage';
 				return false;
@@ -119,7 +119,7 @@ class abschlusspruefung extends basis_db
 			return false;
 		}
 	}
-			
+
 	/**
 	 * Loescht einen Datensatz
 	 * @param abschlusspruefung_id ID des zu loeschenden Datensatzes
@@ -133,21 +133,21 @@ class abschlusspruefung extends basis_db
 			$this->errormsg = 'abschlusspruefung_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
-		$qry = "DELETE FROM lehre.tbl_abschlusspruefung 
+
+		$qry = "DELETE FROM lehre.tbl_abschlusspruefung
 				WHERE abschlusspruefung_id=".$this->db_add_param($abschlusspruefung_id, FHC_INTEGER, false).";";
-		
+
 		if($this->db_query($qry))
 		{
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Prueft die Daten vor dem Speichern
 	 *
@@ -172,7 +172,7 @@ class abschlusspruefung extends basis_db
 		}
 		return true;
 	}
-			
+
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -185,14 +185,14 @@ class abschlusspruefung extends basis_db
 			return false;
 		if($new==null)
 			$new = $this->new;
-			
+
 		if($new)
 		{
-			//Neuen Datensatz anlegen	
-			$qry = "BEGIN;INSERT INTO lehre.tbl_abschlusspruefung (student_uid, vorsitz, pruefer1, 
-					pruefer2, pruefer3, abschlussbeurteilung_kurzbz, akadgrad_id, datum, sponsion, 
-					pruefungstyp_kurzbz, anmerkung, updateamum, updatevon, insertamum, insertvon, 
-					ext_id, note) VALUES (".
+			//Neuen Datensatz anlegen
+			$qry = "BEGIN;INSERT INTO lehre.tbl_abschlusspruefung (student_uid, vorsitz, pruefer1,
+					pruefer2, pruefer3, abschlussbeurteilung_kurzbz, akadgrad_id, datum, sponsion,
+					pruefungstyp_kurzbz, anmerkung, updateamum, updatevon, insertamum, insertvon,
+					note) VALUES (".
 			       $this->db_add_param($this->student_uid).', '.
 			       $this->db_add_param($this->vorsitz).', '.
 			       $this->db_add_param($this->pruefer1).', '.
@@ -208,11 +208,10 @@ class abschlusspruefung extends basis_db
 			       $this->db_add_param($this->updatevon).', '.
 			       $this->db_add_param($this->insertamum).', '.
 			       $this->db_add_param($this->insertvon).', '.
-			       $this->db_add_param($this->ext_id, FHC_INTEGER).','.
 			       $this->db_add_param($this->note, FHC_INTEGER).');';
-			       
+
 		}
-		else 
+		else
 		{
 			//Bestehenden Datensatz aktualisieren
 			$qry= "UPDATE lehre.tbl_abschlusspruefung SET".
@@ -229,11 +228,10 @@ class abschlusspruefung extends basis_db
 				  " pruefungstyp_kurzbz=".$this->db_add_param($this->pruefungstyp_kurzbz).",".
 				  " anmerkung=".$this->db_add_param($this->anmerkung).",".
 				  " updateamum=".$this->db_add_param($this->updateamum).",".
-				  " updatevon=".$this->db_add_param($this->updatevon).",".
-				  " ext_id=".$this->db_add_param($this->ext_id, FHC_INTEGER).
+				  " updatevon=".$this->db_add_param($this->updatevon).
 				  " WHERE abschlusspruefung_id=".$this->db_add_param($this->abschlusspruefung_id, FHC_INTEGER, false);
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			if($new)
@@ -247,31 +245,31 @@ class abschlusspruefung extends basis_db
 						$this->db_query('COMMIT;');
 						return true;
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					$this->db_query('ROLLBACK');
 					return false;
 				}
 			}
-			else 
+			else
 
 				return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt alle Abschlusspruefungen eines Studenten
 	 * @param student_uid UID des Studenten
@@ -279,20 +277,20 @@ class abschlusspruefung extends basis_db
 	 */
 	public function getAbschlusspruefungen($student_uid)
 	{
-		$qry = "SELECT 
-					* 
-				FROM 
-					lehre.tbl_abschlusspruefung 
-					JOIN lehre.tbl_pruefungstyp USING (pruefungstyp_kurzbz) 
+		$qry = "SELECT
+					*
+				FROM
+					lehre.tbl_abschlusspruefung
+					JOIN lehre.tbl_pruefungstyp USING (pruefungstyp_kurzbz)
 				WHERE student_uid=".$this->db_add_param($student_uid, FHC_STRING, false)."
 				ORDER BY datum DESC";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new abschlusspruefung();
-				
+
 				$obj->abschlusspruefung_id = $row->abschlusspruefung_id;
 				$obj->student_uid = $row->student_uid;
 				$obj->vorsitz = $row->vorsitz;
@@ -312,33 +310,33 @@ class abschlusspruefung extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
-		}			
+		}
 	}
-    
-    
+
+
     /**
      * Liefert die letzte Abschlussprüfung eines Studenten
-     * @param type $student_uid 
+     * @param type $student_uid
      */
     public function getLastAbschlusspruefung($student_uid)
     {
-		$qry = "SELECT 
-					* 
-				FROM 
-					lehre.tbl_abschlusspruefung 
-					JOIN lehre.tbl_pruefungstyp USING (pruefungstyp_kurzbz) 
+		$qry = "SELECT
+					*
+				FROM
+					lehre.tbl_abschlusspruefung
+					JOIN lehre.tbl_pruefungstyp USING (pruefungstyp_kurzbz)
 				WHERE student_uid=".$this->db_add_param($student_uid, FHC_STRING, false)."
 				ORDER BY datum DESC LIMIT 1";
-        
+
         if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -362,16 +360,16 @@ class abschlusspruefung extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
-				
+
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
-		}			
+		}
     }
-	
+
 }
 ?>

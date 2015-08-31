@@ -40,7 +40,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('basis/cms'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+	die($rechte->errormsg);
 	
 $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
 ?>
@@ -55,9 +55,13 @@ $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
 	<link href="../skin/style.css.php" rel="stylesheet" type="text/css">
 	<script type="text/javascript" src="../include/tiny_mce/tiny_mce.js"></script>
 	<script type="text/javascript" src="../include/js/jquery.js"></script>
-		
+	
 	<script type="text/javascript">
-
+	function conf_del()
+	{
+		return confirm('Möchten Sie diesen Eintrag wirklich löschen?');
+	}
+	
 	tinyMCE.init
 	(
 		{
@@ -126,6 +130,7 @@ $parent_content_id = isset($_GET['parent_content_id'])?$_GET['parent_content_id'
 $action = isset($_GET['action'])?$_GET['action']:'';
 $method = isset($_GET['method'])?$_GET['method']:null;
 $filter = isset($_GET['filter'])?$_GET['filter']:null;
+$deleted = isset($_GET['deleted'])?$_GET['deleted']:'';
 $message = '';
 $submenu_depth=0;
 $datum_obj = new datum();
@@ -657,6 +662,29 @@ if(!is_null($method))
 				$message.='<span class="error">Fehler: ID wurde nicht uebergeben</span>';
 			}
 			break;
+		case 'delete':
+			if(!$rechte->isBerechtigt('basis/cms', null, 'suid'))
+			{
+				$message.='<span class="error">Sie haben keine Berechtigung zum loeschen von Contents</span>';
+				break;
+			}
+			
+			$content = new content();
+			if (isset($_GET['versionold']) || isset($_GET['spracheold']))
+			{
+				$versionold = $_GET['versionold'];
+				$spracheold = $_GET['spracheold'];
+				$content->deleteContent($_GET['deleted'], $spracheold, $versionold);
+			}
+			/*
+			 * letzte default-language
+			 * letzte version (!= 1)
+			 */
+			else 
+			{
+				$content->deleteContent($_GET['deleted']);
+			}
+			break;
 		default: break;
 	}
 }
@@ -796,10 +824,13 @@ if(!is_null($content_id) && $content_id!='')
 		case 'history':
 					print_history();
 					break;
+		case 'delete':
+					print_delete();
+					break;
 		default: break;
 	}
-	
 }
+
 echo '</td></tr></table>';
 echo '</body>
 </html>';
@@ -880,7 +911,8 @@ function drawheader()
 	echo get_content_link('content','Inhalt').' | ';
 	echo get_content_link('rights','Rechte').' | ';
 	echo get_content_link('childs','Childs').' | ';
-	echo get_content_link('history','History');
+	echo get_content_link('history','History').' | ';
+	echo get_content_link('delete', 'Delete');
 }
 /**
  * Gibt einen Menue Link aus
@@ -1335,4 +1367,69 @@ function print_history()
 		echo '</ul>';
 	}
 }
+	
+/**
+ * Erstellt den Karteireiter zum Löschen des Contents / der Version
+ * Achtet auch darauf ob es die letzte version überhaupt bzw. die Letzte in der DEFAULT_LANGUAGE ist
+ *
+ */
+function print_delete() 
+{
+	global $content_id, $sprache, $version, $filterstr;
+	
+	$content = new content();
+	
+	if ($sprache == DEFAULT_LANGUAGE)
+	{
+		if ($content->getNumberOfVersions($content_id, $sprache) == 1)
+		{
+			echo'Diese Version kann nicht gelöscht werden, da sie die letzte Vorhandene in der Standardsprache ('.DEFAULT_LANGUAGE.') ist.<br>';
+			echo '<form action="'.$_SERVER['PHP_SELF'].'?deleted='.$content_id.'&method=delete&filter='.implode(' ', $filterstr).'" method="POST">
+				 Den gesamten Content <input type="submit" value="löschen" onclick="return conf_del()"></form>';
+		}
+		else
+		{
+			
+			echo'<form action="'.$_SERVER['PHP_SELF'].'?deleted='.$content_id.'&action=delete&versionold='.$version.'&spracheold='.$sprache.'&method=delete&content_id='.$content_id.'&filter='.implode(' ', $filterstr).'" method="POST">
+				Diese Version ('.$sprache.' '.$version.'. Version) <input type="submit" value="löschen" onclick="return conf_del()"> <br /></form>';
+			echo '<form action="'.$_SERVER['PHP_SELF'].'?deleted='.$content_id.'&method=delete&filter='.implode(' ', $filterstr).'" method="POST">
+				Den gesamten Content <input type="submit" value="löschen" onclick="return conf_del()"></form>';
+		}
+		
+	}
+	else
+	{
+		echo'<form action="'.$_SERVER['PHP_SELF'].'?deleted='.$content_id.'&action=delete&versionold='.$version.'&spracheold='.$sprache.'&method=delete&content_id='.$content_id.'&filter='.implode(' ', $filterstr).'" method="POST">
+			Diese Version ('.$sprache.' '.$version.'. Version) <input type="submit" value="löschen" onclick="return conf_del()"> <br /></form>';
+		echo '<form action="'.$_SERVER['PHP_SELF'].'?deleted='.$content_id.'&method=delete&filter='.implode(' ', $filterstr).'" method="POST">
+			Den gesamten Content <input type="submit" value="löschen" onclick="return conf_del()"></form>';
+	}
+}
 ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -75,14 +75,14 @@ class pruefung extends basis_db
 		    return false;
 	    }
 
-	    $qry = "SELECT 
-					tbl_pruefung.*, 
-					tbl_lehreinheit.lehrveranstaltung_id, 
+	    $qry = "SELECT
+					tbl_pruefung.*,
+					tbl_lehreinheit.lehrveranstaltung_id,
 					tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
-			    FROM 
-					lehre.tbl_pruefung 
-					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
-				WHERE 
+			    FROM
+					lehre.tbl_pruefung
+					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+				WHERE
 					pruefung_id=".$this->db_add_param($pruefung_id, FHC_INTEGER);
 
 	    if($this->db_query($qry))
@@ -219,8 +219,8 @@ class pruefung extends basis_db
 	    if($this->new)
 	    {
 		    //Neuen Datensatz anlegen
-		    $qry = 'BEGIN;INSERT INTO lehre.tbl_pruefung (lehreinheit_id, student_uid, mitarbeiter_uid, note, pruefungstyp_kurzbz, 
-				datum, anmerkung, insertamum, insertvon, updateamum, updatevon, ext_id, pruefungsanmeldung_id, vertrag_id, punkte) VALUES ('.
+		    $qry = 'BEGIN;INSERT INTO lehre.tbl_pruefung (lehreinheit_id, student_uid, mitarbeiter_uid, note, pruefungstyp_kurzbz,
+				datum, anmerkung, insertamum, insertvon, updateamum, updatevon, pruefungsanmeldung_id, vertrag_id, punkte) VALUES ('.
 			    $this->db_add_param($this->lehreinheit_id).', '.
 			    $this->db_add_param($this->student_uid).', '.
 			    $this->db_add_param($this->mitarbeiter_uid).', '.
@@ -232,7 +232,6 @@ class pruefung extends basis_db
 			    $this->db_add_param($this->insertvon).', '.
 			    $this->db_add_param($this->updateamum).', '.
 			    $this->db_add_param($this->updatevon).', '.
-			    $this->db_add_param($this->ext_id).', '.
 			    $this->db_add_param($this->pruefungsanmeldung_id).','.
 				$this->db_add_param($this->vertrag_id).','.
 				$this->db_add_param($this->punkte).');';
@@ -260,7 +259,6 @@ class pruefung extends basis_db
 			    'insertvon='.$this->db_add_param($this->insertvon).', '.
 			    'updateamum='.$this->db_add_param($this->updateamum).', '.
 			    'updatevon='.$this->db_add_param($this->updatevon).', '.
-			    'ext_id='.$this->db_add_param($this->ext_id).', '.
 			    'pruefungsanmeldung_id='.$this->db_add_param($this->pruefungsanmeldung_id, FHC_INTEGER).', '.
 				'vertrag_id='.$this->db_add_param($this->vertrag_id, FHC_INTEGER).', '.
 				'punkte='.$this->db_add_param($this->punkte).' '.
@@ -372,7 +370,7 @@ class pruefung extends basis_db
      * @param $pruefungstyp
      * @param $stsem
      * @return boolean
-     */	
+     */
     public function getPruefungenLV($lv_id, $pruefungstyp=null, $stsem=null)
     {
 	    $qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,

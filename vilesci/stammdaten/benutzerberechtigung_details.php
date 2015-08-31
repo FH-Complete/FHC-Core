@@ -261,7 +261,8 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	| <a href="benutzerberechtigung_details.php?filter=ohnewawi&amp;uid='.$uid.'&amp;funktion_kurzbz='.$funktion_kurzbz.'" '.($filter=='ohnewawi'?'style="font-weight:bold"':'').'>ohne WaWi</a>
 	
 	';*/
-	$htmlstr .= "<table id='t1' class='tablesorter2'>\n"; //Normaler Tablesorter markiert beim Hover die Zeile, was bei den Benutzerberechtigungen nervt.
+	
+	$htmlstr .= "<table id='t1' class='tablesorter2'>\n"; //Alternatives styling fuer Tablesorter um Platz zu sparen.
 	$htmlstr .= "<thead><tr></tr>\n";
 	$htmlstr .= "<tr>
 					<th></th>
@@ -286,132 +287,184 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		{
 			case 'alle'; break;
 			case 'wawi';
-					if(!mb_strstr($b->berechtigung_kurzbz,'wawi'))
-						continue 2;
-					break;
+			if(!mb_strstr($b->berechtigung_kurzbz,'wawi'))
+				continue 2;
+			break;
 			case 'ohnewawi';
-					if(mb_strstr($b->berechtigung_kurzbz,'wawi'))
-						continue 2;
-					break;
+			if(mb_strstr($b->berechtigung_kurzbz,'wawi'))
+				continue 2;
+			break;
 			default: break;
 		}
-		$htmlstr .= "	<tr id='".$b->benutzerberechtigung_id."'>\n";
-		$htmlstr .= "<form action='benutzerberechtigung_details.php?filter=".$filter."' method='POST' name='berechtigung".$b->benutzerberechtigung_id."'>\n";
-		$htmlstr .= "<input type='hidden' name='benutzerberechtigung_id' value='".$b->benutzerberechtigung_id."'>\n";
-		$htmlstr .= "<input type='hidden' name='uid' value='".$b->uid."'>\n";
-		$htmlstr .= "<input type='hidden' name='funktion_kurzbz' value='".$b->funktion_kurzbz."'>\n";
-		
-		$heute = strtotime(date('Y-m-d'));
-		if ($b->ende!='' && strtotime($b->ende)<$heute)
+		if(isset($_POST['edit']) && $_POST['benutzerberechtigung_id']==$b->benutzerberechtigung_id)
 		{
-			$status="ampel_rot.png";
-			$titel="ccc";
-		}
-		elseif ($b->start!='' && strtotime($b->start)>$heute)
-		{
-			$status="ampel_gelb.png";
-			$titel="bbb";
-		}
-		else
-		{ 
-			$status="ampel_gruen.png";
-			$titel="aaa";
-		}
-		//Status
-		$htmlstr .= "		<td style='text-align: center; vertical-align: middle' name='td_$b->benutzerberechtigung_id'><img title='".$titel."' src='../../skin/images/".$status."' alt='aktiv'></td>\n";
-		//Rolle
-		$htmlstr .= "		<td style='padding: 1px;' name='td_$b->benutzerberechtigung_id'><select name='rolle_kurzbz' id='rolle_kurzbz_$b->benutzerberechtigung_id' onchange='markier(\"td_".$b->benutzerberechtigung_id."\"); setnull(\"berechtigung_kurzbz_$b->benutzerberechtigung_id\");' ".($b->berechtigung_kurzbz!=''?'disabled':'').">\n";
-		$htmlstr .= "		<option id='aaa' value='' name='' onclick='enable(\"berechtigung_kurzbz_".$b->benutzerberechtigung_id."\");'>&nbsp;</option>\n";
-		for ($i = 0; $i < sizeof($rolle_arr); $i++)
-		{
-			if ($b->rolle_kurzbz == $rolle_arr[$i])
+			$htmlstr .= "	<tr id='".$b->benutzerberechtigung_id."'>\n";
+			$htmlstr .= "<form action='benutzerberechtigung_details.php?filter=".$filter."' method='POST' name='berechtigung".$b->benutzerberechtigung_id."'>\n";
+			$htmlstr .= "<input type='hidden' name='benutzerberechtigung_id' value='".$b->benutzerberechtigung_id."'>\n";
+			$htmlstr .= "<input type='hidden' name='uid' value='".$b->uid."'>\n";
+			$htmlstr .= "<input type='hidden' name='funktion_kurzbz' value='".$b->funktion_kurzbz."'>\n";
+			
+			$heute = strtotime(date('Y-m-d'));
+			if ($b->ende!='' && strtotime($b->ende)<$heute)
 			{
-				$sel = " selected";
+				$status="ampel_rot.png";
+				$titel="ccc";
+			}
+			elseif ($b->start!='' && strtotime($b->start)>$heute)
+			{
+				$status="ampel_gelb.png";
+				$titel="bbb";
 			}
 			else
-				$sel = "";
-			$htmlstr .= "<option id='".$rolle_arr[$i]."' value='".$rolle_arr[$i]."' ".$sel." onclick='disable(\"berechtigung_kurzbz_".$b->benutzerberechtigung_id."\");' >".$rolle_arr[$i]."</option>";
-		}
-		$htmlstr .= "		</select></td>\n";
-		
-		//Berechtigung
-		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><select name='berechtigung_kurzbz' id='berechtigung_kurzbz_$b->benutzerberechtigung_id' ".($b->rolle_kurzbz!=''?'disabled':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\"); setnull(\"rolle_kurzbz_$b->benutzerberechtigung_id\");'>\n";
-		$htmlstr .= "		<option value='' name='' onclick='enable(\"rolle_kurzbz_".$b->benutzerberechtigung_id."\");'>&nbsp;</option>\n";
-		for ($i = 0; $i < sizeof($berechtigung_arr); $i++)
-		{
-			if ($b->berechtigung_kurzbz == $berechtigung_arr[$i])
-				$sel = " selected";
-			else
-				$sel = "";
-			$htmlstr .= "				<option title='".$berechtigung_beschreibung_arr[$i]."' ".(array_search($berechtigung_arr[$i],$berechtigung_user_arr)!==false?"style='color: #666;'":"")." value='".$berechtigung_arr[$i]."' name='".$berechtigung_arr[$i]."' ".$sel." onclick='disable(\"rolle_kurzbz_".$b->benutzerberechtigung_id."\");'>".$berechtigung_arr[$i]."</option>";
-		}
-		$htmlstr .= "		</select></td>\n";
-		
-		//Art
-		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input id='art_$b->benutzerberechtigung_id' type='text' name='art' value='".$b->art."' size='5' maxlength='5' onChange='validateArt(\"art_$b->benutzerberechtigung_id\"); markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
-		
-		//Organisationseinheit
-		$htmlstr .= "		<td class='oe_column' name='td_$b->benutzerberechtigung_id'><select id='oe_".$b->benutzerberechtigung_id."' name='oe_kurzbz' ".($b->kostenstelle_id!=''?'disabled':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\")' style='width: 200px;'>\n";
-		$htmlstr .= "		<option value='' onclick='enable(\"kostenstelle_".$b->benutzerberechtigung_id."\");'>-- Alle --</option>\n";
-
-		foreach ($oe->result as $oekey)
-		{
-			if ($b->oe_kurzbz == $oekey->oe_kurzbz && $b->oe_kurzbz != null)
-				$sel = " selected";
-			else
-				$sel = "";
-			if(!$oekey->aktiv)
-				$class='class="inactive"';
-			else
-				$class='';
-			$htmlstr .= "	<option value='".$oekey->oe_kurzbz."' ".$sel." ".$class." onclick='disable(\"kostenstelle_".$b->benutzerberechtigung_id."\");'>".$oekey->organisationseinheittyp_kurzbz.' '.$oekey->bezeichnung.'</option>';
-		}
-		$htmlstr .= "		</select></td>\n";
-		
-		//Kostenstelle
-		$htmlstr .= "		<td class='ks_column' name='td_$b->benutzerberechtigung_id'><select id='kostenstelle_".$b->benutzerberechtigung_id."'name='kostenstelle_id' ".($b->oe_kurzbz!=''?'disabled':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\")' style='width: 200px;'>\n";
-		$htmlstr .= "		<option value='' onclick='enable(\"oe_".$b->benutzerberechtigung_id."\");'>&nbsp;</option>\n";
-
-		foreach ($kostenstelle->result as $kst)
-		{
-			if ($b->kostenstelle_id == $kst->kostenstelle_id)
-				$sel = " selected";
-			else
-				$sel = "";
-			if(!$kst->aktiv)
-				$class='class="inactive"';
-			else
-				$class='';
+			{ 
+				$status="ampel_gruen.png";
+				$titel="aaa";
+			}
+			//Status
+			$htmlstr .= "		<td style='text-align: center; vertical-align: middle' name='td_$b->benutzerberechtigung_id'><img title='".$titel."' src='../../skin/images/".$status."' alt='aktiv'></td>\n";
+			//Rolle
+			$htmlstr .= "		<td style='padding: 1px;' name='td_$b->benutzerberechtigung_id'><select name='rolle_kurzbz' id='rolle_kurzbz_$b->benutzerberechtigung_id' onchange='markier(\"td_".$b->benutzerberechtigung_id."\"); setnull(\"berechtigung_kurzbz_$b->benutzerberechtigung_id\");' ".($b->berechtigung_kurzbz!=''?'disabled':'').">\n";
+			$htmlstr .= "		<option id='aaa' value='' name='' onclick='enable(\"berechtigung_kurzbz_".$b->benutzerberechtigung_id."\");'>&nbsp;</option>\n";
+			for ($i = 0; $i < sizeof($rolle_arr); $i++)
+			{
+				if ($b->rolle_kurzbz == $rolle_arr[$i])
+				{
+					$sel = " selected";
+				}
+				else
+					$sel = "";
+				$htmlstr .= "<option id='".$rolle_arr[$i]."' value='".$rolle_arr[$i]."' ".$sel." onclick='disable(\"berechtigung_kurzbz_".$b->benutzerberechtigung_id."\");' >".$rolle_arr[$i]."</option>";
+			}
+			$htmlstr .= "		</select></td>\n";
 			
-			$htmlstr .= "	<option value='".$kst->kostenstelle_id."' ".$sel." ".$class." onclick='disable(\"oe_".$b->benutzerberechtigung_id."\");'>".$kst->bezeichnung.'</option>';
+			//Berechtigung
+			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><select name='berechtigung_kurzbz' id='berechtigung_kurzbz_$b->benutzerberechtigung_id' ".($b->rolle_kurzbz!=''?'disabled':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\"); setnull(\"rolle_kurzbz_$b->benutzerberechtigung_id\");'>\n";
+			$htmlstr .= "		<option value='' name='' onclick='enable(\"rolle_kurzbz_".$b->benutzerberechtigung_id."\");'>&nbsp;</option>\n";
+			for ($i = 0; $i < sizeof($berechtigung_arr); $i++)
+			{
+				if ($b->berechtigung_kurzbz == $berechtigung_arr[$i])
+					$sel = " selected";
+				else
+					$sel = "";
+				$htmlstr .= "				<option title='".$berechtigung_beschreibung_arr[$i]."' ".(array_search($berechtigung_arr[$i],$berechtigung_user_arr)!==false?"style='color: #666;'":"")." value='".$berechtigung_arr[$i]."' name='".$berechtigung_arr[$i]."' ".$sel." onclick='disable(\"rolle_kurzbz_".$b->benutzerberechtigung_id."\");'>".$berechtigung_arr[$i]."</option>";
+			}
+			$htmlstr .= "		</select></td>\n";
+			
+			//Art
+			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input id='art_$b->benutzerberechtigung_id' type='text' name='art' value='".$b->art."' size='5' maxlength='5' onChange='validateArt(\"art_$b->benutzerberechtigung_id\"); markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
+			
+			//Organisationseinheit
+			$htmlstr .= "		<td class='oe_column' name='td_$b->benutzerberechtigung_id'><select id='oe_".$b->benutzerberechtigung_id."' name='oe_kurzbz' ".($b->kostenstelle_id!=''?'disabled':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\")' style='width: 200px;'>\n";
+			$htmlstr .= "		<option value='' onclick='enable(\"kostenstelle_".$b->benutzerberechtigung_id."\");'>-- Alle --</option>\n";
+	
+			foreach ($oe->result as $oekey)
+			{
+				if ($b->oe_kurzbz == $oekey->oe_kurzbz && $b->oe_kurzbz != null)
+					$sel = " selected";
+				else
+					$sel = "";
+				if(!$oekey->aktiv)
+					$class='class="inactive"';
+				else
+					$class='';
+				$htmlstr .= "	<option value='".$oekey->oe_kurzbz."' ".$sel." ".$class." onclick='disable(\"kostenstelle_".$b->benutzerberechtigung_id."\");'>".$oekey->organisationseinheittyp_kurzbz.' '.$oekey->bezeichnung.'</option>';
+			}
+			$htmlstr .= "		</select></td>\n";
+			
+			//Kostenstelle
+			$htmlstr .= "		<td class='ks_column' name='td_$b->benutzerberechtigung_id'><select id='kostenstelle_".$b->benutzerberechtigung_id."'name='kostenstelle_id' ".($b->oe_kurzbz!=''?'disabled':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\")' style='width: 200px;'>\n";
+			$htmlstr .= "		<option value='' onclick='enable(\"oe_".$b->benutzerberechtigung_id."\");'>&nbsp;</option>\n";
+	
+			foreach ($kostenstelle->result as $kst)
+			{
+				if ($b->kostenstelle_id == $kst->kostenstelle_id)
+					$sel = " selected";
+				else
+					$sel = "";
+				if(!$kst->aktiv)
+					$class='class="inactive"';
+				else
+					$class='';
+				
+				$htmlstr .= "	<option value='".$kst->kostenstelle_id."' ".$sel." ".$class." onclick='disable(\"oe_".$b->benutzerberechtigung_id."\");'>".$kst->bezeichnung.'</option>';
+			}
+			$htmlstr .= "		</select></td>\n";
+
+			$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'><input type='checkbox' name='negativ' ".($b->negativ?'checked="checked"':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";				
+			$htmlstr .= "		<td nowrap name='td_$b->benutzerberechtigung_id'><input class='datepicker_datum' type='text' name='start' value='".$b->start."' size='10' maxlength='10' onchange='markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
+			$htmlstr .= "		<td nowrap name='td_$b->benutzerberechtigung_id'><input class='datepicker_datum' type='text' name='ende' value='".$b->ende."' size='10' maxlength='10' onchange='markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
+			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input id='anmerkung_$b->benutzerberechtigung_id' type='text' name='anmerkung' value='".$b->anmerkung."' title='".$db->convert_html_chars(mb_eregi_replace('\r\n'," ",$b->anmerkung))."' size='30' maxlength='256' markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
+			$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'><img src='../../skin/images/information.png' alt='information' title='Angelegt von ".$b->insertvon." am ".$b->insertamum." \nZuletzt geaendert von ".$b->updatevon." am ".$b->updateamum."'></td>\n";
+			
+			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input type='submit' name='schick' value='speichern'></td>";
+			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input type='submit' name='del' value='l&ouml;schen'></td>";
+			$htmlstr .= "</form>\n";
+			$htmlstr .= "	</tr>\n";
 		}
-		$htmlstr .= "		</select></td>\n";
-		
-		//Studiensemester	
-		/*$htmlstr .= "		<td><select name='studiensemester_kurzbz' onchange='markier(\"".$b->benutzerberechtigung_id."\")'>\n";
-		$htmlstr .= "			<option value=''></option>\n";
-		for ($i = 0; $i < sizeof($st_arr); $i++)
+		else 
 		{
-			if ($b->studiensemester_kurzbz == $st_arr[$i])
-				$sel = " selected";
+			$htmlstr .= "	<tr id='".$b->benutzerberechtigung_id."'>\n";
+			$htmlstr .= "<form action='benutzerberechtigung_details.php?filter=".$filter."' method='POST' name='berechtigung".$b->benutzerberechtigung_id."'>\n";
+			$htmlstr .= "<input type='hidden' name='benutzerberechtigung_id' value='".$b->benutzerberechtigung_id."'>\n";
+			$htmlstr .= "<input type='hidden' name='uid' value='".$b->uid."'>\n";
+			$htmlstr .= "<input type='hidden' name='funktion_kurzbz' value='".$b->funktion_kurzbz."'>\n";
+		
+			$heute = strtotime(date('Y-m-d'));
+			if ($b->ende!='' && strtotime($b->ende)<$heute)
+			{
+				$status="ampel_rot.png";
+				$titel="ccc";
+			}
+			elseif ($b->start!='' && strtotime($b->start)>$heute)
+			{
+				$status="ampel_gelb.png";
+				$titel="bbb";
+			}
 			else
-				$sel = "";
-			$htmlstr .= "				<option value='".$st_arr[$i]."' ".$sel.">".$st_arr[$i]."</option>";
+			{
+				$status="ampel_gruen.png";
+				$titel="aaa";
+			}
+			//Status
+			$htmlstr .= "		<td style='text-align: center; vertical-align: middle' name='td_$b->benutzerberechtigung_id'><img title='".$titel."' src='../../skin/images/".$status."' alt='aktiv'></td>\n";
+			//Rolle
+			$htmlstr .= "		<td style='padding: 1px;' name='td_$b->benutzerberechtigung_id'>$b->rolle_kurzbz</td>\n";
+		
+			//Berechtigung
+			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'>$b->berechtigung_kurzbz</td>\n";
+		
+			//Art
+			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'>".$b->art."</td>\n";
+		
+			//Organisationseinheit
+			$oekey = $oe->result;
+			$org = new organisationseinheit();
+			$org->load($b->oe_kurzbz);
+			$htmlstr .= "		<td class='oe_column' name='td_$b->benutzerberechtigung_id'>".$org->organisationseinheittyp_kurzbz." ".$org->bezeichnung."</td>\n";
+		
+			//Kostenstelle
+			$kst = new wawi_kostenstelle();
+			$kst->load($b->kostenstelle_id);
+			if(!$kst->aktiv)
+				$style='style="text-decoration:line-through;"';
+			else
+				$style='';
+			$htmlstr .= "		<td class='ks_column' name='td_$b->benutzerberechtigung_id'><span $style>$kst->bezeichnung</span></td>\n";
+			
+			
+			$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'><input type='checkbox' name='negativ' ".($b->negativ?'checked="checked"':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\")' disabled></td>\n";
+			$htmlstr .= "		<td nowrap name='td_$b->benutzerberechtigung_id'>".$b->start."</td>\n";
+			$htmlstr .= "		<td nowrap name='td_$b->benutzerberechtigung_id'>".$b->ende."</td>\n";
+			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'>".$b->anmerkung."</td>\n";
+			$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'><img src='../../skin/images/information.png' alt='information' title='Angelegt von ".$b->insertvon." am ".$b->insertamum." \nZuletzt geaendert von ".$b->updatevon." am ".$b->updateamum."'></td>\n";
+			
+			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input type='submit' name='edit' value='bearbeiten'></td>";
+			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input type='submit' name='del' value='l&ouml;schen'></td>";
+			$htmlstr .= "</form>\n";
+			$htmlstr .= "	</tr>\n";
 		}
-		$htmlstr .= "		</select></td>\n";*/
 		
-		
-		$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'><input type='checkbox' name='negativ' ".($b->negativ?'checked="checked"':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";				
-		$htmlstr .= "		<td nowrap name='td_$b->benutzerberechtigung_id'><input class='datepicker_datum' type='text' name='start' value='".$b->start."' size='10' maxlength='10' onchange='markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
-		$htmlstr .= "		<td nowrap name='td_$b->benutzerberechtigung_id'><input class='datepicker_datum' type='text' name='ende' value='".$b->ende."' size='10' maxlength='10' onchange='markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
-		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input id='anmerkung_$b->benutzerberechtigung_id' type='text' name='anmerkung' value='".$b->anmerkung."' title='".$db->convert_html_chars(mb_eregi_replace('\r\n'," ",$b->anmerkung))."' size='30' maxlength='256' markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
-		$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'><img src='../../skin/images/information.png' alt='information' title='Angelegt von ".$b->insertvon." am ".$b->insertamum." \nZuletzt geaendert von ".$b->updatevon." am ".$b->updateamum."'></td>\n";
-		
-		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input type='submit' name='schick' value='speichern'></td>";
-		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input type='submit' name='del' value='l&ouml;schen'></td>";
-		$htmlstr .= "</form>\n";
-		$htmlstr .= "	</tr>\n";
-		
+	
 	}
 		
 	$htmlstr .= "	</tbody><tfoot><tr id='neu'>\n";
@@ -475,16 +528,6 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	}
 	$htmlstr .= "		</select></td>\n";
 		
-	//Studiensemester			
-	/*$htmlstr .= "		<td style='padding-top: 10px;'><select name='studiensemester_kurzbz' onchange='markier(\"neu\")'>\n";
-	$htmlstr .= "			<option value=''></option>\n";
-	for ($i = 0; $i < sizeof($st_arr); $i++)
-	{
-		$sel = "";
-		$htmlstr .= "				<option value='".$st_arr[$i]."' ".$sel.">".$st_arr[$i]."</option>";
-	}
-	$htmlstr .= "		</select></td>\n";*/
-		
 	$htmlstr .= "		<td align='center' style='padding-top: 15px;'><input type='checkbox' name='negativ' onchange='markier(\"neu\")'></td>\n";
 	$htmlstr .= "		<td nowrap style='padding-top: 15px;'><input class='datepicker_datum' type='text' name='start' value='' size='10' maxlength='10' onchange='markier(\"neu\")'></td>\n";
 	$htmlstr .= "		<td nowrap style='padding-top: 15px;'><input class='datepicker_datum' type='text' name='ende' value='' size='10' maxlength='10' onchange='markier(\"neu\")'></td>\n";
@@ -539,7 +582,7 @@ $htmlstr .= "<div class='inserterror'>".$errorstr."</div>\n";
 	table.tablesorter2 tbody td {	
 		padding: 1px;
 		background-color: #EEEEEE;
-		vertical-align: top;
+		vertical-align: center;
 	}
 	table.tablesorter2 tbody tr.odd td {
 		background-color:lightgray;
@@ -553,6 +596,8 @@ $htmlstr .= "<div class='inserterror'>".$errorstr."</div>\n";
 	table.tablesorter2 thead tr .headerSortDown, table.tablesorter2 thead tr .headerSortUp {
 	background-color: #8dbdd8;
 	}
+	table.tablesorter2 tr:hover td {
+	background-color: rgb(226, 255, 226) !important;
 	
 	TD,TH 
 	{
@@ -685,7 +730,7 @@ $htmlstr .= "<div class='inserterror'>".$errorstr."</div>\n";
 
 <?php
 	echo $htmlstr;
-	//echo $reloadstr;
+	//echo $reloadstr; Auskommentiert weils nervt
 ?>
 
 </body>

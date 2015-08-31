@@ -16,6 +16,7 @@ define('CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_STUDENTENUPLOAD_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_LVINFO_ANZEIGEN',true);
+define('CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT',true); //Legt fest, ob Lehrende die LV-Infos selbst bearbeiten duerfen und ob der Link zum bearbeiten der LV-Infos im CIS angezeigt wird
 define('CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN',false);
@@ -51,6 +52,17 @@ define('CIS_GESAMTNOTE_PUNKTE',false);
 
 // Gibt an ob der Lektor erneut eine LVNote eintragen kann wenn bereits eine Zeugnisnote vorhanden ist (true | false) DEFAULT true
 define('CIS_GESAMTNOTE_UEBERSCHREIBEN',true);
+
+// Gibt an ob im FAS bei den Lehrveranstaltungsnoten ein zusaetzliches Formular angezeigt wird um
+// Vertraege fuer Pruefungshonorare anzulegen
+define('FAS_GESAMTNOTE_PRUEFUNGSHONORAR',false);
+
+// Grenzwerte für Anwesenheit
+define('FAS_ANWESENHEIT_ROT', 70);
+define('FAS_ANWESENHEIT_GELB', 90);
+
+// Legt einen Prüfungstermin an wenn eine neue Note erfasst wird
+define('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN',false);
 
 // Anzeigeoptionen für LV-Plan Menü
 define('CIS_LVPLAN_EXPORT_ANZEIGEN',true);
@@ -88,7 +100,7 @@ define('VORRUECKUNG_LEHRVERBAND_MAX_SEMESTER','');
 define('VORRUECKUNG_STATUS_MAX_SEMESTER',true);
 
 // Bei Statuswechsel auf Bewerber -> soll Reihungstest brücksichtigt werden
-define('REIHUNGSTEST_CHECK', true); 
+define('REIHUNGSTEST_CHECK', true);
 
 /* Schema zur Erstellung der Kurs Kategorien im Moodle
  * Leer oder nicht gesetzt: STSEM -> STG -> Ausbsemester (WS2014 -> BEL -> 1)
@@ -96,8 +108,11 @@ define('REIHUNGSTEST_CHECK', true);
  */
 define('MOODLE_COURSE_SCHEMA','');
 
+// Legt fst ob Fachbereichsleiter zu Moodle Kursen zugeteilt werden (mit Benutzerdefinierter Rolle 11)
+define('MOODLE_SYNC_FACHBEREICHSLEITUNG',false);
+
 // Bei Statuswechsel auf Bewerber -> bei true wird email (INFOMAIL_BEWERBER) an den Bewerber geschickt
-define('SEND_BEWERBER_INFOMAIL', false); 
+define('SEND_BEWERBER_INFOMAIL', false);
 
 // Infotext der an Bewerber gesendet wird
 define('INFOMAIL_BEWERBER', 'Vielen Dank für Ihr Interesse an einem Studium
@@ -113,7 +128,7 @@ Mo-Fr 9:00-12:00 Uhr
 Mi 13:30-15:30 Uhr
 
 Mit freundlichen Grüßen,
-Ihre Fachhochschule'); 
+Ihre Fachhochschule');
 
 // Bei neuen Studierenden UID automatisch als Matrikelnummer setzen (true|false)
 define('SET_UID_AS_MATRIKELNUMMER',false);
@@ -159,7 +174,7 @@ define('BEWERBERTOOL_ZAHLUNGEN_ANZEIGEN', true);
 define('BEWERBERTOOL_DOKUMENTE_ANZEIGEN', true);
 define('BEWERBERTOOL_ZGV_ANZEIGEN', true);
 define('BEWERBERTOOL_BERUFSTAETIGKEIT_ANZEIGEN', true);
-// Wenn hier eine Mailadresse angegeben ist, werden die Bewerbungen aus der Onlinebwerbung an diese Adresse gesendet. 
+// Wenn hier eine Mailadresse angegeben ist, werden die Bewerbungen aus der Onlinebwerbung an diese Adresse gesendet.
 // Wenn leer dann wird an die Studiengangsadresse gesendet
 define('BEWERBERTOOL_MAILEMPFANG', '');
 

@@ -68,7 +68,7 @@ class konto extends basis_db
 	public function __construct($buchungsnr=null)
 	{
 		parent::__construct();
-				
+
 		if($buchungsnr!=null)
 			$this->load($buchungsnr);
 	}
@@ -186,12 +186,12 @@ class konto extends basis_db
 
 		if($new==null)
 			$new = $this->new;
-	
+
 		if($new)
 		{
-			
+
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO public.tbl_konto (person_id, studiengang_kz, studiensemester_kurzbz, buchungsnr_verweis, betrag, buchungsdatum, buchungstext, mahnspanne, buchungstyp_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id, credit_points) VALUES('.
+			$qry='BEGIN;INSERT INTO public.tbl_konto (person_id, studiengang_kz, studiensemester_kurzbz, buchungsnr_verweis, betrag, buchungsdatum, buchungstext, mahnspanne, buchungstyp_kurzbz, updateamum, updatevon, insertamum, insertvon, credit_points) VALUES('.
 			     $this->db_add_param($this->person_id, FHC_INTEGER).', '.
 			     $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 			     $this->db_add_param($this->studiensemester_kurzbz).', '.
@@ -205,7 +205,6 @@ class konto extends basis_db
 			     $this->db_add_param($this->updatevon).', '.
 			     $this->db_add_param($this->insertamum).', '.
 			     $this->db_add_param($this->insertvon).', '.
-			     $this->db_add_param($this->ext_id, FHC_INTEGER).', '.
 				 $this->db_add_param($this->credit_points).');';
 		}
 		else
@@ -225,7 +224,6 @@ class konto extends basis_db
 				   ' updatevon='.$this->db_add_param($this->updatevon).','.
 				   ' insertamum='.$this->db_add_param($this->insertamum).','.
 				   ' insertvon='.$this->db_add_param($this->insertvon).','.
-				   ' ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).','.
 				   ' credit_points='.$this->db_add_param($this->credit_points).
 				   " WHERE buchungsnr='".$this->db_add_param($this->buchungsnr, FHC_INTEGER)."';";
 
@@ -241,7 +239,7 @@ class konto extends basis_db
 						if($row = $this->db_fetch_object())
 						{
 							$this->buchungsnr = $row->id;
-							
+
 							//Zahlungsreferenz generieren
 							if(strlen($this->buchungsnr_verweis) == 0)
 							{
@@ -359,7 +357,7 @@ class konto extends basis_db
 			$qry = "SELECT tbl_konto.*, anrede, titelpost, titelpre, nachname, vorname, vornamen
 					FROM public.tbl_konto JOIN public.tbl_person USING (person_id)
 					WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)." $stgwhere ORDER BY buchungsdatum";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -413,16 +411,16 @@ class konto extends basis_db
 	public function getBuchungstyp($aktiv=null, $typ=null)
 	{
 		$qry = "SELECT * FROM public.tbl_buchungstyp";
-		
+
 		if(!is_null($aktiv))
 			$qry.=" WHERE aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
-		
+
 		if(!is_null($typ) && is_null($aktiv))
 			$qry.=" WHERE buchungstyp_kurzbz=".$this->db_add_param($typ, FHC_STRING);
-		
+
 		if(!is_null($typ) && !is_null($aktiv))
 			$qry.=" AND buchungstyp_kurzbz=".$this->db_add_param($typ, FHC_STRING);
-		
+
 		$qry.=" ORDER BY beschreibung";
 
 		if($this->db_query($qry))
@@ -455,7 +453,7 @@ class konto extends basis_db
 	 */
 	public function getDifferenz($buchungsnr)
 	{
-		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto 
+		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto
 				WHERE buchungsnr=".$this->db_add_param($buchungsnr, FHC_INTEGER)." OR buchungsnr_verweis=".$this->db_add_param($buchungsnr, FHC_INTEGER);
 
 		if($this->db_query($qry))
@@ -484,14 +482,14 @@ class konto extends basis_db
 	public function checkStudienbeitrag($uid, $stsem)
 	{
 		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum FROM public.tbl_konto, public.tbl_benutzer, public.tbl_student
-					WHERE 
-						tbl_konto.studiensemester_kurzbz = ".$this->db_add_param($stsem)." 
-						AND tbl_benutzer.uid = ".$this->db_add_param($uid)." 
+					WHERE
+						tbl_konto.studiensemester_kurzbz = ".$this->db_add_param($stsem)."
+						AND tbl_benutzer.uid = ".$this->db_add_param($uid)."
 						AND tbl_benutzer.uid = tbl_student.student_uid
-						AND tbl_benutzer.person_id = tbl_konto.person_id 
+						AND tbl_benutzer.person_id = tbl_konto.person_id
 						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
 						AND tbl_konto.buchungstyp_kurzbz = 'Studiengebuehr' ORDER BY buchungsnr";
-		
+
 		if($this->db_query($subqry))
 		{
 			if ($this->db_num_rows()==0)
@@ -505,14 +503,14 @@ class konto extends basis_db
 				}
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler bei einer Abfrage';
 			return false;
 		}
 
 
-		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto 
+		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto
 				WHERE buchungsnr=".$this->db_add_param($buch_nr[0])." OR buchungsnr_verweis=".$this->db_add_param($buch_nr[0]);
 
 		if($this->db_query($qry))
@@ -539,7 +537,7 @@ class konto extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Überprüft, ob das Konto einer Person ausgeglichen ist, oder ob noch Zahlungen offen sind
 	 * @param $person_id ID der Person, die geprüft werden soll
@@ -569,8 +567,8 @@ class konto extends basis_db
 			$this->errormsg="Fehler bei der Datenbankabfrage";
 		}
 	}
-    
-    
+
+
     /**
 	 * ueberprueft, ob studiengebuehr gebucht ist fuer
 	 * student_uid und studiensemester
@@ -579,13 +577,13 @@ class konto extends basis_db
 	public function getLastStudienbeitrag($uid)
 	{
 		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum, tbl_konto.buchungsnr_verweis, tbl_konto.studiensemester_kurzbz FROM public.tbl_konto, public.tbl_benutzer, public.tbl_student
-					WHERE 
+					WHERE
 						tbl_benutzer.uid = ".$this->db_add_param($uid)."
 						AND tbl_benutzer.uid = tbl_student.student_uid
-						AND tbl_benutzer.person_id = tbl_konto.person_id 
+						AND tbl_benutzer.person_id = tbl_konto.person_id
 						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
 						AND tbl_konto.buchungstyp_kurzbz = 'Studiengebuehr' ORDER BY buchungsnr DESC";
-		
+
 		if($result = $this->db_query($subqry))
 		{
 			if ($this->db_num_rows($result)==0)
@@ -596,9 +594,9 @@ class konto extends basis_db
 				{
                     if($subrow->buchungsnr_verweis != '')
                     {
-                        $qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto 
+                        $qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto
                             WHERE buchungsnr=".$this->db_add_param($subrow->buchungsnr_verweis, FHC_INTEGER)." OR buchungsnr_verweis=".$this->db_add_param($subrow->buchungsnr_verweis, FHC_INTEGER).";";
-                        
+
                         if($result_test = $this->db_query($qry))
                         {
                             if($row = $this->db_fetch_object($result_test))
@@ -619,13 +617,13 @@ class konto extends basis_db
 				}
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler bei einer Abfrage';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * ueberprueft, ob studiengebuehr gebucht ist fuer
 	 * student_uid und studiensemester
@@ -633,18 +631,18 @@ class konto extends basis_db
 	 */
 	public function getLastStSemBuchungstypen($uid, $buchungstyp_kurzbz_array)
 	{
-		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum, tbl_konto.buchungsnr_verweis, tbl_konto.studiensemester_kurzbz 
-					FROM 
+		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum, tbl_konto.buchungsnr_verweis, tbl_konto.studiensemester_kurzbz
+					FROM
 						public.tbl_konto
 						JOIN public.tbl_benutzer USING(person_id)
 						JOIN public.tbl_student ON(uid=student_uid)
 						JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
-					WHERE 
+					WHERE
 						tbl_benutzer.uid = ".$this->db_add_param($uid)."
 						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
-						AND tbl_konto.buchungstyp_kurzbz in(".$this->db_implode4SQL($buchungstyp_kurzbz_array).") 
+						AND tbl_konto.buchungstyp_kurzbz in(".$this->db_implode4SQL($buchungstyp_kurzbz_array).")
 					ORDER BY tbl_studiensemester.start DESC";
-		
+
 		if($result = $this->db_query($subqry))
 		{
 			if ($this->db_num_rows($result)==0)
@@ -655,10 +653,10 @@ class konto extends basis_db
 				{
                     if($subrow->buchungsnr_verweis != '')
                     {
-                        $qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto 
+                        $qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto
 
                             WHERE buchungsnr=".$this->db_add_param($subrow->buchungsnr_verweis, FHC_INTEGER)." OR buchungsnr_verweis=".$this->db_add_param($subrow->buchungsnr_verweis, FHC_INTEGER).";";
-                        
+
                         if($result_test = $this->db_query($qry))
                         {
                             if($row = $this->db_fetch_object($result_test))
@@ -679,7 +677,7 @@ class konto extends basis_db
 				}
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler bei einer Abfrage';
 			return false;
@@ -687,7 +685,7 @@ class konto extends basis_db
 	}
 
 	/**
-	 * 
+	 *
 	 * Gibt den Betrag der Bezahlten Studiengebühr eines Semesters zurück
 	 * @param $uid StudentUID
 	 * @param $stsem Studiensemester_kurzbz
@@ -695,28 +693,28 @@ class konto extends basis_db
 	 */
 	public function getStudiengebuehrGesamt($uid, $stsem, $studiengang_kz = null)
 	{
-		$qry = "select sum(betrag) as betrag from public.tbl_konto 
+		$qry = "select sum(betrag) as betrag from public.tbl_konto
 				join public.tbl_benutzer benutzer using(person_id)
-				where uid=".$this->db_add_param($uid)." and studiensemester_kurzbz = ".$this->db_add_param($stsem)." 
+				where uid=".$this->db_add_param($uid)." and studiensemester_kurzbz = ".$this->db_add_param($stsem)."
 				and buchungstyp_kurzbz = 'Studiengebuehr' and betrag > 0";
 		if($studiengang_kz!= null)
 		$qry.=" and studiengang_kz = ".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
-				return $row->betrag; 
+				return $row->betrag;
 			}
-			return false; 
+			return false;
 		}
 		else
 		{
 			$this->errormsg = 'Fehler bei der Abfrage aufgetreten';
-			return false; 
+			return false;
 		}
 	}
-	
+
 	/**
 	 * Gibt den Betrag des bezahlten ÖH-Beitrags eines Semesters zurück
 	 * @param $uid StudentUID
@@ -725,25 +723,25 @@ class konto extends basis_db
 	 */
 	public function getOehBeitragGesamt($uid, $stsem, $studiengang_kz = null)
 	{
-		$qry = "select sum(betrag) as betrag from public.tbl_konto 
+		$qry = "select sum(betrag) as betrag from public.tbl_konto
 				join public.tbl_benutzer benutzer using(person_id)
-				where uid=".$this->db_add_param($uid)." and studiensemester_kurzbz = ".$this->db_add_param($stsem)." 
+				where uid=".$this->db_add_param($uid)." and studiensemester_kurzbz = ".$this->db_add_param($stsem)."
 				and LOWER(buchungstyp_kurzbz) = LOWER('OEH') and betrag > 0";
 		if($studiengang_kz!= null)
 		$qry.=" and studiengang_kz = ".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
-				return $row->betrag; 
+				return $row->betrag;
 			}
-			return false; 
+			return false;
 		}
 		else
 		{
 			$this->errormsg = 'Fehler bei der Abfrage aufgetreten';
-			return false; 
+			return false;
 		}
 	}
 
@@ -757,11 +755,11 @@ class konto extends basis_db
 	public function getCreditPoints($uid, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT sum(credit_points) as cp
-				FROM 
-					public.tbl_konto 
+				FROM
+					public.tbl_konto
 					JOIN public.tbl_benutzer USING(person_id)
 				WHERE
-					uid=".$this->db_add_param($uid)." 
+					uid=".$this->db_add_param($uid)."
 					AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 					AND buchungsnr_verweis is null
 					AND credit_points is not null";
@@ -789,12 +787,12 @@ class konto extends basis_db
 			}
 		}
 		else
-		{	
+		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Fügt zur erstellten Buchung eine Zahlungsreferenz hinzu
 	 * @param $buchungsnr Die ID der erstellten Buchung in der Datenbank
@@ -803,11 +801,11 @@ class konto extends basis_db
 	private function addZahlungsreferenz($buchungsnr)
 	{
 		$this->zahlungsreferenz = generateZahlungsreferenz($this->studiengang_kz, $buchungsnr);
-		
+
 		$qry = "UPDATE public.tbl_konto ".
 				"SET zahlungsreferenz=".$this->db_add_param($this->zahlungsreferenz).
 				"WHERE buchungsnr=".$this->db_add_param($buchungsnr).";";
-		
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -815,11 +813,11 @@ class konto extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim speichern der Zahlungsreferenz aufgetreten';
-			return false; 
+			return false;
 		}
-		
+
 	}
-	
+
 	/**
 	 * Laedt eine Buchung anhand ihrer Zahlungsreferenz
 	 * @param $zahlungsreferenz
@@ -827,7 +825,7 @@ class konto extends basis_db
 	public function loadFromZahlungsreferenz($zahlungsreferenz)
 	{
 		$qry = "SELECT * FROM public.tbl_konto WHERE zahlungsreferenz=".$this->db_add_param($zahlungsreferenz);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())

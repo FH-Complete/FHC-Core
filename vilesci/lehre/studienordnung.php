@@ -56,11 +56,19 @@ echo '<!DOCTYPE html>
 	
 	<script type="text/javascript" src="../../include/js/treeGrid/jstreegrid.js"></script>
 	
+	<script type="text/javascript" src="../../include/js/colResizable-1.5.min.js"></script>
+	
 	<script src="studienordnung_lvregel.js" type="text/javascript"></script>
 	<script src="studienordnung.js" type="text/javascript"></script>
 	<style type="text/css">
 		.col_ects {
 			//width: auto;
+		}
+		
+		.col_lehrform {
+			width: auto !important;
+			align:center;
+			text-align:center;
 		}
 		
 		.header_ects {
@@ -81,11 +89,11 @@ echo '<!DOCTYPE html>
 		.find('h3')
 		  .addClass('ui-accordion-header ui-helper-reset ui-state-default ui-corner-top ui-corner-bottom')
 		  .hover(function() { $(this).toggleClass('ui-state-hover'); })
-		  .prepend('<span class=\"ui-icon ui-icon-triangle-1-e\"></span>')
+		  .prepend('<span class=\"ui-icon ui-icon-triangle-1-s\"></span>')
 		  .click(function() {
 			$(this)
 			  .toggleClass('ui-accordion-header-active ui-state-active ui-state-default ui-corner-bottom')
-			  .find('> .ui-icon').toggleClass('ui-icon-triangle-1-e ui-icon-triangle-1-s').end()
+			  .find('> .ui-icon').toggleClass('ui-icon-triangle-1-s ui-icon-triangle-1-e').end()
 			  .next().toggleClass('ui-accordion-content-active').slideToggle();
 			return false;
 		  })
@@ -93,16 +101,17 @@ echo '<!DOCTYPE html>
 			.addClass('ui-accordion-content  ui-helper-reset ui-widget-content ui-corner-bottom');
 
 ";
+echo "$(\"#layoutTable\").colResizable({liveDrag:true});";
 echo "
 		jqUi('#menueRechts').addClass('ui-accordion ui-accordion-icons ui-widget ui-helper-reset')
 		.find('h2')
 		  .addClass('ui-accordion-header ui-helper-reset ui-state-default ui-corner-top ui-corner-bottom')
 		  .hover(function() { $(this).toggleClass('ui-state-hover'); })
-		  .prepend('<span class=\"ui-icon ui-icon-triangle-1-e\"></span>')
+		  .prepend('<span class=\"ui-icon ui-icon-triangle-1-s\"></span>')
 		  .click(function() {
 			$(this)
 			  .toggleClass('ui-accordion-header-active ui-state-active ui-state-default ui-corner-bottom')
-			  .find('> .ui-icon').toggleClass('ui-icon-triangle-1-e ui-icon-triangle-1-s').end()
+			  .find('> .ui-icon').toggleClass('ui-icon-triangle-1-s ui-icon-triangle-1-e').end()
 			  .next().toggleClass('ui-accordion-content-active').slideToggle();
 			return false;
 		  })
@@ -122,11 +131,18 @@ echo "
 	{
 		background-color: #F99F9F;
 	}
+	.ui-icon
+	{
+		display:inline-block;
+	}
 	#filteredLVs > div.jstree-grid-wrapper
 	{
 		width: 600px;
 	}
-
+	h3
+	{
+		white-space: nowrap;
+	}
 	</style>
 </head>
 <body>";
@@ -137,7 +153,7 @@ $studiengang = new studiengang();
 $studiengang->loadArray($stg_arr,'typ,kurzbz');
 
 echo '
-<table style="width:100%">
+<table id="layoutTable" width="100%">
 	<tr>
 		<td valign="top" width="20%">
 			<div id="menueLinks">
@@ -176,12 +192,12 @@ echo '
 				</div>
 			</div>
 	</td>
-	<td valign="top">	
+	<td valign="top" style="max-width:900px">	
 			<div id="header">
 			&nbsp;
 			</div>
-			<div id="treeWrapper">
-				<div id="data" style="min-height: 10px; min-width: 800px;">
+			<div id="treeWrapper" style="overflow:auto">
+				<div id="data" style="min-height: 10px; min-width: 700px;">
 					&nbsp;
 				</div>
 			</div>
@@ -194,6 +210,7 @@ echo '
 				jqUi( "#tabs" ).tabs();
 				$( "#tabs" ).hide();
 			});
+			
 			</script>
 			<div id="tabs">
 				<ul>
@@ -217,18 +234,34 @@ echo '
 			</div>
 			<!-- Tabs ende -->
 	</td>
-	<td valign="top" width="20%">
-		<div id="menueRechts" style="width: 420px;">
+	<td valign="top" width="20%" >
+		<!--script> colResizable plugin used instead
+			$(function() 
+			{
+				jqUi("#menueRechts").resizable({
+					handles: "w",
+					minWidth: 400,
+					maxWidth: 1000,
+					resize: function(event, ui) { jqUi("#menueRechts").css("left",0);}
+				});
+				jqUi("#menueLinks").resizable({
+					handles: "e",
+					minWidth: 200,
+					maxWidth: 1000,
+				});
+			});
+		</script-->
+		<div id="menueRechts" style="width: auto; height:auto; minHeight:20px; maxHeigth: 700px; margin:0px;">
 			<h2><a href=#>Filter</a></h2>
-			<div style="margin:0px;padding:5px;">
+			<div id = "divFilter" style="margin:0px;padding:5px;">
 				<div id="lehrveranstaltung" style="margin:0;padding:0; width: 400px;">
 				Bitte wählen Sie zuerst einen Studienplan aus!';
 echo'
 				</div>
 			</div>
 			<h2>Lehrveranstaltungen</h2>
-			<div style="margin:0px;padding:5px;max-width:400px;">
-				<div id="filteredLVs" style="width:400px; max-height:500px; overflow:auto;">
+			<div id="divLVuebersicht" style="margin:0px;padding:5px;">
+				<div id="filteredLVs" style="width:auto; max-height:500px;">
 					<div id="lvListe">
 						Keine Einträge gefunden!
 					</div>

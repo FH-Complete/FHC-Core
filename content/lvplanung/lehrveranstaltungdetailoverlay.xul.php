@@ -26,6 +26,12 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+$user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 ?>
@@ -39,6 +45,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<popupset>
 		<menupopup id="lehrveranstaltung-detail-gruppe-tree-popup">
 			<menuitem label="Entfernen" oncommand="LeGruppeDel();" />
+			<?php
+			if($rechte->isBerechtigt('lv-plan/gruppenentfernen'))
+			{
+				echo '<menuseparator />';
+				echo '<menuitem label="Stunden aus LV-Plan entfernen" oncommand="LeGruppeDelLVPlan();" />';
+			}
+			?>
 		</menupopup>
 	</popupset>
 	<popupset>
@@ -73,10 +86,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 
 			</row>
-			<row>
+			<!--<row>
 				<label value="Lehrveranstaltung" />
 	  			<textbox id="lehrveranstaltung-detail-textbox-lehrveranstaltung" maxlength="20" disabled="true"/>
-			</row>
+			</row>-->
 		</rows>
 		</grid>
 	</vbox>
@@ -95,6 +108,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<column style="min-width:240px" />
 		  	</columns>
 		  	<rows>
+				<row>
+					<label value="LV-ID" <?php echo ($rechte->isBerechtigt('lehre/lehrveranstaltung',null,'suid'))?'':'hidden="true"'; ?>/>
+		  			<textbox id="lehrveranstaltung-detail-textbox-lehrveranstaltung" disabled="true" maxlength="20" <?php echo ($rechte->isBerechtigt('lehre/lehrveranstaltung',null,'suid'))?'':'hidden="true"'; ?>/>
+				</row>
 				<row>
 		  			<label value="Lehrfach" />
 					<menulist id="lehrveranstaltung-detail-menulist-lehrfach" disabled="true"
@@ -223,7 +240,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				  datasources="rdf:null"
 				  ref="http://www.technikum-wien.at/lehreinheitgruppe/liste"
 				  flags="dont-build-content"
-				  style="border: 1px solid black;"
+				  style="border: 1px solid black; min-height: 100px;"
 				  ondragdrop="nsDragAndDrop.drop(event,LeLvbgrpDDObserver)"
 				  ondrop="nsDragAndDrop.drop(event,LeLvbgrpDDObserver)"
 				  ondragover="nsDragAndDrop.dragOver(event,LeLvbgrpDDObserver)"
@@ -233,7 +250,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				  onkeypress="LvDetailGruppenTreeKeyPress(event)"
 			>
 				<treecols>
-					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-bezeichnung" label="Bezeichnung" flex="2" hidden="false"  persist="hidden, width, ordinal"
+					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-bezeichnung" label="Bezeichnung" flex="4" hidden="false"  persist="hidden, width, ordinal"
 							 class="sortDirectionIndicator"
 							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#bezeichnung" />
 					<splitter class="tree-splitter"/>
@@ -249,6 +266,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-lehreinheitgruppe_id" label="ID" flex="2" hidden="true"  persist="hidden, width, ordinal"
 							 class="sortDirectionIndicator"
 							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id" />
+					 <treecol id="lehrveranstaltung-lehreinheitgruppe-treecol-verplant" label="verplant" flex="1" hidden="false"  persist="hidden, width, ordinal"
+ 							 class="sortDirectionIndicator"
+ 							 sort="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#verplant" />
 				</treecols>
 				<template>
 					<rule>
@@ -260,6 +280,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#studiengang_bezeichnung"   />
 									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#semester"   />
 									<treecell label="rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#lehreinheitgruppe_id"   />
+									<treecell src="../skin/images/verplant_rdf:http://www.technikum-wien.at/lehreinheitgruppe/rdf#verplant^.png"   />
 				 				</treerow>
 				 			</treeitem>
 				 		</treechildren>
@@ -481,7 +502,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<label value="Gruppe" />
 								<menulist id="lehrveranstaltung-lvangebot-textbox-gruppe"
 									editable="true" datasources="rdf:null" flex="1"
-									ref="http://www.technikum-wien.at/gruppen/liste" 
+									ref="http://www.technikum-wien.at/gruppen/liste"
 									oninput="LvAngebotGruppenLoad(this)">
 										<template>
 											<menupopup>

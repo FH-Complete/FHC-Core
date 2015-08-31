@@ -16,20 +16,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *		 Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *		 Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *		 Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
 /* @author Andres Oesterreicher
    @date 20.10.2005
    @brief Formular zum eintragen der ECTS Information auf Deutsch und Englisch
-          Die Informationen werden in der Tabelle tbl_lvinfo gespeichert.
+		 Die Informationen werden in der Tabelle tbl_lvinfo gespeichert.
 
    @edit	08-11-2006 Versionierung entfernt: Studiensemester=WS2007
    			02-01-2007 Umstellung auf die neue DB
 */
 require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../config/global.config.inc.php');
 require_once('../../../../include/basis_db.class.php');	
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/studiengang.class.php');
@@ -38,6 +39,15 @@ require_once('../../../../include/lvinfo.class.php');
 require_once('../../../../include/studiensemester.class.php');
 require_once('../../../../include/phrasen.class.php');
 require_once('../../../../include/safehtml/safehtml.class.php');
+require_once('../../../../include/benutzerberechtigung.class.php');
+require_once('../../../../include/lehreinheitmitarbeiter.class.php');
+require_once('../../../../include/mail.class.php');
+require_once('../../../../include/benutzer.class.php');
+
+$user = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
 
 $sprache1 = getSprache(); 
 $p=new phrasen($sprache1);
@@ -48,6 +58,9 @@ if (!$db = new basis_db())
    $output = '';
    $errormsg = '';
    $okmsg='';
+   
+$lv = '';
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -55,9 +68,13 @@ if (!$db = new basis_db())
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title><?php echo $p->t('courseInformation/ectsInformation')?></title>
-
+<style type="text/css">
+textarea
+{
+	font-size: 13px;
+}
+</style>
 <script language="JavaScript" type="text/javascript">
-<!--
    function save()
    {
    		window.document.editFrm.status.value="save";
@@ -65,7 +82,13 @@ if (!$db = new basis_db())
    		window.document.editFrm.target="_self";
    		window.document.editFrm.submit();
    }
--->
+   function freigeben()
+   {
+   		window.document.editFrm.status.value="freigeben";
+   		window.document.editFrm.action="<?php echo $_SERVER['PHP_SELF']; ?>";
+   		window.document.editFrm.target="_self";
+   		window.document.editFrm.submit();
+   }
 </script>
 </head>
 <body style="padding: 10px">
@@ -78,13 +101,8 @@ if (!$db = new basis_db())
 			return $string;
 	}
 
-	$user = get_uid();
-    //Berechtigung ueberpruefen
-    if(!check_lektor($user))
-    	die("<br><center>".$p->t('global/keineBerechtigungFuerDieseSeite')."</center>");
-	
-    if(isset($_GET['lvid']))
-    	$lv=$_GET['lvid'];
+	if(isset($_GET['lvid']))
+		$lv=$_GET['lvid'];
 
 	//Variablenuebernahme
 	if(isset($_POST['lv']))  //LehrveranstaltungsID
@@ -100,8 +118,10 @@ if (!$db = new basis_db())
 		if(!isset($sem))
 			$sem = $lv_obj->semester;
 	}
+	else 
+		$stg = '';
 
-	if(!isset($stg) && isset($_POST['stg']))
+	if(isset($_POST['stg']))
 		$stg = $_POST['stg'];
 	if(!isset($sem) && isset($_POST['sem']))
 		$sem = $_POST['sem'];	
@@ -113,11 +133,28 @@ if (!$db = new basis_db())
 	if(isset($_POST['status']))
 		$status = $_POST['status'];
 
-//    if(isset($_POST["freigeben"])) //Wird auf 'ja' gesetzt wenn gleich freigegebenwerden soll nach dem Speichern
-//       $freigeben = $_POST["freigeben"];
+//	if(isset($_POST["freigeben"])) //Wird auf 'ja' gesetzt wenn gleich freigegebenwerden soll nach dem Speichern
+//	$freigeben = $_POST["freigeben"];
 
 	if(isset($_POST['sprache'])) //Sprache fuer dieses Lehrfach
 		$sprache = $_POST['sprache'];
+	
+	// Berechtigungen ueberpruefen
+	$lektor_der_lv = false;
+	$lektor = new lehreinheitmitarbeiter();
+	$lektor_der_lv = $lektor->existsLV($lv, null, $user);
+	
+	// Bearbeiten nur moeglich, wenn Lektor der LV und bearbeiten fuer Lektoren aktiviert ist
+	// Oder Berechtigung zum Bearbeiten eingetragen ist
+	if(!(
+			(!defined('CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT') && $lektor_der_lv)
+			|| (defined('CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT') && CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT==true && $lektor_der_lv)
+			|| $rechte->isBerechtigt('lehre/lvinfo',$stg)
+		)
+	)
+	{
+		die($p->t('global/keineBerechtigungFuerDieseSeite'));
+	}
 
 	//Variablen fuer das Formular
 	$lehrziele_de = (isset($_POST['lehrziele_de'])?$_POST['lehrziele_de']:'');
@@ -128,10 +165,10 @@ if (!$db = new basis_db())
 	$anmerkungen_de = (isset($_POST['anmerkungen_de'])?$_POST['anmerkungen_de']:'');
 	$kurzbeschreibung_de = (isset($_POST['kurzbeschreibung_de'])?$_POST['kurzbeschreibung_de']:'');
 	$anwesenheit_de = (isset($_POST['anwesenheit_de'])?$_POST['anwesenheit_de']:'');
-	$freig_de = (isset($_POST['freig_de'])?($_POST['freig_de']=='on'?true:false):'');
+	$freig_de = (isset($_POST['freig_de'])?($_POST['freig_de']=='on' && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg)?true:false):'');
 	$methodik_de = (isset($_POST['methodik_de'])?$_POST['methodik_de']:'');
 	//$titel_de = (isset($_POST['titel_de'])?$_POST['titel_de']:'');
-
+	
 	$parser = new SafeHTML();
  	$lehrziele_de = $parser->parse($lehrziele_de);
  	$parser = new SafeHTML();
@@ -161,7 +198,7 @@ if (!$db = new basis_db())
 	$anmerkungen_en = (isset($_POST['anmerkungen_en'])?$_POST['anmerkungen_en']:'');
 	$kurzbeschreibung_en = (isset($_POST['kurzbeschreibung_en'])?$_POST['kurzbeschreibung_en']:'');
 	$anwesenheit_en = (isset($_POST['anwesenheit_en'])?$_POST['anwesenheit_en']:'');
-	$freig_en = (isset($_POST['freig_en'])?($_POST['freig_en']=='on'?true:false):'');
+	$freig_en = (isset($_POST['freig_en'])?($_POST['freig_en']=='on' && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg)?true:false):'');
 	$methodik_en = (isset($_POST['methodik_en'])?$_POST['methodik_en']:'');
 	//$titel_en = (isset($_POST['titel_en'])?$_POST['titel_en']:'');
 
@@ -189,7 +226,7 @@ if (!$db = new basis_db())
 	/* WriteLog($qry,$uid)
 	* @brief Schreib die Querys im format: uid - datum - qry ins LogFile
 	* @param $qry Query anweisung
-	*        $uid Username
+	*		$uid Username
 	* @return true wenn ok false wenn fehler beim oeffnen
 	*/
 	function WriteLog($qry,$uid)
@@ -225,7 +262,7 @@ if (!$db = new basis_db())
 			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_de);
 			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_de);
 			
-			$lv_obj_sav->genehmigt = ($freig_de?true:false);
+			$lv_obj_sav->genehmigt = ($freig_de==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg)?true:false);
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
 			$lv_obj_sav->aktiv=true;
@@ -238,7 +275,7 @@ if (!$db = new basis_db())
 			$vorhanden=$lv_obj1->exists($lv, ATTR_SPRACHE_DE);
 
 			if(!$vorhanden)
-   	   	   		$lv_obj_sav->new=true;
+   				$lv_obj_sav->new=true;
 			else
 				$lv_obj_sav->new=false;
 
@@ -257,7 +294,7 @@ if (!$db = new basis_db())
 			$lv_obj_sav->anmerkungen=mb_eregi_replace("\r\n", "<br>", $anmerkungen_en);
 			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_en);
 			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_en);
-			$lv_obj_sav->genehmigt = ($freig_en?true:false);
+			$lv_obj_sav->genehmigt = ($freig_en==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg)?true:false);
 			$lv_obj_sav->aktiv=true;
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
@@ -287,6 +324,132 @@ if (!$db = new basis_db())
 				
 			if($save_log_error)
 				$errormsg.= $p->t('courseInformation/fehlerLogFile');
+		}
+		if($status=='freigeben') // Beim druecken auf "Zur Freigabe abschicken"
+		{
+			//Speichert die aenderungen in der Datenbank (de und en)
+			$lv_obj_sav= new lvinfo();
+			$save_error=false;
+			$save_log_error=false;
+			//Deutsch
+			$lv_obj_sav->lehrziele=mb_eregi_replace("\r\n", "<br>", $lehrziele_de);
+			$lv_obj_sav->lehrinhalte=mb_eregi_replace("\r\n", "<br>", $lehrinhalte_de);
+			$lv_obj_sav->voraussetzungen=mb_eregi_replace("\r\n", "<br>", $voraussetzungen_de);
+			$lv_obj_sav->unterlagen=mb_eregi_replace("\r\n", "<br>", $unterlagen_de);
+			$lv_obj_sav->pruefungsordnung=mb_eregi_replace("\r\n", "<br>", $pruefungsordnung_de);
+			$lv_obj_sav->anmerkungen=mb_eregi_replace("\r\n", "<br>", $anmerkungen_de);
+			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_de);
+			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_de);
+				
+			$lv_obj_sav->genehmigt = ($freig_de==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg)?true:false);
+			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
+			$lv_obj_sav->updatevon=$user;
+			$lv_obj_sav->aktiv=true;
+			$lv_obj_sav->sprache=ATTR_SPRACHE_DE;
+			$lv_obj_sav->lehrveranstaltung_id=$lv;
+			$lv_obj_sav->methodik = mb_eregi_replace("\r\n", "<br>", $methodik_de);
+			//$lv_obj_sav->titel = mb_eregi_replace("\r\n", "<br>", $titel_de);
+		
+			$lv_obj1 = new lvinfo();
+			$vorhanden=$lv_obj1->exists($lv, ATTR_SPRACHE_DE);
+		
+			if(!$vorhanden)
+				$lv_obj_sav->new=true;
+			else
+				$lv_obj_sav->new=false;
+		
+			if(!$lv_obj_sav->save())
+				$save_error=true;
+			else
+				if(!WriteLog($lv_obj_sav->lastqry,$user))
+					$save_log_error=true;
+		
+			//Englisch
+			$lv_obj_sav->lehrziele=mb_eregi_replace("\r\n", "<br>", $lehrziele_en);
+			$lv_obj_sav->lehrinhalte=mb_eregi_replace("\r\n", "<br>", $lehrinhalte_en);
+			$lv_obj_sav->voraussetzungen=mb_eregi_replace("\r\n", "<br>", $voraussetzungen_en);
+			$lv_obj_sav->unterlagen=mb_eregi_replace("\r\n", "<br>", $unterlagen_en);
+			$lv_obj_sav->pruefungsordnung=mb_eregi_replace("\r\n", "<br>", $pruefungsordnung_en);
+			$lv_obj_sav->anmerkungen=mb_eregi_replace("\r\n", "<br>", $anmerkungen_en);
+			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_en);
+			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_en);
+			$lv_obj_sav->genehmigt = ($freig_en==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg)?true:false);
+			$lv_obj_sav->aktiv=true;
+			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
+			$lv_obj_sav->updatevon=$user;
+			$lv_obj_sav->sprache=ATTR_SPRACHE_EN;
+			$lv_obj_sav->lehrveranstaltung_id=$lv;
+			$lv_obj_sav->methodik = mb_eregi_replace("\r\n", "<br>", $methodik_en);
+			//$lv_obj_sav->titel = mb_eregi_replace("\r\n", "<br>", $titel_en);
+	
+			$lv_obj1 = new lvinfo();
+			$vorhanden = $lv_obj1->exists($lv, ATTR_SPRACHE_EN);
+	
+			if(!$vorhanden)
+				$lv_obj_sav->new=true;
+			else
+				$lv_obj_sav->new=false;
+	
+			if(!$lv_obj_sav->save())
+				$save_error=true;
+			else
+				if(!WriteLog($lv_obj_sav->lastqry,$user))
+					$save_log_error=true;
+	
+				if($save_error)
+					$errormsg.= $p->t('courseInformation/achtungFehlerBeimSpeichern');
+				else
+					$okmsg.= $p->t('global/erfolgreichgespeichert');
+	
+				if($save_log_error)
+					$errormsg.= $p->t('courseInformation/fehlerLogFile');
+			
+			//Mail an Studiengangsleiter
+			$studiengangsleiter = new studiengang();
+			$stgleiter = $studiengangsleiter->getLeitung($stg);			
+			
+			if($stgleiter)
+			{
+				$to='';
+				foreach($stgleiter as $leiter)
+				{
+					if($to!='')
+					{
+						$to.=', '.$leiter.'@'.DOMAIN;
+					}
+					else
+					{
+						$to.=$leiter.'@'.DOMAIN;
+					}
+				}
+				
+				$benutzer = new benutzer();
+				$benutzer->load($user);
+				
+				$bezeichnung = new lehrveranstaltung();
+				$bezeichnung->load($lv);				
+				
+				$message = $p->t('courseInformation/diesIstEineAutomatischeMail').".\n".
+						$p->t('courseInformation/lvinfoWurdeUeberarbeitet',array($benutzer->nachname.' '.$benutzer->vorname,$bezeichnung->bezeichnung)).":\n";
+				
+				$message.="\n".$p->t('courseInformation/sieKoennenDieseUnterFolgenderAdresseFreigeben').":\n".
+				APP_ROOT."cis/private/lehre/ects/freigabe.php?stg=".$stg."&sem=".$sem."&lv=".$lv;
+									
+				$mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('courseInformation/freigabeLvinfo'), $message);
+				if($mail->send())
+				{
+					$okmsg.="<br><span style='color:green;'>".$p->t('courseInformation/freigabemailWurdeVersandt',array($to))."</span>";
+				}
+				else
+				{
+					$okmsg.="<br><span class='error'>".$p->t('courseInformation/fehlerBeimSendenAufgetreten',array($to))."!</span>";
+				}
+			}
+			else
+			{
+				$okmsg.="<br><span class='error'>".$p->t('courseInformation/konnteKeinFreigabemailVersendetWerden')."</span>";
+			}
+			
 		}
 	}
 
@@ -334,6 +497,8 @@ if (!$db = new basis_db())
 	{
 		$errormsg .= "$stg_obj->errormsg";
 	}
+	
+	
 
 	//Anzeigen des DropDown Menues mit Semester
 	if(isset($changed) && $changed=='stg')
@@ -384,33 +549,33 @@ if (!$db = new basis_db())
 
 	//Anzeigen des DropDown Menues mit Lehrveranstaltungen
 	$lv_obj = new lehrveranstaltung();
-	if($lv_obj->load_lva($stg,$sem,null,true))
+	if($lv_obj->load_lva($stg,$sem,null,true,null,'orgform_kurzbz,semester, bezeichnung'))
 	{
-       $output .= $p->t('global/lehrveranstaltung')." <SELECT name='lv' onChange='javascript:window.document.auswahlFrm.changed.value=\"lv\";window.document.auswahlFrm.submit();'>";
-       $vorhanden=false;
-       unset($firstlv);
+	$output .= $p->t('global/lehrveranstaltung')." <SELECT name='lv' onChange='javascript:window.document.auswahlFrm.changed.value=\"lv\";window.document.auswahlFrm.submit();'>";
+	$vorhanden=false;
+	unset($firstlv);
 
-   	   foreach($lv_obj->lehrveranstaltungen as $erg)
-   	   {
-   	   	  if(!isset($lv) || (isset($changed) && $changed=='sem') || (isset($changed) && $changed=='stg'))
-   	   	  {
-   	   	     $lv = $erg->lehrveranstaltung_id;
-   	   	     $changed='';
-   	   	  }
-   	   	  if(!isset($firstlv))
-   	   	     $firstlv=$erg->lehrveranstaltung_id;
+   	foreach($lv_obj->lehrveranstaltungen as $erg)
+   	{
+   		  if(!isset($lv) || (isset($changed) && $changed=='sem') || (isset($changed) && $changed=='stg'))
+   		  {
+   			$lv = $erg->lehrveranstaltung_id;
+   			$changed='';
+   		  }
+   		  if(!isset($firstlv))
+   			$firstlv=$erg->lehrveranstaltung_id;
 
-   	   	  if($lv == $erg->lehrveranstaltung_id)
-   	   	  {
-   	   	     $output .= "<option value='$erg->lehrveranstaltung_id' selected>".Cut($erg->bezeichnung)."</option>";
-   	   	     $vorhanden=true;
-   	   	  }
-   	   	  else
-   	   	     $output .= "<option value='$erg->lehrveranstaltung_id'>".Cut($erg->bezeichnung)."</option>";
-   	   }
-   	   $output .= "</SELECT>";
-   	   if(!$vorhanden)
-   	       $lv=$firstlv;
+   		  if($lv == $erg->lehrveranstaltung_id)
+   		  {
+   			$output .= "<option value='$erg->lehrveranstaltung_id' selected>".($erg->orgform_kurzbz!=''?$erg->orgform_kurzbz." - ":"").Cut($erg->bezeichnung)."</option>";
+   			$vorhanden=true;
+   		  }
+   		  else
+   			$output .= "<option value='$erg->lehrveranstaltung_id'>".($erg->orgform_kurzbz!=''?$erg->orgform_kurzbz." - ":"").Cut($erg->bezeichnung)."</option>";
+   	}
+   	$output .= "</SELECT>";
+   	if(!$vorhanden)
+   		  $lv=$firstlv;
 	}
 	else
 	{
@@ -426,10 +591,11 @@ if (!$db = new basis_db())
 	//Menue ausgeben
 	$output .= "\n";
 	$output .= "<ul>";
-	$output .= "<li>&nbsp;<a class='Item' href='index.php?stg=$stg&sem=$sem&lv=$lv'><font size='3'>".$p->t('global/bearbeiten')."</font></a></li>";
-	$output .= "<li>&nbsp;<a class='Item' href='freigabe.php?stg=$stg&sem=$sem&lv=$lv'><font size='3'>".$p->t('courseInformation/freigabe')."</font></a></li>";
+	$output .= "<li>&nbsp;<a class='Item' href='index.php?stg=$stg&sem=$sem&lvid=$lv'><font size='3'>".$p->t('global/bearbeiten')."</font></a></li>";
+	if ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))
+		$output .= "<li>&nbsp;<a class='Item' href='freigabe.php?stg=$stg&sem=$sem&lv=$lv'><font size='3'>".$p->t('courseInformation/freigabe')."</font></a></li>";
 	$output .= "<li>&nbsp;<a class='Item' href='beispiele.php'><font size='3'>".$p->t('global/beispiele')."</font></a></li>";
-	$output .= "<li>&nbsp;<a class='Item' href='terminologie.php'><font size='3'>".$p->t('courseInformation/terminologie')."</font></a></li>";
+	//$output .= "<li>&nbsp;<a class='Item' href='terminologie.php'><font size='3'>".$p->t('courseInformation/terminologie')."</font></a></li>";
 	$output .= "</ul>";
 	$output .= "</td></tr></table>";
 
@@ -472,6 +638,10 @@ if (!$db = new basis_db())
 			$freig_de = $lv_de->genehmigt;
 			$titel_de = $lv_de->titel;
 			$methodik_de = $lv_de->methodik;
+			
+			//Fuegt den Satz "Nach erfolgreichem Abschluss sind die Studierenden in der Lage, " vor den Lehrzielen ein, falls noch nicht vorhanden
+			if (substr_count($lehrziele_de, 'Nach erfolgreichem Abschluss sind die Studierenden in der Lage')==0)
+				$lehrziele_de = 'Nach erfolgreichem Abschluss sind die Studierenden in der Lage, '.$lehrziele_de;
 		}
 
 		if(!isset($_POST['lehrziele_en']) && isset($lv_en))
@@ -487,14 +657,18 @@ if (!$db = new basis_db())
 			$freig_en = $lv_en->genehmigt;
 			$titel_en = $lv_en->titel;
 			$methodik_en = $lv_en->methodik;
+			
+			//Fuegt den Satz "Nach erfolgreichem Abschluss sind die Studierenden in der Lage, " vor den Lehrzielen ein, falls noch nicht vorhanden
+			if (substr_count($lehrziele_en, 'After passing this course successfully students are able to')==0)
+				$lehrziele_en = 'After passing this course successfully students are able to '.$lehrziele_en;
 		}
 
 		$lv_obj = new lehrveranstaltung();
 		$lv_obj->load($lv);
 		echo "<Form name='editFrm' action='".$_SERVER['PHP_SELF']."' method='POST'>";
 
-		echo "<table class='tabcontent'>";
-		echo "<tr><td><b>".$p->t('courseInformation/ectsCredits')."</b></td><td>&nbsp;</td><td width='400'>".($lv_obj->ects!=''?number_format($lv_obj->ects,1,'.',''):'')."</td><td width='100%'></td></tr>";
+		echo "<table>";
+		echo "<tr><td><b>".$p->t('courseInformation/ectsCredits')."</b></td><td width='100%'>".($lv_obj->ects!=''?number_format($lv_obj->ects,1,'.',''):'')."</td></tr>";
 
 		$stsem_obj = new studiensemester();
 		$stsem = $stsem_obj->getaktorNext();
@@ -509,7 +683,7 @@ if (!$db = new basis_db())
 					AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id=".$db->db_add_param($lv)." ORDER BY ende DESC LIMIT 1) 
 					AND mitarbeiter_uid=uid";
 
-		echo "<tr><td class='tdvertical' nowrap><b>".$p->t('courseInformation/lehrendeLautLehrauftrag')."</b></td><td>&nbsp;</td><td nowrap>";
+		echo "<tr><td class='tdvertical' nowrap><b>".$p->t('courseInformation/lehrendeLautLehrauftrag')."</b></td><td nowrap>";
 		$helparray = array();
 		if($result=$db->db_query($qry))
 		{
@@ -521,19 +695,19 @@ if (!$db = new basis_db())
 		}
 
 		foreach($helparray as $elem)
-		  echo $elem."<br>";
+		 echo $elem."<br>";
 		echo "</td></tr>";
 
-	   //FB Leiter auslesen
-	   $qry = "	SELECT 
-	   				distinct titelpre, titelpost, vorname, nachname 
-	   			FROM 
-	   				public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) 
-	   			WHERE 
-	   				funktion_kurzbz='Leitung' AND 
-	   				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+	//FB Leiter auslesen
+	$qry = "	SELECT 
+					distinct titelpre, titelpost, vorname, nachname 
+				FROM 
+					public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) 
+				WHERE 
+					funktion_kurzbz='Leitung' AND 
+					(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 					(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
-	   				oe_kurzbz in (SELECT distinct lehrfach.oe_kurzbz 
+					oe_kurzbz in (SELECT distinct lehrfach.oe_kurzbz 
 									FROM 
 										lehre.tbl_lehreinheit 
 										JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
@@ -543,23 +717,23 @@ if (!$db = new basis_db())
 																FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
 																WHERE tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lv, FHC_INTEGER)."
 																ORDER BY ende DESC LIMIT 1
-																)	   											
-								  )";
-	   
-	   echo "<tr><td class='tdvertical'><b>".$p->t('courseInformation/institutsleiter')."</b></td><td>&nbsp;</td><td>";
-	   if($result=$db->db_query($qry))
-	   {
-	   	   while($row=$db->db_fetch_object($result))
-	   	   {
-	   	   	   echo "$row->titelpre $row->vorname $row->nachname $row->titelpost<br>";
-	   	   }
-	   }
+																)												
+								 )";
+	
+	echo "<tr><td class='tdvertical'><b>".$p->t('courseInformation/institutsleiter')."</b></td><td>";
+	if($result=$db->db_query($qry))
+	{
+		while($row=$db->db_fetch_object($result))
+		{
+			echo "$row->titelpre $row->vorname $row->nachname $row->titelpost<br>";
+		}
+	}
 
-	   echo "</td></tr>";
+	echo "</td></tr>";
 
-	   //FB Koordinator auslesen
+	//FB Koordinator auslesen
 		//$qry = "SELECT distinct vorname, nachname FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in (SELECT fachbereich_kurzbz FROM lehre.tbl_lehrfach, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1))";
-	   $qry = "SELECT 
+	$qry = "SELECT 
 				distinct titelpre, titelpost, vorname, nachname, tbl_fachbereich.fachbereich_kurzbz
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_benutzerfunktion, campus.vw_mitarbeiter, public.tbl_fachbereich
@@ -574,124 +748,135 @@ if (!$db = new basis_db())
 				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
 				vw_mitarbeiter.uid=COALESCE(tbl_lehrveranstaltung.koordinator, tbl_benutzerfunktion.uid) AND
 				tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1)";
-	   
-		echo "<tr><td class='tdvertical'><b>".$p->t('courseInformation/institutskoordinator')."</b></td><td>&nbsp;</td><td>";
-	   if($result=$db->db_query($qry))
-	   {
-	   	   while($row=$db->db_fetch_object($result))
-	   	   {
-	   	   	   echo "$row->titelpre $row->vorname $row->nachname $row->titelpost<br>";
-	   	   }
-	   }
-
-	   echo "</td></tr>";
-
-	   //echo "</table>";
-	   echo "<tr><td>";
-
-
-	   echo "<input type='hidden' name='stg' value='$stg'>";
-	   echo "<input type='hidden' name='sem' value='$sem'>";
-	   echo "<input type='hidden' name='lv' value='$lv'>";
-	   echo "<input type='hidden' name='status' value=''>";
-
-	   echo "</td></tr>";
-	   //Sprache ausgeben
-	   echo "<tr><td><b>".$p->t('courseInformation/unterrichtssprache')."</b></td><td>&nbsp;</td><td>$lv_obj->sprache";
-	   echo "</td></tr>";
-	   
-	   //Anz. Incoming ausgeben
-	   	   
-	   if ($lv_obj->incoming > -1)
+	
+		echo "<tr><td class='tdvertical'><b>".$p->t('courseInformation/institutskoordinator')."</b></td><td>";
+	if($result=$db->db_query($qry))
+	{
+		while($row=$db->db_fetch_object($result))
 		{
-			echo "<tr><td valign='top'><b>".$p->t('courseInformation/incomingplaetze')."</b></td><td>&nbsp;</td><td valign='top'>$lv_obj->incoming";
+			echo "$row->titelpre $row->vorname $row->nachname $row->titelpost<br>";
+		}
+	}
+
+	echo "</td></tr>";
+
+	//echo "</table>";
+	echo "<tr><td>";
+
+
+	echo "<input type='hidden' name='stg' value='$stg'>";
+	echo "<input type='hidden' name='sem' value='$sem'>";
+	echo "<input type='hidden' name='lv' value='$lv'>";
+	echo "<input type='hidden' name='status' value=''>";
+
+	echo "</td></tr>";
+	//Sprache ausgeben
+	echo "<tr><td><b>".$p->t('courseInformation/unterrichtssprache')."</b></td><td>$lv_obj->sprache";
+	echo "</td></tr>";
+	
+	//Anz. Incoming ausgeben
+		
+	if ($lv_obj->incoming > -1)
+		{
+			echo "<tr><td valign='top'><b>".$p->t('courseInformation/incomingplaetze')."</b></td><td valign='top'>$lv_obj->incoming";
 		}
 		else echo "<tr><td valign='top'><b>".$p->t('courseInformation/incomingplaetze')."</b></td><td>0";
-			echo "</td></tr><tr><td colspan='4'><font style='font-size:smaller'>".$p->t('courseInformation/beiFehlernInDenFixfeldern',array($stg_obj1->email))."</font></td></tr>";
-			echo "<tr><td align='left' colspan='4'><br/><br/><font style='color:black'>".$p->t('courseInformation/pflichtfelderWerdenAufDerExternenSeiteAngezeigt',array($stg_obj1->email))."</font>.</td></tr>";
+			echo "</td></tr><tr><td colspan='2'><font style='font-size:smaller'>".$p->t('courseInformation/beiFehlernInDenFixfeldern',array($stg_obj1->email))."</font></td></tr>";
+			echo "<tr><td align='left' colspan='2'><br/><br/><font style='color:black'>".$p->t('courseInformation/pflichtfelderWerdenAufDerExternenSeiteAngezeigt',array($stg_obj1->email))."</font>.</td></tr>";
 			//echo "<tr><td align='left' colspan='4'><font style='color:black'>".$p->t('courseInformation/fallsSieAufzaehlungslistenVerwenden',array($stg_obj1->email))."</font></td></tr>"; --> Es sollten keine HTML-Tags gespeichert werden koennen. Hier muss eine andere Loesung gefunde werden.
 			echo "</table><br><br>";
 
-	   //Eingabefelder anzeigen
-	   echo "<table width='100%'  border='0' cellspacing='0' cellpadding='0'>";
+	//Eingabefelder anzeigen
+	echo "<table width='100%'  border='0' cellspacing='0' cellpadding='0'>";
 
 
-	   echo '<tr>
-         <td colspan="2"><b><u>DEUTSCH</u></b></td>
-	     <td rowspan="12" width="20">&nbsp;</td>
-         <td colspan="2"><b><u>ENGLISH</u></b></td>
-         </tr>
-
-       ';
+	echo '<tr>
+		<td colspan="2" align="center"><h2>DEUTSCH</h2></td>
+		<td rowspan="14" width="20">&nbsp;</td>
+		<td colspan="2" align="center"><h2>ENGLISH</h2></td>
+		</tr>';
+	echo '<tr>
+		<td colspan="2" align="center">'.($lv_de->genehmigt==false?'<span style="color:red">'.$p->t('courseInformation/nochNichtFreigegeben').'</span>':$p->t('courseInformation/freigegeben')).'</td>
+		<td colspan="2" align="center">'.($lv_en->genehmigt==false?'<span style="color:red">'.$p->t('courseInformation/nochNichtFreigegeben').'</span>':$p->t('courseInformation/freigegeben')).'</td>
+		</tr>';
+	echo '<tr>
+		<td colspan="5">&nbsp;</td>
+		</tr>';
 	 
-       echo '
-       <tr class="liste0">
-         <td><i>'.$p->t('lvinfo/kurzbeschreibung').' <font style="color:black">(Pflichtfeld)</font></i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="kurzbeschreibung_de">'. (isset($kurzbeschreibung_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$kurzbeschreibung_de)):'').'</textarea></td>
-         <td><i>'.$p->t('lvinfo/kurzbeschreibungEN').' <font style="color:black">(Required)</font></i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="kurzbeschreibung_en">'. (isset($kurzbeschreibung_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$kurzbeschreibung_en)):'').'</textarea></td>
-       </tr>
-       <tr class="liste1">
-         <td><i>'.$p->t('lvinfo/methodik').' <font style="color:black">(Pflichtfeld)</font></i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="methodik_de">'. (isset($methodik_de)?stripslashes(mb_eregi_replace("<br>","\r\n", $methodik_de)):'').'</textarea></td>
-         <td><i>'.$p->t('lvinfo/methodikEN').' <font style="color:black">(Required)</font></i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="methodik_en">'. (isset($methodik_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$methodik_en)):'').'</textarea></td>
-       </tr>';
-       echo '<tr class="liste0">
-         <td><i>'.$p->t('lvinfo/lernergebnisse').' <font style="color:black">(Pflichtfeld)</font></i></td>
-         <td align="right"><textarea rows="5" cols="40" name="lehrziele_de">'. (isset($lehrziele_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrziele_de)):'').'</textarea></td>
-         <td><i>'.$p->t('lvinfo/lernergebnisseEN').' <font style="color:black">(Required)</font></i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="lehrziele_en">'. (isset($lehrziele_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrziele_en)):'').'</textarea></td>
-       </tr>
-       <tr class="liste1">
-         <td><i>'.$p->t('lvinfo/lehrinhalte').' <font style="color:black">(Pflichtfeld)</font></i></td>
-         <td align="right"><textarea rows="5" cols="40" name="lehrinhalte_de">'. (isset($lehrinhalte_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrinhalte_de)):'').'</textarea></td>
-         <td><i>'.$p->t('lvinfo/lehrinhalteEN').' <font style="color:black">(Required)</font></i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="lehrinhalte_en">'. (isset($lehrinhalte_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrinhalte_en)):'').'</textarea></td>
-       </tr>
-       <tr class="liste0">
-         <td><i>'.$p->t('lvinfo/vorkenntnisse').' <font style="color:black">(Pflichtfeld)</font></i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="voraussetzungen_de">'. (isset($voraussetzungen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$voraussetzungen_de)):'').'</textarea></td>
-         <td><i>'.$p->t('lvinfo/vorkenntnisseEN').' <font style="color:black">(Required)</font></i></td>
-         <td align="right"><textarea rows="5" cols="40" name="voraussetzungen_en">'. (isset($voraussetzungen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$voraussetzungen_en)):'').'</textarea></td>
-       </tr>';
-       echo '<tr class="liste1">
-         <td><i>'.$p->t('lvinfo/literatur').'</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="unterlagen_de">'. (isset($unterlagen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$unterlagen_de)):'').'</textarea></td>
-         <td><i>'.$p->t('lvinfo/literaturEN').'</i></td>
-         <td align="right"><textarea rows="5" cols="40" name="unterlagen_en">'. (isset($unterlagen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$unterlagen_en)):'').'</textarea></td>
-       </tr>
-       <tr class="liste0">
-         <td><i>'.$p->t('lvinfo/leistungsbeurteilung').'</i></td>
-         <td align="right"><textarea rows="5" cols="40" name="pruefungsordnung_de">'. (isset($pruefungsordnung_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$pruefungsordnung_de)):'').'</textarea></td>
-         <td><i>'.$p->t('lvinfo/leistungsbeurteilungEN').'</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="pruefungsordnung_en">'. (isset($pruefungsordnung_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$pruefungsordnung_en)):'').'</textarea></td>
-       </tr>
-        <tr class="liste1">
-         <td><i>'.$p->t('lvinfo/anwesenheit').'</i></td>
-         <td align="right"><textarea rows="5" cols="40" name="anwesenheit_de">'. (isset($anwesenheit_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$anwesenheit_de)):'').'</textarea></td>
-         <td><i>'.$p->t('lvinfo/anwesenheitEN').'</i></td>
-         <td align="right"><textarea rows="5" cols="40" name="anwesenheit_en">'. (isset($anwesenheit_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$anwesenheit_en)):'').'</textarea></td>
-       </tr>
-       <tr class="liste0">
-         <td><i>'.$p->t('lvinfo/anmerkungen').'</i></td>
-         <td align="right"><textarea rows="5" cols="40" name="anmerkungen_de">'. (isset($anmerkungen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$anmerkungen_de)):'').'</textarea></td>
-         <td><i>'.$p->t('lvinfo/anmerkungenEN').'</i></td>
-         <td align="right"><textarea rows="5" cols="40" name="anmerkungen_en">'. (isset($anmerkungen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$anmerkungen_en)):'').'</textarea></td>
-       </tr>
-       <tr class="liste0">
-         <td align=center colspan=2><br><input type="checkbox" name="freig_de" '. (isset($freig_de) && ($freig_de==true || $freig_de=='1')?'checked':'').'/><i>'.$p->t('courseInformation/freigeben').'</i><br><br></td>
-         <td align=center colspan=2><input type="checkbox" name="freig_en" '. (isset($freig_en) && ($freig_en==true || $freig_en=='1')?'checked':'').'/><i>'.$p->t('courseInformation/freigeben').'</i> </td>
-         <td ></td>
-       </tr>';
-	   echo "</table><br>";
-	   echo "<div align='right'>";
-	   echo "<input type='button' value='".$p->t('global/speichern')."' onClick='save();'>";
-	   echo "<input type='button' value='".$p->t('courseInformation/voransicht')."' onClick='javascript:window.document.editFrm.action=\"preview.php\";window.document.editFrm.target=\"_blank\";window.document.editFrm.submit();'>";
-	   echo "</div>";
-	   if(isset($error) && $error!='')
-	   	   	echo $error;
-   }
+	echo '
+	<tr class="liste0">
+		<td><i>'.$p->t('lvinfo/kurzbeschreibung').' <font style="color:black">(Pflichtfeld)</font></i> </td>
+		<td align="right"><textarea rows="5" cols="50" name="kurzbeschreibung_de">'. (isset($kurzbeschreibung_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$kurzbeschreibung_de)):'').'</textarea></td>
+		<td><i>'.$p->t('lvinfo/kurzbeschreibungEN').' <font style="color:black">(Required)</font></i> </td>
+		<td align="right"><textarea rows="5" cols="50" name="kurzbeschreibung_en">'. (isset($kurzbeschreibung_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$kurzbeschreibung_en)):'').'</textarea></td>
+	</tr>
+	<tr class="liste1">
+		<td><i>'.$p->t('lvinfo/methodik').' <font style="color:black">(Pflichtfeld)</font></i> </td>
+		<td align="right"><textarea rows="5" cols="50" name="methodik_de">'. (isset($methodik_de)?stripslashes(mb_eregi_replace("<br>","\r\n", $methodik_de)):'').'</textarea></td>
+		<td><i>'.$p->t('lvinfo/methodikEN').' <font style="color:black">(Required)</font></i> </td>
+		<td align="right"><textarea rows="5" cols="50" name="methodik_en">'. (isset($methodik_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$methodik_en)):'').'</textarea></td>
+	</tr>';
+	echo '<tr class="liste0">
+		<td><i>'.$p->t('lvinfo/lernergebnisse').' <font style="color:black">(Pflichtfeld)</font></i></td>
+		<td align="right"><textarea rows="5" cols="50" name="lehrziele_de">'. (isset($lehrziele_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrziele_de)):'Nach erfolgreichem Abschluss sind die Studierenden in der Lage, ').'</textarea></td>
+		<td><i>'.$p->t('lvinfo/lernergebnisseEN').' <font style="color:black">(Required)</font></i> </td>
+		<td align="right"><textarea rows="5" cols="50" name="lehrziele_en">'. (isset($lehrziele_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrziele_en)):'').'</textarea></td>
+	</tr>
+	<tr class="liste1">
+		<td><i>'.$p->t('lvinfo/lehrinhalte').' <font style="color:black">(Pflichtfeld)</font></i></td>
+		<td align="right"><textarea rows="5" cols="50" name="lehrinhalte_de">'. (isset($lehrinhalte_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrinhalte_de)):'').'</textarea></td>
+		<td><i>'.$p->t('lvinfo/lehrinhalteEN').' <font style="color:black">(Required)</font></i> </td>
+		<td align="right"><textarea rows="5" cols="50" name="lehrinhalte_en">'. (isset($lehrinhalte_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrinhalte_en)):'').'</textarea></td>
+	</tr>
+	<tr class="liste0">
+		<td><i>'.$p->t('lvinfo/vorkenntnisse').' <font style="color:black">(Pflichtfeld)</font></i> </td>
+		<td align="right"><textarea rows="5" cols="50" name="voraussetzungen_de">'. (isset($voraussetzungen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$voraussetzungen_de)):'').'</textarea></td>
+		<td><i>'.$p->t('lvinfo/vorkenntnisseEN').' <font style="color:black">(Required)</font></i></td>
+		<td align="right"><textarea rows="5" cols="50" name="voraussetzungen_en">'. (isset($voraussetzungen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$voraussetzungen_en)):'').'</textarea></td>
+	</tr>';
+	echo '<tr class="liste1">
+		<td><i>'.$p->t('lvinfo/literatur').'</i> </td>
+		<td align="right"><textarea rows="5" cols="50" name="unterlagen_de">'. (isset($unterlagen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$unterlagen_de)):'').'</textarea></td>
+		<td><i>'.$p->t('lvinfo/literaturEN').'</i></td>
+		<td align="right"><textarea rows="5" cols="50" name="unterlagen_en">'. (isset($unterlagen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$unterlagen_en)):'').'</textarea></td>
+	</tr>
+	<tr class="liste0">
+		<td><i>'.$p->t('lvinfo/leistungsbeurteilung').'</i></td>
+		<td align="right"><textarea rows="5" cols="50" name="pruefungsordnung_de">'. (isset($pruefungsordnung_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$pruefungsordnung_de)):'').'</textarea></td>
+		<td><i>'.$p->t('lvinfo/leistungsbeurteilungEN').'</i> </td>
+		<td align="right"><textarea rows="5" cols="50" name="pruefungsordnung_en">'. (isset($pruefungsordnung_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$pruefungsordnung_en)):'').'</textarea></td>
+	</tr>
+		<tr class="liste1">
+		<td><i>'.$p->t('lvinfo/anwesenheit').'</i></td>
+		<td align="right"><textarea rows="5" cols="50" name="anwesenheit_de">'. (isset($anwesenheit_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$anwesenheit_de)):'').'</textarea></td>
+		<td><i>'.$p->t('lvinfo/anwesenheitEN').'</i></td>
+		<td align="right"><textarea rows="5" cols="50" name="anwesenheit_en">'. (isset($anwesenheit_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$anwesenheit_en)):'').'</textarea></td>
+	</tr>
+	<tr class="liste0">
+		<td><i>'.$p->t('lvinfo/anmerkungen').'</i></td>
+		<td align="right"><textarea rows="5" cols="50" name="anmerkungen_de">'. (isset($anmerkungen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$anmerkungen_de)):'').'</textarea></td>
+		<td><i>'.$p->t('lvinfo/anmerkungenEN').'</i></td>
+		<td align="right"><textarea rows="5" cols="50" name="anmerkungen_en">'. (isset($anmerkungen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$anmerkungen_en)):'').'</textarea></td>
+	</tr>';
+	if ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))
+		echo '	<tr class="liste0">
+					<td align=center colspan=2><br><input type="checkbox" name="freig_de" '. (isset($freig_de) && ($freig_de==true || $freig_de=='1')?'checked':'').'/><i>'.$p->t('courseInformation/deutschFreigeben').'</i><br><br></td>
+					<td align=center colspan=2><input type="checkbox" name="freig_en" '. (isset($freig_en) && ($freig_en==true || $freig_en=='1')?'checked':'').'/><i>'.$p->t('courseInformation/englischFreigeben').'</i> </td>
+					<td ></td>
+				</tr>';
+	
+	echo "</table><br>";
+	echo "<div align='left'>";
+	echo "<input type='button' value='".$p->t('global/speichern')."' onClick='save();'>";
+	echo "<input type='button' value='".$p->t('courseInformation/voransicht')."' onClick='javascript:window.document.editFrm.action=\"preview.php\";window.document.editFrm.target=\"_blank\";window.document.editFrm.submit();'>";
+	echo "<br><br>";
+	echo "<input type='button' value='".$p->t('courseInformation/zurFreigabeAbschicken')."' onClick='freigeben();'>";
+	echo "</div>";
+	echo "</form>";
+	echo "<br><br><br><br><br><br><br><br><br><br><br><br>";
+	if(isset($error) && $error!='')
+			echo $error;
+	}
 ?>
 <td></tr></table>
 </body>

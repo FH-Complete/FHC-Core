@@ -114,7 +114,7 @@ class lehreinheit extends basis_db
 				$this->ext_id = $row->ext_id;
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Es existiert keine Lehreinheit mit dieser ID';
 				return false;
@@ -126,7 +126,7 @@ class lehreinheit extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt die LE von der View mit erweiterten Attributen
 	 * @param lehreinheit_id
@@ -145,7 +145,7 @@ class lehreinheit extends basis_db
 		{
 			$this->anz=0;
 			while($row = $this->db_fetch_object())
-			{	
+			{
 				$this->lehreinheit_id = $row->lehreinheit_id;
 				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -178,7 +178,7 @@ class lehreinheit extends basis_db
 				$this->gruppe[$this->anz] 			= $row->gruppe;
 				$this->gruppe_kurzbz[$this->anz] 		= $row->gruppe_kurzbz;
 				$this->titel[$this->anz] 			= '';
-				
+
 				$this->anz++;
 			}
 			return true;
@@ -203,9 +203,9 @@ class lehreinheit extends basis_db
 	{
 		$this->lehreinheiten = array();
 		$this->errormsg ='';
-		
-		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE 
-				lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." 
+
+		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE
+				lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
 				AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
 		if($uid!='')
@@ -215,7 +215,7 @@ class lehreinheit extends basis_db
 			$qry .= " AND EXISTS ( SELECT 1 FROM lehre.tbl_lehrveranstaltung JOIN public.tbl_fachbereich USING(oe_kurzbz) WHERE fachbereich_kurzbz=".$this->db_add_param($fachbereich_kurzbz)." AND lehrveranstaltung_id=tbl_lehreinheit.lehrfach_id)";
 
 		$qry.= " ORDER BY lehreinheit_id;";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -253,7 +253,7 @@ class lehreinheit extends basis_db
 			return false;
 		}
 	}
-    
+
 	/**
 	 * Prueft die Variablen vor dem Speichern
 	 * auf Gueltigkeit.
@@ -366,7 +366,7 @@ class lehreinheit extends basis_db
 	public function save($new=null)
 	{
 		$this->errormsg ='';
-	
+
 		if(is_null($new))
 			$new = $this->new;
 
@@ -383,7 +383,7 @@ class lehreinheit extends basis_db
 			//ToDo ID entfernen
 			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz,
 			                                     lehrfach_id, lehrform_kurzbz, stundenblockung, wochenrythmus,
-			                                     start_kw, raumtyp, raumtypalternativ, lehre, anmerkung, unr, lvnr, insertamum, insertvon, updateamum, updatevon,  ext_id, sprache)
+			                                     start_kw, raumtyp, raumtypalternativ, lehre, anmerkung, unr, lvnr, insertamum, insertvon, updateamum, updatevon,  sprache)
 			        VALUES('.$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).','.
 					$this->db_add_param($this->studiensemester_kurzbz).','.
 					$this->db_add_param($this->lehrfach_id, FHC_INTEGER).','.
@@ -401,7 +401,6 @@ class lehreinheit extends basis_db
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->updateamum).','.
 					$this->db_add_param($this->updatevon).','.
-					$this->db_add_param($this->ext_id, FHC_INTEGER).','.
 					$this->db_add_param($this->sprache).');';
 		}
 		else
@@ -422,11 +421,10 @@ class lehreinheit extends basis_db
 			       ' lvnr='.$this->db_add_param($this->lvnr, FHC_INTEGER).','.
 				   ' updateamum='.$this->db_add_param($this->updateamum).','.
 				   ' updatevon='.$this->db_add_param($this->updatevon).','.
-				   ' sprache='.$this->db_add_param($this->sprache).','.
-			       ' ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).
+				   ' sprache='.$this->db_add_param($this->sprache).' '.
 			       " WHERE lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).";";
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			if($new)
@@ -480,14 +478,14 @@ class lehreinheit extends basis_db
 
 		$stg_obj = new studiengang();
 		$stg_obj->getAll();
-		
+
 		$ignore_reservation=false;
 		$ignore_zeitsperre=false;
 		// Parameter Checken
 		// Bezeichnung der Stundenplan-Tabelle und des Keys
 		$stpl_id=$stpl_table.TABLE_ID;
 		$stpl_table='lehre.'.TABLE_BEGIN.$stpl_table;
-		
+
 		//Lektoren SQL
 		$sql_lkt='';
 		foreach ($this->mitarbeiter_uid as $lkt)
@@ -501,14 +499,14 @@ class lehreinheit extends basis_db
 					AND (ort_kurzbz=".$this->db_add_param($ort)." OR $sql_lkt)";
 		if (is_numeric($this->unr))
 			$sql_query.=" AND unr!=".$this->db_add_param($this->unr);
-				
+
 		if (!$this->db_query($sql_query))
 		{
 			$this->errormsg=$this->db_last_error();
 			return false;
 		}
 		$erg_stpl=$this->db_result;
-		
+
 		$anzahl=$this->db_num_rows($erg_stpl);
 		//Check
 		if ($anzahl==0)
@@ -518,11 +516,11 @@ class lehreinheit extends basis_db
 					WHERE datum=".$this->db_add_param($datum)." AND stunde=".$this->db_add_param($stunde);
 			if (is_numeric($this->unr))
 				$sql_query.=" AND unr!=".$this->db_add_param($this->unr)." AND (1=2 ";
-				
+
 			for($anz=0;$anz<count($this->studiengang_kz);$anz++)
-			{	
+			{
 				$sql_query.=" OR ((studiengang_kz=".$this->db_add_param($this->studiengang_kz[$anz])." AND semester=".$this->db_add_param($this->semester[$anz]).")";
-			
+
 				if ($this->gruppe_kurzbz[$anz]!=null && $this->gruppe_kurzbz[$anz]!='' && $this->gruppe_kurzbz[$anz]!=' ')
 					$sql_query.=" OR (gruppe_kurzbz=".$this->db_add_param($this->gruppe_kurzbz[$anz]).")";
 				else
@@ -533,34 +531,34 @@ class lehreinheit extends basis_db
 						$sql_query.=" AND (gruppe=".$this->db_add_param($this->gruppe[$anz])." OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
 				}
 				$sql_query.=')';
-			}	
+			}
 			$sql_query.=")";
-						
+
 			if (!$this->db_query($sql_query))
 			{
 				$this->errormsg=$this->db_last_error();
 				return false;
 			}
 			$erg_stpl=$this->db_result;
-			
+
 			$anzahl=$this->db_num_rows($erg_stpl);
 			if($anzahl==0)
 			{
 				// Reservierungen pruefen?
 				if (!$ignore_reservation)
 				{
-					// Datenbank abfragen  	( studiengang_kz, titel, beschreibung )	 		
+					// Datenbank abfragen  	( studiengang_kz, titel, beschreibung )
 					//Lektoren SQL
 					$sql_lkt='';
 					foreach ($this->mitarbeiter_uid as $lkt)
 						$sql_lkt.="OR uid='$lkt' ";
 					$sql_lkt=mb_substr($sql_lkt,3);
 					$sql_lkt="(($sql_lkt) AND uid not in (".$this->db_implode4SQL(unserialize(KOLLISIONSFREIE_USER))."))";
-					$sql_query="SELECT reservierung_id AS id, uid AS lektor, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde 
+					$sql_query="SELECT reservierung_id AS id, uid AS lektor, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde
 								FROM lehre.vw_reservierung
 								WHERE datum=".$this->db_add_param($datum)." AND stunde=".$this->db_add_param($stunde)."
 								AND (ort_kurzbz=".$this->db_add_param($ort)." OR $sql_lkt)";
-					
+
 					if (!$this->db_query($sql_query))
 					{
 						$this->errormsg=$sql_query.$this->db_last_error();
@@ -574,18 +572,18 @@ class lehreinheit extends basis_db
 						// Zeitsperren pruefen?
 						if (!$ignore_zeitsperre)
 						{
-							// Datenbank abfragen  	( studiengang_kz, titel, beschreibung )	 		
+							// Datenbank abfragen  	( studiengang_kz, titel, beschreibung )
 							//Lektoren SQL
 							$sql_lkt='';
 							foreach ($this->mitarbeiter_uid as $lkt)
 								$sql_lkt.="OR mitarbeiter_uid=".$this->db_add_param($lkt)." ";
 							$sql_lkt=mb_substr($sql_lkt,3);
 							$sql_query="SELECT * FROM campus.tbl_zeitsperre
-											WHERE ($sql_lkt) AND 
-												(  (vondatum<".$this->db_add_param($datum)." AND bisdatum>".$this->db_add_param($datum).") 
+											WHERE ($sql_lkt) AND
+												(  (vondatum<".$this->db_add_param($datum)." AND bisdatum>".$this->db_add_param($datum).")
 												OR (vondatum=".$this->db_add_param($datum)." AND bisdatum=".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde)." AND bisstunde>=".$this->db_add_param($stunde).")
 												OR (vondatum=".$this->db_add_param($datum)." AND bisdatum>".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde).")
-												OR (vondatum<".$this->db_add_param($datum)." AND bisdatum=".$this->db_add_param($datum)." AND bisstunde>=".$this->db_add_param($stunde).") )";	
+												OR (vondatum<".$this->db_add_param($datum)." AND bisdatum=".$this->db_add_param($datum)." AND bisstunde>=".$this->db_add_param($stunde).") )";
 							//echo $sql_query.'<br>';
 							if (!$this->db_query($sql_query))
 							{
@@ -599,10 +597,10 @@ class lehreinheit extends basis_db
 								return true;
 							else
 							{
-								$row=$this->db_fetch_object($erg_zs); 																							 	 	 	 	 	
+								$row=$this->db_fetch_object($erg_zs);
 								$this->errormsg="Kollision (Zeitsperre): $row->zeitsperre_id|$row->mitarbeiter_uid|$row->zeitsperretyp_kurzbz|$row->bezeichnung|$row->vondatum/$row->vonstunde-$row->bisdatum/$row->bisstunde - $row->vertretung_uid";
 								return false;
-							}				
+							}
 						}
 						return true;
 					}
@@ -611,7 +609,7 @@ class lehreinheit extends basis_db
 						$row=$this->db_fetch_object($erg_res);
 						$this->errormsg="Kollision (Reservierung): $row->id|$row->lektor|$row->ort_kurzbz|$row->stg_kurzbz-$row->semester$row->verband$row->gruppe$row->gruppe_kurzbz - $row->datum/$row->stunde";
 						return false;
-					}				
+					}
 				}
 				return true;
 			}
@@ -699,7 +697,7 @@ class lehreinheit extends basis_db
 	{
 		$this->errormsg='';
 		$this->lehreinheiten=array();
-		
+
 		$lva_stpl_view=VIEW_BEGIN.'lva_'.$db_stpl_table;
 
 		if (mb_strlen($studiensemester)<=0)
@@ -728,8 +726,8 @@ class lehreinheit extends basis_db
 			$where.=" AND fachbereich_kurzbz=".$this->db_add_param($fachbereich_kurzbz);
 		}
 		$sql_query='SELECT *, planstunden-verplant::smallint AS offenestunden
-			FROM 
-				lehre.'.$lva_stpl_view.' 
+			FROM
+				lehre.'.$lva_stpl_view.'
 				JOIN lehre.tbl_lehrform ON '.$lva_stpl_view.'.lehrform=tbl_lehrform.lehrform_kurzbz
 			WHERE '.$where.' AND verplanen';
 		if($orgform_kurzbz!='')
@@ -737,7 +735,7 @@ class lehreinheit extends basis_db
 
 		if($order=='')
 			$order='offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz';
-		
+
 		$sql_query.=" ORDER BY $order;";
 
 		if(!$this->db_query($sql_query))
@@ -806,7 +804,7 @@ class lehreinheit extends basis_db
 			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		//Pruefen ob schon eine Kreuzerlliste fuer diese Lehreinheit angelegt wurde.
 		//Falls ja dann wird das loeschen verweigert
 		$qry = "SELECT count(*) as anzahl FROM campus.tbl_uebung WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).";";
@@ -955,9 +953,9 @@ class lehreinheit extends basis_db
 	 */
 	public function getLehreinheitDetails($lehreinheit_id)
 	{
-		$qry = "SELECT 
-					*, tbl_lehrveranstaltung.semester as lv_semester, tbl_lehrveranstaltung.studiengang_kz as lv_studiengang_kz 
-				FROM 
+		$qry = "SELECT
+					*, tbl_lehrveranstaltung.semester as lv_semester, tbl_lehrveranstaltung.studiengang_kz as lv_studiengang_kz
+				FROM
 					lehre.tbl_lehreinheit
 					JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(lehrfach_id=lehrfach.lehrveranstaltung_id)
 					JOIN public.tbl_fachbereich USING(oe_kurzbz)

@@ -230,7 +230,7 @@ class lehreinheitmitarbeiter extends basis_db
 
 			//ToDo ID entfernen
 			$qry = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, semesterstunden, planstunden,
-			                                                stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, bismelden, ext_id, insertamum, insertvon, vertrag_id)
+			                                                stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, bismelden, insertamum, insertvon, vertrag_id)
 			        VALUES('.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
 					$this->db_add_param($this->mitarbeiter_uid).','.
 					$this->db_add_param($this->semesterstunden).','.
@@ -240,7 +240,6 @@ class lehreinheitmitarbeiter extends basis_db
 					$this->db_add_param($this->anmerkung).','.
 					$this->db_add_param($this->lehrfunktion_kurzbz).','.
 					$this->db_add_param($this->bismelden, FHC_BOOLEAN).','.
-					$this->db_add_param($this->ext_id, FHC_INTEGER).','.
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->vertrag_id).');';
@@ -269,8 +268,7 @@ class lehreinheitmitarbeiter extends basis_db
 			       ' bismelden='.$this->db_add_param($this->bismelden, FHC_BOOLEAN).','.
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
 			       ' updatevon='.$this->db_add_param($this->updatevon).','.
-				   ' vertrag_id='.$this->db_add_param($this->vertrag_id).','.
-			       ' ext_id = '.$this->db_add_param($this->ext_id, FHC_INTEGER).
+				   ' vertrag_id='.$this->db_add_param($this->vertrag_id).
 			       $setinsert.
 			       " WHERE lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER)." AND
 			               mitarbeiter_uid=".$this->db_add_param($this->mitarbeiter_uid_old).";";
@@ -325,7 +323,7 @@ class lehreinheitmitarbeiter extends basis_db
 	 * @param $uid
 	 * @return true wenn die Zuteilung existiert sonst false
 	 */
-	public function existsLV($lehrveranstaltung_id, $studiensemester_kurzbz,  $uid)
+	public function existsLV($lehrveranstaltung_id, $studiensemester_kurzbz=NULL,  $uid)
 	{
 		if(!is_numeric($lehrveranstaltung_id))
 		{
@@ -340,8 +338,12 @@ class lehreinheitmitarbeiter extends basis_db
 					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 				WHERE
 					lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
-					AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
-					AND mitarbeiter_uid=".$this->db_add_param($uid).';';
+					AND mitarbeiter_uid=".$this->db_add_param($uid);
+
+		if(!is_null($studiensemester_kurzbz))
+			$qry .= " AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+
+		$qry .= ";";
 
 		if($this->db_query($qry))
 		{
@@ -378,7 +380,7 @@ class lehreinheitmitarbeiter extends basis_db
 			if($row = $this->db_fetch_object())
 			{
 				$undo = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, semesterstunden, planstunden, '.
-			            ' stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, bismelden, ext_id, insertamum, insertvon, updateamum, updatevon)'.
+			            ' stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, bismelden, insertamum, insertvon, updateamum, updatevon)'.
 				       	' VALUES('.$this->db_add_param($row->lehreinheit_id, FHC_INTEGER).','.
 						$this->db_add_param($row->mitarbeiter_uid).','.
 						$this->db_add_param($row->semesterstunden).','.
@@ -388,7 +390,6 @@ class lehreinheitmitarbeiter extends basis_db
 						$this->db_add_param($row->anmerkung).','.
 						$this->db_add_param($row->lehrfunktion_kurzbz).','.
 						$this->db_add_param($this->db_parse_bool($row->bismelden), FHC_BOOLEAN).','.
-						$this->db_add_param($row->ext_id, FHC_INTEGER).','.
 						$this->db_add_param($row->insertamum).','.
 						$this->db_add_param($row->insertvon).','.
 						$this->db_add_param($row->updateamum).','.

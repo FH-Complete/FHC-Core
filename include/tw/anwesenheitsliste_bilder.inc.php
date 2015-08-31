@@ -42,7 +42,7 @@ if ($lvobj = new lehrveranstaltung($lvid))
 
 
 $pdf->SetFont('Arial','',16);
-$pdf->MultiCell(0,20,'Anwesenheitsliste '.$bezeichnung,0,'L',0);
+$pdf->MultiCell(0,20,'Fotoliste '.$bezeichnung,0,'L',0);
 
 $pdf->SetFont('Arial','',10);
 $pdf->SetFillColor(190,190,190);
@@ -59,7 +59,7 @@ $pdf->SetXY(30,60);
 $qry = "SELECT distinct on(kuerzel, semester, verband, gruppe, gruppe_kurzbz) UPPER(stg_typ::varchar(1) || stg_kurzbz) as kuerzel, semester, verband, gruppe, gruppe_kurzbz from campus.vw_lehreinheit WHERE lehrveranstaltung_id='".addslashes($lvid)."' AND studiensemester_kurzbz='".addslashes($stsem)."'";
 if($lehreinheit_id!='')
 	$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
-	
+
 $gruppen='';
 if($result = $db->db_query($qry))
 {
@@ -78,7 +78,7 @@ $gruppen=mb_convert_encoding($gruppen,'ISO-8859-15','UTF-8');
 $pdf->MultiCell(0,20,'Gruppe: '.$gruppen);
 $semester = new studiensemester($stsem);
 $pdf->MultiCell(0,20,'Studiensemester: '.(($semester->beschreibung != NULL) ? $semester->beschreibung : $stsem));
-	
+
 $maxY=$pdf->GetY();
 $maxY=getmax($maxY,$pdf->GetY());
 
@@ -125,20 +125,20 @@ $stsem_obj = new studiensemester();
 $stsem_obj->load($stsem);
 $stsemdatumvon = $stsem_obj->start;
 $stsemdatumbis = $stsem_obj->ende;
-$qry = "SELECT 
+$qry = "SELECT
 			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, person_id, foto_sperre,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 			tbl_bisio.bisio_id, tbl_bisio.bis, tbl_bisio.von,
-			tbl_zeugnisnote.note 
-		FROM 
-			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
-			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid) 
+			tbl_zeugnisnote.note
+		FROM
+			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
+			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
 			LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
 			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
 			LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
-		WHERE 
-			vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND 
+		WHERE
+			vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND
 			vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."'";
 
 if($lehreinheit_id!='')
@@ -157,9 +157,9 @@ if($result = $db->db_query($qry))
 			$i++;
 			if($i%2)
 				$pdf->SetFillColor(190,190,190);
-			else 
+			else
 				$pdf->SetFillColor(255,255,255);
-				
+
 			$pdf->SetFont('Arial','',10);
 			$maxY=$pdf->GetY();
 			if($maxY>660)
@@ -167,7 +167,7 @@ if($result = $db->db_query($qry))
 				$pdf->AddPage();
 				$maxY=$pdf->GetY();
 			}
-	
+
 
 			$vorname=mb_convert_encoding(trim($elem->vorname),'ISO-8859-15','UTF-8');
 			$nachname=mb_convert_encoding(trim($elem->nachname),'ISO-8859-15','UTF-8');
@@ -176,7 +176,7 @@ if($result = $db->db_query($qry))
 			$matrikelnr=trim(mb_convert_encoding($elem->matrikelnr,'ISO-8859-15','UTF-8'));
 
 			$sem_verb_grup=trim(mb_convert_encoding($elem->semester.$elem->verband.$elem->gruppe,'ISO-8859-15','UTF-8'));
-	
+
 			$maxX=30;
 			$pdf->SetXY($maxX,$maxY);
 			$pdf->MultiCell(20,$lineheight,$i,1,'R',1);
@@ -188,15 +188,15 @@ if($result = $db->db_query($qry))
 			$pdf->SetXY($maxX+strlen($nachname)*6+2,$maxY);
 			if($elem->status=='Incoming')
 				$inc=' (i)';
-			else 
+			else
 				$inc='';
-				
+
 			if($elem->bisio_id!='' && $elem->status!='Incoming' && ($elem->bis > $stsemdatumvon || $elem->bis=='') && $elem->von < $stsemdatumbis) //Outgoing
 				$inc.=' (o)';
-				
+
 			if($elem->note==6) //angerechnet
 				$inc.=' (ar)';
-				
+
 			$pdf->MultiCell(130,$lineheight,$vorname.$inc,0,'L',0);
 			$maxX +=130;
 			$pdf->SetXY($maxX,$maxY);
@@ -243,5 +243,5 @@ $pdf->SetFont('Arial','',8);
 $pdf->MultiCell(520,$lineheight,'Fehlt ein Student l�nger als 2 Wochen, bitte um einen deutlichen Vermerk auf der Anwesenheitsliste. Die Anwesenheitsliste bitte am Ende des Monats im Sekretariat abgeben! Bitte achten Sie darauf, dass Sie nur VOLLST�NDIG AUSGEF�LLTE LISTEN abgeben!',0,'L',0);
 */
 
-$pdf->Output('anwesenheitsliste.pdf','I');
+$pdf->Output('fotoliste.pdf','I');
 ?>

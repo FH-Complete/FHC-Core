@@ -175,7 +175,7 @@ else
     switch(substr($studiensemester->studiensemester_kurzbz, 0,2))
     {
 	case "WS":
-	    echo "<zeitraum>von Semptember bis Februar</zeitraum>";
+	    echo "<zeitraum>von September bis Februar</zeitraum>";
 	    break;
 	
 	case "SS":

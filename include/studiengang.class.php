@@ -62,9 +62,9 @@ class studiengang extends basis_db
 	public $mischform;	// boolean
 	public $projektarbeit_note_anzeige; // boolean
 	public $bezeichnung_arr = array();
-    
-    public $beschreibung; 
-	
+
+    public $beschreibung;
+
 	/**
 	 * Konstruktor
 	 * @param studiengang_kz Kennzahl des zu ladenden Studienganges
@@ -72,10 +72,10 @@ class studiengang extends basis_db
 	public function __construct($studiengang_kz=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($studiengang_kz))
 			$this->load($studiengang_kz);
-		
+
 		//$this->getAllTypes();
 /*		$this->studiengang_typ_arr["b"] = "Bachelor";
 		$this->studiengang_typ_arr["d"] = "Diplom";
@@ -182,7 +182,7 @@ class studiengang extends basis_db
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
-		} 
+		}
 
 		while($row = $this->db_fetch_object($result))
 		{
@@ -230,23 +230,23 @@ class studiengang extends basis_db
 
 		return true;
 	}
-    
+
     /**
      * Gibt alle Studiengaenge zurueck, fuer die man sich online bewerben kann
      * @return boolean
      */
-    public function getAllForBewerbung() 
+    public function getAllForBewerbung()
     {
         $qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch '
                 . 'FROM lehre.vw_studienplan '
                 . 'WHERE onlinebewerbung IS TRUE '
                 . 'ORDER BY studiengangbezeichnung ASC';
-		
+
 		if(!$result = $this->db_query($qry))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
-		} 
+		}
 
 		while($row = $this->db_fetch_object($result))
 		{
@@ -255,7 +255,7 @@ class studiengang extends basis_db
 
 		return true;
     }
-	
+
 	/**
 	 * Laedt alle Studientypen in das Attribut studiengang_typ_array
 	 */
@@ -337,9 +337,9 @@ class studiengang extends basis_db
 	{
 		if(count($kennzahlen)==0)
 			return true;
-		
+
 		$kennzahlen = $this->implode4SQL($kennzahlen);
-						
+
 		$qry = 'SELECT * FROM public.tbl_studiengang WHERE studiengang_kz in('.$kennzahlen.')';
 		if ($aktiv)
 			$qry.=' AND aktiv=true';
@@ -351,8 +351,8 @@ class studiengang extends basis_db
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
-		} 
-		
+		}
+
 		while($row = $this->db_fetch_object($result))
 		{
 			$stg_obj = new studiengang();
@@ -400,7 +400,7 @@ class studiengang extends basis_db
 
 		return true;
 	}
-	
+
 	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
@@ -436,7 +436,7 @@ class studiengang extends basis_db
 		$this->errormsg = '';
 		return true;
 	}
-	
+
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * @param $new boolean Legt fest ob der Datensatz neu angelegt wird oder nicht
@@ -446,7 +446,7 @@ class studiengang extends basis_db
 	{
 		if(is_null($new))
 			$new = $this->new;
-		
+
 		//Gueltigkeit der Variablen pruefen
 		if(!$this->validate())
 		{
@@ -458,7 +458,7 @@ class studiengang extends basis_db
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_studiengang (studiengang_kz, kurzbz, kurzbzlang, bezeichnung, english,
 				typ, farbe, email, telefon, max_verband, max_semester, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1,
-				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, onlinebewerbung, ext_id, orgform_kurzbz, zusatzinfo_html,
+				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, onlinebewerbung, orgform_kurzbz, zusatzinfo_html,
 				oe_kurzbz, moodle, sprache, testtool_sprachwahl, studienplaetze, lgartcode, mischform,projektarbeit_note_anzeige) VALUES ('.
 				$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 				$this->db_add_param($this->kurzbz).', '.
@@ -481,7 +481,6 @@ class studiengang extends basis_db
 				$this->db_add_param($this->titelbescheidvom).', '.
 				$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
 				$this->db_add_param($this->onlinebewerbung, FHC_BOOLEAN).', '.
-				$this->db_add_param($this->ext_id).', '.
 				$this->db_add_param($this->orgform_kurzbz).', '.
 				$this->db_add_param($this->zusatzinfo_html).', '.
 				$this->db_add_param($this->oe_kurzbz).', '.
@@ -516,7 +515,6 @@ class studiengang extends basis_db
 				'bescheidgz='.$this->db_add_param($this->bescheidgz).', '.
 				'bescheidvom='.$this->db_add_param($this->bescheidvom).', '.
 				'titelbescheidvom='.$this->db_add_param($this->titelbescheidvom).', '.
-				'ext_id='.$this->db_add_param($this->ext_id).', '.
 				'telefon='.$this->db_add_param($this->telefon).', '.
 				'orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).', '.
 				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
@@ -524,7 +522,7 @@ class studiengang extends basis_db
 				'oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).','.
 				'zusatzinfo_html='.$this->db_add_param($this->zusatzinfo_html).', '.
 				'moodle='.$this->db_add_param($this->moodle, FHC_BOOLEAN).', '.
-				'projektarbeit_note_anzeige='.$this->db_add_param($this->projektarbeit_note_anzeige, FHC_BOOLEAN).', '.			
+				'projektarbeit_note_anzeige='.$this->db_add_param($this->projektarbeit_note_anzeige, FHC_BOOLEAN).', '.
 				'sprache='.$this->db_add_param($this->sprache).', '.
 				'testtool_sprachwahl='.$this->db_add_param($this->testtool_sprachwahl, FHC_BOOLEAN).', '.
 				'studienplaetze='.$this->db_add_param($this->studienplaetze).', '.
@@ -569,7 +567,7 @@ class studiengang extends basis_db
 		}
 
 	}
-	
+
 	/**
 	 * Liefert die UIDs der Studiengangsleiter
 	 *
@@ -579,20 +577,20 @@ class studiengang extends basis_db
 	public function getLeitung($studiengang_kz=null)
 	{
 		$stgl = array();
-		
-		$qry = "SELECT 
+
+		$qry = "SELECT
 					uid
-				FROM 
-					public.tbl_benutzerfunktion 
-					JOIN public.tbl_studiengang USING(oe_kurzbz) 
-				WHERE 
+				FROM
+					public.tbl_benutzerfunktion
+					JOIN public.tbl_studiengang USING(oe_kurzbz)
+				WHERE
 					funktion_kurzbz='Leitung' AND
 					(datum_von is null OR datum_von<=now()) AND
 					(datum_bis is null OR datum_bis>=now())";
-		
+
 		if(!is_null($studiengang_kz))
 			$qry.=" AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -601,13 +599,13 @@ class studiengang extends basis_db
 			}
 			return $stgl;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Studiengangsleiter';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt einen Studiengang anhand seiner Organisationseinheit
 	 * @param $oe_kurzbz
@@ -615,8 +613,8 @@ class studiengang extends basis_db
 	 */
 	public function getStudiengangFromOe($oe_kurzbz)
 	{
-		$qry ="SELECT * FROM public.tbl_studiengang WHERE oe_kurzbz =".$this->db_add_param($oe_kurzbz); 
-		
+		$qry ="SELECT * FROM public.tbl_studiengang WHERE oe_kurzbz =".$this->db_add_param($oe_kurzbz);
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -659,14 +657,14 @@ class studiengang extends basis_db
 				return true;
 			}
 		}
-		else 
+		else
 		{
-			$this->errormsg = "Fehler bei der Datenbankabfrage aufgetreten."; 
-			return false; 
+			$this->errormsg = "Fehler bei der Datenbankabfrage aufgetreten.";
+			return false;
 		}
 	}
-	
-		
+
+
 	/**
 	 * @return Array mit allen Semestern des Studienganges
 	 */
@@ -684,26 +682,26 @@ class studiengang extends basis_db
 		}
 		return $result;
 	}
-    
+
     public function getStudiengangTyp($typ)
     {
-        $qry = "SELECT * FROM public.tbl_studiengangstyp WHERE typ =".$this->db_add_param($typ,FHC_STRING).";"; 
-        
+        $qry = "SELECT * FROM public.tbl_studiengangstyp WHERE typ =".$this->db_add_param($typ,FHC_STRING).";";
+
         if($result = $this->db_query($qry))
         {
             if($row = $this->db_fetch_object($result))
             {
-                $this->typ = $row->typ; 
-                $this->bezeichnung = $row->bezeichnung; 
-                $this->beschreibung = $row->beschreibung; 
+                $this->typ = $row->typ;
+                $this->bezeichnung = $row->bezeichnung;
+                $this->beschreibung = $row->beschreibung;
             }
-            
-            return true; 
+
+            return true;
         }
-        else 
+        else
         {
-            $this->errormsg = "Fehler bei der Abfrage aufgetreten"; 
-            return false; 
+            $this->errormsg = "Fehler bei der Abfrage aufgetreten";
+            return false;
         }
     }
 
@@ -735,7 +733,7 @@ class studiengang extends basis_db
             return false;
         }
     }
-    
+
 	/**
 	 * Sucht nach einem Studiengang
 	 * @param type $searchItem
@@ -743,11 +741,11 @@ class studiengang extends basis_db
 	 */
 	public function search($searchItem)
 	{
-	    $qry = 'SELECT * FROM public.tbl_studiengang WHERE 
+	    $qry = 'SELECT * FROM public.tbl_studiengang WHERE
 	    		LOWER(bezeichnung) LIKE LOWER(\'%'.$this->db_escape((implode(' ',$searchItem))).'%\') OR
 	    		LOWER(english) LIKE LOWER(\'%'.$this->db_escape((implode(' ',$searchItem))).'%\')
 	    		ORDER BY typ,bezeichnung;';
-	    
+
 	    if($this->db_query($qry))
 	    {
 			while($row = $this->db_fetch_object())
@@ -787,12 +785,12 @@ class studiengang extends basis_db
 				$obj->mischform = $this->db_parse_bool($row->mischform);
 				$obj->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
 	    }
-	    else 
+	    else
 	    {
 			$this->errormsg = 'Fehler beim Laden des Studiengangs';
 			return false;
@@ -819,7 +817,7 @@ class studiengang extends basis_db
 		{
 			$qry.=" AND tbl_studiengang.aktiv";
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -866,10 +864,10 @@ class studiengang extends basis_db
 			}
 			return true;
 		}
-		else 
+		else
 		{
-			$this->errormsg = "Fehler bei der Datenbankabfrage aufgetreten."; 
-			return false; 
+			$this->errormsg = "Fehler bei der Datenbankabfrage aufgetreten.";
+			return false;
 		}
 	}
 }

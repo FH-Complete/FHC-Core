@@ -33,8 +33,11 @@ isset($_GET['bis']) ? $bis = date('Y-m-d', strtotime($_GET['bis'])) : $bis = $vo
 isset($_GET['stundevon']) ? $stundevon = $_GET['stundevon'] : $stundevon = null;
 isset($_GET['stundebis']) ? $stundebis = $_GET['stundebis'] : $stundebis = null;
 isset($_GET['stg_kz']) ? $studiengang = $_GET['stg_kz'] : $studiengang = NULL;
-isset($_GET['semester']) ? $semester = $_GET['semester'] : $semester = NULL;
+isset($_GET['sem']) ? $semester = $_GET['sem'] : $semester = NULL;
 isset($_GET['lehreinheit']) ? $lehreinheit = $_GET['lehreinheit'] : $lehreinheit = NULL;
+isset($_GET['fixangestellt']) ? $fixangestellt = $_GET['fixangestellt'] : $fixangestellt = NULL;
+isset($_GET['standort']) ? $standort = $_GET['standort'] : $standort = NULL;
+isset($_GET['lvid']) ? $lvid = $_GET['lvid'] : $lvid = NULL;
 
 if($von)
 	$studiensemester = getStudiensemesterFromDatum($von);
@@ -47,12 +50,14 @@ $data = array();
 */
 // Daten der Lehreinheiten ermitteln
 $qry = "SELECT le.lehreinheit_id, le.lehrveranstaltung_id, lv.lvnr, lv.bezeichnung AS lvbez, stg.bezeichnung AS stgbez, "
-	. "sp.ort_kurzbz, datum, beginn, ende "
+	. "sp.ort_kurzbz, datum, beginn, ende, sto.bezeichnung AS standort "
 	. "FROM lehre.tbl_lehreinheit le "
 	. "JOIN lehre.tbl_lehrveranstaltung lv ON lv.lehrveranstaltung_id = le.lehrveranstaltung_id "
 	. "JOIN public.tbl_studiengang stg ON stg.studiengang_kz = lv.studiengang_kz "
 	. "JOIN lehre.tbl_stundenplan sp ON (sp.lehreinheit_id=le.lehreinheit_id) "
 	. "JOIN lehre.tbl_stunde stu ON stu.stunde = sp.stunde "
+    . "JOIN public.tbl_ort ort ON sp.ort_kurzbz = ort.ort_kurzbz "
+    . "JOIN public.tbl_standort sto ON ort.standort_id = sto.standort_id "
 	. "WHERE 1=1";
 
 if($studiengang!='')
@@ -69,6 +74,10 @@ if(!is_null($stundevon))
 	$qry.=" AND stu.stunde>=".$db->db_add_param($stundevon);
 if(!is_null($stundebis))
 	$qry.=" AND stu.stunde<=".$db->db_add_param($stundebis);
+if($standort)
+	$qry.=" AND sto.standort_id=".$db->db_add_param($standort);
+if($lvid)
+	$qry .= " AND lv.lehrveranstaltung_id = " . $db->db_add_param($lvid);
 $qry .= " ORDER BY datum, beginn";
 
 if($db->db_query($qry))
@@ -85,8 +94,10 @@ if($db->db_query($qry))
 foreach($data as $key => $value)
 {
 	// Daten der Vortragenden ermitteln
-	$qry = "SELECT vorname, nachname, titelpre, titelpost "
+	$qry = "SELECT vorname, nachname, titelpre, titelpost, "
+        . "CASE WHEN fixangestellt IS TRUE THEN 'ja' ELSE 'nein' END AS fixangestellt "
 		. "FROM lehre.tbl_lehreinheitmitarbeiter lema "
+        . "JOIN public.tbl_mitarbeiter ma ON lema.mitarbeiter_uid = ma.mitarbeiter_uid "   
 		. "JOIN public.tbl_benutzer be ON be.uid = lema.mitarbeiter_uid "
 		. "JOIN public.tbl_person pe ON pe.person_id = be.person_id "
 		. "WHERE lehreinheit_id = " . $db->db_add_param($key);
@@ -127,7 +138,20 @@ echo "<anwesenheitslisten>";
 
 foreach($data as $lehreinheit_id => $value)
 {
-	foreach($value['tage'] as $tag)
+	// Anstellung der Vortragenden prüfen
+    if($fixangestellt != '')
+    {
+        $anstellungVortragende = array();
+        foreach($value['vortragende'] as $vortragender)
+        {
+            $anstellungVortragende[] = $vortragender->fixangestellt;
+        }
+
+        if(!in_array($fixangestellt, $anstellungVortragende))
+            continue;
+    }
+    
+    foreach($value['tage'] as $tag)
 	{
 		echo "<anwesenheitsliste>";
 
@@ -144,6 +168,7 @@ foreach($data as $lehreinheit_id => $value)
 		echo "\n			<barcode><![CDATA[".ean13($convertableString)."]]></barcode>";
 		echo "\n			<kuerzel><![CDATA[".$tag[0]->lvnr."]]></kuerzel>";
 		echo "\n			<einheiten><![CDATA[".count($tag)."]]></einheiten>";
+        echo "\n			<standort><![CDATA[".$tag[0]->standort."]]></standort>";
 		echo "\n			<ort><![CDATA[".$tag[0]->ort_kurzbz."]]></ort>";
 		echo "\n			<datum><![CDATA[".date('d.m.Y', strtotime($tag[0]->datum))."]]></datum>";
 		echo "\n			<beginn><![CDATA[".mb_substr($tag[0]->beginn, 0, 5)."]]></beginn>";
@@ -159,6 +184,7 @@ foreach($data as $lehreinheit_id => $value)
 			echo "\n			<nachname><![CDATA[".$vortragender->nachname."]]></nachname>";
 			echo "\n			<titelpre><![CDATA[".$vortragender->titelpre."]]></titelpre>";
 			echo "\n			<titelpost><![CDATA[".$vortragender->titelpost."]]></titelpost>";
+            echo "\n			<fixangestellt><![CDATA[".$vortragender->fixangestellt."]]></fixangestellt>";
 			echo "\n		</vortragender>";
 		}
 		echo "</vortragende>";

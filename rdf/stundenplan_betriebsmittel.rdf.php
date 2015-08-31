@@ -49,14 +49,14 @@ if(isset($_REQUEST['stundenplan_ids']) || isset($_REQUEST['stundenplan_betriebsm
 			if(count($betriebsmittel->result)>0)
 			{
 				foreach($betriebsmittel->result as $row)
-				{	
+				{
 					$i=$oRdf->newObjekt($row->stundenplan_betriebsmittel_id);
 					$oRdf->obj[$i]->setAttribut('stundenplan_betriebsmittel_id',$row->stundenplan_betriebsmittel_id,true);
 					$oRdf->obj[$i]->setAttribut('beschreibung',$row->beschreibung,true);
 					$oRdf->obj[$i]->setAttribut('betriebsmittel_id',$row->betriebsmittel_id,true);
 					$oRdf->obj[$i]->setAttribut('anmerkung',$row->anmerkung,true);
 					$oRdf->obj[$i]->setAttribut('stunde',$row->stunde,true);
-		
+
 					$oRdf->addSequence($row->stundenplan_betriebsmittel_id);
 				}
 			}
@@ -99,7 +99,8 @@ elseif(isset($_REQUEST['von']) && isset($_REQUEST['bis']) && $_REQUEST['xmlforma
 		tbl_stundenplan_betriebsmittel.anmerkung,
 		tbl_lehrveranstaltung.bezeichnung,
 		tbl_stundenplan.mitarbeiter_uid,
-		tbl_stundenplan.lehreinheit_id
+		tbl_stundenplan.lehreinheit_id,
+		tbl_studiengang.kurzbzlang as stg
 	FROM
 		lehre.tbl_stundenplan_betriebsmittel
 		JOIN lehre.tbl_stundenplan ON(stundenplandev_id=stundenplan_id)
@@ -107,11 +108,12 @@ elseif(isset($_REQUEST['von']) && isset($_REQUEST['bis']) && $_REQUEST['xmlforma
 		JOIN lehre.tbl_stunde USING(stunde)
 		JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 		JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+		JOIN public.tbl_studiengang ON(tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz)
 	WHERE
 		tbl_stundenplan.datum>='.$db->db_add_param($von).'
 		AND tbl_stundenplan.datum<='.$db->db_add_param($bis).'
 	ORDER BY datum, ort_kurzbz, stunde';
-	
+
 	header("Content-type: application/xhtml+xml");
 	$xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>";
 	echo '<stundenplan_betriebsmittel>';
@@ -128,6 +130,7 @@ elseif(isset($_REQUEST['von']) && isset($_REQUEST['bis']) && $_REQUEST['xmlforma
 			$obj['beschreibung']=$row->beschreibung;
 			$obj['anmerkung']=$row->anmerkung;
 			$obj['lvbezeichnung']=$row->bezeichnung;
+			$obj['stg']=$row->stg;
 			$data[$row->datum][$row->lehreinheit_id][$row->stunde][]=$obj;
 		}
 	}
@@ -152,6 +155,7 @@ elseif(isset($_REQUEST['von']) && isset($_REQUEST['bis']) && $_REQUEST['xmlforma
 					echo '<beschreibung><![CDATA['.$obj['beschreibung'].']]></beschreibung>';
 					echo '<anmerkung><![CDATA['.$obj['anmerkung'].']]></anmerkung>';
 					echo '<lvbezeichnung><![CDATA['.$obj['lvbezeichnung'].']]></lvbezeichnung>';
+					echo '<studiengang_kurzbzlang><![CDATA['.$obj['stg'].']]></studiengang_kurzbzlang>';
 					echo '</item>';
 				}
 				echo '</stunde>';

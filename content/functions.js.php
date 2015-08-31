@@ -140,7 +140,7 @@ function SetStatusBarText(text)
 function CheckDatum(datum)
 {
 	var pattern = /^(0[1-9]|[1-9]|[12][0-9]|3[01])[.](0[1-9]|[1-9]|1[012])[.](19|20)\d\d$/
-					
+
 	if(pattern.exec(datum))
 		return true;
 	else
@@ -156,13 +156,13 @@ function ConvertDateToISO(datum)
 	if(datum!='')
 	{
 		arr = datum.split('.');
-		
+
 		if(arr[0].length==1)
 			arr[0]='0'+arr[0];
-			
+
 		if(arr[1].length==1)
 			arr[1]='0'+arr[1];
-			
+
 		return arr[2]+'-'+arr[1]+'-'+arr[0];
 	}
 	else
@@ -173,25 +173,25 @@ function ConvertDateToISO(datum)
 // * Liefert die Daten aus der Zwischenablage
 // ****
 function getDataFromClipboard()
-{	
+{
 	netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
-	var clip = Components.classes["@mozilla.org/widget/clipboard;1"].getService(Components.interfaces.nsIClipboard); 
-	if (!clip) 
-		return false; 
-	var trans = Components.classes["@mozilla.org/widget/transferable;1"].createInstance(Components.interfaces.nsITransferable); 
-	if (!trans) 
-		return false; 
-	
+	var clip = Components.classes["@mozilla.org/widget/clipboard;1"].getService(Components.interfaces.nsIClipboard);
+	if (!clip)
+		return false;
+	var trans = Components.classes["@mozilla.org/widget/transferable;1"].createInstance(Components.interfaces.nsITransferable);
+	if (!trans)
+		return false;
+
 	trans.addDataFlavor("text/unicode");
-	
-	clip.getData(trans,clip.kGlobalClipboard); 
-	var str = new Object(); 
-	var strLength = new Object(); 
+
+	clip.getData(trans,clip.kGlobalClipboard);
+	var str = new Object();
+	var strLength = new Object();
 	trans.getTransferData("text/unicode",str,strLength);
 
-	if (str) str = str.value.QueryInterface(Components.interfaces.nsISupportsString); 
+	if (str) str = str.value.QueryInterface(Components.interfaces.nsISupportsString);
 	if (str) pastetext = str.data.substring(0,strLength.value / 2);
-	
+
 	return pastetext;
 }
 
@@ -199,9 +199,9 @@ function getDataFromClipboard()
 // * Oeffnet ein neues Fenster welches dann die Datei 'action' mit dem POST Parameter 'data' aufruft
 // ****
 function OpenWindowPost(action, data)
-{	
+{
 	newwindow= window.open ("","FAS","width=350, height=350");
-	newwindow.document.getElementsByTagName('body')[0].innerHTML = "<form id='postform-form' name='postfrm' action='' method='POST'><input type='hidden' id='postform-textbox-data' name='data' /></form>"; 
+	newwindow.document.getElementsByTagName('body')[0].innerHTML = "<form id='postform-form' name='postfrm' action='' method='POST'><input type='hidden' id='postform-textbox-data' name='data' /></form>";
 	newwindow.document.getElementById('postform-textbox-data').value=data;
 	newwindow.document.getElementById('postform-form').action=action;
 	newwindow.document.postfrm.submit();
@@ -234,13 +234,13 @@ function MenulistSelectItemOnValue(id, data)
 function MenulistGetSelectedValue(id)
 {
 	menulist = document.getElementById(id);
-	
+
 	//Es kann sein, dass im Eingabefeld nichts steht und
 	//trotzdem ein Eintrag auf selected gesetzt ist.
 	//In diesem Fall soll aber kein Wert zurueckgegeben werden
 	if(menulist.value=='')
 		return '';
-	
+
 	//Wenn es Selektierte Eintraege gibt, dann den value zurueckliefern
 	var children = menulist.getElementsByAttribute('selected','true');
 	if(children.length>0)
@@ -290,14 +290,14 @@ function getvariable(variable)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
 	// Request absetzen
-	
+
 	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'getvariable');
 	req.add('name', variable);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
@@ -316,3 +316,35 @@ function getvariable(variable)
 	}
 }
 
+/**
+ * Setzte eine Variable
+ */
+function setVariable(variable, wert)
+{
+	// Request absetzen
+
+	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'variablechange');
+	req.add('name', variable);
+	req.add('wert', wert);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}

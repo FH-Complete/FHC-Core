@@ -27,6 +27,7 @@ require_once('../include/lehrstunde.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/stunde.class.php');
 require_once('../include/anwesenheit.class.php');
+require_once('../include/benutzer.class.php');
 
 $user = get_uid();
 
@@ -48,6 +49,7 @@ foreach($stunde->stunden as $row)
 	$stunden_arr[$row->stunde]['ende']=$row->ende->format('H:i');
 }
 $datum_obj = new datum();
+$verplanteStunden = array();
 
 $oRdf = new rdf('TERMINE','http://www.technikum-wien.at/termine');
 
@@ -55,19 +57,23 @@ $lehrveranstaltung_id = filter_input(INPUT_GET, 'lehrveranstaltung_id');
 $lehreinheit_id = filter_input(INPUT_GET, 'lehreinheit_id');
 $mitarbeiter_uid = filter_input(INPUT_GET,'mitarbeiter_uid');
 $student_uid = filter_input(INPUT_GET,'student_uid');
+$db_stpl_table = filter_input(INPUT_GET,'db_stpl_table');
+if(!in_array($db_stpl_table,array('stundenplan','stundenplandev')))
+	$db_stpl_table='stundenplan';
 
 $oRdf->sendHeader();
 $db = new basis_db();
 
 $lehrstunde = new lehrstunde();
 //$variable->variable->db_stpl_table
-$lehrstunde->getStundenplanData('stundenplan', $lehrveranstaltung_id, $variable->variable->semester_aktuell, $lehreinheit_id, $mitarbeiter_uid, $student_uid);
+$lehrstunde->getStundenplanData($db_stpl_table, $lehrveranstaltung_id, $variable->variable->semester_aktuell, $lehreinheit_id, $mitarbeiter_uid, $student_uid);
 
 $i=0;
 if(isset($lehrstunde->result) && is_array($lehrstunde->result))
 {
+	$lektoren_arr=array();
 	foreach($lehrstunde->result as $row)
-	{	
+	{
 		$i=$oRdf->newObjekt($i);
 		$oRdf->obj[$i]->setAttribut('datum',$datum_obj->formatDatum($row->datum,'d.m.Y'),true);
 		$oRdf->obj[$i]->setAttribut('stundevon',$row->stundevon,true);
@@ -75,7 +81,21 @@ if(isset($lehrstunde->result) && is_array($lehrstunde->result))
 		$oRdf->obj[$i]->setAttribut('uhrzeitvon',$stunden_arr[$row->stundevon]['beginn'],true);
 		$oRdf->obj[$i]->setAttribut('uhrzeitbis',$stunden_arr[$row->stundebis]['ende'],true);
 		$oRdf->obj[$i]->setAttribut('gruppen',implode(',',$row->gruppen),true);
-		$oRdf->obj[$i]->setAttribut('lektor',implode(',',$row->lektoren),true);
+
+		$lektoren='';
+		foreach($row->lektoren as $rowlkt)
+		{
+			if(!isset($lektoren_arr[$rowlkt]))
+			{
+				$lkt_obj = new benutzer();
+				$lkt_obj->load($rowlkt);
+				$lektoren_arr[$rowlkt]=$lkt_obj->nachname.' '.$lkt_obj->vorname;
+			}
+			$lektoren .=",".$lektoren_arr[$rowlkt];
+		}
+		$lektoren = mb_substr($lektoren,1);
+
+		$oRdf->obj[$i]->setAttribut('lektor',$lektoren,true);
 		$oRdf->obj[$i]->setAttribut('ort',implode(',',$row->orte),true);
 		$oRdf->obj[$i]->setAttribut('lehrfach',$row->lehrfach_bezeichnung,true);
 		$oRdf->obj[$i]->setAttribut('lehreinheit_id',$row->lehreinheit_id,true);
@@ -87,8 +107,28 @@ if(isset($lehrstunde->result) && is_array($lehrstunde->result))
 			$anwesend='Nein';
 		$oRdf->obj[$i]->setAttribut('anwesend',$anwesend,true);
 		$oRdf->obj[$i]->setAttribut('datum_iso',$row->datum,true);
+        
+        // Terminkollisionen prüfen
+        $kollision = "";
+        if($lehrveranstaltung_id == '')
+        {
+            for($x = $row->stundevon; $x <= $row->stundebis; $x++)
+            {
+                if(isset($verplanteStunden[$row->datum]) && in_array($x, $verplanteStunden[$row->datum]))
+                {
+                    if(!isset($verplanteStunden[implode(',',$row->orte)]) || !in_array($x, $verplanteStunden[implode(',',$row->orte)]))
+                    {
+                        $kollision = "makeItred";
+                        break;
+                    }
+                }
 
-	
+                $verplanteStunden[$row->datum][] = $x;
+                $verplanteStunden[implode(',',$row->orte)][] = $x;
+            }
+        }
+        $oRdf->obj[$i]->setAttribut('kollision',$kollision,true);
+
 		$oRdf->addSequence($i);
 		$i++;
 	}

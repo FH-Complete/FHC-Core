@@ -47,7 +47,7 @@ class lehreinheitgruppe extends basis_db
 	public function __construct($lehreinheitgruppe_id=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($lehreinheitgruppe_id))
 			$this->load($lehreinheitgruppe_id);
 	}
@@ -81,10 +81,10 @@ class lehreinheitgruppe extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
-				
+
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Es existiert kein Eintrag mit dieser ID';
 				return false;
@@ -154,14 +154,13 @@ class lehreinheitgruppe extends basis_db
 
 		if($new)
 		{
-			$qry = 'INSERT INTO lehre.tbl_lehreinheitgruppe (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, ext_id, insertamum, insertvon)
+			$qry = 'INSERT INTO lehre.tbl_lehreinheitgruppe (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, insertamum, insertvon)
 			        VALUES('.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
 					$this->db_add_param($this->studiengang_kz, FHC_INTEGER).','.
 					$this->db_add_param($this->semester, FHC_INTEGER).','.
 					$this->db_add_param($this->verband).','.
 					$this->db_add_param($this->gruppe).','.
 					$this->db_add_param($this->gruppe_kurzbz).','.
-					$this->db_add_param($this->ext_id, FHC_INTEGER).','.
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).');';
 		}
@@ -174,7 +173,6 @@ class lehreinheitgruppe extends basis_db
 			       ' verband='.$this->db_add_param($this->verband).','.
 			       ' gruppe='.$this->db_add_param($this->gruppe).','.
 			       ' gruppe_kurzbz='.$this->db_add_param($this->gruppe_kurzbz).','.
-			       ' ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).','.
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
 			       ' updatevon='.$this->db_add_param($this->updatevon).
 			       " WHERE lehreinheitgruppe_id=".$this->db_add_param($this->lehreinheitgruppe_id, FHC_INTEGER).";";
@@ -251,7 +249,7 @@ class lehreinheitgruppe extends basis_db
 		}
 
 		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).';';
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -370,51 +368,51 @@ class lehreinheitgruppe extends basis_db
 	 */
 	public function checkVorhanden()
 	{
-		$qry = "SELECT 
-					count(*) as anzahl 
-				FROM 
-					lehre.tbl_lehreinheitgruppe 
-				WHERE 
-					lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER)." AND 
+		$qry = "SELECT
+					count(*) as anzahl
+				FROM
+					lehre.tbl_lehreinheitgruppe
+				WHERE
+					lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER)." AND
 					studiengang_kz=".$this->db_add_param($this->studiengang_kz, FHC_INTEGER);
 		if($this->semester!='')
 			$qry.=" AND semester=".$this->db_add_param($this->semester, FHC_INTEGER);
-		else 
+		else
 			$qry.=" AND (semester='' OR semester is null)";
-			
+
 		if($this->verband!='')
 			$qry.=" AND trim(verband)=".$this->db_add_param($this->verband);
-		else 
+		else
 			$qry.=" AND (trim(verband)='' OR verband is null)";
-			
+
 		if($this->gruppe!='')
 			$qry.=" AND	trim(gruppe)=".$this->db_add_param($this->gruppe);
-		else 
+		else
 			$qry.=" AND (trim(gruppe)='' OR gruppe is null)";
-			
+
 		if($this->gruppe_kurzbz!='')
 			$qry.=" AND	trim(gruppe_kurzbz)=".$this->db_add_param($this->gruppe_kurzbz);
-		else 
+		else
 			$qry.= " AND (trim(gruppe_kurzbz)='' OR gruppe_kurzbz is null)";
-		
+
         $qry.=';';
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
 				if($row->anzahl>0)
 					return true;
-				else 
+				else
 					return false;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Interner Fehler';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg='Fehler bei einer Abfrage';
 			return false;

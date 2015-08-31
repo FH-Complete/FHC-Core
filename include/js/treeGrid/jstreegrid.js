@@ -31,7 +31,7 @@
 // need to use a selector in jquery 1.4.4+
 		depth = a.parentsUntil(tree.get_container().get(0).tagName + ".jstree").filter("li").length;
 		width = width - depth * 18;
-		a.css({width: width, "vertical-align": "top", "overflow": "hidden", "float": "left"});
+		a.css({width: width, "vertical-align": "top", "overflow": "hidden"}); //float_left
 	};
 	renderATitle = function(node, t, tree) {
 		var a = node.get(0).tagName.toLowerCase() === "a" ? node : node.children("a"), title, col = tree.data.grid.columns[0];
@@ -57,7 +57,7 @@
 			this.data.grid.columns = s.columns || [];
 			this.data.grid.treeClass = "jstree-grid-col-0";
 			this.data.grid.columnWidth = s.width;
-			this.data.grid.defaultConf = {display: "inline-block", "*display": "inline", "*+display": "inline", "float": "left"};
+			this.data.grid.defaultConf = {display: "inline-block", "*display": "inline", "*+display": "inline"};
 			this.data.grid.isThemeroller = !!this.data.themeroller;
 			this.data.grid.treeWidthDiff = 0;
 			this.data.grid.resizable = s.resizable;
@@ -76,10 +76,11 @@
 				styled = true;
 				styles = [
 					'.jstree-grid-cell {padding-left: 4px; vertical-align: top; overflow:hidden;}',
-					'.jstree-grid-separator {display: inline-block; border-width: 0 2px 0 0; *display:inline; *+display:inline; margin-right:0px;float:left;}',
-					'.jstree-grid-header-cell {float: left;}',
+					'.jstree-grid-separator {display: inline-block; border-width: 0 2px 0 0; *display:inline; *+display:inline; margin-right:0px;}',
+					'.jstree-grid-wrapper {}', 
+					'.jstree-grid-header-cell {}', 
 					'.jstree-grid-header-themeroller {border: 0; padding: 1px 3px;}',
-					'.jstree-grid-header-regular {background-color: #EBF3FD;}',
+					'.jstree-grid-header-regular {background-color: #EBF3FD; white-space:nowrap}',
 					'.jstree-grid-resizable-separator {cursor: col-resize;}',
 					'.jstree-grid-separator-regular {border-color: #d0d0d0; border-style: solid;}',
 					'.jstree-grid-cell-themeroller {border: none !important; background: transparent !important;}'
@@ -105,7 +106,6 @@
 				node.find("li > a").each($.proxy(function(i, elm) {
 					renderAWidth($(elm), this);
 				}, this));
-
 			}, this));
 			if (this.data.grid.isThemeroller) {
 				this.get_container()
@@ -230,7 +230,7 @@
 					isAlreadyGrid = a.hasClass(c);
 
 					if (a.length === 1) {
-						a.prev().css("float", "left");
+					//	a.prev().css("float", "left"); 
 						a.addClass(c);
 						renderAWidth(a, _this);
 						renderATitle(a, t, _this);

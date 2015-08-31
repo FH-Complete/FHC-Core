@@ -824,6 +824,53 @@ class studiensemester extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Liefert ausgehend von heutigen Datum $plus studiensemester in die Zukunft und $minus Studiensemester in die Vergangenheit
+	 * 
+	 * @param integer $plus Wieviele Studiensemester in die Zukunft sollen ausgegeben werden.
+	 * @param integer $minus Wieviele Studiensemester in die Vergangenheit sollen ausgegeben werden.
+	 *
+	 * @return true wenn ok, sonst false
+	 */
+	public function getPlusMinus($plus=null, $minus=null)
+	{
+		if((is_null($plus) || !is_numeric($plus)) || (is_null($minus) || !is_numeric($minus)))
+			return false;
+		
+		$qry = "SELECT DISTINCT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz IN
+				(
+					(SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start >= now()
+						ORDER BY ende ASC LIMIT $plus)		
+					UNION
+					(SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start <= now()
+						ORDER BY start DESC LIMIT $minus)
+				)
+				ORDER BY ende DESC";
+	
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$stsem_obj = new studiensemester();
+		
+				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$stsem_obj->start = $row->start;
+				$stsem_obj->ende = $row->ende;
+				$stsem_obj->bezeichnung = $row->bezeichnung;
+				$stsem_obj->studienjahr_kurzbz = $row->studienjahr_kurzbz;
+				$stsem_obj->beschreibung = $row->beschreibung;
+		
+				$this->studiensemester[] = $stsem_obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Studiensemester';
+			return false;
+		}
+	}
 
 }
 ?>

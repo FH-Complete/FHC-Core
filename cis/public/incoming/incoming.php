@@ -101,12 +101,34 @@ $firma->getFirmen('Partneruniversität');
 ?>
 <html>
 	<head>
-		<title>Incoming-Verwaltung</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<meta http-equiv="expires" content="Sat, 01 Dec 2001 00:00:00 GMT">
+	<title>Incoming-Verwaltung</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta http-equiv="expires" content="Sat, 01 Dec 2001 00:00:00 GMT">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-	<link href="../../../include/js/tablesort/table.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 	<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+	<script type="text/javascript" src="../../../include/js/jquery.js"></script>
+	<script type="text/javascript">
+			$(document).ready(function()
+			{
+				$("#t1").tablesorter(
+				{
+					sortList: [[1,0],[3,0],[4,0]],
+					widgets: ["zebra"]
+				});
+				$("#t2").tablesorter(
+						{
+							sortList: [[0,0]],
+							widgets: ["zebra"]
+						});
+				$("#t3").tablesorter(
+						{
+							sortList: [[1,0],[3,0],[4,0],[5,0]],
+							widgets: ["zebra"]
+						});
+			});
+		</script>
+	
 	</head>
 	<body>
 		<table width="100%" border="0">
@@ -328,15 +350,15 @@ else if($method=="lehrveranstaltungen")
 			
 			
 			echo '
-				<table width="90%" border="0" align="center" class="table-autosort:1 table-stripeclass:alternate table-autostripe">
+				<table class="tablesorter" id="t1">
 				<thead>
 				<tr class="liste">
 					<th></th>
-					<th class="table-sortable:default">'.$p->t('global/studiengang').'</th>
-					<th class="table-sortable:default">'.$p->t('abgabetool/typ').'</th>
-					<th class="table-sortable:numeric">'.$p->t('global/semester').'</th>
-					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').'</th>
-					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').' '.$p->t('global/englisch').'</th>
+					<th>'.$p->t('global/studiengang').'</th>
+					<th>'.$p->t('abgabetool/typ').'</th>
+					<th>'.$p->t('global/semester').'</th>
+					<th>'.$p->t('global/lehrveranstaltung').'</th>
+					<th>'.$p->t('global/lehrveranstaltung').' '.$p->t('global/englisch').'</th>
 					<th>Info</th>
 				</tr>
 				</thead>
@@ -382,7 +404,7 @@ else if($method=="lehrveranstaltungen")
 			</table> <br><br>';
 			
 		//Uebersicht Deutschkurse
-		echo '<table width="90%" border="0" align="center" class="table-stripeclass:alternate table-autostripe">
+		echo '<table width="90%" border="0" align="center" class="tablesorter" id="t2">
 				<thead align="center">
 				<tr class="liste">
 					<th colspan="2">'.$p->t('incoming/deutschkurse').'</th>
@@ -420,7 +442,7 @@ else if($method=="lehrveranstaltungen")
 		echo '</tbody></table><br><br>';
 		
 		
-		echo '
+		/*echo '
 		<table width="90%" border="0" align="center" class="table-autosort:1 table-stripeclass:alternate table-autostripe">
 		<thead>
 			<tr class="liste">
@@ -456,11 +478,11 @@ else if($method=="lehrveranstaltungen")
 		</tbody>
 		</table>
 		<br><br>
-		';
+		';*/
 		
 		echo '
 		<form name="filterSemester">
-		<table width="90%" border="0" align="center" table-stripeclass:alternate table-autostripe">
+		<table width="90%" border="0" align="center">
 			<tr>
 				<td>'.$p->t('incoming/studentenImWS').'</td>
 			</tr>
@@ -486,18 +508,56 @@ else if($method=="lehrveranstaltungen")
 
 					echo '<option value="SSemester" '.$SSemesterSelected.'>'.$p->t('incoming/sommersemester').'</option>';
 
-			echo'</td>
+			echo'</SELECT><br>';
+			echo $p->t('courseInformation/unterrichtssprache').':<SELECT name="filterUnterrichtssprache" onchange=selectChange()>
+			<option value="">'.$p->t('incoming/alleSprachen').'</option>';
+			
+					// Vorauswahl der Übergebenen Filter
+					$GermanSelected = '';
+					$EnglishSelected = '';
+			
+					if(isset($_GET['unterrichtssprache']))
+						if($_GET['unterrichtssprache'] == 'German')
+							$GermanSelected ='selected';
+						elseif($_GET['unterrichtssprache']=='English')
+							$EnglishSelected='selected';
+			
+					echo '<option value="German" '.$GermanSelected.'>German</option>';
+			
+					echo '<option value="English" '.$EnglishSelected.'>English</option>';
+			
+			echo'</SELECT><br>';
+			echo $p->t('global/studiengang').':<SELECT name="filterStudiengang" onchange=selectChange()>
+			<option value="">Alle Studiengänge</option>';
+				
+				// Vorauswahl der Übergebenen Filter
+				
+				$studiengang = new studiengang();
+				$studiengang->getAll('typ,kurzbz', true);
+				
+				foreach ($studiengang->result as $row)
+				{
+					$selected = '';
+					if(isset($_GET['studiengang']) && $_GET['studiengang'] == $row->studiengang_kz)
+						$selected='selected';
+						
+					echo '<option value="'.$row->studiengang_kz.'" '.$selected.'>'.strtoupper($row->typ.$row->kurzbz).' - '.$row->bezeichnung.'</option>';
+				}
+				
+			echo'</SELECT>';
+			echo '</td>
 			</tr>
 		</table>
 		
 <script language="JavaScript">
 	function selectChange() 
 	{
-	   filter =document.filterSemester.filterLv.options[document.filterSemester.filterLv.selectedIndex].value;
-	   url = document.URL;
-	   url = url+"&filter="+filter;
-	   document.location=url;
-	   
+		filter = document.filterSemester.filterLv.options[document.filterSemester.filterLv.selectedIndex].value;
+		filterSprache = document.filterSemester.filterUnterrichtssprache.options[document.filterSemester.filterUnterrichtssprache.selectedIndex].value;
+		filterStudiengang = document.filterSemester.filterStudiengang.options[document.filterSemester.filterStudiengang.selectedIndex].value;
+		url = [location.protocol, "//", location.host, location.pathname].join("");
+		url = url+"?method=lehrveranstaltungen&filter="+filter+"&unterrichtssprache="+filterSprache+"&studiengang="+filterStudiengang;
+		document.location=url;
 	}
 </script>	
 		
@@ -509,16 +569,19 @@ else if($method=="lehrveranstaltungen")
 		
 		if(isset($_GET['filter']))
 			if($_GET['filter'] == "WSemester")
-				$filterqry= "AND tbl_lehrveranstaltung.semester IN (1,3,5)";
+				$filterqry= " AND tbl_lehrveranstaltung.semester IN (1,3,5)";
 			elseif($_GET['filter'] == "SSemester")
-				$filterqry = "AND tbl_lehrveranstaltung.semester IN (2,4,6)";
+				$filterqry= " AND tbl_lehrveranstaltung.semester IN (2,4,6)";
+		
+		if(isset($_GET['unterrichtssprache']) && $_GET['unterrichtssprache']!='')
+			$filterqry .= " AND tbl_lehrveranstaltung.sprache='".$_GET['unterrichtssprache']."'";
 
 		
 		//Uebersicht LVs
 		$qry = "SELECT 
 					tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.ects, 
-					tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.semester, 
-					tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.incoming,
+					tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache,
+					tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.incoming, tbl_lehrveranstaltung.orgform_kurzbz,
 					(
 					Select count(*) 
 					FROM (
@@ -538,7 +601,7 @@ else if($method=="lehrveranstaltungen")
 							tbl_lehreinheit.studiensemester_kurzbz='$stsem->studiensemester_kurzbz')
 							AND
 							tbl_prestudentstatus.status_kurzbz='Incoming'
-							AND tbl_prestudentstatus.status_kurzbz='$stsem->studiensemester_kurzbz'
+							AND tbl_prestudentstatus.studiensemester_kurzbz='$stsem->studiensemester_kurzbz'
 						UNION
 						SELECT 
 							person_id 
@@ -547,9 +610,9 @@ else if($method=="lehrveranstaltungen")
 						JOIN public.tbl_preincoming using(preincoming_id) 
 						WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id 
 						AND 
-						(von is null OR von >= '$stsem->start') 
+						(von is null OR von <= '$stsem->start') 
 						AND 
-						(bis is null OR bis <= (DATE '$stsem->ende' + INTERVAL '6 MONTH')) 
+						(bis is null OR bis >= (DATE '$stsem->ende')) 
 						AND aktiv = true				
 						)a ) as anzahl
 					FROM 
@@ -558,22 +621,28 @@ else if($method=="lehrveranstaltungen")
 						tbl_lehrveranstaltung.incoming>0 AND 
 						tbl_lehrveranstaltung.aktiv AND 
 						tbl_lehrveranstaltung.lehre
-						AND tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000
-						AND tbl_studiengang.aktiv ".$filterqry." order by studiengang_kz
+						AND tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000";
+		
+					if (isset($_GET['studiengang']) && $_GET['studiengang'] !='')
+						$qry .= "AND tbl_lehrveranstaltung.studiengang_kz=".$_GET['studiengang'];
+				
+					$qry .= "AND tbl_studiengang.aktiv ".$filterqry." order by studiengang_kz
 					";
-	
-		echo '<table width="90%" border="0" align="center" class="table-autosort:1 table-stripeclass:alternate table-autostripe">
+
+		echo '<table class="tablesorter" id="t3" width="90%" border="0" align="center">
 				<thead align="center">
-				<tr class="liste">
+				<tr>
 					<th width="6%"></th>
-					<th class="table-sortable:default">'.$p->t('global/studiengang').'</th>
-					<th class="table-sortable:default">'.$p->t('abgabetool/typ').'</th>
-					<th class="table-sortable:numeric">'.$p->t('global/semester').'</th>
-					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').'</th>
-					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').' '.$p->t('global/englisch').'</th>
-					<th class="table-sortable:numeric">'.$p->t('incoming/ects').'</th>
+					<th>'.$p->t('global/studiengang').'</th>
+					<th>'.$p->t('abgabetool/typ').'</th>
+					<th>'.$p->t('incoming/orgform').'</th>
+					<th>'.$p->t('global/semester').'</th>
+					<th>'.$p->t('global/lehrveranstaltung').'</th>
+					<th>'.$p->t('global/lehrveranstaltung').' '.$p->t('global/englisch').'</th>
+					<th>'.$p->t('incoming/ects').'</th>
+					<th>'.$p->t('courseInformation/unterrichtssprache').'</th>
 					<th>Info</th>
-					<th class="table-sortable:numeric">'.$p->t('incoming/freieplätze').'</th>
+					<th>'.$p->t('incoming/freieplätze').'</th>
 				</tr>
 				</thead>
 				<tbody>';
@@ -599,15 +668,17 @@ else if($method=="lehrveranstaltungen")
 						echo '<td>'.$p->t('global/angemeldet').'</td>';
 					echo '<td>',$studiengang_language,'</td>';
 					echo '<td>',$typ,'</td>';
+					echo '<td>',$row->orgform_kurzbz,'</td>';
 					echo '<td>',$row->semester,'</td>';
 					echo '<td>',$row->bezeichnung,'</td>';
 					echo '<td>',$row->bezeichnung_english,'</td>';
 					echo '<td>',$row->ects,'</td>';
+					echo '<td>',$row->sprache,'</td>';
 					echo '<td>
 							<a href="#Deutsch" class="Item" onclick="javascript:window.open(\'lvinfo.php?lv='.$row->lehrveranstaltung_id.'&amp;language=de\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Deutsch&nbsp;</a>
 							<a href="#Englisch" class="Item" onclick="javascript:window.open(\'lvinfo.php?lv='.$row->lehrveranstaltung_id.'&amp;language=en\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Englisch</a>
 						  </td>';
-					echo '<td>',$freieplaetze,'</td>';
+					echo '<td>',($freieplaetze<$row->incoming?'<strong>'.$freieplaetze.'/'.$row->incoming.'</strong>':$freieplaetze.'/'.$row->incoming),'</td>';
 					echo '</tr>';
 				}
 			}

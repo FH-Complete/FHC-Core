@@ -1547,5 +1547,84 @@ class content extends basis_db
 			return false;
 		}					
 	}
+	
+	/**
+	 * Loescht wahlweise den geamten Content oder nur eine Version in der uebergebenen Sprache
+	 * 
+	 * @param integer $content_id ID des Contents, der geloescht werden soll
+	 * @param string $sprache (optional) Sprache des Contents, die geloescht werden soll
+	 * @param string $version (optional) Version des Contents, die geloescht werden soll (nur in Kombination mit Sprache)
+	 * @return boolean
+	 */
+	
+	public function deleteContent($content_id, $sprache = NULL, $version = NULL) 
+	{
+		if($content_id=='' || !is_numeric($content_id))
+		{
+			$this->errormsg = 'ContentID ungueltig';
+			return false;
+		}
+		
+		if (is_null($version) && is_null($sprache))
+		{
+			//gesamter content wird gelöscht
+			$qry  = "DELETE FROM campus.tbl_contentchild WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER).";
+					 DELETE FROM campus.tbl_contentchild WHERE child_content_id=".$this->db_add_param($content_id, FHC_INTEGER).";
+					 DELETE FROM campus.tbl_contentlog WHERE contentsprache_id IN (SELECT contentsprache_id FROM campus.tbl_contentsprache WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER).");
+				 	 DELETE FROM campus.tbl_contentchild WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER).";
+					 DELETE FROM campus.tbl_contentsprache WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER).";
+					 DELETE FROM campus.tbl_contentgruppe WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER).";
+				 	 DELETE FROM campus.tbl_content WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER).";";
+		}
+		else 
+		{
+			//eine version wird gelöscht
+			$qry = "DELETE FROM campus.tbl_contentlog WHERE contentsprache_id IN (SELECT contentsprache_id FROM campus.tbl_contentsprache WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER)." AND sprache=".$this->db_add_param($sprache)." AND version=".$this->db_add_param($version, FHC_INTEGER).");
+					DELETE FROM campus.tbl_contentsprache WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER)." AND sprache=".$this->db_add_param($sprache)." AND version=".$this->db_add_param($version, FHC_INTEGER).";";
+		}
+		$this->errormsg = $qry;
+		
+		if($this->db_query($qry))
+			return true;
+		else
+			return false;
+		
+	}
+	
+	/**
+	 * Gibt die Anzahl der verbliebenen Eintraege in tbl_contentsprache in der uebergebenen Sprache zurueck
+	 *
+	 * @param integer $content_id ID des Contents
+	 * @param string $sprache Sprache des Contents
+	 * @return anzahl
+	 */
+	
+	public function getNumberOfVersions($content_id, $sprache) 
+	{
+		$qry = "SELECT COUNT(*) as anzahl FROM campus.tbl_contentsprache WHERE content_id = ".$this->db_add_param($content_id, FHC_INTEGER)." AND sprache = ".$this->db_add_param($sprache).";";
+		
+		if($result = $this->db_query($qry))
+		{
+			$row = $this->db_fetch_object($result);
+			return $row->anzahl;
+		}
+		else
+		{
+			return false;
+		}
+	}
 }
 ?>
+
+
+
+
+
+
+
+
+
+
+
+
+

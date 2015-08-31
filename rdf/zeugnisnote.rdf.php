@@ -94,6 +94,11 @@ foreach ($obj->result as $row)
 	$lv_obj = new lehrveranstaltung();
 	$lv_obj->load($row->lehrveranstaltung_id);
 	
+	if ($lv_obj->zeugnis==false)
+		$zeugnis=APP_ROOT.'skin/images/invisible.png';
+	else 
+		$zeugnis='';
+		
 	echo '
 		  <RDF:li>
 	         <RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'" >
@@ -118,6 +123,7 @@ foreach ($obj->result as $row)
 				<NOTE:ects_lv><![CDATA['.$lv_obj->ects.']]></NOTE:ects_lv>
 				<NOTE:student_semester><![CDATA['.$benutzer->semester.']]></NOTE:student_semester>
 				<NOTE:punkte><![CDATA['.($row->punkte!=''?(float)$row->punkte:'').']]></NOTE:punkte>
+				<NOTE:zeugnis><![CDATA['.$zeugnis.']]></NOTE:zeugnis>
 	         </RDF:Description>
 	      </RDF:li>';
 }

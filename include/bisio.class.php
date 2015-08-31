@@ -43,7 +43,7 @@ class bisio extends basis_db
 	public $updateamum; 				// timestamp
 	public $updatevon; 				// varchar(16)
 	public $insertamum; 				// timestamp
-	public $insertvon; 				// varchar(16) 
+	public $insertvon; 				// varchar(16)
 	public $ext_id;					// bigint
 	public $ort;
 	public $universitaet;
@@ -56,7 +56,7 @@ class bisio extends basis_db
 	public function __construct($bisio_id=null)
 	{
 		parent::__construct();
-				
+
 		if(!is_null($bisio_id))
 			$this->load($bisio_id);
 	}
@@ -95,7 +95,7 @@ class bisio extends basis_db
 				$this->ort = $row->ort;
 				$this->universitaet = $row->universitaet;
 				$this->lehreinheit_id = $row->lehreinheit_id;
-				
+
 				return true;
 			}
 			else
@@ -122,40 +122,40 @@ class bisio extends basis_db
 			$this->errormsg = 'Mobilitaetsprogramm ist ungueltig';
 			return false;
 		}
-		
+
 		if(mb_strlen($this->nation_code)>3)
 		{
 			$this->errormsg = 'Nation ist ungueltig';
 			return false;
 		}
-		
+
 		if(mb_strlen($this->zweck_code)>20)
 		{
 			$this->errormsg = 'Zweck ist ungueltig';
 			return false;
 		}
-		
+
 		if(mb_strlen($this->student_uid)>32)
 		{
 			$this->errormsg = 'Student_UID ist ungueltig';
 			return false;
 		}
-		
+
 		if($this->von!='' && !mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->von))
-		{			
+		{
 			$this->errormsg = 'VON-Datum hat ein ungueltiges Format';
 			return false;
 		}
-		
+
 		if($this->bis!='' && !mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->bis))
 		{
 			$this->errormsg = 'BIS-Datum hat ein ungueltiges Format';
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -176,7 +176,7 @@ class bisio extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN;INSERT INTO bis.tbl_bisio (mobilitaetsprogramm_code, nation_code, von, bis, zweck_code, student_uid, updateamum, updatevon, insertamum, insertvon, ext_id, ort, universitaet, lehreinheit_id) VALUES('.
+			$qry='BEGIN;INSERT INTO bis.tbl_bisio (mobilitaetsprogramm_code, nation_code, von, bis, zweck_code, student_uid, updateamum, updatevon, insertamum, insertvon, ort, universitaet, lehreinheit_id) VALUES('.
 			     $this->db_add_param($this->mobilitaetsprogramm_code, FHC_INTEGER).', '.
 			     $this->db_add_param($this->nation_code).', '.
 			     $this->db_add_param($this->von).', '.
@@ -187,7 +187,6 @@ class bisio extends basis_db
 			     $this->db_add_param($this->updatevon).', '.
 			     $this->db_add_param($this->insertamum).', '.
 			     $this->db_add_param($this->insertvon).', '.
-			     $this->db_add_param($this->ext_id, FHC_INTEGER).','.
 			     $this->db_add_param($this->ort).', '.
 			     $this->db_add_param($this->universitaet).', '.
 			     $this->db_add_param($this->lehreinheit_id, FHC_INTEGER).');';
@@ -204,13 +203,12 @@ class bisio extends basis_db
 				   ' student_uid='.$this->db_add_param($this->student_uid).','.
 				   ' updateamum='.$this->db_add_param($this->updateamum).','.
 				   ' updatevon='.$this->db_add_param($this->updatevon).','.
-				   ' ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).','.
 				   ' ort='.$this->db_add_param($this->ort).','.
 				   ' universitaet='.$this->db_add_param($this->universitaet).','.
 				   ' lehreinheit_id='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).
 				   " WHERE bisio_id=".$this->db_add_param($this->bisio_id, FHC_INTEGER).";";
 		}
-		
+
 		if($this->db_query($qry))
 		{
 				if($new)
@@ -258,12 +256,12 @@ class bisio extends basis_db
 			$this->errormsg = 'ID ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "DELETE FROM bis.tbl_bisio WHERE bisio_id=".$this->db_add_param($bisio_id, FHC_INTEGER).";";
-		
+
 		if($this->db_query($qry))
 			return true;
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen des Datensatzes';
 			return false;
@@ -271,32 +269,32 @@ class bisio extends basis_db
 	}
 
 	/**
-	 * Liefert alle Incomming/Outgoing 
+	 * Liefert alle Incomming/Outgoing
 	 * Eintraege eines Studenten
 	 * @param $uid
 	 * @return true wenn ok, false wenn fehler
 	 */
 	public function getIO($uid)
 	{
-		$qry = "SELECT	tbl_bisio.*, 
+		$qry = "SELECT	tbl_bisio.*,
 						tbl_mobilitaetsprogramm.kurzbz as mobilitaetsprogramm_kurzbz,
 						tbl_zweck.bezeichnung as zweck_bezeichnung
-			    FROM 
-			    	bis.tbl_bisio, 
-			    	bis.tbl_zweck, 
-			    	bis.tbl_mobilitaetsprogramm 
-				WHERE 
+			    FROM
+			    	bis.tbl_bisio,
+			    	bis.tbl_zweck,
+			    	bis.tbl_mobilitaetsprogramm
+				WHERE
 					student_uid=".$this->db_add_param($uid)." AND
 					tbl_zweck.zweck_code=tbl_bisio.zweck_code AND
 					tbl_mobilitaetsprogramm.mobilitaetsprogramm_code=tbl_bisio.mobilitaetsprogramm_code
 				ORDER BY bis;";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$io = new bisio();
-				
+
 				$io->bisio_id = $row->bisio_id;
 				$io->mobilitaetsprogramm_code = $row->mobilitaetsprogramm_code;
 				$io->mobilitaetsprogramm_kurzbz = $row->mobilitaetsprogramm_kurzbz;
@@ -314,12 +312,12 @@ class bisio extends basis_db
 				$io->ort = $row->ort;
 				$io->universitaet = $row->universitaet;
 				$io->lehreinheit_id = $row->lehreinheit_id;
-				
+
 				$this->result[] = $io;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;

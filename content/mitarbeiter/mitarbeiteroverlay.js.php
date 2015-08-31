@@ -82,7 +82,7 @@ var MitarbeiterTreeListener =
  		//noch keine values haben. Ab Seamonkey funktionierts auch
 		//ohne dem setTimeout
 		MitarbeiterTreeLoadDataOnSelect2=true;
-		window.setTimeout(MitarbeiterTreeSelectMitarbeiter,10);		
+		window.setTimeout(MitarbeiterTreeSelectMitarbeiter,10);
 	}
 };
 
@@ -231,22 +231,22 @@ function MitarbeiterTreeSort()
 // * die diesem Filter entsprechen geladen
 // ****
 function onMitarbeiterSelect()
-{	
+{
 	//Warnung falls Daten veraendert wurden aber noch nicht gespeichert
 	if(MitarbeiterDetailValueChanged)
 	{
 		if(!confirm('Achtung! Die Daten wurden veraendert aber noch nicht gespeichert. Neuen Datensatz trotzdem laden? (Die geaenderten Daten gehen dabei verloren)'))
 			return false;
 	}
-	
+
 	MitarbeiterDetailValueChanged=false;
-	
+
 	var tree=document.getElementById('tree-menu-mitarbeiter');
 	var col = tree.columns ? tree.columns["tree-menu-mitarbeiter-col-filter"] : "tree-menu-mitarbeiter-col-filter";
-	
+
 	if(tree.currentIndex==-1)
 		return false;
-	
+
 	var filter=tree.view.getCellText(tree.currentIndex,col);
 	var url = "<?php echo APP_ROOT; ?>rdf/personal.rdf.php";
 	var attributes="?type=unknown";
@@ -302,8 +302,11 @@ function onMitarbeiterSelect()
 	{
 		attributes+="&fix=false";
 	}
-	
-	document.getElementById('mitarbeiter-toolbar-neu').disabled=false;	
+	if(filter=="VertragNochNichtRetour")
+	{
+		attributes+="&VertragNochNichtRetour";
+	}
+	document.getElementById('mitarbeiter-toolbar-neu').disabled=false;
 	//Timestamp anhaengen da beim Laden von Zwischengespeicherten Dateien kein
 	//Observer Event ausgeloest wird.
 	url+=attributes+'&'+gettimestamp();
@@ -312,7 +315,7 @@ function onMitarbeiterSelect()
 	MitarbeiterDetailDisableFields(true);
 
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	var tree=document.getElementById('mitarbeiter-tree');
 
 	try
@@ -322,14 +325,14 @@ function onMitarbeiterSelect()
 	}
 	catch(e)
 	{}
-	
+
 	///Alte DS entfernen
 	var oldDatasources = tree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
 	{
 		tree.database.RemoveDataSource(oldDatasources.getNext());
 	}
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	MitarbeiterTreeDatasource = rdfService.GetDataSource(url);
 	MitarbeiterTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -415,7 +418,7 @@ function MitarbeiterDetailDisableFields(val)
 	document.getElementById('mitarbeiter-detail-button-image-infomail').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-anmerkung').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-homepage').disabled=val;
-	
+
 	//document.getElementById('mitarbeiter-detail-textbox-personalnummer').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-kurzbezeichnung').disabled=val;
 	document.getElementById('mitarbeiter-detail-checkbox-lektor').disabled=val;
@@ -450,9 +453,9 @@ function MitarbeiterAuswahl()
 		if(!confirm('Achtung! Die Daten wurden veraendert aber noch nicht gespeichert. Neuen Datensatz trotzdem laden? (Die geaenderten Daten gehen dabei verloren)'))
 			return false;
 	}
-	
+
 	MitarbeiterDetailValueChanged=false;
-	
+
 	// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('mitarbeiter-tree');
@@ -515,7 +518,7 @@ function MitarbeiterAuswahl()
 	geburtsnation=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#geburtsnation" ));
 	sprache=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#sprache" ));
 	person_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_id" ));
-			
+
 	personalnummer=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personalnummer" ));
 	kurzbezeichnung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#kurzbz" ));
 	stundensatz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#stundensatz" ));
@@ -531,7 +534,7 @@ function MitarbeiterAuswahl()
 	urlaubstageprojahr=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#urlaubstageprojahr" ));
 	resturlaubstage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#resturlaubstage" ));
 	kleriker=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#kleriker" ));
-	
+
 	//Daten den Feldern zuweisen
 
 	//Personendaten
@@ -551,7 +554,7 @@ function MitarbeiterAuswahl()
 	document.getElementById('mitarbeiter-detail-textbox-ersatzkennzeichen').value=ersatzkennzeichen;
 	document.getElementById('mitarbeiter-detail-menulist-familienstand').value=familienstand;
 	document.getElementById('mitarbeiter-detail-menulist-geschlecht').value=geschlecht;
-	
+
 	if(aktiv=='Ja')
 		document.getElementById('mitarbeiter-detail-checkbox-aktiv').checked=true;
 	else
@@ -562,7 +565,7 @@ function MitarbeiterAuswahl()
 	document.getElementById('mitarbeiter-detail-menulist-sprache').value=sprache;
 	document.getElementById('mitarbeiter-detail-image').src='<?php echo APP_ROOT?>content/bild.php?src=person&person_id='+person_id+'&'+gettimestamp();
 	document.getElementById('mitarbeiter-detail-textbox-person_id').value=person_id;
-	
+
 	//Mitarbeiterdaten
 	document.getElementById('mitarbeiter-detail-textbox-personalnummer').value=personalnummer;
 	document.getElementById('mitarbeiter-detail-textbox-kurzbezeichnung').value=kurzbezeichnung;
@@ -572,22 +575,22 @@ function MitarbeiterAuswahl()
 		document.getElementById('mitarbeiter-detail-checkbox-lektor').checked=true;
 	else
 		document.getElementById('mitarbeiter-detail-checkbox-lektor').checked=false;
-		
+
 	if(fixangestellt=='Ja')
 		document.getElementById('mitarbeiter-detail-checkbox-fixangestellt').checked=true;
 	else
 		document.getElementById('mitarbeiter-detail-checkbox-fixangestellt').checked=false;
-		
+
 	if(bismelden=='Ja')
 		document.getElementById('mitarbeiter-detail-checkbox-bismelden').checked=true;
 	else
 		document.getElementById('mitarbeiter-detail-checkbox-bismelden').checked=false;
-		
+
 	if(kleriker=='Ja')
 		document.getElementById('mitarbeiter-detail-checkbox-kleriker').checked=true;
 	else
-		document.getElementById('mitarbeiter-detail-checkbox-kleriker').checked=false;		
-		
+		document.getElementById('mitarbeiter-detail-checkbox-kleriker').checked=false;
+
 	document.getElementById('mitarbeiter-detail-menulist-ausbildung').value=ausbildung;
 	document.getElementById('mitarbeiter-detail-textbox-mitarbeiteranmerkung').value=anmerkung;
 	document.getElementById('mitarbeiter-detail-menulist-ort_kurzbz').value=ort_kurzbz;
@@ -600,7 +603,7 @@ function MitarbeiterAuswahl()
 
 	// ***** BETRIEBSMITTEL *****
 	document.getElementById('mitarbeiter-betriebsmittel').setAttribute('src','betriebsmitteloverlay.xul.php?person_id='+person_id+'&uid='+uid);
-	
+
 
 	if(document.getElementById('mitarbeiter-tabs').selectedItem==document.getElementById('mitarbeiter-tab-termine'))
 	{
@@ -611,7 +614,7 @@ function MitarbeiterAuswahl()
 	// **** VERWENDUNG ****
 	verwendungtree = document.getElementById('mitarbeiter-tree-verwendung');
 	url='<?php echo APP_ROOT;?>rdf/bisverwendung.rdf.php?uid='+uid+"&"+gettimestamp();
-	
+
 	try
 	{
 		MitarbeiterVerwendungTreeDatasource.removeXMLSinkObserver(MitarbeiterVerwendungTreeSinkObserver);
@@ -619,7 +622,7 @@ function MitarbeiterAuswahl()
 	}
 	catch(e)
 	{}
-	
+
 	//Alte DS entfernen
 	var oldDatasources = verwendungtree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -628,7 +631,7 @@ function MitarbeiterAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	verwendungtree.builder.rebuild();
-	
+
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	MitarbeiterVerwendungTreeDatasource = rdfService.GetDataSource(url);
@@ -637,9 +640,9 @@ function MitarbeiterAuswahl()
 	verwendungtree.database.AddDataSource(MitarbeiterVerwendungTreeDatasource);
 	MitarbeiterVerwendungTreeDatasource.addXMLSinkObserver(MitarbeiterVerwendungTreeSinkObserver);
 	verwendungtree.builder.addListener(MitarbeiterVerwendungTreeListener);
-	
+
 	MitarbeiterVerwendungDisableFields(false);
-	
+
 	// **** ENTWICKLUNGSTEAM ****
 	entwicklungsteamtree = document.getElementById('mitarbeiter-tree-entwicklungsteam');
 	url='<?php echo APP_ROOT;?>rdf/entwicklungsteam.rdf.php?mitarbeiter_uid='+uid+"&"+gettimestamp();
@@ -651,7 +654,7 @@ function MitarbeiterAuswahl()
 	}
 	catch(e)
 	{}
-	
+
 	//Alte DS entfernen
 	var oldDatasources = entwicklungsteamtree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -668,13 +671,13 @@ function MitarbeiterAuswahl()
 	entwicklungsteamtree.database.AddDataSource(MitarbeiterEntwicklungsteamTreeDatasource);
 	MitarbeiterEntwicklungsteamTreeDatasource.addXMLSinkObserver(MitarbeiterEntwicklungsteamTreeSinkObserver);
 	entwicklungsteamtree.builder.addListener(MitarbeiterEntwicklungsteamTreeListener);
-	
+
 	MitarbeiterEntwicklungsteamDetailDisableFields(true);
 	MitarbeiterEntwicklungsteamDisableFields(false);
-	
+
 	// Funktionen Tree Leeren
 	funktiontree = document.getElementById('mitarbeiter-tree-funktion');
-	
+
 	//Alte DS entfernen
 	var oldDatasources = funktiontree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -683,9 +686,9 @@ function MitarbeiterAuswahl()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	funktiontree.builder.rebuild();
-	
+
 	MitarbeiterFunktionDisableFields(true);
-	
+
 	//Funktionen Laden
 	if(document.getElementById('mitarbeiter-tabs').selectedItem==document.getElementById('mitarbeiter-tab-funktionen'))
 	{
@@ -693,7 +696,7 @@ function MitarbeiterAuswahl()
 		document.getElementById('mitarbeiter-funktionen').setAttribute('src',url);
 	}
 
-	// Buchungen laden falls vorhanden	
+	// Buchungen laden falls vorhanden
 	if(document.getElementById('mitarbeiter-tab-buchung'))
 		MitarbeiterBuchungLoad(person_id)
 
@@ -733,15 +736,15 @@ function MitarbeiterImageDelete()
 	{
 		var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'imagedelete');
 		req.add('person_id', person_id);
 		req.add('studiengang_kz', '');
-	
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-	
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -790,7 +793,7 @@ function MitarbeiterSave()
 	geburtsnation = document.getElementById('mitarbeiter-detail-menulist-geburtsnation').value;
 	sprache = document.getElementById('mitarbeiter-detail-menulist-sprache').value;
 	person_id = document.getElementById('mitarbeiter-detail-textbox-person_id').value;
-	
+
 	//Mitarbeiterdaten
 	personalnummer = document.getElementById('mitarbeiter-detail-textbox-personalnummer').value;
 	kurzbezeichnung = document.getElementById('mitarbeiter-detail-textbox-kurzbezeichnung').value;
@@ -805,16 +808,16 @@ function MitarbeiterSave()
 	standort_id = document.getElementById('mitarbeiter-detail-menulist-standort').value;
 	alias = document.getElementById('mitarbeiter-detail-textbox-alias').value;
 	kleriker = document.getElementById('mitarbeiter-detail-checkbox-kleriker').checked;
-	
+
 	urlaubsanspruch = document.getElementById('mitarbeiter-detail-textbox-urlaubsanspruch').value;
 	resturlaubstage = document.getElementById('mitarbeiter-detail-textbox-resturlaubstage').value;
-	
+
 	if(geburtsdatum!='' && !CheckDatum(geburtsdatum))
 	{
 		alert('Geburtsdatum ist ungueltig');
 		return false;
 	}
-		
+
 	var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
 	var req = new phpRequest(url,'','');
 
@@ -856,13 +859,13 @@ function MitarbeiterSave()
 	req.add('resturlaubstage', resturlaubstage);
 	req.add('kleriker', kleriker);
 	req.add('personalnummer', personalnummer);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
 
 	MitarbeiterDetailValueChanged=false;
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -1047,7 +1050,7 @@ function MitarbeiterVerwendungSelect()
 {
 	// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	var tree = document.getElementById('mitarbeiter-tree-verwendung');
 
 	if (tree.currentIndex==-1) return;
@@ -1056,7 +1059,7 @@ function MitarbeiterVerwendungSelect()
     var col = tree.columns ? tree.columns["mitarbeiter-verwendung-treecol-bisverwendung_id"] : "mitarbeiter-verwendung-treecol-bisverwendung_id";
 	var bisverwendung_id=tree.view.getCellText(tree.currentIndex,col);
 
-	
+
 	// Laden der Funktionen
 	funktiontree = document.getElementById('mitarbeiter-tree-funktion');
 	url='<?php echo APP_ROOT;?>rdf/bisfunktion.rdf.php?bisverwendung_id='+bisverwendung_id+"&"+gettimestamp();
@@ -1068,7 +1071,7 @@ function MitarbeiterVerwendungSelect()
 	}
 	catch(e)
 	{}
-	
+
 	//Alte DS entfernen
 	var oldDatasources = funktiontree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -1085,7 +1088,7 @@ function MitarbeiterVerwendungSelect()
 	funktiontree.database.AddDataSource(MitarbeiterFunktionTreeDatasource);
 	MitarbeiterFunktionTreeDatasource.addXMLSinkObserver(MitarbeiterFunktionTreeSinkObserver);
 	funktiontree.builder.addListener(MitarbeiterFunktionTreeListener);
-	
+
 	MitarbeiterFunktionDisableFields(false);
 }
 
@@ -1106,12 +1109,12 @@ function MitarbeiterVerwendungBearbeiten()
 {
 	var tree=document.getElementById('mitarbeiter-tree-verwendung');
 
-	if (tree.currentIndex==-1) 
+	if (tree.currentIndex==-1)
 	{
 		alert('Bitte zuerst einen Eintrag auswaehlen');
 		return false;
 	}
-	
+
 	//Uid der row holen
 	col = tree.columns ? tree.columns["mitarbeiter-verwendung-treecol-mitarbeiter_uid"] : "mitarbeiter-verwendung-treecol-mitarbeiter_uid";
 	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
@@ -1134,7 +1137,7 @@ function MitarbeiterVerwendungNeu()
 	//Uid der row holen
 	col = tree.columns ? tree.columns["mitarbeiter-treecol-uid"] : "mitarbeiter-treecol-uid";
 	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	window.open("<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.xul.php?mitarbeiter_uid="+mitarbeiter_uid,"popup","chrome, status=no, width=500, height=350, centerscreen, resizable");
 }
 
@@ -1151,7 +1154,7 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	ende = dialog.getElementById('mitarbeiter-verwendung-detail-datum-ende').value;
 	vertragsstunden = dialog.getElementById('mitarbeiter-verwendung-detail-textbox-vertragsstunden').value;
 	dv_art = dialog.getElementById('mitarbeiter-verwendung-detail-textbox-dv_art').value;
-		
+
 	if(verwendung_code=='1' || verwendung_code=='5' || verwendung_code=='6')
 	{
 		if(hauptberuflich==true)
@@ -1174,25 +1177,25 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 			alert('Hauptberuflich darf bei dieser Verwendung nicht gesetzt sein');
 			return false;
 		}
-	}	
-	
+	}
+
 	if(beginn!='' && !CheckDatum(beginn))
 	{
 		alert('Beginn Datum ist ungueltig');
 		return false;
 	}
-	
+
 	if(ende!='' && !CheckDatum(ende))
 	{
 		alert('Ende Datum ist ungueltig');
 		return false;
 	}
-	
+
 	var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'verwendungsave');
-	
+
 	req.add('neu', neu);
 	req.add('mitarbeiter_uid', mitarbeiter_uid);
 	req.add('bisverwendung_id', bisverwendung_id);
@@ -1211,7 +1214,7 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -1236,7 +1239,7 @@ function MitarbeiterVerwendungLoeschen()
 {
 	var tree=document.getElementById('mitarbeiter-tree-verwendung');
 
-	if (tree.currentIndex==-1) 
+	if (tree.currentIndex==-1)
 	{
 		alert('Bitte zuerst einen Eintrag auswaehlen');
 		return false;
@@ -1244,21 +1247,21 @@ function MitarbeiterVerwendungLoeschen()
 	//Bisverwendung_id holen
 	col = tree.columns ? tree.columns["mitarbeiter-verwendung-treecol-bisverwendung_id"] : "mitarbeiter-verwendung-treecol-bisverwendung_id";
 	bisverwendung_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	if(confirm('Diese Verwendung wirklich loeschen?'))
 	{
-	
+
 		var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'verwendungdelete');
-		
+
 		req.add('bisverwendung_id', bisverwendung_id);
-	
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -1350,30 +1353,30 @@ function MitarbeiterFunktionSpeichern()
 	sws = document.getElementById('mitarbeiter-funktion-detail-textbox-sws').value;
 	neu = document.getElementById('mitarbeiter-funktion-detail-checkbox-neu').checked;
 	studiengang_kz_old = document.getElementById('mitarbeiter-funktion-detail-textbox-studiengang').value;
-	
+
 	if(studiengang_kz=='')
 	{
 		alert('Bitte einen Studiengang auswaehlen');
 		return false;
 	}
-		
+
 	//Bisverwendung_id holen
 	var tree=document.getElementById('mitarbeiter-tree-verwendung');
 
-	if (tree.currentIndex==-1) 
+	if (tree.currentIndex==-1)
 	{
 		alert('Es wurde keine Verwendung ausgewaehlt');
 		return false;
 	}
-	
+
 	col = tree.columns ? tree.columns["mitarbeiter-verwendung-treecol-bisverwendung_id"] : "mitarbeiter-verwendung-treecol-bisverwendung_id";
 	bisverwendung_id=tree.view.getCellText(tree.currentIndex,col);
 
 	var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'funktionsave');
-	
+
 	req.add('neu', neu);
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('studiengang_kz_old', studiengang_kz_old);
@@ -1383,7 +1386,7 @@ function MitarbeiterFunktionSpeichern()
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -1403,7 +1406,7 @@ function MitarbeiterFunktionSpeichern()
 	}
 }
 
-// **** 
+// ****
 // * bei der Auswahl einer Funktion wird diese zum Bearbeiten geladen
 // ****
 function MitarbeiterFunktionSelect()
@@ -1411,23 +1414,23 @@ function MitarbeiterFunktionSelect()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	//Daten laden
 	tree = document.getElementById('mitarbeiter-tree-funktion');
-	
-	if (tree.currentIndex==-1) 
+
+	if (tree.currentIndex==-1)
 		return false;
-	
+
 	col = tree.columns ? tree.columns["mitarbeiter-funktion-treecol-bisverwendung_id"] : "mitarbeiter-funktion-treecol-bisverwendung_id";
 	bisverwendung_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	col = tree.columns ? tree.columns["mitarbeiter-funktion-treecol-studiengang_kz"] : "mitarbeiter-funktion-treecol-studiengang_kz";
 	studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	var url = '<?php echo APP_ROOT ?>rdf/bisfunktion.rdf.php?bisverwendung_id='+bisverwendung_id+'&studiengang_kz='+studiengang_kz+'&'+gettimestamp();
-		
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
-    
+
     var dsource = rdfService.GetDataSourceBlocking(url);
-    
+
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/bisfunktion/" + bisverwendung_id+'/'+studiengang_kz);
 
 	var predicateNS = "http://www.technikum-wien.at/bisfunktion/rdf";
@@ -1435,10 +1438,10 @@ function MitarbeiterFunktionSelect()
 	//RDF parsen
 
 	var sws = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#sws" ));
-	
+
 	document.getElementById('mitarbeiter-funktion-detail-menulist-studiengang').value=studiengang_kz;
 	document.getElementById('mitarbeiter-funktion-detail-textbox-sws').value=sws;
-	document.getElementById('mitarbeiter-funktion-detail-checkbox-neu').checked=false;	
+	document.getElementById('mitarbeiter-funktion-detail-checkbox-neu').checked=false;
 	document.getElementById('mitarbeiter-funktion-detail-textbox-studiengang').value=studiengang_kz;
 	MitarbeiterFunktionDetailDisableFields(false);
 }
@@ -1450,33 +1453,33 @@ function MitarbeiterFunktionLoeschen()
 {
 	//Daten laden
 	tree = document.getElementById('mitarbeiter-tree-funktion');
-	
-	if (tree.currentIndex==-1) 
+
+	if (tree.currentIndex==-1)
 	{
 		alert('Es wurde keine Verwendung ausgewaehlt');
 		return false;
 	}
-	
+
 	col = tree.columns ? tree.columns["mitarbeiter-funktion-treecol-bisverwendung_id"] : "mitarbeiter-funktion-treecol-bisverwendung_id";
 	bisverwendung_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	col = tree.columns ? tree.columns["mitarbeiter-funktion-treecol-studiengang_kz"] : "mitarbeiter-funktion-treecol-studiengang_kz";
 	studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	if(confirm("Wollen Sie diese Funktion wirklich loeschen?"))
 	{
 		var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'funktiondelete');
-		
+
 		req.add('studiengang_kz', studiengang_kz);
 		req.add('bisverwendung_id', bisverwendung_id);
-	
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -1535,7 +1538,7 @@ function MitarbeiterEntwicklungsteamDisableFields(val)
 {
 	document.getElementById('mitarbeiter-entwicklungsteam-button-neu').disabled=val;
 	document.getElementById('mitarbeiter-entwicklungsteam-button-loeschen').disabled=val;
-	
+
 	if(val)
 		MitarbeiterEntwicklungsteamDetailDisableFields(val)
 }
@@ -1549,7 +1552,7 @@ function MitarbeiterEntwicklungsteamDetailDisableFields(val)
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-menulist-besqual').disabled=val;
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-beginn').disabled=val;
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-ende').disabled=val;
-	document.getElementById('mitarbeiter-entwicklungsteam-detail-button-speichern').disabled=val;	
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-button-speichern').disabled=val;
 }
 
 // ****
@@ -1572,23 +1575,23 @@ function MitarbeiterEntwicklungsteamSelect()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	//Daten laden
 	tree = document.getElementById('mitarbeiter-tree-entwicklungsteam');
-	
-	if (tree.currentIndex==-1) 
+
+	if (tree.currentIndex==-1)
 		return false;
-	
+
 	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-studiengang_kz"] : "mitarbeiter-entwicklungsteam-treecol-studiengang_kz";
 	studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid"] : "mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid";
 	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
 
 	var url = '<?php echo APP_ROOT ?>rdf/entwicklungsteam.rdf.php?studiengang_kz='+studiengang_kz+'&mitarbeiter_uid='+mitarbeiter_uid+'&'+gettimestamp();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
-    
+
     var dsource = rdfService.GetDataSourceBlocking(url);
-    
+
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/entwicklungsteam/" + mitarbeiter_uid+'/'+studiengang_kz);
 
 	var predicateNS = "http://www.technikum-wien.at/entwicklungsteam/rdf";
@@ -1598,10 +1601,10 @@ function MitarbeiterEntwicklungsteamSelect()
 	var besqualcode = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#besqualcode" ));
 	var beginn = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beginn" ));
 	var ende = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
-	
+
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-menulist-studiengang').value=studiengang_kz;
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-menulist-besqual').value=besqualcode;
-	document.getElementById('mitarbeiter-entwicklungsteam-detail-checkbox-neu').checked=false;	
+	document.getElementById('mitarbeiter-entwicklungsteam-detail-checkbox-neu').checked=false;
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-textbox-studiengang').value=studiengang_kz;
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-beginn').value=beginn;
 	document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-ende').value=ende;
@@ -1615,14 +1618,14 @@ function MitarbeiterEntwicklungsteamSpeichern()
 {
 	// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	studiengang_kz = document.getElementById('mitarbeiter-entwicklungsteam-detail-menulist-studiengang').value;
 	besqualcode = document.getElementById('mitarbeiter-entwicklungsteam-detail-menulist-besqual').value;
 	neu = document.getElementById('mitarbeiter-entwicklungsteam-detail-checkbox-neu').checked;
 	studiengang_kz_old = document.getElementById('mitarbeiter-entwicklungsteam-detail-textbox-studiengang').value;
 	beginn = document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-beginn').value;
 	ende = document.getElementById('mitarbeiter-entwicklungsteam-detail-datum-ende').value;
-	
+
 	if(studiengang_kz=='')
 	{
 		alert('Bitte einen Studiengang auswaehlen');
@@ -1630,7 +1633,7 @@ function MitarbeiterEntwicklungsteamSpeichern()
 	}
 	var tree = document.getElementById('mitarbeiter-tree');
 
-	if (tree.currentIndex==-1) 
+	if (tree.currentIndex==-1)
 	{
 		alert('Es ist kein Mitarbeiter ausgewaehlt');
 		return;
@@ -1642,9 +1645,9 @@ function MitarbeiterEntwicklungsteamSpeichern()
 
 	var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'entwicklungsteamsave');
-	
+
 	req.add('neu', neu);
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('studiengang_kz_old', studiengang_kz_old);
@@ -1656,7 +1659,7 @@ function MitarbeiterEntwicklungsteamSpeichern()
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -1684,33 +1687,33 @@ function MitarbeiterEntwicklungsteamLoeschen()
 {
 	//Daten laden
 	tree = document.getElementById('mitarbeiter-tree-entwicklungsteam');
-	
-	if (tree.currentIndex==-1) 
+
+	if (tree.currentIndex==-1)
 	{
 		alert('Es wurde keine Eintrag ausgewaehlt');
 		return false;
 	}
-	
+
 	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-studiengang_kz"] : "mitarbeiter-entwicklungsteam-treecol-studiengang_kz";
 	studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	col = tree.columns ? tree.columns["mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid"] : "mitarbeiter-entwicklungsteam-treecol-mitarbeiter_uid";
 	mitarbeiter_uid=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	if(confirm("Wollen Sie diesen Eintrag wirklich loeschen?"))
 	{
 		var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'entwicklungsteamdelete');
-		
+
 		req.add('studiengang_kz', studiengang_kz);
 		req.add('mitarbeiter_uid', mitarbeiter_uid);
-	
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -1769,7 +1772,7 @@ function MitarbeiterFunktionIFrameUnLoad()
 function MitarbeiterGenerateGebDatFromSVNR()
 {
 	var svnr = document.getElementById('mitarbeiter-detail-textbox-svnr').value;
-	
+
 	if(svnr!='' && svnr.length==10)
 		document.getElementById('mitarbeiter-detail-textbox-geburtsdatum').value = svnr.charAt(4) + svnr.charAt(5) + "." + svnr.charAt(6) + svnr.charAt(7) + ".19" + svnr.charAt(8) + svnr.charAt(9);
 }
@@ -1785,23 +1788,23 @@ function MitarbeiterSuche()
 		if(!confirm('Achtung! Die Daten wurden veraendert aber noch nicht gespeichert. Neuen Datensatz trotzdem laden? (Die geaenderten Daten gehen dabei verloren)'))
 			return false;
 	}
-	
+
 	MitarbeiterDetailValueChanged=false;
-	
+
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	filter = document.getElementById('mitarbeiter-toolbar-textbox-suche').value;
 	var treeMitarbeiterMenu=document.getElementById('tree-menu-mitarbeiter');
 	treeMitarbeiterMenu.currentIndex=-1;
 	treeMitarbeiterMenu.view.selection.clearSelection();
-	
+
 	//Wenn mehr als 2 Zeichen eingegeben wurden, die Personensuche starten
 	if(filter.length>2)
 	{
 		//Datasource setzen und Felder deaktivieren
 		url = "<?php echo APP_ROOT; ?>rdf/personal.rdf.php?filter="+encodeURIComponent(filter)+"&"+gettimestamp();
-		
+
 		var treeMitarbeiter=document.getElementById('mitarbeiter-tree');
-	
+
 		try
 		{
 			MitarbeiterTreeDatasource.removeXMLSinkObserver(MitarbeiterTreeSinkObserver);
@@ -1809,7 +1812,7 @@ function MitarbeiterSuche()
 		}
 		catch(e)
 		{}
-		
+
 		//Alte DS entfernen
 		var oldDatasources = treeMitarbeiter.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
@@ -1817,7 +1820,7 @@ function MitarbeiterSuche()
 			treeMitarbeiter.database.RemoveDataSource(oldDatasources.getNext());
 		}
 		treeMitarbeiter.builder.rebuild();
-		
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		MitarbeiterTreeDatasource = rdfService.GetDataSource(url);
 		MitarbeiterTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -1825,12 +1828,12 @@ function MitarbeiterSuche()
 		treeMitarbeiter.database.AddDataSource(MitarbeiterTreeDatasource);
 		MitarbeiterTreeDatasource.addXMLSinkObserver(MitarbeiterTreeSinkObserver);
 		treeMitarbeiter.builder.addListener(MitarbeiterTreeListener);
-	
+
 		//Detailfelder Deaktivieren
 		MitarbeiterDetailDisableFields(true);
 	}
 	else
-		alert('Es muessen mindestens 3 Zeichen eingegeben werden');		
+		alert('Es muessen mindestens 3 Zeichen eingegeben werden');
 }
 
 function MitarbeiterImageInfomail()

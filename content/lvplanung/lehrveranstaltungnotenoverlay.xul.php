@@ -48,8 +48,8 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 <popupset>
 	<menupopup id="lehrveranstaltung-noten-tree-popup">
 		<menuitem label="Entfernen" oncommand="LehrveranstaltungNotenDelete();" id="lehrveranstaltung-noten-tree-popup-delete" hidden="false"/>
-		<menuitem label="Freifaecher-Zertifikat erstellen" oncommand="LehrveranstaltungFFZertifikatPrint();" id="lehrveranstaltung-noten-tree-popup-ffzertifikat" hidden="false"/>
-		<menuitem label="Lehrveranstaltungszeugnis erstellen" oncommand="LehrveranstaltungLVZeugnisPrint();" id="lehrveranstaltung-noten-tree-popup-lvzeugnis" hidden="false"/>
+		<menuitem label="Freifaecher-Zertifikat erstellen" oncommand="LehrveranstaltungFFZertifikatPrint(event);" id="lehrveranstaltung-noten-tree-popup-ffzertifikat" hidden="false"/>
+		<menuitem label="Lehrveranstaltungszeugnis erstellen" oncommand="LehrveranstaltungLVZeugnisPrint(event);" id="lehrveranstaltung-noten-tree-popup-lvzeugnis" hidden="false"/>
 	</menupopup>
 </popupset>
 <hbox flex="1" style="margin-top: 10px;">
@@ -62,7 +62,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		context="lehrveranstaltung-noten-tree-popup"
 		flags="dont-build-content"
 	>
-	
+
 		<treecols>
 			<treecol id="lehrveranstaltung-noten-tree-student_vorname" label="Vorname" flex="2" hidden="false" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
@@ -87,7 +87,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 			<treecol id="lehrveranstaltung-noten-tree-benotungsdatum" label="Benotungsdatum" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#benotungsdatum_iso" />
-			<splitter class="tree-splitter"/> 
+			<splitter class="tree-splitter"/>
 			<treecol id="lehrveranstaltung-noten-tree-benotungsdatum-iso" label="BenotungsdatumISO" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#benotungsdatum_iso" />
@@ -125,7 +125,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#punkte" />
 			<splitter class="tree-splitter"/>
 		</treecols>
-	
+
 		<template>
 			<treechildren flex="1" >
 					<treeitem uri="rdf:*">
@@ -156,7 +156,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		<button id="lehrveranstaltung-note-copy" label="&lt;=" style="font-weight: bold;" oncommand="LehrveranstaltungNotenMove();"/>
 		<spacer flex="1"/>
 	</vbox>
-	
+
 	<vbox flex="1">
 	<label value="Lektor" />
 	<tree id="lehrveranstaltung-lvgesamtnoten-tree" seltype="multi" hidecolumnpicker="false" flex="1"
@@ -164,7 +164,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		style="margin-bottom:5px;" height="100%" enableColumnDrag="true"
 		flags="dont-build-content"
 	>
-	
+
 		<treecols>
 			<treecol id="lehrveranstaltung-lvgesamtnoten-tree-student-vorname" label="Vorname" flex="2" hidden="false"
 				class="sortDirectionIndicator"
@@ -219,7 +219,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#punkte" />
 			<splitter class="tree-splitter"/>
 		</treecols>
-	
+
 		<template>
 			<treechildren flex="1" >
 					<treeitem uri="rdf:*">
@@ -243,12 +243,12 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		</template>
 	</tree>
 	</vbox>
-</hbox>		
-<hbox>		
+</hbox>
+<hbox>
 	<label value="Note" control="lehrveranstaltung-noten-menulist-note"/>
 	<menulist id="lehrveranstaltung-noten-menulist-note" disabled="true"
 	          datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php" flex="1"
-	          ref="http://www.technikum-wien.at/note/liste" 
+	          ref="http://www.technikum-wien.at/note/liste"
 	          oncommand="LehrveranstaltungNoteSpeichern()">
 		<template>
 			<menupopup>
@@ -264,5 +264,39 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	<spacer flex="1" />
 	<button id="lehrveranstaltung-noten-button-import" label="Notenimport" oncommand="LehrveranstaltungNotenImport();" />
 </hbox>
+<?php
+if(defined('FAS_GESAMTNOTE_PRUEFUNGSHONORAR') && FAS_GESAMTNOTE_PRUEFUNGSHONORAR)
+{
+	echo '
+<hbox>
+	<groupbox id="lehrveranstaltung-noten-groupbox-pruefung">
+	<caption label="Prüfungshonorar" />
+	<hbox>
+		<label value="Mitarbeiter" control="lehrveranstaltung-noten-pruefung-menulist-mitarbeiter"/>
+		<menulist id="lehrveranstaltung-noten-pruefung-menulist-mitarbeiter"
+		          datasources="'.APP_ROOT.'rdf/mitarbeiter.rdf.php" flex="1"
+		          ref="http://www.technikum-wien.at/mitarbeiter/_alle"
+                  minwidth="250"
+		          >
+			<template>
+				<menupopup>
+                    <menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
+		        		      label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname ( rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid )"
+					  		  uri="rdf:*"/>
+				</menupopup>
+			</template>
+		</menulist>
+		<label value="Satz pro Prüfung" control="lehrveranstaltung-noten-pruefung-textbox-satz"/>
+		<textbox id="lehrveranstaltung-noten-pruefung-textbox-satz" size="2" oninput="LehrveranstaltungNotenPruefungCalculate()"/>
+		<label value="Anzahl Prüfungen" control="lehrveranstaltung-noten-pruefung-textbox-anzahl"/>
+		<textbox id="lehrveranstaltung-noten-pruefung-textbox-anzahl" size="2" oninput="LehrveranstaltungNotenPruefungCalculate()"/>
+		<label value="0.0" id="lehrveranstaltung-noten-pruefung-label-gesamt"/>
+		<button id="lehrveranstaltung-noten-pruefung-button-save" label="Speichern" oncommand="LehrveranstaltungNotenPruefungSave();" />
+		<spacer flex="1"/>
+	</hbox>
+	</groupbox>
+</hbox>';
+}
+?>
 </vbox>
 </overlay>

@@ -72,6 +72,29 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 		};
     return array_filter($array,$callback);
 }
+
+$titel_de = '';
+$methodik_de = '';
+$kurzbeschreibung_de = '';
+$anwesenheit_de = '';
+$lehrziele_de = '';
+$lehrinhalte_de = '';
+$voraussetzungen_de = '';
+$unterlagen_de = '';
+$pruefungsordnung_de = '';
+$anmerkungen_de = '';
+
+$titel_en = '';
+$methodik_en = '';
+$kurzbeschreibung_en = '';
+$anwesenheit_en = '';
+$lehrziele_en = '';
+$lehrinhalte_en = '';
+$voraussetzungen_en = '';
+$unterlagen_en = '';
+$pruefungsordnung_en = '';
+$anmerkungen_en = '';
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -645,7 +668,7 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 
 		if ($anmerkungen_en)
 		{
-			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/anmerkungeEN')."</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/anmerkungenEN')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($anmerkungen_en)."&nbsp;<br /></td></tr>";
 		}
 	}

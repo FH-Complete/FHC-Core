@@ -49,7 +49,11 @@ $student_uid = filter_input(INPUT_GET,'student_uid');
 <vbox flex="1">
 	<groupbox id="termine-groupbox-termine" flex="1">
 		<caption label="Termine" />
-		<hbox flex="1">
+		<vbox flex="1">
+            <hbox>
+                <spacer flex="1" />
+                <button type="checkbox" id="termine-button-stpltable" label="Stundenplan" oncommand="TermineChangeSTPLTable();"/>
+            </hbox>
 			<tree id="termine-tree" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="rdf:null" ref="http://www.technikum-wien.at/termine"
 				persist="hidden, height"
@@ -100,12 +104,12 @@ $student_uid = filter_input(INPUT_GET,'student_uid');
 						sort="rdf:http://www.technikum-wien.at/termine/rdf#datum_iso" onclick="termineTreeSort()"/>
 					<splitter class="tree-splitter"/>
 				</treecols>
-			
+
 				<template>
 					<rule>
 						<treechildren>
 							<treeitem uri="rdf:*">
-								<treerow>
+								<treerow properties="rdf:http://www.technikum-wien.at/termine/rdf#kollision">
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#datum" />
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#stundevon" />
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#stundebis" />
@@ -123,7 +127,7 @@ $student_uid = filter_input(INPUT_GET,'student_uid');
 					</rule>
 				</template>
 			</tree>
-		</hbox>
+		</vbox>
 	</groupbox>
 	<button label="Exportieren" oncommand="TermineExport()"/>
 </vbox>

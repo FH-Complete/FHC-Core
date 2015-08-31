@@ -25,7 +25,7 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class bankverbindung extends basis_db 
+class bankverbindung extends basis_db
 {
 	public $new;				// boolean
 	public $result = array(); 	// adresse Objekt
@@ -55,7 +55,7 @@ class bankverbindung extends basis_db
 	public function __construct($bankverbindung_id=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($bankverbindung_id))
 			$this->load($bankverbindung_id);
 	}
@@ -72,9 +72,9 @@ class bankverbindung extends basis_db
 			$this->errormsg = 'Bankverbindung_id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM public.tbl_bankverbindung WHERE bankverbindung_id=".$this->db_add_param($bankverbindung_id);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -97,13 +97,13 @@ class bankverbindung extends basis_db
 				$this->oe_kurzbz = $row->oe_kurzbz;
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Datensatz wurde nicht gefunden';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
@@ -148,7 +148,7 @@ class bankverbindung extends basis_db
 			$this->errormsg = 'IBAN darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
-				
+
 		if(!is_numeric($this->person_id))
 		{
 			$this->errormsg = 'Person_id ist ungueltig';
@@ -158,7 +158,7 @@ class bankverbindung extends basis_db
 		$this->errormsg = '';
 		return true;
 	}
-		
+
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -176,7 +176,7 @@ class bankverbindung extends basis_db
 			//Neuen Datensatz einfuegen
 
 			$qry = 'BEGIN;INSERT INTO public.tbl_bankverbindung  (person_id, name, anschrift, blz, bic,
-			       kontonr, iban, typ, ext_id, oe_kurzbz, verrechnung, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			       kontonr, iban, typ, oe_kurzbz, verrechnung, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			       $this->db_add_param($this->person_id, FHC_INTEGER).', '.
 			       $this->db_add_param($this->name).', '.
 			       $this->db_add_param($this->anschrift).', '.
@@ -185,7 +185,6 @@ class bankverbindung extends basis_db
 			       $this->db_add_param($this->kontonr).', '.
 			       $this->db_add_param($this->iban).', '.
 			       $this->db_add_param($this->typ).', '.
-			       $this->db_add_param($this->ext_id).', '.
 			       $this->db_add_param($this->oe_kurzbz).', '.
                    $this->db_add_param($this->verrechnung, FHC_BOOLEAN).',  now(), '.
 			       $this->db_add_param($this->insertvon).', now(), '.
@@ -201,7 +200,7 @@ class bankverbindung extends basis_db
 				$this->errormsg = 'bankverbindung_id muss eine gueltige Zahl sein: '.$this->bankverbindung_id.' ('.$this->person_id.')';
 				return false;
 			}
-			
+
 			$qry='UPDATE public.tbl_bankverbindung SET '.
 			'person_id='.$this->db_add_param($this->person_id, FHC_INTEGER).', '.
 			'name='.$this->db_add_param($this->name).', '.
@@ -212,7 +211,6 @@ class bankverbindung extends basis_db
  			'iban='.$this->db_add_param($this->iban).', '.
  			'typ='.$this->db_add_param($this->typ).', '.
  			'verrechnung='.$this->db_add_param($this->verrechnung,FHC_BOOLEAN).', '.
- 			'ext_id='.$this->db_add_param($this->ext_id).', '.
  			'oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).', '.
  			'updateamum='.$this->db_add_param($this->updateamum).','.
  			'updatevon='.$this->db_add_param($this->updatevon).' '.
@@ -233,14 +231,14 @@ class bankverbindung extends basis_db
 						$this->db_query('COMMIT');
 						return true;
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					$this->db_query('ROLLBACK');
@@ -268,18 +266,18 @@ class bankverbindung extends basis_db
 			$this->errormsg = 'Bankverbindung_id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "DELETE FROM public.tbl_bankverbindung WHERE bankverbindung_id=".$this->db_add_param($bankverbindung_id, FHC_INTEGER);
-		
+
 		if($this->db_query($qry))
 			return true;
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen des Datensatzes';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt die Bankverbindung einer Person
 	 * @param  $person_id
@@ -292,15 +290,15 @@ class bankverbindung extends basis_db
 			$this->errormsg = 'Person_id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM public.tbl_bankverbindung WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new bankverbindung();
-				
+
 				$obj->bankverbindung_id = $row->bankverbindung_id;
 				$obj->person_id = $row->person_id;
 				$obj->name = $row->name;
@@ -317,12 +315,12 @@ class bankverbindung extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
@@ -341,15 +339,15 @@ class bankverbindung extends basis_db
 			$this->errormsg = 'keine oe_kurzbz uebergeben';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM public.tbl_bankverbindung WHERE oe_kurzbz=".$this->db_add_param($oe_kurzbz);
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new bankverbindung();
-				
+
 				$obj->bankverbindung_id = $row->bankverbindung_id;
 				$obj->person_id = $row->person_id;
 				$obj->name = $row->name;
@@ -366,16 +364,16 @@ class bankverbindung extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
-	}	
+	}
 }
 ?>

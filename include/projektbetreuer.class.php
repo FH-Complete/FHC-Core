@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -29,7 +29,7 @@ class projektbetreuer extends basis_db
 {
 	public $new;       		// boolean
 	public $result = array(); 	// adresse Objekt
-	
+
 	//Tabellenspalten
 	public $person_id;			// integer
 	public $projektarbeit_id;	// integer
@@ -48,7 +48,7 @@ class projektbetreuer extends basis_db
 	public $vertrag_id;			// bigint
 
 	public $person_id_old;
-	
+
 	/**
 	 * Konstruktor
 	 * @param $person_id, $projektarbeit ID des Projektbetreuers, der geladen werden soll (Default=null)
@@ -57,10 +57,10 @@ class projektbetreuer extends basis_db
 	{
 		parent::__construct();
 
-		if($projektarbeit_id != null && $person_id!=null) 	
+		if($projektarbeit_id != null && $person_id!=null)
 			$this->load($person_id, $projektarbeit_id);
 	}
-	
+
 	/**
 	 * Laedt die Funktion mit der ID $person_id, $projektarbeit_id
 	 * @param  $person_id ID der zu ladenden Funktion
@@ -74,22 +74,22 @@ class projektbetreuer extends basis_db
 			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		if(!is_numeric($projektarbeit_id))
 		{
 			$this->errormsg = 'Projektarbeit_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT
-					* 
-				FROM 
-					lehre.tbl_projektbetreuer 
-				WHERE 
+					*
+				FROM
+					lehre.tbl_projektbetreuer
+				WHERE
 					person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
 					AND projektarbeit_id=".$this->db_add_param($projektarbeit_id, FHC_INTEGER)."
 					AND betreuerart_kurzbz=".$this->db_add_param($betreuerart_kurzbz);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -112,25 +112,25 @@ class projektbetreuer extends basis_db
 				$this->new=false;
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Datensatz wurde nicht gefunden';
 				return false;
-			}				
+			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
-		}		
+		}
 	}
-			
+
 	/**
 	 * Prueft die Variablen auf Gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	protected function validate()
-	{		
+	{
 		if($this->betreuerart_kurzbz=='')
 		{
 			$this->errormsg = 'Betreuerart muss eingegeben werden';
@@ -146,7 +146,7 @@ class projektbetreuer extends basis_db
 			$this->errormsg = 'Name darf nicht länger als 32 Zeichen sein';
 			return false;
 		}
-		
+
 		if($this->note!='' && !is_numeric($this->note))
 		{
 			$this->errormsg = 'Note muss ein numerischer Wert sein';
@@ -166,14 +166,14 @@ class projektbetreuer extends basis_db
 			$this->errormsg = 'Stundensatz muss ein numerischer Wert sein';
 			return false;
 		}
-		
+
 		//Pruefen ob projektarbeit_id eine gueltige Zahl ist
 		if(!is_numeric($this->projektarbeit_id))
 		{
 			$this->errormsg = 'projektarbeit_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		//Pruefen ob person_id eine gueltige Zahl ist
 		if(!is_numeric($this->person_id))
 		{
@@ -181,11 +181,11 @@ class projektbetreuer extends basis_db
 			return false;
 		}
 		$this->errormsg = '';
-		return true;		
+		return true;
 	}
-		
+
 	/**
-	 * Speichert den aktuellen Datensatz in die Datenbank	 
+	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	 * andernfalls wird der Datensatz aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
@@ -194,16 +194,16 @@ class projektbetreuer extends basis_db
 	{
 		if($new==null)
 			$new = $this->new;
-		
+
 		//Variablen pruefen
 		if(!$this->validate())
 			return false;
-			
+
 		if($new)
 		{
-			//Neuen Datensatz einfuegen								
+			//Neuen Datensatz einfuegen
 			$qry='INSERT INTO lehre.tbl_projektbetreuer (person_id, projektarbeit_id, note, betreuerart_kurzbz, faktor, name,
-				 punkte, stunden, stundensatz, ext_id, insertamum, insertvon, updateamum, updatevon, vertrag_id) VALUES('.
+				 punkte, stunden, stundensatz, insertamum, insertvon, updateamum, updatevon, vertrag_id) VALUES('.
 			     $this->db_add_param($this->person_id).', '.
 			     $this->db_add_param($this->projektarbeit_id).', '.
 			     $this->db_add_param($this->note).', '.
@@ -212,23 +212,22 @@ class projektbetreuer extends basis_db
 			     $this->db_add_param($this->name).', '.
 			     $this->db_add_param($this->punkte).', '.
 			     $this->db_add_param($this->stunden).', '.
-			     $this->db_add_param($this->stundensatz).', '.
-			     $this->db_add_param($this->ext_id).',  now(), '.
+			     $this->db_add_param($this->stundensatz).', now(), '.
 			     $this->db_add_param($this->insertvon).', now(), '.
 			     $this->db_add_param($this->updatevon).', '.
-				 $this->db_add_param($this->vertrag_id).');';			
+				 $this->db_add_param($this->vertrag_id).');';
 		}
 		else
 		{
 			//Updaten des bestehenden Datensatzes
 			if($this->person_id_old=='')
 				$this->person_id_old = $this->person_id;
-			
+
 			if(!isset($this->betreuerart_kurzbz_old) || $this->betreuerart_kurzbz_old=='')
 				$this->betreuerart_kurzbz_old = $this->betreuerart_kurzbz;
-			
+
 			$qry='UPDATE lehre.tbl_projektbetreuer SET '.
-				'person_id='.$this->db_add_param($this->person_id).', '. 
+				'person_id='.$this->db_add_param($this->person_id).', '.
 				'note='.$this->db_add_param($this->note).', '.
 				'betreuerart_kurzbz='.$this->db_add_param($this->betreuerart_kurzbz).', '.
 				'faktor='.$this->db_add_param($this->faktor).', '.
@@ -243,18 +242,18 @@ class projektbetreuer extends basis_db
 				" AND person_id=".$this->db_add_param($this->person_id_old, FHC_INTEGER,false).
 				" AND betreuerart_kurzbz=".$this->db_add_param($this->betreuerart_kurzbz_old).";";
 		}
-		
+
 		if($this->db_query($qry))
-		{			
-			return true;		
+		{
+			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Speichern der Daten';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Loescht den Datenensatz mit der ID die uebergeben wird
 	 * @param $person_id ID die geloescht werden soll
@@ -268,26 +267,26 @@ class projektbetreuer extends basis_db
 			$this->errormsg = 'Person_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		if(!is_numeric($projektarbeit_id))
 		{
 			$this->errormsg = 'Projektarbeit_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "DELETE FROM lehre.tbl_projektbetreuer WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)." AND projektarbeit_id=".$this->db_add_param($projektarbeit_id, FHC_INTEGER)." AND betreuerart_kurzbz=".$this->db_add_param($betreuerart_kurzbz).";";
-		
+
 		if($this->db_query($qry))
 		{
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen des Datensatzes';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert alle Betreuer zu einer Projektarbeit
 	 * @param projektarbeit_id
@@ -299,15 +298,15 @@ class projektbetreuer extends basis_db
 			$this->errormsg = 'Projektarbeit_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id=".$this->db_add_param($projektarbeit_id, FHC_INTEGER)." ORDER BY name";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new projektbetreuer();
-				
+
 				$obj->person_id = $row->person_id;
 				$obj->projektarbeit_id = $row->projektarbeit_id;
 				$obj->note = $row->note;
@@ -328,7 +327,7 @@ class projektbetreuer extends basis_db
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler bei einer Abfrage';
 			return false;

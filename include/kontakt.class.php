@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
- * Klasse kontakt 
+ * Klasse kontakt
  * @create 20-12-2006
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
@@ -29,13 +29,13 @@ class kontakt extends basis_db
 {
 	public $new;       // boolean
 	public $result = array(); // adresse Objekt
-	
+
 	//Tabellenspalten
 	public $kontakt_id;	// integer
 	public $person_id;	// integer
 	public $firma_id;		// integer
 	public $standort_id;	// integer
-	
+
 	public $kontakttyp;	// string
 	public $anmerkung;	// string
 	public $kontakt;		// string
@@ -45,7 +45,7 @@ class kontakt extends basis_db
 	public $insertvon;	// bigint
 	public $updateamum;	// timestamp
 	public $updatevon;	// bigint
-	
+
 	public $beschreibung;
 	public $firma_name;
 
@@ -56,7 +56,7 @@ class kontakt extends basis_db
 	public $nachname;
 	public $vorname;
 	public $vornamen;
-	
+
 	/**
 	 * Konstruktor
 	 * @param $kontakt_id ID der Adresse die geladen werden soll (Default=null)
@@ -64,11 +64,11 @@ class kontakt extends basis_db
 	public function __construct($kontakt_id=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($kontakt_id))
 			$this->load($kontakt_id);
 	}
-	
+
 	/**
 	 * Laedt einen Kontakt mit der ID $kontakt_id
 	 * @param  $kontakt_id ID des zu ladenden Kontaktes
@@ -81,21 +81,21 @@ class kontakt extends basis_db
 			$this->errormsg = 'Kontakt_id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name, tbl_firma.firma_id
-				FROM 
+				FROM
 					public.tbl_kontakt
-					LEFT JOIN public.tbl_standort USING(standort_id) 
-					LEFT JOIN public.tbl_firma USING(firma_id) 
+					LEFT JOIN public.tbl_standort USING(standort_id)
+					LEFT JOIN public.tbl_firma USING(firma_id)
 				WHERE kontakt_id=".$this->db_add_param($kontakt_id, FHC_INTEGER).";";
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
 				$this->kontakt_id = $row->kontakt_id;
 				$this->person_id = $row->person_id;
-				$this->standort_id = $row->standort_id;				
+				$this->standort_id = $row->standort_id;
 				$this->firma_id = $row->firma_id;
 				$this->firma_name = $row->firma_name;
 				$this->kontakttyp = $row->kontakttyp;
@@ -109,26 +109,26 @@ class kontakt extends basis_db
 				$this->ext_id = $row->ext_id;
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Datensatz wurde nicht gefunden';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
-			
+
 	/**
 	 * Prueft die Variablen auf Gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function validate()
-	{		
-				
+	{
+
 		//Gesamtlaenge pruefen
 		//$this->errormsg='Eine der Gesamtlaengen wurde ueberschritten';
 		if(mb_strlen($this->kontakttyp)>32)
@@ -152,11 +152,11 @@ class kontakt extends basis_db
 			return false;
 		}
 		$this->errormsg = '';
-		return true;		
+		return true;
 	}
-	
+
 	/**
-	 * Speichert den aktuellen Datensatz in die Datenbank	 
+	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	 * andernfalls wird der Datensatz mit der ID in $kontakt_id aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
@@ -166,25 +166,24 @@ class kontakt extends basis_db
 		//Variablen pruefen
 		if(!$this->validate())
 			return false;
-			
+
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO public.tbl_kontakt (person_id, standort_id, kontakttyp, anmerkung, kontakt, zustellung, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			$qry='BEGIN;INSERT INTO public.tbl_kontakt (person_id, standort_id, kontakttyp, anmerkung, kontakt, zustellung, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			     $this->db_add_param($this->person_id, FHC_INTEGER).', '.
 			     $this->db_add_param($this->standort_id, FHC_INTEGER).', '.
 			     $this->db_add_param($this->kontakttyp).', '.
 			     $this->db_add_param($this->anmerkung).', '.
 			     $this->db_add_param($this->kontakt).', '.
-			     $this->db_add_param($this->zustellung, FHC_BOOLEAN).', '. 
-			     $this->db_add_param($this->ext_id, FHC_INTEGER).',  now(), '.
+			     $this->db_add_param($this->zustellung, FHC_BOOLEAN).', now(), '.
 			     $this->db_add_param($this->insertvon).', now(), '.
-			     $this->db_Add_param($this->updatevon).');';	
+			     $this->db_Add_param($this->updatevon).');';
 		}
 		else
 		{
 			//Updaten des bestehenden Datensatzes
-			
+
 			//Pruefen ob kontakt_id eine gueltige Zahl ist
 			if(!is_numeric($this->kontakt_id))
 			{
@@ -192,25 +191,24 @@ class kontakt extends basis_db
 				return false;
 			}
 			$qry='UPDATE public.tbl_kontakt SET '.
-				'person_id='.$this->db_add_param($this->person_id,FHC_INTEGER).', '. 
-				'standort_id='.$this->db_add_param($this->standort_id, FHC_INTEGER).', '. 				
-				'kontakttyp='.$this->db_add_param($this->kontakttyp).', '. 
-				'anmerkung='.$this->db_add_param($this->anmerkung).', '.  
-				'kontakt='.$this->db_add_param($this->kontakt).', '. 
+				'person_id='.$this->db_add_param($this->person_id,FHC_INTEGER).', '.
+				'standort_id='.$this->db_add_param($this->standort_id, FHC_INTEGER).', '.
+				'kontakttyp='.$this->db_add_param($this->kontakttyp).', '.
+				'anmerkung='.$this->db_add_param($this->anmerkung).', '.
+				'kontakt='.$this->db_add_param($this->kontakt).', '.
 				'zustellung='.$this->db_add_param($this->zustellung, FHC_BOOLEAN).', '.
-				'ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).', '. 
 			    'updateamum= now(), '.
 			    'updatevon='.$this->db_add_param($this->updatevon).' '.
 				'WHERE kontakt_id='.$this->db_add_param($this->kontakt_id, FHC_INTEGER).';';
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			//Sequence auslesen um die eingefuegte ID zu ermitteln
 			if($this->new)
 			{
 				$qry = "SELECT currval('public.tbl_kontakt_kontakt_id_seq') as id;";
-				
+
 				if($this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object())
@@ -219,29 +217,29 @@ class kontakt extends basis_db
 						$this->db_query('COMMIT;');
 						return true;
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen er Sequence';
 						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					$this->db_query('ROLLBACK;');
 					return false;
 				}
-			}				
-			return true;		
+			}
+			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Speichern der Daten';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Loescht den Datenensatz mit der ID die uebergeben wird
 	 * @param $kontakt_id ID die geloescht werden soll
@@ -254,18 +252,18 @@ class kontakt extends basis_db
 			$this->errormsg = 'Kontakt_id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "DELETE FROM public.tbl_kontakt WHERE kontakt_id=".$this->db_add_param($kontakt_id, FHC_INTEGER).";";
-		
+
 		if($this->db_query($qry))
 			return true;
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
-		}	
+		}
 	}
-	
+
     /**
 	 * Laedt Kontaktdaten eines bestimmten typs der Person
 	 * @param person_id
@@ -279,20 +277,20 @@ class kontakt extends basis_db
 			$this->errormsg = 'Person_id ist ungueltig';
 			return false;
 		}
-		
-		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name, tbl_firma.firma_id 
-				FROM public.tbl_kontakt LEFT JOIN public.tbl_standort USING(standort_id) LEFT JOIN public.tbl_firma USING(firma_id) WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)." 
+
+		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name, tbl_firma.firma_id
+				FROM public.tbl_kontakt LEFT JOIN public.tbl_standort USING(standort_id) LEFT JOIN public.tbl_firma USING(firma_id) WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
                 AND kontakttyp =".$this->db_add_param($kontakttyp, FHC_STRING);
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new kontakt();
-				
+
 				$obj->kontakt_id = $row->kontakt_id;
 				$obj->person_id = $row->person_id;
-				$obj->standort_id = $row->standort_id;		
+				$obj->standort_id = $row->standort_id;
 				$obj->firma_id = $row->firma_id;
 				$obj->firma_name = $row->firma_name;
 				$obj->kontakttyp = $row->kontakttyp;
@@ -304,21 +302,21 @@ class kontakt extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
-				
+
 				$this->result[] = $obj;
 			}
-			
+
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
-    
-    
-    
+
+
+
 	/**
 	 * Laedt alle Kontaktdaten einer Person
 	 * @param person_id
@@ -331,19 +329,19 @@ class kontakt extends basis_db
 			$this->errormsg = 'Person_id ist ungueltig';
 			return false;
 		}
-		
-		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name, tbl_firma.firma_id 
+
+		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name, tbl_firma.firma_id
 				FROM public.tbl_kontakt LEFT JOIN public.tbl_standort USING(standort_id) LEFT JOIN public.tbl_firma USING(firma_id) WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER).';';
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new kontakt();
-				
+
 				$obj->kontakt_id = $row->kontakt_id;
 				$obj->person_id = $row->person_id;
-				$obj->standort_id = $row->standort_id;		
+				$obj->standort_id = $row->standort_id;
 				$obj->firma_id = $row->firma_id;
 				$obj->firma_name = $row->firma_name;
 				$obj->kontakttyp = $row->kontakttyp;
@@ -355,19 +353,19 @@ class kontakt extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
-				
+
 				$this->result[] = $obj;
 			}
-			
+
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
-    
+
 	/**
 	 * Laedt alle Kontaktdaten zu einem Standort
 	 * @param standort_id
@@ -397,11 +395,11 @@ class kontakt extends basis_db
 		{
 			$this->errormsg = 'Person ist ungueltig';
 			return false;
-		}		
+		}
 		$qry = "SELECT tbl_kontakt.*
-				,tbl_standort.firma_id, tbl_standort.kurzbz as standort_kurzbz, tbl_standort.bezeichnung as standort_bezeichnung  
-				FROM public.tbl_kontakt,public.tbl_standort 
-				WHERE tbl_standort.standort_id=tbl_kontakt.standort_id  
+				,tbl_standort.firma_id, tbl_standort.kurzbz as standort_kurzbz, tbl_standort.bezeichnung as standort_bezeichnung
+				FROM public.tbl_kontakt,public.tbl_standort
+				WHERE tbl_standort.standort_id=tbl_kontakt.standort_id
 			";
 
 			if(is_numeric($firma_id))
@@ -412,21 +410,21 @@ class kontakt extends basis_db
 				$qry.=" and tbl_kontakt.kontakt_id=".$this->db_add_param($kontakt_id, FHC_INTEGER);
 			if(is_numeric($person_id))
 				$qry.=" and tbl_kontakt.person_id=".$this->db_add_param($person_id, FHC_INTEGER);
-            
+
             $qry.=';';
-##echo $qry;				
+##echo $qry;
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new kontakt();
-				
+
 				$obj->kontakt_id = $row->kontakt_id;
 				$obj->person_id = $row->person_id;
-				$obj->standort_id = $row->standort_id;		
+				$obj->standort_id = $row->standort_id;
 				$obj->firma_id = $row->firma_id;
 				$obj->standort_kurzbz  = $row->standort_kurzbz;
-				$obj->standort_bezeichnung  = $row->standort_bezeichnung;				
+				$obj->standort_bezeichnung  = $row->standort_bezeichnung;
 				$obj->kontakttyp = $row->kontakttyp;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->kontakt = $row->kontakt;
@@ -440,18 +438,18 @@ class kontakt extends basis_db
 				$this->result[] = $obj;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 		return $this->result;
 	}
-	
+
 	/**
 	 * Laedt einen Kontakt eines Standortes
 	 * Es wird nur der erste Eintrag zurueckgeliefert!
-	 * 
+	 *
 	 * @param $standort_id
 	 * @param $kontakttyp
 	 */
@@ -462,9 +460,9 @@ class kontakt extends basis_db
 			$this->errormsg='StandortID ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM public.tbl_kontakt WHERE standort_id=".$this->db_add_param($standort_id, FHC_INTEGER)." AND kontakttyp=".$this->db_add_param($kontakttyp)." ORDER BY kontakt_id LIMIT 1;";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object($result))
@@ -482,7 +480,7 @@ class kontakt extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt alle Kontakttypen
 	 * @return true wenn ok
@@ -491,21 +489,21 @@ class kontakt extends basis_db
 	public function getKontakttyp()
 	{
 		$qry = "SELECT * FROM public.tbl_kontakttyp ORDER BY beschreibung;";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new kontakt();
-				
+
 				$obj->kontakttyp = $row->kontakttyp;
 				$obj->beschreibung = $row->beschreibung;
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;

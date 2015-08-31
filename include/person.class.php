@@ -130,7 +130,7 @@ class person extends basis_db
 				$this->kurzbeschreibung = $row->kurzbeschreibung;
 				$this->zugangscode = $row->zugangscode;
 				$this->foto_sperre = $this->db_parse_bool($row->foto_sperre);
-				$this->matr_nr = $row->matr_nr; 
+				$this->matr_nr = $row->matr_nr;
 			}
 			else
 			{
@@ -146,24 +146,24 @@ class person extends basis_db
 			return false;
 		}
 	}
-        
+
 	/**
-	 * 
+	 *
 	 * Löscht den Datensatz mit der übergebenen person_id
 	 * @param $person_id
 	 */
 	public function delete($person_id)
 	{
-		$qry = "DELETE from public.tbl_person where person_id = ".$this->db_add_param($person_id, FHC_INTEGER).";"; 
-		
+		$qry = "DELETE from public.tbl_person where person_id = ".$this->db_add_param($person_id, FHC_INTEGER).";";
+
 		if($this->db_query($qry))
 		{
-			return true; 
+			return true;
 		}
 		else
 		{
-			$this->errormsg = "Es ist ein Fehler beim Löschen der Person aufgetreten"; 
-			return false; 
+			$this->errormsg = "Es ist ein Fehler beim Löschen der Person aufgetreten";
+			return false;
 		}
 	}
 
@@ -180,7 +180,7 @@ class person extends basis_db
 		$this->anrede = trim($this->anrede);
 		$this->titelpost = trim($this->titelpost);
 		$this->titelpre = trim($this->titelpre);
-		
+
 		if(mb_strlen($this->sprache)>16)
 		{
 			$this->errormsg = 'Sprache darf nicht laenger als 16 Zeichen sein';
@@ -244,13 +244,13 @@ class person extends basis_db
 			$this->errormsg = 'SVNR darf nicht laenger als 10 Zeichen sein';
 			return false;
 		}
-		
+
 		if(mb_strlen($this->matr_nr)>32)
 		{
 			$this->errormsg = 'Matrikelnummer darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
-		
+
 		if($this->svnr!='')
 		{
 			if(mb_strlen($this->svnr)!=10)
@@ -347,7 +347,7 @@ class person extends basis_db
 			$this->errormsg = 'Geschlecht muss w, m oder u sein!';
 			return false;
 		}
-		
+
 		//Pruefen ob das Geburtsdatum mit der SVNR uebereinstimmt.
 		if($this->svnr!='' && $this->gebdatum!='')
 		{
@@ -363,17 +363,17 @@ class person extends basis_db
 				//$month = sprintf('%02s',$regs[2]);
 				//$year = mb_substr($regs[1],2,2);
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Format des Geburtsdatums ist ungueltig';
 				return false;
 			}
-			
+
 			/* das muss nicht immer so sein
 			$day_svnr = mb_substr($this->svnr, 4, 2);
 			$month_svnr = mb_substr($this->svnr, 6, 2);
 			$year_svnr = mb_substr($this->svnr, 8, 2);
-		
+
 			if($day_svnr!=$day || $month_svnr!=$month || $year_svnr!=$year)
 			{
 				$this->errormsg = 'SVNR und Geburtsdatum passen nicht zusammen';
@@ -402,7 +402,7 @@ class person extends basis_db
 			$qry = 'INSERT INTO public.tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
 			                    gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 			                    familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon,
-			                    geschlecht, geburtsnation, staatsbuergerschaft, ext_id, kurzbeschreibung, zugangscode, foto_sperre, matr_nr)
+			                    geschlecht, geburtsnation, staatsbuergerschaft, kurzbeschreibung, zugangscode, foto_sperre, matr_nr)
 			        VALUES('.$this->db_add_param($this->sprache).','.
 						$this->db_add_param($this->anrede).','.
 						$this->db_add_param($this->titelpost).','.
@@ -428,7 +428,6 @@ class person extends basis_db
 				        $this->db_add_param($this->geschlecht).','.
 				        $this->db_add_param($this->geburtsnation).','.
 				        $this->db_add_param($this->staatsbuergerschaft).','.
-				        $this->db_add_param($this->ext_id).','.
 				        $this->db_add_param($this->kurzbeschreibung).','.
 				        $this->db_add_param($this->zugangscode).','.
 				        $this->db_add_param($this->foto_sperre, FHC_BOOLEAN).','.
@@ -467,7 +466,6 @@ class person extends basis_db
 			       ' geschlecht='.$this->db_add_param($this->geschlecht).','.
 			       ' geburtsnation='.$this->db_add_param($this->geburtsnation).','.
 			       ' staatsbuergerschaft='.$this->db_add_param($this->staatsbuergerschaft).','.
-			       //' ext_id='.$this->db_add_param($this->ext_id).','.
 			       ' kurzbeschreibung='.$this->db_add_param($this->kurzbeschreibung).','.
 				   ' foto_sperre='.$this->db_add_param($this->foto_sperre, FHC_BOOLEAN).','.
 				   ' zugangscode='.$this->db_add_param($this->zugangscode).','.
@@ -490,7 +488,7 @@ class person extends basis_db
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = "Fehler beim Auslesen der Sequence";
 					return false;
@@ -505,7 +503,7 @@ class person extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert die Tabellenelemente die den Kriterien der Parameter entsprechen
 	 * @param $filter String mit Vorname oder Nachname
@@ -515,16 +513,16 @@ class person extends basis_db
 	public function getTab($filter, $order='person_id')
 	{
 		$sql_query = "
-			SELECT 
-				distinct on (person_id) * 
-			FROM 
+			SELECT
+				distinct on (person_id) *
+			FROM
 				public.tbl_person
-				LEFT JOIN public.tbl_benutzer USING(person_id) 
+				LEFT JOIN public.tbl_benutzer USING(person_id)
 			WHERE true ";
-		
+
 		if($filter!='')
 		{
-			$sql_query.=" AND 	nachname ~* '".$this->db_escape($filter)."' OR 
+			$sql_query.=" AND 	nachname ~* '".$this->db_escape($filter)."' OR
 								vorname ~* '".$this->db_escape($filter)."' OR
 								(nachname || ' ' || vorname) ~* '".$this->db_escape($filter)."' OR
 								(vorname || ' ' || nachname) ~* '".$this->db_escape($filter)."' OR
@@ -534,7 +532,7 @@ class person extends basis_db
 		$sql_query .= " ORDER BY $order";
 		if($filter=='')
 		   $sql_query .= " LIMIT 30";
-		
+
 		if($this->db_query($sql_query))
 		{
 			while($row = $this->db_fetch_object())
@@ -569,7 +567,7 @@ class person extends basis_db
 				$l->ext_id = $row->ext_id;
 				$l->kurzbeschreibung = $row->kurzbeschreibung;
 				$l->foto_sperre = $this->db_parse_bool($row->foto_sperre);
-				$l->matr_nr = $row->matr_nr; 
+				$l->matr_nr = $row->matr_nr;
 				$this->personen[]=$l;
 			}
 		}
@@ -580,31 +578,31 @@ class person extends basis_db
 		}
 		return true;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Laedt alle standorte zu einer Person die dem Standort zugeordnet sind
 	 * @param $standort_id ID des Standortes
 	 * @param $person_id ID der Person die Zugeordnet ist
-	 * @param $firma_id ID der Firma zu der die standortn geladen werden sollen	 
+	 * @param $firma_id ID der Firma zu der die standortn geladen werden sollen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function load_personfunktion($standort_id='',$person_id='',$firma_id='',$funktion_kurzbz='',$personfunktionstandort_id='')
 	{
 		$this->result=array();
 		$this->errormsg = '';
-			
+
 		//Lesen der Daten aus der Datenbank
 		$qry=" SELECT tbl_person.*
 				,tbl_personfunktionstandort.personfunktionstandort_id,tbl_personfunktionstandort.person_id ,tbl_personfunktionstandort.funktion_kurzbz ,tbl_personfunktionstandort.standort_id
-				,tbl_personfunktionstandort.position,tbl_personfunktionstandort.anrede 
+				,tbl_personfunktionstandort.position,tbl_personfunktionstandort.anrede
 				,tbl_standort.adresse_id,tbl_standort.kurzbz,tbl_standort.bezeichnung,tbl_standort.firma_id
 				,tbl_funktion.beschreibung as funktion_beschreibung , tbl_funktion.aktiv as funktion_aktiv,tbl_funktion.fachbereich as funktion_fachbereich,tbl_funktion.semester as funktion_semester
 			";
 		$qry.=" FROM public.tbl_person,public.tbl_personfunktionstandort
-				LEFT JOIN public.tbl_standort USING(standort_id) 
-				LEFT JOIN public.tbl_funktion USING(funktion_kurzbz) 
+				LEFT JOIN public.tbl_standort USING(standort_id)
+				LEFT JOIN public.tbl_funktion USING(funktion_kurzbz)
 			";
 		$qry.=" WHERE tbl_person.person_id=tbl_personfunktionstandort.person_id";
 
@@ -618,9 +616,9 @@ class person extends basis_db
 			$qry.=" and public.tbl_standort.firma_id=".$this->db_add_param($firma_id, FHC_INTEGER);
 		if($funktion_kurzbz!='')
 			$qry.=" and tbl_personfunktionstandort.funktion_kurzbz=".$this->db_add_param($funktion_kurzbz);
-			
-			
-			
+
+
+
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
@@ -659,43 +657,43 @@ class person extends basis_db
 			$adr_obj->ext_id = $row->ext_id;
 			$adr_obj->kurzbeschreibung = $row->kurzbeschreibung;
 			$adr_obj->foto_sperre = $this->db_parse_bool($row->foto_sperre);
-				
+
 			$adr_obj->standort_id		= $row->standort_id;
 			$adr_obj->adresse_id		= $row->adresse_id;
 			$adr_obj->kurzbz			= $row->kurzbz;
 			$adr_obj->bezeichnung		= $row->bezeichnung;
 			$adr_obj->firma_id			= $row->firma_id;
-			
+
 			$adr_obj->personfunktionstandort_id	= $row->personfunktionstandort_id;
 
 			$adr_obj->funktion_kurzbz	= $row->funktion_kurzbz;
-			
+
 			$adr_obj->position	= $row->position;
 			$adr_obj->anrede	= $row->anrede;
-			
+
 			$adr_obj->funktion_beschreibung	= $row->funktion_beschreibung;
 			$adr_obj->funktion_aktiv	= $this->db_parse_bool($row->funktion_aktiv);
 			$adr_obj->funktion_fachbereich	= $row->funktion_fachbereich;
-			$adr_obj->funktion_semester	= $row->funktion_semester;			
+			$adr_obj->funktion_semester	= $row->funktion_semester;
 
 			$this->result[] = $adr_obj;
 		}
 		return true;
 	}
-	
+
     /**
      *
-     * Überprüfut ob der übergebene Zugangscode einer Person zugeordnet ist und 
+     * Überprüfut ob der übergebene Zugangscode einer Person zugeordnet ist und
      * retuniert im Erfolgsfall dessen person_id
      * @param type $zugangscode
-     * @return boolean 
+     * @return boolean
      */
     public function checkZugangscode($zugangscode)
     {
-        $qry = "SELECT person_id 
+        $qry = "SELECT person_id
                 FROM public.tbl_person
-                WHERE zugangscode=".$this->db_add_param($zugangscode, FHC_STRING); 
-        
+                WHERE zugangscode=".$this->db_add_param($zugangscode, FHC_STRING);
+
         if($this->db_query($qry))
         {
             if($row = $this->db_fetch_object())
@@ -703,39 +701,39 @@ class person extends basis_db
                 return $row->person_id;
             }
             else
-                return false; 
+                return false;
         }
         else
         {
             $this->errormsg = "Fehler bei der Abfrage aufgetreten";
-            return false; 
+            return false;
         }
     }
-    
+
 	/**
-	 * 
+	 *
 	 * Überprüft den übergebenen Zugangscode und retuniert die aktuelle incoming_id
 	 * @param $zugangscode
 	 */
 	public function checkZugangscodeIncoming($zugangscode)
 	{
 		$qry ="
-			SELECT 
-				preincoming_id 
-			FROM 
-				public.tbl_preincoming 
-			WHERE 
-				person_id = (SELECT person_id FROM public.tbl_person WHERE zugangscode=".$this->db_add_param($zugangscode).") 
+			SELECT
+				preincoming_id
+			FROM
+				public.tbl_preincoming
+			WHERE
+				person_id = (SELECT person_id FROM public.tbl_person WHERE zugangscode=".$this->db_add_param($zugangscode).")
 			ORDER BY insertamum DESC;";
 
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
-				return $row->preincoming_id; 
+				return $row->preincoming_id;
 			}
 			else
-				return false; 
+				return false;
 		}
 		else
 		{
@@ -743,30 +741,30 @@ class person extends basis_db
 			return false;
 		}
 	}
-    
+
     	/**
-	 * 
+	 *
 	 * Überprüft den übergebenen Zugangscode und retuniert die aktuelle incoming_id
 	 * @param $zugangscode
 	 */
 	public function checkZugangscodePerson($zugangscode)
 	{
 		$qry ="
-			SELECT 
-				person_id 
-			FROM 
-				public.tbl_person 
-			WHERE 
+			SELECT
+				person_id
+			FROM
+				public.tbl_person
+			WHERE
 				zugangscode=".$this->db_add_param($zugangscode).';';
 
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
-				return $row->person_id; 
+				return $row->person_id;
 			}
 			else
-				return false; 
+				return false;
 		}
 		else
 		{
@@ -776,7 +774,7 @@ class person extends basis_db
 	}
 
 	/**
-	 * 
+	 *
 	 * Lädt eine Person zum übergebenen Zugangscode
 	 * @param $zugangscode
 	 */
@@ -818,20 +816,20 @@ class person extends basis_db
 				$this->kurzbeschreibung = $row->kurzbeschreibung;
 				$this->zugangscode = $row->zugangscode;
 				$this->foto_sperre = $this->db_parse_bool($row->foto_sperre);
-				$this->matr_nr = $row->matr_nr; 
+				$this->matr_nr = $row->matr_nr;
 			}
 			else
 			{
-				$this->errormsg = 'Keine Person zu Zugangscode gefunden'; 
-				return false; 
+				$this->errormsg = 'Keine Person zu Zugangscode gefunden';
+				return false;
 			}
 		}
 		else
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage.';
-			return false; 
+			return false;
 		}
-		return true; 
+		return true;
 	}
 
 	/**
@@ -840,56 +838,56 @@ class person extends basis_db
 	 * @param $svnr
 	 * @param $person_id
 	 * @return true wenn bereits vorhanden sonst false
-	 */	
+	 */
 	public function checkSvnr($svnr, $person_id=null)
 	{
 		$qry = "Select 1 from public.tbl_person where svnr =".$this->db_add_param($svnr);
 		if(!is_null($person_id))
 			$qry.=" AND person_id!=".$this->db_add_param($person_id);
 
-		
+
 		if($result = $this->db_query($qry))
 		{
 			if($this->db_num_rows($result)>0)
-				return true; 
+				return true;
 			else
-				return false; 
+				return false;
 		}
 	}
-	
+
 	public function getFullName($allFirstnames=FALSE)
 	{
 	    $fullname = "";
 	    if((!is_null($this->titelpre)) && ($this->titelpre!=""))
 		$fullname .= $this->titelpre." ";
-	    
+
 	    $fullname .= $this->vorname." ";
-	    
+
 	    if(($allFirstnames) && ($this->vornamen != "") && (!is_null($this->vornamen)))
 		$fullname .= $this->vornamen." ";
-	    
+
 	    $fullname .= $this->nachname;
-	    
+
 	    if((!is_null($this->titelpost)) && ($this->titelpost!=""))
 		$fullname .= " ".$this->titelpost;
-	    
+
 	    return $fullname;
 	}
-	
+
 	/**
 	 * Laedt Personendaten eines Benutzers
 	 * @param $uid
 	 */
 	function getPersonFromBenutzer($uid)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					*
-				FROM 
+				FROM
 					public.tbl_person
 					JOIN public.tbl_benutzer USING(person_id)
 				WHERE
 					uid=".$this->db_add_param($uid, FHC_STRING);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -924,7 +922,7 @@ class person extends basis_db
 				$this->kurzbeschreibung = $row->kurzbeschreibung;
 				$this->zugangscode = $row->zugangscode;
 				$this->foto_sperre = $this->db_parse_bool($row->foto_sperre);
-				$this->matr_nr = $row->matr_nr; 
+				$this->matr_nr = $row->matr_nr;
 				$this->uid = $row->uid;
 				$this->aktiv = $this->db_parse_bool($row->aktiv);;
 				$this->alias = $row->alias;
@@ -934,11 +932,11 @@ class person extends basis_db
 			}
 			else
 			{
-				$this->errormsg = 'Keine Personendaten zu dieser UID gefunden'; 
-				return false; 
+				$this->errormsg = 'Keine Personendaten zu dieser UID gefunden';
+				return false;
 			}
 		}
 	}
-	
+
 }
 ?>
