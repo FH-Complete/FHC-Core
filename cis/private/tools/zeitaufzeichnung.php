@@ -803,6 +803,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<tr><td colspan="4"><hr></td></tr>';		
 			echo '<tr><td>CSV-Import</td><td colspan="2"><input type="file" name="csv" value="" /></td><td align="right"><input type="submit" value="Import" name="import"></td></tr>';		
 		}	
+		else 
+			echo '<input type="file" name="csv" value="" style="visibility:hidden">';
 		echo '</table>';
 		echo '</td><td valign="top"><span id="zeitsaldo"></span></td></tr>
 			</table>';
