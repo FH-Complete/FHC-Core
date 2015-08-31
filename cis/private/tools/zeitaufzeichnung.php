@@ -122,7 +122,6 @@ $( document ).ready(function()
 		for(i in addon)
 		{
 			addon[i].init("cis/private/tools/zeitaufzeichnung.php", {uid:\''.$user.'\'});
-			//addon[i].init("cis/private/tools/zeitaufzeichnung.php", {uid:\'foo\'});
 		}
 	}
 });
@@ -581,6 +580,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 				<tr>
 		      		<td>
 		      			<a href='".$_SERVER['PHP_SELF']."' style='font-size: larger;'>".$p->t("zeitaufzeichnung/neu")."</a>
+		      			&nbsp;
+		      			<a href='".$_SERVER['PHP_SELF']."?csvimport=1' style='font-size: larger;'>CSV Import</a>
 		      		</td>
 		      		<td class='menubox' height='10px'>";
 		if ($p->t("dms_link/handbuchZeitaufzeichnung")!='')
@@ -797,8 +798,11 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<input type="submit" value="'.$p->t("global/aendern").'" name="edit">&nbsp;&nbsp;';
 			echo '<input type="submit" value="'.$p->t("zeitaufzeichnung/alsNeuenEintragSpeichern").'" name="save"></td></tr>';
 		}
-		echo '<tr><td colspan="4"><hr></td></tr>';		
-		echo '<tr><td>CSV-Import</td><td colspan="2"><input type="file" name="csv" value="" /></td><td align="right"><input type="submit" value="Import" name="import"></td></tr>';				
+		if (isset($_GET['csvimport']))
+		{		
+			echo '<tr><td colspan="4"><hr></td></tr>';		
+			echo '<tr><td>CSV-Import</td><td colspan="2"><input type="file" name="csv" value="" /></td><td align="right"><input type="submit" value="Import" name="import"></td></tr>';		
+		}	
 		echo '</table>';
 		echo '</td><td valign="top"><span id="zeitsaldo"></span></td></tr>
 			</table>';
