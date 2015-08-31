@@ -48,15 +48,15 @@ if (!$db = new basis_db())
 $user = get_uid();
 $datum = new datum();
 
-if ($user == 'foo')
+if (check_infrastruktur($user))
 {
-	$za_simple = 1;
-	$activities = array('Arbeit', 'Pause', 'Arztbesuch', 'Dienstreise', 'Behoerde');
+	$za_simple = 0;
+	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'LehreIntern', 'LehreExtern', 'Arztbesuch', 'Dienstreise', 'Behoerde');
 }	
 else 
 {
-	$za_simple = 0;
-	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'Arztbesuch', 'Dienstreise', 'Behoerde');
+	$za_simple = 1;
+	$activities = array('Arbeit', 'Pause', 'LehreIntern', 'LehreExtern', 'Arztbesuch', 'Dienstreise', 'Behoerde');
 }
 
 $activities_str = "'".implode("','", $activities)."'";
@@ -122,6 +122,7 @@ $( document ).ready(function()
 		for(i in addon)
 		{
 			addon[i].init("cis/private/tools/zeitaufzeichnung.php", {uid:\''.$user.'\'});
+			//addon[i].init("cis/private/tools/zeitaufzeichnung.php", {uid:\'foo\'});
 		}
 	}
 });
@@ -365,13 +366,96 @@ if($kartennummer != '')
     $kunde_uid = $betriebsmittel->uid; 
 }
 //Speichern der Daten
-if(isset($_POST['save']) || isset($_POST['edit']))
+if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 {
 	$zeit = new zeitaufzeichnung();
 	
-	if ($datum->formatDatum($von, $format='Y-m-d H:i:s') < $sperrdatum)
+	if ($_FILES['csv']['error'] == 0 && isset($_POST['import']))
+	{
+		$name = $_FILES['csv']['name'];		
+    	$tmpName = $_FILES['csv']['tmp_name'];
+    	$mimeType = mime_content_type($_FILES['csv']['tmp_name']);
+		//echo($mimeType);
+		if($mimeType=='text/plain')
+		{
+			if(($handle = fopen($tmpName, 'r')) !== FALSE)
+			{
+				if 	(mb_detect_encoding(fgets($handle), 'UTF-8', true))
+				{			
+				set_time_limit(0);
+				$anzahl = 0;
+				$importtage_array = array();
+				$ende_vorher = date('Y-m-d H:i:s');
+				while(($data = fgetcsv($handle, 1000, ';', '"')) !== FALSE) 
+				{
+					if($data[0] == $user)
+					{
+						if ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') < $sperrdatum)
+							echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum ('.$data[2].')</b></span><br>';
+						else
+						{	
+							$zeit->new = true;
+							$zeit->insertamum = date('Y-m-d H:i:s');
+							$zeit->updateamum = date('Y-m-d H:i:s');
+							$zeit->updatevon = $user;
+							$zeit->insertvon = $user;			
+							$zeit->uid = $data[0];
+							$zeit->aktivitaet_kurzbz = $data[1];
+							$zeit->start = $datum->formatDatum($data[2], $format='Y-m-d H:i:s');
+							$zeit->ende = $datum->formatDatum($data[3], $format='Y-m-d H:i:s');
+							$zeit->beschreibung = $data[4];
+							$tag = $datum->formatDatum($data[2], $format='Y-m-d');
+							
+							
+							if(!in_array($tag, $importtage_array))
+							{
+								$importtage_array[] = $tag;
+								$zeit->deleteEntriesForUser($user, $tag);
+								$tag_aktuell = $tag;
+							}							
+							else 
+							{
+								if ($ende_vorher < $zeit->start)
+								{
+									$pause = new zeitaufzeichnung();
+									$pause->new = true;
+									$pause->insertamum = date('Y-m-d H:i:s');
+									$pause->updateamum = date('Y-m-d H:i:s');
+									$pause->updatevon = $user;
+									$pause->insertvon = $user;			
+									$pause->uid = $user;
+									$pause->aktivitaet_kurzbz = 'Pause';
+									$pause->start = $ende_vorher;
+									$pause->ende = $zeit->start;
+									$zeit->beschreibung = '';
+									if(!$pause->save())
+									{
+										echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$pause->errormsg.'</b></span>';	
+									}
+								}
+							}
+							
+							if(!$zeit->save())
+							{
+								echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$zeit->errormsg.'</b>('.$zeit->start.')</span>';
+							}
+							else 
+								$anzahl++;
+							$ende_vorher = $zeit->ende;
+						}
+					}
+				}
+				if($anzahl>0)
+					echo '<span style="color:green"><b>'.$p->t("global/datenWurdenGespeichert").' ('.$anzahl.')</b></span>';
+				}
+				else 
+					echo '<span style="color:red"><b>Datei konnte nicht importiert werden. Encoding ist nicht UTF-8!</b></span>';
+			}
+		}
+	}
+	else if ($datum->formatDatum($von, $format='Y-m-d H:i:s') < $sperrdatum)
 		echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum</b></span>';
-	else 
+	else if (isset($_POST['save']) || isset($_POST['edit']))
 	{
 
 		if(isset($_POST['edit']))
@@ -502,7 +586,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		      </table>";
 		
 		//Formular
-		echo '<br><form action="'.$_SERVER['PHP_SELF'].'?zeitaufzeichnung_id='.$zeitaufzeichnung_id.'" method="POST" onsubmit="return checkdatum()">';
+		echo '<br><form action="'.$_SERVER['PHP_SELF'].'?zeitaufzeichnung_id='.$zeitaufzeichnung_id.'" method="POST" onsubmit="return checkdatum()" enctype="multipart/form-data">';
 
 		echo '<table>
 			<tr>
@@ -707,6 +791,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<input type="submit" value="'.$p->t("global/aendern").'" name="edit">&nbsp;&nbsp;';
 			echo '<input type="submit" value="'.$p->t("zeitaufzeichnung/alsNeuenEintragSpeichern").'" name="save"></td></tr>';
 		}
+		echo '<tr><td colspan="4"><hr></td></tr>';		
+		echo '<tr><td>CSV-Import</td><td><input type="file" name="csv" value="" /></td><td></td><td align="right"><input type="submit" value="Import" name="import"></td></tr>';				
 		echo '</table>';
 		echo '</td><td valign="top"><span id="zeitsaldo"></span></td></tr>
 			</table>';
@@ -718,6 +804,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		else 
 			echo '<a href="?alle" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/alleAnzeigen').'"></a>';
 		//echo '<input type="submit" value="'.($alle===true?$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)):$p->t('zeitaufzeichnung/alleAnzeigen')).'" name="'.($alle===true?'normal':'alle').'">';
+		
 		echo '</form>';
 		
 		$za = new zeitaufzeichnung();
@@ -765,6 +852,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			$tagessumme='00:00';
 			$pausesumme='00:00';
 			$wochensumme='00:00';
+			$extlehrearr=array();
+			$elsumme = '00:00';
 			$datum_obj = new datum();
 			$tagesbeginn = '';
 			$tagesende = '';
@@ -808,8 +897,14 @@ if($projekt->getProjekteMitarbeiter($user, true))
 						{
 							$pausesumme = $pausesumme+1800;
 						}
-						
-						$tagessaldo = $tagessaldo-$pausesumme;
+						foreach($extlehrearr as $el)
+						{
+							if ($el["start"] < $tagesende || $el["ende"]<$tagesbeginn)
+								$elsumme = $datum_obj->sumZeit($elsumme, $el["diff"]);
+						}
+						list($h2, $m2) = explode(':', $elsumme);
+						$elsumme = $h2*3600+$m2*60;
+						$tagessaldo = $tagessaldo-$pausesumme-$elsumme;
 						$tagessaldo = date('H:i', ($tagessaldo));
 						echo '<tr id="tag_row_'.$datum->formatDatum($tag,'d_m_Y').'"><td '.$style.' colspan="7">';
 	
@@ -837,6 +932,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 						$tag=$datumtag;
 						$tagessumme='00:00';
 						$pausesumme='00:00';
+						$elsumme='00:00';
+						$extlehrearr = array();
 						$tagesbeginn = '';
 						$tagesende = '';
 						$pflichtpause = false;
@@ -914,7 +1011,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 				$style = '';
 				if ($row->zeitaufzeichnung_id == $zeitaufzeichnung_id)
 					$style = 'style="border-top: 3px solid #8DBDD8; border-bottom: 3px solid #8DBDD8"';
-				if ($row->aktivitaet_kurzbz=='Pause')
+				if ($row->aktivitaet_kurzbz=='Pause' || $row->aktivitaet_kurzbz=='LehreExtern')
 					$style .= ' style="color: grey;"';
 				$summe = $row->summe;
 				$service = new service();
@@ -941,11 +1038,13 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		        echo "</td>\n";
 		        echo "   </tr>\n";
 		        
-		        if ($tagesbeginn=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format='Y-m-d H:i:s')) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start, $format='Y-m-d H:i:s')))
+		        if (($tagesbeginn=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format='Y-m-d H:i:s')) > $datum->mktime_fromtimestamp($datum->formatDatum($row->start, $format='Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern')
 					$tagesbeginn = $row->start;
 					
-				if ($tagesende=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s')) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende, $format='Y-m-d H:i:s')))
+				if (($tagesende=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s')) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende, $format='Y-m-d H:i:s'))) && $row->aktivitaet_kurzbz != 'LehreExtern')
 					$tagesende = $row->ende;
+				if ($row->aktivitaet_kurzbz == 'LehreExtern')				
+					$extlehrearr[] = array("start"=>$row->start, "ende"=>$row->ende, "diff"=>$row->diff);
 				}	    
 		    }
 			echo '</tbody>';

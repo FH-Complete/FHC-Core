@@ -942,4 +942,26 @@ function generateActivationKey()
 
 	return md5(encryptData(uniqid(mt_rand(), true),$key));
 }
+
+function check_infrastruktur($uid)
+{
+	$db = new basis_db();
+	
+	// checken, ob der user eine oezuordnung der infrastruktur hat
+	$sql_query="SELECT 1 FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz = 'oezuordnung' and oe_kurzbz in ('Infrastruktur', 'Systementwicklung', 'ServiceDesk', 'Empfang', 'Haustechnik', 'ITService', 'LVPlanung') and (datum_bis > now() or datum_bis is NULL) and uid=".$db->db_add_param($uid);
+	//echo $sql_query;
+	if($db->db_query($sql_query))
+	{
+		$num_rows=$db->db_num_rows();
+		// Wenn kein ergebnis return 0 sonst 1
+		if ($num_rows>0)
+		{
+			return 1;
+		}
+		else
+			return 0;
+	}
+	else 
+		return 0;
+}
 ?>

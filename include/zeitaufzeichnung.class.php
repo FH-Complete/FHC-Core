@@ -419,5 +419,26 @@ class zeitaufzeichnung extends basis_db
 	    	return false;
 	    }
 	}
+	
+	/**
+	 * Löscht sämtliche Einträge eines Users für einen Tag 
+	 * @param string $user
+	 * @param string $tag Y-m-d
+	 */
+	public function deleteEntriesForUser($user, $tag)
+	{		 
+		$where = "uid=".$this->db_add_param($user);	
+		
+		$qry = "delete from campus.tbl_zeitaufzeichnung where $where and date_trunc('day', start) = '$tag'";
+	    if($result = $this->db_query($qry))
+	    {
+	    	return true;
+	    }
+	    else
+	    {
+	    	$this->errormsg = 'Fehler beim Laden der Daten';
+	    	return false;
+	    }
+	}
 }
 ?>
