@@ -3436,6 +3436,19 @@ if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertrag
 			echo 'Vertragsstatus Storno hinzugefuegt';
 	}
 }
+
+if(!$result = @$db->db_query("SELECT lehrveranstaltung_id FROM lehre.tbl_vertrag LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_vertrag ADD COLUMN lehrveranstaltung_id integer;
+	ALTER TABLE lehre.tbl_vertrag ADD CONSTRAINT fk_vertrag_lehrveranstaltung_id FOREIGN KEY (lehrveranstaltung_id) REFERENCES lehre.tbl_lehrveranstaltung (lehrveranstaltung_id) ON UPDATE CASCADE ON DELETE CASCADE;
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>Vertrag: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'Vertrag: Spalte lehrveranstaltung_id hinzugefügt';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -3570,7 +3583,7 @@ $tabellen=array(
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
 	"lehre.tbl_stundenplandev"  => array("stundenplandev_id","lehreinheit_id","unr","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","mitarbeiter_uid","ort_kurzbz","datum","stunde","titel","anmerkung","fix","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_stundenplan_betriebsmittel" => array("stundenplan_betriebsmittel_id","betriebsmittel_id","stundenplandev_id","anmerkung","insertamum","insertvon"),
-	"lehre.tbl_vertrag"  => array("vertrag_id","person_id","vertragstyp_kurzbz","bezeichnung","betrag","insertamum","insertvon","updateamum","updatevon","ext_id","anmerkung","vertragsdatum"),
+	"lehre.tbl_vertrag"  => array("vertrag_id","person_id","vertragstyp_kurzbz","bezeichnung","betrag","insertamum","insertvon","updateamum","updatevon","ext_id","anmerkung","vertragsdatum","lehrveranstaltung_id"),
 	"lehre.tbl_vertrag_vertragsstatus"  => array("vertragsstatus_kurzbz","vertrag_id","uid","datum","ext_id","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_vertragstyp"  => array("vertragstyp_kurzbz","bezeichnung"),
 	"lehre.tbl_vertragsstatus"  => array("vertragsstatus_kurzbz","bezeichnung"),

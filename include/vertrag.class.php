@@ -39,6 +39,7 @@ class vertrag extends basis_db
 	public $ext_id; 			// bigint
 	public $anmerkung; 			// text
 	public $vertragsdatum;		// date
+	public $lehrveranstaltung_id; // integer
 
     /**
 	 * Konstruktor
@@ -63,6 +64,7 @@ class vertrag extends basis_db
 				$this->person_id = $row->person_id;
 				$this->anmerkung = $row->anmerkung;
 				$this->vertragsdatum = $row->vertragsdatum;
+				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 
 				$this->new=false;
 
@@ -122,6 +124,7 @@ class vertrag extends basis_db
 				$obj->status = $row->status;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->vertragsdatum = $row->vertragsdatum;
+				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 
 				$obj->vertragstyp_bezeichnung = $row->vertragstyp_bezeichnung;
 
@@ -583,7 +586,7 @@ class vertrag extends basis_db
 		if($new)
 		{
 			$qry = "BEGIN;INSERT INTO lehre.tbl_vertrag(bezeichnung, person_id, vertragstyp_kurzbz, betrag, insertamum, insertvon,
-					updateamum, updatevon, anmerkung, vertragsdatum) VALUES(".
+					updateamum, updatevon, anmerkung, vertragsdatum,lehrveranstaltung_id) VALUES(".
 					$this->db_add_param($this->bezeichnung).','.
 					$this->db_add_param($this->person_id,FHC_INTEGER).','.
 					$this->db_add_param($this->vertragstyp_kurzbz).','.
@@ -593,7 +596,8 @@ class vertrag extends basis_db
 					$this->db_add_param($this->updateamum).','.
 					$this->db_add_param($this->updatevon).','.
 					$this->db_add_param($this->anmerkung).','.
-					$this->db_add_param($this->vertragsdatum).');';
+					$this->db_add_param($this->vertragsdatum).','.
+					$this->db_add_param($this->lehrveranstaltung_id).');';
 
 		}
 		else
@@ -606,7 +610,8 @@ class vertrag extends basis_db
 			" updateamum=".$this->db_add_param($this->updateamum).','.
 			" updatevon=".$this->db_add_param($this->updatevon).','.
 			" anmerkung=".$this->db_add_param($this->anmerkung).','.
-			" vertragsdatum=".$this->db_add_param($this->vertragsdatum).
+			" vertragsdatum=".$this->db_add_param($this->vertragsdatum).','.
+			" lehrveranstaltung_id=".$this->db_add_param($this->lehrveranstaltung_id).
 			" WHERE vertrag_id=".$this->db_add_param($this->vertrag_id, FHC_INTEGER,false);
 		}
 
@@ -874,5 +879,87 @@ class vertrag extends basis_db
 		}
 	}
 
+	/**
+	 * Liefert die Vertraege zu einem Datum
+	 *
+	 */
+	public function getVertragFromDatum($mitarbeiter_uid, $datum)
+	{
+		// Studiensemester zu Datum ermitteln
+		$stsem_obj = new studiensemester();
+		$stsem = $stsem_obj->getSemesterFromDatum($datum);
+
+		// Vorheriges Studiensemester
+		$prev = $stsem_obj->getPreviousFrom($stsem);
+		$stsem_obj->load($prev);
+		$prevstsemende = $stsem_obj->ende;
+
+		// Alle Vertraege holen die in das Studiensemester fallen
+		// (Lehreinheiten und Betreuungen)
+		// plus Sonderhonorare die in diesem Zeitraum angelegt wurden
+		$qry = "SELECT
+					*
+				FROM
+					lehre.tbl_vertrag
+				WHERE
+					EXISTS (SELECT
+								1
+							FROM
+								lehre.tbl_lehreinheitmitarbeiter
+								JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+							WHERE
+								vertrag_id=tbl_vertrag.vertrag_id
+								AND studiensemester_kurzbz=".$this->db_add_param($stsem).")
+					OR
+					EXISTS (SELECT
+								1
+							FROM
+								lehre.tbl_projektbetreuer
+								JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+								JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+							WHERE
+								vertrag_id=tbl_vertrag.vertrag_id
+								AND studiensemester_kurzbz=".$this->db_add_param($stsem).")
+				 	OR
+					(NOT EXISTS (SELECT
+								1
+							FROM
+								lehre.tbl_lehreinheitmitarbeiter
+							WHERE
+								vertrag_id=tbl_vertrag.vertrag_id)
+					AND NOT EXISTS (SELECT
+											1
+										FROM
+											lehre.tbl_projektbetreuer
+										WHERE
+											vertrag_id=tbl_vertrag.vertrag_id)
+					AND vertragsdatum<=".$this->db_add_param($datum)."
+					AND vertragsdatum>=".$this->db_add_param($prevstsemende)."
+				)";
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+
+				$obj->vertrag_id = $row->vertrag_id;
+				$obj->vertragstyp_kurzbz = $row->vertragstyp_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->betrag = $row->betrag;
+				$obj->person_id = $row->person_id;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->vertragsdatum = $row->vertragsdatum;
+
+				$this->result[]=$obj;
+			}
+
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

@@ -467,6 +467,8 @@ if(!$error)
 			$vertrag->bezeichnung = $_POST['bezeichnung'];
 			$vertrag->anmerkung = $_POST['anmerkung'];
 			$vertrag->vertragsdatum = $_POST['vertragsdatum'];
+			if(isset($_POST['lehrveranstaltung_id']))
+				$vertrag->lehrveranstaltung_id = $_POST['lehrveranstaltung_id'];
 
 			if($errormsg=='')
 			{
@@ -548,7 +550,7 @@ if(!$error)
                             // Retour Status setzen
                             $vertrag->vertragsstatus_kurzbz = 'retour';
                             $vertrag->datum = date('Y-m-d H:i:s');
-                            
+
                             if(!$vertrag->saveVertragsstatus(true))
                                 $errormsg.=$vertrag->errormsg;
                         }

@@ -2519,6 +2519,7 @@ function LehrveranstaltungNotenPruefungSave()
 	req.add('bezeichnung', 'Pruefungshonorar '+lv_studiengang+' '+lv_semester+' '+lv_bezeichnung+' '+lehrveranstaltung_id);
 	req.add('anmerkung', satz+'€ * '+anzahl);
 	req.add('vertragsdatum', datum);
+	req.add('lehrveranstaltung_id',lehrveranstaltung_id);
 
 	var response = req.executePOST();
 
