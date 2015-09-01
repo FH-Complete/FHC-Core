@@ -106,7 +106,12 @@ textarea
 
 	//Variablenuebernahme
 	if(isset($_POST['lv']))  //LehrveranstaltungsID
+	{
 		$lv = $_POST['lv'];
+		$lv_obj = new lehrveranstaltung();
+		$lv_obj->load($lv);
+		$oe_kurzbz = $lv_obj->oe_kurzbz;
+	}
 
 	if(isset($_GET['lvid']))
 	{
@@ -114,15 +119,29 @@ textarea
 		$lv_obj->load($lv);
 
 		if(!isset($stg))
+		{
 			$stg = $lv_obj->studiengang_kz;
+			$oe_kurzbz = $lv_obj->oe_kurzbz;
+		}
 		if(!isset($sem))
 			$sem = $lv_obj->semester;
 	}
 	else 
+	{
 		$stg = '';
+	}
 
 	if(isset($_POST['stg']))
+	{
 		$stg = $_POST['stg'];
+		if(!isset($oe_kurzbz))
+		{
+			$oe = new studiengang();
+			$oe->load($stg);
+			$oe_kurzbz = $oe->oe_kurzbz;
+		}
+	}
+
 	if(!isset($sem) && isset($_POST['sem']))
 		$sem = $_POST['sem'];	
 		
@@ -146,14 +165,15 @@ textarea
 	
 	// Bearbeiten nur moeglich, wenn Lektor der LV und bearbeiten fuer Lektoren aktiviert ist
 	// Oder Berechtigung zum Bearbeiten eingetragen ist
+	$berechtigt = true;
 	if(!(
 			(!defined('CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT') && $lektor_der_lv)
 			|| (defined('CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT') && CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT==true && $lektor_der_lv)
-			|| $rechte->isBerechtigt('lehre/lvinfo',$stg)
+			|| $rechte->isBerechtigt('lehre/lvinfo',$oe_kurzbz)
 		)
 	)
 	{
-		die($p->t('global/keineBerechtigungFuerDieseSeite'));
+		$berechtigt = false;
 	}
 
 	//Variablen fuer das Formular
@@ -165,7 +185,7 @@ textarea
 	$anmerkungen_de = (isset($_POST['anmerkungen_de'])?$_POST['anmerkungen_de']:'');
 	$kurzbeschreibung_de = (isset($_POST['kurzbeschreibung_de'])?$_POST['kurzbeschreibung_de']:'');
 	$anwesenheit_de = (isset($_POST['anwesenheit_de'])?$_POST['anwesenheit_de']:'');
-	$freig_de = (isset($_POST['freig_de'])?($_POST['freig_de']=='on' && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg)?true:false):'');
+	$freig_de = (isset($_POST['freig_de'])?($_POST['freig_de']=='on' && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz)?true:false):'');
 	$methodik_de = (isset($_POST['methodik_de'])?$_POST['methodik_de']:'');
 	//$titel_de = (isset($_POST['titel_de'])?$_POST['titel_de']:'');
 	
@@ -198,7 +218,7 @@ textarea
 	$anmerkungen_en = (isset($_POST['anmerkungen_en'])?$_POST['anmerkungen_en']:'');
 	$kurzbeschreibung_en = (isset($_POST['kurzbeschreibung_en'])?$_POST['kurzbeschreibung_en']:'');
 	$anwesenheit_en = (isset($_POST['anwesenheit_en'])?$_POST['anwesenheit_en']:'');
-	$freig_en = (isset($_POST['freig_en'])?($_POST['freig_en']=='on' && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg)?true:false):'');
+	$freig_en = (isset($_POST['freig_en'])?($_POST['freig_en']=='on' && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz)?true:false):'');
 	$methodik_en = (isset($_POST['methodik_en'])?$_POST['methodik_en']:'');
 	//$titel_en = (isset($_POST['titel_en'])?$_POST['titel_en']:'');
 
@@ -248,6 +268,8 @@ textarea
 
 		if($status=='save') // Beim druecken auf "Speichern"
 		{
+			if ($berechtigt==false)
+				die($p->t('global/keineBerechtigungFuerDieseSeite'));
 			//Speichert die aenderungen in der Datenbank (de und en)
 			$lv_obj_sav= new lvinfo();
 			$save_error=false;
@@ -262,7 +284,7 @@ textarea
 			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_de);
 			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_de);
 			
-			$lv_obj_sav->genehmigt = ($freig_de==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg)?true:false);
+			$lv_obj_sav->genehmigt = ($freig_de==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz)?true:false);
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
 			$lv_obj_sav->aktiv=true;
@@ -294,7 +316,7 @@ textarea
 			$lv_obj_sav->anmerkungen=mb_eregi_replace("\r\n", "<br>", $anmerkungen_en);
 			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_en);
 			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_en);
-			$lv_obj_sav->genehmigt = ($freig_en==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg)?true:false);
+			$lv_obj_sav->genehmigt = ($freig_en==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz)?true:false);
 			$lv_obj_sav->aktiv=true;
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
@@ -327,6 +349,9 @@ textarea
 		}
 		if($status=='freigeben') // Beim druecken auf "Zur Freigabe abschicken"
 		{
+			if ($berechtigt==false)
+				die($p->t('global/keineBerechtigungFuerDieseSeite'));
+			
 			//Speichert die aenderungen in der Datenbank (de und en)
 			$lv_obj_sav= new lvinfo();
 			$save_error=false;
@@ -341,7 +366,7 @@ textarea
 			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_de);
 			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_de);
 				
-			$lv_obj_sav->genehmigt = ($freig_de==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg)?true:false);
+			$lv_obj_sav->genehmigt = ($freig_de==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz)?true:false);
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
 			$lv_obj_sav->aktiv=true;
@@ -373,7 +398,7 @@ textarea
 			$lv_obj_sav->anmerkungen=mb_eregi_replace("\r\n", "<br>", $anmerkungen_en);
 			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_en);
 			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_en);
-			$lv_obj_sav->genehmigt = ($freig_en==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg)?true:false);
+			$lv_obj_sav->genehmigt = ($freig_en==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz)?true:false);
 			$lv_obj_sav->aktiv=true;
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
@@ -604,6 +629,9 @@ textarea
 	//Kopfzeile hinausschreiben und $output ausgeben
 	echo "<h1>&nbsp;".$p->t('courseInformation/lvInfoSemester',array($stg_obj->kuerzel, $sem))."</h1>";
 	echo $output;
+	
+	if ($berechtigt==false)
+		die($p->t('global/keineBerechtigungFuerDieseSeite'));
 
 	if(isset($lv) && isset($stg) && isset($sem)) // Wenn oben alles Ausgewaehlt wurde
 	{
@@ -858,7 +886,7 @@ textarea
 		<td><i>'.$p->t('lvinfo/anmerkungenEN').'</i></td>
 		<td align="right"><textarea rows="5" cols="50" name="anmerkungen_en">'. (isset($anmerkungen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$anmerkungen_en)):'').'</textarea></td>
 	</tr>';
-	if ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))
+	if ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz))
 		echo '	<tr class="liste0">
 					<td align=center colspan=2><br><input type="checkbox" name="freig_de" '. (isset($freig_de) && ($freig_de==true || $freig_de=='1')?'checked':'').'/><i>'.$p->t('courseInformation/deutschFreigeben').'</i><br><br></td>
 					<td align=center colspan=2><input type="checkbox" name="freig_en" '. (isset($freig_en) && ($freig_en==true || $freig_en=='1')?'checked':'').'/><i>'.$p->t('courseInformation/englischFreigeben').'</i> </td>
