@@ -45,6 +45,7 @@ $uid=get_uid();
 <HEAD>
 	<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<TITLE><?php echo $p->t('lvplan/lehrveranstaltungsplan').' '.CAMPUS_NAME;?></TITLE>
+    <script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script>
 	<script type="text/javascript">
 		<!--
 		function MM_jumpMenu(targ,selObj,restore)
@@ -65,6 +66,86 @@ $uid=get_uid();
 					e.checked = f.check_all.checked;
 			}
 		}
+        
+        $(document).ready(function() {
+            $("select[name='studiengang_kz']").change(function() {
+                var studiengang_kz = $("select[name='studiengang_kz']").val();
+                $.ajax({
+                    url: "lvplan_autocomplete.php",
+                    data: { 'autocomplete':'getSemester',
+                            'stg_kz':studiengang_kz
+                         },
+                    type: "POST",
+                    dataType: "json",
+                    success: function(data) 
+                    {
+                        $("select[name='semester']").empty();
+                        $("select[name='semester']").append('<option value="">*</option>');
+                        $.each(data, function(i, data){
+                            $("select[name='semester']").append('<option value="'+data+'">'+data+'</option>');
+                        });
+                    },
+                    error: function(data) 
+                    {
+                        alert("Fehler beim Laden der Daten");
+                    }
+                });
+            })
+            
+            $("select[name='semester']").change(function() {
+                var studiengang_kz = $("select[name='studiengang_kz']").val();
+                var semester = $("select[name='semester']").val();
+                $.ajax({
+                    url: "lvplan_autocomplete.php",
+                    data: { 'autocomplete':'getVerband',
+                            'stg_kz':studiengang_kz,
+                            'sem':semester
+                         },
+                    type: "POST",
+                    dataType: "json",
+                    success: function(data) 
+                    {
+                        $("select[name='verband']").empty();
+                        $("select[name='verband']").append('<option value="">*</option>');
+                        $.each(data, function(i, data){
+                            $("select[name='verband']").append('<option value="'+data+'">'+data+'</option>');
+                        });
+                    },
+                    error: function(data) 
+                    {
+                        alert("Fehler beim Laden der Daten");
+                    }
+                });
+            })
+            
+            $("select[name='verband']").change(function() {
+                var studiengang_kz = $("select[name='studiengang_kz']").val();
+                var semester = $("select[name='semester']").val();
+                var verband = $("select[name='verband']").val();
+                $.ajax({
+                    url: "lvplan_autocomplete.php",
+                    data: { 'autocomplete':'getGruppe',
+                            'stg_kz':studiengang_kz,
+                            'sem':semester,
+                            'ver':verband
+                         },
+                    type: "POST",
+                    dataType: "json",
+                    success: function(data) 
+                    {
+                        $("select[name='gruppe']").empty();
+                        $("select[name='gruppe']").append('<option value="">*</option>');
+                        $.each(data, function(i, data){
+                            $("select[name='gruppe']").append('<option value="'+data+'">'+data+'</option>');
+                        });
+                    },
+                    error: function(data) 
+                    {
+                        alert("Fehler beim Laden der Daten");
+                    }
+                });
+            })
+        });
 		-->
 	</script>
 	<LINK rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
