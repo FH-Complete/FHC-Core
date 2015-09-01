@@ -44,7 +44,7 @@ if($_SERVER['REMOTE_ADDR']!=$_SERVER['SERVER_ADDR'])
 }
 
 //default bild (ein weisser pixel)
-$cTmpHEX=base64_decode('/9j/4AAQSkZJRgABAQEASABIAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD//gAXQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q/9sAQwAFAwQEBAMFBAQEBQUFBgcMCAcHBwcPCwsJDBEPEhIRDxERExYcFxMUGhURERghGBodHR8fHxMXIiQiHiQcHh8e/9sAQwEFBQUHBgcOCAgOHhQRFB4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4e/8AAEQgAAQABAwEiAAIRAQMRAf/EABUAAQEAAAAAAAAAAAAAAAAAAAAI/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCywAf/2Q==');
+$cTmpHEX='/9j/4AAQSkZJRgABAQEASABIAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD//gAXQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q/9sAQwAFAwQEBAMFBAQEBQUFBgcMCAcHBwcPCwsJDBEPEhIRDxERExYcFxMUGhURERghGBodHR8fHxMXIiQiHiQcHh8e/9sAQwEFBQUHBgcOCAgOHhQRFB4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4e/8AAEQgAAQABAwEiAAIRAQMRAf/EABUAAQEAAAAAAAAAAAAAAAAAAAAI/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCywAf/2Q==';
 //Hex Dump aus der DB holen
 if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id'])  && is_numeric($_GET['person_id']))
 {
@@ -101,7 +101,7 @@ if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id'])  &
 			if($row->foto!='' && !$gesperrt)
 			{
 		  		if($row->dms_id=='')
-					$cTmpHEX=base64_decode($row->foto);
+					$cTmpHEX=$row->foto;
 				else
 					$cTmpHEX=$row->foto;
 			}
@@ -111,7 +111,7 @@ if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id'])  &
 //die bilder werden, sofern es funktioniert, in jpg umgewandelt da es sonst zu fehlern beim erstellen
 //von pdfs kommen kann.
 
-$im = @imagecreatefromstring($cTmpHEX);
+$im = @imagecreatefromstring(base64_decode($cTmpHEX));
 if($im!=false)
 {
   @ob_clean();
