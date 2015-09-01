@@ -184,7 +184,7 @@ if ($insert)
 					else
 						$qry.="NULL,";
 
-					$qry.=$db->db_add_param($leid, FHC_INTEGER).",'".$user." via LVPlanWartung','".$user." via LVPlanWartung');";
+					$qry.=$db->db_add_param($leid, FHC_INTEGER).",'".$user."','".$user."');";
 
 					if(!$result_insert=$db->db_query($qry))
 						die ("DB Fehler $qry" .' '.$db->db_last_error());
