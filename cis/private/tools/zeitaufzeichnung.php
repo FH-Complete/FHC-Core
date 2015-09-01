@@ -905,18 +905,23 @@ if($projekt->getProjekteMitarbeiter($user, true))
 						list($h1, $m1) = explode(':', $pausesumme);
 						$pausesumme = $h1*3600+$m1*60;
 						$tagessaldo = $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s'))-$datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format='Y-m-d H:i:s'))-3600;
-						if ($tagessaldo>18000 && $pflichtpause==false)
+						foreach($extlehrearr as $el)
+						{
+							if ($el["start"] > $tagesbeginn && $el["ende"] < $tagesende)
+								$elsumme = $datum_obj->sumZeit($elsumme, $el["diff"]);
+						}	
+						list($h2, $m2) = explode(':', $elsumme);
+						$elsumme = $h2*3600+$m2*60;					
+						if ($tagessaldo>18000 && $pflichtpause==false && $elsumme == 0)
 						{
 							$pausesumme = $pausesumme+1800;
 						}
-						foreach($extlehrearr as $el)
-						{
-							if ($el["start"] < $tagesende || $el["ende"]<$tagesbeginn)
-								$elsumme = $datum_obj->sumZeit($elsumme, $el["diff"]);
+						if ($elsumme > 0){
+							$pausesumme = $pausesumme + $elsumme;
+							$pflichtpause = true;
 						}
-						list($h2, $m2) = explode(':', $elsumme);
-						$elsumme = $h2*3600+$m2*60;
-						$tagessaldo = $tagessaldo-$pausesumme-$elsumme;
+
+						$tagessaldo = $tagessaldo-$pausesumme;
 						$tagessaldo = date('H:i', ($tagessaldo));
 						echo '<tr id="tag_row_'.$datum->formatDatum($tag,'d_m_Y').'"><td '.$style.' colspan="7">';
 	
@@ -931,7 +936,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 	
 						echo '</td>
 				        <td align="right" colspan="2" '.$style.'>
-				        	<b>'.$p->t("zeitaufzeichnung/arbeitszeit").': '.$datum->formatDatum($tagesbeginn, $format='H:i').'-'.$datum->formatDatum($tagesende, $format='H:i').' '.$p->t("eventkalender/uhr").'</b><br>
+				        	<b>'.$p->t("zeitaufzeichnung/arbeitszeit").': '.$datum->formatDatum($tagesbeginn, $format='H:i').'-'.$datum->formatDatum($tagesende, $format='H:i').' '.$p->t("eventkalender/uhr").'</b><br>LehreExtern / 
 				        	'.$p->t("zeitaufzeichnung/pause").' '.($pflichtpause==false?$p->t("zeitaufzeichnung/inklusivePflichtpause"):'').':
 				        </td>
 				        <td '.$style.' align="right"><b>'.$tagessaldo.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
