@@ -588,6 +588,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		{
 			echo '<p><a href="../../../cms/dms.php?id='.$p->t("dms_link/handbuchZeitaufzeichnung").'" target="_blank">'.$p->t("zeitaufzeichnung/handbuchZeitaufzeichnung").'</a></p>';
 		}
+		echo '<p><a href="zeitsperre_resturlaub.php">'.$p->t("urlaubstool/meineZeitsperren").'</a></p>';	
 		echo "</td>
 		      	</tr>
 		      </table>";
@@ -801,7 +802,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		if (isset($_GET['csvimport']))
 		{		
 			echo '<tr><td colspan="4"><hr></td></tr>';		
-			echo '<tr><td>CSV-Import</td><td colspan="2"><input type="file" name="csv" value="" /></td><td align="right"><input type="submit" value="Import" name="import"></td></tr>';		
+			echo '<tr><td>CSV-Import</td><td colspan="2"><input type="file" name="csv" value="" /></td><td align="right"><input type="submit" value="Import" name="import"></td></tr>';	
+			echo '<tr><td></td><td colspan="3">Informationen zum Format der CSV-Datei s. Leitfaden Arbeitszeitaufzeichnung</td></tr>';	
 		}	
 		else 
 			echo '<input type="file" name="csv" value="" style="visibility:hidden">';
