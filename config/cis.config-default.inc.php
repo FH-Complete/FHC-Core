@@ -201,6 +201,9 @@ define('VIEW_BEGIN','vw_');
 //Gibt an, ob das Studienbuchblatt im CIS gedruckt werden kann
 define('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN',false);
 
+//Gibt an, ob die Studienerfolgsbestätigung im CIS gedruckt werden kann
+define('CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN',false);
+
 //**** INFOSCREEN ****
 //Gibt an, ob der Lageplan im Infoterminal angezeigt werden soll.
 define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN',true);
