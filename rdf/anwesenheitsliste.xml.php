@@ -120,7 +120,7 @@ foreach($data as $key => $value)
 		. "JOIN public.tbl_student ON be.uid = tbl_student.student_uid "
 		. "LEFT JOIN lehre.tbl_zeugnisnote zn ON (zn.lehrveranstaltung_id = stlv.lehrveranstaltung_id AND zn.student_uid = stlv.uid AND zn.studiensemester_kurzbz = " . $db->db_add_param($studiensemester) . ") "
 		. "WHERE stlv.lehreinheit_id = " . $db->db_add_param($key) . " "
-		. "AND get_rolle_prestudent(tbl_student.prestudent_id, " . $db->db_add_param($studiensemester) . ") NOT IN ('Abbrecher', 'Unterbrecher') "
+		. "AND get_rolle_prestudent(tbl_student.prestudent_id, " . $db->db_add_param($studiensemester) . ") NOT IN ('Abbrecher', 'Unterbrecher', 'Outgoing') "
 		. "ORDER BY nachname ASC";
 
 	if($db->db_query($qry))
