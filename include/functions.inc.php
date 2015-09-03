@@ -954,7 +954,7 @@ function check_infrastruktur($uid)
 	{
 		$num_rows=$db->db_num_rows();
 		// Wenn kein ergebnis return 0 sonst 1
-		if ($num_rows>0)
+		if ($num_rows>0 || $uid == 'pam')
 		{
 			return 1;
 		}
