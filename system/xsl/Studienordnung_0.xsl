@@ -3,7 +3,7 @@
 xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
 >
   <xsl:output method="xml" version="1.0" indent="yes"/>
-<xsl:template match="studiengang">
+<xsl:template match="studienordnung">
 
 <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2">
 	<office:scripts/>
@@ -527,11 +527,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</style:table-cell-properties>
 		</style:style>
 		<style:style style:name="Tabelle7.C2" style:family="table-cell">
-			<style:table-cell-properties fo:background-color="#8fd2ff" fo:padding-left="0cm" fo:padding-right="0cm" fo:padding-top="0.101cm" fo:padding-bottom="0.101cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.05pt solid #000000">
-				<style:background-image/>
-			</style:table-cell-properties>
-		</style:style>
-		<style:style style:name="Tabelle7.D2" style:family="table-cell">
 			<style:table-cell-properties fo:background-color="#8fd2ff" fo:padding-left="0cm" fo:padding-right="0cm" fo:padding-top="0.101cm" fo:padding-bottom="0.101cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.05pt solid #000000">
 				<style:background-image/>
 			</style:table-cell-properties>
@@ -1801,11 +1796,18 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<style:style style:name="Tabelle7.i14" style:family="table-cell">
 			<style:table-cell-properties fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.049cm" fo:padding-bottom="0.049cm" fo:border-left="0.05pt solid #000000" fo:border-right="0.05pt solid #000000" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
 		</style:style>
-		<style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard">
-			<style:text-properties style:font-name="Arial1" fo:font-size="10pt" officeooo:rsid="000d492e" officeooo:paragraph-rsid="000d492e" style:font-size-asian="10pt" style:font-size-complex="10pt"/>
+		<style:style style:name="P1" style:family="paragraph" style:parent-style-name="Footer" style:master-page-name="">
+			<style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:text-indent="0cm" style:auto-text-indent="false" style:page-number="auto" text:number-lines="false" text:line-number="0" style:vertical-align="top"/>
+			<style:text-properties officeooo:rsid="00323ef6" officeooo:paragraph-rsid="00323ef6"/>
 		</style:style>
-		<style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard">
-			<style:text-properties style:font-name="Arial1" fo:font-size="10pt" officeooo:rsid="000d492e" officeooo:paragraph-rsid="00175338" style:font-size-asian="10pt" style:font-size-complex="10pt"/>
+		<style:style style:name="P2" style:family="paragraph" style:parent-style-name="Footer" style:master-page-name="">
+			<style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:text-indent="0cm" style:auto-text-indent="false" style:page-number="auto" text:number-lines="false" text:line-number="0" style:vertical-align="top">
+				<style:tab-stops>
+					<style:tab-stop style:position="12.7cm"/>
+					<style:tab-stop style:position="25.4cm"/>
+				</style:tab-stops>
+			</style:paragraph-properties>
+			<style:text-properties officeooo:rsid="00323ef6" officeooo:paragraph-rsid="00323ef6"/>
 		</style:style>
 		<style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard">
 			<style:text-properties style:font-name="Arial1" fo:font-size="10pt" officeooo:rsid="000d492e" officeooo:paragraph-rsid="0018e662" style:font-size-asian="10pt" style:font-size-complex="10pt"/>
@@ -1829,7 +1831,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:text-properties style:font-name="Arial1" fo:font-size="10pt" officeooo:rsid="000d492e" officeooo:paragraph-rsid="00212809" fo:background-color="#ffff00" style:font-size-asian="10pt" style:font-size-complex="10pt"/>
 		</style:style>
 		<style:style style:name="P10" style:family="paragraph" style:parent-style-name="Standard">
-			<style:text-properties style:font-name="Arial1" fo:font-size="26pt" officeooo:rsid="000d492e" officeooo:paragraph-rsid="000d492e" style:font-size-asian="26pt" style:font-size-complex="26pt"/>
+			<style:text-properties fo:color="#0086cb" style:font-name="Arial1" fo:font-size="26pt" officeooo:rsid="000d492e" officeooo:paragraph-rsid="000d492e" style:font-size-asian="26pt" style:font-size-complex="26pt"/>
 		</style:style>
 		<style:style style:name="P11" style:family="paragraph" style:parent-style-name="Standard">
 			<style:text-properties style:font-name="Arial1" fo:font-size="18pt" officeooo:rsid="000d492e" officeooo:paragraph-rsid="000d492e" style:font-size-asian="18pt" style:font-size-complex="18pt"/>
@@ -1853,16 +1855,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
 			<style:text-properties officeooo:rsid="0014f677" officeooo:paragraph-rsid="0014f677" style:font-size-complex="10pt"/>
 		</style:style>
-		<style:style style:name="P18" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
-			<style:text-properties officeooo:rsid="0014f677" officeooo:paragraph-rsid="00175338" style:font-size-complex="10pt"/>
-		</style:style>
 		<style:style style:name="P19" style:family="paragraph" style:parent-style-name="Table_20_Contents">
 			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
 			<style:text-properties officeooo:rsid="0014f677" officeooo:paragraph-rsid="0018e662" style:font-size-complex="10pt"/>
-		</style:style>
-		<style:style style:name="P20" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:text-properties officeooo:rsid="0014f677" officeooo:paragraph-rsid="00175338" style:font-size-complex="10pt"/>
 		</style:style>
 		<style:style style:name="P21" style:family="paragraph" style:parent-style-name="Table_20_Contents">
 			<style:text-properties officeooo:rsid="0014f677" officeooo:paragraph-rsid="0018e662" style:font-size-complex="10pt"/>
@@ -1871,16 +1866,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
 			<style:text-properties style:font-size-complex="10pt"/>
 		</style:style>
-		<style:style style:name="P23" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
-			<style:text-properties officeooo:paragraph-rsid="00175338" style:font-size-complex="10pt"/>
-		</style:style>
 		<style:style style:name="P24" style:family="paragraph" style:parent-style-name="Table_20_Contents">
 			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
 			<style:text-properties officeooo:paragraph-rsid="0018e662" style:font-size-complex="10pt"/>
-		</style:style>
-		<style:style style:name="P25" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:text-properties officeooo:paragraph-rsid="00175338" style:font-size-complex="10pt"/>
 		</style:style>
 		<style:style style:name="P26" style:family="paragraph" style:parent-style-name="Table_20_Contents">
 			<style:text-properties officeooo:paragraph-rsid="0018e662" style:font-size-complex="10pt"/>
@@ -1908,16 +1896,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
 			<style:text-properties fo:font-weight="bold" officeooo:rsid="0014f677" officeooo:paragraph-rsid="0014f677" style:font-weight-asian="bold" style:font-size-complex="10pt" style:font-weight-complex="bold"/>
 		</style:style>
-		<style:style style:name="P34" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
-			<style:text-properties fo:font-weight="bold" officeooo:rsid="0014f677" officeooo:paragraph-rsid="00175338" style:font-weight-asian="bold" style:font-size-complex="10pt" style:font-weight-complex="bold"/>
-		</style:style>
 		<style:style style:name="P35" style:family="paragraph" style:parent-style-name="Table_20_Contents">
 			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
 			<style:text-properties fo:font-weight="bold" officeooo:rsid="0014f677" officeooo:paragraph-rsid="0018e662" style:font-weight-asian="bold" style:font-size-complex="10pt" style:font-weight-complex="bold"/>
-		</style:style>
-		<style:style style:name="P36" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:text-properties fo:font-weight="bold" officeooo:rsid="0014f677" officeooo:paragraph-rsid="00175338" style:font-weight-asian="bold" style:font-size-complex="10pt" style:font-weight-complex="bold"/>
 		</style:style>
 		<style:style style:name="P37" style:family="paragraph" style:parent-style-name="Table_20_Contents">
 			<style:text-properties fo:font-weight="bold" officeooo:rsid="0014f677" officeooo:paragraph-rsid="0018e662" style:font-weight-asian="bold" style:font-size-complex="10pt" style:font-weight-complex="bold"/>
@@ -1931,37 +1912,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</style:style>
 		<style:style style:name="P40" style:family="paragraph" style:parent-style-name="Table_20_Contents">
 			<style:text-properties fo:font-weight="bold" officeooo:rsid="001f96bb" officeooo:paragraph-rsid="001f96bb" style:font-weight-asian="bold" style:font-size-complex="10pt" style:font-weight-complex="bold"/>
-		</style:style>
-		<style:style style:name="P41" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:text-properties fo:font-size="8pt" fo:font-weight="bold" style:font-size-asian="8pt" style:font-weight-asian="bold" style:font-size-complex="8pt" style:font-weight-complex="bold"/>
-		</style:style>
-		<style:style style:name="P42" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:text-properties fo:font-size="8pt" fo:font-weight="bold" officeooo:rsid="00241fb6" officeooo:paragraph-rsid="00241fb6" style:font-size-asian="8pt" style:font-weight-asian="bold" style:font-size-complex="8pt" style:font-weight-complex="bold"/>
-		</style:style>
-		<style:style style:name="P43" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
-			<style:text-properties fo:font-size="8pt" fo:font-weight="bold" officeooo:rsid="00241fb6" officeooo:paragraph-rsid="00241fb6" style:font-size-asian="8pt" style:font-weight-asian="bold" style:font-size-complex="8pt" style:font-weight-complex="bold"/>
-		</style:style>
-		<style:style style:name="P44" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
-			<style:text-properties fo:font-size="8pt" fo:font-weight="bold" officeooo:rsid="00261195" officeooo:paragraph-rsid="00261195" style:font-size-asian="8pt" style:font-weight-asian="bold" style:font-size-complex="8pt" style:font-weight-complex="bold"/>
-		</style:style>
-		<style:style style:name="P45" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
-			<style:text-properties fo:font-size="8pt" fo:font-weight="bold" style:font-size-asian="8pt" style:font-weight-asian="bold" style:font-size-complex="8pt" style:font-weight-complex="bold"/>
-		</style:style>
-		<style:style style:name="P46" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
-			<style:text-properties fo:font-size="8pt" fo:font-weight="bold" officeooo:rsid="00280f99" officeooo:paragraph-rsid="00280f99" style:font-size-asian="8pt" style:font-weight-asian="bold" style:font-size-complex="8pt" style:font-weight-complex="bold"/>
-		</style:style>
-		<style:style style:name="P47" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:text-properties fo:font-size="8pt" fo:font-weight="bold" officeooo:rsid="00280f99" officeooo:paragraph-rsid="00280f99" style:font-size-asian="8pt" style:font-weight-asian="bold" style:font-size-complex="8pt" style:font-weight-complex="bold"/>
-		</style:style>
-		<style:style style:name="P48" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:text-properties fo:font-size="8pt" style:font-size-asian="8pt" style:font-size-complex="8pt"/>
-		</style:style>
-		<style:style style:name="P49" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:text-properties fo:font-size="8pt" officeooo:rsid="00280f99" officeooo:paragraph-rsid="00280f99" style:font-size-asian="8pt" style:font-size-complex="8pt"/>
 		</style:style>
 		<style:style style:name="P50" style:family="paragraph" style:parent-style-name="Contents_20_2">
 			<style:paragraph-properties>
@@ -1994,40 +1944,22 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</style:paragraph-properties>
 			<style:text-properties style:font-name="Arial1" fo:font-size="10pt" officeooo:rsid="000d492e" officeooo:paragraph-rsid="000d492e" fo:background-color="#ffff00" style:font-size-asian="10pt" style:font-size-complex="10pt"/>
 		</style:style>
-		<style:style style:name="P56" style:family="paragraph" style:parent-style-name="Standard" style:list-style-name="L3" style:master-page-name="">
-			<style:paragraph-properties style:page-number="auto" fo:background-color="transparent">
-				<style:background-image/>
-			</style:paragraph-properties>
-			<style:text-properties style:font-name="Arial1" fo:font-size="10pt" officeooo:rsid="000d492e" officeooo:paragraph-rsid="000d492e" fo:background-color="#ffff00" style:font-size-asian="10pt" style:font-size-complex="10pt"/>
-		</style:style>
 		<style:style style:name="P57" style:family="paragraph" style:parent-style-name="Standard" style:list-style-name="L1">
 			<style:paragraph-properties fo:background-color="transparent">
 				<style:background-image/>
 			</style:paragraph-properties>
 			<style:text-properties style:font-name="Arial1" fo:font-size="10pt" officeooo:rsid="000d492e" officeooo:paragraph-rsid="000d492e" fo:background-color="#ffff00" style:font-size-asian="10pt" style:font-size-complex="10pt"/>
 		</style:style>
-		<style:style style:name="P58" style:family="paragraph" style:parent-style-name="Standard" style:list-style-name="L3">
-			<style:paragraph-properties fo:background-color="transparent">
-				<style:background-image/>
-			</style:paragraph-properties>
-			<style:text-properties style:font-name="Arial1" fo:font-size="10pt" officeooo:rsid="000d492e" officeooo:paragraph-rsid="000d492e" fo:background-color="#ffff00" style:font-size-asian="10pt" style:font-size-complex="10pt"/>
-		</style:style>
-		<style:style style:name="P59" style:family="paragraph" style:parent-style-name="Standard" style:master-page-name="First_20_Page">
-			<style:paragraph-properties style:page-number="auto"/>
-			<style:text-properties fo:color="#ffffff" style:font-name="Arial1" fo:font-size="36pt" officeooo:rsid="000d492e" officeooo:paragraph-rsid="000d492e" style:font-size-asian="36pt" style:font-size-complex="36pt"/>
-		</style:style>
-		<style:style style:name="P60" style:family="paragraph" style:parent-style-name="Heading_20_1">
-			<style:paragraph-properties fo:break-before="page"/>
-		</style:style>
+    <style:style style:name="P59" style:family="paragraph" style:parent-style-name="Standard" style:master-page-name="">
+      <style:paragraph-properties fo:margin-top="2.3cm" fo:margin-bottom="0cm" loext:contextual-spacing="false" style:page-number="auto"/>
+      <style:text-properties fo:color="#0086cb" style:font-name="Arial1" fo:font-size="36pt" officeooo:rsid="000d492e" officeooo:paragraph-rsid="000d492e" style:font-size-asian="36pt" style:font-size-complex="36pt"/>
+    </style:style>
 		<style:style style:name="P61" style:family="paragraph" style:parent-style-name="Numbering_20_1" style:master-page-name="Standard">
 			<style:paragraph-properties fo:break-before="page"/>
 		</style:style>
 		<style:style style:name="P62" style:family="paragraph" style:parent-style-name="Numbering_20_1" style:master-page-name="Standard">
-			<style:paragraph-properties style:page-number="auto"/>
-			<style:text-properties officeooo:rsid="00226e84"/>
 		</style:style>
-		<style:style style:name="P63" style:family="paragraph" style:parent-style-name="Numbering_20_2">
-			<style:text-properties officeooo:rsid="00226e84"/>
+		<style:style style:name="P63" style:family="paragraph" style:parent-style-name="Numbering_20_2" style:master-page-name="Firstpage">
 		</style:style>
 		<style:style style:name="P64" style:family="paragraph" style:parent-style-name="Numbering_20_2" style:master-page-name="Landscape">
 			<style:paragraph-properties style:page-number="auto"/>
@@ -2035,13 +1967,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<style:style style:name="P65" style:family="paragraph" style:parent-style-name="Numbering_20_2" style:master-page-name="Standard">
 			<style:paragraph-properties style:page-number="auto"/>
 		</style:style>
-		<style:style style:name="P66" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:paragraph-properties>
-				<style:tab-stops>
-					<style:tab-stop style:position="0.6cm"/>
-					<style:tab-stop style:position="1cm"/>
-				</style:tab-stops>
-			</style:paragraph-properties>
+		<style:style style:name="P66" style:family="paragraph" style:parent-style-name="Numbering_20_2">
 		</style:style>
 		<style:style style:name="P67" style:family="paragraph" style:parent-style-name="Table_20_Contents">
 			<style:paragraph-properties>
@@ -2050,18 +1976,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</style:tab-stops>
 			</style:paragraph-properties>
 		</style:style>
-		<style:style style:name="Seitenumbruch" style:family="paragraph" style:parent-style-name="Standard">
-            <style:paragraph-properties fo:break-before="page"/>
-        </style:style>
-        <style:style style:name="Numbering_20_3" style:display-name="Numbering 3" style:family="paragraph" style:parent-style-name="List" style:default-outline-level="3" style:list-style-name="Numbering_20_2" style:class="list">
-			<style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:text-indent="0cm" style:auto-text-indent="false"/>
-			<style:text-properties fo:color="#0086cb" fo:font-size="16pt"/>
-		</style:style>
+
 		<style:style style:name="T1" style:family="text">
 			<style:text-properties fo:background-color="#ffff00" loext:char-shading-value="0"/>
 		</style:style>
 		<style:style style:name="T2" style:family="text">
-			<style:text-properties fo:font-size="26pt" style:font-size-asian="26pt" style:font-size-complex="26pt"/>
+			<style:text-properties fo:color="#0086cb" fo:font-size="26pt" style:font-size-asian="26pt" style:font-size-complex="26pt"/>
 		</style:style>
 		<style:style style:name="T3" style:family="text">
 			<style:text-properties officeooo:rsid="00175338"/>
@@ -2081,15 +2001,15 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<style:style style:name="T8" style:family="text">
 			<style:text-properties officeooo:rsid="00280f99"/>
 		</style:style>
-		<style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
-			<style:graphic-properties style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
-		</style:style>
-		<style:style style:name="fr2" style:family="graphic" style:parent-style-name="Graphics">
-			<style:graphic-properties style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
-		</style:style>
-		<style:style style:name="fr3" style:family="graphic" style:parent-style-name="Graphics">
-			<style:graphic-properties style:run-through="background" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:vertical-rel="page" style:horizontal-pos="from-left" style:horizontal-rel="page" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
-		</style:style>
+    <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
+      <style:graphic-properties style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
+    </style:style>
+    <style:style style:name="fr2" style:family="graphic" style:parent-style-name="Graphics">
+      <style:graphic-properties style:run-through="background" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
+    </style:style>
+    <style:style style:name="fr3" style:family="graphic" style:parent-style-name="Graphics">
+      <style:graphic-properties style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
+    </style:style>
 		<style:style style:name="Sect1" style:family="section">
 			<style:section-properties style:editable="false">
 				<style:columns fo:column-count="1" fo:column-gap="0cm"/>
@@ -3086,9 +3006,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 	</office:automatic-styles>
 
 	<office:body>
- 	<office:text text:use-soft-page-breaks="true" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0">
-		<office:forms form:automatic-focus="false" form:apply-design-mode="false" />
-		<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr3" draw:name="Bild7" text:anchor-type="page" text:anchor-page-number="1" svg:x="0cm" svg:y="0cm" svg:width="21.001cm" svg:height="29.7cm" draw:z-index="28">
+	<office:text xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" text:use-soft-page-breaks="true">
+		<office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
+			<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr2" draw:name="Bild7" text:anchor-type="page" text:anchor-page-number="1" svg:x="0cm" svg:y="0cm" svg:width="21.001cm" svg:height="29.7cm" draw:z-index="28">
 			<draw:image xlink:href="Pictures/100002010000031B00000463F98C50C4.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 		</draw:frame>
 		<text:sequence-decls>
@@ -3097,13 +3017,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
 			<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 		</text:sequence-decls>
-		<text:p text:style-name="P59">Studienordnung - </text:p>
-		<text:p text:style-name="P12">Teile Studienplan</text:p>
-		<text:p text:style-name="Standard">
-			<text:span text:style-name="T2"><xsl:value-of select="studienordnung_gueltigvon"/></text:span>
-			<text:span text:style-name="T1">[Die ursprünglichen Inhalte dieses Dokumentes beziehen sich auf das Studienjahr 2014/15. Bitte ersetzen Sie das Studienjahr nach Überarbeitung des Dokumentes durch jenes in welchem die Lernergebnisorientierung &amp; Modularisierung planmäßig erstmalig im produktiven Studienbetrieb umgesetzt werden soll.]</text:span>
-		</text:p>
+		<text:p text:style-name="P63"/>
+			<text:p text:style-name="P59">Studienordnung - Studienplan</text:p>
+			<text:p text:style-name="P10"><xsl:value-of select="studienordnung_gueltigvon"/></text:p>
+
 		<text:p text:style-name="P10"><xsl:value-of select="studiengang_bezeichnung"/> (<xsl:value-of select="studiengang_kz"/>)</text:p>
+
 		<text:p text:style-name="P11"/>
 		<text:p text:style-name="P11"/>
 		<text:p text:style-name="P11"/>
@@ -3121,8 +3040,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P11"/>
 		<text:p text:style-name="P11"/>
 		<text:p text:style-name="P11"/>
-		<text:p text:style-name="P13">FHTW - <xsl:value-of select="studiengang_kurzbzlang"/></text:p>
-		<text:h text:style-name="P60" text:outline-level="1">
+		<text:p text:style-name="P13"><xsl:value-of select="studiengang_kz"/>-<xsl:value-of select="studiengang_kurzbzlang"/>-<xsl:value-of select="studienordnung_gueltigvon"/></text:p>
+		<text:h text:style-name="P62" text:outline-level="1">
 			<text:bookmark-start text:name="__RefHeading__3656_462112980"/>Inhaltsverzeichnis<text:bookmark-end text:name="__RefHeading__3656_462112980"/>
 		</text:h>
 		<text:p text:style-name="P1"/>
@@ -3213,10 +3132,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</text:table-of-content-entry-template>
 			</text:table-of-content-source>
 			<text:index-body>
-				<!-- <text:p text:style-name="P51">
-					<text:a xlink:type="simple" xlink:href="#__RefHeading__3656_462112980" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">
-						<text:tab/>Inhaltsverzeichnis<text:tab/>2</text:a>
-				</text:p>-->
 				<text:p text:style-name="P51">
 					<text:a xlink:type="simple" xlink:href="#__RefHeading__3658_462112980" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">1.<text:tab/>Studienplan Organisationsform Berufsbegleitend<text:tab/>3</text:a>
 				</text:p>
@@ -3229,9 +3144,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P50">
 					<text:a xlink:type="simple" xlink:href="#__RefHeading__3664_462112980" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">1.3.<text:tab/>Modulbeschreibungen<text:tab/>6</text:a>
 				</text:p>
-				<text:p text:style-name="P50">
-					<text:a xlink:type="simple" xlink:href="#__RefHeading__3666_462112980" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">1.4.<text:tab/>Lernergebnisabgleich<text:tab/>7</text:a>
-				</text:p>
 				<text:p text:style-name="P51">
 					<text:a xlink:type="simple" xlink:href="#__RefHeading__3668_462112980" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">2.<text:tab/>Studienplan Organisationsform Vollzeit<text:tab/>8</text:a>
 				</text:p>
@@ -3240,17 +3152,15 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</text:p>
 			</text:index-body>
 		</text:table-of-content>
-		
+
 		<xsl:apply-templates select="studienplan"/>
-		
-	</office:text> 
+
+	</office:text>
 	</office:body>
 </office:document-content>
 </xsl:template>
 
 <xsl:template match="studienplan">
-
-			
 			<text:p text:style-name="P1"/>
 			<text:list xml:id="list6602357775918451119" text:style-name="Numbering_20_1">
 				<text:list-item>
@@ -3259,39 +3169,17 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 					</text:h>
 					<text:list>
 						<text:list-item>
-							<text:h text:style-name="Numbering_20_2" text:outline-level="2">
+							<text:h text:style-name="P66" text:outline-level="2">
 								<text:bookmark-start text:name="__RefHeading__3660_462112980"/>Studienplanmatrix<text:bookmark-end text:name="__RefHeading__3660_462112980"/>
 							</text:h>
 						</text:list-item>
 					</text:list>
 				</text:list-item>
 			</text:list>
-			<text:p text:style-name="P8">[Die Studienplanmatrix ist eine Liste der Pflicht-Lehrveranstaltungen eines Studiengangs gruppiert nach Semestern und nach Modulen. Pro aktuell erfasster Lehrveranstaltung und aktuell erfasstem Modul wurden die Bezeichnung, die SWS und die ECTS (sowie der LV-Typ) aus dem FAS exportiert. Die Summenbildung erfolgt je Modul, je Semester und über alle Semester.</text:p>
-			<text:p text:style-name="P8"/>
-			<text:p text:style-name="P8">Todo’s:</text:p>
-			
-			<text:list id="{concat('matrix',position())}" text:style-name="{concat('matrix',position())}">
-				<text:list-item>
-					<text:p text:style-name="P55">Bitte überprüfen Sie alle Einträge auf Korrektheit und überarbeiten Sie diese wenn notwendig auf Basis des IST-Curricula.</text:p>
-				</text:list-item>
-				<text:list-item>
-					<text:p text:style-name="P57">Bitte listen Sie die Wahlpflichtmodule/ -lehrveranstaltungen, Vertiefungen, Spezialisierungen etc. für die jeweiligen Semester in welchen sich diese befinden, separat unterhalb des entsprechenden Semesters, wie am Beispiel des 6. Semesters ersichtlich.</text:p>
-				</text:list-item>
-			</text:list>
-			<text:p text:style-name="P8"/>
-			<text:p text:style-name="P8">Definitionen:</text:p>
-			<text:list xml:id="list5002296067645293145" text:style-name="L2">
-				<text:list-item>
-					<text:p text:style-name="P52">SWS: Von den Studierenden zu absolvierende Semesterwochenstunden.</text:p>
-				</text:list-item>
-				<text:list-item>
-					<text:p text:style-name="P52">ECTS: Von den Studierenden zu erbringender Aufwand an ECTS credits.]</text:p>
-				</text:list-item>
-			</text:list>
 			<text:p text:style-name="P1"/>
-			
-			<xsl:apply-templates select="semester" mode="matrix" />			
-			
+
+			<xsl:apply-templates select="semester" mode="matrix" />
+
 			<text:p text:style-name="P2"/>
 			<text:p text:style-name="P3"/>
 			<table:table table:name="Tabelle3" table:style-name="Tabelle3">
@@ -3499,13 +3387,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 					</text:list>
 				</text:list-item>
 			</text:list>
-			<text:p text:style-name="P8">[Bitte fügen Sie die endgültige Modulgrafik Ihres lernergebnisorientierten und modularisierten Curricula zu Ende aller Überarbeitungen an dieser Stelle ein. Erforderlichenfalls zwischenzeitliche Aktualisierungen integrieren.]</text:p>
+			<text:p text:style-name="P8">[Die Modulgrafik ist derzeit noch nicht automatisch generierbar. Sie wird zu einem späteren Zeitpunkt in den Studienplan integriert werden.]</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1">
-				<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr2" draw:name="Bild1" text:anchor-type="paragraph" svg:width="25.7cm" svg:height="5.196cm" draw:z-index="0" >
-					<draw:image xlink:href="Pictures/1000020100000D27000002A962041C99.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-				</draw:frame>
+			<!--draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr3" draw:name="Bild1" text:anchor-type="paragraph" svg:width="25.7cm" svg:height="5.196cm" draw:z-index="1">
+				<draw:image xlink:href="Pictures/1000020100000D27000002A962041C99.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+			</draw:frame-->
 			</text:p>
 			<text:p text:style-name="P1"/>
 			<!-- <text:list xml:id="list134241269166448" text:continue-numbering="true" text:style-name="Numbering_20_1">-->
@@ -3520,1523 +3408,18 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 					</text:list>
 				</text:list-item>
 			</text:list>
-			<text:p text:style-name="P8">[Bitte beschreiben bzw. aktualisieren Sie jeweils die Beschreibung des Modul und der dem Modul zugeordneten Lehrveranstaltungen. Die folgenden Modul- und LV-Beschreibungen entsprechen Ihrem Curricula aus dem Studienjahr 2014/15 und wurden aus dem FAS exportiert.</text:p>
-			<text:p text:style-name="P14">Dieses Kapitel entspricht Schritt 1b des Prozesses „LE und Modularisierung“.</text:p>
+
 			<text:p text:style-name="P8"/>
-			<text:p text:style-name="P8">Todo’s:</text:p>
-			<text:list id="{concat('modul',position())}" text:style-name="{concat('modul',position())}">
-				<text:list-item>
-					<text:p text:style-name="P54">
-						<text:span text:style-name="T7">Bitte überprüfen Sie alle Einträge auf Korrektheit und überarbeiten Sie diese wenn notwendig auf Basis des IST-Curricula.</text:span>
-					</text:p>
-				</text:list-item>
-				<text:list-item>
-					<text:p text:style-name="P53">Bitte überprüfen und überarbeiten Sie die Lernergebnisse auf LV-Ebene und Modul-Ebene.<text:line-break/>• bei Modulprüfung: Lernergebnisse nur auf Modul-Ebene definieren<text:line-break/>• bei LV-Prüfungen: Lernergebnisse nur auf LV-Ebene definieren</text:p>
-				</text:list-item>
-				<text:list-item>
-					<text:p text:style-name="P53">Bitte beachten Sie, dass eventuelle Änderungen in den definierten Lernergebnissen auf LV- bzw. Modul-Ebene notwendige Änderungen in den Lernergebnissen auf Studiengangsebene = Qualifikationsziele erfordern können. Falls dies der Fall ist, überarbeiten Sie bitte auch die Qualifikationsziele im Dokument „Studienordnung“ (welches je Studiengang im Auftrag der QSE bis 02/2015 erarbeitet wurde).]</text:p>
-				</text:list-item>
-			</text:list>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
-			
+
 			<xsl:apply-templates select="semester" mode="modulbeschreibung" />
-			
+
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
-			<text:list xml:id="list134241279167599" text:continue-list="list134241269166448" text:style-name="Numbering_20_1">
-				<text:list-item>
-					<text:list>
-						<text:list-item>
-							<text:h text:style-name="P64" text:outline-level="2">
-								<text:bookmark-start text:name="__RefHeading__3666_462112980"/>Lernergebnisabgleich<text:bookmark-end text:name="__RefHeading__3666_462112980"/>
-							</text:h>
-						</text:list-item>
-					</text:list>
-				</text:list-item>
-			</text:list>
-			<text:p text:style-name="P8">[In diesem Kapitel soll der Abgleich der Lernergebnisse auf Modul-Ebene (Lernergebnisse) mit den Lernergebnissen auf Studiengangsebene (Qualifikationsziele) stattfinden.</text:p>
-			<text:p text:style-name="P14">Dieses Kapitel entspricht Schritt 2 des Prozesses „LE und Modularisierung“.</text:p>
-			<text:p text:style-name="P8"/>
-			<text:p text:style-name="P8">Todo’s:</text:p>
-			<text:list id="{concat('lernergebnis',position())}" text:style-name="{concat('lernergebnis',position())}">
-				<text:list-item>
-					<text:p text:style-name="P56">Bitte fügen Sie die Qualifikationsziele (Kurzbeschreibung) und Module (Modul#) Ihres Studienganges, nach Semestern, in folgender Tabelle ein und machen jeweils ein „x“ in den Zellen der Schnittstellen.</text:p>
-				</text:list-item>
-				<text:list-item>
-					<text:p text:style-name="P58">Bitte beachten Sie, dass dieser Abgleich Sie darauf aufmerksam machen könnte, dass Lernergebnisse auf LV- bzw. Modul-Ebene keinem Lernergebnis auf Studiengangsebene zugeordnet werden kann bzw. umgekehrt. In diesem Fall ist entweder eine Überarbeitung der Lernergebnisse auf LV- bzw. Modul-Ebene notwendig – diese bitte im vorherigen Kapitel durchführen – oder eine Überarbeitung der Lernergebnisse auf Studiengangsebene (Qualifikationsziele) erforderlich – dann bitte die Qualifikationsziele im Dokument „Studienordnung“ (welches je Studiengang im Auftrag der QSE bis 02/2015 erarbeitet wurde) überarbeiten.]</text:p>
-				</text:list-item>
-			</text:list>
+
 			<text:p text:style-name="P1"/>
-			<table:table table:name="Tabelle7" table:style-name="Tabelle7">
-				<table:table-column table:style-name="Tabelle7.A"/>
-				<table:table-column table:style-name="Tabelle7.B"/>
-				<table:table-column table:style-name="Tabelle7.C" table:number-columns-repeated="5"/>
-				<table:table-column table:style-name="Tabelle7.B"/>
-				<table:table-column table:style-name="Tabelle7.C" table:number-columns-repeated="5"/>
-				<table:table-column table:style-name="Tabelle7.B"/>
-				<table:table-column table:style-name="Tabelle7.C" table:number-columns-repeated="5"/>
-				<table:table-column table:style-name="Tabelle7.B"/>
-				<table:table-column table:style-name="Tabelle7.C" table:number-columns-repeated="5"/>
-				<table:table-column table:style-name="Tabelle7.B"/>
-				<table:table-column table:style-name="Tabelle7.C" table:number-columns-repeated="5"/>
-				<table:table-column table:style-name="Tabelle7.B"/>
-				<table:table-column table:style-name="Tabelle7.C" table:number-columns-repeated="2"/>
-				<table:table-column table:style-name="Tabelle7.i"/>
-				<table:table-row table:style-name="Tabelle7.1">
-					<table:table-cell table:style-name="Tabelle7.A1" table:number-rows-spanned="2" office:value-type="string">
-						<text:p text:style-name="P42">Qualifikationsziele</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
-						<text:p text:style-name="P41"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C1" table:number-columns-spanned="5" office:value-type="string">
-						<text:p text:style-name="P43">Semester 1</text:p>
-					</table:table-cell>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
-						<text:p text:style-name="P45"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C1" table:number-columns-spanned="5" office:value-type="string">
-						<text:p text:style-name="P43">Semester 2</text:p>
-					</table:table-cell>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
-						<text:p text:style-name="P45"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C1" table:number-columns-spanned="5" office:value-type="string">
-						<text:p text:style-name="P43">Semester 3</text:p>
-					</table:table-cell>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
-						<text:p text:style-name="P45"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C1" table:number-columns-spanned="5" office:value-type="string">
-						<text:p text:style-name="P43">Semester 4</text:p>
-					</table:table-cell>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
-						<text:p text:style-name="P45"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C1" table:number-columns-spanned="5" office:value-type="string">
-						<text:p text:style-name="P43">Semester 5</text:p>
-					</table:table-cell>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
-						<text:p text:style-name="P45"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.g1" table:number-columns-spanned="3" office:value-type="string">
-						<text:p text:style-name="P43">Semester 6</text:p>
-					</table:table-cell>
-					<table:covered-table-cell/>
-					<table:covered-table-cell/>
-				</table:table-row>
-				<table:table-row>
-					<table:covered-table-cell/>
-					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
-						<text:p text:style-name="P41"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M11</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M12</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M13</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M14</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M15</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
-						<text:p text:style-name="P45"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M21</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M22</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M23</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M24</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M25</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
-						<text:p text:style-name="P45"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M31</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M32</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M33</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M34</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
-						<text:p text:style-name="P44">M35</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
-						<text:p text:style-name="P45"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
-						<text:p text:style-name="P44">M41</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
-						<text:p text:style-name="P44">M42</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
-						<text:p text:style-name="P44">M43</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
-						<text:p text:style-name="P44">M44</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
-						<text:p text:style-name="P44">M45</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
-						<text:p text:style-name="P45"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
-						<text:p text:style-name="P44">M51</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
-						<text:p text:style-name="P44">M52</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
-						<text:p text:style-name="P44">M53</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
-						<text:p text:style-name="P44">M54</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
-						<text:p text:style-name="P44">M55</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
-						<text:p text:style-name="P45"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
-						<text:p text:style-name="P44">M61</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
-						<text:p text:style-name="P44">M62</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.i2" office:value-type="string">
-						<text:p text:style-name="P44">M63</text:p>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle7.A3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.G3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.H3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.K3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.N3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.R3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.T3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.U3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Y3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Z3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.b3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.f3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.i3" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle7.A4" office:value-type="string">
-						<text:p text:style-name="P47">Fachliche Kompetenzen</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.G4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.H4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.K4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.N4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.R4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.T4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.U4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Y4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Z4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.b4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.f4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.i4" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle7.A13" office:value-type="string">
-						<text:p text:style-name="P49">QZ1</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B8" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D5" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.G5" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.H14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.K5" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.N5" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.R5" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.T14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.U5" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Y5" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Z14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.b5" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.f5" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.i5" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle7.A13" office:value-type="string">
-						<text:p text:style-name="P49">QZ2</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B8" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D6" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.G6" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.H14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.K6" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.N6" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.R6" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.T14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.U6" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Y6" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Z14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.b6" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.f6" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.i6" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle7.A13" office:value-type="string">
-						<text:p text:style-name="P49">QZ3</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B8" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D7" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.G7" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.H14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.K7" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.N7" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.R7" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.T14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.U7" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Y7" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Z14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.b7" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.f7" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.i7" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle7.A13" office:value-type="string">
-						<text:p text:style-name="P48">...</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B8" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D8" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.G8" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.H14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.K8" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.N8" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.R8" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.T14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.U8" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Y8" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Z14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.b8" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.f8" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.i8" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle7.A9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.G9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.H9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.K9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.N9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.R9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.T9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.U9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Y9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Z9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.b9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.f9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.i9" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle7.A10" office:value-type="string">
-						<text:p text:style-name="P47">Sozial-personale Kompetenzen</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.G10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.H10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.K10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.N10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.R10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.T10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.U10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Y10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Z10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.b10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.f10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.i10" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle7.A13" office:value-type="string">
-						<text:p text:style-name="P49">QZ1</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D11" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.G11" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.H14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.K11" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.N11" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.R11" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.T14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.U11" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Y11" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Z14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.b11" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.f11" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.i11" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle7.A13" office:value-type="string">
-						<text:p text:style-name="P49">QZ2</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D12" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.G12" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.H14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.K12" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.N12" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.R12" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.T14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.U12" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Y12" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Z14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.b12" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.f12" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.i12" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle7.A13" office:value-type="string">
-						<text:p text:style-name="P49">QZ3</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.G13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.H14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.K13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.N14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.R13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.T14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.U13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Y13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Z14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.b13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.f14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.i13" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle7.A14" office:value-type="string">
-						<text:p text:style-name="P49">...</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.B14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.D14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.G14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.H14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.K14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.N14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.R14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.T14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.U14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Y14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.Z14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.b14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.f14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.h14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.i14" office:value-type="string">
-						<text:p text:style-name="P48"/>
-					</table:table-cell>
-				</table:table-row>
-			</table:table>			
 </xsl:template>
 
 <xsl:template match="semester" mode="matrix">
@@ -5072,9 +3455,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P33">ECTS</text:p>
 			</table:table-cell>
 		</table:table-row>
-		
+
 		<xsl:apply-templates match="lehrveranstaltung" mode="matrix" />
-		
+
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle1.A8" office:value-type="string">
 				<text:p text:style-name="P32">Summenzeile:</text:p>
@@ -5090,13 +3473,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table-cell>
 		</table:table-row>
 	</table:table>
-	<text:p text:style-name="Seitenumbruch" />
 </xsl:template>
 
 <xsl:template match="lehrveranstaltung" mode="matrix">
 <xsl:choose>
 	<xsl:when test="lv_lehrtyp_kurzbz='modul'">
-		
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle1.A3" office:value-type="string">
 				<text:p text:style-name="P16"><xsl:value-of select="lv_bezeichnung"/></text:p>
@@ -5137,19 +3518,16 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 </xsl:template>
 
 <xsl:template match="semester" mode="modulbeschreibung">
-<text:h text:style-name="Numbering_20_3" text:outline-level="2">
-	<text:bookmark-start text:name="__RefHeading__3660_462112980"/><xsl:value-of select="semester_nr"/>. Semester<text:bookmark-end text:name="__RefHeading__3660_462112980"/>
-</text:h>
-	<xsl:apply-templates match="lehrveranstaltung" mode="modulbeschreibung" />
+	<table:table table:name="Tabelle6" table:style-name="Tabelle6">
+		<table:table-column table:style-name="Tabelle6.A"/>
+		<table:table-column table:style-name="Tabelle6.B"/>
+			<xsl:apply-templates match="lehrveranstaltung" mode="modulbeschreibung" />
+	</table:table>
 </xsl:template>
 
-  
 <xsl:template match="lehrveranstaltung" mode="modulbeschreibung">
-<table:table table:name="Tabelle6" table:style-name="Tabelle6">
-	<table:table-column table:style-name="Tabelle6.A"/>
-	<table:table-column table:style-name="Tabelle6.B"/>
-	<xsl:choose>
-	<xsl:when test="lv_lehrtyp_kurzbz='modul'">		
+<xsl:choose>
+	<xsl:when test="lv_lehrtyp_kurzbz='modul'">
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A1" office:value-type="string">
 				<text:p text:style-name="P40">Modul-Bezeichnung</text:p>
@@ -5160,7 +3538,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</table:table-row>
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
-				<text:p text:style-name="P28" />
+				<text:p text:style-name="P28">Modul-Bezeichnung engl.</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
 				<text:p text:style-name="P28"><xsl:value-of select="lv_bezeichnung_en"/></text:p>
@@ -5192,6 +3570,14 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</table:table-row>
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
+				<text:p text:style-name="P28">Sprache</text:p>
+			</table:table-cell>
+			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
+				<text:p text:style-name="P28"><xsl:value-of select="lv_sprache"/></text:p>
+			</table:table-cell>
+		</table:table-row>
+		<table:table-row>
+			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P28">Kompetenzbereich</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
@@ -5218,7 +3604,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</table:table-row>
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
-				<text:p text:style-name="P28" />
+				<text:p text:style-name="P28">LV-Bezeichnung engl.</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
 				<text:p text:style-name="P28"><xsl:value-of select="lv_bezeichnung_en"/></text:p>
@@ -5251,7 +3637,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P5">Kurzbeschreibung</text:p>
-				<text:p text:style-name="P9">[bitte überarbeiten]</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
 				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_kurzbeschreibung"/></text:p>
@@ -5260,7 +3645,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P5">Course Description</text:p>
-				<text:p text:style-name="P9">[bitte überarbeiten]</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
 				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_kurzbeschreibung_en"/></text:p>
@@ -5268,26 +3652,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</table:table-row>
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
-				<text:p text:style-name="P5">Kompetenzerwerb</text:p>
-				<text:p text:style-name="P9">[ALT: wird gelöscht]</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_lehrziele"/></text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row>
-			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
-				<text:p text:style-name="P5">Competences</text:p>
-				<text:p text:style-name="P9">[ALT: wird gelöscht]</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_lehrziele_en"/></text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row>
-			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P5">Lernergebnisse</text:p>
-				<text:p text:style-name="P9">[NEU: bitte definieren]</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
 				<text:p text:style-name="P29">Nach erfolgreichem Abschluss sind die Studierenden in der Lage,...</text:p>
@@ -5308,7 +3673,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P5">Learning Outcomes</text:p>
-				<text:p text:style-name="P9">[NEU: bitte definieren]</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
 				<text:p text:style-name="P29">After passing this course successfully students are able to...</text:p>
@@ -5329,7 +3693,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P29">Lehrinhalte</text:p>
-				<text:p text:style-name="P9">[bitte überarbeiten]</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
 				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_lehrinhalte"/></text:p>
@@ -5338,7 +3701,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P29">Course Contents</text:p>
-				<text:p text:style-name="P9">[bitte überarbeiten]</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
 				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_lehrinhalte_en"/></text:p>
@@ -5347,7 +3709,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P29">Vorkenntnisse</text:p>
-				<text:p text:style-name="P9">[bitte überarbeiten]</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
 				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_voraussetzungen"/></text:p>
@@ -5356,7 +3717,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P29">Prerequisites</text:p>
-				<text:p text:style-name="P9">[bitte überarbeiten]</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
 				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_voraussetzungen_en"/></text:p>
@@ -5365,7 +3725,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P30">Literatur/Literature</text:p>
-				<text:p text:style-name="P9">[bitte überarbeiten und alphabetisch reihen]</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
 				<text:p text:style-name="P67">
@@ -5379,7 +3738,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P29">Leistungsbeurteilung</text:p>
-				<text:p text:style-name="P9">[bitte überarbeiten]</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
 				<text:p text:style-name="P67">LV-Immanente Leistungsbeurteilung oder</text:p>
@@ -5394,9 +3752,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P29">Assessment Methods</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P67">Course immanent assessment method or</text:p>
-				<text:p text:style-name="P67">Course immanent assessment method and/ or end exam or</text:p>
-				<text:p text:style-name="P67">End exam</text:p>
+				<text:p text:style-name="P67">LV-Immanente Leistungsbeurteilung oder</text:p>
+				<text:p text:style-name="P67">LV-Immanente Leistungsbeurteilung und/ oder Abschlussprüfung oder</text:p>
+				<text:p text:style-name="P67">Abschlussprüfung</text:p>
 				<text:p/>
 				<text:p text:style-name="P30"><xsl:value-of select="lvinfo_pruefungsordnung_en"/></text:p>
 			</table:table-cell>
@@ -5412,38 +3770,17 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P29">Attendance</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
+			</table:table-cell>			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
 				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_anwesenheit_en"/></text:p>
 			</table:table-cell>
 		</table:table-row>
-		<table:table-row>
-			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
-				<text:p text:style-name="P29">Anmerkungen</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_anmerkungen"/></text:p>
-			</table:table-cell>
-		</table:table-row>
-		<table:table-row>
-			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
-				<text:p text:style-name="P29">Comments</text:p>
-			</table:table-cell>
-			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_anmerkungen_en"/></text:p>
-			</table:table-cell>
-		</table:table-row>
 	</xsl:otherwise>
-	</xsl:choose>
-</table:table>
-
+</xsl:choose>
 	<xsl:apply-templates match="lehrveranstaltungen" mode="modulbeschreibung" />
-	
 </xsl:template>
 
 <xsl:template match="lehrveranstaltungen" mode="modulbeschreibung">
 	<xsl:apply-templates match="lehrveranstaltung" mode="modulbeschreibung" />
-	<text:p text:style-name="Seitenumbruch"/>
 </xsl:template>
 
 </xsl:stylesheet>
