@@ -22,10 +22,10 @@
  */
 // content type setzen
 header("Content-type: application/xhtml+xml");
-require_once('../config/vilesci.config.inc.php');
-require_once('../include/functions.inc.php');
-require_once('../include/basis_db.class.php');
-require_once('../include/ean13.function.php');
+require_once('../../../config/vilesci.config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/basis_db.class.php');
+require_once('../../../include/ean13.function.php');
 
 // Optionen abfragen
 isset($_GET['von']) ? $von = date('Y-m-d', strtotime($_GET['von'])) : $von = NULL;
@@ -33,11 +33,8 @@ isset($_GET['bis']) ? $bis = date('Y-m-d', strtotime($_GET['bis'])) : $bis = $vo
 isset($_GET['stundevon']) ? $stundevon = $_GET['stundevon'] : $stundevon = null;
 isset($_GET['stundebis']) ? $stundebis = $_GET['stundebis'] : $stundebis = null;
 isset($_GET['stg_kz']) ? $studiengang = $_GET['stg_kz'] : $studiengang = NULL;
-isset($_GET['sem']) ? $semester = $_GET['sem'] : $semester = NULL;
+isset($_GET['semester']) ? $semester = $_GET['semester'] : $semester = NULL;
 isset($_GET['lehreinheit']) ? $lehreinheit = $_GET['lehreinheit'] : $lehreinheit = NULL;
-isset($_GET['fixangestellt']) ? $fixangestellt = $_GET['fixangestellt'] : $fixangestellt = NULL;
-isset($_GET['standort']) ? $standort = $_GET['standort'] : $standort = NULL;
-isset($_GET['lvid']) ? $lvid = $_GET['lvid'] : $lvid = NULL;
 
 if($von)
 	$studiensemester = getStudiensemesterFromDatum($von);
@@ -50,16 +47,14 @@ $data = array();
 */
 // Daten der Lehreinheiten ermitteln
 $qry = "SELECT le.lehreinheit_id, le.lehrveranstaltung_id, lv.lvnr, lv.bezeichnung AS lvbez, stg.bezeichnung AS stgbez, "
-	. "sp.ort_kurzbz, datum, beginn, ende, sto.bezeichnung AS standort "
+	. "sp.ort_kurzbz, datum, beginn, ende, studiensemester_kurzbz, lv.semester, lv.orgform_kurzbz "
 	. "FROM lehre.tbl_lehreinheit le "
 	. "JOIN lehre.tbl_lehrveranstaltung lv ON lv.lehrveranstaltung_id = le.lehrveranstaltung_id "
 	. "JOIN public.tbl_studiengang stg ON stg.studiengang_kz = lv.studiengang_kz "
 	. "JOIN lehre.tbl_stundenplan sp ON (sp.lehreinheit_id=le.lehreinheit_id) "
 	. "JOIN lehre.tbl_stunde stu ON stu.stunde = sp.stunde "
-    . "JOIN public.tbl_ort ort ON sp.ort_kurzbz = ort.ort_kurzbz "
-    . "JOIN public.tbl_standort sto ON ort.standort_id = sto.standort_id "
 	. "WHERE 1=1";
-
+//echo "<sql>".var_dump($qry)."</sql>";
 if($studiengang!='')
 	$qry.=" AND stg.studiengang_kz = " . $db->db_add_param($studiengang) . " ";
 
@@ -70,14 +65,22 @@ if($semester)
 	$qry .= " AND lv.semester = " . $db->db_add_param($semester);
 if($von)
 	$qry .= " AND (sp.datum >= " . $db->db_add_param($von) . "::DATE AND sp.datum <= " . $db->db_add_param($bis) . "::DATE) ";
-if(!is_null($stundevon))
-	$qry.=" AND stu.stunde>=".$db->db_add_param($stundevon);
-if(!is_null($stundebis))
-	$qry.=" AND stu.stunde<=".$db->db_add_param($stundebis);
-if($standort)
-	$qry.=" AND sto.standort_id=".$db->db_add_param($standort);
-if($lvid)
-	$qry .= " AND lv.lehrveranstaltung_id = " . $db->db_add_param($lvid);
+
+if(!is_null($stundevon) && !is_null($stundebis))
+{
+	// Unterricht zwischen 4. und 8. Stunde
+	//$qry.=" AND EXISTS (SELECT 1 FROM lehre.tbl_stundenplan WHERE datum=sp.datum AND lehreinheit_id=sp.lehreinheit_id AND stunde BETWEEN ".$db->db_add_param($stundevon)." AND ".$db->db_add_param($stundebis).")";
+
+	// Beginn zwischen 4. und 8. Stunde
+	$qry.=" AND (SELECT min(stunde) FROM lehre.tbl_stundenplan WHERE datum=sp.datum AND lehreinheit_id=sp.lehreinheit_id) BETWEEN ".$db->db_add_param($stundevon)." AND ".$db->db_add_param($stundebis);
+}
+else
+{
+	if(!is_null($stundevon))
+		$qry.=" AND stu.stunde>=".$db->db_add_param($stundevon);
+	if(!is_null($stundebis))
+		$qry.=" AND stu.stunde<=".$db->db_add_param($stundebis);
+}
 $qry .= " ORDER BY datum, beginn";
 
 if($db->db_query($qry))
@@ -90,14 +93,12 @@ if($db->db_query($qry))
 		$data[$row->lehreinheit_id]['tage'][$row->datum][] = $row;
 	}
 }
-		
+//echo $qry;
 foreach($data as $key => $value)
 {
 	// Daten der Vortragenden ermitteln
-	$qry = "SELECT vorname, nachname, titelpre, titelpost, "
-        . "CASE WHEN fixangestellt IS TRUE THEN 'ja' ELSE 'nein' END AS fixangestellt "
+	$qry = "SELECT vorname, nachname, titelpre, titelpost "
 		. "FROM lehre.tbl_lehreinheitmitarbeiter lema "
-        . "JOIN public.tbl_mitarbeiter ma ON lema.mitarbeiter_uid = ma.mitarbeiter_uid "   
 		. "JOIN public.tbl_benutzer be ON be.uid = lema.mitarbeiter_uid "
 		. "JOIN public.tbl_person pe ON pe.person_id = be.person_id "
 		. "WHERE lehreinheit_id = " . $db->db_add_param($key);
@@ -110,7 +111,6 @@ foreach($data as $key => $value)
 		}
 	}
 
-
 	// Daten der Studenten ermitteln
 	$qry = "SELECT pe.person_id, vorname, nachname, titelpre, titelpost, note, "
 		. "get_rolle_prestudent(tbl_student.prestudent_id, " . $db->db_add_param($studiensemester) . ") AS laststatus "
@@ -120,7 +120,7 @@ foreach($data as $key => $value)
 		. "JOIN public.tbl_student ON be.uid = tbl_student.student_uid "
 		. "LEFT JOIN lehre.tbl_zeugnisnote zn ON (zn.lehrveranstaltung_id = stlv.lehrveranstaltung_id AND zn.student_uid = stlv.uid AND zn.studiensemester_kurzbz = " . $db->db_add_param($studiensemester) . ") "
 		. "WHERE stlv.lehreinheit_id = " . $db->db_add_param($key) . " "
-		. "AND get_rolle_prestudent(tbl_student.prestudent_id, " . $db->db_add_param($studiensemester) . ") NOT IN ('Abbrecher', 'Unterbrecher') "
+		. "AND get_rolle_prestudent(tbl_student.prestudent_id, " . $db->db_add_param($studiensemester) . ") NOT IN ('Abbrecher', 'Unterbrecher', 'Outgoings') "
 		. "ORDER BY nachname ASC";
 
 	if($db->db_query($qry))
@@ -138,20 +138,7 @@ echo "<anwesenheitslisten>";
 
 foreach($data as $lehreinheit_id => $value)
 {
-	// Anstellung der Vortragenden prüfen
-    if($fixangestellt != '')
-    {
-        $anstellungVortragende = array();
-        foreach($value['vortragende'] as $vortragender)
-        {
-            $anstellungVortragende[] = $vortragender->fixangestellt;
-        }
-
-        if(!in_array($fixangestellt, $anstellungVortragende))
-            continue;
-    }
-    
-    foreach($value['tage'] as $tag)
+	foreach($value['tage'] as $tag)
 	{
 		echo "<anwesenheitsliste>";
 
@@ -164,11 +151,13 @@ foreach($data as $lehreinheit_id => $value)
 		echo "\n		<lehreinheit>";
 		echo "\n			<lehreinheit_id><![CDATA[".$tag[0]->lehreinheit_id."]]></lehreinheit_id>";
 		echo "\n			<studiengang><![CDATA[".$tag[0]->stgbez."]]></studiengang>";
+		echo "\n			<semester><![CDATA[".$tag[0]->semester."]]></semester>";
+		echo "\n			<orgform_kurzbz><![CDATA[".$tag[0]->orgform_kurzbz."]]></orgform_kurzbz>";
+		echo "\n			<studiensemester_kurzbz><![CDATA[".$tag[0]->studiensemester_kurzbz."]]></studiensemester_kurzbz>";
 		echo "\n			<bezeichnung><![CDATA[".$tag[0]->lvbez."]]></bezeichnung>";
 		echo "\n			<barcode><![CDATA[".ean13($convertableString)."]]></barcode>";
 		echo "\n			<kuerzel><![CDATA[".$tag[0]->lvnr."]]></kuerzel>";
 		echo "\n			<einheiten><![CDATA[".count($tag)."]]></einheiten>";
-        echo "\n			<standort><![CDATA[".$tag[0]->standort."]]></standort>";
 		echo "\n			<ort><![CDATA[".$tag[0]->ort_kurzbz."]]></ort>";
 		echo "\n			<datum><![CDATA[".date('d.m.Y', strtotime($tag[0]->datum))."]]></datum>";
 		echo "\n			<beginn><![CDATA[".mb_substr($tag[0]->beginn, 0, 5)."]]></beginn>";
@@ -184,7 +173,6 @@ foreach($data as $lehreinheit_id => $value)
 			echo "\n			<nachname><![CDATA[".$vortragender->nachname."]]></nachname>";
 			echo "\n			<titelpre><![CDATA[".$vortragender->titelpre."]]></titelpre>";
 			echo "\n			<titelpost><![CDATA[".$vortragender->titelpost."]]></titelpost>";
-            echo "\n			<fixangestellt><![CDATA[".$vortragender->fixangestellt."]]></fixangestellt>";
 			echo "\n		</vortragender>";
 		}
 		echo "</vortragende>";
@@ -198,6 +186,10 @@ foreach($data as $lehreinheit_id => $value)
 				// Barcode erstellen
 				$paddedPersonId = str_pad($student->person_id, 12, "0", STR_PAD_LEFT);
 				$barcode = ean13($paddedPersonId);
+				// Anzeigename generieren
+				$namegesamt = (strlen($student->titelpre) > 0) ? $student->titelpre." " : "";
+				$namegesamt .= $student->nachname." ".$student->vorname;
+				$namegesamt .= (strlen($student->titelpost) > 0) ? ", ".$student->titelpost : "";
 
 				echo "\n		<student>";
 				echo "\n			<barcode><![CDATA[".$barcode."]]></barcode>";
@@ -205,6 +197,7 @@ foreach($data as $lehreinheit_id => $value)
 				echo "\n			<nachname><![CDATA[".$student->nachname."]]></nachname>";
 				echo "\n			<titelpre><![CDATA[".$student->titelpre."]]></titelpre>";
 				echo "\n			<titelpost><![CDATA[".$student->titelpost."]]></titelpost>";
+				echo "\n			<namegesamt><![CDATA[".$namegesamt."]]></namegesamt>";
 				echo "\n			<note><![CDATA[".$student->note."]]></note>";
 				echo "\n			<status><![CDATA[".$student->laststatus."]]></status>";
 				echo "\n		</student>";
