@@ -422,7 +422,7 @@ if (!isset($_REQUEST["archive"]))
 				{
 				    $studienordnung = new studienordnung();
 					$studienordnung->loadStudienordnung($_GET['studienordnung_id']);
-					$filename = $filename.'_'.$studienordnung->studiengangkurzbzlang.'.pdf';
+					$filename = 'Studienordnung-Studienplan-'. sprintf("%'.04d",$studienordnung->studiengang_kz).'-'.$studienordnung->studiengangkurzbzlang;
 					$tempPdfName = $vorlage->vorlage_kurzbz.'.pdf';
 				}
 				else

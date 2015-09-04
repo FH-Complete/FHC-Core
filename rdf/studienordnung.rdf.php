@@ -30,6 +30,9 @@ require_once('../include/studienordnung.class.php');
 require_once('../include/studienplan.class.php');
 require_once('../include/organisationsform.class.php');
 require_once('../include/lehrform.class.php');
+require_once('../include/sprache.class.php');
+
+
 
 header("Content-type: application/xhtml+xml");
 
@@ -90,8 +93,8 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		
 				
 		echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-        echo '<studiengang>';
-        echo '  <studiengang_kz><![CDATA['.$objStg->studiengang_kz.']]></studiengang_kz>';
+        echo '<studienordnung>';
+        echo '  <studiengang_kz><![CDATA['. sprintf("%'.04d",$objStg->studiengang_kz).']]></studiengang_kz>';
         echo '  <studiengang_kurzbz><![CDATA['.$objStg->kurzbz.']]></studiengang_kurzbz>';
         echo '  <studiengang_typ><![CDATA['.$objStg->typ.']]></studiengang_typ>';
         echo '  <studiengang_art><![CDATA['.$stg_art.']]></studiengang_art>';
@@ -219,7 +222,7 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo '    </studienplan>';
 		}
         //echo '  </studienplan>';
-        echo '</studiengang>';
+        echo '</studienordnung>';
     }
     else
         die('Parameter studienordnung_id is missing'); 
@@ -232,6 +235,7 @@ function cmp($a, $b)
 {
     return strcmp($a->bezeichnung, $b->bezeichnung);
 }
+
 function printLehrveranstaltungTree($tree)
 {
 	global $summe_ects_semester, $summe_sws_semester;
@@ -269,7 +273,9 @@ function printLehrveranstaltungTree($tree)
 		//Bezeichnung der Lehrform
 		$lehrform_kurzbz = new lehrform();
 		$lehrform_kurzbz->load($lv->lehrform_kurzbz);
-		
+
+		//Klasse "sprache" instanzieren, um anschließend die Sprache(e.g. "German") in der richtigen Sprache zu bekommen("Deutsch")
+		$sp = new sprache();
 
 		echo '  		<lehrveranstaltung>';
 		echo '              <lv_semester><![CDATA['.$lv->semester.']]></lv_semester>';
@@ -285,6 +291,8 @@ function printLehrveranstaltungTree($tree)
 		echo '              <lv_sws><![CDATA['.round($sws,2).']]></lv_sws>';
 		echo '              <lv_alvs><![CDATA['.$alvs.']]></lv_alvs>';
 		echo '              <lv_anmerkung><![CDATA['.clearHtmlTags($lv->anmerkung).']]></lv_anmerkung>';
+		echo '							<lv_sprache><![CDATA['.$sp->getBezeichnung($lv->sprache, constant("DEFAULT_LANGUAGE")).']]></lv_sprache>';
+
 
 		$objLVInfo = new lvinfo();
 		// ***************** LV-Info ***************

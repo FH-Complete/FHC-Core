@@ -929,12 +929,18 @@ class person extends basis_db
 				$this->updateaktivvon = $row->updateaktivvon;
 				$this->updateaktivam = $row->updateaktivam;
 				$this->aktivierungscode = $row->aktivierungscode;
+				return true;
 			}
 			else
 			{
 				$this->errormsg = 'Keine Personendaten zu dieser UID gefunden';
 				return false;
 			}
+		}
+		else
+		{
+			$this->errormsg = "Fehler beim Laden der Personendaten";
+			return false;
 		}
 	}
 

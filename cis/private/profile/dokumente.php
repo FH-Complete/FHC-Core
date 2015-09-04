@@ -159,9 +159,13 @@ if(defined('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN') && CIS_DOKUMENTE_STUDIENBUC
     echo "<hr>";
 }
 
-echo "<a href='studienerfolgsbestaetigung.php' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Deutsch</a><br>";
-echo "<a href='studienerfolgsbestaetigung.php?lang=en' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Englisch</a>";
-echo "<hr><br>";
+if(defined('CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN') && CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN)
+{
+	echo "<a href='studienerfolgsbestaetigung.php' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Deutsch</a><br>";
+	echo "<a href='studienerfolgsbestaetigung.php?lang=en' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Englisch</a>";
+	echo "<hr>";
+}
+echo "<br>";
 	
 echo '</body>
 </html>

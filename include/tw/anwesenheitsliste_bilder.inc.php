@@ -209,7 +209,16 @@ if($result = $db->db_query($qry))
 //			$pdf->SetXY($maxX,$maxY);
 //			$pdf->MultiCell(80,$lineheight,'',0,'L',1);
 			if($elem->foto_sperre=='f')
-				$pdf->Image(APP_ROOT."cis/public/bild.php?src=person&person_id=".$elem->person_id,$maxX+1,$maxY+1,0,"78","jpg","");
+			{
+				$image_link = APP_ROOT."cis/public/bild.php?src=person&person_id=".$elem->person_id;
+				$type = exif_imagetype($image_link);
+
+				if($type==IMAGETYPE_JPEG)
+				{
+					$file_type='jpg';
+					$pdf->Image($image_link,$maxX+1,$maxY+1,0,"78",$file_type,"");
+				}
+			}
 		   	$inhalt[]=array($i,$name,$matrikelnr,$sem_verb_grup,'');
 		}
    }
