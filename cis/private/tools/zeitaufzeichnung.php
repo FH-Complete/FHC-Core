@@ -862,7 +862,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			$woche=date('W');
 			echo '
 			<table id="t1" class="" style="width:100%">
-				<thead>
+				
 					<tr>
 						<th style="background-color: #8DBDD8;" align="center" class="{sorter: false}" colspan="13">'.$p->t("eventkalender/kw").' '.$woche.'</th>
 					</tr>
@@ -880,11 +880,12 @@ if($projekt->getProjekteMitarbeiter($user, true))
 						<th style="background-color:#DCE4EF" align="center">'.$p->t("global/beschreibung").'</th>
 						<th style="background-color:#DCE4EF" align="center" colspan="2">'.$p->t("global/aktion").'</th>
 		    		</tr>
-		    	</thead>
-		    <tbody>';
+		    	
+		    ';
 		    
 		    $tag=null;
-		    $woche=date('W');
+		   $woche=date('W');
+
 			$tagessumme='00:00';
 			$pausesumme='00:00';
 			$wochensumme='00:00';
@@ -990,10 +991,10 @@ if($projekt->getProjekteMitarbeiter($user, true))
 				if(is_null($woche))
 					$woche = $datumwoche;
 				if($woche!=$datumwoche)
-				{
+				{					
 					echo '
-					</tbody>
-					<tfoot>
+					
+					
 							<tr>
 								<th colspan="7" style="background-color: #8DBDD8;"></th>
 								<th style="background-color: #8DBDD8;" align="right" colspan="2" style="font-weight: normal;"><b>'.$p->t("zeitaufzeichnung/wochensummeArbeitszeit").':</b></th>
@@ -1001,13 +1002,13 @@ if($projekt->getProjekteMitarbeiter($user, true))
 								<th style="background-color: #8DBDD8;" colspan="3"></th>
 							</tr>
 							
-					</tfoot>
+					
 					<!--</table>-->';
 
 					echo '
 					<!--<table id="t'.$datumwoche.'" class="tablesorter">-->
 					<tr><th colspan="13">&nbsp;</th></tr>
-						<thead>
+						
 							<tr>
 								<th style="background-color: #8DBDD8;" align="center" class="{sorter: false}" colspan="13">'.$p->t("eventkalender/kw").' '.$datumwoche.'</th>
 							</tr>
@@ -1025,8 +1026,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 								<th style="background-color:#DCE4EF" align="center">'.$p->t("global/beschreibung").'</th>
 								<th style="background-color:#DCE4EF" align="center" colspan="2">'.$p->t("global/aktion").'</th>
 							</tr>
-						</thead>
-					<tbody>';
+						
+					';
 
 
 					$woche=$datumwoche;
@@ -1088,14 +1089,14 @@ if($projekt->getProjekteMitarbeiter($user, true))
 					$extlehrearr[] = array("start"=>$row->start, "ende"=>$row->ende, "diff"=>$row->diff);
 				}	    
 		    }
-			echo '</tbody>';
+			echo '';
 			if ($alle===false)
 			{				
-				echo	'<tfoot>
+				echo	'
 								<tr>
 									<th align="center" colspan="13">'.$p->t('zeitaufzeichnung/endeXTageAnsicht', array($angezeigte_tage)).'</th>
 								</tr>
-						</tfoot>';
+						';
 			}
 			//echo '</table>';
 		
