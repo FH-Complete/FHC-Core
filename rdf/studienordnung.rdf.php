@@ -32,8 +32,6 @@ require_once('../include/organisationsform.class.php');
 require_once('../include/lehrform.class.php');
 require_once('../include/sprache.class.php');
 
-
-
 header("Content-type: application/xhtml+xml");
 
 if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
@@ -41,46 +39,46 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	if(isset($_GET['studienordnung_id']))
 	{
 		$studienordnung_id = $_REQUEST['studienordnung_id'];
-	
+
 		$studienordnung_obj = new studienordnung();
 		$studienordnung_obj->loadStudienordnung($studienordnung_id);
-	
+
 		$stg_kz = $studienordnung_obj->studiengang_kz;
 		$gueltigvon_stsem = $studienordnung_obj->gueltigvon;
 
         $orgform_obj = new organisationsform();
         $orgform_obj->getAll();
-        
+
         foreach($orgform_obj->result as $row_orgform)
         {
         	$orgform[$row_orgform->orgform_kurzbz]=$row_orgform->bezeichnung;
         }
-    	//$datum = new datum(); 
-        
-        $objStg = new studiengang(); 
-        
+    	//$datum = new datum();
+
+        $objStg = new studiengang();
+
         if(!$objStg->load($stg_kz))
             die('Fehler beim laden des Studiengangs');
         $objLVInfo = new lvinfo();
-		
+
 		switch($objStg->typ)
 		{
 			case 'b':
-				$stg_art = 'Bachelor'; 
-				$titel_kurzbz = 'BSc'; 
-				break; 
-			case 'm': 
-				$stg_art = 'Master'; 
-				$titel_kurzbz ='MSc'; 
-				break; 
+				$stg_art = 'Bachelor';
+				$titel_kurzbz = 'BSc';
+				break;
+			case 'm':
+				$stg_art = 'Master';
+				$titel_kurzbz ='MSc';
+				break;
 			case 'd':
-				$stg_art = 'Diplom'; 
-				break; 
-			default: 
-				$stg_art =''; 
-				$titel_kurzbz = ''; 
+				$stg_art = 'Diplom';
+				break;
+			default:
+				$stg_art ='';
+				$titel_kurzbz = '';
 		}
-		
+
 		$stgleiter = $objStg->getLeitung($objStg->studiengang_kz);
 		$stgl='';
 		foreach ($stgleiter as $stgleiter_uid)
@@ -88,10 +86,10 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$stgl_ma = new mitarbeiter($stgleiter_uid);
 			$stgl .= trim($stgl_ma->titelpre.' '.$stgl_ma->vorname.' '.$stgl_ma->nachname.' '.$stgl_ma->titelpost);
 		}
-		
+
 		$orgform_kurzbz_lang = $orgform[$objStg->orgform_kurzbz];
-		
-				
+
+
 		echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
         echo '<studienordnung>';
         echo '  <studiengang_kz><![CDATA['. sprintf("%'.04d",$objStg->studiengang_kz).']]></studiengang_kz>';
@@ -106,10 +104,10 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
         echo '	<orgform_kurzbz><![CDATA['.$objStg->orgform_kurzbz.']]></orgform_kurzbz>';
         echo '	<orgform_kurzbz_lang><![CDATA['.$orgform_kurzbz_lang.']]></orgform_kurzbz_lang>';
         echo '	<studienordnung_gueltigvon><![CDATA['.$gueltigvon_stsem.']]></studienordnung_gueltigvon>';
-        
+
         $studienplan = new studienplan();
     	$studienplan->loadStudienplanSTO($studienordnung_id);
-    				
+
 		foreach($studienplan->result as $row_studienplan)
 		{
 	        $summe_ects_orgform = 0;
@@ -117,7 +115,7 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo '  <studienplan>';
 	        echo '      <regelstudiendauer><![CDATA['.$row_studienplan->regelstudiendauer.']]></regelstudiendauer>';
 	        echo '      <bezeichnung><![CDATA['.$row_studienplan->bezeichnung.']]></bezeichnung>';
-	        
+
 //			$count=$objLV->count_lva_orgform($objStg->studiengang_kz,$orgform_kurzbz);
 
 /*			if($orgform_kurzbz==$objStg->orgform_kurzbz)
@@ -136,9 +134,9 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			}
 			*/
 			$orgform_kurzbz_lang = $orgform[$row_studienplan->orgform_kurzbz];
-		
-			
-			$ects_gesamt = ($row_studienplan->regelstudiendauer)*30; 
+
+
+			$ects_gesamt = ($row_studienplan->regelstudiendauer)*30;
 
 //			echo '  	<orgform>';
 			echo '      	<orgform_kurzbz><![CDATA['.$row_studienplan->orgform_kurzbz.']]></orgform_kurzbz>';
@@ -148,25 +146,25 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			//echo '          <studienplaetze><![CDATA['.$objStg->studienplaetze.']]></studienplaetze>';
 
 			// ************ Lehrveranstaltungen ***************
-			
+
 			//Basis von Ösi
 			/*
 			$lv = new lehrveranstaltung();
 			$lv->loadLehrveranstaltungStudienplan($studienplan_id);
 			getLVFromStudienplanByLehrtyp($studienplan_id, null, $i)
 			$tree = $lv->getLehrveranstaltungTree();
-			
-			
+
+
 			foreach($tree as $module)
 			{
 				echo $module->bezeichnung;
-				
+
 				if(isset($module->childs))
 				{
 					foreach($module->childs as $lv_1)
 					{
 						echo $lv_1->bezeichnung;
-									
+
 						if(isset($lv_1->childs))
 						{
 							foreach($lv_1->childs as $lv_2)
@@ -175,44 +173,44 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					}
 				}
 			}
-			
+
 			printlv($tree);
-			
+
 			function printlv($tree)
 			{
 				foreach($tree as $lv)
 				{
 					echo $lv->bezeichnung;
-					
+
 					if(isset($lv->childs))
 					{
 						printlv($lv->childs);
 					}
 				}
 			}*/
-					
-			
-			
+
+
+
 			for($i=1;$i<=$objStg->max_semester;$i++)
 			{
 				$summe_ects_semester = 0;
 				$summe_sws_semester = 0;
 				echo '		<semester>';
 				echo '			<semester_nr><![CDATA['.$i.']]></semester_nr>';
-				
+
 				$lv = new lehrveranstaltung();
 				$lv->loadLehrveranstaltungStudienplan($row_studienplan->studienplan_id, $i);
 				$tree = $lv->getLehrveranstaltungTree();
-			
+
 				//var_dump($tree);
 				printLehrveranstaltungTree($tree);
-				
+
 				//if ($lv->lehrtyp_kurzbz!='modul')
 				//	$summe += $lv->ects;
-				
+
 				echo '	<lv_summe_ects_semester><![CDATA['.$summe_ects_semester.']]></lv_summe_ects_semester>';
 				echo '	<lv_summe_sws_semester><![CDATA['.round($summe_sws_semester,2).']]></lv_summe_sws_semester>';
-				
+
 				$summe_ects_orgform += $summe_ects_semester;
 				$summe_sws_orgform += $summe_sws_semester;
 				echo '</semester>';
@@ -225,8 +223,8 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
         echo '</studienordnung>';
     }
     else
-        die('Parameter studienordnung_id is missing'); 
-    
+        die('Parameter studienordnung_id is missing');
+
 }
 else
     die('Use Parameter xmlformat = xml');
@@ -242,14 +240,14 @@ function printLehrveranstaltungTree($tree)
 	usort($tree, "cmp");
 	foreach($tree as $lv)
 	{
-		$db = new basis_db();			
-		$lv_alvs = new lehrveranstaltung(); 
+		$db = new basis_db();
+		$lv_alvs = new lehrveranstaltung();
 		if(!$alvs = $lv_alvs->getALVS($lv->lehrveranstaltung_id, $lv->semester))
-			$alvs = ''; 
+			$alvs = '';
 		//Semesterwochen zum berechnen der SWS ermitteln
-		$qry = '	SELECT 
+		$qry = '	SELECT
 						wochen
-					FROM 
+					FROM
 						public.tbl_semesterwochen
 					WHERE
 						studiengang_kz='.$lv->studiengang_kz.'
@@ -262,14 +260,14 @@ function printLehrveranstaltungTree($tree)
 				$row_wochen = $db->db_fetch_object($wochen_stg);
 				$wochen = $row_wochen->wochen;
 			}
-			else 
+			else
 				$wochen = '15';
 		}
 		if ($lv->semesterstunden!='')
 			$sws = ($lv->semesterstunden / $wochen);
-		else 
+		else
 			$sws = 0;
-		
+
 		//Bezeichnung der Lehrform
 		$lehrform_kurzbz = new lehrform();
 		$lehrform_kurzbz->load($lv->lehrform_kurzbz);
@@ -311,7 +309,7 @@ function printLehrveranstaltungTree($tree)
 			echo '              <lvinfo_pruefungsordnung><![CDATA['.clearHtmlTags($objLVInfo->pruefungsordnung).']]></lvinfo_pruefungsordnung>';
 			echo '              <lvinfo_kurzbeschreibung><![CDATA['.clearHtmlTags($objLVInfo->kurzbeschreibung).']]></lvinfo_kurzbeschreibung>';
 			echo '              <lvinfo_anmerkungen><![CDATA['.clearHtmlTags($objLVInfo->anmerkungen).']]></lvinfo_anmerkungen>';
-			echo '              <lvinfo_anwesenheit><![CDATA['.clearHtmlTags($objLVInfo->anmerkungen).']]></lvinfo_anwesenheit>';
+			echo '              <lvinfo_anwesenheit><![CDATA['.clearHtmlTags($objLVInfo->anwesenheit).']]></lvinfo_anwesenheit>';
 		}
 		if ($objLVInfo->exists($lv->lehrveranstaltung_id,'English'))
 		{
@@ -328,15 +326,15 @@ function printLehrveranstaltungTree($tree)
 			echo '              <lvinfo_pruefungsordnung_en><![CDATA['.clearHtmlTags($objLVInfo->pruefungsordnung).']]></lvinfo_pruefungsordnung_en>';
 			echo '              <lvinfo_kurzbeschreibung_en><![CDATA['.clearHtmlTags($objLVInfo->kurzbeschreibung).']]></lvinfo_kurzbeschreibung_en>';
 			echo '              <lvinfo_anmerkungen_en><![CDATA['.clearHtmlTags($objLVInfo->anmerkungen).']]></lvinfo_anmerkungen_en>';
-			echo '              <lvinfo_anwesenheit_en><![CDATA['.clearHtmlTags($objLVInfo->anmerkungen).']]></lvinfo_anwesenheit_en>';
+			echo '              <lvinfo_anwesenheit_en><![CDATA['.clearHtmlTags($objLVInfo->anwesenheit).']]></lvinfo_anwesenheit_en>';
 		}
 		if ($lv->lehrtyp_kurzbz!='modul')
 		{
 			$summe_ects_semester += $lv->ects;
 			$summe_sws_semester += $sws;
 		}
-			
-		// Darunterliegende LVs/Module 
+
+		// Darunterliegende LVs/Module
 		if(isset($lv->childs) && count($lv->childs)>0)
 		{
 			echo '<lehrveranstaltungen>';

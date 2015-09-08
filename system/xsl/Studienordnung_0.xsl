@@ -3486,7 +3486,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P22"><xsl:value-of select="lv_lehrform_kurzbz"/></text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle1.A3" office:value-type="string">
-				<text:p text:style-name="P33"><xsl:value-of select="lv_sws"/></text:p>
+				<text:p text:style-name="P33">
+                    <xsl:if test="lv_sws!=0">
+                        <xsl:value-of select="lv_sws"/>
+                    </xsl:if>
+                </text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle1.D3" office:value-type="string">
 				<text:p text:style-name="P33"><xsl:value-of select="lv_ects"/></text:p>
@@ -3518,6 +3522,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 </xsl:template>
 
 <xsl:template match="semester" mode="modulbeschreibung">
+    <text:h text:style-name="Numbering_20_3" text:outline-level="2">
+	       <text:bookmark-start text:name="__RefHeading__3660_462112980"/><xsl:value-of select="semester_nr"/>. Semester<text:bookmark-end text:name="__RefHeading__3660_462112980"/>
+    </text:h>
+
 	<table:table table:name="Tabelle6" table:style-name="Tabelle6">
 		<table:table-column table:style-name="Tabelle6.A"/>
 		<table:table-column table:style-name="Tabelle6.B"/>
@@ -3544,6 +3552,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P28"><xsl:value-of select="lv_bezeichnung_en"/></text:p>
 			</table:table-cell>
 		</table:table-row>
+        <!--
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P28">Modulnummer</text:p>
@@ -3552,6 +3561,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P28" />
 			</table:table-cell>
 		</table:table-row>
+    -->
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P28">Umfang (ECTS)</text:p>
@@ -3576,6 +3586,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P28"><xsl:value-of select="lv_sprache"/></text:p>
 			</table:table-cell>
 		</table:table-row>
+        <!--
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P28">Kompetenzbereich</text:p>
@@ -3584,12 +3595,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P28" />
 			</table:table-cell>
 		</table:table-row>
+    -->
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P28">Pflicht-/Wahl-Modul</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P31">Wahlmodul</text:p>
+				<text:p text:style-name="P31">Pflichtmodul</text:p>
 			</table:table-cell>
 		</table:table-row>
 	</xsl:when>
@@ -3639,7 +3651,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P5">Kurzbeschreibung</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_kurzbeschreibung"/></text:p>
+				<text:p text:style-name="P29">
+                    <xsl:call-template name="replace">
+                        <xsl:with-param name="string" select="lvinfo_kurzbeschreibung"/>
+                    </xsl:call-template>
+                </text:p>
 			</table:table-cell>
 		</table:table-row>
 		<table:table-row>
@@ -3647,7 +3663,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P5">Course Description</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_kurzbeschreibung_en"/></text:p>
+				<text:p text:style-name="P29">
+                    <xsl:call-template name="replace">
+                        <xsl:with-param name="string" select="lvinfo_kurzbeschreibung_en"/>
+                    </xsl:call-template>
+                </text:p>
 			</table:table-cell>
 		</table:table-row>
 		<table:table-row>
@@ -3655,18 +3675,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P5">Lernergebnisse</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P29">Nach erfolgreichem Abschluss sind die Studierenden in der Lage,...</text:p>
 				<text:p text:style-name="P67">
-					•
-					<text:tab/>LE1
-				</text:p>
-				<text:p text:style-name="P67">
-					•
-					<text:tab/>LE2
-				</text:p>
-				<text:p text:style-name="P67">
-					•
-					<text:tab/>...
+                    <xsl:call-template name="replace">
+                        <xsl:with-param name="string" select="lvinfo_lehrziele"/>
+                    </xsl:call-template>
 				</text:p>
 			</table:table-cell>
 		</table:table-row>
@@ -3675,18 +3687,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P5">Learning Outcomes</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P29">After passing this course successfully students are able to...</text:p>
 				<text:p text:style-name="P67">
-					•
-					<text:tab/>LE1
-				</text:p>
-				<text:p text:style-name="P67">
-					•
-					<text:tab/>LE2
-				</text:p>
-				<text:p text:style-name="P67">
-					•
-					<text:tab/>...
+                    <xsl:call-template name="replace">
+                        <xsl:with-param name="string" select="lvinfo_lehrziele_en"/>
+                    </xsl:call-template>
 				</text:p>
 			</table:table-cell>
 		</table:table-row>
@@ -3695,7 +3699,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P29">Lehrinhalte</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_lehrinhalte"/></text:p>
+				<text:p text:style-name="P29">
+                    <xsl:call-template name="replace">
+                        <xsl:with-param name="string" select="lvinfo_lehrinhalte"/>
+                    </xsl:call-template>
+                </text:p>
 			</table:table-cell>
 		</table:table-row>
 		<table:table-row>
@@ -3703,7 +3711,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P29">Course Contents</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_lehrinhalte_en"/></text:p>
+				<text:p text:style-name="P29">
+                    <xsl:call-template name="replace">
+                        <xsl:with-param name="string" select="lvinfo_lehrinhalte_en"/>
+                    </xsl:call-template>
+                </text:p>
 			</table:table-cell>
 		</table:table-row>
 		<table:table-row>
@@ -3711,7 +3723,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P29">Vorkenntnisse</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_voraussetzungen"/></text:p>
+				<text:p text:style-name="P29">
+                    <xsl:call-template name="replace">
+                        <xsl:with-param name="string" select="lvinfo_voraussetzungen"/>
+                    </xsl:call-template>
+                </text:p>
 			</table:table-cell>
 		</table:table-row>
 		<table:table-row>
@@ -3719,7 +3735,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P29">Prerequisites</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_voraussetzungen_en"/></text:p>
+				<text:p text:style-name="P29">
+                    <xsl:call-template name="replace">
+                        <xsl:with-param name="string" select="lvinfo_voraussetzungen_en"/>
+                    </xsl:call-template>
+                </text:p>
 			</table:table-cell>
 		</table:table-row>
 		<table:table-row>
@@ -3727,12 +3747,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P30">Literatur/Literature</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P67">
-					•
-					<text:tab/>Autor, VN. / Autor, VN. / Autor VN. (Jahr): Titel, Verlag-Herausgeber-sonstiges
-				</text:p>
-				<text:p/>
-				<text:p text:style-name="P30"><xsl:value-of select="lvinfo_unterlagen"/></text:p>
+				<text:p text:style-name="P30">
+                    <xsl:call-template name="replace">
+    					<xsl:with-param name="string" select="lvinfo_unterlagen"/>
+    				</xsl:call-template>
+                </text:p>
 			</table:table-cell>
 		</table:table-row>
 		<table:table-row>
@@ -3740,11 +3759,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P29">Leistungsbeurteilung</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P67">LV-Immanente Leistungsbeurteilung oder</text:p>
-				<text:p text:style-name="P67">LV-Immanente Leistungsbeurteilung und/ oder Abschlussprüfung oder</text:p>
-				<text:p text:style-name="P67">Abschlussprüfung</text:p>
-				<text:p/>
-				<text:p text:style-name="P30"><xsl:value-of select="lvinfo_pruefungsordnung"/></text:p>
+				<text:p text:style-name="P30">
+                    <xsl:call-template name="replace">
+    					<xsl:with-param name="string" select="lvinfo_pruefungsordnung"/>
+    				</xsl:call-template>
+                </text:p>
 			</table:table-cell>
 		</table:table-row>
 		<table:table-row>
@@ -3752,11 +3771,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P29">Assessment Methods</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P67">LV-Immanente Leistungsbeurteilung oder</text:p>
-				<text:p text:style-name="P67">LV-Immanente Leistungsbeurteilung und/ oder Abschlussprüfung oder</text:p>
-				<text:p text:style-name="P67">Abschlussprüfung</text:p>
-				<text:p/>
-				<text:p text:style-name="P30"><xsl:value-of select="lvinfo_pruefungsordnung_en"/></text:p>
+				<text:p text:style-name="P30">
+                    <xsl:call-template name="replace">
+    					<xsl:with-param name="string" select="lvinfo_pruefungsordnung_en"/>
+    				</xsl:call-template>
+                </text:p>
 			</table:table-cell>
 		</table:table-row>
 		<table:table-row>
@@ -3764,14 +3783,22 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P29">Anwesenheit</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_anwesenheit"/></text:p>
+				<text:p text:style-name="P29">
+                    <xsl:call-template name="replace">
+    					<xsl:with-param name="string" select="lvinfo_anwesenheit"/>
+    				</xsl:call-template>
+                </text:p>
 			</table:table-cell>
 		</table:table-row>
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A15" office:value-type="string">
 				<text:p text:style-name="P29">Attendance</text:p>
 			</table:table-cell>			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P29"><xsl:value-of select="lvinfo_anwesenheit_en"/></text:p>
+				<text:p text:style-name="P29">
+                    <xsl:call-template name="replace">
+    					<xsl:with-param name="string" select="lvinfo_anwesenheit_en"/>
+    				</xsl:call-template>
+                </text:p>
 			</table:table-cell>
 		</table:table-row>
 	</xsl:otherwise>
@@ -3781,6 +3808,42 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 
 <xsl:template match="lehrveranstaltungen" mode="modulbeschreibung">
 	<xsl:apply-templates match="lehrveranstaltung" mode="modulbeschreibung" />
+</xsl:template>
+
+<xsl:template name="replace">
+    <xsl:param name="string"/>
+    <xsl:choose>
+        <xsl:when test="contains($string,'\n')">
+            <xsl:call-template name="replaceaufzaehlungszeichen">
+                <xsl:with-param name="string" select="substring-before($string,'\n')"/>
+            </xsl:call-template>
+            <text:line-break/>
+            <xsl:call-template name="replace">
+                <xsl:with-param name="string" select="substring-after($string,'\n')"/>
+            </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:call-template name="replaceaufzaehlungszeichen">
+                <xsl:with-param name="string" select="$string"/>
+            </xsl:call-template>
+        </xsl:otherwise>
+    </xsl:choose>
+</xsl:template>
+
+<xsl:template name="replaceaufzaehlungszeichen">
+    <xsl:param name="string"/>
+    <xsl:choose>
+        <xsl:when test="contains($string,'- ')">
+            <xsl:value-of select="substring-before($string,'- ')"/>
+            <xsl:text>• </xsl:text>
+            <xsl:call-template name="replace">
+                <xsl:with-param name="string" select="substring-after($string,'- ')"/>
+            </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:value-of select="$string"/>
+        </xsl:otherwise>
+    </xsl:choose>
 </xsl:template>
 
 </xsl:stylesheet>
