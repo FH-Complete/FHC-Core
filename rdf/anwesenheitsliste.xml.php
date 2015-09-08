@@ -22,10 +22,10 @@
  */
 // content type setzen
 header("Content-type: application/xhtml+xml");
-require_once('../../../config/vilesci.config.inc.php');
-require_once('../../../include/functions.inc.php');
-require_once('../../../include/basis_db.class.php');
-require_once('../../../include/ean13.function.php');
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/functions.inc.php');
+require_once('../include/basis_db.class.php');
+require_once('../include/ean13.function.php');
 
 // Optionen abfragen
 isset($_GET['von']) ? $von = date('Y-m-d', strtotime($_GET['von'])) : $von = NULL;
@@ -96,7 +96,9 @@ if($db->db_query($qry))
 //echo $qry;
 foreach($data as $key => $value)
 {
-	// Daten der Vortragenden ermitteln
+	$currentDay = key($value['tage']);
+    
+    // Daten der Vortragenden ermitteln
 	$qry = "SELECT vorname, nachname, titelpre, titelpost "
 		. "FROM lehre.tbl_lehreinheitmitarbeiter lema "
 		. "JOIN public.tbl_benutzer be ON be.uid = lema.mitarbeiter_uid "
@@ -120,7 +122,12 @@ foreach($data as $key => $value)
 		. "JOIN public.tbl_student ON be.uid = tbl_student.student_uid "
 		. "LEFT JOIN lehre.tbl_zeugnisnote zn ON (zn.lehrveranstaltung_id = stlv.lehrveranstaltung_id AND zn.student_uid = stlv.uid AND zn.studiensemester_kurzbz = " . $db->db_add_param($studiensemester) . ") "
 		. "WHERE stlv.lehreinheit_id = " . $db->db_add_param($key) . " "
-		. "AND get_rolle_prestudent(tbl_student.prestudent_id, " . $db->db_add_param($studiensemester) . ") NOT IN ('Abbrecher', 'Unterbrecher', 'Outgoings') "
+		. "AND get_rolle_prestudent(tbl_student.prestudent_id, " . $db->db_add_param($studiensemester) . ") NOT IN ('Abbrecher', 'Unterbrecher') "
+        . "AND tbl_student.student_uid NOT IN ("
+            . "SELECT stud.student_uid "
+            . "FROM bis.tbl_bisio bis "
+            . "JOIN public.tbl_student stud ON bis.student_uid = stud.student_uid "
+            . "WHERE bis.von <= " . $db->db_add_param($currentDay) . "::DATE AND bis.bis >= " . $db->db_add_param($currentDay) . "::DATE) "
 		. "ORDER BY nachname ASC";
 
 	if($db->db_query($qry))
