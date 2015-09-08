@@ -2001,6 +2001,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<style:style style:name="T8" style:family="text">
 			<style:text-properties officeooo:rsid="00280f99"/>
 		</style:style>
+        <style:style style:name="Numbering_20_3" style:display-name="Numbering 3" style:family="paragraph" style:parent-style-name="List" style:default-outline-level="3" style:list-style-name="Numbering_20_2" style:class="list">
+        <style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:text-indent="0cm" style:auto-text-indent="false"/>
+        <style:text-properties fo:color="#0086cb" fo:font-size="16pt"/>
+    </style:style>
+
     <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
       <style:graphic-properties style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
     </style:style>
@@ -3833,7 +3838,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 <xsl:template name="replaceaufzaehlungszeichen">
     <xsl:param name="string"/>
     <xsl:choose>
-        <xsl:when test="contains($string,'- ')">
+        <xsl:when test="contains($string,'- ') and substring-before($string,'- ')=''">
             <xsl:value-of select="substring-before($string,'- ')"/>
             <xsl:text>• </xsl:text>
             <xsl:call-template name="replace">
