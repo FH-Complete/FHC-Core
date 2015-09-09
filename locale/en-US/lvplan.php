@@ -84,4 +84,5 @@ $this->phrasen['lvplan/persoenlichenAbonnieren']='Subscribe to personal schedule
 $this->phrasen['lvplan/aktuelleKW']='Current calendar week';
 $this->phrasen['lvplan/rauminformationenAnzeigen']='Show room information';
 $this->phrasen['lvplan/personen']='persons';
+$this->phrasen['lvplan/raumreservierungAufZeitraumEingeschraenkt']='Room reservation is limited to the period from %s to %s';
 ?>
