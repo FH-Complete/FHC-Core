@@ -151,12 +151,30 @@ if(isset($_GET['fixangestellt']))
 	$params.='&fixangestellt='.urlencode($_GET['fixangestellt']);
 if(isset($_GET['standort']))
 	$params.='&standort='.urlencode($_GET['standort']);
+if(isset($_GET['abrechnungsmonat']))
+	$params.='&abrechnungsmonat='.urlencode($_GET['abrechnungsmonat']);
 if(isset($_GET['form']))
 	$params.='&form='.urlencode($_GET['form']);
 $output = (isset($_GET['output'])?$_GET['output']:'odt');
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
+
+//XSL aus der DB holen
+$vorlage = new vorlage();
+if($xsl_oe_kurzbz!='')
+{
+	$vorlage->getAktuelleVorlage($xsl_oe_kurzbz, $xsl, $version);
+}
+else
+{
+	if($xsl_stg_kz=='')
+		$xsl_stg_kz='0';
+
+	$vorlage->getAktuelleVorlage($xsl_stg_kz, $xsl, $version);
+}
+
+$xsl_content = $vorlage->text;
 
 //Berechtigung pruefen
 if($xsl=='AccountInfo')
@@ -253,8 +271,26 @@ elseif($xsl=='Bestellung')
 }
 else
 {
-	echo 'unbekanntes Dokument oder keine Berechtigung';
-	exit;
+	// Wenn Berechtigung direkt beim der Vorlage angegeben ist
+	if(count($vorlage->berechtigung)>0)
+	{
+		$allowed=false;
+		foreach($vorlage->berechtigung as $berechtigung_kurzbz)
+		{
+			if($rechte->isBerechtigt($berechtigung_kurzbz))
+				$allowed=true;
+		}
+		if(!$allowed)
+		{
+			echo 'unbekanntes Dokument oder keine Berechtigung';
+			exit;
+		}
+	}
+	else
+	{
+		echo 'unbekanntes Dokument oder keine Berechtigung';
+		exit;
+	}
 }
 
 
@@ -280,22 +316,6 @@ $xml_doc = new DOMDocument;
 
 if(!$xml_doc->load($xml_url))
 	die('unable to load xml: '.$xml_url);
-
-//XSL aus der DB holen
-$vorlage = new vorlage();
-if($xsl_oe_kurzbz!='')
-{
-	$vorlage->getAktuelleVorlage($xsl_oe_kurzbz, $xsl, $version);
-}
-else
-{
-	if($xsl_stg_kz=='')
-		$xsl_stg_kz='0';
-
-	$vorlage->getAktuelleVorlage($xsl_stg_kz, $xsl, $version);
-}
-
-$xsl_content = $vorlage->text;
 
 //Pdf erstellen
 
@@ -444,8 +464,9 @@ if (!isset($_REQUEST["archive"]))
 				{
 				    $studienordnung = new studienordnung();
 					$studienordnung->loadStudienordnung($_GET['studienordnung_id']);
-					$filename = $filename.'_'.$studienordnung->studiengangkurzbzlang;
+					$filename = 'Studienordnung-Studienplan-'. sprintf("%'.04d",$studienordnung->studiengang_kz).'-'.$studienordnung->studiengangkurzbzlang;
 				}
+
             	$fsize = filesize($tempname_zip);
                 $handle = fopen($tempname_zip,'r');
                 header('Content-type: '.$vorlage->mimetype);
@@ -455,11 +476,11 @@ if (!isset($_REQUEST["archive"]))
            else if($output =='doc')
            {
                 $tempPdfName = $vorlage->vorlage_kurzbz.'.doc';
-           		if($xsl == "Studienordnung")
+				if($xsl == "Studienordnung")
 				{
 				    $studienordnung = new studienordnung();
 					$studienordnung->loadStudienordnung($_GET['studienordnung_id']);
-					$filename = $filename.'_'.$studienordnung->studiengangkurzbzlang.'.doc';
+					$filename = 'Studienordnung-Studienplan-'. sprintf("%'.04d",$studienordnung->studiengang_kz).'-'.$studienordnung->studiengangkurzbzlang;
 				}
 				else
 				{

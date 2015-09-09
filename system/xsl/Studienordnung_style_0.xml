@@ -377,7 +377,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="MP1">
 					Studienordnung-Studienplan-<xsl:value-of select="studiengang_kz"/>-<xsl:value-of select="studiengang_kurzbzlang"/>
 					<text:tab/>
-					<text:tab/>
+                    <text:tab/>
 					<text:page-number text:select-page="current">4</text:page-number>
 				</text:p>
 			</style:footer>
