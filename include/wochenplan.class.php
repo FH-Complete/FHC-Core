@@ -1084,6 +1084,15 @@ class wochenplan extends basis_db
 			echo '</tr></table></form>';
 			echo ' <a href="stpl_reserve_list.php">'.$p->t('lvplan/reservierungenLoeschen').' </a>';
 		}
+		else 
+		{
+			if($this->type=='ort')
+			{
+				echo '<table><tr><td><br>';
+				echo '<span style="color: orange">'.$p->t('lvplan/raumreservierungAufZeitraumEingeschraenkt',array(date("d.m.Y",$datum_res_lektor_start),date("d.m.Y",$datum_res_lektor_ende))).'</span>';
+				echo '</td></tr></table>';
+			}
+		}
 	}
 
 	/**

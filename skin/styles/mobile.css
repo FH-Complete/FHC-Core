@@ -35,10 +35,11 @@ iframe
 	padding:0px;
 	height: 100%;
 	top: 15%;
-	
+	/*
 	border-width:1px;
 	border-style:solid;
 	border-color: #A5AFB6;
+	*/
 }
 textarea
 {
@@ -692,7 +693,8 @@ img.header_logo
 	left: 16px;
 	top: 3%;
 	z-index: 5000;
-	height: 5%;
+	max-height: 7%;
+	max-width: 11%;
 }
 /*
 ==== Farben ====

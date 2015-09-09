@@ -695,7 +695,7 @@ img.lv
 	height: 40px;
 	padding-bottom: 5px;
 }
-img.header_left
+/*img.header_left
 {
 	position: absolute;
 	left: 0px;
@@ -710,14 +710,14 @@ img.header_right
 	z-index: 2;
 	max-width: 100%;
 	height: 16%;
-}
+}*/
 img.header_logo
 {
 	position: absolute;
 	left: 16px;
 	top: 3%;
 	z-index: 5000;
-	height: 7%;
+	height: 8%;
 }
 img.screenshot_boxshadow
 {

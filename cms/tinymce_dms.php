@@ -25,6 +25,7 @@ require_once('../include/functions.inc.php');
 require_once('../include/dms.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/basis_db.class.php');
+require_once('../include/datum.class.php');
 
 $db = new basis_db();
 $user = get_uid();
@@ -401,16 +402,32 @@ if($versionId != '')
 {	
 	//  Übersicht der Versionen
 	echo '<h1>Versionsübersicht</h1>'; 
-	echo '<span style="float:right";><a href="'.$_SERVER['PHP_SELF'].'">zurück</a></span>'; 
+	if (isset($_REQUEST['searching']) && $_REQUEST['searching'] == 'true')
+		echo '<p><a href="'.$_SERVER['PHP_SELF'].'?searching=true&searchstring='.$_REQUEST['searchstring'].'&page='.$page.'&dpp='.$dpp.'">zurück</a></p>';
+	else 
+		echo '<p><a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$_REQUEST['kategorie_kurzbz'].'&page='.$page.'&dpp='.$dpp.'">zurück</a></p>'; 
 	drawAllVersions($versionId); 
 }
 elseif($renameId!='')
 {
-	//  Übersicht der Versionen
+	//  Datei umbenennen
 	echo '<h1>Datei umbennen</h1>'; 
-	echo '<span style="float:right";><a href="'.$_SERVER['PHP_SELF'].'">zurück</a></span>'; 
+	if (isset($_REQUEST['searching']) && $_REQUEST['searching'] == 'true')
+		echo '<p><a href="'.$_SERVER['PHP_SELF'].'?searching=true&searchstring='.$_REQUEST['searchstring'].'&page='.$page.'&dpp='.$dpp.'">zurück</a></p>'; 
+	else 
+		echo '<p><a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$_REQUEST['kategorie_kurzbz'].'&page='.$page.'&dpp='.$dpp.'">zurück</a></p>';
 	drawRenameForm($renameId, $version, $page, $dpp, $searching, $searchstring);
 }
+
+/*if (isset($_REQUEST['searching']) && $_REQUEST['searching'] == 'true')
+			{
+				echo '<form action="'.$_SERVER['PHP_SELF'].'?searching=true&searchstring='.$searchstring.'&page='.$page.'&dpp='.$dpp.'" method="POST" enctype="multipart/form-data">';
+			}
+			else 
+			{
+				echo '<form action="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'&page='.$page.'&dpp='.$dpp.'" method="POST" enctype="multipart/form-data">';
+			}*/
+
 elseif($chkatID != '')
 {
 	if(isset($_POST['action']) && ($_POST['action']=='chkat'))
@@ -420,7 +437,8 @@ elseif($chkatID != '')
 		$dms->load($chkatID);
 		$dms->kategorie_kurzbz = $_POST['kategoriez'];
 		$dms->save();
-		if (isset($_REQUEST['searching']) && $_REQUEST['searching'] == 'true') {
+		if (isset($_REQUEST['searching']) && $_REQUEST['searching'] == 'true') 
+		{
 			echo '<meta http-equiv="refresh" content="0; url='.$_SERVER['PHP_SELF'].'?searching=true&searchstring='.$_REQUEST['searchstring'].'&page='.$page.'&dpp='.$dpp.'" />';
 		}
 		else 
@@ -938,15 +956,20 @@ function drawFilesList($rows)
 				<a href="id://'.$row->dms_id.'/Auswahl" onclick="'.$newerVersionAlert.' FileBrowserDialog.mySubmit('.$row->dms_id.'); return false;" style="font-size: small" title="'.$row->beschreibung.'">
 				'.$newVersion.' '.$row->name.'</a>
 			</td>';
-		echo '<td style="padding: 1px;">';
+		$datum = new datum();
+		
+		echo '<td style="padding: 1px;" title="'.$datum->formatDatum($row->insertamum,'d.m.Y H:m').' von '.$row->insertvon.'">';
 		echo $row->version;
 		echo '</td>';
-
+		
+		$kategorie = new dms();
+		$kategorie->loadKategorie($row->kategorie_kurzbz);
+		
 		// zeige bei suche auch kategorie an
 		if($suche == true)
 		{
 			echo '<td style="padding: 1px;">';
-			echo $row->kategorie_kurzbz;
+			echo '<a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'">'.$kategorie->bezeichnung.'</a>';
 			echo '</td>';
 		}
 		echo'<td style="padding: 1px;">';
@@ -963,10 +986,10 @@ function drawFilesList($rows)
 							$beschreibungstext = str_replace('"',"D4n7ührung",$beschreibungstext);
 							$beschreibungstext = str_replace("\\","6Sl4sh",$beschreibungstext);
 							$beschreibungstext = str_replace("\r\n","Ze1l3numxbr",$beschreibungstext);
-							echo $beschreibungstext.'\'); return upload(\''.$row->dms_id.'\',\''.$row->name.'\');" style="font-size:small">Neue Version hochladen</a></li>
-						<li><a href="'.$_SERVER['PHP_SELF'].'?versionid='.$row->dms_id.'" style="font-size:small" >Alle Versionen anzeigen</a></li>';
+							echo $beschreibungstext.'\'); return upload(\''.$row->dms_id.'\',\''.$row->name.'\');" style="font-size:small">Neue Version hochladen</a></li>';
 						if (isset($_REQUEST['searching']) && $_REQUEST['searching'] == 'true')
 						{
+							echo '<li><a href="'.$_SERVER['PHP_SELF'].'?versionid='.$row->dms_id.'&searching=true&'; if (isset($_REQUEST['searchstring'])) echo 'searchstring='.$_REQUEST['searchstring'].'&page='; if (isset($_REQUEST['page'])) { echo $_REQUEST['page']; } else { echo '1'; } echo '&dpp='; if (isset($_REQUEST['dpp'])) { echo $_REQUEST['dpp']; } else { echo '20'; } echo '" style="font-size:small" >Alle Versionen anzeigen</a></li>';
 							echo '<li><a href="'.$_SERVER['PHP_SELF'].'?chkatID='.$row->dms_id.'&page='; if (isset($_REQUEST['page'])) { echo $_REQUEST['page']; } else { echo '1'; } echo '&dpp='; if (isset($_REQUEST['dpp'])) { echo $_REQUEST['dpp']; } else { echo '20'; } echo '&searching=true&searchstring='.$_REQUEST['searchstring'].'" style="font-size:small" >Kategorie ändern</a></li>';
 							echo '<li><a href="'.$_SERVER['PHP_SELF'].'?renameid='.$row->dms_id.'&version='.$row->version.'&searching=true&'; if (isset($_REQUEST['searchstring'])) echo 'searchstring='.$_REQUEST['searchstring'].'&page='; if (isset($_REQUEST['page'])) { echo $_REQUEST['page']; } else { echo '1'; } echo '&dpp='; if (isset($_REQUEST['dpp'])) { echo $_REQUEST['dpp']; } else { echo '20'; } echo '" style="font-size:small" >Datei umbenennen</a></li>';
 							echo '<li><a href="'.$_SERVER['PHP_SELF'].'?searching=true&'; if (isset($_REQUEST['searchstring'])) echo 'searchstring='.$_REQUEST['searchstring'].'&dms_id='.$row->dms_id.'&delete" onclick="return conf_del()" style="font-size:small" >Löschen</a></li>';
@@ -974,6 +997,7 @@ function drawFilesList($rows)
 						}
 						else
 						{
+							echo '<li><a href="'.$_SERVER['PHP_SELF'].'?versionid='.$row->dms_id.'&version='.$row->version.'&kategorie_kurzbz='.$row->kategorie_kurzbz.'&page='; if (isset($_REQUEST['page'])) { echo $_REQUEST['page']; } else { echo '1'; } echo '&dpp='; if (isset($_REQUEST['dpp'])) { echo $_REQUEST['dpp']; } else { echo '20'; } echo '" style="font-size:small" >Alle Versionen anzeigen</a></li>';
 							echo '<li><a href="'.$_SERVER['PHP_SELF'].'?chkatID='.$row->dms_id.'&page='; if (isset($_REQUEST['page'])) { echo $_REQUEST['page']; } else { echo '1'; } echo '&dpp='; if (isset($_REQUEST['dpp'])) { echo $_REQUEST['dpp']; } else { echo '20'; } echo '" style="font-size:small" >Kategorie ändern</a></li>';
 							echo '<li><a href="'.$_SERVER['PHP_SELF'].'?renameid='.$row->dms_id.'&version='.$row->version.'&kategorie_kurzbz='.$row->kategorie_kurzbz.'&page='; if (isset($_REQUEST['page'])) { echo $_REQUEST['page']; } else { echo '1'; } echo '&dpp='; if (isset($_REQUEST['dpp'])) { echo $_REQUEST['dpp']; } else { echo '20'; } echo '" style="font-size:small" >Datei umbenennen</a></li>';
 							echo '<li><a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'&dms_id='.$row->dms_id.'&delete" onclick="return conf_del()" style="font-size:small" >Löschen</a></li>';
