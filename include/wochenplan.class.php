@@ -1234,6 +1234,8 @@ class wochenplan extends basis_db
 					unset($kollisionsmeldungen);
 					if (isset($a_unr))
 						unset($a_unr);
+					if (isset($a_lvb))
+						unset($a_lvb);
 					foreach ($this->std_plan[$i][$j] as $lehrstunde)
 					{
 						$a_unr[]=$lehrstunde->unr;
@@ -2345,7 +2347,8 @@ class wochenplan extends basis_db
 							// Blockungen ueber mehrere Stunden erkennen
 							if (isset($this->std_plan[$i][$j+1][$idx]) && isset($this->std_plan[$i][$j+1][$idx]->stundenplan_id)
 								&& ($this->std_plan[$i][$j][$idx]->unr == $this->std_plan[$i][$j+1][$idx]->unr) 
-								&& $this->std_plan[$i][$j][$idx]!='0' && $k<($num_rows_stunde-1))
+								&& $this->std_plan[$i][$j][$idx]!='0' && $k<($num_rows_stunde-1)
+								&& !($this->std_plan[$i][$j][$idx]->reservierung && $this->std_plan[$i][$j][$idx]->lektor!=$this->std_plan[$i][$j+1][$idx]->lektor))
 							{
 								//2er Block
 								if(isset($blocked[$this->std_plan[$i][$j][$idx]->unr]))
@@ -2357,7 +2360,8 @@ class wochenplan extends basis_db
 
 								if (isset($this->std_plan[$i][$j+2][$idx]) && isset($this->std_plan[$i][$j+2][$idx]->stundenplan_id)
 									&& ($this->std_plan[$i][$j][$idx]->unr == $this->std_plan[$i][$j+2][$idx]->unr) 
-									&& $k<($num_rows_stunde-2))
+									&& $k<($num_rows_stunde-2)
+									&& !($this->std_plan[$i][$j][$idx]->reservierung && $this->std_plan[$i][$j][$idx]->lektor!=$this->std_plan[$i][$j+2][$idx]->lektor))
 								{
 									//3er Block
 									$blocked[$this->std_plan[$i][$j][$idx]->unr]++;
@@ -2366,7 +2370,8 @@ class wochenplan extends basis_db
 
 									if (isset($this->std_plan[$i][$j+3][$idx]) && isset($this->std_plan[$i][$j+3][$idx]->stundenplan_id)
 										&& ($this->std_plan[$i][$j][$idx]->unr == $this->std_plan[$i][$j+3][$idx]->unr) 
-										&& $k<($num_rows_stunde-3))
+										&& $k<($num_rows_stunde-3)
+										&& !($this->std_plan[$i][$j][$idx]->reservierung && $this->std_plan[$i][$j][$idx]->lektor!=$this->std_plan[$i][$j+3][$idx]->lektor))
 									{
 										//4er Block
 										$blocked[$this->std_plan[$i][$j][$idx]->unr]++;
@@ -2557,7 +2562,7 @@ class wochenplan extends basis_db
 			$ort2 = $this->std_plan[$tag][$stunde][$idx1]->ort;
 			$lektor1 = $this->std_plan[$tag][$stunde][$idx]->lektor;
 			$lektor2 = $this->std_plan[$tag][$stunde][$idx1]->lektor;
-			
+
 			if($unr1==$unr2 && ($ort1==$ort2 || $lektor1==$lektor2) 
 				&& !$this->std_plan[$tag][$stunde][$idx]->reservierung && !$this->std_plan[$tag][$stunde][$idx1]->reservierung)
 				return true;
