@@ -99,7 +99,7 @@ switch ($outputformat)
 		</script>
 	</head>
 	<body>
-		<h2>Statistik - <?php echo $statistik->bezeichnung ?></h2>
+		<h2>Statistik - <?php echo $statistik->bezeichnung ?> - <a href="statistik_sql.php?statistik_kurzbz=<?php echo $statistik_kurzbz?>&outputformat=csv">CSV Download</a></h2>
 			<?php echo $statistik->getHtmlTable('myTable', 'tablesorter'); ?>
 	</body>
 </html>
