@@ -10,7 +10,7 @@ error_reporting(E_ALL);
 // Encoding
 mb_internal_encoding("UTF-8");
 mb_regex_encoding("UTF-8");
-setlocale (LC_ALL, 'de_DE.UTF8','de_DE@euro', 'de_DE', 'de','DE', 'ge','German');
+setlocale (LC_ALL, 'de_AT.utf8');
 
 // Zeitzone
 date_default_timezone_set('Europe/Vienna');
@@ -53,7 +53,7 @@ define('DOC_ROOT','/var/www/');
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH','tw');
 
-// ID des CMS-Contents bei dem das CIS Menue beginnt 
+// ID des CMS-Contents bei dem das CIS Menue beginnt
 define('CIS_MENU_ENTRY_CONTENT',1);
 
 // Zusaetzliche Links bei News anzeigen (Lehrziele, Allg. Download, Newsgroups)
@@ -62,8 +62,8 @@ define('CIS_EXT_MENU',true);
 // Legt fest ob bei den Zeitsperren der Bereich fuer die Resturlaubstage angezeigt wird
 define('URLAUB_TOOLS',true);
 
-// Authentifizierungsmethode 
-// Moegliche Werte: 
+// Authentifizierungsmethode
+// Moegliche Werte:
 // auth_mixed    - htaccess mit LDAP (Default)
 // auth_session  - Sessions mit LDAP (Testbetrieb)
 define("AUTH_SYSTEM", "auth_mixed");
@@ -128,9 +128,9 @@ define("ATTR_SPRACHE_EN","English");
 
 // Konstanten fuer die Reservierung
 // Tage ab wann ein Mitarbeiter reservieren kann.
-define('RES_TAGE_LEKTOR_MIN','5'); 
+define('RES_TAGE_LEKTOR_MIN','5');
 // Datum bis wann im voraus ein Mitarbeiter reservieren kann.
-define('RES_TAGE_LEKTOR_BIS','2020-01-01'); 
+define('RES_TAGE_LEKTOR_BIS','2020-01-01');
 
 // Wie viele Tage pro Woche werden im LVPlan angezeigt
 define('TAGE_PRO_WOCHE','7');
