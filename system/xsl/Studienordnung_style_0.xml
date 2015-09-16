@@ -318,6 +318,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     <style:style style:name="MP1" style:family="paragraph" style:parent-style-name="Footer">
       <style:text-properties officeooo:rsid="00323ef6" officeooo:paragraph-rsid="00323ef6"/>
       <style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:text-indent="0cm" style:auto-text-indent="false" style:page-number="auto" text:number-lines="false" text:line-number="0" style:vertical-align="top">
+          <style:tab-stops>
+            <style:tab-stop style:position="5.7cm"/>
+            <style:tab-stop style:position="15.4cm"/>
+          </style:tab-stops>
       </style:paragraph-properties>
     </style:style>
     <style:style style:name="MP2" style:family="paragraph" style:parent-style-name="Footer">
@@ -376,8 +380,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:footer>
 				<text:p text:style-name="MP1">
 					Studienordnung-Studienplan-<xsl:value-of select="studiengang_kz"/>-<xsl:value-of select="studiengang_kurzbzlang"/>
-					<text:tab/>
-                    <text:tab/>
+                    <text:tab style:position="5.7cm"/>
+				  <text:tab style:position="5.4cm"/>
 					<text:page-number text:select-page="current">4</text:page-number>
 				</text:p>
 			</style:footer>
