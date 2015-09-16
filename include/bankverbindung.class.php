@@ -375,5 +375,58 @@ class bankverbindung extends basis_db
 			return false;
 		}
 	}
+
+
+	/**
+	 * Laedt die Bankverbindung einer Person
+	 * @param  $person_id
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load_pers_verrechnung($person_id)
+	{
+		if(!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id ist ungueltig';
+			return false;
+		}
+
+		$qry = "SELECT * FROM public.tbl_bankverbindung WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)." ORDER BY verrechnung DESC NULLS LAST LIMIT 1";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->bankverbindung_id = $row->bankverbindung_id;
+				$this->person_id = $row->person_id;
+				$this->name = $row->name;
+				$this->anschrift = $row->anschrift;
+				$this->bic = $row->bic;
+				$this->blz = $row->blz;
+				$this->iban = $row->iban;
+				$this->kontonr = $row->kontonr;
+				$this->typ = $row->typ;
+				$this->verrechnung = $this->db_parse_bool($row->verrechnung);
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->ext_id = $row->ext_id;
+				$this->oe_kurzbz = $row->oe_kurzbz;
+	
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Keine Bankverbindung gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
 }
 ?>

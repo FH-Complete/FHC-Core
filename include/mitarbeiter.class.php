@@ -1094,7 +1094,7 @@ class mitarbeiter extends benutzer
 
     /**
      * Liefert MitarbeiterInnen für die Verwaltung der Zutrittskarten
-     *  
+     *
      * @param $filter Buchstabe mit dem der Mitarbeiter beginnt
      * @param $fixangestellt false wenn externer mitarbeiter
      * @param $studSemArray Array mit Studiensemestern in denen der externe Lektor zumindest in einem Unterrichtet haben soll oder NULL. Wenn NULL werden nur externe Mitarbeiter ohne Lehrauftrag ausgegeben.
@@ -1120,7 +1120,7 @@ class mitarbeiter extends benutzer
 	                (SELECT * FROM lehre.tbl_lehreinheitmitarbeiter
 	                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 	                WHERE tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid) ";
-            else 
+            else
 	        	$qry.=" AND NOT fixangestellt AND EXISTS
 	                (SELECT * FROM lehre.tbl_lehreinheitmitarbeiter
 	                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
@@ -1219,5 +1219,51 @@ class mitarbeiter extends benutzer
 	}
 	return false;
     }
+
+	/**
+	 * Laedt einen Mitarbeiter anhand der Personalnummer
+	 *
+	 * @param $uid
+	 * @return true wenn ok, sonst false
+	 */
+	public function getMitarbeiterFromPersonalnummer($personalnummer)
+	{
+		$qry = "SELECT * FROM public.tbl_mitarbeiter
+				WHERE personalnummer=".$this->db_add_param($personalnummer).";";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				if(!benutzer::load($row->mitarbeiter_uid))
+					return false;
+
+				$this->personalnummer = $row->personalnummer;
+				$this->kurzbz = $row->kurzbz;
+				$this->lektor = $this->db_parse_bool($row->lektor);
+				$this->fixangestellt = $this->db_parse_bool($row->fixangestellt);
+				$this->standort_id = $row->standort_id;
+				$this->telefonklappe = $row->telefonklappe;
+				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->stundensatz = $row->stundensatz;
+				$this->anmerkung = $row->anmerkung;
+				$this->ext_id_mitarbeiter = $row->ext_id;
+				$this->bismelden = $this->db_parse_bool($row->bismelden);
+				$this->kleriker = $this->db_parse_bool($row->kleriker);
+
+				return true;
+			}
+			else
+			{
+				$this->errormsg = "Kein Eintrag gefunden fuer den Benutzer\n";
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = "Fehler beim Laden der Daten\n";
+			return false;
+		}
+	}
 }
 ?>

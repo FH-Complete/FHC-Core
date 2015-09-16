@@ -898,10 +898,12 @@ class vertrag extends basis_db
 		// (Lehreinheiten und Betreuungen)
 		// plus Sonderhonorare die in diesem Zeitraum angelegt wurden
 		$qry = "SELECT
-					*
+					tbl_vertrag.*
 				FROM
 					lehre.tbl_vertrag
+					JOIN public.tbl_benutzer USING(person_id)
 				WHERE
+					(
 					EXISTS (SELECT
 								1
 							FROM
@@ -933,9 +935,11 @@ class vertrag extends basis_db
 											lehre.tbl_projektbetreuer
 										WHERE
 											vertrag_id=tbl_vertrag.vertrag_id)
+					))
 					AND vertragsdatum<=".$this->db_add_param($datum)."
 					AND vertragsdatum>=".$this->db_add_param($prevstsemende)."
-				)";
+					AND tbl_benutzer.uid=".$this->db_add_param($mitarbeiter_uid);
+		
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))

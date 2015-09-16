@@ -958,7 +958,7 @@ class lehreinheit extends basis_db
 				FROM
 					lehre.tbl_lehreinheit
 					JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(lehrfach_id=lehrfach.lehrveranstaltung_id)
-					JOIN public.tbl_fachbereich USING(oe_kurzbz)
+					LEFT JOIN public.tbl_fachbereich USING(oe_kurzbz)
 					JOIN lehre.tbl_lehrveranstaltung ON(tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)
 				WHERE
 					tbl_lehreinheit.lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).';';
