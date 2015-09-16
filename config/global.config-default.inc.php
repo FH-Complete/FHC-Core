@@ -6,6 +6,9 @@ define('DEFAULT_LEHREINHEIT_RAUMTYP','Dummy');
 define('DEFAULT_LEHREINHEIT_RAUMTYP_ALTERNATIV','Dummy');
 define('DEFAULT_LEHREINHEIT_LEHRFORM','UE');
 
+// Defaul Trennzeichen fuer E-Mail Empfaenger wenn nicht ueber Variablen ueberschrieben
+define('DEFAULT_EMAILADRESSENTRENNZEICHEN',',');
+
 //Anzeigeoptionen für Lehrveranstaltungen im CIS
 define('CIS_LEHRVERANSTALTUNG_NEWSGROUPS_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN',true);
