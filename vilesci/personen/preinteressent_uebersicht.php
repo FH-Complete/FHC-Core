@@ -234,10 +234,10 @@ if(isset($_GET['action']))
 			$anzahl_freigegeben=0;
 			$anzahl_fehler=0;
 			$qry = "SELECT * FROM public.tbl_preinteressentstudiengang 
-					WHERE preinteressent_id=".$this->db_add_param($_GET['id'])."
+					WHERE preinteressent_id=".$db->db_add_param($_GET['id'])."
 						  AND prioritaet = (SELECT max(prioritaet) 
 						  					FROM public.tbl_preinteressentstudiengang 
-						  					WHERE preinteressent_id=".$this->db_add_param($_GET['id']).")
+						  					WHERE preinteressent_id=".$db->db_add_param($_GET['id']).")
 						  AND freigabedatum is null";
 			//Zuordnungen holen die noch nicht freigegeben wurden und die hoechste Prioritaet haben
 			if($result = $db->db_query($qry))
