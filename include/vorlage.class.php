@@ -375,7 +375,7 @@ class vorlage extends basis_db
 	 *
 	 * @param $oe_kurzbz Organisationseinheit der Vorlage
 	 * 		Fuer Kompatibilitaetszwecke kann hier statt der oe_kurzbz auch die Studiengangskennzahl uebergeben werden.
-	 *		Dies wird in den kommenden Versionen jedoch nicht mehr moeglich sein!
+	 *		In diesem Fall wird ein load der OE des Studiengangs durchgeführt und die entsprechende OE verwendet.
 	 * @param $vorlage_kurzbz Name der Vorlage
 	 * @param $version optional kann die Versionsnummer der Vorlage uebergeben werden
 	 * @return boolean
@@ -385,10 +385,13 @@ class vorlage extends basis_db
 		$studiengang_kz='';
 		if(is_numeric($oe_kurzbz))
 		{
-			$studiengang_kz=$oe_kurzbz;
+			$studiengang = new studiengang();
+			$studiengang->load($oe_kurzbz);
+			$oe_kurzbz=$studiengang->oe_kurzbz;
+			//Durch diese Bedingung wird die Abfrage der studiengang_kz im folgenden Abschnitt hinfaellig.
 		}
 
-		if($studiengang_kz!='')
+		if($studiengang_kz!='') // Es sollte aktuell keine Vorlage mehr ueber die Studiengang_kz aufgerufen werden, da hier kein Fallback der OE erfolgt. Fuer Testzwecke bleibt das noch bestehen. Kindlm 11.09.2015
 		{
 			$qry = "SELECT
 						tbl_vorlagestudiengang.*, tbl_vorlage.mimetype, tbl_vorlage.bezeichnung

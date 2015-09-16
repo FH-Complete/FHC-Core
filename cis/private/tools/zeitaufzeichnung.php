@@ -830,7 +830,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		else 
 			echo '<input type="file" name="csv" value="" style="visibility:hidden">';
 		echo '</table>';
-		echo '</td><td valign="top"><span id="zeitsaldo"></span></td></tr>
+		echo '</td><td valign="top"><span id="zeitsaldo"></span><br><br><div id="monatsliste"></span></td></tr>
 			</table>';
  
 		echo '<hr>';
