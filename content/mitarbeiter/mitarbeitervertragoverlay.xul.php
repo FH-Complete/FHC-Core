@@ -52,6 +52,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		</menupopup>
 		<menupopup id="mitarbeiter-vertrag-tree-popup">
 			<menuitem label="Bearbeiten" oncommand="MitarbeiterVertragEdit()" />
+			<menuitem label="Entfernen" oncommand="MitarbeiterVertragDelete()" />
 		</menupopup>
 		<menupopup id="mitabeiter-vertrag-tree-detail-popup">
 			<menuitem label="Entfernen" oncommand="MitarbeiterVertragDetailDelete()" />
@@ -62,7 +63,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<hbox>
 				<toolbox flex="1">
 					<toolbar>
-						<toolbarbutton label="Filter " id="mitarbeiter-vertrag-filter" type="menu">	
+						<toolbarbutton label="Filter " id="mitarbeiter-vertrag-filter" type="menu">
 							<menupopup id="mitarbeiter-vertrag-menupopup-filter">
 									<menuitem type="radio" value="alle" label="Alle Verträge anzeigen" oncommand="MitarbeiterVertragLoad()"/>
 									<menuitem type="radio" value="offen" label="Offene Verträge anzeigen" checked="true" oncommand="MitarbeiterVertragLoad()"/>
@@ -95,7 +96,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<treecol id="mitarbeiter-vertrag-tree-vertragstyp" label="Vertragstyp" flex="2" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragstyp_bezeichnung" />
-					<splitter class="tree-splitter"/>					
+					<splitter class="tree-splitter"/>
 					<treecol id="mitarbeiter-vertrag-tree-status" label="Status" flex="2" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/vertrag/rdf#status" />
@@ -117,7 +118,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						sort="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsdatum_iso" />
 					<splitter class="tree-splitter"/>
 				</treecols>
-		
+
 				<template>
 					<treechildren flex="1" >
 							<treeitem uri="rdf:*">
@@ -126,10 +127,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#betrag"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragstyp_bezeichnung"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#status"/>
-								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsdatum"/>	
+								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsdatum"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragstyp_kurzbz"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertrag_id"/>
-								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsdatum_iso"/>	
+								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsdatum_iso"/>
 							</treerow>
 						</treeitem>
 					</treechildren>
@@ -139,7 +140,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	</vbox>
 	<hbox flex="2" id="mitarbeiter-vertrag-vbox-vertragsdetails">
 		<vbox flex="2">
-			<description>Vertragsdetails</description>	
+			<description>Vertragsdetails</description>
 			<tree id="mitarbeiter-vertrag-tree-zugeordnet" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/vertragdetails"
 				enableColumnDrag="true"
@@ -163,19 +164,19 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<splitter class="tree-splitter"/>
 					<treecol id="mitarbeiter-vertrag-tree-zugeordnet-studiensemester_kurzbz" label="Studiensemester" flex="2" hidden="false"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#studiensemester_kurzbz" />							
+						sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#studiensemester_kurzbz" />
 					<splitter class="tree-splitter"/>
 					<treecol id="mitarbeiter-vertrag-tree-zugeordnet-pruefung_id" label="PruefungID" flex="2" hidden="true"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#pruefung_id" />							
+						sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#pruefung_id" />
 					<splitter class="tree-splitter"/>
 					<treecol id="mitarbeiter-vertrag-tree-zugeordnet-mitarbeiter_uid" label="mitarbeiter_uid" flex="2" hidden="true"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#mitarbeiter_uid" />							
+						sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#mitarbeiter_uid" />
 					<splitter class="tree-splitter"/>
 					<treecol id="mitarbeiter-vertrag-tree-zugeordnet-projektarbeit_id" label="ProjektarbeitID" flex="2" hidden="true"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#projektarbeit_id" />							
+						sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#projektarbeit_id" />
 					<splitter class="tree-splitter"/>
 					<treecol id="mitarbeiter-vertrag-tree-zugeordnet-lehreinheit_id" label="LehreinheitID" flex="2" hidden="true"
 						class="sortDirectionIndicator"
@@ -183,7 +184,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<splitter class="tree-splitter"/>
 					<treecol id="mitarbeiter-vertrag-tree-zugeordnet-betreuerart_kurzbz" label="BetreuerartKurzbz" flex="2" hidden="true"
 						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#betreuerart_kurzbz" />														
+						sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#betreuerart_kurzbz" />
 				</treecols>
 
 				<template>
@@ -207,7 +208,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		</vbox>
 		<vbox flex="2">
 		    <vbox flex="1">
-			<description>Vertragsstatus</description>	
+			<description>Vertragsstatus</description>
 			<tree id="mitarbeiter-vertrag-tree-vertragsstatus" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/vertragsstatus"
 				enableColumnDrag="true"

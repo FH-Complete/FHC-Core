@@ -24,7 +24,7 @@ require_once('../../include/functions.inc.php');
 $user = get_uid();
 
 if(false): ?> <script type="text/javascript"><?php endif; ?>
-    
+
 var MitarbeiterVertragLoadedPerson=null
 // ****************** FUNKTIONEN ************************** //
 
@@ -47,11 +47,11 @@ function MitarbeiterVertragLoad(person_id)
 	var filter;
 	for (var i = 0; i < e.length; i++)
 	{
-	   if (e[i].getAttribute("checked")) 
+	   if (e[i].getAttribute("checked"))
 			filter=e[i].value
 	}
 
-	// *** Vertrag ***	
+	// *** Vertrag ***
 	var treevertrag = document.getElementById('mitarbeiter-vertrag-tree');
 	url='<?php echo APP_ROOT;?>rdf/vertrag.rdf.php?person_id='+person_id+"&filter="+filter+"&"+gettimestamp();
 
@@ -106,12 +106,12 @@ function MitarbeiterVertragSelectVertrag()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree=document.getElementById('mitarbeiter-vertrag-tree');
 	var col = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertrag_id"] : "mitarbeiter-vertrag-tree-vertrag_id";
-	
+
 	if(tree.currentIndex==-1)
 		return false;
-	
+
 	var vertrag_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	// *** Zugeordnete Vertragselemente laden
 
 	vertragzugeordnettree = document.getElementById('mitarbeiter-vertrag-tree-zugeordnet');
@@ -184,7 +184,7 @@ function MitarbeiterVertragGenerateVertrag(windowdocument)
 		alert('Bitte geben Sie einen Betrag ein');
 		return false;
 	}
-	
+
 	if(vertragstyp_kurzbz == 'fahrtkosten')
 	    betrag = betrag * fahrten;
 
@@ -254,10 +254,10 @@ function MitarbeiterVertragStatusAdd(status)
 {
 	var tree=document.getElementById('mitarbeiter-vertrag-tree');
 	var col = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertrag_id"] : "mitarbeiter-vertrag-tree-vertrag_id";
-	
+
 	if(tree.currentIndex==-1)
 		return false;
-	
+
 	var vertrag_id=tree.view.getCellText(tree.currentIndex,col);
 
 	var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
@@ -282,7 +282,7 @@ function MitarbeiterVertragStatusAdd(status)
 	{
 		MitarbeiterVertragSelectVertrag();
 		return true;
-	}	
+	}
 }
 
 /**
@@ -292,11 +292,11 @@ function MitarbeiterVertragEdit()
 {
 	var tree=document.getElementById('mitarbeiter-vertrag-tree');
 	var col = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertrag_id"] : "mitarbeiter-vertrag-tree-vertrag_id";
-	
+
 	if(tree.currentIndex==-1)
 
 		return false;
-	
+
 	var vertrag_id=tree.view.getCellText(tree.currentIndex,col);
 
 	window.open('<?php echo APP_ROOT?>content/mitarbeiter/mitarbeitervertragneudialog.xul.php?person_id='+MitarbeiterVertragLoadedPerson+'&vertrag_id='+vertrag_id,"Vertrag","status=no, width=500, height=400, centerscreen, resizable");
@@ -306,10 +306,10 @@ function MitarbeiterVertragDetailDelete()
 {
 	var tree=document.getElementById('mitarbeiter-vertrag-tree');
 	var col = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertrag_id"] : "mitarbeiter-vertrag-tree-vertrag_id";
-	
+
 	if(tree.currentIndex==-1)
 		return false;
-	
+
 	var vertrag_id=tree.view.getCellText(tree.currentIndex,col);
 
 	var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
@@ -362,18 +362,18 @@ function MitarbeiterVertragSelectVertragsstatus()
 	var tree=document.getElementById('mitarbeiter-vertrag-tree-vertragsstatus');
 	var col = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertragsstatus-vertrag_id"] : "mitarbeiter-vertrag-tree-vertragsstatus-vertrag_id";
 	var col_status = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertragsstatus-vertragsstatus_kurzbz"] : "mitarbeiter-vertrag-tree-vertragsstatus-vertragsstatus_kurzbz";
-	
+
 	if(tree.currentIndex==-1)
 		return false;
-	
+
 	var vertrag_id=tree.view.getCellText(tree.currentIndex,col);
 	var vertrag_status=tree.view.getCellText(tree.currentIndex,col_status);
-	
+
 	vertragstatustree = document.getElementById('mitarbeiter-vertrag-tree-vertragsstatus');
 	url='<?php echo APP_ROOT;?>rdf/vertragsstatus.rdf.php?vertrag_id='+vertrag_id+'&vertragsstatus_kurzbz='+vertrag_status+'&'+gettimestamp();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	
+
 	var dsource = rdfService.GetDataSourceBlocking(url);
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/vertragsstatus/"+vertrag_status +"/"+ vertrag_id);
 
@@ -384,7 +384,7 @@ function MitarbeiterVertragSelectVertragsstatus()
 
 	// Uhrzeit wegschneiden
 	vertragsdatum = vertragsdatum.substring(0,10);
-	
+
 	document.getElementById('mitarbeiter-vertrag-vertragsstatus-textbox-vertragsdatum').value=vertragsdatum;
 	document.getElementById('mitarbeiter-vertrag-vertragsstatus-textbox-vertragsdatum').disabled=false;
 }
@@ -400,7 +400,7 @@ function MitarbeiterVertragVertragsstatusUpdate()
 
     var vertrag_id=tree.view.getCellText(tree.currentIndex,col);
     var vertrag_status=tree.view.getCellText(tree.currentIndex,col_status);
-    
+
     var vertrag_datum = document.getElementById("mitarbeiter-vertrag-vertragsstatus-textbox-vertragsdatum").iso;
 
     var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
@@ -440,7 +440,7 @@ function MitarbeiterVertragStatusDelete()
 
     var vertrag_id=tree.view.getCellText(tree.currentIndex,col);
     var vertrag_status=tree.view.getCellText(tree.currentIndex,col_status);
-    
+
     var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
     var req = new phpRequest(url,'','');
 
@@ -488,4 +488,42 @@ function MitarbeiterVertragVertragsstatusReload(vertrag_id)
 
 	return true;
 
+}
+
+
+function MitarbeiterVertragDelete()
+{
+    var tree=document.getElementById('mitarbeiter-vertrag-tree');
+    var col = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertrag_id"] : "mitarbeiter-vertrag-tree-vertrag_id";
+
+    if(tree.currentIndex==-1)
+        return false;
+
+    var vertrag_id=tree.view.getCellText(tree.currentIndex,col);
+
+    if(confirm('Wollen Sie diesen Eintrag wirklich löschen'))
+    {
+        var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
+        var req = new phpRequest(url,'','');
+
+        req.add('type', 'vertragdelete');
+        req.add('vertrag_id',vertrag_id);
+
+        var response = req.executePOST();
+
+        var val =  new ParseReturnValue(response)
+
+        if (!val.dbdml_return)
+        {
+            if(val.dbdml_errormsg=='')
+                alert(response)
+            else
+                alert(val.dbdml_errormsg)
+        }
+        else
+        {
+            MitarbeiterVertragLoad(MitarbeiterVertragLoadedPerson);
+            return true;
+        }
+    }
 }

@@ -939,7 +939,7 @@ class vertrag extends basis_db
 					AND vertragsdatum<=".$this->db_add_param($datum)."
 					AND vertragsdatum>=".$this->db_add_param($prevstsemende)."
 					AND tbl_benutzer.uid=".$this->db_add_param($mitarbeiter_uid);
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -962,6 +962,26 @@ class vertrag extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Loescht einen Vertrag und seine Verbindungen
+	 * @param $vertrag_id ID des Vertrags
+	 */
+	public function delete($vertrag_id)
+	{
+		$qry = "UPDATE lehre.tbl_lehreinheitmitarbeiter SET vertrag_id=null WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";
+		UPDATE lehre.tbl_projektbetreuer SET vertrag_id=null WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";
+		DELETE FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";
+		DELETE FROM lehre.tbl_vertrag WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";";
+
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Daten';
 			return false;
 		}
 	}
