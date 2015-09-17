@@ -105,45 +105,6 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
   </template>
 </tree>
 
-<vbox id="vbox-fachbereich">
-	<hbox>
-	<spacer flex="1" />
-	<toolbarbutton label="Laden/Aktualisieren" image="../skin/images/refresh.png" tooltiptext="Liste neu laden" oncommand="FachbereichTreeRefresh()"/>
-	<spacer flex="1" />
-	</hbox>
-	<tree id="tree-fachbereich" onmouseup="onFachbereichSelect(event);"
-		seltype="single" hidecolumnpicker="false" flex="1"
-		datasources="rdf:null" ref="http://www.technikum-wien.at/fachbereich/liste">
-		<treecols>
-		    <treecol id="fachbereich-treecol-bezeichnung" label="Bezeichnung" flex="3" primary="true" />
-		    <splitter class="tree-splitter"/>
-		    <treecol id="fachbereich-treecol-kurzbz" label="Kurzbz" flex="2" hidden="true"/>
-		    <splitter class="tree-splitter"/>
-		    <treecol id="fachbereich-treecol-farbe" label="Farbe" flex="1" hidden="true"/>
-		    <splitter class="tree-splitter"/>
-		     <treecol id="fachbereich-treecol-stg_kz" label="Stg_kz" flex="1" hidden="true"/>
-		     <splitter class="tree-splitter"/>
-		     <treecol id="fachbereich-treecol-uid" label="UID" flex="1" hidden="true"/>
-		</treecols>
-
-		<template>
-		    <rule>
-		      <treechildren>
-		       <treeitem uri="rdf:*">
-		         <treerow>
-		           <treecell label="rdf:http://www.technikum-wien.at/fachbereich/rdf#bezeichnung"/>
-		           <treecell label="rdf:http://www.technikum-wien.at/fachbereich/rdf#kurzbz"/>
-		           <treecell label="rdf:http://www.technikum-wien.at/fachbereich/rdf#farbe"/>
-		           <treecell label="rdf:http://www.technikum-wien.at/fachbereich/rdf#studiengang_kz"/>
-		           <treecell label="rdf:http://www.technikum-wien.at/fachbereich/rdf#uid"/>
-		         </treerow>
-		       </treeitem>
-		      </treechildren>
-		    </rule>
-	  </template>
-	</tree>
-</vbox>
-
 <vbox id="vbox-organisationseinheit">
 	<tree id="tree-organisationseinheit" onmouseup="onOrganisationseinheitSelect(event);"
 		seltype="single" hidecolumnpicker="false" flex="1"
@@ -317,6 +278,24 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 						<treerow>
 						   	<treecell label="noch nicht retourniert"/>
 						   	<treecell label="VertragNochNichtRetour"/>
+						</treerow>
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell label="Habilitiert"/>
+							<treecell label="VertragHabilitiert"/>
+						</treerow>
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell label="nicht Habilitiert"/>
+							<treecell label="VertragNichtHabilitiert"/>
+						</treerow>
+					</treeitem>
+					<treeitem>
+						<treerow>
+							<treecell label="noch nicht gedruckt"/>
+							<treecell label="VertragNichtGedruckt"/>
 						</treerow>
 					</treeitem>
 				</treechildren>

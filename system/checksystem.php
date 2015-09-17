@@ -3449,6 +3449,34 @@ if(!$result = @$db->db_query("SELECT lehrveranstaltung_id FROM lehre.tbl_vertrag
 		echo 'Vertrag: Spalte lehrveranstaltung_id hinzugefügt';
 }
 
+// Vertragsstatus gedruckt
+if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertragsstatus_kurzbz='gedruckt'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO lehre.tbl_vertragsstatus(vertragsstatus_kurzbz, bezeichnung) VALUES('gedruckt','Gedruckt');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Vertragsstatus: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Vertragsstatus gedruckt hinzugefuegt';
+	}
+}
+
+// Vertragsstatus gedruckt
+if($result = $db->db_query("SELECT 1 FROM public.tbl_funktion WHERE funktion_kurzbz='awbefreit'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "INSERT INTO public.tbl_funktion(funktion_kurzbz, beschreibung, aktiv, fachbereich, semester) VALUES('awbefreit','Anwesenheitsbefreit',true,false,false);";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Benutzerfunktion: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Benutzerfunktion awbefreit hinzugefuegt';
+	}
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(

@@ -76,14 +76,33 @@ if (isset($_GET['verwendung']))
 else
 	$verwendung=null;
 
+$vertrag=null;
+
 if (isset($_GET['VertragNochNichtRetour']))
 {
 	// Vertraege muessen nur von externen Lektoren retourniert werden
 	$fix='false';
-	$vertragnochnichtretour = 'true';
+	$vertrag = 'VertragNochNichtRetour';
 }
-else
-	$vertragnochnichtretour=null;
+
+if (isset($_GET['VertragHabilitiert']))
+{
+	$fix='false';
+	$vertrag = 'VertragHabilitiert';
+}
+
+if (isset($_GET['VertragNichtHabilitiert']))
+{
+	$fix='false';
+	$vertrag = 'VertragNichtHabilitiert';
+}
+
+if (isset($_GET['VertragNichtGedruckt']))
+{
+	$fix='false';
+	$vertrag = 'VertragNichtGedruckt';
+}
+
 
 
 if(isset($_GET['filter']))
@@ -111,7 +130,7 @@ if($uid==null)
 	if($filter!='')
 		$mitarbeiterDAO->searchPersonal($filter);
 	else
-		$mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $verwendung, $vertragnochnichtretour);
+		$mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $verwendung, $vertrag);
 
 	foreach ($mitarbeiterDAO->result as $mitarbeiter)
 		draw_row($mitarbeiter);
