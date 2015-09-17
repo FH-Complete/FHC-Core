@@ -286,6 +286,20 @@ if(defined('FAS_GESAMTNOTE_PRUEFUNGSHONORAR') && FAS_GESAMTNOTE_PRUEFUNGSHONORAR
 				</menupopup>
 			</template>
 		</menulist>
+		<label value="Prüfungstyp" control="lehrveranstaltung-noten-pruefung-menulist-vertragstyp"/>
+		<menulist id="lehrveranstaltung-noten-pruefung-menulist-vertragstyp"
+		          datasources="'.APP_ROOT.'rdf/vertragstyp.rdf.php" flex="1"
+		          ref="http://www.technikum-wien.at/vertragstyp"
+                  minwidth="250"
+		          >
+			<template>
+				<menupopup>
+                    <menuitem value="rdf:http://www.technikum-wien.at/vertragstyp/rdf#vertragstyp_kurzbz"
+		        		      label="rdf:http://www.technikum-wien.at/vertragstyp/rdf#vertragstyp_bezeichnung"
+					  		  uri="rdf:*"/>
+				</menupopup>
+			</template>
+		</menulist>
 		<label value="Satz pro Prüfung" control="lehrveranstaltung-noten-pruefung-textbox-satz"/>
 		<textbox id="lehrveranstaltung-noten-pruefung-textbox-satz" size="2" oninput="LehrveranstaltungNotenPruefungCalculate()"/>
 		<label value="Anzahl Prüfungen" control="lehrveranstaltung-noten-pruefung-textbox-anzahl"/>

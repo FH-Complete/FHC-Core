@@ -2480,9 +2480,10 @@ function LehrveranstaltungNotenPruefungSave()
 	var mitarbeiter_uid = document.getElementById('lehrveranstaltung-noten-pruefung-menulist-mitarbeiter').value;
 	var satz = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-satz').value;
 	var anzahl = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anzahl').value;
+	var vertragstyp_kurzbz = document.getElementById('lehrveranstaltung-noten-pruefung-menulist-vertragstyp').value;
 	satz = satz.replace(',','.');
 
-    if(mitarbeiter_uid == '' || satz == '' || anzahl == '')
+    if(mitarbeiter_uid == '' || satz == '' || anzahl == '' || vertragstyp_kurzbz=='')
     {
         alert('Bitte wählen Sie einen Mitarbeiter aus und geben Sie den Satz pro Prüfung sowie die Anzahl der Prüfungen an!');
         return false;
@@ -2514,7 +2515,7 @@ function LehrveranstaltungNotenPruefungSave()
 	datum = heute.getFullYear()+'-'+(heute.getMonth()+1)+'-'+heute.getDate();
 	req.add('type', 'vertraggenerate');
 	req.add('mitarbeiter_uid', mitarbeiter_uid);
-	req.add('vertragstyp_kurzbz', 'Pruefungshonorar');
+	req.add('vertragstyp_kurzbz', vertragstyp_kurzbz);
 	req.add('betrag', gesamt);
 	req.add('bezeichnung', 'Pruefungshonorar '+lv_studiengang+' '+lv_semester+' '+lv_bezeichnung+' '+lehrveranstaltung_id);
 	req.add('anmerkung', satz+'€ * '+anzahl);
