@@ -176,6 +176,9 @@ else
 
 $xsl_content = $vorlage->text;
 
+if($xsl_content=='')
+	die('Für diese Organisationseinheit ist keine Vorlage im System hinterlegt');
+
 //Berechtigung pruefen
 if($xsl=='AccountInfo')
 {
