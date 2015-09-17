@@ -324,6 +324,7 @@ class anwesenheit extends basis_db
 					JOIN campus.vw_student_lehrveranstaltung USING(uid)
 				WHERE
 					uid='.$this->db_add_param($student_uid).'
+					AND vw_student_lehrveranstaltung.lehreinheit_id=tbl_anwesenheit.lehreinheit_id
 					AND lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).'
 					AND studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz).'
 					AND anwesend=' . $this->db_add_param($anwesend, FHC_BOOLEAN).'
