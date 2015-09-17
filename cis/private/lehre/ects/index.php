@@ -129,6 +129,7 @@ textarea
 	else 
 	{
 		$stg = '';
+		$oe_kurzbz = '';
 	}
 
 	if(isset($_POST['stg']))
@@ -140,6 +141,8 @@ textarea
 			$oe->load($stg);
 			$oe_kurzbz = $oe->oe_kurzbz;
 		}
+		else 
+			$oe_kurzbz = '';
 	}
 
 	if(!isset($sem) && isset($_POST['sem']))
@@ -899,7 +902,7 @@ textarea
 	echo "<input type='button' value='".$p->t('global/speichern')."' onClick='save();'>";
 	echo "<input type='button' value='".$p->t('courseInformation/voransicht')."' onClick='javascript:window.document.editFrm.action=\"preview.php\";window.document.editFrm.target=\"_blank\";window.document.editFrm.submit();'>";
 	echo "<br><br>";
-	if (!$berechtigt)
+	if(!$rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz) && !$rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))
 		echo "<input type='button' value='".$p->t('courseInformation/zurFreigabeAbschicken')."' onClick='freigeben();'>";
 	echo "</div>";
 	echo "</form>";
