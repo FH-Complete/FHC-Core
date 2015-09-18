@@ -40,6 +40,7 @@ require_once('../../include/projektbetreuer.class.php');
 require_once('../../include/vertrag.class.php');
 require_once('../../include/lehreinheitmitarbeiter.class.php');
 require_once('../../include/wawi_konto.class.php');
+require_once('../../include/addon.class.php');
 
 $user = get_uid();
 
@@ -662,6 +663,47 @@ if(!$error)
 			{
 				$return = false;
 				$errormsg = 'Failed'.$vertrag->errormsg;
+			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='vertragdelete')
+	{
+		if(!$rechte->isBerechtigt('vertrag/mitarbeiter',null,'suid'))
+		{
+			$return = false;
+			$errormsg = 'Sie haben keine Berechtigung für diesen Vorgang';
+		}
+		else
+		{
+
+			$vertrag_id = filter_input(INPUT_POST, "vertrag_id");
+			$vertrag = new vertrag();
+
+			// Wenn das Abrechnungsaddon geladen ist dann pruefen ob dieser Vertrag bereits abgerechnet wurde
+			$addons = new addon();
+			if(in_array('abrechnung',$addons->aktive_addons))
+			{
+				require_once('../../addons/abrechnung/include/abrechnung.class.php');
+				$abrechnung = new abrechnung();
+				if($abrechnung->isTeilabgerechnet($vertrag_id))
+				{
+					$return =false;
+					$error=true;
+					$errormsg='Vertrag kann nicht gelöscht werden da er bereits abgerechnet wurde.';
+				}
+			}
+
+			if(!$error)
+			{
+				if($vertrag->delete($vertrag_id))
+				{
+					$return=true;
+				}
+				else
+				{
+					$return = false;
+					$errormsg = 'Failed'.$vertrag->errormsg;
+				}
 			}
 		}
 	}
