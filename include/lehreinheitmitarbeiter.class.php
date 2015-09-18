@@ -92,12 +92,13 @@ class lehreinheitmitarbeiter extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
+				$this->vertrag_id = $row->vertrag_id;
 				$this->new=false;
 				return true;
 			}
 			else
 			{
-				$this->errormsg = 'Fehler beim Laden der Daten';
+				$this->errormsg = 'Fehler beim Laden der Daten'
 				return false;
 			}
 		}
