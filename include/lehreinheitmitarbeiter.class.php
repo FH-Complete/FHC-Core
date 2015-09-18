@@ -98,7 +98,7 @@ class lehreinheitmitarbeiter extends basis_db
 			}
 			else
 			{
-				$this->errormsg = 'Fehler beim Laden der Daten'
+				$this->errormsg = 'Fehler beim Laden der Daten';
 				return false;
 			}
 		}
