@@ -22,7 +22,7 @@
  */
 require_once('basis_db.class.php');
 
-class variable extends basis_db 
+class variable extends basis_db
 {
 	public $errormsg; // string
 	public $new;      // boolean
@@ -62,10 +62,10 @@ class variable extends basis_db
 				$this->uid = $uid;
 				$this->name = $name;
 				$this->wert = $row->wert;
-				
+
 				return true;
 			}
-			else 
+			else
 				return false;
 		}
 		else
@@ -116,11 +116,11 @@ class variable extends basis_db
 			{
 				if($this->db_num_rows()==0)
 					$new=true;
-				else 
+				else
 					$new=false;
 			}
 		}
-		
+
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
@@ -150,7 +150,7 @@ class variable extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Loescht einen Variableneintrag
 	 */
@@ -161,67 +161,67 @@ class variable extends basis_db
 			$this->errormsg = 'Name und UID muessen angegeben werden';
 			return false;
 		}
-		
+
 		$qry = "DELETE FROM public.tbl_variable WHERE name=".$this->db_add_param($name)." AND uid=".$this->db_add_param($uid).';';
-		
+
 		if($this->db_query($qry))
 			return true;
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert alle Variablen eines Benutzers
 	 */
 	public function getVars($uid)
 	{
 		$qry = "SELECT * FROM public.tbl_variable WHERE uid=".$this->db_add_param($uid)." ORDER BY name";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$v = new variable();
-				
+
 				$v->uid = $row->uid;
 				$v->name = $row->name;
 				$v->wert = $row->wert;
-				
+
 				$this->variables[] = $v;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt die Variablen in ein assoziatives Array
-	 * 
+	 *
 	 * Zugriff von aussen mit $obj->variable->semester_aktuell
 	 *
 	 * @param $user
 	 * @return true wenn ok, sonst false
 	 */
 	public function loadVariables($user)
-	{			
+	{
 		if(!$this->db_query("SELECT * FROM public.tbl_variable WHERE uid=".$this->db_add_param($user).';'))
 		{
 			$this->errormsg.=$this->db_last_error();
 			return false;
 		}
-		
+
 		while($row=$this->db_fetch_object())
 		{
 			$this->variable->{$row->name}=$row->wert;
 		}
-		
+
 		//Default Werte setzten, wenn Variable nicht gesetzt ist
 		if (!isset($this->variable->semester_aktuell))
 		{
@@ -241,12 +241,17 @@ class variable extends basis_db
 		//Locale auf de_at setzen wenn nicht vorhanden
 		if (!isset($this->variable->locale))
 			$this->variable->locale='de-AT';
-		
+
 		if (!isset($this->variable->db_stpl_table))
 			$this->variable->db_stpl_table='stundenplandev';
 
 		if (!isset($this->variable->emailadressentrennzeichen))
-			$this->variable->emailadressentrennzeichen=',';
+		{
+			if(defined('DEFAULT_EMAILADRESSENTRENNZEICHEN'))
+				$this->variable->emailadressentrennzeichen=DEFAULT_EMAILADRESSENTRENNZEICHEN;
+			else
+				$this->variable->emailadressentrennzeichen=',';
+		}
 
 		if (!isset($this->variable->db_stpl_table))
 			$this->variable->db_stpl_table='stundenplan';
@@ -265,7 +270,7 @@ class variable extends basis_db
 
 		if (!isset($this->variable->kollision_student))
 			$this->variable->kollision_student='false';
-			
+
 		if (!isset($this->variable->max_kollision))
 			$this->variable->max_kollision='0';
 
@@ -277,6 +282,6 @@ class variable extends basis_db
 
 		return true;
 	}
-		
+
 }
 ?>

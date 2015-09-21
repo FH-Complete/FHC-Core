@@ -85,4 +85,5 @@ $this->phrasen['lvplan/aktuelleKW']='Aktuelle Kalenderwoche';
 $this->phrasen['lvplan/rauminformationenAnzeigen']='Rauminformationen anzeigen';
 $this->phrasen['lvplan/personen']='Personen';
 $this->phrasen['lvplan/alleRaeume']='Alle Räume';
+$this->phrasen['lvplan/raumreservierungAufZeitraumEingeschraenkt']='Die Raumreservierung ist auf den Zeitraum vom %s bis %s eingeschränkt';
 ?>

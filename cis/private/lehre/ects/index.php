@@ -170,6 +170,7 @@ textarea
 			(!defined('CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT') && $lektor_der_lv)
 			|| (defined('CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT') && CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT==true && $lektor_der_lv)
 			|| $rechte->isBerechtigt('lehre/lvinfo',$oe_kurzbz)
+			|| $rechte->isBerechtigt('lehre/lvinfo',$stg)
 		)
 	)
 	{
@@ -185,7 +186,7 @@ textarea
 	$anmerkungen_de = (isset($_POST['anmerkungen_de'])?$_POST['anmerkungen_de']:'');
 	$kurzbeschreibung_de = (isset($_POST['kurzbeschreibung_de'])?$_POST['kurzbeschreibung_de']:'');
 	$anwesenheit_de = (isset($_POST['anwesenheit_de'])?$_POST['anwesenheit_de']:'');
-	$freig_de = (isset($_POST['freig_de'])?($_POST['freig_de']=='on' && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz)?true:false):'');
+	$freig_de = (isset($_POST['freig_de'])?($_POST['freig_de']=='on' && ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz) || $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))?true:false):'');
 	$methodik_de = (isset($_POST['methodik_de'])?$_POST['methodik_de']:'');
 	//$titel_de = (isset($_POST['titel_de'])?$_POST['titel_de']:'');
 	
@@ -218,7 +219,7 @@ textarea
 	$anmerkungen_en = (isset($_POST['anmerkungen_en'])?$_POST['anmerkungen_en']:'');
 	$kurzbeschreibung_en = (isset($_POST['kurzbeschreibung_en'])?$_POST['kurzbeschreibung_en']:'');
 	$anwesenheit_en = (isset($_POST['anwesenheit_en'])?$_POST['anwesenheit_en']:'');
-	$freig_en = (isset($_POST['freig_en'])?($_POST['freig_en']=='on' && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz)?true:false):'');
+	$freig_en = (isset($_POST['freig_en'])?($_POST['freig_en']=='on' && ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz) || $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))?true:false):'');
 	$methodik_en = (isset($_POST['methodik_en'])?$_POST['methodik_en']:'');
 	//$titel_en = (isset($_POST['titel_en'])?$_POST['titel_en']:'');
 
@@ -284,7 +285,7 @@ textarea
 			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_de);
 			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_de);
 			
-			$lv_obj_sav->genehmigt = ($freig_de==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz)?true:false);
+			$lv_obj_sav->genehmigt = ($freig_de==true && ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz) || $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))?true:false);
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
 			$lv_obj_sav->aktiv=true;
@@ -316,7 +317,7 @@ textarea
 			$lv_obj_sav->anmerkungen=mb_eregi_replace("\r\n", "<br>", $anmerkungen_en);
 			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_en);
 			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_en);
-			$lv_obj_sav->genehmigt = ($freig_en==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz)?true:false);
+			$lv_obj_sav->genehmigt = ($freig_en==true && ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz) || $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))?true:false);
 			$lv_obj_sav->aktiv=true;
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
@@ -366,7 +367,7 @@ textarea
 			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_de);
 			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_de);
 				
-			$lv_obj_sav->genehmigt = ($freig_de==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz)?true:false);
+			$lv_obj_sav->genehmigt = ($freig_de==true && ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz) || $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))?true:false);
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
 			$lv_obj_sav->aktiv=true;
@@ -398,7 +399,7 @@ textarea
 			$lv_obj_sav->anmerkungen=mb_eregi_replace("\r\n", "<br>", $anmerkungen_en);
 			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_en);
 			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_en);
-			$lv_obj_sav->genehmigt = ($freig_en==true && $rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz)?true:false);
+			$lv_obj_sav->genehmigt = ($freig_en==true && ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz) || $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))?true:false);
 			$lv_obj_sav->aktiv=true;
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
@@ -886,7 +887,7 @@ textarea
 		<td><i>'.$p->t('lvinfo/anmerkungenEN').'</i></td>
 		<td align="right"><textarea rows="5" cols="50" name="anmerkungen_en">'. (isset($anmerkungen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$anmerkungen_en)):'').'</textarea></td>
 	</tr>';
-	if ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz))
+	if ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz) || $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))
 		echo '	<tr class="liste0">
 					<td align=center colspan=2><br><input type="checkbox" name="freig_de" '. (isset($freig_de) && ($freig_de==true || $freig_de=='1')?'checked':'').'/><i>'.$p->t('courseInformation/deutschFreigeben').'</i><br><br></td>
 					<td align=center colspan=2><input type="checkbox" name="freig_en" '. (isset($freig_en) && ($freig_en==true || $freig_en=='1')?'checked':'').'/><i>'.$p->t('courseInformation/englischFreigeben').'</i> </td>
@@ -898,7 +899,8 @@ textarea
 	echo "<input type='button' value='".$p->t('global/speichern')."' onClick='save();'>";
 	echo "<input type='button' value='".$p->t('courseInformation/voransicht')."' onClick='javascript:window.document.editFrm.action=\"preview.php\";window.document.editFrm.target=\"_blank\";window.document.editFrm.submit();'>";
 	echo "<br><br>";
-	echo "<input type='button' value='".$p->t('courseInformation/zurFreigabeAbschicken')."' onClick='freigeben();'>";
+	if (!$berechtigt)
+		echo "<input type='button' value='".$p->t('courseInformation/zurFreigabeAbschicken')."' onClick='freigeben();'>";
 	echo "</div>";
 	echo "</form>";
 	echo "<br><br><br><br><br><br><br><br><br><br><br><br>";

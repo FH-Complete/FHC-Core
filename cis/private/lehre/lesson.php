@@ -33,6 +33,7 @@ require_once('../../../include/lehre_tools.class.php');
 require_once('../../../include/lvangebot.class.php');
 require_once('../../../include/benutzergruppe.class.php');
 require_once('../../../include/lehreinheit.class.php');
+require_once('../../../include/variable.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -52,12 +53,12 @@ if(check_lektor($user))
 	$is_lector=true;
 else
 	$is_lector=false;
-	   
+
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 	$lvid = $_GET['lvid'];
 else
 	die('Fehlerhafte Parameteruebergabe');
-	
+
 $lv_obj = new lehrveranstaltung();
 $lv_obj->load($lvid);
 $lv=$lv_obj;
@@ -153,7 +154,7 @@ foreach($addon_obj->result as $addon)
 // Wenn Seite fertig geladen ist Addons aufrufen
 echo '
 <script>
-$( document ).ready(function() 
+$( document ).ready(function()
 {
 	if(typeof addon  !== \'undefined\')
 	{
@@ -174,7 +175,7 @@ $( document ).ready(function()
 	    -khtml-opacity: 0.9;
 	    opacity: 0.9;
 	}
-	</style> 
+	</style>
 
 	<script language="JavaScript">
 	function showSemPlanHelp(){
@@ -184,7 +185,7 @@ $( document ).ready(function()
 		document.getElementById("semplanhelp").style.visibility = "hidden";
 	}
 
-	</script>   
+	</script>
 </head>
 <body>
 <div id="semplanhelp" style="position:absolute; top:200px; left:200px; width:500px; height:250px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" class="transparent">
@@ -217,9 +218,9 @@ $( document ).ready(function()
 			// wird zusätzlich das Lehrfach der Lehreinheit angezeigt.
 			if($is_lector)
 			{
-				$qry = "SELECT 
-					distinct lehrfach_id 
-					FROM 
+				$qry = "SELECT
+					distinct lehrfach_id
+					FROM
 						lehre.tbl_lehreinheit
 						JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
 					WHERE
@@ -230,14 +231,14 @@ $( document ).ready(function()
 			else
 			{
 				$qry = "SELECT distinct lehrfach_id
-					FROM 
+					FROM
 						campus.vw_student_lehrveranstaltung
-					WHERE 
-						lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." 
+					WHERE
+						lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)."
 						AND studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem)."
 						AND uid=".$db->db_add_param($user);
 			}
-			
+
 			if($result = $db->db_query($qry))
 			{
 				// Wenn die LV mehrere verschiedenen Lehrfaecher hat, und der User zu mehreren davon zugeteilt ist
@@ -252,7 +253,7 @@ $( document ).ready(function()
 						if($lehrfach->bezeichnung_arr[$sprache]==$lv_obj->bezeichnung_arr[$sprache])
 							echo $lv_obj->bezeichnung_arr[$sprache];
 						else
-							echo $lehrfach->bezeichnung_arr[$sprache].' - '.$lv_obj->bezeichnung_arr[$sprache]; 
+							echo $lehrfach->bezeichnung_arr[$sprache].' - '.$lv_obj->bezeichnung_arr[$sprache];
 					}
 				}
 				else
@@ -261,14 +262,14 @@ $( document ).ready(function()
 		}
 		else
 			echo $lv_obj->bezeichnung_arr[$sprache];
-			
+
 		echo ' '.$lv_obj->lehrform_kurzbz;
 
 		if(!defined('CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN)
 			echo ' / '.$kurzbz.'-'.$semester.' '.$lv_obj->orgform_kurzbz;
 
-		
-						
+
+
 	    echo "&nbsp;($angezeigtes_stsem)";
 	    echo '</h1></td>
               </tr>
@@ -276,19 +277,19 @@ $( document ).ready(function()
               <td>&nbsp;</td>
               <td style="vertical-align:top; height: 10px">';
 
-	    $qry = "SELECT * FROM (SELECT distinct on(uid) vorname, nachname, tbl_benutzer.uid as uid, 
-	    			CASE WHEN lehrfunktion_kurzbz='LV-Leitung' THEN true ELSE false END as lvleiter 
-	    		FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_benutzer, public.tbl_person 
-	    		WHERE 
-	    			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
-	    			tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND 
-	    			tbl_person.person_id=tbl_benutzer.person_id AND 
-	    			lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND 
-	    			tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND 
-	    			tbl_benutzer.aktiv=true AND tbl_person.aktiv=true AND 
+	    $qry = "SELECT * FROM (SELECT distinct on(uid) vorname, nachname, tbl_benutzer.uid as uid,
+	    			CASE WHEN lehrfunktion_kurzbz='LV-Leitung' THEN true ELSE false END as lvleiter
+	    		FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_benutzer, public.tbl_person
+	    		WHERE
+	    			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+	    			tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND
+	    			tbl_person.person_id=tbl_benutzer.person_id AND
+	    			lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
+	    			tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND
+	    			tbl_benutzer.aktiv=true AND tbl_person.aktiv=true AND
 	    			studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem);
 
-		// Wenn das Lehrfach angezeigt werden nur die Lektoren angezeigt die dieser 
+		// Wenn das Lehrfach angezeigt werden nur die Lektoren angezeigt die dieser
 		// Lehreinheit / Lehrfach zugeordnet sind
 		if($lehrfach_id!='')
 			$qry.=" AND tbl_lehreinheit.lehrfach_id=".$db->db_add_param($lehrfach_id);
@@ -321,7 +322,7 @@ $( document ).ready(function()
 
 					if($row_lector->lvleiter=='t')
 						$style='style="font-weight: bold"';
-					else 
+					else
 						$style='';
 					echo '<a href="mailto:'.$row_lector->uid.'@'.DOMAIN.'" '.$style.'>'.$row_lector->vorname.' '.$row_lector->nachname.'</a>';
 					if($i!=$num_rows_result)
@@ -331,11 +332,11 @@ $( document ).ready(function()
 		}
 
 		//Berechtigungen auf Fachbereichsebene
-		$qry = "SELECT 
-	  			distinct lehrfach.oe_kurzbz 
-	  		FROM 
-	  			lehre.tbl_lehrveranstaltung 
-	  			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
+		$qry = "SELECT
+	  			distinct lehrfach.oe_kurzbz
+	  		FROM
+	  			lehre.tbl_lehrveranstaltung
+	  			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
 	  			JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
 	  		WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
 

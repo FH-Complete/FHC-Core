@@ -65,6 +65,7 @@ require_once('../../include/notenschluessel.class.php');
 require_once('../../include/anrechnung.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/anwesenheit.class.php');
+require_once('../../include/benutzerfunktion.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -2596,8 +2597,21 @@ if(!$error)
                             $pruefung->student_uid = $student_uid;
                             $pruefung->lehreinheit_id = $lehreinheit_id;
                             $pruefung->datum = date("Y-m-d");
-                            
-                            if(isset($anwesenheit->result[0]) && $anwesenheit->result[0]->prozent < FAS_ANWESENHEIT_ROT)
+
+							$stsem_obj = new studiensemester();
+							$stsem_obj->load($studiensemester_kurzbz);
+
+							// In Benutzerfunktion nachsehen ob eine Anwesenheitsbefreiung eingetragen ist
+							$benutzerfunktion = new benutzerfunktion();
+							$benutzerfunktion->getBenutzerFunktionByUid($student_uid, 'awbefreit', $stsem_obj->start, $stsem_obj->ende);
+
+							$anwesenheitsbefreit=false;
+							if(count($benutzerfunktion->result)>0)
+								$anwesenheitsbefreit=true;
+
+							// Wenn nicht Anwesenheitsbefreit und Anwesenheit unter einem bestimmten Prozentsatz faellt dann wird ein
+							// Pruefungsantritt abgezogen
+                            if(isset($anwesenheit->result[0]) && $anwesenheit->result[0]->prozent < FAS_ANWESENHEIT_ROT && !$anwesenheitsbefreit)
                             {
                                 // 1. Termin mit "nicht beurteilt" erstellen
                                 $pruefung->pruefungstyp_kurzbz = "Termin1";
@@ -2886,7 +2900,7 @@ if(!$error)
 							{
 								$errormsg .= "\n".$zeugnisnote->errormsg;
 							}
-                            
+
                             if(FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $errormsg == '' && $zeugnisnote->new == true)
                             {
                                 $anwesenheit = new anwesenheit();

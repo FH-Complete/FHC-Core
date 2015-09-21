@@ -114,9 +114,11 @@ if(isset($lehrstunde->result) && is_array($lehrstunde->result))
         {
             for($x = $row->stundevon; $x <= $row->stundebis; $x++)
             {
+                $orte = implode(',',$row->orte);
+                
                 if(isset($verplanteStunden[$row->datum]) && in_array($x, $verplanteStunden[$row->datum]))
                 {
-                    if(!isset($verplanteStunden[implode(',',$row->orte)]) || !in_array($x, $verplanteStunden[implode(',',$row->orte)]))
+                    if(!isset($verplanteStunden[$row->datum][$orte]) || !in_array($x, $verplanteStunden[$row->datum][$orte]))
                     {
                         $kollision = "makeItred";
                         break;
@@ -124,7 +126,7 @@ if(isset($lehrstunde->result) && is_array($lehrstunde->result))
                 }
 
                 $verplanteStunden[$row->datum][] = $x;
-                $verplanteStunden[implode(',',$row->orte)][] = $x;
+                $verplanteStunden[$row->datum][$orte][] = $x;
             }
         }
         $oRdf->obj[$i]->setAttribut('kollision',$kollision,true);

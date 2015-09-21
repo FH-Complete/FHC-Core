@@ -898,10 +898,12 @@ class vertrag extends basis_db
 		// (Lehreinheiten und Betreuungen)
 		// plus Sonderhonorare die in diesem Zeitraum angelegt wurden
 		$qry = "SELECT
-					*
+					tbl_vertrag.*
 				FROM
 					lehre.tbl_vertrag
+					JOIN public.tbl_benutzer USING(person_id)
 				WHERE
+					(
 					EXISTS (SELECT
 								1
 							FROM
@@ -933,9 +935,11 @@ class vertrag extends basis_db
 											lehre.tbl_projektbetreuer
 										WHERE
 											vertrag_id=tbl_vertrag.vertrag_id)
+					))
 					AND vertragsdatum<=".$this->db_add_param($datum)."
 					AND vertragsdatum>=".$this->db_add_param($prevstsemende)."
-				)";
+					AND tbl_benutzer.uid=".$this->db_add_param($mitarbeiter_uid);
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -953,6 +957,80 @@ class vertrag extends basis_db
 				$this->result[]=$obj;
 			}
 
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Loescht einen Vertrag und seine Verbindungen
+	 * @param $vertrag_id ID des Vertrags
+	 */
+	public function delete($vertrag_id)
+	{
+		$qry = "UPDATE lehre.tbl_lehreinheitmitarbeiter SET vertrag_id=null WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";
+		UPDATE lehre.tbl_projektbetreuer SET vertrag_id=null WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";
+		DELETE FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";
+		DELETE FROM lehre.tbl_vertrag WHERE vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";";
+
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Liefert alle Vertraege bei denen die Lehraufträge nicht zur Person passen.
+	 * (zB Aufgrund Lektorenaenderung)
+	 * @param $studiensemester_kurzbz
+	 * @return boolean true wenn ok, false im Fehlerfall
+	 */
+	public function getFalscheVertraege($studiensemester_kurzbz)
+	{
+		$qry = "SELECT
+					tbl_vertrag.*
+				FROM
+					lehre.tbl_vertrag
+					JOIN lehre.tbl_lehreinheitmitarbeiter USING(vertrag_id)
+					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+				WHERE
+					studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT IN(SELECT uid FROM public.tbl_benutzer WHERE person_id=tbl_vertrag.person_id)
+				UNION
+				SELECT
+					tbl_vertrag.*
+				FROM
+					lehre.tbl_vertrag
+					JOIN lehre.tbl_projektbetreuer USING(vertrag_id)
+					JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+				WHERE
+					studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					AND tbl_projektbetreuer.person_id!=tbl_vertrag.person_id";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+
+				$obj->vertrag_id = $row->vertrag_id;
+				$obj->vertragstyp_kurzbz = $row->vertragstyp_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->betrag = $row->betrag;
+				$obj->person_id = $row->person_id;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->vertragsdatum = $row->vertragsdatum;
+
+				$this->result[]=$obj;
+			}
 			return true;
 		}
 		else

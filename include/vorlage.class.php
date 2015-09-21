@@ -32,7 +32,7 @@ class vorlage extends basis_db
 	public $num_rows=0;
 	public $errormsg;
 	public $new;
-	
+
 	//Tabellenspalten
 	public $vorlage_kurzbz;					// varchar(16)
 	public $studiengang_kz;	 				// integer
@@ -54,7 +54,7 @@ class vorlage extends basis_db
 	{
 		parent::__construct();
 	}
-	
+
 	/**
 	 * Laedt eine Vorlage
 	 * @param $vorlage_kurzbz
@@ -85,7 +85,7 @@ class vorlage extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Speichert eine Vorlage
 	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
@@ -96,7 +96,7 @@ class vorlage extends basis_db
 	{
 		if(is_null($new))
 			$new = $this->new;
-			
+
 		if($new)
 		{
 			$qry = "INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung, mimetype) VALUES(".
@@ -113,7 +113,7 @@ class vorlage extends basis_db
 							mimetype='.$this->db_add_param($this->mimetype).'
 					WHERE vorlage_kurzbz='.$this->db_add_param($this->vorlage_kurzbz).';';
 		}
-	
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -124,7 +124,7 @@ class vorlage extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert alle Vorlagen
 	 * @param $order Sortierreihenfolge. Default:vorlage_kurzbz
@@ -132,7 +132,7 @@ class vorlage extends basis_db
 	public function getAllVorlagen($order='vorlage_kurzbz')
 	{
 		$qry ="SELECT * FROM public.tbl_vorlage ORDER BY ".$order.";";
-	
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -142,14 +142,14 @@ class vorlage extends basis_db
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->mimetype = $row->mimetype;
-	
+
 				$this->result[]= $obj;
 			}
 		}
 		else
 			return false;
 	}
-	
+
 	/**
 	 * Laedt die Vorlage zu einer OE
 	 * @param $vorlage_kurzbz
@@ -185,20 +185,20 @@ class vorlage extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt alle Versionen einer Vorlage
 	 * @param $vorlage_kurzbz
-	 * @param $oe_kurzbz Optional. Gibt nur die Vorlagen zu dieser OE aus. 
+	 * @param $oe_kurzbz Optional. Gibt nur die Vorlagen zu dieser OE aus.
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function getAllVersions($vorlage_kurzbz=null, $oe_kurzbz=null)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					*
-				FROM 
+				FROM
 					public.tbl_vorlagestudiengang
-				WHERE 
+				WHERE
 					1=1";
 		if(!is_null($vorlage_kurzbz) && $vorlage_kurzbz!='')
 		{
@@ -208,7 +208,7 @@ class vorlage extends basis_db
 		{
 			$qry.=" AND oe_kurzbz=".$this->db_add_param($oe_kurzbz);
 		}
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -223,7 +223,7 @@ class vorlage extends basis_db
 				$obj->style = $row->style;
 				$obj->berechtigung = $row->berechtigung;
 				$obj->anmerkung_vorlagestudiengang = $row->anmerkung_vorlagestudiengang;
-				
+
 				$this->result[]= $obj;
 			}
 		}
@@ -233,7 +233,7 @@ class vorlage extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert alle OEs, welche die $vorlage_kurzbz verwenden
 	 * @param $vorlage_kurzbz Kurzbezeichnung der Vorlage
@@ -241,15 +241,15 @@ class vorlage extends basis_db
 	public function getOEsFromVorlage($vorlage_kurzbz=null)
 	{
 		$qry ="SELECT DISTINCT
-					tbl_organisationseinheit.* 
-				FROM 
-					public.tbl_vorlagestudiengang 
-				JOIN 
+					tbl_organisationseinheit.*
+				FROM
+					public.tbl_vorlagestudiengang
+				JOIN
 					public.tbl_organisationseinheit USING (oe_kurzbz)
 				WHERE
 					vorlage_kurzbz=".$this->db_add_param($vorlage_kurzbz)."
 				ORDER BY oe_kurzbz";
-	
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -262,14 +262,14 @@ class vorlage extends basis_db
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 				$obj->mailverteiler = $this->db_parse_bool($row->mailverteiler);
 				$obj->lehre = $this->db_parse_bool($row->lehre);
-				
+
 				$this->result[]= $obj;
 			}
 		}
 		else
 			return false;
 	}
-	
+
 	/**
 	 * Speichert die Vorlage zu einer OE
 	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
@@ -280,7 +280,7 @@ class vorlage extends basis_db
 	{
 		if($new == null)
 			$new = $this->new;
-			
+
 		if($new)
 		{
 			$qry = "INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz,studiengang_kz,version,text,oe_kurzbz,style,berechtigung,anmerkung_vorlagestudiengang) VALUES(".
@@ -306,7 +306,7 @@ class vorlage extends basis_db
 							anmerkung_vorlagestudiengang='.$this->db_add_param($this->anmerkung_vorlagestudiengang).'
 					WHERE vorlagestudiengang_id='.$this->db_add_param($this->vorlagestudiengang_id).';';
 		}
-	
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -317,7 +317,7 @@ class vorlage extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * LÃ¶scht die Vorlagestudiengagn
 	 * @param type $vorlagestudiengang_id ID der Vorlage
@@ -325,7 +325,7 @@ class vorlage extends basis_db
 	public function deleteVorlagestudiengang($vorlagestudiengang_id)
 	{
 		$qry = 'DELETE FROM public.tbl_vorlagestudiengang WHERE vorlagestudiengang_id='.$this->db_add_param($vorlagestudiengang_id).';';
-	
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -345,15 +345,15 @@ class vorlage extends basis_db
 	 */
 	public function getMaxVersion($oe_kurzbz, $vorlage_kurzbz)
 	{
-		$qry = "SELECT 
-					max(version) maxversion 
-				FROM 
+		$qry = "SELECT
+					max(version) maxversion
+				FROM
 					public.tbl_vorlagestudiengang
-				WHERE 
-					vorlage_kurzbz=".$this->db_add_param($vorlage_kurzbz)." 
-				AND 
+				WHERE
+					vorlage_kurzbz=".$this->db_add_param($vorlage_kurzbz)."
+				AND
 					oe_kurzbz=".$this->db_add_param($oe_kurzbz);
-		
+
 		if($result = $this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object($result))
@@ -367,15 +367,15 @@ class vorlage extends basis_db
 			return false;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Liefert die aktuelle Vorlage
-	 * 
+	 *
 	 *
 	 * @param $oe_kurzbz Organisationseinheit der Vorlage
-	 * 		Fuer Kompatibilitaetszwecke kann hier statt der oe_kurzbz auch die Studiengangskennzahl uebergeben werden. 
-	 *		Dies wird in den kommenden Versionen jedoch nicht mehr moeglich sein! 		
+	 * 		Fuer Kompatibilitaetszwecke kann hier statt der oe_kurzbz auch die Studiengangskennzahl uebergeben werden.
+	 *		In diesem Fall wird ein load der OE des Studiengangs durchgeführt und die entsprechende OE verwendet.
 	 * @param $vorlage_kurzbz Name der Vorlage
 	 * @param $version optional kann die Versionsnummer der Vorlage uebergeben werden
 	 * @return boolean
@@ -385,18 +385,21 @@ class vorlage extends basis_db
 		$studiengang_kz='';
 		if(is_numeric($oe_kurzbz))
 		{
-			$studiengang_kz=$oe_kurzbz;
+			$studiengang = new studiengang();
+			$studiengang->load($oe_kurzbz);
+			$oe_kurzbz=$studiengang->oe_kurzbz;
+			//Durch diese Bedingung wird die Abfrage der studiengang_kz im folgenden Abschnitt hinfaellig.
 		}
-		
-		if($studiengang_kz!='')
+
+		if($studiengang_kz!='') // Es sollte aktuell keine Vorlage mehr ueber die Studiengang_kz aufgerufen werden, da hier kein Fallback der OE erfolgt. Fuer Testzwecke bleibt das noch bestehen. Kindlm 11.09.2015
 		{
-			$qry = "SELECT 
+			$qry = "SELECT
 						tbl_vorlagestudiengang.*, tbl_vorlage.mimetype, tbl_vorlage.bezeichnung
-					FROM 
-						public.tbl_vorlagestudiengang 
-						JOIN public.tbl_vorlage USING(vorlage_kurzbz) 
-					WHERE 
-					(studiengang_kz=0 OR studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER).") AND 
+					FROM
+						public.tbl_vorlagestudiengang
+						JOIN public.tbl_vorlage USING(vorlage_kurzbz)
+					WHERE
+					(studiengang_kz=0 OR studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER).") AND
 					vorlage_kurzbz=".$this->db_add_param($vorlage_kurzbz);
 			if(!is_null($version) && $version!='')
 			{
@@ -413,10 +416,10 @@ class vorlage extends basis_db
 		}
 		else
 		{
-			$qry = "SELECT 
+			$qry = "SELECT
 						tbl_vorlagestudiengang.*, tbl_vorlage.mimetype, tbl_vorlage.bezeichnung
-					FROM 
-						public.tbl_vorlagestudiengang 
+					FROM
+						public.tbl_vorlagestudiengang
 						JOIN public.tbl_vorlage USING(vorlage_kurzbz)
 					WHERE oe_kurzbz=".$this->db_add_param($oe_kurzbz)."
 						AND vorlage_kurzbz=".$this->db_add_param($vorlage_kurzbz);
@@ -426,7 +429,7 @@ class vorlage extends basis_db
 			}
 			$qry.=" ORDER BY version DESC LIMIT 1";
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -438,12 +441,12 @@ class vorlage extends basis_db
 				$this->mimetype = $row->mimetype;
 				$this->bezeichnung = $row->bezeichnung;
 				$this->style = $row->style;
-				$this->berechtigung = $row->berechtigung;
+				$this->berechtigung = $this->db_parse_array($row->berechtigung);
 				$this->anmerkung_vorlagestudiengang = $row->anmerkung_vorlagestudiengang;
-				
+
 				return true;
 			}
-			else 
+			else
 			{
 				if($studiengang_kz!='')
 				{
@@ -456,7 +459,7 @@ class vorlage extends basis_db
 					//nachsehen ob fuer eine der uebergeordneten OEs eine Vorlage vorhanden ist.
 					$oe = new organisationseinheit();
 					$oe->load($oe_kurzbz);
-					
+
 					if($oe->oe_parent_kurzbz!='')
 					{
 						return $this->getAktuelleVorlage($oe->oe_parent_kurzbz, $vorlage_kurzbz, $version);
@@ -469,12 +472,12 @@ class vorlage extends basis_db
 				}
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Vorlage';
 			return false;
 		}
 	}
-	
+
 }
 ?>

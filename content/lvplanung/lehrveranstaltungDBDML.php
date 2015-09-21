@@ -48,6 +48,7 @@ require_once('../../include/lvangebot.class.php');
 require_once('../../include/gruppe.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/datum.class.php');
+require_once('../../include/vertrag.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -703,14 +704,29 @@ if(!$error)
 					else
 					{
 						$leg = new lehreinheitmitarbeiter();
-						if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
+						if($leg->load($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
 						{
-							$return = true;
+							// Wenn ein Vertrag dazu angelegt ist, dann diesen mitloeschen
+							if($leg->vertrag_id!='')
+							{
+								$vertrag = new vertrag();
+								$vertrag->delete($leg->vertrag_id);
+							}
+
+							if($leg->delete($_POST['lehreinheit_id'], $_POST['mitarbeiter_uid']))
+							{
+								$return = true;
+							}
+							else
+							{
+								$return = false;
+								$errormsg = $leg->errormsg;
+							}
 						}
 						else
 						{
 							$return = false;
-							$errormsg = $leg->errormsg;
+							$errormsg='Fehlgeschlagen:'.$leg->errormsg;
 						}
 					}
 				}

@@ -643,7 +643,7 @@ class mitarbeiter extends benutzer
 	 * @param $verwendung wenn true werden alle geladen die eine BIS-Verwendung eingetragen haben
 	 * @return boolean
 	 */
-	public function getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $verwendung, $vertragnochnichtretour=null)
+	public function getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $verwendung, $vertrag=null)
 	{
 		$qry = "SELECT distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum, tbl_mitarbeiter.insertvon, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id)) LEFT JOIN public.tbl_benutzerfunktion USING(uid) LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid) WHERE true";
 
@@ -677,7 +677,7 @@ class mitarbeiter extends benutzer
 		{
 			$qry.=" AND NOT EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE (ende>now() or ende is null) AND tbl_bisverwendung.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid)";
 		}
-		if($vertragnochnichtretour=='true')
+		if($vertrag=='VertragNochNichtRetour')
 		{
 			$qry.=" AND EXISTS(SELECT * FROM lehre.tbl_vertrag
 						WHERE person_id=tbl_benutzer.person_id
@@ -685,8 +685,42 @@ class mitarbeiter extends benutzer
 						AND NOT EXISTS(SELECT 1 FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=tbl_vertrag.vertrag_id AND vertragsstatus_kurzbz='abgerechnet')
 						)";
 		}
+		elseif($vertrag=='VertragHabilitiert')
+		{
+			$qry.=" AND EXISTS(SELECT * FROM lehre.tbl_vertrag
+						WHERE person_id=tbl_benutzer.person_id
+						AND NOT EXISTS(SELECT 1 FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=tbl_vertrag.vertrag_id AND vertragsstatus_kurzbz='abgerechnet')
+						)
+					AND EXISTS(SELECT * FROM bis.tbl_bisverwendung
+								WHERE mitarbeiter_uid=tbl_benutzer.uid
+								AND habilitation=true
+								)
+					";
+		}
+		elseif($vertrag=='VertragNichtHabilitiert')
+		{
+			$qry.=" AND EXISTS(SELECT * FROM lehre.tbl_vertrag
+						WHERE person_id=tbl_benutzer.person_id
+						AND NOT EXISTS(SELECT 1 FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=tbl_vertrag.vertrag_id AND vertragsstatus_kurzbz='abgerechnet')
+						)
+					AND NOT EXISTS(SELECT * FROM bis.tbl_bisverwendung
+								WHERE mitarbeiter_uid=tbl_benutzer.uid
+								AND habilitation=true
+								)
+					";
+		}
+		elseif($vertrag=='VertragNichtGedruckt')
+		{
+			$qry.=" AND EXISTS(SELECT * FROM lehre.tbl_vertrag
+						WHERE person_id=tbl_benutzer.person_id
+						AND NOT EXISTS(SELECT 1 FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=tbl_vertrag.vertrag_id AND vertragsstatus_kurzbz='gedruckt')
+						AND NOT EXISTS(SELECT 1 FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=tbl_vertrag.vertrag_id AND vertragsstatus_kurzbz='abgerechnet')
+						)";
+		}
+
 
         $qry.=';';
+		
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -1094,7 +1128,7 @@ class mitarbeiter extends benutzer
 
     /**
      * Liefert MitarbeiterInnen für die Verwaltung der Zutrittskarten
-     *  
+     *
      * @param $filter Buchstabe mit dem der Mitarbeiter beginnt
      * @param $fixangestellt false wenn externer mitarbeiter
      * @param $studSemArray Array mit Studiensemestern in denen der externe Lektor zumindest in einem Unterrichtet haben soll oder NULL. Wenn NULL werden nur externe Mitarbeiter ohne Lehrauftrag ausgegeben.
@@ -1120,7 +1154,7 @@ class mitarbeiter extends benutzer
 	                (SELECT * FROM lehre.tbl_lehreinheitmitarbeiter
 	                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 	                WHERE tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid) ";
-            else 
+            else
 	        	$qry.=" AND NOT fixangestellt AND EXISTS
 	                (SELECT * FROM lehre.tbl_lehreinheitmitarbeiter
 	                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
@@ -1219,5 +1253,51 @@ class mitarbeiter extends benutzer
 	}
 	return false;
     }
+
+	/**
+	 * Laedt einen Mitarbeiter anhand der Personalnummer
+	 *
+	 * @param $uid
+	 * @return true wenn ok, sonst false
+	 */
+	public function getMitarbeiterFromPersonalnummer($personalnummer)
+	{
+		$qry = "SELECT * FROM public.tbl_mitarbeiter
+				WHERE personalnummer=".$this->db_add_param($personalnummer).";";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				if(!benutzer::load($row->mitarbeiter_uid))
+					return false;
+
+				$this->personalnummer = $row->personalnummer;
+				$this->kurzbz = $row->kurzbz;
+				$this->lektor = $this->db_parse_bool($row->lektor);
+				$this->fixangestellt = $this->db_parse_bool($row->fixangestellt);
+				$this->standort_id = $row->standort_id;
+				$this->telefonklappe = $row->telefonklappe;
+				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->stundensatz = $row->stundensatz;
+				$this->anmerkung = $row->anmerkung;
+				$this->ext_id_mitarbeiter = $row->ext_id;
+				$this->bismelden = $this->db_parse_bool($row->bismelden);
+				$this->kleriker = $this->db_parse_bool($row->kleriker);
+
+				return true;
+			}
+			else
+			{
+				$this->errormsg = "Kein Eintrag gefunden fuer den Benutzer\n";
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = "Fehler beim Laden der Daten\n";
+			return false;
+		}
+	}
 }
 ?>

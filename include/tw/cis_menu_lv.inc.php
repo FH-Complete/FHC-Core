@@ -81,7 +81,7 @@ function checkZeilenUmbruch()
 				echo "<br>";
 			echo "<a href='ects/index.php?lvid=$lvid' target='_blank' class='Item'>".$p->t('lehre/lvInfoBearbeiten')."</a>";
 		}
-		
+
 		echo '</td>';
 	}
 	checkZeilenUmbruch();
@@ -114,7 +114,7 @@ function checkZeilenUmbruch()
 		echo '<td class="tdvertical" align="center">';
 
 		$dir_name=$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/semesterplan';
-			
+
 	  	$dest_dir = @dir($dir_name);
 	  	if(!@is_dir($dest_dir->path))
 		{
@@ -195,10 +195,10 @@ function checkZeilenUmbruch()
 		//DOWNLOAD
 		$eintraegeprozeile++;
 		echo '<td class="tdvertical" align="center">';
-	
+
 
 	  	$dir_name=$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/download';
-		
+
 	  	$dest_dir = @dir($dir_name);
 
 	  	if(!@is_dir($dest_dir->path))
@@ -252,7 +252,7 @@ function checkZeilenUmbruch()
 			echo '<img class="lv" src="../../../skin/images/button_download.png"><br>';
 			echo '<strong>'.$p->t('lehre/download').'</strong>';
 		}
-	
+
 		//Wenn user eine Lehrfachzuteilung fuer dieses Lehrfach hat wird
 		//Ein Link zum Upload angezeigt und ein Link um das Download-Verzeichnis
 		//als Zip Archiv herunterzuladen
@@ -267,11 +267,11 @@ function checkZeilenUmbruch()
 			else
 				echo $p->t('lehre/ziparchiv');
 		}
-	
+
 		echo '</td>';
 	}
 	checkZeilenUmbruch();
-	
+
 
 	if(CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN || $is_lector)
 	{
@@ -281,7 +281,7 @@ function checkZeilenUmbruch()
 
 		if((CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN && $angemeldet) || $is_lector)
 			echo '<img class="lv" src="../../../skin/images/button_listen.png"><br>';
-	
+
 	  	if($is_lector)
 	  	{
 			//Anwesenheitsliste
@@ -345,7 +345,7 @@ function checkZeilenUmbruch()
 		}
 
 		echo '</td>';
-	}	  
+	}
 	checkZeilenUmbruch();
 
 	//Keine Newsgroups fuer Studiengang '0' (Freifaecher) anzeigen
@@ -378,13 +378,13 @@ function checkZeilenUmbruch()
 		$eintraegeprozeile++;
 		echo '<td class="tdvertical" align="center">';
 		$show=false;
-	
+
 		//wenn kein Moodle Kurs existiert dann KT anzeigen
-		$qry = "SELECT 1 FROM lehre.tbl_moodle WHERE 
+		$qry = "SELECT 1 FROM lehre.tbl_moodle WHERE
 				(lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem).")
 				OR
-				(lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
-									WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND 
+				(lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
+									WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
 									studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem)."))";
 
 		if($result = $db->db_query($qry))
@@ -395,8 +395,8 @@ function checkZeilenUmbruch()
 			}
 		}
 		//wenn eine Kreuzerlliste existiert dann den Link immer anzeigen
-		$qry = "SELECT 1 FROM campus.tbl_uebung 
-				WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
+		$qry = "SELECT 1 FROM campus.tbl_uebung
+				WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
 										WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
 										studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem).")";
 		if($result = $db->db_query($qry))
@@ -406,7 +406,7 @@ function checkZeilenUmbruch()
 				$show=true;
 			}
 		}
-	
+
 		if($show)
 		{
 			//Kreuzerltool
@@ -416,13 +416,13 @@ function checkZeilenUmbruch()
 					$studiensem = '&stsem='.$angezeigtes_stsem;
 				else
 					$studiensem = '';
-		
+
 					echo '<a href="benotungstool/verwaltung.php?lvid='.$lvid.$studiensem.'" class="Item">
 						<img class="lv" src="../../../skin/images/button_kreuzerltool.png"><br>
 						<strong>'.$p->t('lehre/kreuzerltool').'</strong></a><br>
 						<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/benotungstoolHandbuch').' [PDF]</a>';
-			} 
-			else 
+			}
+			else
 			{
 				if(isset($angezeigtes_stsem))
 					$studiensem = '&stsem='.$angezeigtes_stsem;
@@ -432,10 +432,10 @@ function checkZeilenUmbruch()
 				echo '<a href="benotungstool/studentenansicht.php?lvid='.$lvid.$studiensem.'" class="Item">
 						<img class="lv" src="../../../skin/images/button_kreuzerltool.png"><br>
 						<strong>'.$p->t('lehre/kreuzerltool').'</strong></a>';
-	
+
 			}
 		}
-		else 
+		else
 		{
 			if($is_lector)
 			{
@@ -445,7 +445,7 @@ function checkZeilenUmbruch()
 						<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/benotungstoolHandbuch').' [PDF]</a>';
 			}
 		}
-	
+
 		echo'</td>';
 	}
 
@@ -466,27 +466,27 @@ function checkZeilenUmbruch()
 			}
 		}
 	}
-	
+
 	if(MOODLE)
 	{
 		//wenn bereits eine Kreuzerlliste existiert, dann den Moodle link nicht anzeigen
-		$qry = "SELECT * FROM campus.tbl_uebung WHERE 
-				lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
+		$qry = "SELECT * FROM campus.tbl_uebung WHERE
+				lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
 									WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)."
 									AND studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem).")";
-		
+
 		if($result = $db->db_query($qry))
 			if($db->db_num_rows($result)>0)
 				$showmoodle=false;
-		
+
 		$moodle = new moodle();
 		$moodle->getAll($lvid, $angezeigtes_stsem);
 		if(count($moodle->result)>0)
 			$showmoodle=true;
 	}
-	else 
+	else
 		$showmoodle=false;
-	
+
 	if($angemeldet)
 	{
 	    if($showmoodle )
@@ -504,23 +504,23 @@ function checkZeilenUmbruch()
 
 				    if(count($moodle->result)==1)
 					    $link = $moodle->getPfad($moodle->result[0]->moodle_version).'course/view.php?id='.$moodle->result[0]->mdl_course_id;
-				    else 
+				    else
 					    $link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
 			    }
-			    else 
+			    else
 			    {
 				    if(count($moodle->result)==1)
 				    {
 					    $link = $moodle->getPfad($moodle->result[0]->moodle_version).'course/view.php?id='.$moodle->result[0]->mdl_course_id;
 				    }
-				    else 
+				    else
 					    $link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
 			    }
 			    echo '<a href="'.$link.'" target="_blank">
 				    <img class="lv" src="../../../skin/images/button_moodle.png"><br>
 				    <strong>'.$p->t('lehre/moodle').'</strong></a><br>';
 		    }
-		    else 
+		    else
 		    {
 			    echo '<img class="lv" src="../../../skin/images/button_moodle.png"><br>
 				    <strong>'.$p->t('lehre/moodle').'</strong><br>';
@@ -532,7 +532,7 @@ function checkZeilenUmbruch()
 
 		    echo '</td>';
 	    }
-	    else 
+	    else
 	    {
 		    if($is_lector)
 		    {
@@ -546,7 +546,7 @@ function checkZeilenUmbruch()
 	    }
 	}
 	checkZeilenUmbruch();
-	
+
 	//Gesamtnote
 	if($is_lector && ((!defined('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN) && $angemeldet))
 	{
@@ -558,13 +558,13 @@ function checkZeilenUmbruch()
 		echo '
 			</td>';
 	}
-	
+
 	checkZeilenUmbruch();
 
 
 	if((!defined('CIS_LEHRVERANSTALTUNG_STUDENTENUPLOAD_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_STUDENTENUPLOAD_ANZEIGEN) && $angemeldet)
 	{
-		//Studentenupload 
+		//Studentenupload
 		$eintraegeprozeile++;
 		echo '<td class="tdvertical" align="center">';
 		//Studentenabgabe
@@ -662,24 +662,27 @@ function checkZeilenUmbruch()
 		}
 		echo '</td>';
 	}
-	
+
 	checkZeilenUmbruch();
 
 	if((!defined('CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN) && $angemeldet)
 	{
 		// Email an Studierende
-	
+
 		$mailto='mailto:';
-		$qry = 'SELECT 
-					distinct vw_lehreinheit.stg_kurzbz, vw_lehreinheit.stg_typ, vw_lehreinheit.semester, 
-					vw_lehreinheit.verband, vw_lehreinheit.gruppe, vw_lehreinheit.gruppe_kurzbz, tbl_gruppe.mailgrp 
-				FROM 
-					campus.vw_lehreinheit 
+		$qry = 'SELECT
+					distinct vw_lehreinheit.stg_kurzbz, vw_lehreinheit.stg_typ, vw_lehreinheit.semester,
+					vw_lehreinheit.verband, vw_lehreinheit.gruppe, vw_lehreinheit.gruppe_kurzbz, tbl_gruppe.mailgrp
+				FROM
+					campus.vw_lehreinheit
 					LEFT JOIN public.tbl_gruppe USING(gruppe_kurzbz)
-				WHERE 
-					lehrveranstaltung_id='.$db->db_add_param($lvid).' 
+				WHERE
+					lehrveranstaltung_id='.$db->db_add_param($lvid).'
 					AND studiensemester_kurzbz='.$db->db_add_param($angezeigtes_stsem);
 		$nomail='';
+		$variable = new variable();
+		$variable->loadVariables($user);
+
 		if($result = $db->db_query($qry))
 		{
 			while($row = $db->db_fetch_object($result))
@@ -694,20 +697,20 @@ function checkZeilenUmbruch()
 						$mailto.=mb_strtolower($row->gruppe_kurzbz.'@'.DOMAIN.',');
 				}
 				else
-					$mailto.=mb_strtolower($row->stg_typ.$row->stg_kurzbz.$row->semester.trim($row->verband).trim($row->gruppe).'@'.DOMAIN.',');
+					$mailto.=mb_strtolower($row->stg_typ.$row->stg_kurzbz.$row->semester.trim($row->verband).trim($row->gruppe).'@'.DOMAIN.$variable->variable->emailadressentrennzeichen);
 			}
 		}
 		if($nomail!='')
 		{
 			$nomail = 'onclick="alert(\''.$p->t('lehre/keinMailverteiler',array($nomail)).'\');"';
 		}
-	
+
 		$eintraegeprozeile++;
 		echo '<td class="tdvertical" align="center">';
 		echo '<a href="'.$mailto.'" '.$nomail.'><img class="lv" src="../../../skin/images/button_feedback.png"><br><strong>'.$p->t('lehre/mail').'</strong></a>';
 		echo '</td>';
 	}
-	
+
 	checkZeilenUmbruch();
 
 	if((!defined('CIS_LEHRVERANSTALTUNG_PINBOARD_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_PINBOARD_ANZEIGEN) && $angemeldet)
@@ -715,14 +718,14 @@ function checkZeilenUmbruch()
 		//Pinboard
 		$eintraegeprozeile++;
 		echo '<td class="tdvertical" align="center">';
-		echo '<img class="lv" src="../../../skin/images/button_pinboard.png"><br>';	
+		echo '<img class="lv" src="../../../skin/images/button_pinboard.png"><br>';
 		echo "<b>".$p->t('lehre/pinboard')."</b></a><br>";
-		echo "<a href='../../../cms/news.php?studiengang_kz=$studiengang_kz&semester=$semester' class='Item'>".$p->t('global/anzeigen')."</a>";	
+		echo "<a href='../../../cms/news.php?studiengang_kz=$studiengang_kz&semester=$semester' class='Item'>".$p->t('global/anzeigen')."</a>";
 		if($is_lector)
 			echo "<br><a href='../../../cms/newsverwaltung.php?studiengang_kz=$studiengang_kz&semester=$semester' class='Item'>".$p->t('profil/adminstration')."</a>";
 		echo '</td>';
 	}
-	
+
 	checkZeilenUmbruch();
 
 	if(!defined('CIS_LEHRVERANSTALTUNG_ABMELDUNG_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_ABMELDUNG_ANZEIGEN)
@@ -744,9 +747,9 @@ function checkZeilenUmbruch()
 			}
 		}
 	}
-	
+
 	//Anzeigen von zusaetzlichen Lehre-Tools
-	
+
 	$lehretools = new lehre_tools();
 	if($lehretools->getTools($lvid, $angezeigtes_stsem))
 	{
@@ -760,9 +763,9 @@ function checkZeilenUmbruch()
 				echo '<a href="'.$row->basis_url.'" target="_blank">';
 				if($row->logo_dms_id!='')
 					echo '<img class="lv" src="../../../cms/dms.php?id='.$row->logo_dms_id.'"><br>';
-									
+
 				echo ' <strong>'.$row->bezeichnung[$sprache].'</strong>';
-				
+
 				if($row->logo_dms_id!='')
 				  echo '</a>';
 				echo '</td>';

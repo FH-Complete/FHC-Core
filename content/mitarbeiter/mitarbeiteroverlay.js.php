@@ -306,6 +306,18 @@ function onMitarbeiterSelect()
 	{
 		attributes+="&VertragNochNichtRetour";
 	}
+	if(filter=="VertragHabilitiert")
+	{
+		attributes+="&VertragHabilitiert";
+	}
+	if(filter=="VertragNichtHabilitiert")
+	{
+		attributes+="&VertragNichtHabilitiert";
+	}
+	if(filter=="VertragNichtGedruckt")
+	{
+		attributes+="&VertragNichtGedruckt";
+	}
 	document.getElementById('mitarbeiter-toolbar-neu').disabled=false;
 	//Timestamp anhaengen da beim Laden von Zwischengespeicherten Dateien kein
 	//Observer Event ausgeloest wird.

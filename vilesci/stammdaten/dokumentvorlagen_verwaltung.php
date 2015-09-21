@@ -141,7 +141,7 @@ if(isset($_POST['speichern']))
 	$neu=false;
 }
 
-// Speichern einer Dokumentvorlage
+// L�schen einer Dokumentvorlage
 if(isset($_GET['delete']))
 {
 
@@ -388,7 +388,7 @@ else
 					<td>';
 			//OE-Dropdown
 			$organisationseinheit = new organisationseinheit();
-			$organisationseinheit->getAll(true, true);
+			$organisationseinheit->getAll();
 				
 			echo "<SELECT name='oe_kurzbz'>";
 				
@@ -399,8 +399,11 @@ else
 					$selected='selected';
 				else
 					$selected='';
-					
-				echo '<OPTION value="'.$row->oe_kurzbz.'" '.$selected.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</OPTION>';
+				
+				$style='';
+				if ($row->aktiv==false)
+					$style='style="text-decoration: line-through"';
+				echo '<OPTION value="'.$row->oe_kurzbz.'" '.$selected.' '.$style.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</OPTION>';
 				echo "\n";
 			}
 			echo '</SELECT>
@@ -435,7 +438,7 @@ else
 					<td></td>
 					<td>
 						<input type="hidden" value="'.$vorlageOE->vorlagestudiengang_id.'" name="vorlagestudiengang_id" />
-						<input type="hidden" value="'.$vorlageOE->vorlage_kurzbz.'" name="vorlage_kurzbz" />
+						
 						<input type="submit" name="speichern" value="'.$val.'">
 					</td>
 				</tr>
@@ -472,11 +475,14 @@ if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 		$oe->load($row->oe_kurzbz);
 		$vorlage->loadVorlage($row->vorlage_kurzbz);
 		$vorlage_bezeichnung = ($vorlage->bezeichnung==''?$vorlage->vorlage_kurzbz:$vorlage->bezeichnung);
+		$style='';
+		if ($oe->aktiv==false)
+			$style='style="text-decoration: line-through"';
 		
 		echo '
 			<tr>
 				<td>'.$db->convert_html_chars($vorlage_bezeichnung).'</td>
-				<td>'.$db->convert_html_chars($oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung).'</td>
+				<td '.$style.'>'.$db->convert_html_chars($oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung).'</td>
 				<td>'.$db->convert_html_chars($row->studiengang_kz).'</td>
 				<td>'.$db->convert_html_chars($row->version).'</td>
 				<td>'.$db->convert_html_chars($row->anmerkung_vorlagestudiengang).'</td>

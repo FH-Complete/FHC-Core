@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
  *
  */
 /**
@@ -66,95 +66,95 @@ class basis_db extends db
 		{
 			if(is_null($i))
 				return pg_fetch_object($this->db_result);
-			else 
+			else
 				return pg_fetch_object($this->db_result, $i);
 		}
-		else 
+		else
 		{
 			if(is_null($i))
 				return pg_fetch_object($result);
-			else 
+			else
 				return pg_fetch_object($result, $i);
-		}			
+		}
 	}
-	
+
 	public function db_fetch_row($result = null, $i=null)
 	{
 		if(is_null($result))
 		{
 			if(is_null($i))
 				return pg_fetch_row($this->db_result);
-			else 
+			else
 				return pg_fetch_row($this->db_result, $i);
 		}
-		else 
+		else
 		{
 			if(is_null($i))
 				return pg_fetch_row($result);
-			else 
+			else
 				return pg_fetch_row($result, $i);
-		}			
+		}
 	}
-	
+
 	public function db_fetch_assoc($result = null, $i=null)
 	{
 		if(is_null($result))
 		{
 			if(is_null($i))
 				return pg_fetch_assoc($this->db_result);
-			else 
+			else
 				return pg_fetch_assoc($this->db_result, $i);
 		}
-		else 
+		else
 		{
 			if(is_null($i))
 				return pg_fetch_row($result);
-			else 
+			else
 				return pg_fetch_row($result, $i);
-		}			
+		}
 	}
-	
+
 	public function db_result($result = null, $i,$item)
 	{
 		if(is_null($result))
 		{
 			return pg_result($this->db_result, $i,$item);
 		}
-		else 
+		else
 		{
 			return pg_result($result, $i,$item);
-		}			
+		}
 	}
-	
+
 	public function db_getResultJSON($result = null)
 	{
 		$rows=array();
 		if(is_null($result))
 		{
-			while($r = pg_fetch_assoc($this->db_result)) 
+			while($r = pg_fetch_assoc($this->db_result))
 				$rows[] = $r;
-			
+
 			//print json_encode($rows);
 		}
-		else 
+		else
 		{
 			pg_result_seek($result, 0);
 			//var_dump($result);
-			while($r = pg_fetch_assoc($result)) 
+			while($r = pg_fetch_assoc($result))
 			{
 				$rows[] = $r;
 			}
-			
+
 			//print json_encode($rows);
-		}		
-		return json_encode($rows);	
+		}
+		return json_encode($rows);
 	}
-	
+
 	public function db_last_error()
 	{
 		return pg_last_error();
 	}
-	
+
 	public function db_affected_rows($result=null)
 	{
 		if(is_null($result))
@@ -162,7 +162,7 @@ class basis_db extends db
 		else
 			return pg_affected_rows($result);
 	}
-	
+
 	public function db_result_seek($result=null, $offset)
 	{
 		if(is_null($result))
@@ -170,7 +170,7 @@ class basis_db extends db
 		else
 			return pg_result_seek($result, $offset);
 	}
-	
+
 	public function db_fetch_array($result=null)
 	{
 		if(is_null($result))
@@ -178,7 +178,7 @@ class basis_db extends db
 		else
 			return pg_fetch_array($result);
 	}
-	
+
 	public function db_num_fields($result=null)
 	{
 		if(is_null($result))
@@ -186,7 +186,7 @@ class basis_db extends db
 		else
 			return pg_num_fields($result);
 	}
-	
+
 	/**
 	 * Liefert den Feldnamen mit index i
 	 */
@@ -208,12 +208,12 @@ class basis_db extends db
 		{
 			return pg_free_result($this->db_result);
 		}
-		else 
+		else
 		{
 			return pg_free_result($result);
-		}			
-	}	
-	
+		}
+	}
+
 	/**
 	 * Liefert die aktuelle Datenbankversion
 	 */
@@ -225,7 +225,7 @@ class basis_db extends db
 	/**
 	 * Escaped Sonderzeichen in Variablen vor der Verwendung in SQL Statements
 	 * um SQL Injections zu verhindern
-	 * 
+	 *
 	 */
 	public function db_escape($var)
 	{
@@ -246,7 +246,7 @@ class basis_db extends db
 		if($qoute)
 			return ($var!==''?$this->db_qoute($var):'null');
 		else
-			return ($var!==''?$var:'null');	
+			return ($var!==''?$var:'null');
 	}
 
 	/**
@@ -264,10 +264,10 @@ class basis_db extends db
      * Es werden abhaengig vom Typ Hochkomma oder Null hinzugefuegt
 	 * @param $var Value der gesetzt werden soll
 	 * @param $type Typ des Values (FHC_STRING | FHC_BOOLEAN | FHC_INTEGER | ...)
-	 * @param $nullable boolean gibt an ob das Feld NULL sein darf. Wenn true wird 
+	 * @param $nullable boolean gibt an ob das Feld NULL sein darf. Wenn true wird
 	 *                  NULL statt einem Leerstring zurueckgeliefert
 	 * @return Escapter Value inklusive Hochkomma wenn noetig
-	 * 
+	 *
      * Verwendungsbeispiel:
 	 *	Update tbl_person set nachname=$this->db_add_param($var)
 	 *  Update tbl_person set aktiv=$this->db_add_param($var, FHC_BOOL, false)
@@ -275,7 +275,7 @@ class basis_db extends db
 	 */
 	public function db_add_param($var, $type=FHC_STRING, $nullable=true)
 	{
-		if($var==='' && $type!=FHC_BOOLEAN)
+		if(($var==='' || is_null($var)) && $type!=FHC_BOOLEAN)
 		{
 			if($nullable)
 				return 'null';
@@ -285,7 +285,7 @@ class basis_db extends db
 
 		switch($type)
 		{
-			case FHC_INTEGER: 
+			case FHC_INTEGER:
 				$var = $this->db_escape($var);
 				if(!is_numeric($var) && $var!=='')
 					die('Invalid Integer Parameter detected:'.$var);
@@ -304,12 +304,12 @@ class basis_db extends db
 				break;
 
 			case FHC_STRING:
-			default: 
+			default:
 				$var = $this->db_escape($var);
 				$var = $this->db_null_value($var);
 				break;
 		}
-		return $var;		
+		return $var;
 	}
 
 	/**
@@ -326,9 +326,9 @@ class basis_db extends db
 		else
 			die('Invalid DB Boolean. Wrong DB-Engine?');
 	}
-	
+
 	/**
-	 * Bereitet ein Array von Elementen auf, damit es in der IN-Klausel eines 
+	 * Bereitet ein Array von Elementen auf, damit es in der IN-Klausel eines
 	 * Select Befehls verwendet werden kann.
 	 */
 	public function db_implode4SQL($array)
@@ -350,7 +350,7 @@ class basis_db extends db
 	 */
 	public function db_parse_array($var)
 	{
-    	if ($var == '') 
+    	if ($var == '')
 			return;
 	    preg_match_all('/(?<=^\{|,)(([^,"{]*)|\s*"((?:[^"\\\\]|\\\\(?:.|[0-9]+|x[0-9a-f]+))*)"\s*)(,|(?<!^\{)(?=\}$))/i', $var, $matches, PREG_SET_ORDER);
 	    $values = array();
