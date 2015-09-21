@@ -211,4 +211,7 @@ define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN',true);
 //User, welcher für das Anlegen von Anrechnungen bei der Prüfungsanmeldung verwendet wird
 define('CIS_PRUEFUNGSANMELDUNG_USER','p.pruefungsanmeldung');
 
+//Gibt an, wie viele Semester aus der Vergangenheit unter Meine LV angezeigt werden
+define('CIS_MEINELV_ANZAHL_SEMESTER_PAST', 3);
+
 ?>
