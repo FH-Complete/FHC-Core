@@ -156,7 +156,7 @@ echo '<!DOCTYPE HTML>
                 
 				$("#img_"+person_id).attr("src","../../skin/images/false.png");
 				var uid = $("#uid_"+person_id).val();
-				$("#anwesenheit_"+uid).val("false");
+				$("#anwesenheit_"+person_id).val("false");
 				$("#usercode").val("");
 			}
 		}
