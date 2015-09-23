@@ -214,4 +214,7 @@ define('CIS_PRUEFUNGSANMELDUNG_USER','p.pruefungsanmeldung');
 //Gibt an, wie viele Semester aus der Vergangenheit unter Meine LV angezeigt werden
 define('CIS_MEINELV_ANZAHL_SEMESTER_PAST', 3);
 
+//Gibt an, welche Buchungstypen bei der Überprüfung auf Einzahlung berücksichtigt werden
+define('CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN', serialize(array("Studiengebuehr")));
+
 ?>
