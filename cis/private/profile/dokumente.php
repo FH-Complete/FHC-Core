@@ -136,7 +136,14 @@ echo $p->t('global/studiensemester')."</b> <SELECT name='stsem' onChange=\"MM_ju
 	
 $konto = new konto();
 
-if ($konto->checkStudienbeitrag($uid, $stsem))
+$buchungstypen = array();
+if(defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))
+{
+    $buchungstypen = unserialize (CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN);
+}
+
+$stsem_zahlung = $konto->getLastStSemBuchungstypen($uid, $buchungstypen);
+if ($stsem_zahlung != FALSE && $stsem == $stsem_zahlung)
 {
 	echo "<a href='../pdfExport.php?xsl=Inskription&xml=student.rdf.php&ss=".$stsem."&uid=".$uid."&xsl_stg_kz=".$xsl_stg_kz."'>".$p->t('tools/inskriptionsbestaetigung')."</a>";
 	echo ' - '.$p->t('tools/studienbeitragFuerSSBezahltAmDatum',array($stsem, $konto->buchungsdatum));
@@ -148,7 +155,7 @@ echo "<hr>";
 
 if(defined('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN') && CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN)
 {
-    if ($konto->checkStudienbeitrag($uid, $stsem))
+    if ($stsem_zahlung != FALSE && $stsem == $stsem_zahlung)
     {
 	    echo "<a href='../pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&ss=".$stsem."&uid=".$uid."'>".$p->t('tools/studienbuchblatt')."</a>";
 	    echo ' - '.$p->t('tools/studienbeitragFuerSSBezahltAmDatum',array($stsem, $konto->buchungsdatum));
