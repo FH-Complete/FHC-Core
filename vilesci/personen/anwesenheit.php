@@ -156,24 +156,24 @@ echo '<!DOCTYPE HTML>
                 
 				$("#img_"+person_id).attr("src","../../skin/images/false.png");
 				var uid = $("#uid_"+person_id).val();
-				$("#anwesenheit_"+uid).val("false");
+				$("#anwesenheit_"+person_id).val("false");
 				$("#usercode").val("");
 			}
 		}
 		function toggleAnwesenheit(person_id)
 		{
 			var uid = $("#uid_"+person_id).val();
-			var wert = $("#anwesenheit_"+uid).val();
+			var wert = $("#anwesenheit_"+person_id).val();
 
 			if(wert=="true")
 			{
 				$("#img_"+person_id).attr("src","../../skin/images/false.png");
-				$("#anwesenheit_"+uid).val("false");
+				$("#anwesenheit_"+person_id).val("false");
 			}
 			else
 			{
 				$("#img_"+person_id).attr("src","../../skin/images/true.png");
-				$("#anwesenheit_"+uid).val("true");
+				$("#anwesenheit_"+person_id).val("true");
 			}
 			return false;
 		}
@@ -186,12 +186,12 @@ if($work=='save')
 {
 	foreach($_POST as $key=>$value)
 	{
-		if(strstr($key, 'anwesenheit_'))
+		if(strstr($key, 'uid_'))
 		{
-			$user = mb_substr($key, mb_strlen('anwesenheit_'));
-
-			$anwesenheit_id=$_POST['anwesenheitid_'.$user];
-
+			$person_id = mb_substr($key, mb_strlen('uid_'));
+			$user = $_POST['uid_'.$person_id];
+			$anwesend = $_POST['anwesenheit_'.$person_id];
+			$anwesenheit_id=$_POST['anwesenheitid_'.$person_id];
 			$anwesenheit = new anwesenheit();			
 
 			if($anwesenheit_id!='')
@@ -203,8 +203,8 @@ if($work=='save')
 			$anwesenheit->einheiten = $_POST['einheiten'];
 			$anwesenheit->lehreinheit_id = $_POST['lehreinheit_id'];
 			$anwesenheit->datum = $_POST['datum'];
-			$anwesenheit->anwesend=($value=='true'?true:false);
-			$anwesenheit->anmerkung = $_POST['anmerkung_'.$user];
+			$anwesenheit->anwesend=($anwesend=='true'?true:false);
+			$anwesenheit->anmerkung = $_POST['anmerkung_'.$person_id];
 			$anwesenheit->save();
 		}
 	}
@@ -315,13 +315,13 @@ if($work=='loadAnwesenheit')
 							<a href="#Toggle" onclick="toggleAnwesenheit(\''.$row->person_id.'\')">
 								<img id="img_'.$row->person_id.'" src="../../skin/images/'.($anwesend?'true':'false').'.png">
 							</a>
-							<input type="hidden" name="anwesenheitid_'.$row->uid.'" value="'.$anwesenheit_id.'" />
-							<input type="hidden" name="anwesenheit_'.$row->uid.'" id="anwesenheit_'.$row->uid.'" value="'.($anwesend?'true':'false').'" />
+							<input type="hidden" name="anwesenheitid_'.$row->person_id.'" value="'.$anwesenheit_id.'" />
+							<input type="hidden" name="anwesenheit_'.$row->person_id.'" id="anwesenheit_'.$row->person_id.'" value="'.($anwesend?'true':'false').'" />
 							<input type="hidden" name="uid_'.$row->person_id.'" id="uid_'.$row->person_id.'" value="'.$row->uid.'" />
 						</td>';
 					echo '<td>'.$row->person_id.'</td>';
 					echo '<td>'.$row->uid.'</td><td>'.$row->vorname.'</td><td>'.$row->nachname.'</td>';
-					echo '<td><input type="text" name="anmerkung_'.$row->uid.'" value="'.$db->convert_html_chars($anmerkung).'" /></td>';
+					echo '<td><input type="text" name="anmerkung_'.$row->person_id.'" value="'.$db->convert_html_chars($anmerkung).'" /></td>';
 					echo '</tr>';
 				}
 

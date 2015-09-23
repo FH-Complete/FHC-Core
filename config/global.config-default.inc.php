@@ -180,6 +180,8 @@ define('BEWERBERTOOL_BERUFSTAETIGKEIT_ANZEIGEN', true);
 // Wenn hier eine Mailadresse angegeben ist, werden die Bewerbungen aus der Onlinebwerbung an diese Adresse gesendet.
 // Wenn leer dann wird an die Studiengangsadresse gesendet
 define('BEWERBERTOOL_MAILEMPFANG', '');
+// Wenn true dann koennen Dokumente nachgereicht werden, wenn false dann nicht
+define('BEWERBERTOOL_DOKUMENTE_NACHREICHEN', true);
 
 // Array mit Usern die nicht Kollidieren
 define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
