@@ -80,6 +80,18 @@ switch ($outputformat)
 		echo $json;
 		return;
 }
+
+$param='';
+foreach($_REQUEST as $name=>$value)
+{
+	if (is_array($value))
+	{
+		foreach($value as $row)
+			$param .= '&'.$name.'[]='.urlencode($row);
+	}
+	else
+		$param .= '&'.$name.'='.urlencode($value);
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -99,7 +111,7 @@ switch ($outputformat)
 		</script>
 	</head>
 	<body>
-		<h2>Statistik - <?php echo $statistik->bezeichnung ?> - <a href="statistik_sql.php?statistik_kurzbz=<?php echo $statistik_kurzbz?>&outputformat=csv">CSV Download</a></h2>
+		<h2>Statistik - <?php echo $statistik->bezeichnung ?> - <a href="statistik_sql.php?outputformat=csv<?php echo $param;?>">CSV Download</a></h2>
 			<?php echo $statistik->getHtmlTable('myTable', 'tablesorter'); ?>
 	</body>
 </html>
