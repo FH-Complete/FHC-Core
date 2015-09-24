@@ -1606,7 +1606,7 @@ if($_GET['method']=='update')
 	echo "</select></td></tr>\n"; 
 	echo "<tr>\n"; 	
 	echo "	<td>Bemerkungen: </td>\n";
-	echo "	<td><input type='text' name='bemerkung' size='60' maxlength='256' value ='$bestellung->bemerkung'></td>\n";
+	echo "	<td><textarea name='bemerkung' cols=70' rows='1'>$bestellung->bemerkung</textarea></td>\n";
 	echo "	<td>Status:</td>\n"; 
 	echo "	<td width ='200px'>\n";
 	echo "<span id='btn_bestellt'>";	
