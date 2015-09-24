@@ -569,11 +569,11 @@ class organisationseinheit extends basis_db
 	    		)';
 	    		foreach($searchItem as $value)
 				{
-					$qry.=' OR (oe_kurzbz='.$this->db_add_param($value).')
-							OR (bezeichnung='.$this->db_add_param($value).')'; 
+					$qry.=' OR (LOWER(oe_kurzbz)=LOWER('.$this->db_add_param($value).'))
+							OR (LOWER(bezeichnung)=LOWER('.$this->db_add_param($value).'))'; 
 				}
-	    $qry.=	'ORDER BY organisationseinheittyp_kurzbz, bezeichnung;';
-	    
+	    $qry.=	' ORDER BY organisationseinheittyp_kurzbz, bezeichnung;';
+	    echo $qry;
 	    if($this->db_query($qry))
 	    {
 			while($row = $this->db_fetch_object())
