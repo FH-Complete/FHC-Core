@@ -423,6 +423,33 @@ if(!$error)
 						}
 					}
 				}
+				if($prestudent->reihungstest_id != $_POST['reihungstest_id'])
+				{
+					$stg = new studiengang($prestudent->studiengang_kz);
+					$datum_obj = new datum();
+					//Hinweis anzeigen, falls diese Person bereits in einem anderen Studiengang (des gleichen typs (b,m,d)
+					//einen RT absolviert hat bzw angemeldet ist
+					$qry = "SELECT
+								reihungstest_id,
+								max_teilnehmer,
+								(SELECT count(*) FROM public.tbl_prestudent WHERE reihungstest_id=".$db->db_add_param($_POST['reihungstest_id'], FHC_INTEGER).") AS anzahl
+							FROM
+								public.tbl_reihungstest
+							WHERE
+								reihungstest_id=".$db->db_add_param($_POST['reihungstest_id'], FHC_INTEGER);
+				
+					if($result = $db->db_query($qry))
+					{
+						//$warning.= "Hinweis: Diese Person hat bereits Reihungstestzuordnungen in anderen Studiengängen:\n\n";
+						if($row = $db->db_fetch_object($result))
+						{
+							if($row->max_teilnehmer!='' && $row->anzahl>$row->max_teilnehmer)
+							{
+								$warning.= "\n\n!!! Hinweis: Die maximale TeilnehmerInnenzahl für diesen Termin ($row->max_teilnehmer) wurde überschritten !!!";
+							}
+						}
+					}
+				}
 				$prestudent->prestudent_id = $_POST['prestudent_id'];
 				$prestudent->aufmerksamdurch_kurzbz = $_POST['aufmerksamdurch_kurzbz'];
 				$prestudent->person_id = $_POST['person_id'];

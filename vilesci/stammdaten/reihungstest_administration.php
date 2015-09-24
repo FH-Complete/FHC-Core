@@ -158,7 +158,7 @@ echo '<br><a href="'.$_SERVER['PHP_SELF'].'?action=showreihungstests">Anzeigen d
 
 if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 {
-	$qry = "SELECT kurzbzlang, datum,ort_kurzbz,anmerkung, uhrzeit, insertvon,reihungstest_id, 
+	$qry = "SELECT kurzbzlang,datum,ort_kurzbz,anmerkung,uhrzeit,max_teilnehmer,insertvon,reihungstest_id, 
 			(SELECT count(*) FROM public.tbl_prestudent WHERE reihungstest_id=tbl_reihungstest.reihungstest_id) as anzahl_teilnehmer
 			FROM public.tbl_reihungstest JOIN public.tbl_studiengang USING (studiengang_kz)
 			WHERE datum>=CURRENT_DATE ORDER BY datum";
@@ -173,6 +173,7 @@ if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 						<th>Ort</th>
 						<th>Uhrzeit</th>
 						<th>Teilnehmer</th>
+						<th>Max-Teilnehmer</th>
 						<th>Anmerkung</th>
 						<th>InsertVon</th>
 						<th>ReihungstestID</th>
@@ -187,6 +188,7 @@ if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 			echo "<td>$row->ort_kurzbz</td>";
 			echo "<td>$row->uhrzeit</td>";
 			echo "<td>$row->anzahl_teilnehmer</td>";
+			echo "<td ".($row->anzahl_teilnehmer>$row->max_teilnehmer?"style='color: red; font-weight: bold'":"").">$row->max_teilnehmer</td>";
 			echo "<td>$row->anmerkung</td>";
 			echo "<td>$row->insertvon</td>";
 			echo "<td>$row->reihungstest_id</td>";
