@@ -24,6 +24,8 @@ require_once('../include/basis_db.class.php');
 require_once('../include/betriebsmittel.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/stunde.class.php');
+require_once('../include/mitarbeiter.class.php');
 
 $datum_obj = new datum();
 if(isset($_REQUEST['stundenplan_ids']) || isset($_REQUEST['stundenplan_betriebsmittel_id']))
@@ -88,81 +90,100 @@ elseif(isset($_REQUEST['von']) && isset($_REQUEST['bis']) && $_REQUEST['xmlforma
 	$bis = $datum_obj->formatDatum($_REQUEST['bis'], 'Y-m-d');
 
 	$db = new basis_db();
-	$qry = '
-	SELECT
-		tbl_stundenplan.datum,
-		tbl_stundenplan.stunde,
-		tbl_stunde.beginn,
-		tbl_stunde.ende,
-		tbl_stundenplan.ort_kurzbz,
-		tbl_betriebsmittel.beschreibung,
-		tbl_stundenplan_betriebsmittel.anmerkung,
-		tbl_lehrveranstaltung.bezeichnung,
-		tbl_stundenplan.mitarbeiter_uid,
-		tbl_stundenplan.lehreinheit_id,
-		tbl_studiengang.kurzbzlang as stg
-	FROM
-		lehre.tbl_stundenplan_betriebsmittel
-		JOIN lehre.tbl_stundenplan ON(stundenplandev_id=stundenplan_id)
-		JOIN wawi.tbl_betriebsmittel USING(betriebsmittel_id)
-		JOIN lehre.tbl_stunde USING(stunde)
-		JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-		JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-		JOIN public.tbl_studiengang ON(tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz)
-	WHERE
-		tbl_stundenplan.datum>='.$db->db_add_param($von).'
-		AND tbl_stundenplan.datum<='.$db->db_add_param($bis).'
-	ORDER BY datum, ort_kurzbz, stunde';
 
+	$qry='
+	SELECT a.*, tbl_lehrveranstaltung.bezeichnung as lvbezeichnung, tbl_studiengang.kurzbzlang as stg
+	FROM
+		(
+			SELECT
+				tbl_stundenplan.datum,
+				tbl_stundenplan.ort_kurzbz,
+				tbl_stundenplan.lehreinheit_id,
+				tbl_lehreinheit.lehrveranstaltung_id,
+				min(tbl_stundenplan.stunde) as von,
+				max(tbl_stundenplan.stunde) as bis,
+				array_agg(tbl_betriebsmittel.beschreibung) as beschreibung,
+				array_agg(tbl_stundenplan_betriebsmittel.anmerkung) as anmerkung,
+				array_agg(tbl_stundenplan.mitarbeiter_uid) as mitarbeiter_uid
+			FROM
+				lehre.tbl_stundenplan_betriebsmittel
+				JOIN lehre.tbl_stundenplan ON(stundenplandev_id=stundenplan_id)
+				JOIN wawi.tbl_betriebsmittel USING(betriebsmittel_id)
+				JOIN lehre.tbl_stunde USING(stunde)
+				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+			WHERE
+				tbl_stundenplan.datum>='.$db->db_add_param($von).'
+				AND tbl_stundenplan.datum<='.$db->db_add_param($bis).'
+			GROUP BY datum, tbl_stundenplan.ort_kurzbz, lehreinheit_id, lehrveranstaltung_id
+		) a
+		JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+		JOIN public.tbl_studiengang USING(studiengang_kz)
+	ORDER BY datum, von, ort_kurzbz';
+
+	$stunde = new stunde();
+	$stunde->loadAll();
+	foreach($stunde->stunden as $row)
+	{
+		$stunden_arr[$row->stunde]['beginn']=$row->beginn->format('H:i');
+		$stunden_arr[$row->stunde]['ende']=$row->ende->format('H:i');
+	}
+	$stunde->loadAll();
 	header("Content-type: application/xhtml+xml");
 	$xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>";
 	echo '<stundenplan_betriebsmittel>';
+	$data = array();
 	if($result = $db->db_query($qry))
 	{
+		$lastdatum = '';
 		while($row = $db->db_fetch_object($result))
 		{
-			$obj = array();
-			$obj['ort_kurzbz']=$row->ort_kurzbz;
-			$obj['stunde']=$row->stunde;
-			$obj['beginn']=$row->beginn;
-			$obj['ende']=$row->ende;
-			$obj['mitarbeiter_uid']=$row->mitarbeiter_uid;
-			$obj['beschreibung']=$row->beschreibung;
-			$obj['anmerkung']=$row->anmerkung;
-			$obj['lvbezeichnung']=$row->bezeichnung;
-			$obj['stg']=$row->stg;
-			$data[$row->datum][$row->lehreinheit_id][$row->stunde][]=$obj;
-		}
-	}
-	foreach($data as $datum=>$tage)
-	{
-		echo '<tage>';
-		echo '<datum><![CDATA['.$datum_obj->formatDatum($datum,'d.m.Y').']]></datum>';
-		foreach($tage as $datum=>$lehreinheiten)
-		{
-			echo '<lehreinheit>';
-			foreach($lehreinheiten as $lehreinheit_id=>$stunden)
+			if($lastdatum!=$row->datum)
 			{
-				echo '<stunde>';
-				foreach($stunden as $stunde=>$obj)
-				{
-					echo '<item>';
-					echo '<ort_kurzbz><![CDATA['.$obj['ort_kurzbz'].']]></ort_kurzbz>';
-					echo '<stunde><![CDATA['.$obj['stunde'].']]></stunde>';
-					echo '<stunde_beginn><![CDATA['.mb_substr($obj['beginn'],0,5).']]></stunde_beginn>';
-					echo '<stunde_ende><![CDATA['.mb_substr($obj['ende'],0,5).']]></stunde_ende>';
-					echo '<mitarbeiter_uid><![CDATA['.$obj['mitarbeiter_uid'].']]></mitarbeiter_uid>';
-					echo '<beschreibung><![CDATA['.$obj['beschreibung'].']]></beschreibung>';
-					echo '<anmerkung><![CDATA['.$obj['anmerkung'].']]></anmerkung>';
-					echo '<lvbezeichnung><![CDATA['.$obj['lvbezeichnung'].']]></lvbezeichnung>';
-					echo '<studiengang_kurzbzlang><![CDATA['.$obj['stg'].']]></studiengang_kurzbzlang>';
-					echo '</item>';
-				}
-				echo '</stunde>';
+				if($lastdatum!='')
+					echo '</tage>';
+				echo '<tage>';
+				echo '<datum><![CDATA['.$datum_obj->formatDatum($row->datum,'d.m.Y').']]></datum>';
+
+				$lastdatum = $row->datum;
 			}
-			echo '</lehreinheit>';
+
+			echo '<item>';
+			echo '<ort_kurzbz><![CDATA['.$row->ort_kurzbz.']]></ort_kurzbz>';
+			echo '<stunde_von><![CDATA['.$row->von.']]></stunde_von>';
+			echo '<stunde_bis><![CDATA['.$row->bis.']]></stunde_bis>';
+			echo '<stunde_beginn><![CDATA['.mb_substr($stunden_arr[$row->von]['beginn'],0,5).']]></stunde_beginn>';
+			echo '<stunde_ende><![CDATA['.mb_substr($stunden_arr[$row->bis]['ende'],0,5).']]></stunde_ende>';
+
+			$mitarbeiter = array_unique($db->db_parse_array($row->mitarbeiter_uid));
+			$ma_obj = new mitarbeiter($mitarbeiter[0]);
+			echo '<mitarbeiter_uid><![CDATA['.$ma_obj->uid.']]></mitarbeiter_uid>';
+			echo '<nachname><![CDATA['.$ma_obj->nachname.']]></nachname>';
+			echo '<vorname><![CDATA['.$ma_obj->vorname.']]></vorname>';
+
+			$beschreibungen = array_unique($db->db_parse_array($row->beschreibung));
+			echo '<beschreibungen>';
+			foreach($beschreibungen as $beschreibung)
+			{
+				if($beschreibung!='')
+					echo '<beschreibung><![CDATA['.$beschreibung.']]></beschreibung>';
+			}
+			echo '</beschreibungen>';
+
+			$anmerkungen = array_unique($db->db_parse_array($row->anmerkung));
+			echo '<anmerkungen>';
+			foreach($anmerkungen as $anmerkung)
+			{
+				if($anmerkung!='')
+					echo '<anmerkung><![CDATA['.$anmerkung.']]></anmerkung>';
+			}
+			echo '</anmerkungen>';
+
+			echo '<lvbezeichnung><![CDATA['.$row->lvbezeichnung.']]></lvbezeichnung>';
+			echo '<studiengang_kurzbzlang><![CDATA['.$row->stg.']]></studiengang_kurzbzlang>';
+			echo '</item>';
 		}
-		echo '</tage>';
+		if($lastdatum!='')
+			echo '</tage>';
 	}
 	echo '</stundenplan_betriebsmittel>';
 }
