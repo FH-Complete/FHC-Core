@@ -237,10 +237,10 @@ class studiengang extends basis_db
      */
     public function getAllForBewerbung()
     {
-        $qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch '
+        $qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch, lgartcode '
                 . 'FROM lehre.vw_studienplan '
                 . 'WHERE onlinebewerbung IS TRUE '
-                . 'ORDER BY studiengangbezeichnung ASC';
+                . 'ORDER BY typ, studiengangbezeichnung ASC';
 
 		if(!$result = $this->db_query($qry))
 		{
@@ -266,7 +266,7 @@ class studiengang extends basis_db
 		{
 			while($row = $this->db_fetch_object($result))
 			{
-				$this->studiengang_typ_arr[$row->typ]=$row->typ.' - '.$row->bezeichnung;
+				$this->studiengang_typ_arr[$row->typ]=$row->bezeichnung;
 			}
 		}
 		else
@@ -867,6 +867,36 @@ class studiengang extends basis_db
 		else
 		{
 			$this->errormsg = "Fehler bei der Datenbankabfrage aufgetreten.";
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt die Lehrgangstypen
+	 * @return boolean true wenn ok sonst false
+	 */
+	public function getLehrgangstyp()
+	{
+		$qry = "SELECT * FROM bis.tbl_lgartcode";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+
+				$obj->lgartcode = $row->lgartcode;
+				$obj->kurzbz = $row->kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beantragung = $this->db_parse_bool($row->beantragung);
+			
+				$this->result[]= $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
