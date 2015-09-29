@@ -21,7 +21,7 @@
  */
 
 require_once('../../../../config/cis.config.inc.php');
-require_once('../../../../include/basis_db.class.php');			
+require_once('../../../../include/basis_db.class.php');
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -41,10 +41,11 @@ require_once('../../../../include/student.class.php');
 require_once('../../../../include/phrasen.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
 require_once('../../../../include/notenschluessel.class.php');
+require_once('../../../../include/note.class.php');
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
-		
+
 $user = get_uid();
 
 $sprache = getSprache();
@@ -80,8 +81,11 @@ $response='';
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 
-//Kopfzeile
-
+$noten_anmerkung=array();
+$note_obj = new note();
+$note_obj->getAll();
+foreach($note_obj->result as $row)
+	$noten_anmerkung[$row->anmerkung]=$row->note;
 
 //Studiensemester laden
 $stsem_obj = new studiensemester();
@@ -95,7 +99,7 @@ if(!$rechte->isBerechtigt('admin',0) &&
    !$rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
 {
 	$qry = "SELECT lehreinheit_id FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
-			JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
+			JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
 			WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
 			tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem)." AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$db->db_add_param($user);
 	if($result = $db->db_query($qry))
@@ -103,7 +107,7 @@ if(!$rechte->isBerechtigt('admin',0) &&
 		if($db->db_num_rows($result)==0)
 			die($p->t('global/keineBerechtigungFuerDieseSeite'));
 	}
-	else 
+	else
 	{
 		die('Fehler beim Pruefen der Rechte');
 	}
@@ -111,7 +115,7 @@ if(!$rechte->isBerechtigt('admin',0) &&
 
 function savenote($db,$lvid, $student_uid, $note, $punkte=null)
 {
-	global $stsem, $user, $p;
+	global $stsem, $user, $p, $noten_anmerkung;
 	$jetzt = date("Y-m-d H:i:s");
 	//Ermitteln ob der Student diesem Kurs zugeteilt ist
 	$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung WHERE uid=".$db->db_add_param($student_uid)." AND lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
@@ -130,6 +134,14 @@ function savenote($db,$lvid, $student_uid, $note, $punkte=null)
 	{
 		$notenschluessel = new notenschluessel();
 		$note = $notenschluessel->getNote($punkte, $lvid, $stsem);
+	}
+
+	if(!is_numeric($note))
+	{
+		// Wenn die Note keine Nummer ist wird anhand der Anmerkung gesucht ob eine passende Note gefunden
+		// wird damit hier die Noten nb, met, etc auch importiert werden koennen
+		if(isset($noten_anmerkung[$note]))
+			$note = $noten_anmerkung[$note];
 	}
 
 	$lvgesamtnote = new lvgesamtnote();
@@ -160,14 +172,14 @@ function savenote($db,$lvid, $student_uid, $note, $punkte=null)
 		$lvgesamtnote->updateamum = $jetzt;
 		$lvgesamtnote->updatevon = $user;
 		$new = false;
-		if ($lvgesamtnote->freigabedatum)		
+		if ($lvgesamtnote->freigabedatum)
 			$response = "update_f";
 		else
 			$response = "update";
 	}
 	if (!$lvgesamtnote->save($new))
-		return "<span class='error'>".$lvgesamtnote->errormsg."</span>";
-	else 
+		return $lvgesamtnote->errormsg;
+	else
 		return $response;
 }
 
@@ -180,7 +192,7 @@ if (isset($_REQUEST["submit"]))
 		$student_uid = $_REQUEST["student_uid"];
 		$note = $_REQUEST["note"];
 		$punkte = (isset($_REQUEST["punkte"])?$_REQUEST["punkte"]:'');
-		
+
 		$response = savenote($db,$lvid, $student_uid, $note, $punkte);
 		echo $response;
 	}
@@ -214,25 +226,25 @@ if (isset($_REQUEST["submit"]))
 						$response.="\n".$p->t('benotungstool/studentMitMatrikelnummerExistiertNicht',array($matrikelnummer));
 						continue;
 					}
-					
+
 					// Hole Zeugnisnote wenn schon eine eingetragen ist
 					/*
 					if ($zeugnisnote = new zeugnisnote($lvid, $student_uid, $stsem))
 						$znote = $zeugnisnote->note;
 					else
-						$znote = null;	
+						$znote = null;
 					*/
 					$val=savenote($db,$lvid, $student_uid, $note, $punkte);
 					if($val!='neu' && $val!='update' && $val!='update_f')
 						$response.=$val;
 				}
-				else 
+				else
 				{
-					$response.="\n".$p->t('global/fehlerBeiDerParameteruebergabe');					
+					$response.="\n".$p->t('global/fehlerBeiDerParameteruebergabe');
 				}
 			}
 		}
 		echo $response;
-	}	
+	}
 }
 ?>
