@@ -79,7 +79,7 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 			$qry.=" AND studiengang_kz='$row->studiengang_kz'";
 		if($buchungstyp != null && $buchungstyp != "alle")
 			$qry.=" AND buchungstyp_kurzbz='$buchungstyp'";
-		
+
 		if($db->db_query($qry))
 			if($row_filter = $db->db_fetch_object())
 				if($row_filter->summe=='0.00' || $row_filter->summe=='' || $row_filter->summe=='0')
@@ -87,14 +87,14 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 	}
 	elseif($filter2=='studiengebuehr')
 	{
-		// Alle Personen die keine Studiengebuehrbelastung haben 
+		// Alle Personen die keine Studiengebuehrbelastung haben
 		// Incoming werden nicht beruecksichtigt
 		$prestudent = new prestudent();
 		$prestudent->getLastStatus($row->prestudent_id);
-		
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE 
-					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND 
-					person_id='".addslashes($row->person_id)."' AND 
+
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE
+					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
+					person_id='".addslashes($row->person_id)."' AND
 					buchungstyp_kurzbz='Studiengebuehr'";
 		if($db->db_query($qry))
 			if($row_filter = $db->db_fetch_object())
@@ -103,15 +103,15 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 	}
 	elseif(strstr($filter2,'buchungstyp;'))
 	{
-		// Alle Personen die keine Belastung auf den uebergebenen Buchungstyp haben 
+		// Alle Personen die keine Belastung auf den uebergebenen Buchungstyp haben
 		// Incoming werden nicht beruecksichtigt
 		list($filter, $buchungstyp) = explode(';',$filter2);
 		$prestudent = new prestudent();
 		$prestudent->getLastStatus($row->prestudent_id);
-		
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE 
-					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND 
-					person_id='".addslashes($row->person_id)."' AND 
+
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE
+					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
+					person_id='".addslashes($row->person_id)."' AND
 					buchungstyp_kurzbz='$buchungstyp'";
 		if($db->db_query($qry))
 			if($row_filter = $db->db_fetch_object())
@@ -129,10 +129,10 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 				if(($row_filter->zgv_code!='' && $row_filter->zgvdatum=='') ||
 				   ($row_filter->zgvmas_code!='' && $row_filter->zgvmadatum==''))
 				   	return true;
-				else 
+				else
 					return false;
 			}
-		}			
+		}
 	}
 	return true;
 }
@@ -147,7 +147,7 @@ function draw_content_liste($row)
 	$status = $prestudent->status_kurzbz;
 	$orgform = $prestudent->orgform_kurzbz;
 	$studienplan_bezeichnung=$prestudent->studienplan_bezeichnung;
-	
+
 	echo '
 	  <RDF:li>
       	<RDF:Description  id="'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'" >
@@ -164,13 +164,17 @@ function draw_content_liste($row)
     		<STUDENT:ersatzkennzeichen>'.($row->ersatzkennzeichen==''?'&#xA0;':'<![CDATA['.$row->ersatzkennzeichen.']]>').'</STUDENT:ersatzkennzeichen>
     		<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
     		<STUDENT:geburtsdatum_iso><![CDATA['.$row->gebdatum.']]></STUDENT:geburtsdatum_iso>
-		<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:'').']]></STUDENT:semester>
+			<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:'').']]></STUDENT:semester>
     		<STUDENT:verband><![CDATA['.(isset($row->verband)?$row->verband:'').']]></STUDENT:verband>
     		<STUDENT:gruppe><![CDATA['.(isset($row->gruppe)?$row->gruppe:'').']]></STUDENT:gruppe>
-		<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
+			<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
     		<STUDENT:mail_privat><![CDATA['.$row->email_privat.']]></STUDENT:mail_privat>
     		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
-		<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
+			<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
+			<STUDENT:status_datum><![CDATA['.$datum_obj->formatDatum($prestudent->datum,'d.m.Y').']]></STUDENT:status_datum>
+			<STUDENT:status_bestaetigung><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'d.m.Y'):'-').']]></STUDENT:status_bestaetigung>
+			<STUDENT:status_datum_iso><![CDATA['.$datum_obj->formatDatum($prestudent->datum,'Y-m-d').']]></STUDENT:status_datum_iso>
+			<STUDENT:status_bestaetigung_iso><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'Y-m-d'):'-').']]></STUDENT:status_bestaetigung_iso>
     		<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
     		<STUDENT:anmerkungpre>'.($row->anmerkung==''?'&#xA0;':'<![CDATA['.$row->anmerkung.']]>').'</STUDENT:anmerkungpre>
     		<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
@@ -206,7 +210,7 @@ function draw_content($row)
 			$mail_privat = $row_mail->kontakt;
 		}
 	}
-	
+
 	$aktiv = "-";
 	if(isset($row->bnaktiv))
 	{
@@ -222,7 +226,7 @@ function draw_content($row)
 		    $aktiv = "-";
 	    }
 	}
-	
+
 	$studiengang = new studiengang();
 	$stgleiter = $studiengang->getLeitung($row->studiengang_kz);
 	$stgl='';
@@ -241,10 +245,10 @@ function draw_content($row)
 		$status = $prestudent->status_kurzbz;
 		$orgform = $prestudent->orgform_kurzbz;
 		$studienplan_bezeichnung=$prestudent->studienplan_bezeichnung;
-		
+
 		if($status=='Aufgenommener' || $status=='Bewerber' || $status=='Wartender' || $status=='Interessent')
 			$semester_prestudent = $prestudent->ausbildungssemester;
-		else 
+		else
 			$semester_prestudent = '';
 	echo '
 	  <RDF:li>
@@ -271,6 +275,10 @@ function draw_content($row)
     		<STUDENT:geburtsnation><![CDATA['.$row->geburtsnation.']]></STUDENT:geburtsnation>
     		<STUDENT:sprache><![CDATA['.$row->sprache.']]></STUDENT:sprache>
     		<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
+			<STUDENT:status_datum><![CDATA['.$datum_obj->formatDatum($prestudent->datum,'d.m.Y').']]></STUDENT:status_datum>
+			<STUDENT:status_datum_iso><![CDATA['.$datum_obj->formatDatum($prestudent->datum,'Y-m-d').']]></STUDENT:status_datum_iso>
+			<STUDENT:status_bestaetigung><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'d.m.Y'):'-').']]></STUDENT:status_bestaetigung>
+			<STUDENT:status_bestaetigung_iso><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'Y-m-d'):'-').']]></STUDENT:status_bestaetigung_iso>
     		<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
     		<STUDENT:studienplan_bezeichnung><![CDATA['.$studienplan_bezeichnung.']]></STUDENT:studienplan_bezeichnung>
     		<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
@@ -421,7 +429,7 @@ if($xmlformat=='rdf')
 				$where.=" AND tbl_studentlehrverband.verband='".$verband."'";
 			if ($gruppe!=null)
 				$where.=" AND tbl_studentlehrverband.gruppe='".$gruppe."'";
-				
+
 			//Wenn eine Orgform uebergeben wird nur das Semester ausgewaehlt ist, dann
 			//nach der Orgform filtern. Bei Verbaenden, Gruppen und Spezialgruppen wird auf
 			//die Orgform keine ruecksicht genommen
@@ -439,7 +447,7 @@ if($xmlformat=='rdf')
 		$sql_query="SELECT p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,	vorname, vornamen, geschlecht,
 						nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
 						tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-						tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, mentor, public.tbl_benutzer.aktiv AS bnaktiv, 
+						tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, mentor, public.tbl_benutzer.aktiv AS bnaktiv,
 						(	SELECT kontakt
 							FROM public.tbl_kontakt
 							WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung
@@ -451,13 +459,13 @@ if($xmlformat=='rdf')
 						(SELECT rt_punkte2 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte2,
 						(SELECT rt_punkte3 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte3,
 						 tbl_prestudent.dual as dual, p.matr_nr
-						FROM public.tbl_student 
+						FROM public.tbl_student
 							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id)  JOIN public.tbl_prestudent USING(prestudent_id) ";
 		if($gruppe_kurzbz!=null)
 			$sql_query.= "JOIN public.tbl_benutzergruppe USING (uid) ";
 		$sql_query.="LEFT JOIN public.tbl_studentlehrverband ON (tbl_studentlehrverband.student_uid=tbl_student.student_uid AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz')";
 		$sql_query.="WHERE ".$where.' ORDER BY nachname, vorname';
-		
+
 
 		if($db->db_query($sql_query))
 		{
@@ -480,17 +488,17 @@ if($xmlformat=='rdf')
 		{
 			$stsem_obj = new studiensemester();
 			$stsem_obj->load($studiensemester_kurzbz);
-			$qry = "SELECT prestudent_id 
-					FROM 
-						bis.tbl_bisio JOIN public.tbl_student USING(student_uid)  
-					WHERE 
+			$qry = "SELECT prestudent_id
+					FROM
+						bis.tbl_bisio JOIN public.tbl_student USING(student_uid)
+					WHERE
 						(
 						(tbl_bisio.von>='".$stsem_obj->start."' AND tbl_bisio.von<='".$stsem_obj->ende."')
 						OR
 						(tbl_bisio.bis>='".$stsem_obj->start."' AND tbl_bisio.bis<='".$stsem_obj->ende."')
 						)
 						AND NOT EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Incoming' AND prestudent_id=tbl_student.prestudent_id)
-					"; 
+					";
 		}
 		if($db->db_query($qry))
 		{
@@ -570,7 +578,7 @@ if($xmlformat=='rdf')
 		    {
 			$zahlungsreferenz = explode(" ", $filter);
 			unset($zahlungsreferenz[0]);
-			
+
 			foreach($zahlungsreferenz as $ref)
 			{
 			    $konto = new konto();
@@ -582,7 +590,7 @@ if($xmlformat=='rdf')
 				$prestudent_temp = new prestudent($prestudent->result[0]->prestudent_id);
 				$student = new student();
 				$uid = $student->getUid($prestudent_temp->prestudent_id);
-				
+
 				if($uid!='' && $uid != false)
 				{
 				    if(!$student->load($uid, $studiensemester_kurzbz))
@@ -601,11 +609,11 @@ if($xmlformat=='rdf')
 		    else
 		    {
 			//$filter = utf8_decode($filter);
-			$qry = "SELECT prestudent_id 
-				FROM 
-				    public.tbl_person JOIN tbl_prestudent USING (person_id) LEFT JOIN tbl_student using(prestudent_id) 
-				WHERE 
-				    nachname||' '||vorname ~* '".addslashes($filter)."' OR 
+			$qry = "SELECT prestudent_id
+				FROM
+				    public.tbl_person JOIN tbl_prestudent USING (person_id) LEFT JOIN tbl_student using(prestudent_id)
+				WHERE
+				    nachname||' '||vorname ~* '".addslashes($filter)."' OR
 				    vorname||' '||nachname ~* '".addslashes($filter)."' OR
 				    student_uid ~* '".addslashes($filter)."' OR
 				    matrikelnr = '".addslashes($filter)."' OR
@@ -682,7 +690,7 @@ else
 
 			$studiengang = new studiengang();
 			$studiengang->load($student->studiengang_kz);
-			
+
 			$stgleiter = $studiengang->getLeitung($student->studiengang_kz);
 			$stgl='';
 			$i = 0;
@@ -693,8 +701,8 @@ else
 				$i++;
 			}
 
-//			$stg_typ = new studiengang(); 
-//			$stg_typ->getStudiengangTyp($studiengang->typ); 
+//			$stg_typ = new studiengang();
+//			$stg_typ->getStudiengangTyp($studiengang->typ);
 //			$typ=$stg_typ->bezeichnung;
 			switch($studiengang->typ)
 			{
@@ -750,7 +758,7 @@ else
 			$lv_studiengang_bezeichnung='';
 			$lv_studiengang_typ='';
 			$lv_studiengang_art='';
-			
+
 			$lv=new lehrveranstaltung();
 			$lv->load_lva_student($student->uid);
 			if(count($lv->lehrveranstaltungen)>0)
@@ -760,7 +768,7 @@ else
 				$lv_studiengang->load($lv_studiengang_kz);
 				$lv_studiengang_bezeichnung=$lv_studiengang->bezeichnung;
 				$lv_studiengang_typ=$lv_studiengang->typ;
-//	            $stg_typ->getStudiengangTyp($lv_studiengang->typ); 
+//	            $stg_typ->getStudiengangTyp($lv_studiengang->typ);
 //				$lv_studiengang_art=$stg_typ->bezeichnung;
 				switch($lv_studiengang->typ)
 				{
@@ -774,13 +782,13 @@ else
 			}
 			$prestudent = new prestudent($student->prestudent_id);
 			$prestudent->getLastStatus($row->prestudent_id);
-			
+
 			$orgform_bezeichnung = new organisationsform();
 			$orgform_bezeichnung->load($studiengang->orgform_kurzbz);
-			
+
 			$orgform_student_bezeichnung = new organisationsform();
 			$orgform_student_bezeichnung->load($prestudent->orgform_kurzbz);
-			
+
 			echo '
 			<student>
 				<uid><![CDATA['.$student->uid.']]></uid>
