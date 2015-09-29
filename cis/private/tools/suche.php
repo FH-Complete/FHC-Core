@@ -346,9 +346,9 @@ function searchDms($searchItems)
 {
 	$mimetypes = array(
 		'application/pdf'=>'pdf_icon.png',
-		'application/vnd.openxmlformats-officedocument.wordprocessingml.document'=>'word2007.jpg',
-		'application/vnd.openxmlformats-officedocument.presentationml.presentation'=>'x-office-presentation.png',
-		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'=>'excel.gif',
+		'application/vnd.openxmlformats-officedocument.wordprocessingml.document'=>'doc_icon.png',
+		'application/vnd.openxmlformats-officedocument.presentationml.presentation'=>'ppt_icon.png',
+		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'=>'xls_icon.png',
 		'application/vnd.oasis.opendocument.text'=>'openoffice0.jpg',
 		'application/msword'=>'doc_icon.png',
 		'application/vnd.ms-excel'=>'xls_icon.png',

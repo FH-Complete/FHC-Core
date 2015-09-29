@@ -212,17 +212,19 @@ $dpp = isset($_REQUEST['dpp'])?$_REQUEST['dpp']:20;
 $searching = isset($_REQUEST['searching'])?$_REQUEST['searching']:'false';
 
 $mimetypes = array(
-	'application/pdf'=>'pdf.ico',
-	'application/vnd.openxmlformats-officedocument.wordprocessingml.document'=>'word2007.jpg',
-	'application/vnd.openxmlformats-officedocument.presentationml.presentation'=>'x-office-presentation.png',
-	'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'=>'excel.gif',
-	'application/vnd.oasis.opendocument.text'=>'openoffice0.jpg',
-	'application/msword'=>'dotpic.gif',
-	'application/vnd.ms-excel'=>'excel.gif',
-	'application/x-zip'=>'zippic.gif',
-	'image/jpeg'=>'imgpic.gif',
-	'image/gif'=>'imgpic.gif',
-	'image/png'=>'imgpic.gif',
+	'application/pdf'=>'pdf_icon.png',
+		'application/vnd.openxmlformats-officedocument.wordprocessingml.document'=>'doc_icon.png',
+		'application/vnd.openxmlformats-officedocument.presentationml.presentation'=>'ppt_icon.png',
+		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'=>'xls_icon.png',
+		'application/vnd.oasis.opendocument.text'=>'openoffice0.jpg',
+		'application/msword'=>'doc_icon.png',
+		'application/vnd.ms-excel'=>'xls_icon.png',
+		'application/x-zip'=>'zip_icon.png',
+		'application/zip'=>'zip_icon.png',
+		'application/mspowerpoint'=>'ppt_icon.png',
+		'image/jpeg'=>'img_icon.png',
+		'image/gif'=>'img_icon.png',
+		'image/png'=>'img_icon.png',
 );
 
 // Hole Datei aus Import Verzeichnis
@@ -251,10 +253,12 @@ if($importFile != '')
     		$dms->version='0';
     		$dms->kategorie_kurzbz=$kategorie_kurzbz;
     	}
-		
+    	//Mimetype auslesen
+    	$finfo = finfo_open(FILEINFO_MIME_TYPE);
+    	
 	    $dms->insertamum=date('Y-m-d H:i:s');
     	$dms->insertvon = $user;
-    	$dms->mimetype= mime_content_type(IMPORT_PATH.$importFile); 
+    	$dms->mimetype= finfo_file($finfo, IMPORT_PATH.$importFile); //Davor deprecated: mime_content_type(IMPORT_PATH.$importFile);
     	$dms->filename = $filename;
     	$dms->name = $importFile;
     	    	
@@ -316,10 +320,12 @@ if(isset($_POST['fileupload']))
     		$dms->version='0';
     		$dms->kategorie_kurzbz=$kategorie_kurzbz;
     	}
+    	//Mimetype auslesen
+    	$finfo = finfo_open(FILEINFO_MIME_TYPE);
     	
     	$dms->insertamum=date('Y-m-d H:i:s');
     	$dms->insertvon = $user;
-    	$dms->mimetype=$_FILES['userfile']['type'];
+    	$dms->mimetype = finfo_file($finfo, $uploadfile); // Davor deprecated: $_FILES['userfile']['type'];
     	$dms->filename = $filename;
     	$dms->name = $_FILES['userfile']['name'];
     	$dms->beschreibung = $beschreibung;
