@@ -520,7 +520,7 @@ else
 		else
 			$sql_query.=",lehreinheit_id=".$db->db_add_param($row->lehreinheit_id);
 		$sql_query.=" WHERE stundenplan_id=".$db->db_add_param($row->stundenplandev_id).";";
-		echo $sql_query.'<BR>';
+		//echo $sql_query.'<BR>';
 		if (!$result_update=$db->db_query($sql_query))
 		{
 			echo $sql_query.' fehlgeschlagen!<BR>'.$db->db_last_error();
