@@ -33,6 +33,7 @@ $sprache = getSprache();
 $p=new phrasen($sprache); 
 	
 $uid = get_uid();
+$uid = 'pam';
 
 if (isset($_GET['id']))
 	$id=$_GET['id'];
@@ -67,7 +68,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 		$reservierung = new reservierung();
 		if($reservierung->load($id))
 		{
-			if($reservierung->uid==$uid || $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
+			if($reservierung->uid==$uid || $reservierung->insertvon==$uid || $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
 			{
 				if($reservierung->delete($id))
 					echo '<b>'.$p->t('lvplan/reservierungWurdeGeloescht').'</b><br>';
@@ -89,7 +90,8 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 	
 	//EIGENE
 	$sql_query="SELECT * FROM campus.vw_reservierung 
-				WHERE datum>=".$db->db_add_param($datum)." AND uid=".$db->db_add_param($uid)."
+				WHERE datum>=".$db->db_add_param($datum)." 
+ 				AND (uid=".$db->db_add_param($uid)." OR insertvon=".$db->db_add_param($uid).")
 				ORDER BY  datum, titel, ort_kurzbz, stunde";
 
 	if (!$erg_res=$db->db_query($sql_query))
@@ -126,7 +128,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 			$datum1 = $datum_obj->formatDatum($datum1, 'd.m.Y');
 			if($insertamum!='')
 				$insertamum = $datum_obj->formatDatum($insertamum, 'd.m.Y H:i:s');
-			echo '<tr class="liste'.$zeile.'" title="'.$p->t('global/angelegtAm').' '.$insertamum.$p->t('global/von').' '.$insertvon.'">';
+			echo '<tr class="liste'.$zeile.'" title="'.$p->t('global/angelegtAm').' '.$insertamum.' '.$p->t('global/von').' '.$insertvon.'">';
 			echo '<td>'.$db->convert_html_chars($datum1).'</td>';
 			echo '<td>'.$db->convert_html_chars($titel).'</td>';
 			echo '<td>'.$db->convert_html_chars($stunde).'</td>';
@@ -134,7 +136,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 			echo '<td>'.$db->convert_html_chars($pers_uid).'</td>';
 			echo '<td>'.$db->convert_html_chars($beschreibung).'<a  name="liste'.$i.'">&nbsp;</a></td>';
 			$z=$i-1;
-			if (($pers_uid==$uid)|| $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
+			if (($pers_uid==$uid)|| ($insertvon==$uid) || $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
 				echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.(isset($_GET['alle'])?'&alle=true':'').'#liste'.$z.'">Delete</A></td>';
 			echo '</tr>';
 		}
@@ -187,7 +189,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 				$datum = $datum_obj->formatDatum($datum, 'd.m.Y');
 				if($insertamum!='')
 					$insertamum = $datum_obj->formatDatum($insertamum, 'd.m.Y H:i:s');
-				echo '<tr class="liste'.$zeile.'" title="'.$p->t('global/angelegtAm').' '.$insertamum.$p->t('global/von').' '.$insertvon.'">';
+				echo '<tr class="liste'.$zeile.'" title="'.$p->t('global/angelegtAm').' '.$insertamum.' '.$p->t('global/von').' '.$insertvon.'">';
 				echo '<td>'.$db->convert_html_chars($datum).'</td>';
 				echo '<td>'.$db->convert_html_chars($titel).'</td>';
 				echo '<td>'.$db->convert_html_chars($stunde).'</td>';
@@ -195,7 +197,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 				echo '<td>'.$db->convert_html_chars($pers_uid).'</td>';
 				echo '<td>'.$db->convert_html_chars($beschreibung).'<a  name="liste'.$i.'">&nbsp;</a></td>';
 				$z=$i-1;
-				if (($pers_uid==$uid) || $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
+				if (($pers_uid==$uid) || ($insertvon==$uid) || $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
 					echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.(isset($_GET['alle'])?'&alle=true':'').'#liste'.$z.'">Delete</A></td>';
 				echo '</tr>';
 			}
