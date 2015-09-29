@@ -633,7 +633,8 @@ $htmlstr .= "<div class='inserterror'>".$errorstr."</div>\n";
 						sortList: [[0,0]],
 						//widgets: ["zebra"],
 						headers: {6:{sorter:false},10:{sorter:false},11:{sorter:false},12:{sorter:false}}
-					}); 
+					});
+				document.berechtigung_neu.rolle_kurzbz.focus(); 
 			});
 
 		function confdel()
