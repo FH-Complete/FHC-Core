@@ -50,7 +50,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/interessentdokumenteoverla
 
 if(isset($_GET['xulapp']))
 	$xulapp=$_GET['xulapp'];
-else 
+else
 	$xulapp='';
 ?>
 <!DOCTYPE overlay >
@@ -74,7 +74,7 @@ else
 					<menuitem label="EMail senden (privat)" oncommand="StudentSendMailPrivat();" id="student-tree-popup-mailprivat" hidden="false"/>
 					<menuseparator />
 					<menuitem label="Personendetails anzeigen" oncommand="StudentShowPersonendetails();" id="student-tree-popup-personendetails" hidden="false"/>
-					<!--					
+					<!--
 					<menuitem label="Interessenten löschen" oncommand="StudentDeleteInteressent();" id="student-tree-popup-deleteinteressent" hidden="false"/>
 					-->
 				</menupopup>
@@ -82,30 +82,30 @@ else
 				<hbox>
 					<toolbox flex="1">
 						<toolbar id="student-nav-toolbar">
-						<?php 
+						<?php
 						if($xulapp!='tempus')
 						{
 						?>
 							<toolbarbutton id="interessent-toolbar-neu" label="Neu" oncommand="InteressentNeu()" disabled="false" image="../skin/images/NeuDokument.png" tooltiptext="Interessent neu anlegen" />
 
 							<toolbarbutton id="student-toolbar-buchung" label="Neue Buchung" oncommand="StudentKontoNeu()" disabled="false" tooltiptext="neue Buchung anlegen"/>
-							
-							<toolbarbutton label="Status ändern " id="student-toolbar-status" type="menu">							
+
+							<toolbarbutton label="Status ändern " id="student-toolbar-status" type="menu">
 						      <menupopup id="student-status-menu-popup" >
 								    <menuitem id="student-toolbar-abbrecher" label="-> Abbrecher" oncommand="StudentAddRolle('Abbrecher','0')" disabled="false" tooltiptext="Student zum Abbrecher machen" hidden="true"/>
 									<menuitem id="student-toolbar-unterbrecher" label="-> Unterbrecher" oncommand="StudentAddRolle('Unterbrecher','0')" disabled="false" tooltiptext="Student zum Unterbrecher machen" hidden="true"/>
 									<menuitem id="student-toolbar-student" label="-> Student" oncommand="StudentUnterbrecherZuStudent()" disabled="false" tooltiptext="Ab/Unterbrecher wieder zum Studenten machen" hidden="true"/>
 									<menuitem id="student-toolbar-diplomand" label="-> Diplomand" oncommand="StudentAddRolle('Diplomand')" disabled="false" tooltiptext="Studenten zum Diplomanden machen" hidden="true"/>
 									<menuitem id="student-toolbar-absolvent" label="-> Absolvent" oncommand="StudentAddRolle('Absolvent')" disabled="false" tooltiptext="Studenten zum Absolventen machen" hidden="true"/>
-											
+
 									<menuitem id="interessent-toolbar-zubewerber" label="-> Bewerber" oncommand="InteressentzuBewerber()" disabled="false" tooltiptext="Interessent zum Bewerber machen" hidden="true"/>
 									<menuitem id="interessent-toolbar-aufgenommener" label="-> Aufgenommener" oncommand="InteressentAddRolle('Aufgenommener')" disabled="false" tooltiptext="Interessent zum Aufgenommenen machen" hidden="true"/>
-									<menuitem id="interessent-toolbar-zustudent" label="-> Student" oncommand="InteressentzuStudent()" disabled="false" tooltiptext="Bewerber zu Studenten machen" hidden="true"/>									
+									<menuitem id="interessent-toolbar-zustudent" label="-> Student" oncommand="InteressentzuStudent()" disabled="false" tooltiptext="Bewerber zu Studenten machen" hidden="true"/>
 									<menuitem id="interessent-toolbar-warteliste" label="-> Warteliste" oncommand="InteressentAddRolle('Wartender')" disabled="false" tooltiptext="Interessent zum Wartenden machen" hidden="true"/>
-									<menuitem id="interessent-toolbar-absage" label="-> Absage" oncommand="InteressentAddRolle('Abgewiesener')" disabled="false" tooltiptext="Interessent zum Absager machen" hidden="true"/>    
+									<menuitem id="interessent-toolbar-absage" label="-> Absage" oncommand="InteressentAddRolle('Abgewiesener')" disabled="false" tooltiptext="Interessent zum Absager machen" hidden="true"/>
 						      </menupopup>
 						    </toolbarbutton>
-														
+
 							<toolbarbutton id="student-toolbar-export" label="Export" oncommand="StudentExport()" disabled="false" image="../skin/images/ExcelIcon.png" tooltiptext="Daten ins Excel Exportieren"/>
 						<?php
 						}
@@ -117,7 +117,7 @@ else
 						if($xulapp!='tempus')
 						{
 						?>
-							<toolbarbutton label="Filter " id="student-toolbar-filter" type="menu">							
+							<toolbarbutton label="Filter " id="student-toolbar-filter" type="menu">
 						      <menupopup id="student-filter-menu-popup" >
 								    <menuitem id="student-toolbar-filter-dokumente" label="fehlende Dokumente" oncommand="InteressentDokumenteFilter()" disabled="false" tooltiptext="Liste aller Studenten mit Fehlenden Dokumenten"/>
 									<menuitem id="student-toolbar-filter-offenebuchungen" label="offene Buchungen" oncommand="StudentKontoFilterStudenten('konto')" disabled="false" tooltiptext="Liste aller Studenten mit offenen Buchungen"/>
@@ -141,7 +141,7 @@ else
 				<vbox>
 				<tree id="student-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 						datasources="rdf:null" ref="http://www.technikum-wien.at/student/alle"
-						<?php echo ($xulapp!='tempus'?'onselect="StudentAuswahl();"':'') ?>						
+						<?php echo ($xulapp!='tempus'?'onselect="StudentAuswahl();"':'') ?>
 						flags="dont-build-content"
 						enableColumnDrag="true"
 						style="margin:0px; height:150px"
@@ -228,6 +228,22 @@ else
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#status" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
+						<treecol id="student-treecol-status" label="Status Datum" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#status_datum_iso" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
+						<treecol id="student-treecol-status" label="Status Bestaetigung" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#status_bestaetigung_iso" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
+						<treecol id="student-treecol-status" label="Status Datum ISO" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#status_datum_iso" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
+						<treecol id="student-treecol-status" label="Status Bestaetigung ISO" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#status_bestaetigung_iso" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-mail_privat" label="EMail (Privat)" flex="1" hidden="true" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#mail_privat" onclick="StudentTreeSort()"/>
@@ -299,7 +315,7 @@ else
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#titelpre" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#nachname" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#vorname" />
-	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#vornamen" />	           							
+	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#vornamen" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#titelpost" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#svnr" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#ersatzkennzeichen" />
@@ -314,6 +330,10 @@ else
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#prestudent_id" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#person_id" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#status" />
+										<treecell label="rdf:http://www.technikum-wien.at/student/rdf#status_datum" />
+										<treecell label="rdf:http://www.technikum-wien.at/student/rdf#status_bestaetigung" />
+										<treecell label="rdf:http://www.technikum-wien.at/student/rdf#status_datum_iso" />
+										<treecell label="rdf:http://www.technikum-wien.at/student/rdf#status_bestaetigung_iso" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#mail_privat" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#mail_intern" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#anmerkungen" />
@@ -360,7 +380,7 @@ else
 							<tab id="student-tab-noten" label="Noten" />
 							<tab id="student-tab-zeugnis" label="Archiv" />
 							<tab id="student-tab-pruefung" label="Prüfung" />
-							<?php 
+							<?php
                             if($rechte->isBerechtigt('student/anrechnung'))
                                 echo '<tab id="student-tab-anrechnungen" label="Anrechnungen" />';
                             ?>
@@ -370,9 +390,9 @@ else
 							<tab id="student-tab-funktionen" label="Funktionen" onclick="StudentFunktionIFrameLoad();"/>
 							<tab id="student-tab-notizen" label="Notizen"/>
 							<tab id="student-tab-termine" label="Termine" onclick="StudentTermineIFrameLoad();"/>
-							<?php 
+							<?php
                             if($rechte->isBerechtigt('student/anwesenheit'))
-								echo '<tab id="student-tab-anwesenheit" label="Anwesenheit" onclick="StudentAnwesenheitIFrameLoad();"/>';						
+								echo '<tab id="student-tab-anwesenheit" label="Anwesenheit" onclick="StudentAnwesenheitIFrameLoad();"/>';
                             ?>
 
 						</tabs>
@@ -387,7 +407,7 @@ else
 							<vbox id="student-noten"  style="margin-top:10px;" />
 							<vbox id="student-zeugnis"  style="margin-top:10px;" />
 							<vbox id="student-pruefung"  style="margin-top:10px;" />
-							<?php 
+							<?php
                             if($rechte->isBerechtigt('student/anrechnung'))
                                 echo '<vbox id="student-anrechnungen"  style="margin-top:10px;" />';
                             ?>
@@ -399,7 +419,7 @@ else
 								<box class="Notiz" flex="1" id="student-box-notizen"/>
 							</vbox>
 							<iframe id="student-termine" src="" style="margin-top:10px;" />
-							<?php 
+							<?php
                             if($rechte->isBerechtigt('student/anwesenheit'))
 								echo '<iframe id="student-anwesenheit" src="" style="margin-top:10px;" />';
                             ?>

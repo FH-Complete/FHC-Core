@@ -521,6 +521,9 @@ class frage extends basis_db
 			
 			$this->frage_id=$this->getNewFrage($gebiet_id, $pruefling_id, $nextlevel);
 			
+			if($this->frage_id=='')
+				break;
+			
 			$this->pruefling_id=$pruefling_id;
 			
 			//hoechste Nummer holen
@@ -548,7 +551,7 @@ class frage extends basis_db
 			
 			$this->begintime='';
 			$this->endtime='';
-			
+
 			//PrueflingFrage speichern
 			if(!$this->save_prueflingfrage(true))
 			{
@@ -686,8 +689,10 @@ class frage extends basis_db
 	public function save_prueflingfrage($new=null)
 	{
 		if(!$this->validate_prueflingfrage())
+		{
 			return false;
-		
+		}
+
 		if(is_null($new))
 			$new = $this->new;
 		
@@ -763,7 +768,7 @@ class frage extends basis_db
 			$qry .= " ORDER BY nummer ASC";
 		
 		$qry .= " LIMIT 1";
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())

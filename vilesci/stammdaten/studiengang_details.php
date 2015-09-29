@@ -595,9 +595,7 @@ if (!$erh->getAll('kurzbz'))
 							<tr>
 								<td valign="top">Bescheid</td>
 								<td>
-									<textarea name="bescheid" cols="37" rows="5" onchange="submitable()">
-										<?php echo $bescheid ?>
-									</textarea>
+									<textarea name="bescheid" cols="37" rows="5" onchange="submitable()"><?php echo $bescheid ?></textarea>
 								</td>
 							</tr>
 						</table>

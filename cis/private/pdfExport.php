@@ -100,9 +100,18 @@ else
 $konto = new konto();
 if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 {
-	if(($xsl=='Inskription' || $xsl == 'Studienblatt') && (!$konto->checkStudienbeitrag($user, $_GET["ss"])))
+    $buchungstypen = array();
+    if(defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))
+    {
+	$buchungstypen = unserialize (CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN);
+    }
+
+    $stsem_zahlung = $konto->getLastStSemBuchungstypen($user, $buchungstypen);
+    
+	if((($xsl=='Inskription') || ($xsl == 'Studienblatt')) && ($_GET["ss"] != $stsem_zahlung))
+	{
 	    die('Der Studienbeitrag wurde noch nicht bezahlt');		
-	
+	}
 	if(isset($_GET['buchungsnummern']))
 	{
 	    //Beim Drucken von Buchungsbestaetigungen pruefen ob diese Buchungen auch zu diesem Benutzer gehoeren

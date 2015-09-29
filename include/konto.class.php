@@ -489,7 +489,7 @@ class konto extends basis_db
 						AND tbl_benutzer.person_id = tbl_konto.person_id
 						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
 						AND tbl_konto.buchungstyp_kurzbz = 'Studiengebuehr' ORDER BY buchungsnr";
-
+		
 		if($this->db_query($subqry))
 		{
 			if ($this->db_num_rows()==0)

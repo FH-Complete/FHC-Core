@@ -1039,5 +1039,53 @@ class vertrag extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Liefert alle Vertraege bei denen die Lehraufträgs-Beträge nicht zur Vertragsbetrag passen
+	 * (zB Aufgrund von Honoraraenderung)
+	 * @param $studiensemester_kurzbz
+	 * @return boolean true wenn ok, false im Fehlerfall
+	 */
+	public function getFalscheBetraege($studiensemester_kurzbz)
+	{
+		$qry = "SELECT
+					tbl_vertrag.*, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehreinheitmitarbeiter.lehreinheit_id,
+					tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.semesterstunden
+				FROM
+					lehre.tbl_vertrag
+					JOIN lehre.tbl_lehreinheitmitarbeiter USING(vertrag_id)
+					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+				WHERE
+					studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					AND tbl_lehreinheitmitarbeiter.semesterstunden*tbl_lehreinheitmitarbeiter.stundensatz!=tbl_vertrag.betrag";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+
+				$obj->vertrag_id = $row->vertrag_id;
+				$obj->vertragstyp_kurzbz = $row->vertragstyp_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->betrag = $row->betrag;
+				$obj->person_id = $row->person_id;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->vertragsdatum = $row->vertragsdatum;
+				$obj->semesterstunden = $row->semesterstunden;
+				$obj->stundensatz = $row->stundensatz;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->lehreinheit_id = $row->lehreinheit_id;
+
+				$this->result[]=$obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

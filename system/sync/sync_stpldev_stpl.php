@@ -411,6 +411,8 @@ else
 						$message[$student]->isalt=true;
 						$message[$student]->mailadress=$student.'@'.DOMAIN;
 						$message[$student]->message_begin=$message_begin.'<BR>';
+						if(!isset($message[$student]->message))
+							$message[$student]->message='';
 						$message[$student]->message.='<font style="color:#FFA100"><strong>Gel&ouml;schte Stunden:</strong></font><BR>
 								<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
 					}
@@ -639,6 +641,8 @@ else
 						$message[$student]->isset=true;
 						$message[$student]->mailadress=$student.'@'.DOMAIN;
 						$message[$student]->message_begin=$message_begin.'<BR>';
+						if(!isset($message[$student]->message))
+							$message[$student]->message='';
 						$message[$student]->message.='<font style="color:blue"><strong>Ge&auml;nderte Stunden:</strong></font><BR>
 								<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
 					}

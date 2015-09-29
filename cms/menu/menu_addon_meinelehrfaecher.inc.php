@@ -52,11 +52,22 @@ class menu_addon_meinelvkompatibel extends menu_addon
 			if ($stsemobj = new studiensemester())
 			{
 				// Angezeigt wird das Studiensemester das am naehesten ist das davor und das danach
+				//cis.config.inc.php: Durch den Eintrag CIS_MEINELV_ANZAHL_SEMESTER_PAST können mehrere Semester aus der Vergangenheit angezeigt werden.
 				$stsem = $stsemobj->getNearest();
-				$stsem_array[]=$stsemobj->getPreviousFrom($stsem);
-				$stsem_array[]=$stsem;
-				$stsem_array[]=$stsemobj->getNextFrom($stsem);
+				$stsem_array = array();
+				array_push($stsem_array, $stsem);
+				array_push($stsem_array, $stsemobj->getNextFrom($stsem));
 				
+				if(defined('CIS_MEINELV_ANZAHL_SEMESTER_PAST'))
+				    $end = CIS_MEINELV_ANZAHL_SEMESTER_PAST;
+				else
+				    $end = 1;
+				
+				for($i=0; $i<$end; $i++)
+				{
+				    $stsem = $stsemobj->getPreviousFrom($stsem);
+				    array_unshift($stsem_array, $stsem);
+				}
 				
 				foreach($stsem_array as $stsem)
 				{
