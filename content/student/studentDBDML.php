@@ -66,6 +66,7 @@ require_once('../../include/anrechnung.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/anwesenheit.class.php');
 require_once('../../include/benutzerfunktion.class.php');
+require_once('../../include/note.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -2818,18 +2819,28 @@ if(!$error)
 		$errormsg = '';
 		$angerechnet=false;
 
+		$noten_anmerkung_arr=array();
+		$note_obj = new note();
+		$note_obj->getAll();
+		foreach($note_obj->result as $row)
+			$noten_anmerkung_arr[$row->anmerkung]=$row->note;
+
 		for($i=0;$i<$_POST['anzahl'];$i++)
 		{
 			if($_POST['matrikelnummer_'.$i]!='')
 			{
 				$zeugnisnote = new zeugnisnote();
 				$error = false;
-				if(!is_numeric(trim($_POST['matrikelnummer_'.$i])) || (isset($_POST['note_'.$i]) && !is_numeric($_POST['note_'.$i])))
+				if(!is_numeric(trim($_POST['matrikelnummer_'.$i])))
 				{
 					$error = true;
-					$errormsg = "\nMatrikelnummer oder Note ist ungueltig: ".$_POST['matrikelnummer_'.$i].' - '.$_POST['note_'.$i];
+					$errormsg = "\nMatrikelnummer ist ungueltig: ".$_POST['matrikelnummer_'.$i];
 				}
-
+				if((isset($_POST['note_'.$i]) && !is_numeric($_POST['note_'.$i]) && !isset($noten_anmerkung_arr[$_POST['note_'.$i]])))
+				{
+					$error = true;
+					$errormsg = "\nNote ist ungueltig: ".$_POST['note_'.$i];
+				}
 				if(!$error)
 				{
 					$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE trim(matrikelnr)=".$db->db_add_param(trim($_POST['matrikelnummer_'.$i]));
@@ -2911,6 +2922,12 @@ if(!$error)
 							{
 								$zeugnisnote->note = $_POST['note_'.$i];
 								$zeugnisnote->punkte = null;
+								// Wenn es nicht numerisch ist, dann nachsehen ob es eine anmerkung gibt die so heisst
+								// zB fuer met, nb, ar, etc
+								if(!is_numeric($zeugnisnote->note) && isset($noten_anmerkung_arr[$zeugnisnote->note]))
+								{
+									$zeugnisnote->note = $noten_anmerkung_arr[$zeugnisnote->note];
+								}
 							}
 							elseif(isset($_POST['punkte_'.$i]))
 							{
