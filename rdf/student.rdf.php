@@ -613,8 +613,8 @@ if($xmlformat=='rdf')
 				FROM
 				    public.tbl_person JOIN tbl_prestudent USING (person_id) LEFT JOIN tbl_student using(prestudent_id)
 				WHERE
-				    nachname||' '||vorname ~* '".addslashes($filter)."' OR
-				    vorname||' '||nachname ~* '".addslashes($filter)."' OR
+				    COALESCE(nachname,'')||' '||COALESCE(vorname,'') ~* '".addslashes($filter)."' OR
+				    COALESCE(vorname,'')||' '||COALESCE(nachname,'') ~* '".addslashes($filter)."' OR
 				    student_uid ~* '".addslashes($filter)."' OR
 				    matrikelnr = '".addslashes($filter)."' OR
 				    svnr = '".addslashes($filter)."';";
