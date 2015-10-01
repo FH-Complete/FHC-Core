@@ -3244,7 +3244,7 @@ if(!$result = @$db->db_query("SELECT warn_semesterstunden_frei FROM public.tbl_o
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_organisationseinheit '.$db->db_last_error().'</strong><br>';
 	else
-		echo ' public.tbl_organisationseinheit: neue Spalte warn_semesterstunden_frei, warn_semesterstunden_fix hinzugefuegt!<br>';
+		echo '<br>public.tbl_organisationseinheit: neue Spalte warn_semesterstunden_frei, warn_semesterstunden_fix hinzugefuegt!<br>';
 }
 
 // Gruppe CMS_LOCK anlegen (benoetigt fuer das Sperren von CMS-Content)
@@ -3259,7 +3259,7 @@ if($result = @$db->db_query("SELECT 1 FROM public.tbl_gruppe WHERE gruppe_kurzbz
 		if(!$db->db_query($qry))
 			echo '<strong>public.tbl_gruppe '.$db->db_last_error().'</strong><br>';
 		else
-			echo ' public.tbl_gruppe: Gruppe CMS_LOCK angelegt (benoetigt fuer das Sperren von CMS-Content)<br>';
+			echo '<br>public.tbl_gruppe: Gruppe CMS_LOCK angelegt (benoetigt fuer das Sperren von CMS-Content)<br>';
 	}
 }
 
@@ -3276,7 +3276,7 @@ if($result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie WHERE katego
 		if(!$db->db_query($qry))
 			echo '<strong>campus.tbl_dms_kategorie '.$db->db_last_error().'</strong><br>';
 		else
-			echo ' campus.tbl_dms_kategorie: Kategorie Akte angelegt und mit Gruppe CMS_LOCK gesperrt<br>';
+			echo '<br>campus.tbl_dms_kategorie: Kategorie Akte angelegt und mit Gruppe CMS_LOCK gesperrt<br>';
 	}
 }
 
@@ -3293,7 +3293,7 @@ if($result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie WHERE katego
 		if(!$db->db_query($qry))
 			echo '<strong>campus.tbl_dms_kategorie '.$db->db_last_error().'</strong><br>';
 		else
-			echo ' campus.tbl_dms_kategorie: Kategorie Notiz angelegt und mit Gruppe CMS_LOCK gesperrt<br>';
+			echo '<br>campus.tbl_dms_kategorie: Kategorie Notiz angelegt und mit Gruppe CMS_LOCK gesperrt<br>';
 	}
 }
 
@@ -3329,7 +3329,7 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 		if(!$db->db_query($qry))
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
-			echo ' system.tbl_berechtigung: Eigene Berechtigung lehre/lvinfo_freigabe fuer die Freigabe von LV-Infos hinzugefuegt!<br>';
+			echo '<br>system.tbl_berechtigung: Eigene Berechtigung lehre/lvinfo_freigabe fuer die Freigabe von LV-Infos hinzugefuegt!<br>';
 	}
 }
 
@@ -3349,7 +3349,7 @@ if($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_lehreinhei
 		if(!$db->db_query($qry))
 			echo '<strong>Indizes: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'Diverse Indizes fuer Vertraege hinzugefuegt';
+			echo '<br>Diverse Indizes fuer Vertraege hinzugefuegt';
 	}
 }
 
@@ -3363,7 +3363,7 @@ if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragstyp WHERE vertragsty
 		if(!$db->db_query($qry))
 			echo '<strong>Vertragstyp: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'Vertragstyp Pruefungshonorar hinzugefuegt';
+			echo '<br>Vertragstyp Pruefungshonorar hinzugefuegt';
 	}
 }
 
@@ -3377,7 +3377,7 @@ if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragstyp WHERE vertragsty
 		if(!$db->db_query($qry))
 			echo '<strong>Vertragstyp: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'Vertragstyp Lehrauftrag hinzugefuegt';
+			echo '<br>Vertragstyp Lehrauftrag hinzugefuegt';
 	}
 }
 
@@ -3391,7 +3391,7 @@ if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertrag
 		if(!$db->db_query($qry))
 			echo '<strong>Vertragsstatus: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'Vertragsstatus Neu hinzugefuegt';
+			echo '<br>Vertragsstatus Neu hinzugefuegt';
 	}
 }
 
@@ -3405,7 +3405,7 @@ if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertrag
 		if(!$db->db_query($qry))
 			echo '<strong>Vertragsstatus: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'Vertragsstatus Abgerechnet hinzugefuegt';
+			echo '<br>Vertragsstatus Abgerechnet hinzugefuegt';
 	}
 }
 
@@ -3419,7 +3419,7 @@ if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertrag
 		if(!$db->db_query($qry))
 			echo '<strong>Vertragsstatus: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'Vertragsstatus retour hinzugefuegt';
+			echo '<br>Vertragsstatus retour hinzugefuegt';
 	}
 }
 
@@ -3433,7 +3433,7 @@ if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertrag
 		if(!$db->db_query($qry))
 			echo '<strong>Vertragsstatus: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'Vertragsstatus Storno hinzugefuegt';
+			echo '<br>Vertragsstatus Storno hinzugefuegt';
 	}
 }
 
@@ -3446,7 +3446,7 @@ if(!$result = @$db->db_query("SELECT lehrveranstaltung_id FROM lehre.tbl_vertrag
 	if(!$db->db_query($qry))
 		echo '<strong>Vertrag: '.$db->db_last_error().'</strong><br>';
 	else
-		echo 'Vertrag: Spalte lehrveranstaltung_id hinzugefügt';
+		echo '<br>Vertrag: Spalte lehrveranstaltung_id hinzugefügt';
 }
 
 // Vertragsstatus gedruckt
@@ -3459,7 +3459,7 @@ if($result = $db->db_query("SELECT 1 FROM lehre.tbl_vertragsstatus WHERE vertrag
 		if(!$db->db_query($qry))
 			echo '<strong>Vertragsstatus: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'Vertragsstatus gedruckt hinzugefuegt';
+			echo '<br>Vertragsstatus gedruckt hinzugefuegt';
 	}
 }
 
@@ -3473,7 +3473,7 @@ if($result = $db->db_query("SELECT 1 FROM public.tbl_funktion WHERE funktion_kur
 		if(!$db->db_query($qry))
 			echo '<strong>Benutzerfunktion: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'Benutzerfunktion awbefreit hinzugefuegt';
+			echo '<br>Benutzerfunktion awbefreit hinzugefuegt';
 	}
 }
 
@@ -3758,7 +3758,8 @@ foreach ($tabellen AS $attribute)
 }
 
 echo '<H2>Gegenpruefung!</H2>';
-$sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync';";
+$error=false;
+$sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync' AND schemaname != 'addon';";
 if (!$result=@$db->db_query($sql_query))
 		echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
 	else
@@ -3766,7 +3767,10 @@ if (!$result=@$db->db_query($sql_query))
 		{
 			$fulltablename=$row->schemaname.'.'.$row->tablename;
 			if (!isset($tabellen[$fulltablename]))
+			{
 				echo 'Tabelle '.$fulltablename.' existiert in der DB, aber nicht in diesem Skript!<BR>';
+				$error=true;
+			}
 			else
 				if (!$result_fields=@$db->db_query("SELECT * FROM $fulltablename LIMIT 1;"))
 					echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
@@ -3782,12 +3786,18 @@ if (!$result=@$db->db_query($sql_query))
 								break;
 							}
 						if (!$found)
+						{
 							echo 'Attribut '.$fulltablename.'.<strong>'.$fieldnameDB.'</strong> existiert in der DB, aber nicht in diesem Skript!<BR>';
+							$error=true;
+						}
 					}
 		}
+if($error==false)
+	echo '<br>Gegenpruefung fehlerfrei';
 
 // ******** Berechtigungen Prüfen ************/
 echo '<h2>Berechtigungen pruefen</h2>';
+$neue=false;
 $berechtigung_kurzbz=0;
 $beschreibung=1;
 $berechtigungen = array(
@@ -3849,7 +3859,7 @@ $berechtigungen = array(
 	array('lehre/studienordnung','Studienordnung'),
 	array('lehre/vorrueckung','Lehreinheitenvorrückung'),
 	array('lv-plan','Stundenplan'),
-	array('lv-plan/gruppenentfernen','erlaut das entfernen von Gruppen aus LVPlan vom FAS aus'),
+	array('lv-plan/gruppenentfernen','Erlaut das Entfernen von Gruppen aus LVPlan vom FAS aus'),
 	array('mitarbeiter','FAS Mitarbeitermodul'),
 	array('mitarbeiter/bankdaten','Bankdaten für Mitarbeiter und Studierende anzeigen'),
 	array('mitarbeiter/personalnummer','Editieren der Personalnummer im FAS'),
@@ -3917,9 +3927,12 @@ foreach($berechtigungen as $row)
 				$db->db_add_param($row[$beschreibung]).');';
 
 			if($db->db_query($qry_insert))
-				echo '<br>'.$row[$berechtigung_kurzbz].'/'.$row[$beschreibung].' hinzugefügt';
+			{
+				echo '<br>'.$row[$berechtigung_kurzbz].' -> '.$row[$beschreibung].' <b>hinzugefügt</b>';
+				$neue=true;
+			}
 			else
-				echo '<br><span class="error">Fehler: '.$row[$berechtigung_kurzbz].'/'.$row[$beschreibung].' hinzufügen nicht möglich</span>';
+				echo '<br><span class="error">Fehler: '.$row[$berechtigung_kurzbz].' -> '.$row[$beschreibung].' hinzufügen nicht möglich</span>';
 
 			//Wenn das Recht basis/vilesci neu angelegt wurde, dann dieses Recht jedem geben, der bisher auch Zugriff auf Vilesci hatte.
 			if ($row[$berechtigung_kurzbz]=='basis/vilesci')
@@ -3959,11 +3972,15 @@ foreach($berechtigungen as $row)
 		}
 	}
 }
+if($neue==false)
+	echo '<br>Keine neuen Berechtigungen';
+	
 // ******** Pruefen ob die Webservice Berechtigungen alle gesetzt sind **********
 
 echo '<h2>Webservice Berechtigungen pruefen</h2>';
 
 // berechtigung_kurzbz,methode,klasse
+$neue=false;
 $berechtigung_kurzbz=0;
 $methode=1;
 $klasse=2;
@@ -4018,12 +4035,18 @@ foreach($webservicerecht as $row)
 				$db->db_add_param($row[$klasse]).');';
 
 			if($db->db_query($qry_insert))
+			{
 				echo '<br>'.$row[$berechtigung_kurzbz].'/'.$row[$methode].'->'.$row[$klasse].' hinzugefügt';
+				$neue=true;
+			}
 			else
 				echo '<br><span class="error">Fehler: '.$row[$berechtigung_kurzbz].'/'.$row[$methode].'->'.$row[$klasse].' hinzufügen nicht möglich</span>';
 		}
 	}
 }
+if($neue==false)
+	echo '<br>Keine neuen Webservicerechte';
+
 
 echo '</body></html>';
 ?>
