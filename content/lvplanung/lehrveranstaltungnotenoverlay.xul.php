@@ -271,43 +271,49 @@ if(defined('FAS_GESAMTNOTE_PRUEFUNGSHONORAR') && FAS_GESAMTNOTE_PRUEFUNGSHONORAR
 <hbox>
 	<groupbox id="lehrveranstaltung-noten-groupbox-pruefung">
 	<caption label="Prüfungshonorar" />
-	<hbox>
-		<label value="Mitarbeiter" control="lehrveranstaltung-noten-pruefung-menulist-mitarbeiter"/>
-		<menulist id="lehrveranstaltung-noten-pruefung-menulist-mitarbeiter"
-		          datasources="'.APP_ROOT.'rdf/mitarbeiter.rdf.php" flex="1"
-		          ref="http://www.technikum-wien.at/mitarbeiter/_alle"
-                  minwidth="250"
-		          >
-			<template>
-				<menupopup>
-                    <menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
-		        		      label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname ( rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid )"
-					  		  uri="rdf:*"/>
-				</menupopup>
-			</template>
-		</menulist>
-		<label value="Prüfungstyp" control="lehrveranstaltung-noten-pruefung-menulist-vertragstyp"/>
-		<menulist id="lehrveranstaltung-noten-pruefung-menulist-vertragstyp"
-		          datasources="'.APP_ROOT.'rdf/vertragstyp.rdf.php" flex="1"
-		          ref="http://www.technikum-wien.at/vertragstyp"
-                  minwidth="250"
-		          >
-			<template>
-				<menupopup>
-                    <menuitem value="rdf:http://www.technikum-wien.at/vertragstyp/rdf#vertragstyp_kurzbz"
-		        		      label="rdf:http://www.technikum-wien.at/vertragstyp/rdf#vertragstyp_bezeichnung"
-					  		  uri="rdf:*"/>
-				</menupopup>
-			</template>
-		</menulist>
-		<label value="Satz pro Prüfung" control="lehrveranstaltung-noten-pruefung-textbox-satz"/>
-		<textbox id="lehrveranstaltung-noten-pruefung-textbox-satz" size="2" oninput="LehrveranstaltungNotenPruefungCalculate()"/>
-		<label value="Anzahl Prüfungen" control="lehrveranstaltung-noten-pruefung-textbox-anzahl"/>
-		<textbox id="lehrveranstaltung-noten-pruefung-textbox-anzahl" size="2" oninput="LehrveranstaltungNotenPruefungCalculate()"/>
-		<label value="0.0" id="lehrveranstaltung-noten-pruefung-label-gesamt"/>
-		<button id="lehrveranstaltung-noten-pruefung-button-save" label="Speichern" oncommand="LehrveranstaltungNotenPruefungSave();" />
-		<spacer flex="1"/>
-	</hbox>
+	<vbox>
+		<hbox>
+			<label value="Mitarbeiter" control="lehrveranstaltung-noten-pruefung-menulist-mitarbeiter"/>
+			<menulist id="lehrveranstaltung-noten-pruefung-menulist-mitarbeiter"
+				      datasources="'.APP_ROOT.'rdf/mitarbeiter.rdf.php" flex="1"
+				      ref="http://www.technikum-wien.at/mitarbeiter/_alle"
+		              minwidth="250"
+				      >
+				<template>
+					<menupopup>
+		                <menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
+				    		      label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname ( rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid )"
+						  		  uri="rdf:*"/>
+					</menupopup>
+				</template>
+			</menulist>
+			<label value="Prüfungstyp" control="lehrveranstaltung-noten-pruefung-menulist-vertragstyp"/>
+			<menulist id="lehrveranstaltung-noten-pruefung-menulist-vertragstyp"
+				      datasources="'.APP_ROOT.'rdf/vertragstyp.rdf.php" flex="1"
+				      ref="http://www.technikum-wien.at/vertragstyp"
+		              minwidth="250"
+				      >
+				<template>
+					<menupopup>
+		                <menuitem value="rdf:http://www.technikum-wien.at/vertragstyp/rdf#vertragstyp_kurzbz"
+				    		      label="rdf:http://www.technikum-wien.at/vertragstyp/rdf#vertragstyp_bezeichnung"
+						  		  uri="rdf:*"/>
+					</menupopup>
+				</template>
+			</menulist>
+			<label value="Satz pro Prüfung" control="lehrveranstaltung-noten-pruefung-textbox-satz"/>
+			<textbox id="lehrveranstaltung-noten-pruefung-textbox-satz" size="2" oninput="LehrveranstaltungNotenPruefungCalculate()"/>
+			<label value="Anzahl Prüfungen" control="lehrveranstaltung-noten-pruefung-textbox-anzahl"/>
+			<textbox id="lehrveranstaltung-noten-pruefung-textbox-anzahl" size="2" oninput="LehrveranstaltungNotenPruefungCalculate()"/>
+			<label value="0.0" id="lehrveranstaltung-noten-pruefung-label-gesamt"/>
+			<spacer flex="1"/>
+		</hbox>
+		<hbox>
+			<label value="Anmerkung" control="lehrveranstaltung-noten-pruefung-textbox-anmerkung"/>
+			<textbox id="lehrveranstaltung-noten-pruefung-textbox-anmerkung" size="60"/>
+			<button id="lehrveranstaltung-noten-pruefung-button-save" label="Speichern" oncommand="LehrveranstaltungNotenPruefungSave();" />
+		</hbox>
+	</vbox>
 	</groupbox>
 </hbox>';
 }

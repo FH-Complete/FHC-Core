@@ -2473,6 +2473,7 @@ function LehrveranstaltungNotenPruefungCalculate()
 
 	var gesamt = satz*anzahl;
 	document.getElementById('lehrveranstaltung-noten-pruefung-label-gesamt').value=gesamt;
+	document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anmerkung').value=satz+'€ * '+anzahl;
 }
 
 function LehrveranstaltungNotenPruefungSave()
@@ -2481,6 +2482,7 @@ function LehrveranstaltungNotenPruefungSave()
 	var satz = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-satz').value;
 	var anzahl = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anzahl').value;
 	var vertragstyp_kurzbz = document.getElementById('lehrveranstaltung-noten-pruefung-menulist-vertragstyp').value;
+	var anmerkung = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anmerkung').value;
 	satz = satz.replace(',','.');
 
     if(mitarbeiter_uid == '' || satz == '' || anzahl == '' || vertragstyp_kurzbz=='')
@@ -2518,7 +2520,7 @@ function LehrveranstaltungNotenPruefungSave()
 	req.add('vertragstyp_kurzbz', vertragstyp_kurzbz);
 	req.add('betrag', gesamt);
 	req.add('bezeichnung', 'Pruefungshonorar '+lv_studiengang+' '+lv_semester+' '+lv_bezeichnung+' '+lehrveranstaltung_id);
-	req.add('anmerkung', satz+'€ * '+anzahl);
+	req.add('anmerkung', anmerkung);
 	req.add('vertragsdatum', datum);
 	req.add('lehrveranstaltung_id',lehrveranstaltung_id);
 
@@ -2539,5 +2541,6 @@ function LehrveranstaltungNotenPruefungSave()
 		document.getElementById('lehrveranstaltung-noten-pruefung-textbox-satz').value='';
 		document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anzahl').value='';
 		document.getElementById('lehrveranstaltung-noten-pruefung-label-gesamt').value='';
+		document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anmerkung').value='';
 	}
 }
