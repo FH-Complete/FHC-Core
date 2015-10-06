@@ -1139,6 +1139,7 @@ if(!$error)
 					    $rolle->datum = $_POST['datum'];
 					    $rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
 					    $rolle->studienplan_id = $_POST['studienplan_id'];
+                        $rolle->anmerkung_status = $_POST['anmerkung'];
 
 					    if($rolle->save_rolle())
 						    $return = true;
