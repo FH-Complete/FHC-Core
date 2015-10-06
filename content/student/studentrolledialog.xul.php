@@ -109,7 +109,7 @@ $db = new basis_db();
 				<row>
 					<label value="Studiensemester" control="student-rolle-menulist-studiensemester"/>
 					<menulist id="student-rolle-menulist-studiensemester" 
-					          datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php" flex="1"
+					          datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php?order=desc" flex="1"
 					          ref="http://www.technikum-wien.at/studiensemester/liste" >
 						<template>
 							<menupopup>
