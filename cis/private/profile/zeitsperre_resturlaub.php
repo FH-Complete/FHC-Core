@@ -220,6 +220,7 @@ function showHideBezeichnungDropDown()
 		str += '<option value="Ableben P/K/E">f) Ableben Partner/Kinder/Elternteil</option>';
 		str += '<option value="Bestattung G/S/G">g) Teilnahme an Bestattung Geschwister/Schwiegereltern/eigener Großeltern</option>';
 		str += '<option value="Wohnungswechsel">h) Wohnungswechsel in eigenen Haushalt</option>';
+		str += '<option value="Bundesheer">i) Einberufung Bundesheer</option>';
 		str += '</select>';
 				
 		sp.innerHTML = str;
