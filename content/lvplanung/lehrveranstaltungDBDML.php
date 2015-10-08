@@ -865,6 +865,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_del_lvplan')
 	{
+		//Pruefen ob diese Gruppe im Stundenplan schon verplant wurde
 		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
@@ -897,9 +898,69 @@ if(!$error)
 			$errormsg = 'Lehreinheit wurde nicht gefunden';
 		}
 
-		//Pruefen ob diese Gruppe im Stundenplan schon verplant wurde
+		// Wenn nur noch diese eine Gruppe im LVPlan verplant ist, dann wird das loeschen verhindert
+		// da sonst der gesamte LVPlan der Lehreinheit weg ist
+		$qry = "SELECT
+					distinct studiengang_kz, semester, verband, gruppe, gruppe_kurzbz
+				FROM
+					lehre.tbl_stundenplandev
+				WHERE
+					lehreinheit_id=(SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id=".$db->db_add_param($_POST['lehreinheitgruppe_id'], FHC_INTEGER).")";
+
+		if($result = $db->db_query($qry))
+		{
+			if($db->db_num_rows($result)<2)
+			{
+				$error = true;
+				$return = false;
+				$errormsg='Diese Gruppe kann nicht aus dem LVPlan entfernt werden da dies die letzte verplante Gruppe ist';
+			}
+		}
+
+		// Wenn Ressourcen an einem der Stundenplaneintraege haengen die geloescht werden wuerden
+		// dann wird das loeschen verhindert
+		$qry = "SELECT
+					1
+				FROM
+					lehre.tbl_stundenplandev
+					JOIN lehre.tbl_stundenplan_betriebsmittel USING(stundenplandev_id)
+					JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id)
+				WHERE
+					tbl_lehreinheitgruppe.lehreinheitgruppe_id=".$db->db_add_param($_POST['lehreinheitgruppe_id'], FHC_INTEGER)."
+					AND
+					(
+						(
+							tbl_lehreinheitgruppe.gruppe_kurzbz is not null
+							AND
+							tbl_lehreinheitgruppe.gruppe_kurzbz=tbl_stundenplandev.gruppe_kurzbz
+						)
+						OR
+						(
+							tbl_lehreinheitgruppe.gruppe_kurzbz is null
+							AND
+							tbl_lehreinheitgruppe.studiengang_kz=tbl_stundenplandev.studiengang_kz
+							AND
+							tbl_lehreinheitgruppe.semester=tbl_stundenplandev.semester
+							AND
+							tbl_lehreinheitgruppe.verband = tbl_stundenplandev.verband
+							AND
+							tbl_lehreinheitgruppe.gruppe = tbl_stundenplandev.gruppe
+						)
+					)";
+
+		if($result = $db->db_query($qry))
+		{
+			if($db->db_num_rows($result)>0)
+			{
+				$return = false;
+				$error = true;
+				$errormsg = 'Gruppe kann nicht entfernt werden da bereits Ressourcen zugeordnet wurden';
+			}
+		}
+
 		if(!$error)
 		{
+
 			$qry = "DELETE FROM lehre.tbl_stundenplandev
 					WHERE
 						(lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband,'')), trim(COALESCE(gruppe,'')), trim(COALESCE(gruppe_kurzbz,''))) =
