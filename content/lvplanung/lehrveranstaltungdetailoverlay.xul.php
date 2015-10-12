@@ -57,6 +57,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<popupset>
 		<menupopup id="lehrveranstaltung-lektor-tree-popup">
 			<menuitem label="Entfernen" oncommand="LeMitarbeiterDel();" />
+			<?php
+			if($rechte->isBerechtigt('lv-plan/lektorentfernen'))
+			{
+				echo '<menuseparator />';
+				echo '<menuitem label="Stunden aus LV-Plan entfernen" oncommand="LeLektorDelLVPlan();" />';
+			}
+			?>
 		</menupopup>
 	</popupset>
 	<popupset>
@@ -329,6 +336,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					    	class="sortDirectionIndicator"
 					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#lehreinheit_id"/>
 					    <splitter class="tree-splitter"/>
+						<treecol id="lehrveranstaltung-lehreinheitmitarbeiter-treecol-verplant" label="Verplant" flex="2" hidden="false"
+					    	class="sortDirectionIndicator"
+					    	sort="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#verplant"/>
+					    <splitter class="tree-splitter"/>
 					</treecols>
 					<template>
 						<rule>
@@ -339,6 +350,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#vorname"   />
 										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#mitarbeiter_uid"   />
 										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#lehreinheit_id"   />
+										<treecell src="../skin/images/verplant_rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#verplant^.png"   />
 					 				</treerow>
 					 			</treeitem>
 					 		</treechildren>

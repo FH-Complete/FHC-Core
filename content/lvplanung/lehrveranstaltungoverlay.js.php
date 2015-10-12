@@ -1308,7 +1308,7 @@ function LeGruppeDel()
 }
 
 // ****
-// * Loescht den LVPlan einer Gruppe zu einer aus dem LVPlan
+// * Loescht den LVPlan einer Gruppe zu einer Lehreinheit aus dem LVPlan
 // ****
 function LeGruppeDelLVPlan()
 {
@@ -1356,6 +1356,61 @@ function LeGruppeDelLVPlan()
 	{
 		//Refresh des Trees
 		LeDetailGruppeTreeRefresh();
+		LvTreeRefresh();
+	}
+}
+
+// ****
+// * Loescht den LVPlan eines Lektors zu einer Lehreinheit aus dem LVPlan
+// ****
+function LeLektorDelLVPlan()
+{
+	tree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');
+
+	//Nachsehen ob Lektor markiert wurde
+	var idx;
+	if(tree.currentIndex>=0)
+		idx = tree.currentIndex;
+	else
+	{
+		alert('Bitte zuerst einen Lektor markieren');
+		return false;
+	}
+
+	try
+	{
+		//Lehreinheit_id holen
+		var col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id"] : "lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id";
+		var lehreinheit_id=tree.view.getCellText(idx,col);
+		var col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid"] : "lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid";
+		var mitarbeiter_uid=tree.view.getCellText(idx,col);
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+
+	if(!confirm("Sind Sie sicher dass Sie diesen Mitarbeiter aus dem LVPlan entfernen wollen?"))
+		return false;
+
+	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
+
+	req.add('type', 'lehreinheit_lektor_del_lvplan');
+	req.add('lehreinheit_id', lehreinheit_id);
+	req.add('mitarbeiter_uid', mitarbeiter_uid);
+
+	var response = req.executePOST();
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		//Refresh des Trees
+		LeLektorTreeRefresh();
 		LvTreeRefresh();
 	}
 }
