@@ -3477,6 +3477,18 @@ if($result = $db->db_query("SELECT 1 FROM public.tbl_funktion WHERE funktion_kur
 	}
 }
 
+// BIS-Verwendung
+if(!@$db->db_query("SELECT inkludierte_lehre FROM bis.tbl_bisverwendung LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_bisverwendung ADD COLUMN inkludierte_lehre smallint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>BIS-Verwendung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>BIS-Verwendung inkludierte_lehre hinzugefuegt';
+
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -3489,7 +3501,7 @@ $tabellen=array(
 	"bis.tbl_besqual"  => array("besqualcode","besqualbez"),
 	"bis.tbl_bisfunktion"  => array("bisverwendung_id","studiengang_kz","sws","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_bisio"  => array("bisio_id","mobilitaetsprogramm_code","nation_code","von","bis","zweck_code","student_uid","updateamum","updatevon","insertamum","insertvon","ext_id","ort","universitaet","lehreinheit_id"),
-	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art"),
+	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre"),
 	"bis.tbl_bundesland"  => array("bundesland_code","kurzbz","bezeichnung"),
 	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
@@ -3974,7 +3986,7 @@ foreach($berechtigungen as $row)
 }
 if($neue==false)
 	echo '<br>Keine neuen Berechtigungen';
-	
+
 // ******** Pruefen ob die Webservice Berechtigungen alle gesetzt sind **********
 
 echo '<h2>Webservice Berechtigungen pruefen</h2>';
