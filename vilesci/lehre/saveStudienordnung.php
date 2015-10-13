@@ -79,12 +79,11 @@ if(mb_stristr($method,'save'))
 
 	$loaddata=json_decode($_REQUEST['loaddata'], true);
 	$savedata=json_decode($_REQUEST['savedata'], true);
-	
 	if(!$rechte->isBerechtigt('lehre/studienordnung'))
 	{
-	    if(!$rechte->isBerechtigt("'lehre/studienordnungInaktiv'"))
+	    if(!$rechte->isBerechtigt("lehre/studienordnungInaktiv"))
 	    {
-		die('Sie haben keine Berechtigung fuer diesen Vorgang.');
+		die('Sie haben keine Berechtigung fuer diesen Vorgang. Recht: lehre/studienordnung');
 	    }
 	    else
 	    {
@@ -143,6 +142,13 @@ if(mb_stristr($method,'save'))
 			$obj->$key=$value;
 		}
 	}
+}
+elseif(mb_stristr($method,'delete'))
+{
+    if(!$rechte->isBerechtigt("lehre/studienordnung"))
+    {
+	die('Sie haben keine Berechtigung fuer diesen Vorgang.');
+    }
 }
 $return = '';
 if(!$error && ($return = call_user_func_array(array($obj, $method), $parameter)))

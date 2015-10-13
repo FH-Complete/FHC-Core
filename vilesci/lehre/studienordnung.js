@@ -83,6 +83,11 @@ function drawHeader(text)
  */
 function loadStudienordnung()
 {
+	var method = 'loadStudienordnungSTGInaktiv';
+	if(typeof initSTOs === 'undefined')
+	{
+		method = 'loadStudienordnungSTG';
+	}
 	// Ausgewaehlten Studiengang holen
 	studiengang_kz = $('#studiengang').val();
 	studiengang_bezeichnung = $( "#studiengang option:selected" ).text();
@@ -103,7 +108,7 @@ function loadStudienordnung()
 		data: {
 				"typ": "json",
 				"class": "studienordnung",
-				"method":	"loadStudienordnungSTG",
+				"method":	method,
 				"parameter_0": studiengang_kz
 			},
 		error: loadError
@@ -486,7 +491,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					var studienplan_lehrveranstaltung_id='';
 					if(data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id){
 						studienplan_lehrveranstaltung_id=data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id.value;
-						//$("#treeData").jstree.refresh();
+						$("#treeData").jstree('refresh');
 					}
 
 					// Aenderung speichern
@@ -1052,6 +1057,10 @@ function loadSemester()
 		}
 		html+="</select>";
 		$("#semesterListe").html(html);
+		if($("#neueLV").length === 0)
+			$("#lehrveranstaltung").append("<div id='neueLV'></div>");
+		
+		$("#neueLV").html("<br/><a href='./lehrveranstaltung_details.php?neu=true' target='_blank'><input type='button' value='Neue LV anlegen'></a>");
 		isLVFilterLoaded=true;
 		loadFilteredLehrveranstaltungen();
 	});
@@ -1149,7 +1158,8 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 	$.ajax(
 	{
 		dataType: "json",
-		url: "../../soap/fhcomplete.php",
+		url: "./saveStudienordnung.php",
+		//url: "../../soap/fhcomplete.php",
 		type: "POST",
 		data: {
 			"typ": "json",
@@ -1199,7 +1209,7 @@ function deleteLehrveranstaltungFromStudienplan(lehrveranstaltung_studienplan_id
 {
 	$.ajax({
 		dataType: "json",
-		url: "../../soap/fhcomplete.php",
+		url: "./saveStudienordnung.php",
 		type: "POST",
 		data: {
 			"typ": "json",
@@ -1213,7 +1223,7 @@ function deleteLehrveranstaltungFromStudienplan(lehrveranstaltung_studienplan_id
 		{
 			$.ajax({
 				dataType: "json",
-				url: "../../soap/fhcomplete.php",
+				url: "./saveStudienordnung.php",
 				type: "POST",
 				data: {
 					"typ": "json",
@@ -1284,7 +1294,7 @@ function saveStudienordnung()
 	$.ajax(
 	{
 		dataType: "json",
-		url: "../../soap/fhcomplete.php",
+		url: "./saveStudienordnung.php",
 		type: "POST",
 		data: {
 				"typ": "json",
@@ -1348,7 +1358,7 @@ function saveStudienplan()
 	$.ajax(
 	{
 		dataType: "json",
-		url: "../../soap/fhcomplete.php",
+		url: "./saveStudienordnung.php",
 		type: "POST",
 		data: {
 				"typ": "json",
@@ -1503,7 +1513,7 @@ function deleteSemesterZuordnung(ausbildungssemester_kurzbz, studiensemester)
 		var row = $("#row_"+ausbildungssemester_kurzbz);
 		$.ajax({
 			dataType: "json",
-			url: "../../soap/fhcomplete.php",
+			url: "./saveStudienordnung.php",
 			type: "POST",
 			data: {
 				"typ":"json",
@@ -1521,7 +1531,7 @@ function deleteSemesterZuordnung(ausbildungssemester_kurzbz, studiensemester)
 	{
 		$.ajax({
 			dataType: "json",
-			url: "../../soap/fhcomplete.php",
+			url: "./saveStudienordnung.php",
 			type: "POST",
 			data: {
 				"typ":"json",

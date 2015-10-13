@@ -672,13 +672,13 @@ class studienordnung extends basis_db
 	{
 		$studiensemester = new studiensemester();
 		$studiensemester->getTimestamp($studiensemester_kurzbz);
-		var_dump($this);
+
 		$semGueltigVon = $studiensemester->begin->start;
 		//$semGueltigBis = $studiensemester->ende->ende;
 		
 		$studiensemester = new studiensemester();
 		$studiensemester->getTimestamp($this->gueltigvon);
-		var_dump($studiensemester);
+
 		$stoGueltigVon = $studiensemester->begin->start;
 		
 		if($this->gueltigbis != null)

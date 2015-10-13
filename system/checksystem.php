@@ -3489,6 +3489,24 @@ if(!@$db->db_query("SELECT inkludierte_lehre FROM bis.tbl_bisverwendung LIMIT 1"
 
 }
 
+// Eigene Berechtigung fuer LV-Info Freigabe
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='lehre/studienordnungInaktiv' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/studienordnungInaktiv','Recht zur Bearbeitung inaktiver Studienordnungen');
+
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lehre/studienordnungInaktiv','assistenz','suid');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Eigene Berechtigung lehre/studienordnungInaktiv zur Bearbeitung von inaktiven Studienordnungen hinzugefuegt!<br>';
+	}
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -3869,6 +3887,7 @@ $berechtigungen = array(
 	array('lehre/reservierung','erweiterte Reservierung inkl. Lektorauswahl, Stg, Sem und Gruppe'),
 	array('lehre/reservierung:begrenzt','normale Raumreservierung im CIS'),
 	array('lehre/studienordnung','Studienordnung'),
+	array('lehre/studienordnungInaktiv','Studienordnung Inaktiv'),
 	array('lehre/vorrueckung','Lehreinheitenvorrückung'),
 	array('lv-plan','Stundenplan'),
 	array('lv-plan/gruppenentfernen','Erlaut das Entfernen von Gruppen aus LVPlan vom FAS aus'),
