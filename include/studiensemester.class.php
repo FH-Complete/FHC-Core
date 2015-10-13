@@ -289,9 +289,12 @@ class studiensemester extends basis_db
 	 *
 	 * @return true wenn ok, sonst false
 	 */
-	public function getAll()
+	public function getAll($order = null)
 	{
 		$qry = "SELECT * FROM public.tbl_studiensemester ORDER BY ende";
+        
+        if($order == "desc")
+            $qry .= " DESC";
 
 		if($this->db_query($qry))
 		{

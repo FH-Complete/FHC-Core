@@ -35,8 +35,9 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/studiensemester.class.php');
 
 // studiensemester holen
+isset($_GET['order']) ? $order = $_GET['order'] : $order = null;
 $studiensemesterDAO=new studiensemester();
-$studiensemesterDAO->getAll();
+$studiensemesterDAO->getAll($order);
 
 $rdf_url='http://www.technikum-wien.at/studiensemester';
 

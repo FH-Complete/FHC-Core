@@ -71,6 +71,17 @@ foreach ($DAO_obj->lehreinheitmitarbeiter as $row)
 			$nachname = $row_lkt->nachname;
 		}
 	}
+
+
+	$qry_verplant = "SELECT 1 FROM lehre.tbl_stundenplandev
+			WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id)."
+			AND mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid);
+
+	if($result_verplant = $db->db_query($qry_verplant))
+		if($db->db_num_rows($result_verplant)>0)
+			$verplant = true;
+		else
+			$verplant = false;
 	?>
       <RDF:li>
          <RDF:Description  id="<?php echo $row->lehreinheit_id.'/'.$row->mitarbeiter_uid; ?>"  about="<?php echo $rdf_url.'/'.$row->lehreinheit_id.'/'.$row->mitarbeiter_uid; ?>" >
@@ -85,6 +96,7 @@ foreach ($DAO_obj->lehreinheitmitarbeiter as $row)
             <LEHREINHEITMITARBEITER:faktor><![CDATA[<?php echo $row->faktor ?>]]></LEHREINHEITMITARBEITER:faktor>
             <LEHREINHEITMITARBEITER:anmerkung><![CDATA[<?php echo $row->anmerkung ?>]]></LEHREINHEITMITARBEITER:anmerkung>
             <LEHREINHEITMITARBEITER:bismelden><![CDATA[<?php echo ($row->bismelden?'Ja':'Nein') ?>]]></LEHREINHEITMITARBEITER:bismelden>
+			<LEHREINHEITMITARBEITER:verplant><![CDATA[<?php echo ($verplant?'true':'false'); ?>]]></LEHREINHEITMITARBEITER:verplant>
          </RDF:Description>
       </RDF:li>
 <?php

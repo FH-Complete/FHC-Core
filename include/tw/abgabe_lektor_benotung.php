@@ -1021,9 +1021,9 @@ else
 			Aufdecken und Darstellen von gr&ouml;&szlig;eren (z.B. wirtschaftlichen und sozialen) Zusammenh&auml;ngen und entsprechende Diskussion</td>
 			<td width="30%"><textarea name="hintergrund" value="'.$db->convert_html_chars($hintergrund).'" cols="50" rows="10" 
 			onKeyDown="txtcount(this.form.hintergrund,this.form.remLen3,500);" onKeyUp="txtcount(this.form.hintergrund,this.form.remLen3,500);"></textarea>
-			<br>Buchstaben noch zur Verf&uuml;gung<input readonly disabled type=text name=remLen3 size=3 maxlength=3 value="500" style="text-align:right"></td>\n
+			<br>Buchstaben noch zur Verf&uuml;gung<input readonly disabled type=text name=remLen3 size=3 maxlength=3 value="500" style="text-align:right"></td>
 			<td width="10%" align="center"><input type="hidden" name="weight" id="weight3" value="0.25">
-			<input  type="text" name="punkte3" value="'.$db->convert_html_chars($punkte3).'" size="5" maxlength="5" id="punkte3" style="text-align:right" onkeyup="berechne()"></td>\n
+			<input  type="text" name="punkte3" value="'.$db->convert_html_chars($punkte3).'" size="5" maxlength="5" id="punkte3" style="text-align:right" onkeyup="berechne()"></td>
 			<td width="10%" align="center">0.25</td>
 			<td width="10%" align="center"><input type="text" name="punkteges3" value="'.$db->convert_html_chars($punkteges3).'" id="punkteges3" style="text-align:right" size="5" maxlength="5" readonly></td></tr>';
 		}

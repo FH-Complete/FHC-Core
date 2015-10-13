@@ -31,12 +31,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 if(isset($_GET['mitarbeiter_uid']))
 	$mitarbeiter_uid=$_GET['mitarbeiter_uid'];
-else 
+else
 	die('MitarbeiterUID muss uebergeben werden');
 
 if(isset($_GET['bisverwendung_id']))
 	$bisverwendung_id = $_GET['bisverwendung_id'];
-else 
+else
 	$bisverwendung_id = '';
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
@@ -52,7 +52,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	onload="MitarbeiterVerwendungInit('<?php echo $mitarbeiter_uid."',".($bisverwendung_id!=''?$bisverwendung_id:"''");?>)"
 	>
-	
+
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeiterverwendungdialog.js.php" />
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />
 
@@ -110,7 +110,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 				<label value="Verwendung" control="mitarbeiter-verwendung-detail-menulist-verwendung"/>
 				<menulist id="mitarbeiter-verwendung-detail-menulist-verwendung"
 				          datasources="<?php echo APP_ROOT ?>rdf/verwendung.rdf.php" flex="1"
-			              ref="http://www.technikum-wien.at/verwendung/liste" 
+			              ref="http://www.technikum-wien.at/verwendung/liste"
 			              oncommand="MitarbeiterVerwendungVerwendungChange()">
 					<template>
 						<menupopup>
@@ -145,7 +145,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
       		</row>
       		<row>
       			<label value="Beginn" control="mitarbeiter-verwendung-detail-datum-beginn"/>
-				<box class="Datum" id="mitarbeiter-verwendung-detail-datum-beginn" />				
+				<box class="Datum" id="mitarbeiter-verwendung-detail-datum-beginn" />
       		</row>
       		<row>
       			<label value="Ende" control="mitarbeiter-verwendung-detail-datum-ende"/>
@@ -159,6 +159,10 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
       			<label value="DV-Art" control="mitarbeiter-verwendung-detail-textbox-dv_art" />
       			<textbox id="mitarbeiter-verwendung-detail-textbox-dv_art" />
       		</row>
+			<row>
+      			<label value="Inkludierte Lehre" control="mitarbeiter-verwendung-detail-textbox-inkludierte_lehre" />
+      			<textbox id="mitarbeiter-verwendung-detail-textbox-inkludierte_lehre" />
+      		</row>
       		<row>
       			<spacer />
       			<hbox>
@@ -167,7 +171,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
       			</hbox>
       		</row>
 		</rows>
-	</grid>	
+	</grid>
 </groupbox>
 
 </window>

@@ -46,6 +46,7 @@ if (!$db = new basis_db())
 	die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
 	
 $user = get_uid();
+
 $datum = new datum();
 
 if (check_infrastruktur($user))
@@ -62,7 +63,7 @@ else
 $activities_str = "'".implode("','", $activities)."'";
 
 // definiert bis zu welchem Datum die Eintragung nicht mehr möglich ist
-$gesperrt_bis = '2015-01-31';
+$gesperrt_bis = '2015-08-31';
 $sperrdatum = date('c', strtotime($gesperrt_bis));
 
 $zeitaufzeichnung_id = (isset($_GET['zeitaufzeichnung_id'])?$_GET['zeitaufzeichnung_id']:'');
@@ -108,7 +109,7 @@ $addon_obj = new addon();
 $addon_obj->loadAddons();
 foreach($addon_obj->result as $addon)
 {
-	if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php') && check_infrastruktur($user))
+	if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
 		echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
 }
 
@@ -456,12 +457,17 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 								}
 							}
 							
-							if(!$zeit->save())
-							{
-								echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$zeit->errormsg.'</b>('.$zeit->start.')</span>';
+							if($data[2] != $data[3])
+							{							
+								if(!$zeit->save())
+								{
+									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$zeit->errormsg.'</b>('.$zeit->start.')</span>';
+								}
+								else 
+									$anzahl++;
 							}
 							else 
-								$anzahl++;
+								$anzahl++;					
 							$ende_vorher = $zeit->ende;
 						}
 					}

@@ -116,7 +116,7 @@
 			echo '<td>'.$row['parent']->buchungstext.'</td>';
 			echo '<td align="right">'.($betrag<0?'-':($betrag>0?'+':'')).sprintf('%.2f',abs($row['parent']->betrag)).' €</td>';
 			echo '<td align="center">';
-			if($betrag==0 && $row['parent']->betrag<0)
+			if($betrag==0 && $row['parent']->betrag<=0)
 				echo '<a href="../pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid='.$uid.'&buchungsnummern='.$row['parent']->buchungsnr.'" title="'.$p->t('tools/bestaetigungDrucken').'"><img src="../../../skin/images/pdfpic.gif" alt="'.$p->t('tools/bestaetigungDrucken').'"></a>';
 			elseif($row['parent']->betrag>0)
 			{

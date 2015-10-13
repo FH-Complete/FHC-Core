@@ -118,7 +118,7 @@ elseif(isset($_REQUEST['von']) && isset($_REQUEST['bis']) && $_REQUEST['xmlforma
 		) a
 		JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 		JOIN public.tbl_studiengang USING(studiengang_kz)
-	ORDER BY datum, von, ort_kurzbz';
+	ORDER BY datum, ort_kurzbz,von';
 
 	$stunde = new stunde();
 	$stunde->loadAll();

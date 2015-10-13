@@ -479,13 +479,22 @@ class moodle24_user extends basis_db
 	{
 		if(!isset($this->gruppenzuordnungen[$groupid]))
 		{
-			$client = new SoapClient($this->serverurl);
-			$response = $client->core_group_get_group_members(array($groupid));
-
-			if(isset($response[0]['userids']))
+			try
 			{
-				$this->gruppenzuordnungen[$groupid]=$response[0]['userids'];
+				$client = new SoapClient($this->serverurl);
+				$response = $client->core_group_get_group_members(array($groupid));
+
+				if(isset($response[0]['userids']))
+				{
+					$this->gruppenzuordnungen[$groupid]=$response[0]['userids'];
+				}
 			}
+			catch (SoapFault $E)
+			{
+				$this->errormsg.="SOAP Fehler beim Laden der Gruppenzuordnung: ".$E->faultstring;
+				return false;
+			}
+
 		}
 
 		foreach($this->gruppenzuordnungen[$groupid] as $id)
@@ -680,12 +689,19 @@ class moodle24_user extends basis_db
 			$data->userid=$this->mdl_user_id;
 			$data->courseid=$mdl_course_id;
 
-			$client = new SoapClient($this->serverurl);
-			$client->enrol_manual_enrol_users(array($data));
-			// WS-Funktion enrol_manual_enrol_users liefert immer null zurück
-			// Fehler bei der Zuordnung koennen daher nicht abgefangen werden.
-			// Eventuell sollten hier nochmals die Teilnehmer des Kurses geladen werden
-			// um zu pruefen ob die Zuordnung erfolgreich war.
+			try
+			{
+				$client = new SoapClient($this->serverurl);
+				$client->enrol_manual_enrol_users(array($data));
+				// WS-Funktion enrol_manual_enrol_users liefert immer null zurück
+				// Fehler bei der Zuordnung koennen daher nicht abgefangen werden.
+				// Eventuell sollten hier nochmals die Teilnehmer des Kurses geladen werden
+				// um zu pruefen ob die Zuordnung erfolgreich war.
+			}
+			catch (SoapFault $E)
+			{
+				$this->errormsg.="SOAP Fehler beim Zuordnen der User: ".$E->faultstring.' '.(isset($E->detail)?$E->detail:'');
+			}
 		}
 
 		return true;
@@ -717,8 +733,16 @@ class moodle24_user extends basis_db
 
 			$param[]=$data;
 		}
-		$client = new SoapClient($this->serverurl);
-		$client->enrol_manual_enrol_users($param);
+
+		try
+		{
+			$client = new SoapClient($this->serverurl);
+			$client->enrol_manual_enrol_users($param);
+		}
+		catch (SoapFault $E)
+		{
+			$this->errormsg.="SOAP Fehler beim Zuordnen der User: ".$E->faultstring.' '.(isset($E->detail)?$E->detail:'');
+		}
 
 		return true;
 	}

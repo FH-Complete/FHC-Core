@@ -66,6 +66,7 @@ require_once('../../include/anrechnung.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/anwesenheit.class.php');
 require_once('../../include/benutzerfunktion.class.php');
+require_once('../../include/note.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -150,6 +151,114 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 	}
 }
 
+/**
+ * Wenn die Anwesenheit und einen bestimmten Prozentsatz faellt, wird ein Pruefungstermin abgezogen
+ * @param $studiensemester_kurzbz
+ * @param $student_uid
+ * @param $lehrveranstaltung_id
+ * @param $note
+ * @return null, error wird direkt in globale Variable geschrieben
+ */
+function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $note)
+{
+	global $return, $error, $errormsg;
+
+	$db = new basis_db();
+    $anwesenheit = new anwesenheit();
+    $anwesenheit->loadAnwesenheitStudiensemester($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id);
+
+    // Lehreinheit ermitteln
+    $error = false;
+    $qry = "SELECT lehreinheit_id FROM campus.vw_student_lehrveranstaltung "
+         . "WHERE uid=".$db->db_add_param($student_uid)." AND lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id)." "
+         . "ORDER BY lehreinheit_id ASC "
+         . "LIMIT 1";
+
+    if($result = $db->db_query($qry))
+    {
+        if($row = $db->db_fetch_object($result))
+        {
+            $lehreinheit_id = $row->lehreinheit_id;
+        }
+        else
+        {
+            $return = false;
+            $error = true;
+            $errormsg = 'Fehler beim Ermitteln der Lehreinheit ID';
+        }
+    }
+    else
+    {
+        $return = false;
+        $error = true;
+        $errormsg = 'Fehler beim Ermitteln der Lehreinheit ID';
+    }
+
+    if(!$error)
+    {
+        $pruefung = new pruefung;
+        $pruefung->new = true;
+        $pruefung->student_uid = $student_uid;
+        $pruefung->lehreinheit_id = $lehreinheit_id;
+        $pruefung->datum = date("Y-m-d");
+
+		$stsem_obj = new studiensemester();
+		$stsem_obj->load($studiensemester_kurzbz);
+
+		// In Benutzerfunktion nachsehen ob eine Anwesenheitsbefreiung eingetragen ist
+		$benutzerfunktion = new benutzerfunktion();
+		$benutzerfunktion->getBenutzerFunktionByUid($student_uid, 'awbefreit', $stsem_obj->start, $stsem_obj->ende);
+
+		$anwesenheitsbefreit=false;
+		if(count($benutzerfunktion->result)>0)
+			$anwesenheitsbefreit=true;
+
+		// Wenn nicht Anwesenheitsbefreit und Anwesenheit unter einem bestimmten Prozentsatz faellt dann wird ein
+		// Pruefungsantritt abgezogen
+        if(isset($anwesenheit->result[0]) && $anwesenheit->result[0]->prozent < FAS_ANWESENHEIT_ROT && !$anwesenheitsbefreit)
+        {
+            // 1. Termin mit "nicht beurteilt" erstellen
+            $pruefung->pruefungstyp_kurzbz = "Termin1";
+            $pruefung->note = 7;
+            if($pruefung->save())
+            {
+                // 2. Termin mit Note erstellen
+                $pruefung->pruefungstyp_kurzbz = "Termin2";
+                $pruefung->note = $note;
+                if($pruefung->save())
+                {
+                    $return = true;
+                }
+                else
+                {
+                    $errormsg = $pruefung->errormsg;
+                    $return = false;
+                }
+            }
+            else
+            {
+                $errormsg = $pruefung->errormsg;
+                $return = false;
+            }
+        }
+        else
+        {
+            // 1. Termin mit Note erstellen
+            $pruefung->pruefungstyp_kurzbz = "Termin1";
+            $pruefung->note = $note;
+
+            if($pruefung->save())
+            {
+                $return = true;
+            }
+            else
+            {
+                $errormsg = $pruefung->errormsg;
+                $return = false;
+            }
+        }
+    }
+}
 
 if(!$error)
 {
@@ -1030,6 +1139,7 @@ if(!$error)
 					    $rolle->datum = $_POST['datum'];
 					    $rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
 					    $rolle->studienplan_id = $_POST['studienplan_id'];
+                        $rolle->anmerkung_status = $_POST['anmerkung'];
 
 					    if($rolle->save_rolle())
 						    $return = true;
@@ -2587,101 +2697,8 @@ if(!$error)
 
                     if(FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $return == true && $noten->new == true)
                     {
-                        $anwesenheit = new anwesenheit();
-                        $anwesenheit->loadAnwesenheitStudiensemester($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id);
-
-                        // Lehreinheit ermitteln
-                        $error = false;
-                        $qry = "SELECT lehreinheit_id FROM campus.vw_student_lehrveranstaltung "
-                             . "WHERE uid=".$db->db_add_param($student_uid)." AND lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id)." "
-                             . "ORDER BY lehreinheit_id ASC "
-                             . "LIMIT 1";
-
-                        if($result = $db->db_query($qry))
-                        {
-                            if($row = $db->db_fetch_object($result))
-                            {
-                                $lehreinheit_id = $row->lehreinheit_id;
-                            }
-                            else
-                            {
-                                $return = false;
-                                $error = true;
-                                $errormsg = 'Fehler beim Ermitteln der Lehreinheit ID';
-                            }
-                        }
-                        else
-                        {
-                            $return = false;
-                            $error = true;
-                            $errormsg = 'Fehler beim Ermitteln der Lehreinheit ID';
-                        }
-
-                        if(!$error)
-                        {
-                            $pruefung = new pruefung;
-                            $pruefung->new = true;
-                            $pruefung->student_uid = $student_uid;
-                            $pruefung->lehreinheit_id = $lehreinheit_id;
-                            $pruefung->datum = date("Y-m-d");
-
-							$stsem_obj = new studiensemester();
-							$stsem_obj->load($studiensemester_kurzbz);
-
-							// In Benutzerfunktion nachsehen ob eine Anwesenheitsbefreiung eingetragen ist
-							$benutzerfunktion = new benutzerfunktion();
-							$benutzerfunktion->getBenutzerFunktionByUid($student_uid, 'awbefreit', $stsem_obj->start, $stsem_obj->ende);
-
-							$anwesenheitsbefreit=false;
-							if(count($benutzerfunktion->result)>0)
-								$anwesenheitsbefreit=true;
-
-							// Wenn nicht Anwesenheitsbefreit und Anwesenheit unter einem bestimmten Prozentsatz faellt dann wird ein
-							// Pruefungsantritt abgezogen
-                            if(isset($anwesenheit->result[0]) && $anwesenheit->result[0]->prozent < FAS_ANWESENHEIT_ROT && !$anwesenheitsbefreit)
-                            {
-                                // 1. Termin mit "nicht beurteilt" erstellen
-                                $pruefung->pruefungstyp_kurzbz = "Termin1";
-                                $pruefung->note = 7;
-                                if($pruefung->save())
-                                {
-                                    // 2. Termin mit Note erstellen
-                                    $pruefung->pruefungstyp_kurzbz = "Termin2";
-                                    $pruefung->note = $noten->note;
-                                    if($pruefung->save())
-                                    {
-                                        $return = true;
-                                    }
-                                    else
-                                    {
-                                        $errormsg = $pruefung->errormsg;
-                                        $return = false;
-                                    }
-                                }
-                                else
-                                {
-                                    $errormsg = $pruefung->errormsg;
-                                    $return = false;
-                                }
-                            }
-                            else
-                            {
-                                // 1. Termin mit Note erstellen
-                                $pruefung->pruefungstyp_kurzbz = "Termin1";
-                                $pruefung->note = $noten->note;
-
-                                if($pruefung->save())
-                                {
-                                    $return = true;
-                                }
-                                else
-                                {
-                                    $errormsg = $pruefung->errormsg;
-                                    $return = false;
-                                }
-                            }
-                        }
-                    }
+						NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $noten->note);
+					}
 				}
 			}
 		}
@@ -2791,6 +2808,13 @@ if(!$error)
 						{
 							$errormsg .= "\n".$zeugnisnote->errormsg;
 						}
+						else
+						{
+							if(FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
+				            {
+								NotePruefungAnlegen($zeugnisnote->studiensemester_kurzbz, $zeugnisnote->student_uid, $zeugnisnote->lehrveranstaltung_id, $zeugnisnote->note);
+							}
+						}
 					}
 					else
 					{
@@ -2818,18 +2842,28 @@ if(!$error)
 		$errormsg = '';
 		$angerechnet=false;
 
+		$noten_anmerkung_arr=array();
+		$note_obj = new note();
+		$note_obj->getAll();
+		foreach($note_obj->result as $row)
+			$noten_anmerkung_arr[$row->anmerkung]=$row->note;
+
 		for($i=0;$i<$_POST['anzahl'];$i++)
 		{
 			if($_POST['matrikelnummer_'.$i]!='')
 			{
 				$zeugnisnote = new zeugnisnote();
 				$error = false;
-				if(!is_numeric(trim($_POST['matrikelnummer_'.$i])) || (isset($_POST['note_'.$i]) && !is_numeric($_POST['note_'.$i])))
+				if(!is_numeric(trim($_POST['matrikelnummer_'.$i])))
 				{
 					$error = true;
-					$errormsg = "\nMatrikelnummer oder Note ist ungueltig: ".$_POST['matrikelnummer_'.$i].' - '.$_POST['note_'.$i];
+					$errormsg = "\nMatrikelnummer ist ungueltig: ".$_POST['matrikelnummer_'.$i];
 				}
-
+				if((isset($_POST['note_'.$i]) && !is_numeric($_POST['note_'.$i]) && !isset($noten_anmerkung_arr[$_POST['note_'.$i]])))
+				{
+					$error = true;
+					$errormsg = "\nNote ist ungueltig: ".$_POST['note_'.$i];
+				}
 				if(!$error)
 				{
 					$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE trim(matrikelnr)=".$db->db_add_param(trim($_POST['matrikelnummer_'.$i]));
@@ -2911,6 +2945,12 @@ if(!$error)
 							{
 								$zeugnisnote->note = $_POST['note_'.$i];
 								$zeugnisnote->punkte = null;
+								// Wenn es nicht numerisch ist, dann nachsehen ob es eine anmerkung gibt die so heisst
+								// zB fuer met, nb, ar, etc
+								if(!is_numeric($zeugnisnote->note) && isset($noten_anmerkung_arr[$zeugnisnote->note]))
+								{
+									$zeugnisnote->note = $noten_anmerkung_arr[$zeugnisnote->note];
+								}
 							}
 							elseif(isset($_POST['punkte_'.$i]))
 							{
@@ -2927,91 +2967,13 @@ if(!$error)
 							{
 								$errormsg .= "\n".$zeugnisnote->errormsg;
 							}
-
-                            if(FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $errormsg == '' && $zeugnisnote->new == true)
-                            {
-                                $anwesenheit = new anwesenheit();
-                                $anwesenheit->loadAnwesenheitStudiensemester($semester_aktuell, $uid, $_POST['lehrveranstaltung_id']);
-
-                                // Lehreinheit ermitteln
-                                $error = false;
-                                $qry = "SELECT lehreinheit_id FROM campus.vw_student_lehrveranstaltung "
-                                     . "WHERE uid=".$db->db_add_param($uid)." AND lehrveranstaltung_id=".$db->db_add_param($_POST['lehrveranstaltung_id'])." "
-                                     . "ORDER BY lehreinheit_id ASC "
-                                     . "LIMIT 1";
-
-                                if($result = $db->db_query($qry))
-                                {
-                                    if($row = $db->db_fetch_object($result))
-                                    {
-                                        $lehreinheit_id = $row->lehreinheit_id;
-                                    }
-                                    else
-                                    {
-                                        $return = false;
-                                        $error = true;
-                                        $errormsg = 'Fehler beim Ermitteln der Lehreinheit ID';
-                                    }
-                                }
-                                else
-                                {
-                                    $return = false;
-                                    $error = true;
-                                    $errormsg = 'Fehler beim Ermitteln der Lehreinheit ID';
-                                }
-
-                                if(!$error)
-                                {
-                                    $pruefung = new pruefung;
-                                    $pruefung->new = true;
-                                    $pruefung->student_uid = $uid;
-                                    $pruefung->lehreinheit_id = $lehreinheit_id;
-                                    $pruefung->datum = date("Y-m-d");
-
-                                    if(isset($anwesenheit->result[0]) && $anwesenheit->result[0]->prozent < FAS_ANWESENHEIT_ROT)
-                                    {
-                                        // 1. Termin mit "nicht beurteilt" erstellen
-                                        $pruefung->pruefungstyp_kurzbz = "Termin1";
-                                        $pruefung->note = 7;
-                                        if($pruefung->save())
-                                        {
-                                            // 2. Termin mit Note erstellen
-                                            $pruefung->pruefungstyp_kurzbz = "Termin2";
-                                            $pruefung->note = $zeugnisnote->note;
-                                            if($pruefung->save())
-                                            {
-                                                $return = true;
-                                            }
-                                            else
-                                            {
-                                                $errormsg = $pruefung->errormsg;
-                                                $return = false;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            $errormsg = $pruefung->errormsg;
-                                            $return = false;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // 1. Termin mit Note erstellen
-                                        $pruefung->pruefungstyp_kurzbz = "Termin1";
-                                        $pruefung->note = $zeugnisnote->note;
-
-                                        if($pruefung->save())
-                                        {
-                                            $return = true;
-                                        }
-                                        else
-                                        {
-                                            $errormsg = $pruefung->errormsg;
-                                            $return = false;
-                                        }
-                                    }
-                                }
-                            }
+							else
+							{
+								if(FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
+						        {
+									NotePruefungAnlegen($semester_aktuell, $uid, $_POST['lehrveranstaltung_id'], $zeugnisnote->note);
+								}
+							}
 						}
 					}
 				}
