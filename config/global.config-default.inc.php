@@ -86,6 +86,9 @@ define('LVPLAN_SYNC_ENDE','');
 // Soll nach dem LVPlan Sync automatisch das Horde Sync angestoßen werden
 define('LVPLAN_HORDE_SYNC',false);
 
+// Format der Tagesinfo im Tempus %t = Wochentag %b = Begin der Stunde %e = Ende der Stunde %s = Stunde
+define('TEMPUS_TAGESINFO_FORMAT','%t %b');
+
 /*
  * VORRUECKUNG_LEHRVERBAND_MAX_SEMESTER
  * leer: Studentlehrverband Semester wird bei der Vorrueckung normal weitergezaehlt bis zum max_semester des Studienganges
