@@ -3507,6 +3507,29 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+// Mehrsprachigkeit fuer ZGV
+if(!@$db->db_query("SELECT bezeichnung FROM bis.tbl_zgv LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE bis.tbl_zgv ADD COLUMN bezeichnung varchar(64)[];
+	ALTER TABLE bis.tbl_zgvmaster ADD COLUMN bezeichnung varchar(64)[];
+	ALTER TABLE bis.tbl_zgvdoktor ADD COLUMN bezeichnung varchar(64)[];
+
+	UPDATE bis.tbl_zgv SET bezeichnung[1]=zgv_bez;
+	UPDATE bis.tbl_zgv SET bezeichnung[2]=zgv_bez;
+	UPDATE bis.tbl_zgvmaster SET bezeichnung[1]=zgvmas_bez;
+	UPDATE bis.tbl_zgvmaster SET bezeichnung[2]=zgvmas_bez;
+	UPDATE bis.tbl_zgvdoktor SET bezeichnung[1]=zgvdoktor_bez;
+	UPDATE bis.tbl_zgvdoktor SET bezeichnung[2]=zgvdoktor_bez;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_zgv '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' Mehrsprachige Bezeichnung für ZGV, Master ZGV und Doktor ZGV hinzugefügt<br>';
+}
+
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -3529,10 +3552,10 @@ $tabellen=array(
 	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre"),
 	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle"),
 	"bis.tbl_verwendung"  => array("verwendung_code","verwendungbez"),
-	"bis.tbl_zgv"  => array("zgv_code","zgv_bez","zgv_kurzbz"),
-	"bis.tbl_zgvmaster"  => array("zgvmas_code","zgvmas_bez","zgvmas_kurzbz"),
+	"bis.tbl_zgv"  => array("zgv_code","zgv_bez","zgv_kurzbz","bezeichnung"),
+	"bis.tbl_zgvmaster"  => array("zgvmas_code","zgvmas_bez","zgvmas_kurzbz","bezeichnung"),
+	"bis.tbl_zgvdoktor" => array("zgvdoktor_code", "zgvdoktor_bez", "zgvdoktor_kurzbz","bezeichnung"),
 	"bis.tbl_zweck"  => array("zweck_code","kurzbz","bezeichnung"),
-    "bis.tbl_zgvdoktor" => array("zgvdoktor_code", "zgvdoktor_bez", "zgvdoktor_kurzbz"),
 	"campus.tbl_abgabe"  => array("abgabe_id","abgabedatei","abgabezeit","anmerkung"),
 	"campus.tbl_anwesenheit"  => array("anwesenheit_id","uid","einheiten","datum","anwesend","lehreinheit_id","anmerkung","ext_id"),
 	"campus.tbl_beispiel"  => array("beispiel_id","uebung_id","nummer","bezeichnung","punkte","updateamum","updatevon","insertamum","insertvon"),
