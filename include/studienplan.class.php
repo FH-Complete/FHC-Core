@@ -1,24 +1,24 @@
 <?php
 /*
  * studienplan.class.php
- * 
- * Copyright 2013 fhcomplete.org 
-* 
+ *
+ * Copyright 2013 fhcomplete.org
+*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
+ *
  *
  * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
  * 			Stefan Puraner	<puraner@technikum-wien.at>
@@ -255,7 +255,7 @@ class studienplan extends basis_db
 	    if($this->new)
 	    {
 		    //Neuen Datensatz einfuegen
-		    $qry='BEGIN;INSERT INTO lehre.tbl_studienplan (studienordnung_id, orgform_kurzbz,version, 
+		    $qry='BEGIN;INSERT INTO lehre.tbl_studienplan (studienordnung_id, orgform_kurzbz,version,
 			    bezeichnung, regelstudiendauer, sprache, aktiv, semesterwochen, testtool_sprachwahl,
 			    insertamum, insertvon) VALUES ('.
 			  $this->db_add_param($this->studienordnung_id, FHC_INTEGER).', '.
@@ -390,7 +390,7 @@ class studienplan extends basis_db
 			    $obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
 			    $obj->pflicht = $row->pflicht;
 			    $obj->koordinator = $row->koordinator;
-			    $obj->sort = $row->sort;	
+			    $obj->sort = $row->sort;
 			    $data[]=$obj;
 		    }
 	    }
@@ -417,7 +417,7 @@ class studienplan extends basis_db
 		    $obj->studienplan_lehrveranstaltung_id_parent = $this->studienplan_lehrveranstaltung_id_parent;
 		    $obj->pflicht = $this->pflicht;
 		    $obj->koordinator = $this->koordinator;
-		    $obj->sort = $this->sort;	
+		    $obj->sort = $this->sort;
 		    $data[]=$obj;
 	    }
 	    return $data;
@@ -440,7 +440,7 @@ class studienplan extends basis_db
 		    return false;
 	    }
 
-	    $qry = "SELECT 1 FROM 
+	    $qry = "SELECT 1 FROM
 				    lehre.tbl_studienplan_lehrveranstaltung
 			    WHERE
 				    studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER).
@@ -454,7 +454,7 @@ class studienplan extends basis_db
 	    if($this->db_num_rows()!=0)
 	    {
 		    return true;
-	    } 
+	    }
 	    else
 	    {
 		    return false;
@@ -465,10 +465,10 @@ class studienplan extends basis_db
      * Speichert die Zuordnung einer Lehrveranstaltung zu einem Studienplan
      * @return true wenn ok, false im Fehlerfall
      */
-    public function saveStudienplanLehrveranstaltung() 
+    public function saveStudienplanLehrveranstaltung()
     {
 
-	    if ($this->new) 
+	    if ($this->new)
 	    {
 		    //Neuen Datensatz einfuegen
 		    $qry = 'BEGIN;INSERT INTO lehre.tbl_studienplan_lehrveranstaltung (studienplan_id, lehrveranstaltung_id,
@@ -482,11 +482,11 @@ class studienplan extends basis_db
 				    $this->db_add_param($this->koordinator) . ', ' .
 				    'now(), ' .
 				    $this->db_add_param($this->insertvon) . ');';
-	    } 
-	    else 
+	    }
+	    else
 	    {
 		    //Pruefen ob studienplan_id eine gueltige Zahl ist
-		    if (!is_numeric($this->studienplan_lehrveranstaltung_id)) 
+		    if (!is_numeric($this->studienplan_lehrveranstaltung_id))
 		    {
 			    $this->errormsg = 'studienplan_lehrveranstaltung_id muss eine gueltige Zahl sein';
 			    return false;
@@ -503,19 +503,19 @@ class studienplan extends basis_db
 				    ' updatevon=' . $this->db_add_param($this->updatevon) . ' ' .
 				    ' WHERE studienplan_lehrveranstaltung_id=' . $this->db_add_param($this->studienplan_lehrveranstaltung_id, FHC_INTEGER, false) . ';';
 
-		    // Bei allen darunterliegenden Zuordnungen wird das Semester angepasst, damit beim 
+		    // Bei allen darunterliegenden Zuordnungen wird das Semester angepasst, damit beim
 		    // verschieben von Modulen die darunterliegenden Eintraege korrekt sind
 		    $qry.='
 		    UPDATE lehre.tbl_studienplan_lehrveranstaltung SET semester='.$this->db_add_param($this->semester).'
 		    WHERE studienplan_lehrveranstaltung_id IN(
-		    WITH RECURSIVE stpllv(studienplan_lehrveranstaltung_id, studienplan_lehrveranstaltung_id_parent) as 
+		    WITH RECURSIVE stpllv(studienplan_lehrveranstaltung_id, studienplan_lehrveranstaltung_id_parent) as
 		    (
-			    SELECT studienplan_lehrveranstaltung_id, studienplan_lehrveranstaltung_id_parent 
+			    SELECT studienplan_lehrveranstaltung_id, studienplan_lehrveranstaltung_id_parent
 			    FROM lehre.tbl_studienplan_lehrveranstaltung
 			    WHERE studienplan_lehrveranstaltung_id='.$this->db_add_param($this->studienplan_lehrveranstaltung_id, FHC_INTEGER).'
 			    UNION ALL
 			    SELECT st.studienplan_lehrveranstaltung_id, st.studienplan_lehrveranstaltung_id_parent
-			    FROM lehre.tbl_studienplan_lehrveranstaltung st, stpllv 
+			    FROM lehre.tbl_studienplan_lehrveranstaltung st, stpllv
 			    WHERE st.studienplan_lehrveranstaltung_id_parent=stpllv.studienplan_lehrveranstaltung_id
 		    )
 		    SELECT studienplan_lehrveranstaltung_id
@@ -523,27 +523,27 @@ class studienplan extends basis_db
 		    GROUP BY studienplan_lehrveranstaltung_id);';
 	    }
 
-	    if ($this->db_query($qry)) 
+	    if ($this->db_query($qry))
 	    {
-		    if ($this->new) 
+		    if ($this->new)
 		    {
 			    //naechste ID aus der Sequence holen
 			    $qry = "SELECT currval('lehre.seq_studienplan_studienplan_lehrveranstaltung_id') as id;";
-			    if ($this->db_query($qry)) 
+			    if ($this->db_query($qry))
 			    {
-				    if ($row = $this->db_fetch_object()) 
+				    if ($row = $this->db_fetch_object())
 				    {
 					    $this->studienplan_lehrveranstaltung_id = $row->id;
 					    $this->db_query('COMMIT');
 				    }
-				    else 
+				    else
 				    {
 					    $this->db_query('ROLLBACK');
 					    $this->errormsg = "Fehler beim Auslesen der Sequence";
 					    return false;
 				    }
 			    }
-			    else 
+			    else
 			    {
 				    $this->db_query('ROLLBACK');
 				    $this->errormsg = 'Fehler beim Auslesen der Sequence';
@@ -551,7 +551,7 @@ class studienplan extends basis_db
 			    }
 		    }
 	    }
-	    else 
+	    else
 	    {
 		    $this->errormsg = 'Fehler beim Speichern des Datensatzes';
 		    return false;
@@ -653,7 +653,7 @@ class studienplan extends basis_db
 		    return false;
 	    }
 
-	    $qry = "DELETE from lehre.tbl_studienplan_lehrveranstaltung 
+	    $qry = "DELETE from lehre.tbl_studienplan_lehrveranstaltung
 		    WHERE studienplan_lehrveranstaltung_id=".$this->db_add_param($studienplan_lehrveranstaltung_id, FHC_INTEGER).";";
 
 	    if($this->db_query($qry))
@@ -675,13 +675,13 @@ class studienplan extends basis_db
      */
     function getStudienplan($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester, $orgform_kurzbz)
     {
-	    $qry = "SELECT 
+	    $qry = "SELECT
 				    tbl_studienplan.studienplan_id
-			    FROM 
-				    lehre.tbl_studienplan 
+			    FROM
+				    lehre.tbl_studienplan
 				    JOIN lehre.tbl_studienordnung USING(studienordnung_id)
 				    JOIN lehre.tbl_studienordnung_semester USING(studienordnung_id)
-			    WHERE 
+			    WHERE
 				    tbl_studienplan.aktiv
 				    AND tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)."
 				    AND tbl_studienordnung_semester.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
@@ -707,42 +707,42 @@ class studienplan extends basis_db
      */
     function getStudienplaene($studiengang_kz)
     {
-	$qry = "SELECT 
-	    distinct tbl_studienplan.*
-	FROM 
-	    lehre.tbl_studienplan 
-	    JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-	WHERE 
-	    tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+    	$qry = "SELECT
+    	    distinct tbl_studienplan.*
+    	FROM
+    	    lehre.tbl_studienplan
+    	    JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+    	WHERE
+    	    tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 
-	if($result = $this->db_query($qry))
-	{
-	    while($row = $this->db_fetch_object($result))
-	    {
-		$obj = new studienplan();
+    	if($result = $this->db_query($qry))
+    	{
+    	    while($row = $this->db_fetch_object($result))
+    	    {
+    		$obj = new studienplan();
 
-		$obj->studienplan_id = $row->studienplan_id;
-		$obj->studienordnung_id = $row->studienordnung_id;
-		$obj->orgform_kurzbz = $row->orgform_kurzbz;
-		$obj->version = $row->version;
-		$obj->bezeichnung = $row->bezeichnung;
-		$obj->regelstudiendauer = $row->regelstudiendauer;
-		$obj->sprache = $row->sprache;
-		$obj->aktiv = $this->db_parse_bool($row->aktiv);
-		$obj->semesterwochen = $row->semesterwochen;
-		$obj->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
-		$obj->updateamum = $row->updateamum;
-		$obj->updatevon = $row->updatevon;
-		$obj->insertamum = $row->insertamum;
-		$obj->insertvon = $row->insertvon;
-		$obj->new=false;
+    		$obj->studienplan_id = $row->studienplan_id;
+    		$obj->studienordnung_id = $row->studienordnung_id;
+    		$obj->orgform_kurzbz = $row->orgform_kurzbz;
+    		$obj->version = $row->version;
+    		$obj->bezeichnung = $row->bezeichnung;
+    		$obj->regelstudiendauer = $row->regelstudiendauer;
+    		$obj->sprache = $row->sprache;
+    		$obj->aktiv = $this->db_parse_bool($row->aktiv);
+    		$obj->semesterwochen = $row->semesterwochen;
+    		$obj->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
+    		$obj->updateamum = $row->updateamum;
+    		$obj->updatevon = $row->updatevon;
+    		$obj->insertamum = $row->insertamum;
+    		$obj->insertvon = $row->insertvon;
+    		$obj->new=false;
 
-		$this->result[] = $obj;
-	    }
-	    return true;			
-	}
+    		$this->result[] = $obj;
+    	    }
+    	    return true;
+    	}
     }
-    
+
     /**
      * Speichert die Sortierung
      * @param type $tudienplan_lehrveranstaltung_id
@@ -752,10 +752,10 @@ class studienplan extends basis_db
     {
 	if($studienplan_lehrveranstaltung_id==NULL)
 	    $studienplan_lehrveranstaltung_id = $this->studienplan_lehrveranstaltung_id;
-	
+
 	if($sort==NULL)
 	    $sort = $this->sort;
-	
+
 	if(!(is_numeric($sort) || is_null($sort)))
 	{
 	    $this->errormsg = "Es muss eine Zahl als Sortierungswert angegeben werden.";
@@ -764,7 +764,7 @@ class studienplan extends basis_db
 	$qry = 'UPDATE lehre.tbl_studienplan_lehrveranstaltung '
 		. 'SET sort='.$this->db_add_param($sort)
 		. ' WHERE studienplan_lehrveranstaltung_id='.$this->db_add_param($studienplan_lehrveranstaltung_id).';';
-	
+
 	$this->orgform_kurzbz = $qry;
 	if(!$this->db_query($qry))
 	{
@@ -772,6 +772,54 @@ class studienplan extends basis_db
 	    return false;
 	}
 	return true;
+    }
+
+    /**
+     * Laedt die Studienplaene zu denen eine Lehrveranstaltung zugeordnet ist
+     */
+    public function getStudienplanLehrveranstaltung($lehrveranstaltung_id, $studiensemester_kurzbz)
+    {
+        $qry= "
+            SELECT
+                distinct tbl_studienplan.*
+            FROM
+                lehre.tbl_studienplan
+                JOIN lehre.tbl_studienplan_lehrveranstaltung USING(studienplan_id)
+            WHERE
+                tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
+                AND EXISTS (
+                    SELECT 1 FROM lehre.tbl_studienordnung_semester
+                    WHERE studienordnung_id=tbl_studienplan.studienordnung_id
+                    AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+                    AND semester = tbl_studienplan_lehrveranstaltung.semester)
+            ORDER BY bezeichnung";
+
+        if($result = $this->db_query($qry))
+    	{
+    	    while($row = $this->db_fetch_object($result))
+    	    {
+        		$obj = new studienplan();
+
+        		$obj->studienplan_id = $row->studienplan_id;
+        		$obj->studienordnung_id = $row->studienordnung_id;
+        		$obj->orgform_kurzbz = $row->orgform_kurzbz;
+        		$obj->version = $row->version;
+        		$obj->bezeichnung = $row->bezeichnung;
+        		$obj->regelstudiendauer = $row->regelstudiendauer;
+        		$obj->sprache = $row->sprache;
+        		$obj->aktiv = $this->db_parse_bool($row->aktiv);
+        		$obj->semesterwochen = $row->semesterwochen;
+        		$obj->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
+        		$obj->updateamum = $row->updateamum;
+        		$obj->updatevon = $row->updatevon;
+        		$obj->insertamum = $row->insertamum;
+        		$obj->insertvon = $row->insertvon;
+        		$obj->new=false;
+
+        		$this->result[] = $obj;
+    	    }
+    	    return true;
+    	}
     }
 }
 ?>
