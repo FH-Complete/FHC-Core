@@ -306,7 +306,8 @@ else if($method=="lehrveranstaltungen")
 				</tr>
 				<tr><td>&nbsp;</td></tr>
 			</table>'; 
-
+			
+			/* Wird laut Telefonat mit Giedre Jukneviciute am 14.10.2015 derzeit nicht benötigt und soll daher ausgeblendet werden.
 			if($preincoming->deutschkurs1 || $preincoming->deutschkurs2 || $preincoming->deutschkurs3)
 			{
 				//Uebersicht Deutschkurse
@@ -346,7 +347,7 @@ else if($method=="lehrveranstaltungen")
 				}
 
 				echo '</tbody></table><br><br>';
-			}
+			}*/
 			
 			
 			echo '
@@ -402,7 +403,8 @@ else if($method=="lehrveranstaltungen")
 					<td width="25%" align="center"><input type="button" value="'.$p->t('incoming/hauptmenue').'" onclick="document.location.href = \'incoming.php\'";></td>
 				</tr>
 			</table> <br><br>';
-			
+		
+		/* Wird laut Telefonat mit Giedre Jukneviciute am 14.10.2015 derzeit nicht benötigt und soll daher ausgeblendet werden.
 		//Uebersicht Deutschkurse
 		echo '<table width="90%" border="0" align="center" class="tablesorter" id="t2">
 				<thead align="center">
@@ -439,7 +441,7 @@ else if($method=="lehrveranstaltungen")
 
 			
 		
-		echo '</tbody></table><br><br>';
+		echo '</tbody></table><br><br>';*/
 		
 		
 		/*echo '
