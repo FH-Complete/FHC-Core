@@ -491,7 +491,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					var studienplan_lehrveranstaltung_id='';
 					if(data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id){
 						studienplan_lehrveranstaltung_id=data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id.value;
-						$("#treeData").jstree('refresh');
+						//$("#treeData").jstree('refresh');
 					}
 
 					// Aenderung speichern
