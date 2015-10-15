@@ -853,7 +853,7 @@ echo $outp;
 
 echo '</td><td valign="top">';
 //Neu Button
-if($write_admin)
+if($write_admin || $rechte->isBerechtigt('lehre/lehrveranstaltungAnlegen',null,'suid'))
 	echo '<input type="button" onclick="parent.lv_detail.location=\'lehrveranstaltung_details.php?neu=true&stg_kz='.$db->convert_html_chars($stg_kz).'&semester='.$db->convert_html_chars($semester).'\'" value="Neu"/>';
 echo '</td></tr></table>';
 

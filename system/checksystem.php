@@ -3489,21 +3489,21 @@ if(!@$db->db_query("SELECT inkludierte_lehre FROM bis.tbl_bisverwendung LIMIT 1"
 
 }
 
-// Eigene Berechtigung fuer LV-Info Freigabe
-if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='lehre/studienordnungInaktiv' LIMIT 1"))
+// Eigene Berechtigung fuer Bearbeitung inaktiver Studienordnungen
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='lehre/lehrveranstaltungAnlegen' LIMIT 1"))
 {
 	if($db->db_num_rows($result)==0)
 	{
 		$qry = "
-		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/studienordnungInaktiv','Recht zur Bearbeitung inaktiver Studienordnungen');
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/lehrveranstaltungAnlegen','Recht zur Anlage von Lehrveranstaltungen');
 
-		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lehre/studienordnungInaktiv','assistenz','suid');
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lehre/lehrveranstaltungAnlegen','assistenz','suid');
 		";
 
 		if(!$db->db_query($qry))
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
-			echo ' system.tbl_berechtigung: Eigene Berechtigung lehre/studienordnungInaktiv zur Bearbeitung von inaktiven Studienordnungen hinzugefuegt!<br>';
+			echo ' system.tbl_berechtigung: Eigene Berechtigung lehre/lehrveranstalgungAnlegen Anlage von Lehrveranstaltungen hinzugefuegt!<br>';
 	}
 }
 
@@ -3527,6 +3527,24 @@ if(!@$db->db_query("SELECT bezeichnung FROM bis.tbl_zgv LIMIT 1"))
 		echo '<strong>bis.tbl_zgv '.$db->db_last_error().'</strong><br>';
 	else
 		echo ' Mehrsprachige Bezeichnung für ZGV, Master ZGV und Doktor ZGV hinzugefügt<br>';
+}
+
+// Eigene Berechtigung fuer Anlage neuer Lehrveranstaltung
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='lehre/studienordnungInaktiv' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/studienordnungInaktiv','Recht zur Bearbeitung inaktiver Studienordnungen');
+
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lehre/studienordnungInaktiv','assistenz','suid');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Eigene Berechtigung lehre/studienordnungInaktiv zur Bearbeitung von inaktiven Studienordnungen hinzugefuegt!<br>';
+	}
 }
 
 

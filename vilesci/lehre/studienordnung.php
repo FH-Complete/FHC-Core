@@ -152,6 +152,8 @@ if((!$rechte->isBerechtigt('lehre/studienordnung')) && (!$rechte->isBerechtigt('
 if($rechte->isBerechtigt('lehre/studienordnungInaktiv'))
     echo "<script type='text/javascript'>var initSTOs = 'inaktiv';</script>";
 $stg_arr = $rechte->getStgKz('lehre/studienordnung');
+if(empty($stg_arr))
+    $stg_arr = $rechte->getStgKz('lehre/studienordnungInaktiv');
 $studiengang = new studiengang();
 $studiengang->loadArray($stg_arr,'typ,kurzbz');
 

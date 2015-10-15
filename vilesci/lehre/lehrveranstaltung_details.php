@@ -50,9 +50,9 @@
 
 	if(isset($_POST["schick"]) || isset($_POST["schick_neu"]))
 	{
-		if(!$rechte->isBerechtigt('lehre/lehrveranstaltung',null,'sui'))
+		if(!$rechte->isBerechtigt('lehre/lehrveranstaltung',null,'sui') && !$rechte->isBerechtigt('lehre/lehrveranstaltungAnlegen',null,'sui'))
 			die('Sie haben keine Berechtigung fuer diese Aktion');
-			
+		
 		$lv = new lehrveranstaltung();
 
 		if(isset($_POST["schick_neu"]))

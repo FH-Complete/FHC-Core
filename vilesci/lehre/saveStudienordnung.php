@@ -30,6 +30,7 @@ require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/webservicerecht.class.php');
 require_once('../../include/studienordnung.class.php');
+require_once('../../include/studienplan.class.php');
 
 $class = $_REQUEST['class'];
 $method = $_REQUEST['method'];
@@ -147,7 +148,20 @@ elseif(mb_stristr($method,'delete'))
 {
     if(!$rechte->isBerechtigt("lehre/studienordnung"))
     {
-	die('Sie haben keine Berechtigung fuer diesen Vorgang.');
+	if(!$rechte->isBerechtigt("lehre/studienordnungInaktiv"))
+	{
+	    die('Sie haben keine Berechtigung fuer diesen Vorgang. Recht: lehre/studienordnung');
+	}
+	else
+	{
+	    $studienplan = new studienplan();
+	    $studienplan->loadStudienplanLehrveranstaltung($_REQUEST['parameter_0']);
+	    $studienordnung = new studienordnung();
+	    $studienordnung->getStudienordnungFromStudienplan($studienplan->studienplan_id);
+	    
+	    if($studienordnung->isAktiv($studienordnung->studienordnung_id))
+		die('Sie haben keine Berechtigung fuer diesen Vorgang. Studienordnung ist aktiv.');
+	}
     }
 }
 $return = '';

@@ -14,7 +14,7 @@ $uid = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
-if(!$rechte->isBerechtigt('lehre/studienordnung'))
+if((!$rechte->isBerechtigt('lehre/studienordnung')) && (!$rechte->isBerechtigt('lehre/studienordnungInaktiv')))
 	die('Sie haben keine Berechtigung für diese Seite');
 
 $method = isset($_REQUEST['method'])?$_REQUEST['method']:'';

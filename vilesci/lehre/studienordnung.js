@@ -1060,7 +1060,7 @@ function loadSemester()
 		if($("#neueLV").length === 0)
 			$("#lehrveranstaltung").append("<div id='neueLV'></div>");
 		
-		$("#neueLV").html("<br/><a href='./lehrveranstaltung_details.php?neu=true' target='_blank'><input type='button' value='Neue LV anlegen'></a>");
+		$("#neueLV").html("<br/><a href='./lehrveranstaltung_details.php?neu=true&stg_kz="+studiengang_kz+"' target='_blank'><input type='button' value='Neue LV anlegen'></a>");
 		isLVFilterLoaded=true;
 		loadFilteredLehrveranstaltungen();
 	});
