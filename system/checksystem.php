@@ -3547,6 +3547,20 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+// Attribut Aktiv für tbl_vorlagestudiengang und alle bisherigen Vorlagen auf aktiv setzen
+if(!$result = @$db->db_query("SELECT aktiv FROM public.tbl_vorlagestudiengang"))
+{
+	$qry = "ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN aktiv boolean NOT NULL default true;	
+			
+			UPDATE public.tbl_vorlagestudiengang SET aktiv=true;
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_vorlagestudiengang: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_vorlagestudiengang: Neue Spalte aktiv hinzugefuegt. Aktiv bei allen Vorlagen auf true gesetzt.';
+}
+
 
 echo '<br><br><br>';
 

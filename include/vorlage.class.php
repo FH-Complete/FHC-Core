@@ -46,6 +46,7 @@ class vorlage extends basis_db
 	public $oe_kurzbz;						// varchar(32)
 	public $vorlagestudiengang_id;			// bigint
 	public $anmerkung_vorlagestudiengang;	// text
+	public $aktiv;							// boolean
 
 	/**
 	 * Konstruktor
@@ -171,6 +172,7 @@ class vorlage extends basis_db
 				$this->style = $row->style;
 				$this->berechtigung = $row->berechtigung;
 				$this->anmerkung_vorlagestudiengang = $row->anmerkung_vorlagestudiengang;
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
 				return true;
 			}
 			else
@@ -223,6 +225,7 @@ class vorlage extends basis_db
 				$obj->style = $row->style;
 				$obj->berechtigung = $row->berechtigung;
 				$obj->anmerkung_vorlagestudiengang = $row->anmerkung_vorlagestudiengang;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 
 				$this->result[]= $obj;
 			}
@@ -283,7 +286,7 @@ class vorlage extends basis_db
 
 		if($new)
 		{
-			$qry = "INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz,studiengang_kz,version,text,oe_kurzbz,style,berechtigung,anmerkung_vorlagestudiengang) VALUES(".
+			$qry = "INSERT INTO public.tbl_vorlagestudiengang(vorlage_kurzbz,studiengang_kz,version,text,oe_kurzbz,style,berechtigung,anmerkung_vorlagestudiengang,aktiv) VALUES(".
 					$this->db_add_param($this->vorlage_kurzbz).','.
 					$this->db_add_param($this->studiengang_kz).','.
 					$this->db_add_param($this->version).','.
@@ -291,6 +294,7 @@ class vorlage extends basis_db
 					$this->db_add_param($this->oe_kurzbz).','.
 					$this->db_add_param($this->style).','.
 					$this->db_add_param($this->berechtigung).','.
+					$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
 					$this->db_add_param($this->anmerkung_vorlagestudiengang).');';
 		}
 		else
@@ -303,6 +307,7 @@ class vorlage extends basis_db
 							oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).',
 							style='.$this->db_add_param($this->style).',
 							berechtigung='.$this->db_add_param($this->berechtigung).',
+							aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).',
 							anmerkung_vorlagestudiengang='.$this->db_add_param($this->anmerkung_vorlagestudiengang).'
 					WHERE vorlagestudiengang_id='.$this->db_add_param($this->vorlagestudiengang_id).';';
 		}
@@ -375,12 +380,13 @@ class vorlage extends basis_db
 	 *
 	 * @param $oe_kurzbz Organisationseinheit der Vorlage
 	 * 		Fuer Kompatibilitaetszwecke kann hier statt der oe_kurzbz auch die Studiengangskennzahl uebergeben werden.
-	 *		In diesem Fall wird ein load der OE des Studiengangs durchgeführt und die entsprechende OE verwendet.
-	 * @param $vorlage_kurzbz Name der Vorlage
-	 * @param $version optional kann die Versionsnummer der Vorlage uebergeben werden
+	 *		In diesem Fall wird ein load der OE des Studiengangs durchgefï¿½hrt und die entsprechende OE verwendet.
+	 * @param string $vorlage_kurzbz Name der Vorlage
+	 * @param integer $version optional kann die Versionsnummer der Vorlage uebergeben werden
+	 * @param boolean $aktiv default:true. Optional. Wenn false: werden nur inaktive Vorlagen geladen. Wenn null, werden alle Vorlagen geladen.
 	 * @return boolean
 	 */
-	public function getAktuelleVorlage($oe_kurzbz, $vorlage_kurzbz, $version=null)
+	public function getAktuelleVorlage($oe_kurzbz, $vorlage_kurzbz, $version=null, $aktiv=true)
 	{
 		$studiengang_kz='';
 		if(is_numeric($oe_kurzbz))
@@ -405,6 +411,10 @@ class vorlage extends basis_db
 			{
 				$qry.=" AND version=".$this->db_add_param($version, FHC_INTEGER);
 			}
+			if(!is_null($aktiv) && $aktiv!='')
+			{
+				$qry.=" AND aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
+			}
 			if($studiengang_kz<0) //Damit bei negativer studiengang_kz richtiges Ergebnis kommt
 			{
 				$qry .=" ORDER BY studiengang_kz ASC, version DESC LIMIT 1;";
@@ -427,6 +437,10 @@ class vorlage extends basis_db
 			{
 				$qry.=" AND version=".$this->db_add_param($version, FHC_INTEGER);
 			}
+			if(!is_null($aktiv) && $aktiv!='')
+			{
+				$qry.=" AND aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
+			}
 			$qry.=" ORDER BY version DESC LIMIT 1";
 		}
 
@@ -443,6 +457,7 @@ class vorlage extends basis_db
 				$this->style = $row->style;
 				$this->berechtigung = $this->db_parse_array($row->berechtigung);
 				$this->anmerkung_vorlagestudiengang = $row->anmerkung_vorlagestudiengang;
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
 
 				return true;
 			}
@@ -462,7 +477,7 @@ class vorlage extends basis_db
 
 					if($oe->oe_parent_kurzbz!='')
 					{
-						return $this->getAktuelleVorlage($oe->oe_parent_kurzbz, $vorlage_kurzbz, $version);
+						return $this->getAktuelleVorlage($oe->oe_parent_kurzbz, $vorlage_kurzbz, $version, $aktiv);
 					}
 					else
 					{

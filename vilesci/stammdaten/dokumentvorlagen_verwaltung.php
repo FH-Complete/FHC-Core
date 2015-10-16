@@ -37,6 +37,7 @@ if (!$db = new basis_db())
 
 $user = get_uid();
 $oe_kurzbz = (isset($_REQUEST['oe_kurzbz']) ? $_REQUEST['oe_kurzbz'] : null);
+$oe_auswahl = (isset($_REQUEST['oe_auswahl']) ? $_REQUEST['oe_auswahl'] : $oe_kurzbz);
 $vorlage_kurzbz = (isset($_REQUEST['vorlage_kurzbz']) ? $_REQUEST['vorlage_kurzbz'] : null);
 $vorlagestudiengang_id = (isset($_REQUEST['vorlagestudiengang_id']) ? $_REQUEST['vorlagestudiengang_id'] : null);
 $neu = (isset($_REQUEST['neu']) ? true : false);
@@ -118,7 +119,7 @@ if(isset($_POST['speichern']))
 		$studiengang_kz = 0;
 	else 
 		$studiengang_kz = $studiengang->studiengang_kz;
-	
+
 	$dokumentvorlage->vorlage_kurzbz = $_POST['vorlage_kurzbz'];
 	$dokumentvorlage->studiengang_kz = $studiengang_kz;
 	$dokumentvorlage->version = $_POST['version'];
@@ -127,6 +128,7 @@ if(isset($_POST['speichern']))
 	$dokumentvorlage->style = $_POST['style'];
 	$dokumentvorlage->berechtigung = $_POST['berechtigung'];
 	$dokumentvorlage->anmerkung_vorlagestudiengang = $_POST['anmerkung'];
+	$dokumentvorlage->aktiv = isset($_POST['aktiv']);
 
 	if($dokumentvorlage->saveVorlageOE())
 	{
@@ -141,7 +143,7 @@ if(isset($_POST['speichern']))
 	$neu=false;
 }
 
-// L�schen einer Dokumentvorlage
+// Loeschen einer Dokumentvorlage
 if(isset($_GET['delete']))
 {
 
@@ -210,7 +212,7 @@ else
 echo "<OPTION value='".$_SERVER['PHP_SELF']."?vorlage_kurzbz=$vorlage_kurzbz&oe_kurzbz=' $selected>Alle Organisationseinheiten</OPTION>";
 foreach ($organisationseinheit->result as $row)
 {
-	if($row->oe_kurzbz==$oe_kurzbz)
+	if($row->oe_kurzbz==$oe_auswahl)
 		$selected='selected';
 	else
 		$selected='';
@@ -428,6 +430,10 @@ else
 				<tr>
 					<td>Anmerkung</td>
 					<td><textarea cols="80" rows="2" name="anmerkung">'.$db->convert_html_chars($vorlageOE->anmerkung_vorlagestudiengang).'</textarea></td>
+				</tr>
+				<tr>
+					<td>Aktiv</td>
+					<td><input type="checkbox" name="aktiv" id="aktiv" '.($vorlageOE->aktiv==true?'checked="checked"':'').'"></td>
 				</tr>';
 			if(!$neu)
 				$val = 'Änderung Speichern';
@@ -438,6 +444,7 @@ else
 					<td></td>
 					<td>
 						<input type="hidden" value="'.$vorlageOE->vorlagestudiengang_id.'" name="vorlagestudiengang_id" />
+						<input type="hidden" value="'.$oe_auswahl.'" name="oe_auswahl" />
 						
 						<input type="submit" name="speichern" value="'.$val.'">
 					</td>
@@ -452,7 +459,7 @@ if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 {
 
 	$vorlage_version = new vorlage();
-	$vorlage_version->getAllVersions($vorlage_kurzbz, $oe_kurzbz);
+	$vorlage_version->getAllVersions($vorlage_kurzbz, $oe_auswahl);
 	$oe = new organisationseinheit();
 	$vorlage = new vorlage();
 	//echo '<span style="font-size: 9pt">Anzahl: '.$db->db_num_rows($vorlage_version->result).'</span>';
@@ -465,6 +472,7 @@ if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 					<th>Studiengang</th>
 					<th>Version</th>
 					<th>Anmerkung</th>
+					<th>Aktiv</th>
 					<th colspan="2"></th>
 				</tr>
 				</thead>
@@ -480,14 +488,15 @@ if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 			$style='style="text-decoration: line-through"';
 		
 		echo '
-			<tr>
+			<tr '.($row->aktiv==false?'style="color:grey"':'').'>
 				<td>'.$db->convert_html_chars($vorlage_bezeichnung).'</td>
 				<td '.$style.'>'.$db->convert_html_chars($oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung).'</td>
 				<td>'.$db->convert_html_chars($row->studiengang_kz).'</td>
 				<td>'.$db->convert_html_chars($row->version).'</td>
 				<td>'.$db->convert_html_chars($row->anmerkung_vorlagestudiengang).'</td>
-				<td><a href="'.$_SERVER['PHP_SELF'].'?vorlagestudiengang_id='.$row->vorlagestudiengang_id.'&vorlage_kurzbz='.$vorlage_kurzbz.'&oe_kurzbz='.$row->oe_kurzbz.'">Edit</a></td>
-				<td><a href="'.$_SERVER['PHP_SELF'].'?vorlagestudiengang_id='.$row->vorlagestudiengang_id.'&vorlage_kurzbz='.$vorlage_kurzbz.'&oe_kurzbz='.$row->oe_kurzbz.'&delete" onclick="return confdel(\''.$vorlage_bezeichnung.'\',\''.$row->version.'\')">Delete</a></td>
+				<td>'.($row->aktiv==false?'inaktiv':'aktiv').'</td>
+				<td><a href="'.$_SERVER['PHP_SELF'].'?vorlagestudiengang_id='.$row->vorlagestudiengang_id.'&vorlage_kurzbz='.$vorlage_kurzbz.'&oe_auswahl='.$oe_auswahl.'">Edit</a></td>
+				<td><a href="'.$_SERVER['PHP_SELF'].'?vorlagestudiengang_id='.$row->vorlagestudiengang_id.'&vorlage_kurzbz='.$vorlage_kurzbz.'&oe_auswahl='.$oe_auswahl.'&delete" onclick="return confdel(\''.$vorlage_bezeichnung.'\',\''.$row->version.'\')">Delete</a></td>
 				
 			</tr>';
 	}
