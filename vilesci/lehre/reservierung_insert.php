@@ -122,7 +122,7 @@ echo '</select>
 		<option value="">*</option>
 ';
 
-for ($i=1;$i<9;$i++)
+for ($i=1;$i<15;$i++)
 {
 	if ($semester==$i)
 		echo "<option value=\"$i\" selected>$i</option>";
@@ -136,7 +136,7 @@ echo '
     <select name="verband">
 	  <option value="">*</option>';
 
-$verbaende=array("A","B","C","D","E","F","V");
+$verbaende=array("A","B","C","D","E","F","I","O","P","V");
 
 foreach ($verbaende as $i)
 {
@@ -152,7 +152,7 @@ echo '
     <select name="gruppe">
 	  <option value="">*</option>';
 
-for ($i=1;$i<3;$i++)
+for ($i=1;$i<10;$i++)
 {
 	if ($gruppe==$i)
 		echo "<option value=\"$i\" selected>$i</option>";
