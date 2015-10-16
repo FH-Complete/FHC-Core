@@ -85,7 +85,18 @@ foreach($uid_arr as $uid)
 			$staatsbuergerschaft->load($student->staatsbuergerschaft);
 			
             $svnr = ($student->svnr == '')?'Ersatzkennzeichen: '.$student->ersatzkennzeichen:$student->svnr; 
-			
+            
+            //Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
+            if ($studiengang->studiengang_kz<0)
+            {
+            	$stg = new studiengang();
+            	$stg->load($studiengang->studiengang_kz);
+            		
+            	$studiengang_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($studiengang->studiengang_kz));
+            }
+            else
+            	$studiengang_kz = sprintf("%04s", abs($studiengang->studiengang_kz));
+            
 			echo "\t\t<quote>1</quote>\n"; 
 			echo "\t\t<anrede>".$student->anrede."</anrede>\n";
 			echo "\t\t<vorname>".$student->vorname." ".$student->vornamen."</vorname>\n";
@@ -101,7 +112,7 @@ foreach($uid_arr as $uid)
 			echo "\t\t<studiengang>".$studiengang->bezeichnung."</studiengang>\n";
 			echo "\t\t<studiengang_englisch>".$studiengang->english."</studiengang_englisch>\n";
             echo "\t\t<studiengang_kurzbz>".$studiengang->kurzbzlang."</studiengang_kurzbz>\n";
-			echo "\t\t<studiengang_kz>".sprintf('%04s', $studiengang->studiengang_kz)."</studiengang_kz>\n";
+			echo "\t\t<studiengang_kz>".$studiengang_kz."</studiengang_kz>\n";
             echo "\t\t<studiengangSprache>".$studiengang->sprache."</studiengangSprache>"; 
             
             echo "\t\t<aktuellesJahr>".date('Y')."</aktuellesJahr>"; 

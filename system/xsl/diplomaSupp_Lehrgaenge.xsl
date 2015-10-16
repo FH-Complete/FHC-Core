@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+<xsl:stylesheet xmlns:fo="http://www.w3.org/1999/XSL/Format" 
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
+xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" 
+xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" 
+xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" 
+xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
+xmlns:xlink="http://www.w3.org/1999/xlink" 
+xmlns:dc="http://purl.org/dc/elements/1.1/" 
+xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" 
+xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" 
+xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" 
+xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" 
 >
   <xsl:output method="xml" version="1.0" indent="yes"/>
 <xsl:template match="supplements">
@@ -221,7 +232,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       </style:table-cell-properties>
     </style:style>
     <style:style style:name="Table4.2" style:family="table-row">
-      <style:table-row-properties style:row-height="0.981cm" fo:keep-together="auto"/>
+      <style:table-row-properties fo:keep-together="auto"/>
     </style:style>
     <style:style style:name="Table4.A2" style:family="table-cell">
       <style:table-cell-properties style:vertical-align="top" fo:padding-left="0.191cm" fo:padding-right="0.191cm" fo:padding-top="0cm" fo:padding-bottom="0cm" fo:border-left="0.5pt solid #000000" fo:border-right="none" fo:border-top="0.5pt solid #000000" fo:border-bottom="0.5pt solid #000000" style:writing-mode="lr-tb"/>
@@ -571,7 +582,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <style:table-cell-properties style:vertical-align="top" fo:padding-left="0.191cm" fo:padding-right="0.191cm" fo:padding-top="0cm" fo:padding-bottom="0cm" fo:border="0.5pt solid #000000" style:writing-mode="lr-tb"/>
     </style:style>
     <style:style style:name="Table7" style:family="table">
-      <style:table-properties fo:break-before="page" style:width="17.02cm" table:align="left" style:writing-mode="lr-tb"/>
+      <style:table-properties style:width="17.02cm" table:align="left" style:writing-mode="lr-tb"/>
     </style:style>
     <style:style style:name="Table7.A" style:family="table-column">
       <style:table-column-properties style:column-width="1cm"/>
@@ -609,7 +620,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <style:table-cell-properties style:vertical-align="top" fo:padding-left="0.191cm" fo:padding-right="0.191cm" fo:padding-top="0cm" fo:padding-bottom="0cm" fo:border="0.5pt solid #000000" style:writing-mode="lr-tb"/>
     </style:style>
     <style:style style:name="Table7.3" style:family="table-row">
-      <style:table-row-properties style:row-height="1.632cm" fo:keep-together="auto"/>
+      <style:table-row-properties fo:keep-together="auto"/>
     </style:style>
     <style:style style:name="Table7.A3" style:family="table-cell">
       <style:table-cell-properties style:vertical-align="top" fo:padding-left="0.191cm" fo:padding-right="0.191cm" fo:padding-top="0cm" fo:padding-bottom="0cm" fo:border-left="0.5pt solid #000000" fo:border-right="none" fo:border-top="0.5pt solid #000000" fo:border-bottom="0.5pt solid #000000" style:writing-mode="lr-tb"/>
@@ -1190,6 +1201,18 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <style:text-properties fo:font-size="9pt" fo:language="en" fo:country="US" style:font-size-asian="9pt" style:font-size-complex="9pt" fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
 	  <style:paragraph-properties fo:text-align="end"/>
     </style:style>
+    <style:style style:name="P77" style:family="paragraph" style:parent-style-name="Standard">
+      <style:paragraph-properties fo:line-height="110%"/>
+      <style:text-properties fo:font-size="14pt" fo:language="en" fo:country="US" style:font-size-asian="14pt" style:font-size-complex="14pt"/>
+    </style:style>
+    <style:style style:name="P78" style:family="paragraph">
+		<style:paragraph-properties fo:line-height="130%" fo:text-align="center"/>
+		<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-pitch="variable" fo:font-size="16pt" style:font-size-asian="16pt" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold"/>
+	</style:style>
+	<style:style style:name="P79" style:family="paragraph">
+		<style:paragraph-properties fo:line-height="130%" fo:text-align="center"/>
+		<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-pitch="variable" fo:font-size="16pt" style:font-size-asian="16pt" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold"/>
+	</style:style>
     <style:style style:name="T1" style:family="text">
       <style:text-properties fo:language="en" fo:country="US"/>
     </style:style>
@@ -1248,6 +1271,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     <style:style style:name="fr4" style:family="graphic" style:parent-style-name="Graphics">
         <style:graphic-properties style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="char" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard" style:flow-with-text="true"/>
     </style:style>
+    <style:style style:name="gr1" style:family="graphic">
+		<style:graphic-properties fo:border="none" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:horizontal-pos="from-left" style:horizontal-rel="paragraph"/>
+	</style:style>
+	<style:style style:name="gr2" style:family="graphic">
+		<style:graphic-properties fo:border="none" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:horizontal-pos="from-left" style:horizontal-rel="paragraph"/>
+	</style:style>
   </office:automatic-styles>
 	<office:body xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0">
  	<office:text text:use-soft-page-breaks="true" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0">
@@ -1258,7 +1287,29 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 	</office:document-content>
  </xsl:template>
 <xsl:template match="supplement">
-		
+		<office:forms form:automatic-focus="false" form:apply-design-mode="false">
+			<form:form form:name="Formular" form:apply-filter="true" form:command-type="table" office:target-frame="" xlink:href="" xlink:type="simple">
+				<form:properties>
+					<form:property form:property-name="PropertyChangeNotificationEnabled" office:value-type="boolean" office:boolean-value="true"/>
+				</form:properties>
+				<xsl:variable select="studiengang_bezeichnung_deutsch" name="studiengang_de"/>
+				<form:text form:name="TextfeldStgDE" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control1" form:id="control1" form:max-length="0" form:current-value="{$studiengang_de}" form:convert-empty-to-null="true">
+					<form:properties>
+						<form:property form:property-name="ControlTypeinMSO" office:value-type="float" office:value="0"/>
+						<form:property form:property-name="DefaultControl" office:value-type="string" office:string-value="com.sun.star.form.control.TextField"/>
+						<form:property form:property-name="ObjIDinMSO" office:value-type="float" office:value="65535"/>
+					</form:properties>
+				</form:text>
+				<xsl:variable select="studiengang_bezeichnung_englisch" name="studiengang_en"/>
+				<form:text form:name="TextfeldStgEN" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control2" form:id="control2" form:max-length="0" form:current-value="{$studiengang_en}" form:convert-empty-to-null="true">
+					<form:properties>
+						<form:property form:property-name="ControlTypeinMSO" office:value-type="float" office:value="0"/>
+						<form:property form:property-name="DefaultControl" office:value-type="string" office:string-value="com.sun.star.form.control.TextField"/>
+						<form:property form:property-name="ObjIDinMSO" office:value-type="float" office:value="65535"/>
+					</form:properties>
+				</form:text>
+			</form:form>
+		</office:forms>
       <text:sequence-decls xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0">
         <text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
         <text:sequence-decl text:display-outline-level="0" text:name="Table"/>
@@ -1274,21 +1325,19 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P31">DIPLOMA SUPPLEMENT</text:p>
       <text:p text:style-name="P9"/>
       <text:p text:style-name="P59">
-        <text:span text:style-name="Tabelleninhalt">
-          <text:span text:style-name="T9"><xsl:value-of select="studiengang_typ"/></text:span>
-        </text:span>
-        <text:span text:style-name="T13">-Studiengang</text:span>
+        <text:span text:style-name="T13">Lehrgang nach §9 FHStG idgF</text:span>
       </text:p>
       <text:p text:style-name="P59">
         <text:span text:style-name="Tabelleninhalt">
-          <text:span text:style-name="T8"><xsl:value-of select="studiengang_bezeichnung_deutsch"/></text:span>
+          <text:span text:style-name="T8"><draw:control text:anchor-type="as-char" svg:y="-0.45cm" draw:z-index="6" draw:style-name="gr1" draw:text-style-name="P78" svg:width="16cm" svg:height="0.8cm" draw:control="control1"/></text:span>
         </text:span>
       </text:p>
       <text:p text:style-name="P11"/>
-      <text:p text:style-name="P4"><text:span text:style-name="Tabelleninhalt"><text:span text:style-name="T10"><xsl:value-of select="studiengang_typ"/></text:span></text:span>’s degree program</text:p>
+      <text:p text:style-name="P4"><text:span text:style-name="Tabelleninhalt">Certificate Program for Further Education</text:span></text:p>
+      <text:p text:style-name="P4"><text:span text:style-name="Tabelleninhalt">(subjected to §9 FHStG)</text:span></text:p>
       <text:p text:style-name="P3">
         <text:span text:style-name="Tabelleninhalt">
-          <text:span text:style-name="T10"><xsl:value-of select="studiengang_bezeichnung_englisch"/></text:span>
+          <text:span text:style-name="T10"><draw:control text:anchor-type="as-char" svg:y="-0.45cm" draw:z-index="6" draw:style-name="gr2" draw:text-style-name="P79" svg:width="16cm" svg:height="0.8cm" draw:control="control2"/></text:span>
         </text:span>
       </text:p>
       <text:p text:style-name="P8"/>
@@ -1540,7 +1589,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:table-cell table:style-name="Table3.B5" office:value-type="string">
             <text:p text:style-name="P44">
               <text:span text:style-name="Tabelleninhalt">
-                <text:span text:style-name="T1">Name und Status der Einrichtung, die das Studium durchführte</text:span>
+                <text:span text:style-name="T1">Name und Status der Einrichtung, die den Lehrgang durchführte</text:span>
               </text:span>
               <text:span text:style-name="Tabelleninhalt"> </text:span>
             </text:p>
@@ -1619,7 +1668,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
               <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="niveau_deutsch"/></text:span>
             </text:p>
             <text:p text:style-name="P44">
+              <text:span text:style-name="Tabelleninhalt">(<xsl:value-of select="niveau_code"/>)</text:span>
+            </text:p>
+            <text:p text:style-name="P44">
               <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="niveau_englisch"/></text:span>
+            </text:p>
+            <text:p text:style-name="P44">
+              <text:span text:style-name="Tabelleninhalt">(<xsl:value-of select="niveau_code"/>)</text:span>
             </text:p>
           </table:table-cell>
         </table:table-row>
@@ -1639,10 +1694,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </table:table-cell>
           <table:table-cell table:style-name="Table4.C3" office:value-type="string">
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="semester"/> Semester | <xsl:value-of select="jahre"/> Jahre | <xsl:value-of select="ects"/> ECTS</text:span>
+              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="semester"/> Semester | <xsl:value-of select="jahre"/> Jahre | <xsl:value-of select="ects_total"/> ECTS</text:span>
             </text:p>
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="semester"/> semester(s) | <xsl:value-of select="jahre"/> year(s) | <xsl:value-of select="ects"/> ECTS</text:span>
+              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="semester"/> semester(s) | <xsl:value-of select="jahre"/> year(s) | <xsl:value-of select="ects_total"/> ECTS</text:span>
             </text:p>
           </table:table-cell>
         </table:table-row>
@@ -1704,7 +1759,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </table:table-cell>
           <table:table-cell table:style-name="Table5.C2" table:number-columns-spanned="4" office:value-type="string">
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="studienart"/></text:span>
+              <text:span text:style-name="Tabelleninhalt">Weiterbildung / Further Education</text:span>
             </text:p>
           </table:table-cell>
           <table:covered-table-cell/>
@@ -1722,7 +1777,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </table:table-cell>
           <table:table-cell table:style-name="Table5.B3" office:value-type="string">
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt">Anforderungen des Studiums</text:span>
+              <text:span text:style-name="Tabelleninhalt">Anforderungen des Lehrgangs</text:span>
             </text:p>
             <text:p text:style-name="P44">
               <text:span text:style-name="Tabelleninhalt">Program requirements</text:span>
@@ -1748,7 +1803,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </table:table-cell>
           <table:table-cell table:style-name="Table5.B4" office:value-type="string">
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt">Angaben zum Studium (z.B absolvierte Module und Einheiten) und erzielte Noten/Bewertungen/ECTS Anrechnungspunkte</text:span>
+              <text:span text:style-name="Tabelleninhalt">Angaben zum Lehrgang (z.B absolvierte Module und Einheiten) und erzielte Noten/Bewertungen/ECTS Anrechnungspunkte</text:span>
             </text:p>
             <text:p text:style-name="P44">
               <text:span text:style-name="Tabelleninhalt">Program details (courses, modules or units of studied, individual grades obtained)</text:span>
@@ -1756,7 +1811,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </table:table-cell>
           <table:table-cell table:style-name="Table5.C4" table:number-columns-spanned="4" office:value-type="string">
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="ects"/> ECTS</text:span>
+              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="ects_total"/> ECTS</text:span>
             </text:p>
             <text:p text:style-name="P44">
               <text:span text:style-name="Tabelleninhalt">Siehe "Studiendaten"</text:span>
@@ -2101,10 +2156,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </table:table-cell>
           <table:table-cell table:style-name="Table6.C2" office:value-type="string">
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="zugangsberechtigung_deutsch"/></text:span>
-            </text:p>
-            <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="zugangsberechtigung_englisch"/> </text:span>
+              <text:span text:style-name="Tabelleninhalt">---</text:span>
             </text:p>
           </table:table-cell>
         </table:table-row>
@@ -2162,32 +2214,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             </text:p>
           </table:table-cell>
           <table:table-cell table:style-name="Table7.C2" office:value-type="string">
-		    <xsl:if test="praktikum != ''">
-               <text:p text:style-name="P44">
-			      <text:span text:style-name="T2"><xsl:value-of select="praktikum"/> </text:span>
-		       </text:p>
-			</xsl:if>
-		    <xsl:if test="auslandssemester != ''">
-               <text:p text:style-name="P44">
-			      <text:span text:style-name="T2"><xsl:value-of select="auslandssemester"/></text:span>
-			   </text:p>
-			</xsl:if>
-		    <xsl:if test="angerechnete_ects_quereinstieg != ''">
-              <text:p text:style-name="P44">
-                <text:span text:style-name="T2">Durch Berücksichtigung fremder, gleichwertiger Studienteile (vgl. Fachhochschul-Studiengesetz, § 12) kommt es bei oben genannter Person zu einer Reduzierung der vorgeschriebenen Studiendauer. In diesem Fall wurden Lehrveranstaltungen im Ausmaß von <xsl:value-of select="angerechnete_ects_quereinstieg"/> ECTS auf das Studium angerechnet und damit ein Einstieg in das <xsl:value-of select="start_semester_number"/>. Semester gestattet.</text:span>
-              </text:p>
-              <text:p text:style-name="P44">
-                <text:span text:style-name="T2">The above named person was granted a reduction of the prescribed duration of studies by taking into account outside equivalent academic achievements (cf. University of Applied Sciences Act, § 12), in this case <xsl:value-of select="angerechnete_ects_quereinstieg"/> credit points. Therefore, the person was admitted to enter the <xsl:value-of select="start_semester_number"/>. study semester.</text:span>
-              </text:p>
-		    </xsl:if>
-			<xsl:if test="(not(praktikum) or praktikum='') and (not(auslandssemester) or auslandssemester = '') and (not(angerechnete_ects_quereinstieg) or angerechnete_ects_quereinstieg = '')">
               <text:p text:style-name="P44">
 			     <text:span text:style-name="T2">Nicht zutreffend</text:span>
 			  </text:p>
               <text:p text:style-name="P44">
 			     <text:span text:style-name="T2">Not applicable</text:span>
 			  </text:p>
-			</xsl:if>
           </table:table-cell>
         </table:table-row>
         <table:table-row table:style-name="Table7.3">
@@ -2212,7 +2244,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
               <text:span text:style-name="Tabelleninhalt">www.aq.ac.at</text:span>
             </text:p>
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt">www.bmwf.gv.at/home/academic_mobility/enic_naric_austria/</text:span>
+              <text:span text:style-name="Tabelleninhalt">http://wissenschaft.bmwfw.gv.at/bmwfw/studium/academic-mobility/enic-naric-austria/</text:span>
             </text:p>
           </table:table-cell>
         </table:table-row>
@@ -2253,7 +2285,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </table:table-cell>
           <table:table-cell table:style-name="Table8.C2" office:value-type="string">
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt">Studiengangsleitung</text:span>
+              <text:span text:style-name="Tabelleninhalt">Lehrgangsleitung</text:span>
             </text:p>
             <text:p text:style-name="P44">
               <text:span text:style-name="Tabelleninhalt">Program Director</text:span>
@@ -2291,9 +2323,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       </table:table>
 	<text:p text:style-name="Standard"></text:p>
 	<text:p text:style-name="Standard">Siehe folgende Seiten</text:p>
-      	<text:p text:style-name="Standard">See following pages</text:p>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
+   	<text:p text:style-name="Standard">See following pages</text:p>
       <text:p text:style-name="P56">ANHANG: Angaben zum nationalen Hochschulsystem</text:p>
       <text:p text:style-name="P74">Stand: 1. September 2014</text:p>
       <text:p text:style-name="P41">Der postsekundäre Sektor in Österreich</text:p>
@@ -2371,7 +2401,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P16"/>
       <text:p text:style-name="P24">Die Inhaber/innen dieser Diplomgrade oder Mastergrade (einschließlich Fachhochschul-Diplomgraden oder Fachhochschul-Mastergraden) sind zur Zulassung zum Doktoratsstudium an einer Universität berechtigt. Der <text:span text:style-name="T15">Doktorgrad</text:span> mit dem Wortlaut "Doktor/in ..." oder "Doctor of Philosophy" ("PhD") wird nach einem mindestens dreijährigen Studium verliehen.</text:p>
       <text:p text:style-name="P24"/>
-      <text:p text:style-name="P25">Neben den ordentlichen Studien, die oben beschrieben wurden, gibt es auch außerordentliche Studien, die an Universitäten entweder ein Universitätslehrgang oder der Besuch einzelner Lehrveranstaltungen, im Fachhochschulbereich ein Lehrgang zur Weiterbildung und an Pädagogischen Hochschulen ein Hochschullehrgang sein können.</text:p>
+      <text:p text:style-name="P25"><text:span text:style-name="T14">Neben den ordentlichen Studien, die oben beschrieben wurden, gibt es auch außerordentliche Studien, die an Universitäten entweder ein Universitätslehrgang oder der Besuch einzelner Lehrveranstaltungen, im Fachhochschulbereich ein Lehrgang zur Weiterbildung und an Pädagogischen Hochschulen ein Hochschullehrgang sein können.</text:span></text:p>
       <text:p text:style-name="P24"/>
       <text:p text:style-name="P41">Bachelorstudium</text:p>
       <text:p text:style-name="P24">Die Zulassung zu einem Bachelorstudium erfolgt auf der Grundlage eines österreichischen oder gleichwertigen ausländischen Reifezeugnisses, eines Zeugnisses über die Studienberechtigungsprüfung oder eines Zeugnisses über die Berufsreifeprüfung, in künstlerischen Studien auf der Grundlage einer Zulassungsprüfung. Die Zulassung zu einem Fachhochschul-Bachelorstudiengang kann auch auf der Grundlage einer einschlägigen beruflichen Qualifikation erfolgen. In einigen Bachelorstudien an Universitäten, in den meisten Fachhochschul-Bachelorstudiengängen und in Bachelorstudien an Pädagogischen Hochschulen findet ein Auswahlverfahren statt.</text:p> 
@@ -2568,7 +2598,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P17"/>
       <text:p text:style-name="P17">Recipients of these diploma degrees from the old system or master’s degrees from the new system (including the ones awarded in both cases by the universities of applied sciences) are entitled to enroll in doctoral programmes (<text:span text:style-name="T15">Doktoratsstudium</text:span>) at universities. A doctoral degree with the designation either <text:span text:style-name="T15">"Doktor/in"</text:span> or "Doctor of Philosophy" (PhD) is awarded upon completion of a doctoral programme with a minimum duration of three years.</text:p>
       <text:p text:style-name="P17"/>
-      <text:p text:style-name="P17">In addition to the degree programmes (<text:span text:style-name="T15">ordentliche Studien</text:span>) described above, non-consecutive certificate programmes (<text:span text:style-name="T15">außerordentliche Studien</text:span>) are offered, for example in the form of university programmes for further education (<text:span text:style-name="T15">Universitätslehrgänge</text:span>) or individual units / modules in scientific subjects, both at universities; certificate university of applied sciences programmes for further education (<text:span text:style-name="T15">Lehrgänge zur Weiterbildung</text:span>) or individual units / modules in scientific subjects at universities of applied sciences; and certificate university college programmes for further education (<text:span text:style-name="T15">Hochschullehrgänge</text:span>) at university colleges of education.</text:p>
+      <text:p text:style-name="P17"><text:span text:style-name="T14">In addition to the degree programmes (<text:span text:style-name="T15">ordentliche Studien</text:span>) described above, non-consecutive certificate programmes (<text:span text:style-name="T15">außerordentliche Studien</text:span>) are offered, for example in the form of university programmes for further education (<text:span text:style-name="T15">Universitätslehrgänge</text:span>) or individual units / modules in scientific subjects, both at universities; certificate university of applied sciences programmes for further education (<text:span text:style-name="T15">Lehrgänge zur Weiterbildung</text:span>) or individual units / modules in scientific subjects at universities of applied sciences; and certificate university college programmes for further education (<text:span text:style-name="T15">Hochschullehrgänge</text:span>) at university colleges of education.</text:span></text:p>
       <text:p text:style-name="P17"/>
       <text:p text:style-name="P39">Bachelor Programme (<text:span text:style-name="T15">Bachelorstudium</text:span>)</text:p>
       <text:p text:style-name="P17">Admission to a bachelor programme is granted upon the basis on the Austrian higher secondary school leaving certificate (<text:span text:style-name="T15">Reifezeugnis</text:span>), its foreign equivalent, or the successful completion of a special university entrance qualification examination (<text:span text:style-name="T15">Studienberechtigungsprüfung</text:span>). Students of compulsory lower schools who have completed additional schooling in the form of apprenticeships as skilled workers may take a vocationally <text:soft-page-break/>based examination acknowledged as equivalent to the higher secondary school leaving certificate (<text:span text:style-name="T15">Berufsreifeprüfung</text:span>). Admission to bachelor programmes in the arts is based on aptitude ascertained by admission examinations. Admission to university of applied sciences bachelor programmes is also possible on the basis of previous vocational or technical experience and qualifications of applicants. In some university bachelor programmes, in most university of applied sciences bachelor programmes and in bachelor programmes at university colleges of education, admission is based on a selective admission process.</text:p>
@@ -2689,7 +2719,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 	  <text:p text:style-name="P75">Source:</text:p>
 	  <text:p text:style-name="P75">Federal Ministry of Science, Research and Economy</text:p>
 	  <text:p text:style-name="P75">Unit VI/7</text:p>
-      <text:p text:style-name="P13"/>
+      
       
 		<text:p text:style-name="P48">
         <draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr2" draw:name="graphics3" text:anchor-type="paragraph" svg:width="17cm" svg:height="24.042cm" draw:z-index="14" >
@@ -2702,7 +2732,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 
       <text:p text:style-name="P5">Semester <xsl:value-of select="start_semester_number"/> - <xsl:value-of select="end_semester_number"/></text:p>
       <text:p text:style-name="P6"/>
-      <text:p text:style-name="P7"><xsl:value-of select="studiengang_typ"/>’s degree program</text:p>
+      <text:p text:style-name="P77">Certificate Program for Further Education (subjected to §9 FHStG)</text:p>
       <text:p text:style-name="P5"><xsl:value-of select="studiengang_bezeichnung_englisch"/><text:line-break/></text:p>
       <text:p text:style-name="P6"/>
       <text:p text:style-name="P34"><text:span text:style-name="T4"></text:span>Student ID: <xsl:value-of select="matrikelnummer"/></text:p>
@@ -2713,7 +2743,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P15"/>
       <text:p text:style-name="P20">Date of Birth: <xsl:value-of select="geburtsdatum"/></text:p>
       <text:p text:style-name="P20"/>
-      <text:p text:style-name="P21">Within the period of studies at the University of Applied Sciences Technikum Wien from <xsl:value-of select="start_semester"/> to <xsl:value-of select="end_semester"/> in the <xsl:value-of select="studiengang_typ"/>’s degree program <xsl:value-of select="studiengang_bezeichnung_englisch"/> examinations in the following subjects were passed:</text:p>
+      <text:p text:style-name="P21">Within the period of studies at the University of Applied Sciences Technikum Wien from <xsl:value-of select="start_semester"/> to <xsl:value-of select="end_semester"/> in the Certificate Program for Further Education (subjected to §9 FHStG) <xsl:value-of select="studiengang_bezeichnung_englisch"/> examinations in the following subjects were passed:</text:p>
       <text:p text:style-name="P20"/>
       <table:table table:name="Table12" table:style-name="Table12">
         <table:table-column table:style-name="Table12.A"/>
@@ -2780,26 +2810,28 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <text:soft-page-break/>
       </text:p>
       <text:p text:style-name="P22"/>
-      <table:table table:name="Table16" table:style-name="Table16">
-         <table:table-column table:style-name="Table16.A" table:number-columns-repeated="2" />
-         <table:table-row>
-            <table:table-cell table:style-name="Table16.A1" table:number-columns-spanned="2" office:value-type="string">
-               <text:p text:style-name="P68">Final Examination</text:p>
-            </table:table-cell>
-            <table:covered-table-cell />
-         </table:table-row>
-         <table:table-row>
-            <table:table-cell table:style-name="Table16.A2" office:value-type="string">
-               <text:p text:style-name="P70"><xsl:value-of select="studiengang_typ"/>'s Examination on <xsl:value-of select="abschlusspruefungsdatum" /></text:p>
-            </table:table-cell>
-            <table:table-cell table:style-name="Table16.B2" office:value-type="string">
-               <text:p text:style-name="P70"><xsl:value-of select="abschlussbeurteilung" /></text:p>
-            </table:table-cell>
-         </table:table-row>
-      </table:table>
-      <text:p text:style-name="P15"/>
-      <text:p text:style-name="P23">Grading Scheme: Passed with highest distinction, Passed with distinction, Passed</text:p>
-      <text:p text:style-name="P22"/>
+      <xsl:if test="abschlusspruefungsdatum != ''">
+	      <table:table table:name="Table16" table:style-name="Table16">
+	         <table:table-column table:style-name="Table16.A" table:number-columns-repeated="2" />
+	         <table:table-row>
+	            <table:table-cell table:style-name="Table16.A1" table:number-columns-spanned="2" office:value-type="string">
+	               <text:p text:style-name="P68">Final Examination</text:p>
+	            </table:table-cell>
+	            <table:covered-table-cell />
+	         </table:table-row>
+	         <table:table-row>
+	            <table:table-cell table:style-name="Table16.A2" office:value-type="string">
+	               <text:p text:style-name="P70"><xsl:value-of select="abschlusspruefungsdatum" /></text:p>
+	            </table:table-cell>
+	            <table:table-cell table:style-name="Table16.B2" office:value-type="string">
+	               <text:p text:style-name="P70"><xsl:value-of select="abschlussbeurteilung" /></text:p>
+	            </table:table-cell>
+	         </table:table-row>
+	      </table:table>
+	      <text:p text:style-name="P15"/>
+     	 <text:p text:style-name="P23">Grading Scheme: Passed with highest distinction, Passed with distinction, Passed</text:p>
+     	 <text:p text:style-name="P22"/>
+      </xsl:if>
       <text:p text:style-name="P22">
 		<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr4" draw:name="graphics5" text:anchor-type="char" svg:x="4.50cm" svg:y="0.1cm" svg:width="3.5cm" svg:height="3.5cm" draw:z-index="16" >
 			<draw:image xlink:href="Pictures/rundstempel_fhtw_35mm.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>

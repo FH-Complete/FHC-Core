@@ -59,12 +59,12 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
-			<text:p text:style-name="P2">Diplom-Urkunde</text:p>
+			<text:p text:style-name="P2">Diplom</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">Gemäß § 6 Abs. 1 des Bundesgesetzes über Fachhochschul-Studiengänge (Fachhochschul-</text:p>
-			<text:p text:style-name="P1">Studiengesetz - FHStG), BGBl. Nr. <xsl:value-of select="bescheidbgbl1" /> idgF,</text:p>
+			<text:p text:style-name="P1">Gemäß § 10 Abs. 3 Z 9 des Bundesgesetzes über Fachhochschul-Studiengänge</text:p>
+			<text:p text:style-name="P1">(Fachhochschul-Studiengesetz - FHStG), BGBl. Nr. 340/1993 idgF,</text:p>
 			<text:p text:style-name="P1">verleiht das Fachhochschulkollegium</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="anrede" /><xsl:text> </xsl:text><xsl:value-of select="name" /></text:p>
@@ -87,20 +87,17 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 					<xsl:text>die/der</xsl:text>
 				</xsl:otherwise>
 			</xsl:choose>
-						den Fachhochschul-<xsl:value-of select="stg_art" /></text:p>
+						den Lehrgang zur Weiterbildung nach §9 FHStG idgF</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="stg_bezeichnung" /></text:p>
-			<text:p text:style-name="P1">(Studiengangskennzahl <xsl:value-of select="studiengang_kz" />)</text:p>
+			<text:p text:style-name="P1">(Lehrgangsnummer <xsl:value-of select="studiengang_kz" />)</text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">an der Fachhochschule Technikum Wien</text:p>
-			<text:p text:style-name="P1">durch Ablegung der Master-Prüfung am <xsl:value-of select="datum" /> ordnungsgemäß abgeschlossen hat,</text:p>
-			<text:p text:style-name="P1">den mit Bescheid des Board der Agentur für Qualitätssicherung und Akkreditierung Austria vom 9.5.2012,</text:p>
-			<text:p text:style-name="P1">GZ FH12020016 idgF, gemäß § 6 Abs. 2 FHStG</text:p>
-			<text:p text:style-name="P1">festgesetzten akademischen Grad</text:p>
+			<text:p text:style-name="P1">an der Fachhochschule Technikum Wien abgeschlossen hat,</text:p>
+			<text:p text:style-name="P1">den Abschluss-Grad</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="titel" /></text:p>
-			<text:p text:style-name="P1">abgekürzt</text:p>
-			<text:p text:style-name="P3"><xsl:value-of select="akadgrad_kurzbz" /></text:p>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P3"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1">Wien, <xsl:value-of select="sponsion" /></text:p>
 			<text:p text:style-name="P1"/>

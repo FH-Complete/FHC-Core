@@ -203,6 +203,18 @@ if($db->db_query($qry))
 		}
 		
 		$studiengang_bezeichnung2 = explode(" ", $studiengang->bezeichnung, 2);
+		$name = trim($student->titelpre.' '.trim($student->vorname.' '.$student->vornamen).' '.$student->nachname.($student->titelpost!=''?', '.$student->titelpost:''));
+		
+		//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
+		if ($student->studiengang_kz<0)
+		{
+			$stg = new studiengang();
+			$stg->load($student->studiengang_kz);
+				
+			$studiengang_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($student->studiengang_kz));
+		}
+		else
+			$studiengang_kz = sprintf("%04s", abs($student->studiengang_kz));
 		
 		echo "\t<pruefung>".'
 		<abschlusspruefung_id><![CDATA['.$row->abschlusspruefung_id.']]></abschlusspruefung_id>
@@ -227,6 +239,7 @@ if($db->db_query($qry))
 		<pruefungstyp_beschreibung><![CDATA['.$row->beschreibung.']]></pruefungstyp_beschreibung>
 		<anrede><![CDATA['.$anrede.']]></anrede>
 		<anrede_engl><![CDATA['.$anrede_engl.']]></anrede_engl>
+		<name><![CDATA['.$name.']]></name>
 		<titelpre><![CDATA['.$student->titelpre.']]></titelpre>
 		<vorname><![CDATA['.$student->vorname.']]></vorname>
 		<vornamen><![CDATA['.$student->vornamen.']]></vornamen>
@@ -241,7 +254,7 @@ if($db->db_query($qry))
 		<staatsbuergerschaft_engl><![CDATA['.$staatsbuergerschaft_engl.']]></staatsbuergerschaft_engl>
 		<geburtsnation><![CDATA['.$geburtsnation.']]></geburtsnation>
 		<geburtsnation_engl><![CDATA['.$geburtsnation_engl.']]></geburtsnation_engl>
-		<studiengang_kz><![CDATA['.sprintf('%04s',$student->studiengang_kz).']]></studiengang_kz>
+		<studiengang_kz><![CDATA['.$studiengang_kz.']]></studiengang_kz>
 		<stg_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></stg_bezeichnung>
 		<stg_bezeichnung2><![CDATA['.$studiengang_bezeichnung2[1].']]></stg_bezeichnung2>
 		<stg_bezeichnung_engl><![CDATA['.$studiengang->english.']]></stg_bezeichnung_engl>

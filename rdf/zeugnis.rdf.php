@@ -170,8 +170,19 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$studiengang_typ=$row->typ;
 		$semester = $row->semester;
 		
+		//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
+		if ($row->studiengang_kz<0)
+		{
+			$stg = new studiengang();
+			$stg->load($row->studiengang_kz);
+				
+			$studiengang_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($row->studiengang_kz));
+		}
+		else
+			$studiengang_kz = sprintf("%04s", abs($row->studiengang_kz));
+		
 		$xml .= "		<studiengang_art>".$bezeichnung."</studiengang_art>";
-		$xml .= "		<studiengang_kz>".sprintf('%04s', abs($row->studiengang_kz))."</studiengang_kz>";
+		$xml .= "		<studiengang_kz>".$studiengang_kz."</studiengang_kz>";
 		$xml .= "\n		<anrede>".$row->anrede."</anrede>";
 		$xml .= "\n		<vorname>".$row->vorname."</vorname>";
 		$xml .= "		<nachname>".$row->nachname."</nachname>";

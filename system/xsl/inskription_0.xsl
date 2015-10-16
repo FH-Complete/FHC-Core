@@ -278,7 +278,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P1">
 				geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
 				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
-				als ordentliche(r) Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
+				als ordentliche(r) Studierende(r) (Studienbeginn<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" />, Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
 				<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
 				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
 			</text:p>
@@ -327,7 +327,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P1">
 				geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
 				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
-				als ordentliche(r) Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
+				als ordentliche(r) Studierende(r) (Studienbeginn<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" />, Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
 				<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
 				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
 			</text:p>
@@ -376,7 +376,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P1">
 				geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
 				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
-				als ordentliche(r) Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
+				als ordentliche(r) Studierende(r) (Studienbeginn<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" />, Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
 				<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
 				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
 			</text:p>
@@ -425,7 +425,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P1">
 				geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
 				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
-				als ordentliche(r) Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
+				als ordentliche(r) Studierende(r) (Studienbeginn<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" />, Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
 				<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
 				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
 			</text:p>
@@ -474,7 +474,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P1">
 				geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
 				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
-				als ordentliche(r) Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
+				als ordentliche(r) Studierende(r) (Studienbeginn<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" />, Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
 				<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
 				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
 			</text:p>

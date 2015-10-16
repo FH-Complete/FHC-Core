@@ -280,7 +280,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 				als a.o. Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 				<text:line-break />des Lehrgangs zur Weiterbildung nach §9 FHStG idgF. 0050018 Pre-College Program im
-				<xsl:text> </xsl:text><xsl:value-of select="semester -1" />. Semester gemeldet.
+				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
 			</text:p>
 			<text:p text:style-name="P1"/>
 			<table:table table:name="Tabelle2" table:style-name="Tabelle2">
@@ -329,7 +329,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 				als a.o. Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 				<text:line-break />des Lehrgangs zur Weiterbildung nach §9 FHStG idgF. 0050018 Pre-College Program im
-				<xsl:text> </xsl:text><xsl:value-of select="semester -1" />. Semester gemeldet.
+				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
 			</text:p>
 			<text:p text:style-name="P1"/>
 			<table:table table:name="Tabelle2" table:style-name="Tabelle2">
@@ -378,7 +378,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 				als a.o. Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 				<text:line-break />des Lehrgangs zur Weiterbildung nach §9 FHStG idgF. 0050018 Pre-College Program im
-				<xsl:text> </xsl:text><xsl:value-of select="semester -1" />. Semester gemeldet.
+				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
 			</text:p>
 			<text:p text:style-name="P1"/>
 			<table:table table:name="Tabelle2" table:style-name="Tabelle2">
@@ -427,7 +427,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 				als a.o. Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 				<text:line-break />des Lehrgangs zur Weiterbildung nach §9 FHStG idgF. 0050018 Pre-College Program im
-				<xsl:text> </xsl:text><xsl:value-of select="semester -1" />. Semester gemeldet.
+				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
 			</text:p>
 			<text:p text:style-name="P1"/>
 			<table:table table:name="Tabelle2" table:style-name="Tabelle2">
@@ -476,7 +476,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 				als a.o. Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 				<text:line-break />des Lehrgangs zur Weiterbildung nach §9 FHStG idgF. 0050018 Pre-College Program im
-				<xsl:text> </xsl:text><xsl:value-of select="semester -1" />. Semester gemeldet.
+				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
 			</text:p>
 			<text:p text:style-name="P1"/>
 			<table:table table:name="Tabelle2" table:style-name="Tabelle2">
