@@ -169,11 +169,11 @@ class benutzerberechtigung extends basis_db
 			return false;
 		}
 		
-		/*if($this->funktion_kurzbz!='' && $this->oe_kurzbz!='') Auskommentiert von kindlm am 28.08.2015. Wenn beim Recht eine OE angegeben wird, wird diese genommen, ansonsten die von der Funktion.  
+		if($this->funktion_kurzbz!='' && $this->oe_kurzbz!='')
 		{
 			$this->errormsg = 'Wenn eine Funktion_kurzbz angegeben wird, darf keine Organisationseinheit eingetragen sein';
 			return false;
-		}*/
+		}
 		
 		if($this->art=='')
 		{
@@ -389,7 +389,7 @@ class benutzerberechtigung extends basis_db
 				SELECT 
 					benutzerberechtigung_id, tbl_benutzerfunktion.uid, tbl_benutzerrolle.funktion_kurzbz,
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
-					COALESCE (tbl_benutzerrolle.oe_kurzbz,tbl_benutzerfunktion.oe_kurzbz) AS oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
+					tbl_benutzerfunktion.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
 				FROM 

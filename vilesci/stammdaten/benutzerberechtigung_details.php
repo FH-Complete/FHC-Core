@@ -354,22 +354,27 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input id='art_$b->benutzerberechtigung_id' type='text' name='art' value='".$b->art."' size='5' maxlength='5' onChange='validateArt(\"art_$b->benutzerberechtigung_id\"); markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
 			
 			//Organisationseinheit
-			$htmlstr .= "		<td class='oe_column' name='td_$b->benutzerberechtigung_id'><select id='oe_".$b->benutzerberechtigung_id."' name='oe_kurzbz' ".($b->kostenstelle_id!=''?'disabled':'')." onchange='".($funktion_kurzbz!=''?"alert(\"Achtung! Durch diese Auswahl wird die Organisationseinheit der Funktion überschrieben!\");":"")."' onchange='markier(\"td_".$b->benutzerberechtigung_id."\")' style='width: 200px;'>\n";
-			$htmlstr .= "		<option value='' onclick='enable(\"kostenstelle_".$b->benutzerberechtigung_id."\");'>-- Alle --</option>\n";
-			
-			foreach ($oe->result as $oekey)
+			if($funktion_kurzbz!='')
+				$htmlstr .= "		<td class='oe_column' name='td_$b->benutzerberechtigung_id'>OE aus MA-Funktion</td>\n";
+			else 
 			{
-				if ($b->oe_kurzbz == $oekey->oe_kurzbz && $b->oe_kurzbz != null)
-					$sel = " selected";
-				else
-					$sel = "";
-				if(!$oekey->aktiv)
-					$class='class="inactive"';
-				else
-					$class='';
-				$htmlstr .= "	<option value='".$oekey->oe_kurzbz."' ".$sel." ".$class." onclick='disable(\"kostenstelle_".$b->benutzerberechtigung_id."\");'>".$oekey->organisationseinheittyp_kurzbz.' '.$oekey->bezeichnung.'</option>';
+				$htmlstr .= "		<td class='oe_column' name='td_$b->benutzerberechtigung_id'><select id='oe_".$b->benutzerberechtigung_id."' name='oe_kurzbz' ".($b->kostenstelle_id!=''?'disabled':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\")' style='width: 200px;'>\n";
+				$htmlstr .= "		<option value='' onclick='enable(\"kostenstelle_".$b->benutzerberechtigung_id."\");'>-- Alle --</option>\n";
+				
+				foreach ($oe->result as $oekey)
+				{
+					if ($b->oe_kurzbz == $oekey->oe_kurzbz && $b->oe_kurzbz != null)
+						$sel = " selected";
+					else
+						$sel = "";
+					if(!$oekey->aktiv)
+						$class='class="inactive"';
+					else
+						$class='';
+					$htmlstr .= "	<option value='".$oekey->oe_kurzbz."' ".$sel." ".$class." onclick='disable(\"kostenstelle_".$b->benutzerberechtigung_id."\");'>".$oekey->organisationseinheittyp_kurzbz.' '.$oekey->bezeichnung.'</option>';
+				}
+				$htmlstr .= "		</select></td>\n";
 			}
-			$htmlstr .= "		</select></td>\n";
 			
 			//Kostenstelle
 			$htmlstr .= "		<td class='ks_column' name='td_$b->benutzerberechtigung_id'><select id='kostenstelle_".$b->benutzerberechtigung_id."'name='kostenstelle_id' ".($b->oe_kurzbz!=''?'disabled':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\")' style='width: 200px;'>\n";
@@ -500,18 +505,23 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	$htmlstr .= "		<td style='padding-top: 15px;'><input id='art_neu' type='text' name='art' value='' size='5' maxlength='5' onBlur='checkrequired(\"art_neu\")' onChange='validateArt(\"art_neu\")' placeholder='suid'></td>\n";
 	
 	//Organisationseinheit
-	$htmlstr .= "		<td class='oe_column' style='padding-top: 15px;'><select id='oe_kurzbz_neu' name='oe_kurzbz' onchange='".($funktion_kurzbz!=''?"alert(\"Achtung! Durch diese Auswahl wird die Organisationseinheit der Funktion überschrieben!\");":"")."' onchange='markier(\"neu\")' style='width: 200px;'>\n";
-	$htmlstr .= "			<option value='' onclick='enable(\"kostenstelle_neu\");'>-- Alle --</option>\n";
-	
-	foreach ($oe->result as $oekey)
+	if($funktion_kurzbz!='')
+		$htmlstr .= "		<td class='oe_column' style='padding-top: 15px;'>OE aus MA-Funktion</td>\n";
+	else 
 	{
-		if(!$oekey->aktiv)
-				$class='class="inactive"';
-			else
-				$class='';
-		$htmlstr .= "				<option value='".$oekey->oe_kurzbz."' ".$class." onclick='disable(\"kostenstelle_neu\");'>".$oekey->organisationseinheittyp_kurzbz.' '.$oekey->bezeichnung.'</option>';
+		$htmlstr .= "		<td class='oe_column' style='padding-top: 15px;'><select id='oe_kurzbz_neu' name='oe_kurzbz' onchange='markier(\"neu\")' style='width: 200px;'>\n";
+		$htmlstr .= "			<option value='' onclick='enable(\"kostenstelle_neu\");'>-- Alle --</option>\n";
+		
+		foreach ($oe->result as $oekey)
+		{
+			if(!$oekey->aktiv)
+					$class='class="inactive"';
+				else
+					$class='';
+			$htmlstr .= "				<option value='".$oekey->oe_kurzbz."' ".$class." onclick='disable(\"kostenstelle_neu\");'>".$oekey->organisationseinheittyp_kurzbz.' '.$oekey->bezeichnung.'</option>';
+		}
+		$htmlstr .= "		</select></td>\n";
 	}
-	$htmlstr .= "		</select></td>\n";
 	
 	//Kostenstelle
 	$htmlstr .= "		<td class='ks_column' style='padding-top: 15px;'><select id='kostenstelle_neu' name='kostenstelle_id' onchange='markier(\"".(isset($b->benutzerberechtigung_id)?$b->benutzerberechtigung_id:'')."\")' style='width: 200px;'>\n";
