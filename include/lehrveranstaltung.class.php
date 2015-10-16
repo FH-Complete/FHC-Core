@@ -237,7 +237,7 @@ class lehrveranstaltung extends basis_db
 	 * @param $semester
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_lva($studiengang_kz, $semester = null, $lehreverzeichnis = null, $lehre = null, $aktiv = null, $sort = null, $oe_kurzbz=null, $lehrtyp=null)
+	public function load_lva($studiengang_kz, $semester = null, $lehreverzeichnis = null, $lehre = null, $aktiv = null, $sort = null, $oe_kurzbz=null, $lehrtyp=null, $orgform=null)
 	{
 		//Variablen pruefen
 		if($semester == "null")
@@ -258,7 +258,7 @@ class lehrveranstaltung extends basis_db
 		}
 		if (!is_null($aktiv) && !is_bool($aktiv))
 		{
-			$this->errormsg = 'Aktivkz muss ein boolscher Wert sein';
+			$this->errormsg = 'Aktiv muss ein boolscher Wert sein';
 			return false;
 		}
 		if (!is_null($lehre) && !is_bool($lehre))
@@ -294,6 +294,9 @@ class lehrveranstaltung extends basis_db
 
 		if(!is_null($lehrtyp))
 			$qry .= " AND lehrtyp_kurzbz=".$this->db_add_param($lehrtyp);
+		
+		if(!is_null($orgform) && $orgform!='')
+			$qry .= " AND orgform_kurzbz=".$this->db_add_param($orgform);
 
 		if (is_null($sort) || empty($sort))
 			$qry .= " ORDER BY semester, bezeichnung";
