@@ -35,7 +35,7 @@ var isLVFilterLoaded=false;
 /**
  * Error-Behandlung bei Ajax Requests
  */
- 
+
 function loadError(xhr, textStatus, errorThrown)
 {
 	if(xhr.status==200)
@@ -83,6 +83,11 @@ function drawHeader(text)
  */
 function loadStudienordnung()
 {
+	var method = 'loadStudienordnungSTGInaktiv';
+	if(typeof initSTOs === 'undefined')
+	{
+		method = 'loadStudienordnungSTG';
+	}
 	// Ausgewaehlten Studiengang holen
 	studiengang_kz = $('#studiengang').val();
 	studiengang_bezeichnung = $( "#studiengang option:selected" ).text();
@@ -103,7 +108,7 @@ function loadStudienordnung()
 		data: {
 				"typ": "json",
 				"class": "studienordnung",
-				"method":	"loadStudienordnungSTG",
+				"method":	method,
 				"parameter_0": studiengang_kz
 			},
 		error: loadError
@@ -129,7 +134,7 @@ function loadStudienordnung()
 function drawStudienordnungen(data)
 {
 	var obj='<a href="#Neu" onclick="neueStudienordnung();return false;">Neue Studienordnung</a><ul style="padding-left: 15px">';
-	
+
 	for(i in data)
 	{
 		if(data[i].studienordnung_id !== null)
@@ -310,10 +315,10 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 			treeData.push(obj);
 		}
 
-				
+
 		// DIV fuer den Tree neu anlegen damit der alte Tree vollstaendig entfernt wird
 		$("#data").html("<div id='treeData'></div>");
-		
+
 		function searchChildren(element, matchingId, original)
 		{
 			var found = false;
@@ -330,7 +335,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					return false;
 				}
 				return true;
-			}		
+			}
 			return false;
 		}
 
@@ -357,7 +362,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					"select_limit": 1,
 					"select_multiple_modifier": "ctrl"
 				},
-				json_data: { 
+				json_data: {
 					data: treeData // Daten an den Tree binden
 				},
 				crrm: {
@@ -379,7 +384,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 									return false;
 								}
 							}
-							
+
 							if(m.o.attr("rel")==="semester")
 							{
 								return false;
@@ -449,7 +454,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 								"Delete" : {
 									"label" : "Eintrag entfernen",
 									"action": function(obj){
-										// Pruefen ob LVs unterhalb dieser LV haengen, 
+										// Pruefen ob LVs unterhalb dieser LV haengen,
 										// falls ja wird das loeschen verhindert
 										if(obj.children().find("li").length === 0)
 										{
@@ -467,7 +472,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 								}
 							};
 						}
-						
+
 					}
 				},
 				plugins: ["themes", "ui", "dnd", "grid", "json_data", "crrm", "types", "sort", "contextmenu"]
@@ -482,17 +487,17 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 //				{
 					// Verschieben eines Eintrages
 
-					// Studienplan_lehrveranstaltung_id ermitteln	
+					// Studienplan_lehrveranstaltung_id ermitteln
 					var studienplan_lehrveranstaltung_id='';
 					if(data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id){
 						studienplan_lehrveranstaltung_id=data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id.value;
-						$("#treeData").jstree.refresh();
+						//$("#treeData").jstree('refresh');
 					}
-					
+
 					// Aenderung speichern
 					saveJsondataFromTree(data.rslt.o[0].id, studienplan_id, studienplan_lehrveranstaltung_id);
 
-					// ECTS Summen neu berechnen				
+					// ECTS Summen neu berechnen
 					var root = data.inst.get_container_ul();
 					var nodes = root[0].childNodes;
 					for(var i=0; i<nodes.length; i++)
@@ -509,7 +514,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 			}).bind("loaded.jstree", function(event, data)
 			{
 				// Wenn der Tree geladen wird, die ECTS Summen der einzelnen Semester berechnen
-				
+
 				var root = data.inst.get_container_ul();
 				var nodes = root[0].childNodes;
 				for(var i=0; i<nodes.length; i++)
@@ -517,7 +522,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					if(nodes[i].getAttribute("rel") === "semester"){
 						writeEctsSum(nodes[i]);
 					}
-					
+
 				}
 				writeOverallSum(nodes);
 			}).bind("open_node.jstree", function(event, data)
@@ -547,7 +552,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 						lvid = lvid.substring(5);
 					}
 				}
-				
+
 
 				// Lehrveranstaltungsdetails laden
 				if(data.rslt.obj.attr("rel") !== "semester")
@@ -558,7 +563,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 				{
 					$("#tab-lehrveranstaltungdetail").html("<p>Klicken Sie auf eine Lehrveranstaltung um die Details anzuzeigen</p>");
 				}
-				
+
 				// Regeln laden
 				if(data.rslt.obj.attr("rel") !== "semester")
 				{
@@ -569,7 +574,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 				{
 					$("#tab-regel").html("<p>Klicken Sie auf eine Lehrveranstaltung um die Regeln anzuzeigen</p>");
 				}
-				
+
 				// Kompatibilitaet laden
 				if(data.rslt.obj.attr("rel") !== "semester")
 				{
@@ -580,7 +585,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 				{
 					$("#tab-kompatibel").html("<p>Klicken Sie auf eine Lehrveranstaltung um die kompatiblen Lehrveranstaltungen anzuzeigen</p>");
 				}
-				
+
 				// Sortierung laden
 				if(data.rslt.obj.attr("rel") !== "semester")
 				{
@@ -661,7 +666,7 @@ function LoadLVDetails(lvid, stpllvid)
 		html+="<br>LV-Semester: "+ClearNull(lvdata.semester);
 		html+="<br><br>LVID: "+ClearNull(lvdata.lehrveranstaltung_id)+" / StgKz: "+ClearNull(lvdata.studiengang_kz);
 		$("#tab-lehrveranstaltungdetail").html(html);
-	});	
+	});
 }
 
 /**
@@ -694,8 +699,8 @@ function loadLVKompatibilitaet(lvid)
 			html = html+'<br><br><a href="lehrveranstaltung_kompatibel.php?lehrveranstaltung_id='+lvid+'&type=edit" target="_blank">kompatible Lehrveranstaltungen hinzufügen</a>';
 		}
 		$("#tab-kompatibel").html(html);
-		
-	});	
+
+	});
 }
 /*
  * lädt die Sortierung einer Lehrveranstaltung innerhalb eines Studienplans
@@ -740,7 +745,7 @@ function saveSortierung(stpllvid)
 		"sort": sort
 	};
 	$.ajax(
-	{	
+	{
 		dataType: "json",
 		url: "../../soap/fhcomplete.php",
 		type: "POST",
@@ -798,14 +803,14 @@ function editStudienplan(studienplan_id)
 }
 
 /*
-* Funktion zum Laden des Baumes der 
+* Funktion zum Laden des Baumes der
 * gefilterten LVs
 * */
 function loadFilteredLehrveranstaltungen()
 {
 	if($("#oeDropdown option:selected").val() === "")
 	{
-		$.ajax(	
+		$.ajax(
 		{
 			dataType: "json",
 			url: "../../soap/fhcomplete.php",
@@ -873,8 +878,8 @@ function showLVTree(data)
 		if($("#lvListe").length === 0)
 		{
 			$("#filteredLVs").html("<h3></h3><div id='lvListe'></div>");
-		} 
-		else 
+		}
+		else
 		{
 			$("#filteredLVs").html("<h3>Daten werden geladen...</h3><div id='lvListe'></div>");
 		}
@@ -883,8 +888,8 @@ function showLVTree(data)
 				"select_limit": 1,
 				"select_multiple_modifier": "ctrl"
 			},
-			
-			json_data: { 
+
+			json_data: {
 				data: TreeData,
 				progressive_render : true
 			},
@@ -925,7 +930,7 @@ function showLVTree(data)
 				resizable: true
 			},
 			plugins: ["themes", "ui", "dnd", "grid", "json_data", "crrm", "types", "sort"]
-		}).bind("loaded.jstree", function(event, data) 
+		}).bind("loaded.jstree", function(event, data)
 		{
 			$("#loadingGif").remove();
 			$("h3:contains('Daten werden geladen...')").remove();
@@ -936,13 +941,13 @@ function showLVTree(data)
 		{
 			// Bei einem Klick auf eine LV werden die Details geladen
 			lvid = data.rslt.obj.attr("lvID");
-			
-			
+
+
 			LoadLVDetails(lvid, null);
-			
+
 			// Regeln laden
 			$("#tab-regel").html("<p>Regeln werden nur angezeigt wenn die LV im Studienplan hängt</p>");
-			
+
 			// Kompatibilitaet laden
 			if(lvid!==undefined)
 				loadLVKompatibilitaet(lvid);
@@ -954,17 +959,17 @@ function showLVTree(data)
 				studienplan_lehrveranstaltung_id=data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id.value;
 				$("#treeData").jstree.refresh();
 			}
-			
+
 			// Aenderung speichern
 			saveJsondataFromTree(data.rslt.o[0].id, studienplan_id, studienplan_lehrveranstaltung_id);
 
-			// ECTS Summen neu berechnen				
-			
+			// ECTS Summen neu berechnen
+
 			hideAllTreeColumns();
 			writeOverallSum(nodes);
 		});
-	} 
-	else 
+	}
+	else
 	{
 		$("#filteredLVs .jstree-grid-wrapper").remove();
 		if($("#lvListe").length !== 0)
@@ -1052,6 +1057,10 @@ function loadSemester()
 		}
 		html+="</select>";
 		$("#semesterListe").html(html);
+		if($("#neueLV").length === 0)
+			$("#lehrveranstaltung").append("<div id='neueLV'></div>");
+		
+		$("#neueLV").html("<br/><a href='./lehrveranstaltung_details.php?neu=true&stg_kz="+studiengang_kz+"' target='_blank'><input type='button' value='Neue LV anlegen'></a>");
 		isLVFilterLoaded=true;
 		loadFilteredLehrveranstaltungen();
 	});
@@ -1073,7 +1082,7 @@ function hideAllTreeColumns()
 		var divs = $("#filteredLVs .jstree-grid-col-" + j);
 		for (var i = 0; i < divs.length; i++)
 		{
-			divs[i].style.display = "none";	
+			divs[i].style.display = "none";
 		}
 	}
 }
@@ -1115,7 +1124,7 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 	{
 		node = $("#"+studienplan_lehrveranstaltung_id);
 	}
-	
+
 	var lehrveranstaltung_id = jsonData[0]["metadata"]["lehrveranstaltung_id"];
 	var semester = node.closest("li[rel=semester]").attr("semester");
 
@@ -1130,14 +1139,14 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 		parent_id = node.parent().parent().attr("studienplan_lehrveranstaltung_id");
 
 	var neu = true;
-	
+
 	if(studienplan_lehrveranstaltung_id !== undefined && studienplan_lehrveranstaltung_id!='')
 		neu = false;
 
 	// Bei neuen Eintraegen kein Load noetig
 	if(neu)
 		loaddata='';
-	
+
 	savedata = {
 		"studienplan_id": studienplan_id,
 		"lehrveranstaltung_id" : lehrveranstaltung_id,
@@ -1145,11 +1154,12 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 		"studienplan_lehrveranstaltung_id_parent": parent_id,
 		"pflicht": true
 	};
-	
+
 	$.ajax(
-	{	
+	{
 		dataType: "json",
-		url: "../../soap/fhcomplete.php",
+		url: "./saveStudienordnung.php",
+		//url: "../../soap/fhcomplete.php",
 		type: "POST",
 		data: {
 			"typ": "json",
@@ -1189,7 +1199,7 @@ function TreeSaveError(xhr, textStatus, errorThrown)
 		alert('Fehler beim Laden der Daten. ErrorNr:'+xhr.status);
 
 	// Studienplan Tree neu Laden um inkonsistente Anzeigen zu verhindern
-	loadLehrveranstaltungSTPL(loadLehrveranstaltungSTPLStudienplan_id, loadLehrveranstaltungSTPLBezeichnung, loadLehrveranstaltungSTPLSemester);	
+	loadLehrveranstaltungSTPL(loadLehrveranstaltungSTPLStudienplan_id, loadLehrveranstaltungSTPLBezeichnung, loadLehrveranstaltungSTPLSemester);
 }
 
 /**
@@ -1199,7 +1209,7 @@ function deleteLehrveranstaltungFromStudienplan(lehrveranstaltung_studienplan_id
 {
 	$.ajax({
 		dataType: "json",
-		url: "../../soap/fhcomplete.php",
+		url: "./saveStudienordnung.php",
 		type: "POST",
 		data: {
 			"typ": "json",
@@ -1213,7 +1223,7 @@ function deleteLehrveranstaltungFromStudienplan(lehrveranstaltung_studienplan_id
 		{
 			$.ajax({
 				dataType: "json",
-				url: "../../soap/fhcomplete.php",
+				url: "./saveStudienordnung.php",
 				type: "POST",
 				data: {
 					"typ": "json",
@@ -1280,11 +1290,11 @@ function saveStudienordnung()
 		"studiengang_kz":studiengang_kz
 	};
 
-	
+
 	$.ajax(
 	{
 		dataType: "json",
-		url: "../../soap/fhcomplete.php",
+		url: "./saveStudienordnung.php",
 		type: "POST",
 		data: {
 				"typ": "json",
@@ -1344,11 +1354,11 @@ function saveStudienplan()
 	"studienordnung_id":studienordnung_id
 	};
 
-	
+
 	$.ajax(
 	{
 		dataType: "json",
-		url: "../../soap/fhcomplete.php",
+		url: "./saveStudienordnung.php",
 		type: "POST",
 		data: {
 				"typ": "json",
@@ -1364,7 +1374,7 @@ function saveStudienplan()
 			{
 				$("#submsg").css("visibility", "visible");
 				window.setTimeout(function(){$("#submsg").css("visibility", "hidden");}, 1500);
-				loadStudienplanSTO(studienordnung_id,studienordnung_bezeichnung);	
+				loadStudienplanSTO(studienordnung_id,studienordnung_bezeichnung);
 			}
 		},
 		error: loadError
@@ -1381,7 +1391,7 @@ function writeEctsSum(parent)
 		if($(parent).children("ul").children().length > 0)
 		{
 			writeEctsSum($(parent).children("ul").children()[i]);
-		}	
+		}
 	}
 	if($(parent).attr("rel") === "semester")
 	{
@@ -1493,7 +1503,7 @@ function saveSemesterStoZuordnung(studiensemester, ausbildungssemester)
 			semesterStoZuordnung();
 		});
 	}
-	
+
 }
 
 function deleteSemesterZuordnung(ausbildungssemester_kurzbz, studiensemester)
@@ -1503,7 +1513,7 @@ function deleteSemesterZuordnung(ausbildungssemester_kurzbz, studiensemester)
 		var row = $("#row_"+ausbildungssemester_kurzbz);
 		$.ajax({
 			dataType: "json",
-			url: "../../soap/fhcomplete.php",
+			url: "./saveStudienordnung.php",
 			type: "POST",
 			data: {
 				"typ":"json",
@@ -1521,7 +1531,7 @@ function deleteSemesterZuordnung(ausbildungssemester_kurzbz, studiensemester)
 	{
 		$.ajax({
 			dataType: "json",
-			url: "../../soap/fhcomplete.php",
+			url: "./saveStudienordnung.php",
 			type: "POST",
 			data: {
 				"typ":"json",
@@ -1536,7 +1546,7 @@ function deleteSemesterZuordnung(ausbildungssemester_kurzbz, studiensemester)
 			semesterStoZuordnung();
 		});
 	}
-	
+
 }
 
 /**
@@ -1563,6 +1573,6 @@ function copyStudienordnung(studienordnung_id)
 				alert(data.errormsg);
 			}
 			loadStudienordnung();
-		});		
+		});
 	}
 }

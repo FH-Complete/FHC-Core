@@ -53,13 +53,13 @@ grid.lvaStundenplan button
 
 
 tree treecol {
-	background-color: #FFFFCC; 
-	border: 1px solid black;	
+	background-color: #FFFFCC;
+	border: 1px solid black;
 }
 
 tree {
 	font-size:9pt;
-	font-family:Arial;	
+	font-family:Arial;
 }
 
 box.studentDetail {
@@ -120,7 +120,7 @@ treechildren::-moz-tree-row(lehrveranstaltung_, selected)
 }
 
 
-treechildren::-moz-tree-checkbox 
+treechildren::-moz-tree-checkbox
 {
   /* unchecked checkbox treecells. This style MUST come before treechildren::-moz-tree-checkbox(checked) otherwise it won't take effect.  */
   list-style-image: url("../skin/images/round.png");
@@ -161,6 +161,7 @@ toolbarbutton.stplweekoverlay-toolbarbutton:hover
 {
 	color: #AAAAAA;
 	visibility:hidden;
+	font-size: small;
 }
 
 treechildren::-moz-tree-row(makeItred)

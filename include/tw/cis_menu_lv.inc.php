@@ -670,15 +670,16 @@ function checkZeilenUmbruch()
 		// Email an Studierende
 
 		$mailto='mailto:';
-		$qry = 'SELECT
+
+		$qry = "SELECT
 					distinct vw_lehreinheit.stg_kurzbz, vw_lehreinheit.stg_typ, vw_lehreinheit.semester,
-					vw_lehreinheit.verband, vw_lehreinheit.gruppe, vw_lehreinheit.gruppe_kurzbz, tbl_gruppe.mailgrp
+					COALESCE(vw_lehreinheit.verband,'') as verband, COALESCE(vw_lehreinheit.gruppe,'') as gruppe, vw_lehreinheit.gruppe_kurzbz, tbl_gruppe.mailgrp
 				FROM
 					campus.vw_lehreinheit
 					LEFT JOIN public.tbl_gruppe USING(gruppe_kurzbz)
 				WHERE
-					lehrveranstaltung_id='.$db->db_add_param($lvid).'
-					AND studiensemester_kurzbz='.$db->db_add_param($angezeigtes_stsem);
+					lehrveranstaltung_id=".$db->db_add_param($lvid)."
+					AND studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem);
 		$nomail='';
 		$variable = new variable();
 		$variable->loadVariables($user);
@@ -694,7 +695,7 @@ function checkZeilenUmbruch()
 						$nomail=$row->gruppe_kurzbz.' ';
 					}
 					else
-						$mailto.=mb_strtolower($row->gruppe_kurzbz.'@'.DOMAIN.',');
+						$mailto.=mb_strtolower($row->gruppe_kurzbz.'@'.DOMAIN.$variable->variable->emailadressentrennzeichen);
 				}
 				else
 					$mailto.=mb_strtolower($row->stg_typ.$row->stg_kurzbz.$row->semester.trim($row->verband).trim($row->gruppe).'@'.DOMAIN.$variable->variable->emailadressentrennzeichen);

@@ -3477,6 +3477,77 @@ if($result = $db->db_query("SELECT 1 FROM public.tbl_funktion WHERE funktion_kur
 	}
 }
 
+// BIS-Verwendung
+if(!@$db->db_query("SELECT inkludierte_lehre FROM bis.tbl_bisverwendung LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_bisverwendung ADD COLUMN inkludierte_lehre smallint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>BIS-Verwendung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>BIS-Verwendung inkludierte_lehre hinzugefuegt';
+
+}
+
+// Eigene Berechtigung fuer Bearbeitung inaktiver Studienordnungen
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='lehre/lehrveranstaltungAnlegen' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/lehrveranstaltungAnlegen','Recht zur Anlage von Lehrveranstaltungen');
+
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lehre/lehrveranstaltungAnlegen','assistenz','suid');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Eigene Berechtigung lehre/lehrveranstalgungAnlegen Anlage von Lehrveranstaltungen hinzugefuegt!<br>';
+	}
+}
+
+// Mehrsprachigkeit fuer ZGV
+if(!@$db->db_query("SELECT bezeichnung FROM bis.tbl_zgv LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE bis.tbl_zgv ADD COLUMN bezeichnung varchar(64)[];
+	ALTER TABLE bis.tbl_zgvmaster ADD COLUMN bezeichnung varchar(64)[];
+	ALTER TABLE bis.tbl_zgvdoktor ADD COLUMN bezeichnung varchar(64)[];
+
+	UPDATE bis.tbl_zgv SET bezeichnung[1]=zgv_bez;
+	UPDATE bis.tbl_zgv SET bezeichnung[2]=zgv_bez;
+	UPDATE bis.tbl_zgvmaster SET bezeichnung[1]=zgvmas_bez;
+	UPDATE bis.tbl_zgvmaster SET bezeichnung[2]=zgvmas_bez;
+	UPDATE bis.tbl_zgvdoktor SET bezeichnung[1]=zgvdoktor_bez;
+	UPDATE bis.tbl_zgvdoktor SET bezeichnung[2]=zgvdoktor_bez;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_zgv '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' Mehrsprachige Bezeichnung für ZGV, Master ZGV und Doktor ZGV hinzugefügt<br>';
+}
+
+// Eigene Berechtigung fuer Anlage neuer Lehrveranstaltung
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='lehre/studienordnungInaktiv' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/studienordnungInaktiv','Recht zur Bearbeitung inaktiver Studienordnungen');
+
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lehre/studienordnungInaktiv','assistenz','suid');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Eigene Berechtigung lehre/studienordnungInaktiv zur Bearbeitung von inaktiven Studienordnungen hinzugefuegt!<br>';
+	}
+}
+
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -3489,7 +3560,7 @@ $tabellen=array(
 	"bis.tbl_besqual"  => array("besqualcode","besqualbez"),
 	"bis.tbl_bisfunktion"  => array("bisverwendung_id","studiengang_kz","sws","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_bisio"  => array("bisio_id","mobilitaetsprogramm_code","nation_code","von","bis","zweck_code","student_uid","updateamum","updatevon","insertamum","insertvon","ext_id","ort","universitaet","lehreinheit_id"),
-	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art"),
+	"bis.tbl_bisverwendung"  => array("bisverwendung_id","ba1code","ba2code","vertragsstunden","beschausmasscode","verwendung_code","mitarbeiter_uid","hauptberufcode","hauptberuflich","habilitation","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id","dv_art","inkludierte_lehre"),
 	"bis.tbl_bundesland"  => array("bundesland_code","kurzbz","bezeichnung"),
 	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
@@ -3499,10 +3570,10 @@ $tabellen=array(
 	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre"),
 	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle"),
 	"bis.tbl_verwendung"  => array("verwendung_code","verwendungbez"),
-	"bis.tbl_zgv"  => array("zgv_code","zgv_bez","zgv_kurzbz"),
-	"bis.tbl_zgvmaster"  => array("zgvmas_code","zgvmas_bez","zgvmas_kurzbz"),
+	"bis.tbl_zgv"  => array("zgv_code","zgv_bez","zgv_kurzbz","bezeichnung"),
+	"bis.tbl_zgvmaster"  => array("zgvmas_code","zgvmas_bez","zgvmas_kurzbz","bezeichnung"),
+	"bis.tbl_zgvdoktor" => array("zgvdoktor_code", "zgvdoktor_bez", "zgvdoktor_kurzbz","bezeichnung"),
 	"bis.tbl_zweck"  => array("zweck_code","kurzbz","bezeichnung"),
-    "bis.tbl_zgvdoktor" => array("zgvdoktor_code", "zgvdoktor_bez", "zgvdoktor_kurzbz"),
 	"campus.tbl_abgabe"  => array("abgabe_id","abgabedatei","abgabezeit","anmerkung"),
 	"campus.tbl_anwesenheit"  => array("anwesenheit_id","uid","einheiten","datum","anwesend","lehreinheit_id","anmerkung","ext_id"),
 	"campus.tbl_beispiel"  => array("beispiel_id","uebung_id","nummer","bezeichnung","punkte","updateamum","updatevon","insertamum","insertvon"),
@@ -3857,9 +3928,11 @@ $berechtigungen = array(
 	array('lehre/reservierung','erweiterte Reservierung inkl. Lektorauswahl, Stg, Sem und Gruppe'),
 	array('lehre/reservierung:begrenzt','normale Raumreservierung im CIS'),
 	array('lehre/studienordnung','Studienordnung'),
+	array('lehre/studienordnungInaktiv','Studienordnung Inaktiv'),
 	array('lehre/vorrueckung','Lehreinheitenvorrückung'),
 	array('lv-plan','Stundenplan'),
 	array('lv-plan/gruppenentfernen','Erlaut das Entfernen von Gruppen aus LVPlan vom FAS aus'),
+	array('lv-plan/lektorentfernen','Erlaut das Entfernen von Lektoren aus LVPlan vom FAS aus'),
 	array('mitarbeiter','FAS Mitarbeitermodul'),
 	array('mitarbeiter/bankdaten','Bankdaten für Mitarbeiter und Studierende anzeigen'),
 	array('mitarbeiter/personalnummer','Editieren der Personalnummer im FAS'),
@@ -3974,7 +4047,7 @@ foreach($berechtigungen as $row)
 }
 if($neue==false)
 	echo '<br>Keine neuen Berechtigungen';
-	
+
 // ******** Pruefen ob die Webservice Berechtigungen alle gesetzt sind **********
 
 echo '<h2>Webservice Berechtigungen pruefen</h2>';

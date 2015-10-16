@@ -34,28 +34,28 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	MitarbeiterVerwendungDetailMitarbeiterUid=mitarbeiter_uid;
-	
+
 	if(bisverwendung_id!='')
 	{
 		//Wenn eine BisverwendungID uebergeben wird, dann wird dieser Datensatz geladen
 		MitarbeiterVerwendungDetailNeu='false';
 		MitarbeiterVerwendungDetailBisverwendungId=bisverwendung_id;
-		
+
 		//Laden der Daten
 		//Daten holen
 		var url = '<?php echo APP_ROOT ?>rdf/bisverwendung.rdf.php?bisverwendung_id='+bisverwendung_id+'&'+gettimestamp();
-			
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
 	                   getService(Components.interfaces.nsIRDFService);
-	    
+
 	    var dsource = rdfService.GetDataSourceBlocking(url);
-	    
+
 		var subject = rdfService.GetResource("http://www.technikum-wien.at/bisverwendung/" + bisverwendung_id);
-	
+
 		var predicateNS = "http://www.technikum-wien.at/bisverwendung/rdf";
-	
+
 		//RDF parsen
-	
+
 		ba1code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ba1code" ));
 		ba2code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ba2code" ));
 		beschausmasscode = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beschausmasscode" ));
@@ -68,12 +68,13 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		ende = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
 		vertragsstunden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertragsstunden" ));
 		dv_art = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dv_art" ));
+		inkludierte_lehre = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#inkludierte_lehre" ));
 	}
 	else
 	{
 		//neuer Datensatz wird angelegt
 		MitarbeiterVerwendungDetailNeu='true';
-		
+
 		//Defaultwerte
 		ba1code=3; //fixer Dienstvertrag
 		ba2code=1; //unbefristet
@@ -86,8 +87,9 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		ende='';
 		vertragsstunden='38.5';
 		dv_art='';
+		inkludierte_lehre='';
 	}
-	
+
 	document.getElementById('mitarbeiter-verwendung-detail-menulist-beschart1').value=ba1code;
 	document.getElementById('mitarbeiter-verwendung-detail-menulist-beschart2').value=ba2code;
 	document.getElementById('mitarbeiter-verwendung-detail-menulist-ausmass').value=beschausmasscode;
@@ -97,17 +99,18 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		document.getElementById('mitarbeiter-verwendung-detail-checkbox-hauptberuflich').checked=true;
 	else
 		document.getElementById('mitarbeiter-verwendung-detail-checkbox-hauptberuflich').checked=false;
-		
+
 	if(habilitation=='Ja')
 		document.getElementById('mitarbeiter-verwendung-detail-checkbox-habilitation').checked=true;
 	else
 		document.getElementById('mitarbeiter-verwendung-detail-checkbox-habilitation').checked=false;
-	
+
 	document.getElementById('mitarbeiter-verwendung-detail-datum-beginn').value=beginn;
 	document.getElementById('mitarbeiter-verwendung-detail-datum-ende').value=ende;
 	document.getElementById('mitarbeiter-verwendung-detail-textbox-vertragsstunden').value=vertragsstunden;
 	document.getElementById('mitarbeiter-verwendung-detail-textbox-dv_art').value=dv_art;
-	
+	document.getElementById('mitarbeiter-verwendung-detail-textbox-inkludierte_lehre').value=inkludierte_lehre;
+
 	MitarbeiterVerwendungDetailToggleHauptberuf();
 	MitarbeiterVerwendungVerwendungChange();
 }
@@ -118,7 +121,7 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 function MitarbeiterVerwendungDetailToggleHauptberuf()
 {
 	var checked = document.getElementById('mitarbeiter-verwendung-detail-checkbox-hauptberuflich').checked;
-	
+
 	if(checked)
 	{
 		document.getElementById('mitarbeiter-verwendung-detail-menulist-hauptberuf').disabled=true;

@@ -1308,7 +1308,7 @@ function LeGruppeDel()
 }
 
 // ****
-// * Loescht den LVPlan einer Gruppe zu einer aus dem LVPlan
+// * Loescht den LVPlan einer Gruppe zu einer Lehreinheit aus dem LVPlan
 // ****
 function LeGruppeDelLVPlan()
 {
@@ -1356,6 +1356,61 @@ function LeGruppeDelLVPlan()
 	{
 		//Refresh des Trees
 		LeDetailGruppeTreeRefresh();
+		LvTreeRefresh();
+	}
+}
+
+// ****
+// * Loescht den LVPlan eines Lektors zu einer Lehreinheit aus dem LVPlan
+// ****
+function LeLektorDelLVPlan()
+{
+	tree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');
+
+	//Nachsehen ob Lektor markiert wurde
+	var idx;
+	if(tree.currentIndex>=0)
+		idx = tree.currentIndex;
+	else
+	{
+		alert('Bitte zuerst einen Lektor markieren');
+		return false;
+	}
+
+	try
+	{
+		//Lehreinheit_id holen
+		var col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id"] : "lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id";
+		var lehreinheit_id=tree.view.getCellText(idx,col);
+		var col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid"] : "lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid";
+		var mitarbeiter_uid=tree.view.getCellText(idx,col);
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+
+	if(!confirm("Sind Sie sicher dass Sie diesen Mitarbeiter aus dem LVPlan entfernen wollen?"))
+		return false;
+
+	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
+
+	req.add('type', 'lehreinheit_lektor_del_lvplan');
+	req.add('lehreinheit_id', lehreinheit_id);
+	req.add('mitarbeiter_uid', mitarbeiter_uid);
+
+	var response = req.executePOST();
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		//Refresh des Trees
+		LeLektorTreeRefresh();
 		LvTreeRefresh();
 	}
 }
@@ -2473,6 +2528,7 @@ function LehrveranstaltungNotenPruefungCalculate()
 
 	var gesamt = satz*anzahl;
 	document.getElementById('lehrveranstaltung-noten-pruefung-label-gesamt').value=gesamt;
+	document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anmerkung').value=satz+'€ * '+anzahl;
 }
 
 function LehrveranstaltungNotenPruefungSave()
@@ -2481,6 +2537,7 @@ function LehrveranstaltungNotenPruefungSave()
 	var satz = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-satz').value;
 	var anzahl = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anzahl').value;
 	var vertragstyp_kurzbz = document.getElementById('lehrveranstaltung-noten-pruefung-menulist-vertragstyp').value;
+	var anmerkung = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anmerkung').value;
 	satz = satz.replace(',','.');
 
     if(mitarbeiter_uid == '' || satz == '' || anzahl == '' || vertragstyp_kurzbz=='')
@@ -2518,7 +2575,7 @@ function LehrveranstaltungNotenPruefungSave()
 	req.add('vertragstyp_kurzbz', vertragstyp_kurzbz);
 	req.add('betrag', gesamt);
 	req.add('bezeichnung', 'Pruefungshonorar '+lv_studiengang+' '+lv_semester+' '+lv_bezeichnung+' '+lehrveranstaltung_id);
-	req.add('anmerkung', satz+'€ * '+anzahl);
+	req.add('anmerkung', anmerkung);
 	req.add('vertragsdatum', datum);
 	req.add('lehrveranstaltung_id',lehrveranstaltung_id);
 
@@ -2539,5 +2596,6 @@ function LehrveranstaltungNotenPruefungSave()
 		document.getElementById('lehrveranstaltung-noten-pruefung-textbox-satz').value='';
 		document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anzahl').value='';
 		document.getElementById('lehrveranstaltung-noten-pruefung-label-gesamt').value='';
+		document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anmerkung').value='';
 	}
 }

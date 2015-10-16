@@ -549,6 +549,34 @@ class studienordnung extends basis_db
 	}
 	
 	/**
+	 * prüft ob die Studienordnung aktiv ist
+	 * @param int $studienordnung_id Die ID der Studienordnung
+	 * @param string $studiensemester_kurzbz Kurzbezeichnung des Studiensemesters
+	 * @param int $ausbildungssemester Ausbildungssemester als Zahl
+	 */
+	public function isAktiv($studienordnung_id)
+	{
+		if(!is_numeric($studienordnung_id))
+		{
+			$this->errormsg = 'studienordnung_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$qry = 'SELECT * FROM lehre.tbl_studienordnung_semester WHERE 
+			studienordnung_id='.$this->db_add_param($studienordnung_id).';';
+		
+		if($this->db_query($qry))
+		{
+			if($this->db_num_rows() >= 1)
+			{
+				return true;
+			}
+			return false;
+		}
+		return false;
+	}
+	
+	/**
 	 * lädt alle zugeordneten Semester einer Studienordnung
 	 * @param int $studienordnung_id ID der Studienordnung
 	 */
@@ -644,13 +672,13 @@ class studienordnung extends basis_db
 	{
 		$studiensemester = new studiensemester();
 		$studiensemester->getTimestamp($studiensemester_kurzbz);
-		
+
 		$semGueltigVon = $studiensemester->begin->start;
 		//$semGueltigBis = $studiensemester->ende->ende;
 		
 		$studiensemester = new studiensemester();
 		$studiensemester->getTimestamp($this->gueltigvon);
-		
+
 		$stoGueltigVon = $studiensemester->begin->start;
 		
 		if($this->gueltigbis != null)
@@ -717,6 +745,70 @@ class studienordnung extends basis_db
 			return false;
 		}
 		$this->new=false;
+		return true;
+	}
+	
+	/**
+	 * Laedt alle Studienordnungen zu einem Studiengang der uebergeben wird, die noch nicht aktiv sind
+	 * @param $studiengang_kz Kennzahl des Studiengangs
+	 * @param $studiensemester_kurzbz
+	 * @param $semester
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function loadStudienordnungSTGInaktiv($studiengang_kz)
+	{
+		//Pruefen ob studiengang_kz eine gueltige Zahl ist
+		if(!is_numeric($studiengang_kz) || $studiengang_kz === '')
+		{
+			$this->errormsg = 'studiengang_kz muss eine gültige Zahl sein';
+			return false;
+		}
+
+		$qry = 'SELECT 
+					* 
+				FROM 
+					lehre.tbl_studienordnung 
+				WHERE 
+					studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
+			
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+			return false;
+		}
+
+		while($row = $this->db_fetch_object())
+		{
+			$obj = new studienordnung();
+
+			$obj->studienordnung_id	= $row->studienordnung_id;
+			$obj->studiengang_kz	= $row->studiengang_kz;
+			$obj->version			= $row->version;
+			$obj->bezeichnung		= $row->bezeichnung;
+			$obj->ects				= $row->ects;
+			$obj->gueltigvon		= $row->gueltigvon;
+			$obj->gueltigbis		= $row->gueltigbis;
+			$obj->studiengangbezeichnung	= $row->studiengangbezeichnung;
+			$obj->studiengangbezeichnung_englisch	= $row->studiengangbezeichnung_englisch;
+			$obj->studiengangkurzbzlang	= $row->studiengangkurzbzlang;
+			$obj->akadgrad_id		= $row->akadgrad_id;
+			$obj->updateamum		= $row->updateamum;
+			$obj->updatevon			= $row->updatevon;
+			$obj->insertamum		= $row->insertamum;
+			$obj->insertvon			= $row->insertvon;
+			$obj->new				= false;
+			$this->result[] = $obj;
+		}
+		
+		foreach($this->result as $key => $obj)
+		{
+		    if($this->isAktiv($obj->studienordnung_id))
+		    {
+			unset($this->result[$key]);
+		    }
+		}
+		array_values($this->result);
+		
 		return true;
 	}
 }

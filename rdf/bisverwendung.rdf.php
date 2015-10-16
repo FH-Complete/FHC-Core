@@ -35,12 +35,12 @@ require_once('../include/datum.class.php');
 
 if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
-else 
+else
 	$uid = '';
 
 if(isset($_GET['bisverwendung_id']) && is_numeric($_GET['bisverwendung_id']))
 	$bisverwendung_id = $_GET['bisverwendung_id'];
-else 
+else
 	$bisverwendung_id = '';
 
 $datum = new datum();
@@ -68,10 +68,10 @@ elseif($bisverwendung_id!='')
 {
 	if($verwendung_obj->load($bisverwendung_id))
 		draw_row($verwendung_obj);
-	else 
+	else
 		die($verwendung_obj->errormsg);
 }
-else 
+else
 	die('Falsche Parameteruebergabe');
 
 
@@ -79,12 +79,12 @@ else
 function draw_row($row)
 {
 	global $rdf_url, $datum;
-	
+
 	if(is_bool($row->hauptberuflich))
 		$hauptberuflich = $row->hauptberuflich?'Ja':'Nein';
-	else 
+	else
 		$hauptberuflich = '';
-		
+
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->bisverwendung_id.'"  about="'.$rdf_url.'/'.$row->bisverwendung_id.'" >
@@ -98,7 +98,7 @@ function draw_row($row)
             <VERWENDUNG:hauptberuflich><![CDATA['.$hauptberuflich.']]></VERWENDUNG:hauptberuflich>
             <VERWENDUNG:habilitation><![CDATA['.($row->habilitation?'Ja':'Nein').']]></VERWENDUNG:habilitation>
             <VERWENDUNG:beginn><![CDATA['.$datum->convertISODate($row->beginn).']]></VERWENDUNG:beginn>
-            <VERWENDUNG:beginn_iso><![CDATA['.$row->beginn.']]></VERWENDUNG:beginn_iso>            
+            <VERWENDUNG:beginn_iso><![CDATA['.$row->beginn.']]></VERWENDUNG:beginn_iso>
             <VERWENDUNG:ende><![CDATA['.$datum->convertISODate($row->ende).']]></VERWENDUNG:ende>
             <VERWENDUNG:ende_iso><![CDATA['.$row->ende.']]></VERWENDUNG:ende_iso>
             <VERWENDUNG:ba1bez><![CDATA['.$row->ba1bez.']]></VERWENDUNG:ba1bez>
@@ -112,6 +112,7 @@ function draw_row($row)
             <VERWENDUNG:insertamum><![CDATA['.$row->insertamum.']]></VERWENDUNG:insertamum>
             <VERWENDUNG:insertvon><![CDATA['.$row->insertvon.']]></VERWENDUNG:insertvon>
 			<VERWENDUNG:dv_art><![CDATA['.$row->dv_art.']]></VERWENDUNG:dv_art>
+			<VERWENDUNG:inkludierte_lehre><![CDATA['.$row->inkludierte_lehre.']]></VERWENDUNG:inkludierte_lehre>
          </RDF:Description>
       </RDF:li>
       ';

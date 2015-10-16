@@ -45,6 +45,7 @@ require_once('../../../../include/mail.class.php');
 require_once('../../../../include/phrasen.class.php');
 require_once('../../../../include/note.class.php');
 require_once('../../../../include/notenschluessel.class.php');
+require_once('../../../../include/studienplan.class.php');
 
 $summe_stud=0;
 $summe_t2=0;
@@ -57,7 +58,7 @@ $p = new phrasen($sprache);
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
-$debg=(isset($_REQUEST['debug'])?$_REQUEST['debug']:'');	
+$debg=(isset($_REQUEST['debug'])?$_REQUEST['debug']:'');
 
 $user = get_uid();
 if(!check_lektor($user))
@@ -108,10 +109,10 @@ echo '<!DOCTYPE HTML>
 	<title>Gesamtnote</title>
     <link href="../../../../skin/jquery.css" rel="stylesheet"  type="text/css"/>
     <link href="../../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-    <script src="../../../../include/js/jquery1.9.min.js" type="text/javascript"></script> 
+    <script src="../../../../include/js/jquery1.9.min.js" type="text/javascript"></script>
 
 	<style type="text/css">
-	.td_datum 
+	.td_datum
 	{
 		width:70px;
 		text-align: left;
@@ -127,10 +128,10 @@ echo '<!DOCTYPE HTML>
 		font-size: 8pt;
 		padding: 4px;
 	}
-	
+
 	</style>
 	<script language="JavaScript" type="text/javascript">
-	
+
 	var noten_array=Array();
 ';
 
@@ -143,7 +144,7 @@ foreach($noten_obj->result as $row)
 	$noten_array[$row->note]['aktiv']=$row->aktiv;
 	$noten_array[$row->note]['lehre']=$row->lehre;
 }
-	
+
 ?>
 	function getTopOffset()
 	{
@@ -186,18 +187,18 @@ foreach($noten_obj->result as $row)
 			punkte = document.getElementById(uid).punkte.value;
 		else
 			punkte='';
-	
+
 		note_orig = document.getElementById(uid).note_orig.value;
-		
+
 		//Request erzeugen und die Note speichern
 	    stud_uid = uid;
-	
+
 		var jetzt = new Date();
 		var ts = jetzt.getTime();
-	    
+
 		var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=".urlencode($lvid)."&stsem=".urlencode($stsem); ?>';
 	    url += '&submit=1&student_uid='+encodeURIComponent(uid)+"&note="+encodeURIComponent(note)+"&punkte="+encodeURIComponent(punkte)+"&"+ts;
-	    
+
 		$.ajax({
 			type:"GET",
 			url: url,
@@ -208,7 +209,7 @@ foreach($noten_obj->result as $row)
 				var note = document.getElementById(uid).note.value;
 	            var resp = result;
 	            if (resp == "neu" || resp == "update" || resp == "update_f")
-	            {				            	
+	            {
 	            	notentd = document.getElementById("note_"+uid);
 	            	while (notentd.childNodes.length>0)
 	            	{
@@ -236,17 +237,17 @@ foreach($noten_obj->result as $row)
   			}
   		});
 	}
-		
+
 	// *************************************************
 	// * Formular zum Eintragen einer Pruefung erstellen
 	// *************************************************
 	function pruefungAnlegen(uid,datum,note,lehreinheit_id,punkte)
 	{
 		var str = "<form name='nachpruefung_form'><center><table style='width:95%'><tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
-		
+
 		var anlegendiv = document.getElementById("nachpruefung_div");
 		var y = getTopOffset();
-		y = y+50;		
+		y = y+50;
 		anlegendiv.style.top = y+"px";
 
 		str += "<tr><td colspan='2'><b><?php echo $p->t('benotungstool/pruefungAnlegenFuer');?> "+uid+":</b></td></tr>";
@@ -275,13 +276,13 @@ foreach($noten_obj->result as $row)
 			echo '</select></td>';
 		?>';
 		str += "</tr><tr><td colspan='2' align='center'><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='pruefungSpeichern();'></td></tr>";
-		str += "</table></center></form>";		
-		anlegendiv.innerHTML = str;	
+		str += "</table></center></form>";
+		anlegendiv.innerHTML = str;
 		anlegendiv.style.visibility = "visible";
 		$('#pruefungsdatum').datepicker();
 		$('#pruefungnoteselect').val(note);
 	}
-	
+
 	// **********************************************
 	// * Speichern der Pruefung
 	// **********************************************
@@ -292,34 +293,34 @@ foreach($noten_obj->result as $row)
 			var punkte = document.nachpruefung_form.punkte.value;
 		else
 			var punkte='';
-		var datum = document.nachpruefung_form.datum.value;		
+		var datum = document.nachpruefung_form.datum.value;
 		var datum_test = datum.split(".");
 		if (datum_test[0].length != 2 || datum_test[1].length != 2 || datum_test[2].length!=4 || isNaN(datum_test[2]) || datum_test[1]>12 || datum_test[1]<1 || datum_test[0]>31 || datum_test[0]<1)
 			alert("Invalid Date Format: DD.MM.YYYY");
 		else
 		{
-			var anlegendiv = document.getElementById("nachpruefung_div");			
-			
+			var anlegendiv = document.getElementById("nachpruefung_div");
+
 			var note = document.nachpruefung_form.note.value;
 			if (note == "" || isNaN(note))
 			{
 				document.nachpruefung_form.note.value = "9";
 				note = "9";
-			}		
+			}
 			var uid = document.nachpruefung_form.uid.value;
 			var lehreinheit_id = document.nachpruefung_form.le_id.value;
-			
+
 		    var jetzt = new Date();
 			var ts = jetzt.getTime();
 		    var url= '<?php echo "nachpruefungeintragen.php?lvid=$lvid&stsem=$stsem"; ?>';
 		    url += '&submit=1&student_uid='+uid+'&note='+note+'&datum='+datum+'&lehreinheit_id_pr='+lehreinheit_id+'&punkte='+punkte+'&'+ts;
-			
+
 			$.ajax({
 				type:"GET",
 				url: url,
 				success:function(result)
 				{
-					var anlegendiv = document.getElementById("nachpruefung_div");	
+					var anlegendiv = document.getElementById("nachpruefung_div");
 					var datum = 	document.nachpruefung_form.datum.value;
 					var note = document.nachpruefung_form.note.value;
 					if(document.nachpruefung_form.punkte)
@@ -329,12 +330,12 @@ foreach($noten_obj->result as $row)
 					var uid = document.nachpruefung_form.uid.value;
 					var lehreinheit_id = document.nachpruefung_form.le_id.value;
 		            var resp = result;
-	            
+
 		            if (resp == "neu" || resp == "update" || resp == "update_f" || resp == "update_pr")
 		            {
 		            	if (resp != "update_pr")
 		            	{
-			                notentd = document.getElementById("note_"+uid);	            	
+			                notentd = document.getElementById("note_"+uid);
 			            	while (notentd.childNodes.length>0)
 			            	{
 								notentd.removeChild(notentd.lastChild);
@@ -345,12 +346,12 @@ foreach($noten_obj->result as $row)
 								var notentext = noten_array[note];
 			            	notenode = document.createTextNode(notentext);
 		                    notentd.appendChild(notenode);
-						}					
+						}
 						notenstatus = document.getElementById("status_"+uid);
 						if (resp == "update_f")
 	                    	notenstatus.innerHTML = "<img src='../../../../skin/images/changed.png'>";
 	                    document.getElementById("lvnoteneingabe_"+uid).style.visibility = "hidden";
-	                    
+
 	   			 		anlegendiv.innerHTML = "";
 						anlegendiv.style.visibility = "hidden";
 						document.getElementById("span_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+noten_array[note]+"<td><input type='button' name='anlegen' value='<?php echo $p->t('global/aendern'); ?>' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\")'></td></tr></table>";
@@ -370,7 +371,7 @@ foreach($noten_obj->result as $row)
  		anlegendiv.innerHTML = "";
  		anlegendiv.style.visibility = "hidden";
  	}
- 
+
  	function OnFreigabeSubmit()
 	{
 		if(document.getElementById('textbox-freigabe-passwort').value.length==0)
@@ -380,9 +381,9 @@ foreach($noten_obj->result as $row)
 		}
 		return true;
 	}
-	
+
 	/**
-	 * Wird bei der Punkteeingabe aufgerufen und laedt 
+	 * Wird bei der Punkteeingabe aufgerufen und laedt
 	 * die dazupassende Noten anhand des Notenschluessels
 	 */
 	function PunkteEingabe(idx)
@@ -395,15 +396,15 @@ foreach($noten_obj->result as $row)
 			$.ajax({
 				type:"POST",
 				url:"lvgesamtnote_worker.php",
-				data: { lehrveranstaltung_id: '<?php echo $lvid; ?>', 
-						punkte: punkte, 
+				data: { lehrveranstaltung_id: '<?php echo $lvid; ?>',
+						punkte: punkte,
 						work: 'getGradeFromPoints',
 						studiensemester_kurzbz: '<?php echo $stsem;?>'
 					},
 				success:function(result)
 				{
 				    note=result;
-				
+
 					var notendropdown = $('#dropdown-note-'+idx);
 					notendropdown.val(note);
 					notendropdown.prop('disabled',true);
@@ -422,7 +423,7 @@ foreach($noten_obj->result as $row)
 	}
 
 	/**
-	 * Wird bei der Punkteeingabe aufgerufen und laedt 
+	 * Wird bei der Punkteeingabe aufgerufen und laedt
 	 * die dazupassende Noten anhand des Notenschluessels
 	 */
 	function PruefungPunkteEingabe()
@@ -436,15 +437,15 @@ foreach($noten_obj->result as $row)
 			$.ajax({
 				type:"POST",
 				url:"lvgesamtnote_worker.php",
-				data: { lehrveranstaltung_id: '<?php echo $lvid; ?>', 
-						punkte: punkte, 
+				data: { lehrveranstaltung_id: '<?php echo $lvid; ?>',
+						punkte: punkte,
 						work: 'getGradeFromPoints',
 						studiensemester_kurzbz: '<?php echo $stsem;?>'
 					},
 				success:function(result)
 				{
 				    note=result;
-				
+
 					var notendropdown = $('#pruefungnoteselect');
 					notendropdown.val(note);
 					notendropdown.prop('disabled',true);
@@ -466,29 +467,29 @@ foreach($noten_obj->result as $row)
 	// * Oeffnet ein Fenster fuer den Import von Noten aus dem Excel
 	// ****
 	function GradeImport()
-	{	
+	{
 		var str = "<form name='gradeimport_form'><center><table style='width:95%'><tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
-		
+
 		var anlegendiv = document.getElementById("nachpruefung_div");
 		var y = getTopOffset();
-		y = y+50;		
+		y = y+50;
 		anlegendiv.style.top = y+"px";
 
 		str += '<tr><td><?php echo $p->t('benotungstool/importAnweisung');?>:</td>';
 		str += '<td></td><tr><td><textarea id="noteimporttextarea" name="notenimport"></textarea></td></tr>';
 		str += "<tr><td><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='saveGradeBulk();'>";
-		str += "</td><td></td></tr></table></center></form>";	
-		anlegendiv.innerHTML = str;	
+		str += "</td><td></td></tr></table></center></form>";
+		anlegendiv.innerHTML = str;
 		anlegendiv.style.visibility = "visible";
 		$('#noteimporttextarea').focus();
 	}
 
-	// Speichert die Noten ueber den Import	
+	// Speichert die Noten ueber den Import
 	function saveGradeBulk()
 	{
 		data = $('#noteimporttextarea').val();
 		closeDiv();
- 	
+
 		//Reihen ermitteln
 		var rows = data.split("\n");
 		var i=0;
@@ -499,7 +500,7 @@ foreach($noten_obj->result as $row)
 		for(row in rows)
 		{
 			zeile = rows[row].split("	");
-	
+
 			if(zeile[0]!='' && zeile[1]!='')
 			{
 				gradedata['matrikelnr_'+i]=zeile[0];
@@ -513,10 +514,10 @@ foreach($noten_obj->result as $row)
 				i++;
 			}
 		}
-		
+
 		if(i>0)
 		{
-			
+
 		    var jetzt = new Date();
 			var ts = jetzt.getTime();
 		    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=".urlencode($lvid)."&stsem=".urlencode($stsem); ?>';
@@ -539,7 +540,7 @@ foreach($noten_obj->result as $row)
 	  				alert('Request fehlgeschlagen');
 	  			}
 	  		});
-		    
+
 		}
 		else
 		{
@@ -556,41 +557,41 @@ foreach($noten_obj->result as $row)
 <?php
 //wenn eine Uebung oder LE-Gesamtnote existiert die Note aus dem Uebungstool uebernehmen
 //sonst aus dem Moodle
-$qry = "SELECT 
-			1 
-		FROM 
-			lehre.tbl_lehrveranstaltung 
+$qry = "SELECT
+			1
+		FROM
+			lehre.tbl_lehrveranstaltung
 			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
 			JOIN campus.tbl_uebung USING(lehreinheit_id)
-		WHERE 
+		WHERE
 			studiensemester_kurzbz=".$db->db_add_param($stsem)." AND
 			lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)."
 		UNION
-		SELECT 
+		SELECT
 			1
 		FROM
-			campus.tbl_legesamtnote 
-		WHERE 
-			lehreinheit_id in (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
+			campus.tbl_legesamtnote
+		WHERE
+			lehreinheit_id in (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
 								WHERE studiensemester_kurzbz=".$db->db_add_param($stsem)." AND
 								lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER).")
-		
+
 		";
 if($result = $db->db_query($qry))
 {
 	if($db->db_num_rows($result)>0)
 		$grade_from_moodle=false;
-	else 
+	else
 	{
 		if(MOODLE)
 			$grade_from_moodle=true;
-		else 
+		else
 			$grade_from_moodle=false;
 	}
 }
-else 
+else
 	die($p->t('global/fehleraufgetreten'));
-	
+
 //Kopfzeile
 echo '
 <table width="100%"><tr><td>
@@ -619,7 +620,7 @@ if(!$rechte->isBerechtigt('admin',0) &&
    !$rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
 {
 	$qry = "SELECT lehreinheit_id FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
-			JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
+			JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
 			WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
 			tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem)." AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$db->db_add_param($user).';';
 	if($result = $db->db_query($qry))
@@ -627,7 +628,7 @@ if(!$rechte->isBerechtigt('admin',0) &&
 		if($db->db_num_rows($result)==0)
 			die($p->t('global/keineBerechtigungFuerDieseSeite'));
 	}
-	else 
+	else
 	{
 		die($p->t('global/fehleraufgetreten'));
 	}
@@ -649,14 +650,19 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 	{
 		$jetzt = date("Y-m-d H:i:s");
 		$neuenoten = 0;
-		$studlist = "<table border='1'><tr><td><b>".$p->t('global/personenkz')."</b></td><td><b>".$p->t('global/nachname')."</b></td><td><b>".$p->t('global/vorname')."</b></td><td><b>".$p->t('benotungstool/note')."</b></td></tr>\n";
+		$studlist = "<table border='1'><tr><td><b>".$p->t('global/personenkz')."</b></td><td><b>".$p->t('global/nachname')."</b></td><td><b>".$p->t('global/vorname')."</b></td>";
+		if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+		{
+			$studlist.="<td><b>".$p->t('benotungstool/punkte')."</b></td>\n";
+		}
+		$studlist.="<td><b>".$p->t('benotungstool/note')."</b></td></tr>\n";
 
-		// studentenquery					
-		$qry_stud = "SELECT 
-						DISTINCT uid, vorname, nachname, matrikelnr 
-					FROM 
-						campus.vw_student_lehrveranstaltung 
-						JOIN campus.vw_student USING(uid) 
+		// studentenquery
+		$qry_stud = "SELECT
+						DISTINCT uid, vorname, nachname, matrikelnr
+					FROM
+						campus.vw_student_lehrveranstaltung
+						JOIN campus.vw_student USING(uid)
 					WHERE
 						studiensemester_kurzbz = ".$db->db_add_param($stsem)."
 						AND lehrveranstaltung_id = ".$db->db_add_param($lvid, FHC_INTEGER)."
@@ -665,45 +671,57 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 		{
 			$i=1;
 			while($row_stud = $db->db_fetch_object($result_stud))
-			{	
+			{
 				$lvgesamtnote = new lvgesamtnote();
     			if ($lvgesamtnote->load($lvid,$row_stud->uid,$stsem))
     			{
-					if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)	    				
-					{	    				
+					if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)
+					{
     					$lvgesamtnote->freigabedatum = $jetzt;
     					$lvgesamtnote->freigabevon_uid = $user;
     					$lvgesamtnote->save($new=null);
-    					$studlist .= "<tr><td>".trim($row_stud->matrikelnr)."</td><td>".trim($row_stud->nachname)."</td><td>".trim($row_stud->vorname)."</td><td>".trim($lvgesamtnote->note)."</td></tr>\n";
+    					$studlist .= "<tr><td>".trim($row_stud->matrikelnr)."</td>";
+						$studlist .= "<td>".trim($row_stud->nachname)."</td>";
+						$studlist .= "<td>".trim($row_stud->vorname)."</td>";
+						if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+						{
+							$studlist.="<td>".($lvgesamtnote->punkte!=''?trim(number_format($lvgesamtnote->punkte,2)):'')."</td>\n";
+						}
+						$studlist.="<td>".$noten_array[trim($lvgesamtnote->note)]['bezeichnung']."</td></tr>\n";
     					$neuenoten++;
     				}
     			}
-			}	
+			}
 		}
-		
+
 		$studlist .= "</table>";
-		
-		//mail an assistentin und den user selber verschicken	
+
+		//mail an assistentin und den user selber verschicken
 		if ($neuenoten > 0)
 		{
 			$lv = new lehrveranstaltung($lvid);
 			$sg = new studiengang($lv->studiengang_kz);
 			$lektor_adresse = $user."@".DOMAIN;
 			$adressen = $sg->email.", ".$user."@".DOMAIN;
-			
-			
+
+			$studienplan = new studienplan();
+			$studienplan->getStudienplanLehrveranstaltung($lvid, $stsem);
+			$studienplan_bezeichnung='';
+			foreach($studienplan->result as $row)
+				$studienplan_bezeichnung.=$row->bezeichnung.' ';
+
 			$mit = new mitarbeiter();
 			$mit->load($user);
 
 			$freigeber = "<b>".mb_strtoupper($user)."</b>";
-			$mail = new mail($adressen, 'vilesci@'.DOMAIN, 'Notenfreigabe '.$lv->bezeichnung,'');
-			$htmlcontent="<html><body><b>".$sg->kuerzel.' '.$lv->semester.'.Semester '.$lv->bezeichnung." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>".$p->t('global/benutzer')." ".$freigeber." (".$mit->kurzbz.") ".$p->t('benotungstool/hatDieLvNotenFuerFolgendeStudenten').":<br><br>\n".$studlist."<br>".$p->t('abgabetool/mailVerschicktAn').": ".$adressen."</body></html>";
+			$mail = new mail($adressen, 'vilesci@'.DOMAIN, 'Notenfreigabe '.$lv->bezeichnung." ".$lv->orgform_kurzbz.' - '.$studienplan_bezeichnung,'');
+			$htmlcontent="<html><body><b>".$sg->kuerzel.' '.$lv->semester.'.Semester '.$lv->bezeichnung." ".$lv->orgform_kurzbz." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>".$p->t('global/benutzer')." ".$freigeber." (".$mit->kurzbz.") ".$p->t('benotungstool/hatDieLvNotenFuerFolgendeStudenten').":<br><br>\n".$studlist."<br>".$p->t('abgabetool/mailVerschicktAn').": ".$adressen."</body></html>";
 			$mail->setHTMLContent($htmlcontent);
 			$mail->setReplyTo($lektor_adresse);
 			$mail->send();
-		}	
+		}
 	}
-	else 
+	else
 	{
 		echo '<span><font class="error">'.$p->t('gesamtnote/passwortFalsch').'</font></span>';
 	}
@@ -724,11 +742,11 @@ if ($pr_all->getPruefungenLV($lvid,"Termin2",$stsem))
 	if ($pr_all->result)
 	{
 		foreach ($pr_all->result as $pruefung)
-		{		
+		{
 			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["note"] = $pruefung->note;
 			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["punkte"] = $pruefung->punkte;
 			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["datum"] = $datum_obj->formatDatum($pruefung->datum,'d.m.Y');
-		}	
+		}
 	}
 }
 $summe_t2=count($studpruef_arr);
@@ -739,11 +757,11 @@ if ($pr_komm->getPruefungenLV($lvid,"kommPruef",$stsem))
 	if ($pr_komm->result)
 	{
 		foreach ($pr_komm->result as $kpruefung)
-		{		
+		{
 			$studpruef_komm[$kpruefung->student_uid][$kpruefung->lehreinheit_id]["note"] = $kpruefung->note;
 			$studpruef_komm[$kpruefung->student_uid][$kpruefung->lehreinheit_id]["punkte"] = $kpruefung->punkte;
 			$studpruef_komm[$kpruefung->student_uid][$kpruefung->lehreinheit_id]["datum"] = $datum_obj->formatDatum($kpruefung->datum,'d.m.Y');
-		}	
+		}
 	}
 }
 $summe_komm=count($studpruef_komm);
@@ -823,13 +841,13 @@ echo "
 			}
 		}
 
-		// studentenquery					
-		$qry_stud = "SELECT 
-						DISTINCT uid, vorname, nachname, matrikelnr 
-					FROM 
-						campus.vw_student_lehrveranstaltung 
-						JOIN campus.vw_student USING(uid) 
-					WHERE 
+		// studentenquery
+		$qry_stud = "SELECT
+						DISTINCT uid, vorname, nachname, matrikelnr
+					FROM
+						campus.vw_student_lehrveranstaltung
+						JOIN campus.vw_student USING(uid)
+					WHERE
 						studiensemester_kurzbz = ".$db->db_add_param($stsem)."
 						AND lehrveranstaltung_id = ".$db->db_add_param($lvid)."
 					ORDER BY nachname, vorname ";
@@ -841,14 +859,14 @@ echo "
 			$summe_stud=$db->db_num_rows($result_stud);
 			while($row_stud = $db->db_fetch_object($result_stud))
 			{
-				
+
 				echo "<tr class='liste".($i%2)."'>
 					<td><a href='mailto:$row_stud->uid@".DOMAIN."'><img src='../../../../skin/images/button_mail.gif'></a></td>";
 				echo "
 					<td>$row_stud->uid</td>
 					<td>$row_stud->nachname</td>
 					<td>$row_stud->vorname</td>";
-				
+
 				$note_les_str = '';
 				$le_anz = 0;
 				$note_le = 0;
@@ -863,18 +881,18 @@ echo "
 						//Noten aus Moodle
 						if (!isset($moodle_course))
 							$moodle_course = new moodle19_course();
-							
+
 						if (!$mdldaten = $moodle_course->loadNoten($lvid, $stsem, '', true,$debg))
-							$mdldaten=''; 
-					}	
+							$mdldaten='';
+					}
 					// Verarbeitet die Kursdaten
 					if (!is_null($mdldaten) && is_array($mdldaten))
 					{
-							reset($mdldaten);		
+							reset($mdldaten);
 							$title="";
 							$mdl_shortname='';
-	    					for ($imdldaten=0;$imdldaten<count($mdldaten) ;$imdldaten++) 
-							{	
+	    					for ($imdldaten=0;$imdldaten<count($mdldaten) ;$imdldaten++)
+							{
 
 								$mdldata=$mdldaten[$imdldaten]->result;
 								$kursArr=(isset($mdldata[2])?$mdldata[2]:array());
@@ -884,49 +902,49 @@ echo "
 
 								$note=0;
 								$userGef=false;
-								
-								reset($kursArr);		
-		    					for ($iKurs=0;$iKurs<count($kursArr) ;$iKurs++) 
-								{	
+
+								reset($kursArr);
+		    					for ($iKurs=0;$iKurs<count($kursArr) ;$iKurs++)
+								{
 									if (isset($kursArr[$iKurs]) && isset($kursArr[$iKurs][2]) && isset($kursArr[$iKurs][6]) && strtolower(trim($row_stud->uid))==strtolower(trim($kursArr[$iKurs][2])) )
 									{
 									    $note=trim($kursArr[$iKurs][6]);
 										$userGef=true;
-										
+
 									   	if (is_numeric($note)  || $debg)
 									   	{
 										   	if (is_numeric($note))
 										   	{
 										   		$note_le += $note;
 						    			   		$le_anz += 1;
-											}	
+											}
 						    				if ($note == 5)
 						    					$leneg = " style='color:red; font-weight:bold'";
 				    						else
 		    									$leneg = " style='font-weight:bold'";
-											
+
 										   $mdl_shortname=$mdldaten[$imdldaten]->mdl_shortname;
 			  							   $title="\r\nMoodle 1.9 KursID: ".$mdldaten[$imdldaten]->mdl_course_id ."\r\n\r\n".$kursname.', '.$mdl_shortname."\r\n";
-									       foreach ($kursasObj[$iKurs] as $key => $value) 
+									       foreach ($kursasObj[$iKurs] as $key => $value)
 										   {
 												$title.=$key."=>".$value."\r\n";
-											}	
-											
-												
+											}
+
+
 											$note_les_str .= "<span ".$leneg.">".$note."</span> <span  title='".$title."' style='font-size:10px'>(".$mdl_shortname.")</span> ";
-										}	
+										}
 									}	// ende If Richtiger User
-									
+
 									if ($userGef)
 									{
-										$iKurs=count($kursArr)+1; // diesen USER for beenden - user wurde gefunden	
-									}	
+										$iKurs=count($kursArr)+1; // diesen USER for beenden - user wurde gefunden
+									}
 
 								} // ende Kursschleife
 							} // MoodleKurse abarbeiten
 
 				#echo "<p><h1> $title Anzahl Noten gef. $le_anz $note_le </h1></p>";
-					}		
+					}
 					else
 					{
 						if(defined('CONN_STRING_MOODLE'))
@@ -964,17 +982,17 @@ echo "
 						}
 					}
 				}
-				else 
+				else
 				{
 					//Noten aus Uebungstool
 					$le = new lehreinheit();
 					$le->load_lehreinheiten($lvid, $stsem);
-					foreach($le->lehreinheiten as $l)				
-					{				
+					foreach($le->lehreinheiten as $l)
+					{
 						$legesamtnote = new legesamtnote($l->lehreinheit_id);
-		    			
+
 		    			if (!$legesamtnote->load($row_stud->uid,$l->lehreinheit_id))
-						{    				
+						{
 		    				//$note_les_str .= "- (".$l->lehreinheit_id.")";
 		    			}
 		    			else
@@ -988,8 +1006,8 @@ echo "
 		    				$note_les_str .= "<span".$leneg.">".$legesamtnote->note."</span> (".$l->lehreinheit_id.") ";
 		    			}
 		    		}
-				}	    		
-					
+				}
+
     			if ($lvgesamtnote = new lvgesamtnote($lvid,$row_stud->uid,$stsem))
     			{
     				$note_lv = $lvgesamtnote->note;
@@ -1000,7 +1018,7 @@ echo "
     				$note_lv = null;
 					$punkte_lv = null;
 				}
-				
+
 				$punkte_vorschlag='';
 				if (!is_null($note_lv))
 					$note_vorschlag = $note_lv;
@@ -1014,7 +1032,7 @@ echo "
 					}
 					else
 					{
-						$note_vorschlag = round($note_le/$le_anz);						
+						$note_vorschlag = round($note_le/$le_anz);
 					}
 				}
 				else
@@ -1022,15 +1040,15 @@ echo "
 				if ($zeugnisnote = new zeugnisnote($lvid, $row_stud->uid, $stsem))
 					$znote = $zeugnisnote->note;
 				else
-					$znote = null;			
-								
-				
+					$znote = null;
+
+
 				echo "<td style='white-space: nowrap;'>".$note_les_str."&nbsp;</td>";
-				
-				if (key_exists($row_stud->uid,$studpruef_arr))	
+
+				if (key_exists($row_stud->uid,$studpruef_arr))
 					$hide = "style='display:none;visibility:hidden;'";
 				else
-					$hide = "style='display:block;visibility:visible;'";				
+					$hide = "style='display:block;visibility:visible;'";
 
 				if(!defined('CIS_GESAMTNOTE_UEBERSCHREIBEN') || CIS_GESAMTNOTE_UEBERSCHREIBEN || (!CIS_GESAMTNOTE_UEBERSCHREIBEN && is_null($znote)))
 				{
@@ -1045,7 +1063,7 @@ echo "
 						//$punkte_lv = $punkte_vorschlag;
 						echo '<input type="text" name="punkte" id="textbox-punkte-'.$i.'" value="'.$punkte_vorschlag.'" size="3" oninput="PunkteEingabe('.$i.')"/>';
 					}
-				
+
 					// Noten DropDown
 					if($punkte_vorschlag!='' && CIS_GESAMTNOTE_PUNKTE)
 						$disabled='disabled="disabled"';
@@ -1074,12 +1092,12 @@ echo "
 				{
 					echo '<td></td>';
 				}
-				
+
 				if(isset($noten_array[$note_lv]) && $noten_array[$note_lv]['positiv']==false)
 					$negmarkier = " style='color:red; font-weight:bold;'";
 				else
-					$negmarkier = "";			
-				
+					$negmarkier = "";
+
 				// LV Note
 				echo '<td align="center" id="note_'.$row_stud->uid.'"><span '.$negmarkier.'>';
 				if(isset($noten_array[$note_lv]))
@@ -1087,16 +1105,16 @@ echo "
 				if($punkte_lv!='')
 					echo ' ('.number_format($punkte_lv,2).')';
 				echo '</span></td>';
-				
+
 				//status
-				echo "<td align='center' id='status_$row_stud->uid'>";				
+				echo "<td align='center' id='status_$row_stud->uid'>";
 				if (!$lvgesamtnote->freigabedatum)
-					echo "<img src='../../../../skin/images/offen.png'>";				
+					echo "<img src='../../../../skin/images/offen.png'>";
 				else if	($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)
 					echo "<img src='../../../../skin/images/changed.png'>";
 				else
 					echo "<img src='../../../../skin/images/ok.png'>";
-					
+
 				echo "</td>";
 				if (($znote) && ($note_lv != $znote))
 					$stylestr = " style='color:red; border-color:red; border-style:solid; border-width:1px;'";
@@ -1110,20 +1128,20 @@ echo "
 					$summe_ng++;
 
 				// Pruefung 2.Termin
-				if (key_exists($row_stud->uid, $studpruef_arr))			
+				if (key_exists($row_stud->uid, $studpruef_arr))
 				{
 					echo "<td colspan='2'>";
 					echo "<span id='span_".$row_stud->uid."'>";
 					echo "<table>";
-					$le_id_arr = array();					
+					$le_id_arr = array();
 					$le_id_arr = array_keys($studpruef_arr[$row_stud->uid]);
 					foreach ($le_id_arr as $le_id_stud)
-					{					
+					{
 						$pr_note = $studpruef_arr[$row_stud->uid][$le_id_stud]["note"];
 						$pr_punkte = $studpruef_arr[$row_stud->uid][$le_id_stud]["punkte"];
 						$pr_datum = $studpruef_arr[$row_stud->uid][$le_id_stud]["datum"];
 						$pr_le_id = $le_id_stud;
-						
+
 						if($pr_punkte!='')
 							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'].' ('.number_format($pr_punkte,2).')';
 						else
@@ -1135,33 +1153,33 @@ echo "
 								<td><input type="button" name="anlegen" value="'.$p->t('global/aendern').'" onclick="pruefungAnlegen(\''.$row_stud->uid.'\',\''.$pr_datum.'\',\''.$pr_note.'\',\''.$pr_le_id.'\',\''.$pr_punkte.'\')"><td>
 							</tr>';
 					}
-					echo "</table>";			
+					echo "</table>";
 					echo "</span>";
 					echo "</td>";
 				}
 				else
 				{
-					if (!is_null($note_lv) || !is_null($znote))				
+					if (!is_null($note_lv) || !is_null($znote))
 						echo "<td colspan='2'><span id='span_".$row_stud->uid."'><input type='button' name='anlegen' value='".$p->t('benotungstool/anlegen')."' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"\",\"\",\"\",\"\")'></span></td>";
 					else
-						echo "<td colspan='2'></td>";	
+						echo "<td colspan='2'></td>";
 				}
 
 				// komm Pruefung
-				if (key_exists($row_stud->uid,$studpruef_komm))			
+				if (key_exists($row_stud->uid,$studpruef_komm))
 				{
 					echo "<td colspan='2'>";
 					echo "<span id='span_".$row_stud->uid."'>";
 					echo "<table>";
-					$le_id_arr = array();					
+					$le_id_arr = array();
 					$le_id_arr = array_keys($studpruef_komm[$row_stud->uid]);
 					foreach ($le_id_arr as $le_id_stud)
-					{					
+					{
 						$pr_note = $studpruef_komm[$row_stud->uid][$le_id_stud]["note"];
 						$pr_punkte = $studpruef_komm[$row_stud->uid][$le_id_stud]["punkte"];
 						$pr_datum = $studpruef_komm[$row_stud->uid][$le_id_stud]["datum"];
 						$pr_le_id = $le_id_stud;
-						
+
 						if($pr_punkte!='')
 							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'].' ('.$pr_punkte.')';
 						else
@@ -1172,15 +1190,15 @@ echo "
 								<td class="td_note">'.$pr_notenbezeichnung.'</td>
 							</tr>';
 					}
-					echo "</table>";			
+					echo "</table>";
 					echo "</span>";
 					echo "</td>";
 				}
 				else
 				{
-						echo "<td colspan='2'></td>";	
+						echo "<td colspan='2'></td>";
 				}
-				
+
 				echo "</tr>";
 				$i++;
 			}

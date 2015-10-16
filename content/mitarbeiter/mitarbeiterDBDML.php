@@ -195,6 +195,7 @@ if(!$error)
 			$verwendung->updateamum = date('Y-m-d H:i:s');
 			$verwendung->updatevon = $user;
 			$verwendung->dv_art = $_POST['dv_art'];
+			$verwendung->inkludierte_lehre = $_POST['inkludierte_lehre'];
 
 			if($verwendung->save())
 			{
