@@ -280,7 +280,7 @@ function searchOrt($search)
 {
 	global $db, $p, $noalias;
 	$ort = new ort();
-	$ort->filter($search, true, true);
+	$ort->filter($search, true, true, true);
 	
 	$uid = get_uid();
 	$berechtigung=new benutzerberechtigung();

@@ -391,13 +391,14 @@ class ort extends basis_db
 	}
 	
 	/**
-	 * Sucht nach einem Ort. Wenn aktiv-parameter true, dann nur aktive. Wenn lehre-parameter true, dann nur lehre
+	 * Sucht nach einem Ort. Wenn aktiv-parameter true, dann nur aktive. Wenn lehre-parameter true, dann nur lehre. Wenn $klappe-parameter true wird auch nach Telefonklappen gesucht.
 	 * @return true wenn ok, false im Fehlerfall
 	 * 
-	 * @param aktiv (optional)
-	 * @param lehre (optional)
+	 * @param boolean aktiv (optional) default:false
+	 * @param boolean lehre (optional) default:false
+	 * @param boolean klappe (optional) default:false
 	 */
-	public function filter($filter, $aktiv=false, $lehre=false)
+	public function filter($filter, $aktiv=false, $lehre=false, $klappe=false)
 	{
 		$qry = "
 			SELECT 
@@ -406,7 +407,10 @@ class ort extends basis_db
 				public.tbl_ort 
 			WHERE (
 				lower(ort_kurzbz) like '%".$this->db_escape(mb_strtolower($filter))."%'
-				OR lower(bezeichnung) like '%".$this->db_escape(mb_strtolower($filter))."%')";
+				OR lower(bezeichnung) like '%".$this->db_escape(mb_strtolower($filter))."%'";
+			if($klappe==true)
+				$qry.=" OR lower(telefonklappe) like '%".$this->db_escape(mb_strtolower($filter))."%'";
+			$qry.=")";
 			if ($aktiv==true)
 				$qry.= " AND aktiv=true";
 			if ($lehre==true)
