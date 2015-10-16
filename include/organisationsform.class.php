@@ -88,6 +88,7 @@ class organisationsform extends basis_db
 				
 				$this->result[] = $orgform; 
 			}
+			return true;
 		}
 		else
 		{

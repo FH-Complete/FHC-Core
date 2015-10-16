@@ -161,9 +161,9 @@ function loadampel()
 <td class="boxshadow">
 	<table cellspacing="0" cellpadding="0" class="header">
 		<tr>
-		<td valign="top" align="left" style="background-image: url(<?php echo APP_ROOT.'skin/styles/'.EXT_FKT_PATH.'/header.png'; ?>); background-position: top; background-repeat: repeat-x;">
-		<a href="index.php"><img class="header_logo" src="<?php echo APP_ROOT.'skin/styles/'.EXT_FKT_PATH.'/logo_250x130.png'; ?>" alt="logo"></a>
-		<!--<img class="header" src="<?php echo APP_ROOT.'skin/styles/'.EXT_FKT_PATH.'/header.png'; ?>" alt="header">-->  	 	
+		<td valign="top" align="left" style="background-image: url(<?php echo APP_ROOT.'skin/styles/'.DEFAULT_STYLE.'/header.png'; ?>); background-position: top; background-repeat: repeat-x;">
+		<a href="index.php"><img class="header_logo" src="<?php echo APP_ROOT.'skin/styles/'.DEFAULT_STYLE.'/logo_250x130.png'; ?>" alt="logo"></a>
+		<!--<img class="header" src="<?php echo APP_ROOT.'skin/styles/'.DEFAULT_STYLE.'/header.png'; ?>" alt="header">-->  	 	
 	   	 	<table class="header_content" cellpadding="0">
 		   	  <tr>
 		   	    <td width="20%" align="center">&nbsp;
