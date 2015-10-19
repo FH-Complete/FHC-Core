@@ -474,7 +474,7 @@ class anwesenheit extends basis_db
 					SELECT count(*) anzahl FROM
 						(SELECT datum, stunde FROM campus.vw_stundenplan
 						WHERE lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id
-						AND vw_stundenplan.titel not like '%Nebenprüfung%' GROUP BY datum, stunde) as a
+						AND (vw_stundenplan.titel not like '%Nebenprüfung%' OR vw_stundenplan.titel is null) GROUP BY datum, stunde) as a
 					) as gesamtstunden
 				FROM
 					campus.vw_student_lehrveranstaltung
