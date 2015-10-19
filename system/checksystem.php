@@ -3574,6 +3574,19 @@ if(!$result = @$db->db_query("SELECT standort_id FROM public.tbl_organisationsei
 		echo '<br>Organisationseinheit: Spalte standort_id hinzugefügt';
 }
 
+// Spalte code zum Standort hinzugefügt
+if(!$result = @$db->db_query("SELECT code FROM public.tbl_standort LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_standort ADD COLUMN code varchar(3);
+            ALTER TABLE public.tbl_standort ADD CONSTRAINT uk_code UNIQUE (code);
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>Standort: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Standort: Spalte code hinzugefügt';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
