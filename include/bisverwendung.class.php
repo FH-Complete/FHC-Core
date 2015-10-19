@@ -229,7 +229,7 @@ class bisverwendung extends basis_db
 			       $this->db_add_param($this->insertamum).', '.
 			       $this->db_add_param($this->insertvon).', '.
 				   $this->db_add_param($this->dv_art).','.
-				   $this->db_add_param($this->inkludierte_lehre).';';
+				   $this->db_add_param($this->inkludierte_lehre).');';
 
 		}
 		else
