@@ -294,8 +294,8 @@ class vorlage extends basis_db
 					$this->db_add_param($this->oe_kurzbz).','.
 					$this->db_add_param($this->style).','.
 					$this->db_add_param($this->berechtigung).','.
-					$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
-					$this->db_add_param($this->anmerkung_vorlagestudiengang).');';
+					$this->db_add_param($this->anmerkung_vorlagestudiengang).','.
+					$this->db_add_param($this->aktiv, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -311,7 +311,7 @@ class vorlage extends basis_db
 							anmerkung_vorlagestudiengang='.$this->db_add_param($this->anmerkung_vorlagestudiengang).'
 					WHERE vorlagestudiengang_id='.$this->db_add_param($this->vorlagestudiengang_id).';';
 		}
-
+		
 		if($this->db_query($qry))
 		{
 			return true;
