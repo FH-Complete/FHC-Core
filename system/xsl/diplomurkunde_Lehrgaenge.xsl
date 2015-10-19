@@ -43,6 +43,11 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<style:paragraph-properties fo:line-height="122%" fo:text-align="center" style:justify-single-word="false"/>
 			<style:text-properties style:font-name="Arial" fo:font-size="16pt" officeooo:rsid="0006c6a3" officeooo:paragraph-rsid="0006c6a3" style:font-size-asian="16pt" style:font-size-complex="16pt"/>
 		</style:style>
+		<style:style style:name="Seitenumbruch" style:family="paragraph" style:parent-style-name="Standard">
+			<style:paragraph-properties fo:break-before="page" fo:line-height="122%" fo:text-align="center" style:justify-single-word="false"/>
+			<style:paragraph-properties fo:line-height="122%" fo:text-align="center" style:justify-single-word="false"/>
+			<style:text-properties style:font-name="Arial" fo:font-size="28pt" officeooo:rsid="0006c6a3" officeooo:paragraph-rsid="0006c6a3" style:font-size-asian="28pt" style:font-size-complex="28pt"/>
+		</style:style>
 	</office:automatic-styles>
 	
 	<office:body>
@@ -59,7 +64,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
-			<text:p text:style-name="P2">Diplom</text:p>
+			<text:p text:style-name="Seitenumbruch">Diplom</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>

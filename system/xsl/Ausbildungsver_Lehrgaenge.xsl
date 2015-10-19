@@ -22,20 +22,22 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rpt="http://openoffice.org/2005/report" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" office:version="1.2">
   <office:scripts/>
   <office:font-face-decls>
-    <style:font-face style:name="Wingdings" svg:font-family="Wingdings" style:font-pitch="variable" style:font-charset="x-symbol"/>
-    <style:font-face style:name="Symbol" svg:font-family="Symbol" style:font-family-generic="roman" style:font-pitch="variable" style:font-charset="x-symbol"/>
-    <style:font-face style:name="Lohit Hindi1" svg:font-family="'Lohit Hindi'"/>
-    <style:font-face style:name="Courier New" svg:font-family="'Courier New'" style:font-family-generic="modern"/>
-    <style:font-face style:name="Lucida Grande" svg:font-family="'Lucida Grande', 'Times New Roman'" style:font-family-generic="roman"/>
-    <style:font-face style:name="Optima" svg:font-family="Optima, 'Times New Roman'" style:font-family-generic="roman"/>
-    <style:font-face style:name="ヒラギノ角ゴ Pro W3" svg:font-family="'ヒラギノ角ゴ Pro W3'" style:font-family-generic="roman"/>
-    <style:font-face style:name="Courier New1" svg:font-family="'Courier New'" style:font-family-generic="modern" style:font-pitch="fixed"/>
-    <style:font-face style:name="Times New Roman" svg:font-family="'Times New Roman'" style:font-family-generic="roman" style:font-pitch="variable"/>
-    <style:font-face style:name="Arial" svg:font-family="Arial" style:font-family-generic="swiss" style:font-pitch="variable"/>
-    <style:font-face style:name="Tahoma" svg:font-family="Tahoma" style:font-family-generic="swiss" style:font-pitch="variable"/>
-    <style:font-face style:name="Droid Sans" svg:font-family="'Droid Sans'" style:font-family-generic="system" style:font-pitch="variable"/>
-    <style:font-face style:name="Lohit Hindi" svg:font-family="'Lohit Hindi'" style:font-family-generic="system" style:font-pitch="variable"/>
-    <style:font-face style:name="Helvetica" svg:font-family="Helvetica" style:font-family-generic="swiss" style:font-pitch="variable"/>
+    	<style:font-face style:name="Wingdings" svg:font-family="Wingdings" style:font-pitch="variable" style:font-charset="x-symbol"/>
+		<style:font-face style:name="Symbol" svg:font-family="Symbol" style:font-family-generic="roman" style:font-pitch="variable" style:font-charset="x-symbol"/>
+		<style:font-face style:name="Lohit Hindi1" svg:font-family="&apos;Lohit Hindi&apos;"/>
+		<style:font-face style:name="Courier New" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern"/>
+		<style:font-face style:name="Lucida Grande" svg:font-family="&apos;Lucida Grande&apos;, &apos;Times New Roman&apos;" style:font-family-generic="roman"/>
+		<style:font-face style:name="Optima" svg:font-family="Optima, &apos;Times New Roman&apos;" style:font-family-generic="roman"/>
+		<style:font-face style:name="ヒラギノ角ゴ Pro W3" svg:font-family="&apos;ヒラギノ角ゴ Pro W3&apos;" style:font-family-generic="roman"/>
+		<style:font-face style:name="Courier New1" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-pitch="fixed"/>
+		<style:font-face style:name="Times New Roman" svg:font-family="&apos;Times New Roman&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
+		<style:font-face style:name="Arial" svg:font-family="Arial" style:font-family-generic="swiss" style:font-pitch="variable"/>
+		<style:font-face style:name="Arial1" svg:font-family="Arial" style:font-adornments="Fett" style:font-family-generic="swiss" style:font-pitch="variable"/>
+		<style:font-face style:name="Arial2" svg:font-family="Arial" style:font-adornments="Standard" style:font-family-generic="swiss" style:font-pitch="variable"/>
+		<style:font-face style:name="Tahoma" svg:font-family="Tahoma" style:font-family-generic="swiss" style:font-pitch="variable"/>
+		<style:font-face style:name="Droid Sans" svg:font-family="&apos;Droid Sans&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+		<style:font-face style:name="Lohit Hindi" svg:font-family="&apos;Lohit Hindi&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+    	<style:font-face style:name="Helvetica" svg:font-family="Helvetica" style:font-family-generic="swiss" style:font-pitch="variable"/>
   </office:font-face-decls>
   <office:automatic-styles>
     <style:style style:name="Tabelle1" style:family="table">
@@ -317,6 +319,18 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<style:paragraph-properties fo:line-height="130%" fo:text-align="start"/>
 			<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-pitch="variable" fo:font-size="9pt" style:font-size-asian="9pt" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold"/>
 	</style:style>
+	<style:style style:name="P140" style:family="paragraph">
+			<style:paragraph-properties fo:text-align="start"/>
+			<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Helvetica" fo:font-size="10pt" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold"/>
+	</style:style>
+	<style:style style:name="P141" style:family="paragraph">
+			<style:paragraph-properties fo:text-align="center"/>
+			<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Helvetica" fo:font-size="10pt" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal"/>
+	</style:style>
+	<style:style style:name="P142" style:family="paragraph">
+			<style:paragraph-properties fo:text-align="start"/>
+			<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Helvetica" fo:font-size="10pt" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal"/>
+	</style:style>
     <style:style style:name="T1" style:family="text">
       <style:text-properties fo:font-weight="bold" style:font-weight-asian="bold"/>
     </style:style>
@@ -360,14 +374,14 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
     <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
       <style:graphic-properties fo:margin-left="0.319cm" fo:margin-right="0.319cm" style:run-through="background" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" fo:padding="0.026cm" fo:border="none" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
     </style:style>
-    <style:style style:name="gr1" style:family="graphic">
-			<style:graphic-properties draw:textarea-vertical-align="top" fo:border="none" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph"/>
-	</style:style>
 	<style:style style:name="gr2" style:family="graphic">
-			<style:graphic-properties fo:border="none" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:horizontal-pos="from-left" style:horizontal-rel="paragraph"/>
+			<style:graphic-properties fo:border="none" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" draw:wrap-influence-on-position="once-concurrent" style:flow-with-text="false"/>
 	</style:style>
 	<style:style style:name="gr3" style:family="graphic">
-			<style:graphic-properties fo:border="none" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:horizontal-pos="from-left" style:horizontal-rel="paragraph"/>
+			<style:graphic-properties fo:border="none" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="middle" style:vertical-rel="line" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" draw:wrap-influence-on-position="once-concurrent" style:flow-with-text="false"/>
+	</style:style>
+	<style:style style:name="gr4" style:family="graphic">
+			<style:graphic-properties draw:textarea-vertical-align="top" fo:border="none" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="middle" style:vertical-rel="line" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" draw:wrap-influence-on-position="once-concurrent" style:flow-with-text="false"/>
 	</style:style>
   </office:automatic-styles>
   <office:body>
@@ -379,31 +393,30 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 <xsl:template match="ausbildungsvertrag">
     <office:text text:use-soft-page-breaks="true" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0">
 	<office:forms form:automatic-focus="false" form:apply-design-mode="false">
-		<form:form form:name="Formular" form:apply-filter="true" form:command-type="table" office:target-frame="" xlink:href="" xlink:type="simple">
+		<form:form form:name="Formular" form:apply-filter="true" form:command-type="table" form:control-implementation="ooo:com.sun.star.form.component.Form" office:target-frame="" xlink:href="" xlink:type="simple">
 			<form:properties>
 				<form:property form:property-name="PropertyChangeNotificationEnabled" office:value-type="boolean" office:boolean-value="true"/>
 			</form:properties>
-			<xsl:variable select="student_maxsemester" name="maxsemester"/>
-			<form:text form:name="TextfeldSemester" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control2" form:id="control2" form:max-length="1" form:current-value="{$maxsemester}" form:convert-empty-to-null="true">
-				<form:properties>
-					<form:property form:property-name="ControlTypeinMSO" office:value-type="float" office:value="0"/>
-					<form:property form:property-name="DefaultControl" office:value-type="string" office:string-value="com.sun.star.form.control.TextField"/>
-					<form:property form:property-name="ObjIDinMSO" office:value-type="float" office:value="65535"/>
-				</form:properties>
-			</form:text>
 			<xsl:variable select="studiengang" name="studiengang"/>
-			<form:text form:name="TextfeldStg" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control3" form:id="control3" form:max-length="0" form:current-value="&quot;{$studiengang}&quot;" form:convert-empty-to-null="true">
+			<form:text form:name="Studiengang" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control1" form:id="control1" form:current-value="&quot;{$studiengang}&quot;" form:value="&quot;{$studiengang}&quot;" form:convert-empty-to-null="true">
 				<form:properties>
 					<form:property form:property-name="ControlTypeinMSO" office:value-type="float" office:value="0"/>
 					<form:property form:property-name="DefaultControl" office:value-type="string" office:string-value="com.sun.star.form.control.TextField"/>
 					<form:property form:property-name="ObjIDinMSO" office:value-type="float" office:value="65535"/>
 				</form:properties>
 			</form:text>
-			<form:textarea form:name="Ausbildungsabschluss"  xml:id="control1" form:id="control1" form:current-value="Nach Abschluss aller vorgeschriebenen Prüfungen wird ein Zertifizierungsdiplom der Technikum Wien Academy verliehen.&#x0a;Nach Abschluss aller vorgeschriebenen Prüfungen wird der Titel &quot;Akademische/r &quot; verliehen.&#x0a;Nach Abschluss aller vorgeschriebenen Prüfungen wird der akademische Grad &quot;Master of &quot; verliehen." form:convert-empty-to-null="true">
+			<xsl:variable select="student_maxsemester" name="maxsemester"/>
+			<form:text form:name="Semester" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control2" form:id="control2" form:max-length="1" form:current-value="{$maxsemester}" form:value="{$maxsemester}" form:convert-empty-to-null="true">
 				<form:properties>
 					<form:property form:property-name="ControlTypeinMSO" office:value-type="float" office:value="0"/>
 					<form:property form:property-name="DefaultControl" office:value-type="string" office:string-value="com.sun.star.form.control.TextField"/>
-					<form:property form:property-name="LineEndFormat" office:value-type="float" office:value="2"/>
+					<form:property form:property-name="ObjIDinMSO" office:value-type="float" office:value="65535"/>
+				</form:properties>
+			</form:text>
+			<form:textarea form:name="Abschluss" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control3" form:id="control3" form:current-value="Nach Abschluss aller vorgeschriebenen Prüfungen wird ein Zertifizierungsdiplom der Technikum Wien Academy verliehen.&#x0a;Nach Abschluss aller vorgeschriebenen Prüfungen wird der Titel &quot;Akademische/r &quot; verliehen.&#x0a;Nach Abschluss aller vorgeschriebenen Prüfungen wird der akademische Grad &quot;Master of &quot; verliehen." form:value="Nach Abschluss aller vorgeschriebenen Prüfungen wird ein Zertifizierungsdiplom der Technikum Wien Academy verliehen.&#x0a;Nach Abschluss aller vorgeschriebenen Prüfungen wird der Titel &quot;Akademische/r &quot; verliehen.&#x0a;Nach Abschluss aller vorgeschriebenen Prüfungen wird der akademische Grad &quot;Master of &quot; verliehen." form:convert-empty-to-null="true">
+				<form:properties>
+					<form:property form:property-name="ControlTypeinMSO" office:value-type="float" office:value="0"/>
+					<form:property form:property-name="DefaultControl" office:value-type="string" office:string-value="com.sun.star.form.control.TextField"/>
 					<form:property form:property-name="MultiLine" office:value-type="boolean" office:boolean-value="true"/>
 					<form:property form:property-name="ObjIDinMSO" office:value-type="float" office:value="65535"/>
 				</form:properties>
@@ -455,11 +468,15 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       </text:p>
       <text:p text:style-name="P7">Personenkennzeichen:<text:tab/><xsl:value-of select="matrikelnr"/></text:p>
       <text:p text:style-name="P11"/>
-      <text:p text:style-name="P4">(kurz „a.o. Studentin“ bzw. „a.o. Student“ genannt) andererseits, im Rahmen des Lehrgangs zur Weiterbildung nach §9 FHStG idgF </text:p>
+      <text:p text:style-name="P4">(kurz „a.o. Studentin“ bzw. „a.o. Student“ genannt) andererseits, im Rahmen des Lehrgangs zur Weiterbildung nach §9 FHStG idgF</text:p>
       <text:p text:style-name="P11"/>
       <xsl:variable select="studiengang" name="studiengang"/>
-	  <xsl:variable name="stglaenge" select="string-length($studiengang)*0.24"/>
-      <text:p text:style-name="P4"><text:span text:style-name="T1"><draw:control text:anchor-type="as-char" svg:y="-0.45cm" draw:z-index="6" draw:style-name="gr3" draw:text-style-name="P45" svg:width="{$stglaenge}cm" svg:height="0.5cm" draw:control="control3"/>, Lehrgangsnummer <xsl:value-of select="studiengang_kz"/>,</text:span></text:p>
+	  <xsl:variable name="stglaenge" select="format-number((string-length($studiengang)*0.21), '#.00')"/>
+      <text:p text:style-name="P4">
+      		<text:span text:style-name="T1">
+      			<draw:control text:anchor-type="as-char" svg:y="-0.45cm" draw:z-index="6" draw:style-name="gr2" draw:text-style-name="P140" svg:width="{$stglaenge}cm" svg:height="0.5cm" draw:control="control1"/>, Lehrgangsnummer <xsl:value-of select="studiengang_kz"/>,
+      		</text:span>
+      </text:p>
       <text:p text:style-name="P11"/>
       <text:p text:style-name="P4"> in der Organisationsform eines 
 	<xsl:choose>
@@ -506,7 +523,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
           </text:list>
         </text:list-item>
       </text:list>
-      <text:p text:style-name="P5">Die Ausbildungsdauer beträgt <draw:control text:anchor-type="as-char" svg:y="-0.45cm" draw:z-index="6" draw:style-name="gr2" draw:text-style-name="P44" svg:width="0.361cm" svg:height="0.5cm" draw:control="control2"/>Semester.</text:p>
+      <text:p text:style-name="P5">Die Ausbildungsdauer beträgt <draw:control text:anchor-type="as-char" draw:z-index="7" draw:style-name="gr3" draw:text-style-name="P141" svg:y="-0.45cm" svg:width="0.4cm" svg:height="0.5cm" draw:control="control2"/> Semester.</text:p>
       <text:p text:style-name="P5"/>
       <text:p text:style-name="P5">Nachgewiesene erworbene Kenntnisse können auf einzelne Lehrveranstaltungen angerechnet werden bzw. zum Erlass einer Lehrveranstaltung führen. Hierzu bedarf es eines Antrages der a.o. Studentin bzw. des a.o. Studenten und der nachfolgenden Feststellung der inhaltlichen und umfänglichen Gleichwertigkeit durch die Lehrgangsleitung.</text:p>
       <text:p text:style-name="P14"/>
@@ -519,8 +536,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
           </text:list>
         </text:list-item>
       </text:list>
-      <text:p text:style-name="P36"><draw:control text:anchor-type="paragraph" draw:z-index="5" draw:style-name="gr1" draw:text-style-name="P42" svg:width="16.005cm" svg:height="1.3cm" svg:x="0.0cm" svg:y="-0.3cm" draw:control="control1"/></text:p>
-      <text:p text:style-name="P36"/>
+      <text:p text:style-name="P36"><draw:control text:anchor-type="as-char" draw:z-index="8" draw:style-name="gr4" draw:text-style-name="P142" svg:width="16cm" svg:height="1.5cm" draw:control="control3"/></text:p>
       <text:p text:style-name="P36"/>
       <text:list xml:id="list890989597" text:continue-numbering="true" text:style-name="WW8Num7">
         <text:list-item>
@@ -531,7 +547,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
           </text:list>
         </text:list-item>
       </text:list>
-      <text:p text:style-name="P27"><text:bookmark-start text:name="_Ref78865698"/>5.1 Rechte<text:bookmark-end text:name="_Ref78865698"/></text:p>
+      <text:p text:style-name="P27">5.1 Rechte</text:p>
       <text:p text:style-name="P5">Der Erhalter führt eine periodische Überprüfung des Studiums im Hinblick auf Relevanz und Aktualität durch und ist im Einvernehmen mit dem FH-Kollegium berechtigt, daraus Änderungen des Lehrgangs zur Weiterbildung abzuleiten.</text:p>
       <text:p text:style-name="P5"/>
       <text:p text:style-name="P5">Der Erhalter ist berechtigt, die Daten der/des a.o. Studierenden an den FH Technikum Wien Alumni Club zu übermitteln. Der Alumni Club ist der AbsolventInnenverein der FH Technikum Wien. Er hat zum Ziel, AbsolventInnen, Studierende und Lehrende miteinander zu vernetzen sowie AbsolventInnen laufend über Aktivitäten an der FH Technikum Wien zu informieren. Einer Zusendung von Informationen durch den Alumni Club kann jederzeit widersprochen werden.</text:p>
