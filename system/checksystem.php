@@ -3561,6 +3561,31 @@ if(!$result = @$db->db_query("SELECT aktiv FROM public.tbl_vorlagestudiengang"))
 		echo '<br>public.tbl_vorlagestudiengang: Neue Spalte aktiv hinzugefuegt. Aktiv bei allen Vorlagen auf true gesetzt.';
 }
 
+// Spalte standort_id (FK) zur Organisationseinheit hinzugefügt
+if(!$result = @$db->db_query("SELECT standort_id FROM public.tbl_organisationseinheit LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_organisationseinheit ADD COLUMN standort_id integer;
+            ALTER TABLE public.tbl_organisationseinheit ADD CONSTRAINT standort_standort_id FOREIGN KEY (standort_id) REFERENCES public.tbl_standort (standort_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>Organisationseinheit: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Organisationseinheit: Spalte standort_id hinzugefügt';
+}
+
+// Spalte code zum Standort hinzugefügt
+if(!$result = @$db->db_query("SELECT code FROM public.tbl_standort LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_standort ADD COLUMN code varchar(3);
+            ALTER TABLE public.tbl_standort ADD CONSTRAINT uk_code UNIQUE (code);
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>Standort: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Standort: Spalte code hinzugefügt';
+}
 
 echo '<br><br><br>';
 
