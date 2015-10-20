@@ -605,6 +605,11 @@ class statistik extends basis_db
 	{
 		return json_encode($this->json);
 	}
+	
+	function getArray()
+	{
+		return $this->json;
+	}
 
 	/**
 	 * 

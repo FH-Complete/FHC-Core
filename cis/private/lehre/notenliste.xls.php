@@ -246,7 +246,7 @@ else
 						$note='';
 					$worksheet->write($lines,1,$elem->nachname.$inc);
 					$worksheet->write($lines,2,$elem->vorname);
-					$worksheet->write($lines,3,$elem->semester.$elem->verband.$elem->gruppe);
+					$worksheet->write($lines,3,'="'.$elem->semester.$elem->verband.$elem->gruppe.'"');
 					$worksheet->write($lines,4,'="'.trim($elem->matrikelnr).'"',$format_highlight);
 					$worksheet->write($lines,5,$note,$format_highlight);
 					$i++;
