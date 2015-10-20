@@ -590,6 +590,7 @@ class moodle24_user extends basis_db
 		catch (SoapFault $E)
 		{
 			$this->errormsg.="SOAP Fehler beim Anlegen der Gruppe: ".$E->faultstring;
+			return false;
 		}
 	}
 
@@ -742,6 +743,7 @@ class moodle24_user extends basis_db
 		catch (SoapFault $E)
 		{
 			$this->errormsg.="SOAP Fehler beim Zuordnen der User: ".$E->faultstring.' '.(isset($E->detail)?$E->detail:'');
+			return false;
 		}
 
 		return true;
