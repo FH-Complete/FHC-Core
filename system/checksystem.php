@@ -3503,7 +3503,7 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 		if(!$db->db_query($qry))
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
-			echo ' system.tbl_berechtigung: Eigene Berechtigung lehre/lehrveranstalgungAnlegen Anlage von Lehrveranstaltungen hinzugefuegt!<br>';
+			echo '<br>system.tbl_berechtigung: Eigene Berechtigung "lehre/lehrveranstalgungAnlegen"; Recht zur Anlage von Lehrveranstaltungen hinzugefuegt!';
 	}
 }
 
@@ -3526,7 +3526,7 @@ if(!@$db->db_query("SELECT bezeichnung FROM bis.tbl_zgv LIMIT 1"))
 	if(!$db->db_query($qry))
 		echo '<strong>bis.tbl_zgv '.$db->db_last_error().'</strong><br>';
 	else
-		echo ' Mehrsprachige Bezeichnung für ZGV, Master ZGV und Doktor ZGV hinzugefügt<br>';
+		echo '<br>Mehrsprachige Bezeichnung für ZGV, Master ZGV und Doktor ZGV hinzugefügt';
 }
 
 // Eigene Berechtigung fuer Anlage neuer Lehrveranstaltung
@@ -3543,7 +3543,7 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 		if(!$db->db_query($qry))
 			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
 		else
-			echo ' system.tbl_berechtigung: Eigene Berechtigung lehre/studienordnungInaktiv zur Bearbeitung von inaktiven Studienordnungen hinzugefuegt!<br>';
+			echo '<br>system.tbl_berechtigung: Eigene Berechtigung lehre/studienordnungInaktiv zur Bearbeitung von inaktiven Studienordnungen hinzugefuegt!';
 	}
 }
 
@@ -3800,7 +3800,7 @@ $tabellen=array(
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype"),
-	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz","style","berechtigung","anmerkung_vorlagestudiengang"),
+	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz","style","berechtigung","anmerkung_vorlagestudiengang","aktiv"),
 	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon","ablauf_vorgaben_id"),
 	"testtool.tbl_ablauf_vorgaben"  => array("ablauf_vorgaben_id","studiengang_kz","sprache","sprachwahl","content_id","insertamum","insertvon","updateamum", "updatevon"),
 	"testtool.tbl_antwort"  => array("antwort_id","pruefling_id","vorschlag_id"),
