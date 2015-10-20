@@ -11,6 +11,7 @@ error_reporting(E_ALL);
 mb_internal_encoding("UTF-8");
 mb_regex_encoding("UTF-8");
 setlocale (LC_ALL, 'de_AT.utf8');
+setlocale (LC_NUMERIC, 'C');
 
 // Zeitzone
 date_default_timezone_set('Europe/Vienna');
