@@ -56,7 +56,7 @@ function initLektorTree()
 			}
 			catch(e)
 			{}
-			
+
 			//Alte DS entfernen
 			var oldDatasources = LektorTree.database.GetDataSources();
 			while(oldDatasources.hasMoreElements())
@@ -223,6 +223,60 @@ function LektorFunktionMail()
 		window.location.href=mailempfaenger;
 }
 
+// ****
+// * Sendet ein Mail an die Mitarbeiter die im Lektor Tree
+// * markiert wurden.
+// ****
+function LektorFunktionMailPrivat()
+{
+	uids='';
+	var tree=document.getElementById('tree-lektor');
+	var numRanges = tree.view.selection.getRangeCount();
+	var start = new Object();
+	var end = new Object();
+	var anzfault=0;
+	//Markierte Datensaetze holen
+	for (var t=0; t<numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+  		for (v=start.value; v<=end.value; v++)
+  		{
+  			var col = tree.columns ? tree.columns["uid"] : "uid";
+  			if(tree.view.getCellText(v,col).length>1)
+  			{
+				uids=uids+';'+tree.view.getCellText(v,col);
+  			}
+  		}
+	}
+
+	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'getprivatemailadressUID');
+	req.add('uids', uids);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+		{
+			alert(val.dbdml_errormsg)
+			if(val.dbdml_data!='')
+				splitmailto(val.dbdml_data,'to');
+		}
+	}
+	else
+	{
+		if(val.dbdml_data!='')
+			splitmailto(val.dbdml_data,'bcc');
+	}
+}
+
 function auswahlValues()
 {
 	this.stg_kz=null;
@@ -364,7 +418,7 @@ function onVerbandSelect(event)
 			}
 			catch(e)
 			{}
-			
+
 			//Alte DS entfernen
 			var oldDatasources = treeLV.database.GetDataSources();
 			while(oldDatasources.hasMoreElements())
@@ -409,7 +463,7 @@ function onVerbandSelect(event)
 			}
 			catch(e)
 			{}
-			
+
 			//Alte DS entfernen
 			var oldDatasources = treeInt.database.GetDataSources();
 			while(oldDatasources.hasMoreElements())
@@ -471,7 +525,7 @@ function onFachbereichSelect(event)
 
 	col = tree.columns ? tree.columns["fachbereich-treecol-uid"] : "fachbereich-treecol-uid";
 	var uid=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	//Wenn auf einen Mitarbeiter geklickt wird, dann die kurzbz vom uebergeordneten
 	//Fachbereich holen
 	if(uid!='')
@@ -495,7 +549,7 @@ function onFachbereichSelect(event)
 		}
 		catch(e)
 		{}
-		
+
 		//Alte DS entfernen
 		var oldDatasources = treeLV.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
@@ -519,7 +573,7 @@ function onFachbereichSelect(event)
 }
 
 /*
- * Wird bei einer Auswahl der Organisationseinheit aufgerufen und laedt die Lehrveranstaltungen der 
+ * Wird bei einer Auswahl der Organisationseinheit aufgerufen und laedt die Lehrveranstaltungen der
  * markierten Organisationseinheit
  */
 function onOrganisationseinheitSelect(event)
@@ -550,7 +604,7 @@ function onOrganisationseinheitSelect(event)
 
 	col = tree.columns ? tree.columns["organisationseinheit-treecol-oe_kurzbz"] : "organisationseinheit-treecol-oe_kurzbz";
 	var kurzbz=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	// Lehrveranstaltung
     document.getElementById('statusbar-progressmeter').setAttribute('mode','undetermined');
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -567,7 +621,7 @@ function onOrganisationseinheitSelect(event)
 		}
 		catch(e)
 		{}
-		
+
 		//Alte DS entfernen
 		var oldDatasources = treeLV.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
@@ -628,14 +682,14 @@ function onLektorSelect(event)
 		return;
 
 	col = tree.columns ? tree.columns["uid"] : "uid";
-	
+
 	var uid=tree.view.getCellText(tree.currentIndex,col);
 
 	var stg_idx = tree.view.getParentIndex(tree.currentIndex);
 	//wenn direkt ein studiengang markiert wurde dann abbrechen
 	if(stg_idx==-1)
 		return;
-		
+
 	var col = tree.columns ? tree.columns["studiengang_kz"] : "studiengang_kz";
 	var stg_kz=tree.view.getCellText(stg_idx,col);
 
@@ -659,7 +713,7 @@ function onLektorSelect(event)
 		}
 		catch(e)
 		{}
-		
+
 		while(oldDatasources.hasMoreElements())
 		{
 			treeLV.database.RemoveDataSource(oldDatasources.getNext());
@@ -702,7 +756,7 @@ function StatistikPrintKoordinatorstunden()
 		var col;
 		col = tree.columns ? tree.columns["organisationseinheit-treecol-oe_kurzbz"] : "organisationseinheit-treecol-oe_kurzbz";
 		var oe_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-			
+
 		window.open('<?php echo APP_ROOT ?>content/statistik/koordinatorstunden.php?oe_kurzbz='+oe_kurzbz,'Koordinatorstunden');
 	}
 	catch(e)
@@ -792,7 +846,7 @@ function StatistikPrintLVPlanung()
 		var uid=tree.view.getCellText(tree.currentIndex,col);
 		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.php?uid='+uid;
 	}
-	
+
 	if(typeof(url)!='undefined')
 		window.open(url,'LV-Planung');
 	else
@@ -806,7 +860,7 @@ function StatistikPrintLVPlanung()
 function StatistikPrintLVPlanungExcel()
 {
 	var studiensemester=getStudiensemester();
-	
+
 	if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-verband'))
 	{
 		tree = document.getElementById('tree-verband');
@@ -857,7 +911,7 @@ function StatistikPrintLVPlanungExcel()
 		var uid=tree.view.getCellText(tree.currentIndex,col);
 		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.xls.php?uid='+uid+'&studiensemester_kurzbz='+studiensemester;
 	}
-	
+
 	if(typeof(url)!='undefined')
 		window.open(url,'LV-Planung');
 	else
@@ -1098,7 +1152,7 @@ function StatistikPrintStudentExportExtended()
 			var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
 		else
 			return false;
-			
+
 		for (var v=0; v < items; v++)
 		{
 			prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
@@ -1106,13 +1160,13 @@ function StatistikPrintStudentExportExtended()
 		}
 	}
 	else
-	{	
+	{
 		var start = new Object();
 		var end = new Object();
 		var numRanges = tree.view.selection.getRangeCount();
 		var paramList= '';
 		var anzahl=0;
-	
+
 		//alle markierten personen holen
 		for (var t = 0; t < numRanges; t++)
 		{
@@ -1124,7 +1178,7 @@ function StatistikPrintStudentExportExtended()
 			}
 		}
 	}
-	
+
 	stsem = getStudiensemester();
 	action = '<?php echo APP_ROOT; ?>content/statistik/studentenexportextended.xls.php?studiensemester_kurzbz='+stsem;
 	OpenWindowPost(action, data);
@@ -1161,7 +1215,7 @@ function ExtrasShowLVverwaltung()
 		var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
 		col = tree.columns ? tree.columns["sem"] : "sem";
 		var semester=tree.view.getCellText(tree.currentIndex,col);
-		
+
 		var url = '<?php echo APP_ROOT ?>vilesci/lehre/lehrveranstaltung.php?stg_kz='+studiengang_kz+'&semester='+semester;
 	}
 	else if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-fachbereich'))
@@ -1184,7 +1238,7 @@ function ExtrasShowLVverwaltung()
 	{
 		var url = '<?php echo APP_ROOT ?>vilesci/lehre/lehrveranstaltung.php';
 	}
-	
+
 	window.open(url,'Lehrveranstaltungen','');
 }
 
@@ -1221,7 +1275,7 @@ function ExtrasShowProjektarbeitsBenotung()
 	var col;
 	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
 	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
-		
+
 	window.open('<?php echo APP_ROOT ?>vilesci/lehre/projektarbeitsbenotung.php?stg_kz='+studiengang_kz,'Projektarbeitsbenotung','');
 }
 
@@ -1242,7 +1296,7 @@ function ExtrasShowProjektarbeitsabgaben()
 	var col;
 	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
 	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
-		
+
 	window.open('<?php echo APP_ROOT ?>vilesci/lehre/abgabe_assistenz_frameset.php?stg_kz='+studiengang_kz,'Projektarbeitsabgaben','');
 }
 
@@ -1585,10 +1639,10 @@ function PrintAccountInfoBlatt(event)
 	var output = 'pdf';
 	if(typeof(event)!=='undefined')
 	{
-		if (event.shiftKey) 
+		if (event.shiftKey)
 		{
 		    var output = 'odt';
-		} 
+		}
 		else if (event.ctrlKey)
 		{
 			var output = 'doc';
@@ -1709,7 +1763,7 @@ function PrintStudienblatt(event)
 		if (check == false)
 			return false;
 	}
-	
+
 	if(document.getElementById('main-content-tabs').selectedItem==document.getElementById('tab-studenten'))
 	{
 		//STUDENTEN
@@ -1746,10 +1800,10 @@ function PrintStudienblatt(event)
 	var output = 'pdf';
 	if(typeof(event)!=='undefined')
 	{
-		if (event.shiftKey) 
+		if (event.shiftKey)
 		{
 		    var output = 'odt';
-		} 
+		}
 		else if (event.ctrlKey)
 		{
 			var output = 'doc';
@@ -1796,7 +1850,7 @@ function PrintStudienblattEnglisch(event)
 		if (check == false)
 			return false;
 	}
-	
+
 	if(document.getElementById('main-content-tabs').selectedItem==document.getElementById('tab-studenten'))
 	{
 		//STUDENTEN
@@ -1833,10 +1887,10 @@ function PrintStudienblattEnglisch(event)
 	var output = 'pdf';
 	if(typeof(event)!=='undefined')
 	{
-		if (event.shiftKey) 
+		if (event.shiftKey)
 		{
 		    var output = 'odt';
-		} 
+		}
 		else if (event.ctrlKey)
 		{
 			var output = 'doc';
@@ -1866,14 +1920,14 @@ function FachbereichTreeRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	tree = document.getElementById('tree-fachbereich');
-	
-	var oldDatasources = tree.database.GetDataSources();	
+
+	var oldDatasources = tree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
 	{
 		tree.database.RemoveDataSource(oldDatasources.getNext());
 	}
 	tree.builder.rebuild();
-	
+
 	url = '<?php echo APP_ROOT; ?>rdf/fachbereich_menue.rdf.php?'+gettimestamp();
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var fb_datasource = rdfService.GetDataSource(url);
@@ -1889,14 +1943,14 @@ function OrganisationseinheitTreeRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	tree = document.getElementById('tree-organisationseinheit');
-	
-	var oldDatasources = tree.database.GetDataSources();	
+
+	var oldDatasources = tree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
 	{
 		tree.database.RemoveDataSource(oldDatasources.getNext());
 	}
 	tree.builder.rebuild();
-	
+
 	url = '<?php echo APP_ROOT; ?>rdf/organisationseinheit_menue.rdf.php?'+gettimestamp();
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var oe_datasource = rdfService.GetDataSource(url);
