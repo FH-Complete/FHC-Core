@@ -64,7 +64,7 @@ if(isset($anwesenheit->result) && is_array($anwesenheit->result))
 	{	
 		$i=$oRdf->newObjekt($i);
 		$oRdf->obj[$i]->setAttribut('lehrveranstaltung_bezeichnung',$row->bezeichnung,true);
-		$oRdf->obj[$i]->setAttribut('prozent',$row->prozent,true,'Integer');
+		$oRdf->obj[$i]->setAttribut('prozent',$row->prozent,true);
 		$oRdf->obj[$i]->setAttribut('anwesend',$row->anwesend,true);
 		$oRdf->obj[$i]->setAttribut('nichtanwesend',$row->nichtanwesend,true);
 		$oRdf->obj[$i]->setAttribut('vorname',$row->vorname,true);
