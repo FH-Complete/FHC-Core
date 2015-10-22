@@ -116,6 +116,7 @@ else
 		<inventarnummer><![CDATA['.$bmp->inventarnummer.']]></inventarnummer>
 		<kaution><![CDATA['.$bmp->kaution.']]></kaution>
 		<ausgegebenam><![CDATA['.$datum->convertISODate($bmp->ausgegebenam).']]></ausgegebenam>
+		<retouram><![CDATA['.$datum->convertISODate($bmp->retouram).']]></retouram>
 		<organisationseinheit><![CDATA['.$organisationseinheit.']]></organisationseinheit>
 		<titelpre><![CDATA['.$person->titelpre.']]></titelpre>
 		<vorname><![CDATA['.$person->vorname.']]></vorname>
