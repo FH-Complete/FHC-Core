@@ -1137,6 +1137,10 @@ if(!$error)
 					    $rolle->ausbildungssemester = $_POST['ausbildungssemester'];
 					    $rolle->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 					    $rolle->datum = $_POST['datum'];
+					    $rolle->bestaetigtam = $_POST['bestaetigtam'];
+					    if($_POST['bestaetigtam']=='')
+					    	$rolle->bestaetigtvon = null;
+					    
 					    $rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
 					    $rolle->studienplan_id = $_POST['studienplan_id'];
                         $rolle->anmerkung_status = $_POST['anmerkung'];
