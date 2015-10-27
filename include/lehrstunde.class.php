@@ -400,7 +400,7 @@ class lehrstunde extends basis_db
 						$sql_query_stdplan
 					)
 					SELECT
-						$stpl_view_ohneschema.* 
+						distinct $stpl_view_ohneschema.* 
 					FROM 
 					".$stpl_view.", lvplan
 					WHERE

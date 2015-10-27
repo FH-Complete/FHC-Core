@@ -1416,8 +1416,11 @@ class wochenplan extends basis_db
 								}
 								else
 								{
-									$paramList.='&amp;stundenplan_id'.$z++.'='.$lehrstunde->stundenplan_id;
-									$stundenplan_ids[]=$lehrstunde->stundenplan_id;
+									if(!in_array($lehrstunde->stundenplan_id, $stundenplan_ids))
+									{
+										$paramList.='&amp;stundenplan_id'.$z++.'='.$lehrstunde->stundenplan_id;
+										$stundenplan_ids[]=$lehrstunde->stundenplan_id;
+									}
 								}
 								if(isset($lehrstunde->farbe) && $farbe=='')
 									$farbe=$lehrstunde->farbe;
