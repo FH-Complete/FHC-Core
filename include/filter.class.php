@@ -3,22 +3,22 @@
  * filter.class.php
  *
  * Copyright 2014 fhcomplete.org
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
+ *
  *
  * Authors: Christian Paminger <pam@technikum-wien.at
  *			Robert Hofer <robert.hofer@technikum-wien.at>
@@ -29,7 +29,7 @@ class filter extends basis_db
 {
 	private $new = true;			// boolean
 	public $result = array();		// Objekte
-	
+
 	//Tabellenspalten
 	protected $filter_id;				// integer (PK)
 	protected $kurzbz;					// varchar(32) unique
@@ -42,9 +42,9 @@ class filter extends basis_db
 	protected $updatevon;				// varchar
 	protected $insertamum;				// timestamp
 	protected $insertvon;				// varchar
-	
+
 	protected $values=array();
-	
+
 	/**
 	 * Konstruktor
 	 */
@@ -52,7 +52,7 @@ class filter extends basis_db
 	{
 		parent::__construct();
 	}
-	
+
 	public function __set($name,$value)
 	{
 		$this->$name=$value;
@@ -62,8 +62,8 @@ class filter extends basis_db
 	{
 		return $this->$name;
 	}
-	
-	
+
+
 	/**
 	 * Laden eines Filters
 	 * @param filter_id ID des Datensatzes, der geladen werden soll
@@ -106,7 +106,7 @@ class filter extends basis_db
 
 		return true;
 	}
-	
+
 	/**
 	 * Laden eines Filters
 	 * @param filter_id ID des Datensatzes, der geladen werden soll
@@ -114,7 +114,7 @@ class filter extends basis_db
 	 */
 	public function loadAll()
 	{
-		
+
 		$qry = "SELECT * FROM public.tbl_filter;";
 
 		if($this->db_query($qry))
@@ -122,21 +122,21 @@ class filter extends basis_db
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new filter();
-				
+
 				$obj->filter_id=$row->filter_id;
 				$obj->kurzbz=$row->kurzbz;
 				$obj->sql=$row->sql;
 				$obj->valuename=$row->valuename;
 				$obj->showvalue = $this->db_parse_bool($row->showvalue);
 				$obj->type=$row->type;
-				$obj->htmlattr=$row->htmlattr;	
+				$obj->htmlattr=$row->htmlattr;
 				$obj->insertamum=$row->insertamum;
 				$obj->insertvon=$row->insertvon;
 				$obj->updateamum=$row->updateamum;
 				$obj->updatevon=$row->updatevon;
 				$obj->new       = false;
 
-				$this->result[] = $obj;			   
+				$this->result[] = $obj;
 			}
 		}
 		else
@@ -147,7 +147,7 @@ class filter extends basis_db
 
 		return true;
 	}
-	
+
 	/**
 	 * Suchen ob Filter vorhanden
 	 * @param kurzbz des Datensatzes, der gefunden werden soll
@@ -160,12 +160,12 @@ class filter extends basis_db
 			if ($filter->kurzbz==$kurzbz)
 				return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
-	 * Ausgabe des HTML Widgets 
+	 * Ausgabe des HTML Widgets
 	 * @param kurzbz des Datensatzes, der gefunden werden soll
 	 * @return boolean true wenn ok, false im Fehlerfall
 	 */
@@ -183,7 +183,9 @@ class filter extends basis_db
 						$html.='<select id="' . $filter->kurzbz . '" class="form-control" name="'.$filter->kurzbz.'[]" ';
 						$html.=$filter->htmlattr;
 						$html.=' >';
-						$this->loadValues($filter->sql, $filter->valuename, $filter->showvalue);
+						$user = get_uid();
+						$sql = str_replace('$user', $user, $filter->sql);
+						$this->loadValues($sql, $filter->valuename, $filter->showvalue);
 						foreach ($this->values as $value)
 							$html.="\n\t\t\t\t".'<option value="'.$value->value.'">'.$value->text.'</option>';
 						$html.="\n\t\t\t</select>";
@@ -198,10 +200,10 @@ class filter extends basis_db
 				return $html;
 			}
 		}
-		
+
 		return $this->errormsg;
 	}
-	
+
 	/**
 	 * Laden eines Filters
 	 * @param filter_id ID des Datensatzes, der geladen werden soll
@@ -237,7 +239,7 @@ class filter extends basis_db
 						$obj->text.=' - '.$row[$i];
 				}
 				//$obj->text = mb_substr($obj->text,1);
-				$this->values[] = $obj;			   
+				$this->values[] = $obj;
 			}
 			//var_dump($this);
 		}
@@ -249,8 +251,8 @@ class filter extends basis_db
 
 		return true;
 	}
-	
-	
+
+
 
 	/**
 	 * Prueft die Variablen auf Gueltigkeit
@@ -272,7 +274,7 @@ class filter extends basis_db
 			$this->errormsg = 'Kurzbz darf nicht länger als 32 Zeichen sein';
 			return false;
 		}
-		
+
 		//Boleanfelder prüfen
 		if(!is_bool($this->showvalue))
 		{
@@ -283,7 +285,7 @@ class filter extends basis_db
 		$this->errormsg = '';
 		return true;
 	}
-	
+
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * @param neueVersion boolean default false; wenn gesetzt, dann
@@ -296,9 +298,9 @@ class filter extends basis_db
 		//Variablen pruefen
 		if(!$this->validate())
 			return false;
-		
+
 		$this->db_query('BEGIN'); //Starting Transaction
-		
+
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
@@ -320,8 +322,8 @@ class filter extends basis_db
 			{
 				$this->errormsg = 'filter_id muss eine gueltige Zahl sein';
 				return false;
-			} 	
-			
+			}
+
 			$qry='UPDATE public.tbl_filter SET'.
 				' kurzbz='.$this->db_add_param($this->kurzbz).', '.
 				' sql='.$this->db_add_param($this->sql).', '.
@@ -333,7 +335,7 @@ class filter extends basis_db
 		      	' updatevon='.$this->db_add_param($this->updatevon).' '.
 		      	' WHERE filter_id='.$this->db_add_param($this->filter_id, FHC_INTEGER, false).';';
 		}
-        
+
         if($this->db_query($qry))
 		{
 			if($this->new)
@@ -401,7 +403,7 @@ class filter extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Ermittelt alle POST/GET-Variablen
 	 * @return Zeichenkette fuer eine GET-Methode, false im Fehlerfall
@@ -422,5 +424,5 @@ class filter extends basis_db
 		//$vars.='&statistik_kurzbz='.$_REQUEST['statistik_kurzbz'];
 		return $vars;
 	}
-	
+
 }
