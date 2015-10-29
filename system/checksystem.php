@@ -3587,6 +3587,25 @@ if(!$result = @$db->db_query("SELECT code FROM public.tbl_standort LIMIT 1"))
 		echo '<br>Standort: Spalte code hinzugefügt';
 }
 
+// Bezeichnung der ZGV auf 128 Zeichen verlaengert
+if($result = @$db->db_query("SELECT * FROM pg_class, pg_attribute WHERE pg_class.relkind = 'r' AND pg_attribute.attrelid = pg_class.oid and pg_class.relname = 'tbl_zgv' and pg_attribute.attname = 'bezeichnung' and pg_attribute.atttypmod=64+4;"))
+{
+	if($db->db_num_rows($result)==1)
+	{
+		$qry = "ALTER TABLE bis.tbl_zgv ALTER COLUMN bezeichnung TYPE varchar(128)[];
+			ALTER TABLE bis.tbl_zgvmaster ALTER COLUMN bezeichnung TYPE varchar(128)[];
+			ALTER TABLE bis.tbl_zgvdoktor ALTER COLUMN bezeichnung TYPE varchar(128)[];
+			";
+
+		if(!$db->db_query($qry))
+			echo '<strong>ZGV Bezeichnung verlaengert: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>ZGV: Spalte bezeichnung verlaengert';
+	}
+}
+
+
+
 echo '<br><br><br>';
 
 $tabellen=array(
