@@ -191,4 +191,8 @@ define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
 
 // Soll der Lageplan am Infoterminal angezeigt werden (true|false)
 define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN', true);
+
+
+//PHANTOM
+define('PHANTOM_SERVER','http://phantomjs.example.com:3003');
 ?>
