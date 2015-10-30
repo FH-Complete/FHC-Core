@@ -3604,6 +3604,22 @@ if($result = @$db->db_query("SELECT * FROM pg_class, pg_attribute WHERE pg_class
 	}
 }
 
+// Mehrsprachigkeit fuer Aufmerksamdurch
+if(!@$db->db_query("SELECT bezeichnung FROM public.tbl_aufmerksamdurch LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE public.tbl_aufmerksamdurch ADD COLUMN bezeichnung varchar(128)[];
+	ALTER TABLE public.tbl_aufmerksamdurch ADD COLUMN aktiv boolean NOT NULL DEFAULT true;
+
+	UPDATE public.tbl_aufmerksamdurch SET bezeichnung[1]=beschreibung;
+	UPDATE public.tbl_aufmerksamdurch SET bezeichnung[2]=beschreibung;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_aufmerksamdurch '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Mehrsprachige Bezeichnung für Aufmerksamdurch hinzugefügt';
+}
 
 
 echo '<br><br><br>';
@@ -3751,7 +3767,7 @@ $tabellen=array(
 	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern"),
 	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
-	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id"),
+	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id","bezeichnung", "aktiv"),
 	"public.tbl_aufnahmeschluessel"  => array("aufnahmeschluessel"),
 	"public.tbl_aufnahmetermin" => array("aufnahmetermin_id","aufnahmetermintyp_kurzbz","prestudent_id","termin","teilgenommen","bewertung","protokoll","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_aufnahmetermintyp" => array("aufnahmetermintyp_kurzbz","bezeichnung"),
