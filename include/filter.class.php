@@ -184,7 +184,7 @@ class filter extends basis_db
 						$html.=$filter->htmlattr;
 						$html.=' >';
 						$user = get_uid();
-						$sql = str_replace('$user', $user, $filter->sql);
+						$sql = str_replace('$user', $this->db_add_param($user), $filter->sql);
 						$this->loadValues($sql, $filter->valuename, $filter->showvalue);
 						foreach ($this->values as $value)
 							$html.="\n\t\t\t\t".'<option value="'.$value->value.'">'.$value->text.'</option>';
