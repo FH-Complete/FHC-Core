@@ -1197,10 +1197,9 @@ function getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$re
 	$htmlstr.="<td>&nbsp;</td>";	
 	$htmlstr.="<td>Bezeichnung: </td>";		
 	$htmlstr.="<td><input type='text' name='bezeichnung' value='".$standort_obj->bezeichnung."' size='40' maxlength='256' /></td>\n";
-
-	$htmlstr.="<td>&nbsp;</td>";	
-	$htmlstr.="<td>Zustelladresse:</td>";
-	$htmlstr.="<td><input type='checkbox' name='zustelladresse' ".($adresse_obj->zustelladresse?'checked':'')."> </td>";
+	$htmlstr.="<td>&nbsp;</td>";
+	$htmlstr.="<td>Name: </td>";		
+	$htmlstr.="<td><input type='text' name='name' value='".$adresse_obj->name."' size='40' maxlength='256' /></td>\n";
 	$htmlstr.="<td>&nbsp;</td>";	
 
 	$htmlstr.="</tr></table></td>";		
@@ -1265,6 +1264,11 @@ function getStandort($firma_id,$standort_id,$adresse_id,$adresstyp_arr,$user,$re
 	$htmlstr.="<td>Strasse:</td>";
 	$htmlstr.="<td><input type='text' name='strasse' value='".$adresse_obj->strasse."' size='80' maxlength='256' /></td>\n";
 	$htmlstr.="<td>&nbsp;</td>";	
+	$htmlstr.="<td>Zustelladresse:</td>";
+	$htmlstr.="<td><input type='checkbox' name='zustelladresse' ".($adresse_obj->zustelladresse?'checked':'')."> </td>";
+
+	$htmlstr.="<td>&nbsp;</td>";	
+
 	$htmlstr.="</tr></table></td>";	
 	$htmlstr.="</tr>\n";
 
