@@ -56,7 +56,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 <vbox id="MitarbeiterEditor" persist="height" flex="1">
 <popupset>
 	<menupopup id="mitarbeiter-tree-popup">
-		<menuitem label="EMail versenden" oncommand="MitarbeiterSendMail();" id="mitarbeiter-tree-popup-mail" hidden="false"/>
+		<menuitem label="EMail senden (intern)" oncommand="MitarbeiterSendMail();" id="mitarbeiter-tree-popup-mail" hidden="false"/>
+		<menuitem label="EMail senden (privat)" oncommand="MitarbeiterSendMailPrivat();" id="mitarbeiter-tree-popup-mail" hidden="false"/>
 		<menuitem label="Personendetails anzeigen" oncommand="MitarbeiterShowPersonendetails()" id="mitarbeiter-tree-popup-personendetails" hidden="false"/>
 	</menupopup>
 </popupset>
@@ -83,7 +84,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 			flags="dont-build-content"
 			enableColumnDrag="true"
 			persist="hidden, height"
-			context="mitarbeiter-tree-popup"				
+			context="mitarbeiter-tree-popup"
 	>
 		<treecols>
 			<treecol id="mitarbeiter-treecol-uid" label="UID" flex="1" persist="hidden, width, ordinal" hidden="false"
@@ -116,7 +117,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpost"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<?php 
+			<?php
 			if($rechte->isBerechtigt('mitarbeiter/persoenlich'))
 			echo '
 				<treecol id="mitarbeiter-treecol-geburtsdatum" label="Geburtsdatum" flex="1" persist="hidden, width, ordinal" hidden="false"
@@ -129,7 +130,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-treecol-svnr" label="SVNR" flex="1" persist="hidden, width, ordinal" hidden="false"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#svnr"  onclick="MitarbeiterTreeSort()"/> 
+					sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#svnr"  onclick="MitarbeiterTreeSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="mitarbeiter-treecol-ersatzkennzeichen" label="Ersatzkennzeichen" flex="1" persist="hidden, width, ordinal" hidden="false"
 					class="sortDirectionIndicator"
@@ -205,9 +206,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
    							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre" />
    							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname" />
    							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vornamen" />   							
+   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vornamen" />
    							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpost" />
-   							<?php 
+   							<?php
 							if($rechte->isBerechtigt('mitarbeiter/persoenlich'))
 							echo '
 	   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#geburtsdatum" />
@@ -251,7 +252,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 				<tab id="mitarbeiter-tab-bis" label="BIS-Daten" />
 				<tab id="mitarbeiter-tab-betriebsmittel" label="Betriebsmittel" />
 				<tab id="mitarbeiter-tab-funktionen" label="Funktionen"  oncommand="MitarbeiterFunktionIFrameLoad()"/>
-				<?php 
+				<?php
 				if($rechte->isBerechtigt('buchung/mitarbeiter'))
 					echo '<tab id="mitarbeiter-tab-buchung" label="Buchungen" />';
 				if($rechte->isBerechtigt('vertrag/mitarbeiter'))
@@ -266,15 +267,15 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 				<vbox id="mitarbeiter-detail-funktionen"  style="margin-top:10px;" />
 				<iframe id="mitarbeiter-betriebsmittel" src="" style="margin-top:10px;" />
 				<iframe id="mitarbeiter-funktionen" src="" style="margin-top:10px;"/>
-				<?php 
+				<?php
 				if($rechte->isBerechtigt('buchung/mitarbeiter'))
 					echo '<vbox id="mitarbeiter-buchung" style="margin-top:10px;" />';
 				if($rechte->isBerechtigt('vertrag/mitarbeiter'))
 					echo '<vbox id="mitarbeiter-vertrag" style="margin-top:10px;" />';
-				?>				
+				?>
 				<iframe id="mitarbeiter-termine" src="" style="margin-top:10px;" />
 			</tabpanels>
-		</tabbox>	
+		</tabbox>
 	</vbox>
 </vbox>
 </overlay>

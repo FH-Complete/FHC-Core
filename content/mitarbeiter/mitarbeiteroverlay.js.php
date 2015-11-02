@@ -1022,6 +1022,54 @@ function MitarbeiterSendMail()
 	window.location.href=mailempfaenger;
 }
 
+/**
+ * Mail an Private EMailadresse senden
+ */
+function MitarbeiterSendMailPrivat()
+{
+	var treeMitarbeiter=document.getElementById('mitarbeiter-tree');
+	var numRanges = treeMitarbeiter.view.selection.getRangeCount();
+	var start = new Object();
+	var end = new Object();
+	var uids='';
+	//Markierte Datensaetze holen
+	for (var t=0; t<numRanges; t++)
+	{
+  		treeMitarbeiter.view.selection.getRangeAt(t,start,end);
+  		for (v=start.value; v<=end.value; v++)
+  		{
+  			var col = treeMitarbeiter.columns ? treeMitarbeiter.columns["mitarbeiter-treecol-uid"] : "mitarbeiter-treecol-uid";
+			uids=uids+';'+treeMitarbeiter.view.getCellText(v,col);
+  		}
+	}
+	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'getprivatemailadressUID');
+	req.add('uids', uids);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+		{
+			alert(val.dbdml_errormsg)
+			if(val.dbdml_data!='')
+				splitmailto(val.dbdml_data,'to');
+		}
+	}
+	else
+	{
+		if(val.dbdml_data!='')
+			splitmailto(val.dbdml_data,'bcc');
+	}
+}
+
 // ***************** VERWENDUNG ********************** //
 
 // ****

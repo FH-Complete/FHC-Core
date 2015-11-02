@@ -546,7 +546,7 @@ if(!$error)
 								public.tbl_reihungstest
 							WHERE
 								reihungstest_id=".$db->db_add_param($_POST['reihungstest_id'], FHC_INTEGER);
-				
+
 					if($result = $db->db_query($qry))
 					{
 						//$warning.= "Hinweis: Diese Person hat bereits Reihungstestzuordnungen in anderen Studiengängen:\n\n";
@@ -2323,10 +2323,8 @@ if(!$error)
 			$betriebsmittel_id = $_POST['betriebsmittel_id'];
 			$bm = new betriebsmittel();
 
-			//Nur Zutrittskarten und Schluessel koennen neu angelegt werden
-			//Das andere Inventar wird vom Zentraleinkauf inventarisiert
-			//Es kann nur ausgewaehlt, aber nicht neu angelegt werden
-			if($_POST['betriebsmitteltyp']=='Zutrittskarte' || $_POST['betriebsmitteltyp']=='Schluessel')
+			// Wenn es kein vorhandenes Inventar ist, dann neu anlegen
+			if($_POST['betriebsmitteltyp']!='Inventar')
 			{
 				if($_POST['betriebsmitteltyp']=='Zutrittskarte')
 					$_POST['nummer']=$bm->transform_kartennummer($_POST['nummer']);

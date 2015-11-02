@@ -1416,8 +1416,11 @@ class wochenplan extends basis_db
 								}
 								else
 								{
-									$paramList.='&amp;stundenplan_id'.$z++.'='.$lehrstunde->stundenplan_id;
-									$stundenplan_ids[]=$lehrstunde->stundenplan_id;
+									if(!in_array($lehrstunde->stundenplan_id, $stundenplan_ids))
+									{
+										$paramList.='&amp;stundenplan_id'.$z++.'='.$lehrstunde->stundenplan_id;
+										$stundenplan_ids[]=$lehrstunde->stundenplan_id;
+									}
 								}
 								if(isset($lehrstunde->farbe) && $farbe=='')
 									$farbe=$lehrstunde->farbe;
@@ -2122,6 +2125,8 @@ class wochenplan extends basis_db
 				$month=mb_substr($row->datum, 5,2);
 				$jahr=mb_substr($row->datum, 0,4);
 				$tag=date("w",mktime(12,0,0,$month,$mtag,$jahr));
+				if(!isset($raster[$tag][$row->stunde]))
+					$raster[$tag][$row->stunde]=new stdClass();
 				$raster[$tag][$row->stunde]->kollision=true;
 			}
 

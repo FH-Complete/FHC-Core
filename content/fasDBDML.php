@@ -65,9 +65,9 @@ if(!$error)
 	//in der Variable type wird die auszufuehrende Aktion mituebergeben
 	if(isset($_POST['type']) && $_POST['type']=='adressesave') // ***** ADRESSEN ***** //
 	{
-		if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') && 
+		if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') &&
 		   !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid')) ||
-		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') && 
+		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') &&
 		   !$rechte->isBerechtigt('mitarbeiter', null, 'suid')))
 		{
 			$return = false;
@@ -79,19 +79,19 @@ if(!$error)
 		{
 			//Speichert die Adressdaten in die Datenbank
 			$adresse = new adresse();
-			
+
 			if($_POST['neu']=='false')
 			{
 				$adresse->load($_POST['adresse_id']);
 				$adresse->new = false;
 			}
-			else 
+			else
 			{
 				$adresse->insertamum = date('Y-m-d H:i:s');
 				$adresse->insertvon = $user;
 				$adresse->new = true;
 			}
-			
+
 			$adresse->adresse_id = $_POST['adresse_id'];
 			$adresse->person_id = $_POST['person_id'];
 			$adresse->name = $_POST['name'];
@@ -106,19 +106,19 @@ if(!$error)
 			$adresse->firma_id = $_POST['firma_id'];
 			$adresse->updateamum = date('Y-m-d H:i:s');
 			$adresse->updatevon = $user;
-			
+
 			//Wenn die Nation Oesterreich ist, dann muss die Gemeinde in der Tabelle Gemeinde vorkommen
 			if($_POST['nation']=='A')
 			{
 				if(is_numeric($_POST['plz']) && $_POST['plz']<32000)
 				{
-					$qry = "SELECT * FROM bis.tbl_gemeinde WHERE lower(name)=lower(".$db->db_add_param($_POST['gemeinde']).") 
+					$qry = "SELECT * FROM bis.tbl_gemeinde WHERE lower(name)=lower(".$db->db_add_param($_POST['gemeinde']).")
 							AND plz=".$db->db_add_param($_POST['plz']);
 					if($db->db_query($qry))
 					{
 						if($row = $db->db_fetch_object())
 						{
-							$adresse->gemeinde = $row->name;	
+							$adresse->gemeinde = $row->name;
 						}
 						else
 						{
@@ -134,14 +134,14 @@ if(!$error)
 						$return = false;
 					}
 				}
-				else 
+				else
 				{
 					$error = true;
 					$errormsg = 'Postleitzahl ist fuer diese Nation ungueltig';
 					$return = false;
 				}
 			}
-	
+
 			if(!$error)
 			{
 				if($adresse->save())
@@ -159,9 +159,9 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='adressedelete')
 	{
-		if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') && 
+		if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') &&
 		   !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid')) ||
-		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') && 
+		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') &&
 		   !$rechte->isBerechtigt('mitarbeiter', null, 'suid')))
 		{
 			$return = false;
@@ -169,7 +169,7 @@ if(!$error)
 			$data = '';
 			$error = true;
 		}
-		else 
+		else
 		{
 			//Loescht Adressen aus der DB
 			$adresse = new adresse();
@@ -178,7 +178,7 @@ if(!$error)
 				$return = false;
 				$errormsg = $adresse->errormsg;
 			}
-			else 
+			else
 			{
 				if($adresse->heimatadresse)
 				{
@@ -187,7 +187,7 @@ if(!$error)
 					$return = false;
 					$errormsg = 'Heimatadressen dürfen nicht gelöscht werden, da diese für die BIS-Meldung relevant sind. Um die Adresse dennoch zu löschen, entfernen sie das Hackerl bei Heimatadresse!';
 				}
-				else 
+				else
 				{
 					if($adresse->delete($_POST['adresse_id']))
 					{
@@ -204,9 +204,9 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='kontaktsave') // ***** KONTAKT ***** //
 	{
-		if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') && 
+		if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') &&
 		   !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid')) ||
-		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') && 
+		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') &&
 		   !$rechte->isBerechtigt('mitarbeiter', null, 'suid')))
 		{
 			$return = false;
@@ -214,11 +214,11 @@ if(!$error)
 			$data = '';
 			$error = true;
 		}
-		else 
+		else
 		{
 			//Speichert die Kontaktdaten in die Datenbank
 			$kontakt = new kontakt();
-	
+
 			if($_POST['neu']=='false')
 			{
 				$kontakt->load($_POST['kontakt_id']);
@@ -230,7 +230,7 @@ if(!$error)
 				$kontakt->insertvon = $user;
 				$kontakt->new = true;
 			}
-	
+
 			$kontakt->kontakt_id = $_POST['kontakt_id'];
 			$kontakt->person_id = $_POST['person_id'];
 			$kontakt->anmerkung = $_POST['anmerkung'];
@@ -240,7 +240,7 @@ if(!$error)
 			$kontakt->standort_id = $_POST['standort_id'];
 			$kontakt->updateamum = date('Y-m-d H:i:s');
 			$kontakt->updatevon = $user;
-	
+
 			if($kontakt->save())
 			{
 				$return = true;
@@ -255,9 +255,9 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='kontaktdelete')
 	{
-		if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') && 
+		if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') &&
 		   !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid')) ||
-		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') && 
+		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') &&
 		   !$rechte->isBerechtigt('mitarbeiter', null, 'suid')))
 		{
 			$return = false;
@@ -265,16 +265,16 @@ if(!$error)
 			$data = '';
 			$error = true;
 		}
-		else 
+		else
 		{
 			//Loescht Kontaktdaten aus der Datenbank
 			$kontakt = new kontakt();
-	
+
 			if($kontakt->delete($_POST['kontakt_id']))
 			{
 				$return = true;
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = $kontakt->errormsg;
@@ -290,23 +290,23 @@ if(!$error)
 			$data = '';
 			$error = true;
 		}
-		else 
+		else
 		{
 			//Speichert die Kontaktdaten in die Datenbank
 			$bankverbindung = new bankverbindung();
-			
+
 			if($_POST['neu']=='false')
 			{
 				$bankverbindung->load($_POST['bankverbindung_id']);
 				$bankverbindung->new = false;
 			}
-			else 
+			else
 			{
 				$bankverbindung->insertamum = date('Y-m-d H:i:s');
 				$bankverbindung->insertvon = $user;
 				$bankverbindung->new = true;
 			}
-			
+
 			$bankverbindung->bankverbindung_id = $_POST['bankverbindung_id'];
 			$bankverbindung->person_id = $_POST['person_id'];
 			$bankverbindung->name = $_POST['name'];
@@ -319,13 +319,13 @@ if(!$error)
 			$bankverbindung->verrechnung = ($_POST['verrechnung']=='true'?true:false);
 			$bankverbindung->updateamum = date('Y-m-d H:i:s');
 			$bankverbindung->updatevon = $user;
-			
+
 			if($bankverbindung->save())
 			{
 				$return = true;
 				$data = $bankverbindung->bankverbindung_id;
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = $bankverbindung->errormsg;
@@ -342,26 +342,26 @@ if(!$error)
 			$error = true;
 		}
 		else
-		{ 
+		{
 			//Loescht Bankverbindungen aus der Datenbank
 			$bankverbindung = new bankverbindung();
-			
+
 			if($bankverbindung->delete($_POST['bankverbindung_id']))
 			{
 				$return = true;
 			}
-			else 
+			else
 			{
 				$return = false;
 				$errormsg = $bankverbindung->errormsg;
 			}
-		}	
+		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='funktionsave') // ****************** BENUTZERFUNKTION **************** //
 	{
-		if(($_POST['studiengang_kz_berecht']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz_berecht'],'suid') && 
+		if(($_POST['studiengang_kz_berecht']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz_berecht'],'suid') &&
 		   !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz_berecht'], 'suid')) ||
-		   ($_POST['studiengang_kz_berecht']=='' && !$rechte->isBerechtigt('admin', null, 'suid') && 
+		   ($_POST['studiengang_kz_berecht']=='' && !$rechte->isBerechtigt('admin', null, 'suid') &&
 		   !$rechte->isBerechtigt('mitarbeiter', null, 'suid')))
 		{
 			$return = false;
@@ -370,7 +370,7 @@ if(!$error)
 			$error = true;
 		}
 		else
-		{ 
+		{
 			$benutzerfunktion = new benutzerfunktion();
 			if(isset($_POST['neu']) && $_POST['neu']=='true')
 			{
@@ -378,7 +378,7 @@ if(!$error)
 				$benutzerfunktion->insertamum=date('Y-m-d H:i:s');
 				$benutzerfunktion->insertvon = $user;
 			}
-			else 
+			else
 			{
 				if(isset($_POST['benutzerfunktion_id']))
 				{
@@ -386,14 +386,14 @@ if(!$error)
 					{
 						$benutzerfunktion->new = false;
 					}
-					else 
+					else
 					{
 						$error = true;
 						$errormsg = 'Fehler beim Laden der Funktion: '.$benutzerfunktion->errormsg;
 						$return = false;
 					}
 				}
-				else 
+				else
 				{
 					$error = true;
 					$errormsg = 'Benutzerfunktion_id wurde nicht uebergeben';
@@ -420,13 +420,13 @@ if(!$error)
 				$benutzerfunktion->datum_bis = $_POST['datum_bis'];
 				$benutzerfunktion->bezeichnung = $_POST['bezeichnung'];
 				$benutzerfunktion->wochenstunden = str_replace(',','.',$_POST['wochenstunden']);
-				
+
 				if($benutzerfunktion->save())
 				{
 					$return = true;
 					$data = $benutzerfunktion->benutzerfunktion_id;
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = 'Fehler beim Speichern:'.$benutzerfunktion->errormsg;
@@ -436,9 +436,9 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='funktiondelete')
 	{
-		if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') && 
+		if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') &&
 		   !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid')) ||
-		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') && 
+		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') &&
 		   !$rechte->isBerechtigt('mitarbeiter', null, 'suid')))
 		{
 			$return = false;
@@ -447,15 +447,15 @@ if(!$error)
 			$error = true;
 		}
 		else
-		{ 
+		{
 			if(isset($_POST['benutzerfunktion_id']) && is_numeric($_POST['benutzerfunktion_id']))
 			{
 				$benutzerfunktion = new benutzerfunktion();
 				if($benutzerfunktion->delete($_POST['benutzerfunktion_id']))
 				{
-					$return = true;	
+					$return = true;
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = 'Fehler beim Loeschen:'.$benutzerfunktion->errormsg;
@@ -466,10 +466,10 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='variablechange') /**********************SONSTIGES*****************/
 	{
 		$variable = new variable();
-		
+
 		$variable->uid = $user;
-		
-		// Aendert die Variable Studiensemester		
+
+		// Aendert die Variable Studiensemester
 		if(isset($_POST['stsem']))
 		{
 			if(isset($_POST['wert']) && $_POST['wert']!=0)
@@ -477,9 +477,9 @@ if(!$error)
 				$stsem = new studiensemester();
 				$studiensemester_kurzbz = $stsem->jump($_POST['stsem'], $_POST['wert']);
 			}
-			else 
+			else
 				$studiensemester_kurzbz = $_POST['stsem'];
-				
+
 			$variable->name = 'semester_aktuell';
 			$variable->wert = $studiensemester_kurzbz;
 		}
@@ -497,7 +497,7 @@ if(!$error)
 		{
 			$error = true;
 		}
-			
+
 		if(!$error)
 		{
 			if($variable->save())
@@ -521,9 +521,9 @@ if(!$error)
 	{
 		if(isset($_POST['person_id']) && is_numeric($_POST['person_id']))
 		{
-			if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') && 
+			if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') &&
 		   !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid')) ||
-		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') && 
+		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') &&
 		   !$rechte->isBerechtigt('mitarbeiter', null, 'suid')))
 			{
 				$return = false;
@@ -549,23 +549,23 @@ if(!$error)
 						$fs->updateamum = date('Y-m-d H:i:s');
 						$fs->updatevon = $user;
 						$fs->save(true);
-						
+
 						$return = true;
 					}
-					else 
+					else
 					{
 						$return = false;
 						$errormsg = 'Fehler beim Loeschen des grossen Bildes';
 					}
 				}
-				else 
+				else
 				{
 					$return = false;
 					$errormsg = 'Fehler beim Loeschen des Bildes';
 				}
 			}
 		}
-		else 
+		else
 		{
 			$return = false;
 			$errormsg = 'Falsche Parameteruebergabe'.$_POST['person_id'].'x';
@@ -574,13 +574,13 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='getvariable')
 	{
 		$variable = new variable();
-		
+
 		if($variable->load($user, $_POST['name']))
-		{	
+		{
 			$return = true;
 			$data = $variable->wert;
 		}
-		else 
+		else
 		{
 			if($variable->errormsg=='')
 			{
@@ -592,6 +592,65 @@ if(!$error)
 				$return = false;
 				$errormsg = 'Fehler: '.$variable->errormsg;
 			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='getprivatemailadressUID')
+	{
+		$variable = new variable();
+		$variable->loadVariables($user);
+		if(isset($_POST['uids']))
+		{
+			$pers_arr = explode(';',$_POST['uids']);
+			$data='';
+			$anz_error=0;
+
+			foreach ($pers_arr as $uid)
+			{
+				if($uid!='')
+				{
+					$qry = "SELECT kontakt
+						FROM
+							public.tbl_kontakt
+							JOIN public.tbl_benutzer USING(person_id)
+						WHERE kontakttyp='email'
+						AND uid=".$db->db_add_param($uid)." AND zustellung=true LIMIT 1";
+
+					if($result = $db->db_query($qry))
+					{
+						if($row = $db->db_fetch_object($result))
+						{
+							if($data!='')
+								$data.=$variable->variable->emailadressentrennzeichen.$row->kontakt;
+							else
+								$data = $row->kontakt;
+						}
+						else
+						{
+							$anz_error++;
+						}
+					}
+				}
+			}
+			if($data!='')
+			{
+				if($anz_error==0)
+					$return = true;
+				else
+				{
+					$return = false;
+					$errormsg = "Bei $anz_error Personen wurde keine Emailadresse gefunden!";
+				}
+			}
+			else
+			{
+				$return = false;
+				$errormsg = 'Es wurde keine Privatadresse gefunden';
+			}
+		}
+		else
+		{
+			$return = false;
+			$errormsg = 'Fehlerhafte Parameteruebergabe';
 		}
 	}
 	else

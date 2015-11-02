@@ -240,7 +240,7 @@ else
 					if($elem->note==6) //angerechnet
 					{
 						$inc.=' (ar)';
-						$note='6';
+						$note='ar';
 					}
 					else 
 						$note='';

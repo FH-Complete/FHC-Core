@@ -309,7 +309,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 <vbox id="vbox-main">
 <popupset>
 		<menupopup id="fasoverlay-lektor-tree-popup">
-			<menuitem label="Mail senden" oncommand="LektorFunktionMail();" />
+			<menuitem label="EMail senden (intern)" oncommand="LektorFunktionMail();" />
+			<menuitem label="EMail senden (privat)" oncommand="LektorFunktionMailPrivat();" />
 			<menuseparator />
 			<menuitem label="Entfernen" oncommand="LektorFunktionDel();" />
 		</menupopup>
