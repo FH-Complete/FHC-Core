@@ -24,6 +24,7 @@
  * @create 02-01-2007
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/sprache.class.php');
 
 class aufmerksamdurch extends basis_db
 {
@@ -33,7 +34,9 @@ class aufmerksamdurch extends basis_db
 	//Tabellenspalten
 	public $aufmerksamdurch_kurzbz;
 	public $beschreibung;
+	public $bezeichnung;
 	public $ext_id;
+	public $aktiv;
 
 
 	/**
@@ -65,7 +68,8 @@ class aufmerksamdurch extends basis_db
 	 */
 	public function getAll($orderby='aufmerksamdurch_kurzbz')
 	{
-		$qry = "SELECT * FROM public.tbl_aufmerksamdurch";
+        $sprache = new sprache();
+		$qry = 'SELECT *,'.$sprache->getSprachQuery('bezeichnung').' FROM public.tbl_aufmerksamdurch';
 		if($orderby!='')
 			$qry .= " ORDER BY ".($orderby);
 
@@ -77,6 +81,8 @@ class aufmerksamdurch extends basis_db
 
 				$obj->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;
 				$obj->beschreibung = $row->beschreibung;
+                $obj->bezeichnung=$sprache->parseSprachResult('bezeichnung',$row);
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 
 				$this->result[] = $obj;
 			}

@@ -182,6 +182,10 @@ $db = new basis_db();
 					<box class='Datum' id="student-rolle-datum-datum" />
 				</row>
 				<row>
+					<label value="Bestätigt am" control="student-rolle-datum-bestaetigt_datum"/>
+					<box class='Datum' id="student-rolle-datum-bestaetigt_datum" />
+				</row>
+				<row>
 					<label value="Studienplan" control="student-rolle-menulist-studienplan"/>
 					<menulist id="student-rolle-menulist-studienplan" >
 						<menupopup>

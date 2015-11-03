@@ -149,7 +149,7 @@ echo "
 if((!$rechte->isBerechtigt('lehre/studienordnung')) && (!$rechte->isBerechtigt('lehre/studienordnungInaktiv')))
 	die('Sie haben keine Berechtigung für diese Seite');
 
-if($rechte->isBerechtigt('lehre/studienordnungInaktiv'))
+if(($rechte->isBerechtigt('lehre/studienordnungInaktiv')) && (!$rechte->isBerechtigt('lehre/studienordnung')))
     echo "<script type='text/javascript'>var initSTOs = 'inaktiv';</script>";
 $stg_arr = $rechte->getStgKz('lehre/studienordnung');
 if(empty($stg_arr))

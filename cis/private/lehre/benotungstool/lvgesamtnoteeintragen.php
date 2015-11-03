@@ -132,8 +132,17 @@ function savenote($db,$lvid, $student_uid, $note, $punkte=null)
 	// Wenn punkte vorhanden sind, dann die note dazu ermitteln
 	if($punkte!='' && $note=='')
 	{
-		$notenschluessel = new notenschluessel();
-		$note = $notenschluessel->getNote($punkte, $lvid, $stsem);
+		if(is_numeric($punkte))
+		{
+			$notenschluessel = new notenschluessel();
+			$note = $notenschluessel->getNote($punkte, $lvid, $stsem);
+		}
+		else
+		{
+			// Wenn Punkte nicht numerisch ist, dann kann es eine der Spezailnoten sein (ar, met, ...)
+			$note = $punkte;
+			$punkte='';
+		}
 	}
 
 	if(!is_numeric($note))

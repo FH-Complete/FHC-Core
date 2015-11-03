@@ -1864,6 +1864,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	studiensemester_kurzbz = dialog.getElementById('student-rolle-menulist-studiensemester').value;
 	ausbildungssemester = dialog.getElementById('student-rolle-menulist-ausbildungssemester').value;
 	datum = dialog.getElementById('student-rolle-datum-datum').value;
+	bestaetigt_datum = dialog.getElementById('student-rolle-datum-bestaetigt_datum').value;
 	orgform_kurzbz = dialog.getElementById('student-rolle-menulist-orgform_kurzbz').value;
 	studienplan_id = dialog.getElementById('student-rolle-menulist-studienplan').value;
 	anmerkung = dialog.getElementById('student-rolle-textbox-anmerkung').value;
@@ -1871,6 +1872,11 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	if(!CheckDatum(datum))
 	{
 		alert('Datum ist ungueltig');
+		return false;
+	}
+	if(bestaetigt_datum!='' && !CheckDatum(bestaetigt_datum))
+	{
+		alert('Bestaetigungsdatum ist ungueltig');
 		return false;
 	}
 	
@@ -1886,6 +1892,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	req.add('ausbildungssemester_old', ausbildungssemester_old);
 	req.add('ausbildungssemester', ausbildungssemester);
 	req.add('datum', ConvertDateToISO(datum));
+	req.add('bestaetigtam', ConvertDateToISO(bestaetigt_datum));
 	req.add('orgform_kurzbz', orgform_kurzbz);
 	req.add('studienplan_id', studienplan_id);
 	req.add('anmerkung', anmerkung);

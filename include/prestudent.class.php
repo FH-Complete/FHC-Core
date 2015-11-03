@@ -528,6 +528,7 @@ class prestudent extends person
 				$this->studienplan_id = $row->studienplan_id;
 				$this->bestaetigtam = $row->bestaetigtam;
 				$this->bestaetigtvon = $row->bestaetigtvon;
+				$this->anmerkung_status = $row->anmerkung;
 
 				return true;
 			}
