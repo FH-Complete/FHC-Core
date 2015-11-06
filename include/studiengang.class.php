@@ -237,10 +237,11 @@ class studiengang extends basis_db
      */
     public function getAllForBewerbung()
     {
-        $qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch, lgartcode '
+        $qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch, lgartcode, tbl_lgartcode.bezeichnung '
                 . 'FROM lehre.vw_studienplan '
+                . 'LEFT JOIN bis.tbl_lgartcode USING (lgartcode) '
                 . 'WHERE onlinebewerbung IS TRUE '
-                . 'ORDER BY typ, studiengangbezeichnung ASC';
+                . 'ORDER BY typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC';
 
 		if(!$result = $this->db_query($qry))
 		{
@@ -889,6 +890,7 @@ class studiengang extends basis_db
 				$obj->kurzbz = $row->kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beantragung = $this->db_parse_bool($row->beantragung);
+				$obj->lgart_biscode = $row->lgart_biscode;
 			
 				$this->result[]= $obj;
 			}
