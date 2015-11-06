@@ -53,6 +53,7 @@ if ($user == 'raab' && isset($_GET["debuguser"]))
 
 
 
+
 $datum = new datum();
 
 if (check_infrastruktur($user))
@@ -625,6 +626,10 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		if ($p->t("dms_link/handbuchZeitaufzeichnung")!='')
 		{
 			echo '<p><a href="../../../cms/dms.php?id='.$p->t("dms_link/handbuchZeitaufzeichnung").'" target="_blank">'.$p->t("zeitaufzeichnung/handbuchZeitaufzeichnung").'</a></p>';
+		}
+		if ($p->t("dms_link/fiktiveNormalarbeitszeit")!='')
+		{
+			echo '<p><a href="../../../cms/dms.php?id='.$p->t("dms_link/fiktiveNormalarbeitszeit").'" target="_blank">'.$p->t("zeitaufzeichnung/fiktiveNormalarbeitszeit").'</a></p>';
 		}
 		echo '<p><a href="../profile/zeitsperre_resturlaub.php">'.$p->t("urlaubstool/meineZeitsperren").'</a></p>';	
 		echo "</td>
