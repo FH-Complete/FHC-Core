@@ -427,7 +427,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		WHERE lehrveranstaltung_id 
 			IN(select distinct(lehrveranstaltung_id) FROM lehre.tbl_lehreinheit 
 			JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
-		 	WHERE studiensemester_kurzbz IN ('$lastStatusSemester','$studiensemesterPrev') and studiengang_kz = '$studiengang_kz') 
+		 	WHERE studiensemester_kurzbz IN ('$lastStatusSemester','$studiensemesterPrev') and studiengang_kz = '$row->studiengang_kz') 
 		 AND studiensemester_kurzbz IN ('$lastStatusSemester','$studiensemesterPrev') group by note order by note";
 		if($result_prevYear = $db->db_query($qry_prevYear))
 		{
@@ -469,7 +469,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		WHERE lehrveranstaltung_id 
 			IN(select distinct(lehrveranstaltung_id) FROM lehre.tbl_lehreinheit 
 			JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
-		 	WHERE studiensemester_kurzbz IN ('$lastStatusSemester','$studiensemesterPrev') and studiengang_kz = '$studiengang_kz') 
+		 	WHERE studiensemester_kurzbz IN ('$lastStatusSemester','$studiensemesterPrev') and studiengang_kz = '$row->studiengang_kz') 
 		 AND studiensemester_kurzbz IN ('$lastStatusSemester','$studiensemesterPrev') group by note order by note";
 		if($result_prevYear = $db->db_query($qry_prevYear))
 			{
