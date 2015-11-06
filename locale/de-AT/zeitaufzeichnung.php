@@ -43,4 +43,5 @@ $this->phrasen['zeitaufzeichnung/arbeitszeit']='Arbeitszeit';
 $this->phrasen['zeitaufzeichnung/pause']='Pausen';'inkl. 30 min. Pflichtpause';
 $this->phrasen['zeitaufzeichnung/inklusivePflichtpause']='inkl. 30 min. Pflichtpause';
 $this->phrasen['zeitaufzeichnung/handbuchZeitaufzeichnung']='Arbeitszeitaufzeichnung Leitfaden';
+$this->phrasen['zeitaufzeichnung/fiktiveNormalarbeitszeit']='Vereinbarung der fiktiven Normalarbeitszeit';
 ?>

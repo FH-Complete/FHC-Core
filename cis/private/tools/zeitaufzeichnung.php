@@ -38,6 +38,8 @@ require_once('../../../include/service.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/betriebsmittelperson.class.php');
 require_once('../../../include/globals.inc.php');
+require_once('../../../include/bisverwendung.class.php');
+require_once('../../../include/studiensemester.class.php');
 
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 
@@ -46,6 +48,11 @@ if (!$db = new basis_db())
 	die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
 	
 $user = get_uid();
+if ($user == 'raab' && isset($_GET["debuguser"]))
+        $user = $_GET["debuguser"];
+
+
+
 
 $datum = new datum();
 
@@ -86,7 +93,11 @@ $alle = (isset($_GET['alle'])?(isset($_GET['normal'])?false:true):false);
 $angezeigte_tage = '50';
 
 $zs = new zeitsperre();
-$zs->getZeitsperrenForZeitaufzeichnung($user,$angezeigte_tage);
+if ($alle)
+	$zs->getZeitsperrenForZeitaufzeichnung($user,'180');
+else
+	$zs->getZeitsperrenForZeitaufzeichnung($user,$angezeigte_tage);
+
 $zeitsperren = $zs->result;
 
 echo '<!DOCTYPE HTML>
@@ -616,7 +627,11 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		{
 			echo '<p><a href="../../../cms/dms.php?id='.$p->t("dms_link/handbuchZeitaufzeichnung").'" target="_blank">'.$p->t("zeitaufzeichnung/handbuchZeitaufzeichnung").'</a></p>';
 		}
-		echo '<p><a href="zeitsperre_resturlaub.php">'.$p->t("urlaubstool/meineZeitsperren").'</a></p>';	
+		if ($p->t("dms_link/fiktiveNormalarbeitszeit")!='')
+		{
+			echo '<p><a href="../../../cms/dms.php?id='.$p->t("dms_link/fiktiveNormalarbeitszeit").'" target="_blank">'.$p->t("zeitaufzeichnung/fiktiveNormalarbeitszeit").'</a></p>';
+		}
+		echo '<p><a href="../profile/zeitsperre_resturlaub.php">'.$p->t("urlaubstool/meineZeitsperren").'</a></p>';	
 		echo "</td>
 		      	</tr>
 		      </table>";
@@ -626,7 +641,7 @@ if($projekt->getProjekteMitarbeiter($user, true))
 
 		echo '<table>
 			<tr>
-				<td>';		
+				<td rowspan="2">';		
 		echo '<table>';
 		if($za_simple == 0)
 		{
@@ -836,9 +851,41 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		else 
 			echo '<input type="file" name="csv" value="" style="visibility:hidden">';
 		echo '</table>';
-		echo '</td><td valign="top"><span id="zeitsaldo"></span><br><br><div id="monatsliste"></span></td></tr>
-			</table>';
- 
+		
+		echo '</td><td valign="top"><span id="zeitsaldo"></span><br><br><div id="monatsliste"></span></td></tr>';
+		
+		echo '<tr><td style="float:right;">';
+		
+		// Summen Lehre anzeigen
+		$bv = new bisverwendung();
+		$bv->getLastAktVerwendung($user);
+		$lehre_inkludiert = $bv->inkludierte_lehre;
+		if (!$lehre_inkludiert)
+			$lehre_inkludiert = 0;
+		
+		$stsem = new studiensemester();
+		$sem_akt = $stsem->getakt();
+		$lehre = new zeitaufzeichnung();		
+		$l_arr = $lehre->getLehreForUser($user, $sem_akt);
+		if ($l_arr["LehreAuftraege"]>0 || $l_arr["LehreIntern"] > 0 || $l_arr["LehreExtern"] > 0)
+		{		
+			$l_extern_soll = $l_arr["LehreAuftraege"]-$lehre_inkludiert;
+			$l_extern_soll_norm = $l_extern_soll/4*3;
+			$lehre_inkludiert_norm = $lehre_inkludiert/4*3;
+			echo '<table>';
+			echo '<tr><td colspan="3"><h3>Übersicht Lehre '.$sem_akt.'</h3></tr>';
+			echo '<tr><td colspan="3">(in Stunden)</tr>';
+			echo '<tr><td></td><td>beauftragt (LE)</td><td>gebucht</td></tr>';
+			if ($lehre_inkludiert > 0 || $l_arr["LehreIntern"] > 0)			
+				echo '<tr><td>LehreIntern:</td><td align="right">'.$lehre_inkludiert_norm.' ('.$lehre_inkludiert.')</td><td align="right">'.$l_arr["LehreIntern"].'</td></tr>';
+			if ($l_extern_soll > 0 || $l_arr["LehreExtern"] > 0)
+				echo '<tr><td>LehreExtern:</td><td align="right">'.$l_extern_soll_norm.' ('.$l_extern_soll.')</td><td align="right">'.$l_arr["LehreExtern"].'</td></tr>';
+
+			echo '</table>';
+		}
+		echo '</td></tr>';
+		echo '</table>';
+ 		
 		echo '<hr>';
 		echo '<h3>'.($alle===true?$p->t('zeitaufzeichnung/alleEintraege'):$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage))).'</h3>';
 		if ($alle===true)		
@@ -943,7 +990,11 @@ if($projekt->getProjekteMitarbeiter($user, true))
 						}	
 						list($h2, $m2) = explode(':', $elsumme);
 						$elsumme = $h2*3600+$m2*60;					
-						if ($tagessaldo>18000 && $pflichtpause==false && $elsumme == 0)
+						if ($tagessaldo > 18000 && $tagessaldo < 19800 && $pflichtpause==false && $elsumme == 0)
+						{
+							$pausesumme = $tagessaldo-18000;
+						}
+						else if ($tagessaldo>18000 && $pflichtpause==false && $elsumme == 0)
 						{
 							$pausesumme = $pausesumme+1800;
 						}

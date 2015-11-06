@@ -482,7 +482,7 @@ class zeitsperre extends basis_db
 
 		$qry = "select datum::date, freigabevon, zeitsperretyp_kurzbz
 					from  (SELECT generate_series(vondatum::timestamp, bisdatum::timestamp, '1 day') as datum, freigabevon, mitarbeiter_uid, zeitsperretyp_kurzbz FROM campus.tbl_zeitsperre where vonstunde is null and bisstunde is null) a 
-					where a.mitarbeiter_uid = ".$this->db_add_param($uid)." and datum>(now() - interval '50 Days') and zeitsperretyp_kurzbz in ('Krank','Urlaub', 'ZA', 'DienstV','PflegeU')";
+					where a.mitarbeiter_uid = ".$this->db_add_param($uid)." and datum>(now() - interval '".$anz_tage." Days') and zeitsperretyp_kurzbz in ('Krank','Urlaub', 'ZA', 'DienstV','PflegeU')";
 		
 
 
