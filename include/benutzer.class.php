@@ -395,7 +395,7 @@ class benutzer extends person
 		if($aktiv)
 			$qry.=" AND tbl_benutzer.aktiv=true ";
 
-		$qry .= "ORDER BY tbl_person.insertamum";
+		$qry .= " ORDER BY tbl_person.insertamum";
 
 		if($result = $this->db_query($qry))
 		{
