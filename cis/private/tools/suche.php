@@ -150,7 +150,7 @@ function searchPerson($searchItems)
 			echo '<td><a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
 			if($row->aktiv==false)
 				echo '<span style="color: red"> (ausgeschieden)</span>';
-			elseif($bisverwendung->beschausmasscode==5)
+			elseif($bisverwendung->beschausmasscode=='5')
 				echo '<span style="color: orange"> (karenziert)</span>';
 			echo '</td>';
 			//echo '<td>',$row->titelpost,'</td>';
@@ -243,14 +243,14 @@ function searchOE($searchItems)
 					$kontakt = new kontakt();
 					$kontakt->loadFirmaKontakttyp($mitarbeiter->standort_id,'telefon');
 					$bisverwendung = new bisverwendung();
-					$bisverwendung->getLastVerwendung($bf->uid);
+					$bisverwendung->getLastAktVerwendung($bf->uid);
 					echo '<tr>';
 					echo '<td>'.$person->vorname.'</td>';
 					echo '<td><a href="../profile/index.php?uid=',$person->uid,'" title="',$person->titelpre,' ',$person->vorname,' ',$person->nachname,' ',$person->titelpost,'">',$person->nachname,'</a></td>';
 					echo '<td>'.$bf->bezeichnung;
 						if($person->aktiv==false)
 							echo '<span style="color: red"> (ausgeschieden)</span>';
-						elseif($bisverwendung->beschausmasscode==5)
+						elseif($bisverwendung->beschausmasscode=='5')
 							echo '<span style="color: orange"> (karenziert)</span>';
 						echo '</td>';
 					
