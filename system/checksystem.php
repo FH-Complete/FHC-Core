@@ -3756,6 +3756,34 @@ if($result = @$db->db_query("SELECT * FROM information_schema.tables WHERE table
 	}
 }
 
+// Eigene Berechtigung ob Unoconv-Dokumente aus dem FAS als Nicht-PDF exportiert werden dürfen 
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='system/change_outputformat' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('system/change_outputformat','Recht, um Dokumente aus dem FAS als Nicht-PDF exportieren zu duerfen (mittels UMSCHALT- oder STRG-Taste)');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+			else
+				echo '<br>system.tbl_berechtigung: Eigene Berechtigung system/change_outputformat um Dokumente aus dem FAS als Nicht-PDF exportieren zu duerfen (mittels UMSCHALT- oder STRG-Taste) hinzugefuegt!';
+	}
+}
+
+// Neue Spalte lgart_biscode
+if(!@$db->db_query("SELECT lgart_biscode FROM bis.tbl_lgartcode LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE bis.tbl_lgartcode ADD COLUMN lgart_biscode integer;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_lgartcode '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte lgart_biscode hinzugefügt';
+}
 
 echo '<br><br><br>';
 
@@ -3774,7 +3802,7 @@ $tabellen=array(
 	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
 	"bis.tbl_hauptberuf"  => array("hauptberufcode","bezeichnung"),
-	"bis.tbl_lgartcode"  => array("lgartcode","kurzbz","bezeichnung","beantragung"),
+	"bis.tbl_lgartcode"  => array("lgartcode","kurzbz","bezeichnung","beantragung","lgart_biscode"),
 	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung","sichtbar","sichtbar_outgoing"),
 	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre"),
 	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle"),
