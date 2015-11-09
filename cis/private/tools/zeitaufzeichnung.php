@@ -872,14 +872,14 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			$l_extern_soll = $l_arr["LehreAuftraege"]-$lehre_inkludiert;
 			$l_extern_soll_norm = $l_extern_soll/4*3;
 			$lehre_inkludiert_norm = $lehre_inkludiert/4*3;
-			echo '<table>';
-			echo '<tr><td colspan="3"><h3>Übersicht Lehre '.$sem_akt.'</h3></tr>';
-			echo '<tr><td colspan="3">(in Stunden)</tr>';
-			echo '<tr><td></td><td>beauftragt (LE)</td><td>gebucht</td></tr>';
+			echo '<table style="border: 1px solid gray">';
+			echo '<tr><td colspan="3" style="border: 1px solid gray"><h3>Übersicht Lehre '.$sem_akt.'</h3></tr>';
+			echo '<tr><td colspan="3" style="border: 1px solid gray">(in Stunden)</tr>';
+			echo '<tr><td></td><td style="border: 1px solid gray">beauftragt (LE)</td><td style="border: 1px solid gray">gebucht</td></tr>';
 			if ($lehre_inkludiert > 0 || $l_arr["LehreIntern"] > 0)			
-				echo '<tr><td>LehreIntern:</td><td align="right">'.$lehre_inkludiert_norm.' ('.$lehre_inkludiert.')</td><td align="right">'.$l_arr["LehreIntern"].'</td></tr>';
+				echo '<tr><td style="border: 1px solid gray">LehreIntern:</td><td align="right" style="border: 1px solid gray">'.$lehre_inkludiert_norm.' ('.$lehre_inkludiert.')</td><td align="right" style="border: 1px solid gray">'.$l_arr["LehreIntern"].'</td></tr>';
 			if ($l_extern_soll > 0 || $l_arr["LehreExtern"] > 0)
-				echo '<tr><td>LehreExtern:</td><td align="right">'.$l_extern_soll_norm.' ('.$l_extern_soll.')</td><td align="right">'.$l_arr["LehreExtern"].'</td></tr>';
+				echo '<tr><td style="border: 1px solid gray">LehreExtern:</td><td align="right" style="border: 1px solid gray">'.$l_extern_soll_norm.' ('.$l_extern_soll.')</td><td align="right" style="border: 1px solid gray">'.$l_arr["LehreExtern"].'</td></tr>';
 
 			echo '</table>';
 		}
