@@ -190,6 +190,9 @@ define('BEWERBERTOOL_UPLOAD_EMPFAENGER', serialize(array()));
 //Array von Empfaengern fuer das Abschicken von Bewerbungen aus dem Bewerbungstool. Kommagetrenntes Array in der Form: "Stg-Kz" => "empfaenger@domain.at". zB: "227" => "info.bbe@technikum-wien.at",
 define('BEWERBERTOOL_BEWERBUNG_EMPFAENGER', serialize(array()));
 
+// Google Tag Manager HTML/JS Snippet für Bewerbertool Tracking
+define('BEWERBERTOOL_GTM', '');
+
 // Array mit Usern die nicht Kollidieren
 define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
 
