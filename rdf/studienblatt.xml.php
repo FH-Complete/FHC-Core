@@ -121,6 +121,17 @@ foreach($uid_arr as $uid)
                     $geschlecht =''; 
             }
             
+            //Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
+            if ($studienordnung->studiengang_kz<0)
+            {
+            	$stg = new studiengang();
+            	$stg->load($studienordnung->studiengang_kz);
+            
+            	$studiengang_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($studienordnung->studiengang_kz));
+            }
+            else
+            	$studiengang_kz = sprintf("%04s", abs($studienordnung->studiengang_kz));
+            
 			echo "\t\t<quote>1</quote>\n"; 
 			echo "\t\t<personenkz>".$uid."</personenkz>\n";
 			echo "\t\t<geschlecht>".$geschlecht."</geschlecht>\n";
@@ -138,7 +149,7 @@ foreach($uid_arr as $uid)
 			echo "\t\t<studiengang>".$studienordnung->studiengangbezeichnung."</studiengang>\n";
 			echo "\t\t<studiengang_englisch>".$studienordnung->studiengangbezeichnung_englisch."</studiengang_englisch>\n";
             echo "\t\t<studiengang_kurzbz>".$studienordnung->studiengangkurzbzlang."</studiengang_kurzbz>\n";
-			echo "\t\t<studiengang_kz>".sprintf('%04s', abs($studienordnung->studiengang_kz))."</studiengang_kz>\n";
+			echo "\t\t<studiengang_kz>".$studiengang_kz."</studiengang_kz>\n";
             echo "\t\t<studiengangSprache>".$studienplan->sprache."</studiengangSprache>"; 
             echo "\t\t<ects_gesamt>".$studienordnung->ects."</ects_gesamt>"; 
             echo "\t\t<ects_pro_semester>".($studienplan->regelstudiendauer!=0?$studienordnung->ects/$studienplan->regelstudiendauer:0)."</ects_pro_semester>";
