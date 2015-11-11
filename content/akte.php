@@ -97,7 +97,7 @@ function OutputData($akte)
 		        if($dms->mimetype=='')
 		            $dms->mimetype='application/octetstream';
 
-		        header('Content-type: '.$dms->mimetype);
+		        header('Content-type: application/octetstream');
 		        header('Content-Disposition: inline; filename="'.$dms->name.'"');
 		        header('Content-Length: ' .filesize($filename));
 

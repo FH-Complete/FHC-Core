@@ -438,5 +438,55 @@ class zeitaufzeichnung extends basis_db
 	    	return false;
 	    }
 	}
+
+	/**
+	 * Holt alle ZA-Einträge Typ LehreIntern und LehreExtern  eines Users 
+	 * für das laufende Studienjahr und gibt die Summen in einem Array zurück
+	 * @param string $user
+	 * @return Array mit Keay: LehreIntern, LehreExtern, LehreAuftraege, LehreInkludiert
+	 */	
+	public function getLehreForUser($user,$sem)
+	{
+		$where = "uid=".$this->db_add_param($user);	
+		$where_sem = "studiensemester_kurzbz=".$this->db_add_param($sem);
+		$lehre_arr = array("LehreIntern"=>0, "LehreExtern"=>0, "LehreAuftraege"=>0);
+		
+		$qry = "
+		select sum(extract(epoch from ende-start))/3600 as lehre, aktivitaet_kurzbz from campus.tbl_zeitaufzeichnung where $where and aktivitaet_kurzbz in ('LehreIntern', 'LehreExtern') and start > (select start from public.tbl_studiensemester where $where_sem) group by aktivitaet_kurzbz
+		";
+		
+	    if($result = $this->db_query($qry))
+	    {
+				    	
+	    	while($row = $this->db_fetch_object($result))
+	    	{
+					$lehre_arr[$row->aktivitaet_kurzbz] = round($row->lehre,2);	
+	    	}
+	    }
+	    else
+	    {
+	    	return false;
+	    }	
+	    $where = "mitarbeiter_uid=".$this->db_add_param($user);
+	    $where_sem = "l.studiensemester_kurzbz=".$this->db_add_param($sem);
+	    $qry = "
+		select sum(m.semesterstunden) from lehre.tbl_lehreinheitmitarbeiter m, lehre.tbl_lehreinheit l where $where and $where_sem and l.lehreinheit_id = m.lehreinheit_id
+		";
+		
+	    if($result = $this->db_query($qry))
+	    {
+				    	
+	    	while($row = $this->db_fetch_object($result))
+	    	{
+					$lehre_arr["LehreAuftraege"] = round($row->sum);	
+	    	}
+	    }
+	    else
+	    {
+	    	return false;
+	    }	
+	    
+	    return $lehre_arr;
+	}
 }
 ?>

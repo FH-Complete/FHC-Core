@@ -347,7 +347,7 @@ if($result = $db->db_query($qry))
 						$gruppen.=' ';
 				}
 			}
-			echo "<OPTION value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id' $selected>$row->kurzbz - $gruppen $lektoren</OPTION>\n";
+			echo "<OPTION value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$row->lehreinheit_id".(isset($uid) && $uid!=''?'&uid='.$uid:'')."' $selected>$row->kurzbz - $gruppen $lektoren</OPTION>\n";
 		}
 		echo '</SELECT> ';
 	}

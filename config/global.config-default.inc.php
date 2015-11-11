@@ -185,84 +185,13 @@ define('BEWERBERTOOL_BERUFSTAETIGKEIT_ANZEIGEN', true);
 define('BEWERBERTOOL_MAILEMPFANG', '');
 // Wenn true dann koennen Dokumente nachgereicht werden, wenn false dann nicht
 define('BEWERBERTOOL_DOKUMENTE_NACHREICHEN', true);
-//Wer soll beim nachtraeglichen Upload von Dokumenten im Bewerbertool benachrichtigt werden
-define('BEWERBERTOOL_UPLOAD_EMPFAENGER', serialize(
-array(
-		"227" => "info.bbe@technikum-wien.at",
-		"254" => "info.bel@technikum-wien.at",
-		"768" => "info.bsa@technikum-wien.at",
-		"255" => "info.bew@technikum-wien.at",
-		"257" => "info.bif@technikum-wien.at",
-		"258" => "info.bic@technikum-wien.at",
-		"335" => "info.biw@technikum-wien.at",
-		"779" => "info.bmb@technikum-wien.at",
-		"330" => "info.bmr@technikum-wien.at",
-		"327" => "info.bst@technikum-wien.at",
-		"476" => "info.bee@technikum-wien.at",
-		"333" => "info.bvu@technikum-wien.at",
-		"256" => "info.bwi@technikum-wien.at",
-		"228" => "info.mbe@technikum-wien.at",
-		"297" => "info.mes@technikum-wien.at",
-		"578" => "info.mee@technikum-wien.at",
-		"585" => "info.mgs@technikum-wien.at",
-		"329" => "info.mgr@technikum-wien.at",
-		"300" => "info.mie@technikum-wien.at",
-		"303" => "info.mic@technikum-wien.at",
-		"334" => "info.mit@technikum-wien.at",
-		"336" => "info.miw@technikum-wien.at",
-		"331" => "info.mmr@technikum-wien.at",
-		"299" => "info.mse@technikum-wien.at",
-		"328" => "info.mst@technikum-wien.at",
-		"332" => "info.mut@technikum-wien.at",
-		"334" => "info.mit@technikum-wien.at",
-		"692" => "info.mte@technikum-wien.at",
-		"302" => "info.mwi@technikum-wien.at",
-		"-16" => "info.lad@technikum-wien.at",
-		"-17" => "info.lwd@technikum-wien.at",
-		"-5" => "info.lsm@technikum-wien.at",
-		"-7" => "info.kad@technikum-wien.at",
-		"-11" => "info.kwd@technikum-wien.at",
-		"-12" => "info.ksm@technikum-wien.at",
-)));
-//Array von Empfaengern fuer das Abschicken von Bewerbungen aus dem Bewerbungstool
-define('BEWERBERTOOL_BEWERBUNG_EMPFAENGER', serialize(
-array(
-		"227" => "info.bbe@technikum-wien.at",
-		"254" => "info.bel@technikum-wien.at",
-		"768" => "info.bsa@technikum-wien.at",
-		"255" => "info.bew@technikum-wien.at",
-		"257" => "info.bif@technikum-wien.at",
-		"258" => "info.bic@technikum-wien.at",
-		"335" => "info.biw@technikum-wien.at",
-		"779" => "info.bmb@technikum-wien.at",
-		"330" => "info.bmr@technikum-wien.at",
-		"327" => "info.bst@technikum-wien.at",
-		"476" => "info.bee@technikum-wien.at",
-		"333" => "info.bvu@technikum-wien.at",
-		"256" => "info.bwi@technikum-wien.at",
-		"228" => "info.mbe@technikum-wien.at",
-		"297" => "info.mes@technikum-wien.at",
-		"578" => "info.mee@technikum-wien.at",
-		"585" => "info.mgs@technikum-wien.at",
-		"329" => "info.mgr@technikum-wien.at",
-		"300" => "info.mie@technikum-wien.at",
-		"303" => "info.mic@technikum-wien.at",
-		"334" => "info.mit@technikum-wien.at",
-		"336" => "info.miw@technikum-wien.at",
-		"331" => "info.mmr@technikum-wien.at",
-		"299" => "info.mse@technikum-wien.at",
-		"328" => "info.mst@technikum-wien.at",
-		"332" => "info.mut@technikum-wien.at",
-		"334" => "info.mit@technikum-wien.at",
-		"692" => "info.mte@technikum-wien.at",
-		"302" => "info.mwi@technikum-wien.at",
-		"-16" => "info.lad@technikum-wien.at",
-		"-17" => "info.lwd@technikum-wien.at",
-		"-5" => "info.lsm@technikum-wien.at",
-		"-7" => "info.kad@technikum-wien.at",
-		"-11" => "info.kwd@technikum-wien.at",
-		"-12" => "info.ksm@technikum-wien.at",
-)));
+//Wer soll beim nachtraeglichen Upload von Dokumenten im Bewerbertool benachrichtigt werden. Kommagetrenntes Array in der Form: "Stg-Kz" => "empfaenger@domain.at". zB: "227" => "info.bbe@technikum-wien.at",
+define('BEWERBERTOOL_UPLOAD_EMPFAENGER', serialize(array()));
+//Array von Empfaengern fuer das Abschicken von Bewerbungen aus dem Bewerbungstool. Kommagetrenntes Array in der Form: "Stg-Kz" => "empfaenger@domain.at". zB: "227" => "info.bbe@technikum-wien.at",
+define('BEWERBERTOOL_BEWERBUNG_EMPFAENGER', serialize(array()));
+
+// Google Tag Manager HTML/JS Snippet für Bewerbertool Tracking
+define('BEWERBERTOOL_GTM', '');
 
 // Array mit Usern die nicht Kollidieren
 define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));

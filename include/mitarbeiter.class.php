@@ -715,6 +715,7 @@ class mitarbeiter extends benutzer
 						WHERE person_id=tbl_benutzer.person_id
 						AND NOT EXISTS(SELECT 1 FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=tbl_vertrag.vertrag_id AND vertragsstatus_kurzbz='gedruckt')
 						AND NOT EXISTS(SELECT 1 FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=tbl_vertrag.vertrag_id AND vertragsstatus_kurzbz='abgerechnet')
+						AND EXISTS(SELECT 1 FROM lehre.tbl_lehreinheitmitarbeiter WHERE vertrag_id=tbl_vertrag.vertrag_id)
 						)";
 		}
 

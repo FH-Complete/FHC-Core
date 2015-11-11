@@ -15,6 +15,7 @@ $this->phrasen['dms_link/bedienungsanleitungMailverteiler']='1474'; //Bedienungs
 $this->phrasen['dms_link/berechtigungskonzeptMailverteiler']='1475'; //Berechtigungskonzept Mailverteiler
 $this->phrasen['dms_link/handbuchUrlaubsverwaltung']='759'; //Handbuch Urlaubsverwaltung -> Leer lassen, falls es keines gibt
 $this->phrasen['dms_link/handbuchZeitaufzeichnung']='1545'; //Handbuch Zeitaufzeichnung -> Leer lassen, falls es keines gibt
+$this->phrasen['dms_link/fiktiveNormalarbeitszeit']='2512'; //fiktive Normalarbeitszeit -> Leer lassen, falls es keines gibt
 
 // Content IDs (=Englisch)
 $this->phrasen['dms_link/lvPlanFAQ']='6887'; //Hilfe-Link aus dem LV-Plan in die LV-Plan FAQ auf der CIS (CMS-ID)

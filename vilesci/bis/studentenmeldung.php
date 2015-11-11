@@ -148,12 +148,6 @@ if($result = $db->db_query($qry))
 }
 
 //Studiengangsdaten auslesen
-$qry="
-	SELECT 
-		*
-	FROM 
-		public.tbl_studiengang 
-	WHERE studiengang_kz=".$db->db_add_param($stg_kz);
 $stg_obj = new studiengang();
 if($stg_obj->load($stg_kz))
 {
@@ -174,6 +168,11 @@ if($stg_obj->load($stg_kz))
 		case 'e': $stgart=4; break;
 		default: die('<h2>Dieser Studiengangstyp kann nicht gemeldet werden. Typ muss (b, m, d oder e) sein</h2>'); break;
 	}
+
+	// DoubleDegree Studierende werden per Default aus BB gemeldet.
+	// Wenn es ein reiner VZ Studiengang ist, dann sollen diese aber als VZ gemeldet werden.
+	if($stg_obj->orgform_kurzbz=='VZ')
+		$orgform_code_array['DDP']=$orgform_code_array['VZ'];
 
 	$orgform_code = $orgform_code_array[$stg_obj->orgform_kurzbz];
 	$orgform_kurzbz=$stg_obj->orgform_kurzbz;
@@ -830,7 +829,7 @@ function GenerateXMLStudentBlock($row)
 			die("\nQry Failed:".$qry_ap);
 		}
 	}
-	if($storgform!='VZ')
+	if($orgform_code_array[$storgform]!=1) // Wenn nicht Vollzeit
 	{
 		if($row->berufstaetigkeit_code=='' || $row->berufstaetigkeit_code==null)
 		{
@@ -981,7 +980,7 @@ function GenerateXMLStudentBlock($row)
 		
 		$datei.="
 			<StudStatusCode>".$status."</StudStatusCode>";
-		if($storgform!='VZ' && !$ausserordentlich)
+		if($orgform_code_array[$storgform]!=1 && !$ausserordentlich) // Wenn nicht Vollzeit und nicht Ausserordentlich
 		{
 			$datei.="
 			<BerufstaetigkeitCode>".$row->berufstaetigkeit_code."</BerufstaetigkeitCode>";
