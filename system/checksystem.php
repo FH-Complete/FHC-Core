@@ -3756,6 +3756,89 @@ if($result = @$db->db_query("SELECT * FROM information_schema.tables WHERE table
 	}
 }
 
+// Eigene Berechtigung ob Unoconv-Dokumente aus dem FAS als Nicht-PDF exportiert werden dürfen 
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='system/change_outputformat' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('system/change_outputformat','Recht, um Dokumente aus dem FAS als Nicht-PDF exportieren zu duerfen (mittels UMSCHALT- oder STRG-Taste)');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+			else
+				echo '<br>system.tbl_berechtigung: Eigene Berechtigung system/change_outputformat um Dokumente aus dem FAS als Nicht-PDF exportieren zu duerfen (mittels UMSCHALT- oder STRG-Taste) hinzugefuegt!';
+	}
+}
+
+// Neue Spalte lgart_biscode
+if(!@$db->db_query("SELECT lgart_biscode FROM bis.tbl_lgartcode LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE bis.tbl_lgartcode ADD COLUMN lgart_biscode integer;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_lgartcode '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte lgart_biscode hinzugefügt';
+}
+
+//Spalte studiensemester_kurzbz für Reihungstest
+if(!$result = @$db->db_query("SELECT studiensemester_kurzbz FROM public.tbl_reihungstest LIMIT 1"))
+{
+    $qry = "ALTER TABLE public.tbl_reihungstest ADD COLUMN studiensemester_kurzbz varchar(16);
+	   ALTER TABLE public.tbl_reihungstest ADD CONSTRAINT fk_reihungsteset_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+    if(!$db->db_query($qry))
+	    echo '<strong>public.tbl_reihungstest: '.$db->db_last_error().'</strong><br>';
+	else
+	    echo 'public.tbl_reihungstest: Spalte studiensemester_kurzbz hinzugefuegt';
+}
+
+//Tabelle public.tbl_foerdervertrag
+if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_foerdervertrag LIMIT 1;"))
+{
+	$qry = "CREATE TABLE public.tbl_foerdervertrag
+			(
+				foerdervertrag_id integer NOT NULL,
+				studiengang_kz integer NOT NULL,
+				foerdergeber varchar(256),
+				foerdersatz numeric(8,2),
+				foerdergruppe varchar(256),
+				gueltigvon varchar(16),
+				gueltigbis varchar(16),
+				erlaeuterungen text,
+				insertamum timestamp,
+				insertvon varchar(32),
+				updateamum timestamp,
+				updatevon varchar(32)
+			);
+
+		CREATE SEQUENCE public.seq_foerdervertrag_foerdervertrag_id
+		 INCREMENT BY 1
+		 NO MAXVALUE
+		 NO MINVALUE
+		 CACHE 1;
+
+		ALTER TABLE public.tbl_foerdervertrag ADD CONSTRAINT pk_foerdervertrag PRIMARY KEY (foerdervertrag_id);
+		ALTER TABLE public.tbl_foerdervertrag ALTER COLUMN foerdervertrag_id SET DEFAULT nextval('public.seq_foerdervertrag_foerdervertrag_id');
+
+		ALTER TABLE public.tbl_foerdervertrag ADD CONSTRAINT fk_foerdervertrag_studiengang FOREIGN KEY (studiengang_kz) REFERENCES public.tbl_studiengang (studiengang_kz) ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE public.tbl_foerdervertrag ADD CONSTRAINT fk_foerdervertrag_studiensemester_gueltigvon FOREIGN KEY (gueltigvon) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE public.tbl_foerdervertrag ADD CONSTRAINT fk_foerdervertrag_studiensemester_gueltigbis FOREIGN KEY (gueltigbis) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		GRANT SELECT ON public.tbl_foerdervertrag TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_foerdervertrag TO vilesci;
+		GRANT SELECT, UPDATE ON public.seq_foerdervertrag_foerdervertrag_id TO vilesci;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_foerdervertrag: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' public.tbl_foerdervertrag: Tabelle hinzugefuegt<br>';
+}
 
 echo '<br><br><br>';
 
@@ -3774,7 +3857,7 @@ $tabellen=array(
 	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
 	"bis.tbl_hauptberuf"  => array("hauptberufcode","bezeichnung"),
-	"bis.tbl_lgartcode"  => array("lgartcode","kurzbz","bezeichnung","beantragung"),
+	"bis.tbl_lgartcode"  => array("lgartcode","kurzbz","bezeichnung","beantragung","lgart_biscode"),
 	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung","sichtbar","sichtbar_outgoing"),
 	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre"),
 	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle"),
@@ -3955,7 +4038,7 @@ $tabellen=array(
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor","zgvnation","zgvmanation","zgvdoktornation"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv", "anmerkung"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten"),
-	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich"),
+	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
 	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id"),

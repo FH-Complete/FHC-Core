@@ -46,6 +46,7 @@ class reihungstest extends basis_db
 	public $freigeschaltet=false;	//  boolean
 	public $oeffentlich=false;	//  boolean
 	public $max_teilnehmer;	//  integer
+	public $studiensemester_kurzbz; //string
 
 	/**
 	 * Konstruktor
@@ -92,6 +93,7 @@ class reihungstest extends basis_db
 				$this->max_teilnehmer = $row->max_teilnehmer;
 				$this->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$this->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
+				$this->studiensemester_kurzbz =$row->studiensemester_kurzbz;
 				return true;
 			}
 			else
@@ -139,6 +141,7 @@ class reihungstest extends basis_db
 				$obj->max_teilnehmer = $row->max_teilnehmer;
 				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
+				$obj->studiensemester_kurzbz =$row->studiensemester_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -195,7 +198,7 @@ class reihungstest extends basis_db
 			//Neuen Datensatz einfuegen
 
 			$qry='BEGIN; INSERT INTO public.tbl_reihungstest (studiengang_kz, ort_kurzbz, anmerkung, datum, uhrzeit,
-				 insertamum, insertvon, updateamum, updatevon, max_teilnehmer, oeffentlich, freigeschaltet) VALUES('.
+				 insertamum, insertvon, updateamum, updatevon, max_teilnehmer, oeffentlich, freigeschaltet, studiensemester_kurzbz) VALUES('.
 			     $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 			     $this->db_add_param($this->ort_kurzbz).', '.
 			     $this->db_add_param($this->anmerkung).', '.
@@ -205,7 +208,8 @@ class reihungstest extends basis_db
 			     $this->db_add_param($this->updatevon).','.
 			     $this->db_add_param($this->max_teilnehmer).','.
 			     $this->db_add_param($this->oeffentlich, FHC_BOOLEAN).','.
-			     $this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).');';
+			     $this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).','.
+			     $this->db_add_param($this->studiensemester_kurzbz).');';
 		}
 		else
 		{
@@ -219,10 +223,11 @@ class reihungstest extends basis_db
 		     	'updatevon='.$this->db_add_param($this->updatevon).', '.
 		     	'max_teilnehmer='.$this->db_add_param($this->max_teilnehmer).', '.
 				'oeffentlich='.$this->db_add_param($this->oeffentlich, FHC_BOOLEAN).', '.
-				'freigeschaltet='.$this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).' '.
+				'freigeschaltet='.$this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).', '.
+				'studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).' '.
 				'WHERE reihungstest_id='.$this->db_add_param($this->reihungstest_id, FHC_INTEGER, false).';';
 		}
-
+		
 		if($this->db_query($qry))
 		{
 			if($this->new)
@@ -266,12 +271,18 @@ class reihungstest extends basis_db
 	 * @param $order (optional)
 	 * @return true wenn ok, sonst false
 	 */
-	public function getReihungstest($studiengang_kz,$order=null)
+	public function getReihungstest($studiengang_kz,$order=null,$studiensemester_kurzbz=null)
 	{
 		$qry = "SELECT * FROM public.tbl_reihungstest WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
 
+		if ($studiensemester_kurzbz!=null)
+			$qry .=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz, FHC_STRING, false);
+		
 		if ($order!=null)
-			$qry .=" ORDER BY ".$order.";";
+			$qry .=" ORDER BY ".$order;
+		
+		
+		$qry.= ";";
 
 		if($this->db_query($qry))
 		{
@@ -293,6 +304,7 @@ class reihungstest extends basis_db
 				$obj->max_teilnehmer = $row->max_teilnehmer;
 				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
+				$obj->studiensemester_kurzbz =$row->studiensemester_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -341,6 +353,7 @@ class reihungstest extends basis_db
 				$obj->max_teilnehmer = $row->max_teilnehmer;
 				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
+				$obj->studiensemester_kurzbz =$row->studiensemester_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -381,6 +394,7 @@ class reihungstest extends basis_db
 				$obj->max_teilnehmer = $row->max_teilnehmer;
 				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
+				$obj->studiensemester_kurzbz =$row->studiensemester_kurzbz;
 
 				$this->result[] = $obj;
 			}
