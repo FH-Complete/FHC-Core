@@ -415,76 +415,89 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 			{
 				if 	(mb_detect_encoding(fgets($handle), 'UTF-8', true))
 				{			
-				set_time_limit(0);
-				$anzahl = 0;
-				$importtage_array = array();
-				$ende_vorher = date('Y-m-d H:i:s');
-				while(($data = fgetcsv($handle, 1000, ';', '"')) !== FALSE) 
-				{
-					if($data[0] == $user)
+					set_time_limit(0);
+					$anzahl = 0;
+					$importtage_array = array();
+					$ende_vorher = date('Y-m-d H:i:s');
+					while(($data = fgetcsv($handle, 1000, ';', '"')) !== FALSE) 
 					{
-						if ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') < $sperrdatum)
-							echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum ('.$data[2].')</b></span><br>';
-						else
-						{	
-							$zeit->new = true;
-							$zeit->insertamum = date('Y-m-d H:i:s');
-							$zeit->updateamum = date('Y-m-d H:i:s');
-							$zeit->updatevon = $user;
-							$zeit->insertvon = $user;			
-							$zeit->uid = $data[0];
-							$zeit->aktivitaet_kurzbz = $data[1];
-							$zeit->start = $datum->formatDatum($data[2], $format='Y-m-d H:i:s');
-							$zeit->ende = $datum->formatDatum($data[3], $format='Y-m-d H:i:s');
-							$zeit->beschreibung = $data[4];
-							$tag = $datum->formatDatum($data[2], $format='Y-m-d');
-							
-							
-							if(!in_array($tag, $importtage_array))
-							{
-								$importtage_array[] = $tag;
-								$zeit->deleteEntriesForUser($user, $tag);
-								$tag_aktuell = $tag;
-							}							
-							else 
-							{
-								if ($ende_vorher < $zeit->start)
+						if($data[0] == $user)
+						{
+							if ($datum->formatDatum($data[2], $format='Y-m-d H:i:s') < $sperrdatum)
+								echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum ('.$data[2].')</b></span><br>';
+							else
+							{	
+								$zeit->new = true;
+								$zeit->insertamum = date('Y-m-d H:i:s');
+								$zeit->updateamum = date('Y-m-d H:i:s');
+								$zeit->updatevon = $user;
+								$zeit->insertvon = $user;			
+								$zeit->uid = $data[0];
+								$zeit->aktivitaet_kurzbz = $data[1];
+								$zeit->start = $datum->formatDatum($data[2], $format='Y-m-d H:i:s');
+								$zeit->ende = $datum->formatDatum($data[3], $format='Y-m-d H:i:s');
+								$zeit->beschreibung = $data[4];
+								$tag = $datum->formatDatum($data[2], $format='Y-m-d');
+								
+								
+								
+								if(!in_array($tag, $importtage_array))
 								{
-									$pause = new zeitaufzeichnung();
-									$pause->new = true;
-									$pause->insertamum = date('Y-m-d H:i:s');
-									$pause->updateamum = date('Y-m-d H:i:s');
-									$pause->updatevon = $user;
-									$pause->insertvon = $user;			
-									$pause->uid = $user;
-									$pause->aktivitaet_kurzbz = 'Pause';
-									$pause->start = $ende_vorher;
-									$pause->ende = $zeit->start;
-									$zeit->beschreibung = '';
-									if(!$pause->save())
+									$importtage_array[] = $tag;
+									$zeit->deleteEntriesForUser($user, $tag);
+									$tag_aktuell = $tag;
+								}							
+								else 
+								{
+									if ($ende_vorher < $zeit->start)
 									{
-										echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$pause->errormsg.'</b></span>';	
+										$pause = new zeitaufzeichnung();
+										$pause->new = true;
+										$pause->insertamum = date('Y-m-d H:i:s');
+										$pause->updateamum = date('Y-m-d H:i:s');
+										$pause->updatevon = $user;
+										$pause->insertvon = $user;			
+										$pause->uid = $user;
+										$pause->aktivitaet_kurzbz = 'Pause';
+										$pause->start = $ende_vorher;
+										$pause->ende = $zeit->start;
+										$zeit->beschreibung = '';
+										if(!$pause->save())
+										{
+											echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$pause->errormsg.'</b></span>';	
+										}
 									}
 								}
-							}
-							
-							if($data[2] != $data[3])
-							{							
-								if(!$zeit->save())
-								{
-									echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$zeit->errormsg.'</b>('.$zeit->start.')</span>';
+								
+								$ende_vorher = $zeit->ende;
+								if($data[2] != $data[3])
+								{							
+									if ($data[1] == 'LehreExtern')
+									{
+										$zeit->start = date('Y-m-d H:i:s', strtotime('+2 seconds', strtotime($data[2])));
+										$zeit->ende = date('Y-m-d H:i:s', strtotime('-2 seconds', strtotime($data[3])));
+									}
+									if(!$zeit->save())
+									{
+										echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$zeit->errormsg.'</b>('.$zeit->start.')</span>';
+									}
+									else 
+										$anzahl++;
 								}
 								else 
-									$anzahl++;
+									$anzahl++;					
+								
 							}
-							else 
-								$anzahl++;					
-							$ende_vorher = $zeit->ende;
 						}
 					}
-				}
-				if($anzahl>0)
-					echo '<span style="color:green"><b>'.$p->t("global/datenWurdenGespeichert").' ('.$anzahl.')</b></span>';
+					if($anzahl>0)
+					{
+						echo '<span style="color:green"><b>'.$p->t("global/datenWurdenGespeichert").' ('.$anzahl.')</b></span>';
+						foreach ($importtage_array as $ptag)
+						{	
+							$zeit->cleanPausenForUser($user, $ptag);
+						}
+					}
 				}
 				else 
 					echo '<span style="color:red"><b>Datei konnte nicht importiert werden. Encoding ist nicht UTF-8!</b></span>';

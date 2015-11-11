@@ -440,6 +440,40 @@ class zeitaufzeichnung extends basis_db
 	}
 
 	/**
+	 * Löscht Pauseneinträge eines Users für einen Tag, die außerhalb der Arbeitszeit liegen 
+	 * Löscht Pauseneinträge an Tagen ohne Arbeitszeit
+	 * @param string $user
+	 * @param string $tag Y-m-d
+	 */
+	public function cleanPausenForUser($user, $tag)
+	{		 
+		$where = "uid=".$this->db_add_param($user);	
+		
+		$qry = "
+		delete from campus.tbl_zeitaufzeichnung where aktivitaet_kurzbz = 'Pause' and start::date = '$tag' and $where and
+(
+start::time >= 
+(SELECT max(ende::time) as endzeit from campus.tbl_zeitaufzeichnung where $where and start::date = '$tag' AND (aktivitaet_kurzbz != 'LehreExtern' or aktivitaet_kurzbz is null ) and aktivitaet_kurzbz != 'Pause')
+or
+ende::time<=
+(SELECT min(start::time) as startzeit from campus.tbl_zeitaufzeichnung where $where and start::date = '$tag' AND (aktivitaet_kurzbz != 'LehreExtern' or aktivitaet_kurzbz is null ) and aktivitaet_kurzbz != 'Pause')
+or not exists
+(select 1 from campus.tbl_zeitaufzeichnung where aktivitaet_kurzbz != 'LehreExtern' and aktivitaet_kurzbz != 'Pause' and start::date = '$tag' and $where ) 
+)
+		";
+		
+	    if($result = $this->db_query($qry))
+	    {
+	    	return true;
+	    }
+	    else
+	    {
+	    	$this->errormsg = 'Fehler beim Laden der Daten';
+	    	return false;
+	    }
+	}
+
+	/**
 	 * Holt alle ZA-Einträge Typ LehreIntern und LehreExtern  eines Users 
 	 * für das laufende Studienjahr und gibt die Summen in einem Array zurück
 	 * @param string $user
@@ -470,7 +504,7 @@ class zeitaufzeichnung extends basis_db
 	    $where = "mitarbeiter_uid=".$this->db_add_param($user);
 	    $where_sem = "l.studiensemester_kurzbz=".$this->db_add_param($sem);
 	    $qry = "
-		select sum(m.semesterstunden) from lehre.tbl_lehreinheitmitarbeiter m, lehre.tbl_lehreinheit l where $where and $where_sem and l.lehreinheit_id = m.lehreinheit_id
+		select sum(m.semesterstunden) from lehre.tbl_lehreinheitmitarbeiter m, lehre.tbl_lehreinheit l where $where and $where_sem and l.lehreinheit_id = m.lehreinheit_id and m.stundensatz*m.semesterstunden > 0
 		";
 		
 	    if($result = $this->db_query($qry))
