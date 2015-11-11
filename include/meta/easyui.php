@@ -19,11 +19,17 @@
  */
 //require_once('/config/vilesci.config.inc.php'); Muss vor dieser Datei eingebunden werden!
 
-echo '<link rel="stylesheet" type="text/css" href="'.APP_ROOT.'include/js/easyui-vilesci-theme/easyui.css">';
-echo '<link rel="stylesheet" type="text/css" href="'.APP_ROOT.'include/js/easyui/themes/icon.css">';
-echo '<link rel="stylesheet" type="text/css" href="'.APP_ROOT.'include/vendor_custom/easyui/icon.css">';
 
-echo '<script src="'.APP_ROOT.'include/js/easyui/jquery.min.js"></script>';
-echo '<script src="'.APP_ROOT.'include/js/easyui/jquery.easyui.min.js"></script>';
-?>
+
+//Originaldateien des herstellers
+echo '<link rel="stylesheet" type="text/css" href="'.APP_ROOT.'vendor/easyui/themes/icon.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.APP_ROOT.'vendor/easyui/themes/gray/easyui.css">';
+
+echo '<script src="'.APP_ROOT.'vendor/easyui/jquery.min.js"></script>';
+echo '<script src="'.APP_ROOT.'vendor/easyui/jquery.easyui.min.js"></script>';
+
+
+//Anpassungen
+echo '<link rel="stylesheet" type="text/css" href="'.APP_ROOT.'include/vendor_custom/easyui/easyui.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.APP_ROOT.'include/vendor_custom/easyui/icon.css">';
 
