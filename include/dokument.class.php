@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
@@ -30,7 +30,7 @@ class dokument extends basis_db
 	public $dokument_kurzbz;
 	public $bezeichnung;
 	public $studiengang_kz;
-    public $pflicht;
+	public $pflicht;
 
 	public $prestudent_id;
 	public $mitarbeiter_uid;
@@ -58,7 +58,7 @@ class dokument extends basis_db
 	/**
 	 * Laedt eine Dokument-Prestudent Zuordnung
 	 * @param dokument_kurzbz
-	 *        prestudent_id
+	 *		prestudent_id
 	 */
 	public function load($dokument_kurzbz, $prestudent_id)
 	{
@@ -150,15 +150,15 @@ class dokument extends basis_db
 		if($new)
 		{
 			$qry = 'INSERT INTO public.tbl_dokumentprestudent(dokument_kurzbz, prestudent_id, mitarbeiter_uid, datum, updateamum,
-			        updatevon, insertamum, insertvon) VALUES('.
-			        $this->db_add_param($this->dokument_kurzbz).','.
-			        $this->db_add_param($this->prestudent_id, FHC_INTEGER).','.
-			        $this->db_add_param($this->mitarbeiter_uid).','.
-			        $this->db_add_param($this->datum).','.
-			        $this->db_add_param($this->updateamum).','.
-			        $this->db_add_param($this->updatevon).','.
-			        $this->db_add_param($this->insertamum).','.
-			        $this->db_add_param($this->insertvon).');';
+					updatevon, insertamum, insertvon) VALUES('.
+					$this->db_add_param($this->dokument_kurzbz).','.
+					$this->db_add_param($this->prestudent_id, FHC_INTEGER).','.
+					$this->db_add_param($this->mitarbeiter_uid).','.
+					$this->db_add_param($this->datum).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).');';
 		}
 		else
 		{
@@ -217,8 +217,8 @@ class dokument extends basis_db
 		if($new)
 		{
 			$qry = 'INSERT INTO public.tbl_dokument(dokument_kurzbz, bezeichnung) VALUES('.
-			        $this->db_add_param($this->dokument_kurzbz).','.
-			        $this->db_add_param($this->bezeichnung).');';
+					$this->db_add_param($this->dokument_kurzbz).','.
+					$this->db_add_param($this->bezeichnung).');';
 		}
 		else
 		{
@@ -241,7 +241,7 @@ class dokument extends basis_db
 	/**
 	 * Loescht eine Zuordnung
 	 * @param dokument_kurzbz
-	 *        prestudent_id
+	 *		prestudent_id
 	 */
 	public function delete($dokument_kurzbz, $prestudent_id)
 	{
@@ -266,7 +266,7 @@ class dokument extends basis_db
 	/**
 	 * Loescht eine Zuordnung
 	 * @param dokument_kurzbz
-	 *        stg_kz
+	 *		stg_kz
 	 */
 	public function deleteDokumentStg($dokument_kurzbz, $stg_kz)
 	{
@@ -337,7 +337,7 @@ class dokument extends basis_db
 	 * Laedt alle Dokumente fuer einen Stg die der
 	 * Prestudent noch nicht abgegeben hat
 	 * @param studiengang_kz
-	 *        prestudent_id
+	 *		prestudent_id
 	 * @return true wenn ok, false wenn Fehler
 	 */
 	public function getFehlendeDokumente($studiengang_kz, $prestudent_id=null)
@@ -575,22 +575,24 @@ class dokument extends basis_db
 		}
 	}
 
-    /**
-     * Liefert alle Dokumente die eine Person abzugeben hat
-     * ist notwendig um bei einer Bewerbung bei mehreren Studiengängen zu wissen was der Student im gesamten abzugeben hat
-     * @param $person_id
+	/**
+	 * Liefert alle Dokumente die eine Person abzugeben hat.
+	 * Ist notwendig, um bei einer Bewerbung mit mehreren Studiengängen zu wissen, was der Student im Gesamten abzugeben hat
+	 * @param $person_id
 	 * @param onlinebewerbung
-     */
-    public function getAllDokumenteForPerson($person_id, $onlinebewerbung= false)
-    {
+	 */
+	public function getAllDokumenteForPerson($person_id, $onlinebewerbung= false)
+	{
 		$sprache = new sprache();
 		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
-        $qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht,
-			$bezeichnung_mehrsprachig
-            FROM public.tbl_dokumentstudiengang
-            JOIN public.tbl_prestudent using (studiengang_kz)
-            JOIN public.tbl_dokument using (dokument_kurzbz)
-            WHERE person_id =".$this->db_add_param($person_id, FHC_INTEGER);
+		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
+		$beschreibung_mehrsprachig = $sprache->getSprachQuery('beschreibung_mehrsprachig');
+		$qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht,
+			$bezeichnung_mehrsprachig, $dokumentbeschreibung_mehrsprachig, $beschreibung_mehrsprachig
+			FROM public.tbl_dokumentstudiengang
+			JOIN public.tbl_prestudent using (studiengang_kz)
+			JOIN public.tbl_dokument using (dokument_kurzbz)
+			WHERE person_id =".$this->db_add_param($person_id, FHC_INTEGER);
 
 		if($onlinebewerbung)
 			$qry.= " AND onlinebewerbung is true";
@@ -598,27 +600,71 @@ class dokument extends basis_db
 			$qry.=" ";
 		$qry.=" ORDER BY dokument_kurzbz, pflicht desc";
 
-        if($result = $this->db_query($qry))
-        {
-            while($row = $this->db_fetch_object($result))
-            {
-                $dok = new dokument();
-                $dok->dokument_kurzbz = $row->dokument_kurzbz;
-                $dok->bezeichnung = $row->bezeichnung;
-                $dok->pflicht= $this->db_parse_bool($row->pflicht);
-                $dok->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$dok = new dokument();
+				$dok->dokument_kurzbz = $row->dokument_kurzbz;
+				$dok->bezeichnung = $row->bezeichnung;
+				$dok->pflicht= $this->db_parse_bool($row->pflicht);
+				$dok->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
+				$dok->dokumentbeschreibung_mehrsprachig = $sprache->parseSprachResult('dokumentbeschreibung_mehrsprachig', $row);
+				$dok->beschreibung_mehrsprachig = $sprache->parseSprachResult('beschreibung_mehrsprachig', $row);
 
-                $this->result[] = $dok;
-            }
-            return true;
-        }
-        else
-        {
-            $this->errormsg="Fehler bei der Abfrage aufgetreten";
-            return false;
-        }
+				$this->result[] = $dok;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg="Fehler bei der Abfrage aufgetreten";
+			return false;
+		}
 
-    }
+	}
+	
+	/**
+	 * Liefert die Beschreibungstexte des uebergebenen Dokuments und der uebergebenen Studiengaenge
+	 * @param array $studiengangs_kz Array mit den Studiengangskennzahlen
+	 * @param string $dokument_kurzbz Kurzbz des Dokuments dessen Beschreibungstexte geliefert werden sollen
+	 */
+	public function getBeschreibungenDokumente($studiengangs_kz, $dokument_kurzbz)
+	{
+		$sprache = new sprache();
+		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
+		$beschreibung_mehrsprachig = $sprache->getSprachQuery('beschreibung_mehrsprachig');
+		
+		$qry = "	SELECT DISTINCT dokument_kurzbz, studiengang_kz, 
+					$dokumentbeschreibung_mehrsprachig, $beschreibung_mehrsprachig					
+					FROM public.tbl_dokumentstudiengang  
+					JOIN public.tbl_dokument using (dokument_kurzbz) 
+					WHERE dokument_kurzbz=".$this->db_add_param($dokument_kurzbz, FHC_STRING)."
+					AND (dokumentbeschreibung_mehrsprachig IS NOT NULL OR beschreibung_mehrsprachig IS NOT NULL)
+					AND studiengang_kz IN (".implode(",", $studiengangs_kz).")
+					ORDER BY studiengang_kz";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$dok = new dokument();
+				$dok->dokument_kurzbz = $row->dokument_kurzbz;
+				$dok->studiengang_kz = $row->studiengang_kz;
+				$dok->dokumentbeschreibung_mehrsprachig = $sprache->parseSprachResult('dokumentbeschreibung_mehrsprachig', $row);
+				$dok->beschreibung_mehrsprachig = $sprache->parseSprachResult('beschreibung_mehrsprachig', $row);
+
+				$this->result[] = $dok;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg="Fehler bei der Abfrage aufgetreten";
+			return false;
+		}
+	
+	}
 
 	/**
 	 * Loescht einen Dokumenttyp
@@ -640,13 +686,21 @@ class dokument extends basis_db
 	}
 
 	/**
-	 * Prueft ob das Dokument bei einem der Prestudenten einer Person bereits akzeptiert wurde
+	 * Prueft ob das Dokument bei einem der Prestudenten einer Person bereits akzeptiert wurde.
+	 * Optional kann auch eine studiengang_kz uebergeben werden, ob speziell dort das Dokument akzeptiert wurde
 	 * @param $dokument_kurzbz
 	 * @param $person_id
+	 * @param $studiengang_kz integer
 	 * @return boolean true wenn akzeptiert, false wenn noch nicht akzeptiert
 	 */
-	function akzeptiert($dokument_kurzbz, $person_id)
+	function akzeptiert($dokument_kurzbz, $person_id, $studiengang_kz=null)
 	{
+		if($studiengang_kz!='' && !is_numeric($studiengang_kz))
+		{
+			$this->errormsg = 'Studiengang_kz ist ungueltig';
+			return false;
+		}
+		
 		$qry = "SELECT
 					*
 				FROM
@@ -655,7 +709,8 @@ class dokument extends basis_db
 				WHERE
 					dokument_kurzbz=".$this->db_add_param($dokument_kurzbz)."
 					AND tbl_prestudent.person_id=".$this->db_add_param($person_id);
-
+		if ($studiengang_kz!='')
+			$qry .= " AND studiengang_kz=".$this->db_add_param($dokument_kurzbz, FHC_INTEGER);
 		if($result = $this->db_query($qry))
 		{
 			if($this->db_num_rows($result)>0)

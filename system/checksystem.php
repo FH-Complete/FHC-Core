@@ -3785,6 +3785,32 @@ if(!@$db->db_query("SELECT lgart_biscode FROM bis.tbl_lgartcode LIMIT 1"))
 			echo '<br>Spalte lgart_biscode hinzugefügt';
 }
 
+// Neue Spalte beschreibung_mehrsprachig bei tbl_dokument 
+if(!@$db->db_query("SELECT dokumentbeschreibung_mehrsprachig FROM public.tbl_dokument LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE public.tbl_dokument ADD COLUMN dokumentbeschreibung_mehrsprachig text[];
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_dokument '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte dokumentbeschreibung_mehrsprachig in public.tbl_dokument hinzugefügt';
+}
+
+// Neue Spalte beschreibung_mehrsprachig bei tbl_dokumentstudiengang 
+if(!@$db->db_query("SELECT beschreibung_mehrsprachig FROM public.tbl_dokumentstudiengang LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE public.tbl_dokumentstudiengang ADD COLUMN beschreibung_mehrsprachig text[];
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_dokumentstudiengang '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte beschreibung_mehrsprachig in public.tbl_dokumentstudiengang hinzugefügt';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
