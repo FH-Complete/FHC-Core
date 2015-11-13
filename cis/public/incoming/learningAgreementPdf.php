@@ -32,6 +32,7 @@ require_once('../../../include/xslfo2pdf/xslfo2pdf.php');
 require_once('../../../include/akte.class.php');
 require_once('../../../include/vorlage.class.php');
 require_once('../../../include/organisationseinheit.class.php');
+require_once('../../../include/studiengang.class.php');
 
 $db = new basis_db();
 
