@@ -1,0 +1,17 @@
+.panel-body {
+  overflow: auto;
+  border-top-width: 0;
+  padding: 0;
+}
+.panel-body-noheader {
+  border-top-width: 1px;
+}
+.panel-header,
+.panel-body {
+  border-color: #888;
+}
+.panel-body {
+  background-color: #EEE;
+  color: #333;
+  font-size: 12px;
+}

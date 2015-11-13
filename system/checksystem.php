@@ -20,10 +20,11 @@
  *
  * Beschreibung:
  * Dieses Skript prueft die gesamte Systemumgebung und sollte nach jedem Update gestartet werden.
- * Geprueft wird: - die Datenbank auf aktualitaet, dabei werden fehlende Attribute angelegt.
+ * Geprueft wird: die Datenbank per "dbupdate_VERSION.php" auf aktualitaet, dabei werden fehlende Attribute angelegt.
  */
 require_once('../config/system.config.inc.php');
 require_once('../include/basis_db.class.php');
+require_once('../version.php');
 
 // Datenbank Verbindung
 $db = new basis_db();
@@ -4129,6 +4130,14 @@ if (!$result=@$db->db_query($sql_query))
 if($error==false)
 	echo '<br>Gegenpruefung fehlerfrei';
 
+echo '<div>';
+  $dbupdStr = 'dbupdate_'.$fhcomplete_version.'.php';
+  echo $dbupdStr . ' wird aufgerufen...';
+echo '</div>';
+echo '<div>';
+  require_once($dbupdStr);
+echo '</div>';
+
 // ******** Berechtigungen Prüfen ************/
 echo '<h2>Berechtigungen pruefen</h2>';
 $neue=false;
@@ -4383,7 +4392,6 @@ foreach($webservicerecht as $row)
 }
 if($neue==false)
 	echo '<br>Keine neuen Webservicerechte';
-
 
 echo '</body></html>';
 ?>
