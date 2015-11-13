@@ -160,6 +160,35 @@ $output = (isset($_GET['output'])?$_GET['output']:'odt');
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
+//OE fuer Output ermitteln
+
+if ($xsl_oe_kurzbz!='')
+{
+	$oe_kurzbz = $xsl_oe_kurzbz;
+}
+else
+{
+	if($xsl_stg_kz=='')
+		$xsl_stg_kz='0';
+	$oe = new studiengang();
+	$oe->load($xsl_stg_kz);
+	$oe_kurzbz = $oe->oe_kurzbz;
+}
+
+//Darf der User Dokumente in einem NICHT-PDF-Format exportieren?
+if (isset($_GET['output']) && $_GET['output']!='pdf')
+{
+	if (!$rechte->isBerechtigt('system/change_outputformat',$oe_kurzbz))
+	{
+		$output = 'pdf';
+	}
+	else
+		$output = $_GET['output'];
+}
+else 
+	$output = 'pdf';
+
+
 //XSL aus der DB holen
 $vorlage = new vorlage();
 if($xsl_oe_kurzbz!='')
