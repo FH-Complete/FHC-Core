@@ -389,8 +389,9 @@ class notiz extends basis_db
 					public.tbl_notiz
 					LEFT JOIN public.tbl_notizzuordnung USING(notiz_id)
 				WHERE person_id = ' . $this->db_add_param($person_id, FHC_INTEGER) .
-                ' AND insertvon = ' . $this->db_add_param('Bewerbungstool') .
-                ' ORDER BY notiz_id';
+                ' AND (insertvon = ' . $this->db_add_param('online'.$person_id) .' OR insertvon = ' . $this->db_add_param('online_notiz'.$person_id).')
+                
+                ORDER BY notiz_id';
 
 		if($result = $this->db_query($qry))
 		{
