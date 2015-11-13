@@ -258,6 +258,9 @@
 <!ENTITY menu-dokumente-studienblatt.label	"Studienblatt">
 <!ENTITY menu-dokumente-studienblatt.accesskey	"B">
 
+<!ENTITY menu-dokumente-studienblatt_englisch.label	"Studienblatt Englisch">
+<!ENTITY menu-dokumente-studienblatt_englisch.accesskey	"T">
+
 <!ENTITY menu-dokumente-pruefungsprotokoll.label		"Prüfungsprotokoll 1 (Alte Version)">
 <!ENTITY menu-dokumente-pruefungsprotokoll.accesskey	"P">
 
