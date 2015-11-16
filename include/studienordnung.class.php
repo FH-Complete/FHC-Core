@@ -217,16 +217,17 @@ class studienordnung extends basis_db
 			$this->errormsg='studiengang_kz enthaelt ungueltige Zeichen';
 			return false;
 		}
-		if(!is_numeric($this->ects))
-		{
-			$this->errormsg='ects enthaelt ungueltige Zeichen';
-			return false;
-		}
-		if(!is_numeric($this->akadgrad_id))
-		{
-			$this->errormsg='akadgrad_id enthaelt ungueltige Zeichen';
-			return false;
-		}
+		//changes for addon Studiengangsverwaltung; ECTS and akadgrad_id are optional
+//		if(!is_numeric($this->ects))
+//		{
+//			$this->errormsg='ects enthaelt ungueltige Zeichen';
+//			return false;
+//		}
+//		if(!is_numeric($this->akadgrad_id))
+//		{
+//			$this->errormsg='akadgrad_id enthaelt ungueltige Zeichen';
+//			return false;
+//		}
 
 		//Gesamtlaenge pruefen
 		if(mb_strlen($this->version)>256)
