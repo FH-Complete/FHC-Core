@@ -492,8 +492,7 @@ if($result = $db->db_query($qry))
 	          <HeimatGemeinde>".$gemeinde."</HeimatGemeinde>
 	          <HeimatNation>".$nation."</HeimatNation>
 	          <ZugangCode>".$row->zgv_code."</ZugangCode>
-	          <ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>
-	          <Ausstellungsstaat>".$ausstellungsstaat."</Ausstellungsstaat>";
+	          <ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
 				
 				if($lgartcode==1)
 				{
@@ -501,6 +500,9 @@ if($result = $db->db_query($qry))
 	          <ZugangMasterCode>".$row->zgvmas_code."</ZugangMasterCode>
 	          <ZugangMasterDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvmadatum))."</ZugangMasterDatum>";
 				}
+
+				$datei.="
+			  <Ausstellungsstaat>".$ausstellungsstaat."</Ausstellungsstaat>";
 				
 				$qryad="SELECT 
 							* 
