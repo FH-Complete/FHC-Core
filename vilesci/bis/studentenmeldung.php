@@ -868,7 +868,15 @@ function GenerateXMLStudentBlock($row)
 		else
 			$beginndatum='';
 	}
-	if($row->ausstellungsstaat=='' && ($datumobj->mktime_fromdate($beginndatum) > $datumobj->mktime_fromdate('2011-04-15')) && !$ausserordentlich)
+	$ausstellungsstaat='';
+	if($row->zgvmanation!='')
+		$ausstellungsstaat = $row->zgvmanation;
+	elseif($row->zgvnation!='')
+		$ausstellungsstaat = $row->zgvnation;
+	else
+		$ausstellungsstaat = $row->ausstellungsstaat;
+
+	if($ausstellungsstaat=='' && ($datumobj->mktime_fromdate($beginndatum) > $datumobj->mktime_fromdate('2011-04-15')) && !$ausserordentlich)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Ausstellungsstaat ist nicht eingetragen";
 	}
@@ -954,10 +962,17 @@ function GenerateXMLStudentBlock($row)
 		
 		if($aktstatus!='Incoming' && !$ausserordentlich)
 		{
-			if($row->ausstellungsstaat!='' && ($datumobj->mktime_fromdate($beginndatum) > $datumobj->mktime_fromdate('2011-04-15')))
+			if($row->zgvmanation!='')
+				$ausstellungsstaat = $row->zgvmanation;
+			elseif($row->zgvnation!='')
+				$ausstellungsstaat = $row->zgvnation;
+			else
+				$ausstellungsstaat = $row->ausstellungsstaat;
+
+			if($ausstellungsstaat!='' && ($datumobj->mktime_fromdate($beginndatum) > $datumobj->mktime_fromdate('2011-04-15')))
 			{
 				$datei.='
-				<Ausstellungsstaat>'.$row->ausstellungsstaat.'</Ausstellungsstaat>';
+				<Ausstellungsstaat>'.$ausstellungsstaat.'</Ausstellungsstaat>';
 			}
 		}
 				

@@ -469,6 +469,13 @@ if($result = $db->db_query($qry))
 					}
 				}
 				//<HeimatStrasse><![CDATA[".$strasse."]]></HeimatStrasse>
+
+				if($row->zgvmanation!='')
+					$ausstellungsstaat = $row->zgvmanation;
+				elseif($row->zgvnation!='')
+					$ausstellungsstaat = $row->zgvnation;
+				else
+					$ausstellungsstaat = $row->ausstellungsstaat;
 				$datei.="
 	          <StaatsangehoerigkeitCode>".$row->staatsbuergerschaft."</StaatsangehoerigkeitCode>
 	          <HeimatPLZ>".$plz."</HeimatPLZ>
@@ -476,7 +483,7 @@ if($result = $db->db_query($qry))
 	          <HeimatNation>".$nation."</HeimatNation>
 	          <ZugangCode>".$row->zgv_code."</ZugangCode>
 	          <ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>
-	          <Ausstellungsstaat>".$row->ausstellungsstaat."</Ausstellungsstaat>";
+	          <Ausstellungsstaat>".$ausstellungsstaat."</Ausstellungsstaat>";
 				
 				if($stgart==2)
 				{
