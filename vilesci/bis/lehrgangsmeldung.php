@@ -102,6 +102,16 @@ if($result = $db->db_query($qry))
 	if($row = $db->db_fetch_object($result))
 	{
 		$stgart=$row->typ;
+		$lgartcode = $row->lgartcode;
+		$qrylgart = "SELECT lgart_biscode FROM bis.tbl_lgartcode WHERE lgartcode=".$db->db_add_param($row->lgartcode);
+		if($result_lgartcode = $db->db_query($qrylgart))
+		{
+			if($row_lgartcode = $db->db_fetch_object($result_lgartcode))
+			{
+				$lgartcode=$row_lgartcode->lgart_biscode;
+			}
+		}
+
 		$stgemail=$row->email;
 		if(strlen(trim($row->erhalter_kz))==1)
 		{
@@ -256,7 +266,7 @@ if($result = $db->db_query($qry))
 					$error_log.=(!empty($error_log)?', ':'')."ZugangDatum ('".$row->zgvdatum."') kleiner als Geburtsdatum ('".$row->gebdatum."')";
 			}
 		}
-		if($stgart==2)
+		if($lgartcode==1)
 		{
 			if($row->zgvmas_code=='' || $row->zgvmas_code==null)
 			{
@@ -485,7 +495,7 @@ if($result = $db->db_query($qry))
 	          <ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>
 	          <Ausstellungsstaat>".$ausstellungsstaat."</Ausstellungsstaat>";
 				
-				if($stgart==2)
+				if($lgartcode==1)
 				{
 					$datei.="
 	          <ZugangMasterCode>".$row->zgvmas_code."</ZugangMasterCode>
