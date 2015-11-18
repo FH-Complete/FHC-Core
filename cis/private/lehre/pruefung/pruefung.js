@@ -483,7 +483,10 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 	if(bemerkungen === undefined)
 		bemerkungen = "von Lektor hinzugefügt";
 	
-	var studienverpflichtung_id = $("#studienverpflichtung option:selected").val();
+	var studienverpflichtung_id = null;
+    if($("#studienverpflichtung").length)
+        studienverpflichtung_id = $("#studienverpflichtung option:selected").val();
+        
 	console.log(studienverpflichtung_id);
 	
 	$.ajax({
