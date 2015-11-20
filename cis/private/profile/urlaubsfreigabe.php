@@ -228,7 +228,9 @@ if($uid!='')
 	echo "<a href='".$_SERVER['PHP_SELF']."?year=$year' class='Item'>Alle Mitarbeiter anzeigen</a><br></td>";
 	echo '<td style="width:33%">';
 	echo '</td><td style="width:33%">';
-
+	//echo '<div id="resturlaub"></div>';
+	//echo '</td></tr></table>';
+	
 	//Anzeige Resturlaubsberechnung
 	
 	$resturlaub = new resturlaub();
@@ -305,6 +307,7 @@ if($uid!='')
 	echo '</div>';
 	
 	echo '</td></tr></table>';
+	
 }
 
 echo '<br><center>';
