@@ -47,7 +47,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 
 <window
 	id="planner"
-	title="&window.title; &window.version;"
+	title="&window.title; - &window.version;"
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	orient="vertical"
