@@ -40,7 +40,7 @@ if(!$variable->loadVariables($user))
 //$benutzer = new benutzer($conn);
 //if(!$benutzer->loadVariables($user))
 //	$error_msg = $benutzer->errormsg;
-	
+
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
@@ -110,8 +110,8 @@ foreach($addon_obj->result as $addon)
   <command id="menu-statistic-substatistik-studentenprosemester-excel:command" oncommand="StatistikPrintStudentenProSemester('xls');"/>
   <command id="menu-statistic-substatistik-studentenprosemester-html:command" oncommand="StatistikPrintStudentenProSemester('');"/>
   <command id="menu-statistic-substatistik-alvsstatistik-excel:command" oncommand="StatistikPrintALVSStatistik('xls');"/>
-  <command id="menu-statistic-substatistik-alvsstatistik-html:command" oncommand="StatistikPrintALVSStatistik('');"/>  
-  <command id="menu-statistic-substatistik-lvplanunggesamtsj-excel:command" oncommand="StatistikPrintLvPlanungGesamtSJ();"/>  
+  <command id="menu-statistic-substatistik-alvsstatistik-html:command" oncommand="StatistikPrintALVSStatistik('');"/>
+  <command id="menu-statistic-substatistik-lvplanunggesamtsj-excel:command" oncommand="StatistikPrintLvPlanungGesamtSJ();"/>
   <command id="menu-statistic-absolventenstatistik:command" oncommand="StatistikPrintAbsolventenstatistik();"/>
   <command id="menu-statistic-absolventenzahlen:command" oncommand="StatistikPrintAbsolventenZahlen();"/>
   <command id="menu-statistic-studentenstatistik:command" oncommand="StatistikPrintStudentenstatistik();"/>
@@ -133,7 +133,7 @@ foreach($addon_obj->result as $addon)
   <command id="menu-dokumente-studienerfolgeng-finanzamt:command" oncommand="StudentCreateStudienerfolg(event, 'StudienerfolgEng','finanzamt');"/>
   <command id="menu-dokumente-studienerfolgeng-allesemester-normal:command" oncommand="StudentCreateStudienerfolg(event, 'StudienerfolgEng','', '', 'true');"/>
   <command id="menu-dokumente-studienerfolgeng-allesemester-finanzamt:command" oncommand="StudentCreateStudienerfolg(event, 'StudienerfolgEng','finanzamt', '', 'true');"/>
-  <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt(event);"/>  
+  <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt(event);"/>
   <command id="menu-dokumente-zutrittskarte:command" oncommand="PrintZutrittskarte();"/>
   <command id="menu-dokumente-studienblatt:command" oncommand="PrintStudienblatt(event);"/>
   <command id="menu-dokumente-studienblatt_englisch:command" oncommand="PrintStudienblattEnglisch(event);"/>
@@ -529,16 +529,16 @@ foreach($addon_obj->result as $addon)
 				    </menupopup>
 				</menu>
 	          <?php
-	          
+
 	          $qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende<now() ORDER BY ende DESC LIMIT 5";
 	          $db = new basis_db();
-	          
+
 	          if($db->db_query($qry))
 	          {
 	          	while($row = $db->db_fetch_object())
 	          	{
 	          		$stsem_kurzbz = $row->studiensemester_kurzbz;
-	          		
+
 					echo '
 					<menu id="menu-dokumente-studienerfolg-menu" label="'.$stsem_kurzbz.'">
 					  <menupopup id="menu-dokumente-studienerfolg-menu-popup">
@@ -546,13 +546,13 @@ foreach($addon_obj->result as $addon)
 					       id        =  "menu-dokumente-studienerfolg-menu-normal"
 					       key       =  "menu-dokumente-studienerfolg-normal:key"
 					       label     = "&menu-dokumente-studienerfolg-normal.label;"
-					       oncommand   =  "StudentCreateStudienerfolg(\'Studienerfolg\',null, \''.$stsem_kurzbz.'\');"
+					       oncommand   =  "StudentCreateStudienerfolg(event,\'Studienerfolg\',null, \''.$stsem_kurzbz.'\');"
 					       accesskey = "&menu-dokumente-studienerfolg-normal.accesskey;"/>
 					   	<menuitem
 					       id        =  "menu-dokumente-studienerfolg-finanzamt"
 					       key       =  "menu-dokumente-studienerfolg-finanzamt:key"
 					       label     = "&menu-dokumente-studienerfolg-finanzamt.label;"
-					       oncommand   =  "StudentCreateStudienerfolg(\'Studienerfolg\',\'finanzamt\', \''.$stsem_kurzbz.'\');"
+					       oncommand   =  "StudentCreateStudienerfolg(event,\'Studienerfolg\',\'finanzamt\', \''.$stsem_kurzbz.'\');"
 					       accesskey = "&menu-dokumente-studienerfolg-finanzamt.accesskey;"/>
 					    </menupopup>
 					</menu>';
@@ -592,16 +592,16 @@ foreach($addon_obj->result as $addon)
 				    </menupopup>
 				</menu>
 	          <?php
-	          
+
 	          $qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende<now() ORDER BY ende DESC LIMIT 5";
 	          $db = new basis_db();
-	          
+
 	          if($db->db_query($qry))
 	          {
 	          	while($row = $db->db_fetch_object())
 	          	{
 	          		$stsem_kurzbz = $row->studiensemester_kurzbz;
-	          		
+
 					echo '
 					<menu id="menu-dokumente-studienerfolg-menu" label="'.$stsem_kurzbz.'">
 					  <menupopup id="menu-dokumente-studienerfolg-menu-popup">
@@ -609,13 +609,13 @@ foreach($addon_obj->result as $addon)
 					       id        =  "menu-dokumente-studienerfolgeng-menu-normal"
 					       key       =  "menu-dokumente-studienerfolgeng-normal:key"
 					       label     = "&menu-dokumente-studienerfolgeng-normal.label;"
-					       oncommand   =  "StudentCreateStudienerfolg(\'StudienerfolgEng\',null, \''.$stsem_kurzbz.'\');"
+					       oncommand   =  "StudentCreateStudienerfolg(event,\'StudienerfolgEng\',null, \''.$stsem_kurzbz.'\');"
 					       accesskey = "&menu-dokumente-studienerfolgeng-normal.accesskey;"/>
 					   	<menuitem
 					       id        =  "menu-dokumente-studienerfolgeng-finanzamt"
 					       key       =  "menu-dokumente-studienerfolgeng-finanzamt:key"
 					       label     = "&menu-dokumente-studienerfolgeng-finanzamt.label;"
-					       oncommand   =  "StudentCreateStudienerfolg(\'StudienerfolgEng\',\'finanzamt\', \''.$stsem_kurzbz.'\');"
+					       oncommand   =  "StudentCreateStudienerfolg(event,\'StudienerfolgEng\',\'finanzamt\', \''.$stsem_kurzbz.'\');"
 					       accesskey = "&menu-dokumente-studienerfolgeng-finanzamt.accesskey;"/>
 					    </menupopup>
 					</menu>';
@@ -776,7 +776,7 @@ foreach($addon_obj->result as $addon)
                key       =  "menu-extras-projektarbeitsabgaben:key"
                label     = "&menu-extras-projektarbeitsabgaben.label;"
                command   =  "menu-extras-projektarbeitsabgaben:command"
-               accesskey = "&menu-extras-projektarbeitsabgaben.accesskey;"/>         
+               accesskey = "&menu-extras-projektarbeitsabgaben.accesskey;"/>
              <menuitem
                id        =  "menu-extras-projektarbeitsbenotung"
                key       =  "menu-extras-projektarbeitsbenotung:key"
