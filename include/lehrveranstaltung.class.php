@@ -1908,7 +1908,7 @@ class lehrveranstaltung extends basis_db
                 return false;
             }
 
-            $qry = 'SELECT uid FROM campus.vw_student_lehrveranstaltung WHERE '
+            $qry = 'SELECT distinct uid FROM campus.vw_student_lehrveranstaltung WHERE '
                     . 'lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id);
 
             if(!is_null($studiensemester_kurzbz))
@@ -2193,5 +2193,44 @@ class lehrveranstaltung extends basis_db
 
         return $oe;
     }
+
+	/**
+	 * Laedt den LV-Leiter einer Lehrveranstaltung, wenn keiner der Lektoren als LVLeiter eingetragen ist, 
+	 * wird der erstbeste Lektor geliefert
+	 * @param $lehrveranstaltung_id ID der Lehrveranstaltung
+	 * @param $studiensemester_kurzbz Studiensemester
+	 * @return UID des Mitarbeiters
+	 */
+	public function getLVLeitung($lehrveranstaltung_id, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT 
+					mitarbeiter_uid,
+					CASE WHEN lehrfunktion_kurzbz='LV-Leitung' THEN 1 ELSE 2 END as sort
+				FROM 
+					lehre.tbl_lehreinheit
+					JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+				WHERE
+					tbl_lehreinheit.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id)."
+					AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+				ORDER BY sort LIMIT 1";
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->mitarbeiter_uid;
+			}
+			else
+			{
+				$this->errormsg = 'Keine Eintrag gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
