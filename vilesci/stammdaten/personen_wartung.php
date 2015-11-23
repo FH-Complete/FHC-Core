@@ -91,7 +91,7 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 			if($person->foto_sperre)
 				$sql_query_upd1.="UPDATE public.tbl_person SET foto_sperre=true WHERE person_id=".$db->db_add_param($radio_2, FHC_INTEGER).";";
 
-			// Wenn die zu loeschende Person ein Foto hat, und die andere nicht, 
+			// Wenn die zu loeschende Person ein Foto hat, und die andere nicht,
 			// dann wird das Foto uebernommen
 			if($person->foto!='')
 			{
@@ -114,10 +114,11 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 			$sql_query_upd1.="UPDATE public.tbl_adresse SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
 			$sql_query_upd1.="UPDATE public.tbl_akte SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
 			$sql_query_upd1.="UPDATE public.tbl_bankverbindung SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
-			$sql_query_upd1.="UPDATE public.tbl_kontakt SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";			
+			$sql_query_upd1.="UPDATE public.tbl_kontakt SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
 			$sql_query_upd1.="UPDATE public.tbl_preinteressent SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
 			$sql_query_upd1.="UPDATE public.tbl_personfunktionstandort SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
 			$sql_query_upd1.="UPDATE public.tbl_notizzuordnung SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+			$sql_query_upd1.="UPDATE wawi.tbl_konto SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
 			$sql_query_upd1.="DELETE FROM public.tbl_person WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
 
 			if($db->db_query($sql_query_upd1))
@@ -156,19 +157,19 @@ if((isset($radio_1) && !isset($radio_2))||(!isset($radio_1) && isset($radio_2)) 
 	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
 	<link href="../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
 	<script type="text/javascript">
-	
-	$(document).ready(function() 
-	{ 
+
+	$(document).ready(function()
+	{
 		$('#t1').tablesorter(
 		{
 			sortList: [[1,0]],
 			widgets: ["zebra"]
-		}); 
+		});
 		$('#t2').tablesorter(
 		{
 			sortList: [[2,0]],
 			widgets: ["zebra"]
-		}); 
+		});
 
 	});
 	function enable(id)
@@ -179,7 +180,7 @@ if((isset($radio_1) && !isset($radio_2))||(!isset($radio_1) && isset($radio_2)) 
 			var radios = document.getElementsByName('radio_1');
 		for (var i=0, iLen=radios.length; i<iLen; i++) {
 			radios[i].disabled = false;
-			} 
+			}
 	}
 	function disable(id)
 	{
