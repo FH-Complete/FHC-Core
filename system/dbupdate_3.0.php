@@ -3780,50 +3780,6 @@ if(!$result = @$db->db_query("SELECT studiensemester_kurzbz FROM public.tbl_reih
 	else
 	    echo 'public.tbl_reihungstest: Spalte studiensemester_kurzbz hinzugefuegt';
 }
-
-//Tabelle public.tbl_foerdervertrag
-if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_foerdervertrag LIMIT 1;"))
-{
-	$qry = "CREATE TABLE public.tbl_foerdervertrag
-			(
-				foerdervertrag_id integer NOT NULL,
-				studiengang_kz integer NOT NULL,
-				foerdergeber varchar(256),
-				foerdersatz numeric(8,2),
-				foerdergruppe varchar(256),
-				gueltigvon varchar(16),
-				gueltigbis varchar(16),
-				erlaeuterungen text,
-				insertamum timestamp,
-				insertvon varchar(32),
-				updateamum timestamp,
-				updatevon varchar(32)
-			);
-
-		CREATE SEQUENCE public.seq_foerdervertrag_foerdervertrag_id
-		 INCREMENT BY 1
-		 NO MAXVALUE
-		 NO MINVALUE
-		 CACHE 1;
-
-		ALTER TABLE public.tbl_foerdervertrag ADD CONSTRAINT pk_foerdervertrag PRIMARY KEY (foerdervertrag_id);
-		ALTER TABLE public.tbl_foerdervertrag ALTER COLUMN foerdervertrag_id SET DEFAULT nextval('public.seq_foerdervertrag_foerdervertrag_id');
-
-		ALTER TABLE public.tbl_foerdervertrag ADD CONSTRAINT fk_foerdervertrag_studiengang FOREIGN KEY (studiengang_kz) REFERENCES public.tbl_studiengang (studiengang_kz) ON DELETE RESTRICT ON UPDATE CASCADE;
-		ALTER TABLE public.tbl_foerdervertrag ADD CONSTRAINT fk_foerdervertrag_studiensemester_gueltigvon FOREIGN KEY (gueltigvon) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-		ALTER TABLE public.tbl_foerdervertrag ADD CONSTRAINT fk_foerdervertrag_studiensemester_gueltigbis FOREIGN KEY (gueltigbis) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-
-		GRANT SELECT ON public.tbl_foerdervertrag TO web;
-		GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_foerdervertrag TO vilesci;
-		GRANT SELECT, UPDATE ON public.seq_foerdervertrag_foerdervertrag_id TO vilesci;
-	";
-
-	if(!$db->db_query($qry))
-		echo '<strong>public.tbl_foerdervertrag: '.$db->db_last_error().'</strong><br>';
-	else
-		echo ' public.tbl_foerdervertrag: Tabelle hinzugefuegt<br>';
-}
-
 echo '<br><br><br>';
 
 $tabellen=array(

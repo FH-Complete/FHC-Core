@@ -40,6 +40,7 @@ require_once('../../../include/betriebsmittelperson.class.php');
 require_once('../../../include/globals.inc.php');
 require_once('../../../include/bisverwendung.class.php');
 require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 
@@ -48,10 +49,22 @@ if (!$db = new basis_db())
 	die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
 	
 $user = get_uid();
-if ($user == 'raab' && isset($_GET["debuguser"]))
-        $user = $_GET["debuguser"];
 
-
+//Wenn User Administrator ist und UID uebergeben wurde, dann die Zeiaufzeichnung 
+//des uebergebenen Users anzeigen
+if(isset($_GET['uid']))
+{
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+	if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter/urlaube', null, 'suid'))
+	{
+		$user = $_GET['uid'];
+	}
+	else 
+	{
+		die($p->t('global/FuerDieseAktionBenoetigenSieAdministrationsrechte'));
+	}
+}
 
 
 $datum = new datum();
