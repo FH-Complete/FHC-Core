@@ -333,7 +333,7 @@ $datum_obj = new datum();
 		
 		if ((($gueltigvon<=$jetzt) || ($gueltigvon=='')) && (($gueltigbis>=$jetzt) || ($gueltigbis=='')) && ($exklusiv==false && $row->exklusiv==false))
 			$aktiv=true;
-		elseif ($exklusiv==true && $row->exklusiv==true)
+		elseif (($exklusiv==true && $row->exklusiv==true) && (($gueltigvon<=$jetzt) || ($gueltigvon=='')) && (($gueltigbis>=$jetzt) || ($gueltigbis=='')))
 			$aktiv=true;
 		else 
 		{
