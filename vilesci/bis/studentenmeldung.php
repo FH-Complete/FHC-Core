@@ -869,7 +869,7 @@ function GenerateXMLStudentBlock($row)
 			$beginndatum='';
 	}
 	$ausstellungsstaat='';
-	if($row->zgvmanation!='')
+	if($row->zgvmanation!='' && $stgart==2) // Master
 		$ausstellungsstaat = $row->zgvmanation;
 	elseif($row->zgvnation!='')
 		$ausstellungsstaat = $row->zgvnation;
@@ -962,7 +962,7 @@ function GenerateXMLStudentBlock($row)
 		
 		if($aktstatus!='Incoming' && !$ausserordentlich)
 		{
-			if($row->zgvmanation!='')
+			if($row->zgvmanation!='' && $stgart=='2')
 				$ausstellungsstaat = $row->zgvmanation;
 			elseif($row->zgvnation!='')
 				$ausstellungsstaat = $row->zgvnation;
