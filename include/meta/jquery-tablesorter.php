@@ -19,23 +19,20 @@
  */
 //require_once('/config/vilesci.config.inc.php'); Muss vor dieser Datei eingebunden werden!
 
+
 $ar = APP_ROOT;
 if(isset($_SERVER["https"]) && $_SERVER["https"] != "")
 	$ar = preg_replace("/^http:/i", "https:", $ar);
 else
 	$ar = preg_replace("/^https:/i", "http:", $ar);
 
-
 //Originaldateien des Herstellers
-echo '<link rel="stylesheet" type="text/css" href="'.$ar.'vendor/FHC-vendor/easyui/themes/icon.css">';
-echo '<link rel="stylesheet" type="text/css" href="'.$ar.'vendor/FHC-vendor/easyui/themes/gray/easyui.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.$ar.'vendor/FHC-vendor/jquery-tablesorter/css/theme.default.css">';
 
-echo '<script src="'.$ar.'vendor/FHC-vendor/easyui/jquery.min.js"></script>';
-echo '<script src="'.$ar.'vendor/FHC-vendor/easyui/jquery.easyui.min.js"></script>';
+echo '<script src="'.$ar.'vendor/FHC-vendor/jquery-tablesorter/js/jquery.tablesorter.js"></script>';
 
 
 //Anpassungen
-echo '<link rel="stylesheet" type="text/css" href="'.$ar.'include/vendor_custom/easyui/easyui.css">';
-echo '<link rel="stylesheet" type="text/css" href="'.$ar.'include/vendor_custom/easyui/icon.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.$ar.'include/vendor_custom/jquery-tablesorter/tablesort.css">';
 
 ?>
