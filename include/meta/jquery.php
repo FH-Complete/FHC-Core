@@ -17,7 +17,7 @@
  *
  * Authors: Andreas Moik <moik@technikum-wien.at>
  */
-//require_once('/config/vilesci.config.inc.php'); Muss vor dieser Datei eingebunden werden!
+//require_once(dirname(__FILE__).'/config/vilesci.config.inc.php'); Muss vor dieser Datei eingebunden werden!
 
 
 $ar = APP_ROOT;
