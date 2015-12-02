@@ -19,19 +19,17 @@
  */
 //require_once(dirname(__FILE__).'/config/vilesci.config.inc.php'); Muss vor dieser Datei eingebunden werden!
 
-$ar = APP_ROOT;
-if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] != "" && $_SERVER["HTTPS"] != "off")
-	$ar = preg_replace("/^http:/i", "https:", $ar);
-else
-	$ar = preg_replace("/^https:/i", "http:", $ar);
+$dr = DOC_ROOT;
+$dr = str_replace($_SERVER["DOCUMENT_ROOT"], "", $dr);
+
 
 //Originaldateien des Herstellers
-echo '<link rel="stylesheet" type="text/css" href="'.$ar.'vendor/FHC-vendor/jquery-tablesorter/css/theme.default.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.$dr.'vendor/FHC-vendor/jquery-tablesorter/css/theme.default.css">';
 
-echo '<script src="'.$ar.'vendor/FHC-vendor/jquery-tablesorter/js/jquery.tablesorter.js"></script>';
+echo '<script src="'.$dr.'vendor/FHC-vendor/jquery-tablesorter/js/jquery.tablesorter.js"></script>';
 
 
 //Anpassungen
-echo '<link rel="stylesheet" type="text/css" href="'.$ar.'include/vendor_custom/jquery-tablesorter/tablesort.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.$dr.'include/vendor_custom/jquery-tablesorter/tablesort.css">';
 
 ?>

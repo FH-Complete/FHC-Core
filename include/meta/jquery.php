@@ -19,15 +19,11 @@
  */
 //require_once(dirname(__FILE__).'/config/vilesci.config.inc.php'); Muss vor dieser Datei eingebunden werden!
 
-
-$ar = APP_ROOT;
-if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] != "" && $_SERVER["HTTPS"] != "off")
-	$ar = preg_replace("/^http:/i", "https:", $ar);
-else
-	$ar = preg_replace("/^https:/i", "http:", $ar);
+$dr = DOC_ROOT;
+$dr = str_replace($_SERVER["DOCUMENT_ROOT"], "", $dr);
 
 //Originaldateien des Herstellers
-echo '<script src="'.$ar.'vendor/components/jquery/jquery.min.js"></script>';
+echo '<script src="'.$dr.'vendor/components/jquery/jquery.min.js"></script>';
 
 
 ?>

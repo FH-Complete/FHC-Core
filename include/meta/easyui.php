@@ -19,22 +19,20 @@
  */
 //require_once(dirname(__FILE__).'/config/vilesci.config.inc.php'); Muss vor dieser Datei eingebunden werden!
 
-$ar = APP_ROOT;
-if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] != "" && $_SERVER["HTTPS"] != "off")
-	$ar = preg_replace("/^http:/i", "https:", $ar);
-else
-	$ar = preg_replace("/^https:/i", "http:", $ar);
+$dr = DOC_ROOT;
+$dr = str_replace($_SERVER["DOCUMENT_ROOT"], "", $dr);
+
 
 //Originaldateien des Herstellers
-echo '<link rel="stylesheet" type="text/css" href="'.$ar.'vendor/FHC-vendor/easyui/themes/icon.css">';
-echo '<link rel="stylesheet" type="text/css" href="'.$ar.'vendor/FHC-vendor/easyui/themes/gray/easyui.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.$dr.'vendor/FHC-vendor/easyui/themes/icon.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.$dr.'vendor/FHC-vendor/easyui/themes/gray/easyui.css">';
 
-echo '<script src="'.$ar.'vendor/FHC-vendor/easyui/jquery.min.js"></script>';
-echo '<script src="'.$ar.'vendor/FHC-vendor/easyui/jquery.easyui.min.js"></script>';
+echo '<script src="'.$dr.'vendor/FHC-vendor/easyui/jquery.min.js"></script>';
+echo '<script src="'.$dr.'vendor/FHC-vendor/easyui/jquery.easyui.min.js"></script>';
 
 
 //Anpassungen
-echo '<link rel="stylesheet" type="text/css" href="'.$ar.'include/vendor_custom/easyui/easyui.css">';
-echo '<link rel="stylesheet" type="text/css" href="'.$ar.'include/vendor_custom/easyui/icon.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.$dr.'include/vendor_custom/easyui/easyui.css">';
+echo '<link rel="stylesheet" type="text/css" href="'.$dr.'include/vendor_custom/easyui/icon.css">';
 
 ?>
