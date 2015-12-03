@@ -294,7 +294,7 @@ class lehrveranstaltung extends basis_db
 
 		if(!is_null($lehrtyp))
 			$qry .= " AND lehrtyp_kurzbz=".$this->db_add_param($lehrtyp);
-		
+
 		if(!is_null($orgform) && $orgform!='')
 			$qry .= " AND orgform_kurzbz=".$this->db_add_param($orgform);
 
@@ -899,7 +899,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->incoming = $row->incoming;
 				$lv_obj->zeugnis = $this->db_parse_bool($row->zeugnis);
 				$lv_obj->projektarbeit = $this->db_parse_bool($row->projektarbeit);
-				$lv_obj->zeugnis = $row->koordinator;
+				$lv_obj->koordinator = $row->koordinator;
 				$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 				$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
 				$lv_obj->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
@@ -1920,7 +1920,7 @@ class lehrveranstaltung extends basis_db
                 return false;
             }
 
-            $qry = 'SELECT uid FROM campus.vw_student_lehrveranstaltung WHERE '
+            $qry = 'SELECT distinct uid FROM campus.vw_student_lehrveranstaltung WHERE '
                     . 'lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id);
 
             if(!is_null($studiensemester_kurzbz))
@@ -2205,5 +2205,122 @@ class lehrveranstaltung extends basis_db
 
         return $oe;
     }
+
+	/**
+	 * Laedt den LV-Leiter einer Lehrveranstaltung, wenn keiner der Lektoren als LVLeiter eingetragen ist,
+	 * wird der erstbeste Lektor geliefert
+	 * @param $lehrveranstaltung_id ID der Lehrveranstaltung
+	 * @param $studiensemester_kurzbz Studiensemester
+	 * @return UID des Mitarbeiters
+	 */
+	public function getLVLeitung($lehrveranstaltung_id, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT
+					mitarbeiter_uid,
+					CASE WHEN lehrfunktion_kurzbz='LV-Leitung' THEN 1 ELSE 2 END as sort
+				FROM
+					lehre.tbl_lehreinheit
+					JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+				WHERE
+					tbl_lehreinheit.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id)."
+					AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+				ORDER BY sort LIMIT 1";
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->mitarbeiter_uid;
+			}
+			else
+			{
+				$this->errormsg = 'Keine Eintrag gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Liefert den Koordinator einer Lehrveranstaltung
+	 * @param $lehrveranstaltung_id
+	 * @param $studiensemester_kurzbz
+	 */
+	public function getKoordinator($lehrveranstaltung_id, $studiensemester_kurzbz=null)
+	{
+		$qry = "
+		SELECT a.uid, vorname, nachname, titelpre, titelpost
+		FROM
+		(
+			SELECT
+				koordinator as uid
+			FROM
+				lehre.tbl_lehrveranstaltung
+			WHERE
+				lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
+			UNION
+			SELECT
+				uid
+			FROM
+				lehre.tbl_lehreinheit
+				JOIN lehre.tbl_lehrveranstaltung as lehrfach on(tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id)
+				JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz)
+				JOIN public.tbl_benutzerfunktion ON(tbl_fachbereich.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz)
+			WHERE
+				tbl_benutzerfunktion.funktion_kurzbz='fbk'
+				AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now())
+				AND (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
+				AND tbl_lehreinheit.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
+				AND tbl_benutzerfunktion.oe_kurzbz=(
+					SELECT
+						tbl_studiengang.oe_kurzbz
+					FROM
+						lehre.tbl_lehrveranstaltung
+						JOIN public.tbl_studiengang USING(studiengang_kz)
+					WHERE lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
+					)
+				AND EXISTS(
+					SELECT
+						lehrveranstaltung_id
+					FROM
+						lehre.tbl_lehrveranstaltung
+					WHERE
+						lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
+						AND koordinator is null
+					)
+				";
+		if(!is_null($studiensemester_kurzbz))
+				$qry.=" AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+		$qry.="
+		) as a
+		JOIN campus.vw_mitarbeiter ON(a.uid=vw_mitarbeiter.uid)
+		WHERE vw_mitarbeiter.aktiv";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+
+				$obj->uid = $row->uid;
+				$obj->vorname = $row->vorname;
+				$obj->nachname = $row->nachname;
+				$obj->titelpost = $row->titelpost;
+				$obj->titelpre = $row->titelpre;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
