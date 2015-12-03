@@ -77,12 +77,12 @@ class news extends basis_db
 			$qry.= " AND (now()-datum)<interval '$maxalter days'";
 		}
 		if(!$all)
-			$qry.=' AND datum<=now() AND (datum_bis>= now()::date OR datum_bis is null)';
+			$qry.=" AND datum<=now() AND (datum_bis>= now()::date OR datum_bis is null)";
 			
 		if(trim($fachbereich_kurzbz)!='*')
 		{
 			if(is_null($fachbereich_kurzbz) || trim($fachbereich_kurzbz)=='')
-				$qry.=' AND fachbereich_kurzbz is null';	
+				$qry.=" AND fachbereich_kurzbz is null";	
 			else 
 				$qry.=" AND fachbereich_kurzbz=".$this->db_add_param(trim($fachbereich_kurzbz));
 		}

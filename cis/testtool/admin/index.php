@@ -31,7 +31,7 @@ require_once('../../../include/frage.class.php');
 require_once('../../../include/vorschlag.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/studiengang.class.php');
-  
+
 if (!$db = new basis_db())
 {
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -52,7 +52,7 @@ if(!$rechte->isBerechtigt('basis/testtool', null, 's'))
 $studiengang = new studiengang();
 $studiengang->getAll('typ, kurzbz', false);
 $stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'-1');
-	
+
 if(isset($_GET['gebiet_id']))
 {
 	$gebiet_id = $_GET['gebiet_id'];
@@ -112,7 +112,7 @@ function previewvorschlag()
 {
 	document.getElementById('vorschauvorschlag').innerHTML = document.getElementById('text_vorschlag').value;
 }
-function insertfrage(aTag, eTag) 
+function insertfrage(aTag, eTag)
 {
 	var input = document.forms['formular_frage'].elements['text'];
 	input.focus();
@@ -131,7 +131,7 @@ function insertfrage(aTag, eTag)
     input.selectionStart = pos;
     input.selectionEnd = pos;
 }
-function insertvorschlag(aTag, eTag) 
+function insertvorschlag(aTag, eTag)
 {
 	var input = document.forms['formular_vorschlag'].elements['text_vorschlag'];
 	input.focus();
@@ -150,6 +150,11 @@ function insertvorschlag(aTag, eTag)
     input.selectionStart = pos;
     input.selectionEnd = pos;
 }
+
+function confirmDeleteFrage()
+{
+    return confirm('Wollen Sie diese Frage wirklich löschen?');
+}
 </script>
 <style type="text/css">
 
@@ -164,7 +169,7 @@ font-size: 10pt;
 
 <h1>
 	<div style="float:left">Testtool - Administrationsseite</div>
-	<div style="text-align:right; padding-right: 5px;"><a href="uebersichtFragen.php" class="Item" target="blank">Fragenübersicht</a> | <a href="auswertung.php" class="Item">Auswertung</a> | <a href="Testtool.pdf" class="Item" target="_blank">Hilfe</a></div>
+	<div style="text-align:right; padding-right: 5px;"><a href="uebersichtGebiete.php" class="Item" target="blank">Gebietübersicht</a> |<a href="uebersichtFragen.php" class="Item" target="blank">Fragenübersicht</a> | <a href="auswertung.php" class="Item">Auswertung</a> | <a href="Testtool.pdf" class="Item" target="_blank">Hilfe</a></div>
 </h1>
 <?php
 
@@ -176,7 +181,7 @@ if(isset($_GET['type']) && $_GET['type']=='changesprache')
 
 if(!isset($_SESSION['sprache']))
 	$_SESSION['sprache']=DEFAULT_LANGUAGE;
-	
+
 $sprache = $_SESSION['sprache'];
 
 //Bei Upload des Bildes
@@ -270,7 +275,7 @@ if(isset($_POST['submitdata']))
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
 		die('Sie haben keine Berechtigung fuer diese Aktion');
-	
+
 	$frage = new frage();
 	if($frage->load($_GET['frage_id']))
 	{
@@ -278,14 +283,14 @@ if(isset($_POST['submitdata']))
 		$frage->nummer = $_POST['nummer'];
 		$frage->level = $_POST['level'];
 		$frage->new = false;
-		
+
 		if($frage->save())
 		{
 			if(!$frage->getFrageSprache($frage->frage_id, $sprache))
 			{
 				$frage->new=true;
 			}
-			
+
 			$frage->text = $_POST['text'];
 			$frage->sprache = $sprache;
 
@@ -298,14 +303,14 @@ if(isset($_POST['submitdata']))
 					echo "<b>Daten gespeichert</b><br />";
 					$nummer = $frage->nummer;
 				}
-				else 
+				else
 					echo '<b>Fehler:'.$frage->errormsg.'</b><br />';
 			}
-			else 
+			else
 			{
 				$frage_error_text = $frage->text;
 				echo '<b>Fehler: Text ist kein gueltiges XML:<span class="error"><br />';
-				foreach (libxml_get_errors() as $error) 
+				foreach (libxml_get_errors() as $error)
 				{
         			echo $error->message.'<br />';
     			}
@@ -324,7 +329,7 @@ if(isset($_POST['submitvorschlag']))
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
 		die('Sie haben keine Berechtigung fuer diese Aktion');
-	
+
 	$bildcontent='';
 	if(isset($_FILES['bild']['tmp_name']) && is_uploaded_file($_FILES['bild']['tmp_name']))
 	{
@@ -347,7 +352,7 @@ if(isset($_POST['submitvorschlag']))
 		else
 			echo "<b>Datei ist kein Bild!</b><br />";
 	}
-	
+
 	$audiocontent='';
 	if(isset($_FILES['audio']['tmp_name']) && is_uploaded_file($_FILES['audio']['tmp_name']))
 	{
@@ -409,18 +414,18 @@ if(isset($_POST['submitvorschlag']))
 		$vorschlag->sprache = $sprache;
 		$vorschlag->updateamum = date('Y-m-d H:i:s');
 		$vorschlag->updatevon = $user;
-		
+
 		$xml = '<?xml version="1.0" encoding="utf-8"?><root>'.$vorschlag->text.'</root>';
 		libxml_use_internal_errors(true);
 		if(simplexml_load_string($xml))
-		{			
+		{
 			if($vorschlag->save())
 			{
 				if($vorschlag->save_vorschlagsprache())
 				{
 					echo "<b>Vorschlag gespeichert</b><br />";
 				}
-				else 
+				else
 				{
 					$save_vorschlag_error=true;
 					echo "Fehler beim Speichern von Vorschlagsprache: $vorschlag->errormsg<br />";
@@ -432,11 +437,11 @@ if(isset($_POST['submitvorschlag']))
 				echo '<b>'.$vorschlag->errormsg.'</b><br />';
 			}
 		}
-		else 
+		else
 		{
 			$vorschlag_error_text = $vorschlag->text;
 			echo '<b>Fehler: Text ist kein gueltiges XML:<span class="error"><br />';
-			foreach (libxml_get_errors() as $error) 
+			foreach (libxml_get_errors() as $error)
 			{
     			echo $error->message.'<br />';
 			}
@@ -451,11 +456,23 @@ if(isset($_GET['type']) && $_GET['type']=='delete' && isset($_GET['vorschlag_id'
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
 		die('Sie haben keine Berechtigung fuer diese Aktion');
-	
+
 	$vs = new vorschlag();
 	if(!$vs->delete($_GET['vorschlag_id']))
 		echo '<b>'.$vs->errormsg.'</b><br />';
 	$vorschlag_id='';
+}
+
+if(isset($_POST['type']) && $_POST['type']=='deleteFrage')
+{
+    if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+
+    $frage = new frage();
+    if(!$frage->delete($_GET['frage_id']))
+    {
+        echo "Löschen fehlgeschlagen:".$frage->errormsg;
+    }
 }
 
 // anlegen einer neuen Frage
@@ -463,9 +480,9 @@ if(isset($_GET['type']) && $_GET['type']=='neuefrage')
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
 		die('Sie haben keine Berechtigung fuer diese Aktion');
-	
+
 	$frage_obj = new frage();
-	
+
 	$frage_obj->gebiet_id = $_GET['gebiet_id'];
 	$frage_obj->nummer=999;
 	$frage_obj->demo=false;
@@ -480,12 +497,12 @@ if(isset($_GET['type']) && $_GET['type']=='neuefrage')
 			echo 'Frage wurde erfolgreich angelegt';
 			$nummer=999;
 		}
-		else 
+		else
 		{
 			echo '<span class="error">Fehler beim Speichern der FrageSprache: '.$frage_obj->errormsg.'</span>';
 		}
 	}
-	else 
+	else
 	{
 		echo '<span class="error">Fehler beim Speichern der Frage: '.$frage_obj->errormsg.'</span>';
 	}
@@ -495,18 +512,18 @@ if(isset($_GET['type']) && $_GET['type']=='neuefrage')
 if(isset($_GET['type']) && $_GET['type']=='gebietpruefen' && isset($_GET['gebiet_id']))
 {
 	$gebiet = new gebiet($gebiet_id);
-	
+
 	if($gebiet->check_gebiet($gebiet_id))
 	{
 		echo "<b>Das Gebiet $gebiet->bezeichnung wurde erfolgreich ueberprueft</b>";
 	}
-	else 
+	else
 	{
 		echo "<b>Bei der Ueberpruefung des Gebiets '$gebiet->bezeichnung' sind folgende Fehler aufgetreten:<br /></b>";
 		echo nl2br($gebiet->errormsg);
 		echo '<br /><br />';
 	}
-	
+
 	$maxpunkte = $gebiet->berechneMaximalpunkte($gebiet_id);
 	if($gebiet->maxpunkte!=$maxpunkte)
 	{
@@ -519,63 +536,63 @@ echo '<table width="100%"><tr><td>';
 //Liste der Studiengänge
 echo 'Studiengang: <select onchange="window.location.href=this.value">';
 		echo '<option value="'.$PHP_SELF.'?" >Alle Studiengänge</option>';
-		foreach ($studiengang->result as $row) 
+		foreach ($studiengang->result as $row)
 		{
 			$stg_arr[$row->studiengang_kz] = $row->kuerzel;
 			if($stg_kz=='')
 				$stg_kz=$row->studiengang_kz;
 			if($row->studiengang_kz==$stg_kz)
 				$selected='selected="selected"';
-			else 
+			else
 				$selected='';
-				
+
 			echo '<option value="'.$PHP_SELF.'?stg_kz='.$row->studiengang_kz.'" '.$selected.'>'.$db->convert_html_chars($row->kuerzel).'</option>'."\n";
 		}
 		echo '</select>';
 
 //Liste der Gebiete
-	$qry= "SELECT * FROM testtool.tbl_ablauf WHERE studiengang_kz=".$stg_kz."";	
+	$qry= "SELECT * FROM testtool.tbl_ablauf WHERE studiengang_kz=".$stg_kz."";
 	$anzahl = $db->db_num_rows($db->db_query($qry));
-	
+
 	if ($stg_kz!=="-1" && $anzahl!==0)
 		$qry= "SELECT * FROM testtool.tbl_gebiet LEFT JOIN testtool.tbl_ablauf USING (gebiet_id) WHERE studiengang_kz=".$stg_kz." ORDER BY semester,reihung";
-	else 
+	else
 		$qry= "SELECT * FROM testtool.tbl_gebiet ORDER BY bezeichnung";
-		
+
 if (($anzahl!==0) || ($stg_kz=='-1') && ($stg_kz!==''))
 {
 	if($result = $db->db_query($qry))
 	{
 		echo ' Gebiet:<select onchange="window.location.href=\''.$PHP_SELF.'?stg_kz='.$stg_kz.'&amp;gebiet_id=\'+this.value;">';
 		//echo 'Gebiet: <select onchange="window.location.href=this.value">';
-	
+
 		while($row = $db->db_fetch_object($result))
 		{
 			if($gebiet_id=='')
 				$gebiet_id = $row->gebiet_id;
-			
+
 			if($gebiet_id==$row->gebiet_id)
 				$selected='selected="selected"';
-			else 
+			else
 				$selected='';
-			
+
 			if ($stg_kz=="-1")
 				echo '<option value="'.$row->gebiet_id.'" '.$selected.'>'.$row->bezeichnung.' - '.$row->kurzbz.' - '.$row->zeit.'</option>'."\n";
-			else 
+			else
 				echo '<option value="'.$row->gebiet_id.'" '.$selected.'>('.$row->semester.') - '.$row->bezeichnung.' - '.$row->kurzbz.' - '.$row->zeit.'</option>'."\n";
 		}
 		echo '</select>';
 	}
-		
+
 	echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;type=gebietpruefen' class='Item'>Pruefen</a> | ";
 	echo " <a href='edit_gebiet.php?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz' class='Item'>Bearbeiten</a>";
 	//echo " <br/>Gebiet_id=".$gebiet_id."";
 	echo '</td><td align="right">';
-	
+
 	//Liste der Sprachen
-	
+
 	$qry = "SELECT sprache FROM public.tbl_sprache WHERE content ORDER BY sprache DESC";
-	
+
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
@@ -584,17 +601,17 @@ if (($anzahl!==0) || ($stg_kz=='-1') && ($stg_kz!==''))
 				$sprache = $row->sprache;
 			if($sprache==$row->sprache)
 				$selected='style="border:1px solid black;"';
-			else 
+			else
 				$selected='';
 			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;stg_kz=$stg_kz&amp;type=changesprache&amp;sprache=$row->sprache' class='Item' $selected><img src='../bild.php?src=flag&amp;sprache=$row->sprache' alt='$row->sprache' title='$row->sprache'/></a>";
 		}
 	}
 	echo '</td></tr></table>';
 	echo '<br />';
-	
+
 	// Liste der Fragen
 	$qry = "SELECT distinct nummer FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($gebiet_id)." ORDER BY nummer";
-	
+
 	if($result = $db->db_query($qry))
 	{
 		echo 'Nummer: ';
@@ -602,7 +619,7 @@ if (($anzahl!==0) || ($stg_kz=='-1') && ($stg_kz!==''))
 		{
 			if($nummer=='')
 				$nummer = $row->nummer;
-	
+
 			if($nummer==$row->nummer)
 				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$row->nummer' class='Item'><u>$row->nummer</u></a> -";
 			else
@@ -612,30 +629,30 @@ if (($anzahl!==0) || ($stg_kz=='-1') && ($stg_kz!==''))
 		if($nummer<$db->db_num_rows($result)-1)
 			echo " - <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=".($nummer+1)."' class='Item'>Weiter &gt;&gt;</a>";
 	}
-	
+
 	echo "\n\n<br />";
-	
+
 	//Fragen holen
 	$frage = new frage();
 	$frage->getFragen($gebiet_id, $nummer);
-	
+
 	if(count($frage->result)==1)
 	{
 		$frage_id = $frage->result[0]->frage_id;
 	}
-	else 
+	else
 	{
 		//Wenn fuer diese Nummer mehrere Fragen vorhanden sind,
 		//koennen diese extra ausgewaehlt werden
 		echo 'FrageID: ';
-		foreach ($frage->result as $row) 
+		foreach ($frage->result as $row)
 		{
 			if($frage_id=='')
 				$frage_id=$row->frage_id;
-			
+
 			if($frage_id==$row->frage_id)
 				echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$row->nummer&amp;frage_id=$row->frage_id' class='Item'><u>$row->frage_id</u></a> -";
-			else 
+			else
 				echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$row->nummer&amp;frage_id=$row->frage_id' class='Item'>$row->frage_id</a> -";
 		}
 	}
@@ -650,9 +667,13 @@ if($frage_id!='')
 {
 	$frage->load($frage_id);
 	$frage->getFrageSprache($frage_id, $sprache);
-	
-	
-	echo "<table><tr><td>";
+
+
+	echo '<table><tr><td valign="top" align="right">';
+    echo '<form action="'.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$nummer.'&amp;frage_id='.$frage->frage_id.'" method="POST" onsubmit="return confirmDeleteFrage()">
+    <input type="hidden" name="type" value="deleteFrage" />
+    <input type="submit" value="Frage löschen" />
+    </form>';
 	//Fragen
 	echo "<table>";
 	echo "<tr>";
@@ -696,7 +717,7 @@ if($frage_id!='')
 	echo "<table>";
 	//Bei Aenderungen im Textfeld werden diese sofort in der Vorschau angezeigt
 	//Wenn beim Speichern der Text kein Gueltiges XML ist, wird der vorige Text erneut angezeigt
-	
+
 	echo "<tr valign='top'><td colspan='2'>\n<textarea name='text' id='text' cols='50' rows='27' oninput='preview()'><![CDATA[".(isset($frage_error_text)?$frage_error_text:$frage->text)."]]></textarea>\n</td>";
 	echo "<table><tr><td><input type='button' value='br' onclick='insertfrage(\"&lt;br/&gt;\", \"\")' />";
 	echo "<input type='button' value='F' style='font-weight:bold' onclick='insertfrage(\"&lt;strong&gt;\", \"&lt;/strong&gt;\")' />";
@@ -790,7 +811,7 @@ if($frage_id!='')
 	echo '<tr>';
 	//Upload Feld fuer Audio
 	echo "<td>Audio:</td><td><input type='file' name='audio' /></td></tr>";
-	
+
 	echo "<tr><td colspan='2' align='right'><input type='submit' name='submitvorschlag' value='Speichern' />".($vorschlag_id!=''?"<input type='button' value='Abbrechen' onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage->frage_id'\" />":'')."</td></tr>";
 	//Vorschau fuer das Text-Feld
 	echo "<tr><td colspan='2'>Vorschau:<br /><div id='vorschauvorschlag' style='border: 1px solid black' align='center'>$vorschlag->text</div></td></tr>";
@@ -818,7 +839,7 @@ if($frage_id!='')
 					  else
 					   echo "<td align='right' style='color:#FF8204'>$vs->punkte";
 					  echo "</td><td>$vs->text</td>
-					  <td>".($vs->bild!=''?"<img src='../bild.php?src=vorschlag&amp;vorschlag_id=$vs->vorschlag_id&amp;sprache=$sprache' height='24' onmouseover='height=200' onmouseout='height=24'/>":"")."</td>			
+					  <td>".($vs->bild!=''?"<img src='../bild.php?src=vorschlag&amp;vorschlag_id=$vs->vorschlag_id&amp;sprache=$sprache' height='24' onmouseover='height=200' onmouseout='height=24'/>":"")."</td>
 					  <td>";
 			$a[] = $vs->punkte;
 			if($vs->audio!='')
@@ -833,9 +854,9 @@ if($frage_id!='')
 					  <td><a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage->frage_id&amp;vorschlag_id=$vs->vorschlag_id'>edit</a></td>
 					  <td><a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage->frage_id&amp;vorschlag_id=$vs->vorschlag_id&amp;type=delete' onclick=\"return confirm('Wollen Sie diesen Eintrag wirklich loeschen?')\">delete</a></td>
 				  </tr>";
-		
+
 		}
-		
+
 		echo '<tr><td>Summe:</td><td align="left">'.number_format(array_sum($a),2, ".", "").'&nbsp;&nbsp;</td></tr>';
 		echo '</table><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>';
 	}

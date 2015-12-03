@@ -285,12 +285,14 @@ $studiensemester->getAll();
 			    <span type="text" id="terminBis" disabled="true"></span>
 			</td>
 		    </tr>
-		    <tr>
+		    <?php if(!defined('CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG') || CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG == true): ?>
+            <tr>
 			<td style="vertical-align: top; font-weight: bold;">Studienverpflichtung:* </td>
 			<td>
 			    <select id="studienverpflichtung"></select>
 			</td>
 		    </tr>
+            <?php endif; ?>
 		    <tr>
 			<td style="vertical-align: top; font-weight: bold;">Bemerkung: </td>
 			<td>

@@ -26,7 +26,7 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class gebiet extends basis_db 
+class gebiet extends basis_db
 {
 	//Tabellenspalten
 	public $gebiet_id;
@@ -48,7 +48,7 @@ class gebiet extends basis_db
 	public $insertvon;
 	public $updateamum;
 	public $updatevon;
-		
+
 	// ErgebnisArray
 	public $result=array();
 	public $new;
@@ -60,7 +60,7 @@ class gebiet extends basis_db
 	public function __construct($gebiet_id=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($gebiet_id))
 			$this->load($gebiet_id);
 	}
@@ -98,7 +98,7 @@ class gebiet extends basis_db
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->antwortenprozeile = $row->antwortenprozeile;
-				
+
 				return true;
 			}
 			else
@@ -113,7 +113,7 @@ class gebiet extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Prueft die Variablen vor dem Speichern
 	 * auf Gueltigkeit.
@@ -184,15 +184,15 @@ class gebiet extends basis_db
 	{
 		if(is_null($new))
 			$new = $this->new;
-		
+
 		//Variablen auf Gueltigkeit pruefen
 		if(!$this->validate())
 			return false;
-			
+
 		if($new)
 		{
-			$qry = 'BEGIN;INSERT INTO testtool.tbl_gebiet (kurzbz, bezeichnung, beschreibung, zeit, multipleresponse, 
-					kategorien, maxfragen, zufallfrage, zufallvorschlag, level_start, level_sprung_auf, level_sprung_ab, 
+			$qry = 'BEGIN;INSERT INTO testtool.tbl_gebiet (kurzbz, bezeichnung, beschreibung, zeit, multipleresponse,
+					kategorien, maxfragen, zufallfrage, zufallvorschlag, level_start, level_sprung_auf, level_sprung_ab,
 					levelgleichverteilung, maxpunkte, antwortenprozeile, insertamum, insertvon , updateamum, updatevon) VALUES('.
 			       $this->db_add_param($this->kurzbz).','.
 			       $this->db_add_param($this->bezeichnung).','.
@@ -235,7 +235,7 @@ class gebiet extends basis_db
 			       ' updatevon='.$this->db_add_param($this->updatevon).
 			       " WHERE gebiet_id=".$this->db_add_param($this->gebiet_id, FHC_INTEGER, false).";";
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			//aktuelle ID aus der Sequence holen
@@ -250,14 +250,14 @@ class gebiet extends basis_db
 						$this->db_query('COMMIT');
 						return true;
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Lesen der Sequence';
 						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Lesen der Sequence';
 					$this->db_query('ROLLBACK');
@@ -273,7 +273,7 @@ class gebiet extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * prueft das Gebiet auf Gueltigkeit
 	 * (diverse Plausichecks)
@@ -284,19 +284,19 @@ class gebiet extends basis_db
 	{
 		$this->errormsg = '';
 		$this->load($gebiet_id);
-	
+
 		//wenn levels verwendet werden muss maxfragen gesetzt sein
 		if($this->level_start!='' && $this->maxfragen=='')
 		{
 			$this->errormsg .= "Wenn Levels verwendet werden, muss die maximale Fragenanzahl gesetzt sein.\n";
 		}
-		
+
 		//Levelgleichverteilung gibt es nur bei nicht geleveltem ablauf
 		if($this->level_start!='' && $this->levelgleichverteilung)
 		{
 			$this->errormsg .= "Levelgleichverteilung ist nur dann erlaubt, wenn der Ablauf nicht gelevelt ist.\n";
 		}
-		
+
 		//Von jedem level muessen mindestens maxfragen vorhanden sein wenn levels aktiv ist
 		if($this->level_start!='')
 		{
@@ -312,9 +312,9 @@ class gebiet extends basis_db
 				}
 			}
 		}
-		
+
 		//Pruefen ob jede Fragen mindestens 2 Vorschlaege hat
-		$qry = "SELECT frage_id, nummer FROM testtool.tbl_frage 
+		$qry = "SELECT frage_id, nummer FROM testtool.tbl_frage
 				WHERE (SELECT count(*) as anzahl FROM testtool.tbl_vorschlag WHERE frage_id=tbl_frage.frage_id)<2
 				AND gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND NOT demo;";
 		if($this->db_query($qry))
@@ -337,7 +337,7 @@ class gebiet extends basis_db
 				}
 			}
 		}
-		
+
 		// Wenn Levelgleichverteilung true ist, muss maxfragen mindestens so gross wie die Anzahl der level sein
 		if($this->levelgleichverteilung)
 		{
@@ -351,13 +351,13 @@ class gebiet extends basis_db
 						if($row->anzahl>$this->maxfragen)
 						{
 							$this->errormsg .= "Wenn Levelgleichverteilung gesetzt ist, muss maxfragen groesser als die Anzahl der verwendeten Levels sein\n";
-						}						
+						}
 					}
 				}
 			}
 		}
-			
-		// Wenn zufallsfrage=true und level_start!='' oder levelgleichverteilung 
+
+		// Wenn zufallsfrage=true und level_start!='' oder levelgleichverteilung
 		// dann darf die punkteanzahl pro level/Frage sich nicht unterscheiden
 		if($this->zufallfrage && ($this->level_start!='' || $this->levelgleichverteilung))
 		{
@@ -365,10 +365,10 @@ class gebiet extends basis_db
 						SELECT level, count(*) as anzahl FROM (
 							SELECT level, punkte, count(*) as anzahl FROM (
 								SELECT level, sum(punkte) as punkte
-								FROM testtool.tbl_frage JOIN testtool.tbl_vorschlag USING(frage_id) 
+								FROM testtool.tbl_frage JOIN testtool.tbl_vorschlag USING(frage_id)
 								WHERE punkte>0 AND not demo AND gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)."
-								GROUP BY frage_id, level) as a 
-							GROUP BY level, punkte ) as b 
+								GROUP BY frage_id, level) as a
+							GROUP BY level, punkte ) as b
 						GROUP BY level) as c
 					WHERE c.anzahl>1";
 			if($this->db_query($qry))
@@ -379,33 +379,33 @@ class gebiet extends basis_db
 				}
 			}
 		}
-		
+
 		// kein Multipleresponse bei gelevelten Gebieten
 		if($this->level_start!='' && $this->level_start!=0 && $this->multipleresponse)
 		{
 			$this->errormsg .= "Bei gelevelten Gebieten ist Multipleresponse nicht erlaubt\n";
 		}
-		
+
 		// maxpunkte muss eingetragen sein
 		if($this->maxpunkte=='' || $this->maxpunkte==0)
 		{
 			$this->errormsg = "Es wurden keine Maximalpunkte fuer dieses Gebiet eingetragen\n";
 		}
-		
+
 		// Pruefung, ob eine Frage mehrere gleiche Antworten oder gleiche Bilder hat
 		$qry = "SELECT text AS antwort, sprache, frage_id, tbl_frage.nummer, COUNT(text) AS Anz
-				FROM testtool.tbl_vorschlag_sprache 
+				FROM testtool.tbl_vorschlag_sprache
 				JOIN testtool.tbl_vorschlag USING (vorschlag_id)
 				JOIN testtool.tbl_frage USING (frage_id)
 				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)."
 				AND (bild IS NULL AND audio IS NULL)
 				GROUP BY antwort,frage_id,tbl_frage.nummer,sprache
 				HAVING ( COUNT(text) > 1 )
-				
+
 				UNION
-				
+
 				SELECT bild AS antwort, sprache, frage_id, tbl_frage.nummer, COUNT(bild) AS Anz
-				FROM testtool.tbl_vorschlag_sprache 
+				FROM testtool.tbl_vorschlag_sprache
 				JOIN testtool.tbl_vorschlag USING (vorschlag_id)
 				JOIN testtool.tbl_frage USING (frage_id)
 				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)."
@@ -419,13 +419,13 @@ class gebiet extends basis_db
 				$this->errormsg .= "Frage Nummer $row->nummer (ID: $row->frage_id) Sprache $row->sprache hat mehrere gleiche Antworten.\n";
 			}
 		}
-		
+
 		if($this->errormsg=='')
 			return true;
-		else 
+		else
 			return false;
 	}
-	
+
 	/**
 	 * Holt alle Gebiete aus der DB
 	 *
@@ -434,13 +434,13 @@ class gebiet extends basis_db
 	public function getAll()
 	{
 		$qry = 'SELECT * FROM testtool.tbl_gebiet ORDER BY bezeichnung';
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new gebiet();
-				
+
 				$obj->gebiet_id = $row->gebiet_id;
 				$obj->kurzbz = $row->kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
@@ -461,19 +461,19 @@ class gebiet extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->antwortenprozeile = $row->antwortenprozeile;
-				
+
 				$this->result[] = $obj;
 			}
-			
+
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler in Fkt getAll()';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Berechnet die maxpunkte fuer das Gebiet
 	 *
@@ -483,10 +483,10 @@ class gebiet extends basis_db
 	{
 		if(!$this->load($gebiet_id))
 			return false;
-			
+
 		if(!$this->levelgleichverteilung && ($this->level_start=='' || $this->level_start==0))
 		{
-			$qry = "SELECT sum(punkte) as max 
+			$qry = "SELECT sum(punkte) as max
 					FROM testtool.tbl_vorschlag JOIN testtool.tbl_frage USING(frage_id)
 					WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND punkte>0 AND NOT demo";
 			if($this->maxfragen!='' && $this->maxfragen>0)
@@ -500,11 +500,11 @@ class gebiet extends basis_db
 						SELECT round((anz::decimal/fragengesamt::decimal)*$this->maxfragen*punkte) as punkteprolevel
 						FROM
 						(
-						SELECT 
-							level, punkte, count(*) as anz, 
-							(SELECT count(*) FROM testtool.tbl_frage 
+						SELECT
+							level, punkte, count(*) as anz,
+							(SELECT count(*) FROM testtool.tbl_frage
 							WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER).") as fragengesamt
-						FROM 
+						FROM
 							testtool.tbl_frage
 							JOIN testtool.tbl_vorschlag USING(frage_id)
 						WHERE
@@ -522,11 +522,11 @@ class gebiet extends basis_db
 						SELECT round((anz::decimal/fragengesamt::decimal)*$this->maxfragen*punkte) as punkteprolevel
 						FROM
 						(
-						SELECT 
-							level, punkte, count(*) as anz, 
-							(SELECT count(*) FROM testtool.tbl_frage 
+						SELECT
+							level, punkte, count(*) as anz,
+							(SELECT count(*) FROM testtool.tbl_frage
 							WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER).") as fragengesamt
-						FROM 
+						FROM
 							testtool.tbl_frage
 							JOIN testtool.tbl_vorschlag USING(frage_id)
 						WHERE
@@ -539,19 +539,19 @@ class gebiet extends basis_db
 		elseif($this->level_start!='')
 		{
 			//Maximalpunkte fuer geleveltes Gebiet ermitteln
-			
+
 			//Punkte pro Level holen
 			$qry = "
-			SELECT level, punkte 
+			SELECT level, punkte
 			FROM
 				(
-				SELECT level, frage_id, sum(punkte) as punkte 
+				SELECT level, frage_id, sum(punkte) as punkte
 				FROM testtool.tbl_frage JOIN testtool.tbl_vorschlag USING(frage_id)
-				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND punkte>0 AND level>=".$this->db_add_param($this->level_start)." AND NOT demo 
+				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND punkte>0 AND level>=".$this->db_add_param($this->level_start)." AND NOT demo
 				GROUP BY level, frage_id
-				) as a 
+				) as a
 			GROUP by level, punkte ORDER BY level";
-			
+
 			if($this->db_query($qry))
 			{
 				$maxfragen = $this->maxfragen;
@@ -572,26 +572,26 @@ class gebiet extends basis_db
 				return $maxpunkte;
 			}
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
 				return $row->max;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim Ermitteln der Maximalpunkte';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Ermitteln der Maximalpunkte';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Prueft ob das Gebiet bereits gestartet wurde.  Wahlweise pruefling_id oder prestudent_id
 	 *
@@ -603,7 +603,7 @@ class gebiet extends basis_db
 	public function isGestartet($gebiet_id, $pruefling_id=null, $prestudent_id=null)
 	{
 		$this->errormsg='';
-		
+
 		if(!is_numeric($gebiet_id) || $gebiet_id=='')
 		{
 			$this->errormsg = 'Gebiet_id muss eine gueltige Zahl sein';
@@ -619,40 +619,189 @@ class gebiet extends basis_db
 			$this->errormsg = 'Prestudent_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
-		$qry = '	SELECT 
-						begintime 
-					FROM 
+
+		$qry = '	SELECT
+						begintime
+					FROM
 						testtool.tbl_pruefling_frage
-					JOIN 
+					JOIN
 						testtool.tbl_pruefling USING (pruefling_id)
-					JOIN 
+					JOIN
 						testtool.tbl_frage USING (frage_id)
 					WHERE ';
 		if (!is_null($pruefling_id))
 			$qry.='		pruefling_id='.$this->db_add_param($pruefling_id, FHC_INTEGER);
 		else
 			$qry.='		prestudent_id='.$this->db_add_param($prestudent_id, FHC_INTEGER);
-			
-			$qry.='	AND 
+
+			$qry.='	AND
 						gebiet_id='.$this->db_add_param($gebiet_id, FHC_INTEGER).'
-					AND 
+					AND
 						begintime IS NOT NULL';
-		
+
 	 	if($result = $this->db_query($qry))
         {
             if($this->db_fetch_object($result))
-                return true; 
+                return true;
             else
-            { 
-                return false; 
+            {
+                return false;
             }
         }
         else
         {
-            $this->errormsg = 'Fehler bei der Abfrage aufgetreten'; 
-            return false; 
+            $this->errormsg = 'Fehler bei der Abfrage aufgetreten';
+            return false;
         }
+	}
+
+	/**
+	 * Laedt die Ablaufe die zu einem Gebiet zugeordnet sind
+	 * @param $gebiet_id
+	 * @return boolean true wenn ok, false im Fehlerfall
+	 */
+	public function loadAblaufGebiet($gebiet_id)
+	{
+		$qry = "SELECT * FROM testtool.tbl_ablauf WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER);
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+				$obj->ablauf_id = $row->ablauf_id;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->gebiet_id = $row->gebiet_id;
+				$obj->reihung = $row->reihung;
+				$obj->gewicht = $row->gewicht;
+				$obj->semester = $row->semester;
+				$obj->ablauf_vorgaben_id = $row->ablauf_vorgaben_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+
+				$this->result[] = $obj;
+			}
+			return false;
+		}
+	}
+
+	/**
+	 * Loescht ein Gebiet und den zugeordneten Ablauf
+	 * @param $gebiet_id
+	 * @return boolean true wenn ok, false im Fehlerfall
+	 */
+	public function delete($gebiet_id)
+	{
+		$qry = "SELECT * FROM testtool.tbl_frage WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER);
+
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+			{
+				$this->errormsg = 'Bitte entfernen Sie zuerst alle Fragen aus dem Gebiet';
+				return false;
+			}
+		}
+
+		$qry = "
+			DELETE FROM testtool.tbl_ablauf WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)."
+			DELETE FROM testtool.tbl_gebiet WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER);
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Loeschen des Gebiets';
+			return false;
+		}
+	}
+
+	/**
+	 * Loescht einen Ablauf
+	 * @param $ablauf_id
+	 * @return boolean true wenn ok, false im Fehlerfall
+	 */
+	public function deleteAblaufZuordnung($ablauf_id)
+	{
+		$qry = "DELETE FROM testtool.tbl_ablauf WHERE ablauf_id=".$this->db_add_param($ablauf_id, FHC_INTEGER);
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Entfernen des Ablaufs';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt alle AblaufVorabe Eintraege
+	 * @return boolean true wenn ok, false im Fehlerfall
+	 */
+	public function getAblaufVorgaben()
+	{
+		$qry = "SELECT * FROM testtool.tbl_ablauf_vorgaben ORDER BY studiengang_kz";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+
+				$obj->ablauf_vorgaben_id = $row->ablauf_vorgaben_id;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->sprache = $row->sprache;
+				$obj->sprachwahl = $this->db_parse_bool($row->sprachwahl);
+				$obj->content_id = $row->content_id;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Speichert den Ablauf
+	 */
+	public function saveAblauf()
+	{
+		if($this->new)
+		{
+			$qry = "INSERT INTO testtool.tbl_ablauf (studiengang_kz, gebiet_id, reihung,gewicht,semester,ablauf_vorgaben_id, insertamum, insertvon) VALUES(".
+				$this->db_add_param($this->studiengang_kz, FHC_INTEGER).','.
+				$this->db_add_param($this->gebiet_id, FHC_INTEGER).','.
+				$this->db_add_param($this->reihung, FHC_INTEGER).','.
+				$this->db_add_param($this->gewicht, FHC_INTEGER).','.
+				$this->db_add_param($this->semester, FHC_INTEGER).','.
+				$this->db_add_param($this->ablauf_vorgaben_id, FHC_INTEGER).','.
+				$this->db_add_param($this->insertamum).','.
+				$this->db_add_param($this->insertvon).');';
+		}
+		else
+		{
+			$this->errormsg='not implemented';
+			return false;
+		}
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der Daten';
+			return true;
+		}
 	}
 }
 ?>

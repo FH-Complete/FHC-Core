@@ -36,7 +36,7 @@ class frage extends basis_db
 	public $demo;
 	public $level;
 	public $kategorie_kurzbz;
-	
+
 	public $sprache;
 	public $audio;
 	public $text;
@@ -45,12 +45,12 @@ class frage extends basis_db
 	public $prueflingfrage_id;
 	public $begintime;
 	public $endtime;
-	
+
 	public $insertamum;
 	public $updateamum;
 	public $insertvon;
 	public $updatevon;
-	
+
 	// ErgebnisArray
 	public $result=array();
 	public $num_rows=0;
@@ -63,7 +63,7 @@ class frage extends basis_db
 	public function __construct($frage_id=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($frage_id))
 			$this->load($frage_id);
 	}
@@ -73,13 +73,13 @@ class frage extends basis_db
 	 * @param $frage_id ID der Frage die geladen werden soll
 	 */
 	public function load($frage_id)
-	{ 
+	{
 		if(!is_numeric($frage_id) || $frage_id=='')
 		{
 			$this->errormsg = 'Frage_id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM testtool.tbl_frage WHERE frage_id=".$this->db_add_param($frage_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
@@ -96,7 +96,7 @@ class frage extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->level = $row->level;
-				
+
 				return true;
 			}
 			else
@@ -136,7 +136,7 @@ class frage extends basis_db
 
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'BEGIN;INSERT INTO testtool.tbl_frage (kategorie_kurzbz, gebiet_id, level, nummer, demo, 
+			$qry = 'BEGIN;INSERT INTO testtool.tbl_frage (kategorie_kurzbz, gebiet_id, level, nummer, demo,
 													insertamum, insertvon, updateamum, updatevon) VALUES('.
 			       $this->db_add_param($this->kategorie_kurzbz).','.
 			       $this->db_add_param($this->gebiet_id, FHC_INTEGER).','.
@@ -159,7 +159,7 @@ class frage extends basis_db
 			       ' updatevon='.$this->db_add_param($this->updatevon).
 			       " WHERE frage_id=".$this->db_add_param($this->frage_id, FHC_INTEGER, false).";";
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			if($this->new)
@@ -173,21 +173,21 @@ class frage extends basis_db
 						$this->db_query('COMMIT');
 						return true;
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Lesen der Sequence';
 						$this->db_query('ROLLBACK');
 						return false;
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Lesen der Sequence';
 					$this->db_query('ROLLBACK');
 					return false;
 				}
 			}
-			else 
+			else
 			{
 				return true;
 			}
@@ -229,7 +229,7 @@ class frage extends basis_db
 			       ' updatevon='.$this->db_add_param($this->updatevon).
 			       " WHERE frage_id=".$this->db_add_param($this->frage_id, FHC_INTEGER, false)." AND sprache=".$this->db_add_param($this->sprache).";";
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -250,7 +250,7 @@ class frage extends basis_db
 	 */
 	public function getFragen($gebiet_id, $nummer)
 	{
-		$qry = "SELECT * FROM testtool.tbl_frage 
+		$qry = "SELECT * FROM testtool.tbl_frage
 				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND nummer=".$this->db_add_param($nummer);
 
 		if($this->db_query($qry))
@@ -258,18 +258,18 @@ class frage extends basis_db
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new frage();
-				
+
 				$obj->frage_id = $row->frage_id;
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
 				$obj->gebiet_id = $row->gebiet_id;
 				$obj->level = $row->level;
 				$obj->nummer = $row->nummer;
 				$obj->demo = $this->db_parse_bool($row->demo);
-				
+
 				$this->result[] = $obj;
 			}
-			
-			return true;			
+
+			return true;
 		}
 		else
 		{
@@ -277,7 +277,7 @@ class frage extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert die Fragen eines Gebietes
 	 *
@@ -286,7 +286,7 @@ class frage extends basis_db
 	 */
 	public function getFragenGebiet($gebiet_id)
 	{
-		$qry = "SELECT * FROM testtool.tbl_frage 
+		$qry = "SELECT * FROM testtool.tbl_frage
 				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." ORDER BY nummer";
 
 		if($this->db_query($qry))
@@ -294,18 +294,18 @@ class frage extends basis_db
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new frage();
-				
+
 				$obj->frage_id = $row->frage_id;
 				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
 				$obj->gebiet_id = $row->gebiet_id;
 				$obj->level = $row->level;
 				$obj->nummer = $row->nummer;
 				$obj->demo = $this->db_parse_bool($row->demo);
-				
+
 				$this->result[] = $obj;
 			}
-			
-			return true;			
+
+			return true;
 		}
 		else
 		{
@@ -328,26 +328,26 @@ class frage extends basis_db
 	{
 		if($demo)
 		{
-			$qry = "SELECT frage_id FROM testtool.tbl_frage 
-					WHERE tbl_frage.gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." 
+			$qry = "SELECT frage_id FROM testtool.tbl_frage
+					WHERE tbl_frage.gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)."
 					AND demo ";
 			if(!is_null($frage_id))
 				$qry.=" AND nummer<(SELECT nummer FROM testtool.tbl_frage WHERE frage_id=".$this->db_add_param($frage_id, FHC_INTEGER).")";
 			$qry .= " ORDER BY nummer DESC LIMIT 1";
 		}
-		else 
+		else
 		{
-			$qry = "SELECT frage_id FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id) 
-					WHERE 
-						tbl_frage.gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND 
+			$qry = "SELECT frage_id FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id)
+					WHERE
+						tbl_frage.gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND
 						tbl_pruefling_frage.pruefling_id=".$this->db_add_param($pruefling_id, FHC_INTEGER)." AND
 						NOT demo ";
-			
+
 			if(!is_null($frage_id))
 				$qry.="	AND tbl_pruefling_frage.nummer>(SELECT nummer FROM testtool.tbl_pruefling_frage WHERE pruefling_id=".$this->db_add_param($pruefling_id, FHC_INTEGER)." AND frage_id=".$this->db_add_param($frage_id, FHC_INTEGER)." LIMIT 1)";
 			elseif(is_null($frage_id) && $levelgebiet)
 				$qry.=" AND tbl_pruefling_frage.endtime is null ";
-				
+
 			$qry.="ORDER BY tbl_pruefling_frage.nummer ASC LIMIT 1";
 		}
 
@@ -361,7 +361,7 @@ class frage extends basis_db
 		else
 			return false;
 	}
-	
+
 	/**
 	 * Laedt die Frage in der angegebenen Sprache
 	 *
@@ -373,7 +373,7 @@ class frage extends basis_db
 	{
 		$qry = "SELECT * FROM testtool.tbl_frage_sprache JOIN testtool.tbl_frage USING(frage_id)
 				WHERE frage_id=".$this->db_add_param($frage_id, FHC_INTEGER)." AND sprache=".$this->db_add_param($sprache);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -387,26 +387,26 @@ class frage extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
-				
+
 				$this->level = $row->level;
 				$this->demo = $this->db_parse_bool($row->demo);
 				$this->nummer = $row->nummer;
-				
+
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler beim Laden der Frage';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Frage';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert das naechste Level zu dem noch Fragen fehlen
 	 *
@@ -420,10 +420,10 @@ class frage extends basis_db
 			if($row>0)
 				return $key;
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * Generiert den Fragenpool fuer den Pruefling bzw
 	 * die naechste Frage bei gelevelten Gebieten
@@ -434,7 +434,7 @@ class frage extends basis_db
 	public function generateFragenpool($pruefling_id, $gebiet_id)
 	{
 		$gebiet = new gebiet($gebiet_id);
-		
+
 		//Bei Levelgesteuerten Fragen wird nur die erste Frage angelegt
 		if($gebiet->level_start!='')
 		{
@@ -454,10 +454,10 @@ class frage extends basis_db
 			}
 			$maxfragen=1;
 		}
-		else 
+		else
 		{
 			$maxfragen = $gebiet->maxfragen;
-			
+
 			// Wie viele Fragen gibt es in diesem Gebiet
 			$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage WHERE NOT demo AND gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER);
 			if($this->db_query($qry))
@@ -467,23 +467,23 @@ class frage extends basis_db
 					$fragengesamt = $row->anzahl;
 				}
 			}
-			
+
 			// Wenn im Gebiet keine Maximalzahl angegeben ist, dann kommen alle Fragen in den Pool
 			if($maxfragen=='')
 			{
 				$maxfragen = $fragengesamt;
 			}
-			
+
 			$level = array();
-			
+
 			// Bei Levelgleichverteilung die Anzahl der Fragen pro level ermitteln
 			if($gebiet->levelgleichverteilung)
 			{
-				$qry = "SELECT level, count(*) as anzahl FROM testtool.tbl_frage 
+				$qry = "SELECT level, count(*) as anzahl FROM testtool.tbl_frage
 						WHERE NOT demo AND gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)."
 						GROUP BY level
 						ORDER BY level";
-				
+
 				if($this->db_query($qry))
 				{
 					while($row = $this->db_fetch_object())
@@ -491,7 +491,7 @@ class frage extends basis_db
 						$level[$row->level]=round(($row->anzahl/$fragengesamt)*$maxfragen);
 					}
 				}
-				
+
 				// Von jedem Gebiet muss mindestens eine Frage kommen
 				foreach ($level as $key=>$row)
 				{
@@ -502,9 +502,9 @@ class frage extends basis_db
 				}
 			}
 		}
-		
+
 		$this->db_query('BEGIN;');
-		
+
 		while($maxfragen>0)
 		{
 			//Bei levelgleichverteilung das Level der naechsten Frage holen
@@ -518,20 +518,20 @@ class frage extends basis_db
 			{
 				$nextlevel=null;
 			}
-			
+
 			$this->frage_id=$this->getNewFrage($gebiet_id, $pruefling_id, $nextlevel);
-			
+
 			if($this->frage_id=='')
 				break;
-			
+
 			$this->pruefling_id=$pruefling_id;
-			
+
 			//hoechste Nummer holen
-			$qry = "SELECT 
+			$qry = "SELECT
 						tbl_pruefling_frage.nummer
 					FROM
 						testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id)
-					WHERE 
+					WHERE
 						tbl_frage.gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND
 						tbl_pruefling_frage.pruefling_id=".$this->db_add_param($pruefling_id, FHC_INTEGER)."
 					ORDER BY nummer DESC LIMIT 1;";
@@ -539,7 +539,7 @@ class frage extends basis_db
 			{
 				if($row = $this->db_fetch_object())
 					$this->nummer = $row->nummer+1;
-				else 
+				else
 					$this->nummer = 1;
 			}
 			else
@@ -548,7 +548,7 @@ class frage extends basis_db
 				$this->db_query('ROLLBACK');
 				return false;
 			}
-			
+
 			$this->begintime='';
 			$this->endtime='';
 
@@ -558,14 +558,14 @@ class frage extends basis_db
 				$this->db_query('ROLLBACK');
 				return false;
 			}
-			
+
 			$maxfragen--;
 		}
 
 		$this->db_query('COMMIT;');
 		return true;
 	}
-	
+
 	/**
 	 * Laedt eine Prueflingfrage
 	 *
@@ -579,7 +579,7 @@ class frage extends basis_db
 			$this->errormsg = 'prueflingfrage_id ist ungueltig';
 			return false;
 		}
-	
+
 		$qry = "SELECT * FROM testtool.tbl_pruefling_frage WHERE prueflingfrage_id=".$this->db_add_param($prueflingfrage_id, FHC_INTEGER);
 		if($this->db_query($qry))
 		{
@@ -591,22 +591,22 @@ class frage extends basis_db
 				$this->nummer = $row->nummer;
 				$this->begintime = $row->begintime;
 				$this->endtime = $row->endtime;
-				
+
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Es wurde keine PrueflingFrage mit der uebergebenen ID gefunden';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der PrueflingFrage';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt eine Prueflingfrage
 	 *
@@ -621,15 +621,15 @@ class frage extends basis_db
 			$this->errormsg = 'Pruefling_id ist ungueltig';
 			return false;
 		}
-		
+
 		if(!is_numeric($frage_id) || $frage_id=='')
 		{
 			$this->errormsg = 'Frage_id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM testtool.tbl_pruefling_frage WHERE pruefling_id=".$this->db_add_param($pruefling_id, FHC_INTEGER)." AND frage_id=".$this->db_add_param($frage_id, FHC_INTEGER);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -640,21 +640,21 @@ class frage extends basis_db
 				$this->nummer = $row->nummer;
 				$this->begintime = $row->begintime;
 				$this->endtime = $row->endtime;
-				
+
 				return true;
 			}
-			else 
+			else
 			{
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der PrueflingFrage';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Prueft die Daten vor dem Speichern in die Tabelle tbl_pruefling_frage
 	 *
@@ -666,13 +666,13 @@ class frage extends basis_db
 			$this->errormsg = 'Pruefling_id ist ungueltig';
 			return false;
 		}
-		
+
 		if(!is_numeric($this->frage_id) || $this->frage_id=='')
 		{
 			$this->errormsg = 'Frage_id ist ungueltig';
-			return false;	
+			return false;
 		}
-		
+
 		if(!is_numeric($this->nummer))
 		{
 			$this->errormsg = 'Nummer ist ungueltig';
@@ -680,7 +680,7 @@ class frage extends basis_db
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Speichert einen Eintrag in der Tabelle tbl_pruefling_frage
 	 *
@@ -695,7 +695,7 @@ class frage extends basis_db
 
 		if(is_null($new))
 			$new = $this->new;
-		
+
 		if($new)
 		{
 			$qry = 'INSERT INTO testtool.tbl_pruefling_frage(pruefling_id, frage_id, nummer, begintime, endtime) VALUES('.
@@ -705,7 +705,7 @@ class frage extends basis_db
 					$this->db_add_param($this->begintime).','.
 					$this->db_add_param($this->endtime).');';
 		}
-		else 
+		else
 		{
 			$qry = 'UPDATE testtool.tbl_pruefling_frage SET'.
 					' pruefling_id='.$this->db_add_param($this->pruefling_id, FHC_INTEGER).','.
@@ -715,18 +715,18 @@ class frage extends basis_db
 					' endtime='.$this->db_add_param($this->endtime).
 					" WHERE prueflingfrage_id=".$this->db_add_param($this->prueflingfrage_id, FHC_INTEGER, false);
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Speichern in tbl_pruefling_frage';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Sucht eine neue Frage fuer einen Pruefling
 	 *
@@ -738,35 +738,35 @@ class frage extends basis_db
 	{
 		$gebiet = new gebiet($gebiet_id);
 		$pruefling = new pruefling();
-		
-		
+
+
 		//Frage suchen die dem pruefling noch nicht zugeordnet ist
-		$qry = "SELECT frage_id FROM testtool.tbl_frage 
-				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND				
-					frage_id NOT IN (SELECT frage_id FROM testtool.tbl_pruefling_frage 
+		$qry = "SELECT frage_id FROM testtool.tbl_frage
+				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND
+					frage_id NOT IN (SELECT frage_id FROM testtool.tbl_pruefling_frage
 								WHERE pruefling_id=".$this->db_add_param($pruefling_id, FHC_INTEGER, false)."
 								)
 					AND NOT demo";
-		
+
 		// Wenn die Frage abhaengig vom level sein soll, dann den aktuellen Level ermitteln und dazuhaengen
 		if($gebiet->level_start!='')
 		{
-			$level2 = $pruefling->getPrueflingLevel($pruefling_id, $gebiet_id);	
+			$level2 = $pruefling->getPrueflingLevel($pruefling_id, $gebiet_id);
 			$qry.=" AND level=".$this->db_add_param($level2);
 		}
-		
+
 		// Bei Levelgleichverteilung wird der Level mituebergeben
 		if(!is_null($level))
 		{
 			$qry.=" AND level=".$this->db_add_param($level);
 		}
-		
+
 		//Sortierung
 		if($gebiet->zufallfrage)
 			$qry .= " ORDER BY random()";
-		else 
+		else
 			$qry .= " ORDER BY nummer ASC";
-		
+
 		$qry .= " LIMIT 1";
 
 		if($this->db_query($qry))
@@ -775,15 +775,47 @@ class frage extends basis_db
 			{
 				return $row->frage_id;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Es gibt keine Fragen die den Kriterien entsprechen';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Holen der Frage';
+			return false;
+		}
+	}
+
+	public function delete($frage_id)
+	{
+		$qry = "SELECT * FROM
+			testtool.tbl_antwort
+			JOIN testtool.tbl_vorschlag USING(vorschlag_id)
+			WHERE tbl_vorschlag.frage_id=".$this->db_add_param($frage_id, FHC_INTEGER);
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+			{
+				$this->errormsg = 'Frage kann nicht gelöscht werden da bereits Antworten vorhanden sind';
+				return false;
+			}
+		}
+
+		$qry = "
+		DELETE FROM testtool.tbl_vorschlag_sprache WHERE vorschlag_id IN (SELECT vorschlag_id FROM testtool.tbl_vorschlag WHERE frage_id=".$this->db_add_param($frage_id, FHC_INTEGER).");
+		DELETE FROM testtool.tbl_vorschlag WHERE frage_id=".$this->db_add_param($frage_id, FHC_INTEGER).";
+		DELETE FROM testtool.tbl_frage_sprache WHERE frage_id=".$this->db_add_param($frage_id, FHC_INTEGER).";
+		DELETE FROM testtool.tbl_frage WHERE frage_id=".$this->db_add_param($frage_id, FHC_INTEGER);
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim loeschen der Frage';
 			return false;
 		}
 	}

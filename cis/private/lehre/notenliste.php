@@ -99,6 +99,8 @@ if(isset($_GET['uid']))
     else
         $getParam = "";
 }
+else
+	$getParam='';
 
 $datum_obj = new datum();
 

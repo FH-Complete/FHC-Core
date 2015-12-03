@@ -162,7 +162,7 @@ if(isset($_POST['save']))
 				{
 					$firma_oe->firma_id = $firma->firma_id;
 					$firma_oe->new = true;
-					$firma_oe->oe_kurzbz='etw';
+					$firma_oe->oe_kurzbz='gst';
 					$firma_oe->insertamum = date('Y-m-d H:i:s');
 					$firma_oe->insertvon = $user;
 				}
@@ -410,7 +410,7 @@ if($method=='new' || $method=='update')
 		$firma_id = $firma->firma_id;
 		
 		$firma_oe = new firma();
-		$firma_oe->get_firmaorganisationseinheit($firma_id,'etw');
+		$firma_oe->get_firmaorganisationseinheit($firma_id,'gst');
 		if(isset($firma_oe->result[0]))
 		{
 			$kundennummer_erhalter = $firma_oe->result[0]->kundennummer;
