@@ -1331,6 +1331,7 @@ class lehrveranstaltung extends basis_db
 				$obj->lehrveranstaltung_id = $lv->lehrveranstaltung_id;
 				$obj->studiengang_kz = $lv->studiengang_kz;
 				$obj->bezeichnung = $lv->bezeichnung;
+				$obj->bezeichnung_english = $lv->bezeichnung_english;
 				$obj->kurzbz = $lv->kurzbz;
 				$obj->lehrform_kurzbz = $lv->lehrform_kurzbz;
 				$obj->semester = $lv->semester;
@@ -1343,6 +1344,16 @@ class lehrveranstaltung extends basis_db
 				$obj->stpllv_koordinator = $lv->stpllv_koordinator;
 				$obj->lvnr = $lv->lvnr;
 				$obj->stpllv_sort = $lv->stpllv_sort;
+				$obj->oe_kurzbz = $lv->oe_kurzbz;
+				$obj->sws = $lv->sws;
+				$obj->alvs = $lv->alvs;
+				$obj->lvs = $lv->lvs;
+				$obj->lvps = $lv->lvps;
+				$obj->las = $lv->las;
+				$obj->semesterwochen = $lv->semesterwochen;
+				$obj->orgform_kurzbz = $lv->orgform_kurzbz;
+				$obj->incoming = $lv->incoming;
+				$obj->sprache = $lv->sprache;
 
 				$obj->children = array();
 				if(count($lv->childs) > 0)
@@ -1629,6 +1640,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->lvnr = $row->lvnr;
 			$lv_obj->semester_alternativ = $row->semester_alternativ;
 			$lv_obj->farbe = $row->farbe;
+			$lv_obj->oe_kurzbz = $row->oe_kurzbz;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;

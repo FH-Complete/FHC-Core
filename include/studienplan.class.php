@@ -345,7 +345,7 @@ class studienplan extends basis_db
 	    }
 
 	    //loeschen des Datensatzes
-	    $qry="DELETE FROM public.tbl_studienplan WHERE studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER, false).";";
+	    $qry="DELETE FROM lehre.tbl_studienplan WHERE studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER, false).";";
 
 	    if($this->db_query($qry))
 	    {

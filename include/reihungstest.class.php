@@ -416,4 +416,17 @@ class reihungstest extends basis_db
 
 		return $obj->anzahl;
 	}
+	
+	public function delete($reihungstest_id)
+	{
+	    $qry = "DELETE from public.tbl_reihungstest WHERE reihungstest_id=".$this->db_add_param($reihungstest_id);
+	    
+	    if(!$this->db_query($qry))
+	    {
+		$this->errormsg = 'Fehler beim Löschen der Daten';
+		return false;
+	    }
+	    
+	    return true;
+	}
 }
