@@ -83,6 +83,7 @@ foreach ($dok->result as $row)
 	// Schleife für alle Akten -> wenn akte draufhängt id in rdf -> akte_id anhängen
 	
 	$onlinebewerbung = ($row->onlinebewerbung)?'ja':'nein'; 
+	$pflicht = ($row->pflicht)?'ja':'nein';
 	// Wenn Akten vorhanden anzeigen
 	if(count($akte->result) != 0)
 	{
@@ -93,7 +94,7 @@ foreach ($dok->result as $row)
 			$datumhochgeladen=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):''; 
 			$nachgereicht = (isset($a->nachgereicht) && $a->nachgereicht)?'ja':''; 
 			$info = (isset($a->anmerkung))?$akte->result[0]->anmerkung:''; 
-			$vorhanden = (isset($a->dms_id) || $a->inhalt_vorhanden)?'ja':'nein'; 
+			$vorhanden = (isset($a->dms_id) || $a->inhalt_vorhanden)?'ja':((isset($a->nachgereicht) && $a->nachgereicht)?'nachgereicht':'nein'); 
 
 			echo 	'
 			  <RDF:li>
@@ -109,6 +110,7 @@ foreach ($dok->result as $row)
 						<DOKUMENT:titel_intern><![CDATA['.$a->titel_intern.']]></DOKUMENT:titel_intern>
 						<DOKUMENT:anmerkung_intern><![CDATA['.$a->anmerkung_intern.']]></DOKUMENT:anmerkung_intern>
 						<DOKUMENT:onlinebewerbung><![CDATA['.$onlinebewerbung.']]></DOKUMENT:onlinebewerbung>
+						<DOKUMENT:pflicht><![CDATA['.$pflicht.']]></DOKUMENT:pflicht>
 					</RDF:Description>
 			  </RDF:li>
 				  ';
@@ -130,6 +132,7 @@ foreach ($dok->result as $row)
 						<DOKUMENT:titel_intern></DOKUMENT:titel_intern>
 						<DOKUMENT:anmerkung_intern></DOKUMENT:anmerkung_intern>
 						<DOKUMENT:onlinebewerbung><![CDATA['.$onlinebewerbung.']]></DOKUMENT:onlinebewerbung>
+						<DOKUMENT:pflicht><![CDATA['.$pflicht.']]></DOKUMENT:pflicht>
 					</RDF:Description>
 			  </RDF:li>
 				  ';
