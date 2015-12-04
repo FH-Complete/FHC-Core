@@ -259,11 +259,30 @@ if($result = $db->db_query($qry))
 								}
 							}
 							
+							$verwfkt_found=false;
+
+							// Wenn mehrere Verwendungen vorhanden sind fuer und funktionen fuer die gleichen Studiengaenge
+							// dann muessen diese zusammengezaehlt werden
+							if(isset($verwendung_data[$key]['fkt']) && is_array($verwendung_data[$key]['fkt']))
+							{
+								foreach($verwendung_data[$key]['fkt'] as $key_verwfkt=>$row_verwfkt)
+								{
+									if($row_verwfkt['stgkz']==$rowfkt->studiengang_kz)
+									{
+										$verwendung_data[$key]['fkt'][$key_verwfkt]['sws']+=$rowfkt->sws;
+										$verwfkt_found=true;
+										break;
+									}
+								}
+							}
+							if(!$verwfkt_found)
+							{
 							$verwendung_data[$key]['fkt'][] = array(
 								'stgkz'=>$rowfkt->studiengang_kz,
 								'sws'=>$rowfkt->sws,
 								'hauptberuflich'=>$rowvw->hauptberuflich,
 								'hauptberufcode'=>$rowvw->hauptberufcode);
+							}
 						}
 					}
 				}

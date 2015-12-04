@@ -447,5 +447,57 @@ class ort extends basis_db
 		}
 		return true;
 	}
+	
+	/**
+	 * Laedt alle verfuegbaren Orte
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getActive($aktiv=true, $lehre=true, $raumtyp_kurzbz=null)
+	{
+		$qry = 'SELECT * FROM public.tbl_ort WHERE aktiv='.$this->db_add_param($aktiv, FHC_BOOLEAN);
+		
+		if(!is_null($raumtyp_kurzbz) && $raumtyp_kurzbz!='')
+		{
+		    $qry .= ' AND raumtyp_kurzbz='.$this->db_add_param($raumtyp_kurzbz, FHC_STRING);
+		}
+		if(!is_null($lehre))
+		{
+		    $qry .= ' AND lehre='.$this->db_add_param($lehre, FHC_BOOLEAN);
+		}
+		
+		$qry .= ' ORDER BY ort_kurzbz;';
+
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Laden der Datensaetze';
+			return false;
+		}
+
+		while($row = $this->db_fetch_object())
+		{
+			$ort_obj = new ort();
+
+			$ort_obj->ort_kurzbz 		= $row->ort_kurzbz;
+			$ort_obj->bezeichnung 		= $row->bezeichnung;
+			$ort_obj->planbezeichnung 	= $row->planbezeichnung;
+			$ort_obj->max_person 		= $row->max_person;
+			$ort_obj->aktiv 			= $this->db_parse_bool($row->aktiv);
+			$ort_obj->lehre 			= $this->db_parse_bool($row->lehre);
+			$ort_obj->lageplan 			= $row->lageplan;
+			$ort_obj->dislozierung 		= $row->dislozierung;
+			$ort_obj->kosten 			= $row->kosten;
+			$ort_obj->reservieren		= $this->db_parse_bool($row->reservieren);
+			$ort_obj->ausstattung		= $row->ausstattung;
+			$ort_obj->stockwerk			= $row->stockwerk;
+			$ort_obj->standort_id		= $row->standort_id;
+			$ort_obj->telefonklappe		= $row->telefonklappe;
+			$ort_obj->content_id		= $row->content_id;
+			$ort_obj->m2				= $row->m2;
+			$ort_obj->oe_kurzbz			= $row->oe_kurzbz;
+			$ort_obj->gebteil			= $row->gebteil;
+			$this->result[] = $ort_obj;
+		}
+		return true;
+	}
 }
 ?>

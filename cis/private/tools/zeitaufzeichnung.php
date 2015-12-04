@@ -895,7 +895,13 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		$l_arr = $lehre->getLehreForUser($user, $sem_akt);
 		if ($l_arr["LehreAuftraege"]>0 || $l_arr["LehreIntern"] > 0 || $l_arr["LehreExtern"] > 0)
 		{		
-			$l_extern_soll = $l_arr["LehreAuftraege"]-$lehre_inkludiert;
+			if ($lehre_inkludiert == -1)
+			{
+				$l_extern_soll = 0;
+				$lehre_inkludiert = $l_arr["LehreAuftraege"];
+			}
+			else			
+				$l_extern_soll = $l_arr["LehreAuftraege"]-$lehre_inkludiert;
 			$l_extern_soll_norm = $l_extern_soll/4*3;
 			$lehre_inkludiert_norm = $lehre_inkludiert/4*3;
 			echo '<table style="border: 1px solid gray">';

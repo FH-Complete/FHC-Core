@@ -313,7 +313,7 @@ class betriebsmittelperson extends basis_db
 	 * @param $betriebsmitteltyp Typ auf den gefiltert werden soll
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	public function getBetriebsmittelPerson($person_id, $betriebsmitteltyp=null)
+	public function getBetriebsmittelPerson($person_id, $betriebsmitteltyp=null, $order=null)
 	{
 		$this->result=array();
 		$this->errormsg = '';
@@ -326,7 +326,11 @@ class betriebsmittelperson extends basis_db
 				WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		if(!is_null($betriebsmitteltyp))
 			$qry.=" AND betriebsmitteltyp=".$this->db_add_param($betriebsmitteltyp);
-		$qry.=" ORDER BY betriebsmitteltyp, nummer";
+
+		if(!is_null($order))
+			$qry.=" ORDER BY ".$order;
+		else
+			$qry.=" ORDER BY betriebsmitteltyp, nummer";
 
 		if($this->db_query($qry))
 		{

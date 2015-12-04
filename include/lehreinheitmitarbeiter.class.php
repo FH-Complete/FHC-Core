@@ -489,4 +489,49 @@ class lehreinheitmitarbeiter extends basis_db
 
 		return $ret;
 	}
+
+	/**
+	 * Laedt die Lektoren einer Lehrveranstlatung in einem Studiensemester
+	 * @param lehrveranstaltung_id
+	 * @param studiensemester_kurzbz
+	 * @return array + true wenn ok / false im Fehlerfall
+	 */
+	public function getMitarbeiterLV($lehrveranstaltung_id, $studiensemester_kurzbz)
+	{
+		if(!is_numeric($lehrveranstaltung_id))
+		{
+			$this->errormsg = 'Lehreinheit_id ist ungueltig';
+			return false;
+		}
+
+		$qry = "SELECT
+					vw_mitarbeiter.uid, vorname, nachname, titelpre, titelpost
+				FROM
+					lehre.tbl_lehreinheitmitarbeiter
+					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+					JOIN campus.vw_mitarbeiter ON(tbl_lehreinheitmitarbeiter.mitarbeiter_uid=vw_mitarbeiter.uid)
+				WHERE
+					lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
+					AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+		$qry .=" ORDER BY nachname, vorname;";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new stdClass();
+				$obj->vorname = $row->vorname;
+				$obj->nachname = $row->nachname;
+				$obj->uid = $row->uid;
+				$obj->titelpre = $row->titelpre;
+				$obj->titelpost = $row->titelpost;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+
+		return false;
+	}
+
 }
