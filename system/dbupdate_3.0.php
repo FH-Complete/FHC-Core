@@ -3237,7 +3237,7 @@ if($result = @$db->db_query("SELECT 1 FROM public.tbl_gruppe WHERE gruppe_kurzbz
 	if($db->db_num_rows($result)==0)
 	{
 		$qry = "
-		INSERT INTO public.tbl_gruppe(gruppe_kurzbz,studiengang_kz,semester,bezeichnung,beschreibung,sichtbar,lehre,aktiv,sort,mailgrp,generiert,insertamum,insertvon,orgform_kurzbz,content_visible,gesperrt,zutrittssystem) VALUES('CMS_LOCK',0,NULL,'CMS_LOCK','Sperrgruppe CMS',FALSE,TRUE,TRUE,NULL,FALSE,FALSE,now(),'checksystem',NULL,WAHR,FALSE,FALSE);
+		INSERT INTO public.tbl_gruppe(gruppe_kurzbz,studiengang_kz,semester,bezeichnung,beschreibung,sichtbar,lehre,aktiv,sort,mailgrp,generiert,insertamum,insertvon,orgform_kurzbz,content_visible,gesperrt,zutrittssystem) VALUES('CMS_LOCK',0,NULL,'CMS_LOCK','Sperrgruppe CMS',FALSE,TRUE,TRUE,NULL,FALSE,FALSE,now(),'checksystem',NULL,TRUE,FALSE,FALSE);
 		";
 
 		if(!$db->db_query($qry))
