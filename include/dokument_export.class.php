@@ -33,7 +33,7 @@ class dokument_export
 	private $temp_filename;
 	private $temp_folder;
 	private $images=array();
-	
+
 	/**
 	 * Konstruktor
 	 */
@@ -52,7 +52,7 @@ class dokument_export
 		if($this->vorlage->style!='')
 		{
 			$this->styles_xsl = new DOMDocument;
-			if(!$this->styles_xsl->loadXML($vorlage->style))
+			if(!$this->styles_xsl->loadXML($this->vorlage->style))
 				die('unable to load styles xsl');
 		}
 
@@ -163,7 +163,7 @@ class dokument_export
 		$proc->importStyleSheet($this->content_xsl);
 
 		$contentbuffer = $proc->transformToXml($this->xml_data);
-		
+
 		$this->temp_folder = '/tmp/fhcunoconv-'.uniqid();
 		mkdir($this->temp_folder);
 		chdir($this->temp_folder);
@@ -173,7 +173,7 @@ class dokument_export
 		if(!is_null($this->styles_xsl))
 		{
 			$style_proc = new XSLTProcessor;
-			$style_proc->importStyleSheet($this->styles_xsl); 
+			$style_proc->importStyleSheet($this->styles_xsl);
 
 			$stylesbuffer = $style_proc->transformToXml($this->xml_data);
 
@@ -200,7 +200,7 @@ class dokument_export
 		$tempname_zip = 'out.zip';
 		if(!copy($zipfile, $tempname_zip))
 			die('copy failed');
-		
+
 		exec("zip $tempname_zip content.xml");
 		if(!is_null($this->styles_xsl))
 			exec("zip $tempname_zip styles.xml");
@@ -227,7 +227,7 @@ class dokument_export
 			foreach($this->images as $bild)
 			{
 				copy($bild['path'], 'Pictures/'.$bild['name']);
-	
+
 				//Neues Element unterhalb des Root Nodes anlegen
 				$node = $manifest_xml->createElement("manifest:file-entry");
 				$node->setAttribute("manifest:full-path",'Pictures/'.$bild['name']);
@@ -266,7 +266,7 @@ class dokument_export
 					$this->errormsg = 'Dokumentenkonvertierung ist derzeit nicht möglich. Bitte informieren Sie den Administrator';
 					return false;
 				}
-				break;	
+				break;
 			case 'odt':
 			default:
 				$this->temp_filename = $tempname_zip;
@@ -284,13 +284,13 @@ class dokument_export
 	 */
 	public function output($download=true)
 	{
-	
+
 		$fsize = filesize($this->temp_filename);
 		if(!$handle = fopen($this->temp_filename,'r'))
 			die('load failed');
 
 		if($download)
-		{                
+		{
 			switch($this->outputformat)
 			{
 				case 'pdf':
@@ -350,7 +350,7 @@ class dokument_export
 			rmdir('META-INF');
 		}
 
-	
+
 		rmdir($this->temp_folder);
 
 		return true;
@@ -363,15 +363,15 @@ class dokument_export
 	 * @param $xml_data SimpleXMLElement fuer Rekursionsaufloesung
 	 * @return xml
 	 */
-	private function ConvertArrayToXML($data, $rootElement=null, $xml_data=null ) 
+	private function ConvertArrayToXML($data, $rootElement=null, $xml_data=null )
 	{
 		$_xml_data = $xml_data;
-		if ($_xml_data === null) 
+		if ($_xml_data === null)
 			$_xml_data = new SimpleXMLElement($rootElement !== null ? '<'.$rootElement.' />' : '<root/>');
 
-		foreach( $data as $key => $value ) 
+		foreach( $data as $key => $value )
 		{
-		    if( is_array($value) ) 
+		    if( is_array($value) )
 			{
 		        if( is_numeric($key) )
 				{
@@ -383,8 +383,8 @@ class dokument_export
 		        	$subnode = $_xml_data->addChild($key);
 			        $this->ConvertArrayToXML($value, null, $subnode);
 				}
-		    } 
-			else 
+		    }
+			else
 		        $_xml_data->addChild("$key",htmlspecialchars("$value"));
 		}
 		return $_xml_data->asXML();
