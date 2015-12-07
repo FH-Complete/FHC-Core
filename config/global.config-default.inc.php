@@ -195,8 +195,4 @@ define('BEWERBERTOOL_GTM', '');
 
 // Array mit Usern die nicht Kollidieren
 define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
-
-// Soll der Lageplan am Infoterminal angezeigt werden (true|false)
-define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN', true);
-
 ?>
