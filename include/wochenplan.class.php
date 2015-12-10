@@ -638,7 +638,14 @@ class wochenplan extends basis_db
 
 		// Formularbeginn wenn Lektor
 		if ($raumres && $this->type=='ort')
-			echo '<form name="reserve" method="post" action="stpl_week.php">'.$this->crlf;
+		{
+			$ort = new ort();
+			$ort->load($this->ort_kurzbz);
+			if($ort->reservieren)
+				echo '<form name="reserve" method="post" action="stpl_week.php">'.$this->crlf;
+			else
+				$raumres=false;
+		}
 
 		//Tabelle zeichnen
 		echo '	<table class="stdplan" width="100%" border="0" cellpadding="1" cellspacing="1" name="Stundenplantabelle" align="center">'.$this->crlf;
