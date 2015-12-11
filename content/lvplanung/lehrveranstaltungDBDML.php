@@ -1251,6 +1251,7 @@ if(!$error)
 					$leDAO->lehrform_kurzbz=$_POST['lehrform'];
 					$leDAO->stundenblockung=$_POST['stundenblockung'];
 					$leDAO->wochenrythmus=$_POST['wochenrythmus'];
+					$leDAO->gewicht = $_POST['gewicht'];
 
 					if (isset($_POST['start_kw']))
 						$leDAO->start_kw=$_POST['start_kw'];

@@ -52,6 +52,7 @@ class lehreinheit extends basis_db
 	public $updatevon;					// varchar(16)
 	public $sprache;					// varchar(16)
 	public $ext_id;						// bigint
+	public $gewicht=1;					// smallint
 
 	public $anz=0;						//Zahler fuer erweiterte Attribute
 	public $mitarbeiter_uid=array();
@@ -112,6 +113,7 @@ class lehreinheit extends basis_db
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->ext_id = $row->ext_id;
+				$this->gewicht = $row->gewicht;
 				return true;
 			}
 			else
@@ -242,6 +244,7 @@ class lehreinheit extends basis_db
 				$le_obj->updateamum = $row->updateamum;
 				$le_obj->updatevon = $row->updatevon;
 				$le_obj->ext_id = $row->ext_id;
+				$le_obj->gewicht = $row->gewicht;
 
 				$this->lehreinheiten[] = $le_obj;
 			}
@@ -354,6 +357,11 @@ class lehreinheit extends basis_db
 			return false;
 		}
 
+		if($this->gewicht!='' && !is_numeric($this->gewicht))
+		{
+			$this->errormsg = 'Gewicht muss eine gueltige Zahl sein';
+			return false;
+		}
 		return true;
 	}
 
@@ -383,7 +391,7 @@ class lehreinheit extends basis_db
 			//ToDo ID entfernen
 			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz,
 			                                     lehrfach_id, lehrform_kurzbz, stundenblockung, wochenrythmus,
-			                                     start_kw, raumtyp, raumtypalternativ, lehre, anmerkung, unr, lvnr, insertamum, insertvon, updateamum, updatevon,  sprache)
+			                                     start_kw, raumtyp, raumtypalternativ, lehre, anmerkung, unr, lvnr, insertamum, insertvon, updateamum, updatevon,  sprache, gewicht)
 			        VALUES('.$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).','.
 					$this->db_add_param($this->studiensemester_kurzbz).','.
 					$this->db_add_param($this->lehrfach_id, FHC_INTEGER).','.
@@ -401,7 +409,8 @@ class lehreinheit extends basis_db
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->updateamum).','.
 					$this->db_add_param($this->updatevon).','.
-					$this->db_add_param($this->sprache).');';
+					$this->db_add_param($this->sprache).','.
+					$this->db_add_param($this->gewicht, FHC_INTEGER).');';
 		}
 		else
 		{
@@ -421,7 +430,8 @@ class lehreinheit extends basis_db
 			       ' lvnr='.$this->db_add_param($this->lvnr, FHC_INTEGER).','.
 				   ' updateamum='.$this->db_add_param($this->updateamum).','.
 				   ' updatevon='.$this->db_add_param($this->updatevon).','.
-				   ' sprache='.$this->db_add_param($this->sprache).' '.
+				   ' sprache='.$this->db_add_param($this->sprache).', '.
+				   ' gewicht='.$this->db_add_param($this->gewicht).' '.
 			       " WHERE lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).";";
 		}
 
