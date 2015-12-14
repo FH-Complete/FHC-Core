@@ -56,6 +56,9 @@ define('CIS_GESAMTNOTE_PUNKTE',false);
 // Gibt an ob der Lektor erneut eine LVNote eintragen kann wenn bereits eine Zeugnisnote vorhanden ist (true | false) DEFAULT true
 define('CIS_GESAMTNOTE_UEBERSCHREIBEN',true);
 
+// Gewichtung der Lehreinheiten bei Noteneintragung true|false
+define('CIS_GESAMTNOTE_GEWICHTUNG', true);
+
 // Gibt an ob im FAS bei den Lehrveranstaltungsnoten ein zusaetzliches Formular angezeigt wird um
 // Vertraege fuer Pruefungshonorare anzulegen
 define('FAS_GESAMTNOTE_PRUEFUNGSHONORAR',false);
@@ -195,8 +198,4 @@ define('BEWERBERTOOL_GTM', '');
 
 // Array mit Usern die nicht Kollidieren
 define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
-
-// Soll der Lageplan am Infoterminal angezeigt werden (true|false)
-define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN', true);
-
 ?>

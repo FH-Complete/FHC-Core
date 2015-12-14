@@ -33,7 +33,6 @@ $sprache = getSprache();
 $p=new phrasen($sprache); 
 	
 $uid = get_uid();
-$uid = 'pam';
 
 if (isset($_GET['id']))
 	$id=$_GET['id'];

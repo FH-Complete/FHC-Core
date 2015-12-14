@@ -5482,5 +5482,5 @@ function StudentCisNotenliste(event)
     var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
 	var uid = tree.view.getCellText(tree.currentIndex,col);
     
-    window.open('<?php echo CIS_ROOT; ?>cis/private/lehre/notenliste.php?uid='+uid);
+    window.open('<?php echo CIS_ROOT; ?>cis/private/lehre/notenliste.php?stsem=alle&uid='+uid);
 }

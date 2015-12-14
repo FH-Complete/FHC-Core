@@ -29,18 +29,15 @@ require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/ort.class.php');
 require_once('../../../include/phrasen.class.php');
 
-$sprache = getSprache(); 
-$p=new phrasen($sprache); 
+$sprache = getSprache();
+$p=new phrasen($sprache);
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
-	
-
 
 $uid=get_uid();
-?>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 <HEAD>
 	<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -54,7 +51,7 @@ $uid=get_uid();
 	  		if (restore)
 	  			selObj.selectedIndex=0;
 		}
-		
+
         function toggle_checkboxes(obj)
         {
 			var f = obj.form;
@@ -66,7 +63,7 @@ $uid=get_uid();
 					e.checked = f.check_all.checked;
 			}
 		}
-        
+
         $(document).ready(function() {
             $("select[name='studiengang_kz']").change(function() {
                 var studiengang_kz = $("select[name='studiengang_kz']").val();
@@ -77,7 +74,7 @@ $uid=get_uid();
                          },
                     type: "POST",
                     dataType: "json",
-                    success: function(data) 
+                    success: function(data)
                     {
                         $("select[name='semester']").empty();
                         $("select[name='semester']").append('<option value="">*</option>');
@@ -85,13 +82,13 @@ $uid=get_uid();
                             $("select[name='semester']").append('<option value="'+data+'">'+data+'</option>');
                         });
                     },
-                    error: function(data) 
+                    error: function(data)
                     {
                         alert("Fehler beim Laden der Daten");
                     }
                 });
             })
-            
+
             $("select[name='semester']").change(function() {
                 var studiengang_kz = $("select[name='studiengang_kz']").val();
                 var semester = $("select[name='semester']").val();
@@ -103,7 +100,7 @@ $uid=get_uid();
                          },
                     type: "POST",
                     dataType: "json",
-                    success: function(data) 
+                    success: function(data)
                     {
                         $("select[name='verband']").empty();
                         $("select[name='verband']").append('<option value="">*</option>');
@@ -111,13 +108,13 @@ $uid=get_uid();
                             $("select[name='verband']").append('<option value="'+data+'">'+data+'</option>');
                         });
                     },
-                    error: function(data) 
+                    error: function(data)
                     {
                         alert("Fehler beim Laden der Daten");
                     }
                 });
             })
-            
+
             $("select[name='verband']").change(function() {
                 var studiengang_kz = $("select[name='studiengang_kz']").val();
                 var semester = $("select[name='semester']").val();
@@ -131,7 +128,7 @@ $uid=get_uid();
                          },
                     type: "POST",
                     dataType: "json",
-                    success: function(data) 
+                    success: function(data)
                     {
                         $("select[name='gruppe']").empty();
                         $("select[name='gruppe']").append('<option value="">*</option>');
@@ -139,7 +136,7 @@ $uid=get_uid();
                             $("select[name='gruppe']").append('<option value="'+data+'">'+data+'</option>');
                         });
                     },
-                    error: function(data) 
+                    error: function(data)
                     {
                         alert("Fehler beim Laden der Daten");
                     }
@@ -152,7 +149,6 @@ $uid=get_uid();
 	<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
 	<script src="../../../include/js/flexcroll.js" type="text/javascript" ></script>
 </HEAD>
-
 <BODY id="inhalt">
 <div class="flexcroll" style="outline: none;">
 <h1><?php echo $p->t('lvplan/wochenplan');?></h1>
@@ -298,14 +294,14 @@ if (!isset($pers_uid))
 if (isset($_POST['reserve']))
 	$reserve=$_POST['reserve'];
 else if (isset($_GET['reserve']))
-	$reserve=$_GET['reserve'];	
+	$reserve=$_GET['reserve'];
 // Reservieren
 if (isset($reserve) && $raumres)
 {
 	$ort_obj = new ort();
 	if(!$ort_obj->load($ort_kurzbz))
 		die($p->t('lvplan/raumExistiertNicht'));
-	
+
 	if(!$erg_std=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 	{
 		die($db->db_last_error());
@@ -319,13 +315,13 @@ if (isset($reserve) && $raumres)
 		{
 			$stunde=$db->db_result($erg_std,$j,'"stunde"');
 			$var='reserve'.$t.'_'.$stunde;
-				
+
 			if (isset($_REQUEST[$var]))
 			{
 				$datum_res=$_REQUEST[$var];
 
 				$reservierung = new reservierung();
-				
+
 				if(!$reservierung->isReserviert($ort_kurzbz, $datum_res, $stunde))
 				{
 					if (empty($_REQUEST['titel']) && empty($_REQUEST['beschreibung']))
@@ -335,7 +331,7 @@ if (isset($reserve) && $raumres)
 					else if ( empty($_REQUEST['beschreibung']))
 						echo "<br>".$p->t('lvplan/beschreibungFehlt')."! <br>";
 					else
-					{			 
+					{
 	  					$reservierung = new reservierung();
 		  				$reservierung->datum = $datum_res;
 				  		$reservierung->ort_kurzbz = $ort_kurzbz;
@@ -344,7 +340,7 @@ if (isset($reserve) && $raumres)
 		  				$reservierung->titel = $_REQUEST['titel'];
 		  				$reservierung->insertamum=date('Y-m-d H:i:s');
 		  				$reservierung->insertvon=$uid;
-		  				
+
 		  				if(isset($_REQUEST['studiengang_kz']))
 		  				{
 		  					$reservierung->studiengang_kz = $_REQUEST['studiengang_kz'];
@@ -359,17 +355,17 @@ if (isset($reserve) && $raumres)
 			  				$reservierung->studiengang_kz='0';
 			  				$reservierung->uid = $uid;
 		  				}
-		  				
+
 	  					if(!$reservierung->save(true))
 		  					echo $reservierung->errormsg;
 	            		else
 	         				$count++;
-            		}    
+            		}
 				}
 				else
 				{
 					echo "<br>$ort_kurzbz ".$p->t('lvplan/bereitsReserviert').": $datum_res - Stunde $stunde <br>";
-				}	
+				}
 			}
 		}
 	}

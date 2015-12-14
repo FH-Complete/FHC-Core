@@ -2697,7 +2697,7 @@ if(!$error)
 						$return = false;
 					}
 
-                    if(FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $return == true && $noten->new == true)
+                    if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $return == true && $noten->new == true)
                     {
 						NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $noten->note);
 					}
@@ -2812,7 +2812,7 @@ if(!$error)
 						}
 						else
 						{
-							if(FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
+							if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
 				            {
 								NotePruefungAnlegen($zeugnisnote->studiensemester_kurzbz, $zeugnisnote->student_uid, $zeugnisnote->lehrveranstaltung_id, $zeugnisnote->note);
 							}
@@ -2971,7 +2971,7 @@ if(!$error)
 							}
 							else
 							{
-								if(FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
+								if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
 						        {
 									NotePruefungAnlegen($semester_aktuell, $uid, $_POST['lehrveranstaltung_id'], $zeugnisnote->note);
 								}

@@ -23,7 +23,7 @@
  * Klasse benutzerfunktion (FAS-Online)
  * @create 04-12-2006
  */
-require_once(dirname(__FILE__).'/basis_db.class.php');	
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class benutzerfunktion extends basis_db
 {
@@ -57,7 +57,7 @@ class benutzerfunktion extends basis_db
 	public function __construct($benutzerfunktion_id=null)
 	{
 		parent::__construct();
-		
+
 		if($benutzerfunktion_id != null)
 			$this->load($benutzerfunktion_id);
 	}
@@ -106,7 +106,7 @@ class benutzerfunktion extends basis_db
 	 */
 	public function benutzerfunktion_exists($uid, $benutzerfunktion)
 	{
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzerfunktion 
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzerfunktion
 				WHERE uid=".$this->db_add_param($uid)." AND funktion_kurzbz=".$this->db_add_param($benutzerfunktion);
 
 		if($row = $this->db_fetch_object($this->db_query($qry)))
@@ -131,8 +131,8 @@ class benutzerfunktion extends basis_db
 	 */
 	public function getBenutzerFunktion($uid, $funktion_kurzbz, $oe_kurzbz)
 	{
-		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
-				WHERE uid=".$this->db_add_param($uid)." AND funktion_kurzbz=".$this->db_add_param($funktion_kurzbz)." 
+		$qry = "SELECT * FROM public.tbl_benutzerfunktion
+				WHERE uid=".$this->db_add_param($uid)." AND funktion_kurzbz=".$this->db_add_param($funktion_kurzbz)."
 				AND oe_kurzbz=".$this->db_add_param($oe_kurzbz);
 
 		if($result = $this->db_query($qry))
@@ -168,7 +168,7 @@ class benutzerfunktion extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt mehrere BenutzerFunktionen
 	 * @param funktion_kurzbz, studiengang_kz, semester
@@ -177,7 +177,7 @@ class benutzerfunktion extends basis_db
 	 */
 	public function getBenutzerFunktionen($funktion_kurzbz, $oe_kurzbz='', $semester='', $uid='')
 	{
-		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
+		$qry = "SELECT * FROM public.tbl_benutzerfunktion
 				WHERE funktion_kurzbz=".$this->db_add_param($funktion_kurzbz)."
 				AND (datum_bis >= now() OR datum_bis IS NULL)
 				AND (datum_von <= now() OR datum_von IS NULL)";
@@ -188,7 +188,7 @@ class benutzerfunktion extends basis_db
 			$qry.=" AND semester=".$this->db_add_param($semester);
 		if($uid!='')
 			$qry.=" AND uid=".$this->db_add_param($uid);
-		
+
 		$qry.=" ORDER BY funktion_kurzbz, oe_kurzbz, semester";
 
 		if($result = $this->db_query($qry))
@@ -196,7 +196,7 @@ class benutzerfunktion extends basis_db
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new benutzerfunktion();
-				
+
 				$obj->benutzerfunktion_id = $row->benutzerfunktion_id;
 				$obj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
 				$obj->uid = $row->uid;
@@ -211,9 +211,9 @@ class benutzerfunktion extends basis_db
 				$obj->datum_bis = $row->datum_bis;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->wochenstunden = $row->wochenstunden;
-				
+
 				$this->result[] = $obj;
-				
+
 			}
 			return true;
 		}
@@ -283,7 +283,7 @@ class benutzerfunktion extends basis_db
 			$this->errormsg='Benutzerfunktion_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "DELETE FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id=".$this->db_add_param($benutzerfunktion_id, FHC_INTEGER);
 		if(!$this->db_query($qry))
 		{
@@ -293,7 +293,7 @@ class benutzerfunktion extends basis_db
 		else
 			return true;
 	}
-		
+
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
@@ -379,13 +379,13 @@ class benutzerfunktion extends basis_db
 						$this->benutzerfunktion_id = $row->id;
 						$this->db_query('COMMIT;');
 					}
-					else 
+					else
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						$this->db_query('ROLLBACK');
 					}
 				}
-				else 
+				else
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					$this->db_query('ROLLBACK');
@@ -399,7 +399,7 @@ class benutzerfunktion extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Lädt alle Benutzerfunktionen zu einer UID
 	 * @param type $uid UID des Mitarbeiters
@@ -410,7 +410,7 @@ class benutzerfunktion extends basis_db
 	 */
 	public function getBenutzerFunktionByUid($uid, $funktion_kurzbz=null, $startZeitraum=null, $endeZeitraum=null)
 	{
-	    $qry = "SELECT * FROM public.tbl_benutzerfunktion 
+	    $qry = "SELECT * FROM public.tbl_benutzerfunktion
 			    WHERE uid=".$this->db_add_param($uid);
 	    if(!is_null($funktion_kurzbz))
 	    {
@@ -458,7 +458,7 @@ class benutzerfunktion extends basis_db
 		return false;
 	    }
 	}
-	
+
 	/**
 	 * Laedt alle Benutzerfunktionen in einer Organisationseinheit
 	 * @param $oe_kurzbz
@@ -470,7 +470,7 @@ class benutzerfunktion extends basis_db
 	 */
 	public function getOeFunktionen($oe_kurzbz, $funktionen_kurzbz=null, $startZeitraum=null, $endeZeitraum=null)
 	{
-		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
+		$qry = "SELECT * FROM public.tbl_benutzerfunktion
 				WHERE oe_kurzbz=".$this->db_add_param($oe_kurzbz);
 
 		if(!is_null($funktionen_kurzbz))
@@ -486,15 +486,15 @@ class benutzerfunktion extends basis_db
 	    {
 			$qry .=' AND (datum_von IS NULL OR datum_von <='.$this->db_add_param($endeZeitraum).')';
 	    }
-		
+
 		$qry.=" ORDER BY bezeichnung, uid";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new benutzerfunktion();
-				
+
 				$obj->benutzerfunktion_id = $row->benutzerfunktion_id;
 				$obj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
 				$obj->uid = $row->uid;
@@ -509,9 +509,9 @@ class benutzerfunktion extends basis_db
 				$obj->datum_bis = $row->datum_bis;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->wochenstunden = $row->wochenstunden;
-				
+
 				$this->result[] = $obj;
-				
+
 			}
 			return true;
 		}
@@ -521,5 +521,7 @@ class benutzerfunktion extends basis_db
 			return false;
 		}
 	}
+
+	
 }
 ?>

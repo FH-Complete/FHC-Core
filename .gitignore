@@ -1,7 +1,7 @@
 .htaccess
 /nbproject/
 /vendor/*
-!/vendor/easyui
+!/vendor/FHC-vendor
 /.idea/
 documents/
 .settings

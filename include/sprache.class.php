@@ -56,7 +56,7 @@ class sprache extends basis_db
 	 */
 	public function load($sprache)
 	{
-		$qry = "SELECT * FROM public.tbl_sprache WHERE sprache=".$this->db_add_param($sprache, FHC_STRING, false).";";
+		$qry = "SELECT *,".$this->getSprachQuery('bezeichnung')." FROM public.tbl_sprache WHERE sprache=".$this->db_add_param($sprache, FHC_STRING, false).";";
 		
 		if($this->db_query($qry))
 		{
@@ -66,6 +66,7 @@ class sprache extends basis_db
 				$this->locale = $row->locale; 
 				$this->index = $row->index; 
 				$this->content = $this->db_parse_bool($row->content);
+				$this->bezeichnung_arr=$this->parseSprachResult('bezeichnung',$row);
 				return true; 
 			}
 			else

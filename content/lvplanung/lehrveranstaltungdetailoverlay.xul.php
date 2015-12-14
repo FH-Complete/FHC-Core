@@ -26,6 +26,7 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
 $user = get_uid();
@@ -118,6 +119,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<row>
 					<label value="LV-ID" <?php echo ($rechte->isBerechtigt('lehre/lehrveranstaltung',null,'suid'))?'':'hidden="true"'; ?>/>
 		  			<textbox id="lehrveranstaltung-detail-textbox-lehrveranstaltung" disabled="true" maxlength="20" <?php echo ($rechte->isBerechtigt('lehre/lehrveranstaltung',null,'suid'))?'':'hidden="true"'; ?>/>
+					<label value="Gewicht" <?php echo (defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG)?'':'hidden="true"'; ?>/>
+					<textbox id="lehrveranstaltung-detail-textbox-gewicht" disabled="true" maxlength="4" <?php echo (defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG)?'':'hidden="true"'; ?>/>
+
 				</row>
 				<row>
 		  			<label value="Lehrfach" />

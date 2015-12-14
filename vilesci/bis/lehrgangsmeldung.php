@@ -129,7 +129,14 @@ if($result = $db->db_query($qry))
 	}
 }
 $lehrgangsnummer = $erhalter.sprintf('%04s', abs($stg_kz));
-
+$tabelle = '<table>
+	<tr>
+		<th>UID</th>
+		<th>Nachname</th>
+		<th>Vorname</th>
+		<th>PersKz</th>
+	</tr>';
+$anzahl_gemeldet=0;
 //Hauptselect
 $qry="SELECT DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
 	FROM public.tbl_student
@@ -445,7 +452,10 @@ if($result = $db->db_query($qry))
 			continue;
 		}
 		else
-		{
+		{	
+			$anzahl_gemeldet++;
+			$tabelle.='<tr><td>'.$row->student_uid.'</td><td>'.$row->nachname.'</td><td>'.$row->vorname.'</td><td>'.$row->matrikelnr.'</td></tr>';
+
 			//Erstellung der XML-Datei
 				$datei.="
 			<StudentIn>
@@ -480,7 +490,7 @@ if($result = $db->db_query($qry))
 				}
 				//<HeimatStrasse><![CDATA[".$strasse."]]></HeimatStrasse>
 
-				if($row->zgvmanation!='')
+				if($row->zgvmanation!='' && $lgartcode==1) // Master Lehrgang
 					$ausstellungsstaat = $row->zgvmanation;
 				elseif($row->zgvnation!='')
 					$ausstellungsstaat = $row->zgvnation;
@@ -537,6 +547,8 @@ if($result = $db->db_query($qry))
 	 </StudentIn>";
 		}
 	}
+	$tabelle.='</table>';
+
 	$datei.="
      </Lehrgang>
   </LehrgangMeldung>
@@ -568,5 +580,10 @@ if($result = $db->db_query($qry))
 	{
 		echo "<a href=$ddd>XML-Datei f&uuml;r BIS-Meldung Lehrgang ".$lehrgangsname.' ('.$lehrgangsnummer.")</a><br>";
 	}
+
+	echo '<hr>';
+	echo '<br>Folgende Personen sind in der Meldung enthalten:<br><br>';
+	echo 'Anzahl:'.$anzahl_gemeldet;
+	echo $tabelle;
 }
 ?>

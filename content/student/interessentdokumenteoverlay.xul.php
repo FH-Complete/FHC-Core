@@ -108,6 +108,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dokument/rdf#onlinebewerbung" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="interessent-dokumente-tree-nichtabgegeben-pflicht" label="pflicht" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/dokument/rdf#pflicht" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
+				<splitter class="tree-splitter"/>
 			</treecols>
 		
 			<template>
@@ -126,6 +130,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#titel_intern" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#anmerkung_intern" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#onlinebewerbung" />
+								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#pflicht" />
 							</treerow>
 						</treeitem>
 					</treechildren>
