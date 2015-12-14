@@ -31,6 +31,8 @@ class dokument extends basis_db
 	public $bezeichnung;
 	public $studiengang_kz;
 	public $pflicht;
+	public $bezeichnung_mehrsprachig;
+	public $dokumentbeschreibung_mehrsprachig;
 
 	public $prestudent_id;
 	public $mitarbeiter_uid;
@@ -609,10 +611,8 @@ class dokument extends basis_db
 		$sprache = new sprache();
 		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
 		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
-
 		$qry="SELECT *, ".$bezeichnung_mehrsprachig.",".$dokumentbeschreibung_mehrsprachig." FROM public.tbl_dokument
 				WHERE dokument_kurzbz =".$this->db_add_param($dokument_kurzbz).";";
-
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
