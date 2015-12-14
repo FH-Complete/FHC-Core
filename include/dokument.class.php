@@ -44,9 +44,6 @@ class dokument extends basis_db
 	public $ext_id;
 	public $onlinebewerbung;
 
-	public $bezeichnung_mehrsprachig;
-	public $dokumentbeschreibung_mehrsprachig;
-
 	/**
 	 * Konstruktor - Laedt optional ein Dokument
 	 * @param $dokument_kurzbz
