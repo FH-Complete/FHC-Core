@@ -177,6 +177,24 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 						<VERBAND:orgform>'.$orgform.'</VERBAND:orgform>
 					</RDF:Description>
 
+					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/interessenten/bewerbungabgeschickt" >
+						<VERBAND:name>Bewerbung abgeschickt</VERBAND:name>
+						<VERBAND:stg>'.$stg_kurzbz.'</VERBAND:stg>
+						<VERBAND:stg_kz>'.$stg_kz.'</VERBAND:stg_kz>
+						<VERBAND:stsem>'.$stsem->studiensemester_kurzbz.'</VERBAND:stsem>
+						<VERBAND:typ>bewerbungabgeschickt</VERBAND:typ>
+						<VERBAND:orgform>'.$orgform.'</VERBAND:orgform>
+					</RDF:Description>
+								
+					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/interessenten/statusbestaetigt" >
+						<VERBAND:name>Status bestätigt</VERBAND:name>
+						<VERBAND:stg>'.$stg_kurzbz.'</VERBAND:stg>
+						<VERBAND:stg_kz>'.$stg_kz.'</VERBAND:stg_kz>
+						<VERBAND:stsem>'.$stsem->studiensemester_kurzbz.'</VERBAND:stsem>
+						<VERBAND:typ>statusbestaetigt</VERBAND:typ>
+						<VERBAND:orgform>'.$orgform.'</VERBAND:orgform>
+					</RDF:Description>
+								
 					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/interessenten/zgv" >
 						<VERBAND:name>ZGV erfüllt</VERBAND:name>
 						<VERBAND:stg>'.$stg_kurzbz.'</VERBAND:stg>
@@ -253,6 +271,8 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 	
 			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li>";
 			$orgform_sequence[$stg_kz].= "\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten\">\n";
+			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/bewerbungabgeschickt\" />\n";
+			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/statusbestaetigt\" />\n";
 			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/zgv\" />\n";
 			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/reihungstestangemeldet\" />\n";
 			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/reihungstestnichtangemeldet\" />\n";
@@ -465,7 +485,23 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 				<VERBAND:typ>interessenten</VERBAND:typ>
 			</RDF:Description>
-	
+			
+			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/bewerbungabgeschickt'; ?>" >
+				<VERBAND:name>Bewerbung abgeschickt</VERBAND:name>
+				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
+				<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
+				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
+				<VERBAND:typ>bewerbungabgeschickt</VERBAND:typ>
+			</RDF:Description>
+			
+			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/statusbestaetigt'; ?>" >
+				<VERBAND:name>Status bestätigt</VERBAND:name>
+				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
+				<VERBAND:stg_kz><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
+				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
+				<VERBAND:typ>statusbestaetigt</VERBAND:typ>
+			</RDF:Description>
+			
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/zgv'; ?>" >
 				<VERBAND:name>ZGV erfüllt</VERBAND:name>
 				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -683,6 +719,8 @@ draw_orgformpart($stg_kz);
 	
 					echo "\t\t\t<RDF:li>";
 					echo "\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten\">\n";
+					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/bewerbungabgeschickt\" />\n";
+					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/statusbestaetigt\" />\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/zgv\" />\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/reihungstestangemeldet\" />\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/reihungstestnichtangemeldet\" />\n";
