@@ -20,6 +20,7 @@
  *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/sprache.class.php');
 
 class dokument extends basis_db
 {
@@ -236,8 +237,7 @@ class dokument extends basis_db
 				$qry.=$this->db_add_param($value).',';
 			foreach($this->dokumentbeschreibung_mehrsprachig as $key=>$value)
 				$qry.=$this->db_add_param($value).',';
-			$this->db_add_param($this->bezeichnung).');';
-
+			$qry.= $this->db_add_param($this->bezeichnung).');';
 		}
 		else
 		{
@@ -254,7 +254,7 @@ class dokument extends basis_db
 				$qry.=" dokumentbeschreibung_mehrsprachig[$idx]=".$this->db_add_param($value).",";
 			}
 			$qry = mb_substr($qry,0,-1);
-			$qry.='WHERE dokument_kurzbz = '.$this->db_add_param($this->dokument_kurzbz);
+			$qry.=' WHERE dokument_kurzbz = '.$this->db_add_param($this->dokument_kurzbz);
 		}
 
 		if($this->db_query($qry))
