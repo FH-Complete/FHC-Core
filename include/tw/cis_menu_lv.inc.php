@@ -361,6 +361,7 @@ function checkZeilenUmbruch()
 	}
 
 	checkZeilenUmbruch();
+	/*
 	//FEEDBACK
 	if((!defined('CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN) && $angemeldet)
 	{
@@ -368,7 +369,21 @@ function checkZeilenUmbruch()
 		echo '<td class="tdvertical" align="center">';
 		echo '<a href="feedback.php?lvid='.$lvid.'" target="_blank" class="Item"><img class="lv" src="../../../skin/images/button_feedback.png"><br><strong>'.$p->t('lehre/feedback').'</strong></a>';
 		echo '</td>';
+	}*/
+	// TODO
+	checkZeilenUmbruch();
+
+	if($is_lector)
+	{
+		$eintraegeprozeile++;
+		echo '<td class="tdvertical" align="center">';
+		echo '<a href="../../../addons/lvevaluierung/cis/administration.php?lehrveranstaltung_id='.$lvid.'&studiensemester_kurzbz='.$angezeigtes_stsem.'">';
+		echo '<img class="lv" src="../../../skin/images/button_feedback.png"><br>';
+
+		echo "<b>".$p->t('lvevaluierung/lvevaluierung')."</b></a><br>";
+		echo '</td>';
 	}
+	// END TODO
 
 	checkZeilenUmbruch();
 
