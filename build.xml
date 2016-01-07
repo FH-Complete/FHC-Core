@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="FHComplete" default="test">
+	
+	<fileset dir="." id="fileset.deploy.id">
+		<!-- directories which should not be deployed -->
+		<exclude name="config/cis.config.inc.php"/>
+		<exclude name="config/vilesci.config.inc.php"/>
+		<exclude name="config/system.config.inc.php" />
+		<exclude name="config/global.config.inc.php" />
+		<exclude name="config/wawi.config.inc.php" />
+		<exclude name="phpdoc/**"/>
+		
+		<!-- git repo -->
+		<exclude name=".git/**"/>
+		
+		<!-- build file -->
+		<exclude name="build.xml"/>
+	</fileset>
+	<fileset dir="." id="phpfiles">
+		<include name="include/*.php" />
+	</fileset>	
+
+	<target name="test">
+		<echo msg="Testing for Syntax Errors" />
+		<phplint>
+			<fileset refid="phpfiles" />
+		</phplint>
+	</target>
+
+	<!-- requires a 512M memory limit to complete -->
+	<target name="phpdoc">
+		<mkdir dir="phpdoc"/>
+		<phpdoc2 title="FHComplete API Documentation" destdir="phpdoc">
+			<fileset dir=".">
+				<include name="include/*.class.php" />
+			</fileset>
+		</phpdoc2>
+	</target>
+	<target name="deploy">
+	   	<echo msg="Deploying FHComplete" />
+		<exec command="/home/fhcomplete/UpdateFHComplete.sh" passthru="true"/>
+	</target>	
+</project>
