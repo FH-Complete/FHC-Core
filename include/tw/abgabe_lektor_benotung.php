@@ -358,19 +358,19 @@ else
 		$pdf->SetFont('Arial','',7);
 		$maxX +=120;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(80,12,'0 - 49 Pkte = 5',1,'C',0);
+		$pdf->MultiCell(80,12,'0 - 50 Pkte = 5',1,'C',0);
 		$maxX +=80;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(80,12,'50 - 62 Pkte = 4',1,'C',0);
+		$pdf->MultiCell(80,12,'51 - 64 Pkte = 4',1,'C',0);
 		$maxX +=80;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(80,12,'63 - 74 Pkte = 3',1,'C',0);
+		$pdf->MultiCell(80,12,'65 - 77 Pkte = 3',1,'C',0);
 		$maxX +=80;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(80,12,'75 - 87 Pkte = 2',1,'C',0);
+		$pdf->MultiCell(80,12,'78 - 90 Pkte = 2',1,'C',0);
 		$maxX +=80;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(80,12,'88 - 100 Pkte = 1',1,'C',0);
+		$pdf->MultiCell(80,12,'91 - 100 Pkte = 1',1,'C',0);
 		$maxY=$pdf->GetY();
 		$maxX=160;
 		$pdf->SetXY($maxX,$maxY);	
@@ -644,19 +644,19 @@ else
 		$pdf->SetFont('Arial','',8);
 		$maxX +=130;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(80,12,'0 - 49 Pkte = 5',1,'C',0);
+		$pdf->MultiCell(80,12,'0 - 50 Pkte = 5',1,'C',0);
 		$maxX +=80;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(80,12,'50 - 62 Pkte = 4',1,'C',0);
+		$pdf->MultiCell(80,12,'51 - 64 Pkte = 4',1,'C',0);
 		$maxX +=80;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(80,12,'63 - 74 Pkte = 3',1,'C',0);
+		$pdf->MultiCell(80,12,'65 - 77 Pkte = 3',1,'C',0);
 		$maxX +=80;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(80,12,'75 - 87 Pkte = 2',1,'C',0);
+		$pdf->MultiCell(80,12,'78 - 90 Pkte = 2',1,'C',0);
 		$maxX +=80;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(80,12,'88 - 100 Pkte = 1',1,'C',0);
+		$pdf->MultiCell(80,12,'91 - 100 Pkte = 1',1,'C',0);
 		$maxY=$pdf->GetY();
 		$maxX=160;
 		$pdf->SetXY($maxX,$maxY);
@@ -829,19 +829,19 @@ else
 					}
 					else
 					{
-						if(document.getElementById("summe2").value<50)
+						if(document.getElementById("summe2").value<=50)
 						{
 							ergebnis=5;
 						}
-						else if(document.getElementById("summe2").value<63)
+						else if(document.getElementById("summe2").value<65)
 						{
 							ergebnis=4;
 						}
-						else if(document.getElementById("summe2").value<75)
+						else if(document.getElementById("summe2").value<78)
 						{
 							ergebnis=3;
 						}
-						else if(document.getElementById("summe2").value<88)
+						else if(document.getElementById("summe2").value<91)
 						{
 							ergebnis=2;
 						}
@@ -865,19 +865,19 @@ else
 					}
 					else
 					{
-						if(document.getElementById("summe2").value<50)
+						if(document.getElementById("summe2").value<=50)
 						{
 							ergebnis=5;
 						}
-						else if(document.getElementById("summe2").value<63)
+						else if(document.getElementById("summe2").value<65)
 						{
 							ergebnis=4;
 						}
-						else if(document.getElementById("summe2").value<75)
+						else if(document.getElementById("summe2").value<78)
 						{
 							ergebnis=3;
 						}
-						else if(document.getElementById("summe2").value<88)
+						else if(document.getElementById("summe2").value<91)
 						{
 							ergebnis=2;
 						}
@@ -905,8 +905,7 @@ else
 		</head>
 		<body class="Background_main"  style="background-color:#eeeeee;" onload="berechne()">';
 		
-		$htmlstr = "<h3 style='color: red'>Achtung: Ab sofort ist hier der neue Notenschlüssel laut Prüfungsordnung vom 25.10.2015, 3. Abschnitt §7 (9) hinterlegt</h3>";
-		$htmlstr .= "<br>";
+		$htmlstr = "<br>";
 		$htmlstr .= "<table border='1'  class='detail'>\n";
 		$htmlstr .= '<form action="'.htmlspecialchars($_SERVER['PHP_SELF']).'" method="POST" onsubmit="return inputcheck()">';
 		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Student: <b>".$row->matrikelnr.", ".trim($row->titelpre." ".$row->vorname." ".$row->nachname." ".$row->titelpost)."</b></td>";
@@ -1044,7 +1043,7 @@ else
 		$htmlstr .="</table>";
 				
 		$htmlstr .= "<br><table border='1' align='center' width='70%'>";
-		$htmlstr .= "<tr><td>Ergebnis<50 Punkte : Note 5</td><td>Ergebnis<63 : Note 4</td><td>Ergebnis<75 : Note 3</td><td>Ergebnis<88 : Note 2</td><td>Ergebnis>=88 : Note 1</td></tr>";
+		$htmlstr .= "<tr><td>Ergebnis <=50 Punkte : Note 5</td><td>50< Ergebnis <65 : Note 4</td><td>65<= Ergebnis <78 : Note 3</td><td>78<= Ergebnis <91 : Note 2</td><td>91<= Ergebnis : Note 1</td></tr>";
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
 			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkten &rArr; Diplomarbeit gesamt negativ</td></tr>";
