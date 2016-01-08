@@ -90,6 +90,56 @@ if(isset($_POST['del']))
 
 }
 
+if(isset($_POST['kopieren']))
+{
+	if($rechte->isBerechtigt('basis/berechtigung', null, 'suid'))
+	{
+		$uid = $_POST['uid'];
+		$uid_von = $_POST['uid_von'];
+
+		$rechtevon = new benutzerberechtigung();
+		if(!$rechtevon->loadBenutzerRollen($uid_von))
+			die('Fehler beim Laden der Berechtigung von '.$uid_von);
+		
+		foreach($rechtevon->berechtigungen AS $row)
+		{
+			//Nur aktive Berechtigungen kopieren
+			if(($row->start=='' || $row->start<=date('Y-m-d')) && ($row->ende=='' || $row->ende>=date('Y-m-d')))
+			{
+				$ber = new benutzerberechtigung();
+				$ber->new = true;
+				//$ber->benutzerberechtigung_id = $benutzerberechtigung_id;
+				$ber->art = $row->art;
+				$ber->oe_kurzbz = $row->oe_kurzbz;
+				$ber->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				$ber->rolle_kurzbz = $row->rolle_kurzbz;
+				$ber->uid = $uid;
+				$ber->funktion_kurzbz = $row->funktion_kurzbz;
+				$ber->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$ber->start = $row->start;
+				$ber->ende = $row->ende;
+				$ber->negativ = $row->negativ;
+				$ber->insertamum=date('Y-m-d H:i:s');
+				$ber->insertvon = $user;
+				$ber->updateamum = date('Y-m-d H:i:s');
+				$ber->updatevon = $user;
+				$ber->kostenstelle_id = $row->kostenstelle_id;
+				$ber->anmerkung = 'Kopiert von UID '.$uid_von.($row->anmerkung!=''?'. Anmerkung von UID '.$uid_von.': '.$row->anmerkung:'');
+				
+				if(!$ber->save())
+				{
+					if (!$ber->new)
+						$errorstr .= "Datensatz konnte nicht gespeichert werden!".$ber->errormsg;
+				}
+			}
+		}
+	}
+	else
+	{
+		$errorstr.= $rechte->errormsg;
+	}
+}
+
 if(isset($_POST['schick']))
 {
 	if($rechte->isBerechtigt('basis/berechtigung', null, 'suid'))
@@ -210,6 +260,12 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$name = new benutzer();
 		$name->load($uid);
 		$htmlstr .= "Berechtigungen von <b>".$name->nachname." ".$name->vorname." (".$uid.")</b>\n";
+		//Formular zum Kopieren von Berechtigungen
+		$htmlstr .= "<form action='benutzerberechtigung_details.php' method='POST' name='berechtigung_kopieren'>\n";
+		$htmlstr .= "Berechtigungen (aktive) kopieren von UID <input id='uid_von' name='uid_von' type='text'>\n";
+		$htmlstr .= "<input type='submit' name='kopieren' value='Kopieren' onclick=\"if (document.getElementById('uid_von').value == '')  {alert('UID darf nicht leer sein'); return false}\">\n";
+		$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
+		$htmlstr .= "</form>\n";
 		$i = 0;
 		
 		// Zusätzlich jede Funktion mit einer gültigen Berechtigung anzeigen
@@ -235,7 +291,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 					$i++;
 					if ($i==1)
 					{
-						$htmlstr .= "<br/>Geerbte Berechtigungen aus Funktion\n";
+						$htmlstr .= "Geerbte Berechtigungen aus Funktion\n";
 					}
 					$htmlstr .= ($i>1?"</a>, <a href='benutzerberechtigung_details.php?funktion_kurzbz=$funktion_bezeichnung->funktion_kurzbz'>":"<a href='benutzerberechtigung_details.php?funktion_kurzbz=$funktion_bezeichnung->funktion_kurzbz'>").$funktion_bezeichnung->beschreibung."</a>";
 				}

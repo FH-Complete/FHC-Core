@@ -280,13 +280,13 @@ class studiengang extends basis_db
 	 */
 	public function getOrgForm($studiengang_kz)
 	{
-		$qry = 'SELECT distinct orgform_kurzbz '
+		$qry = 'SELECT distinct tbl_studienplan.orgform_kurzbz '
 				. 'FROM lehre.tbl_studienordnung '
 				. 'JOIN lehre.tbl_studienplan '
 				. 'USING (studienordnung_id) '
 				. 'WHERE aktiv '
 				. 'AND studiengang_kz = ' . $this->db_add_param($studiengang_kz, FHC_INTEGER)
-				. ' AND orgform_kurzbz!='. $this->db_add_param('DDP');
+				. ' AND tbl_studienplan.orgform_kurzbz!='. $this->db_add_param('DDP');
 
 		if($result = $this->db_query($qry))
 		{
