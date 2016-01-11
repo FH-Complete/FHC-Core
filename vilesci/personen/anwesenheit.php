@@ -196,7 +196,19 @@ if($work=='save')
 
 			if($anwesenheit_id!='')
 			{
-				$anwesenheit->load($anwesenheit_id);
+				if(!$anwesenheit->load($anwesenheit_id))
+					die('Es ist ein Fehler beim Laden der Daten aufgetreten: '.$anwesenheit->errormsg.' Bitte versuchen Sie es erneut');
+			}
+			else
+			{
+				// Wenn der Eintrag bereits exisitiert aber kein Update durchgefuehrt wird, dann wird der Eintrag uebersprungen
+				// da der Eintrag sonst doppelt vorhanden ist.
+				// zB bei Reload der Seite oder schliessen und erneuten oeffnen des Browsers und Absenden der POST Daten
+				if($anwesenheit->AnwesenheitExists($_POST['lehreinheit_id'], $_POST['datum'], $user))
+				{
+					echo $anwesenheit->convert_html_chars($user)." wird übersprungen da der Eintrag bereits erfasst wurde<br>";
+					continue;
+				}
 			}
 
 			$anwesenheit->uid = $user;
