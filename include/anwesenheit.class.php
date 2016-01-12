@@ -436,6 +436,38 @@ class anwesenheit extends basis_db
 	}
 
 	/**
+	 * Prueft ob Anwesenheiten erfasst wurden
+	 * @param $lehreinheit_id ID der Lehreinheit
+	 * @param $datum Datum
+	 * @param $uid UID des Studierenden
+	 * @return boolean true wenn vorhanden, sonst false
+	 */
+	public function AnwesenheitEntryExists($lehreinheit_id, $datum, $uid=null)
+	{
+		$qry = "SELECT
+					1
+				FROM
+					campus.tbl_anwesenheit
+				WHERE
+					lehreinheit_id=".$this->db_add_param($lehreinheit_id)."
+					AND datum=".$this->db_add_param($datum)."
+					AND uid=".$this->db_add_param($uid);
+
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
 	 * Laedt die Anwesenheiten in Prozent von Studierenden bei Lehrveranstaltungen
 	 * Wenn die StudentUID uebergeben wird, werden alle Lehrveranstaltungen zu denen der Studierenden zugeteilt ist inkl Prozent der Anwesenheit
 	 * Wenn die LehrveranstaltungID uebergeben wird, werden alle Studierenden geholt die zugeteilt sind inkl Prozent der Anwesenheit
@@ -524,4 +556,84 @@ class anwesenheit extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Aendert die bestehende Anwesenheit
+	 * @param $lehreinheit_id ID der Lehreinheit
+	 * @param $datum Datum
+	 * @param $uid UID des Studierenden
+	 * @return boolean true ok, sonst false
+	 */
+	public function AnwesenheitToggle($lehreinheit_id, $datum, $uid)
+	{
+		if($this->AnwesenheitEntryExists($lehreinheit_id, $datum, $uid))
+		{
+			$qry = "UPDATE
+						campus.tbl_anwesenheit
+					SET anwesend= NOT anwesend
+					WHERE
+						lehreinheit_id=".$this->db_add_param($lehreinheit_id)."
+						AND datum=".$this->db_add_param($datum)."
+						AND uid=".$this->db_add_param($uid);
+
+			if($result = $this->db_query($qry))
+			{
+				if($this->db_affected_rows($result)>0)
+					return true;
+				else
+				{
+					$this->errormsg='Anwesenheitsliste wurde noch nicht erfasst';
+					return false;
+				}
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			// Anwesenheitsliste wurde noch nicht erfasst. Eintrag neu anlegen
+
+			// Einheiten ermitteln
+			$qry = "SELECT 
+						distinct stunde 
+					FROM 
+						lehre.tbl_stundenplan 
+					WHERE 
+						lehreinheit_id=".$this->db_add_param($lehreinheit_id)." 
+						AND datum=".$this->db_add_param($datum);
+
+			if($result = $this->db_query($qry))
+			{
+				if($anzahl = $this->db_num_rows($result))
+				{
+					$einheiten = $anzahl;
+				}
+			}
+			if($einheiten>0)
+			{
+				$this->lehreinheit_id=$lehreinheit_id;
+				$this->datum = $datum;
+				$this->uid = $uid;
+				$this->anwesend=true;
+				$this->new=true;
+				$this->einheiten=$einheiten;
+				if($this->save())
+					return true;
+				else
+				{
+					$this->errormsg = 'Fehler beim Speichern der Daten';
+					return true;
+				}
+			}
+			else
+			{
+				$this->errormsg = 'Anzahl der Einheiten fuer diesen Tag konnte nicht ermittelt werden';
+				return false;
+			}
+		}
+	}
+
 }
