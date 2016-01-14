@@ -21,6 +21,8 @@
 
 $dr = DOC_ROOT;
 $dr = str_replace($_SERVER["DOCUMENT_ROOT"], "", $dr);
+if($dr=='')
+	$dr='/';
 
 //Originaldateien des Herstellers
 echo '<script src="'.$dr.'vendor/components/jquery/jquery.min.js"></script>';
