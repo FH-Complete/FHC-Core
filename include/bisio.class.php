@@ -39,7 +39,7 @@ class bisio extends basis_db
 	public $bis; 						// date
 	public $zweck_code; 				// varchar(20)
 	public $zweck_bezeichnung;
-	public $student_uid; 				// varchar(16)
+	public $prestudent_id; 				// integer
 	public $updateamum; 				// timestamp
 	public $updatevon; 				// varchar(16)
 	public $insertamum; 				// timestamp
@@ -86,7 +86,7 @@ class bisio extends basis_db
 				$this->von = $row->von;
 				$this->bis = $row->bis;
 				$this->zweck_code = $row->zweck_code;
-				$this->student_uid = $row->student_uid;
+				$this->prestudent_id = $row->prestudent_id;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
@@ -135,9 +135,9 @@ class bisio extends basis_db
 			return false;
 		}
 
-		if(mb_strlen($this->student_uid)>32)
+		if(!is_numeric($this->prestudent_id))
 		{
-			$this->errormsg = 'Student_UID ist ungueltig';
+			$this->errormsg = 'Prestudent_id ist ungueltig';
 			return false;
 		}
 
@@ -176,13 +176,13 @@ class bisio extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN;INSERT INTO bis.tbl_bisio (mobilitaetsprogramm_code, nation_code, von, bis, zweck_code, student_uid, updateamum, updatevon, insertamum, insertvon, ort, universitaet, lehreinheit_id) VALUES('.
+			$qry='BEGIN;INSERT INTO bis.tbl_bisio (mobilitaetsprogramm_code, nation_code, von, bis, zweck_code, prestudent_id, updateamum, updatevon, insertamum, insertvon, ort, universitaet, lehreinheit_id) VALUES('.
 			     $this->db_add_param($this->mobilitaetsprogramm_code, FHC_INTEGER).', '.
 			     $this->db_add_param($this->nation_code).', '.
 			     $this->db_add_param($this->von).', '.
 			     $this->db_add_param($this->bis).', '.
 			     $this->db_add_param($this->zweck_code).', '.
-			     $this->db_add_param($this->student_uid).', '.
+			     $this->db_add_param($this->prestudent_id).', '.
 			     $this->db_add_param($this->updateamum).', '.
 			     $this->db_add_param($this->updatevon).', '.
 			     $this->db_add_param($this->insertamum).', '.
@@ -200,7 +200,7 @@ class bisio extends basis_db
 				   ' von='.$this->db_add_param($this->von).','.
 				   ' bis='.$this->db_add_param($this->bis).','.
 				   ' zweck_code='.$this->db_add_param($this->zweck_code).','.
-				   ' student_uid='.$this->db_add_param($this->student_uid).','.
+				   ' prestudent_id='.$this->db_add_param($this->prestudent_id).','.
 				   ' updateamum='.$this->db_add_param($this->updateamum).','.
 				   ' updatevon='.$this->db_add_param($this->updatevon).','.
 				   ' ort='.$this->db_add_param($this->ort).','.
@@ -271,20 +271,20 @@ class bisio extends basis_db
 	/**
 	 * Liefert alle Incomming/Outgoing
 	 * Eintraege eines Studenten
-	 * @param $uid
+	 * @param $prestudent_id
 	 * @return true wenn ok, false wenn fehler
 	 */
-	public function getIO($uid)
+	public function getIO($prestudent_id)
 	{
 		$qry = "SELECT	tbl_bisio.*,
 						tbl_mobilitaetsprogramm.kurzbz as mobilitaetsprogramm_kurzbz,
 						tbl_zweck.bezeichnung as zweck_bezeichnung
-			    FROM
-			    	bis.tbl_bisio,
-			    	bis.tbl_zweck,
-			    	bis.tbl_mobilitaetsprogramm
+				FROM
+					bis.tbl_bisio,
+					bis.tbl_zweck,
+					bis.tbl_mobilitaetsprogramm
 				WHERE
-					student_uid=".$this->db_add_param($uid)." AND
+					prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)." AND
 					tbl_zweck.zweck_code=tbl_bisio.zweck_code AND
 					tbl_mobilitaetsprogramm.mobilitaetsprogramm_code=tbl_bisio.mobilitaetsprogramm_code
 				ORDER BY bis;";
@@ -303,7 +303,7 @@ class bisio extends basis_db
 				$io->bis = $row->bis;
 				$io->zweck_code = $row->zweck_code;
 				$io->zweck_bezeichnung = $row->zweck_bezeichnung;
-				$io->student_uid = $row->student_uid;
+				$io->prestudent_id = $row->prestudent_id;
 				$io->updateamum = $row->updateamum;
 				$io->updatevon = $row->updatevon;
 				$io->insertamum = $row->insertamum;

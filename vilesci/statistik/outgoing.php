@@ -35,8 +35,8 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<title>Outgoing</title>
 	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
-	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">	
-	<script type="text/javascript" src="../../include/js/jquery.js"></script> 
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<script type="text/javascript" src="../../include/js/jquery.js"></script>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 </head>
 <body>
@@ -64,43 +64,43 @@ $stsem = new studiensemester();
 $stsem->getFinished();
 foreach($stsem->studiensemester as $row)
 {
-	$qry="SELECT 
+	$qry="SELECT
 			distinct vorname, nachname, tbl_studiengang.studiengang_kz, UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg
-		  FROM 
-		  	public.tbl_prestudent 
+		  FROM
+		  	public.tbl_prestudent
 		  	JOIN public.tbl_person USING(person_id)
 		  	JOIN public.tbl_studiengang USING(studiengang_kz)
 		  	JOIN public.tbl_student USING(prestudent_id)
-		  	JOIN bis.tbl_bisio USING(student_uid)
+		  	JOIN bis.tbl_bisio USING(prestudent_id)
 		  WHERE
-		  	 
+
 		  	(
-		  		(tbl_bisio.von>='$row->start' AND tbl_bisio.von<='$row->ende')
+		  		(tbl_bisio.von>=".$db->db_add_param($row->start)." AND tbl_bisio.von<=".$db->db_add_param($row->ende).")
 		  	 OR (tbl_bisio.bis<='$row->ende' AND tbl_bisio.bis>='$row->start')
 		  	)
 		  	AND get_rolle_prestudent (prestudent_id, '$row->studiensemester_kurzbz')<>'Incoming' ";
 	if($studiengang_kz!='')
-		$qry.=" AND tbl_student.studiengang_kz='".addslashes($studiengang_kz)."'";
+		$qry.=" AND tbl_student.studiengang_kz=".$db->db_add_param($studiengang_kz);
 	$qry.=" ORDER BY stg";
-		
+
 	if($result = $db->db_query($qry))
 	{
 		$anzahl = $db->db_num_rows($result);
 		echo '<h3>'.$row->studiensemester_kurzbz.' Anzahl: '.$anzahl.'</h3>';
-		
+
 		if($anzahl>0)
 		{
 			echo '
 			<script type="text/javascript">
-			$(document).ready(function() 
-				{ 
+			$(document).ready(function()
+				{
 				    $("#'.$row->studiensemester_kurzbz.'").tablesorter(
 					{
 						sortList: [[2,0]],
 						widgets: ["zebra"]
-					}); 
-				} 
-			); 
+					});
+				}
+			);
 			</script>
 			<table id="'.$row->studiensemester_kurzbz.'" class="tablesorter" style="width:auto">
 			<thead>
@@ -111,7 +111,7 @@ foreach($stsem->studiensemester as $row)
 			</tr>
 			</thead>
 			<tbody>';
-			
+
 			while($row = $db->db_fetch_object($result))
 			{
 				echo '<tr>';

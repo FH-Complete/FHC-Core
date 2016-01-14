@@ -58,7 +58,7 @@ $pdf->SetXY(30,60);
 $qry = "SELECT distinct on(kuerzel, semester, verband, gruppe, gruppe_kurzbz) UPPER(stg_typ::varchar(1) || stg_kurzbz) as kuerzel, semester, verband, gruppe, gruppe_kurzbz from campus.vw_lehreinheit WHERE lehrveranstaltung_id='".addslashes($lvid)."' AND studiensemester_kurzbz='".addslashes($stsem)."'";
 if($lehreinheit_id!='')
 	$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
-	
+
 $gruppen='';
 if($result = $db->db_query($qry))
 {
@@ -73,14 +73,14 @@ if($result = $db->db_query($qry))
 	}
 }
 $gruppen=mb_convert_encoding($gruppen,'ISO-8859-15','UTF-8');
- 
+
 if(strlen($gruppen)>50)
 	$linebreak="\n";
-else 
+else
 	$linebreak=' ';
 $semester = new studiensemester($stsem);
 $pdf->MultiCell(0,15,'Gruppe: '.$gruppen.$linebreak.'Studiensemester: '.(($semester->beschreibung != NULL) ? $semester->beschreibung : $stsem));
-	
+
 $maxY=$pdf->GetY();
 $maxY=getmax($maxY,$pdf->GetY());
 
@@ -112,11 +112,11 @@ $pdf->SetXY($maxX,$maxY);
 $pdf->MultiCell(40,$lineheight,'',1,'L',0);
 $maxX +=40;
 $pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
+$pdf->MultiCell(40,$lineheight,'',1,'L',0);
 $maxX +=40;
 $pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
-	
+$pdf->MultiCell(40,$lineheight,'',1,'L',0);
+
 //Anzahl der abgehaltenen Stunden
 $maxY=$pdf->GetY();
 $maxX=30;
@@ -136,10 +136,10 @@ $pdf->SetXY($maxX,$maxY);
 $pdf->MultiCell(40,$lineheight,'',1,'L',0);
 $maxX +=40;
 $pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
+$pdf->MultiCell(40,$lineheight,'',1,'L',0);
 $maxX +=40;
 $pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
+$pdf->MultiCell(40,$lineheight,'',1,'L',0);
 
 //Lektoren
 $pdf->SetFont('Arial','B',10);
@@ -150,13 +150,13 @@ $pdf->MultiCell(520,$lineheight+2,'LektorInnen',1,'L',1);
 
 //Schleife aller lektoren
 
-$qry = "SELECT 
-			distinct vorname, nachname 
-		FROM campus.vw_benutzer, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter 
-		WHERE 
-			uid=mitarbeiter_uid AND 
-			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
-			lehrveranstaltung_id='".addslashes($lvid)."' AND 
+$qry = "SELECT
+			distinct vorname, nachname
+		FROM campus.vw_benutzer, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
+		WHERE
+			uid=mitarbeiter_uid AND
+			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+			lehrveranstaltung_id='".addslashes($lvid)."' AND
 			studiensemester_kurzbz='$stsem' ";
 		if($lehreinheit_id!='')
 				$qry.=" AND tbl_lehreinheit.lehreinheit_id='".addslashes($lehreinheit_id)."'";
@@ -169,11 +169,11 @@ if($result = $db->db_query($qry))
 		$maxY=$pdf->GetY();
 		$maxX=30;
 		$pdf->SetXY($maxX,$maxY);
-		
+
 		$vorname=mb_convert_encoding(trim($row->vorname),'ISO-8859-15','UTF-8');
 		$nachname=mb_convert_encoding(trim($row->nachname),'ISO-8859-15','UTF-8');
 		$name="$vorname $nachname";
-		
+
 		$pdf->MultiCell(280,$lineheight,$name,1,'L',0);
 		$maxX +=280;
 		$pdf->SetXY($maxX,$maxY);
@@ -189,10 +189,10 @@ if($result = $db->db_query($qry))
 		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
 		$maxX +=40;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
+		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
 		$maxX +=40;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
+		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
 	}
 }
 //Studenten
@@ -235,43 +235,43 @@ $pdf->SetFont('Arial','',8);
 		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
 		$maxX +=40;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
+		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
 		$maxX +=40;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
+		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
 		$maxX +=40;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
+		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
 		$maxX +=40;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
+		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
 		$maxX +=40;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(40,$lineheight,'',1,'L',0);	
+		$pdf->MultiCell(40,$lineheight,'',1,'L',0);
 $stsem_obj = new studiensemester();
 $stsem_obj->load($stsem);
 $stsemdatumvon = $stsem_obj->start;
 $stsemdatumbis = $stsem_obj->ende;
 
-$qry = "SELECT 
-			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, 
+$qry = "SELECT
+			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
-			tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis, 
-			tbl_zeugnisnote.note 
-		FROM 
-			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
-			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid) 
+			tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis,
+			tbl_zeugnisnote.note
+		FROM
+			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
+			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
 			LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
 			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
-			LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
-		WHERE 
-			vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND 
+			LEFT JOIN bis.tbl_bisio ON tbl_student.prestudent_id=tbl_bisio.prestudent_id
+		WHERE
+			vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND
 			vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."'";
 
 if($lehreinheit_id!='')
 	$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id='".addslashes($lehreinheit_id)."'";
-	
+
 $qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
 //echo $qry;
 if($result = $db->db_query($qry))
@@ -285,9 +285,9 @@ if($result = $db->db_query($qry))
 			$i++;
 			if($i%2)
 				$pdf->SetFillColor(190,190,190);
-			else 
+			else
 				$pdf->SetFillColor(255,255,255);
-				
+
 			$pdf->SetFont('Arial','',8);
 			$maxY=$pdf->GetY();
 			if($maxY>770)
@@ -295,16 +295,16 @@ if($result = $db->db_query($qry))
 				$pdf->AddPage();
 				$maxY=$pdf->GetY();
 			}
-	
+
 			$vorname=mb_convert_encoding(trim($elem->vorname),'ISO-8859-15','UTF-8');
 			$nachname=mb_convert_encoding(trim($elem->nachname),'ISO-8859-15','UTF-8');
 			$name="$vorname $nachname";
 			$matrikelnr=trim(mb_convert_encoding($elem->matrikelnr,'ISO-8859-15','UTF-8'));
 			$sem_verb_grup=trim(mb_convert_encoding($elem->semester.$elem->verband.$elem->gruppe,'ISO-8859-15','UTF-8'));
 
-				
 
-			
+
+
 			$maxX=30;
 			$pdf->SetXY($maxX,$maxY);
 			$pdf->MultiCell(20,$lineheight,$i,1,'R',1);
@@ -316,16 +316,16 @@ if($result = $db->db_query($qry))
 			$pdf->SetXY($maxX+strlen($nachname)*5+1,$maxY);
 			if($elem->status=='Incoming') //Incoming
 				$inc=' (i)';
-			else 
+			else
 				$inc='';
-			
+
 			if($elem->bisio_id!='' && $elem->status!='Incoming' && ($elem->bis > $stsemdatumvon || $elem->bis=='') && $elem->von < $stsemdatumbis) //Outgoing
 				$inc.=' (o)';
-				
+
 			if($elem->note==6) //angerechnet
 				$inc.=' (ar)';
-			
-			
+
+
 			$pdf->MultiCell(130,$lineheight,$vorname.$inc,0,'L',0);
 			$maxX +=130;
 			$pdf->SetXY($maxX,$maxY);
@@ -339,19 +339,19 @@ if($result = $db->db_query($qry))
 			$pdf->MultiCell(40,$lineheight,'',1,'L',1);
 			$maxX +=40;
 			$pdf->SetXY($maxX,$maxY);
-			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
+			$pdf->MultiCell(40,$lineheight,'',1,'L',1);
 			$maxX +=40;
 			$pdf->SetXY($maxX,$maxY);
-			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
+			$pdf->MultiCell(40,$lineheight,'',1,'L',1);
 			$maxX +=40;
 			$pdf->SetXY($maxX,$maxY);
-			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
+			$pdf->MultiCell(40,$lineheight,'',1,'L',1);
 			$maxX +=40;
 			$pdf->SetXY($maxX,$maxY);
-			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
+			$pdf->MultiCell(40,$lineheight,'',1,'L',1);
 			$maxX +=40;
 			$pdf->SetXY($maxX,$maxY);
-			$pdf->MultiCell(40,$lineheight,'',1,'L',1);	
+			$pdf->MultiCell(40,$lineheight,'',1,'L',1);
 		    $inhalt[]=array($i,$nachname.' '.$vorname,$matrikelnr,$sem_verb_grup,'','','','','','');
 		}
    }

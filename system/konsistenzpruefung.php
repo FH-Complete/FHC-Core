@@ -56,11 +56,11 @@ echo '<!DOCTYPE HTML>
  * tbl_person->tbl_benutzer->tbl_student->tbl_prestudent->tbl_person
  */
 
-$qry = "SELECT 
-			vorname, nachname, tbl_benutzer.uid, tbl_prestudent.prestudent_id, 
+$qry = "SELECT
+			vorname, nachname, tbl_benutzer.uid, tbl_prestudent.prestudent_id,
 			tbl_person.person_id as pers_person_id, tbl_prestudent.person_id pre_person_id
-		FROM 
-			public.tbl_person 
+		FROM
+			public.tbl_person
 			JOIN public.tbl_benutzer USING(person_id)
 			JOIN public.tbl_student ON(uid=student_uid)
 			JOIN public.tbl_prestudent USING(prestudent_id)
@@ -79,14 +79,14 @@ if($result = $db->db_query($qry))
 		echo '<br><a href="#Anzeigen" onclick="$(\'#personenkreislauf\').toggle(); return false;">Anzeigen &gt;&gt;</a>';
 		echo '
 		<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 				$("#personenkreislauf").tablesorter(
 				{
 					sortList: [[0,0]],
 					widgets: ["zebra"]
-				}); 
-			}); 
+				});
+			});
 		</script>
 			<table id="personenkreislauf" class="tablesorter" style="display:none">
 				<thead>
@@ -123,35 +123,35 @@ flush();
  * UIDs ohne Student und ohne Mitarbeiter
  *
  */
-$qry = "SELECT 
+$qry = "SELECT
 			tbl_benutzer.uid, tbl_benutzer.person_id, tbl_person.vorname, tbl_person.nachname
-		FROM 
+		FROM
 			public.tbl_benutzer
 			LEFT JOIN public.tbl_person USING(person_id)
-		WHERE 
+		WHERE
 				NOT EXISTS (SELECT 1 FROM public.tbl_student WHERE student_uid=tbl_benutzer.uid)
 			AND NOT EXISTS (SELECT 1 FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=tbl_benutzer.uid)";
 
 if($result = $db->db_query($qry))
 {
 	echo '<h2>Benutzer ohne Student und ohne Mitarbeiter Eintrag</h2>';
-	
+
 	$anzahl = $db->db_num_rows($result);
-	
+
 	echo '<span class="'.($anzahl>0?'warning':'ok').'">'.$anzahl.' Probleme gefunden</span>';
 	if($anzahl>0)
 	{
 		echo '<br><a href="#Anzeigen" onclick="$(\'#benutzerohnestudent\').toggle(); return false;">Anzeigen &gt;&gt;</a>';
 			echo '
 		<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 				$("#benutzerohnestudent").tablesorter(
 				{
 					sortList: [[0,0]],
 					widgets: ["zebra"]
-				}); 
-			}); 
+				});
+			});
 		</script>
 			<table class="tablesorter" id="benutzerohnestudent" style="display:none">
 				<thead>
@@ -182,9 +182,9 @@ if($result = $db->db_query($qry))
  * Studentenstatus ohne UID
  *
  */
-$qry = "SELECT 
+$qry = "SELECT
 			distinct tbl_person.person_id, tbl_person.vorname, tbl_person.nachname, tbl_prestudent.prestudent_id
-		FROM 
+		FROM
 			public.tbl_prestudentstatus
 			JOIN public.tbl_prestudent USING(prestudent_id)
 			JOIN public.tbl_person USING(person_id)
@@ -195,9 +195,9 @@ $qry = "SELECT
 if($result = $db->db_query($qry))
 {
 	echo '<h2>Prestudenten mit Studenten/Absolventen/Diplomanden/Incoming Status aber ohne StudentUID</h2>';
-	
+
 	$anzahl = $db->db_num_rows($result);
-	
+
 	echo '<span class="'.($anzahl>0?'error':'ok').'">'.$anzahl.' Probleme gefunden</span>';
 
 	if($anzahl>0)
@@ -205,14 +205,14 @@ if($result = $db->db_query($qry))
 		echo '<br><a href="#Anzeigen" onclick="$(\'#studentohneuid\').toggle(); return false;">Anzeigen &gt;&gt;</a>';
 			echo '
 		<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 				$("#studentohneuid").tablesorter(
 				{
 					sortList: [[0,0]],
 					widgets: ["zebra"]
-				}); 
-			}); 
+				});
+			});
 		</script>
 			<table class="tablesorter" id="studentohneuid" style="display:none">
 				<thead>
@@ -243,10 +243,10 @@ if($result = $db->db_query($qry))
  * StgKz von Stunent und Prestudent unterschiedlich
  *
  */
-$qry = "SELECT 
-			tbl_person.vorname, tbl_person.nachname, tbl_prestudent.prestudent_id, tbl_student.student_uid, 
+$qry = "SELECT
+			tbl_person.vorname, tbl_person.nachname, tbl_prestudent.prestudent_id, tbl_student.student_uid,
 			tbl_student.studiengang_kz as stud_studiengang_kz, tbl_prestudent.studiengang_kz as pre_studiengang_kz
-		FROM 
+		FROM
 			public.tbl_student
 			JOIN public.tbl_prestudent USING(prestudent_id)
 			JOIN public.tbl_person USING(person_id)
@@ -256,9 +256,9 @@ $qry = "SELECT
 if($result = $db->db_query($qry))
 {
 	echo '<h2>Studiengangskennzahl von tbl_student ungleich tbl_prestudent</h2>';
-	
+
 	$anzahl = $db->db_num_rows($result);
-	
+
 	echo '<span class="'.($anzahl>0?'error':'ok').'">'.$anzahl.' Probleme gefunden</span>';
 
 	if($anzahl>0)
@@ -266,14 +266,14 @@ if($result = $db->db_query($qry))
 		echo '<br><a href="#Anzeigen" onclick="$(\'#stgungleich\').toggle(); return false;">Anzeigen &gt;&gt;</a>';
 			echo '
 		<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 				$("#stgungleich").tablesorter(
 				{
 					sortList: [[0,0]],
 					widgets: ["zebra"]
-				}); 
-			}); 
+				});
+			});
 		</script>
 			<table class="tablesorter" id="stgungleich" style="display:none">
 				<thead>
@@ -306,10 +306,10 @@ if($result = $db->db_query($qry))
  * Studenten ohne passenden Status
  *
  */
-$qry = "SELECT 
+$qry = "SELECT
 			tbl_person.vorname, tbl_person.nachname, tbl_prestudent.prestudent_id, tbl_student.student_uid,
 			get_rolle_prestudent(prestudent_id, null) as laststatus
-		FROM 
+		FROM
 			public.tbl_student
 			JOIN public.tbl_prestudent USING(prestudent_id)
 			JOIN public.tbl_person USING(person_id)
@@ -319,9 +319,9 @@ $qry = "SELECT
 if($result = $db->db_query($qry))
 {
 	echo '<h2>Studenten ohne Status Student/Diplomand/Incoming/Absolvent</h2>';
-	
+
 	$anzahl = $db->db_num_rows($result);
-	
+
 	echo '<span class="'.($anzahl>0?'warning':'ok').'">'.$anzahl.' Probleme gefunden</span>';
 
 	if($anzahl>0)
@@ -329,14 +329,14 @@ if($result = $db->db_query($qry))
 		echo '<br><a href="#Anzeigen" onclick="$(\'#studentenohnestatus\').toggle(); return false;">Anzeigen &gt;&gt;</a>';
 			echo '
 		<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 				$("#studentenohnestatus").tablesorter(
 				{
 					sortList: [[0,0]],
 					widgets: ["zebra"]
-				}); 
-			}); 
+				});
+			});
 		</script>
 			<table class="tablesorter" id="studentenohnestatus" style="display:none">
 				<thead>
@@ -369,9 +369,9 @@ if($result = $db->db_query($qry))
  * Prestudenten ohne Status
  *
  */
-$qry = "SELECT 
+$qry = "SELECT
 			tbl_person.vorname, tbl_person.nachname, tbl_prestudent.prestudent_id
-		FROM 
+		FROM
 			public.tbl_prestudent
 			JOIN public.tbl_person USING(person_id)
 		WHERE
@@ -380,9 +380,9 @@ $qry = "SELECT
 if($result = $db->db_query($qry))
 {
 	echo '<h2>Prestudenten ohne Status</h2>';
-	
+
 	$anzahl = $db->db_num_rows($result);
-	
+
 	echo '<span class="'.($anzahl>0?'warning':'ok').'">'.$anzahl.' Probleme gefunden</span>';
 
 	if($anzahl>0)
@@ -390,14 +390,14 @@ if($result = $db->db_query($qry))
 		echo '<br><a href="#Anzeigen" onclick="$(\'#prestudentenohnestatus\').toggle(); return false;">Anzeigen &gt;&gt;</a>';
 			echo '
 		<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 				$("#prestudentenohnestatus").tablesorter(
 				{
 					sortList: [[0,0]],
 					widgets: ["zebra"]
-				}); 
-			}); 
+				});
+			});
 		</script>
 			<table class="tablesorter" id="prestudentenohnestatus" style="display:none">
 				<thead>
@@ -426,10 +426,10 @@ if($result = $db->db_query($qry))
  * Studenten ohne Studentlehrverband eintrag
  *
  */
-$qry = "SELECT 
+$qry = "SELECT
 			tbl_person.vorname, tbl_person.nachname, tbl_student.student_uid
-		FROM 
-			public.tbl_student 
+		FROM
+			public.tbl_student
 			JOIN public.tbl_benutzer ON(uid=student_uid)
 			JOIN public.tbl_person USING(person_id)
 		WHERE
@@ -438,9 +438,9 @@ $qry = "SELECT
 if($result = $db->db_query($qry))
 {
 	echo '<h2>Studenten ohne Studentlehrverband Eintrag</h2>';
-	
+
 	$anzahl = $db->db_num_rows($result);
-	
+
 	echo '<span class="'.($anzahl>0?'warning':'ok').'">'.$anzahl.' Probleme gefunden</span>';
 
 	if($anzahl>0)
@@ -448,14 +448,14 @@ if($result = $db->db_query($qry))
 		echo '<br><a href="#Anzeigen" onclick="$(\'#studentlehrverband\').toggle(); return false;">Anzeigen &gt;&gt;</a>';
 			echo '
 		<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 				$("#studentlehrverband").tablesorter(
 				{
 					sortList: [[0,0]],
 					widgets: ["zebra"]
-				}); 
-			}); 
+				});
+			});
 		</script>
 			<table class="tablesorter" id="studentlehrverband" style="display:none">
 				<thead>
@@ -484,22 +484,22 @@ if($result = $db->db_query($qry))
  * Incoming ohne IO Datensatz
  *
  */
-$qry = "SELECT 
+$qry = "SELECT
 			tbl_person.vorname, tbl_person.nachname, tbl_student.student_uid
-		FROM 
-			public.tbl_student 
+		FROM
+			public.tbl_student
 			JOIN public.tbl_prestudent USING(prestudent_id)
 			JOIN public.tbl_person USING(person_id)
 		WHERE
-			NOT EXISTS(SELECT 1 FROM bis.tbl_bisio WHERE student_uid=tbl_student.student_uid)
+			NOT EXISTS(SELECT 1 FROM bis.tbl_bisio WHERE prestudent_id=tbl_student.prestudent_id)
 			AND EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id AND status_kurzbz='Incoming')";
 
 if($result = $db->db_query($qry))
 {
 	echo '<h2>Incoming ohne IO-Datensatz</h2>';
-	
+
 	$anzahl = $db->db_num_rows($result);
-	
+
 	echo '<span class="'.($anzahl>0?'warning':'ok').'">'.$anzahl.' Probleme gefunden</span>';
 
 	if($anzahl>0)
@@ -507,14 +507,14 @@ if($result = $db->db_query($qry))
 		echo '<br><a href="#Anzeigen" onclick="$(\'#incomingohneio\').toggle(); return false;">Anzeigen &gt;&gt;</a>';
 			echo '
 		<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 				$("#incomingohneio").tablesorter(
 				{
 					sortList: [[0,0]],
 					widgets: ["zebra"]
-				}); 
-			}); 
+				});
+			});
 		</script>
 			<table class="tablesorter" id="incomingohneio" style="display:none">
 				<thead>
@@ -543,10 +543,10 @@ if($result = $db->db_query($qry))
  * Personenkennzeichen passt nicht zur Studiengangskennzahl
  *
  */
-$qry = "SELECT 
+$qry = "SELECT
 			tbl_person.vorname, tbl_person.nachname, tbl_student.student_uid, tbl_student.matrikelnr, tbl_student.studiengang_kz
-		FROM 
-			public.tbl_student 
+		FROM
+			public.tbl_student
 			JOIN public.tbl_prestudent USING(prestudent_id)
 			JOIN public.tbl_person USING(person_id)
 		WHERE
@@ -556,9 +556,9 @@ $qry = "SELECT
 if($result = $db->db_query($qry))
 {
 	echo '<h2>Personenkennzeichen passt nicht zum Studiengang</h2>';
-	
+
 	$anzahl = $db->db_num_rows($result);
-	
+
 	echo '<span class="'.($anzahl>0?'warning':'ok').'">'.$anzahl.' Probleme gefunden</span>';
 
 	if($anzahl>0)
@@ -566,14 +566,14 @@ if($result = $db->db_query($qry))
 		echo '<br><a href="#Anzeigen" onclick="$(\'#perskzstg\').toggle(); return false;">Anzeigen &gt;&gt;</a>';
 			echo '
 		<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 				$("#perskzstg").tablesorter(
 				{
 					sortList: [[0,0]],
 					widgets: ["zebra"]
-				}); 
-			}); 
+				});
+			});
 		</script>
 			<table class="tablesorter" id="perskzstg" style="display:none">
 				<thead>
@@ -606,10 +606,10 @@ if($result = $db->db_query($qry))
  * Absolventen ohne Abschlusspruefung
  *
  */
-$qry = "SELECT 
+$qry = "SELECT
 			tbl_person.vorname, tbl_person.nachname, tbl_student.student_uid
-		FROM 
-			public.tbl_student 
+		FROM
+			public.tbl_student
 			JOIN public.tbl_prestudent USING(prestudent_id)
 			JOIN public.tbl_person USING(person_id)
 		WHERE
@@ -620,9 +620,9 @@ $qry = "SELECT
 if($result = $db->db_query($qry))
 {
 	echo '<h2>Absolventen ohne Abschlusspruefung</h2>';
-	
+
 	$anzahl = $db->db_num_rows($result);
-	
+
 	echo '<span class="'.($anzahl>0?'warning':'ok').'">'.$anzahl.' Probleme gefunden</span>';
 
 	if($anzahl>0)
@@ -630,14 +630,14 @@ if($result = $db->db_query($qry))
 		echo '<br><a href="#Anzeigen" onclick="$(\'#absolventohnepruefung\').toggle(); return false;">Anzeigen &gt;&gt;</a>';
 			echo '
 		<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 				$("#absolventohnepruefung").tablesorter(
 				{
 					sortList: [[0,0]],
 					widgets: ["zebra"]
-				}); 
-			}); 
+				});
+			});
 		</script>
 			<table class="tablesorter" id="absolventohnepruefung" style="display:none">
 				<thead>
@@ -666,10 +666,10 @@ if($result = $db->db_query($qry))
  * Studenten mit mind. 2 Stati ohne Noten
  *
  */
-$qry = "SELECT 
+$qry = "SELECT
 			tbl_person.vorname, tbl_person.nachname, tbl_student.student_uid
-		FROM 
-			public.tbl_student 
+		FROM
+			public.tbl_student
 			JOIN public.tbl_prestudent USING(prestudent_id)
 			JOIN public.tbl_person USING(person_id)
 		WHERE
@@ -680,9 +680,9 @@ $qry = "SELECT
 if($result = $db->db_query($qry))
 {
 	echo '<h2>Studenten mit mind. 2 Studentenstati aber ohne Noten</h2>';
-	
+
 	$anzahl = $db->db_num_rows($result);
-	
+
 	echo '<span class="'.($anzahl>0?'warning':'ok').'">'.$anzahl.' Probleme gefunden</span>';
 
 	if($anzahl>0)
@@ -690,14 +690,14 @@ if($result = $db->db_query($qry))
 		echo '<br><a href="#Anzeigen" onclick="$(\'#studentohnenoten\').toggle(); return false;">Anzeigen &gt;&gt;</a>';
 			echo '
 		<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 				$("#studentohnenoten").tablesorter(
 				{
 					sortList: [[0,0]],
 					widgets: ["zebra"]
-				}); 
-			}); 
+				});
+			});
 		</script>
 			<table class="tablesorter" id="studentohnenoten" style="display:none">
 				<thead>

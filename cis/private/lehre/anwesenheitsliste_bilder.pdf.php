@@ -29,17 +29,17 @@
 
  	require_once('../../../config/cis.config.inc.php');
 // ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
+//	Datenbankanbindung
 // ------------------------------------------------------------------------------------------
 	require_once('../../../include/basis_db.class.php');
 	if (!$db = new basis_db())
 			die('Fehler beim Herstellen der Datenbankverbindung');
-				
+
    // Pfad zu fpdf
    define('FPDF_FONTPATH','../../../include/pdf/font/');
    // library einbinden
    require_once('../../../include/pdf/fpdf.php');
-   
+
    require_once('../../../include/person.class.php');
    require_once('../../../include/studiengang.class.php');
    require_once('../../../include/studiensemester.class.php');
@@ -54,21 +54,21 @@
       else
       	die('Fehler bei der Parameteruebergabe');
    }
-   else 
+   else
    		$stg='';
    if(isset($_GET['sem'])) //Semester
    {
    	  if(is_numeric($_GET['sem']))
    	  	$sem=$_GET['sem'];
-   	  else 
+   	  else
    	  	die('Fehler bei der Parameteruebergabe');
    }
-   else 
+   else
    		$sem='';
-   
+
    if(isset($_GET['verband'])) //Verband
       $verband=$_GET['verband'];
-   else 
+   else
       $verband='';
    if(isset($_GET['gruppe'])) //Gruppe
       $gruppe=$_GET['gruppe'];
@@ -76,17 +76,17 @@
 	  $gruppe='';
    if(isset($_GET['gruppe_kurzbz'])) //Einheit
       $gruppe_kurzbz = $_GET['gruppe_kurzbz'];
-   else 
+   else
       $gruppe_kurzbz='';
-      
+
    if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
    		$lvid = $_GET['lvid'];
-   	else 
+   	else
    		die('Fehler bei der Parameteruebergabe');
-   		
+
    	if(isset($_GET['stsem']))
    		$stsem = $_GET['stsem'];
-   	else 
+   	else
    		die('Studiensemester wurde nicht uebergeben');
 
    $lehreinheit_id = (isset($_GET['lehreinheit_id'])?$_GET['lehreinheit_id']:'');

@@ -783,17 +783,17 @@ if(!$error)
 												$student->gruppe='';
 											}
 
-                                            // noch nicht eingetragene Noten ergänzen
-                                            $noten = new zeugnisnote();
-                                            $noten->getZeugnisnoten(null, $uid, $semester_aktuell);
-                                            foreach($noten->result as $obj)
-                                            {
-                                                if($obj->note == '')
-                                                {
-                                                    $obj->note = 9;
-                                                    $obj->save(true);
-                                                }
-                                            }
+											// noch nicht eingetragene Noten ergänzen
+											$noten = new zeugnisnote();
+											$noten->getZeugnisnoten(null, $prestudent_id, $semester_aktuell);
+											foreach($noten->result as $obj)
+											{
+												if($obj->note == '')
+												{
+													$obj->note = 9;
+													$obj->save(true);
+												}
+											}
 
 											//Nachschauen ob dieser Lehrverband schon existiert, falls nicht dann anlegen
 											$lehrverband = new lehrverband();
@@ -1140,7 +1140,7 @@ if(!$error)
 					    $rolle->bestaetigtam = $_POST['bestaetigtam'];
 					    if($_POST['bestaetigtam']=='')
 					    	$rolle->bestaetigtvon = null;
-					    
+
 					    $rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
 					    $rolle->studienplan_id = $_POST['studienplan_id'];
                         $rolle->anmerkung_status = $_POST['anmerkung'];
@@ -2549,7 +2549,7 @@ if(!$error)
 			$bisio->von = $_POST['von'];
 			$bisio->bis = $_POST['bis'];
 			$bisio->zweck_code = $_POST['zweck_code'];
-			$bisio->student_uid = $_POST['student_uid'];
+			$bisio->prestudent_id = $_POST['prestudent_id'];
 			$bisio->lehreinheit_id = $_POST['lehreinheit_id'];
 			$bisio->ort = $_POST['ort'];
 			$bisio->universitaet = $_POST['universitaet'];

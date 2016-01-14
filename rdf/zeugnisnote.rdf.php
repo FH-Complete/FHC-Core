@@ -54,22 +54,22 @@ $stg_arr = array();
 $stg_obj = new studiengang();
 $stg_obj->getAll(null, false);
 
-foreach ($stg_obj->result as $stg) 
+foreach ($stg_obj->result as $stg)
 	$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;
 
-if(isset($_GET['uid']))
-	$uid = $_GET['uid'];
-else 
-	$uid = null;
-	
+if(isset($_GET['prestudent_id']))
+	$prestudent_id = $_GET['prestudent_id'];
+else
+	$prestudent_id = null;
+
 if(isset($_GET['lehrveranstaltung_id']))
 	$lehrveranstaltung_id = $_GET['lehrveranstaltung_id'];
-else 
+else
 	$lehrveranstaltung_id = null;
 
 if(isset($_GET['studiensemester_kurzbz']))
 	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
-else 
+else
 	$studiensemester_kurzbz = $semester_aktuell;
 
 $rdf_url='http://www.technikum-wien.at/zeugnisnote';
@@ -81,29 +81,30 @@ echo '
 >
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
-   
+
 //Daten holen
 $obj = new zeugnisnote();
 
-$obj->getZeugnisnoten($lehrveranstaltung_id, $uid, $studiensemester_kurzbz);
+$obj->getZeugnisnoten($lehrveranstaltung_id, $prestudent_id, $studiensemester_kurzbz);
 $benutzer = new student();
 
-foreach ($obj->result as $row)	
+foreach ($obj->result as $row)
 {
 	$benutzer->load($row->student_uid);
 	$lv_obj = new lehrveranstaltung();
 	$lv_obj->load($row->lehrveranstaltung_id);
-	
+
 	if ($lv_obj->zeugnis==false)
 		$zeugnis=APP_ROOT.'skin/images/invisible.png';
-	else 
+	else
 		$zeugnis='';
-		
+
 	echo '
 		  <RDF:li>
 	         <RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'" >
 				<NOTE:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></NOTE:lehrveranstaltung_id>
 				<NOTE:student_uid><![CDATA['.$row->student_uid.']]></NOTE:student_uid>
+				<NOTE:prestudent_id><![CDATA['.$row->prestudent_id.']]></NOTE:prestudent_id>
 				<NOTE:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></NOTE:studiensemester_kurzbz>
 				<NOTE:note><![CDATA['.$row->note.']]></NOTE:note>
 				<NOTE:uebernahmedatum_iso><![CDATA['.$row->uebernahmedatum.']]></NOTE:uebernahmedatum_iso>

@@ -36,18 +36,18 @@ require_once('../include/datum.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
-if(isset($_GET['uid']))
-	$uid = $_GET['uid'];
-else 
-	$uid = null;
-	
+if(isset($_GET['prestudent_id']))
+	$prestudent_id = $_GET['prestudent_id'];
+else
+	$prestudent_id = null;
+
 if(isset($_GET['bisio_id']))
 	$bisio_id = $_GET['bisio_id'];
-else 
+else
 	$bisio_id = null;
 
 $datum = new datum();
-	
+
 $rdf_url='http://www.technikum-wien.at/bisio';
 
 echo '
@@ -57,20 +57,20 @@ echo '
 >
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
-   
+
 //Daten holen
 $ioobj = new bisio();
 
 //Wenn die UID uebergeben wurde, dann werden alle
 //Eintraege dieser Person geladen
-if($uid)
+if(is_numeric($prestudent_id))
 {
-	if($ioobj->getIO($uid))
+	if($ioobj->getIO($prestudent_id))
 	{
 		foreach ($ioobj->result as $row)
 			draw_content($row);
 	}
-	else 
+	else
 		die($ioobj->errormsg);
 }
 elseif($bisio_id)
@@ -79,18 +79,18 @@ elseif($bisio_id)
 	//dieser eine Datensatz geladen
 	if($ioobj->load($bisio_id))
 		draw_content($ioobj);
-	else 
+	else
 		die($ioobj->errormsg);
 }
-else 
+else
 	die('Falsche Parameteruebergabe');
 
 function draw_content($row)
-{		
+{
 	global $rdf_url, $datum, $db;
 	$lehrveranstaltung_id='';
 	$studiensemester_kurzbz = '';
-	
+
 	if($row->lehreinheit_id!='')
 	{
 		$qry = "SELECT lehrveranstaltung_id, studiensemester_kurzbz FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$row->lehreinheit_id'";
@@ -103,7 +103,7 @@ function draw_content($row)
 			}
 		}
 	}
-	
+
 	echo '
 		  <RDF:li>
 	         <RDF:Description  id="'.$row->bisio_id.'"  about="'.$rdf_url.'/'.$row->bisio_id.'" >
@@ -117,7 +117,7 @@ function draw_content($row)
 	            <IO:bis><![CDATA['.$datum->convertISODate($row->bis).']]></IO:bis>
 	            <IO:zweck_code><![CDATA['.$row->zweck_code.']]></IO:zweck_code>
 	            <IO:zweck_bezeichnung><![CDATA['.$row->zweck_bezeichnung.']]></IO:zweck_bezeichnung>
-	            <IO:student_uid><![CDATA['.$row->student_uid.']]></IO:student_uid>
+	            <IO:prestudent_id><![CDATA['.$row->prestudent_id.']]></IO:prestudent_id>
 	            <IO:lehreinheit_id><![CDATA['.$row->lehreinheit_id.']]></IO:lehreinheit_id>
 	            <IO:ort><![CDATA['.$row->ort.']]></IO:ort>
 	            <IO:universitaet><![CDATA['.$row->universitaet.']]></IO:universitaet>

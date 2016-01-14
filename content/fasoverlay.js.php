@@ -362,43 +362,46 @@ function onVerbandSelect(event)
 		// -------------- Studenten --------------------------
 		try
 		{
-			stsem = getStudiensemester();
-			url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ=student&orgform="+orgform+"&"+gettimestamp();
-			var treeStudent=document.getElementById('student-tree');
-
-			//Alte DS entfernen
-			var oldDatasources = treeStudent.database.GetDataSources();
-			while(oldDatasources.hasMoreElements())
+			if(stg_kz != "")
 			{
-				treeStudent.database.RemoveDataSource(oldDatasources.getNext());
-			}
+				stsem = getStudiensemester();
+				url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ=student&orgform="+orgform+"&"+gettimestamp();
+				var treeStudent=document.getElementById('student-tree');
 
-			try
-			{
-				StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
-				treeStudent.builder.removeListener(StudentTreeListener);
-			}
-			catch(e)
-			{}
-			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-			StudentTreeDatasource = rdfService.GetDataSource(url);
-			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-			StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-			treeStudent.database.AddDataSource(StudentTreeDatasource);
-			StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
-			treeStudent.builder.addListener(StudentTreeListener);
+				//Alte DS entfernen
+				var oldDatasources = treeStudent.database.GetDataSources();
+				while(oldDatasources.hasMoreElements())
+				{
+					treeStudent.database.RemoveDataSource(oldDatasources.getNext());
+				}
 
-			//Detailfelder Deaktivieren
-			StudentDetailReset();
-			StudentDetailDisableFields(true);
-			StudentPrestudentDisableFields(true);
-			StudentKontoDisableFields(true);
-			StudentAkteDisableFields(true);
-			StudentIODisableFields(true);
-			StudentNoteDisableFields(true);
-			document.getElementById('student-kontakt').setAttribute('src','');
-			document.getElementById('student-betriebsmittel').setAttribute('src','');
-			StudentAbschlusspruefungDisableFields(true);
+				try
+				{
+					StudentTreeDatasource.removeXMLSinkObserver(StudentTreeSinkObserver);
+					treeStudent.builder.removeListener(StudentTreeListener);
+				}
+				catch(e)
+				{}
+				var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+				StudentTreeDatasource = rdfService.GetDataSource(url);
+				StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+				StudentTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+				treeStudent.database.AddDataSource(StudentTreeDatasource);
+				StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
+				treeStudent.builder.addListener(StudentTreeListener);
+
+				//Detailfelder Deaktivieren
+				StudentDetailReset();
+				StudentDetailDisableFields(true);
+				StudentPrestudentDisableFields(true);
+				StudentKontoDisableFields(true);
+				StudentAkteDisableFields(true);
+				StudentIODisableFields(true);
+				StudentNoteDisableFields(true);
+				document.getElementById('student-kontakt').setAttribute('src','');
+				document.getElementById('student-betriebsmittel').setAttribute('src','');
+				StudentAbschlusspruefungDisableFields(true);
+			}
 		}
 		catch(e)
 		{
@@ -408,33 +411,36 @@ function onVerbandSelect(event)
 		// -------------- Lehrveranstaltung --------------------------
 		try
 		{
-			url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&sem='+sem+'&ver='+ver+'&grp='+grp+'&gruppe='+gruppe+'&orgform='+orgform+"&"+gettimestamp();
-			var treeLV=document.getElementById('lehrveranstaltung-tree');
-
-			try
+			if(stg_kz != "")
 			{
-				LvTreeDatasource.removeXMLSinkObserver(LvTreeSinkObserver);
-				treeLV.builder.removeListener(LvTreeListener);
+				url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&sem='+sem+'&ver='+ver+'&grp='+grp+'&gruppe='+gruppe+'&orgform='+orgform+"&"+gettimestamp();
+				var treeLV=document.getElementById('lehrveranstaltung-tree');
+
+				try
+				{
+					LvTreeDatasource.removeXMLSinkObserver(LvTreeSinkObserver);
+					treeLV.builder.removeListener(LvTreeListener);
+				}
+				catch(e)
+				{}
+
+				//Alte DS entfernen
+				var oldDatasources = treeLV.database.GetDataSources();
+				while(oldDatasources.hasMoreElements())
+				{
+					treeLV.database.RemoveDataSource(oldDatasources.getNext());
+				}
+
+				var rdfService1 = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+
+				LvTreeDatasource = rdfService1.GetDataSource(url);
+				LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+				LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+				treeLV.database.AddDataSource(LvTreeDatasource);
+				LvTreeDatasource.addXMLSinkObserver(LvTreeSinkObserver);
+				treeLV.builder.addListener(LvTreeListener);
+				document.getElementById('lehrveranstaltung-toolbar-lehrauftrag').hidden=true;
 			}
-			catch(e)
-			{}
-
-			//Alte DS entfernen
-			var oldDatasources = treeLV.database.GetDataSources();
-			while(oldDatasources.hasMoreElements())
-			{
-				treeLV.database.RemoveDataSource(oldDatasources.getNext());
-			}
-
-			var rdfService1 = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-
-			LvTreeDatasource = rdfService1.GetDataSource(url);
-			LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-			LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-			treeLV.database.AddDataSource(LvTreeDatasource);
-			LvTreeDatasource.addXMLSinkObserver(LvTreeSinkObserver);
-			treeLV.builder.addListener(LvTreeListener);
-			document.getElementById('lehrveranstaltung-toolbar-lehrauftrag').hidden=true;
 		}
 		catch(e)
 		{
@@ -700,7 +706,6 @@ function onLektorSelect(event)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	try
 	{
-		//alert(stg_kz);
 		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&uid='+uid+'&'+gettimestamp();
 		var treeLV=document.getElementById('lehrveranstaltung-tree');
 

@@ -89,7 +89,7 @@ if($db->db_query($qry))
 	{
 		if(empty($row))
 			die("Lehreinheit $lehreinheit am $von nicht gefunden");
-		
+
 		$data[$row->lehreinheit_id]['tage'][$row->datum][] = $row;
 	}
 }
@@ -97,8 +97,8 @@ if($db->db_query($qry))
 foreach($data as $key => $value)
 {
 	$currentDay = key($value['tage']);
-    
-    // Daten der Vortragenden ermitteln
+
+	// Daten der Vortragenden ermitteln
 	$qry = "SELECT vorname, nachname, titelpre, titelpost "
 		. "FROM lehre.tbl_lehreinheitmitarbeiter lema "
 		. "JOIN public.tbl_benutzer be ON be.uid = lema.mitarbeiter_uid "
@@ -126,7 +126,7 @@ foreach($data as $key => $value)
         . "AND tbl_student.student_uid NOT IN ("
             . "SELECT stud.student_uid "
             . "FROM bis.tbl_bisio bis "
-            . "JOIN public.tbl_student stud ON bis.student_uid = stud.student_uid "
+            . "JOIN public.tbl_student stud ON bis.prestudent_id = stud.prestudent_id "
             . "WHERE bis.von <= " . $db->db_add_param($currentDay) . "::DATE AND bis.bis >= " . $db->db_add_param($currentDay) . "::DATE) "
 		. "ORDER BY nachname ASC";
 

@@ -56,7 +56,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						context="student-io-tree-popup"
 						flags="dont-build-content"
 					>
-					<!-- onselect="StudentIOAuswahl()" - wird jetzt per JS gesetzt -->					
+					<!-- onselect="StudentIOAuswahl()" - wird jetzt per JS gesetzt -->
 						<treecols>
 							<treecol id="student-io-tree-mobilitaetsprogramm_kurzbz" label="Kurzbz" flex="2" hidden="false" primary="true"
 								class="sortDirectionIndicator"
@@ -85,7 +85,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								sort="rdf:http://www.technikum-wien.at/bisio/rdf#bisio_id" />
 							<splitter class="tree-splitter"/>
 						</treecols>
-					
+
 						<template>
 							<treechildren flex="1" >
 									<treeitem uri="rdf:*">
@@ -104,15 +104,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<vbox>
 						<hbox>
 							<button id="student-io-button-neu" label="Neu" oncommand="StudentIONeu();" disabled="true"/>
-							<button id="student-io-button-loeschen" label="Loeschen" oncommand="StudentIODelete();" disabled="true"/>							
+							<button id="student-io-button-loeschen" label="Loeschen" oncommand="StudentIODelete();" disabled="true"/>
 						</hbox>
 						<vbox hidden="true">
 							<label value="Neu"/>
-							<checkbox id="student-io-detail-checkbox-neu" checked="true" />      	
+							<checkbox id="student-io-detail-checkbox-neu" checked="true" />
 							<label value="Uid"/>
-				      		<textbox id="student-io-detail-textbox-uid" disabled="true"/>					
-				      		<label value="BisIO ID"/>
-				      		<textbox id="student-io-detail-textbox-bisio_id" disabled="true"/>
+								<textbox id="student-io-detail-textbox-prestudent_id" disabled="true"/>
+								<textbox id="student-io-detail-textbox-uid" disabled="true"/>
+								<label value="BisIO ID"/>
+								<textbox id="student-io-detail-textbox-bisio_id" disabled="true"/>
 						</vbox>
 						<groupbox id="student-io-groupbox" flex="1">
 						<caption label="BIS"/>
@@ -126,7 +127,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<label value="Von" control="student-io-textbox-von"/>
 										<hbox>
 											<box class="Datum" id="student-io-textbox-von" disabled="true"/>
-					      					<spacer flex="1" />			
+					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
 									<row>
@@ -179,7 +180,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											</template>
 										</menulist>
 									</row>
-									
+
 								</rows>
 							</grid>
 						</groupbox>
@@ -195,7 +196,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<label value="Lehrveranstaltung" control="student-io-menulist-lehrveranstaltung"/>
 										<menulist id="student-io-menulist-lehrveranstaltung" disabled="true"
 										          datasources="rdf:null" flex="1"
-										          ref="http://www.technikum-wien.at/lehrveranstaltung/liste" 
+										          ref="http://www.technikum-wien.at/lehrveranstaltung/liste"
 										          oncommand="StudentIOLVAChange()">
 											<template>
 												<menupopup>
@@ -230,7 +231,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									</row>
 								</rows>
 							</grid>
-						</groupbox>	
+						</groupbox>
 						<hbox>
 							<spacer flex="1" />
 							<button id="student-io-button-speichern" oncommand="StudentIODetailSpeichern()" label="Speichern" disabled="true"/>

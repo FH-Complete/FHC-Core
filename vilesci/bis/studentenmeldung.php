@@ -22,12 +22,12 @@
  */
 /**
  * Studentenmeldung
- * 
+ *
  * Erstellt ein XML File fuer die Studentenmeldung an den FHR
- * Das XML-File wird im Filesystem abgelegt. 
+ * Das XML-File wird im Filesystem abgelegt.
  * Zusaetzlich wird eine Uebersichtsliste ueber die im File enthaltenen Daten erstellt und
  * nicht plausible Daten
- * 
+ *
  * Parameter: stg_kz ... Kennzahl des Studienganges
  */
 require_once('../../config/vilesci.config.inc.php');
@@ -157,7 +157,7 @@ if($stg_obj->load($stg_kz))
 		echo "Die maximale Semesteranzahl des Studienganges ist nicht angegeben!";
 		exit;
 	}
-	
+
 	$erhalter = sprintf('%03s',$stg_obj->erhalter_kz);
 
 	switch($stg_obj->typ)
@@ -177,29 +177,29 @@ if($stg_obj->load($stg_kz))
 	$orgform_code = $orgform_code_array[$stg_obj->orgform_kurzbz];
 	$orgform_kurzbz=$stg_obj->orgform_kurzbz;
 }
-else 
+else
 	die('Fehler:'.$stg_obj->errormsg);
 
 
 //Ausgabe aktiver Studenten, die nicht gemeldet werden
 $qry_akt="
-	SELECT 
+	SELECT
 		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id
-	FROM 
+	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
 		JOIN public.tbl_person USING (person_id)
 		JOIN public.tbl_prestudent USING (prestudent_id)
 		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
-	WHERE 
+	WHERE
 		bismelden=FALSE
 		AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
 		AND (tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem)." AND status_kurzbz IN ('Student','Diplomand','Unterbrecher','Praktikant','Outgoing'))
 		AND tbl_prestudent.prestudent_id NOT IN
 			(
-			SELECT prestudent_id 
-			FROM public.tbl_prestudentstatus 
-			WHERE 
+			SELECT prestudent_id
+			FROM public.tbl_prestudentstatus
+			WHERE
 			 	tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem)."
 			 	AND (status_kurzbz='Abbrecher' OR status_kurzbz='Absolvent')
 			 )
@@ -216,18 +216,18 @@ if($result_akt = $db->db_query($qry_akt))
 
 //Incoming ohne I/O Datensatz anzeigen
 $qry_in="
-	SELECT 
+	SELECT
 		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id
-	FROM 
+	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
 		JOIN public.tbl_person USING (person_id)
 		JOIN public.tbl_prestudent USING (prestudent_id)
 		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
-	WHERE 
+	WHERE
 		bismelden=TRUE
 		AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
-		AND (status_kurzbz='Incoming' AND student_uid NOT IN (SELECT student_uid FROM bis.tbl_bisio))
+		AND (status_kurzbz='Incoming' AND tbl_student.prestudent_id NOT IN (SELECT prestudent_id FROM bis.tbl_bisio))
 	ORDER BY student_uid, nachname, vorname
 	";
 if($result_in = $db->db_query($qry_in))
@@ -242,15 +242,15 @@ if($result_in = $db->db_query($qry_in))
 
 //Hauptselect
 $qry="
-	SELECT 
+	SELECT
 		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
-	FROM 
+	FROM
 		public.tbl_student
 		JOIN public.tbl_benutzer ON(student_uid=uid)
 		JOIN public.tbl_person USING (person_id)
 		JOIN public.tbl_prestudent USING (prestudent_id)
 		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
-	WHERE 
+	WHERE
 		bismelden=TRUE
 		AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
 		AND (((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem).") AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
@@ -259,7 +259,7 @@ $qry="
 			OR status_kurzbz='Abbrecher' OR status_kurzbz='Unterbrecher'))
 			OR ((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($psem).") AND (status_kurzbz='Absolvent'
 			OR status_kurzbz='Abbrecher') AND tbl_prestudentstatus.datum>".$db->db_add_param($bisprevious).")
-			OR (status_kurzbz='Incoming' AND student_uid IN (SELECT student_uid FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
+			OR (status_kurzbz='Incoming' AND tbl_student.prestudent_id IN (SELECT prestudent_id FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
 				OR (tbl_bisio.von<=".$db->db_add_param($bisdatum)." AND (tbl_bisio.bis>=".$db->db_add_param($bisdatum)."  OR tbl_bisio.bis IS NULL))
 		)))
 	ORDER BY student_uid, nachname, vorname
@@ -309,7 +309,7 @@ if($result = $db->db_query($qry))
 	{
       	//orgform!='3'
       	//Stg mit einer Orgform
-      	 
+
 		$datei.="
 		<StudiengangDetail>
 			<OrgFormTeilCode>".$orgform_code."</OrgFormTeilCode>
@@ -319,7 +319,7 @@ if($result = $db->db_query($qry))
 		{
 			$datei.= GenerateXMLStudentBlock($row);
 		}
-		
+
 		//Bewerberblock bei Ausserordentlichen nicht anzeigen
 		if($stg_kz!=('9'.$erhalter))
 		{
@@ -410,7 +410,7 @@ foreach ($semester_arr as $semester)
 	$abbrecher.='<td>&nbsp;';
 	$absolventen.='<td>&nbsp;';
 	$outgoing.='<td>&nbsp;';
-	
+
 	$i=0;
 	foreach($verwendete_orgformen as $orgform)
 	{
@@ -422,13 +422,13 @@ foreach ($semester_arr as $semester)
 			$absolventen.=' / ';
 			$outgoing.=' / ';
 		}
-		
+
 		$aktiv .= (isset($stsem[$orgform][$semester])?$stsem[$orgform][$semester]:'');
 		$unterbrecher .= (isset($usem[$orgform][$semester])?$usem[$orgform][$semester]:'');
 		$abbrecher .= (isset($asem[$orgform][$semester])?$asem[$orgform][$semester]:'');
 		$absolventen .= (isset($absem[$orgform][$semester])?$absem[$orgform][$semester]:'');
 		$outgoing .= (isset($iosem[$orgform][$semester])?$iosem[$orgform][$semester]:'');
-		
+
 		$i++;
 	}
 	$aktiv.='</td>';
@@ -469,7 +469,7 @@ for($i=0;$i<sizeof($verwendete_orgformen);$i++)
 {
 	if($i!=0)
 		$tabelle.=' / ';
-	
+
 	$tabelle.= isset($bewerbercount[$verwendete_orgformen[$i]])?$bewerbercount[$verwendete_orgformen[$i]]:'';
 }
 $tabelle.='</td>';
@@ -535,7 +535,7 @@ echo '<table border=1>
 echo '</body></html>';
 
 /**************************************************************************
- *  FUNKTIONEN 
+ *  FUNKTIONEN
  **************************************************************************/
 
 /**
@@ -553,13 +553,13 @@ function GenerateXMLStudentBlock($row)
 	$error_log1='';
 	$datei = '';
 	$datumobj = new datum();
-	
+
 	//Pruefen ob Ausserordnetlicher Studierender (4.Stelle in Personenkennzeichen = 9)
 	if(mb_substr($row->matrikelnr,3,1)=='9')
 		$ausserordentlich=true;
 	else
 		$ausserordentlich=false;
-		
+
 	$qryadr="SELECT * FROM public.tbl_adresse WHERE heimatadresse IS TRUE AND person_id=".$db->db_add_param($row->pers_id).";";
 	$results=$db->db_query($qryadr);
 
@@ -681,7 +681,7 @@ function GenerateXMLStudentBlock($row)
 			}
 		}
 	}
-	
+
 	//StudStatusCode und Semester ermitteln
 	$qrystatus="SELECT * FROM public.tbl_prestudentstatus
 		WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." AND studiensemester_kurzbz=".$db->db_add_param($ssem)." AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
@@ -767,7 +767,7 @@ function GenerateXMLStudentBlock($row)
 							}
 						}
 					}
-					
+
 					if($ausserordentlich)
 					{
 						$status=1;
@@ -799,7 +799,7 @@ function GenerateXMLStudentBlock($row)
 	//Wenn im Status keine Organisationsform eingetragen ist, wird die des Studienganges uebernommen
 	if($storgform=='')
 		$storgform=$orgform_kurzbz;
-	
+
 	//bei Absolventen das Beendigungsdatum (Sponsion oder Abschlussprüfung) überprüfen
 	if($aktstatus=='Absolvent')
 	{
@@ -854,10 +854,10 @@ function GenerateXMLStudentBlock($row)
 			$error_log.=(!empty($error_log)?', ':'')."Heimat-Nation bei Incoming('".$nation."')";
 		}
 	}
-	
-	$qryad="SELECT * FROM public.tbl_prestudentstatus 
-				WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." 
-				AND (status_kurzbz='Student' OR status_kurzbz='Unterbrecher') 
+
+	$qryad="SELECT * FROM public.tbl_prestudentstatus
+				WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)."
+				AND (status_kurzbz='Student' OR status_kurzbz='Unterbrecher')
 				AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).") ORDER BY datum asc;";
 	if($resultad = $db->db_query($qryad))
 	{
@@ -880,7 +880,7 @@ function GenerateXMLStudentBlock($row)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Ausstellungsstaat ist nicht eingetragen";
 	}
-	
+
 	if($error_log!='' OR $error_log1!='')
 	{
 		$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->status_kurzbz): </u>\n";
@@ -908,7 +908,7 @@ function GenerateXMLStudentBlock($row)
 			$datei.="
 			<OrgFormCode>".$orgform_code_array[$storgform]."</OrgFormCode>";
 		}
-		
+
 		$datei.="
 			<GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
 			<Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
@@ -959,7 +959,7 @@ function GenerateXMLStudentBlock($row)
 			$datei.="
 			<ZugangMaStgDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvmadatum))."</ZugangMaStgDatum>";
 		}
-		
+
 		if($aktstatus!='Incoming' && !$ausserordentlich)
 		{
 			if($row->zgvmanation!='' && $stgart=='2')
@@ -975,13 +975,13 @@ function GenerateXMLStudentBlock($row)
 				<Ausstellungsstaat>'.$ausstellungsstaat.'</Ausstellungsstaat>';
 			}
 		}
-				
+
 		if($beginndatum!='' && !$ausserordentlich)
 		{
 			$datei.="
 			<BeginnDatum>".date("dmY", $datumobj->mktime_fromdate($beginndatum))."</BeginnDatum>";
 		}
-			
+
 		if($aktstatus=='Absolvent' || $aktstatus=='Abbrecher')
 		{
 			$datei.="
@@ -992,7 +992,7 @@ function GenerateXMLStudentBlock($row)
 			$datei.="
 			<Ausbildungssemester>".$sem."</Ausbildungssemester>";
 		}
-		
+
 		$datei.="
 			<StudStatusCode>".$status."</StudStatusCode>";
 		if($orgform_code_array[$storgform]!=1 && !$ausserordentlich) // Wenn nicht Vollzeit und nicht Ausserordentlich
@@ -1009,18 +1009,18 @@ function GenerateXMLStudentBlock($row)
 		/*
 		 * BMWFFoerderrung derzeit fuer alle Studierende auf Ja gesetzt
 		 * Ausnahme: ausserordnetliche Studierende und Incoming
-		 * 
+		 *
 		 * ToDo: sollte pro Studierenden konfigurierbar sein
 		 */
 		if($aktstatus=='Incoming' || $ausserordentlich)
 			$bmwf='N';
 		else
 			$bmwf='J';
-		
+
 		$datei.="
 				<BMWFWfoerderrelevant>".$bmwf."</BMWFWfoerderrelevant>";
-		
-		$qryio="SELECT * FROM bis.tbl_bisio WHERE student_uid=".$db->db_add_param($row->student_uid)."
+
+		$qryio="SELECT * FROM bis.tbl_bisio WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)."
 					AND (von>".$db->db_add_param($bisprevious)." OR bis IS NULL OR bis>".$db->db_add_param($bisprevious).")
 					AND von<=".$db->db_add_param($bisdatum).";";
 		if($resultio = $db->db_query($qryio))
@@ -1064,7 +1064,7 @@ function GenerateXMLStudentBlock($row)
 				}
 			}
 		}
-		
+
 		$datei.="
 		</StudentIn>";
 
@@ -1103,7 +1103,7 @@ function GenerateXMLStudentBlock($row)
 	}
 	if(!in_array($storgform, $verwendete_orgformen))
 		$verwendete_orgformen[]=$storgform;
-	
+
 	//Studentenliste
 	$stlist.="<tr><td align=center>".trim($row->student_uid)."</td><td align=center>".trim($row->matrikelnr)."</td><td>".trim($row->nachname)."</td><td>".trim($row->vorname)."</td><td>".trim($aktstatus)."</td><td align=center>".trim($sem)."</td><td align=center>".trim($storgform)."</td></tr>";
 	return $datei;
@@ -1125,7 +1125,7 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 	$datei = '';
 	$bewerberM=array();
 	$bewerberW=array();
-	
+
 	if(mb_strstr($ssem,"WS"))
 	{
 		//Bewerber
@@ -1139,7 +1139,7 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 			";
 		if(!is_null($orgformcode))
 			$qrybw.=" AND tbl_orgform.code=".$db->db_add_param($orgformcode);
-		
+
 		if($resultbw = $db->db_query($qrybw))
 		{
 			while($rowbw = $db->db_fetch_object($resultbw))
@@ -1185,16 +1185,16 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 					}
 				}
 				$bworgform = ($rowbw->orgform_kurzbz!=''?$rowbw->orgform_kurzbz:$orgform_kurzbz);
-				
+
 				if(isset($bewerbercount[0]))
 					$bewerbercount[0]++;
-				else 
+				else
 					$bewerbercount[0]=1;
 				if(isset($bewerbercount[$bworgform]))
 					$bewerbercount[$bworgform]++;
-				else 
+				else
 					$bewerbercount[$bworgform]=1;
-				
+
 				$bwlist.='<tr><td>'.trim($rowbw->nachname).'</td><td>'.trim($rowbw->vorname).'</td><td>'.$bworgform.'</td></tr>';
 			}
 		}
@@ -1213,7 +1213,7 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 			if($stgart==2)
 				$datei.='
 				<ZugangMaStgCode>'.$key.'</ZugangMaStgCode>';
-			else 
+			else
 				$datei.='
 				<ZugangCode>'.$key.'</ZugangCode>';
 

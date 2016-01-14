@@ -45,47 +45,47 @@ if(!check_lektor($uid))
 
 if (!$db = new basis_db())
 	die('Fehler beim Herstellen der Datenbankverbindung');
-	
+
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 	$lvid=$_GET['lvid'];
 else
 	die("Fehlerhafte Parameteruebergabe");
-   	
+
 if(isset($_GET['stg']) && is_numeric($_GET['stg']))
 	$stg=$_GET['stg'];
-else 
+else
 	die("Fehlerhafte Parameteruebergabe");
-   		
+
 if(isset($_GET['gruppe_kurzbz']))
 	$gruppe_kurzbz = $_GET['gruppe_kurzbz'];
-else 
+else
 	$gruppe_kurzbz = '';
-   		
+
 if(isset($_GET['sem']) && is_numeric($_GET['sem']))
 	$sem = $_GET['sem'];
-else 	
+else
 	$sem = '';
-   	
+
 if(isset($_GET['verband']))
 	$verband = $_GET['verband'];
-else 
+else
 	$verband = '';
-   		
+
 if(isset($_GET['gruppe']) && is_numeric($_GET['gruppe']))
 	$gruppe = $_GET['gruppe'];
 else
 	$gruppe = '';
-   		
+
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
 	die('Studiensemester muss uebergeben werden');
-   		
+
 if(isset($_GET['lehreinheit_id']))
 	$lehreinheit_id = $_GET['lehreinheit_id'];
-else 
+else
 	$lehreinheit_id = '';
-   	
+
 /*
  * Create Excel File
  */
@@ -93,7 +93,7 @@ else
 	// Creating a workbook
 	$workbook = new Spreadsheet_Excel_Writer();
 	$workbook->setVersion(8);
-	
+
 	// sending HTTP headers
 	$workbook->send($p->t('anwesenheitsliste/notenliste'). "_" . date("d_m_Y") . ".xls");
 	$workbook->setCustomColor (15,192,192,192); //Setzen der HG-Farbe Hellgrau
@@ -105,12 +105,12 @@ else
 
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
-	
+
 	$format_highlight =& $workbook->addFormat();
 	$format_highlight->setFgColor(15);
 	$format_highlight->setBorder(1);
 	$format_highlight->setBorderColor('white');
-	
+
 	$format_border_bottom =& $workbook->addFormat();
 	$format_border_bottom ->setBottom(2);
 	$format_border_bottom->setBold();
@@ -124,17 +124,17 @@ else
 	$format_title->setAlign('merge');
 
 	$lvobj = new lehrveranstaltung($lvid);
-		
+
 	$worksheet->write(0,0,$p->t('anwesenheitsliste/notenliste')." ".($sprache=='English'?$lvobj->bezeichnung_english:$lvobj->bezeichnung),$format_bold);
-	
+
 	$stg_obj = new studiengang($stg);
-	
+
 	$qry = "SELECT
-				distinct on(kuerzel, semester, verband, gruppe, gruppe_kurzbz) UPPER(stg_typ::varchar(1) || stg_kurzbz) as kuerzel, 
-				semester, verband, gruppe, gruppe_kurzbz 
+				distinct on(kuerzel, semester, verband, gruppe, gruppe_kurzbz) UPPER(stg_typ::varchar(1) || stg_kurzbz) as kuerzel,
+				semester, verband, gruppe, gruppe_kurzbz
 			FROM
-				campus.vw_lehreinheit 
-			WHERE 
+				campus.vw_lehreinheit
+			WHERE
 				lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND studiensemester_kurzbz=".$db->db_add_param($stsem);
 	if($lehreinheit_id!='')
 		$qry.=" AND lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
@@ -152,26 +152,26 @@ else
 				$gruppen.=$row->gruppe_kurzbz;
 		}
 	}
-			
+
 	$worksheet->write(1,0,$p->t('global/studiengang').": $stg_obj->bezeichnung $gruppen");
 	$lines=2;
 	//Lektoren ermitteln
-	
-	$qry = "SELECT 
-				distinct vorname, nachname 
-			FROM 
-				campus.vw_benutzer, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter 
-			WHERE 
-				uid=mitarbeiter_uid AND 
-				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
-				lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND 
+
+	$qry = "SELECT
+				distinct vorname, nachname
+			FROM
+				campus.vw_benutzer, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
+			WHERE
+				uid=mitarbeiter_uid AND
+				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+				lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
 				studiensemester_kurzbz=".$db->db_add_param($stsem);
-	
+
 	if($lehreinheit_id!='')
 		$qry.=" AND tbl_lehreinheit.lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
-	
+
 	$qry.=' ORDER BY nachname, vorname';
-	
+
 	if($result = $db->db_query($qry))
 	{
 		while($row=$db->db_fetch_object($result))
@@ -196,29 +196,29 @@ else
 	$stsem_obj = new studiensemester();
 	$stsem_obj->load($stsem);
 	$stsemdatumvon = $stsem_obj->start;
-	$stsemdatumbis = $stsem_obj->ende;	
-	
-	$qry = "SELECT 
+	$stsemdatumbis = $stsem_obj->ende;
+
+	$qry = "SELECT
 			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, person_id, tbl_student.student_uid as uid,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 			tbl_bisio.bisio_id, tbl_bisio.bis, tbl_bisio.von,
-			tbl_zeugnisnote.note 
-		FROM 
-			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
-			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid) 
+			tbl_zeugnisnote.note
+		FROM
+			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
+			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
 			LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
 			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
-			LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
-		WHERE 
-			vw_student_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND 
+			LEFT JOIN bis.tbl_bisio ON(public.tbl_student.prestudent_id=tbl_bisio.prestudent_id)
+		WHERE
+			vw_student_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
 			vw_student_lehrveranstaltung.studiensemester_kurzbz=".$db->db_add_param($stsem);
 
 	if($lehreinheit_id!='')
 		$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
-	
+
 	$qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
-	
+
 	if($result = $db->db_query($qry))
 	{
 		$i=1;
@@ -226,23 +226,23 @@ else
 		while($elem = $db->db_fetch_object($result))
 		{
 			if(!preg_match('*dummy*',$elem->uid) && $elem->semester!=10)
-	   		{   	
+	   		{
 	   			if($elem->status!='Abbrecher' && $elem->status!='Unterbrecher')
 	   			{
 					$worksheet->write($lines,0,$i);
 					if($elem->status=='Incoming')
 						$inc=' (i)';
-					else 
+					else
 						$inc='';
 					if($elem->bisio_id!='' && $elem->status!='Incoming' && ($elem->bis > $stsemdatumvon || $elem->bis=='') && $elem->von < $stsemdatumbis) //Outgoing
 						$inc.=' (o)';
-						
+
 					if($elem->note==6) //angerechnet
 					{
 						$inc.=' (ar)';
 						$note='ar';
 					}
-					else 
+					else
 						$note='';
 					$worksheet->write($lines,1,$elem->nachname.$inc);
 					$worksheet->write($lines,2,$elem->vorname);
@@ -255,7 +255,7 @@ else
 	   		}
 		}
 	}
-	
+
 	//Noten
 	$note = new note();
 	$note->getAll();
@@ -266,8 +266,8 @@ else
 
 	$aufteilung = array();
 	foreach($notenschluessel->result as $row)
-		$aufteilung[$row->note]=$row->punkte;	
-	
+		$aufteilung[$row->note]=$row->punkte;
+
 	$worksheet->write(++$lines,0,$p->t('benotungstool/note').":");
 	foreach($note->result as $row)
 	{
@@ -285,15 +285,15 @@ else
 				$worksheet->write(++$lines,0,$row->bezeichnung.' ('.$row->anmerkung.')');
 		}
 	}
-	
+
 	$worksheet->writeBlank(++$lines,0,0);
 	$worksheet->writeBlank(++$lines,0,$format_highlight);
 	$worksheet->write($lines,1,'...'.$p->t('anwesenheitsliste/anleitungImportFunktion'));
 	$lines++;
-	$worksheet->write(++$lines,0,'(i)  ... Incoming');	
+	$worksheet->write(++$lines,0,'(i)  ... Incoming');
 	$worksheet->write(++$lines,0,'(o)  ... Outgoing');
 	$worksheet->write(++$lines,0,'(ar) ... '.$p->t('anwesenheitsliste/angerechnet'));
-	
+
 	$worksheet->setColumn(0, 0, 5);
 	$worksheet->setColumn(1, 1, 25);
 	$worksheet->setColumn(2, 2, 25);

@@ -78,7 +78,7 @@ if(isset($_GET['stg_kz']))
 	{
 		$stg_kz=$_GET['stg_kz'];
 	}
-	else 
+	else
 	{
 		echo "<H2>Es wurde kein Lehrgang ausgew&auml;hlt!</H2>";
 	}
@@ -152,7 +152,7 @@ $qry="SELECT DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.pe
 		OR status_kurzbz='Abbrecher' OR status_kurzbz='Unterbrecher'))
 		OR ((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($psem).") AND (status_kurzbz='Absolvent'
 		OR status_kurzbz='Abbrecher') AND tbl_prestudentstatus.datum>".$db->db_add_param($bisprevious).")
-		OR (status_kurzbz='Incoming' AND student_uid IN (SELECT student_uid FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
+		OR (status_kurzbz='Incoming' AND tbl_student.prestudent_id IN (SELECT prestudent_id FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
 			OR (tbl_bisio.von<".$db->db_add_param($bisdatum)." AND (tbl_bisio.bis>=".$db->db_add_param($bisdatum)."  OR tbl_bisio.bis IS NULL))
 	)))
 	ORDER BY student_uid, nachname, vorname
@@ -168,7 +168,7 @@ if($result = $db->db_query($qry))
 	<LehrgangMeldung>
   		<Lehrgang>
 			<LehrgangNr>".$lehrgangsnummer."</LehrgangNr>";
-	
+
 	while($row = $db->db_fetch_object($result))
   	{
       	//Plausichecks
@@ -452,7 +452,7 @@ if($result = $db->db_query($qry))
 			continue;
 		}
 		else
-		{	
+		{
 			$anzahl_gemeldet++;
 			$tabelle.='<tr><td>'.$row->student_uid.'</td><td>'.$row->nachname.'</td><td>'.$row->vorname.'</td><td>'.$row->matrikelnr.'</td></tr>';
 
@@ -503,7 +503,7 @@ if($result = $db->db_query($qry))
 	          <HeimatNation>".$nation."</HeimatNation>
 	          <ZugangCode>".$row->zgv_code."</ZugangCode>
 	          <ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
-				
+
 				if($lgartcode==1)
 				{
 					$datei.="
@@ -513,16 +513,16 @@ if($result = $db->db_query($qry))
 
 				$datei.="
 			  <Ausstellungsstaat>".$ausstellungsstaat."</Ausstellungsstaat>";
-				
-				$qryad="SELECT 
-							* 
-						FROM 
-							public.tbl_prestudentstatus 
-						WHERE 
+
+				$qryad="SELECT
+							*
+						FROM
+							public.tbl_prestudentstatus
+						WHERE
 							prestudent_id=".$db->db_add_param($row->prestudent_id, FHC_INTEGER)."
-							AND (status_kurzbz='Student'  OR status_kurzbz='Unterbrecher')  
+							AND (status_kurzbz='Student'  OR status_kurzbz='Unterbrecher')
 							AND (tbl_prestudentstatus.datum<".$db->db_add_param($bisdatum).") ORDER BY datum asc;";
-				
+
 				if($resultad = $db->db_query($qryad))
 				{
 					if($rowad = $db->db_fetch_object($resultad))
@@ -531,7 +531,7 @@ if($result = $db->db_query($qry))
 	          <BeginnDatum>".date("dmY", $datumobj->mktime_fromdate($rowad->datum))."</BeginnDatum>";
 					}
 				}
-				
+
 				if($aktstatus=='Absolvent')
 				{
 					$datei.="
@@ -553,7 +553,7 @@ if($result = $db->db_query($qry))
      </Lehrgang>
   </LehrgangMeldung>
 </Erhalter>";
-		
+
 	echo '
 	<html>
 		<head>
@@ -562,20 +562,20 @@ if($result = $db->db_query($qry))
 		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 		</head>
 	<body>';
-	
+
 	echo "<H1>BIS - Studentendaten werden &uuml;berpr&uuml;ft! Lehrgang: ".$lehrgangsname.' ('.$lehrgangsnummer.")</H1>\n";
-	
+
 	if(strlen(trim($v))>0)
 	{
 		echo "<H2>Nicht plausible BIS-Daten (f&uuml;r Meldung ".$ssem."): </H2><br>";
-		echo nl2br($v."\n\n");	
+		echo nl2br($v."\n\n");
 	}
-	
+
 	$ddd='bisdaten/bismeldung_'.$ssem.'_Lehrgang'.$lehrgangsnummer.'.xml';
 	$dateiausgabe=fopen($ddd,'w');
 	fwrite($dateiausgabe,$datei);
 	fclose($dateiausgabe);
-	
+
 	if(file_exists($ddd))
 	{
 		echo "<a href=$ddd>XML-Datei f&uuml;r BIS-Meldung Lehrgang ".$lehrgangsname.' ('.$lehrgangsnummer.")</a><br>";

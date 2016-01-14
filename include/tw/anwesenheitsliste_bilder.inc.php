@@ -136,7 +136,7 @@ $qry = "SELECT
 			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
 			LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
 			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
-			LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
+			LEFT JOIN bis.tbl_bisio ON public.tbl_student.prestudent_id=tbl_bisio.prestudent_id
 		WHERE
 			vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND
 			vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."'";

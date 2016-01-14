@@ -24,12 +24,10 @@
  * @create 2007-06-06
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
-
 class zeugnisnote extends basis_db
 {
 	public $new;       		// boolean
 	public $result=array();
-
 	//Tabellenspalten
 	public $lehrveranstaltung_id;		/// serial
 	public $student_uid;				// varchar(16)
@@ -44,12 +42,10 @@ class zeugnisnote extends basis_db
 	public $ext_id;						// bigint
 	public $bemerkung;					// text
 	public $punkte;						// numeric(8,4)
-
 	public $lehrveranstaltung_bezeichung;
 	public $note_bezeichnung;
 	public $zeugnis;
 	public $lv_lehrform_kurzbz;
-
 	/**
 	 * Konstruktor
 	 * Laedt optional eine Zeugnisnote
@@ -61,11 +57,9 @@ class zeugnisnote extends basis_db
 	public function __construct($lehrveranstaltung_id=null, $student_uid=null, $studiensemester_kurzbz=null)
 	{
 		parent::__construct();
-
 		if($lehrveranstaltung_id!=null && $student_uid!=null && $studiensemester_kurzbz!=null)
 			$this->load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz);
 	}
-
 	/**
 	 * Laedt eine Zeugnisnote
 	 *
@@ -81,7 +75,6 @@ class zeugnisnote extends basis_db
 			$this->errormsg = 'Lehrveranstaltung_id ist ungueltig';
 			return false;
 		}
-
 		$qry = "SELECT
 					*
 				FROM
@@ -90,7 +83,6 @@ class zeugnisnote extends basis_db
 					lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
 					AND	student_uid=".$this->db_add_param($student_uid)."
 					AND	studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
-
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -122,7 +114,6 @@ class zeugnisnote extends basis_db
 			return false;
 		}
 	}
-
 	/**
 	 * Prueft die Daten vor dem Speichern
 	 * auf Gueltigkeit
@@ -161,7 +152,6 @@ class zeugnisnote extends basis_db
 		}
 		return true;
 	}
-
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -172,10 +162,8 @@ class zeugnisnote extends basis_db
 	{
 		if($new==null)
 			$new=$this->new;
-
 		if(!$this->validate())
 			return false;
-
 		if($new)
 		{
 			//Neuen Datensatz einfuegen
@@ -209,7 +197,6 @@ class zeugnisnote extends basis_db
 				'AND student_uid='.$this->db_add_param($this->student_uid).' '.
 				'AND studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).';';
 		}
-
 		if($this->db_query($qry))
 		{
 			return true;
@@ -220,7 +207,6 @@ class zeugnisnote extends basis_db
 			return false;
 		}
 	}
-
 	/**
 	 * Loescht den Datenensatz mit der ID die uebergeben wird
 	 * @param $lehrveranstaltung_id
@@ -234,7 +220,6 @@ class zeugnisnote extends basis_db
 				lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER, false)." AND
 				student_uid=".$this->db_add_param($student_uid)." AND
 				studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
-
 		if($this->db_query($qry))
 			return true;
 		else
@@ -243,7 +228,6 @@ class zeugnisnote extends basis_db
 			return false;
 		}
 	}
-
 	/**
 	 * Laedt die Noten
 	 * @param $lehrveranstaltung_id
@@ -251,47 +235,48 @@ class zeugnisnote extends basis_db
 	 *        $studiensemester_kurzbz
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	public function getZeugnisnoten($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
+	public function getZeugnisnoten($lehrveranstaltung_id, $prestudent_id, $studiensemester_kurzbz)
 	{
 		$where='';
 		if($lehrveranstaltung_id!=null)
 			$where.=" AND vw_student_lehrveranstaltung.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id);
-		if($student_uid!=null)
-			$where.=" AND uid=".$this->db_add_param($student_uid);
+		if($prestudent_id!=null)
+			$where.=" AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
 		if($studiensemester_kurzbz!=null)
 			$where.=" AND vw_student_lehrveranstaltung.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		$where2='';
 		if($lehrveranstaltung_id!=null)
 			$where2.=" AND lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
-		if($student_uid!=null)
-			$where2.=" AND student_uid=".$this->db_add_param($student_uid);
+		if($prestudent_id!=null)
+			$where2.=" AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
 		if($studiensemester_kurzbz!=null)
 			$where2.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
-
-		$qry = "SELECT vw_student_lehrveranstaltung.lehrveranstaltung_id, uid,
-					   vw_student_lehrveranstaltung.studiensemester_kurzbz, note, punkte, uebernahmedatum, benotungsdatum,
-					   vw_student_lehrveranstaltung.ects, vw_student_lehrveranstaltung.semesterstunden,
-					   tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
-					   tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id,
-					   vw_student_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung,
-					   vw_student_lehrveranstaltung.bezeichnung_english as lehrveranstaltung_bezeichnung_english,
-					   tbl_note.bezeichnung as note_bezeichnung,
-					   tbl_zeugnisnote.bemerkung as bemerkung,
-					   vw_student_lehrveranstaltung.sort,
-					   vw_student_lehrveranstaltung.zeugnis,
-					   vw_student_lehrveranstaltung.studiengang_kz,
-					   vw_student_lehrveranstaltung.lv_lehrform_kurzbz
+		$qry = "SELECT vw_student_lehrveranstaltung.lehrveranstaltung_id, prestudent_id, uid,
+						vw_student_lehrveranstaltung.studiensemester_kurzbz, note, punkte, uebernahmedatum, benotungsdatum,
+						vw_student_lehrveranstaltung.ects, vw_student_lehrveranstaltung.semesterstunden,
+						tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
+						tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id,
+						vw_student_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung,
+						vw_student_lehrveranstaltung.bezeichnung_english as lehrveranstaltung_bezeichnung_english,
+						tbl_note.bezeichnung as note_bezeichnung,
+						tbl_zeugnisnote.bemerkung as bemerkung,
+						vw_student_lehrveranstaltung.sort,
+						vw_student_lehrveranstaltung.zeugnis,
+						vw_student_lehrveranstaltung.studiengang_kz,
+						vw_student_lehrveranstaltung.lv_lehrform_kurzbz
 				FROM
 				(
 					campus.vw_student_lehrveranstaltung LEFT JOIN lehre.tbl_zeugnisnote
 						ON(uid=student_uid
-						   AND vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_zeugnisnote.studiensemester_kurzbz
-						   AND vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
-						  )
-				) LEFT JOIN lehre.tbl_note USING(note)
+							AND vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_zeugnisnote.studiensemester_kurzbz
+							AND vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
+						)
+				)
+				LEFT JOIN lehre.tbl_note USING(note)
+				LEFT JOIN public.tbl_student ON( public.tbl_student.student_uid=vw_student_lehrveranstaltung.uid)
 				WHERE true $where
-				UNION
-				SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,student_uid AS uid,studiensemester_kurzbz, note, punkte,
+			UNION
+				SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,prestudent_id, lehre.tbl_zeugnisnote.student_uid AS uid,studiensemester_kurzbz, note, punkte,
 					uebernahmedatum, benotungsdatum,lehre.tbl_lehrveranstaltung.ects,lehre.tbl_lehrveranstaltung.semesterstunden, tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
 					tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id, lehre.tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, lehre.tbl_lehrveranstaltung.bezeichnung_english as lehrveranstaltung_bezeichnung_english,
 					tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung as bemerkung, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.studiengang_kz,
@@ -300,17 +285,17 @@ class zeugnisnote extends basis_db
 					lehre.tbl_zeugnisnote
 					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
 					JOIN lehre.tbl_note USING(note)
+					LEFT JOIN public.tbl_student ON( public.tbl_student.student_uid=lehre.tbl_zeugnisnote.student_uid )
 				WHERE true $where2
 				ORDER BY sort";
-
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new zeugnisnote();
-
 				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				$obj->student_uid = $row->uid;
+				$obj->prestudent_id = $row->prestudent_id;
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->note = $row->note;
 				$obj->punkte = $row->punkte;
@@ -331,7 +316,6 @@ class zeugnisnote extends basis_db
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->zeugnis = $this->db_parse_bool($row->zeugnis);
 				$obj->lv_lehrform_kurzbz = $row->lv_lehrform_kurzbz;
-
 				$this->result[] = $obj;
 			}
 			return true;
@@ -342,7 +326,6 @@ class zeugnisnote extends basis_db
 			return false;
 		}
 	}
-
 	/**
 	 * Laedt die Noten Studienjahr
 	 * @param $lehrveranstaltung_id
@@ -352,9 +335,7 @@ class zeugnisnote extends basis_db
 	 */
 	public function getZeugnisnotenStudienplan($student_uid, $studiensemester_arr, $studienplan_id)
 	{
-
 		$stsem = $this->db_implode4SQL($studiensemester_arr);
-
 		/*
 		 * Alle Lehrveranstaltungen holen zu denen eine Note eingetragen ist und alle zu denen der Studierende zugeteilt ist.
 		 * Danach wird im Studienplan gesucht und eventuell darbueberliegenden Module zusaetzlich geladen
@@ -393,7 +374,6 @@ class zeugnisnote extends basis_db
 				student_uid=".$this->db_add_param($student_uid)."
 				AND studiensemester_kurzbz IN(".$stsem.")
 				AND tbl_studienplan_lehrveranstaltung.studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER)."
-
 			UNION ALL
 			SELECT stpllv.lehrveranstaltung_id, stpllv.studienplan_lehrveranstaltung_id, stpllv.studienplan_lehrveranstaltung_id_parent
 			FROM lehre.tbl_studienplan_lehrveranstaltung stpllv, data
@@ -418,13 +398,11 @@ class zeugnisnote extends basis_db
 			AND tbl_lehrveranstaltung.lehrveranstaltung_id in(SELECT lvid FROM data)
 		ORDER BY studienplan_lehrveranstaltung_id_parent desc, studienplan_lehrveranstaltung_id
 		";
-
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new zeugnisnote();
-
 				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 				$obj->student_uid = $student_uid;
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -450,7 +428,6 @@ class zeugnisnote extends basis_db
 				$obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
 				$obj->studienplan_lehrveranstaltung_semester = $row->semester;
 				$obj->studienplan_lehrveranstaltung_sort = $row->studienplan_lehrveranstaltung_sort;
-
 				$this->result[] = $obj;
 			}
 			return true;
@@ -461,7 +438,6 @@ class zeugnisnote extends basis_db
 			return false;
 		}
 	}
-
 	/**
 	 * Generiert den SQL-Befehl für eine UNDO-Aktion
 	 * @param type $crud gewünschter Typ der UNDO-Aktion
