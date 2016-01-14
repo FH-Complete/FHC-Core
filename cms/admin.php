@@ -1114,7 +1114,7 @@ function print_prefs()
 			</td>
 		</tr>
 		<tr>
-			<td>Aktiv</td>
+			<td>Content Aktiv</td>
 			<td><input type="checkbox" name="aktiv" '.($content->aktiv?'checked':'').'></td>
 		</tr>
 		<tr>
@@ -1126,7 +1126,7 @@ function print_prefs()
 			<td><textarea name="beschreibung" cols="50" class="mceNoEditor" >'.$content->beschreibung.'</textarea></td>
 		</tr>
 		<tr>
-			<td></td>
+			<td><hr></td>
 			<td><hr></td>
 		</tr>
 		<tr>
@@ -1135,7 +1135,7 @@ function print_prefs()
 		</tr>
 		
 		<tr>
-			<td>Sichtbar</td>
+			<td>Version Sichtbar</td>
 			<td><input type="checkbox" name="sichtbar" '.($content->sichtbar?'checked':'').'></td>
 		</tr>
 		<tr>

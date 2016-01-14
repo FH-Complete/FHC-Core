@@ -561,6 +561,7 @@ function LeDetailReset()
 	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=getStudiensemester();
 	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value='<?php echo DEFAULT_LEHREINHEIT_LEHRFORM; ?>';
 	document.getElementById('lehrveranstaltung-detail-textbox-lehreinheit_id').value='';
+	document.getElementById('lehrveranstaltung-detail-textbox-gewicht').value='1';
 
 	//mitarbeiterlehreinheit tree leeren
 	lektortree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');
@@ -611,6 +612,7 @@ function LeDetailDisableFields(val)
 
 	document.getElementById('lehrveranstaltung-detail-textbox-unr').disabled=val;
 	document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').disabled=val;
+	document.getElementById('lehrveranstaltung-detail-textbox-gewicht').disabled=val;
 }
 
 // ****
@@ -633,6 +635,7 @@ function LeDetailSave()
 	raumtypalternativ = document.getElementById('lehrveranstaltung-detail-menulist-raumtypalternativ').value;
 	studiensemester = document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value;
 	lehrform = document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value;
+	gewicht = document.getElementById('lehrveranstaltung-detail-textbox-gewicht').value;
 
 	if(lehrveranstaltung=='')
 		return false;
@@ -685,6 +688,7 @@ function LeDetailSave()
 	req.add('studiensemester_kurzbz', studiensemester);
 	req.add('lehrform', lehrform);
 	req.add('anmerkung', anmerkung);
+	req.add('gewicht', gewicht);
 
 	var response = req.executePOST();
 
@@ -853,6 +857,7 @@ function LeAuswahl()
 	studiensemester=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiensemester_kurzbz" ));
 	lehrform=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrform_kurzbz" ));
 	anzahl_studenten=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anzahl_studenten" ));
+	gewicht=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gewicht" ));
 
 	//Lehrfach drop down setzen
 
@@ -909,6 +914,7 @@ function LeAuswahl()
 	document.getElementById('lehrveranstaltung-detail-textbox-lehreinheit_id').value=lehreinheit_id;
 	document.getElementById('lehrveranstaltung-detail-groupbox-caption').label='Details - Anzahl TeilnehmerInnen: '+anzahl_studenten;
 
+	document.getElementById('lehrveranstaltung-detail-textbox-gewicht').value=gewicht;
 	//Lehreinheitmitarbeiter tree setzen
 	url='<?php echo APP_ROOT;?>rdf/lehreinheitmitarbeiter.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
 	try

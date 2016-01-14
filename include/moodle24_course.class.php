@@ -743,4 +743,22 @@ class moodle24_course extends basis_db
 		return true;
 
 	}
+
+	/**
+	 * gibt alle LE Ids der Übergebenen Moodle_Course_ID zurück
+	 */
+	public function getLeFromCourse($moodle_course_id)
+	{
+		$qry = "SELECT lehreinheit_id FROM lehre.tbl_moodle WHERE moodle_version='2.4' AND mdl_course_id =".$this->db_add_param($moodle_course_id, FHC_INTEGER).';'; 
+		$le = array();
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$le[] = $row->lehreinheit_id;
+			}
+		}
+		return $le;
+	}
+
 }

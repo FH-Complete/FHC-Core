@@ -661,21 +661,27 @@ if(!$error)
 						}
 					}
 
-					if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgv_code=='')
-					{
-						$error = true;
-						$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung eingetragen sein.";
-						$anzahl_fehler++;
-					}
+					if(!defined("ZGV_CHECK") || ZGV_CHECK)
+                    {
+                        if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgv_code=='')
+                        {
+                            $error = true;
+                            $errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung eingetragen sein.";
+                            $anzahl_fehler++;
+                        }
+                    }
 
 					$stg_obj = new studiengang();
 					$stg_obj->load($prestd->studiengang_kz);
-					if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgvmas_code=='' && $stg_obj->typ=='m')
-					{
-						$error = true;
-						$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung Master eingetragen sein.";
-						$anzahl_fehler++;
-					}
+                    if(!defined("ZGV_CHECK") || ZGV_CHECK)
+                    {
+                        if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgvmas_code=='' && $stg_obj->typ=='m')
+                        {
+                            $error = true;
+                            $errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung Master eingetragen sein.";
+                            $anzahl_fehler++;
+                        }
+                    }
 
 					if(!$error)
 					{
@@ -1313,12 +1319,12 @@ if(!$error)
 
 							if(!$error)
 							{
-								if($prestd->zgv_code!='')
+								if((!defined("ZGV_CHECK") && $prestd->zgv_code!='') || (defined("ZGV_CHECK") && ZGV_CHECK == false) || (defined("ZGV_CHECK") && ZGV_CHECK == true && $prestd->zgv_code!=''))
 								{
 									$stg = new studiengang();
 									$stg->load($prestd->studiengang_kz);
 
-									if($stg->typ=='m' && $prestd->zgvmas_code=='')
+									if((defined("ZGV_CHECK") && ZGV_CHECK == true && $stg->typ=='m' && $prestd->zgvmas_code=='') || (!defined("ZGV_CHECK") && $stg->typ=='m' && $prestd->zgvmas_code==''))
 									{
 										$return = false;
 										$errormsg .= "\n$prestd->vorname $prestd->nachname: ZGV Master muss eingegeben werden";
@@ -2697,7 +2703,7 @@ if(!$error)
 						$return = false;
 					}
 
-                    if(FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $return == true && $noten->new == true)
+                    if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $return == true && $noten->new == true)
                     {
 						NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $noten->note);
 					}
@@ -2812,7 +2818,7 @@ if(!$error)
 						}
 						else
 						{
-							if(FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
+							if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
 				            {
 								NotePruefungAnlegen($zeugnisnote->studiensemester_kurzbz, $zeugnisnote->student_uid, $zeugnisnote->lehrveranstaltung_id, $zeugnisnote->note);
 							}
@@ -2971,7 +2977,7 @@ if(!$error)
 							}
 							else
 							{
-								if(FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
+								if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
 						        {
 									NotePruefungAnlegen($semester_aktuell, $uid, $_POST['lehrveranstaltung_id'], $zeugnisnote->note);
 								}

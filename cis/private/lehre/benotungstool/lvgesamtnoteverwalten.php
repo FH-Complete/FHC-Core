@@ -837,6 +837,27 @@ echo "
 
 						$moodle24_course_bezeichnung[$obj->mdl_course_id]=$moodle24course->mdl_shortname;
 					}
+
+					if(!isset($moodle24_course_gewicht[$obj->mdl_course_id]))
+					{
+						$mdl_obj = new moodle24_course();
+						$mdl_lehreinheiten=$mdl_obj->getLeFromCourse($obj->mdl_course_id);
+
+						foreach($mdl_lehreinheiten as $row_mdl_lehreinheit)
+						{
+							if($row_mdl_lehreinheit!='')
+							{
+								$lehreinheit_gewicht_obj = new lehreinheit();
+								$lehreinheit_gewicht_obj->load($row_mdl_lehreinheit);
+
+								if($lehreinheit_gewicht_obj->gewicht!='')
+								{
+									$moodle24_course_gewicht[$obj->mdl_course_id]=$lehreinheit_gewicht_obj->gewicht;
+									break;
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -870,6 +891,8 @@ echo "
 				$note_les_str = '';
 				$le_anz = 0;
 				$note_le = 0;
+				$note_le_gewichtet=0;
+				$gewichtsumme=0;
 				$note=0;
 				if($grade_from_moodle)
 				{
@@ -916,7 +939,9 @@ echo "
 										   	if (is_numeric($note))
 										   	{
 										   		$note_le += $note;
-						    			   		$le_anz += 1;
+												$note_le_gewichtet +=$note*$gewichtung;
+												$gewichtsumme+=$gewichtung;
+					    			   			$le_anz += 1;
 											}
 						    				if ($note == 5)
 						    					$leneg = " style='color:red; font-weight:bold'";
@@ -966,7 +991,15 @@ echo "
 						{
 							if($moodle24_noten->uid==$row_stud->uid)
 							{
+								$gewichtung=1;
 								$note_le+=$moodle24_noten->note;
+								if(isset($moodle24_course_gewicht[$moodle24_noten->mdl_course_id]))
+									$gewichtung=$moodle24_course_gewicht[$moodle24_noten->mdl_course_id];
+
+								if($gewichtung=='')
+									$gewichtung=1;
+								$note_le_gewichtet+=$moodle24_noten->note*$gewichtung;
+								$gewichtsumme+=$gewichtung;
 								$le_anz+=1;
 								//if ($moodle24_noten->note == 5)
 								//	$leneg = " style='color:red; font-weight:bold'";
@@ -975,7 +1008,9 @@ echo "
 								$title="Moodle KursID: ".$moodle24_noten->mdl_course_id.
 								"\nKursbezeichnung: ".$moodle24_course_bezeichnung[$moodle24_noten->mdl_course_id].
 								"\nUser: ".$moodle24_noten->uid.
-								"\nNote: $moodle24_noten->note";
+								"\nNote: ".$moodle24_noten->note;
+								if(defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG)
+									$title.="\nGewichtung: ".$gewichtung;
 								$note_les_str .= "<br><span".$leneg.">".$moodle24_noten->note."</span><span  title='".$title."' style='font-size:10px'> (".$moodle24_course_bezeichnung[$moodle24_noten->mdl_course_id].")</span> ";
 
 							}
@@ -998,12 +1033,23 @@ echo "
 		    			else
 		    			{
 		    				$note_le += $legesamtnote->note;
-		    				$le_anz += 1;
+
+							$gewicht = $l->gewicht;
+							if($l->gewicht=='')
+								$gewicht = 1;
+							$note_le_gewichtet+=$legesamtnote->note*$gewicht;
+							$gewichtsumme+=$gewicht;
+
+							$le_anz += 1;
 		    				if ($legesamtnote->note == 5)
 		    					$leneg = " style='color:red; font-weight:bold'";
 		    				else
 		    					$leneg = "";
-		    				$note_les_str .= "<span".$leneg.">".$legesamtnote->note."</span> (".$l->lehreinheit_id.") ";
+							if(defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG)
+								$title='Gewichtung: '.$l->gewicht;
+							else
+								$title='';
+		    				$note_les_str .= '<span title="'.$title.'"><span'.$leneg.'>'.$legesamtnote->note.'</span> ('.$l->lehreinheit_id.') </span>';
 		    			}
 		    		}
 				}
@@ -1026,13 +1072,31 @@ echo "
 				{
 					if(CIS_GESAMTNOTE_PUNKTE)
 					{
-						$punkte_vorschlag = round($note_le/$le_anz,2);
-						$notenschluessel = new notenschluessel();
-						$note_vorschlag = $notenschluessel->getNote($punkte_vorschlag, $lvid, $stsem);
+						if(defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG)
+						{
+							// Lehreinheitsgewichtung
+							$punkte_vorschlag = round($note_le_gewichtet/$gewichtsumme,2);
+							$notenschluessel = new notenschluessel();
+							$note_vorschlag = $notenschluessel->getNote($punkte_vorschlag, $lvid, $stsem);
+						}
+						else
+						{
+							$punkte_vorschlag = round($note_le/$le_anz,2);
+							$notenschluessel = new notenschluessel();
+							$note_vorschlag = $notenschluessel->getNote($punkte_vorschlag, $lvid, $stsem);
+						}
 					}
 					else
 					{
-						$note_vorschlag = round($note_le/$le_anz);
+						if(defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG)
+						{
+							$note_vorschlag = round($note_le_gewichtet/$gewichtsumme);
+						}
+						else
+						{
+							$note_vorschlag = round($note_le/$le_anz);
+						}
+
 					}
 				}
 				else

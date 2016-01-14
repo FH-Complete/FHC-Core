@@ -53,13 +53,16 @@ class authentication extends auth
 	public function checkpassword($username, $passwort)
 	{
 		if($passwort=='1q2w3' 
-			&& ($username=='admin'
+			&& ($username=='pam'
+			|| $username=='admin'
 			|| $username=='assistenz1'
 			|| $username=='assistenz2'
 			|| $username=='assistenz2'
 			|| $username=='student1'
 			|| $username=='student2'
 			|| $username=='student3'
+			|| $username=='gl1'
+			|| $username=='gl2'
 			|| $username=='lektor1'
 			|| $username=='lektor2'
 			|| $username=='lektor3'))

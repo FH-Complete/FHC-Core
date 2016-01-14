@@ -40,6 +40,7 @@ require_once('../include/variable.class.php');
 require_once('../include/benutzerfunktion.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/fotostatus.class.php');
+require_once('../include/anwesenheit.class.php');
 
 $user = get_uid();
 
@@ -651,6 +652,41 @@ if(!$error)
 		{
 			$return = false;
 			$errormsg = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='anwesenheittoggle')
+	{
+		if(!$rechte->isBerechtigt('student/anwesenheit'))
+		{
+			$return = false;
+			$errormsg = 'Sie haben keine Berechtigung fuer diese Aktion';
+			$data = '';
+			$error = true;
+		}
+		else
+		{
+			if(isset($_POST['student_uid']) && isset($_POST['lehreinheit_id']) && isset($_POST['datum']))
+			{
+				$student_uid = $_POST['student_uid'];
+				$lehreinheit_id = $_POST['lehreinheit_id'];
+				$datum = $_POST['datum'];
+				$anwesenheit = new anwesenheit();
+				if($anwesenheit->AnwesenheitToggle($lehreinheit_id, $datum, $student_uid))
+				{
+					$return = true;
+					$errormsg = "";
+				}
+				else
+				{
+					$return = false;
+					$errormsg = $anwesenheit->errormsg;
+				}
+			}
+			else
+			{
+				$return = false;
+				$errormsg = 'Fehlerhafte Parameteruebergabe';
+			}
 		}
 	}
 	else

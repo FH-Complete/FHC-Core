@@ -21,8 +21,6 @@
  * Dieses Skript prueft die Datenbank auf aktualitaet, dabei werden fehlende Attribute angelegt.
  */
 
-echo "keine Updates vorhanden!";
-
 // Neue Spalte beschreibung_mehrsprachig bei tbl_dokument
 if(!@$db->db_query("SELECT dokumentbeschreibung_mehrsprachig FROM public.tbl_dokument LIMIT 1"))
 {
@@ -66,6 +64,32 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 		else
 			echo 'Löschrechte fuer Testtool Tabellen fuer web user gesetzt ';
 	}
+}
+
+// Neue Spalte Gewicht bei tbl_lehreinheit
+if(!@$db->db_query("SELECT gewicht FROM lehre.tbl_lehreinheit LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE lehre.tbl_lehreinheit ADD COLUMN gewicht smallint DEFAULT 1;;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_lehreinheit '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte gewicht in lehre.tbl_lehreinheit hinzugefügt';
+}
+
+// Neue Spalte bewerbung_abgeschicktamum bei tbl_prestudentstatus
+if(!@$db->db_query("SELECT bewerbung_abgeschicktamum FROM public.tbl_prestudentstatus LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE public.tbl_prestudentstatus ADD COLUMN bewerbung_abgeschicktamum timestamp;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_prestudentstatus '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte bewerbung_abgeschicktamum in public.tbl_prestudentstatus hinzugefügt';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -172,7 +196,7 @@ $tabellen=array(
     "lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
 	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung"),
 	"lehre.tbl_ferien"  => array("bezeichnung","studiengang_kz","vondatum","bisdatum"),
-	"lehre.tbl_lehreinheit"  => array("lehreinheit_id","lehrveranstaltung_id","studiensemester_kurzbz","lehrfach_id","lehrform_kurzbz","stundenblockung","wochenrythmus","start_kw","raumtyp","raumtypalternativ","sprache","lehre","anmerkung","unr","lvnr","updateamum","updatevon","insertamum","insertvon","ext_id","lehrfach_id_old"),
+	"lehre.tbl_lehreinheit"  => array("lehreinheit_id","lehrveranstaltung_id","studiensemester_kurzbz","lehrfach_id","lehrform_kurzbz","stundenblockung","wochenrythmus","start_kw","raumtyp","raumtypalternativ","sprache","lehre","anmerkung","unr","lvnr","updateamum","updatevon","insertamum","insertvon","ext_id","lehrfach_id_old","gewicht"),
 	"lehre.tbl_lehreinheitgruppe"  => array("lehreinheitgruppe_id","lehreinheit_id","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_lehreinheitmitarbeiter"  => array("lehreinheit_id","mitarbeiter_uid","lehrfunktion_kurzbz","semesterstunden","planstunden","stundensatz","faktor","anmerkung","bismelden","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id","vertrag_id"),
 	"lehre.tbl_lehrfach"  => array("lehrfach_id","studiengang_kz","fachbereich_kurzbz","kurzbz","bezeichnung","farbe","aktiv","semester","sprache","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -267,7 +291,7 @@ $tabellen=array(
 	"public.tbl_preoutgoing_preoutgoing_status" => array("status_id","preoutgoing_status_kurzbz","preoutgoing_id","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor","zgvnation","zgvmanation","zgvdoktornation"),
-	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv", "anmerkung"),
+	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv", "anmerkung","bewerbung_abgeschicktamum"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),

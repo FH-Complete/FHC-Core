@@ -37,20 +37,20 @@ class studiensemester extends basis_db
 
 	/**
 	 * Konstruktor - Laedt optional ein StSem
-	 * 
+	 *
 	 * @param $studiensemester_kurzbz StSem das geladen werden soll (default=null)
 	 */
 	public function __construct($studiensemester_kurzbz=null)
 	{
 		parent::__construct();
-		
+
 		if($studiensemester_kurzbz != null)
 			$this->load($studiensemester_kurzbz);
 	}
-	
+
 	/**
 	 * Laedt das Studiensemester mit der uebergebenen Kurzbz
-	 * 
+	 *
 	 * @param $studiensemester_kurzbz Stsem das geladen werden soll
 	 */
 	public function load($studiensemester_kurzbz)
@@ -84,9 +84,9 @@ class studiensemester extends basis_db
 	/**
 	 * Prueft die Variablen vor dem Speichern
 	 * auf Gueltigkeit.
-	 * 
+	 *
 	 * @return true wenn ok, false im Fehlerfall
-	 */	
+	 */
 	private function validate()
 	{
 		if(mb_strlen($this->studiensemester_kurzbz)>16)
@@ -111,7 +111,7 @@ class studiensemester extends basis_db
 	 * Speichert das Studiensemester in die Datenbank
 	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
 	 * angelegt, ansonsten der Datensatz upgedated
-	 * 
+	 *
 	 * @return true wenn erfolgreich, false im Fehlerfall
 	 */
 	public function save()
@@ -149,7 +149,7 @@ class studiensemester extends basis_db
 
 	/**
 	 * Liefert das aktuelle Studiensemester
-	 * 
+	 *
 	 * @return aktuelles Studiensemester oder false wenn es keines gibt
 	 */
 	public function getakt()
@@ -177,17 +177,17 @@ class studiensemester extends basis_db
 	/**
 	 * Liefert ein Studiensemester mit Startdatum vom naechstgelegenen Studiensemester und
 	 * dem Startdatum vom folgenden Studiensemester als Endedatum
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public function getNearestTillNext()
 	{
 		if(!$this->getNearest())
 			return false;
-		
+
 		$start=$this->start;
 		$studiensemester_kurzbz=$this->studiensemester_kurzbz;
-		
+
 		if (!$this->getNextFrom($this->studiensemester_kurzbz))
 			return false;
 		$ende=$this->start;
@@ -201,7 +201,7 @@ class studiensemester extends basis_db
 
 	/**
 	 * Liefert das Aktuelle Studiensemester oder das darauffolgende
-	 * 
+	 *
 	 * @param $semester wenn das semester uebergeben wird, dann werden nur die studiensemester
 	 *                  geliefert die in dieses semester fallen (Bei geradem semester nur SS sonst WS)
 	 * @return Studiensemester oder false wenn es keines gibt
@@ -213,7 +213,7 @@ class studiensemester extends basis_db
 		else
 		{
 			$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE true";
-			
+
 			if($semester!='')
 			{
 				if($semester%2==0)
@@ -245,7 +245,7 @@ class studiensemester extends basis_db
 
 	/**
 	 * Liefert das naechstgelegenste Studiensemester
-	 * 
+	 *
 	 * @param semester  wenn das semester uebergeben wird, dann werden nur die studiensemester
 	 *                  geliefert die in dieses semester fallen (Bei geradem semester nur SS sonst WS)
 	 * @return Studiensemester oder false wenn es keines gibt
@@ -292,7 +292,7 @@ class studiensemester extends basis_db
 	public function getAll($order = null)
 	{
 		$qry = "SELECT * FROM public.tbl_studiensemester ORDER BY ende";
-        
+
         if($order == "desc")
             $qry .= " DESC";
 
@@ -322,7 +322,7 @@ class studiensemester extends basis_db
 
 	/**
 	 * Liefert das naechste Studiensemester
-	 * 
+	 *
 	 * @param $art Wenn art=WS dann wird das naechste Wintersemester geliefert
 	 *             Wenn art=SS dann wird das naechste Sommersemester geliefert
 	 * @return true wenn ok, false wenn kein entsprechendes vorhanden ist
@@ -356,10 +356,10 @@ class studiensemester extends basis_db
 
 		return true;
 	}
-	
+
 	/**
 	 * Liefert die naechsten Studiensemester bis zum eingestellten Limit
-	 * 
+	 *
 	 * @param $art Wenn art=WS dann wird das naechste Wintersemester geliefert
 	 *             Wenn art=SS dann wird das naechste Sommersemester geliefert
 	 *        $limit Wie viele kommende Studiensemester sollen geliefert werden?
@@ -374,10 +374,10 @@ class studiensemester extends basis_db
 			$qry.= " AND substring(studiensemester_kurzbz from 1 for 2)=".$this->db_add_param($art);
 
 		$qry.=" ORDER BY start";
-		
+
 		if(!is_null($limit) && is_numeric($limit))
 			$qry.=" LIMIT ".$limit;
-		else 
+		else
 			$qry.=" LIMIT 1";
 
 		if($this->db_query($qry))
@@ -385,17 +385,17 @@ class studiensemester extends basis_db
 			while($row = $this->db_fetch_object())
 			{
 				$stsem_obj = new studiensemester();
-				
+
 				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$stsem_obj->start = $row->start;
 				$stsem_obj->ende = $row->ende;
 				$stsem_obj->bezeichnung = $row->bezeichnung;
-				
+
 				$this->studiensemester[] = $stsem_obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Lesen des Studiensemesters';
 			return false;
@@ -404,7 +404,7 @@ class studiensemester extends basis_db
 
 	/**
 	 * Liefert das vorige Studiensemester
-	 * 
+	 *
 	 * @return studiensemester_kurzbz oder false wenn keines vorhanden
 	 */
 	public function getPrevious()
@@ -429,10 +429,10 @@ class studiensemester extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert das vorvorige Studiensemester
-	 * 
+	 *
 	 * @return studiensemester_kurzbz oder false wenn keines vorhanden
 	 */
 	public function getBeforePrevious()
@@ -468,7 +468,7 @@ class studiensemester extends basis_db
 
 	/**
 	 * Liefert das Studiensemester vor $studiensemester_kurzbz
-	 * 
+	 *
 	 * @param $studiensemester_kurzbz
 	 * @return $studiensemester_kurzbz oder false wenn Fehler
 	 */
@@ -500,7 +500,7 @@ class studiensemester extends basis_db
 
 	/**
 	 * Liefert das Studiensemester nach $studiensemester_kurzbz
-	 * 
+	 *
 	 * @param $studiensemester_kurzbz
 	 * @return $studiensemester_kurzbz oder false wenn Fehler
 	 */
@@ -535,7 +535,7 @@ class studiensemester extends basis_db
 
 	/**
 	 * Liefert das Studiensemester das aktuell am naehesten zu $studiensemester_kurzbz liegt
-	 * 
+	 *
 	 * @param $studiensemester_kurzbz
 	 * @return $studiensemester_kurzbz oder false wenn Fehler
 	 */
@@ -569,7 +569,7 @@ class studiensemester extends basis_db
 
 	/**
 	 * Springt von Studiensemester $studiensemester_kurzbz um $wert Studiensemester vor/zurueck
-	 * 
+	 *
 	 * @param $studiensemester_kurzbz
 	 * @param $wert
 	 * @return studiensemester_kurzbz
@@ -616,13 +616,13 @@ class studiensemester extends basis_db
 			else
 				return $studiensemester_kurzbz;
 		}
-		else 
+		else
 		{
 			$this->errormsg='Fehler bei einer Abfrage';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt die vergangenen Studiensemester und das aktuelle
 	 *
@@ -655,12 +655,12 @@ class studiensemester extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
-	 * Liefert $days (Default 60) Tage nach dem start des neuen Semesters noch das vorherige Studiensemester 
+	 * Liefert $days (Default 60) Tage nach dem start des neuen Semesters noch das vorherige Studiensemester
 	 * zurueck, danach das aktuelle.
-	 * 
-	 * 
+	 *
+	 *
 	 * @return studiensemester_kurzbz oder false wenn keines vorhanden
 	 */
 	public function getLastOrAktSemester($days=60)
@@ -685,12 +685,12 @@ class studiensemester extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
-	 * Liefert $days (Default 60) Tage nach dem start des neuen Semesters noch das vorherige Studiensemester 
+	 * Liefert $days (Default 60) Tage nach dem start des neuen Semesters noch das vorherige Studiensemester
 	 * zurueck, danach das aktuelle.
-	 * 
-	 * 
+	 *
+	 *
 	 * @return studiensemester_kurzbz oder false wenn keines vorhanden
 	 */
 	public function getNextOrAktSemester($days=60)
@@ -717,7 +717,7 @@ class studiensemester extends basis_db
 	}
 	/**
 	 * Liefert den UNIX Timestamp (Beginn,Ende) eines Studiensemesters
-	 * 
+	 *
 	 * @param $studiensemester_kurzbz
 	 * @return Beginn und Ende eines Studiensemesters als Timestamp
 	 */
@@ -729,7 +729,7 @@ class studiensemester extends basis_db
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
-			{	
+			{
 				if(!isset($this->begin))
 					$this->begin=new stdclass();
 				$this->begin->start=mktime(0,0,0,mb_substr($row->start,5,2),mb_substr($row->start,8,2),mb_substr($row->start,0,4));
@@ -749,42 +749,45 @@ class studiensemester extends basis_db
 			$this->errormsg = 'Fehler beim Ermitteln des Studiensemesters';
 			return false;
 		}
-	} 
+	}
     /**
      * untersucht das uebergebene datum in welchem semester es sich befindet
      * @param type $datum
-     * @return boolean 
+     * @return boolean
      */
-    public function getSemesterFromDatum($datum)
+    public function getSemesterFromDatum($datum, $next=null)
     {
         if($datum == '')
         {
-            $this->errormsg = "Ungueltiges Datum uebergeben"; 
-            return false; 
+            $this->errormsg = "Ungueltiges Datum uebergeben";
+            return false;
         }
-        $qry = "SELECT * FROM public.tbl_studiensemester WHERE start <=".$this->db_add_param($datum, FHC_STRING)." AND ende >= ".$this->db_add_param($datum).';'; 
-        
+		if(is_null($next))
+        	$qry = "SELECT * FROM public.tbl_studiensemester WHERE start <=".$this->db_add_param($datum, FHC_STRING)." AND ende >= ".$this->db_add_param($datum).';';
+		else
+			$qry = "SELECT * FROM public.tbl_studiensemester WHERE start <=".$this->db_add_param($datum, FHC_STRING)." ORDER BY start desc limit 1;";
+
         if($result = $this->db_query($qry))
         {
             if($row = $this->db_fetch_object())
             {
-                return $row->studiensemester_kurzbz; 
+                return $row->studiensemester_kurzbz;
             }
             else
             {
-                $this->errormsg = "Es wurde kein passendes Studiensemester gefunden"; 
-                return false; 
+                $this->errormsg = "Es wurde kein passendes Studiensemester gefunden";
+                return false;
             }
         }
         else
         {
-            $this->errormsg = "Fehler bei der Abfrage aufgetreten."; 
-            return false; 
+            $this->errormsg = "Fehler bei der Abfrage aufgetreten.";
+            return false;
         }
     }
-    
+
     /**
-     * Liefert das dazupassende Studiensemester im Studienjahr 
+     * Liefert das dazupassende Studiensemester im Studienjahr
      * @param $studiensemester_kurzbz
      * @return $studiensemester_kurzbz
      */
@@ -798,39 +801,39 @@ class studiensemester extends basis_db
 
 	/**
 	 * Laedt die Studiensemester die fuer die Onlinebewerbung aktiviert sind
-	 * 
+	 *
 	 * @return true wenn ok, sonst false
 	 */
 	public function getStudiensemesterOnlinebewerbung()
 	{
 		$qry = "SELECT * FROM public.tbl_studiensemester WHERE onlinebewerbung=true
 				ORDER BY start";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$stsem_obj = new studiensemester();
-				
+
 				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$stsem_obj->start = $row->start;
 				$stsem_obj->ende = $row->ende;
 				$stsem_obj->bezeichnung = $row->bezeichnung;
-				
+
 				$this->studiensemester[] = $stsem_obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Lesen des Studiensemesters';
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert ausgehend von heutigen Datum $plus studiensemester in die Zukunft und $minus Studiensemester in die Vergangenheit
-	 * 
+	 *
 	 * @param integer $plus Wieviele Studiensemester in die Zukunft sollen ausgegeben werden.
 	 * @param integer $minus Wieviele Studiensemester in die Vergangenheit sollen ausgegeben werden.
 	 *
@@ -840,30 +843,30 @@ class studiensemester extends basis_db
 	{
 		if((is_null($plus) || !is_numeric($plus)) || (is_null($minus) || !is_numeric($minus)))
 			return false;
-		
+
 		$qry = "SELECT DISTINCT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz IN
 				(
 					(SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start >= now()
-						ORDER BY ende ASC LIMIT $plus)		
+						ORDER BY ende ASC LIMIT $plus)
 					UNION
 					(SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start <= now()
 						ORDER BY start DESC LIMIT $minus)
 				)
 				ORDER BY ende DESC";
-	
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$stsem_obj = new studiensemester();
-		
+
 				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$stsem_obj->start = $row->start;
 				$stsem_obj->ende = $row->ende;
 				$stsem_obj->bezeichnung = $row->bezeichnung;
 				$stsem_obj->studienjahr_kurzbz = $row->studienjahr_kurzbz;
 				$stsem_obj->beschreibung = $row->beschreibung;
-		
+
 				$this->studiensemester[] = $stsem_obj;
 			}
 			return true;
@@ -875,5 +878,55 @@ class studiensemester extends basis_db
 		}
 	}
 
+	/**
+	 * Liefert das Studiensemester das am naehesten zu einem Datum in einem
+	 * Studiensemester liegt
+	 *
+	 * @param $studiensemester_kurzbz
+	 * @param $datum
+	 * @return $studiensemester_kurzbz oder false wenn Fehler
+	 */
+	public function getNearestTo($studiensemester_kurzbz, $datum)
+	{
+		$qry = "SELECT * FROM
+				(
+				SELECT tbl_studiensemester.studiensemester_kurzbz,
+				    tbl_studiensemester.start,
+				    tbl_studiensemester.ende,
+				    tbl_studiensemester.ext_id,
+				    @ (tbl_studiensemester.start - ".$this->db_add_param($datum)."::date) AS delta
+				   FROM tbl_studiensemester
+				UNION
+				 SELECT tbl_studiensemester.studiensemester_kurzbz,
+				    tbl_studiensemester.start,
+				    tbl_studiensemester.ende,
+				    tbl_studiensemester.ext_id,
+				    @ (".$this->db_add_param($datum)."::date - tbl_studiensemester.ende) AS delta
+				   FROM tbl_studiensemester
+				) a
+				WHERE a.studiensemester_kurzbz!=".$this->db_add_param($studiensemester_kurzbz)."
+				ORDER BY delta LIMIT 1";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->start = $row->start;
+				$this->ende = $row->ende;
+				return $row->studiensemester_kurzbz;
+			}
+			else
+			{
+				$this->errormsg = 'Es wurde kein folgendes Studiensemester gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Ermitteln des folgenden Studiensemesters';
+			return false;
+		}
+	}
 }
 ?>

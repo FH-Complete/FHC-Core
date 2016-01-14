@@ -78,11 +78,11 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
 }
 
 if($lehreinheit_id!='')
-{	
+{
 	$lehreinheit->load($lehreinheit_id);
 	draw_row($lehreinheit);
 }
-else 
+else
 {
 	if($lehrveranstaltung_id!='')
 	{
@@ -90,7 +90,7 @@ else
 		foreach ($lehreinheit->lehreinheiten as $row)
 			draw_row($row);
 	}
-	else 
+	else
 		die('Fehlerhafte Parameteruebergabe');
 }
 
@@ -98,41 +98,41 @@ else
 function draw_row($row)
 {
 	global $rdf_url;
-	
+
 	$legrp = new lehreinheitgruppe();
 	$legrp->getLehreinheitgruppe($row->lehreinheit_id);
-	
+
 	$grp='';
 	foreach ($legrp->lehreinheitgruppe as $leg_row)
 	{
 		if($leg_row->gruppe_kurzbz!='')
 			$grp .=" ".$leg_row->gruppe_kurzbz;
-		else 
+		else
 			$grp .=" ".$leg_row->semester.$leg_row->verband.$leg_row->gruppe;
 	}
-	
-	$qry = "SELECT kurzbz FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE 
+
+	$qry = "SELECT kurzbz FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE
 			lehreinheit_id='$row->lehreinheit_id'";
 
 	$mitarbeiter='';
 	$db = new basis_db();
-	
+
 	if($db->db_query($qry))
 	{
 		while($row_ma = $db->db_fetch_object())
 			$mitarbeiter .=' '.$row_ma->kurzbz;
 	}
 	$mitarbeiter = '('.$mitarbeiter.')';
-	
-	$anzahl_studenten=0;		
+
+	$anzahl_studenten=0;
 	$qry = "SELECT count(*) as anz FROM campus.vw_student_lehrveranstaltung WHERE lehreinheit_id='".addslashes($row->lehreinheit_id)."'";
 	if($db->db_query($qry))
 		if($row_std = $db->db_fetch_object())
 			$anzahl_studenten = $row_std->anz;
-	
+
 	$lehrfach = new lehrveranstaltung();
 	$lehrfach->load($row->lehrfach_id);
-	
+
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->lehreinheit_id.'"  about="'.$rdf_url.'/'.$row->lehreinheit_id.'" >
@@ -153,10 +153,11 @@ function draw_row($row)
             <LEHREINHEIT:lvnr><![CDATA['.$row->lvnr.']]></LEHREINHEIT:lvnr>
             <LEHREINHEIT:bezeichnung><![CDATA['.$lehrfach->kurzbz.'-'.$row->lehrform_kurzbz.' '.$lehrfach->bezeichnung.' '.$grp.' '.$mitarbeiter.']]></LEHREINHEIT:bezeichnung>
             <LEHREINHEIT:anzahl_studenten><![CDATA['.$anzahl_studenten.']]></LEHREINHEIT:anzahl_studenten>
+			<LEHREINHEIT:gewicht><![CDATA['.$row->gewicht.']]></LEHREINHEIT:gewicht>
          </RDF:Description>
       </RDF:li>
       ';
-}    
+}
 ?>
    </RDF:Seq>
 </RDF:RDF>
