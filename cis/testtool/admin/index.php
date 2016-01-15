@@ -513,15 +513,24 @@ if(isset($_GET['type']) && $_GET['type']=='gebietpruefen' && isset($_GET['gebiet
 {
 	$gebiet = new gebiet($gebiet_id);
 
-	if($gebiet->check_gebiet($gebiet_id))
+	if($gebiet->check_gebiet($gebiet_id) && $gebiet->warningmsg=='')
 	{
 		echo "<b>Das Gebiet $gebiet->bezeichnung wurde erfolgreich ueberprueft</b>";
 	}
 	else
 	{
-		echo "<b>Bei der Ueberpruefung des Gebiets '$gebiet->bezeichnung' sind folgende Fehler aufgetreten:<br /></b>";
-		echo nl2br($gebiet->errormsg);
-		echo '<br /><br />';
+		if($gebiet->errormsg!='')
+		{
+			echo "<b>Bei der Ueberpruefung des Gebiets '$gebiet->bezeichnung' sind folgende Fehler aufgetreten:<br /></b>";
+			echo "<span class='error'>".nl2br($gebiet->errormsg)."</span>";
+			echo '<br /><br />';
+		}
+		if($gebiet->warningmsg!='')
+		{
+			echo "<b>Folgende Warnungen sind aufgetreten:<br /></b>";
+			echo nl2br($gebiet->warningmsg);
+			echo '<br /><br />';
+		}
 	}
 
 	$maxpunkte = $gebiet->berechneMaximalpunkte($gebiet_id);
