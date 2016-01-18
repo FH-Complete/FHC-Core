@@ -92,6 +92,28 @@ if(!@$db->db_query("SELECT bewerbung_abgeschicktamum FROM public.tbl_prestudents
 			echo '<br>Spalte bewerbung_abgeschicktamum in public.tbl_prestudentstatus hinzugefügt';
 }
 
+//Spalte benotung in lehre.tbl_lehrveranstaltung
+if (!$result = @$db->db_query("SELECT benotung FROM lehre.tbl_lehrveranstaltung LIMIT 1;"))
+{
+    $qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN benotung boolean NOT NULL DEFAULT FALSE;";
+    
+    if (!$db->db_query($qry))
+	echo '<strong>lehre.tbl_lehrveranstaltung: ' . $db->db_last_error() . '</strong><br>';
+    else
+	echo ' lehre.tbl_lehrveranstaltung: Spalte benotung hinzugefügt.<br>'; 
+}
+
+//Spalte lvinfo in lehre.tbl_lehrveranstaltung
+if (!$result = @$db->db_query("SELECT lvinfo FROM lehre.tbl_lehrveranstaltung LIMIT 1;"))
+{
+    $qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN lvinfo boolean NOT NULL DEFAULT FALSE;";
+    
+    if (!$db->db_query($qry))
+	echo '<strong>lehre.tbl_lehrveranstaltung: ' . $db->db_last_error() . '</strong><br>';
+    else
+	echo ' lehre.tbl_lehrveranstaltung: Spalte lvinfo hinzugefügt.<br>'; 
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
