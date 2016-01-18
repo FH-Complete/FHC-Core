@@ -131,6 +131,8 @@ $worksheet->write($zeile,++$spalte,'Anschaffungsdatum',$format_bold);
 $maxlength[$spalte]=17;
 $worksheet->write($zeile,++$spalte,'Anschaffungswert',$format_bold);
 $maxlength[$spalte]=16;
+$worksheet->write($zeile,++$spalte,'Person',$format_bold);
+$maxlength[$spalte]=20;
 
 for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 {
@@ -148,8 +150,9 @@ for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 			$resultBetriebsmittel[$pos]->oe_kurzbz=$oBetriebsmittelOrganisationseinheit->errormsg;
 	}
 	
-	$oOrganisationseinheit->bezeichnung='';
+	
 	$oOrganisationseinheit = new organisationseinheit($resultBetriebsmittel[$pos]->oe_kurzbz);
+	//$oOrganisationseinheit->bezeichnung='';
 	// String - Daten Leerzeichen am Ende entfernen
 	$resultBetriebsmittel[$pos]->bestellnr=trim($resultBetriebsmittel[$pos]->bestellnr);
 
@@ -173,6 +176,13 @@ for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 			
 	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->anschaffungsdatum,'d.m.Y'),$format_date);
 	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->anschaffungswert, $format_number);
+
+	$bmp = new betriebsmittelperson();
+	$bmp->load_betriebsmittelpersonen($resultBetriebsmittel[$pos]->betriebsmittel_id);
+	$person = new person();
+	$person->load($bmp->person_id);
+	$person_name=$person->vorname.' '.$person->nachname;
+	InsertCell($zeile,++$spalte,$person_name, $format_number);
 }
 $maxlength[1]=30;
 $maxlength[2]=30;
