@@ -79,8 +79,8 @@ class lehrveranstaltung extends basis_db
 	public $lvps;
 	public $las;
 	
-	public $benotung;
-	public $lvinfo;
+	public $benotung=false;
+	public $lvinfo=false;
 
 	/**
 	 * Konstruktor
