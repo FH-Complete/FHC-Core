@@ -531,9 +531,9 @@ $error_msg='';
 	}
 
 	// **************************************************************
-	// StudentenvertreterVerteiler abgleichen
+	// StudienvertretungenVerteiler abgleichen
 	
-	echo 'Studentenvertreterverteiler werden abgeglichen!<BR>';
+	echo 'Studienvertretungsverteiler werden abgeglichen!<BR>';
 	flush();
 	
 	//Verteiler anlegen
@@ -556,7 +556,7 @@ $error_msg='';
 				$sql_query="INSERT INTO public.tbl_gruppe(gruppe_kurzbz, studiengang_kz, semester, bezeichnung,
 								beschreibung, mailgrp, sichtbar, generiert, aktiv, updateamum, updatevon,
 								insertamum, insertvon)
-								VALUES(".$db->db_add_param($row->gruppe).",".$db->db_add_param($row->studiengang_kz).", NULL,".$db->db_add_param('Studierendenvertretung '.$row->studiengang).",".$db->db_add_param('Studierendenvertretung '.$row->studiengang).", true, true, true, true, now(),'mlists_generate',now(), 'mlists_generate');";
+								VALUES(".$db->db_add_param($row->gruppe).",".$db->db_add_param($row->studiengang_kz).", NULL,".$db->db_add_param('Studienvertretung '.$row->studiengang).",".$db->db_add_param('Studienvertretung '.$row->studiengang).", true, true, true, true, now(),'mlists_generate',now(), 'mlists_generate');";
 				if(!$db->db_query($sql_query))
 					echo "<br>Fehler beim Anlegen der Gruppe: $sql_query<br>";
 			}
@@ -628,7 +628,7 @@ $error_msg='';
 			$sql_query="INSERT INTO public.tbl_gruppe(gruppe_kurzbz, studiengang_kz, semester, bezeichnung,
 							beschreibung, mailgrp, sichtbar, generiert, aktiv, updateamum, updatevon,
 							insertamum, insertvon)
-							VALUES('TW_STDV',0, NULL,'Alle StudierendenvertreterInnen','Alle StudierendenvertreterInnen', true, true, true, true, now(),'mlists_generate',now(), 'mlists_generate');";
+							VALUES('TW_STDV',0, NULL,'Alle StudienvertreterInnen','Alle StudienvertreterInnen', true, true, true, true, now(),'mlists_generate',now(), 'mlists_generate');";
 			if(!$db->db_query($sql_query))
 				echo "<br>Fehler beim Anlegen der Gruppe: $sql_query<br>";
 		}
