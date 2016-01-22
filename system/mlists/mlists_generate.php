@@ -33,6 +33,7 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/organisationseinheit.class.php');
 require_once('../../include/gruppe.class.php');
+require_once('../../include/basis_db.class.php');
 
 $error_msg='';
 ?>
@@ -46,7 +47,8 @@ $error_msg='';
 <BODY>
 	<H3>MailingListen abgleich</H3>
 	<?php
-	$db = new basis_db();
+	if (!$db = new basis_db())
+ 		die('Fehler beim Oeffnen der Datenbankverbindung');
 	
    	// aktuelles Studiensemester ermitteln
 	$sql_query="SELECT studiensemester_kurzbz FROM public.vw_studiensemester ORDER BY delta LIMIT 1";
@@ -453,11 +455,115 @@ $error_msg='';
 	}
 	
 	// **************************************************************
+	// Verteiler Hochschulvertretung abgleichen
+	
+	echo 'Hochschulvertretungsverteiler werden abgeglichen!<BR>';
+	flush();
+	
+	//Verteiler anlegen, wenn nicht vorhanden
+	$sql_query="SELECT * FROM public.tbl_gruppe WHERE gruppe_kurzbz='TW_HSV'";
+	if($res = $db->db_query($sql_query))
+	{
+		if($db->db_num_rows($res)<=0)
+		{
+			$sql_query="INSERT INTO public.tbl_gruppe(gruppe_kurzbz, studiengang_kz, semester, bezeichnung,
+							beschreibung, mailgrp, sichtbar, generiert, aktiv, updateamum, updatevon,
+							insertamum, insertvon)
+							VALUES('TW_HSV',0, NULL,'Hochschulvertretung FHTW','Hochschulvertretung FHTW', true, true, true, true, now(),'mlists_generate',now(), 'mlists_generate');";
+			if(!$db->db_query($sql_query))
+				echo "<br>Fehler beim Anlegen der Gruppe: $sql_query<br>";
+		}
+	}
+	else
+		echo "<br>Fehler:$sql_query";
+	
+	// Studierende holen, die nicht mehr in den Verteiler gehoeren
+	$sql_query="SELECT gruppe_kurzbz, uid 
+				FROM public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) 
+				WHERE gruppe_kurzbz = 'TW_HSV' 
+				AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion JOIN public.tbl_benutzer USING(uid)
+								WHERE funktion_kurzbz='hsv' AND tbl_benutzer.aktiv AND
+								(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
+								(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now()) 
+								AND (SELECT studiengang_kz FROM public.tbl_studiengang 
+									WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1)=tbl_gruppe.studiengang_kz)";
+	if(!($result=$db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error();
+	while($row = $db->db_fetch_object($result))
+	{
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$row->gruppe_kurzbz') AND uid='$row->uid'";
+		if(!$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error().$sql_query;
+		echo '-';
+		flush();
+	}
+
+	// Studierende holen, die nicht im Verteiler sind
+	echo '<BR>';
+	$sql_query="SELECT uid, tbl_gruppe.gruppe_kurzbz
+				FROM 
+					public.tbl_benutzerfunktion 
+					JOIN public.tbl_benutzer USING(uid)
+					JOIN public.tbl_studiengang USING(oe_kurzbz)
+					JOIN public.tbl_gruppe ON(tbl_gruppe.studiengang_kz=tbl_studiengang.studiengang_kz AND gruppe_kurzbz = 'TW_HSV')
+				WHERE 
+					funktion_kurzbz='hsv' 
+					AND tbl_benutzer.aktiv AND 
+					(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
+					(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
+					AND uid NOT in(SELECT uid from public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) 
+				WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang 
+				WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) 
+					AND gruppe_kurzbz = 'TW_HSV')";
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error();
+	while($row = $db->db_fetch_object($result))
+	{
+		if($row->gruppe_kurzbz!='')
+		{
+			setGeneriert($row->gruppe_kurzbz);
+	     	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".mb_strtoupper($row->gruppe_kurzbz)."', now(), 'mlists_generate')";
+			if(!$db->db_query($sql_query))
+				$error_msg.=$db->db_last_error().$sql_query;
+			echo '-';
+			flush();
+		}
+	}
+
+	// **************************************************************
 	// StudentenvertreterVerteiler abgleichen
-	// Studenten holen die nicht mehr in den Verteiler gehoeren
 	
 	echo 'Studentenvertreterverteiler werden abgeglichen!<BR>';
 	flush();
+	
+	//Verteiler anlegen
+	$sql_query="SELECT DISTINCT 
+					UPPER(typ||kurzbz)||'_'||UPPER(funktion_kurzbz) AS gruppe ,
+					UPPER(typ||kurzbz) AS studiengang,
+					tbl_studiengang.studiengang_kz
+				FROM public.tbl_benutzerfunktion 
+				JOIN public.tbl_studiengang USING (oe_kurzbz) 
+				WHERE funktion_kurzbz='stdv'
+				AND UPPER(typ||kurzbz)||'_'||UPPER(funktion_kurzbz) NOT IN (SELECT gruppe_kurzbz FROM public.tbl_gruppe)
+				AND tbl_studiengang.aktiv 
+				AND tbl_studiengang.studiengang_kz!=0";
+	if($res = $db->db_query($sql_query))
+	{
+		while($row = $db->db_fetch_object($res))
+		{
+			if($db->db_num_rows($res)>0)
+			{
+				$sql_query="INSERT INTO public.tbl_gruppe(gruppe_kurzbz, studiengang_kz, semester, bezeichnung,
+								beschreibung, mailgrp, sichtbar, generiert, aktiv, updateamum, updatevon,
+								insertamum, insertvon)
+								VALUES(".$db->db_add_param($row->gruppe).",".$db->db_add_param($row->studiengang_kz).", NULL,".$db->db_add_param('Studierendenvertretung '.$row->studiengang).",".$db->db_add_param('Studierendenvertretung '.$row->studiengang).", true, true, true, true, now(),'mlists_generate',now(), 'mlists_generate');";
+				if(!$db->db_query($sql_query))
+					echo "<br>Fehler beim Anlegen der Gruppe: $sql_query<br>";
+			}
+		}
+	}
+	
+	// Studierende holen, die nicht mehr in den Verteiler gehoeren
 	$sql_query="SELECT gruppe_kurzbz, uid 
 				FROM public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) 
 				WHERE gruppe_kurzbz LIKE '%_STDV' 
@@ -479,22 +585,22 @@ $error_msg='';
 		flush();
 	}
 
-	// Studenten holen die nicht im Verteiler sind
+	// Studierende holen, die nicht im Verteiler sind
 	echo '<BR>';
 	$sql_query="SELECT uid, tbl_gruppe.gruppe_kurzbz
-FROM 
-	public.tbl_benutzerfunktion 
-	JOIN public.tbl_benutzer USING(uid)
-	JOIN public.tbl_studiengang USING(oe_kurzbz)
-	JOIN public.tbl_gruppe ON(tbl_gruppe.studiengang_kz=tbl_studiengang.studiengang_kz AND gruppe_kurzbz like '%_STDV')
-WHERE 
-	funktion_kurzbz='stdv' 
-	AND tbl_benutzer.aktiv AND 
-	(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
-	(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
-	AND uid NOT in(Select uid from public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) 
-					WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang 
-											WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) 
+				FROM 
+					public.tbl_benutzerfunktion 
+					JOIN public.tbl_benutzer USING(uid)
+					JOIN public.tbl_studiengang USING(oe_kurzbz)
+					JOIN public.tbl_gruppe ON(tbl_gruppe.studiengang_kz=tbl_studiengang.studiengang_kz AND gruppe_kurzbz like '%_STDV')
+				WHERE 
+					funktion_kurzbz='stdv' 
+					AND tbl_benutzer.aktiv AND 
+					(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
+					(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
+					AND uid NOT in(Select uid from public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) 
+				WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang 
+				WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) 
 					AND gruppe_kurzbz Like '%_STDV')";
 	if(!($result = $db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error();
@@ -511,7 +617,25 @@ WHERE
 		}
 	}
 	
-	//tw_stdv abgleichen
+	//TW_STDV abgleichen
+	
+	//Verteiler TW_STDV anlegen, wenn nicht vorhanden
+	$sql_query="SELECT * FROM public.tbl_gruppe WHERE gruppe_kurzbz='TW_STDV'";
+	if($res = $db->db_query($sql_query))
+	{
+		if($db->db_num_rows($res)<=0)
+		{
+			$sql_query="INSERT INTO public.tbl_gruppe(gruppe_kurzbz, studiengang_kz, semester, bezeichnung,
+							beschreibung, mailgrp, sichtbar, generiert, aktiv, updateamum, updatevon,
+							insertamum, insertvon)
+							VALUES('TW_STDV',0, NULL,'Alle StudierendenvertreterInnen','Alle StudierendenvertreterInnen', true, true, true, true, now(),'mlists_generate',now(), 'mlists_generate');";
+			if(!$db->db_query($sql_query))
+				echo "<br>Fehler beim Anlegen der Gruppe: $sql_query<br>";
+		}
+	}
+	else
+		echo "<br>Fehler:$sql_query";
+	
     flush();
     setGeneriert('TW_STDV');
 	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe 
@@ -532,7 +656,7 @@ WHERE
 		flush();
 	}
 	
-	// Studenten holen die nicht im Verteiler sind
+	// Studierende holen, die nicht im Verteiler sind und einfuegen
 	echo '<BR>';
 	$sql_query="SELECT uid FROM public.tbl_benutzerfunktion JOIN public.tbl_benutzer USING(uid)
 				WHERE funktion_kurzbz='stdv' AND tbl_benutzer.aktiv AND
@@ -550,7 +674,152 @@ WHERE
 		echo '-';
 		flush();
 	}
+	
+	// **************************************************************
+	// Verteiler Jahrgangsvertretung abgleichen
+	
+	echo 'Jahrgangsvertretungsverteiler werden abgeglichen!<BR>';
+	flush();
+	
+	//Verteiler der einzelnen Studiengaenge anlegen
+	$sql_query="SELECT DISTINCT 
+					UPPER(typ||kurzbz)||'_'||UPPER(funktion_kurzbz) AS gruppe ,
+					UPPER(typ||kurzbz) AS studiengang,
+					tbl_studiengang.studiengang_kz
+				FROM public.tbl_benutzerfunktion 
+				JOIN public.tbl_studiengang USING (oe_kurzbz) 
+				WHERE funktion_kurzbz='jgv'
+				AND UPPER(typ||kurzbz)||'_'||UPPER(funktion_kurzbz) NOT IN (SELECT gruppe_kurzbz FROM public.tbl_gruppe)
+				AND tbl_studiengang.aktiv 
+				AND tbl_studiengang.studiengang_kz!=0";
+	if($res = $db->db_query($sql_query))
+	{
+		while($row = $db->db_fetch_object($res))
+		{
+			if($db->db_num_rows($res)>0)
+			{
+				$sql_query="INSERT INTO public.tbl_gruppe(gruppe_kurzbz, studiengang_kz, semester, bezeichnung,
+								beschreibung, mailgrp, sichtbar, generiert, aktiv, updateamum, updatevon,
+								insertamum, insertvon)
+								VALUES(".$db->db_add_param($row->gruppe).",".$db->db_add_param($row->studiengang_kz).", NULL,".$db->db_add_param('Jahrgangsvertretung '.$row->studiengang).",".$db->db_add_param('Jahrgangsvertretung '.$row->studiengang).", true, true, true, true, now(),'mlists_generate',now(), 'mlists_generate');";
+				if(!$db->db_query($sql_query))
+					echo "<br>Fehler beim Anlegen der Gruppe: $sql_query<br>";
+			}
+		}
+	}
+	
+	// Studierende holen, die nicht mehr in den Verteiler gehoeren
+	$sql_query="SELECT gruppe_kurzbz, uid 
+				FROM public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) 
+				WHERE gruppe_kurzbz LIKE '%_JGV' 
+				AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion JOIN public.tbl_benutzer USING(uid)
+								WHERE funktion_kurzbz='jgv' AND tbl_benutzer.aktiv AND
+								(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
+								(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now()) 
+								AND (SELECT studiengang_kz FROM public.tbl_studiengang 
+									WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1)=tbl_gruppe.studiengang_kz) 
+								AND tbl_gruppe.studiengang_kz!='0'";
+	if(!($result=$db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error();
+	while($row = $db->db_fetch_object($result))
+	{
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$row->gruppe_kurzbz') AND uid='$row->uid'";
+		if(!$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error().$sql_query;
+		echo '-';
+		flush();
+	}
 
+	// Studierende holen, die noch nicht im Verteiler sind
+	echo '<BR>';
+	$sql_query="SELECT uid, tbl_gruppe.gruppe_kurzbz
+				FROM 
+					public.tbl_benutzerfunktion 
+					JOIN public.tbl_benutzer USING(uid)
+					JOIN public.tbl_studiengang USING(oe_kurzbz)
+					JOIN public.tbl_gruppe ON(tbl_gruppe.studiengang_kz=tbl_studiengang.studiengang_kz AND gruppe_kurzbz like '%_JGV')
+				WHERE 
+					funktion_kurzbz='jgv' 
+					AND tbl_benutzer.aktiv AND 
+					(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
+					(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
+					AND uid NOT in(Select uid from public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) 
+				WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang 
+				WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) 
+					AND gruppe_kurzbz Like '%_JGV')";
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error();
+	while($row = $db->db_fetch_object($result))
+	{
+		if($row->gruppe_kurzbz!='')
+		{
+			setGeneriert($row->gruppe_kurzbz);
+	     	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".mb_strtoupper($row->gruppe_kurzbz)."', now(), 'mlists_generate')";
+			if(!$db->db_query($sql_query))
+				$error_msg.=$db->db_last_error().$sql_query;
+			echo '-';
+			flush();
+		}
+	}
+	
+	//TW_JGV abgleichen
+	
+	//Verteiler TW_JGV anlegen, wenn nicht vorhanden
+	$sql_query="SELECT * FROM public.tbl_gruppe WHERE gruppe_kurzbz='TW_JGV'";
+	if($res = $db->db_query($sql_query))
+	{
+		if($db->db_num_rows($res)<=0)
+		{
+			$sql_query="INSERT INTO public.tbl_gruppe(gruppe_kurzbz, studiengang_kz, semester, bezeichnung,
+							beschreibung, mailgrp, sichtbar, generiert, aktiv, updateamum, updatevon,
+							insertamum, insertvon)
+							VALUES('TW_JGV',0, NULL,'Alle JahrgangsvertreterInnen','Alle JahrgangsvertreterInnen', true, true, true, true, now(),'mlists_generate',now(), 'mlists_generate');";
+			if(!$db->db_query($sql_query))
+				echo "<br>Fehler beim Anlegen der Gruppe: $sql_query<br>";
+		}
+	}
+	else
+		echo "<br>Fehler:$sql_query";
+	// Studierende holen, die nicht mehr in den Verteiler gehoeren
+    flush();
+    setGeneriert('TW_JGV');
+	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe 
+				WHERE gruppe_kurzbz='TW_JGV' 
+				AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion JOIN public.tbl_benutzer USING(uid)
+								WHERE funktion_kurzbz='jgv' AND tbl_benutzer.aktiv AND 
+								(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
+								(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
+								)";
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error();
+	while($row = $db->db_fetch_object($result))
+	{
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('tw_jgv') AND uid='$row->uid'";
+		if(!$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error().$sql_query;
+		echo '-';
+		flush();
+	}
+	
+	// Studierende holen, die noch nicht im Verteiler sind
+	echo '<BR>';
+	$sql_query="SELECT uid FROM public.tbl_benutzerfunktion JOIN public.tbl_benutzer USING(uid)
+				WHERE funktion_kurzbz='jgv' AND tbl_benutzer.aktiv AND
+				(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
+				(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
+				AND uid NOT in(Select uid from public.tbl_benutzergruppe 
+								WHERE UPPER(gruppe_kurzbz)= UPPER('TW_JGV'))";
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error();
+	while($row = $db->db_fetch_object($result))
+	{
+	   	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','TW_JGV', now(), 'mlists_generate')";
+		if(!$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error().$sql_query;
+		echo '-';
+		flush();
+	}
+	
 	// ***************************
 	// TW_STD abgleichen
     flush();

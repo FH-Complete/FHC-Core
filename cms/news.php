@@ -45,6 +45,7 @@ require_once('../include/phrasen.class.php');
 require_once('../include/student.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/ort.class.php');
+require_once('../include/funktion.class.php');
 
 $sprache = getSprache();
 
@@ -362,22 +363,66 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 	//Zusatzinfo (Oeffnungszeiten etc)
 	$xml.='<zusatzinfo><![CDATA['.$studiengang->zusatzinfo_html.']]></zusatzinfo>';
 				
-	
-	//Studentenvertreter
+	//Hochschulvertretung
 	$benutzerfkt = new benutzerfunktion();
-	$benutzerfkt->getBenutzerFunktionen('stdv', $studiengang->oe_kurzbz);
-	$xml.='<stdv_name><![CDATA['.$p->t('global/studentenvertreter').']]></stdv_name>';
+	$benutzerfkt->getBenutzerFunktionen('hsv');
+	$xml.='<hochschulvertr_name><![CDATA['.$p->t('global/hochschulvertretung').']]></hochschulvertr_name>';
 	foreach($benutzerfkt->result as $row)
 	{
 		$bn = new benutzer();
 		$bn->load($row->uid);
 		
+		$funktion = new funktion();
+		$funktion->load($row->funktion_kurzbz);
 		if($bn->uid!='' && $bn->bnaktiv)
 		{
-			$xml.='<stdv>';			
-			$xml.='<name><![CDATA['.$bn->titelpre.' '.$bn->vorname.' '.$bn->nachname.' '.$bn->titelpost.']]></name>';
+			$xml.='<hochschulvertr>';
+			$xml.='<name><![CDATA['.$bn->titelpre.' '.$bn->vorname.' '.$bn->nachname.' '.$bn->titelpost.' '.($row->bezeichnung!='' && $row->bezeichnung!=$funktion->beschreibung?'('.$row->bezeichnung.')':'').']]></name>';
 			$xml.='<email><![CDATA['.$bn->uid.'@'.DOMAIN.']]></email>';
+			$xml.='<uid><![CDATA['.$bn->uid.']]></uid>';
+			$xml.='</hochschulvertr>';
+		}
+	}
+	
+	//Studentenvertretung
+	$benutzerfkt = new benutzerfunktion();
+	$benutzerfkt->getBenutzerFunktionen('stdv', $studiengang->oe_kurzbz);
+	$xml.='<stdv_name><![CDATA['.$p->t('global/studentenvertreter').' '.strtoupper($studiengang->oe_kurzbz).']]></stdv_name>';
+	foreach($benutzerfkt->result as $row)
+	{
+		$bn = new benutzer();
+		$bn->load($row->uid);
+		
+		$funktion = new funktion();
+		$funktion->load($row->funktion_kurzbz);
+		if($bn->uid!='' && $bn->bnaktiv)
+		{
+			$xml.='<stdv>';
+			$xml.='<name><![CDATA['.$bn->titelpre.' '.$bn->vorname.' '.$bn->nachname.' '.$bn->titelpost.' '.($row->bezeichnung!='' && $row->bezeichnung!=$funktion->beschreibung?'('.$row->bezeichnung.')':'').']]></name>';
+			$xml.='<email><![CDATA['.$bn->uid.'@'.DOMAIN.']]></email>';
+			$xml.='<uid><![CDATA['.$bn->uid.']]></uid>';
 			$xml.='</stdv>';
+		}
+	}
+	
+	//Jahrgangsvertretung
+	$benutzerfkt = new benutzerfunktion();
+	$benutzerfkt->getBenutzerFunktionen('jgv', $studiengang->oe_kurzbz, $semester);
+	$xml.='<jahrgangsvertr_name><![CDATA['.$p->t('global/jahrgangsvertretung').' '.$semester.'. '.$p->t('global/semester').']]></jahrgangsvertr_name>';
+	foreach($benutzerfkt->result as $row)
+	{
+		$bn = new benutzer();
+		$bn->load($row->uid);
+		
+		$funktion = new funktion();
+		$funktion->load($row->funktion_kurzbz);
+		if($bn->uid!='' && $bn->bnaktiv)
+		{
+			$xml.='<jahrgangsvertr>';			
+			$xml.='<name><![CDATA['.$bn->titelpre.' '.$bn->vorname.' '.$bn->nachname.' '.$bn->titelpost.' '.($row->bezeichnung!='' && $row->bezeichnung!=$funktion->beschreibung?'('.$row->bezeichnung.')':'').']]></name>';
+			$xml.='<email><![CDATA['.$bn->uid.'@'.DOMAIN.']]></email>';
+			$xml.='<uid><![CDATA['.$bn->uid.']]></uid>';
+			$xml.='</jahrgangsvertr>';
 		}
 	}
 	
