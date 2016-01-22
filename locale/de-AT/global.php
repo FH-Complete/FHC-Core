@@ -18,6 +18,8 @@ $this->phrasen['global/geschaeftsfuehrendeltg']='geschäftsf. Leitung';
 $this->phrasen['global/stellvertreter']='Stellvertretung';
 $this->phrasen['global/sekretariat']='Sekretariat';
 $this->phrasen['global/studentenvertreter']='Studierendenvertretung';
+$this->phrasen['global/jahrgangsvertretung']='Jahrgangsvertretung';
+$this->phrasen['global/hochschulvertretung']='Hochschulvertretung';
 
 $this->phrasen['global/lehrziele']='Lehrziele';
 $this->phrasen['global/allgemeinerdownload']='Allgemeiner Download';
