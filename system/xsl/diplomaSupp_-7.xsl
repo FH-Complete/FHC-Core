@@ -19,15 +19,21 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
   <office:scripts/>
   <office:font-face-decls>
     <style:font-face style:name="Wingdings" svg:font-family="Wingdings" style:font-pitch="variable" style:font-charset="x-symbol"/>
-    <style:font-face style:name="Symbol" svg:font-family="Symbol" style:font-family-generic="roman" style:font-pitch="variable" style:font-charset="x-symbol"/>
-    <style:font-face style:name="Courier New" svg:font-family="'Courier New'" style:font-family-generic="modern"/>
-    <style:font-face style:name="FreeSans1" svg:font-family="FreeSans" style:font-family-generic="swiss"/>
-    <style:font-face style:name="Courier New1" svg:font-family="'Courier New'" style:font-family-generic="modern" style:font-pitch="fixed"/>
-    <style:font-face style:name="Times New Roman" svg:font-family="'Times New Roman'" style:font-family-generic="roman" style:font-pitch="variable"/>
-    <style:font-face style:name="Arial" svg:font-family="Arial" style:font-family-generic="swiss" style:font-pitch="variable"/>
-    <style:font-face style:name="Helvetica" svg:font-family="Helvetica" style:font-family-generic="swiss" style:font-pitch="variable"/>
-    <style:font-face style:name="Droid Sans Fallback" svg:font-family="'Droid Sans Fallback'" style:font-family-generic="system" style:font-pitch="variable"/>
-    <style:font-face style:name="FreeSans" svg:font-family="FreeSans" style:font-family-generic="system" style:font-pitch="variable"/>
+		<style:font-face style:name="Symbol" svg:font-family="Symbol" style:font-family-generic="roman" style:font-pitch="variable" style:font-charset="x-symbol"/>
+		<style:font-face style:name="Lohit Hindi1" svg:font-family="&apos;Lohit Hindi&apos;"/>
+		<style:font-face style:name="Courier New" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern"/>
+		<style:font-face style:name="Lucida Grande" svg:font-family="&apos;Lucida Grande&apos;, &apos;Times New Roman&apos;" style:font-family-generic="roman"/>
+		<style:font-face style:name="Optima" svg:font-family="Optima, &apos;Times New Roman&apos;" style:font-family-generic="roman"/>
+		<style:font-face style:name="ヒラギノ角ゴ Pro W3" svg:font-family="&apos;ヒラギノ角ゴ Pro W3&apos;" style:font-family-generic="roman"/>
+		<style:font-face style:name="Courier New1" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-pitch="fixed"/>
+		<style:font-face style:name="Times New Roman" svg:font-family="&apos;Times New Roman&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
+		<style:font-face style:name="Arial" svg:font-family="Arial" style:font-family-generic="swiss" style:font-pitch="variable"/>
+		<style:font-face style:name="Arial1" svg:font-family="Arial" style:font-adornments="Fett" style:font-family-generic="swiss" style:font-pitch="variable"/>
+		<style:font-face style:name="Arial2" svg:font-family="Arial" style:font-adornments="Standard" style:font-family-generic="swiss" style:font-pitch="variable"/>
+		<style:font-face style:name="Tahoma" svg:font-family="Tahoma" style:font-family-generic="swiss" style:font-pitch="variable"/>
+		<style:font-face style:name="Droid Sans" svg:font-family="&apos;Droid Sans&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+		<style:font-face style:name="Lohit Hindi" svg:font-family="&apos;Lohit Hindi&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+    	<style:font-face style:name="Helvetica" svg:font-family="Helvetica" style:font-family-generic="swiss" style:font-pitch="variable"/>
   </office:font-face-decls>
   <office:automatic-styles>
     <style:style style:name="Table1" style:family="table" style:master-page-name="Convert_20_1">
@@ -1295,6 +1301,57 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 	</office:document-content>
  </xsl:template>
 <xsl:template match="supplement">
+		<office:forms form:automatic-focus="false" form:apply-design-mode="false">
+			<form:form form:name="Formular" form:apply-filter="true" form:command-type="table" office:target-frame="" xlink:href="" xlink:type="simple">
+				<form:properties>
+					<form:property form:property-name="PropertyChangeNotificationEnabled" office:value-type="boolean" office:boolean-value="true"/>
+				</form:properties>
+				<xsl:variable select="studiengang_bezeichnung_deutsch" name="studiengang_de"/>
+				<form:text form:name="TextfeldStgDE" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control1" form:id="control1" form:max-length="0" form:current-value="{$studiengang_de}" form:convert-empty-to-null="true">
+					<form:properties>
+						<form:property form:property-name="ControlTypeinMSO" office:value-type="float" office:value="0"/>
+						<form:property form:property-name="DefaultControl" office:value-type="string" office:string-value="com.sun.star.form.control.TextField"/>
+						<form:property form:property-name="ObjIDinMSO" office:value-type="float" office:value="65535"/>
+					</form:properties>
+				</form:text>
+				<xsl:variable select="studiengang_bezeichnung_englisch" name="studiengang_en"/>
+				<form:text form:name="TextfeldStgEN" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control2" form:id="control2" form:max-length="0" form:current-value="{$studiengang_en}" form:convert-empty-to-null="true">
+					<form:properties>
+						<form:property form:property-name="ControlTypeinMSO" office:value-type="float" office:value="0"/>
+						<form:property form:property-name="DefaultControl" office:value-type="string" office:string-value="com.sun.star.form.control.TextField"/>
+						<form:property form:property-name="ObjIDinMSO" office:value-type="float" office:value="65535"/>
+					</form:properties>
+				</form:text>
+				<form:text form:name="TextfeldStgDE2" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control3" form:id="control3" form:max-length="0" form:current-value="{$studiengang_de}" form:convert-empty-to-null="true">
+					<form:properties>
+						<form:property form:property-name="ControlTypeinMSO" office:value-type="float" office:value="0"/>
+						<form:property form:property-name="DefaultControl" office:value-type="string" office:string-value="com.sun.star.form.control.TextField"/>
+						<form:property form:property-name="ObjIDinMSO" office:value-type="float" office:value="65535"/>
+					</form:properties>
+				</form:text>
+				<form:text form:name="TextfeldStgEN2" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control4" form:id="control4" form:max-length="0" form:current-value="{$studiengang_en}" form:convert-empty-to-null="true">
+					<form:properties>
+						<form:property form:property-name="ControlTypeinMSO" office:value-type="float" office:value="0"/>
+						<form:property form:property-name="DefaultControl" office:value-type="string" office:string-value="com.sun.star.form.control.TextField"/>
+						<form:property form:property-name="ObjIDinMSO" office:value-type="float" office:value="65535"/>
+					</form:properties>
+				</form:text>
+				<form:text form:name="TextfeldStgEN3" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control5" form:id="control5" form:max-length="0" form:current-value="{$studiengang_en}" form:convert-empty-to-null="true">
+					<form:properties>
+						<form:property form:property-name="ControlTypeinMSO" office:value-type="float" office:value="0"/>
+						<form:property form:property-name="DefaultControl" office:value-type="string" office:string-value="com.sun.star.form.control.TextField"/>
+						<form:property form:property-name="ObjIDinMSO" office:value-type="float" office:value="65535"/>
+					</form:properties>
+				</form:text>
+				<form:text form:name="TextfeldStgEN4" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control6" form:id="control6" form:max-length="0" form:current-value="{$studiengang_en}" form:convert-empty-to-null="true">
+					<form:properties>
+						<form:property form:property-name="ControlTypeinMSO" office:value-type="float" office:value="0"/>
+						<form:property form:property-name="DefaultControl" office:value-type="string" office:string-value="com.sun.star.form.control.TextField"/>
+						<form:property form:property-name="ObjIDinMSO" office:value-type="float" office:value="65535"/>
+					</form:properties>
+				</form:text>
+			</form:form>
+		</office:forms>
       <text:sequence-decls xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0">
         <text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
         <text:sequence-decl text:display-outline-level="0" text:name="Table"/>
@@ -1314,7 +1371,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       </text:p>
       <text:p text:style-name="P59">
         <text:span text:style-name="Tabelleninhalt">
-          <text:span text:style-name="T8"><xsl:value-of select="studiengang_bezeichnung_deutsch"/></text:span>
+          <draw:control text:anchor-type="as-char" svg:y="-0.45cm" draw:z-index="6" draw:style-name="gr1" draw:text-style-name="P100" svg:width="16cm" svg:height="0.8cm" draw:control="control1"/>
         </text:span>
       </text:p>
       <text:p text:style-name="P11"/>
@@ -1322,7 +1379,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       <text:p text:style-name="P4"><text:span text:style-name="Tabelleninhalt">(subjected to §9 FHStG)</text:span></text:p>
       <text:p text:style-name="P3">
         <text:span text:style-name="Tabelleninhalt">
-          <text:span text:style-name="T10"><xsl:value-of select="studiengang_bezeichnung_englisch"/></text:span>
+          <draw:control text:anchor-type="as-char" svg:y="-0.45cm" draw:z-index="6" draw:style-name="gr1" draw:text-style-name="P100" svg:width="16cm" svg:height="0.8cm" draw:control="control2"/>
         </text:span>
       </text:p>
       <text:p text:style-name="P8"/>
@@ -1528,11 +1585,11 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
             </text:p>
           </table:table-cell>
           <table:table-cell table:style-name="Table3.C3" office:value-type="string">
-            <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="studiengang_bezeichnung_deutsch"/></text:span>
+            <text:p text:style-name="P101">
+              <draw:control text:anchor-type="as-char" svg:y="0.1cm" draw:z-index="6" draw:style-name="gr2" draw:text-style-name="P101" svg:width="8.5cm" svg:height="0.35cm" draw:control="control3"/>
             </text:p>
-            <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="studiengang_bezeichnung_englisch"/></text:span>
+            <text:p text:style-name="P101">
+              <draw:control text:anchor-type="as-char" svg:y="0.1cm" draw:z-index="6" draw:style-name="gr2" draw:text-style-name="P101" svg:width="8.5cm" svg:height="0.35cm" draw:control="control4"/>
             </text:p>
           </table:table-cell>
         </table:table-row>
@@ -2718,7 +2775,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       <text:p text:style-name="P5">Semester <xsl:value-of select="start_semester_number"/> - <xsl:value-of select="end_semester_number"/></text:p>
       <text:p text:style-name="P6"/>
       <text:p text:style-name="P77">Certificate Program for Further Education (subjected to §9 FHStG)</text:p>
-      <text:p text:style-name="P5"><xsl:value-of select="studiengang_bezeichnung_englisch"/><text:line-break/></text:p>
+      <text:p text:style-name="P5"><draw:control text:anchor-type="as-char" svg:y="0.1cm" draw:z-index="6" draw:style-name="gr2" draw:text-style-name="P102" svg:width="16cm" svg:height="0.8cm" draw:control="control5"/><text:line-break/></text:p>
       <text:p text:style-name="P6"/>
       <text:p text:style-name="P34"><text:span text:style-name="T4"></text:span>Student ID: <xsl:value-of select="matrikelnummer"/></text:p>
       <text:p text:style-name="P34"><text:span text:style-name="T4"></text:span>Program Code: <xsl:value-of select="studiengang_kz"/></text:p>
@@ -2728,7 +2785,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       <text:p text:style-name="P15"/>
       <text:p text:style-name="P20">Date of Birth: <xsl:value-of select="geburtsdatum"/></text:p>
       <text:p text:style-name="P20"/>
-      <text:p text:style-name="P21">Within the period of studies at the University of Applied Sciences Technikum Wien from <xsl:value-of select="start_semester"/> to <xsl:value-of select="end_semester"/> in the Certificate Program for Further Education (subjected to §9 FHStG) <xsl:value-of select="studiengang_bezeichnung_englisch"/> examinations in the following subjects were passed:</text:p>
+      <text:p text:style-name="P21">Within the period of studies at the University of Applied Sciences Technikum Wien from <xsl:value-of select="start_semester"/> to <xsl:value-of select="end_semester"/> in the Certificate Program for Further Education (subjected to §9 FHStG) <draw:control text:anchor-type="as-char" svg:y="-0.25cm" draw:z-index="6" draw:style-name="gr2" draw:text-style-name="P103" svg:width="3.5cm" svg:height="0.35cm" draw:control="control6"/> examinations in the following subjects were passed:</text:p>
       <text:p text:style-name="P20"/>
       <table:table table:name="Table12" table:style-name="Table12">
         <table:table-column table:style-name="Table12.A"/>
