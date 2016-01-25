@@ -32,6 +32,7 @@
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../config/global.config.inc.php');
 require_once('../../include/'.EXT_FKT_PATH.'/generateuid.inc.php');
+require_once('../../include/'.EXT_FKT_PATH.'/generatematrikelnr.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/benutzergruppe.class.php');
@@ -67,6 +68,8 @@ require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/anwesenheit.class.php');
 require_once('../../include/benutzerfunktion.class.php');
 require_once('../../include/note.class.php');
+require_once('../../include/standort.class.php');
+require_once('../../include/adresse.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -661,21 +664,27 @@ if(!$error)
 						}
 					}
 
-					if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgv_code=='')
-					{
-						$error = true;
-						$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung eingetragen sein.";
-						$anzahl_fehler++;
-					}
+					if(!defined("ZGV_CHECK") || ZGV_CHECK)
+                    {
+                        if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgv_code=='')
+                        {
+                            $error = true;
+                            $errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung eingetragen sein.";
+                            $anzahl_fehler++;
+                        }
+                    }
 
 					$stg_obj = new studiengang();
 					$stg_obj->load($prestd->studiengang_kz);
-					if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgvmas_code=='' && $stg_obj->typ=='m')
-					{
-						$error = true;
-						$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung Master eingetragen sein.";
-						$anzahl_fehler++;
-					}
+                    if(!defined("ZGV_CHECK") || ZGV_CHECK)
+                    {
+                        if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgvmas_code=='' && $stg_obj->typ=='m')
+                        {
+                            $error = true;
+                            $errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung Master eingetragen sein.";
+                            $anzahl_fehler++;
+                        }
+                    }
 
 					if(!$error)
 					{
@@ -1313,12 +1322,12 @@ if(!$error)
 
 							if(!$error)
 							{
-								if($prestd->zgv_code!='')
+								if((!defined("ZGV_CHECK") && $prestd->zgv_code!='') || (defined("ZGV_CHECK") && ZGV_CHECK == false) || (defined("ZGV_CHECK") && ZGV_CHECK == true && $prestd->zgv_code!=''))
 								{
 									$stg = new studiengang();
 									$stg->load($prestd->studiengang_kz);
 
-									if($stg->typ=='m' && $prestd->zgvmas_code=='')
+									if((defined("ZGV_CHECK") && ZGV_CHECK == true && $stg->typ=='m' && $prestd->zgvmas_code=='') || (!defined("ZGV_CHECK") && $stg->typ=='m' && $prestd->zgvmas_code==''))
 									{
 										$return = false;
 										$errormsg .= "\n$prestd->vorname $prestd->nachname: ZGV Master muss eingegeben werden";
@@ -1360,6 +1369,13 @@ if(!$error)
 														$stg_obj = new studiengang();
 														$stg_obj->load(ltrim($stg,'0'));
 														$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr);
+                                                        $matrikelnummer = generateMatrikelnr($stg_obj->oe_kurzbz);
+                                                        
+                                                        if($matrikelnummer != null)
+                                                        {
+                                                            $qry = "UPDATE public.tbl_person SET matr_nr=".$db->db_add_param($matrikelnummer)." WHERE person_id=".$db->db_add_param($prestd->person_id, FHC_INTEGER).' AND matr_nr is null';
+															$db->db_query($qry);
+                                                        }
 
 														if(defined('SET_UID_AS_PERSONENKENNZEICHEN') && SET_UID_AS_PERSONENKENNZEICHEN)
 														{

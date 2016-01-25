@@ -118,3 +118,52 @@ function TermineExport()
 	var url = 'statistik/termine.xls.php?lehreinheit_id='+TermineLehreinheitID+'&lehrveranstaltung_id='+TermineLehrveranstaltungID+'&mitarbeiter_uid='+TermineMitarbeiterUID+'&student_uid='+TermineStudentUID+'&db_stpl_table='+TermineStundenplanTable;
 	window.open(url);
 }
+
+function TermineToggleAnwesenheit()
+{
+	if(TermineStudentUID=='')
+	{
+		alert('Anwesenheit kann nur in der Studierendenansicht geaendert werden');
+		return;
+	}
+	
+	if(TermineStundenplanTable!='stundenplan')
+	{
+		alert('Bitte wechseln Sie auf die Stundenplan Tabelle. Anhand der StundenplanDEV duerfen keine Anwesenheiten geaendert werden.');
+		return;
+	}
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('termine-tree');
+
+	if (tree.currentIndex==-1) return;
+
+	//Ausgewaehlte Nr holen
+	var datum = getTreeCellText(tree, 'termine-treecol-datum_iso', tree.currentIndex);
+	var lehreinheit_id = getTreeCellText(tree, 'termine-treecol-lehreinheit_id', tree.currentIndex);
+
+	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'anwesenheittoggle');
+
+	req.add('datum', datum);
+	req.add('lehreinheit_id', lehreinheit_id);
+	req.add('student_uid', TermineStudentUID);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		TermineLoadTree();
+		SetStatusBarText('Daten wurden gespeichert');
+	}
+}

@@ -21,7 +21,8 @@
 
 $dr = DOC_ROOT;
 $dr = str_replace($_SERVER["DOCUMENT_ROOT"], "", $dr);
-
+if($dr=='')
+	$dr='/';
 
 //Originaldateien des Herstellers
 echo '<link rel="stylesheet" type="text/css" href="'.$dr.'vendor/FHC-vendor/easyui/themes/icon.css">';

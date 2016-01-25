@@ -168,7 +168,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<row>
 										<label value="Lehreinheit" control="student-pruefung-menulist-lehreinheit"/>
 										<menulist id="student-pruefung-menulist-lehreinheit" disabled="true"
-										          datasources="rdf:null" flex="1"
+										          datasources="rdf:null" flex="1" style="max-width: 600px"
 										          ref="http://www.technikum-wien.at/lehreinheit/liste" >
 											<template>
 												<menupopup>

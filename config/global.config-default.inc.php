@@ -111,6 +111,9 @@ define('VORRUECKUNG_STATUS_MAX_SEMESTER',true);
 // Bei Statuswechsel auf Bewerber -> soll Reihungstest brücksichtigt werden
 define('REIHUNGSTEST_CHECK', true);
 
+// Bei Statuswechsel auf Bewerber bzw. Student -> soll ZGV brücksichtigt werden
+define('ZGV_CHECK', true);
+
 /* Schema zur Erstellung der Kurs Kategorien im Moodle
  * Leer oder nicht gesetzt: STSEM -> STG -> Ausbsemester (WS2014 -> BEL -> 1)
  * DEP-STG-JG-STSEM: Department -> STG -> Jahrgang -> StSem (Informationstechnologie und Informationsmanagement -> BIMK -> Jahrgang 2014 -> WS2014)

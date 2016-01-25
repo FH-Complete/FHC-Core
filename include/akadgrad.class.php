@@ -155,5 +155,9 @@ class akadgrad extends basis_db
 			return false;
 		}
 	}
+	
+	public function __toString(){
+	    return $this->akadgrad_kurzbz;
+	}
 }
 ?>

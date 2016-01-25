@@ -42,6 +42,7 @@ class organisationseinheit extends basis_db
 	public $aktiv=true;
 	public $lehre=true;
 	public $mailverteiler=false;
+    public $standort_id;
 	
 	public $oe_kurzbz_orig;
 	public $beschreibung;
@@ -133,6 +134,7 @@ class organisationseinheit extends basis_db
 			$this->aktiv = $this->db_parse_bool($row->aktiv);
 			$this->mailverteiler = $this->db_parse_bool($row->mailverteiler);
 			$this->lehre = $this->db_parse_bool($row->lehre);
+            $this->standort_id = $row->standort_id;
 		}
 		else
 		{
