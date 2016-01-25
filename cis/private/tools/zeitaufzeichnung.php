@@ -485,11 +485,13 @@ if(isset($_POST['save']) || isset($_POST['edit']) || isset($_POST['import']))
 								$ende_vorher = $zeit->ende;
 								if($data[2] != $data[3])
 								{							
+									/*									
 									if ($data[1] == 'LehreExtern')
 									{
 										$zeit->start = date('Y-m-d H:i:s', strtotime('+2 seconds', strtotime($data[2])));
 										$zeit->ende = date('Y-m-d H:i:s', strtotime('-2 seconds', strtotime($data[3])));
 									}
+									*/
 									if(!$zeit->save())
 									{
 										echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$zeit->errormsg.'</b>('.$zeit->start.')</span>';
