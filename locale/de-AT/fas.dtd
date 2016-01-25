@@ -192,7 +192,7 @@
 <!ENTITY menu-dokumente-inskriptionsbestaetigung.accesskey	"I">
 
 <!ENTITY menu-dokumente-zeugnis.key		"Z">
-<!ENTITY menu-dokumente-zeugnis.label		"Zeugnis">
+<!ENTITY menu-dokumente-zeugnis.label		"Zeugnis Deutsch">
 <!ENTITY menu-dokumente-zeugnis.accesskey	"Z">
 
 <!ENTITY menu-dokumente-zeugniseng.key		"E">
@@ -215,7 +215,7 @@
 <!ENTITY menu-dokumente-ausbildungsvertrag_englisch.label	"Ausbildungsvertrag Englisch">
 <!ENTITY menu-dokumente-ausbildungsvertrag_englisch.accesskey	"U">
 
-<!ENTITY menu-dokumente-studienerfolg.label	"Studienerfolgsbestaetigung">
+<!ENTITY menu-dokumente-studienerfolg.label	"Studienerfolgsbestaetigung Deutsch">
 <!ENTITY menu-dokumente-studienerfolg.accesskey	"E">
 
 <!ENTITY menu-dokumente-studienerfolg-normal.label	"Normal">
@@ -255,7 +255,7 @@
 <!ENTITY menu-dokumente-zutrittskarte.label	"Zutrittskarte">
 <!ENTITY menu-dokumente-zutrittskarte.accesskey	"Z">
 
-<!ENTITY menu-dokumente-studienblatt.label	"Studienblatt">
+<!ENTITY menu-dokumente-studienblatt.label	"Studienblatt Deutsch">
 <!ENTITY menu-dokumente-studienblatt.accesskey	"B">
 
 <!ENTITY menu-dokumente-studienblatt_englisch.label	"Studienblatt Englisch">
@@ -267,13 +267,13 @@
 <!ENTITY menu-dokumente-pruefungsprotokoll_englisch.label		"Prüfungsprotokoll Englisch 1 (Alte Version)">
 <!ENTITY menu-dokumente-pruefungsprotokoll_englisch.accesskey	"P">
 
-<!ENTITY menu-dokumente-pruefungsprotokoll2.label		"Prüfungsprotokoll 2 (Neue Version)">
+<!ENTITY menu-dokumente-pruefungsprotokoll2.label		"Prüfungsprotokoll Deutsch">
 <!ENTITY menu-dokumente-pruefungsprotokoll2.accesskey	"P">
 
-<!ENTITY menu-dokumente-pruefungsprotokoll2_englisch.label		"Prüfungsprotokoll Englisch 2 (Neue Version)">
+<!ENTITY menu-dokumente-pruefungsprotokoll2_englisch.label		"Prüfungsprotokoll Englisch">
 <!ENTITY menu-dokumente-pruefungsprotokoll2_englisch.accesskey	"P">
 
-<!ENTITY menu-dokumente-pruefungszeugnis.label		"Prüfungszeugnis">
+<!ENTITY menu-dokumente-pruefungszeugnis.label		"Prüfungszeugnis Deutsch">
 <!ENTITY menu-dokumente-pruefungszeugnis.accesskey	"Z">
 
 <!ENTITY menu-dokumente-pruefungszeugnis_englisch.label		"Prüfungszeugnis Englisch">
