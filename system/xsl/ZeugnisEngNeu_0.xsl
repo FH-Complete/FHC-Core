@@ -37,12 +37,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <style:table-row-properties style:min-row-height="0.75cm"/>
         </style:style>
         <style:style style:name="Tabelle1.A1" style:family="table-cell">
-            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#afb8bc" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000">
+            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#999999" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000">
                 <style:background-image/>
             </style:table-cell-properties>
         </style:style>
         <style:style style:name="Tabelle1.D1" style:family="table-cell">
-            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#afb8bc" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border="0.05pt solid #000000">
+            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#999999" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border="0.05pt solid #000000">
                 <style:background-image/>
             </style:table-cell-properties>
         </style:style>
@@ -143,7 +143,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <style:table-row-properties style:min-row-height="0.75cm"/>
         </style:style>
         <style:style style:name="Tabelle2.A1" style:family="table-cell">
-            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#afb8bc" fo:padding="0.097cm" fo:border="0.05pt solid #000000">
+            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#999999" fo:padding="0.097cm" fo:border="0.05pt solid #000000">
                 <style:background-image/>
             </style:table-cell-properties>
         </style:style>
@@ -248,7 +248,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <style:text-properties fo:font-size="9pt" officeooo:rsid="0013c612" officeooo:paragraph-rsid="0013c612" style:font-size-complex="9pt"/>
         </style:style>
         <style:style style:name="P18" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-            <style:paragraph-properties fo:background-color="#afb8bc">
+            <style:paragraph-properties fo:background-color="#999999">
                 <style:background-image/>
             </style:paragraph-properties>
             <style:text-properties fo:font-size="9pt" fo:font-weight="bold" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="9pt" style:font-weight-asian="bold" style:font-size-complex="9pt" style:font-weight-complex="bold"/>
@@ -290,6 +290,14 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <style:style style:name="P27" style:family="paragraph" style:parent-style-name="Standard">
             <style:text-properties fo:font-size="5pt" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="1.75pt" style:font-size-complex="2pt"/>
         </style:style>
+        <style:style style:name="P28" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+            <style:paragraph-properties fo:text-align="start" style:justify-single-word="false"/>
+            <style:text-properties fo:font-size="9pt" fo:color="#ffffff" fo:font-weight="bold" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="9pt" style:font-weight-asian="bold" style:font-size-complex="9pt" style:font-weight-complex="bold"/>
+        </style:style>
+        <style:style style:name="P29" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+            <style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
+            <style:text-properties fo:font-size="9pt" fo:color="#ffffff" fo:font-weight="bold" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="9pt" style:font-weight-asian="bold" style:font-size-complex="9pt" style:font-weight-complex="bold"/>
+        </style:style>
         <style:style style:name="Seitenumbruch" style:family="paragraph" style:parent-style-name="Standard">
             <style:paragraph-properties fo:break-before="page"/>
             <style:text-properties fo:font-size="16pt" fo:font-weight="bold" officeooo:rsid="000de2a1" officeooo:paragraph-rsid="000de2a1" style:font-size-asian="16pt" style:font-weight-asian="bold" style:font-size-complex="16pt" style:font-weight-complex="bold"/>
@@ -303,6 +311,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <style:style style:name="T3" style:family="text">
             <style:text-properties officeooo:rsid="0027b377"/>
         </style:style>
+        <style:style style:name="T4" style:family="text">
+	      <style:text-properties style:text-position="super 58%"/>
+	    </style:style>
         <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Frame">
             <style:graphic-properties style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:vertical-rel="page-content" style:horizontal-pos="center" style:horizontal-rel="page-content" fo:padding="0cm" fo:border="none" style:shadow="none" draw:shadow-opacity="100%"/>
         </style:style>
@@ -341,7 +352,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		                        <table:table-column table:style-name="Tabelle3.C"/>
 		                        <table:table-row>
 		                            <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-		                                <text:p text:style-name="P17">Wien, am <xsl:value-of select="ort_datum" /></text:p>
+		                                <text:p text:style-name="P17">Vienna, <xsl:value-of select="ort_datum" /></text:p>
 		                            </table:table-cell>
 		                            <table:table-cell table:style-name="Tabelle3.B1" office:value-type="string">
 		                                <text:p text:style-name="P16"/>
@@ -352,14 +363,14 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		                        </table:table-row>
 		                        <table:table-row>
 		                            <table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-		                                <text:p text:style-name="P17">Ort, Datum</text:p>
+		                                <text:p text:style-name="P17">Place, Date</text:p>
 		                            </table:table-cell>
 		                            <table:table-cell table:style-name="Tabelle3.B2" office:value-type="string">
 		                                <text:p text:style-name="P16"/>
 		                            </table:table-cell>
 		                            <table:table-cell table:style-name="Tabelle3.C2" office:value-type="string">
 		                                <text:p text:style-name="P17"><xsl:value-of select="studiengangsleiter" /></text:p>
-		                                <text:p text:style-name="P17">Lehrgangsleitung</text:p>
+		                                <text:p text:style-name="P17">Program Director</text:p>
 		                            </table:table-cell>
 		                        </table:table-row>
 		                    </table:table>
@@ -370,59 +381,75 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		            </draw:frame>
 				</xsl:for-each>
 			</xsl:if>
-            <text:p text:style-name="Seitenumbruch">ZEUGNIS</text:p>
+            <text:p text:style-name="Seitenumbruch">Transcript of Records</text:p>
             <text:p text:style-name="P6">
             	<xsl:choose>
 					<xsl:when test="string-length(semester_bezeichnung)=0">
 						<xsl:value-of select="stsem"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="semester_bezeichnung"/>
-						<xsl:text> (</xsl:text>
+						<xsl:value-of select="semester"/>
+						<xsl:choose>
+							<xsl:when test="semester=1">
+								<xsl:text>st</xsl:text>
+							</xsl:when>
+							<xsl:when test="semester=2">
+								<xsl:text>nd</xsl:text>
+							</xsl:when>
+							<xsl:when test="semester=3">
+								<xsl:text>rd</xsl:text>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:text>th</xsl:text>
+							</xsl:otherwise>
+						</xsl:choose>
+						<xsl:text> Semester (</xsl:text>
 						<xsl:value-of select="stsem"/>
 						<xsl:text>)</xsl:text>
 					</xsl:otherwise>
 				</xsl:choose>
             </text:p>
             <text:p text:style-name="P5"/>
-            <text:p text:style-name="P5">Lehrgang zur Weiterbildung nach §9 FHStG idgF</text:p>
-            <text:p text:style-name="P1">
-                <draw:frame draw:style-name="fr2" draw:name="Rahmen2" text:anchor-type="paragraph" svg:width="7.999cm" draw:z-index="2">
-                    <draw:text-box fo:min-height="0.499cm">
-                        <text:p text:style-name="P6"><xsl:value-of select="studiengang"/></text:p>
-                    </draw:text-box>
-                </draw:frame>
-            </text:p>
+            <text:p text:style-name="P5">
+			<xsl:choose>
+				<xsl:when test="studiengang_art='Bachelor'">
+					<xsl:text>Bachelor's</xsl:text>
+				</xsl:when>
+				<xsl:when test="studiengang_art='Master'">
+					<xsl:text>Master's</xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="studiengang_art"/>
+				</xsl:otherwise>
+			</xsl:choose> Degree Program
+			</text:p>
+            <text:p text:style-name="P6"><xsl:value-of select="studiengang_englisch"/></text:p>
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P1"/>
-            <text:p text:style-name="P1"/>
-            <text:p text:style-name="P1"/>
-            <text:p text:style-name="P2">Personenkennzeichen: <xsl:value-of select="matrikelnr" /></text:p>
-            <text:p text:style-name="P2">Lehrgangsnummer: <xsl:value-of select="studiengang_kz" /></text:p>
+            <text:p text:style-name="P2">Student ID: <xsl:value-of select="matrikelnr" /></text:p>
+            <text:p text:style-name="P2">Program Code: <xsl:value-of select="studiengang_kz" /></text:p>
             <text:p text:style-name="P2"/>
             <text:p text:style-name="P3"/>
             <text:p text:style-name="P3"/>
-            <text:p text:style-name="P3"/>
-            <text:p text:style-name="P27"/>
-            <text:p text:style-name="P4">Vorname/Familienname:<text:tab/>
+            <text:p text:style-name="P4">First Name/Last Name:<text:tab/>
                 <text:span text:style-name="T1"><xsl:value-of select="name"/></text:span>
             </text:p>
             <text:p text:style-name="P27"/>
-            <text:p text:style-name="P4">Geburtsdatum:<text:tab/><xsl:value-of select="gebdatum" /></text:p>
+            <text:p text:style-name="P4">Date of Birth:<text:tab/><xsl:value-of select="gebdatum" /></text:p>
             <table:table table:name="Tabelle1" table:style-name="Tabelle1">
                 <table:table-column table:style-name="Tabelle1.A"/>
                 <table:table-column table:style-name="Tabelle1.B" table:number-columns-repeated="2"/>
                 <table:table-column table:style-name="Tabelle1.D"/>
                 <table:table-row table:style-name="Tabelle1.1">
                     <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-                        <text:p text:style-name="P14">Lehrveranstaltung</text:p>
+                        <text:p text:style-name="P14">Course</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-                        <text:p text:style-name="P15">Note</text:p>
+                        <text:p text:style-name="P15">Grade<text:span text:style-name="T4">1</text:span></text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-                        <text:p text:style-name="P15">SWS</text:p>
+                        <text:p text:style-name="P15">SP/W<text:span text:style-name="T4">2</text:span></text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.D1" office:value-type="string">
                         <text:p text:style-name="P15">ECTS</text:p>
@@ -431,7 +458,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 <xsl:apply-templates select="unterrichtsfach"/>
                 <table:table-row>
                     <table:table-cell table:style-name="Tabelle1.A7" office:value-type="string">
-                        <text:p text:style-name="P10">Gesamt</text:p>
+                        <text:p text:style-name="P10">Total</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.B7" office:value-type="string">
                         <text:p text:style-name="P13">-</text:p>
@@ -446,37 +473,38 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 <xsl:apply-templates select="fussnote"/> 
             </table:table>
             <text:p text:style-name="P26"/>
-            <text:p text:style-name="P22">Notenstufen:<text:tab/>Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), Nicht genügend (5), mit Erfolg teilgenommen (met), nicht teilgenommen (nt), teilgenommen(tg),</text:p>
+            <text:p text:style-name="P22">¹ Grades:<text:tab/>excellent (1), very good (2), good (3), satisfactory (4), fail (5), not graded (nb), Credit based on previous experience/work (ar),</text:p>
             <text:p text:style-name="P22">
-                <text:tab/>angerechnet (ar), nicht beurteilt (nb), bestanden (b), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</text:p>
+                <text:tab/>Participated with success (met), passed (b), successfully completed (ea), not successfully completed (nea), did not participate (nt), participated(tg)</text:p>
+            <text:p text:style-name="P22">² 1 Semester period per week = 45 minutes</text:p>
             <text:p text:style-name="P7"/>
-            <xsl:if test="abschlusspruefung_datum != ''">
+            <xsl:if test="abschlusspruefung_typ">
 	            <table:table table:name="Tabelle2" table:style-name="Tabelle2">
 	                <table:table-column table:style-name="Tabelle2.A"/>
 	                <table:table-column table:style-name="Tabelle2.B"/>
 	                <table:table-row table:style-name="Tabelle2.1">
 	                    <table:table-cell table:style-name="Tabelle2.A1" table:number-columns-spanned="2" office:value-type="string">
-	                        <text:p text:style-name="P18">Kommissionelle Abschlussprüfung</text:p>
+	                        <text:p text:style-name="P18">Final Examination</text:p>
 	                    </table:table-cell>
 	                    <table:covered-table-cell/>
 	                </table:table-row>
 	                <table:table-row table:style-name="Tabelle2.1">
 	                    <table:table-cell table:style-name="Tabelle2.A2" office:value-type="string">
 	                        <xsl:if test="abschlusspruefung_typ='Bachelor'" >
-								<text:p text:style-name="P8">Bachelorprüfung vom <xsl:value-of select="abschlusspruefung_datum" /></text:p>
+								<text:p text:style-name="P8">Bachelor's Examination on <xsl:value-of select="abschlusspruefung_datum" /></text:p>
 							</xsl:if>
 							<xsl:if test="abschlusspruefung_typ='Diplom'" >
-								<text:p text:style-name="P8">Masterprüfung vom <xsl:value-of select="abschlusspruefung_datum" /></text:p>
+								<text:p text:style-name="P8">Master's Examination on <xsl:value-of select="abschlusspruefung_datum" /></text:p>
 							</xsl:if>
 							
 	                    </table:table-cell>
 	                    <table:table-cell table:style-name="Tabelle2.B2" office:value-type="string">
-	                        <text:p text:style-name="P8"><xsl:value-of select="abschlusspruefung_note" /></text:p>
+	                        <text:p text:style-name="P8"><xsl:value-of select="abschlusspruefung_note_english" /></text:p>
 	                    </table:table-cell>
 	                </table:table-row>
 	            </table:table>
 	            <text:p text:style-name="P26"/>
-	            <text:p text:style-name="P23">Notenstufen:<text:tab/>mit ausgezeichnetem Erfolg bestanden, mit gutem Erfolg bestanden, bestanden</text:p>
+	            <text:p text:style-name="P23">Grades:<text:tab/>Passed with highest distinction, Passed with distinction, Passed</text:p>
 	            <text:p text:style-name="P19"/>
             </xsl:if>
         </office:text>
@@ -486,11 +514,36 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     <table:table-cell table:style-name="Tabelle1.A7" office:value-type="string">
     	<xsl:choose>
 			<xsl:when test="bisio_von">
-                        <text:p text:style-name="P12">Auslandsaufenthalt: <xsl:value-of select="bisio_von"/>-<xsl:value-of select="bisio_bis"/>, <xsl:value-of select="bisio_ort"/>, <xsl:value-of select="bisio_universitaet"/></text:p>
-                        <text:p text:style-name="P12">Die im Ausland absolvierten Lehrveranstaltungen werden für das <xsl:value-of select="../semester"/>. Semester des Studiums an der Fachhochschule Technikum Wien angerechnet (Details siehe Transcript of Records der Gasthochschule).</text:p>
+                        <text:p text:style-name="P12">International Semester Abroad: <xsl:value-of select="bisio_von"/>-<xsl:value-of select="bisio_bis"/>, at <xsl:value-of select="bisio_ort"/>, <xsl:value-of select="bisio_universitaet"/></text:p>
+                        <text:p text:style-name="P12">All credits earned during the International Semester Abroad (ISA) are fully credited for the 
+                        <xsl:value-of select="../semester"/>
+							<xsl:choose>
+								<xsl:when test="../semester=1">
+									<xsl:text>st</xsl:text>
+								</xsl:when>
+								<xsl:when test="../semester=2">
+									<xsl:text>nd</xsl:text>
+								</xsl:when>
+								<xsl:when test="../semester=3">
+									<xsl:text>rd</xsl:text>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:text>th</xsl:text>
+								</xsl:otherwise>
+							</xsl:choose>
+                        semester at the UAS Technikum Wien. (see Transcript of Records)</text:p>
 			</xsl:when>
 			<xsl:otherwise>
-				<text:p text:style-name="P10"><xsl:value-of select="bezeichnung"/></text:p>
+			<text:p text:style-name="P10">
+				<xsl:choose>
+					<xsl:when test="string-length(bezeichnung_englisch)!=0">
+						<xsl:value-of select="bezeichnung_englisch"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text>[ACHTUNG: Keine englische Bezeichung für "</xsl:text><xsl:value-of select="bezeichnung"/><xsl:text>" in der Datenbank!]</xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
+			</text:p>
 			</xsl:otherwise>
 		</xsl:choose>
     </table:table-cell>
@@ -525,20 +578,72 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     <table:table-cell table:style-name="Tabelle1.A8" office:value-type="string">
     	<xsl:choose>
 			<xsl:when test="themenbereich!=''">
-				<text:p text:style-name="P10"><xsl:value-of select="fussnotenzeichen"/>
-		        	<xsl:text> </xsl:text><text:span text:style-name="T1">Themenbereich:</text:span>
-		        	<xsl:text> </xsl:text><xsl:value-of select="themenbereich"/>
+		        <text:p text:style-name="P10"><xsl:value-of select="fussnotenzeichen"/>
+			        <xsl:text> </xsl:text>
+			        <text:span text:style-name="T1">
+			        	<xsl:choose>
+							<xsl:when test="themenbereich!=''">
+								<xsl:text>Subject Area:</xsl:text>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:text></xsl:text>
+							</xsl:otherwise>
+						</xsl:choose>
+			        </text:span>
+			        <xsl:text> </xsl:text><xsl:value-of select="themenbereich"/>
 		        </text:p>
 		        <text:p text:style-name="P10">
-		        	<xsl:text> </xsl:text><text:span text:style-name="T1"><xsl:value-of select="titel_bezeichnung"/>:</text:span>
-       				<xsl:text> </xsl:text><xsl:value-of select="titel"/>
-	        	</text:p>
-			</xsl:when>
-			<xsl:otherwise>
-				<text:p text:style-name="P10"><xsl:value-of select="fussnotenzeichen"/>
-		        	<xsl:text> </xsl:text><text:span text:style-name="T1"><xsl:value-of select="titel_bezeichnung"/>:</text:span>
-      				 <xsl:text> </xsl:text><xsl:value-of select="titel"/>
-        		</text:p>
+		       <xsl:text> </xsl:text>
+		       <text:span text:style-name="T1">
+			     <xsl:choose>
+					<xsl:when test="titel_kurzbz='Bachelor'">
+						<xsl:text>Bachelor's Thesis:</xsl:text>
+					</xsl:when>
+					<xsl:when test="titel_kurzbz='Diplom'">
+						<xsl:text>Master's Thesis:</xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text></xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
+		       </text:span>
+		       <xsl:text> </xsl:text>
+		       <xsl:choose>
+					<xsl:when test="string-length(titel_en)!=0">
+						<xsl:value-of select="titel_en"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="titel"/>
+					</xsl:otherwise>
+				</xsl:choose>
+		       </text:p>
+        	</xsl:when>
+        	<xsl:otherwise>
+        		<text:p text:style-name="P10"><xsl:value-of select="fussnotenzeichen"/>
+				<xsl:text> </xsl:text>
+				<text:span text:style-name="T1">
+			     <xsl:choose>
+					<xsl:when test="titel_kurzbz='Bachelor'">
+						<xsl:text>Bachelor's Thesis:</xsl:text>
+					</xsl:when>
+					<xsl:when test="titel_kurzbz='Diplom'">
+						<xsl:text>Master's Thesis:</xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:text></xsl:text>
+					</xsl:otherwise>
+				</xsl:choose>
+		       </text:span>
+		       <xsl:text> </xsl:text>
+		       <xsl:choose>
+					<xsl:when test="string-length(titel_en)!=0">
+						<xsl:value-of select="titel_en"/>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="titel"/>
+					</xsl:otherwise>
+				</xsl:choose>
+				</text:p>
         	</xsl:otherwise>
 		</xsl:choose>
     </table:table-cell>

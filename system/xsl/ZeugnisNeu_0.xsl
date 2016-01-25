@@ -37,12 +37,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <style:table-row-properties style:min-row-height="0.75cm"/>
         </style:style>
         <style:style style:name="Tabelle1.A1" style:family="table-cell">
-            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#afb8bc" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000">
+            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#999999" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000">
                 <style:background-image/>
             </style:table-cell-properties>
         </style:style>
         <style:style style:name="Tabelle1.D1" style:family="table-cell">
-            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#afb8bc" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border="0.05pt solid #000000">
+            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#999999" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border="0.05pt solid #000000">
                 <style:background-image/>
             </style:table-cell-properties>
         </style:style>
@@ -143,7 +143,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <style:table-row-properties style:min-row-height="0.75cm"/>
         </style:style>
         <style:style style:name="Tabelle2.A1" style:family="table-cell">
-            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#afb8bc" fo:padding="0.097cm" fo:border="0.05pt solid #000000">
+            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#999999" fo:padding="0.097cm" fo:border="0.05pt solid #000000">
                 <style:background-image/>
             </style:table-cell-properties>
         </style:style>
@@ -248,7 +248,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <style:text-properties fo:font-size="9pt" officeooo:rsid="0013c612" officeooo:paragraph-rsid="0013c612" style:font-size-complex="9pt"/>
         </style:style>
         <style:style style:name="P18" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-            <style:paragraph-properties fo:background-color="#afb8bc">
+            <style:paragraph-properties fo:background-color="#999999">
                 <style:background-image/>
             </style:paragraph-properties>
             <style:text-properties fo:font-size="9pt" fo:font-weight="bold" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="9pt" style:font-weight-asian="bold" style:font-size-complex="9pt" style:font-weight-complex="bold"/>
@@ -289,6 +289,14 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </style:style>
         <style:style style:name="P27" style:family="paragraph" style:parent-style-name="Standard">
             <style:text-properties fo:font-size="5pt" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="1.75pt" style:font-size-complex="2pt"/>
+        </style:style>
+        <style:style style:name="P28" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+            <style:paragraph-properties fo:text-align="start" style:justify-single-word="false"/>
+            <style:text-properties fo:font-size="9pt" fo:color="#ffffff" fo:font-weight="bold" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="9pt" style:font-weight-asian="bold" style:font-size-complex="9pt" style:font-weight-complex="bold"/>
+        </style:style>
+        <style:style style:name="P29" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+            <style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
+            <style:text-properties fo:font-size="9pt" fo:color="#ffffff" fo:font-weight="bold" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="9pt" style:font-weight-asian="bold" style:font-size-complex="9pt" style:font-weight-complex="bold"/>
         </style:style>
         <style:style style:name="Seitenumbruch" style:family="paragraph" style:parent-style-name="Standard">
             <style:paragraph-properties fo:break-before="page"/>
@@ -359,7 +367,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		                            </table:table-cell>
 		                            <table:table-cell table:style-name="Tabelle3.C2" office:value-type="string">
 		                                <text:p text:style-name="P17"><xsl:value-of select="studiengangsleiter" /></text:p>
-		                                <text:p text:style-name="P17">Lehrgangsleitung</text:p>
+		                                <text:p text:style-name="P17">Studiengangsleitung</text:p>
 		                            </table:table-cell>
 		                        </table:table-row>
 		                    </table:table>
@@ -385,26 +393,16 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</xsl:choose>
             </text:p>
             <text:p text:style-name="P5"/>
-            <text:p text:style-name="P5">Lehrgang zur Weiterbildung nach §9 FHStG idgF</text:p>
-            <text:p text:style-name="P1">
-                <draw:frame draw:style-name="fr2" draw:name="Rahmen2" text:anchor-type="paragraph" svg:width="7.999cm" draw:z-index="2">
-                    <draw:text-box fo:min-height="0.499cm">
-                        <text:p text:style-name="P6"><xsl:value-of select="studiengang"/></text:p>
-                    </draw:text-box>
-                </draw:frame>
-            </text:p>
-            <text:p text:style-name="P1"/>
-            <text:p text:style-name="P1"/>
+            <text:p text:style-name="P5"><xsl:value-of select="studiengang_art"/>-Studiengang</text:p>
+            <text:p text:style-name="P6"><xsl:value-of select="studiengang"/></text:p>
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P2">Personenkennzeichen: <xsl:value-of select="matrikelnr" /></text:p>
-            <text:p text:style-name="P2">Lehrgangsnummer: <xsl:value-of select="studiengang_kz" /></text:p>
+            <text:p text:style-name="P2">Kennzahl des Studienganges: <xsl:value-of select="studiengang_kz" /></text:p>
             <text:p text:style-name="P2"/>
             <text:p text:style-name="P3"/>
             <text:p text:style-name="P3"/>
-            <text:p text:style-name="P3"/>
-            <text:p text:style-name="P27"/>
             <text:p text:style-name="P4">Vorname/Familienname:<text:tab/>
                 <text:span text:style-name="T1"><xsl:value-of select="name"/></text:span>
             </text:p>
@@ -450,7 +448,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <text:p text:style-name="P22">
                 <text:tab/>angerechnet (ar), nicht beurteilt (nb), bestanden (b), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</text:p>
             <text:p text:style-name="P7"/>
-            <xsl:if test="abschlusspruefung_datum != ''">
+            <xsl:if test="abschlusspruefung_typ">
 	            <table:table table:name="Tabelle2" table:style-name="Tabelle2">
 	                <table:table-column table:style-name="Tabelle2.A"/>
 	                <table:table-column table:style-name="Tabelle2.B"/>
