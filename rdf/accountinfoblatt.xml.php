@@ -84,7 +84,7 @@ foreach ($uid_arr as $uid)
 	else 
 	{	
 		//Student
-		$qry ="SELECT vorname, nachname, matrikelnr, uid, tbl_studiengang.bezeichnung, aktivierungscode, alias
+		$qry ="SELECT vorname, nachname, matrikelnr, uid, tbl_studiengang.bezeichnung, tbl_studiengang.english, aktivierungscode, alias
 		       FROM campus.vw_student JOIN public.tbl_studiengang USING(studiengang_kz) WHERE uid=".$db->db_add_param($uid);
 		if($db->db_query($qry))
 		{
@@ -96,6 +96,7 @@ foreach ($uid_arr as $uid)
 				$nachname1 = $row->nachname;
 				$matrikelnr = $row->matrikelnr;
 				$studiengang = convertProblemChars($row->bezeichnung);
+				$studiengang_eng = convertProblemChars($row->english);
 				$uid = $row->uid;
 			}
 			else 
@@ -116,7 +117,10 @@ foreach ($uid_arr as $uid)
 	else
 		echo "\n			<alias><![CDATA[]]></alias>";
 	if($studiengang!='')
+	{
 		echo "\n			<bezeichnung><![CDATA[".$studiengang."]]></bezeichnung>";
+		echo "\n			<bezeichnung_english><![CDATA[".$studiengang_eng."]]></bezeichnung_english>";
+	}
 	echo "\n			<email><![CDATA[".$uid.'@'.DOMAIN."]]></email>";
 	echo "\n			<fileserver><![CDATA[".$fileserver."]]></fileserver>";
 	echo "\n			<logopath>".DOC_ROOT."skin/styles/".EXT_FKT_PATH."/</logopath>";
