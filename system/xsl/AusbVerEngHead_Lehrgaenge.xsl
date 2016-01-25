@@ -918,7 +918,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </text:p>
                 <text:p text:style-name="Footer">
                     <text:span text:style-name="Page_20_Number">
-                        <text:span text:style-name="MT2"><xsl:value-of select="studiengang_typ"/>-Studiengang (Degree Program) <xsl:value-of select="studiengang"/> (<xsl:value-of select="studiengang_englisch"/>)</text:span>
+                        <text:span text:style-name="MT2">Lehrgang zur Weiterbildung (Certificate Program for Further Education) <xsl:value-of select="studiengang"/> (<xsl:value-of select="studiengang_englisch"/>)</text:span>
                     </text:span>
                 </text:p>
             </style:footer>
@@ -935,7 +935,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </text:p>
                 <text:p text:style-name="Footer">
                     <text:span text:style-name="Page_20_Number">
-                        <text:span text:style-name="MT2"><xsl:value-of select="studiengang_typ"/>-Studiengang (Degree Program) <xsl:value-of select="studiengang"/> (<xsl:value-of select="studiengang_englisch"/>)</text:span>
+                        <text:span text:style-name="MT2">Lehrgang zur Weiterbildung (Certificate Program for Further Education) <xsl:value-of select="studiengang"/> (<xsl:value-of select="studiengang_englisch"/>)</text:span>
                     </text:span>
                 </text:p>
             </style:footer-first>

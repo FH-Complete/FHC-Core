@@ -363,7 +363,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P6">Adresse: <text:tab/><xsl:value-of select="strasse"/>; <xsl:value-of select="plz"/></text:p>
       <text:p text:style-name="P7">Geburtsdatum: <text:tab/><text:database-display text:table-name="" text:table-type="table" text:column-name="Geb.datum"><xsl:value-of select="gebdatum"/></text:database-display></text:p>
       <text:p text:style-name="P1">
-        <text:span text:style-name="T10">Sozialversicherungsnummer:
+        <text:span text:style-name="T10"><text:span text:style-name="T10">Sozialversicherungsnummer:</text:span>
         <text:span text:style-name="Footnote_20_Symbol">
           <text:span text:style-name="T10">
             <text:note text:id="ftn1" text:note-class="footnote">
@@ -379,8 +379,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
               </text:note-body>
             </text:note>
           </text:span>
-        </text:span><text:tab/><xsl:value-of select="svnr"/>
-        </text:span>
+        </text:span><text:tab/><xsl:value-of select="svnr"/></text:span>
       </text:p>
       <text:p text:style-name="P7">Personenkennzeichen:<text:tab/><xsl:value-of select="matrikelnr"/></text:p>
       <text:p text:style-name="P11"/>
