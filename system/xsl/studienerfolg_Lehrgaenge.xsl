@@ -492,12 +492,12 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				</table:table-row>
 				<table:table-row table:style-name="Tabelle1.2">
 					<table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="2" office:value-type="string">
-						<text:p text:style-name="P8">Studiengang</text:p>
+						<text:p text:style-name="P8">Lehrgang zur Weiterbildung nach §9 FHStG idgF.</text:p>
 						<text:p text:style-name="P7"><xsl:value-of select="studiengang" /></text:p>
 					</table:table-cell>
 					<table:covered-table-cell/>
 					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
-						<text:p text:style-name="P16">Kennzahl</text:p>
+						<text:p text:style-name="P16">Lehrgangsnummer</text:p>
 						<text:p text:style-name="P12"><xsl:value-of select="studiengang_kz" /></text:p>
 					</table:table-cell>
 				</table:table-row>
