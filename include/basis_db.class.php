@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> 
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
  *
  */
 /**
@@ -38,6 +38,7 @@ abstract class db extends basis
 			define('FHC_INTEGER',1);
 			define('FHC_STRING',2);
 			define('FHC_BOOLEAN',3);
+			define('FHC_LANG_ARRAY',4);
 		}
 		if (is_null(db::$db_conn))
 			$this->db_connect();
@@ -56,7 +57,7 @@ abstract class db extends basis
 	abstract function db_affected_rows($result=null);
 	abstract function db_result_seek($result=null, $offset);
 	abstract function db_last_error();
-	abstract function db_free_result($result=null);	
+	abstract function db_free_result($result=null);
 	abstract function db_version();
 	abstract function db_escape($var);
 	abstract function db_null_value($var, $qoute=true);
@@ -67,7 +68,7 @@ abstract class db extends basis
 	abstract function db_getResultJSON($result = null);
 	abstract function db_parse_array($var);
 
-	
+
 	/**
 	 * Erzeugt aus den Funktionsparameter eine SQL Abfrage
 	 * --- Wird in der Art Sonderzeichen gefunden wird dieses als FunktionsParmeter verarbeitet
@@ -95,7 +96,7 @@ abstract class db extends basis
 		$where=(!is_null($pWhere)?trim($pWhere):'');
 		$order=(!is_null($pOrder)?trim($pOrder):'');
 		$limit=(is_numeric($pLimit)?$pLimit:'');
-		
+
 		if (empty($sql) && empty($art))
 		{
 			$this->errormsg='die SQL Art fehlt!';
@@ -123,7 +124,7 @@ abstract class db extends basis
 				$sql.=($where?' '.trim($where).' ':'');
 			else
 				$sql.=($where?' where '.trim($where).' ':'');
-			if ($art=='select')		
+			if ($art=='select')
 			{
 			    // FIXME: If $where is e.g. 'orderstatus' because there's a column named orderstatus, this would
 			    // fail horribly? Same for the 'where'-stuff above. -MP
@@ -131,22 +132,22 @@ abstract class db extends basis
 					$sql.=($order?trim($order).' ':'');
 				else
 					$sql.=($order?' order by '.trim($order).' ':'');
-			}	
-			if ($art=='select')	
+			}
+			if ($art=='select')
 			{
 				if (strstr('limit',strtolower($where)))
 					$sql.=($limit?trim($limit).' ':'');
-				else		
+				else
 					$sql.=($limit?' limit '.trim($limit).' ':'');
 			}
 		}
-		
+
 		if (!$results=$this->db_query($sql))
 		{
 			$this->errormsg=$this->db_last_error();
 			return false;
 		}
-		
+
 		if ($art!='select' && empty($pSql))
 			return true;
 
@@ -159,9 +160,9 @@ abstract class db extends basis
 		$rows=array();
 		while($row = $this->db_fetch_object($results))
 			$rows[]=$row;
-		return $rows;	
-	}	
-	
+		return $rows;
+	}
+
 }
 require_once(dirname(__FILE__).'/'.DB_SYSTEM.'.class.php');
 
