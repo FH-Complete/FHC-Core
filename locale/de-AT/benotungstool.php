@@ -139,6 +139,7 @@ $this->phrasen['benotungstool/importieren']='Importieren';
 $this->phrasen['benotungstool/moodleNote']='Moodle-Note';
 $this->phrasen['benotungstool/zeugnisnote']='Zeugnisnote';
 $this->phrasen['benotungstool/nachpruefung']='Nachprüfung';
+$this->phrasen['benotungstool/nachpruefung2']='2. Nebenprüfungstermin';
 $this->phrasen['benotungstool/kommissionellePruefung']='Kommissionelle Prüfung';
 $this->phrasen['benotungstool/anzahlDerStudenten']='Anzahl der Studenten';
 $this->phrasen['benotungstool/anzahlNegativerBeurteilungen']='Anzahl negativer Beurteilungen';

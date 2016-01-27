@@ -22,7 +22,7 @@
  */
 
 require_once('../../../../config/cis.config.inc.php');
-require_once('../../../../include/basis_db.class.php');	
+require_once('../../../../include/basis_db.class.php');
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -62,7 +62,7 @@ if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehr
 
 if(isset($_GET['lehreinheit_id_pr']) && is_numeric($_GET['lehreinheit_id_pr'])) //Lehreinheit_id der pruefung
 	$lehreinheit_id = $_GET['lehreinheit_id_pr'];
-	
+
 if(isset($_GET['datum']))
 {
 	$datum = $_GET['datum'];
@@ -84,7 +84,7 @@ if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
 else
 	$stsem = '';
-	
+
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 
@@ -101,6 +101,20 @@ if(isset($_REQUEST['punkte']))
 else
 	$punkte = '';
 
+$punkte = str_replace(',','.',$punkte);
+
+if(!isset($_GET['typ']))
+{
+	$typ='Termin2';
+}
+else
+{
+	if(in_array($_GET['typ'],array('Termin2','Termin3')))
+		$typ=$_GET['typ'];
+	else
+		die('Typ ist ungueltig');
+}
+
 if($note=='')
 	$note = 9;
 
@@ -111,12 +125,12 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 {
 	// Die Pruefung muss einer Lehreinheit zugeordnet werden
 	// deshalb wird hier versucht eine passende Lehreinheit zu ermitteln.
-	$le_arr = array();			
-	$qry_stud = "SELECT DISTINCT lehreinheit_id, lehrform_kurzbz 
-		FROM 
-			campus.vw_student_lehrveranstaltung 
-			JOIN campus.vw_student using(uid) 
-		WHERE  
+	$le_arr = array();
+	$qry_stud = "SELECT DISTINCT lehreinheit_id, lehrform_kurzbz
+		FROM
+			campus.vw_student_lehrveranstaltung
+			JOIN campus.vw_student using(uid)
+		WHERE
 			studiensemester_kurzbz = ".$db->db_add_param($stsem)."
 			AND lehrveranstaltung_id = ".$db->db_add_param($lvid, FHC_INTEGER)."
 			AND uid=".$db->db_add_param($student_uid)."
@@ -133,7 +147,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 
 	if (!in_array($lehreinheit_id,$le_arr))
 		$lehreinheit_id = $le_arr[0];
-	
+
 	$jetzt = date("Y-m-d H:i:s");
 
 	$pr = new Pruefung();
@@ -178,15 +192,16 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 		}
 	}
 
+
 	$prTermin2 = new Pruefung();
 	$pr_2 = new Pruefung();
 
 	// Die Pruefung wird als Termin2 eingetragen
-	if ($prTermin2->getPruefungen($student_uid, "Termin2", $lvid, $stsem))
+	if ($prTermin2->getPruefungen($student_uid, $typ, $lvid, $stsem))
 	{
 		if	($prTermin2->result)
 		{
-			$pr_2->load($prTermin2->result[0]->pruefung_id);		
+			$pr_2->load($prTermin2->result[0]->pruefung_id);
 			$pr_2->new = null;
 			$pr_2->updateamum = $jetzt;
 			$pr_2->updatevon = $user;
@@ -203,7 +218,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 			$pr_2->mitarbeiter_uid = $user;
 			$pr_2->note = $note;
 			$pr_2->punkte = $punkte;
-			$pr_2->pruefungstyp_kurzbz = "Termin2";
+			$pr_2->pruefungstyp_kurzbz = $typ;
 			$pr_2->datum = $datum;
 			$pr_2->anmerkung = "";
 			$pr_2->insertamum = $jetzt;
@@ -212,14 +227,14 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 			$pr_2->updatevon = null;
 			$pr_2->ext_id = null;
 			$pr_2->new = true;
-			$old_note = -1;		
+			$old_note = -1;
 		}
 		$pr_2->save();
 	}
 
 
 	// Wenn eine Pruefung eingetragen wird, wird danach die LV-Note korrigiert
-	$jetzt = date("Y-m-d H:i:s");	
+	$jetzt = date("Y-m-d H:i:s");
 
 	$lvid = $_REQUEST["lvid"];
 	$lvgesamtnote = new lvgesamtnote();
@@ -250,14 +265,14 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 		$lvgesamtnote->updateamum = $jetzt;
 		$lvgesamtnote->updatevon = $user;
 		$new = false;
-		if ($lvgesamtnote->freigabedatum)		
+		if ($lvgesamtnote->freigabedatum)
 			$response = "update_f";
 		else
 			$response = "update";
 	}
 	if (!$lvgesamtnote->save($new))
 		echo "<span class='error'>".$lvgesamtnote->errormsg."</span>";
-	else 
+	else
 		echo $response;
 }
 else

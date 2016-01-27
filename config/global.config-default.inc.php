@@ -59,6 +59,10 @@ define('CIS_GESAMTNOTE_UEBERSCHREIBEN',true);
 // Gewichtung der Lehreinheiten bei Noteneintragung true|false
 define('CIS_GESAMTNOTE_GEWICHTUNG', true);
 
+// Bei Gesamtnote eine zusaetzliche Spalte fuer den 3. Termin anzeigen
+define('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3',true);
+
+
 // Gibt an ob im FAS bei den Lehrveranstaltungsnoten ein zusaetzliches Formular angezeigt wird um
 // Vertraege fuer Pruefungshonorare anzulegen
 define('FAS_GESAMTNOTE_PRUEFUNGSHONORAR',false);
