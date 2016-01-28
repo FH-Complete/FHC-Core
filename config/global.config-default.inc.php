@@ -74,6 +74,10 @@ define('FAS_ANWESENHEIT_GELB', 90);
 // Legt einen Prüfungstermin an wenn eine neue Note erfasst wird
 define('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN',false);
 
+// Legt fest ob bei der Uebernahme der Reihungstestpunkte die Punkte
+//oder Prozentpunkte uebernommen werden true=Punkte, false=Prozentpunkte
+define('FAS_REIHUNGSTEST_PUNKTE', false);
+
 // Anzeigeoptionen für LV-Plan Menü
 define('CIS_LVPLAN_EXPORT_ANZEIGEN',true);
 define('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN',true);
