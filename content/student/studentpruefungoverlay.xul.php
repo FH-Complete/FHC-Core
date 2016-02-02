@@ -57,13 +57,18 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			</columns>
 			<rows>
 				<row>
+					<vbox>
+						<hbox>
+							<spacer flex="1"/>
+							<button type="checkbox" id="student-pruefung-button-filterstsem" label="Alle Studiensemester anzeigen" oncommand="StudentPruefungFilterStsem();" disabled="true"/>
+						</hbox>
 					<tree id="student-pruefung-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 						datasources="rdf:null" ref="http://www.technikum-wien.at/pruefung/liste"
 						style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
 						context="student-pruefung-tree-popup"
 						flags="dont-build-content"
 					>
-										
+
 						<treecols>
 							<treecol id="student-pruefung-tree-datum" label="Datum" flex="2" hidden="false" primary="true"
 								class="sortDirectionIndicator"
@@ -110,7 +115,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								sort="rdf:http://www.technikum-wien.at/pruefung/rdf#punkte" />
 							<splitter class="tree-splitter"/>
 						</treecols>
-					
+
 						<template>
 							<treechildren flex="1" >
 									<treeitem uri="rdf:*">
@@ -131,6 +136,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</treechildren>
 						</template>
 					</tree>
+					</vbox>
 					<vbox>
 						<hbox>
 							<button id="student-pruefung-button-neu" label="Neu" oncommand="StudentPruefungNeu();" disabled="true"/>
@@ -154,7 +160,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<label value="Lehrveranstaltung" control="student-pruefung-menulist-lehrveranstaltung"/>
 										<menulist id="student-pruefung-menulist-lehrveranstaltung" disabled="true"
 										          datasources="rdf:null" flex="1"
-										          ref="http://www.technikum-wien.at/lehrveranstaltung/liste" 
+										          ref="http://www.technikum-wien.at/lehrveranstaltung/liste"
 										          oncommand="StudentPruefungLVAChange()">
 											<template>
 												<menupopup>
