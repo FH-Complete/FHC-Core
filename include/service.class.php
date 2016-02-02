@@ -182,27 +182,18 @@ class service extends basis_db
 		else
 			$zeit = "";
 
-		$qry = "	SELECT service_id,oe_kurzbz,bezeichnung,beschreibung,ext_id,content_id, sum(a.anzahl) AS anzahl FROM (
-						SELECT
-						tbl_service.*,
-						  (SELECT COUNT (tbl_zeitaufzeichnung.service_id) FROM campus.tbl_zeitaufzeichnung
-						   WHERE tbl_service.service_id=tbl_zeitaufzeichnung.service_id AND tbl_zeitaufzeichnung.uid=".$this->db_add_param($user)."
-						   $zeit
-						   ) AS anzahl
-						FROM public.tbl_service
-						WHERE
-						  (SELECT COUNT (tbl_zeitaufzeichnung.service_id) FROM campus.tbl_zeitaufzeichnung
-						   WHERE tbl_service.service_id=tbl_zeitaufzeichnung.service_id AND tbl_zeitaufzeichnung.uid=".$this->db_add_param($user)."
-						   $zeit
-						   ) > $anzahl_ereignisse
-						GROUP BY tbl_service.service_id,tbl_service.beschreibung,tbl_service.ext_id,tbl_service.oe_kurzbz,tbl_service.bezeichnung,tbl_service.content_id,anzahl
-
-						UNION
-						SELECT tbl_service.*, '0' AS anzahl
-						FROM public.tbl_service
-					) AS a
-					GROUP BY service_id,oe_kurzbz,bezeichnung,beschreibung,ext_id,content_id
-					ORDER BY anzahl DESC,bezeichnung,oe_kurzbz";
+		$qry = "	SELECT tbl_service.*, count(tbl_zeitaufzeichnung.service_id)
+					FROM campus.tbl_zeitaufzeichnung
+					JOIN public.tbl_service USING (service_id)
+					WHERE tbl_zeitaufzeichnung.uid=".$this->db_add_param($user)."
+					$zeit
+					GROUP BY tbl_service.service_id HAVING COUNT(*) > $anzahl_ereignisse
+					
+					UNION
+					SELECT tbl_service.*, '0' AS anzahl
+					FROM public.tbl_service
+					
+					ORDER BY count DESC,bezeichnung,oe_kurzbz";
 
 		if($result = $this->db_query($qry))
 		{
@@ -215,7 +206,7 @@ class service extends basis_db
 				$obj->beschreibung = $row->beschreibung;
 				$obj->ext_id = $row->ext_id;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
-				$obj->anzahl = $row->anzahl;
+				$obj->anzahl = $row->count;
 				$obj->content_id = $row->content_id;
 
 				$this->result[] = $obj;
