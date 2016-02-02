@@ -103,6 +103,10 @@ function checkZeilenUmbruch()
 				$text.= "<br>";
 			$text.= "<a href='ects/index.php?lvid=$lvid' target='_blank' class='Item'>".$p->t('lehre/lvInfoBearbeiten')."</a>";
 		}
+		elseif ($is_lector)
+		{
+			$text.= "<br>Bearbeiten der LV-Infos derzeit gesperrt";
+		}
 
 		$menu[]=array
 		(
