@@ -37,6 +37,7 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/sprache.class.php');
 require_once('../../../include/ferien.class.php');
 require_once('../../../include/Excel/excel.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 	$sprache = getSprache();
 	$p = new phrasen($sprache);
@@ -46,8 +47,11 @@ require_once('../../../include/Excel/excel.php');
 	
 	$uid = get_uid();
 	
-	if(!check_lektor($uid))
-	die($p->t('global/keineBerechtigung'));
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($uid);
+	
+	if(!check_lektor($uid) && (!$rechte->isBerechtigt('admin',0) && !$rechte->isBerechtigt('mitarbeiter')))
+		die($p->t('global/keineBerechtigung'));
 
 	if(isset($_GET['lektor']))
 		$lektor=$_GET['lektor'];
