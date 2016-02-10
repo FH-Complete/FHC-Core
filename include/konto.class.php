@@ -489,7 +489,7 @@ class konto extends basis_db
 						AND tbl_benutzer.person_id = tbl_konto.person_id
 						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
 						AND tbl_konto.buchungstyp_kurzbz = 'Studiengebuehr' ORDER BY buchungsnr";
-		
+
 		if($this->db_query($subqry))
 		{
 			if ($this->db_num_rows()==0)
@@ -629,7 +629,7 @@ class konto extends basis_db
 	 * student_uid und studiensemester
 	 * gibt true/false zurueck und setzt bei true das buchungsdatum $this->buchungsdatum
 	 */
-	public function getLastStSemBuchungstypen($uid, $buchungstyp_kurzbz_array)
+	public function getLastStSemBuchungstypen($uid, $buchungstyp_kurzbz_array, $studiensemester_kurzbz=null)
 	{
 		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum, tbl_konto.buchungsnr_verweis, tbl_konto.studiensemester_kurzbz
 					FROM
@@ -640,7 +640,11 @@ class konto extends basis_db
 					WHERE
 						tbl_benutzer.uid = ".$this->db_add_param($uid)."
 						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
-						AND tbl_konto.buchungstyp_kurzbz in(".$this->db_implode4SQL($buchungstyp_kurzbz_array).")
+						AND tbl_konto.buchungstyp_kurzbz in(".$this->db_implode4SQL($buchungstyp_kurzbz_array).")";
+		if(!is_null($studiensemester_kurzbz))
+			$subqry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+			
+		$subqry.="
 					ORDER BY tbl_studiensemester.start DESC";
 
 		if($result = $this->db_query($subqry))
