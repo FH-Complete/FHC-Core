@@ -167,10 +167,17 @@ if(!$result = @$db->db_query("SELECT bisorgform_kurzbz FROM bis.tbl_orgform LIMI
 		echo 'bis.tbl_orgform: Spalte bisorgform_kurzbz hinzugefuegt';
 }
 
-
-
-
-
+//Spalte curriculum in lehre.tbl_studienordnung_lehrveranstaltung
+if (!$result = @$db->db_query("SELECT curriculum FROM lehre.tbl_studienplan_lehrveranstaltung LIMIT 1;"))
+{
+    $qry = "ALTER TABLE lehre.tbl_studienplan_lehrveranstaltung ADD COLUMN curriculum BOOLEAN DEFAULT TRUE;";
+    
+    if (!$db->db_query($qry))
+	echo '<strong>lehre.tbl_studienplan_lehrveranstaltung: ' . $db->db_last_error() . '</strong><br>';
+    else
+	echo ' lehre.tbl_studienplan_lehrveranstaltung: Spalte curriculum hinzugefügt.<br>';
+    
+}
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -304,7 +311,7 @@ $tabellen=array(
 	"lehre.tbl_studienordnung"  => array("studienordnung_id","studiengang_kz","version","gueltigvon","gueltigbis","bezeichnung","ects","studiengangbezeichnung","studiengangbezeichnung_englisch","studiengangkurzbzlang","akadgrad_id","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"lehre.tbl_studienordnung_semester"  => array("studienordnung_semester_id","studienordnung_id","studiensemester_kurzbz","semester"),
 	"lehre.tbl_studienplan" => array("studienplan_id","studienordnung_id","orgform_kurzbz","version","regelstudiendauer","sprache","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon","semesterwochen","testtool_sprachwahl","ext_id"),
-	"lehre.tbl_studienplan_lehrveranstaltung" => array("studienplan_lehrveranstaltung_id","studienplan_id","lehrveranstaltung_id","semester","studienplan_lehrveranstaltung_id_parent","pflicht","koordinator","insertamum","insertvon","updateamum","updatevon","sort","ext_id"),
+	"lehre.tbl_studienplan_lehrveranstaltung" => array("studienplan_lehrveranstaltung_id","studienplan_id","lehrveranstaltung_id","semester","studienplan_lehrveranstaltung_id_parent","pflicht","koordinator","insertamum","insertvon","updateamum","updatevon","sort","ext_id", "curriculum"),
 	"lehre.tbl_studienplatz" => array("studienplatz_id","studiengang_kz","studiensemester_kurzbz","orgform_kurzbz","ausbildungssemester","gpz","npz","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"lehre.tbl_stunde"  => array("stunde","beginn","ende"),
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
