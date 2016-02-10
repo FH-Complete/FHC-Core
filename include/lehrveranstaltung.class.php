@@ -81,6 +81,7 @@ class lehrveranstaltung extends basis_db
 	
 	public $benotung=false;
 	public $lvinfo=false;
+	public $curriculum=true;
 
 	/**
 	 * Konstruktor
@@ -1174,7 +1175,8 @@ class lehrveranstaltung extends basis_db
 			tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht,
 			tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator,
 			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent,
-			tbl_studienplan_lehrveranstaltung.sort stpllv_sort
+			tbl_studienplan_lehrveranstaltung.sort stpllv_sort,
+			tbl_studienplan_lehrveranstaltung.curriculum
 		FROM lehre.tbl_lehrveranstaltung
 		JOIN lehre.tbl_studienplan_lehrveranstaltung
 		USING(lehrveranstaltung_id)
@@ -1243,6 +1245,7 @@ class lehrveranstaltung extends basis_db
 				$obj->stpllv_koordinator = $row->stpllv_koordinator;
 				$obj->studienplan_lehrveranstaltung_id = $row->studienplan_lehrveranstaltung_id;
 				$obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
+				$obj->curriculum = $row->curriculum;
 				$obj->new = false;
 
 				$this->lehrveranstaltungen[] = $obj;
@@ -1388,9 +1391,10 @@ class lehrveranstaltung extends basis_db
 				$obj->orgform_kurzbz = $lv->orgform_kurzbz;
 				$obj->incoming = $lv->incoming;
 				$obj->sprache = $lv->sprache;
-				$obj->benotung = $lv->benotung;
-				$obj->lvinfo = $lv->lvinfo;
-				$obj->zeugnis = $lv->zeugnis;
+				$obj->benotung = $this->db_parse_bool($lv->benotung);
+				$obj->lvinfo =$this->db_parse_bool($lv->lvinfo);
+				$obj->zeugnis = $this->db_parse_bool($lv->zeugnis);
+				$obj->curriculum = $this->db_parse_bool($lv->curriculum);
 
 				$obj->children = array();
 				if(count($lv->childs) > 0)
@@ -1419,6 +1423,7 @@ class lehrveranstaltung extends basis_db
 			$obj->benotung = $this->db_parse_bool($this->benotung);
 			$obj->lvinfo =$this->db_parse_bool( $this->lvinfo);
 			$obj->zeugnis = $this->db_parse_bool($this->zeugnis);
+			$obj->curriculum = $this->db_parse_bool($this->curriculum);
 
 			$values[] = $obj;
 		}
