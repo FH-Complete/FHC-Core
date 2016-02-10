@@ -146,7 +146,7 @@ foreach($noten_obj->result as $row)
 }
 
 ?>
-	function getTopOffset()
+	function getOffset(pos)
 	{
 		var x,y;
 		if (self.pageYOffset) // all except Explorer
@@ -160,12 +160,20 @@ foreach($noten_obj->result as $row)
 			x = document.documentElement.scrollLeft;
 			y = document.documentElement.scrollTop;
 		}
+		else if(window.scrollX)
+		{
+			x = window.scrollX;
+			y = window.scrollY;
+		}
 		else if (document.body) // all other Explorers
 		{
 			x = document.body.scrollLeft;
 			y = document.body.scrollTop;
 		}
-		return y;
+		if(pos=='x')
+			return x;
+		else
+			return y;
 	}
 
     // ******************************************
@@ -241,18 +249,25 @@ foreach($noten_obj->result as $row)
 	// *************************************************
 	// * Formular zum Eintragen einer Pruefung erstellen
 	// *************************************************
-	function pruefungAnlegen(uid,datum,note,lehreinheit_id,punkte)
+	function pruefungAnlegen(uid,datum,note,lehreinheit_id,punkte,typ)
 	{
+		if(typeof(typ)=='undefined')
+			typ = 'Termin2';
 		var str = "<form name='nachpruefung_form'><center><table style='width:95%'><tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
 
 		var anlegendiv = document.getElementById("nachpruefung_div");
-		var y = getTopOffset();
+		var y = getOffset('y');
 		y = y+50;
 		anlegendiv.style.top = y+"px";
+		var x = getOffset('x');
+		x = x+300;
+
+		anlegendiv.style.left = x+"px";
 
 		str += "<tr><td colspan='2'><b><?php echo $p->t('benotungstool/pruefungAnlegenFuer');?> "+uid+":</b></td></tr>";
 		str += "<tr><td><?php echo $p->t('global/datum');?>:</td>";
 		str += "<td><input type='hidden' name='uid' value='"+uid+"'><input type='hidden' name='le_id' value='"+lehreinheit_id+"'>";
+		str += "<input type='hidden' name='typ' value='"+typ+"'>";
 		str += "<input type='text' id='pruefungsdatum' name='datum' size='10' value='"+datum+"'> [DD.MM.YYYY]</td></tr>";
 
 		<?php
@@ -289,6 +304,7 @@ foreach($noten_obj->result as $row)
 	function pruefungSpeichern()
 	{
 		var note = document.nachpruefung_form.note.value;
+		var typ=document.nachpruefung_form.typ.value;
 		if(document.nachpruefung_form.punkte)
 			var punkte = document.nachpruefung_form.punkte.value;
 		else
@@ -313,7 +329,7 @@ foreach($noten_obj->result as $row)
 		    var jetzt = new Date();
 			var ts = jetzt.getTime();
 		    var url= '<?php echo "nachpruefungeintragen.php?lvid=$lvid&stsem=$stsem"; ?>';
-		    url += '&submit=1&student_uid='+uid+'&note='+note+'&datum='+datum+'&lehreinheit_id_pr='+lehreinheit_id+'&punkte='+punkte+'&'+ts;
+		    url += '&submit=1&student_uid='+uid+'&note='+note+'&datum='+datum+'&lehreinheit_id_pr='+lehreinheit_id+'&punkte='+punkte+'&typ='+typ+'&'+ts;
 
 			$.ajax({
 				type:"GET",
@@ -323,6 +339,7 @@ foreach($noten_obj->result as $row)
 					var anlegendiv = document.getElementById("nachpruefung_div");
 					var datum = 	document.nachpruefung_form.datum.value;
 					var note = document.nachpruefung_form.note.value;
+					var typ = document.nachpruefung_form.typ.value;
 					if(document.nachpruefung_form.punkte)
 						var punkte = document.nachpruefung_form.punkte.value;
 					else
@@ -354,7 +371,8 @@ foreach($noten_obj->result as $row)
 
 	   			 		anlegendiv.innerHTML = "";
 						anlegendiv.style.visibility = "hidden";
-						document.getElementById("span_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+noten_array[note]+"<td><input type='button' name='anlegen' value='<?php echo $p->t('global/aendern'); ?>' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\")'></td></tr></table>";
+
+						document.getElementById("span_"+typ+"_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+noten_array[note]+"<td><input type='button' name='anlegen' value='<?php echo $p->t('global/aendern'); ?>' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\",\""+punkte+"\",\""+typ+"\")'></td></tr></table>";
 					}
 	  			},
 	  			error:function(result)
@@ -471,7 +489,7 @@ foreach($noten_obj->result as $row)
 		var str = "<form name='gradeimport_form'><center><table style='width:95%'><tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
 
 		var anlegendiv = document.getElementById("nachpruefung_div");
-		var y = getTopOffset();
+		var y = getOffset('y');
 		y = y+50;
 		anlegendiv.style.top = y+"px";
 
@@ -750,6 +768,23 @@ if ($pr_all->getPruefungenLV($lvid,"Termin2",$stsem))
 	}
 }
 $summe_t2=count($studpruef_arr);
+
+$studpruef_arr_t3 = array();
+$pr_all = new Pruefung();
+if ($pr_all->getPruefungenLV($lvid,"Termin3",$stsem))
+{
+	if ($pr_all->result)
+	{
+		foreach ($pr_all->result as $pruefung)
+		{
+			$studpruef_arr_t3[$pruefung->student_uid][$pruefung->lehreinheit_id]["note"] = $pruefung->note;
+			$studpruef_arr_t3[$pruefung->student_uid][$pruefung->lehreinheit_id]["punkte"] = $pruefung->punkte;
+			$studpruef_arr_t3[$pruefung->student_uid][$pruefung->lehreinheit_id]["datum"] = $datum_obj->formatDatum($pruefung->datum,'d.m.Y');
+		}
+	}
+}
+$summe_t3=count($studpruef_arr_t3);
+
 $studpruef_komm = array();
 $pr_komm = new Pruefung();
 if ($pr_komm->getPruefungenLV($lvid,"kommPruef",$stsem))
@@ -788,7 +823,12 @@ echo "
 				</form>
 			</th>
 			<th>".$p->t('benotungstool/zeugnisnote')."</th>
-			<th colspan='2'>".$p->t('benotungstool/nachpruefung')."</th>
+			<th colspan='2'>".$p->t('benotungstool/nachpruefung')."</th>";
+			if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
+			{
+				echo "<th colspan='2' nowrap>".$p->t('benotungstool/nachpruefung2')."</th>";
+			}
+			echo "
 			<th colspan='2'>".$p->t('benotungstool/kommissionellePruefung')."</th>
 		</tr>
 			<tr>
@@ -801,7 +841,20 @@ echo "
 						<td></td>
 					</tr>
 					</table>
-				</th>
+				</th>";
+				if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
+				{
+					echo "<th colspan='2'>
+						<table>
+						<tr>
+							<td class='td_datum'>".$p->t('global/datum')."</td>
+							<td class='td_note'>".$p->t('benotungstool/note')."</td>
+							<td></td>
+						</tr>
+						</table>
+					</th>";
+				}
+				echo "
 				<th colspan='2'>
 					<table>
 					<tr>
@@ -1191,11 +1244,11 @@ echo "
 				if(isset($noten_array[$znote]) && $noten_array[$znote]['positiv']==false)
 					$summe_ng++;
 
-				// Pruefung 2.Termin
+				// Pruefung 2. Termin
 				if (key_exists($row_stud->uid, $studpruef_arr))
 				{
 					echo "<td colspan='2'>";
-					echo "<span id='span_".$row_stud->uid."'>";
+					echo "<span id='span_Termin2_".$row_stud->uid."'>";
 					echo "<table>";
 					$le_id_arr = array();
 					$le_id_arr = array_keys($studpruef_arr[$row_stud->uid]);
@@ -1224,9 +1277,50 @@ echo "
 				else
 				{
 					if (!is_null($note_lv) || !is_null($znote))
-						echo "<td colspan='2'><span id='span_".$row_stud->uid."'><input type='button' name='anlegen' value='".$p->t('benotungstool/anlegen')."' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"\",\"\",\"\",\"\")'></span></td>";
+						echo "<td colspan='2'><span id='span_Termin2_".$row_stud->uid."'><input type='button' name='anlegen' value='".$p->t('benotungstool/anlegen')."' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"\",\"\",\"\",\"\")'></span></td>";
 					else
 						echo "<td colspan='2'></td>";
+				}
+
+				if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
+				{
+					// Pruefung 3. Termin
+					if (key_exists($row_stud->uid, $studpruef_arr_t3))
+					{
+						echo "<td colspan='2'>";
+						echo "<span id='span_Termin3_".$row_stud->uid."'>";
+						echo "<table>";
+						$le_id_arr = array();
+						$le_id_arr = array_keys($studpruef_arr_t3[$row_stud->uid]);
+						foreach ($le_id_arr as $le_id_stud)
+						{
+							$pr_note = $studpruef_arr_t3[$row_stud->uid][$le_id_stud]["note"];
+							$pr_punkte = $studpruef_arr_t3[$row_stud->uid][$le_id_stud]["punkte"];
+							$pr_datum = $studpruef_arr_t3[$row_stud->uid][$le_id_stud]["datum"];
+							$pr_le_id = $le_id_stud;
+
+							if($pr_punkte!='')
+								$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'].' ('.number_format($pr_punkte,2).')';
+							else
+								$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'];
+
+							echo '<tr>
+									<td class="td_datum">'.$pr_datum.'</td>
+									<td class="td_note">'.$pr_notenbezeichnung.'</td>
+									<td><input type="button" name="anlegen" value="'.$p->t('global/aendern').'" onclick="pruefungAnlegen(\''.$row_stud->uid.'\',\''.$pr_datum.'\',\''.$pr_note.'\',\''.$pr_le_id.'\',\''.$pr_punkte.'\',\'Termin3\')"><td>
+								</tr>';
+						}
+						echo "</table>";
+						echo "</span>";
+						echo "</td>";
+					}
+					else
+					{
+						if (!is_null($note_lv) || !is_null($znote))
+							echo "<td colspan='2'><span id='span_Termin3_".$row_stud->uid."'><input type='button' name='anlegen' value='".$p->t('benotungstool/anlegen')."' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"\",\"\",\"\",\"\",\"Termin3\")'></span></td>";
+						else
+							echo "<td colspan='2'></td>";
+					}
 				}
 
 				// komm Pruefung
@@ -1245,7 +1339,7 @@ echo "
 						$pr_le_id = $le_id_stud;
 
 						if($pr_punkte!='')
-							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'].' ('.$pr_punkte.')';
+							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'].' ('.number_format($pr_punkte,2).')';
 						else
 							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'];
 
@@ -1276,6 +1370,7 @@ echo "
 		<th colspan='6'></td>
 		<th style='color:red; font-weight:bold;' title='".$p->t('benotungstool/anzahlNegativerBeurteilungen')."'>$summe_ng</th>
 		<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlNachpruefungen')."'>$summe_t2</th>
+		<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlNachpruefungen')."'>$summe_t3</th>
 		<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlKommisionellePruefungen')."'>$summe_komm</th>
 	</tr>
 </table>
@@ -1285,7 +1380,7 @@ echo "
 ";
 ?>
 
-<div id="nachpruefung_div" style="position:absolute; top:100px; left:200px; width:400px; height:200px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" ></div>
+<div id="nachpruefung_div" style="position:absolute; top:100px; left:300px; width:400px; height:200px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" ></div>
 
 </body>
 </html>

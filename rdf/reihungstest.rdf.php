@@ -55,17 +55,17 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
 			<RT:anmerkung></RT:anmerkung>
 			<RT:datum></RT:datum>
 			<RT:uhrzeit></RT:uhrzeit>
-			<RT:bezeichnung>-- keine Auswahl --</RT:bezeichnung>			
+			<RT:bezeichnung>-- keine Auswahl --</RT:bezeichnung>
       	</RDF:Description>
       </RDF:li>
-	
+
 ';
 }
 
 $stg = array();
 $stg_obj = new studiengang();
 $stg_obj->getAll();
-foreach ($stg_obj->result as $row) 
+foreach ($stg_obj->result as $row)
 	$stg[$row->studiengang_kz]=$row->kuerzel;
 
 $rt = new reihungstest();
@@ -81,6 +81,14 @@ else
 
 foreach ($rt->result as $row)
 {
+	$freieplaetze = '';
+	if(isset($row->angemeldete_teilnehmer))
+	{
+		if($row->max_teilnehmer!='' && $row->max_teilnehmer>0)
+			$freieplaetze = ' ('.$row->angemeldete_teilnehmer.'/'.$row->max_teilnehmer.')';
+	}
+
+	$bezeichnung = (array_key_exists($row->studiengang_kz, $stg)?$stg[$row->studiengang_kz].' ':'').$row->datum.' '.$row->uhrzeit.' '.$row->ort_kurzbz.' '.$row->anmerkung.$freieplaetze;
 ?>
 	  <RDF:li>
       	<RDF:Description  id="<?php echo $row->reihungstest_id; ?>"  about="<?php echo $rdf_url.'/'.$row->reihungstest_id; ?>" >
@@ -90,7 +98,7 @@ foreach ($rt->result as $row)
 			<RT:anmerkung><![CDATA[<?php echo $row->anmerkung;  ?>]]></RT:anmerkung>
 			<RT:datum><![CDATA[<?php echo $row->datum;  ?>]]></RT:datum>
 			<RT:uhrzeit><![CDATA[<?php echo $row->uhrzeit;  ?>]]></RT:uhrzeit>
-			<RT:bezeichnung><![CDATA[<?php echo (array_key_exists($row->studiengang_kz, $stg)?$stg[$row->studiengang_kz].' ':'').$row->datum.' '.$row->uhrzeit.' '.$row->ort_kurzbz.' '.$row->anmerkung;  ?>]]></RT:bezeichnung>			
+			<RT:bezeichnung><![CDATA[<?php echo $bezeichnung;  ?>]]></RT:bezeichnung>
       	</RDF:Description>
       </RDF:li>
 <?php

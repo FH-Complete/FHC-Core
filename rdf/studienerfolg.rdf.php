@@ -121,6 +121,16 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 		$stgl_ma = new mitarbeiter($stgleiter_uid);
 		$stgl .= trim($stgl_ma->titelpre.' '.$stgl_ma->vorname.' '.$stgl_ma->nachname.' '.$stgl_ma->titelpost);
 	}
+	//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
+	if ($row->studiengang_kz<0)
+	{
+		$stg = new studiengang();
+		$stg->load($row->studiengang_kz);
+	
+		$studiengang_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($row->studiengang_kz));
+	}
+	else
+		$studiengang_kz = sprintf("%04s", abs($row->studiengang_kz));
 	
 	$stdsem = new studiensemester($studiensemester_kurzbz);
 	
@@ -134,7 +144,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$xml .=	"		<semester_aktuell_semester>".$semester_aktuell."</semester_aktuell_semester>";
 	$xml .= "		<studiengang>".$row->bezeichnung."</studiengang>";
 	$xml .= "		<studiengang_englisch>".$row->bezeichnung_englisch."</studiengang_englisch>";
-	$xml .= "		<studiengang_kz>".sprintf('%04s',$row->studiengang_kz)."</studiengang_kz>";
+	$xml .= "		<studiengang_kz>".$studiengang_kz."</studiengang_kz>";
 	$xml .= "		<titelpre>".$row->titelpre."</titelpre>";
 	$xml .= "		<titelpost>".$row->titelpost."</titelpost>";
 	$xml .= "		<vorname>".$row->vorname."</vorname>";

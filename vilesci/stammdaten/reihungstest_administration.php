@@ -118,6 +118,24 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www
 						widgets: ["zebra"],
 						headers: {5:{sorter:false}}
 					}); 
+		
+				$(".prestudent_option").click(function ()
+				{
+					var elementExists = document.getElementById("input_prestudent");
+					var e = document.getElementById("pruefling_select");
+					var strUser = e.options[e.selectedIndex].value;
+					if (elementExists != null) 
+					{
+						elementExists.value=strUser;
+					}
+					$(this).closest("form").submit();
+				});
+				
+				$("#prestudent_input").click(function ()
+				{
+					$(this).closest("form").submit();
+				});
+				
 			});
 		</script>
 		
@@ -199,16 +217,32 @@ if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 }
 
 // Antworten eines Gebietes einer Person löschen und einen Logfile-Eintrag mit Undo-Befehl erstellen
+if(isset($_POST['prestudent']) && is_numeric($_POST['prestudent']))
+	$prestudent_id = $_POST['prestudent'];
+else 
+	$prestudent_id = '';
+
 $ps=new prestudent();
 $datum=date('Y-m-d');
 $ps->getPrestudentRT($datum,true);
 if ($ps->num_rows==0)
 	$ps->getPrestudentRT($datum);
-	
+
+$prestudent_arr = array();
+//Array mit Dropdownwerten befüllen
+foreach($ps->result as $prestd)
+{
+	$stg = new studiengang();
+	$stg->load($prestd->studiengang_kz);
+	$prestudent_arr[] .= $prestd->prestudent_id;
+}
+
 echo '<hr><br>Antworten eines Prüflings löschen<br>';
 echo '<form name="teilgebiet_loeschen" action="'.$_SERVER['PHP_SELF'].'" method="POST">
-		Prüfling: <SELECT name="prestudent" onchange="document.teilgebiet_loeschen.submit();">';
+		Prüfling: <SELECT id="pruefling_select" name="prestudent">';
 echo '<OPTION value="">-- Name auswählen --</OPTION>';
+echo '<OPTION id="prestudent_input" value="-1" '.($prestudent_id!='' && !array_search($prestudent_id, $prestudent_arr)?'selected':'').'>Prestudent ID eingeben</OPTION>';
+echo '<OPTION value="" disabled="disabled">--------------</OPTION>';
 foreach($ps->result as $prestd)
 {
 	$stg = new studiengang();
@@ -217,17 +251,15 @@ foreach($ps->result as $prestd)
 		$selected='selected';
 	else
 		$selected='';
-	
-	echo '<OPTION value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.', '.(strtoupper($stg->typ.$stg->kurzbz)).'; ID='.$prestd->prestudent_id.'; '.$prestd->gebdatum."</OPTION>\n";
+	echo '<OPTION class="prestudent_option" value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.', '.(strtoupper($stg->typ.$stg->kurzbz)).'; ID='.$prestd->prestudent_id.'; '.$prestd->gebdatum."</OPTION>\n";
 }
 echo '</SELECT>';
+if($prestudent_id!='' && !in_array($prestudent_id, $prestudent_arr))
+{
+	echo ' <INPUT id="input_prestudent" type="text" name="prestudent" value="'.($prestudent_id!='-1'?$prestudent_id:'').'">';
+}
 
-if(isset($_POST['prestudent']) && is_numeric($_POST['prestudent']))
-	$prestudent_id = $_POST['prestudent'];
-else 
-	$prestudent_id = '';
-
-if ($prestudent_id!='')
+if ($prestudent_id!='' && $prestudent_id!='-1')
 {
 	$qry = "SELECT DISTINCT(tbl_gebiet.gebiet_id),tbl_gebiet.bezeichnung,tbl_gebiet.kurzbz FROM testtool.tbl_gebiet 
 			JOIN testtool.tbl_ablauf USING (gebiet_id)

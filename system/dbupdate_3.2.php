@@ -21,6 +21,18 @@
  * Dieses Skript prueft die Datenbank auf aktualitaet, dabei werden fehlende Attribute angelegt.
  */
 
+//Spalte studiensemester_kurzbz für Reihungstest
+if(!$result = @$db->db_query("SELECT studiensemester_kurzbz FROM public.tbl_reihungstest LIMIT 1"))
+{
+    $qry = "ALTER TABLE public.tbl_reihungstest ADD COLUMN studiensemester_kurzbz varchar(16);
+	   ALTER TABLE public.tbl_reihungstest ADD CONSTRAINT fk_reihungsteset_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+    if(!$db->db_query($qry))
+	    echo '<strong>public.tbl_reihungstest: '.$db->db_last_error().'</strong><br>';
+	else
+	    echo 'public.tbl_reihungstest: Spalte studiensemester_kurzbz hinzugefuegt';
+}
+
 // Neue Spalte beschreibung_mehrsprachig bei tbl_dokument
 if(!@$db->db_query("SELECT dokumentbeschreibung_mehrsprachig FROM public.tbl_dokument LIMIT 1"))
 {
@@ -96,23 +108,69 @@ if(!@$db->db_query("SELECT bewerbung_abgeschicktamum FROM public.tbl_prestudents
 if (!$result = @$db->db_query("SELECT benotung FROM lehre.tbl_lehrveranstaltung LIMIT 1;"))
 {
     $qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN benotung boolean NOT NULL DEFAULT FALSE;";
-    
+
     if (!$db->db_query($qry))
 	echo '<strong>lehre.tbl_lehrveranstaltung: ' . $db->db_last_error() . '</strong><br>';
     else
-	echo ' lehre.tbl_lehrveranstaltung: Spalte benotung hinzugefügt.<br>'; 
+	echo ' lehre.tbl_lehrveranstaltung: Spalte benotung hinzugefügt.<br>';
 }
 
 //Spalte lvinfo in lehre.tbl_lehrveranstaltung
 if (!$result = @$db->db_query("SELECT lvinfo FROM lehre.tbl_lehrveranstaltung LIMIT 1;"))
 {
     $qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN lvinfo boolean NOT NULL DEFAULT FALSE;";
-    
+
     if (!$db->db_query($qry))
 	echo '<strong>lehre.tbl_lehrveranstaltung: ' . $db->db_last_error() . '</strong><br>';
     else
-	echo ' lehre.tbl_lehrveranstaltung: Spalte lvinfo hinzugefügt.<br>'; 
+	echo ' lehre.tbl_lehrveranstaltung: Spalte lvinfo hinzugefügt.<br>';
 }
+
+
+
+
+// tbl_bisorgform hinzufuegen
+if(!$result = @$db->db_query("SELECT 1 FROM bis.tbl_bisorgform LIMIT 1;"))
+{
+	$qry = "
+
+	CREATE TABLE bis.tbl_bisorgform
+	(
+		bisorgform_kurzbz varchar(3) NOT NULL,
+		code smallint,
+		bezeichnung varchar(64)
+	);
+
+	COMMENT ON TABLE bis.tbl_bisorgform IS 'Offizielle OrgFormen fuer die BIS-Meldung';
+
+	ALTER TABLE bis.tbl_bisorgform ADD CONSTRAINT pk_bisorgform_kurzbz PRIMARY KEY (bisorgform_kurzbz);
+
+	GRANT SELECT ON bis.tbl_bisorgform TO vilesci;
+	GRANT SELECT ON bis.tbl_bisorgform TO web;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>Dokumentenupload fuer Notizen: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' Tabelle bis.tbl_orgform hinzugefuegt!<br>';
+}
+
+//Spalte bisorgform_kurzbz für tbl_orgform
+if(!$result = @$db->db_query("SELECT bisorgform_kurzbz FROM bis.tbl_orgform LIMIT 1"))
+{
+	$qry = "ALTER TABLE bis.tbl_orgform ADD COLUMN bisorgform_kurzbz varchar(3);
+	ALTER TABLE bis.tbl_orgform ADD CONSTRAINT fk_orgform_bisorgform FOREIGN KEY (bisorgform_kurzbz) REFERENCES bis.tbl_bisorgform (bisorgform_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_orgform: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'bis.tbl_orgform: Spalte bisorgform_kurzbz hinzugefuegt';
+}
+
+
+
+
+
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -120,6 +178,7 @@ echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 echo '<br><br><br>';
 
 $tabellen=array(
+	"bis.tbl_bisorgform" => array("bisorgform_kurzbz","code","bezeichnung"),
 	"bis.tbl_archiv"  => array("archiv_id","studiensemester_kurzbz","meldung","html","studiengang_kz","insertamum","insertvon","typ"),
 	"bis.tbl_ausbildung"  => array("ausbildungcode","ausbildungbez","ausbildungbeschreibung"),
 	"bis.tbl_berufstaetigkeit"  => array("berufstaetigkeit_code","berufstaetigkeit_bez","berufstaetigkeit_kurzbz"),
@@ -137,7 +196,7 @@ $tabellen=array(
 	"bis.tbl_lgartcode"  => array("lgartcode","kurzbz","bezeichnung","beantragung","lgart_biscode"),
 	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung","sichtbar","sichtbar_outgoing"),
 	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre"),
-	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle"),
+	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle","bisorgform_kurzbz"),
 	"bis.tbl_verwendung"  => array("verwendung_code","verwendungbez"),
 	"bis.tbl_zgv"  => array("zgv_code","zgv_bez","zgv_kurzbz","bezeichnung"),
 	"bis.tbl_zgvmaster"  => array("zgvmas_code","zgvmas_bez","zgvmas_kurzbz","bezeichnung"),
@@ -214,8 +273,8 @@ $tabellen=array(
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
-    "lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id"),
-    "lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
+	"lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
 	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung"),
 	"lehre.tbl_ferien"  => array("bezeichnung","studiengang_kz","vondatum","bisdatum"),
 	"lehre.tbl_lehreinheit"  => array("lehreinheit_id","lehrveranstaltung_id","studiensemester_kurzbz","lehrfach_id","lehrform_kurzbz","stundenblockung","wochenrythmus","start_kw","raumtyp","raumtypalternativ","sprache","lehre","anmerkung","unr","lvnr","updateamum","updatevon","insertamum","insertvon","ext_id","lehrfach_id_old","gewicht"),
@@ -226,7 +285,7 @@ $tabellen=array(
 	"lehre.tbl_lehrfunktion"  => array("lehrfunktion_kurzbz","beschreibung","standardfaktor","sort"),
 	"lehre.tbl_lehrmittel" => array("lehrmittel_kurzbz","beschreibung","ort_kurzbz"),
 	"lehre.tbl_lehrtyp" => array("lehrtyp_kurzbz","bezeichnung"),
-	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las"),
+	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las","benotung","lvinfo"),
 	"lehre.tbl_lehrveranstaltung_kompatibel" => array("lehrveranstaltung_id","lehrveranstaltung_id_kompatibel"),
 	"lehre.tbl_lvangebot" => array("lvangebot_id","lehrveranstaltung_id","studiensemester_kurzbz","gruppe_kurzbz","incomingplaetze","gesamtplaetze","anmeldefenster_start","anmeldefenster_ende","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_lvregel" => array("lvregel_id","lvregeltyp_kurzbz","operator","parameter","lvregel_id_parent","lehrveranstaltung_id","studienplan_lehrveranstaltung_id","insertamum","insertvon","updateamum","updatevon"),
@@ -296,7 +355,7 @@ $tabellen=array(
 	"public.tbl_notiz"  => array("notiz_id","titel","text","verfasser_uid","bearbeiter_uid","start","ende","erledigt","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_notizzuordnung"  => array("notizzuordnung_id","notiz_id","projekt_kurzbz","projektphase_id","projekttask_id","uid","person_id","prestudent_id","bestellung_id","lehreinheit_id","ext_id","anrechnung_id"),
 	"public.tbl_notiz_dokument" => array("notiz_id","dms_id"),
-    "public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id","m2","gebteil","oe_kurzbz"),
+	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id","m2","gebteil","oe_kurzbz"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
 	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen","lehre","standort","warn_semesterstunden_frei","warn_semesterstunden_fix","standort_id"),
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
@@ -399,7 +458,7 @@ foreach ($tabellen AS $attribute)
 
 echo '<H2>Gegenpruefung!</H2>';
 $error=false;
-$sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync' AND schemaname != 'addon';";
+$sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync' AND schemaname != 'addon' AND schemaname != 'reports';";
 if (!$result=@$db->db_query($sql_query))
 		echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
 	else

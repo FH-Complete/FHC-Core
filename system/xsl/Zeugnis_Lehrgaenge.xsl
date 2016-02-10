@@ -450,7 +450,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <text:p text:style-name="P22">
                 <text:tab/>angerechnet (ar), nicht beurteilt (nb), bestanden (b), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</text:p>
             <text:p text:style-name="P7"/>
-            <xsl:if test="abschlusspruefung_typ">
+            <xsl:if test="abschlusspruefung_datum != ''">
 	            <table:table table:name="Tabelle2" table:style-name="Tabelle2">
 	                <table:table-column table:style-name="Tabelle2.A"/>
 	                <table:table-column table:style-name="Tabelle2.B"/>

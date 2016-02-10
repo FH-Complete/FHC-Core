@@ -356,7 +356,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 <table:table-row table:style-name="Tabelle2.1">
                     <table:table-cell table:style-name="Tabelle2.A1" table:number-columns-spanned="3" office:value-type="string">
                         <text:p text:style-name="P10">Institution</text:p>
-                        <text:p text:style-name="P8">Fachhochschule Technikum Wien</text:p>
+                        <text:p text:style-name="P8">University of Applied Sciences Technikum Wien</text:p>
                     </table:table-cell>
                     <table:covered-table-cell/>
                     <table:covered-table-cell/>

@@ -1149,7 +1149,7 @@ if(!$error)
 					    $rolle->bestaetigtam = $_POST['bestaetigtam'];
 					    if($_POST['bestaetigtam']=='')
 					    	$rolle->bestaetigtvon = null;
-					    
+
 					    $rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
 					    $rolle->studienplan_id = $_POST['studienplan_id'];
                         $rolle->anmerkung_status = $_POST['anmerkung'];
@@ -1370,7 +1370,7 @@ if(!$error)
 														$stg_obj->load(ltrim($stg,'0'));
 														$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr);
                                                         $matrikelnummer = generateMatrikelnr($stg_obj->oe_kurzbz);
-                                                        
+
                                                         if($matrikelnummer != null)
                                                         {
                                                             $qry = "UPDATE public.tbl_person SET matr_nr=".$db->db_add_param($matrikelnummer)." WHERE person_id=".$db->db_add_param($prestd->person_id, FHC_INTEGER).' AND matr_nr is null';
@@ -3745,7 +3745,10 @@ if(!$error)
 		if(isset($_POST['prestudent_id']))
 		{
 			$pruefling = new pruefling();
-			$data = $pruefling->getReihungstestErgebnis($_POST['prestudent_id']);
+			if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+				$data = $pruefling->getReihungstestErgebnis($_POST['prestudent_id'], true);
+			else
+				$data = $pruefling->getReihungstestErgebnis($_POST['prestudent_id']);
 			$return = true;
 		}
 	}

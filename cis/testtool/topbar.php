@@ -99,7 +99,7 @@ function changeSprache(sprache)
 echo '	<table style="background-image: url(../../skin/images/header_testtool.png); background-repeat: repeat-x;" width="100%" height="100%" cellspacing="0" cellpadding="0">
 		<tr>
     		<td valign="top" align="left">
-    			<a href="index.html" target="_top"><img class="header_logo" style="height:70%; left: 16px; top: 10%;" src="../../skin/styles/'.DEFAULT_STYLE.'/logo_klein.png" alt="logo"></a>
+    			<a href="index.html" target="_top"><img class="header_logo" style="min-height:80%; left: 16px; top: 10%;" src="../../skin/styles/'.DEFAULT_STYLE.'/logo_250x130.png" alt="logo"></a>
     		</td>
     		<td align="right">
     		<select style="text-align: left; color: #0086CC; border: 1;" name="select">';

@@ -89,10 +89,22 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				
 			</xsl:if>
 			<xsl:value-of select="zusatzinfo" disable-output-escaping="yes"/>
+			<xsl:if test="hochschulvertr">
+				
+				<h2><xsl:value-of select="hochschulvertr_name" /></h2>
+				<p><xsl:apply-templates select="hochschulvertr" /></p>
+				
+			</xsl:if>
 			<xsl:if test="stdv">
 				
 				<h2><xsl:value-of select="stdv_name" /></h2>
-				<xsl:apply-templates select="stdv" />
+				<p><xsl:apply-templates select="stdv" /></p>
+				
+			</xsl:if>
+			<xsl:if test="jahrgangsvertr">
+				
+				<h2><xsl:value-of select="jahrgangsvertr_name" /></h2>
+				<p><xsl:apply-templates select="jahrgangsvertr" /></p>
 				
 			</xsl:if>
 			</font>
@@ -132,9 +144,17 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 			E: <xsl:variable name="mail" select="email"></xsl:variable>
 			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a></p>
 	</xsl:template>
+	<xsl:template match="hochschulvertr">
+			<xsl:variable name="uid" select="uid"></xsl:variable>
+			<a href="../cis/private/profile/index.php?uid={$uid}"><xsl:value-of select="name" /></a><br />
+	</xsl:template>
 	<xsl:template match="stdv">
-			<xsl:variable name="mail" select="email"></xsl:variable>
-			<a href="mailto:{$mail}"><xsl:value-of select="name" /></a><br/>
+			<xsl:variable name="uid" select="uid"></xsl:variable>
+			<a href="../cis/private/profile/index.php?uid={$uid}"><xsl:value-of select="name" /></a><br />
+	</xsl:template>
+	<xsl:template match="jahrgangsvertr">
+			<xsl:variable name="uid" select="uid"></xsl:variable>
+			<a href="../cis/private/profile/index.php?uid={$uid}"><xsl:value-of select="name" /></a><br />
 	</xsl:template>
 	<xsl:template match="cis_ext_menu">
 			<xsl:variable name="kurzbz" select="kurzbz"></xsl:variable>

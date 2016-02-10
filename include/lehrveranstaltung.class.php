@@ -823,9 +823,9 @@ class lehrveranstaltung extends basis_db
 					'lvs = '.$this->db_add_param($this->lvs).', '.
 					'alvs = '.$this->db_add_param($this->alvs).', '.
 					'lvps = '.$this->db_add_param($this->lvps).', '.
-					'las = '.$this->db_add_param($this->las).' '.
-					'benotung = '.$this->db_add_param($this->benotung).' '.
-					'lvinfo = '.$this->db_add_param($this->lvinfo).' '.
+					'las = '.$this->db_add_param($this->las).', '.
+					'benotung = '.$this->db_add_param($this->benotung, FHC_BOOLEAN).', '.
+					'lvinfo = '.$this->db_add_param($this->lvinfo, FHC_BOOLEAN).' '.
 					'WHERE lehrveranstaltung_id = ' . $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER, false) . ';';
 		}
 

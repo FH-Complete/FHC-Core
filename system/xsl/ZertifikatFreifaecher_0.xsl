@@ -241,7 +241,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			                        <table:table-column table:style-name="Tabelle3.C"/>
 			                        <table:table-row>
 			                            <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-			                                <text:p text:style-name="P17">Wien, am <xsl:value-of select="ort_datum" /></text:p>
+			                                <text:p text:style-name="P17"><xsl:value-of select="ort_datum" /></text:p>
 			                            </table:table-cell>
 			                            <table:table-cell table:style-name="Tabelle3.B1" office:value-type="string">
 			                                <text:p text:style-name="P16"/>

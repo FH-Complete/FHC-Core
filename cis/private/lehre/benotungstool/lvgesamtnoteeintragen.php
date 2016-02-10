@@ -117,6 +117,7 @@ function savenote($db,$lvid, $student_uid, $note, $punkte=null)
 {
 	global $stsem, $user, $p, $noten_anmerkung;
 	$jetzt = date("Y-m-d H:i:s");
+	$punkte = str_replace(',','.',$punkte);
 	//Ermitteln ob der Student diesem Kurs zugeteilt ist
 	$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung WHERE uid=".$db->db_add_param($student_uid)." AND lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
 	if($result = $db->db_query($qry))

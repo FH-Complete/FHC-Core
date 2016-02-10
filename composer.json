@@ -5,24 +5,5 @@
     "components/bootstrap": "3.3.5",
     "michelf/php-markdown": "1.5.0"
     
-  },
- 
- 
- 
- 
- 
- 
- 
- 
-  "_comment":
-  {
-    "um GIT-Repos zu inkludieren, muss die url zuerst zu 'repositories' hinzugefügt werden. Anschließend kann es bei 'require' wie üblich mit angegeben werden:":{
-      "repositories": [
-        {"type": "git", "url": "https://github.com/BEISPIEL/BEISPIEL.git"}
-      ],
-      "require": {
-        "BEISPIEL/BEISPIEL": "x.x.x"
-      }
-    }
   }
 }

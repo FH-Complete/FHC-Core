@@ -151,6 +151,12 @@ echo '<!DOCTYPE HTML>
 				widgets: ["zebra"],
 				headers: {2:{sorter:false}}
 			});
+			$("#t2").tablesorter(
+			{
+				sortList: [[2,0]],
+				widgets: ["zebra"],
+				headers: {0:{sorter:false}}
+			});
 		});
 
 		function showDocumentForm(dokument_kurzbz="",bezeichnung="",neu=true)
@@ -223,7 +229,7 @@ if(isset($_GET['action']) && $_GET['action']=='dokumenttypen')
 
 	echo '
 
-	<table id="t1" class="tablesorter" style="width:auto">
+	<table id="t2" class="tablesorter" style="width:auto">
 	<thead>
 		<th></th>
 		<th>Kurzbz</th>
@@ -308,7 +314,7 @@ if(isset($_GET['action']) && $_GET['action']=='dokumenttypen')
 			<td><input type="submit" name="saveDokumenttyp" value="Speichern"></td>
 		</tr>
 	</table>
-	</form>';
+	</form><br><br><br><br><br><br><br><br><br><br><br><br>';
 }
 else
 {

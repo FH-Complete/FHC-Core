@@ -22,6 +22,7 @@
 /**
  * Datenbank Abstraktionsklasse fuer Postgresql Datenbank
  */
+require_once('sprache.class.php');
 
 class basis_db extends db
 {
@@ -292,6 +293,27 @@ class basis_db extends db
 				$var = $this->db_null_value($var, false);
 				break;
 
+			case FHC_LANG_ARRAY:
+
+				$sprache = new sprache();
+				$sprache->getAll(true);
+				$buf = $var;
+				$var = array();
+				$languages = $sprache->getAllIndexesSorted();
+
+				foreach($languages as $sk => $sp)
+				{
+					if(!$sp || !isset($buf[$sp]))
+						$var[$sk] = "";
+					else
+						$var[$sk] = $this->db_escape($buf[$sp]);
+				}
+				$var = str_replace('\\', '\\\\', $var);
+				$var = str_replace('"', '\\\"', $var);
+				$var = '\'{"' . join('","', $var) . '"}\'';
+
+				break;
+
 			case FHC_BOOLEAN:
 				if($var===true)
 					$var='true';
@@ -350,15 +372,48 @@ class basis_db extends db
 	 */
 	public function db_parse_array($var)
 	{
-    	if ($var == '')
+		if ($var == '')
 			return;
-	    preg_match_all('/(?<=^\{|,)(([^,"{]*)|\s*"((?:[^"\\\\]|\\\\(?:.|[0-9]+|x[0-9a-f]+))*)"\s*)(,|(?<!^\{)(?=\}$))/i', $var, $matches, PREG_SET_ORDER);
-	    $values = array();
-	    foreach ($matches as $match)
+		preg_match_all('/(?<=^\{|,)(([^,"{]*)|\s*"((?:[^"\\\\]|\\\\(?:.|[0-9]+|x[0-9a-f]+))*)"\s*)(,|(?<!^\{)(?=\}$))/i', $var, $matches, PREG_SET_ORDER);
+		$values = array();
+		foreach ($matches as $match)
 		{
-        	$values[] = $match[3] != '' ? stripcslashes($match[3]) : (strtolower($match[2]) == 'null' ? null : $match[2]);
-    	}
-	    return $values;
+			$values[] = $match[3] != '' ? stripcslashes($match[3]) : (strtolower($match[2]) == 'null' ? null : $match[2]);
+		}
+		return $values;
 	}
+
+	/**
+	 * Erstellt aus einem DB Array ein PHP Array
+	 * @param $var DB Result Array Spalte
+	 * @return php array
+	 */
+	public function db_parse_lang_array($var)
+	{
+
+		if ($var == '')
+			return;
+		preg_match_all('/(?<=^\{|,)(([^,"{]*)|\s*"((?:[^"\\\\]|\\\\(?:.|[0-9]+|x[0-9a-f]+))*)"\s*)(,|(?<!^\{)(?=\}$))/i', $var, $matches, PREG_SET_ORDER);
+		$values = array();
+
+		$sprache = new sprache();
+		$sprache->loadIndexArray();
+
+		$sprache = new sprache();
+		$sprache->getAll(true);
+		$languages = $sprache->getAllIndexesSorted();
+
+
+		foreach ($matches as $mk => $match)
+		{
+			$values[$languages[$mk+1]] = $match[3] != '' ? stripcslashes($match[3]) : (strtolower($match[2]) == 'null' ? null : $match[2]);
+		}
+		return $values;
+	}
+}
+
+function indexSort($a, $b)
+{
+	return strcmp($a->index, $b->index);
 }
 ?>

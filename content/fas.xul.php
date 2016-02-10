@@ -474,42 +474,54 @@ foreach($addon_obj->result as $addon)
     <menu id="menu-dokumente" label="&menu-dokumente.label;" accesskey="&menu-dokumente.accesskey;">
           <menupopup id="menu-dokumente-popup">
           <menuitem
+               id        =  "menu-dokumente-accountinfoblatt"
+               key       =  "menu-dokumente-accountinfoblatt:key"
+               label     = "&menu-dokumente-accountinfoblatt.label;"
+               command   =  "menu-dokumente-accountinfoblatt:command"
+               accesskey = "&menu-dokumente-accountinfoblatt.accesskey;"/>
+          <menuitem
+               id        =  "menu-dokumente-ausbildungsvertrag"
+               key       =  "menu-dokumente-ausbildungsvertrag:key"
+               label     = "&menu-dokumente-ausbildungsvertrag.label;"
+               command   =  "menu-dokumente-ausbildungsvertrag:command"
+               accesskey = "&menu-dokumente-ausbildungsvertrag.accesskey;"/>
+            <menuitem
+               id        =  "menu-dokumente-ausbildungsvertrag_englisch"
+               key       =  "menu-dokumente-ausbildungsvertrag_englisch:key"
+               label     = "&menu-dokumente-ausbildungsvertrag_englisch.label;"
+               command   =  "menu-dokumente-ausbildungsvertrag_englisch:command"
+               accesskey = "&menu-dokumente-ausbildungsvertrag_englisch.accesskey;"/>
+          <menuitem
+               id        =  "menu-dokumente-zutrittskarte"
+               key       =  "menu-dokumente-zutrittskarte:key"
+               label     = "&menu-dokumente-zutrittskarte.label;"
+               command   =  "menu-dokumente-zutrittskarte:command"
+               accesskey = "&menu-dokumente-zutrittskarte.accesskey;"/>
+          <menuseparator/>
+          <menuitem
+               id        =  "menu-dokumente-inskriptionsbestaetigung"
+               key       =  "menu-dokumente-inskriptionsbestaetigung:key"
+               label     = "&menu-dokumente-inskriptionsbestaetigung.label;"
+               command   =  "menu-dokumente-inskriptionsbestaetigung:command"
+               accesskey = "&menu-dokumente-inskriptionsbestaetigung.accesskey;"/>
+          <menuitem
                id        =  "menu-statistic-lehrauftraege"
                key       =  "menu-statistic-lehrauftraege:key"
                label     = "&menu-statistic-lehrauftraege.label;"
                command   =  "menu-statistic-lehrauftraege:command"
                accesskey = "&menu-statistic-lehrauftraege.accesskey;"/>
             <menuitem
-               id        =  "menu-dokumente-inskriptionsbestaetigung"
-               key       =  "menu-dokumente-inskriptionsbestaetigung:key"
-               label     = "&menu-dokumente-inskriptionsbestaetigung.label;"
-               command   =  "menu-dokumente-inskriptionsbestaetigung:command"
-               accesskey = "&menu-dokumente-inskriptionsbestaetigung.accesskey;"/>
+               id        =  "menu-dokumente-studienblatt"
+               key       =  "menu-dokumente-studienblatt:key"
+               label     = "&menu-dokumente-studienblatt.label;"
+               command   =  "menu-dokumente-studienblatt:command"
+               accesskey = "&menu-dokumente-studienblatt.accesskey;"/>
             <menuitem
-               id        =  "menu-dokumente-zeugnis"
-               key       =  "menu-dokumente-zeugnis:key"
-               label     = "&menu-dokumente-zeugnis.label;"
-               command   =  "menu-dokumente-zeugnis:command"
-               accesskey = "&menu-dokumente-zeugnis.accesskey;"/>
-            <menuitem
-               id        =  "menu-dokumente-zeugniseng"
-               key       =  "&menu-dokumente-zeugniseng.key;"
-               label     = "&menu-dokumente-zeugniseng.label;"
-               command   =  "menu-dokumente-zeugniseng:command"
-               accesskey = "&menu-dokumente-zeugniseng.accesskey;"/>
-<!--            <menuitem
-               id        = "menu-dokumente-sammelzeugnis"
-               key       = "&menu-dokumente-sammelzeugnis.key;"
-               label     = "&menu-dokumente-sammelzeugnis.label;"
-               command   = "menu-dokumente-sammelzeugnis:command"
-               accesskey = "&menu-dokumente-sammelzeugnis.accesskey;"/>
--->
-            <menuitem
-               id        =  "menu-dokumente-diplsupplement"
-               key       =  "menu-dokumente-diplsupplement:key"
-               label     = "&menu-dokumente-diplsupplement.label;"
-               command   =  "menu-dokumente-diplsupplement:command"
-               accesskey = "&menu-dokumente-diplsupplement.accesskey;"/>
+               id        =  "menu-dokumente-studienblatt_englisch"
+               key       =  "menu-dokumente-studienblatt_englisch:key"
+               label     = "&menu-dokumente-studienblatt_englisch.label;"
+               command   =  "menu-dokumente-studienblatt_englisch:command"
+               accesskey = "&menu-dokumente-studienblatt_englisch.accesskey;"/>
             <menu id="menu-dokumente-studienerfolg" label="&menu-dokumente-studienerfolg.label;" accesskey="&menu-dokumente-studienerfolg.accesskey;">
 	          <menupopup id="menu-dokumente-studienerfolg-popup">
 	          <menu id="menu-dokumente-studienerfolg-allesemester" label="&menu-dokumente-studienerfolg-allesemester.label;">
@@ -636,43 +648,13 @@ foreach($addon_obj->result as $addon)
 	               accesskey = "&menu-dokumente-studienerfolgeng-finanzamt.accesskey;"/>
 	            </menupopup>
 	        </menu>
-	         <menuitem
-               id        =  "menu-dokumente-accountinfoblatt"
-               key       =  "menu-dokumente-accountinfoblatt:key"
-               label     = "&menu-dokumente-accountinfoblatt.label;"
-               command   =  "menu-dokumente-accountinfoblatt:command"
-               accesskey = "&menu-dokumente-accountinfoblatt.accesskey;"/>
-            <menuitem
-               id        =  "menu-dokumente-zutrittskarte"
-               key       =  "menu-dokumente-zutrittskarte:key"
-               label     = "&menu-dokumente-zutrittskarte.label;"
-               command   =  "menu-dokumente-zutrittskarte:command"
-               accesskey = "&menu-dokumente-zutrittskarte.accesskey;"/>
-            <menuitem
-               id        =  "menu-dokumente-studienblatt"
-               key       =  "menu-dokumente-studienblatt:key"
-               label     = "&menu-dokumente-studienblatt.label;"
-               command   =  "menu-dokumente-studienblatt:command"
-               accesskey = "&menu-dokumente-studienblatt.accesskey;"/>
-            <menuitem
-               id        =  "menu-dokumente-studienblatt_englisch"
-               key       =  "menu-dokumente-studienblatt_englisch:key"
-               label     = "&menu-dokumente-studienblatt_englisch.label;"
-               command   =  "menu-dokumente-studienblatt_englisch:command"
-               accesskey = "&menu-dokumente-studienblatt_englisch.accesskey;"/>
 			<menuseparator/>
-			<menuitem
-               id        =  "menu-dokumente-pruefungsprotokoll"
-               key       =  "menu-dokumente-pruefungsprotokoll:key"
-               label     = "&menu-dokumente-pruefungsprotokoll.label;"
-               command   =  "menu-dokumente-pruefungsprotokoll:command"
-               accesskey = "&menu-dokumente-pruefungsprotokoll.accesskey;"/>
             <menuitem
-               id        =  "menu-dokumente-pruefungsprotokoll_englisch"
-               key       =  "menu-dokumente-pruefungsprotokoll_englisch:key"
-               label     = "&menu-dokumente-pruefungsprotokoll_englisch.label;"
-               command   =  "menu-dokumente-pruefungsprotokoll_englisch:command"
-               accesskey = "&menu-dokumente-pruefungsprotokoll_englisch.accesskey;"/>
+               id        =  "menu-dokumente-diplsupplement"
+               key       =  "menu-dokumente-diplsupplement:key"
+               label     = "&menu-dokumente-diplsupplement.label;"
+               command   =  "menu-dokumente-diplsupplement:command"
+               accesskey = "&menu-dokumente-diplsupplement.accesskey;"/>
             <menuitem
                id        =  "menu-dokumente-pruefungsprotokoll2"
                key       =  "menu-dokumente-pruefungsprotokoll2:key"
@@ -685,13 +667,13 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-dokumente-pruefungsprotokoll2_englisch.label;"
                command   =  "menu-dokumente-pruefungsprotokoll2_englisch:command"
                accesskey = "&menu-dokumente-pruefungsprotokoll2_englisch.accesskey;"/>
-			<menuitem
+            <menuitem
                id        =  "menu-dokumente-pruefungszeugnis"
                key       =  "menu-dokumente-pruefungszeugnis:key"
                label     = "&menu-dokumente-pruefungszeugnis.label;"
                command   =  "menu-dokumente-pruefungszeugnis:command"
                accesskey = "&menu-dokumente-pruefungszeugnis.accesskey;"/>
-               <menuitem
+            <menuitem
                id        =  "menu-dokumente-pruefungszeugnis_englisch"
                key       =  "menu-dokumente-pruefungszeugnis_englisch:key"
                label     = "&menu-dokumente-pruefungszeugnis_englisch.label;"
@@ -710,17 +692,37 @@ foreach($addon_obj->result as $addon)
                command   =  "menu-dokumente-urkunde_englisch:command"
                accesskey = "&menu-dokumente-urkunde_englisch.accesskey;"/>
             <menuitem
-               id        =  "menu-dokumente-ausbildungsvertrag"
-               key       =  "menu-dokumente-ausbildungsvertrag:key"
-               label     = "&menu-dokumente-ausbildungsvertrag.label;"
-               command   =  "menu-dokumente-ausbildungsvertrag:command"
-               accesskey = "&menu-dokumente-ausbildungsvertrag.accesskey;"/>
+               id        =  "menu-dokumente-zeugnis"
+               key       =  "menu-dokumente-zeugnis:key"
+               label     = "&menu-dokumente-zeugnis.label;"
+               command   =  "menu-dokumente-zeugnis:command"
+               accesskey = "&menu-dokumente-zeugnis.accesskey;"/>
             <menuitem
-               id        =  "menu-dokumente-ausbildungsvertrag_englisch"
-               key       =  "menu-dokumente-ausbildungsvertrag_englisch:key"
-               label     = "&menu-dokumente-ausbildungsvertrag_englisch.label;"
-               command   =  "menu-dokumente-ausbildungsvertrag_englisch:command"
-               accesskey = "&menu-dokumente-ausbildungsvertrag_englisch.accesskey;"/>
+               id        =  "menu-dokumente-zeugniseng"
+               key       =  "&menu-dokumente-zeugniseng.key;"
+               label     = "&menu-dokumente-zeugniseng.label;"
+               command   =  "menu-dokumente-zeugniseng:command"
+               accesskey = "&menu-dokumente-zeugniseng.accesskey;"/>
+<!--            <menuitem
+               id        = "menu-dokumente-sammelzeugnis"
+               key       = "&menu-dokumente-sammelzeugnis.key;"
+               label     = "&menu-dokumente-sammelzeugnis.label;"
+               command   = "menu-dokumente-sammelzeugnis:command"
+               accesskey = "&menu-dokumente-sammelzeugnis.accesskey;"/>
+			<menuitem
+               id        =  "menu-dokumente-pruefungsprotokoll"
+               key       =  "menu-dokumente-pruefungsprotokoll:key"
+               label     = "&menu-dokumente-pruefungsprotokoll.label;"
+               command   =  "menu-dokumente-pruefungsprotokoll:command"
+               accesskey = "&menu-dokumente-pruefungsprotokoll.accesskey;"/>
+            <menuitem
+               id        =  "menu-dokumente-pruefungsprotokoll_englisch"
+               key       =  "menu-dokumente-pruefungsprotokoll_englisch:key"
+               label     = "&menu-dokumente-pruefungsprotokoll_englisch.label;"
+               command   =  "menu-dokumente-pruefungsprotokoll_englisch:command"
+               accesskey = "&menu-dokumente-pruefungsprotokoll_englisch.accesskey;"/>
+            -->
+
           </menupopup>
     </menu>
     <!-- ***** CIS ***** -->

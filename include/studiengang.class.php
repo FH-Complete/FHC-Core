@@ -241,6 +241,7 @@ class studiengang extends basis_db
                 . 'FROM lehre.vw_studienplan '
                 . 'LEFT JOIN bis.tbl_lgartcode USING (lgartcode) '
                 . 'WHERE onlinebewerbung IS TRUE '
+                . 'AND aktiv IS TRUE '
                 . 'ORDER BY typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC';
 
 		if(!$result = $this->db_query($qry))

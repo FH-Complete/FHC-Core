@@ -587,8 +587,11 @@ class prestudent extends person
 			case "interessenten":
 				$qry.=" AND a.rolle='Interessent'";
 				break;
+			case "bewerbungnichtabgeschickt":
+				$qry.=" AND a.rolle='Interessent' AND bewerbung_abgeschicktamum is null";
+				break;
 			case "bewerbungabgeschickt":
-				$qry.=" AND a.rolle='Interessent' AND bewerbung_abgeschicktamum is not null";
+				$qry.=" AND a.rolle='Interessent' AND bewerbung_abgeschicktamum is not null AND bestaetigtam is null";
 				break;
 			case "statusbestaetigt":
 				$qry.=" AND a.rolle='Interessent' AND bestaetigtam is not null";
