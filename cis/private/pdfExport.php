@@ -106,7 +106,8 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 	$buchungstypen = unserialize (CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN);
     }
 
-    $stsem_zahlung = $konto->getLastStSemBuchungstypen($user, $buchungstypen, $_GET['ss']);
+	if(isset($_GET['ss']))
+	    $stsem_zahlung = $konto->getLastStSemBuchungstypen($user, $buchungstypen, $_GET['ss']);
 
 	if((($xsl=='Inskription') || ($xsl == 'Studienblatt')) && ($_GET["ss"] != $stsem_zahlung))
 	{
