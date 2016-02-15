@@ -97,7 +97,7 @@ $lehrstunde->getStundenplanData($db_stpl_table, $lehrveranstaltung_id, $variable
 	$format_title->setAlign('merge');
 
 	//Zeilenueberschriften ausgeben
-	$headline=array('Datum','Von','Bis','Ort','Lektoren','Gruppen','Lehrfach','StundeVon','StundeBis');
+	$headline=array('Datum','Von','Bis','Ort','Lektoren','Gruppen','Lehrfach','Anmerkung','StundeVon','StundeBis');
 
 	$i=0;
 	foreach ($headline as $title)
@@ -133,6 +133,7 @@ $lehrstunde->getStundenplanData($db_stpl_table, $lehrveranstaltung_id, $variable
 		writecol($zeile, $i++, $lektoren);
 		writecol($zeile, $i++, implode(',',$row->gruppen));
 		writecol($zeile, $i++, $row->lehrfach_bezeichnung);
+		writecol($zeile, $i++, implode(',',$row->titel));
 		writecol($zeile, $i++, $row->stundevon);
 		writecol($zeile, $i++, $row->stundebis);
 
