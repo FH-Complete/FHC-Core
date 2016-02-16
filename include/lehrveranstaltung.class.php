@@ -1245,7 +1245,7 @@ class lehrveranstaltung extends basis_db
 				$obj->stpllv_koordinator = $row->stpllv_koordinator;
 				$obj->studienplan_lehrveranstaltung_id = $row->studienplan_lehrveranstaltung_id;
 				$obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
-				$obj->curriculum = $row->curriculum;
+				$obj->curriculum = $this->db_parse_bool($row->curriculum);
 				$obj->new = false;
 
 				$this->lehrveranstaltungen[] = $obj;
@@ -1391,10 +1391,10 @@ class lehrveranstaltung extends basis_db
 				$obj->orgform_kurzbz = $lv->orgform_kurzbz;
 				$obj->incoming = $lv->incoming;
 				$obj->sprache = $lv->sprache;
-				$obj->benotung = $this->db_parse_bool($lv->benotung);
-				$obj->lvinfo =$this->db_parse_bool($lv->lvinfo);
-				$obj->zeugnis = $this->db_parse_bool($lv->zeugnis);
-				$obj->curriculum = $this->db_parse_bool($lv->curriculum);
+				$obj->benotung = $lv->benotung;
+				$obj->lvinfo = $lv->lvinfo;
+				$obj->zeugnis = $lv->zeugnis;
+				$obj->curriculum = $lv->curriculum;
 
 				$obj->children = array();
 				if(count($lv->childs) > 0)
