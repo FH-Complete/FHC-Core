@@ -495,11 +495,13 @@ class wochenplan extends basis_db
 		//global $kalender_begin_ws, $kalender_ende_ws, $kalender_begin_ss, $kalender_ende_ss;
 		$kal_link_ws=$this->kal_link.'&begin='.$this->studiensemester_now->start.'&ende='.$this->studiensemester_now->ende;
 		$kal_link_ss=$this->kal_link.'&begin='.$this->studiensemester_next->start.'&ende='.$this->studiensemester_next->ende;
+
 		//echo '				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>'.$p->t('global/kalender').':&nbsp;&nbsp;&nbsp;</strong>'.$this->crlf;
 		echo 				$this->crlf;
 		//echo '				'.$p->t('lvplan/uebersicht').':&nbsp;<A href="'.$kal_link_ws.'&format=html" target="_blank" title="HTML">'.$this->studiensemester_now->name.'</A>&nbsp;'.$this->crlf;
 		echo				$this->studiensemester_now->name.'<br>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ws.'&format=html" target="_blank" title="HTML"><IMG src="../../../skin/images/html.png" height="30" alt="HTML" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ws.'&format=excel" title="excel"><IMG src="../../../skin/images/xls.png" height="30" alt="Excel" border="0"></A>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ws.'&format=csv" title="CSV"><IMG src="../../../skin/images/csv.png" height="30" alt="CSV" border="0"></A>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ws.'&format=csv&target=outlook" title="CSV-Outlook"><IMG src="../../../skin/images/outlook.png" height="30" alt="CSV-Outlook" border="0"></A>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ws.'&format=ical&version=1&target=ical" title="iCal Version 1.0"><IMG src="../../../skin/images/ical1.0.png" height="30" alt="vCal Version 1.0" border="0"></A>'.$this->crlf;
@@ -508,6 +510,7 @@ class wochenplan extends basis_db
 		//echo '				&nbsp;&nbsp;&nbsp;&nbsp;'.$p->t('lvplan/uebersicht').':&nbsp;<A href="'.$kal_link_ss.'&format=html" target="_blank" title="HTML">'.$this->studiensemester_next->name.'</A>&nbsp;'.$this->crlf;
 		echo '				<span style="color:#999">'.$this->studiensemester_next->name.'</span><br>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ss.'&format=html" target="_blank" title="HTML"><IMG src="../../../skin/images/html_light.png" height="30" alt="HTML" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ss.'&format=excel" title="excel"><IMG src="../../../skin/images/xls_light.png" height="30" alt="Excel" border="0"></A>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ss.'&format=csv" title="CSV"><IMG src="../../../skin/images/csv_light.png" height="30" alt="CSV" border="0"></A>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ss.'&format=csv&target=outlook" title="CSV-Outlook"><IMG src="../../../skin/images/outlook_light.png" height="30" alt="CSV-Outlook" border="0"></A>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ss.'&format=ical&version=1&target=ical" title="iCal Version 1.0"><IMG src="../../../skin/images/ical1.0_light.png" height="30" alt="iCal Version 1.0" border="0"></A>'.$this->crlf;
@@ -2264,6 +2267,7 @@ class wochenplan extends basis_db
 		{
 			$blocked=array();
 			$gruppiert=array();
+
   			for ($k=0; $k<$num_rows_stunde; $k++)
 			{
 				$row = $this->db_fetch_object($this->stunde, $k);
@@ -2280,14 +2284,20 @@ class wochenplan extends basis_db
 						unset($lehrverband);
 					if (isset($lehrfach))
 						unset($lehrfach);
+					if (isset($lektor_uids))
+						unset($lektor_uids);
+					if (isset($stunden_arr))
+						unset($stunden_arr);
 					foreach ($this->std_plan[$i][$j] as $lehrstunde)
 					{
 
 						$unr[]=$lehrstunde->unr;
 						// Lektoren
 						$lektor[]=$lehrstunde->lektor;
+						$lektor_uids[]=$lehrstunde->lektor_uid;
 						// Lehrverband
 						$lvb=$lehrstunde->stg.'-'.$lehrstunde->sem;
+						$stunden_arr[]=$j;
 						if ($lehrstunde->ver!=null && $lehrstunde->ver!='0' && $lehrstunde->ver!='')
 						{
 							$lvb.=$lehrstunde->ver;
@@ -2383,48 +2393,37 @@ class wochenplan extends basis_db
 						if(!$blockcontinue)
 						{
 							// Blockungen ueber mehrere Stunden erkennen
-							if (isset($this->std_plan[$i][$j+1][$idx]) && isset($this->std_plan[$i][$j+1][$idx]->stundenplan_id)
-								&& ($this->std_plan[$i][$j][$idx]->unr == $this->std_plan[$i][$j+1][$idx]->unr)
-								&& $this->std_plan[$i][$j][$idx]!='0' && $k<($num_rows_stunde-1)
-								&& !($this->std_plan[$i][$j][$idx]->reservierung && $this->std_plan[$i][$j][$idx]->lektor!=$this->std_plan[$i][$j+1][$idx]->lektor))
+
+							$blockflag=false;
+							for($blockstunden=1;$blockstunden<=$num_rows_stunde;$blockstunden++)
 							{
-								//2er Block
-								if(isset($blocked[$this->std_plan[$i][$j][$idx]->unr]))
-									$blocked[$this->std_plan[$i][$j][$idx]->unr]++;
-								else
-									$blocked[$this->std_plan[$i][$j][$idx]->unr]=1;
-								$row = $this->db_fetch_object($this->stunde, ($k+1));
-								$end_time=$row->ende;
-
-								if (isset($this->std_plan[$i][$j+2][$idx]) && isset($this->std_plan[$i][$j+2][$idx]->stundenplan_id)
-									&& ($this->std_plan[$i][$j][$idx]->unr == $this->std_plan[$i][$j+2][$idx]->unr)
-									&& $k<($num_rows_stunde-2)
-									&& !($this->std_plan[$i][$j][$idx]->reservierung && $this->std_plan[$i][$j][$idx]->lektor!=$this->std_plan[$i][$j+2][$idx]->lektor))
+								if (isset($this->std_plan[$i][$j+$blockstunden][$idx]) && isset($this->std_plan[$i][$j+$blockstunden][$idx]->stundenplan_id)
+									&& ($this->std_plan[$i][$j][$idx]->unr == $this->std_plan[$i][$j+$blockstunden][$idx]->unr)
+									&& $this->std_plan[$i][$j][$idx]!='0' && $k<($num_rows_stunde-$blockstunden)
+									&& !($this->std_plan[$i][$j][$idx]->reservierung && $this->std_plan[$i][$j][$idx]->lektor!=$this->std_plan[$i][$j+$blockstunden][$idx]->lektor))
 								{
-									//3er Block
-									$blocked[$this->std_plan[$i][$j][$idx]->unr]++;
-									$row = $this->db_fetch_object($this->stunde, ($k+2));
-									$end_time=$row->ende;
 
-									if (isset($this->std_plan[$i][$j+3][$idx]) && isset($this->std_plan[$i][$j+3][$idx]->stundenplan_id)
-										&& ($this->std_plan[$i][$j][$idx]->unr == $this->std_plan[$i][$j+3][$idx]->unr)
-										&& $k<($num_rows_stunde-3)
-										&& !($this->std_plan[$i][$j][$idx]->reservierung && $this->std_plan[$i][$j][$idx]->lektor!=$this->std_plan[$i][$j+3][$idx]->lektor))
-									{
-										//4er Block
+									if(isset($blocked[$this->std_plan[$i][$j][$idx]->unr]))
 										$blocked[$this->std_plan[$i][$j][$idx]->unr]++;
-										$row = $this->db_fetch_object($this->stunde, ($k+3));
+									else
+										$blocked[$this->std_plan[$i][$j][$idx]->unr]=1;
+									$row = $this->db_fetch_object($this->stunde, ($k+$blockstunden));
+									$stunden_arr[]=$row->stunde;
+									$end_time=$row->ende;
+									$blockflag=true;
+								}
+								else
+								{
+									if(!$blockflag)
+									{
+										$row = $this->db_fetch_object($this->stunde, $k);
+										$stunden_arr[]=$row->stunde;
 										$end_time=$row->ende;
+										break;
 									}
 								}
 							}
-							else
-							{
-								$row = $this->db_fetch_object($this->stunde, $k);
-								$end_time=$row->ende;
-							}
 						}
-
 
 						//Wenn im selben Raum mehrere Lektoren sind bzw mehrere Gruppen
 						//dann werden diese zusammengruppiert und als ein Eintrag angezeigt
@@ -2544,9 +2543,19 @@ class wochenplan extends basis_db
 							$description = str_replace(',',' ',$description);
 
 							$return[]=array('UID'=>$UID,
+							'lehrfach_id'=>(isset($this->std_plan[$i][$j][$idx]->lehrfach_id)?$this->std_plan[$i][$j][$idx]->lehrfach_id:''),
+							'ort'=>$this->std_plan[$i][$j][$idx]->ort,
+							'lektor_uid'=>array_unique($lektor_uids),
+							'gruppen'=>array_unique($lehrverband),
+							'stunden'=>array_unique($stunden_arr),
+							'titel'=>$this->std_plan[$i][$j][$idx]->titel,
 							'unr'=>$unr,
 							'Summary'=>$Summary,
 							'Description'=>$description,
+							'start_date'=>$start_date,
+							'end_date'=>$end_date,
+							'start_time'=>$start_time,
+							'end_time'=>$end_time,
 							'dtstart'=>$start_date_time_ical,
 							'dtend'=>$end_date_time_ical,
 							'reservierung'=>$this->std_plan[$i][$j][$idx]->reservierung,

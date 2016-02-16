@@ -19,6 +19,7 @@
  */
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
+require_once('../include/globals.inc.php');
 require_once('../include/rdf.class.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/betriebsmittel.class.php');
@@ -104,7 +105,8 @@ elseif(isset($_REQUEST['von']) && isset($_REQUEST['bis']) && $_REQUEST['xmlforma
 				max(tbl_stundenplan.stunde) as bis,
 				array_agg(tbl_betriebsmittel.beschreibung) as beschreibung,
 				array_agg(tbl_stundenplan_betriebsmittel.anmerkung) as anmerkung,
-				array_agg(tbl_stundenplan.mitarbeiter_uid) as mitarbeiter_uid
+				array_agg(tbl_stundenplan.mitarbeiter_uid) as mitarbeiter_uid,
+				array_agg(tbl_stundenplan.titel) as titel
 			FROM
 				lehre.tbl_stundenplan_betriebsmittel
 				JOIN lehre.tbl_stundenplan ON(stundenplandev_id=stundenplan_id)
@@ -143,6 +145,7 @@ elseif(isset($_REQUEST['von']) && isset($_REQUEST['bis']) && $_REQUEST['xmlforma
 					echo '</tage>';
 				echo '<tage>';
 				echo '<datum><![CDATA['.$datum_obj->formatDatum($row->datum,'d.m.Y').']]></datum>';
+				echo '<wochentag><![CDATA['.$tagbez[1][$datum_obj->formatDatum($row->datum,'w')].']]></wochentag>';
 
 				$lastdatum = $row->datum;
 			}
@@ -177,7 +180,8 @@ elseif(isset($_REQUEST['von']) && isset($_REQUEST['bis']) && $_REQUEST['xmlforma
 					echo '<anmerkung><![CDATA['.$anmerkung.']]></anmerkung>';
 			}
 			echo '</anmerkungen>';
-
+			$titel = array_filter(array_unique($db->db_parse_array($row->titel)));
+			echo '<titel><![CDATA['.implode($titel,',').']]></titel>';
 			echo '<lvbezeichnung><![CDATA['.$row->lvbezeichnung.']]></lvbezeichnung>';
 			echo '<studiengang_kurzbzlang><![CDATA['.$row->stg.']]></studiengang_kurzbzlang>';
 			echo '</item>';

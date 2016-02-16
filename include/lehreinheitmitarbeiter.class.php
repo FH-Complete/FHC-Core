@@ -505,7 +505,7 @@ class lehreinheitmitarbeiter extends basis_db
 		}
 
 		$qry = "SELECT
-					vw_mitarbeiter.uid, vorname, nachname, titelpre, titelpost
+					distinct vw_mitarbeiter.uid, vorname, nachname, titelpre, titelpost
 				FROM
 					lehre.tbl_lehreinheitmitarbeiter
 					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)

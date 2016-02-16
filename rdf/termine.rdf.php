@@ -99,6 +99,7 @@ if(isset($lehrstunde->result) && is_array($lehrstunde->result))
 		$oRdf->obj[$i]->setAttribut('ort',implode(',',$row->orte),true);
 		$oRdf->obj[$i]->setAttribut('lehrfach',$row->lehrfach_bezeichnung,true);
 		$oRdf->obj[$i]->setAttribut('lehreinheit_id',$row->lehreinheit_id,true);
+		$oRdf->obj[$i]->setAttribut('titel',implode(',',$row->titel),true);
 
 		$anwesenheit = new anwesenheit();
 		if($anwesenheit->AnwesenheitExists($row->lehreinheit_id, $row->datum, $student_uid))
@@ -107,7 +108,7 @@ if(isset($lehrstunde->result) && is_array($lehrstunde->result))
 			$anwesend='Nein';
 		$oRdf->obj[$i]->setAttribut('anwesend',$anwesend,true);
 		$oRdf->obj[$i]->setAttribut('datum_iso',$row->datum,true);
-        
+
         // Terminkollisionen prüfen
         $kollision = "";
         if($lehrveranstaltung_id == '')
@@ -115,7 +116,7 @@ if(isset($lehrstunde->result) && is_array($lehrstunde->result))
             for($x = $row->stundevon; $x <= $row->stundebis; $x++)
             {
                 $orte = implode(',',$row->orte);
-                
+
                 if(isset($verplanteStunden[$row->datum]) && in_array($x, $verplanteStunden[$row->datum]))
                 {
                     if(!isset($verplanteStunden[$row->datum][$orte]) || !in_array($x, $verplanteStunden[$row->datum][$orte]))
