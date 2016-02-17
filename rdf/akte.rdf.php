@@ -31,6 +31,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/akte.class.php');
+require_once('../include/dokument.class.php');
 require_once('../include/datum.class.php');
 
 if(isset($_GET['person_id']))
@@ -75,12 +76,15 @@ echo '
 
 foreach ($akten->result as $row)
 {
+	$dokument = new dokument();
+	$dokument->loadDokumenttyp($row->dokument_kurzbz);
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->akte_id.'"  about="'.$rdf_url.'/'.$row->akte_id.'" >
             <AKTE:akte_id><![CDATA['.$row->akte_id.']]></AKTE:akte_id>
             <AKTE:person_id><![CDATA['.$row->person_id.']]></AKTE:person_id>
             <AKTE:dokument_kurzbz><![CDATA['.$row->dokument_kurzbz.']]></AKTE:dokument_kurzbz>
+            <AKTE:dokument_bezeichnung><![CDATA['.$dokument->bezeichnung.']]></AKTE:dokument_bezeichnung>
             <AKTE:mimetype><![CDATA['.$row->mimetype.']]></AKTE:mimetype>
             <AKTE:erstelltam><![CDATA['.$datum->convertISODate($row->erstelltam).']]></AKTE:erstelltam>
             <AKTE:erstelltam_iso><![CDATA['.$row->erstelltam.']]></AKTE:erstelltam_iso>
