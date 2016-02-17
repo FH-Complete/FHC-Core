@@ -170,14 +170,518 @@ if(!$result = @$db->db_query("SELECT bisorgform_kurzbz FROM bis.tbl_orgform LIMI
 //Spalte curriculum in lehre.tbl_studienordnung_lehrveranstaltung
 if (!$result = @$db->db_query("SELECT curriculum FROM lehre.tbl_studienplan_lehrveranstaltung LIMIT 1;"))
 {
-    $qry = "ALTER TABLE lehre.tbl_studienplan_lehrveranstaltung ADD COLUMN curriculum BOOLEAN DEFAULT TRUE;";
-    
-    if (!$db->db_query($qry))
-	echo '<strong>lehre.tbl_studienplan_lehrveranstaltung: ' . $db->db_last_error() . '</strong><br>';
-    else
-	echo ' lehre.tbl_studienplan_lehrveranstaltung: Spalte curriculum hinzugefügt.<br>';
-    
+	$qry = "ALTER TABLE lehre.tbl_studienplan_lehrveranstaltung ADD COLUMN curriculum BOOLEAN DEFAULT TRUE;";
+
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienplan_lehrveranstaltung: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' lehre.tbl_studienplan_lehrveranstaltung: Spalte curriculum hinzugefügt.<br>';
 }
+
+
+
+
+
+
+
+//sozialversicherungsnummer auf char(16) erhöhen
+/**********************************************************ANFANG SVNR ÄNDERUNG**************************************************************************/
+if($result = @$db->db_query("SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='public' AND TABLE_NAME='tbl_person' AND COLUMN_NAME = 'svnr' AND DATA_TYPE='character varying' AND character_maximum_length='16';"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		//********************************GENERIC********************************
+		$views=array();
+		$success = true;
+
+		//********************************GET ALL NEEDED VIEWS********************************
+
+		$qry="
+			SELECT column_name as spalte, table_name as tabelle, table_schema as schema
+			FROM information_schema.columns
+			WHERE
+				column_name in('svnr')
+				AND data_type='character'
+				AND character_maximum_length='10'
+			ORDER BY table_name DESC, column_name";
+
+
+		if($result = $db->db_query($qry))
+		{
+			$db->db_query('BEGIN');
+			while($row = $db->db_fetch_object($result))
+			{
+				$comment = "";
+
+				//Alle Views die Spalten enthalten die geaendert werden loeschen
+				if(substr($row->tabelle,0,3)=='vw_')
+				{
+					$qry_view = "SELECT * FROM pg_views WHERE viewname='$row->tabelle' AND schemaname='$row->schema'";
+					if($result_view = $db->db_query($qry_view))
+					{
+						if($row_view = $db->db_fetch_object($result_view))
+						{
+							if($row_view->schemaname != "public")
+								$key = $row_view->schemaname.".".$row_view->viewname;
+							else
+								$key = $row_view->viewname;
+
+							if(!isset($views[$key]))
+							{
+								$privileges = array();
+
+								//get all privileges of this view
+								$qry_view_priv = "SELECT *
+									FROM information_schema.role_table_grants
+										WHERE table_schema='".$row_view->schemaname."'
+										AND table_name='".$row_view->viewname."';";
+
+								if($result_view_priv = $db->db_query($qry_view_priv))
+								{
+									while($row_view_priv = $db->db_fetch_object($result_view_priv))
+									{
+										$privileges[] = array(
+											"grantee" => $row_view_priv->grantee,
+											"privilege_type" => $row_view_priv->privilege_type,
+											);
+									}
+								}
+
+
+
+
+								//get the comment of the view
+								$qry_view_comment = "SELECT nspname, cl.relname, obj_description(cl.oid)
+									FROM pg_class cl, pg_catalog.pg_namespace ns
+									WHERE ns.oid=cl.relnamespace
+									AND cl.relname='".$row_view->viewname."'
+									AND nspname='".$row_view->schemaname."';";
+
+								if($result_view_comment = $db->db_query($qry_view_comment))
+								{
+									if($row_view_comment = $db->db_fetch_object($result_view_comment))
+									{
+										$comment = $row_view_comment->obj_description;
+									}
+								}
+
+
+
+
+								//save the view informations for later
+								$views[$key]['definition']=$row_view->definition;
+								$views[$key]['schema']=$row_view->schemaname;
+								$views[$key]['viewname']=$row_view->viewname;
+								$views[$key]['dropped']=false;
+								$views[$key]['privileges']=$privileges;
+								$views[$key]['comment']=$comment;
+
+
+								//resolve dependencys
+								echo "resolving deps for " . $key."<br>";
+								$qry_RECURSIVE_DEPS =
+										"WITH RECURSIVE dep_recursive AS (
+
+											SELECT
+													0 AS \"level\",
+													'".$key."' AS \"dep_name\",
+													'' AS \"dep_table\",
+													'' AS \"dep_type\",
+													'' AS \"ref_name\",
+													'' AS \"ref_type\"
+
+											UNION ALL
+
+											SELECT
+													level + 1 AS \"level\",
+													depedencies.dep_name,
+													depedencies.dep_table,
+													depedencies.dep_type,
+													depedencies.ref_name,
+													depedencies.ref_type
+											FROM (
+													WITH classType AS (
+															SELECT
+																	oid,
+																	CASE relkind
+																			WHEN 'm' THEN 'MATERIALIZED VIEW'::text
+																			WHEN 'r' THEN 'TABLE'::text
+																			WHEN 'i' THEN 'INDEX'::text
+																			WHEN 'S' THEN 'SEQUENCE'::text
+																			WHEN 'v' THEN 'VIEW'::text
+																			WHEN 'c' THEN 'TYPE'::text
+																			WHEN 't' THEN 'TABLE'::text
+																	END AS \"type\"
+															FROM pg_class
+													)
+
+													SELECT DISTINCT
+															CASE classid
+																	WHEN 'pg_class'::regclass THEN objid::regclass::text
+																	WHEN 'pg_type'::regclass THEN objid::regtype::text
+																	WHEN 'pg_proc'::regclass THEN objid::regprocedure::text
+																	WHEN 'pg_constraint'::regclass THEN (SELECT conname FROM pg_constraint WHERE OID = objid)
+																	WHEN 'pg_attrdef'::regclass THEN 'default'
+																	WHEN 'pg_rewrite'::regclass THEN (SELECT ev_class::regclass::text FROM pg_rewrite WHERE OID = objid)
+																	WHEN 'pg_trigger'::regclass THEN (SELECT tgname FROM pg_trigger WHERE OID = objid)
+																	ELSE objid::text
+															END AS \"dep_name\",
+															CASE classid
+																	WHEN 'pg_constraint'::regclass THEN (SELECT conrelid::regclass::text FROM pg_constraint WHERE OID = objid)
+																	WHEN 'pg_attrdef'::regclass THEN (SELECT adrelid::regclass::text FROM pg_attrdef WHERE OID = objid)
+																	WHEN 'pg_trigger'::regclass THEN (SELECT tgrelid::regclass::text FROM pg_trigger WHERE OID = objid)
+																	ELSE ''
+															END AS \"dep_table\",
+															CASE classid
+																	WHEN 'pg_class'::regclass THEN (SELECT TYPE FROM classType WHERE OID = objid)
+																	WHEN 'pg_type'::regclass THEN 'TYPE'
+																	WHEN 'pg_proc'::regclass THEN 'FUNCTION'
+																	WHEN 'pg_constraint'::regclass THEN 'TABLE CONSTRAINT'
+																	WHEN 'pg_attrdef'::regclass THEN 'TABLE DEFAULT'
+																	WHEN 'pg_rewrite'::regclass THEN (SELECT TYPE FROM classType WHERE OID = (SELECT ev_class FROM pg_rewrite WHERE OID = objid))
+																	WHEN 'pg_trigger'::regclass THEN 'TRIGGER'
+																	ELSE objid::text
+															END AS \"dep_type\",
+															CASE refclassid
+																	WHEN 'pg_class'::regclass THEN refobjid::regclass::text
+																	WHEN 'pg_type'::regclass THEN refobjid::regtype::text
+																	WHEN 'pg_proc'::regclass THEN refobjid::regprocedure::text
+																	ELSE refobjid::text
+															END AS \"ref_name\",
+															CASE refclassid
+																	WHEN 'pg_class'::regclass THEN (SELECT TYPE FROM classType WHERE OID = refobjid)
+																	WHEN 'pg_type'::regclass THEN 'TYPE'
+																	WHEN 'pg_proc'::regclass THEN 'FUNCTION'
+																	ELSE refobjid::text
+															END AS \"ref_type\",
+															CASE deptype
+																	WHEN 'n' THEN 'normal'
+																	WHEN 'a' THEN 'automatic'
+																	WHEN 'i' THEN 'internal'
+																	WHEN 'e' THEN 'extension'
+																	WHEN 'p' THEN 'pinned'
+															END AS \"dependency type\"
+													FROM pg_catalog.pg_depend
+													WHERE deptype = 'n'
+													AND refclassid NOT IN (2615, 2612)
+
+											) depedencies
+											JOIN dep_recursive ON (dep_recursive.dep_name = depedencies.ref_name)
+											WHERE depedencies.ref_name NOT IN(depedencies.dep_name, depedencies.dep_table)
+
+									)
+
+									SELECT
+											MAX(level) AS \"level\",
+											dep_name,
+											MIN(dep_table) AS \"dep_table\",
+											MIN(dep_type) AS \"dep_type\",
+											string_agg(ref_name, ', ') AS \"ref_names\",
+											string_agg(ref_type, ', ') AS \"ref_types\"
+									FROM dep_recursive
+									WHERE level > 0
+									AND dep_type='VIEW'
+									GROUP BY dep_name
+									ORDER BY level desc, dep_name;";
+
+								if($res_RECURSIVE_DEPS = $db->db_query($qry_RECURSIVE_DEPS))
+								{
+									while($rrd = $db->db_fetch_object($res_RECURSIVE_DEPS))
+									{
+										$comment_deps = "";
+
+										echo "<span style='margin-left:20px;'>added " .$rrd->dep_name."</span><br>";
+										if(strpos($rrd->dep_name,".") !== false)
+											$qry_view_deps = "SELECT * FROM pg_views WHERE (schemaname || '.' || viewname)='$rrd->dep_name'";
+										else
+											$qry_view_deps = "SELECT * FROM pg_views WHERE viewname='$rrd->dep_name' AND schemaname='public'";
+
+										if($result_view_deps = $db->db_query($qry_view_deps))
+										{
+											if($row_view_deps = $db->db_fetch_object($result_view_deps))
+											{
+												$key_deps = $row_view_deps->schemaname.".".$row_view_deps->viewname;
+												if(!isset($views[$key_deps]))
+												{
+													$privileges = array();
+
+													//get all privileges of this view
+													$qry_view_priv = "SELECT *
+														FROM information_schema.role_table_grants
+															WHERE table_schema='".$row_view_deps->schemaname."'
+															AND table_name='".$row_view_deps->viewname."';";
+
+													if($result_view_priv = $db->db_query($qry_view_priv))
+													{
+														while($row_view_priv = $db->db_fetch_object($result_view_priv))
+														{
+															$privileges[] = array(
+																"grantee" => $row_view_priv->grantee,
+																"privilege_type" => $row_view_priv->privilege_type,
+																);
+														}
+													}
+
+
+
+													//get the comment of the view
+													$qry_view_comment = "SELECT nspname, cl.relname, obj_description(cl.oid)
+														FROM pg_class cl, pg_catalog.pg_namespace ns
+														WHERE ns.oid=cl.relnamespace
+														AND cl.relname='".$row_view_deps->viewname."'
+														AND nspname='".$row_view_deps->schemaname."';";
+
+													if($result_view_comment = $db->db_query($qry_view_comment))
+													{
+														if($row_view_comment = $db->db_fetch_object($result_view_comment))
+														{
+															$comment_deps = $row_view_comment->obj_description;
+														}
+													}
+
+
+
+													$views[$key_deps]['definition']=$row_view_deps->definition;
+													$views[$key_deps]['schema']=$row_view_deps->schemaname;
+													$views[$key_deps]['viewname']=$row_view_deps->viewname;
+													$views[$key_deps]['dropped']=false;
+													$views[$key_deps]['privileges']=$privileges;
+													$views[$key_deps]['comment']=$comment_deps;
+												}
+											}
+											else
+											{
+												echo "<span style='margin-left:40px;'>view " . $rrd->dep_name . " not found!<br>";
+												var_dump($qry_view_deps);
+												echo "</span><br>";
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			//********************************DROP ALL VIEWS RECURSIVELY********************************
+			echo "<br><br>LÖSCHEN:<br>";
+			if(!drop_all_views_recursively($db, $views)){$success = false;}
+
+
+
+
+
+			//********************************CHANGE DATATYPE********************************
+			$qry_alter = "
+			ALTER TABLE public.tbl_person ALTER COLUMN svnr TYPE varchar(16);";
+
+			if(!$db->db_query($qry_alter))
+				echo '<strong>public.tbl_person: '.$db->db_last_error().'</strong><br>';
+			else
+				echo 'public.tbl_person: svnr auf varchar(16) erhöht<br>';
+
+			//********************************CREATE ALL VIEWS AGAIN********************************
+			echo "<br><br>NEU ANLEGEN:<br>";
+			if(!create_all_views_recursively($db, $views)){$success = false;}
+
+			if($success)
+				$db->db_query('COMMIT');
+			else
+				$db->db_query('ROLLBACK');
+		}
+	}
+}
+
+
+
+//RECURSIVE DROP FUNCTIONS
+function recursiveDrop($db, &$allviews, $lastcount)
+{
+
+	$nc = 0;
+	foreach($allviews as $vk => $v)
+	{
+		if(!$allviews[$vk]["dropped"])
+		{
+			$db->db_query('SAVEPOINT drop_'.$v['schema'].'_'.$v['viewname'].';');
+
+			$qry_drp_view = "DROP VIEW ".$vk.";";
+			if(@$db->db_query($qry_drp_view))
+			{
+				echo $vk ." DROPPED<br>";
+				$allviews[$vk]["dropped"] = true;
+				continue;
+			}
+			$nc ++;		//count the not dropped
+			$db->db_query('ROLLBACK TO drop_'.$v['schema'].'_'.$v['viewname'].';');
+		}
+	}
+
+	if($lastcount == 0)
+		return true;
+
+
+	if($nc == $lastcount)
+	{
+		echo "<br><br>ENDLESS!<br>";
+		printAllUndroppedViews($allviews);
+		return false;
+	}
+
+
+
+	$lastcount = $nc;
+	return recursiveDrop($db, $allviews, $lastcount);
+}
+
+
+
+
+function drop_all_views_recursively($db, &$allviews)
+{
+	return recursiveDrop($db, $allviews, count($allviews));
+}
+
+
+
+
+function printAllUndroppedViews($allviews)
+{
+	foreach($allviews as $vk => $v)
+	{
+		if(!$v["dropped"])
+		{
+			echo $vk.'<br>';
+			//var_dump($v);
+		}
+	}
+}
+
+
+
+
+
+//RECURSIVE CREATE FUNCTIONS
+function recursiveCreate($db, &$allviews, $lastcount)
+{
+	$nc = 0;
+	foreach($allviews as $vk => $v)
+	{
+		if($allviews[$vk]["dropped"])
+		{
+			$db->db_query('SAVEPOINT create_'.$v['schema'].'_'.$v['viewname'].';');
+
+			$qry_drp_view = "CREATE VIEW ".$vk." AS ".$v["definition"].";";
+			if($v["comment"] != "")
+			{
+				$qry_drp_view .= "COMMENT ON VIEW $vk IS '".$v["comment"]."';";
+			}
+
+			if(@$db->db_query($qry_drp_view))
+			{
+				echo $vk ." CREATED<br>";
+
+				foreach($v["privileges"] as $p)
+				{
+					$qry_add_privileges = "GRANT ".$p["privilege_type"]." ON ".$vk." TO ".$p["grantee"].";";
+					if(!$db->db_query($qry_add_privileges))
+						echo "<div style='color:red;'> ACHTUNG: Konnte ".$p["grantee"]." keine ".$p["privilege_type"]." rechte an $vk gewähren!</div>";
+				}
+
+				$allviews[$vk]["dropped"] = false;
+				continue;
+			}
+			$nc ++;		//count the not created
+			$db->db_query('ROLLBACK TO create_'.$v['schema'].'_'.$v['viewname'].';');
+		}
+	}
+
+	if($lastcount == 0)
+		return true;
+
+
+
+	if($nc == $lastcount)
+	{
+		echo "<br><br>ENDLESS!<br>";
+		printAllDroppedViews($allviews);
+		return false;
+	}
+
+
+	$lastcount = $nc;
+	return recursiveCreate($db, $allviews, $lastcount);
+}
+
+
+
+
+function create_all_views_recursively($db, &$allviews)
+{
+	return recursiveCreate($db, $allviews, count($allviews));
+}
+
+
+
+
+function printAllDroppedViews($allviews)
+{
+	foreach($allviews as $vk => $v)
+	{
+		if($v["dropped"])
+		{
+			echo $vk.'<br>';
+			//var_dump($v);
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+/***********************************************************ENDE SVNR ÄNDERUNG***********************************************************/
+
+
+//SVNR check auf char_length(16) || char_length(10) einfuegen
+
+if($result = @$db->db_query("SELECT * FROM information_schema.table_constraints WHERE constraint_schema='public' AND table_name='tbl_person' AND constraint_name='chk_person_svnr' LIMIT 1;"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "ALTER TABLE public.tbl_person ADD CONSTRAINT chk_person_svnr CHECK ((char_length(svnr) = 10) OR (char_length(svnr) = 16) OR svnr IS NULL);";
+
+		if(!$db->db_query($qry))
+		{
+			echo '<strong>public.tbl_person: '.$db->db_last_error().'</strong><br>';
+			$qry = "SELECT * FROM public.tbl_person WHERE char_length(svnr) != 10 AND char_length(svnr) != 16 AND svnr IS NOT NULL;";
+			$res = $db->db_query($qry);
+			while($r = $db->db_fetch_object($res))
+				echo $r->person_id . ": " . $r->vorname . " " . $r->nachname . ": '" . $r->svnr."'<br>";
+		}
+		else
+			echo 'public.tbl_person: Spalte svnr: Check auf char_length(10) oder char_length(16) hinzugefuegt';
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
