@@ -3395,6 +3395,7 @@ if(!$error)
 			$pruefung->akadgrad_id = $_POST['akadgrad_id'];
 			$pruefung->pruefungstyp_kurzbz = $_POST['pruefungstyp_kurzbz'];
 			$pruefung->datum = $_POST['datum'];
+			$pruefung->uhrzeit = $_POST['uhrzeit'];
 			$pruefung->sponsion = $_POST['sponsion'];
 			$pruefung->anmerkung = $_POST['anmerkung'];
 			$pruefung->updateamum = date('Y-m-d H:i:s');

@@ -167,6 +167,7 @@ function StudentAbschlusspruefungDetailDisableFields(val)
 	document.getElementById('student-abschlusspruefung-menulist-akadgrad').disabled=val;
 	document.getElementById('student-abschlusspruefung-menulist-typ').disabled=val;
 	document.getElementById('student-abschlusspruefung-datum-datum').disabled=val;
+	document.getElementById('student-abschlusspruefung-datum-uhrzeit').disabled=val;
 	document.getElementById('student-abschlusspruefung-datum-sponsion').disabled=val;
 	document.getElementById('student-abschlusspruefung-textbox-anmerkung').disabled=val;
 	document.getElementById('student-abschlusspruefung-button-speichern').disabled=val;
@@ -189,6 +190,7 @@ function StudentAbschlusspruefungResetFields()
 	//document.getElementById('student-abschlusspruefung-menulist-akadgrad').value='';
 	//document.getElementById('student-abschlusspruefung-menulist-typ').value='Bachelor';
 	document.getElementById('student-abschlusspruefung-datum-datum').value='';
+	document.getElementById('student-abschlusspruefung-datum-uhrzeit').value='00:00';
 	document.getElementById('student-abschlusspruefung-datum-sponsion').value='';
 	document.getElementById('student-abschlusspruefung-textbox-anmerkung').value='';
 }
@@ -343,6 +345,7 @@ function StudentAbschlusspruefungAuswahl()
 	notekommpruef = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#notekommpruef" ));
 	akadgrad_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#akadgrad_id" ));
 	datum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum" ));
+	uhrzeit = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#uhrzeit" ));
 	sponsion = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#sponsion" ));
 	pruefungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#pruefungstyp_kurzbz" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
@@ -395,6 +398,7 @@ function StudentAbschlusspruefungAuswahl()
 	document.getElementById('student-abschlusspruefung-menulist-notekommpruef').value=notekommpruef;
 	document.getElementById('student-abschlusspruefung-menulist-akadgrad').value=akadgrad_id;
 	document.getElementById('student-abschlusspruefung-datum-datum').value=datum;
+	document.getElementById('student-abschlusspruefung-datum-uhrzeit').value=uhrzeit;
 	document.getElementById('student-abschlusspruefung-datum-sponsion').value=sponsion;
 	document.getElementById('student-abschlusspruefung-menulist-typ').value=pruefungstyp_kurzbz;
 	document.getElementById('student-abschlusspruefung-textbox-anmerkung').value=anmerkung;
@@ -413,19 +417,20 @@ function StudentAbschlusspruefungSpeichern()
 
 	//der Value einer Editable Menulist muss mittels dieser Funktion geholt werden
 	//da sonst der Text der Menulist geliefert wird und nicht der dahinterliegene Wert
-	vorsitz = MenulistGetSelectedValue('student-abschlusspruefung-menulist-vorsitz');
-	pruefer1 = MenulistGetSelectedValue('student-abschlusspruefung-menulist-pruefer1');
-	pruefer2 = MenulistGetSelectedValue('student-abschlusspruefung-menulist-pruefer2');
-	pruefer3 = MenulistGetSelectedValue('student-abschlusspruefung-menulist-pruefer3');
-	abschlussbeurteilung_kurzbz = document.getElementById('student-abschlusspruefung-menulist-abschlussbeurteilung').value;
-	notekommpruef = document.getElementById('student-abschlusspruefung-menulist-notekommpruef').value;
-	akadgrad_id = document.getElementById('student-abschlusspruefung-menulist-akadgrad').value;
-	datum = document.getElementById('student-abschlusspruefung-datum-datum').value;
-	sponsion = document.getElementById('student-abschlusspruefung-datum-sponsion').value;
-	pruefungstyp_kurzbz = document.getElementById('student-abschlusspruefung-menulist-typ').value;
-	anmerkung = document.getElementById('student-abschlusspruefung-textbox-anmerkung').value;
-	abschlusspruefung_id = document.getElementById('student-abschlusspruefung-textbox-abschlusspruefung_id').value;
-	neu = document.getElementById('student-abschlusspruefung-checkbox-neu').checked;
+	var vorsitz = MenulistGetSelectedValue('student-abschlusspruefung-menulist-vorsitz');
+	var pruefer1 = MenulistGetSelectedValue('student-abschlusspruefung-menulist-pruefer1');
+	var pruefer2 = MenulistGetSelectedValue('student-abschlusspruefung-menulist-pruefer2');
+	var pruefer3 = MenulistGetSelectedValue('student-abschlusspruefung-menulist-pruefer3');
+	var abschlussbeurteilung_kurzbz = document.getElementById('student-abschlusspruefung-menulist-abschlussbeurteilung').value;
+	var notekommpruef = document.getElementById('student-abschlusspruefung-menulist-notekommpruef').value;
+	var akadgrad_id = document.getElementById('student-abschlusspruefung-menulist-akadgrad').value;
+	var datum = document.getElementById('student-abschlusspruefung-datum-datum').value;
+	var uhrzeit = document.getElementById('student-abschlusspruefung-datum-uhrzeit').value;
+	var sponsion = document.getElementById('student-abschlusspruefung-datum-sponsion').value;
+	var pruefungstyp_kurzbz = document.getElementById('student-abschlusspruefung-menulist-typ').value;
+	var anmerkung = document.getElementById('student-abschlusspruefung-textbox-anmerkung').value;
+	var abschlusspruefung_id = document.getElementById('student-abschlusspruefung-textbox-abschlusspruefung_id').value;
+	var neu = document.getElementById('student-abschlusspruefung-checkbox-neu').checked;
 
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 
@@ -478,6 +483,7 @@ function StudentAbschlusspruefungSpeichern()
 	req.add('notekommpruef', notekommpruef);
 	req.add('akadgrad_id', akadgrad_id);
 	req.add('datum', ConvertDateToISO(datum));
+	req.add('uhrzeit', uhrzeit);
 	req.add('sponsion', ConvertDateToISO(sponsion));
 	req.add('pruefungstyp_kurzbz', pruefungstyp_kurzbz);
 	req.add('anmerkung', anmerkung);
@@ -657,7 +663,7 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event, lang)
 		if(lang=='en2')
 			xsl='PrProtMAEng';
 	}
-	
+
 	var tree = document.getElementById('student-tree');
 
 	if (tree.currentIndex==-1)
@@ -682,10 +688,10 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event, lang)
 	}
 	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 
-	if (event.shiftKey) 
+	if (event.shiftKey)
 	{
 	    var output='odt';
-	} 
+	}
 	else if (event.ctrlKey)
 	{
 		var output='doc';
@@ -720,7 +726,7 @@ function StudentAbschlusspruefungPrintPruefungsprotokoll(event, lang)
 
 	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 
-	
+
 	if(pruefungstyp_kurzbz=='Bachelor')
 	{
 		if(lang=='de')
@@ -731,7 +737,7 @@ function StudentAbschlusspruefungPrintPruefungsprotokoll(event, lang)
 			xsl='PrProtBA';
 		if(lang=='en2')
 			xsl='PrProtBAEng';
-	}			
+	}
 	else
 	{
 		if(lang=='de')
@@ -744,10 +750,10 @@ function StudentAbschlusspruefungPrintPruefungsprotokoll(event, lang)
 			xsl='PrProtMAEng';
 	}
 
-	if (event.shiftKey) 
+	if (event.shiftKey)
 	{
 	    var output='odt';
-	} 
+	}
 	else if (event.ctrlKey)
 	{
 		var output='doc';
@@ -827,10 +833,10 @@ function StudentAbschlusspruefungPrintPruefungszeugnisMultiple(event, sprache)
 		}
 	}
 
-	if (event.shiftKey) 
+	if (event.shiftKey)
 	{
 	    var output='odt';
-	} 
+	}
 	else if (event.ctrlKey)
 	{
 		var output='doc';
@@ -866,10 +872,10 @@ function StudentAbschlusspruefungPrintPruefungszeugnis(event)
 	else
 		xsl='Diplomzeugnis';
 
-	if (event.shiftKey) 
+	if (event.shiftKey)
 	{
 	    var output='odt';
-	} 
+	}
 	else if (event.ctrlKey)
 	{
 		var output='doc';
@@ -944,10 +950,10 @@ function StudentAbschlusspruefungPrintUrkundeMultiple(event, sprache)
 		}
 	}
 
-	if (event.shiftKey) 
+	if (event.shiftKey)
 	{
 	    var output='odt';
-	} 
+	}
 	else if (event.ctrlKey)
 	{
 		var output='doc';
@@ -995,10 +1001,10 @@ function StudentAbschlusspruefungPrintUrkunde(event, sprache)
 	else if(pruefungstyp_kurzbz=='Abschluss' && sprache=='deutsch')
 	    xsl='Magisterurkunde';
 
-	if (event.shiftKey) 
+	if (event.shiftKey)
 	{
 	    var output='odt';
-	} 
+	}
 	else if (event.ctrlKey)
 	{
 		var output='doc';
