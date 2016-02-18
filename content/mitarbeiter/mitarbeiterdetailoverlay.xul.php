@@ -97,7 +97,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					</row>
     					<row <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?>>
       						<label value="SVNR" control="mitarbeiter-detail-textbox-svnr"/>
-      						<hbox><textbox id="mitarbeiter-detail-textbox-svnr" disabled="true" maxlength="10" size="10" oninput="MitarbeiterGenerateGebDatFromSVNR(); MitarbeiterDetailValueChange()"/></hbox>
+      						<hbox><textbox id="mitarbeiter-detail-textbox-svnr" disabled="true" maxlength="16" size="10" oninput="MitarbeiterGenerateGebDatFromSVNR(); MitarbeiterDetailValueChange()"/></hbox>
       						<label value="Ersatzkennzeichen" control="mitarbeiter-detail-textbox-ersatzkennzeichen"/>
       						<hbox><textbox id="mitarbeiter-detail-textbox-ersatzkennzeichen" disabled="true" maxlength="10" size="10" oninput="MitarbeiterDetailValueChange()"/></hbox>
     					</row>

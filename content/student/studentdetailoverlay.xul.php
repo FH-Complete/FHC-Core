@@ -104,7 +104,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					</row>
     					<row>
       						<label value="SVNR" control="student-detail-textbox-svnr"/>
-      						<hbox><textbox id="student-detail-textbox-svnr" disabled="true" maxlength="10" size="10"/></hbox>
+      						<hbox><textbox id="student-detail-textbox-svnr" disabled="true" maxlength="16" size="10"/></hbox>
       						<label value="Ersatzkennzeichen" control="student-detail-textbox-ersatzkennzeichen"/>
       						<hbox><textbox id="student-detail-textbox-ersatzkennzeichen" disabled="true" maxlength="10" size="15"/></hbox>
       						<label value="Geburtszeit" control="student-detail-textbox-geburtszeit" hidden="true"/>
