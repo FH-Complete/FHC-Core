@@ -94,6 +94,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#datum_iso" onclick="StudentAbschlusspruefungTreeSort()"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="student-abschlusspruefung-treecol-uhrzeit" label="Uhrzeit" flex="1" persist="hidden, width" hidden="false"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#uhrzeit" onclick="StudentAbschlusspruefungTreeSort()"/>
+				<splitter class="tree-splitter"/>
 				<treecol id="student-abschlusspruefung-treecol-sponsion" label="Sponsion" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#sponsion_iso" onclick="StudentAbschlusspruefungTreeSort()"/>
@@ -128,6 +132,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer3_nachname" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlussbeurteilung_kurzbz" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#datum" />
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#uhrzeit" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#sponsion" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#anmerkung" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlusspruefung_id" />
