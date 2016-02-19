@@ -6,10 +6,16 @@ $this->phrasen['global/semester']='Semester';
 $this->phrasen['global/studiensemester']='Studiensemester';
 $this->phrasen['global/studienzentrum']='Studienzentrum';
 $this->phrasen['global/studiengangsleitung']='Studiengangsleitung';
+$this->phrasen['global/leitung']='Leitung';
+$this->phrasen['global/koordination']='Koordination';
 $this->phrasen['global/lehrveranstaltung']='Lehrveranstaltung';
 $this->phrasen['global/lehreinheit']='Lehreinheit';
 $this->phrasen['global/organisationseinheit']='Organisationseinheit';
 $this->phrasen['global/organisationseinheiten']='Organisationseinheiten';
+$this->phrasen['global/organisationsform']='Organisationsform';
+
+$this->phrasen['global/ects']='ECTS';
+$this->phrasen['global/semesterstunden']='Semesterstunden';
 
 $this->phrasen['global/studiengangsmanagement']='Studiengangsmanagement';
 $this->phrasen['global/geschaeftsfuehrendeltg']='geschäftsf. Leitung';
