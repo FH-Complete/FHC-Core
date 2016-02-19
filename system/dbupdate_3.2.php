@@ -636,13 +636,6 @@ function printAllDroppedViews($allviews)
 	}
 }
 
-
-
-
-
-
-
-
 /***********************************************************ENDE SVNR ÄNDERUNG***********************************************************/
 
 
@@ -667,11 +660,6 @@ if($result = @$db->db_query("SELECT * FROM information_schema.table_constraints 
 	}
 }
 
-
-
-
-
-<<<<<<< HEAD
 //uhrzeit zu tbl_abschlusspruefung hinzufuegen
 if(!$result = @$db->db_query("SELECT uhrzeit from lehre.tbl_abschlusspruefung LIMIT 1;"))
 {
@@ -682,17 +670,6 @@ if(!$result = @$db->db_query("SELECT uhrzeit from lehre.tbl_abschlusspruefung LI
 	else
 		echo 'lehre.tbl_abschlusspruefung: spalte uhrzeit hinzugefügt';
 }
-=======
-
-
->>>>>>> bc33acb5ba38aaa75a13086c28ea68f0cc08cdfc
-
-
-
-
-
-
-
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
