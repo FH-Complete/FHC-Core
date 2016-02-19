@@ -186,7 +186,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "\n		<anrede>".$row->anrede."</anrede>";
 		$xml .= "\n		<vorname>".$row->vorname."</vorname>";
 		$xml .= "		<nachname>".$row->nachname."</nachname>";
-		$xml .= "		<name>".trim($row->titelpre.' '.trim($row->vorname.' '.$row->vornamen).' '.mb_strtoupper($row->nachname).($row->titelpost!=''?', '.$row->titelpost:''))."</name>";
+		$xml .= "		<name>".trim($row->titelpre.' '.trim($row->vorname.' '.$row->vornamen).' '.$row->nachname.($row->titelpost!=''?', '.$row->titelpost:''))."</name>";
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 		$xml .= "		<gebdatum>".$gebdatum."</gebdatum>";
 		$xml .= "		<matrikelnr>".trim($row->matrikelnr)."</matrikelnr>";
