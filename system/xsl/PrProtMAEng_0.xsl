@@ -18,25 +18,25 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <style:table-properties style:width="18.232cm" fo:margin-left="-0.199cm" table:align="left" style:writing-mode="lr-tb"/>
     </style:style>
     <style:style style:name="Tabelle1.A" style:family="table-column">
-      <style:table-column-properties style:column-width="2,15cm"/>
+      <style:table-column-properties style:column-width="2.896cm"/>
     </style:style>
     <style:style style:name="Tabelle1.B" style:family="table-column">
-      <style:table-column-properties style:column-width="2.401cm"/>
+      <style:table-column-properties style:column-width="2.492cm"/>
     </style:style>
     <style:style style:name="Tabelle1.C" style:family="table-column">
-      <style:table-column-properties style:column-width="4.024cm"/>
+      <style:table-column-properties style:column-width="0.72cm"/>
     </style:style>
     <style:style style:name="Tabelle1.D" style:family="table-column">
-      <style:table-column-properties style:column-width="3.358cm"/>
+      <style:table-column-properties style:column-width="1.182cm"/>
     </style:style>
     <style:style style:name="Tabelle1.E" style:family="table-column">
-      <style:table-column-properties style:column-width="2.752cm"/>
+      <style:table-column-properties style:column-width="1.817cm"/>
     </style:style>
-    <style:style style:name="Tabelle1.F" style:family="table-column">
-      <style:table-column-properties style:column-width="0.46cm"/>
+    <style:style style:name="Tabelle1.H" style:family="table-column">
+      <style:table-column-properties style:column-width="0.794cm"/>
     </style:style>
-    <style:style style:name="Tabelle1.G" style:family="table-column">
-      <style:table-column-properties style:column-width="2.66cm"/>
+    <style:style style:name="Tabelle1.I" style:family="table-column">
+      <style:table-column-properties style:column-width="2.538cm"/>
     </style:style>
     <style:style style:name="Tabelle1.1" style:family="table-row">
       <style:table-row-properties style:min-row-height="0.5cm" fo:keep-together="auto"/>
@@ -162,7 +162,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <style:text-properties style:font-name="Arial" fo:font-size="10pt" fo:language="de" fo:country="AT" fo:font-style="italic" style:font-size-asian="10pt" style:font-style-asian="italic" style:font-name-complex="Arial" style:font-size-complex="10pt"/>
     </style:style>
     <style:style style:name="P14" style:family="paragraph" style:parent-style-name="Standard">
-      <style:paragraph-properties fo:line-height="130%"/>
+      <style:paragraph-properties fo:line-height="150%"/>
       <style:text-properties style:font-name="Arial" fo:font-size="10pt" style:font-size-asian="10pt" style:font-size-complex="10pt"/>
     </style:style>
     <style:style style:name="P15" style:family="paragraph" style:parent-style-name="Standard">
@@ -197,6 +197,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     <style:style style:name="P23" style:family="paragraph" style:parent-style-name="Standard">
       <style:paragraph-properties fo:break-before="page" />
     </style:style>
+    <style:style style:name="P24" style:family="paragraph" style:parent-style-name="Heading_20_2" style:master-page-name="Standard">
+		<style:paragraph-properties style:page-number="1"/>
+		<style:text-properties style:font-name="Arial" fo:language="de" fo:country="AT"/>
+	</style:style>
+	<style:style style:name="P25" style:family="paragraph" style:parent-style-name="Heading_20_2">
+		<style:text-properties style:font-name="Arial" fo:language="de" fo:country="AT"/>
+	</style:style>
     <style:style style:name="T1" style:family="text">
       <style:text-properties fo:language="de" fo:country="AT" style:font-name-complex="Arial"/>
     </style:style>
@@ -222,7 +229,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <text:sequence-decl text:display-outline-level="0" text:name="Text"/>
         <text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
       </text:sequence-decls>
-      <text:p text:style-name="P20">Record of Master Examination before a Committee</text:p>
+      <text:p text:style-name="P24"/>
+		<text:p text:style-name="P25">Record of Master Examination before a Committee</text:p>
       <text:p text:style-name="P18">held in the UAS Master’s Degree Program <xsl:value-of select="stg_bezeichnung_engl" />, Classification Number <xsl:value-of select="studiengang_kz" /></text:p>
       <text:p text:style-name="P2"/>
       <text:p text:style-name="P19"><xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" /></text:p>
@@ -235,10 +243,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <table:table-column table:style-name="Tabelle1.C"/>
         <table:table-column table:style-name="Tabelle1.D"/>
         <table:table-column table:style-name="Tabelle1.E"/>
-        <table:table-column table:style-name="Tabelle1.F"/>
-        <table:table-column table:style-name="Tabelle1.G"/>
+        <table:table-column table:style-name="Tabelle1.A" table:number-columns-repeated="2"/>
+        <table:table-column table:style-name="Tabelle1.H"/>
+        <table:table-column table:style-name="Tabelle1.I"/>
         <table:table-row table:style-name="Tabelle1.1">
-          <table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="7" office:value-type="string">
+          <table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="9" office:value-type="string">
             <text:p text:style-name="P4">Examining Committee</text:p>
           </table:table-cell>
           <table:covered-table-cell/>
@@ -247,41 +256,49 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.1">
-          <table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
+          <table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="3" office:value-type="string">
             <text:p text:style-name="P4">Chair</text:p>
           </table:table-cell>
           <table:covered-table-cell/>
-          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="5" office:value-type="string">
+          <table:covered-table-cell/>
+          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="6" office:value-type="string">
             <text:p text:style-name="P4"><xsl:value-of select="vorsitz_nachname" /></text:p>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
+          <table:covered-table-cell/>
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.1">
-          <table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
+          <table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="3" office:value-type="string">
             <text:p text:style-name="P4">1st Examiner</text:p>
           </table:table-cell>
           <table:covered-table-cell/>
-          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="5" office:value-type="string">
+          <table:covered-table-cell/>
+          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="6" office:value-type="string">
             <text:p text:style-name="P4"><xsl:value-of select="pruefer1_nachname" /></text:p>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
+          <table:covered-table-cell/>
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.1">
-          <table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
+          <table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="3" office:value-type="string">
             <text:p text:style-name="P5">2nd Examiner</text:p>
           </table:table-cell>
           <table:covered-table-cell/>
-          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="5" office:value-type="string">
+          <table:covered-table-cell/>
+          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="6" office:value-type="string">
             <text:p text:style-name="P4"><xsl:value-of select="pruefer2_nachname" /></text:p>
           </table:table-cell>
+          <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
@@ -291,12 +308,14 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
             <text:p text:style-name="P4">Exam Date</text:p>
           </table:table-cell>
-          <table:table-cell table:style-name="Tabelle1.B5" office:value-type="string">
+          <table:table-cell table:style-name="Tabelle1.B5" table:number-columns-spanned="2" office:value-type="string">
             <text:p text:style-name="P4"><xsl:value-of select="datum" /></text:p>
           </table:table-cell>
-          <table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
+          <table:covered-table-cell/>
+          <table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
             <text:p text:style-name="P4">Time of Start</text:p>
           </table:table-cell>
+          <table:covered-table-cell/>
           <table:table-cell table:style-name="Tabelle1.B5" office:value-type="string">
             <text:p text:style-name="P6"/>
           </table:table-cell>
@@ -311,62 +330,43 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:covered-table-cell/>
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.1">
-          <table:table-cell table:style-name="Tabelle1.A2" table:number-rows-spanned="3" table:number-columns-spanned="2" office:value-type="string">
+          <table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="3" office:value-type="string">
             <text:p text:style-name="P4">Examination Attempt</text:p>
           </table:table-cell>
           <table:covered-table-cell/>
-          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="5" office:value-type="string">
-            <text:p text:style-name="P4">1st Attempt 
-            <draw:custom-shape text:anchor-type="char" draw:z-index="0" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.4cm" svg:height="0.4cm" svg:x="10.9cm" svg:y="0.02cm"><text:p/>
+          <table:covered-table-cell/>
+          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="6" office:value-type="string">
+            <text:p text:style-name="P12">            
+            1st Attempt 
+            <draw:custom-shape text:anchor-type="char" draw:z-index="0" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.336cm" svg:height="0.359cm" svg:x="1.9cm" svg:y="0.05cm"><text:p/>
             	<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
             </draw:custom-shape>
-			</text:p>
+            <text:s text:c="6"/>/ 1st Retake 
+            <draw:custom-shape text:anchor-type="char" draw:z-index="2" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.336cm" svg:height="0.359cm" svg:x="4.46cm" svg:y="0.05cm"><text:p/>
+	          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
+	        </draw:custom-shape>
+       		<text:s text:c="7"/>/ <text:s/>2nd Retake
+	        <draw:custom-shape text:anchor-type="char" draw:z-index="3" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.336cm" svg:height="0.359cm" svg:x="7.35cm" svg:y="0.05cm"><text:p/>
+	          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
+	        </draw:custom-shape>
+			</text:p>        
           </table:table-cell>
+          <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
         </table:table-row>
-		<table:table-row table:style-name="Tabelle1.1">
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="5" office:value-type="string">
-			<text:p text:style-name="P4">1st Retake
-            <draw:custom-shape text:anchor-type="char" draw:z-index="2" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.4cm" svg:height="0.4cm" svg:x="10.9cm" svg:y="0.02cm"><text:p/>
-	          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-	        </draw:custom-shape>
-			</text:p>
-		  </table:table-cell>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-		</table:table-row>
-		<table:table-row table:style-name="Tabelle1.1">
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="5" office:value-type="string">
-			<text:p text:style-name="P4">2nd Retake
-	        <draw:custom-shape text:anchor-type="char" draw:z-index="3" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.4cm" svg:height="0.4cm" svg:x="10.9cm" svg:y="0.02cm"><text:p/>
-	          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-	        </draw:custom-shape>
-			</text:p>
-		  </table:table-cell>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-		</table:table-row>
         <table:table-row table:style-name="Tabelle1.1">
           <table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
             <text:p text:style-name="P4">Topic and Assessment of Master's thesis</text:p>
           </table:table-cell>
           <table:covered-table-cell/>
-          <table:table-cell table:style-name="Tabelle1.B5" table:number-columns-spanned="4" office:value-type="string">
+          <table:table-cell table:style-name="Tabelle1.B5" table:number-columns-spanned="6" office:value-type="string">
             <text:p text:style-name="P4"><xsl:value-of select="themenbereich" /></text:p>
-            <text:p text:style-name="P4"/>
-            <text:p text:style-name="P4"/>
           </table:table-cell>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
@@ -380,65 +380,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <text:p text:style-name="P4">Subject of the Examination</text:p>
           </table:table-cell>
           <table:covered-table-cell/>
-          <table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="5" office:value-type="string">
-            <text:p text:style-name="P4">Presentation and Examination interview on the Master’s thesis and its links to subjects of the curriculum as well as examination interview on a curricular theme</text:p>
-          </table:table-cell>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-        </table:table-row>
-        <table:table-row table:style-name="Tabelle1.1">
-          <table:table-cell table:style-name="Tabelle1.A2" table:number-rows-spanned="3" table:number-columns-spanned="2" office:value-type="string">
-            <text:p text:style-name="P14">Parts of the examination held in English (Optional - in line with the degree program’s guidelines):</text:p>
-          </table:table-cell>
-          <table:covered-table-cell/>
-          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="5" office:value-type="string">
-            <text:p text:style-name="P4">Presentation of the Master's thesis
-			  <draw:custom-shape text:anchor-type="char" draw:z-index="6" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.4cm" svg:height="0.4cm" svg:x="10.9cm" svg:y="0.02cm">
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-			  </draw:custom-shape>
-			</text:p>
-          </table:table-cell>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-        </table:table-row>
-        <table:table-row table:style-name="Tabelle1.1">
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="5" office:value-type="string">
-			<text:p text:style-name="P4">Examination interview on the Master's thesis and its links </text:p>
-			<text:p text:style-name="P4">to subjects of the curriculum
-			  <draw:custom-shape text:anchor-type="char" draw:z-index="4" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.4cm" svg:height="0.4cm" svg:x="10.9cm" svg:y="-0.3cm">
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-			  </draw:custom-shape>
-			</text:p>
-          </table:table-cell>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-        </table:table-row>
-        <table:table-row table:style-name="Tabelle1.1">
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="5" office:value-type="string">
-            <text:p text:style-name="P4">Examination interview on other subjects relevant to the curriculum
-			  <draw:custom-shape text:anchor-type="char" draw:z-index="5" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.4cm" svg:height="0.4cm" svg:x="10.9cm" svg:y="0.02cm">
-				<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-			  </draw:custom-shape>
-			</text:p>
-          </table:table-cell>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-          <table:covered-table-cell/>
-        </table:table-row>
-        <table:table-row table:style-name="Tabelle1.1">
           <table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="7" office:value-type="string">
-            <text:p text:style-name="P4">Questions to open the examination interview</text:p>
+            <text:p text:style-name="P4">Examination interview on the Master’s thesis and its links to subjects of the curriculum as well as examination interview on a curricular theme</text:p>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
@@ -448,15 +391,15 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:covered-table-cell/>
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.1">
+          <table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
+            <text:p text:style-name="P4">Parts of the examination held in English (Optional - in line with the degree program’s guidelines):</text:p>
+          </table:table-cell>
+          <table:covered-table-cell/>
           <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="7" office:value-type="string">
-            <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
+            <text:p text:style-name="P14"><draw:custom-shape text:anchor-type="char" draw:z-index="6" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.336cm" svg:height="0.359cm" svg:x="10.964cm" svg:y="0.153cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>Presentation of the Master's thesis</text:p>
+            <text:p text:style-name="P14">Examination interview on the Master's thesis <text:span text:style-name="T1">and its links</text:span></text:p>
+            <text:p text:style-name="P4"><draw:custom-shape text:anchor-type="char" draw:z-index="4" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.336cm" svg:height="0.359cm" svg:x="10.982cm" svg:y="-0.046cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>to subjects of the curriculum</text:p>
+            <text:p text:style-name="P14"><draw:custom-shape text:anchor-type="char" draw:z-index="5" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.336cm" svg:height="0.359cm" svg:x="10.986cm" svg:y="-0.019cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>Examination interview on other subjects relevant to the curriculum</text:p>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
@@ -465,17 +408,69 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:covered-table-cell/>
           <table:covered-table-cell/>
         </table:table-row>
-        <table:table-row table:style-name="Tabelle1.14">
-          <table:table-cell table:style-name="Tabelle1.A14" table:number-columns-spanned="7" office:value-type="string">
-            <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
+        <table:table-row table:style-name="Tabelle1.1">
+          <table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="9" office:value-type="string">
+            <text:p text:style-name="P4">Notes on the presentation of the Master's thesis</text:p>
           </table:table-cell>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+        </table:table-row>
+        <table:table-row table:style-name="Tabelle1.1">
+          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="9" office:value-type="string">
+            <!-- Wenn die Titel der Projektarbeiten zu lang werden, werden hier Zeilenabstände im Bereich "Notizen" reduziert -->
+			<xsl:variable select="themenbereich" name="themenbereich"/>
+			<xsl:variable name="themenbereichlaenge" select="(string-length($themenbereich))"/>
+				<xsl:if test="$themenbereichlaenge &lt; 400">
+					<text:p text:style-name="P4"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge &lt; 350">
+					<text:p text:style-name="P4"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge &lt; 300">
+					<text:p text:style-name="P4"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge &lt; 250">
+					<text:p text:style-name="P4"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge &lt; 200">
+					<text:p text:style-name="P4"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge &lt; 150">
+					<text:p text:style-name="P4"/>
+				</xsl:if>
+			<xsl:variable select="themenbereich_2" name="themenbereich_2"/>
+			<xsl:variable name="themenbereichlaenge_2" select="(string-length($themenbereich_2))"/>
+				<xsl:if test="$themenbereichlaenge_2 &lt; 400">
+					<text:p text:style-name="P4"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge_2 &lt; 350">
+					<text:p text:style-name="P4"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge_2 &lt; 300">
+					<text:p text:style-name="P4"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge_2 &lt; 250">
+					<text:p text:style-name="P4"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge_2 &lt; 200">
+					<text:p text:style-name="P4"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge_2 &lt; 150">
+					<text:p text:style-name="P4"/>
+				</xsl:if>
+			<text:p text:style-name="P4"/>
+			<text:p text:style-name="P4"/>
+			<text:p text:style-name="P4"/>
+			<text:p text:style-name="P4"/>
+          </table:table-cell>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
@@ -491,56 +486,136 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       
       <table:table table:name="Tabelle1" table:style-name="Tabelle1">
         <table:table-column table:style-name="Tabelle1.A"/>
-        <table:table-row table:style-name="Tabelle1.16">
-          <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-            <text:p text:style-name="P4">Assessment of the examination interview based on technical accuracy, completeness, structure and linguistic quality. </text:p>
-            <text:p text:style-name="P4">Passed with highest distinction, Passed with distinction, Passed, Failed</text:p>
+        <table:table-column table:style-name="Tabelle1.B"/>
+        <table:table-column table:style-name="Tabelle1.C"/>
+        <table:table-column table:style-name="Tabelle1.D"/>
+        <table:table-column table:style-name="Tabelle1.E"/>
+        <table:table-column table:style-name="Tabelle1.A" table:number-columns-repeated="2"/>
+        <table:table-column table:style-name="Tabelle1.H"/>
+        <table:table-column table:style-name="Tabelle1.I"/>
+        <table:table-row table:style-name="Tabelle1.1">
+          <table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="9" office:value-type="string">
+            <text:p text:style-name="P4">Questions to open the examination interview</text:p>
           </table:table-cell>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.1">
-          <table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
-           <text:p text:style-name="P12"/>
-           <text:p text:style-name="P12"/>
-           <text:p text:style-name="P12"/>
+          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="9" office:value-type="string">
+            <text:p text:style-name="P12"/>
+            <text:p text:style-name="P12"/>
+            <text:p text:style-name="P12"/>
+            <text:p text:style-name="P12"/>
+            <text:p text:style-name="P12"/>
+            <text:p text:style-name="P12"/>
           </table:table-cell>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+        </table:table-row>
+        <table:table-row table:style-name="Tabelle1.15">
+          <table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="4" office:value-type="string">
+            <text:p text:style-name="P7">
+            <draw:custom-shape text:anchor-type="char" draw:z-index="7" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.336cm" svg:height="0.359cm" svg:x="16cm" svg:y="0.1cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:mirror-horizontal="false" draw:mirror-vertical="false" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
+            <draw:custom-shape text:anchor-type="char" draw:z-index="10" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.336cm" svg:height="0.359cm" svg:x="16cm" svg:y="0.7cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:mirror-horizontal="false" draw:mirror-vertical="false" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
+            <draw:custom-shape text:anchor-type="char" draw:z-index="8" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.336cm" svg:height="0.359cm" svg:x="16cm" svg:y="1.3cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:mirror-horizontal="false" draw:mirror-vertical="false" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>
+            <draw:custom-shape text:anchor-type="char" draw:z-index="9" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.336cm" svg:height="0.359cm" svg:x="16cm" svg:y="1.9cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:mirror-horizontal="false" draw:mirror-vertical="false" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>Assessment of the examination interview</text:p>
+            <text:p text:style-name="P7">based on technical accuracy, completeness, structure and linguistic quality.</text:p>
+          </table:table-cell>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="5" office:value-type="string">         
+            <text:p text:style-name="P4">                        	
+            	 (+++) Passed with highest distinction
+           	</text:p>
+            <text:p text:style-name="P4">
+            	(++) Passt with distinction
+            </text:p>
+            <text:p text:style-name="P4">
+            	(+) Passed
+            </text:p>
+            <text:p text:style-name="P4">
+            	(-) Failed
+            </text:p>
+            <text:p text:style-name="P22" />
+          </table:table-cell>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.16">
-          <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
+          <table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="9" office:value-type="string">
             <text:p text:style-name="P4">Reasons for failing OR any possible explanatory notes on a passing grade </text:p>
           </table:table-cell>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.1">
-          <table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
-           <text:p text:style-name="P12"/>
-           <text:p text:style-name="P12"/>
-           <text:p text:style-name="P12"/>
+          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="9" office:value-type="string">
            <text:p text:style-name="P12"/>
            <text:p text:style-name="P12"/>
            <text:p text:style-name="P12"/>
            <text:p text:style-name="P12"/>
           </table:table-cell>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.16">
-          <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
+          <table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="9" office:value-type="string">
             <text:p text:style-name="P4">Any unusual occurrences</text:p>
           </table:table-cell>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.19">
-          <table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
+          <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="9" office:value-type="string">
             <text:p text:style-name="P8"/>
             <text:p text:style-name="P7"/>
             <text:p text:style-name="P7"/>
             <text:p text:style-name="P7"/>
-            <text:p text:style-name="P7"/>
-            <text:p text:style-name="P7"/>
-            <text:p text:style-name="P7"/>
           </table:table-cell>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
+          <table:covered-table-cell/>
         </table:table-row>
       </table:table>
       <text:p text:style-name="P11"/>
-      <text:p text:style-name="P9"/>
-      <text:p text:style-name="P9"/>
-      <text:p text:style-name="P9"/>
       <text:p text:style-name="P9"/>
       <text:p text:style-name="P9"/>
       <text:p text:style-name="P9">_________________________<text:tab/>_______________________<text:tab/>_____________________</text:p>

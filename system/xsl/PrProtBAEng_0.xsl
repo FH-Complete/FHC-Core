@@ -197,6 +197,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     <style:style style:name="P23" style:family="paragraph" style:parent-style-name="Standard">
       <style:paragraph-properties fo:break-before="page" />
     </style:style>
+    <style:style style:name="P24" style:family="paragraph" style:parent-style-name="Heading_20_2" style:master-page-name="Standard">
+		<style:paragraph-properties style:page-number="1"/>
+		<style:text-properties fo:language="de" fo:country="AT"/>
+	</style:style>
+	<style:style style:name="P25" style:family="paragraph" style:parent-style-name="Heading_20_2">
+		<style:text-properties fo:language="de" fo:country="AT"/>
+	</style:style>
     <style:style style:name="T1" style:family="text">
       <style:text-properties fo:language="de" fo:country="AT" style:font-name-complex="Arial"/>
     </style:style>
@@ -229,7 +236,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <text:sequence-decl text:display-outline-level="0" text:name="Text"/>
         <text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
       </text:sequence-decls>
-      <text:p text:style-name="P20">Record of Bachelor Examination before a Committee</text:p>
+      <text:p text:style-name="P24"/>
+      <text:p text:style-name="P25">Record of Bachelor Examination before a Committee</text:p>
       <text:p text:style-name="P1">held in the UAS Bachelor's Degree Program <xsl:value-of select="stg_bezeichnung_engl" />, Classification Number <xsl:value-of select="studiengang_kz" /></text:p>
       <text:p text:style-name="P1"/>
       <text:p text:style-name="P2"><xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" /></text:p>
@@ -365,10 +373,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:covered-table-cell/>
           <table:table-cell table:style-name="Tabelle1.B5" table:number-columns-spanned="4" office:value-type="string">
             <text:p text:style-name="P5"><xsl:value-of select="themenbereich" /></text:p>
-            <text:p text:style-name="P5"/>
-            <text:p text:style-name="P5"/>
-            <text:p text:style-name="P5"/>
-            <text:p text:style-name="P5"/>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
@@ -386,10 +390,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:covered-table-cell/>
           <table:table-cell table:style-name="Tabelle1.B5" table:number-columns-spanned="4" office:value-type="string">
             <text:p text:style-name="P5"><xsl:value-of select="themenbereich_2" /></text:p>
-            <text:p text:style-name="P5"/>
-            <text:p text:style-name="P5"/>
-            <text:p text:style-name="P5"/>
-            <text:p text:style-name="P5"/>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
@@ -490,19 +490,50 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.1">
           <table:table-cell table:style-name="Tabelle1.C2" table:number-columns-spanned="7" office:value-type="string">
-            <text:p text:style-name="P9"/>
-            <text:p text:style-name="P8"/>
-            <text:p text:style-name="P8"/>
-            <text:p text:style-name="P8"/>
-            <text:p text:style-name="P8"/>
-            <text:p text:style-name="P8"/>
-            <text:p text:style-name="P8"/>
-            <text:p text:style-name="P8"/>
-            <text:p text:style-name="P8"/>
-            <text:p text:style-name="P8"/>
-            <text:p text:style-name="P8"/>
-            <text:p text:style-name="P8"/>
-            <text:p text:style-name="P8"/>
+            <!-- Wenn die Titel der Projektarbeiten zu lang werden, werden hier Zeilenabstände im Bereich "Notizen" reduziert -->
+			<xsl:variable select="themenbereich" name="themenbereich"/>
+			<xsl:variable name="themenbereichlaenge" select="(string-length($themenbereich))"/>
+				<xsl:if test="$themenbereichlaenge &lt; 400">
+					<text:p text:style-name="P5"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge &lt; 350">
+					<text:p text:style-name="P5"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge &lt; 300">
+					<text:p text:style-name="P5"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge &lt; 250">
+					<text:p text:style-name="P5"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge &lt; 200">
+					<text:p text:style-name="P5"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge &lt; 150">
+					<text:p text:style-name="P5"/>
+				</xsl:if>
+			<xsl:variable select="themenbereich_2" name="themenbereich_2"/>
+			<xsl:variable name="themenbereichlaenge_2" select="(string-length($themenbereich_2))"/>
+				<xsl:if test="$themenbereichlaenge_2 &lt; 400">
+					<text:p text:style-name="P5"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge_2 &lt; 350">
+					<text:p text:style-name="P5"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge_2 &lt; 300">
+					<text:p text:style-name="P5"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge_2 &lt; 250">
+					<text:p text:style-name="P5"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge_2 &lt; 200">
+					<text:p text:style-name="P5"/>
+				</xsl:if>
+				<xsl:if test="$themenbereichlaenge_2 &lt; 150">
+					<text:p text:style-name="P5"/>
+				</xsl:if>
+			<text:p text:style-name="P5"/>
+			<text:p text:style-name="P5"/>
+			<text:p text:style-name="P5"/>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
