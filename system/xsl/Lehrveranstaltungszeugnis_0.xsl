@@ -284,13 +284,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 						<text:p text:style-name="P11">Lehrveranstaltung</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-						<text:p text:style-name="P12">Note</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
 						<text:p text:style-name="P12">SWS</text:p>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.D1" office:value-type="string">
+					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
 						<text:p text:style-name="P12">ECTS</text:p>
+					</table:table-cell>
+					<table:table-cell table:style-name="Tabelle1.D1" office:value-type="string">
+						<text:p text:style-name="P12">Note</text:p>
 					</table:table-cell>
 				</table:table-row>
 				<table:table-row>
@@ -300,12 +300,30 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			    <table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
 			        <text:p text:style-name="P9">
 					<xsl:choose>
-						<xsl:when test="note='tg'">
-							<xsl:text>teilgenommen</xsl:text>
+						<xsl:when test="sws=''">
+							<xsl:text>-</xsl:text>
 						</xsl:when>
-						<xsl:when test="note='met'">
-							<xsl:text>mit Erfolg teilgenommen</xsl:text>
+						<xsl:otherwise>
+							<xsl:value-of select="sws"/>
+						</xsl:otherwise>
+					</xsl:choose>
+			        </text:p>
+			    </table:table-cell>
+			    <table:table-cell table:style-name="Tabelle1.C2" office:value-type="string">
+			        <text:p text:style-name="P9">
+			 		<xsl:choose>
+						<xsl:when test="ects=''">
+							<xsl:text>-</xsl:text>
 						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="ects"/>
+						</xsl:otherwise>
+					</xsl:choose>	
+					</text:p>
+			    </table:table-cell>
+			    <table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
+			        <text:p text:style-name="P9">
+					<xsl:choose>
 						<xsl:when test="note=''">
 							<xsl:text>-</xsl:text>
 						</xsl:when>
@@ -313,22 +331,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 							<xsl:value-of select="note"/>
 						</xsl:otherwise>
 					</xsl:choose>
-			        </text:p>
-			    </table:table-cell>
-			    <table:table-cell table:style-name="Tabelle1.C2" office:value-type="string">
-			        <text:p text:style-name="P9">
-				        <xsl:if test="sws=''">
-							<xsl:text>-</xsl:text>
-						</xsl:if>
-						<xsl:value-of select="sws"/>
-					</text:p>
-			    </table:table-cell>
-			    <table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
-			        <text:p text:style-name="P9">
-				        <xsl:if test="ects=''">
-							<xsl:text>-</xsl:text>
-						</xsl:if>
-						<xsl:value-of select="ects"/>
 					</text:p>
 			    </table:table-cell>
 			</table:table-row>
@@ -345,7 +347,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P22">
 
 			<xsl:call-template name="replace">
-				<xsl:with-param name="string" select="lehrinhalte"/>
+				<xsl:with-param name="string" select="lehrziele"/>
 			</xsl:call-template>
 			
 			</text:p>

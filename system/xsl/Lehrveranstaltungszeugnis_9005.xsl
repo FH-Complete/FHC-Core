@@ -228,6 +228,176 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
 			<text:p text:style-name="P15">LEHRVERANSTALTUNGSZEUGNIS</text:p>
+			<text:p text:style-name="P16"/>
+			<text:p text:style-name="P16"><xsl:value-of select="lv_studiengang_art"/>-Studiengang</text:p>
+			<text:p text:style-name="P5"><xsl:value-of select="lv_studiengang_bezeichnung"/></text:p>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P2">Personenkennzeichen: <xsl:value-of select="matrikelnr"/></text:p>
+			<text:p text:style-name="P2">Kennzahl des Studienganges: <xsl:value-of select="lv_studiengang_kennzahl"/></text:p>
+			<text:p text:style-name="P3"/>
+			<text:p text:style-name="P3"/>
+			<text:p text:style-name="P3"/>
+			<text:p text:style-name="P7"/>
+			<text:p text:style-name="P4">Vorname/Familienname:<text:tab/>
+				<text:span text:style-name="T1"><xsl:value-of select="name"/></text:span>
+			</text:p>
+			<text:p text:style-name="P7"/>
+			<text:p text:style-name="P4">Geburtsdatum:<text:tab/><xsl:value-of select="gebdatum" /></text:p>
+			<text:p text:style-name="P4"/>
+			<text:p text:style-name="P19">
+			<xsl:choose>
+				<xsl:when test="geschlecht='m'">
+					<xsl:text>Herr </xsl:text>
+				</xsl:when>
+				<xsl:when test="geschlecht='w'">
+					<xsl:text>Frau </xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>Herr/Frau </xsl:text>
+				</xsl:otherwise>
+			</xsl:choose>
+			<xsl:value-of select="name"/> hat im <xsl:value-of select="studiensemester" /> als 
+			<xsl:choose>
+				<xsl:when test="geschlecht='m'">
+					<xsl:text>außerordentlicher Student </xsl:text>
+				</xsl:when>
+				<xsl:when test="geschlecht='w'">
+					<xsl:text>außerordentliche Studentin </xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>außerordentliche/r Student/in </xsl:text>
+				</xsl:otherwise>
+			</xsl:choose>
+			folgende Lehrveranstaltung an der FH Technikum Wien absolviert:</text:p>
+			<text:p text:style-name="P19"/>
+			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
+				<table:table-column table:style-name="Tabelle1.A"/>
+				<table:table-column table:style-name="Tabelle1.B"/>
+				<table:table-column table:style-name="Tabelle1.D"/>
+				<table:table-column table:style-name="Tabelle1.D"/>
+				<table:table-row table:style-name="Tabelle1.1">
+					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
+						<text:p text:style-name="P11">Lehrveranstaltung</text:p>
+					</table:table-cell>
+					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
+						<text:p text:style-name="P12">SWS</text:p>
+					</table:table-cell>
+					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
+						<text:p text:style-name="P12">ECTS</text:p>
+					</table:table-cell>
+					<table:table-cell table:style-name="Tabelle1.D1" office:value-type="string">
+						<text:p text:style-name="P12">Note</text:p>
+					</table:table-cell>
+				</table:table-row>
+				<table:table-row>
+			    <table:table-cell table:style-name="Tabelle1.A7" office:value-type="string">
+					<text:p text:style-name="P10"><xsl:value-of select="bezeichnung"/></text:p>
+			    </table:table-cell>
+			    <table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
+			        <text:p text:style-name="P9">
+					<xsl:choose>
+						<xsl:when test="sws=''">
+							<xsl:text>-</xsl:text>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="sws"/>
+						</xsl:otherwise>
+					</xsl:choose>
+			        </text:p>
+			    </table:table-cell>
+			    <table:table-cell table:style-name="Tabelle1.C2" office:value-type="string">
+			        <text:p text:style-name="P9">
+			 		<xsl:choose>
+						<xsl:when test="ects=''">
+							<xsl:text>-</xsl:text>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="ects"/>
+						</xsl:otherwise>
+					</xsl:choose>	
+					</text:p>
+			    </table:table-cell>
+			    <table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
+			        <text:p text:style-name="P9">
+					<xsl:choose>
+						<xsl:when test="note=''">
+							<xsl:text>-</xsl:text>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="note"/>
+						</xsl:otherwise>
+					</xsl:choose>
+					</text:p>
+			    </table:table-cell>
+			</table:table-row>
+			</table:table>
+			<text:p text:style-name="P6"/>
+			<text:p text:style-name="P6"/>
+			<text:p text:style-name="P25">Notenstufen:<text:tab/>Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), Nicht genügend (5), mit Erfolg teilgenommen (met), nicht teilgenommen (nt), teilgenommen(tg),</text:p>
+			<text:p text:style-name="P25"><text:tab/>angerechnet (ar), nicht beurteilt (nb), bestanden (b), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</text:p>
+			<text:p text:style-name="P20"/>
+			<text:p text:style-name="P21"/>
+			<text:p text:style-name="P22">Inhalte der Lehrveranstaltung:</text:p>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22">
+
+			<xsl:call-template name="replace">
+				<xsl:with-param name="string" select="lehrziele"/>
+			</xsl:call-template>
+			
+			</text:p>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22">
+				<draw:frame draw:style-name="fr1" draw:name="Rahmen1" text:anchor-type="char" draw:z-index="0">
+					<draw:text-box fo:min-height="0.499cm" fo:min-width="2cm">
+						<table:table table:name="Tabelle3" table:style-name="Tabelle3">
+							<table:table-column table:style-name="Tabelle3.A"/>
+							<table:table-column table:style-name="Tabelle3.B"/>
+							<table:table-column table:style-name="Tabelle3.C"/>
+							<table:table-row>
+								<table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
+									<text:p text:style-name="P17">
+										<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr3" draw:name="Bild1" text:anchor-type="char" svg:x="5.2cm" svg:width="3.51cm" svg:height="3.51cm" draw:z-index="1">
+											<draw:image xlink:href="Pictures/10000201000002290000022939997AEC.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+										</draw:frame>
+										<xsl:value-of select="ort_datum" /></text:p>
+								</table:table-cell>
+								<table:table-cell table:style-name="Tabelle3.B1" office:value-type="string">
+									<text:p text:style-name="P16"/>
+								</table:table-cell>
+								<table:table-cell table:style-name="Tabelle3.C1" office:value-type="string">
+									<text:p text:style-name="P16"/>
+								</table:table-cell>
+							</table:table-row>
+							<table:table-row>
+								<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+									<text:p text:style-name="P17">Ort, Datum</text:p>
+								</table:table-cell>
+								<table:table-cell table:style-name="Tabelle3.B2" office:value-type="string">
+									<text:p text:style-name="P16"/>
+								</table:table-cell>
+								<table:table-cell table:style-name="Tabelle3.C2" office:value-type="string">
+									<text:p text:style-name="P14"><xsl:value-of select="studiengangsleiter" /></text:p>
+									<text:p text:style-name="P23">Studiengangsleitung</text:p>
+								</table:table-cell>
+							</table:table-row>
+						</table:table>
+					</draw:text-box>
+				</draw:frame>
+			</text:p>
 		</office:text>
 </xsl:template>
 <xsl:template name="replace">
