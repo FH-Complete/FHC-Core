@@ -60,9 +60,9 @@
 //	Request Parameter 
 // ------------------------------------------------------------------------------------------
 	// Parameter Veranstaltungskategorie
-  	$veranstaltungskategorie_kurzbz=trim((isset($_REQUEST['veranstaltungskategorie_kurzbz']) ? $_REQUEST['veranstaltungskategorie_kurzbz']:''));
+	$veranstaltungskategorie_kurzbz=trim((isset($_REQUEST['veranstaltungskategorie_kurzbz']) ? $_REQUEST['veranstaltungskategorie_kurzbz']:''));
 	// Parameter Veranstaltung
-   	$veranstaltung_id=trim((isset($_REQUEST['veranstaltung_id']) ? $_REQUEST['veranstaltung_id']:''));
+	$veranstaltung_id=trim((isset($_REQUEST['veranstaltung_id']) ? $_REQUEST['veranstaltung_id']:''));
 	$work=trim((isset($_REQUEST['work']) ? $_REQUEST['work']:''));
 	
 // ------------------------------------------------------------------------------------------
@@ -78,7 +78,6 @@
 		$Jahresplan->freigabe=($is_wartungsberechtigt?false:true);
 		if ($work=='save')
 		{
-			
 			$Jahresplan->new=false;
 			if (!isset($veranstaltung_id) || empty($veranstaltung_id) )
 				$Jahresplan->new=true;
@@ -88,22 +87,22 @@
 			$Jahresplan->veranstaltungskategorie_kurzbz=$_REQUEST["veranstaltungskategorie_kurzbz"];
 			$Jahresplan->beschreibung=$_REQUEST["beschreibung"];
 			$Jahresplan->inhalt=$_REQUEST["inhalt"];
-			
-			$Jahresplan->start=date('Y-m-d H:i:s',$_REQUEST["start"]);							
-			$Jahresplan->ende=date('Y-m-d H:i:s',$_REQUEST["ende"]);	
 
-			$Jahresplan->insertamum=date('Y-m-d H:i:s');							
-			$Jahresplan->insertvon=$user;							
+			$Jahresplan->start=date('Y-m-d H:i:s',$_REQUEST["start"]);
+			$Jahresplan->ende=date('Y-m-d H:i:s',$_REQUEST["ende"]);
+
+			$Jahresplan->insertamum=date('Y-m-d H:i:s');
+			$Jahresplan->insertvon=$user;
 
 			$Jahresplan->updateamum=date('Y-m-d H:i:s');
-			$Jahresplan->updatevon=$user;		
-								
-			$Jahresplan->freigabeamum=(!empty($_REQUEST["freigabeamum"])?date('Y-m-d H:i:s',$_REQUEST["freigabeamum"]):null);							
-			$Jahresplan->freigabevon=$_REQUEST["freigabevon"];	
+			$Jahresplan->updatevon=$user;
+
+			$Jahresplan->freigabeamum=(!empty($_REQUEST["freigabeamum"])?date('Y-m-d H:i:s',$_REQUEST["freigabeamum"]):null);
+			$Jahresplan->freigabevon=$_REQUEST["freigabevon"];
 
 			if(!$veranstaltung=$Jahresplan->saveVeranstaltung())
-			{	
-				$error='Fehler bei der '.($Jahresplan->new?' Neuanlage ':' &Auml;nderung ').' '.$Jahresplan->errormsg; 
+			{
+				$error='Fehler bei der '.($Jahresplan->new?' Neuanlage ':' &Auml;nderung ').' '.$Jahresplan->errormsg;
 			}
 			else
 			{
@@ -117,7 +116,7 @@
 								}	
 							}
 						-->
-						</script>				
+						</script>
 					';
 			}
 		}
@@ -178,8 +177,10 @@
 			$veranstaltungen=jahresplan_funk_veranstaltung_extend($veranstaltungen);
 			while (list($key, $value) = each($veranstaltungen)) 
 			{
-			    $veranstaltung[$key]=$value;
+				$veranstaltung[$key]=$value;
 			}
+			$veranstaltung["start_timestamp"] = strtotime($veranstaltung["start"]);
+			$veranstaltung["ende_timestamp"] = strtotime($veranstaltung["ende"]);
 		}
 		elseif (empty($work))  // Es gibt keine Veranstaltung oder Fehler beim Lesen - keine weitere Anzeige mehr moeglich
 		{
@@ -408,7 +409,7 @@
 
 					<td title="<?php echo $p->t("eventkalender/neuanlage")?> <?php echo date("d.m.Y",$veranstaltung['start_timestamp']);?>"  class="cursor_hand" onclick="self.location.href='<?php echo $_SERVER['PHP_SELF'].'?start_timestamp='.(isset($veranstaltung['start_timestamp'])?$veranstaltung['start_timestamp']:$cTmpTimestampStart).'&amp;ende_timestamp='.(isset($veranstaltung['ende_timestamp'])?$veranstaltung['ende_timestamp']:$cTmpTimestampEnde) ;?>';" ><?php echo $p->t("eventkalender/neuanlage")?>&nbsp;<img border="0" alt="Neuanlage" src="../../../skin/images/date_add.png" ></td>
 					
-				</tr>				
+				</tr>
 				
 				<tr>
 					<td><label for="veranstaltung_id"><?php echo $p->t("eventkalender/kategorie")?></label></td>
@@ -432,7 +433,7 @@
 						}
 					?>
 					</select></td>
-				</tr>				
+				</tr>
 				<tr>
 					<td><label for="Datum1"><?php echo $p->t("eventkalender/datumVon")?></label></td>
 					<td>
@@ -443,21 +444,19 @@
 						<?php
 						$veranstaltung['start_zeit']=date("H:i",$veranstaltung['start_timestamp']);
 						$veranstaltung['start_zeit']=trim($veranstaltung['start_zeit']);
-						for ($timeIND=0;$timeIND<24;$timeIND++)
+
+						for ($i=0;$i<24;$i++)
 						{
-							$cTmpTime=$timeIND.':00';
-							echo '<option '. ($veranstaltung['start_zeit']==$cTmpTime || $veranstaltung['start_zeit']=='0'.$cTmpTime?'selected="selected"':'') .' value="'.(strlen($cTmpTime)==4?'0'.$cTmpTime:$cTmpTime).'">'.$cTmpTime.'</option>';	
-							$cTmpTime=$timeIND.':15';
-							echo '<option '. ($veranstaltung['start_zeit']==$cTmpTime || $veranstaltung['start_zeit']=='0'.$cTmpTime?'selected="selected"':'') .' value="'.(strlen($cTmpTime)==4?'0'.$cTmpTime:$cTmpTime).'">'.$cTmpTime.'</option>';	
-							$cTmpTime=$timeIND.':30';
-							echo '<option '. ($veranstaltung['start_zeit']==$cTmpTime || $veranstaltung['start_zeit']=='0'.$cTmpTime?'selected="selected"':'') .' value="'.(strlen($cTmpTime)==4?'0'.$cTmpTime:$cTmpTime).'">'.$cTmpTime.'</option>';	
-							$cTmpTime=$timeIND.':45';
-							echo '<option '. ($veranstaltung['start_zeit']==$cTmpTime || $veranstaltung['start_zeit']=='0'.$cTmpTime?'selected="selected"':'') .' value="'.(strlen($cTmpTime)==4?'0'.$cTmpTime:$cTmpTime).'">'.$cTmpTime.'</option>';	
-						}	
-						?>	
+							for($j=0; $j <60; $j+=15)
+							{
+								$tmpTime = $i.":".(strlen($j)<2?'0'.$j:$j);
+								echo '<option '. ($veranstaltung['start_zeit']==$tmpTime || $veranstaltung['start_zeit']=='0'.$tmpTime?'selected="selected"':'') .' value="'.(strlen($tmpTime)==4?'0'.$tmpTime:$tmpTime).'">'.$tmpTime.'</option>';
+							}
+						}
+						?>
 						</select>
-					</td>	
-				</tr>				
+					</td>
+				</tr>
 
 
 				<tr>
@@ -470,19 +469,17 @@
 						<?php
 						$veranstaltung['ende_zeit']=date("H:i",$veranstaltung['ende_timestamp']);
 						$veranstaltung['ende_zeit']=trim($veranstaltung['ende_zeit']);
-						for ($timeIND=0;$timeIND<24;$timeIND++)
+
+						for ($i=0;$i<24;$i++)
 						{
-							$cTmpTime=$timeIND.':00';
-							echo '<option '. ($veranstaltung['ende_zeit']==$cTmpTime || $veranstaltung['ende_zeit']=='0'.$cTmpTime?'selected="selected"':'') .' value="'.(strlen($cTmpTime)==4?'0'.$cTmpTime:$cTmpTime).'">'.$cTmpTime.'</option>';	
-							$cTmpTime=$timeIND.':15';
-							echo '<option '. ($veranstaltung['ende_zeit']==$cTmpTime || $veranstaltung['ende_zeit']=='0'.$cTmpTime?'selected="selected"':'') .' value="'.(strlen($cTmpTime)==4?'0'.$cTmpTime:$cTmpTime).'">'.$cTmpTime.'</option>';	
-							$cTmpTime=$timeIND.':30';
-							echo '<option '. ($veranstaltung['ende_zeit']==$cTmpTime || $veranstaltung['ende_zeit']=='0'.$cTmpTime?'selected="selected"':'') .' value="'.(strlen($cTmpTime)==4?'0'.$cTmpTime:$cTmpTime).'">'.$cTmpTime.'</option>';	
-							$cTmpTime=$timeIND.':45';
-							echo '<option '. ($veranstaltung['ende_zeit']==$cTmpTime || $veranstaltung['ende_zeit']=='0'.$cTmpTime?'selected="selected"':'') .' value="'.(strlen($cTmpTime)==4?'0'.$cTmpTime:$cTmpTime).'">'.$cTmpTime.'</option>';	
-						}	
-						?>	
-						</select> 
+							for($j=0; $j <60; $j+=15)
+							{
+								$tmpTime = $i.":".(strlen($j)<2?'0'.$j:$j);
+								echo '<option '. ($veranstaltung['ende_zeit']==$tmpTime || $veranstaltung['ende_zeit']=='0'.$tmpTime?'selected="selected"':'') .' value="'.(strlen($tmpTime)==4?'0'.$tmpTime:$tmpTime).'">'.$tmpTime.'</option>';
+							}
+						}
+						?>
+						</select>
 					 &nbsp;<?php echo $p->t("eventkalender/ganztaegigeVeranstaltung")?>
 					 &nbsp;<input  <?php echo ( ($veranstaltung['start_zeit']=='00:00' && $veranstaltung['ende_zeit']=='23:45')?' checked="checked" ':'' );   ?> type="checkbox"  value="1" onclick="if (this.checked!=false) {window.document.selVeranstaltung.Zeit1.options.selectedIndex=0;window.document.selVeranstaltung.Zeit2.options.selectedIndex=(window.document.selVeranstaltung.Zeit2.options.length - 1); }; var time_stamp=TimestampDatumZeit(window.document.selVeranstaltung.Datum1.value,window.document.selVeranstaltung.Zeit1.value);  if (time_stamp) {window.document.selVeranstaltung.start.value=time_stamp; }; time_stamp=TimestampDatumZeit(window.document.selVeranstaltung.Datum2.value,window.document.selVeranstaltung.Zeit2.value);  if (time_stamp) {window.document.selVeranstaltung.ende.value=time_stamp; };" name="tmpGanztag" >
 					</td>	
@@ -563,6 +560,6 @@
 	{
 		echo '<hr><span class="footer_zeile">'.$p->t("eventkalender/reservierungenKoennenErstNachDemSpeichernZugeordnetWerden").'.</span>';
 	}
-	?>	
+	?>
 </body>
 </html>	
