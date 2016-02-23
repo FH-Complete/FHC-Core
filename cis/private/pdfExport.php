@@ -34,6 +34,7 @@ require_once('../../include/konto.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/vorlage.class.php');
 require_once('../../include/addon.class.php');
+require_once('../../include/studiengang.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -92,10 +93,35 @@ if(isset($_GET['typ']))
 	$params.='&typ='.$_GET['typ'];
 if(isset($_GET['all']))
     $params.='&all=1';
-if(isset($_GET['output']))
-	$output=$_GET['output'];
+
+//OE fuer Output ermitteln
+
+if ($xsl_oe_kurzbz!='')
+{
+	$oe_kurzbz = $xsl_oe_kurzbz;
+}
 else
-	$output='pdf';
+{
+	if($xsl_stg_kz=='')
+		$xsl_stg_kz='0';
+	$oe = new studiengang();
+	$oe->load($xsl_stg_kz);
+	$oe_kurzbz = $oe->oe_kurzbz;
+}
+
+//Darf der User Dokumente in einem NICHT-PDF-Format exportieren?
+if (isset($_GET['output']) && $_GET['output']!='pdf')
+{
+	if (!$rechte->isBerechtigt('system/change_outputformat',$oe_kurzbz))
+	{
+		$output = 'pdf';
+	}
+	else
+		$output = $_GET['output'];
+}
+else 
+	$output = 'pdf';
+
 
 $konto = new konto();
 if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
