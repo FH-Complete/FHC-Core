@@ -43,10 +43,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<style:paragraph-properties fo:line-height="122%" fo:text-align="center" style:justify-single-word="false"/>
 			<style:text-properties style:font-name="Arial" fo:font-size="16pt" officeooo:rsid="0006c6a3" officeooo:paragraph-rsid="0006c6a3" style:font-size-asian="16pt" style:font-size-complex="16pt"/>
 		</style:style>
-		<style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard">
-			<style:paragraph-properties fo:line-height="122%" fo:text-align="center" style:justify-single-word="false"/>
-			<style:text-properties style:font-name="Arial" fo:color="#ff3333" fo:font-weight="bold" fo:font-size="16pt" officeooo:rsid="0006c6a3" officeooo:paragraph-rsid="0006c6a3" style:font-size-asian="16pt" style:font-size-complex="16pt"/>
-		</style:style>
 		<style:style style:name="Seitenumbruch" style:family="paragraph" style:parent-style-name="Standard">
 			<style:paragraph-properties fo:break-before="page" fo:line-height="122%" fo:text-align="center" style:justify-single-word="false"/>
 			<style:paragraph-properties fo:line-height="122%" fo:text-align="center" style:justify-single-word="false"/>
@@ -68,16 +64,18 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
+			
 			<text:p text:style-name="Seitenumbruch">Diploma</text:p>
 				<!-- Ueberprueft ob benoetigte Datenfelder leer sind -->
-				<xsl:if test="staatsbuergerschaft = ''"><text:p text:style-name="P4">Staatsbürgerschaft nicht angegeben</text:p></xsl:if>
-				<xsl:if test="datum = ''"><text:p text:style-name="P4">Datum der Abschlussprüfung nicht gesetzt</text:p></xsl:if>
+				<xsl:if test="staatsbuergerschaft_engl = ''"><text:p text:style-name="P4">Staatsbürgerschaft nicht angegeben</text:p></xsl:if>
+				
 				<xsl:if test="titel = ''"><text:p text:style-name="P4">Kein akademischer Grad ausgewählt</text:p></xsl:if>
 				<xsl:if test="sponsion = ''"><text:p text:style-name="P4">Sponsionsdatum nicht gesetzt</text:p></xsl:if>
+			
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">Pursuant to section 6 subsection 1 of the Universities of Applied Sciences Studies Act</text:p>
+			<text:p text:style-name="P1">Pursuant to paragraph 10 section 3 subsection 9 of the Universities of Applied Sciences Studies Act</text:p>
 			<text:p text:style-name="P1">(Austrian legal reference: Fachhochschul-Studiengesetz - FHStG, BGBl. Nr. <xsl:value-of select="bescheidbgbl1" /> idgF,</text:p>
 			<text:p text:style-name="P1">the University of Applied Sciences Council (Fachhochschulkollegium) awards</text:p>
 			<text:p text:style-name="P1"/>
@@ -89,19 +87,15 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<xsl:text>, </xsl:text>
 			</xsl:if>
 			<xsl:value-of select="geburtsnation_engl" />, citizen of <xsl:value-of select="staatsbuergerschaft_engl" />,</text:p>
-			<text:p text:style-name="P1">student of the university of applied sciences <xsl:value-of select="stg_art_engl" />'s degree program</text:p>
+			<text:p text:style-name="P1">that passed the Certificate Program for Further Education subjected to § 9 FHStG</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="stg_bezeichnung_engl" /></text:p>
-			<text:p text:style-name="P1">(program classification number <xsl:value-of select="studiengang_kz" />)</text:p>
+			<text:p text:style-name="P1">(program number <xsl:value-of select="studiengang_kz" />)</text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">after successfully passing the diploma examination on <xsl:value-of select="datum" /></text:p>
-			<text:p text:style-name="P1">at the University of Applied Sciences Technikum Wien (Fachhochschule Technikum Wien)</text:p>
-			<text:p text:style-name="P1">in accordance with the directive of the Agency for Quality Assurance and Accreditation Austria</text:p>
-			<text:p text:style-name="P1">dated 9.5.2012 the academic degree</text:p>
+			<text:p text:style-name="P1">at the University of Applied Sciences Technikum Wien</text:p>
+			<text:p text:style-name="P1">the academic degree</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="titel" /></text:p>
-			<text:p text:style-name="P1">abbreviated</text:p>
-			<text:p text:style-name="P3"><xsl:value-of select="akadgrad_kurzbz" /></text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1">Vienna, <xsl:value-of select="sponsion" /></text:p>
 			<text:p text:style-name="P1"/>
