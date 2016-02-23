@@ -1960,7 +1960,7 @@ class lehrveranstaltung extends basis_db
          * @param string $studiensemester_kurzbz Kurzbezeichnung des Studiensemesters
          * @return boolean|array false, wenn eine Fehler auftritt; Array mit UIDs wenn erfolgreich
          */
-        public function getStudentsOfLv($lehrveranstaltung_id, $studiensemester_kurzbz=null)
+        public function getStudentsOfLv($lehrveranstaltung_id, $studiensemester_kurzbz=null, $lehreinheit_id=null)
         {
             if(!is_numeric($lehrveranstaltung_id))
             {
@@ -1974,6 +1974,10 @@ class lehrveranstaltung extends basis_db
             if(!is_null($studiensemester_kurzbz))
             {
                 $qry .= ' AND studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz);
+            }
+            if(!is_null($lehreinheit_id))
+            {
+            	$qry .= ' AND lehreinheit_id='.$this->db_add_param($lehreinheit_id);
             }
             $qry .= ';';
 
