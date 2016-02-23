@@ -347,16 +347,23 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       </text:sequence-decls>
       <text:h text:style-name="P22" text:outline-level="1" text:is-list-header="true">Ausbildungsvertrag außerordentliches Studium (Besuch einzelner Lehrveranstaltungen eines Studiengangs)</text:h>
       <text:p text:style-name="P2"/>
-      <text:p text:style-name="P4">Dieser Vertrag regelt das Rechtsverhältnis zwischen </text:p>
-      <text:p text:style-name="P4"><text:span text:style-name="T1">dem Verein Fachhochschule Technikum Wien,</text:span> 1060 Wien, Mariahilfer Straße 37-39 (kurz „Erhalter“ genannt) einerseits <text:span text:style-name="T1">und</text:span></text:p>
+      <text:p text:style-name="P4">Dieser Vertrag regelt das Rechtsverhältnis zwischen dem </text:p>
+      <text:p text:style-name="P4"><text:span text:style-name="T1">Verein Fachhochschule Technikum Wien,</text:span> 1060 Wien, Mariahilfer Straße 37-39 (kurz „Erhalter“ genannt) einerseits <text:span text:style-name="T1">und</text:span></text:p>
       <text:p text:style-name="P2"/>
       <text:p text:style-name="P6">Familienname: <text:tab/><xsl:value-of select="nachname"/></text:p>
       <text:p text:style-name="P6">Vorname: <text:tab/><xsl:value-of select="vorname"/></text:p>
-      <text:p text:style-name="P6">Akademische/r Titel: <text:tab/><xsl:value-of select="titelpre"/><xsl:value-of select="titelpost"/></text:p>
+      <text:p text:style-name="P6">Akademische/r Titel: <text:tab/>      
+		<xsl:choose>
+		  <xsl:when test="titelpre!='' or titelpost!=''">
+		    <xsl:value-of select="titelpre"/><xsl:value-of select="titelpost"/>
+		  </xsl:when>
+		  <xsl:otherwise>-</xsl:otherwise>
+	  </xsl:choose>
+	  </text:p>
       <text:p text:style-name="P6">Adresse: <text:tab/><xsl:value-of select="strasse"/>; <xsl:value-of select="plz"/></text:p>
       <text:p text:style-name="P7">Geburtsdatum: <text:tab/><text:database-display text:table-name="" text:table-type="table" text:column-name="Geb.datum"><xsl:value-of select="gebdatum"/></text:database-display></text:p>
       <text:p text:style-name="P1">
-        <text:span text:style-name="T10">Sozialversicherungsnummer:</text:span>
+        <text:span text:style-name="T10"><text:span text:style-name="T10">Sozialversicherungsnummer:</text:span>
         <text:span text:style-name="Footnote_20_Symbol">
           <text:span text:style-name="T10">
             <text:note text:id="ftn1" text:note-class="footnote">
@@ -372,13 +379,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
               </text:note-body>
             </text:note>
           </text:span>
-        </text:span>
-        <text:span text:style-name="T10">
-          <text:tab/>
-        </text:span>
-        <text:span text:style-name="T10">
-          <xsl:value-of select="svnr"/>
-        </text:span>
+        </text:span><text:tab/><xsl:value-of select="svnr"/></text:span>
       </text:p>
       <text:p text:style-name="P7">Personenkennzeichen:<text:tab/><xsl:value-of select="matrikelnr"/></text:p>
       <text:p text:style-name="P11"/>
@@ -389,17 +390,18 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <text:list-item>
           <text:list>
             <text:list-item>
-              <text:p text:style-name="P24">Ausbildungsort</text:p>
+              <text:p text:style-name="P26">Ausbildungsort</text:p>
             </text:list-item>
           </text:list>
         </text:list-item>
       </text:list>
       <text:p text:style-name="P5">Studienort sind die Räumlichkeiten der FH Technikum Wien, 1200 Wien, Höchstädtplatz und 1210 Wien, Giefinggasse. Bei Bedarf kann der Erhalter einen anderen Studienort festlegen.</text:p>
+      <text:p text:style-name="P36"/>
       <text:list xml:id="list932404618" text:continue-numbering="true" text:style-name="WW8Num7">
         <text:list-item>
           <text:list>
             <text:list-item>
-              <text:p text:style-name="P24">Vertragsgrundlage</text:p>
+              <text:p text:style-name="P26">Vertragsgrundlage</text:p>
             </text:list-item>
           </text:list>
         </text:list-item>
@@ -409,7 +411,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <text:list-item>
           <text:list>
             <text:list-item>
-              <text:p text:style-name="P24"><text:bookmark-start text:name="_Ref78860434"/>Ausbildungsdauer<text:bookmark-end text:name="_Ref78860434"/></text:p>
+              <text:p text:style-name="P26">Ausbildungsdauer</text:p>
             </text:list-item>
           </text:list>
         </text:list-item>
@@ -419,13 +421,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <text:list-item>
           <text:list>
             <text:list-item>
-              <text:p text:style-name="P24">Ausbildungsabschluss</text:p>
+              <text:p text:style-name="P26">Ausbildungsabschluss</text:p>
             </text:list-item>
           </text:list>
         </text:list-item>
       </text:list>
-      <text:p text:style-name="P5">Das außerordentliche Studium endet mit der positiven Absolvierung der in den jeweiligen Lehrveranstaltungen vorgesehenen Leistungsanforderungen. Nach dem positiven Abschluss wird der für die jeweilige Lehrveranstaltung vorgesehene Leistungsnachweis ausgestellt.</text:p>
-      <text:p text:style-name="P5"/>
+      <text:p text:style-name="P36">Das außerordentliche Studium endet mit der positiven Absolvierung der in den jeweiligen Lehrveranstaltungen vorgesehenen Leistungsanforderungen. Nach dem positiven Abschluss wird der für die jeweilige Lehrveranstaltung vorgesehene Leistungsnachweis ausgestellt.</text:p>
+      <text:p text:style-name="P36"/>
       <text:list xml:id="list890989597" text:continue-numbering="true" text:style-name="WW8Num7">
         <text:list-item>
           <text:list>
@@ -589,7 +591,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P5">Sollten einzelne Bestimmungen dieses Vertrages unwirksam oder nichtig sein oder werden, so berührt dies die Gültigkeit der übrigen Bestimmungen dieses Vertrages nicht.</text:p>
       <text:p text:style-name="P5">Die Vertragsparteien verpflichten sich, unwirksame oder nichtige Bestimmungen durch neue Bestimmungen zu ersetzen, die dem in den unwirksamen oder nichtigen Bestimmungen enthaltenen Regelungsgehalt in rechtlich zulässiger Weise gerecht werden. Zur Ausfüllung einer allfälligen Lücke verpflichten sich die Vertragsparteien, auf die Etablierung angemessener Regelungen in diesem Vertrag hinzuwirken, die dem am nächsten kommen, was sie nach dem Sinn und Zweck des Vertrages bestimmt hätten, wenn der Punkt von ihnen bedacht worden wäre.</text:p>
       <text:p text:style-name="P5"/>
-	<text:p text:style-name="P5"/>
       <text:list xml:id="list118967672" text:continue-list="list866389060" text:style-name="WW8Num7">
         <text:list-item>
           <text:list>
