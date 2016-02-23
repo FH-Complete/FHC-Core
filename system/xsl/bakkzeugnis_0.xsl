@@ -333,7 +333,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<table:table-column table:style-name="Tabelle1.B"/>
 				<table:table-row table:style-name="Tabelle1.1">
 					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-						<text:p text:style-name="P21">Gesamtnote der Bachelor-Prüfung:</text:p>
+						<text:p text:style-name="P21">Gesamtnote der Bachelor-Prüfung</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
 						<text:p text:style-name="P20">
@@ -343,7 +343,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				</table:table-row>
 				<table:table-row table:style-name="Tabelle1.1">
 					<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-						<text:p text:style-name="P24">Datum der kommissionellen Prüfung:</text:p>
+						<text:p text:style-name="P24">Datum der kommissionellen Prüfung</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
 						<text:p text:style-name="P23"><xsl:value-of select="datum" /></text:p>

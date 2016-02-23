@@ -348,7 +348,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<table:table-column table:style-name="Tabelle1.B"/>
 				<table:table-row table:style-name="Tabelle1.1">
 					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-						<text:p text:style-name="P21">Final assessment:</text:p>
+						<text:p text:style-name="P21">Final assessment</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
 						<text:p text:style-name="P20">
@@ -358,7 +358,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				</table:table-row>
 				<table:table-row table:style-name="Tabelle1.1">
 					<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-						<text:p text:style-name="P24">Part 1:</text:p>
+						<text:p text:style-name="P24">Part 1</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
 						<text:p text:style-name="P23">Master Thesis</text:p>
@@ -366,7 +366,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				</table:table-row>
 				<table:table-row table:style-name="Tabelle1.1">
 					<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-						<text:p text:style-name="P24">Title of Master Thesis:</text:p>
+						<text:p text:style-name="P24">Title of Master Thesis</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
 						<text:p text:style-name="P23"><xsl:value-of select="themenbereich" /></text:p>
@@ -374,7 +374,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				</table:table-row>
 				<table:table-row table:style-name="Tabelle1.1">
 					<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-						<text:p text:style-name="P24">Part 2:</text:p>
+						<text:p text:style-name="P24">Part 2</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
 						<text:p text:style-name="P23">Final examination</text:p>
@@ -382,7 +382,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				</table:table-row>
 				<table:table-row table:style-name="Tabelle1.1">
 					<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-						<text:p text:style-name="P24">Date of assessment:</text:p>
+						<text:p text:style-name="P24">Date of assessment</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
 						<text:p text:style-name="P23"><xsl:value-of select="datum" /></text:p>
