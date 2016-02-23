@@ -361,19 +361,16 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P32"/>
 			<text:p text:style-name="P32"><xsl:value-of select="mitarbeiter/name_gesamt" /></text:p>
 			<text:p text:style-name="P32"><xsl:value-of select="mitarbeiter/anschrift" /></text:p>
-			<text:p text:style-name="P32"><xsl:value-of select="mitarbeiter/plz" /><xsl:text> </xsl:text><xsl:value-of select="mitarbeiter/ort" /></text:p>
+			<text:p text:style-name="P32"><xsl:value-of select="mitarbeiter/plz" /> <xsl:value-of select="mitarbeiter/ort" /></text:p>
 			<xsl:if test="string-length(mitarbeiter/zuhanden)!=0">
 				<text:p text:style-name="P32"><xsl:value-of select="mitarbeiter/zuhanden" /></text:p>
 			</xsl:if>
 			<text:p text:style-name="P33"/>
-			<text:p text:style-name="P34">Abs.: <text:s/>Fachhochschule Technikum Wien, Höchstädtplatz 6, 1200 Wien </text:p>
+			<text:p text:style-name="P34">Abs.: <text:s/>Technikum Wien GmbH, Höchstädtplatz 6, 1200 Wien </text:p>
 			<text:p text:style-name="P33"/>
 			<text:p text:style-name="P17"/>
 			<text:p text:style-name="P17"/>
-			<text:p text:style-name="P25">Lehrauftrag 
-				<xsl:if test="studiengang_typ!=''">
-					<xsl:value-of select="studiengang_typ" />-Studiengang <xsl:value-of select="studiengang_bezeichnung" /><xsl:text> </xsl:text>
-				</xsl:if>
+			<text:p text:style-name="P25">Lehrauftrag Lehrgang <xsl:value-of select="studiengang_bezeichnung" /><xsl:text> </xsl:text>
 			<xsl:value-of select="studiensemester_kurzbz" /></text:p>
 			<text:p text:style-name="P19"/>
 			<text:p text:style-name="P21"><xsl:value-of select="mitarbeiter/name_gesamt" /></text:p>
@@ -474,7 +471,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle2.B1" office:value-type="string">
 						<text:p text:style-name="P8"><xsl:value-of select="studiengangsleiter" /></text:p>
-						<text:p text:style-name="P7">Studiengangsleitung</text:p>
+						<text:p text:style-name="P7">Lehrgangsleitung</text:p>
 					</table:table-cell>
 				</table:table-row>
 			</table:table>

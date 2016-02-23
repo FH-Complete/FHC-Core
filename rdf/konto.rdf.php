@@ -42,7 +42,7 @@ if(isset($_SERVER['REMOTE_USER']))
 	$user=get_uid();
 	$berechtigung = new benutzerberechtigung();
 	$berechtigung->getBerechtigungen($user);
-	if(!$berechtigung->isBerechtigt('admin'))
+	if(!$berechtigung->isBerechtigt('student/stammdaten'))
 		die('Sie haben keine Berechtigung fuer diese Seite');
 }
 
