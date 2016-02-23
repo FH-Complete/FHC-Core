@@ -764,6 +764,17 @@ else
 			if(count($lv->lehrveranstaltungen)>0)
 			{
 				$lv_studiengang_kz=$lv->lehrveranstaltungen[0]->studiengang_kz;
+				//Wenn die LV an der ersten Stelle ein Freifach (Stg 0) ist, nimm die naechste sofern eine vorhanden
+				if($lv_studiengang_kz==0)
+				{
+					for ($i = 0; $i < count($lv->lehrveranstaltungen); $i++)
+					{
+						$lv_studiengang_kz=$lv->lehrveranstaltungen[$i]->studiengang_kz;
+						if ($lv_studiengang_kz!=0)
+							break;
+					}
+				}
+				
 				$lv_studiengang=new studiengang();
 				$lv_studiengang->load($lv_studiengang_kz);
 				$lv_studiengang_bezeichnung=$lv_studiengang->bezeichnung;
@@ -780,8 +791,8 @@ else
 								break;
 				}
 			}
-			$prestudent = new prestudent($student->prestudent_id);
-			$prestudent->getLastStatus($row->prestudent_id);
+			$prestudent = new prestudent();
+			$prestudent->getLastStatus($student->prestudent_id);
 
 			$orgform_bezeichnung = new organisationsform();
 			$orgform_bezeichnung->load($studiengang->orgform_kurzbz);
