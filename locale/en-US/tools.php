@@ -3,7 +3,7 @@
 //Dokumente
 $this->phrasen['tools/dokumente']='Documents';
 $this->phrasen['tools/inskriptionsbestaetigung']='Enrollment Confirmation';
-$this->phrasen['tools/studienbeitragFuerSSBezahltAmDatum']='tuition fee for semester %1$s paid at %2$s';
+$this->phrasen['tools/studienbeitragFuerSSBezahlt']='tuition fee for semester %1$s paid';
 $this->phrasen['tools/studienbeitragFuerSSNochNichtBezahlt']='tuition fee for semester %1$s not yet paid';
 $this->phrasen['tools/studienerfolgsbestaetigung']='Student progress report';
 $this->phrasen['tools/studiensemesterAuswaehlen']='Please select the corresponding semester';

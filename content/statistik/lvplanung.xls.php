@@ -114,7 +114,7 @@ FROM
 	JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
 	JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
 	JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
-	JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz)
+	LEFT JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz)
 WHERE 
 	tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);	
 

@@ -105,6 +105,10 @@ $student_uid = filter_input(INPUT_GET,'student_uid');
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/termine/rdf#anwesend" onclick="termineTreeSort()"/>
 					<splitter class="tree-splitter"/>
+                    <treecol id="termine-treecol-titel" label="Titel" flex="1" hidden="false"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/termine/rdf#titel" onclick="termineTreeSort()"/>
+					<splitter class="tree-splitter"/>
 					<treecol id="termine-treecol-datum_iso" label="DatumISO" flex="1" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/termine/rdf#datum_iso" onclick="termineTreeSort()"/>
@@ -131,6 +135,7 @@ $student_uid = filter_input(INPUT_GET,'student_uid');
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#lektor" />
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#lehrfach" />
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#anwesend" />
+                                    <treecell label="rdf:http://www.technikum-wien.at/termine/rdf#titel" />
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#datum_iso" />
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#lehreinheit_id" />
 								</treerow>

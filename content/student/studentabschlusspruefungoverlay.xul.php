@@ -34,7 +34,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
-	
+
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/student/studentabschlusspruefung.js.php" />
 
 <!-- Abschlusspruefung DETAILS -->
@@ -94,6 +94,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#datum_iso" onclick="StudentAbschlusspruefungTreeSort()"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="student-abschlusspruefung-treecol-uhrzeit" label="Uhrzeit" flex="1" persist="hidden, width" hidden="false"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#uhrzeit" onclick="StudentAbschlusspruefungTreeSort()"/>
+				<splitter class="tree-splitter"/>
 				<treecol id="student-abschlusspruefung-treecol-sponsion" label="Sponsion" flex="1" persist="hidden, width" hidden="false"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#sponsion_iso" onclick="StudentAbschlusspruefungTreeSort()"/>
@@ -105,35 +109,36 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<treecol id="student-abschlusspruefung-treecol-abschlusspruefung_id" label="Abschlusspruefung_id" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlusspruefung_id" onclick="StudentAbschlusspruefungTreeSort()"/>
-				<splitter class="tree-splitter"/>				
+				<splitter class="tree-splitter"/>
 				<treecol id="student-abschlusspruefung-treecol-pruefungstyp_kurzbz" label="Typ" flex="1" persist="hidden, width"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefungstyp_kurzbz" onclick="StudentAbschlusspruefungTreeSort()" hidden="true" ignoreincolumnpicker="true"/><!-- Spalte ist im columnpicker nicht auswählbar, wird aber im Hintergrund für die Erstellung der Diplomurkunde benötigt -->
-				<splitter class="tree-splitter"/>				
+				<splitter class="tree-splitter"/>
 				<treecol id="student-abschlusspruefung-treecol-beschreibung" label="Typ" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#beschreibung" onclick="StudentAbschlusspruefungTreeSort()"/>
 				<splitter class="tree-splitter"/>
 			</treecols>
-	
+
 			<template>
 				<rule>
 						<treechildren>
 							<treeitem uri="rdf:*">
-	 						<treerow>
-	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#student_uid" />
-	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#vorsitz_nachname" />
-	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer1_nachname" />
-	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer2_nachname" />
-	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer3_nachname" />
-	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlussbeurteilung_kurzbz" />
-	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#datum" />
-	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#sponsion" />
-	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#anmerkung" />
-	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlusspruefung_id" />
-	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefungstyp_kurzbz"/>
-	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#beschreibung"/>
-	 						</treerow>
+								<treerow>
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#student_uid" />
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#vorsitz_nachname" />
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer1_nachname" />
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer2_nachname" />
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer3_nachname" />
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlussbeurteilung_kurzbz" />
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#datum" />
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#uhrzeit" />
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#sponsion" />
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#anmerkung" />
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlusspruefung_id" />
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefungstyp_kurzbz"/>
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#beschreibung"/>
+								</treerow>
 							</treeitem>
 						</treechildren>
 					</rule>
@@ -149,53 +154,53 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <groupbox>
 	<caption label="Details" />
 	<grid align="end" flex="1"
-		  flags="dont-build-content"
-		  enableColumnDrag="true"
+			flags="dont-build-content"
+			enableColumnDrag="true"
 	>
 		<columns  >
-    		<column flex="1"/>
-    		<column flex="5"/>
-    		<column flex="1"/>
-    		<column flex="5"/>
-    	</columns>
-  		<rows>
-  			<row>
-  				<label value="Typ" control="student-abschlusspruefung-menulist-typ" />
-    			<menulist id="student-abschlusspruefung-menulist-typ"
+				<column flex="1"/>
+				<column flex="5"/>
+				<column flex="1"/>
+				<column flex="5"/>
+			</columns>
+			<rows>
+				<row>
+					<label value="Typ" control="student-abschlusspruefung-menulist-typ" />
+					<menulist id="student-abschlusspruefung-menulist-typ"
 						  disabled="true"
 				          datasources="<?php echo APP_ROOT; ?>rdf/pruefungstyp.rdf.php?abschluss=true" flex="1"
-				          ref="http://www.technikum-wien.at/pruefungstyp/liste" 
+				          ref="http://www.technikum-wien.at/pruefungstyp/liste"
 				          oncommand="StudentAbschlusspruefungTypChange()"
 				>
 					<template>
 						<menupopup>
 							<menuitem value="rdf:http://www.technikum-wien.at/pruefungstyp/rdf#pruefungstyp_kurzbz"
-				        		      label="rdf:http://www.technikum-wien.at/pruefungstyp/rdf#beschreibung"
-							  		  uri="rdf:*"/>
+								label="rdf:http://www.technikum-wien.at/pruefungstyp/rdf#beschreibung"
+								uri="rdf:*"/>
 						</menupopup>
 					</template>
 				</menulist>
 				<label value="Note komm. Pruefung" control="student-abschlusspruefung-menulist-notekommpruef" />
-    			<menulist id="student-abschlusspruefung-menulist-notekommpruef"
-						  disabled="true"
-				          datasources="<?php echo APP_ROOT;?>rdf/note.rdf.php?optional=true" flex="1"
-				          ref="http://www.technikum-wien.at/note/liste" 
+					<menulist id="student-abschlusspruefung-menulist-notekommpruef"
+						disabled="true"
+						datasources="<?php echo APP_ROOT;?>rdf/note.rdf.php?optional=true" flex="1"
+						ref="http://www.technikum-wien.at/note/liste"
 					>
 					<template>
 						<menupopup>
 							<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
-				        		      label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
-							  		  uri="rdf:*"/>
+								label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+								uri="rdf:*"/>
 						</menupopup>
 					</template>
 				</menulist>
-  			</row>
-    		<row>
-    			<label value="Vorsitz" control="student-abschlusspruefung-menulist-vorsitz" />
-    			<menulist id="student-abschlusspruefung-menulist-vorsitz"
+				</row>
+				<row>
+					<label value="Vorsitz" control="student-abschlusspruefung-menulist-vorsitz" />
+					<menulist id="student-abschlusspruefung-menulist-vorsitz"
 						  editable="true" disabled="true"
 				          datasources="rdf:null" flex="1"
-				          ref="http://www.technikum-wien.at/mitarbeiter/liste" 
+				          ref="http://www.technikum-wien.at/mitarbeiter/liste"
 				          oninput="StudentAbschlusspruefungMenulistMitarbeiterLoad(this)">
 					<template>
 						<menupopup>
@@ -207,105 +212,118 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</template>
 				</menulist>
 				<label value="Pruefer 1" id="student-abschlusspruefung-label-pruefer1" control="student-abschlusspruefung-menulist-pruefer1" />
-    			<menulist id="student-abschlusspruefung-menulist-pruefer1"
-						  editable="true" disabled="true"
-				          datasources="rdf:null" flex="1"
-				          ref="http://www.technikum-wien.at/person/liste" 
-				          oninput="StudentAbschlusspruefungMenulistPersonLoad(this)">
+					<menulist id="student-abschlusspruefung-menulist-pruefer1"
+						editable="true" disabled="true"
+						datasources="rdf:null" flex="1"
+						ref="http://www.technikum-wien.at/person/liste"
+						oninput="StudentAbschlusspruefungMenulistPersonLoad(this)">
 					<template>
 						<menupopup>
 							<menuitem value="rdf:http://www.technikum-wien.at/person/rdf#person_id"
-				        		      label="rdf:http://www.technikum-wien.at/person/rdf#anzeigename"
-							  		  uri="rdf:*"/>
+								label="rdf:http://www.technikum-wien.at/person/rdf#anzeigename"
+								uri="rdf:*"/>
 						</menupopup>
 					</template>
 				</menulist>
-    		</row>
-    		<row>
-    			<label value="Abschlussbeurteilung" control="student-abschlusspruefung-menulist-abschlussbeurteilung" />
-    			<menulist id="student-abschlusspruefung-menulist-abschlussbeurteilung"
-						  disabled="true"
-				          datasources="<?php echo APP_ROOT;?>rdf/abschlussbeurteilung.rdf.php?optional=true" flex="1"
-				          ref="http://www.technikum-wien.at/abschlussbeurteilung/liste" 
-				>
-					<template>
-						<menupopup>
-							<menuitem value="rdf:http://www.technikum-wien.at/abschlussbeurteilung/rdf#abschlussbeurteilung_kurzbz"
-				        		      label="rdf:http://www.technikum-wien.at/abschlussbeurteilung/rdf#bezeichnung"
-							  		  uri="rdf:*"/>
-						</menupopup>
-					</template>
-				</menulist>
+				</row>
+				<row>
+					<label value="Abschlussbeurteilung" control="student-abschlusspruefung-menulist-abschlussbeurteilung" />
+					<menulist id="student-abschlusspruefung-menulist-abschlussbeurteilung"
+						disabled="true"
+						datasources="<?php echo APP_ROOT;?>rdf/abschlussbeurteilung.rdf.php?optional=true" flex="1"
+						ref="http://www.technikum-wien.at/abschlussbeurteilung/liste"
+					>
+						<template>
+							<menupopup>
+								<menuitem value="rdf:http://www.technikum-wien.at/abschlussbeurteilung/rdf#abschlussbeurteilung_kurzbz"
+									label="rdf:http://www.technikum-wien.at/abschlussbeurteilung/rdf#bezeichnung"
+									uri="rdf:*"/>
+							</menupopup>
+						</template>
+					</menulist>
 				<label value="Pruefer 2" id="student-abschlusspruefung-label-pruefer2" control="student-abschlusspruefung-menulist-pruefer2" />
-    			<menulist id="student-abschlusspruefung-menulist-pruefer2"
-						  editable="true" disabled="true"
-				          datasources="rdf:null" flex="1"
-				          ref="http://www.technikum-wien.at/person/liste" 
-				          oninput="StudentAbschlusspruefungMenulistPersonLoad(this)">
+					<menulist id="student-abschlusspruefung-menulist-pruefer2"
+						editable="true" disabled="true"
+						datasources="rdf:null" flex="1"
+						ref="http://www.technikum-wien.at/person/liste"
+						oninput="StudentAbschlusspruefungMenulistPersonLoad(this)">
 					<template>
 						<menupopup>
 							<menuitem value="rdf:http://www.technikum-wien.at/person/rdf#person_id"
-				        		      label="rdf:http://www.technikum-wien.at/person/rdf#anzeigename"
-							  		  uri="rdf:*"/>
+								label="rdf:http://www.technikum-wien.at/person/rdf#anzeigename"
+								uri="rdf:*"/>
 							</menupopup>
 					</template>
 				</menulist>
-    		</row>
-    		<row>
-    			<label value="Akademischer Grad" control="student-abschlusspruefung-menulist-akadgrad" />
-    			<menulist id="student-abschlusspruefung-menulist-akadgrad"
-						  disabled="true"
-				          datasources="rdf:null" flex="1"
-				          ref="http://www.technikum-wien.at/akadgrad/liste" 
+				</row>
+				<row>
+					<label value="Akademischer Grad" control="student-abschlusspruefung-menulist-akadgrad" />
+					<menulist id="student-abschlusspruefung-menulist-akadgrad"
+						disabled="true"
+						datasources="rdf:null" flex="1"
+						ref="http://www.technikum-wien.at/akadgrad/liste"
 				>
 					<template>
 						<menupopup>
 							<menuitem value="rdf:http://www.technikum-wien.at/akadgrad/rdf#akadgrad_id"
-				        		      label="rdf:http://www.technikum-wien.at/akadgrad/rdf#titel"
-							  		  uri="rdf:*"/>
+								label="rdf:http://www.technikum-wien.at/akadgrad/rdf#titel"
+								uri="rdf:*"/>
 							</menupopup>
 					</template>
 				</menulist>
 				<label value="Pruefer 3" id="student-abschlusspruefung-label-pruefer3" control="student-abschlusspruefung-menulist-pruefer3" />
-    			<menulist id="student-abschlusspruefung-menulist-pruefer3"
-						  editable="true" disabled="true"
-				          datasources="rdf:null" flex="1"
-				          ref="http://www.technikum-wien.at/person/liste" 
-				          oninput="StudentAbschlusspruefungMenulistPersonLoad(this)">
+				<menulist id="student-abschlusspruefung-menulist-pruefer3"
+					editable="true" disabled="true"
+					datasources="rdf:null" flex="1"
+					ref="http://www.technikum-wien.at/person/liste"
+					oninput="StudentAbschlusspruefungMenulistPersonLoad(this)">
 					<template>
 						<menupopup>
 							<menuitem value="rdf:http://www.technikum-wien.at/person/rdf#person_id"
-				        		      label="rdf:http://www.technikum-wien.at/person/rdf#anzeigename"
-							  		  uri="rdf:*"/>
+								label="rdf:http://www.technikum-wien.at/person/rdf#anzeigename"
+								uri="rdf:*"/>
 							</menupopup>
 					</template>
 				</menulist>
-    		</row>
-    		<row>
-    			<vbox>
-    				<label value="Datum" control="student-abschlusspruefung-datum-datum" />
-    				<label id="student-abschlusspruefung-datum-sponsion-label" value="Sponsion" control="student-abschlusspruefung-datum-sponsion" />
-    			</vbox>
-    			<vbox>
-					<box class="Datum" id="student-abschlusspruefung-datum-datum"  disabled="true"/>
-    				<box class="Datum" id="student-abschlusspruefung-datum-sponsion"  disabled="true"/>
-    			</vbox>    		
-		    	
-		    	<label value="Anmerkung" control="student-abschlusspruefung-textbox-anmerkung" />
-    			<textbox id="student-abschlusspruefung-textbox-anmerkung" multiline="true" maxlength="256" disabled="true"/>
-    		</row>
-    	    		
-    		<row>
-    			<spacer />
-    			<spacer />
-    			<spacer />
-    			<hbox>
-    				<spacer flex="1" />
-    				<button id="student-abschlusspruefung-button-speichern" label="Speichern" oncommand="StudentAbschlusspruefungSpeichern()" disabled="true"/>
-    			</hbox>
-    		</row>
-    	</rows>
-    </grid>		
+				</row>
+				<row>
+					<vbox>
+						<label value="Datum" control="student-abschlusspruefung-datum-datum" />
+					</vbox>
+					<vbox>
+						<box class="Datum" id="student-abschlusspruefung-datum-datum" disabled="true"/>
+					</vbox>
+				</row>
+				<row>
+					<vbox>
+						<label value="Uhrzeit" control="student-abschlusspruefung-datum-uhrzeit" />
+					</vbox>
+					<vbox>
+						<timepicker id="student-abschlusspruefung-datum-uhrzeit" hideseconds="true" disabled="true"/>
+					</vbox>
+					<label value="Anmerkung" control="student-abschlusspruefung-textbox-anmerkung" />
+					<textbox id="student-abschlusspruefung-textbox-anmerkung" multiline="true" maxlength="256" disabled="true"/>
+				</row>
+				<row>
+					<vbox>
+						<label id="student-abschlusspruefung-datum-sponsion-label" value="Sponsion" control="student-abschlusspruefung-datum-sponsion" />
+					</vbox>
+					<vbox>
+						<box class="Datum" id="student-abschlusspruefung-datum-sponsion" disabled="true"/>
+					</vbox>
+				</row>
+
+				<row>
+					<spacer />
+					<spacer />
+					<spacer />
+					<hbox>
+						<spacer flex="1" />
+						<button id="student-abschlusspruefung-button-speichern" label="Speichern" oncommand="StudentAbschlusspruefungSpeichern()" disabled="true"/>
+					</hbox>
+				</row>
+			</rows>
+		</grid>
 </groupbox>
 
 <spacer flex="1" />

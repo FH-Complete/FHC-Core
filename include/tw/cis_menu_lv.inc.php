@@ -159,6 +159,7 @@ function checkZeilenUmbruch()
 			'name'=>$p->t('lehre/semesterplan'),
 			'icon'=>'../../../skin/images/button_semplan.png',
 			'link'=>$link,
+			'link_target'=>'_blank',
 			'text'=>$text
 		);
 	}

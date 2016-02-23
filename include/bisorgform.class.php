@@ -19,16 +19,16 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class bisorgform extends basis_db 
+class bisorgform extends basis_db
 {
 	public $new;
 	public $result = array();
-	
+
 	//Tabellenspalten
 	public $bisorgform_kurzbz;
 	public $code;
 
-	
+
 	/**
 	 * Konstruktor
 	 * @param code des zu ladenden Datensatzes
@@ -36,11 +36,11 @@ class bisorgform extends basis_db
 	public function __construct($code=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($code))
 			$this->load($code);
 	}
-	
+
 	/**
 	 * Laedt einen Datensatz
 	 * @param code des zu ladenden Datensatzes
@@ -53,25 +53,25 @@ class bisorgform extends basis_db
 			$this->errormsg = 'code muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		//laden des Datensatzes
-		$qry = "SELECT 
-					distinct code,bisorgform_kurzbz 
-				FROM 
+		$qry = "SELECT
+					distinct code,bisorgform_kurzbz
+				FROM
 					bis.tbl_orgform
-				WHERE 
+				WHERE
 					code=".$this->db_add_param($code, FHC_INTEGER);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
 				$this->bisorgform_kurzbz = $row->bisorgform_kurzbz;
 				$this->code = $row->code;
-			
-				return true;		
+
+				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Fehler bei der Datenbankabfrage';
 				return false;
@@ -83,9 +83,9 @@ class bisorgform extends basis_db
 			return false;
 		}
 	}
-			
-	
-	
+
+
+
 	/**
 	 * Laedt alle BIS Orgformen
 	 * @return List mit Orgformen wenn ok, false wenn Fehler
@@ -93,10 +93,10 @@ class bisorgform extends basis_db
 	public function getList()
 	{
 		//laden des Datensatzes
-		$qry = "SELECT 
-					distinct code,bisorgform_kurzbz  
-				FROM 
-					bis.tbl_bisorgfom
+		$qry = "SELECT
+					distinct code,bisorgform_kurzbz
+				FROM
+					bis.tbl_bisorgform
 				ORDER BY code";
 
 		if($this->db_query($qry))
@@ -106,7 +106,7 @@ class bisorgform extends basis_db
 			{
 				$obj = new bisorgform();
 				$obj->bisorgform_kurzbz = $row->bisorgform_kurzbz;
-				$obj->code = $row->code;			
+				$obj->code = $row->code;
 				$this->result[] = $obj;
 			}
 			return $this->result;
@@ -115,7 +115,7 @@ class bisorgform extends basis_db
 		{
 			$this->errormsg = 'Fehler bei der Datenbankabfrage';
 			return false;
-		}			
+		}
 	}
 }
 ?>

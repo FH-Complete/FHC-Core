@@ -38,7 +38,7 @@ if(isset($_GET['stsem']))
 else
 	$stsem = '';
 
-$uid=get_uid();	
+$uid=get_uid();
 
 $student_studiengang = new student();
 $student_studiengang->load($uid);
@@ -114,13 +114,13 @@ echo '
 
 <body>
 <h1>'.$p->t('tools/dokumente').'</h1>';
-	
-	
+
+
 //Aktuelles Studiensemester oder gewaehltes Studiensemester
 $stsem_obj = new studiensemester();
 	if($stsem=='')
 		$stsem = $stsem_obj->getaktorNext();
-	
+
 $stsem_obj->getAll();
 
 echo "<br><hr>";
@@ -133,7 +133,7 @@ echo $p->t('global/studiensemester')."</b> <SELECT name='stsem' onChange=\"MM_ju
 			echo "<OPTION value='dokumente.php?stsem=$semrow->studiensemester_kurzbz'>$semrow->studiensemester_kurzbz</OPTION>";
 	}
 	echo "</SELECT><br />";
-	
+
 $konto = new konto();
 
 $buchungstypen = array();
@@ -142,11 +142,11 @@ if(defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))
     $buchungstypen = unserialize (CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN);
 }
 
-$stsem_zahlung = $konto->getLastStSemBuchungstypen($uid, $buchungstypen);
+$stsem_zahlung = $konto->getLastStSemBuchungstypen($uid, $buchungstypen, $stsem);
 if ($stsem_zahlung != FALSE && $stsem == $stsem_zahlung)
 {
 	echo "<a href='../pdfExport.php?xsl=Inskription&xml=student.rdf.php&ss=".$stsem."&uid=".$uid."&xsl_stg_kz=".$xsl_stg_kz."'>".$p->t('tools/inskriptionsbestaetigung')."</a>";
-	echo ' - '.$p->t('tools/studienbeitragFuerSSBezahltAmDatum',array($stsem, $konto->buchungsdatum));
+	echo ' - '.$p->t('tools/studienbeitragFuerSSBezahlt',array($stsem));
 }
 else
 	echo $p->t('tools/inskriptionsbestaetigung')." - ".$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem));
@@ -158,7 +158,7 @@ if(defined('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN') && CIS_DOKUMENTE_STUDIENBUC
     if ($stsem_zahlung != FALSE && $stsem == $stsem_zahlung)
     {
 	    echo "<a href='../pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&ss=".$stsem."&uid=".$uid."'>".$p->t('tools/studienbuchblatt')."</a>";
-	    echo ' - '.$p->t('tools/studienbeitragFuerSSBezahltAmDatum',array($stsem, $konto->buchungsdatum));
+	    echo ' - '.$p->t('tools/studienbeitragFuerSSBezahlt',array($stsem));
     }
     else
 	    echo $p->t('tools/studienbuchblatt')." - ".$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem));
@@ -173,7 +173,7 @@ if(defined('CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN') && CIS_DOKUMENTE_
 	echo "<hr>";
 }
 echo "<br>";
-	
+
 echo '</body>
 </html>
 ';
