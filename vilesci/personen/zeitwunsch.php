@@ -26,21 +26,20 @@
  *  POST statt GET - ist aber Geschmacksache
  *
  */
-
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/basis_db.class.php');
-include('../../include/functions.inc.php');
-include('../../include/globals.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/globals.inc.php');
 require_once('../../include/datum.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-
 if (isset($_GET['uid']))
 {
 	$uid=$_GET['uid'];
-} 
+}
 else if (isset($_POST['uid']))
 {
 	$uid=$_POST['uid'];
@@ -50,6 +49,12 @@ if (!isset($uid))
 	die( "uid nicht gesetzt");
 }
 $uid_benutzer = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid_benutzer);
+if(!$rechte->isBerechtigt('mitarbeiter'))
+	die($rechte->errormsg);
+
 $datum_obj = new datum();
 $updatevon = 0;
 
@@ -68,20 +73,19 @@ $updatevon = 0;
 				//echo $$var;
 				$gewicht=$_POST[$var];
 				$stunde=$i+1;
-				$query="SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='".addslashes($uid)."' AND stunde='$stunde' AND tag='$t'";
+				$query="SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid=".$db->db_add_param($uid)." AND stunde=".$db->db_add_param($stunde, FHC_INTEGER)." AND tag=".$db->db_add_param($t, FHC_INTEGER);
 				if(! $erg_wunsch=$db->db_query($query))
 					die($db->db_last_error());
 				$num_rows_wunsch=$db->db_num_rows($erg_wunsch);
 				if ($num_rows_wunsch==0)
 				{
-					$query="INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, stunde, tag, gewicht, updateamum, updatevon) VALUES ('$uid', '$stunde', '$t', '$gewicht', now(), '$uid_benutzer')";
+					$query="INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, stunde, tag, gewicht, updateamum, updatevon) VALUES (".$db->db_add_param($uid).", ".$db->db_add_param($stunde).", ".$db->db_add_param($t).", ".$db->db_add_param($gewicht).", now(), ".$db->db_add_param($uid_benutzer).")";
 					if(!($erg=$db->db_query($query)))
 						die($db->db_last_error());
 				}
 				elseif ($num_rows_wunsch==1)
 				{
-					$query="UPDATE campus.tbl_zeitwunsch SET gewicht=$gewicht, updateamum=now(), updatevon='$uid_benutzer' WHERE mitarbeiter_uid='$uid' AND stunde='$stunde' AND tag='$t'";
-					//echo $query;
+					$query="UPDATE campus.tbl_zeitwunsch SET gewicht=".$db->db_add_param($gewicht).", updateamum=now(), updatevon=".$db->db_add_param($uid_benutzer)." WHERE mitarbeiter_uid=".$db->db_add_param($uid)." AND stunde=".$db->db_add_param($stunde)." AND tag=".$db->db_add_param($t);
 					if(!($erg=$db->db_query($query)))
 						die($db->db_last_error());
 				}
@@ -90,7 +94,7 @@ $updatevon = 0;
 			}
 	}
 
-	if(!($erg=$db->db_query("SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='$uid'")))
+	if(!($erg=$db->db_query("SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid=".$db->db_add_param($uid))))
 		die($db->db_last_error());
 	$num_rows=$db->db_num_rows($erg);
 	for ($i=0;$i<$num_rows;$i++)
@@ -116,7 +120,7 @@ $updatevon = 0;
 
 
 	// Personendaten
-	if(! $result=$db->db_query("SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid='$uid'"))
+	if(! $result=$db->db_query("SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=".$db->db_add_param($uid)))
 		die($db->db_last_error());
 	if ($db->db_num_rows($result)==1)
 		$person=$db->db_fetch_object($result);
@@ -166,7 +170,7 @@ $updatevon = 0;
 	?>
   </TABLE>
   <br/>
-  <?php 
+  <?php
   if($updatevon!='')
   {
   	echo 'Zeitwunsch zuletzt aktualisiert von ';
@@ -230,7 +234,6 @@ $updatevon = 0;
   <LI>Es sollten f&uuml;r jede Stunde die tats&auml;chlich unterrichtet wird, mindestens das 3-fache an positiven Zeitw&uuml;nschen angegeben werden.<BR>
     Beispiel: Sie unterrichten 4 Stunden/Woche, dann sollten Sie mindestens 12 Stunden im Raster mit positiven Werten ausf&uuml;llen.</LI>
 </OL>
-<P>Bei Problemen wenden Sie sich bitte an die <A href="mailto:lvplan@technikum-wien.at">Lehrveranstaltungsplanung</A>.</P>
 <P>&nbsp;</P>
 </body>
 </html>

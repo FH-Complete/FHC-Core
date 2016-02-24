@@ -20,30 +20,21 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/basis_db.class.php');
-include('../../include/functions.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+$user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('mitarbeiter'))
+	die($rechte->errormsg);
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-
-if(isset($_GET['fix']) && isset($_GET['uid']))
-{
-	$sql_query = "UPDATE public.tbl_mitarbeiter SET fixangestellt=". ($_GET['fix']=='t'?'false':'true') ." WHERE mitarbeiter_uid='".addslashes($_GET['uid'])."'";
-	//echo $sql_query;
-	if(!($erg=$db->db_query($sql_query)))
-		die($db->db_last_error());
-}
-if(isset($_GET['lek']) && isset($_GET['uid']))
-{
-	$sql_query = "UPDATE public.tbl_mitarbeiter SET lektor=". ($_GET['lek']=='t'?'false':'true') ." WHERE mitarbeiter_uid='".addslashes($_GET['uid'])."'";
-	//echo $sql_query;
-	if(!($erg=$db->db_query($sql_query)))
-			die($db->db_last_error());
-
-}
 ?>
 <html>
 <head>
@@ -52,43 +43,30 @@ if(isset($_GET['lek']) && isset($_GET['uid']))
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-<script language="JavaScript" type="text/javascript">
-function confdel()
-{
-	if(confirm("Diesen Datensatz wirklick loeschen?"))
-	  return true;
-	return false;
-}
-</script>
 </head>
 
 <body class="background_main">
 <h2>Mitarbeiter &Uuml;bersicht</h2><br>
 
 <?php
-
-
 if(isset($_GET['searchstr']))
 	$searchstr = $_GET['searchstr'];
-else 
+else
 	$searchstr = '';
-	
+
 echo '
 	<form accept-charset="UTF-8" name="search" method="GET">
-  		Bitte Suchbegriff eingeben: 
-  		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
+  		Bitte Suchbegriff eingeben:
+  		<input type="text" name="searchstr" size="30" value="'.$db->convert_html_chars($searchstr).'">
   		<input type="submit" value="Suchen">
-  	</form>';	
-if(!isset($_GET['searchstr']))	
+  	</form>';
+if(!isset($_GET['searchstr']))
 	exit;
 
 	$qry = "SELECT vw_mitarbeiter.*, tbl_standort.kurzbz as standort_kurzbz FROM campus.vw_mitarbeiter LEFT JOIN public.tbl_standort USING(standort_id)";
 	if(!empty($searchstr))
-			$qry.=" where nachname||' '||vorname ~* '".addslashes($searchstr)."' OR vorname||' '||nachname ~* '".addslashes($searchstr)."' OR uid ~* '".addslashes($searchstr)."'  ";
-	if(isset($order))
-		$qry .= " ORDER BY $order";
-	else
-		$qry .= " ORDER BY nachname, vorname";
+			$qry.=" where nachname||' '||vorname ~* '".$db->db_escape($searchstr)."' OR vorname||' '||nachname ~* '".$db->db_escape($searchstr)."' OR uid ~* '".$db->db_escape($searchstr)."'  ";
+	$qry .= " ORDER BY nachname, vorname";
 
 	if($result = $db->db_query($qry))
 	{
@@ -120,13 +98,12 @@ if(!isset($_GET['searchstr']))
 			echo "<td nowrap>".$row->titelpre."</td>";
 			echo "<td nowrap>".$row->vorname."</td>";
 			echo "<td nowrap>".$row->nachname."</td>";
-			echo "<td valign='middle' align='center' nowrap><a href='lektor_uebersicht.php?uid=".$row->uid."&fix=".$row->fixangestellt . (isset($order)?'&order='.$order:'') ."&searchstr=".$searchstr."'><img src='../../skin/images/".($row->fixangestellt=='t'?'true':'false').".png' height='20'></a></td>";
-			echo "<td valign='middle' align='center' nowrap><a href='lektor_uebersicht.php?uid=".$row->uid."&lek=".$row->lektor . (isset($order)?'&order='.$order:'') ."&searchstr=".$searchstr."'><img src='../../skin/images/".($row->lektor=='t'?'true':'false').".png' height='20'></a></td>";
-
+			echo "<td nowrap>".($row->fixangestellt=='t'?'Ja':'Nein')."</td>";
+			echo "<td nowrap>".($row->lektor=='t'?'Ja':'Nein')."</td>";
 			echo "<td nowrap>".$row->ort_kurzbz."</td>";
 			echo "<td nowrap>".$row->standort_kurzbz."</td>";
 			echo "<td nowrap>".$row->telefonklappe."</td>";
-			
+
 			$email=$row->uid.'@'.DOMAIN;
 			echo "<td nowrap><a href='mailto:$email'>$email</a></td>";
 			echo "<td nowrap class='button'><a href='personen_details.php?uid=".$row->uid."'>Edit</a></td>";
@@ -142,11 +119,6 @@ if(!isset($_GET['searchstr']))
 	}
 	else
 		echo "Fehler beim Laden der Mitarbeiter: ".$db->db_last_error();
-
-	if(isset($_GET['fix']) || isset($_GET['lek'])) //Zum Anker hüpfen
-	{
-		echo "<script language='JavaScript'>this.location.hash='#anker1'</script>";
-	}
 ?>
 
 </body>
