@@ -251,7 +251,7 @@ class person extends basis_db
 			return false;
 		}
 
-		if(mb_strlen($this->svnr) != 16 && mb_strlen($this->svnr) != 10)
+		if($this->svnr!='' && mb_strlen($this->svnr) != 16 && mb_strlen($this->svnr) != 10)
 		{
 			$this->errormsg = 'SVNR muss 10 oder 16 Zeichen lang sein';
 			return false;
