@@ -20,10 +20,10 @@
  *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		
+
 /*******************************************************************************************************
  *				abgabe_assistenz
- * 		abgabe_assistenz ist die Assistenzoberfläche des Abgabesystems 
+ * 		abgabe_assistenz ist die Assistenzoberfläche des Abgabesystems
  * 			für Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 require_once('../../config/vilesci.config.inc.php');
@@ -61,7 +61,7 @@ if(isset($_GET['id']) && isset($_GET['uid']) && isset($_GET['pdfread']))
 	header('Content-Type: application/octet-stream');
 	header('Content-disposition: attachment; filename="'.$file.'"');
 	echo readfile($filename);
-	exit(); 
+	exit();
 }
 
 if (!$db = new basis_db())
@@ -85,8 +85,8 @@ if(!isset($_POST['uid']))
 	$kurzbz = '';
 	if($projektarbeit_id!='-1')
 	{
-		$qry_stg="SELECT tbl_studiengang.* FROM public.tbl_studiengang 
-			JOIN lehre.tbl_lehrveranstaltung USING(studiengang_kz) 
+		$qry_stg="SELECT tbl_studiengang.* FROM public.tbl_studiengang
+			JOIN lehre.tbl_lehrveranstaltung USING(studiengang_kz)
 			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
 			JOIN lehre.tbl_projektarbeit USING(lehreinheit_id)
 			WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER);
@@ -97,24 +97,24 @@ if(!isset($_POST['uid']))
 				$stgbez=$row_stg->bezeichnung;
 				$stg_kz=$row_stg->studiengang_kz;
 			}
-			else 
+			else
 			{
 				echo "<font color=\"#FF0000\">Fehler beim Laden des Studiengangs!</font><br>&nbsp;";
 				exit;
 			}
 		}
-		else 
+		else
 		{
 			echo "<font color=\"#FF0000\">Studiengang konnte nicht gefunden werden!</font><br>&nbsp;";
 			exit;
 		}
 	}
-	else 
+	else
 	{
 		exit;
 	}
 }
-else 
+else
 {
 	$uid = (isset($_POST['uid'])?$_POST['uid']:'-1');
 	$projektarbeit_id = (isset($_POST['projektarbeit_id'])?$_POST['projektarbeit_id']:'-1');
@@ -201,8 +201,8 @@ if(isset($_POST["schick"]))
 			$row_std=$db->db_fetch_object($result_std);
 			if($command=='insert')
 			{
-				$qrychk="SELECT * FROM campus.tbl_paabgabe 
-					WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)." AND paabgabetyp_kurzbz=".$db->db_add_param($paabgabetyp_kurzbz)." 
+				$qrychk="SELECT * FROM campus.tbl_paabgabe
+					WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)." AND paabgabetyp_kurzbz=".$db->db_add_param($paabgabetyp_kurzbz)."
 					AND fixtermin=".($fixtermin==1?'true':'false')." AND datum=".$db->db_add_param($datum)." AND kurzbz=".$db->db_add_param($kurzbz);
 				if($result=$db->db_query($qrychk))
 				{
@@ -210,32 +210,32 @@ if(isset($_POST["schick"]))
 					{
 						//Datensatz bereits vorhanden
 					}
-					else 
+					else
 					{
 						//neuer Termin
-						$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, 
-							fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
+						$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz,
+							fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum)
 							VALUES (".$db->db_add_param($projektarbeit_id).", ".
 							$db->db_add_param($paabgabetyp_kurzbz).", ".($fixtermin==1?'true':'false').", ".
 							$db->db_add_param($datum).",".
 							$db->db_add_param($kurzbz).", NULL, ".
 							$db->db_add_param($user).", now(), NULL, NULL)";
-						//echo $qry;	
+						//echo $qry;
 						if(!$result=$db->db_query($qry))
 						{
-							echo "<font color=\"#FF0000\">Termin konnte nicht eingetragen werden!</font><br>";	
+							echo "<font color=\"#FF0000\">Termin konnte nicht eingetragen werden!</font><br>";
 						}
-						else 
+						else
 						{
 							$row=$db->db_fetch_object($result);
-							$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp 
+							$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp
 								WHERE paabgabetyp_kurzbz=".$db->db_add_param($paabgabetyp_kurzbz);
 
 							if($result_typ=$db->db_query($qry_typ))
 							{
 								$row_typ=$db->db_fetch_object($result_typ);
 							}
-							else 
+							else
 							{
 								$row_typ->bezeichnung='';
 							}
@@ -247,20 +247,20 @@ if(isset($_POST["schick"]))
 								$mail->setReplyTo($user."@".DOMAIN);
 								if(!$mail->send())
 								{
-									echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>";	
+									echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>";
 								}
 								else
 								{
 									echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
 								}
 							}
-							
+
 							//Mail an Erstbegutachter
-							$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
-								public.tbl_mitarbeiter.mitarbeiter_uid, anrede 
+							$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,
+								public.tbl_mitarbeiter.mitarbeiter_uid, anrede
 								FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
-								LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
-								LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
+								LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id)
+								LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid)
 								WHERE mitarbeiter_uid=".$db->db_add_param($erst);
 							if(!$betr=$db->db_query($qry_betr))
 							{
@@ -277,19 +277,19 @@ if(isset($_POST["schick"]))
 										$mail->setReplyTo($user."@".DOMAIN);
 										if(!$mail->send())
 										{
-											echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter! ($row_betr->first)</font><br>";	
+											echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter! ($row_betr->first)</font><br>";
 										}
-										else 
+										else
 										{
 											echo "Mail verschickt an Erstbegutachter: ".$row_betr->first."<br>";
 										}
 									}
 									else
 									{
-										echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter(in)! ($row_betr->first ist kein Mitarbeiter)</font><br>&nbsp;<br>";	
+										echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter(in)! ($row_betr->first ist kein Mitarbeiter)</font><br>&nbsp;<br>";
 									}
 								}
-								else 
+								else
 								{
 									echo "<font color=\"#FF0000\">Erstbegutachter nicht gefunden. Kein Mail verschickt!</font><br>;";
 								}
@@ -297,10 +297,13 @@ if(isset($_POST["schick"]))
 							//Mail an Zweitbegutachter
 							if($p2id!='')
 							{
-								$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
-									anrede, kontakt 
-									FROM public.tbl_person JOIN public.tbl_kontakt USING(person_id) 
-									WHERE person_id=".$db->db_add_param($p2id, FHC_INTEGER)." AND kontakttyp='email' AND zustellung LIMIT 1";
+								$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,
+									anrede, kontakt, tbl_benutzer.uid
+									FROM
+										public.tbl_person
+										JOIN public.tbl_kontakt USING(person_id)
+										LEFT JOIN public.tbl_benutzer USING(person_id)
+									WHERE person_id=".$db->db_add_param($p2id, FHC_INTEGER)." AND kontakttyp='email' AND zustellung AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv is null) LIMIT 1";
 								if(!$betr=$db->db_query($qry_betr))
 								{
 									echo "<font color=\"#FF0000\">Fehler beim Laden des Zweitbegutachters!</font><br>";
@@ -309,19 +312,23 @@ if(isset($_POST["schick"]))
 								{
 									if($row_betr=$db->db_fetch_object($betr))
 									{
-										$mail = new mail($row_betr->kontakt, "no-reply@".DOMAIN, "Neuer Termin Bachelor-/Masterarbeitsbetreuung bei Studiengang $stgbez",
+										if($row_betr->uid!='')
+											$to = $row_betr->uid.'@'.DOMAIN;
+										else
+											$to = $row_betr->kontakt;
+										$mail = new mail($to, "no-reply@".DOMAIN, "Neuer Termin Bachelor-/Masterarbeitsbetreuung bei Studiengang $stgbez",
 										"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat einen neuen Termin angelegt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost).":\n".($fixtermin==1?'Fixer Termin':'Variabler Termin').", ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Masterarbeitsabgabesystem generiertes Info-Mail\n--------------------------------------------------------------------------");
 										$mail->setReplyTo($user."@".DOMAIN);
 										if(!$mail->send())
 										{
-											echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an (Zweit-)Begutachter(in)! ($erst)</font><br>";	
+											echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an (Zweit-)Begutachter(in)! ($erst)</font><br>";
 										}
-										else 
+										else
 										{
-											echo "Mail verschickt an Zweitbegutachter(in): ".$row_betr->first."<br>";
+											echo "Mail verschickt an Zweitbegutachter(in): ".$row_betr->first.' '.$to."<br>";
 										}
 									}
-									else 
+									else
 									{
 										echo "<font color=\"#FF0000\">Zweitbegutachter(in) nicht gefunden. Kein Mail verschickt! ($p2id)</font><br>";
 									}
@@ -331,7 +338,7 @@ if(isset($_POST["schick"]))
 						$command='';
 					}
 				}
-				else 
+				else
 				{
 					echo "Datenbank-Zugriffsfehler!";
 				}
@@ -343,9 +350,9 @@ if(isset($_POST["schick"]))
 				$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id=".$db->db_add_param($paabgabe_id, FHC_INTEGER);
 				if(!$result_old=$db->db_query($qry_old))
 				{
-					echo "<font color=\"#FF0000\">Termin konnte nicht gefunden werden!</font><br>&nbsp;";	
+					echo "<font color=\"#FF0000\">Termin konnte nicht gefunden werden!</font><br>&nbsp;";
 				}
-				else 
+				else
 				{
 					$row_old=$db->db_fetch_object($result_old);
 					//Abgabetyp
@@ -355,26 +362,26 @@ if(isset($_POST["schick"]))
 						$row_told=$db->db_fetch_object($result_told);
 						$obezeichnung=$row_told->bezeichnung;
 					}
-					else 
+					else
 					{
 						$obezeichnung='';
 					}
 					//Termin updaten
 					$qry="UPDATE campus.tbl_paabgabe SET
-						projektarbeit_id = ".$db->db_add_param($projektarbeit_id, FHC_INTEGER).", 
-						paabgabetyp_kurzbz = ".$db->db_add_param($paabgabetyp_kurzbz).", 
-						fixtermin = ".($fixtermin==1?'true':'false').", 
-						datum = ".$db->db_add_param($datum).", 
-						kurzbz = ".$db->db_add_param($kurzbz).", 
-						updatevon = ".$db->db_add_param($user).", 
-						updateamum = now() 
+						projektarbeit_id = ".$db->db_add_param($projektarbeit_id, FHC_INTEGER).",
+						paabgabetyp_kurzbz = ".$db->db_add_param($paabgabetyp_kurzbz).",
+						fixtermin = ".($fixtermin==1?'true':'false').",
+						datum = ".$db->db_add_param($datum).",
+						kurzbz = ".$db->db_add_param($kurzbz).",
+						updatevon = ".$db->db_add_param($user).",
+						updateamum = now()
 						WHERE paabgabe_id=".$db->db_add_param($paabgabe_id, FHC_INTEGER);
-					//echo $qry;	
+					//echo $qry;
 					if(!$result=$db->db_query($qry))
 					{
-						echo "<font color=\"#FF0000\">Termin&auml;nderung konnte nicht eingetragen werden!</font><br>";	
+						echo "<font color=\"#FF0000\">Termin&auml;nderung konnte nicht eingetragen werden!</font><br>";
 					}
-					else 
+					else
 					{
 						//Abgabetyp
 						$qry_told="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz=".$db->db_add_param($paabgabetyp_kurzbz);
@@ -383,7 +390,7 @@ if(isset($_POST["schick"]))
 							$row_typ=$db->db_fetch_object($result_told);
 							$bezeichnung=$row_typ->bezeichnung;
 						}
-						else 
+						else
 						{
 							$bezeichnung='';
 						}
@@ -395,20 +402,20 @@ if(isset($_POST["schick"]))
 							$mail->setReplyTo($user."@".DOMAIN);
 							if(!$mail->send())
 							{
-								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>";	
+								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>";
 							}
 							else
 							{
 								echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
 							}
 						}
-							
+
 						//Mail an Erstbegutachter
-						$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
-							public.tbl_mitarbeiter.mitarbeiter_uid, anrede 
+						$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,
+							public.tbl_mitarbeiter.mitarbeiter_uid, anrede
 							FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
-							LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
-							LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
+							LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id)
+							LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid)
 							WHERE mitarbeiter_uid=".$db->db_add_param($erst);
 						if(!$betr=$db->db_query($qry_betr))
 						{
@@ -423,14 +430,14 @@ if(isset($_POST["schick"]))
 								$mail->setReplyTo($user."@".DOMAIN);
 								if(!$mail->send())
 								{
-									echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an (Erst-)Begutachter(in)!</font><br>";	
+									echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an (Erst-)Begutachter(in)!</font><br>";
 								}
-								else 
+								else
 								{
 									echo "Mail verschickt an Erstbegutachter(in): ".$row_betr->first."<br>";
 								}
 							}
-							else 
+							else
 							{
 								echo "<font color=\"#FF0000\">Erstbegutachter(in) nicht gefunden. Kein Mail verschickt!</font><br>";
 							}
@@ -438,10 +445,18 @@ if(isset($_POST["schick"]))
 						//Mail an Zweitbegutachter
 						if($p2id!='')
 						{
-							$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
-								anrede, kontakt 
-								FROM public.tbl_person JOIN public.tbl_kontakt USING(person_id) 
-								WHERE person_id=".$db->db_add_param($p2id, FHC_INTEGER)." AND kontakttyp='email' AND zustellung LIMIT 1";
+							$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,
+								anrede, kontakt, tbl_benutzer.uid
+								FROM
+								 	public.tbl_person
+									JOIN public.tbl_kontakt USING(person_id)
+									LEFT JOIN public.tbl_benutzer USING(person_id)
+								WHERE
+									person_id=".$db->db_add_param($p2id, FHC_INTEGER)."
+									AND kontakttyp='email'
+									AND zustellung
+									AND (tbl_benutzer.aktiv OR tbl_benutzer is null)
+								LIMIT 1";
 							if(!$betr=$db->db_query($qry_betr))
 							{
 								echo "<font color=\"#FF0000\">Fehler beim Laden von Zweitbegutachter(in)!</font><br>";
@@ -450,19 +465,23 @@ if(isset($_POST["schick"]))
 							{
 								if($row_betr=$db->db_fetch_object($betr))
 								{
-									$mail = new mail($row_betr->kontakt, "no-reply@".DOMAIN, "Terminänderung Bachelor-/Masterarbeitsbetreuung bei Studiengang $stgbez",
+									if($row_betr->uid!='')
+										$to = $row_betr->uid.'@'.DOMAIN;
+									else
+										$to = $row_betr->kontakt;
+									$mail = new mail($to, "no-reply@".DOMAIN, "Terminänderung Bachelor-/Masterarbeitsbetreuung bei Studiengang $stgbez",
 									"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat einen Termin geändert für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."\nVon: ".($row_old->fixtermin=='t'?'Fixer Termin':'Variabler Termin').", ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$obezeichnung.", ".$row_old->kurzbz."\nAuf: ".($fixtermin==1?'Fixer Termin':'Variabler Termin').", ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$bezeichnung." ".$kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Masterarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Masterarbeitsabgabe\n--------------------------------------------------------------------------");
 									$mail->setReplyTo($user."@".DOMAIN);
 									if(!$mail->send())
 									{
-										echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an (Zweit-)Begutachter(in)! ($erst)</font><br>";	
+										echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an (Zweit-)Begutachter(in)! ($erst)</font><br>";
 									}
-									else 
+									else
 									{
-										echo "Mail verschickt an Zweitbegutachter(in): ".$row_betr->first."<br>";
+										echo "Mail verschickt an Zweitbegutachter(in): ".$row_betr->first.' '.$to."<br>";
 									}
 								}
-								else 
+								else
 								{
 									echo "<font color=\"#FF0000\">Zweitbegutachter(in) nicht gefunden. Kein Mail verschickt! ($p2id)</font><br>";
 								}
@@ -474,7 +493,7 @@ if(isset($_POST["schick"]))
 			}
 		}
 	}
-	else 
+	else
 	{
 		echo "<font color=\"#FF0000\">Datumseingabe ung&uuml;ltig!</font><br>&nbsp;";
 	}
@@ -489,9 +508,9 @@ if(isset($_POST["del"]))
 		$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id=".$db->db_add_param($paabgabe_id);
 		if(!$result_old=$db->db_query($qry_old))
 		{
-			echo "<font color=\"#FF0000\">Termin konnte nicht gefunden werden!</font><br>&nbsp;";	
+			echo "<font color=\"#FF0000\">Termin konnte nicht gefunden werden!</font><br>&nbsp;";
 		}
-		else 
+		else
 		{
 			$row_old=$db->db_fetch_object($result_old);
 			$qry_std="SELECT * FROM campus.vw_benutzer where uid=".$db->db_add_param($uid);
@@ -507,7 +526,7 @@ if(isset($_POST["del"]))
 				{
 					echo "<font color=\"#FF0000\">Fehler beim L&ouml;schen des Termins!</font><br>&nbsp;";
 				}
-				else 
+				else
 				{
 					//Mail an Studierenden
 					if($row_old->paabgabetyp_kurzbz !='note')
@@ -517,20 +536,20 @@ if(isset($_POST["del"]))
 						$mail->setReplyTo($user."@".DOMAIN);
 						if(!$mail->send())
 						{
-							echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails!</font><br>&nbsp;";	
+							echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails!</font><br>&nbsp;";
 						}
 						else
 						{
 							echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
 						}
 					}
-						
+
 					//Mail an Erstbegutachter
-					$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
-						public.tbl_mitarbeiter.mitarbeiter_uid, anrede 
+					$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,
+						public.tbl_mitarbeiter.mitarbeiter_uid, anrede
 						FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
-						LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
-						LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
+						LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id)
+						LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid)
 						WHERE mitarbeiter_uid=".$db->db_add_param($erst);
 					if(!$betr=$db->db_query($qry_betr))
 					{
@@ -545,14 +564,14 @@ if(isset($_POST["del"]))
 							$mail->setReplyTo($user."@".DOMAIN);
 							if(!$mail->send())
 							{
-								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter(in)!</font><br>&nbsp;";	
+								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter(in)!</font><br>&nbsp;";
 							}
-							else 
+							else
 							{
 								echo "Mail verschickt an: ".$row_betr->first."<br>";
 							}
 						}
-						else 
+						else
 						{
 							echo "<font color=\"#FF0000\">Begutachter(in) nicht gefunden. Kein Mail verschickt!</font><br>&nbsp;";
 						}
@@ -560,10 +579,18 @@ if(isset($_POST["del"]))
 					//Mail an Zweitbegutachter
 					if($p2id!='')
 					{
-						$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
-							anrede, kontakt 
-							FROM public.tbl_person JOIN public.tbl_kontakt USING(person_id) 
-							WHERE person_id=".$db->db_add_param($p2id, FHC_INTEGER)." AND kontakttyp='email' AND zustellung LIMIT 1";
+						$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,
+							anrede, kontakt, tbl_benutzer.uid
+							FROM
+								public.tbl_person
+								JOIN public.tbl_kontakt USING(person_id)
+								LEFT JOIN public.tbl_benutzer USING(person_id)
+							WHERE
+								person_id=".$db->db_add_param($p2id, FHC_INTEGER)."
+								AND kontakttyp='email'
+								AND zustellung
+								AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv is null)
+							LIMIT 1";
 						if(!$betr=$db->db_query($qry_betr))
 						{
 							echo "<font color=\"#FF0000\">Fehler beim Laden von Zweitbegutachter(in)!</font><br>&nbsp;";
@@ -572,19 +599,23 @@ if(isset($_POST["del"]))
 						{
 							if($row_betr=$db->db_fetch_object($betr))
 							{
-								$mail = new mail($row_betr->kontakt, "no-reply@".DOMAIN, "Termin Bachelor-/Masterarbeitsbetreuung bei Studiengang $stgbez",
+								if($row_betr->uid!='')
+									$to = $row_betr->uid.'@'.DOMAIN;
+								else
+									$to = $row_betr->kontakt;
+								$mail = new mail($to, "no-reply@".DOMAIN, "Termin Bachelor-/Masterarbeitsbetreuung bei Studiengang $stgbez",
 								"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat einen Termin entfernt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."\n".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_old->kurzbz."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Masterarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Masterarbeitsabgabe\n--------------------------------------------------------------------------");
 								$mail->setReplyTo($user."@".DOMAIN);
 								if(!$mail->send())
 								{
-									echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an (Zweit-)Begutachter(in)! ($erst)</font><br>&nbsp;";	
+									echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an (Zweit-)Begutachter(in)! ($erst)</font><br>&nbsp;";
 								}
-								else 
+								else
 								{
-									echo "Mail verschickt an Zweitbetreuer(in): ".$row_betr->first."<br>";
+									echo "Mail verschickt an Zweitbetreuer(in): ".$row_betr->first.' '.$to."<br>";
 								}
 							}
-							else 
+							else
 							{
 								echo "<font color=\"#FF0000\">Zweitbegutachter(in) nicht gefunden. Kein Mail verschickt! ($p2id)</font><br>&nbsp;";
 							}
@@ -594,7 +625,7 @@ if(isset($_POST["del"]))
 			}
 		}
 	}
-	else 
+	else
 	{
 		echo "<font color=\"#FF0000\">Datumseingabe ung&uuml;ltig!</font><br>&nbsp;";
 	}
@@ -605,16 +636,16 @@ if(isset($_POST["enda"]))
 {
 	//Abgabetermin mit akt. Datum speichern
 	$qry="UPDATE campus.tbl_paabgabe SET
-		abgabedatum = now(), 
-		updatevon = ".$db->db_add_param($user).", 
-		updateamum = now() 
+		abgabedatum = now(),
+		updatevon = ".$db->db_add_param($user).",
+		updateamum = now()
 		WHERE paabgabe_id=".$db->db_add_param($paabgabe_id, FHC_INTEGER);
-	//echo $qry;	
+	//echo $qry;
 	if(!$result=$db->db_query($qry))
 	{
-		echo "<font color=\"#FF0000\">Terminbest&auml;tigung konnte nicht eingetragen werden!</font><br>&nbsp;";	
+		echo "<font color=\"#FF0000\">Terminbest&auml;tigung konnte nicht eingetragen werden!</font><br>&nbsp;";
 	}
-	else 
+	else
 	{
 		echo "Endabgabe-Best&auml;tigungsdatum wurde eingetragen.";
 	}
@@ -624,16 +655,16 @@ if(isset($_POST["note"]))
 {
 	//Abgabetermin mit akt. Datum speichern
 	$qry="UPDATE campus.tbl_paabgabe SET
-		abgabedatum = now(), 
-		updatevon = ".$db->db_add_param($user).", 
-		updateamum = now() 
+		abgabedatum = now(),
+		updatevon = ".$db->db_add_param($user).",
+		updateamum = now()
 		WHERE paabgabe_id=".$db->db_add_param($paabgabe_id, FHC_INTEGER);
-	//echo $qry;	
+	//echo $qry;
 	if(!$result=$db->db_query($qry))
 	{
-		echo "<font color=\"#FF0000\">Terminbest&auml;tigung konnte nicht eingetragen werden!</font><br>&nbsp;";	
+		echo "<font color=\"#FF0000\">Terminbest&auml;tigung konnte nicht eingetragen werden!</font><br>&nbsp;";
 	}
-	else 
+	else
 	{
 		echo "Benotung-Best&auml;tigungsdatum wurde eingetragen.";
 	}
@@ -685,14 +716,14 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 				$bgcol='#FFFF00';
 				$fcol='#000000';
 			}
-			else 
+			else
 			{
 				//"normaler" Termin - schwarz auf weiß
 				$bgcol='#FFFFFF';
 				$fcol='#000000';
 			}
 		}
-		else 
+		else
 		{
 			if($row->abgabedatum>$row->datum)
 			{
@@ -700,7 +731,7 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 				$bgcol='#EA7B7B';
 				$fcol='#FFFFFF';
 			}
-			else 
+			else
 			{
 				//Abgabe vor Termin - schwarz auf grün
 				$bgcol='#00FF00';
@@ -720,26 +751,26 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 			{
 				$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."' selected>$row_typ->bezeichnung</option>";
 			}
-			else 
+			else
 			{
 				$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."'>$row_typ->bezeichnung</option>";
 			}
-		}		
+		}
 		$htmlstr .= "		</select></td>\n";
-		$htmlstr .= "		<td><input  type='text' name='kurzbz' value='".htmlspecialchars($row->kurzbz,ENT_QUOTES)."' size='60' maxlegth='256'></td>\n";		
+		$htmlstr .= "		<td><input  type='text' name='kurzbz' value='".htmlspecialchars($row->kurzbz,ENT_QUOTES)."' size='60' maxlegth='256'></td>\n";
 		$htmlstr .= "		<td>".($row->abgabedatum==''?'&nbsp;':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y'))."</td>\n";
-			
+
 		$htmlstr .= "		<td><input type='submit' name='schick' value='speichern' title='Termin&auml;nderung speichern'></td>";
-	
+
 		if(!$row->abgabedatum)
 		{
 			$htmlstr .= "		<td><input type='submit' name='del' value='l&ouml;schen' onclick='return confdel()' title='Termin l&ouml;schen'></td>";
 		}
-		else 
+		else
 		{
 			$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 		}
-	
+
 		if($row->paabgabetyp_kurzbz=='enda' && $row->abgabedatum==NULL)
 		{
 			$htmlstr .= "		<td width=50px><input type='submit' name='enda' value='best&auml;tigen' title='Endabgabe best&auml;tigen'></td>";
@@ -748,13 +779,13 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 		{
 			$htmlstr .= "		<td width=50px><input type='submit' name='note' value='best&auml;tigen' title='Notenabgabe best&auml;tigen'></td>";
 		}
-		else 
+		else
 		{
 			if(file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
 			{
 				$htmlstr .= "		<td align=center><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid&pdfread=1' target='_blank'><img src='../../skin/images/pdf.ico' alt='PDF' title='abgegebene Datei' border=0></a></td>";
 			}
-			else 
+			else
 			{
 				$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 			}
@@ -762,15 +793,15 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 			{
 				$htmlstr .= "		<td align=center><a href='abgabe_assistenz_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../skin/images/folder.gif' alt='zus&auml;tzliche Daten' title='Kontrolle der Zusatzdaten' border=0></a></td>";
 			}
-			else 
+			else
 			{
 				$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 			}
 		}
 		$htmlstr .= "	</tr>\n";
 		$htmlstr .= "</form>\n";
-	}	
-	
+	}
+
 //Eingabezeile für neuen Termin
 $htmlstr .= '<form action="'.htmlspecialchars($_SERVER['PHP_SELF']).'" method="POST" onsubmit="return checksubmit()" name="'.$db->convert_html_chars($projektarbeit_id).'">'."\n";
 $htmlstr .= '<input type="hidden" name="projektarbeit_id" value="'.$db->convert_html_chars($projektarbeit_id).'">'."\n";
@@ -793,11 +824,11 @@ $result_typ=$db->db_query($qry_typ);
 while ($result_typ && $row_typ=$db->db_fetch_object($result_typ))
 {
 	$htmlstr .= '		<option value="'.$db->convert_html_chars($row_typ->paabgabetyp_kurzbz).'">'.$db->convert_html_chars($row_typ->bezeichnung).'</option>';
-}		
+}
 $htmlstr .= "		</select></td>\n";
 
-$htmlstr .= "		<td><input type='text' name='kurzbz' size='60' maxlegth='256'></td>\n";		
-$htmlstr .= "		<td>&nbsp;</td>\n";		
+$htmlstr .= "		<td><input type='text' name='kurzbz' size='60' maxlegth='256'></td>\n";
+$htmlstr .= "		<td>&nbsp;</td>\n";
 $htmlstr .= "		<td><input type='submit' name='schick'  value='speichern' title='neuen Termin speichern'></td>";
 
 $htmlstr .= "</tr>\n";
@@ -805,5 +836,5 @@ $htmlstr .= "</form>\n";
 $htmlstr .= "</table>\n";
 $htmlstr .= "</body></html>\n";
 
-echo $htmlstr;  
+echo $htmlstr;
 ?>
