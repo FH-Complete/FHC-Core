@@ -491,12 +491,13 @@ class lehreinheitmitarbeiter extends basis_db
 	}
 
 	/**
-	 * Laedt die Lektoren einer Lehrveranstlatung in einem Studiensemester
+	 * Laedt die Lektoren einer Lehrveranstaltung in einem Studiensemester
 	 * @param lehrveranstaltung_id
 	 * @param studiensemester_kurzbz
+	 * @param integer lehreinheit_id Optional Lehreinheit_id 
 	 * @return array + true wenn ok / false im Fehlerfall
 	 */
-	public function getMitarbeiterLV($lehrveranstaltung_id, $studiensemester_kurzbz)
+	public function getMitarbeiterLV($lehrveranstaltung_id, $studiensemester_kurzbz, $lehreinheit_id=null)
 	{
 		if(!is_numeric($lehrveranstaltung_id))
 		{
@@ -504,8 +505,8 @@ class lehreinheitmitarbeiter extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT
-					distinct vw_mitarbeiter.uid, vorname, nachname, titelpre, titelpost
+		$qry = "SELECT DISTINCT
+					vw_mitarbeiter.uid, vorname, nachname, titelpre, titelpost
 				FROM
 					lehre.tbl_lehreinheitmitarbeiter
 					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
@@ -513,6 +514,9 @@ class lehreinheitmitarbeiter extends basis_db
 				WHERE
 					lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
 					AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+		
+		if(!is_null($lehreinheit_id))
+			$qry .=" AND tbl_lehreinheit.lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
 		$qry .=" ORDER BY nachname, vorname;";
 
 		if($this->db_query($qry))

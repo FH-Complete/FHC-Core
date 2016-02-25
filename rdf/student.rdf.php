@@ -764,6 +764,17 @@ else
 			if(count($lv->lehrveranstaltungen)>0)
 			{
 				$lv_studiengang_kz=$lv->lehrveranstaltungen[0]->studiengang_kz;
+				//Wenn die LV an der ersten Stelle ein Freifach (Stg 0) ist, nimm die naechste sofern eine vorhanden
+				if($lv_studiengang_kz==0)
+				{
+					for ($i = 0; $i < count($lv->lehrveranstaltungen); $i++)
+					{
+						$lv_studiengang_kz=$lv->lehrveranstaltungen[$i]->studiengang_kz;
+						if ($lv_studiengang_kz!=0)
+							break;
+					}
+				}
+				
 				$lv_studiengang=new studiengang();
 				$lv_studiengang->load($lv_studiengang_kz);
 				$lv_studiengang_bezeichnung=$lv_studiengang->bezeichnung;
@@ -780,14 +791,36 @@ else
 								break;
 				}
 			}
-			$prestudent = new prestudent($student->prestudent_id);
-			$prestudent->getLastStatus($row->prestudent_id);
+			$prestudent = new prestudent();
+			$prestudent->getLastStatus($student->prestudent_id);
 
 			$orgform_bezeichnung = new organisationsform();
 			$orgform_bezeichnung->load($studiengang->orgform_kurzbz);
 
 			$orgform_student_bezeichnung = new organisationsform();
 			$orgform_student_bezeichnung->load($prestudent->orgform_kurzbz);
+			
+			//Wenn Lehrgang, dann Erhalter-KZ vor die LV-Studiengangs-Kz hängen
+			if ($lv_studiengang_kz<0)
+			{
+				$stg = new studiengang();
+				$stg->load($lv_studiengang_kz);
+			
+				$lv_studiengang_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($lv_studiengang_kz));
+			}
+			else
+				$lv_studiengang_kz = sprintf("%04s", abs($lv_studiengang_kz));
+			
+			//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
+			if ($student->studiengang_kz<0)
+			{
+				$stg = new studiengang();
+				$stg->load($student->studiengang_kz);
+			
+				$stg_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($student->studiengang_kz));
+			}
+			else
+				$stg_kz = sprintf("%04s", abs($student->studiengang_kz));
 
 			echo '
 			<student>
@@ -806,18 +839,19 @@ else
 				<gruppe><![CDATA['.$student->gruppe.']]></gruppe>
 				<student_orgform_kurzbz><![CDATA['.$prestudent->orgform_kurzbz.']]></student_orgform_kurzbz>
                 <student_orgform_bezeichnung><![CDATA['.$orgform_student_bezeichnung->bezeichnung.']]></student_orgform_bezeichnung>
-				<studiengang_kz><![CDATA['.sprintf("%04d",abs($student->studiengang_kz)).']]></studiengang_kz>
+				<studiengang_kz><![CDATA['.$stg_kz.']]></studiengang_kz>
 				<studiengang_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></studiengang_bezeichnung>
 				<studiengang_art><![CDATA['.$typ.']]></studiengang_art>
                 <studiengang_typ><![CDATA['.$studiengang->typ.']]></studiengang_typ>
                 <studiengang_orgform_kurzbz><![CDATA['.$studiengang->orgform_kurzbz.']]></studiengang_orgform_kurzbz>
                 <studiengang_orgform_bezeichnung><![CDATA['.$orgform_bezeichnung->bezeichnung.']]></studiengang_orgform_bezeichnung>
                 <studiengang_studiengangsleitung><![CDATA['.$stgl.']]></studiengang_studiengangsleitung>
-				<lv_studiengang_kz><![CDATA['.sprintf("%04d",abs($lv_studiengang_kz)).']]></lv_studiengang_kz>
+				<lv_studiengang_kz><![CDATA['.$lv_studiengang_kz.']]></lv_studiengang_kz>
 				<lv_studiengang_bezeichnung><![CDATA['.$lv_studiengang_bezeichnung.']]></lv_studiengang_bezeichnung>
                 <lv_studiengang_typ><![CDATA['.$lv_studiengang_typ.']]></lv_studiengang_typ>
 				<lv_studiengang_art><![CDATA['.$lv_studiengang_art.']]></lv_studiengang_art>
 				<anrede><![CDATA['.$student->anrede.']]></anrede>
+				<geschlecht><![CDATA['.$student->geschlecht.']]></geschlecht>
 				<svnr><![CDATA['.$student->svnr.']]></svnr>
 				<ersatzkennzeichen><![CDATA['.$student->ersatzkennzeichen.']]></ersatzkennzeichen>
 				<familienstand><![CDATA['.$student->familienstand.']]></familienstand>

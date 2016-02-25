@@ -92,7 +92,7 @@ if($stsem!='')
 						<th>Studiengänge</th>
 						<th>Absolut / %</th>
 						<th>In / Out</th>
-						<th>BB / VZ / DL</th>
+						<th>BB / VZ / DL / DDP / PT</th>
 						<th>m</th>
 						<th>w</th>
 						<th>&Ouml;sterreich</th>
@@ -101,7 +101,7 @@ if($stsem!='')
 					</tr>
 			 ";
 	//Bachelor
-	$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung, orgform_kurzbz,
+	$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung, orgform_kurzbz, mischform,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem'
 					) a) AS gesamt_stg,
@@ -124,6 +124,12 @@ if($stsem!='')
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='DL'
 					) a) AS fs,
+	   			(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='DDP'
+					) a) AS ddp,
+	   			 (SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='PT'
+					) a) AS pt,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND geschlecht='w'
 					) a) AS w,
@@ -154,6 +160,8 @@ if($stsem!='')
 		$gesamt_bb=0;
 		$gesamt_vz=0;
 		$gesamt_fs=0;
+		$gesamt_ddp=0;
+		$gesamt_pt=0;
 		$gesamt_m=0;
 		$gesamt_w=0;
 		$gesamt_at=0;
@@ -169,36 +177,64 @@ if($stsem!='')
 			$prozent = ($row->gesamt_alle!=0?$row->gesamt_stg/$row->gesamt_alle*100:0);
 			echo "<td align='center'>$row->gesamt_stg / ".sprintf('%0.2f', $prozent)." %</td>";
 			echo "<td align='center'>$row->inc / $row->out</td>";
-			if($row->orgform_kurzbz=='BB')
+			if($row->orgform_kurzbz=='BB' && $db->db_parse_bool($row->mischform)==false)
 			{
 				//berufsbegleitend: gesamtzahl in spalte bb
-				echo "<td align='center'>$row->gesamt_stg / $row->vz / $row->fs</td>";
+				echo "<td align='center'>$row->gesamt_stg / $row->vz / $row->fs / $row->ddp / $row->pt</td>";
 				$gesamt_bb += $row->gesamt_stg;
 				$gesamt_vz += $row->vz;
 				$gesamt_fs += $row->fs;
+				$gesamt_ddp += $row->ddp;
+				$gesamt_pt += $row->pt;
 			}
-			else if($row->orgform_kurzbz=='VZ')
+			else if($row->orgform_kurzbz=='VZ' && $db->db_parse_bool($row->mischform)==false)
 			{
 				//vollzeit: gesamtzahl in spalte vz
-				echo "<td align='center'>$row->bb / $row->gesamt_stg / $row->fs</td>";
+				echo "<td align='center'>$row->bb / $row->gesamt_stg / $row->fs / $row->ddp / $row->pt</td>";
 				$gesamt_bb += $row->bb;
 				$gesamt_vz += $row->gesamt_stg;
 				$gesamt_fs += $row->fs;
+				$gesamt_ddp += $row->ddp;
+				$gesamt_pt += $row->pt;
 			}
-			else if($row->orgform_kurzbz=='DL')
+			else if($row->orgform_kurzbz=='DL' && $db->db_parse_bool($row->mischform)==false)
 			{
 				//fernlehre: gesamtzahl in spalte DL
-				echo "<td align='center'>$row->bb / $row->vz / $row->gesamt_stg</td>";
+				echo "<td align='center'>$row->bb / $row->vz / $row->gesamt_stg / $row->ddp / $row->pt</td>";
 				$gesamt_bb += $row->bb;
 				$gesamt_vz += $row->vz;
 				$gesamt_fs += $row->gesamt_stg;
+				$gesamt_ddp += $row->ddp;
+				$gesamt_pt += $row->pt;
 			}
-			else 
+			else if($row->orgform_kurzbz=='DDP' && $db->db_parse_bool($row->mischform)==false)
 			{
-				echo "<td align='center'>$row->bb / $row->vz / $row->fs</td>";
+				//doubledegree: gesamtzahl in spalte DDP
+				echo "<td align='center'>$row->bb / $row->vz / $row->fs / $row->gesamt_stg / $row->pt</td>";
 				$gesamt_bb += $row->bb;
 				$gesamt_vz += $row->vz;
 				$gesamt_fs += $row->fs;
+				$gesamt_pt += $row->gesamt_stg;
+				$gesamt_pt += $row->pt;
+			}
+			else if($row->orgform_kurzbz=='PT' && $db->db_parse_bool($row->mischform)==false)
+			{
+				//parttime: gesamtzahl in spalte PT
+				echo "<td align='center'>$row->bb / $row->vz / $row->fs / $row->ddp / $row->gesamt_stg</td>";
+				$gesamt_bb += $row->bb;
+				$gesamt_vz += $row->vz;
+				$gesamt_fs += $row->fs;
+				$gesamt_ddp += $row->ddp;
+				$gesamt_pt += $row->gesamt_stg;
+			}
+			else 
+			{
+				echo "<td align='center'>$row->bb / $row->vz / $row->fs / $row->ddp / $row->pt</td>";
+				$gesamt_bb += $row->bb;
+				$gesamt_vz += $row->vz;
+				$gesamt_fs += $row->fs;
+				$gesamt_ddp += $row->ddp;
+				$gesamt_pt += $row->pt;
 			}
 			echo "<td align='center'>$row->m</td>";
 			echo "<td align='center'>$row->w</td>";
@@ -221,7 +257,7 @@ if($stsem!='')
 		echo "<td>&nbsp;</td>";
 		echo "<td align='center'><b>$gesamt / ".sprintf('%0.2f', $gesamt_prozent)." %</b></td>";
 		echo "<td align='center'><b>$gesamt_inc / $gesamt_out</b></td>";
-		echo "<td align='center'><b>$gesamt_bb / $gesamt_vz / $gesamt_fs</b></td>";
+		echo "<td align='center'><b>$gesamt_bb / $gesamt_vz / $gesamt_fs / $gesamt_ddp / $gesamt_pt</b></td>";
 		echo "<td align='center'><b>$gesamt_m</b></td>";
 		echo "<td align='center'><b>$gesamt_w</b></td>";
 		echo "<td align='center'><b>$gesamt_at</b></td>";
@@ -236,6 +272,8 @@ if($stsem!='')
 	$gesamtsumme_bb = $gesamt_bb;
 	$gesamtsumme_vz = $gesamt_vz;
 	$gesamtsumme_fs = $gesamt_fs;
+	$gesamtsumme_ddp = $gesamt_ddp;
+	$gesamtsumme_pt = $gesamt_pt;
 	$gesamtsumme_m = $gesamt_m;
 	$gesamtsumme_w = $gesamt_w;
 	$gesamtsumme_at = $gesamt_at;
@@ -251,14 +289,14 @@ if($stsem!='')
 		<th>Studiengänge</th>
 		<th>Absolut / %</th>
 		<th>In / Out</th>
-		<th>BB / VZ / DL</th>
+		<th>BB / VZ / DL / DDP / PT</th>
 		<th>m</th>
 		<th>w</th>
 		<th>&Ouml;sterreich</th>
 		<th>EU</th>
 		<th>Nicht-EU</th>
 	</tr>';
-	$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung, orgform_kurzbz,
+	$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung, orgform_kurzbz,mischform,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."'
 					) AS gesamt_stg,
@@ -281,6 +319,12 @@ if($stsem!='')
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='DL'
 					) a) AS fs,
+	   			 (SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='DDP'
+					) a) AS ddp,
+	   			 (SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND orgform_kurzbz='PT'
+					) a) AS pt,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='".addslashes($stsem)."' AND geschlecht='w'
 					) a) AS w,
@@ -311,6 +355,8 @@ if($stsem!='')
 		$gesamt_bb=0;
 		$gesamt_vz=0;
 		$gesamt_fs=0;
+		$gesamt_ddp=0;
+		$gesamt_pt=0;
 		$gesamt_m=0;
 		$gesamt_w=0;
 		$gesamt_at=0;
@@ -326,36 +372,64 @@ if($stsem!='')
 			$prozent = ($row->gesamt_alle!=0?$row->gesamt_stg/$row->gesamt_alle*100:0);
 			echo "<td align='center'>$row->gesamt_stg / ".sprintf('%0.2f', $prozent)." %</td>";
 			echo "<td align='center'>$row->inc / $row->out</td>";
-			if($row->orgform_kurzbz=='BB')
+		if($row->orgform_kurzbz=='BB' && $db->db_parse_bool($row->mischform)==false)
 			{
 				//berufsbegleitend: gesamtzahl in spalte bb
-				echo "<td align='center'>$row->gesamt_stg / $row->vz / $row->fs</td>";
+				echo "<td align='center'>$row->gesamt_stg / $row->vz / $row->fs / $row->ddp / $row->pt</td>";
 				$gesamt_bb += $row->gesamt_stg;
 				$gesamt_vz += $row->vz;
 				$gesamt_fs += $row->fs;
+				$gesamt_ddp += $row->ddp;
+				$gesamt_pt += $row->pt;
 			}
-			else if($row->orgform_kurzbz=='VZ')
+			else if($row->orgform_kurzbz=='VZ' && $db->db_parse_bool($row->mischform)==false)
 			{
 				//vollzeit: gesamtzahl in spalte vz
-				echo "<td align='center'>$row->bb / $row->gesamt_stg / $row->fs</td>";
+				echo "<td align='center'>$row->bb / $row->gesamt_stg / $row->fs / $row->ddp / $row->pt</td>";
 				$gesamt_bb += $row->bb;
 				$gesamt_vz += $row->gesamt_stg;
 				$gesamt_fs += $row->fs;
+				$gesamt_ddp += $row->ddp;
+				$gesamt_pt += $row->pt;
 			}
-			else if($row->orgform_kurzbz=='DL')
+			else if($row->orgform_kurzbz=='DL' && $db->db_parse_bool($row->mischform)==false)
 			{
 				//fernlehre: gesamtzahl in spalte DL
-				echo "<td align='center'>$row->bb / $row->vz / $row->gesamt_stg</td>";
+				echo "<td align='center'>$row->bb / $row->vz / $row->gesamt_stg / $row->ddp / $row->pt</td>";
 				$gesamt_bb += $row->bb;
 				$gesamt_vz += $row->vz;
 				$gesamt_fs += $row->gesamt_stg;
+				$gesamt_ddp += $row->ddp;
+				$gesamt_pt += $row->pt;
 			}
-			else 
+			else if($row->orgform_kurzbz=='DDP' && $db->db_parse_bool($row->mischform)==false)
 			{
-				echo "<td align='center'>$row->bb / $row->vz / $row->fs</td>";
+				//doubledegree: gesamtzahl in spalte DDP
+				echo "<td align='center'>$row->bb / $row->vz / $row->fs / $row->gesamt_stg / $row->pt</td>";
 				$gesamt_bb += $row->bb;
 				$gesamt_vz += $row->vz;
 				$gesamt_fs += $row->fs;
+				$gesamt_pt += $row->gesamt_stg;
+				$gesamt_pt += $row->pt;
+			}
+			else if($row->orgform_kurzbz=='PT' && $db->db_parse_bool($row->mischform)==false)
+			{
+				//parttime: gesamtzahl in spalte PT
+				echo "<td align='center'>$row->bb / $row->vz / $row->fs / $row->ddp / $row->gesamt_stg</td>";
+				$gesamt_bb += $row->bb;
+				$gesamt_vz += $row->vz;
+				$gesamt_fs += $row->fs;
+				$gesamt_ddp += $row->ddp;
+				$gesamt_pt += $row->gesamt_stg;
+			}
+			else 
+			{
+				echo "<td align='center'>$row->bb / $row->vz / $row->fs / $row->ddp / $row->pt</td>";
+				$gesamt_bb += $row->bb;
+				$gesamt_vz += $row->vz;
+				$gesamt_fs += $row->fs;
+				$gesamt_ddp += $row->ddp;
+				$gesamt_pt += $row->pt;
 			}
 			echo "<td align='center'>$row->m</td>";
 			echo "<td align='center'>$row->w</td>";
@@ -378,7 +452,7 @@ if($stsem!='')
 		echo "<td>&nbsp;</td>";
 		echo "<td align='center'><b>$gesamt / ".sprintf('%0.2f', $gesamt_prozent)." %</b></td>";
 		echo "<td align='center'><b>$gesamt_inc / $gesamt_out</b></td>";
-		echo "<td align='center'><b>$gesamt_bb / $gesamt_vz / $gesamt_fs</b></td>";
+		echo "<td align='center'><b>$gesamt_bb / $gesamt_vz / $gesamt_fs / $gesamt_ddp / $gesamt_pt</b></td>";
 		echo "<td align='center'><b>$gesamt_m</b></td>";
 		echo "<td align='center'><b>$gesamt_w</b></td>";
 		echo "<td align='center'><b>$gesamt_at</b></td>";
@@ -392,6 +466,8 @@ if($stsem!='')
 	$gesamtsumme_bb += $gesamt_bb;
 	$gesamtsumme_vz += $gesamt_vz;
 	$gesamtsumme_fs += $gesamt_fs;
+	$gesamtsumme_ddp += $gesamt_ddp;
+	$gesamtsumme_pt += $gesamt_pt;
 	$gesamtsumme_m += $gesamt_m;
 	$gesamtsumme_w += $gesamt_w;
 	$gesamtsumme_at += $gesamt_at;
@@ -404,7 +480,7 @@ if($stsem!='')
 	echo "<td>&nbsp;</td>";
 	echo "<td align='center'><b>$gesamtsumme / ".sprintf('%0.2f', $gesamtsumme_prozent)." %</b></td>";
 	echo "<td align='center'><b>$gesamtsumme_inc / $gesamtsumme_out</b></td>";
-	echo "<td align='center'><b>$gesamtsumme_bb / $gesamtsumme_vz / $gesamtsumme_fs</b></td>";
+	echo "<td align='center'><b>$gesamtsumme_bb / $gesamtsumme_vz / $gesamtsumme_fs / $gesamtsumme_ddp / $gesamtsumme_pt</b></td>";
 	echo "<td align='center'><b>$gesamtsumme_m</b></td>";
 	echo "<td align='center'><b>$gesamtsumme_w</b></td>";
 	echo "<td align='center'><b>$gesamtsumme_at</b></td>";

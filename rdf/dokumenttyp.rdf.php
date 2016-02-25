@@ -24,8 +24,10 @@ require_once('../include/dokument.class.php');
 $oRdf = new rdf('DOKUMENTTYP','http://www.technikum-wien.at/dokumenttyp');
 $oRdf->sendHeader();
 
+$ohne_dok=isset($_REQUEST["ohne_dok"])?$_REQUEST["ohne_dok"]:'';
+
 $dokumente = new dokument();
-$dokumente->getAllDokumente();
+$dokumente->getAllDokumente($ohne_dok);
 
 foreach($dokumente->result as $row)
 {	

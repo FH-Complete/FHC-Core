@@ -215,7 +215,7 @@ else
 			$lv_obj->load($row->lehrveranstaltung_id);
 			
 			$i++;
-			$tbl.= "<tr class='liste".($i%2)."'><td>".$lv_obj->bezeichnung_arr[$sprache]." (".$lv_obj->lehrform_kurzbz.")</td>";
+			$tbl.= "<tr class='liste".($i%2)."'><td>".$lv_obj->bezeichnung_arr[$sprache].($lv_obj->lehrform_kurzbz!="" && $lv_obj->lehrform_kurzbz!=" - "?" (".$lv_obj->lehrform_kurzbz.")":"")."</td>";
 			$tbl.= "<td>";
 			
 			//Nur freigegebene Noten anzeigen

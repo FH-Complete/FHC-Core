@@ -515,7 +515,10 @@ function InteressentDokumenteNichtabgegebenEntfernen()
 	var akte_id = getTreeCellText(tree, 'interessent-dokumente-tree-nichtabgegeben-akte_id', tree.currentIndex);
 	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
 
-	InteressentDokumentEntfernen(akte_id, prestudent_id);
+	if(confirm('Dieses Dokument wirklich loeschen?'))
+	{
+		InteressentDokumentEntfernen(akte_id, prestudent_id);
+	 }
 }
 
 function InteressentDokumenteAbgegebenBearbeiten()
@@ -546,8 +549,11 @@ function InteressentDokumenteAbgegebenEntfernen()
 	var tree = document.getElementById('interessent-dokumente-tree-abgegeben');
 	var akte_id = getTreeCellText(tree, 'interessent-dokumente-tree-abgegeben-akte_id', tree.currentIndex);
 	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
-
-	InteressentDokumentEntfernen(akte_id, prestudent_id);
+	
+	if(confirm('Dieses Dokument wirklich loeschen?'))
+	{
+		InteressentDokumentEntfernen(akte_id, prestudent_id);
+	}
 }
 
 function InteressentDokumentEntfernen(akte_id, prestudent_id)

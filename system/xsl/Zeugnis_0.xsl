@@ -334,45 +334,45 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<xsl:for-each select="../zeugnis">
 					<xsl:variable select="position()" name="number"/><!-- Variable number definieren, die nach jedem Dokument um eines erhöht wird (position) -->
 						<draw:frame draw:style-name="fr1" draw:name="Rahmen{$number}" text:anchor-type="page" text:anchor-page-number="{$number}" svg:y="21.001cm" draw:z-index="0">
-		                <draw:text-box fo:min-height="0.499cm" fo:min-width="2cm">
-		                    <table:table table:name="Tabelle3" table:style-name="Tabelle3">
-		                        <table:table-column table:style-name="Tabelle3.A"/>
-		                        <table:table-column table:style-name="Tabelle3.B"/>
-		                        <table:table-column table:style-name="Tabelle3.C"/>
-		                        <table:table-row>
-		                            <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-		                                <text:p text:style-name="P17">Wien, am <xsl:value-of select="ort_datum" /></text:p>
-		                            </table:table-cell>
-		                            <table:table-cell table:style-name="Tabelle3.B1" office:value-type="string">
-		                                <text:p text:style-name="P16"/>
-		                            </table:table-cell>
-		                            <table:table-cell table:style-name="Tabelle3.C1" office:value-type="string">
-		                                <text:p text:style-name="P16"/>
-		                            </table:table-cell>
-		                        </table:table-row>
-		                        <table:table-row>
-		                            <table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-		                                <text:p text:style-name="P17">Ort, Datum</text:p>
-		                            </table:table-cell>
-		                            <table:table-cell table:style-name="Tabelle3.B2" office:value-type="string">
-		                                <text:p text:style-name="P16"/>
-		                            </table:table-cell>
-		                            <table:table-cell table:style-name="Tabelle3.C2" office:value-type="string">
-		                                <text:p text:style-name="P17"><xsl:value-of select="studiengangsleiter" /></text:p>
-		                                <text:p text:style-name="P17">Studiengangsleitung</text:p>
-		                            </table:table-cell>
-		                        </table:table-row>
-		                    </table:table>
-		                </draw:text-box>
-		            </draw:frame>
-		            <draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr3" draw:name="Bild{$number}" text:anchor-type="page" text:anchor-page-number="{$number}" svg:x="5.2cm" svg:width="3.51cm" svg:height="3.51cm" draw:z-index="1">
-		                <draw:image xlink:href="Pictures/10000201000002290000022939997AEC.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-		            </draw:frame>
+						<draw:text-box fo:min-height="0.499cm" fo:min-width="2cm">
+							<table:table table:name="Tabelle3" table:style-name="Tabelle3">
+								<table:table-column table:style-name="Tabelle3.A"/>
+								<table:table-column table:style-name="Tabelle3.B"/>
+								<table:table-column table:style-name="Tabelle3.C"/>
+								<table:table-row>
+									<table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
+										<text:p text:style-name="P17">Wien, am <xsl:value-of select="ort_datum" /></text:p>
+									</table:table-cell>
+									<table:table-cell table:style-name="Tabelle3.B1" office:value-type="string">
+										<text:p text:style-name="P16"/>
+									</table:table-cell>
+									<table:table-cell table:style-name="Tabelle3.C1" office:value-type="string">
+										<text:p text:style-name="P16"/>
+									</table:table-cell>
+								</table:table-row>
+								<table:table-row>
+									<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+										<text:p text:style-name="P17">Ort, Datum</text:p>
+									</table:table-cell>
+									<table:table-cell table:style-name="Tabelle3.B2" office:value-type="string">
+										<text:p text:style-name="P16"/>
+									</table:table-cell>
+									<table:table-cell table:style-name="Tabelle3.C2" office:value-type="string">
+										<text:p text:style-name="P17"><xsl:value-of select="studiengangsleiter" /></text:p>
+										<text:p text:style-name="P17">Studiengangsleitung</text:p>
+									</table:table-cell>
+								</table:table-row>
+							</table:table>
+						</draw:text-box>
+					</draw:frame>
+					<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr3" draw:name="Bild{$number}" text:anchor-type="page" text:anchor-page-number="{$number}" svg:x="5.2cm" svg:width="3.51cm" svg:height="3.51cm" draw:z-index="1">
+						<draw:image xlink:href="Pictures/10000201000002290000022939997AEC.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+					</draw:frame>
 				</xsl:for-each>
 			</xsl:if>
-            <text:p text:style-name="Seitenumbruch">ZEUGNIS</text:p>
-            <text:p text:style-name="P6">
-            	<xsl:choose>
+			<text:p text:style-name="Seitenumbruch">ZEUGNIS</text:p>
+			<text:p text:style-name="P6">
+				<xsl:choose>
 					<xsl:when test="string-length(semester_bezeichnung)=0">
 						<xsl:value-of select="stsem"/>
 					</xsl:when>

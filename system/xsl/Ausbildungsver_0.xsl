@@ -285,6 +285,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       </style:paragraph-properties>
       <style:text-properties fo:color="#000000" style:font-name="Arial" fo:font-size="10pt" style:font-size-asian="10pt" style:font-name-complex="Arial"/>
     </style:style>
+    <style:style style:name="P42" style:family="paragraph" style:parent-style-name="Standard1">
+      <style:paragraph-properties fo:line-height="130%"/>
+      <style:text-properties fo:color="#ff3333" fo:font-size="16pt" style:font-size-asian="16pt" style:font-name-complex="Arial" style:font-size-complex="16pt"/>
+    </style:style>
     <style:style style:name="T1" style:family="text">
       <style:text-properties fo:font-weight="bold" style:font-weight-asian="bold"/>
     </style:style>
@@ -346,6 +350,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
       </text:sequence-decls>
       <text:h text:style-name="P22" text:outline-level="1" text:is-list-header="true">Ausbildungsvertrag</text:h>
+      			<!-- Ueberprueft ob benoetigte Datenfelder leer sind -->
+				<xsl:if test="svnr = ''"><text:p text:style-name="P42">Keine Sozialversicherungsnummer oder Ersatzkennzeichen vorhanden</text:p></xsl:if>
+				<xsl:if test="gebdatum = ''"><text:p text:style-name="P42">Kein Geburtsdatum vorhanden</text:p></xsl:if>
+				<xsl:if test="titel_kurzbz = ''"><text:p text:style-name="P42">Kein akademischer Grad vorhanden</text:p></xsl:if>
+				
       <text:p text:style-name="P2"/>
       <text:p text:style-name="P4">Dieser Vertrag regelt das Rechtsverhältnis zwischen dem </text:p>
       <text:p text:style-name="P4"><text:span text:style-name="T1">Verein Fachhochschule Technikum Wien,</text:span> 1060 Wien, Mariahilfer Straße 37-39 (kurz „Erhalter“ genannt) einerseits <text:span text:style-name="T1">und</text:span></text:p>
@@ -381,7 +390,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </text:span>
         </text:span><text:tab/><xsl:value-of select="svnr"/></text:span>
       </text:p>
-      <text:p text:style-name="P7">Personenkennzeichen:<text:tab/><xsl:value-of select="matrikelnr"/></text:p>
       <text:p text:style-name="P11"/>
       <text:p text:style-name="P4">(kurz „Studentin“ bzw. „Student“ genannt) andererseits im Rahmen des <xsl:value-of select="studiengang_typ"/> Studienganges „<xsl:value-of select="studiengang"/>“, StgKz <xsl:value-of select="studiengang_kz"/>, in der Organisationsform eines 
 	<xsl:choose>
@@ -428,7 +436,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </text:list>
         </text:list-item>
       </text:list>
-      <text:p text:style-name="P5">Die Ausbildungsdauer beträgt <xsl:value-of select="student_maxsemester"/> Semester.</text:p>
+      <text:p text:style-name="P5">Die Ausbildungsdauer beträgt <xsl:value-of select="studiengang_maxsemester"/> Semester.</text:p>
       <text:p text:style-name="P5"/>
       <text:p text:style-name="P5">Nachgewiesene erworbene Kenntnisse können auf einzelne Lehrveranstaltungen angerechnet werden bzw. zum Erlass einer Lehrveranstaltung oder des Berufspraktikums führen. Hierzu bedarf es eines Antrages der Studentin bzw. des Studenten und der nachfolgenden Feststellung der inhaltlichen und umfänglichen Gleichwertigkeit durch die Studiengangsleitung.</text:p>
       <text:p text:style-name="P36"/>

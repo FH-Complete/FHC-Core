@@ -246,7 +246,7 @@ if($db->db_query($qry))
 		<vornamen><![CDATA['.$student->vornamen.']]></vornamen>
 		<nachname><![CDATA['.$student->nachname.']]></nachname>
 		<titelpost><![CDATA['.$student->titelpost.']]></titelpost>
-		<matrikelnr><![CDATA['.$student->matrikelnr.']]></matrikelnr>
+		<matrikelnr><![CDATA['.trim($student->matrikelnr).']]></matrikelnr>
 		<gebdatum_iso><![CDATA['.$student->gebdatum.']]></gebdatum_iso>
 		<geschlecht><![CDATA['.$student->geschlecht.']]></geschlecht>
 		<gebdatum><![CDATA['.$datum_obj->convertISODate($student->gebdatum).']]></gebdatum>

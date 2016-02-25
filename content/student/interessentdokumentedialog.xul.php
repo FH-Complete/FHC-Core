@@ -79,7 +79,7 @@ $db = new basis_db();
 				<row>
 					<label value="Dokumenttyp" />
 					<menulist id="interessent-dokumente-dialog-menulist-dokument_kurzbz"
-						      datasources="<?php echo APP_ROOT; ?>rdf/dokumenttyp.rdf.php" flex="1"
+						      datasources="<?php echo APP_ROOT; ?>rdf/dokumenttyp.rdf.php?ohne_dok=Zeugnis" flex="1"
 						      ref="http://www.technikum-wien.at/dokumenttyp" 
 					>
 						<template>

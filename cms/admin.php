@@ -96,12 +96,13 @@ $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
 	);
 	function FHCFileBrowser(field_name, url, type, win) 
 	{
-		cmsURL = "<?php echo APP_ROOT;?>cms/tinymce_dms.php?type="+type;
+		dms_id = url.substring(url.indexOf("=") +1);
+		cmsURL = "<?php echo APP_ROOT;?>cms/tinymce_dms.php?type="+type+"&searchstring="+dms_id;
 		tinyMCE.activeEditor.windowManager.open({
 			file: cmsURL,
 			title : "FHComplete File Browser",
-			width: 800,
-			height: 600,
+			width: 1400,
+			height: 850,
 			resizable: "yes",
 			close_previous: "no",
 			scrollbars: "yes",

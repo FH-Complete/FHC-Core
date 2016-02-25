@@ -152,6 +152,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	}
 	
 	$lehrinhalte = '';
+	$lehrziele = '';
 	$infoqry = "SELECT * FROM campus.tbl_lvinfo WHERE sprache='German' AND lehrveranstaltung_id = ".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 	if($db->db_query($infoqry))
 	{
@@ -161,6 +162,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			for ($i = 0; $i < sizeof($lehrinhalte_arr); $i++)
 			{
 				$lehrinhalte .= $lehrinhalte_arr[$i].'\n';			
+			}
+			$lehrziele_arr = explode("<br>",$inforow->lehrziele);
+			for ($i = 0; $i < sizeof($lehrziele_arr); $i++)
+			{
+				$lehrziele .= $lehrziele_arr[$i].'\n';
 			}
 		}		
 	}	
@@ -199,7 +205,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "\n		<studiensemester>".$studiensemester->bezeichnung."</studiensemester>";
 		$xml .= "\n		<vorname>".$row->vorname."</vorname>";
 		$xml .= "\n		<nachname>".$row->nachname."</nachname>";
-		$xml .= "\n		<name>".trim($row->titelpre.' '.$row->vorname.' '.mb_strtoupper($row->nachname).($row->titelpost!=''?', '.$row->titelpost:''))."</name>";
+		$xml .= "\n		<name>".trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.($row->titelpost!=''?', '.$row->titelpost:''))."</name>";
+		$xml .= "\n		<titelpre>".$row->titelpre."</titelpre>";
+		$xml .= "\n		<titelpost>".$row->titelpost."</titelpost>";
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 		$xml .= "\n		<gebdatum>".$gebdatum."</gebdatum>";
 		$xml .= "\n		<geschlecht>".$row->geschlecht."</geschlecht>";
@@ -237,6 +245,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "				<ects>".number_format($ects,1)."</ects>";
 		$xml .= "				<lvleiter>".$leiter_titel." ".$leiter_vorname." ".$leiter_nachname.($leiter_titelpost!=''?', '.$leiter_titelpost:'')."</lvleiter>";
 		$xml .= "				<lehrinhalte><![CDATA[".clearHtmlTags($lehrinhalte)."]]></lehrinhalte>";
+		$xml .= "				<lehrziele><![CDATA[".clearHtmlTags($lehrziele)."]]></lehrziele>";
 
 		
 		$xml .= "	</zertifikat>";

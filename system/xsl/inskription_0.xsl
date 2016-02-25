@@ -249,248 +249,85 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
-			<text:p text:style-name="P9">Studienbestätigung Fachhochschule Technikum Wien</text:p>
-			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
-				<table:table-column table:style-name="Tabelle1.A"/>
-				<table:table-column table:style-name="Tabelle1.B"/>
-				<table:table-row table:style-name="Tabelle1.1">
-					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-						<text:p text:style-name="P5">Zur Vorlage an (Stelle an der die Bestätigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
-						<text:p text:style-name="P6">Personenkennzeichen</text:p>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row table:style-name="Tabelle1.2">
-					<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-						<text:p text:style-name="P8">
-							<xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="vornamen" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" />
-						</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
-						<text:p text:style-name="P7">
-							<xsl:value-of select="matrikelnummer" />
-						</text:p>
-					</table:table-cell>
-				</table:table-row>
-			</table:table>
-			<text:p text:style-name="P1" />
-			<text:p text:style-name="P1">
-				geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
-				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
-				als ordentliche(r) Studierende(r) (Studienbeginn<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" />, Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
-				<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
-				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
-			</text:p>
+			
+			<xsl:call-template name="abschnitt"/>			
 			<text:p text:style-name="P1"/>
-			<table:table table:name="Tabelle2" table:style-name="Tabelle2">
-				<table:table-column table:style-name="Tabelle2.A"/>
-				<table:table-column table:style-name="Tabelle2.B"/>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-						<text:p text:style-name="P2">Datum:<xsl:text> </xsl:text><xsl:value-of select="tagesdatum" /><xsl:text> </xsl:text>DVR: 0928381</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-						<text:p text:style-name="P3">Rektor:<xsl:text> </xsl:text><xsl:value-of select="rektor" /></text:p>
-					</table:table-cell>
-				</table:table-row>
-			</table:table>
-			<text:p />
 			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
-			<text:p />
-			<text:p text:style-name="P9">Studienbestätigung Fachhochschule Technikum Wien</text:p>
-			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
-				<table:table-column table:style-name="Tabelle1.A"/>
-				<table:table-column table:style-name="Tabelle1.B"/>
-				<table:table-row table:style-name="Tabelle1.1">
-					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-						<text:p text:style-name="P5">Zur Vorlage an (Stelle an der die Bestätigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
-						<text:p text:style-name="P6">Personenkennzeichen</text:p>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row table:style-name="Tabelle1.2">
-					<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-						<text:p text:style-name="P8">
-							<xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="vornamen" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" />
-						</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
-						<text:p text:style-name="P7">
-							<xsl:value-of select="matrikelnummer" />
-						</text:p>
-					</table:table-cell>
-				</table:table-row>
-			</table:table>
-			<text:p text:style-name="P1" />
-			<text:p text:style-name="P1">
-				geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
-				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
-				als ordentliche(r) Studierende(r) (Studienbeginn<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" />, Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
-				<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
-				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
-			</text:p>
 			<text:p text:style-name="P1"/>
-			<table:table table:name="Tabelle2" table:style-name="Tabelle2">
-				<table:table-column table:style-name="Tabelle2.A"/>
-				<table:table-column table:style-name="Tabelle2.B"/>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-						<text:p text:style-name="P2">Datum:<xsl:text> </xsl:text><xsl:value-of select="tagesdatum" /><xsl:text> </xsl:text>DVR: 0928381</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-						<text:p text:style-name="P3">Rektor:<xsl:text> </xsl:text><xsl:value-of select="rektor" /></text:p>
-					</table:table-cell>
-				</table:table-row>
-			</table:table>
-			<text:p />
+			<xsl:call-template name="abschnitt"/>	
+			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
-			<text:p />
-			<text:p text:style-name="P9">Studienbestätigung Fachhochschule Technikum Wien</text:p>
-			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
-				<table:table-column table:style-name="Tabelle1.A"/>
-				<table:table-column table:style-name="Tabelle1.B"/>
-				<table:table-row table:style-name="Tabelle1.1">
-					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-						<text:p text:style-name="P5">Zur Vorlage an (Stelle an der die Bestätigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
-						<text:p text:style-name="P6">Personenkennzeichen</text:p>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row table:style-name="Tabelle1.2">
-					<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-						<text:p text:style-name="P8">
-							<xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="vornamen" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" />
-						</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
-						<text:p text:style-name="P7">
-							<xsl:value-of select="matrikelnummer" />
-						</text:p>
-					</table:table-cell>
-				</table:table-row>
-			</table:table>
-			<text:p text:style-name="P1" />
-			<text:p text:style-name="P1">
-				geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
-				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
-				als ordentliche(r) Studierende(r) (Studienbeginn<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" />, Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
-				<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
-				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
-			</text:p>
 			<text:p text:style-name="P1"/>
-			<table:table table:name="Tabelle2" table:style-name="Tabelle2">
-				<table:table-column table:style-name="Tabelle2.A"/>
-				<table:table-column table:style-name="Tabelle2.B"/>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-						<text:p text:style-name="P2">Datum:<xsl:text> </xsl:text><xsl:value-of select="tagesdatum" /><xsl:text> </xsl:text>DVR: 0928381</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-						<text:p text:style-name="P3">Rektor:<xsl:text> </xsl:text><xsl:value-of select="rektor" /></text:p>
-					</table:table-cell>
-				</table:table-row>
-			</table:table>
-			<text:p />
+			<xsl:call-template name="abschnitt"/>	
+			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
-			<text:p />
-			<text:p text:style-name="P9">Studienbestätigung Fachhochschule Technikum Wien</text:p>
-			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
-				<table:table-column table:style-name="Tabelle1.A"/>
-				<table:table-column table:style-name="Tabelle1.B"/>
-				<table:table-row table:style-name="Tabelle1.1">
-					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-						<text:p text:style-name="P5">Zur Vorlage an (Stelle an der die Bestätigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
-						<text:p text:style-name="P6">Personenkennzeichen</text:p>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row table:style-name="Tabelle1.2">
-					<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-						<text:p text:style-name="P8">
-							<xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="vornamen" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" />
-						</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
-						<text:p text:style-name="P7">
-							<xsl:value-of select="matrikelnummer" />
-						</text:p>
-					</table:table-cell>
-				</table:table-row>
-			</table:table>
-			<text:p text:style-name="P1" />
-			<text:p text:style-name="P1">
-				geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
-				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
-				als ordentliche(r) Studierende(r) (Studienbeginn<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" />, Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
-				<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
-				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
-			</text:p>
 			<text:p text:style-name="P1"/>
-			<table:table table:name="Tabelle2" table:style-name="Tabelle2">
-				<table:table-column table:style-name="Tabelle2.A"/>
-				<table:table-column table:style-name="Tabelle2.B"/>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-						<text:p text:style-name="P2">Datum:<xsl:text> </xsl:text><xsl:value-of select="tagesdatum" /><xsl:text> </xsl:text>DVR: 0928381</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-						<text:p text:style-name="P3">Rektor:<xsl:text> </xsl:text><xsl:value-of select="rektor" /></text:p>
-					</table:table-cell>
-				</table:table-row>
-			</table:table>
-			<text:p />
+			<xsl:call-template name="abschnitt"/>	
+			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
-			<text:p />
-			<text:p text:style-name="P9">Studienbestätigung Fachhochschule Technikum Wien</text:p>
-			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
-				<table:table-column table:style-name="Tabelle1.A"/>
-				<table:table-column table:style-name="Tabelle1.B"/>
-				<table:table-row table:style-name="Tabelle1.1">
-					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-						<text:p text:style-name="P5">Zur Vorlage an (Stelle an der die Bestätigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
-						<text:p text:style-name="P6">Personenkennzeichen</text:p>
-					</table:table-cell>
-				</table:table-row>
-				<table:table-row table:style-name="Tabelle1.2">
-					<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-						<text:p text:style-name="P8">
-							<xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="vornamen" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" />
-						</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
-						<text:p text:style-name="P7">
-							<xsl:value-of select="matrikelnummer" />
-						</text:p>
-					</table:table-cell>
-				</table:table-row>
-			</table:table>
-			<text:p text:style-name="P1" />
-			<text:p text:style-name="P1">
-				geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
-				ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
-				als ordentliche(r) Studierende(r) (Studienbeginn<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" />, Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
-				<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
-				<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
-			</text:p>
 			<text:p text:style-name="P1"/>
-			<table:table table:name="Tabelle2" table:style-name="Tabelle2">
-				<table:table-column table:style-name="Tabelle2.A"/>
-				<table:table-column table:style-name="Tabelle2.B"/>
-				<table:table-row>
-					<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-						<text:p text:style-name="P2">Datum:<xsl:text> </xsl:text><xsl:value-of select="tagesdatum" /><xsl:text> </xsl:text>DVR: 0928381</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-						<text:p text:style-name="P3">Rektor:<xsl:text> </xsl:text><xsl:value-of select="rektor" /></text:p>
-					</table:table-cell>
-				</table:table-row>
-			</table:table>
+			<xsl:call-template name="abschnitt"/>
+			
 		 </office:text>
+</xsl:template>
+<xsl:template name="abschnitt">
+	<text:p text:style-name="P9">Studienbestätigung Fachhochschule Technikum Wien</text:p>
+		<table:table table:name="Tabelle1" table:style-name="Tabelle1">
+			<table:table-column table:style-name="Tabelle1.A"/>
+			<table:table-column table:style-name="Tabelle1.B"/>
+			<table:table-row table:style-name="Tabelle1.1">
+				<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
+					<text:p text:style-name="P5">Zur Vorlage an (Stelle an der die Bestätigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)</text:p>
+				</table:table-cell>
+				<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
+					<text:p text:style-name="P6">Personenkennzeichen</text:p>
+				</table:table-cell>
+			</table:table-row>
+			<table:table-row table:style-name="Tabelle1.2">
+				<table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
+					<text:p text:style-name="P8">
+						<xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="vornamen" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" />
+					</text:p>
+				</table:table-cell>
+				<table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
+					<text:p text:style-name="P7">
+						<xsl:value-of select="matrikelnummer" />
+					</text:p>
+				</table:table-cell>
+			</table:table-row>
+		</table:table>
+		<text:p text:style-name="P1" />
+		<text:p text:style-name="P1">
+			geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
+			ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
+			als 
+			<xsl:choose>
+				<xsl:when test="geschlecht='m'">
+					<xsl:text>ordentlicher Studierender </xsl:text>
+				</xsl:when>
+				<xsl:when test="geschlecht='w'">
+					<xsl:text>ordentliche Studierende </xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>ordentliche(r) Studierende(r) </xsl:text>
+				</xsl:otherwise>
+			</xsl:choose>
+			(Studienbeginn<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" />, Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
+			<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
+			<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
+		</text:p>
+		<text:p text:style-name="P1"/>
+		<table:table table:name="Tabelle2" table:style-name="Tabelle2">
+			<table:table-column table:style-name="Tabelle2.A"/>
+			<table:table-column table:style-name="Tabelle2.B"/>
+			<table:table-row>
+				<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
+					<text:p text:style-name="P2">Datum:<xsl:text> </xsl:text><xsl:value-of select="tagesdatum" /><xsl:text> </xsl:text>DVR: 0928381</text:p>
+				</table:table-cell>
+				<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
+					<text:p text:style-name="P3">Rektor:<xsl:text> </xsl:text><xsl:value-of select="rektor" /></text:p>
+				</table:table-cell>
+			</table:table-row>
+		</table:table>
 </xsl:template>
 </xsl:stylesheet>
