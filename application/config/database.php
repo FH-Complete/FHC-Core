@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+defined('DB_HOST') OR require_once './config/system.config.inc.php'; // For CLI-Migrations
 
 /*
 | -------------------------------------------------------------------

@@ -6,12 +6,15 @@ class Migration_Create_basedb extends CI_Migration {
 
         public function up()
         {
-			$this->load->helper('file');
-            $sqlfile =  read_file('./system/fhcomplete3.0.sql');
-
-			if (!$this->db->simple_query($sqlfile))
+			if (!$this->db->table_exists('tbl_person'))
 			{
-					echo "Error creating Basis DB-Schema!";
+				$this->load->helper('file');
+		        $sqlfile =  read_file('./system/fhcomplete3.0.sql');
+
+				if (!$this->db->simple_query($sqlfile))
+				{
+						echo "Error creating Basis DB-Schema!";
+				}
 			}
         }
 
