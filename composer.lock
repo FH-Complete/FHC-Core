@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3446439fc0a3c19a1292cba921c29a92",
-    "content-hash": "f83541dff2ed308d9d00f9da737a085a",
+    "hash": "ea064e414812c16fa7b4e1fc066dc2b3",
+    "content-hash": "73ee27147eb49e32aef9d975d2a90ffa",
     "packages": [
         {
             "name": "codeigniter-restserver",
@@ -950,6 +950,71 @@
                 "php"
             ],
             "time": "2015-11-05 03:32:43"
+        },
+        {
+            "name": "rougin/refinery",
+            "version": "v0.1.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rougin/refinery.git",
+                "reference": "d32a49dfb61072dcf9619b181de9d9c762e6e26c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rougin/refinery/zipball/d32a49dfb61072dcf9619b181de9d9c762e6e26c",
+                "reference": "d32a49dfb61072dcf9619b181de9d9c762e6e26c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0",
+                "rougin/blueprint": "0.1.*",
+                "rougin/describe": "1.2.*",
+                "rougin/spark-plug": "0.2.*"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*",
+                "scrutinizer/ocular": "~1.1"
+            },
+            "suggest": {
+                "rougin/codeigniter": "Yet another way to install CodeIgniter via Composer",
+                "rougin/combustor": "A tool for speeding up web development in CodeIgniter"
+            },
+            "bin": [
+                "bin/refinery",
+                "bin/refinery.php"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.2-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Rougin\\Refinery\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Rougin Royce Gutib",
+                    "email": "rougingutib@gmail.com",
+                    "homepage": "http://rougin.github.io",
+                    "role": "Developer"
+                }
+            ],
+            "description": "'Ready-to-eat' migrations for Codeigniter",
+            "homepage": "https://github.com/rougin/refinery",
+            "keywords": [
+                "database",
+                "migrations",
+                "php",
+                "refinery"
+            ],
+            "time": "2016-03-04 16:55:32"
         },
         {
             "name": "rougin/spark-plug",

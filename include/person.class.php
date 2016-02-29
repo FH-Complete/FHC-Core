@@ -22,13 +22,19 @@
 /*
  * Benoetigt functions.inc.php
  */
-require_once(dirname(__FILE__).'/basis_db.class.php');
+//require_once(dirname(__FILE__).'/basis_db.class.php');  Now over CI
 require_once(dirname(__FILE__).'/datum.class.php');
 
-class person extends basis_db
+// CI
+require_once(dirname(__FILE__).'/../ci_hack.php');
+require_once(dirname(__FILE__).'/../application/models/Person_model.php');
+
+class person extends Person_model
 {
+	use db_extra; //CI Hack
+	
 	public $errormsg;			// string
-	public $new=true;      		// boolean
+	public $new;      			// boolean
 	public $personen = array(); // person Objekt
 	public $done=false;			// boolean
 
@@ -47,7 +53,7 @@ class person extends basis_db
 	public $foto;              	// text
 	public $anmerkungen;       	// varchar(256)
 	public $homepage;          	// varchar(256)
-	public $svnr;				// varchar(16)
+	public $svnr;				// char(10)
 	public $ersatzkennzeichen; 	// char(10)
 	public $familienstand;     	// char(1)
 	public $anzahlkinder;      	// smalint
@@ -86,7 +92,8 @@ class person extends basis_db
 		//person_id auf gueltigkeit pruefen
 		if(is_numeric($person_id) && $person_id!='')
 		{
-			$qry = "SELECT person_id, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
+			/* Alter Code
+				$qry = "SELECT person_id, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
 				gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 				familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
 				geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung, zugangscode, foto_sperre, matr_nr
@@ -98,7 +105,8 @@ class person extends basis_db
 				return false;
 			}
 
-			if($row = $this->db_fetch_object())
+			if($row = $this->db_fetch_object())*/
+			if ($row = $this->get_personen($person_id))
 			{
 				$this->person_id = $row->person_id;
 				$this->sprache = $row->sprache;
@@ -180,7 +188,7 @@ class person extends basis_db
 		$this->anrede = trim($this->anrede);
 		$this->titelpost = trim($this->titelpost);
 		$this->titelpre = trim($this->titelpre);
-
+		
 		if(mb_strlen($this->sprache)>16)
 		{
 			$this->errormsg = 'Sprache darf nicht laenger als 16 Zeichen sein';
@@ -244,7 +252,7 @@ class person extends basis_db
 			$this->errormsg = 'SVNR darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-
+		
 		if(mb_strlen($this->matr_nr)>32)
 		{
 			$this->errormsg = 'Matrikelnummer darf nicht laenger als 32 Zeichen sein';
@@ -348,7 +356,7 @@ class person extends basis_db
 			$this->errormsg = 'Geschlecht muss w, m oder u sein!';
 			return false;
 		}
-
+		
 		//Pruefen ob das Geburtsdatum mit der SVNR uebereinstimmt.
 		if($this->svnr!='' && $this->gebdatum!='')
 		{
@@ -369,7 +377,7 @@ class person extends basis_db
 				$this->errormsg = 'Format des Geburtsdatums ist ungueltig';
 				return false;
 			}
-
+			
 			/* das muss nicht immer so sein
 			$day_svnr = mb_substr($this->svnr, 4, 2);
 			$month_svnr = mb_substr($this->svnr, 6, 2);
@@ -504,7 +512,7 @@ class person extends basis_db
 			return false;
 		}
 	}
-
+	
 	/**
 	 * Liefert die Tabellenelemente die den Kriterien der Parameter entsprechen
 	 * @param $filter String mit Vorname oder Nachname
@@ -520,7 +528,7 @@ class person extends basis_db
 				public.tbl_person
 				LEFT JOIN public.tbl_benutzer USING(person_id)
 			WHERE true ";
-
+		
 		if($filter!='')
 		{
 			$sql_query.=" AND 	nachname ~* '".$this->db_escape($filter)."' OR
@@ -533,7 +541,7 @@ class person extends basis_db
 		$sql_query .= " ORDER BY $order";
 		if($filter=='')
 		   $sql_query .= " LIMIT 30";
-
+		
 		if($this->db_query($sql_query))
 		{
 			while($row = $this->db_fetch_object())

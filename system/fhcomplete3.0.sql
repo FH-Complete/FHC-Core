@@ -15,6 +15,11 @@ SET escape_string_warning = off;
 
 COMMENT ON DATABASE fhcomplete IS 'FH-Complete 3.0';
 
+-- Rollen im System
+-- CREATE ROLE wawi LOGIN PASSWORD 'vilesci';
+-- CREATE ROLE wawi LOGIN PASSWORD 'wawi';
+-- CREATE ROLE wawi LOGIN PASSWORD 'web';
+
 
 --
 -- Name: bis; Type: SCHEMA; Schema: -; Owner: postgres
@@ -108,10 +113,10 @@ ALTER SCHEMA wawi OWNER TO fhcomplete;
 -- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: postgres
 --
 
-CREATE PROCEDURAL LANGUAGE plpgsql;
+-- CREATE PROCEDURAL LANGUAGE plpgsql;
 
 
-ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO fhcomplete;
+-- ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO fhcomplete;
 
 SET search_path = public, pg_catalog;
 
@@ -159,16 +164,7 @@ CREATE FUNCTION get_rolle_prestudent(integer, character varying) RETURNS charact
 
 ALTER FUNCTION public.get_rolle_prestudent(integer, character varying) OWNER TO fhcomplete;
 
---
--- Name: plpgsql_call_handler(); Type: FUNCTION; Schema: public; Owner: postgres
---
 
-CREATE FUNCTION plpgsql_call_handler() RETURNS language_handler
-    LANGUAGE c
-    AS '$libdir/plpgsql', 'plpgsql_call_handler';
-
-
-ALTER FUNCTION public.plpgsql_call_handler() OWNER TO fhcomplete;
 
 SET search_path = bis, pg_catalog;
 
@@ -46370,4 +46366,5 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zahlungstyp TO vilesci;
 --
 -- PostgreSQL database dump complete
 --
+SET search_path = public, pg_catalog;
 
