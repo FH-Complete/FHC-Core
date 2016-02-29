@@ -1,4 +1,5 @@
 .htaccess
+bin
 /nbproject/
 /vendor/*
 !/vendor/FHC-vendor
