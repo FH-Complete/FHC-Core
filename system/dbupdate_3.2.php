@@ -671,6 +671,173 @@ if(!$result = @$db->db_query("SELECT uhrzeit from lehre.tbl_abschlusspruefung LI
 		echo 'lehre.tbl_abschlusspruefung: spalte uhrzeit hinzugefügt';
 }
 
+//Spalte status_kurzbz in lehre.tbl_studienordnung
+if (!$result = @$db->db_query("SELECT status_kurzbz FROM lehre.tbl_studienordnung LIMIT 1;"))
+{
+    $qry = "ALTER TABLE lehre.tbl_studienordnung ADD COLUMN status_kurzbz varchar(32); 
+	   
+	    ALTER TABLE lehre.tbl_studienordnung ADD CONSTRAINT status_kurzbz FOREIGN KEY (status_kurzbz) REFERENCES addon.tbl_stgv_studienordnungstatus (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	    UPDATE lehre.tbl_studienordnung SET status_kurzbz = 'approved';
+	   ";
+    
+    if (!$db->db_query($qry))
+	echo '<strong>lehre.tbl_studienordnung: ' . $db->db_last_error() . '</strong><br>';
+    else
+	echo ' lehre.tbl_studienordnung: Spalte status_kurzbz hinzugefügt.<br>';
+    
+}
+
+//Spalte standort_id in lehre.tbl_studienordnung
+if (!$result = @$db->db_query("SELECT standort_id FROM lehre.tbl_studienordnung LIMIT 1;"))
+{
+    $qry = "ALTER TABLE lehre.tbl_studienordnung ADD COLUMN standort_id integer;
+	    
+	    ALTER TABLE lehre.tbl_studienordnung ADD CONSTRAINT studienordnung_standort_id FOREIGN KEY (standort_id) REFERENCES public.tbl_standort (standort_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	   ";
+    
+    if (!$db->db_query($qry))
+	echo '<strong>lehre.tbl_studienordnung: ' . $db->db_last_error() . '</strong><br>';
+    else
+	echo ' lehre.tbl_studienordnung: Spalte standort_id hinzugefügt.<br>';
+    
+}
+
+//Spalte ects_stpl in lehre.tbl_studienplan
+if (!$result = @$db->db_query("SELECT ects_stpl FROM lehre.tbl_studienplan LIMIT 1;"))
+{
+    $qry = "ALTER TABLE lehre.tbl_studienplan ADD COLUMN ects_stpl numeric(5,2);";
+    
+    if (!$db->db_query($qry))
+	echo '<strong>lehre.tbl_studienplan: ' . $db->db_last_error() . '</strong><br>';
+    else
+	echo ' lehre.tbl_studienplan: Spalte ects_stpl hinzugefügt.<br>';
+    
+}
+
+//Spalte pflicht_sws in lehre.tbl_studienplan
+if (!$result = @$db->db_query("SELECT pflicht_sws FROM lehre.tbl_studienplan LIMIT 1;"))
+{
+    $qry = "ALTER TABLE lehre.tbl_studienplan ADD COLUMN pflicht_sws integer;";
+    
+    if (!$db->db_query($qry))
+	echo '<strong>lehre.tbl_studienplan: ' . $db->db_last_error() . '</strong><br>';
+    else
+	echo ' lehre.tbl_studienplan: Spalte pflicht_sws hinzugefügt.<br>';
+    
+}
+
+//Spalte pflicht_lvs in lehre.tbl_studienplan
+if (!$result = @$db->db_query("SELECT pflicht_lvs FROM lehre.tbl_studienplan LIMIT 1;"))
+{
+    $qry = "ALTER TABLE lehre.tbl_studienplan ADD COLUMN pflicht_lvs integer;";
+    
+    if (!$db->db_query($qry))
+	echo '<strong>lehre.tbl_studienplan: ' . $db->db_last_error() . '</strong><br>';
+    else
+	echo ' lehre.tbl_studienplan: Spalte pflicht_lvs hinzugefügt.<br>';
+    
+}
+
+// Tabelle Studienplan_Semester
+if (!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienplan_semester LIMIT 1;")) {
+    $qry = "CREATE TABLE lehre.tbl_studienplan_semester
+			(
+				studienplan_semester_id integer NOT NULL,
+				studienplan_id integer NOT NULL,
+				studiensemester_kurzbz varchar(16) NOT NULL,
+				semester smallint NOT NULL
+			);
+
+		CREATE SEQUENCE lehre.tbl_studienplan_semester_studienplan_semester_id
+		 INCREMENT BY 1
+		 NO MAXVALUE
+		 NO MINVALUE
+		 CACHE 1;
+
+		ALTER TABLE lehre.tbl_studienplan_semester ADD CONSTRAINT pk_studienplan_semester PRIMARY KEY (studienplan_semester_id);
+		ALTER TABLE lehre.tbl_studienplan_semester ALTER COLUMN studienplan_semester_id SET DEFAULT nextval('lehre.tbl_studienplan_semester_studienplan_semester_id');
+
+		ALTER TABLE lehre.tbl_studienplan_semester ADD CONSTRAINT fk_studienplan_semester_studienplan_id FOREIGN KEY (studienplan_id) REFERENCES lehre.tbl_studienplan (studienplan_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE lehre.tbl_studienplan_semester ADD CONSTRAINT fk_studienplan_semester_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		GRANT SELECT ON lehre.tbl_studienplan_semester TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_studienplan_semester TO vilesci;
+		GRANT SELECT, UPDATE ON lehre.tbl_studienplan_semester_studienplan_semester_id TO vilesci;
+	";
+
+    if (!$db->db_query($qry))
+	echo '<strong>lehre.tbl_studienplan_semester: ' . $db->db_last_error() . '</strong><br>';
+    else
+	echo ' lehre.tbl_studienplan_semester: Tabelle hinzugefuegt<br>';
+}
+
+//Tabelle public.tbl_bewerbungstermine
+if (!$result = @$db->db_query("SELECT 1 FROM public.tbl_bewerbungstermine LIMIT 1;")) {
+    $qry = "CREATE TABLE public.tbl_bewerbungstermine
+			(
+				bewerbungstermin_id integer NOT NULL,
+				studiengang_kz integer NOT NULL,
+				studiensemester_kurzbz varchar(16) NOT NULL,
+				beginn timestamp,
+				ende timestamp,
+				nachfrist boolean default false,
+				nachfrist_ende timestamp,
+				anmerkung text,
+				insertamum timestamp,
+				insertvon varchar(32),
+				updateamum timestamp,
+				updatevon varchar(32)
+			);
+			
+		    CREATE SEQUENCE public.tbl_bewerbungstermine_bewerbungstermin_id_seq
+			INCREMENT BY 1
+			NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+
+		ALTER TABLE public.tbl_bewerbungstermine ADD CONSTRAINT pk_bewerbungstermin_id PRIMARY KEY (bewerbungstermin_id);
+		ALTER TABLE public.tbl_bewerbungstermine ALTER COLUMN bewerbungstermin_id SET DEFAULT nextval('public.tbl_bewerbungstermine_bewerbungstermin_id_seq');
+		ALTER TABLE public.tbl_bewerbungstermine ADD CONSTRAINT fk_bewerbungstermin_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE public.tbl_bewerbungstermine ADD CONSTRAINT fk_bewerbungstermin_studiengang FOREIGN KEY (studiengang_kz) REFERENCES public.tbl_studiengang (studiengang_kz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		GRANT SELECT ON public.tbl_bewerbungstermine TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_bewerbungstermine TO vilesci;
+		GRANT SELECT, UPDATE ON public.tbl_bewerbungstermine_bewerbungstermin_id_seq TO vilesci;
+	";
+
+    if (!$db->db_query($qry))
+	echo '<strong>public.tbl_studienordnungstatus: ' . $db->db_last_error() . '</strong><br>';
+    else
+	echo ' public.tbl_studienordnungstatus: Tabelle hinzugefuegt<br>';
+}
+
+//Tabelle lehre.tbl_studienordnungstatus
+if (!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienordnungstatus LIMIT 1;")) {
+    $qry = "CREATE TABLE lehre.tbl_studienordnungstatus
+			(
+				status_kurzbz varchar(32) NOT NULL,
+				bezeichnung varchar(256),
+				reihenfolge integer
+			);
+
+		ALTER TABLE lehre.tbl_studienordnungstatus ADD CONSTRAINT pk_studienordnungstatus PRIMARY KEY (status_kurzbz);
+
+		GRANT SELECT ON lehre.tbl_studienordnungstatus TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_studienordnungstatus TO vilesci;
+		
+		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('development', 'in Bearbeitung', 1);
+		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('review', 'in Review', 2);
+		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('approved', 'genehmigt', 3);
+		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('expired', 'ausgelaufen', 4);
+		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('notApproved', 'nicht genehmigt', 5);
+	";
+
+    if (!$db->db_query($qry))
+	echo '<strong>lehre.tbl_studienordnungstatus: ' . $db->db_last_error() . '</strong><br>';
+    else
+	echo ' lehre.tbl_studienordnungstatus: Tabelle hinzugefuegt<br>';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -800,10 +967,12 @@ $tabellen=array(
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id","vertrag_id", "punkte"),
 	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung","abschluss"),
-	"lehre.tbl_studienordnung"  => array("studienordnung_id","studiengang_kz","version","gueltigvon","gueltigbis","bezeichnung","ects","studiengangbezeichnung","studiengangbezeichnung_englisch","studiengangkurzbzlang","akadgrad_id","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"lehre.tbl_studienordnung"  => array("studienordnung_id","studiengang_kz","version","gueltigvon","gueltigbis","bezeichnung","ects","studiengangbezeichnung","studiengangbezeichnung_englisch","studiengangkurzbzlang","akadgrad_id","insertamum","insertvon","updateamum","updatevon","ext_id", "status_kurzbz", "standort_id"),
+	"lehre.tbl_studienordnungstatus" => array("status_kurzbz","bezeichnung","reihenfolge"),	
 	"lehre.tbl_studienordnung_semester"  => array("studienordnung_semester_id","studienordnung_id","studiensemester_kurzbz","semester"),
-	"lehre.tbl_studienplan" => array("studienplan_id","studienordnung_id","orgform_kurzbz","version","regelstudiendauer","sprache","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon","semesterwochen","testtool_sprachwahl","ext_id"),
+	"lehre.tbl_studienplan" => array("studienplan_id","studienordnung_id","orgform_kurzbz","version","regelstudiendauer","sprache","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon","semesterwochen","testtool_sprachwahl","ext_id", "ects_stpl", "pflicht_sws", "pflicht_lvs"),
 	"lehre.tbl_studienplan_lehrveranstaltung" => array("studienplan_lehrveranstaltung_id","studienplan_id","lehrveranstaltung_id","semester","studienplan_lehrveranstaltung_id_parent","pflicht","koordinator","insertamum","insertvon","updateamum","updatevon","sort","ext_id", "curriculum"),
+	"lehre.tbl_studienplan_semester" => array("studienplan_semester_id", "studienplan_id", "studiensemester_kurzbz", "semester"),	
 	"lehre.tbl_studienplatz" => array("studienplatz_id","studiengang_kz","studiensemester_kurzbz","orgform_kurzbz","ausbildungssemester","gpz","npz","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"lehre.tbl_stunde"  => array("stunde","beginn","ende"),
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
@@ -828,6 +997,7 @@ $tabellen=array(
 	"public.tbl_benutzer"  => array("uid","person_id","aktiv","alias","insertamum","insertvon","updateamum","updatevon","ext_id","updateaktivvon","updateaktivam","aktivierungscode"),
 	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung","wochenstunden"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"public.tbl_bewerbungstermine" => array("bewerbungstermin_id","studiengang_kz","studiensemester_kurzbz","beginn","ende","nachfrist","nachfrist_ende","anmerkung", "insertamum", "insertvon", "updateamum", "updatevon"),
 	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext","aktiv","credit_points"),
 	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id","bezeichnung_mehrsprachig","dokumentbeschreibung_mehrsprachig"),
 	"public.tbl_dokumentprestudent"  => array("dokument_kurzbz","prestudent_id","mitarbeiter_uid","datum","updateamum","updatevon","insertamum","insertvon","ext_id"),

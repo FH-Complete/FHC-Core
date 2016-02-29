@@ -46,6 +46,9 @@ class studienplan extends basis_db
     protected $updatevon;				// varchar
     protected $insertamum;				// timestamp
     protected $insertvon;				// varchar
+    protected $ects_stpl;
+    protected $pflicht_sws;
+    protected $pflicht_lvs;
 
     //Tabellenspalten für Zwischentabelle tbl_studienplan_lehrveranstaltung
     protected $studienplan_lehrveranstaltung_id;		//integer
@@ -111,6 +114,9 @@ class studienplan extends basis_db
 		    $this->aktiv = $this->db_parse_bool($row->aktiv);
 		    $this->semesterwochen = $row->semesterwochen;
 		    $this->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
+		    $this->ects_stpl = $row->ects_stpl;
+		    $this->pflicht_lvs = $row->pflicht_lvs;
+		    $this->pflicht_sws = $row->pflicht_sws;
 		    $this->updateamum = $row->updateamum;
 		    $this->updatevon = $row->updatevon;
 		    $this->insertamum = $row->insertamum;
@@ -164,6 +170,9 @@ class studienplan extends basis_db
 			    $obj->aktiv = $this->db_parse_bool($row->aktiv);
 			    $obj->semesterwochen = $row->semesterwochen;
 			    $obj->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
+			    $obj->ects_stpl = $row->ects_stpl;
+			    $obj->pflicht_lvs = $row->pflicht_lvs;
+			    $obj->pflicht_sws = $row->pflicht_sws;
 			    $obj->updateamum = $row->updateamum;
 			    $obj->updatevon = $row->updatevon;
 			    $obj->insertamum = $row->insertamum;
@@ -257,7 +266,7 @@ class studienplan extends basis_db
 		    //Neuen Datensatz einfuegen
 		    $qry='BEGIN;INSERT INTO lehre.tbl_studienplan (studienordnung_id, orgform_kurzbz,version,
 			    bezeichnung, regelstudiendauer, sprache, aktiv, semesterwochen, testtool_sprachwahl,
-			    insertamum, insertvon) VALUES ('.
+			    pflicht_sws, pflicht_lvs, ects_stpl, insertamum, insertvon) VALUES ('.
 			  $this->db_add_param($this->studienordnung_id, FHC_INTEGER).', '.
 			  $this->db_add_param($this->orgform_kurzbz).', '.
 			  $this->db_add_param($this->version).', '.
@@ -267,6 +276,9 @@ class studienplan extends basis_db
 			  $this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
 			  $this->db_add_param($this->semesterwochen,FHC_INTEGER).', '.
 			  $this->db_add_param($this->testtool_sprachwahl,FHC_BOOLEAN).', '.
+			  $this->db_add_param($this->pflicht_sws) . ', ' .
+			  $this->db_add_param($this->pflicht_lvs) . ', ' .
+			  $this->db_add_param($this->ects_stpl) . ', ' .
 			  'now(), '.
 			  $this->db_add_param($this->insertvon).');';
 	    }
@@ -288,6 +300,9 @@ class studienplan extends basis_db
 		    ' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
 		    ' semesterwochen='.$this->db_add_param($this->semesterwochen, FHC_INTEGER).', '.
 		    ' testtool_sprachwahl='.$this->db_add_param($this->testtool_sprachwahl, FHC_BOOLEAN).','.
+		    ' ects_stpl=' . $this->db_add_param($this->ects_stpl) . ',' .
+		    ' pflicht_sws=' . $this->db_add_param($this->pflicht_sws, FHC_INTEGER) . ',' .
+		    ' pflicht_lvs=' . $this->db_add_param($this->pflicht_lvs, FHC_INTEGER) . ',' .
 		    ' updateamum= now(), '.
 		    ' updatevon='.$this->db_add_param($this->updatevon).' '.
 		    ' WHERE studienplan_id='.$this->db_add_param($this->studienplan_id, FHC_INTEGER, false).';';
@@ -820,6 +835,212 @@ class studienplan extends basis_db
     	    }
     	    return true;
     	}
+    }
+    
+    /**
+     * speichert die Semesterzuordnung für die Studieordnung
+     * @param int $$studienplan_id Die ID des Studienplans
+     * @param string $studiensemester_kurzbz Kurzbezeichnung des Studiensemesters
+     * @param int $ausbildungssemester Ausbildungssemester als Zahl
+     */
+    public function saveSemesterZuordnung($zuordnung = array())
+    {
+
+	if (is_array($zuordnung))
+	{
+	    $qry = "";
+	    foreach ($zuordnung as $key)
+	    {
+		if (!is_numeric($key["studienplan_id"]))
+		{
+		    $this->errormsg = 'studienplan_id muss eine gueltige Zahl sein';
+		    return false;
+		}
+
+		if (!is_string($key["studiensemester_kurzbz"]) || strlen($key["studiensemester_kurzbz"]) != 6)
+		{
+		    $this->errormsg = 'studiensemester_kurzbz muss ein String mit 6 Zeichen sein';
+		    return false;
+		}
+
+		if (!is_numeric($key["ausbildungssemester"]))
+		{
+		    $this->errormsg = 'ausbildungssemester muss eine gueltige Zahl sein';
+		    return false;
+		}
+
+
+		$qry .= "INSERT INTO lehre.tbl_studienplan_semester (studienplan_id, studiensemester_kurzbz, semester) VALUES (" .
+			$this->db_add_param($key["studienplan_id"]) . ', ' .
+			$this->db_add_param($key["studiensemester_kurzbz"]) . ', ' .
+			$this->db_add_param($key["ausbildungssemester"]) . '); ';
+	    }
+
+	    if (!$this->db_query($qry))
+	    {
+		$this->errormsg = 'Fehler beim Speichern des Datensatzes';
+		return false;
+	    }
+	    return true;
+	} else
+	{
+	    $this->errormsg = 'Der übergebene Parameter ist kein Array.';
+	    return false;
+	}
+	return false;
+    }
+
+    /**
+     * lädt alle zugeordneten Semester eines Studienplans
+     * @param int $studienplan ID
+     */
+    public function loadStudiensemesterFromStudienplan($studienplan_id)
+    {
+	if (!is_numeric($studienplan_id))
+	{
+	    $this->errormsg = 'studienplan_id muss eine gueltige Zahl sein';
+	    return false;
+	}
+
+	$qry = 'SELECT DISTINCT studiensemester_kurzbz, tbl_studiensemester.start
+				FROM 
+					lehre.tbl_studienplan_semester 
+					JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+				WHERE studienplan_id=' . $this->db_add_param($studienplan_id) . '
+				ORDER BY tbl_studiensemester.start, studiensemester_kurzbz';
+
+	if (!$this->db_query($qry))
+	{
+	    $this->errormsg = 'Fehler bei einer Datenbankabfrage';
+	    return false;
+	}
+
+	$data = array();
+	while ($row = $this->db_fetch_object())
+	{
+	    $obj = new stdClass();
+	    $data[] = $row->studiensemester_kurzbz;
+	}
+	return $data;
+    }
+
+    public function loadAusbildungsemesterFromStudiensemester($studienplan_id, $studiensemester_kurzbz)
+    {
+	$qry = 'SELECT semester 
+					FROM lehre.tbl_studienplan_semester
+					WHERE studienplan_id=' . $this->db_add_param($studienplan_id) . ' AND 
+						studiensemester_kurzbz=' . $this->db_add_param($studiensemester_kurzbz) . ' 
+					ORDER BY semester;';
+
+	if (!$this->db_query($qry))
+	{
+	    return false;
+	}
+
+	$data = array();
+	while ($row = $this->db_fetch_object())
+	{
+	    $data[] = $row->semester;
+	}
+	return $data;
+    }
+
+    function isSemesterZugeordnet($studienplan_id, $studiensemester_kurzbz, $ausbildungssemester)
+    {
+	if (!is_numeric($studienplan_id))
+	{
+	    $this->errormsg = 'studienplan_id muss eine gueltige Zahl sein';
+	    return false;
+	}
+
+	if (!is_string($studiensemester_kurzbz) || strlen($studiensemester_kurzbz) != 6)
+	{
+	    $this->errormsg = 'studiensemester_kurzbz muss ein String mit 6 Zeichen sein';
+	    return false;
+	}
+
+	if (!is_numeric($ausbildungssemester))
+	{
+	    $this->errormsg = 'ausbildungssemester muss eine gueltige Zahl sein';
+	    return false;
+	}
+
+	$qry = 'SELECT * FROM lehre.tbl_studienplan_semester WHERE 
+			studienplan_id=' . $this->db_add_param($studienplan_id) . ' AND 
+			studiensemester_kurzbz=' . $this->db_add_param($studiensemester_kurzbz) . ' AND 
+			semester=' . $this->db_add_param($ausbildungssemester) . ';';
+
+	if ($this->db_query($qry))
+	{
+	    if ($this->db_num_rows() == 1)
+	    {
+		return true;
+	    }
+	    if ($this->db_num_rows() == 0)
+	    {
+		return false;
+	    }
+	    return false;
+	}
+	return false;
+    }
+
+    public function deleteSemesterZuordnung($studienplan_id, $studiensemester_kurzbz, $ausbildungssemester = NULL)
+    {
+	if (!is_numeric($studienplan_id))
+	{
+	    $this->errormsg = 'studienplan_id muss eine gueltige Zahl sein';
+	    return false;
+	}
+
+	if (!is_string($studiensemester_kurzbz) || strlen($studiensemester_kurzbz) != 6)
+	{
+	    $this->errormsg = 'studiensemester_kurzbz muss ein String mit 6 Zeichen sein';
+	    return false;
+	}
+
+	$qry = 'DELETE FROM lehre.tbl_studienplan_semester 
+					WHERE studienplan_id=' . $this->db_add_param($studienplan_id) . ' AND 
+						studiensemester_kurzbz=' . $this->db_add_param($studiensemester_kurzbz) . '';
+	if ($ausbildungssemester !== null)
+	    $qry.=' AND semester=' . $this->db_add_param($ausbildungssemester) . '';
+
+	$qry.=';';
+
+	if ($this->db_query($qry))
+	{
+	    return true;
+	} else
+	{
+	    $this->errormsg = 'Fehler beim Löschen der Zuordnung' . "\n";
+	    return false;
+	}
+    }
+    
+    /**
+     * prüft ob dem Studienplan Semester zugeordnet sind (Gültigkeit)
+     * @param int $studienplan_id Die ID des Studienplans
+     */
+    public function hasSemesterZugeordnet($studienplan_id)
+    {
+	if (!is_numeric($studienplan_id))
+	{
+	    $this->errormsg = 'studienplan_id muss eine gueltige Zahl sein';
+	    return false;
+	}
+
+	$qry = 'SELECT * FROM lehre.tbl_studienplan_semester WHERE 
+			studienplan_id=' . $this->db_add_param($studienplan_id) . ';';
+
+	if ($this->db_query($qry))
+	{
+	    if ($this->db_num_rows() >= 1)
+	    {
+		return true;
+	    }
+	    return false;
+	}
+	return false;
     }
 }
 ?>
