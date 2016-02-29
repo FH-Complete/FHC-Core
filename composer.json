@@ -1,9 +1,61 @@
 {
-  "require": {
+  "name": "fh-complete/fhc-core",
+  "type": "app",
+  "description": "FH-Complete Core",
+  "keywords": ["fhc", "fh-complete", "campusmanagement"],
+  "homepage": "https://github.com/FH-Complete/FHC-Core",
+  "license": "GPLv3",
+  "authors": [
+  {
+    "name": "Christian Paminger",
+    "email": "christian.paminger@fhcomplete.org",
+    "homepage": "http://fhcomplete.org"
+  },
+  {
+    "name": "Andreas Österreicher",
+    "email": "oesi@technikum-wien.at",
+    "homepage": "http://fhcomplete.org"
+  }],
+  "support": 
+  {
+        "email": "info@fhcomplete.org",
+        "forum": "https://plus.google.com/communities/113278802529782592610",
+        "wiki": "http://wiki.fhcomplete.org/"
+  },
+  "repositories": [
+	{
+		"type": "package",
+		"package": 
+        {
+			"name": "codeigniter-restserver",
+			"version": "2.6",
+			"dist": 
+            {
+				"url": "https://github.com/chriskacerguis/codeigniter-restserver/archive/master.zip",
+				"type": "zip"
+			}
+		}
+	}
+  ],
+  "require": 
+  {
+    "php": ">=5.4.0",
+    "codeigniter/framework":"3.*",
+    "codeigniter-restserver": "2.6",
+	"easyrdf/easyrdf": "0.9.*",
+	"ml/json-ld": "1.*",
+    "rougin/combustor":"1.1.*",
     "components/jquery": "2.1.4",
     "components/angular.js": "1.3.16",
     "components/bootstrap": "3.3.5",
-    "michelf/php-markdown": "1.5.0"
-    
+    "michelf/php-markdown": "1.5.0",
+	"zetacomponents/workflow": "1.*",
+	"zetacomponents/document": "1.*",
+	"zetacomponents/workflow-database-tiein": "1.*",
+	"zetacomponents/workflow-event-log-tiein": "1.*"
+  },
+  "config":
+  {
+    "bin-dir": "bin"
   }
 }
