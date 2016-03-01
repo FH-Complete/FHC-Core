@@ -20,13 +20,11 @@ class Migration_Create_basedb extends CI_Migration {
 
         public function down()
         {
-                $this->db->simple_query('DROP SCHEMA addon;');
-				$this->db->simple_query('DROP SCHEMA bis;');
+                $this->db->simple_query('DROP SCHEMA bis;');
 				$this->db->simple_query('DROP SCHEMA campus;');
 				$this->db->simple_query('DROP SCHEMA fue;');
 				$this->db->simple_query('DROP SCHEMA kommune;');
 				$this->db->simple_query('DROP SCHEMA lehre;');
-				$this->db->simple_query('DROP SCHEMA reports;');
 				$this->db->simple_query('DROP SCHEMA sync;');
 				$this->db->simple_query('DROP SCHEMA system;');
 				$this->db->simple_query('DROP SCHEMA testtool;');

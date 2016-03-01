@@ -16,6 +16,7 @@ SET escape_string_warning = off;
 COMMENT ON DATABASE fhcomplete IS 'FH-Complete 3.0';
 
 -- Rollen im System
+-- CREATE ROLE wawi LOGIN PASSWORD 'admin';
 -- CREATE ROLE wawi LOGIN PASSWORD 'vilesci';
 -- CREATE ROLE wawi LOGIN PASSWORD 'wawi';
 -- CREATE ROLE wawi LOGIN PASSWORD 'web';

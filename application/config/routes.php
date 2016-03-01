@@ -51,6 +51,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 $route['person/(:any)'] = 'person/view/$1';
 $route['person'] = 'person';
-$route['default_controller'] = 'welcome';
+$route['default_controller'] = 'Vilesci';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
