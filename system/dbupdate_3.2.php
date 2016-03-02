@@ -178,10 +178,27 @@ if (!$result = @$db->db_query("SELECT curriculum FROM lehre.tbl_studienplan_lehr
 		echo ' lehre.tbl_studienplan_lehrveranstaltung: Spalte curriculum hinzugefügt.<br>';
 }
 
+//Spalte export in lehre.tbl_studienordnung_lehrveranstaltung
+if (!$result = @$db->db_query("SELECT export FROM lehre.tbl_studienplan_lehrveranstaltung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_studienplan_lehrveranstaltung ADD COLUMN export BOOLEAN DEFAULT TRUE;";
 
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienplan_lehrveranstaltung: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' lehre.tbl_studienplan_lehrveranstaltung: Spalte export hinzugefügt.<br>';
+}
 
+//Spalte lehrauftrag in lehre.tbl_lehrveranstaltung
+if (!$result = @$db->db_query("SELECT lehrauftrag FROM lehre.tbl_lehrveranstaltung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN lehrauftrag BOOLEAN DEFAULT TRUE;";
 
-
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_lehrveranstaltung: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' lehre.tbl_lehrveranstaltung: Spalte lehrauftrag hinzugefügt.<br>';
+}
 
 
 //sozialversicherungsnummer auf char(16) erhöhen
@@ -676,7 +693,7 @@ if (!$result = @$db->db_query("SELECT status_kurzbz FROM lehre.tbl_studienordnun
 {
     $qry = "ALTER TABLE lehre.tbl_studienordnung ADD COLUMN status_kurzbz varchar(32); 
 	   
-	    ALTER TABLE lehre.tbl_studienordnung ADD CONSTRAINT status_kurzbz FOREIGN KEY (status_kurzbz) REFERENCES addon.tbl_stgv_studienordnungstatus (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	    ALTER TABLE lehre.tbl_studienordnung ADD CONSTRAINT status_kurzbz FOREIGN KEY (status_kurzbz) REFERENCES lehre.tbl_studienordnungstatus (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 	    UPDATE lehre.tbl_studienordnung SET status_kurzbz = 'approved';
 	   ";
     
@@ -806,9 +823,9 @@ if (!$result = @$db->db_query("SELECT 1 FROM public.tbl_bewerbungstermine LIMIT 
 	";
 
     if (!$db->db_query($qry))
-	echo '<strong>public.tbl_studienordnungstatus: ' . $db->db_last_error() . '</strong><br>';
+	echo '<strong>public.tbl_bewerbungstermine: ' . $db->db_last_error() . '</strong><br>';
     else
-	echo ' public.tbl_studienordnungstatus: Tabelle hinzugefuegt<br>';
+	echo ' public.tbl_bewerbungstermine: Tabelle hinzugefuegt<br>';
 }
 
 //Tabelle lehre.tbl_studienordnungstatus
