@@ -42,8 +42,8 @@ if(!@$db->db_query("SELECT dokumentbeschreibung_mehrsprachig FROM public.tbl_dok
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_dokument '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Spalte dokumentbeschreibung_mehrsprachig in public.tbl_dokument hinzugefügt';
+	else
+		echo '<br>Spalte dokumentbeschreibung_mehrsprachig in public.tbl_dokument hinzugefügt';
 }
 
 // Neue Spalte beschreibung_mehrsprachig bei tbl_dokumentstudiengang
@@ -829,8 +829,9 @@ if (!$result = @$db->db_query("SELECT 1 FROM public.tbl_bewerbungstermine LIMIT 
 }
 
 //Tabelle lehre.tbl_studienordnungstatus
-if (!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienordnungstatus LIMIT 1;")) {
-    $qry = "CREATE TABLE lehre.tbl_studienordnungstatus
+if (!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienordnungstatus LIMIT 1;"))
+{
+		$qry = "CREATE TABLE lehre.tbl_studienordnungstatus
 			(
 				status_kurzbz varchar(32) NOT NULL,
 				bezeichnung varchar(256),
@@ -849,10 +850,33 @@ if (!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienordnungstatus LIMI
 		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('notApproved', 'nicht genehmigt', 5);
 	";
 
-    if (!$db->db_query($qry))
-	echo '<strong>lehre.tbl_studienordnungstatus: ' . $db->db_last_error() . '</strong><br>';
-    else
-	echo ' lehre.tbl_studienordnungstatus: Tabelle hinzugefuegt<br>';
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienordnungstatus: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' lehre.tbl_studienordnungstatus: Tabelle hinzugefuegt<br>';
+}
+
+//Tabelle lehre.tbl_studienplatz Spalte APZ
+if (!$result = @$db->db_query("SELECT APZ FROM lehre.tbl_studienplatz LIMIT 1;"))
+{
+		$qry = "ALTER TABLE lehre.tbl_studienplatz ADD COLUMN APZ integer;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienplatz '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte APZ in lehre.tbl_studienplatz hinzugefügt';
+}
+
+//Tabelle lehre.tbl_studienplatz Spalte studienplan_id
+if (!$result = @$db->db_query("SELECT studienplan_id FROM lehre.tbl_studienplatz LIMIT 1;"))
+{
+		$qry = "ALTER TABLE lehre.tbl_studienplatz ADD COLUMN studienplan_id integer;
+		ALTER TABLE lehre.tbl_studienplatz ADD CONSTRAINT fk_studienplatz_studienplan FOREIGN KEY (studienplan_id) REFERENCES lehre.tbl_studienplan (studienplan_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienplatz '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte studienplan_id in lehre.tbl_studienplatz hinzugefügt';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -990,7 +1014,7 @@ $tabellen=array(
 	"lehre.tbl_studienplan" => array("studienplan_id","studienordnung_id","orgform_kurzbz","version","regelstudiendauer","sprache","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon","semesterwochen","testtool_sprachwahl","ext_id", "ects_stpl", "pflicht_sws", "pflicht_lvs"),
 	"lehre.tbl_studienplan_lehrveranstaltung" => array("studienplan_lehrveranstaltung_id","studienplan_id","lehrveranstaltung_id","semester","studienplan_lehrveranstaltung_id_parent","pflicht","koordinator","insertamum","insertvon","updateamum","updatevon","sort","ext_id", "curriculum"),
 	"lehre.tbl_studienplan_semester" => array("studienplan_semester_id", "studienplan_id", "studiensemester_kurzbz", "semester"),	
-	"lehre.tbl_studienplatz" => array("studienplatz_id","studiengang_kz","studiensemester_kurzbz","orgform_kurzbz","ausbildungssemester","gpz","npz","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"lehre.tbl_studienplatz" => array("studienplatz_id","studiengang_kz","studiensemester_kurzbz","orgform_kurzbz","ausbildungssemester","gpz","npz","insertamum","insertvon","updateamum","updatevon","ext_id", "apz", "studienplan_id"),
 	"lehre.tbl_stunde"  => array("stunde","beginn","ende"),
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
 	"lehre.tbl_stundenplandev"  => array("stundenplandev_id","lehreinheit_id","unr","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","mitarbeiter_uid","ort_kurzbz","datum","stunde","titel","anmerkung","fix","updateamum","updatevon","insertamum","insertvon","ext_id"),
