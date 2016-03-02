@@ -862,6 +862,119 @@ if (!$result = @$db->db_query("SELECT studienplan_id FROM lehre.tbl_studienplatz
 		echo '<br>Spalte studienplan_id in lehre.tbl_studienplatz hinzugefügt';
 }
 
+
+//Tabelle lehre.tbl_studienplatz Spalte studienplan_id
+if ($result = @$db->db_query("SELECT studienplan_id FROM lehre.tbl_studienplatz WHERE studienplan_id IS NOT NULL;"))
+{
+	if(!$db->db_num_rows($result))
+	{
+		$result = @$db->db_query("SELECT studienplan_id FROM lehre.tbl_studienplatz WHERE studienplan_id IS NULL;");
+		$count = $db->db_num_rows($result);
+		echo "<br>Insgesamt <span style='color:green;'>$count</span> zu bearbeitende Einträge in tbl_studienplatz gefunden<br>";
+
+		$qry = "
+			Select *,
+			(
+				SELECT studienplan_id FROM lehre.tbl_studienplan
+				JOIN lehre.tbl_studienordnung using(studienordnung_id)
+				WHERE studiengang_kz=tbl_studienplatz.studiengang_kz
+				AND tbl_studienplan.orgform_kurzbz=tbl_studienplatz.orgform_kurzbz
+				AND EXISTS
+				(
+					SELECT 1 FROM lehre.tbl_studienordnung_semester
+					WHERE studienordnung_id=tbl_studienplan.studienordnung_id
+					AND studiensemester_kurzbz=tbl_studienplatz.studiensemester_kurzbz
+				) lIMIT 1
+			) as studienplan_id_neu
+			FROM lehre.tbl_studienplatz;
+		";
+
+		if(!$result = $db->db_query($qry))
+			die('<strong>lehre.tbl_studienplatz '.$db->db_last_error().'</strong><br>');
+
+		$count_not_found = 0;
+
+		while($row = $db->db_fetch_object($result))
+		{
+			//handle null
+			if($row->studienplan_id_neu !== null)
+			{
+				//look if found the studienplan exists
+				$qry_search = "
+					SELECT *
+					FROM lehre.tbl_studienplan
+						WHERE studienplan_id=".$db->db_add_param($row->studienplan_id_neu, FHC_INTEGER).";";
+
+				if($result_search = $db->db_query($qry_search))
+				{
+					$tmpFoundRows = $db->db_num_rows($result_search);
+					if($tmpFoundRows == 1)
+					{
+						//one entry found (=success)
+						$qry_update = "UPDATE lehre.tbl_studienplatz SET studienplan_id = ".$db->db_add_param($row->studienplan_id_neu, FHC_INTEGER)."
+							WHERE studienplatz_id=".$db->db_add_param($row->studienplatz_id, FHC_INTEGER).";";
+
+						if($result_update = $db->db_query($qry_update))
+						{
+							continue;
+						}
+						echo "<strong>" . $row->studienplan_id_neu . ": fehler beim update!</strong><br>";
+					}
+					else if($tmpFoundRows < 1)
+					{
+						echo "<strong>" . $row->studienplan_id_neu . " nicht gefunden!</strong><br>";
+					}
+					else
+					{
+						echo "<strong>" . $row->studienplan_id_neu . " gibt es mehr als ein mal!</strong><br>";
+					}
+				}
+			}
+
+			$count_not_found ++;
+		}
+
+
+		//calculate the quote
+		if($count_not_found)
+			$quote = ($count_not_found)/$count*100;
+		else
+			$quote = 0;
+		echo "<strong>unbehandelte:</strong> <span style='color:red;'>" . $count_not_found . "</span><br>";
+		echo "<strong>Die Quote beträgt:</strong> <span style='color:red;'>" . (100-round($quote, 4)) . "%</span><br>";
+
+
+		$qry_updated = "SELECT * FROM lehre.tbl_studienplatz WHERE studienplan_id IS NOT NULL;";
+		if($result_updated = $db->db_query($qry_updated))
+		{
+			while($row = $db->db_fetch_object($result_updated))
+				echo "Für STG $row->studiengang_kz wurde studienplan_id $row->studienplan_id eingesetzt<br>";
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
