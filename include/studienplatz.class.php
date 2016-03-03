@@ -1,24 +1,24 @@
 <?php
 /*
  * studienplatz.class.php
- * 
+ *
  * Copyright 2013 Technikum-Wien
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty oferr
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
+ *
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
  *          Werner Masik <werner@gefi.at>
@@ -29,35 +29,39 @@ require_once(__DIR__ .'/functions.inc.php');
 class studienplatz extends basis_db
 {
 	/** @var $new boolean */
-	private $new = true;		
+	private $new = true;
 	/** @var DB-Result */
 	private $result;
 	/** @var object */
-	public $studienplatz = array();	
+	public $studienplatz = array();
 
 	//Tabellenspalten
 	/** @var integer */
-	private $studienplatz_id;		
+	private $studienplatz_id;
 	/** @var integer */
-	private $studiengang_kz;	
+	private $studiengang_kz;
 	/** @var string */
-	private $orgform_kurzbz; 	
+	private $orgform_kurzbz;
 	/** @var string */
 	private $studiensemester_kurzbz;
 	/** @var integer */
-	private $ausbildungssemester;  	
+	private $ausbildungssemester;
 	/** @var integer */
-	private $gpz;					
+	private $gpz;
 	/** @var integer */
-	private $npz;            		
+	private $npz;
 	/** @var timestamp */
-	private $updateamum;	
+	private $updateamum;
 	/** @var string */
-	private $updatevon;		
+	private $updatevon;
 	/** @var timestamp */
-	private $insertamum;      		
+	private $insertamum;
 	/** @var string */
-	private $insertvon;      	
+	private $insertvon;
+	/** @var integer */
+	private $apz;
+	/** @var integer */
+	private $studienplan_id;
 
 	/**
 	 * Konstruktor
@@ -66,7 +70,7 @@ class studienplatz extends basis_db
 	public function __construct($studienplatz_id=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($studienplatz_id))
 			$this->load($studienplatz_id);
 	}
@@ -76,9 +80,10 @@ class studienplatz extends basis_db
 		switch ($name)
 		{
 			case 'gpz':
-			case 'npz': 
-            case 'ausbildungssemester':			
+			case 'npz':
+			case 'ausbildungssemester':
 			case 'studienplatz_id':
+			case 'studienplan_id':
 				if ($value != null && !is_numeric($value))
 					throw new Exception("Attribute $name must be numeric! ($value)");
 				$this->$name=$value;
@@ -92,8 +97,8 @@ class studienplatz extends basis_db
 	{
 		return $this->$name;
 	}
-	
-	
+
+
 	/**
 	 * Laedt einzelnen Studienplatz der ID $studienplatz_id
 	 * @param integer $studienplatz_id ID des zu ladenden Studienplatzes
@@ -126,7 +131,6 @@ class studienplatz extends basis_db
 			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
 			return false;
 		}
-
 		return true;
 	}
 
@@ -135,31 +139,33 @@ class studienplatz extends basis_db
 	 * @param type $target
 	 * @param type $row
 	 */
-	private function mapRow($target,$row) {		
-		$target->studienplatz_id	= $row->studienplatz_id;
-		$target->studiengang_kz 	= $row->studiengang_kz;
-		$target->orgform_kurzbz	= $row->orgform_kurzbz;
-		$target->studiensemester_kurzbz	= $row->studiensemester_kurzbz;
-		$target->ausbildungssemester	= $row->ausbildungssemester;
-		$target->gpz			= $row->gpz;
-		$target->npz			= $row->npz;			
-		$target->updateamum		= $row->updateamum;
-		$target->updatevon		= $row->updatevon;
-		$target->insertamum		= $row->insertamum;
-		$target->insertvon		= $row->insertvon;
-        $target->new            = false;
+	private function mapRow($target,$row) {
+		$target->studienplatz_id					= $row->studienplatz_id;
+		$target->studiengang_kz 					= $row->studiengang_kz;
+		$target->orgform_kurzbz						= $row->orgform_kurzbz;
+		$target->studiensemester_kurzbz		= $row->studiensemester_kurzbz;
+		$target->ausbildungssemester			= $row->ausbildungssemester;
+		$target->gpz											= $row->gpz;
+		$target->npz											= $row->npz;
+		$target->updateamum								= $row->updateamum;
+		$target->updatevon								= $row->updatevon;
+		$target->insertamum								= $row->insertamum;
+		$target->insertvon								= $row->insertvon;
+		$target->apz											= $row->apz;
+		$target->studienplan_id						= $row->studienplan_id;
+		$target->new											= false;
 	}
-	
+
 	/**
 	 * Laedt alle Studienplaetze zu einem Studiengang und Semester. Ergebnis
 	 * steht in result, wobei es nur einen Datensatz geben kann, wenn
 	 * keinAusbildungssemester = true ist.
-	 * @param integer $studiengang_kz 
+	 * @param integer $studiengang_kz
 	 * @param string studiensemester_kurzbz
 	 * @param string orgform_kurzbz
 	 * @param boolean Ausbildungssemester ist optional. Wenn true werden
-	 *  nur Datensätze geladen wo das Ausbildungssemester null ist. Wenn 
-	 *  false werden alle geladen wo ein Ausbildungssemester eingetragen 
+	 *  nur Datensätze geladen wo das Ausbildungssemester null ist. Wenn
+	 *  false werden alle geladen wo ein Ausbildungssemester eingetragen
 	 *  ist.
 	 * @return true wenn ok, false im Fehlerfall
 	 */
@@ -179,22 +185,63 @@ class studienplatz extends basis_db
 				//" AND art=".$this->db_add_param($art, FHC_STRING, false).
 				" AND orgform_kurzbz=".$this->db_add_param($orgform, FHC_STRING, false).
 				" AND ausbildungssemester ".($keinAusbildungssemester ? 'is null':'is not null');
-        $this->result = array();
-        if(!$this->db_query($qry))
-		{			
+		$this->result = array();
+		if(!$this->db_query($qry))
+		{
 			return false;
 		}
 
 		while($row = $this->db_fetch_object())
 		{
-            $rec = new studienplatz();
-            $this->mapRow($rec, $row);
-			$this->result[] = $rec;		
-        }
+	          $rec = new studienplatz();
+	          $this->mapRow($rec, $row);
+			$this->result[] = $rec;
+	      }
 		return true;
 	}
-	
-	
+
+	/**
+	 * Laedt alle Studienplaetze zu einem Studiengang und Semester. Ergebnis
+	 * steht in result, wobei es nur einen Datensatz geben kann, wenn
+	 * keinAusbildungssemester = true ist.
+	 * @param integer $studiengang_kz
+	 * @param string studiensemester_kurzbz
+	 * @param boolean Ausbildungssemester ist optional. Wenn true werden
+	 *  nur Datensätze geladen wo das Ausbildungssemester null ist. Wenn
+	 *  false werden alle geladen wo ein Ausbildungssemester eingetragen
+	 *  ist.
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load_studiengang_studiensemester($studiengang_kz, $studiensemester_kurzbz, $keinAusbildungssemester = true)
+	{
+		//Pruefen ob $studiengang_kz eine gueltige Zahl ist
+		if(!is_numeric($studiengang_kz) || $studiengang_kz == '')
+		{
+			$this->errormsg = 'studiengang_kz muss eine gültige Zahl sein';
+			return false;
+		}
+
+		//Lesen der Daten aus der Datenbank
+		$qry = "SELECT * FROM lehre.tbl_studienplatz RIGHT JOIN lehre.tbl_studienplan using(studienplan_id) WHERE studiengang_kz=".
+			$this->db_add_param($studiengang_kz, FHC_INTEGER, false).
+			" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz, FHC_STRING, false).
+			" AND ausbildungssemester ".($keinAusbildungssemester ? 'is null':'is not null').
+			" AND studienplan_id IS NOT NULL;";
+
+		$this->result = array();
+		if(!$this->db_query($qry))
+		{
+			return false;
+		}
+
+		while($row = $this->db_fetch_object())
+		{
+			$this->result[] = $row;
+		}
+		return true;
+	}
+
+
 	/**
 	 * Liefert Array mit GPZ und NPZ für die FÖBis relevanten Orgformen (BB, VZ, VBB).
 	 * Dient als Ersatz für load_studiengang_studiensemester_orgform weil hiermit
@@ -207,10 +254,10 @@ class studienplatz extends basis_db
 	{
 
 		// Semesterliste für where klausel erzeugen:
-		$startSemester= 'WS'.substr($studienjahr,0,4);		
+		$startSemester= 'WS'.substr($studienjahr,0,4);
 		$semesterList = generateSemesterList($startSemester,($zeitraum*2)-1);
 		$semesterList_comma_separated = "'".join("','",$semesterList)."'";
-		
+
 		//Lesen der Daten aus der Datenbank
 		$qry =  "SELECT  studiensemester_kurzbz,studiengang_kz,
 				sum(case when orgform_kurzbz='VZ' then npz else 0 end) as npz_vz,
@@ -220,30 +267,69 @@ class studienplatz extends basis_db
 				sum(case when orgform_kurzbz='VZ' then gpz else 0 end) as gpz_vz,
 				sum(case when orgform_kurzbz='BB' then gpz else 0 end) as gpz_bb,
 				sum(case when orgform_kurzbz='VBB' then gpz else 0 end) as gpz_vbb,
-				sum(gpz) as gpz_gesamt 
-				FROM lehre.tbl_studienplatz 
-				WHERE ausbildungssemester is null and studiensemester_kurzbz IN ($semesterList_comma_separated) 
-				group by studiensemester_kurzbz,studiengang_kz";				
-        $this->result = array();
-        if(!$this->db_query($qry))
-		{			
+				sum(gpz) as gpz_gesamt
+				FROM lehre.tbl_studienplatz
+				WHERE ausbildungssemester is null and studiensemester_kurzbz IN ($semesterList_comma_separated)
+				group by studiensemester_kurzbz,studiengang_kz";
+		$this->result = array();
+		if(!$this->db_query($qry))
+		{
 			return false;
 		}
 		$result = array();
 		while($row = $this->db_fetch_object())
 		{
-            $result[$row->studiensemester_kurzbz][$row->studiengang_kz]['BB']['NPZ'] = $row->npz_bb;		
-			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['VZ']['NPZ'] = $row->npz_vz;		
-			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['VBB']['NPZ'] = $row->npz_vbb;		
-			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['gesamt']['NPZ'] = $row->npz_gesamt;		
-			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['BB']['GPZ'] = $row->gpz_bb;		
-			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['VZ']['GPZ'] = $row->gpz_vz;		
-			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['VBB']['GPZ'] = $row->gpz_vbb;		
-			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['gesamt']['GPZ'] = $row->gpz_gesamt;		
-        }
+			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['BB']['NPZ'] = $row->npz_bb;
+			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['VZ']['NPZ'] = $row->npz_vz;
+			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['VBB']['NPZ'] = $row->npz_vbb;
+			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['gesamt']['NPZ'] = $row->npz_gesamt;
+			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['BB']['GPZ'] = $row->gpz_bb;
+			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['VZ']['GPZ'] = $row->gpz_vz;
+			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['VBB']['GPZ'] = $row->gpz_vbb;
+			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['gesamt']['GPZ'] = $row->gpz_gesamt;
+		}
 		return $result;
 	}
+
+
+	/**
+	 * Liefert alle Studienplätze eines Studiengangs und Semesters
+	 * @param string $stg_kz  z.B: -16
+	 * @param string $studiensemester_kurzbz  z.B: WS2015
+	 * @return boolean|array  false bei Fehler
+	 */
+	public function getFromStgKzAndStudsem($stg_kz, $studiensemester_kurzbz)
+	{
+
+		if(!is_numeric($stg_kz))
+		{
+			$this->errormsg='stg_kz muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		if($studiensemester_kurzbz == "")
+		{
+			$this->errormsg='Es wurde kein gueltiges studiensemester_kurzbz uerbergeben';
+			return false;
+		}
 	
+		//Lesen der Daten aus der Datenbank
+		$qry = "SELECT * FROM lehre.tbl_studienplatz
+			JOIN public.tbl_studiengang using(studiengang_kz)
+			WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+			AND studiengang_kz=".$this->db_add_param($stg_kz, FHC_INTEGER);
+
+		if($this->db_query($qry))
+		{
+			$result = array();
+			while($row = $this->db_fetch_object())
+			{
+				$result[] = $row;
+			}
+			return $result;
+		}
+		return false;
+	}
 
 	/**
 	 * Prueft die Variablen auf Gueltigkeit
@@ -260,7 +346,7 @@ class studienplatz extends basis_db
 		{
 			$this->errormsg='studiengang_kz enthaelt ungueltige Zeichen';
 			return false;
-		}	
+		}
 		if(mb_strlen($this->orgform_kurzbz)>3)
 		{
 			$this->errormsg = 'orgform_kurzbz darf nicht länger als 3 Zeichen sein';
@@ -284,11 +370,19 @@ class studienplatz extends basis_db
 		{
 			$this->errormsg='npz enthaelt ungueltige Zeichen';
 			return false;
+		}if(!is_numeric($this->apz) && $this->apz!='')
+		{
+			$this->errormsg='apz enthaelt ungueltige Zeichen';
+			return false;
+		}if(!is_numeric($this->studienplan_id) && $this->studienplan_id!='')
+		{
+			$this->errormsg='studienplan_id enthaelt ungueltige Zeichen';
+			return false;
 		}
 		$this->errormsg = '';
 		return true;
 	}
-	
+
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -305,20 +399,22 @@ class studienplatz extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO lehre.tbl_studienplatz ('.
-				 'studiengang_kz, orgform_kurzbz, studiensemester_kurzbz, '.
-				 'ausbildungssemester, gpz, npz, insertamum, insertvon, '.
-			     'updateamum, updatevon) VALUES('.			      
-			      $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
-			      $this->db_add_param($this->orgform_kurzbz).', '.
-			      $this->db_add_param($this->studiensemester_kurzbz).', '.			     
-			      $this->db_add_param($this->ausbildungssemester, FHC_INTEGER).', '.
-				  //$this->db_add_param($this->art).', '.			     
-			      $this->db_add_param($this->gpz, FHC_INTEGER).', '.
-				  $this->db_add_param($this->npz, FHC_INTEGER).', '.
-				  'now(), '.
-			      $this->db_add_param($this->insertvon).', '.
-			      'now(), '.
-			      $this->db_add_param($this->updatevon).');';
+				'studiengang_kz, orgform_kurzbz, studiensemester_kurzbz, '.
+				'ausbildungssemester, gpz, npz, apz, studienplan_id insertamum, insertvon, '.
+				'updateamum, updatevon) VALUES('.
+				$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
+				$this->db_add_param($this->orgform_kurzbz).', '.
+				$this->db_add_param($this->studiensemester_kurzbz).', '.
+				$this->db_add_param($this->ausbildungssemester, FHC_INTEGER).', '.
+				//$this->db_add_param($this->art).', '.
+				$this->db_add_param($this->gpz, FHC_INTEGER).', '.
+				$this->db_add_param($this->npz, FHC_INTEGER).', '.
+				$this->db_add_param($this->apz, FHC_INTEGER).', '.
+				$this->db_add_param($this->studienplan_id, FHC_INTEGER).', '.
+				'now(), '.
+				$this->db_add_param($this->insertvon).', '.
+				'now(), '.
+				$this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
@@ -328,19 +424,21 @@ class studienplatz extends basis_db
 				$this->errormsg = 'studienplatz_id muss eine gueltige Zahl sein';
 				return false;
 			}
-			$qry='UPDATE lehre.tbl_studienplatz SET'.				
+			$qry='UPDATE lehre.tbl_studienplatz SET'.
 				' studiengang_kz='.$this->db_add_param($this->studiengang_kz).', '.
 				' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).', '.
 				' studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).', '.
-		      	' ausbildungssemester='.$this->db_add_param($this->ausbildungssemester).', '.
+				' ausbildungssemester='.$this->db_add_param($this->ausbildungssemester).', '.
 				//' art='.$this->db_add_param($this->art).', '.
-		      	' gpz='.$this->db_add_param($this->gpz).', '.
-		      	' npz='.$this->db_add_param($this->npz).', '.		     
-		      	' updateamum= now(), '.
-		      	' updatevon='.$this->db_add_param($this->updatevon).		      	
-		      	' WHERE studienplatz_id='.$this->db_add_param($this->studienplatz_id, FHC_INTEGER, false).';';
+				' gpz='.$this->db_add_param($this->gpz).', '.
+				' npz='.$this->db_add_param($this->npz).', '.
+				' apz='.$this->db_add_param($this->apz, FHC_INTEGER).', '.
+				' studienplan_id='.$this->db_add_param($this->studienplan_id, FHC_INTEGER).', '.
+				' updateamum= now(), '.
+				' updatevon='.$this->db_add_param($this->updatevon).
+				' WHERE studienplatz_id='.$this->db_add_param($this->studienplatz_id, FHC_INTEGER, false).';';
 		}
-        
+
 		if($this->db_query($qry))
 		{
 			if($this->new)
@@ -371,7 +469,7 @@ class studienplatz extends basis_db
 
 		}
 		else
-		{			
+		{
 			return false;
 		}
 		return $this->studienplatz_id;
@@ -399,7 +497,7 @@ class studienplatz extends basis_db
 			return true;
 		}
 		else
-		{			
+		{
 			return false;
 		}
 	}

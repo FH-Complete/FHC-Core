@@ -1301,6 +1301,14 @@ function ExtrasShowProjektarbeitsabgaben()
 }
 
 // ****
+// * Zeigt HTML Seite für die Aliquote Reduktion
+// ****
+function ExtrasShowAliquote_reduktion()
+{
+	window.open('<?php echo APP_ROOT ?>vilesci/personen/aliquote_reduktion.php','Aliquote Reduktion','');
+}
+
+// ****
 // * Zeigt HTML Seite zur Bearbeitung der Gruppen an
 // ****
 function ExtrasShowGruppenverwaltung()
