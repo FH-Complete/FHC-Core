@@ -1004,8 +1004,8 @@ if (!$result = @$db->db_query("SELECT 1 FROM bis.tbl_zgvgruppe_zuordnung LIMIT 1
 		(
 			zgvgruppe_id integer NOT NULL,
 			studiengang_kz integer,
-			zgv_code smallint,
-			zgvma_code smallint,
+			zgv_code integer,
+			zgvma_code integer,
 			gruppe_kurzbz varchar(16)
 		);
 
