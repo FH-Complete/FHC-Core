@@ -833,7 +833,7 @@ class lehrveranstaltung extends basis_db
 					'lvps = '.$this->db_add_param($this->lvps).', '.
 					'las = '.$this->db_add_param($this->las).', '.
 					'benotung = '.$this->db_add_param($this->benotung, FHC_BOOLEAN).', '.
-					'lvinfo = '.$this->db_add_param($this->lvinfo, FHC_BOOLEAN).' '.
+					'lvinfo = '.$this->db_add_param($this->lvinfo, FHC_BOOLEAN).', '.
 					'lehrauftrag = '.$this->db_add_param($this->lehrauftrag, FHC_BOOLEAN).' '.
 					'WHERE lehrveranstaltung_id = ' . $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER, false) . ';';
 		}

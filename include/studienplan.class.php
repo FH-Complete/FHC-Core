@@ -487,7 +487,7 @@ class studienplan extends basis_db
 	    {
 		    //Neuen Datensatz einfuegen
 		    $qry = 'BEGIN;INSERT INTO lehre.tbl_studienplan_lehrveranstaltung (studienplan_id, lehrveranstaltung_id,
-			    semester,studienplan_lehrveranstaltung_id_parent,pflicht, koordinator,
+			    semester,studienplan_lehrveranstaltung_id_parent,pflicht, koordinator, curriculum, export
 			    insertamum, insertvon) VALUES (' .
 				    $this->db_add_param($this->studienplan_id, FHC_INTEGER) . ', ' .
 				    $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER) . ', ' .
@@ -495,6 +495,8 @@ class studienplan extends basis_db
 				    $this->db_add_param($this->studienplan_lehrveranstaltung_id_parent, FHC_INTEGER) . ', ' .
 				    $this->db_add_param($this->pflicht, FHC_BOOLEAN) . ', ' .
 				    $this->db_add_param($this->koordinator) . ', ' .
+				    $this->db_add_param($this->curriculum) . ', ' .
+				    $this->db_add_param($this->export) . ', ' .
 				    'now(), ' .
 				    $this->db_add_param($this->insertvon) . ');';
 	    }
@@ -514,6 +516,8 @@ class studienplan extends basis_db
 				    ' studienplan_lehrveranstaltung_id_parent=' . $this->db_add_param($this->studienplan_lehrveranstaltung_id_parent, FHC_INTEGER) . ', ' .
 				    ' pflicht=' . $this->db_add_param($this->pflicht, FHC_BOOLEAN) . ', ' .
 				    ' koordinator=' . $this->db_add_param($this->koordinator) . ', ' .
+				    ' curriculum=' . $this->db_add_param($this->curriculum, FHC_BOOLEAN) . ', ' .
+				    ' export=' . $this->db_add_param($this->export, FHC_BOOLEAN) . ', ' .
 				    ' updateamum= now(), ' .
 				    ' updatevon=' . $this->db_add_param($this->updatevon) . ' ' .
 				    ' WHERE studienplan_lehrveranstaltung_id=' . $this->db_add_param($this->studienplan_lehrveranstaltung_id, FHC_INTEGER, false) . ';';
@@ -599,6 +603,8 @@ class studienplan extends basis_db
 			    $this->updateamum = $row->updateamum;
 			    $this->updatevon = $row->updatevon;
 			    $this->sort = $row->sort;
+			    $this->curriculum = $row->curriculum;
+			    $this->export = $row->export;
 			    $this->new=false;
 			    return true;
 		    }

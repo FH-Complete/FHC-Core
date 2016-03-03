@@ -688,6 +688,34 @@ if(!$result = @$db->db_query("SELECT uhrzeit from lehre.tbl_abschlusspruefung LI
 		echo 'lehre.tbl_abschlusspruefung: spalte uhrzeit hinzugefügt';
 }
 
+//Tabelle lehre.tbl_studienordnungstatus
+if (!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienordnungstatus LIMIT 1;"))
+{
+		$qry = "CREATE TABLE lehre.tbl_studienordnungstatus
+			(
+				status_kurzbz varchar(32) NOT NULL,
+				bezeichnung varchar(256),
+				reihenfolge integer
+			);
+
+		ALTER TABLE lehre.tbl_studienordnungstatus ADD CONSTRAINT pk_studienordnungstatus PRIMARY KEY (status_kurzbz);
+
+		GRANT SELECT ON lehre.tbl_studienordnungstatus TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_studienordnungstatus TO vilesci;
+		
+		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('development', 'in Bearbeitung', 1);
+		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('review', 'in Review', 2);
+		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('approved', 'genehmigt', 3);
+		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('expired', 'ausgelaufen', 4);
+		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('notApproved', 'nicht genehmigt', 5);
+	";
+
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienordnungstatus: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' lehre.tbl_studienordnungstatus: Tabelle hinzugefuegt<br>';
+}
+
 //Spalte status_kurzbz in lehre.tbl_studienordnung
 if (!$result = @$db->db_query("SELECT status_kurzbz FROM lehre.tbl_studienordnung LIMIT 1;"))
 {
@@ -826,34 +854,6 @@ if (!$result = @$db->db_query("SELECT 1 FROM public.tbl_bewerbungstermine LIMIT 
 	echo '<strong>public.tbl_bewerbungstermine: ' . $db->db_last_error() . '</strong><br>';
     else
 	echo ' public.tbl_bewerbungstermine: Tabelle hinzugefuegt<br>';
-}
-
-//Tabelle lehre.tbl_studienordnungstatus
-if (!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienordnungstatus LIMIT 1;"))
-{
-		$qry = "CREATE TABLE lehre.tbl_studienordnungstatus
-			(
-				status_kurzbz varchar(32) NOT NULL,
-				bezeichnung varchar(256),
-				reihenfolge integer
-			);
-
-		ALTER TABLE lehre.tbl_studienordnungstatus ADD CONSTRAINT pk_studienordnungstatus PRIMARY KEY (status_kurzbz);
-
-		GRANT SELECT ON lehre.tbl_studienordnungstatus TO web;
-		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_studienordnungstatus TO vilesci;
-		
-		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('development', 'in Bearbeitung', 1);
-		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('review', 'in Review', 2);
-		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('approved', 'genehmigt', 3);
-		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('expired', 'ausgelaufen', 4);
-		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('notApproved', 'nicht genehmigt', 5);
-	";
-
-	if (!$db->db_query($qry))
-		echo '<strong>lehre.tbl_studienordnungstatus: ' . $db->db_last_error() . '</strong><br>';
-	else
-		echo ' lehre.tbl_studienordnungstatus: Tabelle hinzugefuegt<br>';
 }
 
 //Tabelle lehre.tbl_studienplatz Spalte APZ
