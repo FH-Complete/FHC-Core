@@ -1019,6 +1019,8 @@ if (!$result = @$db->db_query("SELECT 1 FROM bis.tbl_zgvgruppe_zuordnung LIMIT 1
 		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ADD CONSTRAINT pk_zgvgruppe_id PRIMARY KEY (zgvgruppe_id);
 
 		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ADD CONSTRAINT fk_zgvgruppe_zuordnung_studiengang FOREIGN KEY (studiengang_kz) REFERENCES public.tbl_studiengang (studiengang_kz) ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ADD CONSTRAINT fk_zgvgruppe_zuordnung_zgv FOREIGN KEY (zgv_code) REFERENCES bis.tbl_zgv (zgv_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ADD CONSTRAINT fk_zgvgruppe_zuordnung_zgvmaster FOREIGN KEY (zgv_code) REFERENCES bis.tbl_zgvmaster (zgvmas_code) ON DELETE RESTRICT ON UPDATE CASCADE;
 		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ADD CONSTRAINT fk_zgvgruppe_zuordnung_zgvgruppe FOREIGN KEY (gruppe_kurzbz) REFERENCES bis.tbl_zgvgruppe (gruppe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 		GRANT SELECT ON bis.tbl_zgvgruppe_zuordnung TO web;
