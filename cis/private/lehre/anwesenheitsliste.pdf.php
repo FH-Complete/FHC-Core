@@ -46,7 +46,7 @@ if(isset($_GET['stsem']))
 else 
 	die('Eine Studiensemester muss uebergeben werden');
 
-if(!$berechtigung->isBerechtigt('admin') && !check_lektor_lehrveranstaltung($user,$lvid,$studiensemester))
+if(!$berechtigung->isBerechtigt('admin') && !$berechtigung->isBerechtigt('assistenz') && !check_lektor_lehrveranstaltung($user,$lvid,$studiensemester))
 	die('Sie muessen LektorIn der LV oder Admin sein, um diese Seite aufrufen zu koennen');
 
 $output='pdf';
