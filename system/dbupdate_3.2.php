@@ -850,10 +850,10 @@ if (!$result = @$db->db_query("SELECT 1 FROM public.tbl_bewerbungstermine LIMIT 
 		GRANT SELECT, UPDATE ON public.tbl_bewerbungstermine_bewerbungstermin_id_seq TO vilesci;
 	";
 
-    if (!$db->db_query($qry))
-	echo '<strong>public.tbl_bewerbungstermine: ' . $db->db_last_error() . '</strong><br>';
-    else
-	echo ' public.tbl_bewerbungstermine: Tabelle hinzugefuegt<br>';
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_bewerbungstermine: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' public.tbl_bewerbungstermine: Tabelle hinzugefuegt<br>';
 }
 
 //Tabelle lehre.tbl_studienplatz Spalte APZ
@@ -972,7 +972,65 @@ if ($result = @$db->db_query("SELECT studienplan_id FROM lehre.tbl_studienplatz 
 
 
 
+//Tabelle bis.tbl_zgvgruppe
+if (!$result = @$db->db_query("SELECT 1 FROM bis.tbl_zgvgruppe LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE bis.tbl_zgvgruppe
+		(
+			gruppe_kurzbz varchar(16),
+			bezeichnung varchar(256)
+		);
 
+		ALTER TABLE bis.tbl_zgvgruppe ADD CONSTRAINT uk_zgvgruppe_gruppe_kurzbz UNIQUE (gruppe_kurzbz);
+
+		GRANT SELECT ON bis.tbl_zgvgruppe TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON bis.tbl_zgvgruppe TO vilesci;
+	";
+
+	if (!$db->db_query($qry))
+		echo '<strong>bis.tbl_zgvgruppe: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo 'bis.tbl_zgvgruppe: Tabelle hinzugefuegt<br>';
+}
+
+
+
+//Tabelle bis.tbl_zgvgruppe_zuordnung
+if (!$result = @$db->db_query("SELECT 1 FROM bis.tbl_zgvgruppe_zuordnung LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE bis.tbl_zgvgruppe_zuordnung
+		(
+			zgvgruppe_id integer NOT NULL,
+			studiengang_kz integer,
+			zgv_code smallint,
+			zgvma_code smallint,
+			gruppe_kurzbz varchar(16)
+		);
+
+		CREATE SEQUENCE bis.tbl_zgvgruppe_zuordnung_zgvgruppe_id_seq
+			INCREMENT BY 1
+			NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+
+		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ALTER COLUMN zgvgruppe_id SET DEFAULT nextval('bis.tbl_zgvgruppe_zuordnung_zgvgruppe_id_seq');
+		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ADD CONSTRAINT pk_zgvgruppe_id PRIMARY KEY (zgvgruppe_id);
+
+		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ADD CONSTRAINT fk_zgvgruppe_zuordnung_studiengang FOREIGN KEY (studiengang_kz) REFERENCES public.tbl_studiengang (studiengang_kz) ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ADD CONSTRAINT fk_zgvgruppe_zuordnung_zgvgruppe FOREIGN KEY (gruppe_kurzbz) REFERENCES bis.tbl_zgvgruppe (gruppe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		GRANT SELECT ON bis.tbl_zgvgruppe_zuordnung TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON bis.tbl_zgvgruppe_zuordnung TO vilesci;
+		GRANT SELECT, UPDATE ON bis.tbl_zgvgruppe_zuordnung_zgvgruppe_id_seq TO vilesci;
+	";
+
+	if (!$db->db_query($qry))
+		echo '<strong>bis.tbl_zgvgruppe_zuordnung: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo 'bis.tbl_zgvgruppe_zuordnung: Tabelle hinzugefuegt<br>';
+}
 
 
 
@@ -1022,6 +1080,8 @@ $tabellen=array(
 	"bis.tbl_zgvmaster"  => array("zgvmas_code","zgvmas_bez","zgvmas_kurzbz","bezeichnung"),
 	"bis.tbl_zgvdoktor" => array("zgvdoktor_code", "zgvdoktor_bez", "zgvdoktor_kurzbz","bezeichnung"),
 	"bis.tbl_zweck"  => array("zweck_code","kurzbz","bezeichnung"),
+	"bis.tbl_zgvgruppe"  => array("gruppe_kurzbz","bezeichnung"),
+	"bis.tbl_zgvgruppe_zuordnung"  => array("zgvgruppe_id" ,"studiengang_kz","zgv_code","zgvma_code","gruppe_kurzbz"),
 	"campus.tbl_abgabe"  => array("abgabe_id","abgabedatei","abgabezeit","anmerkung"),
 	"campus.tbl_anwesenheit"  => array("anwesenheit_id","uid","einheiten","datum","anwesend","lehreinheit_id","anmerkung","ext_id"),
 	"campus.tbl_beispiel"  => array("beispiel_id","uebung_id","nummer","bezeichnung","punkte","updateamum","updatevon","insertamum","insertvon"),
