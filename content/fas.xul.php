@@ -159,6 +159,7 @@ foreach($addon_obj->result as $addon)
   <command id="menu-extras-lektorenzuordnunginstitute:command" oncommand="ExtrasShowLektorenzuordnunginstitute();"/>
   <command id="menu-extras-preinteressentenuebernahme:command" oncommand="ExtrasShowPreinteressentenuebernahme();"/>
   <command id="menu-extras-projektarbeitsabgaben:command" oncommand="ExtrasShowProjektarbeitsabgaben();"/>
+  <command id="menu-extras-aliquote_reduktion:command" oncommand="ExtrasShowAliquote_reduktion();"/>
   <command id="menu-bis-mitarbeiter-import:command" oncommand="BISMitarbeiterImport();"/>
   <command id="menu-bis-mitarbeiter-export:command" oncommand="BISMitarbeiterExport();"/>
   <command id="menu-bis-mitarbeiter-checkverwendung:command" oncommand="BISMitarbeiterCheckVerwendung();"/>
@@ -779,6 +780,12 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-extras-projektarbeitsabgaben.label;"
                command   =  "menu-extras-projektarbeitsabgaben:command"
                accesskey = "&menu-extras-projektarbeitsabgaben.accesskey;"/>
+             <menuitem
+               id        =  "menu-extras-aliquote_reduktion"
+               key       =  "menu-extras-aliquote_reduktion:key"
+               label     = "&menu-extras-aliquote_reduktion.label;"
+               command   =  "menu-extras-aliquote_reduktion:command"
+               accesskey = "&menu-extras-aliquote_reduktion.accesskey;"/>
              <menuitem
                id        =  "menu-extras-projektarbeitsbenotung"
                key       =  "menu-extras-projektarbeitsbenotung:key"

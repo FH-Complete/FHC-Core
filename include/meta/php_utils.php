@@ -31,12 +31,12 @@ function returnAJAX($success, $obj)
 	//if there is an error
 	if(error_get_last())
 		$ret = array(
-		"erfolg" => false,
+		"return" => false,
 		);
 	else if(!$success)
 	{
 		$ret = array(
-		"erfolg" => false,
+		"return" => false,
 		"message" => $obj,
 		);
 	}
@@ -44,20 +44,19 @@ function returnAJAX($success, $obj)
 	else if (!$getuid = get_uid())
 	{
 		$ret = array(
-		"erfolg" => false,
+		"return" => false,
 		);
 	}
 	//if everything worked fine
 	else
 	{
 		$ret = array(
-		"erfolg" => true,
-		"user" => $getuid,
-		"info" => $obj,
+		"return" => true,
+		"action" => $obj,
 		);
 	}
 	echo json_encode($ret);
-	if($ret["erfolg"] === false)
+	if($ret["return"] === false)
 		die("");
 }
 ?>

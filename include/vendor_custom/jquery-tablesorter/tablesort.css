@@ -42,3 +42,9 @@ TD,TH
 {
 	font-size: 9pt;
 }
+table.tablesorter tbody td
+{
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+}
