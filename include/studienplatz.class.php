@@ -193,10 +193,10 @@ class studienplatz extends basis_db
 
 		while($row = $this->db_fetch_object())
 		{
-	          $rec = new studienplatz();
-	          $this->mapRow($rec, $row);
+			$rec = new studienplatz();
+			$this->mapRow($rec, $row);
 			$this->result[] = $rec;
-	      }
+		}
 		return true;
 	}
 
