@@ -61,7 +61,7 @@ switch($action)
 		$studiensemester_kurzbz = $_REQUEST["studiensemester_kurzbz"];
 
 		$prestudent = new prestudent();
-		$return = $prestudent->getAllBewerberFromStudienplanStudsem($studienplan_id, $studiensemester_kurzbz, $studiengang_kz);
+		$return = $prestudent->getAllStudentenFromStudienplanAndStudsem($studienplan_id, $studiensemester_kurzbz, $studiengang_kz);
 
 		returnAJAX(true,json_encode($return));
 		break;

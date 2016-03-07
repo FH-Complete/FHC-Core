@@ -1724,7 +1724,7 @@ class prestudent extends person
 	 * @param $studiengang_kz
 	 * @return array mit allen Prestudenten, welche sich für den angegebenen Studienplan im angegebenen Semester beworben haben
 	 */
-	public function getAllBewerberFromStudienplanStudsem($studienplan_id, $studiensemester_kurzbz, $studiengang_kz)
+	public function getAllStudentenFromStudienplanAndStudsem($studienplan_id, $studiensemester_kurzbz, $studiengang_kz)
 	{
 		if(!is_numeric($studienplan_id))
 		{
@@ -1746,7 +1746,6 @@ class prestudent extends person
 					LEFT JOIN bis.tbl_zgvgruppe USING(gruppe_kurzbz)
 			WHERE
 				tbl_prestudent.studiengang_kz=". $this->db_add_param($studiengang_kz)."
-				AND (get_rolle_prestudent(prestudent_id, null)='Bewerber' OR  get_rolle_prestudent(prestudent_id, null)='Wartender')
 				AND EXISTS(
 					SELECT
 						1
