@@ -81,7 +81,7 @@ switch($action)
 		break;
 
 
-	case "getStudienplaene":
+	case "getStudienplaetze":
 		if(!isset($_REQUEST["studiensemester_kurzbz"]))
 			die("keine studiensemester_kurzbz erhalten");
 		$studiensemester_kurzbz = $_REQUEST["studiensemester_kurzbz"];

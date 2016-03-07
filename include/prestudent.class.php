@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/person.class.php');
+require_once(dirname(__FILE__).'/log.class.php');
 
 class prestudent extends person
 {

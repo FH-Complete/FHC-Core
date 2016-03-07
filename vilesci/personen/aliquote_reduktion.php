@@ -51,9 +51,9 @@
 			}
 			function sortStudentenRTP(a,b)
 			{
-				if (a.rt_gesamtpunkte < b.rt_gesamtpunkte)
+				if (b.rt_gesamtpunkte == null || parseFloat(a.rt_gesamtpunkte) > parseFloat(b.rt_gesamtpunkte))
 					return -1;
-				else if (a.rt_gesamtpunkte > b.rt_gesamtpunkte)
+				else if (a.rt_gesamtpunkte == null || parseFloat(a.rt_gesamtpunkte) < parseFloat(b.rt_gesamtpunkte))
 					return 1;
 				else
 					return 0;
@@ -68,12 +68,12 @@
 				aqr.selectedStudiengang = Object();
 				aqr.selectedStudiengang.studiengang_kz = _GET()["studiengang_kz"];
 				aqr.selectedStudiensemester = "";
-				aqr.selectedStudienplan = "";
+				aqr.selectedStudienplatz = "";
 				aqr.choosenStuds = 0;
 				aqr.studenten = [];
 				aqr.studiengaenge = [];
 				aqr.studiensemester = [];
-				aqr.studienplaene = [];
+				aqr.studienplaetze = [];
 				SERVICE_TARGET = "aliquote_reduktion.json.php"
 
 				if(!aqr.studiensemester_kurzbz)
@@ -87,11 +87,11 @@
 
 
 
-				//bei jeder änderung des studiensemesters, sollen die studienplaene erneut geholt werden
+				//bei jeder änderung des studiensemesters, sollen die studienplaetze erneut geholt werden
 				$scope.$watch('aqr.selectedStudiengang', function (){aqr.loadStudienPlaene();},true);
 				$scope.$watch('aqr.selectedStudiensemester', function (){aqr.loadStudienPlaene();},true);
 
-				$scope.$watch('aqr.selectedStudienplan', function (){aqr.loadStudenten();},true);
+				$scope.$watch('aqr.selectedStudienplatz', function (){aqr.loadStudenten();},true);
 
 
 				AJAXCall({action:"getStudiensemester",studiengang_kz:aqr.selectedStudiengang.studiengang_kz},function(res){aqr.studiensemester=res;aqr.setStudiensemester(aqr.studiensemester_kurzbz);$scope.$apply();});
@@ -101,12 +101,12 @@
 
 				aqr.submit = function()
 				{
-					if(aqr.choosenStuds < aqr.selectedStudienplan.apz)
+					if(aqr.choosenStuds < aqr.selectedStudienplatz.apz)
 					{
 						if(!confirm("Es wurden zu wenig Studenten gewählt!"))
 							return;
 					}
-					else if(aqr.choosenStuds > aqr.selectedStudienplan.apz)
+					else if(aqr.choosenStuds > aqr.selectedStudienplatz.apz)
 					{
 						if(!confirm("Es wurden zu viel Studenten gewählt!"))
 							return;
@@ -138,14 +138,17 @@
 
 				aqr.setStudiengang = function(studiengang_kz)
 				{
+					var found = false;
 					aqr.studiengaenge.forEach(function(i)
 					{
 						if(i.studiengang_kz == studiengang_kz)
 						{
 							aqr.selectedStudiengang = i;
-							return;
+							found = true;
 						}
 					});
+					if(!found)
+						alert("Studiengang nicht gefunden!");
 				}
 
 				aqr.setStudiensemester = function(studiensemester_kurzbz)
@@ -164,12 +167,12 @@
 				{
 					if(aqr.selectedStudiensemester != "")
 					{
-						aqr.selectedStudienplan = "";
-						aqr.studienplaene.clear;
-						AJAXCall({action:"getStudienplaene",studiengang_kz:aqr.selectedStudiengang.studiengang_kz,studiensemester_kurzbz:aqr.selectedStudiensemester.studiensemester_kurzbz},function(res)
+						aqr.selectedStudienplatz = "";
+						aqr.studienplaetze.clear;
+						AJAXCall({action:"getStudienplaetze",studiengang_kz:aqr.selectedStudiengang.studiengang_kz,studiensemester_kurzbz:aqr.selectedStudiensemester.studiensemester_kurzbz},function(res)
 						{
-							aqr.studienplaene=res;
-							aqr.selectedStudienplan=aqr.studienplaene[0];
+							aqr.studienplaetze=res;
+							aqr.selectedStudienplatz=aqr.studienplaetze[0];
 							$scope.$apply();
 						});
 					}
@@ -178,8 +181,8 @@
 				aqr.loadStudenten = function()
 				{
 					aqr.studenten=[];
-					if(aqr.selectedStudienplan && aqr.selectedStudienplan.studienplan_id)
-						AJAXCall({action:"getStudenten",studiengang_kz:aqr.selectedStudiengang.studiengang_kz,studienplan_id:aqr.selectedStudienplan.studienplan_id,studiensemester_kurzbz:aqr.selectedStudiensemester.studiensemester_kurzbz},function(res)
+					if(aqr.selectedStudienplatz && aqr.selectedStudienplatz.studienplan_id)
+						AJAXCall({action:"getStudenten",studiengang_kz:aqr.selectedStudiengang.studiengang_kz,studienplan_id:aqr.selectedStudienplatz.studienplan_id,studiensemester_kurzbz:aqr.selectedStudiensemester.studiensemester_kurzbz},function(res)
 						{
 							aqr.studenten=res;
 							aqr.studenten.forEach(function(i)
@@ -219,11 +222,11 @@
 
 				aqr.doPreselection = function()
 				{
-					if(parseInt(aqr.selectedStudienplan.apz) >= 0)
+					if(parseInt(aqr.selectedStudienplatz.apz) >= 0)
 					{
-						aqr.studenten.sort(sortStudentenRTP);
+
 						var zgvs = aqr.getZGVArray();
-						var neededStudentsCount = aqr.selectedStudienplan.apz - aqr.getAcceptedCount();
+						var neededStudentsCount = aqr.selectedStudienplatz.apz - aqr.getAcceptedCount();
 						var perZGV = parseInt(neededStudentsCount / zgvs.length);
 						var zgvElems = [];
 
@@ -232,20 +235,53 @@
 							zgvElems.push({name:i,needed:perZGV});
 						});
 
-						aqr.studenten.forEach(function(i)
+						aqr.studenten.sort(sortStudentenRTP);
+						aqr.recursiveChoose(neededStudentsCount, zgvElems);
+					}
+				}
+
+
+				aqr.recursiveChoose = function(needed, zgvElems)
+				{
+					var beginNeeded = JSON.parse(JSON.stringify(needed));
+					aqr.studenten.forEach(function(i)
+					{
+						if(i.laststatus=='Wartender'||i.laststatus=='Bewerber')
 						{
-							if(i.laststatus=='Wartender'||i.laststatus=='Bewerber')
+							zgvElems.forEach(function(j)
 							{
-								zgvElems.forEach(function(j)
+								if(j.needed > 0 && !i.selected && i.bezeichnung == j.name)
 								{
-									if(j.needed > 0 && !i.selected && i.bezeichnung == j.name)
-									{
-										i.selected = true;
-										j.needed --;
-									}
-								});
+									i.selected = true;
+									j.needed --;
+									needed --;
+								}
+							});
+						}
+					});
+
+					if(beginNeeded == needed)
+					{
+						var endless = true;
+						zgvElems.forEach(function(j)
+						{
+							if(j.needed < 1)
+							{
+								j.needed ++;
+								endless = false;
 							}
 						});
+					}
+					if(endless)
+					{
+						//prevent deadlock(should never happen)
+						alert("Die Automatische Selektierung konnte nicht abgeschlossen werden!");
+						return;
+					}
+					if(needed > 0)
+						aqr.recursiveChoose(needed, zgvElems);
+					else
+					{
 					}
 				}
 			});
@@ -253,14 +289,14 @@
 	</head>
 	<body class="Background_main">
 		<div ng-controller="aliqRedController as aqr" ng-app="aliqRed">
-			<h2>{{aqr.name}} {{aqr.selectedStudiengang.studiengang_kz}}</h2>
+			<h2>{{aqr.name}} {{aqr.selectedStudiengang.studiengang_kz}}/{{aqr.selectedStudienplatz.studienplatz_id}}</h2>
 
 			<select data-ng-options="stg.kurzbzlang for stg in aqr.studiengaenge" data-ng-model="aqr.selectedStudiengang"></select>
 			<select data-ng-options="stsem.studiensemester_kurzbz for stsem in aqr.studiensemester" data-ng-model="aqr.selectedStudiensemester"></select>
-			<span ng-if="aqr.selectedStudienplan"><select data-ng-options="stpl.bezeichnung for stpl in aqr.studienplaene" data-ng-model="aqr.selectedStudienplan"></select></span><span ng-if="!aqr.selectedStudienplan" style="color:#A33;">Keinen Studienplan gefunden!</span>
-			<span ng-if="aqr.studenten.length == 1">{{aqr.studenten.length}} Student</span>
-			<span ng-if="aqr.studenten.length > 1">{{aqr.studenten.length}} Studenten</span>
-			<span ng-if="aqr.studenten.length < 1">keine Student</span>
+			<span ng-if="aqr.selectedStudienplatz"><select data-ng-options="stpl.bezeichnung for stpl in aqr.studienplaetze" data-ng-model="aqr.selectedStudienplatz"></select></span><span ng-if="!aqr.selectedStudienplatz" style="color:#A33;">Keinen Studienplan gefunden!</span>
+			<span ng-if="aqr.selectedStudienplatz && aqr.studenten.length == 1">{{aqr.studenten.length}} Student</span>
+			<span ng-if="aqr.selectedStudienplatz && aqr.studenten.length > 1">{{aqr.studenten.length}} Studenten</span>
+			<span ng-if="aqr.selectedStudienplatz && aqr.studenten.length < 1">keine Student</span>
 
 			<h3>Auswahl</h3>
 			<table ts-wrapper>
@@ -272,8 +308,8 @@
 						<th ts-criteria="bezeichnung" ts-default="descending">ZGV Gruppe</th>
 						<th ts-criteria="rt_gesamtpunkte|parseFloat" ts-default="descending">RT Gesamt</th>
 						<th ts-criteria="laststatus">Status</th>
-						<th ng-if="aqr.selectedStudienplan.apz">{{aqr.choosenStuds}}/{{aqr.selectedStudienplan.apz}}</th>
-						<th ng-if="!aqr.selectedStudienplan.apz">{{aqr.choosenStuds}}/Keine APZ</th>
+						<th ng-if="aqr.selectedStudienplatz.apz">{{aqr.choosenStuds}}/{{aqr.selectedStudienplatz.apz}}</th>
+						<th ng-if="!aqr.selectedStudienplatz.apz">{{aqr.choosenStuds}}/Keine APZ</th>
 					</tr>
 				</thead>
 				<tbody>
