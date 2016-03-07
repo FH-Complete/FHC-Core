@@ -1305,7 +1305,20 @@ function ExtrasShowProjektarbeitsabgaben()
 // ****
 function ExtrasShowAliquote_reduktion()
 {
-	window.open('<?php echo APP_ROOT ?>vilesci/personen/aliquote_reduktion.php','Aliquote Reduktion','');
+	tree = document.getElementById('tree-verband');
+
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Studiengang auswaehlen');
+		return;
+	}
+
+	//Studiengang holen
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+	var studiensemester_kurzbz = getStudiensemester();
+	window.open('<?php echo APP_ROOT ?>vilesci/personen/aliquote_reduktion.php?studiengang_kz='+studiengang_kz+'&studiensemester_kurzbz='+studiensemester_kurzbz,'Aliquote Reduktion','');
 }
 
 // ****
