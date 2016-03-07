@@ -58,6 +58,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<spacer />
 						</hbox>
 					</row>
+
 					<row>
 						<label value="OE (Organisationseinheit)" control="textbox-projekt-detail-oe_kurzbz"/>
 						<hbox>
@@ -100,21 +101,43 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<label value="Beschreibung" control="textbox-projekt-detail-beschreibung"/>
 	   					<textbox id="textbox-projekt-detail-beschreibung" multiline="true"  disabled="true" rows="10"/>
 					</row>
-					<row>
+					<row style="background-color:#eeeeee">
+						<label value="Projektwürdigkeit" control="textbox-projekt-detail-projektwuerdigkeit" style="font-weight:bold;"/>
+						<hbox>
+							<textbox id="textbox-projekt-detail-projektwuerdigkeit" size="16" maxlength="16" readonly="true" style="font-weight:bold;"/>
+							<spacer />
+						</hbox>
+					</row>
+					<row style="background-color:#eeeeee">
 						<label value="Beginn" control="textbox-projekt-detail-beginn"/>
-	   					<box class="Datum" id="textbox-projekt-detail-beginn"  disabled="true"/>
+	   					<box class="Datum" id="textbox-projekt-detail-beginn"  disabled="true" onchange="makeProjektAnalyse()"/>
+
 					</row>
-					<row>
+					<row style="background-color:#eeeeee">
 						<label value="Ende" control="textbox-projekt-detail-ende"/>
-	   					<box class="Datum" id="textbox-projekt-detail-ende"  disabled="true"/>
+	   					<box class="Datum" id="textbox-projekt-detail-ende"  disabled="true" onchange="makeProjektAnalyse()"/>
 					</row>
-					<row>
+					<row style="background-color:#eeeeee">
 						<label value="Budget" control="textbox-projekt-detail-budget"/>
 						<hbox>
-	   						<textbox id="textbox-projekt-detail-budget" size="12" maxlength="13"  disabled="true"/>
+	   						<textbox id="textbox-projekt-detail-budget" size="12" maxlength="13"  disabled="true" onchange="makeProjektAnalyse()"/>
 	   						<spacer />
 	   					</hbox>
 					</row>
+					<row style="background-color:#eeeeee">
+						<label value="Anzahl MA" control="textbox-projekt-anzahl_ma"/>
+							<hbox>	   					
+	   					<textbox id="textbox-projekt-anzahl_ma"  size="7" maxlength="7" disabled="true" onchange="makeProjektAnalyse()"/>
+	   					</hbox>
+	   					<spacer />
+	   			</row>
+					<row style="background-color:#eeeeee">
+						<label value="Aufwand PT" control="textbox-projekt-aufwand_pt" />
+							<hbox>	   					
+	   					<textbox id="textbox-projekt-aufwand_pt"  size="7" maxlength="7" disabled="true" onchange="makeProjektAnalyse()"/>
+	   					</hbox>
+	   					<spacer />
+	   			</row>
                     <row>
 						<label value="Farbe" control="textbox-projekt-detail-farbe"/>
 						<hbox>
@@ -122,6 +145,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	   						<spacer />
 	   					</hbox>
 					</row>
+
 					<row>
 						<label value="Aufwandstyp" control="textbox-projekt-detail-aufwandstyp"/>
 						<hbox>

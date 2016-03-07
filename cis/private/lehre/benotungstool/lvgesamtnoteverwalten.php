@@ -253,7 +253,7 @@ foreach($noten_obj->result as $row)
 	{
 		if(typeof(typ)=='undefined')
 			typ = 'Termin2';
-		var str = "<form name='nachpruefung_form'><center><table style='width:95%'><tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
+		var str = "<form name='nachpruefung_form'><table style='width:95%'><tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
 
 		var anlegendiv = document.getElementById("nachpruefung_div");
 		var y = getOffset('y');
@@ -291,7 +291,7 @@ foreach($noten_obj->result as $row)
 			echo '</select></td>';
 		?>';
 		str += "</tr><tr><td colspan='2' align='center'><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='pruefungSpeichern();'></td></tr>";
-		str += "</table></center></form>";
+		str += "</table></form>";
 		anlegendiv.innerHTML = str;
 		anlegendiv.style.visibility = "visible";
 		$('#pruefungsdatum').datepicker();

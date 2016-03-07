@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../../config/vilesci.config.inc.php');
@@ -1188,19 +1189,19 @@ if($vorname!='' && $nachname!='')
 {
 	if($where!='')
 		$where.=' OR';
-	$where.=" (LOWER(vorname)=LOWER('".$vorname."') AND LOWER(nachname)=LOWER('".$nachname."'))";
+	$where.=" (LOWER(vorname)=LOWER(".$db->db_add_param($vorname).") AND LOWER(nachname)=LOWER(".$db->db_add_param($nachname)."))";
 }
 elseif($nachname!='')
 {
 	if($where!='')
 		$where.=' OR';
-	$where.=" LOWER(nachname)=LOWER('".$nachname."')";
+	$where.=" LOWER(nachname)=LOWER(".$db->db_add_param($nachname).")";
 }
 
 if($where!='')
 {
 	$qry = "SELECT * FROM public.tbl_person WHERE $where ORDER BY nachname, vorname, gebdatum";
-	
+
 	if($result = $db->db_query($qry))
 	{
 		echo '<table style="margin-top: 0px" class="tablesorter" id="t1"><thead><tr><th></th><th>Nachname</th><th>Vorname</th><th>Weitere<br/>Vornamen</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th><th>Details</th></tr></thead>';
