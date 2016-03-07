@@ -74,6 +74,7 @@
 				aqr.studiengaenge = [];
 				aqr.studiensemester = [];
 				aqr.studienplaetze = [];
+				aqr.actualSequence = 1;
 				SERVICE_TARGET = "aliquote_reduktion.json.php"
 
 				if(!aqr.studiensemester_kurzbz)
@@ -180,6 +181,7 @@
 
 				aqr.loadStudenten = function()
 				{
+					aqr.actualSequence = 1;
 					aqr.studenten=[];
 					if(aqr.selectedStudienplatz && aqr.selectedStudienplatz.studienplan_id)
 						AJAXCall({action:"getStudenten",studiengang_kz:aqr.selectedStudiengang.studiengang_kz,studienplan_id:aqr.selectedStudienplatz.studienplan_id,studiensemester_kurzbz:aqr.selectedStudiensemester.studiensemester_kurzbz},function(res)
@@ -224,6 +226,7 @@
 				{
 					if(parseInt(aqr.selectedStudienplatz.apz) >= 0)
 					{
+						aqr.studenten.sort(sortStudentenRTP);
 
 						var zgvs = aqr.getZGVArray();
 						var neededStudentsCount = aqr.selectedStudienplatz.apz - aqr.getAcceptedCount();
@@ -234,54 +237,97 @@
 						{
 							zgvElems.push({name:i,needed:perZGV});
 						});
+						var residual = perZGV * zgvs.length;
+						var resDiff = neededStudentsCount - residual;
 
-						aqr.studenten.sort(sortStudentenRTP);
-						aqr.recursiveChoose(neededStudentsCount, zgvElems);
+						// distribute the remaining places
+						while(resDiff > 0)
+						{
+							zgvElems.forEach(function(i)
+							{
+								if(resDiff > 0)
+								{
+									i.needed ++;
+									resDiff --;
+								}
+							});
+						}
+						aqr.recursiveChoose(aqr.selectedStudienplatz.apz, zgvElems);
 					}
+				}
+
+				aqr.getActualSeq = function()
+				{
+					aqr.actualSequence ++;
+					return aqr.actualSequence;
+				}
+				aqr.setSequence = function(elem)
+				{
+					if(!elem.seqPlace)
+					{
+						elem.seqPlace = aqr.actualSequence;
+					}
+					aqr.actualSequence ++;
 				}
 
 
 				aqr.recursiveChoose = function(needed, zgvElems)
 				{
-					var beginNeeded = JSON.parse(JSON.stringify(needed));
-					aqr.studenten.forEach(function(i)
+					var beginNeeded = needed;
+
+					for(var i=0; i < zgvElems.length; i++)
 					{
-						if(i.laststatus=='Wartender'||i.laststatus=='Bewerber')
+						for(var j in aqr.studenten)
 						{
-							zgvElems.forEach(function(j)
+							if(
+									 aqr.studenten[j].laststatus!='Abgewiesener'
+								&& aqr.studenten[j].laststatus!='Abbrecher'
+								&& zgvElems[i].needed > 0
+								&& aqr.studenten[j].bezeichnung == zgvElems[i].name
+								&& !aqr.studenten[j].seqPlace)
 							{
-								if(j.needed > 0 && !i.selected && i.bezeichnung == j.name)
+								aqr.setSequence(aqr.studenten[j]);
+								zgvElems[i].needed --;
+								aqr.studenten[j].selected = true;
+								needed --;
+								break;
+							}
+						}
+					}
+
+					if(needed < 1 || beginNeeded == needed)
+					{
+						for(var j in aqr.studenten)
+						{
+							if(!aqr.studenten[j].selected && aqr.studenten[j].bezeichnung)
+							{
+								aqr.setSequence(aqr.studenten[j]);
+								if(needed > 0 && (aqr.studenten[j].laststatus=='Wartender'||aqr.studenten[j].laststatus=='Bewerber'))
 								{
-									i.selected = true;
-									j.needed --;
+									aqr.studenten[j].selected = true;
 									needed --;
 								}
-							});
-						}
-					});
-
-					if(beginNeeded == needed)
-					{
-						var endless = true;
-						zgvElems.forEach(function(j)
-						{
-							if(j.needed < 1)
-							{
-								j.needed ++;
-								endless = false;
 							}
-						});
-					}
-					if(endless)
-					{
-						//prevent deadlock(should never happen)
-						alert("Die Automatische Selektierung konnte nicht abgeschlossen werden!");
+						}
+						for(var j in aqr.studenten)
+						{
+							if(!aqr.studenten[j].selected && !aqr.studenten[j].bezeichnung)
+							{
+								aqr.setSequence(aqr.studenten[j]);
+								if(needed > 0 && (aqr.studenten[j].laststatus=='Wartender'||aqr.studenten[j].laststatus=='Bewerber'))
+								{
+									aqr.studenten[j].selected = true;
+									needed --;
+								}
+							}
+						}
+						if(needed > 0)
+							alert("Es werden mehr Studenten benötigt, als es Bewerber gibt!");
 						return;
 					}
-					if(needed > 0)
-						aqr.recursiveChoose(needed, zgvElems);
 					else
 					{
+						aqr.recursiveChoose(needed, zgvElems);
 					}
 				}
 			});
@@ -305,8 +351,9 @@
 						<th ts-criteria="prestudent_id">ID</th>
 						<th ts-criteria="vorname">Vorname</th>
 						<th ts-criteria="nachname">Nachname</th>
-						<th ts-criteria="bezeichnung" ts-default="descending">ZGV Gruppe</th>
-						<th ts-criteria="rt_gesamtpunkte|parseFloat" ts-default="descending">RT Gesamt</th>
+						<th ts-criteria="bezeichnung">ZGV Gruppe</th>
+						<th ts-criteria="seqPlace|parseInt" ts-default="ascending">Reihung</th>
+						<th ts-criteria="rt_gesamtpunkte|parseFloat" ts-default="ascending">RT Gesamt</th>
 						<th ts-criteria="laststatus">Status</th>
 						<th ng-if="aqr.selectedStudienplatz.apz">{{aqr.choosenStuds}}/{{aqr.selectedStudienplatz.apz}}</th>
 						<th ng-if="!aqr.selectedStudienplatz.apz">{{aqr.choosenStuds}}/Keine APZ</th>
@@ -319,6 +366,7 @@
 						<td>{{stud.nachname}}</td>
 						<td ng-if="stud.bezeichnung">{{stud.bezeichnung}}</td>
 						<td ng-if="!stud.bezeichnung" style="font-weight: bold;">Keine Angabe</td>
+						<td>{{stud.seqPlace}}</td>
 						<td>{{stud.rt_gesamtpunkte}}</td>
 						<td>{{stud.laststatus}}</td>
 						<td>
@@ -338,8 +386,9 @@
 						<th ts-criteria="prestudent_id">ID</th>
 						<th ts-criteria="vorname">Vorname</th>
 						<th ts-criteria="nachname">Nachname</th>
-						<th ts-criteria="bezeichnung" ts-default="descending">ZGV Gruppe</th>
-						<th ts-criteria="rt_gesamtpunkte|parseFloat" ts-default="descending">RT Gesamt</th>
+						<th ts-criteria="bezeichnung">ZGV Gruppe</th>
+						<th ts-criteria="seqPlace|parseInt" ts-default="ascending">Reihung</th>
+						<th ts-criteria="rt_gesamtpunkte|parseFloat">RT Gesamt</th>
 						<th ts-criteria="laststatus">Status</th>
 						<th></th>
 					</tr>
@@ -351,6 +400,7 @@
 						<td>{{stud.nachname}}</td>
 						<td ng-if="stud.bezeichnung">{{stud.bezeichnung}}</td>
 						<td ng-if="!stud.bezeichnung" style="font-weight: bold;">Keine Angabe</td>
+						<td>{{stud.seqPlace}}</td>
 						<td>{{stud.rt_gesamtpunkte}}</td>
 						<td>{{stud.laststatus}}</td>
 						<td>
