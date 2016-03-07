@@ -1035,14 +1035,32 @@ if (!$result = @$db->db_query("SELECT 1 FROM bis.tbl_zgvgruppe_zuordnung LIMIT 1
 }
 
 
+// Neue Spalte anzahl_ma bei fue.tbl_projekt
+if(!@$db->db_query("SELECT anzahl_ma FROM fue.tbl_projekt LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE fue.tbl_projekt ADD COLUMN anzahl_ma integer;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekt '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte anzahl_ma in fue.tbl_projekt hinzugefügt';
+}
 
 
+// Neue Spalte aufwand_pt bei fue.tbl_projekt
+if(!@$db->db_query("SELECT aufwand_pt FROM fue.tbl_projekt LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE fue.tbl_projekt ADD COLUMN aufwand_pt integer;
+	";
 
-
-
-
-
-
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekt '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte aufwand_pt in fue.tbl_projekt hinzugefügt';
+}
 
 
 
@@ -1138,7 +1156,7 @@ $tabellen=array(
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung","sort"),
 	"fue.tbl_aufwandstyp" => array("aufwandstyp_kurzbz","bezeichnung"),
-	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz","ressource_id"),
+	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz","ressource_id","anzahl_ma","aufwand_pt"),
 	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","typ","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage","farbe","ressource_id"),
 	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon","projekttask_fk","erledigt","ende","ressource_id","scrumsprint_id"),
 	"fue.tbl_projekt_dokument"  => array("projekt_dokument_id","projektphase_id","projekt_kurzbz","dms_id"),
