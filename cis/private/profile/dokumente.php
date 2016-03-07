@@ -26,6 +26,7 @@ require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/konto.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/student.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -39,6 +40,24 @@ else
 	$stsem = '';
 
 $uid=get_uid();
+
+if(isset($_GET['uid']))
+{
+	// Administratoren duerfen die UID als Parameter uebergeben um die Notenliste
+	// von anderen Personen anzuzeigen
+
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($uid);
+	if($rechte->isBerechtigt('admin'))
+    {
+		$uid = $_GET['uid'];
+        $getParam = "&uid=" . $uid;
+    }
+    else
+        $getParam = "";
+}
+else
+	$getParam='';
 
 $student_studiengang = new student();
 $student_studiengang->load($uid);
@@ -102,7 +121,7 @@ echo '
 <script language="JavaScript" type="text/javascript">
 	function MM_jumpMenu(targ, selObj, restore)
 	{
-	  eval(targ + ".location=\'" + selObj.options[selObj.selectedIndex].value + "\'");
+	  eval(targ + ".location=\'" + selObj.options[selObj.selectedIndex].value + "'.$getParam.'\'");
 
 	  if(restore)
 	  {
@@ -168,8 +187,8 @@ if(defined('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN') && CIS_DOKUMENTE_STUDIENBUC
 
 if(defined('CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN') && CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN)
 {
-	echo "<a href='studienerfolgsbestaetigung.php' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Deutsch</a><br>";
-	echo "<a href='studienerfolgsbestaetigung.php?lang=en' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Englisch</a>";
+	echo "<a href='studienerfolgsbestaetigung.php?".$getParam."' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Deutsch</a><br>";
+	echo "<a href='studienerfolgsbestaetigung.php?lang=en".$getParam."' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Englisch</a>";
 	echo "<hr>";
 }
 echo "<br>";

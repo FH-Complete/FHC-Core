@@ -29,10 +29,25 @@
 	require_once('../../../include/datum.class.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/phrasen.class.php');
+	require_once('../../../include/benutzerberechtigung.class.php');
 	
 	$sprache = getSprache();
 	$p = new phrasen($sprache);
 	$uid=get_uid();
+	
+	if(isset($_GET['uid']))
+	{
+		// Administratoren duerfen die UID als Parameter uebergeben um die Zahlungen
+		// von anderen Personen anzuzeigen
+	
+		$rechte = new benutzerberechtigung();
+		$rechte->getBerechtigungen($uid);
+		if($rechte->isBerechtigt('admin'))
+		{
+			$uid = $_GET['uid'];
+		}
+	}
+	
 	$datum_obj = new datum();
 
 	echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
