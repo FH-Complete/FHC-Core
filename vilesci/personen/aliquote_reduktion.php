@@ -75,7 +75,7 @@
 				aqr.studiensemester = [];
 				aqr.studienplaetze = [];
 				aqr.actualSequence = 1;
-				SERVICE_TARGET = "aliquote_reduktion.json.php"
+				SERVICE_TARGET = "aliquote_reduktion.json.php";
 
 				if(!aqr.studiensemester_kurzbz)
 					die("Es wurde kein Studiensemester angegeben");
@@ -330,6 +330,49 @@
 						aqr.recursiveChoose(needed, zgvElems);
 					}
 				}
+
+				aqr.download = function()
+				{
+					var filteredStudents = [];
+
+
+					aqr.studenten.forEach(function(i)
+					{
+						if(i.applicant)
+						{
+							filteredStudents.push(i);
+						}
+					});
+
+
+					var form = document.createElement("form");
+					form.setAttribute("method", "post");
+					form.setAttribute("action", "aliquote_reduktion.json.php");
+					form.setAttribute("target", "view");
+
+					var hiddenField = document.createElement("input");
+					hiddenField.setAttribute("type", "hidden");
+					hiddenField.setAttribute("name", "action");
+					hiddenField.setAttribute("value", "dlTable");
+					form.appendChild(hiddenField);
+
+					var hiddenField = document.createElement("input");
+					hiddenField.setAttribute("type", "hidden");
+					hiddenField.setAttribute("name", "studiengang_kz");
+					hiddenField.setAttribute("value", aqr.selectedStudiengang.studiengang_kz);
+					form.appendChild(hiddenField);
+
+					var hiddenField = document.createElement("input");
+					hiddenField.setAttribute("type", "hidden");
+					hiddenField.setAttribute("name", "students");
+					hiddenField.setAttribute("value", JSON.stringify(filteredStudents));
+					form.appendChild(hiddenField);
+
+					document.body.appendChild(form);
+
+
+					form.submit();
+				}
 			});
 		</script>
 	</head>
@@ -349,8 +392,8 @@
 				<thead>
 					<tr>
 						<th ts-criteria="prestudent_id">ID</th>
-						<th ts-criteria="vorname">Vorname</th>
 						<th ts-criteria="nachname">Nachname</th>
+						<th ts-criteria="vorname">Vorname</th>
 						<th ts-criteria="bezeichnung">ZGV Gruppe</th>
 						<th ts-criteria="seqPlace|parseInt" ts-default="ascending">Reihung</th>
 						<th ts-criteria="rt_gesamtpunkte|parseFloat" ts-default="ascending">RT Gesamt</th>
@@ -362,8 +405,8 @@
 				<tbody>
 					<tr ng-repeat="stud in aqr.studenten track by stud.prestudent_id" ng-if="stud.applicant" ng-click="aqr.countChoosen()" ts-repeat ts-hide-no-data ng-class="{true:'applicant', false:'no_applicant', undefined:'no_applicant'}[stud.applicant]"><!-- "{applicant, no_applicant : stud.applicant}">-->
 						<td>{{stud.prestudent_id}}</td>
-						<td>{{stud.vorname}}</td>
 						<td>{{stud.nachname}}</td>
+						<td>{{stud.vorname}}</td>
 						<td ng-if="stud.bezeichnung">{{stud.bezeichnung}}</td>
 						<td ng-if="!stud.bezeichnung" style="font-weight: bold;">Keine Angabe</td>
 						<td>{{stud.seqPlace}}</td>
@@ -378,14 +421,15 @@
 			</table>
 
 			<input style="float:right;" type="button" value="Annehmen" ng-click="aqr.submit()"/>
+			<input style="float:right;" type="button" value="Download" ng-click="aqr.download()"/>
 
 			<h3>Bereits aufgenommene</h3>
 			<table ts-wrapper>
 				<thead>
 					<tr>
 						<th ts-criteria="prestudent_id">ID</th>
-						<th ts-criteria="vorname">Vorname</th>
 						<th ts-criteria="nachname">Nachname</th>
+						<th ts-criteria="vorname">Vorname</th>
 						<th ts-criteria="bezeichnung">ZGV Gruppe</th>
 						<th ts-criteria="seqPlace|parseInt" ts-default="ascending">Reihung</th>
 						<th ts-criteria="rt_gesamtpunkte|parseFloat">RT Gesamt</th>
@@ -396,8 +440,8 @@
 				<tbody>
 					<tr ng-repeat="stud in aqr.studenten track by stud.prestudent_id" ng-if="!stud.applicant" ng-click="aqr.countChoosen()" ts-repeat ts-hide-no-data ng-class="{true:'applicant', false:'no_applicant', undefined:'no_applicant'}[stud.applicant]"><!-- "{applicant, no_applicant : stud.applicant}">-->
 						<td>{{stud.prestudent_id}}</td>
-						<td>{{stud.vorname}}</td>
 						<td>{{stud.nachname}}</td>
+						<td>{{stud.vorname}}</td>
 						<td ng-if="stud.bezeichnung">{{stud.bezeichnung}}</td>
 						<td ng-if="!stud.bezeichnung" style="font-weight: bold;">Keine Angabe</td>
 						<td>{{stud.seqPlace}}</td>

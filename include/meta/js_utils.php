@@ -77,7 +77,7 @@ echo '
 				}
 				else
 				{
-					die(result);
+					die(res.message);
 				}
 
 		}).fail(function(jqXHR, status)
