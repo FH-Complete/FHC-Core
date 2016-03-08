@@ -694,7 +694,8 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 		{
 			$studlist.="<td><b>".$p->t('benotungstool/punkte')."</b></td>\n";
 		}
-		$studlist.="<td><b>".$p->t('benotungstool/note')."</b></td></tr>\n";
+		$studlist.="<td><b>".$p->t('benotungstool/note')."</b></td>\n";
+		$studlist.="<td><b>".$p->t('benotungstool/bearbeitetvon')."</b></td></tr>\n";
 
 		// studentenquery
 		$qry_stud = "SELECT
@@ -726,7 +727,8 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 						{
 							$studlist.="<td>".($lvgesamtnote->punkte!=''?trim(number_format($lvgesamtnote->punkte,2)):'')."</td>\n";
 						}
-						$studlist.="<td>".$noten_array[trim($lvgesamtnote->note)]['bezeichnung']."</td></tr>\n";
+						$studlist.="<td>".$noten_array[trim($lvgesamtnote->note)]['bezeichnung']."</td>";
+						$studlist.="<td>".$lvgesamtnote->mitarbeiter_uid.($lvgesamtnote->updatevon!=''?" (".$lvgesamtnote->updatevon.")":'')."</td></tr>\n";
     					$neuenoten++;
     				}
     			}
@@ -754,7 +756,15 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 
 			$freigeber = "<b>".mb_strtoupper($user)."</b>";
 			$mail = new mail($adressen, 'vilesci@'.DOMAIN, 'Notenfreigabe '.$lv->bezeichnung." ".$lv->orgform_kurzbz.' - '.$studienplan_bezeichnung,'');
-			$htmlcontent="<html><body><b>".$sg->kuerzel.' '.$lv->semester.'.Semester '.$lv->bezeichnung." ".$lv->orgform_kurzbz." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>".$p->t('global/benutzer')." ".$freigeber." (".$mit->kurzbz.") ".$p->t('benotungstool/hatDieLvNotenFuerFolgendeStudenten').":<br><br>\n".$studlist."<br>".$p->t('abgabetool/mailVerschicktAn').": ".$adressen."</body></html>";
+			$htmlcontent="<html>
+				<body>
+					<b>".$sg->kuerzel.' '.$lv->semester.'.Semester '.$lv->bezeichnung." ".$lv->orgform_kurzbz." - ".$stsem."</b>
+					(".$lv->semester.". Sem.)
+					<br><br>".$p->t('global/benutzer')." ".$freigeber." (".$mit->kurzbz.") ".$p->t('benotungstool/hatDieLvNotenFuerFolgendeStudenten').":
+					<br><br>\n".$studlist."
+					<br>Anzahl der Noten:".$neuenoten."
+					<br>".$p->t('abgabetool/mailVerschicktAn').": ".$adressen."
+				</body></html>";
 			$mail->setHTMLContent($htmlcontent);
 			$mail->setReplyTo($lektor_adresse);
 			$mail->send();
