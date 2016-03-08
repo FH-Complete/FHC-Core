@@ -453,8 +453,12 @@ class konto extends basis_db
 	 */
 	public function getDifferenz($buchungsnr)
 	{
-		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto
-				WHERE buchungsnr=".$this->db_add_param($buchungsnr, FHC_INTEGER)." OR buchungsnr_verweis=".$this->db_add_param($buchungsnr, FHC_INTEGER);
+		$qry = "SELECT 
+					sum(betrag) as differenz FROM public.tbl_konto
+				WHERE 
+					(buchungsnr=".$this->db_add_param($buchungsnr, FHC_INTEGER)." OR buchungsnr_verweis=".$this->db_add_param($buchungsnr, FHC_INTEGER).")
+				OR 
+					(buchungsnr=(SELECT buchungsnr_verweis FROM public.tbl_konto WHERE buchungsnr=".$this->db_add_param($buchungsnr, FHC_INTEGER).") OR buchungsnr_verweis=(SELECT buchungsnr_verweis FROM public.tbl_konto WHERE buchungsnr=".$this->db_add_param($buchungsnr, FHC_INTEGER)."))";
 
 		if($this->db_query($qry))
 		{
