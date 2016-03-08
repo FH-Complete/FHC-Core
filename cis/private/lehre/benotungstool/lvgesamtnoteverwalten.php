@@ -131,7 +131,8 @@ echo '<!DOCTYPE HTML>
 
 	</style>
 	<script language="JavaScript" type="text/javascript">
-
+	var notenrequests=0;
+	var notenrequests_arr=Array();
 	var noten_array=Array();
 ';
 
@@ -290,7 +291,7 @@ foreach($noten_obj->result as $row)
 			}
 			echo '</select></td>';
 		?>';
-		str += "</tr><tr><td colspan='2' align='center'><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='pruefungSpeichern();'></td></tr>";
+		str += "</tr><tr><td colspan='2' align='center'><input id='pruefungsnotensave' type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='pruefungSpeichern();'></td></tr>";
 		str += "</table></form>";
 		anlegendiv.innerHTML = str;
 		anlegendiv.style.visibility = "visible";
@@ -411,6 +412,10 @@ foreach($noten_obj->result as $row)
 		// Request absetzen und Note zu den Punkten holen
 		if(punkte!='')
 		{
+			if(typeof(notenrequests_arr[idx])=='undefined')
+				notenrequests_arr[idx]=0;
+			notenrequests_arr[idx]=notenrequests_arr[idx]+1;
+			$('#button-note-save-'+idx).prop('disabled',true);
 			$.ajax({
 				type:"POST",
 				url:"lvgesamtnote_worker.php",
@@ -422,14 +427,21 @@ foreach($noten_obj->result as $row)
 				success:function(result)
 				{
 				    note=result;
+					notenrequests_arr[idx]=notenrequests_arr[idx]-1;
 
 					var notendropdown = $('#dropdown-note-'+idx);
 					notendropdown.val(note);
 					notendropdown.prop('disabled',true);
+
+					if(notenrequests_arr[idx]==0)
+					{
+						$('#button-note-save-'+idx).prop('disabled',false);
+					}
 	  			},
 	  			error:function(result)
 	  			{
-	  				alert('Noten ermittlung fehlgeschlagen');
+					notenrequests_arr[idx]=notenrequests_arr[idx]-1;
+					alert('Notenermittlung fehlgeschlagen');
 	  			}
 	  		});
 		}
@@ -452,6 +464,8 @@ foreach($noten_obj->result as $row)
 		// Request absetzen und Note zu den Punkten holen
 		if(punkte!='')
 		{
+			notenrequests = notenrequests+1;
+			$('#pruefungsnotensave').prop('disabled',true);
 			$.ajax({
 				type:"POST",
 				url:"lvgesamtnote_worker.php",
@@ -462,14 +476,21 @@ foreach($noten_obj->result as $row)
 					},
 				success:function(result)
 				{
+					notenrequests = notenrequests-1;
 				    note=result;
 
 					var notendropdown = $('#pruefungnoteselect');
 					notendropdown.val(note);
 					notendropdown.prop('disabled',true);
+
+					if(notenrequests==0)
+						$('#pruefungsnotensave').prop('disabled',false);
 	  			},
 	  			error:function(result)
 	  			{
+					notenrequests = notenrequests-1;
+					if(notenrequests==0)
+						$('#pruefungsnotensave').prop('disabled',false);
 	  				alert('Noten ermittlung fehlgeschlagen');
 	  			}
 	  		});
@@ -1201,7 +1222,7 @@ echo "
 					echo '</select>';
 					echo "
 								<input type='hidden' name='note_orig' value='$note_lv'>
-								<input type='button' value='->' onclick=\"saveLVNote('".$row_stud->uid."');\">
+								<input type='button' id='button-note-save-".$i."' value='->' onclick=\"saveLVNote('".$row_stud->uid."');\">
 							</span>
 						</form></td>";
 				}
