@@ -17,6 +17,7 @@
 - **[CIS]** LVPlan Begrenzung der 4er Blockung aufgehoben. 
  
 ### Updateinfo
+- **[FAS]** Für Lehraufträge muss eine Unoconv-Vorlage erstellt werden, da der für xsl-fo notwendige Seitenumbruch-Tag aus dem RDF entfernt wurde. 
 
 ## [3.1.0] - 2015-11-12
 ### Added
