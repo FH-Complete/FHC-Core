@@ -28,6 +28,8 @@ require_once(dirname(__FILE__).'/../../include/studiengang.class.php');
 require_once(dirname(__FILE__).'/../../include/studiensemester.class.php');
 require_once(dirname(__FILE__).'/../../include/prestudent.class.php');
 require_once(dirname(__FILE__).'/../../include/studienplatz.class.php');
+require_once(dirname(__FILE__).'/../../include/Excel/excel.php');
+require_once(dirname(__FILE__).'/../../include/dokument.class.php');
 
 
 $user = get_uid();
@@ -110,8 +112,135 @@ switch($action)
 		returnAJAX(true, "");
 		break;
 
+	case "dlTable":
+
+		if(!isset($_REQUEST["students"]))
+			die("keine Studenten erhalten");
+		$students = json_decode($_REQUEST["students"]);
+
+
+
+		// Creating a workbook
+		$workbook = new Spreadsheet_Excel_Writer();
+
+		// sending HTTP headers
+		$workbook->send('aliquote_reduktion_'.$studiengang_kz.'.xls');
+		$workbook->setVersion(8);
+
+		// Creating a worksheet
+		$worksheet =& $workbook->addWorksheet("Tabelle");
+		$worksheet->setInputEncoding('utf-8');
+
+		$format_bold =& $workbook->addFormat();
+		$format_bold->setBold();
+
+		$format_float =& $workbook->addFormat();
+		$format_float->setNumFormat("0.0000");
+
+
+		$spalte=0;
+		$zeile=0;
+
+		$worksheet->write($zeile,$spalte,'ID',$format_bold);
+		$maxlength[$spalte]=3;
+		$worksheet->write($zeile,++$spalte,'Nachname',$format_bold);
+		$maxlength[$spalte]=7;
+		$worksheet->write($zeile,++$spalte,'Vorname',$format_bold);
+		$maxlength[$spalte]=7;
+		$worksheet->write($zeile,++$spalte,'ZGV Gruppe',$format_bold);
+		$maxlength[$spalte]=8;
+		$worksheet->write($zeile,++$spalte,'Reihung',$format_bold);
+		$maxlength[$spalte]=8;
+		$worksheet->write($zeile,++$spalte,'RT Gesamt',$format_bold);
+		$maxlength[$spalte]=8;
+		$worksheet->write($zeile,++$spalte,'Status',$format_bold);
+		$maxlength[$spalte]=8;
+		$worksheet->write($zeile,++$spalte,'Auswahl',$format_bold);
+		$maxlength[$spalte]=8;
+
+
+		usort($students, "studentsSort");
+		foreach($students as $s)
+		{
+			$zeile++;
+			$spalte=0;
+
+			$worksheet->writeNumber($zeile,$spalte,$s->prestudent_id);
+			if(mb_strlen($s->prestudent_id)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($s->prestudent_id);
+
+			$worksheet->write($zeile,++$spalte,$s->nachname);
+			if(mb_strlen($s->nachname)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($s->nachname);
+
+			$worksheet->write($zeile,++$spalte, $s->vorname);
+			if(mb_strlen($s->vorname)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($s->vorname);
+
+			if(isset($s->bezeichnung) && $s->bezeichnung)
+			{
+				$worksheet->write($zeile,++$spalte, $s->bezeichnung);
+				if(mb_strlen($s->bezeichnung)>$maxlength[$spalte])
+					$maxlength[$spalte]=mb_strlen($s->bezeichnung);
+			}
+			else
+			{
+				$worksheet->write($zeile,++$spalte, "");
+				if(mb_strlen("")>$maxlength[$spalte])
+					$maxlength[$spalte]=mb_strlen("");
+			}
+
+			$worksheet->writeNumber($zeile,++$spalte, $s->seqPlace);
+			if(mb_strlen($s->seqPlace)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($s->seqPlace);
+
+			if(isset($s->rt_gesamtpunkte) && $s->rt_gesamtpunkte)
+			{
+				$worksheet->writeNumber($zeile,++$spalte, $s->rt_gesamtpunkte, $format_float);
+				if(mb_strlen($s->rt_gesamtpunkte)>$maxlength[$spalte])
+					$maxlength[$spalte]=mb_strlen($s->rt_gesamtpunkte);
+			}
+			else
+			{
+				$worksheet->write($zeile,++$spalte, "");
+				if(mb_strlen("")>$maxlength[$spalte])
+					$maxlength[$spalte]=mb_strlen("");
+			}
+
+			$worksheet->write($zeile,++$spalte, $s->laststatus);
+			if(mb_strlen($s->laststatus)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($s->laststatus);
+
+			if(isset($s->selected) && $s->selected)
+			{
+				$worksheet->write($zeile,++$spalte, "x");
+				if(mb_strlen("x")>$maxlength[$spalte])
+					$maxlength[$spalte]=mb_strlen("x");
+			}
+			else
+			{
+				$worksheet->write($zeile,++$spalte, "");
+				if(mb_strlen("")>$maxlength[$spalte])
+					$maxlength[$spalte]=mb_strlen("");
+			}
+		}
+
+		//Die Breite der Spalten setzen
+		foreach($maxlength as $i=>$breite)
+			$worksheet->setColumn($i, $i, $breite+2);
+
+		$workbook->close();
+		break;
+
 	default:
-		returnAJAX(false,"eine Aktion erhalten");
+		returnAJAX(false,"unknown action: " . $action);
 }
+
+
+function studentsSort($a, $b)
+{
+	return $a->seqPlace > $b->seqPlace;
+}
+
 
 ?>

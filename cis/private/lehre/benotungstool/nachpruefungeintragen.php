@@ -40,6 +40,7 @@ require_once('../../../../include/mail.class.php');
 require_once('../../../../include/benutzerfunktion.class.php');
 require_once('../../../../include/benutzer.class.php');
 require_once('../../../../include/student.class.php');
+require_once('../../../../include/notenschluessel.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Herstellen der Datenbankverbindung');
@@ -102,6 +103,18 @@ else
 	$punkte = '';
 
 $punkte = str_replace(',','.',$punkte);
+
+if($punkte!='')
+{
+	// Bei Punkteeingabe wird die Note nochmals geprueft und ggf korrigiert
+	$notenschluessel = new notenschluessel();
+	$note_pruef = $notenschluessel->getNote($punkte, $lvid, $stsem);
+	if($note_pruef!=$note)
+	{
+		$note = $note_pruef;
+		$note_dirty=true;
+	}
+}
 
 if(!isset($_GET['typ']))
 {

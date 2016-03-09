@@ -131,7 +131,8 @@ echo '<!DOCTYPE HTML>
 
 	</style>
 	<script language="JavaScript" type="text/javascript">
-
+	var notenrequests=0;
+	var notenrequests_arr=Array();
 	var noten_array=Array();
 ';
 
@@ -290,7 +291,7 @@ foreach($noten_obj->result as $row)
 			}
 			echo '</select></td>';
 		?>';
-		str += "</tr><tr><td colspan='2' align='center'><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='pruefungSpeichern();'></td></tr>";
+		str += "</tr><tr><td colspan='2' align='center'><input id='pruefungsnotensave' type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='pruefungSpeichern();'></td></tr>";
 		str += "</table></form>";
 		anlegendiv.innerHTML = str;
 		anlegendiv.style.visibility = "visible";
@@ -411,6 +412,10 @@ foreach($noten_obj->result as $row)
 		// Request absetzen und Note zu den Punkten holen
 		if(punkte!='')
 		{
+			if(typeof(notenrequests_arr[idx])=='undefined')
+				notenrequests_arr[idx]=0;
+			notenrequests_arr[idx]=notenrequests_arr[idx]+1;
+			$('#button-note-save-'+idx).prop('disabled',true);
 			$.ajax({
 				type:"POST",
 				url:"lvgesamtnote_worker.php",
@@ -422,14 +427,21 @@ foreach($noten_obj->result as $row)
 				success:function(result)
 				{
 				    note=result;
+					notenrequests_arr[idx]=notenrequests_arr[idx]-1;
 
 					var notendropdown = $('#dropdown-note-'+idx);
 					notendropdown.val(note);
 					notendropdown.prop('disabled',true);
+
+					if(notenrequests_arr[idx]==0)
+					{
+						$('#button-note-save-'+idx).prop('disabled',false);
+					}
 	  			},
 	  			error:function(result)
 	  			{
-	  				alert('Noten ermittlung fehlgeschlagen');
+					notenrequests_arr[idx]=notenrequests_arr[idx]-1;
+					alert('Notenermittlung fehlgeschlagen');
 	  			}
 	  		});
 		}
@@ -452,6 +464,8 @@ foreach($noten_obj->result as $row)
 		// Request absetzen und Note zu den Punkten holen
 		if(punkte!='')
 		{
+			notenrequests = notenrequests+1;
+			$('#pruefungsnotensave').prop('disabled',true);
 			$.ajax({
 				type:"POST",
 				url:"lvgesamtnote_worker.php",
@@ -462,14 +476,21 @@ foreach($noten_obj->result as $row)
 					},
 				success:function(result)
 				{
+					notenrequests = notenrequests-1;
 				    note=result;
 
 					var notendropdown = $('#pruefungnoteselect');
 					notendropdown.val(note);
 					notendropdown.prop('disabled',true);
+
+					if(notenrequests==0)
+						$('#pruefungsnotensave').prop('disabled',false);
 	  			},
 	  			error:function(result)
 	  			{
+					notenrequests = notenrequests-1;
+					if(notenrequests==0)
+						$('#pruefungsnotensave').prop('disabled',false);
 	  				alert('Noten ermittlung fehlgeschlagen');
 	  			}
 	  		});
@@ -673,7 +694,8 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 		{
 			$studlist.="<td><b>".$p->t('benotungstool/punkte')."</b></td>\n";
 		}
-		$studlist.="<td><b>".$p->t('benotungstool/note')."</b></td></tr>\n";
+		$studlist.="<td><b>".$p->t('benotungstool/note')."</b></td>\n";
+		$studlist.="<td><b>".$p->t('benotungstool/bearbeitetvon')."</b></td></tr>\n";
 
 		// studentenquery
 		$qry_stud = "SELECT
@@ -705,7 +727,8 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 						{
 							$studlist.="<td>".($lvgesamtnote->punkte!=''?trim(number_format($lvgesamtnote->punkte,2)):'')."</td>\n";
 						}
-						$studlist.="<td>".$noten_array[trim($lvgesamtnote->note)]['bezeichnung']."</td></tr>\n";
+						$studlist.="<td>".$noten_array[trim($lvgesamtnote->note)]['bezeichnung']."</td>";
+						$studlist.="<td>".$lvgesamtnote->mitarbeiter_uid.($lvgesamtnote->updatevon!=''?" (".$lvgesamtnote->updatevon.")":'')."</td></tr>\n";
     					$neuenoten++;
     				}
     			}
@@ -733,7 +756,15 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 
 			$freigeber = "<b>".mb_strtoupper($user)."</b>";
 			$mail = new mail($adressen, 'vilesci@'.DOMAIN, 'Notenfreigabe '.$lv->bezeichnung." ".$lv->orgform_kurzbz.' - '.$studienplan_bezeichnung,'');
-			$htmlcontent="<html><body><b>".$sg->kuerzel.' '.$lv->semester.'.Semester '.$lv->bezeichnung." ".$lv->orgform_kurzbz." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>".$p->t('global/benutzer')." ".$freigeber." (".$mit->kurzbz.") ".$p->t('benotungstool/hatDieLvNotenFuerFolgendeStudenten').":<br><br>\n".$studlist."<br>".$p->t('abgabetool/mailVerschicktAn').": ".$adressen."</body></html>";
+			$htmlcontent="<html>
+				<body>
+					<b>".$sg->kuerzel.' '.$lv->semester.'.Semester '.$lv->bezeichnung." ".$lv->orgform_kurzbz." - ".$stsem."</b>
+					(".$lv->semester.". Sem.)
+					<br><br>".$p->t('global/benutzer')." ".$freigeber." (".$mit->kurzbz.") ".$p->t('benotungstool/hatDieLvNotenFuerFolgendeStudenten').":
+					<br><br>\n".$studlist."
+					<br>Anzahl der Noten:".$neuenoten."
+					<br>".$p->t('abgabetool/mailVerschicktAn').": ".$adressen."
+				</body></html>";
 			$mail->setHTMLContent($htmlcontent);
 			$mail->setReplyTo($lektor_adresse);
 			$mail->send();
@@ -1201,7 +1232,7 @@ echo "
 					echo '</select>';
 					echo "
 								<input type='hidden' name='note_orig' value='$note_lv'>
-								<input type='button' value='->' onclick=\"saveLVNote('".$row_stud->uid."');\">
+								<input type='button' id='button-note-save-".$i."' value='->' onclick=\"saveLVNote('".$row_stud->uid."');\">
 							</span>
 						</form></td>";
 				}
