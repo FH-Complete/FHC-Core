@@ -1062,7 +1062,32 @@ if(!@$db->db_query("SELECT aufwand_pt FROM fue.tbl_projekt LIMIT 1"))
 			echo '<br>Spalte aufwand_pt in fue.tbl_projekt hinzugefügt';
 }
 
+//Tabelle public.tbl_studienjahr
+if (!$result = @$db->db_query("SELECT 1 FROM public.tbl_studienjahr LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE public.tbl_studienjahr
+		(
+			studienjahr_kurzbz varchar(16) NOT NULL,
+			bezeichnung varchar(64)
+			
+		);
 
+		ALTER TABLE public.tbl_studienjahr ADD CONSTRAINT pk_studienjahr_kurzbz PRIMARY KEY (studienjahr_kurzbz);
+		
+		INSERT INTO public.tbl_studienjahr (studienjahr_kurzbz) SELECT DISTINCT s.studienjahr_kurzbz FROM public.tbl_studiensemester s;
+		
+		ALTER TABLE public.tbl_studiensemester ADD CONSTRAINT fk_studiensemester_studienjahr FOREIGN KEY (studienjahr_kurzbz) REFERENCES public.tbl_studienjahr (studienjahr_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		GRANT SELECT ON public.tbl_studienjahr TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_studienjahr TO vilesci;
+	";
+
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_studienjahr: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo 'public.tbl_studienjahr: Tabelle hinzugefuegt<br>';
+}
 
 
 
@@ -1288,6 +1313,7 @@ $tabellen=array(
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung"),
 	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung"),
+	"public.tbl_studienjahr"  => array("studienjahr_id","studienjahr_kurzbz"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
