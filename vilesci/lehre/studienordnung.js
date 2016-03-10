@@ -1603,6 +1603,7 @@ function deleteSemesterZuordnung(ausbildungssemester_kurzbz, studiensemester)
 			url: "./saveStudienordnung.php",
 			type: "POST",
 			data: {
+				"typ": "json",
 				"class" : "studienordnung",
 				"method": "deleteSemesterZuordnung",
 				"parameter_0": global_studienordnung_id,
@@ -1620,6 +1621,7 @@ function deleteSemesterZuordnung(ausbildungssemester_kurzbz, studiensemester)
 			url: "./saveStudienordnung.php",
 			type: "POST",
 			data: {
+				"typ": "json",
 				"class" : "studienordnung",
 				"method": "deleteSemesterZuordnung",
 				"parameter_0": global_studienordnung_id,
