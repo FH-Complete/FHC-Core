@@ -198,7 +198,7 @@ if($result = $db->db_query($qry))
 	$data['anzahl_studierende'] = $anzahl_studierende;
 	$data = array_reverse($data, true);
 }
-var_dump($data);
+//var_dump($data);
 //$files=array();
 /*
 foreach($codes_obj->result as $code)
