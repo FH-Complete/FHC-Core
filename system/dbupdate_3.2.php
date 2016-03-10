@@ -721,7 +721,7 @@ if (!$result = @$db->db_query("SELECT status_kurzbz FROM lehre.tbl_studienordnun
 {
     $qry = "ALTER TABLE lehre.tbl_studienordnung ADD COLUMN status_kurzbz varchar(32); 
 	   
-	    ALTER TABLE lehre.tbl_studienordnung ADD CONSTRAINT status_kurzbz FOREIGN KEY (status_kurzbz) REFERENCES lehre.tbl_studienordnungstatus (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	    ALTER TABLE lehre.tbl_studienordnung ADD CONSTRAINT fk_studienordnung_status_kurzbz FOREIGN KEY (status_kurzbz) REFERENCES lehre.tbl_studienordnungstatus (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 	    UPDATE lehre.tbl_studienordnung SET status_kurzbz = 'approved';
 	   ";
     
