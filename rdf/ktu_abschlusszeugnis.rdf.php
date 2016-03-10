@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Stefan Puraner <stefan.puraner@technikum-wien.at>,
- Andreas Moik <moik@technikum-wien.at>
+ *          Andreas Moik <moik@technikum-wien.at>
 
  */
 header("Content-type: application/xhtml+xml");
