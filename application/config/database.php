@@ -79,6 +79,7 @@ $db['default'] = array(
 	'hostname' => DB_HOST,
 	'username' => DB_USER,
 	'password' => DB_PASSWORD,
+	'port' 	   => DB_PORT,
 	'database' => DB_NAME,
 	'dbdriver' => 'postgre',
 	'dbprefix' => '',
