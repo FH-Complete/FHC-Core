@@ -1549,7 +1549,7 @@ function saveSemesterSTPLZuordnung(studiensemester, ausbildungssemester)
 			{
 				$.ajax({
 					dataType: "json",
-					url: "../../soap/studienordnung.json.php",
+					url: "../../soap/studienplan.json.php",
 					type: "POST",
 					data: {
 						"method": "saveSemesterSTPLZuordnung",
@@ -1573,7 +1573,7 @@ function saveSemesterSTPLZuordnung(studiensemester, ausbildungssemester)
 	{
 		$.ajax({
 			dataType: "json",
-			url: "../../soap/studienordnung.json.php",
+			url: "../../soap/studienplan.json.php",
 			type: "POST",
 			data: {
 				"method": "saveSemesterSTPLZuordnung",
@@ -1643,7 +1643,7 @@ function deleteSemesterSTPLZuordnung(ausbildungssemester_kurzbz, studiensemester
 		var row = $("#row_"+ausbildungssemester_kurzbz);
 		$.ajax({
 			dataType: "json",
-			url: "../../soap/studienordnung.json.php",
+			url: "../../soap/studienplan.json.php",
 			type: "POST",
 			data: {
 				"method": "deleteSemesterSTPLZuordnung",
@@ -1664,7 +1664,7 @@ function deleteSemesterSTPLZuordnung(ausbildungssemester_kurzbz, studiensemester
 	{
 		$.ajax({
 			dataType: "json",
-			url: "../../soap/studienordnung.json.php",
+			url: "../../soap/studienplan.json.php",
 			type: "POST",
 			data: {
 				"method": "deleteSemesterSTPLZuordnung",
