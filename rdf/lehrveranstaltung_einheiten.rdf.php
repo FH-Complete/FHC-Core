@@ -99,10 +99,10 @@ elseif($fachbereich_kurzbz!='') // Alle LVs eines Fachbereiches
 				JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
 				JOIN lehre.tbl_studienplan USING(studienplan_id)
 				JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-				JOIN lehre.tbl_studienordnung_semester USING(studienordnung_id)
+				JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
 			WHERE
 				tbl_lehrveranstaltung.oe_kurzbz=(Select oe_kurzbz from public.tbl_fachbereich where fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz).")
-				AND tbl_studienordnung_semester.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
+				AND tbl_studienplan_semester.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
 				AND tbl_lehrveranstaltung.aktiv
 			UNION ";
 	}
@@ -133,10 +133,10 @@ elseif($fachbereich_kurzbz!='') // Alle LVs eines Fachbereiches
 			JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
 			JOIN lehre.tbl_studienplan USING(studienplan_id)
 			JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-			JOIN lehre.tbl_studienordnung_semester USING(studienordnung_id)
+			JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
 		WHERE
 			tbl_lehrveranstaltung.oe_kurzbz=(Select oe_kurzbz from public.tbl_fachbereich where fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz).")
-			AND tbl_studienordnung_semester.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).")";
+			AND tbl_studienplan_semester.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).")";
 	}
 
 }
@@ -174,10 +174,11 @@ else
 	if($orgform=='')
 		$orgform=null;
 	$stp_ids=array();
-	$sto_obj = new studienordnung();
-	if($sto_obj->loadStudienordnungSTG($stg_kz, $semester_aktuell, $sem))
+	$stpl_main = new studienplan();
+
+	if($stpl_main->getStudienplaeneFromSem($stg_kz, $semester_aktuell, $sem))
 	{
-		foreach($sto_obj->result as $row_sto)
+		foreach($stpl_main->result as $row_sto)
 		{
 			$stp_obj = new studienplan();
 			if($stp_obj->loadStudienplanSTO($row_sto->studienordnung_id, $orgform))
@@ -190,7 +191,7 @@ else
 		}
 	}
 	else
-		echo "FAILED:".$sto_obj->errormsg;
+		echo "FAILED:".$stpl_main->errormsg;
 	$qry='';
 	if(count($stp_ids)>0)
 	{

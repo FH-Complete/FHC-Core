@@ -690,37 +690,46 @@ class studienplan extends basis_db
 	}
 
 	/**
-	 * Holt den aktiven Studienplan eines Studiensemester / Ausbildungssemesters
+	 * Holt die aktiven Studienplaene eines Studiensemester / Ausbildungssemesters
 	 * @param studiensemester_kurzbz
 	 * @param $ausbuldungssemester
 	 * @param $orgform_kurzbz
 	 */
-	function getStudienplan($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester, $orgform_kurzbz)
+	function getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester, $orgform_kurzbz = "")
 	{
 		$qry = "SELECT
-					tbl_studienplan.studienplan_id
+					*
 				FROM
 					lehre.tbl_studienplan
 					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-					JOIN lehre.tbl_studienordnung_semester USING(studienordnung_id)
+					JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
 				WHERE
 					tbl_studienplan.aktiv
 					AND tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)."
-					AND tbl_studienordnung_semester.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
-					AND tbl_studienordnung_semester.semester=".$this->db_add_param($ausbildungssemester);
+					AND tbl_studienplan_semester.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
+					AND tbl_studienplan_semester.semester=".$this->db_add_param($ausbildungssemester);
 
 		if($orgform_kurzbz!='')
 		{
 			$qry.=" AND orgform_kurzbz=".$this->db_add_param($orgform_kurzbz);
 		}
 
+
+		$res = array();
+
 		if($result = $this->db_query($qry))
 		{
-			if($row = $this->db_fetch_object($result))
+			while($row = $this->db_fetch_object($result))
 			{
-				return $row->studienplan_id;
+				$res[] = $row;
 			}
+
+			$this->result = $res;
+			return true;
 		}
+
+		$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+		return false;
 	}
 
 	/**
@@ -925,7 +934,6 @@ class studienplan extends basis_db
 		$data = array();
 		while ($row = $this->db_fetch_object())
 		{
-			$obj = new stdClass();
 			$data[] = $row->studiensemester_kurzbz;
 		}
 		return $data;

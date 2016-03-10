@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Stefan Puraner <stefan.puraner@technikum-wien.at>,
+ Andreas Moik <moik@technikum-wien.at>
 
  */
 header("Content-type: application/xhtml+xml");
@@ -37,12 +38,12 @@ require_once('../include/lehreinheit.class.php');
 
 if(isset($_SERVER['REMOTE_USER']))
 {
-$uid = get_uid();
-$rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen($uid);
+	$uid = get_uid();
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('student/noten'))
-        die('Sie haben keine Berechtigung für diese Seite');
+	if(!$rechte->isBerechtigt('student/noten'))
+		die('Sie haben keine Berechtigung für diese Seite');
 }
 
 $datum = new datum();
@@ -60,11 +61,10 @@ $prestudent = new prestudent();
 $prestudent->getLastStatus($student->prestudent_id, $studiensemester_kurzbz, "Student");
 
 $studienplan = new studienplan();
-$studienplan_id = $studienplan->getStudienplan($studiengang->studiengang_kz, $studiensemester_kurzbz, $prestudent->ausbildungssemester, $studiengang->orgform_kurzbz);
-$studienplan->loadStudienplan($studienplan_id);
+$studienplan->loadStudienplan($prestudent->studienplan_id);
 
 $lehrveranstaltung = new lehrveranstaltung();
-$tree = $lehrveranstaltung->getLvTree($studienplan_id);
+$tree = $lehrveranstaltung->getLvTree($prestudent->studienplan_id);
 
 $pruefung = new pruefung();
 $pruefung->getPruefungen($student->uid, "fachpruefung");
@@ -95,69 +95,69 @@ echo "<gesamt_note>".$note->bezeichnung."</gesamt_note>";
 
 if(!empty($projektarbeit->result))
 {
-    $lehreinheit = new lehreinheit($projektarbeit->result[0]->lehreinheit_id);
-    $lehrveranstaltung = new lehrveranstaltung($lehreinheit->lehrveranstaltung_id);
-    $note = new note($projektarbeit->result[0]->note);
-    echo "<projektarbeit_titel>".$projektarbeit->result[0]->titel."</projektarbeit_titel>";
-    echo "<projektarbeit_note>".$note->bezeichnung."</projektarbeit_note>";
-    echo "<projektarbeit_lv>".$lehrveranstaltung->bezeichnung."</projektarbeit_lv>";
+	$lehreinheit = new lehreinheit($projektarbeit->result[0]->lehreinheit_id);
+	$lehrveranstaltung = new lehrveranstaltung($lehreinheit->lehrveranstaltung_id);
+	$note = new note($projektarbeit->result[0]->note);
+	echo "<projektarbeit_titel>".$projektarbeit->result[0]->titel."</projektarbeit_titel>";
+	echo "<projektarbeit_note>".$note->bezeichnung."</projektarbeit_note>";
+	echo "<projektarbeit_lv>".$lehrveranstaltung->bezeichnung."</projektarbeit_lv>";
 }
 else
 {
-    echo "<projektarbeit_titel></projektarbeit_titel>";
+	echo "<projektarbeit_titel></projektarbeit_titel>";
 }
 
 if(sizeof($tree) > 1)
 {
-    foreach($tree as $modul)
-    {
-	if($modul_temp == "")
+	foreach($tree as $modul)
 	{
-	    echo "<module>";
-	    echo "<modul>";
-	    $modul_temp = $modul->bezeichnung;
-	    echo "<modul_bezeichnung>".$modul->bezeichnung."</modul_bezeichnung>";
-	    echo "<lehrveranstaltungen>";
-	    foreach($modul->children as $child)
-	    {
-		echo "<lv_bezeichnung>".$child->bezeichnung."</lv_bezeichnung>";
-		echo "<lv_ects>".$child->ects."</lv_ects>";
-	    }
-	}
+		if($modul_temp == "")
+		{
+			echo "<module>";
+			echo "<modul>";
+			$modul_temp = $modul->bezeichnung;
+			echo "<modul_bezeichnung>".$modul->bezeichnung."</modul_bezeichnung>";
+			echo "<lehrveranstaltungen>";
+			foreach($modul->children as $child)
+			{
+				echo "<lv_bezeichnung>".$child->bezeichnung."</lv_bezeichnung>";
+				echo "<lv_ects>".$child->ects."</lv_ects>";
+			}
+		}
 
-	if($modul_temp != $modul->bezeichnung && $modul_temp != '')
-	{
-	    echo '</lehrveranstaltungen></modul><modul>';
-	    $modul_temp = $modul->bezeichnung;
-	    echo "<modul_bezeichnung>".$modul->bezeichnung."</modul_bezeichnung>";
-	    echo "<lehrveranstaltungen>";
-	    foreach($modul->children as $child)
-	    {
-		echo "<lv_bezeichnung>".$child->bezeichnung."</lv_bezeichnung>";
-		echo "<lv_ects>".$child->ects."</lv_ects>";
-	    }
+		if($modul_temp != $modul->bezeichnung && $modul_temp != '')
+		{
+			echo '</lehrveranstaltungen></modul><modul>';
+			$modul_temp = $modul->bezeichnung;
+			echo "<modul_bezeichnung>".$modul->bezeichnung."</modul_bezeichnung>";
+			echo "<lehrveranstaltungen>";
+			foreach($modul->children as $child)
+			{
+				echo "<lv_bezeichnung>".$child->bezeichnung."</lv_bezeichnung>";
+				echo "<lv_ects>".$child->ects."</lv_ects>";
+			}
+		}
+		else
+		{
+			foreach($modul->children as $child)
+			{
+				echo "<lv_bezeichnung>".$child->bezeichnung."</lv_bezeichnung>";
+				echo "<lv_ects>".$child->ects."</lv_ects>";
+			}
+		}
 	}
-	else
-	{
-	    foreach($modul->children as $child)
-	    {
-		echo "<lv_bezeichnung>".$child->bezeichnung."</lv_bezeichnung>";
-		echo "<lv_ects>".$child->ects."</lv_ects>";
-	    }
-	}
-    }
-    echo '</lehrveranstaltungen></modul></module>';
+	echo '</lehrveranstaltungen></modul></module>';
 }
 echo '<fachpruefungen>';
 foreach($pruefung->result as $key => $prf)
 {
-    echo '<pruefung_'.$key.'>';
-    echo '<prf_'.$key.'_bezeichnung>'.$prf->pruefungstyp_beschreibung.'</prf_'.$key.'_bezeichnung>';
-    echo '<prf_'.$key.'_datum>'.$datum->formatDatum($prf->datum,"d.m.Y").'</prf_'.$key.'_datum>';
-    echo '<prf_'.$key.'_note>'.$prf->note.'</prf_'.$key.'_note>';
-    echo '<prf_'.$key.'_note_bezeichnung>'.$prf->note_bezeichnung.'</prf_'.$key.'_note_bezeichnung>';
-    echo '<prf_'.$key.'_lv_bezeichnung>'.$prf->lehrveranstaltung_bezeichnung.'</prf_'.$key.'_lv_bezeichnung>';
-    echo '</pruefung_'.$key.'>';
+	echo '<pruefung_'.$key.'>';
+	echo '<prf_'.$key.'_bezeichnung>'.$prf->pruefungstyp_beschreibung.'</prf_'.$key.'_bezeichnung>';
+	echo '<prf_'.$key.'_datum>'.$datum->formatDatum($prf->datum,"d.m.Y").'</prf_'.$key.'_datum>';
+	echo '<prf_'.$key.'_note>'.$prf->note.'</prf_'.$key.'_note>';
+	echo '<prf_'.$key.'_note_bezeichnung>'.$prf->note_bezeichnung.'</prf_'.$key.'_note_bezeichnung>';
+	echo '<prf_'.$key.'_lv_bezeichnung>'.$prf->lehrveranstaltung_bezeichnung.'</prf_'.$key.'_lv_bezeichnung>';
+	echo '</pruefung_'.$key.'>';
 }
 echo '</fachpruefungen>';
 echo "</abschlusszeugnis>";
