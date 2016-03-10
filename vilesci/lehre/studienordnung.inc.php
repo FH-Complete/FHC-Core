@@ -259,7 +259,7 @@ switch($method)
 				
 		$studienordnung = new studienordnung();
 		$studienordnung->loadStudienordnung($studienordnung_id);
-		
+
 		$studienSemesterResult = $studienordnung->loadStudiensemesterFromStudienordnung($studienordnung_id);
 		foreach ($studienSemesterResult as $studienSem)
 		{
@@ -332,6 +332,88 @@ switch($method)
 			</table>
 			';
 		break;
+
+		case 'semesterSTPLZuordnung':
+		$studienplan_id = $_GET["studienplan_id"];
+
+		$studienplan = new studienplan();
+		$studienplan->loadStudienplan($studienplan_id);
+		$studienSemesterResult = $studienplan->loadStudiensemesterFromStudienplan($studienplan_id);
+
+		$studiensemester = new studiensemester();
+		$studiensemester->getAll();
+
+		$ausbildungssemesterResult = array();
+/*
+		$studienSemesterResult = $studienordnung->loadStudiensemesterFromStudienordnung($studienordnung_id);*/
+		foreach ($studienSemesterResult as $studienSem)
+		{
+			$obj = new stdClass();
+			$obj->studiensemester = $studienSem;
+			$obj->ausbildungssemester = $studienplan->loadAusbildungsemesterFromStudiensemester($studienplan_id, $studienSem);
+			$ausbildungssemesterResult[] = $obj;
+		}
+
+		$studiengang = new studiengang();
+		//$studiengang->load($studienordnung->studiengang_kz);
+//		$ausbildungssemester = $studiengang->getSemesterFromStudiengang($studienordnung->studiengang_kz)
+		$ausbildungssemester = $studienplan->regelstudiendauer;
+
+		echo '
+			<table width="100%" rules="rows">
+				<thead>
+					<tr>
+						<th style="font-size: 1.1em;">Studiensasdfemester</th>
+						';
+						for($i = 1; $i<=$ausbildungssemester; $i++)
+						{
+							echo '<th style="font-size: 1.1em">'.$i.". Semester</th>";
+						}
+					echo '<th>&nbsp;</th>';
+		echo '</tr>
+				</thead>
+				<tbody>';
+
+
+		foreach($ausbildungssemesterResult as $row)
+		{
+			echo '<tr id="row_'.$row->studiensemester.'" style="font-size: 1em !important;"><td style="font-size: 1em; padding: 0.5em 0.5em 0.5em 0.5em;" align="center">'.$row->studiensemester.'</td>';
+			for($i = 1; $i<=$ausbildungssemester; $i++)
+			{
+				if(in_array($i, $row->ausbildungssemester))
+				{
+					echo '<td style="font-size: 1.2em; color: green;" align="center"><a href="#" onclick="javascript:deleteSemesterSTPLZuordnung(\''.$row->studiensemester.'\',\''.$i.'\')"><img id='.$row->studiensemester.$i.' width="30px" src="../../skin/images/true.png"></a></td>';
+				}
+				else
+				{
+					echo '<td style="font-size: 1em; color: red;" align="center"><a href="#" onclick="javascript:saveSemesterSTPLZuordnung(\''.$row->studiensemester.'\', \''.$i.'\');"><img width="20px" src="../../skin/images/false.png"></a></td>';
+				}
+			}
+			echo '<td><a href="#" onclick="javascript:deleteSemesterSTPLZuordnung(\''.$row->studiensemester.'\');">Löschen</a></td></tr>';
+		}
+		echo '<tr>
+				<td align="center"><select id="studiensemester">';
+				$length = count($studiensemester->studiensemester)-1;
+				for($i = $length; $i>0; $i--)
+				{
+					echo '<option value='.$studiensemester->studiensemester[$i]->studiensemester_kurzbz.'>'.$studiensemester->studiensemester[$i]->studiensemester_kurzbz.'</option>';
+				}
+		echo '</select></td>';
+		for($j=1; $j<=$ausbildungssemester; $j++)
+		{
+			echo '<td align="center"><input type="checkbox" semester='.$j.'></td>';
+		}
+		echo '
+			<td><input style="margin: 0.5em 0 0.5em 0" type="button" value="Zuordnen" onclick="javascript:saveSemesterSTPLZuordnung();"></td>
+			</tr>
+			<tr>
+			</tr>
+			';
+		echo '</tbody>
+			</table>
+			';
+		break;
+
 	default:
 		echo 'Unknown Method'.$method;
 		break;

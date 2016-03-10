@@ -57,6 +57,53 @@ switch($method)
 			$data['errormsg']=$studienordnung->errormsg;
 		}
 		break;
+	case 'saveSemesterSTPLZuordnung':
+		$studienplan_id=$_REQUEST['studienplan_id'];
+		$studiensemester_kurzbz=$_REQUEST['studiensemester_kurzbz'];
+		$ausbildungssemester=$_REQUEST['ausbildungssemester'];
+
+		$studienplan = new studienplan();
+		$studienplan->loadStudienplan($studienplan_id);
+		$saveArr = array(array("studienplan_id"=>$studienplan_id, "studiensemester_kurzbz"=>$studiensemester_kurzbz, "ausbildungssemester"=>$ausbildungssemester));
+		if($result = $studienplan->saveSemesterZuordnung($saveArr))
+		{
+			$data['result']=$result;
+			$data['error']='false';
+			$data['errormsg']='';
+		}
+		else
+		{
+			$data['error']='true';
+			$data['errormsg']=$studienplan->errormsg;
+		}
+		break;
+	case 'deleteSemesterSTPLZuordnung':
+		$studienplan_id=$_REQUEST['studienplan_id'];
+		$ausbildungssemester_kurzbz=$_REQUEST['ausbildungssemester_kurzbz'];
+		$studienplan = new studienplan();
+		$studienplan->loadStudienplan($studienplan_id);
+
+		if(!isset($_REQUEST["studiensemester"]))
+		{
+			$result = $studienplan->deleteSemesterZuordnung($studienplan_id, $ausbildungssemester_kurzbz);
+		}
+		else
+		{
+			$studiensemester = $_REQUEST["studiensemester"];
+			$result = $studienplan->deleteSemesterZuordnung($studienplan_id, $ausbildungssemester_kurzbz, $studiensemester);
+		}
+
+		if($result)
+		{
+			$data['error']='false';
+			$data['errormsg']='';
+		}
+		else
+		{
+			$data['error']='true';
+			$data['errormsg']=$studienplan->errormsg;
+		}
+		break;
 	case 'copyStudienordnung':
 			$studienordnung_id=$_REQUEST['studienordnung_id'];
 			
