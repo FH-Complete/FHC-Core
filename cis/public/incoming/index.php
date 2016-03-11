@@ -19,31 +19,31 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Karl Burkhart <burkhart@technikum-wien.at>.
  */
- 
+
 require_once '../../../config/cis.config.inc.php';
 require_once '../../../include/phrasen.class.php';
-require_once '../../../include/person.class.php'; 
+require_once '../../../include/person.class.php';
 
 if(isset($_GET['lang']))
 	setSprache($_GET['lang']);
 
-$sprache = getSprache(); 
-$p=new phrasen($sprache); 
+$sprache = getSprache();
+$p=new phrasen($sprache);
 
-if (isset($_POST['userid'])) 
+if (isset($_POST['userid']))
 {
-	$login = $_REQUEST['userid']; 
-	$person = new person(); 
-		
+	$login = $_REQUEST['userid'];
+	$person = new person();
+
 	session_start();
-	
-	$preincoming=$person->checkZugangscodeIncoming($login); 
-	
+
+	$preincoming=$person->checkZugangscodeIncoming($login);
+
 	//Zugangscode wird  überprüft
 	if($preincoming != false)
 	{
 		$_SESSION['incoming/user'] = $login;
-		$_SESSION['incoming/preincomingid'] = $preincoming; 
+		$_SESSION['incoming/preincomingid'] = $preincoming;
 
 		header('Location: incoming.php');
 		exit;
@@ -67,19 +67,19 @@ if (isset($_POST['userid']))
 	<table width="100%" border="0">
 			<tr>
 				<td align="left"></td>
-				<td align ="right"><?php 		
+				<td align ="right"><?php
 				echo $p->t("global/sprache")." ";
-				echo '<a href="'.$_SERVER['PHP_SELF'].'?lang=English">'.$p->t("global/englisch").'</a> | 
+				echo '<a href="'.$_SERVER['PHP_SELF'].'?lang=English">'.$p->t("global/englisch").'</a> |
 				<a href="'.$_SERVER['PHP_SELF'].'?lang=German">'.$p->t("global/deutsch").'</a><br>';?></td>
 			</tr>
 		</table>
 		<form action ="index.php" method="POST">
 		<table border ="0" width ="100%" height="40%">
 			<tr height="50%">
-				<td align ="center" valign="center"><h3><?php echo $p->t('incoming/welcomeToUAS');?></h3><span style="font-size:1.2em"></span></td>
+				<td align ="center" valign="center"><h3><?php echo $p->t('incoming/welcomeToUAS',array(CAMPUS_NAME));?></h3><span style="font-size:1.2em"></span></td>
 			</tr>
 			<tr >
-				<td align="center" valign="bottom"> <img src="../../../skin/images/tw_logo_02.jpg"></td>
+				<td align="center" valign="bottom"> <img src="../../../skin/styles/<?php echo DEFAULT_STYLE ?>/logo.png"></td>
 			</tr>
 		</table>
 		<table border ="0" width ="100%">
@@ -110,7 +110,7 @@ if (isset($_POST['userid']))
 			</tr>
 		</table>
 		</form>
-	
+
 	</body>
 
 </html>
