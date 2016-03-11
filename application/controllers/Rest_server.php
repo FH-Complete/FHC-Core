@@ -29,7 +29,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *
  * A more detailed class description.
 */
-class Rest_server extends CI_Controller {
+class Rest_server extends MY_Controller {
 
     public function index()
     {
