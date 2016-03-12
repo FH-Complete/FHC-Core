@@ -38,6 +38,8 @@ class Person extends API_Controller
         
         if (!is_null($code))
 			$result = $this->person_model->getPersonByCode($code);
+		else
+			$result = $this->person_model->getPersonen();
 		//	var_dump($result[0]);
 
         if (empty($result))
@@ -50,12 +52,12 @@ class Person extends API_Controller
         }
 		else
 		{
-			// return all available locations
+			// return all available persons
             $payload = [
                 'success' => true,
-                'message' => 'Person with code found',
-                'person_id' => $result[0]->person_id
+                'message' => 'Persons found'
             ];
+			$payload['data'] = $result;
             $httpstatus = REST_Controller::HTTP_OK;
 		}
 

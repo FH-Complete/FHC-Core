@@ -4,12 +4,12 @@ class Person extends MY_Controller {
         public function __construct()
         {
                 parent::__construct();
-                $this->load->model('person_model');
+                $this->load->model('person/person_model');
         }
 
         public function index()
         {
-                $data['person'] = $this->person_model->get_personen();
+                $data['person'] = $this->person_model->getPersonen();
 				$data['title'] = 'Personen Archiv';
 
 				$this->load->view('templates/header', $data);
@@ -19,7 +19,7 @@ class Person extends MY_Controller {
 
         public function view($slug = NULL)
         {
-            $data['person_item'] = $this->person_model->get_personen($slug);
+            $data['person_item'] = $this->person_model->getPersonen($slug);
 			if (empty($data['person_item']))
 		    {
 		            show_404();

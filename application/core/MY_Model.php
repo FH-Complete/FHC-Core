@@ -1,13 +1,20 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class DB_Model extends CI_Model 
+class MY_Model extends CI_Model 
 {
 	function __construct()  
 	{
         parent::__construct();
-		$this->load->library('database');
-		
+    }
+}
+
+class DB_Model extends MY_Model 
+{
+	function __construct()  
+	{
+        parent::__construct();
+		$this->load->database();
     }
 
 }
