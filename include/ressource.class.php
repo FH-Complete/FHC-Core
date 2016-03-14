@@ -87,6 +87,7 @@ class ressource extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->funktion_kurzbz = $row->funktion_kurzbz;
 				return true;
 			}
 			else 
@@ -130,6 +131,7 @@ class ressource extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->funktion_kurzbz = $row->funktion_kurzbz;
 				$this->result[] = $obj;
 			}
 			//var_dump($this->result);
@@ -150,7 +152,7 @@ class ressource extends basis_db
 	 */
 	public function getProjectRessourcen($project_kurzbz)
 	{
-		$qry = "SELECT ressource.*, project.projekt_ressource_id, project.aufwand FROM fue.tbl_ressource as ressource
+		$qry = "SELECT ressource.*, project.projekt_ressource_id, project.aufwand, project.funktion_kurzbz FROM fue.tbl_ressource as ressource
 		JOIN fue.tbl_projekt_ressource project ON(project.ressource_id = ressource.ressource_id) 
 		WHERE project.projekt_kurzbz =".$this->db_add_param($project_kurzbz).";";
 		
@@ -174,6 +176,7 @@ class ressource extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->aufwand = $row->aufwand;
+				$obj->funktion_kurzbz = $row->funktion_kurzbz;
 				$obj->projekt_ressource_id= $row->projekt_ressource_id;
 				
 				$this->result[] = $obj;
@@ -188,6 +191,41 @@ class ressource extends basis_db
 		}
 	}
 	
+	
+	/**
+	 * 
+	 * Lädt die Projektressource
+	 * @param $project_ressource_id
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getSingleProjektRessource($projekt_ressource_id)
+	{
+		$qry = "select * from fue.tbl_projekt_ressource where projekt_ressource_id = ".$this->db_add_param($projekt_ressource_id);
+		$this->result=array();
+			
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->ressource_id = $row->ressource_id;
+				$this->beschreibung = $row->beschreibung;
+				$this->aufwand = $row->aufwand;
+				$this->funktion_kurzbz = $row->funktion_kurzbz;
+				$this->projekt_ressource_id= $row->projekt_ressource_id;
+				$this->projekt_kurzbz = $row->projekt_kurzbz;
+				$this->projektphase_id = $row->projektphase_id;	
+				return true;
+			}
+			//var_dump($this->result);
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
 	/**
 	 * 
 	 * Lädt alle Ressourcen zu einer Phase
@@ -196,7 +234,7 @@ class ressource extends basis_db
 	 */
 	public function getPhaseRessourcen($projektphase_id)
 	{
-		$qry = "SELECT ressource.*, project.aufwand, project.projekt_ressource_id FROM fue.tbl_ressource as ressource
+		$qry = "SELECT ressource.*, project.aufwand, project.funktion_kurzbz, project.projekt_ressource_id FROM fue.tbl_ressource as ressource
 		JOIN fue.tbl_projekt_ressource project ON(project.ressource_id = ressource.ressource_id) 
 		WHERE project.projektphase_id =".$this->db_add_param($projektphase_id, FHC_INTEGER).";";
 		
@@ -220,6 +258,7 @@ class ressource extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->aufwand = $row->aufwand;
+				$obj->funktion_kurzbz = $row->funktion_kurzbz;
 				$obj->projekt_ressource_id = $row->projekt_ressource_id;
 				$this->result[] = $obj;
 			}
