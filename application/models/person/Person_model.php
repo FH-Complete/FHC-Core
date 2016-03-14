@@ -1,9 +1,9 @@
 <?php
 class Person_model extends DB_Model 
 {
-	public function __construct()
+	public function __construct($uid=null)
 	{
-		parent::__construct();
+		parent::__construct($uid);
 	}
 
 	public function getPersonen($person_id = FALSE)
@@ -20,7 +20,10 @@ class Person_model extends DB_Model
 
 	public function getPersonByCode($code)
 	{
-		    $query = $this->db->get_where('public.tbl_person', array('zugangscode' => $code));
+		if ($this->fhc_db_acl->bb->isBerechtigt('person','s'))
+		{
+			$query = $this->db->get_where('public.tbl_person', array('zugangscode' => $code));
 		    return $query->result_object();
+		}
 	}
 }

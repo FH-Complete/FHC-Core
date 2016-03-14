@@ -11,10 +11,12 @@ class MY_Model extends CI_Model
 
 class DB_Model extends MY_Model 
 {
-	function __construct()  
+	function __construct($uid=null)  
 	{
         parent::__construct();
 		$this->load->database();
+		// Loading Tools for Access Control (Benutzerberechtigungen)
+		$this->load->library('FHC_DB_ACL',array('uid' => $uid));
     }
 
 }

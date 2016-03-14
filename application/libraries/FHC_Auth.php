@@ -25,7 +25,7 @@ require_once 'include/authentication.class.php';
 
 // ------------------------------------------------------------------------
 
-class FHCAuth
+class FHC_Auth
 {
 	/**
 	 * Auth Username, Password over FH-Complete
@@ -39,7 +39,7 @@ class FHCAuth
 		$auth = new authentication();
 		if ($auth->checkpassword($username, $password))
 		{
-			echo 'Auth-Method-False';
+			echo 'Auth-Method-True';
 			return true;
 		}
 		else
