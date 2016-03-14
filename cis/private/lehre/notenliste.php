@@ -209,6 +209,7 @@ else
             </thead>
             <tbody>";
 		$i=0;
+		$legende = false;
 		while($row=$db->db_fetch_object($result))
 		{
 			$lv_obj = new lehrveranstaltung();
@@ -237,10 +238,13 @@ else
 			}
 
 			if ($row->note != $row->lvnote && $row->lvnote != NULL)
-				$markier = " style='border: 1px solid red;'";
+			{
+				$markier = " style='background-color: #FFD999;'";
+				$legende=true;
+			}
 			else
 				$markier = "";
-			$tbl .= "<td".$markier.">";
+			$tbl .= "<td ".$markier.">";
 			
 			if(isset($notenarr[$row->note]))
 				$tbl.=$notenarr[$row->note];
@@ -288,6 +292,9 @@ else
 		
 
 		$tbl.= "</tbody></table>";
+		
+		if($legende)
+			$tbl.= "<table><tbody><tr><td width='50' style='background-color: #FFD999;'></td><td>".$p->t('tools/hinweistextMarkierung')."</td></tr></tbody></table>";
 		if($i==0)
 			echo $p->t('tools/nochKeineBeurteilungEingetragen');
 		else
