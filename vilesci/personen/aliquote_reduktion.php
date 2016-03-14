@@ -124,6 +124,7 @@
 
 					AJAXCall({action:"setAufgenommene",studiengang_kz:aqr.selectedStudiengang.studiengang_kz,prestudent_ids:JSON.stringify(prestudent_ids)},function(res){aqr.loadStudenten();});
 				}
+
 				aqr.countChoosen = function()
 				{
 					var buf = 0;
@@ -385,7 +386,7 @@
 			<span ng-if="aqr.selectedStudienplatz"><select data-ng-options="stpl.bezeichnung for stpl in aqr.studienplaetze" data-ng-model="aqr.selectedStudienplatz"></select></span><span ng-if="!aqr.selectedStudienplatz" style="color:#A33;">Keinen Studienplan gefunden!</span>
 			<span ng-if="aqr.selectedStudienplatz && aqr.studenten.length == 1">{{aqr.studenten.length}} Student</span>
 			<span ng-if="aqr.selectedStudienplatz && aqr.studenten.length > 1">{{aqr.studenten.length}} Studenten</span>
-			<span ng-if="aqr.selectedStudienplatz && aqr.studenten.length < 1">keine Student</span>
+			<span ng-if="aqr.selectedStudienplatz && aqr.studenten.length < 1">keine Studenten</span>
 
 			<h3>Auswahl</h3>
 			<table ts-wrapper>
