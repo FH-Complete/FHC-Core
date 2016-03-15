@@ -10,14 +10,14 @@
  * @since	Version 1.0.0
  * @filesource
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
-require_once('include/basis_db.class.php');
-require_once('include/organisationseinheit.class.php');
-require_once('include/studiengang.class.php');
-require_once('include/fachbereich.class.php');
-require_once('include/functions.inc.php');
-require_once('include/wawi_kostenstelle.class.php');
-require_once('include/benutzerberechtigung.class.php');
+defined('FCPATH') OR exit('No direct script access allowed');
+require_once(FCPATH.'include/basis_db.class.php');
+require_once(FCPATH.'include/organisationseinheit.class.php');
+require_once(FCPATH.'include/studiengang.class.php');
+require_once(FCPATH.'include/fachbereich.class.php');
+require_once(FCPATH.'include/functions.inc.php');
+require_once(FCPATH.'include/wawi_kostenstelle.class.php');
+require_once(FCPATH.'include/benutzerberechtigung.class.php');
 
 /**
  * FHC-Auth Helpers

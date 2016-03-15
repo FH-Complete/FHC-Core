@@ -1,5 +1,5 @@
 <?php
-class Person extends MY_Controller {
+class Person extends FHC_Controller {
 
         public function __construct()
         {

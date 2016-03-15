@@ -27,7 +27,7 @@ require_once(dirname(__FILE__).'/datum.class.php');
 
 // CI
 require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/Person_model.php');
+require_once(dirname(__FILE__).'/../application/models/person/Person_model.php');
 
 class person extends Person_model
 {

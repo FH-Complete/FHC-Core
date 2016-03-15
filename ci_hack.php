@@ -53,7 +53,7 @@
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
-	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
+	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'production');
 /*
  *---------------------------------------------------------------
  * ERROR REPORTING
@@ -304,6 +304,7 @@ $loader=new CI_Loader();
 require_once(dirname(__FILE__).'/vendor/codeigniter/framework/system/core/Controller.php');
 $controller=new CI_Controller();
 require_once(dirname(__FILE__).'/vendor/codeigniter/framework/system/core/Model.php');
+require_once(dirname(__FILE__).'/application/core/MY_Model.php');
 $model=new CI_Model();
 
 // Traits

@@ -6,9 +6,9 @@ class Person_model extends DB_Model
 		parent::__construct($uid);
 	}
 
-	public function getPersonen($person_id = FALSE)
+	public function getPerson($person_id = null)
 	{
-		    if ($person_id === FALSE)
+		    if (is_null($person_id))
 		    {
 		            $query = $this->db->get_where('public.tbl_person', array('vorname' => 'Christian'));
 		            return $query->result_object();
