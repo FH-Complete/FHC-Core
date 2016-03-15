@@ -119,4 +119,7 @@ $this->phrasen['incoming/geaendertesLA']='Geändertes Learning Agreement';
 $this->phrasen['incoming/studienrichtungGastuniversitaet']= 'Studienrichtung Gastuniversität';
 $this->phrasen['incoming/orgform']='Orgform';
 $this->phrasen['incoming/alleSprachen']='Alle Sprachen';
+$this->phrasen['incoming/ausgewaehlteUniversitaeten']='Ausgewählte Universitäten';
+$this->phrasen['incoming/bereitsAusgewaehlt']='Diese Universität wurde bereits ausgewählt';
+$this->phrasen['incoming/anfrageAbschicken']='Anfrage an CIR abschicken';
 ?>
