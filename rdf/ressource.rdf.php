@@ -82,6 +82,7 @@ if($projekt_kurzbz!=null)
 	$ressource->getProjectRessourcen($projekt_kurzbz);
 else if($projekt_phase!= null)
 	$ressource->getPhaseRessourcen($projekt_phase);
+
 else 
 	$ressource->getAllRessourcen(); 
 
@@ -242,6 +243,7 @@ function draw_ressource($ressource)
 		<RESSOURCE:updateamum><![CDATA['.$ressource->updateamum.']]></RESSOURCE:updateamum>
 		<RESSOURCE:updatevon><![CDATA['.$ressource->updatevon.']]></RESSOURCE:updatevon>
 		<RESSOURCE:aufwand><![CDATA['.$ressource->aufwand.']]></RESSOURCE:aufwand>
+		<RESSOURCE:funktion_kurzbz><![CDATA['.$ressource->funktion_kurzbz.']]></RESSOURCE:funktion_kurzbz>
 		<RESSOURCE:projekt_ressource_id><![CDATA['.$ressource->projekt_ressource_id.']]></RESSOURCE:projekt_ressource_id>
 		<RESSOURCE:rdf_description><![CDATA['.$RdfDescription.']]></RESSOURCE:rdf_description>
   	</RDF:Description>

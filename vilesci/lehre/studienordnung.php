@@ -20,6 +20,7 @@
  *
  * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
  * 			Stefan Puraner	<puraner@technikum-wien.at>
+ * 			Andreas Moik	<moik@technikum-wien.at>
  */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/studienordnung.class.php');

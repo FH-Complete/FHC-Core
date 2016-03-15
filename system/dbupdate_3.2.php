@@ -721,7 +721,7 @@ if (!$result = @$db->db_query("SELECT status_kurzbz FROM lehre.tbl_studienordnun
 {
     $qry = "ALTER TABLE lehre.tbl_studienordnung ADD COLUMN status_kurzbz varchar(32); 
 	   
-	    ALTER TABLE lehre.tbl_studienordnung ADD CONSTRAINT status_kurzbz FOREIGN KEY (status_kurzbz) REFERENCES lehre.tbl_studienordnungstatus (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	    ALTER TABLE lehre.tbl_studienordnung ADD CONSTRAINT fk_studienordnung_status_kurzbz FOREIGN KEY (status_kurzbz) REFERENCES lehre.tbl_studienordnungstatus (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 	    UPDATE lehre.tbl_studienordnung SET status_kurzbz = 'approved';
 	   ";
     
@@ -784,8 +784,9 @@ if (!$result = @$db->db_query("SELECT pflicht_lvs FROM lehre.tbl_studienplan LIM
 }
 
 // Tabelle Studienplan_Semester
-if (!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienplan_semester LIMIT 1;")) {
-    $qry = "CREATE TABLE lehre.tbl_studienplan_semester
+if (!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienplan_semester LIMIT 1;"))
+{
+		$qry = "CREATE TABLE lehre.tbl_studienplan_semester
 			(
 				studienplan_semester_id integer NOT NULL,
 				studienplan_id integer NOT NULL,
@@ -810,15 +811,35 @@ if (!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienplan_semester LIMI
 		GRANT SELECT, UPDATE ON lehre.tbl_studienplan_semester_studienplan_semester_id TO vilesci;
 	";
 
-    if (!$db->db_query($qry))
-	echo '<strong>lehre.tbl_studienplan_semester: ' . $db->db_last_error() . '</strong><br>';
-    else
-	echo ' lehre.tbl_studienplan_semester: Tabelle hinzugefuegt<br>';
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienplan_semester: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' lehre.tbl_studienplan_semester: Tabelle hinzugefuegt<br>';
+
+
+	$qry_select = "SELECT * from lehre.tbl_studienordnung_semester JOIN lehre.tbl_studienplan using(studienordnung_id);";
+	if($res_select = $db->db_query($qry_select))
+	{
+		$studienplan_semester_insert_error = false;
+		while($row = $db->db_fetch_object($res_select))
+		{
+			$qry_insert = "INSERT INTO lehre.tbl_studienplan_semester (studienplan_id, studiensemester_kurzbz, semester) VALUES (".$db->db_add_param($row->studienplan_id).",".$db->db_add_param($row->studiensemester_kurzbz).",".$db->db_add_param($row->semester, FHC_INTEGER).");";
+			if(!$db->db_query($qry_insert))
+				$studienplan_semester_insert_error = true;
+		}
+
+		if ($studienplan_semester_insert_error)
+			echo '<strong>lehre.tbl_studienplan_semester Konvertierung: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo ' lehre.tbl_studienplan_semester Konvertierung: abgeschlossen<br>';
+	}
+
 }
 
 //Tabelle public.tbl_bewerbungstermine
-if (!$result = @$db->db_query("SELECT 1 FROM public.tbl_bewerbungstermine LIMIT 1;")) {
-    $qry = "CREATE TABLE public.tbl_bewerbungstermine
+if (!$result = @$db->db_query("SELECT 1 FROM public.tbl_bewerbungstermine LIMIT 1;"))
+{
+		$qry = "CREATE TABLE public.tbl_bewerbungstermine
 			(
 				bewerbungstermin_id integer NOT NULL,
 				studiengang_kz integer NOT NULL,
