@@ -363,7 +363,7 @@ switch($method)
 			<table width="100%" rules="rows">
 				<thead>
 					<tr>
-						<th style="font-size: 1.1em;">Studiensasdfemester</th>
+						<th style="font-size: 1.1em;">Studiensemester</th>
 						';
 						for($i = 1; $i<=$ausbildungssemester; $i++)
 						{

@@ -1,22 +1,22 @@
 <?php
 /*
  * Copyright 2013 fhcomplete.org
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
+ *
  *
  * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
  *
@@ -42,6 +42,7 @@ require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/benutzergruppe.class.php');
 require_once('../../../include/konto.class.php');
 require_once('../../../include/lvinfo.class.php');
+require_once('../../../include/addon.class.php');
 
 $uid = get_uid();
 
@@ -76,7 +77,7 @@ if(isset($_GET['getAnmeldung']))
 
 	// Die Anmeldung ist zur Lehrveranstaltung selbst und zu den dazu kompatiblen Lehrveranstaltungen moeglich
 	$kompatibel = $lehrveranstaltung->loadLVkompatibel($lehrveranstaltung_id);
-	
+
 	$datum = new datum();
 	$kompatibel[]=$lehrveranstaltung_id;
 	$kompatibel = array_unique($kompatibel);
@@ -121,7 +122,7 @@ if(isset($_GET['getAnmeldung']))
 			}*/
 		}
 	}
-	
+
 	if($anzahl>0)
 		echo '<br><br><input type="submit" value="'.$p->t('studienplan/anmelden').'" /></form>';
 	else
@@ -137,8 +138,34 @@ echo '<!DOCTYPE html>
 	<link rel="stylesheet" href="../../../skin/style.css.php" />
 	<link rel="stylesheet" href="../../../skin/jquery.css" />
 	<link rel="stylesheet" href="../../../skin/jquery-ui-1.9.2.custom.min.css" />
-	<script type="text/javascript" src="../../../include/js/jquery1.9.min.js"></script>
+	<script type="text/javascript" src="../../../include/js/jquery1.9.min.js"></script>';
 
+	// ADDONS laden
+	$addon_obj = new addon();
+	$addon_obj->loadAddons();
+	foreach($addon_obj->result as $addon)
+	{
+	    if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
+	        echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+	}
+
+	// Wenn Seite fertig geladen ist Addons aufrufen
+	echo '
+	<script>
+	$( document ).ready(function()
+	{
+	    if(typeof addon  !== \'undefined\')
+	    {
+	        for(i in addon)
+	        {
+	            addon[i].init("cis/private/profile/studienplan.php", {});
+	        }
+	    }
+	});
+	</script>
+	';
+
+echo '
 	<script type="text/javascript">
 	$(document).ready(function() {
 		$("#dialog").dialog({ autoOpen: false, width: "auto" });
@@ -231,7 +258,7 @@ $tree = $lehrveranstaltung->getLehrveranstaltungTree();
 
 
 /*
- Vom Semesterstart des Studierenden ausgehend werden die Studiensemester geladen. 
+ Vom Semesterstart des Studierenden ausgehend werden die Studiensemester geladen.
  Es werden mindestens so viele Studiensemester geladen wie die Regelstudiendauer des
  Studienplanes angibt.
 */
@@ -257,7 +284,11 @@ if(!in_array($stsemToShow,$stsem_arr))
 {
 	for($i=count($stsem_arr);$i<50;$i++)
 	{
-		$stsem_arr[$i]=$stsem->getNextFrom($studiensemester_prev);
+		if(!$stsem_arr[$i]=$stsem->getNextFrom($studiensemester_prev))
+		{
+			unset($stsem_arr[$i]);
+			break;
+		}
 		$studiensemester_prev=$stsem_arr[$i];
 		if($stsemToShow==$studiensemester_prev)
 		{
@@ -307,7 +338,7 @@ echo '<table style="border: 1px solid black">
 
 if(CIS_STUDIENPLAN_SEMESTER_ANZEIGEN)
 	echo '<th>'.$p->t('global/semester').'</th>';
-  
+
 echo '<th>'.$p->t('studienplan/ects').'</th>
 	  <th>'.$p->t('studienplan/status').'</th>';
 
@@ -362,7 +393,7 @@ function drawTree($tree, $depth)
 			default:
 				$icon='';
 		}
-		
+
 
 		echo '<tr'.$style.'>
 			<td>'.$bstart;
@@ -391,7 +422,7 @@ function drawTree($tree, $depth)
 			$sprache = 'de';
 			break;
 		    case 'English':
-			$sprach = 'en';
+			$sprache = 'en';
 			break;
 		    default:
 			$sprache = 'de';
@@ -402,14 +433,14 @@ function drawTree($tree, $depth)
 		// Bezeichnung der Lehrveranstaltung
 		    echo $icon." ".$termine." ".$row_tree->kurzbz.' - '.$row_tree->bezeichnung;
 		echo $bende.'</td>';
-		
+
 		// Semester
 		if(CIS_STUDIENPLAN_SEMESTER_ANZEIGEN)
 			echo '<td>'.$row_tree->semester.'</td>';
-		
+
 		// ECTS Punkte
 		echo '<td>'.$row_tree->ects.'</td>';
-		
+
 		// Status der LV (absolviert, offen)
 		echo '<td>';
 
@@ -440,11 +471,11 @@ function drawTree($tree, $depth)
 		}
 		echo '</td>';
 
-		// Spalten für die einzelnen Studiensemester		
+		// Spalten für die einzelnen Studiensemester
 		foreach($stsem_arr as $key=>$stsem)
 		{
 			$semester=$key+1;
-			
+
 			$tdclass=array();
 			//Empfehlung holen
 //			if(isset($lv_arr[$row_tree->lehrveranstaltung_id]))
@@ -495,7 +526,7 @@ function drawTree($tree, $depth)
 					// Angebot der LV pruefen
 					if(isset($lvangebot_arr[$row_lvid])
 					&& isset($lvangebot_arr[$row_lvid][$stsem]))
-					{				
+					{
 						$angebot_vorhanden=true;
 						// LV findet statt
 						$angebot = $lvangebot_arr[$row_lvid][$stsem];
@@ -537,7 +568,7 @@ function drawTree($tree, $depth)
 						}
 						else
 						{
-							if($anmeldungmoeglich)		
+							if($anmeldungmoeglich)
 								$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/anmelden.png" title="'.$p->t('studienplan/anmelden').'" height="15px" /></a>';
 							else
 								$tdinhalt.= '<span title="'.$anmeldeinformation.'">-</a>';
@@ -559,7 +590,7 @@ function drawTree($tree, $depth)
 			echo '</td>';
 		}
 		echo '</tr>';
-		
+
 		// Wenn Subtree vorhanden, dann anzeigen
 		if(!empty($row_tree->childs))
 			drawTree($row_tree->childs, $depth+1);

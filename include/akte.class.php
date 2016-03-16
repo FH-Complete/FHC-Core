@@ -383,6 +383,58 @@ class akte extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Liefert die Akten anhand der dms_id
+	 *
+	 * @param $person_id
+	 * @return true wenn ok, sonst false
+	 */
+	public function getAktenDms($dms_id)
+	{
+		$qry = "SELECT
+					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt,
+					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid,
+					dms_id,nachgereicht,anmerkung,titel_intern,anmerkung_intern
+				FROM public.tbl_akte WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER)." 
+				ORDER BY erstelltam";
+	
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$akten = new akte();
+	
+				$akten->akte_id = $row->akte_id;
+				$akten->person_id = $row->person_id;
+				$akten->dokument_kurzbz = $row->dokument_kurzbz;
+				//$akte->inhalt = $row->inhalt;
+				$akten->mimetype = $row->mimetype;
+				$akten->erstelltam = $row->erstelltam;
+				$akten->gedruckt = $this->db_parse_bool($row->gedruckt);
+				$akten->titel = $row->titel;
+				$akten->bezeichnung = $row->bezeichnung;
+				$akten->updateamum = $row->updateamum;
+				$akten->updatevon = $row->updatevon;
+				$akten->insertamum = $row->insertamum;
+				$akten->insertvon = $row->insertvon;
+				$akten->uid = $row->uid;
+				$akten->dms_id = $row->dms_id;
+				$akten->nachgereicht = $this->db_parse_bool($row->nachgereicht);
+				$akten->anmerkung = $row->anmerkung;
+				$akten->titel_intern = $row->titel_intern;
+				$akten->anmerkung_intern = $row->anmerkung_intern;
+	
+				$this->result[] = $akten;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 
 }
 ?>
