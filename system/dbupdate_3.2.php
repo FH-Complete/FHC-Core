@@ -24,13 +24,13 @@
 //Spalte studiensemester_kurzbz für Reihungstest
 if(!$result = @$db->db_query("SELECT studiensemester_kurzbz FROM public.tbl_reihungstest LIMIT 1"))
 {
-    $qry = "ALTER TABLE public.tbl_reihungstest ADD COLUMN studiensemester_kurzbz varchar(16);
-	   ALTER TABLE public.tbl_reihungstest ADD CONSTRAINT fk_reihungsteset_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;";
+	$qry = "ALTER TABLE public.tbl_reihungstest ADD COLUMN studiensemester_kurzbz varchar(16);
+		ALTER TABLE public.tbl_reihungstest ADD CONSTRAINT fk_reihungsteset_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;";
 
-    if(!$db->db_query($qry))
-	    echo '<strong>public.tbl_reihungstest: '.$db->db_last_error().'</strong><br>';
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_reihungstest: '.$db->db_last_error().'</strong><br>';
 	else
-	    echo 'public.tbl_reihungstest: Spalte studiensemester_kurzbz hinzugefuegt';
+		echo 'public.tbl_reihungstest: Spalte studiensemester_kurzbz hinzugefuegt';
 }
 
 // Neue Spalte beschreibung_mehrsprachig bei tbl_dokument
@@ -66,10 +66,10 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	{
 
 		$qry = "GRANT DELETE ON testtool.tbl_frage TO web;
-        GRANT DELETE ON testtool.tbl_gebiet TO web;
-        GRANT SELECT, UPDATE, INSERT, DELETE ON testtool.tbl_ablauf TO web;
-        GRANT SELECT, UPDATE ON testtool.tbl_ablauf_ablauf_id_seq TO web;
-        ";
+			GRANT DELETE ON testtool.tbl_gebiet TO web;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON testtool.tbl_ablauf TO web;
+			GRANT SELECT, UPDATE ON testtool.tbl_ablauf_ablauf_id_seq TO web;
+			";
 
 		if(!$db->db_query($qry))
 			echo '<strong>Testtool Berechtigungen: '.$db->db_last_error().'</strong><br>';
@@ -107,23 +107,23 @@ if(!@$db->db_query("SELECT bewerbung_abgeschicktamum FROM public.tbl_prestudents
 //Spalte benotung in lehre.tbl_lehrveranstaltung
 if (!$result = @$db->db_query("SELECT benotung FROM lehre.tbl_lehrveranstaltung LIMIT 1;"))
 {
-    $qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN benotung boolean NOT NULL DEFAULT FALSE;";
+	$qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN benotung boolean NOT NULL DEFAULT FALSE;";
 
-    if (!$db->db_query($qry))
-	echo '<strong>lehre.tbl_lehrveranstaltung: ' . $db->db_last_error() . '</strong><br>';
-    else
-	echo ' lehre.tbl_lehrveranstaltung: Spalte benotung hinzugefügt.<br>';
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_lehrveranstaltung: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' lehre.tbl_lehrveranstaltung: Spalte benotung hinzugefügt.<br>';
 }
 
 //Spalte lvinfo in lehre.tbl_lehrveranstaltung
 if (!$result = @$db->db_query("SELECT lvinfo FROM lehre.tbl_lehrveranstaltung LIMIT 1;"))
 {
-    $qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN lvinfo boolean NOT NULL DEFAULT FALSE;";
+	$qry = "ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN lvinfo boolean NOT NULL DEFAULT FALSE;";
 
-    if (!$db->db_query($qry))
-	echo '<strong>lehre.tbl_lehrveranstaltung: ' . $db->db_last_error() . '</strong><br>';
-    else
-	echo ' lehre.tbl_lehrveranstaltung: Spalte lvinfo hinzugefügt.<br>';
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_lehrveranstaltung: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' lehre.tbl_lehrveranstaltung: Spalte lvinfo hinzugefügt.<br>';
 }
 
 
@@ -719,68 +719,61 @@ if (!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienordnungstatus LIMI
 //Spalte status_kurzbz in lehre.tbl_studienordnung
 if (!$result = @$db->db_query("SELECT status_kurzbz FROM lehre.tbl_studienordnung LIMIT 1;"))
 {
-    $qry = "ALTER TABLE lehre.tbl_studienordnung ADD COLUMN status_kurzbz varchar(32); 
-	   
-	    ALTER TABLE lehre.tbl_studienordnung ADD CONSTRAINT fk_studienordnung_status_kurzbz FOREIGN KEY (status_kurzbz) REFERENCES lehre.tbl_studienordnungstatus (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
-	    UPDATE lehre.tbl_studienordnung SET status_kurzbz = 'approved';
-	   ";
-    
-    if (!$db->db_query($qry))
-	echo '<strong>lehre.tbl_studienordnung: ' . $db->db_last_error() . '</strong><br>';
-    else
-	echo ' lehre.tbl_studienordnung: Spalte status_kurzbz hinzugefügt.<br>';
-    
+	$qry = "ALTER TABLE lehre.tbl_studienordnung ADD COLUMN status_kurzbz varchar(32);
+		ALTER TABLE lehre.tbl_studienordnung ADD CONSTRAINT fk_studienordnung_status_kurzbz FOREIGN KEY (status_kurzbz) REFERENCES lehre.tbl_studienordnungstatus (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+		UPDATE lehre.tbl_studienordnung SET status_kurzbz = 'approved';
+		";
+
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienordnung: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' lehre.tbl_studienordnung: Spalte status_kurzbz hinzugefügt.<br>';
 }
 
 //Spalte standort_id in lehre.tbl_studienordnung
 if (!$result = @$db->db_query("SELECT standort_id FROM lehre.tbl_studienordnung LIMIT 1;"))
 {
-    $qry = "ALTER TABLE lehre.tbl_studienordnung ADD COLUMN standort_id integer;
-	    
-	    ALTER TABLE lehre.tbl_studienordnung ADD CONSTRAINT studienordnung_standort_id FOREIGN KEY (standort_id) REFERENCES public.tbl_standort (standort_id) ON DELETE RESTRICT ON UPDATE CASCADE;
-	   ";
-    
-    if (!$db->db_query($qry))
-	echo '<strong>lehre.tbl_studienordnung: ' . $db->db_last_error() . '</strong><br>';
-    else
-	echo ' lehre.tbl_studienordnung: Spalte standort_id hinzugefügt.<br>';
-    
+	$qry = "ALTER TABLE lehre.tbl_studienordnung ADD COLUMN standort_id integer;
+		ALTER TABLE lehre.tbl_studienordnung ADD CONSTRAINT studienordnung_standort_id FOREIGN KEY (standort_id) REFERENCES public.tbl_standort (standort_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+		";
+
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienordnung: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' lehre.tbl_studienordnung: Spalte standort_id hinzugefügt.<br>';
 }
 
 //Spalte ects_stpl in lehre.tbl_studienplan
 if (!$result = @$db->db_query("SELECT ects_stpl FROM lehre.tbl_studienplan LIMIT 1;"))
 {
-    $qry = "ALTER TABLE lehre.tbl_studienplan ADD COLUMN ects_stpl numeric(5,2);";
-    
-    if (!$db->db_query($qry))
-	echo '<strong>lehre.tbl_studienplan: ' . $db->db_last_error() . '</strong><br>';
-    else
-	echo ' lehre.tbl_studienplan: Spalte ects_stpl hinzugefügt.<br>';
-    
+	$qry = "ALTER TABLE lehre.tbl_studienplan ADD COLUMN ects_stpl numeric(5,2);";
+
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienplan: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' lehre.tbl_studienplan: Spalte ects_stpl hinzugefügt.<br>';
 }
 
 //Spalte pflicht_sws in lehre.tbl_studienplan
 if (!$result = @$db->db_query("SELECT pflicht_sws FROM lehre.tbl_studienplan LIMIT 1;"))
 {
-    $qry = "ALTER TABLE lehre.tbl_studienplan ADD COLUMN pflicht_sws integer;";
-    
-    if (!$db->db_query($qry))
-	echo '<strong>lehre.tbl_studienplan: ' . $db->db_last_error() . '</strong><br>';
-    else
-	echo ' lehre.tbl_studienplan: Spalte pflicht_sws hinzugefügt.<br>';
-    
+	$qry = "ALTER TABLE lehre.tbl_studienplan ADD COLUMN pflicht_sws integer;";
+
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienplan: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' lehre.tbl_studienplan: Spalte pflicht_sws hinzugefügt.<br>';
 }
 
 //Spalte pflicht_lvs in lehre.tbl_studienplan
 if (!$result = @$db->db_query("SELECT pflicht_lvs FROM lehre.tbl_studienplan LIMIT 1;"))
 {
-    $qry = "ALTER TABLE lehre.tbl_studienplan ADD COLUMN pflicht_lvs integer;";
-    
-    if (!$db->db_query($qry))
-	echo '<strong>lehre.tbl_studienplan: ' . $db->db_last_error() . '</strong><br>';
-    else
-	echo ' lehre.tbl_studienplan: Spalte pflicht_lvs hinzugefügt.<br>';
-    
+	$qry = "ALTER TABLE lehre.tbl_studienplan ADD COLUMN pflicht_lvs integer;";
+
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienplan: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' lehre.tbl_studienplan: Spalte pflicht_lvs hinzugefügt.<br>';
 }
 
 // Tabelle Studienplan_Semester
