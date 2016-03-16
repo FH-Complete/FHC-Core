@@ -23,9 +23,24 @@ require_once('../config/cis.config.inc.php');
 require_once('../include/dms.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/akte.class.php');
+require_once('../include/dokument.class.php');
+
+session_cache_limiter('none'); //muss gesetzt werden sonst funktioniert der Download mit IE8 nicht
+session_start();
 
 if(!isset($_GET['id']))
 	die('ID muss uebergeben werden');
+
+if(isset($_SESSION['bewerbung/personId']))
+	$person_id = $_SESSION['bewerbung/personId'];
+else
+	$person_id ='';
+
+if(isset($_GET['akte_id']))
+	$akte_id = $_GET['akte_id'];
+else
+	$akte_id ='';
 
 //if(!isset($_GET['version']))
 //	die('Version muss uebergeben werden'); 
@@ -45,15 +60,38 @@ if(!$doc->load($id,$version))
 
 if($doc->isLocked($id))
 {
-	//Dokument erfordert Authentifizierung
-	$user = get_uid();
-	if(!$doc->isBerechtigt($id, $user))
-	{
-		//Globales DMS recht pruefen
-		$rechte = new benutzerberechtigung();
-		$rechte->getBerechtigungen($user);
-		if(!$rechte->isBerechtigt('basis/dms'))
+	//Wenn person_id aus Session und akte_id uebergeben wurde 
+	//und person_id Besitzer des Dokuments ist (person_id aus tbl_akte) 
+	//und das Dokument in der Onlinebewerbung hochgeladen werden kann
+	//darf das Dokument heruntergeladen werden
+	if($person_id!='' && $akte_id!='')
+	{	
+		$akte = new akte();
+		$akte->load($akte_id);
+		$akte_person = $akte->person_id;
+		$akte_dokument_kurzbz = $akte->dokument_kurzbz;
+		
+		$dokumente_person = new dokument();
+		$dokumente_person->getAllDokumenteForPerson($person_id, true);
+		$dokumente_arr = array();
+		foreach ($dokumente_person->result AS $row)
+			$dokumente_arr[] .= $row->dokument_kurzbz;
+		
+		if ($person_id!=$akte_person || !in_array($akte_dokument_kurzbz, $dokumente_arr))
 			die('Sie haben keinen Zugriff auf dieses Dokument');
+	}
+	else
+	{
+		//Dokument erfordert Authentifizierung
+		$user = get_uid();
+		if(!$doc->isBerechtigt($id, $user))
+		{
+			//Globales DMS recht pruefen
+			$rechte = new benutzerberechtigung();
+			$rechte->getBerechtigungen($user);
+			if(!$rechte->isBerechtigt('basis/dms'))
+				die('Sie haben keinen Zugriff auf dieses Dokument');
+		}
 	}
 }
 
