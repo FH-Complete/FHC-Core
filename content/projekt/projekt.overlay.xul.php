@@ -63,7 +63,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdetail.overlay.xul.
 		<!-- ************* -->
 		<!-- Bem.: style="visibility:collapse" versteckt eine Spalte -->
 		<tree id="tree-projekt" seltype="single" hidecolumnpicker="false" flex="1"
-				datasources="../../rdf/projekt.rdf.php?foo=<?php echo time(); ?>" ref="http://www.technikum-wien.at/projekt/alle-projekte"
+				datasources="../rdf/projekt.rdf.php?nocache=<?php echo time(); ?>" ref="http://www.technikum-wien.at/projekt/alle-projekte"
 				style="margin:0px;height:250px" enableColumnDrag="true"
 				onselect="onselectProjekt(this);"
  				persist="height"
@@ -154,5 +154,5 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdetail.overlay.xul.
 				</tabpanels>
 			</tabbox>
 		</vbox>
-	</vbox>	
+	</vbox>
 </overlay>
