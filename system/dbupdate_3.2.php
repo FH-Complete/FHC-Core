@@ -702,7 +702,7 @@ if (!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienordnungstatus LIMI
 
 		GRANT SELECT ON lehre.tbl_studienordnungstatus TO web;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_studienordnungstatus TO vilesci;
-		
+
 		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('development', 'in Bearbeitung', 1);
 		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('review', 'in Review', 2);
 		INSERT INTO lehre.tbl_studienordnungstatus (status_kurzbz, bezeichnung, reihenfolge) VALUES ('approved', 'genehmigt', 3);
@@ -847,7 +847,7 @@ if (!$result = @$db->db_query("SELECT 1 FROM public.tbl_bewerbungstermine LIMIT 
 				updateamum timestamp,
 				updatevon varchar(32)
 			);
-			
+
 		    CREATE SEQUENCE public.tbl_bewerbungstermine_bewerbungstermin_id_seq
 			INCREMENT BY 1
 			NO MAXVALUE
@@ -1084,13 +1084,13 @@ if (!$result = @$db->db_query("SELECT 1 FROM public.tbl_studienjahr LIMIT 1;"))
 		(
 			studienjahr_kurzbz varchar(16) NOT NULL,
 			bezeichnung varchar(64)
-			
+
 		);
 
 		ALTER TABLE public.tbl_studienjahr ADD CONSTRAINT pk_studienjahr_kurzbz PRIMARY KEY (studienjahr_kurzbz);
-		
-		INSERT INTO public.tbl_studienjahr (studienjahr_kurzbz) SELECT DISTINCT s.studienjahr_kurzbz FROM public.tbl_studiensemester s;
-		
+
+		INSERT INTO public.tbl_studienjahr (studienjahr_kurzbz) SELECT DISTINCT s.studienjahr_kurzbz FROM public.tbl_studiensemester s WHERE s.studienjahr_kurzbz is not null;
+
 		ALTER TABLE public.tbl_studiensemester ADD CONSTRAINT fk_studiensemester_studienjahr FOREIGN KEY (studienjahr_kurzbz) REFERENCES public.tbl_studienjahr (studienjahr_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 		GRANT SELECT ON public.tbl_studienjahr TO web;
@@ -1224,7 +1224,7 @@ $tabellen=array(
 	"lehre.tbl_lehrfunktion"  => array("lehrfunktion_kurzbz","beschreibung","standardfaktor","sort"),
 	"lehre.tbl_lehrmittel" => array("lehrmittel_kurzbz","beschreibung","ort_kurzbz"),
 	"lehre.tbl_lehrtyp" => array("lehrtyp_kurzbz","bezeichnung"),
-	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las","benotung","lvinfo"),
+	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las","benotung","lvinfo","lehrauftrag"),
 	"lehre.tbl_lehrveranstaltung_kompatibel" => array("lehrveranstaltung_id","lehrveranstaltung_id_kompatibel"),
 	"lehre.tbl_lvangebot" => array("lvangebot_id","lehrveranstaltung_id","studiensemester_kurzbz","gruppe_kurzbz","incomingplaetze","gesamtplaetze","anmeldefenster_start","anmeldefenster_ende","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_lvregel" => array("lvregel_id","lvregeltyp_kurzbz","operator","parameter","lvregel_id_parent","lehrveranstaltung_id","studienplan_lehrveranstaltung_id","insertamum","insertvon","updateamum","updatevon"),
@@ -1241,11 +1241,11 @@ $tabellen=array(
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id","vertrag_id", "punkte"),
 	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung","abschluss"),
 	"lehre.tbl_studienordnung"  => array("studienordnung_id","studiengang_kz","version","gueltigvon","gueltigbis","bezeichnung","ects","studiengangbezeichnung","studiengangbezeichnung_englisch","studiengangkurzbzlang","akadgrad_id","insertamum","insertvon","updateamum","updatevon","ext_id", "status_kurzbz", "standort_id"),
-	"lehre.tbl_studienordnungstatus" => array("status_kurzbz","bezeichnung","reihenfolge"),	
+	"lehre.tbl_studienordnungstatus" => array("status_kurzbz","bezeichnung","reihenfolge"),
 	"lehre.tbl_studienordnung_semester"  => array("studienordnung_semester_id","studienordnung_id","studiensemester_kurzbz","semester"),
 	"lehre.tbl_studienplan" => array("studienplan_id","studienordnung_id","orgform_kurzbz","version","regelstudiendauer","sprache","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon","semesterwochen","testtool_sprachwahl","ext_id", "ects_stpl", "pflicht_sws", "pflicht_lvs"),
-	"lehre.tbl_studienplan_lehrveranstaltung" => array("studienplan_lehrveranstaltung_id","studienplan_id","lehrveranstaltung_id","semester","studienplan_lehrveranstaltung_id_parent","pflicht","koordinator","insertamum","insertvon","updateamum","updatevon","sort","ext_id", "curriculum"),
-	"lehre.tbl_studienplan_semester" => array("studienplan_semester_id", "studienplan_id", "studiensemester_kurzbz", "semester"),	
+	"lehre.tbl_studienplan_lehrveranstaltung" => array("studienplan_lehrveranstaltung_id","studienplan_id","lehrveranstaltung_id","semester","studienplan_lehrveranstaltung_id_parent","pflicht","koordinator","insertamum","insertvon","updateamum","updatevon","sort","ext_id", "curriculum","export"),
+	"lehre.tbl_studienplan_semester" => array("studienplan_semester_id", "studienplan_id", "studiensemester_kurzbz", "semester"),
 	"lehre.tbl_studienplatz" => array("studienplatz_id","studiengang_kz","studiensemester_kurzbz","orgform_kurzbz","ausbildungssemester","gpz","npz","insertamum","insertvon","updateamum","updatevon","ext_id", "apz", "studienplan_id"),
 	"lehre.tbl_stunde"  => array("stunde","beginn","ende"),
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
