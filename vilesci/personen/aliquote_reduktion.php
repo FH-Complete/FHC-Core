@@ -327,7 +327,7 @@
 							}
 						}
 						if(needed > 0)
-							alert("Es werden mehr Bewerber benötigt, als gibt!");
+							alert("Es werden mehr Bewerber benötigt, als es gibt!");
 						return;
 					}
 					else
