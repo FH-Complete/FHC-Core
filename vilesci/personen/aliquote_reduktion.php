@@ -253,7 +253,7 @@
 								}
 							});
 						}
-						aqr.recursiveChoose(aqr.selectedStudienplatz.apz, zgvElems);
+						aqr.recursiveChoose(neededStudentsCount, zgvElems);
 					}
 				}
 
