@@ -241,7 +241,7 @@
 						var residual = perZGV * zgvs.length;
 						var resDiff = neededStudentsCount - residual;
 
-						// distribute the remaining places
+						// distribute the remaining places on the present ZGVs
 						while(resDiff > 0)
 						{
 							zgvElems.forEach(function(i)
@@ -253,7 +253,7 @@
 								}
 							});
 						}
-						aqr.recursiveChoose(aqr.selectedStudienplatz.apz, zgvElems);
+						aqr.recursiveChoose(neededStudentsCount, zgvElems);
 					}
 				}
 

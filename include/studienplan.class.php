@@ -59,6 +59,8 @@ class studienplan extends basis_db
 	protected $pflicht;									//boolean
 	protected $koordinator;								//varchar(32)
 	protected $sort;
+	protected $curriculum=true;
+	protected $export=true;
 
 
 
