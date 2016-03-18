@@ -131,7 +131,7 @@ if(isset($_POST["start"]) && $_POST["start"] == "start")
 		echo $entries_not_found." nicht gefunden<br>";
 		echo $entries_not_unique." nicht eindeutig<br>";
 		echo $entries_with_error." konnten aufgrund eines Fehlers nicht eingetragen werden<br>";
-		echo "Es wurde eine quote von " . $quote . " erreicht<br>";
+		echo "Es wurde eine quote von " . round($quote,2) . "% erreicht<br>";
 	}
 }
 else
@@ -140,6 +140,8 @@ else
 	<p>Der folgende Vorgang kann unter Umständen mehrere Minuten dauern!</p>
 	<p>Es wird versucht anhand der orgform_kurzbz, der prestudent_id, der studiensemester_kurzbz und des ausbildungssemesters die studienplan_id des prestudentstatus zu ermitteln</p>
 	<p>Es werden nur Einträge mit studienplan_id IS NULL geändert</p>
+	<p>Hinweis:</p>
+	<p>Die Tabelle lehre.tbl_studienplan_semester muss hierfür bereits durch CHECKSYSTEM angelegt UND befüllt sein. Andernfalls kann keine studienplan_id gefunden werden!</p>
 
 	<form onclick="hideStartButton()" action='prestudentstatus_studienplan_id.php' method='POST'>
 		<input type="hidden" name="start" value="start" />
