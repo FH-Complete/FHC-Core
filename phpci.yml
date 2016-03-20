@@ -28,19 +28,17 @@ test:
         - "application/"
         recursive: true
     php_loc:
-    php_docblock_checker:
-        path: "application/controllers/"
-        allowed_warnings: 100
-        skip_classes: false
+#    php_docblock_checker:
+#        path: "application/controllers/"
+#        allowed_warnings: 100
+#        skip_classes: false
     php_code_sniffer:
-        path: "application/controllers"
-#        ignore:
-#            - "backend/application/views"
+        path: "application/controllers/"
         standard: "tests/codesniffer/FHComplete"
         allowed_errors: 100
         allowed_warnings: 200
-    codeception:
-        config: "tests"
+#    codeception:
+#        config: "tests/codeception/"
 #    php_unit:
 #        directory: "tests/phpunit/"
 
