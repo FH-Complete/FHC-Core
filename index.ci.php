@@ -301,10 +301,8 @@ switch (ENVIRONMENT)
 
 // First load the FHC-Config-Files
 require_once 'config/global.config.inc.php';
-require_once 'config/system.config.inc.php';
+require_once 'config/vilesci.config.inc.php';
 
 // Now the bootstrap file
 require_once BASEPATH.'core/CodeIgniter.php';
 
-/* End of file index.php */
-/* Location: ./index.php */

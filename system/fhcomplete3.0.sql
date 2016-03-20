@@ -13,7 +13,7 @@ SET escape_string_warning = off;
 -- Name: fhcomplete30; Type: COMMENT; Schema: -; Owner: oesi
 --
 
-COMMENT ON DATABASE fhcomplete IS 'FH-Complete 3.0';
+-- COMMENT ON DATABASE fhcomplete IS 'FH-Complete 3.0';
 
 -- Rollen im System
 -- CREATE ROLE wawi LOGIN PASSWORD 'admin';

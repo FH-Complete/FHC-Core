@@ -23,10 +23,11 @@
 	// Authentifizierungsmethode
 	// Moegliche Werte:
 	// auth_mixed    - htaccess mit LDAP (Default)
+// auth_demo     - Demo Modus (.htaccess)
 	// auth_session  - Sessions mit LDAP (Testbetrieb)
-	define("AUTH_SYSTEM", "auth_mixed"); 
+	define("AUTH_SYSTEM", "auth_demo"); 
 	// Gibt den Namen fuer die htaccess Authentifizierung an (muss mit dem Attribut AuthName im htaccess uebereinstimmen)
-	define("AUTH_NAME","FHComplete");
+	define("AUTH_NAME","FH-Complete");
 	
 	// DatenbankRollen fuer Grants
 	define('DB_CIS_USER_GROUP','web');

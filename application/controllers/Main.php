@@ -1,45 +1,54 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed');
  
-class Main extends CI_Controller {
- 
-    function __construct()
+class Main extends CI_Controller
+{
+	/**
+	 * Load Database und the url-helper
+	 **/
+	private function __construct()
     {
         parent::__construct();
- 
-        /* Standard Libraries of codeigniter are required */
+		// Standard Libraries of codeigniter are required
         $this->load->database();
         $this->load->helper('url');
-        /* ------------------ */ 
- 
+ 		// Test the grocery CRUD
         $this->load->library('grocery_CRUD');
- 
     }
+
+    /**
+	 * Show the Welcome Page by default
+	 * @return void
+	 **/
+	public function index()
+	{
+		echo "<h1>Welcome to the world of Codeigniter</h1>";
+		//Just an example to ensure that we get into the function die();
+	}
  
-    public function index()
+    /**
+	 * Test grocery CRUD for tbl_person
+	 * @return void
+	 **/
+	public function person()
     {
-        echo "<h1>Welcome to the world of Codeigniter</h1>";//Just an example to ensure that we get into the function
-                die();
-    }
- 
-    public function prestudent()
-    {
-        $this->grocery_crud->set_table('tbl_prestudent');
+        $this->grocery_crud->set_table('tbl_pperson');
         $output = $this->grocery_crud->render();
  		
 		echo "<pre>";
         print_r($output);
         echo "</pre>";
-        die();
+        //die();
 
-        $this->_example_output($output);        
+        $this->__exampleOutput($output);
     }
- 
-    function _example_output($output = null)
- 
+
+    /**
+	 * example Output
+	 * @param string $output The HTML-Output from grocery.
+	 * @return void
+	 **/
+	private function __exampleOutput($output = null)
     {
-        $this->load->view('our_template.php',$output);    
+        $this->load->view('our_template.php', $output);
     }
 }
- 
-/* End of file main.php */
-/* Location: ./application/controllers/main.php */

@@ -70,7 +70,7 @@ $config['url_suffix'] = '';
 | than english.
 |
 */
-$config['language']	= 'de_AT';
+$config['language']	= 'de-AT';
 
 /*
 |--------------------------------------------------------------------------
@@ -509,9 +509,12 @@ $config['proxy_ips'] = '';
 |--------------------------------------------------------------------------
 |
 */
-function __autoload($class) {
-    if (substr($class,0,3) !== 'CI_' && substr($class,0,4) !== 'FHC_') {
-        if (file_exists($file = APPPATH . 'core/' . $class . '.php')) {
+function __autoload($class) 
+{
+    if (substr($class,0,3) !== 'CI_' && substr($class,0,4) !== 'FHC_') 
+	{
+        if (file_exists($file = APPPATH . 'core/' . $class . '.php')) 
+		{
             require_once $file;
         }
     }

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ea064e414812c16fa7b4e1fc066dc2b3",
-    "content-hash": "73ee27147eb49e32aef9d975d2a90ffa",
+    "hash": "b493cb136eac0b78682504c3ecca2e0e",
+    "content-hash": "49873c248081b898a86919ea22b51e9e",
     "packages": [
         {
             "name": "codeigniter-restserver",
@@ -20,16 +20,16 @@
         },
         {
             "name": "codeigniter/framework",
-            "version": "3.0.4",
+            "version": "3.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bcit-ci/CodeIgniter.git",
-                "reference": "ac067858c21250dd8c60cdc1f9bc12ba2ff82755"
+                "reference": "4aeab69d8519873c0b20b8a51c910a0674a6c84e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bcit-ci/CodeIgniter/zipball/ac067858c21250dd8c60cdc1f9bc12ba2ff82755",
-                "reference": "ac067858c21250dd8c60cdc1f9bc12ba2ff82755",
+                "url": "https://api.github.com/repos/bcit-ci/CodeIgniter/zipball/4aeab69d8519873c0b20b8a51c910a0674a6c84e",
+                "reference": "4aeab69d8519873c0b20b8a51c910a0674a6c84e",
                 "shasum": ""
             },
             "require": {
@@ -38,6 +38,9 @@
             "require-dev": {
                 "mikey179/vfsstream": "1.1.*"
             },
+            "suggest": {
+                "paragonie/random_compat": "Provides better randomness in PHP 5.x"
+            },
             "type": "project",
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -45,7 +48,7 @@
             ],
             "description": "The CodeIgniter framework",
             "homepage": "https://codeigniter.com",
-            "time": "2016-01-13 00:09:27"
+            "time": "2016-03-11 16:29:31"
         },
         {
             "name": "components/angular.js",
@@ -723,16 +726,16 @@
         },
         {
             "name": "rdlowrey/auryn",
-            "version": "1.2",
+            "version": "v1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rdlowrey/auryn.git",
-                "reference": "d6e03a7026a1724965c921f4fbd8351ab8f0a9f1"
+                "reference": "2e4240791162dfe073d59654d8dc06df0eb0b73f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rdlowrey/auryn/zipball/d6e03a7026a1724965c921f4fbd8351ab8f0a9f1",
-                "reference": "d6e03a7026a1724965c921f4fbd8351ab8f0a9f1",
+                "url": "https://api.github.com/repos/rdlowrey/auryn/zipball/2e4240791162dfe073d59654d8dc06df0eb0b73f",
+                "reference": "2e4240791162dfe073d59654d8dc06df0eb0b73f",
                 "shasum": ""
             },
             "require": {
@@ -780,7 +783,7 @@
                 "dic",
                 "ioc"
             ],
-            "time": "2015-12-09 16:44:14"
+            "time": "2016-03-14 20:10:19"
         },
         {
             "name": "rougin/blueprint",
@@ -900,16 +903,16 @@
         },
         {
             "name": "rougin/describe",
-            "version": "v1.2.1",
+            "version": "v1.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rougin/describe.git",
-                "reference": "e07689e64d03bac231202a96bf5517dac7a21802"
+                "reference": "bd6b934d3ab2b28ddc936a5eb0cafa2eed02e360"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rougin/describe/zipball/e07689e64d03bac231202a96bf5517dac7a21802",
-                "reference": "e07689e64d03bac231202a96bf5517dac7a21802",
+                "url": "https://api.github.com/repos/rougin/describe/zipball/bd6b934d3ab2b28ddc936a5eb0cafa2eed02e360",
+                "reference": "bd6b934d3ab2b28ddc936a5eb0cafa2eed02e360",
                 "shasum": ""
             },
             "require": {
@@ -949,7 +952,7 @@
                 "describe",
                 "php"
             ],
-            "time": "2015-11-05 03:32:43"
+            "time": "2016-03-24 18:17:47"
         },
         {
             "name": "rougin/refinery",
@@ -1137,7 +1140,7 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
@@ -1687,7 +1690,171 @@
             "time": "2007-12-17 09:04:44"
         }
     ],
-    "packages-dev": [],
+    "packages-dev": [
+        {
+            "name": "ciricihq/cirici-codesniffer",
+            "version": "3.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ciricihq/cirici-codesniffer.git",
+                "reference": "051af93dbdbc317d573dd23d2fdadc05f28a6994"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ciricihq/cirici-codesniffer/zipball/051af93dbdbc317d573dd23d2fdadc05f28a6994",
+                "reference": "051af93dbdbc317d573dd23d2fdadc05f28a6994",
+                "shasum": ""
+            },
+            "require": {
+                "squizlabs/php_codesniffer": "2.*"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.1.*"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "CakePHP Community",
+                    "homepage": "https://github.com/cakephp/cakephp-codesniffer/graphs/contributors"
+                },
+                {
+                    "name": "Òscar Casajuana",
+                    "homepage": "http://racotecnic.com"
+                },
+                {
+                    "name": "Cirici Thinking Digital",
+                    "homepage": "http://cirici.com"
+                }
+            ],
+            "description": "Cirici CodeSniffer Standards",
+            "homepage": "http://cirici.com",
+            "keywords": [
+                "codesniffer",
+                "framework"
+            ],
+            "time": "2015-04-06 20:18:32"
+        },
+        {
+            "name": "squizlabs/php_codesniffer",
+            "version": "2.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
+                "reference": "6731851d6aaf1d0d6c58feff1065227b7fda3ba8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/6731851d6aaf1d0d6c58feff1065227b7fda3ba8",
+                "reference": "6731851d6aaf1d0d6c58feff1065227b7fda3ba8",
+                "shasum": ""
+            },
+            "require": {
+                "ext-tokenizer": "*",
+                "ext-xmlwriter": "*",
+                "php": ">=5.1.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "bin": [
+                "scripts/phpcs",
+                "scripts/phpcbf"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.x-dev"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "CodeSniffer.php",
+                    "CodeSniffer/CLI.php",
+                    "CodeSniffer/Exception.php",
+                    "CodeSniffer/File.php",
+                    "CodeSniffer/Fixer.php",
+                    "CodeSniffer/Report.php",
+                    "CodeSniffer/Reporting.php",
+                    "CodeSniffer/Sniff.php",
+                    "CodeSniffer/Tokens.php",
+                    "CodeSniffer/Reports/",
+                    "CodeSniffer/Tokenizers/",
+                    "CodeSniffer/DocGenerators/",
+                    "CodeSniffer/Standards/AbstractPatternSniff.php",
+                    "CodeSniffer/Standards/AbstractScopeSniff.php",
+                    "CodeSniffer/Standards/AbstractVariableSniff.php",
+                    "CodeSniffer/Standards/IncorrectPatternException.php",
+                    "CodeSniffer/Standards/Generic/Sniffs/",
+                    "CodeSniffer/Standards/MySource/Sniffs/",
+                    "CodeSniffer/Standards/PEAR/Sniffs/",
+                    "CodeSniffer/Standards/PSR1/Sniffs/",
+                    "CodeSniffer/Standards/PSR2/Sniffs/",
+                    "CodeSniffer/Standards/Squiz/Sniffs/",
+                    "CodeSniffer/Standards/Zend/Sniffs/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Greg Sherwood",
+                    "role": "lead"
+                }
+            ],
+            "description": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
+            "homepage": "http://www.squizlabs.com/php-codesniffer",
+            "keywords": [
+                "phpcs",
+                "standards"
+            ],
+            "time": "2016-01-19 23:39:10"
+        },
+        {
+            "name": "toin0u/cakephp-codesniffer",
+            "version": "2.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/toin0u/cakephp-codesniffer.git",
+                "reference": "149af3ec5525151543892221eb2945bb54fa4069"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/toin0u/cakephp-codesniffer/zipball/149af3ec5525151543892221eb2945bb54fa4069",
+                "reference": "149af3ec5525151543892221eb2945bb54fa4069",
+                "shasum": ""
+            },
+            "require": {
+                "squizlabs/php_codesniffer": "2.*"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.1.*"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "CakePHP Community",
+                    "homepage": "https://github.com/cakephp/cakephp-codesniffer/graphs/contributors"
+                }
+            ],
+            "description": "CakePHP CodeSniffer Standards",
+            "homepage": "http://cakephp.org",
+            "keywords": [
+                "codesniffer",
+                "framework"
+            ],
+            "time": "2015-03-17 01:11:58"
+        }
+    ],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": [],

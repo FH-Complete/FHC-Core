@@ -5,7 +5,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Migration_Create_basedb extends CI_Migration {
 
         public function up()
-        {
+        {			
+			//$this->load->database('system');
 			if (!$this->db->table_exists('tbl_person'))
 			{
 				$this->load->helper('file');
@@ -20,7 +21,7 @@ class Migration_Create_basedb extends CI_Migration {
 
         public function down()
         {
-                $this->db->simple_query('DROP SCHEMA bis;');
+                /*$this->db->simple_query('DROP SCHEMA bis;');
 				$this->db->simple_query('DROP SCHEMA campus;');
 				$this->db->simple_query('DROP SCHEMA fue;');
 				$this->db->simple_query('DROP SCHEMA kommune;');
@@ -28,7 +29,7 @@ class Migration_Create_basedb extends CI_Migration {
 				$this->db->simple_query('DROP SCHEMA sync;');
 				$this->db->simple_query('DROP SCHEMA system;');
 				$this->db->simple_query('DROP SCHEMA testtool;');
-				$this->db->simple_query('DROP SCHEMA wawi;');
+				$this->db->simple_query('DROP SCHEMA wawi;');*/
         }
 }
 

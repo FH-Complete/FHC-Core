@@ -6,7 +6,8 @@ class Migration_Add_apikey extends CI_Migration {
 
         public function up()
         {
-            $this->dbforge->add_field(array(
+            //$this->load->database('system');
+			$this->dbforge->add_field(array(
                     'apikey_id' => array(
                             'type' => 'INT',
                             'constraint' => 5,

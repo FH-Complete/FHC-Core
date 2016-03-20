@@ -20,9 +20,9 @@ date_default_timezone_set('Europe/Vienna');
 define("DB_SYSTEM","pgsql");
 define("DB_HOST","localhost");
 define("DB_PORT","5432");
-define("DB_NAME","fhcomplete");
-define("DB_USER","bla");
-define("DB_PASSWORD","bla");
+define("DB_NAME","fhctest");
+define("DB_USER","web");
+define("DB_PASSWORD","web");
 define("DB_CONNECT_PERSISTENT",TRUE);
 define('CONN_CLIENT_ENCODING','UTF-8' );
 
@@ -42,14 +42,14 @@ define('IMPORT_PATH','/var/fhcomplete/documents/import/');
 define('PAABGABE_PATH','/var/fhcomplete/documents/paabgabe/');
 
 // Pfad zu den Rauminfos
-define('RAUMINFO_PATH','/var/www/rauminfos/');
+define('RAUMINFO_PATH','/var/www/html/build/rauminfos/');
 
 // URL zu RDF Verzeichnis
-define('XML_ROOT','http://www.technikum-wien.at/rdf/');
+define('XML_ROOT','http://www.fhcomplete.org/build/rdf/');
 // URL zu Application Root
-define('APP_ROOT','http://www.technikum-wien.at/');
+define('APP_ROOT','http://www.fhcomplete.org/build/');
 // Pfad zu Document Root
-define('DOC_ROOT','/var/www/');
+define('DOC_ROOT','/var/www/html/build/');
 
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH','tw');
@@ -67,9 +67,9 @@ define('URLAUB_TOOLS',true);
 // Moegliche Werte:
 // auth_mixed    - htaccess mit LDAP (Default)
 // auth_session  - Sessions mit LDAP (Testbetrieb)
-define("AUTH_SYSTEM", "auth_mixed");
+define("AUTH_SYSTEM", "auth_demo");
 // Gibt den Namen fuer die htaccess Authentifizierung an (muss mit dem Attribut AuthName im htaccess uebereinstimmen)
-define("AUTH_NAME","FHComplete");
+define("AUTH_NAME","FH-Complete");
 
 /*
  * LDAP Einstellungen
@@ -200,10 +200,10 @@ define('TABLE_BEGIN','tbl_');
 define('VIEW_BEGIN','vw_');
 
 //Gibt an, ob das Studienbuchblatt im CIS gedruckt werden kann
-define('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN',false);
+define('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN',true);
 
 //Gibt an, ob die Studienerfolgsbestätigung im CIS gedruckt werden kann
-define('CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN',false);
+define('CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN',true);
 
 //**** INFOSCREEN ****
 //Gibt an, ob der Lageplan im Infoterminal angezeigt werden soll.

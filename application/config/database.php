@@ -97,13 +97,13 @@ $db['default'] = array(
 	'save_queries' => TRUE
 );
 
-$db['wawi'] = array(
+$db['system'] = array(
 	'dsn'	=> '',
 	'hostname' => DB_HOST,
-	'username' => DB_USER,
-	'password' => DB_PASSWORD,
+	'username' => 'fhcomplete',
+	'password' => 'fhcomplete',
 	'database' => DB_NAME,
-	'dbschema' => 'wawi',
+	'dbschema' => 'public',
 	'dbdriver' => 'postgre',
 	'dbprefix' => '',
 	'pconnect' => DB_CONNECT_PERSISTENT,

@@ -7,7 +7,8 @@ class Migration_Pk_migrations extends CI_Migration {
         public function up()
         {
           
-            if ($this->db->table_exists('ci_migrations'))
+            //$this->load->database('system');
+			if ($this->db->table_exists('ci_migrations'))
 			{
 				$this->db->query('ALTER TABLE ci_migrations ADD CONSTRAINT pk_migrations PRIMARY KEY(version);');
     		}

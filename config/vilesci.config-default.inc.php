@@ -18,25 +18,25 @@ date_default_timezone_set('Europe/Vienna');
 	
 // Connection Strings zur Datenbank
 define("DB_SYSTEM","pgsql");
-define("DB_HOST","www.technikum-wien.at");
+define("DB_HOST","localhost");
 define("DB_PORT","5432");
-define("DB_NAME","devvilesci");
-define("DB_USER","bla");
-define("DB_PASSWORD","bla");
+define("DB_NAME","fhctest");
+define("DB_USER","vilesci");
+define("DB_PASSWORD","vilesci");
 define("DB_CONNECT_PERSISTENT",TRUE);
 define('CONN_CLIENT_ENCODING','UTF-8' );
 	
 // Name des Servers (benoetigt fuer Cronjobs
-define('SERVER_NAME','vilesci.technikum-wien.at');
+define('SERVER_NAME','localhost');
 	
 // URL zu FHComplete Root
-define('APP_ROOT','http://www.technikum-wien.at/');
+define('APP_ROOT','http://www.fhcomlete.org/build/');
 // URL zu RDF Verzeichnis
-define('XML_ROOT','http://www.technikum-wien.at/rdf/');
+define('XML_ROOT','http://www.fhcomlete.org/build/rdf/');
 // Pfad zu Document Root
-define('DOC_ROOT','/var/www/');
+define('DOC_ROOT','/var/www/html/build/');
 // URL zu CIS
-define('CIS_ROOT','http://www.technikum-wien.at/');
+define('CIS_ROOT','http://www.fhcomlete.org/build/cis/');
 
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH','tw');
@@ -52,7 +52,7 @@ define('DMS_PATH','/var/fhcomplete/documents/dms/');
 // auth_mixed    - htaccess mit LDAP (Default)
 // auth_demo     - Demo Modus (.htaccess)
 // auth_session  - Sessions mit LDAP (Testbetrieb)
-define("AUTH_SYSTEM", "auth_mixed");
+define("AUTH_SYSTEM", "auth_demo");
 // Gibt den Namen fuer die htaccess Authentifizierung an (muss mit dem Attribut AuthName im htaccess uebereinstimmen)
 define("AUTH_NAME","Technikum-Wien");
 

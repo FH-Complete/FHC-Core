@@ -14,15 +14,15 @@
 
 // ------------------------------------------------------------------------
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') || exit('No direct script access allowed');
 
-class Person extends API_Controller
+class Person extends REST_Controller
 {
 	//public $session;
     /**
      * Person API constructor.
      */
-    function __construct()
+    private function __construct()
     {
         parent::__construct();
 
@@ -64,5 +64,4 @@ class Person extends API_Controller
         // Set the response and exit
         $this->response($payload, $httpstatus);
     }
-
 }
