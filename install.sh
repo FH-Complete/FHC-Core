@@ -16,6 +16,7 @@
 # Anyway, the following steps are an example to help install a full system:
 # 
 # ------------------------------------------------------------------------------
+# apt-get install sudo
 # sudo apt-get update
 # apt-get install phppgadmin postgresql apache
 # apt-get install php5-pgsql php5-gd php5-curl
@@ -58,10 +59,18 @@ cp config/vilesci.config-default.inc.php config/vilesci.config.inc.php
 cp config/system.config-default.inc.php config/system.config.inc.php
 # mkdir documents
 #chown www-data data/cache
-#./composer.phar update
-php index.php Migrate
+
+echo "======= Install composer and run it ============="
+php -r "readfile('https://getcomposer.org/installer');" > composer-setup.php
+php -r "if (hash('SHA384', file_get_contents('composer-setup.php')) === '41e71d86b40f28e771d4bb662b997f79625196afcca95a5abf44391188c695c6c1456e16154c75a211d238cc3bc5cb47') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+./composer.phar update
+
+echo "======= Database Migration ============="
+php index.ci.php Migrate
+
 echo "Done!"
-echo "Now make #composer update"
-echo "and #php bin/fhcomplete update"
+echo "Now run #php bin/fhcomplete update (Joking, its just a todo notice!)"
 
 exit 0
