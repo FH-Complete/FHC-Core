@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Klasse Adresse
@@ -279,20 +280,20 @@ class adresse extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO public.tbl_adresse (person_id, name, strasse, plz, typ, ort, nation, insertamum, insertvon,
-			     gemeinde, heimatadresse, zustelladresse, firma_id, updateamum, updatevon) VALUES('.
-			      $this->db_add_param($this->person_id, FHC_INTEGER).', '.
-			      $this->db_add_param($this->name).', '.
-			      $this->db_add_param($this->strasse).', '.
-			      $this->db_add_param($this->plz).', '.
-			      $this->db_add_param(trim($this->typ)).', '.
-			      $this->db_add_param($this->ort).', '.
-			      $this->db_add_param($this->nation).', now(), '.
-			      $this->db_add_param($this->insertvon).', '.
-			      $this->db_add_param($this->gemeinde).', '.
-			      $this->db_add_param($this->heimatadresse,FHC_BOOLEAN, false).', '.
-			      $this->db_add_param($this->zustelladresse,FHC_BOOLEAN, false).', '.
-			      $this->db_add_param($this->firma_id, FHC_INTEGER).', now(), '.
-			      $this->db_add_param($this->updatevon).');';
+				gemeinde, heimatadresse, zustelladresse, firma_id, updateamum, updatevon) VALUES('.
+				$this->db_add_param($this->person_id, FHC_INTEGER).', '.
+				$this->db_add_param($this->name).', '.
+				$this->db_add_param($this->strasse).', '.
+				$this->db_add_param($this->plz).', '.
+				$this->db_add_param(trim($this->typ)).', '.
+				$this->db_add_param($this->ort).', '.
+				$this->db_add_param($this->nation).', now(), '.
+				$this->db_add_param($this->insertvon).', '.
+				$this->db_add_param($this->gemeinde).', '.
+				$this->db_add_param($this->heimatadresse,FHC_BOOLEAN, false).', '.
+				$this->db_add_param($this->zustelladresse,FHC_BOOLEAN, false).', '.
+				$this->db_add_param($this->firma_id, FHC_INTEGER).', now(), '.
+				$this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
@@ -307,16 +308,16 @@ class adresse extends basis_db
 				' name='.$this->db_add_param($this->name).', '.
 				' strasse='.$this->db_add_param($this->strasse).', '.
 				' plz='.$this->db_add_param($this->plz).', '.
-		      	' typ='.$this->db_add_param(trim($this->typ)).', '.
-		      	' ort='.$this->db_add_param($this->ort).', '.
-		      	' nation='.$this->db_add_param($this->nation).', '.
-		      	' gemeinde='.$this->db_add_param($this->gemeinde).', '.
-		      	' firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).','.
-		      	' updateamum= now(), '.
-		      	' updatevon='.$this->db_add_param($this->updatevon).', '.
-		      	' heimatadresse='.$this->db_add_param($this->heimatadresse, FHC_BOOLEAN, false).', '.
-		      	' zustelladresse='.$this->db_add_param($this->zustelladresse, FHC_BOOLEAN, false).' '.
-		      	'WHERE adresse_id='.$this->db_add_param($this->adresse_id, FHC_INTEGER, false).';';
+				' typ='.$this->db_add_param(trim($this->typ)).', '.
+				' ort='.$this->db_add_param($this->ort).', '.
+				' nation='.$this->db_add_param($this->nation).', '.
+				' gemeinde='.$this->db_add_param($this->gemeinde).', '.
+				' firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).','.
+				' updateamum= now(), '.
+				' updatevon='.$this->db_add_param($this->updatevon).', '.
+				' heimatadresse='.$this->db_add_param($this->heimatadresse, FHC_BOOLEAN, false).', '.
+				' zustelladresse='.$this->db_add_param($this->zustelladresse, FHC_BOOLEAN, false).' '.
+				'WHERE adresse_id='.$this->db_add_param($this->adresse_id, FHC_INTEGER, false).';';
 		}
 
 		if($this->db_query($qry))
@@ -432,7 +433,6 @@ class adresse extends basis_db
 			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
 			return false;
 		}
-
 		return true;
 	}
 }

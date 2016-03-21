@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
@@ -43,8 +44,8 @@ class akte extends basis_db
 	public $uid;
 	public $ext_id;
 	public $dms_id;
-    public $nachgereicht;
-    public $anmerkung;
+	public $nachgereicht;
+	public $anmerkung;
 	public $titel_intern;
 	public $anmerkung_intern;
 
@@ -95,8 +96,8 @@ class akte extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->uid = $row->uid;
 				$this->dms_id = $row->dms_id;
-                $this->anmerkung = $row->anmerkung;
-                $this->nachgereicht = $this->db_parse_bool($row->nachgereicht);
+				$this->anmerkung = $row->anmerkung;
+				$this->nachgereicht = $this->db_parse_bool($row->nachgereicht);
 				$this->titel_intern = $row->titel_intern;
 				$this->anmerkung_intern = $row->anmerkung_intern;
 				return true;
@@ -182,47 +183,46 @@ class akte extends basis_db
 			//Neuen Datensatz anlegen
 			$qry = "BEGIN;INSERT INTO public.tbl_akte (person_id, dokument_kurzbz, inhalt, mimetype, erstelltam, gedruckt, titel,
 					bezeichnung, updateamum, updatevon, insertamum, insertvon, uid, dms_id, nachgereicht, anmerkung, titel_intern, anmerkung_intern ) VALUES (".
-			       $this->db_add_param($this->person_id, FHC_INTEGER).', '.
-			       $this->db_add_param($this->dokument_kurzbz).', '.
-			       $this->db_add_param($this->inhalt).', '.
-			       $this->db_add_param($this->mimetype).', '.
-			       $this->db_add_param($this->erstelltam).', '.
-			       $this->db_add_param($this->gedruckt, FHC_BOOLEAN).', '.
-			       $this->db_add_param($this->titel).', '.
-			       $this->db_add_param($this->bezeichnung).', '.
-			       $this->db_add_param($this->updateamum).', '.
-			       $this->db_add_param($this->updatevon).', '.
-			       $this->db_add_param($this->insertamum).', '.
-			       $this->db_add_param($this->insertvon).', '.
-			       $this->db_add_param($this->uid).','.
-                    $this->db_add_param($this->dms_id, FHC_INTEGER).','.
-                    $this->db_add_param($this->nachgereicht, FHC_BOOLEAN).','.
-					$this->db_add_param($this->anmerkung).','.
-					$this->db_add_param($this->titel_intern).','.
-			       $this->db_add_param($this->anmerkung_intern).');';
-
+						$this->db_add_param($this->person_id, FHC_INTEGER).', '.
+						$this->db_add_param($this->dokument_kurzbz).', '.
+						$this->db_add_param($this->inhalt).', '.
+						$this->db_add_param($this->mimetype).', '.
+						$this->db_add_param($this->erstelltam).', '.
+						$this->db_add_param($this->gedruckt, FHC_BOOLEAN).', '.
+						$this->db_add_param($this->titel).', '.
+						$this->db_add_param($this->bezeichnung).', '.
+						$this->db_add_param($this->updateamum).', '.
+						$this->db_add_param($this->updatevon).', '.
+						$this->db_add_param($this->insertamum).', '.
+						$this->db_add_param($this->insertvon).', '.
+						$this->db_add_param($this->uid).','.
+						$this->db_add_param($this->dms_id, FHC_INTEGER).','.
+						$this->db_add_param($this->nachgereicht, FHC_BOOLEAN).','.
+						$this->db_add_param($this->anmerkung).','.
+						$this->db_add_param($this->titel_intern).','.
+						$this->db_add_param($this->anmerkung_intern).');';
 		}
 		else
 		{
 			//Bestehenden Datensatz aktualisieren
 			$qry= "UPDATE public.tbl_akte SET".
-				  " person_id=".$this->db_add_param($this->person_id, FHC_INTEGER).",".
-				  " dokument_kurzbz=".$this->db_add_param($this->dokument_kurzbz).",".
-				  " inhalt=".$this->db_add_param($this->inhalt).",".
-				  " mimetype=".$this->db_add_param($this->mimetype).",".
-				  " erstelltam=".$this->db_add_param($this->erstelltam).",".
-				  " gedruckt=".$this->db_add_param($this->gedruckt,FHC_BOOLEAN).",".
-				  " titel=".$this->db_add_param($this->titel).",".
-				  " bezeichnung=".$this->db_add_param($this->bezeichnung).",".
-				  " updateamum=".$this->db_add_param($this->updateamum).",".
-				  " updatevon=".$this->db_add_param($this->updatevon).",".
-				  " uid=".$this->db_add_param($this->uid).",".
-                  " dms_id=".$this->db_add_param($this->dms_id, FHC_INTEGER).",".
-                  " nachgereicht=".$this->db_add_param($this->nachgereicht, FHC_BOOLEAN).",".
-					" anmerkung=".$this->db_add_param($this->anmerkung).",".
-					" titel_intern=".$this->db_add_param($this->titel_intern).",".
-				  " anmerkung_intern=".$this->db_add_param($this->anmerkung_intern).
-				  " WHERE akte_id=".$this->db_add_param($this->akte_id, FHC_INTEGER);
+				" person_id=".$this->db_add_param($this->person_id, FHC_INTEGER).",".
+				" dokument_kurzbz=".$this->db_add_param($this->dokument_kurzbz).",".
+				" inhalt=".$this->db_add_param($this->inhalt).",".
+				" mimetype=".$this->db_add_param($this->mimetype).",".
+				" erstelltam=".$this->db_add_param($this->erstelltam).",".
+				" gedruckt=".$this->db_add_param($this->gedruckt,FHC_BOOLEAN).",".
+				" titel=".$this->db_add_param($this->titel).",".
+				" bezeichnung=".$this->db_add_param($this->bezeichnung).",".
+				" updateamum=".$this->db_add_param($this->updateamum).",".
+				" updatevon=".$this->db_add_param($this->updatevon).",".
+				" uid=".$this->db_add_param($this->uid).",".
+				" dms_id=".$this->db_add_param($this->dms_id, FHC_INTEGER).",".
+				" nachgereicht=".$this->db_add_param($this->nachgereicht, FHC_BOOLEAN).",".
+				" anmerkung=".$this->db_add_param($this->anmerkung).",".
+				" titel_intern=".$this->db_add_param($this->titel_intern).",".
+				" anmerkung_intern=".$this->db_add_param($this->anmerkung_intern).
+				" WHERE akte_id=".$this->db_add_param($this->akte_id, FHC_INTEGER);
 		}
 
 		if($this->db_query($qry))
@@ -313,8 +313,8 @@ class akte extends basis_db
 				$akten->insertvon = $row->insertvon;
 				$akten->uid = $row->uid;
 				$akten->dms_id = $row->dms_id;
-                $akten->nachgereicht = $this->db_parse_bool($row->nachgereicht);
-                $akten->anmerkung = $row->anmerkung;
+				$akten->nachgereicht = $this->db_parse_bool($row->nachgereicht);
+				$akten->anmerkung = $row->anmerkung;
 				$akten->titel_intern = $row->titel_intern;
 				$akten->anmerkung_intern = $row->anmerkung_intern;
 
@@ -339,12 +339,12 @@ class akte extends basis_db
 	public function getAktenOutgoing($person_id)
 	{
 		$qry = "SELECT
-					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt,
-					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid,
-					dms_id,nachgereicht,anmerkung,titel_intern,anmerkung_intern
-				FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
+			akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt,
+			titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid,
+			dms_id,nachgereicht,anmerkung,titel_intern,anmerkung_intern
+			FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 
-			$qry.=" AND dokument_kurzbz IN ('Lebenslf','Motivat','LearnAgr')";
+		$qry.=" AND dokument_kurzbz IN ('Lebenslf','Motivat','LearnAgr')";
 		$qry.=" ORDER BY erstelltam";
 
 		if($this->db_query($qry))
@@ -368,8 +368,8 @@ class akte extends basis_db
 				$akten->insertvon = $row->insertvon;
 				$akten->uid = $row->uid;
 				$akten->dms_id = $row->dms_id;
-                $akten->nachgereicht = $this->db_parse_bool($row->nachgereicht);
-                $akten->anmerkung = $row->anmerkung;
+				$akten->nachgereicht = $this->db_parse_bool($row->nachgereicht);
+				$akten->anmerkung = $row->anmerkung;
 				$akten->titel_intern = $row->titel_intern;
 				$akten->anmerkung_intern = $row->anmerkung_intern;
 
@@ -435,6 +435,5 @@ class akte extends basis_db
 			return false;
 		}
 	}
-
 }
 ?>
