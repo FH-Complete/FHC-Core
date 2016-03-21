@@ -47,11 +47,11 @@
 			<td><?php echo ++$start ?></td>
 			<td style="text-align:center">
 				<?php 
-				echo anchor(site_url('studiengang/read/'.$studiengang->),'Read'); 
+				echo anchor(site_url('studiengang/read/'.$studiengang->studiengang_kz),'Read'); 
 				echo ' | '; 
-				echo anchor(site_url('studiengang/update/'.$studiengang->),'Update'); 
+				echo anchor(site_url('studiengang/update/'.$studiengang->studiengang_kz),'Update'); 
 				echo ' | '; 
-				echo anchor(site_url('studiengang/delete/'.$studiengang->),'Delete','onclick="javasciprt: return confirm(\'Are You Sure ?\')"'); 
+				echo anchor(site_url('studiengang/delete/'.$studiengang->studiengang_kz),'Delete','onclick="javasciprt: return confirm(\'Are You Sure ?\')"'); 
 				?>
 			</td>
 		</tr>

@@ -12,7 +12,7 @@
     <body>
         <h2 style="margin-top:0px">Tbl_studiengang <?php echo $button ?></h2>
         <form action="<?php echo $action; ?>" method="post">
-	    <input type="hidden" name="" value="<?php echo $; ?>" /> 
+	    <input type="hidden" name="studiengang_kz" value="<?php echo $studiengang->studiengang_kz; ?>" /> 
 	    <button type="submit" class="btn btn-primary"><?php echo $button ?></button> 
 	    <a href="<?php echo site_url('studiengang') ?>" class="btn btn-default">Cancel</a>
 	</form>
