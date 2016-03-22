@@ -25,7 +25,7 @@ require_once('../include/basis_db.class.php');
 $db = new basis_db();
 echo '<html>
 <head>
-	<title>CheckSystem</title>
+	<title>CS-EineUid</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<link rel="stylesheet" href="../skin/vilesci.css" type="text/css" />
 </head>
@@ -43,57 +43,59 @@ if(!isset($_POST["action"]) || $_POST["action"] != "start")
 
 	echo "</p>";
 	echo "<form action='dbupdate_eine_uid.php' method='POST' name='startform'><input type='submit' value='start' name='action'></form>";
-	die("");
 }
-
-echo '<H1>Systemcheck!</H1>';
-echo '<H2>DB-Updates!</H2>';
-
-
-// *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
-echo '<H2>Pruefe Tabellen und Attribute!</H2>';
-
-
-
-
-
-
-//prestudent_id hinzufügen und student_uid auf prestudent_id umhängen
-if(!$result = @$db->db_query("SELECT prestudent_id FROM bis.tbl_bisio LIMIT 1;"))
+else
 {
-	//spalte einfuegen
-	$add_qry = 'BEGIN; ALTER TABLE bis.tbl_bisio ADD COLUMN prestudent_id int;
-	UPDATE bis.tbl_bisio SET prestudent_id = (SELECT prestudent_id FROM public.tbl_student WHERE student_uid=tbl_bisio.student_uid);';
-	$db->db_query($add_qry);
 
-	//constraints: prestudent_id FK, prestudent_id NOT NULL
-	$constraint_qry = 'ALTER TABLE bis.tbl_bisio ALTER COLUMN prestudent_id SET NOT NULL;
-		ALTER TABLE bis.tbl_bisio ADD CONSTRAINT prestudent_id FOREIGN KEY (prestudent_id) REFERENCES public.tbl_prestudent (prestudent_id);';
+	echo '<H1>Systemcheck!</H1>';
+	echo '<H2>DB-Updates!</H2>';
 
-	if(!$db->db_query($constraint_qry))
+
+	// *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
+	echo '<H2>Pruefe Tabellen und Attribute!</H2>';
+
+
+
+
+
+
+	//prestudent_id hinzufügen und student_uid auf prestudent_id umhängen
+	if(!$result = @$db->db_query("SELECT prestudent_id FROM bis.tbl_bisio LIMIT 1;"))
 	{
-		$db->db_query("ROLLBACK;");
-		echo '<strong>bis.tbl_bisio: '.$db->db_last_error().'</strong><br>';
-	}
-	else
-	{
-		$db->db_query("COMMIT;");
-		echo ' bis.tbl_bisio: Spalte prestudent_id hinzugefuegt!<br>';
-		echo ' bis.tbl_bisio: Spalte student_uid auf prestudent_id geändert!<br>';
-		echo ' bis.tbl_bisio: Spalte prestudent_id constraints eingefuegt!<br>';
+		//spalte einfuegen
+		$add_qry = 'BEGIN; ALTER TABLE bis.tbl_bisio ADD COLUMN prestudent_id int;
+		UPDATE bis.tbl_bisio SET prestudent_id = (SELECT prestudent_id FROM public.tbl_student WHERE student_uid=tbl_bisio.student_uid);';
+		$db->db_query($add_qry);
 
-		//student_uid löschen
-		if($result = @$db->db_query("SELECT student_uid FROM bis.tbl_bisio LIMIT 1;"))
+		//constraints: prestudent_id FK, prestudent_id NOT NULL
+		$constraint_qry = 'ALTER TABLE bis.tbl_bisio ALTER COLUMN prestudent_id SET NOT NULL;
+			ALTER TABLE bis.tbl_bisio ADD CONSTRAINT prestudent_id FOREIGN KEY (prestudent_id) REFERENCES public.tbl_prestudent (prestudent_id);';
+
+		if(!$db->db_query($constraint_qry))
 		{
-			$qry = 'ALTER TABLE bis.tbl_bisio DROP COLUMN student_uid;';
+			$db->db_query("ROLLBACK;");
+			echo '<strong>bis.tbl_bisio: '.$db->db_last_error().'</strong><br>';
+		}
+		else
+		{
+			$db->db_query("COMMIT;");
+			echo ' bis.tbl_bisio: Spalte prestudent_id hinzugefuegt!<br>';
+			echo ' bis.tbl_bisio: Spalte student_uid auf prestudent_id geändert!<br>';
+			echo ' bis.tbl_bisio: Spalte prestudent_id constraints eingefuegt!<br>';
 
-			if(!$db->db_query($qry))
+			//student_uid löschen
+			if($result = @$db->db_query("SELECT student_uid FROM bis.tbl_bisio LIMIT 1;"))
 			{
-				echo '<strong>bis.tbl_bisio: '.$db->db_last_error().'</strong><br>';
-				echo '<strong>bis.tbl_bisio: ACHTUNG! In diesem Fall sollte prestudent_id ordnungsgemäß eingetragen sein, jedoch student_uid nicht gelöscht worden sein. Das Skript erneut zu starten wird nicht funktionieren!</strong><br>';
+				$qry = 'ALTER TABLE bis.tbl_bisio DROP COLUMN student_uid;';
+
+				if(!$db->db_query($qry))
+				{
+					echo '<strong>bis.tbl_bisio: '.$db->db_last_error().'</strong><br>';
+					echo '<strong>bis.tbl_bisio: ACHTUNG! In diesem Fall sollte prestudent_id ordnungsgemäß eingetragen sein, jedoch student_uid nicht gelöscht worden sein. Das Skript erneut zu starten wird nicht funktionieren!</strong><br>';
+				}
+				else
+					echo ' bis.tbl_bisio: Spalte student_uid gelöscht!<br>';
 			}
-			else
-				echo ' bis.tbl_bisio: Spalte student_uid gelöscht!<br>';
 		}
 	}
 }
