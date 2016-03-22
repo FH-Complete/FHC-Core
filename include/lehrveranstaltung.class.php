@@ -1307,6 +1307,31 @@ class lehrveranstaltung extends basis_db
 		}
 		return $childs;
 	}
+        
+        /**
+	 * Generiert die Subtrees des Lehrveranstaltungstrees
+	 */
+	public function hasChildren($studienplan_lehrveranstaltung_id)
+	{
+		$childs = array();
+		foreach ($this->lehrveranstaltungen as $row)
+		{
+			if ($row->studienplan_lehrveranstaltung_id_parent === $studienplan_lehrveranstaltung_id)
+			{
+				$childs[$row->studienplan_lehrveranstaltung_id] = $row;
+				$childs[$row->studienplan_lehrveranstaltung_id]->childs = $this->getLehrveranstaltungTreeChilds($row->studienplan_lehrveranstaltung_id);
+			}
+		}
+		if(count($childs) > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+                    
+                }
 
 	/**
 	 * Baut die Datenstruktur für senden als JSON Objekt auf
