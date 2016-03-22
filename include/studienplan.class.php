@@ -59,6 +59,8 @@ class studienplan extends basis_db
 	protected $pflicht;									//boolean
 	protected $koordinator;								//varchar(32)
 	protected $sort;
+	protected $curriculum=true;
+	protected $export=true;
 
 
 
@@ -488,7 +490,7 @@ class studienplan extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry = 'BEGIN;INSERT INTO lehre.tbl_studienplan_lehrveranstaltung (studienplan_id, lehrveranstaltung_id,
-				semester,studienplan_lehrveranstaltung_id_parent,pflicht, koordinator, curriculum, export
+				semester,studienplan_lehrveranstaltung_id_parent,pflicht, koordinator, curriculum, export,
 				insertamum, insertvon) VALUES (' .
 					$this->db_add_param($this->studienplan_id, FHC_INTEGER) . ', ' .
 					$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER) . ', ' .

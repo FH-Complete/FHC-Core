@@ -124,6 +124,7 @@
 
 					AJAXCall({action:"setAufgenommene",studiengang_kz:aqr.selectedStudiengang.studiengang_kz,prestudent_ids:JSON.stringify(prestudent_ids)},function(res){aqr.loadStudenten();});
 				}
+
 				aqr.countChoosen = function()
 				{
 					var buf = 0;
@@ -240,7 +241,7 @@
 						var residual = perZGV * zgvs.length;
 						var resDiff = neededStudentsCount - residual;
 
-						// distribute the remaining places
+						// distribute the remaining places on the present ZGVs
 						while(resDiff > 0)
 						{
 							zgvElems.forEach(function(i)
@@ -252,7 +253,7 @@
 								}
 							});
 						}
-						aqr.recursiveChoose(aqr.selectedStudienplatz.apz, zgvElems);
+						aqr.recursiveChoose(neededStudentsCount, zgvElems);
 					}
 				}
 
@@ -275,6 +276,7 @@
 				{
 					var beginNeeded = needed;
 
+					//distribute the remainig applicants to the present ZGVs
 					for(var i=0; i < zgvElems.length; i++)
 					{
 						for(var j in aqr.studenten)
@@ -295,8 +297,10 @@
 						}
 					}
 
+					//if we are finished or the ZGVs are full
 					if(needed < 1 || beginNeeded == needed)
 					{
+						//distribute the rest of the applicants, WITH a ZGV group
 						for(var j in aqr.studenten)
 						{
 							if(!aqr.studenten[j].selected && aqr.studenten[j].bezeichnung)
@@ -309,6 +313,7 @@
 								}
 							}
 						}
+						//distribute the rest of the applicants, WITHOUT a ZGV group
 						for(var j in aqr.studenten)
 						{
 							if(!aqr.studenten[j].selected && !aqr.studenten[j].bezeichnung)
@@ -322,7 +327,7 @@
 							}
 						}
 						if(needed > 0)
-							alert("Es werden mehr Studenten benötigt, als es Bewerber gibt!");
+							alert("Es werden mehr Bewerber benötigt, als es gibt!");
 						return;
 					}
 					else
@@ -385,7 +390,7 @@
 			<span ng-if="aqr.selectedStudienplatz"><select data-ng-options="stpl.bezeichnung for stpl in aqr.studienplaetze" data-ng-model="aqr.selectedStudienplatz"></select></span><span ng-if="!aqr.selectedStudienplatz" style="color:#A33;">Keinen Studienplan gefunden!</span>
 			<span ng-if="aqr.selectedStudienplatz && aqr.studenten.length == 1">{{aqr.studenten.length}} Student</span>
 			<span ng-if="aqr.selectedStudienplatz && aqr.studenten.length > 1">{{aqr.studenten.length}} Studenten</span>
-			<span ng-if="aqr.selectedStudienplatz && aqr.studenten.length < 1">keine Student</span>
+			<span ng-if="aqr.selectedStudienplatz && aqr.studenten.length < 1">keine Studenten</span>
 
 			<h3>Auswahl</h3>
 			<table ts-wrapper>

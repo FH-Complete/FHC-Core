@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Klasse zur Verwaltung der Abschlusspruefungen
@@ -327,12 +328,12 @@ class abschlusspruefung extends basis_db
 	}
 
 
-    /**
-     * Liefert die letzte Abschlussprüfung eines Studenten
-     * @param type $student_uid
-     */
-    public function getLastAbschlusspruefung($student_uid)
-    {
+	/**
+	 * Liefert die letzte Abschlussprüfung eines Studenten
+	 * @param type $student_uid
+	 */
+	public function getLastAbschlusspruefung($student_uid)
+	{
 		$qry = "SELECT
 					*
 				FROM
@@ -341,7 +342,7 @@ class abschlusspruefung extends basis_db
 				WHERE student_uid=".$this->db_add_param($student_uid, FHC_STRING, false)."
 				ORDER BY datum DESC LIMIT 1";
 
-        if($this->db_query($qry))
+		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
@@ -365,7 +366,6 @@ class abschlusspruefung extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
-
 			}
 			return true;
 		}
@@ -374,7 +374,6 @@ class abschlusspruefung extends basis_db
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
-    }
-
+	}
 }
 ?>

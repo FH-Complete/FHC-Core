@@ -22,22 +22,27 @@ require_once('../../config/vilesci.config.inc.php');
 
 ?>
 
-var global_year; 
-var global_url; 
+var global_year;
+var global_url;
 
 function getProperties()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree=document.getElementById('tree-projektmenue');
-	
+
 	// Wenn auf die Ueberschrift geklickt wird, soll nix passieren
 	if(tree.currentIndex==-1)
 	{
-		alert("Kein gültiges Projekt ausgewählt!");
-		return;
-	}	
-	projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
-	
+		if(typeof(ProjektSelectKurzbz)!='undefined')
+			projekt_kurzbz = ProjektSelectKurzbz;
+		else
+		{
+			alert("Kein gültiges Projekt ausgewählt!");
+			return;
+		}
+	}
+	else
+		projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
 }
 
 function showStudienjahr()
@@ -47,27 +52,35 @@ function showStudienjahr()
 	{
 		var datumAktuell = new Date();
 		var jahrAktuell = datumAktuell.getFullYear();
-		global_year = jahrAktuell; 
+		global_year = jahrAktuell;
 	}
 
 	var tree=document.getElementById('tree-projektmenue');
 	// Wenn auf die Ueberschrift geklickt wird, soll nix passieren
 	if(tree.currentIndex==-1)
 	{
-		alert("Kein gültiges Projekt ausgewählt!");
-		return;
-	}	
-	projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
+		if(typeof(ProjektSelectKurzbz)!='undefined')
+			projekt_kurzbz = ProjektSelectKurzbz;
+		else
+		{
+			alert("Kein gültiges Projekt ausgewählt!");
+			return;
+		}
+	}
+	else
+	{
+		projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
+	}
 	if(projekt_kurzbz == '')
 	{
-		oe_kurzbz = getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex); 
+		oe_kurzbz = getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex);
 		var url = 'projekt/gantt.svg.php?oe='+oe_kurzbz+'&studienjahr='+(global_year-1)+'&ansicht=studienjahr';
-		global_url=url; 
+		global_url=url;
 	}
 	else
 	{
 		var url = 'projekt/gantt.svg.php?projekt='+projekt_kurzbz+'&studienjahr='+(global_year-1)+'&ansicht=studienjahr';
-		global_url = url; 
+		global_url = url;
 	}
 
 	document.getElementById('iframe-gant-projekt').contentWindow.location.href=url;
@@ -79,33 +92,40 @@ function showKalenderjahr()
 	{
 		var datumAktuell = new Date();
 		var jahrAktuell = datumAktuell.getFullYear();
-		global_year = jahrAktuell; 
+		global_year = jahrAktuell;
 	}
 
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree=document.getElementById('tree-projektmenue');
-	
+
 	// Wenn auf die Ueberschrift geklickt wird, soll nix passieren
 	if(tree.currentIndex==-1)
 	{
-		alert("Kein gültiges Projekt ausgewählt!");
-		return;
-	}	
-	projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
+		if(typeof(ProjektSelectKurzbz)!='undefined')
+			projekt_kurzbz = ProjektSelectKurzbz;
+		else
+		{
+			alert("Kein gültiges Projekt ausgewählt!");
+			return;
+		}
+	}
+	else
+		projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
+		
 	if(projekt_kurzbz == '')
 	{
-		oe_kurzbz = getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex); 
+		oe_kurzbz = getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex);
 		var url = 'projekt/gantt.svg.php?oe='+oe_kurzbz+'&studienjahr='+global_year+'&ansicht=kalenderjahr';
-		global_url = url; 
+		global_url = url;
 	}
 	else
 	{
 		var url = 'projekt/gantt.svg.php?projekt='+projekt_kurzbz+'&studienjahr='+global_year+'&ansicht=kalenderjahr';
-		global_url = url; 
+		global_url = url;
 	}
 
 	global_url = url;
-	document.getElementById('iframe-gant-projekt').contentWindow.location.href=url;	
+	document.getElementById('iframe-gant-projekt').contentWindow.location.href=url;
 }
 
 function showZeitraum(beginn, ende)
@@ -114,36 +134,36 @@ function showZeitraum(beginn, ende)
     {
     	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
         var tree=document.getElementById('tree-projektmenue');
-        
+
         // Wenn auf die Ueberschrift geklickt wird, soll nix passieren
         if(tree.currentIndex==-1)
         {
             alert("Kein gültiges Projekt ausgewählt!");
             return;
-        }	
-        
+        }
+
         projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
         if(projekt_kurzbz == '')
         {
-            oe_kurzbz = getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex); 
+            oe_kurzbz = getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex);
             var url = 'projekt/gantt.svg.php?oe='+oe_kurzbz+'&beginn='+beginn+'&ende='+ende;
-            global_url = url; 
+            global_url = url;
         }
 
         global_url = url;
-        document.getElementById('iframe-gant-projekt').contentWindow.location.href=url;	
+        document.getElementById('iframe-gant-projekt').contentWindow.location.href=url;
     }
     else
         alert('kein gültiges Datum eingetragen');
-    
+
 }
 
 function showYear()
 {
 	var datumAktuell = new Date();
 	var jahrAktuell = datumAktuell.getFullYear();
-	global_year = jahrAktuell; 
-	
+	global_year = jahrAktuell;
+
 	foo = document.getElementById('toolbarbutton-menuitem-gantt-kalenderjahr');
 	checked=foo.getAttribute('checked');
 	// kalenderjahr checked
@@ -207,7 +227,7 @@ function showYearPlus()
 }
 
 function printGantt()
-{ 
+{
 	foo = window.open(global_url);
 	foo.onload = function ()
 	{
