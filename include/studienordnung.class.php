@@ -320,8 +320,8 @@ class studienordnung extends basis_db
 		      	' studiengangbezeichnung_englisch='.$this->db_add_param($this->studiengangbezeichnung_englisch).', '.
 		      	' studiengangkurzbzlang='.$this->db_add_param($this->studiengangkurzbzlang).','.
 		      	' akadgrad_id='.$this->db_add_param($this->akadgrad_id, FHC_INTEGER).', '.
-			' standort_id='.$this->db_add_param($this->standort_id, FHC_INTEGER).', '.
-			' status_kurzbz='.$this->db_add_param($this->status_kurzbz, FHC_INTEGER).', '.
+				' standort_id='.$this->db_add_param($this->standort_id, FHC_INTEGER).', '.
+				' status_kurzbz='.$this->db_add_param($this->status_kurzbz).', '.
 		      	' updateamum= now(), '.
 		      	' updatevon='.$this->db_add_param($this->updatevon).' '.
 		      	' WHERE studienordnung_id='.$this->db_add_param($this->studienordnung_id, FHC_INTEGER, false).';';

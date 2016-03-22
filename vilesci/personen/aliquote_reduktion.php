@@ -276,6 +276,7 @@
 				{
 					var beginNeeded = needed;
 
+					//distribute the remainig applicants to the present ZGVs
 					for(var i=0; i < zgvElems.length; i++)
 					{
 						for(var j in aqr.studenten)
@@ -296,8 +297,10 @@
 						}
 					}
 
+					//if we are finished or the ZGVs are full
 					if(needed < 1 || beginNeeded == needed)
 					{
+						//distribute the rest of the applicants, WITH a ZGV group
 						for(var j in aqr.studenten)
 						{
 							if(!aqr.studenten[j].selected && aqr.studenten[j].bezeichnung)
@@ -310,6 +313,7 @@
 								}
 							}
 						}
+						//distribute the rest of the applicants, WITHOUT a ZGV group
 						for(var j in aqr.studenten)
 						{
 							if(!aqr.studenten[j].selected && !aqr.studenten[j].bezeichnung)
@@ -323,7 +327,7 @@
 							}
 						}
 						if(needed > 0)
-							alert("Es werden mehr Studenten benötigt, als es Bewerber gibt!");
+							alert("Es werden mehr Bewerber benötigt, als es gibt!");
 						return;
 					}
 					else

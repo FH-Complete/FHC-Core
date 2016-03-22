@@ -79,7 +79,7 @@ class lehrveranstaltung extends basis_db
 	public $alvs;
 	public $lvps;
 	public $las;
-	
+
 	public $benotung=false;
 	public $lvinfo=false;
 	public $curriculum=true;
@@ -160,12 +160,15 @@ class lehrveranstaltung extends basis_db
 			$this->alvs = $row->alvs;
 			$this->lvps = $row->lvps;
 			$this->las = $row->las;
-			
+
 			$this->benotung = $this->db_parse_bool($row->benotung);
 			$this->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$this->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
 
+			// FIXME: LV-Bezeichnung richtig mehrsprachig machen
+			// Zwischenzeitlich 'Italian' zum bezeichnung_arr dazugegeben
 			$this->bezeichnung_arr['German'] = $this->bezeichnung;
+			$this->bezeichnung_arr['Italian'] = $this->bezeichnung;
 			$this->bezeichnung_arr['English'] = $this->bezeichnung_english;
 			if ($this->bezeichnung_arr['English'] == '')
 				$this->bezeichnung_arr['English'] = $this->bezeichnung_arr['German'];
@@ -229,7 +232,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->lvnr = $row->lvnr;
 			$lv_obj->semester_alternativ = $row->semester_alternativ;
 			$lv_obj->farbe = $row->farbe;
-			
+
 			$lv_obj->benotung = $this->db_parse_bool($row->benotung);
 			$lv_obj->lvinfo = $this->db_parse_bool($row->lvinfo);
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
@@ -1189,7 +1192,7 @@ class lehrveranstaltung extends basis_db
 			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent,
 			tbl_studienplan_lehrveranstaltung.sort stpllv_sort,
 			tbl_studienplan_lehrveranstaltung.curriculum,
-			tbl_studienplan_lehrveranstaltung.export 
+			tbl_studienplan_lehrveranstaltung.export
 		FROM lehre.tbl_lehrveranstaltung
 		JOIN lehre.tbl_studienplan_lehrveranstaltung
 		USING(lehrveranstaltung_id)
