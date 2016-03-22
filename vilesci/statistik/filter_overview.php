@@ -38,7 +38,7 @@ if(isset($_POST['action']) && $_POST['action']=='delete' && isset($_POST['filter
 {
 	$filter = new filter();
 	$filter->delete($_POST['filter_id']);
-		
+
 }
 $filter = new filter();
 if (!$filter->loadAll())
@@ -50,7 +50,9 @@ if (!$filter->loadAll())
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<script type="text/javascript" src="../../include/js/jquery.min.1.11.1.js"></script>
-		<script type="text/javascript" src="../../submodules/tablesorter/jquery.tablesorter.min.js"></script>
+		<?php
+		include("../../include/meta/jquery-tablesorter.php");
+		?>
 		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 		<script language="JavaScript" type="text/javascript">
 
