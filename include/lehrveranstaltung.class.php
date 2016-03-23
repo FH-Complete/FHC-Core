@@ -1192,7 +1192,8 @@ class lehrveranstaltung extends basis_db
 			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent,
 			tbl_studienplan_lehrveranstaltung.sort stpllv_sort,
 			tbl_studienplan_lehrveranstaltung.curriculum,
-			tbl_studienplan_lehrveranstaltung.export
+			tbl_studienplan_lehrveranstaltung.export,
+			tbl_studienplan_lehrveranstaltung.genehmigung
 		FROM lehre.tbl_lehrveranstaltung
 		JOIN lehre.tbl_studienplan_lehrveranstaltung
 		USING(lehrveranstaltung_id)
@@ -1264,6 +1265,7 @@ class lehrveranstaltung extends basis_db
 				$obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
 				$obj->curriculum = $this->db_parse_bool($row->curriculum);
 				$obj->export = $this->db_parse_bool($row->export);
+				$obj->genehmigung = $this->db_parse_bool($row->genehmigung);
 				$obj->new = false;
 
 				$this->lehrveranstaltungen[] = $obj;

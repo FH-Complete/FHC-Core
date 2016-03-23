@@ -490,7 +490,7 @@ class studienplan extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry = 'BEGIN;INSERT INTO lehre.tbl_studienplan_lehrveranstaltung (studienplan_id, lehrveranstaltung_id,
-				semester,studienplan_lehrveranstaltung_id_parent,pflicht, koordinator, curriculum, export,
+				semester,studienplan_lehrveranstaltung_id_parent,pflicht, koordinator, curriculum, export, genehmigung,
 				insertamum, insertvon) VALUES (' .
 					$this->db_add_param($this->studienplan_id, FHC_INTEGER) . ', ' .
 					$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER) . ', ' .
@@ -500,6 +500,7 @@ class studienplan extends basis_db
 					$this->db_add_param($this->koordinator) . ', ' .
 					$this->db_add_param($this->curriculum) . ', ' .
 					$this->db_add_param($this->export) . ', ' .
+					$this->db_add_param($this->genehmigung) . ', ' .
 					'now(), ' .
 					$this->db_add_param($this->insertvon) . ');';
 		}
@@ -521,6 +522,7 @@ class studienplan extends basis_db
 					' koordinator=' . $this->db_add_param($this->koordinator) . ', ' .
 					' curriculum=' . $this->db_add_param($this->curriculum, FHC_BOOLEAN) . ', ' .
 					' export=' . $this->db_add_param($this->export, FHC_BOOLEAN) . ', ' .
+					' genehmigung=' . $this->db_add_param($this->genehmigung, FHC_BOOLEAN) . ', ' .
 					' updateamum= now(), ' .
 					' updatevon=' . $this->db_add_param($this->updatevon) . ' ' .
 					' WHERE studienplan_lehrveranstaltung_id=' . $this->db_add_param($this->studienplan_lehrveranstaltung_id, FHC_INTEGER, false) . ';';
