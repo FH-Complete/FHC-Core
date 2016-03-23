@@ -61,6 +61,7 @@ class studienplan extends basis_db
 	protected $sort;
 	protected $curriculum=true;
 	protected $export=true;
+	protected $genehmigung=true;
 
 
 
