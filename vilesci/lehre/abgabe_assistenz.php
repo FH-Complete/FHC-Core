@@ -334,7 +334,7 @@ function markiere()
 {
 	var items=document.getElementsByTagName('input');
 	var alle=document.getElementById('alle');
-	for each(item in items)
+	for(var item in items)
 	{
 		if(item.type=='checkbox')
 		{
@@ -347,7 +347,7 @@ function stserienmail(trenner, stgbez)
 	//E-Mail an mehrere ausgewaehlte Studenten
 	var studenten=document.getElementsByTagName('input');
 	var adressen='';
-	for each(students in studenten)
+	for(var students in studenten)
 	{
 		if(students.type=='hidden' && students.name.substr(0,3)=="st_")
 		{
@@ -375,7 +375,7 @@ function btserienmail(trenner, stgbez)
 	//Mail an mehrere ausgewählte Betreuer
 	var lektoren=document.getElementsByTagName('input');
 	var adressen='';
-	for each(personen in lektoren)
+	for(var personen in lektoren)
 	{
 		if(personen.type=='hidden' && personen.name.substr(0,3)=="b1_" && personen.value!='')
 		{

@@ -116,7 +116,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 		FROM 
 			campus.vw_student_lehrveranstaltung 
 			JOIN campus.vw_student using(uid) 
-		WHERE  
+		WHERE
 			studiensemester_kurzbz = ".$db->db_add_param($stsem)."
 			AND lehrveranstaltung_id = ".$db->db_add_param($lvid, FHC_INTEGER)."
 			AND uid=".$db->db_add_param($student_uid)."
@@ -146,8 +146,9 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 			$termin1 = 1;
 		else
 		{
+			$student = new student($student_uid);
 			$lvnote = new lvgesamtnote();
-			if ($lvnote->load($lvid, $student_uid, $stsem))
+			if ($lvnote->load($lvid, $student->prestudent_id, $stsem))
 			{
 				$pr_note = $lvnote->note;
 				$pr_punkte = $lvnote->punkte;
@@ -222,10 +223,12 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 	$jetzt = date("Y-m-d H:i:s");	
 
 	$lvid = $_REQUEST["lvid"];
+
+	$student = new student($student_uid);
 	$lvgesamtnote = new lvgesamtnote();
-    if (!$lvgesamtnote->load($lvid, $student_uid, $stsem))
-    {
-		$lvgesamtnote->student_uid = $student_uid;
+	if (!$lvgesamtnote->load($lvid, $student->prestudent_id, $stsem))
+	{
+		$lvgesamtnote->prestudent_id = $prestudent_id;
 		$lvgesamtnote->lehrveranstaltung_id = $lvid;
 		$lvgesamtnote->studiensemester_kurzbz = $stsem;
 		$lvgesamtnote->note = $note;

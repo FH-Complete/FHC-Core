@@ -2776,7 +2776,8 @@ if(!$error)
 				}
 				else
 				{
-					if($lvgesamtnote->load($_POST['lehrveranstaltung_id_'.$i], $_POST['student_uid_'.$i], $_POST['studiensemester_kurzbz_'.$i]))
+					$student = new student($_POST['student_uid_'.$i]);
+					if($lvgesamtnote->load($_POST['lehrveranstaltung_id_'.$i], $student->prestudent_id, $_POST['studiensemester_kurzbz_'.$i]))
 					{
 						if($zeugnisnote->load($_POST['lehrveranstaltung_id_'.$i], $_POST['student_uid_'.$i], $_POST['studiensemester_kurzbz_'.$i]))
 						{

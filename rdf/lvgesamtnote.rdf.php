@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 // header für no cache
@@ -33,6 +34,7 @@ require_once('../include/lvgesamtnote.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/student.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
@@ -57,12 +59,12 @@ if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
 else 
 	$uid = null;
-	
+
 if(isset($_GET['lehrveranstaltung_id']))
 	$lehrveranstaltung_id = $_GET['lehrveranstaltung_id'];
 else 
 	$lehrveranstaltung_id = null;
-	
+
 $rdf_url='http://www.technikum-wien.at/lvgesamtnote';
 
 echo '
@@ -70,13 +72,15 @@ echo '
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:NOTE="'.$rdf_url.'/rdf#"
 >
-   <RDF:Seq about="'.$rdf_url.'/liste">
+	<RDF:Seq about="'.$rdf_url.'/liste">
 ';
-   
+
 //Daten holen
 $obj = new lvgesamtnote();
 
-$obj->getLvGesamtNoten($lehrveranstaltung_id, $uid, $semester_aktuell);
+$student = new student($uid);
+
+$obj->getLvGesamtNoten($lehrveranstaltung_id, $student->prestudent_id, $semester_aktuell);
 $db = new basis_db();
 
 foreach ($obj->result as $row)	
@@ -96,27 +100,27 @@ foreach ($obj->result as $row)
 		}
 		
 		echo '
-			  <RDF:li>
-		         <RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'" >
-					<NOTE:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></NOTE:lehrveranstaltung_id>
-					<NOTE:student_uid><![CDATA['.$row->student_uid.']]></NOTE:student_uid>
-					<NOTE:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></NOTE:mitarbeiter_uid>
-					<NOTE:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></NOTE:studiensemester_kurzbz>
-					<NOTE:note><![CDATA['.$row->note.']]></NOTE:note>
-					<NOTE:punkte><![CDATA['.$row->punkte.']]></NOTE:punkte>
-					<NOTE:freigabedatum_iso><![CDATA['.$row->freigabedatum.']]></NOTE:freigabedatum_iso>
-					<NOTE:freigabedatum><![CDATA['.$datum->convertISODate($row->freigabedatum).']]></NOTE:freigabedatum>
-					<NOTE:benotungsdatum_iso><![CDATA['.$row->benotungsdatum.']]></NOTE:benotungsdatum_iso>
-					<NOTE:benotungsdatum><![CDATA['.$datum->convertISODate($row->benotungsdatum).']]></NOTE:benotungsdatum>
-					<NOTE:note_bezeichnung><![CDATA['.$row->note_bezeichnung.']]></NOTE:note_bezeichnung>
-					<NOTE:lehrveranstaltung_bezeichnung><![CDATA['.$row->lehrveranstaltung_bezeichnung.']]></NOTE:lehrveranstaltung_bezeichnung>
-					<NOTE:student_vorname><![CDATA['.$vorname.']]></NOTE:student_vorname>
-					<NOTE:student_nachname><![CDATA['.$nachname.']]></NOTE:student_nachname>
-					<NOTE:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></NOTE:studiengang>
-		         </RDF:Description>
-		      </RDF:li>';
+		<RDF:li>
+			<RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'" >
+				<NOTE:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></NOTE:lehrveranstaltung_id>
+				<NOTE:student_uid><![CDATA['.$row->student_uid.']]></NOTE:student_uid>
+				<NOTE:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></NOTE:mitarbeiter_uid>
+				<NOTE:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></NOTE:studiensemester_kurzbz>
+				<NOTE:note><![CDATA['.$row->note.']]></NOTE:note>
+				<NOTE:punkte><![CDATA['.$row->punkte.']]></NOTE:punkte>
+				<NOTE:freigabedatum_iso><![CDATA['.$row->freigabedatum.']]></NOTE:freigabedatum_iso>
+				<NOTE:freigabedatum><![CDATA['.$datum->convertISODate($row->freigabedatum).']]></NOTE:freigabedatum>
+				<NOTE:benotungsdatum_iso><![CDATA['.$row->benotungsdatum.']]></NOTE:benotungsdatum_iso>
+				<NOTE:benotungsdatum><![CDATA['.$datum->convertISODate($row->benotungsdatum).']]></NOTE:benotungsdatum>
+				<NOTE:note_bezeichnung><![CDATA['.$row->note_bezeichnung.']]></NOTE:note_bezeichnung>
+				<NOTE:lehrveranstaltung_bezeichnung><![CDATA['.$row->lehrveranstaltung_bezeichnung.']]></NOTE:lehrveranstaltung_bezeichnung>
+				<NOTE:student_vorname><![CDATA['.$vorname.']]></NOTE:student_vorname>
+				<NOTE:student_nachname><![CDATA['.$nachname.']]></NOTE:student_nachname>
+				<NOTE:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></NOTE:studiengang>
+			</RDF:Description>
+		</RDF:li>';
 	}
 }
 ?>
-   </RDF:Seq>
+	</RDF:Seq>
 </RDF:RDF>

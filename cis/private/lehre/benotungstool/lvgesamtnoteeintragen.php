@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../../../config/cis.config.inc.php');
@@ -153,10 +154,14 @@ function savenote($db,$lvid, $student_uid, $note, $punkte=null)
 			$note = $noten_anmerkung[$note];
 	}
 
+
+		$student = new student();
+		$student->load($student_uid);
+
 	$lvgesamtnote = new lvgesamtnote();
-    if (!$lvgesamtnote->load($lvid, $student_uid, $stsem))
-    {
-		$lvgesamtnote->student_uid = $student_uid;
+	if (!$lvgesamtnote->load($lvid, $student->prestudent_id, $stsem))
+	{
+		$lvgesamtnote->prestudent_id = $student->prestudent_id;
 		$lvgesamtnote->lehrveranstaltung_id = $lvid;
 		$lvgesamtnote->studiensemester_kurzbz = $stsem;
 		$lvgesamtnote->note = trim($note);
@@ -172,9 +177,9 @@ function savenote($db,$lvid, $student_uid, $note, $punkte=null)
 		$lvgesamtnote->punkte = $punkte;
 		$new = true;
 		$response = "neu";
-    }
-    else
-    {
+	}
+	else
+	{
 		$lvgesamtnote->note = trim($note);
 		$lvgesamtnote->punkte = $punkte;
 		$lvgesamtnote->benotungsdatum = $jetzt;

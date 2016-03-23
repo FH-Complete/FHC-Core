@@ -197,7 +197,7 @@ foreach($noten_obj->result as $row)
 		var ts = jetzt.getTime();
 
 		var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=".urlencode($lvid)."&stsem=".urlencode($stsem); ?>';
-	    url += '&submit=1&student_uid='+encodeURIComponent(uid)+"&note="+encodeURIComponent(note)+"&punkte="+encodeURIComponent(punkte)+"&"+ts;
+		url += '&submit=1&student_uid='+encodeURIComponent(uid)+"&note="+encodeURIComponent(note)+"&punkte="+encodeURIComponent(punkte)+"&"+ts;
 
 		$.ajax({
 			type:"GET",
@@ -673,7 +673,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 			while($row_stud = $db->db_fetch_object($result_stud))
 			{
 				$lvgesamtnote = new lvgesamtnote();
-    			if ($lvgesamtnote->load($lvid,$row_stud->uid,$stsem))
+    			if ($lvgesamtnote->load($lvid,$row_stud->prestudent_uid,$stsem))
     			{
 					if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)
 					{
@@ -1054,14 +1054,14 @@ echo "
 		    		}
 				}
 
-    			if ($lvgesamtnote = new lvgesamtnote($lvid,$row_stud->uid,$stsem))
-    			{
-    				$note_lv = $lvgesamtnote->note;
-					$punkte_lv = $lvgesamtnote->punkte;
-    			}
-    			else
+				if ($lvgesamtnote = new lvgesamtnote($lvid,$row_stud->prestudent_id,$stsem))
 				{
-    				$note_lv = null;
+					$note_lv = $lvgesamtnote->note;
+					$punkte_lv = $lvgesamtnote->punkte;
+				}
+				else
+				{
+					$note_lv = null;
 					$punkte_lv = null;
 				}
 
