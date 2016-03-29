@@ -15,6 +15,7 @@
 - **[CORE]** LVPlan Update Mail ist nun zweisprachig Deutsch/Englisch
 - **[FAS]** Prüfungen im FAS werden nur noch vom aktuell ausgewählten Studiensemester angezeigt. Umschalten auf volle Ansicht möglich
 - **[CIS]** LVPlan Begrenzung der 4er Blockung aufgehoben. 
+- **[CIS]** Im Menü 'Zeitsperren' Link zu Resturlaubsübersicht entfernt. Falls benötigt verlinkung über CMS möglich.
  
 ### Updateinfo
 - **[FAS]** Für Lehraufträge muss eine Unoconv-Vorlage erstellt werden, da der für xsl-fo notwendige Seitenumbruch-Tag aus dem RDF entfernt wurde. 
