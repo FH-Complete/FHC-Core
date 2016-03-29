@@ -31,17 +31,41 @@ echo '<html>
 </head>
 <body>';
 
+$all_tables_to_update =
+array
+(
+	"bis.tbl_bisio",
+	"campus.tbl_lvgesamtnote",
+	"campus.tbl_studentbeispiel",
+);
+
 if(!isset($_POST["action"]) || $_POST["action"] != "start")
 {
-	echo "<h2 style='color:red;'>ACHTUNG!</h2>";
-	echo "<h3>Folgendes wird geändert:</h3>";
-	echo "<p>";
+	$needed = false;
+	foreach($all_tables_to_update as $t)
+	{
+		if(checkForUpdates($db, $t))
+			$needed = true;
+	}
 
-		describeOneChange("bis.tbl_bisio");
-		describeOneChange("campus.tbl_lvgesamtnote");
 
-	echo "</p>";
-	echo "<form action='dbupdate_eine_uid.php' method='POST' name='startform'><input type='submit' value='start' name='action'></form>";
+
+	if($needed)
+	{
+		echo "<h2 style='color:red;'>ACHTUNG!</h2>";
+		echo "<h3>Folgendes wird geändert:</h3>";
+		echo "<p>";
+
+		foreach($all_tables_to_update as $t)
+			describeOneChange($db, $t);
+
+		echo "</p>";
+		echo "<form action='dbupdate_eine_uid.php' method='POST' name='startform'><input type='submit' value='start' name='action'></form>";
+	}
+	else
+	{
+		echo "<h2>Es sind keine Änderungen vorzunehmen!</h2>";
+	}
 }
 else
 {
@@ -54,16 +78,27 @@ else
 	echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
 
-	modifyOneTable($db, "campus.tbl_lvgesamtnote");
-	modifyOneTable($db, "bis.tbl_bisio");
-
+	foreach($all_tables_to_update as $t)
+	modifyOneTable($db, $t);
 }
 
 
-function describeOneChange($tablename)
+function describeOneChange($db, $tablename)
 {
-	echo "<div>".$tablename.": student_uid wird <strong style='color:red;'>gelöscht</strong>!</div>";
-	echo "<div>".$tablename.": prestudent_id wird <strong style='color:green;'>eingefügt</strong>!</div>";
+	if(!$result = @$db->db_query("SELECT prestudent_id FROM ".$tablename." LIMIT 1;"))
+	{
+		echo "<div>".$tablename.": student_uid wird <strong style='color:red;'>gelöscht</strong>!</div>";
+		echo "<div>".$tablename.": prestudent_id wird <strong style='color:green;'>eingefügt</strong>!</div>";
+	}
+}
+
+function checkForUpdates($db, $tablename)
+{
+	if(!$result = @$db->db_query("SELECT prestudent_id FROM ".$tablename." LIMIT 1;"))
+	{
+		return true;
+	}
+	return false;
 }
 
 
