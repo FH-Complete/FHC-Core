@@ -18,7 +18,7 @@
  * Authors: Andreas Moik <moik@technikum-wien.at>,
  *
  * Beschreibung:
- * Dieses Skript prueft die Datenbank auf aenderungen bezueglich eine_uid, dabei werden fehlende Attribute angelegt.
+ * Dieses Skript prueft die Datenbank auf Aenderungen bezueglich eine_uid, dabei werden fehlende Attribute angelegt.
  */
 require_once('../config/system.config.inc.php');
 require_once('../include/basis_db.class.php');
