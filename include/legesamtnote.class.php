@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
@@ -27,7 +28,7 @@ class legesamtnote extends basis_db
 	public $legesamtnoten = array();
 
 	//Tabellenspalten
-	public $student_uid;		// varchar(16)
+	public $prestudent_id;		// integer
 	public $lehreinheit_id;	// int
 	public $note;				// smallint
 	public $benotungsdatum;	//date
@@ -40,34 +41,39 @@ class legesamtnote extends basis_db
 	 * Konstruktor - Laedt optional eine LEGesamtNote
 	 * @param $uebung_id
 	 */
-	public function __construct($student_uid=null, $lehreinheit_id=null)
+	public function __construct($prestudent_id=null, $lehreinheit_id=null)
 	{
 		parent::__construct();
 		
-		if(!is_null($student_uid))
-			$this->load($student_uid, $lehreinheit_id);
+		if(is_numeric($prestudent_id))
+			$this->load($prestudent_id, $lehreinheit_id);
 	}
 
 	/**
 	 * Laedt die legesamtnote
-	 * @param student_uid, lehreinheit_id
+	 * @param prestudent_id, lehreinheit_id
 	 */
-	public function load($student_uid, $lehreinheit_id)
+	public function load($prestudent_id, $lehreinheit_id)
 	{
 		if(!is_numeric($lehreinheit_id))
 		{
 			$this->errormsg='lehreinheit_id muss eine gueltige Zahl sein';
 			return false;
 		}
+		if(!is_numeric($prestudent_id))
+		{
+			$this->errormsg='Prestudent_id muss eine gueltige Zahl sein';
+			return false;
+		}
 		$qry = "SELECT * FROM campus.tbl_legesamtnote 
-				WHERE student_uid = ".$this->db_add_param($student_uid)." AND lehreinheit_id = ".$this->db_add_param($lehreinheit_id, FHC_INTEGER).';';
+				WHERE prestudent_id = ".$this->db_add_param($prestudent_id, FHC_INTEGER)." AND lehreinheit_id = ".$this->db_add_param($lehreinheit_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
 				$this->lehreinheit_id = $row->lehreinheit_id;
-				$this->student_uid = $row->student_uid;
+				$this->prestudent_id = $row->prestudent_id;
 				$this->note = $row->note;
 				$this->benotungsdatum = $row->benotungsdatum;
 				$this->updateamum = $row->updateamum;
@@ -103,7 +109,7 @@ class legesamtnote extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM campus.tbl_legesamtnote WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER)." ORDER BY student_uid;";
+		$qry = "SELECT * FROM campus.tbl_legesamtnote WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER)." ORDER BY prestudent_id;";
 
 
 		if($this->db_query($qry))
@@ -112,7 +118,7 @@ class legesamtnote extends basis_db
 			{
 				$legesamtnote_obj = new legesamtnote();
 
-				$legesamtnote_obj->student_uid = $row->student_uid;
+				$legesamtnote_obj->prestudent_id = $row->prestudent_id;
 				$legesamtnote_obj->note = $row->note;
 				$legesamtnote_obj->lehreinheit_id = $row->lehreinheit_id;
 				$legesamtnote_obj->benotungsdatum = $row->benotungsdatum;
@@ -166,8 +172,8 @@ class legesamtnote extends basis_db
 
 		if($this->new)
 		{
-			$qry = 'INSERT INTO campus.tbl_legesamtnote(student_uid, lehreinheit_id, note, benotungsdatum, updateamum, updatevon, insertamum, insertvon) VALUES('.
-			        $this->db_add_param($this->student_uid).','.
+			$qry = 'INSERT INTO campus.tbl_legesamtnote(prestudent_id, lehreinheit_id, note, benotungsdatum, updateamum, updatevon, insertamum, insertvon) VALUES('.
+			        $this->db_add_param($this->prestudent_id).','.
 			        $this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
 			        $this->db_add_param($this->note, FHC_INTEGER).','.
 			        $this->db_add_param($this->benotungsdatum).','.
@@ -179,13 +185,13 @@ class legesamtnote extends basis_db
 		else
 		{
 			$qry = 'UPDATE campus.tbl_legesamtnote SET'.
-			       ' student_uid='.$this->db_add_param($this->student_uid).','.
+			       ' prestudent_id='.$this->db_add_param($this->prestudent_id).','.
 			       ' lehreinheit_id ='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
 			       ' note='.$this->db_add_param($this->note, FHC_INTEGER).','.
 			       ' benotungsdatum='.$this->db_add_param($this->benotungsdatum).','.
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
 			       ' updatevon='.$this->db_add_param($this->updatevon).
-			       " WHERE lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER)." AND student_uid = ".$this->db_add_param($this->student_uid).";";
+			       " WHERE lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER)." AND prestudent_id = ".$this->db_add_param($this->prestudent_id).";";
 		}
 
 		if($this->db_query($qry))

@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >,
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at > and
+ *          Andreas Moik 	<moik@technikum-wien.at >.
  */
 require_once('../../../../config/cis.config.inc.php');
 require_once('../../../../config/global.config.inc.php');
@@ -1026,7 +1027,7 @@ echo "
 					{
 						$legesamtnote = new legesamtnote($l->lehreinheit_id);
 
-		    			if (!$legesamtnote->load($row_stud->uid,$l->lehreinheit_id))
+		    			if (!$legesamtnote->load($row_stud->prestudent_id,$l->lehreinheit_id))
 						{
 		    				//$note_les_str .= "- (".$l->lehreinheit_id.")";
 		    			}

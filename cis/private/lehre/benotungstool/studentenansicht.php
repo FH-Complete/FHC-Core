@@ -1157,9 +1157,11 @@ else
 	echo "</td><td valign='top'>";
 
 	$legesamtnote = new legesamtnote($lehreinheit_id);
-	$student = new student();
 
-	if (!$legesamtnote->load($user, $lehreinheit_id))
+	if(!$student = new student($user))
+		die($p->t('benotungstool/studentWurdeNichtGefunden'));
+
+	if (!$legesamtnote->load($student->prestudent_id, $lehreinheit_id))
 	{
 		$lenote = null;
 	}

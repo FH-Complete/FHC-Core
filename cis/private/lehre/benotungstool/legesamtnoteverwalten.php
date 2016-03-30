@@ -329,9 +329,13 @@ if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
 	$jetzt = date("Y-m-d H:i:s");	
 	$student_uid = $_POST["student_uid"];	
 	$legesamtnote = new legesamtnote($lehreinheit_id);
-    if (!$legesamtnote->load($student_uid,$lehreinheit_id))
-    {
-		$legesamtnote->student_uid = $student_uid;
+
+	if(!$student = new student($student_uid))
+		die($p->t('benotungstool/studentWurdeNichtGefunden'));
+
+	if (!$legesamtnote->load($student->prestudent_id,$lehreinheit_id))
+	{
+		$legesamtnote->prestudent_id = $prestudent_id;
 		$legesamtnote->lehreinheit_id = $lehreinheit_id;
 		$legesamtnote->note = $_POST["note"];
 		$legesamtnote->benotungsdatum = $jetzt;
@@ -340,9 +344,9 @@ if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
 		$legesamtnote->insertamum = $jetzt;
 		$legesamtnote->insertvon = $user;
 		$legesamtnote->new = true;
-    }
-    else
-    {
+	}
+	else
+	{
 		$legesamtnote->note = $_POST["note"];
 		$legesamtnote->benotungsdatum = $jetzt;
 		$legesamtnote->updateamum = $jetzt;
@@ -427,8 +431,8 @@ if($result_stud = $db->db_query($qry_stud))
 		$studentnote->calc_gesamtnote($lehreinheit_id,$stsem,$row_stud->prestudent_id);
 		//echo $studentnote->debug;
 		$legesamtnote = new legesamtnote($lehreinheit_id);
-		if (!$legesamtnote->load($row_stud->uid,$lehreinheit_id))
-		{    				
+		if (!$legesamtnote->load($row_stud->prestudent_id,$lehreinheit_id))
+		{
 			$note = null;
 		}
 		else
@@ -455,11 +459,11 @@ if($result_stud = $db->db_query($qry_stud))
 			echo "<span class='negativ'>X</span>";
 		else
 			echo "ok";
-		echo "</td>";				
+		echo "</td>";
 		if ($note)
 			$note_final = $note;
 		else
-		{						
+		{
 			if ($studentnote->negativ)
 				$note_final = 5;
 			else
@@ -473,8 +477,8 @@ if($result_stud = $db->db_query($qry_stud))
 		if ($note == 5)
 			$negmarkier = " style='color:red; font-weight:bold;'";
 		else
-			$negmarkier = "";	
-		echo "<td align='center' id='note_$row_stud->uid'><span".$negmarkier.">$note</span></td>";				
+			$negmarkier = "";
+		echo "<td align='center' id='note_$row_stud->uid'><span".$negmarkier.">$note</span></td>";
 		echo "</tr>";
 		$i++;
 	}

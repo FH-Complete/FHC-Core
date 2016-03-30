@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../../../config/cis.config.inc.php');
@@ -93,11 +94,15 @@ $note = $_REQUEST["note"];
 if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16))  ){
 	
 	$jetzt = date("Y-m-d H:i:s");	
-	$student_uid = $_REQUEST["student_uid"];	
+	$student_uid = $_REQUEST["student_uid"];
+
+	if(!$student = new student($user))
+		die("Der Student wurde nicht gefunden!");
+
 	$legesamtnote = new legesamtnote($lehreinheit_id);
-    if (!$legesamtnote->load($student_uid,$lehreinheit_id))
-    {
-		$legesamtnote->student_uid = $student_uid;
+	if (!$legesamtnote->load($student->prestudent_id,$lehreinheit_id))
+	{
+		$legesamtnote->prestudent_id = $prestudent_id;
 		$legesamtnote->lehreinheit_id = $lehreinheit_id;
 		$legesamtnote->note = $_REQUEST["note"];
 		$legesamtnote->benotungsdatum = $jetzt;
