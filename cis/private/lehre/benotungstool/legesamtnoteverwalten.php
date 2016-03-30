@@ -424,7 +424,7 @@ if($result_stud = $db->db_query($qry_stud))
 	while($row_stud = $db->db_fetch_object($result_stud))
 	{
 		$studentnote = new studentnote();
-		$studentnote->calc_gesamtnote($lehreinheit_id,$stsem,$row_stud->uid);
+		$studentnote->calc_gesamtnote($lehreinheit_id,$stsem,$row_stud->prestudent_id);
 		//echo $studentnote->debug;
 		$legesamtnote = new legesamtnote($lehreinheit_id);
 		if (!$legesamtnote->load($row_stud->uid,$lehreinheit_id))

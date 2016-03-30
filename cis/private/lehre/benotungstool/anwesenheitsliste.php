@@ -71,7 +71,11 @@ if (isset($_GET["download_abgabe"])){
 	$uebung_id = $_GET["uebung_id"];
 	$uid = $_GET['uid'];
 	$ueb = new uebung();
-	$ueb->load_studentuebung($uid, $uebung_id);
+
+	if(!$student = new student($uid))
+		die("Der Student wurde nicht gefunden!");
+
+	$ueb->load_studentuebung($student->prestudent_id, $uebung_id);
 	$ueb->load_abgabe($ueb->abgabe_id);
 	$filename = BENOTUNGSTOOL_PATH."abgabe/".$ueb->abgabedatei;
 	header('Content-Type: application/octet-stream');
@@ -308,7 +312,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				
 				//mitarbeit
 				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id) 
-				WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($row_stud->uid);
+				WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND prestudent_id=".$db->db_add_param($row_stud->prestudent_id, FHC_INTEGER);
 				if($result = $db->db_query($qry))
 					if($row = $db->db_fetch_object($result))
 						$mitarbeit=$row->mitarbeit;	
@@ -507,7 +511,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				
 				//mitarbeit heute
 				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit_heute FROM campus.tbl_studentuebung 
-					WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($row_stud->uid);
+					WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND prestudent_id=".$db->db_add_param($row_stud->prestudent_id, FHC_INTEGER);
 				if($result = $db->db_query($qry))
 					if($row = $db->db_fetch_object($result))
 						$worksheet->write($zeile,++$spalte,($row->mitarbeit_heute!=''?$row->mitarbeit_heute:'0'));
@@ -534,7 +538,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				
 				//mitarbeit insgesamt
 				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit_heute FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id) 
-				WHERE student_uid=".$db->db_add_param($row_stud->uid)." AND lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
+				WHERE prestudent_id=".$db->db_add_param($row_stud->prestudent_id, FHC_INTEGER)." AND lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
 				if($result = $db->db_query($qry))
 					if($row = $db->db_fetch_object($result))
 						$worksheet->write($zeile,++$spalte,($row->mitarbeit_heute!=''?$row->mitarbeit_heute:'0'));
@@ -630,9 +634,12 @@ function addUser(student_uid)
 				}
 				else
 				{
-					if (!$uebung_obj->load_studentuebung($uid,$uebung_id))
+					if(!$student = new student($uid))
+						die("Der Student wurde nicht gefunden!");
+
+					if (!$uebung_obj->load_studentuebung($student->prestudent_id,$uebung_id))
 					{
-						$uebung_obj->student_uid = $uid;
+						$uebung_obj->prestudent_id = $student->prestudent_id;
 						$uebung_obj->mitarbeiter_uid = $user;
 						$uebung_obj->abgabe_id = null;
 						$uebung_obj->note = $_POST['update_'.$uid.'_note'];
@@ -648,7 +655,7 @@ function addUser(student_uid)
 					}
 					else
 					{
-						$uebung_obj->load_studentuebung($uid,$uebung_id);
+						$uebung_obj->load_studentuebung($student->prestudent_id,$uebung_id);
 						$uebung_obj->mitarbeiter_uid = $user;
 						$uebung_obj->note = $_POST['update_'.$uid.'_note'];
 						$uebung_obj->benotungsdatum = date("Y-m-d H:i:s");
@@ -789,7 +796,7 @@ function addUser(student_uid)
 
 			$filename = '';
 			$su_obj = new uebung($uebung_id);
-			$su_obj->load_studentuebung($row_stud->uid, $uebung_id);
+			$su_obj->load_studentuebung($row_stud->prestudent_id, $uebung_id);
 			if ($su_obj->abgabe_id)	
 			{	
 				$su_obj->load_abgabe($su_obj->abgabe_id);
@@ -803,7 +810,7 @@ function addUser(student_uid)
 			if (!$uebung_obj->beispiele)
 			{
 				$studentuebung_obj = new uebung();
-				$studentuebung_obj->load_studentuebung($row_stud->uid,$uebung_id);
+				$studentuebung_obj->load_studentuebung($row_stud->prestudent_id,$uebung_id);
 				echo "<td align='center'><input type='text' name='update_".$row_stud->uid."_note' onchange=\"addUser('$row_stud->uid');\" value='".$studentuebung_obj->note."' size='3'></td>\n";
 				
 			}			

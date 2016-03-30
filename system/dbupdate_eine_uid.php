@@ -37,6 +37,7 @@ array
 	"bis.tbl_bisio",
 	"campus.tbl_lvgesamtnote",
 	"campus.tbl_studentbeispiel",
+	"campus.tbl_studentuebung",
 );
 
 if(!isset($_POST["action"]) || $_POST["action"] != "start")

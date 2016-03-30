@@ -96,11 +96,16 @@ $datum_obj = new datum();
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 
 //Abgabedatei ausliefern
-if (isset($_GET["download_abgabe"])){
+if (isset($_GET["download_abgabe"]))
+{
+
+	if(!$student = new student($user))
+		die($p->t('benotungstool/studentWurdeNichtGefunden'));
+
 	$file=$_GET["download_abgabe"];
 	$uebung_id = $_GET["uebung_id"];
 	$ueb = new uebung();
-	$ueb->load_studentuebung($user, $uebung_id);
+	$ueb->load_studentuebung($student->prestudent_id, $uebung_id);
 	$ueb->load_abgabe($ueb->abgabe_id);
 	$filename = BENOTUNGSTOOL_PATH."abgabe/".$ueb->abgabedatei;
 	header('Content-Type: application/octet-stream');
@@ -176,11 +181,16 @@ if (isset($_POST["abgabe"]))
 		$abgabepfad = BENOTUNGSTOOL_PATH."abgabe/".$abgabedatei;	
 			
 		$uebung_obj = new uebung();
-		$uebung_obj->load_studentuebung($user, $uebung_id);
+
+
+		if(!$student = new student($user))
+			die($p->t('benotungstool/studentWurdeNichtGefunden'));
+
+		$uebung_obj->load_studentuebung($student->prestudent_id, $uebung_id);
 			
 		if ($uebung_obj->errormsg != "")
 		{
-			$uebung_obj->student_uid = $user;
+			$uebung_obj->prestudent_id = $student->prestudent_id;
 			$uebung_obj->mitarbeiter_uid = null;
 			$uebung_obj->abgabe_id = null;
 			$uebung_obj->uebung_id = $uebung_id;
@@ -767,8 +777,11 @@ if (!isset($_GET["notenuebersicht"]))
 				if($row = $db->db_fetch_object($result))
 					$punkte_gesamt = $row->punktegesamt;
 
+		if(!$student = new student($user))
+			die($p->t('benotungstool/studentWurdeNichtGefunden'));
+
 			//Eingetragen diese Kreuzerlliste
-			$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($user)." AND vorbereitet=true";
+			$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND prestudent_id=".$db->db_add_param($student->prestudent_id, FHC_INTEGER)." AND vorbereitet=true";
 			$punkte_eingetragen=0;
 			if($result=$db->db_query($qry))
 				if($row = $db->db_fetch_object($result))
@@ -791,15 +804,19 @@ if (!isset($_GET["notenuebersicht"]))
 					tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
 					tbl_uebung.lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND
 					tbl_uebung.liste_id = ".$db->db_add_param($liste_id, FHC_INTEGER)." AND 
-					tbl_studentbeispiel.student_uid=".$db->db_add_param($user)." AND vorbereitet=true";
+					tbl_studentbeispiel.prestudent_id=".$db->db_add_param($student->prestudent_id, FHC_INTEGER)." AND vorbereitet=true";
 			$punkte_eingetragen_alle=0;
 			if($result=$db->db_query($qry))
 				if($row = $db->db_fetch_object($result))
 					$punkte_eingetragen_alle = ($row->punkteeingetragen_alle!=''?$row->punkteeingetragen_alle:0);
 
+
+			if(!$student = new student($user))
+				die($p->t('benotungstool/studentWurdeNichtGefunden'));
+
 			//Mitarbeitspunkte
 			$qry = "SELECT sum(mitarbeitspunkte) as mitarbeitspunkte FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id)
-					WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($user)." AND liste_id = ".$db->db_add_param($liste_id, FHC_INTEGER);
+					WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND prestudent_id=".$db->db_add_param($student->prestudent_id, FHC_INTEGER)." AND liste_id = ".$db->db_add_param($liste_id, FHC_INTEGER);
 			$mitarbeit_alle=0;
 			if($result=$db->db_query($qry))
 				if($row = $db->db_fetch_object($result))
@@ -807,7 +824,7 @@ if (!isset($_GET["notenuebersicht"]))
 
 			//Mitarbeitspunkte
 			$qry = "SELECT mitarbeitspunkte FROM campus.tbl_studentuebung
-					WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($user);
+					WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND prestudent_id=".$db->db_add_param($student->prestudent_id, FHC_INTEGER);
 			$mitarbeit=0;
 			if($result=$db->db_query($qry))
 				if($row = $db->db_fetch_object($result))
@@ -887,7 +904,7 @@ if (!isset($_GET["notenuebersicht"]))
 						           </td>
 				        		</tr>';
 						$i=0;
-						$qry_cnt = "SELECT distinct student_uid FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id=".$db->db_add_param($uebung_id)." GROUP BY student_uid";
+						$qry_cnt = "SELECT distinct prestudent_id FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id=".$db->db_add_param($uebung_id)." GROUP BY prestudent_id";
 							if($result_cnt = $db->db_query($qry_cnt))
 									$gesamt=$db->db_num_rows($result_cnt);
 
@@ -1048,8 +1065,10 @@ else
 			if(count($subuebung_obj->uebungen) >= 0)
 			{
 
+				if(!$student = new student($user))
+					die($p->t('benotungstool/studentWurdeNichtGefunden'));
 
-				$l1note->calc_l1_note($row->uebung_id, $user, $lehreinheit_id);
+				$l1note->calc_l1_note($row->uebung_id, $student->prestudent_id, $lehreinheit_id);
 				if ($l1note->negativ)
 					$l1_note = 5;
 				else
@@ -1090,17 +1109,23 @@ else
 					echo "		</td>\n";
 					if ($subrow->beispiele)
 					{
-						$l1note->calc_punkte($subrow->uebung_id, $user);
+						if(!$student = new student($user))
+							die($p->t('benotungstool/studentWurdeNichtGefunden'));
+
+						$l1note->calc_punkte($subrow->uebung_id, $student->prestudent_id);
 						echo "		<td align='center'>".$l1note->punkte_gesamt."</td>";
-						echo "		<td align='center'></td>\n";	
-						echo "		<td align='center'></td>\n";				
+						echo "		<td align='center'></td>\n";
+						echo "		<td align='center'></td>\n";
 					}
 					else if ($subrow->abgabe)
 					{
-						$l1note->calc_note($subrow->uebung_id, $user);
-						echo "		<td align='center'></td>\n";	
-						echo "		<td align='center'>".$l1note->note."</td>";	
-						echo "		<td align='center'></td>\n";		
+						if(!$student = new student($user))
+							die($p->t('benotungstool/studentWurdeNichtGefunden'));
+
+						$l1note->calc_note($subrow->uebung_id, $student->prestudent_id);
+						echo "		<td align='center'></td>\n";
+						echo "		<td align='center'>".$l1note->note."</td>";
+						echo "		<td align='center'></td>\n";
 					}
 					echo "	</tr>\n";					/*
 					if($datum_obj->mktime_fromtimestamp($subrow->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($subrow->freigabebis)>time())
@@ -1113,7 +1138,11 @@ else
 
 			}
 		}
-		$l1note->calc_gesamtnote($lehreinheit_id, $stsem, $user);
+
+		if(!$student = new student($user))
+			die($p->t('benotungstool/studentWurdeNichtGefunden'));
+
+		$l1note->calc_gesamtnote($lehreinheit_id, $stsem, $student->prestudent_id);
 		if ($l1note->negativ)
 			$gesamtnote = 5;
 		else

@@ -86,7 +86,7 @@ if (isset($_GET["download_abgabe"])){
 	$file=$_GET["download_abgabe"];
 	$uebung_id = $_GET["uebung_id"];
 	$ueb = new uebung();
-	$ueb->load_studentuebung($uid, $uebung_id);
+	$ueb->load_studentuebung($prestudent_id, $uebung_id);
 	$ueb->load_abgabe($ueb->abgabe_id);
 	$filename = BENOTUNGSTOOL_PATH."abgabe/".$ueb->abgabedatei;
 	header('Content-Type: application/octet-stream');
@@ -121,12 +121,12 @@ if (isset($_FILES["abgabedatei"]))
 		$abgabepfad = BENOTUNGSTOOL_PATH."abgabe/".$abgabedatei;	
 			
 		$uebung_obj = new uebung();
-		$uebung_obj->load_studentuebung($student_uid, $uebung_id);
+		$uebung_obj->load_studentuebung($student->prestudent_id, $uebung_id);
 	
 			
 		if ($uebung_obj->errormsg != "")
 		{
-			$uebung_obj->student_uid = $student_uid;
+			$uebung_obj->prestudent_id = $student->prestudent_id;
 			$uebung_obj->mitarbeiter_uid = null;
 			$uebung_obj->abgabe_id = null;
 			$uebung_obj->uebung_id = $uebung_id;
@@ -336,7 +336,7 @@ if(isset($_POST['submit']))
 	if(isset($punkte) && is_numeric($punkte) && !isset($_POST['abgabe']))
 	{
 		$ueb_obj = new uebung();
-		if($ueb_obj->load_studentuebung($uid, $uebung_id))
+		if($ueb_obj->load_studentuebung($prestudent_id, $uebung_id))
 			$ueb_obj->new = false;
 		else
 		{
@@ -351,7 +351,7 @@ if(isset($_POST['submit']))
 		$ueb_obj->updatevon = $user;
 		$ueb_obj->mitarbeiter_uid = $user;
 		$ueb_obj->uebung_id = $uebung_id;
-		$ueb_obj->student_uid = $uid;
+		$ueb_obj->student->prestudent_id = $prestudent_id;
 
 		if(!$ueb_obj->studentuebung_save())
 			$error = true;
@@ -403,7 +403,7 @@ if(isset($_POST['submit']))
 	{
 		$note = $_POST['note'];
 		$ueb_obj = new uebung();
-		if($ueb_obj->load_studentuebung($uid, $uebung_id))
+		if($ueb_obj->load_studentuebung($prestudent_id, $uebung_id))
 			$ueb_obj->new = false;
 		else
 		{
@@ -418,7 +418,7 @@ if(isset($_POST['submit']))
 		$ueb_obj->updatevon = $user;
 		$ueb_obj->mitarbeiter_uid = $user;
 		$ueb_obj->uebung_id = $uebung_id;
-		$ueb_obj->student_uid = $uid;
+		$ueb_obj->prestudent_id = $student->prestudent_id;
 
 		if(!$ueb_obj->studentuebung_save())
 			$error = true;
@@ -574,7 +574,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 
 	$ueb_obj = new uebung();
 	$ueb_obj->load($uebung_id);
-	if($ueb_obj->load_studentuebung($uid, $uebung_id))
+	if($ueb_obj->load_studentuebung($prestudent_id, $uebung_id))
 	{
 		$anmerkung = $ueb_obj->anmerkung;
 		$mitarbeit = $ueb_obj->mitarbeitspunkte;
@@ -633,7 +633,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		
 		
 		
-		$ueb_obj->load_studentuebung($uid, $uebung_id);
+		$ueb_obj->load_studentuebung($prestudent_id, $uebung_id);
 		if ($ueb_obj->abgabe_id)	
 		{	
 			$ueb_obj->load_abgabe($ueb_obj->abgabe_id);
@@ -690,7 +690,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 	
 		//Mitarbeitspunkte
 		$qry = "SELECT sum(mitarbeitspunkte) as mitarbeitspunkte FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id)
-				WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($uid)." and liste_id=".$db->db_add_param($liste_id);
+				WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND prestudent_id=".$db->db_add_param($student->prestudent_id, FHC_INTEGER)." and liste_id=".$db->db_add_param($liste_id);
 		$mitarbeit_alle=0;
 		if($result=$db->db_query($qry))
 			if($row = $db->db_fetch_object($result))
@@ -698,7 +698,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 	
 		//Mitarbeitspunkte
 		$qry = "SELECT mitarbeitspunkte FROM campus.tbl_studentuebung
-				WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($uid);
+				WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND prestudent_id=".$db->db_add_param($student->prestudent_id, FHC_INTEGER);
 		$mitarbeit=0;
 		if($result=$db->db_query($qry))
 			if($row = $db->db_fetch_object($result))
@@ -766,7 +766,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 	}
 	else if (is_numeric($_GET['uebung_id']))
 	{
-		$ueb_obj->load_studentuebung($uid, $uebung_id);
+		$ueb_obj->load_studentuebung($prestudent_id, $uebung_id);
 		if ($ueb_obj->abgabe_id)	
 		{	
 			$ueb_obj->load_abgabe($ueb_obj->abgabe_id);
@@ -776,7 +776,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 			$filename='';
 		//Abgaben benoten
 		$studentnote = new studentnote($lehreinheit_id,$stsem,$uid,$uebung_id);
-		$studentnote->calc_note($uebung_id, $uid);
+		$studentnote->calc_note($uebung_id, $prestudent_id);
 		echo "<span class='studentnote'>".$p->t('benotungstool/note').": ".$studentnote->note." (Gewicht: ".$ueb_obj->gewicht.")</span><br><br>";
 		if ($filename != '')
 			echo $p->t('benotungstool/abgabedatei').": <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid&download_abgabe=$filename'>".$filename."</a><br><br>";
