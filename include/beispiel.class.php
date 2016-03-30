@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
@@ -37,7 +38,7 @@ class beispiel extends basis_db
 	public $insertvon;		// varchar(16)
 	public $nummer;			// smallint
 
-	public $student_uid;
+	public $prestudent_id	//integer;
 	public $vorbereitet;
 	public $probleme;
 
@@ -307,16 +308,21 @@ class beispiel extends basis_db
 	 * @param $beispiel_id
 	 * @return boolean
 	 */
-	public function studentbeispiel_exists($uid,$beispiel_id)
+	public function studentbeispiel_exists($prestudent_id,$beispiel_id)
 	{
 		if(!is_numeric($beispiel_id))
 		{
 			$this->errormsg = 'Beispiel_id muss eine gueltige Zahl sein';
 			return false;
 		}
+		if(!is_numeric($prestudent_id))
+		{
+			$this->errormsg = 'Prestudent_id muss eine gueltige Zahl sein';
+			return false;
+		}
 
 		$qry = "SELECT vorbereitet FROM campus.tbl_studentbeispiel 
-				WHERE beispiel_id=".$this->db_add_param($beispiel_id,FHC_INTEGER)." AND student_uid=".$this->db_add_param($uid).';';
+				WHERE beispiel_id=".$this->db_add_param($beispiel_id,FHC_INTEGER)." AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
@@ -365,22 +371,27 @@ class beispiel extends basis_db
 	 * @param $beispiel_id
 	 * @return boolean
 	 */
-	public function load_studentbeispiel($uid, $beispiel_id)
+	public function load_studentbeispiel($prestudent_id, $beispiel_id)
 	{
 		if(!is_numeric($beispiel_id))
 		{
 			$this->errormsg = 'Beispiel_id muss eine gueltige Zahl sein';
 			return false;
 		}
+		if(!is_numeric($prestudent_id))
+		{
+			$this->errormsg = 'Prestudent_id muss eine gueltige Zahl sein';
+			return false;
+		}
 		$qry = "SELECT * FROM campus.tbl_studentbeispiel 
-				WHERE student_uid=".$this->db_add_param($uid)." AND beispiel_id=".$this->db_add_param($beispiel_id, FHC_INTEGER).';';
+				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)." AND beispiel_id=".$this->db_add_param($beispiel_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
 				$this->beispiel_id = $row->beispiel_id;
-				$this->student_uid = $row->student_uid;
+				$this->prestudent_id = $row->prestudent_id;
 				$this->vorbereitet = $this->db_parse_bool($row->vorbereitet);
 				$this->probleme = $this->db_parse_bool($row->probleme);
 				$this->updateamum = $row->updateamum;
@@ -466,9 +477,9 @@ class beispiel extends basis_db
 
 		if($new)
 		{
-			$qry = 'INSERT INTO campus.tbl_studentbeispiel(student_uid, beispiel_id, vorbereitet, probleme,
+			$qry = 'INSERT INTO campus.tbl_studentbeispiel(prestudent_id, beispiel_id, vorbereitet, probleme,
 					updateamum, updatevon, insertamum, insertvon) VALUES('.
-			        $this->db_add_param($this->student_uid).','.
+			        $this->db_add_param($this->prestudent_id, FHC_INTEGER).','.
 			        $this->db_add_param($this->beispiel_id, FHC_INTEGER).','.
 			        $this->db_add_param($this->vorbereitet,FHC_BOOLEAN).','.
 			        $this->db_add_param($this->probleme).','.
@@ -484,7 +495,7 @@ class beispiel extends basis_db
 			       ' probleme='.$this->db_add_param($this->probleme, FHC_BOOLEAN).','.
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
 			       ' updatevon='.$this->db_add_param($this->updatevon).
-			       " WHERE beispiel_id=".$this->db_add_param($this->beispiel_id, FHC_INTEGER)." AND student_uid=".$this->db_add_param($this->student_uid).';';
+			       " WHERE beispiel_id=".$this->db_add_param($this->beispiel_id, FHC_INTEGER)." AND prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER).';';
 		}
 
 		if($this->db_query($qry))

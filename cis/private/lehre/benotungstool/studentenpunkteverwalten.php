@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../../../config/cis.config.inc.php');
@@ -31,6 +32,7 @@ require_once('../../../../include/benutzerberechtigung.class.php');
 require_once('../../../../include/uebung.class.php');
 require_once('../../../../include/beispiel.class.php');
 require_once('../../../../include/studentnote.class.php');
+require_once('../../../../include/student.class.php');
 require_once('../../../../include/datum.class.php');
 require_once('functions.inc.php');
 require_once('../../../../include/phrasen.class.php');
@@ -75,6 +77,9 @@ $datum_obj = new datum();
 
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
+if(!$student = new student($uid))
+	die($p->t('benotungstool/studentWurdeNichtGefunden'));
+$prestudent_id = $student->prestudent_id;
 
 //Abgabedatei ausliefern
 if (isset($_GET["download_abgabe"])){
@@ -104,7 +109,7 @@ if (isset($_FILES["abgabedatei"]))
 {
 	//echo $_FILES["abgabedatei"];	
 	$abgabedatei_up = $_FILES["abgabedatei"]["tmp_name"];
-					
+
 	if ($abgabedatei_up)
 	{
 		$student_uid = $uid;
@@ -359,7 +364,7 @@ if(isset($_POST['submit']))
 			{
 					$stud_bsp_obj = new beispiel();
 
-					if($stud_bsp_obj->load_studentbeispiel($uid, $row->beispiel_id))
+					if($stud_bsp_obj->load_studentbeispiel($prestudent_id, $row->beispiel_id))
 					{
 						$stud_bsp_obj->new=false;
 					}
@@ -373,7 +378,7 @@ if(isset($_POST['submit']))
 					$stud_bsp_obj->probleme = (isset($_POST['problem_'.$row->beispiel_id])?true:false);
 					$stud_bsp_obj->updateamum = date('Y-m-d H:i:s');
 					$stud_bsp_obj->updatevon = $user;
-					$stud_bsp_obj->student_uid = $uid;
+					$stud_bsp_obj->prestudent_id = $prestudent_id;
 					$stud_bsp_obj->beispiel_id = $row->beispiel_id;
 
 					if(!$stud_bsp_obj->studentbeispiel_save())
@@ -605,7 +610,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		foreach ($bsp_obj->beispiele as $row)
 		{
 			$stud_bsp_obj = new beispiel();
-			if($stud_bsp_obj->load_studentbeispiel($uid, $row->beispiel_id))
+			if($stud_bsp_obj->load_studentbeispiel($prestudent_id, $row->beispiel_id))
 			{
 				$vorbereitet = $stud_bsp_obj->vorbereitet;
 				$probleme = $stud_bsp_obj->probleme;
@@ -653,7 +658,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 				$punkte_gesamt = $row->punktegesamt;
 	
 		//Eingetragen diese Kreuzerlliste
-		$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($uid)." AND vorbereitet=true";
+		$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER)." AND vorbereitet=true";
 		$punkte_eingetragen=0;
 		if($result=$db->db_query($qry))
 			if($row = $db->db_fetch_object($result))
@@ -677,7 +682,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 				tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
 				tbl_uebung.lehreinheit_id=".$db->db_add_param($lehreinheit_id)." AND
 				tbl_uebung.liste_id = ".$db->db_add_param($liste_id)." AND 
-				tbl_studentbeispiel.student_uid=".$db->db_add_param($uid)." AND vorbereitet=true";
+				tbl_studentbeispiel.prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER)." AND vorbereitet=true";
 		$punkte_eingetragen_alle=0;
 		if($result=$db->db_query($qry))
 			if($row = $db->db_fetch_object($result))

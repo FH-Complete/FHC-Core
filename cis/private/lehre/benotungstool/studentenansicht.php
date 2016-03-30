@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 // ********************
 // * Studentenansicht fuers Kreuzerltool
@@ -519,8 +520,10 @@ if (!isset($_GET["notenuebersicht"]))
 					foreach ($bsp_obj->beispiele as $row)
 					{
 						$stud_bsp_obj = new beispiel();
+						if(!$student = new student($user))
+							die($p->t('benotungstool/studentWurdeNichtGefunden'));
 
-						if($stud_bsp_obj->load_studentbeispiel($user, $row->beispiel_id))
+						if($stud_bsp_obj->load_studentbeispiel($student->prestudent_id, $row->beispiel_id))
 						{
 							$stud_bsp_obj->new=false;
 						}
@@ -534,10 +537,12 @@ if (!isset($_GET["notenuebersicht"]))
 						if (isset($_POST['solved_'.$row->beispiel_id]))				
 							$stud_bsp_obj->vorbereitet = ($_POST['solved_'.$row->beispiel_id]==1?true:false);
 
+
+
 						$stud_bsp_obj->probleme = (isset($_POST['problem_'.$row->beispiel_id])?true:false);
 						$stud_bsp_obj->updateamum = date('Y-m-d H:i:s');
 						$stud_bsp_obj->updatevon = $user;
-						$stud_bsp_obj->student_uid = $user;
+						$stud_bsp_obj->prestudent_id = $student->prestudent_id;
 						$stud_bsp_obj->beispiel_id = $row->beispiel_id;
 
 						if(!$row->check_anzahl_studentbeispiel($row->beispiel_id))
@@ -545,7 +550,7 @@ if (!isset($_GET["notenuebersicht"]))
 						if (($row->anzahl_studentbeispiel >= $ueb_hlp_obj->maxstd) && ($stud_bsp_obj->vorbereitet==true) && ($ueb_hlp_obj->maxstd != null)) //isset($_POST['problem_'.$row->beispiel_id]) &&  $stud_bsp_obj->new || 
 						{
 							$hlp = new beispiel();
-							if($hlp->load_studentbeispiel($user, $row->beispiel_id))
+							if($hlp->load_studentbeispiel($student->prestudent_id, $row->beispiel_id))
 							{
 								if($hlp->vorbereitet!=$stud_bsp_obj->vorbereitet)
 								{
@@ -609,8 +614,11 @@ if (!isset($_GET["notenuebersicht"]))
 		$anmerkung = mb_str_replace("\n", "<br>", $anmerkung);
 		if ($uebung_obj->beispiele)
 		{
+			if(!$student = new student($user))
+				die($p->t('benotungstool/studentWurdeNichtGefunden'));
 
-			$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id IN (SELECT beispiel_id from campus.tbl_beispiel where uebung_id =".$db->db_add_param($uebung_id, FHC_INTEGER).") AND vorbereitet=true and student_uid = ".$db->db_add_param($user);
+
+			$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id IN (SELECT beispiel_id from campus.tbl_beispiel where uebung_id =".$db->db_add_param($uebung_id, FHC_INTEGER).") AND vorbereitet=true and prestudent_id = ".$db->db_add_param($student->prestudent_id, FHC_INTEGER);
 				if($result_cnt = $db->db_query($qry_cnt))
 					if($row_cnt = $db->db_fetch_object($result_cnt))
 						$anzahl = $row_cnt->anzahl;
@@ -670,15 +678,18 @@ if (!isset($_GET["notenuebersicht"]))
 
 				foreach ($bsp_obj->beispiele as $row)
 				{
-					$bsp_voll = false;		
+					$bsp_voll = false;
 					$stud_bsp_obj = new beispiel();
+					if(!$student = new student($user))
+						die($p->t('benotungstool/studentWurdeNichtGefunden'));
+
 					if ($uebung_obj->maxstd > 0)
 					{
 						$stud_bsp_obj->check_anzahl_studentbeispiel($row->beispiel_id);
 						if ($stud_bsp_obj->anzahl_studentbeispiel >= $uebung_obj->maxstd)
 							$bsp_voll = true;
 					}
-					if($stud_bsp_obj->load_studentbeispiel($user, $row->beispiel_id))
+					if($stud_bsp_obj->load_studentbeispiel($student->prestudent_id, $row->beispiel_id))
 					{
 						$vorbereitet = $stud_bsp_obj->vorbereitet;
 						$probleme = $stud_bsp_obj->probleme;

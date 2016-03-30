@@ -17,8 +17,9 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *			gerald Raab <gerald.raab@technikum-wien.at>.
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *          Gerald Raab <gerald.raab@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Notenverwaltung fuer das Kreuzerltool
@@ -67,20 +68,20 @@ class studentnote extends basis_db
 		$beispiele = false;
 		
 		$ueb1_obj = new uebung();
-		$ueb1_obj->load_uebung($lehreinheit_id,1);	
+		$ueb1_obj->load_uebung($lehreinheit_id,1);
 		foreach($ueb1_obj->uebungen as $ueb1)
 		{
 			$this->calc_l1_note($ueb1->uebung_id, $student_uid, $lehreinheit_id);
 			$note_x_gewicht_l1 += ($this->l1_note * $this->l1_gewicht);
 			$gewichte_l1 += $this->l1_gewicht;
-			if ($this->negativ)				
+			if ($this->negativ)
 				$negativ_all = $this->negativ;
-			if ($this->fehlt)				
+			if ($this->fehlt)
 				$fehlt_all = $this->fehlt;
 					
 		}
 		if ($gewichte_l1 > 0)
-		{					
+		{
 			$this->studentgesamtnote = ($note_x_gewicht_l1 / $gewichte_l1);
 			$this->negativ = $negativ_all;
 			$this->fehlt = $fehlt_all;
@@ -116,25 +117,25 @@ class studentnote extends basis_db
 		$punkte_eingetragen = 0;
 		$l1_gewicht = 0;
 		$ueb1 = new uebung($uebung_id);
-		
-		$ueb_obj = new uebung();	
+
+		$ueb_obj = new uebung();
 		$ueb_obj->load_uebung($lehreinheit_id, 2, $uebung_id);
 		if ($ueb_obj->uebungen)
 		{
 			$note_x_gewicht = 0;
 			$gewichte = 0;
 			$punkte_gesamt = 0;
-			
+
 			foreach ($ueb_obj->uebungen as $ueb)
 			{
 				if ($ueb->abgabe && !$ueb->beispiele)
-				{							
+				{
 					if ($this->calc_note($ueb->uebung_id, $student_uid))
 					{
 						if (is_numeric($this->note))
 						{
 							if ($ueb->positiv && $this->note == 5)
-								$negativ = true;	
+								$negativ = true;
 							$note_x_gewicht += ($this->note * $this->gewicht);
 							$gewichte += $this->gewicht;
 						}
@@ -148,11 +149,11 @@ class studentnote extends basis_db
 				}
 				else
 				{
-					$this->calc_punkte($ueb->uebung_id, $student_uid);							
+					$this->calc_punkte($ueb->uebung_id, $student_uid);
 					$punkte_gesamt += $this->punkte_gesamt;
 					$punkte_mitarbeit += $this->punkte_mitarbeit;
 					$punkte_eingetragen += $this->punkte_eingetragen;
-					$beispiele = true;					
+					$beispiele = true;
 				}
 			}
 			
@@ -166,16 +167,16 @@ class studentnote extends basis_db
 			{
 				
 				if ($ueb1->prozent == 't')
-				{					
+				{
 					$qry = "SELECT sum(tbl_beispiel.punkte) as punktegesamt_alle FROM campus.tbl_beispiel, campus.tbl_uebung
 							WHERE tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
 							tbl_uebung.lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER)." and tbl_uebung.liste_id = ".$this->db_add_param($ueb1->uebung_id, FHC_INTEGER);
 					$punkte_moeglich=1;
 					if($this->db_query($qry))
 						if($row = $this->db_fetch_object())
-							$punkte_moeglich = $row->punktegesamt_alle;					
+							$punkte_moeglich = $row->punktegesamt_alle;
 					if ($punkte_moeglich == 0)
-						$punkte_moeglich = 1;						
+						$punkte_moeglich = 1;
 					$punkte_ns = $punkte_gesamt/$punkte_moeglich*100;
 				}
 				else
@@ -186,29 +187,29 @@ class studentnote extends basis_db
 				
 				if($this->db_query($qry))
 				{
-                	if($row = $this->db_fetch_object())
-	                	$note = $row->note;
+					if($row = $this->db_fetch_object())
+						$note = $row->note;
 					else
 						$note = 5;
 				}
 				if ($ueb1->positiv && ($note == 5))
-					$negativ = true;					
-				$l1_note = $note;					
+					$negativ = true;
+				$l1_note = $note;
 				
-				if ($note != null)					
+				if ($note != null)
 					$l1_gewicht = $ueb1->gewicht;
 				else
-					$l1_gewicht = 0;				
+					$l1_gewicht = 0;
 			}
 			if ($ueb1->positiv && $beispiele && ($punkte_gesamt == 0))
 				$negativ = true;
 		}
 		else
 		{
-			$s = new uebung();					
+			$s = new uebung();
 			$s->load_studentuebung($student_uid, $ueb1->uebung_id);
 			if ($s->note && $ueb1->gewicht)
-			{					
+			{
 				if ($s->note == 5 && $ueb1->positiv)
 					$negativ = true;
 				$l1_note= $s->note;
@@ -223,7 +224,7 @@ class studentnote extends basis_db
 		}
 		
 		if ($l1_gewicht > 0)
-		{					
+		{
 			$this->l1_note = $l1_note;
 			$this->l1_gewicht = $l1_gewicht;
 			$this->negativ = $negativ;
@@ -267,17 +268,17 @@ class studentnote extends basis_db
 			$ueb->load($uebung_id);
 			
 			if($ueb->load_studentuebung($student_uid, $uebung_id))
-        	{
-	        	$this->note = $ueb->note;
+			{
+				$this->note = $ueb->note;
 				$this->gewicht = $ueb->gewicht;
 				return true;
-        	}
-            else
-            {
+			}
+			else
+			{
 				$this->note = null;
-				$this->gewicht = 0;	            
-	            return true;
-	        }	
+				$this->gewicht = 0;
+				return true;
+			}
 		}
 	}
 
@@ -311,9 +312,9 @@ class studentnote extends basis_db
 					$punkte_eingetragen = ($row->punkteeingetragen!=''?$row->punkteeingetragen:0);
 			
 			if($ueb->load_studentuebung($student_uid, $uebung_id))
-            {
-            	$mitarbeit = $ueb->mitarbeitspunkte;
-            }
+			{
+				$mitarbeit = $ueb->mitarbeitspunkte;
+			}
 
 			$punkte_gesamt = $punkte_eingetragen + $mitarbeit;
 
@@ -321,8 +322,7 @@ class studentnote extends basis_db
 			$this->punkte_eingetragen = $punkte_eingetragen;
 			$this->punkte_mitarbeit = $mitarbeit;
 			return true;
-		}		
+		}
 	}
-
 }
 ?>

@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../../../config/cis.config.inc.php');
@@ -31,6 +32,7 @@ require_once('../../../../include/benutzerberechtigung.class.php');
 require_once('../../../../include/uebung.class.php');
 require_once('../../../../include/beispiel.class.php');
 require_once('../../../../include/datum.class.php');
+require_once('../../../../include/student.class.php');
 include_once('../../../../include/Excel/excel.php');
 
 if (!$db = new basis_db())
@@ -214,7 +216,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				$gruppe_bez = 'Alle Studienrende';
 				//Alle Studenten die dieser Lehreinheit zugeordnet sind
 				$qry_stud = "SELECT 
-								vw_student.uid, vorname, nachname, matrikelnr, 
+								vw_student.uid, vw_student.prestudent_id, vorname, nachname, matrikelnr,
 								tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe 
 							FROM 
 								campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe, 
@@ -284,7 +286,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				foreach($ueb_obj->uebungen as $row_ueb)
 				{
 					$qry = "SELECT sum(punkte) as punkte FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) 
-						WHERE uebung_id=".$db->db_add_param($row_ueb->uebung_id)." AND student_uid=".$db->db_add_param($row_stud->uid)." AND vorbereitet=true";
+						WHERE uebung_id=".$db->db_add_param($row_ueb->uebung_id)." AND prestudent_id=".$db->db_add_param($row_stud->prestudent_id, FHC_INTEGER)." AND vorbereitet=true";
 					if($result = $db->db_query($qry))
 					{
 						if($row = $db->db_fetch_object($result))
@@ -490,7 +492,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				foreach($beispiel_obj->beispiele as $row_bsp)
 				{
 					$studentbeispiel_obj = new beispiel();
-					$studentbeispiel_obj->load_studentbeispiel($row_stud->uid, $row_bsp->beispiel_id);
+					$studentbeispiel_obj->load_studentbeispiel($row_stud->prestudent_id, $row_bsp->beispiel_id);
 					if($studentbeispiel_obj->vorbereitet)
 						$punkte = $row_bsp->punkte;
 					else 
@@ -516,7 +518,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				
 				//punkte insgesamt
 				$qry = "SELECT sum(tbl_beispiel.punkte) AS gesamt_ohne_mitarbeit FROM campus.tbl_uebung, campus.tbl_beispiel, campus.tbl_studentbeispiel WHERE
-						tbl_studentbeispiel.student_uid=".$db->db_add_param($row_stud->uid)." AND
+						tbl_studentbeispiel.prestudent_id=".$db->db_add_param($row_stud->prestudent_id, FHC_INTEGER)." AND
 						tbl_studentbeispiel.vorbereitet=true AND
 						tbl_uebung.lehreinheit_id=".$db->db_add_param($uebung_obj->lehreinheit_id, FHC_INTEGER)." AND
 						tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
@@ -589,30 +591,34 @@ function addUser(student_uid)
 		{
 			if($uid!='')
 			{
-				if ($uebung_obj->beispiele)				
-				{				
+				if ($uebung_obj->beispiele)
+				{
 					foreach($beispiel_obj->beispiele as $bsp)
 					{
 						if(isset($_POST['update_'.$uid.'_'.$bsp->beispiel_id]))
 							$vorbereitet=true;
 						else 
 							$vorbereitet=false;
-							
+
+						if(!$student = new student($uid))
+							die("Der Student wurde nicht gefunden!");
+
 						$bsp_obj = new beispiel();
 						
-						if(!$bsp_obj->studentbeispiel_exists($uid,$bsp->beispiel_id))
+						if(!$bsp_obj->studentbeispiel_exists($student->prestudent_id,$bsp->beispiel_id))
 						{
 							$new=true;
 							$bsp_obj->insertamum = date('Y-m-d H:i:s');
 							$bsp_obj->insertvon = $user;
 						}
 						else 
-						{		
-							$bsp_obj->load_studentbeispiel($uid, $bsp->beispiel_id);
+						{
+							$bsp_obj->load_studentbeispiel($student->prestudent_id, $bsp->beispiel_id);
 							$new=false;
 						}
-							
-						$bsp_obj->student_uid = $uid;
+
+
+						$bsp_obj->prestudent_id = $student->prestudent_id;
 						$bsp_obj->beispiel_id = $bsp->beispiel_id;
 						$bsp_obj->vorbereitet = $vorbereitet;
 						$bsp_obj->updateamum = date('Y-m-d H:i:s');
@@ -638,20 +644,20 @@ function addUser(student_uid)
 						$uebung_obj->updatevon = null;
 						$uebung_obj->insertamum = date("Y-m-d H:i:s");
 						$uebung_obj->insertvon = $user;
-						$new = true;						
+						$new = true;
 					}
 					else
 					{
-						$uebung_obj->load_studentuebung($uid,$uebung_id);				
+						$uebung_obj->load_studentuebung($uid,$uebung_id);
 						$uebung_obj->mitarbeiter_uid = $user;
 						$uebung_obj->note = $_POST['update_'.$uid.'_note'];
 						$uebung_obj->benotungsdatum = date("Y-m-d H:i:s");
 						$uebung_obj->updateamum = date("Y-m-d H:i:s");
 						$uebung_obj->updatevon = $user;
-						$new = false;						
+						$new = false;
 					}
 					$uebung_obj->studentuebung_save($new);
-									
+
 				}
 			}
 		}
@@ -806,7 +812,7 @@ function addUser(student_uid)
 				foreach($beispiel_obj->beispiele as $row_bsp)
 				{
 					$studentbeispiel_obj = new beispiel();
-					$studentbeispiel_obj->load_studentbeispiel($row_stud->uid, $row_bsp->beispiel_id);
+					$studentbeispiel_obj->load_studentbeispiel($row_stud->prestudent_id, $row_bsp->beispiel_id);
 					echo "<td align='center'><input type='checkbox' name='update_".$row_stud->uid."_".$row_bsp->beispiel_id."' onClick=\"addUser('$row_stud->uid');\" ".($studentbeispiel_obj->vorbereitet?'checked':'').">".($studentbeispiel_obj->probleme?'<i><small>P</small></i>':'')."</td>\n";
 				}
 			}
