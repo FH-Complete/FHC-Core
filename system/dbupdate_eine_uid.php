@@ -38,6 +38,7 @@ array
 	"campus.tbl_lvgesamtnote",
 	"campus.tbl_studentbeispiel",
 	"campus.tbl_studentuebung",
+	"campus.tbl_legesamtnote",
 );
 
 if(!isset($_POST["action"]) || $_POST["action"] != "start")
