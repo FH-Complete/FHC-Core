@@ -38,7 +38,7 @@ class beispiel extends basis_db
 	public $insertvon;		// varchar(16)
 	public $nummer;			// smallint
 
-	public $prestudent_id	//integer;
+	public $prestudent_id;	//integer
 	public $vorbereitet;
 	public $probleme;
 

@@ -668,7 +668,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 						studiensemester_kurzbz = ".$db->db_add_param($stsem)."
 						AND lehrveranstaltung_id = ".$db->db_add_param($lvid, FHC_INTEGER)."
 					ORDER BY nachname, vorname ";
-        if($result_stud = $db->db_query($qry_stud))
+		if($result_stud = $db->db_query($qry_stud))
 		{
 			$i=1;
 			while($row_stud = $db->db_fetch_object($result_stud))
@@ -678,10 +678,10 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
     			{
 					if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)
 					{
-    					$lvgesamtnote->freigabedatum = $jetzt;
-    					$lvgesamtnote->freigabevon_uid = $user;
-    					$lvgesamtnote->save($new=null);
-    					$studlist .= "<tr><td>".trim($row_stud->matrikelnr)."</td>";
+						$lvgesamtnote->freigabedatum = $jetzt;
+						$lvgesamtnote->freigabevon_uid = $user;
+						$lvgesamtnote->save($new=null);
+						$studlist .= "<tr><td>".trim($row_stud->matrikelnr)."</td>";
 						$studlist .= "<td>".trim($row_stud->nachname)."</td>";
 						$studlist .= "<td>".trim($row_stud->vorname)."</td>";
 						if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
@@ -865,7 +865,7 @@ echo "
 
 		// studentenquery
 		$qry_stud = "SELECT
-						DISTINCT uid, vorname, nachname, matrikelnr
+						DISTINCT uid, prestudent_id, vorname, nachname, matrikelnr
 					FROM
 						campus.vw_student_lehrveranstaltung
 						JOIN campus.vw_student USING(uid)
@@ -873,8 +873,8 @@ echo "
 						studiensemester_kurzbz = ".$db->db_add_param($stsem)."
 						AND lehrveranstaltung_id = ".$db->db_add_param($lvid)."
 					ORDER BY nachname, vorname ";
-      	$mdldaten=null;
-	    if($result_stud = $db->db_query($qry_stud))
+		$mdldaten=null;
+		if($result_stud = $db->db_query($qry_stud))
 		{
 			$i=1;
 			$errorshown=false;
@@ -1027,13 +1027,13 @@ echo "
 					{
 						$legesamtnote = new legesamtnote($l->lehreinheit_id);
 
-		    			if (!$legesamtnote->load($row_stud->prestudent_id,$l->lehreinheit_id))
+						if (!$legesamtnote->load($row_stud->prestudent_id,$l->lehreinheit_id))
 						{
-		    				//$note_les_str .= "- (".$l->lehreinheit_id.")";
-		    			}
-		    			else
-		    			{
-		    				$note_le += $legesamtnote->note;
+							//$note_les_str .= "- (".$l->lehreinheit_id.")";
+						}
+						else
+						{
+							$note_le += $legesamtnote->note;
 
 							$gewicht = $l->gewicht;
 							if($l->gewicht=='')
