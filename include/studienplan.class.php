@@ -609,8 +609,8 @@ class studienplan extends basis_db
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->sort = $row->sort;
-				$this->curriculum = $row->curriculum;
-				$this->export = $row->export;
+				$this->curriculum = $this->db_parse_bool($row->curriculum);
+				$this->export = $this->db_parse_bool($row->export);
 				$this->new=false;
 				return true;
 			}
