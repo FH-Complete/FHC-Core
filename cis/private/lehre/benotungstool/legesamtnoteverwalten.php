@@ -420,7 +420,7 @@ echo "
 */
 
 // studentenquery		
-$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = ".$db->db_add_param($stsem)." and lehreinheit_id = ".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." ORDER BY nachname, vorname";
+$qry_stud = "SELECT uid, prestudent_id, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = ".$db->db_add_param($stsem)." and lehreinheit_id = ".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." ORDER BY nachname, vorname";
 
 if($result_stud = $db->db_query($qry_stud))
 {

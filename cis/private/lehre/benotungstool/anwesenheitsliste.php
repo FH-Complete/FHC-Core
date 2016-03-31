@@ -432,7 +432,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				$lehreinheit_id = $_GET['lehreinheit_id'];
 				$gruppe_bez = 'Alle Studienrende';
 
-				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) 
+				$qry_stud = "SELECT uid, prestudent_id, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid)
 				WHERE  studiensemester_kurzbz = ".$db->db_add_param($stsem)." AND lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." ORDER BY nachname, vorname";
 			
 				//Alle Studenten die dieser Lehreinheit zugeordnet sind
@@ -585,7 +585,7 @@ function addUser(student_uid)
 	if(isset($_POST['submit']))
 	{		
 		//Update der Daten
-		$uids = split('#',$_POST['update_ids']);
+		$uids = explode('#',$_POST['update_ids']);
 		
 		$uebung_obj = new uebung($uebung_id);
 		$beispiel_obj = new beispiel();
@@ -729,7 +729,7 @@ function addUser(student_uid)
 			$gruppe_bez = 'Alle Studierende';
 			//Alle Studenten die dieser lehreinheit zugeordnet sind
 			// studentenquery		
-			$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) 
+			$qry_stud = "SELECT uid, prestudent_id, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid)
 			WHERE  studiensemester_kurzbz = ".$db->db_add_param($stsem)." AND lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." ORDER BY nachname, vorname";
 			/*		
 			$qry_stud = "SELECT vw_student.uid, vorname, nachname FROM campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe 

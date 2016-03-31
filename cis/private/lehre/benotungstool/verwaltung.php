@@ -425,16 +425,16 @@ if (isset($_REQUEST["copy_uebung"]))
 						$ueb_2_target->defaultbemerkung = $subrow->defaultbemerkung;
 						$ueb_2_target->lehreinheit_id = $lehreinheit_id_target;
 						$ueb_2_target->nummer = $nummer_source2;
-								
+
 						if (!$ueb_2_target->save($new))
 						{
 							$error = 1;
 							echo "<span class='error'>".$p->t('benotungstool/uebungKonnteNichtKopiertWerden')."!</span>";
 						}
-						
+
 						//angabedatei syncen
 						if ($subrow->angabedatei != "")
-						{	
+						{
 							$angabedatei_source = $subrow->angabedatei;
 							$angabedatei_target = makeUploadName($db, 'angabe', $lehreinheit_id, $ueb_2_target->uebung_id, $stsem);
 							$angabedatei_target .= ".".mb_substr($angabedatei_source, mb_strrpos($angabedatei_source, '.') + 1);
@@ -443,7 +443,7 @@ if (isset($_REQUEST["copy_uebung"]))
 							$angabeupdate = "update campus.tbl_uebung set angabedatei = ".$db->db_add_param($angabedatei_target)." where uebung_id = ".$db->db_add_param($ueb_2_target->uebung_id, FHC_INTEGER);
 							$db->db_query($angabeupdate);
 						}
-										
+
 						if (($error == 0) and $ueb_2_target->beispiele)
 						{
 							// beispiele synchronisieren
@@ -486,9 +486,9 @@ if (isset($_REQUEST["copy_uebung"]))
 								if (!$bsp_target->save($new))
 								{
 									$error = 1;
-									echo "<span class='error'>".$p->t('benotungstool/beispieleKonntenNichtAngelegtWerden')."</span>";							
+									echo "<span class='error'>".$p->t('benotungstool/beispieleKonntenNichtAngelegtWerden')."</span>";
 								}
-								
+
 								//Notenschlüssel synchronisieren
 								$clear = "delete from campus.tbl_notenschluesseluebung where uebung_id = ".$db->db_add_param($ueb_1_target->uebung_id, FHC_INTEGER);
 								$db->db_query($clear);
@@ -498,12 +498,10 @@ if (isset($_REQUEST["copy_uebung"]))
 								while($row_ns = $db->db_fetch_object($result_ns_source))
 								{
 									$ns_insert = "INSERT INTO campus.tbl_notenschluesseluebung values (".$db->db_add_param($ueb_1_target->uebung_id).",".$db->db_add_param($row_ns->note).", ".$db->db_add_param($row_ns->punkte).")";
-									$db->db_query($ns_insert);					
-								}					
-											
-							}									
+									$db->db_query($ns_insert);
+								}
+							}
 						}
-							
 					}
 				}
 			}
@@ -565,7 +563,7 @@ if(isset($_POST['uebung_neu']))
 			$uebung_obj->statistik = false;
 			$uebung_obj->liste_id = null;
 			$uebung_obj->get_next_nummer();
-			$uebung_obj->nummer = $uebung_obj->next_nummer;			
+			$uebung_obj->nummer = $uebung_obj->next_nummer;
 			
 			if($uebung_obj->save(true))
 			{
