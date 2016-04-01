@@ -896,12 +896,17 @@ class studienplan extends basis_db
 					$this->db_add_param($key["ausbildungssemester"]) . '); ';
 			}
 
-			if (!$this->db_query($qry))
+			if($qry!='')
 			{
-				$this->errormsg = 'Fehler beim Speichern des Datensatzes';
-				return false;
+				if (!$this->db_query($qry))
+				{
+					$this->errormsg = 'Fehler beim Speichern des Datensatzes';
+					return false;
+				}
+				return true;
 			}
-			return true;
+			else
+				return true;
 		}
 		else
 		{
