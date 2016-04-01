@@ -1299,7 +1299,7 @@ class lehrveranstaltung extends basis_db
 	/**
 	 * Generiert die Subtrees des Lehrveranstaltungstrees
 	 */
-	protected function getLehrveranstaltungTreeChilds($studienplan_lehrveranstaltung_id)
+	public function getLehrveranstaltungTreeChilds($studienplan_lehrveranstaltung_id)
 	{
 		$childs = array();
 		foreach ($this->lehrveranstaltungen as $row)
