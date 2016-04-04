@@ -34,14 +34,14 @@ echo '<html>
 $all_tables_to_update =
 array
 (
-	"bis.tbl_bisio",
-	"campus.tbl_lvgesamtnote",
-	"campus.tbl_studentbeispiel",
-	"campus.tbl_studentuebung",
-	"campus.tbl_legesamtnote",
+	array("schema" => "bis", "name" => "tbl_bisio"),
+	array("schema" => "campus", "name" => "tbl_lvgesamtnote"),
+	array("schema" => "campus", "name" => "tbl_studentbeispiel"),
+	array("schema" => "campus", "name" => "tbl_studentuebung"),
+	array("schema" => "campus", "name" => "tbl_legesamtnote"),
 );
 
-if(!isset($_POST["action"]) || $_POST["action"] != "start")
+if(!isset($_POST["action"]))
 {
 	$needed = false;
 	foreach($all_tables_to_update as $t)
@@ -62,14 +62,42 @@ if(!isset($_POST["action"]) || $_POST["action"] != "start")
 			describeOneChange($db, $t);
 
 		echo "</p>";
-		echo "<form action='dbupdate_eine_uid.php' method='POST' name='startform'><input type='submit' value='start' name='action'></form>";
+		echo "
+		<form action='dbupdate_eine_uid.php' method='POST' name='startform'>
+			<input type='submit' value='Starten' name='action'>
+			<input type='submit' value='Testen' name='action'>
+		</form>";
 	}
 	else
 	{
 		echo "<h2>Es sind keine Änderungen vorzunehmen!</h2>";
 	}
 }
-else
+else if($_POST["action"] == "Testen")
+{
+
+	echo '<H1>Systemcheck!</H1>';
+	echo '<H2>DB-Updates!</H2>';
+
+
+	// *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
+	echo '<H2>Pruefe Tabellen und Attribute!</H2>';
+
+	//modify all tables
+	foreach($all_tables_to_update as $t)
+		modifyOneTable($db, $t, false);
+
+
+
+	echo "
+	<form action='dbupdate_eine_uid.php' method='POST' name='startform'>
+		<input type='submit' value='Starten' name='action'>
+		<input type='submit' value='Testen' name='action'>
+	</form>";
+
+
+}
+else if($_POST["action"] == "Starten")
 {
 
 	echo '<H1>Systemcheck!</H1>';
@@ -80,23 +108,115 @@ else
 	echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
 
+
+	//********************************DROP ALL VIEWS********************************
+	if(!$db->db_query("DROP VIEW bis.vw_bisio"))
+	{
+		echo "<p>Could not DROP view bis.vw_bisio: " . $create_view_qry."</p>";
+	}
+
+
+	//modify all tables
 	foreach($all_tables_to_update as $t)
-	modifyOneTable($db, $t);
+		modifyOneTable($db, $t, true);
+
+
+
+
+
+
+
+	//********************************CREATE ALL VIEWS AGAIN********************************
+
+	$create_view_qry = "
+		CREATE VIEW bis.vw_bisio AS SELECT tbl_prestudentstatus.studiensemester_kurzbz,
+			tbl_prestudentstatus.status_kurzbz,
+			tbl_prestudent.person_id,
+			tbl_prestudent.prestudent_id,
+			tbl_bisio.bisio_id,
+			tbl_bisio.mobilitaetsprogramm_code,
+			tbl_bisio.nation_code,
+			tbl_bisio.von,
+			tbl_bisio.bis,
+			tbl_bisio.zweck_code,
+			tbl_bisio.ort,
+			tbl_bisio.universitaet,
+			tbl_bisio.lehreinheit_id,
+			tbl_student.matrikelnr,
+			tbl_student.student_uid,
+			tbl_prestudent.studiengang_kz,
+			tbl_student.semester,
+			tbl_prestudent.aufmerksamdurch_kurzbz,
+			tbl_prestudent.berufstaetigkeit_code,
+			tbl_prestudent.ausbildungcode,
+			tbl_prestudent.zgv_code,
+			tbl_prestudent.zgvort,
+			tbl_prestudent.zgvdatum,
+			tbl_prestudent.zgvmas_code,
+			tbl_prestudent.zgvmaort,
+			tbl_prestudent.zgvmadatum,
+			tbl_prestudent.aufnahmeschluessel,
+			tbl_prestudent.facheinschlberuf,
+			tbl_prestudent.reihungstest_id,
+			tbl_prestudent.anmeldungreihungstest,
+			tbl_prestudent.reihungstestangetreten,
+			tbl_prestudent.rt_gesamtpunkte,
+			tbl_prestudent.bismelden,
+			tbl_prestudent.dual,
+			tbl_prestudent.rt_punkte1,
+			tbl_prestudent.rt_punkte2,
+			tbl_prestudent.ausstellungsstaat,
+			tbl_prestudent.rt_punkte3,
+			tbl_prestudent.zgvdoktor_code,
+			tbl_prestudent.zgvdoktorort,
+			tbl_prestudent.zgvdoktordatum,
+			tbl_prestudent.mentor,
+			tbl_prestudent.zgvnation,
+			tbl_prestudent.zgvmanation,
+			tbl_prestudent.zgvdoktornation,
+			tbl_prestudentstatus.ausbildungssemester,
+			tbl_prestudentstatus.datum,
+			tbl_prestudentstatus.orgform_kurzbz,
+			tbl_prestudentstatus.studienplan_id,
+			tbl_prestudentstatus.bestaetigtam,
+			tbl_prestudentstatus.bestaetigtvon,
+			tbl_prestudentstatus.fgm,
+			tbl_prestudentstatus.faktiv,
+			tbl_prestudentstatus.bewerbung_abgeschicktamum
+		FROM bis.tbl_bisio
+			JOIN tbl_student USING (prestudent_id)
+			JOIN tbl_prestudent USING (prestudent_id)
+			LEFT JOIN tbl_prestudentstatus ON tbl_prestudent.prestudent_id = tbl_prestudentstatus.prestudent_id AND (tbl_prestudentstatus.status_kurzbz::text = 'Incoming'::text OR tbl_prestudentstatus.status_kurzbz::text = 'Outgoing'::text);
+		COMMENT ON VIEW bis.vw_bisio IS 'Incoming Outgoing';";
+		if(!$db->db_query($create_view_qry))
+		{
+			echo "<p>Could not CREATE view bis.vw_bisio: " . $create_view_qry."</p>";
+		}
+
 }
 
 
-function describeOneChange($db, $tablename)
+
+
+echo '</body></html>';
+
+
+
+
+/* FUNCTIONS */
+function describeOneChange($db, $table)
 {
-	if(!$result = @$db->db_query("SELECT prestudent_id FROM ".$tablename." LIMIT 1;"))
+
+	if(!$result = @$db->db_query("SELECT prestudent_id FROM ".$table["schema"].".".$table["name"]." LIMIT 1;"))
 	{
-		echo "<div>".$tablename.": student_uid wird <strong style='color:red;'>gelöscht</strong>!</div>";
-		echo "<div>".$tablename.": prestudent_id wird <strong style='color:green;'>eingefügt</strong>!</div>";
+		echo "<div>".$table["schema"].".".$table["name"].": student_uid wird <strong style='color:red;'>gelöscht</strong>!</div>";
+		echo "<div>".$table["schema"].".".$table["name"].": prestudent_id wird <strong style='color:green;'>eingefügt</strong>!</div>";
 	}
 }
 
-function checkForUpdates($db, $tablename)
+function checkForUpdates($db, $table)
 {
-	if(!$result = @$db->db_query("SELECT prestudent_id FROM ".$tablename." LIMIT 1;"))
+	if(!$result = @$db->db_query("SELECT prestudent_id FROM ".$table["schema"].".".$table["name"]." LIMIT 1;"))
 	{
 		return true;
 	}
@@ -104,89 +224,121 @@ function checkForUpdates($db, $tablename)
 }
 
 
-function modifyOneTable($db, $tablename)
+function modifyOneTable($db, $table, $permanent)
 {
-	if(!$result = @$db->db_query("SELECT prestudent_id FROM ".$tablename." LIMIT 1;"))
+	if(!$result = @$db->db_query("SELECT prestudent_id FROM ".$table["schema"].".".$table["name"]." LIMIT 1;"))
 	{
-		//spalte einfuegen
-		$add_qry = 'BEGIN; ALTER TABLE '.$tablename.' ADD COLUMN prestudent_id int;
-		UPDATE '.$tablename.' SET prestudent_id = (SELECT prestudent_id FROM public.tbl_student WHERE student_uid='.$tablename.'.student_uid);';
-		$db->db_query($add_qry);
+		$db->db_query("BEGIN;");
 
-		//constraints: prestudent_id FK, prestudent_id NOT NULL
-		$constraint_qry = 'ALTER TABLE '.$tablename.' ALTER COLUMN prestudent_id SET NOT NULL;
-			ALTER TABLE '.$tablename.' ADD CONSTRAINT prestudent_id FOREIGN KEY (prestudent_id) REFERENCES public.tbl_prestudent (prestudent_id);';
+		$indices = array();
+		$primary_keys = array();
 
-		if(!$db->db_query($constraint_qry))
+		$index_search_result = $db->db_query("SELECT * FROM pg_indexes WHERE schemaname=".$db->db_add_param($table["schema"])." AND tablename=".$db->db_add_param($table["name"]));
+		while($row = $db->db_fetch_object($index_search_result))
 		{
-			echo '<strong>'.$tablename.': '.$db->db_last_error().'</strong><br>';
-		}
-		else
-		{
-			echo ' '.$tablename.': Spalte prestudent_id hinzugefuegt!<br>';
-			echo ' '.$tablename.': Spalte student_uid auf prestudent_id geändert!<br>';
-			echo ' '.$tablename.': Spalte prestudent_id constraints eingefuegt!<br>';
+			$check_if_pk_result = $db->db_query("select * from pg_constraint where conname=".$db->db_add_param($row->indexname));
 
-		//student_uid löschen
-			$qry = 'ALTER TABLE '.$tablename.' DROP COLUMN student_uid;';
-
-			if(!$db->db_query($qry))
+			if($db->db_num_rows($check_if_pk_result) == 1)
 			{
-				echo '<strong>'.$tablename.': '.$db->db_last_error().'</strong><br>';
-				echo '<strong>'.$tablename.': ACHTUNG! In diesem Fall sollte prestudent_id ordnungsgemäß eingetragen sein, jedoch student_uid nicht gelöscht worden sein. Das Skript erneut zu starten wird nicht funktionieren!</strong><br>';
+
+				$get_definition_result = $db->db_query(
+					"SELECT conrelid::regclass AS table_from
+						,conname
+						,pg_get_constraintdef(c.oid)
+						FROM pg_constraint c
+						JOIN pg_namespace n ON n.oid = c.connamespace
+					WHERE contype IN ('f', 'p ')
+						AND n.nspname = ".$db->db_add_param($row->schemaname)."
+						AND conname = ".$db->db_add_param($row->indexname)."
+						ORDER BY conrelid::regclass::text, contype DESC;");
+				$def = $db->db_fetch_object($get_definition_result);
+
+				if(!$index_drop_result = $db->db_query('ALTER TABLE '.$table["schema"].".".$table["name"].' DROP CONSTRAINT '.$row->indexname))
+				{
+					echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
+					$db->db_query("ROLLBACK;");
+					return;
+				}
+
+				$constraint_add_query = str_replace ( "student_uid" , "prestudent_id" , $def->pg_get_constraintdef );
+				$primary_keys[] = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT '.$row->indexname.' '.$constraint_add_query;
 			}
 			else
 			{
-				echo ' '.$tablename.': Spalte student_uid gelöscht!<br>';
-				$db->db_query("COMMIT;");
+				if(!$index_drop_result = $db->db_query('ALTER TABLE '.$table["schema"].".".$table["name"].' DROP INDEX '.$row->indexname))
+				{
+					echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
+					$db->db_query("ROLLBACK;");
+					return;
+				}
+
+				$index_add_query = str_replace ( "student_uid" , "prestudent_id" , $row->indexdef );
+				$indices[] = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT '.$row->indexname.' '.$index_add_query;
+			}
+		}
+
+
+
+		//spalte einfuegen
+		$add_qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ADD COLUMN prestudent_id int;
+		UPDATE '.$table["schema"].".".$table["name"].' SET prestudent_id = (SELECT prestudent_id FROM public.tbl_student WHERE student_uid='.$table["schema"].".".$table["name"].'.student_uid);';
+		$db->db_query($add_qry);
+
+		//constraints: prestudent_id FK, prestudent_id NOT NULL
+		$constraint_qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ALTER COLUMN prestudent_id SET NOT NULL;
+			ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT fk_'.$table["name"].'_tbl_prestudent_prestudent_id FOREIGN KEY (prestudent_id) REFERENCES public.tbl_prestudent (prestudent_id);';
+
+		if(!$db->db_query($constraint_qry))
+		{
+			echo '<strong>'.$table["schema"].".".$table["name"].': '.$db->db_last_error().'</strong><br>';
+		}
+		else
+		{
+			echo ' '.$table["schema"].".".$table["name"].': Spalte prestudent_id hinzugefuegt!<br>';
+			echo ' '.$table["schema"].".".$table["name"].': Spalte student_uid auf prestudent_id geändert!<br>';
+			echo ' '.$table["schema"].".".$table["name"].': Spalte prestudent_id constraints eingefuegt!<br>';
+
+		//student_uid löschen
+			$qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' DROP COLUMN student_uid;';
+
+			if(!$db->db_query($qry))
+			{
+				echo '<strong>'.$table["schema"].".".$table["name"].': '.$db->db_last_error().'</strong><br>';
+				echo '<strong>'.$table["schema"].".".$table["name"].': ACHTUNG! In diesem Fall sollte prestudent_id ordnungsgemäß eingetragen sein, jedoch student_uid nicht gelöscht worden sein. Das Skript erneut zu starten wird nicht funktionieren!</strong><br>';
+			}
+			else
+			{
+				echo ' '.$table["schema"].".".$table["name"].': Spalte student_uid gelöscht!<br>';
+
+				foreach( $primary_keys as $pk)
+				{
+					if(!$index_drop_result = $db->db_query($pk))
+					{
+						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von  INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
+						$db->db_query("ROLLBACK;");
+						return;
+					}
+				}
+				foreach( $indices as $ind)
+				{
+					if(!$index_drop_result = $db->db_query($ind))
+					{
+						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von  INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
+						$db->db_query("ROLLBACK;");
+						return;
+					}
+				}
+
+
+				if(!$permanent)
+					$db->db_query("ROLLBACK;");
+				else
+					$db->db_query("COMMIT;");
 				return;
 			}
 		}
 	}
-	$db->db_query("ROLLBACK;");
 }
 
 
-
-
-
-$tabellen=array(
-	"bis.tbl_bisio"  => array("bisio_id","mobilitaetsprogramm_code","nation_code","von","bis","zweck_code","updateamum","updatevon","insertamum","insertvon", "ext_id","ort","universitaet","lehreinheit_id","prestudent_id"),
-	"campus.tbl_lvgesamtnote"  => array("lehrveranstaltung_id","studiensemester_kurzbz","note","mitarbeiter_uid","benotungsdatum","freigabedatum","bemerkung","freigabevon_uid","prestudent_id","punkte","ext_id","updateamum","updatevon","insertamum","insertvon"),
-);
-
-echo '<H2>Gegenpruefung!</H2>';
-$error=false;
-$sql_query="SELECT schemaname,tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND schemaname != 'sync' AND schemaname != 'addon';";
-if (!$result=@$db->db_query($sql_query))
-		echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
-	else
-		while ($row=$db->db_fetch_object($result))
-		{
-			$fulltablename=$row->schemaname.'.'.$row->tablename;
-			if (isset($tabellen[$fulltablename]))
-				if (!$result_fields=@$db->db_query("SELECT * FROM $fulltablename LIMIT 1;"))
-					echo '<BR><strong>'.$db->db_last_error().' </strong><BR>';
-				else
-					for ($i=0; $i<$db->db_num_fields($result_fields); $i++)
-					{
-						$found=false;
-						$fieldnameDB=$db->db_field_name($result_fields,$i);
-						foreach ($tabellen[$fulltablename] AS $fieldnameARRAY)
-							if ($fieldnameDB==$fieldnameARRAY)
-							{
-								$found=true;
-								break;
-							}
-						if (!$found)
-						{
-							echo 'Attribut '.$fulltablename.'.<strong>'.$fieldnameDB.'</strong> existiert in der DB, aber nicht in diesem Skript!<BR>';
-							$error=true;
-						}
-					}
-		}
-if($error==false)
-	echo '<br>Gegenpruefung fehlerfrei';
-
-echo '</body></html>';
 ?>
