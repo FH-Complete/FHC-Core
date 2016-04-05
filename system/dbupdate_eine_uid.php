@@ -65,37 +65,12 @@ if(!isset($_POST["action"]))
 		echo "
 		<form action='dbupdate_eine_uid.php' method='POST' name='startform'>
 			<input type='submit' value='Starten' name='action'>
-			<input type='submit' value='Testen' name='action'>
 		</form>";
 	}
 	else
 	{
 		echo "<h2>Es sind keine Änderungen vorzunehmen!</h2>";
 	}
-}
-else if($_POST["action"] == "Testen")
-{
-
-	echo '<H1>Systemcheck!</H1>';
-	echo '<H2>DB-Updates!</H2>';
-
-
-	// *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
-	echo '<H2>Pruefe Tabellen und Attribute!</H2>';
-
-	//modify all tables
-	foreach($all_tables_to_update as $t)
-		modifyOneTable($db, $t, false);
-
-
-
-	echo "
-	<form action='dbupdate_eine_uid.php' method='POST' name='startform'>
-		<input type='submit' value='Starten' name='action'>
-		<input type='submit' value='Testen' name='action'>
-	</form>";
-
-
 }
 else if($_POST["action"] == "Starten")
 {
@@ -118,7 +93,7 @@ else if($_POST["action"] == "Starten")
 
 	//modify all tables
 	foreach($all_tables_to_update as $t)
-		modifyOneTable($db, $t, true);
+		modifyOneTable($db, $t);
 
 
 
@@ -224,7 +199,7 @@ function checkForUpdates($db, $table)
 }
 
 
-function modifyOneTable($db, $table, $permanent)
+function modifyOneTable($db, $table)
 {
 	if(!$result = @$db->db_query("SELECT prestudent_id FROM ".$table["schema"].".".$table["name"]." LIMIT 1;"))
 	{
@@ -329,11 +304,7 @@ function modifyOneTable($db, $table, $permanent)
 					}
 				}
 
-
-				if(!$permanent)
-					$db->db_query("ROLLBACK;");
-				else
-					$db->db_query("COMMIT;");
+				$db->db_query("COMMIT;");
 				return;
 			}
 		}
