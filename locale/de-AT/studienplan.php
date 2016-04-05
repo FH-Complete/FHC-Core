@@ -15,6 +15,7 @@ $this->phrasen['studienplan/legende']='Legende';
 $this->phrasen['studienplan/legendeLVwirdAngeboten']='Lehrveranstaltung wird in diesem Semester angeboten';
 $this->phrasen['studienplan/legendeLock']='Lehrveranstaltung für dieses Semester gesperrt';
 $this->phrasen['studienplan/legendeEmpfehlung']='Empfehlung';
+$this->phrasen['studienplan/legendeAngemeldet']='angemeldet';
 $this->phrasen['studienplan/LehrveranstalungWaehlen']='Bitte wählen Sie die Lehrveranstaltung zu der Sie sich anmelden möchten:';
 $this->phrasen['studienplan/AnmeldungDerzeitNichtMoeglich']='Derzeit sind noch keine Anmeldungen moeglich';
 $this->phrasen['studienplan/bereitsAngemeldet']='Sie sind bereits zu dieser Lehrveranstaltung angemeldet';
@@ -24,4 +25,3 @@ $this->phrasen['studienplan/einschreibungErfolgreich']='Sie wurden erfolgreich i
 $this->phrasen['studienplan/AnmeldungNichtMoeglich']='Keine Anmeldung moeglich';
 $this->phrasen['studienplan/regelabgeschlossen']='abgeschlossen';
 ?>
-
