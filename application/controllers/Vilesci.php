@@ -20,7 +20,7 @@ class Vilesci extends CI_Controller {
 	 */
 	public function index()
 	{
-		if ($this->dbupdate())
+		if (false)//$this->dbupdate())
 			echo 'System-DB needs update!';
 		else
 		{

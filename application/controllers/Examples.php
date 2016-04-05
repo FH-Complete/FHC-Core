@@ -73,12 +73,12 @@ class Examples extends CI_Controller {
 			$crud = new grocery_CRUD();
 
 			$crud->set_table('customers');
-			$crud->columns('customerName','contactLastName','phone','city','country','salesRepEmployeeNumber','creditLimit');
-			$crud->display_as('salesRepEmployeeNumber','from Employeer')
-				 ->display_as('customerName','Name')
-				 ->display_as('contactLastName','Last Name');
+			$crud->columns('customername','contactlastname','phone','city','country','salesrepemployeenumber','creditlimit');
+			$crud->display_as('salesrepemployeenumber','from Employeer')
+				 ->display_as('customername','Name')
+				 ->display_as('contactlastname','Last Name');
 			$crud->set_subject('Customer');
-			$crud->set_relation('salesRepEmployeeNumber','employees','lastName');
+			$crud->set_relation('salesrepemployeenumber','employees','lastname');
 
 			$output = $crud->render();
 

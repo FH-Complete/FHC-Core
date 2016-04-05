@@ -38,9 +38,14 @@ class Migration_Add_apikey extends CI_Migration {
             	$this->dbforge->create_table('ci_apikey');
     		}
 
-			if (!$this->db->simple_query("INSERT INTO ci_apikey (key) VALUES ('aufnahme@fhcomplete.org');"))
+			if (!$this->db->simple_query('GRANT SELECT ON public.ci_apikey TO vilesci;'))
 			{
-					echo "Error DB-Insert!";
+					echo 'Error GRANT to vilesci!';
+			}
+
+			if (!$this->db->simple_query("INSERT INTO ci_apikey (key) VALUES ('testapikey@fhcomplete.org'); INSERT INTO ci_apikey (key) VALUES ('aufnahme@fhcomplete.org');"))
+			{
+					echo 'Error DB-Insert!';
 			}
         }
 
