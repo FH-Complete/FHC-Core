@@ -76,7 +76,7 @@ if($stsem!='' && !check_stsem($stsem))
 $datum_obj = new datum();
 
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
-$uid = (isset($_GET['uid'])?$_GET['uid']:'');
+$prestudent_id = (isset($_GET['prestudent_id'])?$_GET['prestudent_id']:'');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -132,23 +132,23 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
         	alert("Fehler beim Erstellen des Anfrageobjekts!");
     }
    
-   function saveLENote(uid)
+   function saveLENote(prestudent_id)
    {
-		note = document.getElementById(uid).note.value;	
+		note = document.getElementById(prestudent_id).note.value;
 		if ((note < 0) || (note > 5 && note != 8 && note != 7 && note!=16))
 		{
 			alert("<?php echo $p->t('benotungstool/noteEingeben');?>");
-			document.getElementById(uid).note.value="";
+			document.getElementById(prestudent_id).note.value="";
 		}
 		else
 		{	
 			erzeugeAnfrage(); 
-		    //note = document.getElementById(uid).note.value;
-		    stud_uid = uid;
+		    //note = document.getElementById(prestudent_id).note.value;
+		    student_prestudent_id = prestudent_id;
 		    var jetzt = new Date();
 			var ts = jetzt.getTime();
 		    var url= '<?php echo "legesamtnoteeintragen.php?lvid=".addslashes($lvid)."&lehreinheit_id=".addslashes($lehreinheit_id)."&stsem=".addslashes($stsem); ?>';
-		    url += '&submit=1&student_uid='+uid+"&note="+note+"&"+ts;
+		    url += '&submit=1&prestudent_id='+prestudent_id+"&note="+note+"&"+ts;
 		    anfrage.open("GET", url, true);
 		    anfrage.onreadystatechange = updateSeite;
 		    anfrage.send(null);
@@ -161,13 +161,13 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 	    {
 	        if (anfrage.status == 200) 
 	        {
-	        	uid = stud_uid;
-				var note = document.getElementById(uid).note.value;
+	        	prestudent_id = student_prestudent_id;
+				var note = document.getElementById(prestudent_id).note.value;
 	            var resp = anfrage.responseText;
 	            if (resp == "neu" || resp == "update")
 	            {
 					            	
-	            	notentd = document.getElementById("note_"+uid);
+	            	notentd = document.getElementById("note_"+prestudent_id);
 	            	while (notentd.childNodes.length>0)
 	            	{
 						notentd.removeChild(notentd.lastChild);
@@ -178,7 +178,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
                  else
                  	{
 	                 	alert(resp);
-	                 	document.getElementById(uid).note.value="";
+	                 	document.getElementById(prestudent_id).note.value="";
                  	}
 	        } 
 	        else 
@@ -418,7 +418,7 @@ echo "
 */
 
 // studentenquery		
-$qry_stud = "SELECT uid, prestudent_id, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = ".$db->db_add_param($stsem)." and lehreinheit_id = ".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." ORDER BY nachname, vorname";
+$qry_stud = "SELECT uid, prestudent_id, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE studiensemester_kurzbz = ".$db->db_add_param($stsem)." and lehreinheit_id = ".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." ORDER BY nachname, vorname";
 
 if($result_stud = $db->db_query($qry_stud))
 {
@@ -471,12 +471,12 @@ if($result_stud = $db->db_query($qry_stud))
 					$note_final = null;
 			}
 		} 
-		echo "<form  accept-charset='UTF-8' name='$row_stud->uid' id='$row_stud->uid' method='POST' action='legesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='prestudent_id' value='$row_stud->prestudent_id'><input type='text' size='1' value='$note_final' name='note'><input type='button' value='->' onclick='saveLENote(\"$row_stud->uid\")'></td></form>";
+		echo "<form  accept-charset='UTF-8' name='$row_stud->uid' id='$row_stud->prestudent_id' method='POST' action='legesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='prestudent_id' value='$row_stud->prestudent_id'><input type='text' size='1' value='$note_final' name='note'><input type='button' value='->' onclick='saveLENote(\"$row_stud->prestudent_id\")'></td></form>";
 		if ($note == 5)
 			$negmarkier = " style='color:red; font-weight:bold;'";
 		else
 			$negmarkier = "";
-		echo "<td align='center' id='note_$row_stud->uid'><span".$negmarkier.">$note</span></td>";
+		echo "<td align='center' id='note_$row_stud->prestudent_id'><span".$negmarkier.">$note</span></td>";
 		echo "</tr>";
 		$i++;
 	}

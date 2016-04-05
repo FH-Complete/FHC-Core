@@ -35,6 +35,7 @@ require_once('../../../../include/datum.class.php');
 require_once('../../../../include/legesamtnote.class.php');
 require_once('../../../../include/lvgesamtnote.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
+require_once('../../../../include/student.class.php');
 
 $user = get_uid();
 
@@ -91,10 +92,10 @@ $note = $_REQUEST["note"];
 
 // lvgesamtnote für studenten speichern
 
-if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16))  ){
+if (isset($_REQUEST["submit"]) && ($_REQUEST["prestudent_id"] != '') && ((($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16))  ){
 	
 	$jetzt = date("Y-m-d H:i:s");	
-	$student_uid = $_REQUEST["student_uid"];
+	$prestudent_id = $_REQUEST["prestudent_id"];
 
 	if(!$student = new student($user))
 		die("Der Student wurde nicht gefunden!");
