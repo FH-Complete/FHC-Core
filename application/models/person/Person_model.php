@@ -10,7 +10,7 @@ class Person_model extends DB_Model
 	{
 		    if (is_null($person_id))
 		    {
-		            $query = $this->db->get_where('public.tbl_person', array('vorname' => 'Christian'));
+		            $query = $this->db->get_where('public.tbl_person', array());
 		            return $query->result_object();
 		    }
 

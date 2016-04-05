@@ -53,7 +53,7 @@
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
-	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'production');
+	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 /*
  *---------------------------------------------------------------
  * ERROR REPORTING
@@ -304,7 +304,7 @@ $loader=new CI_Loader();
 require_once(dirname(__FILE__).'/vendor/codeigniter/framework/system/core/Controller.php');
 $controller=new CI_Controller();
 require_once(dirname(__FILE__).'/vendor/codeigniter/framework/system/core/Model.php');
-require_once(dirname(__FILE__).'/application/core/MY_Model.php');
+require_once(dirname(__FILE__).'/application/core/FHC_Model.php');
 $model=new CI_Model();
 
 // Traits
@@ -391,6 +391,11 @@ trait db_extra
 			return ($var!==''?$this->db_qoute($var):'null');
 		else
 			return ($var!==''?$var:'null');	
+	}
+	
+	public function db_qoute($var)
+	{
+		return "'".$var."'";
 	}
 	
 	public function db_parse_bool($var)
