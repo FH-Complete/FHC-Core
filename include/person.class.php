@@ -418,8 +418,8 @@ class person extends Person_model
 						$this->db_add_param($this->anrede).','.
 						$this->db_add_param($this->titelpost).','.
 				        $this->db_add_param($this->titelpre).','.
-				        $this->db_add_param($this->nachname, FHC_STRING).','.
-				        $this->db_add_param($this->vorname,FHC_STRING).','.
+				        $this->db_add_param($this->nachname).','.
+				        $this->db_add_param($this->vorname).','.
 				        $this->db_add_param($this->vornamen).','.
 				        $this->db_add_param($this->gebdatum).','.
 				        $this->db_add_param($this->gebort).','.
