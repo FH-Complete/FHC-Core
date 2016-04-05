@@ -22,7 +22,7 @@ class Person extends REST_Controller
     /**
      * Person API constructor.
      */
-    private function __construct()
+    public function __construct()
     {
         parent::__construct();
 

@@ -299,9 +299,12 @@ switch (ENVIRONMENT)
  *
  */
 
-// First load the FHC-Config-Files
+// First load the FHC-Config-Files ...
 require_once 'config/global.config.inc.php';
 require_once 'config/vilesci.config.inc.php';
+
+// ... and the vendor autoload
+include_once 'vendor/autoload.php';
 
 // Now the bootstrap file
 require_once BASEPATH.'core/CodeIgniter.php';

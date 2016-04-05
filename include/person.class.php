@@ -107,7 +107,7 @@ class person extends Person_model
 			}
 
 			if ($row = $this->db_fetch_object())*/
-			if ($row = $this->get_personen($personId))
+			if ($row = $this->getPerson($personId))
 			{
 				$this->person_id = $row->person_id;
 				$this->sprache = $row->sprache;

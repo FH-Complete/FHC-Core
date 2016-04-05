@@ -1,6 +1,6 @@
 <?php
 
-class Migrate extends CI_Controller
+class Migrate extends FHC_Controller
 {
 	private $class_version = '1.0';
 	private $cli = false;
@@ -20,14 +20,24 @@ class Migrate extends CI_Controller
 		}
 		$this->load->database('system'); //Use the system-Connection for DB-Manipulation
 		$this->load->library('migration');
+		$this->load->library('FHC_Seed');
 	}
         
+
+ public function help() {
+        $result = "The following are the available command line interface commands\n\n";
+        $result .= "php index.ci.php db migrate [\"version_number\"]    Run all migrations. The version number is optional.\n";
+        $result .= "php index.ci.php db seed \"file_name\"              Run the specified seed file. Filename is optional.\n";
+
+        echo $result . PHP_EOL;
+    }
+
 	/**
 	 * Migrate to latest or current version
 	 *
 	 * @param  string $version One of either "latest" or "current"
 	 */
-	public function index($version = 'latest')
+	public function migrate($version = 'latest')
     {
             
 	    if ($this->cli && $this->migration->current() === FALSE)
@@ -39,7 +49,7 @@ class Migrate extends CI_Controller
 			$this->_failed('Migration version must be either latest or current');
 		}
 
-		if (!$this->migration->$version())
+		if (!$this->migration->version())
 		{
 			$this->_failed();
 		}
@@ -96,6 +106,17 @@ class Migrate extends CI_Controller
 	{
 		$this->rollback(0);
 	}
+
+	/**
+	 * Seed DB with TestData
+	 *
+	 * @param  string $name Name of the SeedFile
+	 */
+
+	public function seed($name = null) 
+	{
+        $this->fhc_seed->seed($name);
+    }
 
 	/**
 	 * Yay, it worked! Tell the user.

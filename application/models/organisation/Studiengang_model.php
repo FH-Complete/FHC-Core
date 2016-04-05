@@ -3,11 +3,11 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class Studiengang_model extends CI_Model
+class Studiengang_model extends DB_Model
 {
 
-    public $table = 'tbl_studiengang';
-    public $id = '';
+    public $table = 'public.tbl_studiengang';
+    public $id = 'studiengang_kz';
     public $order = 'DESC';
 
     function __construct()
