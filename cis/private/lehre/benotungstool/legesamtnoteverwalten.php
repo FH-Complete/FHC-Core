@@ -324,16 +324,14 @@ echo "<br><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehrei
 */
 
 // legesamtnote für studenten speichern
-if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
+if (isset($_REQUEST["submit"]) && ($_POST["prestudent_id"] != '')){
 	
 	$jetzt = date("Y-m-d H:i:s");	
-	$student_uid = $_POST["student_uid"];	
+	$prestudent_id = $_POST["prestudent_id"];
 	$legesamtnote = new legesamtnote($lehreinheit_id);
 
-	if(!$student = new student($student_uid))
-		die($p->t('benotungstool/studentWurdeNichtGefunden'));
 
-	if (!$legesamtnote->load($student->prestudent_id,$lehreinheit_id))
+	if (!$legesamtnote->load($prestudent_id,$lehreinheit_id))
 	{
 		$legesamtnote->prestudent_id = $prestudent_id;
 		$legesamtnote->lehreinheit_id = $lehreinheit_id;
@@ -473,7 +471,7 @@ if($result_stud = $db->db_query($qry_stud))
 					$note_final = null;
 			}
 		} 
-		echo "<form  accept-charset='UTF-8' name='$row_stud->uid' id='$row_stud->uid' method='POST' action='legesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_final' name='note'><input type='button' value='->' onclick='saveLENote(\"$row_stud->uid\")'></td></form>";
+		echo "<form  accept-charset='UTF-8' name='$row_stud->uid' id='$row_stud->uid' method='POST' action='legesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='prestudent_id' value='$row_stud->prestudent_id'><input type='text' size='1' value='$note_final' name='note'><input type='button' value='->' onclick='saveLENote(\"$row_stud->uid\")'></td></form>";
 		if ($note == 5)
 			$negmarkier = " style='color:red; font-weight:bold;'";
 		else
