@@ -34,11 +34,11 @@ echo '<html>
 $all_tables_to_update =
 array
 (
-	array("schema" => "bis", "name" => "tbl_bisio"),
-	array("schema" => "campus", "name" => "tbl_lvgesamtnote"),
-	array("schema" => "campus", "name" => "tbl_studentbeispiel"),
-	array("schema" => "campus", "name" => "tbl_studentuebung"),
-	array("schema" => "campus", "name" => "tbl_legesamtnote"),
+	array("schema" => "bis",    "name" => "tbl_bisio",           "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
+	array("schema" => "campus", "name" => "tbl_lvgesamtnote",    "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
+	array("schema" => "campus", "name" => "tbl_studentbeispiel", "from" => "student_uid", "to" => "uid",           "datatype" => "varchar(32)", "newTarget" => "tbl_benutzer",   "newTargetSchema" => "public", "pickDataFrom" => "tbl_benutzer", "pickDataFromCol" => "uid"        ),
+	array("schema" => "campus", "name" => "tbl_studentuebung",   "from" => "student_uid", "to" => "uid",           "datatype" => "varchar(32)", "newTarget" => "tbl_benutzer",   "newTargetSchema" => "public", "pickDataFrom" => "tbl_benutzer", "pickDataFromCol" => "uid"        ),
+	array("schema" => "campus", "name" => "tbl_legesamtnote",    "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
 );
 
 if(!isset($_POST["action"]))
@@ -102,7 +102,6 @@ else if($_POST["action"] == "Starten")
 
 
 	//********************************CREATE ALL VIEWS AGAIN********************************
-
 	$create_view_qry = "
 		CREATE VIEW bis.vw_bisio AS SELECT tbl_prestudentstatus.studiensemester_kurzbz,
 			tbl_prestudentstatus.status_kurzbz,
@@ -182,16 +181,16 @@ echo '</body></html>';
 function describeOneChange($db, $table)
 {
 
-	if(!$result = @$db->db_query("SELECT prestudent_id FROM ".$table["schema"].".".$table["name"]." LIMIT 1;"))
+	if(!$result = @$db->db_query('SELECT '.$table["to"].' FROM '.$table["schema"].'.'.$table["name"].' LIMIT 1;'))
 	{
-		echo "<div>".$table["schema"].".".$table["name"].": student_uid wird <strong style='color:red;'>gelöscht</strong>!</div>";
-		echo "<div>".$table["schema"].".".$table["name"].": prestudent_id wird <strong style='color:green;'>eingefügt</strong>!</div>";
+		echo "<div>".$table["schema"].".".$table["name"].": ".$table["from"]." wird <strong style='color:red;'>gelöscht</strong>!</div>";
+		echo "<div>".$table["schema"].".".$table["name"].": ".$table["to"]." wird <strong style='color:green;'>eingefügt</strong>!</div>";
 	}
 }
 
 function checkForUpdates($db, $table)
 {
-	if(!$result = @$db->db_query("SELECT prestudent_id FROM ".$table["schema"].".".$table["name"]." LIMIT 1;"))
+	if(!$result = @$db->db_query('SELECT '.$table["to"].' FROM '.$table["schema"].'.'.$table["name"].' LIMIT 1;'))
 	{
 		return true;
 	}
@@ -201,7 +200,7 @@ function checkForUpdates($db, $table)
 
 function modifyOneTable($db, $table)
 {
-	if(!$result = @$db->db_query("SELECT prestudent_id FROM ".$table["schema"].".".$table["name"]." LIMIT 1;"))
+	if(!$result = @$db->db_query('SELECT '.$table["to"].' FROM '.$table["schema"].'.'.$table["name"].' LIMIT 1;'))
 	{
 		$db->db_query("BEGIN;");
 
@@ -235,7 +234,7 @@ function modifyOneTable($db, $table)
 					return;
 				}
 
-				$constraint_add_query = str_replace ( "student_uid" , "prestudent_id" , $def->pg_get_constraintdef );
+				$constraint_add_query = str_replace ($table["from"], $table["to"], $def->pg_get_constraintdef );
 				$primary_keys[] = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT '.$row->indexname.' '.$constraint_add_query;
 			}
 			else
@@ -247,7 +246,7 @@ function modifyOneTable($db, $table)
 					return;
 				}
 
-				$index_add_query = str_replace ( "student_uid" , "prestudent_id" , $row->indexdef );
+				$index_add_query = str_replace ($table["from"], $table["to"], $row->indexdef );
 				$indices[] = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT '.$row->indexname.' '.$index_add_query;
 			}
 		}
@@ -255,13 +254,14 @@ function modifyOneTable($db, $table)
 
 
 		//spalte einfuegen
-		$add_qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ADD COLUMN prestudent_id int;
-		UPDATE '.$table["schema"].".".$table["name"].' SET prestudent_id = (SELECT prestudent_id FROM public.tbl_student WHERE student_uid='.$table["schema"].".".$table["name"].'.student_uid);';
-		$db->db_query($add_qry);
+		$alter_update_qry = 'ALTER TABLE '.$table["schema"].'.'.$table["name"].' ADD COLUMN '.$table["to"].' '.$table["datatype"].';
+		UPDATE '.$table["schema"].".".$table["name"].' SET '.$table["to"].' = (SELECT '.$table["to"].' FROM '.$table["newTargetSchema"].'.'.$table["pickDataFrom"].' WHERE '.$table["pickDataFromCol"].'='.$table["schema"].'.'.$table["name"].'.'.$table["from"].');';
+		$db->db_query($alter_update_qry);
 
-		//constraints: prestudent_id FK, prestudent_id NOT NULL
-		$constraint_qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ALTER COLUMN prestudent_id SET NOT NULL;
-			ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT fk_'.$table["name"].'_tbl_prestudent_prestudent_id FOREIGN KEY (prestudent_id) REFERENCES public.tbl_prestudent (prestudent_id);';
+
+		//constraints: $TO FK, $TO NOT NULL
+		$constraint_qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ALTER COLUMN '.$table["to"].' SET NOT NULL;
+			ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT fk_'.$table["name"].'_'.$table["newTarget"].'_'.$table["to"].' FOREIGN KEY ('.$table["to"].') REFERENCES '.$table["newTargetSchema"].'.'.$table["newTarget"].' ('.$table["to"].');';
 
 		if(!$db->db_query($constraint_qry))
 		{
@@ -269,27 +269,27 @@ function modifyOneTable($db, $table)
 		}
 		else
 		{
-			echo ' '.$table["schema"].".".$table["name"].': Spalte prestudent_id hinzugefuegt!<br>';
-			echo ' '.$table["schema"].".".$table["name"].': Spalte student_uid auf prestudent_id geändert!<br>';
-			echo ' '.$table["schema"].".".$table["name"].': Spalte prestudent_id constraints eingefuegt!<br>';
+			echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["to"].' hinzugefuegt!<br>';
+			echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["from"].' auf '.$table["to"].' geändert!<br>';
+			echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["to"].' constraints eingefuegt!<br>';
 
-		//student_uid löschen
-			$qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' DROP COLUMN student_uid;';
+		//FROM löschen
+			$qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' DROP COLUMN '.$table["from"].';';
 
 			if(!$db->db_query($qry))
 			{
 				echo '<strong>'.$table["schema"].".".$table["name"].': '.$db->db_last_error().'</strong><br>';
-				echo '<strong>'.$table["schema"].".".$table["name"].': ACHTUNG! In diesem Fall sollte prestudent_id ordnungsgemäß eingetragen sein, jedoch student_uid nicht gelöscht worden sein. Das Skript erneut zu starten wird nicht funktionieren!</strong><br>';
+				echo '<strong>'.$table["schema"].".".$table["name"].': ACHTUNG! In diesem Fall sollte '.$table["to"].' ordnungsgemäß eingetragen sein, jedoch '.$table["from"].' nicht gelöscht worden sein. Das Skript erneut zu starten wird nicht funktionieren!</strong><br>';
 			}
 			else
 			{
-				echo ' '.$table["schema"].".".$table["name"].': Spalte student_uid gelöscht!<br>';
+				echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["from"].' gelöscht!<br>';
 
 				foreach( $primary_keys as $pk)
 				{
 					if(!$index_drop_result = $db->db_query($pk))
 					{
-						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von  INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
+						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
 						$db->db_query("ROLLBACK;");
 						return;
 					}
@@ -298,7 +298,7 @@ function modifyOneTable($db, $table)
 				{
 					if(!$index_drop_result = $db->db_query($ind))
 					{
-						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von  INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
+						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
 						$db->db_query("ROLLBACK;");
 						return;
 					}
