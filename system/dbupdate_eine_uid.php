@@ -34,11 +34,12 @@ echo '<html>
 $all_tables_to_update =
 array
 (
-	array("schema" => "bis",    "name" => "tbl_bisio",           "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
-	array("schema" => "campus", "name" => "tbl_lvgesamtnote",    "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
-	array("schema" => "campus", "name" => "tbl_studentbeispiel", "from" => "student_uid", "to" => "uid",           "datatype" => "varchar(32)", "newTarget" => "tbl_benutzer",   "newTargetSchema" => "public", "pickDataFrom" => "tbl_benutzer", "pickDataFromCol" => "uid"        ),
-	array("schema" => "campus", "name" => "tbl_studentuebung",   "from" => "student_uid", "to" => "uid",           "datatype" => "varchar(32)", "newTarget" => "tbl_benutzer",   "newTargetSchema" => "public", "pickDataFrom" => "tbl_benutzer", "pickDataFromCol" => "uid"        ),
-	array("schema" => "campus", "name" => "tbl_legesamtnote",    "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
+	array("schema" => "bis",    "name" => "tbl_bisio",             "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
+	array("schema" => "campus", "name" => "tbl_lvgesamtnote",      "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
+	array("schema" => "campus", "name" => "tbl_studentbeispiel",   "from" => "student_uid", "to" => "uid",           "datatype" => "varchar(32)", "newTarget" => "tbl_benutzer",   "newTargetSchema" => "public", "pickDataFrom" => "tbl_benutzer", "pickDataFromCol" => "uid"        ),
+	array("schema" => "campus", "name" => "tbl_studentuebung",     "from" => "student_uid", "to" => "uid",           "datatype" => "varchar(32)", "newTarget" => "tbl_benutzer",   "newTargetSchema" => "public", "pickDataFrom" => "tbl_benutzer", "pickDataFromCol" => "uid"        ),
+	array("schema" => "campus", "name" => "tbl_legesamtnote",      "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
+	array("schema" => "lehre",  "name" => "tbl_abschlusspruefung", "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
 );
 
 if(!isset($_POST["action"]))
@@ -231,7 +232,7 @@ function modifyOneTable($db, $table)
 
 				if(!$pk_drop_result = $db->db_query('ALTER TABLE '.$table["schema"].".".$table["name"].' DROP CONSTRAINT '.$row->indexname))
 				{
-					echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
+					echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen</p>";
 					$db->db_query("ROLLBACK;");
 					return;
 				}
@@ -243,13 +244,13 @@ function modifyOneTable($db, $table)
 			{
 				if(!$index_drop_result = $db->db_query('DROP INDEX '.$table["schema"].".".$row->indexname))
 				{
-					echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
+					echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von INDEX ".$row->indexname." fehlgeschlagen</p>";
 					$db->db_query("ROLLBACK;");
 					return;
 				}
 
 				$index_add_query = str_replace ($table["from"], $table["to"], $row->indexdef );
-				$indices[] = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT '.$row->indexname.' '.$index_add_query;
+				$indices[] = $index_add_query;
 			}
 		}
 
@@ -291,7 +292,7 @@ function modifyOneTable($db, $table)
 				{
 					if(!$pk_add_result = $db->db_query($pk))
 					{
-						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
+						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen</p>";
 						$db->db_query("ROLLBACK;");
 						return;
 					}
@@ -299,8 +300,8 @@ function modifyOneTable($db, $table)
 				foreach( $indices as $ind)
 				{
 					if(!$index_add_result = $db->db_query($ind))
-					{
-						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
+					{echo $ind;
+						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von INDEX ".$row->indexname." fehlgeschlagen</p>";
 						$db->db_query("ROLLBACK;");
 						return;
 					}
