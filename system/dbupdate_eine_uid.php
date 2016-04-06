@@ -300,7 +300,7 @@ function modifyOneTable($db, $table)
 				foreach( $indices as $ind)
 				{
 					if(!$index_add_result = $db->db_query($ind))
-					{echo $ind;
+					{
 						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von INDEX ".$row->indexname." fehlgeschlagen</p>";
 						$db->db_query("ROLLBACK;");
 						return;
