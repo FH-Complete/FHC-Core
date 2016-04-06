@@ -950,7 +950,8 @@ class lehrstunde extends basis_db
 					CASE WHEN gruppe_kurzbz is not null THEN gruppe_kurzbz
 					ELSE (SELECT UPPER(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=stpl.studiengang_kz) || COALESCE(stpl.semester,'0') || COALESCE(stpl.verband,'') || COALESCE(stpl.gruppe,'')
 					END) as gruppen, array_agg(mitarbeiter_uid) as lektoren,
-					array_agg(ort_kurzbz) as orte
+					array_agg(ort_kurzbz) as orte,
+					array_agg(titel) as titel
 				FROM
 					lehre.tbl_".$db_stpl_table." as stpl
 					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
@@ -993,6 +994,7 @@ class lehrstunde extends basis_db
 
 		$qry.="GROUP BY stpl.datum, stpl.unr, stpl.lehreinheit_id, lehrfach.bezeichnung
 					ORDER BY stpl.datum,  min(stpl.stunde), stpl.unr, stpl.lehreinheit_id";
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -1005,6 +1007,7 @@ class lehrstunde extends basis_db
 				$obj->gruppen = array_unique($this->db_parse_array($row->gruppen));
 				$obj->lektoren = array_unique($this->db_parse_array($row->lektoren));
 				$obj->orte = array_unique($this->db_parse_array($row->orte));
+				$obj->titel = array_filter(array_unique($this->db_parse_array($row->titel)));
 				$obj->lehrfach_bezeichnung = $row->lehrfach_bezeichnung;
 				$obj->lehreinheit_id = $row->lehreinheit_id;
 

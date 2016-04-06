@@ -152,6 +152,7 @@ class studiengang extends basis_db
 
 				$this->bezeichnung_arr['German'] = $this->bezeichnung;
 				$this->bezeichnung_arr['English'] = $this->english;
+				$this->bezeichnung_arr['Italian'] = $this->bezeichnung;
 			}
 		}
 		else
@@ -241,6 +242,7 @@ class studiengang extends basis_db
                 . 'FROM lehre.vw_studienplan '
                 . 'LEFT JOIN bis.tbl_lgartcode USING (lgartcode) '
                 . 'WHERE onlinebewerbung IS TRUE '
+                . 'AND aktiv IS TRUE '
                 . 'ORDER BY typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC';
 
 		if(!$result = $this->db_query($qry))
@@ -280,13 +282,13 @@ class studiengang extends basis_db
 	 */
 	public function getOrgForm($studiengang_kz)
 	{
-		$qry = 'SELECT distinct orgform_kurzbz '
+		$qry = 'SELECT distinct tbl_studienplan.orgform_kurzbz '
 				. 'FROM lehre.tbl_studienordnung '
 				. 'JOIN lehre.tbl_studienplan '
 				. 'USING (studienordnung_id) '
 				. 'WHERE aktiv '
 				. 'AND studiengang_kz = ' . $this->db_add_param($studiengang_kz, FHC_INTEGER)
-				. ' AND orgform_kurzbz!='. $this->db_add_param('DDP');
+				. ' AND tbl_studienplan.orgform_kurzbz!='. $this->db_add_param('DDP');
 
 		if($result = $this->db_query($qry))
 		{
@@ -891,7 +893,7 @@ class studiengang extends basis_db
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beantragung = $this->db_parse_bool($row->beantragung);
 				$obj->lgart_biscode = $row->lgart_biscode;
-			
+
 				$this->result[]= $obj;
 			}
 			return true;

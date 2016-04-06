@@ -54,13 +54,13 @@ $datum_obj = new datum();
 $db = new basis_db();
 
 $abschlussbeurteilung_arr = array();
-$abschlussbeurteilung_arrEnglish = array(); 
+$abschlussbeurteilung_arrEnglish = array();
 $qry = "SELECT * FROM lehre.tbl_abschlussbeurteilung";
 if($db->db_query($qry))
 	while($row = $db->db_fetch_object())
 	{
 		$abschlussbeurteilung_arr[$row->abschlussbeurteilung_kurzbz]=$row->bezeichnung;
-		$abschlussbeurteilung_arrEng[$row->abschlussbeurteilung_kurzbz]=$row->bezeichnung_english; 
+		$abschlussbeurteilung_arrEng[$row->abschlussbeurteilung_kurzbz]=$row->bezeichnung_english;
 	}
 
 $note_arr = array();
@@ -68,7 +68,7 @@ $qry = "SELECT * FROM lehre.tbl_note";
 if($db->db_query($qry))
 	while($row = $db->db_fetch_object())
 		$note_arr[$row->note]=$row->anmerkung;
-		
+
 	function draw_content_xml($row)
 	{
 		global $rdf_url, $datum_obj, $abschlussbeurteilung_arr, $abschlussbeurteilung_arrEng, $note_arr;
@@ -91,7 +91,7 @@ if($db->db_query($qry))
 
 		$studiengang = new studiengang($student->studiengang_kz);
 		$akadgrad = new akadgrad($row->akadgrad_id);
-		
+
 		if($mitarbeiter->load($row->vorsitz))
 		{
 		    $vorsitz = trim($mitarbeiter->titelpre.' '.$mitarbeiter->vorname.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost);
@@ -103,7 +103,7 @@ if($db->db_query($qry))
 			$pruefer2 = trim($person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost);
 		if($person->load($row->pruefer3))
 			$pruefer3 = trim($person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost);
-			
+
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='rek'";
 		$rektor = '';
 		$db = new basis_db();
@@ -111,8 +111,8 @@ if($db->db_query($qry))
 		if($db->db_query($qry))
 			if($row_rek = $db->db_fetch_object())
 				$rektor = $row_rek->titelpre.' '.$row_rek->vorname.' '.$row_rek->nachname.' '.$row_rek->titelpost;
-		$qry = "SELECT * FROM (SELECT titel as themenbereich, ende, projektarbeit_id, note, beginn FROM lehre.tbl_projektarbeit a 
-							WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom' OR projekttyp_kurzbz='Master' OR projekttyp_kurzbz='Dissertation' OR projekttyp_kurzbz='Lizenziat' OR projekttyp_kurzbz='Magister') 
+		$qry = "SELECT * FROM (SELECT titel as themenbereich, ende, projektarbeit_id, note, beginn FROM lehre.tbl_projektarbeit a
+							WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom' OR projekttyp_kurzbz='Master' OR projekttyp_kurzbz='Dissertation' OR projekttyp_kurzbz='Lizenziat' OR projekttyp_kurzbz='Magister')
 							ORDER BY beginn DESC, projektarbeit_id ASC LIMIT 2) as a ORDER BY beginn asc";
 		$themenbereich='';
 		$datum_projekt='';
@@ -122,9 +122,9 @@ if($db->db_query($qry))
 		$note = '';
 		$note2='';
 		$datum_projekt2='';
-		
+
 		if($result_proj = $db->db_query($qry))
-		{			
+		{
 			if($row_proj = $db->db_fetch_object($result_proj))
 			{
 				$qry_bet = "SELECT titelpre, vorname, nachname, titelpost FROM lehre.tbl_projektbetreuer JOIN public.tbl_person USING(person_id) WHERE projektarbeit_id='$row_proj->projektarbeit_id' AND (betreuerart_kurzbz in('Erstbegutachter', 'Erstbetreuer', 'Betreuer', 'Begutacher')) LIMIT 1";
@@ -140,7 +140,7 @@ if($db->db_query($qry))
 				$lehrveranstaltung = new lehrveranstaltung($lehreinheit->lehrveranstaltung_id);
 				$projektnote = new note($note);
 			}
-			
+
 			if($row_proj = $db->db_fetch_object($result_proj))
 			{
 				$qry_bet = "SELECT titelpre, vorname, nachname, titelpost FROM lehre.tbl_projektbetreuer JOIN public.tbl_person USING(person_id) WHERE projektarbeit_id='$row_proj->projektarbeit_id' AND (betreuerart_kurzbz in('Erstbegutachter', 'Erstbetreuer', 'Betreuer', 'Begutacher')) LIMIT 1";
@@ -153,24 +153,24 @@ if($db->db_query($qry))
 				$datum_projekt2 = $datum_obj->convertISODate($row_proj->ende);
 			}
 		}
-		
+
 		switch($student->anrede)
 		{
 			case 'Herr': $anrede_engl = 'Mr'; break;
 			case 'Frau': $anrede_engl = 'Ms'; break;
 			default: $anrede_engl = ''; break;
 		}
-		
+
 		if($student->anrede == 'Herr')
 			$anrede = 'Herrn';
-		else 
+		else
 			$anrede = $student->anrede;
-		
-		
-					
+
+
+
 		if($row->sponsion=='')
 			$row->sponsion=$row->datum;
-			
+
 		if($studiengang->typ=='m')
 		{
 			$stg_art='Master-Studiengang';
@@ -186,11 +186,11 @@ if($db->db_query($qry))
 			$stg_art='Diplom-Studiengang';
 			$stg_art_engl='diploma';
 		}
-		
+
 		$oe = new organisationseinheit();
 		$parents = $oe->getParents($studiengang->oe_kurzbz);
 		$oe_parent = "";
-		
+
 		foreach ($parents as $parent)
 		{
 		    $oe_temp = new organisationseinheit();
@@ -201,21 +201,21 @@ if($db->db_query($qry))
 			break;
 		    }
 		}
-		
+
 		$studiengang_bezeichnung2 = explode(" ", $studiengang->bezeichnung, 2);
 		$name = trim($student->titelpre.' '.trim($student->vorname.' '.$student->vornamen).' '.$student->nachname.($student->titelpost!=''?', '.$student->titelpost:''));
-		
+
 		//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
 		if ($student->studiengang_kz<0)
 		{
 			$stg = new studiengang();
 			$stg->load($student->studiengang_kz);
-				
+
 			$studiengang_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($student->studiengang_kz));
 		}
 		else
 			$studiengang_kz = sprintf("%04s", abs($student->studiengang_kz));
-		
+
 		echo "\t<pruefung>".'
 		<abschlusspruefung_id><![CDATA['.$row->abschlusspruefung_id.']]></abschlusspruefung_id>
 		<student_uid><![CDATA['.$row->student_uid.']]></student_uid>
@@ -233,6 +233,7 @@ if($db->db_query($qry))
 		<akadgrad_id><![CDATA['.$row->akadgrad_id.']]></akadgrad_id>
 		<datum><![CDATA['.$datum_obj->convertISODate($row->datum).']]></datum>
 		<datum_iso><![CDATA['.$row->datum.']]></datum_iso>
+		<uhrzeit><![CDATA['.$row->uhrzeit.']]></uhrzeit>
 		<sponsion><![CDATA['.$datum_obj->convertISODate($row->sponsion).']]></sponsion>
 		<sponsion_iso><![CDATA['.$row->sponsion.']]></sponsion_iso>
 		<pruefungstyp_kurzbz><![CDATA['.$row->pruefungstyp_kurzbz.']]></pruefungstyp_kurzbz>
@@ -245,7 +246,7 @@ if($db->db_query($qry))
 		<vornamen><![CDATA['.$student->vornamen.']]></vornamen>
 		<nachname><![CDATA['.$student->nachname.']]></nachname>
 		<titelpost><![CDATA['.$student->titelpost.']]></titelpost>
-		<matrikelnr><![CDATA['.$student->matrikelnr.']]></matrikelnr>
+		<matrikelnr><![CDATA['.trim($student->matrikelnr).']]></matrikelnr>
 		<gebdatum_iso><![CDATA['.$student->gebdatum.']]></gebdatum_iso>
 		<geschlecht><![CDATA['.$student->geschlecht.']]></geschlecht>
 		<gebdatum><![CDATA['.$datum_obj->convertISODate($student->gebdatum).']]></gebdatum>
@@ -285,7 +286,7 @@ if($db->db_query($qry))
 		<datum_projekt><![CDATA['.$datum_projekt.']]></datum_projekt>
 		<datum_projekt2><![CDATA['.$datum_projekt.']]></datum_projekt2>
 		<ort_datum><![CDATA['.date('d.m.Y').']]></ort_datum>';
-		
+
 	 	echo "\n\t</pruefung>";
 	}
 
@@ -318,31 +319,32 @@ if ($xmlformat=='rdf')
 			$pruefer3 = $person->nachname;
 
 		echo '
-	      <RDF:li>
-	         <RDF:Description id="'.$row->abschlusspruefung_id.'"  about="'.$rdf_url.'/'.$row->abschlusspruefung_id.'" >
-	            <ABSCHLUSSPRUEFUNG:abschlusspruefung_id><![CDATA['.$row->abschlusspruefung_id.']]></ABSCHLUSSPRUEFUNG:abschlusspruefung_id>
-	            <ABSCHLUSSPRUEFUNG:student_uid><![CDATA['.$row->student_uid.']]></ABSCHLUSSPRUEFUNG:student_uid>
-	            <ABSCHLUSSPRUEFUNG:vorsitz><![CDATA['.$row->vorsitz.']]></ABSCHLUSSPRUEFUNG:vorsitz>
-	            <ABSCHLUSSPRUEFUNG:vorsitz_nachname><![CDATA['.$vorsitz.']]></ABSCHLUSSPRUEFUNG:vorsitz_nachname>
-	            <ABSCHLUSSPRUEFUNG:pruefer1><![CDATA['.$row->pruefer1.']]></ABSCHLUSSPRUEFUNG:pruefer1>
-	            <ABSCHLUSSPRUEFUNG:pruefer1_nachname><![CDATA['.$pruefer1.']]></ABSCHLUSSPRUEFUNG:pruefer1_nachname>
-	            <ABSCHLUSSPRUEFUNG:pruefer2><![CDATA['.$row->pruefer2.']]></ABSCHLUSSPRUEFUNG:pruefer2>
-	            <ABSCHLUSSPRUEFUNG:pruefer2_nachname><![CDATA['.$pruefer2.']]></ABSCHLUSSPRUEFUNG:pruefer2_nachname>
-	            <ABSCHLUSSPRUEFUNG:pruefer3><![CDATA['.$row->pruefer3.']]></ABSCHLUSSPRUEFUNG:pruefer3>
-	            <ABSCHLUSSPRUEFUNG:pruefer3_nachname><![CDATA['.$pruefer3.']]></ABSCHLUSSPRUEFUNG:pruefer3_nachname>
-	            <ABSCHLUSSPRUEFUNG:abschlussbeurteilung_kurzbz><![CDATA['.$row->abschlussbeurteilung_kurzbz.']]></ABSCHLUSSPRUEFUNG:abschlussbeurteilung_kurzbz>
-	            <ABSCHLUSSPRUEFUNG:notekommpruef><![CDATA['.$row->note.']]></ABSCHLUSSPRUEFUNG:notekommpruef>
-	            <ABSCHLUSSPRUEFUNG:akadgrad_id><![CDATA['.$row->akadgrad_id.']]></ABSCHLUSSPRUEFUNG:akadgrad_id>
-	    		<ABSCHLUSSPRUEFUNG:datum><![CDATA['.$datum_obj->convertISODate($row->datum).']]></ABSCHLUSSPRUEFUNG:datum>
-	            <ABSCHLUSSPRUEFUNG:datum_iso><![CDATA['.$row->datum.']]></ABSCHLUSSPRUEFUNG:datum_iso>
-	            <ABSCHLUSSPRUEFUNG:sponsion><![CDATA['.$datum_obj->convertISODate($row->sponsion).']]></ABSCHLUSSPRUEFUNG:sponsion>
-	            <ABSCHLUSSPRUEFUNG:sponsion_iso><![CDATA['.$row->sponsion.']]></ABSCHLUSSPRUEFUNG:sponsion_iso>
-	            <ABSCHLUSSPRUEFUNG:pruefungstyp_kurzbz><![CDATA['.$row->pruefungstyp_kurzbz.']]></ABSCHLUSSPRUEFUNG:pruefungstyp_kurzbz>
-	            <ABSCHLUSSPRUEFUNG:beschreibung><![CDATA['.$row->beschreibung.']]></ABSCHLUSSPRUEFUNG:beschreibung>
-	            <ABSCHLUSSPRUEFUNG:anmerkung><![CDATA['.$row->anmerkung.']]></ABSCHLUSSPRUEFUNG:anmerkung>
-	         </RDF:Description>
-	      </RDF:li>
-	      ';
+				<RDF:li>
+					<RDF:Description id="'.$row->abschlusspruefung_id.'"  about="'.$rdf_url.'/'.$row->abschlusspruefung_id.'" >
+						<ABSCHLUSSPRUEFUNG:abschlusspruefung_id><![CDATA['.$row->abschlusspruefung_id.']]></ABSCHLUSSPRUEFUNG:abschlusspruefung_id>
+						<ABSCHLUSSPRUEFUNG:student_uid><![CDATA['.$row->student_uid.']]></ABSCHLUSSPRUEFUNG:student_uid>
+						<ABSCHLUSSPRUEFUNG:vorsitz><![CDATA['.$row->vorsitz.']]></ABSCHLUSSPRUEFUNG:vorsitz>
+						<ABSCHLUSSPRUEFUNG:vorsitz_nachname><![CDATA['.$vorsitz.']]></ABSCHLUSSPRUEFUNG:vorsitz_nachname>
+						<ABSCHLUSSPRUEFUNG:pruefer1><![CDATA['.$row->pruefer1.']]></ABSCHLUSSPRUEFUNG:pruefer1>
+						<ABSCHLUSSPRUEFUNG:pruefer1_nachname><![CDATA['.$pruefer1.']]></ABSCHLUSSPRUEFUNG:pruefer1_nachname>
+						<ABSCHLUSSPRUEFUNG:pruefer2><![CDATA['.$row->pruefer2.']]></ABSCHLUSSPRUEFUNG:pruefer2>
+						<ABSCHLUSSPRUEFUNG:pruefer2_nachname><![CDATA['.$pruefer2.']]></ABSCHLUSSPRUEFUNG:pruefer2_nachname>
+						<ABSCHLUSSPRUEFUNG:pruefer3><![CDATA['.$row->pruefer3.']]></ABSCHLUSSPRUEFUNG:pruefer3>
+						<ABSCHLUSSPRUEFUNG:pruefer3_nachname><![CDATA['.$pruefer3.']]></ABSCHLUSSPRUEFUNG:pruefer3_nachname>
+						<ABSCHLUSSPRUEFUNG:abschlussbeurteilung_kurzbz><![CDATA['.$row->abschlussbeurteilung_kurzbz.']]></ABSCHLUSSPRUEFUNG:abschlussbeurteilung_kurzbz>
+						<ABSCHLUSSPRUEFUNG:notekommpruef><![CDATA['.$row->note.']]></ABSCHLUSSPRUEFUNG:notekommpruef>
+						<ABSCHLUSSPRUEFUNG:akadgrad_id><![CDATA['.$row->akadgrad_id.']]></ABSCHLUSSPRUEFUNG:akadgrad_id>
+						<ABSCHLUSSPRUEFUNG:datum><![CDATA['.$datum_obj->convertISODate($row->datum).']]></ABSCHLUSSPRUEFUNG:datum>
+						<ABSCHLUSSPRUEFUNG:datum_iso><![CDATA['.$row->datum.']]></ABSCHLUSSPRUEFUNG:datum_iso>
+						<ABSCHLUSSPRUEFUNG:uhrzeit><![CDATA['.$row->uhrzeit.']]></ABSCHLUSSPRUEFUNG:uhrzeit>
+						<ABSCHLUSSPRUEFUNG:sponsion><![CDATA['.$datum_obj->convertISODate($row->sponsion).']]></ABSCHLUSSPRUEFUNG:sponsion>
+						<ABSCHLUSSPRUEFUNG:sponsion_iso><![CDATA['.$row->sponsion.']]></ABSCHLUSSPRUEFUNG:sponsion_iso>
+						<ABSCHLUSSPRUEFUNG:pruefungstyp_kurzbz><![CDATA['.$row->pruefungstyp_kurzbz.']]></ABSCHLUSSPRUEFUNG:pruefungstyp_kurzbz>
+						<ABSCHLUSSPRUEFUNG:beschreibung><![CDATA['.$row->beschreibung.']]></ABSCHLUSSPRUEFUNG:beschreibung>
+						<ABSCHLUSSPRUEFUNG:anmerkung><![CDATA['.$row->anmerkung.']]></ABSCHLUSSPRUEFUNG:anmerkung>
+					</RDF:Description>
+				</RDF:li>
+				';
 	}
 	echo '
 	<RDF:RDF
@@ -370,7 +372,7 @@ if ($xmlformat=='rdf')
 	else
 		die('Student_uid oder Abschlusspruefung_id muss uebergeben werden');
 
-	
+
 	echo '	</RDF:Seq>';
 	echo '</RDF:RDF>';
 }	//endof xmlformat==rdf
@@ -384,7 +386,7 @@ elseif ($xmlformat=='xml')
 	{
 		$uids = explode(';',$_GET['uid']);
 
-		foreach ($uids as $uid) 
+		foreach ($uids as $uid)
 		{
 			if($uid!='')
 			{

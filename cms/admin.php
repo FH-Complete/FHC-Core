@@ -96,12 +96,13 @@ $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
 	);
 	function FHCFileBrowser(field_name, url, type, win) 
 	{
-		cmsURL = "<?php echo APP_ROOT;?>cms/tinymce_dms.php?type="+type;
+		dms_id = url.substring(url.indexOf("=") +1);
+		cmsURL = "<?php echo APP_ROOT;?>cms/tinymce_dms.php?type="+type+"&searchstring="+dms_id;
 		tinyMCE.activeEditor.windowManager.open({
 			file: cmsURL,
 			title : "FHComplete File Browser",
-			width: 800,
-			height: 600,
+			width: 1400,
+			height: 850,
 			resizable: "yes",
 			close_previous: "no",
 			scrollbars: "yes",
@@ -1114,7 +1115,7 @@ function print_prefs()
 			</td>
 		</tr>
 		<tr>
-			<td>Aktiv</td>
+			<td>Content Aktiv</td>
 			<td><input type="checkbox" name="aktiv" '.($content->aktiv?'checked':'').'></td>
 		</tr>
 		<tr>
@@ -1126,7 +1127,7 @@ function print_prefs()
 			<td><textarea name="beschreibung" cols="50" class="mceNoEditor" >'.$content->beschreibung.'</textarea></td>
 		</tr>
 		<tr>
-			<td></td>
+			<td><hr></td>
 			<td><hr></td>
 		</tr>
 		<tr>
@@ -1135,7 +1136,7 @@ function print_prefs()
 		</tr>
 		
 		<tr>
-			<td>Sichtbar</td>
+			<td>Version Sichtbar</td>
 			<td><input type="checkbox" name="sichtbar" '.($content->sichtbar?'checked':'').'></td>
 		</tr>
 		<tr>

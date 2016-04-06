@@ -61,7 +61,7 @@ function cmp($a, $b)
 	return 1;
     }
     return ($a->datum < $b->datum) ? -1 : 1;
-    
+
 }
 
 function getLastStundeByDatum(Array $array, $filterDatum)
@@ -121,7 +121,7 @@ $anmerkungen_en = '';
 	if(isset($_REQUEST['lv']))
 		$lv = $_REQUEST['lv'];
 	$language='';
-	
+
 	if(isset($_GET['language']))
 		$language=$_GET['language'];
 
@@ -170,7 +170,7 @@ $anmerkungen_en = '';
 		$anwesenheit_de = $parser->parse($anwesenheit_de);
 		$parser = new SafeHTML();
 		$methodik_de = $parser->parse($methodik_de);
-		
+
 		// Englisch content variables
 		//$titel_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['titel_en']));
 		$methodik_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['methodik_en']));
@@ -182,7 +182,7 @@ $anmerkungen_en = '';
 		$unterlagen_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['unterlagen_en']));
 		$pruefungsordnung_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['pruefungsordnung_en']));
 		$anmerkungen_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['anmerkungen_en']));
-		
+
 		$parser = new SafeHTML();
 		$lehrziele_en = $parser->parse($lehrziele_en);
 		$parser = new SafeHTML();
@@ -260,8 +260,8 @@ $anmerkungen_en = '';
 
 	if (!isset($lv))
 		$lv=0;
-		
-	
+
+
 	//Zugeteilte Fachbereiche auslesen
 	$qry = "SELECT distinct tbl_fachbereich.bezeichnung as bezeichnung, tbl_fachbereich.fachbereich_kurzbz as fachbereich_kurzbz
 			FROM public.tbl_fachbereich, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
@@ -302,18 +302,18 @@ $anmerkungen_en = '';
 		$lehrform_kurzbz[] = $row->lehrform_kurzbz;
 	//Fachbereichsleiter fuer alle FB ermitteln
 	$qry="
-		SELECT 
-			vorname, nachname, tbl_fachbereich.fachbereich_kurzbz 
-		FROM 
-			public.tbl_benutzerfunktion 
+		SELECT
+			vorname, nachname, tbl_fachbereich.fachbereich_kurzbz
+		FROM
+			public.tbl_benutzerfunktion
 			JOIN public.tbl_fachbereich USING(oe_kurzbz)
-			JOIN campus.vw_mitarbeiter USING(uid) 
-		WHERE 
+			JOIN campus.vw_mitarbeiter USING(uid)
+		WHERE
 			vw_mitarbeiter.aktiv AND
-			funktion_kurzbz='Leitung' AND tbl_fachbereich.fachbereich_kurzbz in($fachbereiche) AND 
+			funktion_kurzbz='Leitung' AND tbl_fachbereich.fachbereich_kurzbz in($fachbereiche) AND
 			(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 			(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
-	
+
 	if(!$res=$db->db_query($qry))
 		die('Fehler '.$db->errormsg);
 
@@ -323,7 +323,7 @@ $anmerkungen_en = '';
 
 	//Fachbereichskoordinatoren fuer alle FB ermitteln
 	//$qry="SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in($fachbereiche)";
-	$qry = "SELECT 
+	$qry = "SELECT
 				distinct vorname, nachname, tbl_fachbereich.fachbereich_kurzbz
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_benutzerfunktion, campus.vw_mitarbeiter, public.tbl_fachbereich
@@ -334,7 +334,7 @@ $anmerkungen_en = '';
 				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND
 				lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz AND
 				tbl_fachbereich.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
-				tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
+				tbl_benutzerfunktion.funktion_kurzbz='fbk' AND
 				vw_mitarbeiter.uid=COALESCE(tbl_lehrveranstaltung.koordinator, tbl_benutzerfunktion.uid) AND
 				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
@@ -392,7 +392,7 @@ $anmerkungen_en = '';
 		echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 		if(($anz=count($lehrendearray))>0)
 		{
-			echo "<tr valign='top'><td><nobr>".$phrasen->t('lehre/Lehrbeauftrager').": </nobr></td><td>";
+			echo "<tr valign='top'><td><nobr>".$phrasen->t('lehre/lehrbeauftragter').": </nobr></td><td>";
 
 			foreach($lehrendearray as $elem)
 			{
@@ -417,7 +417,7 @@ $anmerkungen_en = '';
 
 		if ($ects_points)
 			echo '<tr><td>ECTS:&nbsp;</td><td>'.number_format(stripslashes($ects_points),1,'.','').'</td></tr>';
-			
+
 		if ($anz_incoming > -1)
 		{
 			echo '<tr><td>Incomingpl&auml;tze:&nbsp;</td><td>'.stripslashes($anz_incoming).'</td></tr>';
@@ -506,7 +506,7 @@ $anmerkungen_en = '';
 			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/literatur')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($unterlagen_de)."<br /><br /></td></tr>";
 		}
-		
+
 		if ($anwesenheit_de)
 		{
 			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/anwesenheit')."</h2></td></tr>";
@@ -568,7 +568,7 @@ $anmerkungen_en = '';
 
 	    if ($ects_points)
 			echo "<tr><td>ECTS Credits:&nbsp;</td><td>".number_format(stripslashes($ects_points),1,'.','')."</td></tr>";
-			
+
 		if ($anz_incoming > -1)
 		{
 			echo '<tr><td>Places Available for Incoming Students:&nbsp;</td><td>'.stripslashes($anz_incoming).'</td></tr>';
@@ -659,7 +659,7 @@ $anmerkungen_en = '';
 			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/literaturEN')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($unterlagen_en)."<br /><br /></td></tr>";
 		}
-		
+
 		if ($anwesenheit_en)
 		{
 			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/anwesenheitEN')."</h2></td></tr>";
@@ -674,7 +674,7 @@ $anmerkungen_en = '';
 	}
 
     echo "</table>";
-    
+
     $lehreinheit = new lehreinheit();
     $studiensemester = new studiensemester();
     $lehreinheit->load_lehreinheiten($lv, $studiensemester->getaktorNext());
@@ -690,7 +690,7 @@ $anmerkungen_en = '';
 			    $lehrstunde->load_lehrstunden_le($lehreinheit_temp->lehreinheit_id);
 			    $i = 1;
 			    echo "<tr><td><ul>";
-			    
+
 			    $result = $lehrstunde->lehrstunden;
 			    $last = "";
 			    $bis = "";

@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/person.class.php');
+require_once(dirname(__FILE__).'/log.class.php');
 
 class prestudent extends person
 {
@@ -46,17 +47,17 @@ class prestudent extends person
 	public $punkte; //rt_gesamtpunkte
 	public $rt_punkte1;
 	public $rt_punkte2;
-    public $rt_punkte3 = 0;
-    public $bismelden = true;
+	public $rt_punkte3 = 0;
+	public $bismelden = true;
 	public $anmerkung;
 	public $anmerkung_status;
 	public $mentor;
 	public $ext_id_prestudent;
-    public $dual = false;
-    public $zgvdoktor_code;
-    public $zgvdoktorort;
-    public $zgvdoktordatum;
-    public $zgvdoktornation;
+	public $dual = false;
+	public $zgvdoktor_code;
+	public $zgvdoktorort;
+	public $zgvdoktordatum;
+	public $zgvdoktornation;
 
 	public $status_kurzbz;
 	public $studiensemester_kurzbz;
@@ -565,8 +566,8 @@ class prestudent extends person
 					(
 						SELECT
 							*, (SELECT status_kurzbz FROM tbl_prestudentstatus
-							    WHERE prestudent_id=prestudent.prestudent_id $stsemqry
-							    ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) AS rolle
+								WHERE prestudent_id=prestudent.prestudent_id $stsemqry
+								ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) AS rolle
 						FROM tbl_prestudent prestudent ORDER BY prestudent_id
 					) a, tbl_prestudentstatus, tbl_person
 				WHERE a.rolle=tbl_prestudentstatus.status_kurzbz AND
@@ -587,8 +588,11 @@ class prestudent extends person
 			case "interessenten":
 				$qry.=" AND a.rolle='Interessent'";
 				break;
+			case "bewerbungnichtabgeschickt":
+				$qry.=" AND a.rolle='Interessent' AND bewerbung_abgeschicktamum is null";
+				break;
 			case "bewerbungabgeschickt":
-				$qry.=" AND a.rolle='Interessent' AND bewerbung_abgeschicktamum is not null";
+				$qry.=" AND a.rolle='Interessent' AND bewerbung_abgeschicktamum is not null AND bestaetigtam is null";
 				break;
 			case "statusbestaetigt":
 				$qry.=" AND a.rolle='Interessent' AND bestaetigtam is not null";
@@ -1115,9 +1119,9 @@ class prestudent extends person
 				$obj->ext_id_prestudent = $row->ext_id;
 				$obj->dual = $this->db_parse_bool($row->dual);
 				$obj->ausstellungsstaat = $row->ausstellungsstaat;
-                $obj->zgvdoktor_code = $row->zgvdoktor_code;
-                $obj->zgvdoktorort = $row->zgvdoktorort;
-                $obj->zgvdoktordatum = $row->zgvdoktordatum;
+				$obj->zgvdoktor_code = $row->zgvdoktor_code;
+				$obj->zgvdoktorort = $row->zgvdoktorort;
+				$obj->zgvdoktordatum = $row->zgvdoktordatum;
 
 				$this->result[] = $obj;
 			}
@@ -1130,56 +1134,60 @@ class prestudent extends person
 		}
 	}
 
-    /**
-     * Gibt die eingetragenen ZGV zurück
-     * @return array
-     */
-    public function getZgv() {
+	/**
+	 * Gibt die eingetragenen ZGV zurück
+	 * @return array
+	 */
+	public function getZgv()
+	{
 
-        $zgv = array(
-            'bachelor' => array(),
-            'master' => array(),
-//            'doktor' => array(),
-        );
-        $attribute = array(
-            'art',
-            'ort',
-            'datum',
-            'nation',
-        );
-        $db_attribute = array(
-            'zgv_code',
-            'zgvort',
-            'zgvdatum',
-            'zgvnation',
-            'zgvmas_code',
-            'zgvmaort',
-            'zgvmadatum',
-            'zgvmanation',
-            'zgvdoktor_code',
-            'zgvdoktorort',
-            'zgvdoktordatum',
-            'zgvdoktornation',
-        );
+		$zgv = array
+		(
+			'bachelor' => array(),
+			'master' => array(),
+			//'doktor' => array(),
+		);
+		$attribute = array
+		(
+			'art',
+			'ort',
+			'datum',
+			'nation',
+		);
+		$db_attribute = array
+		(
+			'zgv_code',
+			'zgvort',
+			'zgvdatum',
+			'zgvnation',
+			'zgvmas_code',
+			'zgvmaort',
+			'zgvmadatum',
+			'zgvmanation',
+			'zgvdoktor_code',
+			'zgvdoktorort',
+			'zgvdoktordatum',
+			'zgvdoktornation',
+		);
 
-        foreach($this->result as $prestudent) {
-
-            foreach($zgv as &$value) {
-
-                foreach($attribute as $attribut) {
-                    $db_attribute_name = current($db_attribute);
-
-                    if($prestudent->$db_attribute_name) {
-                        $value[$attribut] = $prestudent->$db_attribute_name;
-                    }
-                    next($db_attribute);
-                }
-            }
-            reset($db_attribute);
-        }
-
-        return $zgv;
-    }
+		foreach($this->result as $prestudent)
+		{
+			foreach($zgv as &$value)
+			{
+				foreach($attribute as $attribut)
+				{
+					$db_attribute_name = current($db_attribute);
+					if($prestudent->$db_attribute_name)
+					{
+						$value[$attribut] = $prestudent->$db_attribute_name;
+					}
+					next($db_attribute);
+				}
+			}
+			reset($db_attribute);
+		}
+	return $zgv;
+	}
 
 	/**
 	 * Liefert die Anzahl der Bewerber im ausgewaehlten Bereich
@@ -1701,6 +1709,69 @@ class prestudent extends person
 				$semester[$row->studiensemester_kurzbz] = $row->bezeichnung;
 
 			return $semester;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+
+	/**
+	 * Laedt alle Studenten eines Studienplans und eines Studiensemesters
+	 * @param $studienplan_id
+	 * @param $studiensemester_kurzbz
+	 * @param $studiengang_kz
+	 * @return array mit allen Prestudenten, welche sich für den angegebenen Studienplan im angegebenen Semester beworben haben
+	 */
+	public function getAllStudentenFromStudienplanAndStudsem($studienplan_id, $studiensemester_kurzbz, $studiengang_kz)
+	{
+		if(!is_numeric($studienplan_id))
+		{
+			$this->errormsg = 'studienplan_id ist ungueltig';
+			return false;
+		}
+
+		if(!$studiensemester_kurzbz || $studiensemester_kurzbz == "")
+		{
+			$this->errormsg = 'studiensemester_kurzbz ist ungueltig';
+			return false;
+		}
+
+		$qry = "SELECT DISTINCT prestudent_id, vorname, nachname, gebdatum, rt_gesamtpunkte, tbl_prestudent.studiengang_kz, bis.tbl_zgvgruppe.bezeichnung, get_rolle_prestudent(prestudent_id, null) as laststatus
+			FROM
+				public.tbl_prestudent
+					JOIN public.tbl_person USING(person_id)
+					LEFT JOIN bis.tbl_zgvgruppe_zuordnung USING(zgv_code)
+					LEFT JOIN bis.tbl_zgvgruppe USING(gruppe_kurzbz)
+			WHERE
+				tbl_prestudent.studiengang_kz=". $this->db_add_param($studiengang_kz)."
+				AND EXISTS(
+					SELECT
+						1
+					FROM
+						public.tbl_prestudentstatus
+					WHERE
+						tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id
+						AND studiensemester_kurzbz=". $this->db_add_param($studiensemester_kurzbz)."
+						AND status_kurzbz='Bewerber'
+						AND (
+							studienplan_id=". $this->db_add_param($studienplan_id)."
+							OR
+							(anmerkung like '%' || (SELECT orgform_kurzbz || '_' || sprache FROM lehre.tbl_studienplan WHERE studienplan_id=". $this->db_add_param($studienplan_id).") || '%')
+					)
+			);";
+
+
+		if($result = $this->db_query($qry))
+		{
+			$ret = array();
+
+			while($row = $this->db_fetch_object($result))
+				$ret[] = $row;
+
+			return $ret;
 		}
 		else
 		{

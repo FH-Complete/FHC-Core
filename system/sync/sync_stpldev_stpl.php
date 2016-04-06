@@ -31,6 +31,10 @@ require_once(dirname(__FILE__).'/../../include/functions.inc.php');
 require_once(dirname(__FILE__).'/../../include/studiensemester.class.php');
 require_once(dirname(__FILE__).'/../../include/mail.class.php');
 require_once(dirname(__FILE__).'/../../include/datum.class.php');
+require_once(dirname(__FILE__).'/../../include/phrasen.class.php');
+
+$p_de = new phrasen('German');
+$p_en = new phrasen('English');
 
 echo '<html>
 <head>
@@ -184,8 +188,14 @@ th,td
 .unmarked
 {
 }
+span.engl
+{
+	color:gray;
+	size:small;
+}
 </style>
-Dies ist eine automatische Mail!<BR>Es haben sich folgende Aenderungen in Ihrem LV-Plan ergeben:<BR>';
+'.$p_de->t('lvplan/automatischeMail').'<BR>'.$p_de->t('lvplan/folgendeAenderungen').'<BR>
+<span class="engl">'.$p_en->t('lvplan/automatischeMail').'<BR>'.$p_en->t('lvplan/folgendeAenderungen').'<BR></span>';
 
 /**************************************************
  * Datensaetze holen die neu sind
@@ -283,8 +293,17 @@ else
 					$message[$row->uid]->isneu=true;
 					$message[$row->uid]->mailadress=$row->uid.'@'.DOMAIN;
 					$message[$row->uid]->message_begin=$message_begin.'<BR>';
-					$message[$row->uid]->message='<font style="color:green"><strong>Neue Stunden:</strong></font><BR>
-						<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+					$message[$row->uid]->message='<font style="color:green"><strong>'.$p_de->t('lvplan/neueStunden').' / '.$p_en->t('lvplan/neueStunden').'</strong></font><BR>
+						<TABLE>
+							<TR>
+								<TH>'.$p_de->t('lvplan/raum').'<br><span class="engl">'.$p_en->t('lvplan/raum').'</span></TH>
+								<TH>'.$p_de->t('lvplan/lehrverband').'<br><span class="engl">'.$p_en->t('lvplan/lehrverband').'</span></TH>
+								<TH>'.$p_de->t('lvplan/lektor').'<br><span class="engl">'.$p_en->t('lvplan/lektor').'</span></TH>
+								<TH>'.$p_de->t('global/datum').'<br><span class="engl">'.$p_en->t('global/datum').'</span></TH>
+								<TH>'.$p_de->t('lvplan/stdBeginn').'<br><span class="engl">'.$p_en->t('lvplan/stdBeginn').'</span></TH>
+								<TH>'.$p_de->t('lvplan/lehrfach').'<br><span class="engl">'.$p_en->t('lvplan/lehrfach').'</span></TH>
+								<TH>'.$p_de->t('lvplan/info').'<br><span class="engl">'.$p_en->t('lvplan/info').'</span></TH>
+							</TR>';
 				}
 				$message[$row->uid]->message.="\n";
 				$message[$row->uid]->message.='<TR><TD>'.$row->ort_kurzbz.'</TD>';
@@ -310,8 +329,17 @@ else
 						$message[$student]->isneu=true;
 						$message[$student]->mailadress=$student.'@'.DOMAIN;
 						$message[$student]->message_begin=$message_begin.'<BR>';
-						$message[$student]->message='<font style="color:green"><strong>Neue Stunden:</strong></font><BR>
-								<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+						$message[$student]->message='<font style="color:green"><strong>'.$p_de->t('lvplan/neueStunden').' / '.$p_en->t('lvplan/neueStunden').'</strong></font><BR>
+								<TABLE>
+								<TR>
+									<TH>'.$p_de->t('lvplan/raum').'<br><span class="engl">'.$p_en->t('lvplan/raum').'</span></TH>
+									<TH>'.$p_de->t('lvplan/lehrverband').'<br><span class="engl">'.$p_en->t('lvplan/lehrverband').'</span></TH>
+									<TH>'.$p_de->t('lvplan/lektor').'<br><span class="engl">'.$p_en->t('lvplan/lektor').'</span></TH>
+									<TH>'.$p_de->t('global/datum').'<br><span class="engl">'.$p_en->t('global/datum').'</span></TH>
+									<TH>'.$p_de->t('lvplan/stdBeginn').'<br><span class="engl">'.$p_en->t('lvplan/stdBeginn').'</span></TH>
+									<TH>'.$p_de->t('lvplan/lehrfach').'<br><span class="engl">'.$p_en->t('lvplan/lehrfach').'</span></TH>
+									<TH>'.$p_de->t('lvplan/info').'<br><span class="engl">'.$p_en->t('lvplan/info').'</span></TH>
+								</TR>';
 					}
 					$message[$student]->message.="\n";
 					$message[$student]->message.='<TR><TD>'.$row->ort_kurzbz.'</TD>';
@@ -384,8 +412,17 @@ else
 					$message[$row->uid]->message_begin=$message_begin.'<BR>';
 					if(!isset($message[$row->uid]->message))
 						$message[$row->uid]->message='';
-					$message[$row->uid]->message.='<font style="color:#FFA100"><strong>Gel&ouml;schte Stunden:</strong></font><BR>
-						<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+					$message[$row->uid]->message.='<font style="color:#FFA100"><strong>'.$p_de->t('lvplan/geloeschteStunden').' / '.$p_en->t('lvplan/geloeschteStunden').'</strong></font><BR>
+						<TABLE>
+						<TR>
+							<TH>'.$p_de->t('lvplan/raum').'<br><span class="engl">'.$p_en->t('lvplan/raum').'</span></TH>
+							<TH>'.$p_de->t('lvplan/lehrverband').'<br><span class="engl">'.$p_en->t('lvplan/lehrverband').'</span></TH>
+							<TH>'.$p_de->t('lvplan/lektor').'<br><span class="engl">'.$p_en->t('lvplan/lektor').'</span></TH>
+							<TH>'.$p_de->t('global/datum').'<br><span class="engl">'.$p_en->t('global/datum').'</span></TH>
+							<TH>'.$p_de->t('lvplan/stdBeginn').'<br><span class="engl">'.$p_en->t('lvplan/stdBeginn').'</span></TH>
+							<TH>'.$p_de->t('lvplan/lehrfach').'<br><span class="engl">'.$p_en->t('lvplan/lehrfach').'</span></TH>
+							<TH>'.$p_de->t('lvplan/info').'<br><span class="engl">'.$p_en->t('lvplan/info').'</span></TH>
+						</TR>';
 				}
 				$message[$row->uid]->message.="\n";
 				$message[$row->uid]->message.='<TR><TD>'.$row->ort_kurzbz.'</TD>';
@@ -413,8 +450,17 @@ else
 						$message[$student]->message_begin=$message_begin.'<BR>';
 						if(!isset($message[$student]->message))
 							$message[$student]->message='';
-						$message[$student]->message.='<font style="color:#FFA100"><strong>Gel&ouml;schte Stunden:</strong></font><BR>
-								<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+						$message[$student]->message.='<font style="color:#FFA100"><strong>'.$p_de->t('lvplan/gloeschteStunden').' / '.$p_en->t('lvplan/geloeschteStunden').'</strong></font><BR>
+								<TABLE>
+								<TR>
+									<TH>'.$p_de->t('lvplan/raum').'<br><span class="engl">'.$p_en->t('lvplan/raum').'</span></TH>
+									<TH>'.$p_de->t('lvplan/lehrverband').'<br><span class="engl">'.$p_en->t('lvplan/lehrverband').'</span></TH>
+									<TH>'.$p_de->t('lvplan/lektor').'<br><span class="engl">'.$p_en->t('lvplan/lektor').'</span></TH>
+									<TH>'.$p_de->t('global/datum').'<br><span class="engl">'.$p_en->t('global/datum').'</span></TH>
+									<TH>'.$p_de->t('lvplan/stdBeginn').'<br><span class="engl">'.$p_en->t('lvplan/stdBeginn').'</span></TH>
+									<TH>'.$p_de->t('lvplan/lehrfach').'<br><span class="engl">'.$p_en->t('lvplan/lehrfach').'</span></TH>
+									<TH>'.$p_de->t('lvplan/info').'<br><span class="engl">'.$p_en->t('lvplan/info').'</span></TH>
+								</TR>';
 					}
 					$message[$student]->message.="\n";
 					$message[$student]->message.='<TR><TD>'.$row->ort_kurzbz.'</TD>';
@@ -550,11 +596,21 @@ else
 					$message[$row->uid]->message_begin=$message_begin.'<BR>';
 					if(!isset($message[$row->uid]->message))
 						$message[$row->uid]->message='';
-					$message[$row->uid]->message.='<font style="color:blue"><strong>Ge&auml;nderte Stunden:</strong></font><BR>
-						<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+					$message[$row->uid]->message.='<font style="color:blue"><strong>'.$p_de->t('lvplan/geaenderteStunden').' / '.$p_en->t('lvplan/geaenderteStunden').'</strong></font><BR>
+						<TABLE>
+						<TR>
+							<TH>'.$p_de->t('lvplan/status').'<br><span class="engl">'.$p_en->t('lvplan/status').'</span></TH>
+							<TH>'.$p_de->t('lvplan/raum').'<br><span class="engl">'.$p_en->t('lvplan/raum').'</span></TH>
+							<TH>'.$p_de->t('lvplan/lehrverband').'<br><span class="engl">'.$p_en->t('lvplan/lehrverband').'</span></TH>
+							<TH>'.$p_de->t('lvplan/lektor').'<br><span class="engl">'.$p_en->t('lvplan/lektor').'</span></TH>
+							<TH>'.$p_de->t('global/datum').'<br><span class="engl">'.$p_en->t('global/datum').'</span></TH>
+							<TH>'.$p_de->t('lvplan/stdBeginn').'<br><span class="engl">'.$p_en->t('lvplan/stdBeginn').'</span></TH>
+							<TH>'.$p_de->t('lvplan/lehrfach').'<br><span class="engl">'.$p_en->t('lvplan/lehrfach').'</span></TH>
+							<TH>'.$p_de->t('lvplan/info').'<br><span class="engl">'.$p_en->t('lvplan/info').'</span></TH>
+						</TR>';
 				}
 				$message[$row->uid]->message.="\n";
-				$message[$row->uid]->message.='<TR><TD>Vorher: </TD>';
+				$message[$row->uid]->message.='<TR><TD>'.$p_de->t('lvplan/vorher').' / '.$p_en->t('lvplan/vorher').': </TD>';
 				$message[$row->uid]->message.='<TD>'.$row->old_ort_kurzbz.'</TD>';
 				$message[$row->uid]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
 				$message[$row->uid]->message.='<TD>'.$row->old_lektor.'</TD>';
@@ -564,7 +620,7 @@ else
 				$message[$row->uid]->message.='<TD>'.$row->old_titel.'</TD></TR>';
 
 				$message[$row->uid]->message.="\n";
-				$message[$row->uid]->message.='<TR><TD>Jetzt: </TD>';
+				$message[$row->uid]->message.='<TR><TD>'.$p_de->t('lvplan/jetzt').' / '.$p_en->t('lvplan/jetzt').': </TD>';
 				$myclass=($row->ort_kurzbz!=$row->old_ort_kurzbz?'marked':'unmarked');
 				$message[$row->uid]->message.='<TD><span class="'.$myclass.'">'.$row->ort_kurzbz.'</span></TD>';
 				$myclass='unmarked';
@@ -595,11 +651,21 @@ else
 						$message[$row->old_uid]->isset=true;
 						$message[$row->old_uid]->mailadress=$row->old_uid.'@'.DOMAIN;
 						$message[$row->old_uid]->message_begin=$message_begin.'<BR>';
-						$message[$row->old_uid]->message.='<font style="color:blue"><strong>Ge&auml;nderte Stunden:</strong></font><BR>
-							<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+						$message[$row->old_uid]->message.='<font style="color:blue"><strong>'.$p_de->t('lvplan/geaenderteStunden').' / '.$p_en->t('lvplan/geaenderteStunden').'</strong></font><BR>
+							<TABLE>
+							<TR>
+								<TH>'.$p_de->t('lvplan/status').'<br><span class="engl">'.$p_en->t('lvplan/status').'</TH>
+								<TH>'.$p_de->t('lvplan/raum').'<br><span class="engl">'.$p_en->t('lvplan/raum').'</span></TH>
+								<TH>'.$p_de->t('lvplan/lehrverband').'<br><span class="engl">'.$p_en->t('lvplan/lehrverband').'</span></TH>
+								<TH>'.$p_de->t('lvplan/lektor').'<br><span class="engl">'.$p_en->t('lvplan/lektor').'</span></TH>
+								<TH>'.$p_de->t('global/datum').'<br><span class="engl">'.$p_en->t('global/datum').'</span></TH>
+								<TH>'.$p_de->t('lvplan/stdBeginn').'<br><span class="engl">'.$p_en->t('lvplan/stdBeginn').'</span></TH>
+								<TH>'.$p_de->t('lvplan/lehrfach').'<br><span class="engl">'.$p_en->t('lvplan/lehrfach').'</span></TH>
+								<TH>'.$p_de->t('lvplan/info').'<br><span class="engl">'.$p_en->t('lvplan/info').'</span></TH>
+							</TR>';
 					}
 					$message[$row->old_uid]->message.="\n";
-					$message[$row->old_uid]->message.='<TR><TD>Vorher: </TD>';
+					$message[$row->old_uid]->message.='<TR><TD>'.$p_de->t('lvplan/vorher').' / '.$p_en->t('lvplan/vorher').': </TD>';
 					$message[$row->old_uid]->message.='<TD>'.$row->old_ort_kurzbz.'</TD>';
 					$message[$row->old_uid]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
 					$message[$row->old_uid]->message.='<TD>'.$row->old_lektor.'</TD>';
@@ -609,7 +675,7 @@ else
 					$message[$row->old_uid]->message.='<TD>'.$row->old_titel.'</TD></TR>';
 
 					$message[$row->old_uid]->message.="\n";
-					$message[$row->old_uid]->message.='<TR><TD>Jetzt: </TD>';
+					$message[$row->old_uid]->message.='<TR><TD>'.$p_de->t('lvplan/jetzt').' / '.$p_en->t('lvplan/jetzt').': </TD>';
 					$myclass=($row->ort_kurzbz!=$row->old_ort_kurzbz?'marked':'unmarked');
 					$message[$row->old_uid]->message.='<TD><span class="'.$myclass.'">'.$row->ort_kurzbz.'</span></TD>';
 					$myclass='unmarked';
@@ -643,11 +709,20 @@ else
 						$message[$student]->message_begin=$message_begin.'<BR>';
 						if(!isset($message[$student]->message))
 							$message[$student]->message='';
-						$message[$student]->message.='<font style="color:blue"><strong>Ge&auml;nderte Stunden:</strong></font><BR>
-								<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>LektorIn</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+						$message[$student]->message.='<font style="color:blue"><strong>'.$p_de->t('lvplan/geaenderteStunden').' / '.$p_en->t('lvplan/geaenderteStunden').'</strong></font><BR>
+								<TABLE><TR>
+									<TH>'.$p_de->t('lvplan/status').'<br><span class="engl">'.$p_en->t('lvplan/status').'</TH>
+									<TH>'.$p_de->t('lvplan/raum').'<br><span class="engl">'.$p_en->t('lvplan/raum').'</span></TH>
+									<TH>'.$p_de->t('lvplan/lehrverband').'<br><span class="engl">'.$p_en->t('lvplan/lehrverband').'</span></TH>
+									<TH>'.$p_de->t('lvplan/lektor').'<br><span class="engl">'.$p_en->t('lvplan/lektor').'</span></TH>
+									<TH>'.$p_de->t('global/datum').'<br><span class="engl">'.$p_en->t('global/datum').'</span></TH>
+									<TH>'.$p_de->t('lvplan/stdBeginn').'<br><span class="engl">'.$p_en->t('lvplan/stdBeginn').'</span></TH>
+									<TH>'.$p_de->t('lvplan/lehrfach').'<br><span class="engl">'.$p_en->t('lvplan/lehrfach').'</span></TH>
+									<TH>'.$p_de->t('lvplan/info').'<br><span class="engl">'.$p_en->t('lvplan/info').'</span></TH>
+								</TR>';
 					}
 					$message[$student]->message.="\n";
-					$message[$student]->message.='<TR><TD>Vorher: </TD>';
+					$message[$student]->message.='<TR><TD>'.$p_de->t('lvplan/vorher').' / '.$p_en->t('lvplan/vorher').': </TD>';
 					$message[$student]->message.='<TD>'.$row->old_ort_kurzbz.'</TD>';
 					$message[$student]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
 					$message[$student]->message.='<TD>'.$row->old_lektor.'</TD>';
@@ -657,7 +732,7 @@ else
 					$message[$student]->message.='<TD>'.$row->old_titel.'</TD></TR>';
 
 					$message[$student]->message.="\n";
-					$message[$student]->message.='<TR><TD>Jetzt: </TD>';
+					$message[$student]->message.='<TR><TD>'.$p_de->t('lvplan/jetzt').' / '.$p_en->t('lvplan/jetzt').': </TD>';
 					$myclass=($row->ort_kurzbz!=$row->old_ort_kurzbz?'marked':'unmarked');
 					$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->ort_kurzbz.'</span></TD>';
 					$myclass='unmarked';

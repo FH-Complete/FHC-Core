@@ -69,6 +69,8 @@ function saveProjekt($username, $passwort, $projekt)
     $projektNew->farbe = $projekt->farbe;
 	$projektNew->oe_kurzbz = $projekt->oe_kurzbz;
 	$projektNew->aufwandstyp_kurzbz = $projekt->aufwandstyp_kurzbz;
+	$projektNew->anzahl_ma = $projekt->anzahl_ma;
+	$projektNew->aufwand_pt = $projekt->aufwand_pt;
 	
 	if($projekt->neu=='true')
 		$projektNew->new = true; 

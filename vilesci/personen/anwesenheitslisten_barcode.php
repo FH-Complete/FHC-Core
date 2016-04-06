@@ -17,13 +17,19 @@
  *
  * Authors: Nikolaus Krondraf <nikolaus.krondraf@technikum-wien.at>
  */
-
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/stunde.class.php');
 require_once('../../include/standort.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
+$uid = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+if(!$rechte->isBerechtigt('basis/person'))
+	die($rechte->errormsg);
+	
 $studiengang = new studiengang;
 $studiengang->getAll("typ, kurzbz");
 $standort = new standort;
@@ -38,25 +44,25 @@ $standort->getAllStandorteWithOrt();
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
-	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script> 
-	
+	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
+
 	<script type="text/javascript">
-	$(document).ready(function() 
-	{ 
+	$(document).ready(function()
+	{
 	    $(".datepicker").datepicker($.datepicker.regional['de']).datepicker("setDate", new Date());
-        
+
         // Dropdown der Lehrveranstaltungen befüllen
-        $("#stg_kz, #sem").change(function() 
+        $("#stg_kz, #sem").change(function()
         {
             // alte Optionen entfernen
             $("#lvid")
                 .empty()
                 .append($('<option>', {value : ''})
                 .text('-- Alle --'));
-        
+
             var stg_kz = $("#stg_kz").val();
             var sem = $("#sem").val();
-        
+
             if(stg_kz != '' && sem != '')
             {
                 // LVs ergänzen
@@ -64,17 +70,17 @@ $standort->getAllStandorteWithOrt();
                     $.each(data, function(key, value) {
                         $('#lvid')
                             .append($('<option>', {value : key})
-                            .text(value)); 
+                            .text(value));
                     });
                 });
             }
         })
 	});
-	
+
 	function checkDates()
 	{
 		var result = true;
-		
+
 		if($("#von").val() == '' || $("#bis").val() == '')
 		{
 			result = false;
@@ -98,7 +104,7 @@ $standort->getAllStandorteWithOrt();
 				result = true;
 			}
 		}
-		
+
 		return result;
 	}
 	</script>
@@ -111,7 +117,7 @@ $standort->getAllStandorteWithOrt();
 		<input type="hidden" name="xsl" value="AnwListBarcode" />
 		<input type="hidden" name="output" value="pdf" />
 		<input type="hidden" name="xml" value="anwesenheitsliste.xml.php" />
-		
+
 		<table>
 		<tbody>
 			<tr>
@@ -170,7 +176,7 @@ $standort->getAllStandorteWithOrt();
 				<td>
 					<select name="lvid" id="lvid">
 						<option value=''>-- Alle --</option>
-						
+
 					</select>
 				</td>
 			</tr>

@@ -55,8 +55,19 @@ function InteressentDokumenteDialogInit(prestudent_id, akte_id)
 		var anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 		var nachgereicht = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nachgereicht" ));
 		var dokument_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dokument_kurzbz" ));
+		var dokument_bezeichnung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dokument_bezeichnung" ));
 	}
-	
+	//Wenn eine Akte geladen wird, deren Dokumenttyp nicht im Dropdown der Dokumenttypen aufscheint, wird der Typ hinzugefuegt
+	var vorhanden = document.getElementById('interessent-dokumente-dialog-menulist-dokument_kurzbz').getElementsByAttribute('value',dokument_kurzbz);
+	if(typeof(vorhanden[0])=='undefined')
+	{
+		dokumentemenue = document.getElementById("interessent-dokumente-dialog-menulist-dokument_kurzbz").children[1];
+		var menuentry = document.createElement("menuitem");
+		menuentry.setAttribute("value",dokument_kurzbz);
+		menuentry.setAttribute("label",dokument_bezeichnung);
+		dokumentemenue.appendChild(menuentry);
+	}
+		
 	document.getElementById('interessent-dokumente-dialog-textbox-titel').value=titel_intern;
 	document.getElementById('interessent-dokumente-dialog-textbox-anmerkung').value=anmerkung_intern;
 

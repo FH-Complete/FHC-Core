@@ -133,7 +133,22 @@ class zeitaufzeichnung extends basis_db
 		//Variablen pruefen
 		if(!$this->validate())
 			return false;
-
+		
+		// check ob identischer eintrag existiert
+		$check_qry = 'SELECT count(*) from campus.tbl_zeitaufzeichnung where uid='.$this->db_add_param($this->uid).' and start = '.$this->db_add_param($this->start).' and ende = '.$this->db_add_param($this->ende);
+		if($this->db_query($check_qry) && $this->new)
+		{
+			if($row = $this->db_fetch_object())
+			{
+				if ($row->count)
+				{
+					$this->errormsg = 'Identischer Eintrag existiert!';							
+					return false;
+				}
+			}
+		}
+		
+		
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen

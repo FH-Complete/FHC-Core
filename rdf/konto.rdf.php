@@ -34,6 +34,17 @@ require_once('../include/studiengang.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/student.class.php');
+require_once('../include/benutzerberechtigung.class.php');
+
+if(isset($_SERVER['REMOTE_USER']))
+{
+	// Wenn das Script direkt aufgerufen wird muss es ein Admin sein
+	$user=get_uid();
+	$berechtigung = new benutzerberechtigung();
+	$berechtigung->getBerechtigungen($user);
+	if(!$berechtigung->isBerechtigt('student/stammdaten'))
+		die('Sie haben keine Berechtigung fuer diese Seite');
+}
 
 $hier='';
 if(isset($_GET['xmlformat']))
@@ -239,16 +250,33 @@ elseif ($xmlformat=='xml')
 		$student_obj = new student();
 		$student_obj->load_person($row->person_id, $row->studiengang_kz);
 		
+		switch($stg->typ)
+		{
+			case 'b':
+				$studTyp = 'Bachelor';
+				break;
+			case 'm':
+				$studTyp = 'Master';
+				break;
+			case 'd':
+				$studTyp = 'Diplom';
+				break;
+			default:
+				$studTyp ='';
+		}
+		
 		echo "
   		<person>
 			<person_id><![CDATA[".$pers->person_id."]]></person_id>
 			<anrede><![CDATA[".$pers->anrede."]]></anrede>
+			<geschlecht><![CDATA[".$pers->geschlecht."]]></geschlecht>
 			<titelpost><![CDATA[".$pers->titelpost."]]></titelpost>
 			<titelpre><![CDATA[".$pers->titelpre."]]></titelpre>
 			<nachname><![CDATA[".$pers->nachname."]]></nachname>
 			<vorname><![CDATA[".$pers->vorname."]]></vorname>
 			<vornamen><![CDATA[".$pers->vornamen."]]></vornamen>
 			<name_gesamt><![CDATA[".trim($pers->anrede.' '.$pers->titelpre.' '.$pers->vorname.' '.$pers->nachname.' '.$pers->titelpost)."]]></name_gesamt>
+			<name_titel><![CDATA[".trim($pers->titelpre.' '.$pers->vorname.' '.$pers->nachname.' '.$pers->titelpost)."]]></name_titel>
 			<geburtsdatum><![CDATA[".$datum->convertISODate($pers->gebdatum)."]]></geburtsdatum>
 			<sozialversicherungsnummer><![CDATA[".$pers->svnr."]]></sozialversicherungsnummer>
 			<ersatzkennzeichen><![CDATA[".$pers->ersatzkennzeichen."]]></ersatzkennzeichen>
@@ -256,6 +284,7 @@ elseif ($xmlformat=='xml')
 			<tagesdatum><![CDATA[".date('d.m.Y')."]]></tagesdatum>
 			<logopath>".DOC_ROOT."skin/images/</logopath>
 			<studiengang><![CDATA[".$stg->bezeichnung."]]></studiengang>
+			<studiengang_typ><![CDATA[".$studTyp."]]></studiengang_typ>
 		</person>";
 	}
 

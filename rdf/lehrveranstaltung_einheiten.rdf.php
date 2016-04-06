@@ -99,10 +99,10 @@ elseif($fachbereich_kurzbz!='') // Alle LVs eines Fachbereiches
 				JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
 				JOIN lehre.tbl_studienplan USING(studienplan_id)
 				JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-				JOIN lehre.tbl_studienordnung_semester USING(studienordnung_id)
+				JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
 			WHERE
 				tbl_lehrveranstaltung.oe_kurzbz=(Select oe_kurzbz from public.tbl_fachbereich where fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz).")
-				AND tbl_studienordnung_semester.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
+				AND tbl_studienplan_semester.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
 				AND tbl_lehrveranstaltung.aktiv
 			UNION ";
 	}
@@ -133,10 +133,10 @@ elseif($fachbereich_kurzbz!='') // Alle LVs eines Fachbereiches
 			JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
 			JOIN lehre.tbl_studienplan USING(studienplan_id)
 			JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-			JOIN lehre.tbl_studienordnung_semester USING(studienordnung_id)
+			JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
 		WHERE
 			tbl_lehrveranstaltung.oe_kurzbz=(Select oe_kurzbz from public.tbl_fachbereich where fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz).")
-			AND tbl_studienordnung_semester.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).")";
+			AND tbl_studienplan_semester.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).")";
 	}
 
 }
@@ -174,24 +174,29 @@ else
 	if($orgform=='')
 		$orgform=null;
 	$stp_ids=array();
+	$stpl_main = new studienplan();
+
 	$sto_obj = new studienordnung();
 	if($sto_obj->loadStudienordnungSTG($stg_kz, $semester_aktuell, $sem))
 	{
 		foreach($sto_obj->result as $row_sto)
 		{
+			//echo "$row_sto->studienordnung_id $row_sto->semester\n";
 			$stp_obj = new studienplan();
 			if($stp_obj->loadStudienplanSTO($row_sto->studienordnung_id, $orgform))
 			{
 				foreach($stp_obj->result as $row_stp)
 				{
+					$stp_ids_arr[]=array('stpid'=>$row_stp->studienplan_id,'semester'=>$row_sto->semester);
 					$stp_ids[]=$row_stp->studienplan_id;
 				}
 			}
 		}
 	}
 	else
-		echo "FAILED:".$sto_obj->errormsg;
+		echo "FAILED:".$stpl_main->errormsg;
 	$qry='';
+
 	if(count($stp_ids)>0)
 	{
 		// Alle Lehrveranstaltungen die lt Studienplan zugeordnet sind
@@ -206,10 +211,15 @@ else
 				lehre.tbl_lehrveranstaltung
 				JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
 				JOIN lehre.tbl_studienplan USING(studienplan_id)
-			WHERE studienplan_id in (".$db->db_implode4SQL($stp_ids).")
-			AND tbl_lehrveranstaltung.aktiv";
-		if($sem!='')
-			$qry.=" AND tbl_studienplan_lehrveranstaltung.semester=".$db->db_add_param($sem);
+			WHERE (1!=1 ";
+
+		foreach($stp_ids_arr as $elem)
+		{
+			$qry.= "OR (
+		 		studienplan_id=".$db->db_add_param($elem['stpid'])."
+				AND tbl_studienplan_lehrveranstaltung.semester=".$db->db_add_param($elem['semester'])." )";
+		}
+		$qry.=") AND tbl_lehrveranstaltung.aktiv";
 		$qry.=" UNION ";
 	}
 
@@ -239,7 +249,7 @@ else
 	}
 	//$qry = 'SELECT distinct on(lehrveranstaltung_id) * FROM ('.$qry.' ORDER BY studienplan_id DESC) a';
 }
-// die($qry);
+ //die($qry);
 if(!$result = $db->db_query($qry))
 	die($db->db_last_error().'<BR>'.$qry);
 

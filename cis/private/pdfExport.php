@@ -34,10 +34,11 @@ require_once('../../include/konto.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/vorlage.class.php');
 require_once('../../include/addon.class.php');
+require_once('../../include/studiengang.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
-      
+
 $user = get_uid();
 loadVariables($user);
 
@@ -60,9 +61,9 @@ else
 
 if(isset($_GET['version']) && is_numeric($_GET['version']))
 	$version = $_GET['version'];
-else 
+else
 	$version ='';
-	
+
 if(isset($_GET['xsl_oe_kurzbz']))
 	$xsl_oe_kurzbz=$_GET['xsl_oe_kurzbz'];
 else
@@ -92,10 +93,35 @@ if(isset($_GET['typ']))
 	$params.='&typ='.$_GET['typ'];
 if(isset($_GET['all']))
     $params.='&all=1';
-if(isset($_GET['output']))
-	$output=$_GET['output'];
+
+//OE fuer Output ermitteln
+
+if ($xsl_oe_kurzbz!='')
+{
+	$oe_kurzbz = $xsl_oe_kurzbz;
+}
 else
-	$output='pdf';
+{
+	if($xsl_stg_kz=='')
+		$xsl_stg_kz='0';
+	$oe = new studiengang();
+	$oe->load($xsl_stg_kz);
+	$oe_kurzbz = $oe->oe_kurzbz;
+}
+
+//Darf der User Dokumente in einem NICHT-PDF-Format exportieren?
+if (isset($_GET['output']) && $_GET['output']!='pdf')
+{
+	if (!$rechte->isBerechtigt('system/change_outputformat',$oe_kurzbz))
+	{
+		$output = 'pdf';
+	}
+	else
+		$output = $_GET['output'];
+}
+else 
+	$output = 'pdf';
+
 
 $konto = new konto();
 if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
@@ -106,11 +132,12 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 	$buchungstypen = unserialize (CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN);
     }
 
-    $stsem_zahlung = $konto->getLastStSemBuchungstypen($user, $buchungstypen);
-    
+	if(isset($_GET['ss']))
+	    $stsem_zahlung = $konto->getLastStSemBuchungstypen($user, $buchungstypen, $_GET['ss']);
+
 	if((($xsl=='Inskription') || ($xsl == 'Studienblatt')) && ($_GET["ss"] != $stsem_zahlung))
 	{
-	    die('Der Studienbeitrag wurde noch nicht bezahlt');		
+	    die('Der Studienbeitrag wurde noch nicht bezahlt');
 	}
 	if(isset($_GET['buchungsnummern']))
 	{
@@ -134,11 +161,11 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 	//echo $xml_url;
 	// Load the XML source
 	$xml_doc = new DOMDocument;
-	
+
 	if(!$xml_doc->load($xml_url))
 		die('unable to load xml');
 	//echo ':'.$xml_doc->saveXML().':';
-		
+
 	//XSL aus der DB holen
 	$vorlage = new vorlage();
 	if($xsl_oe_kurzbz!='')
@@ -149,7 +176,7 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 	{
 		if($xsl_stg_kz=='')
 			$xsl_stg_kz='0';
-		
+
 		$vorlage->getAktuelleVorlage($xsl_stg_kz, $xsl, $version);
 	}
 
@@ -159,12 +186,12 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 		{
 		    case 'application/vnd.oasis.opendocument.text':
 			$endung = 'odt';
-			break; 
+			break;
 		    case 'application/vnd.oasis.opendocument.spreadsheet':
-			$endung = 'ods'; 
-			break;               
+			$endung = 'ods';
+			break;
 		    default:
-			$endung = 'pdf'; 
+			$endung = 'pdf';
 		}
 
 		// Load the XSL source
@@ -172,11 +199,11 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 
 		if(!$xsl_doc->loadXML($vorlage->text))
 		    die('unable to load xsl');
-		
+
 		// Configure the transformer
 		$proc = new XSLTProcessor;
 		$proc->importStyleSheet($xsl_doc); // attach the xsl rules
-		
+
 		$buffer = $proc->transformToXml($xml_doc);
 		//echo $buffer;
 		//exit;
@@ -186,7 +213,7 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 		file_put_contents('content.xml', $buffer);
 
 		// Wenn ein Style XSL uebergeben wurde wird ein zweites XML File erstellt mit den
-		// Styleanweisungen und ebenfalls zum Zip hinzugefuegt        
+		// Styleanweisungen und ebenfalls zum Zip hinzugefuegt
 		if(isset($_GET['style_xsl']))
 		{
 		    $style_xsl=$_GET['style_xsl'];
@@ -220,8 +247,8 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 		}
 		if(!$vorlage_found)
 		    $zipfile = DOC_ROOT.'/system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
-		
-		
+
+
 		$tempname_zip = 'out.zip';
 		if(copy($zipfile, $tempname_zip))
 		{
@@ -229,10 +256,10 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 		    if(isset($_GET['style_xsl']))
 			    exec("zip $tempname_zip styles.xml");
 
-		    clearstatcache(); 
+		    clearstatcache();
 		    if($vorlage->bezeichnung!='')
 			    $filename = $vorlage->bezeichnung;
-		    else 
+		    else
 			    $filename = $vorlage->vorlage_kurzbz;
             if($output == 'pdf')
             {
@@ -261,12 +288,12 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 				    $filename = $filename.'.pdf';
 				}
                 exec("unoconv -e IsSkipEmptyPages=false --stdout -f pdf $tempname_zip > $tempPdfName");
-                
-                $fsize = filesize($tempPdfName); 
+
+                $fsize = filesize($tempPdfName);
                 $handle = fopen($tempPdfName,'r');
                 header('Content-type: application/pdf');
                 header('Content-Disposition: attachment; filename="'.$filename.'"');
-                header('Content-Length: '.$fsize); 
+                header('Content-Length: '.$fsize);
             }
             else if($output =='odt')
             {
@@ -280,8 +307,8 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
                 $handle = fopen($tempname_zip,'r');
                 header('Content-type: '.$vorlage->mimetype);
                 header('Content-Disposition: attachment; filename="'.$filename.'.'.$endung.'"');
-                header('Content-Length: '.$fsize); 
-           } 
+                header('Content-Length: '.$fsize);
+           }
            else if($output =='doc')
            {
                 $tempPdfName = $vorlage->vorlage_kurzbz.'.doc';
@@ -291,19 +318,19 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 				    $studienordnung->loadStudienordnung($_GET['studienordnung_id']);
 				    $filename = $filename.'_'.$studienordnung->studiengangkurzbzlang.'.doc';
 				}
-				else 
+				else
 				{
 				    $filename = $filename.'.doc';
 				}
                 exec("unoconv -e IsSkipEmptyPages=false --stdout -f doc $tempname_zip > $tempPdfName");
-                
-                $fsize = filesize($tempPdfName); 
+
+                $fsize = filesize($tempPdfName);
                 $handle = fopen($tempPdfName,'r');
                 header('Content-type: application/vnd.ms-word');
                 header('Content-Disposition: attachment; filename="'.$filename.'"');
-                header('Content-Length: '.$fsize); 
+                header('Content-Length: '.$fsize);
 	    }
-	    while (!feof($handle)) 
+	    while (!feof($handle))
 	    {
 		echo fread($handle, 8192);
 	    }
@@ -339,7 +366,7 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 
 	    //wenn uid gefunden wird, dann den Nachnamen zum Dateinamen dazuhaengen
 	    $nachname='';
-	
+
 
 	    if(isset($_GET['uid']) && $_GET['uid']!='')
 	    {

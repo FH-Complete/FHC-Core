@@ -150,6 +150,8 @@ function onselectProjekt()
     var ende=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
     var budget=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#budget" ));
     var farbe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#farbe" ));
+    var aufwand_pt=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufwand_pt" ));
+    var anzahl_ma=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anzahl_ma" ));
     var aufwandstyp_kurzbz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufwandstyp_kurzbz" ));
     
     //Daten den Feldern zuweisen
@@ -165,6 +167,8 @@ function onselectProjekt()
     document.getElementById('textbox-projekt-detail-budget').value=budget;
     document.getElementById('textbox-projekt-detail-farbe').value=farbe;
     document.getElementById('checkbox-projekt-detail-neu').checked=false;
+    document.getElementById('textbox-projekt-anzahl_ma').value=anzahl_ma;
+    document.getElementById('textbox-projekt-aufwand_pt').value=aufwand_pt;
     MenulistSelectItemOnValue('menulist-projekt-detail-aufwandstyp', aufwandstyp_kurzbz);
     
     
@@ -174,7 +178,7 @@ function onselectProjekt()
 	
 	ressource = document.getElementById('box-projekt-ressourcen');
 	ressource.LoadRessourceTree(projekt_kurzbz,'');
-	
+	makeProjektAnalyse()
 
 }
 // ****
@@ -193,9 +197,11 @@ function saveProjektDetail()
 	beginn = document.getElementById('textbox-projekt-detail-beginn').iso;
 	ende = document.getElementById('textbox-projekt-detail-ende').iso;
 	budget = document.getElementById('textbox-projekt-detail-budget').value;
-    farbe = document.getElementById('textbox-projekt-detail-farbe').value;
+   farbe = document.getElementById('textbox-projekt-detail-farbe').value;
 	neu = document.getElementById('checkbox-projekt-detail-neu').checked;
 	aufwandstyp_kurzbz = MenulistGetSelectedValue('menulist-projekt-detail-aufwandstyp');
+	anzahl_ma = document.getElementById('textbox-projekt-anzahl_ma').value;
+	aufwand_pt = document.getElementById('textbox-projekt-aufwand_pt').value;
 	
 	var soapBody = new SOAPObject("saveProjekt");
 	//soapBody.appendChild(new SOAPObject("username")).val('joe');
@@ -212,6 +218,8 @@ function saveProjektDetail()
     projekt.appendChild(new SOAPObject("budget")).val(budget);
     projekt.appendChild(new SOAPObject("farbe")).val(farbe);
     projekt.appendChild(new SOAPObject("aufwandstyp_kurzbz")).val(aufwandstyp_kurzbz);
+    projekt.appendChild(new SOAPObject("anzahl_ma")).val(anzahl_ma);
+    projekt.appendChild(new SOAPObject("aufwand_pt")).val(aufwand_pt);
     
 	if(neu)
 		projekt.appendChild(new SOAPObject("neu")).val('true');
@@ -335,6 +343,9 @@ function ProjektDetailReset()
 	document.getElementById('textbox-projekt-detail-beginn').value='';
 	document.getElementById('textbox-projekt-detail-ende').value='';
 	document.getElementById('textbox-projekt-detail-budget').value='';
+	document.getElementById('textbox-projekt-anzahl_ma').value='';
+	document.getElementById('textbox-projekt-aufwand_pt').value='';
+	document.getElementById('textbox-projekt-detail-projektwuerdigkeit').value='';
 }
 
 // ****
@@ -349,9 +360,11 @@ function ProjektDisableFields(val)
 	document.getElementById('textbox-projekt-detail-beginn').disabled=val;
 	document.getElementById('textbox-projekt-detail-ende').disabled=val;
 	document.getElementById('textbox-projekt-detail-budget').disabled=val;
-    document.getElementById('textbox-projekt-detail-farbe').disabled=val;
+   document.getElementById('textbox-projekt-detail-farbe').disabled=val;
 	document.getElementById('button-projekt-detail-speichern').disabled=val;
 	document.getElementById('menulist-projekt-detail-aufwandstyp').disabled=val;
+	document.getElementById('textbox-projekt-anzahl_ma').disabled=val;
+	document.getElementById('textbox-projekt-aufwand_pt').disabled=val;
 }
 
 
@@ -373,9 +386,63 @@ function ProjektNeu()
 	document.getElementById('checkbox-projekt-detail-neu').checked=true;
 	document.getElementById('caption-projekt-detail').label='Neues Projekt';
 	document.getElementById('textbox-projekt-detail-farbe').value='#FF0000';
+	document.getElementById('textbox-projekt-anzahl_ma').disabled=false;
+	document.getElementById('textbox-projekt-aufwand_pt').disabled=false;
     
 	//Detail Tab auswaehlen
 	document.getElementById('tabs-projekt-main').selectedItem=document.getElementById('tab-projekt-detail');	
+}
+
+function makeProjektAnalyse(){
+	var ergebnis_el = document.getElementById('textbox-projekt-detail-projektwuerdigkeit');
+	ergebnis_el.value="";	
+	var anzahl_ma = document.getElementById('textbox-projekt-anzahl_ma').value;
+	var aufwand_pt = document.getElementById('textbox-projekt-aufwand_pt').value;
+	var budget = document.getElementById('textbox-projekt-detail-budget').value;
+	var beginn = document.getElementById('textbox-projekt-detail-beginn').value;
+	var ende = document.getElementById('textbox-projekt-detail-ende').value;
+	
+	if (!anzahl_ma || !aufwand_pt || !budget || !beginn || !ende)
+	{
+		ergebnis_el.value = 'Angaben unvollständig';
+	}
+	else
+	{
+		var beginn_arr = beginn.split(".");
+		var ende_arr = ende.split(".");
+		var date1 = new Date(beginn_arr[2],beginn_arr[1],beginn_arr[0]);
+		var date2 = new Date(ende_arr[2],ende_arr[1],ende_arr[0]);
+		
+		var dauerTage = parseInt((date2 - date1) / (1000 * 60 * 60 * 24));
+		
+		var punkte_gesamt = 0;
+		var projekttyp = '';
+		if (aufwand_pt < 10) punkte_gesamt += 1; 
+		else if (aufwand_pt <= 50) punkte_gesamt += 4;
+		else if (aufwand_pt <= 250) punkte_gesamt += 8;
+		else punkte_gesamt += 8;
+	
+		if (anzahl_ma < 3) punkte_gesamt += 1; 
+		else if (anzahl_ma <= 5) punkte_gesamt += 3;
+		else if (anzahl_ma <= 20) punkte_gesamt += 6;
+		else punkte_gesamt += 9;
+		
+		if (budget < 5000) punkte_gesamt += 1; 
+		else if (budget <= 25000) punkte_gesamt += 2;
+		else if (budget <= 500000) punkte_gesamt += 4;
+		else punkte_gesamt += 6;	
+	
+		if (dauerTage < 30) punkte_gesamt += 0; 
+		else if (dauerTage <= 90) punkte_gesamt += 4;
+		else if (dauerTage <= 360) punkte_gesamt += 5;
+		else punkte_gesamt += 7;	
+		
+		if (punkte_gesamt <= 8) projekttyp = 'Vorhaben';
+		else if  (punkte_gesamt <= 15) projekttyp = 'Kleinprojekt';
+		else if  (punkte_gesamt <= 30) projekttyp = 'Projekt';
+		else projekttyp = 'Großrojekt';
+		ergebnis_el.value = projekttyp;
+	}
 }
 
 function ProjektPrintStatusbericht()

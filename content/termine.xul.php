@@ -47,6 +47,11 @@ $student_uid = filter_input(INPUT_GET,'student_uid');
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/phpRequest.js.php" />
 
 <vbox flex="1">
+<popupset>
+	<menupopup id="termine-tree-popup">
+		<menuitem label="Anwesenheit umschalten" oncommand="TermineToggleAnwesenheit();" id="termine-tree-popup-toggle-anwesenheit" hidden="false"/>
+	</menupopup>
+</popupset>
 	<groupbox id="termine-groupbox-termine" flex="1">
 		<caption label="Termine" />
 		<vbox flex="1">
@@ -57,6 +62,7 @@ $student_uid = filter_input(INPUT_GET,'student_uid');
 			<tree id="termine-tree" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="rdf:null" ref="http://www.technikum-wien.at/termine"
 				persist="hidden, height"
+				context="termine-tree-popup"
 			>
 				<treecols>
 					<treecol id="termine-treecol-datum" label="Datum" flex="1" hidden="false"
@@ -99,10 +105,19 @@ $student_uid = filter_input(INPUT_GET,'student_uid');
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/termine/rdf#anwesend" onclick="termineTreeSort()"/>
 					<splitter class="tree-splitter"/>
+                    <treecol id="termine-treecol-titel" label="Titel" flex="1" hidden="false"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/termine/rdf#titel" onclick="termineTreeSort()"/>
+					<splitter class="tree-splitter"/>
 					<treecol id="termine-treecol-datum_iso" label="DatumISO" flex="1" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/termine/rdf#datum_iso" onclick="termineTreeSort()"/>
 					<splitter class="tree-splitter"/>
+					<treecol id="termine-treecol-lehreinheit_id" label="LehreinheitID" flex="1" hidden="true"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/termine/rdf#lehreinheit_id" onclick="termineTreeSort()"/>
+					<splitter class="tree-splitter"/>
+
 				</treecols>
 
 				<template>
@@ -120,7 +135,9 @@ $student_uid = filter_input(INPUT_GET,'student_uid');
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#lektor" />
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#lehrfach" />
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#anwesend" />
+                                    <treecell label="rdf:http://www.technikum-wien.at/termine/rdf#titel" />
 									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#datum_iso" />
+									<treecell label="rdf:http://www.technikum-wien.at/termine/rdf#lehreinheit_id" />
 								</treerow>
 							</treeitem>
 						</treechildren>

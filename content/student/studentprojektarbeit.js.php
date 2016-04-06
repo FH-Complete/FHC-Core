@@ -848,7 +848,18 @@ function StudentProjektbetreuerDetailReset()
 	document.getElementById('student-projektbetreuer-menulist-note').value='';
 	document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Betreuer';
 	document.getElementById('student-projektbetreuer-textbox-punkte').value='0.0';
-	document.getElementById('student-projektbetreuer-textbox-stunden').value='3.0';
+	if(document.getElementById('student-projektarbeit-menulist-projekttyp').value=='Diplom')
+	{
+		document.getElementById('student-projektbetreuer-textbox-stunden').value='5.0';
+	}
+	else if(document.getElementById('student-projektarbeit-menulist-projekttyp').value=='Bachelor')
+	{
+		document.getElementById('student-projektbetreuer-textbox-stunden').value='3.0';
+	}
+	else
+	{
+		document.getElementById('student-projektbetreuer-textbox-stunden').value='0.0';
+	}
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').value='80.0';
 	document.getElementById('student-projektbetreuer-menulist-person').value='';
 }

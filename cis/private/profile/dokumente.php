@@ -26,6 +26,7 @@ require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/konto.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/student.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -38,7 +39,25 @@ if(isset($_GET['stsem']))
 else
 	$stsem = '';
 
-$uid=get_uid();	
+$uid=get_uid();
+
+if(isset($_GET['uid']))
+{
+	// Administratoren duerfen die UID als Parameter uebergeben um die Notenliste
+	// von anderen Personen anzuzeigen
+
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($uid);
+	if($rechte->isBerechtigt('admin'))
+    {
+		$uid = $_GET['uid'];
+        $getParam = "&uid=" . $uid;
+    }
+    else
+        $getParam = "";
+}
+else
+	$getParam='';
 
 $student_studiengang = new student();
 $student_studiengang->load($uid);
@@ -102,7 +121,7 @@ echo '
 <script language="JavaScript" type="text/javascript">
 	function MM_jumpMenu(targ, selObj, restore)
 	{
-	  eval(targ + ".location=\'" + selObj.options[selObj.selectedIndex].value + "\'");
+	  eval(targ + ".location=\'" + selObj.options[selObj.selectedIndex].value + "'.$getParam.'\'");
 
 	  if(restore)
 	  {
@@ -114,13 +133,13 @@ echo '
 
 <body>
 <h1>'.$p->t('tools/dokumente').'</h1>';
-	
-	
+
+
 //Aktuelles Studiensemester oder gewaehltes Studiensemester
 $stsem_obj = new studiensemester();
 	if($stsem=='')
 		$stsem = $stsem_obj->getaktorNext();
-	
+
 $stsem_obj->getAll();
 
 echo "<br><hr>";
@@ -133,7 +152,7 @@ echo $p->t('global/studiensemester')."</b> <SELECT name='stsem' onChange=\"MM_ju
 			echo "<OPTION value='dokumente.php?stsem=$semrow->studiensemester_kurzbz'>$semrow->studiensemester_kurzbz</OPTION>";
 	}
 	echo "</SELECT><br />";
-	
+
 $konto = new konto();
 
 $buchungstypen = array();
@@ -142,11 +161,11 @@ if(defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))
     $buchungstypen = unserialize (CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN);
 }
 
-$stsem_zahlung = $konto->getLastStSemBuchungstypen($uid, $buchungstypen);
+$stsem_zahlung = $konto->getLastStSemBuchungstypen($uid, $buchungstypen, $stsem);
 if ($stsem_zahlung != FALSE && $stsem == $stsem_zahlung)
 {
 	echo "<a href='../pdfExport.php?xsl=Inskription&xml=student.rdf.php&ss=".$stsem."&uid=".$uid."&xsl_stg_kz=".$xsl_stg_kz."'>".$p->t('tools/inskriptionsbestaetigung')."</a>";
-	echo ' - '.$p->t('tools/studienbeitragFuerSSBezahltAmDatum',array($stsem, $konto->buchungsdatum));
+	echo ' - '.$p->t('tools/studienbeitragFuerSSBezahlt',array($stsem));
 }
 else
 	echo $p->t('tools/inskriptionsbestaetigung')." - ".$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem));
@@ -158,7 +177,7 @@ if(defined('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN') && CIS_DOKUMENTE_STUDIENBUC
     if ($stsem_zahlung != FALSE && $stsem == $stsem_zahlung)
     {
 	    echo "<a href='../pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&ss=".$stsem."&uid=".$uid."'>".$p->t('tools/studienbuchblatt')."</a>";
-	    echo ' - '.$p->t('tools/studienbeitragFuerSSBezahltAmDatum',array($stsem, $konto->buchungsdatum));
+	    echo ' - '.$p->t('tools/studienbeitragFuerSSBezahlt',array($stsem));
     }
     else
 	    echo $p->t('tools/studienbuchblatt')." - ".$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem));
@@ -168,12 +187,12 @@ if(defined('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN') && CIS_DOKUMENTE_STUDIENBUC
 
 if(defined('CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN') && CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN)
 {
-	echo "<a href='studienerfolgsbestaetigung.php' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Deutsch</a><br>";
-	echo "<a href='studienerfolgsbestaetigung.php?lang=en' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Englisch</a>";
+	echo "<a href='studienerfolgsbestaetigung.php?".$getParam."' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Deutsch</a><br>";
+	echo "<a href='studienerfolgsbestaetigung.php?lang=en".$getParam."' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Englisch</a>";
 	echo "<hr>";
 }
 echo "<br>";
-	
+
 echo '</body>
 </html>
 ';

@@ -714,6 +714,7 @@ function StudentDetailSave()
 	var alias = document.getElementById('student-detail-textbox-alias').value;
 	var matr_nr = document.getElementById('student-detail-textbox-matr_nr').value;
 
+
 	//Wenn es noch kein Student ist, dann wird die Studiengang_kz vom Prestudent genommen
 	if(studiengang_kz=='')
 		studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
@@ -1343,7 +1344,11 @@ function StudentAuswahl()
 		// *** Incomming/Outgoing ***
 		bisiotree = document.getElementById('student-io-tree');
 
+<<<<<<< HEAD
 		url='<?php echo APP_ROOT;?>rdf/bisio.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
+=======
+		url='<?php echo APP_ROOT;?>rdf/bisio.rdf.php?uid='+uid+"&"+gettimestamp();
+>>>>>>> master
 
 		try
 		{
@@ -1375,7 +1380,12 @@ function StudentAuswahl()
 	{
 		// *** ZeugnisNoten ***
 		notentree = document.getElementById('student-noten-tree');
+<<<<<<< HEAD
 		url='<?php echo APP_ROOT;?>rdf/zeugnisnote.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
+=======
+
+		url='<?php echo APP_ROOT;?>rdf/zeugnisnote.rdf.php?uid='+uid+"&"+gettimestamp();
+>>>>>>> master
 
 		try
 		{
@@ -1444,7 +1454,14 @@ function StudentAuswahl()
 		// ***** Pruefungen *****
 		pruefungtree = document.getElementById('student-pruefung-tree');
 
+<<<<<<< HEAD
 		url='<?php echo APP_ROOT;?>rdf/pruefung.rdf.php?student_uid='+uid+"&"+gettimestamp();
+=======
+		var pruefungstsemall='';
+		if(document.getElementById('student-pruefung-button-filterstsem').checked)
+			pruefungstsemall='&all_stsem';
+		url='<?php echo APP_ROOT;?>rdf/pruefung.rdf.php?student_uid='+uid+pruefungstsemall+"&"+gettimestamp();
+>>>>>>> master
 
 		try
 		{
@@ -3908,6 +3925,45 @@ function StudentNotenPunkteChange()
 
 // **************** PRUEFUNG ************** //
 
+function pruefungTreeRefresh()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var uid = document.getElementById('student-detail-textbox-uid').value;
+	var pruefungtree = document.getElementById('student-pruefung-tree');
+
+	var pruefungstsemall='';
+	if(document.getElementById('student-pruefung-button-filterstsem').checked)
+		pruefungstsemall='&all_stsem';
+	url='<?php echo APP_ROOT;?>rdf/pruefung.rdf.php?student_uid='+uid+pruefungstsemall+"&"+gettimestamp();
+
+	try
+	{
+		StudentPruefungTreeDatasource.removeXMLSinkObserver(StudentPruefungTreeSinkObserver);
+		pruefungtree.builder.removeListener(StudentPruefungTreeListener);
+	}
+	catch(e)
+	{}
+
+	//Alte DS entfernen
+	var oldDatasources = pruefungtree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		pruefungtree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	pruefungtree.builder.rebuild();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	StudentPruefungTreeDatasource = rdfService.GetDataSource(url);
+	StudentPruefungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	StudentPruefungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	pruefungtree.database.AddDataSource(StudentPruefungTreeDatasource);
+	StudentPruefungTreeDatasource.addXMLSinkObserver(StudentPruefungTreeSinkObserver);
+	pruefungtree.builder.addListener(StudentPruefungTreeListener);
+
+	StudentPruefungDetailDisableFields(true);
+}
+
 // ****
 // * Selectiert den Pruefung Eintrag nachdem der Tree
 // * rebuildet wurde.
@@ -3950,6 +4006,7 @@ function StudentPruefungDisableFileds(val)
 {
 	document.getElementById('student-pruefung-button-neu').disabled = val;
 	document.getElementById('student-pruefung-button-loeschen').disabled= val;
+	document.getElementById('student-pruefung-button-filterstsem').disabled=val;
 
 	if(val)
 		StudentPruefungDetailDisableFields(val);
@@ -4389,6 +4446,18 @@ function StudentPruefungAuswahl()
 	document.getElementById('student-pruefung-checkbox-neu').checked=false;
 	document.getElementById('student-pruefung-textbox-pruefung_id').value=pruefung_id;
 	document.getElementById('student-pruefung-textbox-punkte').value=punkte;
+}
+
+function StudentPruefungFilterStsem()
+{
+	var buttonstsem = document.getElementById('student-pruefung-button-filterstsem');
+	if(buttonstsem.checked)
+		buttonstsem.label="Aktuelles Studiensemester anzeigen";
+	else
+		buttonstsem.label="Alle Studiensemester anzeigen";
+
+
+	pruefungTreeRefresh();
 }
 
 // **************** ANRECHNUNGEN ************** //

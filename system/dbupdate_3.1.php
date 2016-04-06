@@ -20,8 +20,8 @@
  * Beschreibung:
  * Dieses Skript prueft die Datenbank auf aktualitaet, dabei werden fehlende Attribute angelegt.
  */
- 
- 
+
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -3534,8 +3534,8 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 // Attribut Aktiv für tbl_vorlagestudiengang und alle bisherigen Vorlagen auf aktiv setzen
 if(!$result = @$db->db_query("SELECT aktiv FROM public.tbl_vorlagestudiengang"))
 {
-	$qry = "ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN aktiv boolean NOT NULL default true;	
-			
+	$qry = "ALTER TABLE public.tbl_vorlagestudiengang ADD COLUMN aktiv boolean NOT NULL default true;
+
 			UPDATE public.tbl_vorlagestudiengang SET aktiv=true;
 			";
 
@@ -3613,117 +3613,117 @@ if($result = @$db->db_query("SELECT * FROM information_schema.tables WHERE table
 		$qry = "
 		CREATE OR REPLACE VIEW system.vw_berechtigung_nichtrekursiv AS
 		SELECT
-			uid, berechtigung_kurzbz, 
+			uid, berechtigung_kurzbz,
 			-- art zusammenfassung und nur die nehmen die gleich sind
-			CASE WHEN length(art)>length(art1) THEN art1 ELSE art END as art, 
+			CASE WHEN length(art)>length(art1) THEN art1 ELSE art END as art,
 			oe_kurzbz, kostenstelle_id
 		FROM
 			(
 			-- Normal
-			SELECT 
+			SELECT
 				benutzerberechtigung_id, tbl_benutzerrolle.uid, tbl_benutzerrolle.funktion_kurzbz,
 				tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 				tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 				tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 				tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
-			FROM 
-				system.tbl_benutzerrolle JOIN system.tbl_berechtigung USING(berechtigung_kurzbz) 
+			FROM
+				system.tbl_benutzerrolle JOIN system.tbl_berechtigung USING(berechtigung_kurzbz)
 
 			-- Rollen
 			UNION
-			SELECT 
+			SELECT
 				benutzerberechtigung_id, tbl_benutzerrolle.uid, tbl_benutzerrolle.funktion_kurzbz,
 				tbl_benutzerrolle.rolle_kurzbz, tbl_berechtigung.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_rolleberechtigung.art art1,
 				tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 				tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 				tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
-			FROM 
-				system.tbl_benutzerrolle JOIN system.tbl_rolle USING(rolle_kurzbz) 
-				JOIN system.tbl_rolleberechtigung USING(rolle_kurzbz) 
+			FROM
+				system.tbl_benutzerrolle JOIN system.tbl_rolle USING(rolle_kurzbz)
+				JOIN system.tbl_rolleberechtigung USING(rolle_kurzbz)
 				JOIN system.tbl_berechtigung ON(tbl_rolleberechtigung.berechtigung_kurzbz=tbl_berechtigung.berechtigung_kurzbz)
 
 			-- Funktionen
 			UNION
-			SELECT 
+			SELECT
 				benutzerberechtigung_id, tbl_benutzerfunktion.uid, tbl_benutzerrolle.funktion_kurzbz,
 				tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 				tbl_benutzerfunktion.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 				tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 				tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
-			FROM 
+			FROM
 				system.tbl_benutzerrolle JOIN public.tbl_benutzerfunktion USING(funktion_kurzbz)
-			WHERE 
+			WHERE
 				(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now())
 				AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
 
 			-- Funktion Mitarbeiter
 			UNION
-			SELECT 
+			SELECT
 				benutzerberechtigung_id, vw_mitarbeiter.uid, tbl_benutzerrolle.funktion_kurzbz,
 				tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 				tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 				tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 				tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
-			FROM 
+			FROM
 				system.tbl_benutzerrolle, campus.vw_mitarbeiter
-			WHERE 
+			WHERE
 				tbl_benutzerrolle.funktion_kurzbz='Mitarbeiter' and vw_mitarbeiter.aktiv
 
-	
+
 			-- Funktion Student
 			UNION
-			SELECT 
+			SELECT
 				benutzerberechtigung_id, vw_student.uid, tbl_benutzerrolle.funktion_kurzbz,
 				tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 				tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 				tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 				tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
-			FROM 
+			FROM
 				system.tbl_benutzerrolle, campus.vw_student
-			WHERE 
+			WHERE
 				tbl_benutzerrolle.funktion_kurzbz='Student' and vw_student.aktiv
-		) as a 
-		WHERE 
+		) as a
+		WHERE
 			-- Datumsgrenzen beruecksichtigen
-			(a.start<=now() OR a.start is null) 
+			(a.start<=now() OR a.start is null)
 			AND (a.ende>=now() OR a.ende is null)
 
 			-- Neagtiv Rechte entfernen
 			AND not negativ
-			AND NOT EXISTS(SELECT 
+			AND NOT EXISTS(SELECT
 				1
-			FROM 
+			FROM
 				system.tbl_benutzerrolle JOIN system.tbl_berechtigung USING(berechtigung_kurzbz) WHERE uid=a.uid AND berechtigung_kurzbz=a.berechtigung_kurzbz AND negativ);
 
 
-		
+
 		CREATE OR REPLACE VIEW system.vw_berechtigung AS
-		WITH RECURSIVE oes(oe_kurzbz, pfad) as 
+		WITH RECURSIVE oes(oe_kurzbz, pfad) as
 		(
-			SELECT 
-				oe_kurzbz, '/' || oe_kurzbz::text as pfad FROM public.tbl_organisationseinheit 
-			WHERE 
-				oe_parent_kurzbz is null AND aktiv = true 
+			SELECT
+				oe_kurzbz, '/' || oe_kurzbz::text as pfad FROM public.tbl_organisationseinheit
+			WHERE
+				oe_parent_kurzbz is null AND aktiv = true
 			UNION ALL
-			SELECT 
-				o.oe_kurzbz, COALESCE(oes.pfad,'') || '/' || COALESCE(o.oe_kurzbz,'') as pfad 
-			FROM 
-				public.tbl_organisationseinheit o, oes 
-			WHERE 
+			SELECT
+				o.oe_kurzbz, COALESCE(oes.pfad,'') || '/' || COALESCE(o.oe_kurzbz,'') as pfad
+			FROM
+				public.tbl_organisationseinheit o, oes
+			WHERE
 				o.oe_parent_kurzbz=oes.oe_kurzbz and aktiv = true
 		)
-		SELECT 
+		SELECT
 			uid, berechtigung_kurzbz, art, oes.oe_kurzbz, kostenstelle_id
-		FROM 
-			system.vw_berechtigung_nichtrekursiv, oes 
-		WHERE 
+		FROM
+			system.vw_berechtigung_nichtrekursiv, oes
+		WHERE
 			(oes.pfad || '/' like '%/' || vw_berechtigung_nichtrekursiv.oe_kurzbz || '/%'
 			OR (vw_berechtigung_nichtrekursiv.oe_kurzbz is null AND kostenstelle_id is null))
 		UNION
-		SELECT 
+		SELECT
 			uid, berechtigung_kurzbz, art, null::varchar(32), kostenstelle_id
-		FROM 
-			system.vw_berechtigung_nichtrekursiv 
+		FROM
+			system.vw_berechtigung_nichtrekursiv
 		WHERE
 			kostenstelle_id is not null;
 
@@ -3740,7 +3740,7 @@ if($result = @$db->db_query("SELECT * FROM information_schema.tables WHERE table
 	}
 }
 
-// Eigene Berechtigung ob Unoconv-Dokumente aus dem FAS als Nicht-PDF exportiert werden dürfen 
+// Eigene Berechtigung ob Unoconv-Dokumente aus dem FAS als Nicht-PDF exportiert werden dürfen
 if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='system/change_outputformat' LIMIT 1"))
 {
 	if($db->db_num_rows($result)==0)
@@ -4099,5 +4099,5 @@ if (!$result=@$db->db_query($sql_query))
 if($error==false)
 	echo '<br>Gegenpruefung fehlerfrei';
 
-	
+
 ?>

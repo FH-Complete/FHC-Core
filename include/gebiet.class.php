@@ -283,6 +283,7 @@ class gebiet extends basis_db
 	public function check_gebiet($gebiet_id)
 	{
 		$this->errormsg = '';
+		$this->warningmsg = '';
 		$this->load($gebiet_id);
 
 		//wenn levels verwendet werden muss maxfragen gesetzt sein
@@ -416,7 +417,7 @@ class gebiet extends basis_db
 		{
 			while($row = $this->db_fetch_object())
 			{
-				$this->errormsg .= "Frage Nummer $row->nummer (ID: $row->frage_id) Sprache $row->sprache hat mehrere gleiche Antworten.\n";
+				$this->warningmsg .= "Frage Nummer $row->nummer (ID: $row->frage_id) Sprache $row->sprache hat mehrere gleiche Antworten.\n";
 			}
 		}
 

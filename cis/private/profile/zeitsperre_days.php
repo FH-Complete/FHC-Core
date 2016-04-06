@@ -36,6 +36,7 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/sprache.class.php');
 require_once('../../../include/Excel/excel.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $datum_obj = new datum();
 $sprache = getSprache();
@@ -44,9 +45,12 @@ $sprache_obj = new sprache();
 $sprache_obj->load($sprache);
 $sprache_index=$sprache_obj->index;
 $uid = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
 	
-if(!check_lektor($uid))
-die($p->t('global/keineBerechtigung'));
+if(!check_lektor($uid) && (!$rechte->isBerechtigt('admin',0) && !$rechte->isBerechtigt('mitarbeiter')))
+	die($p->t('global/keineBerechtigung'));
 
 $days=trim((isset($_REQUEST['days']) && is_numeric($_REQUEST['days'])?$_REQUEST['days']:14));
 

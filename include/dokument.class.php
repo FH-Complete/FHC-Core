@@ -237,8 +237,7 @@ class dokument extends basis_db
 				$qry.=$this->db_add_param($value).',';
 			foreach($this->dokumentbeschreibung_mehrsprachig as $key=>$value)
 				$qry.=$this->db_add_param($value).',';
-			$this->db_add_param($this->bezeichnung).');';
-
+			$qry.= $this->db_add_param($this->bezeichnung).');';
 		}
 		else
 		{
@@ -255,7 +254,7 @@ class dokument extends basis_db
 				$qry.=" dokumentbeschreibung_mehrsprachig[$idx]=".$this->db_add_param($value).",";
 			}
 			$qry = mb_substr($qry,0,-1);
-			$qry.='WHERE dokument_kurzbz = '.$this->db_add_param($this->dokument_kurzbz);
+			$qry.=' WHERE dokument_kurzbz = '.$this->db_add_param($this->dokument_kurzbz);
 		}
 
 		if($this->db_query($qry))
@@ -451,12 +450,19 @@ class dokument extends basis_db
 
 	/**
 	 * Liefert alle Dokumenttypen
+	 * @param string $not_in Kommagetrennter String von dokument_kurzbz. Optional. Um bestimmte Dokumente (zB Zeugnis, welcher fix im Core vorhanden sein muss) auszuschließen. 
 	 * @return true wenn ok false im Fehlerfall
 	 */
-	public function getAllDokumente()
+	public function getAllDokumente($not_in='')
 	{
-		$qry = "SELECT * FROM public.tbl_dokument ORDER BY bezeichnung;";
-
+		$qry = "SELECT * FROM public.tbl_dokument ";
+		
+		if($not_in!='')
+		{
+			$qry .= " WHERE dokument_kurzbz NOT IN (".$this->implode4SQL(explode(',', $not_in)).")";
+		}
+		$qry .= " ORDER BY bezeichnung;";
+		
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -744,16 +750,18 @@ class dokument extends basis_db
 	 * Optional kann auch eine studiengang_kz uebergeben werden, ob speziell dort das Dokument akzeptiert wurde
 	 * @param $dokument_kurzbz
 	 * @param $person_id
-	 * @param $studiengang_kz integer
+	 * @param $studiengang_kz integer oder array aus mehreren studiengang_kz
 	 * @return boolean true wenn akzeptiert, false wenn noch nicht akzeptiert
 	 */
 	function akzeptiert($dokument_kurzbz, $person_id, $studiengang_kz=null)
 	{
-		if($studiengang_kz!='' && !is_numeric($studiengang_kz))
+		if(($studiengang_kz!='' && !is_numeric($studiengang_kz)) && !is_array($studiengang_kz))
 		{
 			$this->errormsg = 'Studiengang_kz ist ungueltig';
 			return false;
 		}
+		if(is_array($studiengang_kz))
+			$studiengang_kz = $this->implode4SQL($studiengang_kz);
 
 		$qry = "SELECT
 					*
@@ -764,7 +772,8 @@ class dokument extends basis_db
 					dokument_kurzbz=".$this->db_add_param($dokument_kurzbz)."
 					AND tbl_prestudent.person_id=".$this->db_add_param($person_id);
 		if ($studiengang_kz!='')
-			$qry .= " AND studiengang_kz=".$this->db_add_param($dokument_kurzbz, FHC_INTEGER);
+			$qry .= " AND studiengang_kz IN (".$studiengang_kz.")";
+		
 		if($result = $this->db_query($qry))
 		{
 			if($this->db_num_rows($result)>0)

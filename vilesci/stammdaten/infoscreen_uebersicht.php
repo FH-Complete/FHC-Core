@@ -28,7 +28,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 	
 if(!$rechte->isBerechtigt('basis/infoscreen'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+	die($rechte->errormsg);
 
 $datum_obj = new datum();
 
@@ -127,6 +127,26 @@ if($action=='new' || $action=='update')
 	</table>
 	</form>';
 }
+if($action=='reboot')
+{
+	if(!$rechte->isBerechtigt('admin'))
+		die($rechte->errormsg);
+	
+	set_include_path ("../../vendor/FHC-vendor/phpseclib");
+	require_once("Net/SSH2.php");
+	
+	if(isset($_GET["ip"]) && $_GET["ip"])
+	{
+		$ssh = new Net_SSH2($_GET["ip"]);
+		if (!$ssh->login(INFOSCREEN_USER, INFOSCREEN_PASSWORD))
+		{
+			exit('Login Failed');
+		}
+		echo $ssh->exec('reboot') . "<br>";
+	}
+	echo '<script>window.location.href = "infoscreen_uebersicht.php";</script>';
+}
+
 $infoscreen = new infoscreen();
 
 if(!$infoscreen->getAll())
@@ -151,6 +171,8 @@ foreach($infoscreen->result as $row)
 	echo '<td>',$basis->convert_html_chars($row->bezeichnung),'</td>';
 	echo '<td>',$basis->convert_html_chars($row->beschreibung),'</td>';
 	echo '<td>',$basis->convert_html_chars($row->ipadresse),'</td>';
+	if($rechte->isBerechtigt('admin'))
+		echo '<td><a href="infoscreen_uebersicht.php?action=reboot&ip='.$row->ipadresse.' " target="uebersicht_infoscreen">Reboot</a></td>';
 	echo '<td><a href="infoscreen_details.php?action=show&infoscreen_id=',$basis->convert_html_chars($row->infoscreen_id),' " target="detail_infoscreen">details</a></td>';
 	echo '<td><a href="infoscreen_uebersicht.php?action=update&infoscreen_id=',$basis->convert_html_chars($row->infoscreen_id),' " target="uebersicht_infoscreen">bearbeiten</a></td>';
 	echo '</tr>';

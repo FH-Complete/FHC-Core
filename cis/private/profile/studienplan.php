@@ -42,6 +42,7 @@ require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/benutzergruppe.class.php');
 require_once('../../../include/konto.class.php');
 require_once('../../../include/lvinfo.class.php');
+require_once('../../../include/addon.class.php');
 
 $uid = get_uid();
 
@@ -137,8 +138,34 @@ echo '<!DOCTYPE html>
 	<link rel="stylesheet" href="../../../skin/style.css.php" />
 	<link rel="stylesheet" href="../../../skin/jquery.css" />
 	<link rel="stylesheet" href="../../../skin/jquery-ui-1.9.2.custom.min.css" />
-	<script type="text/javascript" src="../../../include/js/jquery1.9.min.js"></script>
+	<script type="text/javascript" src="../../../include/js/jquery1.9.min.js"></script>';
 
+	// ADDONS laden
+	$addon_obj = new addon();
+	$addon_obj->loadAddons();
+	foreach($addon_obj->result as $addon)
+	{
+	    if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
+	        echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+	}
+
+	// Wenn Seite fertig geladen ist Addons aufrufen
+	echo '
+	<script>
+	$( document ).ready(function()
+	{
+	    if(typeof addon  !== \'undefined\')
+	    {
+	        for(i in addon)
+	        {
+	            addon[i].init("cis/private/profile/studienplan.php", {});
+	        }
+	    }
+	});
+	</script>
+	';
+
+echo '
 	<script type="text/javascript">
 	$(document).ready(function() {
 		$("#dialog").dialog({ autoOpen: false, width: "auto" });
@@ -257,7 +284,11 @@ if(!in_array($stsemToShow,$stsem_arr))
 {
 	for($i=count($stsem_arr);$i<50;$i++)
 	{
-		$stsem_arr[$i]=$stsem->getNextFrom($studiensemester_prev);
+		if(!$stsem_arr[$i]=$stsem->getNextFrom($studiensemester_prev))
+		{
+			unset($stsem_arr[$i]);
+			break;
+		}
 		$studiensemester_prev=$stsem_arr[$i];
 		if($stsemToShow==$studiensemester_prev)
 		{
@@ -391,7 +422,7 @@ function drawTree($tree, $depth)
 			$sprache = 'de';
 			break;
 		    case 'English':
-			$sprach = 'en';
+			$sprache = 'en';
 			break;
 		    default:
 			$sprache = 'de';

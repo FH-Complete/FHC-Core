@@ -34,7 +34,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:table-column-properties style:column-width="7.5cm" style:rel-column-width="29971*"/>
 		</style:style>
 		<style:style style:name="Tabelle3.A1" style:family="table-cell">
-			<style:table-cell-properties style:vertical-align="" fo:padding-left="0cm" fo:padding-right="0cm" fo:padding-top="0.101cm" fo:padding-bottom="0.101cm" fo:border-left="none" fo:border-right="none" fo:border-top="none" fo:border-bottom="1pt dotted #000000"/>
+			<style:table-cell-properties style:vertical-align="bottom" fo:padding-left="0cm" fo:padding-right="0cm" fo:padding-top="0.101cm" fo:padding-bottom="0.101cm" fo:border-left="none" fo:border-right="none" fo:border-top="none" fo:border-bottom="1pt dotted #000000"/>
 		</style:style>
 		<style:style style:name="Tabelle3.B1" style:family="table-cell">
 			<style:table-cell-properties fo:padding-left="0cm" fo:padding-right="0cm" fo:padding-top="0.101cm" fo:padding-bottom="0.101cm" fo:border="none"/>
@@ -55,27 +55,24 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:table-properties style:width="16.401cm" fo:margin-top="0.199cm" fo:margin-bottom="0cm" table:align="margins"/>
 		</style:style>
 		<style:style style:name="Tabelle1.A" style:family="table-column">
-			<style:table-column-properties style:column-width="8.701cm" style:rel-column-width="4933*"/>
+			<style:table-column-properties style:column-width="10.437cm" style:rel-column-width="41702*"/>
 		</style:style>
 		<style:style style:name="Tabelle1.B" style:family="table-column">
-			<style:table-column-properties style:column-width="3.799cm" style:rel-column-width="2154*"/>
-		</style:style>
-		<style:style style:name="Tabelle1.C" style:family="table-column">
-			<style:table-column-properties style:column-width="1.499cm" style:rel-column-width="850*"/>
+			<style:table-column-properties style:column-width="1.988cm" style:rel-column-width="7944*"/>
 		</style:style>
 		<style:style style:name="Tabelle1.D" style:family="table-column">
-			<style:table-column-properties style:column-width="2.401cm" style:rel-column-width="1361*"/>
+			<style:table-column-properties style:column-width="1.988cm" style:rel-column-width="7945*"/>
 		</style:style>
 		<style:style style:name="Tabelle1.1" style:family="table-row">
 			<style:table-row-properties style:min-row-height="0.75cm"/>
 		</style:style>
 		<style:style style:name="Tabelle1.A1" style:family="table-cell">
-			<style:table-cell-properties style:vertical-align="middle" fo:background-color="#afb8bc" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000">
+			<style:table-cell-properties style:vertical-align="middle" fo:background-color="#999999" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000">
 				<style:background-image/>
 			</style:table-cell-properties>
 		</style:style>
 		<style:style style:name="Tabelle1.D1" style:family="table-cell">
-			<style:table-cell-properties style:vertical-align="middle" fo:background-color="#afb8bc" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border="0.05pt solid #000000">
+			<style:table-cell-properties style:vertical-align="middle" fo:background-color="#999999" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border="0.05pt solid #000000">
 				<style:background-image/>
 			</style:table-cell-properties>
 		</style:style>
@@ -194,6 +191,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
 			<style:text-properties fo:font-size="9pt" officeooo:rsid="00317832" officeooo:paragraph-rsid="00317832" style:font-size-asian="9pt" style:font-size-complex="9pt"/>
 		</style:style>
+		<style:style style:name="P25" style:family="paragraph" style:parent-style-name="Standard">
+			<style:text-properties style:font-name="Arial" fo:font-size="6pt" officeooo:rsid="003032c4" officeooo:paragraph-rsid="003032c4" style:font-size-asian="9pt" style:font-size-complex="9pt"/>
+		</style:style>
 		<style:style style:name="T1" style:family="text">
 			<style:text-properties fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
 		</style:style>
@@ -204,7 +204,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:text-properties officeooo:rsid="00317832"/>
 		</style:style>
 		<style:style style:name="fr1" style:family="graphic" style:parent-style-name="Frame">
-			<style:graphic-properties style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:vertical-rel="page-content" style:horizontal-pos="center" style:horizontal-rel="page-content" fo:padding="0cm" fo:border="none" style:shadow="none" draw:shadow-opacity="100%"/>
+			<style:graphic-properties style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="bottom" style:vertical-rel="page-content" style:horizontal-pos="center" style:horizontal-rel="page-content" fo:padding="0cm" fo:border="none" style:shadow="none" draw:shadow-opacity="100%"/>
 		</style:style>
 		<style:style style:name="fr2" style:family="graphic" style:parent-style-name="Graphics">
 			<style:graphic-properties style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="bottom" style:vertical-rel="page-content" style:horizontal-pos="from-left" style:horizontal-rel="page-content" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
@@ -227,49 +227,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
-			<!-- Wichtig für Mehrfachdruck (mehrere Studenten ausgewählt): Wenn ein Element (in diesem Fall Stempel und Unterschriftenblock) relativ zur SEITE ausgerichtet werden soll, 
-			muss für jedes Dokument (jeder neue Durchlauf der Schleife) ein draw:frame-Tag definiert werden. Diese müssen ALLE VOR den ersten text:p-Elementen stehen.
-			Deshalb wirde erst die Schleife für die draw:frames aufgerufen, dann folg tder Inhalt -->
-			<xsl:if test="position()=1">
-				<xsl:for-each select="../zertifikat">
-					<xsl:variable select="position()" name="number"/><!-- Variable number definieren, die nach jedem Dokument um eines erhöht wird (position) -->
-						<draw:frame draw:style-name="fr1" draw:name="Rahmen{$number}" text:anchor-type="page" text:anchor-page-number="{$number}" svg:y="21.001cm" draw:z-index="0">
-			                <draw:text-box fo:min-height="0.499cm" fo:min-width="2cm">
-			                    <table:table table:name="Tabelle3" table:style-name="Tabelle3">
-			                        <table:table-column table:style-name="Tabelle3.A"/>
-			                        <table:table-column table:style-name="Tabelle3.B"/>
-			                        <table:table-column table:style-name="Tabelle3.C"/>
-			                        <table:table-row>
-			                            <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-			                                <text:p text:style-name="P17">Wien, am <xsl:value-of select="ort_datum" /></text:p>
-			                            </table:table-cell>
-			                            <table:table-cell table:style-name="Tabelle3.B1" office:value-type="string">
-			                                <text:p text:style-name="P16"/>
-			                            </table:table-cell>
-			                            <table:table-cell table:style-name="Tabelle3.C1" office:value-type="string">
-			                                <text:p text:style-name="P16"/>
-			                            </table:table-cell>
-			                        </table:table-row>
-			                        <table:table-row>
-			                            <table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-			                                <text:p text:style-name="P17">Ort, Datum</text:p>
-			                            </table:table-cell>
-			                            <table:table-cell table:style-name="Tabelle3.B2" office:value-type="string">
-			                                <text:p text:style-name="P16"/>
-			                            </table:table-cell>
-			                            <table:table-cell table:style-name="Tabelle3.C2" office:value-type="string">
-											<text:p text:style-name="P14"><xsl:value-of select="lvleiter" /></text:p>
-											<text:p text:style-name="P23">LeiterIn Freifach</text:p>
-										</table:table-cell>
-			                        </table:table-row>
-			                    </table:table>
-			                </draw:text-box>
-		            	</draw:frame>
-		            <draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr3" draw:name="Bild{$number}" text:anchor-type="page" text:anchor-page-number="{$number}" svg:x="5.2cm" svg:width="3.51cm" svg:height="3.51cm" draw:z-index="1">
-		                <draw:image xlink:href="Pictures/10000201000002290000022939997AEC.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-		            </draw:frame>
-				</xsl:for-each>
-			</xsl:if>
 			<text:p text:style-name="P15">ZERTIFIKAT</text:p>
 			<text:p text:style-name="P16">
 				<text:span text:style-name="T1">Freifächer</text:span>
@@ -279,15 +236,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P2">Personenkennzeichen: <xsl:value-of select="matrikelnr" /></text:p>
 			<text:p text:style-name="P2"/>
 			<text:p text:style-name="P3"/>
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"/>
 			<text:p text:style-name="P3"/>
 			<text:p text:style-name="P7"/>
@@ -297,42 +248,70 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P7"/>
 			<text:p text:style-name="P4">Geburtsdatum:<text:tab/><xsl:value-of select="gebdatum" /></text:p>
 			<text:p text:style-name="P4"/>
-			<text:p text:style-name="P19">Herr/Frau <xsl:value-of select="name"/> hat im <xsl:value-of select="studiensemester" /> das folgende Freifach an der FH</text:p>
-			<text:p text:style-name="P19">Technikum Wien belegt:</text:p>
+			<text:p text:style-name="P19">
+			<xsl:choose>
+				<xsl:when test="geschlecht='m'">
+					<xsl:text>Herr </xsl:text>
+				</xsl:when>
+				<xsl:when test="geschlecht='w'">
+					<xsl:text>Frau </xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>Herr/Frau </xsl:text>
+				</xsl:otherwise>
+			</xsl:choose>
+			<xsl:value-of select="name"/> hat im <xsl:value-of select="studiensemester" /> das folgende Freifach an der FH Technikum Wien belegt:</text:p>
 			<text:p text:style-name="P19"/>
 			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
 				<table:table-column table:style-name="Tabelle1.A"/>
 				<table:table-column table:style-name="Tabelle1.B"/>
-				<table:table-column table:style-name="Tabelle1.C"/>
+				<table:table-column table:style-name="Tabelle1.D"/>
 				<table:table-column table:style-name="Tabelle1.D"/>
 				<table:table-row table:style-name="Tabelle1.1">
 					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
 						<text:p text:style-name="P11">Lehrveranstaltung</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-						<text:p text:style-name="P12">Note</text:p>
-					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
 						<text:p text:style-name="P12">SWS</text:p>
 					</table:table-cell>
+					<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
+						<text:p text:style-name="P12">ECTS</text:p>
+					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.D1" office:value-type="string">
-						<text:p text:style-name="P12">ECTS <text:span text:style-name="T3">credits</text:span>
-						</text:p>
+						<text:p text:style-name="P12">Note</text:p>
 					</table:table-cell>
 				</table:table-row>
 				<table:table-row>
-			    <table:table-cell table:style-name="Tabelle1.A7" office:value-type="string">
+				<table:table-cell table:style-name="Tabelle1.A7" office:value-type="string">
 					<text:p text:style-name="P10"><xsl:value-of select="bezeichnung"/></text:p>
-			    </table:table-cell>
-			    <table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
-			        <text:p text:style-name="P9">
+				</table:table-cell>
+				<table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
+					<text:p text:style-name="P9">
 					<xsl:choose>
-						<xsl:when test="note='tg'">
-							<xsl:text>teilgenommen</xsl:text>
+						<xsl:when test="sws=''">
+							<xsl:text>-</xsl:text>
 						</xsl:when>
-						<xsl:when test="note='met'">
-							<xsl:text>mit Erfolg teilgenommen</xsl:text>
+						<xsl:otherwise>
+							<xsl:value-of select="sws"/>
+						</xsl:otherwise>
+					</xsl:choose>
+					</text:p>
+				</table:table-cell>
+				<table:table-cell table:style-name="Tabelle1.C2" office:value-type="string">
+					<text:p text:style-name="P9">
+					<xsl:choose>
+						<xsl:when test="ects=''">
+							<xsl:text>-</xsl:text>
 						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="ects"/>
+						</xsl:otherwise>
+					</xsl:choose>
+					</text:p>
+				</table:table-cell>
+				<table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
+					<text:p text:style-name="P9">
+					<xsl:choose>
 						<xsl:when test="note=''">
 							<xsl:text>-</xsl:text>
 						</xsl:when>
@@ -340,27 +319,14 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 							<xsl:value-of select="note"/>
 						</xsl:otherwise>
 					</xsl:choose>
-			        </text:p>
-			    </table:table-cell>
-			    <table:table-cell table:style-name="Tabelle1.C2" office:value-type="string">
-			        <text:p text:style-name="P9">
-				        <xsl:if test="sws=''">
-							<xsl:text>-</xsl:text>
-						</xsl:if>
-						<xsl:value-of select="sws"/>
 					</text:p>
-			    </table:table-cell>
-			    <table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
-			        <text:p text:style-name="P9">
-				        <xsl:if test="ects=''">
-							<xsl:text>-</xsl:text>
-						</xsl:if>
-						<xsl:value-of select="ects"/>
-					</text:p>
-			    </table:table-cell>
+				</table:table-cell>
 			</table:table-row>
 			</table:table>
 			<text:p text:style-name="P6"/>
+			<text:p text:style-name="P6"/>
+			<text:p text:style-name="P25">Notenstufen:<text:tab/>Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), Nicht genügend (5), mit Erfolg teilgenommen (met), nicht teilgenommen (nt), teilgenommen(tg),</text:p>
+			<text:p text:style-name="P25"><text:tab/>angerechnet (ar), nicht beurteilt (nb), bestanden (b), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</text:p>
 			<text:p text:style-name="P20"/>
 			<text:p text:style-name="P21"/>
 			<text:p text:style-name="P22">Inhalte der Lehrveranstaltung:</text:p>
@@ -368,9 +334,57 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P22"/>
 			<text:p text:style-name="P22">
 
-				<xsl:call-template name="replace">
-					<xsl:with-param name="string" select="lehrinhalte"/>
-				</xsl:call-template>
+			<xsl:call-template name="replace">
+				<xsl:with-param name="string" select="lehrziele"/>
+			</xsl:call-template>
+			
+			</text:p>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22"/>
+			<text:p text:style-name="P22">
+				<draw:frame draw:style-name="fr1" draw:name="Rahmen1" text:anchor-type="char" draw:z-index="0">
+					<draw:text-box fo:min-height="0.499cm" fo:min-width="2cm">
+						<table:table table:name="Tabelle3" table:style-name="Tabelle3">
+							<table:table-column table:style-name="Tabelle3.A"/>
+							<table:table-column table:style-name="Tabelle3.B"/>
+							<table:table-column table:style-name="Tabelle3.C"/>
+							<table:table-row>
+								<table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
+									<text:p text:style-name="P17">
+										<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr3" draw:name="Bild1" text:anchor-type="char" svg:x="5.2cm" svg:width="3.51cm" svg:height="3.51cm" draw:z-index="1">
+											<draw:image xlink:href="Pictures/10000201000002290000022939997AEC.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+										</draw:frame>
+										<xsl:value-of select="ort_datum" /></text:p>
+								</table:table-cell>
+								<table:table-cell table:style-name="Tabelle3.B1" office:value-type="string">
+									<text:p text:style-name="P16"/>
+								</table:table-cell>
+								<table:table-cell table:style-name="Tabelle3.C1" office:value-type="string">
+									<text:p text:style-name="P16"/>
+								</table:table-cell>
+							</table:table-row>
+							<table:table-row>
+								<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
+									<text:p text:style-name="P17">Ort, Datum</text:p>
+								</table:table-cell>
+								<table:table-cell table:style-name="Tabelle3.B2" office:value-type="string">
+									<text:p text:style-name="P16"/>
+								</table:table-cell>
+								<table:table-cell table:style-name="Tabelle3.C2" office:value-type="string">
+									<text:p text:style-name="P14"><xsl:value-of select="lvleiter" /></text:p>
+									<text:p text:style-name="P23">LeiterIn Freifach</text:p>
+								</table:table-cell>
+							</table:table-row>
+						</table:table>
+					</draw:text-box>
+				</draw:frame>
 			</text:p>
 		</office:text>
 </xsl:template>

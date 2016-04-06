@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Klasse zur Verwaltung der Abschlusspruefungen
@@ -40,6 +41,7 @@ class abschlusspruefung extends basis_db
 	public $note;
 	public $akadgrad_id;
 	public $datum;
+	public $uhrzeit;
 	public $sponsion;
 	public $pruefungstyp_kurzbz;
 	public $anmerkung;
@@ -96,6 +98,7 @@ class abschlusspruefung extends basis_db
 				$this->note = $row->note;
 				$this->akadgrad_id = $row->akadgrad_id;
 				$this->datum = $row->datum;
+				$this->uhrzeit = $row->uhrzeit;
 				$this->sponsion = $row->sponsion;
 				$this->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
 				$this->beschreibung = $row->beschreibung;
@@ -190,46 +193,48 @@ class abschlusspruefung extends basis_db
 		{
 			//Neuen Datensatz anlegen
 			$qry = "BEGIN;INSERT INTO lehre.tbl_abschlusspruefung (student_uid, vorsitz, pruefer1,
-					pruefer2, pruefer3, abschlussbeurteilung_kurzbz, akadgrad_id, datum, sponsion,
+					pruefer2, pruefer3, abschlussbeurteilung_kurzbz, akadgrad_id, datum, uhrzeit, sponsion,
 					pruefungstyp_kurzbz, anmerkung, updateamum, updatevon, insertamum, insertvon,
 					note) VALUES (".
-			       $this->db_add_param($this->student_uid).', '.
-			       $this->db_add_param($this->vorsitz).', '.
-			       $this->db_add_param($this->pruefer1).', '.
-			       $this->db_add_param($this->pruefer2).', '.
-			       $this->db_add_param($this->pruefer3).', '.
-			       $this->db_add_param($this->abschlussbeurteilung_kurzbz).', '.
-			       $this->db_add_param($this->akadgrad_id, FHC_INTEGER).', '.
-			       $this->db_add_param($this->datum).', '.
-			       $this->db_add_param($this->sponsion).', '.
-			       $this->db_add_param($this->pruefungstyp_kurzbz).', '.
-			       $this->db_add_param($this->anmerkung).', '.
-			       $this->db_add_param($this->updateamum).', '.
-			       $this->db_add_param($this->updatevon).', '.
-			       $this->db_add_param($this->insertamum).', '.
-			       $this->db_add_param($this->insertvon).', '.
-			       $this->db_add_param($this->note, FHC_INTEGER).');';
+						$this->db_add_param($this->student_uid).', '.
+						$this->db_add_param($this->vorsitz).', '.
+						$this->db_add_param($this->pruefer1).', '.
+						$this->db_add_param($this->pruefer2).', '.
+						$this->db_add_param($this->pruefer3).', '.
+						$this->db_add_param($this->abschlussbeurteilung_kurzbz).', '.
+						$this->db_add_param($this->akadgrad_id, FHC_INTEGER).', '.
+						$this->db_add_param($this->datum).', '.
+						$this->db_add_param($this->uhrzeit, FHC_STRING, false).', '.
+						$this->db_add_param($this->sponsion).', '.
+						$this->db_add_param($this->pruefungstyp_kurzbz).', '.
+						$this->db_add_param($this->anmerkung).', '.
+						$this->db_add_param($this->updateamum).', '.
+						$this->db_add_param($this->updatevon).', '.
+						$this->db_add_param($this->insertamum).', '.
+						$this->db_add_param($this->insertvon).', '.
+						$this->db_add_param($this->note, FHC_INTEGER).');';
 
 		}
 		else
 		{
 			//Bestehenden Datensatz aktualisieren
 			$qry= "UPDATE lehre.tbl_abschlusspruefung SET".
-				  " student_uid=".$this->db_add_param($this->student_uid).",".
-				  " vorsitz=".$this->db_add_param($this->vorsitz).",".
-				  " pruefer1=".$this->db_add_param($this->pruefer1).",".
-				  " pruefer2=".$this->db_add_param($this->pruefer2).",".
-				  " pruefer3=".$this->db_add_param($this->pruefer3).",".
-				  " abschlussbeurteilung_kurzbz=".$this->db_add_param($this->abschlussbeurteilung_kurzbz).",".
-				  " note=".$this->db_add_param($this->note, FHC_INTEGER).",".
-				  " akadgrad_id=".$this->db_add_param($this->akadgrad_id, FHC_INTEGER).",".
-				  " datum=".$this->db_add_param($this->datum).",".
-				  " sponsion=".$this->db_add_param($this->sponsion).",".
-				  " pruefungstyp_kurzbz=".$this->db_add_param($this->pruefungstyp_kurzbz).",".
-				  " anmerkung=".$this->db_add_param($this->anmerkung).",".
-				  " updateamum=".$this->db_add_param($this->updateamum).",".
-				  " updatevon=".$this->db_add_param($this->updatevon).
-				  " WHERE abschlusspruefung_id=".$this->db_add_param($this->abschlusspruefung_id, FHC_INTEGER, false);
+				" student_uid=".$this->db_add_param($this->student_uid).",".
+				" vorsitz=".$this->db_add_param($this->vorsitz).",".
+				" pruefer1=".$this->db_add_param($this->pruefer1).",".
+				" pruefer2=".$this->db_add_param($this->pruefer2).",".
+				" pruefer3=".$this->db_add_param($this->pruefer3).",".
+				" abschlussbeurteilung_kurzbz=".$this->db_add_param($this->abschlussbeurteilung_kurzbz).",".
+				" note=".$this->db_add_param($this->note, FHC_INTEGER).",".
+				" akadgrad_id=".$this->db_add_param($this->akadgrad_id, FHC_INTEGER).",".
+				" datum=".$this->db_add_param($this->datum).",".
+				" uhrzeit=".$this->db_add_param($this->uhrzeit, FHC_STRING, false).",".
+				" sponsion=".$this->db_add_param($this->sponsion).",".
+				" pruefungstyp_kurzbz=".$this->db_add_param($this->pruefungstyp_kurzbz).",".
+				" anmerkung=".$this->db_add_param($this->anmerkung).",".
+				" updateamum=".$this->db_add_param($this->updateamum).",".
+				" updatevon=".$this->db_add_param($this->updatevon).
+				" WHERE abschlusspruefung_id=".$this->db_add_param($this->abschlusspruefung_id, FHC_INTEGER, false);
 		}
 
 		if($this->db_query($qry))
@@ -260,7 +265,6 @@ class abschlusspruefung extends basis_db
 				}
 			}
 			else
-
 				return true;
 		}
 		else
@@ -301,6 +305,7 @@ class abschlusspruefung extends basis_db
 				$obj->note = $row->note;
 				$obj->akadgrad_id = $row->akadgrad_id;
 				$obj->datum = $row->datum;
+				$obj->uhrzeit = $row->uhrzeit;
 				$obj->sponsion = $row->sponsion;
 				$obj->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
 				$obj->beschreibung = $row->beschreibung;
@@ -323,12 +328,12 @@ class abschlusspruefung extends basis_db
 	}
 
 
-    /**
-     * Liefert die letzte Abschlussprüfung eines Studenten
-     * @param type $student_uid
-     */
-    public function getLastAbschlusspruefung($student_uid)
-    {
+	/**
+	 * Liefert die letzte Abschlussprüfung eines Studenten
+	 * @param type $student_uid
+	 */
+	public function getLastAbschlusspruefung($student_uid)
+	{
 		$qry = "SELECT
 					*
 				FROM
@@ -337,7 +342,7 @@ class abschlusspruefung extends basis_db
 				WHERE student_uid=".$this->db_add_param($student_uid, FHC_STRING, false)."
 				ORDER BY datum DESC LIMIT 1";
 
-        if($this->db_query($qry))
+		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
@@ -351,6 +356,7 @@ class abschlusspruefung extends basis_db
 				$this->note = $row->note;
 				$this->akadgrad_id = $row->akadgrad_id;
 				$this->datum = $row->datum;
+				$this->uhrzeit = $row->uhrzeit;
 				$this->sponsion = $row->sponsion;
 				$this->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
 				$this->beschreibung = $row->beschreibung;
@@ -360,7 +366,6 @@ class abschlusspruefung extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
-
 			}
 			return true;
 		}
@@ -369,7 +374,6 @@ class abschlusspruefung extends basis_db
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
-    }
-
+	}
 }
 ?>

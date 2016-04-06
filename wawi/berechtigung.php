@@ -30,18 +30,18 @@ require_once('../include/benutzer.class.php');
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-	<title>WaWi Kostenstellen - Berechtigungen</title>	
+	<title>WaWi Kostenstellen - Berechtigungen</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
 
-	<script type="text/javascript" src="../include/js/jquery.js"></script> 
+	<script type="text/javascript" src="../include/js/jquery.js"></script>
 
 </head>
 <body>
-<?php 
+<?php
 
-$kostenstelle = new wawi_kostenstelle(); 
+$kostenstelle = new wawi_kostenstelle();
 $uid=get_uid();
 
 $rechte = new benutzerberechtigung();
@@ -50,7 +50,7 @@ $rechte->getBerechtigungen($uid);
 if(isset($_GET['kostenstelle_id']))
 {
 	$kostenstelle_id = $_GET['kostenstelle_id'];
-	
+
 	if($rechte->isBerechtigt('wawi/rechnung',null, null, $kostenstelle_id)
 	|| $rechte->isBerechtigt('wawi/bestellung',null, null, $kostenstelle_id)
 	|| $rechte->isBerechtigt('wawi/freigabe',null, null, $kostenstelle_id))
@@ -58,13 +58,13 @@ if(isset($_GET['kostenstelle_id']))
 		$kst = new wawi_kostenstelle();
 		if(!$kst->load($kostenstelle_id))
 			die('Fehler beim Laden der Kostenstelle');
-		
+		$rechte = new benutzerberechtigung();
 		echo '<h1>Berechtigungen - Kostenstelle '.$kst->bezeichnung.'</h1>';
 		echo '<a href="berechtigung.php">Zurück</a>';
 		$rechte->getKostenstelleUser($kostenstelle_id);
-		
+
 		$rights = array();
-		
+
 		function getArt($art)
 		{
 			$value=array();
@@ -78,20 +78,20 @@ if(isset($_GET['kostenstelle_id']))
 				$value['delete']=true;
 			return $value;
 		}
-		
+
 		foreach($rechte->berechtigungen as $row)
 		{
-			
+
 			if(!isset($rights[$row->uid]))
 			{
 				$benutzer = new benutzer();
 				$benutzer->load($row->uid);
-	
+
 				if($benutzer->bnaktiv==true && in_array($row->berechtigung_kurzbz, array('wawi/rechnung','wawi/bestellung','wawi/freigabe')))
 				{
 					$rights[$row->uid]['vorname']=$benutzer->vorname;
 					$rights[$row->uid]['nachname']=$benutzer->nachname;
-					
+
 				}
 				else
 					continue;
@@ -103,19 +103,19 @@ if(isset($_GET['kostenstelle_id']))
 				case 'wawi/freigabe': $rights[$row->uid]['freigabe']=true; break;
 				default: break;
 			}
-			
+
 		}
 		echo '
 		<script type="text/javascript">
-			$(document).ready(function() 
-				{ 
+			$(document).ready(function()
+				{
 				    $("#myTable").tablesorter(
 					{
 						sortList: [[0,0]],
 						widgets: ["zebra"]
-					}); 
-				} 
-			); 			
+					});
+				}
+			);
 		</script>';
 		echo '<table class="tablesorter" id="myTable" style="width:auto">
 			<thead>
@@ -153,11 +153,11 @@ if(isset($_GET['kostenstelle_id']))
 			echo '<td>'.(isset($user1['freigabe'])?'X':'').'</td>';
 			echo '</tr>';
 		}
-		
+
 		echo '</tbody></table>';
 	}
 	else
-		die('Sie haben keine Berechtigung!'); 
+		die('Sie haben keine Berechtigung!');
 }
 else
 {
@@ -165,27 +165,27 @@ else
 	$kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/rechnung'));
 	$kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/bestellung'));
 	$kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/freigabe'));
-	
+
 	$kst_array = array_unique($kst_array);
-	
+
 	echo '<h1>Kostenstellen - Berechtigungen</h1>';
-	
+
 	if(count($kst_array)==0)
 		die('Sie benoetigen eine Kostenstellenberechtigung um diese Seite anzuzeigen');
-	
+
 	$kst = new wawi_kostenstelle();
 	$kst->loadArray($kst_array);
 	echo '
 	<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 			    $("#myTable").tablesorter(
 				{
 					sortList: [[1,0]],
 					widgets: ["zebra"]
-				}); 
-			} 
-		); 			
+				});
+			}
+		);
 	</script>';
 	echo '<table id="myTable" class="tablesorter" style="width:auto">
 		<thead>
@@ -208,6 +208,6 @@ else
 		</table>';
 }
 
-echo '<br><br><br><br><br><br>';	
+echo '<br><br><br><br><br><br>';
 
 ?>

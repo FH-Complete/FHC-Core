@@ -31,6 +31,7 @@ require_once('../include/pruefung.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/variable.class.php');
 
 $uid = get_uid();
 $rechte = new benutzerberechtigung();
@@ -41,14 +42,14 @@ if(!$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('admin'))
 
 if(isset($_GET['student_uid']))
 	$student_uid = $_GET['student_uid'];
-else 
+else
 	$student_uid = '';
 
 if(isset($_GET['pruefung_id']))
 	$pruefung_id = $_GET['pruefung_id'];
-else 
+else
 	$pruefung_id = '';
-	
+
 $datum_obj = new datum();
 
 $pruefung = new pruefung();
@@ -61,7 +62,7 @@ echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:PRUEFUNG="'.$rdf_url.'/rdf#"
-	xmlns:NC="http://home.netscape.com/NC-rdf#" 
+	xmlns:NC="http://home.netscape.com/NC-rdf#"
 >
 
    <RDF:Seq about="'.$rdf_url.'/liste">
@@ -74,7 +75,15 @@ if($pruefung_id!='')
 }
 else
 {
-	$pruefung->getPruefungen($student_uid);
+	if(isset($_REQUEST['all_stsem']))
+		$stsem = null;
+	else
+	{
+		$variable = new variable();
+		$variable->loadVariables($uid);
+		$stsem = $variable->variable->semester_aktuell;
+	}
+	$pruefung->getPruefungen($student_uid, null, null, $stsem);
 	foreach ($pruefung->result as $row)
 		draw_rdf($row);
 }
@@ -82,7 +91,7 @@ else
 function draw_rdf($row)
 {
 	global $rdf_url, $datum_obj;
-	
+
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->pruefung_id.'"  about="'.$rdf_url.'/'.$row->pruefung_id.'" >

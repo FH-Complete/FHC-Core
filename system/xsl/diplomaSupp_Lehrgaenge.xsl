@@ -1205,13 +1205,21 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       <style:paragraph-properties fo:line-height="110%"/>
       <style:text-properties fo:font-size="14pt" fo:language="en" fo:country="US" style:font-size-asian="14pt" style:font-size-complex="14pt"/>
     </style:style>
-    <style:style style:name="P78" style:family="paragraph">
+	<style:style style:name="P100" style:family="paragraph">
 		<style:paragraph-properties fo:line-height="130%" fo:text-align="center"/>
-		<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-pitch="variable" fo:font-size="16pt" style:font-size-asian="16pt" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold"/>
+		<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Helvetica" fo:font-size="16pt" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold"/>
 	</style:style>
-	<style:style style:name="P79" style:family="paragraph">
-		<style:paragraph-properties fo:line-height="130%" fo:text-align="center"/>
-		<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-pitch="variable" fo:font-size="16pt" style:font-size-asian="16pt" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold"/>
+	<style:style style:name="P101" style:family="paragraph">
+		<style:paragraph-properties fo:line-height="100%" fo:text-align="start"/>
+		<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Helvetica" fo:font-size="8pt" fo:font-style="normal" style:text-underline-style="none"/>
+	</style:style>
+	<style:style style:name="P102" style:family="paragraph">
+		<style:paragraph-properties fo:line-height="110%" fo:text-align="start"/>
+		<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Helvetica" fo:font-size="14pt" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold"/>
+	</style:style>
+	<style:style style:name="P103" style:family="paragraph">
+		<style:paragraph-properties fo:line-height="100%" fo:text-align="start"/>
+		<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Helvetica" fo:font-size="8pt" fo:font-style="normal" style:text-underline-style="none"/>
 	</style:style>
     <style:style style:name="T1" style:family="text">
       <style:text-properties fo:language="en" fo:country="US"/>
@@ -1287,29 +1295,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 	</office:document-content>
  </xsl:template>
 <xsl:template match="supplement">
-		<office:forms form:automatic-focus="false" form:apply-design-mode="false">
-			<form:form form:name="Formular" form:apply-filter="true" form:command-type="table" office:target-frame="" xlink:href="" xlink:type="simple">
-				<form:properties>
-					<form:property form:property-name="PropertyChangeNotificationEnabled" office:value-type="boolean" office:boolean-value="true"/>
-				</form:properties>
-				<xsl:variable select="studiengang_bezeichnung_deutsch" name="studiengang_de"/>
-				<form:text form:name="TextfeldStgDE" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control1" form:id="control1" form:max-length="0" form:current-value="{$studiengang_de}" form:convert-empty-to-null="true">
-					<form:properties>
-						<form:property form:property-name="ControlTypeinMSO" office:value-type="float" office:value="0"/>
-						<form:property form:property-name="DefaultControl" office:value-type="string" office:string-value="com.sun.star.form.control.TextField"/>
-						<form:property form:property-name="ObjIDinMSO" office:value-type="float" office:value="65535"/>
-					</form:properties>
-				</form:text>
-				<xsl:variable select="studiengang_bezeichnung_englisch" name="studiengang_en"/>
-				<form:text form:name="TextfeldStgEN" form:control-implementation="ooo:com.sun.star.form.component.TextField" xml:id="control2" form:id="control2" form:max-length="0" form:current-value="{$studiengang_en}" form:convert-empty-to-null="true">
-					<form:properties>
-						<form:property form:property-name="ControlTypeinMSO" office:value-type="float" office:value="0"/>
-						<form:property form:property-name="DefaultControl" office:value-type="string" office:string-value="com.sun.star.form.control.TextField"/>
-						<form:property form:property-name="ObjIDinMSO" office:value-type="float" office:value="65535"/>
-					</form:properties>
-				</form:text>
-			</form:form>
-		</office:forms>
       <text:sequence-decls xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0">
         <text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
         <text:sequence-decl text:display-outline-level="0" text:name="Table"/>
@@ -1329,7 +1314,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       </text:p>
       <text:p text:style-name="P59">
         <text:span text:style-name="Tabelleninhalt">
-          <text:span text:style-name="T8"><draw:control text:anchor-type="as-char" svg:y="-0.45cm" draw:z-index="6" draw:style-name="gr1" draw:text-style-name="P78" svg:width="16cm" svg:height="0.8cm" draw:control="control1"/></text:span>
+          <text:span text:style-name="T8"><xsl:value-of select="studiengang_bezeichnung_deutsch"/></text:span>
         </text:span>
       </text:p>
       <text:p text:style-name="P11"/>
@@ -1337,7 +1322,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       <text:p text:style-name="P4"><text:span text:style-name="Tabelleninhalt">(subjected to §9 FHStG)</text:span></text:p>
       <text:p text:style-name="P3">
         <text:span text:style-name="Tabelleninhalt">
-          <text:span text:style-name="T10"><draw:control text:anchor-type="as-char" svg:y="-0.45cm" draw:z-index="6" draw:style-name="gr2" draw:text-style-name="P79" svg:width="16cm" svg:height="0.8cm" draw:control="control2"/></text:span>
+          <text:span text:style-name="T10"><xsl:value-of select="studiengang_bezeichnung_englisch"/></text:span>
         </text:span>
       </text:p>
       <text:p text:style-name="P8"/>
