@@ -229,9 +229,9 @@ function modifyOneTable($db, $table)
 						ORDER BY conrelid::regclass::text, contype DESC;");
 				$def = $db->db_fetch_object($get_definition_result);
 
-				if(!$index_drop_result = $db->db_query('ALTER TABLE '.$table["schema"].".".$table["name"].' DROP CONSTRAINT '.$row->indexname))
+				if(!$pk_drop_result = $db->db_query('ALTER TABLE '.$table["schema"].".".$table["name"].' DROP CONSTRAINT '.$row->indexname))
 				{
-					echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
+					echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
 					$db->db_query("ROLLBACK;");
 					return;
 				}
@@ -241,7 +241,7 @@ function modifyOneTable($db, $table)
 			}
 			else
 			{
-				if(!$index_drop_result = $db->db_query('ALTER TABLE '.$table["schema"].".".$table["name"].' DROP INDEX '.$row->indexname))
+				if(!$index_drop_result = $db->db_query('DROP INDEX '.$table["schema"].".".$row->indexname))
 				{
 					echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
 					$db->db_query("ROLLBACK;");
@@ -289,16 +289,16 @@ function modifyOneTable($db, $table)
 
 				foreach( $primary_keys as $pk)
 				{
-					if(!$index_drop_result = $db->db_query($pk))
+					if(!$pk_add_result = $db->db_query($pk))
 					{
-						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
+						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
 						$db->db_query("ROLLBACK;");
 						return;
 					}
 				}
 				foreach( $indices as $ind)
 				{
-					if(!$index_drop_result = $db->db_query($ind))
+					if(!$index_add_result = $db->db_query($ind))
 					{
 						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
 						$db->db_query("ROLLBACK;");
