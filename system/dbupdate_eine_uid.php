@@ -83,11 +83,13 @@ else if($_POST["action"] == "Starten")
 	echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
 
-
 	//********************************DROP ALL VIEWS********************************
-	if(!$db->db_query("DROP VIEW bis.vw_bisio"))
+	if($result = @$db->db_query("SELECT 1 FROM bis.vw_bisio LIMIT 1;"))
 	{
-		echo "<p>Could not DROP view bis.vw_bisio: " . $create_view_qry."</p>";
+		if(!$db->db_query("DROP VIEW bis.vw_bisio"))
+		{
+			echo "<p>Could not DROP view bis.vw_bisio: " . $create_view_qry."</p>";
+		}
 	}
 
 
@@ -100,73 +102,74 @@ else if($_POST["action"] == "Starten")
 
 
 
-
-	//********************************CREATE ALL VIEWS AGAIN********************************
-	$create_view_qry = "
-		CREATE VIEW bis.vw_bisio AS SELECT tbl_prestudentstatus.studiensemester_kurzbz,
-			tbl_prestudentstatus.status_kurzbz,
-			tbl_prestudent.person_id,
-			tbl_prestudent.prestudent_id,
-			tbl_bisio.bisio_id,
-			tbl_bisio.mobilitaetsprogramm_code,
-			tbl_bisio.nation_code,
-			tbl_bisio.von,
-			tbl_bisio.bis,
-			tbl_bisio.zweck_code,
-			tbl_bisio.ort,
-			tbl_bisio.universitaet,
-			tbl_bisio.lehreinheit_id,
-			tbl_student.matrikelnr,
-			tbl_student.student_uid,
-			tbl_prestudent.studiengang_kz,
-			tbl_student.semester,
-			tbl_prestudent.aufmerksamdurch_kurzbz,
-			tbl_prestudent.berufstaetigkeit_code,
-			tbl_prestudent.ausbildungcode,
-			tbl_prestudent.zgv_code,
-			tbl_prestudent.zgvort,
-			tbl_prestudent.zgvdatum,
-			tbl_prestudent.zgvmas_code,
-			tbl_prestudent.zgvmaort,
-			tbl_prestudent.zgvmadatum,
-			tbl_prestudent.aufnahmeschluessel,
-			tbl_prestudent.facheinschlberuf,
-			tbl_prestudent.reihungstest_id,
-			tbl_prestudent.anmeldungreihungstest,
-			tbl_prestudent.reihungstestangetreten,
-			tbl_prestudent.rt_gesamtpunkte,
-			tbl_prestudent.bismelden,
-			tbl_prestudent.dual,
-			tbl_prestudent.rt_punkte1,
-			tbl_prestudent.rt_punkte2,
-			tbl_prestudent.ausstellungsstaat,
-			tbl_prestudent.rt_punkte3,
-			tbl_prestudent.zgvdoktor_code,
-			tbl_prestudent.zgvdoktorort,
-			tbl_prestudent.zgvdoktordatum,
-			tbl_prestudent.mentor,
-			tbl_prestudent.zgvnation,
-			tbl_prestudent.zgvmanation,
-			tbl_prestudent.zgvdoktornation,
-			tbl_prestudentstatus.ausbildungssemester,
-			tbl_prestudentstatus.datum,
-			tbl_prestudentstatus.orgform_kurzbz,
-			tbl_prestudentstatus.studienplan_id,
-			tbl_prestudentstatus.bestaetigtam,
-			tbl_prestudentstatus.bestaetigtvon,
-			tbl_prestudentstatus.fgm,
-			tbl_prestudentstatus.faktiv,
-			tbl_prestudentstatus.bewerbung_abgeschicktamum
-		FROM bis.tbl_bisio
-			JOIN tbl_student USING (prestudent_id)
-			JOIN tbl_prestudent USING (prestudent_id)
-			LEFT JOIN tbl_prestudentstatus ON tbl_prestudent.prestudent_id = tbl_prestudentstatus.prestudent_id AND (tbl_prestudentstatus.status_kurzbz::text = 'Incoming'::text OR tbl_prestudentstatus.status_kurzbz::text = 'Outgoing'::text);
-		COMMENT ON VIEW bis.vw_bisio IS 'Incoming Outgoing';";
+	if(!$result = @$db->db_query("SELECT 1 FROM bis.vw_bisio LIMIT 1;"))
+	{
+		//********************************CREATE ALL VIEWS AGAIN********************************
+		$create_view_qry = "
+			CREATE VIEW bis.vw_bisio AS SELECT tbl_prestudentstatus.studiensemester_kurzbz,
+				tbl_prestudentstatus.status_kurzbz,
+				tbl_prestudent.person_id,
+				tbl_prestudent.prestudent_id,
+				tbl_bisio.bisio_id,
+				tbl_bisio.mobilitaetsprogramm_code,
+				tbl_bisio.nation_code,
+				tbl_bisio.von,
+				tbl_bisio.bis,
+				tbl_bisio.zweck_code,
+				tbl_bisio.ort,
+				tbl_bisio.universitaet,
+				tbl_bisio.lehreinheit_id,
+				tbl_student.matrikelnr,
+				tbl_student.student_uid,
+				tbl_prestudent.studiengang_kz,
+				tbl_student.semester,
+				tbl_prestudent.aufmerksamdurch_kurzbz,
+				tbl_prestudent.berufstaetigkeit_code,
+				tbl_prestudent.ausbildungcode,
+				tbl_prestudent.zgv_code,
+				tbl_prestudent.zgvort,
+				tbl_prestudent.zgvdatum,
+				tbl_prestudent.zgvmas_code,
+				tbl_prestudent.zgvmaort,
+				tbl_prestudent.zgvmadatum,
+				tbl_prestudent.aufnahmeschluessel,
+				tbl_prestudent.facheinschlberuf,
+				tbl_prestudent.reihungstest_id,
+				tbl_prestudent.anmeldungreihungstest,
+				tbl_prestudent.reihungstestangetreten,
+				tbl_prestudent.rt_gesamtpunkte,
+				tbl_prestudent.bismelden,
+				tbl_prestudent.dual,
+				tbl_prestudent.rt_punkte1,
+				tbl_prestudent.rt_punkte2,
+				tbl_prestudent.ausstellungsstaat,
+				tbl_prestudent.rt_punkte3,
+				tbl_prestudent.zgvdoktor_code,
+				tbl_prestudent.zgvdoktorort,
+				tbl_prestudent.zgvdoktordatum,
+				tbl_prestudent.mentor,
+				tbl_prestudent.zgvnation,
+				tbl_prestudent.zgvmanation,
+				tbl_prestudent.zgvdoktornation,
+				tbl_prestudentstatus.ausbildungssemester,
+				tbl_prestudentstatus.datum,
+				tbl_prestudentstatus.orgform_kurzbz,
+				tbl_prestudentstatus.studienplan_id,
+				tbl_prestudentstatus.bestaetigtam,
+				tbl_prestudentstatus.bestaetigtvon,
+				tbl_prestudentstatus.fgm,
+				tbl_prestudentstatus.faktiv,
+				tbl_prestudentstatus.bewerbung_abgeschicktamum
+			FROM bis.tbl_bisio
+				JOIN tbl_student USING (prestudent_id)
+				JOIN tbl_prestudent USING (prestudent_id)
+				LEFT JOIN tbl_prestudentstatus ON tbl_prestudent.prestudent_id = tbl_prestudentstatus.prestudent_id AND (tbl_prestudentstatus.status_kurzbz::text = 'Incoming'::text OR tbl_prestudentstatus.status_kurzbz::text = 'Outgoing'::text);
+			COMMENT ON VIEW bis.vw_bisio IS 'Incoming Outgoing';";
 		if(!$db->db_query($create_view_qry))
 		{
 			echo "<p>Could not CREATE view bis.vw_bisio: " . $create_view_qry."</p>";
 		}
-
+	}
 }
 
 
@@ -214,7 +217,6 @@ function modifyOneTable($db, $table)
 
 			if($db->db_num_rows($check_if_pk_result) == 1)
 			{
-
 				$get_definition_result = $db->db_query(
 					"SELECT conrelid::regclass AS table_from
 						,conname
@@ -227,9 +229,9 @@ function modifyOneTable($db, $table)
 						ORDER BY conrelid::regclass::text, contype DESC;");
 				$def = $db->db_fetch_object($get_definition_result);
 
-				if(!$index_drop_result = $db->db_query('ALTER TABLE '.$table["schema"].".".$table["name"].' DROP CONSTRAINT '.$row->indexname))
+				if(!$pk_drop_result = $db->db_query('ALTER TABLE '.$table["schema"].".".$table["name"].' DROP CONSTRAINT '.$row->indexname))
 				{
-					echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
+					echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
 					$db->db_query("ROLLBACK;");
 					return;
 				}
@@ -239,7 +241,7 @@ function modifyOneTable($db, $table)
 			}
 			else
 			{
-				if(!$index_drop_result = $db->db_query('ALTER TABLE '.$table["schema"].".".$table["name"].' DROP INDEX '.$row->indexname))
+				if(!$index_drop_result = $db->db_query('DROP INDEX '.$table["schema"].".".$row->indexname))
 				{
 					echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
 					$db->db_query("ROLLBACK;");
@@ -287,16 +289,16 @@ function modifyOneTable($db, $table)
 
 				foreach( $primary_keys as $pk)
 				{
-					if(!$index_drop_result = $db->db_query($pk))
+					if(!$pk_add_result = $db->db_query($pk))
 					{
-						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
+						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
 						$db->db_query("ROLLBACK;");
 						return;
 					}
 				}
 				foreach( $indices as $ind)
 				{
-					if(!$index_drop_result = $db->db_query($ind))
+					if(!$index_add_result = $db->db_query($ind))
 					{
 						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von INDEX ".$row->indexname." fehlgeschlagen(wird übersprungen)</p>";
 						$db->db_query("ROLLBACK;");
