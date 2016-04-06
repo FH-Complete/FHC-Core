@@ -247,6 +247,7 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 								$lem_obj->insertamum = date('Y-m-d H:i:s');
 								$lem_obj->insertvon = 'Vorrueckung_'.$user;
 								$lem_obj->ext_id = '';
+								$lem_obj->vertrag_id='';
 								
 								if(!$lem_obj->save())
 								{

@@ -564,7 +564,7 @@ function drawTree($tree, $depth)
 						$tdclass[]='angebot';
 						if($angemeldet)
 						{
-							$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/anmelden.png" title="angemeldet" /></a>';
+							$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/ja.png" title="'.$p->t('studienplan/legendeAngemeldet').'" /></a>';
 						}
 						else
 						{
@@ -614,6 +614,10 @@ echo '<br><br>'.$p->t('studienplan/legende').':<br>
 <tr>
 	<td align="center"><img src="../../../skin/images/anmelden.png"></td>
 	<td>'.$p->t('studienplan/Anmeldung').'</td>
+</tr>
+<tr>
+	<td align="center"><img src="../../../skin/images/ja.png"></td>
+	<td>'.$p->t('studienplan/legendeAngemeldet').'</td>
 </tr>
 <tr>
 	<td align="center"><img src="../../../skin/images/not-available.png"></td>
