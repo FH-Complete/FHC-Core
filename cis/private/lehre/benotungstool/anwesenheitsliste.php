@@ -32,7 +32,6 @@ require_once('../../../../include/benutzerberechtigung.class.php');
 require_once('../../../../include/uebung.class.php');
 require_once('../../../../include/beispiel.class.php');
 require_once('../../../../include/datum.class.php');
-require_once('../../../../include/student.class.php');
 include_once('../../../../include/Excel/excel.php');
 
 if (!$db = new basis_db())
@@ -72,10 +71,7 @@ if (isset($_GET["download_abgabe"])){
 	$uid = $_GET['uid'];
 	$ueb = new uebung();
 
-	if(!$student = new student($uid))
-		die("Der Student wurde nicht gefunden!");
-
-	$ueb->load_studentuebung($student->prestudent_id, $uebung_id);
+	$ueb->load_studentuebung($uid, $uebung_id);
 	$ueb->load_abgabe($ueb->abgabe_id);
 	$filename = BENOTUNGSTOOL_PATH."abgabe/".$ueb->abgabedatei;
 	header('Content-Type: application/octet-stream');
@@ -220,7 +216,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				$gruppe_bez = 'Alle Studienrende';
 				//Alle Studenten die dieser Lehreinheit zugeordnet sind
 				$qry_stud = "SELECT 
-								vw_student.uid, vw_student.prestudent_id, vorname, nachname, matrikelnr,
+								vw_student.uid, vorname, nachname, matrikelnr,
 								tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe 
 							FROM 
 								campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe, 
@@ -290,7 +286,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				foreach($ueb_obj->uebungen as $row_ueb)
 				{
 					$qry = "SELECT sum(punkte) as punkte FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) 
-						WHERE uebung_id=".$db->db_add_param($row_ueb->uebung_id)." AND prestudent_id=".$db->db_add_param($row_stud->prestudent_id, FHC_INTEGER)." AND vorbereitet=true";
+						WHERE uebung_id=".$db->db_add_param($row_ueb->uebung_id)." AND uid=".$db->db_add_param($row_stud->uid)." AND vorbereitet=true";
 					if($result = $db->db_query($qry))
 					{
 						if($row = $db->db_fetch_object($result))
@@ -312,7 +308,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				
 				//mitarbeit
 				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id) 
-				WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND prestudent_id=".$db->db_add_param($row_stud->prestudent_id, FHC_INTEGER);
+				WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND uid=".$db->db_add_param($row_stud->uid);
 				if($result = $db->db_query($qry))
 					if($row = $db->db_fetch_object($result))
 						$mitarbeit=$row->mitarbeit;	
@@ -432,7 +428,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				$lehreinheit_id = $_GET['lehreinheit_id'];
 				$gruppe_bez = 'Alle Studienrende';
 
-				$qry_stud = "SELECT uid, prestudent_id, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid)
+				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid)
 				WHERE  studiensemester_kurzbz = ".$db->db_add_param($stsem)." AND lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." ORDER BY nachname, vorname";
 			
 				//Alle Studenten die dieser Lehreinheit zugeordnet sind
@@ -496,7 +492,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				foreach($beispiel_obj->beispiele as $row_bsp)
 				{
 					$studentbeispiel_obj = new beispiel();
-					$studentbeispiel_obj->load_studentbeispiel($row_stud->prestudent_id, $row_bsp->beispiel_id);
+					$studentbeispiel_obj->load_studentbeispiel($row_stud->uid, $row_bsp->beispiel_id);
 					if($studentbeispiel_obj->vorbereitet)
 						$punkte = $row_bsp->punkte;
 					else 
@@ -511,7 +507,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				
 				//mitarbeit heute
 				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit_heute FROM campus.tbl_studentuebung 
-					WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND prestudent_id=".$db->db_add_param($row_stud->prestudent_id, FHC_INTEGER);
+					WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND uid=".$db->db_add_param($row_stud->uid);
 				if($result = $db->db_query($qry))
 					if($row = $db->db_fetch_object($result))
 						$worksheet->write($zeile,++$spalte,($row->mitarbeit_heute!=''?$row->mitarbeit_heute:'0'));
@@ -522,7 +518,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				
 				//punkte insgesamt
 				$qry = "SELECT sum(tbl_beispiel.punkte) AS gesamt_ohne_mitarbeit FROM campus.tbl_uebung, campus.tbl_beispiel, campus.tbl_studentbeispiel WHERE
-						tbl_studentbeispiel.prestudent_id=".$db->db_add_param($row_stud->prestudent_id, FHC_INTEGER)." AND
+						tbl_studentbeispiel.uid=".$db->db_add_param($row_stud->uid)." AND
 						tbl_studentbeispiel.vorbereitet=true AND
 						tbl_uebung.lehreinheit_id=".$db->db_add_param($uebung_obj->lehreinheit_id, FHC_INTEGER)." AND
 						tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
@@ -538,7 +534,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				
 				//mitarbeit insgesamt
 				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit_heute FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id) 
-				WHERE prestudent_id=".$db->db_add_param($row_stud->prestudent_id, FHC_INTEGER)." AND lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
+				WHERE uid=".$db->db_add_param($row_stud->uid)." AND lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
 				if($result = $db->db_query($qry))
 					if($row = $db->db_fetch_object($result))
 						$worksheet->write($zeile,++$spalte,($row->mitarbeit_heute!=''?$row->mitarbeit_heute:'0'));
@@ -604,12 +600,9 @@ function addUser(student_uid)
 						else 
 							$vorbereitet=false;
 
-						if(!$student = new student($uid))
-							die("Der Student wurde nicht gefunden!");
-
 						$bsp_obj = new beispiel();
-						
-						if(!$bsp_obj->studentbeispiel_exists($student->prestudent_id,$bsp->beispiel_id))
+
+						if(!$bsp_obj->studentbeispiel_exists($uid,$bsp->beispiel_id))
 						{
 							$new=true;
 							$bsp_obj->insertamum = date('Y-m-d H:i:s');
@@ -617,12 +610,12 @@ function addUser(student_uid)
 						}
 						else 
 						{
-							$bsp_obj->load_studentbeispiel($student->prestudent_id, $bsp->beispiel_id);
+							$bsp_obj->load_studentbeispiel($uid, $bsp->beispiel_id);
 							$new=false;
 						}
 
 
-						$bsp_obj->prestudent_id = $student->prestudent_id;
+						$bsp_obj->uid = $uid;
 						$bsp_obj->beispiel_id = $bsp->beispiel_id;
 						$bsp_obj->vorbereitet = $vorbereitet;
 						$bsp_obj->updateamum = date('Y-m-d H:i:s');
@@ -634,12 +627,10 @@ function addUser(student_uid)
 				}
 				else
 				{
-					if(!$student = new student($uid))
-						die("Der Student wurde nicht gefunden!");
 
-					if (!$uebung_obj->load_studentuebung($student->prestudent_id,$uebung_id))
+					if (!$uebung_obj->load_studentuebung($uid,$uebung_id))
 					{
-						$uebung_obj->prestudent_id = $student->prestudent_id;
+						$uebung_obj->uid = $uid;
 						$uebung_obj->mitarbeiter_uid = $user;
 						$uebung_obj->abgabe_id = null;
 						$uebung_obj->note = $_POST['update_'.$uid.'_note'];
@@ -655,7 +646,7 @@ function addUser(student_uid)
 					}
 					else
 					{
-						$uebung_obj->load_studentuebung($student->prestudent_id,$uebung_id);
+						$uebung_obj->load_studentuebung($uid,$uebung_id);
 						$uebung_obj->mitarbeiter_uid = $user;
 						$uebung_obj->note = $_POST['update_'.$uid.'_note'];
 						$uebung_obj->benotungsdatum = date("Y-m-d H:i:s");
@@ -729,7 +720,7 @@ function addUser(student_uid)
 			$gruppe_bez = 'Alle Studierende';
 			//Alle Studenten die dieser lehreinheit zugeordnet sind
 			// studentenquery		
-			$qry_stud = "SELECT uid, prestudent_id, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid)
+			$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid)
 			WHERE  studiensemester_kurzbz = ".$db->db_add_param($stsem)." AND lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." ORDER BY nachname, vorname";
 			/*		
 			$qry_stud = "SELECT vw_student.uid, vorname, nachname FROM campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe 
@@ -796,7 +787,7 @@ function addUser(student_uid)
 
 			$filename = '';
 			$su_obj = new uebung($uebung_id);
-			$su_obj->load_studentuebung($row_stud->prestudent_id, $uebung_id);
+			$su_obj->load_studentuebung($row_stud->uid, $uebung_id);
 			if ($su_obj->abgabe_id)	
 			{	
 				$su_obj->load_abgabe($su_obj->abgabe_id);
@@ -810,7 +801,7 @@ function addUser(student_uid)
 			if (!$uebung_obj->beispiele)
 			{
 				$studentuebung_obj = new uebung();
-				$studentuebung_obj->load_studentuebung($row_stud->prestudent_id,$uebung_id);
+				$studentuebung_obj->load_studentuebung($row_stud->uid,$uebung_id);
 				echo "<td align='center'><input type='text' name='update_".$row_stud->uid."_note' onchange=\"addUser('$row_stud->uid');\" value='".$studentuebung_obj->note."' size='3'></td>\n";
 				
 			}			
@@ -819,7 +810,7 @@ function addUser(student_uid)
 				foreach($beispiel_obj->beispiele as $row_bsp)
 				{
 					$studentbeispiel_obj = new beispiel();
-					$studentbeispiel_obj->load_studentbeispiel($row_stud->prestudent_id, $row_bsp->beispiel_id);
+					$studentbeispiel_obj->load_studentbeispiel($row_stud->uid, $row_bsp->beispiel_id);
 					echo "<td align='center'><input type='checkbox' name='update_".$row_stud->uid."_".$row_bsp->beispiel_id."' onClick=\"addUser('$row_stud->uid');\" ".($studentbeispiel_obj->vorbereitet?'checked':'').">".($studentbeispiel_obj->probleme?'<i><small>P</small></i>':'')."</td>\n";
 				}
 			}

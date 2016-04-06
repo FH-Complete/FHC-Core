@@ -345,7 +345,7 @@ if(isset($uebung_id) && $uebung_id!='')
 		             </td>
           		</tr>';
 			$i=0;
-			$qry_cnt = "SELECT distinct prestudent_id FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." GROUP BY prestudent_id";
+			$qry_cnt = "SELECT distinct prestudent_id FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." GROUP BY uid";
 				if($result_cnt = $db->db_query($qry_cnt))
 						$gesamt=$db->db_num_rows($result_cnt);
 
