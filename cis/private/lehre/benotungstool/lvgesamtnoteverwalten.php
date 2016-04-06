@@ -660,7 +660,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 
 		// studentenquery
 		$qry_stud = "SELECT
-						DISTINCT uid, vorname, nachname, matrikelnr
+						DISTINCT uid, prestudent_id, vorname, nachname, matrikelnr
 					FROM
 						campus.vw_student_lehrveranstaltung
 						JOIN campus.vw_student USING(uid)
@@ -674,7 +674,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 			while($row_stud = $db->db_fetch_object($result_stud))
 			{
 				$lvgesamtnote = new lvgesamtnote();
-    			if ($lvgesamtnote->load($lvid,$row_stud->prestudent_uid,$stsem))
+    			if ($lvgesamtnote->load($lvid,$row_stud->prestudent_id,$stsem))
     			{
 					if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)
 					{

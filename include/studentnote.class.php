@@ -53,9 +53,9 @@ class studentnote extends basis_db
 	 *
 	 * @param $lehreinheit_id
 	 * @param $ss Studiensemester
-	 * @param $prestudent_id
+	 * @param $uid
 	 */
-	public function calc_gesamtnote($lehreinheit_id, $ss, $prestudent_id)
+	public function calc_gesamtnote($lehreinheit_id, $ss, $uid)
 	{
 		$studentgesamtnote = 0;
 		$counter = 0;
@@ -71,7 +71,7 @@ class studentnote extends basis_db
 		$ueb1_obj->load_uebung($lehreinheit_id,1);
 		foreach($ueb1_obj->uebungen as $ueb1)
 		{
-			$this->calc_l1_note($ueb1->uebung_id, $prestudent_id, $lehreinheit_id);
+			$this->calc_l1_note($ueb1->uebung_id, $uid, $lehreinheit_id);
 			$note_x_gewicht_l1 += ($this->l1_note * $this->l1_gewicht);
 			$gewichte_l1 += $this->l1_gewicht;
 			if ($this->negativ)
@@ -98,19 +98,14 @@ class studentnote extends basis_db
 	 * ?? berechnet irgendwas...
 	 *
 	 * @param $uebung_id
-	 * @param $prestudent_id
+	 * @param $uid
 	 * @param lehreinheit_id
 	 */
-	public function calc_l1_note($uebung_id, $prestudent_id, $lehreinheit_id)
+	public function calc_l1_note($uebung_id, $uid, $lehreinheit_id)
 	{
 		if(!is_numeric($uebung_id))
 		{
 			$this->errormsg='Uebung_id muss eine gueltige Zahl sein';
-			return false;
-		}
-		if(!is_numeric($prestudent_id))
-		{
-			$this->errormsg='Prestudent_id muss eine gueltige Zahl sein';
 			return false;
 		}
 		if(!is_numeric($lehreinheit_id))
@@ -145,7 +140,7 @@ class studentnote extends basis_db
 			{
 				if ($ueb->abgabe && !$ueb->beispiele)
 				{
-					if ($this->calc_note($ueb->uebung_id, $prestudent_id))
+					if ($this->calc_note($ueb->uebung_id, $uid))
 					{
 						if (is_numeric($this->note))
 						{
@@ -164,7 +159,7 @@ class studentnote extends basis_db
 				}
 				else
 				{
-					$this->calc_punkte($ueb->uebung_id, $prestudent_id);
+					$this->calc_punkte($ueb->uebung_id, $uid);
 					$punkte_gesamt += $this->punkte_gesamt;
 					$punkte_mitarbeit += $this->punkte_mitarbeit;
 					$punkte_eingetragen += $this->punkte_eingetragen;
@@ -222,7 +217,7 @@ class studentnote extends basis_db
 		else
 		{
 			$s = new uebung();
-			$s->load_studentuebung($prestudent_id, $ueb1->uebung_id);
+			$s->load_studentuebung($uid, $ueb1->uebung_id);
 			if ($s->note && $ueb1->gewicht)
 			{
 				if ($s->note == 5 && $ueb1->positiv)
@@ -263,19 +258,14 @@ class studentnote extends basis_db
 
 	/**
 	 * berechnet die note der übung
-	 * @param uebung_id, prestudent_id
+	 * @param uebung_id, uid
 	 * setzt this->note, this->gewicht
 	 */
-	public function calc_note($uebung_id, $prestudent_id)
+	public function calc_note($uebung_id, $uid)
 	{
 		if(!is_numeric($uebung_id))
 		{
 			$this->errormsg='Uebung_id muss eine gueltige Zahl sein';
-			return false;
-		}
-		else if(!is_numeric($prestudent_id))
-		{
-			$this->errormsg='Prestudent_id muss eine gueltige Zahl sein';
 			return false;
 		}
 		else
@@ -287,7 +277,7 @@ class studentnote extends basis_db
 			$ueb = new uebung();
 			$ueb->load($uebung_id);
 			
-			if($ueb->load_studentuebung($prestudent_id, $uebung_id))
+			if($ueb->load_studentuebung($uid, $uebung_id))
 			{
 				$this->note = $ueb->note;
 				$this->gewicht = $ueb->gewicht;
@@ -305,19 +295,14 @@ class studentnote extends basis_db
 
 	/**
 	 * berechnet die punkte der übung (kreuzerlliste)
-	 * @param uebung_id, prestudent_id
+	 * @param uebung_id, uid
 	 * setzt this->punkte_gesamt
 	 */
-	public function calc_punkte($uebung_id, $prestudent_id)
+	public function calc_punkte($uebung_id, $uid)
 	{
 		if(!is_numeric($uebung_id))
 		{
 			$this->errormsg='Uebung_id muss eine gueltige Zahl sein';
-			return false;
-		}
-		else if(!is_numeric($prestudent_id))
-		{
-			$this->errormsg='Prestudent_id muss eine gueltige Zahl sein';
 			return false;
 		}
 		else
@@ -330,13 +315,13 @@ class studentnote extends basis_db
 			
 			//Eingetragen diese Kreuzerlliste
 			$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) 
-				WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER)." AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)." AND vorbereitet=true";
+				WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER)." AND uid=".$this->db_add_param($uid)." AND vorbereitet=true";
 			$punkte_eingetragen=0;
 			if($this->db_query($qry))
 				if($row = $this->db_fetch_object())
 					$punkte_eingetragen = ($row->punkteeingetragen!=''?$row->punkteeingetragen:0);
 			
-			if($ueb->load_studentuebung($prestudent_id, $uebung_id))
+			if($ueb->load_studentuebung($uid, $uebung_id))
 			{
 				$mitarbeit = $ueb->mitarbeitspunkte;
 			}

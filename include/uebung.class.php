@@ -55,7 +55,7 @@ class uebung extends basis_db
 	public $prozent;
 
 	//Studentuebung
-	public $prestudent_id;		// integer
+	public $uid;					// varchar(32)
 	public $mitarbeiter_uid;	// varchar(16)
 	public $abgabe_id;			// integer
 	public $note;				// smalint
@@ -156,18 +156,12 @@ class uebung extends basis_db
 	/**
 	 * Laedt eine Studentuebung Zuordnung
 	 *
-	 * @param $prestudent_id
+	 * @param $uid
 	 * @param $uebung_id
 	 * @return boolean
 	 */
-	public function load_studentuebung($prestudent_id, $uebung_id)
+	public function load_studentuebung($uid, $uebung_id)
 	{
-		if(!is_numeric($prestudent_id))
-		{
-			$this->errormsg = 'Prestudent_id muss eine gueltige Zahl sein';
-			return false;
-		}
-
 		if(!is_numeric($uebung_id))
 		{
 			$this->errormsg = 'Uebung_id muss eine gueltige Zahl sein';
@@ -175,13 +169,13 @@ class uebung extends basis_db
 		}
 
 
-		$qry = "SELECT * FROM campus.tbl_studentuebung WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)." AND uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER).";";
+		$qry = "SELECT * FROM campus.tbl_studentuebung WHERE uid=".$this->db_add_param($uid)." AND uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER).";";
 
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
-				$this->prestudent_id = $row->prestudent_id;
+				$this->uid = $row->uid;
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->abgabe_id = $row->abgabe_id;
 				$this->uebung_id = $row->uebung_id;
@@ -488,11 +482,6 @@ class uebung extends basis_db
 			$this->errormsg = 'Uebung_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(!is_numeric($this->prestudent_id))
-		{
-			$this->errormsg = 'Prestudent_id muss eine gueltige Zahl sein';
-			return false;
-		}
 		return true;
 	}
 
@@ -513,10 +502,10 @@ class uebung extends basis_db
 
 		if($new)
 		{
-			$qry = 'INSERT INTO campus.tbl_studentuebung(prestudent_id, mitarbeiter_uid, abgabe_id, uebung_id,
+			$qry = 'INSERT INTO campus.tbl_studentuebung(uid, mitarbeiter_uid, abgabe_id, uebung_id,
 					note, mitarbeitspunkte, punkte, anmerkung, benotungsdatum, updateamum,
 			        updatevon, insertamum, insertvon) VALUES('.
-			        $this->db_add_param($this->prestudent_id, FHC_INTEGER).','.
+			        $this->db_add_param($this->uid).','.
 			        $this->db_add_param($this->mitarbeiter_uid).','.
 			        $this->db_add_param($this->abgabe_id, FHC_INTEGER).','.
 			        $this->db_add_param($this->uebung_id, FHC_INTEGER).','.
@@ -544,7 +533,7 @@ class uebung extends basis_db
 				' updateamum='.$this->db_add_param($this->updateamum).','.
 				' updatevon='.$this->db_add_param($this->updatevon).
 					" WHERE uebung_id=".$this->db_add_param($this->uebung_id, FHC_INTEGER).
-					" AND prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER).";";
+					" AND uid=".$this->db_add_param($this->uid).";";
 		}
 
 		if($this->db_query($qry))

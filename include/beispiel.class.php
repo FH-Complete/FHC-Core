@@ -31,14 +31,14 @@ class beispiel extends basis_db
 	public $beispiel_id;	// Serial
 	public $uebung_id;		// integer
 	public $bezeichnung;	// varchar(32)
-	public $punkte;			// real
+	public $punkte;				// real
 	public $updateamum;		// timestamp
 	public $updatevon;		// varchar(16)
 	public $insertamum;		// timestamp
 	public $insertvon;		// varchar(16)
-	public $nummer;			// smallint
+	public $nummer;				// smallint
 
-	public $prestudent_id;	//integer
+	public $uid;					// varchar(32)
 	public $vorbereitet;
 	public $probleme;
 
@@ -308,21 +308,21 @@ class beispiel extends basis_db
 	 * @param $beispiel_id
 	 * @return boolean
 	 */
-	public function studentbeispiel_exists($prestudent_id,$beispiel_id)
+	public function studentbeispiel_exists($uid,$beispiel_id)
 	{
 		if(!is_numeric($beispiel_id))
 		{
 			$this->errormsg = 'Beispiel_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(!is_numeric($prestudent_id))
+		if(!is_numeric($uid))
 		{
 			$this->errormsg = 'Prestudent_id muss eine gueltige Zahl sein';
 			return false;
 		}
 
 		$qry = "SELECT vorbereitet FROM campus.tbl_studentbeispiel 
-				WHERE beispiel_id=".$this->db_add_param($beispiel_id,FHC_INTEGER)." AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER).';';
+				WHERE beispiel_id=".$this->db_add_param($beispiel_id,FHC_INTEGER)." AND uid=".$this->db_add_param($uid).';';
 
 		if($this->db_query($qry))
 		{
@@ -371,27 +371,27 @@ class beispiel extends basis_db
 	 * @param $beispiel_id
 	 * @return boolean
 	 */
-	public function load_studentbeispiel($prestudent_id, $beispiel_id)
+	public function load_studentbeispiel($uid, $beispiel_id)
 	{
 		if(!is_numeric($beispiel_id))
 		{
 			$this->errormsg = 'Beispiel_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		if(!is_numeric($prestudent_id))
+		if(!is_numeric($uid))
 		{
 			$this->errormsg = 'Prestudent_id muss eine gueltige Zahl sein';
 			return false;
 		}
 		$qry = "SELECT * FROM campus.tbl_studentbeispiel 
-				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)." AND beispiel_id=".$this->db_add_param($beispiel_id, FHC_INTEGER).';';
+				WHERE uid=".$this->db_add_param($uid)." AND beispiel_id=".$this->db_add_param($beispiel_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
 				$this->beispiel_id = $row->beispiel_id;
-				$this->prestudent_id = $row->prestudent_id;
+				$this->uid = $row->uid;
 				$this->vorbereitet = $this->db_parse_bool($row->vorbereitet);
 				$this->probleme = $this->db_parse_bool($row->probleme);
 				$this->updateamum = $row->updateamum;
@@ -477,9 +477,9 @@ class beispiel extends basis_db
 
 		if($new)
 		{
-			$qry = 'INSERT INTO campus.tbl_studentbeispiel(prestudent_id, beispiel_id, vorbereitet, probleme,
+			$qry = 'INSERT INTO campus.tbl_studentbeispiel(uid, beispiel_id, vorbereitet, probleme,
 					updateamum, updatevon, insertamum, insertvon) VALUES('.
-			        $this->db_add_param($this->prestudent_id, FHC_INTEGER).','.
+			        $this->db_add_param($this->uid).','.
 			        $this->db_add_param($this->beispiel_id, FHC_INTEGER).','.
 			        $this->db_add_param($this->vorbereitet,FHC_BOOLEAN).','.
 			        $this->db_add_param($this->probleme).','.
@@ -495,7 +495,7 @@ class beispiel extends basis_db
 			       ' probleme='.$this->db_add_param($this->probleme, FHC_BOOLEAN).','.
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
 			       ' updatevon='.$this->db_add_param($this->updatevon).
-			       " WHERE beispiel_id=".$this->db_add_param($this->beispiel_id, FHC_INTEGER)." AND prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER).';';
+			       " WHERE beispiel_id=".$this->db_add_param($this->beispiel_id, FHC_INTEGER)." AND uid=".$this->db_add_param($this->uid).';';
 		}
 
 		if($this->db_query($qry))
