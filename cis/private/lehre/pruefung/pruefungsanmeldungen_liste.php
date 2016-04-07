@@ -208,7 +208,7 @@ $rechte->getBerechtigungen($uid);
 		    $einzeln = TRUE;
 		    $pruefungsintervall = $pruefung->pruefungsintervall;
 		}
-	    }
+	    
 	    ?>
 	    <span class="bold">Lehrveranstaltung: </span><span><?=$lehrveranstaltung->bezeichnung?></span><br/>
 	    <span class="bold">Studiensemester: </span><span><?=$stdsem->bezeichnung?></span><br/>
@@ -255,6 +255,14 @@ $rechte->getBerechtigungen($uid);
 		    ?>
 		</tbody>
 	    <?php
+	    }
+	    else
+	    {
+		?>
+	    
+		<span>Keine bestätigten Anmeldungen vorhanden.</span><br/>
+		<?php
+	    }
 	}
 	?>
 	    </table>

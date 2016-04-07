@@ -199,14 +199,14 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
                             </select>
                         </td>
                     </tr>
-                    <tr>
+                    <!--<tr>
                         <td>Prüfungstyp:</td>
                         <td>
                             <select id='pruefungsTyp' name="pruefungsTyp">
-<!--				Daten werden per JavaScript geladen-->
+
                             </select>
                         </td>
-                    </tr>
+                    </tr>-->
                     <tr>
                         <td style="vertical-align: top;">Methode:</td>
                         <td><textarea id='methode' placeholder="Multiple Choice, etc." rows="5" cols="20" name="methode"></textarea></td>

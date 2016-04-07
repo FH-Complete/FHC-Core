@@ -36,6 +36,7 @@ require_once('../include/studienplan.class.php');
 require_once('../include/student.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/organisationseinheit.class.php');
+require_once('../include/anrechnung.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -314,14 +315,60 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "				<lvleiter>".$leiter_titel." ".$leiter_vorname." ".$leiter_nachname.($leiter_titelpost!=''?', '.$leiter_titelpost:'')."</lvleiter>";
 		$xml .= "				<lehrinhalte><![CDATA[".clearHtmlTags($lehrinhalte)."]]></lehrinhalte>";
 		$xml .= "				<kompatible_lvs>";
+		
 		$lehrveranstaltung->getLVkompatibel($lehrveranstaltung_id);
 		foreach($lehrveranstaltung->lehrveranstaltungen as $lv_kompatibel)
 		{
 		    $xml .= "<lv>".$lv_kompatibel->bezeichnung."</lv>";
 		}
+
 		$xml .= "	</kompatible_lvs>";
 		
-		$return = $lehrveranstaltung->getLVFromStudienplanByLehrtyp($studienplan_id, "modul");
+		$anrechnung = new anrechnung();
+		
+//		var_dump($lehrveranstaltung_id);
+		$anrechnung->getAnrechnungPrestudent($student->prestudent_id, null, $lehrveranstaltung_id);
+
+		$xml .= "<studienverpflichtung>";
+		$lehrveranstaltung_id_kompatibel = "";
+		if(count($anrechnung->result) === 1)
+		{
+		    $lehrveranstaltung_id_kompatibel = $anrechnung->result[0]->lehrveranstaltung_id;
+		    $xml .= $anrechnung->result[0]->lehrveranstaltung_bez;
+		}
+		$xml .= "</studienverpflichtung>";
+
+		$lehrveranstaltung->loadLehrveranstaltungStudienplan($studienplan_id);
+		
+		$studienplan_lehrveranstaltung_id = "";
+		foreach($lehrveranstaltung->lehrveranstaltungen as $lv)
+		{
+		    if(($lv->lehrveranstaltung_id == $lehrveranstaltung_id) || ($lv->lehrveranstaltung_id == $lehrveranstaltung_id_kompatibel))
+		    {
+			$studienplan_lehrveranstaltung_id = $lv->studienplan_lehrveranstaltung_id;
+			break;
+		    }
+		}
+		
+		$studienplan = new studienplan();
+		if($studienplan_lehrveranstaltung_id != "")
+		{
+		    $studienplan->loadStudienplanLehrveranstaltung($studienplan_lehrveranstaltung_id);
+		    $lv = new lehrveranstaltung();
+		    while($lv->lehrtyp_kurzbz != "modul")
+		    {
+			$lv->load($studienplan->lehrveranstaltung_id);
+			$studienplan->loadStudienplanLehrveranstaltung($studienplan->studienplan_lehrveranstaltung_id_parent);
+		    }
+		    $lehrveranstaltung->lehrveranstaltungen = array(0 => $lv);
+		}
+		else
+		{
+		    $lehrveranstaltung->lehrveranstaltungen = array();
+		}
+		
+//		$return = $lehrveranstaltung->getLVFromStudienplanByLehrtyp($studienplan_id, "modul");
+
 		$xml .= "	<module>";
 		
 		//Variable wird zur korrekten Darstellung im Dokument benötigt
