@@ -11,37 +11,46 @@
  * @since		Version 1.0
  * @filesource
  */
-
 // ------------------------------------------------------------------------
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
 class Person extends APIv1_Controller
 {
-	//public $session;
+
+    //public $session;
     /**
      * Person API constructor.
      */
     public function __construct()
     {
-        parent::__construct();
+	parent::__construct();
 
-        $this->load->model('person/person_model');
+	$this->load->model('person/person_model');
     }
 
     public function person_get()
     {
-        //if (!$this->session_model->validate($this->get('session_id'), $this->get('device_id')))
-        //    $this->response(array(['success' => false, 'message' => 'access denied']), REST_Controller::HTTP_UNAUTHORIZED);
+	//if (!$this->session_model->validate($this->get('session_id'), $this->get('device_id')))
+	//    $this->response(array(['success' => false, 'message' => 'access denied']), REST_Controller::HTTP_UNAUTHORIZED);
 
-        $code = $this->get('code');
-        
-        if (!is_null($code))
-			$result = $this->person_model->getPersonByCode($code);
-		else
-			$result = $this->person_model->getPerson();
-		//	var_dump($result[0]);
+	$code = $this->get('code');
+	$person_id = $this->get('person_id');
 
+	if (!is_null($code))
+	{
+	    $result = $this->person_model->getPersonByCode($code);
+	}
+	elseif (!is_null($person_id))
+	{
+	    $result = $this->person_model->getPerson($person_id);
+	}
+	else
+	{
+	    $result = $this->person_model->getPerson();
+	}
+
+<<<<<<< HEAD
 		if ($result['err'])
         {
             $payload = [
@@ -60,8 +69,114 @@ class Person extends APIv1_Controller
 			$payload['data'] = $result;
             $httpstatus = REST_Controller::HTTP_OK;
 		}
+=======
+	if (empty($result))
+	{
+	    $payload = [
+		'success' => false,
+		'message' => 'Person not found'
+	    ];
+	    $httpstatus = REST_Controller::HTTP_OK;
+	}
+	else
+	{
+	    // return all available persons
+	    $payload = [
+		'success' => true,
+		'message' => 'Persons found'
+	    ];
+	    $payload['data'] = $result;
+	    $httpstatus = REST_Controller::HTTP_OK;
+	}
+>>>>>>> 97ddc838a8c9e707d3bf5a6a700301252d2f5ed8
 
-        // Set the response and exit
-        $this->response($payload, $httpstatus);
+	// Set the response and exit
+	$this->response($payload, $httpstatus);
     }
+    
+    public function person_post()
+    {
+	$result = $this->person_model->savePerson($this->post());
+	if($result != FALSE)
+	{
+	    $httpstatus = REST_Controller::HTTP_OK;
+	    $payload = [
+		'success' => true,
+		'message' => 'Person saved.'
+	    ];
+	    $payload['data'] = $result;
+	}
+	else
+	{
+	    $payload = [
+		'success' => false,
+		'message' => 'Could not save person.'
+	    ];
+	    $httpstatus = REST_Controller::HTTP_OK;
+	}
+	
+	$this->response($payload, $httpstatus);
+    }
+    
+    public function personUpdate_post()
+    {
+	$result = $this->person_model->updatePerson($this->post());
+	if($result != FALSE)
+	{
+	    $httpstatus = REST_Controller::HTTP_OK;
+	    $payload = [
+		'success' => true,
+		'message' => 'Person updated.'
+	    ];
+	    $payload['data'] = $result;
+	}
+	else
+	{
+	    $payload = [
+		'success' => false,
+		'message' => 'Could not update person.'
+	    ];
+	    $httpstatus = REST_Controller::HTTP_OK;
+	}
+//	
+	$this->response($payload, $httpstatus);
+    }
+    
+    public function checkBewerbung_get()
+    {
+	$result = $this->person_model->checkBewerbung($this->get("email"),$this->get("studiensemester_kurzbz"));
+	$httpstatus = REST_Controller::HTTP_OK;
+	$payload = [
+	    'success' => true,
+	    'message' => 'Bewerbung exists.'
+	];
+	$payload['data'] = $result;
+	
+	$this->response($payload, $httpstatus);
+    }
+    
+    public function  checkZugangscodePerson_get()
+    {
+	$result = $this->person_model->checkZugangscodePerson($this->get("code"));
+	$httpstatus = REST_Controller::HTTP_OK;
+	if(!empty($result))
+	{
+	    $payload = [
+		'success' => true,
+		'message' => 'Zugangscode exists.'
+	    ];
+	    $payload['data'] = $result;
+	}
+	else
+	{
+	    $payload = [
+		'success' => false,
+		'message' => 'Zugangscode does not exist.'
+	    ];
+	    $httpstatus = REST_Controller::HTTP_OK;
+	}
+	
+	$this->response($payload, $httpstatus);
+    }
+
 }

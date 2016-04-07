@@ -414,6 +414,11 @@ trait db_extra
 			return ($var!==''?$var:'null');	
 	}
 	
+	public function db_qoute($var)
+	{
+		return "'".$var."'";
+	}
+	
 	public function db_parse_bool($var)
 	{
 		if($var=='t')
