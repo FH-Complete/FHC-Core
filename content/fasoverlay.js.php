@@ -1767,10 +1767,20 @@ function PrintStudienblatt(event)
 {
 	var tree = document.getElementById('student-prestudent-tree-rolle');
 	var ss = document.getElementById('statusbarpanel-semester').label;
+	
+	var items = tree.view.rowCount;
 
 	try
 	{
-		var studienplan_id = getTreeCellText(tree, "student-prestudent-tree-rolle-studienplan_id", 0);
+	    var studienplan_id = "";
+	    for (var v=0; v < items; v++)
+	    {
+		var stsem = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', v);
+		if(stsem == ss)
+		{
+		    studienplan_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-studienplan_id', v);
+		}
+	    }
 	}
 	catch(e)
 	{
@@ -1854,10 +1864,19 @@ function PrintStudienblatt(event)
 function PrintStudienblattEnglisch(event)
 {
 	var tree = document.getElementById('student-prestudent-tree-rolle');
+	var items = tree.view.rowCount;
 
 	try
 	{
-		var studienplan_id = getTreeCellText(tree, "student-prestudent-tree-rolle-studienplan_id", 0);
+	    var studienplan_id = "";
+	    for (var v=0; v < items; v++)
+	    {
+		var stsem = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', v);
+		if(stsem == ss)
+		{
+		    studienplan_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-studienplan_id', v);
+		}
+	    }
 	}
 	catch(e)
 	{

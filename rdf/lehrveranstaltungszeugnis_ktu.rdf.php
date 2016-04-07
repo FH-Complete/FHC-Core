@@ -37,6 +37,7 @@ require_once('../include/student.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/organisationseinheit.class.php');
 require_once('../include/anrechnung.class.php');
+require_once('../include/lehrform.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -153,6 +154,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	$lvbezeichnung = $lehrveranstaltung->bezeichnung;
 	$lvstg = $lehrveranstaltung->studiengang_kz;
 	$lehrform_kurzbz=$lehrveranstaltung->lehrform_kurzbz;
+	$lehrform = new lehrform($lehrform_kurzbz);
+	$lehrform_bezeichnung = $lehrform->bezeichnung;
 	$organisationseinheit = new organisationseinheit($lehrveranstaltung->oe_kurzbz);
 	
 	$lehreinheit=new lehreinheit();
@@ -310,6 +313,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "				<benotungsdatum>".$datum->formatDatum($benotungsdatum,'d.m.Y')."</benotungsdatum>";
 		$xml .= "				<uebernahmedatum>".$datum->formatDatum($uebernahmedatum,'d.m.Y')."</uebernahmedatum>";
 		$xml .= "				<lehrform_kurzbz>".$lehrform_kurzbz."</lehrform_kurzbz>";
+		$xml .= "				<lehrform_bezeichnung>".$lehrform_bezeichnung."</lehrform_bezeichnung>";
 		$xml .= "				<sws>".($sws==0?'':number_format(sprintf('%.1F',$sws),1))."</sws>";
 		$xml .= "				<ects>".number_format($ects,1)."</ects>";
 		$xml .= "				<lvleiter>".$leiter_titel." ".$leiter_vorname." ".$leiter_nachname.($leiter_titelpost!=''?', '.$leiter_titelpost:'')."</lvleiter>";
@@ -325,8 +329,6 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "	</kompatible_lvs>";
 		
 		$anrechnung = new anrechnung();
-		
-//		var_dump($lehrveranstaltung_id);
 		$anrechnung->getAnrechnungPrestudent($student->prestudent_id, null, $lehrveranstaltung_id);
 
 		$xml .= "<studienverpflichtung>";
