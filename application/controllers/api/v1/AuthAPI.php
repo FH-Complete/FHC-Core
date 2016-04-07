@@ -17,12 +17,13 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 // This can be removed if you use __autoload() in config.php OR use Modular Extensions
-require APPPATH . '/libraries/REST_Controller.php';
+//require APPPATH . '/libraries/REST_Controller.php';
 
 /**
  * Handles user authentication and registration process
  */
-class AuthAPI extends REST_Controller {
+class AuthAPI extends APIv1_Controller 
+{
 
     /**
      * Userauth-Controller constructor.
@@ -39,8 +40,9 @@ class AuthAPI extends REST_Controller {
         $this->methods['login_get']['limit'] = 500; // 500 requests per hour per user/key
         
         // Load helper
-        $this->load->helper('fhcauth');
+        //$this->load->helper('fhcauth');
 		$this->load->library('session');
+		$this->load->library('FHC_Auth');
     }
 
     /**
@@ -58,7 +60,7 @@ class AuthAPI extends REST_Controller {
         $username = urldecode($this->get('username'));
         $password = urldecode($this->get('password'));
         
-        $account = auth($username,$password);
+        $account = $this->FHCAuth->auth($username,$password);
 
         // perform login checks
         if (!$account)

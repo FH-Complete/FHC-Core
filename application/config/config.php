@@ -508,7 +508,7 @@ $config['proxy_ips'] = '';
 | Autoload Custom Controllers
 |--------------------------------------------------------------------------
 |
-*/
+Don't work so sometime delete this*/
 function __autoload($class) 
 {
     if (substr($class,0,3) !== 'CI_' && substr($class,0,4) !== 'FHC_') 

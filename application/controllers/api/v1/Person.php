@@ -16,7 +16,7 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Person extends REST_Controller
+class Person extends APIv1_Controller
 {
 	//public $session;
     /**
@@ -42,11 +42,11 @@ class Person extends REST_Controller
 			$result = $this->person_model->getPerson();
 		//	var_dump($result[0]);
 
-        if (empty($result))
+		if ($result['err'])
         {
             $payload = [
                         'success' => false,
-                        'message' => 'Person not found'
+                        'message' => $result['msg'].': '.$result['retval']
                     ];
                     $httpstatus = REST_Controller::HTTP_OK;
         }

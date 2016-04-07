@@ -19,12 +19,22 @@ class Person_model extends DB_Model
 		    return $query->row_object();
 	}
 
+	/**
+	 * Laedt Personendaten einer Person mittels Code
+	 * @param	string	$code	DB-Attr: tbl_benutzer.zugangscode .
+	 * @return	object
+	 */
 	public function getPersonByCode($code)
 	{
 		if ($this->fhc_db_acl->bb->isBerechtigt('person','s'))
 		{
 			$query = $this->db->get_where('public.tbl_person', array('zugangscode' => $code));
 		    return $query->result_object();
+		}
+		else
+		{
+			return $this->_general_error($this->fhc_db_acl->bb->errormsg);
+			//return false;
 		}
 	}
 
