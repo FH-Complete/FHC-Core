@@ -1,7 +1,8 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') || exit('No direct script access allowed');
 
-class Vilesci extends CI_Controller {
+class Vilesci extends CI_Controller
+{
 
 	/**
 	 * Index Page for this controller.
@@ -17,10 +18,12 @@ class Vilesci extends CI_Controller {
 	 * So any other public methods not prefixed with an underscore will
 	 * map to /index.php/welcome/<method_name>
 	 * @see http://codeigniter.com/user_guide/general/urls.html
+	 * @return void
 	 */
 	public function index()
 	{
-		if (false)//$this->dbupdate())
+		// ToDo: check if update is needed
+		if (false && $this->dbupdate())
 			echo 'System-DB needs update!';
 		else
 		{
@@ -30,11 +33,15 @@ class Vilesci extends CI_Controller {
 		}
 	}
 
-	private function dbupdate()
+	/**
+	 *
+	 * @return bool
+	 */
+	private function __dbupdate()
 	{
 		// Check for update (codeigniter migration)
 		$this->load->library('migration');
-		if ($this->migration->current() === FALSE)
+		if ($this->migration->current() === false)
 			show_error($this->migration->error_string());
         if ($this->migration->current() != $this->migration->latest())
 			return true;
