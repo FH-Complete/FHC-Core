@@ -9,9 +9,20 @@ settings:
     colors: true
     memory_limit: 1024M
 modules:
-    config:
-        Db:
-            dsn: ''
-            user: ''
-            password: ''
-            dump: codeception/_data/dump.sql
+enabled:
+    - Db
+config:
+    Db:
+        dsn: 'pgsql:host=localhost;port=5432;dbname=fhctest'
+        user: 'fhcomplete'
+        password: 'fhcomplete'
+        dump: codeception/_data/dump.sql
+        populate: true
+        cleanup: false
+        reconnect: false
+coverage:
+    enabled: true
+    include:
+        - application/*
+    exclude:
+        - application/cache/*

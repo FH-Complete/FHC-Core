@@ -6,9 +6,9 @@ class Migration_Init extends CI_Migration {
 
         public function up()
         {        	
-			//$this->load->database('system');
+			$this->load->database('system');
 			// Schemas
-			//$this->db->query('CREATE SCHEMA IF NOT EXISTS gis;');
+			$this->db->query('CREATE SCHEMA IF NOT EXISTS addon;');
           
 		}
 

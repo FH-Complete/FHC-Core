@@ -288,8 +288,35 @@ switch (ENVIRONMENT)
  *
  * And away we go...
  */
+include_once 'vendor/autoload.php';
 //require_once BASEPATH.'core/CodeIgniter.php';
-//require_once(dirname(__FILE__).'/include/authentication.class.php');
+
+// Now the Hack starts
+/*
+ * ------------------------------------------------------
+ *  Load the framework constants
+ * ------------------------------------------------------
+ */
+	if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/constants.php'))
+	{
+		require_once(APPPATH.'config/'.ENVIRONMENT.'/constants.php');
+	}
+	require_once(APPPATH.'config/constants.php');
+
+// ToDo: Check if Security procedure is needed
+// ToDo: Check if custom error handler is needed
+
+/*
+ * ------------------------------------------------------
+ *  Set the subclass_prefix
+ * ------------------------------------------------------
+ *
+ */
+	if ( ! empty($assign_to_config['subclass_prefix']))
+	{
+		get_config(array('subclass_prefix' => $assign_to_config['subclass_prefix']));
+	}
+
 require_once(dirname(__FILE__).'/vendor/codeigniter/framework/system/core/Common.php');
 require_once(dirname(__FILE__).'/vendor/codeigniter/framework/system/core/Controller.php');
 /*
@@ -312,6 +339,14 @@ require_once(dirname(__FILE__).'/vendor/codeigniter/framework/system/core/Contro
 			$CFG->set_item($key, $value);
 		}
 	}
+
+/*
+ * ------------------------------------------------------
+ *  Load the Language class
+ * ------------------------------------------------------
+ */
+	$LANG =& load_class('Lang', 'core');
+
 function &get_instance()
 {
 	return CI_Controller::get_instance();
@@ -319,10 +354,10 @@ function &get_instance()
 /*require_once(dirname(__FILE__).'/vendor/codeigniter/framework/system/core/CodeIgniter.php');
 */
 require_once(dirname(__FILE__).'/vendor/codeigniter/framework/system/database/DB.php');
-require_once(dirname(__FILE__).'/vendor/codeigniter/framework/system/core/Common.php');
+//require_once(dirname(__FILE__).'/vendor/codeigniter/framework/system/core/Common.php');
 require_once(dirname(__FILE__).'/vendor/codeigniter/framework/system/core/Loader.php');
 $loader=new CI_Loader();
-//require_once(dirname(__FILE__).'/application/core/FHC_Controller.php');
+require_once(dirname(__FILE__).'/application/core/FHC_Controller.php');
 $controller=new CI_Controller();
 require_once(dirname(__FILE__).'/vendor/codeigniter/framework/system/core/Model.php');
 require_once(dirname(__FILE__).'/application/core/FHC_Model.php');
