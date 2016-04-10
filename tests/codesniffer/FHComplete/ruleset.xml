@@ -22,12 +22,13 @@
   	</properties>
   </rule>
 
+	<rule ref="FHComplete.Commenting.FunctionComment.ParamCommentFullStop">
+		<severity>0</severity>
+	</rule>
+
   <!--
   Temporarily ignore until API docblock formatting and line length issues in core code are fixed.
   <rule ref="FHComplete.Commenting.FunctionComment.ParamCommentNotCapital">
-    <severity>0</severity>
-  </rule>
-  <rule ref="FHComplete.Commenting.FunctionComment.ParamCommentFullStop">
     <severity>0</severity>
   </rule>
   <rule ref="FHComplete.Commenting.FunctionComment.ThrowsNotCapital">

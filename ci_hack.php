@@ -329,23 +329,23 @@ require_once(dirname(__FILE__).'/vendor/codeigniter/framework/system/core/Contro
  * depending on another class that uses it.
  *
  */
-	$CFG =& load_class('Config', 'core');
+$CFG =& load_class('Config', 'core');
 
-	// Do we have any manually set config items in the index.php file?
-	if (isset($assign_to_config) && is_array($assign_to_config))
+// Do we have any manually set config items in the index.php file?
+if (isset($assign_to_config) && is_array($assign_to_config))
+{
+	foreach ($assign_to_config as $key => $value)
 	{
-		foreach ($assign_to_config as $key => $value)
-		{
-			$CFG->set_item($key, $value);
-		}
+		$CFG->set_item($key, $value);
 	}
+}
 
 /*
  * ------------------------------------------------------
  *  Load the Language class
  * ------------------------------------------------------
  */
-	$LANG =& load_class('Lang', 'core');
+$LANG =& load_class('Lang', 'core');
 
 function &get_instance()
 {
@@ -466,4 +466,3 @@ trait db_extra
 			die('Invalid DB Boolean. Wrong DB-Engine?');
 	}
 }
-
