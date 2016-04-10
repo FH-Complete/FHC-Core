@@ -8,8 +8,8 @@ documents/
 .settings
 .project
 .buildpath
-!/tests/codeception.yml
-!/tests/codeception/api.suite.yml
-!/tests/codeception/functional.suite.yml
-!/tests/codeception/acceptance.suite.yml
-!/submodules/d3/
+!tests/codeception.yml
+!tests/codeception/api.suite.yml
+!tests/codeception/functional.suite.yml
+!tests/codeception/acceptance.suite.yml
+!/submodules/d3
