@@ -26,7 +26,7 @@
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
 // **************** Spalte scrumsprint_id Tabelle fue.tbl_projekttask
-if(!$result = $db->db_query("SELECT scrumsprint_id FROM fue.tbl_projekttask LIMIT 1;"))
+if(!$result = @$db->db_query("SELECT scrumsprint_id FROM fue.tbl_projekttask LIMIT 1;"))
 {
 	$qry = 'ALTER TABLE fue.tbl_projekttask ADD COLUMN scrumsprint_id bigint;
 			CREATE TABLE fue.tbl_scrumteam
