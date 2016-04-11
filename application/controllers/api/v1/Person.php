@@ -33,13 +33,56 @@ class Person extends REST_Controller
     {
 	//if (!$this->session_model->validate($this->get('session_id'), $this->get('device_id')))
 	//    $this->response(array(['success' => false, 'message' => 'access denied']), REST_Controller::HTTP_UNAUTHORIZED);
-
+	
 	$code = $this->get('code');
+	$email = $this->get('email');
 	$person_id = $this->get('person_id');
 
-	if (!is_null($code))
+	if ((!is_null($code)) && (!is_null($email)))
 	{
-	    $result = $this->person_model->getPersonByCode($code);
+	    $result = $this->person_model->getPersonByCodeAndEmail($code, $email);
+	}
+	elseif (!is_null($person_id))
+	{
+	    $result = $this->person_model->getPerson($person_id);
+	}
+	else
+	{
+	    $result = $this->person_model->getPerson();
+	}
+
+	if (empty($result))
+	{
+	    $payload = [
+		'success' => false,
+		'message' => 'Person not found'
+	    ];
+	    $httpstatus = REST_Controller::HTTP_OK;
+	}
+	else
+	{
+	    // return all available persons
+	    $payload = [
+		'success' => true,
+		'message' => 'Persons found'
+	    ];
+	    $payload['data'] = $result;
+	    $httpstatus = REST_Controller::HTTP_OK;
+	}
+
+	// Set the response and exit
+	$this->response($payload, $httpstatus);
+    }
+    
+    public function personFromCode_post()
+    {
+	$code = $this->post('code');
+	$email = $this->post('email');
+	$person_id = $this->post('person_id');
+
+	if ((!is_null($code)) && (!is_null($email)))
+	{
+	    $result = $this->person_model->getPersonByCodeAndEmail($code, $email);
 	}
 	elseif (!is_null($person_id))
 	{
@@ -134,7 +177,7 @@ class Person extends REST_Controller
 	$this->response($payload, $httpstatus);
     }
     
-    public function  checkZugangscodePerson_get()
+    public function checkZugangscodePerson_get()
     {
 	$result = $this->person_model->checkZugangscodePerson($this->get("code"));
 	$httpstatus = REST_Controller::HTTP_OK;

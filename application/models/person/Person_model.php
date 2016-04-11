@@ -21,13 +21,20 @@ class Person_model extends DB_Model
 	return $query->row_object();
     }
 
-    public function getPersonByCode($code)
+    public function getPersonByCodeAndEmail($code, $email)
     {
-	if ($this->fhc_db_acl->bb->isBerechtigt('person', 's'))
-	{
-	    $query = $this->db->get_where('public.tbl_person', array('zugangscode' => $code));
-	    return $query->result_object();
-	}
+//	if ($this->fhc_db_acl->bb->isBerechtigt('person', 'suid'))
+//	{
+	    $this->db->select("*")
+		    ->from('public.tbl_person p')
+		    ->join("public.tbl_kontakt k", "k.person_id=p.person_id")
+		    ->where("p.zugangscode", $code)
+		    ->where("k.kontakt", $email);
+	    
+	    return $this->db->get()->result_object();
+//	    $query = $this->db->get_where('public.tbl_person p ', array('zugangscode' => $code));
+//	    return $query->result_object();
+//	}
     }
 
     /**
@@ -57,6 +64,7 @@ class Person_model extends DB_Model
 		"gebdatum"=>$person["gebdatum"],
 		"aktiv" => true,
 		"zugangscode"=>$person["zugangscode"],
+		"zugangscode_timestamp"=>date('Y-m-d H:i:s'),
 		"insertamum"=>date('Y-m-d H:i:s'),
 		"insertvon"=>$person["insertvon"],
 	    );
