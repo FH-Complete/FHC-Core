@@ -13,7 +13,8 @@
  */
 // ------------------------------------------------------------------------
 
-defined('BASEPATH') || exit('No direct script access allowed');
+if (! defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 class Person extends APIv1_Controller
 {
@@ -26,19 +27,22 @@ class Person extends APIv1_Controller
 		$this->load->model('person/person_model');
     }
 
-    public function person_get()
+	/**
+	 * @return void
+	 */
+	public function person_get()
     {
 	//if(!$this->session_model->validate($this->get('session_id'), $this->get('device_id')))
-	//    $this->response(array(['success' => false, 'message' => 'access denied']), REST_Controller::HTTP_UNAUTHORIZED);
+	// $this->response(array(['success' => false, 'message' => 'access denied']), REST_Controller::HTTP_UNAUTHORIZED);
 
 		$code = $this->get('code');
 		$person_id = $this->get('person_id');
 
-		if(!is_null($code))
+		if (! is_null($code))
 		{
 			$result = $this->person_model->getPersonByCode($code);
 		}
-		elseif(!is_null($person_id))
+		elseif (! is_null($person_id))
 		{
 			$result = $this->person_model->getPerson($person_id);
 		}
@@ -47,7 +51,7 @@ class Person extends APIv1_Controller
 			$result = $this->person_model->getPerson();
 		}
 
-		if($result['err'])
+		if ($result['err'])
         {
             $payload = [
 				'success' => false,
@@ -66,7 +70,7 @@ class Person extends APIv1_Controller
             $httpstatus = REST_Controller::HTTP_OK;
 		}
 
-		if(empty($result))
+		if (empty($result))
 		{
 			$payload = [
 				'success' => false,
@@ -88,10 +92,13 @@ class Person extends APIv1_Controller
 		$this->response($payload, $httpstatus);
     }
 
-    public function person_post()
+    /**
+	 * @return void
+	 */
+	public function person_post()
     {
 		$result = $this->person_model->savePerson($this->post());
-		if($result != FALSE)
+		if ($result != false)
 		{
 			$httpstatus = REST_Controller::HTTP_OK;
 			$payload = [
@@ -111,10 +118,13 @@ class Person extends APIv1_Controller
 		$this->response($payload, $httpstatus);
     }
 
-    public function personUpdate_post()
+    /**
+	 * @return void
+	 */
+	public function personUpdate_post()
     {
 		$result = $this->person_model->updatePerson($this->post());
-		if($result != FALSE)
+		if ($result != false)
 		{
 			$httpstatus = REST_Controller::HTTP_OK;
 			$payload = [
@@ -134,9 +144,12 @@ class Person extends APIv1_Controller
 		$this->response($payload, $httpstatus);
     }
 
-    public function checkBewerbung_get()
+    /**
+	 * @return void
+	 */
+	public function checkBewerbung_get()
     {
-		$result = $this->person_model->checkBewerbung($this->get("email"),$this->get("studiensemester_kurzbz"));
+		$result = $this->person_model->checkBewerbung($this->get("email"), $this->get("studiensemester_kurzbz"));
 		$httpstatus = REST_Controller::HTTP_OK;
 		$payload = [
 			'success' => true,
@@ -146,11 +159,14 @@ class Person extends APIv1_Controller
 		$this->response($payload, $httpstatus);
     }
 
-    public function  checkZugangscodePerson_get()
+    /**
+	 * @return void
+	 */
+	public function checkZugangscodePerson_get()
     {
 		$result = $this->person_model->checkZugangscodePerson($this->get("code"));
 		$httpstatus = REST_Controller::HTTP_OK;
-		if(!empty($result))
+		if (!empty($result))
 		{
 			$payload = [
 				'success' => true,

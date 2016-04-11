@@ -85,7 +85,7 @@ class DBTools extends FHC_Controller
 	/**
 	 * Migrate to latest or current version
 	 *
-	 * @param  string $version One of either "latest" or "current"
+	 * @param  string $version [optional] One of either "latest" or "current"
 	 * @return	void
 	 */
 	public function migrate($version = 'latest')

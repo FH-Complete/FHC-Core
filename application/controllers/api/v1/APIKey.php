@@ -1,9 +1,10 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+if (! defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 // This can be removed if you use __autoload() in config.php OR use Modular Extensions
-require APPPATH . '/libraries/REST_Controller.php';
+require APPPATH.'/libraries/REST_Controller.php';
 
 /**
  * Keys Controller
@@ -16,8 +17,8 @@ require APPPATH . '/libraries/REST_Controller.php';
  * @license         MIT
  * @link            https://github.com/chriskacerguis/codeigniter-restserver
  */
-class Key extends REST_Controller {
-
+class APIKey extends REST_Controller
+{
     protected $methods = [
             'index_put' => ['level' => 10, 'limit' => 10],
             'index_delete' => ['level' => 10],
@@ -34,24 +35,24 @@ class Key extends REST_Controller {
     public function index_put()
     {
         // Build a new key
-        $key = $this->_generate_key();
+        $key = $this->__generateKey();
 
         // If no key level provided, provide a generic key
         $level = $this->put('level') ? $this->put('level') : 1;
-        $ignore_limits = ctype_digit($this->put('ignore_limits')) ? (int) $this->put('ignore_limits') : 1;
+        $ignore_limits = ctype_digit($this->put('ignore_limits')) ? (int)$this->put('ignore_limits') : 1;
 
         // Insert the new key
         if ($this->_insert_key($key, ['level' => $level, 'ignore_limits' => $ignore_limits]))
         {
             $this->response([
-                'status' => TRUE,
+                'status' => true,
                 'key' => $key
             ], REST_Controller::HTTP_CREATED); // CREATED (201) being the HTTP response code
         }
         else
         {
             $this->response([
-                'status' => FALSE,
+                'status' => false,
                 'message' => 'Could not save the key'
             ], REST_Controller::HTTP_INTERNAL_SERVER_ERROR); // INTERNAL_SERVER_ERROR (500) being the HTTP response code
         }
@@ -72,7 +73,7 @@ class Key extends REST_Controller {
         {
             // It doesn't appear the key exists
             $this->response([
-                'status' => FALSE,
+                'status' => false,
                 'message' => 'Invalid API key'
             ], REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
         }
@@ -82,7 +83,7 @@ class Key extends REST_Controller {
 
         // Respond that the key was destroyed
         $this->response([
-            'status' => TRUE,
+            'status' => true,
             'message' => 'API key was deleted'
             ], REST_Controller::HTTP_NO_CONTENT); // NO_CONTENT (204) being the HTTP response code
     }
@@ -103,7 +104,7 @@ class Key extends REST_Controller {
         {
             // It doesn't appear the key exists
             $this->response([
-                'status' => FALSE,
+                'status' => false,
                 'message' => 'Invalid API key'
             ], REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
         }
@@ -112,14 +113,14 @@ class Key extends REST_Controller {
         if ($this->_update_key($key, ['level' => $new_level]))
         {
             $this->response([
-                'status' => TRUE,
+                'status' => true,
                 'message' => 'API key was updated'
             ], REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
         }
         else
         {
             $this->response([
-                'status' => FALSE,
+                'status' => false,
                 'message' => 'Could not update the key level'
             ], REST_Controller::HTTP_INTERNAL_SERVER_ERROR); // INTERNAL_SERVER_ERROR (500) being the HTTP response code
         }
@@ -140,7 +141,7 @@ class Key extends REST_Controller {
         {
             // It doesn't appear the key exists
             $this->response([
-                'status' => FALSE,
+                'status' => false,
                 'message' => 'Invalid API key'
             ], REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
         }
@@ -149,14 +150,14 @@ class Key extends REST_Controller {
         if ($this->_update_key($key, ['level' => 0]))
         {
             $this->response([
-                'status' => TRUE,
+                'status' => true,
                 'message' => 'Key was suspended'
             ], REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
         }
         else
         {
             $this->response([
-                'status' => FALSE,
+                'status' => false,
                 'message' => 'Could not suspend the user'
             ], REST_Controller::HTTP_INTERNAL_SERVER_ERROR); // INTERNAL_SERVER_ERROR (500) being the HTTP response code
         }
@@ -171,20 +172,20 @@ class Key extends REST_Controller {
     public function regenerate_post()
     {
         $old_key = $this->post('key');
-        $key_details = $this->_get_key($old_key);
+        $key_details = $this->__getKey($old_key);
 
         // Does this key exist?
         if (!$key_details)
         {
             // It doesn't appear the key exists
             $this->response([
-                'status' => FALSE,
+                'status' => false,
                 'message' => 'Invalid API key'
             ], REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
         }
 
         // Build a new key
-        $new_key = $this->_generate_key();
+        $new_key = $this->__generateKey();
 
         // Insert the new key
         if ($this->_insert_key($new_key, ['level' => $key_details->level, 'ignore_limits' => $key_details->ignore_limits]))
@@ -193,14 +194,14 @@ class Key extends REST_Controller {
             $this->_update_key($old_key, ['level' => 0]);
 
             $this->response([
-                'status' => TRUE,
+                'status' => true,
                 'key' => $new_key
             ], REST_Controller::HTTP_CREATED); // CREATED (201) being the HTTP response code
         }
         else
         {
             $this->response([
-                'status' => FALSE,
+                'status' => false,
                 'message' => 'Could not save the key'
             ], REST_Controller::HTTP_INTERNAL_SERVER_ERROR); // INTERNAL_SERVER_ERROR (500) being the HTTP response code
         }
@@ -208,7 +209,13 @@ class Key extends REST_Controller {
 
     /* Helper Methods */
 
-    private function _generate_key()
+    /**
+     * Generate a key
+     *
+     * @access private
+     * @return void
+     */
+    private function __generateKey()
     {
         do
         {
@@ -216,9 +223,9 @@ class Key extends REST_Controller {
             $salt = base_convert(bin2hex($this->security->get_random_bytes(64)), 16, 36);
 
             // If an error occurred, then fall back to the previous method
-            if ($salt === FALSE)
+            if ($salt === false)
             {
-                $salt = hash('sha256', time() . mt_rand());
+                $salt = hash('sha256', time().mt_rand());
             }
 
             $new_key = substr($salt, 0, config_item('rest_key_length'));
@@ -230,7 +237,14 @@ class Key extends REST_Controller {
 
     /* Private Data Methods */
 
-    private function _get_key($key)
+	/**
+	 * Get a key
+	 *
+     * @access private
+	 * @param string $key The API-Key.
+     * @return array
+	 */
+    private function __getKey($key)
     {
         return $this->db
             ->where(config_item('rest_key_column'), $key)
@@ -238,6 +252,13 @@ class Key extends REST_Controller {
             ->row();
     }
 
+	/**
+     * Check if key exists
+     *
+     * @access private
+	 * @param string $key The API-Key.
+     * @return bool
+     */
     private function _key_exists($key)
     {
         return $this->db
@@ -245,6 +266,14 @@ class Key extends REST_Controller {
             ->count_all_results(config_item('rest_keys_table')) > 0;
     }
 
+	/**
+	 * Insert a key
+	 *
+	 * @access private
+	 * @param string $key The API-Key.
+	 * @param array $data The API-Key-Data.
+	 * @return bool
+	 */
     private function _insert_key($key, $data)
     {
         $data[config_item('rest_key_column')] = $key;
@@ -255,6 +284,14 @@ class Key extends REST_Controller {
             ->insert(config_item('rest_keys_table'));
     }
 
+	/**
+     * Update a key
+     *
+	 * @access private
+	 * @param string $key The API-Key.
+	 * @param array $data The API-Key-Data.
+	 * @return bool
+	 */
     private function _update_key($key, $data)
     {
         return $this->db
@@ -262,6 +299,13 @@ class Key extends REST_Controller {
             ->update(config_item('rest_keys_table'), $data);
     }
 
+	/**
+	 * Delete a key
+	 *
+	 * @access private
+	 * @param string $key The API-Key.
+	 * @return bool
+	 */
     private function _delete_key($key)
     {
         return $this->db

@@ -14,7 +14,8 @@
 
 // ------------------------------------------------------------------------
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+if (! defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 // This can be removed if you use __autoload() in config.php OR use Modular Extensions
 //require APPPATH . '/libraries/REST_Controller.php';
@@ -22,15 +23,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 /**
  * Handles user authentication and registration process
  */
-class AuthAPI extends APIv1_Controller 
+class AuthAPI extends APIv1_Controller
 {
-
     /**
      * Userauth-Controller constructor.
      * A more elaborate description of the constructor.
      * {@inheritdoc}
      */
-    function __construct()
+    public function __construct()
     {
         // Construct the parent class
         parent::__construct();
@@ -47,10 +47,11 @@ class AuthAPI extends APIv1_Controller
 
     /**
      * Checks user credentials and creates a new session
-     * @return string JSON that indicates success/failure of login
+     *
      * @example normal account: http://wsp.fortyseeds.at/backend/api/userauth/login/username/foo%40bar.at/password/secret/device_id/abcdef123
      * @example OAuth Google: http://wsp.fortyseeds.at/backend/api/userauth/login/username/foo%40bar.at/device_id/abcdef123/google_token/qwert321
      * @example OAuth Facebook: http://wsp.fortyseeds.at/backend/api/userauth/login/username/foo%40bar.at/device_id/abcdef123/fb_token/qwert321
+	 * @return void		JSON that indicates success/failure of login.
      */
     public function login_get()
     {
@@ -59,8 +60,8 @@ class AuthAPI extends APIv1_Controller
         $httpstatus = null;
         $username = urldecode($this->get('username'));
         $password = urldecode($this->get('password'));
-        
-        $account = $this->FHCAuth->auth($username,$password);
+
+        $account = $this->FHCAuth->auth($username, $password);
 
         // perform login checks
         if (!$account)
@@ -94,8 +95,9 @@ class AuthAPI extends APIv1_Controller
 
     /**
      * Logs out user by destroying session
-     * @return string JSON that indicates success/failure of logout
+     *
      * @example http://wsp.fortyseeds.at/backend/api/userauth/logout/username/foo%40bar.at/session_id/55afab8ba6f1b/device_id/abcdef123
+	 * @return void JSON that indicates success/failure of logout
      */
     public function logout_get()
     {
@@ -127,6 +129,4 @@ class AuthAPI extends APIv1_Controller
         // Set the response and exit
         $this->response($payload, $httpstatus);
     }
-
-  
 }

@@ -35,7 +35,7 @@ test:
     php_code_sniffer:
         path: "application/controllers/"
         standard: "tests/codesniffer/FHComplete"
-        allowed_errors: 100
+        allowed_errors: 200
         allowed_warnings: 200
     codeception:
         config: "tests/"
