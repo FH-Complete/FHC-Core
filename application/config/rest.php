@@ -126,7 +126,8 @@ $config['rest_auth'] = 'basic';
 | Note: If 'rest_auth' is set to 'session' then change 'auth_source' to the name of the session variable
 |
 */
-$config['auth_source'] = 'RestAPISession';
+//$config['auth_source'] = 'RestAPISession';
+$config['auth_source'] = 'library';
 
 /*
 |--------------------------------------------------------------------------
@@ -301,7 +302,7 @@ $config['rest_keys_table'] = 'ci_apikey';
 |   ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 |
 */
-$config['rest_enable_keys'] = FALSE;
+$config['rest_enable_keys'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------

@@ -10,6 +10,7 @@
  * @link		http://whisperocity.com/
  * @since		Version 1.0
  * @filesource
+ * @example curl -H "FHC-API-Key: testapikey@fhcomplete.org" http://localhost/fhcomplete/index.ci.php/api/v1/APIAuth/login?code=aladsfasdf
  */
 
 // ------------------------------------------------------------------------
@@ -23,7 +24,7 @@ if (! defined('BASEPATH'))
 /**
  * Handles user authentication and registration process
  */
-class AuthAPI extends APIv1_Controller
+class APIAuth extends APIv1_Controller
 {
     /**
      * Userauth-Controller constructor.
@@ -61,7 +62,7 @@ class AuthAPI extends APIv1_Controller
         $username = urldecode($this->get('username'));
         $password = urldecode($this->get('password'));
 
-        $account = $this->FHCAuth->auth($username, $password);
+        $account = $this->fhc_auth->auth($username, $password);
 
         // perform login checks
         if (!$account)
