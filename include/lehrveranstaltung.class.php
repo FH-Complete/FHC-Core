@@ -1258,6 +1258,12 @@ class lehrveranstaltung extends basis_db
 				if ($obj->bezeichnung_arr['English'] == '')
 					$obj->bezeichnung_arr['English'] = $obj->bezeichnung_arr['German'];
 
+				$obj->sws = $row->sws;
+				$obj->lvs = $row->lvs;
+				$obj->alvs = $row->alvs;
+				$obj->lvps = $row->lvps;
+				$obj->las = $row->las;
+
 				$obj->stpllv_semester = $row->stpllv_semester;
 				$obj->stpllv_pflicht = $this->db_parse_bool($row->stpllv_pflicht);
 				$obj->stpllv_koordinator = $row->stpllv_koordinator;
@@ -1312,7 +1318,7 @@ class lehrveranstaltung extends basis_db
 		}
 		return $childs;
 	}
-        
+
         /**
 	 * Generiert die Subtrees des Lehrveranstaltungstrees
 	 */
@@ -1335,7 +1341,7 @@ class lehrveranstaltung extends basis_db
                 {
                     return false;
                 }
-                    
+
                 }
 
 	/**
