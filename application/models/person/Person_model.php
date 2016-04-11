@@ -19,24 +19,21 @@ class Person_model extends DB_Model
 		return $query->row_object();
     }
 
-	/**
-	 * Laedt Personendaten einer Person mittels Code
-	 * @param	string	$code	DB-Attr: tbl_benutzer.zugangscode .
-	 * @return	object
-	 */
-	public function getPersonByCode($code)
-	{
-		if($this->fhc_db_acl->bb->isBerechtigt('person','s'))
-		{
-			$query = $this->db->get_where('public.tbl_person', array('zugangscode' => $code));
-		    return $query->result_object();
-		}
-		else
-		{
-			return $this->_general_error($this->fhc_db_acl->bb->errormsg);
-			//return false;
-		}
-	}
+    public function getPersonByCodeAndEmail($code, $email)
+    {
+//	if ($this->fhc_db_acl->bb->isBerechtigt('person', 'suid'))
+//	{
+	    $this->db->select("*")
+		    ->from('public.tbl_person p')
+		    ->join("public.tbl_kontakt k", "k.person_id=p.person_id")
+		    ->where("p.zugangscode", $code)
+		    ->where("k.kontakt", $email);
+	    
+	    return $this->db->get()->result_object();
+//	    $query = $this->db->get_where('public.tbl_person p ', array('zugangscode' => $code));
+//	    return $query->result_object();
+//	}
+    }
 
     /**
      * Laedt Personendaten eine BenutzerUID
@@ -61,13 +58,14 @@ class Person_model extends DB_Model
 //	if($this->fhc_db_acl->bb->isBerechtigt('person', 'sui'))
 //	{
 	    $data = array(
-			"vorname"=>$person["vorname"],
-			"nachname"=>$person["nachname"],
-			"gebdatum"=>$person["gebdatum"],
-			"aktiv" => true,
-			"zugangscode"=>$person["zugangscode"],
-			"insertamum"=>date('Y-m-d H:i:s'),
-			"insertvon"=>$person["insertvon"],
+		"vorname"=>$person["vorname"],
+		"nachname"=>$person["nachname"],
+		"gebdatum"=>$person["gebdatum"],
+		"aktiv" => true,
+		"zugangscode"=>$person["zugangscode"],
+		"zugangscode_timestamp"=>date('Y-m-d H:i:s'),
+		"insertamum"=>date('Y-m-d H:i:s'),
+		"insertvon"=>$person["insertvon"],
 	    );
 	    if($this->db->insert("public.tbl_person", $data)){
 			return $this->db->insert_id();
