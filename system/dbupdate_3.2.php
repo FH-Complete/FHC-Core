@@ -1114,7 +1114,17 @@ if (!$result = @$db->db_query("SELECT genehmigung FROM lehre.tbl_studienplan_leh
 		echo ' lehre.tbl_studienplan_lehrveranstaltung: Spalte genehmigung hinzugefügt.<br>';
 }
 
+//Spalte pruefungstyp_kurzbz in campus.tbl_pruefungsanmeldung
+if (!$result = @$db->db_query("SELECT pruefungstyp_kurzbz FROM campus.tbl_pruefungsanmeldung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE campus.tbl_pruefungsanmeldung ADD COLUMN pruefungstyp_kurzbz varchar(16);
+		ALTER TABLE campus.tbl_pruefungsanmeldung ADD CONSTRAINT fk_pruefungsanmeldung_pruefungstyp_pruefungstyp_kurzbz FOREIGN KEY (pruefungstyp_kurzbz) REFERENCES lehre.tbl_pruefungstyp(pruefungstyp_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;";
 
+	if (!$db->db_query($qry))
+		echo '<strong>campus.tbl_pruefungsanmeldung: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' campus.tbl_pruefungsanmeldung: Spalte pruefungstyp_kurzbz hinzugefügt.<br>';
+}
 
 
 

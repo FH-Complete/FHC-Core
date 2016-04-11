@@ -30,7 +30,7 @@ require_once('../../../../include/konto.class.php');
 require_once('../../../../include/studiensemester.class.php');
 require_once('../../../../include/student.class.php');
 
-
+//TODO
 $uid = get_uid();
 
 $db = new basis_db();

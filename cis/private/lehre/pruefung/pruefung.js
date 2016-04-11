@@ -487,8 +487,6 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 	var studienverpflichtung_id = null;
     if($("#studienverpflichtung").length)
         studienverpflichtung_id = $("#studienverpflichtung option:selected").val();
-        
-	console.log(studienverpflichtung_id);
 	
 	$.ajax({
 		dataType: 'json',

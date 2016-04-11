@@ -378,9 +378,9 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
     $addon = new addon();
     foreach ($addon->aktive_addons as $a)
     {
-	if($a === "ktu")
+	if($a === "ku")
 	{
-	    require '../../../../addons/ktu/cis/prfVerwaltung_array.php';
+	    require '../../../../addons/'.$a.'/cis/prfVerwaltung_array.php';
 	    switch($lehrveranstaltung->oe_kurzbz)
 	    {
 		case $fakultaeten[0]["fakultaet"]:
@@ -426,6 +426,18 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
     $pruefung->getPruefungen($uid, NULL, $lehrveranstaltung->lehrveranstaltung_id);
     $anmeldung_moeglich = true;
     $anzahlPruefungen = count($pruefung->result);
+    if(isset($pruefungstyp_kurzbzArray))
+    {
+	if($anzahlPruefungen < count($pruefungstyp_kurzbzArray))
+	{
+	    $pruefungstyp_kurzbz = $pruefungstyp_kurzbzArray[$anzahlPruefungen];
+	}
+    }
+    else
+    {
+	$pruefungstyp_kurzbz = null;
+    }
+    
     foreach($pruefung->result as $prf)
     {
 	$note = new note($prf->note);
@@ -470,6 +482,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	    $anmeldung->uid = $uid;
 	    $anmeldung->reihung = $reihung+1;
 	    $anmeldung->status_kurzbz = "angemeldet";
+	    $anmeldung->pruefungstyp_kurzbz = $pruefungstyp_kurzbz;
 	    $lehrveranstaltung = new lehrveranstaltung($_REQUEST["lehrveranstaltung_id"]);
 
 	    $konto = new konto();
