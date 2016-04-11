@@ -436,9 +436,10 @@ function openDialog(lehrveranstaltung_id, termin_id, lvBezeichnung, terminVon, t
 		error: loadError
 	}).success(function(data){
 		var html = "";
+		html += '<option id="'+lehrveranstaltung_id+'" value="'+lehrveranstaltung_id+'">';
+		html += lvBezeichnung;
+		html += "</option>";
 		data.result.forEach(function(v, i){
-			console.log(i);
-			console.log(v);
 			html += '<option id="'+v.lehrveranstaltung_id+'" value="'+v.lehrveranstaltung_id+'">';
 			html += v.bezeichnung;
 			html += "</option>";
