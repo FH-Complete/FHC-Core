@@ -1,4 +1,5 @@
 .htaccess
+.htaccessbak
 bin
 /nbproject/
 /vendor/*
@@ -12,4 +13,6 @@ tests/codeception.yml
 tests/codeception/api.suite.yml
 tests/codeception/functional.suite.yml
 tests/codeception/acceptance.suite.yml
+tests/codeception/_output/*
+!/tests/codeception/_output/.placeholder
 /submodules/d3

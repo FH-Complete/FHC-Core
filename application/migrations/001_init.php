@@ -10,6 +10,10 @@ class Migration_Init extends CI_Migration {
 			// Schemas
 			$this->db->query('CREATE SCHEMA IF NOT EXISTS public;');
           	$this->db->query('CREATE SCHEMA IF NOT EXISTS addon;');
+          	$this->db->query('CREATE SCHEMA IF NOT EXISTS fue;');
+          	$this->db->query('CREATE SCHEMA IF NOT EXISTS lehre;');
+          	$this->db->query('CREATE SCHEMA IF NOT EXISTS system;');
+          	$this->db->query('CREATE SCHEMA IF NOT EXISTS bis;');
 		}
 
         public function down()
