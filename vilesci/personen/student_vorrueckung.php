@@ -58,7 +58,12 @@ echo '<html>
 // Output flushen damit nach dem aendern des Dropdowns gleich die neue Seite geladen wird.
 // Sonst wird bei zu langen Ladezeiten vom User noch auf einen anderen Link gedrueckt und der Studiengang
 // wieder zurueckgesetzt 
-ob_flush();
+// This prevent the notice error "ob_flush(): failed to flush buffer. No buffer to flush"
+if(ob_get_contents() != false)
+{
+	ob_flush();
+}
+
 flush();
 
 //Einlesen der studiensemester in einen Array
