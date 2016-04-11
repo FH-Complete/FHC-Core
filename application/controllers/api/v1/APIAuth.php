@@ -23,7 +23,7 @@ if (! defined('BASEPATH'))
 /**
  * Handles user authentication and registration process
  */
-class AuthAPI extends APIv1_Controller
+class APIAuth extends APIv1_Controller
 {
     /**
      * Userauth-Controller constructor.
@@ -42,7 +42,7 @@ class AuthAPI extends APIv1_Controller
         // Load helper
         //$this->load->helper('fhcauth');
 		$this->load->library('session');
-		$this->load->library('FHC_Auth');
+		$this->load->library('Fhcauth');
     }
 
     /**
@@ -60,8 +60,8 @@ class AuthAPI extends APIv1_Controller
         $httpstatus = null;
         $username = urldecode($this->get('username'));
         $password = urldecode($this->get('password'));
-
-        $account = $this->FHCAuth->auth($username, $password);
+		
+		$account = $this->fhcauth->auth($username, $password);
 
         // perform login checks
         if (!$account)

@@ -60,7 +60,7 @@ $autoload['packages'] = array();
 */
 
 //$autoload['libraries'] = array();
-$autoload['libraries'] = array('session', 'FHC_Auth');
+$autoload['libraries'] = array('session', 'Fhcauth');
 
 //$autoload['libraries'] = array();
 $autoload['libraries'] = array('session');
