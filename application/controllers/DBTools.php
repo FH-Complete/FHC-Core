@@ -75,7 +75,7 @@ class DBTools extends FHC_Controller
     public function index()
 	{
         $result = "The following are the available command line interface commands\n\n";
-        $result .= "php index.ci.php DBTools migrate [\"version_number\"]    Run all migrations. "
+        $result .= "php index.ci.php DBTools migrate [\"version_number\"]    Run all migrations. ";
 		$result .= "The version number is optional.\n";
         $result .= "php index.ci.php DBTools seed \"file_name\"              Run the specified seed file.\n";
 

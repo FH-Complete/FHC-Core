@@ -21,20 +21,25 @@
 * @return some value on success.
 */
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') || exit('No direct script access allowed');
 
-/** 
+/**
  * @class Rest_server
  * @brief Rest Server Controller
  *
  * A more detailed class description.
-*/
-class Rest_server extends FHC_Controller {
-
-    public function index()
+ */
+class Rest_server extends FHC_Controller
+{
+    /**
+	 * Index Method for default function.
+	 *
+	 * @return void
+	 *
+	 */
+	public function index()
     {
         $this->load->helper('url');
-
         $this->load->view('rest_server');
     }
 }
