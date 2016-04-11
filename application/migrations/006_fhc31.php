@@ -6,17 +6,11 @@ class Migration_fhc31 extends CI_Migration {
 
         public function up()
         {			
-			//$this->load->database('system');
-			if (!$this->db->table_exists('tbl_person'))
-			{
-				$this->load->helper('file');
-		        $sqlfile =  read_file('./system/fhcomplete3.0.sql');
-
-				if (!$this->db->simple_query($sqlfile))
-				{
-						echo "Error creating Basis DB-Schema!";
-				}
-			}
+			echo '<br/><h1>Update to FHC 3.1</h1><br/>';
+			$this->db=$this->load->database('system', true); 	
+			$this->load->helper('fhcdb');
+			$db = new basis_db($this);
+			require_once('./system/dbupdate_3.1.php');
         }
 
         public function down()

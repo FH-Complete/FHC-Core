@@ -12,7 +12,7 @@ class FHC_Controller extends CI_Controller
 
 require_once APPPATH . '/libraries/REST_Controller.php';
 
-class API_Controller extends REST_Controller 
+class APIv1_Controller extends REST_Controller 
 {
 	function __construct()  
 	{

@@ -21,26 +21,30 @@
  */
 
 /**
-* Implementation super class
-*/
-class basis 
+ * Implementation super class
+ */
+class basis
 {
 	/**
-	* Error message
-	* @var base_errors $msgs
-	*/
+	 * Error message
+	 * @var base_errors $msgs
+	 */
 	public $errormsg;
 	
 	/**
-	* Constructor
-	*
-	* @access public
-	*/
-	public function __construct($db_system='pgsql')
+	 * Constructor
+	 *
+	 * @param string $dbSystem Choose the DB-System.
+	 * @access public
+	 */
+	public function __construct($dbSystem = 'pgsql')
 	{
 		//empty
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getErrorMsg()
 	{
 		return $this->errormsg;
@@ -52,26 +56,30 @@ class basis
 	 * Zeichen mit Backslash versehen und das Ergbnis
 	 * unter Hochkomma gesetzt.
 	 *
-	 * 12/2011 DEPRECATED use db_add_param
+	 * ToDo: 12/2011 DEPRECATED use db_add_param
+	 * @param string $var The String you want to be slashed.
+	 * @return string
 	 */
 	public function addslashes($var)
 	{
-		return ($var!=''?"'".addslashes($var)."'":'null');
+		return ($var != ''?"'".addslashes($var)."'":'null');
 	}
 	
 	/**
 	 * Splittet ein Array auf um es zB in der IN Klausel eines SQL Befehles zu verwenden
 	 * Die einzelnen Elemente werden unter Hochkomma gesetzt und mit Beistrich getrennt.
-	 * @param $array
+	 * ToDo: Its also deprecated
+	 * @param array $array Array to be imploded.
+	 * @return string
 	 */
 	public function implode4SQL($array)
 	{
 		$string = '';
-		foreach($array as $row)
+		foreach ($array as $row)
 		{
-			if($string!='')
-				$string.=',';
-			$string.="'".addslashes($row)."'";
+			if($string != '')
+				$string .= ',';
+			$string .= "'".addslashes($row)."'";
 		}
 		return $string;
 	}
@@ -79,40 +87,49 @@ class basis
 	/**
 	 * Berechnet die Kalenderwoche eines gegebenen Datums
 	 * Datum muss timestamp uebergeben werden
-	 * @param $datum
+	 * @param timestamp $datum Timestamp from which to calculate the CalendarWeek.
+	 * @return int
 	 */
-	function kw($datum)
+	public function kw($datum)
 	{
 		//$woche=date("W",mktime($date[hours],$date[minutes],$date[seconds],$date[mon],$date[mday],$date[year]));
-		if (!date("w",$datum))
-			$datum+=86400;
+		if (!date("w", $datum))
+			$datum += 86400;
 		//echo date("l j.m.Y - W",$datum);
-		$woche=date("W",$datum);
-		//if ($woche==53)
-		//	$woche=1;
+		$woche = date("W", $datum);
+		// ToDo: Every 4 year we have a Problem.
+		//if ($woche == 53)
+		//	$woche = 1;
 		return $woche;
 	}
 	
-	function jump_week($datum, $wochen)
+	/**
+	 * Springt zur entsprechenden KW im aktuellen Jahr
+	 *
+	 * @param timestamp $datum Timestamp from which to start.
+	 * @param signed int $wochen Number of Weeks to jump.
+	 * @return int
+	 */
+	public function jump_week($datum, $wochen)
 	{
-		$stunde_vor=date("G",$datum);
+		$stundeVor = date("G", $datum);
 		// Eine Woche sind 604800 Sekunden
-		$datum+=604800*$wochen;
-		$stunde_nach=date("G",$datum);
-		if ($stunde_nach!=$stunde_vor)
-			$datum+=3600;
+		$datum += 604800 * $wochen;
+		$stundeNach = date("G", $datum);
+		if ($stundeNach != $stundeVor)
+			$datum += 3600;
 		return $datum;
 	}
 	
 	/**
-	 * Konvertiert eine Zeichenkette, 
+	 * Konvertiert eine Zeichenkette,
 	 * damit diese in HTML Dokumenten sicher ausgegeben werden kann
-	 * 
-	 * @param $value
+	 *
+	 * @param string $value The HTML-Chars to convert.
+	 * @return string
 	 */
 	public function convert_html_chars($value)
 	{
 		return htmlspecialchars($value);
 	}
 }
-?>

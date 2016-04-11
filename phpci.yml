@@ -20,7 +20,7 @@ setup:
         - "cd %BUILD_PATH% && chmod u+x install.sh && ./install.sh fhctest" # Install Database
         - "rm -f /var/www/html/build" # SymLink löschen falls vorhanden
         - "ln -s %BUILD_PATH% /var/www/html/build" # SymLink to the actual build
-        - "php index.ci.php Migrate" # DB-Migration
+        - "php index.ci.php DBTools migrate" # DB-Migration
 
 test:
     lint:
@@ -35,10 +35,10 @@ test:
     php_code_sniffer:
         path: "application/controllers/"
         standard: "tests/codesniffer/FHComplete"
-        allowed_errors: 100
+        allowed_errors: 200
         allowed_warnings: 200
-#    codeception:
-#        config: "tests/codeception/"
+    codeception:
+        config: "tests/"
 #    php_unit:
 #        directory: "tests/phpunit/"
 

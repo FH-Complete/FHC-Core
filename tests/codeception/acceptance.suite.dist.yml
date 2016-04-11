@@ -11,4 +11,4 @@ modules:
         - AcceptanceHelper
     config:
         PhpBrowser:
-            url: 'http://localhost/build/'
+            url: 'http://admin:1q2w3@localhost/build/'

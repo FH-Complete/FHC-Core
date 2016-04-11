@@ -1,0 +1,13 @@
+CodeIgniter - FHComplete -> Hybrid Cyborg
+=========================================
+
+== CodeIgniter Basics
+
+https://codeigniter.com/user_guide/
+
+=== wichtige Pfadkonstanten
+
+* FCPATH   -> dort wo die index.php liegt -> Bspl: /var/www/html/
+* BASEPATH -> Pfad zum CodeIgniter-Framework -> Bspl: '..../vendor/codeingiter/framework/system/'
+* APPPATH  -> Pfad zur Application-Folder '/var/www/html/application/'
+

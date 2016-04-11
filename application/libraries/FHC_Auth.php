@@ -11,7 +11,7 @@
  * @filesource
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
-require_once 'include/authentication.class.php';
+require_once FCPATH.'include/authentication.class.php';
 
 /**
  * FHC-Auth Helpers
@@ -39,12 +39,12 @@ class FHC_Auth
 		$auth = new authentication();
 		if ($auth->checkpassword($username, $password))
 		{
-			echo 'Auth-Method-True';
+			//echo 'Auth-Method-True';
 			return true;
 		}
 		else
 		{
-			echo 'Auth-Method-False';
+			//echo 'Auth-Method-False';
 			return false;
 		}
 	}

@@ -3,6 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class FHC_Model extends CI_Model 
 {
+	//protected errormsg;
 	function __construct()  
 	{
         parent::__construct();
@@ -31,12 +32,13 @@ class FHC_Model extends CI_Model
      *
      * @return  array
      */
-    protected function _general_error()
+    protected function _general_error($retval = '', $message = FHC_ERR_GENERAL)
     {
         return array(
             'err'  => 1,
             'code' => FHC_ERR_GENERAL,
-            'msg'  => lang('fhc_'.FHC_ERR_GENERAL)
+            'msg'  => lang('fhc_'.$message),
+            'retval' => $retval
         );
     }
 }

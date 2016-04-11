@@ -61,14 +61,15 @@ cp config/system.config-default.inc.php config/system.config.inc.php
 #chown www-data data/cache
 
 echo "======= Install composer and run it ============="
-php -r "readfile('https://getcomposer.org/installer');" > composer-setup.php
-php -r "if (hash('SHA384', file_get_contents('composer-setup.php')) === '41e71d86b40f28e771d4bb662b997f79625196afcca95a5abf44391188c695c6c1456e16154c75a211d238cc3bc5cb47') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-php composer-setup.php
-php -r "unlink('composer-setup.php');"
-./composer.phar update
+echo "commented out for phpci"
+# php -r "readfile('https://getcomposer.org/installer');" > composer-setup.php
+# php -r "if (hash('SHA384', file_get_contents('composer-setup.php')) === '41e71d86b40f28e771d4bb662b997f79625196afcca95a5abf44391188c695c6c1456e16154c75a211d238cc3bc5cb47') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+# php composer-setup.php
+# php -r "unlink('composer-setup.php');"
+# ./composer.phar update
 
 echo "======= Database Migration ============="
-php index.ci.php Migrate
+php index.ci.php DBTools migrate
 
 echo "Done!"
 echo "Now run #php bin/fhcomplete update (Joking, its just a todo notice!)"
