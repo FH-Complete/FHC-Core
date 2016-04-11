@@ -10,6 +10,7 @@
  * @link		http://whisperocity.com/
  * @since		Version 1.0
  * @filesource
+ * @example curl -H "FHC-API-Key: testapikey@fhcomplete.org" http://localhost/fhcomplete/index.ci.php/api/v1/APIAuth/login?code=aladsfasdf
  */
 
 // ------------------------------------------------------------------------
