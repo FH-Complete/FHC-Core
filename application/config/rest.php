@@ -145,7 +145,7 @@ $config['auth_source'] = 'library';
 | e.g: md5('admin:REST API:1234') = '1e957ebc35631ab22d5bd6526bd14ea2'
 |
 */
-$config['auth_library_class'] = 'FHCAuth';
+$config['auth_library_class'] = 'Fhcauth';
 $config['auth_library_function'] = 'auth';
 
 /*
@@ -188,6 +188,15 @@ $config['auth_library_function'] = 'auth';
 |            $config['auth_override_class_method_http']['deals']['insert']['post'] = 'none';
 |            $config['auth_override_class_method_http']['deals']['*']['options'] = 'none';
 */
+
+$config['auth_override_class_method_http']['Person']['checkBewerbung']['get'] = 'none';
+$config['auth_override_class_method_http']['Person']['person']['post'] = 'none';
+$config['auth_override_class_method_http']['Person']['person']['get'] = 'none';
+$config['auth_override_class_method_http']['Kontakt']['kontakt']['post'] = 'none';
+$config['auth_override_class_method_http']['Person']['checkZugangscodePerson']['get'] = 'none';
+$config['auth_override_class_method_http']['Kontakt']['kontaktPerson']['get'] = 'none';
+$config['auth_override_class_method_http']['Person']['personFromCode']['post'] = 'none';
+$config['auth_override_class_method_http']['Person']['personUpdate']['post'] = 'none';
 
 // ---Uncomment list line for the wildard unit test
 // $config['auth_override_class_method_http']['wildcard_test_cases']['*']['options'] = 'basic';
