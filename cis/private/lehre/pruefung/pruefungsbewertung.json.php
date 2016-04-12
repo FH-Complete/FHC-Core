@@ -231,19 +231,19 @@ function saveBeurteilung($lehrveranstaltung_id, $student_uid, $mitarbeiter_uid, 
     $pruefung->new = true;
     if(!empty($lehreinheiten))
     {
+	$pruefungsanmeldung = new pruefungsanmeldung($pruefungsanmeldung_id);
+	$pruefungstermin = new pruefungstermin($pruefungsanmeldung->pruefungstermin_id);
+	
 	$pruefung->lehreinheit_id = $lehreinheiten[0];
 	$pruefung->student_uid = $student_uid;
 	$pruefung->mitarbeiter_uid = $mitarbeiter_uid;
 	$pruefung->note = $note;
-	$pruefung->pruefungstyp_kurzbz = $pruefungCis->pruefungstyp_kurzbz;
+	$pruefung->pruefungstyp_kurzbz = $pruefungsanmeldung->pruefungstyp_kurzbz;
 	$pruefung->datum = $datum;
 	$pruefung->anmerkung = $anmerkung;
 	$pruefung->pruefungsanmeldung_id = $pruefungsanmeldung_id;
 	$pruefung->insertvon = $uid;
 	$pruefung->insertamum = date('Y-m-d H:i:s');
-
-	$pruefungsanmeldung = new pruefungsanmeldung($pruefungsanmeldung_id);
-	$pruefungstermin = new pruefungstermin($pruefungsanmeldung->pruefungstermin_id);
 
 	$datum = new datum();
 //	var_dump(date("Y-m-d", time()));
