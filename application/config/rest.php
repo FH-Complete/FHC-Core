@@ -126,7 +126,6 @@ $config['rest_auth'] = 'basic';
 | Note: If 'rest_auth' is set to 'session' then change 'auth_source' to the name of the session variable
 |
 */
-//$config['auth_source'] = 'RestAPISession';
 $config['auth_source'] = 'library';
 
 /*
@@ -145,7 +144,7 @@ $config['auth_source'] = 'library';
 | e.g: md5('admin:REST API:1234') = '1e957ebc35631ab22d5bd6526bd14ea2'
 |
 */
-$config['auth_library_class'] = 'Fhcauth';
+$config['auth_library_class'] = 'FHC_Auth';
 $config['auth_library_function'] = 'auth';
 
 /*
@@ -164,7 +163,10 @@ $config['auth_library_function'] = 'auth';
 |           $config['auth_override_class_method']['accounts']['user'] = 'basic';
 |           $config['auth_override_class_method']['dashboard']['*'] = 'none|digest|basic';
 |
-| Here 'deals', 'accounts' and 'dashboard' are controller names, 'view', 'insert' and 'user' are methods within. An asterisk may also be used to specify an authentication method for an entire classes methods. Ex: $config['auth_override_class_method']['dashboard']['*'] = 'basic'; (NOTE: leave off the '_get' or '_post' from the end of the method name)
+| Here 'deals', 'accounts' and 'dashboard' are controller names, 'view', 'insert' and 'user' are methods within. 
+ * An asterisk may also be used to specify an authentication method for an entire classes methods. 
+ * Ex: $config['auth_override_class_method']['dashboard']['*'] = 'basic'; (NOTE: leave off the '_get' or '_post' from the end 
+ * of the method name)
 | Acceptable values are; 'none', 'digest' and 'basic'.
 |
 */
@@ -206,10 +208,10 @@ $config['auth_override_class_method_http']['Person']['personUpdate']['post'] = '
 | REST Login Usernames
 |--------------------------------------------------------------------------
 |
-| Array of usernames and passwords for login, if ldap is configured this is ignored
+| Array of usernames and passwords for login, if ldap (even library) is configured this is ignored
 |
 */
-$config['rest_valid_logins'] = ['admin' => '1234'];
+$config['rest_valid_logins'] = ['admin' => '1234', 'test' => 'test'];
 
 /*
 |--------------------------------------------------------------------------
@@ -226,7 +228,7 @@ $config['rest_valid_logins'] = ['admin' => '1234'];
 |    restrict certain methods to IPs in your whitelist
 |
 */
-$config['rest_ip_whitelist_enabled'] = FALSE;
+$config['rest_ip_whitelist_enabled'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------

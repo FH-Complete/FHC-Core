@@ -61,8 +61,8 @@ class APIAuth extends APIv1_Controller
         $httpstatus = null;
         $username = urldecode($this->get('username'));
         $password = urldecode($this->get('password'));
-
-        $account = $this->fhc_auth->auth($username, $password);
+		
+		$account = $this->fhc_auth->auth($username, $password);
 
         // perform login checks
         if (!$account)
