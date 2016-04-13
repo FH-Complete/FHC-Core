@@ -30,8 +30,15 @@ class Person_model extends DB_Model
 		    ->where("k.kontakt", $email);
 	    
 	    return $this->db->get()->result_object();
-//	    $query = $this->db->get_where('public.tbl_person p ', array('zugangscode' => $code));
-//	    return $query->result_object();
+//	}
+    }
+
+ public function getPersonByCode($code)
+    {
+//	if ($this->fhc_db_acl->bb->isBerechtigt('person', 'suid'))
+//	{
+	    $query = $this->db->get_where('public.tbl_person', array('zugangscode' => $code));
+	    return $query->result_object();
 //	}
     }
 
