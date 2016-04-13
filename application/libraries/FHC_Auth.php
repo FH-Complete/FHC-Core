@@ -25,7 +25,7 @@ require_once FCPATH.'include/authentication.class.php';
 
 // ------------------------------------------------------------------------
 
-class Fhcauth
+class FHC_Auth
 {
 	/**
 	 * Auth Username, Password over FH-Complete

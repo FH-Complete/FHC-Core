@@ -43,7 +43,7 @@ class APIAuth extends APIv1_Controller
         // Load helper
         //$this->load->helper('fhcauth');
 		$this->load->library('session');
-		$this->load->library('Fhcauth');
+		$this->load->library('FHC_Auth');
     }
 
     /**
@@ -62,7 +62,7 @@ class APIAuth extends APIv1_Controller
         $username = urldecode($this->get('username'));
         $password = urldecode($this->get('password'));
 		
-		$account = $this->fhcauth->auth($username, $password);
+		$account = $this->fhc_auth->auth($username, $password);
 
         // perform login checks
         if (!$account)

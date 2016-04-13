@@ -144,7 +144,7 @@ $config['auth_source'] = 'library';
 | e.g: md5('admin:REST API:1234') = '1e957ebc35631ab22d5bd6526bd14ea2'
 |
 */
-$config['auth_library_class'] = 'fhcauth';
+$config['auth_library_class'] = 'FHC_Auth';
 $config['auth_library_function'] = 'auth';
 
 /*

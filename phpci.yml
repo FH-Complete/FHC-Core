@@ -9,8 +9,10 @@ build_settings:
     pgsql:
         host: 'localhost;dbname=template1'
         user: 'fhcomplete'
-        pass: 'fhcomplete'        
+        pass: 'fhcomplete'
 setup:
+    shell:
+        - "pkill -f fhctest"
     composer:
         directory: ""
         action: "install"
