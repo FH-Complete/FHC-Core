@@ -110,7 +110,7 @@ $config['rest_realm'] = 'FHC REST API';
 |           authorization key
 |
 */
-$config['rest_auth'] = 'basic';
+$config['rest_auth'] = 'digest';
 
 /*
 |--------------------------------------------------------------------------
@@ -145,7 +145,8 @@ $config['auth_source'] = 'library';
 |
 */
 $config['auth_library_class'] = 'fhcauth';
-$config['auth_library_function'] = 'auth';
+//$config['auth_library_function'] = 'auth';
+$config['auth_library_function'] = 'auth_digest';
 
 /*
 |--------------------------------------------------------------------------
@@ -202,7 +203,7 @@ $config['auth_library_function'] = 'auth';
 | Array of usernames and passwords for login, if ldap (even library) is configured this is ignored
 |
 */
-$config['rest_valid_logins'] = ['admin' => '1234', 'test' => 'test'];
+//$config['rest_valid_logins'] = ['admin' => '1234', 'test' => 'test'];
 
 /*
 |--------------------------------------------------------------------------

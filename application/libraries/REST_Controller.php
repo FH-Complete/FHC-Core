@@ -528,7 +528,7 @@ abstract class REST_Controller extends CI_Controller {
         {
             $this->_allow = $this->_detect_api_key();
         }
-
+		
         // Only allow ajax requests
         if ($this->input->is_ajax_request() === FALSE && $this->config->item('rest_ajax_only'))
         {
@@ -540,7 +540,7 @@ abstract class REST_Controller extends CI_Controller {
         }
 
         // When there is no specific override for the current class/method, use the default auth value set in the config
-        if ($this->auth_override === FALSE && !($this->config->item('rest_enable_keys') && $this->_allow === TRUE))
+        if ($this->auth_override === FALSE && ($this->config->item('rest_enable_keys') && $this->_allow === TRUE))
         {
             $rest_auth = strtolower($this->config->item('rest_auth'));
             switch ($rest_auth)
