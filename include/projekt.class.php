@@ -82,9 +82,9 @@ class projekt extends basis_db
 				$this->ende = $row->ende;
 				$this->oe_kurzbz= $row->oe_kurzbz;
 				$this->budget= $row->budget;
-            $this->farbe= $row->farbe;
-            $this->anzahl_ma = $row->anzahl_ma;
-            $this->aufwand_pt = $row->aufwand_pt;
+            	$this->farbe= $row->farbe;
+            	$this->anzahl_ma = $row->anzahl_ma;
+            	$this->aufwand_pt = $row->aufwand_pt;
 
 				return true;
 			}
@@ -134,10 +134,10 @@ class projekt extends basis_db
 				$obj->ende = $row->ende;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->budget = $row->budget;
-            $obj->farbe = $row->farbe;
-            $obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
-            $obj->anzahl_ma = $row->anzahl_ma;
-            $obj->aufwand_pt = $row->aufwand_pt;
+            	$obj->farbe = $row->farbe;
+            	$obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
+            	$obj->anzahl_ma = $row->anzahl_ma;
+            	$obj->aufwand_pt = $row->aufwand_pt;
 
 				$this->result[] = $obj;
 			}
@@ -178,9 +178,9 @@ class projekt extends basis_db
 				$obj->ende = $row->ende;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->budget = $row->budget;
-            $obj->farbe = $row->farbe;
-            $obj->anzahl_ma = $row->anzahl_ma;
-            $obj->aufwand_pt = $row->aufwand_pt;
+            	$obj->farbe = $row->farbe;
+            	$obj->anzahl_ma = $row->anzahl_ma;
+            	$obj->aufwand_pt = $row->aufwand_pt;
 
 				$this->result[] = $obj;
 			}
@@ -220,10 +220,10 @@ class projekt extends basis_db
 				$obj->ende = $row->ende;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->budget = $row->budget;
-            $obj->farbe = $row->farbe;
-            $obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
-            $obj->anzahl_ma = $row->anzahl_ma;
-            $obj->aufwand_pt = $row->aufwand_pt;
+            	$obj->farbe = $row->farbe;
+            	$obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
+            	$obj->anzahl_ma = $row->anzahl_ma;
+            	$obj->aufwand_pt = $row->aufwand_pt;
 
 				$this->result[] = $obj;
 			}
@@ -359,9 +359,9 @@ class projekt extends basis_db
 
 	/**
 	 * Liefert die Projekte zu denen ein Mitarbeiter zugeordnet ist.
-         * Optional auch mit den Zuteilungen zu Projektphasen.
+     * Optional auch mit den Zuteilungen zu Projektphasen.
 	 * @param $mitarbeiter_uid
-         * @param $projektphasen boolean Default false. Wenn true, werden auch Zuteilungen zu Projektphasen geliefert.
+     * @param $projektphasen boolean Default false. Wenn true, werden auch Zuteilungen zu Projektphasen geliefert.
 	 */
 	function getProjekteMitarbeiter($mitarbeiter_uid, $projektphasen=false)
 	{
@@ -386,7 +386,7 @@ class projekt extends basis_db
                                         JOIN fue.tbl_projekt_ressource USING (projektphase_id)
                                         JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
                                 WHERE (tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
-                                AND (tbl_projekt.ende>=now() OR tbl_projekt.ende is null OR 1=1) 
+                                AND (tbl_projekt.ende>=now() OR tbl_projekt.ende is null OR 1=1)
                                 AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid);
 
 		if($result = $this->db_query($qry))
@@ -431,9 +431,9 @@ class projekt extends basis_db
 				$this->ende = $row->ende;
 				$this->oe_kurzbz= $row->oe_kurzbz;
 				$this->budget= $row->budget;
-            $this->farbe= $row->farbe;
-            $this->anzahl_ma = $row->anzahl_ma;
-            $this->aufwand_pt = $row->aufwand_pt;
+            	$this->farbe= $row->farbe;
+            	$this->anzahl_ma = $row->anzahl_ma;
+            	$this->aufwand_pt = $row->aufwand_pt;
 
 				return true;
 			}
