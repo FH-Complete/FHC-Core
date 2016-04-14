@@ -82,9 +82,9 @@ class projekt extends basis_db
 				$this->ende = $row->ende;
 				$this->oe_kurzbz= $row->oe_kurzbz;
 				$this->budget= $row->budget;
-            	$this->farbe= $row->farbe;
-            	$this->anzahl_ma = $row->anzahl_ma;
-            	$this->aufwand_pt = $row->aufwand_pt;
+				$this->farbe= $row->farbe;
+				$this->anzahl_ma = $row->anzahl_ma;
+				$this->aufwand_pt = $row->aufwand_pt;
 
 				return true;
 			}
@@ -134,10 +134,10 @@ class projekt extends basis_db
 				$obj->ende = $row->ende;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->budget = $row->budget;
-            	$obj->farbe = $row->farbe;
-            	$obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
-            	$obj->anzahl_ma = $row->anzahl_ma;
-            	$obj->aufwand_pt = $row->aufwand_pt;
+				$obj->farbe = $row->farbe;
+				$obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
+				$obj->anzahl_ma = $row->anzahl_ma;
+				$obj->aufwand_pt = $row->aufwand_pt;
 
 				$this->result[] = $obj;
 			}
@@ -178,9 +178,9 @@ class projekt extends basis_db
 				$obj->ende = $row->ende;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->budget = $row->budget;
-            	$obj->farbe = $row->farbe;
-            	$obj->anzahl_ma = $row->anzahl_ma;
-            	$obj->aufwand_pt = $row->aufwand_pt;
+				$obj->farbe = $row->farbe;
+				$obj->anzahl_ma = $row->anzahl_ma;
+				$obj->aufwand_pt = $row->aufwand_pt;
 
 				$this->result[] = $obj;
 			}
@@ -220,10 +220,10 @@ class projekt extends basis_db
 				$obj->ende = $row->ende;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->budget = $row->budget;
-            	$obj->farbe = $row->farbe;
-            	$obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
-            	$obj->anzahl_ma = $row->anzahl_ma;
-            	$obj->aufwand_pt = $row->aufwand_pt;
+				$obj->farbe = $row->farbe;
+				$obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
+				$obj->anzahl_ma = $row->anzahl_ma;
+				$obj->aufwand_pt = $row->aufwand_pt;
 
 				$this->result[] = $obj;
 			}
@@ -299,7 +299,7 @@ class projekt extends basis_db
 		     $this->db_add_param($this->beginn).', '.
 		     $this->db_add_param($this->ende).', '.
 		     $this->db_add_param($this->budget).', '.
-             $this->db_add_param($this->farbe).', '.
+	 	     $this->db_add_param($this->farbe).', '.
 		     $this->db_add_param($this->oe_kurzbz).','.
 		     $this->db_add_param($this->aufwand_pt).','.
 		     $this->db_add_param($this->anzahl_ma).','.
@@ -317,7 +317,7 @@ class projekt extends basis_db
 				'beginn='.$this->db_add_param($this->beginn).', '.
 				'ende='.$this->db_add_param($this->ende).', '.
 				'budget='.$this->db_add_param($this->budget).', '.
-                'farbe='.$this->db_add_param($this->farbe).', '.
+				'farbe='.$this->db_add_param($this->farbe).', '.
 				'oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).', '.
 				'anzahl_ma='.$this->db_add_param($this->anzahl_ma).', '.
 				'aufwand_pt='.$this->db_add_param($this->aufwand_pt).', '.
@@ -431,9 +431,9 @@ class projekt extends basis_db
 				$this->ende = $row->ende;
 				$this->oe_kurzbz= $row->oe_kurzbz;
 				$this->budget= $row->budget;
-            	$this->farbe= $row->farbe;
-            	$this->anzahl_ma = $row->anzahl_ma;
-            	$this->aufwand_pt = $row->aufwand_pt;
+				$this->farbe= $row->farbe;
+				$this->anzahl_ma = $row->anzahl_ma;
+				$this->aufwand_pt = $row->aufwand_pt;
 
 				return true;
 			}
