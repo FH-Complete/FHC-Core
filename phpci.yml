@@ -11,14 +11,14 @@ build_settings:
         user: 'fhcomplete'
         pass: 'fhcomplete'
 setup:
-    shell:
-        - "pkill -f fhctest &"
     composer:
         directory: ""
         action: "install"
-    pgsql:
-        - "DROP DATABASE IF EXISTS fhctest;"
+#    pgsql:
+#        - "DROP DATABASE IF EXISTS fhctest;"
     shell:
+        - "pkill -f fhctest &"
+        - "sudo -u postgres psql fhctest -c 'DROP DATABASE IF EXISTS fhctest;'"
         - "cd %BUILD_PATH% && chmod u+x install.sh && ./install.sh fhctest" # Install Database
         - "rm -f /var/www/html/build" # SymLink löschen falls vorhanden
         - "ln -s %BUILD_PATH% /var/www/html/build" # SymLink to the actual build
@@ -45,19 +45,19 @@ test:
 #        directory: "tests/phpunit/"
 
 complete:
-    xmpp:
-        username: "fhcomplete"
-        password: "fhcomplete1q2w3blah.im"
-        recipients:
-            - "fhcomplete@darkness.su"
-            - "nk@jabber.at" 
-            - "tschux@jabber.org"
-            - "lexdesign@blah.im"
-            - "tschux@jabber.at"      
-        server: "jabber.blah.im"
-        tls: 1
-        alias: "jabber.blah.im"
-        date_format: "%d.%m.%Y"
+#    xmpp:
+#        username: "fhcomplete"
+#        password: "fhcomplete1q2w3blah.im"
+#        recipients:
+#            - "fhcomplete@darkness.su"
+#            - "nk@jabber.at" 
+#            - "tschux@jabber.org"
+#            - "lexdesign@blah.im"
+#            - "tschux@jabber.at"      
+#        server: "jabber.blah.im"
+#        tls: 1
+#        alias: "jabber.blah.im"
+#        date_format: "%d.%m.%Y"
     clean_build:
         remove:
             - index.php
