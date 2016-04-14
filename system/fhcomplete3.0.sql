@@ -30752,7 +30752,7 @@ INSERT INTO tbl_aufmerksamdurch VALUES ('DivMessen', 'Diverse Messen', NULL);
 -- Data for Name: tbl_benutzer; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO tbl_benutzer VALUES ('administrator', 1, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO tbl_benutzer VALUES ('admin', 1, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO tbl_benutzer VALUES ('_DummyLektor', 2, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
@@ -36107,6 +36107,7 @@ INSERT INTO tbl_berechtigung VALUES ('assistenz', 'Assistenz');
 INSERT INTO tbl_berechtigung VALUES ('news', 'News eintragen');
 INSERT INTO tbl_berechtigung VALUES ('preinteressent', 'Verwaltung der Preinteressenten');
 INSERT INTO tbl_berechtigung VALUES ('veranstaltung', 'Berechtigungen fuer Veranstaltungen wie Jahresplan');
+INSERT INTO tbl_berechtigung VALUES ('basis/vilesci', 'Berechtigungen fuer VileSci');
 INSERT INTO tbl_berechtigung VALUES ('basis/berechtigung', 'Berechtigungsverwaltung');
 INSERT INTO tbl_berechtigung VALUES ('basis/variable', 'Variablenverwaltung');
 INSERT INTO tbl_berechtigung VALUES ('basis/studiengang', 'Studiengangsverwaltung');
@@ -36242,6 +36243,7 @@ INSERT INTO tbl_rolleberechtigung VALUES ('basis/person', 'admin', 'suid');
 INSERT INTO tbl_rolleberechtigung VALUES ('basis/studiengang', 'admin', 'suid');
 INSERT INTO tbl_rolleberechtigung VALUES ('basis/testtool', 'admin', 'suid');
 INSERT INTO tbl_rolleberechtigung VALUES ('basis/variable', 'admin', 'suid');
+INSERT INTO tbl_rolleberechtigung VALUES ('basis/vilesci', 'admin', 'suid');
 INSERT INTO tbl_rolleberechtigung VALUES ('info/news', 'admin', 'suid');
 INSERT INTO tbl_rolleberechtigung VALUES ('info/veranstaltungsplan', 'admin', 'suid');
 INSERT INTO tbl_rolleberechtigung VALUES ('lehre/abgabetool', 'admin', 'suid');

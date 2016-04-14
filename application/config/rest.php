@@ -139,14 +139,16 @@ $config['auth_source'] = 'library';
 | In other cases override the function _perform_library_auth in your controller
 |
 | For digest authentication the library function should return already a stored
-| md5(username:restrealm:password) for that username
-|
-| e.g: md5('admin:REST API:1234') = '1e957ebc35631ab22d5bd6526bd14ea2'
+| password for that username, even if it is hashed
 |
 */
-$config['auth_library_class'] = 'fhcauth';
+$config['auth_library_class'] = 'FHC_Auth';
+
+// rest_auth is basic
 //$config['auth_library_function'] = 'auth';
-$config['auth_library_function'] = 'auth_digest';
+
+// rest_auth is digest
+$config['auth_library_function'] = 'digestAuthentication';
 
 /*
 |--------------------------------------------------------------------------

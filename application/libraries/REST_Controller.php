@@ -1978,12 +1978,19 @@ abstract class REST_Controller extends CI_Controller {
         preg_match_all('@(username|nonce|uri|nc|cnonce|qop|response)=[\'"]?([^\'",]+)@', $digest_string, $matches);
         $digest = (empty($matches[1]) || empty($matches[2])) ? [] : array_combine($matches[1], $matches[2]);
 
-        // For digest authentication the library function should return already stored md5(username:restrealm:password) for that username @see rest.php::auth_library_function config
+        // For digest authentication the library function should return 
+		// already stored password for that username, even if it is hashed
         $username = $this->_check_login($digest['username'], TRUE);
-        if (array_key_exists('username', $digest) === FALSE || $username === FALSE)
+		// If there no password
+        if (array_key_exists('username', $digest) === FALSE || $username === FALSE || $username === NULL)
         {
             $this->_force_login($unique_id);
         }
+		// If the password was found for this username, generete the string md5('USERNAME:REALM:PASSWORD')
+		else
+		{
+			$username = md5($digest['username'].":".$this->config->item('rest_realm').":".$username);
+		}
 
         $md5 = md5(strtoupper($this->request->method) . ':' . $digest['uri']);
         $valid_response = md5($username . ':' . $digest['nonce'] . ':' . $digest['nc'] . ':' . $digest['cnonce'] . ':' . $digest['qop'] . ':' . $md5);

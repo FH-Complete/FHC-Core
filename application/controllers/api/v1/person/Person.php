@@ -36,9 +36,14 @@ class Person extends APIv1_Controller
 	// $this->response(array(['success' => false, 'message' => 'access denied']), REST_Controller::HTTP_UNAUTHORIZED);
 
 		$code = $this->get('code');
+		$email = $this->get('email');
 		$person_id = $this->get('person_id');
 
-		if (! is_null($code))
+		if ((!is_null($code)) && (!is_null($email)))
+		{
+			$result = $this->person_model->getPersonByCodeAndEmail($code, $email);
+		}
+		elseif (! is_null($code))
 		{
 			$result = $this->person_model->getPersonByCode($code);
 		}
