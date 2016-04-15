@@ -33,19 +33,17 @@ class FHC_Auth
 	 *
 	 * @param	string	$username
 	 * @param	string	$password
-	 * @return	bool
+	 * @return	bool	
 	 */
-	function auth($username, $password)
+	function basicAuthentication($username, $password)
 	{
 		$auth = new authentication();
-		if ($auth->checkpassword($username, $password))
+		if($auth->checkpassword($username, $password))
 		{
-			//echo 'Auth-Method-True';
 			return true;
 		}
 		else
 		{
-			//echo 'Auth-Method-False';
 			return false;
 		}
 	}

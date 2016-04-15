@@ -110,7 +110,7 @@ $config['rest_realm'] = 'FHC REST API';
 |           authorization key
 |
 */
-$config['rest_auth'] = 'digest';
+$config['rest_auth'] = 'basic';
 
 /*
 |--------------------------------------------------------------------------
@@ -119,7 +119,8 @@ $config['rest_auth'] = 'digest';
 |
 | Is login required and if so, the user store to use
 |
-| ''        Use config based users or wildcard testing
+| ''        Use config based users or wildcard testing, only for testing purpose
+|			it would be very unsecure to let unset in a production environment
 | 'ldap'    Use LDAP authentication
 | 'library' Use a authentication library
 |
@@ -145,10 +146,10 @@ $config['auth_source'] = 'library';
 $config['auth_library_class'] = 'FHC_Auth';
 
 // rest_auth is basic
-//$config['auth_library_function'] = 'auth';
+$config['auth_library_function'] = 'basicAuthentication';
 
 // rest_auth is digest
-$config['auth_library_function'] = 'digestAuthentication';
+//$config['auth_library_function'] = 'digestAuthentication';
 
 /*
 |--------------------------------------------------------------------------
