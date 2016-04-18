@@ -1126,7 +1126,35 @@ if (!$result = @$db->db_query("SELECT pruefungstyp_kurzbz FROM campus.tbl_pruefu
 		echo ' campus.tbl_pruefungsanmeldung: Spalte pruefungstyp_kurzbz hinzugefügt.<br>';
 }
 
+// Neue Spalte bezeichnung_mehrsprachig bei tbl_status
+if(!@$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_status LIMIT 1"))
+{
+	$qry = " ALTER TABLE public.tbl_status ADD COLUMN bezeichnung_mehrsprachig varchar(32)[];
+             
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Abbrecher\",\"Abbrecher\",\"Abbrecher\",\"Abbrecher\"}' where status_kurzbz = 'Abbrecher';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Abgewiesener\",\"Abgewiesener\",\"Abgewiesener\",\"Abgewiesener\"}' where status_kurzbz = 'Abgewiesener';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Absolvent\",\"Absolvent\",\"Absolvent\",\"Absolvent\"}' where status_kurzbz = 'Absolvent';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Aufgenommener\",\"Aufgenommener\",\"Aufgenommener\",\"Aufgenommener\"}' where status_kurzbz = 'Aufgenommener';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Ausserordentlicher\",\"Ausserordentlicher\",\"Ausserordentlicher\",\"Ausserordentlicher\"}' where status_kurzbz = 'Ausserordentlicher';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Bewerber\",\"Bewerber\",\"Bewerber\",\"Bewerber\"}' where status_kurzbz = 'Bewerber';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Diplomand\",\"Diplomand\",\"Diplomand\",\"Diplomand\"}' where status_kurzbz = 'Diplomand';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Incoming\",\"Incoming\",\"Incoming\",\"Incoming\"}' where status_kurzbz = 'Incoming';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Interessent\",\"Interessent\",\"Interessent\",\"Interessent\"}' where status_kurzbz = 'Interessent';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Outgoing\",\"Outgoing\",\"Outgoing\",\"Outgoing\"}' where status_kurzbz = 'Outgoing';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Praktikant\",\"Praktikant\",\"Praktikant\",\"Praktikant\"}' where status_kurzbz = 'Praktikant';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Student\",\"Student\",\"Student\",\"Student\"}' where status_kurzbz = 'Student';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Unterbrecher\",\"Unterbrecher\",\"Unterbrecher\",\"Unterbrecher\"}' where status_kurzbz = 'Unterbrecher';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"VertragErhalten\",\"VertragErhalten\",\"VertragErhalten\",\"VertragErhalten\"}' where status_kurzbz = 'VertragErhalten';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Vertragsausfertigung\",\"Vertragsausfertigung\",\"Vertragsausfertigung\",\"Vertragsausfertigung\"}' where status_kurzbz = 'Vertragsausfertigung';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"VertragVersendet\",\"VertragVersendet\",\"VertragVersendet\",\"VertragVersendet\"}' where status_kurzbz = 'VertragVersendet';
+             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Wartender\",\"Wartender\",\"Wartender\",\"Wartender\"}' where status_kurzbz = 'Wartender';";
+    
 
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_status '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte bezeichnung_mehrsprachig in public.tbl_status hinzugefügt';
+}
 
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -1337,7 +1365,7 @@ $tabellen=array(
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv", "anmerkung","bewerbung_abgeschicktamum"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz"),
-	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
+	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id","bezeichnung_mehrsprachig"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
 	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id"),
 	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content","bezeichnung"),
