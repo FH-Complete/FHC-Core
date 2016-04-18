@@ -35,7 +35,7 @@ class FHC_Auth
 	 * @param	string	$password
 	 * @return	bool	
 	 */
-	function basicAuthentication($username, $password)
+	public function basicAuthentication($username, $password)
 	{
 		$auth = new authentication();
 		if($auth->checkpassword($username, $password))
