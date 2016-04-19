@@ -432,7 +432,7 @@ class student extends benutzer
 		{
 			if($row = $this->db_fetch_object())
 			{
-				$this->uid = $this->getUid($row->prestudent_id();
+				$this->uid = $this->getUid($row->prestudent_id);
 
 				$this->prestudent_id = $row->prestudent_id;
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
