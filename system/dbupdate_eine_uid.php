@@ -34,13 +34,14 @@ echo '<html>
 $all_tables_to_update =
 array
 (
-	array("schema" => "bis",    "name" => "tbl_bisio",             "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
-	array("schema" => "campus", "name" => "tbl_lvgesamtnote",      "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
-	array("schema" => "campus", "name" => "tbl_studentbeispiel",   "from" => "student_uid", "to" => "uid",           "datatype" => "varchar(32)", "newTarget" => "tbl_benutzer",   "newTargetSchema" => "public", "pickDataFrom" => "tbl_benutzer", "pickDataFromCol" => "uid"        ),
-	array("schema" => "campus", "name" => "tbl_studentuebung",     "from" => "student_uid", "to" => "uid",           "datatype" => "varchar(32)", "newTarget" => "tbl_benutzer",   "newTargetSchema" => "public", "pickDataFrom" => "tbl_benutzer", "pickDataFromCol" => "uid"        ),
-	array("schema" => "campus", "name" => "tbl_legesamtnote",      "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
-	array("schema" => "lehre",  "name" => "tbl_abschlusspruefung", "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
-	array("schema" => "public",  "name" => "tbl_studentlehrverband", "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
+	array("schema" => "bis",    "name" => "tbl_bisio",                "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
+	array("schema" => "campus", "name" => "tbl_lvgesamtnote",         "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
+	array("schema" => "campus", "name" => "tbl_studentbeispiel",      "from" => "student_uid", "to" => "uid",           "datatype" => "varchar(32)", "newTarget" => "tbl_benutzer",   "newTargetSchema" => "public", "pickDataFrom" => "tbl_benutzer", "pickDataFromCol" => "uid"        ),
+	array("schema" => "campus", "name" => "tbl_studentuebung",        "from" => "student_uid", "to" => "uid",           "datatype" => "varchar(32)", "newTarget" => "tbl_benutzer",   "newTargetSchema" => "public", "pickDataFrom" => "tbl_benutzer", "pickDataFromCol" => "uid"        ),
+	array("schema" => "campus", "name" => "tbl_legesamtnote",         "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
+	array("schema" => "lehre",  "name" => "tbl_abschlusspruefung",    "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
+	array("schema" => "public", "name" => "tbl_studentlehrverband",   "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
+	array("schema" => "lehre",  "name" => "tbl_projektarbeit",        "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
 );
 
 if(!isset($_POST["action"]))
@@ -362,7 +363,7 @@ else if($_POST["action"] == "Starten")
 					upper(btrim((((( SELECT tbl_studiengang.typ::text || tbl_studiengang.kurzbz::text
 								 FROM tbl_studiengang
 								WHERE tbl_studiengang.studiengang_kz = tbl_lehrverband.studiengang_kz)) || tbl_lehrverband.semester) || tbl_lehrverband.verband::text) || tbl_lehrverband.gruppe::text)) AS gruppe_kurzbz,
-					tbl_studentlehrverband.student_uid AS uid,
+					tbl_studentlehrverband.prestudent_id,
 					true AS mailgrp,
 					tbl_lehrverband.bezeichnung AS beschreibung,
 					tbl_lehrverband.studiengang_kz,
@@ -431,46 +432,50 @@ function modifyOneTable($db, $table)
 		$indices = array();
 		$primary_keys = array();
 
+
 		$index_search_result = $db->db_query("SELECT * FROM pg_indexes WHERE schemaname=".$db->db_add_param($table["schema"])." AND tablename=".$db->db_add_param($table["name"]));
 		while($row = $db->db_fetch_object($index_search_result))
 		{
-			$check_if_pk_result = $db->db_query("select * from pg_constraint where conname=".$db->db_add_param($row->indexname));
-
-			if($db->db_num_rows($check_if_pk_result) == 1)
+			if(strpos($row->indexdef, $table["from"]) !== false)		//only if the pk is affected
 			{
-				$get_definition_result = $db->db_query(
-					"SELECT conrelid::regclass AS table_from
-						,conname
-						,pg_get_constraintdef(c.oid)
-						FROM pg_constraint c
-						JOIN pg_namespace n ON n.oid = c.connamespace
-					WHERE contype IN ('f', 'p ')
-						AND n.nspname = ".$db->db_add_param($row->schemaname)."
-						AND conname = ".$db->db_add_param($row->indexname)."
-						ORDER BY conrelid::regclass::text, contype DESC;");
-				$def = $db->db_fetch_object($get_definition_result);
+				$check_if_pk_result = $db->db_query("select * from pg_constraint where conname=".$db->db_add_param($row->indexname));
 
-				if(!$pk_drop_result = $db->db_query('ALTER TABLE '.$table["schema"].".".$table["name"].' DROP CONSTRAINT '.$row->indexname))
+				if($db->db_num_rows($check_if_pk_result) == 1)
 				{
-					echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen</p>";
-					$db->db_query("ROLLBACK;");
-					return;
-				}
+					$get_definition_result = $db->db_query(
+						"SELECT conrelid::regclass AS table_from
+							,conname
+							,pg_get_constraintdef(c.oid)
+							FROM pg_constraint c
+							JOIN pg_namespace n ON n.oid = c.connamespace
+						WHERE contype IN ('f', 'p ')
+							AND n.nspname = ".$db->db_add_param($row->schemaname)."
+							AND conname = ".$db->db_add_param($row->indexname)."
+							ORDER BY conrelid::regclass::text, contype DESC;");
+					$def = $db->db_fetch_object($get_definition_result);
 
-				$constraint_add_query = str_replace ($table["from"], $table["to"], $def->pg_get_constraintdef );
-				$primary_keys[] = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT '.$row->indexname.' '.$constraint_add_query;
-			}
-			else
-			{
-				if(!$index_drop_result = $db->db_query('DROP INDEX '.$table["schema"].".".$row->indexname))
+					if(!$pk_drop_result = $db->db_query('ALTER TABLE '.$table["schema"].".".$table["name"].' DROP CONSTRAINT '.$row->indexname))
+					{
+						echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen</p>";
+						$db->db_query("ROLLBACK;");
+						return;
+					}
+
+					$constraint_add_query = str_replace ($table["from"], $table["to"], $def->pg_get_constraintdef );
+					$primary_keys[] = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT '.$row->indexname.' '.$constraint_add_query;
+				}
+				else
 				{
-					echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von INDEX ".$row->indexname." fehlgeschlagen</p>";
-					$db->db_query("ROLLBACK;");
-					return;
-				}
+					if(!$index_drop_result = $db->db_query('DROP INDEX '.$table["schema"].".".$row->indexname))
+					{
+						echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von INDEX ".$row->indexname." fehlgeschlagen</p>";
+						$db->db_query("ROLLBACK;");
+						return;
+					}
 
-				$index_add_query = str_replace ($table["from"], $table["to"], $row->indexdef );
-				$indices[] = $index_add_query;
+					$index_add_query = str_replace ($table["from"], $table["to"], $row->indexdef );
+					$indices[] = $index_add_query;
+				}
 			}
 		}
 
