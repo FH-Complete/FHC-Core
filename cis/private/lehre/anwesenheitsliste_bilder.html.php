@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
    /**
     *
@@ -154,7 +155,7 @@ $qry = "SELECT
 		FROM
 			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
 			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
-			LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
+			LEFT JOIN public.tbl_studentlehrverband ON(public.tbl_student.prestudent_id=tbl_studentlehrverband.prestudent_id AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
 			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
 			LEFT JOIN bis.tbl_bisio ON(public.tbl_student.prestudent_id=tbl_bisio.prestudent_id)
 		WHERE

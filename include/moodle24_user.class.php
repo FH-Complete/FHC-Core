@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /*
  * Connector fuer Moodle 2.4 User
@@ -25,6 +26,7 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/moodle.class.php');
+require_once(dirname(__FILE__).'/student.class.php');
 
 class moodle24_user extends basis_db
 {
@@ -309,7 +311,7 @@ class moodle24_user extends basis_db
 				if($row_std->gruppe_kurzbz=='') //LVB Gruppe
 				{
 					$qry = "SELECT
-								distinct student_uid
+								distinct prestudent_id
 							FROM
 								public.tbl_studentlehrverband
 							WHERE
@@ -345,13 +347,22 @@ class moodle24_user extends basis_db
 				{
 					while($row_user = $this->db_fetch_object($result_user))
 					{
+						if(isset($row_user->prestudent_id))
+						{
+							$student = new student();
+							$uid = $student->getUid($row_user->prestudent_id);
+						}
+						else
+						{
+							$uid = $row_user->student_uid;
+						}
 
 						//Nachschauen ob dieser Student bereits zugeteilt ist
 
 						$user_zugeteilt=false;
 						foreach($enrolled_users as $user)
 						{
-							if($user['username']==$row_user->student_uid)
+							if($user['username']==$uid)
 							{
 								$user_zugeteilt=true;
 								$this->mdl_user_id=$user['id'];
@@ -363,12 +374,12 @@ class moodle24_user extends basis_db
 						{
 
 							//MoodleID des Users holen bzw ggf neu anlegen
-							if(!$this->loaduser($row_user->student_uid))
+							if(!$this->loaduser($uid))
 							{
 								//User anlegen
-								if(!$this->createUser($row_user->student_uid))
+								if(!$this->createUser($uid))
 								{
-									$this->errormsg = "Fehler beim Anlegen des Users $row_user->student_uid: $this->errormsg";
+									$this->errormsg = "Fehler beim Anlegen des Users $uid: $this->errormsg";
 									return false;
 								}
 								else
@@ -389,8 +400,8 @@ class moodle24_user extends basis_db
 
 							$userstoenroll[]=$data;
 
-							$this->log.="\nStudentIn $row_user->student_uid wurde zum Kurs hinzugefügt";
-							$this->log_public.="\nStudentIn $row_user->student_uid wurde zum Kurs hinzugefügt";
+							$this->log.="\nStudentIn $uid wurde zum Kurs hinzugefügt";
+							$this->log_public.="\nStudentIn $uid wurde zum Kurs hinzugefügt";
 							$this->sync_create++;
 						}
 
@@ -418,7 +429,7 @@ class moodle24_user extends basis_db
 								$groupid=$vorhandenegruppen[$gruppenbezeichnung];
 
 							//if($this->mdl_user_id=='')
-							//	$this->loaduser($row_user->student_uid);
+							//	$this->loaduser($uid);
 							//Schauen ob eine Zuteilung zu dieser Gruppe vorhanden ist
 							if(!$this->getGroupMember($groupid, $this->mdl_user_id))
 							{
@@ -426,8 +437,8 @@ class moodle24_user extends basis_db
 								$groupmembertoadd[] = array('groupid'=>$groupid,'userid'=>$this->mdl_user_id);
 								//$this->createGroupMember($groupid, $this->mdl_user_id);
 								$this->group_update++;
-								$this->log.="\nStudentIn $row_user->student_uid wurde der Gruppe $gruppenbezeichnung ($groupid) zugeordnet";
-								$this->log_public.="\nStudentIn $row_user->student_uid wurde der Gruppe $gruppenbezeichnung zugeordnet";
+								$this->log.="\nStudentIn $uid wurde der Gruppe $gruppenbezeichnung ($groupid) zugeordnet";
+								$this->log_public.="\nStudentIn $uid wurde der Gruppe $gruppenbezeichnung zugeordnet";
 							}
 						}
 					}

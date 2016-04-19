@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *			Gerald Raab <gerald.raab@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *          Gerald Raab <gerald.raab@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -290,8 +291,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 		}
 
+		if(!$std = new student($uid_arr[$i]))
+			die("Student nicht gefunden");
+
 		$akadgrad_id='';
-		$qry = "SELECT bezeichnung, akadgrad_id, bezeichnung_english FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE student_uid='".$uid_arr[$i]."' ORDER BY datum DESC LIMIT 1";
+		$qry = "SELECT bezeichnung, akadgrad_id, bezeichnung_english FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE prestudent_id=".$db->db_add_param($student->prestudent_id)." ORDER BY datum DESC LIMIT 1";
 		if($db->db_query($qry))
 		{
 			if($row1 = $db->db_fetch_object())
@@ -336,8 +340,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
 
 
-		$std = new student();
-		$std->load($uid_arr[$i]);
+		if(!$std = new student($uid_arr[$i]))
+			die("Student nicht gefunden");
 
 		$qry = "SELECT von, bis FROM bis.tbl_bisio WHERE prestudent_id=".$db->db_add_param($std->prestudent_id);
 		if($db->db_query($qry))
@@ -374,9 +378,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 		echo "		<stgl>$stgl</stgl>";
 
+
+		if(!$student = new student($uid_arr[$i]))
+			die("Student nicht gefunden!");
+
         $abschlussbeurteilung='';
         // Hole Datum der Sponsion -> wenn keine vorhanden nimm aktuelles datum
-        $qry = "SELECT sponsion, tbl_abschlussbeurteilung.bezeichnung_english,datum FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE student_uid='".$uid_arr[$i]."' ORDER BY datum DESC LIMIT 1";
+        $qry = "SELECT sponsion, tbl_abschlussbeurteilung.bezeichnung_english,datum FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE prestudent_id=".$db->db_add_param($student->prestudent_id)." ORDER BY datum DESC LIMIT 1";
         $sponsion_datum = date('d.m.Y');
         $abschlusspruefungsdatum = '';
         $abschlussbeurteilung='';
@@ -408,8 +416,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		/*
 		 * Hole Notendurchschnitt vom Jahr nach dem letzten Status und 2 Jahre davor,
 		*/
-		$student = new student();
-		$student->load($uid_arr[$i]);
+		if(!$student = new student($uid_arr[$i]))
+			die("Student nicht gefunden");
+
 		$prestudent = new prestudent();
 		$prestudent->getLastStatus($student->prestudent_id, null, 'Student');
 

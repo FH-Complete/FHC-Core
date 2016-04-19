@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Karl Burkhart <burkhart@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Karl Burkhart <burkhart@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
  
 header("Content-type: application/xhtml+xml");
@@ -65,7 +66,7 @@ if(isset($_REQUEST['xmlformat']) && $_REQUEST['xmlformat']=="xml")
 					WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz 
 					AND tbl_student.student_uid = tbl_benutzer.uid AND tbl_benutzer.person_id = tbl_person.person_id 
 					AND tbl_student.student_uid = '".addslashes($uid)."' 
-					AND tbl_studentlehrverband.student_uid=tbl_student.student_uid 
+					AND tbl_studentlehrverband.prestudent_id=tbl_student.prestudent_id
 					AND tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz 
 					order by semester;"; 
 	

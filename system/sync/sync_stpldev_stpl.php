@@ -128,11 +128,11 @@ function getStudentsFromGroup($studiengang_kz, $semester, $verband, $gruppe, $gr
 	if($gruppe_kurzbz=='')
 	{
 		$qry = "SELECT
-					distinct student_uid
+					distinct prestudent_id
 				FROM
 					public.tbl_studentlehrverband
-				LEFT JOIN
-					public.tbl_benutzer ON (uid=student_uid)
+				JOIN public.tbl_prestudent USING(prestudent_id)
+				LEFT JOIN public.tbl_benutzer USING(person_id)
 				WHERE
 					tbl_benutzer.aktiv=true AND
 					studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND

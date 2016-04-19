@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Karl Burkhart <burkhart@technikum-wien.at>
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Karl Burkhart <burkhart@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../config/vilesci.config.inc.php');
@@ -188,7 +189,7 @@ $student = new student();
 $prestudent = new prestudent(); 
 $qry = "select distinct(student.student_uid), prestudent.prestudent_id, status.ausbildungssemester, lv.semester, student.studiengang_kz studiengang
 from public.tbl_student student
-join public.tbl_studentlehrverband lv using(student_uid)
+join public.tbl_studentlehrverband lv ON(public.tbl_student.prestudent_id = public.tbl_studentlehrverband.prestudent_id)
 join public.tbl_prestudent prestudent using(prestudent_id)
 join public.tbl_prestudentstatus status using(prestudent_id) 
 WHERE status.studiensemester_kurzbz = '$aktSem'  

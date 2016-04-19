@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/benutzer.class.php');
 
@@ -67,7 +68,7 @@ class student extends benutzer
 		else
 			$qry = "SELECT *, tbl_studentlehrverband.studiengang_kz as studiengang_kz, tbl_studentlehrverband.semester as semester,
 					tbl_studentlehrverband.verband as verband, tbl_studentlehrverband.gruppe as gruppe
-					FROM public.tbl_student JOIN public.tbl_studentlehrverband USING(student_uid)
+					FROM public.tbl_student JOIN public.tbl_studentlehrverband USING(prestudent_id)
 					WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)." AND student_uid=".$this->db_add_param($uid);
 		if($this->db_query($qry))
 		{
@@ -269,7 +270,7 @@ class student extends benutzer
 					  FROM public.tbl_person, public.tbl_student, public.tbl_benutzer, public.tbl_studentlehrverband, public.tbl_prestudent";
 		if($gruppe!=null)
 			$sql_query.= ",public.tbl_benutzergruppe";
-		$sql_query.= " WHERE tbl_prestudent.prestudent_id=tbl_student.prestudent_id AND tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND tbl_studentlehrverband.student_uid=tbl_student.student_uid AND $where ORDER BY nachname, vorname";
+		$sql_query.= " WHERE tbl_prestudent.prestudent_id=tbl_student.prestudent_id AND tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_student.student_uid AND tbl_studentlehrverband.prestudent_id=tbl_student.prestudent_id AND $where ORDER BY nachname, vorname";
 	    //echo $sql_query;
 		if(!$this->db_query($sql_query))
 		{
@@ -387,10 +388,10 @@ class student extends benutzer
 	 * @param studiensemester_kurzbz
 	 * @return true wenn vorhanden, false wenn nicht
 	 */
-	public function studentlehrverband_exists($student_uid, $studiensemester_kurzbz)
+	public function studentlehrverband_exists($prestudent_id, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_studentlehrverband
-				WHERE student_uid=".$this->db_add_param($student_uid)." AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)." AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
 		if($this->db_query($qry))
 		{
@@ -417,21 +418,23 @@ class student extends benutzer
 	/**
 	 * Prueft ob die StudentLehrverband Zuteilung
 	 * bereits existiert
-	 * @param student_uid
+	 * @param prestudent_id
 	 *        studiensemester_kurzbz
 	 * @return true wenn vorhanden, false wenn nicht
 	 */
-	public function load_studentlehrverband($student_uid, $studiensemester_kurzbz)
+	public function load_studentlehrverband($prestudent_id, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT * FROM public.tbl_studentlehrverband
-				WHERE student_uid=".$this->db_add_param($student_uid)."
+				WHERE prestudent_id=".$this->db_add_param($prestudent_id)."
 				AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
-				$this->uid = $row->student_uid;
+				$this->uid = $this->getUid($row->prestudent_id();
+
+				$this->prestudent_id = $row->prestudent_id;
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$this->studiengang_kz = $row->studiengang_kz;
 				$this->semester = $row->semester;
@@ -469,8 +472,9 @@ class student extends benutzer
 
 		if($new)
 		{
-			$qry = "INSERT INTO public.tbl_studentlehrverband (student_uid, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, updateamum, updatevon, insertamum, insertvon)
-					VALUES(".$this->db_add_param($this->uid).','.
+			$qry = "INSERT INTO public.tbl_studentlehrverband (prestudent_id, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, updateamum, updatevon, insertamum, insertvon)
+					VALUES(".
+					$this->db_add_param($this->prestudent_id).','.
 					$this->db_add_param($this->studiensemester_kurzbz).','.
 					$this->db_add_param($this->studiengang_kz).','.
 					$this->db_add_param($this->semester).','.
@@ -485,12 +489,13 @@ class student extends benutzer
 		{
 			$qry = "UPDATE public.tbl_studentlehrverband SET".
 					" studiengang_kz=".$this->db_add_param($this->studiengang_kz).",".
+					" prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER).",".
 					" semester=".$this->db_add_param($this->semester).",".
 					" verband=".$this->db_add_param(($this->verband==''?' ':$this->verband)).",".
 					" gruppe=".$this->db_add_param(($this->gruppe==''?' ':$this->gruppe)).",".
 					" updateamum=".$this->db_add_param($this->updateamum).",".
 					" updatevon=".$this->db_add_param($this->updatevon).
-					" WHERE student_uid=".$this->db_add_param($this->uid)." AND studiensemester_kurzbz=".$this->db_add_param($this->studiensemester_kurzbz);
+					" WHERE prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER)." AND studiensemester_kurzbz=".$this->db_add_param($this->studiensemester_kurzbz);
 		}
 
 		if($this->db_query($qry))
@@ -768,17 +773,17 @@ class student extends benutzer
 
     /**
      * Löscht die Zuordnung eines Studenten zu einer Lehrverbandsgruppe
-     * @param type $uid
+     * @param type $prestudent_id
      * @param type $studiengang_kz
      * @param type $studiensemester
      * @param type $semester
      * @param type $verband
      * @param type $gruppe
      */
-    public function delete_studentLehrverband($uid, $studiengang_kz, $studiensemester, $semester)
+    public function delete_studentLehrverband($prestudent_id, $studiengang_kz, $studiensemester, $semester)
     {
 		$qry = 'DELETE FROM public.tbl_studentlehrverband '
-			. 'WHERE student_uid='.$this->db_add_param($uid)
+			. 'WHERE prestudent_id='.$this->db_add_param($prestudent_id, FHC_INTEGER)
 			. ' AND studiensemester_kurzbz='.$this->db_add_param($studiensemester)
 			. ' AND studiengang_kz='.$this->db_add_param($studiengang_kz)
 			. ' AND semester='.$this->db_add_param($semester).';';

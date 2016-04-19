@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ * Authors: Christian Paminger       <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher    <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl             <rudolf.hangl@technikum-wien.at>,
+ *          Gerald Simane-Sequens    <gerald.simane-sequens@technikum-wien.at> and
+ *          Andreas Moik             <moik@technikum-wien.at>.
  */
 /**
  * Studentenmeldung
@@ -803,7 +804,7 @@ function GenerateXMLStudentBlock($row)
 	//bei Absolventen das Beendigungsdatum (Sponsion oder Abschlussprüfung) überprüfen
 	if($aktstatus=='Absolvent')
 	{
-		$qry_ap="SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid=".$db->db_add_param($row->student_uid)." AND abschlussbeurteilung_kurzbz!='nicht' AND abschlussbeurteilung_kurzbz IS NOT NULL";
+		$qry_ap="SELECT * FROM lehre.tbl_abschlusspruefung WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." AND abschlussbeurteilung_kurzbz!='nicht' AND abschlussbeurteilung_kurzbz IS NOT NULL";
 		if($result_ap = $db->db_query($qry_ap))
 		{
 			$ap=0;

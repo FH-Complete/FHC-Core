@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *			Gerald Raab <gerald.raab@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *          Gerald Raab <gerald.raab@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 header("Content-type: application/xhtml+xml");
 require_once('../config/vilesci.config.inc.php');
@@ -55,7 +56,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				and tbl_student.student_uid = tbl_benutzer.uid
 				and tbl_benutzer.person_id = tbl_person.person_id
 				and tbl_student.student_uid = ".$db->db_add_param($uid)."
-				and tbl_studentlehrverband.student_uid=tbl_student.student_uid
+				and tbl_studentlehrverband.prestudent_id=tbl_student.prestudent_id
 				and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz
 				and tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz);
 

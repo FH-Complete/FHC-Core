@@ -30,6 +30,7 @@
 
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/studiensemester.class.php');
+require_once(dirname(__FILE__).'/student.class.php');
 require_once(dirname(__FILE__).'/variable.class.php');
 
 class lehrstunde extends basis_db
@@ -315,10 +316,14 @@ class lehrstunde extends basis_db
 			if(!isset($this->ssnext))
 				$this->ssnext = $this->ss;
 
+			if(!$student = new student($uid))
+				$this->errormsg = $student->errormsg;
+
+
 			// Lehrverbandszuordnungen der betreffenden Studiensemester laden
 			$sql_query="SELECT studiengang_kz, semester, verband, gruppe
 				FROM public.tbl_studentlehrverband
-				WHERE student_uid=".$this->db_add_param($uid)."
+				WHERE prestudent_id=".$this->db_add_param($student->prestudent_id)."
 				AND studiensemester_kurzbz in(".$this->db_add_param($this->ss).",".$this->db_add_param($this->ssnext).")";
 
 			$verbaende=array();

@@ -352,12 +352,15 @@ if ($xmlformat=='rdf')
 		xmlns:ABSCHLUSSPRUEFUNG="'.$rdf_url.'/rdf#"
 	>
 
-	   <RDF:Seq about="'.$rdf_url.'/liste">
+		<RDF:Seq about="'.$rdf_url.'/liste">
 	';
 
 	if(isset($_GET['student_uid']))
 	{
-		$pruefung->getAbschlusspruefungen($_GET['student_uid']);
+		if(!$student=new student($_GET['student_uid']))
+			die($student->errormsg);
+
+		$pruefung->getAbschlusspruefungen($student->prestudent_id);
 
 		foreach ($pruefung->result as $row)
 			draw_content($row);
@@ -388,10 +391,10 @@ elseif ($xmlformat=='xml')
 
 		foreach ($uids as $uid)
 		{
-			if($uid!='')
+			if($student=new student($uid))
 			{
 				$pruefung = new abschlusspruefung();
-				if($pruefung->getAbschlusspruefungen($uid))
+				if($pruefung->getAbschlusspruefungen($student->prestudent_id))
 				{
 					foreach ($pruefung->result as $row)
 						draw_content_xml($row);
@@ -401,7 +404,10 @@ elseif ($xmlformat=='xml')
 	}
 	elseif(isset($_GET['student_uid']))
 	{
-		$pruefung->getAbschlusspruefungen($_GET['student_uid']);
+		if(!$student=new student($_GET['student_uid']))
+			die($student->errormsg);
+
+		$pruefung->getAbschlusspruefungen($student->prestudent_id);
 
 		foreach ($pruefung->result as $row)
 			draw_content_xml($row);

@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Exportiert die Studentendaten in ein Excel File.
@@ -42,12 +43,12 @@ loadVariables($user);
 		if(mb_strlen($content)>$maxlength[$i])
 			$maxlength[$i]=mb_strlen($content);
 	}
-	
+
 	//Parameter holen
 	$studiengang_kz = isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:'';
 	$semester = isset($_GET['semester'])?$_GET['semester']:'';
 	$studiensemester_kurzbz = isset($_GET['studiensemester_kurzbz'])?$_GET['studiensemester_kurzbz']:'';
-		
+
 	$maxlength= array();
 	$zeile=1;
 
@@ -60,7 +61,7 @@ loadVariables($user);
 	// Creating a worksheet
 	$worksheet =& $workbook->addWorksheet("Abschlusspruefung");
 	$worksheet->setInputEncoding('utf-8');
-	
+
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
 
@@ -71,11 +72,11 @@ loadVariables($user);
 
 	$stsem = new studiensemester();
 	$stsem->load($studiensemester_kurzbz);
-	
-	//Zeilenueberschriften ausgeben	
+
+	//Zeilenueberschriften ausgeben
 	$headline=array('Titelpre','Vorname','Nachname','Titelpost','Vorsitz','Pruefer1','Pruefer2','Pruefer3',
 					'Abschlussbeurteilung','Typ','Datum','Sponsion','Anmerkung');
-	
+
 	$i=0;
 	foreach ($headline as $title)
 	{
@@ -83,24 +84,24 @@ loadVariables($user);
 			$maxlength[$i]=mb_strlen($title);
 		$i++;
 	}
-			
+
 	// Daten holen
-	$qry = "SELECT 
-				titelpre, vorname, nachname, titelpost, 
+	$qry = "SELECT
+				titelpre, vorname, nachname, titelpost,
 				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=vorsitz) as vorsitz,
 				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer1) as pruefer1,
 				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer2) as pruefer2,
-				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer3) as pruefer3,  
+				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=pruefer3) as pruefer3,
 				(SELECT bezeichnung FROM lehre.tbl_abschlussbeurteilung WHERE tbl_abschlussbeurteilung.abschlussbeurteilung_kurzbz=tbl_abschlusspruefung.abschlussbeurteilung_kurzbz) as bezeichnung, tbl_pruefungstyp.beschreibung, datum, sponsion, tbl_abschlusspruefung.anmerkung
-			FROM 
-				lehre.tbl_abschlusspruefung, public.tbl_studentlehrverband, public.tbl_benutzer, public.tbl_person, 
+			FROM
+				lehre.tbl_abschlusspruefung, public.tbl_studentlehrverband, public.tbl_prestudent, public.tbl_person,
 				lehre.tbl_pruefungstyp
 			WHERE
-				tbl_abschlusspruefung.student_uid=public.tbl_studentlehrverband.student_uid AND
-				tbl_studentlehrverband.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
-				tbl_studentlehrverband.studiengang_kz='".addslashes($studiengang_kz)."' AND
-				tbl_benutzer.uid = tbl_abschlusspruefung.student_uid AND
-				tbl_person.person_id = tbl_benutzer.person_id AND
+				tbl_abschlusspruefung.prestudent_id=public.tbl_studentlehrverband.prestudent_id AND
+				tbl_studentlehrverband.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
+				tbl_studentlehrverband.studiengang_kz=".$db->db_add_param($studiengang_kz)." AND
+				tbl_prestudent.prestudent_id = tbl_abschlusspruefung.prestudent_id AND
+				tbl_person.person_id = tbl_prestudent.person_id AND
 				tbl_abschlusspruefung.pruefungstyp_kurzbz = tbl_pruefungstyp.pruefungstyp_kurzbz
 			";
 	if($semester!='')
@@ -112,7 +113,7 @@ loadVariables($user);
 		while($row = $db->db_fetch_object())
 		{
 			$i=0;
-			
+
 			writecol($zeile, $i++, $row->titelpre);
 			writecol($zeile, $i++, $row->vorname);
 			writecol($zeile, $i++, $row->nachname);
@@ -126,15 +127,15 @@ loadVariables($user);
 			writecol($zeile, $i++, $row->datum);
 			writecol($zeile, $i++, $row->sponsion);
 			writecol($zeile, $i++, $row->anmerkung);
-			
+
 			$zeile++;
 		}
 	}
-	else 
+	else
 		die('Fehler in Qry: '.$qry);
 	//Die Breite der Spalten setzen
 	foreach($maxlength as $i=>$breite)
 		$worksheet->setColumn($i, $i, $breite+2);
-    
+
 	$workbook->close();
 ?>

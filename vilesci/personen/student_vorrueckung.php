@@ -151,7 +151,7 @@ if ($result_stg=$db->db_query($qry_stg))
 	
 //select für die Anzeige
 $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv, 
-			tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
+			tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (prestudent_id)
 				JOIN tbl_benutzer ON (student_uid=uid)
 				JOIN tbl_person USING (person_id)
 			WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER)." 
@@ -181,7 +181,7 @@ if (isset($_POST['vorr']))
 	
 	//select für die Vorrückung
 	$sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv, 
-				tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
+				tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (prestudent_id)
 				JOIN tbl_benutzer ON (student_uid=uid)
 				JOIN tbl_person USING (person_id)
 				WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER)." 
@@ -260,14 +260,14 @@ if (isset($_POST['vorr']))
 				}
 				//Überprüfen ob Eintrag schon vorhanden
 				$qry_chk="SELECT * FROM public.tbl_studentlehrverband 
-						WHERE student_uid=".$db->db_add_param($row->student_uid)." 
+						WHERE prestudent_id=".$db->db_add_param($row->prestudent_id, FHC_INTEGER)."
 						AND studiensemester_kurzbz=".$db->db_add_param($next_ss).";";
 				$sql='';
 				if($db->db_num_rows($db->db_query($qry_chk))<1)
 				{
 					//Eintragen der neuen Gruppe
-					$sql="INSERT INTO public.tbl_studentlehrverband (student_uid, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, updateamum, updatevon, insertamum, insertvon, ext_id) 
-						VALUES (".$db->db_add_param($row->student_uid).",".$db->db_add_param($next_ss).",".$db->db_add_param($row->studiengang_kz).",
+					$sql="INSERT INTO public.tbl_studentlehrverband (prestudent_id, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, updateamum, updatevon, insertamum, insertvon, ext_id)
+						VALUES (".$db->db_add_param($row->prestudent_id, FHC_INTEGER).",".$db->db_add_param($next_ss).",".$db->db_add_param($row->studiengang_kz).",
 						".$db->db_add_param($s).",".$db->db_add_param($row->verband_stlv).",".$db->db_add_param($row->gruppe_stlv).",NULL,NULL,now(),".$db->db_add_param($user).",NULL);";
 				}
 				$qry_chk="SELECT * FROM public.tbl_prestudentstatus

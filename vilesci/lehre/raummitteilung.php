@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Karl Burkhart <karl.burkhart@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Karl Burkhart <karl.burkhart@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /*
  * Raummitteilung
@@ -196,11 +197,13 @@ if(isset($_POST['show']))
 				{
 					//Studierende aus Lehrverbandsgruppen
 					$qry = "SELECT
-								student_uid as uid
+								uid
 							FROM
+								public.tbl_benutzer,
 								public.tbl_studentlehrverband
 							WHERE
-								studiensemester_kurzbz='".$stsem."'
+								public.tbl_benutzer.person_id = public.tbl_studentlehrverband.person_id
+								AND studiensemester_kurzbz='".$stsem."'
 								AND studiengang_kz='".$row->studiengang_kz."'";
 					if($row->semester!='')
 						$qry.=" AND semester='".$row->semester."'";

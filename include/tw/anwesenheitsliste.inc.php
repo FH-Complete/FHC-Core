@@ -260,17 +260,19 @@ $qry = "SELECT
 			tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis,
 			tbl_zeugnisnote.note
 		FROM
-			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
-			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
-			LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
+			campus.vw_student_lehrveranstaltung
+			JOIN public.tbl_benutzer USING(uid)
+			JOIN public.tbl_person USING(person_id)
+			JOIN public.tbl_prestudent ON(public.tbl_prestudent.person_id=public.tbl_person.person_id)
+			LEFT JOIN public.tbl_studentlehrverband ON(public.tbl_prestudent.prestudent_id=public.tbl_studentlehrverband.prestudent_id AND campus.vw_student_lehrveranstaltung.studiensemester_kurzbz=public.tbl_studentlehrverband.studiensemester_kurzbz)
 			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
-			LEFT JOIN bis.tbl_bisio ON tbl_student.prestudent_id=tbl_bisio.prestudent_id
+			LEFT JOIN bis.tbl_bisio ON(tbl_student.prestudent_id=tbl_bisio.prestudent_id)
 		WHERE
-			vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND
-			vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."'";
+			vw_student_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid)." AND
+			vw_student_lehrveranstaltung.studiensemester_kurzbz=".$db->db_add_param($stsem);
 
 if($lehreinheit_id!='')
-	$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id='".addslashes($lehreinheit_id)."'";
+	$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id=".$db->db_add_param($lehreinheit_id);
 
 $qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
 //echo $qry;

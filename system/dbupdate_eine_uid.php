@@ -40,6 +40,7 @@ array
 	array("schema" => "campus", "name" => "tbl_studentuebung",     "from" => "student_uid", "to" => "uid",           "datatype" => "varchar(32)", "newTarget" => "tbl_benutzer",   "newTargetSchema" => "public", "pickDataFrom" => "tbl_benutzer", "pickDataFromCol" => "uid"        ),
 	array("schema" => "campus", "name" => "tbl_legesamtnote",      "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
 	array("schema" => "lehre",  "name" => "tbl_abschlusspruefung", "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
+	array("schema" => "public",  "name" => "tbl_studentlehrverband", "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid"),
 );
 
 if(!isset($_POST["action"]))
@@ -85,11 +86,39 @@ else if($_POST["action"] == "Starten")
 
 
 	//********************************DROP ALL VIEWS********************************
+	//bis.vw_bisio
 	if($result = @$db->db_query("SELECT 1 FROM bis.vw_bisio LIMIT 1;"))
 	{
 		if(!$db->db_query("DROP VIEW bis.vw_bisio"))
 		{
 			echo "<p>Could not DROP view bis.vw_bisio: " . $create_view_qry."</p>";
+		}
+	}
+
+	//campus.vw_student_lehrveranstaltung
+	if($result = @$db->db_query("SELECT 1 FROM campus.vw_student_lehrveranstaltung LIMIT 1;"))
+	{
+		if(!$db->db_query("DROP VIEW campus.vw_student_lehrveranstaltung"))
+		{
+			echo "<p>Could not DROP view campus.vw_student_lehrveranstaltung: " . $create_view_qry."</p>";
+		}
+	}
+
+	//lehre.vw_stundenplandev_student_unr
+	if($result = @$db->db_query("SELECT 1 FROM lehre.vw_stundenplandev_student_unr LIMIT 1;"))
+	{
+		if(!$db->db_query("DROP VIEW lehre.vw_stundenplandev_student_unr"))
+		{
+			echo "<p>Could not DROP view lehre.vw_stundenplandev_student_unr: " . $create_view_qry."</p>";
+		}
+	}
+
+	//public.vw_gruppen
+	if($result = @$db->db_query("SELECT 1 FROM public.vw_gruppen LIMIT 1;"))
+	{
+		if(!$db->db_query("DROP VIEW public.vw_gruppen"))
+		{
+			echo "<p>Could not DROP view public.vw_gruppen: " . $create_view_qry."</p>";
 		}
 	}
 
@@ -103,9 +132,11 @@ else if($_POST["action"] == "Starten")
 
 
 
+	//********************************CREATE ALL VIEWS********************************
+
+	//bis.vw_bisio
 	if(!$result = @$db->db_query("SELECT 1 FROM bis.vw_bisio LIMIT 1;"))
 	{
-		//********************************CREATE ALL VIEWS AGAIN********************************
 		$create_view_qry = "
 			CREATE VIEW bis.vw_bisio AS SELECT tbl_prestudentstatus.studiensemester_kurzbz,
 				tbl_prestudentstatus.status_kurzbz,
@@ -171,8 +202,197 @@ else if($_POST["action"] == "Starten")
 			echo "<p>Could not CREATE view bis.vw_bisio: " . $create_view_qry."</p>";
 		}
 	}
-}
 
+
+
+	//campus.vw_student_lehrveranstaltung
+	if(!$result = @$db->db_query("SELECT 1 FROM campus.vw_student_lehrveranstaltung LIMIT 1;"))
+	{
+		$create_view_qry = "
+			CREATE VIEW campus.vw_student_lehrveranstaltung AS
+				SELECT tbl_benutzergruppe.uid,
+					tbl_lehrveranstaltung.zeugnis,
+					tbl_lehrveranstaltung.sort,
+					tbl_lehrveranstaltung.lehrveranstaltung_id,
+					tbl_lehrveranstaltung.kurzbz,
+					tbl_lehrveranstaltung.bezeichnung,
+					tbl_lehrveranstaltung.bezeichnung_english,
+					tbl_lehrveranstaltung.studiengang_kz,
+					tbl_lehrveranstaltung.semester,
+					tbl_lehrveranstaltung.sprache,
+					tbl_lehrveranstaltung.ects,
+					tbl_lehrveranstaltung.semesterstunden,
+					tbl_lehrveranstaltung.anmerkung,
+					tbl_lehrveranstaltung.lehre,
+					tbl_lehrveranstaltung.lehreverzeichnis,
+					tbl_lehrveranstaltung.aktiv,
+					tbl_lehrveranstaltung.planfaktor,
+					tbl_lehrveranstaltung.planlektoren,
+					tbl_lehrveranstaltung.planpersonalkosten,
+					tbl_lehrveranstaltung.plankostenprolektor,
+					tbl_lehrveranstaltung.updateamum,
+					tbl_lehrveranstaltung.updatevon,
+					tbl_lehrveranstaltung.insertamum,
+					tbl_lehrveranstaltung.insertvon,
+					tbl_lehrveranstaltung.ext_id,
+					tbl_lehreinheit.lehreinheit_id,
+					tbl_lehreinheit.studiensemester_kurzbz,
+					tbl_lehreinheit.lehrfach_id,
+					tbl_lehreinheit.lehrform_kurzbz,
+					tbl_lehreinheit.stundenblockung,
+					tbl_lehreinheit.wochenrythmus,
+					tbl_lehreinheit.start_kw,
+					tbl_lehreinheit.raumtyp,
+					tbl_lehreinheit.raumtypalternativ,
+					tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz
+				FROM lehre.tbl_lehreinheitgruppe,
+					tbl_benutzergruppe,
+					lehre.tbl_lehreinheit,
+					lehre.tbl_lehrveranstaltung
+				WHERE tbl_lehreinheitgruppe.gruppe_kurzbz::text = tbl_benutzergruppe.gruppe_kurzbz::text AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id AND tbl_lehreinheit.studiensemester_kurzbz::text = tbl_benutzergruppe.studiensemester_kurzbz::text
+					UNION
+					SELECT tbl_studentlehrverband.prestudent_id AS prestudent_id,
+					tbl_lehrveranstaltung.zeugnis,
+					tbl_lehrveranstaltung.sort,
+					tbl_lehrveranstaltung.lehrveranstaltung_id,
+					tbl_lehrveranstaltung.kurzbz,
+					tbl_lehrveranstaltung.bezeichnung,
+					tbl_lehrveranstaltung.bezeichnung_english,
+					tbl_lehrveranstaltung.studiengang_kz,
+					tbl_lehrveranstaltung.semester,
+					tbl_lehrveranstaltung.sprache,
+					tbl_lehrveranstaltung.ects,
+					tbl_lehrveranstaltung.semesterstunden,
+					tbl_lehrveranstaltung.anmerkung,
+					tbl_lehrveranstaltung.lehre,
+					tbl_lehrveranstaltung.lehreverzeichnis,
+					tbl_lehrveranstaltung.aktiv,
+					tbl_lehrveranstaltung.planfaktor,
+					tbl_lehrveranstaltung.planlektoren,
+					tbl_lehrveranstaltung.planpersonalkosten,
+					tbl_lehrveranstaltung.plankostenprolektor,
+					tbl_lehrveranstaltung.updateamum,
+					tbl_lehrveranstaltung.updatevon,
+					tbl_lehrveranstaltung.insertamum,
+					tbl_lehrveranstaltung.insertvon,
+					tbl_lehrveranstaltung.ext_id,
+					tbl_lehreinheit.lehreinheit_id,
+					tbl_lehreinheit.studiensemester_kurzbz,
+					tbl_lehreinheit.lehrfach_id,
+					tbl_lehreinheit.lehrform_kurzbz,
+					tbl_lehreinheit.stundenblockung,
+					tbl_lehreinheit.wochenrythmus,
+					tbl_lehreinheit.start_kw,
+					tbl_lehreinheit.raumtyp,
+					tbl_lehreinheit.raumtypalternativ,
+					tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz
+					FROM lehre.tbl_lehreinheitgruppe,
+					tbl_studentlehrverband,
+					lehre.tbl_lehreinheit,
+					lehre.tbl_lehrveranstaltung
+					WHERE tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id AND tbl_lehreinheit.studiensemester_kurzbz::text = tbl_studentlehrverband.studiensemester_kurzbz::text AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND tbl_studentlehrverband.studiengang_kz = tbl_lehreinheitgruppe.studiengang_kz AND tbl_studentlehrverband.semester = tbl_lehreinheitgruppe.semester AND (btrim(tbl_studentlehrverband.verband::text) = btrim(tbl_lehreinheitgruppe.verband::text) OR (tbl_lehreinheitgruppe.verband IS NULL OR btrim(tbl_lehreinheitgruppe.verband::text) = ''::text) AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL) AND (btrim(tbl_studentlehrverband.gruppe::text) = btrim(tbl_lehreinheitgruppe.gruppe::text) OR (tbl_lehreinheitgruppe.gruppe IS NULL OR btrim(tbl_lehreinheitgruppe.gruppe::text) = ''::text) AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL);
+		";
+		if(!$db->db_query($create_view_qry))
+		{
+			echo "<p>Could not CREATE view campus.vw_student_lehrveranstaltung: " . $create_view_qry."</p>";
+		}
+	}
+
+
+
+	//lehre.vw_stundenplandev_student_unr
+	if(!$result = @$db->db_query("SELECT 1 FROM lehre.vw_stundenplandev_student_unr LIMIT 1;"))
+	{
+		$create_view_qry = "
+			CREATE VIEW lehre.vw_stundenplandev_student_unr AS
+				SELECT sub_stpl_uid.unr,
+					sub_stpl_uid.datum,
+					sub_stpl_uid.stunde,
+					sub_stpl_uid.student_uid
+				FROM ( SELECT stpl.unr,
+								stpl.datum,
+								stpl.stunde,
+								tbl_benutzergruppe.uid AS student_uid
+							 FROM tbl_stundenplandev stpl
+								 JOIN tbl_benutzergruppe USING (gruppe_kurzbz)
+							WHERE tbl_benutzergruppe.studiensemester_kurzbz::text = ((( SELECT tbl_studiensemester.studiensemester_kurzbz
+								       FROM tbl_studiensemester
+								      WHERE stpl.datum <= tbl_studiensemester.ende AND stpl.datum >= tbl_studiensemester.start))::text)
+							GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.uid
+						UNION
+						 SELECT stpl.unr,
+								stpl.datum,
+								stpl.stunde,
+								tbl_studentlehrverband.student_uid
+							 FROM tbl_stundenplandev stpl
+								 JOIN tbl_studentlehrverband ON stpl.gruppe_kurzbz IS NULL AND stpl.studiengang_kz = tbl_studentlehrverband.studiengang_kz AND stpl.semester = tbl_studentlehrverband.semester AND (stpl.verband = tbl_studentlehrverband.verband OR stpl.verband = ' '::bpchar AND stpl.verband <> tbl_studentlehrverband.verband) AND (stpl.gruppe = tbl_studentlehrverband.gruppe OR stpl.gruppe = ' '::bpchar AND stpl.gruppe <> tbl_studentlehrverband.gruppe)
+							WHERE tbl_studentlehrverband.studiensemester_kurzbz::text = ((( SELECT tbl_studiensemester.studiensemester_kurzbz
+								       FROM tbl_studiensemester
+								      WHERE stpl.datum <= tbl_studiensemester.ende AND stpl.datum >= tbl_studiensemester.start))::text)
+							GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.student_uid) sub_stpl_uid
+				GROUP BY sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.student_uid;
+			";
+		if(!$db->db_query($create_view_qry))
+		{
+			echo "<p>Could not CREATE view lehre.vw_stundenplandev_student_unr: " . $create_view_qry."</p>";
+		}
+	}
+
+
+
+	//public.vw_gruppen
+	if(!$result = @$db->db_query("SELECT 1 FROM public.vw_gruppen LIMIT 1;"))
+	{
+		$create_view_qry = "
+			CREATE VIEW public.vw_gruppen AS
+				SELECT tbl_gruppe.gid,
+					tbl_gruppe.gruppe_kurzbz,
+					tbl_benutzergruppe.uid,
+					tbl_gruppe.mailgrp,
+					tbl_gruppe.beschreibung,
+					tbl_gruppe.studiengang_kz,
+					tbl_gruppe.semester,
+					tbl_benutzergruppe.studiensemester_kurzbz,
+					NULL::bpchar AS verband,
+					NULL::bpchar AS gruppe
+				 FROM tbl_gruppe
+					 LEFT JOIN tbl_benutzergruppe USING (gruppe_kurzbz)
+				UNION
+				SELECT tbl_lehrverband.gid,
+					upper(btrim((((( SELECT tbl_studiengang.typ::text || tbl_studiengang.kurzbz::text
+								 FROM tbl_studiengang
+								WHERE tbl_studiengang.studiengang_kz = tbl_lehrverband.studiengang_kz)) || tbl_lehrverband.semester) || tbl_lehrverband.verband::text) || tbl_lehrverband.gruppe::text)) AS gruppe_kurzbz,
+					tbl_studentlehrverband.student_uid AS uid,
+					true AS mailgrp,
+					tbl_lehrverband.bezeichnung AS beschreibung,
+					tbl_lehrverband.studiengang_kz,
+					tbl_lehrverband.semester,
+					tbl_studentlehrverband.studiensemester_kurzbz,
+					tbl_lehrverband.verband,
+					tbl_lehrverband.gruppe
+				 FROM tbl_lehrverband
+					 LEFT JOIN tbl_studentlehrverband USING (studiengang_kz, semester)
+				WHERE (tbl_lehrverband.verband = tbl_studentlehrverband.verband OR tbl_lehrverband.verband IS NULL OR btrim(tbl_lehrverband.verband::text) = ''::text OR tbl_studentlehrverband.verband IS NULL) AND (tbl_lehrverband.gruppe = tbl_studentlehrverband.gruppe OR tbl_lehrverband.gruppe IS NULL OR btrim(tbl_lehrverband.gruppe::text) = ''::text OR tbl_studentlehrverband.gruppe IS NULL);
+			";
+		if(!$db->db_query($create_view_qry))
+		{
+			echo "<p>Could not CREATE view public.vw_gruppen: " . $create_view_qry."</p>";
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
 
 
 

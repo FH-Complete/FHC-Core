@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /* Erstellt diverse Dokumente
  *
@@ -590,16 +591,19 @@ else
 		$prestudent->getLastStatus($student->prestudent_id,$ss);
 		$semester=$prestudent->ausbildungssemester;
 
-		$query = "SELECT
-					tbl_studiengang.studiengang_kz, tbl_studentlehrverband.semester, tbl_studiengang.typ,
-					tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer,
-					tbl_studentlehrverband, tbl_studiengang
-				WHERE
-					tbl_studentlehrverband.student_uid = tbl_benutzer.uid
-					AND tbl_benutzer.person_id = tbl_person.person_id
-					AND tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz
-					AND tbl_studentlehrverband.student_uid = ".$db->db_add_param($uid)."
-					AND tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($ss);
+		$query = "
+			SELECT
+				tbl_studiengang.studiengang_kz, tbl_studentlehrverband.semester, tbl_studiengang.typ,
+				tbl_studiengang.kurzbz, tbl_person.person_id
+			FROM
+				tbl_person, tbl_prestudent,
+				tbl_studentlehrverband, tbl_studiengang
+			WHERE
+				tbl_studentlehrverband.prestudent_id = tbl_prestudent.prestudent_id
+				AND tbl_prestudent.person_id = tbl_person.person_id
+				AND tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz
+				AND tbl_studentlehrverband.prestudent_id = ".$db->db_add_param($prestudent->prestudent_id, FHC_INTEGER)."
+				AND tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($ss);
 
 		if($result = $db->db_query($query))
 		{

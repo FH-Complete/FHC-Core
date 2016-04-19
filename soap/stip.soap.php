@@ -106,7 +106,8 @@ function GetStipendienbezieherStip($parameters)
 			{
 				$year = mb_substr($BezieherStip->Studienjahr, 0,4); 
 				$studSemester = "WS".$year; 
-			}elseif ($BezieherStip->Semester == "SS" || $BezieherStip->Semester == "ss")
+			}
+			elseif ($BezieherStip->Semester == "SS" || $BezieherStip->Semester == "ss")
 			{
 				$year = mb_substr($BezieherStip->Studienjahr, 0,2).mb_substr($BezieherStip->Studienjahr, 5,7); 
 				$studSemester = "SS".$year; 
@@ -127,53 +128,53 @@ function GetStipendienbezieherStip($parameters)
 				$student = new student(); 
 				$studentUID = $student->getUID($prestudentID); 
 
-                $abschlusspruefung = new abschlusspruefung();
-                $abschlusspruefung->getLastAbschlusspruefung($studentUID);
-                
-				$student->load($studentUID); 
+				$abschlusspruefung = new abschlusspruefung();
+				$abschlusspruefung->getLastAbschlusspruefung($prestudentID);
+
+				$student->load($studentUID);
 				$studiengang_kz = $student->studiengang_kz; 
-				
-				$konto = new konto(); 
+
+				$konto = new konto();
 				$studGebuehr = $konto->getStudiengebuehrGesamt($studentUID, $studSemester, $studiengang_kz);
 				// , als Dezimaltrennzeichen
 				$studGebuehr = str_replace('.', ',', $studGebuehr); 
-				
+
 				// wenn nicht bezahlt
 				if($studGebuehr == "")
 					$studGebuehr = "0,00";
-			
+
 				if(!$prestudentStatus->getLastStatus($prestudentID,$studSemester))
 					$StipBezieher->Inskribiert = 'n';
 				else
-                {
-                    // wenn nur Interessent letzer Status ist -> nicht inskribiert
-                    if($prestudentStatus->status_kurzbz == 'Interessent')
-                        $StipBezieher->Inskribiert = 'n';
-                    else
-                        $StipBezieher->Inskribiert = 'j';	
-                }
+				{
+					// wenn nur Interessent letzer Status ist -> nicht inskribiert
+					if($prestudentStatus->status_kurzbz == 'Interessent')
+						$StipBezieher->Inskribiert = 'n';
+					else
+						$StipBezieher->Inskribiert = 'j';
+				}
 					
 				if($BezieherStip->Typ == "as" || $BezieherStip->Typ == "AS")
 				{
 					$StipBezieher->getOrgFormTeilCode($studentUID, $studSemester, $prestudentID);
 					$StipBezieher->Studienbeitrag = $studGebuehr; 
-                    
-                    // Wenn letzter Status von Semester Interessent ist -> Semester = null
-                    if($prestudentStatus->status_kurzbz != 'Interessent')
-                        $StipBezieher->Ausbildungssemester = $StipBezieher->getSemester($prestudentID, $studSemester);						
+
+					// Wenn letzter Status von Semester Interessent ist -> Semester = null
+					if($prestudentStatus->status_kurzbz != 'Interessent')
+						$StipBezieher->Ausbildungssemester = $StipBezieher->getSemester($prestudentID, $studSemester);
 					else
-                       $StipBezieher->Ausbildungssemester = null; 
-                     
-                    $StipBezieher->StudStatusCode = $StipBezieher->getStudStatusCode($prestudentID, $studSemester);
-                    
-                    // Ausgeschieden ohne Abschluss
+						$StipBezieher->Ausbildungssemester = null;
+
+					$StipBezieher->StudStatusCode = $StipBezieher->getStudStatusCode($prestudentID, $studSemester);
+
+					// Ausgeschieden ohne Abschluss
 					if($StipBezieher->StudStatusCode==4)
 						$StipBezieher->BeendigungsDatum = $datum_obj->formatDatum($prestudent->datum,'dmY');
 					else if($StipBezieher->StudStatusCode==3) // Absolvent -> letzte Prüfung nehmen
-                        $StipBezieher->BeendigungsDatum = $datum_obj->formatDatum($abschlusspruefung->datum,'dmY');
-                    else
+						$StipBezieher->BeendigungsDatum = $datum_obj->formatDatum($abschlusspruefung->datum,'dmY');
+					else
 						$StipBezieher->BeendigungsDatum = null; 
-						
+
 					$StipBezieher->Erfolg = $StipBezieher->getErfolg($prestudentID, $studSemester);
 				}
 				elseif($BezieherStip->Typ =="ag" || $BezieherStip->Typ == "AG")
@@ -184,10 +185,8 @@ function GetStipendienbezieherStip($parameters)
 					$StipBezieher->Studienbeitrag = null; 
 					$StipBezieher->OrgFormTeilCode = null; 
 				}
-				
-				$StipBezieherAntwort[$i] = $StipBezieher; 
+				$StipBezieherAntwort[$i] = $StipBezieher;
 				$i++;
-
 			}
 			else if($StipBezieher->AntwortStatusCode == 2)
 			{
@@ -207,7 +206,6 @@ function GetStipendienbezieherStip($parameters)
 				$StipBezieherAntwort[$i] = $StipBezieher; 
 				$i++;
 			}
-
 		}
 		else
 		{

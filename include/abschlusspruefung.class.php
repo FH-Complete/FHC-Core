@@ -32,7 +32,7 @@ class abschlusspruefung extends basis_db
 
 	//Tabellenspalten
 	public $abschlusspruefung_id;
-	public $student_uid;
+	public $prestudent_id;		//int
 	public $vorsitz;
 	public $pruefer1;
 	public $pruefer2;
@@ -89,7 +89,7 @@ class abschlusspruefung extends basis_db
 			if($row = $this->db_fetch_object())
 			{
 				$this->abschlusspruefung_id = $row->abschlusspruefung_id;
-				$this->student_uid = $row->student_uid;
+				$this->prestudent_id = $row->prestudent_id;
 				$this->vorsitz = $row->vorsitz;
 				$this->pruefer1 = $row->pruefer1;
 				$this->pruefer2 = $row->pruefer2;
@@ -168,9 +168,9 @@ class abschlusspruefung extends basis_db
 			$this->errormsg = 'Pruefungstyp muss eingetragen werden';
 			return false;
 		}
-		if($this->student_uid=='')
+		if(!is_numeric($this->prestudent_id))
 		{
-			$this->errormsg = 'UID muss eingetragen werden';
+			$this->errormsg = 'prestudent_id ist ungueltig';
 			return false;
 		}
 		return true;
@@ -192,11 +192,11 @@ class abschlusspruefung extends basis_db
 		if($new)
 		{
 			//Neuen Datensatz anlegen
-			$qry = "BEGIN;INSERT INTO lehre.tbl_abschlusspruefung (student_uid, vorsitz, pruefer1,
+			$qry = "BEGIN;INSERT INTO lehre.tbl_abschlusspruefung (prestudent_id, vorsitz, pruefer1,
 					pruefer2, pruefer3, abschlussbeurteilung_kurzbz, akadgrad_id, datum, uhrzeit, sponsion,
 					pruefungstyp_kurzbz, anmerkung, updateamum, updatevon, insertamum, insertvon,
 					note) VALUES (".
-						$this->db_add_param($this->student_uid).', '.
+						$this->db_add_param($this->prestudent_id, FHC_INTEGER).', '.
 						$this->db_add_param($this->vorsitz).', '.
 						$this->db_add_param($this->pruefer1).', '.
 						$this->db_add_param($this->pruefer2).', '.
@@ -219,7 +219,7 @@ class abschlusspruefung extends basis_db
 		{
 			//Bestehenden Datensatz aktualisieren
 			$qry= "UPDATE lehre.tbl_abschlusspruefung SET".
-				" student_uid=".$this->db_add_param($this->student_uid).",".
+				" prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER).",".
 				" vorsitz=".$this->db_add_param($this->vorsitz).",".
 				" pruefer1=".$this->db_add_param($this->pruefer1).",".
 				" pruefer2=".$this->db_add_param($this->pruefer2).",".
@@ -276,17 +276,17 @@ class abschlusspruefung extends basis_db
 
 	/**
 	 * Laedt alle Abschlusspruefungen eines Studenten
-	 * @param student_uid UID des Studenten
+	 * @param prestudent_id prestudent_id des Prestudenten
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	public function getAbschlusspruefungen($student_uid)
+	public function getAbschlusspruefungen($prestudent_id)
 	{
 		$qry = "SELECT
 					*
 				FROM
 					lehre.tbl_abschlusspruefung
 					JOIN lehre.tbl_pruefungstyp USING (pruefungstyp_kurzbz)
-				WHERE student_uid=".$this->db_add_param($student_uid, FHC_STRING, false)."
+				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER, false)."
 				ORDER BY datum DESC";
 
 		if($this->db_query($qry))
@@ -296,7 +296,7 @@ class abschlusspruefung extends basis_db
 				$obj = new abschlusspruefung();
 
 				$obj->abschlusspruefung_id = $row->abschlusspruefung_id;
-				$obj->student_uid = $row->student_uid;
+				$obj->prestudent_id = $row->prestudent_id;
 				$obj->vorsitz = $row->vorsitz;
 				$obj->pruefer1 = $row->pruefer1;
 				$obj->pruefer2 = $row->pruefer2;
@@ -330,16 +330,16 @@ class abschlusspruefung extends basis_db
 
 	/**
 	 * Liefert die letzte Abschlussprüfung eines Studenten
-	 * @param type $student_uid
+	 * @param type $prestudent_id
 	 */
-	public function getLastAbschlusspruefung($student_uid)
+	public function getLastAbschlusspruefung($prestudent_id)
 	{
 		$qry = "SELECT
 					*
 				FROM
 					lehre.tbl_abschlusspruefung
 					JOIN lehre.tbl_pruefungstyp USING (pruefungstyp_kurzbz)
-				WHERE student_uid=".$this->db_add_param($student_uid, FHC_STRING, false)."
+				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER, false)."
 				ORDER BY datum DESC LIMIT 1";
 
 		if($this->db_query($qry))
@@ -347,7 +347,7 @@ class abschlusspruefung extends basis_db
 			if($row = $this->db_fetch_object())
 			{
 				$this->abschlusspruefung_id = $row->abschlusspruefung_id;
-				$this->student_uid = $row->student_uid;
+				$this->prestudent_id = $row->prestudent_id;
 				$this->vorsitz = $row->vorsitz;
 				$this->pruefer1 = $row->pruefer1;
 				$this->pruefer2 = $row->pruefer2;

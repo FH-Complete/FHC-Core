@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 // header fuer no cache
 header("Cache-Control: no-cache");
@@ -463,7 +464,7 @@ if($xmlformat=='rdf')
 							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id)  JOIN public.tbl_prestudent USING(prestudent_id) ";
 		if($gruppe_kurzbz!=null)
 			$sql_query.= "JOIN public.tbl_benutzergruppe USING (uid) ";
-		$sql_query.="LEFT JOIN public.tbl_studentlehrverband ON (tbl_studentlehrverband.student_uid=tbl_student.student_uid AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz')";
+		$sql_query.="LEFT JOIN public.tbl_studentlehrverband ON (tbl_studentlehrverband.prestudent_id=tbl_student.prestudent_id AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz')";
 		$sql_query.="WHERE ".$where.' ORDER BY nachname, vorname';
 
 

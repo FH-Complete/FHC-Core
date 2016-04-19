@@ -16,15 +16,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 // ****************************************
 // * Insert/Update/Delete
 // * der Studenten
 // *
-// * Script sorgt fuer den Datenbanzugriff
+// * Script sorgt fuer den Datenbankzugriff
 // * fuer das XUL - Studenten-Modul
 // *
 // ****************************************
@@ -201,7 +202,9 @@ function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranst
 	{
 		$pruefung = new pruefung;
 		$pruefung->new = true;
-		$pruefung->student_uid = $student_uid;
+		if(!$std = new student($_POST['student_uid']))
+			die("Student nicht gefunden");
+		$pruefung->prestudent_id = $std->prestudent_id;
 		$pruefung->lehreinheit_id = $lehreinheit_id;
 		$pruefung->datum = date("Y-m-d");
 
@@ -370,7 +373,9 @@ if(!$error)
 
 							if(count($prestudentobj->result)>0)
 							{
-								if($student_lvb->studentlehrverband_exists($_POST['uid'], $semester_aktuell))
+								$tmpStudent = new student($_POST['uid']);
+
+								if($student_lvb->studentlehrverband_exists($tmpStudent->prestudent_id, $semester_aktuell))
 									$student_lvb->new = false;
 								else
 									$student_lvb->new = true;
@@ -966,8 +971,7 @@ if(!$error)
 								if($return)
 								{
 									$student = new student();
-									$temp_uid = $student->getUid($rolle->prestudent_id);
-									if(!$student->delete_studentLehrverband($temp_uid, $_POST['studiengang_kz'], $rolle->studiensemester_kurzbz, $rolle->ausbildungssemester))
+									if(!$student->delete_studentLehrverband($rolle->prestudent_id, $_POST['studiengang_kz'], $rolle->studiensemester_kurzbz, $rolle->ausbildungssemester))
 									{
 										$return = false;
 										$errormsg = "Fehler beim Löschen der Lehrverbandszuordnung.";
@@ -1120,7 +1124,7 @@ if(!$error)
 
 								$prestudent_temp = new prestudent();
 								$prestudent_temp->getLastStatus($rolle->prestudent_id, "", "Student");
-								if($student->load_studentlehrverband($temp_uid, $prestudent_temp->studiensemester_kurzbz))
+								if($student->load_studentlehrverband($rolle->prestudent_id, $prestudent_temp->studiensemester_kurzbz))
 									$student->new=false;
 								else
 									$student->new=true;
@@ -1246,7 +1250,7 @@ if(!$error)
 
 					if(!$error)
 					{
-						$student->load_studentlehrverband($temp_uid, $_POST["studiensemester_kurzbz"]);
+						$student->load_studentlehrverband($rolle->prestudent_id, $_POST["studiensemester_kurzbz"]);
 						$lehrverband = new lehrverband();
 						if(!$lehrverband->exists($student->studiengang_kz, $semester, $student->verband, $student->gruppe))
 						{
@@ -1699,7 +1703,7 @@ if(!$error)
 								//Eintrag in der Tabelle Studentlehrverband aendern
 								$student_lvb = new student();
 
-								if($student_lvb->studentlehrverband_exists($uid, $semester_aktuell))
+								if($student_lvb->studentlehrverband_exists($student->prestudent_id, $semester_aktuell))
 									$student_lvb->new = false;
 								else
 									$student_lvb->new = true;
@@ -3225,8 +3229,11 @@ if(!$error)
 
 			if(!$error)
 			{
+				if(!$student = new student($_POST['student_uid']))
+					die("Student nicht gefunden");
+
 				$pruefung->lehreinheit_id = $_POST['lehreinheit_id'];
-				$pruefung->student_uid = $_POST['student_uid'];
+				$pruefung->prestudent_id = $student->prestudent_id;
 				$pruefung->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 				$pruefung->note = $_POST['note'];
 				if(isset($_POST['punkte']))
@@ -3385,7 +3392,9 @@ if(!$error)
 				$pruefung->insertvon = $user;
 			}
 
-			$pruefung->student_uid = $_POST['student_uid'];
+			if(!$std = new student($_POST['student_uid']))
+				die("Student nicht gefunden");
+			$pruefung->prestudent_id = $std->prestudent_id;
 			$pruefung->vorsitz = $_POST['vorsitz'];
 			$pruefung->pruefer1 = $_POST['pruefer1'];
 			$pruefung->pruefer2 = $_POST['pruefer2'];

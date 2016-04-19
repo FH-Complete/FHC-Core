@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /*
  * requires moodle_course.class.php
@@ -26,6 +27,7 @@
  * Klasse zur Kommunikation mit Moodle 1.9 
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/student.class.php');
 
 class moodle19_user extends basis_db
 {
@@ -301,13 +303,13 @@ class moodle19_user extends basis_db
 				if($row_std->gruppe_kurzbz=='') //LVB Gruppe
 				{
 					$qry = "SELECT
-								distinct student_uid
+								distinct prestudent_id
 							FROM
 								public.tbl_studentlehrverband
 							WHERE
-								studiensemester_kurzbz='".addslashes($row_std->studiensemester_kurzbz)."' AND
-								studiengang_kz = '".addslashes($row_std->studiengang_kz)."' AND
-								semester = '".addslashes($row_std->semester)."'";
+								studiensemester_kurzbz=".$db->db_add_param($row_std->studiensemester_kurzbz)." AND
+								studiengang_kz = ".$db->db_add_param($row_std->studiengang_kz)." AND
+								semester = ".$db->db_add_param($row_std->semester);
 					if(trim($row_std->verband)!='')
 					{
 						$qry.=" AND verband = '$row_std->verband'";
@@ -327,8 +329,8 @@ class moodle19_user extends basis_db
 							FROM
 								public.tbl_benutzergruppe
 							WHERE
-								gruppe_kurzbz='".addslashes($row_std->gruppe_kurzbz)."' AND
-								studiensemester_kurzbz='".addslashes($row_std->studiensemester_kurzbz)."'";
+								gruppe_kurzbz=".$this->db_add_param($row_std->gruppe_kurzbz)." AND
+								studiensemester_kurzbz=".$this->db_add_param($row_std->studiensemester_kurzbz);
 					$gruppenbezeichnung = $row_std->gruppe_kurzbz;
 				}
 
@@ -336,13 +338,23 @@ class moodle19_user extends basis_db
 				{
 					while($row_user = $this->db_fetch_object($result_user))
 					{
+						if(isset($row_user->prestudent_id))
+						{
+							$student = new student();
+							$uid = $student->getUid($row_user->prestudent_id);
+						}
+						else
+						{
+							$uid = $row_user->student_uid;
+						}
+
 						//MoodleID des Users holen bzw ggf neu anlegen
-						if(!$this->loaduser($row_user->student_uid))
+						if(!$this->loaduser($uid))
 						{
 							//User anlegen
-							if(!$this->createUser($row_user->student_uid))
+							if(!$this->createUser($uid))
 							{
-								$this->errormsg = "Fehler beim Anlegen des Users $row_user->student_uid: $this->errormsg";
+								$this->errormsg = "Fehler beim Anlegen des Users $uid: $this->errormsg";
 								return false;
 							}
 							else 

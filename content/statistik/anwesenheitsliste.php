@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /*
  * Generiert eine Anwesenheitsliste mit Fotos
@@ -95,8 +96,8 @@ else
 			distinct on(person_id) foto, vorname, nachname, person_id, tbl_studentlehrverband.studiengang_kz, tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe
 		FROM 
 			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
-			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid) 
-			LEFT JOIN public.tbl_studentlehrverband USING(student_uid)
+			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
+			LEFT JOIN public.tbl_studentlehrverband USING(prestudent_id)
 		WHERE 
 			lehrveranstaltung_id='".addslashes($lvid)."' AND 
 			vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."' AND

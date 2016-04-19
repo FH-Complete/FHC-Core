@@ -127,7 +127,7 @@ $qry = "SELECT
 					FROM
 						public.tbl_studentlehrverband
 					WHERE
-			        	student_uid=tbl_student.student_uid AND
+			        	prestudent_id=tbl_student.prestudent_id AND
 			        	studiensemester_kurzbz=tbl_prestudentstatus.studiensemester_kurzbz AND
 			        	semester<>0
 			        )
@@ -145,7 +145,7 @@ if($result = $db->db_query($qry))
 		{
 			//Studentlehrverbandeintrag aktualisieren
 			$student = new student();
-			if($student->studentlehrverband_exists($row->student_uid, $row->studiensemester_kurzbz))
+			if($student->studentlehrverband_exists($row->prestudent_id, $row->studiensemester_kurzbz))
 				$student->new = false;
 			else
 			{
@@ -205,13 +205,13 @@ $qry = "SELECT
 			tbl_student.semester as semester_old,
 			tbl_student.verband as verband_old,
 			tbl_student.gruppe as gruppe_old,
-			tbl_studentlehrverband.student_uid,
+			tbl_student.student_uid,
 			tbl_studentlehrverband.studiengang_kz,
 			tbl_studentlehrverband.semester,
 			tbl_studentlehrverband.verband,
 			tbl_studentlehrverband.gruppe
 		FROM
-			public.tbl_student JOIN public.tbl_studentlehrverband USING(student_uid)
+			public.tbl_student JOIN public.tbl_studentlehrverband USING(prestudent_id)
 		WHERE
 			tbl_studentlehrverband.studiensemester_kurzbz=".$db->db_add_param($stsem)." AND
 			(

@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 //PDF fuer die Anwesenheitsliste auf CIS
@@ -125,24 +126,27 @@ $stsem_obj = new studiensemester();
 $stsem_obj->load($stsem);
 $stsemdatumvon = $stsem_obj->start;
 $stsemdatumbis = $stsem_obj->ende;
+
 $qry = "SELECT
 			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, person_id, foto_sperre,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
-			tbl_bisio.bisio_id, tbl_bisio.bis, tbl_bisio.von,
+			tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis,
 			tbl_zeugnisnote.note
 		FROM
-			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
-			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
-			LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
+			campus.vw_student_lehrveranstaltung
+			JOIN public.tbl_benutzer USING(uid)
+			JOIN public.tbl_person USING(person_id)
+			JOIN public.tbl_prestudent ON(public.tbl_prestudent.person_id=public.tbl_person.person_id)
+			LEFT JOIN public.tbl_studentlehrverband ON(public.tbl_prestudent.prestudent_id=public.tbl_studentlehrverband.prestudent_id AND campus.vw_student_lehrveranstaltung.studiensemester_kurzbz=public.tbl_studentlehrverband.studiensemester_kurzbz)
 			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
-			LEFT JOIN bis.tbl_bisio ON public.tbl_student.prestudent_id=tbl_bisio.prestudent_id
+			LEFT JOIN bis.tbl_bisio ON(tbl_student.prestudent_id=tbl_bisio.prestudent_id)
 		WHERE
-			vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND
-			vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."'";
+			vw_student_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid)." AND
+			vw_student_lehrveranstaltung.studiensemester_kurzbz=".$db->db_add_param($stsem);
 
 if($lehreinheit_id!='')
-	$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id='".addslashes($lehreinheit_id)."'";
+	$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id=".$db->db_add_param($lehreinheit_id);
 $qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
 
 $lineheight=80;

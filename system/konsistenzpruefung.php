@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+            Andreas Moik          <moik@technikum-wien.at>.
  */
 /*
  * Prueft die Daten in der Datenbank auf konsistenz und gibt Hinweise
@@ -433,7 +434,7 @@ $qry = "SELECT
 			JOIN public.tbl_benutzer ON(uid=student_uid)
 			JOIN public.tbl_person USING(person_id)
 		WHERE
-			NOT EXISTS(SELECT 1 FROM public.tbl_studentlehrverband WHERE student_uid=tbl_student.student_uid)";
+			NOT EXISTS(SELECT 1 FROM public.tbl_studentlehrverband WHERE prestudent_id=tbl_student.prestudent_id)";
 
 if($result = $db->db_query($qry))
 {
@@ -615,7 +616,7 @@ $qry = "SELECT
 		WHERE
 			tbl_student.studiengang_kz<1000 AND tbl_student.studiengang_kz>0
 			AND EXISTS (SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Absolvent' AND prestudent_id=tbl_student.prestudent_id)
-			AND NOT EXISTS(SELECT 1 FROM lehre.tbl_abschlusspruefung WHERE student_uid=tbl_student.student_uid)";
+			AND NOT EXISTS(SELECT 1 FROM lehre.tbl_abschlusspruefung WHERE prestudent_id=tbl_student.prestudent_id)";
 
 if($result = $db->db_query($qry))
 {

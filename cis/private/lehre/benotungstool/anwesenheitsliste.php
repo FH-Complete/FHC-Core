@@ -226,7 +226,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 								tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitgruppe.lehreinheit_id AND
 								vw_student.uid = tbl_benutzergruppe.uid AND
 								tbl_benutzergruppe.gruppe_kurzbz = tbl_lehreinheitgruppe.gruppe_kurzbz AND
-								vw_student.uid=tbl_studentlehrverband.student_uid AND
+								vw_student.prestudent_id=tbl_studentlehrverband.prestudent_id AND
 								tbl_studentlehrverband.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz
 							UNION
 							SELECT 
@@ -238,7 +238,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 								tbl_lehreinheitgruppe.lehreinheit_id=".$db->db_add_param($lehreinheit_id)." AND
 								tbl_lehreinheitgruppe.studiengang_kz=tbl_studentlehrverband.studiengang_kz AND
 								tbl_lehreinheitgruppe.semester = tbl_studentlehrverband.semester AND
-								tbl_studentlehrverband.student_uid=vw_student.uid AND
+								tbl_studentlehrverband.prestudent_id=vw_student.prestudent_id AND
 								tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitgruppe.lehreinheit_id AND
 								tbl_lehreinheit.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz AND
 							((tbl_lehreinheitgruppe.verband<>'' AND 

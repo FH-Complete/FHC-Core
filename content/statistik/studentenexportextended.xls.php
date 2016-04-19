@@ -17,8 +17,9 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>.
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *          Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Exportiert die Daten von Prestudenten und Studenten in ein Excel File.
@@ -304,9 +305,9 @@ loadVariables($user);
 		$worksheet->write($zeile,$i, $row->stgbez);
 		$i++;
 		
-		$qry = "SELECT tbl_studentlehrverband.semester AS semester_studiensemester, tbl_student.semester AS semester_aktuell,* FROM public.tbl_studentlehrverband JOIN public.tbl_student USING(student_uid) 
-				WHERE prestudent_id='".addslashes($row->prestudent_id)."' 
-				AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		$qry = "SELECT tbl_studentlehrverband.semester AS semester_studiensemester, tbl_student.semester AS semester_aktuell,* FROM public.tbl_studentlehrverband JOIN public.tbl_student USING(prestudent_id)
+				WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)."
+				AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
 		if($db->db_query($qry))
 		{
 			if($row_sem = $db->db_fetch_object())

@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Exportiert eine Liste der Absolventen in ein Excel File.
@@ -87,9 +88,9 @@ if($studiengang_kz!='')
 		
 	// Daten holen
 	$qry = "SELECT DISTINCT nachname, vorname, prestudent_id, public.get_rolle_prestudent(prestudent_id, NULL) AS status, tbl_studentlehrverband.semester FROM 
-				public.tbl_person JOIN public.tbl_prestudent USING(person_id)
-				LEFT JOIN public.tbl_student USING (prestudent_id)
-				LEFT JOIN public.tbl_studentlehrverband USING (student_uid)
+				public.tbl_person
+				JOIN public.tbl_prestudent USING(person_id)
+				LEFT JOIN public.tbl_studentlehrverband USING (prestudent_id)
 			WHERE 
 				prestudent_id IN(
 				SELECT 

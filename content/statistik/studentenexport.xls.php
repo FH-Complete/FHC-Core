@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Exportiert die Studentendaten in ein Excel File.
@@ -355,7 +356,7 @@ loadVariables($user);
 		$worksheet->write($zeile,$i, $row->stgbez);
 		$i++;
 		
-		$qry = "SELECT tbl_studentlehrverband.semester AS semester_studiensemester, tbl_student.semester AS semester_aktuell,* FROM public.tbl_studentlehrverband JOIN public.tbl_student USING(student_uid) WHERE prestudent_id='$row->prestudent_id' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		$qry = "SELECT tbl_studentlehrverband.semester AS semester_studiensemester, tbl_student.semester AS semester_aktuell,* FROM public.tbl_studentlehrverband JOIN public.tbl_student USING(prestudent_id) WHERE prestudent_id='$row->prestudent_id' AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
 		if($result_sem = $db->db_query($qry))
 		{
 			if($row_sem = $db->db_fetch_object($result_sem))
