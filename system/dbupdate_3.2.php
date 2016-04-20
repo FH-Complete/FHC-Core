@@ -1129,31 +1129,14 @@ if (!$result = @$db->db_query("SELECT pruefungstyp_kurzbz FROM campus.tbl_pruefu
 // Neue Spalte bezeichnung_mehrsprachig bei tbl_status
 if(!@$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_status LIMIT 1"))
 {
-	$qry = " ALTER TABLE public.tbl_status ADD COLUMN bezeichnung_mehrsprachig varchar(32)[];
-             
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Abbrecher\",\"Abbrecher\",\"Abbrecher\",\"Abbrecher\"}' where status_kurzbz = 'Abbrecher';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Abgewiesener\",\"Abgewiesener\",\"Abgewiesener\",\"Abgewiesener\"}' where status_kurzbz = 'Abgewiesener';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Absolvent\",\"Absolvent\",\"Absolvent\",\"Absolvent\"}' where status_kurzbz = 'Absolvent';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Aufgenommener\",\"Aufgenommener\",\"Aufgenommener\",\"Aufgenommener\"}' where status_kurzbz = 'Aufgenommener';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Ausserordentlicher\",\"Ausserordentlicher\",\"Ausserordentlicher\",\"Ausserordentlicher\"}' where status_kurzbz = 'Ausserordentlicher';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Bewerber\",\"Bewerber\",\"Bewerber\",\"Bewerber\"}' where status_kurzbz = 'Bewerber';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Diplomand\",\"Diplomand\",\"Diplomand\",\"Diplomand\"}' where status_kurzbz = 'Diplomand';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Incoming\",\"Incoming\",\"Incoming\",\"Incoming\"}' where status_kurzbz = 'Incoming';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Interessent\",\"Interessent\",\"Interessent\",\"Interessent\"}' where status_kurzbz = 'Interessent';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Outgoing\",\"Outgoing\",\"Outgoing\",\"Outgoing\"}' where status_kurzbz = 'Outgoing';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Praktikant\",\"Praktikant\",\"Praktikant\",\"Praktikant\"}' where status_kurzbz = 'Praktikant';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Student\",\"Student\",\"Student\",\"Student\"}' where status_kurzbz = 'Student';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Unterbrecher\",\"Unterbrecher\",\"Unterbrecher\",\"Unterbrecher\"}' where status_kurzbz = 'Unterbrecher';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"VertragErhalten\",\"VertragErhalten\",\"VertragErhalten\",\"VertragErhalten\"}' where status_kurzbz = 'VertragErhalten';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Vertragsausfertigung\",\"Vertragsausfertigung\",\"Vertragsausfertigung\",\"Vertragsausfertigung\"}' where status_kurzbz = 'Vertragsausfertigung';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"VertragVersendet\",\"VertragVersendet\",\"VertragVersendet\",\"VertragVersendet\"}' where status_kurzbz = 'VertragVersendet';
-             UPDATE public.tbl_status SET bezeichnung_mehrsprachig = '{\"Wartender\",\"Wartender\",\"Wartender\",\"Wartender\"}' where status_kurzbz = 'Wartender';";
-    
+	$qry = " ALTER TABLE public.tbl_status ADD COLUMN bezeichnung_mehrsprachig varchar(255)[];
+			update tbl_status set bezeichnung_mehrsprachig = cast('{'||status_kurzbz||','||status_kurzbz||'}' as varchar[]);";
+
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_status '.$db->db_last_error().'</strong><br>';
 	else
-		echo '<br>Spalte bezeichnung_mehrsprachig in public.tbl_status hinzugefügt';
+		echo '<br>Spalte bezeichnung_mehrsprachig in public.tbl_status hinzugefügt<br>Die ersten beiden Sprachen wurden vorbefüllt. Weitere Übersetzungen sind zu ergänzen!<br>';
 }
 
 

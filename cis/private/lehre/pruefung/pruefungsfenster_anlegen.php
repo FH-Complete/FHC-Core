@@ -2,22 +2,22 @@
 <?php
 /*
  * Copyright 2014 fhcomplete.org
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
+ *
  *
  * Authors: Stefan Puraner	<puraner@technikum-wien.at>
  */
@@ -29,6 +29,14 @@ require_once('../../../../include/organisationseinheit.class.php');
 require_once('../../../../include/studiensemester.class.php');
 require_once('../../../../include/datum.class.php');
 require_once('../../../../include/pruefungsfenster.class.php');
+require_once('../../../../include/phrasen.class.php');
+require_once('../../../../include/globals.inc.php');
+require_once('../../../../include/sprache.class.php');
+
+$sprache = getSprache();
+$lang = new sprache();
+$lang->load($sprache);
+$p = new phrasen($sprache);
 
 $uid = get_uid();
 $db = new basis_db();
@@ -42,7 +50,7 @@ function compareOe($a, $b)
 {
     if($a->organisationseinheittyp_kurzbz == $b->organisationseinheittyp_kurzbz)
         return 0;
-    
+
     return ($a->organisationseinheittyp_kurzbz < $b->organisationseinheittyp_kurzbz) ? -1 : 1;
 }
 
@@ -50,7 +58,7 @@ function compareOe($a, $b)
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Prüfungsfenster anlegen</title>
+        <title><?php echo $p->t('pruefung/titlePruefungsfenster') ?></title>
         <script src="../../../../include/js/datecheck.js"></script>
         <script src="../../../../include/js/jquery1.9.min.js"></script>
         <link rel="stylesheet" href="../../../../skin/jquery-ui-1.9.2.custom.min.css">
@@ -83,7 +91,7 @@ $oe = $rechte->getOEkurzbz("lehre/pruefungsfenster");
 $studiensemester = new studiensemester();
 $studiensemester->getAll();
 
-if (isset($_POST["method"]) && $_POST["method"] == "save") 
+if (isset($_POST["method"]) && $_POST["method"] == "save")
 {
     $method = $_POST["method"];
     $studiensemester_selected = (isset($_POST["studiensemester"]) ? $_POST["studiensemester"] : "");
@@ -107,30 +115,30 @@ if (isset($_POST["method"]) && $_POST["method"] == "save")
                     $pruefungsfenster->ende = $endDate;
                     if ($pruefungsfenster->save())
                     {
-                        echo "Datensatz erfolgreich gespeichert";
+                        echo $p->t('pruefung/erfolgreichgespeichert');
                     }
                     else {
-                        echo "Fehler: ".$pruefungsfenster->errormsg;
+                        echo $p->t('pruefung/fehler').$pruefungsfenster->errormsg;
                     }
-//                } 
-//                else 
+//                }
+//                else
 //                {
 //                    echo "Fehler: Startdatum liegt in der Vergangenheit.";
 //                }
-            } 
+            }
             else
             {
-                echo "Fehler: Enddatum liegt in der Vergangenheit.";
+                echo $p->t('pruefung/fehlerEndDatumInDerVergangenheit');
             }
-        } 
-        else 
-        {
-            echo "Fehler: Enddatum liegt nicht nach dem Startdatum.";
         }
-    } 
-    else 
+        else
+        {
+            echo $p->t('pruefung/fehlerEndDatumVorStartDatum');
+        }
+    }
+    else
     {
-        echo "Fehler: Datumseingabe nicht korrekt.";
+        echo $p->t('pruefung/fehlerDatumNichtKorrekt');
     }
 }
 else if(isset($_POST["method"]) && $_POST["method"] == "update")
@@ -151,44 +159,44 @@ else if(isset($_POST["method"]) && $_POST["method"] == "update")
 	            	$pruefungsfenster_id = $_POST["id"];
 	            	$pruefungsfenster = new pruefungsfenster();
 	            	$pruefungsfenster->load($pruefungsfenster_id);
-	            	
+
                     if(in_array($pruefungsfenster->oe_kurzbz, $oe))
-                    {                        
+                    {
                         $pruefungsfenster->studiensemester_kurzbz = $studiensemester_selected;
                         $pruefungsfenster->oe_kurzbz = $oe_kurzbz;
                         $pruefungsfenster->start = $startDate;
                         $pruefungsfenster->ende = $endDate;
                         if ($pruefungsfenster->save())
                         {
-                            echo "Datensatz erfolgreich geändert.";
+                            echo $p->t('pruefung/erfolgreichgeaendert');
                         }
                         else {
-                            echo "Fehler: ".$pruefungsfenster->errormsg;
+                            echo $p->t('pruefung/fehler').$pruefungsfenster->errormsg;
                         }
                     }
                     else
                     {
-                        echo "Keine Berechtigung zum Ändern dieses Datensatzes.";
+                        echo $p->t('pruefung/keineBerechtigungZumAendernDesDatensatzes');
                     }
-//                } 
-//                else 
+//                }
+//                else
 //                {
 //                    echo "Fehler: Startdatum liegt in der Vergangenheit.";
 //                }
-            } 
+            }
             else
             {
-                echo "Fehler: Enddatum liegt in der Vergangenheit.";
+                echo $p->t('pruefung/fehlerEndDatumInDerVergangenheit');
             }
-        } 
-        else 
-        {
-            echo "Fehler: Enddatum liegt nicht nach dem Startdatum.";
         }
-    } 
-    else 
+        else
+        {
+            echo $p->t('pruefung/fehlerEndDatumVorStartDatum');
+        }
+    }
+    else
     {
-        echo "Fehler: Datumseingabe nicht korrekt.";
+        echo $p->t('pruefung/fehlerDatumNichtKorrekt');
     }
 }
 else if(isset($_GET["id"]) && $_GET["id"]!= null && isset($_GET["method"]) && $_GET["method"]=="update")
@@ -198,41 +206,41 @@ else if(isset($_GET["id"]) && $_GET["id"]!= null && isset($_GET["method"]) && $_
     $pruefungsfenster->load($pruefungsfenster_id);
     if(!in_array($pruefungsfenster->oe_kurzbz, $oe))
     {
-        echo "Keine Berechtigung zum Anzeigen dieses Datensatzes.";
+        echo $p->t('pruefung/keineBerechtigungZumAnzeigenDesDatensatzes');
         $pruefungsfenster = new pruefungsfenster();
     }
     $method = $_GET["method"];
-} 
+}
 else if(isset($_GET["id"]) && $_GET["id"]!= null && isset($_GET["method"]) && $_GET["method"]=="delete")
-{   
+{
     $pruefungsfenster_id = $_GET["id"];
     $pruefungsfenster = new pruefungsfenster();
     $pruefungsfenster->load($pruefungsfenster_id);
-    
+
     if(in_array($pruefungsfenster->oe_kurzbz, $oe))
     {
         if(!$pruefungsfenster->hasPruefungen($pruefungsfenster_id) && $pruefungsfenster->errormsg === null)
         {
-            
+
             if($pruefungsfenster->delete($pruefungsfenster_id))
             {
-                echo "Datensatz erfolgreich gelöscht.";
-            } 
+                echo $p->t('pruefung/erfolgreichgeloescht');
+            }
             else
             {
                 echo "Fehler: ".$pruefungsfenster->errormsg;
             }
-            
+
         }
         else
         {
-            echo "Prüfungsfenster konnte nicht gelöscht werden, da Prüfungen verknüpft sind.";
+            echo $p->t('pruefung/pruefungsfensterKonnteNichtGeloeschtWerdenDaPruefungen');
         }
         $method = $_GET["method"];
     }
     else
     {
-        echo "Keine Berechtigung zum Löschen dieses Datensatzes.";
+        echo $p->t('pruefung/keineBerechtigungZumLoeschenDesDatensatzes');
     }
 }
 
@@ -240,9 +248,9 @@ $prfFenster = new pruefungsfenster();
 $prfFenster->getAll("start");
 if($method != "update")
 {
-?>        
-        <h1>Prüfungsfenster-Verwaltung</h1>
-        <h2>Neues Prüfungsfenster anlegen</h2>
+?>
+        <h1><?php echo $p->t('pruefung/pruefungsfensterVerwaltung'); ?></h1>
+        <h2><?php echo $p->t('pruefung/neuesPruefungsfensterAnlegen'); ?></h2>
         <div>
             <form method="POST" action="pruefungsfenster_anlegen.php">
                 <table>
@@ -250,12 +258,12 @@ if($method != "update")
                         <td><input type="hidden" name="method" value="save"></td>
                     </tr>
                     <tr>
-                        <td>Studiensemester: </td>
+                        <td><?php echo $p->t('global/studiensemester'); ?>: </td>
                         <td>
                             <select id="studiensemester" name="studiensemester">
                                 <?php
                                 $aktuellesSemester = $studiensemester->getSemesterFromDatum(date("Y-m-d"));
-                                foreach ($studiensemester->studiensemester as $result) 
+                                foreach ($studiensemester->studiensemester as $result)
                                 {
                                     if($aktuellesSemester == $result->studiensemester_kurzbz)
                                     {
@@ -271,23 +279,23 @@ if($method != "update")
                         </td>
                     </tr>
                     <tr>
-                        <td>Organisationseinheit: </td>
+                        <td><?php echo $p->t('global/organisationseinheit'); ?>: </td>
                         <td>
                             <select id="oe_kurzbz" name="oe_kurzbz">
                                 <?php
-                                
+
                                 $oe_array = array();
-                                
-                                foreach ($oe as $result) 
+
+                                foreach ($oe as $result)
                                 {
                                     $organisationseinheit = new organisationseinheit();
                                     $organisationseinheit->load($result);
                                     array_push($oe_array, $organisationseinheit);
                                 }
-                                
+
                                 usort($oe_array, "compareOe");
-                                
-                                foreach ($oe_array as $result) 
+
+                                foreach ($oe_array as $result)
                                 {
                                     echo '<option value="'.$result->oe_kurzbz.'">'.$result->organisationseinheittyp_kurzbz.' '.$result->bezeichnung.'</option>';
                                 }
@@ -296,15 +304,15 @@ if($method != "update")
                         </td>
                     </tr>
                     <tr>
-                        <td>Start: </td>
+                        <td><?php echo $p->t('pruefung/start'); ?>: </td>
                         <td><input type="text" id="startDate" name="startDate"></td>
                     </tr>
                     <tr>
-                        <td>Ende: </td>
+                        <td><?php echo $p->t('pruefung/ende'); ?>: </td>
                         <td><input type="text" id="endDate" name="endDate"></td>
                     </tr>
                     <tr>
-                        <td><input type="submit" value="speichern"></td>
+                        <td><input type="submit" value="<?php echo $p->t('global/speichern'); ?>"></td>
                     </tr>
                 </table>
             </form>
@@ -314,8 +322,8 @@ if($method != "update")
 else
 {
     ?>
-    <h1>Prüfungsfenster-Verwaltung</h1>
-    <h2>Prüfungsfenster bearbeiten</h2>
+    <h1><?php echo $p->t('pruefung/pruefungsfensterVerwaltung'); ?></h1>
+    <h2><?php echo $p->t('pruefung/pruefungsfensterBearbeiten'); ?></h2>
         <div>
             <form method="POST" action="pruefungsfenster_anlegen.php">
                 <table>
@@ -326,11 +334,11 @@ else
                         <td><input type="hidden" name="id" value="<?php echo $pruefungsfenster->pruefungsfenster_id; ?>"></td>
                     </tr>
                     <tr>
-                        <td>Studiensemester: </td>
+                        <td><?php echo $p->t('global/studiensemester'); ?>: </td>
                         <td>
                             <select id="studiensemester" name="studiensemester">
                                 <?php
-                                foreach ($studiensemester->studiensemester as $result) 
+                                foreach ($studiensemester->studiensemester as $result)
                                 {
                                     if($result->studiensemester_kurzbz == $pruefungsfenster->studiensemester_kurzbz)
                                     {
@@ -346,11 +354,11 @@ else
                         </td>
                     </tr>
                     <tr>
-                        <td>Organisationseinheit: </td>
+                        <td><?php echo $p->t('global/organisationseinheit'); ?>: </td>
                         <td>
                             <select id="oe_kurzbz" name="oe_kurzbz">
                                 <?php
-                                foreach ($oe as $result) 
+                                foreach ($oe as $result)
                                 {
                                     if($result == $pruefungsfenster->oe_kurzbz)
                                     {
@@ -366,16 +374,16 @@ else
                         </td>
                     </tr>
                     <tr>
-                        <td>Start: </td>
+                        <td><?php echo $p->t('pruefung/start'); ?>: </td>
                         <td><input type="text" id="startDate" name="startDate" value="<?php echo $pruefungsfenster->start; ?>"></td>
                     </tr>
                     <tr>
-                        <td>Ende: </td>
+                        <td><?php echo $p->t('pruefung/ende'); ?>: </td>
                         <td><input type="text" id="endDate" name="endDate" value="<?php echo $pruefungsfenster->ende; ?>"></td>
                     </tr>
                     <tr>
-                        <td><input type="submit" value="Speichern"></td>
-                        <td><a href="pruefungsfenster_anlegen.php"><input type="button" value="Abbrechen"></a></td>
+                        <td><input type="submit" value="<?php echo $p->t('global/speichern'); ?>"></td>
+                        <td><a href="pruefungsfenster_anlegen.php"><input type="button" value="<?php echo $p->t('global/abbrechen'); ?>"></a></td>
                     </tr>
                 </table>
             </form>
@@ -390,21 +398,21 @@ else
  if((isset($_GET["id"]) && $method!="update") || !isset($_GET["id"]))
  {
         ?>
-    <h2>Prüfungsfenster bearbeiten</h2>
+    <h2><?php echo $p->t('pruefung/pruefungsfensterBearbeiten'); ?></h2>
         <div style="width: 50%;">
-            <?php                    
+            <?php
                 if(!empty($prfFenster->result)){
-            
+
             ?>
             <table class="tablesorter" id="prfTable">
                 <thead>
                     <tr>
-                        <th>Studiensemester</th>
-                        <th>Organisationseinheit</th>
-                        <th>Startdatum</th>
-                        <th>Enddatum</th>
-                        <th>Bearbeiten</th>
-                        <th>Löschen</th>
+                        <th><?php echo $p->t('global/studiensemester'); ?></th>
+                        <th><?php echo $p->t('global/organisationseinheit'); ?></th>
+                        <th><?php echo $p->t('pruefung/start'); ?></th>
+                        <th><?php echo $p->t('pruefung/ende'); ?></th>
+                        <th><?php echo $p->t('global/bearbeiten'); ?></th>
+                        <th><?php echo $p->t('global/loeschen'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -415,14 +423,14 @@ else
                             if(in_array($result->oe_kurzbz, $oe))
                             {
                                 $organisationseinheit->load($result->oe_kurzbz);
-                                echo 
+                                echo
                                 '<tr>
                                     <td>'.$result->studiensemester_kurzbz.'</td>
                                     <td>'.$organisationseinheit->organisationseinheittyp_kurzbz." ".$organisationseinheit->bezeichnung.'</td>
                                     <td>'.$result->start.'</td>
                                     <td>'.$result->ende.'</td>
-                                    <td><a href="pruefungsfenster_anlegen.php?method=update&id='.$result->pruefungsfenster_id.'">bearbeiten</a></td>
-                                    <td><a href="pruefungsfenster_anlegen.php?method=delete&id='.$result->pruefungsfenster_id.'">löschen</a></td>
+                                    <td><a href="pruefungsfenster_anlegen.php?method=update&id='.$result->pruefungsfenster_id.'">'.$p->t('global/bearbeiten').'</a></td>
+                                    <td><a href="pruefungsfenster_anlegen.php?method=delete&id='.$result->pruefungsfenster_id.'">'. $p->t('global/loeschen').'</a></td>
                                 </tr>';
                             }
                         }
@@ -433,14 +441,14 @@ else
                 }
                 else
                 {
-                    echo 
+                    echo
                     '<tr>
-                        <td>Keine Prüfungsfenster gespeichert.</td>
+                        <td>'.$p->t('pruefung/keinePruefungsfensterGespeichert').'</td>
                     </tr>';
                 }
             ?>
         </div>
-<?php 
+<?php
     }
 ?>
     </body>
