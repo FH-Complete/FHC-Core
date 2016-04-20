@@ -253,7 +253,7 @@ else if($_POST["action"] == "Starten")
 					lehre.tbl_lehrveranstaltung
 				WHERE tbl_lehreinheitgruppe.gruppe_kurzbz::text = tbl_benutzergruppe.gruppe_kurzbz::text AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id AND tbl_lehreinheit.studiensemester_kurzbz::text = tbl_benutzergruppe.studiensemester_kurzbz::text
 					UNION
-					SELECT tbl_studentlehrverband.prestudent_id AS prestudent_id,
+					SELECT tbl_studentlehrverband.prestudent_id,
 					tbl_lehrveranstaltung.zeugnis,
 					tbl_lehrveranstaltung.sort,
 					tbl_lehrveranstaltung.lehrveranstaltung_id,
