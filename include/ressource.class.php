@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Karl Burkhart <burkhart@technikum-wien.at>.
+ * Authors: Karl Burkhart <burkhart@technikum-wien.at> and
+ *          Andreas Moik  <moik@technikum-wien.at>.
  */
 
 require_once(dirname(__FILE__).'/basis_db.class.php');
@@ -30,7 +31,7 @@ class ressource extends basis_db
 	public $bezeichnung;	    //string
 	public $beschreibung;	    //string
 	public $mitarbeiter_uid;	//string
-	public $student_uid;	    //string
+	public $uid;              //string
 	public $betriebsmittel_id;	//integer
 	public $firma_id;		    //integer
 	public $insertamum;	   	 	//timestamp
@@ -80,7 +81,7 @@ class ressource extends basis_db
 				$this->bezeichnung = $row->bezeichnung;
 				$this->beschreibung = $row->beschreibung;
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
-				$this->student_uid = $row->student_uid;
+				$this->uid = $row->uid;
 				$this->betriebsmittel_id = $row->betriebsmittel_id;
 				$this->firma_id = $row->firma_id;
 				$this->insertamum = $row->insertamum;
@@ -124,7 +125,7 @@ class ressource extends basis_db
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beschreibung = $row->beschreibung;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
-				$obj->student_uid = $row->student_uid;
+				$obj->uid = $row->uid;
 				$obj->betriebsmittel_id = $row->betriebsmittel_id;
 				$obj->firma_id = $row->firma_id;
 				$obj->insertamum = $row->insertamum;
@@ -167,7 +168,7 @@ class ressource extends basis_db
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beschreibung = $row->beschreibung;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
-				$obj->student_uid = $row->student_uid;
+				$obj->uid = $row->uid;
 				$obj->betriebsmittel_id = $row->betriebsmittel_id;
 				$obj->firma_id = $row->firma_id;
 				$obj->insertamum = $row->insertamum;
@@ -249,7 +250,7 @@ class ressource extends basis_db
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beschreibung = $row->beschreibung;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
-				$obj->student_uid = $row->student_uid;
+				$obj->uid = $row->uid;
 				$obj->betriebsmittel_id = $row->betriebsmittel_id;
 				$obj->firma_id = $row->firma_id;
 				$obj->insertamum = $row->insertamum;
@@ -360,11 +361,11 @@ class ressource extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN; INSERT INTO fue.tbl_ressource (bezeichnung, beschreibung,
-				mitarbeiter_uid, student_uid, betriebsmittel_id, firma_id, insertvon, insertamum, updatevon, updateamum) VALUES ('.
+				mitarbeiter_uid, uid, betriebsmittel_id, firma_id, insertvon, insertamum, updatevon, updateamum) VALUES ('.
 			     $this->db_add_param($this->bezeichnung).', '.
 				 $this->db_add_param($this->beschreibung).', '.
 			     $this->db_add_param($this->mitarbeiter_uid).', '.
-			     $this->db_add_param($this->student_uid).', '.
+			     $this->db_add_param($this->uid).', '.
 			     $this->db_add_param($this->betriebsmittel_id, FHC_INTEGER).', '.
 			     $this->db_add_param($this->firma_id, FHC_INTEGER).', '.
 			     $this->db_add_param($this->insertvon).', now(), '.
@@ -377,7 +378,7 @@ class ressource extends basis_db
 				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
 				'beschreibung='.$this->db_add_param($this->beschreibung).', '.
 				'mitarbeiter_uid='.$this->db_add_param($this->mitarbeiter_uid).', '.
-				'student_uid='.$this->db_add_param($this->student_uid).', '.
+				'uid='.$this->db_add_param($this->uid).', '.
 				'betriebsmittel_id='.$this->db_add_param($this->betriebsmittel_id, FHC_INTEGER).', '.
 				'firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).', '.
 				'updateamum= now(), '.
@@ -476,7 +477,7 @@ class ressource extends basis_db
 		SELECT
 			distinct
 			tbl_projekt_ressource.*, tbl_projekt.beginn as start, tbl_projekt.ende,
-			tbl_ressource.student_uid, tbl_ressource.mitarbeiter_uid, tbl_ressource.betriebsmittel_id, tbl_ressource.firma_id,
+			tbl_ressource.uid, tbl_ressource.mitarbeiter_uid, tbl_ressource.betriebsmittel_id, tbl_ressource.firma_id,
 			tbl_ressource.bezeichnung, tbl_ressource.beschreibung
 		FROM
 			fue.tbl_ressource
@@ -499,7 +500,7 @@ class ressource extends basis_db
 				$obj->ende = $row->ende;
 
 				$obj->ressource_id = $row->ressource_id;
-				$obj->student_uid = $row->student_uid;
+				$obj->uid = $row->uid;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->betriebsmittel_id = $row->betriebsmittel_id;
 				$obj->firma_id = $row->firma_id;
@@ -523,7 +524,7 @@ class ressource extends basis_db
 		SELECT
 			distinct
 			tbl_projekt_ressource.*, tbl_projektphase.start, tbl_projektphase.ende,
-			tbl_ressource.student_uid, tbl_ressource.mitarbeiter_uid, tbl_ressource.betriebsmittel_id, tbl_ressource.firma_id,
+			tbl_ressource.uid, tbl_ressource.mitarbeiter_uid, tbl_ressource.betriebsmittel_id, tbl_ressource.firma_id,
 			tbl_ressource.bezeichnung, tbl_ressource.beschreibung
 		FROM
 			fue.tbl_ressource
@@ -551,7 +552,7 @@ class ressource extends basis_db
 				$obj->ende = $row->ende;
 
 				$obj->ressource_id = $row->ressource_id;
-				$obj->student_uid = $row->student_uid;
+				$obj->uid = $row->uid;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->betriebsmittel_id = $row->betriebsmittel_id;
 				$obj->firma_id = $row->firma_id;
@@ -582,7 +583,7 @@ class ressource extends basis_db
 		SELECT
 		distinct
 		tbl_projekttask.*, tbl_projektphase.start, tbl_projekttask.ende,
-		tbl_ressource.student_uid, tbl_ressource.mitarbeiter_uid, tbl_ressource.betriebsmittel_id, tbl_ressource.firma_id,
+		tbl_ressource.uid, tbl_ressource.mitarbeiter_uid, tbl_ressource.betriebsmittel_id, tbl_ressource.firma_id,
 		tbl_ressource.bezeichnung, tbl_ressource.beschreibung
 		FROM
 		fue.tbl_ressource
@@ -611,7 +612,7 @@ class ressource extends basis_db
 				$obj->ende = $row->ende;
 
 				$obj->ressource_id = $row->ressource_id;
-				$obj->student_uid = $row->student_uid;
+				$obj->uid = $row->uid;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->betriebsmittel_id = $row->betriebsmittel_id;
 				$obj->firma_id = $row->firma_id;

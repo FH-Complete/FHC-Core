@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
- *          Karl Burkhart <burkhart@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Karl Burkhart <burkhart@technikum-wien.at> and
+ *          Andreas Moik  <moik@technikum-wien.at>.
  */
 /**
  * DMS Dokumenten Management System
@@ -1174,7 +1175,7 @@ class dms extends basis_db
 									fue.tbl_ressource
 									JOIN fue.tbl_projekt_ressource USING(ressource_id)
 								WHERE
-									(tbl_ressource.student_uid=".$this->db_add_param($user)."
+									(tbl_ressource.uid=".$this->db_add_param($user)."
 									 OR tbl_ressource.mitarbeiter_uid=".$this->db_add_param($user).")
 									 AND 
 									 (projekt_kurzbz=".$this->db_add_param($row->projekt_kurzbz)."
@@ -1199,7 +1200,7 @@ class dms extends basis_db
 									fue.tbl_ressource
 									JOIN fue.tbl_projekt_ressource USING(ressource_id)
 								WHERE
-									(tbl_ressource.student_uid=".$this->db_add_param($user)."
+									(tbl_ressource.uid=".$this->db_add_param($user)."
 									 OR tbl_ressource.mitarbeiter_uid=".$this->db_add_param($user).")
 									AND
 									 (

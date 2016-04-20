@@ -16,15 +16,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Karl Burkhart <burkhart@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Karl Burkhart <burkhart@technikum-wien.at> and
+ *          Andreas Moik  <moik@technikum-wien.at>.
  */
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 
-require_once('../config/vilesci.config.inc.php'); 
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/ressource.class.php');
 require_once('../include/datum.class.php');
@@ -71,7 +72,7 @@ function saveRessource($username, $passwort, $ressource)
 	$ressourceNew->bezeichnung=$ressource->bezeichnung;
 	$ressourceNew->beschreibung=$ressource->beschreibung;
 	$ressourceNew->mitarbeiter_uid = $ressource->mitarbeiter_uid;
-	$ressourceNew->student_uid = $ressource->student_uid;
+	$ressourceNew->uid = $ressource->student_uid;
 	$ressourceNew->betriebsmittel_id = $ressource->betriebsmittel_id;
 	$ressourceNew->firma_id = $ressource->firma_id;
 	$ressourceNew->updatevon = $user;

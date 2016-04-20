@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Karl Burkhart <burkhart@technikum-wien.at>.
+ * Authors: Karl Burkhart <burkhart@technikum-wien.at> and
+ *          Andreas Moik  <moik@technikum-wien.at>.
  */
 
 $projekt_kurzbz=(isset($_GET['projekt_kurzbz'])?$_GET['projekt_kurzbz']:null);
@@ -175,9 +176,9 @@ function draw_ressource($ressource)
 		$typ ='Mitarbeiter';
 	}
 	// Ressource ist ein Student
-	if($ressource->student_uid != '')
+	if($ressource->uid != '')
 	{
-		$qry = "SELECT vorname, nachname from campus.vw_student where uid='".addslashes($ressource->student_uid)."'";
+		$qry = "SELECT vorname, nachname from campus.vw_student where uid='".addslashes($ressource->uid)."'";
 		if($db->db_query($qry))
 		{
 			if($row = $db->db_fetch_object())
@@ -235,7 +236,7 @@ function draw_ressource($ressource)
 		<RESSOURCE:typ><![CDATA['.$typ.']]></RESSOURCE:typ>
 		<RESSOURCE:beschreibung><![CDATA['.$ressource->beschreibung.']]></RESSOURCE:beschreibung>
 		<RESSOURCE:mitarbeiter_uid><![CDATA['.$ressource->mitarbeiter_uid.']]></RESSOURCE:mitarbeiter_uid>
-		<RESSOURCE:student_uid><![CDATA['.$ressource->student_uid.']]></RESSOURCE:student_uid>
+		<RESSOURCE:student_uid><![CDATA['.$ressource->uid.']]></RESSOURCE:student_uid>
 		<RESSOURCE:betriebsmittel_id><![CDATA['.$ressource->betriebsmittel_id.']]></RESSOURCE:betriebsmittel_id>
 		<RESSOURCE:firma_id><![CDATA['.$ressource->firma_id.']]></RESSOURCE:firma_id>
 		<RESSOURCE:insertamum><![CDATA['.$ressource->insertamum.']]></RESSOURCE:insertamum>
