@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik  <moik@technikum-wien.at>.
  */
 /* Erstellt einen Lehrauftrag im PDF Format
  *
@@ -132,7 +133,7 @@ if($uid==null)
 			        WHERE 
 			        	tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND
 						tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
-						student_uid=vw_student.uid AND
+						prestudent_id=vw_student.prestudent_id AND
 						tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid AND
 						tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
 						tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($ss)." AND
@@ -349,7 +350,7 @@ function drawLehrauftrag($uid)
 	        FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehrveranstaltung, public.tbl_fachbereich,
 	               public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student 
 	        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid=".$db->db_add_param($uid)." AND 
-	              tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND student_uid=vw_student.uid AND tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz
+	              tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND prestudent_id=vw_student.prestudent_id AND tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz
 	              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND
 	              tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($ss)." AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id ";
 	if($studiengang_kz!='')

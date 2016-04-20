@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Karl Burkhart <karl.burkhart@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Karl Burkhart <karl.burkhart@technikum-wien.at> and
+ *          Andreas Moik 	<moik@technikum-wien.at>.
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
@@ -89,7 +90,8 @@ $sql_query = "
 		campus.tbl_paabgabe 
 		JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
 		JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id)
-		JOIN public.tbl_benutzer bn_student ON(tbl_projektarbeit.student_uid=bn_student.uid)
+		JOIN public.tbl_prestudent ON(tbl_projektarbeit.prestudent_id = tbl_projektarbeit.prestudent_id)
+		JOIN public.tbl_benutzer bn_student ON(tbl_prestudent.person_id=bn_student.person_id)
 		JOIN public.tbl_person person_student ON(bn_student.person_id=person_student.person_id)
 		JOIN lehre.tbl_lehreinheit ON(tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id)
 		JOIN lehre.tbl_lehrveranstaltung ON(tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)

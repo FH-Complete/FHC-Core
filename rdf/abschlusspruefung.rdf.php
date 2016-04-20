@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik  <moik@technikum-wien.at>.
  */
 // header für no cache
 header("Cache-Control: no-cache");
@@ -112,7 +113,7 @@ if($db->db_query($qry))
 			if($row_rek = $db->db_fetch_object())
 				$rektor = $row_rek->titelpre.' '.$row_rek->vorname.' '.$row_rek->nachname.' '.$row_rek->titelpost;
 		$qry = "SELECT * FROM (SELECT titel as themenbereich, ende, projektarbeit_id, note, beginn FROM lehre.tbl_projektarbeit a
-							WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom' OR projekttyp_kurzbz='Master' OR projekttyp_kurzbz='Dissertation' OR projekttyp_kurzbz='Lizenziat' OR projekttyp_kurzbz='Magister')
+							WHERE prestudent_id='$student->prestudent_id' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom' OR projekttyp_kurzbz='Master' OR projekttyp_kurzbz='Dissertation' OR projekttyp_kurzbz='Lizenziat' OR projekttyp_kurzbz='Magister')
 							ORDER BY beginn DESC, projektarbeit_id ASC LIMIT 2) as a ORDER BY beginn asc";
 		$themenbereich='';
 		$datum_projekt='';

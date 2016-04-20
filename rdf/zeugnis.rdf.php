@@ -241,7 +241,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 		$obj->getZeugnisnoten($lehrveranstaltung_id=null, $prestudent_id_arr[$i], $studiensemester_kurzbz);
 
-        $ects_gesamt = 0;
+		$ects_gesamt = 0;
 		foreach ($obj->result as $row)
 		{
 			if($row->zeugnis)

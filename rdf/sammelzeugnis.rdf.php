@@ -30,6 +30,7 @@ require_once('../include/note.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/prestudent.class.php');
+require_once('../include/student.class.php');
 require_once('../include/projektarbeit.class.php');
 
 $db = new basis_db(); 
@@ -65,7 +66,7 @@ if(isset($_REQUEST['xmlformat']) && $_REQUEST['xmlformat']=="xml")
 					FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester 
 					WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz 
 					AND tbl_student.student_uid = tbl_benutzer.uid AND tbl_benutzer.person_id = tbl_person.person_id 
-					AND tbl_student.student_uid = '".addslashes($uid)."' 
+					AND tbl_student.student_uid = ".$db->db_add_param($uid)."
 					AND tbl_studentlehrverband.prestudent_id=tbl_student.prestudent_id
 					AND tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz 
 					order by semester;"; 
@@ -124,11 +125,14 @@ if(isset($_REQUEST['xmlformat']) && $_REQUEST['xmlformat']=="xml")
 				echo '  <end_semester_number>'.$prestudent->ausbildungssemester.'</end_semester_number>';
 			}
 		}
+
+		if(!$student = new student($uid))
+			die("Student nicht gefunden");
 		
-		$qry_projektarbeit = "SELECT lehrveranstaltung_id, titel, themenbereich, note, titel_english 
+		$qry_projektarbeit = "SELECT lehrveranstaltung_id, titel, themenbereich, note, titel_english
 		FROM lehre.tbl_projektarbeit 
 		JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
-		WHERE student_uid='$uid' 
+		WHERE prestudent_id=".$db->db_add_param($student->prestudent_id,FHC_INTEGER)."
 		AND projekttyp_kurzbz in('Bachelor', 'Diplom') 
 		ORDER BY beginn ASC, projektarbeit_id ASC;";
 		

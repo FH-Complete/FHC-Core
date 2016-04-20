@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik  <moik@technikum-wien.at>.
  */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
@@ -47,19 +48,21 @@ function drawBetreuungen()
 	global $gesamtkosten_fb, $format_number, $format_number1;
 	
 	$qry_fb = "SELECT
-				*
+				*, tbl_benutzer.uid as student_uid
 			FROM
-				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrfach
+				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrfach, public.tbl_benutzer, public.tbl_prestudent
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
-				(tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem1)."' OR
-				 tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem2)."') AND
+				(tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem1)." OR
+				 tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem2).") AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0 AND
-				tbl_lehrfach.fachbereich_kurzbz='".addslashes($last_fb)."'
+				tbl_lehrfach.fachbereich_kurzbz=".$db->db_add_param($last_fb)." AND
+				tbl_prestudent.prestudent_id = tbl_projektarbeit.prestudent_id AND
+				tbl_prestudent.person_id = tbl_benutzer.person_id
 			";
 	$db = new basis_db();
 	$gesamtkosten_betreuung=0;

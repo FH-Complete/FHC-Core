@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Andreas Moik 	<moik@technikum-wien.at>.
  */
 /*******************************************************************************************************
  *		Autocomplete 
@@ -85,7 +86,8 @@ cellSeparator (default value: "|")
 			$qry="	SELECT distinct campus.tbl_paabgabe.datum as termin , to_char(campus.tbl_paabgabe.datum, 'DD.MM.YYYY') as termin_anzeige 
 					FROM lehre.tbl_projektarbeit 
 							JOIN campus.tbl_paabgabe USING(projektarbeit_id)
-							LEFT JOIN public.tbl_benutzer ON(uid=student_uid) 
+							LEFT JOIN public.tbl_prestudent ON(tbl_prestudent.prestudent_id=tbl_projektarbeit.prestudent_id)
+							LEFT JOIN public.tbl_benutzer ON(tbl_benutzer.person_id=tbl_prestudent.person_id)
 							LEFT JOIN public.tbl_person ON(tbl_benutzer.person_id=tbl_person.person_id)
 							LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 							LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 

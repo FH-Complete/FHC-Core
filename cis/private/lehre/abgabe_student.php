@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >,
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >,
+ *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >,
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at > and
+ *          Andreas Moik 	<moik@technikum-wien.at>.
  */
 
 require_once('../../../config/cis.config.inc.php');
@@ -60,7 +61,7 @@ if(isset($_GET['uid']))
 	$rechte->getBerechtigungen($getuid);
 	if($rechte->isBerechtigt('lehre/abgabetool',$stg_obj->oe_kurzbz,'s'))
 		$allowed=true;
-	
+
 	//oder Lektor mit Betreuung dieses Studenten
 	$qry = "SELECT 1
 			FROM 
@@ -68,7 +69,7 @@ if(isset($_GET['uid']))
 				JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id) 
 				JOIN campus.vw_benutzer on(vw_benutzer.person_id=tbl_projektbetreuer.person_id)
 			WHERE
-				tbl_projektarbeit.student_uid=".$db->db_add_param($uid)." AND
+				tbl_projektarbeit.prestudent_id=".$db->db_add_param($student->prestudent_id, FHC_INTEGER)." AND
 				vw_benutzer.uid=".$db->db_add_param($getuid).";";
 	
 	if($result = $db->db_query($qry))
@@ -89,7 +90,10 @@ $htmlstr1 = '';
 $vorname='';
 $nachname='';
 
-$sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tbl_projektbetreuer.person_id) AS bnachname, 
+if(!$student = new student($uid))
+	die("Student nicht gefunden");
+
+$sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tbl_projektbetreuer.person_id) AS bnachname,
 			(SELECT vorname FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS bvorname, 
 			(SELECT titelpre FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS btitelpre, 
 			(SELECT titelpost FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS btitelpost, 
@@ -105,7 +109,7 @@ $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tb
 		LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 		WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') 
 		AND (tbl_projektbetreuer.betreuerart_kurzbz='Betreuer' OR tbl_projektbetreuer.betreuerart_kurzbz='Begutachter' OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbetreuer' OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter') 
-		AND tbl_projektarbeit.student_uid=".$db->db_add_param($uid)." 
+		AND tbl_projektarbeit.prestudent_id=".$db->db_add_param($student->prestudent_id, FHC_INTEGER)."
 		AND public.tbl_benutzer.aktiv 
 		AND lehre.tbl_projektarbeit.note IS NULL 
 		ORDER BY studiensemester_kurzbz desc, tbl_lehrveranstaltung.kurzbz";

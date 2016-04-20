@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik  <moik@technikum-wien.at>.
  */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
@@ -297,7 +298,7 @@ elseif($oe_kurzbz!='')
 	$qry = "SELECT
 				*
 			FROM
-				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrveranstaltung as lehrfach
+				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_prestudent, public.tbl_benutzer
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
@@ -306,7 +307,9 @@ elseif($oe_kurzbz!='')
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
 				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
 				lehrfach.oe_kurzbz=".$db->db_add_param($oe_kurzbz)." AND
-				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
+				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0 AND
+				lehre.tbl_projektarbeit.prestudent_id = public.tbl_prestudent.prestudent_id AND
+				public.tbl_benutzer.person_id = public.tbl_prestudent.person_id
 				";
 }
 else 
@@ -341,7 +344,7 @@ if($result = $db->db_query($qry))
 			//echo '<td>&nbsp;</td>';
 			echo "<td align='right'>".number_format($row->stunden,2)."</td>";
 			$benutzer = new benutzer();
-			$benutzer->load($row->student_uid);
+			$benutzer->load($row->uid);
 			echo "<td>$benutzer->nachname $benutzer->vorname</td>";
 			echo "<td>$row->nachname $row->vorname</td>";
 			echo "<td align='right'>".number_format(($row->stundensatz*$row->faktor*$row->stunden),2,',','.')." €</td>";

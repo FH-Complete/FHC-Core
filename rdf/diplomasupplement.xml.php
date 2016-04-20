@@ -327,9 +327,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
 		echo '		<titel_de>'.$titel_de.'</titel_de>';
 		echo '		<titel_en>'.$titel_en.'</titel_en>';
-        $praktikum = false;
-        $auslandssemester = false;
-		$qry = "SELECT projektarbeit_id FROM lehre.tbl_projektarbeit WHERE student_uid=".$db->db_add_param($uid_arr[$i])." AND (projekttyp_kurzbz='Praxis' OR projekttyp_kurzbz='Praktikum')";
+		$praktikum = false;
+		$auslandssemester = false;
+
+		if(!$student = new student($uid_arr[$i]))
+			die($student->errormsg);
+
+		$qry = "SELECT projektarbeit_id FROM lehre.tbl_projektarbeit WHERE prestudent_id=".$db->db_add_param($student->prestudent_id)." AND (projekttyp_kurzbz='Praxis' OR projekttyp_kurzbz='Praktikum')";
 		if($db->db_query($qry))
 		{
 			if($row1 = $db->db_fetch_object())
@@ -516,11 +520,14 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo "  <gradePrevLastYearNb>".sprintf("%01.1f",($noteArrayPrev[7]/$noten_anzahl*100))."</gradePrevLastYearNb>";
 		echo "  <gradePrevLastYearEa>".sprintf("%01.1f",($noteArrayPrev[12]/$noten_anzahl*100))."</gradePrevLastYearEa>";
 
+		if(!$student = new student($uid_arr[$i]))
+			die("Student nicht gefunden");
+
 		//Projektarbeiten
-        $qry_projektarbeit = "SELECT lehrveranstaltung_id, titel, themenbereich, note, titel_english
+		$qry_projektarbeit = "SELECT lehrveranstaltung_id, titel, themenbereich, note, titel_english
 		FROM lehre.tbl_projektarbeit
 		JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-		WHERE student_uid=".$db->db_add_param($uid_arr[$i])."
+		WHERE prestudent_id=".$db->db_add_param($student->prestudent_id)."
 		AND projekttyp_kurzbz in('Bachelor', 'Diplom')
 		ORDER BY beginn ASC, projektarbeit_id ASC;";
 
@@ -762,6 +769,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                     $bezeichnung_englisch = $row_stud->bezeichnung_english;
                     $bezeichnung = $row_stud->bezeichnung;
 
+					if(!$student = new student($uid_arr[$i]))
+						die("Student nicht gefunden");
+
                     // Check ob Lehrveranstaltung ein Praktikum mit eingetragener Firma besitzt
                     $qry = "
                     SELECT
@@ -771,7 +781,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                     	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
                     	JOIN public.tbl_firma USING(firma_id)
                     WHERE
-                    	student_uid=".$db->db_add_param($uid_arr[$i])."
+                    	prestudent_id=".$db->db_add_param($student->prestudent_id)."
                     	AND projekttyp_kurzbz in('Praktikum', 'Praxis')
                     	AND tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
                     ORDER BY beginn ASC, projektarbeit_id ASC;";
@@ -785,11 +795,14 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                         }
                     }
 
+							if(!$student = new student($uid_arr[$i]))
+								die("Student nicht gefunden");
+
                     // Check ob an Lehrveranstaltung eine Thesis hängt
                     $qry = "SELECT lehrveranstaltung_id, titel, themenbereich, note, titel_english
                     FROM lehre.tbl_projektarbeit
                     JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-                    WHERE student_uid=".$db->db_add_param($uid_arr[$i])."
+                    WHERE prestudent_id=".$db->db_add_param($student->prestudent_id)."
                     AND projekttyp_kurzbz in('Bachelor', 'Diplom')
                     AND lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
                     ORDER BY beginn DESC, projektarbeit_id DESC LIMIT 1;";
@@ -864,12 +877,15 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                         </lv>';
                 }
 
+							if(!$student = new student($uid_arr[$i]))
+								die("Student nicht gefunden");
+
                 // Ist er Outgoing in diesem semester
                 $qry_outgoing = "SELECT studiensemester_kurzbz, ort, ects, semesterstunden, von, bis, universitaet, lehrveranstaltung_id
                     FROM bis.tbl_bisio
                     JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
                     JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-                    WHERE student_uid = ".$db->db_add_param($uid_arr[$i]);
+                    WHERE prestudent_id = ".$db->db_add_param($student->prestudent_id);
 
                 if($result_outgoing = $db->db_query($qry_outgoing))
                 {

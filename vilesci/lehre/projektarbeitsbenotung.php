@@ -215,10 +215,10 @@ foreach ($projekt->result as $row)
 	}
 	echo "</SELECT>";
 	echo "</td>";
-	
+
 	echo "</tr>";
 }
-	
+
 echo '</tbody></table>';
 echo '<br><br><div align="right"><input type="submit" value="Speichern" name="savedata"/></div>';
 echo '</form>';	
@@ -228,3 +228,5 @@ echo '</form>';
 <br>
 </body>
 </html>
+?>
+

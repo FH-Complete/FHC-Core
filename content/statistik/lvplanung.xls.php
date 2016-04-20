@@ -18,6 +18,7 @@
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik  <moik@technikum-wien.at>.
   */
 // Erstellt ein Excel mit den Kosten der Lehrveranstaltungen
 require_once('../../config/vilesci.config.inc.php');
@@ -375,15 +376,17 @@ if($result = $db->db_query($qry))
 		  								   )
 							)
 				) as koordinator_vorname, nachname, vorname, lehrfach.bezeichnung, 
-				tbl_lehrveranstaltung.semester, student_uid, stunden, tbl_projektbetreuer.stundensatz, 
+				tbl_lehrveranstaltung.semester, tbl_benutzer.uid as student_uid, stunden, tbl_projektbetreuer.stundensatz,
 				tbl_projektbetreuer.faktor
 			FROM
 				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, 
-				lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich
+				lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich, public.tbl_prestudent, public.tbl_benutzer
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
+				tbl_projektarbeit.prestudent_id = tbl_prestudent.prestudent_id AND
+				tbl_prestudent.person_id = tbl_benutzer.person_id AND
 				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND
 				lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND

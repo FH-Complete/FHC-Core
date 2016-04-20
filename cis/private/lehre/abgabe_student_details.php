@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Andreas Moik 	<moik@technikum-wien.at>
  */
 /*******************************************************************************************************
  *				abgabe_lektor
@@ -138,7 +139,7 @@ if($uid!=$user)
 				JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id) 
 				JOIN campus.vw_benutzer on(vw_benutzer.person_id=tbl_projektbetreuer.person_id)
 			WHERE
-				tbl_projektarbeit.student_uid=".$db->db_add_param($uid)." AND
+				tbl_projektarbeit.prestudent_id=".$db->db_add_param($student->prestudent_id, FHC_INTEGER)." AND
 				vw_benutzer.uid=".$db->db_add_param($user).";";
 	
 	if($result = $db->db_query($qry))
@@ -156,7 +157,9 @@ if($uid!=$user)
 }	
 else
 {
-	if($uid!=$projektarbeit_obj->student_uid)
+	$student = new student($uid);
+
+	if($student->prestudent_id!=$projektarbeit_obj->prestudent_id)
 		die('Sie haben keine Berechtigung fuer diese Seite');
 }
 

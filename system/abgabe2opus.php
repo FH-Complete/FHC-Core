@@ -18,7 +18,8 @@
  * Authors: Christian Paminger 		<christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>,
  *          Rudolf Hangl 			<rudolf.hangl@technikum-wien.at>,
- *          Gerald Simane-Sequens 	<gerald.simane-sequens@technikum-wien.at>
+ *          Gerald Simane-Sequens 	<gerald.simane-sequens@technikum-wien.at> and
+ *          Andreas Moik  <moik@technikum-wien.at>.
  *
  *******************************************************************************************************
  *				abgabe2opus.php
@@ -1154,14 +1155,16 @@ function indexdatei($source_opus, $fd)
 //Abgabedatum nicht länger als 6 Monate zurück
 //Freigegeben oder Endedatum der Sperre vorbei
 //****************************************************************************************************
-$qry="SELECT *, tbl_lehreinheit.studiensemester_kurzbz, tbl_projektarbeit.student_uid as stud_uid, tbl_fachbereich.bezeichnung as fb_bez, 
+$qry="SELECT *, tbl_lehreinheit.studiensemester_kurzbz, tbl_benutzer.uid as stud_uid, tbl_fachbereich.bezeichnung as fb_bez,
 	tbl_lehrveranstaltung.studiengang_kz as stg_kz, tbl_projektarbeit.note as note1, tbl_zeugnisnote.note as note2  
-	FROM lehre.tbl_projektarbeit 
-	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+	FROM lehre.tbl_projektarbeit
+	JOIN public.tbl_prestudent ON(tbl_projektarbeit.prestudent_id = tbl_prestudent.prestudent_id)
+	JOIN public.tbl_benutzer ON(tbl_prestudent.person_id = tbl_benutzer.person_id)
+	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 	JOIN lehre.tbl_lehrveranstaltung ON(tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id) 
-	JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) 
+	JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
 	JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz) 
-	LEFT JOIN lehre.tbl_zeugnisnote ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz AND tbl_projektarbeit.student_uid=tbl_zeugnisnote.student_uid)
+	LEFT JOIN lehre.tbl_zeugnisnote ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz AND tbl_benutzer.uid=tbl_zeugnisnote.student_uid)
 	WHERE ((tbl_projektarbeit.note>0 AND tbl_projektarbeit.note<5) OR (tbl_zeugnisnote.note>0 AND tbl_zeugnisnote.note<5)) AND projekttyp_kurzbz='Diplom'
 	AND to_char(tbl_projektarbeit.abgabedatum,'YYYYMMDD')>'".date('Ymd',mktime(0, 0, 0, date('m')-6, date('d'), date('Y')))."' 
 	AND (tbl_projektarbeit.freigegeben OR (to_char(tbl_projektarbeit.gesperrtbis,'YYYYMMDD')<'".date('Ymd',mktime(0, 0, 0, date('m'), date('d'), date('Y')))."'))";

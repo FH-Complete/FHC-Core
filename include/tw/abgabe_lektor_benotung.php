@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Andreas Moik  <moik@technikum-wien.at>
  */
 /*******************************************************************************************************
  *			abgabe_lektor_benotung
@@ -33,6 +34,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
+require_once('../../include/student.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Herstellen der Datenbankverbindung');
@@ -83,7 +85,10 @@ if(!$projektarbeit_obj->load($_REQUEST['projektarbeit_id']))
 
 $titel = $projektarbeit_obj->titel;
 $benutzer_autor = new benutzer();
-if(!$benutzer_autor->load($projektarbeit_obj->student_uid))
+$student = new student();
+$uid = $student->getUid($projektarbeit_obj->prestudent_id);
+
+if(!$benutzer_autor->load($uid))
 	die('Studierender kann nicht geladen werden');
 $nachname_clean = convertProblemChars($benutzer_autor->nachname);
 
@@ -700,8 +705,10 @@ else
 
 
 $sql_query = "SELECT *,(SELECT abgabedatum FROM campus.tbl_paabgabe WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)." AND abgabedatum is NOT NULL ORDER BY abgabedatum DESC LIMIT 1) as abgabedatum FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) tbl_studiengang.bezeichnung as stgbezeichnung, tbl_studiengang.typ as stgtyp, * 
-	FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
-	LEFT JOIN public.tbl_benutzer on(uid=student_uid) 
+	FROM lehre.tbl_projektarbeit
+	LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id)
+	LEFT JOIN public.tbl_prestudent_id using(prestudent_id)
+	LEFT JOIN public.tbl_benutzer on(tbl_benutzer.person_id=tbl_prestudent_id.person_id)
 	LEFT JOIN public.tbl_student on(tbl_benutzer.uid=tbl_student.student_uid) 
 	LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
 	LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id) 

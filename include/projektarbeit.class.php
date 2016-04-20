@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik  <moik@technikum-wien.at>.
  */
 /**
  * Klasse projektarbeit
@@ -37,7 +38,7 @@ class projektarbeit extends basis_db
 	public $titel;				// string
 	public $titel_english;		// string
 	public $lehreinheit_id;		// integer
-	public $student_uid;		// integer
+	public $prestudent_id;		// integer
 	public $firma_id;			// integer
 	public $note;				// integer
 	public $punkte;				// numeric(6,2)
@@ -95,7 +96,7 @@ class projektarbeit extends basis_db
 				$this->titel = $row->titel;
 				$this->titel_english = $row->titel_english;
 				$this->lehreinheit_id = $row->lehreinheit_id;
-				$this->student_uid = $row->student_uid;
+				$this->prestudent_id = $row->prestudent_id;
 				$this->firma_id = $row->firma_id;
 				$this->note = $row->note;
 				$this->punkte = $row->punkte;
@@ -172,7 +173,7 @@ class projektarbeit extends basis_db
 		}
 		/*if(!is_numeric($this->note))
 		{
-			$this->errormsg = 'Note muß ein numerischer Wert sein - student_uid: '.$this->student_uid;
+			$this->errormsg = 'Note muß ein numerischer Wert sein - prestudent_id: '.$this->prestudent_id;
 			return false;
 		}*/
 		if($this->punkte!='' && !is_numeric($this->punkte))
@@ -224,13 +225,13 @@ class projektarbeit extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN; INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid, firma_id, note, punkte,
+			$qry='BEGIN; INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, prestudent_id, firma_id, note, punkte,
 				beginn, ende, faktor, freigegeben, gesperrtbis, stundensatz, gesamtstunden, themenbereich, anmerkung,
 				insertamum, insertvon, updateamum, updatevon, titel_english) VALUES('.
 			     $this->db_add_param($this->projekttyp_kurzbz).', '.
 			     $this->db_add_param($this->titel).', '.
 			     $this->db_add_param($this->lehreinheit_id, FHC_INTEGER).', '.
-			     $this->db_add_param($this->student_uid).', '.
+			     $this->db_add_param($this->prestudent_id).', '.
 			     $this->db_add_param($this->firma_id, FHC_INTEGER).', '.
 			     $this->db_add_param($this->note).', '.
 			     $this->db_add_param($this->punkte).', '.
@@ -263,7 +264,7 @@ class projektarbeit extends basis_db
 				'titel='.$this->db_add_param($this->titel).', '.
 				'titel_english='.$this->db_add_param($this->titel_english).', '.
 				'lehreinheit_id='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).', '.
-				'student_uid='.$this->db_add_param($this->student_uid).', '.
+				'prestudent_id='.$this->db_add_param($this->prestudent_id, FHC_INTEGER).', '.
 				'firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).', '.
 				'note='.$this->db_add_param($this->note).', '.
 				'punkte='.$this->db_add_param($this->punkte).', '.
@@ -347,13 +348,13 @@ class projektarbeit extends basis_db
 
 	/**
 	 * Laedt alle Projektarbeiten eines Studenten
-	 * @param student_uid
+	 * @param prestudent_id
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	public function getProjektarbeit($student_uid)
+	public function getProjektarbeit($prestudent_id)
 	{
 		$qry = "SELECT * FROM lehre.tbl_projektarbeit JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
-				WHERE student_uid=".$this->db_add_param($student_uid);
+				WHERE prestudent_id=".$this->db_add_param($prestudent_id);
 
 		if($this->db_query($qry))
 		{
@@ -367,7 +368,7 @@ class projektarbeit extends basis_db
 				$obj->titel = $row->titel;
 				$obj->titel_english = $row->titel_english;
 				$obj->lehreinheit_id = $row->lehreinheit_id;
-				$obj->student_uid = $row->student_uid;
+				$obj->prestudent_id = $row->prestudent_id;
 				$obj->firma_id = $row->firma_id;
 				$obj->note = $row->note;
 				$obj->punkte = $row->punkte;
@@ -429,7 +430,7 @@ class projektarbeit extends basis_db
 				$obj->titel = $row->titel;
 				$obj->titel_english = $row->titel_english;
 				$obj->lehreinheit_id = $row->lehreinheit_id;
-				$obj->student_uid = $row->student_uid;
+				$obj->prestudent_id = $row->prestudent_id;
 				$obj->firma_id = $row->firma_id;
 				$obj->note = $row->note;
 				$obj->punkte = $row->punkte;

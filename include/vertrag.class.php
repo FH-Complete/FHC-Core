@@ -16,7 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Nikolaus Krondraf <nikolaus.krondraf@technikum-wien.at>,
- *          Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Andreas Österreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Andreas Moik  <moik@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
@@ -351,7 +352,7 @@ class vertrag extends basis_db
 			(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
-			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
+			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) JOIN public.tbl_prestudent_id ON(tbl_benutzer.person_id=tbl_prestudent.person_id) WHERE tbl_prestudent.prestudent_id=tbl_projektarbeit.prestudent_id)
 			as bezeichnung
 		FROM
 			lehre.tbl_projektbetreuer
@@ -517,7 +518,7 @@ class vertrag extends basis_db
 			(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
-			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
+			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) JOIN public.tbl_prestudent ON(tbl_benutzer.person_id = tbl_prestudent.person_id) WHERE tbl_prestudent.prestudent_id=tbl_projektarbeit.prestudent_id)
 			as bezeichnung
 		FROM
 			lehre.tbl_projektbetreuer

@@ -3489,11 +3489,13 @@ if(!$error)
 				$projektarbeit->insertvon = $user;
 			}
 
+			$student = new student($_POST['student_uid']);
+
 			$projektarbeit->projekttyp_kurzbz = $_POST['projekttyp_kurzbz'];
 			$projektarbeit->titel = $_POST['titel'];
 			$projektarbeit->titel_english = $_POST['titel_english'];
 			$projektarbeit->lehreinheit_id = $_POST['lehreinheit_id'];
-			$projektarbeit->student_uid = $_POST['student_uid'];
+			$projektarbeit->prestudent_id = $student->prestudent_id;
 			$projektarbeit->firma_id = $_POST['firma_id'];
 			$projektarbeit->note = $_POST['note'];
 			$projektarbeit->punkte = str_replace(',','.',$_POST['punkte']);

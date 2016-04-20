@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik  <moik@technikum-wien.at>.
  */
 // header für no cache
 header("Cache-Control: no-cache");
@@ -33,6 +34,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/projektarbeit.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/lehreinheit.class.php');
+require_once('../include/student.class.php');
 	
 $rdf_url='http://www.technikum-wien.at/projektarbeit';
 
@@ -50,7 +52,10 @@ $projektarbeit = new projektarbeit();
 
 if(isset($_GET['student_uid']))
 {
-	$projektarbeit->getProjektarbeit($_GET['student_uid']);
+
+	$student = new student($_GET['student_uid']);
+
+	$projektarbeit->getProjektarbeit($student->prestudent_id);
 	
 	foreach ($projektarbeit->result as $row)
 		draw_content($row);

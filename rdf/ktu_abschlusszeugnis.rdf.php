@@ -76,7 +76,7 @@ $pruefung = new pruefung();
 $pruefung->getPruefungen($student_uid, "fachpruefung");
 
 $projektarbeit = new projektarbeit();
-$projektarbeit->getProjektarbeit($student_uid);
+$projektarbeit->getProjektarbeit($prestudent->prestudent_id);
 
 if(!$person = new person($prestudent->person_id))
 	die($person->errormsg);

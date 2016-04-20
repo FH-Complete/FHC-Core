@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Andreas Moik  <moik@technikum-wien.at>
  */
 		
 /*******************************************************************************************************
@@ -84,8 +85,9 @@ $sql_query = "SELECT *,
 			WHERE prestudent_id=(Select prestudent_id from tbl_student where student_uid=xy.uid limit 1)
 			ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1
 			) as organisationsform
-			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) public.tbl_studiengang.bezeichnung as stgbez,tbl_projekttyp.bezeichnung AS prjbez,* FROM lehre.tbl_projektarbeit  
-			LEFT JOIN public.tbl_benutzer on(uid=student_uid) 
+			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) public.tbl_studiengang.bezeichnung as stgbez,tbl_projekttyp.bezeichnung AS prjbez,* FROM lehre.tbl_projektarbeit
+			LEFT JOIN public.tbl_prestudent ON(tbl_prestudent.prestudent_id = tbl_projektarbeit.prestudent_id)
+			LEFT JOIN public.tbl_benutzer on(tbl_prestudent.person_id=tbl_benutzer.person_id)
 			LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
 			LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id) 
 			LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id) 

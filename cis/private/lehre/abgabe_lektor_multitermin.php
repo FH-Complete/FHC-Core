@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *          Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /*******************************************************************************************************
  *				abgabe_lektor
@@ -170,7 +171,7 @@ if(isset($_POST["schick"]))
 							$row_typ->bezeichnung='';
 						}
 						//Student zu projektarbeit_id suchen
-						$qry_std="SELECT * FROM campus.vw_student WHERE uid IN(SELECT student_uid FROM lehre.tbl_projektarbeit WHERE projektarbeit_id=".$db->db_add_param($termine[$j]).")";
+						$qry_std="SELECT * FROM campus.vw_student WHERE prestudent_id IN(SELECT prestudent_id FROM lehre.tbl_projektarbeit WHERE projektarbeit_id=".$db->db_add_param($termine[$j]).")";
 						if($result_std=@$db->db_query($qry_std))
 						{
 							$row_std=$db->db_fetch_object($result_std);
