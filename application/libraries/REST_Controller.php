@@ -351,8 +351,13 @@ abstract class REST_Controller extends CI_Controller {
         self::HTTP_INTERNAL_SERVER_ERROR => 'INTERNAL SERVER ERROR',
         self::HTTP_NOT_IMPLEMENTED => 'NOT IMPLEMENTED'
     ];
+	
+	/**
+	 * 
+	 */
+	protected $_addonID = NULL;
 
-    /**
+	/**
      * Extend this function to apply additional checking early on in the process
      *
      * @access protected
@@ -361,7 +366,7 @@ abstract class REST_Controller extends CI_Controller {
     protected function early_checks()
     {
     }
-
+	
     /**
      * Constructor for the REST API
      *
@@ -604,8 +609,10 @@ abstract class REST_Controller extends CI_Controller {
         // Remove the supported format from the function name e.g. index.json => index
         $object_called = preg_replace('/^(.*)\.(?:' . implode('|', array_keys($this->_supported_formats)) . ')$/', '$1', $object_called);
 
-        $controller_method = $object_called . '_' . $this->request->method;
-
+        //$controller_method = $object_called . '_' . $this->request->method;
+		// CamelCase compliant
+		$controller_method = $this->request->method.ucfirst($object_called);
+		
         // Do we want to log this method (if allowed by config)?
         $log_method = !(isset($this->methods[$controller_method]['log']) && $this->methods[$controller_method]['log'] === FALSE);
 
@@ -1900,6 +1907,25 @@ abstract class REST_Controller extends CI_Controller {
                 ], self::HTTP_UNAUTHORIZED);
         }
     }
+	
+	/**
+	 * TO BE COMMENTED
+	 */
+	private function _setAddonID($username)
+	{
+		if(!isset($this->_addonID) && isset($username))
+		{
+			$this->_addonID = $username;
+		}
+	}
+
+	/**
+	 * @return int ID of the authenticated addon
+	 */
+	protected function _getAddonID()
+	{
+		return $this->_addonID;
+	}
 
     /**
      * Prepares for basic authentication
@@ -1940,6 +1966,10 @@ abstract class REST_Controller extends CI_Controller {
         {
             $this->_force_login();
         }
+		else // If logged
+		{
+			$this->_setAddonID($username);
+		}
     }
 
     /**
@@ -2155,5 +2185,4 @@ abstract class REST_Controller extends CI_Controller {
             ->get($this->config->item('rest_access_table'))
             ->num_rows() > 0;
     }
-
 }

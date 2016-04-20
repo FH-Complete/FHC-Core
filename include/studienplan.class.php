@@ -24,12 +24,19 @@
  * 			Stefan Puraner	<puraner@technikum-wien.at>
  */
 
-require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/datum.class.php');
 
-class studienplan extends basis_db
+// CI
+require_once(dirname(__FILE__).'/../ci_hack.php');
+require_once(dirname(__FILE__).'/../application/models/studies/Plan_model.php');
+
+class studienplan extends Plan_model
 {
+	use db_extra; //CI Hack
+	
     public $new = true;			// boolean
     public $result = array();		// Objekte
+	public $errormsg;			// string
 
     //Tabellenspalten
     protected $studienplan_id;			// integer (PK)
@@ -74,10 +81,10 @@ class studienplan extends basis_db
 	    $this->$name=$value;
     }
 
-    public function __get($name)
+    /*public function __get($name)
     {
 	    return $this->$name;
-    }
+    }*/
 
     /**
      * Laedt Studienplan mit der ID $studienplan_id
@@ -722,13 +729,7 @@ class studienplan extends basis_db
      */
     function getStudienplaene($studiengang_kz)
     {
-    	$qry = "SELECT
-    	    distinct tbl_studienplan.*
-    	FROM
-    	    lehre.tbl_studienplan
-    	    JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-    	WHERE
-    	    tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+		$qry = str_replace('?', $this->db_add_param($studiengang_kz, FHC_INTEGER), $this->_curriculaQuery);
 
     	if($result = $this->db_query($qry))
     	{

@@ -428,3 +428,23 @@ function indexSort($a, $b)
 {
 	return strcmp($a->index, $b->index);
 }
+
+/**
+ * Bereitet ein Array von Elementen auf, damit es in der IN-Klausel eines
+ * Select Befehls verwendet werden kann.
+ */
+function dbImplode4SQL($array)
+{
+	$string = '';
+	
+	foreach($array as $row)
+	{
+		if($string != '')
+		{
+			$string.=',';
+		}
+		$string.=$this->db_add_param($row);
+	}
+	
+	return $string;
+}

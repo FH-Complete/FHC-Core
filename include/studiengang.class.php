@@ -20,12 +20,21 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *          Gerald Raab <gerald.raab@technikum-wien.at>.
  */
-require_once(dirname(__FILE__).'/basis_db.class.php');
+//require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class studiengang extends basis_db
+require_once(dirname(__FILE__).'/datum.class.php');
+
+// CI
+require_once(dirname(__FILE__).'/../ci_hack.php');
+require_once(dirname(__FILE__).'/../application/models/studies/Course_model.php');
+
+class studiengang extends Course_model
 {
+	use db_extra; //CI Hack
+	
 	public $new;      			// boolean
 	public $result = array();	// studiengang Objekt
+	public $errormsg;			// string
 
 	public $studiengang_kz;		// integer
 	public $kurzbz;				// varchar(5)
@@ -55,7 +64,6 @@ class studiengang extends basis_db
 	public $onlinebewerbung;	// boolean
 
 	public $kuerzel;	// = typ + kurzbz (Bsp: BBE)
-	private $studiengang_typ_arr = array(); 	// Array mit den Studiengangstypen
 	public $kuerzel_arr = array();			// Array mit allen Kurzeln Index=studiengangs_kz
 	public $moodle;		// boolean
 	public $lgartcode;	//integer
@@ -64,6 +72,8 @@ class studiengang extends basis_db
 	public $bezeichnung_arr = array();
 
     public $beschreibung;
+	
+	public $studiengang_typ_arr = array(); 	// Array mit den Studiengangstypen
 
 	/**
 	 * Konstruktor
@@ -84,7 +94,7 @@ class studiengang extends basis_db
 		$this->studiengang_typ_arr["e"] = "Erhalter"; */
 	}
 
-	public function __get($value)
+	/*public function __get($value)
 	{
 		switch($value)
 		{
@@ -95,7 +105,7 @@ class studiengang extends basis_db
 				}
 		}
 		return $this->$value;
-	}
+	}*/
 
 	/**
 	 * Laedt einen Studiengang
@@ -109,8 +119,8 @@ class studiengang extends basis_db
 			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-
-		$qry = "SELECT * FROM public.tbl_studiengang WHERE studiengang_kz=".$this->db_add_param($studiengang_kz);
+		
+		$qry = "SELECT * FROM public.tbl_studiengang WHERE studiengang_kz = " . $this->db_add_param($studiengang_kz);
 
 		if($this->db_query($qry))
 		{
@@ -237,14 +247,7 @@ class studiengang extends basis_db
      */
     public function getAllForBewerbung()
     {
-        $qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch, lgartcode, tbl_lgartcode.bezeichnung '
-                . 'FROM lehre.vw_studienplan '
-                . 'LEFT JOIN bis.tbl_lgartcode USING (lgartcode) '
-                . 'WHERE onlinebewerbung IS TRUE '
-                . 'AND aktiv IS TRUE '
-                . 'ORDER BY typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC';
-
-		if(!$result = $this->db_query($qry))
+		if(!$result = $this->db_query($this->_enabledCoursesQuery))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
@@ -340,7 +343,7 @@ class studiengang extends basis_db
 		if(count($kennzahlen)==0)
 			return true;
 
-		$kennzahlen = $this->implode4SQL($kennzahlen);
+		$kennzahlen = $this->db_implode4SQL($kennzahlen);
 
 		$qry = 'SELECT * FROM public.tbl_studiengang WHERE studiengang_kz in('.$kennzahlen.')';
 		if ($aktiv)

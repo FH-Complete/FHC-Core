@@ -24,12 +24,19 @@
  * Klasse Nation (FAS-Online)
  * @create 06-04-2006
  */
-require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/datum.class.php');
 
-class nation extends basis_db 
+// CI
+require_once(dirname(__FILE__).'/../ci_hack.php');
+require_once(dirname(__FILE__).'/../application/models/Nation_model.php');
+
+class nation extends Nation_model
 {
+	use db_extra; //CI Hack
+	
 	public $new;      // boolean
 	public $nation = array(); // nation Objekt
+	public $errormsg;			// string
 
 	//Tabellenspalten
 	public $code;
@@ -100,15 +107,7 @@ class nation extends basis_db
 	public function getAll($ohnesperre=false, $orderEnglish=false)
 	{
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM bis.tbl_nation";
-		if($ohnesperre)
-			$qry .= " WHERE sperre is null";
-		if($orderEnglish == false)
-			$qry .=" ORDER BY kurztext";
-		else 
-			$qry .=" ORDER BY engltext";
-        
-        $qry.=';';
+        $qry = $this->_getNationQuery($ohnesperre, $orderEnglish);
 			
 		if(!$this->db_query($qry))
 		{

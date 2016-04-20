@@ -465,4 +465,20 @@ trait db_extra
 		else
 			die('Invalid DB Boolean. Wrong DB-Engine?');
 	}
+	
+	/**
+	 * Bereitet ein Array von Elementen auf, damit es in der IN-Klausel eines
+	 * Select Befehls verwendet werden kann.
+	 */
+	public function db_implode4SQL($array)
+	{
+		$string = '';
+		foreach($array as $row)
+		{
+			if($string!='')
+				$string.=',';
+			$string.=$this->db_add_param($row);
+		}
+		return $string;
+	}
 }

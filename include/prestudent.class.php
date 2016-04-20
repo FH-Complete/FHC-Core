@@ -19,10 +19,17 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-require_once(dirname(__FILE__).'/person.class.php');
+require_once(dirname(__FILE__).'/datum.class.php');
 
-class prestudent extends person
+// CI
+require_once(dirname(__FILE__).'/../ci_hack.php');
+require_once(dirname(__FILE__).'/../application/models/person/Person_model.php');
+
+class prestudent extends Person_model
 {
+	use db_extra; //CI Hack
+	public $errormsg;			// string
+	
 	//Tabellenspalten
 	public $prestudent_id;	// varchar(16)
 	public $aufmerksamdurch_kurzbz;

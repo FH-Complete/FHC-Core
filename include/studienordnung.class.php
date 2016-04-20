@@ -297,7 +297,7 @@ class studienordnung extends basis_db
 			      $this->db_add_param($this->studiengangkurzbzlang).', '.
 			      $this->db_add_param($this->akadgrad_id,FHC_INTEGER).', '.
 			      $this->db_add_param($this->standort_id,FHC_INTEGER).', '.
-			      $this->db_add_param($this->status_kurzb).', '.
+			      $this->db_add_param($this->status_kurzbz).', '.
 			      ' now(), '.
 			      $this->db_add_param($this->insertvon).');';
 		}
@@ -417,7 +417,7 @@ class studienordnung extends basis_db
 				$obj->studiengangkurzbzlang	= $row->studiengangkurzbzlang;
 				$obj->akadgrad_id		= $row->akadgrad_id;
 				$obj->standort_id		= $row->standort_id;
-				$obj->status_kurzb		= $row->status_kurzb;
+				$obj->status_kurzbz		= $row->status_kurzbz;
 				$obj->updateamum		= $row->updateamum;
 				$obj->updatevon		= $row->updatevon;
 				$obj->insertamum		= $row->insertamum;
@@ -442,7 +442,7 @@ class studienordnung extends basis_db
 			$obj->studiengangkurzbzlang	= $this->studiengangkurzbzlang;
 			$obj->akadgrad_id		= $this->akadgrad_id;
 			$obj->standort_id		= $this->standort_id;
-			$obj->status_kurzb		= $this->status_kurzb;
+			$obj->status_kurzbz		= $this->status_kurzbz;
 			$obj->updateamum		= $this->updateamum;
 			$obj->updatevon		= $this->updatevon;
 			$obj->insertamum		= $this->insertamum;
@@ -746,7 +746,7 @@ class studienordnung extends basis_db
 			$this->studiengangkurzbzlang	= $row->studiengangkurzbzlang;
 			$this->akadgrad_id		= $row->akadgrad_id;
 			$this->standort_id		= $row->standort_id;
-			$this->status_kurzb		= $row->status_kurzb;
+			$this->status_kurzbz		= $row->status_kurzbz;
 			$this->updateamum		= $row->updateamum;
 			$this->updatevon		= $row->updatevon;
 			$this->insertamum		= $row->insertamum;
@@ -806,7 +806,7 @@ class studienordnung extends basis_db
 			$obj->studiengangkurzbzlang	= $row->studiengangkurzbzlang;
 			$obj->akadgrad_id		= $row->akadgrad_id;
 			$this->standort_id		= $row->standort_id;
-			$this->status_kurzb		= $row->status_kurzb;
+			$this->status_kurzbz		= $row->status_kurzbz;
 			$obj->updateamum		= $row->updateamum;
 			$obj->updatevon			= $row->updatevon;
 			$obj->insertamum		= $row->insertamum;

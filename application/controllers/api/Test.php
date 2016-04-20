@@ -21,7 +21,7 @@ class Test extends REST_Controller
 	 * 
 	 * @return void
 	 */
-    public function test_get()
+    public function getTest()
     {
 		$payload = [
 			'success' => TRUE,
@@ -38,7 +38,7 @@ class Test extends REST_Controller
 	 * 
 	 * @return void
 	 */
-    public function test_post()
+    public function postTest()
     {
 		$payload = [
 			'success' => TRUE,
