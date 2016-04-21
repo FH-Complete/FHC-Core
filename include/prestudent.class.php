@@ -331,7 +331,7 @@ class prestudent extends Person_model
 			return false;
 		}
 	}
-
+	
     /**
      * Falls ZGV vorhanden, setze Ausstellungsstaat (für BIS-Meldung)
      * auf Nation der höchsten angegebenen ZGV

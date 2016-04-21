@@ -155,7 +155,6 @@ class Person extends REST_Controller
 				'success' => true,
 				'message' => 'Interested student saved.'
 			];
-			$payload['data'] = $result;
 		}
 		else
 		{
