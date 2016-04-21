@@ -186,13 +186,25 @@ class anrechnung extends basis_db
 	 * @param $prestudent_id
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getAnrechnungPrestudent($prestudent_id)
+	public function getAnrechnungPrestudent($prestudent_id, $lehrveranstaltung_id=null, $lehrveranstaltung_id_kompatibel=null)
 	{
 		$qry = "SELECT anrechnung_id, prestudent_id, lehrveranstaltung_id, begruendung_id, bezeichnung AS begruendung, "
 			. "lehrveranstaltung_id_kompatibel, genehmigt_von , insertamum, insertvon, updateamum, updatevon "
 			. "FROM lehre.tbl_anrechnung "
 			. "JOIN lehre.tbl_anrechnung_begruendung USING (begruendung_id) "
 			. "WHERE prestudent_id = " . $this->db_add_param($prestudent_id);
+		
+		if($lehrveranstaltung_id != NULL)
+		{
+		    $qry .= " AND lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id);
+		}
+		
+		if($lehrveranstaltung_id_kompatibel != NULL)
+		{
+		    $qry .= " AND lehrveranstaltung_id_kompatibel=".$this->db_add_param($lehrveranstaltung_id_kompatibel);
+		}
+		
+		$qry .= ";";
 
 		if ($this->db_query($qry))
 		{

@@ -39,6 +39,7 @@ class pruefungsanmeldung extends basis_db {
     public $statusupdatevon;		//varchar(32)
     public $statusupdateamum;		//timestamp
     public $anrechnung_id;		//integer
+    public $pruefungstyp_kurzbz;		//varchar(32)
     
     /**
      * Konstruktor
@@ -92,7 +93,7 @@ class pruefungsanmeldung extends basis_db {
         
         if($new)
         {
-            $qry = 'INSERT INTO campus.tbl_pruefungsanmeldung (uid, pruefungstermin_id, lehrveranstaltung_id, status_kurzbz, wuensche, reihung, kommentar, anrechnung_id) VALUES ('
+            $qry = 'INSERT INTO campus.tbl_pruefungsanmeldung (uid, pruefungstermin_id, lehrveranstaltung_id, status_kurzbz, wuensche, reihung, kommentar, anrechnung_id, pruefungstyp_kurzbz) VALUES ('
                     . $this->db_add_param($this->uid).', '
                     . $this->db_add_param($this->pruefungstermin_id).', '
                     . $this->db_add_param($this->lehrveranstaltung_id).', '
@@ -100,7 +101,8 @@ class pruefungsanmeldung extends basis_db {
                     . $this->db_add_param($this->wuensche).', '
                     . $this->db_add_param($this->reihung).', '
                     . $this->db_add_param($this->kommentar).', '
-		    . $this->db_add_param($this->anrechnung_id).');';
+		    . $this->db_add_param($this->anrechnung_id).', '
+		    . $this->db_add_param($this->pruefungstyp_kurzbz).');';
         }
         else
         {
@@ -113,6 +115,7 @@ class pruefungsanmeldung extends basis_db {
 		    . 'reihung='.$this->db_add_param($this->reihung).', '
 		    . 'kommentar='.$this->db_add_param($this->kommentar).', '
 		    . 'anrechnung_id='.$this->db_add_param($this->anrechnung_id)
+		    . 'pruefungstyp_kurzbz='.$this->db_add_param($this->pruefungstyp_kurzbz)
 		    . ' WHERE pruefungsanmeldung_id='.$this->db_add_param($this->pruefungsanmeldung_id).';';
         }
         
@@ -162,6 +165,7 @@ class pruefungsanmeldung extends basis_db {
 		$this->statusupdateamum = $row->statusupdateamum;
 		$this->statusupdatevon = $row->statusupdatevon;
 		$this->anrechnung_id = $row->anrechnung_id;
+		$this->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
             }
             return true;
         }
@@ -206,6 +210,7 @@ class pruefungsanmeldung extends basis_db {
 		$anmeldung->statusupdateamum = $row->statusupdateamum;
 		$anmeldung->statusupdatevon = $row->statusupdatevon;
 		$anmeldung->anrechnung_id = $row->anrechnung_id;
+		$anmeldung->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
                 array_push($anmeldungen, $anmeldung);
             }
             return $anmeldungen;
@@ -264,6 +269,7 @@ class pruefungsanmeldung extends basis_db {
 		$anmeldung->statusupdateamum = $row->statusupdateamum;
 		$anmeldung->statusupdatevon = $row->statusupdatevon;
 		$anmeldung->anrechnung_id = $row->anrechnung_id;
+		$anmeldung->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
                 array_push($anmeldungen, $anmeldung);
             }
             return $anmeldungen;

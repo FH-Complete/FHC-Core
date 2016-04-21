@@ -497,6 +497,8 @@ if($xmlformat=='rdf')
 						(tbl_bisio.von>='".$stsem_obj->start."' AND tbl_bisio.von<='".$stsem_obj->ende."')
 						OR
 						(tbl_bisio.bis>='".$stsem_obj->start."' AND tbl_bisio.bis<='".$stsem_obj->ende."')
+						OR
+						(tbl_bisio.von<='".$stsem_obj->start."' AND tbl_bisio.bis>='".$stsem_obj->ende."')
 						)
 						AND NOT EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Incoming' AND prestudent_id=bis.tbl_bisio.prestudent_id)
 					";
@@ -775,7 +777,7 @@ else
 							break;
 					}
 				}
-				
+
 				$lv_studiengang=new studiengang();
 				$lv_studiengang->load($lv_studiengang_kz);
 				$lv_studiengang_bezeichnung=$lv_studiengang->bezeichnung;
@@ -800,24 +802,24 @@ else
 
 			$orgform_student_bezeichnung = new organisationsform();
 			$orgform_student_bezeichnung->load($prestudent->orgform_kurzbz);
-			
+
 			//Wenn Lehrgang, dann Erhalter-KZ vor die LV-Studiengangs-Kz hängen
 			if ($lv_studiengang_kz<0)
 			{
 				$stg = new studiengang();
 				$stg->load($lv_studiengang_kz);
-			
+
 				$lv_studiengang_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($lv_studiengang_kz));
 			}
 			else
 				$lv_studiengang_kz = sprintf("%04s", abs($lv_studiengang_kz));
-			
+
 			//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
 			if ($student->studiengang_kz<0)
 			{
 				$stg = new studiengang();
 				$stg->load($student->studiengang_kz);
-			
+
 				$stg_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($student->studiengang_kz));
 			}
 			else

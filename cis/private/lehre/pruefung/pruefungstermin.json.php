@@ -15,6 +15,14 @@ require_once('../../../../include/datum.class.php');
 require_once('../../../../include/studiensemester.class.php');
 require_once('../../../../include/pruefungsfenster.class.php');
 require_once('../../../../include/pruefungsanmeldung.class.php');
+require_once('../../../../include/phrasen.class.php');
+require_once('../../../../include/globals.inc.php');
+require_once('../../../../include/sprache.class.php');
+
+$sprache = getSprache();
+$lang = new sprache();
+$lang->load($sprache);
+$p = new phrasen($sprache);
 
 $uid = get_uid();
 
@@ -66,7 +74,7 @@ switch($method)
 	{
 	    $data['result']='false';
 	    $data['error']='true';
-	    $data['errormsg']='Sie haben keine Berechtigung.';
+	    $data['errormsg']=$p->t('global/keineBerechtigung');
 	    break;
 	}
 	$data = savePruefungstermin($mitarbeiter_uid, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $pruefungsintervall);
@@ -105,7 +113,7 @@ switch($method)
 	{
 	    $data['result']='false';
 	    $data['error']='true';
-	    $data['errormsg']='Sie haben keine Berechtigung.';
+	    $data['errormsg']=$p->t('global/keineBerechtigung');
 	    break;
 	}
 	$data = updatePruefungstermin($mitarbeiter_uid, $pruefung_id, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $termineNeu, $pruefungsintervall);
@@ -115,7 +123,7 @@ switch($method)
 	{
 	    $data['result']='false';
 	    $data['error']='true';
-	    $data['errormsg']='Sie haben keine Berechtigung.';
+	    $data['errormsg']=$p->t('global/keineBerechtigung');
 	    break;
 	}
 	$lvId = $_POST["lehrveranstaltung_id"];
@@ -127,7 +135,7 @@ switch($method)
 	{
 	    $data['result']='false';
 	    $data['error']='true';
-	    $data['errormsg']='Sie haben keine Berechtigung.';
+	    $data['errormsg']=$p->t('global/keineBerechtigung');
 	    break;
 	}
 	$pruefung_id = $_REQUEST["pruefung_id"];
@@ -138,7 +146,7 @@ switch($method)
 	{
 	    $data['result']='false';
 	    $data['error']='true';
-	    $data['errormsg']='Sie haben keine Berechtigung.';
+	    $data['errormsg']=$p->t('global/keineBerechtigung');
 	    break;
 	}
 	$pruefung_id = $_REQUEST["pruefung_id"];
@@ -158,7 +166,7 @@ switch($method)
 	{
 	    $data['result']='false';
 	    $data['error']='true';
-	    $data['errormsg']='Sie haben keine Berechtigung.';
+	    $data['errormsg']=$p->t('global/keineBerechtigung');
 	    break;
 	}
 	break;
@@ -255,10 +263,11 @@ function getPruefungsfensterByStudiensemester($studiensemester_kurzbz)
  */
 function savePruefungstermin($uid, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $pruefungsintervall)
 {
+	global $p;
     if($lehrveranstaltungen === null)
     {
 	$data['error']='true';
-	$data['errormsg']="Keine Lehrverantaltung angegeben.";
+	$data['errormsg']=$p->t('pruefung/keineLvAngegeben');
 	return $data;
     }
     $termineArray = array();
@@ -282,7 +291,7 @@ function savePruefungstermin($uid, $studiensemester_kurzbz, $pruefungsfenster_id
 	    else
 	    {
 		$data['error']='true';
-		$data['errormsg']="Kollision mit anderem Termin.";
+		$data['errormsg']=$p->t('pruefung/kollisionMitAnderemTermin');
 		return $data;
 	    }
 //	}
@@ -292,7 +301,7 @@ function savePruefungstermin($uid, $studiensemester_kurzbz, $pruefungsfenster_id
 //	    $data['errormsg']="Termin ist nicht innerhalb des Prüfungsfensters.";
 //	    return $data;
 //	}
-    }    
+    }
 
     $pruefung = new pruefungCis();
     $pruefung->termine = $termineArray;
@@ -313,7 +322,7 @@ function savePruefungstermin($uid, $studiensemester_kurzbz, $pruefungsfenster_id
 	    array_push($pruefung->lehrveranstaltungen, $lv);
 	}
     }
-    
+
     if($pruefung->save(true))
     {
 	$data['result']="true";
@@ -397,12 +406,13 @@ function getLehrveranstaltungenByMitarbeiter($mitarbeiter_uid, $studiensemester_
  */
 function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $termineNeu, $pruefungsintervall)
 {
+	global $p;
     $pruefungsfenster = new pruefungsfenster();
     $pruefungsfenster->load($pruefungsfenster_id);
     $datum = new datum();
     $pruefung = new pruefungCis();
     $pruefung->load($pruefung_id);
-    
+
     if($termineNeu !== null)
     {
 	$termineNeuArray = array();
@@ -426,7 +436,7 @@ function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pru
 		else
 		{
 		    $data['error']='true';
-		    $data['errormsg']="Kollision mit anderem Termin.";
+		    $data['errormsg']=$p->t('pruefung/kollisionMitAnderemTermin');
 		    return $data;
 		}
 //	    }
@@ -442,7 +452,7 @@ function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pru
 	    $pruefung->saveTerminPruefung($pruefung_id, $t->beginn, $t->ende, $t->max, $t->min, $t->sammelklausur);
 	}
     }
-    
+
     if($termine !== null)
     {
 	$termineArray = array();
@@ -474,7 +484,7 @@ function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pru
 	}
 	$pruefung->termine = $termineArray;
     }
-    
+
     $pruefung->mitarbeiter_uid = $uid;
     $pruefung->studiensemester_kurzbz = $studiensemester_kurzbz;
     $pruefung->pruefungsfenster_id = $pruefungsfenster_id;

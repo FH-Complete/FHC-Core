@@ -609,8 +609,8 @@ class studienplan extends basis_db
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->sort = $row->sort;
-				$this->curriculum = $row->curriculum;
-				$this->export = $row->export;
+				$this->curriculum = $this->db_parse_bool($row->curriculum);
+				$this->export = $this->db_parse_bool($row->export);
 				$this->new=false;
 				return true;
 			}
@@ -700,7 +700,7 @@ class studienplan extends basis_db
 	 * @param $ausbuldungssemester
 	 * @param $orgform_kurzbz
 	 */
-	function getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester, $orgform_kurzbz = "")
+	function getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester="", $orgform_kurzbz = "")
 	{
 		$qry = "SELECT
 					*
@@ -711,8 +711,10 @@ class studienplan extends basis_db
 				WHERE
 					tbl_studienplan.aktiv
 					AND tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)."
-					AND tbl_studienplan_semester.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
-					AND tbl_studienplan_semester.semester=".$this->db_add_param($ausbildungssemester);
+					AND tbl_studienplan_semester.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz);
+
+		if($ausbildungssemester!='')
+			$qry.=" AND tbl_studienplan_semester.semester=".$this->db_add_param($ausbildungssemester);
 
 		if($orgform_kurzbz!='')
 		{
@@ -896,12 +898,17 @@ class studienplan extends basis_db
 					$this->db_add_param($key["ausbildungssemester"]) . '); ';
 			}
 
-			if (!$this->db_query($qry))
+			if($qry!='')
 			{
-				$this->errormsg = 'Fehler beim Speichern des Datensatzes';
-				return false;
+				if (!$this->db_query($qry))
+				{
+					$this->errormsg = 'Fehler beim Speichern des Datensatzes';
+					return false;
+				}
+				return true;
 			}
-			return true;
+			else
+				return true;
 		}
 		else
 		{

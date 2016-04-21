@@ -9,15 +9,18 @@
 - **[CORE]** Reihungstest Punkteübernahme oder Prozentpunkte ist konfigurierbar
 - **[CIS]** LVPlan Export für Excel
 - **[FAS]** Termine Karteireiter im FAS zeigt die Anmerkung aus dem LVPlan an
+- **[CIS]** Onlinebewerbungstool greift auf mehrsprachige Statusbezeichnungen zu.
 
 ### Changed
 - **[FAS]** Dokumente Menü im FAS neu sortiert um den Lebenszyklus des Studierenden abzubilden
 - **[CORE]** LVPlan Update Mail ist nun zweisprachig Deutsch/Englisch
 - **[FAS]** Prüfungen im FAS werden nur noch vom aktuell ausgewählten Studiensemester angezeigt. Umschalten auf volle Ansicht möglich
-- **[CIS]** LVPlan Begrenzung der 4er Blockung aufgehoben. 
- 
+- **[CIS]** LVPlan Begrenzung der 4er Blockung aufgehoben.
+- **[CIS]** Im Menü 'Zeitsperren' Link zu Resturlaubsübersicht entfernt. Falls benötigt Verlinkung über CMS möglich.
+
 ### Updateinfo
-- **[FAS]** Für Lehraufträge muss eine Unoconv-Vorlage erstellt werden, da der für xsl-fo notwendige Seitenumbruch-Tag aus dem RDF entfernt wurde. 
+- **[FAS]** Für Lehraufträge muss eine Unoconv-Vorlage erstellt werden, da der für xsl-fo notwendige Seitenumbruch-Tag aus dem RDF entfernt wurde.
+- **[FAS]** Mehrsprachigkeitsspalte tbl_status.bezeichnung_mehrsprachig wird durch das Updatescript automatisch in den ersten beiden Sprachen mit der status_kurzbz vorbefüllt. Übersetzungen sind anzupassen.
 
 ## [3.1.0] - 2015-11-12
 ### Added
@@ -25,7 +28,7 @@
 - **[FAS]** Bei Noten können zusätzlich Punkte gespeichert werden. Notenschlüssel für Gesamtnote kann hinterlegt werden
 - **[FAS]** Anwesenheiten von Studierenden können erfasst werden
 - **[FAS]** Vertragsverwaltung bei Mitarbeiter
-- **[FAS]** Dokumente im FAS können mit SHIFT bzw STRG statt als PDF auch als DOC oder ODT erstellt werden 
+- **[FAS]** Dokumente im FAS können mit SHIFT bzw STRG statt als PDF auch als DOC oder ODT erstellt werden
 - **[BERECHTIGUNG]** system/changeoutputformat Legt fest ob Dokumente als DOC/ODT exportiert werden dürfen
 - **[FAS]** Termine Karteireiter im FAS zeigt den LVPlan von Studierenden/Lehrveranstaltungen
 - **[FAS]** Bereits verplante Lektoren können vom FAS aus, aus dem LVPlan gelöscht werden. Zusätzlich wird im FAS angezeigt ob dieser Lektor bereits verplant ist
@@ -37,7 +40,7 @@
 - **[CORE]** Mehrsprachigkeit bei diversen Tabellen (Dokumente, ZGV, ...) hinzugefügt
 
 ### Fixed
-- **[TEMPUS]** Kollisionsfreie User werden in Verbandsansicht nicht mehr als Kollision angezeigt 
+- **[TEMPUS]** Kollisionsfreie User werden in Verbandsansicht nicht mehr als Kollision angezeigt
 
 ### Changed
 - **[FAS]** Stundenobergrenze für Lektoren kann jetzt pro Organisationseinheit festgelegt werden. (warn_semesterstunden_frei/fix tbl_organisationseinheit)

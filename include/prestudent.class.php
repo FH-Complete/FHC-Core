@@ -973,9 +973,13 @@ class prestudent extends person
 			return false;
 		}
 
-		$qry = "SELECT tbl_prestudentstatus.*, bezeichnung AS studienplan_bezeichnung
-			FROM public.tbl_prestudentstatus LEFT JOIN lehre.tbl_studienplan USING (studienplan_id)
-			 WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
+		$qry = "SELECT tbl_prestudentstatus.*, bezeichnung AS studienplan_bezeichnung,
+                tbl_status.bezeichnung_mehrsprachig
+                FROM public.tbl_prestudentstatus
+                LEFT JOIN lehre.tbl_studienplan USING (studienplan_id)
+                JOIN public.tbl_status USING (status_kurzbz)
+                WHERE tbl_status.status_kurzbz = tbl_prestudentstatus.status_kurzbz
+                AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
 
 		if($studiensemester_kurzbz!='')
 			$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
@@ -990,6 +994,7 @@ class prestudent extends person
 			{
 				$this->prestudent_id = $row->prestudent_id;
 				$this->status_kurzbz = $row->status_kurzbz;
+				$this->status_mehrsprachig = $this->db_parse_lang_array($row->bezeichnung_mehrsprachig);
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$this->ausbildungssemester = $row->ausbildungssemester;
 				$this->datum = $row->datum;

@@ -155,9 +155,10 @@ class studienordnung extends basis_db
 		}
 		else
 		{
-			$qry = 'SELECT sto.*, s.bezeichnung as status_bezeichnung, sem.* FROM lehre.tbl_studienordnung sto
+			$qry = 'SELECT distinct sto.*, s.bezeichnung as status_bezeichnung, sem.* FROM lehre.tbl_studienordnung sto
 					JOIN lehre.tbl_studienordnungstatus s USING(status_kurzbz)
-					LEFT JOIN lehre.tbl_studienordnung_semester sem USING (studienordnung_id)
+					LEFT JOIN lehre.tbl_studienplan USING(studienordnung_id)
+					LEFT JOIN lehre.tbl_studienplan_semester sem USING (studienplan_id)
 					WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
 
 			if (!is_null($studiensemester_kurzbz))
@@ -200,7 +201,8 @@ class studienordnung extends basis_db
 			{
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->semester = $row->semester;
-				$obj->studienordnung_semester_id = $row->studienordnung_semester_id;
+				//$obj->studienordnung_semester_id = $row->studienordnung_semester_id;
+				$obj->studienplan_semester_id = $row->studienplan_semester_id;
 			}
 			$this->result[] = $obj;
 		}

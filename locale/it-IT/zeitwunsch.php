@@ -1,0 +1,25 @@
+<?php
+$this->phrasen['zeitwunsch/bedeutung']='';
+$this->phrasen['zeitwunsch/beiProblemenWendenSieSichAn']='';
+$this->phrasen['zeitwunsch/erklaerung']='';
+$this->phrasen['zeitwunsch/erklärung']='';
+$this->phrasen['zeitwunsch/esSolltenFuerJedeStunde']='';
+$this->phrasen['zeitwunsch/falscheWerteEingetragen']='';
+$this->phrasen['zeitwunsch/folgendePunkteSindZuBeachten']='';
+$this->phrasen['zeitwunsch/formularZumEintragenDerZeitsperren']='';
+$this->phrasen['zeitwunsch/help']='';
+$this->phrasen['zeitwunsch/hierAufGarKeinenFall']='';
+$this->phrasen['zeitwunsch/hierKannIchUnterrichten']='';
+$this->phrasen['zeitwunsch/hierMoechteIchUnterrichten']='';
+$this->phrasen['zeitwunsch/kontrollierenSieIhreZeitwuensche']='';
+$this->phrasen['zeitwunsch/letzteAenderung']='';
+$this->phrasen['zeitwunsch/nurInNotfaellen']='';
+$this->phrasen['zeitwunsch/profil']='';
+$this->phrasen['zeitwunsch/sperrenSieNurTermine']='';
+$this->phrasen['zeitwunsch/tragenSieInDiesesNormwochenraster']='inserire nel modulo settimanale standard la propria disponibilità relativa alla normale settimana lavorativa';
+$this->phrasen['zeitwunsch/verwendenSieDenWertNur']='';
+$this->phrasen['zeitwunsch/von']='';
+$this->phrasen['zeitwunsch/wert']='';
+$this->phrasen['zeitwunsch/zeitwunsch']='';
+$this->phrasen['zeitwunsch/zeitwunschVon']='';
+?>
