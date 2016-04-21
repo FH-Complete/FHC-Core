@@ -153,5 +153,6 @@ $this->phrasen['global/warnungWirklichLoeschen']='';
 $this->phrasen['global/zurueck']='Indietro';
 $this->phrasen['global/zuruecksetzen']='';
 $this->phrasen['global/zweck']='';
+$this->phrasen['global/ects']='ECTS';
 
 ?>
