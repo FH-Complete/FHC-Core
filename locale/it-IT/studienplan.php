@@ -1,6 +1,6 @@
 <?php
 $this->phrasen['studienplan/abgeschlossen']='superato';
-$this->phrasen['studienplan/anmelden']='inscriversi';
+$this->phrasen['studienplan/anmelden']='iscriversi';
 $this->phrasen['studienplan/Anmeldung']='Scelta del corso opzionale';
 $this->phrasen['studienplan/AnmeldungDerzeitNichtMoeglich']='';
 $this->phrasen['studienplan/anmeldunggesperrt']='';
