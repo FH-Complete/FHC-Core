@@ -57,7 +57,7 @@ $studiensemester->getAll();
         <script src="../../../../include/js/datecheck.js"></script>
         <script src="../../../../include/js/jquery1.9.min.js"></script>
 	<script src="../../../../include/js/jquery.tablesorter.min.js"></script>
-        <script src="./pruefung.js"></script>
+        <script src="./pruefung.js.php"></script>
         <link rel="stylesheet" href="../../../../skin/jquery-ui-1.9.2.custom.min.css">
         <link rel="stylesheet" href="../../../../skin/fhcomplete.css">
         <link rel="stylesheet" href="../../../../skin/style.css.php">
