@@ -173,31 +173,50 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 		if ($lv_obj->load_lva($studiengang_kz,$semester,null,TRUE,TRUE,'orgform_kurzbz DESC, bezeichnung'))
 		{
 			$db = new basis_db();
+			$qry = "SELECT * FROM lehre.tbl_studienordnung WHERE studiengang_kz=".$this->db_add_param($studiengang_kz)." AND status_kurzbz='approved'";
+			$genehmigte_sto_vorhanden=false;
+			if($result_sto = $db->db_query($qry))
+			{
+				if($db->db_num_rows($result_sto)>0)
+				{
+					$genehmigte_sto_vorhanden=true;
+				}
+			}
+
 			$lastform=null;
 			foreach ($lv_obj->lehrveranstaltungen as $row)
 			{
 				// Alle LVs herausfiltern die nicht in genehmigten Studienplaenen vorkommen
 				// Module werden auch herausgefiltert
-
-				$qry = "SELECT
-							count(*) as anzahl
-						FROM
-							lehre.tbl_studienplan_lehrveranstaltung
-							JOIN lehre.tbl_studienplan USING(studienplan_id)
-							JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-							JOIN lehre.tbl_lehrtyp USING(lehrtyp_kurzbz)
-						WHERE
-							tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($row->lehrveranstaltung_id)."
-							AND tbl_studienordnung.status_kurzbz='approved'
-							AND lehrtyp_kurzbz='lv'";
-				if($result_genehmigt = $db->db_query($qry))
+				if($genehmigte_sto_vorhanden)
 				{
-					if($row_genehmigt = $db->db_fetch_object($result_genehmigt))
+					$qry = "SELECT
+								count(*) as anzahl
+							FROM
+								lehre.tbl_studienplan_lehrveranstaltung
+								JOIN lehre.tbl_studienplan USING(studienplan_id)
+								JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+								JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+								JOIN lehre.tbl_lehrtyp USING(lehrtyp_kurzbz)
+							WHERE
+								tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($row->lehrveranstaltung_id)."
+								AND tbl_studienordnung.status_kurzbz='approved'
+								AND lehrtyp_kurzbz='lv'";
+					if($result_genehmigt = $db->db_query($qry))
 					{
-						if($row_genehmigt->anzahl==0)
-							continue;
+						if($row_genehmigt = $db->db_fetch_object($result_genehmigt))
+						{
+							if($row_genehmigt->anzahl==0)
+								continue;
+						}
 					}
+				}
+				else
+				{
+					// Wenn es in diesem Studiengang keine genehmigte Studienordnung gibt dann 
+					// alle LVs anzeigen und nur die Module herausfiltern
+					if($row->lehrtyp_kurzbz!='lv')
+						continue;
 				}
 
 				if($row->orgform_kurzbz!=$lastform)
