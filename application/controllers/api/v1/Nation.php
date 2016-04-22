@@ -35,12 +35,12 @@ class Nation extends REST_Controller
 		
 		$result = $this->NationModel->getAll($notLocked, $orderEnglish);
 		
-		if(!is_null($result) && $result->num_rows() > 0)
+		if(is_object($result))
 		{
 			$payload = [
 				'success'	=>	TRUE,
 				'message'	=>	'Nation found',
-				'data'		=>	$result->result()[0]
+				'data'		=>	$result->result()
 			];
 			$httpstatus = REST_Controller::HTTP_OK;
 		}
@@ -60,12 +60,12 @@ class Nation extends REST_Controller
 	{
 		$result = $this->NationModel->getFederalState();
 		
-		if(!is_null($result) && $result->num_rows() > 0)
+		if(is_object($result))
 		{
 			$payload = [
 				'success'	=>	TRUE,
 				'message'	=>	'Bundesland found',
-				'data'		=>	$result->result_array()
+				'data'		=>	$result->result()
 			];
 			$httpstatus = REST_Controller::HTTP_OK;
 		}

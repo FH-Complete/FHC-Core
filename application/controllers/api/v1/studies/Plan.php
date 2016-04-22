@@ -34,12 +34,12 @@ class Plan extends REST_Controller
 		
 		$result = $this->PlanModel->getCurricula($courseOfStudiesID);
 		
-		if(!is_null($result) && $result->num_rows() > 0)
+		if(is_object($result))
 		{
 			$payload = [
 				'success'	=>	TRUE,
 				'message'	=>	'Curricula found',
-				'data'		=>	$result->result()[0]
+				'data'		=>	$result->result()
 			];
 			$httpstatus = REST_Controller::HTTP_OK;
 		}

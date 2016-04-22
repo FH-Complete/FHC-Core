@@ -38,7 +38,7 @@ class Nation_model extends DB_Model
 		
 		if($notLocked)
 		{
-			$qry .= " WHERE sperre is null";
+			$qry .= " WHERE sperre IS NULL";
 		}
 		if(!$orderEnglish)
 		{

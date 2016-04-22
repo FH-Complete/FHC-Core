@@ -32,12 +32,12 @@ class Course extends REST_Controller
 	{
 		$result = $this->CourseModel->getEnabledCourses();
 		
-		if(!is_null($result) && $result->num_rows() > 0)
+		if(is_object($result))
 		{
 			$payload = [
 				'success'	=>	TRUE,
 				'message'	=>	'Courses found',
-				'data'		=>	$result->result()[0]
+				'data'		=>	$result->result()
 			];
 			$httpstatus = REST_Controller::HTTP_OK;
 		}
@@ -45,7 +45,7 @@ class Course extends REST_Controller
 		{
 			$payload = [
 				'success'	=>	FALSE,
-				'message'	=>	'Person not found'
+				'message'	=>	'No courses found'
 			];
 			$httpstatus = REST_Controller::HTTP_OK;
 		}

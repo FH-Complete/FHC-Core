@@ -39,26 +39,14 @@ class Person extends REST_Controller
 
 		$result = $this->PersonModel->getPerson($personID, $code, $email);
 
-		if(!is_null($result) && $result->num_rows() > 0)
+		if(is_object($result))
 		{
-			if($result->num_rows() > 1)
-			{
-				$payload = [
-					'success'	=>	TRUE,
-					'message'	=>	'People found',
-					'data'		=>	$result->result()[0]
-				];
-				$httpstatus = REST_Controller::HTTP_OK;
-			}
-			else if($result->num_rows() == 1)
-			{
-				$payload = [
-					'success'	=>	TRUE,
-					'message'	=>	'Person found',
-					'data'		=>	$result->result()[0]
-				];
-				$httpstatus = REST_Controller::HTTP_OK;
-			}
+			$payload = [
+				'success'	=>	TRUE,
+				'message'	=>	'People found',
+				'data'		=>	$result->result()
+			];
+			$httpstatus = REST_Controller::HTTP_OK;
 		}
 		else
 		{
@@ -93,6 +81,32 @@ class Person extends REST_Controller
 			$payload = [
 				'success' => false,
 				'message' => 'Could not save person.'
+			];
+			$httpstatus = REST_Controller::HTTP_OK;
+		}
+		$this->response($payload, $httpstatus);
+	}
+	
+	/**
+	 * 
+	 */
+	public function postInterestedStudent()
+	{
+		$result = $this->PersonModel->saveInterestedStudent($this->post());
+		
+		if($result === TRUE)
+		{
+			$httpstatus = REST_Controller::HTTP_OK;
+			$payload = [
+				'success' => true,
+				'message' => 'Interested student saved.'
+			];
+		}
+		else
+		{
+			$payload = [
+				'success' => false,
+				'message' => 'Could not save interested student.'
 			];
 			$httpstatus = REST_Controller::HTTP_OK;
 		}
@@ -138,32 +152,6 @@ class Person extends REST_Controller
 			$httpstatus = REST_Controller::HTTP_OK;
 		}
 
-		$this->response($payload, $httpstatus);
-	}
-	
-	/**
-	 * 
-	 */
-	public function postInterestedStudent()
-	{
-		$result = $this->PersonModel->saveInterestedStudent($this->post());
-		
-		if($result === TRUE)
-		{
-			$httpstatus = REST_Controller::HTTP_OK;
-			$payload = [
-				'success' => true,
-				'message' => 'Interested student saved.'
-			];
-		}
-		else
-		{
-			$payload = [
-				'success' => false,
-				'message' => 'Could not save interested student.'
-			];
-			$httpstatus = REST_Controller::HTTP_OK;
-		}
 		$this->response($payload, $httpstatus);
 	}
 }

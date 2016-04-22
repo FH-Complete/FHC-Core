@@ -56,11 +56,11 @@ class Person_model extends DB_Model
 		// All the code should be put inside this if statement
 		if($this->_checkPermissions())
 		{
-			if((!is_null($code)) && (!is_null($email)))
+			if((isset($code)) && (isset($email)))
 			{
 				$result = $this->_getPersonByCodeAndEmail($code, $email);
 			}
-			elseif(!is_null($code))
+			elseif(isset($code))
 			{
 				$result = $this->_getPersonByCode($code);
 			}
@@ -77,11 +77,11 @@ class Person_model extends DB_Model
 	 * @param int $personID Person ID
 	 * @return object
 	 */
-	private function _getPersonByID($personID)
+	private function _getPersonByID($personID = NULL)
 	{
 		$result = NULL;
 		
-		if(!is_null($personID))
+		if(isset($personID))
 		{
 			$result = $this->db->query($this->_loadQuery, array($personID));
 		}
@@ -92,24 +92,38 @@ class Person_model extends DB_Model
 	/**
 	 * 
 	 */
-	private function _getPersonByCodeAndEmail($code, $email)
+	private function _getPersonByCodeAndEmail($code = NULL, $email = NULL)
 	{
-		$this->db->select("*")
-				->from('public.tbl_person p')
-				->join("public.tbl_kontakt k", "k.person_id=p.person_id")
-				->where("p.zugangscode", $code)
-				->where("k.kontakt", $email);
+		$result = NULL;
+		$query = "SELECT *
+					FROM public.tbl_person p JOIN public.tbl_kontakt k USING (person_id)
+				   WHERE p.zugangscode = ?
+					 AND k.kontakt = ?";
+		
+		if((isset($code)) && (isset($email)))
+		{
+			$result = $this->db->query($query, array($code, $email));
+		}
 
-		return $this->db->get()->result_object();
+		return $result;
 	}
 
 	/**
 	 * 
 	 */
-	private function _getPersonByCode($code)
+	private function _getPersonByCode($code = NULL)
 	{
-		$query = $this->db->get_where('public.tbl_person', array('zugangscode' => $code));
-		return $query->result_object();
+		$result = NULL;
+		$query = "SELECT *
+					FROM public.tbl_person p
+				   WHERE p.zugangscode = ?";
+		
+		if(isset($code))
+		{
+			$result = $this->db->query($query, array($code));
+		}
+
+		return $result;
 	}
 
 	/**
