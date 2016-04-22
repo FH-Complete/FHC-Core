@@ -95,4 +95,14 @@ class DB_Model extends FHC_Model
 	{
 		$this->_addonID = $addonID;
 	}
+	
+	/**
+	 * Method getAddonID
+	 * 
+	 * @return string _addonID
+	 */
+	public function getAddonID()
+	{
+		return $this->_addonID;
+	}
 }
