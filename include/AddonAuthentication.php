@@ -5,7 +5,7 @@
  * CI_Hack couldn't be included here because this class is called every time an addon
  * makes an API call, so it would raise a lot of "already declared" errors
  */
-require_once('/var/www/fhc/fhcomplete/vendor/codeigniter/framework/system/core/Model.php');
+require_once(dirname(__FILE__).'/../vendor/codeigniter/framework/system/core/Model.php');
 require_once(dirname(__FILE__).'/../application/core/FHC_Model.php');
 
 /**
