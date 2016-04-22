@@ -8,6 +8,7 @@ class FHC_Model extends CI_Model
 	{
 		parent::__construct();
 		$this->load->helper('language');
+		$this->load->helper('fhc_db_acl');
 		$this->lang->load('fhcomplete');
 	}
 
@@ -82,15 +83,6 @@ class DB_Model extends FHC_Model
 			'code' => $error,
 			'msg' => lang('fhc_' . $error)
 		);
-	}
-	
-	/**
-	 * TODO
-	 */
-	protected function _checkPermissions()
-	{
-		// If _addonID is NOT set (core) or if _addonID is set (API call) and has permissions
-		return !isset($this->_addonID) || (isset($this->_addonID) && TRUE);
 	}
 	
 	/**

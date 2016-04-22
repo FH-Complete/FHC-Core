@@ -347,6 +347,11 @@ if (isset($assign_to_config) && is_array($assign_to_config))
  */
 $LANG =& load_class('Lang', 'core');
 
+define('FHC_INTEGER',1);
+define('FHC_STRING',2);
+define('FHC_BOOLEAN',3);
+define('FHC_LANG_ARRAY',4);
+
 function &get_instance()
 {
 	return CI_Controller::get_instance();

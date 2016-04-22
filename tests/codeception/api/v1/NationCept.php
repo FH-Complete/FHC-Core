@@ -1,7 +1,7 @@
 <?php
 
 $I = new ApiTester($scenario);
-$I->wantTo('Test API call v1/nation/All');
+$I->wantTo('Test API call v1/nation All and FederalState');
 $I->amHttpAuthenticated("wu11e001", "1Q2W3E4R");
 $I->haveHttpHeader('FHC-API-KEY', 'testapikey@fhcomplete.org');
 $I->sendGET('v1/nation/All');

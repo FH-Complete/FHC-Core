@@ -24,7 +24,7 @@ class Plan_model extends DB_Model
 		
 		// Checks if the operation is permitted by the API caller
 		// All the code should be put inside this if statement
-		if($this->_checkPermissions())
+		if(isAllowed($this->_addonID, 'person'))
 		{
 			$result = $this->db->query($this->_planQuery, array($courseOfStudiesID));
 		}

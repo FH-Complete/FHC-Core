@@ -54,7 +54,7 @@ class Person_model extends DB_Model
 		
 		// Checks if the operation is permitted by the API caller
 		// All the code should be put inside this if statement
-		if($this->_checkPermissions())
+		if(isAllowed($this->_addonID, 'person'))
 		{
 			if((isset($code)) && (isset($email)))
 			{
@@ -135,7 +135,7 @@ class Person_model extends DB_Model
 		
 		// Checks if the operation is permitted by the API caller
 		// All the code should be put inside this if statement
-		if($this->_checkPermissions())
+		if(isAllowed($this->_addonID, 'person'))
 		{
 			if($this->_validate($person))
 			{
@@ -331,7 +331,7 @@ class Person_model extends DB_Model
 	{
 		// Checks if the operation is permitted by the API caller
 		// All the code should be put inside this if statement
-		if($this->_checkPermissions())
+		if(isAllowed($this->_addonID, 'person'))
 		{
 			return $this->_saveInterestedStudent($interestedStudent);
 		}
