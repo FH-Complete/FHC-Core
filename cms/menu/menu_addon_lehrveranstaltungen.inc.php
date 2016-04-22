@@ -19,10 +19,10 @@
  */
 /**
  * Menue Addon zur Auswahl von LVs
- * 
+ *
  * Dieses Addon erstellt ein Formular zur Auswahl von Studiengang und Semester und zeigt die
  * zugehoerigen LVs an
- * 
+ *
  * Parameter fuer das Params Array:
  * - studiengang_kz
  * - semester
@@ -44,9 +44,9 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 		global $params;
 
 		parent::__construct();
-		
+
 		$this->link=false;
-		
+
 		$sprache = getSprache();
 		$user = get_uid();
 		$student = new student();
@@ -55,17 +55,17 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 			$studiengang_kz=$student->studiengang_kz;
 			$semester=$student->semester;
 		}
-			
+
 		$p = new phrasen($sprache);
-		
-		
+
+
 		$this->block.='
 			<script language="JavaScript" type="text/javascript">
 			<!--
 				function MM_jumpMenu(targ, selObj, restore)
 				{
 				  eval(targ + ".location=\'" + selObj.options[selObj.selectedIndex].value + "\'");
-			
+
 				  if(restore)
 				  {
 				  	selObj.selectedIndex = 0;
@@ -86,7 +86,7 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 
 		if(isset($params['studiengang_kz']) && is_numeric($params['studiengang_kz']))
 			$studiengang_kz=$params['studiengang_kz'];
-		
+
 		if(isset($params['semester']) && is_numeric($params['semester']))
 			$semester=$params['semester'];
 		else
@@ -94,7 +94,7 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 			if(!isset($semester))
 				$semester=1;
 		}
-		
+
 		$sel_kurzbzlang='';
 		foreach($stg_obj->result as $row)
 		{
@@ -115,7 +115,7 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 				}
 			}
 		}
-		
+
 		$this->block.='
 			  	</select>
 			  	</td>
@@ -127,7 +127,7 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 			  	<td class="tdwrap">'.$p->t('global/semester').': </td>
 			  	<td class="tdwrap">
 			  	<select name="term" onChange="MM_jumpMenu(\'self\',this,0)">';
-		
+
 		$short = 'Fehler Stg.Kz '.$studiengang_kz;
 		$max = 1;
 		if ($stg_obj=new studiengang($studiengang_kz))
@@ -137,12 +137,12 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 		}
 		if($semester>$max)
 			$semester=1;
-			
+
 		$params['studiengang_kz'] = $studiengang_kz;
 		$params['semester'] = $semester;
 		$params['studiengang_kurzbz_lo'] = strtolower($short);
 		$params['studiengang_kurzbz_hi'] = $short;
-		
+
 		for($i=0;$i<$max;$i++)
 		{
 			if(($i+1)==$semester)
@@ -150,7 +150,7 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 			else
 				$this->block.= '<option value="?content_id='.$_GET['content_id'].'&studiengang_kz='.$studiengang_kz.'&semester='.($i+1).'">'.($i+1).'. Semester</option>';
 		}
-		
+
 		$this->block.='
 			  	</select>
 			  	</td>
@@ -165,24 +165,49 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 		  <td class="tdwrap">&nbsp;</td>
 		</tr>';
 
-		
+
 		if (!$lv_obj = new lehrveranstaltung())
-			die('Fehler beim Oeffnen der Lehrveranstaltung'); 
-				 
+			die('Fehler beim Oeffnen der Lehrveranstaltung');
+
 		$lv_obj->lehrveranstaltungen=array();
 		if ($lv_obj->load_lva($studiengang_kz,$semester,null,TRUE,TRUE,'orgform_kurzbz DESC, bezeichnung'))
 		{
+			$db = new basis_db();
 			$lastform=null;
 			foreach ($lv_obj->lehrveranstaltungen as $row)
-			{		
+			{
+				// Alle LVs herausfiltern die nicht in genehmigten Studienplaenen vorkommen
+				// Module werden auch herausgefiltert
+
+				$qry = "SELECT
+							count(*) as anzahl
+						FROM
+							lehre.tbl_studienplan_lehrveranstaltung
+							JOIN lehre.tbl_studienplan USING(studienplan_id)
+							JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+							JOIN lehre.tbl_lehrtyp USING(lehrtyp_kurzbz)
+						WHERE
+							tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($row->lehrveranstaltung_id)."
+							AND tbl_studienordnung.status_kurzbz='approved'
+							AND lehrtyp_kurzbz='lv'";
+				if($result_genehmigt = $db->db_query($qry))
+				{
+					if($row_genehmigt = $db->db_fetch_object($result_genehmigt))
+					{
+						if($row_genehmigt->anzahl==0)
+							continue;
+					}
+				}
+
 				if($row->orgform_kurzbz!=$lastform)
 				{
 					$orgform = new organisationsform();
 					$orgform->load($row->orgform_kurzbz);
-					
-					$this->block.= "<tr><td><b>$orgform->bezeichnung</b></td></tr>";			
-					
-					$lastform=$row->orgform_kurzbz;						
+
+					$this->block.= "<tr><td><b>$orgform->bezeichnung</b></td></tr>";
+
+					$lastform=$row->orgform_kurzbz;
 				}
 				$this->block.= '<tr>';
 				$this->block.= '	<td class="tdwrap"><ul style="margin: 0px; padding: 0px; ">';
@@ -194,7 +219,7 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 		$this->block.='</table>';
 		$this->output();
 	}
-	
+
 	private function CutString($strVal, $limit)
 	{
 		if(mb_strlen($strVal) > $limit+3)
