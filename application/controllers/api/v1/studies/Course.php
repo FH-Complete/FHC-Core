@@ -32,7 +32,7 @@ class Course extends REST_Controller
 	{
 		$result = $this->CourseModel->getEnabledCourses();
 		
-		if(is_object($result))
+		if(is_object($result) && $result->num_rows() > 0)
 		{
 			$payload = [
 				'success'	=>	TRUE,

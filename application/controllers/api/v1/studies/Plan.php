@@ -28,17 +28,17 @@ class Plan extends REST_Controller
 		$this->PlanModel->setAddonID($this->_getAddonID());
 	}
 	
-	public function getCurricula()
+	public function getPlan()
 	{
 		$courseOfStudiesID = $this->get('studiengang_kz');
 		
-		$result = $this->PlanModel->getCurricula($courseOfStudiesID);
+		$result = $this->PlanModel->getPlan($courseOfStudiesID);
 		
-		if(is_object($result))
+		if(is_object($result) && $result->num_rows() > 0)
 		{
 			$payload = [
 				'success'	=>	TRUE,
-				'message'	=>	'Curricula found',
+				'message'	=>	'Plan found',
 				'data'		=>	$result->result()
 			];
 			$httpstatus = REST_Controller::HTTP_OK;
@@ -47,7 +47,7 @@ class Plan extends REST_Controller
 		{
 			$payload = [
 				'success'	=>	FALSE,
-				'message'	=>	'Curricula not found'
+				'message'	=>	'Plan not found'
 			];
 			$httpstatus = REST_Controller::HTTP_OK;
 		}

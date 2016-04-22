@@ -3,7 +3,7 @@
 class Plan_model extends DB_Model
 {
 	// 
-	protected $_curriculaQuery = "SELECT DISTINCT tbl_studienplan.*
+	protected $_planQuery = "SELECT DISTINCT tbl_studienplan.*
 							 	    FROM lehre.tbl_studienplan JOIN lehre.tbl_studienordnung USING(studienordnung_id)
 						 		   WHERE tbl_studienordnung.studiengang_kz = ?";
 
@@ -18,7 +18,7 @@ class Plan_model extends DB_Model
 	/**
 	 * 
 	 */
-	public function getCurricula($courseOfStudiesID)
+	public function getPlan($courseOfStudiesID)
 	{
 		$result = NULL;
 		
@@ -26,7 +26,7 @@ class Plan_model extends DB_Model
 		// All the code should be put inside this if statement
 		if($this->_checkPermissions())
 		{
-			$result = $this->db->query($this->_curriculaQuery, array($courseOfStudiesID));
+			$result = $this->db->query($this->_planQuery, array($courseOfStudiesID));
 		}
 		
 		return $result;

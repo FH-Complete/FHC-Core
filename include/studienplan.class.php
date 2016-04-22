@@ -729,7 +729,7 @@ class studienplan extends Plan_model
      */
     function getStudienplaene($studiengang_kz)
     {
-		$qry = str_replace('?', $this->db_add_param($studiengang_kz, FHC_INTEGER), $this->_curriculaQuery);
+		$qry = str_replace('?', $this->db_add_param($studiengang_kz, FHC_INTEGER), $this->_planQuery);
 
     	if($result = $this->db_query($qry))
     	{

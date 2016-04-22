@@ -39,11 +39,11 @@ class Person extends REST_Controller
 
 		$result = $this->PersonModel->getPerson($personID, $code, $email);
 
-		if(is_object($result))
+		if(is_object($result) && $result->num_rows() > 0)
 		{
 			$payload = [
 				'success'	=>	TRUE,
-				'message'	=>	'People found',
+				'message'	=>	'Person found',
 				'data'		=>	$result->result()
 			];
 			$httpstatus = REST_Controller::HTTP_OK;
