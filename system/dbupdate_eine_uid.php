@@ -43,6 +43,7 @@ array
 	array("schema" => "public", "name" => "tbl_studentlehrverband",   "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid", "constraint" => "SET NOT NULL"),
 	array("schema" => "lehre",  "name" => "tbl_projektarbeit",        "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid", "constraint" => "SET NOT NULL"),
 	array("schema" => "fue",    "name" => "tbl_ressource",            "from" => "student_uid", "to" => "uid",           "datatype" => "varchar(32)", "newTarget" => "tbl_benutzer",   "newTargetSchema" => "public", "pickDataFrom" => "tbl_benutzer", "pickDataFromCol" => "uid"        , "constraint" => ""),
+	array("schema" => "lehre",  "name" => "tbl_pruefung",             "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid", "constraint" => "SET NOT NULL"),
 );
 
 if(!isset($_POST["action"]))
@@ -403,6 +404,25 @@ echo '</body></html>';
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* FUNCTIONS */
 function describeOneChange($db, $table)
 {
@@ -491,7 +511,7 @@ function modifyOneTable($db, $table)
 
 		//constraints: $TO FK, $TO
 		if($table["constraint"] != "")
-			$constraint_qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ALTER COLUMN '.$table["to"].' '.$table["constraint"];
+			$constraint_qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ALTER COLUMN '.$table["to"].' '.$table["constraint"].";";
 
 		$constraint_qry.=' ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT fk_'.$table["name"].'_'.$table["newTarget"].'_'.$table["to"].' FOREIGN KEY ('.$table["to"].') REFERENCES '.$table["newTargetSchema"].'.'.$table["newTarget"].' ('.$table["to"].');';
 
