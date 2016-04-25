@@ -2442,5 +2442,51 @@ class lehrveranstaltung extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Prüft ob eine Lehrvernstaltung in Studienplordnungen verwendet wird die
+ 	 * nicht mehr in bearbeitung sind. Diese sind fuer die bearbeitung gesperrt
+	 * @param integer $lehrveranstaltung_id
+	 * @return boolean true wenn gesperrt
+	 * @return boolean false wenn nicht gesperrt
+	 * @return boolean false und errormsg im Fehlerfall
+	 */
+	public function isGesperrt($lehrveranstaltung_id)
+	{
+		$qry = "SELECT
+					count(*) as anzahl
+				FROM
+					lehre.tbl_studienplan
+					JOIN lehre.tbl_studienplan_lehrveranstaltung USING(studienplan_id)
+					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+				WHERE
+					tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
+					AND tbl_studienordnung.status_kurzbz<>'development'";
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				if($row->anzahl>0)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				$this->errormsg='Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

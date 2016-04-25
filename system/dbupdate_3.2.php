@@ -1114,9 +1114,30 @@ if (!$result = @$db->db_query("SELECT genehmigung FROM lehre.tbl_studienplan_leh
 		echo ' lehre.tbl_studienplan_lehrveranstaltung: Spalte genehmigung hinzugefügt.<br>';
 }
 
+//Spalte pruefungstyp_kurzbz in campus.tbl_pruefungsanmeldung
+if (!$result = @$db->db_query("SELECT pruefungstyp_kurzbz FROM campus.tbl_pruefungsanmeldung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE campus.tbl_pruefungsanmeldung ADD COLUMN pruefungstyp_kurzbz varchar(16);
+		ALTER TABLE campus.tbl_pruefungsanmeldung ADD CONSTRAINT fk_pruefungsanmeldung_pruefungstyp_pruefungstyp_kurzbz FOREIGN KEY (pruefungstyp_kurzbz) REFERENCES lehre.tbl_pruefungstyp(pruefungstyp_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;";
+
+	if (!$db->db_query($qry))
+		echo '<strong>campus.tbl_pruefungsanmeldung: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' campus.tbl_pruefungsanmeldung: Spalte pruefungstyp_kurzbz hinzugefügt.<br>';
+}
+
+// Neue Spalte bezeichnung_mehrsprachig bei tbl_status
+if(!@$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_status LIMIT 1"))
+{
+	$qry = " ALTER TABLE public.tbl_status ADD COLUMN bezeichnung_mehrsprachig varchar(255)[];
+			update tbl_status set bezeichnung_mehrsprachig = cast('{'||status_kurzbz||','||status_kurzbz||'}' as varchar[]);";
 
 
-
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_status '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte bezeichnung_mehrsprachig in public.tbl_status hinzugefügt<br>Die ersten beiden Sprachen wurden vorbefüllt. Weitere Übersetzungen sind zu ergänzen!<br>';
+}
 
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -1327,7 +1348,7 @@ $tabellen=array(
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv", "anmerkung","bewerbung_abgeschicktamum"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz"),
-	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
+	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id","bezeichnung_mehrsprachig"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
 	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id"),
 	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content","bezeichnung"),

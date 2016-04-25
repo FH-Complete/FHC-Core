@@ -22,6 +22,7 @@
  * Klasse projekt
  *
  * Verwaltet die Projekte
+ * @param string $projekt_kurzbz primary key Projektname.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
@@ -51,9 +52,9 @@ class projekt extends basis_db
 
 	/**
 	 * Konstruktor
-	 * @param $projekt_kurzbz ID der Projektarbeit, die geladen werden soll (Default=null)
+	 * @param string $projekt_kurzbz ID der Projektarbeit, die geladen werden soll (Default=null).
 	 */
-	public function __construct($projekt_kurzbz=null)
+	public function __construct($projekt_kurzbz = null)
 	{
 		parent::__construct();
 
@@ -63,28 +64,28 @@ class projekt extends basis_db
 
 	/**
 	 * Laedt die Projek mit der Kurzbezeichnung $projekt_kurzbz
-	 * @param  $projekt_kurzbz Kurzbz des Projekts
+	 * @param  string $projekt_kurzbz Kurzbz des Projekts.
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function load($projekt_kurzbz)
 	{
 		$qry = "SELECT * FROM fue.tbl_projekt WHERE projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
 
-		if($this->db_query($qry))
+		if ($this->db_query($qry))
 		{
-			if($row = $this->db_fetch_object())
+			if ($row = $this->db_fetch_object())
 			{
 				$this->projekt_kurzbz = $row->projekt_kurzbz;
-				$this->nummer= $row->nummer;
-				$this->titel= $row->titel;
-				$this->beschreibung= $row->beschreibung;
-				$this->beginn= $row->beginn;
+				$this->nummer = $row->nummer;
+				$this->titel = $row->titel;
+				$this->beschreibung = $row->beschreibung;
+				$this->beginn = $row->beginn;
 				$this->ende = $row->ende;
-				$this->oe_kurzbz= $row->oe_kurzbz;
-				$this->budget= $row->budget;
-            $this->farbe= $row->farbe;
-            $this->anzahl_ma = $row->anzahl_ma;
-            $this->aufwand_pt = $row->aufwand_pt;
+				$this->oe_kurzbz = $row->oe_kurzbz;
+				$this->budget = $row->budget;
+				$this->farbe = $row->farbe;
+				$this->anzahl_ma = $row->anzahl_ma;
+				$this->aufwand_pt = $row->aufwand_pt;
 
 				return true;
 			}
@@ -103,26 +104,27 @@ class projekt extends basis_db
 
     /**
      * Laedt alle aktuellen Projekte
-     * @param $kommend lädt auch alle zukünftigen
-     * @return boolean
+     * @param bool $filter_kommende Lädt auch alle zukünftigen.
+	 * @param string $oe Organisationseinheit.
+     * @return bool
      */
-    public function getProjekteAktuell($filter_kommende = false, $oe=null)
+    public function getProjekteAktuell($filter_kommende = false, $oe = null)
     {
         $qry = 'SELECT * FROM fue.tbl_projekt WHERE ';
 
         if($filter_kommende)
-            $qry.= " ((beginn < CURRENT_TIMESTAMP AND ende > CURRENT_TIMESTAMP) OR beginn > CURRENT_TIMESTAMP)";
+            $qry .= " ((beginn < CURRENT_TIMESTAMP AND ende > CURRENT_TIMESTAMP) OR beginn > CURRENT_TIMESTAMP)";
         else
-            $qry.=" (beginn < CURRENT_TIMESTAMP AND ende > CURRENT_TIMESTAMP)";
+            $qry .= " (beginn < CURRENT_TIMESTAMP AND ende > CURRENT_TIMESTAMP)";
 
 
-        if(!is_null($oe))
-            $qry.= ' AND oe_kurzbz='.$this->db_add_param($oe);
+        if (!is_null($oe))
+            $qry .= ' AND oe_kurzbz='.$this->db_add_param($oe);
 
-        $qry.= ' ORDER BY oe_kurzbz;';
-        if($this->db_query($qry))
+        $qry .= ' ORDER BY oe_kurzbz;';
+        if ($this->db_query($qry))
 		{
-			while($row = $this->db_fetch_object())
+			while ($row = $this->db_fetch_object())
 			{
 				$obj = new projekt();
 
@@ -134,10 +136,10 @@ class projekt extends basis_db
 				$obj->ende = $row->ende;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->budget = $row->budget;
-            $obj->farbe = $row->farbe;
-            $obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
-            $obj->anzahl_ma = $row->anzahl_ma;
-            $obj->aufwand_pt = $row->aufwand_pt;
+				$obj->farbe = $row->farbe;
+				$obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
+				$obj->anzahl_ma = $row->anzahl_ma;
+				$obj->aufwand_pt = $row->aufwand_pt;
 
 				$this->result[] = $obj;
 			}
@@ -152,21 +154,21 @@ class projekt extends basis_db
 
     /**
      * Laedt alle Projekte die zwischen beginn und ende liegen
-     * @param $beginn
-     * @param $ende
-     * @param $oe
-     * @return boolean
+     * @param date $beginn Anfang.
+     * @param date $ende Ende.
+     * @param string $oe Organisationseinheit.
+     * @return bool
      */
-    public function getProjekteInZeitraum($beginn, $ende, $oe=null)
+    public function getProjekteInZeitraum($beginn, $ende, $oe = null)
     {
 		$qry = 'select * from fue.tbl_projekt where beginn <= '.$this->db_add_param($ende).' and ende >= '.$this->db_add_param($beginn);
 		if (!is_null($oe))
-			$qry.= " AND oe_kurzbz=".$this->db_add_param($oe);
-		$qry.= ' ORDER BY oe_kurzbz;';
+			$qry .= " AND oe_kurzbz=".$this->db_add_param($oe);
+		$qry .= ' ORDER BY oe_kurzbz;';
 		//echo $qry;
-		if($this->db_query($qry))
+		if ($this->db_query($qry))
 		{
-			while($row = $this->db_fetch_object())
+			while ($row = $this->db_fetch_object())
 			{
 				$obj = new projekt();
 
@@ -178,9 +180,9 @@ class projekt extends basis_db
 				$obj->ende = $row->ende;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->budget = $row->budget;
-            $obj->farbe = $row->farbe;
-            $obj->anzahl_ma = $row->anzahl_ma;
-            $obj->aufwand_pt = $row->aufwand_pt;
+				$obj->farbe = $row->farbe;
+				$obj->anzahl_ma = $row->anzahl_ma;
+				$obj->aufwand_pt = $row->aufwand_pt;
 
 				$this->result[] = $obj;
 			}
@@ -196,19 +198,19 @@ class projekt extends basis_db
 
 	/**
 	 * Laedt die Projeke einer Organisationseinheit
-	 * @param  $projekt_kurzbz Kurzbezeichnung des Projekts
+	 * @param string $oe Organisationseinheit.
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getProjekte($oe=null)
+	public function getProjekte($oe = null)
 	{
 		$qry = 'SELECT * FROM fue.tbl_projekt';
 		if (!is_null($oe))
-			$qry.= " WHERE oe_kurzbz=".$this->db_add_param($oe);
-		$qry.= ' ORDER BY oe_kurzbz;';
+			$qry .= " WHERE oe_kurzbz=".$this->db_add_param($oe);
+		$qry .= ' ORDER BY oe_kurzbz;';
 		//echo $qry;
-		if($this->db_query($qry))
+		if ($this->db_query($qry))
 		{
-			while($row = $this->db_fetch_object())
+			while ($row = $this->db_fetch_object())
 			{
 				$obj = new projekt();
 
@@ -220,10 +222,10 @@ class projekt extends basis_db
 				$obj->ende = $row->ende;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->budget = $row->budget;
-            $obj->farbe = $row->farbe;
-            $obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
-            $obj->anzahl_ma = $row->anzahl_ma;
-            $obj->aufwand_pt = $row->aufwand_pt;
+				$obj->farbe = $row->farbe;
+				$obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
+				$obj->anzahl_ma = $row->anzahl_ma;
+				$obj->aufwand_pt = $row->aufwand_pt;
 
 				$this->result[] = $obj;
 			}
@@ -242,27 +244,26 @@ class projekt extends basis_db
 	 */
 	protected function validate()
 	{
-
 		//Gesamtlaenge pruefen
-		if ($this->projekt_kurzbz==null)
+		if ($this->projekt_kurzbz == null)
 		{
-			$this->errormsg='Projekt kurzbz darf nicht NULL sein!';
+			$this->errormsg = 'Projekt kurzbz darf nicht NULL sein!';
 		}
-		if ($this->oe_kurzbz==null)
+		if ($this->oe_kurzbz == null)
 		{
-			$this->errormsg='OE kurbz darf nicht NULL sein!';
+			$this->errormsg = 'OE kurbz darf nicht NULL sein!';
 		}
-		if(mb_strlen($this->projekt_kurzbz)>16)
+		if (mb_strlen($this->projekt_kurzbz) > 16)
 		{
 			$this->errormsg = 'Projektyp_kurzbz darf nicht länger als 16 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->nummer)>8)
+		if (mb_strlen($this->nummer) > 8)
 		{
 			$this->errormsg = 'Nummer darf nicht länger als 8 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->titel)>256)
+		if (mb_strlen($this->titel) > 256)
 		{
 			$this->errormsg = 'Titel darf nicht länger als 256 Zeichen sein';
 			return false;
@@ -276,22 +277,23 @@ class projekt extends basis_db
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	 * andernfalls wird der Datensatz mit der ID in $projekt_kurzbz aktualisiert
+	 * @param bool $new Neu ja/nein.
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function save($new=null)
+	public function save($new = null)
 	{
 		//Variablen pruefen
 		if(!$this->validate())
 			return false;
 
-		if($new==null)
+		if ($new == null)
 			$new = $this->new;
 
-		if($new)
+		if ($new)
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='INSERT INTO fue.tbl_projekt (projekt_kurzbz, nummer, titel,beschreibung, beginn, ende, budget, farbe, oe_kurzbz, aufwand_pt, anzahl_ma, aufwandstyp_kurzbz) VALUES('.
+			$qry = 'INSERT INTO fue.tbl_projekt (projekt_kurzbz, nummer, titel,beschreibung, beginn, ende, budget, farbe, oe_kurzbz, aufwand_pt, anzahl_ma, aufwandstyp_kurzbz) VALUES('.
 		     $this->db_add_param($this->projekt_kurzbz).', '.
 		     $this->db_add_param($this->nummer).', '.
 		     $this->db_add_param($this->titel).', '.
@@ -299,7 +301,7 @@ class projekt extends basis_db
 		     $this->db_add_param($this->beginn).', '.
 		     $this->db_add_param($this->ende).', '.
 		     $this->db_add_param($this->budget).', '.
-             $this->db_add_param($this->farbe).', '.
+	 	     $this->db_add_param($this->farbe).', '.
 		     $this->db_add_param($this->oe_kurzbz).','.
 		     $this->db_add_param($this->aufwand_pt).','.
 		     $this->db_add_param($this->anzahl_ma).','.
@@ -309,7 +311,7 @@ class projekt extends basis_db
 		{
 			//Updaten des bestehenden Datensatzes
 
-			$qry='UPDATE fue.tbl_projekt SET '.
+			$qry = 'UPDATE fue.tbl_projekt SET '.
 				'projekt_kurzbz='.$this->db_add_param($this->projekt_kurzbz).', '.
 				'nummer='.$this->db_add_param($this->nummer).', '.
 				'titel='.$this->db_add_param($this->titel).', '.
@@ -317,7 +319,7 @@ class projekt extends basis_db
 				'beginn='.$this->db_add_param($this->beginn).', '.
 				'ende='.$this->db_add_param($this->ende).', '.
 				'budget='.$this->db_add_param($this->budget).', '.
-                'farbe='.$this->db_add_param($this->farbe).', '.
+				'farbe='.$this->db_add_param($this->farbe).', '.
 				'oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).', '.
 				'anzahl_ma='.$this->db_add_param($this->anzahl_ma).', '.
 				'aufwand_pt='.$this->db_add_param($this->aufwand_pt).', '.
@@ -325,7 +327,7 @@ class projekt extends basis_db
 				'WHERE projekt_kurzbz='.$this->db_add_param($this->projekt_kurzbz).';';
 		}
 
-		if($this->db_query($qry))
+		if ($this->db_query($qry))
 		{
 			return true;
 		}
@@ -338,15 +340,14 @@ class projekt extends basis_db
 
 	/**
 	 * Loescht den Datenensatz
-	 * @param $projekt_kurzbz Projekt das geloescht werden soll
+	 * @param string $projekt_kurzbz Projekt das geloescht werden soll.
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function delete($projekt_kurzbz)
 	{
-
 		$qry = "DELETE FROM lehre.tbl_projek WHERE projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
 
-		if($this->db_query($qry))
+		if ($this->db_query($qry))
 		{
 			return true;
 		}
@@ -359,11 +360,12 @@ class projekt extends basis_db
 
 	/**
 	 * Liefert die Projekte zu denen ein Mitarbeiter zugeordnet ist.
-         * Optional auch mit den Zuteilungen zu Projektphasen.
-	 * @param $mitarbeiter_uid
-         * @param $projektphasen boolean Default false. Wenn true, werden auch Zuteilungen zu Projektphasen geliefert.
+	 * Optional auch mit den Zuteilungen zu Projektphasen.
+	 * @param string $mitarbeiter_uid MitarbeiterUID.
+	 * @param bool $projektphasen Default false. Wenn true, werden auch Zuteilungen zu Projektphasen geliefert.
+	 * @return true wenn ok, false im Fehlerfall
 	 */
-	function getProjekteMitarbeiter($mitarbeiter_uid, $projektphasen=false)
+	function getProjekteMitarbeiter($mitarbeiter_uid, $projektphasen = false)
 	{
                 $qry = "SELECT DISTINCT
 					tbl_projekt.*
@@ -375,8 +377,8 @@ class projekt extends basis_db
 				AND (ende>=now() OR ende is null)
 				AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid);
 
-                if ($projektphasen==true)
-                    $qry.=  "UNION
+                if ($projektphasen == true)
+                    $qry .=  "UNION
 
                              SELECT DISTINCT
                                         tbl_projekt.*
@@ -386,12 +388,12 @@ class projekt extends basis_db
                                         JOIN fue.tbl_projekt_ressource USING (projektphase_id)
                                         JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
                                 WHERE (tbl_projekt.beginn<=now() or tbl_projekt.beginn is null)
-                                AND (tbl_projekt.ende>=now() OR tbl_projekt.ende is null OR 1=1) 
+                                AND (tbl_projekt.ende>=now() OR tbl_projekt.ende is null OR 1=1)
                                 AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid);
 
-		if($result = $this->db_query($qry))
+		if ($result = $this->db_query($qry))
 		{
-			while($row = $this->db_fetch_object($result))
+			while ($row = $this->db_fetch_object($result))
 			{
 				$obj = new projekt();
 
@@ -415,25 +417,25 @@ class projekt extends basis_db
 	}
 	public function getProjektFromBestellung($bestellung_id)
 	{
-		$qry ="select * from fue.tbl_projekt
+		$qry = "select * from fue.tbl_projekt
 				join wawi.tbl_projekt_bestellung USING (projekt_kurzbz)
 				where bestellung_id= ".$this->db_add_param($bestellung_id);
 
-		if($this->db_query($qry))
+		if ($this->db_query($qry))
 		{
-			if($row = $this->db_fetch_object())
+			if ($row = $this->db_fetch_object())
 			{
 				$this->projekt_kurzbz = $row->projekt_kurzbz;
-				$this->nummer= $row->nummer;
-				$this->titel= $row->titel;
-				$this->beschreibung= $row->beschreibung;
-				$this->beginn= $row->beginn;
+				$this->nummer = $row->nummer;
+				$this->titel = $row->titel;
+				$this->beschreibung = $row->beschreibung;
+				$this->beginn = $row->beginn;
 				$this->ende = $row->ende;
-				$this->oe_kurzbz= $row->oe_kurzbz;
-				$this->budget= $row->budget;
-            $this->farbe= $row->farbe;
-            $this->anzahl_ma = $row->anzahl_ma;
-            $this->aufwand_pt = $row->aufwand_pt;
+				$this->oe_kurzbz = $row->oe_kurzbz;
+				$this->budget = $row->budget;
+				$this->farbe = $row->farbe;
+				$this->anzahl_ma = $row->anzahl_ma;
+				$this->aufwand_pt = $row->aufwand_pt;
 
 				return true;
 			}
@@ -449,6 +451,5 @@ class projekt extends basis_db
 			return false;
 		}
 	}
-
 }
 ?>

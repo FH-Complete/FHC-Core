@@ -1,0 +1,39 @@
+<?php
+$this->phrasen['urlaubstool/aktuellerStand']='stato attuale';
+$this->phrasen['urlaubstool/aktuellGebuchterUrlaub']='ferie attualmente prenotate';
+$this->phrasen['urlaubstool/anspruch']='';
+$this->phrasen['urlaubstool/anspruchAnzahlDerUrlaubstage']='';
+$this->phrasen['urlaubstool/bis']='';
+$this->phrasen['urlaubstool/diesIstEineAutomatischeMail']='';
+$this->phrasen['urlaubstool/eintragungenSpeichern']='';
+$this->phrasen['urlaubstool/eintragungLoeschen']='';
+$this->phrasen['urlaubstool/eintragWirklichLoeschen']='';
+$this->phrasen['urlaubstool/erreichbar']='';
+$this->phrasen['urlaubstool/erreichbarkeit']='';
+$this->phrasen['urlaubstool/fehlerBeimSendenAufgetreten']='errore in sede di trasmissione della mail di attivazione a %s';
+$this->phrasen['urlaubstool/fehlerBeimSendenVertretungAufgetreten']='errore in sede di trasmissione della mail di informazione a %s per la sostituzione per vacanze';
+$this->phrasen['urlaubstool/freigabeansuchenUrlaub']='';
+$this->phrasen['urlaubstool/freigabemailWurdeVersandt']='';
+$this->phrasen['urlaubstool/freigegebenDurch']='';
+$this->phrasen['urlaubstool/freigegebenDurchAm']='';
+$this->phrasen['urlaubstool/handbuchUrlaubserfassung']='';
+$this->phrasen['urlaubstool/hilfe']='';
+$this->phrasen['urlaubstool/jaehrlich']='';
+$this->phrasen['urlaubstool/keineVertretungEingetragen']='';
+$this->phrasen['urlaubstool/konnteKeinFreigabemailVersendetWerden']='';
+$this->phrasen['urlaubstool/mailtextVertretung']='';
+$this->phrasen['urlaubstool/meineZeitsperren']='';
+$this->phrasen['urlaubstool/ok']='';
+$this->phrasen['urlaubstool/resturlaub']='';
+$this->phrasen['urlaubstool/sieKoennenDiesenUnterFolgenderAdresseFreigeben']='';
+$this->phrasen['urlaubstool/stichtag']='';
+$this->phrasen['urlaubstool/tage']='';
+$this->phrasen['urlaubstool/urlaubImGeschaeftsjahr']='';
+$this->phrasen['urlaubstool/urlaubstool']='';
+$this->phrasen['urlaubstool/vertretung']='';
+$this->phrasen['urlaubstool/vertretungsmailWurdeVersandt']='';
+$this->phrasen['urlaubstool/von']='';
+$this->phrasen['urlaubstool/xHatNeuenUrlaubEingetragen']='';
+$this->phrasen['urlaubstool/zuerstVertretungAuswaehlen']='';
+
+?>

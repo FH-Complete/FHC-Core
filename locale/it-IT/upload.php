@@ -1,0 +1,40 @@
+<?php
+$this->phrasen['upload/aktionen']='azioni';
+$this->phrasen['upload/auswaehlen']='';
+$this->phrasen['upload/benutzerKonnteNichtZugeordnetWerden']='';
+$this->phrasen['upload/dateiAufServerDateiformat']='Errore: il formato del file che si vuole caricare sul server non viene supportato';
+$this->phrasen['upload/dateien']='';
+$this->phrasen['upload/dateienAutomatischUeberschreiben']='';
+$this->phrasen['upload/dateienImOrdner']='';
+$this->phrasen['upload/dateienInOrdnern']='';
+$this->phrasen['upload/dateiExistiertBereits']='Errore: il file è già esistente! Si prega di utilizzare l\'opzione "sovrascrivere automaticamente i file';
+$this->phrasen['upload/dateinameDarfNurBuchstaben']='';
+$this->phrasen['upload/dateiUpload']='';
+$this->phrasen['upload/esWurdeKeinPfadDefiniert']='';
+$this->phrasen['upload/fehlerBeimLadenDerLv']='errore di caricamento della LV';
+$this->phrasen['upload/fehlerBeimLoeschenDesOrdners']='errore in sede di cancellazione della cartella';
+$this->phrasen['upload/formattributInEinNeues ']='';
+$this->phrasen['upload/kbGespeichert']='';
+$this->phrasen['upload/keineDateienGefunden']='impossibile trovare file';
+$this->phrasen['upload/keineGegenstaendeDefiniert']='';
+$this->phrasen['upload/keineOrdnerGefunden']='impossibile trovare cartelle corrispondenti';
+$this->phrasen['upload/keineSemesterDefiniert']='';
+$this->phrasen['upload/keineStudiengaengeDefiniert']='';
+$this->phrasen['upload/leeren']='';
+$this->phrasen['upload/maxUploadgroesse']='';
+$this->phrasen['upload/name']='';
+$this->phrasen['upload/neuesVerzeichnisErstellen']='';
+$this->phrasen['upload/studentenUploadEinsehen']='';
+$this->phrasen['upload/studentenUploadVerwalten']='';
+$this->phrasen['upload/studentenUploadverzeichnis']='';
+$this->phrasen['upload/studentenUploadverzeichnisLeeren']='';
+$this->phrasen['upload/umEinenOrdnerOderEineDatei']='';
+$this->phrasen['upload/unterordnerVon']='';
+$this->phrasen['upload/upload']='';
+$this->phrasen['upload/verzeichnisErstellen']='';
+$this->phrasen['upload/verzeichnisname']='';
+$this->phrasen['upload/verzeichnisnameDarfNurBuchstaben']='';
+$this->phrasen['upload/wollenSieOrdnerWirklichLoeschen']='';
+$this->phrasen['upload/wollenSieUploadWirklichLeeren']='';
+
+?>
