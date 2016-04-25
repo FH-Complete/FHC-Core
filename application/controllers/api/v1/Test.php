@@ -2,12 +2,12 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-require_once APPPATH . '/libraries/REST_Controller.php';
+//require_once APPPATH . '/libraries/REST_Controller.php';
 
 /**
  * Testing class for REST calls and authentication
  */
-class Test extends REST_Controller
+class Test extends APIv1_Controller
 {
     public function __construct()
     {

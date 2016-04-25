@@ -223,7 +223,7 @@ $config['auth_library_function'] = 'basicAuthentication';
 |    restrict certain methods to IPs in your whitelist
 |
 */
-$config['rest_ip_whitelist_enabled'] = TRUE;
+$config['rest_ip_whitelist_enabled'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------

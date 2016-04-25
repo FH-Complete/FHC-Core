@@ -2,7 +2,7 @@
 
 $I = new ApiTester($scenario);
 $I->wantTo('Test the HTTP basic autentication whith HTTP GET and POST method and the API Keys');
-$I->amHttpAuthenticated("wu11e001", "1Q2W3E4R");
+$I->amHttpAuthenticated("admin", "1q2w3");
 $I->haveHttpHeader('FHC-API-KEY', 'testapikey@fhcomplete.org');
 $I->sendGET('Test/test');
 $I->seeResponseCodeIs(200);

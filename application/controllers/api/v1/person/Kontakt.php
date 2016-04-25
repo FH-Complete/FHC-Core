@@ -15,7 +15,7 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Kontakt extends REST_Controller
+class Kontakt extends APIv1_Controller
 {
 
     //public $session;
