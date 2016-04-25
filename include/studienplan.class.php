@@ -28,9 +28,9 @@ require_once(dirname(__FILE__).'/datum.class.php');
 
 // CI
 require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/studies/Plan_model.php');
+require_once(dirname(__FILE__).'/../application/models/lehre/Studienplan_model.php');
 
-class studienplan extends Plan_model
+class studienplan extends Studienplan_model
 {
 	use db_extra; //CI Hack
 	
@@ -729,33 +729,36 @@ class studienplan extends Plan_model
      */
     function getStudienplaene($studiengang_kz)
     {
-		$qry = str_replace('?', $this->db_add_param($studiengang_kz, FHC_INTEGER), $this->_studienplaeneQuery);
-
-    	if($result = $this->db_query($qry))
+		error_log("getStudienplaene called!!!");
+		
+		$result = parent::getStudienplaene($studiengang_kz);
+		
+    	if(is_object($result))
     	{
-    	    while($row = $this->db_fetch_object($result))
+			foreach($result->result() as $row)
     	    {
-    		$obj = new studienplan();
+				$obj = new studienplan();
 
-    		$obj->studienplan_id = $row->studienplan_id;
-    		$obj->studienordnung_id = $row->studienordnung_id;
-    		$obj->orgform_kurzbz = $row->orgform_kurzbz;
-    		$obj->version = $row->version;
-    		$obj->bezeichnung = $row->bezeichnung;
-    		$obj->regelstudiendauer = $row->regelstudiendauer;
-    		$obj->sprache = $row->sprache;
-    		$obj->aktiv = $this->db_parse_bool($row->aktiv);
-    		$obj->semesterwochen = $row->semesterwochen;
-    		$obj->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
-    		$obj->updateamum = $row->updateamum;
-    		$obj->updatevon = $row->updatevon;
-    		$obj->insertamum = $row->insertamum;
-    		$obj->insertvon = $row->insertvon;
-    		$obj->new=false;
+				$obj->studienplan_id = $row->studienplan_id;
+				$obj->studienordnung_id = $row->studienordnung_id;
+				$obj->orgform_kurzbz = $row->orgform_kurzbz;
+				$obj->version = $row->version;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->regelstudiendauer = $row->regelstudiendauer;
+				$obj->sprache = $row->sprache;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->semesterwochen = $row->semesterwochen;
+				$obj->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->new = FALSE;
 
-    		$this->result[] = $obj;
+				$this->result[] = $obj;
     	    }
-    	    return true;
+			
+    	    return TRUE;
     	}
     }
 

@@ -2,41 +2,6 @@
 
 class Person_model extends DB_Model
 {
-	// 
-	protected $_loadQuery = "SELECT person_id,
-								    sprache,
-								    anrede,
-								    titelpost,
-								    titelpre,
-								    nachname,
-								    vorname,
-								    vornamen,
-								    gebdatum,
-								    gebort,
-								    gebzeit,
-								    foto,
-								    anmerkung,
-								    homepage,
-								    svnr,
-								    ersatzkennzeichen,
-								    familienstand,
-								    anzahlkinder,
-								    aktiv,
-								    insertamum,
-								    insertvon,
-								    updateamum,
-								    updatevon,
-								    ext_id,
-								    geschlecht,
-								    staatsbuergerschaft,
-								    geburtsnation,
-								    kurzbeschreibung,
-								    zugangscode,
-								    foto_sperre,
-								    matr_nr
-							   FROM public.tbl_person
-							  WHERE person_id = ?";
-	
 	/**
 	 * 
 	 */
@@ -48,7 +13,7 @@ class Person_model extends DB_Model
 	/**
 	 * 
 	 */
-	public function getPerson($personID = NULL, $code = NULL, $email = NULL)
+	public function getPerson($personId = NULL, $code = NULL, $email = NULL)
 	{
 		$result = NULL;
 		
@@ -66,7 +31,7 @@ class Person_model extends DB_Model
 			}
 			else
 			{
-				$result = $this->_getPersonByID($personID);
+				$result = $this->_getPersonByID($personId);
 			}
 		}
 		
@@ -74,16 +39,49 @@ class Person_model extends DB_Model
 	}
 	
 	/**
-	 * @param int $personID Person ID
+	 * @param int $personId Person ID
 	 * @return object
 	 */
-	private function _getPersonByID($personID = NULL)
+	private function _getPersonByID($personId = NULL)
 	{
 		$result = NULL;
+		$loadQuery = "SELECT person_id,
+							sprache,
+							anrede,
+							titelpost,
+							titelpre,
+							nachname,
+							vorname,
+							vornamen,
+							gebdatum,
+							gebort,
+							gebzeit,
+							foto,
+							anmerkung,
+							homepage,
+							svnr,
+							ersatzkennzeichen,
+							familienstand,
+							anzahlkinder,
+							aktiv,
+							insertamum,
+							insertvon,
+							updateamum,
+							updatevon,
+							ext_id,
+							geschlecht,
+							staatsbuergerschaft,
+							geburtsnation,
+							kurzbeschreibung,
+							zugangscode,
+							foto_sperre,
+							matr_nr
+					   FROM public.tbl_person
+					  WHERE person_id = ?";
 		
-		if(isset($personID))
+		if(isset($personId))
 		{
-			$result = $this->db->query($this->_loadQuery, array($personID));
+			$result = $this->db->query($loadQuery, array($personId));
 		}
 		
 		return $result;

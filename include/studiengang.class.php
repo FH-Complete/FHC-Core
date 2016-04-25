@@ -26,9 +26,9 @@ require_once(dirname(__FILE__).'/datum.class.php');
 
 // CI
 require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/studies/Course_model.php');
+require_once(dirname(__FILE__).'/../application/models/lehre/Studiengang_model.php');
 
-class studiengang extends Course_model
+class studiengang extends Studiengang_model
 {
 	use db_extra; //CI Hack
 	
@@ -247,18 +247,19 @@ class studiengang extends Course_model
      */
     public function getAllForBewerbung()
     {
-		if(!$result = $this->db_query($this->_allForBewerbungQuery))
+		error_log("getAllForBewerbung called!!!");
+		
+		$result = parent::getAllForBewerbung();
+		
+		if(!is_object($result))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
-			return false;
+			return FALSE;
 		}
 
-		while($row = $this->db_fetch_object($result))
-		{
-			$this->result[] = $row;
-		}
+		$this->result = $result->result();
 
-		return true;
+		return TRUE;
     }
 
 	/**

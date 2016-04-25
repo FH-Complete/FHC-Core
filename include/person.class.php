@@ -90,17 +90,19 @@ class person extends Person_model
 	public function load($personId)
 	{
 		//person_id auf gueltigkeit pruefen
-		if (is_numeric($personId) && $personId != '')
+		if(is_numeric($personId) && $personId != '')
 		{
-			$qry = str_replace('?', $this->db_add_param($personId, FHC_INTEGER), $this->_loadQuery);
-
-			if (!$this->db_query($qry))
+			$result = $this->getPerson($personId);
+			
+			if(!is_object($result))
 			{
 				$this->errormsg = "Fehler beim Lesen der Personendaten\n";
-				return false;
+				return FALSE;
 			}
 
-			if ($row = $this->db_fetch_object())
+			$row = $result->row();
+			
+			if(isset($row))
 			{
 				$this->person_id = $row->person_id;
 				$this->sprache = $row->sprache;
