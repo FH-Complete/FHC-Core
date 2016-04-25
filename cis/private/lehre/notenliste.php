@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Andreas Moik <moik@technikum-wien.at>
  */
 /*
  * Erstellt eine Liste mit den Noten des eingeloggten Studenten
@@ -31,6 +32,7 @@ require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/note.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/student.class.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/pruefung.class.php');
@@ -261,8 +263,9 @@ else
 
 			$tbl .= '<td>'.$datum_obj->formatDatum($row->benotungsdatum,'d.m.Y').'</td>';
 
+			$student = new student($user);
 			$pruefung = new pruefung();
-			$pruefung->getPruefungen($user, null,$row->lehrveranstaltung_id,$stsem);
+			$pruefung->getPruefungen($student->prestudent_id, null,$row->lehrveranstaltung_id,$stsem);
 
 			if(count($pruefung->result)>0)
 			{

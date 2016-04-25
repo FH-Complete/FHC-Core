@@ -233,6 +233,8 @@ function getNoten()
  */
 function saveBeurteilung($lehrveranstaltung_id, $student_uid, $mitarbeiter_uid, $note, $pruefung_id, $datum, $anmerkung, $pruefungsanmeldung_id, $uid)
 {
+	$student = new student($student_uid);
+	
 	global $p;
     $pruefungCis = new pruefungCis($pruefung_id);
     $lehrveranstaltung = new lehrveranstaltung();
@@ -245,7 +247,7 @@ function saveBeurteilung($lehrveranstaltung_id, $student_uid, $mitarbeiter_uid, 
 	$pruefungstermin = new pruefungstermin($pruefungsanmeldung->pruefungstermin_id);
 
 	$pruefung->lehreinheit_id = $lehreinheiten[0];
-	$pruefung->student_uid = $student_uid;
+	$pruefung->prestudent_id = $student->prestudent_id;
 	$pruefung->mitarbeiter_uid = $mitarbeiter_uid;
 	$pruefung->note = $note;
 	$pruefung->pruefungstyp_kurzbz = $pruefungsanmeldung->pruefungstyp_kurzbz;

@@ -17,38 +17,39 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *          Gerald Raab <gerald.raab@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class pruefung extends basis_db
 {
-    public $new;      				// boolean
-    public $result = array();		// pruefung Objekt
+	public $new;      				// boolean
+	public $result = array();		// pruefung Objekt
 
-    public $pruefung_id;
-    public $lehreinheit_id;			// integer
-    public $student_uid;			// varchar(16)
-    public $mitarbeiter_uid;		// varchar(16)
-    public $note;					// smallint
-    public $pruefungstyp_kurzbz;	// varchar(16)
-    public $datum;					// Date
-    public $anmerkung;				// varchar(256)
-    public $insertamum;				// timestamp)
-    public $insertvon;				// varchar(16)
-    public $updateamum;				// timestamp
-    public $updatevon;				// varchar(16)
-    public $ext_id;					// bigint
-    public $pruefungsanmeldung_id;	// bigint
+	public $pruefung_id;
+	public $lehreinheit_id;			// integer
+	public $prestudent_id;			// integer
+	public $mitarbeiter_uid;		// varchar(16)
+	public $note;					// smallint
+	public $pruefungstyp_kurzbz;	// varchar(16)
+	public $datum;					// Date
+	public $anmerkung;				// varchar(256)
+	public $insertamum;				// timestamp)
+	public $insertvon;				// varchar(16)
+	public $updateamum;				// timestamp
+	public $updatevon;				// varchar(16)
+	public $ext_id;					// bigint
+	public $pruefungsanmeldung_id;	// bigint
 	public $vertrag_id;				// bigint
 	public $punkte;					// numeric(8,4)
 
-    public $lehrveranstaltung_bezeichnung;
-    public $lehrveranstaltung_id;
-    public $note_bezeichnung;
-    public $pruefungstyp_beschreibung;
-    public $studiensemester_kurzbz;
+	public $lehrveranstaltung_bezeichnung;
+	public $lehrveranstaltung_id;
+	public $note_bezeichnung;
+	public $pruefungstyp_beschreibung;
+	public $studiensemester_kurzbz;
 
     /**
      * Konstruktor
@@ -91,7 +92,7 @@ class pruefung extends basis_db
 		    {
 			    $this->pruefung_id = $row->pruefung_id;
 			    $this->lehreinheit_id=$row->lehreinheit_id;
-			    $this->student_uid=$row->student_uid;
+			    $this->prestudent_id=$row->prestudent_id;
 			    $this->mitarbeiter_uid=$row->mitarbeiter_uid;
 			    $this->note=$row->note;
 			    $this->pruefungstyp_kurzbz=$row->pruefungstyp_kurzbz;
@@ -122,11 +123,11 @@ class pruefung extends basis_db
      * Liefert alle Pruefungen
      * @return true wenn ok, false im Fehlerfall
      */
-    public function getAll($order=null, $student_uid=null)
+    public function getAll($order=null, $prestudent_id=null)
     {
 	    $qry = 'SELECT * FROM lehre.tbl_pruefung';
-	    if ($student_uid)
-		    $qry.=" WHERE student_uid =".$this->db_add_param($student);
+	    if ($prestudent_id)
+		    $qry.=" WHERE prestudent_id =".$this->db_add_param($student);
 
 	    if($order!=null)
 		    $qry .=" ORDER BY $order";
@@ -139,22 +140,22 @@ class pruefung extends basis_db
 
 	    while($row = $this->db_fetch_object())
 	    {
-		    $pruef_obj = new pruefung();
-		    $pruef_obj->lehreinheit_id=$row->lehreinheit_id;
-		    $pruef_obj->student_uid=$row->student_uid;
-		    $pruef_obj->mitarbeiter_uid=$row->mitarbeiter_uid;
-		    $pruef_obj->note=$row->note;
-		    $pruef_obj->pruefungstyp_kurzbz=$row->pruefungstyp_kurzbz;
-		    $pruef_obj->datum=$row->datum;
-		    $pruef_obj->anmerkung=$row->anmerkung;
-		    $pruef_obj->insertamum=$row->insertamum;
-		    $pruef_obj->insertvon=$row->insertvon;
-		    $pruef_obj->updateamum=$row->updateamum;
-		    $pruef_obj->updatevon=$row->updatevon;
-		    $pruef_obj->ext_id=$row->ext_id;
-		    $pruef_obj->pruefungsanmeldung_id=$row->pruefungsanmeldung_id;
-			$pruef_obj->vertrag_id = $row->vertrag_id;
-			$pruef_obj->punkte = $row->punkte;
+				$pruef_obj = new pruefung();
+				$pruef_obj->lehreinheit_id=$row->lehreinheit_id;
+				$pruef_obj->prestudent_id=$row->prestudent_id;
+				$pruef_obj->mitarbeiter_uid=$row->mitarbeiter_uid;
+				$pruef_obj->note=$row->note;
+				$pruef_obj->pruefungstyp_kurzbz=$row->pruefungstyp_kurzbz;
+				$pruef_obj->datum=$row->datum;
+				$pruef_obj->anmerkung=$row->anmerkung;
+				$pruef_obj->insertamum=$row->insertamum;
+				$pruef_obj->insertvon=$row->insertvon;
+				$pruef_obj->updateamum=$row->updateamum;
+				$pruef_obj->updatevon=$row->updatevon;
+				$pruef_obj->ext_id=$row->ext_id;
+				$pruef_obj->pruefungsanmeldung_id=$row->pruefungsanmeldung_id;
+				$pruef_obj->vertrag_id = $row->vertrag_id;
+				$pruef_obj->punkte = $row->punkte;
 
 		    $this->result[] = $pruef_obj;
 	    }
@@ -219,10 +220,10 @@ class pruefung extends basis_db
 	    if($this->new)
 	    {
 		    //Neuen Datensatz anlegen
-		    $qry = 'BEGIN;INSERT INTO lehre.tbl_pruefung (lehreinheit_id, student_uid, mitarbeiter_uid, note, pruefungstyp_kurzbz,
+		    $qry = 'BEGIN;INSERT INTO lehre.tbl_pruefung (lehreinheit_id, prestudent_id, mitarbeiter_uid, note, pruefungstyp_kurzbz,
 				datum, anmerkung, insertamum, insertvon, updateamum, updatevon, pruefungsanmeldung_id, vertrag_id, punkte) VALUES ('.
 			    $this->db_add_param($this->lehreinheit_id).', '.
-			    $this->db_add_param($this->student_uid).', '.
+			    $this->db_add_param($this->prestudent_id).', '.
 			    $this->db_add_param($this->mitarbeiter_uid).', '.
 			    $this->db_add_param($this->note).', '.
 			    $this->db_add_param($this->pruefungstyp_kurzbz).', '.
@@ -249,7 +250,7 @@ class pruefung extends basis_db
 
 		    $qry = 'UPDATE lehre.tbl_pruefung SET '.
 			    'lehreinheit_id='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).', '.
-			    'student_uid='.$this->db_add_param($this->student_uid).', '.
+			    'prestudent_id='.$this->db_add_param($this->prestudent_id).', '.
 			    'mitarbeiter_uid='.$this->db_add_param($this->mitarbeiter_uid).', '.
 			    'note='.$this->db_add_param($this->note).', '.
 			    'pruefungstyp_kurzbz='.$this->db_add_param($this->pruefungstyp_kurzbz).', '.
@@ -305,15 +306,15 @@ class pruefung extends basis_db
 
     /**
      * Liefert alle Pruefungen eines Studenten
-     * @param student_uid
+     * @param prestudent_id
      * @return true wenn ok, false wenn Fehler
      */
-    public function getPruefungen($student_uid, $pruefungstyp=null,$lv_id=null,$stsem=null)
+    public function getPruefungen($prestudent_id, $pruefungstyp=null,$lv_id=null,$stsem=null)
     {
 	    $qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 			    tbl_note.bezeichnung as note_bezeichnung, tbl_pruefungstyp.beschreibung as typ_beschreibung, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
 			    FROM lehre.tbl_pruefung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_note, lehre.tbl_pruefungstyp
-			    WHERE student_uid=".$this->db_add_param($student_uid)."
+			    WHERE prestudent_id=".$this->db_add_param($prestudent_id)."
 			    AND tbl_pruefung.lehreinheit_id=tbl_lehreinheit.lehreinheit_id
 			    AND tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
 			    AND tbl_pruefung.note = tbl_note.note
@@ -330,29 +331,29 @@ class pruefung extends basis_db
 	    {
 		    while($row = $this->db_fetch_object())
 		    {
-			    $obj = new pruefung();
+					$obj = new pruefung();
 
-			    $obj->pruefung_id = $row->pruefung_id;
-			    $obj->lehreinheit_id = $row->lehreinheit_id;
-			    $obj->student_uid = $row->student_uid;
-			    $obj->mitarbeiter_uid = $row->mitarbeiter_uid;
-			    $obj->note = $row->note;
-			    $obj->note_bezeichnung = $row->note_bezeichnung;
-			    $obj->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
-			    $obj->pruefungstyp_beschreibung = $row->typ_beschreibung;
-			    $obj->datum = $row->datum;
-			    $obj->anmerkung = $row->anmerkung;
-			    $obj->insertamum = $row->insertamum;
-			    $obj->insertvon = $row->insertvon;
-			    $obj->updateamum = $row->updateamum;
-			    $obj->updatevon = $row->updatevon;
-			    $obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
-			    $obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
-			    $obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
-			    $obj->pruefungsanmeldung_id = $row->pruefungsanmeldung_id;
-				$obj->punkte = $row->punkte;
+					$obj->pruefung_id = $row->pruefung_id;
+					$obj->lehreinheit_id = $row->lehreinheit_id;
+					$obj->prestudent_id = $row->prestudent_id;
+					$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+					$obj->note = $row->note;
+					$obj->note_bezeichnung = $row->note_bezeichnung;
+					$obj->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
+					$obj->pruefungstyp_beschreibung = $row->typ_beschreibung;
+					$obj->datum = $row->datum;
+					$obj->anmerkung = $row->anmerkung;
+					$obj->insertamum = $row->insertamum;
+					$obj->insertvon = $row->insertvon;
+					$obj->updateamum = $row->updateamum;
+					$obj->updatevon = $row->updatevon;
+					$obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
+					$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+					$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+					$obj->pruefungsanmeldung_id = $row->pruefungsanmeldung_id;
+					$obj->punkte = $row->punkte;
 
-			    $this->result[] = $obj;
+					$this->result[] = $obj;
 		    }
 		    return true;
 	    }
@@ -393,26 +394,26 @@ class pruefung extends basis_db
 	    {
 		    while($row = $this->db_fetch_object())
 		    {
-			    $obj = new pruefung();
+					$obj = new pruefung();
 
-			    $obj->pruefung_id = $row->pruefung_id;
-			    $obj->lehreinheit_id = $row->lehreinheit_id;
-			    $obj->student_uid = $row->student_uid;
-			    $obj->mitarbeiter_uid = $row->mitarbeiter_uid;
-			    $obj->note = $row->note;
-			    $obj->note_bezeichnung = $row->note_bezeichnung;
-			    $obj->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
-			    $obj->pruefungstyp_beschreibung = $row->typ_beschreibung;
-			    $obj->datum = $row->datum;
-			    $obj->anmerkung = $row->anmerkung;
-			    $obj->insertamum = $row->insertamum;
-			    $obj->insertvon = $row->insertvon;
-			    $obj->updateamum = $row->updateamum;
-			    $obj->updatevon = $row->updatevon;
-			    $obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
-			    $obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
-			    $obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
-				$obj->punkte = $row->punkte;
+					$obj->pruefung_id = $row->pruefung_id;
+					$obj->lehreinheit_id = $row->lehreinheit_id;
+					$obj->prestudent_id = $row->prestudent_id;
+					$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+					$obj->note = $row->note;
+					$obj->note_bezeichnung = $row->note_bezeichnung;
+					$obj->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
+					$obj->pruefungstyp_beschreibung = $row->typ_beschreibung;
+					$obj->datum = $row->datum;
+					$obj->anmerkung = $row->anmerkung;
+					$obj->insertamum = $row->insertamum;
+					$obj->insertvon = $row->insertvon;
+					$obj->updateamum = $row->updateamum;
+					$obj->updatevon = $row->updatevon;
+					$obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
+					$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+					$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+					$obj->punkte = $row->punkte;
 
 			    $this->result[] = $obj;
 		    }
@@ -446,7 +447,7 @@ class pruefung extends basis_db
 			{
 				$this->pruefung_id = $row->pruefung_id;
 				$this->lehreinheit_id=$row->lehreinheit_id;
-				$this->student_uid=$row->student_uid;
+				$this->prestudent_id=$row->prestudent_id;
 				$this->mitarbeiter_uid=$row->mitarbeiter_uid;
 				$this->note=$row->note;
 				$this->pruefungstyp_kurzbz=$row->pruefungstyp_kurzbz;

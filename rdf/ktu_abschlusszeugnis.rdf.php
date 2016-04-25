@@ -73,7 +73,7 @@ if(!$student_uid)
 	die($student->errormsg);
 
 $pruefung = new pruefung();
-$pruefung->getPruefungen($student_uid, "fachpruefung");
+$pruefung->getPruefungen($prestudent->prestudent_id, "fachpruefung");
 
 $projektarbeit = new projektarbeit();
 $projektarbeit->getProjektarbeit($prestudent->prestudent_id);

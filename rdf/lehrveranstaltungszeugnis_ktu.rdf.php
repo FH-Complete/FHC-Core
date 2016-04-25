@@ -211,11 +211,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$anzahl_fussnoten=0;
 		$studiengang_typ='';
 		$xml_fussnote='';
+		$stud = new student($uid_arr[$i]);
 		
 		$query = "SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheit as le
 			JOIN lehre.tbl_pruefung as p USING(lehreinheit_id)
 			JOIN lehre.tbl_lehrveranstaltung as lv USING(lehrveranstaltung_id)
-			WHERE p.student_uid = ".$db->db_add_param($uid_arr[$i])."
+			WHERE p.prestudent_id = ".$db->db_add_param($stud->prestudent_id, FHC_INTEGER)."
 			AND le.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz)."
 			AND lv.lehrveranstaltung_id = ".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 		

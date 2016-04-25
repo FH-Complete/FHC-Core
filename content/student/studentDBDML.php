@@ -3174,10 +3174,13 @@ if(!$error)
 
 			if($_POST['pruefungstyp_kurzbz']=='Termin2')
 			{
+				if(!$student = new student($_POST['student_uid']))
+					die("Student nicht gefunden");
+
 				//Wenn ein 2. Termin angelegt wird, und kein 1. Termin vorhanden ist,
 				//dann wird auch ein 1. Termin angelegt mit der derzeitigen Zeugnisnote
 				$qry = "SELECT * FROM lehre.tbl_pruefung WHERE
-						student_uid=".$db->db_add_param($_POST['student_uid'])." AND
+						student_uid=".$db->db_add_param($student->prestudent_id)." AND
 						lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND
 						pruefungstyp_kurzbz='Termin1'";
 				if($result = $db->db_query($qry))
@@ -3192,13 +3195,15 @@ if(!$error)
 						{
 							if($row = $db->db_fetch_object($result))
 							{
+								$student = new student($_POST['student_uid']);
+								
 								//Wenn kein Ersttermin existiert, dann wird einer angelegt
 								$ersttermin = new pruefung();
 								$ersttermin->new=true;
 								$ersttermin->insertamum = date('Y-m-d H:i:s');
 								$ersttermin->insertvon = $user;
 								$ersttermin->lehreinheit_id = $_POST['lehreinheit_id'];
-								$ersttermin->student_uid = $_POST['student_uid'];
+								$ersttermin->prestudent_id = $student->prestudent_id;
 								$ersttermin->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 								$ersttermin->note = $row->note;
 								$ersttermin->punkte = $row->punkte;

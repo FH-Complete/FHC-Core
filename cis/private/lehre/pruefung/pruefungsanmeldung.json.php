@@ -361,6 +361,7 @@ function loadTermine()
  */
 function saveAnmeldung($aktStudiensemester = null, $uid = null)
 {
+    $student = new student($uid);
     $termin = new pruefungstermin($_REQUEST["termin_id"]);
     $pruefung = new pruefung();
     $lehrveranstaltung = new lehrveranstaltung($_REQUEST["lehrveranstaltung_id"]);
@@ -423,7 +424,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	return $data;
     }
 
-    $pruefung->getPruefungen($uid, NULL, $lehrveranstaltung->lehrveranstaltung_id);
+    $pruefung->getPruefungen($student->prestudent_id, NULL, $lehrveranstaltung->lehrveranstaltung_id);
     $anmeldung_moeglich = true;
     $anzahlPruefungen = count($pruefung->result);
     if(isset($pruefungstyp_kurzbzArray))

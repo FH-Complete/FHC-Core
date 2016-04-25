@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 // header für no cache
 header("Cache-Control: no-cache");
@@ -32,6 +33,7 @@ require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/variable.class.php');
+require_once('../include/student.class.php');
 
 $uid = get_uid();
 $rechte = new benutzerberechtigung();
@@ -83,7 +85,10 @@ else
 		$variable->loadVariables($uid);
 		$stsem = $variable->variable->semester_aktuell;
 	}
-	$pruefung->getPruefungen($student_uid, null, null, $stsem);
+	
+	$student = new student($student_uid);
+	
+	$pruefung->getPruefungen($student->prestudent_id, null, null, $stsem);
 	foreach ($pruefung->result as $row)
 		draw_rdf($row);
 }
