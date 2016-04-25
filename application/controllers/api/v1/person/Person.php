@@ -90,9 +90,9 @@ class Person extends APIv1_Controller
 	/**
 	 * 
 	 */
-	public function postInterestedStudent()
+	public function postPrestudent()
 	{
-		$result = $this->PersonModel->saveInterestedStudent($this->post());
+		$result = $this->PersonModel->savePrestudent($this->post());
 		
 		if($result === TRUE)
 		{

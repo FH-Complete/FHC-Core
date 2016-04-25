@@ -14,7 +14,7 @@
 
 if(!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Nation extends REST_Controller
+class Nation extends APIv1_Controller
 {
 	/**
 	 * Course API constructor.
@@ -30,10 +30,7 @@ class Nation extends REST_Controller
 	
 	public function getAll()
 	{
-		$notLocked = $this->get('ohnesperre');
-		$orderEnglish = $this->get('orderEnglish');
-		
-		$result = $this->NationModel->getAll($notLocked, $orderEnglish);
+		$result = $this->NationModel->getAll($this->get('ohnesperre'), $this->get('orderEnglish'));
 		
 		if(is_object($result))
 		{
@@ -56,9 +53,9 @@ class Nation extends REST_Controller
 		$this->response($payload, $httpstatus);
 	}
 	
-	public function getFederalState()
+	public function getBundesland()
 	{
-		$result = $this->NationModel->getFederalState();
+		$result = $this->NationModel->getBundesland();
 		
 		if(is_object($result))
 		{

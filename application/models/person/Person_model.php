@@ -327,13 +327,13 @@ class Person_model extends DB_Model
 	/**
 	 * 
 	 */
-	public function saveInterestedStudent($interestedStudent = NULL)
+	public function savePrestudent($interestedStudent = NULL)
 	{
 		// Checks if the operation is permitted by the API caller
 		// All the code should be put inside this if statement
 		if(isAllowed($this->getAddonID(), 'person'))
 		{
-			return $this->_saveInterestedStudent($interestedStudent);
+			return $this->_savePrestudent($interestedStudent);
 		}
 	}
 	
@@ -342,7 +342,7 @@ class Person_model extends DB_Model
 	 * 
 	 * @return bool true when everything goes right, otherwise false
 	 */
-	private function _saveInterestedStudent($interestedStudent = NULL)
+	private function _savePrestudent($interestedStudent = NULL)
 	{
 		if(!isset($interestedStudent))
 		{

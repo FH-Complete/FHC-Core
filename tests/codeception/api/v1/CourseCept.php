@@ -1,10 +1,10 @@
 <?php
 
 $I = new ApiTester($scenario);
-$I->wantTo('Test API call v1/studies/course/EnabledCourses');
-$I->amHttpAuthenticated("wu11e001", "1Q2W3E4R");
+$I->wantTo('Test API call v1/lehre/studiengang/AllForBewerbung');
+$I->amHttpAuthenticated("admin", "1q2w3");
 $I->haveHttpHeader('FHC-API-KEY', 'testapikey@fhcomplete.org');
-$I->sendGET('v1/studies/course/EnabledCourses');
+$I->sendGET('v1/lehre/studiengang/AllForBewerbung');
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson([

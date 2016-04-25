@@ -14,7 +14,7 @@ modules:
         PhpBrowser:
             url: 'http://admin:1q2w3@localhost/build/'
         Db:
-            dsn: 'pgsql:host=localhost;port=5432;dbname=fhctest'
+            dsn: 'pgsql:host=calva;port=5433;dbname=devfhcomplete3'
             user: 'fhcomplete'
             password: 'fhcomplete'
             dump: codeception/_data/dump.sql

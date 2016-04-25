@@ -8,9 +8,9 @@ class FHC_Model extends CI_Model
 	{
 		parent::__construct();
 		$this->load->helper('language');
-		//$this->load->helper('fhc_db_acl');
+		$this->load->helper('fhc_db_acl');
 		$this->lang->load('fhcomplete');
-		$this->load->library('FHC_DB_ACL');
+		//$this->load->library('FHC_DB_ACL');
 	}
 
 	/** ---------------------------------------------------------------

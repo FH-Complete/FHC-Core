@@ -14,7 +14,7 @@
 
 if(!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Course extends REST_Controller
+class Studienplan extends APIv1_Controller
 {
 	/**
 	 * Course API constructor.
@@ -23,20 +23,20 @@ class Course extends REST_Controller
 	{
 		parent::__construct();
 		// Load model PersonModel
-		$this->load->model('studies/course_model', 'CourseModel');
+		$this->load->model('lehre/studienplan_model', 'StudienplanModel');
 		// Load set the addonID of the model to let to check the permissions
-		$this->CourseModel->setAddonID($this->_getAddonID());
+		$this->StudienplanModel->setAddonID($this->_getAddonID());
 	}
 	
-	public function getEnabledCourses()
+	public function getStudienplaene()
 	{
-		$result = $this->CourseModel->getEnabledCourses();
+		$result = $this->StudienplanModel->getStudienplaene($this->get('studiengang_kz'));
 		
 		if(is_object($result) && $result->num_rows() > 0)
 		{
 			$payload = [
 				'success'	=>	TRUE,
-				'message'	=>	'Courses found',
+				'message'	=>	'Plan found',
 				'data'		=>	$result->result()
 			];
 			$httpstatus = REST_Controller::HTTP_OK;
@@ -45,7 +45,7 @@ class Course extends REST_Controller
 		{
 			$payload = [
 				'success'	=>	FALSE,
-				'message'	=>	'No courses found'
+				'message'	=>	'Plan not found'
 			];
 			$httpstatus = REST_Controller::HTTP_OK;
 		}

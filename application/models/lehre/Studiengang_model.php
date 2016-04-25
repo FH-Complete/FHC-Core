@@ -1,9 +1,9 @@
 <?php
 
-class Course_model extends DB_Model
+class Studiengang_model extends DB_Model
 {
 	// 
-	protected $_enabledCoursesQuery = "SELECT DISTINCT studiengang_kz,
+	protected $_allForBewerbungQuery = "SELECT DISTINCT studiengang_kz,
 											  typ,
 											  organisationseinheittyp_kurzbz,
 											  studiengangbezeichnung,
@@ -27,7 +27,7 @@ class Course_model extends DB_Model
 	/**
 	 * 
 	 */
-	public function getEnabledCourses()
+	public function getAllForBewerbung()
 	{
 		$result = NULL;
 		
@@ -35,7 +35,7 @@ class Course_model extends DB_Model
 		// All the code should be put inside this if statement
 		if(isAllowed($this->getAddonID(), 'course'))
 		{
-			$result = $this->db->query($this->_enabledCoursesQuery);
+			$result = $this->db->query($this->_allForBewerbungQuery);
 		}
 		
 		return $result;

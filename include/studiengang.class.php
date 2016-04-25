@@ -247,7 +247,7 @@ class studiengang extends Course_model
      */
     public function getAllForBewerbung()
     {
-		if(!$result = $this->db_query($this->_enabledCoursesQuery))
+		if(!$result = $this->db_query($this->_allForBewerbungQuery))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;

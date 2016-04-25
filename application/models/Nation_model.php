@@ -2,7 +2,7 @@
 
 class Nation_model extends DB_Model
 {
-	protected $_federalStateQuery = "SELECT * FROM bis.tbl_bundesland";
+	protected $_bundeslandQuery = "SELECT * FROM bis.tbl_bundesland";
 	
 	/**
 	 * 
@@ -55,7 +55,7 @@ class Nation_model extends DB_Model
 	/**
 	 * 
 	 */
-	public function getFederalState()
+	public function getBundesland()
 	{
 		$result = NULL;
 		
@@ -63,7 +63,7 @@ class Nation_model extends DB_Model
 		// All the code should be put inside this if statement
 		if(isAllowed($this->getAddonID(), 'nation'))
 		{
-			$result = $this->db->query($this->_federalStateQuery);
+			$result = $this->db->query($this->_bundeslandQuery);
 		}
 		
 		return $result;
