@@ -17,7 +17,7 @@ $this->phrasen['tools/mussAlsStudentEingeloggtSein']='You must be logged in as a
 $this->phrasen['tools/nochKeineBeurteilungEingetragen']='No grade has been entered yet';
 $this->phrasen['tools/fehlerBeimAuslesenDerNoten']='Error reading the grades.';
 $this->phrasen['tools/benotungsdatumDerZeugnisnote']='Date of grading';
-$this->phrasen['tools/hinweistextMarkierung']='Kennzeichnet jene Einträge, bei denen sich die LV-Note von der Zeugnisnote unterscheidet. <b>Letztgültig ist die Zeugnisnote</b>.<br>Sollten diese Angaben nicht stimmen, wenden Sie sich bitte an Ihre zuständige Assistenz.'; //Noch zu übersetzen
+$this->phrasen['tools/hinweistextMarkierung']='The marking indicates those entries where the grade for the course is different from the grade on the report card.<b>The grade on the report card is the valid one.</b> <br>Should these details not be correct please contact the Administrative Assistant responsible.';
 
 //Zahlungen
 $this->phrasen['tools/zahlungen']='Payments';
