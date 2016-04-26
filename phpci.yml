@@ -11,8 +11,8 @@ build_settings:
         user: 'fhcomplete'
         pass: 'fhcomplete'
 setup:
-    shell:
-        - "pkill -f fhctest &"
+#    shell:
+#        - "pkill -f fhctest &"
     composer:
         directory: ""
         action: "install"
