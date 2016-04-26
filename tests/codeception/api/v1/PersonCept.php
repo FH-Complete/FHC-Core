@@ -1,22 +1,22 @@
 <?php
 
 $I = new ApiTester($scenario);
-$I->wantTo('Test API call v1/person/person/Person');
+$I->wantTo('test the Person code');
 $I->amHttpAuthenticated("admin", "1q2w3");
 $I->haveHttpHeader('FHC-API-KEY', 'testapikey@fhcomplete.org');
-$I->sendGET('v1/person/person/Person', array('person_id' => 62788));
+$I->sendGET('v1/person/Person/person?code=4ffd30cc58718');
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson([
-	'success' => TRUE,
-	'message' => 'Person found']);
+    'person_id' => '3',
+    'nachname' => 'McKenzie']);
 
 $I->sendGET('v1/person/person/Person', array('code' => 'bd94ef5d5a'));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson([
-	'success' => TRUE,
-	'message' => 'Person found']);
+	'success' => false,
+	'message' => 'Person not found']);
 
 /*$I->sendGET('v1/person/person/Person', array('code' => 'bd94ef5d5a', 'email' => '12351235'));
 $I->seeResponseCodeIs(200);
