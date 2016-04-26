@@ -7,6 +7,7 @@
  */
 require_once(dirname(__FILE__).'/../vendor/codeigniter/framework/system/core/Model.php');
 require_once(dirname(__FILE__).'/../application/core/FHC_Model.php');
+require_once(dirname(__FILE__).'/../application/core/DB_Model.php');
 
 /**
  * This class is used to authenticate the addons on the core system
