@@ -509,7 +509,7 @@ $config['proxy_ips'] = '';
 |--------------------------------------------------------------------------
 |
 Don't work so sometime delete this*/
-function __autoload($class) 
+spl_autoload_register ( function ($class)
 {
     if (substr($class,0,3) !== 'CI_' && substr($class,0,4) !== 'FHC_') 
 	{
@@ -518,4 +518,4 @@ function __autoload($class)
             require_once $file;
         }
     }
-}
+});

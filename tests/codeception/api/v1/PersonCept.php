@@ -18,9 +18,9 @@ $I->seeResponseContainsJson([
 	'success' => TRUE,
 	'message' => 'Person found']);
 
-$I->sendGET('v1/person/person/Person', array('code' => 'bd94ef5d5a', 'email' => '12351235'));
+/*$I->sendGET('v1/person/person/Person', array('code' => 'bd94ef5d5a', 'email' => '12351235'));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson([
 	'success' => TRUE,
-	'message' => 'Person found']);
+	'message' => 'Person found']);*/
