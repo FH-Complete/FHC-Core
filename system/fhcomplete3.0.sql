@@ -26,7 +26,7 @@ SET escape_string_warning = off;
 -- Name: bis; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
-CREATE SCHEMA bis;
+CREATE SCHEMA IF NOT EXISTS bis;
 
 
 ALTER SCHEMA bis OWNER TO fhcomplete;
@@ -35,7 +35,7 @@ ALTER SCHEMA bis OWNER TO fhcomplete;
 -- Name: campus; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
-CREATE SCHEMA campus;
+CREATE SCHEMA IF NOT EXISTS campus;
 
 
 ALTER SCHEMA campus OWNER TO fhcomplete;
@@ -44,7 +44,7 @@ ALTER SCHEMA campus OWNER TO fhcomplete;
 -- Name: fue; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
-CREATE SCHEMA fue;
+CREATE SCHEMA IF NOT EXISTS fue;
 
 
 ALTER SCHEMA fue OWNER TO fhcomplete;
@@ -53,7 +53,7 @@ ALTER SCHEMA fue OWNER TO fhcomplete;
 -- Name: kommune; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
-CREATE SCHEMA kommune;
+CREATE SCHEMA IF NOT EXISTS kommune;
 
 
 ALTER SCHEMA kommune OWNER TO fhcomplete;
@@ -62,7 +62,7 @@ ALTER SCHEMA kommune OWNER TO fhcomplete;
 -- Name: lehre; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
-CREATE SCHEMA lehre;
+CREATE SCHEMA IF NOT EXISTS lehre;
 
 
 ALTER SCHEMA lehre OWNER TO fhcomplete;
@@ -71,7 +71,7 @@ ALTER SCHEMA lehre OWNER TO fhcomplete;
 -- Name: sync; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
-CREATE SCHEMA sync;
+CREATE SCHEMA IF NOT EXISTS sync;
 
 
 ALTER SCHEMA sync OWNER TO fhcomplete;
@@ -87,7 +87,7 @@ COMMENT ON SCHEMA sync IS 'Schema zum Synchronisieren von Daten';
 -- Name: system; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
-CREATE SCHEMA system;
+CREATE SCHEMA IF NOT EXISTS system;
 
 
 ALTER SCHEMA system OWNER TO fhcomplete;
@@ -96,7 +96,7 @@ ALTER SCHEMA system OWNER TO fhcomplete;
 -- Name: testtool; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
-CREATE SCHEMA testtool;
+CREATE SCHEMA IF NOT EXISTS testtool;
 
 
 ALTER SCHEMA testtool OWNER TO fhcomplete;
@@ -105,7 +105,7 @@ ALTER SCHEMA testtool OWNER TO fhcomplete;
 -- Name: wawi; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
-CREATE SCHEMA wawi;
+CREATE SCHEMA IF NOT EXISTS wawi;
 
 
 ALTER SCHEMA wawi OWNER TO fhcomplete;
@@ -31054,7 +31054,7 @@ INSERT INTO tbl_lehrverband VALUES (2, 4, 'B', '2', true, '', NULL, NULL, 50071)
 -- Data for Name: tbl_mitarbeiter; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO tbl_mitarbeiter VALUES ('administrator', 1213, NULL, 'Admin', true, false, NULL, NULL, NULL, NULL, NULL, '2013-06-04 16:51:25.448077', 'auto', NULL, NULL, false, NULL);
+INSERT INTO tbl_mitarbeiter VALUES ('admin', 1213, NULL, 'Admin', true, false, NULL, NULL, NULL, NULL, NULL, '2013-06-04 16:51:25.448077', 'auto', NULL, NULL, false, NULL);
 INSERT INTO tbl_mitarbeiter VALUES ('_DummyLektor', 1214, NULL, 'Dummy', true, false, NULL, NULL, NULL, NULL, NULL, '2013-08-06 07:41:48.894325', 'auto', NULL, NULL, false, NULL);
 
 
@@ -36090,7 +36090,7 @@ SET search_path = system, pg_catalog;
 -- Data for Name: tbl_benutzerrolle; Type: TABLE DATA; Schema: system; Owner: postgres
 --
 
-INSERT INTO tbl_benutzerrolle VALUES (1, 'admin', NULL, 'administrator', NULL, 'etw', 'suid', NULL, NULL, NULL, false, NULL, NULL, '2013-06-04 17:09:29.321309', NULL, NULL);
+INSERT INTO tbl_benutzerrolle VALUES (1, 'admin', NULL, 'admin', NULL, 'etw', 'suid', NULL, NULL, NULL, false, NULL, NULL, '2013-06-04 17:09:29.321309', NULL, NULL);
 
 
 --
