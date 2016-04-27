@@ -22,7 +22,7 @@ setup:
         - "cd %BUILD_PATH% && chmod u+x install.sh && ./install.sh fhctest" # Install Database
         - "rm -f /var/www/html/build" # SymLink löschen falls vorhanden
         - "ln -s %BUILD_PATH% /var/www/html/build" # SymLink to the actual build
-        - "php index.ci.php DBTools migrate" # DB-Migration
+#        - "php index.ci.php DBTools migrate" # DB-Migration
 
 test:
     lint:
