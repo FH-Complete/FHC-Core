@@ -17,4 +17,3 @@ tests/codeception/_support/_generated
 tests/codeception/_output/*
 !/tests/codeception/_output/.placeholder
 /submodules/d3
-install.sh
