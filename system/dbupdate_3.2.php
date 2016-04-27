@@ -1139,6 +1139,19 @@ if(!@$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_status LIMIT
 		echo '<br>Spalte bezeichnung_mehrsprachig in public.tbl_status hinzugefügt<br>Die ersten beiden Sprachen wurden vorbefüllt. Weitere Übersetzungen sind zu ergänzen!<br>';
 }
 
+// Remove NOT NULL constraint on verfasser_uid on public.tbl_notiz
+if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_notiz' AND COLUMN_NAME = 'verfasser_uid' AND is_nullable = 'YES'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = " ALTER TABLE public.tbl_notiz ALTER COLUMN verfasser_uid DROP NOT NULL;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_notiz '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Removed NOT NULL constraint on "verfasser_uid" from public.tbl_notiz<br>';
+	}
+}
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
