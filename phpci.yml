@@ -14,8 +14,8 @@ setup:
     composer:
         directory: ""
         action: "install"
-#    pgsql:
-#        - "DROP DATABASE IF EXISTS fhctest;"
+    pgsql:
+        - "DROP DATABASE IF EXISTS fhctest;"
     shell:
 #        - "pkill -f fhctest &"
 #        - "sudo -u postgres psql fhctest -c 'DROP DATABASE IF EXISTS fhctest;'"
