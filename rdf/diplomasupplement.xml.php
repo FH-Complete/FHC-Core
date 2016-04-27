@@ -69,10 +69,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		if($db->db_query($query))
 		{
 				if(!$row = $db->db_fetch_object())
-					die('Student not found'.$uid_arr[$i]);
+					die('Student not found: '.$uid_arr[$i]);
 		}
 		else
-			die('Student not found'.$uid_arr[$i]);
+			die('Student not found: '.$uid_arr[$i]);
 
 		//Bei DEW und DPW werden 60 ECTS angerechnet
 		if($row->studiengang_kz==92 || $row->studiengang_kz==91)
@@ -291,11 +291,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 		}
 
-		if(!$std = new student($uid_arr[$i]))
+		if(!$student = new student($uid_arr[$i]))
 			die("Student nicht gefunden");
 
 		$akadgrad_id='';
-		$qry = "SELECT bezeichnung, akadgrad_id, bezeichnung_english FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE prestudent_id=".$db->db_add_param($student->prestudent_id)." ORDER BY datum DESC LIMIT 1";
+		$qry = "SELECT bezeichnung, akadgrad_id, bezeichnung_english FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE prestudent_id=".$db->db_add_param($student->prestudent_id, FHC_INTEGER)." ORDER BY datum DESC LIMIT 1";
 		if($db->db_query($qry))
 		{
 			if($row1 = $db->db_fetch_object())
@@ -555,7 +555,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
             $semester_ects = 0;
 			//$thesis_beschreibung = '';
 			echo "<semesters>";
-
+			$student = new student($uid_arr[$i]);
 
             // alle semester für das ausbildungssemester holen
             // Semester wo Unterbrecher nicht holen
@@ -563,9 +563,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
             from lehre.tbl_zeugnisnote zeugnis
                 join lehre.tbl_note note using(note)
             join lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-            join public.tbl_student student USING(student_uid)
             join public.tbl_prestudentstatus status USING(prestudent_id)
-			where student_uid = ".$db->db_add_param($uid_arr[$i])." AND
+			where prestudent_id = ".$db->db_add_param($student->prestudent_id, FHC_INTEGER)." AND
             zeugnis = true AND
 			status.ausbildungssemester = ".$db->db_add_param($start)." AND
             status.status_kurzbz NOT IN('Unterbrecher', 'Interessent','Bewerber','Aufgenommener','Abgewiesener','Wartender')
@@ -596,7 +595,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$semester_kurzbz = 'Winter Semester '.$year.'/'.$helpyear;
 			}
 
-            $sqlStudent = new student();
+            $sqlStudent = new student($uid_arr[$i]);
 
 			echo "   <semesterKurzbz>Semester $start | $semester_kurzbz</semesterKurzbz>";
 
@@ -609,7 +608,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
             from lehre.tbl_zeugnisnote zeugnis
             join lehre.tbl_note note using(note)
             join lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-			where student_uid = ".$db->db_add_param($uid_arr[$i])." AND zeugnis = true AND
+			where prestudent_id = ".$db->db_add_param($sqlStudent->prestudent_id, FHC_INTEGER)." AND zeugnis = true AND
 			studiensemester_kurzbz in (".$sqlStudent->implode4SQL($aktuellesSemester).")
             ORDER BY sort, tbl_lehrveranstaltung.bezeichnung;";
 
@@ -748,12 +747,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					}
                     $arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['lehrform_kurzbz']= $lehrform_kurzbz;
 //					echo "   <lehrform_kurzbz>$lehrform_kurzbz</lehrform_kurzbz>";
-
+					$student = new student($uid_arr[$i]);
 					//  hole benotungsdatum von aktueller LV
 					$qry_benotung = "SELECT benotungsdatum FROM
 					lehre.tbl_zeugnisnote WHERE lehrveranstaltung_id = ".$db->db_add_param($row_stud->lehrveranstaltung_id)."
 					AND studiensemester_kurzbz = ".$db->db_add_param($row_stud->studiensemester_kurzbz)."
-					AND student_uid = ".$db->db_add_param($uid_arr[$i]).";";
+					AND prestudent_id = ".$db->db_add_param($student->prestudent_id, FHC_INTEGER).";";
 					if($result_benotung = $db->db_query($qry_benotung))
 					{
 						if($row_benotung = $db->db_fetch_object($result_benotung))
@@ -897,12 +896,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                             $note_outgoing = 'ar';
                             $benotungsdatum_outgoing = '';
                             $lehrform_kurzbz_outgoing = '';
+														$student = new student($uid_arr[$i]);
 
                             $qry_outgoing_note = "SELECT anmerkung, benotungsdatum, lehrform_kurzbz
                                 FROM lehre.tbl_zeugnisnote
                                 JOIN tbl_lehrveranstaltung using(lehrveranstaltung_id)
                                 JOIN tbl_note using(note)
-                                WHERE lehrveranstaltung_id = ".$db->db_add_param($row_outgoing->lehrveranstaltung_id)." and student_uid = ".$db->db_add_param($uid_arr[$i]);
+                                WHERE lehrveranstaltung_id = ".$db->db_add_param($row_outgoing->lehrveranstaltung_id)." and prestudent_id = ".$db->db_add_param($student->prestudent_id, FHC_INTEGER);
 
 
                             if($result_outgoing_note = $db->db_query($qry_outgoing_note))

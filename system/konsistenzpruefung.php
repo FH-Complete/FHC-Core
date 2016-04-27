@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
-            Andreas Moik          <moik@technikum-wien.at>.
+            Andreas Moik <moik@technikum-wien.at>.
  */
 /*
  * Prueft die Daten in der Datenbank auf konsistenz und gibt Hinweise
@@ -54,7 +54,7 @@ echo '<!DOCTYPE HTML>
 
 /************************************************************************************
  * Pruefung auf falschen Personenkreislauf
- * tbl_person->tbl_benutzer->tbl_student->tbl_prestudent->tbl_person
+ * tbl_person->tbl_benutzer->tbl_prestudent->tbl_person
  */
 
 $qry = "SELECT
@@ -63,15 +63,14 @@ $qry = "SELECT
 		FROM
 			public.tbl_person
 			JOIN public.tbl_benutzer USING(person_id)
-			JOIN public.tbl_student ON(uid=student_uid)
-			JOIN public.tbl_prestudent USING(prestudent_id)
+			JOIN public.tbl_prestudent USING(person_id)
 		WHERE
 			tbl_person.person_id<>tbl_prestudent.person_id
 		ORDER BY nachname, vorname, uid";
 
 if($result = $db->db_query($qry))
 {
-	echo '<h2>Inkonsistenter Personenkreislauf tbl_person-&gt;tbl_benutzer-&gt;tbl_student-&gt;tbl_prestudent-&gt;tbl_person</h2>';
+	echo '<h2>Inkonsistenter Personenkreislauf tbl_person-&gt;tbl_benutzer-&gt;tbl_prestudent-&gt;tbl_person</h2>';
 	$anzahl = $db->db_num_rows($result);
 	echo '<span class="'.($anzahl>0?'error':'ok').'">'.$anzahl.' Probleme gefunden</span>';
 
@@ -130,7 +129,7 @@ $qry = "SELECT
 			public.tbl_benutzer
 			LEFT JOIN public.tbl_person USING(person_id)
 		WHERE
-				NOT EXISTS (SELECT 1 FROM public.tbl_student WHERE student_uid=tbl_benutzer.uid)
+				NOT EXISTS (SELECT 1 FROM public.tbl_prestudent WHERE uid=tbl_benutzer.uid)
 			AND NOT EXISTS (SELECT 1 FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=tbl_benutzer.uid)";
 
 if($result = $db->db_query($qry))
@@ -191,11 +190,11 @@ $qry = "SELECT
 			JOIN public.tbl_person USING(person_id)
 		WHERE
 			status_kurzbz IN('Student','Absolvent','Diplomand','Incoming')
-			AND NOT EXISTS (SELECT 1 FROM public.tbl_student WHERE prestudent_id=tbl_prestudent.prestudent_id)";
+			AND public.tbl_prestudent.uid IS NULL";
 
 if($result = $db->db_query($qry))
 {
-	echo '<h2>Prestudenten mit Studenten/Absolventen/Diplomanden/Incoming Status aber ohne StudentUID</h2>';
+	echo '<h2>Prestudenten mit Studenten/Absolventen/Diplomanden/Incoming Status aber ohne UID</h2>';
 
 	$anzahl = $db->db_num_rows($result);
 
@@ -240,79 +239,16 @@ if($result = $db->db_query($qry))
 	}
 }
 
-/**************************************************************************************
- * StgKz von Stunent und Prestudent unterschiedlich
- *
- */
-$qry = "SELECT
-			tbl_person.vorname, tbl_person.nachname, tbl_prestudent.prestudent_id, tbl_student.student_uid,
-			tbl_student.studiengang_kz as stud_studiengang_kz, tbl_prestudent.studiengang_kz as pre_studiengang_kz
-		FROM
-			public.tbl_student
-			JOIN public.tbl_prestudent USING(prestudent_id)
-			JOIN public.tbl_person USING(person_id)
-		WHERE
-			tbl_student.studiengang_kz<>tbl_prestudent.studiengang_kz";
-
-if($result = $db->db_query($qry))
-{
-	echo '<h2>Studiengangskennzahl von tbl_student ungleich tbl_prestudent</h2>';
-
-	$anzahl = $db->db_num_rows($result);
-
-	echo '<span class="'.($anzahl>0?'error':'ok').'">'.$anzahl.' Probleme gefunden</span>';
-
-	if($anzahl>0)
-	{
-		echo '<br><a href="#Anzeigen" onclick="$(\'#stgungleich\').toggle(); return false;">Anzeigen &gt;&gt;</a>';
-			echo '
-		<script type="text/javascript">
-		$(document).ready(function()
-			{
-				$("#stgungleich").tablesorter(
-				{
-					sortList: [[0,0]],
-					widgets: ["zebra"]
-				});
-			});
-		</script>
-			<table class="tablesorter" id="stgungleich" style="display:none">
-				<thead>
-					<tr>
-						<th>Nachname</th>
-						<th>Vorname</th>
-						<th>PrestudentID</th>
-						<th>StudentStgKZ</th>
-						<th>PrestudentStgKZ</th>
-					</tr>
-				</thead>
-				<tbody>';
-		while($row = $db->db_fetch_object($result))
-		{
-			$error_kritisch++;
-			echo '
-			<tr>
-				<td>'.$db->convert_html_chars($row->nachname).'</td>
-				<td>'.$db->convert_html_chars($row->vorname).'</td>
-				<td>'.$db->convert_html_chars($row->prestudent_id).'</td>
-				<td>'.$db->convert_html_chars($row->stud_studiengang_kz).'</td>
-				<td>'.$db->convert_html_chars($row->pre_studiengang_kz).'</td>
-			</tr>';
-		}
-		echo '</tbody></table>';
-	}
-}
 
 /**************************************************************************************
  * Studenten ohne passenden Status
  *
  */
 $qry = "SELECT
-			tbl_person.vorname, tbl_person.nachname, tbl_prestudent.prestudent_id, tbl_student.student_uid,
+			tbl_person.vorname, tbl_person.nachname, tbl_prestudent.prestudent_id, tbl_prestudent.uid,
 			get_rolle_prestudent(prestudent_id, null) as laststatus
 		FROM
-			public.tbl_student
-			JOIN public.tbl_prestudent USING(prestudent_id)
+			public.tbl_prestudent
 			JOIN public.tbl_person USING(person_id)
 		WHERE
 			NOT EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND status_kurzbz in('Student','Incoming','Diplomand','Absolvent'))";
@@ -358,7 +294,7 @@ if($result = $db->db_query($qry))
 				<td>'.$db->convert_html_chars($row->nachname).'</td>
 				<td>'.$db->convert_html_chars($row->vorname).'</td>
 				<td>'.$db->convert_html_chars($row->prestudent_id).'</td>
-				<td>'.$db->convert_html_chars($row->student_uid).'</td>
+				<td>'.$db->convert_html_chars($row->uid).'</td>
 				<td>'.$db->convert_html_chars($row->laststatus).'</td>
 			</tr>';
 		}
@@ -428,13 +364,13 @@ if($result = $db->db_query($qry))
  *
  */
 $qry = "SELECT
-			tbl_person.vorname, tbl_person.nachname, tbl_student.student_uid
+			tbl_person.vorname, tbl_person.nachname, tbl_prestudent.uid
 		FROM
-			public.tbl_student
-			JOIN public.tbl_benutzer ON(uid=student_uid)
-			JOIN public.tbl_person USING(person_id)
+			public.tbl_prestudent
+			JOIN public.tbl_benutzer ON(tbl_benutzer.uid=tbl_prestudent.uid)
+			JOIN public.tbl_person ON(tbl_person.person_id=tbl_prestudent.person_id)
 		WHERE
-			NOT EXISTS(SELECT 1 FROM public.tbl_studentlehrverband WHERE prestudent_id=tbl_student.prestudent_id)";
+			NOT EXISTS(SELECT 1 FROM public.tbl_studentlehrverband WHERE prestudent_id=tbl_prestudent.prestudent_id)";
 
 if($result = $db->db_query($qry))
 {
@@ -474,7 +410,7 @@ if($result = $db->db_query($qry))
 			<tr>
 				<td>'.$db->convert_html_chars($row->nachname).'</td>
 				<td>'.$db->convert_html_chars($row->vorname).'</td>
-				<td>'.$db->convert_html_chars($row->student_uid).'</td>
+				<td>'.$db->convert_html_chars($row->uid).'</td>
 			</tr>';
 		}
 		echo '</tbody></table>';
@@ -486,14 +422,13 @@ if($result = $db->db_query($qry))
  *
  */
 $qry = "SELECT
-			tbl_person.vorname, tbl_person.nachname, tbl_student.student_uid
+			tbl_person.vorname, tbl_person.nachname, tbl_prestudent.uid
 		FROM
-			public.tbl_student
-			JOIN public.tbl_prestudent USING(prestudent_id)
+			public.tbl_prestudent
 			JOIN public.tbl_person USING(person_id)
 		WHERE
-			NOT EXISTS(SELECT 1 FROM bis.tbl_bisio WHERE prestudent_id=tbl_student.prestudent_id)
-			AND EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id AND status_kurzbz='Incoming')";
+			NOT EXISTS(SELECT 1 FROM bis.tbl_bisio WHERE prestudent_id=tbl_prestudent.prestudent_id)
+			AND EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND status_kurzbz='Incoming')";
 
 if($result = $db->db_query($qry))
 {
@@ -533,7 +468,7 @@ if($result = $db->db_query($qry))
 			<tr>
 				<td>'.$db->convert_html_chars($row->nachname).'</td>
 				<td>'.$db->convert_html_chars($row->vorname).'</td>
-				<td>'.$db->convert_html_chars($row->student_uid).'</td>
+				<td>'.$db->convert_html_chars($row->uid).'</td>
 			</tr>';
 		}
 		echo '</tbody></table>';
@@ -545,14 +480,13 @@ if($result = $db->db_query($qry))
  *
  */
 $qry = "SELECT
-			tbl_person.vorname, tbl_person.nachname, tbl_student.student_uid, tbl_student.matrikelnr, tbl_student.studiengang_kz
+			tbl_person.vorname, tbl_person.nachname, tbl_prestudent.uid, tbl_prestudent.perskz, tbl_prestudent.studiengang_kz
 		FROM
-			public.tbl_student
-			JOIN public.tbl_prestudent USING(prestudent_id)
+			public.tbl_prestudent
 			JOIN public.tbl_person USING(person_id)
 		WHERE
-			tbl_student.studiengang_kz<1000 AND tbl_student.studiengang_kz>0
-			AND tbl_student.studiengang_kz::text!=trim(leading '0' from substring(matrikelnr,5,3))";
+			tbl_prestudent.studiengang_kz<1000 AND tbl_prestudent.studiengang_kz>0
+			AND tbl_prestudent.studiengang_kz::text!=trim(leading '0' from substring(perskz,5,3))";
 
 if($result = $db->db_query($qry))
 {
@@ -594,8 +528,8 @@ if($result = $db->db_query($qry))
 			<tr>
 				<td>'.$db->convert_html_chars($row->nachname).'</td>
 				<td>'.$db->convert_html_chars($row->vorname).'</td>
-				<td>'.$db->convert_html_chars($row->student_uid).'</td>
-				<td>'.$db->convert_html_chars($row->matrikelnr).'</td>
+				<td>'.$db->convert_html_chars($row->uid).'</td>
+				<td>'.$db->convert_html_chars($row->perskz).'</td>
 				<td>'.$db->convert_html_chars($row->studiengang_kz).'</td>
 			</tr>';
 		}
@@ -608,15 +542,14 @@ if($result = $db->db_query($qry))
  *
  */
 $qry = "SELECT
-			tbl_person.vorname, tbl_person.nachname, tbl_student.student_uid
+			tbl_person.vorname, tbl_person.nachname, tbl_prestudent.uid
 		FROM
-			public.tbl_student
-			JOIN public.tbl_prestudent USING(prestudent_id)
+			public.tbl_prestudent
 			JOIN public.tbl_person USING(person_id)
 		WHERE
-			tbl_student.studiengang_kz<1000 AND tbl_student.studiengang_kz>0
-			AND EXISTS (SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Absolvent' AND prestudent_id=tbl_student.prestudent_id)
-			AND NOT EXISTS(SELECT 1 FROM lehre.tbl_abschlusspruefung WHERE prestudent_id=tbl_student.prestudent_id)";
+			tbl_prestudent.studiengang_kz<1000 AND tbl_prestudent.studiengang_kz>0
+			AND EXISTS (SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Absolvent' AND prestudent_id=tbl_prestudent.prestudent_id)
+			AND NOT EXISTS(SELECT 1 FROM lehre.tbl_abschlusspruefung WHERE prestudent_id=tbl_prestudent.prestudent_id)";
 
 if($result = $db->db_query($qry))
 {
@@ -656,7 +589,7 @@ if($result = $db->db_query($qry))
 			<tr>
 				<td>'.$db->convert_html_chars($row->nachname).'</td>
 				<td>'.$db->convert_html_chars($row->vorname).'</td>
-				<td>'.$db->convert_html_chars($row->student_uid).'</td>
+				<td>'.$db->convert_html_chars($row->uid).'</td>
 			</tr>';
 		}
 		echo '</tbody></table>';
@@ -668,15 +601,14 @@ if($result = $db->db_query($qry))
  *
  */
 $qry = "SELECT
-			tbl_person.vorname, tbl_person.nachname, tbl_student.student_uid
+			tbl_person.vorname, tbl_person.nachname, tbl_prestudent.uid
 		FROM
-			public.tbl_student
-			JOIN public.tbl_prestudent USING(prestudent_id)
+			public.tbl_prestudent
 			JOIN public.tbl_person USING(person_id)
 		WHERE
-			tbl_student.studiengang_kz<1000 AND tbl_student.studiengang_kz>0
-			AND 1<(SELECT count(*) FROM public.tbl_prestudentstatus WHERE status_kurzbz='Student' AND prestudent_id=tbl_student.prestudent_id)
-			AND NOT EXISTS(SELECT 1 FROM lehre.tbl_zeugnisnote WHERE student_uid=tbl_student.student_uid)";
+			tbl_prestudent.studiengang_kz<1000 AND tbl_prestudent.studiengang_kz>0
+			AND 1<(SELECT count(*) FROM public.tbl_prestudentstatus WHERE status_kurzbz='Student' AND tbl_prestudentstatus.prestudent_id=tbl_prestudent.prestudent_id)
+			AND NOT EXISTS(SELECT 1 FROM lehre.tbl_zeugnisnote WHERE tbl_zeugnisnote.prestudent_id=tbl_prestudent.prestudent_id)";
 
 if($result = $db->db_query($qry))
 {
@@ -716,7 +648,7 @@ if($result = $db->db_query($qry))
 			<tr>
 				<td>'.$db->convert_html_chars($row->nachname).'</td>
 				<td>'.$db->convert_html_chars($row->vorname).'</td>
-				<td>'.$db->convert_html_chars($row->student_uid).'</td>
+				<td>'.$db->convert_html_chars($row->uid).'</td>
 			</tr>';
 		}
 		echo '</tbody></table>';

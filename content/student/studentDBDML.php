@@ -2668,7 +2668,7 @@ if(!$error)
 				else
 				{
 
-					if($noten->load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz))
+					if($noten->load($lehrveranstaltung_id, $prestudent_id, $studiensemester_kurzbz))
 					{
 						$noten->new = false;
 						$noten->updateamum = date('Y-m-d H:i:s');
@@ -2686,7 +2686,7 @@ if(!$error)
 								'updateamum= '.$db->db_add_param($noten->updateamum).', '.
 								'updatevon='.$db->db_add_param($noten->updatevon).' '.
 								'WHERE lehrveranstaltung_id='.$db->db_add_param($noten->lehrveranstaltung_id, FHC_INTEGER).' '.
-								'AND student_uid='.$db->db_add_param($noten->student_uid).' '.
+								'AND prestudent_id='.$db->db_add_param($noten->prestudent_id, FHC_INTEGER).' '.
 								'AND studiensemester_kurzbz='.$db->db_add_param($noten->studiensemester_kurzbz).';';
 						$log->sqlundo = $noten->getUndo('update');
 						$log->save(true);

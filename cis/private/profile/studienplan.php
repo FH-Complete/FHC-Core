@@ -18,7 +18,8 @@
  * MA 02110-1301, USA.
  *
  *
- * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
+ * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  *
  * Zeigt den Studienplan eines Studierenden an
  * und bietet die Möglichkeit zur Anmeldung zu Lehrveranstaltungen.
@@ -410,7 +411,8 @@ function drawTree($tree, $depth)
 		$lvregel = new lvregel();
 		if($lvregel->exists($row_tree->studienplan_lehrveranstaltung_id))
 		{
-			if($lvregel->isAbgeschlossen($uid, $row_tree->studienplan_lehrveranstaltung_id))
+			$student = new student($uid);
+			if($lvregel->isAbgeschlossen($student->prestudent_id, $row_tree->studienplan_lehrveranstaltung_id))
 				$abgeschlossen=true;
 			else
 				$abgeschlossen=false;
@@ -553,7 +555,8 @@ function drawTree($tree, $depth)
 				}
 				else
 				{
-					if(!$lvregel->isZugangsberechtigt($uid, $row_tree->studienplan_lehrveranstaltung_id, $stsem))
+					$student = new student($uid);
+					if(!$lvregel->isZugangsberechtigt($student->prestudent_id, $row_tree->studienplan_lehrveranstaltung_id, $stsem))
 					{
 						$regelerfuellt=false;
 					}

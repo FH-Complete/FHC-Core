@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *			Gerald Raab <gerald.raab@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *          Gerald Raab <gerald.raab@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -279,10 +280,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "\n		<studiengangsleiter>".$stgl."</studiengangsleiter>";
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "\n		<ort_datum>Wien, am ".$datum_aktuell."</ort_datum>";
-		
-		
+
+		$student = new student($uid_arr[$i]);
+
 		$obj = new zeugnisnote();
-		$obj->load($lehrveranstaltung_id, $uid_arr[$i], $studiensemester_kurzbz);
+		$obj->load($lehrveranstaltung_id, $student->prestudent_id, $studiensemester_kurzbz);
 
 		if ($obj->note)
 		{

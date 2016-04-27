@@ -1186,7 +1186,7 @@ echo "
 				}
 				else
 					$note_vorschlag = null;
-				if ($zeugnisnote = new zeugnisnote($lvid, $row_stud->uid, $stsem))
+				if ($zeugnisnote = new zeugnisnote($lvid, $row_stud->prestudent_id, $stsem))
 					$znote = $zeugnisnote->note;
 				else
 					$znote = null;

@@ -172,7 +172,9 @@ else
     }
     else
         $sqlFilter = "";
-    
+
+		$student = new student($user);
+
     $qry = "SELECT
 				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_zeugnisnote.note, tbl_zeugnisnote.punkte,
 				tbl_lvgesamtnote.note as lvnote, tbl_lvgesamtnote.punkte as lvpunkte,
@@ -184,7 +186,7 @@ else
 				campus.tbl_lvgesamtnote
 			USING (lehrveranstaltung_id, student_uid, studiensemester_kurzbz)
 			WHERE
-				tbl_zeugnisnote.student_uid = ".$db->db_add_param($user)
+				tbl_zeugnisnote.prestudent_id = ".$db->db_add_param($student->prestudent_id, FHC_INTEGER)
 			.$sqlFilter."
 			AND	tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_zeugnisnote.lehrveranstaltung_id
 			ORDER BY bezeichnung";

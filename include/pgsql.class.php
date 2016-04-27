@@ -271,8 +271,8 @@ class basis_db extends db
 	 *
      * Verwendungsbeispiel:
 	 *	Update tbl_person set nachname=$this->db_add_param($var)
-	 *  Update tbl_person set aktiv=$this->db_add_param($var, FHC_BOOL, false)
-     *	Update tbl_person set anzahlkinder=$this->db_add_param($var, FHC_INT)
+	 *  Update tbl_person set aktiv=$this->db_add_param($var, FHC_BOOLEAN, false)
+     *	Update tbl_person set anzahlkinder=$this->db_add_param($var, FHC_INTEGER)
 	 */
 	public function db_add_param($var, $type=FHC_STRING, $nullable=true)
 	{
@@ -290,6 +290,7 @@ class basis_db extends db
 				$var = $this->db_escape($var);
 				if(!is_numeric($var) && $var!=='')
 					die('Invalid Integer Parameter detected:'.$var);
+
 				$var = $this->db_null_value($var, false);
 				break;
 

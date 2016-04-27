@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Erstellt einen Notenspiegel
@@ -78,14 +79,14 @@ $stg->load($studiengang_kz);
 
 $student = new student();
 $result_student = $student->getStudents($studiengang_kz,$semester,null,null,null, $semester_aktuell);
-$uids='';
+$preids='';
 foreach ($result_student as $row) 
 {
-	if($uids!='')
-		$uids.=',';
-	$uids.=$db->db_add_param($row->uid);
+	if($preids!='')
+		$preids.=',';
+	$preids.=$db->db_add_param($row->prestudent_id, FHC_INTEGER);
 }
-if($uids=='')
+if($preids=='')
 	die('Es befinden sich keine Studierende in diesem Semester');
 
 $qry = "SELECT 
@@ -114,7 +115,7 @@ $qry = "SELECT
 	    	lehre.tbl_lehrveranstaltung JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id)
 	    WHERE
 	    	tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
-	    	tbl_zeugnisnote.student_uid in($uids) AND
+	    	tbl_zeugnisnote.prestudent_id in($preids) AND
 	    	tbl_zeugnisnote.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
 		ORDER BY bezeichnung";
 
@@ -256,7 +257,7 @@ if($typ=='xls')
 				
 		//Alle Zeugnisnoten des Studierenden holen
 		$noten = array();
-		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE student_uid=".$db->db_add_param($row_student->uid)." AND studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
+		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE prestudent_id=".$db->db_add_param($row_student->prestudent_id, FHC_INTEGER)." AND studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
 		if($result = $db->db_query($qry))
 			while($row = $db->db_fetch_object($result))
 				$noten[$row->lehrveranstaltung_id] = $row->note;
@@ -444,7 +445,7 @@ else
 		echo "<tr><td>$i</td><td>$row_student->nachname $row_student->vorname</td><td>$row_student->matrikelnr</td>";
 		
 		$noten = array();
-		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE student_uid=".$db->db_add_param($row_student->uid)." AND studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
+		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE prestudent_id=".$db->db_add_param($row_student->prestudent_id, FHC_INTEGER)." AND studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
 		if($result = $db->db_query($qry))
 			while($row = $db->db_fetch_object($result))
 				$noten[$row->lehrveranstaltung_id] = $row->note;

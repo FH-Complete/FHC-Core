@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+            Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Klasse lvregel
@@ -477,32 +478,32 @@ class lvregel extends basis_db
 
 	/**
 	 * Prüft ob sich ein Student zu einer Lehrveranstaltung anmelden darf
-	 * @param $uid UID des Studierenden
+	 * @param $prestudent_id prestudent_id des Studierenden
 	 * @param $studienplan_lehrveranstaltung_id ID der Lehrveranstaltungszuordnung
 	 */
-	public function isZugangsberechtigt($uid, $studienplan_lehrveranstaltung_id, $studiensemester_kurzbz=null)
+	public function isZugangsberechtigt($prestudent_id, $studienplan_lehrveranstaltung_id, $studiensemester_kurzbz=null)
 	{
-		$this->debug('Teste Zugangsberechtigung für '.$uid,2);
+		$this->debug('Teste Zugangsberechtigung für '.$prestudent_id,2);
 		if($result = $this->getLVRegelTree($studienplan_lehrveranstaltung_id))
 		{
-				return $this->TestRegeln($uid, $result, $studiensemester_kurzbz);
+				return $this->TestRegeln($prestudent_id, $result, $studiensemester_kurzbz);
 		}
 		return true;
 	}
 
 	/**
 	 * Prueft die Regeln fuer einen Studierenden
-	 * @param $uid UID des Studierenden
+	 * @param $prestudent_id prestudent_id des Studierenden
 	 * @param $regel_obj Regel Baum
 	 * @param $studiensemester_kurzbz Studiensemester das geprueft werden soll
 	 */
-	public function TestRegeln($uid, $regel_obj, $studiensemester_kurzbz=null, $retval=true)
+	public function TestRegeln($prestudent_id, $regel_obj, $studiensemester_kurzbz=null, $retval=true)
 	{
 		$ects=0;
 		foreach($regel_obj as $regel)
 		{
 
-			list($testval,$ects_tmp) = $this->Test($uid, $regel, $studiensemester_kurzbz, $retval);
+			list($testval,$ects_tmp) = $this->Test($prestudent_id, $regel, $studiensemester_kurzbz, $retval);
 			$this->debug("<br>Compare ".$regel[0]->operator.", ".($retval?'T':'F').", ".($testval?'T':'F'),5);
 			$retval = $this->Compare($regel[0]->operator, $retval, $testval);
 			
@@ -562,16 +563,16 @@ class lvregel extends basis_db
 
 	/**
 	 * Testet die Regel für einen Studenten
-	 * @param $uid User
+	 * @param $prestudent_id prestudent_id
 	 * @param $regel_obj
 	 * @param $studiensemester_kurzbz
 	 */
-	public function Test($uid, $regel_obj, $studiensemester_kurzbz=null, $retvalglobal)
+	public function Test($prestudent_id, $regel_obj, $studiensemester_kurzbz=null, $retvalglobal)
 	{
 		$regel = $regel_obj[0];
 		$ects=0;
 		$this->debug('<br><b>Teste Regel '.$regel->lvregel_id.'</b>',2);
-		$this->debug("<br>UID:$uid OP:$regel->operator STSEM:$studiensemester_kurzbz RETVAL:".($retvalglobal?'T':'F'),5);
+		$this->debug("<br>prestudent_id:$prestudent_id OP:$regel->operator STSEM:$studiensemester_kurzbz RETVAL:".($retvalglobal?'T':'F'),5);
 
 		switch($regel->lvregeltyp_kurzbz)
 		{
@@ -589,19 +590,18 @@ class lvregel extends basis_db
 				}
 
 				// Ausbildungssemester wird nur beim 1. durchlauf ermittelt
-				if(!isset($this->cache[$uid]) && !isset($this->cache[$uid][$studiensemester_kurzbz]))
+				if(!isset($this->cache[$prestudent_id]) && !isset($this->cache[$prestudent_id][$studiensemester_kurzbz]))
 				{
-					$student = new student();
-					$student->load($uid);
-				
+					$student = new student($prestudent_id);
+
 					// Ausbildungssemester aus dem Status holen
 					$prestudent = new prestudent();
-					if($prestudent->getLastStatus($student->prestudent_id, $studiensemester_kurzbz))
+					if($prestudent->getLastStatus($prestudent_id, $studiensemester_kurzbz))
 					{
-						$this->cache[$uid][$studiensemester_kurzbz]=$prestudent->ausbildungssemester;
+						$this->cache[$prestudent_id][$studiensemester_kurzbz]=$prestudent->ausbildungssemester;
 					}
 				}
-				$ausbildungssemester = $this->cache[$uid][$studiensemester_kurzbz];
+				$ausbildungssemester = $this->cache[$prestudent_id][$studiensemester_kurzbz];
 
 				// Vergleichen des Ausbildungssemesters mit dem RegelParameter
 				if($ausbildungssemester>=$regel->parameter)
@@ -629,7 +629,7 @@ class lvregel extends basis_db
 							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 						WHERE 
 							tbl_note.positiv 
-							AND student_uid=".$this->db_add_param($uid)."
+							AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)."
 							AND lehrveranstaltung_id=".$this->db_add_param($regel->lehrveranstaltung_id);
 
 				if($result = $this->db_query($qry))
@@ -663,7 +663,7 @@ class lvregel extends basis_db
 							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 						WHERE 
 							tbl_note.positiv 
-							AND student_uid=".$this->db_add_param($uid)."
+							AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)."
 							AND lehrveranstaltung_id=".$this->db_add_param($regel->lehrveranstaltung_id);
 
 				if($result = $this->db_query($qry))
@@ -698,7 +698,7 @@ class lvregel extends basis_db
 		if(isset($regel_obj['childs']) && count($regel_obj['childs'])>0)
 		{
 			$this->debug('<br> == <b>Subregel:'.$regel->lvregel_id.'</b> Start ==',2);
-			list($testval,$ects_tmp) = $this->TestRegeln($uid, $regel_obj['childs'],null, $retval);
+			list($testval,$ects_tmp) = $this->TestRegeln($prestudent_id, $regel_obj['childs'],null, $retval);
 			$retval = $this->Compare($regel->operator, $retval, $testval);
 
 			if($testval)
@@ -753,18 +753,18 @@ class lvregel extends basis_db
 
 	/**
 	 * Prüft ob das Modul für den Studierenden abgeschlossen ist
-	 * @param $uid UID des Studierenden
+	 * @param $prestudent_id prestudent_id des Studierenden
 	 * @param $studienplan_lehrveranstaltung_id ID der Lehrveranstaltungszuordnung
 	 */
-	public function isAbgeschlossen($uid, $studienplan_lehrveranstaltung_id)
+	public function isAbgeschlossen($prestudent_id, $studienplan_lehrveranstaltung_id)
 	{
-		$this->debug('Teste Abschluss für '.$uid,2);
+		$this->debug('Teste Abschluss für '.$prestudent_id,2);
 		$ects=0;
 		$retval=true;
 
 		if($result = $this->getLVRegelTree($studienplan_lehrveranstaltung_id))
 		{
-			list($retval, $ects) = $this->TestRegeln($uid, $result, null);
+			list($retval, $ects) = $this->TestRegeln($prestudent_id, $result, null);
 		}
 		else
 		{

@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 header("Content-type: application/xhtml+xml");
 require_once('../config/vilesci.config.inc.php');
@@ -177,7 +178,7 @@ $lehrveranstaltungen = array();
 		$obj = new zeugnisnote();
 		
 		
-		$obj->getZeugnisnotenStudienplan($uid, array($studiensemester_kurzbz, $studiensemester_kurzbz2),$prestudent->studienplan_id);
+		$obj->getZeugnisnotenStudienplan($prestudent_id, array($studiensemester_kurzbz, $studiensemester_kurzbz2),$prestudent->studienplan_id);
 		
 		foreach ($obj->result as $row)
 		{

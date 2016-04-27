@@ -244,7 +244,8 @@ if (isset($_REQUEST["submit"]))
 
 					// Hole Zeugnisnote wenn schon eine eingetragen ist
 					/*
-					if ($zeugnisnote = new zeugnisnote($lvid, $student_uid, $stsem))
+					$student = new student($student_uid);
+					if ($zeugnisnote = new zeugnisnote($lvid, $student->prestudent_id, $stsem))
 						$znote = $zeugnisnote->note;
 					else
 						$znote = null;
