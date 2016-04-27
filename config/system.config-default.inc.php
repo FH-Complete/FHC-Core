@@ -11,7 +11,7 @@
 	define("DB_SYSTEM","pgsql");
 	define("DB_HOST","localhost");
 	define("DB_PORT","5432");
-	define("DB_NAME","fhcomplete");
+	define("DB_NAME","fhctest");
 	define("DB_USER","fhcomplete");
 	define("DB_PASSWORD","fhcomplete");
 	define("DB_CONNECT_PERSISTENT",FALSE);
