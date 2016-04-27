@@ -49,6 +49,8 @@ echo "Starting..."
 
 cwd=$(pwd)
 echo "Database ..."
+pkill -f fhctest &
+sudo -u postgres psql fhctest -c 'DROP DATABASE IF EXISTS fhctest;'
 sudo -u postgres createdb -O fhcomplete fhctest
 
 echo "Installing FH-Complete..."
