@@ -4,16 +4,16 @@ $I = new ApiTester($scenario);
 $I->wantTo('test the Person id');
 $I->amHttpAuthenticated("admin", "1q2w3");
 $I->haveHttpHeader('FHC-API-KEY', 'testapikey@fhcomplete.org');
-$I->sendGET('v1/person/Person/person?person_id=3');
+$I->sendGET('v1/person/person/Person', array('person_id' => 3));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson([
     'person_id' => '3',
     'nachname' => 'McKenzie']);
 
+$I->sendGET('v1/person/person/Person', array('code' => '01234567A'));
 $I->wantTo('test the Person code');
 $I->haveHttpHeader('FHC-API-KEY', 'testapikey@fhcomplete.org');
-$I->sendGET('v1/person/Person/person?code=bd94ef5d5a');
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson([
