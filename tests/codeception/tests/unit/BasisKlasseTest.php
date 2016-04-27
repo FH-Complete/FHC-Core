@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__FILE__).'/../../../include/basis.class.php');
+require_once(dirname(__FILE__).'/../../../../include/basis.class.php');
 
 class ExampleTest extends \Codeception\TestCase\Test
 {
