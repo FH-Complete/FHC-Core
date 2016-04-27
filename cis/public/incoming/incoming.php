@@ -649,7 +649,7 @@ else if($method=="lehrveranstaltungen")
 						tbl_lehrveranstaltung.incoming>0 AND
 						tbl_lehrveranstaltung.aktiv AND
 						tbl_lehrveranstaltung.lehre
-						AND tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000";
+						AND ((tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000) OR tbl_lehrveranstaltung.studiengang_kz=10006)";
 
 					if (isset($_GET['studiengang']) && $_GET['studiengang'] !='')
 						$qry .= "AND tbl_lehrveranstaltung.studiengang_kz=".$_GET['studiengang'];
