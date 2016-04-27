@@ -50,10 +50,7 @@ echo "Starting..."
 cwd=$(pwd)
 echo "Database ..."
 pkill -f fhctest &
-if sudo -u postgres psql template1 -c 'DROP DATABASE IF EXISTS fhctest;'
-then
-	echo "Database fhctest dropped!"
-fi
+sudo -u postgres psql template1 -c 'DROP DATABASE IF EXISTS fhctest;' |	echo "Database fhctest dropped!"
 sudo -u postgres createdb -O fhcomplete fhctest
 
 echo "Installing FH-Complete..."
