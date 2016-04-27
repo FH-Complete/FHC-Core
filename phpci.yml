@@ -15,6 +15,8 @@ setup:
         directory: ""
         action: "install"
     pgsql:
+        - "UPDATE pg_database SET datallowconn='false' WHERE datname='fhctest';"
+        - "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='fhctest';"
         - "DROP DATABASE IF EXISTS fhctest;"
     shell:
 #        - "pkill -f fhctest &"
