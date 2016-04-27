@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../config/vilesci.config.inc.php');
@@ -1344,11 +1345,7 @@ function StudentAuswahl()
 		// *** Incomming/Outgoing ***
 		bisiotree = document.getElementById('student-io-tree');
 
-<<<<<<< HEAD
 		url='<?php echo APP_ROOT;?>rdf/bisio.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
-=======
-		url='<?php echo APP_ROOT;?>rdf/bisio.rdf.php?uid='+uid+"&"+gettimestamp();
->>>>>>> master
 
 		try
 		{
@@ -1380,12 +1377,8 @@ function StudentAuswahl()
 	{
 		// *** ZeugnisNoten ***
 		notentree = document.getElementById('student-noten-tree');
-<<<<<<< HEAD
-		url='<?php echo APP_ROOT;?>rdf/zeugnisnote.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
-=======
 
-		url='<?php echo APP_ROOT;?>rdf/zeugnisnote.rdf.php?uid='+uid+"&"+gettimestamp();
->>>>>>> master
+		url='<?php echo APP_ROOT;?>rdf/zeugnisnote.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
 
 		try
 		{
@@ -1454,14 +1447,12 @@ function StudentAuswahl()
 		// ***** Pruefungen *****
 		pruefungtree = document.getElementById('student-pruefung-tree');
 
-<<<<<<< HEAD
-		url='<?php echo APP_ROOT;?>rdf/pruefung.rdf.php?student_uid='+uid+"&"+gettimestamp();
-=======
+
 		var pruefungstsemall='';
 		if(document.getElementById('student-pruefung-button-filterstsem').checked)
 			pruefungstsemall='&all_stsem';
 		url='<?php echo APP_ROOT;?>rdf/pruefung.rdf.php?student_uid='+uid+pruefungstsemall+"&"+gettimestamp();
->>>>>>> master
+
 
 		try
 		{

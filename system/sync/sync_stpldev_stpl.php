@@ -128,7 +128,7 @@ function getStudentsFromGroup($studiengang_kz, $semester, $verband, $gruppe, $gr
 	if($gruppe_kurzbz=='')
 	{
 		$qry = "SELECT
-					distinct prestudent_id
+					distinct uid
 				FROM
 					public.tbl_studentlehrverband
 				JOIN public.tbl_prestudent USING(prestudent_id)
@@ -150,7 +150,7 @@ function getStudentsFromGroup($studiengang_kz, $semester, $verband, $gruppe, $gr
 	else
 	{
 		$qry = "SELECT
-					distinct uid as student_uid
+					distinct uid
 				FROM
 					public.tbl_benutzergruppe
 				LEFT JOIN
@@ -167,7 +167,7 @@ function getStudentsFromGroup($studiengang_kz, $semester, $verband, $gruppe, $gr
 	{
 		while($row = $db->db_fetch_object())
 		{
-			$students[]=$row->student_uid;
+			$students[]=$row->uid;
 		}
 	}
 

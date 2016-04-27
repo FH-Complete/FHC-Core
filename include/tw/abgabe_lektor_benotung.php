@@ -79,6 +79,10 @@ function getmax($val1,$val2)
 	return ($val1>$val2)?$val1:$val2;
 
 }
+
+if(!isset($_REQUEST['projektarbeit_id']))
+	die("Es wurde keine projektarbeit_id uebergeben!");
+
 $projektarbeit_obj = new projektarbeit();
 if(!$projektarbeit_obj->load($_REQUEST['projektarbeit_id']))
 	die('Projektarbeit konnte nicht geladen werden');
@@ -702,25 +706,21 @@ else
 	exit();
 }
 
-
-
-$sql_query = "SELECT *,(SELECT abgabedatum FROM campus.tbl_paabgabe WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)." AND abgabedatum is NOT NULL ORDER BY abgabedatum DESC LIMIT 1) as abgabedatum FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) tbl_studiengang.bezeichnung as stgbezeichnung, tbl_studiengang.typ as stgtyp, * 
+$sql_query = "SELECT *,(SELECT abgabedatum FROM campus.tbl_paabgabe WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)." AND abgabedatum is NOT NULL ORDER BY abgabedatum DESC LIMIT 1) as abgabedatum FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) tbl_studiengang.bezeichnung as stgbezeichnung, tbl_studiengang.typ as stgtyp, *
 	FROM lehre.tbl_projektarbeit
 	LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id)
-	LEFT JOIN public.tbl_prestudent_id using(prestudent_id)
-	LEFT JOIN public.tbl_benutzer on(tbl_benutzer.person_id=tbl_prestudent_id.person_id)
-	LEFT JOIN public.tbl_student on(tbl_benutzer.uid=tbl_student.student_uid) 
-	LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
-	LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id) 
-	LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id) 
+	LEFT JOIN public.tbl_prestudent on(tbl_projektarbeit.prestudent_id = tbl_prestudent.prestudent_id)
+	LEFT JOIN public.tbl_person on(tbl_prestudent.person_id=tbl_person.person_id)
+	LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id)
+	LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
 	LEFT JOIN public.tbl_studiengang on(tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz)
 	WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
-	AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_benutzer 
-							WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id 
-							AND public.tbl_benutzer.uid=".$db->db_add_param($getuid).")
-	AND lehre.tbl_projektarbeit.note IS NULL 
+	AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_prestudent
+							WHERE public.tbl_prestudent.person_id=lehre.tbl_projektbetreuer.person_id
+							AND public.tbl_prestudent.uid=".$db->db_add_param($getuid).")
+	AND lehre.tbl_projektarbeit.note IS NULL
 	AND lehre.tbl_projektarbeit.projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
-	ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy 
+	ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy
 	ORDER BY nachname";
 
 if(!$erg=$db->db_query($sql_query))

@@ -45,24 +45,42 @@ array
 	array("schema" => "fue",    "name" => "tbl_ressource",            "from" => "student_uid", "to" => "uid",           "datatype" => "varchar(32)", "newTarget" => "tbl_benutzer",   "newTargetSchema" => "public", "pickDataFrom" => "tbl_benutzer", "pickDataFromCol" => "uid"        , "constraint" => ""),
 	array("schema" => "lehre",  "name" => "tbl_pruefung",             "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid", "constraint" => "SET NOT NULL"),
 	array("schema" => "lehre",  "name" => "tbl_zeugnis",             "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid", "constraint" => "SET NOT NULL"),
+	array("schema" => "lehre",  "name" => "tbl_zeugnisnote",             "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid", "constraint" => "SET NOT NULL"),
+
 );
 
 if(!isset($_POST["action"]))
 {
-	$needed = false;
+	$change_needed = false;
+	$generic_needs = "";
+	
+	/* GENERIC */
+	if(!$result = @$db->db_query("SELECT perskz FROM public.tbl_prestudent LIMIT 1;"))
+	{
+		$change_needed = true;
+		$generic_needs .= "public.tbl_prestudent: uid wird <strong style='color:green;'>eingefügt</strong>(student_uid von tbl_student)<br>";
+		$generic_needs .= "public.tbl_prestudent: perskz wird <strong style='color:green;'>eingefügt</strong>(matrikelnr von tbl_student)<br>";
+	}
+	
+	/* TABLE SPECIFIC */
 	foreach($all_tables_to_update as $t)
 	{
 		if(checkForUpdates($db, $t))
-			$needed = true;
+			$change_needed = true;
 	}
 
 
 
-	if($needed)
+	if($change_needed)
 	{
 		echo "<h2 style='color:red;'>ACHTUNG!</h2>";
 		echo "<h3>Folgendes wird geändert:</h3>";
 		echo "<p>";
+		
+		if($generic_needs != "")
+		{
+			echo $generic_needs;
+		}
 
 		foreach($all_tables_to_update as $t)
 			describeOneChange($db, $t);
@@ -87,6 +105,31 @@ else if($_POST["action"] == "Starten")
 
 	// *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 	echo '<H2>Pruefe Tabellen und Attribute!</H2>';
+
+	//********************************tbl_prestudent CHANGES********************************
+	if(!$result = @$db->db_query("SELECT perskz FROM public.tbl_prestudent LIMIT 1;"))
+	{
+		$prestudent_qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN uid varchar(32);
+			ALTER TABLE public.tbl_prestudent ADD CONSTRAINT fk_tbl_prestudent_tbl_benutzer_uid FOREIGN KEY (uid) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+			UPDATE public.tbl_prestudent SET uid = (SELECT student_uid FROM public.tbl_student WHERE tbl_student.prestudent_id = tbl_prestudent.prestudent_id);
+		";
+		if(!$result = @$db->db_query($prestudent_qry))
+		{
+			echo "<p>Could not ADD COLUMN uid TO public.tbl_prestudent: " . $db->db_last_error()."</p>";
+		}
+		
+		
+		$prestudent_qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN perskz character(15);
+		UPDATE public.tbl_prestudent SET perskz = (SELECT matrikelnr FROM public.tbl_student WHERE tbl_student.prestudent_id = tbl_prestudent.prestudent_id);
+		";
+		if(!$result = @$db->db_query($prestudent_qry))
+		{
+			echo "<p>Could not ADD COLUMN perskz TO public.tbl_prestudent: " . $db->db_last_error()."</p>";
+		}
+	}
+	
+
+
 
 
 	//********************************DROP ALL VIEWS********************************
@@ -125,6 +168,27 @@ else if($_POST["action"] == "Starten")
 			echo "<p>Could not DROP view public.vw_gruppen: " . $create_view_qry."</p>";
 		}
 	}
+	
+	//lehre.vw_zeugnisnote
+	if($result = @$db->db_query("SELECT 1 FROM lehre.vw_zeugnisnote LIMIT 1;"))
+	{
+		if(!$db->db_query("DROP VIEW lehre.vw_zeugnisnote"))
+		{
+			echo "<p>Could not DROP view lehre.vw_zeugnisnote: " . $create_view_qry."</p>";
+		}
+	}
+	
+	//testtool.vw_reihungstest_zeugnisnoten
+	if($result = @$db->db_query("SELECT 1 FROM testtool.vw_reihungstest_zeugnisnoten LIMIT 1;"))
+	{
+		if(!$db->db_query("DROP VIEW testtool.vw_reihungstest_zeugnisnoten"))
+		{
+			echo "<p>Could not DROP view testtool.vw_reihungstest_zeugnisnoten: " . $create_view_qry."</p>";
+		}
+	}
+
+
+
 
 
 	//modify all tables
@@ -385,6 +449,137 @@ else if($_POST["action"] == "Starten")
 	}
 
 
+
+	//lehre.vw_zeugnisnote
+	if(!$result = @$db->db_query("SELECT 1 FROM lehre.vw_zeugnisnote LIMIT 1;"))
+	{
+		$create_view_qry = "
+			CREATE VIEW lehre.vw_zeugnisnote AS
+				SELECT tbl_zeugnisnote.studiensemester_kurzbz,
+					tbl_prestudent.uid,
+					tbl_prestudent.perskz,
+					tbl_prestudent.studiengang_kz,
+					tbl_lehrveranstaltung.kurzbz,
+					tbl_zeugnisnote.note,
+					tbl_lehrveranstaltung.ects,
+					tbl_zeugnisnote.lehrveranstaltung_id,
+					tbl_person.person_id,
+					tbl_prestudent.prestudent_id,
+					tbl_zeugnisnote.benotungsdatum,
+					tbl_person.staatsbuergerschaft,
+					tbl_person.geburtsnation,
+					tbl_person.sprache,
+					tbl_person.nachname,
+					tbl_person.vorname,
+					tbl_person.gebdatum,
+					tbl_person.gebort,
+					tbl_person.gebzeit,
+					tbl_person.svnr,
+					tbl_person.ersatzkennzeichen,
+					tbl_person.familienstand,
+					tbl_person.geschlecht,
+					tbl_person.anzahlkinder,
+					tbl_person.bundesland_code,
+					tbl_lehrveranstaltung.bezeichnung,
+					tbl_lehrveranstaltung.studiengang_kz AS lv_studiengang_kz,
+					tbl_lehrveranstaltung.semester AS lv_semester,
+					tbl_lehrveranstaltung.semesterstunden,
+					tbl_lehrveranstaltung.lehrform_kurzbz,
+					tbl_lehrveranstaltung.orgform_kurzbz,
+					tbl_prestudent.rt_punkte1,
+					tbl_prestudent.rt_punkte2,
+					tbl_prestudent.rt_punkte3,
+					tbl_prestudent.rt_gesamtpunkte
+				 FROM tbl_prestudent
+					 JOIN lehre.tbl_zeugnisnote USING (prestudent_id)
+					 JOIN tbl_person USING (person_id)
+					 JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id);
+				COMMENT ON VIEW lehre.vw_zeugnisnote IS 'Zeugnisnoten inkl. Personendaten, LV-Daten und RT-Punkte';
+			";
+		if(!$db->db_query($create_view_qry))
+		{
+			echo "<p>Could not CREATE view lehre.vw_zeugnisnote: " . $create_view_qry."</p>";
+		}
+	}
+
+	//testtool.VIEW
+	if(!$result = @$db->db_query("SELECT 1 FROM testtool.vw_reihungstest_zeugnisnoten LIMIT 1;"))
+	{
+		$create_view_qry = "
+			CREATE VIEW testtool.vw_reihungstest_zeugnisnoten AS
+				SELECT tbl_zeugnisnote.studiensemester_kurzbz,
+								CASE
+								    WHEN tbl_zeugnisnote.note IS NULL THEN 5
+								    WHEN tbl_zeugnisnote.note = ANY (ARRAY[7, 13, 14, 15]) THEN 5
+								    ELSE tbl_zeugnisnote.note::integer
+								END AS note,
+						tbl_zeugnisnote.lehrveranstaltung_id,
+						tbl_zeugnisnote.benotungsdatum,
+						tbl_benutzer.uid,
+						tbl_student.matrikelnr,
+						tbl_student.studiengang_kz AS student_stg_kz,
+						tbl_student.semester,
+						tbl_student.prestudent_id,
+						tbl_lehrveranstaltung.kurzbz,
+						tbl_lehrveranstaltung.bezeichnung,
+						tbl_lehrveranstaltung.studiengang_kz AS lv_studiengang_kz,
+						tbl_lehrveranstaltung.semester AS lv_semester,
+						tbl_lehrveranstaltung.semesterstunden,
+						tbl_lehrveranstaltung.lehrform_kurzbz,
+						tbl_lehrveranstaltung.orgform_kurzbz,
+						tbl_lehrveranstaltung.ects,
+						tbl_lehrveranstaltung.zeugnis,
+						tbl_lehrveranstaltung.studiengang_kz AS lv_stg_kz,
+						tbl_person.person_id,
+						tbl_person.staatsbuergerschaft,
+						tbl_person.geburtsnation,
+						tbl_person.sprache,
+						tbl_person.nachname,
+						tbl_person.vorname,
+						tbl_person.gebdatum,
+						tbl_person.gebort,
+						tbl_person.gebzeit,
+						tbl_person.svnr,
+						tbl_person.ersatzkennzeichen,
+						tbl_person.familienstand,
+						tbl_person.geschlecht,
+						tbl_person.anzahlkinder,
+						tbl_person.bundesland_code,
+						tbl_prestudent.rt_punkte1,
+						tbl_prestudent.rt_punkte2,
+						tbl_prestudent.rt_punkte3,
+						tbl_prestudent.rt_gesamtpunkte,
+						tbl_studiensemester.ende
+					 FROM tbl_student
+						 JOIN lehre.tbl_zeugnisnote USING (student_uid)
+						 JOIN tbl_benutzer ON tbl_student.student_uid::text = tbl_benutzer.uid::text
+						 JOIN tbl_person USING (person_id)
+						 JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+						 JOIN tbl_prestudent USING (prestudent_id)
+						 JOIN tbl_studiensemester USING (studiensemester_kurzbz);
+				COMMENT ON VIEW testtool.vw_reihungstest_zeugnisnoten IS 'Fuer die Gegenueberstellung der Reihungstestergebnisse mit den Zeugnisnoten';
+			";
+		if(!$db->db_query($create_view_qry))
+		{
+			echo "<p>Could not CREATE view testtool.vw_reihungstest_zeugnisnoten: " . $create_view_qry."</p>";
+		}
+	}
+
+/* TODO:SCHEMA.TODO:VIEW TEMPLATE
+	//SCHEMA.TODO:VIEW
+	if(!$result = @$db->db_query("SELECT 1 FROM TODO:SCHEMA.TODO:VIEW LIMIT 1;"))
+	{
+		$create_view_qry = "
+			CREATE VIEW TODO:SCHEMA.TODO:VIEW AS
+				TODO:DEFINITION
+			";
+		if(!$db->db_query($create_view_qry))
+		{
+			echo "<p>Could not CREATE view TODO:SCHEMA.TODO:VIEW: " . $create_view_qry."</p>";
+		}
+	}
+
+*/
 
 
 

@@ -263,12 +263,13 @@ if($studiengang_kz!='')
 	$qry = "SELECT
 				*
 			FROM
-				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person
+				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person, public.tbl_prestudent
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
+				tbl_prestudent.prestudent_id=tbl_projektarbeit.prestudent_id AND
 				tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
 				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
@@ -282,12 +283,13 @@ elseif($mitarbeiter_uid!='')
 	$qry = "SELECT
 				*
 			FROM
-				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person
+				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person, public.tbl_prestudent
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
+				tbl_prestudent.prestudent_id=tbl_projektarbeit.prestudent_id AND
 				tbl_projektbetreuer.person_id=".$db->db_add_param($mitarbeiter->person_id, FHC_INTEGER)." AND
 				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0

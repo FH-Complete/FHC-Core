@@ -445,7 +445,7 @@ if($xmlformat=='rdf')
 
 		//$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz'";
 
-		$sql_query="SELECT p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,	vorname, vornamen, geschlecht,
+		$sql_query="SELECT p.person_id, tbl_prestudent.prestudent_id, tbl_prestudent.uid, titelpre, titelpost,	vorname, vornamen, geschlecht,
 						nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
 						tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 						tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, mentor, public.tbl_benutzer.aktiv AS bnaktiv,

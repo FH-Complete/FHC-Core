@@ -91,7 +91,6 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$studiensemester_kurzbz = $semester_aktuell;
 
 	//Daten holen
-
 	$xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>";
 	$xml .= "<zeugnisse>";
 
@@ -102,16 +101,16 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml_fussnote='';
 		$projektarbeit=array();
 
-		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.projektarbeit_note_anzeige,
+		$query = "SELECT tbl_prestudent.perskz, tbl_prestudent.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.projektarbeit_note_anzeige,
 					tbl_studiengang.bezeichnung, tbl_studiengang.english, tbl_studentlehrverband.semester,
 					tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre,
 					tbl_person.titelpost, tbl_person.anrede, tbl_studiensemester.bezeichnung as sembezeichnung,
-					tbl_studiensemester.studiensemester_kurzbz as stsem, tbl_student.prestudent_id, tbl_studiengang.max_semester
-				FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester
-				WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz
-				AND tbl_student.student_uid = tbl_benutzer.uid AND tbl_benutzer.person_id = tbl_person.person_id
-				AND tbl_student.prestudent_id = ".$db->db_add_param($prestudent_id_arr[$i])."
-				AND tbl_studentlehrverband.prestudent_id=tbl_student.prestudent_id
+					tbl_studiensemester.studiensemester_kurzbz as stsem, tbl_prestudent.prestudent_id, tbl_studiengang.max_semester
+				FROM tbl_person, tbl_prestudent, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester
+				WHERE tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz
+				AND tbl_prestudent.uid = tbl_benutzer.uid AND tbl_benutzer.person_id = tbl_person.person_id
+				AND tbl_prestudent.prestudent_id = ".$db->db_add_param($prestudent_id_arr[$i])."
+				AND tbl_studentlehrverband.prestudent_id=tbl_prestudent.prestudent_id
 				AND tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz
 				AND tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz);
 
@@ -190,7 +189,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "		<name>".trim($row->titelpre.' '.trim($row->vorname.' '.$row->vornamen).' '.$row->nachname.($row->titelpost!=''?', '.$row->titelpost:''))."</name>";
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 		$xml .= "		<gebdatum>".$gebdatum."</gebdatum>";
-		$xml .= "		<matrikelnr>".trim($row->matrikelnr)."</matrikelnr>";
+		$xml .= "		<matrikelnr>".trim($row->perskz)."</matrikelnr>";
 		$xml .= "		<studiengangsleiter>".$stgl."</studiengangsleiter>";
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "		<ort_datum>".$datum_aktuell."</ort_datum>";

@@ -46,24 +46,24 @@ function drawBetreuungen()
 	global $gesamtkosten_lva, $zeile, $spalte, $stsem1, $stsem2, $last_fb, $worksheet;
 	global $format_bold, $format_colored, $gesamtkosten_betreuung;
 	global $gesamtkosten_fb, $format_number, $format_number1;
-	
+
 	$qry_fb = "SELECT
-				*, tbl_benutzer.uid as student_uid
+				*, tbl_prestudent.uid as student_uid
 			FROM
-				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrfach, public.tbl_benutzer, public.tbl_prestudent
+				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrfach, public.tbl_prestudent
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
-				(tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem1)." OR
-				 tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem2).") AND
+				(tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem1)."' OR
+				 tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem2)."') AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0 AND
-				tbl_lehrfach.fachbereich_kurzbz=".$db->db_add_param($last_fb)." AND
 				tbl_prestudent.prestudent_id = tbl_projektarbeit.prestudent_id AND
-				tbl_prestudent.person_id = tbl_benutzer.person_id
+				tbl_lehrfach.fachbereich_kurzbz='".addslashes($last_fb)."'
 			";
+
 	$db = new basis_db();
 	$gesamtkosten_betreuung=0;
 	if($result_fb = $db->db_query($qry_fb))

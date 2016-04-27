@@ -34,7 +34,7 @@ $db = new basis_db();
 $user = get_uid();
 $datum_obj = new datum();
 loadVariables($user);
-	
+
 	//Parameter holen
 	$studiengang_kz = isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:'';
 	$semester = isset($_GET['semester'])?$_GET['semester']:'';
@@ -78,29 +78,30 @@ loadVariables($user);
 			$maxlength[$i]=mb_strlen($title);
 		$i++;
 	}
-			
+
 	// Daten holen
-	$qry = "SELECT 
-				tbl_projekttyp.bezeichnung, titel, trim(COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'')), 
+	$qry = "SELECT
+				tbl_projekttyp.bezeichnung, titel, trim(COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'')),
 				(SELECT anmerkung FROM lehre.tbl_note WHERE note=tbl_projektarbeit.note) as anmerkung, punkte, beginn,
 				ende, CASE WHEN freigegeben THEN 'Ja' ELSE 'Nein' END, gesperrtbis, gesamtstunden, themenbereich, tbl_projektarbeit.anmerkung, projektarbeit_id
-			FROM 
-				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, 
-				public.tbl_benutzer, public.tbl_person, lehre.tbl_projekttyp, public.tbl_prestudent
+			FROM
+				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung,
+				public.tbl_prestudent, lehre.tbl_projekttyp, public.tbl_person, public.tbl_benutzer
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-				tbl_prestudent.prestudent_id=tbl_projektarbeit.prestudent_id AND
-				tbl_prestudent.person_id=tbl_benutzer.person_id AND
-				tbl_benutzer.person_id=tbl_person.person_id AND
+				tbl_projektarbeit.prestudent_id=tbl_prestudent.prestudent_id AND
+				tbl_prestudent.uid=tbl_benutzer.uid AND
+				tbl_person.person_id=tbl_benutzer.person_id AND
 				tbl_projektarbeit.projekttyp_kurzbz=tbl_projekttyp.projekttyp_kurzbz AND
 				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
-				tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
+				tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz)." AND
 				tbl_projektarbeit.projekttyp_kurzbz IN ('Bachelor','Diplom','Projekt')";
-	
+
+
 	if($semester!='')
 		$qry.= " AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester);
-	
+
 	//echo $qry;
 	$zeile=1;
 	if($result = $db->db_query($qry))
@@ -122,9 +123,8 @@ loadVariables($user);
 				}
 			}
 			$zeile++;
-						
+
 			//Betreuer
-									
 			$qry_betreuer = "SELECT betreuerart_kurzbz, COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,''), tbl_note.anmerkung, faktor, name, punkte, stunden, stundensatz FROM (lehre.tbl_projektbetreuer JOIN tbl_person USING(person_id)) LEFT JOIN lehre.tbl_note USING(note) WHERE projektarbeit_id='".$row['projektarbeit_id']."'";
 			
 			if($result_betreuer = $db->db_query($qry_betreuer))
@@ -168,7 +168,7 @@ loadVariables($user);
 	//Die Breite der Spalten setzen
 	foreach($maxlength as $i=>$breite)
 		$worksheet->setColumn($i, $i, $breite+2);
-    
+
 	$workbook->close();
 
 ?>

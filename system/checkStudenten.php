@@ -81,11 +81,10 @@ else
 	
 $text.= "<br>Suche alle Abbrecher die noch aktiv sind ... <br><br>";
 
-$qry ="select pre_status.status_kurzbz, benutzer.aktiv, benutzer.uid, student.studiengang_kz studiengang
+$qry ="select pre_status.status_kurzbz, benutzer.aktiv, benutzer.uid, pre.studiengang_kz studiengang
 from public.tbl_prestudentstatus pre_status 
 join public.tbl_prestudent pre using(prestudent_id)
-join public.tbl_student student using(prestudent_id)
-join public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
+join public.tbl_benutzer benutzer on(benutzer.uid=pre.uid)
 where pre_status.status_kurzbz ='Abbrecher' and benutzer.aktiv = 'true';";
 
 if($db->db_query($qry))
@@ -184,27 +183,24 @@ if($db->db_query($qry))
  */ 
 
 $text .="<br><br>Suche Studenten deren Semstern nicht mit dem Ausbildungssemesters des aktuellen Status übereinstimmt ... <br><br>"; 
-	
-$student = new student(); 
-$prestudent = new prestudent(); 
-$qry = "select distinct(student.student_uid), prestudent.prestudent_id, status.ausbildungssemester, lv.semester, student.studiengang_kz studiengang
-from public.tbl_student student
-join public.tbl_studentlehrverband lv ON(public.tbl_student.prestudent_id = public.tbl_studentlehrverband.prestudent_id)
-join public.tbl_prestudent prestudent using(prestudent_id)
-join public.tbl_prestudentstatus status using(prestudent_id) 
-WHERE status.studiensemester_kurzbz = '$aktSem'  
+
+$qry = "select distinct(pre.uid), pre.prestudent_id, status.ausbildungssemester, lv.semester, pre.studiengang_kz studiengang
+from public.tbl_prestudent pre
+join public.tbl_studentlehrverband lv USING(prestudent_id)
+join public.tbl_prestudentstatus status USING(prestudent_id)
+WHERE status.studiensemester_kurzbz = '$aktSem'
 and lv.studiensemester_kurzbz = '$aktSem' AND status.status_kurzbz NOT IN ('Interessent','Bewerber')
-and get_rolle_prestudent (prestudent_id, '$aktSem')='Student';"; 
+and get_rolle_prestudent (prestudent_id, '$aktSem')='Student';";
 
 if($db->db_query($qry))
 {
 	while($row = $db->db_fetch_object())
 	{
-		$student_uid = $row->student_uid;
-		
+		$student_uid = $row->uid;
+
 		if($row->ausbildungssemester != $row->semester)
 		{
-			$ausgabe[$row->studiengang][5][]= $student_uid; 
+			$ausgabe[$row->studiengang][5][]= $student_uid;
 			$text.="Studenten-uid: ".$student_uid."<br>";
 		} 
 	}

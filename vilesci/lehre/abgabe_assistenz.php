@@ -78,24 +78,25 @@ function showFarbcodes()
  
 $trenner = new variable();
 $trenner->loadVariables($getuid);
-	
-$sql_query = "SELECT *, 
+
+$sql_query = "SELECT *,
 			(SELECT orgform_kurzbz
 			FROM tbl_prestudentstatus
-			WHERE prestudent_id=(Select prestudent_id from tbl_student where student_uid=xy.uid limit 1)
+			WHERE prestudent_id=(Select prestudent_id from tbl_prestudent where uid=xy.uid limit 1)
 			ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1
 			) as organisationsform
-			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) public.tbl_studiengang.bezeichnung as stgbez,tbl_projekttyp.bezeichnung AS prjbez,* FROM lehre.tbl_projektarbeit
-			LEFT JOIN public.tbl_prestudent ON(tbl_prestudent.prestudent_id = tbl_projektarbeit.prestudent_id)
-			LEFT JOIN public.tbl_benutzer on(tbl_prestudent.person_id=tbl_benutzer.person_id)
+			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id, tbl_prestudent.uid) public.tbl_studiengang.bezeichnung as stgbez,tbl_projekttyp.bezeichnung AS prjbez, projektarbeit_id, tbl_prestudent.uid, studiensemester_kurzbz, vorname, nachname, titel
+				FROM lehre.tbl_projektarbeit
+			LEFT JOIN public.tbl_prestudent using(prestudent_id)
+			LEFT JOIN public.tbl_benutzer on(tbl_benutzer.uid=tbl_prestudent.uid)
 			LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
-			LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id) 
-			LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id) 
-			LEFT JOIN public.tbl_studiengang using(studiengang_kz)
+			LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id)
+			LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
+			LEFT JOIN public.tbl_studiengang on(tbl_studiengang.studiengang_kz = tbl_lehrveranstaltung.studiengang_kz)
 			LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 			WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
-			AND public.tbl_benutzer.aktiv 
-			AND lehre.tbl_projektarbeit.note IS NULL 
+			AND public.tbl_benutzer.aktiv
+			AND lehre.tbl_projektarbeit.note IS NULL
 			AND public.tbl_studiengang.studiengang_kz=".$db->db_add_param($stg_kz)."
 			ORDER BY tbl_projektarbeit.projektarbeit_id desc) as xy 
 		ORDER BY nachname";

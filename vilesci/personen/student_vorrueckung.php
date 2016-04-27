@@ -150,10 +150,10 @@ if ($result_stg=$db->db_query($qry_stg))
 }	
 	
 //select für die Anzeige
-$sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv, 
-			tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (prestudent_id)
-				JOIN tbl_benutzer ON (student_uid=uid)
-				JOIN tbl_person USING (person_id)
+$sql_query="SELECT tbl_prestudent.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv,
+			tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_prestudent USING (prestudent_id)
+				JOIN tbl_benutzer USING (uid)
+				JOIN tbl_person ON (tbl_person.person_id = tbl_prestudent.person_id)
 			WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER)." 
 			AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
 if($semester<100)
@@ -180,10 +180,10 @@ if (isset($_POST['vorr']))
 		die('Sie haben keine Berechtigung fuer diese Aktion');
 	
 	//select für die Vorrückung
-	$sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv, 
-				tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (prestudent_id)
-				JOIN tbl_benutzer ON (student_uid=uid)
-				JOIN tbl_person USING (person_id)
+	$sql_query="SELECT tbl_prestudent.*,tbl_person.*, tbl_studentlehrverband.semester as semester_stlv,  tbl_studentlehrverband.verband as verband_stlv,
+				tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_prestudent USING (prestudent_id)
+				JOIN tbl_benutzer USING (uid)
+				JOIN tbl_person ON (tbl_person.person_id = tbl_prestudent.person_id)
 				WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER)." 
 				AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz_akt);
 	
