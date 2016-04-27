@@ -12,6 +12,8 @@ $I->seeResponseContainsJson([
     'nachname' => 'McKenzie']);
 
 $I->sendGET('v1/person/person/Person', array('code' => '01234567A'));
+$I->wantTo('test the Person code');
+$I->haveHttpHeader('FHC-API-KEY', 'testapikey@fhcomplete.org');
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson([
@@ -31,3 +33,4 @@ $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson([
 	'success' => TRUE,
+	'message' => 'Person found']);*/
