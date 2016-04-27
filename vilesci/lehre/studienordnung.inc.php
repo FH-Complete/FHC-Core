@@ -1,22 +1,22 @@
 <?php
-/* 
+/*
  * Copyright 2013 fhcomplete.org
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
+ *
  *
  * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
  */
@@ -31,6 +31,7 @@ require_once('../../include/organisationsform.class.php');
 require_once('../../include/sprache.class.php');
 require_once('../../include/akadgrad.class.php');
 require_once('../../include/lvregel.class.php');
+require_once('../../include/standort.class.php');
 
 $uid = get_uid();
 $db = new basis_db();
@@ -65,7 +66,7 @@ switch($method)
 		}
 		else
 			$new=true;
-		
+
 		echo '
 		<input type="hidden" id="studienordnung_id" value ="'.$studienordnung_id.'"/>
 		<table>
@@ -143,6 +144,44 @@ switch($method)
 		echo '
 					</select>
 			</tr>
+
+			<tr>
+				<td>Status:</td>
+				<td><select id="studienordnung_status">
+				<option value="">--keine Auswahl--</option>';
+		$studienordnungstatus = new studienordnung();
+		$studienordnungstatus->getstatus();
+		foreach($studienordnungstatus->result as $row_status)
+		{
+			if($row_status->status_kurzbz==$studienordnung->status_kurzbz)
+				$selected = 'selected';
+			else
+				$selected = '';
+			echo '<option value="'.$db->convert_html_chars($row_status->status_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_status->bezeichnung).'</option>';
+		}
+		echo '
+
+				</select></td>
+			</tr>
+			<tr>
+				<td>Standort</td>
+				<td><select id="standort_id">
+				<option value="">--keine Auswahl--</option>';
+		$standort = new standort();
+		$standort->getStandorteWithTyp('Intern');
+
+		foreach($standort->result as $row_standort)
+		{
+			if($row_standort->standort_id == $studienordnung->standort_id)
+				$selected = 'selected';
+			else
+				$selected = '';
+			echo '<option value="'.$db->convert_html_chars($row_standort->standort_id).'" '.$selected.'>'.$db->convert_html_chars($row_standort->bezeichnung).'</option>';
+		}
+		echo '
+				</select>
+			</tr>
+
 			<tr>
 				<td><span id="submsg" style="color:green; visibility:hidden;">Daten gespeichert</span></td>
 				<td><input type="button" value="Speichern" onclick="saveStudienordnung()"/></td>
@@ -173,7 +212,7 @@ switch($method)
 		}
 		else
 			$new=true;
-		
+
 		echo '
 		<input type="hidden" id="studienplan_id" value="'.$studienplan_id.'"/>
 		<table>
@@ -245,6 +284,18 @@ switch($method)
 				<td><input type="checkbox" id="aktiv"'.($new?' checked="checked"':$checked).'/></td>
 			</tr>
 			<tr>
+				<td>ECTS gesamt</td>
+				<td><input type="text"  size="6" id="ects_stpl" value="'.$studienplan->ects_stpl.'" /></td>
+			</tr>
+			<tr>
+				<td>Pflicht SWS</td>
+				<td><input type="text" size="3" id="pflicht_sws" value="'.$studienplan->pflicht_sws.'" /></td>
+			</tr>
+			<tr>
+				<td>Pflicht LVS</td>
+				<td><input type="text"  size="3" id="pflicht_lvs" value="'.$studienplan->pflicht_lvs.'" /></td>
+			</tr>
+			<tr>
 				<td><span id="submsg" style="color:green; visibility:hidden;">Daten gespeichert</span></td>
 				<td><input type="button" value="Speichern" onclick="saveStudienplan()" /></td>
 			</tr>
@@ -256,7 +307,7 @@ switch($method)
 		$studienordnung_id = $_GET["studienordnung_id"];
 //		$studiensemester_kurzbz = isset($_GET["studiensemester_kurzbz"]) ? $_GET["studiensemester_kurzbz"] : "";
 //		$semester = isset($_GET["semester"]) ? $_GET["semester"] : "";
-				
+
 		$studienordnung = new studienordnung();
 		$studienordnung->loadStudienordnung($studienordnung_id);
 
@@ -268,12 +319,12 @@ switch($method)
 			$obj->ausbildungssemester = $studienordnung->loadAusbildungsemesterFromStudiensemester($studienordnung_id, $studienSem);
 			$ausbildungssemesterResult[] = $obj;
 		}
-		
+
 		$studiengang = new studiengang();
 		$studiengang->load($studienordnung->studiengang_kz);
 //		$ausbildungssemester = $studiengang->getSemesterFromStudiengang($studienordnung->studiengang_kz)
 		$ausbildungssemester = $studiengang->max_semester;
-			
+
 		$studiensemester = new studiensemester();
 		$studiensemester->getAll();
 		echo '
@@ -290,7 +341,7 @@ switch($method)
 		echo '</tr>
 				</thead>
 				<tbody>';
-		
+
 		if($studienSemesterResult != null)
 		{
 			foreach($ausbildungssemesterResult as $row)
