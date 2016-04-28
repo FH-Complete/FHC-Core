@@ -368,6 +368,7 @@ cellSeparator (default value: "|")
                             $item['funktion_kurzbz']=$oRresult[$i]->funktion_kurzbz?html_entity_decode($oRresult[$i]->funktion_kurzbz).' ':'';
                             $item['aktiv']=$oRresult[$i]->aktiv==true || $oRresult[$i]->aktiv=='t'?true:false;
                             $item['uid']=$oRresult[$i]->uid;
+                            $item['person_id']=$oRresult[$i]->person_id;
                             $json[]=$item;
 /*				echo html_entity_decode($oRresult[$i]->person_id).'|'
 									.trim($oRresult[$i]->anrede).'&nbsp;'.($oRresult[$i]->titelpre?html_entity_decode($oRresult[$i]->titelpre).'&nbsp;':'')

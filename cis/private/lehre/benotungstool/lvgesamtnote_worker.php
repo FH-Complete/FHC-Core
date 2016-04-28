@@ -18,7 +18,7 @@
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  */
 /**
- * 
+ *
  */
 require_once('../../../../config/cis.config.inc.php');
 require_once('../../../../include/functions.inc.php');
@@ -44,5 +44,5 @@ switch($work)
 		$note = $notenschluessel->getNote($punkte, $lehrveranstaltung_id, $studiensemester_kurzbz);
 		echo $note;
 		exit;
-}	
-?>	
+}
+?>

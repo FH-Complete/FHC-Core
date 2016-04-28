@@ -31,15 +31,15 @@ class menu_addon_zeitsperren extends menu_addon
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		$sprache = getSprache();
 		$user = get_uid();
-		
+
 		$rechte = new benutzerberechtigung();
 		$rechte->getBerechtigungen($user);
-			
+
 		$p = new phrasen($sprache);
-		
+
 		$fkt=new funktion();
 		$fkt->getAll($user);
 
@@ -50,7 +50,8 @@ class menu_addon_zeitsperren extends menu_addon
 								'link'  => 'private/profile/zeitsperre_days.php?days=12',
 								'name'  => $p->t('menu/zeitsperren')
 								);
-	    		
+
+			/*
 			if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter'))
 			{
 				$this->items[] = array('title' => $p->t('menu/resturlaub'),
@@ -59,8 +60,9 @@ class menu_addon_zeitsperren extends menu_addon
 								   'name'  => $p->t('menu/resturlaub')
 								  );
 			}
-					
-			if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter') 
+			*/
+
+			if ($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('mitarbeiter')
 			    || $fkt->checkFunktion('stvLtg')|| $fkt->checkFunktion('gLtg')
 			    || $fkt->checkFunktion('Leitung') || $fkt->checkFunktion('ass'))
 			{
@@ -85,7 +87,7 @@ class menu_addon_zeitsperren extends menu_addon
 								   'name'  => $p->t('menu/assistenz')
 								  );
 			}
-			
+
 			$stg_obj = new studiengang();
 			$stg_obj->loadArray($rechte->getStgKz('admin'), 'typ, kurzbz', true);
 			foreach($stg_obj->result as $row)
@@ -95,7 +97,7 @@ class menu_addon_zeitsperren extends menu_addon
 								   'link'  => 'private/profile/zeitsperre.php?funktion=lkt&stg_kz='.$row->studiengang_kz,
 								   'name'  => $p->t('menu/lektoren').' '.$row->kurzbzlang
 								  );
-			}	
+			}
 		}
 		$this->output();
 	}

@@ -46,7 +46,7 @@ if(isset($_GET['stsem']))
 else 
 	die('Eine Studiensemester muss uebergeben werden');
 
-if(!$berechtigung->isBerechtigt('admin') && !check_lektor_lehrveranstaltung($user,$lvid,$studiensemester))
+if(!$berechtigung->isBerechtigt('admin') && !$berechtigung->isBerechtigt('assistenz') && !check_lektor_lehrveranstaltung($user,$lvid,$studiensemester))
 	die('Sie muessen LektorIn der LV oder Admin sein, um diese Seite aufrufen zu koennen');
 
 $output='pdf';
@@ -95,9 +95,6 @@ $stg->load($lv->studiengang_kz);
 
 $studiengang_bezeichnung=$stg->bezeichnung;
 
-$teilnehmer = $lv->getStudentsOfLv($lvid, $studiensemester, $lehreinheit);
-$anzahl_studierende=count($teilnehmer);
-
 $stg->getAllTypes();
 
 $data = array(
@@ -111,7 +108,6 @@ $data = array(
 	'sprache'=>$lv->sprache,
 	'studiensemester'=>$studiensemester,
 	'semester'=>$lv->semester,
-	'anzahl_studierende'=>$anzahl_studierende,
 	'orgform'=>$lv->orgform_kurzbz,
 );
 
@@ -159,13 +155,16 @@ $erhalter = new erhalter();
 $erhalter->getAll();
 
 $a_o_kz = '9'.sprintf("%03s", $erhalter->result[0]->erhalter_kz); //Stg_Kz AO-Studierende auslesen (9005 fuer FHTW)
+$anzahl_studierende = 0;
 
 if($result = $db->db_query($qry))
-{
+{	
 	while($row = $db->db_fetch_object($result))
 	{
 		if($row->status!='Abbrecher' && $row->status!='Unterbrecher')
 		{
+			$anzahl_studierende++;
+			
 			if($row->status=='Incoming') //Incoming
 				$zusatz='(i)';
 			else 
@@ -193,10 +192,13 @@ if($result = $db->db_query($qry))
 							'zusatz'=>$zusatz
 							));
 		}
-		
 	}
+	//Anzahl Studierende in Array $data (an erster Stelle) einfuegen
+	$data = array_reverse($data, true);
+	$data['anzahl_studierende'] = $anzahl_studierende;
+	$data = array_reverse($data, true);
 }
-
+//var_dump($data);
 //$files=array();
 /*
 foreach($codes_obj->result as $code)

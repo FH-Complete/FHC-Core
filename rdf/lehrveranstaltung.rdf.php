@@ -40,6 +40,7 @@ require_once('../include/lehrveranstaltung.class.php');
 $uid=get_uid();
 
 $error_msg='';
+$db = new basis_db();
 
 $error_msg.=loadVariables($uid);
 
@@ -58,7 +59,7 @@ else
 	$sem=null;
 if(isset($_GET['uid']))
 	$student_uid = $_GET['uid'];
-else 
+else
 	$student_uid=null;
 
 if(isset($_GET['lehrveranstaltung_kompatibel_id']))
@@ -136,7 +137,34 @@ foreach ($lehrveranstaltung->lehrveranstaltungen as $row)
 		else
 			continue;
 	}
-	
+
+	if(isset($_GET['genehmigt']))
+	{
+		// Wenn genehmigt Parameter mitgeliefert wird, dann werden nur LVs
+		// geliefert die genehmigten Studienordnungen zugeordnet sind
+		// Module werden nicht geliefert
+		$qry = "SELECT
+					count(*) as anzahl
+				FROM
+					lehre.tbl_studienplan_lehrveranstaltung
+					JOIN lehre.tbl_studienplan USING(studienplan_id)
+					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+					JOIN lehre.tbl_lehrtyp USING(lehrtyp_kurzbz)
+				WHERE
+					tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($row->lehrveranstaltung_id)."
+					AND tbl_studienordnung.status_kurzbz='approved'
+					AND lehrtyp_kurzbz='lv'";
+		if($result_genehmigt = $db->db_query($qry))
+		{
+			if($row_genehmigt = $db->db_fetch_object($result_genehmigt))
+			{
+				if($row_genehmigt->anzahl==0)
+					continue;
+			}
+		}
+	}
+
 	echo'<RDF:li>
       		<RDF:Description  id="'.$row->lehrveranstaltung_id.'" about="'.$rdf_url.$row->lehrveranstaltung_id.'">
         		<LVA:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></LVA:lehrveranstaltung_id>

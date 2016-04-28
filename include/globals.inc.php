@@ -33,8 +33,15 @@
 	$tagbez[2][5]="Friday";
 	$tagbez[2][6]="Saturday";
 	$tagbez[2][7]="Sunday";
-	
-	// Mehrsprache Monatstage 
+    $tagbez[4][1]="Lunedì";
+    $tagbez[4][2]="Martedì";
+    $tagbez[4][3]="Mercoledì";
+    $tagbez[4][4]="Giovedì";
+    $tagbez[4][5]="Venerdì";
+    $tagbez[4][6]="Sabato";
+    $tagbez[4][7]="Domenica";
+
+	// Mehrsprache Monatstage
 	global $monatsname;
 	$monatsname = array();
 	$monatsname[1][0]="Januar";
@@ -61,6 +68,18 @@
 	$monatsname[2][9]="October";
 	$monatsname[2][10]="November";
 	$monatsname[2][11]="December";
+    $monatsname[4][0]="Gennaio";
+    $monatsname[4][1]="Febbraio";
+    $monatsname[4][2]="Marzo";
+    $monatsname[4][3]="Aprile";
+    $monatsname[4][4]="Maggio";
+    $monatsname[4][5]="Giunio";
+    $monatsname[4][6]="Luglio";
+    $monatsname[4][7]="Agosto";
+    $monatsname[4][8]="Settembre";
+    $monatsname[4][9]="Ottobre";
+    $monatsname[4][10]="Novembre";
+    $monatsname[4][11]="Dicembre";
 	//$monatsname = array("Januar", "Februar", "M&auml;rz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember");
 
 	// Studiengaenge die keine Alias Email Adressen erhalten
@@ -68,6 +87,6 @@
 	//$noalias[0]='330';
 	//$noalias[1]='331';
 	//$noalias[2]='204';
-	
-	
+
+
 ?>

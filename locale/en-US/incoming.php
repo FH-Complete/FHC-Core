@@ -5,10 +5,10 @@ $this->phrasen['incoming/learningagreementerstellen']='Create Learning Agreement
 $this->phrasen['incoming/uploadvondateien']='Upload/Manage Documents';
 $this->phrasen['incoming/ungueltigerbenutzer']='Invalid User Name';
 $this->phrasen['incoming/austauschprogram']='Exchange Program';
-$this->phrasen['incoming/austauschprgramwählen']= 'Select Exchange Program'; 
+$this->phrasen['incoming/austauschprgramwählen']= 'Select Exchange Program';
 $this->phrasen['incoming/übersichtlehrveranstaltungen']= 'All Subjects';
 $this->phrasen['incoming/eigenelehrveranstaltungen']= 'Registered Subjects';
-$this->phrasen['incoming/freieplätze']='Available Seats'; 
+$this->phrasen['incoming/freieplätze']='Available Seats';
 $this->phrasen['incoming/studiertvon']='Studies in Vienna From';
 $this->phrasen['incoming/studiertbis']='Studies in Vienna To';
 $this->phrasen['incoming/eigeneuniversitaet']='Sending Institution Information';
@@ -34,10 +34,6 @@ $this->phrasen['incoming/motivationsschreiben']='Letter of motivation';
 $this->phrasen['incoming/zeugnis']='Transcript of record';
 $this->phrasen['incoming/lichtbild']='photo';
 $this->phrasen['incoming/name']='Name';
-$this->phrasen['incoming/registrationEmail']='This is an automatically generated email.<br><br>
-Thank you, for your registration at the UAS Technikum Wien.<br><br>Your application was successfully registered in our system.<br><br><br>
-With your user ID: <b>%s</b> you can now access our online application system for incoming students and fill in your data (<a href="'.APP_ROOT.'cis/public/incoming">application link</a>).<br><br><br> 
-Kind regards, <br><br>FH Technikum Wien International<br>Center for International Relations & Cross-Cultural Education<br>UAS Technikum Wien<br>Hoechstaedtplatz 5, 1200 Wien, AUSTRIA ';
 $this->phrasen['incoming/weiter']='Next';
 $this->phrasen['incoming/fehlerAdresse']='Error, creating address.';
 $this->phrasen['incoming/fehlerKontakt']='Error, creating contact.';
@@ -58,7 +54,7 @@ $this->phrasen['incoming/nothesis']='no Thesis';
 $this->phrasen['incoming/masterthesis']='Master Thesis';
 $this->phrasen['incoming/bachelorthesis']='Bachelor Thesis';
 $this->phrasen['incoming/researcharea']='Research Area';
-$this->phrasen['incoming/wennVorhanden']='if applicable'; 
+$this->phrasen['incoming/wennVorhanden']='if applicable';
 $this->phrasen['incoming/studentenImWS']='Applicants for the winter semester choose semesters: 1,3,5';
 $this->phrasen['incoming/studentenImSS']='Applicants for the summer semester choose semesters: 2,4,6';
 $this->phrasen['incoming/filter']='Filter';
@@ -79,7 +75,7 @@ $this->phrasen['incoming/willkommenBeiOutgoingAnmeldung']='<p><b>Welcome to Outg
 <p>You have the following possibilities for a study visit abroad: Our European partner universities as part of the ERASMUS and CEEPUS mobility programs, our non-European partner institutions, other universities (free mover) and Summer Schools.</p>
 <p>You can study abroad and make use of a funding program for up to 12 months. At our partner universities you pay no tuition fees and the application process is supported by the Center for International Relations at the TW. A list of the partner institutions can be found on our homepage.</p>
 <p>On the following pages you can select the mobility program and the partner institution as well as entering the period of time you are planning for your study visit abroad. After we approve your registration you can enter further details and download the form for a Learning Agreement (important for the accreditation of your study abroad).</p>
-<p>Click on the button "Registration". Select the mobility program and the partner institution. Enter the data required and save your details. You will be informed via e-mail as to whether your selection has been approved. You can then discuss the application process with the Center for International Relations and enter further personal details. 
+<p>Click on the button "Registration". Select the mobility program and the partner institution. Enter the data required and save your details. You will be informed via e-mail as to whether your selection has been approved. You can then discuss the application process with the Center for International Relations and enter further personal details.
 You can upload documents and prepare the Learning Agreement for the semester abroad. Your application documents will be forwarded to the partner institution you wish to apply for by the Center for International Relations,</p>';
 $this->phrasen['incoming/programmAuswahl']='Program Selection';
 $this->phrasen['incoming/auswahlUniversitaeten']='University Selection';
@@ -120,4 +116,9 @@ $this->phrasen['incoming/geaendertesLA']='Changed Learning Agreement';
 $this->phrasen['incoming/studienrichtungGastuniversitaet']= 'Program home university';
 $this->phrasen['incoming/orgform']='Org. structure';
 $this->phrasen['incoming/alleSprachen']='All languages';
+$this->phrasen['incoming/ausgewaehlteUniversitaeten']='Selected universities';
+$this->phrasen['incoming/bereitsAusgewaehlt']='This universtity has already been choosed';
+$this->phrasen['incoming/anfrageAbschicken']='Send request to CIR';
+$this->phrasen['incoming/captcha']='Please enter the characters shown in the picture (spam protection).';
+$this->phrasen['incoming/andereGrafik']='Reload picture';
 ?>

@@ -37,6 +37,85 @@ if (!$db = new basis_db())
 
 $uid=get_uid();
 
+//$type='ort';
+//$ort_kurzbz='EDV6.08';
+//$datum=1102260015;
+
+// Deutsche Umgebung
+//$loc_de=setlocale(LC_ALL, 'de_AT@euro', 'de_AT','de_DE@euro', 'de_DE');
+//setlocale(LC_ALL, $loc_de);
+
+// Variablen uebernehmen
+if (isset($_GET['type']))
+	$type=$_GET['type'];
+if (isset($_POST['type']))
+	$type=$_POST['type'];
+if (isset($_GET['datum']))
+	$datum=$_GET['datum'];
+if (isset($_POST['datum']))
+	$datum=$_POST['datum'];
+
+if (isset($_GET['ort_kurzbz']))
+	$ort_kurzbz=$_GET['ort_kurzbz'];
+else if (isset($_POST['ort_kurzbz']))
+	$ort_kurzbz=$_POST['ort_kurzbz'];
+else
+	$ort_kurzbz=null;
+
+if (isset($_GET['pers_uid']))
+	$pers_uid=$_GET['pers_uid'];
+
+if (isset($_GET['stg_kz']))
+	$stg_kz=$_GET['stg_kz'];
+else if (isset($_POST['stg_kz']))
+	$stg_kz=$_POST['stg_kz'];
+else
+	$stg_kz=null;
+
+if (isset($_GET['lva']))
+	$lva=$_GET['lva'];
+else if (isset($_POST['lva']))
+	$lva=$_POST['lva'];
+else
+	$lva=null;
+
+if (isset($_POST['sem']))
+	$sem=$_POST['sem'];
+else if (isset($_GET['sem']))
+	$sem=$_GET['sem'];
+else
+	$sem=null;
+
+if (isset($_POST['ver']))
+	$ver=$_POST['ver'];
+else if (isset($_GET['ver']))
+	$ver=$_GET['ver'];
+else
+	$ver=null;
+
+if (isset($_POST['grp']))
+	$grp=$_POST['grp'];
+else if (isset($_GET['grp']))
+	$grp=$_GET['grp'];
+else
+	$grp=null;
+
+if (isset($_POST['gruppe_kurzbz']))
+	$gruppe_kurzbz=$_POST['gruppe_kurzbz'];
+else if (isset($_GET['gruppe_kurzbz']))
+	$gruppe_kurzbz=$_GET['gruppe_kurzbz'];
+else
+	$gruppe_kurzbz=null;
+
+if (isset($_POST['user_uid']))
+	$user_uid=$_POST['user_uid'];
+if (isset($_POST['reserve']))
+	$reserve=$_POST['reserve'];
+if (isset($_POST['beschreibung']))
+	$beschreibung=$_POST['beschreibung'];
+if (isset($_POST['titel']))
+	$titel=$_POST['titel'];
+
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <HTML>
 <HEAD>
@@ -145,18 +224,41 @@ $uid=get_uid();
         });
 		-->
 	</script>
-	<LINK rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
-	<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
-	<script src="../../../include/js/flexcroll.js" type="text/javascript" ></script>
+	<?php
+	// ADDONS laden
+	$addon_obj = new addon();
+	$addon_obj->loadAddons();
+	foreach($addon_obj->result as $addon)
+	{
+		if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
+			echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+	}
+	
+	// Wenn Seite fertig geladen ist Addons aufrufen
+	echo '
+	<script>
+	$( document ).ready(function() 
+	{
+		if(typeof addon  !== \'undefined\')
+		{
+			for(i in addon)
+			{
+				addon[i].init("cis/private/lvplan/stpl_week.php", {ort_kurzbz:\''.$ort_kurzbz.'\'});
+			}
+		}
+	});
+	</script>
+	';
+	?>
+	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </HEAD>
 <BODY id="inhalt">
-<div class="flexcroll" style="outline: none;">
 <h1><?php echo $p->t('lvplan/wochenplan');?></h1>
 <table class="tabcontent">
 <tr>
 <td>
 <a href="index.php"><?php echo $p->t('lvplan/hauptmenue');?></a><br>
-<?php echo '<a href="../../../cms/content.php?content_id='.$p->t("dms_link/lvPlanFAQ").'" class="hilfe" target="_blank">'.$p->t("global/hilfe").'</a>'; ?>
+<?php if ($p->t("dms_link/lvPlanFAQ")!='') echo '<a href="../../../cms/content.php?content_id='.$p->t("dms_link/lvPlanFAQ").'" class="hilfe" target="_blank">'.$p->t("global/hilfe").'</a>'; ?>
 </td>
 </tr>
 </table>
@@ -172,85 +274,6 @@ $uid=get_uid();
  * Erstellt: 		21.8.2001
  * Update: 			15.11.2004 von Christian Paminger
  *****************************************************************************/
-
-//$type='ort';
-//$ort_kurzbz='EDV6.08';
-//$datum=1102260015;
-
-// Deutsche Umgebung
-//$loc_de=setlocale(LC_ALL, 'de_AT@euro', 'de_AT','de_DE@euro', 'de_DE');
-//setlocale(LC_ALL, $loc_de);
-
-// Variablen uebernehmen
-if (isset($_GET['type']))
-	$type=$_GET['type'];
-if (isset($_POST['type']))
-	$type=$_POST['type'];
-if (isset($_GET['datum']))
-	$datum=$_GET['datum'];
-if (isset($_POST['datum']))
-	$datum=$_POST['datum'];
-
-if (isset($_GET['ort_kurzbz']))
-	$ort_kurzbz=$_GET['ort_kurzbz'];
-else if (isset($_POST['ort_kurzbz']))
-	$ort_kurzbz=$_POST['ort_kurzbz'];
-else
-	$ort_kurzbz=null;
-
-if (isset($_GET['pers_uid']))
-	$pers_uid=$_GET['pers_uid'];
-
-if (isset($_GET['stg_kz']))
-	$stg_kz=$_GET['stg_kz'];
-else if (isset($_POST['stg_kz']))
-	$stg_kz=$_POST['stg_kz'];
-else
-	$stg_kz=null;
-
-if (isset($_GET['lva']))
-	$lva=$_GET['lva'];
-else if (isset($_POST['lva']))
-	$lva=$_POST['lva'];
-else
-	$lva=null;
-
-if (isset($_POST['sem']))
-	$sem=$_POST['sem'];
-else if (isset($_GET['sem']))
-	$sem=$_GET['sem'];
-else
-	$sem=null;
-
-if (isset($_POST['ver']))
-	$ver=$_POST['ver'];
-else if (isset($_GET['ver']))
-	$ver=$_GET['ver'];
-else
-	$ver=null;
-
-if (isset($_POST['grp']))
-	$grp=$_POST['grp'];
-else if (isset($_GET['grp']))
-	$grp=$_GET['grp'];
-else
-	$grp=null;
-
-if (isset($_POST['gruppe_kurzbz']))
-	$gruppe_kurzbz=$_POST['gruppe_kurzbz'];
-else if (isset($_GET['gruppe_kurzbz']))
-	$gruppe_kurzbz=$_GET['gruppe_kurzbz'];
-else
-	$gruppe_kurzbz=null;
-
-if (isset($_POST['user_uid']))
-	$user_uid=$_POST['user_uid'];
-if (isset($_POST['reserve']))
-	$reserve=$_POST['reserve'];
-if (isset($_POST['beschreibung']))
-	$beschreibung=$_POST['beschreibung'];
-if (isset($_POST['titel']))
-	$titel=$_POST['titel'];
 
 //Parameter pruefen
 if($stg_kz!='' && !is_numeric($stg_kz))
@@ -411,6 +434,5 @@ if (isset($count))
 ?>
 
 <P><br><?php echo $p->t('lvplan/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>"><?php echo $p->t('lvplan/lvKoordinationsstelle');?></A>.</P>
-</div>
 </BODY>
 </HTML>

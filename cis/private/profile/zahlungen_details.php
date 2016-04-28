@@ -25,8 +25,27 @@ require_once('../../../include/studiengang.class.php');
 require_once('../../../include/organisationseinheit.class.php');
 require_once('../../../include/addon.class.php');
 require_once('../../../include/benutzer.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 	
 $uid = get_uid();
+
+if(isset($_GET['uid']))
+{
+	// Administratoren duerfen die UID als Parameter uebergeben um die Zahlungsdetails
+	// von anderen Personen anzuzeigen
+
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($uid);
+	if($rechte->isBerechtigt('admin'))
+	{
+		$uid = $_GET['uid'];
+		$getParam = "&uid=" . $uid;
+	}
+	else
+		$getParam = "";
+}
+else
+	$getParam='';
 	
 $benutzer = new benutzer();
 if(!$benutzer->load($uid))

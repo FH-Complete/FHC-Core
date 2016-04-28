@@ -1139,6 +1139,151 @@ if(!@$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_status LIMIT
 		echo '<br>Spalte bezeichnung_mehrsprachig in public.tbl_status hinzugefügt<br>Die ersten beiden Sprachen wurden vorbefüllt. Weitere Übersetzungen sind zu ergänzen!<br>';
 }
 
+// Remove NOT NULL constraint on verfasser_uid on public.tbl_notiz
+if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_notiz' AND COLUMN_NAME = 'verfasser_uid' AND is_nullable = 'YES'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = " ALTER TABLE public.tbl_notiz ALTER COLUMN verfasser_uid DROP NOT NULL;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_notiz '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Removed NOT NULL constraint on "verfasser_uid" from public.tbl_notiz<br>';
+	}
+}
+
+
+
+//Tabelle bis.tbl_zgvgruppe_zuordnung
+if (!$result = @$db->db_query("SELECT 1 FROM bis.tbl_zgvgruppe_zuordnung LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE bis.tbl_zgvgruppe_zuordnung
+		(
+			zgvgruppe_id integer NOT NULL,
+			studiengang_kz integer,
+			zgv_code integer,
+			zgvmas_code integer,
+			gruppe_kurzbz varchar(16)
+		);
+
+		CREATE SEQUENCE bis.tbl_zgvgruppe_zuordnung_zgvgruppe_id_seq
+			INCREMENT BY 1
+			NO MAXVALUE
+			NO MINVALUE
+			CACHE 1;
+
+		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ALTER COLUMN zgvgruppe_id SET DEFAULT nextval('bis.tbl_zgvgruppe_zuordnung_zgvgruppe_id_seq');
+		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ADD CONSTRAINT pk_zgvgruppe_id PRIMARY KEY (zgvgruppe_id);
+
+		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ADD CONSTRAINT fk_zgvgruppe_zuordnung_studiengang FOREIGN KEY (studiengang_kz) REFERENCES public.tbl_studiengang (studiengang_kz) ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ADD CONSTRAINT fk_zgvgruppe_zuordnung_zgv FOREIGN KEY (zgv_code) REFERENCES bis.tbl_zgv (zgv_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ADD CONSTRAINT fk_zgvgruppe_zuordnung_zgvmaster FOREIGN KEY (zgvmas_code) REFERENCES bis.tbl_zgvmaster (zgvmas_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+		ALTER TABLE bis.tbl_zgvgruppe_zuordnung ADD CONSTRAINT fk_zgvgruppe_zuordnung_zgvgruppe FOREIGN KEY (gruppe_kurzbz) REFERENCES bis.tbl_zgvgruppe (gruppe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		GRANT SELECT ON bis.tbl_zgvgruppe_zuordnung TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON bis.tbl_zgvgruppe_zuordnung TO vilesci;
+		GRANT SELECT, UPDATE ON bis.tbl_zgvgruppe_zuordnung_zgvgruppe_id_seq TO vilesci;
+	";
+
+	if (!$db->db_query($qry))
+		echo '<strong>bis.tbl_zgvgruppe_zuordnung: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo 'bis.tbl_zgvgruppe_zuordnung: Tabelle hinzugefuegt<br>';
+}
+
+
+// Neue Spalte anzahl_ma bei fue.tbl_projekt
+if(!@$db->db_query("SELECT anzahl_ma FROM fue.tbl_projekt LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE fue.tbl_projekt ADD COLUMN anzahl_ma integer;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekt '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte anzahl_ma in fue.tbl_projekt hinzugefügt';
+}
+
+
+// Neue Spalte aufwand_pt bei fue.tbl_projekt
+if(!@$db->db_query("SELECT aufwand_pt FROM fue.tbl_projekt LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE fue.tbl_projekt ADD COLUMN aufwand_pt integer;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekt '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte aufwand_pt in fue.tbl_projekt hinzugefügt';
+}
+
+//Tabelle public.tbl_studienjahr
+if (!$result = @$db->db_query("SELECT 1 FROM public.tbl_studienjahr LIMIT 1;"))
+{
+	$qry = "
+		CREATE TABLE public.tbl_studienjahr
+		(
+			studienjahr_kurzbz varchar(16) NOT NULL,
+			bezeichnung varchar(64)
+
+		);
+
+		ALTER TABLE public.tbl_studienjahr ADD CONSTRAINT pk_studienjahr_kurzbz PRIMARY KEY (studienjahr_kurzbz);
+
+		INSERT INTO public.tbl_studienjahr (studienjahr_kurzbz) SELECT DISTINCT s.studienjahr_kurzbz FROM public.tbl_studiensemester s WHERE s.studienjahr_kurzbz is not null;
+
+		ALTER TABLE public.tbl_studiensemester ADD CONSTRAINT fk_studiensemester_studienjahr FOREIGN KEY (studienjahr_kurzbz) REFERENCES public.tbl_studienjahr (studienjahr_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		GRANT SELECT ON public.tbl_studienjahr TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_studienjahr TO vilesci;
+	";
+
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_studienjahr: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo 'public.tbl_studienjahr: Tabelle hinzugefuegt<br>';
+}
+
+//Spalte genehmigung in lehre.tbl_studienordnung_lehrveranstaltung
+if (!$result = @$db->db_query("SELECT genehmigung FROM lehre.tbl_studienplan_lehrveranstaltung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_studienplan_lehrveranstaltung ADD COLUMN genehmigung BOOLEAN DEFAULT TRUE;";
+
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienplan_lehrveranstaltung: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' lehre.tbl_studienplan_lehrveranstaltung: Spalte genehmigung hinzugefügt.<br>';
+}
+
+//Spalte pruefungstyp_kurzbz in campus.tbl_pruefungsanmeldung
+if (!$result = @$db->db_query("SELECT pruefungstyp_kurzbz FROM campus.tbl_pruefungsanmeldung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE campus.tbl_pruefungsanmeldung ADD COLUMN pruefungstyp_kurzbz varchar(16);
+		ALTER TABLE campus.tbl_pruefungsanmeldung ADD CONSTRAINT fk_pruefungsanmeldung_pruefungstyp_pruefungstyp_kurzbz FOREIGN KEY (pruefungstyp_kurzbz) REFERENCES lehre.tbl_pruefungstyp(pruefungstyp_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;";
+
+	if (!$db->db_query($qry))
+		echo '<strong>campus.tbl_pruefungsanmeldung: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' campus.tbl_pruefungsanmeldung: Spalte pruefungstyp_kurzbz hinzugefügt.<br>';
+}
+
+// Neue Spalte bezeichnung_mehrsprachig bei tbl_status
+if(!@$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_status LIMIT 1"))
+{
+	$qry = " ALTER TABLE public.tbl_status ADD COLUMN bezeichnung_mehrsprachig varchar(255)[];
+			update tbl_status set bezeichnung_mehrsprachig = cast('{'||status_kurzbz||','||status_kurzbz||'}' as varchar[]);";
+
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_status '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Spalte bezeichnung_mehrsprachig in public.tbl_status hinzugefügt<br>Die ersten beiden Sprachen wurden vorbefüllt. Weitere Übersetzungen sind zu ergänzen!<br>';
+}
+
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';

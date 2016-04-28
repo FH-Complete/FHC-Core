@@ -1,0 +1,47 @@
+<?php
+$this->phrasen['zeitaufzeichnung/aktivitaet']='attività';
+$this->phrasen['zeitaufzeichnung/aktuelleZeitLaden']='importa ora attuale';
+$this->phrasen['zeitaufzeichnung/alleAnzeigen']='mostra tutto';
+$this->phrasen['zeitaufzeichnung/alleEintraege']='tutte le registrazioni ';
+$this->phrasen['zeitaufzeichnung/alsEndzeitUebernehmen']='imposta come fine';
+$this->phrasen['zeitaufzeichnung/alsNeuenEintragSpeichern']='salva come nuova registrazione';
+$this->phrasen['zeitaufzeichnung/alsStartzeitUebernehmen']='imposta come inizio';
+$this->phrasen['zeitaufzeichnung/arbeitszeit']='';
+$this->phrasen['zeitaufzeichnung/benutzerWurdeNichtGefunden']='';
+$this->phrasen['zeitaufzeichnung/bisDatumKleinerAlsVonDatum']='';
+$this->phrasen['zeitaufzeichnung/dauer']='';
+$this->phrasen['zeitaufzeichnung/ende']='';
+$this->phrasen['zeitaufzeichnung/endeXTageAnsicht']='';
+$this->phrasen['zeitaufzeichnung/fehlerBeimErmittelnDerProjekte']='errore di identificazione dei progetti';
+$this->phrasen['zeitaufzeichnung/gesamtdauer']='';
+$this->phrasen['zeitaufzeichnung/handbuchZeitaufzeichnung']='';
+$this->phrasen['zeitaufzeichnung/id']='';
+$this->phrasen['zeitaufzeichnung/inklusivePflichtpause']='';
+$this->phrasen['zeitaufzeichnung/kartennummer']='';
+$this->phrasen['zeitaufzeichnung/keineAuswahl']='';
+$this->phrasen['zeitaufzeichnung/kunde']='';
+$this->phrasen['zeitaufzeichnung/nameEingeben']='';
+$this->phrasen['zeitaufzeichnung/neu']='';
+$this->phrasen['zeitaufzeichnung/oderKartennummerOptional']='';
+$this->phrasen['zeitaufzeichnung/oe']='';
+$this->phrasen['zeitaufzeichnung/organisationseinheit1']='';
+$this->phrasen['zeitaufzeichnung/organisationseinheit2']='';
+$this->phrasen['zeitaufzeichnung/organisationseinheiten']='';
+$this->phrasen['zeitaufzeichnung/pause']='';
+$this->phrasen['zeitaufzeichnung/projekt']='';
+$this->phrasen['zeitaufzeichnung/service']='';
+$this->phrasen['zeitaufzeichnung/sieSindDerzeitKeinenProjektenZugeordnet']='';
+$this->phrasen['zeitaufzeichnung/start']='';
+$this->phrasen['zeitaufzeichnung/summeEintraege']='';
+$this->phrasen['zeitaufzeichnung/tagessumme']='';
+$this->phrasen['zeitaufzeichnung/uebersicht']='';
+$this->phrasen['zeitaufzeichnung/user']='';
+$this->phrasen['zeitaufzeichnung/wochensumme']='';
+$this->phrasen['zeitaufzeichnung/wochensummeArbeitszeit']='';
+$this->phrasen['zeitaufzeichnung/wochensummeEintraege']='';
+$this->phrasen['zeitaufzeichnung/xTageAnsicht']='';
+$this->phrasen['zeitaufzeichnung/zeitaufzeichnung']='';
+$this->phrasen['zeitaufzeichnung/zeitaufzeichnungVon']='';
+$this->phrasen['zeitaufzeichnung/zeitraumAuffallendHoch']='Attenzione, il periodo indicato risulta molto lungo. \n Confermare per salvataggio dei dati indicati.';
+
+?>

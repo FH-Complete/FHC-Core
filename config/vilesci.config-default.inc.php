@@ -25,6 +25,10 @@ define("DB_USER","vilesci");
 define("DB_PASSWORD","vilesci");
 define("DB_CONNECT_PERSISTENT",TRUE);
 define('CONN_CLIENT_ENCODING','UTF-8' );
+
+//Connection String Infoscreen
+define("INFOSCREEN_USER","");
+define("INFOSCREEN_PASSWORD","");
 	
 // Name des Servers (benoetigt fuer Cronjobs
 define('SERVER_NAME','localhost');

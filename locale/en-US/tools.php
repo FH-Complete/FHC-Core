@@ -8,6 +8,7 @@ $this->phrasen['tools/studienbeitragFuerSSNochNichtBezahlt']='tuition fee for se
 $this->phrasen['tools/studienerfolgsbestaetigung']='Student progress report';
 $this->phrasen['tools/studiensemesterAuswaehlen']='Please select the corresponding semester';
 $this->phrasen['tools/vorlageWohnsitzfinanzamt']='for submission to local tax office';
+$this->phrasen['tools/studienbuchblatt']='Studienbuchblatt'; //Noch zu übersetzen
 
 //Leistungsbeurteilung
 $this->phrasen['tools/leistungsbeurteilung']='Performance Assessment ';
@@ -16,6 +17,7 @@ $this->phrasen['tools/mussAlsStudentEingeloggtSein']='You must be logged in as a
 $this->phrasen['tools/nochKeineBeurteilungEingetragen']='No grade has been entered yet';
 $this->phrasen['tools/fehlerBeimAuslesenDerNoten']='Error reading the grades.';
 $this->phrasen['tools/benotungsdatumDerZeugnisnote']='Date of grading';
+$this->phrasen['tools/hinweistextMarkierung']='The marking indicates those entries where the grade for the course is different from the grade on the report card.<b>The grade on the report card is the valid one.</b> <br>Should these details not be correct please contact the Administrative Assistant responsible.';
 
 //Zahlungen
 $this->phrasen['tools/zahlungen']='Payments';

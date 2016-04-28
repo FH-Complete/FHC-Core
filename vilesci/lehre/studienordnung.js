@@ -16,12 +16,13 @@
  *
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
  *			Stefan Puraner	<puraner@technikum-wien.at>
+ *			Andreas Moik	<moik@technikum-wien.at>
  */
-var studiengang_kz='';
-var studiengang_bezeichnung='';
-var studienordnung_id='';
-var studienordnung_bezeichnung='';
-var studienplan_id='';
+var global_studiengang_kz='';
+var global_studiengang_bezeichnung='';
+var global_studienordnung_id='';
+var global_studienordnung_bezeichnung='';
+var global_studienplan_id='';
 var lehrveranstaltungen='';
 
 // Speichert die Parameter des aktuell angezeigten Studienplans fuer Refresh des Trees
@@ -63,10 +64,10 @@ function drawHeader(text)
 	if(text===undefined)
 	{
 		text = '<h2>';
-		if(studiengang_bezeichnung!='')
-			text=text+studiengang_bezeichnung;
-		if(studienordnung_bezeichnung!='')
-			text=text+' <b>&gt;</b> '+studienordnung_bezeichnung;
+		if(global_studiengang_bezeichnung!='')
+			text=text+global_studiengang_bezeichnung;
+		if(global_studienordnung_bezeichnung!='')
+			text=text+' <b>&gt;</b> '+global_studienordnung_bezeichnung;
 		if(studienplan_bezeichnung!='')
 			text=text+' <b>&gt;</b> '+studienplan_bezeichnung;
 
@@ -89,13 +90,13 @@ function loadStudienordnung()
 		method = 'loadStudienordnungSTG';
 	}
 	// Ausgewaehlten Studiengang holen
-	studiengang_kz = $('#studiengang').val();
-	studiengang_bezeichnung = $( "#studiengang option:selected" ).text();
+	global_studiengang_kz = $('#studiengang').val();
+	global_studiengang_bezeichnung = $( "#studiengang option:selected" ).text();
 
 	// Globale Variablen resetten
-	studienordnung_id='';
-	studienordnung_bezeichnung='';
-	studienplan_id='';
+	global_studienordnung_id='';
+	global_studienordnung_bezeichnung='';
+	global_studienplan_id='';
 	studienplan_bezeichnung='';
 
 	drawHeader();
@@ -109,7 +110,7 @@ function loadStudienordnung()
 				"typ": "json",
 				"class": "studienordnung",
 				"method":	method,
-				"parameter_0": studiengang_kz
+				"parameter_0": global_studiengang_kz
 			},
 		error: loadError
 	}).success(function(data)
@@ -139,7 +140,7 @@ function drawStudienordnungen(data)
 	{
 		if(data[i].studienordnung_id !== null)
 		{
-			obj=obj+'<li><a style="white-space:nowrap" href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+',\''+data[i].bezeichnung+'\');return false;">'+data[i].bezeichnung+'</a>'
+			obj=obj+'<li><a style="white-space:nowrap" href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+','+data[i].studienplan_id+',\''+data[i].bezeichnung+'\', semesterStoZuordnung);return false;">'+data[i].bezeichnung+'</a>'
 				+' <a href="#Edit'+data[i].studienordnung_id+'" onclick="editStudienordnung('+data[i].studienordnung_id+');return false;"><img title="Bearbeiten" src="../../skin/images/edit.png"></a>'
 				+' <a href="#Copy'+data[i].studienordnung_id+'" onclick="copyStudienordnung('+data[i].studienordnung_id+');return false;"><img title="Studienordnung kopieren" src="../../skin/images/copy.png"></a>&nbsp;&nbsp;&nbsp;'
 				+' <a href="../../content/pdfExport.php?xml=studienordnung.rdf.php&xsl=Studienordnung&studienordnung_id='+data[i].studienordnung_id+'&stg_kz=0&output=doc"><img style="cursor:pointer; height: 16px;" title="Studienordnung als Word-Dokument exportieren" src="../../skin/images/doc_icon.png"></a>'
@@ -155,10 +156,12 @@ function drawStudienordnungen(data)
 /**
  * Laedt die Studienplaene zu einer Studienordnung
  */
-function loadStudienplanSTO(neue_studienordnung_id,bezeichnung)
+function loadStudienplanSTO(neue_studienordnung_id, studienplan_id,bezeichnung, callback)
 {
-	studienordnung_bezeichnung=bezeichnung;
-	studienordnung_id=neue_studienordnung_id;
+	global_studienordnung_bezeichnung=bezeichnung;
+	global_studienordnung_id=neue_studienordnung_id;
+	global_studienplan_id = studienplan_id;
+
 	drawHeader();
 	$.ajax(
 	{
@@ -168,7 +171,7 @@ function loadStudienplanSTO(neue_studienordnung_id,bezeichnung)
 				"typ": "json",
 				"class": "studienplan",
 				"method":	"loadStudienplanSTO",
-				"parameter_0": studienordnung_id
+				"parameter_0": global_studienordnung_id
 			},
 		error: loadError
 	}).success(function(data)
@@ -182,7 +185,7 @@ function loadStudienplanSTO(neue_studienordnung_id,bezeichnung)
 			drawStudienplan(data.result);
 			//jqUi( "#menueLinks" ).accordion("option","active",2);
 		}
-		semesterStoZuordnung();
+		callback();
 	});
 	$.ajax({
 		dataType: "json",
@@ -191,7 +194,7 @@ function loadStudienplanSTO(neue_studienordnung_id,bezeichnung)
 			"typ" : "json",
 			"class": "studienordnung",
 			"method": "loadStudienordnung",
-			"parameter_0": studienordnung_id
+			"parameter_0": global_studienordnung_id
 		},
 		error: loadError
 	}).success(function(data){
@@ -203,25 +206,30 @@ function loadStudienplanSTO(neue_studienordnung_id,bezeichnung)
 	});
 }
 
+
 /**
  * Erstellt die Links zu den Studienplaenen
  */
 function drawStudienplan(data)
 {
-	var obj='<a href="#Neu" onclick="neuerStudienplan();return false;">Neuer Studienplan</a><ul  style="padding-left: 15px">';
+	var obj ='<a href="#Neu" onclick="neuerStudienplan();return false;">Neuer Studienplan</a><ul  style="padding-left: 15px">';
 
 	for(i in data)
 	{
 		if(data[i].studienplan_id !== null)
 		{
-			obj=obj+'<li><a href="#Load'+data[i].studienplan_id+'" onclick="loadLehrveranstaltungSTPL('+data[i].studienplan_id+',\''+data[i].bezeichnung+'\',\''+data[i].regelstudiendauer+'\');return false;">'+data[i].bezeichnung+'</a>'
-			+' <a href="#Edit'+data[i].studienplan_id+'" onclick="editStudienplan('+data[i].studienplan_id+');return false;"><img title="edit" src="../../skin/images/edit.png"></a></li>';
+			obj=obj+'<li>'
+			+' <a href="#Load'+data[i].studienplan_id+'" onclick="loadLehrveranstaltungSTPL('+data[i].studienplan_id+',\''+data[i].bezeichnung+'\',\''+data[i].regelstudiendauer+'\');return false;">'+data[i].bezeichnung+'</a>'
+			+' <a href="#Edit'+data[i].studienplan_id+'" onclick="editStudienplan('+data[i].studienplan_id+');return false;"><img title="edit" src="../../skin/images/edit.png"></a>'
+			+' <a href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+','+data[i].studienplan_id+',\''+data[i].bezeichnung+'\',semesterSTPLZuordnung);return false;"><img title="Semesterzuordnung" src="../../skin/images/split-arrows.png"></a>'
+			+'</li>';
 		}
 	}
 	obj=obj+'</ul>';
 	$("#tabs").hide();
 	$('#studienplan').html(obj);
 }
+
 
 /**
  * Konvertiert den Tree fuer den Studienplan damit dieser mit jstree angezeigt werden kann
@@ -254,7 +262,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 	loadLehrveranstaltungSTPLBezeichnung = bezeichnung;
 	loadLehrveranstaltungSTPLSemester = max_semester;
 
-	//studienplan_id = studienplan_id;
+	global_studienplan_id = studienplan_id;
 	studienplan_bezeichnung=bezeichnung;
 	drawHeader();
 
@@ -267,7 +275,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 				"typ": "json",
 				"class": "lehrveranstaltung",
 				"method": "getLvTree",
-				"parameter_0": studienplan_id,
+				"parameter_0": global_studienplan_id,
 			},
 		error: loadError
 	}).success(function(data)
@@ -495,7 +503,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					}
 
 					// Aenderung speichern
-					saveJsondataFromTree(data.rslt.o[0].id, studienplan_id, studienplan_lehrveranstaltung_id);
+					saveJsondataFromTree(data.rslt.o[0].id, global_studienplan_id, studienplan_lehrveranstaltung_id);
 
 					// ECTS Summen neu berechnen
 					var root = data.inst.get_container_ul();
@@ -769,7 +777,7 @@ function neueStudienordnung()
 {
 	$("#tabs").hide();
 	drawHeader('Neue Studienordnung');
-	$("#data").load('studienordnung.inc.php?method=neueStudienordnung&studiengang_kz='+studiengang_kz);
+	$("#data").load('studienordnung.inc.php?method=neueStudienordnung&studiengang_kz='+global_studiengang_kz);
 }
 
 /**
@@ -779,7 +787,7 @@ function neuerStudienplan()
 {
 	$("#tabs").hide();
 	drawHeader('Neuer Studienplan');
-	$("#data").load('studienordnung.inc.php?method=neuerStudienplan&studiengang_kz='+studiengang_kz);
+	$("#data").load('studienordnung.inc.php?method=neuerStudienplan&studiengang_kz='+global_studiengang_kz);
 }
 
 /**
@@ -789,7 +797,7 @@ function editStudienordnung(studienordnung_id)
 {
 	$("#tabs").hide();
 	drawHeader('Studienordnung bearbeiten');
-	$("#data").load('studienordnung.inc.php?method=neueStudienordnung&studiengang_kz='+studiengang_kz+'&studienordnung_id='+studienordnung_id);
+	$("#data").load('studienordnung.inc.php?method=neueStudienordnung&studiengang_kz='+global_studiengang_kz+'&studienordnung_id='+studienordnung_id);
 }
 
 /**
@@ -799,7 +807,7 @@ function editStudienplan(studienplan_id)
 {
 	$("#tabs").hide();
 	drawHeader('Studienplan bearbeiten');
-	$("#data").load('studienordnung.inc.php?method=neuerStudienplan&studiengang_kz='+studiengang_kz+'&studienplan_id='+studienplan_id);
+	$("#data").load('studienordnung.inc.php?method=neuerStudienplan&studiengang_kz='+global_studiengang_kz+'&studienplan_id='+studienplan_id);
 }
 
 /*
@@ -818,7 +826,7 @@ function loadFilteredLehrveranstaltungen()
 					"typ": "json",
 					"class": "lehrveranstaltung",
 					"method":	"load_lva",
-					"parameter_0": studiengang_kz,						//Studiengangskennzahl
+					"parameter_0": global_studiengang_kz,						//Studiengangskennzahl
 					"parameter_1": $("#semesterDropdown").val(),		//Semester
 					"parameter_2": "null",								//Lehrverzeichnis
 					"parameter_3": "null",								//Lehre // sollte TRUE sein
@@ -961,7 +969,7 @@ function showLVTree(data)
 			}
 
 			// Aenderung speichern
-			saveJsondataFromTree(data.rslt.o[0].id, studienplan_id, studienplan_lehrveranstaltung_id);
+			saveJsondataFromTree(data.rslt.o[0].id, global_studienplan_id, studienplan_lehrveranstaltung_id);
 
 			// ECTS Summen neu berechnen
 
@@ -1029,7 +1037,7 @@ function loadSemester()
 		url: "../../soap/studienplan.json.php",
 		data: {
 				"method": "getSemesterFromStudiengang",
-				"studiengang_kz": studiengang_kz
+				"studiengang_kz": global_studiengang_kz
 			},
 		error: loadError
 	}).success(function(data)
@@ -1060,7 +1068,7 @@ function loadSemester()
 		if($("#neueLV").length === 0)
 			$("#lehrveranstaltung").append("<div id='neueLV'></div>");
 
-		$("#neueLV").html("<br/><a href='./lehrveranstaltung_details.php?neu=true&stg_kz="+studiengang_kz+"' target='_blank'><input type='button' value='Neue LV anlegen'></a>");
+		$("#neueLV").html("<br/><a href='./lehrveranstaltung_details.php?neu=true&stg_kz="+global_studiengang_kz+"' target='_blank'><input type='button' value='Neue LV anlegen'></a>");
 		isLVFilterLoaded=true;
 		loadFilteredLehrveranstaltungen();
 	});
@@ -1256,16 +1264,18 @@ function deleteLehrveranstaltungFromStudienplan(lehrveranstaltung_studienplan_id
  */
 function saveStudienordnung()
 {
-	bezeichnung = $("#bezeichnung").val();
-	version = $("#version").val();
-	gueltigvon = $("#gueltigvon option:selected").val();
-	gueltigbis = $("#gueltigbis option:selected").val();
-	ects = $("#ects").val();
-	studiengangbezeichnung = $("#studiengangbezeichnung").val();
-	studiengangbezeichnungenglisch = $("#studiengangbezeichnungenglisch").val();
-	studiengangkurzbzlang = $("#studiengangkurzbzlang").val();
-	mystudienordnung_id = $("#studienordnung_id").val();
-	akadgrad_id = $("#akadgrad_id").val();
+	var bezeichnung = $("#bezeichnung").val();
+	var version = $("#version").val();
+	var gueltigvon = $("#gueltigvon option:selected").val();
+	var gueltigbis = $("#gueltigbis option:selected").val();
+	var ects = $("#ects").val();
+	var studiengangbezeichnung = $("#studiengangbezeichnung").val();
+	var studiengangbezeichnungenglisch = $("#studiengangbezeichnungenglisch").val();
+	var studiengangkurzbzlang = $("#studiengangkurzbzlang").val();
+	var mystudienordnung_id = $("#studienordnung_id").val();
+	var akadgrad_id = $("#akadgrad_id").val();
+	var status_kurzbz = $("#studienordnung_status").val();
+	var standort_id = $("#standort_id").val();
 
 	if(mystudienordnung_id!='')
 	{
@@ -1287,7 +1297,9 @@ function saveStudienordnung()
 		"studiengangbezeichnung_englisch":studiengangbezeichnungenglisch,
 		"studiengangkurzbzlang":studiengangkurzbzlang,
 		"akadgrad_id":akadgrad_id,
-		"studiengang_kz":studiengang_kz
+		"studiengang_kz":global_studiengang_kz,
+		"status_kurzbz":status_kurzbz,
+		"standort_id":standort_id
 	};
 
 
@@ -1330,13 +1342,16 @@ function saveStudienplan()
 	semesterwochen = $("#semesterwochen").val();
 	testtool_sprachwahl = $("#testtool_sprachwahl").prop("checked");
 	aktiv = $("#aktiv").prop("checked");
-	mystudienplan_id = $("#studienplan_id").val();
+	var studienplan_id = $("#studienplan_id").val();
+	var pflicht_sws = $("#pflicht_sws").val();
+	var pflicht_lvs = $("#pflicht_lvs").val();
+	var ects_stpl = $("#ects_stpl").val();
 
-	if(mystudienplan_id!='')
+	if(studienplan_id!='')
 	{
 		loaddata = {
 			"method": "loadStudienplan",
-			"parameter_0": mystudienplan_id
+			"parameter_0": studienplan_id
 		};
 	}
 	else
@@ -1351,7 +1366,10 @@ function saveStudienplan()
 	"semesterwochen":semesterwochen,
 	"testtool_sprachwahl":testtool_sprachwahl,
 	"aktiv":aktiv,
-	"studienordnung_id":studienordnung_id
+	"studienordnung_id":global_studienordnung_id,
+	"ects_stpl":ects_stpl,
+	"pflicht_sws":pflicht_sws,
+	"pflicht_lvs":pflicht_lvs
 	};
 
 
@@ -1374,7 +1392,7 @@ function saveStudienplan()
 			{
 				$("#submsg").css("visibility", "visible");
 				window.setTimeout(function(){$("#submsg").css("visibility", "hidden");}, 1500);
-				loadStudienplanSTO(studienordnung_id,studienordnung_bezeichnung);
+				loadStudienplanSTO(global_studienordnung_id, studienplan_id, global_studienordnung_bezeichnung, semesterStoZuordnung);
 			}
 		},
 		error: loadError
@@ -1435,7 +1453,16 @@ function writeOverallSum(root)
 function semesterStoZuordnung()
 {
 	drawHeader('Neue Semester Zuordnung');
-	$("#data").load('studienordnung.inc.php?method=semesterStoZuordnung&studienordnung_id='+studienordnung_id);
+	$("#data").load('studienordnung.inc.php?method=semesterStoZuordnung&studienordnung_id='+global_studienordnung_id);
+}
+
+/**
+ * Laedt die Daten zum Eintragen der Studienplan/Semester zuordnung
+ */
+function semesterSTPLZuordnung()
+{
+	drawHeader('Neue Studienplan Zuordnung');
+	$("#data").load('studienordnung.inc.php?method=semesterSTPLZuordnung&studienplan_id='+global_studienplan_id);
 }
 
 /**
@@ -1467,7 +1494,7 @@ function saveSemesterStoZuordnung(studiensemester, ausbildungssemester)
 					type: "POST",
 					data: {
 						"method": "saveSemesterZuordnung",
-						"studienordnung_id": studienordnung_id,
+						"studienordnung_id": global_studienordnung_id,
 						"studiensemester_kurzbz" : studiensemester,
 						"ausbildungssemester": j+1
 					}
@@ -1490,7 +1517,7 @@ function saveSemesterStoZuordnung(studiensemester, ausbildungssemester)
 			type: "POST",
 			data: {
 				"method": "saveSemesterZuordnung",
-				"studienordnung_id": studienordnung_id,
+				"studienordnung_id": global_studienordnung_id,
 				"studiensemester_kurzbz" : studiensemester,
 				"ausbildungssemester": ausbildungssemester
 			}
@@ -1503,8 +1530,78 @@ function saveSemesterStoZuordnung(studiensemester, ausbildungssemester)
 			semesterStoZuordnung();
 		});
 	}
-
 }
+
+
+/**
+ * Speichert die Studienplan/Semester zuordnung
+ */
+function saveSemesterSTPLZuordnung(studiensemester, ausbildungssemester)
+{
+	//new
+	if(studiensemester == undefined &&  ausbildungssemester == undefined)
+	{
+		var sem = $("#studiensemester").val();
+		var cells = $("#studiensemester").parents().closest("tr").find("input[type=checkbox]");
+		var semester = new Array();
+		var semesterKurzbz = "";
+
+		for(var i = 0; i < cells.length; i++)
+		{
+			//semester[cells[i].getAttribute("semester")] = cells[i].checked;
+			semester.push(cells[i].checked);
+		}
+
+		var studiensemester = $("#studiensemester").val();
+		for(var j=0; j<semester.length; j++)
+		{
+			if(semester[j] === true)
+			{
+				$.ajax({
+					dataType: "json",
+					url: "../../soap/studienplan.json.php",
+					type: "POST",
+					data: {
+						"method": "saveSemesterSTPLZuordnung",
+						"studienplan_id": global_studienplan_id,
+						"studiensemester_kurzbz" : studiensemester,
+						"ausbildungssemester": j+1
+					}
+				}).success(function(data)
+				{
+					if(data.error === "true")
+					{
+						alert(data.errormsg);
+					}
+					semesterSTPLZuordnung();
+				});
+			}
+		}
+	}
+	//update
+	else
+	{
+		$.ajax({
+			dataType: "json",
+			url: "../../soap/studienplan.json.php",
+			type: "POST",
+			data: {
+				"method": "saveSemesterSTPLZuordnung",
+				"studienplan_id": global_studienplan_id,
+				"studiensemester_kurzbz" : studiensemester,
+				"ausbildungssemester": ausbildungssemester
+			}
+		}).success(function(data)
+		{
+			if(data.error === "true")
+			{
+				alert(data.errormsg);
+			}
+			semesterSTPLZuordnung();
+		});
+	}
+}
+
 
 function deleteSemesterZuordnung(ausbildungssemester_kurzbz, studiensemester)
 {
@@ -1516,10 +1613,10 @@ function deleteSemesterZuordnung(ausbildungssemester_kurzbz, studiensemester)
 			url: "./saveStudienordnung.php",
 			type: "POST",
 			data: {
-				"typ":"json",
+				"typ": "json",
 				"class" : "studienordnung",
 				"method": "deleteSemesterZuordnung",
-				"parameter_0": studienordnung_id,
+				"parameter_0": global_studienordnung_id,
 				"parameter_1" : ausbildungssemester_kurzbz
 			}
 		}).success(function(data)
@@ -1534,16 +1631,66 @@ function deleteSemesterZuordnung(ausbildungssemester_kurzbz, studiensemester)
 			url: "./saveStudienordnung.php",
 			type: "POST",
 			data: {
-				"typ":"json",
+				"typ": "json",
 				"class" : "studienordnung",
 				"method": "deleteSemesterZuordnung",
-				"parameter_0": studienordnung_id,
+				"parameter_0": global_studienordnung_id,
 				"parameter_1" : ausbildungssemester_kurzbz,
 				"parameter_2" : studiensemester
 			}
 		}).success(function(data)
 		{
 			semesterStoZuordnung();
+		});
+	}
+
+}
+
+
+function deleteSemesterSTPLZuordnung(ausbildungssemester_kurzbz, studiensemester)
+{
+	//new
+	if(studiensemester == undefined)
+	{
+		var row = $("#row_"+ausbildungssemester_kurzbz);
+		$.ajax({
+			dataType: "json",
+			url: "../../soap/studienplan.json.php",
+			type: "POST",
+			data: {
+				"method": "deleteSemesterSTPLZuordnung",
+				"studienplan_id": global_studienplan_id,
+				"ausbildungssemester_kurzbz" : ausbildungssemester_kurzbz
+			}
+		}).success(function(data)
+		{
+			if(data.error === "true")
+			{
+				alert(data.errormsg);
+			}
+			semesterSTPLZuordnung();
+		});
+	}
+	//update
+	else
+	{
+		$.ajax({
+			dataType: "json",
+			url: "../../soap/studienplan.json.php",
+			type: "POST",
+			data: {
+				"method": "deleteSemesterSTPLZuordnung",
+				"studienplan_id": global_studienplan_id,
+				"ausbildungssemester_kurzbz" : ausbildungssemester_kurzbz,
+				"studiensemester" : studiensemester
+			}
+		}).success(function(data)
+		{
+			if(data.error === "true")
+			{
+				alert(data.errormsg);
+			}
+			semesterSTPLZuordnung();
 		});
 	}
 

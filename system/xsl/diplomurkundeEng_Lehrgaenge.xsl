@@ -87,13 +87,13 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<xsl:text>, </xsl:text>
 			</xsl:if>
 			<xsl:value-of select="geburtsnation_engl" />, citizen of <xsl:value-of select="staatsbuergerschaft_engl" />,</text:p>
-			<text:p text:style-name="P1">that passed the Certificate Program for Further Education subjected to § 9 FHStG</text:p>
+			<text:p text:style-name="P1">who completed the CVET course</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="stg_bezeichnung_engl" /></text:p>
 			<text:p text:style-name="P1">(program number <xsl:value-of select="studiengang_kz" />)</text:p>
 			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P1">at the University of Applied Sciences Technikum Wien</text:p>
-			<text:p text:style-name="P1">the academic degree</text:p>
+			<text:p text:style-name="P1">at the University of Applied Sciences Technikum Wien in accordance with §9 FHStG as amended</text:p>
+			<text:p text:style-name="P1">the title</text:p>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P3"><xsl:value-of select="titel" /></text:p>
 			<text:p text:style-name="P1"/>

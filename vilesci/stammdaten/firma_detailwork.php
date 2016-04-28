@@ -1113,7 +1113,7 @@ function eingabePersonenfunktionen($firma_id,$standort_id,$personfunktionstandor
                     },
                     select: function(event, ui)
                     {
-                        ui.item.value=ui.item.uid;
+                        ui.item.value=ui.item.person_id;
                     }
                 });
             });

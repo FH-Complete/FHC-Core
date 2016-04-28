@@ -53,137 +53,137 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				style="margin:4px;"
 				>
 			<columns  >
-    					<column flex="1"/>
-    					<column flex="5"/>
-    					<column flex="1"/>
-    					<column flex="5"/>
-    					<column flex="1"/>
-    					<column flex="5"/>
-  					</columns>
-  					<rows>
-    					<row>
-      						<label value="UID" control="mitarbeiter-detail-textbox-uid"/>
-      						<hbox><textbox id="mitarbeiter-detail-textbox-uid" disabled="true" maxlength="32" size="16" oninput="MitarbeiterDetailValueChange()"/></hbox>
-      						<spacer />
-      						<spacer />
-      						<label value="Aktiv" control="mitarbeiter-detail-checkbox-aktiv"/>
-      						<checkbox id="mitarbeiter-detail-checkbox-aktiv" checked="true" disabled="true" onchange="MitarbeiterDetailValueChange()"/>
-    					</row>
-    					<row>
-      						<label value="Anrede" control="mitarbeiter-detail-textbox-anrede"/>
-      						<hbox><textbox id="mitarbeiter-detail-textbox-anrede" disabled="true" maxlength="16" size="16" oninput="MitarbeiterDetailValueChange()"/></hbox>
-      						<label value="TitelPre" control="mitarbeiter-detail-textbox-titelpre"/>
-      						<textbox id="mitarbeiter-detail-textbox-titelpre" disabled="true" maxlength="64" oninput="MitarbeiterDetailValueChange()"/>
-      						<label value="TitelPost" control="mitarbeiter-detail-textbox-titelpost"/>
-      						<textbox id="mitarbeiter-detail-textbox-titelpost" disabled="true" maxlength="32" oninput="MitarbeiterDetailValueChange()"/>
-    					</row>
-    					<row>
-    						<label value="Nachname" control="mitarbeiter-detail-textbox-nachname"/>
-      						<textbox id="mitarbeiter-detail-textbox-nachname" disabled="true" maxlength="64" oninput="MitarbeiterDetailValueChange()"/>
-      						<label value="Vorname" control="mitarbeiter-detail-textbox-vorname"/>
-      						<textbox id="mitarbeiter-detail-textbox-vorname" disabled="true" maxlength="32" oninput="MitarbeiterDetailValueChange()"/>
-      						<label value="Vornamen" control="mitarbeiter-detail-textbox-vornamen"/>
-      						<textbox id="mitarbeiter-detail-textbox-vornamen" disabled="true" maxlength="128" oninput="MitarbeiterDetailValueChange()"/>
-    					</row>
-    					<row <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?>>
-      						<label value="Geburtsdatum" control="mitarbeiter-detail-textbox-geburtsdatum" />
-      						<hbox>
-      							<box class="Datum" id="mitarbeiter-detail-textbox-geburtsdatum" disabled="true" oninput="MitarbeiterDetailValueChange()" />
-      						</hbox>
-      						<label value="Geburtsort" control="mitarbeiter-detail-textbox-geburtsort"/>
-      						<textbox id="mitarbeiter-detail-textbox-geburtsort" disabled="true" maxlength="128" oninput="MitarbeiterDetailValueChange()"/>
-      						<label value="Geburtszeit" control="mitarbeiter-detail-textbox-geburtszeit" hidden="true"/>
-      						<hbox><textbox id="mitarbeiter-detail-textbox-geburtszeit" disabled="true" maxlength="5" size="5" tooltiptext="Format: hh:mm Beispiel: 10:30" oninput="MitarbeiterDetailValueChange()" hidden="true"/></hbox>
-    					</row>
-    					<row <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?>>
-      						<label value="SVNR" control="mitarbeiter-detail-textbox-svnr"/>
-      						<hbox><textbox id="mitarbeiter-detail-textbox-svnr" disabled="true" maxlength="16" size="10" oninput="MitarbeiterGenerateGebDatFromSVNR(); MitarbeiterDetailValueChange()"/></hbox>
-      						<label value="Ersatzkennzeichen" control="mitarbeiter-detail-textbox-ersatzkennzeichen"/>
-      						<hbox><textbox id="mitarbeiter-detail-textbox-ersatzkennzeichen" disabled="true" maxlength="10" size="10" oninput="MitarbeiterDetailValueChange()"/></hbox>
-    					</row>
-    					<row>
+							<column flex="1"/>
+							<column flex="5"/>
+							<column flex="1"/>
+							<column flex="5"/>
+							<column flex="1"/>
+							<column flex="5"/>
+						</columns>
+						<rows>
+							<row>
+									<label value="UID" control="mitarbeiter-detail-textbox-uid"/>
+									<hbox><textbox id="mitarbeiter-detail-textbox-uid" disabled="true" maxlength="32" size="16" oninput="MitarbeiterDetailValueChange()"/></hbox>
+									<spacer />
+									<spacer />
+									<label value="Aktiv" control="mitarbeiter-detail-checkbox-aktiv"/>
+									<checkbox id="mitarbeiter-detail-checkbox-aktiv" checked="true" disabled="true" onchange="MitarbeiterDetailValueChange()"/>
+							</row>
+							<row>
+									<label value="Anrede" control="mitarbeiter-detail-textbox-anrede"/>
+									<hbox><textbox id="mitarbeiter-detail-textbox-anrede" disabled="true" maxlength="16" size="16" oninput="MitarbeiterDetailValueChange()"/></hbox>
+									<label value="TitelPre" control="mitarbeiter-detail-textbox-titelpre"/>
+									<textbox id="mitarbeiter-detail-textbox-titelpre" disabled="true" maxlength="64" oninput="MitarbeiterDetailValueChange()"/>
+									<label value="TitelPost" control="mitarbeiter-detail-textbox-titelpost"/>
+									<textbox id="mitarbeiter-detail-textbox-titelpost" disabled="true" maxlength="32" oninput="MitarbeiterDetailValueChange()"/>
+							</row>
+							<row>
+								<label value="Nachname" control="mitarbeiter-detail-textbox-nachname"/>
+									<textbox id="mitarbeiter-detail-textbox-nachname" disabled="true" maxlength="64" oninput="MitarbeiterDetailValueChange()"/>
+									<label value="Vorname" control="mitarbeiter-detail-textbox-vorname"/>
+									<textbox id="mitarbeiter-detail-textbox-vorname" disabled="true" maxlength="32" oninput="MitarbeiterDetailValueChange()"/>
+									<label value="Vornamen" control="mitarbeiter-detail-textbox-vornamen"/>
+									<textbox id="mitarbeiter-detail-textbox-vornamen" disabled="true" maxlength="128" oninput="MitarbeiterDetailValueChange()"/>
+							</row>
+							<row <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?>>
+									<label value="Geburtsdatum" control="mitarbeiter-detail-textbox-geburtsdatum" />
+									<hbox>
+										<box class="Datum" id="mitarbeiter-detail-textbox-geburtsdatum" disabled="true" oninput="MitarbeiterDetailValueChange()" />
+									</hbox>
+									<label value="Geburtsort" control="mitarbeiter-detail-textbox-geburtsort"/>
+									<textbox id="mitarbeiter-detail-textbox-geburtsort" disabled="true" maxlength="128" oninput="MitarbeiterDetailValueChange()"/>
+									<label value="Geburtszeit" control="mitarbeiter-detail-textbox-geburtszeit" hidden="true"/>
+									<hbox><textbox id="mitarbeiter-detail-textbox-geburtszeit" disabled="true" maxlength="5" size="5" tooltiptext="Format: hh:mm Beispiel: 10:30" oninput="MitarbeiterDetailValueChange()" hidden="true"/></hbox>
+							</row>
+							<row <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?>>
+									<label value="SVNR" control="mitarbeiter-detail-textbox-svnr"/>
+									<hbox><textbox id="mitarbeiter-detail-textbox-svnr" disabled="true" maxlength="16" size="10" oninput="MitarbeiterDetailValueChange()"/></hbox><!--  oninput="MitarbeiterGenerateGebDatFromSVNR(); fuer automatisches eintragen der SVNR anhand des Geburtsdatums -->
+									<label value="Ersatzkennzeichen" control="mitarbeiter-detail-textbox-ersatzkennzeichen"/>
+									<hbox><textbox id="mitarbeiter-detail-textbox-ersatzkennzeichen" disabled="true" maxlength="10" size="10" oninput="MitarbeiterDetailValueChange()"/></hbox>
+							</row>
+				<row>
 							<label value="Staatsbuergerschaft" control="mitarbeiter-detail-menulist-staatsbuergerschaft" <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?>/>
 							<menulist id="mitarbeiter-detail-menulist-staatsbuergerschaft" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
-						              ref="http://www.technikum-wien.at/nation/liste"  oncommand="MitarbeiterDetailValueChange()"
-						              <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?> >
+								datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
+								ref="http://www.technikum-wien.at/nation/liste"  oncommand="MitarbeiterDetailValueChange()"
+								<?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?> >
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
-							        		      label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
-										  		  uri="rdf:*"/>
+											label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+											uri="rdf:*"/>
 										</menupopup>
 								</template>
 							</menulist>
 							<label value="Geburtsnation" control="mitarbeiter-detail-menulist-geburtsnation" <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?> />
 							<menulist id="mitarbeiter-detail-menulist-geburtsnation" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
-						              ref="http://www.technikum-wien.at/nation/liste"  oncommand="MitarbeiterDetailValueChange()"
-						              <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?> >
+								datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
+								ref="http://www.technikum-wien.at/nation/liste"  oncommand="MitarbeiterDetailValueChange()"
+								<?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?> >
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
-							        		      label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
-										  		  uri="rdf:*"/>
+											label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+											uri="rdf:*"/>
 										</menupopup>
 								</template>
 							</menulist>
 							<label value="Sprache" control="mitarbeiter-detail-menulist-sprache" />
 							<menulist id="mitarbeiter-detail-menulist-sprache" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/sprache.rdf.php?optional=true" flex="1"
-						              ref="http://www.technikum-wien.at/sprachen/liste"  oncommand="MitarbeiterDetailValueChange()">
+								datasources="<?php echo APP_ROOT ?>rdf/sprache.rdf.php?optional=true" flex="1"
+								ref="http://www.technikum-wien.at/sprachen/liste"  oncommand="MitarbeiterDetailValueChange()">
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/sprachen/rdf#bezeichnung"
-							        		      label="rdf:http://www.technikum-wien.at/sprachen/rdf#anzeigename"
-										  		  uri="rdf:*"/>
+											label="rdf:http://www.technikum-wien.at/sprachen/rdf#anzeigename"
+											uri="rdf:*"/>
 										</menupopup>
 								</template>
 							</menulist>
 						</row>
-    					<row>
-      						<label value="Geschlecht" control="mitarbeiter-detail-menulist-geschlecht"/>
-      						<menulist id="mitarbeiter-detail-menulist-geschlecht" disabled="true" oncommand="MitarbeiterDetailValueChange()">
+							<row>
+									<label value="Geschlecht" control="mitarbeiter-detail-menulist-geschlecht"/>
+									<menulist id="mitarbeiter-detail-menulist-geschlecht" disabled="true" oncommand="MitarbeiterDetailValueChange()">
 								<menupopup>
 										<menuitem value="m" label="maennlich"/>
 										<menuitem value="w" label="weiblich"/>
 										<menuitem value="u" label="unbekannt"/>
-								</menupopup>								
+								</menupopup>
 							</menulist>
 							<label value="Familienstand" control="mitarbeiter-detail-menulist-familienstand" <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?> />
-      						<menulist id="mitarbeiter-detail-menulist-familienstand" disabled="true" oncommand="MitarbeiterDetailValueChange()" <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?> >
+									<menulist id="mitarbeiter-detail-menulist-familienstand" disabled="true" oncommand="MitarbeiterDetailValueChange()" <?php echo ($rechte->isBerechtigt('mitarbeiter/persoenlich'))?'':'hidden="true"'; ?> >
 								<menupopup>
 										<menuitem value="" label="--keine Auswahl--"/>
 										<menuitem value="g" label="geschieden"/>
 										<menuitem value="l" label="ledig"/>
 										<menuitem value="v" label="verheiratet"/>
 										<menuitem value="w" label="verwitwet"/>
-								</menupopup>								
+								</menupopup>
 							</menulist>
 							<label value="Anzahl der Kinder" control="mitarbeiter-detail-textbox-anzahlderkinder" hidden="true"/>
-      						<textbox id="mitarbeiter-detail-textbox-anzahlderkinder" disabled="true" maxlength="2" oninput="MitarbeiterDetailValueChange()" hidden="true"/>
-    					</row>
-    					<row>
-      						<vbox>
-      							<label value="Foto" />
-      							<hbox>
-      								<button id="mitarbeiter-detail-button-image-upload" label="Upload" oncommand="MitarbeiterImageUpload();" disabled="true"/>
-      								<button id="mitarbeiter-detail-button-image-delete" label="Delete" oncommand="MitarbeiterImageDelete();" disabled="true"/>
-      								<spacer flex="1" />
-      							</hbox>
-      							<button id="mitarbeiter-detail-button-image-infomail" label="Infomail" oncommand="MitarbeiterImageInfomail();" disabled="true"/>
-      						</vbox>
-   							<hbox>
-   								<image src='' id="mitarbeiter-detail-image" style="margin-left:5px; width:90px; height:120px"/> <!-- width="60" height="60" -->
-   								<spacer flex="1"/>
-   							</hbox>
-      						<label value="Anmerkung" control="mitarbeiter-detail-textbox-anmerkung"/>
-      						<textbox id="mitarbeiter-detail-textbox-anmerkung" disabled="true" multiline="true" oninput="MitarbeiterDetailValueChange()"/>
-      						<label value="Homepage" control="mitarbeiter-detail-textbox-homepage"/>
-      						<vbox><textbox id="mitarbeiter-detail-textbox-homepage" disabled="true" maxlength="256" oninput="MitarbeiterDetailValueChange()"/></vbox>
-    					</row>
+									<textbox id="mitarbeiter-detail-textbox-anzahlderkinder" disabled="true" maxlength="2" oninput="MitarbeiterDetailValueChange()" hidden="true"/>
+							</row>
+							<row>
+									<vbox>
+										<label value="Foto" />
+										<hbox>
+											<button id="mitarbeiter-detail-button-image-upload" label="Upload" oncommand="MitarbeiterImageUpload();" disabled="true"/>
+											<button id="mitarbeiter-detail-button-image-delete" label="Delete" oncommand="MitarbeiterImageDelete();" disabled="true"/>
+											<spacer flex="1" />
+										</hbox>
+										<button id="mitarbeiter-detail-button-image-infomail" label="Infomail" oncommand="MitarbeiterImageInfomail();" disabled="true"/>
+									</vbox>
+								<hbox>
+									<image src='' id="mitarbeiter-detail-image" style="margin-left:5px; width:90px; height:120px"/> <!-- width="60" height="60" -->
+									<spacer flex="1"/>
+								</hbox>
+									<label value="Anmerkung" control="mitarbeiter-detail-textbox-anmerkung"/>
+									<textbox id="mitarbeiter-detail-textbox-anmerkung" disabled="true" multiline="true" oninput="MitarbeiterDetailValueChange()"/>
+									<label value="Homepage" control="mitarbeiter-detail-textbox-homepage"/>
+									<vbox><textbox id="mitarbeiter-detail-textbox-homepage" disabled="true" maxlength="256" oninput="MitarbeiterDetailValueChange()"/></vbox>
+							</row>
 				</rows>
-		  </grid>
+			</grid>
 
 		</groupbox>
 		

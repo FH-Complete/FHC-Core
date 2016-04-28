@@ -1,0 +1,46 @@
+<?php
+$this->phrasen['courseInformation/achtungFehlerBeimSpeichern']='Attenzione: errore di salvataggio dei dati! Si prega di riprovare ';
+$this->phrasen['courseInformation/bearbeitetVon']='elaborato da';
+$this->phrasen['courseInformation/beiFehlernInDenFixfeldern']='\'in caso di errori nei campi fissi rivolgersi all\' <a class="Item" href="mailto:%s"> assistente incaricata  </a> .\';';
+$this->phrasen['courseInformation/beispielComputerarchitektur']='esempi architettura PC';
+$this->phrasen['courseInformation/beispielItProjektarbeitDeutsch']='esempi elaborati progetto IT tedesco';
+$this->phrasen['courseInformation/beispielItProjektarbeitEnglisch']='esempi elaborati progetto IT inglese';
+$this->phrasen['courseInformation/beispielMSEChangeManagement']='Esempi MSE Change Management e softwareevolution';
+$this->phrasen['courseInformation/beispielProjektmarketing']='Esempi marketing e controlling per lavori a progetto ';
+$this->phrasen['courseInformation/deutschFreigeben']='attivare informazioni in tedesco della lezione';
+$this->phrasen['courseInformation/diesIstEineAutomatischeMail']='questo è un messaggio automatico';
+$this->phrasen['courseInformation/ectsCredits']='';
+$this->phrasen['courseInformation/ectsInformation']='';
+$this->phrasen['courseInformation/ectsLvInfo']='';
+$this->phrasen['courseInformation/englischFreigeben']='attivare informazioni inglese della lezione';
+$this->phrasen['courseInformation/fallsSieAufzaehlungslistenVerwenden']='se si vogliono utilizzare liste si prega di inserirle nel modo seguente: <br/> <font style="color:blue">&lt;ul&gt;</font><br/><font style="color:green">&lt;li&gt;</font>Listeneintrag1<font style="color:green">&lt;/li&gt;</font><font style "color:green">&lt;li&gt;</font>Listeneintrag2<font style "color:green">&lt;/li&gt;</font><br/><font style "color:blue">&lt;/ul&gt;</font>\';';
+$this->phrasen['courseInformation/fehlerBeimSchreibenDesLog']='errore di scrittura del log file';
+$this->phrasen['courseInformation/fehlerBeimSendenAufgetreten']='errore di trasmissione della mail di attivazione a %s';
+$this->phrasen['courseInformation/fehlerLogFile']='errore di scrittura del log file';
+$this->phrasen['courseInformation/freigabe']='attiva';
+$this->phrasen['courseInformation/freigabeLvinfo']='attiva informazioni della lezione';
+$this->phrasen['courseInformation/freigabemailWurdeVersandt']='ok: mail di attivazione spedito a %s';
+$this->phrasen['courseInformation/freigeben']='attivare';
+$this->phrasen['courseInformation/freigegeben']='arrivare informazioni della lezione';
+$this->phrasen['courseInformation/incomingplaetze']='posti incoming';
+$this->phrasen['courseInformation/institutskoordinator']='coordinatore o coordinatrice d\'istituto';
+$this->phrasen['courseInformation/institutsleiter']='';
+$this->phrasen['courseInformation/konnteKeinFreigabemailVersendetWerden']='errore di trasmissione della mai di attivazione delle informazioni della lezione';
+$this->phrasen['courseInformation/lehrendeLautLehrauftrag']='lettore previsto dall\'incarico';
+$this->phrasen['courseInformation/lvInfoBeispiele']='informazioni della lezione - esempi';
+$this->phrasen['courseInformation/lvInfoFreigabe']='informazioni della lezione - attivazione';
+$this->phrasen['courseInformation/lvInfoSemester']='informazione della lezione  - %s - %s. Semestre';
+$this->phrasen['courseInformation/lvinfoWurdeUeberarbeitet']='%s ha elaborato le informazioni della lezione %s e richiede di attivarle';
+$this->phrasen['courseInformation/nochNichtFreigegeben']='informazioni della lezione non ancora attivate';
+$this->phrasen['courseInformation/online']='online';
+$this->phrasen['courseInformation/pflichtfelderWerdenAufDerExternenSeiteAngezeigt']='i campi necessari sono visibili anche sulla pagina web ufficiale e devono perciò essere compilati';
+$this->phrasen['courseInformation/sieKoennenDieseUnterFolgenderAdresseFreigeben']='queste possono essere attivate seguendo il link ';
+$this->phrasen['courseInformation/terminologie']='terminologia';
+$this->phrasen['courseInformation/terminologieDeutschEnglisch']='terminologia tedesco-inglese';
+$this->phrasen['courseInformation/unterrichtssprache']='lingua della lezione';
+$this->phrasen['courseInformation/updateAm']='update del ';
+$this->phrasen['courseInformation/voransicht']='';
+$this->phrasen['courseInformation/zurFreigabeAbschicken']='spedire per l\'attivazione';
+$this->phrasen['courseInformatoin/lvInfoTerminologie']='informazioni della lezione - terminologia';
+
+?>

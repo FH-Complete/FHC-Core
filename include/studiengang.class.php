@@ -162,6 +162,7 @@ class studiengang extends Studiengang_model
 
 				$this->bezeichnung_arr['German'] = $this->bezeichnung;
 				$this->bezeichnung_arr['English'] = $this->english;
+				$this->bezeichnung_arr['Italian'] = $this->bezeichnung;
 			}
 		}
 		else
@@ -896,7 +897,7 @@ class studiengang extends Studiengang_model
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beantragung = $this->db_parse_bool($row->beantragung);
 				$obj->lgart_biscode = $row->lgart_biscode;
-			
+
 				$this->result[]= $obj;
 			}
 			return true;

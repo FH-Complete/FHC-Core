@@ -450,14 +450,19 @@ class firma extends basis_db
 
 	/**
 	 * Laedt alle Firmen eines bestimmen Firmentyps
+	 * @param boolean $aktiv Default NULL
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getFirmen($firmentyp_kurzbz='')
+	public function getFirmen($firmentyp_kurzbz='', $aktiv=null)
 	{
-		$qry = "SElECT * FROM public.tbl_firma";
+		$qry = "SELECT * FROM public.tbl_firma";
 
 		if($firmentyp_kurzbz!='')
 			$qry.=" WHERE firmentyp_kurzbz=".$this->db_add_param($firmentyp_kurzbz);
+		
+		if(!is_null($aktiv))
+			$qry.=" AND aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
+			
 		$qry.=" ORDER BY name;";
 
 		if($this->db_query($qry))

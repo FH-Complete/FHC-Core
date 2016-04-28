@@ -64,8 +64,6 @@ if(isset($_GET['ss']))
 else
 	die('Fehlerhafte Parameteruebergabe');
 
-$ANZAHL_ZEILEN_PRO_SEITE=25;
-
 //String der laenger als limit ist wird
 //abgeschnitten und '...' angehaengt
 function CutString($strVal, $limit)
@@ -162,7 +160,6 @@ function drawLehrauftrag($uid)
 	global $ss;
 	global $xml;
 	global $stgl;
-	global $ANZAHL_ZEILEN_PRO_SEITE;
 	
 	$db = new basis_db();
 	
@@ -395,36 +392,25 @@ function drawLehrauftrag($uid)
 		}
 	}
 	
-	$anz=0;
-	$newsite=false;
+	
+	
 	foreach ($lv as $lv_row) 
 	{
-		if($anz>$ANZAHL_ZEILEN_PRO_SEITE)
-		{
-			if($newsite)
-				$xml.='</newsite>';
-			$xml.='<newsite>';
-			$newsite=true;
-			$anz=0;
-		}
-			$xml.='
-				<lehreinheit>
-					<lehreinheit_id><![CDATA['.$lv_row['lehreinheit_id'].']]></lehreinheit_id>
-					<lehrveranstaltung><![CDATA['.$lv_row['lehrveranstaltung'].']]></lehrveranstaltung>
-					<fachbereich><![CDATA['.$lv_row['fachbereich'].']]></fachbereich>
-					<gruppe><![CDATA['.$lv_row['gruppe'].']]></gruppe>
-						<gruppen_getrennt>
-							'.$lv_row['einzelgruppe'].'
-						</gruppen_getrennt>
-					<stunden><![CDATA['.$lv_row['stunden'].']]></stunden>
-					<satz><![CDATA['.$lv_row['satz'].']]></satz>
-					<faktor><![CDATA['.$lv_row['faktor'].']]></faktor>
-					<brutto><![CDATA['.$lv_row['brutto'].']]></brutto>
-				</lehreinheit>';
-		$anz++;
-	}
-	if($newsite)
-		$xml.='</newsite>';
+		$xml.='
+			<lehreinheit>
+				<lehreinheit_id><![CDATA['.$lv_row['lehreinheit_id'].']]></lehreinheit_id>
+				<lehrveranstaltung><![CDATA['.$lv_row['lehrveranstaltung'].']]></lehrveranstaltung>
+				<fachbereich><![CDATA['.$lv_row['fachbereich'].']]></fachbereich>
+				<gruppe><![CDATA['.$lv_row['gruppe'].']]></gruppe>
+					<gruppen_getrennt>
+						'.$lv_row['einzelgruppe'].'
+					</gruppen_getrennt>
+				<stunden><![CDATA['.$lv_row['stunden'].']]></stunden>
+				<satz><![CDATA['.$lv_row['satz'].']]></satz>
+				<faktor><![CDATA['.$lv_row['faktor'].']]></faktor>
+				<brutto><![CDATA['.$lv_row['brutto'].']]></brutto>
+			</lehreinheit>';
+	};
 		
 	// Gesamtstunden und Gesamtkosten
 	$xml.="

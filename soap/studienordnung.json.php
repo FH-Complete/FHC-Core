@@ -59,7 +59,7 @@ switch($method)
 		break;
 	case 'copyStudienordnung':
 			$studienordnung_id=$_REQUEST['studienordnung_id'];
-			
+
 			$studienordnung = new studienordnung();
 			if($studienordnung->loadStudienordnung($studienordnung_id))
 			{
@@ -68,11 +68,11 @@ switch($method)
 				$studienordnung->bezeichnung .= ' Kopie 1';
 				$studienordnung->insertamum=date('Y-m-d H:i:s');
 				$studienordnung->insertvon=$uid;
-				
+
 				if($studienordnung->save())
 				{
 					$studienordnung_id_neu = $studienordnung->studienordnung_id;
-					
+
 					// Studienplaene kopieren
 					$studienplan = new studienplan();
 					if($studienplan->loadStudienplanSTO($studienordnung_id))
@@ -81,17 +81,17 @@ switch($method)
 						{
 							$stpllv_ID_Array=array();
 							$lvregel_ID_Array=array();
-							
+
 							$studienplan_obj->studienordnung_id = $studienordnung_id_neu;
 							$studienplan_obj->new=true;
 							$studienplan_obj->insertamum=date('Y-m-d H:i:s');
 							$studienplan_obj->insertvon=$uid;
-							
+
 							$studienplan_id_alt = $studienplan_obj->studienplan_id;
 
 							if($studienplan_obj->save())
 							{
-								
+
 								// Lehrveranstaltungszuordnungen kopieren
 								$stpllv = new studienplan();
 								$stpllv->loadStudienplanLV($studienplan_id_alt);
@@ -101,9 +101,9 @@ switch($method)
 									$stpllv_obj->studienplan_id=$studienplan_obj->studienplan_id;
 									$stpllv_obj->insertamum = date('Y-m-d H:i:s');
 									$stpllv_obj->insertvon = $uid;
-									
+
 									$studienplan_lehrveranstaltung_id_alt = $stpllv_obj->studienplan_lehrveranstaltung_id;
-									
+
 									if($stpllv_obj->saveStudienplanLehrveranstaltung())
 									{
 										// Alte und neue ID Speichern damit danach die Parents gesetzt werden koennen

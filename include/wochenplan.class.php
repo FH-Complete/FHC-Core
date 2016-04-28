@@ -482,7 +482,14 @@ class wochenplan extends basis_db
 			$this->link.='&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp;
 		}
 		if ($this->type=='ort' && $this->ort_kurzbz != 'all')
-			echo '<strong>'.$p->t('lvplan/raum').': </strong>'.$this->ort_kurzbz.' - '.$this->ort_bezeichnung.' - '.($this->ort_max_person!=''?'( '.$this->ort_max_person.' '.$p->t('lvplan/personen').' )':'').($this->ort_content_id!=''?' - <a href="../../../cms/content.php?content_id='.$this->ort_content_id.'" target="_self">'.$p->t('lvplan/rauminformationenAnzeigen').'</a>':'').'<br>'.$this->ort_ausstattung;
+		{
+			echo '<strong>'.$p->t('lvplan/raum').': </strong>'.$this->ort_kurzbz;
+			echo ' - '.$this->ort_bezeichnung;
+			echo ($this->ort_max_person!=''?' - ( '.$this->ort_max_person.' '.$p->t('lvplan/personen').' )':'');
+			echo ($this->ort_content_id!=''?' - <a href="../../../cms/content.php?content_id='.$this->ort_content_id.'" target="_self">'.$p->t('lvplan/rauminformationenAnzeigen').'</a>':'');
+			echo '<span id="software"></span>';
+			echo '<br>'.$this->ort_ausstattung;
+		}
 		if ($this->type=='lva')
 			$this->link.='&lva='.$this->lva;
 		echo '</P>'.$this->crlf;

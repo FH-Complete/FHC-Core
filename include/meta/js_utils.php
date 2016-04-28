@@ -21,7 +21,7 @@
 require_once(dirname(__FILE__)."/jquery.php");
 echo '
 <script>
-	var TARGET = "";
+	var SERVICE_TARGET = "";
 	function _GET()
 	{
 		var url = window.location.href;
@@ -37,16 +37,16 @@ echo '
 		return vars;
 	}
 
-	function AJAXCall(info, successfunction)
+	function AJAXCall(action, successfunction)
 	{
-		if(TARGET == "")
+		if(SERVICE_TARGET == "")
 			die("Es wurde kein AJAX-Target angegeben");
 		$.ajax(
 		{
-			url: TARGET,
+			url: SERVICE_TARGET,
 			type: "POST",
 			dataType: "html",
-			data: info,
+			data: action,
 			timeout: 5000
 
 		}).done(function(result)
@@ -60,32 +60,36 @@ echo '
 				die(result);
 				return false;
 			}
-				if(res.erfolg)
+				if(res.return)
 				{
-					try
+					if(res.action != "")
 					{
-						var ret = JSON.parse(res.info);
-						successfunction(ret);
+						try
+						{
+							var ret = JSON.parse(res.action);
+						}
+						catch(e)
+						{
+							die(action.action + "<br><br>" + res.action);
+						}
 					}
-					catch(e)
-					{
-						die(res.info);
-					}
+					successfunction(ret);
 				}
 				else
 				{
-					die(result);
+					die(res.message);
 				}
 
 		}).fail(function(jqXHR, status)
 		{
-			die(status);
+			die("AJAX failed: " + status);
 		});
 	}
 
 	function die(msg)
 	{
-		document.body.innerHTML = msg;
+		var full = "<h1 style=\'color:#900;\'>Fehler:</h1><div>"+msg+"</div>";
+		document.body.innerHTML = full;
 		throw new Error(msg);
 	}
 
