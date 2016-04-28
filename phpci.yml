@@ -43,6 +43,7 @@ test:
         allowed_warnings: 200
     codeception:
         config: "tests/codeception/"
+        path: "tests/codeception/_output/"
 #    php_unit:
 #        directory: "tests/phpunit/"
 
