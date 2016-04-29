@@ -642,14 +642,22 @@ else if($method=="lehrveranstaltungen")
 						AND
 						(bis is null OR bis >= (DATE '$stsem->ende'))
 						AND aktiv = true
-						)a ) as anzahl
+						)a ) as anzahl 
 					FROM
-						lehre.tbl_lehrveranstaltung JOIN public.tbl_studiengang USING(studiengang_kz)
+						lehre.tbl_lehrveranstaltung 
+					JOIN 
+						public.tbl_studiengang USING(studiengang_kz) 
 					WHERE
-						tbl_lehrveranstaltung.incoming>0 AND
-						tbl_lehrveranstaltung.aktiv AND
-						tbl_lehrveranstaltung.lehre
-						AND ((tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000) OR tbl_lehrveranstaltung.studiengang_kz=10006)";
+						tbl_lehrveranstaltung.incoming>0 AND 
+						tbl_lehrveranstaltung.aktiv AND 
+						tbl_lehrveranstaltung.lehre AND 
+						tbl_lehrveranstaltung.lehrveranstaltung_id IN (
+							SELECT lehrveranstaltung_id FROM lehre.tbl_studienplan_lehrveranstaltung 
+							JOIN lehre.tbl_studienplan USING (studienplan_id) 
+							JOIN lehre.tbl_studienordnung USING (studienordnung_id) 
+							WHERE tbl_studienordnung.status_kurzbz='approved' 
+							AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id) AND 
+						((tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000) OR tbl_lehrveranstaltung.studiengang_kz=10006)";
 
 					if (isset($_GET['studiengang']) && $_GET['studiengang'] !='')
 						$qry .= "AND tbl_lehrveranstaltung.studiengang_kz=".$_GET['studiengang'];
@@ -679,8 +687,8 @@ else if($method=="lehrveranstaltungen")
 			while($row = $db->db_fetch_object($result))
 			{
 				$freieplaetze = $row->incoming - $row->anzahl;
-				if($freieplaetze>0)
-				{
+				//if($freieplaetze>0)
+				//{
 					$studiengang = new studiengang();
 					$studiengang->load($row->studiengang_kz);
 					$studiengang_language = ($sprache == 'German') ? $studiengang->bezeichnung : $studiengang->english;
@@ -691,8 +699,10 @@ else if($method=="lehrveranstaltungen")
 						$typ = 'MA';
 					echo '<tr>';
                     echo '<td style="display:none">'.$row->lehrveranstaltung_id.'</td>';
-					if(!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id))
+					if(!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id) && $freieplaetze>0)
 						echo '<td><a href="incoming.php?method=lehrveranstaltungen&mode=add&id='.$row->lehrveranstaltung_id.'">'.$p->t('global/anmelden').'</a></td>';
+					elseif (!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id) && $freieplaetze==0)
+						echo '<td>'.$p->t('incoming/noVacancies').'</td>';
 					else
 						echo '<td>'.$p->t('global/angemeldet').'</td>';
 					echo '<td>',$studiengang_language,'</td>';
@@ -709,7 +719,7 @@ else if($method=="lehrveranstaltungen")
 						  </td>';
 					echo '<td>',($freieplaetze<$row->incoming?'<strong>'.$freieplaetze.'/'.$row->incoming.'</strong>':$freieplaetze.'/'.$row->incoming),'</td>';
 					echo '</tr>';
-				}
+				//}
 			}
 		}
 		echo '</tbody></table>';
