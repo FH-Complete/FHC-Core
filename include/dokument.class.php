@@ -455,7 +455,10 @@ class dokument extends basis_db
 	 */
 	public function getAllDokumente($not_in='')
 	{
-		$qry = "SELECT * FROM public.tbl_dokument ";
+		$sprache = new sprache();
+		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
+		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
+		$qry = "SELECT dokument_kurzbz, bezeichnung, $bezeichnung_mehrsprachig, $dokumentbeschreibung_mehrsprachig FROM public.tbl_dokument ";
 		
 		if($not_in!='')
 		{
@@ -471,6 +474,8 @@ class dokument extends basis_db
 
 				$dok->dokument_kurzbz = $row->dokument_kurzbz;
 				$dok->bezeichnung = $row->bezeichnung;
+				$dok->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
+				$dok->dokumentbeschreibung_mehrsprachig = $sprache->parseSprachResult('dokumentbeschreibung_mehrsprachig', $row);
 
 				$this->result[] = $dok;
 			}
