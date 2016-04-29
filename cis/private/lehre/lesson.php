@@ -190,7 +190,7 @@ $( document ).ready(function()
 <body>
 <div id="semplanhelp" style="position:absolute; top:200px; left:200px; width:500px; height:250px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" class="transparent">
 <table width="100%">
-<tr><td valign="top"><h2>&nbsp;Erstellung des Semesterplanes</h2></td><td align="right" valign="top"><a href="#" onclick="hideSemPlanHelp();">X</a>&nbsp;</td></tr>
+<tr><td valign="top"><h2>&nbsp;<?php echo $p->t('semesterplan/ErstellungDesSemesterplans');?></h2></td><td align="right" valign="top"><a href="#" onclick="hideSemPlanHelp();">X</a>&nbsp;</td></tr>
 <tr>
 <td colspan="2">
 <ol style="font-size:8pt;">
@@ -203,7 +203,7 @@ $( document ).ready(function()
 </ol>
 </td>
 </tr>
-<tr><td colspan="2" align="center"><a href="#" onClick="hideSemPlanHelp();">schlie&szlig;en</a></td></tr>
+<tr><td colspan="2" align="center"><a href="#" onClick="hideSemPlanHelp();"><?php echo $p->t('semesterplan/schliessen');?></a></td></tr>
 </table>
 </div>
 <table class="tabcontent" height="100%" id="inhalt">

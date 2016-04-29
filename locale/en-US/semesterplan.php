@@ -1,4 +1,4 @@
-<?php 
+<?php
 $this->phrasen['semesterplan/fehlerBeiDerParameteruebergabe']='Error in the parameter transfer';
 $this->phrasen['semesterplan/fehlerBeimLadenDerLv']='Error loading the course';
 $this->phrasen['semesterplan/fehlerBeimLadenDesStudienganges']='Error loading the degree program';
@@ -16,4 +16,6 @@ $this->phrasen['semesterplan/speichernSieDasDokument']='Save the document as a �
 $this->phrasen['semesterplan/inMSWord']='(In MS Word: “File” -> “Save As” -> File name: index.html, Save as type: Web Page)';
 $this->phrasen['semesterplan/ladenSieDieDateiHoch']='Now upload this file with the “Upload” button.';
 $this->phrasen['semesterplan/fertig']='Finished';
+$this->phrasen['semesterplan/ErstellungDesSemesterplans']='Setting up the Semesterplan';
+$this->phrasen['semesterplan/schliessen']='close';
 ?>
