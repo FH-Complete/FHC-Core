@@ -115,5 +115,51 @@ class ModelTest extends FHC_Controller
 			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
 		else
 			var_dump($res->retval);
+
+		$this->load->model('core/Sprache_model');		
+		// Insert Sprache
+		$data = array
+		(
+			'sprache' => 'test',
+			'bezeichnung' => "{'testsprache'}",
+			'locale' => 'te_TE',
+			'content' => false
+		);
+		$res = $this->Sprache_model->insert($data);
+		if ($res->error)
+			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+		else
+			$id = $data['sprache'];
+		var_dump($res);
+
+		// Update Sprache
+		$data = array
+		(
+			'index' => 4,
+			'bezeichnung' => "{'TestSprache', 'TestLanguage', 'TestSpanisch'}",
+			'content' => true
+		);
+		$res = $this->Sprache_model->update($id, $data);
+		if ($res->error)
+			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+		else
+			$id=$res->retval; //echo $id;
+
+		// Load Sprache
+		$res = $this->Sprache_model->load($id);
+		if ($res->error)
+			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+		else
+		{
+			$result = $res->retval->result_object();
+			var_dump($this->Sprache_model->pgArrayPhp($result[0]->bezeichnung));
+		}
+
+		// Delete Sprache
+		$res = $this->Sprache_model->delete($id);
+		if ($res->error)
+			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+		else
+			var_dump($res->retval);
 	}
 }

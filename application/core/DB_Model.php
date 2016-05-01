@@ -110,8 +110,10 @@ class DB_Model extends FHC_Model
 			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
 
 		// DB-SELECT
-		if ($this->db->get_where($this->dbTable, array($this->pk => $id)))
-			return $this->_success($id);
+		$result = $this->db->get_where($this->dbTable, array($this->pk => $id));
+		//var_dump($result);
+		if ($result)
+			return $this->_success($result);
 		else
 			return $this->_error($this->db->error(), FHC_DB_ERROR);
 	}
@@ -139,6 +141,58 @@ class DB_Model extends FHC_Model
 			return $this->_success($id);
 		else
 			return $this->_error($this->db->error(), FHC_DB_ERROR);
+	}
+
+	/** ---------------------------------------------------------------
+	 * Convert PG-Array to PHP-Array
+	 *
+	 * @param   integer  config.php error code numbers
+	 * @return  array
+	 */
+	public function pgArrayPhp($s,$start=0,&$end=NULL)
+	{
+		if (empty($s) || $s[0]!='{') return NULL;
+		$return = array();
+		$br = 0;
+		$string = false;
+		$quote='';
+		$len = strlen($s);
+		$v = '';
+		for($i=$start+1; $i<$len;$i++)
+		{
+		    $ch = $s[$i];
+		    if (!$string && $ch=='}')
+			{
+		        if ($v!=='' || !empty($return))
+					$return[] = $v;
+		        $end = $i;
+		        break;
+		    }
+			else
+				if (!$string && $ch=='{')
+				    $v = $this->pgArrayPhp($s,$i,$i);
+				else
+					if (!$string && $ch==',')
+					{
+				    	$return[] = $v;
+				    	$v = '';
+					}
+					else
+						if (!$string && ($ch=='"' || $ch=="'"))
+						{
+							$string = TRUE;
+							$quote = $ch;
+						}
+						else
+							if ($string && $ch==$quote && $s[$i-1]=="\\")
+								$v = substr($v,0,-1).$ch;
+							else
+								if ($string && $ch==$quote && $s[$i-1]!="\\")
+									$string = FALSE;
+								else
+									$v .= $ch;
+		}
+		return $return;
 	}
 
 	/** ---------------------------------------------------------------

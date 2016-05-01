@@ -7,4 +7,6 @@ $config['fhc_acl'] = array
 	'public.tbl_person' => 'basis/person',
 	'public.tbl_prestudent' => 'basis/person',
 	'public.tbl_organisationseinheit' => 'basis/organisationseinheit'
+,
+	'public.tbl_sprache' => 'admin'
 );
