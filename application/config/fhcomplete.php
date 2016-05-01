@@ -2,7 +2,7 @@
 
 $config['fhc_version'] = '3.2';
 
-
-// status return message codes
-define('FHC_SUCCESS', 0);
-define('FHC_ERR_GENERAL', 1);
+$config['fhc_acl'] = array
+(
+	'public.tbl_prestudent' => 'basis/person'
+);

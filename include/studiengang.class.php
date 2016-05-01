@@ -25,7 +25,12 @@
 require_once(dirname(__FILE__).'/datum.class.php');
 
 // CI
-require_once(dirname(__FILE__).'/../ci_hack.php');
+// look if get_instance() is declared
+if (function_exists('get_instance'))
+	require_once(dirname(__FILE__).'/../ci_db_extra.php');
+else
+	require_once(dirname(__FILE__).'/../ci_hack.php');
+
 require_once(dirname(__FILE__).'/../application/models/lehre/Studiengang_model.php');
 
 class studiengang extends Studiengang_model

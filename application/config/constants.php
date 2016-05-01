@@ -3,6 +3,24 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 /*
 |--------------------------------------------------------------------------
+| FH-Complete Constants
+|--------------------------------------------------------------------------
+|
+| These constants are used for internal messages. It are also be used
+| and translated in the language files.
+|
+*/
+define('FHC_SUCCESS', 0); 		// General Success Message
+define('FHC_ERROR', 1); 		// General Error Message
+define('FHC_MODEL_ERROR', 2); 	// Model Error
+define('FHC_DB_ERROR', 3);		// Database Error
+define('FHC_NODBTABLE', 4); 	// No DB-Table is set
+define('FHC_NORIGHT', 5); 	    // No rights
+
+
+
+/*
+|--------------------------------------------------------------------------
 | File and Directory Modes
 |--------------------------------------------------------------------------
 |
@@ -75,6 +93,7 @@ define('SHOW_DEBUG_BACKTRACE', TRUE);
 */
 define('EXIT_SUCCESS', 0); // no errors
 define('EXIT_ERROR', 1); // generic error
+define('EXIT_MODEL', 2); // model error
 define('EXIT_CONFIG', 3); // configuration error
 define('EXIT_UNKNOWN_FILE', 4); // file not found
 define('EXIT_UNKNOWN_CLASS', 5); // unknown class
