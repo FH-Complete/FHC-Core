@@ -42,6 +42,7 @@ $this->phrasen['pruefung/keinFensterVorhanden'] = 'Keine Prüfungsfenster vorhan
 $this->phrasen['pruefung/keineDatenVorhanden'] = 'Keine Daten vorhanden.';
 $this->phrasen['pruefung/anmeldefristAbgelaufen'] = 'Anmeldefrist abgelaufen';
 $this->phrasen['pruefung/stornierenMoeglichBis'] = 'Stornieren möglich bis';
+$this->phrasen['pruefung/stornoNichtMehrMoeglich'] = 'Storno nicht mehr möglich.';
 $this->phrasen['pruefung/anmeldenMoeglichBis'] = 'Anmeldung möglich bis';
 $this->phrasen['pruefung/zurLvAnmeldung'] = 'zur LV-Anmeldung';
 $this->phrasen['pruefung/zuerstPruefungAuswaehlen'] = 'Zuerst Prüfung auswählen.';

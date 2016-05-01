@@ -355,7 +355,7 @@ function writePruefungsTable(e, data, anmeldung)
 			if(!storno)
 				button = "<p><span style='display: inline-block; width: 155px;'><?php echo $p->t('pruefung/anmeldefristAbgelaufen'); ?></span></br>";
 			else
-				button = "<p><span style='display: inline-block; width: 155px;'>Storno nicht mehr möglich.</span></br>";
+				button = "<p><span style='display: inline-block; width: 155px;'><?php echo $p->t('pruefung/stornoNichtMehrMoeglich'); ?></span></br>";
 		}
 		else if(anmeldung || e.lehrveranstaltung[0].angemeldet)
 		{

@@ -43,6 +43,7 @@ $this->phrasen['pruefung/keineDatenVorhanden'] = 'Nessuna data a disposizione.';
 $this->phrasen['pruefung/anmeldefristAbgelaufen'] = 'Termine di iscrizione scaduto.';
 $this->phrasen['pruefung/stornierenMoeglichBis'] = 'Possibilità di annullare l’iscrizione entro il';
 $this->phrasen['pruefung/anmeldenMoeglichBis'] = 'Possibilità di iscrizione entro il';
+$this->phrasen['pruefung/stornoNichtMehrMoeglich'] = 'Storno nicht mehr möglich.';
 $this->phrasen['pruefung/zurLvAnmeldung'] = 'iscriversi al corso';
 $this->phrasen['pruefung/zuerstPruefungAuswaehlen'] = 'Scegliere prima l’esame.';
 $this->phrasen['pruefung/bemerkungVonLektorHinzugefuegt'] = 'inserito da docente';
