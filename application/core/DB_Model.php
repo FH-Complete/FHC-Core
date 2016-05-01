@@ -32,7 +32,7 @@ class DB_Model extends FHC_Model
 
 		// Check rights
 		if (! $this->fhc_db_acl->isBerechtigt((string)($this->acl[$this->dbTable]), 'i'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT), FHC_MODEL_ERROR);
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
 
 		// DB-INSERT
 		if ($this->db->insert($this->dbTable, $data))
@@ -55,7 +55,7 @@ class DB_Model extends FHC_Model
 		
 		// Check rights
 		if (! $this->fhc_db_acl->isBerechtigt((string)($this->acl[$this->dbTable]), 'ui'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT), FHC_MODEL_ERROR);
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
 
 		// DB-REPLACE
 		if ($this->db->replace($this->dbTable, $data))
@@ -81,7 +81,7 @@ class DB_Model extends FHC_Model
 		
 		// Check rights
 		if (! $this->fhc_db_acl->isBerechtigt((string)($this->acl[$this->dbTable]), 'u'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT), FHC_MODEL_ERROR);
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
 
 		// DB-UPDATE
 		$this->db->where($this->pk, $id);
@@ -92,9 +92,9 @@ class DB_Model extends FHC_Model
 	}
 
 	/** ---------------------------------------------------------------
-	 * Replace Data in DB-Table
+	 * Load data from DB-Table
 	 *
-	 * @param   array $data  DataArray for Replacement
+	 * @param   string $id  Primary Key for SELECT
 	 * @return  array
 	 */
 	public function load($id)
@@ -107,10 +107,35 @@ class DB_Model extends FHC_Model
 		
 		// Check rights
 		if (! $this->fhc_db_acl->isBerechtigt((string)($this->acl[$this->dbTable]), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT), FHC_MODEL_ERROR);
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
 
 		// DB-SELECT
 		if ($this->db->get_where($this->dbTable, array($this->pk => $id)))
+			return $this->_success($id);
+		else
+			return $this->_error($this->db->error(), FHC_DB_ERROR);
+	}
+
+	/** ---------------------------------------------------------------
+	 * Delete data from DB-Table
+	 *
+	 * @param   string $id  Primary Key for DELETE
+	 * @return  array
+	 */
+	public function delete($id)
+	{
+		// Check Class-Attributes
+		if(is_null($this->dbTable))
+			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+		if(is_null($this->pk))
+			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
+		
+		// Check rights
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 'd'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
+
+		// DB-DELETE
+		if ($this->db->delete($this->dbTable, array($this->pk => $id)))
 			return $this->_success($id);
 		else
 			return $this->_error($this->db->error(), FHC_DB_ERROR);

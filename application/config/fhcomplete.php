@@ -4,5 +4,7 @@ $config['fhc_version'] = '3.2';
 
 $config['fhc_acl'] = array
 (
-	'public.tbl_prestudent' => 'basis/person'
+	'public.tbl_person' => 'basis/person',
+	'public.tbl_prestudent' => 'basis/person',
+	'public.tbl_organisationseinheit' => 'basis/organisationseinheit'
 );

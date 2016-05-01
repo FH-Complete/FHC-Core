@@ -5,3 +5,4 @@ if ( ! defined('BASEPATH'))
 // DB-Errormessages
 $lang['fhc_'.FHC_MODEL_ERROR]	= 'Error in Model';
 $lang['fhc_'.FHC_NODBTABLE]	= 'dbTable is not set!';
+$lang['fhc_'.FHC_NORIGHT]	= 'rights are missing!';
