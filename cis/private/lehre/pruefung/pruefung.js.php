@@ -30,6 +30,16 @@ $sprache = getSprache();
 $lang = new sprache();
 $lang->load($sprache);
 $p = new phrasen($sprache);
+
+if (defined('CIS_PRUEFUNGSANMELDUNG_FRIST'))
+{
+	$anmeldefrist = CIS_PRUEFUNGSANMELDUNG_FRIST;
+}
+else
+{
+	$anmeldefrist = 3;
+}
+
 ?>
 
 /* Copyright (C) 2013 fhcomplete.org
@@ -336,7 +346,7 @@ function writePruefungsTable(e, data, anmeldung)
 		var frist = termin;
 		termin = termin.getDate()+"."+(termin.getMonth()+1)+"."+termin.getFullYear();
 		frist = frist.getTime();
-		frist = frist - (3*24*60*60*1000);
+		frist = frist - (<?php echo $anmeldefrist ?>*24*60*60*1000);
 		var fristDate = new Date(frist);
 		frist = fristDate.getDate()+"."+(fristDate.getMonth()+1)+"."+fristDate.getFullYear();
 
@@ -1309,6 +1319,7 @@ function unmarkMissingFormEntry()
 function loadLehrveranstaltungen()
 {
 	var studiensemester_kurzbz = $("#studiensemester").val();
+	//alert(studiensemester_kurzbz);
 	var mitarbeiter_uid = $("#mitarbeiter_uid").val();
 	$.ajax({
 		dataType: 'json',
