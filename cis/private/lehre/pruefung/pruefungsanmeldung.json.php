@@ -426,6 +426,10 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
     $pruefung->getPruefungen($uid, NULL, $lehrveranstaltung->lehrveranstaltung_id);
     $anmeldung_moeglich = true;
     $anzahlPruefungen = count($pruefung->result);
+
+	// Defaulteinstellung für Prüfungstypen - schauen, ob bereits aus KTU-Addon geladen
+	if(!isset($pruefungstyp_kurzbzArray))
+		$pruefungstyp_kurzbzArray = array("Termin1","Termin2","kommPruef");
     if(isset($pruefungstyp_kurzbzArray))
     {
 	if($anzahlPruefungen < count($pruefungstyp_kurzbzArray))

@@ -328,7 +328,7 @@ function writePruefungsTable(e, data, anmeldung)
 	var row = "";
 	var teilnehmer = "";
 	var button = "";
-	row += "<tr><td>"+e.organisationseinheit+"</td><td style='cursor: pointer; text-decoration: underline;' onclick='showPruefungsDetails(\""+e.pruefung.pruefung_id+"\",\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\");'>"+e.lehrveranstaltung[0].bezeichnung+"</td><td>";
+	row += "<tr><td>"+e.organisationseinheit+"</td><td style='cursor: pointer; text-decoration: underline;' onclick='showPruefungsDetails(\""+e.pruefung.pruefung_id+"\",\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\");'>"+e.lehrveranstaltung[0].bezeichnung+" <br>("+e.lehrveranstaltung[0].lehrform_kurzbz+", "+e.lehrveranstaltung[0].ects+" ECTS, "+e.pruefung.mitarbeiter_uid+")</td><td>";
 	e.pruefung.termine.forEach(function(d){
 		var storno = false;
 		var anmeldung_id = null;
