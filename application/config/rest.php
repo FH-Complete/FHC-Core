@@ -195,6 +195,15 @@ $config['auth_library_function'] = 'basicAuthentication';
 |            $config['auth_override_class_method_http']['deals']['*']['options'] = 'none';
 */
 
+$config['auth_override_class_method_http']['Person']['checkBewerbung']['get'] = 'none';
+$config['auth_override_class_method_http']['Person']['person']['post'] = 'none';
+$config['auth_override_class_method_http']['Person']['person']['get'] = 'none';
+$config['auth_override_class_method_http']['Person']['checkZugangscodePerson']['get'] = 'none';
+$config['auth_override_class_method_http']['Person']['personFromCode']['post'] = 'none';
+$config['auth_override_class_method_http']['Person']['personUpdate']['post'] = 'none';
+$config['auth_override_class_method_http']['Kontakt']['kontakt']['post'] = 'none';
+$config['auth_override_class_method_http']['Kontakt']['kontaktPerson']['get'] = 'none';
+
 // ---Uncomment list line for the wildard unit test
 // $config['auth_override_class_method_http']['wildcard_test_cases']['*']['options'] = 'basic';
 
