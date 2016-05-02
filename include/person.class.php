@@ -172,7 +172,7 @@ class person extends basis_db
 	// * auf Gueltigkeit.
 	// * @return true wenn ok, false im Fehlerfall
 	// *******************************************
-	protected function validate()
+	public function validate()
 	{
 		$this->nachname = trim($this->nachname);
 		$this->vorname = trim($this->vorname);

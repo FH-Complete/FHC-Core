@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 header("Cache-Control: no-cache");
@@ -41,7 +42,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <vbox id="student-gruppen" style="overflow:auto; margin:0px;" flex="1">
 <popupset>
 	<menupopup id="student-gruppe-tree-popup">
-		<menuitem label="Entfernen" oncommand="StudentGruppeDelete();" id="student-gruppe-tree-popup-delete" hidden="false"/>		
+		<menuitem label="Entfernen" oncommand="StudentGruppeDelete();" id="student-gruppe-tree-popup-delete" hidden="false"/>
 	</menupopup>
 </popupset>
 <hbox flex="1">
@@ -71,12 +72,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/gruppen/rdf#generiert" />
 				<splitter class="tree-splitter"/>
+				<treecol id="student-gruppen-prestudent_id" label="PID" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/gruppen/rdf#prestudent_id" />
+				<splitter class="tree-splitter"/>
 				<treecol id="student-gruppen-uid" label="UID" flex="1" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/gruppen/rdf#uid" />
 				<splitter class="tree-splitter"/>
 			</treecols>
-		
+
 			<template>
 				<rule>
 					<treechildren>

@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../config/vilesci.config.inc.php');
@@ -134,8 +135,8 @@ function StudentGruppeDelete()
 	
 	col = tree.columns ? tree.columns["student-gruppen-gruppe_kurzbz"] : "student-gruppen-gruppe_kurzbz";
 	gruppe_kurzbz = tree.view.getCellText(i,col);
-	col = tree.columns ? tree.columns["student-gruppen-uid"] : "student-gruppen-uid";
-	uid = tree.view.getCellText(i,col);
+	col = tree.columns ? tree.columns["student-gruppen-prestudent_id"] : "student-gruppen-prestudent_id";
+	prestudent_id = tree.view.getCellText(i,col);
 	col = tree.columns ? tree.columns["student-gruppen-generiert"] : "student-gruppen-generiert";
 	generiert = tree.view.getCellText(i,col);
 	
@@ -151,7 +152,7 @@ function StudentGruppeDelete()
 		var req = new phpRequest('student/studentDBDML.php','','');
 
 		req.add('type','deleteGruppenzuteilung');
-		req.add('uid',uid);
+		req.add('prestudent_id',prestudent_id);
 		req.add('gruppe_kurzbz', gruppe_kurzbz);
 
 		var response = req.executePOST();

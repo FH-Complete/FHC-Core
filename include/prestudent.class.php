@@ -26,6 +26,8 @@ class prestudent extends person
 {
 	//Tabellenspalten
 	public $prestudent_id;	// varchar(16)
+	public $uid;
+	public $perskz;
 	public $aufmerksamdurch_kurzbz;
 	public $studiengang_kz;
 	public $berufstaetigkeit_code;
@@ -74,12 +76,12 @@ class prestudent extends person
 	public $bestaetigtvon;
 	public $bewerbung_abgeschicktamum;
 
-    public $studiensemester_old = '';
-    public $ausbildungssemester_old = '';
+	public $studiensemester_old = '';
+	public $ausbildungssemester_old = '';
 
-    // ErgebnisArray
-    public $result = array();
-    public $num_rows = 0;
+	// ErgebnisArray
+	public $result = array();
+	public $num_rows = 0;
 
 	/**
 	 * Konstruktor - Uebergibt die Connection und laedt optional einen Prestudent
@@ -114,6 +116,8 @@ class prestudent extends person
 			if($row = $this->db_fetch_object())
 			{
 				$this->prestudent_id = $row->prestudent_id;
+				$this->uid = $row->uid;
+				$this->perskz = $row->perskz;
 				$this->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;
 				$this->studiengang_kz = $row->studiengang_kz;
 				$this->berufstaetigkeit_code = $row->berufstaetigkeit_code;
@@ -124,9 +128,9 @@ class prestudent extends person
 				$this->zgvnation = $row->zgvnation;
 				$this->zgvmas_code = $row->zgvmas_code;
 				$this->zgvmaort = $row->zgvmaort;
-                $this->zgvmadatum = $row->zgvmadatum;
-                $this->zgvmanation = $row->zgvmanation;
-                $this->aufnahmeschluessel = $row->aufnahmeschluessel;
+				$this->zgvmadatum = $row->zgvmadatum;
+				$this->zgvmanation = $row->zgvmanation;
+				$this->aufnahmeschluessel = $row->aufnahmeschluessel;
 				$this->facheinschlberuf = $this->db_parse_bool($row->facheinschlberuf);
 				$this->anmeldungreihungstest = $row->anmeldungreihungstest;
 				$this->reihungstestangetreten = $this->db_parse_bool($row->reihungstestangetreten);
@@ -142,12 +146,12 @@ class prestudent extends person
 				$this->ext_id_prestudent = $row->ext_id;
 				$this->dual = $this->db_parse_bool($row->dual);
 				$this->ausstellungsstaat = $row->ausstellungsstaat;
-                $this->zgvdoktor_code = $row->zgvdoktor_code;
-                $this->zgvdoktorort = $row->zgvdoktorort;
-                $this->zgvdoktordatum = $row->zgvdoktordatum;
-                $this->zgvdoktornation = $row->zgvdoktornation;
+				$this->zgvdoktor_code = $row->zgvdoktor_code;
+				$this->zgvdoktorort = $row->zgvdoktorort;
+				$this->zgvdoktordatum = $row->zgvdoktordatum;
+				$this->zgvdoktornation = $row->zgvdoktornation;
 
-                if(!person::load($row->person_id))
+				if(!person::load($row->person_id))
 					return false;
 				else
 					return true;
@@ -170,7 +174,7 @@ class prestudent extends person
 	 * auf Gueltigkeit.
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	protected function validate()
+	public function validate()
 	{
 		if($this->punkte>9999.9999)
 		{
@@ -216,47 +220,51 @@ class prestudent extends person
 
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'BEGIN;INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id,
+			$qry = 'BEGIN;INSERT INTO public.tbl_prestudent (uid, perskz, aufmerksamdurch_kurzbz, person_id,
 					studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvnation,
 					zgvmas_code, zgvmaort, zgvmadatum, zgvmanation, aufnahmeschluessel, facheinschlberuf,
 					reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte,
 					rt_punkte1, rt_punkte2, rt_punkte3, bismelden, insertamum, insertvon,
 					updateamum, updatevon, anmerkung, dual, ausstellungsstaat, mentor) VALUES('.
-			       $this->db_add_param($this->aufmerksamdurch_kurzbz).",".
-			       $this->db_add_param($this->person_id).",".
-			       $this->db_add_param($this->studiengang_kz).",".
-			       $this->db_add_param($this->berufstaetigkeit_code).",".
-			       $this->db_add_param($this->ausbildungcode).",".
-			       $this->db_add_param($this->zgv_code).",".
-			       $this->db_add_param($this->zgvort).",".
-			       $this->db_add_param($this->zgvdatum).",".
-			       $this->db_add_param($this->zgvnation).",".
-			       $this->db_add_param($this->zgvmas_code).",".
-			       $this->db_add_param($this->zgvmaort).",".
-			       $this->db_add_param($this->zgvmadatum).",".
-                   $this->db_add_param($this->zgvmanation).",".
-			       $this->db_add_param($this->aufnahmeschluessel).",".
-			       $this->db_add_param($this->facheinschlberuf, FHC_BOOLEAN).",".
-			       $this->db_add_param($this->reihungstest_id).",".
-			       $this->db_add_param($this->anmeldungreihungstest).",".
-			       $this->db_add_param($this->reihungstestangetreten, FHC_BOOLEAN).",".
-			       $this->db_add_param($this->punkte).",".
-			       $this->db_add_param($this->rt_punkte1).",".
-			       $this->db_add_param($this->rt_punkte2).",".
-			       $this->db_add_param($this->rt_punkte3).",".
-			       $this->db_add_param($this->bismelden, FHC_BOOLEAN).",".
-			       $this->db_add_param($this->insertamum).",".
-			       $this->db_add_param($this->insertvon).",".
-			       $this->db_add_param($this->updateamum).",".
-			       $this->db_add_param($this->updatevon).",".
-			       $this->db_add_param($this->anmerkung).",".
-			       $this->db_add_param($this->dual, FHC_BOOLEAN).",".
-			       $this->db_add_param($this->ausstellungsstaat).",".
-			       $this->db_add_param($this->mentor).");";
+						$this->db_add_param($this->uid).",".
+						$this->db_add_param($this->perskz).",".
+						$this->db_add_param($this->aufmerksamdurch_kurzbz).",".
+						$this->db_add_param($this->person_id).",".
+						$this->db_add_param($this->studiengang_kz).",".
+						$this->db_add_param($this->berufstaetigkeit_code).",".
+						$this->db_add_param($this->ausbildungcode).",".
+						$this->db_add_param($this->zgv_code).",".
+						$this->db_add_param($this->zgvort).",".
+						$this->db_add_param($this->zgvdatum).",".
+						$this->db_add_param($this->zgvnation).",".
+						$this->db_add_param($this->zgvmas_code).",".
+						$this->db_add_param($this->zgvmaort).",".
+						$this->db_add_param($this->zgvmadatum).",".
+						$this->db_add_param($this->zgvmanation).",".
+						$this->db_add_param($this->aufnahmeschluessel).",".
+						$this->db_add_param($this->facheinschlberuf, FHC_BOOLEAN).",".
+						$this->db_add_param($this->reihungstest_id).",".
+						$this->db_add_param($this->anmeldungreihungstest).",".
+						$this->db_add_param($this->reihungstestangetreten, FHC_BOOLEAN).",".
+						$this->db_add_param($this->punkte).",".
+						$this->db_add_param($this->rt_punkte1).",".
+						$this->db_add_param($this->rt_punkte2).",".
+						$this->db_add_param($this->rt_punkte3).",".
+						$this->db_add_param($this->bismelden, FHC_BOOLEAN).",".
+						$this->db_add_param($this->insertamum).",".
+						$this->db_add_param($this->insertvon).",".
+						$this->db_add_param($this->updateamum).",".
+						$this->db_add_param($this->updatevon).",".
+						$this->db_add_param($this->anmerkung).",".
+						$this->db_add_param($this->dual, FHC_BOOLEAN).",".
+						$this->db_add_param($this->ausstellungsstaat).",".
+						$this->db_add_param($this->mentor).");";
 		}
 		else
 		{
 			$qry = 'UPDATE public.tbl_prestudent SET'.
+			       ' uid='.$this->db_add_param($this->uid).",".
+			       ' perskz='.$this->db_add_param($this->perskz).",".
 			       ' aufmerksamdurch_kurzbz='.$this->db_add_param($this->aufmerksamdurch_kurzbz).",".
 			       ' person_id='.$this->db_add_param($this->person_id).",".
 			       ' studiengang_kz='.$this->db_add_param($this->studiengang_kz).",".
@@ -373,6 +381,8 @@ class prestudent extends person
 		{
 			$ps=new prestudent();
 			$ps->prestudent_id = $row->prestudent_id;
+			$ps->uid = $row->uid;
+			$ps->perskz = $row->perskz;
 			$ps->person_id = $row->person_id;
 			$ps->reihungstest_id = $row->reihungstest_id;
 			$ps->staatsbuergerschaft = $row->staatsbuergerschaft;
@@ -646,6 +656,8 @@ class prestudent extends person
 				$ps = new prestudent();
 
 				$ps->person_id = $row->person_id;
+				$ps->uid = $row->uid;
+				$ps->perskz = $row->perskz;
 				$ps->staatsbuergerschaft = $row->staatsbuergerschaft;
 				$ps->gebnation = $row->geburtsnation;
 				$ps->sprache = $row->sprache;
@@ -782,11 +794,13 @@ class prestudent extends person
 				return false;
 			}
 
-			$qry = 'INSERT INTO public.tbl_prestudentstatus (prestudent_id, status_kurzbz,
+			$qry = 'INSERT INTO public.tbl_prestudentstatus (prestudent_id, uid, perskz, status_kurzbz,
 					studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon,
 					updateamum, updatevon, ext_id, orgform_kurzbz, bestaetigtam, bestaetigtvon, anmerkung,
 					bewerbung_abgeschicktamum, studienplan_id) VALUES('.
-			       $this->db_add_param($this->prestudent_id).",".
+			       $this->db_add_param($this->prestudent_id, FHC_INTEGER).",".
+			       $this->db_add_param($this->uid).",".
+			       $this->db_add_param($this->perskz).",".
 			       $this->db_add_param($this->status_kurzbz).",".
 			       $this->db_add_param($this->studiensemester_kurzbz).",".
 			       $this->db_add_param($this->ausbildungssemester).",".
@@ -883,10 +897,12 @@ class prestudent extends person
 			$log->beschreibung = 'Loeschen der Rolle '.$status_kurzbz.' bei '.$prestudent_id;
 			$log->mitarbeiter_uid = get_uid();
 			$log->sql = $qry;
-			$log->sqlundo = 'INSERT INTO public.tbl_prestudentstatus(prestudent_id, status_kurzbz, studiensemester_kurzbz,'
+			$log->sqlundo = 'INSERT INTO public.tbl_prestudentstatus(prestudent_id, uid, perskz, status_kurzbz, studiensemester_kurzbz,'
 							. ' ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz,'
 							. ' bestaetigtam, bestaetigtvon, anmerkung, bewerbung_abgeschicktamum, studienplan_id) VALUES('.
 							$this->db_add_param($this->prestudent_id).','.
+							$this->db_add_param($this->uid).",".
+							$this->db_add_param($this->perskz).",".
 							$this->db_add_param($this->status_kurzbz).','.
 							$this->db_add_param($this->studiensemester_kurzbz).','.
 							$this->db_add_param($this->ausbildungssemester).','.
@@ -1096,6 +1112,8 @@ class prestudent extends person
 				$obj = new prestudent();
 
 				$obj->prestudent_id = $row->prestudent_id;
+				$obj->uid = $row->uid;
+				$obj->perskz = $row->perskz;
 				$obj->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->berufstaetigkeit_code = $row->berufstaetigkeit_code;
@@ -1699,11 +1717,10 @@ class prestudent extends person
 				FROM
 					public.tbl_prestudentstatus
 					JOIN public.tbl_prestudent USING (prestudent_id)
-					JOIN public.tbl_student USING (prestudent_id)
 					JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
 				WHERE
 					status_kurzbz IN ('Student', 'Diplomand','Incoming')
-				 	AND student_uid = ". $this->db_add_param($uid)."
+				 	AND uid = ". $this->db_add_param($uid)."
 				 ORDER BY ausbildungssemester";
 
 		if($result = $this->db_query($qry))

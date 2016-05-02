@@ -83,13 +83,13 @@ $student = new student($uid);
 $obj->getLvGesamtNoten($lehrveranstaltung_id, $student->prestudent_id, $semester_aktuell);
 $db = new basis_db();
 
-foreach ($obj->result as $row)	
+foreach ($obj->result as $row)
 {
 	if($row->freigabedatum!='')
 	{
 		$vorname = '';
 		$nachname = '';
-		$qry_name = "SELECT vorname, nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=".$db->db_add_param($row->student_uid);
+		$qry_name = "SELECT vorname, nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) JOIN public.tbl_prestudent USING(person_id) WHERE prestudent_id=".$db->db_add_param($row->prestudent_id, FHC_INTEGER);
 		if($db->db_query($qry_name))
 		{
 			if($row_name = $db->db_fetch_object())
@@ -99,11 +99,15 @@ foreach ($obj->result as $row)
 			}
 		}
 		
+		//TODO EINE_UID
+		$student = new student();
+		$uid = $student->getUid($row->prestudent_id);
+
 		echo '
 		<RDF:li>
-			<RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'" >
+			<RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$uid.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$uid.'/'.$row->studiensemester_kurzbz.'" >
 				<NOTE:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></NOTE:lehrveranstaltung_id>
-				<NOTE:student_uid><![CDATA['.$row->student_uid.']]></NOTE:student_uid>
+				<NOTE:student_uid><![CDATA['.$uid.']]></NOTE:student_uid>
 				<NOTE:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></NOTE:mitarbeiter_uid>
 				<NOTE:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></NOTE:studiensemester_kurzbz>
 				<NOTE:note><![CDATA['.$row->note.']]></NOTE:note>

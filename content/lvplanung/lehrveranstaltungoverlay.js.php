@@ -17,7 +17,8 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../config/global.config.inc.php');
@@ -38,7 +39,7 @@ var leDetailLektorLehreinheit_id; // Lehreinheit_id der Lektorzuordnung die nach
 var lehrveranstaltungNotenTreeDatasource; //Datasource des Noten Trees
 var lehrveranstaltungNotenSelectUID=null; //UID des Noten Eintrages der nach dem Refresh markiert werden soll
 var lehrveranstaltungLvGesamtNotenTreeDatasource; //Datasource des Noten Trees
-var lehrveranstaltungLvGesamtNotenSelectUID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
+var LehrveranstaltungLvGesamtNotenSelectPrestudentID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
 var lehrveranstaltungNotenTreeloaded=false;
 var lehrveranstaltungGesamtNotenTreeloaded=false;
 var LehrveranstaltungAusbildungssemesterFilter='';
@@ -1641,16 +1642,16 @@ function LehrveranstaltungLvGesamtNotenTreeSelectID()
 		return false;
 
 	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
-	if(lehrveranstaltungLvGesamtNotenSelectUID!=null)
+	if(LehrveranstaltungLvGesamtNotenSelectPrestudentID!=null)
 	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ID der row holen
-			col = tree.columns ? tree.columns["lehrveranstaltung-lvgesamtnoten-tree-student_uid"] : "lehrveranstaltung-lvgesamtnoten-tree-student_uid";
-			var uid=tree.view.getCellText(i,col);
+			col = tree.columns ? tree.columns["lehrveranstaltung-lvgesamtnoten-tree-prestudent_id"] : "lehrveranstaltung-lvgesamtnoten-tree-prestudent_id";
+			var prestudent_id=tree.view.getCellText(i,col);
 
 			//wenn dies die zu selektierende Zeile ist
-			if(uid == lehrveranstaltungLvGesamtNotenSelectUID)
+			if(prestudent_id == LehrveranstaltungLvGesamtNotenSelectPrestudentID)
 			{
 				//Zeile markieren
 				tree.view.selection.select(i);
@@ -1720,18 +1721,18 @@ function LehrveranstaltungNotenMove()
 
 	for (var t = 0; t < numRanges; t++)
 	{
-  		tree.view.selection.getRangeAt(t,start,end);
+		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
 			col = tree.columns ? tree.columns["lehrveranstaltung-lvgesamtnoten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-lvgesamtnoten-tree-lehrveranstaltung_id";
 			lehrveranstaltung_id = tree.view.getCellText(v,col);
-			col = tree.columns ? tree.columns["lehrveranstaltung-lvgesamtnoten-tree-student_uid"] : "lehrveranstaltung-lvgesamtnoten-tree-student_uid";
-			student_uid = tree.view.getCellText(v,col);
+			col = tree.columns ? tree.columns["lehrveranstaltung-lvgesamtnoten-tree-prestudent_id"] : "lehrveranstaltung-lvgesamtnoten-tree-prestudent_id";
+			prestudent_id = tree.view.getCellText(v,col);
 			col = tree.columns ? tree.columns["lehrveranstaltung-lvgesamtnoten-tree-studiensemester_kurzbz"] : "lehrveranstaltung-lvgesamtnoten-tree-studiensemester_kurzbz";
 			studiensemester_kurzbz = tree.view.getCellText(v,col);
 
 			req.add('lehrveranstaltung_id_'+i, lehrveranstaltung_id);
-			req.add('student_uid_'+i, student_uid);
+			req.add('prestudent_id'+i, prestudent_id);
 			req.add('studiensemester_kurzbz_'+i, studiensemester_kurzbz);
 			i++;
 		}
@@ -1776,10 +1777,10 @@ function LehrveranstaltungNoteSpeichern()
 	}
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
+	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
 	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
-	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
-	var student_uid=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-prestudent_id"] : "lehrveranstaltung-noten-tree-prestudent_id";
+	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
 	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiensemester_kurzbz"] : "lehrveranstaltung-noten-tree-studiensemester_kurzbz";
 	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 
@@ -1793,7 +1794,7 @@ function LehrveranstaltungNoteSpeichern()
 	req.add('type', 'savenote');
 
 	req.add('lehrveranstaltung_id', lehrveranstaltung_id);
-	req.add('student_uid', student_uid);
+	req.add('prestudent_id', prestudent_id);
 	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 	req.add('note', note);
 	req.add('punkte', punkte);
@@ -1811,7 +1812,7 @@ function LehrveranstaltungNoteSpeichern()
 	}
 	else
 	{
-		LehrveranstaltungLvGesamtNotenSelectUID=student_uid;
+		LehrveranstaltungLvGesamtNotenSelectPrestudentID=prestudent_id;
 		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 		LehrveranstaltungNotenDetailDisableFields(true);
@@ -1904,7 +1905,7 @@ function LehrveranstaltungNotenImport()
 
 		if(zeile[0]!='' && zeile[1]!='')
 		{
-			req.add('matrikelnummer_'+i, zeile[0]);
+			req.add('perskz_'+i, zeile[0]);
 			<?php
 			if(CIS_GESAMTNOTE_PUNKTE)
 				echo "req.add('punkte_'+i, zeile[1]);";
@@ -2074,8 +2075,8 @@ function LehrveranstaltungNotenDelete()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	tree = document.getElementById('lehrveranstaltung-noten-tree');
 
-	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
-	uid = tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-perstudent_id"] : "lehrveranstaltung-noten-tree-perstudent_id";
+	perstudent_id = tree.view.getCellText(tree.currentIndex,col);
 
 	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
 	lvid = tree.view.getCellText(tree.currentIndex,col);
@@ -2091,7 +2092,7 @@ function LehrveranstaltungNotenDelete()
 		req.add('type', 'deletenote');
 
 		req.add('lehrveranstaltung_id', lvid);
-		req.add('student_uid', uid);
+		req.add('perstudent_id', perstudent_id);
 		req.add('studiensemester_kurzbz', stsem);
 
 		var response = req.executePOST();

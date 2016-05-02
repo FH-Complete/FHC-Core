@@ -89,7 +89,7 @@ var studentDDObserver=
 {
 	onDragStart: function (evt,transferData,action)
 	{
-	
+
 		var tree = document.getElementById('student-tree')
 	    var row = { }
 	    var col = { }
@@ -106,7 +106,7 @@ var studentDDObserver=
 		var end = new Object();
 		var numRanges = tree.view.selection.getRangeCount();
 		var paramList= '';
-		
+
 		for (var t = 0; t < numRanges; t++)
 		{
 	  		tree.view.selection.getRangeAt(t,start,end);
@@ -122,7 +122,7 @@ var studentDDObserver=
 				paramList += ';'+uid;
   			}
 		}
-		
+
 		transferData.data=new TransferData();
 		transferData.data.addDataForFlavour("application/tempus-student",paramList);
   	}
@@ -298,7 +298,7 @@ var LektorFunktionDDObserver=
 			alert('Mitarbeiter kann nur auf einen Studiengang gezogen werden');
 			return false;
 		}
-		
+
 	    uid=dropdata.data;
 
 	    var req = new phpRequest('tempusDBDML.php','','');
@@ -421,11 +421,11 @@ var listObserver=
 		var paramList="?dragtype="+type+"&dragdatum="+dragdatum+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&einheit="+einheit+"&old_ort="+old_ort+idList+"&aktion="+aktion;
 		idList = TimeTableWeekGetMarkedIdList();
 		paramList = paramList+idList;
-		
+
 		//die Buttons die verschoben werden grau einfaerben
 		var styleNow=evt.target.getAttribute("style");
 		evt.target.setAttribute("style",styleNow+"color:gray;");
-					
+
 		var items = document.getElementsByTagName('button');
 		for each(var button in items)
 		{
@@ -439,8 +439,8 @@ var listObserver=
 				}
 			}
 		}
-		
-		
+
+
 		transferData.data=new TransferData();
 		transferData.data.addDataForFlavour("application/tempus-lehrstunde",paramList);
   	}
@@ -545,7 +545,7 @@ var boardObserver=
 			}
 			else if(evt.target.tagName=="button")
 			{
-	
+
 				if(getvariable('allow_lehrstunde_drop')=='true')
 				{
 					// Wenn direkt auf die Stunde gezogen wird, wird der Raum uebernommen und die unr gleich gesetzt
@@ -579,7 +579,7 @@ var boardObserver=
 				url+="&new_ort="+new_ort+"&kollisionsanzahl="+kollisionsanzahl;
 			else
 				url+="&aktion=stpl_move";
-	
+
 			if(new_unr)
 				url+="&new_unr="+new_unr;
 			if(new_blockung)
@@ -617,7 +617,7 @@ function getNewBlockung(item)
 			buttonunr=button.getAttribute('unr');
 			buttonwochentag=button.getAttribute('wochentag');
 			buttonstunde=button.getAttribute('stunde');
-			
+
 			if(buttonunr==unr && buttonwochentag==wochentag && buttonstunde>stunde)
 			{
 				blockung=blockung+1;
@@ -666,49 +666,47 @@ var verbandtreeDDObserver=
 	    var row = { }
 	    var col = { }
 	    var child = { }
-	   
+
 	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
-	    
+
 	    if(row.value!=-1) //Drop on Row
 	    {
 		    //Ziel holen
 		    col = tree.columns ? tree.columns["gruppe"] : "gruppe";
 			gruppe_kurzbz=tree.view.getCellText(row.value,col);
-			
+
 			col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
 			stg_kz=tree.view.getCellText(row.value,col);
-			
+
 			col = tree.columns ? tree.columns["sem"] : "sem";
 			sem=tree.view.getCellText(row.value,col);
-			
-			col = tree.columns ? tree.columns["ver"] : "ver";
-			ver=tree.view.getCellText(row.value,col);
-			
+
 			col = tree.columns ? tree.columns["grp"] : "grp";
 			grp=tree.view.getCellText(row.value,col);
 	    }
 	    else
 	    	return false;
-	    
+
 	    if(gruppe_kurzbz=='' && sem=='')
 	    {
 	    	alert('Zuteilung ist nur zu Spezial- oder Lehrverbandsgruppen moeglich');
 	    	return false;
 	    }
-	    
-	    uid=dropdata.data;
-	    
-	    var req = new phpRequest('student/studentDBDML.php','','');
-		
-		req.add('type','gruppenzuteilung');
 
-		req.add('uid', uid);
+			var prestudent_id = parseInt(dropdata.data);
+
+			if(!prestudent_id)
+			{
+				alert(dropdata.data + " ist keine id!");
+			}
+
+		var req = new phpRequest('student/studentDBDML.php','','');
+
+		req.add('type','gruppenzuteilung');
+		req.add('prestudent_id', prestudent_id);
 		req.add('gruppe_kurzbz', gruppe_kurzbz);
 		req.add('stg_kz', stg_kz);
-		req.add('semester', sem);
-		req.add('verband', ver);
-		req.add('gruppe', grp);
-		
+
 		var response = req.executePOST();
 
 		var val =  new ParseReturnValue(response)

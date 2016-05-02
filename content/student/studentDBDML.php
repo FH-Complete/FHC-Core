@@ -202,9 +202,7 @@ function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranst
 	{
 		$pruefung = new pruefung;
 		$pruefung->new = true;
-		if(!$std = new student($_POST['student_uid']))
-			die("Student nicht gefunden");
-		$pruefung->prestudent_id = $std->prestudent_id;
+		$pruefung->prestudent_id = $_POST['prestudent_id'];
 		$pruefung->lehreinheit_id = $lehreinheit_id;
 		$pruefung->datum = date("Y-m-d");
 
@@ -281,48 +279,74 @@ if(!$error)
 		//Studentendaten speichern
 		if(!$error)
 		{
-			$student = new student();
 
-			if(!$student->load($_POST['uid']))
+			$prestudent = new prestudent();
+			if(!$prestudent->load($_POST['prestudent_id']))
 			{
 				$return = false;
-				$errormsg = 'Fehler beim Laden:'.$student->errormsg;
+				$errormsg = 'Fehler beim Laden:'.$prestudent->errormsg;
 				$error = true;
+			}
+
+			$person = new person();
+			if(!$error)
+			{
+				if(!$person->load($prestudent->person_id))
+				{
+					$return = false;
+					$errormsg = 'Fehler beim Laden:'.$person->errormsg;
+					$error = true;
+				}
+			}
+
+			$benutzer = new benutzer();
+			if(!$error)
+			{
+				if(!$benutzer->load($prestudent->uid))
+				{
+					$return = false;
+					$errormsg = 'Fehler beim Laden:'.$benutzer->errormsg;
+					$error = true;
+				}
 			}
 
 			if(!$error)
 			{
-				$student->uid = $_POST['uid'];
-				$student->anrede = $_POST['anrede'];
-				$student->titelpre = $_POST['titelpre'];
-				$student->titelpost = $_POST['titelpost'];
-				$student->vorname = $_POST['vorname'];
-				$student->vornamen = $_POST['vornamen'];
-				$student->nachname = $_POST['nachname'];
-				$student->gebdatum = $_POST['geburtsdatum'];
-				$student->gebort = $_POST['geburtsort'];
-				$student->gebzeit = $_POST['geburtszeit'];
-				$student->anmerkungen = $_POST['anmerkung'];
-				$student->homepage = $_POST['homepage'];
-				$student->matr_nr = $_POST['matr_nr'];
-				$student->svnr = $_POST['svnr'];
-				$student->ersatzkennzeichen = $_POST['ersatzkennzeichen'];
-				$student->familienstand = $_POST['familienstand'];
-				$student->geschlecht = $_POST['geschlecht'];
-				$student->bnaktiv = ($_POST['aktiv']=='true'?true:false);
-				$student->anzahlkinder = $_POST['anzahlderkinder'];
-				$student->staatsbuergerschaft = $_POST['staatsbuergerschaft'];
-				$student->geburtsnation = $_POST['geburtsnation'];
-				$student->sprache = $_POST['sprache'];
-				$student->matrikelnr = $_POST['matrikelnummer'];
-				$student->updateamum = date('Y-m-d H:i:s');
-				$student->updatevon = $user;
+				$prestudent->uid = $_POST['uid'];
+				$prestudent->perskz = $_POST['perskz'];
+				$prestudent->updateamum = date('Y-m-d H:i:s');
+				$prestudent->updatevon = $user;
+				$prestudent->anmerkungen = $_POST['anmerkung'];
+
+				$person->anrede = $_POST['anrede'];
+				$person->titelpre = $_POST['titelpre'];
+				$person->titelpost = $_POST['titelpost'];
+				$person->vorname = $_POST['vorname'];
+				$person->vornamen = $_POST['vornamen'];
+				$person->nachname = $_POST['nachname'];
+				$person->gebdatum = $_POST['geburtsdatum'];
+				$person->gebort = $_POST['geburtsort'];
+				$person->gebzeit = $_POST['geburtszeit'];
+				$person->homepage = $_POST['homepage'];
+				$person->matr_nr = $_POST['matr_nr'];
+				$person->svnr = $_POST['svnr'];
+				$person->ersatzkennzeichen = $_POST['ersatzkennzeichen'];
+				$person->familienstand = $_POST['familienstand'];
+				$person->geschlecht = $_POST['geschlecht'];
+				$person->anzahlkinder = $_POST['anzahlderkinder'];
+				$person->staatsbuergerschaft = $_POST['staatsbuergerschaft'];
+				$person->geburtsnation = $_POST['geburtsnation'];
+				$person->sprache = $_POST['sprache'];
+				$person->updateamum = date('Y-m-d H:i:s');
+				$person->updatevon = $user;
+
+				$benutzer->aktiv = ($_POST['aktiv']=='true'?true:false);
 
 				if($_POST['alias']!='')
 				{
 					if(checkalias($_POST['alias']))
 					{
-						$student->alias = $_POST['alias'];
+						$benutzer->alias = $_POST['alias'];
 					}
 					else
 					{
@@ -332,7 +356,7 @@ if(!$error)
 					}
 				}
 				else
-					$student->alias = '';
+					$benutzer->alias = '';
 
 				if(!$error)
 				{
@@ -343,13 +367,12 @@ if(!$error)
 					//Sonst nur in der Tabelle Studentlehrverband
 					if($semester_aktuell == $stsem_kurzbz)
 					{
-						$student->studiengang_kz = $_POST['studiengang_kz'];
-						$student->semester = $_POST['semester'];
-						$student->verband = ($_POST['verband']==''?' ':$_POST['verband']);
-						$student->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
+						$prestudent->studiengang_kz = $_POST['studiengang_kz'];
 					}
 
-					$student->new=false;
+					$prestudent->new=false;
+					$benutzer->new=false;
+					$person->new=false;
 
 					$lehrverband = new lehrverband();
 					if(!$lehrverband->exists($_POST['studiengang_kz'],$_POST['semester'],$_POST['verband'], $_POST['gruppe']))
@@ -361,59 +384,62 @@ if(!$error)
 
 					if(!$error)
 					{
-						if($student->save())
+						if($prestudent->validate() && $benutzer->validate() && $person->validate())
 						{
-							$student_lvb = new student();
-
-							// Studentlehrverband Eintrag nur Speichern, wenn der Student in diesem Studiensemester
-							// einen Status besitzt da es sonst beim Bearbeiten von alten Studenten immer in das
-							// entsprechende Studiensemester gewechselt werden muss.
-							$prestudentobj = new prestudent();
-							$prestudentobj->getPrestudentRolle($student->prestudent_id, null, $semester_aktuell);
-
-							if(count($prestudentobj->result)>0)
+							if($prestudent->save() && $benutzer->save() && $person->save())
 							{
-								$tmpStudent = new student($_POST['uid']);
+								$student_lvb = new student();
 
-								if($student_lvb->studentlehrverband_exists($tmpStudent->prestudent_id, $semester_aktuell))
-									$student_lvb->new = false;
-								else
-									$student_lvb->new = true;
+								// Studentlehrverband Eintrag nur Speichern, wenn der Student in diesem Studiensemester
+								// einen Status besitzt da es sonst beim Bearbeiten von alten Studenten immer in das
+								// entsprechende Studiensemester gewechselt werden muss.
+								$prestudentobj = new prestudent();
+								$prestudentobj->getPrestudentRolle($prestudent->prestudent_id, null, $semester_aktuell);
 
-								$student_lvb->uid = $_POST['uid'];
-								$student_lvb->studiensemester_kurzbz = $semester_aktuell;
-								$student_lvb->studiengang_kz = $_POST['studiengang_kz'];
-								$student_lvb->semester = $_POST['semester'];
-								$student_lvb->verband = ($_POST['verband']==''?' ':$_POST['verband']);
-								$student_lvb->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
-								$student_lvb->updateamum = date('Y-m-d H:i:s');
-								$student_lvb->updatevon = $user;
-
-								if($student_lvb->save_studentlehrverband())
+								if(count($prestudentobj->result)>0)
 								{
-									$return = true;
-									$error=false;
-									$data = $student->prestudent_id;
+									$tmpStudent = new student($_POST['uid']);
+
+									if($student_lvb->studentlehrverband_exists($tmpStudent->prestudent_id, $semester_aktuell))
+										$student_lvb->new = false;
+									else
+										$student_lvb->new = true;
+
+									$student_lvb->uid = $_POST['uid'];
+									$student_lvb->studiensemester_kurzbz = $semester_aktuell;
+									$student_lvb->studiengang_kz = $_POST['studiengang_kz'];
+									$student_lvb->semester = $_POST['semester'];
+									$student_lvb->verband = ($_POST['verband']==''?' ':$_POST['verband']);
+									$student_lvb->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
+									$student_lvb->updateamum = date('Y-m-d H:i:s');
+									$student_lvb->updatevon = $user;
+
+									if($student_lvb->save_studentlehrverband())
+									{
+										$return = true;
+										$error=false;
+										$data = $prestudent->prestudent_id;
+									}
+									else
+									{
+										$error = true;
+										$errormsg = $student_lvb->errormsg;
+										$return = false;
+									}
 								}
 								else
 								{
-									$error = true;
-									$errormsg = $student_lvb->errormsg;
-									$return = false;
+									$error = false;
+									$return = true;
+									$data = $student->prestudent_id;
 								}
 							}
 							else
 							{
-								$error = false;
-								$return = true;
-								$data = $student->prestudent_id;
+								$return = false;
+								$errormsg = $student->errormsg;
+								$error = true;
 							}
-						}
-						else
-						{
-							$return = false;
-							$errormsg = $student->errormsg;
-							$error = true;
 						}
 					}
 				}
@@ -670,26 +696,26 @@ if(!$error)
 					}
 
 					if(!defined("ZGV_CHECK") || ZGV_CHECK)
-                    {
-                        if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgv_code=='')
-                        {
-                            $error = true;
-                            $errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung eingetragen sein.";
-                            $anzahl_fehler++;
-                        }
-                    }
+					{
+						if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgv_code=='')
+						{
+							$error = true;
+							$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung eingetragen sein.";
+							$anzahl_fehler++;
+						}
+					}
 
 					$stg_obj = new studiengang();
 					$stg_obj->load($prestd->studiengang_kz);
-                    if(!defined("ZGV_CHECK") || ZGV_CHECK)
-                    {
-                        if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgvmas_code=='' && $stg_obj->typ=='m')
-                        {
-                            $error = true;
-                            $errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung Master eingetragen sein.";
-                            $anzahl_fehler++;
-                        }
-                    }
+					if(!defined("ZGV_CHECK") || ZGV_CHECK)
+					{
+						if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgvmas_code=='' && $stg_obj->typ=='m')
+						{
+							$error = true;
+							$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung Master eingetragen sein.";
+							$anzahl_fehler++;
+						}
+					}
 
 					if(!$error)
 					{
@@ -1746,18 +1772,18 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='deleteGruppenzuteilung')
 	{
-		if(isset($_POST['uid']) && isset($_POST['gruppe_kurzbz']))
+		if(isset($_POST['preid']) && isset($_POST['gruppe_kurzbz']))
 		{
 			$gruppe = new gruppe();
 			if($gruppe->load($_POST['gruppe_kurzbz']))
 			{
-				$uids = explode(';',$_POST['uid']);
+				$preids = explode(';',$_POST['preid']);
 				$errormsg = '';
-				foreach ($uids as $uid)
+				foreach ($preids as $preid)
 				{
-					if($uid!='')
+					if(is_numeric($preid))
 					{
-						$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($uid);
+						$qry = "SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($preid);
 						if($result = $db->db_query($qry))
 						{
 							if($row = $db->db_fetch_object($result))
@@ -1776,17 +1802,17 @@ if(!$error)
 								{
 									$benutzergruppe = new benutzergruppe();
 
-									if(!$benutzergruppe->delete($uid, $_POST['gruppe_kurzbz']))
+									if(!$benutzergruppe->delete($preid, $_POST['gruppe_kurzbz']))
 									{
-										$errormsg .= "$uid konnte nicht aus der Gruppe geloescht werden\n";
+										$errormsg .= "$preid konnte nicht aus der Gruppe geloescht werden\n";
 									}
 								}
 							}
 							else
-								$errormsg .= "Studiengang von $uid konnte nicht ermittelt werden\n";
+								$errormsg .= "Studiengang von $preid konnte nicht ermittelt werden\n";
 						}
 						else
-							$errormsg .= "Studiengang von $uid konnte nicht ermittelt werden\n";
+							$errormsg .= "Studiengang von $preid konnte nicht ermittelt werden\n";
 					}
 				}
 				if($errormsg=='')
@@ -2627,13 +2653,13 @@ if(!$error)
 		//Speichert einen Noteneintrag
 		$noten = new zeugnisnote();
 		$lehrveranstaltung_id = filter_input(INPUT_POST, 'lehrveranstaltung_id');
-		$student_uid = filter_input(INPUT_POST, 'student_uid');
+		$prestudent_id = filter_input(INPUT_POST, 'prestudent_id');
 		$studiensemester_kurzbz = filter_input(INPUT_POST, 'studiensemester_kurzbz');
 
-		if(!is_null($lehrveranstaltung_id) && !is_null($student_uid) && !is_null($studiensemester_kurzbz))
+		if(!is_null($lehrveranstaltung_id) && is_numeric($prestudent_id) && !is_null($studiensemester_kurzbz))
 		{
 			//Berechtigung pruefen
-			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($student_uid);
+			$qry = "SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($prestudent_id);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2676,7 +2702,7 @@ if(!$error)
 						$log = new log();
 						$log->executetime = date('Y-m-d H:i:s');
 						$log->mitarbeiter_uid = $user;
-						$log->beschreibung = "Ändern der Note ".$noten->note." bei ".$noten->student_uid;
+						$log->beschreibung = "Ändern der Note ".$noten->note." bei ".$noten->prestudent_id;
 						$log->sql = 'UPDATE lehre.tbl_zeugnisnote SET '.
 								'note='.$db->db_add_param($noten->note).', '.
 								'punkte='.$db->db_add_param($noten->punkte).','.
@@ -2699,7 +2725,7 @@ if(!$error)
 					}
 
 					$noten->lehrveranstaltung_id = $_POST['lehrveranstaltung_id'];
-					$noten->student_uid = $_POST['student_uid'];
+					$noten->prestudent_id = $_POST['prestudent_id'];
 					$noten->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 					$noten->benotungsdatum = date('Y-m-d H:i:s');
 					$noten->note = $_POST['note'];
@@ -2764,7 +2790,7 @@ if(!$error)
 				$errormsg = 'Fehler beim Ermitteln der LVA';
 			}
 
-			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($_POST['student_uid_'.$i]);
+			$qry = "SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($_POST['prestudent_id'.$i]);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2795,10 +2821,9 @@ if(!$error)
 				}
 				else
 				{
-					$student = new student($_POST['student_uid_'.$i]);
-					if($lvgesamtnote->load($_POST['lehrveranstaltung_id_'.$i], $student->prestudent_id, $_POST['studiensemester_kurzbz_'.$i]))
+					if($lvgesamtnote->load($_POST['lehrveranstaltung_id_'.$i], $_POST['prestudent_id'.$i], $_POST['studiensemester_kurzbz_'.$i]))
 					{
-						if($zeugnisnote->load($_POST['lehrveranstaltung_id_'.$i], $_POST['student_uid_'.$i], $_POST['studiensemester_kurzbz_'.$i]))
+						if($zeugnisnote->load($_POST['lehrveranstaltung_id_'.$i], $_POST['prestudent_id'.$i], $_POST['studiensemester_kurzbz_'.$i]))
 						{
 							$zeugnisnote->new = false;
 							$zeugnisnote->updateamum = date('Y-m-d H:i:s');
@@ -2816,7 +2841,7 @@ if(!$error)
 							$zeugnisnote->insertamum = date('Y-m-d H:i:s');
 							$zeugnisnote->insertvon = $user;
 							$zeugnisnote->lehrveranstaltung_id = $_POST['lehrveranstaltung_id_'.$i];
-							$zeugnisnote->student_uid = $_POST['student_uid_'.$i];
+							$zeugnisnote->prestudent_id = $_POST['prestudent_id'.$i];
 							$zeugnisnote->studiensemester_kurzbz = $_POST['studiensemester_kurzbz_'.$i];
 						}
 
@@ -2834,7 +2859,7 @@ if(!$error)
 						{
 							if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
 							{
-								NotePruefungAnlegen($zeugnisnote->studiensemester_kurzbz, $zeugnisnote->student_uid, $zeugnisnote->lehrveranstaltung_id, $zeugnisnote->note);
+								NotePruefungAnlegen($zeugnisnote->studiensemester_kurzbz, $zeugnisnote->prestudent_id, $zeugnisnote->lehrveranstaltung_id, $zeugnisnote->note);
 							}
 						}
 					}
@@ -2888,12 +2913,12 @@ if(!$error)
 				}
 				if(!$error)
 				{
-					$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE trim(matrikelnr)=".$db->db_add_param(trim($_POST['matrikelnummer_'.$i]));
+					$qry = "SELECT uid, studiengang_kz FROM public.tbl_prestudent WHERE trim(perskz)=".$db->db_add_param(trim($_POST['perskz_'.$i]));
 					if($result = $db->db_query($qry))
 					{
 						if($row = $db->db_fetch_object($result))
 						{
-							$uid = $row->student_uid;
+							$preid = $row->prestudent_id;
 							$stg_std = $row->studiengang_kz;
 						}
 						else
@@ -2941,7 +2966,7 @@ if(!$error)
 						}
 						else
 						{
-							if($zeugnisnote->load($_POST['lehrveranstaltung_id'], $uid, $semester_aktuell))
+							if($zeugnisnote->load($_POST['lehrveranstaltung_id'], $preid, $semester_aktuell))
 							{
 								$zeugnisnote->new = false;
 								$zeugnisnote->updateamum = date('Y-m-d H:i:s');
@@ -2959,7 +2984,7 @@ if(!$error)
 								$zeugnisnote->insertamum = date('Y-m-d H:i:s');
 								$zeugnisnote->insertvon = $user;
 								$zeugnisnote->lehrveranstaltung_id = $_POST['lehrveranstaltung_id'];
-								$zeugnisnote->student_uid = $uid;
+								$zeugnisnote->prestudent_id = $preid;
 								$zeugnisnote->studiensemester_kurzbz = $semester_aktuell;
 							}
 
@@ -3017,10 +3042,10 @@ if(!$error)
 
 		$noten = new zeugnisnote();
 		$lehrveranstaltung_id = filter_input(INPUT_POST, 'lehrveranstaltung_id');
-		$student_uid = filter_input(INPUT_POST, 'student_uid');
+		$prestudent_id = filter_input(INPUT_POST, 'prestudent_id');
 		$studiensemester_kurzbz = filter_input(INPUT_POST, 'studiensemester_kurzbz');
 
-		if(!is_null($lehrveranstaltung_id) && !is_null($student_uid) && !is_null($studiensemester_kurzbz))
+		if(!is_null($lehrveranstaltung_id) && is_numeric($prestudent_id) && !is_null($studiensemester_kurzbz))
 		{
 			//Berechtigung pruefen
 			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
@@ -3044,7 +3069,7 @@ if(!$error)
 				$errormsg = 'Fehler beim Ermitteln der LVA';
 			}
 
-			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($student_uid);
+			$qry = "SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($prestudent_id);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -3076,16 +3101,16 @@ if(!$error)
 				}
 				else
 				{
-					$noten->load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz);
-					if($noten->delete($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz))
+					$noten->load($lehrveranstaltung_id, $prestudent_id, $studiensemester_kurzbz);
+					if($noten->delete($lehrveranstaltung_id, $prestudent_id, $studiensemester_kurzbz))
 					{
 						$log = new log();
 						$log->executetime = date('Y-m-d H:i:s');
 						$log->mitarbeiter_uid = $user;
-						$log->beschreibung = "Löschen der Note ".$noten->note." bei ".$noten->student_uid;
+						$log->beschreibung = "Löschen der Note ".$noten->note." bei ".$noten->prestudent_id;
 						$log->sql = "DELETE FROM lehre.tbl_zeugnisnote WHERE
 								lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER, false)." AND
-								student_uid=".$db->db_add_param($student_uid)." AND
+								prestudent_id=".$db->db_add_param($prestudent_id)." AND
 								studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz).";";
 						$log->sqlundo = $noten->getUndo('insert');
 						$log->save(true);
@@ -3174,13 +3199,11 @@ if(!$error)
 
 			if($_POST['pruefungstyp_kurzbz']=='Termin2')
 			{
-				if(!$student = new student($_POST['student_uid']))
-					die("Student nicht gefunden");
 
 				//Wenn ein 2. Termin angelegt wird, und kein 1. Termin vorhanden ist,
 				//dann wird auch ein 1. Termin angelegt mit der derzeitigen Zeugnisnote
 				$qry = "SELECT * FROM lehre.tbl_pruefung WHERE
-						student_uid=".$db->db_add_param($student->prestudent_id)." AND
+						prestudent_id=".$db->db_add_param($_POST['prestudent_id'], FHC_INTEGER)." AND
 						lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND
 						pruefungstyp_kurzbz='Termin1'";
 				if($result = $db->db_query($qry))
@@ -3188,15 +3211,14 @@ if(!$error)
 					if($db->db_num_rows($result)==0)
 					{
 						$qry = "SELECT note,punkte, benotungsdatum FROM lehre.tbl_zeugnisnote JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE
-								student_uid=".$db->db_add_param($_POST['student_uid'])." AND
+								prestudent_id=".$db->db_add_param($student->prestudent_id, FHC_INTEGER)." AND
 								tbl_lehreinheit.lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND
 								tbl_lehreinheit.studiensemester_kurzbz = tbl_zeugnisnote.studiensemester_kurzbz";
 						if($result = $db->db_query($qry))
 						{
 							if($row = $db->db_fetch_object($result))
 							{
-								$student = new student($_POST['student_uid']);
-								
+
 								//Wenn kein Ersttermin existiert, dann wird einer angelegt
 								$ersttermin = new pruefung();
 								$ersttermin->new=true;
@@ -3234,11 +3256,9 @@ if(!$error)
 
 			if(!$error)
 			{
-				if(!$student = new student($_POST['student_uid']))
-					die("Student nicht gefunden");
 
 				$pruefung->lehreinheit_id = $_POST['lehreinheit_id'];
-				$pruefung->prestudent_id = $student->prestudent_id;
+				$pruefung->prestudent_id = $_POST['prestudent_id'];
 				$pruefung->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 				$pruefung->note = $_POST['note'];
 				if(isset($_POST['punkte']))
@@ -3282,7 +3302,7 @@ if(!$error)
 					if(!$error)
 					{
 						$zeugnisnote = new zeugnisnote();
-						if($zeugnisnote->load($lehrveranstaltung_id, $_POST['student_uid'], $studiensemester_kurzbz))
+						if($zeugnisnote->load($lehrveranstaltung_id, $_POST['prestudent_id'], $studiensemester_kurzbz))
 						{
 							if($zeugnisnote->uebernahmedatum=='' ||
 								($datum_obj->mktime_fromtimestamp($zeugnisnote->benotungsdatum) >
@@ -3314,7 +3334,7 @@ if(!$error)
 
 						if(!$error)
 						{
-							$zeugnisnote->student_uid = $_POST['student_uid'];
+							$zeugnisnote->prestudent_id = $_POST['prestudent_id'];
 							$zeugnisnote->lehrveranstaltung_id = $lehrveranstaltung_id;
 							$zeugnisnote->studiensemester_kurzbz = $studiensemester_kurzbz;
 							$zeugnisnote->note = $_POST['note'];
@@ -3397,9 +3417,7 @@ if(!$error)
 				$pruefung->insertvon = $user;
 			}
 
-			if(!$std = new student($_POST['student_uid']))
-				die("Student nicht gefunden");
-			$pruefung->prestudent_id = $std->prestudent_id;
+			$pruefung->prestudent_id = $_POST['prestudent_id'];
 			$pruefung->vorsitz = $_POST['vorsitz'];
 			$pruefung->pruefer1 = $_POST['pruefer1'];
 			$pruefung->pruefer2 = $_POST['pruefer2'];
@@ -3494,13 +3512,11 @@ if(!$error)
 				$projektarbeit->insertvon = $user;
 			}
 
-			$student = new student($_POST['student_uid']);
-
 			$projektarbeit->projekttyp_kurzbz = $_POST['projekttyp_kurzbz'];
 			$projektarbeit->titel = $_POST['titel'];
 			$projektarbeit->titel_english = $_POST['titel_english'];
 			$projektarbeit->lehreinheit_id = $_POST['lehreinheit_id'];
-			$projektarbeit->prestudent_id = $student->prestudent_id;
+			$projektarbeit->prestudent_id = $_POST['prestudent_id'];
 			$projektarbeit->firma_id = $_POST['firma_id'];
 			$projektarbeit->note = $_POST['note'];
 			$projektarbeit->punkte = str_replace(',','.',$_POST['punkte']);

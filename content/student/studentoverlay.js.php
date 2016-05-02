@@ -547,15 +547,15 @@ function StudentGruppeDel()
 	var numRanges = tree.view.selection.getRangeCount();
 	var paramList= '';
 	var anzahl=0;
-	var uids='';
+	var preids='';
 	for (var t = 0; t < numRanges; t++)
 	{
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-			uid = ';'+tree.view.getCellText(v,col);
-			uids = uids + uid;
+			col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			preid = ';'+tree.view.getCellText(v,col);
+			preids = preids + preid;
 			anzahl++;
 		}
 	}
@@ -591,7 +591,7 @@ function StudentGruppeDel()
 		var req = new phpRequest('student/studentDBDML.php','','');
 
 		req.add('type','deleteGruppenzuteilung');
-		req.add('uid',uids);
+		req.add('prestudent_id',preids);
 		req.add('gruppe_kurzbz', gruppe_kurzbz);
 
 		var response = req.executePOST();
@@ -686,7 +686,9 @@ function StudentDetailSave()
 	//Werte holen
 	var person_id = document.getElementById('student-detail-textbox-person_id').value;
 	var uid = document.getElementById('student-detail-textbox-uid').value;
+	var perskz = document.getElementById('student-detail-textbox-matrikelnummer').value;
 	var prestudent_id = document.getElementById('student-detail-textbox-prestudent_id').value;
+	var uid = document.getElementById('student-detail-textbox-uid').value;
 	var anrede = document.getElementById('student-detail-textbox-anrede').value;
 	var titelpre = document.getElementById('student-detail-textbox-titelpre').value;
 	var titelpost = document.getElementById('student-detail-textbox-titelpost').value;
@@ -738,13 +740,15 @@ function StudentDetailSave()
 		req.add('do','update');
 	}
 
-	if(uid=='')
+	if(!prestudent_id || !parseInt(prestudent_id))
 		req.add('type', 'saveperson');
 	else
 		req.add('type', 'savestudent');
 
 	req.add('person_id', person_id);
+	req.add('prestudent_id', prestudent_id);
 	req.add('uid', uid);
+	req.add('perskz', perskz);
 	req.add('anrede', anrede);
 	req.add('titelpre', titelpre);
 	req.add('titelpost', titelpost);
@@ -2093,7 +2097,7 @@ function StudentAddRolle(rolle, semester, studiensemester)
 
 		req.add('prestudent_id', paramList);
 		req.add('status_kurzbz', rolle);
-		req.add('semester', semester);
+
 		if(typeof(studiensemester)!='unknown')
 			req.add('studiensemester_kurzbz', studiensemester);
 
@@ -3257,7 +3261,6 @@ function StudentIODetailSpeichern()
 	req.add('mobilitaetsprogramm_code', mobilitaetsprogramm);
 	req.add('nation_code', nation_code);
 	req.add('zweck_code', zweck_code);
-	req.add('student_uid', uid);
 	req.add('prestudent_id', prestudent_id);
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('lehreinheit_id', lehreinheit_id);
@@ -3718,10 +3721,10 @@ function StudentNoteSpeichern()
 	}
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
+	var col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
 	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
-	var col = tree.columns ? tree.columns["student-noten-tree-student_uid"] : "student-noten-tree-student_uid";
-	var student_uid=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["student-noten-tree-prestudent_id"] : "student-noten-tree-prestudent_id";
+	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
 	var col = tree.columns ? tree.columns["student-noten-tree-studiensemester_kurzbz"] : "student-noten-tree-studiensemester_kurzbz";
 	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 
@@ -3735,7 +3738,7 @@ function StudentNoteSpeichern()
 	req.add('type', 'savenote');
 
 	req.add('lehrveranstaltung_id', lehrveranstaltung_id);
-	req.add('student_uid', student_uid);
+	req.add('prestudent_id', prestudent_id);
 	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 	req.add('note', note);
 	req.add('punkte', punkte);
@@ -3786,13 +3789,13 @@ function StudentNotenMove()
 		{
 			col = tree.columns ? tree.columns["student-lvgesamtnoten-tree-lehrveranstaltung_id"] : "student-lvgesamtnoten-tree-lehrveranstaltung_id";
 			lehrveranstaltung_id = tree.view.getCellText(v,col);
-			col = tree.columns ? tree.columns["student-lvgesamtnoten-tree-student_uid"] : "student-lvgesamtnoten-tree-student_uid";
-			student_uid = tree.view.getCellText(v,col);
+			col = tree.columns ? tree.columns["student-lvgesamtnoten-tree-prestudent_id"] : "student-lvgesamtnoten-tree-prestudent_id";
+			prestudent_id = tree.view.getCellText(v,col);
 			col = tree.columns ? tree.columns["student-lvgesamtnoten-tree-studiensemester_kurzbz"] : "student-lvgesamtnoten-tree-studiensemester_kurzbz";
 			studiensemester_kurzbz = tree.view.getCellText(v,col);
 
 			req.add('lehrveranstaltung_id_'+i, lehrveranstaltung_id);
-			req.add('student_uid_'+i, student_uid);
+			req.add('prestudent_id_'+i, prestudent_id);
 			req.add('studiensemester_kurzbz_'+i, studiensemester_kurzbz);
 			i++;
 		}
@@ -3830,8 +3833,8 @@ function StudentNotenDelete()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-noten-tree');
 
-	col = tree.columns ? tree.columns["student-noten-tree-student_uid"] : "student-noten-tree-student_uid";
-	uid = tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["student-noten-tree-prestudent_id"] : "student-noten-tree-prestudent_id";
+	prestudent_id = tree.view.getCellText(tree.currentIndex,col);
 
 	col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
 	lvid = tree.view.getCellText(tree.currentIndex,col);
@@ -3847,7 +3850,7 @@ function StudentNotenDelete()
 		req.add('type', 'deletenote');
 
 		req.add('lehrveranstaltung_id', lvid);
-		req.add('student_uid', uid);
+		req.add('prestudent_id', prestudent_id);
 		req.add('studiensemester_kurzbz', stsem);
 
 		var response = req.executePOST();
@@ -4231,8 +4234,8 @@ function StudentPruefungDetailSpeichern()
 		alert('Student muss ausgewaehlt sein');
 		return;
 	}
-    var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-	var student_uid=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
 
 	if(datum!='' && !CheckDatum(datum))
 	{
@@ -4259,7 +4262,7 @@ function StudentPruefungDetailSpeichern()
 	req.add('anmerkung', anmerkung);
 	req.add('neu', neu);
 	req.add('pruefung_id', pruefung_id);
-	req.add('student_uid', student_uid);
+	req.add('prestudent_id', prestudent_id);
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('punkte', punkte);
 

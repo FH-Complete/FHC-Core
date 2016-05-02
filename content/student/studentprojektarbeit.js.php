@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../config/vilesci.config.inc.php');
@@ -319,7 +320,6 @@ function StudentProjektarbeitAuswahl()
 	lehreinheit_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehreinheit_id" ));
 	lehrveranstaltung_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrveranstaltung_id" ));
 	lehreinheit_stsem = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehreinheit_stsem" ));
-	student_uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#student_uid" ));
 	firma_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#firma_id" ));
 	note = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#note" ));
 	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
@@ -486,12 +486,12 @@ function StudentProjektarbeitSpeichern()
 	anmerkung = document.getElementById('student-projektarbeit-textbox-anmerkung').value;
 	neu = document.getElementById('student-projektarbeit-checkbox-neu').checked;
 
-	student_uid =document.getElementById('student-detail-textbox-uid').value;
+	prestudent_id =document.getElementById('student-detail-textbox-prestudent_id').value;
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	
-	if(student_uid=='')
+	if(!parseInt(prestudent_id))
 	{
-		alert('UID dieser Person konnte nicht ermittelt werden');
+		alert('prestudent_id dieser Person konnte nicht ermittelt werden');
 		return false;
 	}
 	
@@ -533,7 +533,7 @@ function StudentProjektarbeitSpeichern()
 	req.add('titel', titel);
 	req.add('titel_english', titel_english);
 	req.add('lehreinheit_id', lehreinheit_id);
-	req.add('student_uid', student_uid);
+	req.add('prestudent_id', prestudent_id);
 	req.add('firma_id', firma_id);
 	req.add('note', note);
 	req.add('punkte', punkte);
@@ -626,7 +626,7 @@ function StudentProjektarbeitLoeschen()
 	}
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-projektarbeit-tree-projektarbeit_id"] : "student-projektarbeit-tree-projektarbeit_id";
+	var col = tree.columns ? tree.columns["student-projektarbeit-tree-projektarbeit_id"] : "student-projektarbeit-tree-projektarbeit_id";
 	var projektarbeit_id=tree.view.getCellText(tree.currentIndex,col);
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	

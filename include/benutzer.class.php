@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/person.class.php');
 
@@ -83,7 +84,7 @@ class benutzer extends person
 	 * auf Gueltigkeit.
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	protected function validate()
+	public function validate()
 	{
 		if(mb_strlen($this->uid)>32)
 		{

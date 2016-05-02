@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../config/vilesci.config.inc.php');
@@ -456,7 +457,7 @@ function StudentAbschlusspruefungSpeichern()
 		return false;
 	}
 
-	var student_uid = getTreeCellText(tree, "student-treecol-uid", tree.currentIndex);
+	var prestudent_id = getTreeCellText(tree, "student-treecol-prestudent_id", tree.currentIndex);
 
 	//Datum pruefen
 	if(datum!='' && !CheckDatum(datum))
@@ -476,7 +477,7 @@ function StudentAbschlusspruefungSpeichern()
 
 	req.add('type', 'saveabschlusspruefung');
 
-	req.add('student_uid', student_uid);
+	req.add('prestudent_id', prestudent_id);
 	req.add('vorsitz', vorsitz);
 	req.add('pruefer1', pruefer1);
 	req.add('pruefer2', pruefer2);
