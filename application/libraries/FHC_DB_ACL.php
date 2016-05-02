@@ -34,7 +34,7 @@ require_once(FCPATH.'include/benutzerberechtigung.class.php');
 class FHC_DB_ACL
 {
 	public $bb;
-	protected $uid;
+	protected $_uid;
 
 	/**
 	 * Auth Username, Password over FH-Complete
@@ -46,12 +46,23 @@ class FHC_DB_ACL
 	function __construct($param)
 	{
 		$this->bb = new benutzerberechtigung();
-		$this->uid = $param['uid'];
+		$this->_uid = $param['uid'];
 	}
 
 	function isBerechtigt($berechtigung_kurzbz, $art=null,  $oe_kurzbz=null,  $kostenstelle_id=null)
 	{
-		$this->bb->getBerechtigungen($this->uid);
+		$this->bb->getBerechtigungen($this->_uid);
 		return $this->bb->isBerechtigt($berechtigung_kurzbz, $oe_kurzbz=null, $art=null, $kostenstelle_id=null);
+	}
+
+	/** ---------------------------------------------------------------
+	 * Set UID
+	 *
+	 * @param   string  $uid
+	 * @return  bool
+	 */
+	public function setUID($uid)
+	{
+		return $this->_uid = $uid;
 	}
 }

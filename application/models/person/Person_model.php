@@ -19,8 +19,8 @@ class Person_model extends DB_Model
 		
 		// Checks if the operation is permitted by the API caller
 		// All the code should be put inside this if statement
-		if(isAllowed($this->getAddonID(), 'person'))
-		{
+		/*if(isAllowed($this->getAddonID(), 'person'))
+		{*/
 			if((isset($code)) && (isset($email)))
 			{
 				$result = $this->_getPersonByCodeAndEmail($code, $email);
@@ -33,7 +33,7 @@ class Person_model extends DB_Model
 			{
 				$result = $this->_getPersonByID($personId);
 			}
-		}
+		//}
 		
 		return $result;
 	}

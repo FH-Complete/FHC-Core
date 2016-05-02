@@ -31,7 +31,7 @@ class DB_Model extends FHC_Model
 			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
 
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt((string)($this->acl[$this->dbTable]), 'i'))
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 'i'))
 			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
 
 		// DB-INSERT
@@ -54,7 +54,7 @@ class DB_Model extends FHC_Model
 			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
 		
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt((string)($this->acl[$this->dbTable]), 'ui'))
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 'ui'))
 			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
 
 		// DB-REPLACE
@@ -80,11 +80,20 @@ class DB_Model extends FHC_Model
 			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
 		
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt((string)($this->acl[$this->dbTable]), 'u'))
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 'u'))
 			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
 
 		// DB-UPDATE
-		$this->db->where($this->pk, $id);
+		// Check for composite Primary Key
+		if (is_array($id))
+		{
+			if (isset($id[0]))
+				$this->db->where($this->_arrayMergeIndex($this->pk, $id));
+			else
+				$this->db->where($id);
+		}
+		else
+			$this->db->where($this->pk, $id);
 		if ($this->db->update($this->dbTable, $data))
 			return $this->_success($id);
 		else
@@ -92,9 +101,9 @@ class DB_Model extends FHC_Model
 	}
 
 	/** ---------------------------------------------------------------
-	 * Load data from DB-Table
+	 * Load single data from DB-Table
 	 *
-	 * @param   string $id  Primary Key for SELECT
+	 * @param   string $id  ID (Primary Key) for SELECT ... WHERE
 	 * @return  array
 	 */
 	public function load($id)
@@ -106,12 +115,46 @@ class DB_Model extends FHC_Model
 			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
 		
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt((string)($this->acl[$this->dbTable]), 's'))
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 's'))
 			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
 
 		// DB-SELECT
-		$result = $this->db->get_where($this->dbTable, array($this->pk => $id));
-		//var_dump($result);
+		// Check for composite Primary Key
+		if (is_array($id))
+		{
+			if (isset($id[0]))
+				$result = $this->db->get_where($this->dbTable, $this->_arrayMergeIndex($this->pk, $id));
+			else
+				$result = $this->db->get_where($this->dbTable, $id);
+		}
+		else
+			$result = $this->db->get_where($this->dbTable, array($this->pk => $id));
+		if ($result)
+			return $this->_success($result);
+		else
+			return $this->_error($this->db->error(), FHC_DB_ERROR);
+	}
+
+	/** ---------------------------------------------------------------
+	 * Load data from DB-Table
+	 *
+	* @return  array
+	 */
+	public function loadWhere($where = null)
+	{
+		// Check Class-Attributes
+		if(is_null($this->dbTable))
+			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+		
+		// Check rights
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
+
+		// DB-SELECT
+		if (is_null($where))
+			$result = $this->db->get($this->dbTable);
+		else
+			$result = $this->db->get_where($this->dbTable, $where);
 		if ($result)
 			return $this->_success($result);
 		else
@@ -137,16 +180,44 @@ class DB_Model extends FHC_Model
 			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
 
 		// DB-DELETE
-		if ($this->db->delete($this->dbTable, array($this->pk => $id)))
+		// Check for composite Primary Key
+		if (is_array($id))
+		{
+			if (isset($id[0]))
+				$result = $this->db->delete($this->dbTable, $this->_arrayMergeIndex($this->pk, $id));
+			else
+				$result = $this->db->delete($this->dbTable, $id);
+		}
+		else
+			$result = $this->db->delete($this->dbTable, array($this->pk => $id));
+		if ($result)
 			return $this->_success($id);
 		else
 			return $this->_error($this->db->error(), FHC_DB_ERROR);
 	}
 
 	/** ---------------------------------------------------------------
+	 * Convert PG-Boolean to PHP-Boolean
+	 *
+	 * @param   char	$b	PG-Char to convert
+	 * @return  bool
+	 */
+	public function pgBoolPhp($b)
+	{
+		if (is_null($b))
+			return null;
+		elseif ($b==='t')
+			return true;
+		else
+			return false;
+	}
+
+	/** ---------------------------------------------------------------
 	 * Convert PG-Array to PHP-Array
 	 *
-	 * @param   integer  config.php error code numbers
+	 * @param   string	$s		PG-String to convert
+	 * @param   string	$start	start-point for recursive iterations
+	 * @param   string	$end	end-point for recursive iterations
 	 * @return  array
 	 */
 	public function pgArrayPhp($s,$start=0,&$end=NULL)
@@ -195,6 +266,22 @@ class DB_Model extends FHC_Model
 		return $return;
 	}
 
+	/** ---------------------------------------------------------------
+	 * Invalid ID
+	 *
+	 * @param   array $i	Array with indexes.
+	 * @param   array $v	Array with values.
+	 * @return  array
+	 */
+	protected function _arrayMergeIndex($i,$v)
+	{
+		if (count($i) != count($v))
+			return false;
+		for ($j=0; $j < count($i); $j++)
+			$a[$i[$j]] = $v[$j];
+		return $a;
+	}
+	
 	/** ---------------------------------------------------------------
 	 * Invalid ID
 	 *

@@ -22,7 +22,12 @@ class ModelTest extends FHC_Controller
 	 */
 	public function index()
 	{
-		$this->session->uid='admin';	// Should normaly be set through auth
+		//$this->session->uid='admin';	// Should normaly be set through auth
+		$this->load->model('person/Person_model');
+		$this->Person_model->setUID('admin');	// Should normaly be set through auth
+		$res = $this->Person_model->getPerson(null, 'asdf\' OR person_id=1; SELECT 1; --');
+		var_dump($res->result_object());
+
 		$this->load->model('person/Prestudent_model');
 		$id=null;
 		
@@ -35,7 +40,7 @@ class ModelTest extends FHC_Controller
 		);
 		$res = $this->Prestudent_model->insert($data);
 		if ($res->error)
-			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+			echo 'Error: ',$res->error, ', Code: ',$res->fhcCode,' -> ',$res->msg,': ',$res->retval,'<br/>';
 		else
 			$id=$res->retval;
 
@@ -48,7 +53,7 @@ class ModelTest extends FHC_Controller
 		);
 		$res = $this->Prestudent_model->update($id, $data);
 		if ($res->error)
-			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+			echo 'Error: ',$res->error, ', Code: ',$res->fhcCode,' -> ',$res->msg,': ',$res->retval,'<br/>';
 		else
 			$id=$res->retval;
 		
@@ -62,21 +67,55 @@ class ModelTest extends FHC_Controller
 		);
 		$res = $this->Prestudent_model->replace($data);
 		if ($res->error)
-			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval;
+			echo 'Error: ',$res->error, ', Code: ',$res->fhcCode,' -> ',$res->msg,': ',$res->retval;
 		else
-			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval;*/
+			echo 'Error: ',$res->error, ', Code: ',$res->fhcCode,' -> ',$res->msg,': ',$res->retval;*/
 		
 		// Load PreStudent
 		$res = $this->Prestudent_model->load($id);
 		if ($res->error)
-			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+			echo 'Error: ',$res->error, ', Code: ',$res->fhcCode,' -> ',$res->msg,': ',$res->retval,'<br/>';
 		else
 			var_dump($res->retval);
 
+		// Insert PreStudentStatus
+		$this->load->model('person/Prestudentstatus_model');
+		$data = array
+		(
+			'prestudent_id' => $id,
+			'status_kurzbz' => 'Interessent',
+			'studiensemester_kurzbz' => 'WS2001',
+			'ausbildungssemester' => 1
+		);
+		$res = $this->Prestudentstatus_model->insert($data);
+		var_dump($res->retval);
+		
+		// Load PreStudentStatus
+		$res = $this->Prestudentstatus_model->load($data);
+		var_dump($res->retval->result_object());
+		$res = $this->Prestudentstatus_model->load(array($id,'Interessent', 'WS2001', 1));
+		var_dump($res->retval->result_object());
+		
+		// Update PreStudentStatus
+		$res = $this->Prestudentstatus_model->update($data, array
+			(
+				'prestudent_id' => $id,
+				'status_kurzbz' => 'Bewerber',
+				'studiensemester_kurzbz' => 'WS2011',
+				'ausbildungssemester' => 2
+			));
+		var_dump($res->retval);
+		$res = $this->Prestudentstatus_model->update(array($id,'Bewerber', 'WS2011', 2), $data );
+		var_dump($res->retval);
+		
+		// Delete PreStudentStatus
+		$res = $this->Prestudentstatus_model->delete($data);
+		var_dump($res->retval);
+		
 		// Delete PreStudent
 		$res = $this->Prestudent_model->delete($id);
 		if ($res->error)
-			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+			echo 'Error: ',$res->error, ', Code: ',$res->fhcCode,' -> ',$res->msg,': ',$res->retval,'<br/>';
 		else
 			var_dump($res->retval);
 
@@ -91,12 +130,12 @@ class ModelTest extends FHC_Controller
 		);
 		$res = $this->Organisationseinheit_model->insert($data);
 		if ($res->error)
-			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+			echo 'Error: ',$res->error, ', Code: ',$res->fhcCode,' -> ',$res->msg,': ',$res->retval,'<br/>';
 		else
 			$id = $data['oe_kurzbz'];
 		var_dump($res);
 
-		// Update PreStudent
+		// Update OE
 		$data = array
 		(
 			'freigabegrenze' => 1234.56,
@@ -105,14 +144,14 @@ class ModelTest extends FHC_Controller
 		);
 		$res = $this->Organisationseinheit_model->update($id, $data);
 		if ($res->error)
-			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+			echo 'Error: ',$res->error, ', Code: ',$res->fhcCode,' -> ',$res->msg,': ',$res->retval,'<br/>';
 		else
 			$id=$res->retval;
-		
-		// Delete PreStudent
+
+		// Delete Organisationseinheit
 		$res = $this->Organisationseinheit_model->delete($id);
 		if ($res->error)
-			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+			echo 'Error: ',$res->error, ', Code: ',$res->fhcCode,' -> ',$res->msg,': ',$res->retval,'<br/>';
 		else
 			var_dump($res->retval);
 
@@ -127,7 +166,7 @@ class ModelTest extends FHC_Controller
 		);
 		$res = $this->Sprache_model->insert($data);
 		if ($res->error)
-			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+			echo 'Error: ',$res->error, ', Code: ',$res->fhcCode,' -> ',$res->msg,': ',$res->retval,'<br/>';
 		else
 			$id = $data['sprache'];
 		var_dump($res);
@@ -141,24 +180,37 @@ class ModelTest extends FHC_Controller
 		);
 		$res = $this->Sprache_model->update($id, $data);
 		if ($res->error)
-			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+			echo 'Error: ',$res->error, ', Code: ',$res->fhcCode,' -> ',$res->msg,': ',$res->retval,'<br/>';
 		else
 			$id=$res->retval; //echo $id;
 
 		// Load Sprache
 		$res = $this->Sprache_model->load($id);
 		if ($res->error)
-			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+			echo 'Error: ',$res->error, ', Code: ',$res->fhcCode,' -> ',$res->msg,': ',$res->retval,'<br/>';
 		else
 		{
 			$result = $res->retval->result_object();
+			var_dump($result);
 			var_dump($this->Sprache_model->pgArrayPhp($result[0]->bezeichnung));
+			var_dump($this->Sprache_model->pgBoolPhp($result[0]->content));
+		}
+
+		// Load All Sprache
+		$res = $this->Sprache_model->loadWhere();
+		if ($res->error)
+			echo 'Error: ',$res->error, ', Code: ',$res->fhcCode,' -> ',$res->msg,': ',$res->retval,'<br/>';
+		else
+		{
+			var_dump($res->retval);			
+			$result = $res->retval->result_object();
+			var_dump($result);
 		}
 
 		// Delete Sprache
 		$res = $this->Sprache_model->delete($id);
 		if ($res->error)
-			echo 'Error: ',$res->error, ', Code: ',$res->code,' -> ',$res->msg,': ',$res->retval,'<br/>';
+			echo 'Error: ',$res->error, ', Code: ',$res->fhcCode,' -> ',$res->msg,': ',$res->retval,'<br/>';
 		else
 			var_dump($res->retval);
 	}

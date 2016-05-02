@@ -18,6 +18,17 @@ class FHC_Model extends CI_Model
 	}
 
 	/** ---------------------------------------------------------------
+	 * Set UID
+	 *
+	 * @param   string  $uid
+	 * @return  bool
+	 */
+	public function setUID($uid)
+	{
+		return $this->fhc_db_acl->setUID($uid);
+	}
+
+	/** ---------------------------------------------------------------
 	 * Success
 	 *
 	 * @param   mixed  $retval
@@ -27,7 +38,7 @@ class FHC_Model extends CI_Model
 	{
 		$return = new stdClass();
 		$return->error = EXIT_SUCCESS;
-		$return->code = $message;
+		$return->fhcCode = $message;
 		$return->msg = lang('fhc_' . $message);
 		$return->retval = $retval;
 		return $return;
@@ -42,7 +53,7 @@ class FHC_Model extends CI_Model
 	{
 		$return = new stdClass();
 		$return->error = EXIT_MODEL;
-		$return->code = $message;
+		$return->fhcCode = $message;
 		$return->msg = lang('fhc_' . $message);
 		$return->retval = $retval;
 		return $return;
