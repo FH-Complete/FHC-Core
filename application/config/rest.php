@@ -119,7 +119,8 @@ $config['rest_auth'] = 'basic';
 |
 | Is login required and if so, the user store to use
 |
-| ''        Use config based users or wildcard testing
+| ''        Use config based users or wildcard testing, only for testing purpose
+|			it would be very unsecure to let unset in a production environment
 | 'ldap'    Use LDAP authentication
 | 'library' Use a authentication library
 |
@@ -139,13 +140,16 @@ $config['auth_source'] = 'library';
 | In other cases override the function _perform_library_auth in your controller
 |
 | For digest authentication the library function should return already a stored
-| md5(username:restrealm:password) for that username
-|
-| e.g: md5('admin:REST API:1234') = '1e957ebc35631ab22d5bd6526bd14ea2'
+| password for that username, even if it is hashed
 |
 */
 $config['auth_library_class'] = 'FHC_Auth';
-$config['auth_library_function'] = 'auth';
+
+// rest_auth is basic
+$config['auth_library_function'] = 'basicAuthentication';
+
+// rest_auth is digest
+//$config['auth_library_function'] = 'digestAuthentication';
 
 /*
 |--------------------------------------------------------------------------
@@ -211,7 +215,7 @@ $config['auth_override_class_method_http']['Kontakt']['kontaktPerson']['get'] = 
 | Array of usernames and passwords for login, if ldap (even library) is configured this is ignored
 |
 */
-$config['rest_valid_logins'] = ['admin' => '1234', 'test' => 'test'];
+//$config['rest_valid_logins'] = ['admin' => '1234', 'test' => 'test'];
 
 /*
 |--------------------------------------------------------------------------
@@ -228,7 +232,7 @@ $config['rest_valid_logins'] = ['admin' => '1234', 'test' => 'test'];
 |    restrict certain methods to IPs in your whitelist
 |
 */
-$config['rest_ip_whitelist_enabled'] = TRUE;
+$config['rest_ip_whitelist_enabled'] = FALSE;
 
 /*
 |--------------------------------------------------------------------------

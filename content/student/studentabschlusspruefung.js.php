@@ -398,6 +398,8 @@ function StudentAbschlusspruefungAuswahl()
 	document.getElementById('student-abschlusspruefung-menulist-notekommpruef').value=notekommpruef;
 	document.getElementById('student-abschlusspruefung-menulist-akadgrad').value=akadgrad_id;
 	document.getElementById('student-abschlusspruefung-datum-datum').value=datum;
+	if(uhrzeit=='')
+		uhrzeit='00:00';
 	document.getElementById('student-abschlusspruefung-datum-uhrzeit').value=uhrzeit;
 	document.getElementById('student-abschlusspruefung-datum-sponsion').value=sponsion;
 	document.getElementById('student-abschlusspruefung-menulist-typ').value=pruefungstyp_kurzbz;

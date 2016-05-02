@@ -471,7 +471,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       <text:p text:style-name="P4">(kurz „a.o. Studentin“ bzw. „a.o. Student“ genannt) andererseits, im Rahmen des Lehrgangs zur Weiterbildung nach §9 FHStG idgF</text:p>
       <text:p text:style-name="P11"/>
       <xsl:variable select="studiengang" name="studiengang"/>
-	  <xsl:variable name="stglaenge" select="format-number((string-length($studiengang)*0.21), '#.00')"/>
+	  <xsl:variable name="stglaenge" select="format-number((string-length($studiengang)*0.23), '#.00')"/>
       <text:p text:style-name="P4">
       		<text:span text:style-name="T1">
       			<draw:control text:anchor-type="as-char" svg:y="-0.45cm" draw:z-index="6" draw:style-name="gr2" draw:text-style-name="P140" svg:width="{$stglaenge}cm" svg:height="0.5cm" draw:control="control1"/>, Lehrgangsnummer <xsl:value-of select="studiengang_kz"/>,

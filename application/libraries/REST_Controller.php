@@ -351,8 +351,13 @@ abstract class REST_Controller extends CI_Controller {
         self::HTTP_INTERNAL_SERVER_ERROR => 'INTERNAL SERVER ERROR',
         self::HTTP_NOT_IMPLEMENTED => 'NOT IMPLEMENTED'
     ];
+	
+	/**
+	 * 
+	 */
+	protected $_addonID = NULL;
 
-    /**
+	/**
      * Extend this function to apply additional checking early on in the process
      *
      * @access protected
@@ -361,7 +366,7 @@ abstract class REST_Controller extends CI_Controller {
     protected function early_checks()
     {
     }
-
+	
     /**
      * Constructor for the REST API
      *
@@ -528,7 +533,7 @@ abstract class REST_Controller extends CI_Controller {
         {
             $this->_allow = $this->_detect_api_key();
         }
-
+		
         // Only allow ajax requests
         if ($this->input->is_ajax_request() === FALSE && $this->config->item('rest_ajax_only'))
         {
@@ -540,7 +545,7 @@ abstract class REST_Controller extends CI_Controller {
         }
 
         // When there is no specific override for the current class/method, use the default auth value set in the config
-        if ($this->auth_override === FALSE && !($this->config->item('rest_enable_keys') && $this->_allow === TRUE))
+        if ($this->auth_override === FALSE && ($this->config->item('rest_enable_keys') && $this->_allow === TRUE))
         {
             $rest_auth = strtolower($this->config->item('rest_auth'));
             switch ($rest_auth)
@@ -604,8 +609,10 @@ abstract class REST_Controller extends CI_Controller {
         // Remove the supported format from the function name e.g. index.json => index
         $object_called = preg_replace('/^(.*)\.(?:' . implode('|', array_keys($this->_supported_formats)) . ')$/', '$1', $object_called);
 
-        $controller_method = $object_called . '_' . $this->request->method;
-
+        //$controller_method = $object_called . '_' . $this->request->method;
+		// CamelCase compliant
+		$controller_method = $this->request->method.ucfirst($object_called);
+		
         // Do we want to log this method (if allowed by config)?
         $log_method = !(isset($this->methods[$controller_method]['log']) && $this->methods[$controller_method]['log'] === FALSE);
 
@@ -1900,6 +1907,25 @@ abstract class REST_Controller extends CI_Controller {
                 ], self::HTTP_UNAUTHORIZED);
         }
     }
+	
+	/**
+	 * TO BE COMMENTED
+	 */
+	private function _setAddonID($username)
+	{
+		if(!isset($this->_addonID) && isset($username))
+		{
+			$this->_addonID = $username;
+		}
+	}
+
+	/**
+	 * @return int ID of the authenticated addon
+	 */
+	protected function _getAddonID()
+	{
+		return $this->_addonID;
+	}
 
     /**
      * Prepares for basic authentication
@@ -1940,6 +1966,10 @@ abstract class REST_Controller extends CI_Controller {
         {
             $this->_force_login();
         }
+		else // If logged
+		{
+			$this->_setAddonID($username);
+		}
     }
 
     /**
@@ -1978,12 +2008,19 @@ abstract class REST_Controller extends CI_Controller {
         preg_match_all('@(username|nonce|uri|nc|cnonce|qop|response)=[\'"]?([^\'",]+)@', $digest_string, $matches);
         $digest = (empty($matches[1]) || empty($matches[2])) ? [] : array_combine($matches[1], $matches[2]);
 
-        // For digest authentication the library function should return already stored md5(username:restrealm:password) for that username @see rest.php::auth_library_function config
+        // For digest authentication the library function should return 
+		// already stored password for that username, even if it is hashed
         $username = $this->_check_login($digest['username'], TRUE);
-        if (array_key_exists('username', $digest) === FALSE || $username === FALSE)
+		// If there no password
+        if (array_key_exists('username', $digest) === FALSE || $username === FALSE || $username === NULL)
         {
             $this->_force_login($unique_id);
         }
+		// If the password was found for this username, generete the string md5('USERNAME:REALM:PASSWORD')
+		else
+		{
+			$username = md5($digest['username'].":".$this->config->item('rest_realm').":".$username);
+		}
 
         $md5 = md5(strtoupper($this->request->method) . ':' . $digest['uri']);
         $valid_response = md5($username . ':' . $digest['nonce'] . ':' . $digest['nc'] . ':' . $digest['cnonce'] . ':' . $digest['qop'] . ':' . $md5);
@@ -2148,5 +2185,4 @@ abstract class REST_Controller extends CI_Controller {
             ->get($this->config->item('rest_access_table'))
             ->num_rows() > 0;
     }
-
 }

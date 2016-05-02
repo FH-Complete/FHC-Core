@@ -1,0 +1,21 @@
+class_name: ApiTester
+modules:
+    enabled:
+        - \Helper\Api
+        - Db
+        - REST:
+            # API URL
+            url: http://localhost/build/index.ci.php/api/
+            # Can also be a framework module name
+            depends: PhpBrowser
+            # Limits PhpBrowser to JSON or XML
+            part: Json
+    config:
+        Db:
+            dsn: 'pgsql:host=localhost;port=5432;dbname=fhctest'
+            user: 'fhcomplete'
+            password: 'fhcomplete'
+            dump: _data/dump.sql
+            populate: true
+            cleanup: false
+            reconnect: false

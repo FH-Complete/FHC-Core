@@ -2,11 +2,11 @@
 /*
  * Signatur die an E-Mails angehängt wird, die vom System verschickt werden
  */
-$this->phrasen['mail/signatur']="Mit freundlichen Grüßen\n\nFachhochschule Technikum Wien\nHöchstädtplatz 6\n1200 Wien\n";
+$this->phrasen['mail/signatur']="Mit freundlichen Grüßen\n\nIhre Hochschule\n";
 /*
  * Mail, die vom Profil aus an den Einkauf bezüglich Betriebsmittel verschickt wird
  */
-$this->phrasen['mail/profilBetriebsmittelKorrektur']="einkauf@technikum-wien.at";
+$this->phrasen['mail/profilBetriebsmittelKorrektur']="invalid@example.com";
 
 $this->phrasen['mail/accountaktivierung']='<b><center>Account Information</center></b><br>
 Name: %1$s %2$s<br>
@@ -39,4 +39,12 @@ For questions concerning the network services, see<br>
 These pages will give you a detailed overview of all services available.
 <br><br>
 ';
+
+$this->phrasen['mail/incomingRegistrationEmail']='Dies ist eine automatisch generierte E-Mail.<br><br>
+Vielen Dank für Ihre Registrierung.<br><br>Sie wurden erfolgreich am System registriert.
+<br><br><br>Mit Hilfe Ihrer UID: <b>%s</b> können Sie sich in unserem
+System (<a href="'.APP_ROOT.'cis/public/incoming">Link zur Anmeldung</a>) anmelden und Ihre Daten bearbeiten.<br><br><br>
+Mit freundlichen Grüßen,
+Ihre Hochschule';
+
 ?>

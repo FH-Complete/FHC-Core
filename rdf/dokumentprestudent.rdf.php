@@ -86,7 +86,7 @@ foreach ($dok->result as $row)
 				  <RDF:li>
 						<RDF:Description  id="'.$row->dokument_kurzbz.'/'.$a->akte_id.'"  about="'.$rdf_url.'/'.$row->dokument_kurzbz.'/'.$a->akte_id.'" >
 							<DOKUMENT:dokument_kurzbz><![CDATA['.$row->dokument_kurzbz.']]></DOKUMENT:dokument_kurzbz>
-							<DOKUMENT:bezeichnung><![CDATA['.$row->bezeichnung.']]></DOKUMENT:bezeichnung>
+							<DOKUMENT:bezeichnung><![CDATA['.($row->dokument_kurzbz=='Sonst' && $a->titel_intern!==''?$row->bezeichnung.' ('.$a->titel_intern.')':$row->bezeichnung).']]></DOKUMENT:bezeichnung>
 							<DOKUMENT:mitarbeiter_uid><![CDATA['.$mitarbeiter->vorname." ".$mitarbeiter->nachname.']]></DOKUMENT:mitarbeiter_uid>
 							<DOKUMENT:datum>'.$datum.'</DOKUMENT:datum>
 							<DOKUMENT:datumhochgeladen>'.$datumhochgeladen.'</DOKUMENT:datumhochgeladen>

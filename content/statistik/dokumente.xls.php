@@ -127,7 +127,7 @@ if($studiengang_kz!='')
 			$worksheet->write($zeile,++$spalte, $row->status);
 			if(mb_strlen($row->status)>$maxlength[$spalte])
 				$maxlength[$spalte]=mb_strlen($row->status);
-			
+
 			$worksheet->write($zeile,++$spalte, $row->semester, $format_center);
 			if(mb_strlen($row->semester)>$maxlength[$spalte])
 				$maxlength[$spalte]=mb_strlen($row->semester);
@@ -142,11 +142,11 @@ if($studiengang_kz!='')
 			}
 		}
 	}
-	
+
 	//Die Breite der Spalten setzen
 	foreach($maxlength as $i=>$breite)
 		$worksheet->setColumn($i, $i, $breite+2);
-    
+
 	$workbook->close();
 }
 else 

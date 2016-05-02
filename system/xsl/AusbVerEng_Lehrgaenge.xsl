@@ -1034,9 +1034,9 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 					<text:span text:style-name="Strong_20_Emphasis"/>
 				</text:p>
 				<text:p text:style-name="P49"/>
-				<text:p text:style-name="P49">Nach Abschluss aller vorgeschriebenen Prüfungen wird ein Zertifizierungsdiplom der Technikum Wien Academy verliehen.</text:p>
-				<text:p text:style-name="P49">Nach Abschluss aller vorgeschriebenen Prüfungen wird der Titel &quot;Akademische/r &quot; verliehen.</text:p>
-				<text:p text:style-name="P49">Nach Abschluss aller vorgeschriebenen Prüfungen wird der akademische Grad &quot;Master of &quot; verliehen.</text:p>
+				<text:p text:style-name="P49">When all the required examinations have been completed a Technikum Wien Academy diploma certificate will be awarded.</text:p>
+				<text:p text:style-name="P49">When all the required examinations have been completed the title &quot;Academic &quot; will be awarded.</text:p>
+				<text:p text:style-name="P49">When all the required examinations have been completed the academic degree &quot;Master of &quot; will be awarded.</text:p>
 				<text:p text:style-name="P86"/>
 				<text:p text:style-name="P45">
 					<text:span text:style-name="Strong_20_Emphasis">
@@ -1093,6 +1093,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:list xml:id="list111613941182599" text:continue-numbering="true" text:style-name="WW8Num4">
 					<text:list-item>
 						<text:p text:style-name="P81">Die Voraussetzungen zur Erfüllung dieser Verpflichtung sind Gegenstand des vom Kollegium genehmigten Lehrgangs idgF, der Satzung der FH Technikum Wien idgf und der Hausordnung idgF.</text:p>
+						<text:p text:style-name="P81" />
 					</text:list-item>
 					<text:list-item>
 						<text:p text:style-name="P80">Der Erhalter ist weiters verpflichtet, den Lehrgang zur Weiterbildung auf der Grundlage höchster Qualitätsansprüche hinsichtlich der Erreichung der Ausbildungsziele zu gestalten und allfällige Änderungen des akkreditierten Studienganges bekannt zu geben.</text:p>
@@ -1105,10 +1106,11 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:list xml:id="list111613942177494" text:continue-numbering="true" text:style-name="WW8Num4">
 					<text:list-item>
 						<text:p text:style-name="P80">
-							<text:s/>The conditions for the fulfillment of this obligation are the subject of the accredited ?????vom Kollegium genehmigten Lehrgangs idgF??????, the Statutes of the UAS Technikum Wien as amended, and the House Rules as amended. </text:p>
+							<text:s/>The conditions for the fulfillment of this obligation are laid down by the course approved by the UAS Council as amended, by the statutes of the UAS Technikum Wien as amended and by the House Rules as amended.</text:p>
 					</text:list-item>
 					<text:list-item>
 						<text:p text:style-name="P79">The operator also undertakes to design the external study on the basis of the highest possible quality standards as regards the achievement of the educational goals and to make known any changes to the accredited degree program. </text:p>
+						<text:p text:style-name="P81" />
 					</text:list-item>
 					<text:list-item>
 						<text:p text:style-name="P83">The operator is committed to use the personal data of the external students carefully. The data is only to be used within the operator’s legal and contractual obligations as well as its program of studies and is not to be handed on to unauthorized third parties.</text:p>
@@ -1181,11 +1183,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 						<text:span text:style-name="T29">6. Rights and Duties of the external Students</text:span>
 					</text:span>
 				</text:p>
-				<text:p text:style-name="P64">
-					<text:span text:style-name="Strong_20_Emphasis">
-						<text:s/>
-					</text:span>
-				</text:p>
 				<text:p text:style-name="Standard">
 					<text:span text:style-name="Strong_20_Emphasis">
 						<text:span text:style-name="T18"/>
@@ -1215,7 +1212,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P2">
 					<text:span text:style-name="T8">6.2 Duties</text:span>
 				</text:p>
-				<text:p text:style-name="P48">6.2.1 Lehrgangskosten inkl. Studierenden-beitrag ("ÖH-Beitrag")
+				<text:p text:style-name="P48">6.2.1 Course costs inc. student fee (Austrian Student Union fee)
 				<text:span text:style-name="Footnote_20_Symbol">
 						<text:span text:style-name="T10">
 							<text:note text:id="ftn1" text:note-class="footnote">
@@ -1225,10 +1222,12 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 									<text:span text:style-name="T4">
 										<text:s/>
 									</text:span>
-									<text:span text:style-name="T4">Gemäß § 4 Abs. 10 des Fachhochschul-Studiengesetzes (BGBl. Nr. 340/1993 idgF und der Bundesministeriengesetz-Novelle 2007, BGBl. I Nr. 6/2007) gehören ordentliche und außerordentliche Studierende an Fachhochschul-Studiengängen 
-									der Österreichischen HochschülerInnenschaft (ÖH) gemäß Hochschülerinnen- und Hochschülerschaftsgesetz (HSG 2014) an. Daraus resultiert die Verpflichtung der Studentin oder des Studenten zur Entrichtung des ÖH-Beitrags. Dies gilt auch in 
-									Semestern mit DiplomandInnenstatus. Der Studierendenbeitrag kann jährlich durch die ÖH indexiert werden; die genaue Höhe des Studierendenbeitrags wird von der ÖH jährlich für das folgende Studienjahr bekannt gegeben. Die Einhebung des 
-									Betrags erfolgt durch die Fachhochschule. Der Erhalter überweist in Folge die eingezahlten Beträge der Studierenden ohne Abzüge an die ÖH. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum Studium bzw. für dessen Fortsetzung.
+									<text:span text:style-name="T4">According to § 4 para. 10 of the Universities of Applied Sciences Studies Act (Fachhochschul-Studiengesetz) (Federal Legal Gazette (BGBI) No. 340/1993 as amended 
+									and the Federal Ministries Act amendment of 2007, BGBI. I No. 6/2007) regular and external students on UAS degree programs are members of the Austrian Student Union (ÖH) in accordance with the 
+									University of Applied Sciences Student Act (HSG 2014). As a result the student is obliged to pay the ÖH fee. This also applies to the semesters where the student will take the diploma. 
+									The student fee can be indexed annually by the ÖH; the precise amount of the student fee is announced by the ÖH for the following academic year. 
+									The fee is collected by the university. Subsequently, the governing body transfers the entire student fees to the ÖH without any deductions. 
+									Payment of the fee is one of the conditions for admittance to or continuance on a course of study.
 									</text:span>
 								</text:p>
 								<text:p text:style-name="P10"/>
@@ -1237,7 +1236,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 						</text:span>
 					</text:span>
 				</text:p>
-				<text:p text:style-name="P48">Voraussetzung für die Geltung dieses Ausbildungsvertrages und für die Teilnahme am Lehrgang ist die erfolgte vollständige Bezahlung der Lehrgangskosten zu den jeweiligen Zahlungsterminen. Bezüglich der Möglichkeiten (teilweiser) Rückerstattungen gelten die AGBs der Technikum Wien GmbH für Lehrgänge zur Weiterbildung.</text:p>
+				<text:p text:style-name="P48">One condition for the validity of the training contract and for participation in the course is full payment of the course costs by the respective payment deadlines. As regards the possibilities of (partial) reimbursement, the terms and conditions of the Technikum Wien GmbH for courses for further education apply.</text:p>
 				<text:p text:style-name="P73"/>
 				<text:p text:style-name="P32">6.2.2 Beibringung persönlicher Daten <text:bookmark-end text:name="_Ref78863824"/>
 				</text:p>
@@ -1249,7 +1248,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P36"/>
 				<text:p text:style-name="P48">6.2.2 Providing Personal Data</text:p>
 				<text:p text:style-name="P55">The external student is obliged to produce personal data which must be registered because of a law, regulation or a decision by the operator, or is essential fort he fulfilling of the training contract or fort he program of studies.</text:p>
-				<text:p text:style-name="P55"/>
 				<text:p text:style-name="P55"/>
 				<text:p text:style-name="P55"/>
 				<text:p text:style-name="P55">6.2.3 Updating personal data and the retrieval of information</text:p>
@@ -1279,11 +1277,9 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P48">Unless other arrangements have been agreed between the operator and the external student at an individual level, on written request, the external student undertakes to offer the operator the rights to research and development results. </text:p>
 				<text:p text:style-name="P48"/>
 				<text:p text:style-name="P48"/>
-				<text:p text:style-name="P48"/>
 				<text:p text:style-name="P48">6.2.5 Recordings </text:p>
 				<text:p text:style-name="P48">It is expressly forbidden for the external student to record lectures in part or in total (e.g. by using film and / or sound recordings or other audio-visual means suitable for this purpose). In addition, any form of making the aforementioned recordings publically available (wired or wireless) for example in social networks such as Facebook, WhatsAPP, LinkedIn, XING etc, but also on Youtube, Instagram etc., or by other means of communication designed for these purposes is strictly prohibited. These regulations shall apply correspondingly to scripts, other learning aids and examination data. </text:p>
 				<text:p text:style-name="P48">The only exception is a recording exclusively for the purpose of learning, study and research and for personal use, provided that the lecturer has expressly granted his / her prior written consent.</text:p>
-				<text:p text:style-name="P48"/>
 				<text:p text:style-name="P48"/>
 				<text:p text:style-name="P48"/>
 				<text:p text:style-name="P48"/>
@@ -1329,7 +1325,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				</text:list>
 				<text:p text:style-name="P88"/>
 				<text:p text:style-name="P89"/>
-				<text:p text:style-name="P48"/>
 				<text:p text:style-name="P2">
 					<text:span text:style-name="Strong_20_Emphasis">
 						<text:span text:style-name="T29">7. Termination of the contract </text:span>
@@ -1437,7 +1432,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P4">
 					<text:span text:style-name="T29">7.4 Expiry</text:span>
 				</text:p>
-				<text:p text:style-name="P48">Der Ausbildungsvertrag erlischt mit dem Abschluss des Lehrgangs.</text:p>
+				<text:p text:style-name="P48">The training contract expires on completion of the course.</text:p>
 				<text:p text:style-name="P21"/>
 				<text:p text:style-name="Standard">
 					<text:span text:style-name="T29">8. Ergänzende Vereinbarungen</text:span>

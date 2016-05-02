@@ -22,7 +22,6 @@
 /*
  * Benoetigt functions.inc.php
  */
-//require_once(dirname(__FILE__).'/basis_db.class.php');  Now over CI
 require_once(dirname(__FILE__).'/datum.class.php');
 
 // CI
@@ -91,23 +90,19 @@ class person extends Person_model
 	public function load($personId)
 	{
 		//person_id auf gueltigkeit pruefen
-		if (is_numeric($personId) && $personId != '')
+		if(is_numeric($personId) && $personId != '')
 		{
-			/* Alter Code
-				$qry = "SELECT person_id, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
-				gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
-				familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
-				geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung, zugangscode, foto_sperre, matr_nr
-				FROM public.tbl_person WHERE person_id=".$this->db_add_param($personId, FHC_INTEGER);
-
-			if (!$this->db_query($qry))
+			$result = $this->getPerson($personId);
+			
+			if(!is_object($result))
 			{
 				$this->errormsg = "Fehler beim Lesen der Personendaten\n";
-				return false;
+				return FALSE;
 			}
 
-			if ($row = $this->db_fetch_object())*/
-			if ($row = $this->getPerson($personId))
+			$row = $result->row();
+			
+			if(isset($row))
 			{
 				$this->person_id = $row->person_id;
 				$this->sprache = $row->sprache;

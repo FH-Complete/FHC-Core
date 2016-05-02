@@ -20,12 +20,26 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *          Gerald Raab <gerald.raab@technikum-wien.at>.
  */
-require_once(dirname(__FILE__).'/basis_db.class.php');
+//require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class studiengang extends basis_db
+require_once(dirname(__FILE__).'/datum.class.php');
+
+// CI
+// look if get_instance() is declared
+if (function_exists('get_instance'))
+	require_once(dirname(__FILE__).'/../ci_db_extra.php');
+else
+	require_once(dirname(__FILE__).'/../ci_hack.php');
+
+require_once(dirname(__FILE__).'/../application/models/lehre/Studiengang_model.php');
+
+class studiengang extends Studiengang_model
 {
+	use db_extra; //CI Hack
+	
 	public $new;      			// boolean
 	public $result = array();	// studiengang Objekt
+	public $errormsg;			// string
 
 	public $studiengang_kz;		// integer
 	public $kurzbz;				// varchar(5)
@@ -55,7 +69,6 @@ class studiengang extends basis_db
 	public $onlinebewerbung;	// boolean
 
 	public $kuerzel;	// = typ + kurzbz (Bsp: BBE)
-	private $studiengang_typ_arr = array(); 	// Array mit den Studiengangstypen
 	public $kuerzel_arr = array();			// Array mit allen Kurzeln Index=studiengangs_kz
 	public $moodle;		// boolean
 	public $lgartcode;	//integer
@@ -64,6 +77,8 @@ class studiengang extends basis_db
 	public $bezeichnung_arr = array();
 
     public $beschreibung;
+	
+	public $studiengang_typ_arr = array(); 	// Array mit den Studiengangstypen
 
 	/**
 	 * Konstruktor
@@ -84,7 +99,7 @@ class studiengang extends basis_db
 		$this->studiengang_typ_arr["e"] = "Erhalter"; */
 	}
 
-	public function __get($value)
+	/*public function __get($value)
 	{
 		switch($value)
 		{
@@ -95,7 +110,7 @@ class studiengang extends basis_db
 				}
 		}
 		return $this->$value;
-	}
+	}*/
 
 	/**
 	 * Laedt einen Studiengang
@@ -109,8 +124,8 @@ class studiengang extends basis_db
 			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-
-		$qry = "SELECT * FROM public.tbl_studiengang WHERE studiengang_kz=".$this->db_add_param($studiengang_kz);
+		
+		$qry = "SELECT * FROM public.tbl_studiengang WHERE studiengang_kz = " . $this->db_add_param($studiengang_kz);
 
 		if($this->db_query($qry))
 		{
@@ -152,6 +167,7 @@ class studiengang extends basis_db
 
 				$this->bezeichnung_arr['German'] = $this->bezeichnung;
 				$this->bezeichnung_arr['English'] = $this->english;
+				$this->bezeichnung_arr['Italian'] = $this->bezeichnung;
 			}
 		}
 		else
@@ -237,25 +253,19 @@ class studiengang extends basis_db
      */
     public function getAllForBewerbung()
     {
-        $qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch, lgartcode, tbl_lgartcode.bezeichnung '
-                . 'FROM lehre.vw_studienplan '
-                . 'LEFT JOIN bis.tbl_lgartcode USING (lgartcode) '
-                . 'WHERE onlinebewerbung IS TRUE '
-                . 'AND aktiv IS TRUE '
-                . 'ORDER BY typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC';
-
-		if(!$result = $this->db_query($qry))
+		error_log("getAllForBewerbung called!!!");
+		
+		$result = parent::getAllForBewerbung();
+		
+		if(!is_object($result))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
-			return false;
+			return FALSE;
 		}
 
-		while($row = $this->db_fetch_object($result))
-		{
-			$this->result[] = $row;
-		}
+		$this->result = $result->result();
 
-		return true;
+		return TRUE;
     }
 
 	/**
@@ -340,7 +350,7 @@ class studiengang extends basis_db
 		if(count($kennzahlen)==0)
 			return true;
 
-		$kennzahlen = $this->implode4SQL($kennzahlen);
+		$kennzahlen = $this->db_implode4SQL($kennzahlen);
 
 		$qry = 'SELECT * FROM public.tbl_studiengang WHERE studiengang_kz in('.$kennzahlen.')';
 		if ($aktiv)
@@ -892,7 +902,7 @@ class studiengang extends basis_db
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beantragung = $this->db_parse_bool($row->beantragung);
 				$obj->lgart_biscode = $row->lgart_biscode;
-			
+
 				$this->result[]= $obj;
 			}
 			return true;

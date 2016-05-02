@@ -2,4 +2,4 @@
 
 // Account Creation
 $lang['fhc_'.FHC_SUCCESS]		= 'Erfolgreich';
-$lang['fhc_'.FHC_ERR_GENERAL]	= 'Fehler';
+$lang['fhc_'.FHC_ERROR]	= 'Fehler';

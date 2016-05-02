@@ -24,7 +24,7 @@
 
 // Oberflaeche zum Upload von Bildern
 
-session_cache_limiter('none'); //muss gesetzt werden damit der upload in chrome und das automatische updaten des profilbildes funktioniert
+//session_cache_limiter('none'); //muss gesetzt werden damit der upload in chrome und das automatische updaten des profilbildes funktioniert
 require_once('../../config/cis.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');

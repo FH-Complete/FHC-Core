@@ -2695,7 +2695,7 @@ function sendBestellerMail($bestellung, $status)
 	switch($status)
 	{
 		case 'bestellt':	$email.=" <b>Ihre Bestellung wurde bestellt</b>"; break;
-		case 'geliefert':	$email.=" <b>Ihre Bestellung wurde geliefert</b><br>Hinweis: Nach erfolgter Lieferung werden Waren ab einem Wert von EUR 250,-- pro Einzelposition inventarisiert. <br>"; break;
+		case 'geliefert':	$email.=" <b>Ihre Bestellung wurde geliefert</b><br>Hinweis: Nach erfolgter Lieferung werden Waren ab einem Wert von EUR 400,-- pro Einzelposition inventarisiert. <br>"; break;
 		case 'freigabe':	$email.=" <b>Ihre Bestellung wurde freigegeben</b>"; break;
 		case 'storno':		$email.=" <b>Ihre Bestellung wurde storniert</b>"; break;
 	}

@@ -38,6 +38,7 @@ require_once('../include/zgv.class.php');
 require_once('../include/konto.class.php');
 
 $uid_arr = (isset($_REQUEST['uid'])?$_REQUEST['uid']:null);
+$studiensemester = (isset($_REQUEST['ss'])?$_REQUEST['ss']:null);
 
 $uid_arr = explode(";",$uid_arr);
 
@@ -93,7 +94,7 @@ foreach($uid_arr as $uid)
 			$datum_aktuell = date('d.m.Y');
 			$gebdatum = date('d.m.Y',strtotime($student->gebdatum));
 			$prestudent = new prestudent($student->prestudent_id);
-			$prestudent->getLastStatus($student->prestudent_id,null,'Student');
+			$prestudent->getLastStatus($student->prestudent_id,$studiensemester,'Student');
 			$studienordnung = new studienordnung();
 			$studienordnung->getStudienordnungFromStudienplan($prestudent->studienplan_id);
 			$studiengang = new studiengang();
@@ -159,7 +160,7 @@ foreach($uid_arr as $uid)
             echo "\t\t<ausbildungssemester_aktuell>".$prestudent->ausbildungssemester."</ausbildungssemester_aktuell>";
             
             $studiensemester_aktuell = new studiensemester();
-            $studiensemester_aktuell->load($prestudent->studiensemester_kurzbz);
+            $studiensemester_aktuell->load($studiensemester);
             
             echo "\t\t<studiensemester_aktuell>".$studiensemester_aktuell->bezeichnung."</studiensemester_aktuell>";
 			
@@ -178,7 +179,7 @@ foreach($uid_arr as $uid)
             echo "\t\t<studiensemester_beginn>".$studiensemester_beginn->bezeichnung."</studiensemester_beginn>";
             echo "\t\t<studiensemester_beginndatum>".date('d.m.Y',strtotime($studiensemester_beginn->start))."</studiensemester_beginndatum>";
 	
-            $prestudent->getLastStatus($student->prestudent_id,null,'Student');
+            $prestudent->getLastStatus($student->prestudent_id,$studiensemester,'Student');
             $studiensemester_abschluss = new studiensemester();
             $abschluss = $studiensemester_abschluss->jump($prestudent->studiensemester_kurzbz, $studienplan->regelstudiendauer-$prestudent->ausbildungssemester);
             $studiensemester_abschluss->load($abschluss);

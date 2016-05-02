@@ -1301,6 +1301,27 @@ function ExtrasShowProjektarbeitsabgaben()
 }
 
 // ****
+// * Zeigt HTML Seite für die Aliquote Reduktion
+// ****
+function ExtrasShowAliquote_reduktion()
+{
+	tree = document.getElementById('tree-verband');
+
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte zuerst einen Studiengang auswaehlen');
+		return;
+	}
+
+	//Studiengang holen
+	var col;
+	col = tree.columns ? tree.columns["stg_kz"] : "stg_kz";
+	var studiengang_kz=tree.view.getCellText(tree.currentIndex,col);
+	var studiensemester_kurzbz = getStudiensemester();
+	window.open('<?php echo APP_ROOT ?>vilesci/personen/aliquote_reduktion.php?studiengang_kz='+studiengang_kz+'&studiensemester_kurzbz='+studiensemester_kurzbz,'Aliquote Reduktion','');
+}
+
+// ****
 // * Zeigt HTML Seite zur Bearbeitung der Gruppen an
 // ****
 function ExtrasShowGruppenverwaltung()
@@ -1745,10 +1766,21 @@ function PrintZutrittskarte()
 function PrintStudienblatt(event)
 {
 	var tree = document.getElementById('student-prestudent-tree-rolle');
+	var ss = document.getElementById('statusbarpanel-semester').label;
+	
+	var items = tree.view.rowCount;
 
 	try
 	{
-		var studienplan_id = getTreeCellText(tree, "student-prestudent-tree-rolle-studienplan_id", 0);
+	    var studienplan_id = "";
+	    for (var v=0; v < items; v++)
+	    {
+		var stsem = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', v);
+		if(stsem == ss)
+		{
+		    studienplan_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-studienplan_id', v);
+		}
+	    }
 	}
 	catch(e)
 	{
@@ -1817,7 +1849,7 @@ function PrintStudienblatt(event)
 	{
 		if(error>0)
 			alert(error+' der ausgewaehlten Personen haben keinen Account');
-		action = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&output='+output+'&&uid='+data;
+		action = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&output='+output+'&&uid='+data+"&ss="+ss;
 		window.open(action,'Studienblatt','height=520,width=500,left=350,top=350,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	}
 	else
@@ -1832,10 +1864,19 @@ function PrintStudienblatt(event)
 function PrintStudienblattEnglisch(event)
 {
 	var tree = document.getElementById('student-prestudent-tree-rolle');
+	var items = tree.view.rowCount;
 
 	try
 	{
-		var studienplan_id = getTreeCellText(tree, "student-prestudent-tree-rolle-studienplan_id", 0);
+	    var studienplan_id = "";
+	    for (var v=0; v < items; v++)
+	    {
+		var stsem = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', v);
+		if(stsem == ss)
+		{
+		    studienplan_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-studienplan_id', v);
+		}
+	    }
 	}
 	catch(e)
 	{

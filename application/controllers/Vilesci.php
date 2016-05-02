@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class Vilesci extends CI_Controller
+class Vilesci extends FHC_Controller
 {
 
 	/**
@@ -22,30 +22,8 @@ class Vilesci extends CI_Controller
 	 */
 	public function index()
 	{
-		// ToDo: check if update is needed
-		if (false && $this->dbupdate())
-			echo 'System-DB needs update!';
-		else
-		{
-			$this->load->view('templates/header');
-			$this->load->view('vilesci_frameset');
-			$this->load->view('templates/footer');
-		}
-	}
-
-	/**
-	 *
-	 * @return bool
-	 */
-	private function __dbupdate()
-	{
-		// Check for update (codeigniter migration)
-		$this->load->library('migration');
-		if ($this->migration->current() === false)
-			show_error($this->migration->error_string());
-        if ($this->migration->current() != $this->migration->latest())
-			return true;
-		else
-			return false;
+		$this->load->view('templates/header');
+		$this->load->view('vilesci_frameset');
+		$this->load->view('templates/footer');
 	}
 }

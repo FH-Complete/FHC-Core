@@ -500,12 +500,10 @@ $error_msg='';
 
 	// Studierende holen, die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT uid, tbl_gruppe.gruppe_kurzbz
+	$sql_query="SELECT uid
 				FROM 
 					public.tbl_benutzerfunktion 
 					JOIN public.tbl_benutzer USING(uid)
-					JOIN public.tbl_studiengang USING(oe_kurzbz)
-					JOIN public.tbl_gruppe ON(tbl_gruppe.studiengang_kz=tbl_studiengang.studiengang_kz AND gruppe_kurzbz = 'TW_HSV')
 				WHERE 
 					funktion_kurzbz='hsv' 
 					AND tbl_benutzer.aktiv AND 
@@ -519,10 +517,10 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-		if($row->gruppe_kurzbz!='')
+		if($row->uid!='')
 		{
-			setGeneriert($row->gruppe_kurzbz);
-	     	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".mb_strtoupper($row->gruppe_kurzbz)."', now(), 'mlists_generate')";
+			setGeneriert('TW_HSV');
+	     	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES (".$db->db_add_param($row->uid).",'TW_HSV', now(), 'mlists_generate')";
 			if(!$db->db_query($sql_query))
 				$error_msg.=$db->db_last_error().$sql_query;
 			echo '-';
@@ -584,7 +582,7 @@ $error_msg='';
 		echo '-';
 		flush();
 	}
-
+	ob_flush();
 	// Studierende holen, die nicht im Verteiler sind
 	echo '<BR>';
 	$sql_query="SELECT uid, tbl_gruppe.gruppe_kurzbz
@@ -637,6 +635,7 @@ $error_msg='';
 		echo "<br>Fehler:$sql_query";
 	
     flush();
+	ob_flush();
     setGeneriert('TW_STDV');
 	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe 
 				WHERE gruppe_kurzbz='TW_STDV' 
@@ -782,6 +781,7 @@ $error_msg='';
 		echo "<br>Fehler:$sql_query";
 	// Studierende holen, die nicht mehr in den Verteiler gehoeren
     flush();
+	ob_flush();
     setGeneriert('TW_JGV');
 	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe 
 				WHERE gruppe_kurzbz='TW_JGV' 
@@ -869,6 +869,7 @@ $error_msg='';
 	// ***************************
 	// TW_STD_M abgleichen. Alle maennlichen Studenten
     flush();
+	ob_flush();
     setGeneriert('TW_STD_M');
     echo 'TW_STD_M wird abgeglichen!<br>';
 
@@ -915,6 +916,7 @@ $error_msg='';
 	// ***************************
 	// TW_STD_W abgleichen. Alle weiblichen Studentinnen
     flush();
+	ob_flush();
     setGeneriert('TW_STD_W');
     echo 'TW_STD_W wird abgeglichen!<br>';
 
@@ -965,6 +967,7 @@ $error_msg='';
 	// Lektoren holen die nicht mehr in den Verteiler gehoeren
 	echo $mlist_name.' wird abgeglichen!<BR>';
 	flush();
+	ob_flush();
 	
 	$sql_query = "SELECT distinct mitarbeiter_uid uid 
 				from lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_moodle ,campus.vw_lehreinheit 
@@ -1382,6 +1385,7 @@ $error_msg='';
 	// Personen holen die nicht mehr in den Verteiler gehoeren
 	echo $mlist_name.' wird abgeglichen!<BR>';
 	flush();
+	ob_flush();
 	$sql_query="SELECT uid FROM public.tbl_benutzergruppe 
 				WHERE 
 					UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND 

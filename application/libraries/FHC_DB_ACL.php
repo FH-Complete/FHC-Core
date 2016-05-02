@@ -43,10 +43,10 @@ class FHC_DB_ACL
 	 * @param	string	$password
 	 * @return	bool
 	 */
-	function __construct($uid)
+	function __construct($param)
 	{
 		$this->bb = new benutzerberechtigung();
-		$this->uid = $uid;
+		$this->uid = $param['uid'];
 	}
 
 	function isBerechtigt($berechtigung_kurzbz, $art=null,  $oe_kurzbz=null,  $kostenstelle_id=null)

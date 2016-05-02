@@ -28,6 +28,7 @@ require_once('../../include/fachbereich.class.php');
 require_once('../../include/lvinfo.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/organisationsform.class.php');
+require_once('../../include/addon.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -51,7 +52,7 @@ if (isset($_GET['stg_kz']) || isset($_POST['stg_kz']))
 }
 else
 	$stg_kz='';
-	
+
 if (isset($_GET['semester']) || isset($_POST['semester']))
 	$semester=(isset($_GET['semester'])?$_GET['semester']:$_POST['semester']);
 else
@@ -75,7 +76,7 @@ if(isset($_REQUEST['fachbereich_kurzbz']))
 		$oe_fachbereich = $fb_obj->oe_kurzbz;
 	}
 }
-else 
+else
 	$fachbereich_kurzbz = '';
 
 if (isset($_REQUEST['oe_kurzbz']))
@@ -103,7 +104,7 @@ $messages='';
 
 if(isset($_POST['lvid']))
 {
-	//Wenn eine LVID uebergeben wird, dann wird die berechtigung des studienganges 
+	//Wenn eine LVID uebergeben wird, dann wird die berechtigung des studienganges
 	//dieser LV geprueft
 	$lv_obj = new lehrveranstaltung();
 	$lv_obj->load($_POST['lvid']);
@@ -115,7 +116,7 @@ if($rechte->isBerechtigt('lehre/lehrveranstaltung', $oe_studiengang, 'suid')
 || $rechte->isBerechtigt('lehre/lehrveranstaltung', $oe_fachbereich, 'suid'))
 	$write_admin=true;
 
-if($rechte->isBerechtigt('lehre/lehrveranstaltung:begrenzt', $oe_studiengang, 'suid') 
+if($rechte->isBerechtigt('lehre/lehrveranstaltung:begrenzt', $oe_studiengang, 'suid')
 || $rechte->isBerechtigt('lehre/lehrveranstaltung:begrenzt', $oe_fachbereich, 'suid'))
 	$write_low=true;
 
@@ -169,10 +170,10 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
 					exit( 'true');
-				else 
+				else
 					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
 			}
-			else 
+			else
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
 
@@ -187,14 +188,14 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
 					exit('true');
-				else 
+				else
 					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
 			}
-			else 
+			else
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
 	}
-	
+
 	if($write_low || $write_admin)
 	{
 		//LVInfo kopieren
@@ -203,10 +204,10 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 			$lvinfo = new lvinfo();
 			if(!$lvinfo->copy($_POST['source_id'], $_POST['lvid']))
 				exit('Fehler beim Kopieren');
-			else 
+			else
 				exit('true');
 		}
-		
+
 		//Lehre Feld setzen
 		if(isset($_POST['lehre']))
 		{
@@ -218,13 +219,13 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
 					exit('true');
-				else 
+				else
 					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
 			}
-			else 
+			else
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
-	
+
 		//Zeugnis Feld setzen
 		if(isset($_POST['zeugnis']))
 		{
@@ -236,13 +237,13 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
 					exit('true');
-				else 
+				else
 					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
 			}
-			else 
+			else
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
-	
+
 		//Sort Speichern
 		if(isset($_POST['sort']))
 		{
@@ -254,13 +255,13 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
 					exit('true');
-				else 
+				else
 					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
 			}
-			else 
+			else
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
-		
+
 		//Incoming Speichern
 		if(isset($_POST['incoming']))
 		{
@@ -272,13 +273,13 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
 					exit('true');
-				else 
+				else
 					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
 			}
-			else 
+			else
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
-	
+
 		//FBK Speichern
 		if(isset($_POST['fbk']))
 		{
@@ -290,13 +291,13 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
 					exit('true');
-				else 
+				else
 					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
 			}
-			else 
+			else
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
-		
+
 		//Lehrform Speichern
 		if(isset($_POST['lf']))
 		{
@@ -308,13 +309,13 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
 					exit('true');
-				else 
+				else
 					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
 			}
-			else 
+			else
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
-	
+
 		//Lehrtyp Speichern
 		if(isset($_POST['lt']))
 		{
@@ -326,13 +327,13 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
 					exit('true');
-				else 
+				else
 					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
 			}
-			else 
+			else
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
-	
+
 		//Projektarbeit Feld setzen
 		if(isset($_POST['projektarbeit']))
 		{
@@ -344,14 +345,14 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 				$lv_obj->updatevon = $user;
 				if($lv_obj->save(false))
 					exit('true');
-				else 
+				else
 					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
 			}
-			else 
+			else
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
 	}
-	else 
+	else
 	{
 		exit('Sie haben keine Schreibrechte fuer diese Seite');
 	}
@@ -397,7 +398,7 @@ if($result = $db->db_query($qry))
 $fb_kurzbz='';
 if($stg_kz!='')
 {
-	$where = "oe_kurzbz=(SELECT oe_kurzbz FROM public.tbl_studiengang 
+	$where = "oe_kurzbz=(SELECT oe_kurzbz FROM public.tbl_studiengang
 						WHERE studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER)." LIMIT 1)";
 	$where2="studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER);
 	$tables='lehre.tbl_lehrveranstaltung';
@@ -413,12 +414,12 @@ else
 		$fb_kurzbz=$fachb->fachbereich_kurzbz;
 	}
 	$where = "fachbereich_kurzbz=".$db->db_add_param($fb_kurzbz);
-	$where2 = $where." AND 
-	          tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
+	$where2 = $where." AND
+	          tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 	          tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz";
 	$tables='lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich';
 }
-	
+
 $qry = "
 SELECT
 	distinct
@@ -450,7 +451,7 @@ $isaktiv=trim($isaktiv);
 
 if($isaktiv=='true')
 {
-	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';	
+	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';
 }
 elseif($isaktiv=='false')
 {
@@ -463,13 +464,13 @@ else
 
 if($fb_kurzbz !='')
 	$sql_query="
-	SELECT 
-		distinct tbl_lehrveranstaltung.* 
-	FROM 	
+	SELECT
+		distinct tbl_lehrveranstaltung.*
+	FROM
 		lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich
 	WHERE
-		tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id 
-		AND	tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id 
+		tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id
+		AND	tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id
 		AND lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz
 		AND	tbl_fachbereich.fachbereich_kurzbz=".$db->db_add_param($fb_kurzbz);
 else
@@ -485,7 +486,7 @@ if($semester != -1)
 if($orgform_kurzbz != -1)
 	if($orgform_kurzbz == 'none')
 		$sql_query.=" AND (tbl_lehrveranstaltung.orgform_kurzbz IS NULL OR tbl_lehrveranstaltung.orgform_kurzbz='')";
-	else 
+	else
 		$sql_query.=" AND tbl_lehrveranstaltung.orgform_kurzbz=".$db->db_add_param($orgform_kurzbz, FHC_STRING);
 
 $sql_query.=" $aktiv ORDER BY tbl_lehrveranstaltung.bezeichnung";
@@ -573,7 +574,7 @@ $outp.= '</SELECT>';
 	$outp.= "<OPTION value='false '".($isaktiv=='false'?'selected':'').">-- Nicht aktiv --</OPTION>";
 	$outp.= '</SELECT>';
 //}
-/*else 
+/*else
 {
 	$isaktiv='aktiv';
 }*/
@@ -604,22 +605,49 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
 	<script type="text/javascript" src="../../include/js/jquery.js"></script>
-	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
+	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">';
+
+	// ADDONS laden
+	$addon_obj = new addon();
+	$addon_obj->loadAddons();
+	foreach($addon_obj->result as $addon)
+	{
+		if(file_exists('../../addons/'.$addon->kurzbz.'/vilesci/init.js.php'))
+			echo '<script type="application/x-javascript" src="../../addons/'.$addon->kurzbz.'/vilesci/init.js.php" ></script>';
+	}
+
+	// Wenn Seite fertig geladen ist Addons aufrufen
+	echo '
+	<script>
+	$( document ).ready(function()
+	{
+		if(typeof addon  !== \'undefined\')
+		{
+			for(i in addon)
+			{
+				addon[i].init("vilesci/lehre/lehrveranstaltung.php", {uid:\''.$user.'\'});
+			}
+		}
+	});
+	</script>
+	';
+
+echo '
 
 	<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 				$("#t1").tablesorter(
 				{
 					sortList: [[2,0]],
 					widgets: ["zebra"]
-				}); 
-			}); 
+				});
+			});
 
 			var isaktiv="'.$isaktiv.'";
 			function checksubmit()
-			{		
-				if(document.getElementById("select_stg_kz").value==\'\' 
+			{
+				if(document.getElementById("select_stg_kz").value==\'\'
 					&& document.getElementById("select_fachbereich_kurzbz").value==\'\'
 					&& document.getElementById("select_oe_kurzbz").value==\'\')
 				{
@@ -628,16 +656,16 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 				}
 				else
 					return true;
-		
+
 			}
 			function changelehrevz(lvid, lehrevz)
 			{
 				$.ajax({
 					type:"POST",
-					url:"lehrveranstaltung.php", 
+					url:"lehrveranstaltung.php",
 					data:{ "lvid": lvid, "lehrevz": lehrevz },
-					success: function(data) 
-					{ 
+					success: function(data)
+					{
 						if(data!="true")
 							alert("ERROR:"+data)
 						else
@@ -654,10 +682,10 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 			{
 				$.ajax({
 					type:"POST",
-					url:"lehrveranstaltung.php", 
+					url:"lehrveranstaltung.php",
 					data:{ "lvid": lvid, "sort": sort },
-					success: function(data) 
-					{ 
+					success: function(data)
+					{
 						if(data!="true")
 							alert("ERROR:"+data)
 						else
@@ -673,10 +701,10 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 			{
 				$.ajax({
 					type:"POST",
-					url:"lehrveranstaltung.php", 
+					url:"lehrveranstaltung.php",
 					data:{ "lvid": lvid, "incoming": incoming },
-					success: function(data) 
-					{ 
+					success: function(data)
+					{
 						if(data!="true")
 							alert("ERROR:"+data)
 						else
@@ -694,10 +722,10 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 			{
 				$.ajax({
 					type:"POST",
-					url:"lehrveranstaltung.php", 
+					url:"lehrveranstaltung.php",
 					data:{ "lvid": lvid, "fbk": fbk },
-					success: function(data) 
-					{ 
+					success: function(data)
+					{
 						if(data!="true")
 							alert("ERROR:"+data)
 						else
@@ -710,15 +738,15 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 					error: function() { alert("error"); }
 				});
 			}
-			
+
 			function changelehrform(lvid, lf)
 			{
 				$.ajax({
 					type:"POST",
-					url:"lehrveranstaltung.php", 
+					url:"lehrveranstaltung.php",
 					data:{ "lvid": lvid, "lf": lf },
-					success: function(data) 
-					{ 
+					success: function(data)
+					{
 						if(data!="true")
 							alert("ERROR:"+data)
 						else
@@ -736,10 +764,10 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 			{
 				$.ajax({
 					type:"POST",
-					url:"lehrveranstaltung.php", 
+					url:"lehrveranstaltung.php",
 					data:{ "lvid": lvid, "lt": lt },
-					success: function(data) 
-					{ 
+					success: function(data)
+					{
 						if(data!="true")
 							alert("ERROR:"+data)
 						else
@@ -752,15 +780,15 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 					error: function() { alert("error"); }
 				});
 			}
-			
+
 			function copylvinfo(lvid, source_id)
 			{
 				$.ajax({
 					type:"POST",
-					url:"lehrveranstaltung.php", 
+					url:"lehrveranstaltung.php",
 					data:{ "lvid": lvid, "source_id": source_id },
-					success: function(data) 
-					{ 
+					success: function(data)
+					{
 						if(data!="true")
 							alert("ERROR:"+data)
 						else
@@ -775,16 +803,16 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 			function changeboolean(lvid, name)
 			{
 				value=document.getElementById(name+lvid).value;
-				
+
 				var dataObj = {};
 				dataObj["lvid"]=lvid;
 				dataObj[name]=value;
 
 				$.ajax({
 					type:"POST",
-					url:"lehrveranstaltung.php", 
+					url:"lehrveranstaltung.php",
 					data:dataObj,
-					success: function(data) 
+					success: function(data)
 					{
 						if(data=="true")
 						{
@@ -796,7 +824,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 							document.getElementById(name+lvid).value=value;
 							document.getElementById(name+"img"+lvid).src="../../skin/images/"+value+".png";
 						}
-						else 
+						else
 							alert("ERROR:"+data)
 					},
 					error: function() { alert("error"); }
@@ -820,7 +848,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 			{
 				return confirm("Diese Lehrveranstaltung wirklich löschen?");
 			}
-			
+
 		</script>
 	</head>
 	<body class="Background_main">
@@ -843,7 +871,7 @@ if($semester!='-1')
 if($orgform_kurzbz!='-1')
 	if($orgform_kurzbz=='none')
 		$header .= ' - Ohne Orgform';
-	else 
+	else
 		$header .= ' - '.$orgform_kurzbz;
 
 echo "<H2>Lehrveranstaltung Verwaltung (".$db->convert_html_chars($header).")</H2>";
@@ -886,8 +914,8 @@ if ($result_lv!=0)
 		  <th>Zeugnis</th>
 		  <th title='Soll diese Lehrveranstaltung bei Diplom-/Bachelorarbeit ausgewaehlt werden koennen?'>BA/DA</th>
 		  <th>Koordinator</th>
-		  <th>LV-Info</th>\n";
-		  
+		  <th class=\"lvinfo\" >LV-Info</th>\n";
+
 		  if($write_admin)
 		  {
 			  echo "<th>LV-Angebot</th>
@@ -905,7 +933,7 @@ if ($result_lv!=0)
 		echo "<td align='right'>";
 		if($write_admin)
 			echo '<a href="lehrveranstaltung_details.php?lv_id='.$db->convert_html_chars($row->lehrveranstaltung_id).'" target="lv_detail">'.$db->convert_html_chars($row->lehrveranstaltung_id).'</a>';
-		else		
+		else
 			echo $db->convert_html_chars($row->lehrveranstaltung_id);
 		echo '</td>';
 		//Kurzbz
@@ -932,7 +960,7 @@ if ($result_lv!=0)
 		}
 		echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrform(\''.$row->lehrveranstaltung_id.'\',$(\'#lf'.$row->lehrveranstaltung_id.'\').val())">';
 		echo '</td>';
-		
+
 		//Lehrtyp
 		echo '<td style="white-space:nowrap;">';
 		echo '<SELECT id="lt'.$row->lehrveranstaltung_id.'">';
@@ -1032,7 +1060,7 @@ if ($result_lv!=0)
 		}
 		echo '</SELECT><input type="button" value="ok" id="fbkok'.$row->lehrveranstaltung_id.'" onclick="changefbk(\''.$row->lehrveranstaltung_id.'\',$(\'#fbk'.$row->lehrveranstaltung_id.'\').val())">';
 		echo '</td>';
-		echo '<td nowrap>';
+		echo '<td class="lvinfo" nowrap>';
 		//LVInfo
 		$lvinfo = new lvinfo();
 		if(!$lvinfo->exists($row->lehrveranstaltung_id))
@@ -1042,7 +1070,7 @@ if ($result_lv!=0)
 					<input type="button" value="ok" onclick="copylvinfo(\''.$row->lehrveranstaltung_id.'\',$(\'#source_id'.$row->lehrveranstaltung_id.'\').val())">
 				</span>';
 		}
-		else 
+		else
 			echo 'vorhanden';
 		echo '</td>';
 		if($write_admin)

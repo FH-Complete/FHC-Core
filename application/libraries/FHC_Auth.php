@@ -12,6 +12,7 @@
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
 require_once FCPATH.'include/authentication.class.php';
+require_once FCPATH.'include/AddonAuthentication.php';
 
 /**
  * FHC-Auth Helpers
@@ -32,20 +33,31 @@ class FHC_Auth
 	 *
 	 * @param	string	$username
 	 * @param	string	$password
-	 * @return	bool
+	 * @return	bool	
 	 */
-	function auth($username, $password)
+	public function basicAuthentication($username, $password)
 	{
 		$auth = new authentication();
-		if ($auth->checkpassword($username, $password))
+		if($auth->checkpassword($username, $password))
 		{
-			//echo 'Auth-Method-True';
 			return true;
 		}
 		else
 		{
-			//echo 'Auth-Method-False';
 			return false;
 		}
+	}
+	
+	/**
+	 * Get the md5 hashed password by the addon username
+	 *
+	 * @param	string	$username addon username
+	 * @return	string	md5 hashed string
+	 */
+	public function digestAuthentication($username)
+	{
+		$aam = new AddonAuthentication();
+		
+		return md5($aam->getPasswordByUsername($username));
 	}
 }
