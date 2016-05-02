@@ -380,7 +380,7 @@ function writePruefungsTable(e, data, anmeldung)
 
 		if(d.max === null)
 		{
-			teilnehmer += "unbegrenzt</br>";
+			teilnehmer += "<?php echo $p->t('pruefung/unbegrenzt'); ?></br>";
 		}
 		else
 		{

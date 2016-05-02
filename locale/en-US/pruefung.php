@@ -72,6 +72,7 @@ $this->phrasen['pruefung/pruefungStornieren'] = 'Prüfung stornieren';
 $this->phrasen['pruefung/lvErfolgreichEntfernt'] = 'Lehrveranstaltung erfolgreich entfernt';
 $this->phrasen['pruefung/pruefungStorniert'] = 'Prüfung storniert';
 $this->phrasen['pruefung/terminGeloescht'] = 'Termin gelöscht';
+$this->phrasen['pruefung/unbegrenzt'] = 'unlimited';
 
 // pruefungsbewertung
 $this->phrasen['pruefung/pruefungsbewertungTitle'] = 'Prüfungsbewertung';
