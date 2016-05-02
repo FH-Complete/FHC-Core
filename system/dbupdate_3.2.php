@@ -1103,7 +1103,7 @@ if (!$result = @$db->db_query("SELECT 1 FROM public.tbl_studienjahr LIMIT 1;"))
 		echo 'public.tbl_studienjahr: Tabelle hinzugefuegt<br>';
 }
 
-//Spalte genehmigung in lehre.tbl_studienordnung_lehrveranstaltung
+//Spalte genehmigung in lehre.tbl_studienplan_lehrveranstaltung
 if (!$result = @$db->db_query("SELECT genehmigung FROM lehre.tbl_studienplan_lehrveranstaltung LIMIT 1;"))
 {
 	$qry = "ALTER TABLE lehre.tbl_studienplan_lehrveranstaltung ADD COLUMN genehmigung BOOLEAN DEFAULT TRUE;";
