@@ -23,7 +23,7 @@ class Nation extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PersonModel
-		$this->load->model('nation_model', 'NationModel');
+		$this->load->model('codex/nation_model', 'NationModel');
 		// Load set the uid of the model to let to check the permissions
 		$this->NationModel->setUID($this->_getUID());
 	}

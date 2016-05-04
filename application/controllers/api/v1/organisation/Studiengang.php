@@ -11,7 +11,6 @@
  * @filesource
  */
 // ------------------------------------------------------------------------
-
 if(!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Studiengang extends APIv1_Controller
@@ -23,7 +22,7 @@ class Studiengang extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PersonModel
-		$this->load->model('lehre/studiengang_model', 'StudiengangModel');
+		$this->load->model('organisation/studiengang_model', 'StudiengangModel');
 		// Load set the uid of the model to let to check the permissions
 		$this->StudiengangModel->setUID($this->_getUID());
 	}
