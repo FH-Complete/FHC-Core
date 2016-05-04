@@ -3,17 +3,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class FHC_Model extends CI_Model
 {
-	//protected errormsg;
 	function __construct($uid = null)
 	{
 		parent::__construct();
 		$this->load->helper('language');
 		$this->lang->load('fhc_model');
-		//$this->load->helper('fhc_db_acl');
 		$this->lang->load('fhcomplete');
-		//$this->load->library('session');
-		if (is_null($uid))
+		if (is_null($uid) && isset($this->session->uid))
 			$uid = $this->session->uid;
+		else
+			$uid = null;
 		$this->load->library('FHC_DB_ACL',array('uid' => $uid));
 	}
 
