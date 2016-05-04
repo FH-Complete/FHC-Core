@@ -6,9 +6,6 @@ class DB_Model extends FHC_Model
 	protected $pk;  // Name of the PrimaryKey for DB-Update, Load, ...
 	protected $acl;  // Name of the PrimaryKey for DB-Update, Load, ...
 	
-	// Addon ID, stored to let to check the permissions
-	private $_addonID;
-
 	function __construct($dbTable = null, $pk = null)
 	{
 		parent::__construct();
@@ -114,6 +111,7 @@ class DB_Model extends FHC_Model
 		if(is_null($this->pk))
 			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
 		
+		
 		// Check rights
 		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 's'))
 			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
@@ -129,16 +127,17 @@ class DB_Model extends FHC_Model
 		}
 		else
 			$result = $this->db->get_where($this->dbTable, array($this->pk => $id));
+		
 		if ($result)
-			return $this->_success($result);
+			return $this->_success($result->result());
 		else
 			return $this->_error($this->db->error(), FHC_DB_ERROR);
 	}
 
 	/** ---------------------------------------------------------------
-	 * Load data from DB-Table
+	 * Load data from DB-Table with a where clause
 	 *
-	* @return  array
+	 * @return  array
 	 */
 	public function loadWhere($where = null)
 	{
@@ -156,9 +155,73 @@ class DB_Model extends FHC_Model
 		else
 			$result = $this->db->get_where($this->dbTable, $where);
 		if ($result)
-			return $this->_success($result);
+			return $this->_success($result->result());
 		else
 			return $this->_error($this->db->error(), FHC_DB_ERROR);
+	}
+	
+	/** ---------------------------------------------------------------
+	 * Load single data from DB-Table
+	 *
+	 * @param   string $id  ID (Primary Key) for SELECT ... WHERE
+	 * @return  array
+	 */
+	public function loadWhole()
+	{
+		// Check Class-Attributes
+		if(is_null($this->dbTable))
+			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+		if(is_null($this->pk))
+			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
+		
+		
+		// Check rights
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
+
+		// DB-SELECT
+		$result = $this->db->get($this->dbTable);
+		
+		if ($result)
+			return $this->_success($result->result());
+		else
+			return $this->_error($this->db->error(), FHC_DB_ERROR);
+	}
+	
+	/** ---------------------------------------------------------------
+	 * Add a table to join with
+	 *
+	 * @return  void
+	 */
+	public function addJoin($joinTable = null, $cond = null, $type = '')
+	{
+		// Check parameters
+		if(is_null($joinTable) || is_null($cond) || !in_array($type, array('', 'LEFT', 'RIGHT', 'OUTER', 'INNER', 'LEFT OUTER', 'RIGHT OUTER')))
+			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+		
+		// Check rights for joined table
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$joinTable], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$joinTable], FHC_MODEL_ERROR);
+
+		$this->db->join($joinTable, $cond, $type);
+		
+		return $this->_success(TRUE);
+	}
+	
+	/** ---------------------------------------------------------------
+	 * Add order clause
+	 *
+	 * @return  void
+	 */
+	public function addOrder($field = null, $type = 'ASC')
+	{
+		// Check Class-Attributes and parameters
+		if(is_null($field) || !in_array($type, array('ASC', 'DESC')))
+			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+		
+		$this->db->order_by($field, $type);
+		
+		return $this->_success(TRUE);
 	}
 
 	/** ---------------------------------------------------------------
@@ -194,6 +257,16 @@ class DB_Model extends FHC_Model
 			return $this->_success($id);
 		else
 			return $this->_error($this->db->error(), FHC_DB_ERROR);
+	}
+	
+	/** ---------------------------------------------------------------
+	 * Reset the query builder state
+	 *
+	 * @return  void
+	 */
+	public function resetQuery()
+	{
+		$this->db->reset_query();
 	}
 
 	/** ---------------------------------------------------------------
@@ -295,26 +368,5 @@ class DB_Model extends FHC_Model
 			'code' => $error,
 			'msg' => lang('fhc_' . $error)
 		);
-	}
-	
-	/**
-	 * Method setAddonID
-	 * 
-	 * @param $addonID
-	 * @return void
-	 */
-	public function setAddonID($addonID)
-	{
-		$this->_addonID = $addonID;
-	}
-	
-	/**
-	 * Method getAddonID
-	 * 
-	 * @return string _addonID
-	 */
-	public function getAddonID()
-	{
-		return $this->_addonID;
 	}
 }

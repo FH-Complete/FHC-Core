@@ -24,57 +24,33 @@ class Nation extends APIv1_Controller
 		parent::__construct();
 		// Load model PersonModel
 		$this->load->model('nation_model', 'NationModel');
-		// Load set the addonID of the model to let to check the permissions
-		$this->NationModel->setAddonID($this->_getAddonID());
+		// Load set the uid of the model to let to check the permissions
+		$this->NationModel->setUID($this->_getUID());
 	}
 	
 	public function getAll()
 	{
-		$result = $this->NationModel->getAll($this->get('ohnesperre'), $this->get('orderEnglish'));
-		
-		if(is_object($result))
+		if(!$this->get('orderEnglish'))
 		{
-			$payload = [
-				'success'	=>	TRUE,
-				'message'	=>	'Nation found',
-				'data'		=>	$result->result()
-			];
-			$httpstatus = REST_Controller::HTTP_OK;
+			$result = $this->NationModel->addOrder('kurztext');
 		}
 		else
 		{
-			$payload = [
-				'success'	=>	FALSE,
-				'message'	=>	'Nation not found'
-			];
-			$httpstatus = REST_Controller::HTTP_OK;
+			$result = $this->NationModel->addOrder('engltext');
 		}
 		
-		$this->response($payload, $httpstatus);
-	}
-	
-	public function getBundesland()
-	{
-		$result = $this->NationModel->getBundesland();
-		
-		if(is_object($result))
+		if($result->error == EXIT_SUCCESS)
 		{
-			$payload = [
-				'success'	=>	TRUE,
-				'message'	=>	'Bundesland found',
-				'data'		=>	$result->result()
-			];
-			$httpstatus = REST_Controller::HTTP_OK;
-		}
-		else
-		{
-			$payload = [
-				'success'	=>	FALSE,
-				'message'	=>	'Bundesland not found'
-			];
-			$httpstatus = REST_Controller::HTTP_OK;
+			if($this->get('ohnesperre'))
+			{
+				$result = $this->NationModel->loadWhere('sperre IS NULL');
+			}
+			else
+			{
+				$result = $this->NationModel->loadWhole();
+			}
 		}
 		
-		$this->response($payload, $httpstatus);
+		$this->response($result, REST_Controller::HTTP_OK);
 	}
 }

@@ -24,32 +24,14 @@ class Studiengang extends APIv1_Controller
 		parent::__construct();
 		// Load model PersonModel
 		$this->load->model('lehre/studiengang_model', 'StudiengangModel');
-		// Load set the addonID of the model to let to check the permissions
-		$this->StudiengangModel->setAddonID($this->_getAddonID());
+		// Load set the uid of the model to let to check the permissions
+		$this->StudiengangModel->setUID($this->_getUID());
 	}
 	
 	public function getAllForBewerbung()
 	{
 		$result = $this->StudiengangModel->getAllForBewerbung();
 		
-		if(is_object($result) && $result->num_rows() > 0)
-		{
-			$payload = [
-				'success'	=>	TRUE,
-				'message'	=>	'Courses found',
-				'data'		=>	$result->result()
-			];
-			$httpstatus = REST_Controller::HTTP_OK;
-		}
-		else
-		{
-			$payload = [
-				'success'	=>	FALSE,
-				'message'	=>	'No courses found'
-			];
-			$httpstatus = REST_Controller::HTTP_OK;
-		}
-		
-		$this->response($payload, $httpstatus);
+		$this->response($result, REST_Controller::HTTP_OK);
 	}
 }

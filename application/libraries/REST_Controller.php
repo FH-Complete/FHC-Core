@@ -355,7 +355,7 @@ abstract class REST_Controller extends CI_Controller {
 	/**
 	 * 
 	 */
-	protected $_addonID = NULL;
+	protected $_uid = NULL;
 
 	/**
      * Extend this function to apply additional checking early on in the process
@@ -727,7 +727,6 @@ abstract class REST_Controller extends CI_Controller {
 
         // Set the output as NULL by default
         $output = NULL;
-
         // If data is NULL and no HTTP status code provided, then display, error and exit
         if ($data === NULL && $http_code === NULL)
         {
@@ -743,7 +742,7 @@ abstract class REST_Controller extends CI_Controller {
                 // Set the format header
                 $this->output->set_content_type($this->_supported_formats[$this->response->format], strtolower($this->config->item('charset')));
                 $output = $this->format->factory($data)->{'to_' . $this->response->format}();
-
+				
                 // An array must be parsed as a string, so as not to cause an array to string error
                 // Json is the most appropriate form for such a datatype
                 if ($this->response->format === 'array')
@@ -758,7 +757,6 @@ abstract class REST_Controller extends CI_Controller {
                 {
                     $data = $this->format->factory($data)->{'to_json'}();
                 }
-
                 // Format is not supported, so output the raw data as a string
                 $output = $data;
             }
@@ -1911,20 +1909,20 @@ abstract class REST_Controller extends CI_Controller {
 	/**
 	 * TO BE COMMENTED
 	 */
-	private function _setAddonID($username)
+	private function _setUID($username)
 	{
-		if(!isset($this->_addonID) && isset($username))
+		if(!isset($this->_uid) && isset($username))
 		{
-			$this->_addonID = $username;
+			$this->_uid = $username;
 		}
 	}
 
 	/**
-	 * @return int ID of the authenticated addon
+	 * @return int ID of the authenticated caller
 	 */
-	protected function _getAddonID()
+	protected function _getUID()
 	{
-		return $this->_addonID;
+		return $this->_uid;
 	}
 
     /**
@@ -1968,7 +1966,7 @@ abstract class REST_Controller extends CI_Controller {
         }
 		else // If logged
 		{
-			$this->_setAddonID($username);
+			$this->_setUID($username);
 		}
     }
 

@@ -19,3 +19,4 @@ tests/codeception/_output/*
 /submodules/d3
 composer.lock
 bin
+/tests/codeception/api.suite.yml
