@@ -1,5 +1,5 @@
 <?php
-class Pruefung_model extends DB_Model
+class LePruefung_model extends DB_Model
 {
 
 	/**
@@ -8,7 +8,7 @@ class Pruefung_model extends DB_Model
 	public function __construct()
 	{
 		parent::__construct();
-		$this->dbTable = 'campus.tbl_pruefung';
+		$this->dbTable = 'lehre.tbl_pruefung';
 		$this->pk = 'pruefung_id';
 	}
 }
