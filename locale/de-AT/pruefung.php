@@ -109,7 +109,35 @@ $this->phrasen['pruefung/keineAnmeldungenVorhanden'] = 'Keine Anmeldungen vorhan
 $this->phrasen['pruefung/anmeldungenVerwaltenTitle'] = 'Prüfungsanmeldung Verwaltung';
 $this->phrasen['pruefung/anmeldungenVerwalten'] = 'Anmeldungen Verwalten';
 
+// prüfungsanmeldung.json.php
+$this->phrasen['pruefung/anmeldungErfolgreich'] = 'Anmeldung erfolgreich!';
+$this->phrasen['pruefung/zuWenigeCreditPoints'] = 'Credit-Points-Guthaben ist zu gering.';
+$this->phrasen['pruefung/kollisionMitAndererAnmeldung'] = 'Kollision mit anderer Anmeldung.';
+$this->phrasen['pruefung/keineFreienPlaetzeVorhanden'] = 'Keine freien Plätze vorhanden.';
+$this->phrasen['pruefung/anmeldungAufgrundVonSperreNichtMoeglich'] = 'Anmeldung auf Grund von Sperre nicht möglich.';
+$this->phrasen['pruefung/prestudentNichtGefunden'] = 'Prestudent nicht gefunden.';
+$this->phrasen['pruefung/anmeldungErfolgreichGeloescht'] = 'Anmeldung erfolgreich gelöscht.';
 
+// Mailtexte
+$this->phrasen['pruefung/emailSubjectAnmeldungBestaetigung'] = 'Anmeldungsbestätigung zur Prüfung';
+$this->phrasen['pruefung/emailBody1'] = 'Ihre Anmeldung zur Prüfung wurde von';
+$this->phrasen['pruefung/emailBody2'] = 'bestätigt.';
+$this->phrasen['pruefung/emailBodyPruefung'] = 'Prüfung:';
+$this->phrasen['pruefung/emailBodyTermin'] = 'Termin:';
+$this->phrasen['pruefung/emailBodyDauer'] = 'Dauer:';
+$this->phrasen['pruefung/emailBodyUm'] = 'um';
+$this->phrasen['pruefung/emailBodyMinuten'] = 'Minuten';
+$this->phrasen['pruefung/emailBodyOrt'] = 'Ort:';
+$this->phrasen['pruefung/emailBodyLinkZurAnmeldung'] = 'Link zur Anmeldung';
+$this->phrasen['pruefung/emailBodyBitteHtmlSicht'] = 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.';
+
+$this->phrasen['pruefung/emailLektorSubjectAnmeldung'] = 'Anmeldung zur Prüfung';
+$this->phrasen['pruefung/emailLektorStudentIn'] = 'StudentIn';
+$this->phrasen['pruefung/emailLektorHatSichZurPruefung'] = 'hat sich zur Prüfung';
+$this->phrasen['pruefung/emailLektorAm'] = 'am';
+$this->phrasen['pruefung/emailLektorVon'] = 'von';
+$this->phrasen['pruefung/emailLektorUhrBis'] = 'Uhr bis';
+$this->phrasen['pruefung/emailLektorUhrAngemeldet'] = 'Uhr angemeldet.';
 
 
 ?>
