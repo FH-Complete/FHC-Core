@@ -3,7 +3,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class FHC_Model extends CI_Model
 {
-	//protected errormsg;
 	function __construct()
 	{
 		parent::__construct();
