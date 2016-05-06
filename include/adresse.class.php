@@ -129,6 +129,7 @@ class adresse extends basis_db
 
 		//Lesen der Daten aus der Datenbank
 		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id=".$this->db_add_param($pers_id, FHC_INTEGER, false);
+		$qry.=" ORDER BY zustelladresse DESC";
 
 		if(!$this->db_query($qry))
 		{
