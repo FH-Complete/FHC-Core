@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Karl Burkhart <burkhart@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Karl Burkhart <burkhart@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../../config/cis.config.inc.php');
@@ -67,7 +68,7 @@ $num_rows=$db->db_num_rows($erg);
 	{
 		echo '<td class="MarkLine" nowrap valign="top">';
 		$row=$db->db_fetch_object($erg, $i);
-     	$stg_kz=$row->studiengang_kz;
+		$stg_kz=$row->studiengang_kz;
 		$stg_kzbz=$row->typ.$row->kurzbz;
 		$sql_query="SELECT DISTINCT semester FROM tbl_student WHERE studiengang_kz=$stg_kz AND semester<10 ORDER BY semester";
 		//echo $sql_query;
