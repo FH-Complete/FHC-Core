@@ -34,7 +34,7 @@ class Studiengang_model extends DB_Model
 			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['lehre.vw_studienplan'], FHC_MODEL_ERROR);
 		
 		if (! $this->fhc_db_acl->isBerechtigt($this->acl['bis.tbl_lgartcode'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['lehre.vw_studienplan'], FHC_MODEL_ERROR);
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['bis.tbl_lgartcode'], FHC_MODEL_ERROR);
 		
 		return $this->db->query($allForBewerbungQuery);
 	}
