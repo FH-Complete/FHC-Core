@@ -53,36 +53,15 @@ $text ="";
 		<h2>Studenten Checkskript für BIS-Meldung</h2>
 <?php 
 
+
 /*
- *   	Studiengang muss beim Prestudenten und beim Studenten gleich sein
+ * Abbrecher dürfen nicht mehr aktiv sein
  */
 
-$qry="select stud.student_uid, pre.studiengang_kz, stud.studiengang_kz studiengang 
-from public.tbl_prestudent pre 
-join public.tbl_student stud using(prestudent_id) 
-where stud.studiengang_kz != pre.studiengang_kz;"; 
-
-$text.="Suche Studiengänge die bei Prestudenten und Studenten nicht gleich sind ...<br><br>";
-
-if($db->db_query($qry))
-{
-	while($row = $db->db_fetch_object())
-	{
-		$ausgabe[$row->studiengang][1][]= $row->student_uid; 
-		$text.="Studenten-uid: ".$row->student_uid."<br>"; 
-	}
-}
-else
-	$text.="Fehler bei der Abfrage aufgetreten. <br>"; 
-
-/*	
- * Abbrecher dürfen nicht mehr aktiv sein 
- */
-	
 $text.= "<br>Suche alle Abbrecher die noch aktiv sind ... <br><br>";
 
 $qry ="select pre_status.status_kurzbz, benutzer.aktiv, benutzer.uid, pre.studiengang_kz studiengang
-from public.tbl_prestudentstatus pre_status 
+from public.tbl_prestudentstatus pre_status
 join public.tbl_prestudent pre using(prestudent_id)
 join public.tbl_benutzer benutzer on(benutzer.uid=pre.uid)
 where pre_status.status_kurzbz ='Abbrecher' and benutzer.aktiv = 'true';";
@@ -91,12 +70,12 @@ if($db->db_query($qry))
 {
 	while($row = $db->db_fetch_object())
 	{
-		$ausgabe[$row->studiengang][2][]= $row->uid; 
-		$text .="Studenten-uid: ".$row->uid."<br>"; 
+		$ausgabe[$row->studiengang][2][]= $row->uid;
+		$text .="Studenten-uid: ".$row->uid."<br>";
 	}
 }
 else
-	$text.= "Fehler bei der Abfrage aufgetreten. <br>"; 
+	$text.= "Fehler bei der Abfrage aufgetreten. <br>";
 
 
 
@@ -104,21 +83,20 @@ else
  *	Organisationsform eines Studienganges, sollte mit den Organisationsformen der Studenten übereinstimmen
  */
 
-$text.= "<br>Suche Studenten mit ungleichen Organisationsformeinträgen (Studiengang <--> Prestudentstatus) ... <br><br>"; 
+$text.= "<br>Suche Studenten mit ungleichen Organisationsformeinträgen (Studiengang <--> Prestudentstatus) ... <br><br>";
 
 $orgArray = array(); 
 $orgForm = new organisationsform(); 
 
-$qry ="select studiengang.orgform_kurzbz as studorgkz, student.student_uid, prestudentstatus.orgform_kurzbz as studentorgkz, student.studiengang_kz studiengang
+$qry ="select studiengang.orgform_kurzbz as studorgkz, prestudent.uid, prestudentstatus.orgform_kurzbz as studentorgkz, prestudent.studiengang_kz studiengang
 from public.tbl_studiengang studiengang
-join public.tbl_student student using(studiengang_kz)
-join public.tbl_prestudent prestudent using(prestudent_id)
+join public.tbl_prestudent prestudent using(studiengang_kz)
 join public.tbl_prestudentstatus prestudentstatus using(prestudent_id)
-join public.tbl_benutzer benutzer on(benutzer.uid = student.student_uid)
+join public.tbl_benutzer benutzer on(benutzer.uid = prestudent.uid)
 where benutzer.aktiv = 'true' and prestudentstatus.status_kurzbz ='Student'
 and studiengang.studiengang_kz < 10000
 and prestudentstatus.studiensemester_kurzbz = '$aktSem' 
-order by student_uid; "; 
+order by prestudent.uid; ";
 
 
 if($db->db_query($qry))
@@ -126,7 +104,7 @@ if($db->db_query($qry))
 	while($row = $db->db_fetch_object())
 	{
 		$studOrgform = $row->studorgkz; 
-		$student_uid = $row->student_uid; 
+		$student_uid = $row->uid;
 		$studentOrgform = $row->studentorgkz; 
 
 		$orgArray = $orgForm->checkOrgForm($studOrgform); 
@@ -134,7 +112,7 @@ if($db->db_query($qry))
 		{
 			if(!in_array($studentOrgform, $orgArray))
 			{
-				$ausgabe[$row->studiengang][3][]= $row->student_uid; 
+				$ausgabe[$row->studiengang][3][]= $student_uid;
 				$text.= "Student_uid: $student_uid <br>";
 			}
 		}
@@ -152,37 +130,36 @@ $prestudentAbbrecher = new prestudent();
 $prestudentLast = new prestudent(); 
 $text.= "<br>Suche alle Abbrecher die wieder einen Status bekommen haben...<br><br>"; 
 
-$qry ="select student.student_uid, prestudent.prestudent_id, student.studiengang_kz studiengang
-from public.tbl_student student
-join public.tbl_prestudent prestudent using(prestudent_id)
-join public.tbl_prestudentstatus prestatus using(prestudent_id) 
-where prestatus.status_kurzbz = 'Abbrecher'; "; 
+$qry ="select prestudent.uid, prestudent.prestudent_id, prestudent.studiengang_kz studiengang
+from public.tbl_prestudent prestudent
+join public.tbl_prestudentstatus prestatus using(prestudent_id)
+where prestatus.status_kurzbz = 'Abbrecher'; ";
 
 if($db->db_query($qry))
 {
 	while($row = $db->db_fetch_object())
 	{
-		$student_uid = $row->student_uid; 
-		$prestudent_id = $row->prestudent_id; 
-		
-		$prestudentLast->result = array(); 
-		
-		$prestudentLast->getLastStatus($prestudent_id); 
-		
+		$student_uid = $row->uid;
+		$prestudent_id = $row->prestudent_id;
+
+		$prestudentLast->result = array();
+
+		$prestudentLast->getLastStatus($prestudent_id);
+
 		if($prestudentLast->status_kurzbz != 'Abbrecher')
 		{
-			$ausgabe[$row->studiengang][4][]= $student_uid; 
-			$text.= "Studenten-uid: ".$student_uid."<br>";   
+			$ausgabe[$row->studiengang][4][]= $student_uid;
+			$text.= "Studenten-uid: ".$student_uid."<br>";
 		}
 	}
 }
 
 
 /*
- * 	Aktuelles Semester beim Studenten stimmt nicht mit dem Ausbildungssemester des aktuellen Status überein
- */ 
+ * Aktuelles Semester beim Studenten stimmt nicht mit dem Ausbildungssemester des aktuellen Status überein
+ */
 
-$text .="<br><br>Suche Studenten deren Semstern nicht mit dem Ausbildungssemesters des aktuellen Status übereinstimmt ... <br><br>"; 
+$text .="<br><br>Suche Studenten deren Semstern nicht mit dem Ausbildungssemesters des aktuellen Status übereinstimmt ... <br><br>";
 
 $qry = "select distinct(pre.uid), pre.prestudent_id, status.ausbildungssemester, lv.semester, pre.studiengang_kz studiengang
 from public.tbl_prestudent pre
@@ -213,19 +190,18 @@ if($db->db_query($qry))
 
 $text.="<br><br>Suche alle inaktiven Studenten mit einem aktiven Status ... <br><br>"; 
 
-$qry = "Select distinct(student.student_uid), student.studiengang_kz studiengang 
+$qry = "Select distinct(prestudent.uid), prestudent.studiengang_kz studiengang
 from public.tbl_benutzer benutzer 
-join public.tbl_student student on(benutzer.uid = student.student_uid)
-join public.tbl_prestudent prestudent using(prestudent_id)
-where benutzer.aktiv = 'false' 
+join public.tbl_prestudent prestudent using(uid)
+where benutzer.aktiv = 'false'
 and get_rolle_prestudent (prestudent_id, '$aktSem') in ('Student', 'Diplomand', 'Unterbrecher', 'Praktikant')";
 
 if($db->db_query($qry))
 {
 	while($row = $db->db_fetch_object())
 	{
-		$ausgabe[$row->studiengang][6][]= $row->student_uid; 
-		$text.="Studenten-uid: ".$row->student_uid."<br>"; 
+		$ausgabe[$row->studiengang][6][]= $row->uid;
+		$text.="Studenten-uid: ".$row->uid."<br>";
 	}
 }
 
@@ -237,12 +213,11 @@ if($db->db_query($qry))
 
 $text.="<br><br>Suche alle Studenten deren Inskription im aktuellen Semester vor der letzten BIS-Meldung liegt ...<br><br>";
 
-$qry ="Select distinct(student.student_uid), prestudent.prestudent_id, student.studiengang_kz studiengang 
+$qry ="Select distinct(prestudent.uid), prestudent.prestudent_id, prestudent.studiengang_kz studiengang
 from public.tbl_benutzer benutzer 
-join public.tbl_student student on(benutzer.uid = student.student_uid)
-join public.tbl_prestudent prestudent using(prestudent_id)
-join public.tbl_prestudentstatus prestatus using(prestudent_id) 
-where benutzer.aktiv = 'true'"; 
+join public.tbl_prestudent prestudent using(uid)
+join public.tbl_prestudentstatus prestatus using(prestudent_id)
+where benutzer.aktiv = 'true'";
 
 if($db->db_query($qry))
 {
@@ -260,8 +235,8 @@ if($db->db_query($qry))
 			// Wenn Inscriptionsdatum vor der letzten BIS Meldung liegt
 			if($datumInscription < $datumBIS)
 			{
-				$ausgabe[$row->studiengang][7][]= $row->student_uid; 
-				$text.= $row->student_uid ." Inskribiert am: ".$datumInscription." BIS Meldung: ".$datumBIS."<br>"; 
+				$ausgabe[$row->studiengang][7][]= $row->uid;
+				$text.= $row->uid ." Inskribiert am: ".$datumInscription." BIS Meldung: ".$datumBIS."<br>";
 			}
 		}
 
@@ -273,16 +248,15 @@ if($db->db_query($qry))
  *	Datum und Studiensemester bei den Stati sind in falscher Reihenfolge 
  */
 
-$text.="<br><br>Suche alle Studenten die Datum und Studiensemester in deren Stati in falscher Reihenfolge haben ...<br><br>"; 
+$text.="<br><br>Suche alle Studenten die Datum und Studiensemester in deren Stati in falscher Reihenfolge haben ...<br><br>";
 $prestudentFirst = new prestudent();
 $prestudentSecond = new prestudent();
 $i = 0; 
 
 // alle aktiven Studenten die im aktuellen Semster den Status Student haben
-$qry_student ="Select distinct(student_uid), prestudent.prestudent_id, student.studiengang_kz studiengang 
-from public.tbl_student student 
-join public.tbl_benutzer benutzer on(student.student_uid = benutzer.uid)
-join public.tbl_prestudent prestudent using(prestudent_id)
+$qry_student ="Select distinct(prestudent.uid), prestudent.prestudent_id, prestudent.studiengang_kz studiengang
+from public.tbl_prestudent prestudent
+join public.tbl_benutzer benutzer on(prestudent.uid = benutzer.uid)
 join public.tbl_prestudentstatus status using(prestudent_id)
 where benutzer.aktiv = 'true' 
 and status.status_kurzbz ='Student' 
@@ -330,8 +304,8 @@ if($result = $db->db_query($qry_student))
 		{
 			if($prestudentFirst->result[$i]->studiensemester_kurzbz != $prestudentSecond->result[$i]->studiensemester_kurzbz)
 			{
-				$ausgabe[$student->studiengang][8][]= $student->student_uid; 
-				$text.= "Studenten-uid: ".$student->student_uid."<br>"; 
+				$ausgabe[$student->studiengang][8][]= $student->uid;
+				$text.= "Studenten-uid: ".$student->uid."<br>";
 				continue 2; 
 			}
 		}
@@ -345,10 +319,9 @@ if($result = $db->db_query($qry_student))
 $prestudent = new prestudent(); 
 $text.="<br><br>Suche alle aktiven Studenten die keinen Status im aktuellen Studiensemester haben.<br><br>"; 
 
-$qry ="Select distinct (student_uid), prestudent.prestudent_id, student.studiengang_kz studiengang
-from public.tbl_student student 
-join public.tbl_benutzer benutzer on (benutzer.uid = student.student_uid)
-join public.tbl_prestudent prestudent using(prestudent_id)
+$qry ="Select distinct (prestudent.uid), prestudent.prestudent_id, prestudent.studiengang_kz studiengang
+from public.tbl_prestudent prestudent
+join public.tbl_benutzer benutzer on (benutzer.uid = prestudent.uid)
 join public.tbl_prestudentstatus status using(prestudent_id)
 where benutzer.aktiv = 'true'"; 
 
@@ -359,8 +332,8 @@ if($result = $db->db_query($qry))
 		if(!$prestudent->getLastStatus($row->prestudent_id, $aktSem) 
 		&& !$prestudent->getLastStatus($row->prestudent_id, $nextSem))
 		{
-			$ausgabe[$row->studiengang][9][]= $row->student_uid; 
-			$text.= $row->student_uid."<br>";
+			$ausgabe[$row->studiengang][9][]= $row->uid;
+			$text.= $row->uid."<br>";
 		} 
 	}
 }
@@ -435,9 +408,6 @@ foreach($ausgabe as $stg_kz=>$value)
 	foreach($value as $code=>$uid)
 	{
 		switch ($code) {
-			case 1:
-					echo '<tr><td>&nbsp;</td></tr><tr><td colspan="4"><b>Studenten deren Studiengänge (Prestudent <-> Student) nicht gleich sind</b></td></tr>';
-					break;
 			case 2:
 					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Abrecher die noch aktiv sind</b></td></td>";
 					break;
