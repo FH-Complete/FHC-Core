@@ -10,12 +10,13 @@ class FHC_Model extends CI_Model
 		$this->load->helper('language');
 		$this->lang->load('fhc_model');
 		$this->lang->load('fhcomplete');
-		if (is_null($uid) && isset($this->session->uid))
+		
+		$uid = NULL;
+		if(is_null($uid) && isset($this->session->uid))
+		{
 			$uid = $this->session->uid;
-		else
-			$uid = null;
+		}
 		$this->load->library('FHC_DB_ACL', array('uid' => $uid));
-		//$this->load->library('FHC_DB_ACL');
 	}
 
 	/** ---------------------------------------------------------------
