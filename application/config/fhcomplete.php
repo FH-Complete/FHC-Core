@@ -9,12 +9,16 @@ $config['fhc_acl'] = array
 	'bis.tbl_nation' => 'basis/nation',
 	'bis.tbl_lgartcode' => 'basis/lgartcode',
 	
+	'campus.tbl_dms' => 'basis/tbl_dms',
+	'campus.tbl_dms_version' => 'basis/tbl_dms_version',
+	
 	'lehre.tbl_studienplan' => 'basis/studienplan',
 	'lehre.tbl_studienordnung' => 'basis/studienordnung',
 	'lehre.vw_studienplan' => 'basis/vw_studienplan',
 	
 	'public.tbl_person' => 'basis/person',
 	'public.tbl_kontakt' => 'basis/kontakt',
+	'public.tbl_benutzer' => 'basis/benutzer',
 	'public.tbl_prestudent' => 'basis/person',
 	'public.tbl_prestudentstatus' => 'basis/person',
 	'public.tbl_organisationseinheit' => 'basis/organisationseinheit',

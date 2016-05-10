@@ -223,6 +223,29 @@ class DB_Model extends FHC_Model
 		
 		return $this->_success(TRUE);
 	}
+	
+	/** ---------------------------------------------------------------
+	 * Add limit clause
+	 *
+	 * @return  void
+	 */
+	public function addLimit($start = null, $end = null)
+	{
+		// Check Class-Attributes and parameters
+		if(!is_numeric($start) || (is_numeric($start) && $start <= 0))
+			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+		
+		if(is_numeric($end) && $end > $start)
+		{
+			$this->db->limit($start, $end);
+		}
+		else
+		{
+			$this->db->limit($start);
+		}
+		
+		return $this->_success(TRUE);
+	}
 
 	/** ---------------------------------------------------------------
 	 * Delete data from DB-Table

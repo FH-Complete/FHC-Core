@@ -57,39 +57,55 @@ class Person_model extends DB_Model
 	 */
 	public function checkBewerbung($email, $studiensemester_kurzbz = NULL)
 	{
-		$this->db->distinct();
-
+		// Checks if the operation is permitted by the API caller
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_person'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_person'], FHC_MODEL_ERROR);
+		
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_kontakt'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_kontakt'], FHC_MODEL_ERROR);
+		
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_benutzer'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_benutzer'], FHC_MODEL_ERROR);
+		
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_prestudent'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_prestudent'], FHC_MODEL_ERROR);
+		
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_prestudentstatus'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_prestudentstatus'], FHC_MODEL_ERROR);
+		
+		$result = NULL;
+		
 		if(is_null($studiensemester_kurzbz))
 		{
-			$this->db->select("p.person_id, p.zugangscode, p.insertamum")
-					->from("public.tbl_person p")
-					->join("public.tbl_kontakt k", "p.person_id=k.person_id")
-					->join("public.tbl_benutzer b", "p.person_id=b.person_id", "left")
-					->where("k.kontakttyp", 'email')
-					->where("(kontakt='" . $email . "'" .
-							" OR alias ||'@technikum-wien.at'='" . $email . "'" .
-							" OR uid ||'@technikum-wien.at'='" . $email . "')")
-					->order_by("p.insertamum", "DESC")
-					->limit(1)
-			;
+			$checkBewerbungQuery = "SELECT DISTINCT p.person_id, p.zugangscode, p.insertamum
+ 									  FROM public.tbl_person p JOIN public.tbl_kontakt k ON p.person_id = k.person_id
+							     LEFT JOIN public.tbl_benutzer b ON p.person_id = b.person_id
+								     WHERE k.kontakttyp = 'email'
+									   AND (kontakt = ? OR alias || '@technikum-wien.at' = ? OR uid || '@technikum-wien.at' = ?)
+								  ORDER BY p.insertamum DESC
+								     LIMIT 1";
+			
+			$result = $this->db->query($checkBewerbungQuery, array($email, $email, $email));
 		}
 		else
 		{
-			$this->db->select("p.person_id,p.zugangscode,p.insertamum")
-					->from("public.tbl_person p")
-					->join("public.tbl_kontakt k", "p.person_id=k.person_id")
-					->join("public.tbl_benutzer b", "p.person_id=b.person_id", "left")
-					->join("public.tbl_prestudent ps", "p.person_id=ps.person_id")
-					->join("public.tbl_prestudentstatus pst", "pst.prestudent_id=ps.prestudent_id")
-					->where("k.kontakttyp", 'email')
-					->where("(kontakt='" . $email . "'" .
-							" OR alias ||'@technikum-wien.at'='" . $email . "'" .
-							" OR uid ||'@technikum-wien.at'='" . $email . "')")
-					->where("studiensemester_kurzbz='" . $studiensemester_kurzbz . "'")
-					->order_by("p.insertamum", "DESC")
-					->limit(1)
-			;
+			$checkBewerbungQuery = "SELECT DISTINCT p.person_id, p.zugangscode, p.insertamum
+									  FROM public.tbl_person p JOIN public.tbl_kontakt k ON p.person_id = k.person_id
+								 LEFT JOIN public.tbl_benutzer b ON p.person_id = b.person_id
+									  JOIN public.tbl_prestudent ps ON p.person_id = ps.person_id
+									  JOIN public.tbl_prestudentstatus pst ON pst.prestudent_id = ps.prestudent_id
+									 WHERE k.kontakttyp = 'email'
+									   AND (kontakt = ? OR alias || '@technikum-wien.at' = ? OR uid || '@technikum-wien.at' = ?)
+									   AND studiensemester_kurzbz = ?
+								  ORDER BY p.insertamum DESC
+									 LIMIT 1";
+			
+			$result = $this->db->query($checkBewerbungQuery, array($email, $email, $email, $studiensemester_kurzbz));
 		}
-		return $this->db->get()->result_array();
+		
+		if(is_object($result))
+			return $this->_success($result->result());
+		else
+			return $this->_error($this->db->error(), FHC_DB_ERROR);
 	}
 }

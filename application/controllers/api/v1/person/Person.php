@@ -94,43 +94,21 @@ class Person extends APIv1_Controller
 	 */
 	public function getCheckBewerbung()
 	{
-		$result = $this->PersonModel->checkBewerbung($this->get("email"), $this->get("studiensemester_kurzbz"));
-		$httpstatus = REST_Controller::HTTP_OK;
-		$payload = [
-			'success' => true,
-			'message' => 'Bewerbung exists.'
-		];
-		$payload['data'] = $result;
-		$this->response($payload, $httpstatus);
-	}
-
-	/**
-	 * @return void
-	 */
-	public function getCheckZugangscodePerson()
-	{
-		$result = $this->PersonModel->checkZugangscodePerson($this->get("code"));
-		$httpstatus = REST_Controller::HTTP_OK;
-		if(!empty($result))
+		$email = $this->get('email');
+		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
+		
+		if(isset($email))
 		{
-			$payload = [
-				'success' => true,
-				'message' => 'Zugangscode exists.'
-			];
-			$payload['data'] = $result;
+			$result = $this->PersonModel->checkBewerbung($email, $studiensemester_kurzbz);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
 		{
-			$payload = [
-				'success' => false,
-				'message' => 'Zugangscode does not exist.'
-			];
-			$httpstatus = REST_Controller::HTTP_OK;
+			$this->response();
 		}
-
-		$this->response($payload, $httpstatus);
 	}
-	
+
 	private function _validate($person = NULL)
 	{
 		if(!isset($person))
