@@ -60,7 +60,8 @@ class Person extends APIv1_Controller
 		}
 		else
 		{
-			$this->response();
+                        $fields = $this->PersonModel->getFields();
+			$this->response($fields, REST_Controller::HTTP_OK);
 		}
 	}
 
