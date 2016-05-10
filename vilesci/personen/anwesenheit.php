@@ -392,7 +392,7 @@ if($work=='')
 	echo '</select>';
 
 	$stsem = new studiensemester();
-	$akt = $stsem->getAktOrNext();
+	$akt = $stsem->getaktorNext();
 	$stsem->getAll();
 	echo 'Studiensemester <select name="stsem" id="stsem" onchange="loadListe()">';
 	foreach($stsem->studiensemester as $row)

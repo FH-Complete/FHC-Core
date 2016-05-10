@@ -21,6 +21,7 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  *          Manfred Kindl <manfred.kindl@technikum-wien.at>
  *          Alexander Nimmervoll <alexander.nimmervoll@technikum-wien.at>
+ *          Andreas Moik 	< moik@technikum-wien.at >
  */
  
 require_once('../../../config/cis.config.inc.php');
@@ -98,7 +99,7 @@ if(!$result_ort)
   	die("ort not found!");  	
 $num_rows_ort=$db->db_num_rows($result_ort);
 
-/*$sql_query="SELECT student_uid FROM public.tbl_student ORDER BY student_uid";
+/*$sql_query="SELECT uid FROM public.tbl_prestudent ORDER BY uid";
 $result_lektor=$db->db_query($sql_query);
 if(!$result_lektor)
 	die("lektor not found!");

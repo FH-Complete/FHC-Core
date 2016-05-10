@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /****************************************************************************
  * Script: 			mlists_generate.php
@@ -1264,8 +1265,8 @@ $error_msg='';
 			tbl_studiengang.typ, 
 			tbl_studiengang.kurzbz 
 		FROM 
-			public.tbl_student
-			JOIN public.tbl_benutzer ON(student_uid=uid)
+			public.tbl_prestudent
+			JOIN public.tbl_benutzer USING(uid)
 			JOIN public.tbl_prestudentstatus USING(prestudent_id)
 			JOIN public.tbl_studiengang USING(studiengang_kz)
 		WHERE
@@ -1314,18 +1315,18 @@ $error_msg='';
 				SELECT 
 					distinct student_uid
 				FROM 
-					public.tbl_student 
-					JOIN public.tbl_benutzer ON(uid=student_uid)
+					public.tbl_prestudent
+					JOIN public.tbl_benutzer USING(uid)
 				WHERE
 					tbl_benutzer.aktiv AND
 					'".addslashes($row->orgform_kurzbz)."'=
 						(SELECT orgform_kurzbz 
 						 FROM public.tbl_prestudentstatus 
 						 WHERE 
-						 	prestudent_id=tbl_student.prestudent_id 
+						 	prestudent_id=tbl_prestudent.prestudent_id
 						 	AND tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($stsem)."' 
-						 ORDER BY datum desc, insertamum desc, ext_id desc LIMIT 1)					
-					AND tbl_student.studiengang_kz='".addslashes($row->studiengang_kz)."'";
+						 ORDER BY datum desc, insertamum desc, ext_id desc LIMIT 1)
+					AND tbl_prestudent.studiengang_kz='".addslashes($row->studiengang_kz)."'";
 			
 			//Personen entfernen die nicht mehr in den Verteiler gehoeren
 			$qry = "DELETE FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='".$mlist_name."' AND uid NOT IN(".$sql_query.");";

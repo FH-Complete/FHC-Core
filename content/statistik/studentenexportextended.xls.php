@@ -186,7 +186,7 @@ loadVariables($user);
 	{
 		// Student holen
 		$qry = "SELECT *, tbl_prestudent.studiengang_kz as prestgkz, (SELECT UPPER(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_prestudent.studiengang_kz) as stgbez
-				FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student USING(prestudent_id) 
+				FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id)
 				WHERE prestudent_id in($prestudent_ids) ORDER BY nachname, vorname";
 	
 		if($db->db_query($qry))
@@ -305,7 +305,7 @@ loadVariables($user);
 		$worksheet->write($zeile,$i, $row->stgbez);
 		$i++;
 		
-		$qry = "SELECT tbl_studentlehrverband.semester AS semester_studiensemester, tbl_student.semester AS semester_aktuell,* FROM public.tbl_studentlehrverband JOIN public.tbl_student USING(prestudent_id)
+		$qry = "SELECT tbl_studentlehrverband.semester AS semester_studiensemester, tbl_student.semester AS semester_aktuell,* FROM public.tbl_studentlehrverband
 				WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)."
 				AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
 		if($db->db_query($qry))

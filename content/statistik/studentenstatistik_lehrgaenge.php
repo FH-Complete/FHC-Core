@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /*
  * Erstellt eine Liste der Studenten eines Studiensemesters
@@ -110,7 +111,7 @@ if($stsem!='')
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Incoming' AND studiensemester_kurzbz='".addslashes($stsem)."'
 					) a) AS inc,
-				(SELECT count(*) FROM (SELECT distinct student_uid FROM public.tbl_student JOIN bis.tbl_bisio USING (student_uid)
+				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_prestudent JOIN bis.tbl_bisio USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND (bis>='".addslashes($stsem_obj->start)."' OR bis is null) AND von<='".addslashes($stsem_obj->ende)."'
 					) a) AS out,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
@@ -264,7 +265,7 @@ if($stsem!='')
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Incoming' AND studiensemester_kurzbz='".addslashes($stsem)."'
 					) a) AS inc,
-				(SELECT count(*) FROM (SELECT distinct student_uid FROM public.tbl_student JOIN bis.tbl_bisio USING (student_uid)
+				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_prestudent JOIN bis.tbl_bisio USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND (bis>='".addslashes($stsem_obj->start)."' OR bis is null) AND von<='".addslashes($stsem_obj->ende)."'
 					) a) AS out,
 				(SELECT count(*) FROM (SELECT distinct prestudent_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)

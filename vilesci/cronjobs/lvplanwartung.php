@@ -73,7 +73,7 @@ else
 	$semester='';
 
 $stsem_obj = new studiensemester();
-$studiensemester_kurzbz = $stsem_obj->getAktOrNext();
+$studiensemester_kurzbz = $stsem_obj->getaktorNext();
 
 $qry="SELECT
 			*, planstunden-verplant::smallint AS offenestunden

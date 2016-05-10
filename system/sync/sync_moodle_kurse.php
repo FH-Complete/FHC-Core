@@ -46,7 +46,7 @@ if(php_sapi_name() != 'cli')
 $db = new basis_db();
 
 $stsem_obj = new studiensemester();
-$stsem = $stsem_obj->getAktOrNext();
+$stsem = $stsem_obj->getaktorNext();
 
 $qry = "SELECT
                         distinct lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.kurzbz,

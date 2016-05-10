@@ -45,7 +45,7 @@ $datum_obj = new datum();
 if($studiensemester_kurzbz=='')
 {
 	$stsem = new studiensemester();
-	$studiensemester_kurzbz = $stsem->getAktOrNext();
+	$studiensemester_kurzbz = $stsem->getaktorNext();
 }
 
 if($studiensemester_kurzbz!='')

@@ -41,7 +41,7 @@ $db = new basis_db();
 $datum_obj = new datum();
 
 $stsem_obj = new studiensemester();
-$studiensemester_kurzbz = $stsem_obj->getAktOrNext();
+$studiensemester_kurzbz = $stsem_obj->getaktorNext();
 
 $erhalter = new erhalter();
 $erhalter->getAll();

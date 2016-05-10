@@ -267,12 +267,12 @@ $qry = "SELECT distinct lehreinheit_id, lehrfach.kurzbz FROM lehre.tbl_lehreinhe
 		SELECT 
 			lehreinheit_id 
 		FROM 
-			public.tbl_student, lehre.tbl_lehreinheitgruppe, public.tbl_studentlehrverband
+			public.tbl_prestudent, lehre.tbl_lehreinheitgruppe, public.tbl_studentlehrverband
 		WHERE 
-			tbl_student.student_uid=".$db->db_add_param($user)." AND
-			tbl_studentlehrverband.prestudent_id=tbl_student.prestudent_id AND
+			tbl_prestudent.uid=".$db->db_add_param($user)." AND
+			tbl_studentlehrverband.prestudent_id=tbl_prestudent.prestudent_id AND
 			tbl_studentlehrverband.studiensemester_kurzbz=".$db->db_add_param($stsem)." AND
-			tbl_student.studiengang_kz=tbl_lehreinheitgruppe.studiengang_kz AND
+			tbl_prestudent.studiengang_kz=tbl_lehreinheitgruppe.studiengang_kz AND
 			tbl_lehreinheitgruppe.gruppe_kurzbz is null AND
 			tbl_studentlehrverband.semester=tbl_lehreinheitgruppe.semester AND
 			(

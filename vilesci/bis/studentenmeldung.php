@@ -185,16 +185,15 @@ else
 //Ausgabe aktiver Studenten, die nicht gemeldet werden
 $qry_akt="
 	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id
+		DISTINCT ON(uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id
 	FROM
-		public.tbl_student
-		JOIN public.tbl_benutzer ON(student_uid=uid)
-		JOIN public.tbl_person USING (person_id)
-		JOIN public.tbl_prestudent USING (prestudent_id)
+		public.tbl_prestudent
+		JOIN public.tbl_benutzer USING (uid)
+		JOIN public.tbl_person ON (tbl_prestudent.person_id=tbl_person.person_id)
 		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
 	WHERE
 		bismelden=FALSE
-		AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
+		AND tbl_prestudent.studiengang_kz=".$db->db_add_param($stg_kz)."
 		AND (tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem)." AND status_kurzbz IN ('Student','Diplomand','Unterbrecher','Praktikant','Outgoing'))
 		AND tbl_prestudent.prestudent_id NOT IN
 			(
@@ -204,13 +203,13 @@ $qry_akt="
 			 	tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem)."
 			 	AND (status_kurzbz='Abbrecher' OR status_kurzbz='Absolvent')
 			 )
-	ORDER BY student_uid, nachname, vorname
+	ORDER BY uid, nachname, vorname
 	";
 if($result_akt = $db->db_query($qry_akt))
 {
 	while($row_akt = $db->db_fetch_object($result_akt))
 	{
-		$v.="<u><b>Person (UID, Vorname, Nachname) '".$row_akt->student_uid."', '".$row_akt->nachname."', '".$row_akt->vorname."'</u></b> hat Status $row_akt->status_kurzbz, wird aber nicht BIS gemeldet!!! <br>\n";
+		$v.="<u><b>Person (UID, Vorname, Nachname) '".$row_akt->uid."', '".$row_akt->nachname."', '".$row_akt->vorname."'</u></b> hat Status $row_akt->status_kurzbz, wird aber nicht BIS gemeldet!!! <br>\n";
 		$anzahl_fehler++;
 	}
 }
@@ -218,24 +217,23 @@ if($result_akt = $db->db_query($qry_akt))
 //Incoming ohne I/O Datensatz anzeigen
 $qry_in="
 	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id
+		DISTINCT ON(uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id
 	FROM
-		public.tbl_student
-		JOIN public.tbl_benutzer ON(student_uid=uid)
-		JOIN public.tbl_person USING (person_id)
-		JOIN public.tbl_prestudent USING (prestudent_id)
+		public.tbl_prestudent
+		JOIN public.tbl_benutzer USING (uid)
+		JOIN public.tbl_person ON (tbl_prestudent.person_id=tbl_person.person_id)
 		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
 	WHERE
 		bismelden=TRUE
-		AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
-		AND (status_kurzbz='Incoming' AND tbl_student.prestudent_id NOT IN (SELECT prestudent_id FROM bis.tbl_bisio))
-	ORDER BY student_uid, nachname, vorname
+		AND tbl_prestudent.studiengang_kz=".$db->db_add_param($stg_kz)."
+		AND (status_kurzbz='Incoming' AND tbl_prestudent.prestudent_id NOT IN (SELECT prestudent_id FROM bis.tbl_bisio))
+	ORDER BY uid, nachname, vorname
 	";
 if($result_in = $db->db_query($qry_in))
 {
 	while($row_in = $db->db_fetch_object($result_in))
 	{
-		$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row_in->student_uid."', '".$row_in->nachname."', '".$row_in->vorname."' ($row_in->status_kurzbz): </u>\n";
+		$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row_in->uid."', '".$row_in->nachname."', '".$row_in->vorname."' ($row_in->status_kurzbz): </u>\n";
 		$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Es fehlt der I/O-Datensatz\n\n";
 		$anzahl_fehler++;
 	}
@@ -244,26 +242,25 @@ if($result_in = $db->db_query($qry_in))
 //Hauptselect
 $qry="
 	SELECT
-		DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+		DISTINCT ON(uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
 	FROM
-		public.tbl_student
-		JOIN public.tbl_benutzer ON(student_uid=uid)
-		JOIN public.tbl_person USING (person_id)
-		JOIN public.tbl_prestudent USING (prestudent_id)
+		public.tbl_prestudent
+		JOIN public.tbl_benutzer USING (uid)
+		JOIN public.tbl_person ON (tbl_prestudent.person_id=tbl_person.person_id)
 		JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
 	WHERE
 		bismelden=TRUE
-		AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
+		AND tbl_prestudent.studiengang_kz=".$db->db_add_param($stg_kz)."
 		AND (((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem).") AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
 			AND (status_kurzbz='Student' OR status_kurzbz='Outgoing'
 			OR status_kurzbz='Praktikant' OR status_kurzbz='Diplomand' OR status_kurzbz='Absolvent'
 			OR status_kurzbz='Abbrecher' OR status_kurzbz='Unterbrecher'))
 			OR ((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($psem).") AND (status_kurzbz='Absolvent'
 			OR status_kurzbz='Abbrecher') AND tbl_prestudentstatus.datum>".$db->db_add_param($bisprevious).")
-			OR (status_kurzbz='Incoming' AND tbl_student.prestudent_id IN (SELECT prestudent_id FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
+			OR (status_kurzbz='Incoming' AND tbl_prestudent.prestudent_id IN (SELECT prestudent_id FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
 				OR (tbl_bisio.von<=".$db->db_add_param($bisdatum)." AND (tbl_bisio.bis>=".$db->db_add_param($bisdatum)."  OR tbl_bisio.bis IS NULL))
 		)))
-	ORDER BY student_uid, nachname, vorname
+	ORDER BY uid, nachname, vorname
 	";
 
 if($result = $db->db_query($qry))
@@ -556,7 +553,7 @@ function GenerateXMLStudentBlock($row)
 	$datumobj = new datum();
 
 	//Pruefen ob Ausserordnetlicher Studierender (4.Stelle in Personenkennzeichen = 9)
-	if(mb_substr($row->matrikelnr,3,1)=='9')
+	if(mb_substr($row->perskz,3,1)=='9')
 		$ausserordentlich=true;
 	else
 		$ausserordentlich=false;
@@ -884,7 +881,7 @@ function GenerateXMLStudentBlock($row)
 
 	if($error_log!='' OR $error_log1!='')
 	{
-		$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->status_kurzbz): </u>\n";
+		$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->uid."', '".$row->nachname."', '".$row->vorname."' ($row->status_kurzbz): </u>\n";
 		if($error_log!='')
 		{
 			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fehler: ".$error_log."\n";
@@ -903,7 +900,7 @@ function GenerateXMLStudentBlock($row)
 	{
 		$datei.="
 		<StudentIn>
-			<PersKz>".trim($row->matrikelnr)."</PersKz>";
+			<PersKz>".trim($row->perskz)."</PersKz>";
 		if(!$ausserordentlich)
 		{
 			$datei.="
@@ -1106,7 +1103,7 @@ function GenerateXMLStudentBlock($row)
 		$verwendete_orgformen[]=$storgform;
 
 	//Studentenliste
-	$stlist.="<tr><td align=center>".trim($row->student_uid)."</td><td align=center>".trim($row->matrikelnr)."</td><td>".trim($row->nachname)."</td><td>".trim($row->vorname)."</td><td>".trim($aktstatus)."</td><td align=center>".trim($sem)."</td><td align=center>".trim($storgform)."</td></tr>";
+	$stlist.="<tr><td align=center>".trim($row->uid)."</td><td align=center>".trim($row->perskz)."</td><td>".trim($row->nachname)."</td><td>".trim($row->vorname)."</td><td>".trim($aktstatus)."</td><td align=center>".trim($sem)."</td><td align=center>".trim($storgform)."</td></tr>";
 	return $datei;
 }
 

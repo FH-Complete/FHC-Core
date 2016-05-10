@@ -16,14 +16,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Generiert die Listen fuer die Mailverteiler der Studenten
  */
 	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/functions.inc.php');
+	require_once('../../include/studiensemester.class.php');
 	
 	$db = new basis_db();
 	if(!($erg=$db->db_query("SELECT studiengang_kz, bezeichnung, lower(typ::varchar(1) || kurzbz) as kurzbz FROM public.tbl_studiengang ORDER BY kurzbz ASC")))
@@ -42,12 +44,16 @@
 
 
 <?php
+
+ $stsem = new studiensemester();
+ $studiensemester_kurzbz = $stsem->getaktorNext();
+
 	for ($i=0; $i<$num_rows; $i++)
 	{
 		$row=$db->db_fetch_object($erg, $i);
-     	$stg_kz=$row->studiengang_kz;
+		$stg_kz=$row->studiengang_kz;
 		$stg_kzbz=$row->kurzbz;
-		$sql_query="SELECT DISTINCT semester FROM public.tbl_student WHERE studiengang_kz=$stg_kz AND student_uid NOT LIKE '\\\\_%' AND semester<10 AND semester>0 ORDER BY semester";
+		$sql_query="SELECT DISTINCT semester FROM public.tbl_studentlehrverband WHERE studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER)." AND semester<10 AND semester>0 ORDER BY semester";
 
 		if(!($result_sem = $db->db_query($sql_query)))
 			die($db->db_last_error());
@@ -57,7 +63,7 @@
 			$row_sem=$db->db_fetch_object($result_sem, $j);
 			echo $stg_kzbz.'-'.$row_sem->semester.'<br>';
 
-			$sql_query="SELECT DISTINCT verband FROM public.tbl_student WHERE studiengang_kz=$stg_kz AND semester=$row_sem->semester AND student_uid NOT LIKE '\\\\_%' ORDER BY verband";
+			$sql_query="SELECT DISTINCT verband FROM public.tbl_studentlehrverband WHERE studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER)." AND semester=".$db->db_add_param($row_sem->semester)." ORDER BY verband";
 			
 			if(!($result_ver = $db->db_query($sql_query)))
 				die($db->db_last_error());
@@ -69,7 +75,7 @@
 				if ( ($row_ver->verband==' ' || $row_ver->verband=='') )
 					$row_ver->verband='A';
 
-				$sql_query="SELECT DISTINCT gruppe FROM public.tbl_student WHERE studiengang_kz=$stg_kz AND semester=$row_sem->semester AND (verband='$row_ver->verband' OR verband='' OR verband=' ') AND student_uid NOT LIKE '\\\\_%' ORDER BY gruppe";
+				$sql_query="SELECT DISTINCT gruppe FROM public.tbl_studentlehrverband WHERE studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER)." AND semester=$row_sem->semester AND (verband='$row_ver->verband' OR verband='' OR verband=' ') ORDER BY gruppe";
 
 				if(!($result_grp = $db->db_query($sql_query)))
 					die($db->db_last_error());
