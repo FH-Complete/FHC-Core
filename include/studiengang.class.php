@@ -31,7 +31,7 @@ if (function_exists('get_instance'))
 else
 	require_once(dirname(__FILE__).'/../ci_hack.php');
 
-require_once(dirname(__FILE__).'/../application/models/lehre/Studiengang_model.php');
+require_once(dirname(__FILE__).'/../application/models/organisation/Studiengang_model.php');
 
 class studiengang extends Studiengang_model
 {

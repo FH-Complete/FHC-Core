@@ -1,5 +1,6 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+if (! defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 class FHC_Model extends CI_Model
 {
@@ -13,7 +14,7 @@ class FHC_Model extends CI_Model
 			$uid = $this->session->uid;
 		else
 			$uid = null;
-		$this->load->library('FHC_DB_ACL',array('uid' => $uid));
+		$this->load->library('FHC_DB_ACL', array('uid' => $uid));
 	}
 
 	/** ---------------------------------------------------------------
