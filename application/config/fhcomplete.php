@@ -22,12 +22,7 @@ $config['fhc_acl'] = array
 	'public.tbl_prestudent' => 'basis/person',
 	'public.tbl_prestudentstatus' => 'basis/person',
 	'public.tbl_organisationseinheit' => 'basis/organisationseinheit',
-<<<<<<< HEAD
 	'public.tbl_sprache' => 'admin',
 	'public.tbl_msg_thread' => 'admin',
 	'public.tbl_msg_message' => 'admin'
 );
-=======
-	'public.tbl_sprache' => 'admin'
-);
->>>>>>> 44ebe15c9cab8fbbf8396d255648b8afda0f5d14
