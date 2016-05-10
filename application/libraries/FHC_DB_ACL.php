@@ -10,7 +10,9 @@
  * @since	Version 1.0.0
  * @filesource
  */
-defined('FCPATH') OR exit('No direct script access allowed');
+if (! defined('FCPATH'))
+	exit('No direct script access allowed');
+
 require_once(FCPATH.'include/basis_db.class.php');
 require_once(FCPATH.'include/organisationseinheit.class.php');
 require_once(FCPATH.'include/studiengang.class.php');
@@ -43,10 +45,11 @@ class FHC_DB_ACL
 	 * @param	string	$password
 	 * @return	bool
 	 */
-	function __construct($param)
+	function __construct($param = null)
 	{
 		$this->bb = new benutzerberechtigung();
-		$this->_uid = $param['uid'];
+		if (is_array($param) && isset($param['uid']))
+			$this->_uid = $param['uid'];
 	}
 
 	function isBerechtigt($berechtigung_kurzbz, $art=null,  $oe_kurzbz=null,  $kostenstelle_id=null)

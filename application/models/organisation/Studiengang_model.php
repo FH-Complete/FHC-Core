@@ -1,10 +1,8 @@
 <?php
-
 class Studiengang_model extends DB_Model
 {
-
 	/**
-	 * Constructor
+	 * 
 	 */
 	public function __construct()
 	{
@@ -18,7 +16,13 @@ class Studiengang_model extends DB_Model
 	 */
 	public function getAllForBewerbung()
 	{
-		$result = NULL;
+		// Checks if the operation is permitted by the API caller
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['lehre.vw_studienplan'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['lehre.vw_studienplan'], FHC_MODEL_ERROR);
+		
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['bis.tbl_lgartcode'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['bis.tbl_lgartcode'], FHC_MODEL_ERROR);
+		
 		$allForBewerbungQuery = "SELECT DISTINCT studiengang_kz,
 										typ,
 										organisationseinheittyp_kurzbz,
@@ -32,13 +36,8 @@ class Studiengang_model extends DB_Model
 									AND aktiv IS TRUE
 							   ORDER BY typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC";
 		
-		// Checks if the operation is permitted by the API caller
-		// All the code should be put inside this if statement
-		if(isAllowed($this->getAddonID(), 'course'))
-		{
-			$result = $this->db->query($allForBewerbungQuery);
-		}
+		$result = $this->db->query($allForBewerbungQuery);
 		
-		return $result;
+		return $this->_success($result->result());
 	}
 }

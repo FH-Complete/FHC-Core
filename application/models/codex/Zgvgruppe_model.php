@@ -1,7 +1,6 @@
 <?php
 class Zgvgruppe_model extends DB_Model
 {
-
 	/**
 	 * Constructor
 	 */
@@ -9,6 +8,6 @@ class Zgvgruppe_model extends DB_Model
 	{
 		parent::__construct();
 		$this->dbTable = 'bis.tbl_zgvgruppe';
-		$this->pk = ;
+		$this->pk = '';
 	}
 }

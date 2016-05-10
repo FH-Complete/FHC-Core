@@ -1,7 +1,6 @@
 <?php
 class Organisationseinheit_model extends DB_Model
 {
-
 	/**
 	 * Constructor
 	 */

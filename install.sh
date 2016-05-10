@@ -56,10 +56,14 @@ sudo -u postgres createdb -O fhcomplete fhctest
 
 echo "Installing FH-Complete..."
 # cp index.ci.php index.php		# Maybe somtimes
-cp config/global.config-default.inc.php config/global.config.inc.php
-cp config/cis.config-default.inc.php config/cis.config.inc.php
-cp config/vilesci.config-default.inc.php config/vilesci.config.inc.php
-cp config/system.config-default.inc.php config/system.config.inc.php
+
+if [ "$1" != "-no-copy-config" ]; then
+	cp config/global.config-default.inc.php config/global.config.inc.php
+	cp config/cis.config-default.inc.php config/cis.config.inc.php
+	cp config/vilesci.config-default.inc.php config/vilesci.config.inc.php
+	cp config/system.config-default.inc.php config/system.config.inc.php
+fi
+
 # mkdir documents
 #chown www-data data/cache
 

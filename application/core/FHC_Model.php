@@ -4,7 +4,7 @@ if (! defined('BASEPATH'))
 
 class FHC_Model extends CI_Model
 {
-	function __construct($uid = null)
+	function __construct()
 	{
 		parent::__construct();
 		$this->load->helper('language');
@@ -15,6 +15,7 @@ class FHC_Model extends CI_Model
 		else
 			$uid = null;
 		$this->load->library('FHC_DB_ACL', array('uid' => $uid));
+		//$this->load->library('FHC_DB_ACL');
 	}
 
 	/** ---------------------------------------------------------------
@@ -27,7 +28,7 @@ class FHC_Model extends CI_Model
 	{
 		return $this->fhc_db_acl->setUID($uid);
 	}
-
+	
 	/** ---------------------------------------------------------------
 	 * Success
 	 *
