@@ -45,8 +45,8 @@
 
 <?php
 
- $stsem = new studiensemester();
- $studiensemester_kurzbz = $stsem->getaktorNext();
+	$stsem = new studiensemester();
+	$studiensemester_kurzbz = $stsem->getaktorNext();
 
 	for ($i=0; $i<$num_rows; $i++)
 	{

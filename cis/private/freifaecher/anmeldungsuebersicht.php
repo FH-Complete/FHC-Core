@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >,
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at > and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
  
 /*
@@ -83,20 +84,18 @@ else
 //Wenn das Formular abgeschickt wurde
 if($lvid!='')
 {
-
 	$qry = "SELECT
 				vorname,
 				nachname,
 				uid,
-				tbl_student.semester as semester,
 				tbl_studiengang.kurzbzlang
 			FROM
 				campus.vw_benutzer
 				LEFT JOIN
-				(public.tbl_student LEFT JOIN public.tbl_studiengang using (studiengang_kz)) ON (student_uid = uid)
+				(public.tbl_prestudent LEFT JOIN public.tbl_studiengang using (studiengang_kz)) USING(uid)
 			WHERE
 				uid IN (SELECT uid FROM campus.tbl_benutzerlvstudiensemester
-				        WHERE lehrveranstaltung_id='".addslashes($lvid)."' AND studiensemester_kurzbz='".addslashes($stsem)."')
+					WHERE lehrveranstaltung_id=".$db->db_add_param($lvid)." AND studiensemester_kurzbz=".$db->db_add_param($stsem).")
 			ORDER BY
 				nachname, vorname";
 				
@@ -113,7 +112,7 @@ if($lvid!='')
 		while($row=$db->db_fetch_object($result))
 		{
 			$i++;
-			$content .= "\n<tr class='liste".($i%2)."'><td>$i</td><td>$row->nachname</td><td>$row->vorname</td><td><a href='mailto:$row->uid@technikum-wien.at'>$row->uid@technikum-wien.at</a></td><td align='center'>$row->kurzbzlang</td><td align='center'>$row->semester</td></tr>";
+			$content .= "\n<tr class='liste".($i%2)."'><td>$i</td><td>$row->nachname</td><td>$row->vorname</td><td><a href='mailto:$row->uid@technikum-wien.at'>$row->uid@technikum-wien.at</a></td><td align='center'>$row->kurzbzlang</td><td align='center'>$stsem</td></tr>";
 			
 			if(isset($mailto[$mailto_idx]) && mb_strlen($mailto[$mailto_idx])>450)
 				$mailto_idx++;
