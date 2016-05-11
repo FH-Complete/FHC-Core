@@ -11,46 +11,6 @@ class Person_model extends DB_Model
 		$this->dbTable = 'public.tbl_person';
 		$this->pk = 'person_id';
 	}
-        
-         public function getFields()
-        {
-            $fields =  array(
-                   //Tabellenspalten
-                "person_id" => NULL,
-                "sprache" => NULL,
-                "anrede" => NULL,
-                "titelpost" => NULL,
-                "titelpre" => NULL,
-                "nachname" => NULL,
-                "vorname" => NULL,
-                "vornamen" => NULL,
-                "gebdatum" => NULL,
-                "gebort" => NULL,
-                "gebzeit" => NULL,
-                "foto" => NULL,
-                "anmerkungen" => NULL,
-                "homepage" => NULL,
-                "svnr" => NULL,
-                "ersatzkennzeichen" => NULL,
-                "familienstand" => NULL,
-                "anzahlkinder" => NULL,
-                "aktiv"=>TRUE,
-                "insertamum" => NULL,
-                "insertvon" => NULL,
-                "updateamum" => NULL,
-                "updatevon" => NULL,
-                "geschlecht" => "u",
-                "staatsbuergerschaft" => NULL,
-                "geburtsnation"	=> NULL,
-                "ext_id" => NULL,
-                "kurzbeschreibung"> NULL,
-                "zugangscode" => NULL,
-                "foto_sperre" => FALSE,
-                "matr_nr"=> NULL
-            );
-            
-            return $this->_success($fields);
-        }
 
 	/**
 	 * 

@@ -60,8 +60,7 @@ class Person extends APIv1_Controller
 		}
 		else
 		{
-                        $fields = $this->PersonModel->getFields();
-			$this->response($fields, REST_Controller::HTTP_OK);
+			$this->response();
 		}
 	}
 
@@ -70,15 +69,17 @@ class Person extends APIv1_Controller
 	 */
 	public function postPerson()
 	{
+                $person = $this->_parseData($this->post());
+            
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['person_id']))
+			if(isset($person['person_id']) && !(is_null($person["person_id"])) && ($person["person_id"] != ""))
 			{
-				$result = $this->PersonModel->update($this->post()['person_id'], $this->post());
+				$result = $this->PersonModel->update($person['person_id'], $person);
 			}
 			else
 			{
-				$result = $this->PersonModel->insert($this->post());
+				$result = $this->PersonModel->insert($person);
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
@@ -108,6 +109,21 @@ class Person extends APIv1_Controller
 			$this->response();
 		}
 	}
+        
+        private function _parseData($person)
+        {
+            if(is_array($person))
+            {
+                foreach($person as $key=>$value)
+                {
+                    if($value === "")
+                    {
+                        $person[$key] = null;
+                    }
+                }
+                return $person;
+            }
+        }
 
 	private function _validate($person = NULL)
 	{
@@ -115,7 +131,10 @@ class Person extends APIv1_Controller
 		{
 			return false;
 		}
-		
+                
+                //TODO
+                return true;
+                
 		$person['nachname'] = trim($person['nachname']);
 		$person['vorname'] = trim($person['vorname']);
 		$person['vornamen'] = trim($person['vornamen']);
