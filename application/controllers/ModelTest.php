@@ -28,7 +28,7 @@ class ModelTest extends FHC_Controller
 		$res = $this->Person_model->getPerson(null, 'asdf\' OR person_id=1; SELECT 1; --');
 		var_dump($res->result_object());
 
-		$this->load->model('person/Prestudent_model');
+		$this->load->model('crm/Prestudent_model');
 		$id=null;
 		
 		// Insert PreStudent
@@ -79,7 +79,7 @@ class ModelTest extends FHC_Controller
 			var_dump($res->retval);
 
 		// Insert PreStudentStatus
-		$this->load->model('person/Prestudentstatus_model');
+		$this->load->model('crm/Prestudentstatus_model');
 		$data = array
 		(
 			'prestudent_id' => $id,
@@ -155,7 +155,7 @@ class ModelTest extends FHC_Controller
 		else
 			var_dump($res->retval);
 
-		$this->load->model('core/Sprache_model');		
+		$this->load->model('system/Sprache_model');		
 		// Insert Sprache
 		$data = array
 		(

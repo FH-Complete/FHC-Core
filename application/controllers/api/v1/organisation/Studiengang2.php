@@ -13,7 +13,7 @@
 // ------------------------------------------------------------------------
 if(!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Studiengang extends APIv1_Controller
+class Studiengang2 extends APIv1_Controller
 {
 	/**
 	 * Course API constructor.
@@ -29,8 +29,6 @@ class Studiengang extends APIv1_Controller
 	
 	public function getAllForBewerbung()
 	{
-		$result = $this->StudiengangModel->getAllForBewerbung();
-		
-		$this->response($result, REST_Controller::HTTP_OK);
+		$this->response($this->StudiengangModel->getAllForBewerbung(), REST_Controller::HTTP_OK);
 	}
 }

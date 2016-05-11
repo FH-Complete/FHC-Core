@@ -48,6 +48,7 @@ class DBTools extends FHC_Controller
         if (ENVIRONMENT !== 'development')
             exit('Wowsers! You don\'t want to do that!');
  		$this->load->database('system'); //Use the system-Connection for DB-Manipulation
+		$this->config->load('migration');
 		$this->load->library('migration');
  
 		// If not set, set it
@@ -301,7 +302,7 @@ class DBTools extends FHC_Controller
 	 */
 	private function __getVersion()
 	{
-		$row = $this->db->get('ci_migrations')->row();
+		$row = $this->db->get($this->config->item('migration_table'))->row();
 		return $row ? $row->version : 0;
 	}
 }
