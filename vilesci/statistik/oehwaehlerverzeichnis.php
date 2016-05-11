@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  *
  */
 /**
@@ -60,15 +61,15 @@ header( 'Content-Disposition: attachment;filename='.$filename);
 // Daten holen - Alle Personen mit akt. Status Student, Diplomand die bezahlt haben
 $qry="
 SELECT * FROM (
-SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzeichen, 
+SELECT DISTINCT ON (perskz) perskz AS personenkennzeichen,
 	tbl_person.svnr,
 	tbl_person.ersatzkennzeichen,
 	tbl_person.gebdatum,
 	tbl_person.nachname,
 	tbl_person.vorname,
 	tbl_person.geschlecht,
-	tbl_student.studiengang_kz,
-	tbl_student.student_uid,
+	tbl_prestudent.studiengang_kz,
+	tbl_prestudent.uid,
 	(SELECT plz FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY zustelladresse desc  LIMIT 1) AS zustell_plz, 
 	(SELECT gemeinde FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY zustelladresse desc  LIMIT 1) AS zustell_ort, 
 	(SELECT strasse FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY zustelladresse desc  LIMIT 1) AS zustell_strasse, 
@@ -80,17 +81,16 @@ FROM public.tbl_person
 	JOIN public.tbl_konto as ka using(person_id) 
 	JOIN public.tbl_konto as kb using(person_id) 
 	JOIN public.tbl_benutzer using(person_id) 
-	JOIN public.tbl_student on(uid=student_uid)
-	JOIN public.tbl_prestudent using(prestudent_id)
-	JOIN public.tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
-WHERE 
-	tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." 
+	JOIN public.tbl_prestudent using(uid)
+	JOIN public.tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_prestudent.prestudent_id)
+WHERE
+	tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
 	AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand')
-	AND tbl_student.studiengang_kz<10000
-	AND tbl_student.studiengang_kz>0
-	AND tbl_student.studiengang_kz!='9".$erhalter_row->erhalter_kz."'
-	AND ka.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND ka.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=ka.studiengang_kz 
-	AND kb.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND kb.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=kb.studiengang_kz 
+	AND tbl_prestudent.studiengang_kz<10000
+	AND tbl_prestudent.studiengang_kz>0
+	AND tbl_prestudent.studiengang_kz!='9".$erhalter_row->erhalter_kz."'
+	AND ka.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND ka.buchungstyp_kurzbz='OEH' AND tbl_prestudent.studiengang_kz=ka.studiengang_kz
+	AND kb.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND kb.buchungstyp_kurzbz='OEH' AND tbl_prestudent.studiengang_kz=kb.studiengang_kz
 	AND kb.buchungsnr_verweis=ka.buchungsnr AND bismelden
 ) a
 ORDER BY person_id";
@@ -138,7 +138,7 @@ if($result = $db->db_query($qry))
 			$row->heimat_plz,
 			$row->heimat_ort,
 			$row->heimat_strasse,
-			$row->student_uid.'@'.DOMAIN
+			$row->uid.'@'.DOMAIN
 			);
 		
 	}

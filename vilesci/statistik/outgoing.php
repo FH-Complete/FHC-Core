@@ -15,9 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Karl Burkhart <burkhart@technikum-wien.at>
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >,
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >,
+ *          Karl Burkhart <burkhart@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
@@ -70,7 +71,6 @@ foreach($stsem->studiensemester as $row)
 		  	public.tbl_prestudent
 		  	JOIN public.tbl_person USING(person_id)
 		  	JOIN public.tbl_studiengang USING(studiengang_kz)
-		  	JOIN public.tbl_student USING(prestudent_id)
 		  	JOIN bis.tbl_bisio USING(prestudent_id)
 		  WHERE
 
@@ -80,7 +80,7 @@ foreach($stsem->studiensemester as $row)
 		  	)
 		  	AND get_rolle_prestudent (prestudent_id, '$row->studiensemester_kurzbz')<>'Incoming' ";
 	if($studiengang_kz!='')
-		$qry.=" AND tbl_student.studiengang_kz=".$db->db_add_param($studiengang_kz);
+		$qry.=" AND tbl_prestudent.studiengang_kz=".$db->db_add_param($studiengang_kz);
 	$qry.=" ORDER BY stg";
 
 	if($result = $db->db_query($qry))
