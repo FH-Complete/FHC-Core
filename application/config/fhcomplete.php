@@ -6,6 +6,7 @@ $config['fhc_version'] = '3.2';
 
 $config['fhc_acl'] = array
 (
+	'bis.tbl_bundesland' => 'basis/nation',
 	'bis.tbl_nation' => 'basis/nation',
 	'bis.tbl_lgartcode' => 'basis/lgartcode',
 	
