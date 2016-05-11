@@ -1167,6 +1167,20 @@ if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE
 	}
 }
 
+// Fehlender FK bei tbl_studienplan_lehrveranstaltung
+if($result = $db->db_query("SELECT * FROM information_schema.table_constraints WHERE constraint_name='fk_studienplan_lehrveranstaltung_parent_id'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "ALTER TABLE lehre.tbl_studienplan_lehrveranstaltung ADD CONSTRAINT fk_studienplan_lehrveranstaltung_parent_id FOREIGN KEY (studienplan_lehrveranstaltung_id_parent) REFERENCES lehre.tbl_studienplan_lehrveranstaltung(studienplan_lehrveranstaltung_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_studienplan_lehrveranstaltung '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Fehlenden FK bei Tabelle lehre.tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent gesetzt<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
