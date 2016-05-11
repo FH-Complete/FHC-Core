@@ -17,6 +17,7 @@ $config['fhc_acl'] = array
 	'lehre.tbl_studienordnung' => 'basis/studienordnung',
 	'lehre.vw_studienplan' => 'basis/vw_studienplan',
 	
+	'public.tbl_adresse' => 'basis/adresse',
 	'public.tbl_person' => 'basis/person',
 	'public.tbl_kontakt' => 'basis/kontakt',
 	'public.tbl_benutzer' => 'basis/benutzer',
