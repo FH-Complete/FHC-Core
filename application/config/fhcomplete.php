@@ -24,6 +24,8 @@ $config['fhc_acl'] = array
 	'public.tbl_prestudent' => 'basis/person',
 	'public.tbl_prestudentstatus' => 'basis/person',
 	'public.tbl_organisationseinheit' => 'basis/organisationseinheit',
+	'public.tbl_studiengang' => 'basis/studiengang',
+	
 	'public.tbl_sprache' => 'admin',
 	'public.tbl_msg_thread' => 'admin',
 	'public.tbl_msg_message' => 'admin'

@@ -27,6 +27,22 @@ class Studiengang2 extends APIv1_Controller
 		$this->StudiengangModel->setUID($this->_getUID());
 	}
 	
+	public function getStudiengang()
+	{
+		$studiengang_kz = $this->get('studiengang_kz');
+		
+		if(isset($studiengang_kz))
+		{
+			$result = $this->StudiengangModel->load($studiengang_kz);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
 	public function getAllForBewerbung()
 	{
 		$this->response($this->StudiengangModel->getAllForBewerbung(), REST_Controller::HTTP_OK);
