@@ -21,6 +21,7 @@ $config['fhc_acl'] = array
 	'public.tbl_person' => 'basis/person',
 	'public.tbl_kontakt' => 'basis/kontakt',
 	'public.tbl_benutzer' => 'basis/benutzer',
+	'public.tbl_preinteressent' => 'basis/preinteressent',
 	'public.tbl_prestudent' => 'basis/person',
 	'public.tbl_prestudentstatus' => 'basis/person',
 	'public.tbl_organisationseinheit' => 'basis/organisationseinheit',
