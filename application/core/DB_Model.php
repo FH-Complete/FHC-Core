@@ -225,6 +225,16 @@ class DB_Model extends FHC_Model
 	}
 	
 	/** ---------------------------------------------------------------
+	 * Add distinct clause
+	 *
+	 * @return  void
+	 */
+	public function addDistinct()
+	{
+		$this->db->distinct();
+	}
+	
+	/** ---------------------------------------------------------------
 	 * Add limit clause
 	 *
 	 * @return  void
