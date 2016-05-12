@@ -15,6 +15,8 @@ DELETE FROM public.tbl_ort;
 DELETE FROM public.tbl_kontakt WHERE person_id > 2;
 -- EMPTY public.tbl_benutzer
 DELETE FROM public.tbl_benutzer WHERE person_id > 2;
+-- EMPTY public.tbl_preinteressent
+DELETE FROM public.tbl_preinteressent WHERE person_id > 2;
 -- EMPTY public.tbl_person
 DELETE FROM public.tbl_person WHERE person_id > 2;
 
