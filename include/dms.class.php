@@ -24,7 +24,13 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class dms extends basis_db
+require_once(dirname(__FILE__).'/datum.class.php');
+
+// CI
+require_once(dirname(__FILE__).'/../ci_hack.php');
+require_once(dirname(__FILE__).'/../application/models/content/Dms_model.php');
+
+class dms extends Dms_model
 {
 	public $new;
 	public $result=array();
