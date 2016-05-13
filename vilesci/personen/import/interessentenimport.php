@@ -526,13 +526,13 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 	
 	$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
 	
-	$qry = "SELECT matrikelnr FROM public.tbl_student WHERE matrikelnr LIKE '$matrikelnummer%' ORDER BY matrikelnr DESC LIMIT 1";
+	$qry = "SELECT perskz FROM public.tbl_prestudent WHERE perskz LIKE '$matrikelnummer%' ORDER BY perskz DESC LIMIT 1";
 	
 	if($db->db_query($qry))
 	{
 		if($row = $db->db_fetch_object())
 		{
-			$max = mb_substr($row->matrikelnr,7);
+			$max = mb_substr($row->perskz,7);
 		}
 		else 
 			$max = 0;

@@ -16,11 +16,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/person.class.php');
 require_once(dirname(__FILE__).'/log.class.php');
+require_once(dirname(__FILE__).'/studiensemester.class.php');
 
 class prestudent extends person
 {
@@ -1800,5 +1802,26 @@ class prestudent extends person
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
+	}
+
+	/**
+	 * Liefert den studentlehrverband des Prestudenten im aktuellen oder nächsten Semester
+	 * @return Objekt mit gruppe, verband und semester
+	 */
+	public function getStudentLehrverband()
+	{
+		$studiensemester = new studiensemester();
+		$studiensemester_kurzbz = $studiensemester->getaktorNext();
+
+		$qry_sem = "SELECT gruppe, verband, semester from tbl_studentlehrverband WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)." AND prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER);
+		if(!$res_sem = $this->db_query($qry_sem))
+			$this->errormsg = 'Fehler beim Laden der Daten';
+
+		if($this->db_num_rows($res_sem) == 1)
+		{
+			$row_sem = $this->db_fetch_object($res_sem);
+			return $row_sem;
+		}
+		return false;
 	}
 }

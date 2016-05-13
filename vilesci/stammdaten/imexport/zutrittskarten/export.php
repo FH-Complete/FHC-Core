@@ -50,26 +50,26 @@ else
 
 // Neue Zutrittskarten
 /*$sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,
-				max(tbl_benutzer.uid) AS uid, max(matrikelnr) AS matrikelnr, max(kurzbzlang) AS stg_kurzbzlang,
+				max(tbl_benutzer.uid) AS uid, max(perskz) AS perskz, max(kurzbzlang) AS stg_kurzbzlang,
 				upper(max(typ) || max(kurzbz)) AS stg_kurzbz,
 				EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
 				EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
 				EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
 			FROM public.vw_betriebsmittelperson
-				LEFT OUTER JOIN (public.tbl_benutzer JOIN public.tbl_student ON (uid=student_uid)
+				LEFT OUTER JOIN (public.tbl_benutzer JOIN public.tbl_prestudent USING(uid)
 					JOIN public.tbl_studiengang USING (studiengang_kz))
 				USING (person_id)
 			WHERE betriebsmitteltyp='Zutrittskarte' AND nummer NOT IN (SELECT physaswnumber FROM sync.tbl_zutrittskarte)
 			GROUP BY svnr,vorname,nachname,nummerintern,nummer, vw_betriebsmittelperson.insertamum;";
 */
 
-$sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer, uid, matrikelnr, kurzbzlang AS stg_kurzbzlang,
+$sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer, uid, perskz, kurzbzlang AS stg_kurzbzlang,
 				upper(typ)||upper(kurzbz) AS stg_kurzbz,
 				EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
 				EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
 				EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
 			FROM public.vw_betriebsmittelperson
-				 LEFT OUTER JOIN (public.tbl_student JOIN public.tbl_studiengang USING (studiengang_kz)) ON (uid=student_uid)
+				 LEFT OUTER JOIN (public.tbl_prestudent JOIN public.tbl_studiengang USING (studiengang_kz)) USING(uid)
 			WHERE betriebsmitteltyp='Zutrittskarte' AND benutzer_aktiv AND retouram IS NULL
 				AND nummer NOT IN (SELECT physaswnumber FROM sync.tbl_zutrittskarte);";
 //echo $sql_query;
@@ -77,13 +77,13 @@ if(!$result_neu=$db->db_query($sql_query))
 	die($db->db_last_error().'<BR>'.$sql_query);
 
 // Updates von Zutrittskarten
-$sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,firstname,name,key, uid, matrikelnr,
+$sql_query="SELECT svnr,vorname,nachname,nummerintern,nummer,firstname,name,key, uid, perskz,
 				kurzbzlang AS stg_kurzbzlang, upper(typ)||upper(kurzbz) AS stg_kurzbz, text1,pin,
 				EXTRACT(DAY FROM vw_betriebsmittelperson.insertamum) AS tag,
 				EXTRACT(MONTH FROM vw_betriebsmittelperson.insertamum) AS monat,
 				EXTRACT(YEAR FROM vw_betriebsmittelperson.insertamum) AS jahr
 			FROM public.vw_betriebsmittelperson
-				 LEFT OUTER JOIN (public.tbl_student JOIN public.tbl_studiengang USING (studiengang_kz)) ON (uid=student_uid)
+				 LEFT OUTER JOIN (public.tbl_prestudent JOIN public.tbl_studiengang USING (studiengang_kz)) USING(uid)
 				 JOIN sync.tbl_zutrittskarte ON (physaswnumber=nummer)
 			WHERE benutzer_aktiv AND retouram IS NULL
 				AND (trim(vw_betriebsmittelperson.nachname)!=trim(tbl_zutrittskarte.name)
@@ -168,7 +168,7 @@ while ($row=$db->db_fetch_object($result_neu))
 	$worksheet->write($z,7, $row->tag.'.'.$row->monat.'.'.$row->jahr);
 	$worksheet->write($z,8, $row->tag.'.'.$row->monat.'.'.($row->jahr+5));
 	$worksheet->write($z,9, $row->uid);
-	$worksheet->write($z,10,$row->matrikelnr);
+	$worksheet->write($z,10,$row->perskz);
 	$worksheet->write($z,11,'');
 	$worksheet->write($z,12,'');
 	$worksheet->write($z,13,'');
@@ -195,7 +195,7 @@ while ($row=$db->db_fetch_object($result_upd))
 	$worksheet->write($z,7, $row->tag.'.'.$row->monat.'.'.$row->jahr);
 	$worksheet->write($z,8, $row->tag.'.'.$row->monat.'.'.($row->jahr+5));
 	$worksheet->write($z,9, $row->uid);
-	$worksheet->write($z,10,$row->matrikelnr);
+	$worksheet->write($z,10,$row->perskz);
 	$worksheet->write($z,11,'');
 	$worksheet->write($z,12,$row->text1);
 	$worksheet->write($z,13,$row->name);

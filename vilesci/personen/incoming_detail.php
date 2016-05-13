@@ -293,7 +293,7 @@ if($method!='')
 						$error=true;
 						$errormsg = $prestudent->errormsg;
 					}
-							
+
 					if(!$error)
 					{
 						//Prestudent Rolle Anlegen			
@@ -322,15 +322,15 @@ if($method!='')
 					if(!$error)
 					{
 						//Matrikelnummer und UID generieren
-						$matrikelnr = generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz);
+						$perskz = generatePerskz($studiengang_kz, $studiensemester_kurzbz);
 								
-						$jahr = mb_substr($matrikelnr,0, 2);
-						$stg = mb_substr($matrikelnr, 3, 4);
+						$jahr = mb_substr($perskz,0, 2);
+						$stg = mb_substr($perskz, 3, 4);
 						
 						$stg_obj = new studiengang();
 						$stg_obj->load(ltrim($stg,'0'));
 						
-						$uid = generateUID($stg_obj->kurzbz,$jahr, $stg_obj->typ, $matrikelnr);
+						$uid = generateUID($stg_obj->kurzbz,$jahr, $stg_obj->typ, $perskz);
 										
 						//Benutzerdatensatz anlegen
 						$benutzer = new benutzer();
@@ -364,7 +364,7 @@ if($method!='')
 							//Studentendatensatz anlegen
 							$student = new student();
 							$student->uid = $uid;
-							$student->matrikelnr = $matrikelnr;
+							$student->perskz = $perskz;
 							$student->prestudent_id = $prestudent->prestudent_id;
 							$student->studiengang_kz = $studiengang_kz;
 							$student->semester = '0';
@@ -1113,15 +1113,15 @@ function print_lehrveranstaltungen()
 
 
 // ****
-// * Generiert die Matrikelnummer
+// * Generiert die Personenkennzeichen
 // * FORMAT: 0710254001
 // * 07 = Jahr
 // * 1/2/0  = WS/SS/incoming
 // * 0254 = Studiengangskennzahl vierstellig
 // * 001 = Laufende Nummer
 // ****
-function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
-{ 
+function generatePerskz($studiengang_kz, $studiensemester_kurzbz)
+{
 	$db = new basis_db();
 	
 	$jahr = mb_substr($studiensemester_kurzbz, 4);	
@@ -1130,21 +1130,21 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 		$jahr = $jahr-1;
 	$art =0;
 	
-	$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
+	$perskz = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
 	
-	$qry = "SELECT matrikelnr FROM public.tbl_student WHERE matrikelnr LIKE '".$db->db_escape($matrikelnummer)."%' ORDER BY matrikelnr DESC LIMIT 1";
+	$qry = "SELECT perskz FROM public.tbl_prestudent WHERE perskz LIKE '".$db->db_escape($perskz)."%' ORDER BY perskz DESC LIMIT 1";
 	
 	if($db->db_query($qry))
 	{
 		if($row = $db->db_fetch_object())
 		{
-			$max = mb_substr($row->matrikelnr,7);
+			$max = mb_substr($row->perskz,7);
 		}
 		else 
 			$max = 0;
 		
 		$max += 1;
-		return $matrikelnummer.sprintf("%03d",$max);
+		return $perskz.sprintf("%03d",$max);
 	}
 	else 
 	{

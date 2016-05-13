@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >,
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >,
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >,
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at > and
+ *          Andreas moik 	< moik@technikum-wien.at >.
  */
 require_once('../../config/vilesci.config.inc.php');			
 require_once('../../include/functions.inc.php');
@@ -33,6 +34,7 @@ require_once('../../include/adresse.class.php');
 require_once('../../include/nation.class.php');
 require_once('../../include/firma.class.php');
 require_once('../../include/preincoming.class.php');
+require_once('../../include/studiensemester.class.php');
 
 $user = get_uid();
 
@@ -270,32 +272,26 @@ if(count($prestudent->result)>0)
 			</thead><tbody>';
 	foreach ($prestudent->result as $row)
 	{
+		$uid='';
+		$gruppe='';
+
+		$pst = new prestudent($row->prestudent_id);
+
+		$uid = $pst->uid;
+		if($vrb = $pst->getStudentLehrverband())
+			$gruppe = $vrb->semester.$vrb->verband.$vrb->gruppe;
+
 		echo '<tr>';
 		echo "<td>$row->prestudent_id</td>";
 		echo "<td>".$studiengang->kuerzel_arr[$row->studiengang_kz]."</td>";
 		echo "<td>".($row->reihungstestangetreten?'Ja':'Nein')."</td>";
-		$uid='';
-		$gruppe='';
-		$qry ="SELECT * FROM public.tbl_student WHERE prestudent_id='$row->prestudent_id'";
-		if($result = $db->db_query($qry))
-		{
-			if($db->db_num_rows($result)>1)
-			{
-				$uid='ACHTUNG: Es gibt mehrere Studenteneinträge die auf diesen Prestudenten zeigen!';
-			}
-			else 
-			{
-				if($row_std = $db->db_fetch_object($result))
-				{
-					$uid = $row_std->student_uid;
-					$gruppe = $row_std->semester.$row_std->verband.$row_std->gruppe;
-				}
-			}
-		}
+
+
+
 		echo "<td>$uid</td>";
 		echo "<td>$gruppe</td>";
 		$prestudent1 = new prestudent();
-		$prestudent1->getLastStatus($row->prestudent_id);	
+		$prestudent1->getLastStatus($row->prestudent_id);
 		echo "<td>$prestudent1->status_kurzbz ".($prestudent1->ausbildungssemester!=''?"($prestudent1->ausbildungssemester. Semester)":'')."</td>";
 		echo '</tr>';
 	}
@@ -307,7 +303,7 @@ if($result = $db->db_query($qry))
 {
 	if($db->db_num_rows($result)>0)
 	{
-		echo '<br><h2>Mitarbeiter</h2>';		
+		echo '<br><h2>Mitarbeiter</h2>';
 		echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
 			<thead>
 				<tr>

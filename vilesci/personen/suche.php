@@ -18,7 +18,8 @@
  * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at > and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../config/vilesci.config.inc.php');
@@ -32,6 +33,7 @@ require_once('../../include/prestudent.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/authentication.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/studiensemester.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -188,9 +190,9 @@ if($searchstr!='')
 					}
 
 					$qry = "SELECT *, tbl_benutzer.updateamum as bnupdateamum, tbl_benutzer.updatevon as bnupdatevon,
-									tbl_student.updateamum as supdateamum, tbl_student.updatevon as supdatevon
-							FROM public.tbl_student JOIN public.tbl_benutzer ON(student_uid=uid)
-							WHERE person_id=".$db->db_add_param($row->person_id, FHC_INTEGER);
+									tbl_prestudent.updateamum as supdateamum, tbl_prestudent.updatevon as supdatevon
+							FROM public.tbl_prestudent JOIN public.tbl_benutzer USING(uid)
+							WHERE tbl_benutzer.person_id=".$db->db_add_param($row->person_id, FHC_INTEGER);
 					if($result_student = $db->db_query($qry))
 					{
 						if($db->db_num_rows($result_student))
@@ -198,8 +200,19 @@ if($searchstr!='')
 
 							while($row_student = $db->db_fetch_object($result_student))
 							{
-								$student = new prestudent();
+								$stsem = new studiensemester();
+								$stsem_kurzbz = $stsem->getaktorNext();
+								$qry_sem = "SELECT gruppe, verband, semester from tbl_studentlehrverband WHERE studiensemester_kurzbz=".$db->db_add_param($stsem_kurzbz);
+								if(!$res_sem = $db->db_query($qry_sem))
+									die("Fehler beim holen des Lehrverbandes");
+
+
+								$gruppe='';
+								$student = new prestudent();var_dump($row_student->prestudent_id);
 								$student->getLastStatus($row_student->prestudent_id);
+
+								if($vrb = $student->getStudentLehrverband())
+									$gruppe = $vrb->semester.$vrb->verband.$vrb->gruppe;
 
 								$content.= '<tr>';
 								$content.= '<td></td>';
@@ -225,7 +238,7 @@ if($searchstr!='')
 								$content.= "<td></td>";
 								$content.= "<td></td>";
 								$content.= "<td>".$stg_arr[$row_student->studiengang_kz]."</td>";
-								$content.= "<td>$row_student->semester$row_student->verband$row_student->gruppe</td>";
+								$content.= "<td>$gruppe</td>";
 								$content.= "<td>".($row_student->supdateamum!=''?date('d.m.Y H:i:s', $datum_obj->mktime_fromtimestamp($row_student->supdateamum)):'')."</td>";
 								$content.= "<td>$row_student->supdatevon</td>";
 								$content.= '</tr>';
