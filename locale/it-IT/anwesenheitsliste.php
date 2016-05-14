@@ -2,8 +2,9 @@
 $this->phrasen['anwesenheitsliste/angerechnet']='riconosciuto';
 $this->phrasen['anwesenheitsliste/anleitungImportFunktion']='copiare i presenti elementi nella memoria temporanea per compilare la colonna import del modulo generale voti';
 $this->phrasen['anwesenheitsliste/anwesenheit']='presenza';
-$this->phrasen['anwesenheitsliste/anwesenheitslisten']='elenco presenti';
-$this->phrasen['anwesenheitsliste/anwesenheitslistenMitBildern']='elenchi presenti con foto';
+$this->phrasen['anwesenheitsliste/anwesenheitslisten']='elenco studenti';
+$this->phrasen['anwesenheitsliste/anwesenheitslistenMitBildern']='elenchi
+studenti con foto';
 $this->phrasen['anwesenheitsliste/erstellenDerListeKlicken']='Per creare la lista cliccare sul gruppo desiderato!';
 $this->phrasen['anwesenheitsliste/fehlerhafteParameteruebergabe']='errore di trasferimento dei parametri. Si prega di riprovare';
 $this->phrasen['anwesenheitsliste/fehlstunden']='ore di assenza';
