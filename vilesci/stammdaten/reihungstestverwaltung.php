@@ -616,7 +616,7 @@ if($reihungstest_id!='')
 					<td align="right">'.($rtergebnis!=0 && $row->rt_punkte1==''?'<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&prestudent_id='.$row->prestudent_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>':$row->rt_punkte1).'</td>
 				</tr>';
 
-			$mailto.= ($mailto!=''?',':'').$row->email;
+			$mailto.= ($mailto!=''?DEFAULT_EMAILADRESSENTRENNZEICHEN:'').$row->email;
 		}
 		echo "</tbody></table>";
 		echo "<span style='font-size: 9pt'><a href='mailto:?bcc=$mailto'>Mail an alle senden</a></span>";
