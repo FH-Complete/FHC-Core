@@ -1,5 +1,5 @@
 -- UPDATE tbl_studiengang
-UPDATE public.tbl_studiengang SET onlinebewerbung = TRUE;
+UPDATE tbl_studiengang SET onlinebewerbung = TRUE;
 
 -- EMPTY lehre.tbl_studienplan
 DELETE FROM lehre.tbl_studienplan;
