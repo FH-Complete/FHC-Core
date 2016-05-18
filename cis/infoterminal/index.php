@@ -21,35 +21,35 @@
  *          Gerald Simane-Sequens 	<gerald.simane-sequens@technikum-wien.at> and
  *          Andreas Moik 	<moik@technikum-wien.at>.
  */
-	
+
 // ------------------------------------------------------------------------------------------
 // Session Starten - Merk Anwenderdaten
 // ------------------------------------------------------------------------------------------
-  	$SESSIONID=trim((isset($_REQUEST['SESSIONID']) ? $_REQUEST['SESSIONID']:''));
- 	if (session_start($SESSIONID)) 
+	$SESSIONID=trim((isset($_REQUEST['SESSIONID']) ? $_REQUEST['SESSIONID']:''));
+	if (session_start($SESSIONID))
 		$SESSIONID=@session_id();	
 
 	require_once('../../config/cis.config.inc.php');
 	require_once('../../include/wochenplan.class.php');
 	require_once('../../include/benutzerberechtigung.class.php');
-    require_once('../../include/betriebsmittel.class.php');
-  	require_once('../../include/betriebsmittelperson.class.php');		
-  	require_once('../../include/betriebsmitteltyp.class.php');	
-  	require_once('../../include/mail.class.php');
-  	require_once('../../include/news.class.php');
-  	require_once('../../include/content.class.php');
-    require_once('../../include/studiensemester.class.php'); 
-    require_once('../../include/konto.class.php'); 
-    require_once('../../include/functions.inc.php'); 
-    require_once('../../include/authentication.class.php'); 
-    require_once('../../include/addon.class.php'); 
+	require_once('../../include/betriebsmittel.class.php');
+	require_once('../../include/betriebsmittelperson.class.php');
+	require_once('../../include/betriebsmitteltyp.class.php');
+	require_once('../../include/mail.class.php');
+	require_once('../../include/news.class.php');
+	require_once('../../include/content.class.php');
+	require_once('../../include/studiensemester.class.php');
+	require_once('../../include/konto.class.php');
+	require_once('../../include/functions.inc.php');
+	require_once('../../include/authentication.class.php');
+	require_once('../../include/addon.class.php');
 	require_once('../../include/'.EXT_FKT_PATH.'/serviceterminal.inc.php');
 
 	if (!$db = new basis_db())
 		$db=false;
-		
+
 //	Initialisieren des Fehlertextes
-	$error='';	
+	$error='';
 	$news='';
 // ------------------------------------------------------------------------------------------
 //	Konstante
@@ -67,27 +67,28 @@
 // ------------------------------------------------------------------------------------------
 //	Request Parameter 
 // ------------------------------------------------------------------------------------------
-  	$timer=trim((isset($_REQUEST['timer']) ? $_REQUEST['timer']:0));
+	$timer=trim((isset($_REQUEST['timer']) ? $_REQUEST['timer']:0));
 	if(!isset($ServiceTerminalDefaultRaumtyp))
 		$ServiceTerminalDefaultRaumtyp='HS';
 
 	// Raumtyp
-  	$raumtyp_kurzbz=trim((isset($_REQUEST['raumtyp_kurzbz']) ? $_REQUEST['raumtyp_kurzbz']:$ServiceTerminalDefaultRaumtyp));
+	$raumtyp_kurzbz=trim((isset($_REQUEST['raumtyp_kurzbz']) ? $_REQUEST['raumtyp_kurzbz']:$ServiceTerminalDefaultRaumtyp));
 	// Saal - Raum
-  	$ort_kurzbz=trim((isset($_REQUEST['ort_kurzbz']) ? $_REQUEST['ort_kurzbz']:''));
+	$ort_kurzbz=trim((isset($_REQUEST['ort_kurzbz']) ? $_REQUEST['ort_kurzbz']:''));
 	// Work
-  	$work=trim((isset($_REQUEST['work']) ? $_REQUEST['work']:'raumanzeigen'));
+	$work=trim((isset($_REQUEST['work']) ? $_REQUEST['work']:'raumanzeigen'));
 	// User
-  	$key_input=trim((isset($_REQUEST['key_input']) ? $_REQUEST['key_input']:''));
-  	$uid=trim((isset($_REQUEST['uid']) ? $_REQUEST['uid']:''));
-  	$pwd=trim((isset($_REQUEST['pwd']) ? $_REQUEST['pwd']:''));
-  	$debug=trim((isset($_REQUEST['debug']) ? $_REQUEST['debug']:''));
-  	$sdtools=trim((isset($_REQUEST['sdtools']) ? $_REQUEST['sdtools']:false));	
-  	$standort_id = (isset($_COOKIE['standort_id']) ? $_COOKIE['standort_id']:'');
+	$key_input=trim((isset($_REQUEST['key_input']) ? $_REQUEST['key_input']:''));
+	$uid=trim((isset($_REQUEST['uid']) ? $_REQUEST['uid']:''));
+	$pwd=trim((isset($_REQUEST['pwd']) ? $_REQUEST['pwd']:''));
+	$debug=trim((isset($_REQUEST['debug']) ? $_REQUEST['debug']:''));
+	$sdtools=trim((isset($_REQUEST['sdtools']) ? $_REQUEST['sdtools']:false));
+	$standort_id = (isset($_COOKIE['standort_id']) ? $_COOKIE['standort_id']:'');
+
 	if ($sdtools)
 		$work='login';
 
-   
+
 // ------------------------------------------------------------------------------------------
 //	Verarbeiten wenn Kennzeichen work = login oder logoff
 // ------------------------------------------------------------------------------------------
@@ -100,13 +101,13 @@
 	  	$raumtyp_kurzbz=$ServiceTerminalDefaultRaumtyp;
 	}
 
-	
+
 	// Es gibt eine Serverauth., aber es erfolgte noch kein Login fuer Persoenliche Daten - Login erzwingen
 	if (isset($_SERVER['PHP_AUTH_USER'])  && !empty($_SERVER['PHP_AUTH_USER']) && (!isset($_SESSION[constSESSIONNAME]["uid"]) || empty($_SESSION[constSESSIONNAME]["uid"])) )
 	{
 		$work="login";
-	  	$uid=trim((isset($_SERVER['PHP_AUTH_USER'])?$_SERVER['PHP_AUTH_USER']:''));
-  		$pwd=trim((isset($_SERVER['PHP_AUTH_PW'])?$_SERVER['PHP_AUTH_PW']:''));
+		$uid=trim((isset($_SERVER['PHP_AUTH_USER'])?$_SERVER['PHP_AUTH_USER']:''));
+		$pwd=trim((isset($_SERVER['PHP_AUTH_PW'])?$_SERVER['PHP_AUTH_PW']:''));
 	}
 
 	// Login Prozedure wenn Anmeldung ueber einen Schluessel erfolgte 
@@ -115,48 +116,48 @@
 	$cardnumber = "";
 	if ($db && !empty($key_input)) // Login 
 	{
-	    // Pruefen ob es sich um eine HEX Eingabe handelt 
-	    $betriebsmittel = new betriebsmittel(); 
-	    //$key_input = $betriebsmittel->transform_kartennummer($key_input); 
-        
-	    // führende nullen entfernen
-	    $key_input = preg_replace("/^0*/", "", $key_input);
-	    $uidStudent = getUidFromCardNumber($key_input); 
-	    if($uidStudent != false)
-	    {
-		$uid = $uidStudent; 
-		$work = "login"; 
-		$cardlogin = true;
-	    }
-	    else
-	    {
-		$addon_externeAusweise = false;
-		$addon = new addon();
-		$addon->loadAddons();
-		foreach($addon->result as $ad)
-		{
-		    if($ad->kurzbz == "externeAusweise")
-		    {
-			$addon_externeAusweise = true;
-		    }
-		}
+		// Pruefen ob es sich um eine HEX Eingabe handelt
+		$betriebsmittel = new betriebsmittel();
+		//$key_input = $betriebsmittel->transform_kartennummer($key_input);
 
-		if($addon_externeAusweise)
+		// führende nullen entfernen
+		$key_input = preg_replace("/^0*/", "", $key_input);
+		$uidStudent = getUidFromCardNumber($key_input);
+		if($uidStudent != false)
 		{
-		    require_once (dirname(__FILE__).'/../../addons/externeAusweise/include/idCard.class.php');
-		    $idCard = new idCard();
-		    if($idCard->loadByCardnumber($key_input))
-		    {
-			$uid = "";
-			$cardnumber = $idCard->cardnumber;
-			$work = "verlaengerung";
+			$uid = $uidStudent;
+			$work = "login";
 			$cardlogin = true;
-			$_SESSION[constSESSIONNAME]["uid"]=$cardnumber;
-		    }
 		}
-	    }
+		else
+		{
+			$addon_externeAusweise = false;
+			$addon = new addon();
+			$addon->loadAddons();
+			foreach($addon->result as $ad)
+			{
+				if($ad->kurzbz == "externeAusweise")
+				{
+					$addon_externeAusweise = true;
+				}
+			}
+
+			if($addon_externeAusweise)
+			{
+				require_once (dirname(__FILE__).'/../../addons/externeAusweise/include/idCard.class.php');
+				$idCard = new idCard();
+				if($idCard->loadByCardnumber($key_input))
+				{
+					$uid = "";
+					$cardnumber = $idCard->cardnumber;
+					$work = "verlaengerung";
+					$cardlogin = true;
+					$_SESSION[constSESSIONNAME]["uid"]=$cardnumber;
+				}
+			}
+		}
 	}
-		
+
 	if (mb_strtolower($work)=='login')
 	{
 		if (isset($_SESSION[constSESSIONNAME]))
@@ -194,7 +195,7 @@
 		$semester=trim($_SESSION[constSESSIONNAME]["dat"]->semester);
 	}
 	$fachbereich_kurzbz="";
- 	if (strtolower($work)!=strtolower("meinedaten") || !isset($_SESSION[constSESSIONNAME]))
+	if (strtolower($work)!=strtolower("meinedaten") || !isset($_SESSION[constSESSIONNAME]))
 		$news=read_create_html_news($db,$fachbereich_kurzbz,$studiengang_kz,$semester);
 
 // ------------------------------------------------------------------------------------------
@@ -209,7 +210,7 @@
 				array("type"=>"HS","beschreibung"=>"&nbsp;Freie&nbsp;<br>&nbsp;H&ouml;rs&auml;le&nbsp;","img"=>""),
 				array("type"=>"SEM","beschreibung"=>"&nbsp;Freie&nbsp;<br>&nbsp;Seminarr&auml;ume&nbsp;","img"=>""),
 				array("type"=>"Lab","beschreibung"=>"&nbsp;Freie&nbsp;<br>&nbsp;Laborr&auml;ume&nbsp;","img"=>""),
-				);			
+				);
 	}
 
 $refreshtime = ($sdtools?99999:(isset($_SESSION[constSESSIONNAME]["uid"]) && !empty($_SESSION[constSESSIONNAME]["uid"])?10:(date('H')>22 || date('H')<5?12000:900)));
@@ -224,177 +225,172 @@ $refreshtime = ($sdtools?99999:(isset($_SESSION[constSESSIONNAME]["uid"]) && !em
 <script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script> 
 <link rel="stylesheet" href="infoterm.css" type="text/css">	
 	<script language="JavaScript1.2" type="text/javascript">
-	<!--
 		var keyfeld;
 		var warten;
 		var PrintWin;
 		var BitteWartenID='bitteWarten';
 		var input_focus;
-        
-        var verlaengerungsautomat = false; 
-		
-        function isVerlaengerungsautomat()
-        {
-            $.ajax({url:"<?php echo mb_str_replace('https://','http://',APP_ROOT); ?>isProxyActive",
-            cache: false, 
-            async: true, 
-            timeout: 35000, 
-            error: proxyError, 
-            dataType:"text",
-            data: { },
-            success: proxySuccess
-            });             
-        }
-        
-        function proxyError(data)
-        {
-        }
-        
-        function proxySuccess(data)
-        {           
-            if(data=='TRUE')
-                verlaengerungsautomat = true; 
-            
-            if(verlaengerungsautomat == true)
-            {
-                <?php if (!isset($_SESSION[constSESSIONNAME]["uid"])  && empty($_SESSION[constSESSIONNAME]["uid"]))
-                    echo 'getRFID(); ';?>
-                
-                
-                document.getElementById('btn_ejectcard').style.display = 'block';
+
+		var verlaengerungsautomat = false;
+
+		function isVerlaengerungsautomat()
+		{
+			$.ajax({url:"<?php echo mb_str_replace('https://','http://',APP_ROOT); ?>isProxyActive",
+			cache: false,
+			async: true,
+			timeout: 35000,
+			error: proxyError,
+			dataType:"text",
+			data: { },
+			success: proxySuccess
+			});
+		}
+
+		function proxyError(data)
+		{
+		}
+
+		function proxySuccess(data)
+		{
+			if(data=='TRUE')
+				verlaengerungsautomat = true;
+
+			if(verlaengerungsautomat == true)
+			{
+				<?php if (!isset($_SESSION[constSESSIONNAME]["uid"])  && empty($_SESSION[constSESSIONNAME]["uid"]))
+				echo 'getRFID(); ';?>
+
+				document.getElementById('btn_ejectcard').style.display = 'block';
 				if(document.getElementById('btn_verlaengerung'))
-                	document.getElementById('btn_verlaengerung').style.display = 'block';
-            }
+				document.getElementById('btn_verlaengerung').style.display = 'block';
+			}
+		}
 
-        }
-        
-        function checkVerlaengerung()
-        {
-            if(verlaengerungsautomat == true)
-                alert('Verlängerungsautomat'); 
-            else
-                alert('Infoterminal'); 
-        }
-        
-        function getRFID()
-        {
-            $.ajax({url:"<?php echo mb_str_replace('https://','http://',APP_ROOT); ?>getUID",
-            cache: false, 
-            async:true,
-            timeout:35000,
-            error: showRFIDError,
-            dataType: "text",
-            data: { },
-            success: fillRFID
-            });
-        }
-        
-        function showRFIDError(data)
-        {
-            // wenn fehler aufgetreten ist, nochmal aufrufen
-            getRFID(); 
-        }
-        
-        function fillRFID(data)
-        {
-            if(data != '' && data != 'TIMEOUT')
-            {
-                // wenn nummer und kein timeout zurückgekommen ist dann weiterleiten
-                document.location.href='<?php echo $_SERVER['PHP_SELF'];?>?key_input='+data+'&work=login&timer=<?PHP echo time().'&amp;standort_id='.$standort_id; ?>'; 
-            }
-            
-            if(data =='TIMEOUT')
-            {
-                getRFID(); 
-            }
-        }
-        
-        function printCard()
-        {
+		function checkVerlaengerung()
+		{
+			if(verlaengerungsautomat == true)
+				alert('Verlängerungsautomat');
+			else
+				alert('Infoterminal');
+		}
+
+		function getRFID()
+		{
+			$.ajax({url:"<?php echo mb_str_replace('https://','http://',APP_ROOT); ?>getUID",
+				cache: false,
+				async:true,
+				timeout:35000,
+				error: showRFIDError,
+				dataType: "text",
+				data: { },
+				success: fillRFID
+			});
+		}
+
+		function showRFIDError(data)
+		{
+			// wenn fehler aufgetreten ist, nochmal aufrufen
+			getRFID();
+		}
+
+		function fillRFID(data)
+		{
+			if(data != '' && data != 'TIMEOUT')
+			{
+				// wenn nummer und kein timeout zurückgekommen ist dann weiterleiten
+				document.location.href='<?php echo $_SERVER['PHP_SELF'];?>?key_input='+data+'&work=login&timer=<?PHP echo time().'&amp;standort_id='.$standort_id; ?>';
+			}
+
+			if(data =='TIMEOUT')
+			{
+				getRFID();
+			}
+		}
+
+		function printCard()
+		{
 			// Automatischen Seiten Refresh deaktivieren
-        	window.clearTimeout(logouttimeout);
+			window.clearTimeout(logouttimeout);
 
-        	$('#divDruckStatus').html('Karte wird gedruckt - Bitte warten <img src="../../skin/images/spinner.gif">');
-        	$('#divKarteDrucken').hide();
+			$('#divDruckStatus').html('Karte wird gedruckt - Bitte warten <img src="../../skin/images/spinner.gif">');
+			$('#divKarteDrucken').hide();
 
 			// Karte Drucken
-            $.ajax({url:"<?php echo mb_str_replace('https://','http://',APP_ROOT); ?>printCard",
-            cache:false,
-            async:true, 
-            timeout:30000, 
-            error: cardError, 
-            dataType: "text", 
-            success: cardSuccess
-            });
-        }
-        
-        function cardError(data)
-        {
-			alert("Print Error")
-        }
-        
-        function cardSuccess(data)
-        {
-        	$('#divDruckStatus').html('Bitte entnehmen Sie ihre Karte');
+			$.ajax({url:"<?php echo mb_str_replace('https://','http://',APP_ROOT); ?>printCard",
+				cache:false,
+				async:true,
+				timeout:30000,
+				error: cardError,
+				dataType: "text",
+				success: cardSuccess
+			});
+		}
 
-        	logouttimeout = window.setTimeout('logout()', 2000);
-        	
-            // nach print noch einmal aus der seriellen verbindung lesen
-			
-            $.ajax({url:"<?php echo mb_str_replace('https://','http://',APP_ROOT); ?>getUID",
-            cache: false, 
-            async:true,
-            timeout:35000,
-            dataType: "text",
-            data: { }
-            });
-        }
-        
-        function ejectCard()
-        {
+		function cardError(data)
+		{
+			alert("Print Error")
+		}
+
+		function cardSuccess(data)
+		{
+			$('#divDruckStatus').html('Bitte entnehmen Sie ihre Karte');
+
+			logouttimeout = window.setTimeout('logout()', 2000);
+
+			// nach print noch einmal aus der seriellen verbindung lesen
+
+			$.ajax({url:"<?php echo mb_str_replace('https://','http://',APP_ROOT); ?>getUID",
+				cache: false,
+				async:true,
+				timeout:35000,
+				dataType: "text",
+				data: { }
+			});
+		}
+
+		function ejectCard()
+		{
 			$('#btn_ejectcard').html('Ejecting Card..');
-            $.ajax({url:"<?php echo mb_str_replace('https://','http://',APP_ROOT); ?>ejectCard",
-            cache:false,
-            async:true,
-            timeout:4000, 
-            error: ejectError,
-            dataType:"text",
-            success: ejectSuccess
-            });
-        }
-        
-        function ejectError(data)
-        {
-            $('#btn_ejectcard').html('Eject Failed<br>Restarting Service');
+			$.ajax({url:"<?php echo mb_str_replace('https://','http://',APP_ROOT); ?>ejectCard",
+				cache:false,
+				async:true,
+				timeout:4000,
+				error: ejectError,
+				dataType:"text",
+				success: ejectSuccess
+			});
+		}
+
+		function ejectError(data)
+		{
+			$('#btn_ejectcard').html('Eject Failed<br>Restarting Service');
 			window.location.href='index.php?work=Logoff&amp;raumtyp_kurzbz=&amp;ort_kurzbz=&amp;timer=<?PHP echo time().'&standort_id='.$standort_id; ?>';
-        }
-        
-        function ejectSuccess(data)
-        {
-            // logout
-            window.location.href='index.php?work=Logoff&amp;raumtyp_kurzbz=&amp;ort_kurzbz=&amp;timer=<?PHP echo time().'&standort_id='.$standort_id; ?>';
-        }
-        
+		}
+
+		function ejectSuccess(data)
+		{
+			// logout
+			window.location.href='index.php?work=Logoff&amp;raumtyp_kurzbz=&amp;ort_kurzbz=&amp;timer=<?PHP echo time().'&standort_id='.$standort_id; ?>';
+		}
+
 		function logout()
 		{
-            if(verlaengerungsautomat == true)
-            {
-                document.getElementById('btn_ejectcard').disabled=true;
-                
-                ejectCard(); 
-                
-            }
-            else
-            {
-                window.location.href='index.php?work=Logoff&amp;raumtyp_kurzbz=&amp;ort_kurzbz=&amp;timer=<?PHP echo time().'&standort_id='.$standort_id; ?>';
-            }
+			if(verlaengerungsautomat == true)
+			{
+				document.getElementById('btn_ejectcard').disabled=true;
+				ejectCard();
+			}
+			else
+			{
+				window.location.href='index.php?work=Logoff&amp;raumtyp_kurzbz=&amp;ort_kurzbz=&amp;timer=<?PHP echo time().'&standort_id='.$standort_id; ?>';
+			}
 		}
-		
+
 		function LogoutTimer()
 		{
 			logouttimeout = window.setTimeout('logout()', <?php echo $refreshtime*1000;?>);
 		}
-		
+
 		function updateSiteRefresh()
 		{
 			window.clearTimeout(logouttimeout);
@@ -405,97 +401,112 @@ $refreshtime = ($sdtools?99999:(isset($_SESSION[constSESSIONNAME]["uid"]) && !em
 			input_focus=window.setInterval('input_focus_key()',8000);
 			function input_focus_key() {	
 				if (document.getElementById('key_input')) {
-				 	document.getElementById('key_input').focus();
-			}		
+					document.getElementById('key_input').focus();
+			}
 		}
-		<?php } ?>		
+		<?php } ?>
 		
-		function check_key(param_key_input_feld) {	
+		function check_key(param_key_input_feld)
+		{
 			keyfeld=param_key_input_feld;
-			if (keyfeld && keyfeld.value.length>0) {		
+			if (keyfeld && keyfeld.value.length>0)
+			{
 				// Bitte Wartentext
 				document.getElementById(BitteWartenID).className='einblenden';
 				// 10 Stellige Schluessel-Keys muessen auch berucksichtigt werden
-				if (keyfeld.value.length>7) {
+				if (keyfeld.value.length>7)
+				{
 					warten=window.setInterval('call_key()',1000);
-				}		 
-				if (keyfeld.value.length>11) {
+				}
+				if (keyfeld.value.length>11)
+				{
 					call_key();
-				}		 
-			}						
-		}	
-
-		function call_key() {	
-			// sollte noch das Timerobjekt vorhanden sein muss es entfernt werden
-				if (input_focus) {
-					window.clearInterval(input_focus);
-					input_focus=false;
 				}
-				
-				if (warten) {
-					window.clearInterval(warten);
-					warten=false;
-				}	
-				
-				if (PrintWin) {
-					PrintWin.close();
-					PrintWin=false;
-				}
-				
-				if (keyfeld && keyfeld.value.length>0) {		
-					keyfeld.className='ausblenden';
-					keyfeld.disabled=true ;
-					
-					var tmpWert=keyfeld.value;
-					
-					tmpWert=tmpWert.substring(0,12 );
-					document.location.href='<?php echo $_SERVER['PHP_SELF'];?>?key_input='+encodeURIComponent(tmpWert)+'&work=login&timer=<?PHP echo time().'&amp;standort_id='.$standort_id; ?>';			
-					}
+			}
 		}
-		
+
+		function call_key()
+		{
+			// sollte noch das Timerobjekt vorhanden sein muss es entfernt werden
+			if (input_focus)
+			{
+				window.clearInterval(input_focus);
+				input_focus=false;
+			}
+
+			if (warten)
+			{
+				window.clearInterval(warten);
+				warten=false;
+			}
+
+			if (PrintWin)
+			{
+				PrintWin.close();
+				PrintWin=false;
+			}
+
+			if (keyfeld && keyfeld.value.length>0)
+			{
+				keyfeld.className='ausblenden';
+				keyfeld.disabled=true ;
+				var tmpWert=keyfeld.value;
+
+				tmpWert=tmpWert.substring(0,12 );
+				document.location.href='<?php echo $_SERVER['PHP_SELF'];?>?key_input='+encodeURIComponent(tmpWert)+'&work=login&timer=<?PHP echo time().'&amp;standort_id='.$standort_id; ?>';
+			}
+		}
+
 		function show_layer(x)
 		{
- 		if (document.getElementById && document.getElementById(x)) 
-		{  
-			document.getElementById(x).style.visibility = 'visible';
-			document.getElementById(x).style.display = 'inline';
-		} else if (document.all && document.all[x]) {      
-		   	document.all[x].visibility = 'visible';
-			document.all[x].style.display='inline';
-	      	} else if (document.layers && document.layers[x]) {                          
-	           	 document.layers[x].visibility = 'show';
-			 document.layers[x].style.display='inline';
-	          }
-	}
+			if (document.getElementById && document.getElementById(x))
+			{
+				document.getElementById(x).style.visibility = 'visible';
+				document.getElementById(x).style.display = 'inline';
+			}
+			else if (document.all && document.all[x])
+			{
+				document.all[x].visibility = 'visible';
+				document.all[x].style.display='inline';
+			}
+			else if (document.layers && document.layers[x])
+			{
+				document.layers[x].visibility = 'show';
+				document.layers[x].style.display='inline';
+			}
+		}
 
-	function hide_layer(x)
-	{
-		if (document.getElementById && document.getElementById(x)) 
-		{                       
-		   	document.getElementById(x).style.visibility = 'hidden';
-			document.getElementById(x).style.display = 'none';
-       	} else if (document.all && document.all[x]) {                                
-			document.all[x].visibility = 'hidden';
-			document.all[x].style.display='none';
-       	} else if (document.layers && document.layers[x]) {                          
-	           	 document.layers[x].visibility = 'hide';
-			 document.layers[x].style.display='none';
-	          }
-	}		
-	
+		function hide_layer(x)
+		{
+			if (document.getElementById && document.getElementById(x))
+			{
+				document.getElementById(x).style.visibility = 'hidden';
+				document.getElementById(x).style.display = 'none';
+			}
+			else if (document.all && document.all[x])
+			{
+				document.all[x].visibility = 'hidden';
+				document.all[x].style.display='none';
+			}
+			else if (document.layers && document.layers[x])
+			{
+				document.layers[x].visibility = 'hide';
+				document.layers[x].style.display='none';
+			}
+		}
+
 	var aktivTimeout;
 	function close_news()
 	{
 		window.clearTimeout(aktivTimeout);
 		hide_layer('news');
 		document.getElementById('news').innerHTML='';
-		if (document.getElementById('key_input')) {
-		 	document.getElementById('key_input').focus();
+		if (document.getElementById('key_input'))
+		{
+			document.getElementById('key_input').focus();
 		}
-	}		
-
-	//-->
-</script>	
+	}
+</script>
 
 </head>
 <body onload="if (document.getElementById('key_input')) { document.getElementById('key_input').focus();} LogoutTimer(); isVerlaengerungsautomat(); ">
@@ -503,122 +514,123 @@ $refreshtime = ($sdtools?99999:(isset($_SESSION[constSESSIONNAME]["uid"]) && !em
 <?php 
 	ob_flush();
 	flush();
- 
-	
-    echo ' 
-    <div id="news" style="display:none; width:90%;	border: 2px solid Black;padding: 7px 7px 7px 7px;background-color: #FFFFFF;z-index:100;position:absolute;top: 15px;left:20px;empty-cells: hide;"></div>
-<table  style="z-index:1" class="content" border="0" cellspacing="0" cellpadding="0">
-  <tr>
-	<!-- Start Linkes Menue -->
-  	<td valign="top">
-		<table class="ort_liste" cellpadding="1" cellspacing="1">    		
-    <tr><td style="padding-bottom: 10px;" align="center" valign="middle">';
-    
-    echo '<a href="'.htmlspecialchars($_SERVER['PHP_SELF']).'?standort_id='.$standort_id.'">
-    			<img alt="Logo" src="../../skin/styles/'.DEFAULT_STYLE.'/logo.png" border="0" style="max-width: 170px; max-height: 150px">
-    	  </a></td></tr>';
-	if(isset($_SESSION[constSESSIONNAME]["uid"])  && !empty($_SESSION[constSESSIONNAME]["uid"]) && !empty($_SESSION[constSESSIONNAME]["pwd"])) 
+
+
+	echo '
+		<div id="news" style="display:none; width:90%;	border: 2px solid Black;padding: 7px 7px 7px 7px;background-color: #FFFFFF;z-index:100;position:absolute;top: 15px;left:20px;empty-cells: hide;"></div>
+		<table  style="z-index:1" class="content" border="0" cellspacing="0" cellpadding="0">
+		<tr>
+		<!-- Start Linkes Menue -->
+		<td valign="top">
+		<table class="ort_liste" cellpadding="1" cellspacing="1">
+		<tr><td style="padding-bottom: 10px;" align="center" valign="middle">';
+
+	echo '<a href="'.htmlspecialchars($_SERVER['PHP_SELF']).'?standort_id='.$standort_id.'">
+		<img alt="Logo" src="../../skin/styles/'.DEFAULT_STYLE.'/logo.png" border="0" style="max-width: 170px; max-height: 150px">
+		</a></td></tr>';
+
+	if(isset($_SESSION[constSESSIONNAME]["uid"])  && !empty($_SESSION[constSESSIONNAME]["uid"]) && !empty($_SESSION[constSESSIONNAME]["pwd"]))
 	{
 		//Angemeldeter User -  Stundenplan der Woche
 		echo '
-		  <tr class="cursor_hand">
-	  		<td>
+			<tr class="cursor_hand">
+				<td>
 				<a href="'.htmlspecialchars($_SERVER['PHP_SELF']).'?work=stundenplan&amp;standort_id='.$standort_id.'">
 						<span class="blau_mitteText">
 							Mein<br>LV-Plan
 						</span>
 				</a>
-	  		</td>
- 		</tr>';
+				</td>
+		</tr>';
 	} 
 	else 
 	{
 		echo '<tr class="keyinput"><td class="keyinput"><span id="key_input_feld"><input id="key_input" name="key_inputs" onkeydown="check_key(this);" onkeypress="check_key(this);" maxlength="12"></span></td></tr>';	
 	}
-	
-	// Tabelle der Raumtypen	
+
+	// Tabelle der Raumtypen
 	echo html_output_liste_raumtypen($row_ort);
-	if(isset($_SESSION[constSESSIONNAME]["uid"])  && !empty($_SESSION[constSESSIONNAME]["uid"]) && empty($cardnumber)) 
+	if(isset($_SESSION[constSESSIONNAME]["uid"])  && !empty($_SESSION[constSESSIONNAME]["uid"]) && empty($cardnumber))
 	{
-		 //Angemeldeter User -  Stundenplan der Woche	
-		 echo '
-		  <tr class="cursor_hand">
-	  		<td>
-				<a href="'.htmlspecialchars($_SERVER['PHP_SELF']).'?work=meinedaten&amp;standort_id='.$standort_id.'">		
+		//Angemeldeter User -  Stundenplan der Woche
+		echo '
+		<tr class="cursor_hand">
+			<td>
+				<a href="'.htmlspecialchars($_SERVER['PHP_SELF']).'?work=meinedaten&amp;standort_id='.$standort_id.'">
 						<span class="blau_mitteText">
 							Pers&ouml;nliche<br>Daten
 						</span>
 				</a>
-	  		</td>
- 		</tr>
-        <tr class="cursor_hand" id="btn_verlaengerung" style="display:none; ">
-	  		<td>
+			</td>
+		</tr>
+		<tr class="cursor_hand" id="btn_verlaengerung" style="display:none; ">
+			<td>
 				<a href="'.htmlspecialchars($_SERVER['PHP_SELF']).'?work=verlaengerung&amp;standort_id='.$standort_id.'">	
 						<span class="blau_mitteText">
 							Studierendenausweis <br> verl&auml;ngern
 						</span>
 				</a>
-	  		</td>
- 		</tr>';
+			</td>
+		</tr>';
 	}
 	else 
 	{
 		// Lageplan
-	    if(defined('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN') && CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN)
-	    {
-		echo '	   
-		<tr class="cursor_hand">
-	  		<td>
-				<a href="'.htmlspecialchars($_SERVER['PHP_SELF']).'?work=lageplan&amp;standort_id='.$standort_id.'">		
-					<span class="blau_mitteText">
-						Lageplan<br>&nbsp;
-					</span>
-				</a>
-	  		</td>
- 		</tr>';
-	    }
+		if(defined('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN') && CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN)
+		{
+			echo '
+			<tr class="cursor_hand">
+				<td>
+					<a href="'.htmlspecialchars($_SERVER['PHP_SELF']).'?work=lageplan&amp;standort_id='.$standort_id.'">
+						<span class="blau_mitteText">
+							Lageplan<br>&nbsp;
+						</span>
+					</a>
+				</td>
+			</tr>';
+		}
 	}
 	
 	echo '<tr><td>&nbsp;</td></tr>';
 	// Login
-		
+
 	// Wenn keine Server Userauth. vorhanden ist
 	if (!isset($_SERVER['PHP_AUTH_USER']) || (isset($_SERVER['PHP_AUTH_USER']) && empty($_SERVER['PHP_AUTH_USER'])) ) 
 	{
 		echo '
-		  <tr class="cursor_hand">
-		  		<td>
+			<tr class="cursor_hand">
+				<td>
 					<a href="'.htmlspecialchars($_SERVER['PHP_SELF']).'?work='.(isset($_SESSION[constSESSIONNAME]["uid"]) && !empty($_SESSION[constSESSIONNAME]["uid"])?'logoff':'login').'&amp;raumtyp_kurzbz='.$raumtyp_kurzbz.'&amp;ort_kurzbz='.$ort_kurzbz.'&amp;standort_id='.$standort_id.'">
 						<span class="blau_mitteText">';
 		if(isset($_SESSION[constSESSIONNAME]["uid"]) && !empty($_SESSION[constSESSIONNAME]["uid"]))
 			echo '<img alt="Logout" height="35" src="system-users_out.png" border="0">&nbsp;Logoff';
 		else
 			echo '<img alt="Login" height="35" src="system-users_in.png" border="0">&nbsp;Login';
-		
+
 		echo '
 						</span>
 					</a>
-		  		</td>
+					</td>
 			</tr>
-		  <tr class="cursor_hand">
-	  		<td>
-				<a href="#" onclick="ejectCard();return false;" id="btn_ejectcard" style="display:none">		
-						<span class="blau_mitteText">
-							Eject<br>Card
-						</span>
-				</a>
-	  		</td>
- 		</tr>';
+			<tr class="cursor_hand">
+				<td>
+					<a href="#" onclick="ejectCard();return false;" id="btn_ejectcard" style="display:none">
+							<span class="blau_mitteText">
+								Eject<br>Card
+							</span>
+					</a>
+			</td>
+		</tr>';
 	}
-	
+
 	echo '
-		<tr><td height="100%">&nbsp;</td></tr>	
-  		</table>
-  	</td>';
+		<tr><td height="100%">&nbsp;</td></tr>
+		</table>
+		</td>';
 
 	// Ende Linkes Menue
- 	echo '<td width="100%" valign="top" id="content">';
- 	
+	echo '<td width="100%" valign="top" id="content">';
+
 	if (!$db || mb_strtolower($work)==mb_strtolower('lageplan'))
 	{
 		echo '<h1>Lageplan '.CAMPUS_NAME.'</h1>';
@@ -626,7 +638,7 @@ $refreshtime = ($sdtools?99999:(isset($_SESSION[constSESSIONNAME]["uid"]) && !em
 		// Wenn fuer den ausgewaehlten Standort ein eigener Lageplan verfuegbar ist, wird dieser angezeigt
 		// ansonsten wird der normale Lageplan angezeigt.
 		if($standort_id!='' && file_exists($pfad_standort_lageplan))
-			echo '<img height="400" src="'.$pfad_standort_lageplan.'" border="0" >';	
+			echo '<img height="400" src="'.$pfad_standort_lageplan.'" border="0" >';
 		else
 			echo '<img height="400" src="../../skin/styles/'.DEFAULT_STYLE.'/lageplan.jpg" border="0" >';
 	}
@@ -634,15 +646,15 @@ $refreshtime = ($sdtools?99999:(isset($_SESSION[constSESSIONNAME]["uid"]) && !em
 	{
 		echo '<h1>Login '.CAMPUS_NAME.'</h1>';
 		include_once('keyboard.php');
-	}	
+	}
 	else if (strtolower($work)==strtolower("meinedaten") && isset($_SESSION[constSESSIONNAME]))
 	{
 		echo meine_uid_informationen($db,$_SESSION[constSESSIONNAME]["uid"],$_SESSION[constSESSIONNAME]["dat"]);
-	}	
-    else if (strtolower($work)==strtolower("verlaengerung") && isset($_SESSION[constSESSIONNAME]))
+	}
+	else if (strtolower($work)==strtolower("verlaengerung") && isset($_SESSION[constSESSIONNAME]))
 	{
 		karten_verlaengerung($_SESSION[constSESSIONNAME]["uid"],$cardnumber);
-	}	
+	}
 	else if (mb_strtolower($work)==mb_strtolower("stundenplan") && isset($_SESSION[constSESSIONNAME]["uid"])  && !empty($_SESSION[constSESSIONNAME]["uid"]) )
 	{
 		echo alle_uid_stundenplan_informationen($db,$_SESSION[constSESSIONNAME]["uid"],$_SESSION[constSESSIONNAME]["dat"]);
@@ -654,10 +666,10 @@ $refreshtime = ($sdtools?99999:(isset($_SESSION[constSESSIONNAME]["uid"]) && !em
 	
 	// Zusatzinformation wie Error,News und Warten
 	echo '<span class="error_zeile">'.(isset($error)?$error:'').'&nbsp;</span>
-	  <span id="bitteWarten" class="ausblenden"><span class="error_text"><br>Bitte warten</span></span>
-	  <br><span class="news_zeile">'.(isset($news)?$news:'').'&nbsp;</span>
+		<span id="bitteWarten" class="ausblenden"><span class="error_text"><br>Bitte warten</span></span>
+		<br><span class="news_zeile">'.(isset($news)?$news:'').'&nbsp;</span>
 	</td>
-  </tr>	
+	</tr>
 </table>
 </body>
 </html>';
@@ -679,7 +691,7 @@ function meine_uid_informationen($db,$uid,$user="")
 	$html_user_daten='';
 	$html_user_daten_detail='';
 	// Lesen der Gesamtinformation zu einer Person (ALle UIDs holen)
-	$user_array=array();	
+	$user_array=array();
 	if ($db)
 		$user_array=personen_id_read_mitarbeiter_oder_student($db,$user->person_id);
 
@@ -701,13 +713,13 @@ function meine_uid_informationen($db,$uid,$user="")
 					if ($user_array[$i]->aktiv =='t' || ($user_array[$i]->aktiv !='f' && $user_array[$i]->aktiv))
 					{
 						$html_user_daten.='<a href="'.$_SERVER['PHP_SELF'].'?sdtools=1&amp;login=1&amp;uid='.urlencode($user_array[$i]->uid).'&amp;standort_id='.$standort_id.'">';
-						$html_user_daten.='		
+						$html_user_daten.='
 								<span class="gruen_mitteText">&nbsp;'.($user_array[$i]->uid==$uid?'<b>':''). trim($user_array[$i]->uid).($user_array[$i]->uid==$uid?'</b>':'').'&nbsp;</span>';
 						$html_user_daten.='</a>';
 					}
 					else
 					{
-						$html_user_daten.='		
+						$html_user_daten.='
 								<span class="rot_mitteText">&nbsp;'.trim($user_array[$i]->uid).'&nbsp;</span>';
 					}
 					$html_user_daten.='</td>';
@@ -727,25 +739,25 @@ function meine_uid_informationen($db,$uid,$user="")
 	$html_user_daten.=$html_user_daten_detail;
 
 	$html_user_daten.='<hr>';
-    
+
 	// eMail senden nach anforderung
-    /*
-  	$send_mail=(isset($_REQUEST['send_mail']) ? $_REQUEST['send_mail']:false);
+	/*
+	$send_mail=(isset($_REQUEST['send_mail']) ? $_REQUEST['send_mail']:false);
 	if ($send_mail)
 	{
 		$to=$uid.'@'.DOMAIN;
 		$from=MAIL_CIS;
 		$subject=CAMPUS_NAME.' Informationen';
-		
+
 		$mail=new mail($to, $from, $subject, $html_user_daten_detail);
 		if (isset($user_array) && is_array($user_array) && count($user_array)>1)
-		{		
+		{
 			reset($user_array);
 			for ($i=0;$i<count($user_array);$i++)
 			{
 				if ($uid!=$user_array[$i]->uid && ($user_array[$i]->aktiv='t' || ($user_array[$i]->aktiv !='f' && $user_array[$i]->aktiv)) )
 					$mail->setCCRecievers($user_array[$i]->uid.'@'.DOMAIN);
-			}	
+			}
 		}
 		$mail->setHTMLContent($html_user_daten_detail);
 		if ($mail->send())
@@ -763,16 +775,16 @@ function meine_uid_informationen($db,$uid,$user="")
 					$html_user_daten.='<a href="'.$_SERVER['PHP_SELF'].'?work=meinedaten&amp;send_mail=x&amp;standort_id='.$standort_id.'">';
 					$html_user_daten.='<b class="'.$farbe.'_rtop">
 								  <b class="'.$farbe.'_r1"></b> <b class="'.$farbe.'_r2"></b> <b class="'.$farbe.'_r3"></b> <b class="'.$farbe.'_r4"></b>
-								</b>		
+								</b>
 							<span class="'.$farbe.'_mitteText">';
 					$html_user_daten.='Informationen per Mail senden';
 					$html_user_daten.='
 							</span>
 							<b class="'.$farbe.'_rbottom">
 								  <b class="'.$farbe.'_r4"></b><b class="'.$farbe.'_r3"></b> <b class="'.$farbe.'_r2"></b> <b class="'.$farbe.'_r1"></b>
-							</b>';			
+							</b>';
 				$html_user_daten.='</a>';
-				$html_user_daten.='</td>';	
+				$html_user_daten.='</td>';
 			$html_user_daten.='</tr>';
 		$html_user_daten.='</table>';
 	}*/
@@ -785,71 +797,71 @@ function meine_uid_informationen($db,$uid,$user="")
 */
 function karten_verlaengerung($uid, $cardnumber=NULL)
 {
-    if(is_null($cardnumber))
-    {
-	$studienbeitrag = false;
-	// Mitarbeiter brauchen die Karte nicht verlängern
-
-	$cardPerson = new benutzer(); 
-	if(!$cardPerson->load($uid))
+	if(is_null($cardnumber))
 	{
-	    die('Konnte User nicht laden');  
+		$studienbeitrag = false;
+		// Mitarbeiter brauchen die Karte nicht verlängern
+
+		$cardPerson = new benutzer();
+		if(!$cardPerson->load($uid))
+		{
+			die('Konnte User nicht laden');
+		}
+
+		$html_user_daten='';
+		$html_user_daten.='<h1>Verl&auml;ngerung Studienausweis</h1>';
+		$html_user_daten.='<table>
+					<tr>
+				<td valign="top">
+						<table>
+					<tr>
+							<td><b><font size="+2">'.($cardPerson->titelpre?$cardPerson->titelpre.' ':'').$cardPerson->vorname.' '.$cardPerson->nachname.' '.($cardPerson->titelpost?$cardPerson->titelpost:'').'</font></b>&nbsp;</td>
+					</tr>
+					<tr>
+							<td></td>
+					</tr>
+						</table>
+				&nbsp;</td>
+				<td valign="top">
+						<table>
+					<tr><td>&nbsp;</td></tr>
+						</table>
+				&nbsp;</td>
+					</tr>
+		</table>';
+
+		echo $html_user_daten;
 	}
+	// User zur Karte konnte nicht geladen werden
 
-	$html_user_daten='';
-	$html_user_daten.='<h1>Verl&auml;ngerung Studienausweis</h1>';
-	$html_user_daten.='<table>
-		    <tr>
-			<td valign="top">
-			    <table>
-				<tr>
-				    <td><b><font size="+2">'.($cardPerson->titelpre?$cardPerson->titelpre.' ':'').$cardPerson->vorname.' '.$cardPerson->nachname.' '.($cardPerson->titelpost?$cardPerson->titelpost:'').'</font></b>&nbsp;</td>
-				</tr>
-				<tr>
-				    <td></td>
-				</tr>
-			    </table>
-			&nbsp;</td>
-			<td valign="top">
-			    <table>
-				<tr><td>&nbsp;</td></tr>
-			    </table>
-			&nbsp;</td>
-		    </tr>	
-	</table>';
-
-	echo $html_user_daten;
-    }
-    // User zur Karte konnte nicht geladen werden
-        
 	$data = ServiceTerminalCheckVerlaengerung($uid, $cardnumber);
-    
-	if($data[0]===true)
-    {
-        echo $data[1]; 
-        echo '<br>Um Karte zu verlängern dr&uuml;cken Sie bitte folgenden Button:';
 
-        echo'   <table>
-                    <tr class="cursor_hand" id="btn_drucken">
-                        <td>
-                        	<div id="divKarteDrucken">
-                            <a onclick="printCard();">		
-                                    <span class="blau_mitteText">
-                                    <br>
-                                        Karte drucken<br>
-                                    <br>
-                                    </span>
-                            </a>
-                            </div>
-                            
-                        </td>
-                    </tr>
-                </table>
-       			 <div id="divDruckStatus" style="font-size:large; font-weight:bold; color:red;">
-                 </div>';
-    }
-    else
-        echo $data[1].'<br><br>';
+	if($data[0]===true)
+	{
+		echo $data[1];
+		echo '<br>Um Karte zu verlängern dr&uuml;cken Sie bitte folgenden Button:';
+
+		echo'
+		<table>
+			<tr class="cursor_hand" id="btn_drucken">
+				<td>
+					<div id="divKarteDrucken">
+						<a onclick="printCard();">
+							<span class="blau_mitteText">
+								<br>
+									Karte drucken<br>
+								<br>
+							</span>
+						</a>
+					</div>
+				</td>
+			</tr>
+		</table>
+		<div id="divDruckStatus" style="font-size:large; font-weight:bold; color:red;">
+		</div>';
+	}
+	else
+		echo $data[1].'<br><br>';
 
 }
 
@@ -881,7 +893,7 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 	if ($num_rows==1)
 	{
 		$person_id=$db->db_result($erg,0,"person_id");
-		
+
 		$anrede=$db->db_result($erg,0,"anrede");
 		$vorname=$db->db_result($erg,0,"vorname");
 		$vornamen=$db->db_result($erg,0,"vornamen");
@@ -890,21 +902,21 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 		$gebort=$db->db_result($erg,0,"gebort");
 		
 		$aktiv=$db->db_result($erg,0,"aktiv");
-		
+
 		$svnr=$db->db_result($erg,0,"svnr");
-				
+
 		$titelpre=$db->db_result($erg,0,"titelpre");
 		$titelpost=$db->db_result($erg,0,"titelpost");
 		$email=$db->db_result($erg,0,"uid").'@'.DOMAIN;
 		$email_alias=$db->db_result($erg,0,"alias");
 		if ($email_alias)
 			$email_alias=$email_alias.'@'.DOMAIN;
-			
+
 		$hp=$db->db_result($erg,0,"homepage");
 		$aktiv=$db->db_result($erg,0,"aktiv");
 		$foto=$db->db_result($erg,0,"foto");
 	}
-	
+
 	if(!($erg_stud=$db->db_query("SELECT studiengang_kz, semester, verband, gruppe, perskz, typ::varchar(1) || kurzbz AS stgkz, tbl_studiengang.bezeichnung AS stgbz FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE uid=".$db->db_add_param($uid, FHC_STRING))))
 		die($db->db_last_error());
 	$stud_num_rows=$db->db_num_rows($erg_stud);
@@ -918,11 +930,11 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 		$gruppe=$db->db_result($erg_stud,0,"gruppe");
 		$matrikelnr=$db->db_result($erg_stud,0,"perskz");
 	}
-	
+
 	$ort='';
 	$kurzbz='';
 	$tel='';
-	$vorwahl='';	
+	$vorwahl='';
 	if(!($erg_lekt=$db->db_query("SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=".$db->db_add_param($uid, FHC_STRING))))
 		die($db->db_last_error());
 	$lekt_num_rows=$db->db_num_rows($erg_lekt);
@@ -943,21 +955,21 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 				if($row_tel = $db->db_fetch_object($result_tel))
 					$vorwahl = $row_tel->kontakt;
 			}
-		}	
-	}	
-	
+		}
+	}
+
 	// Mail-Groups
-    if(isset($semester))
-        $semester_qry = " and semester =".$db->db_add_param($semester, FHC_STRING);
-    else
-        $semester_qry = '';
-    
+	if(isset($semester))
+		$semester_qry = " and semester =".$db->db_add_param($semester, FHC_STRING);
+	else
+		$semester_qry = '';
+
 	if(!($erg_mg=$db->db_query("SELECT gruppe_kurzbz, beschreibung FROM campus.vw_persongruppe WHERE mailgrp and uid=".$db->db_add_param($uid, FHC_STRING)." ".$semester_qry." ORDER BY gruppe_kurzbz")))
 		die($db->db_last_error());
 	$nr_mg=$db->db_num_rows($erg_mg);
-	
-	// Betriebsmittel zur Person lesen 
-    /*
+
+	// Betriebsmittel zur Person lesen
+	/*
 	$betriebsmittelperson=array();
 	$qry="SELECT nummer,betriebsmitteltyp FROM public.vw_betriebsmittelperson where uid='".addslashes(trim($uid))."' and aktiv and benutzer_aktiv and ( retouram  IS NULL ) LIMIT 50 ; ";
 	if(!$result=$db->db_query($qry))
@@ -973,14 +985,14 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 				$anfrage = mssql_query('SELECT * FROM view_fh_technikum_mitarbeiterkarten_berechtigungen where card_no='.$card_no);
 				if (mssql_num_rows($anfrage)) 
 				{
-			       	$rows->asco=array();
-				    while ($datensatz = mssql_fetch_object($anfrage)) 
-				       	$rows->asco[]=$datensatz;
+					$rows->asco=array();
+					while ($datensatz = mssql_fetch_object($anfrage))
+						$rows->asco[]=$datensatz;
 				}
 				mssql_free_result($anfrage);
-			}	
+			}
 			$betriebsmittelperson[]=$rows;
-		}	
+		}
 	}*/
 
 	if ($count==0)
@@ -1003,7 +1015,7 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 		</table>';
 	}	
 	
-	if ($count==0)	
+	if ($count==0)
 		$html_user_daten.='<hr>';
 
 // 	HTML Header mit den Benutzerdaten
@@ -1011,13 +1023,13 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 	$html_user_daten.='<tr><td colspan="4" style="background-color: #E9ECEE;">Informationen zu BenutzerIn <b>'.$uid.'</b></td></tr>';
 
 		if ($aktiv=='f' || !$aktiv)
-		{		
+		{
 			$html_user_daten.='<tr>';
 				$html_user_daten.='<td colspan="2" style="color:red;"><b>Account nicht mehr AKTIV !</b></td>';
 			$html_user_daten.='</tr>';
 		}
 		else
-		{		
+		{
 			$html_user_daten.='<tr>';
 			$html_user_daten.='<td colspan="2">Aktiv</td>';
 			$html_user_daten.='</tr>';
@@ -1027,9 +1039,9 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 		$html_user_daten.='<tr><td ><b>Intern</b></td><td >'.$email.'</td></tr>';
 		$html_user_daten.='<tr><td ><b>Alias</b></td><td >'.$email_alias.'</td></tr>';
 		/*
-		 
+
 		$html_user_daten.='<tr><td style="background-color: #E9ECEE;" align="center" colspan="2" ><b>Mitglied in folgenden Verteilern</b></td></tr>';
-  		for($i=0;$i<$nr_mg;$i++)
+		for($i=0;$i<$nr_mg;$i++)
 		{
 				$row=$db->db_fetch_object($erg_mg,$i);
 			
@@ -1038,17 +1050,17 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 					$html_user_daten.='<td >'.$row->beschreibung.'&nbsp;</td>';
 				$html_user_daten.='</tr>';
 		}
-			
+
 		if (isset($matrikelnr))
 		{
 			$html_user_daten.='<TR><TD valign="top"><A class="Item" href="mailto:'.strtolower(trim($stgkz)).'_std@'.DOMAIN.'">'.strtolower($stgkz).'_std&nbsp;</TD>';
-	    	$html_user_daten.="\n<TD >&nbsp;Alle Studierdenden von $stgbez</TD><TD></TD></TR>";
+			$html_user_daten.="\n<TD >&nbsp;Alle Studierdenden von $stgbez</TD><TD></TD></TR>";
 			$html_user_daten.='<TR><TD valign="top">'.strtolower($stgkz).$semester.'&nbsp;</TD>';
-	    	$html_user_daten.="\n<TD >&nbsp;Alle Studierenden von $stgkz $semester</TD><TD></TD></TR>";
+			$html_user_daten.="\n<TD >&nbsp;Alle Studierenden von $stgkz $semester</TD><TD></TD></TR>";
 			$html_user_daten.='<TR><TD valign="top"><A class="Item" href="mailto:'.strtolower(trim($stgkz)).trim($semester).strtolower(trim($verband)).'@'.DOMAIN.'">'.strtolower($stgkz).$semester.strtolower($verband).'&nbsp;</TD>';
-	    	$html_user_daten.="\n<TD >&nbsp;Alle Studierenden von $stgkz $semester$verband</TD><TD></TD></TR>";
+			$html_user_daten.="\n<TD >&nbsp;Alle Studierenden von $stgkz $semester$verband</TD><TD></TD></TR>";
 			$html_user_daten.='<TR><TD valign="top"><A class="Item" href="mailto:'.strtolower(trim($stgkz)).trim($semester).strtolower(trim($verband)).trim($gruppe).'@'.DOMAIN.'">'.strtolower($stgkz).$semester.strtolower($verband).$gruppe.'&nbsp;</TD>';
-	    	$html_user_daten.="\n<TD >&nbsp;Alle Studierenden von $stgkz $semester$verband$gruppe</TD><TD></TD></TR>";
+			$html_user_daten.="\n<TD >&nbsp;Alle Studierenden von $stgkz $semester$verband$gruppe</TD><TD></TD></TR>";
 		}
 		$html_user_daten.='</table>&nbsp;</td>';
 
@@ -1057,23 +1069,22 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 		{
 			$html_user_daten.='<tr><td colspan="2"  align="center"  style="background-color: #E9ECEE;"><b><font size="+1">StudentIn</font></b></td></tr>';
 			$html_user_daten.="<td colspan='2' >
-				Studiengang: $stgbez<br>
-				Semester: $semester<br>
-				Verband: $verband<br>
-				Gruppe: $gruppe<br>
-    			Matrikelnummer: $matrikelnr";
+			Studiengang: $stgbez<br>
+			Semester: $semester<br>
+			Verband: $verband<br>
+			Gruppe: $gruppe<br>
+			Matrikelnummer: $matrikelnr";
 			$html_user_daten.='</td></tr>';
-		}	
+		}
 		else if ($lekt_num_rows==1)
 		{
 			$html_user_daten.='<tr><td colspan="2"  align="center"  style="background-color: #E9ECEE;"><b><font size="+1">Lektor </font></b></td></tr>';
 			$html_user_daten.='<td colspan="2"><b>Kurzzeichen: </b>'.$kurzbz.'<br><b>Standort: </b>'.$ort.'<br><b>'.($tel!=''?'Telefon TW:</b> '.$vorwahl.' '.$tel:'').'</td></tr>';
 		}*/
-		        
+
 		$html_user_daten.='</table>';
 		$html_user_daten.='&nbsp;</td></tr></table>';
 		return $html_user_daten;
-	
 }
 
 #-------------------------------------------------------------------------------------------	
@@ -1103,27 +1114,27 @@ function alle_uid_stundenplan_informationen($db,$uid,$user_array="")
 // ------------------------------------------------------------------------------------------
 //	Kalenderwoche und Tage Initialisieren
 // ------------------------------------------------------------------------------------------
-/*	
+/*
 	$date    = date('d');
 	$month   = date('m');
 	$year    = date('y');
 	$weekday = date('w');
 	$kalenderweek = ((int)date('W')<10?'0'.(int)date('W'):date('W'));
-	
+
 	// Montag ermitteln
 	if($weekday == 0)
 	{
 		$datum=mktime(0, 0, 0, $month, $date-$weekday -6, $year);
 		$ersterTagMonat=date('m', mktime(0, 0, 0, $month, $date-$weekday -6, $year));
 		$ersterTag=date('d', mktime(0, 0, 0, $month, $date-$weekday -6, $year));
-	} 
+	}
 	else
 	{
 		$datum=mktime(0, 0, 0, $month, $date-$weekday +1, $year);
 		$ersterTagMonat=date('m', mktime(0, 0, 0, $month, $date-$weekday +1, $year));
 		$ersterTag=date('d', mktime(0, 0, 0, $month, $date-$weekday +1, $year));
 	}
-*/	
+*/
 // ------------------------------------------------------------------------------------------
 //	Alle Termine zum User lesen
 // ------------------------------------------------------------------------------------------
@@ -1137,8 +1148,8 @@ function alle_uid_stundenplan_informationen($db,$uid,$user_array="")
 		//die("Cannot set usertype!");
 		//GastAccountHack
 		$type='student';
-	}	
-	
+	}
+
 	// Stundenplan erstellen
 	$stdplan=new wochenplan($type);
 	// Benutzergruppe
@@ -1180,7 +1191,7 @@ function alle_uid_stundenplan_informationen($db,$uid,$user_array="")
 	$row_stunde=array();
 	$qry="SELECT stunde, beginn, ende FROM lehre.tbl_stunde ORDER BY stunde";
 	if(!$result=$db->db_query($qry))
-			die('Probleme beim lesen der Stundentabelle '.$db->db_last_error());
+		die('Probleme beim lesen der Stundentabelle '.$db->db_last_error());
 	$num_rows_stunde=$db->db_num_rows();
 	while($row_stunden = $db->db_fetch_object())
 	{
@@ -1189,7 +1200,7 @@ function alle_uid_stundenplan_informationen($db,$uid,$user_array="")
 		$row_stunden->beginn_show=mb_substr($row_stunden->beginn, 0,5);
 		$row_stunden->ende_show=mb_substr($row_stunden->ende, 0,5);
 		$row_stunde[]=$row_stunden;
-	}	
+	}
 
 // ------------------------------------------------------------------------------------------
 //	Tabelle alle Termine zum User anzeigen
@@ -1200,8 +1211,8 @@ function alle_uid_stundenplan_informationen($db,$uid,$user_array="")
 	// Datum-Header
 	$html_liste_raum.='<tr>';
 	$html_liste_raum.='<th><a href="#bottom"><img src="go-bottom.png" border="0">&nbsp;</a>Zeit</th>';
-	$lektor_max=0;		
-	// Datumszeile	
+	$lektor_max=0;
+	// Datumszeile
 	for ($ii=0;$ii<TAGE_PRO_WOCHE;$ii++)
 	{
 		$aktiverWochentag=date('w', mktime(0, 0, 0, $ersterTagMonat, $ersterTag + $ii, $year));
@@ -1214,7 +1225,7 @@ function alle_uid_stundenplan_informationen($db,$uid,$user_array="")
 // ------------------------------------------------------------------------------------------
 	reset($row_stunde);
 	for ($i=0;$i<count($row_stunde);$i++)
-	{	
+	{
 	// Zeile je Stundeneinteilung
 		$html_liste_raum.='<tr>';
 		// Stunden Linker Rand - Erste Spalte
@@ -1239,13 +1250,13 @@ function alle_uid_stundenplan_informationen($db,$uid,$user_array="")
 			$aktiverDatumseintrag=date('Ymd',mktime(0, 0, 0, $ersterTagMonat,$ersterTag+ $ii, $year));
 			$aktiverTag=strftime(constHeaderStundenplanTag,mktime(0, 0, 0, $ersterTagMonat,$ersterTag+ $ii, $year));
 			$aktiverWochentag=date('w', mktime(0, 0, 0, $ersterTagMonat, $ersterTag + $ii, $year));
-			
+
 			$zeit_aktuell=false;
 			if ($weekday==$aktiverWochentag && $row_stunde[$i]->time_beginn<=time() && $row_stunde[$i]->time_ende>=time())
 			{
 				$zeit_aktuell=true;
 			}
-			
+
 			if ($zeit_aktuell)
 			{
 				$html_liste_raum.='<td class="stundenplan_detail_kpl_aktuell"><table width="100%" cellspacing="1" cellpadding="0" border="0">';
@@ -1255,13 +1266,12 @@ function alle_uid_stundenplan_informationen($db,$uid,$user_array="")
 				$html_liste_raum.='<td class="stundenplan_detail_kpl_normal"><table width="100%" cellspacing="1" cellpadding="0" border="0">';
 			}
 
-			
 			$gef_raum_einteilung_check=false;
 			$TagInd=$ii + 1;
 			$StdInd=$i + 1;
 
 			$lektor='';
-			$lektor_anz=0;		
+			$lektor_anz=0;
 
 			if (isset($stdplan->std_plan[$TagInd]) && isset($stdplan->std_plan[$TagInd][$StdInd]) && isset($stdplan->std_plan[$TagInd][$StdInd][0]->lehrfach))
 			{
@@ -1269,33 +1279,33 @@ function alle_uid_stundenplan_informationen($db,$uid,$user_array="")
 				{
 					//if (!isset($lehrstunde->reservierung) || ($lehrstunde->reservierung && $type!='lektor') )
 					//	continue;
-						
-					if (!$gef_raum_einteilung_check)	
+
+					if (!$gef_raum_einteilung_check)
 						$gef_raum_einteilung_check=$lehrstunde;
 					$lektor.=(isset($lehrstunde->lektor) && !empty($lehrstunde->lektor)?trim($lehrstunde->lektor).'<br>':'tw-0');
 					$lektor_anz++;
 					if ($lektor_max<$lektor_anz)
-						$lektor_max=$lektor_anz;		
-				}	
+						$lektor_max=$lektor_anz;
+				}
 			}
 			if ($gef_raum_einteilung_check)
 			{
 				if ($gef_raum_einteilung_check->reservierung)
-					$lehrstunde=trim($gef_raum_einteilung_check->titel).'<br>';	
+					$lehrstunde=trim($gef_raum_einteilung_check->titel).'<br>';
 				else
-					$lehrstunde=trim($gef_raum_einteilung_check->lehrfach).'-'.trim($gef_raum_einteilung_check->lehrform).'<br>';	
-					
+					$lehrstunde=trim($gef_raum_einteilung_check->lehrfach).'-'.trim($gef_raum_einteilung_check->lehrform).'<br>';
+
 				$ort=(isset($gef_raum_einteilung_check->ort) && !empty($gef_raum_einteilung_check->ort)?trim($gef_raum_einteilung_check->ort).'<br>':'');
 				$farbe=(isset($gef_raum_einteilung_check->farbe) && !empty($gef_raum_einteilung_check->farbe)?$gef_raum_einteilung_check->farbe:'');
- 				$html_liste_raum.='<tr><td '.($zeit_aktuell?' class="stundenplan_detail_aktuell" ':' class="stundenplan_detail_normal" ') .' '.(!empty($farbe)? ' style="background-color:#'.$farbe.';" ':'').'>';
+				$html_liste_raum.='<tr><td '.($zeit_aktuell?' class="stundenplan_detail_aktuell" ':' class="stundenplan_detail_normal" ') .' '.(!empty($farbe)? ' style="background-color:#'.$farbe.';" ':'').'>';
 #					$html_liste_raum.=$TagInd.'**'.$StdInd .'<br>'.$lehrstunde.$lektor.$ort;
 					$html_liste_raum.=$lehrstunde.$lektor.($lektor_anz>1?'':'{***}')."<b>$ort</b>";
 				$html_liste_raum.='</td></tr>';
-			}		
+			}
 			else
 			{
 				$html_liste_raum.='<tr><td '.($zeit_aktuell?' class="stundenplan_detail_aktuell" ':' class="stundenplan_detail_normal" ') .' >&nbsp;</td></tr>';
-			}	
+			}
 			$html_liste_raum.='</table></td>';
 		}
 		$html_liste_raum.='</tr>';
@@ -1303,7 +1313,7 @@ function alle_uid_stundenplan_informationen($db,$uid,$user_array="")
 	$html_liste_raum=($lektor_max>1?str_replace('{***}','<br>',$html_liste_raum):str_replace('{***}','',$html_liste_raum));
 	$html_liste_raum.='<tr><th><a href="#top"><img src="go-top.png" border="0">&nbsp;</a>Top<a name="bottom">&nbsp;</a></th><th colspan="7">&nbsp;</th></tr>';
 	$html_liste_raum.='</table>';
-	return $html_liste_raum;	
+	return $html_liste_raum;
 }
 #-------------------------------------------------------------------------------------------	
 /* 
@@ -1349,14 +1359,14 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 	$qry.=" ; ";
 
 	if(!$result=$db->db_query($qry))
-			die('Probleme beim lesen der Raumtyptabelle '.$db->db_last_error());
+		die('Probleme beim lesen der Raumtyptabelle '.$db->db_last_error());
 	$num_rows_stunde=$db->db_num_rows($result);
 
 	if($num_rows_stunde==0)
 		return "Derzeit sind hier keine Eintraege vorhanden";
-	
+
 	while($tmp_row_raum = $db->db_fetch_object($result))
-	{		
+	{
 		// Wenn noch kein Raum gewaehlt wurde den ersten als Default nehmen
 		if (!trim($ort_kurzbz))
 			$ort_kurzbz=$tmp_row_raum->ort_kurzbz;
@@ -1364,7 +1374,7 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 		// Aktiven Raum Anzeigen
 		if (trim($ort_kurzbz)==trim($tmp_row_raum->ort_kurzbz))
 			$row_raum_aktiv=$tmp_row_raum;
-			
+
 		$row_raum_alle[]=$tmp_row_raum->ort_kurzbz;
 		$row_raum[]=$tmp_row_raum;
 	}
@@ -1390,7 +1400,7 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 #	$qry.=" ORDER BY stunde desc LIMIT 1; ";
 
 	if(!$result=$db->db_query($qry))
-			die('Probleme beim lesen der Raumtyptabelle '.$db->db_last_error());
+		die('Probleme beim lesen der Raumtyptabelle '.$db->db_last_error());
 
 	// In einer Pause wird kein Datensatz gefunden, den letzten holen
 	if (!$num_rows_stunde=$db->db_num_rows($result))
@@ -1405,23 +1415,23 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 	}
 
 	while($tmp_row_stunde = $db->db_fetch_object($result))
-		$row_stunde[]=$tmp_row_stunde;			
+		$row_stunde[]=$tmp_row_stunde;
 
 	// Plausib Stunde
 	if(!isset($row_stunde[0]))
 		$row_stunde[0]=new stdClass();
 
 	$row_stunde[0]->stunde=(isset($row_stunde[0]) && isset($row_stunde[0]->stunde)?$row_stunde[0]->stunde:0);
-	
+
 	$html_liste_raum.='<table class="raum_auswahlliste">';
 	$html_liste_raum.='<tr>';
 	reset($row_raum);
 	for ($i=0;$i<count($row_raum);$i++)
 	{
-	
+
 		// Default
 		$farbe="orange";
-		
+
 		$ort_kurzbz=$row_raum[$i]->ort_kurzbz;
 		$datum=date("Y-m-d", mktime(0,0,0,date("m"),date("d"),date("y")));
 		$stunde_von=$row_stunde[0]->stunde;
@@ -1430,7 +1440,7 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 		{
 			$farbe="rot";
 		}
-		
+
 		$ort_kurzbz=$row_raum[$i]->ort_kurzbz;
 		$datum=date("Y-m-d", mktime(0,0,0,date("m"),date("d"),date("y")));
 		$stunde_von=$row_stunde[0]->stunde;
@@ -1438,7 +1448,7 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 		if (!$info=stundenplan_raum($db,$ort_kurzbz,$datum,$stunde_von,$stunde_bis))
 		{
 			$farbe="gruen";
-		}	
+		}
 
 #	if ($farbe=="orange")
 #		var_dump($info);
@@ -1446,15 +1456,15 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 		// Nach 4 Raumanzeigen eine Neuezeile erzeugen
 		$html_liste_raum.=($i==0 || $i%4?"":"</tr><tr>");
 		$html_liste_raum.='<td>';
-			$html_liste_raum.='<a href="'.$_SERVER['PHP_SELF'].'?raumtyp_kurzbz='.$raumtyp_kurzbz.'&amp;ort_kurzbz='.$ort_kurzbz.'&amp;standort_id='.$standort_id.'">';
-			$html_liste_raum.='<span class="'.$farbe.'_mitteText">';
-			$html_liste_raum.=trim($ort_kurzbz);
-			$html_liste_raum.='
-					</span>';			
+		$html_liste_raum.='<a href="'.$_SERVER['PHP_SELF'].'?raumtyp_kurzbz='.$raumtyp_kurzbz.'&amp;ort_kurzbz='.$ort_kurzbz.'&amp;standort_id='.$standort_id.'">';
+		$html_liste_raum.='<span class="'.$farbe.'_mitteText">';
+		$html_liste_raum.=trim($ort_kurzbz);
+		$html_liste_raum.='
+				</span>';
 		$html_liste_raum.='</a>';
 
 		$html_liste_raum.='</td>';
-	}		
+	}
 	$html_liste_raum.='</tr>';
 	$html_liste_raum.='</table>';
 
@@ -1463,19 +1473,19 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 	$html_liste_raum.='<table width="100%" cellpadding="0" cellspacing="0">';
 	$html_liste_raum.='<tr>';
 
-		$html_liste_raum.='<td><table><tr><td><span class="gruen_mitteText">&nbsp;&nbsp;&nbsp;</span></td><td>Mindestens n&auml;chsten 2 Einheiten frei</td></tr></table></td>';
-		$html_liste_raum.='<td><table><tr><td><span class="orange_mitteText">&nbsp;&nbsp;&nbsp;</span></td><td>Derzeit frei</td></tr></table></td>';
-		$html_liste_raum.='<td><table><tr><td><span class="rot_mitteText">&nbsp;&nbsp;&nbsp;</span></td><td>Raum derzeit besetzt</td></tr></table></td>';
+	$html_liste_raum.='<td><table><tr><td><span class="gruen_mitteText">&nbsp;&nbsp;&nbsp;</span></td><td>Mindestens n&auml;chsten 2 Einheiten frei</td></tr></table></td>';
+	$html_liste_raum.='<td><table><tr><td><span class="orange_mitteText">&nbsp;&nbsp;&nbsp;</span></td><td>Derzeit frei</td></tr></table></td>';
+	$html_liste_raum.='<td><table><tr><td><span class="rot_mitteText">&nbsp;&nbsp;&nbsp;</span></td><td>Raum derzeit besetzt</td></tr></table></td>';
 	$html_liste_raum.='</tr>';
 	$html_liste_raum.='</table>';
 	$html_liste_raum.='<hr>';
-	
-	// Aktiver Raum Haederinformation 
+
+	// Aktiver Raum Haederinformation
 	$html_liste_raum.='<h1>'.$row_raum_aktiv->ort_kurzbz.'&nbsp;&nbsp;-&nbsp;&nbsp;'.strftime(constRaumDatumZeit,time()).'&nbsp;&nbsp;<span style="font-size:small;">'.$row_raum_aktiv->bezeichnung.'</span>'.'</h1>';
 
 	$ort_kurzbz=$row_raum_aktiv->ort_kurzbz;
 	$datum=date("Ymd", mktime(0,0,0,date("m"),date("d"),date("y")));
-	
+
 	$stunde_von=0;
 	$stunde_bis=99;
 	if (!$row_raum_plan=stundenplan_raum($db,$ort_kurzbz,$datum,$stunde_von,$stunde_bis))
@@ -1491,7 +1501,7 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 	$row_stunde=array();
 	$qry="SELECT stunde, beginn, ende FROM lehre.tbl_stunde ORDER BY stunde";
 	if(!$result=$db->db_query($qry))
-			die('Probleme beim lesen der Stundentabelle '.$db->db_last_error());
+		die('Probleme beim lesen der Stundentabelle '.$db->db_last_error());
 
 	$lastEnde=0;
 	$num_rows_stunde=$db->db_num_rows();
@@ -1504,14 +1514,14 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 		$row->ende_kurz=mb_substr($row->ende, 0,5);
 
 		$row->beginn_show=substr($row->beginn, 0,5);
-		$row->ende_show=substr($row->ende, 0,5);		
+		$row->ende_show=substr($row->ende, 0,5);
 		
 		// Pausenzeiten werden zur naechsten Std. gerechnet als Aktuellezeit
 		// dh. Letztes Ende ist gleich Start aktueller Datensatz
 		if ($lastEnde && $row->time_beginn!=$lastEnde)
 		{
 #			echo "<p>Zeit korr. Funktion:alle_raum_informationen ".$row->beginn_show." wird zu ".$lastShowEnde."</p>";
-			 $row->time_beginn=$lastEnde;
+			$row->time_beginn=$lastEnde;
 		}
 		
 		// Aktuelle Stunde kennzeichnen
@@ -1527,7 +1537,7 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 	for ($i=0;$i<count($row_stunde);$i++)
 	{
 		$row=$row_stunde[$i];
-		
+
 		$tageshelfte=$num_rows_stunde/2;
 		$html_liste_raum.=($i==0 || $i%$tageshelfte?"":"</tr><tr>");
 
@@ -1539,12 +1549,12 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 		else
 		{
 			$html_liste_raum.='<tr><th >'.trim($row->beginn_kurz)."<br>".trim($row->ende_kurz).'</th></tr>';
-        }
+		}
 
 		reset($row_raum_plan);
 		$gef_raum_einteilung=array();
 		for ($ii=0;$ii<count($row_raum_plan);$ii++)
-		{			
+		{
 			if ($row->stunde!=$row_raum_plan[$ii]->stunde)
 			{
 				continue;
@@ -1583,7 +1593,7 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 				{
 					$gef_raum_einteilung->farbe=$gef_stundenplan_detail->farbe;
 				}
-			}	
+			}
 			// Reservierung Detail
 			if (isset($gef_raum_einteilung->reservierung_id) && !empty($gef_raum_einteilung->reservierung_id))
 			{
@@ -1608,7 +1618,7 @@ function alle_raum_informationen($db,$raumtyp_kurzbz,$ort_kurzbz, $standort_id)
 				{
 					$gef_raum_einteilung->farbe=$gef_stundenplan_detail->farbe;
 				}
-			}	
+			}
 		}
 		$html_liste_raum.='<tr><td '.($row->aktuell?' class="raum_liste_detail_stundenplan_aktuell" ':' class="raum_liste_detail_stundenplan_normal"  ') .' '. (isset($gef_raum_einteilung->farbe)?' style="background-color:#'.$gef_raum_einteilung->farbe.'" ':'').'>'.(isset($gef_raum_einteilung->infotext) && $gef_raum_einteilung->infotext? $gef_raum_einteilung->infotext :'&nbsp;<br><br>').'&nbsp;</td></tr>';
 		$html_liste_raum.='</table>';
@@ -1660,11 +1670,11 @@ function stundenplan_raum($db,$ort_kurzbz="",$datum="",$stunde_von,$stunde_bis=0
 	$datum_obj = new datum();
 	if (!empty($datum))
 	{
-		$qry.=" and  tbl_reservierung.datum =".$db->db_add_param(trim($datum), FHC_STRING);	
+		$qry.=" and  tbl_reservierung.datum =".$db->db_add_param(trim($datum), FHC_STRING);
 	}
 	if (!empty($kalenderwoche))
 	{
-		$qry.=" and  to_char(tbl_reservierung.datum, 'IW') =".$db->db_add_param(trim($kalenderwoche), FHC_STRING);	
+		$qry.=" and  to_char(tbl_reservierung.datum, 'IW') =".$db->db_add_param(trim($kalenderwoche), FHC_STRING);
 	}	
 	if (!empty($ort_kurzbz))
 	{
@@ -1676,19 +1686,19 @@ function stundenplan_raum($db,$ort_kurzbz="",$datum="",$stunde_von,$stunde_bis=0
 	}
 	if (!empty($studiengang_kz) || $studiengang_kz=='0')
 	{
-		$qry.=" and studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_STRING);	
+		$qry.=" and studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_STRING);
 	}
 	if (!empty($semester) || $semester=='0')
 	{
-		$qry.=" and semester=".$db->db_add_param($semester, FHC_STRING);	
+		$qry.=" and semester=".$db->db_add_param($semester, FHC_STRING);
 	}
 	if (!empty($verband) || $verband=='0')
 	{
-		$qry.=" and verband=".$db->db_add_param(trim($verband), FHC_STRING);	
+		$qry.=" and verband=".$db->db_add_param(trim($verband), FHC_STRING);
 	}
 	if (!empty($gruppe) || $gruppe=='0')
 	{
-		$qry.=" and gruppe=".$db->db_add_param($gruppe, FHC_STRING);	
+		$qry.=" and gruppe=".$db->db_add_param($gruppe, FHC_STRING);
 	}
 
 	$qry.=" UNION ";
@@ -1700,22 +1710,22 @@ function stundenplan_raum($db,$ort_kurzbz="",$datum="",$stunde_von,$stunde_bis=0
 	if (!empty($datum))
 	{
 		$qry.=" and  tbl_stundenplan.datum =".$db->db_add_param(trim($datum), FHC_STRING);
-	}	
+	}
 	if (!empty($kalenderwoche))
 	{
 		$qry.=" and  to_char(tbl_stundenplan.datum, 'IW') =".$db->db_add_param(trim($kalenderwoche), FHC_STRING);
-	}	
+	}
 	if (!empty($ort_kurzbz))
 	{
-		$qry.=" and  ort_kurzbz =E".$db->db_add_param(trim($ort_kurzbz), FHC_STRING);	
+		$qry.=" and  ort_kurzbz =E".$db->db_add_param(trim($ort_kurzbz), FHC_STRING);
 	}
 	if (!empty($uid) || $uid=='0')
 	{
-		$qry.=" and mitarbeiter_uid=".$db->db_add_param(trim($uid), FHC_STRING);	
+		$qry.=" and mitarbeiter_uid=".$db->db_add_param(trim($uid), FHC_STRING);
 	}
 	if (!empty($studiengang_kz) || $studiengang_kz=='0')
 	{
-		$qry.=" and studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_STRING);	
+		$qry.=" and studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_STRING);
 	}
 	if (!empty($semester) || $semester=='0')
 	{
@@ -1723,11 +1733,11 @@ function stundenplan_raum($db,$ort_kurzbz="",$datum="",$stunde_von,$stunde_bis=0
 	}
 	if (!empty($verband) || $verband=='0')
 	{
-		$qry.=" and verband=E".$db->db_add_param(trim($verband), FHC_STRING);	
+		$qry.=" and verband=E".$db->db_add_param(trim($verband), FHC_STRING);
 	}
 	if (!empty($gruppe) || $gruppe=='0')
 	{
-		$qry.=" and gruppe=".$db->db_add_param($gruppe, FHC_STRING);	
+		$qry.=" and gruppe=".$db->db_add_param($gruppe, FHC_STRING);
 	}
 	$qry.=" ; ";
 	
@@ -1982,11 +1992,11 @@ function read_create_html_news($db,$fachbereich_kurzbz,$studiengang_kz,$semester
 	//	Lesen Newstickerzeilen
 	// ------------------------------------------------------------------------------------------
 	//	Initialisieren der Newstickerzeilen
-	$news='';	
+	$news='';
 
 	$news_obj = new news();
 	$news_obj->getnews(MAXNEWSALTER, $studiengang_kz, $semester, false, null, MAXNEWS);
-	
+
 	// Newsliste erzeugen
 	$news='<table class="news" border="0" cellpadding="0" cellspacing="0">';
 	$i=0;
@@ -2022,7 +2032,7 @@ function read_create_html_news($db,$fachbereich_kurzbz,$studiengang_kz,$semester
 				
 			$news.='<td width="89%" >'. (stristr($text,'</table>')?$text:(mb_strlen($text)>90?mb_substr(trim('<b>'.$betreff.'</b><br>'.$text),0,90).'<span style="font-size:7px;">...</span>' :trim($text))).'</td>
 	
-				<td width="9%">		
+				<td width="9%">
 							<span class="blau_mitteText" style="font-size:small;">
 								Detail
 							</span>
@@ -2033,7 +2043,7 @@ function read_create_html_news($db,$fachbereich_kurzbz,$studiengang_kz,$semester
 							<span class="blau_mitteText">
 								schliessen
 							</span>
-						</div>			
+						</div>
 						<p>&nbsp;</p>
 					</div>
 				</td></tr><tr '.($i%2? ' class="news_row_0" ':' class="news_row_1" ').'><td '.($i%2? ' class="news_row_0" ':' class="news_row_1" ').' colspan="3">&nbsp;</td></tr>';
