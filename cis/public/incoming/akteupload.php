@@ -165,12 +165,12 @@ if(isset($_GET['person_id']))
 					 <SELECT name='dokumenttyp'>";
 				foreach ($dokument->result as $dok)
 				{
-					if($dok->dokument_kurzbz == 'Lebenslf' || $dok->dokument_kurzbz == 'Motivat' || $dok->dokument_kurzbz == 'Zeugnis' || $dok->dokument_kurzbz == 'Lichtbil' || $dok->dokument_kurzbz == 'LearnAgr')
+					if($dok->dokument_kurzbz == 'Lebenslf' || $dok->dokument_kurzbz == 'Motivat' || $dok->dokument_kurzbz == 'Maturaze' || $dok->dokument_kurzbz == 'LearnAgr')
 					{
 						$selected =""; 
 						if($dok->dokument_kurzbz == $dokumenttyp)
 							$selected = "selected";
-						echo '<option '.$selected.' value="'.$dok->dokument_kurzbz.'" >'.$dok->bezeichnung."</option>\n";
+						echo '<option '.$selected.' value="'.$dok->dokument_kurzbz.'" >'.$dok->bezeichnung_mehrsprachig[$sprache]."</option>\n";
 					}
 				}
 echo "				</select>

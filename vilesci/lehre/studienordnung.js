@@ -1264,16 +1264,18 @@ function deleteLehrveranstaltungFromStudienplan(lehrveranstaltung_studienplan_id
  */
 function saveStudienordnung()
 {
-	bezeichnung = $("#bezeichnung").val();
-	version = $("#version").val();
-	gueltigvon = $("#gueltigvon option:selected").val();
-	gueltigbis = $("#gueltigbis option:selected").val();
-	ects = $("#ects").val();
-	studiengangbezeichnung = $("#studiengangbezeichnung").val();
-	studiengangbezeichnungenglisch = $("#studiengangbezeichnungenglisch").val();
-	studiengangkurzbzlang = $("#studiengangkurzbzlang").val();
-	mystudienordnung_id = $("#studienordnung_id").val();
-	akadgrad_id = $("#akadgrad_id").val();
+	var bezeichnung = $("#bezeichnung").val();
+	var version = $("#version").val();
+	var gueltigvon = $("#gueltigvon option:selected").val();
+	var gueltigbis = $("#gueltigbis option:selected").val();
+	var ects = $("#ects").val();
+	var studiengangbezeichnung = $("#studiengangbezeichnung").val();
+	var studiengangbezeichnungenglisch = $("#studiengangbezeichnungenglisch").val();
+	var studiengangkurzbzlang = $("#studiengangkurzbzlang").val();
+	var mystudienordnung_id = $("#studienordnung_id").val();
+	var akadgrad_id = $("#akadgrad_id").val();
+	var status_kurzbz = $("#studienordnung_status").val();
+	var standort_id = $("#standort_id").val();
 
 	if(mystudienordnung_id!='')
 	{
@@ -1295,7 +1297,9 @@ function saveStudienordnung()
 		"studiengangbezeichnung_englisch":studiengangbezeichnungenglisch,
 		"studiengangkurzbzlang":studiengangkurzbzlang,
 		"akadgrad_id":akadgrad_id,
-		"studiengang_kz":global_studiengang_kz
+		"studiengang_kz":global_studiengang_kz,
+		"status_kurzbz":status_kurzbz,
+		"standort_id":standort_id
 	};
 
 
@@ -1339,6 +1343,9 @@ function saveStudienplan()
 	testtool_sprachwahl = $("#testtool_sprachwahl").prop("checked");
 	aktiv = $("#aktiv").prop("checked");
 	var studienplan_id = $("#studienplan_id").val();
+	var pflicht_sws = $("#pflicht_sws").val();
+	var pflicht_lvs = $("#pflicht_lvs").val();
+	var ects_stpl = $("#ects_stpl").val();
 
 	if(studienplan_id!='')
 	{
@@ -1359,7 +1366,10 @@ function saveStudienplan()
 	"semesterwochen":semesterwochen,
 	"testtool_sprachwahl":testtool_sprachwahl,
 	"aktiv":aktiv,
-	"studienordnung_id":global_studienordnung_id
+	"studienordnung_id":global_studienordnung_id,
+	"ects_stpl":ects_stpl,
+	"pflicht_sws":pflicht_sws,
+	"pflicht_lvs":pflicht_lvs
 	};
 
 

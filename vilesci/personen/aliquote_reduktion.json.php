@@ -65,6 +65,25 @@ switch($action)
 		$prestudent = new prestudent();
 		$return = $prestudent->getAllStudentenFromStudienplanAndStudsem($studienplan_id, $studiensemester_kurzbz, $studiengang_kz);
 
+		$db = new basis_db();
+		foreach($return as $key=>$value)
+		{
+			$qry = "SELECT
+				*
+				FROM
+					public.tbl_dokumentprestudent
+				WHERE
+					prestudent_id=".$db->db_add_param($value->prestudent_id)."
+					AND dokument_kurzbz=".$db->db_add_param('IvBo'.$value->studiengang_kz);
+
+			if($result_dok = $db->db_query($qry))
+			{
+				if($db->db_num_rows($result_dok)>0)
+					$return[$key]->interviewbogen=true;
+				else
+					$return[$key]->interviewbogen=false;
+			}
+		}
 		returnAJAX(true,json_encode($return));
 		break;
 
@@ -148,11 +167,13 @@ switch($action)
 		$worksheet->write($zeile,++$spalte,'Vorname',$format_bold);
 		$maxlength[$spalte]=7;
 		$worksheet->write($zeile,++$spalte,'ZGV Gruppe',$format_bold);
-		$maxlength[$spalte]=8;
+		$maxlength[$spalte]=10;
 		$worksheet->write($zeile,++$spalte,'Reihung',$format_bold);
 		$maxlength[$spalte]=8;
 		$worksheet->write($zeile,++$spalte,'RT Gesamt',$format_bold);
 		$maxlength[$spalte]=8;
+		$worksheet->write($zeile,++$spalte,'Interviewbogen',$format_bold);
+		$maxlength[$spalte]=14;
 		$worksheet->write($zeile,++$spalte,'Status',$format_bold);
 		$maxlength[$spalte]=8;
 		$worksheet->write($zeile,++$spalte,'Auswahl',$format_bold);
@@ -190,9 +211,9 @@ switch($action)
 					$maxlength[$spalte]=mb_strlen("");
 			}
 
-			$worksheet->writeNumber($zeile,++$spalte, $s->seqPlace);
-			if(mb_strlen($s->seqPlace)>$maxlength[$spalte])
-				$maxlength[$spalte]=mb_strlen($s->seqPlace);
+			$worksheet->writeNumber($zeile,++$spalte, (isset($s->seqPlace)?$s->seqPlace:''));
+			if(mb_strlen((isset($s->seqPlace)?$s->seqPlace:''))>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen((isset($s->seqPlace)?$s->seqPlace:''));
 
 			if(isset($s->rt_gesamtpunkte) && $s->rt_gesamtpunkte)
 			{
@@ -207,6 +228,18 @@ switch($action)
 					$maxlength[$spalte]=mb_strlen("");
 			}
 
+			if(isset($s->interviewbogen))
+			{
+				$worksheet->write($zeile,++$spalte, ($s->interviewbogen?'vorhanden':'nicht vorhanden'));
+				if(mb_strlen(($s->interviewbogen?'vorhanden':'nicht vorhanden'))>$maxlength[$spalte])
+					$maxlength[$spalte]=mb_strlen(($s->interviewbogen?'vorhanden':'nicht vorhanden'));
+			}
+			else
+			{
+				$worksheet->write($zeile,++$spalte, "");
+				if(mb_strlen("")>$maxlength[$spalte])
+					$maxlength[$spalte]=mb_strlen("");
+			}
 			$worksheet->write($zeile,++$spalte, $s->laststatus);
 			if(mb_strlen($s->laststatus)>$maxlength[$spalte])
 				$maxlength[$spalte]=mb_strlen($s->laststatus);
@@ -239,7 +272,10 @@ switch($action)
 
 function studentsSort($a, $b)
 {
-	return $a->seqPlace > $b->seqPlace;
+	if(isset($a->seqPlace))
+		return $a->seqPlace > $b->seqPlace;
+	else
+		return false;
 }
 
 

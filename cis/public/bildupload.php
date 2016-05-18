@@ -90,7 +90,7 @@ $person = new person();
 if(isset($_SESSION['prestudent/user']))
 	$person_id=$person->checkZugangscode($_SESSION['prestudent/user']); 
 if(isset($_SESSION['incoming/user']))
-	$person_id=$person->checkZugangscode($_SESSION['prestudent/user']); 
+	$person_id=$person->checkZugangscode($_SESSION['incoming/user']); 
 if($person_id!=$_GET['person_id'])
 	die('Sie haben keine Berechtigung für diese Seite');
 

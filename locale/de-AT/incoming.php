@@ -120,4 +120,5 @@ $this->phrasen['incoming/bereitsAusgewaehlt']='Diese Universität wurde bereits 
 $this->phrasen['incoming/anfrageAbschicken']='Anfrage an CIR abschicken';
 $this->phrasen['incoming/captcha']='Geben Sie bitte hier die Zeichen aus der Grafik ein (Spamschutz).';
 $this->phrasen['incoming/andereGrafik']='Andere Grafik';
+$this->phrasen['incoming/noVacancies']='LV voll belegt';
 ?>

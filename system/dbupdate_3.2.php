@@ -1103,7 +1103,7 @@ if (!$result = @$db->db_query("SELECT 1 FROM public.tbl_studienjahr LIMIT 1;"))
 		echo 'public.tbl_studienjahr: Tabelle hinzugefuegt<br>';
 }
 
-//Spalte genehmigung in lehre.tbl_studienordnung_lehrveranstaltung
+//Spalte genehmigung in lehre.tbl_studienplan_lehrveranstaltung
 if (!$result = @$db->db_query("SELECT genehmigung FROM lehre.tbl_studienplan_lehrveranstaltung LIMIT 1;"))
 {
 	$qry = "ALTER TABLE lehre.tbl_studienplan_lehrveranstaltung ADD COLUMN genehmigung BOOLEAN DEFAULT TRUE;";
@@ -1139,6 +1139,47 @@ if(!@$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_status LIMIT
 		echo '<br>Spalte bezeichnung_mehrsprachig in public.tbl_status hinzugefügt<br>Die ersten beiden Sprachen wurden vorbefüllt. Weitere Übersetzungen sind zu ergänzen!<br>';
 }
 
+// Remove NOT NULL constraint on verfasser_uid on public.tbl_notiz
+if($result = @$db->db_query("SELECT is_nullable FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'public' AND TABLE_NAME = 'tbl_notiz' AND COLUMN_NAME = 'verfasser_uid' AND is_nullable = 'YES'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = " ALTER TABLE public.tbl_notiz ALTER COLUMN verfasser_uid DROP NOT NULL;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_notiz '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Removed NOT NULL constraint on "verfasser_uid" from public.tbl_notiz<br>';
+	}
+}
+
+// LAS Spalte von Smallint auf numeric(5,2)
+if($result = $db->db_query("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='lehre' AND TABLE_NAME='tbl_lehrveranstaltung' AND COLUMN_NAME = 'las' AND DATA_TYPE='smallint' "))
+{
+	if($db->db_num_rows($result)>0)
+	{
+		$qry = " ALTER TABLE lehre.tbl_lehrveranstaltung ALTER COLUMN las TYPE numeric(5,2);";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_lehrveranstaltung '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Spalte las in lehre.tbl_lehrveranstaltung von smallint auf numeric(5,2) geändert<br>';
+	}
+}
+
+// Fehlender FK bei tbl_studienplan_lehrveranstaltung
+if($result = $db->db_query("SELECT * FROM information_schema.table_constraints WHERE constraint_name='fk_studienplan_lehrveranstaltung_parent_id'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "ALTER TABLE lehre.tbl_studienplan_lehrveranstaltung ADD CONSTRAINT fk_studienplan_lehrveranstaltung_parent_id FOREIGN KEY (studienplan_lehrveranstaltung_id_parent) REFERENCES lehre.tbl_studienplan_lehrveranstaltung(studienplan_lehrveranstaltung_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_studienplan_lehrveranstaltung '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Fehlenden FK bei Tabelle lehre.tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent gesetzt<br>';
+	}
+}
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -1210,7 +1251,7 @@ $tabellen=array(
 	"campus.tbl_pruefungsfenster" => array("pruefungsfenster_id","studiensemester_kurzbz","oe_kurzbz","start","ende"),
 	"campus.tbl_pruefung" => array("pruefung_id","mitarbeiter_uid","studiensemester_kurzbz","pruefungsfenster_id","pruefungstyp_kurzbz","titel","beschreibung","methode","einzeln","storniert","insertvon","insertamum","updatevon","updateamum","pruefungsintervall"),
 	"campus.tbl_pruefungstermin" => array("pruefungstermin_id","pruefung_id","von","bis","teilnehmer_max","teilnehmer_min","anmeldung_von","anmeldung_bis","ort_kurzbz","sammelklausur"),
-	"campus.tbl_pruefungsanmeldung" => array("pruefungsanmeldung_id","uid","pruefungstermin_id","lehrveranstaltung_id","status_kurzbz","wuensche","reihung","kommentar","statusupdatevon","statusupdateamum","anrechnung_id"),
+	"campus.tbl_pruefungsanmeldung" => array("pruefungsanmeldung_id","uid","pruefungstermin_id","lehrveranstaltung_id","status_kurzbz","wuensche","reihung","kommentar","statusupdatevon","statusupdateamum","anrechnung_id","pruefungstyp_kurzbz"),
 	"campus.tbl_pruefungsstatus" => array("status_kurzbz","bezeichnung"),
 	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz","veranstaltung_id","insertamum","insertvon"),
 	"campus.tbl_resturlaub"  => array("mitarbeiter_uid","resturlaubstage","mehrarbeitsstunden","updateamum","updatevon","insertamum","insertvon","urlaubstageprojahr"),

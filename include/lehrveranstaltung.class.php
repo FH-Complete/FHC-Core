@@ -81,8 +81,8 @@ class lehrveranstaltung extends basis_db
 	public $lvps;
 	public $las;
 
-	public $benotung=false;
-	public $lvinfo=false;
+	public $benotung=true;
+	public $lvinfo=true;
 	public $curriculum=true;
 	public $export=true;
 

@@ -23,6 +23,15 @@
 require_once(dirname(__FILE__).'/person.class.php');
 require_once(dirname(__FILE__).'/log.class.php');
 
+require_once(dirname(__FILE__).'/phrasen.class.php');
+require_once(dirname(__FILE__).'/globals.inc.php');
+require_once(dirname(__FILE__).'/sprache.class.php');
+
+$sprache = getSprache();
+$lang = new sprache();
+$lang->load($sprache);
+$p = new phrasen($sprache);
+
 class prestudent extends person
 {
 	//Tabellenspalten
@@ -790,12 +799,14 @@ class prestudent extends person
 	 */
 	public function save_rolle()
 	{
+		global $p;
 		if($this->new)
 		{
 			//pruefen ob die Rolle schon vorhanden ist
 			if($this->load_rolle($this->prestudent_id, $this->status_kurzbz, $this->studiensemester_kurzbz, $this->ausbildungssemester))
 			{
-				$this->errormsg = 'Diese Rolle existiert bereits';
+				//$this->errormsg = 'Diese Rolle existiert bereits';
+				$this->errormsg = $p->t('errors/rolleExistiertBereits');
 				return false;
 			}
 
@@ -834,7 +845,8 @@ class prestudent extends person
 			{
 				if($this->load_rolle($this->prestudent_id, $this->status_kurzbz, $this->studiensemester_kurzbz, $this->ausbildungssemester))
 				{
-					$this->errormsg = 'Diese Rolle existiert bereits';
+					//$this->errormsg = 'Diese Rolle existiert bereits';
+					$this->errormsg = $p->t('errors/rolleExistiertBereits');
 					return false;
 				}
 			}

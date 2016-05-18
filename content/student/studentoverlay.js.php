@@ -5243,16 +5243,16 @@ function StudentPrintAusbildungsvertrag(event)
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-			var uid=tree.view.getCellText(v,col);
-			paramList += ';'+uid;
+			var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			var prestudentId=tree.view.getCellText(v,col);
+			paramList += ';'+prestudentId;
 			stg_kz=getTreeCellText(tree,"student-treecol-studiengang_kz", v);
 		}
 	}
 
 	if(paramList.replace(";",'')=='')
 	{
-		alert('Bitte einen Studenten auswaehlen');
+		alert('Bitte mindestens eine Person auswaehlen');
 		return false;
 	}
 	if (event.shiftKey)
@@ -5269,7 +5269,7 @@ function StudentPrintAusbildungsvertrag(event)
 	}
 
 	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&style_xsl=AusbildStatus&output='+output+'&uid='+paramList,'Ausbildungsvertrag', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&style_xsl=AusbildStatus&output='+output+'&prestudent_id='+paramList,'Ausbildungsvertrag', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 //****
@@ -5292,16 +5292,16 @@ function StudentPrintAusbildungsvertragEnglisch(event)
 		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-			var uid=tree.view.getCellText(v,col);
-			paramList += ';'+uid;
+			var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			var prestudentId=tree.view.getCellText(v,col);
+			paramList += ';'+prestudentId;
 			stg_kz=getTreeCellText(tree,"student-treecol-studiengang_kz", v);
 		}
 	}
 
 	if(paramList.replace(";",'')=='')
 	{
-		alert('Bitte mindestens einen Studenten auswaehlen');
+		alert('Bitte mindestens eine Person auswaehlen');
 		return false;
 	}
 	if (event.shiftKey)
@@ -5318,7 +5318,7 @@ function StudentPrintAusbildungsvertragEnglisch(event)
 	}
 
 	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&style_xsl=AusbVerEngHead&output='+output+'&uid='+paramList,'AusbildungsvertragEng', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&style_xsl=AusbVerEngHead&output='+output+'&prestudent_id='+paramList,'AusbildungsvertragEng', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****

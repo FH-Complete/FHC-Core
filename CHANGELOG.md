@@ -17,6 +17,7 @@
 - **[FAS]** Prüfungen im FAS werden nur noch vom aktuell ausgewählten Studiensemester angezeigt. Umschalten auf volle Ansicht möglich
 - **[CIS]** LVPlan Begrenzung der 4er Blockung aufgehoben.
 - **[CIS]** Im Menü 'Zeitsperren' Link zu Resturlaubsübersicht entfernt. Falls benötigt Verlinkung über CMS möglich.
+- **[CORE]** Removed NOT NULL constraint on 'verfasser\_uid' from public.tbl\_notiz
 
 ### Updateinfo
 - **[FAS]** Für Lehraufträge muss eine Unoconv-Vorlage erstellt werden, da der für xsl-fo notwendige Seitenumbruch-Tag aus dem RDF entfernt wurde.
