@@ -2033,9 +2033,9 @@ function read_create_html_news($db,$fachbereich_kurzbz,$studiengang_kz,$semester
 			$news.='<td width="89%" >'. (stristr($text,'</table>')?$text:(mb_strlen($text)>90?mb_substr(trim('<b>'.$betreff.'</b><br>'.$text),0,90).'<span style="font-size:7px;">...</span>' :trim($text))).'</td>
 	
 				<td width="9%">
-							<span class="blau_mitteText" style="font-size:small;">
-								Detail
-							</span>
+					<span class="blau_mitteText" style="font-size:small;">
+						Detail
+					</span>
 				</td>
 				<td class="ausblenden">
 					<div id="news_'.$row->news_id.'_anzeige"><h1>'.trim($betreff).'</h1>'.trim($text).'
