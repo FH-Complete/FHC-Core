@@ -14,30 +14,30 @@
 
 if(!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Fachbereich extends APIv1_Controller
+class Geschaeftsjahr2 extends APIv1_Controller
 {
 	/**
-	 * Fachbereich API constructor.
+	 * Geschaeftsjahr API constructor.
 	 */
 	public function __construct()
 	{
 		parent::__construct();
-		// Load model FachbereichModel
-		$this->load->model('organisation/fachbereich_model', 'FachbereichModel');
+		// Load model GeschaeftsjahrModel
+		$this->load->model('organisation/geschaeftsjahr_model', 'GeschaeftsjahrModel');
 		// Load set the uid of the model to let to check the permissions
-		$this->FachbereichModel->setUID($this->_getUID());
+		$this->GeschaeftsjahrModel->setUID($this->_getUID());
 	}
 
 	/**
 	 * @return void
 	 */
-	public function getFachbereich()
+	public function getGeschaeftsjahr()
 	{
-		$fachbereichID = $this->get('fachbereich_id');
+		$geschaeftsjahr_kurzbz = $this->get('geschaeftsjahr_kurzbz');
 		
-		if(isset($fachbereichID))
+		if(isset($geschaeftsjahr_kurzbz))
 		{
-			$result = $this->FachbereichModel->load($fachbereichID);
+			$result = $this->GeschaeftsjahrModel->load($geschaeftsjahr_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -50,17 +50,17 @@ class Fachbereich extends APIv1_Controller
 	/**
 	 * @return void
 	 */
-	public function postFachbereich()
+	public function postGeschaeftsjahr()
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['fachbereich_id']))
+			if(isset($this->post()['geschaeftsjahr_id']))
 			{
-				$result = $this->FachbereichModel->update($this->post()['fachbereich_id'], $this->post());
+				$result = $this->GeschaeftsjahrModel->update($this->post()['geschaeftsjahr_id'], $this->post());
 			}
 			else
 			{
-				$result = $this->FachbereichModel->insert($this->post());
+				$result = $this->GeschaeftsjahrModel->insert($this->post());
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
@@ -71,7 +71,7 @@ class Fachbereich extends APIv1_Controller
 		}
 	}
 	
-	private function _validate($fachbereich = NULL)
+	private function _validate($geschaeftsjahr = NULL)
 	{
 		return true;
 	}

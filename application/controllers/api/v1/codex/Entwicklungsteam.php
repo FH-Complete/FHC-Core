@@ -33,11 +33,12 @@ class Entwicklungsteam extends APIv1_Controller
 	 */
 	public function getEntwicklungsteam()
 	{
-		$entwicklungsteamID = $this->get('entwicklungsteam_id');
+		$studiengang_kz = $this->get('studiengang_kz');
+		$mitarbeiter_uid = $this->get('mitarbeiter_uid');
 		
-		if(isset($entwicklungsteamID))
+		if(isset($studiengang_kz) && isset($mitarbeiter_uid))
 		{
-			$result = $this->EntwicklungsteamModel->load($entwicklungsteamID);
+			$result = $this->EntwicklungsteamModel->load(array($studiengang_kz, $mitarbeiter_uid));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

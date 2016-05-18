@@ -33,11 +33,12 @@ class Bestelldetailtag extends APIv1_Controller
 	 */
 	public function getBestelldetailtag()
 	{
-		$bestelldetailtagID = $this->get('bestelldetailtag_id');
+		$bestelldetail_id = $this->get('bestelldetail_id');
+		$tag = $this->get('tag');
 		
-		if(isset($bestelldetailtagID))
+		if(isset($bestelldetail_id) && isset($tag))
 		{
-			$result = $this->BestelldetailtagModel->load($bestelldetailtagID);
+			$result = $this->BestelldetailtagModel->load(array($bestelldetail_id, $tag));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

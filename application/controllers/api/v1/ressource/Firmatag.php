@@ -33,11 +33,12 @@ class Firmatag extends APIv1_Controller
 	 */
 	public function getFirmatag()
 	{
-		$firmatagID = $this->get('firmatag_id');
+		$tag = $this->get('tag');
+		$firma_id = $this->get('firma_id');
 		
-		if(isset($firmatagID))
+		if(isset($tag) && isset($firma_id))
 		{
-			$result = $this->FirmatagModel->load($firmatagID);
+			$result = $this->FirmatagModel->load(array($tag, $firma_id));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

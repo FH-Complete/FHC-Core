@@ -33,11 +33,14 @@ class Prestudentstatus extends APIv1_Controller
 	 */
 	public function getPrestudentstatus()
 	{
-		$prestudentstatusID = $this->get('prestudentstatus_id');
+		$ausbildungssemester = $this->get('ausbildungssemester');
+		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
+		$status_kurzbz = $this->get('status_kurzbz');
+		$prestudent_id = $this->get('prestudent_id');
 		
-		if(isset($prestudentstatusID))
+		if(isset($ausbildungssemester) && isset($studiensemester_kurzbz) && isset($status_kurzbz) && isset($prestudent_id))
 		{
-			$result = $this->PrestudentstatusModel->load($prestudentstatusID);
+			$result = $this->PrestudentstatusModel->load(array($ausbildungssemester, $studiensemester_kurzbz, $status_kurzbz, $prestudent_id));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

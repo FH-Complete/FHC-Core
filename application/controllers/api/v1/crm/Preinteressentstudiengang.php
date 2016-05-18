@@ -33,11 +33,12 @@ class Preinteressentstudiengang extends APIv1_Controller
 	 */
 	public function getPreinteressentstudiengang()
 	{
-		$preinteressentstudiengangID = $this->get('preinteressentstudiengang_id');
+		$preinteressent_id = $this->get('preinteressent_id');
+		$studiengang_kz = $this->get('studiengang_kz');
 		
-		if(isset($preinteressentstudiengangID))
+		if(isset($preinteressent_id) && isset($studiengang_kz))
 		{
-			$result = $this->PreinteressentstudiengangModel->load($preinteressentstudiengangID);
+			$result = $this->PreinteressentstudiengangModel->load(array($preinteressent_id, $studiengang_kz));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

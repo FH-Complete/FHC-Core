@@ -33,11 +33,12 @@ class Rolleberechtigung extends APIv1_Controller
 	 */
 	public function getRolleberechtigung()
 	{
-		$rolleberechtigungID = $this->get('rolleberechtigung_id');
+		$rolle_kurzbz = $this->get('rolle_kurzbz');
+		$berechtigung_kurzbz = $this->get('berechtigung_kurzbz');
 		
-		if(isset($rolleberechtigungID))
+		if(isset($rolle_kurzbz) && isset($berechtigung_kurzbz))
 		{
-			$result = $this->RolleberechtigungModel->load($rolleberechtigungID);
+			$result = $this->RolleberechtigungModel->load(array($rolle_kurzbz, $berechtigung_kurzbz));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

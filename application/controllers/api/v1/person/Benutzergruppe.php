@@ -33,11 +33,12 @@ class Benutzergruppe extends APIv1_Controller
 	 */
 	public function getBenutzergruppe()
 	{
-		$benutzergruppeID = $this->get('benutzergruppe_id');
+		$gruppe_kurzbz = $this->get('gruppe_kurzbz');
+		$uid = $this->get('uid');
 		
-		if(isset($benutzergruppeID))
+		if(isset($gruppe_kurzbz) && isset($uid))
 		{
-			$result = $this->BenutzergruppeModel->load($benutzergruppeID);
+			$result = $this->BenutzergruppeModel->load(array($gruppe_kurzbz, $uid));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

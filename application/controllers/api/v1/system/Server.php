@@ -33,11 +33,11 @@ class Server extends APIv1_Controller
 	 */
 	public function getServer()
 	{
-		$serverID = $this->get('server_id');
+		$server_kurzbz = $this->get('server_kurzbz');
 		
-		if(isset($serverID))
+		if(isset($server_kurzbz))
 		{
-			$result = $this->ServerModel->load($serverID);
+			$result = $this->ServerModel->load($server_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

@@ -33,11 +33,12 @@ class Contentgruppe extends APIv1_Controller
 	 */
 	public function getContentgruppe()
 	{
-		$contentgruppeID = $this->get('contentgruppe_id');
+		$gruppe_kurzbz = $this->get('gruppe_kurzbz');
+		$content_id = $this->get('content_id');
 		
-		if(isset($contentgruppeID))
+		if(isset($gruppe_kurzbz) && isset($content_id))
 		{
-			$result = $this->ContentgruppeModel->load($contentgruppeID);
+			$result = $this->ContentgruppeModel->load(array($gruppe_kurzbz, $content_id));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

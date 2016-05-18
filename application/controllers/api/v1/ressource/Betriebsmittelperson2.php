@@ -14,30 +14,30 @@
 
 if(!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Organisationseinheit extends APIv1_Controller
+class Betriebsmittelperson2 extends APIv1_Controller
 {
 	/**
-	 * Organisationseinheit API constructor.
+	 * Betriebsmittelperson API constructor.
 	 */
 	public function __construct()
 	{
 		parent::__construct();
-		// Load model OrganisationseinheitModel
-		$this->load->model('organisation/organisationseinheit_model', 'OrganisationseinheitModel');
+		// Load model BetriebsmittelpersonModel
+		$this->load->model('ressource/betriebsmittelperson_model', 'BetriebsmittelpersonModel');
 		// Load set the uid of the model to let to check the permissions
-		$this->OrganisationseinheitModel->setUID($this->_getUID());
+		$this->BetriebsmittelpersonModel->setUID($this->_getUID());
 	}
 
 	/**
 	 * @return void
 	 */
-	public function getOrganisationseinheit()
+	public function getBetriebsmittelperson()
 	{
-		$organisationseinheitID = $this->get('organisationseinheit_id');
+		$betriebsmittelpersonID = $this->get('betriebsmittelperson_id');
 		
-		if(isset($organisationseinheitID))
+		if(isset($betriebsmittelpersonID))
 		{
-			$result = $this->OrganisationseinheitModel->load($organisationseinheitID);
+			$result = $this->BetriebsmittelpersonModel->load($betriebsmittelpersonID);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -50,17 +50,17 @@ class Organisationseinheit extends APIv1_Controller
 	/**
 	 * @return void
 	 */
-	public function postOrganisationseinheit()
+	public function postBetriebsmittelperson()
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['organisationseinheit_id']))
+			if(isset($this->post()['betriebsmittelperson_id']))
 			{
-				$result = $this->OrganisationseinheitModel->update($this->post()['organisationseinheit_id'], $this->post());
+				$result = $this->BetriebsmittelpersonModel->update($this->post()['betriebsmittelperson_id'], $this->post());
 			}
 			else
 			{
-				$result = $this->OrganisationseinheitModel->insert($this->post());
+				$result = $this->BetriebsmittelpersonModel->insert($this->post());
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
@@ -71,7 +71,7 @@ class Organisationseinheit extends APIv1_Controller
 		}
 	}
 	
-	private function _validate($organisationseinheit = NULL)
+	private function _validate($betriebsmittelperson = NULL)
 	{
 		return true;
 	}
