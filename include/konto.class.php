@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Klasse Konto
@@ -485,13 +486,13 @@ class konto extends basis_db
 	 */
 	public function checkStudienbeitrag($uid, $stsem)
 	{
-		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum FROM public.tbl_konto, public.tbl_benutzer, public.tbl_student
+		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum FROM public.tbl_konto, public.tbl_benutzer, public.tbl_prestudent
 					WHERE
 						tbl_konto.studiensemester_kurzbz = ".$this->db_add_param($stsem)."
 						AND tbl_benutzer.uid = ".$this->db_add_param($uid)."
-						AND tbl_benutzer.uid = tbl_student.student_uid
+						AND tbl_benutzer.uid = tbl_prestudent.uid
 						AND tbl_benutzer.person_id = tbl_konto.person_id
-						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
+						AND tbl_konto.studiengang_kz=tbl_prestudent.studiengang_kz
 						AND tbl_konto.buchungstyp_kurzbz = 'Studiengebuehr' ORDER BY buchungsnr";
 
 		if($this->db_query($subqry))
@@ -580,12 +581,12 @@ class konto extends basis_db
 	 */
 	public function getLastStudienbeitrag($uid)
 	{
-		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum, tbl_konto.buchungsnr_verweis, tbl_konto.studiensemester_kurzbz FROM public.tbl_konto, public.tbl_benutzer, public.tbl_student
+		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum, tbl_konto.buchungsnr_verweis, tbl_konto.studiensemester_kurzbz FROM public.tbl_konto, public.tbl_benutzer, public.tbl_prestudent
 					WHERE
 						tbl_benutzer.uid = ".$this->db_add_param($uid)."
-						AND tbl_benutzer.uid = tbl_student.student_uid
+						AND tbl_benutzer.uid = tbl_prestudent.uid
 						AND tbl_benutzer.person_id = tbl_konto.person_id
-						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
+						AND tbl_konto.studiengang_kz=tbl_prestudent.studiengang_kz
 						AND tbl_konto.buchungstyp_kurzbz = 'Studiengebuehr' ORDER BY buchungsnr DESC";
 
 		if($result = $this->db_query($subqry))
@@ -639,11 +640,11 @@ class konto extends basis_db
 					FROM
 						public.tbl_konto
 						JOIN public.tbl_benutzer USING(person_id)
-						JOIN public.tbl_student ON(uid=student_uid)
+						JOIN public.tbl_prestudent ON(tbl_prestudent.uid=tbl_benutzer.uid)
 						JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
 					WHERE
 						tbl_benutzer.uid = ".$this->db_add_param($uid)."
-						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
+						AND tbl_konto.studiengang_kz=tbl_prestudent.studiengang_kz
 						AND tbl_konto.buchungstyp_kurzbz in(".$this->db_implode4SQL($buchungstyp_kurzbz_array).")";
 		if(!is_null($studiensemester_kurzbz))
 			$subqry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);

@@ -274,7 +274,7 @@ class zeugnisnote extends basis_db
 						)
 				)
 				LEFT JOIN lehre.tbl_note USING(note)
-				LEFT JOIN public.tbl_student ON( public.tbl_student.student_uid=vw_student_lehrveranstaltung.uid)
+				LEFT JOIN public.tbl_prestudent ON( public.tbl_prestudent.uid=vw_student_lehrveranstaltung.uid)
 				WHERE true $where
 			UNION
 				SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,prestudent_id, lehre.tbl_zeugnisnote.prestudent_id AS uid,studiensemester_kurzbz, note, punkte,
@@ -286,7 +286,7 @@ class zeugnisnote extends basis_db
 					lehre.tbl_zeugnisnote
 					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
 					JOIN lehre.tbl_note USING(note)
-					LEFT JOIN public.tbl_student ON( public.tbl_student.student_uid=lehre.tbl_zeugnisnote.prestudent_id )
+					LEFT JOIN public.tbl_prestudent ON( public.tbl_prestudent.prestudent_id=lehre.tbl_zeugnisnote.prestudent_id )
 				WHERE true $where2
 				ORDER BY sort";
 		if($this->db_query($qry))

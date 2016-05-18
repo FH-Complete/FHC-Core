@@ -46,22 +46,21 @@ if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='prestudent')
 	if (is_null($search) ||$search=='')
 		exit();	
 	$qry = "SELECT 
-				nachname, vorname, prestudent_id, student_uid, 
+				nachname, vorname, prestudent_id, uid,
 				UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg, 
 				get_rolle_prestudent(prestudent_id, null) as status
 			FROM 
 				public.tbl_person 
 				JOIN public.tbl_prestudent USING(person_id)
 				JOIN public.tbl_studiengang USING(studiengang_kz)
-				LEFT JOIN public.tbl_student USING (prestudent_id)
 			WHERE
 				lower(nachname) like '%".$db->db_escape(mb_strtolower($search))."%' OR
 				lower(vorname) like '%".$db->db_escape(mb_strtolower($search))."%' OR
 				lower(nachname || ' ' || vorname) like '%".$db->db_escape(mb_strtolower($search))."%' OR
 				lower(vorname || ' ' || nachname) like '%".$db->db_escape(mb_strtolower($search))."%' OR
 				prestudent_id::text like '%".$db->db_escape(mb_strtolower($search))."%' OR
-				student_uid::text like '%".$db->db_escape(mb_strtolower($search))."%'
-				ORDER BY nachname,vorname,stg 
+				uid::text like '%".$db->db_escape(mb_strtolower($search))."%'
+				ORDER BY nachname,vorname,stg
 				LIMIT 10
 			";
 	if($result = $db->db_query($qry))
@@ -74,7 +73,7 @@ if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='prestudent')
 			$item['stg']=html_entity_decode($row->stg);
 			$item['status']=html_entity_decode($row->status);
 			$item['prestudent_id']=html_entity_decode($row->prestudent_id);
-			$item['student_uid']=html_entity_decode($row->student_uid);
+			$item['student_uid']=html_entity_decode($row->uid);
 			$result_obj[]=$item;
 		}
 		echo json_encode($result_obj);

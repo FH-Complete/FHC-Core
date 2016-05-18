@@ -272,14 +272,13 @@ if(count($prestudent->result)>0)
 			</thead><tbody>';
 	foreach ($prestudent->result as $row)
 	{
-		$uid='';
-		$gruppe='';
+		$pst = new prestudent();
+		$pst->getLastStatus($prestudent->prestudent_id);
+		$studiensemester = new studiensemester();
+		$studiensemester_kurzbz = $studiensemester->getaktorNext();
+		$pst->load_studentlehrverband($studiensemester_kurzbz);
 
-		$pst = new prestudent($row->prestudent_id);
-
-		$uid = $pst->uid;
-		if($vrb = $pst->getStudentLehrverband())
-			$gruppe = $vrb->semester.$vrb->verband.$vrb->gruppe;
+		$pst->getLastStatus($row->prestudent_id);
 
 		echo '<tr>';
 		echo "<td>$row->prestudent_id</td>";
@@ -287,12 +286,9 @@ if(count($prestudent->result)>0)
 		echo "<td>".($row->reihungstestangetreten?'Ja':'Nein')."</td>";
 
 
+		echo "<td>$pst->uid</td>";
 
-		echo "<td>$uid</td>";
-		echo "<td>$gruppe</td>";
-		$prestudent1 = new prestudent();
-		$prestudent1->getLastStatus($row->prestudent_id);
-		echo "<td>$prestudent1->status_kurzbz ".($prestudent1->ausbildungssemester!=''?"($prestudent1->ausbildungssemester. Semester)":'')."</td>";
+		echo "<td>$pst->status_kurzbz ".($pst->ausbildungssemester!=''?"($pst->ausbildungssemester. Semester)":'')."</td>";
 		echo '</tr>';
 	}
 	echo '</tbody></table>';

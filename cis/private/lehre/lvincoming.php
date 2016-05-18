@@ -15,9 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ * Authors: Christian Paminger 	<christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl 		<rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik 	<moik@technikum-wien.at>.
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/studiensemester.class.php');
@@ -71,7 +72,7 @@ $stg->getAll();
 					count(*)
 				FROM 
 					campus.vw_student_lehrveranstaltung 
-					JOIN public.tbl_student ON(uid=student_uid) 
+					JOIN public.tbl_prestudent USING(prestudent_id)
 					JOIN public.tbl_prestudentstatus USING(prestudent_id)
 				WHERE
 					lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND

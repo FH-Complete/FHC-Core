@@ -139,24 +139,23 @@ $tabelle = '<table>
 	</tr>';
 $anzahl_gemeldet=0;
 //Hauptselect
-$qry="SELECT DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
-	FROM public.tbl_student
-	JOIN public.tbl_benutzer ON(student_uid=uid)
-	JOIN public.tbl_person USING (person_id)
-	JOIN public.tbl_prestudent USING (prestudent_id)
+$qry="SELECT DISTINCT ON(uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
+	FROM public.tbl_prestudent
+	JOIN public.tbl_benutzer USING (uid)
+	JOIN public.tbl_person ON (tbl_person.person_id = tbl_prestudent.person_id)
 	JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
 	WHERE bismelden IS TRUE
-	AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
+	AND tbl_prestudent.studiengang_kz=".$db->db_add_param($stg_kz)."
 	AND (((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem).") AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
 		AND (status_kurzbz='Student' OR status_kurzbz='Outgoing'
 		OR status_kurzbz='Praktikant' OR status_kurzbz='Diplomand' OR status_kurzbz='Absolvent'
 		OR status_kurzbz='Abbrecher' OR status_kurzbz='Unterbrecher'))
 		OR ((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($psem).") AND (status_kurzbz='Absolvent'
 		OR status_kurzbz='Abbrecher') AND tbl_prestudentstatus.datum>".$db->db_add_param($bisprevious).")
-		OR (status_kurzbz='Incoming' AND tbl_student.prestudent_id IN (SELECT prestudent_id FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
+		OR (status_kurzbz='Incoming' AND tbl_prestudent.prestudent_id IN (SELECT prestudent_id FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
 			OR (tbl_bisio.von<".$db->db_add_param($bisdatum)." AND (tbl_bisio.bis>=".$db->db_add_param($bisdatum)."  OR tbl_bisio.bis IS NULL))
 	)))
-	ORDER BY student_uid, nachname, vorname
+	ORDER BY uid, nachname, vorname
 	";
 
 if($result = $db->db_query($qry))
@@ -437,7 +436,7 @@ if($result = $db->db_query($qry))
 		if($error_log!='' OR $error_log1!='')
 		{
 			//Ausgabe der fehlenden Daten
-			$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->status_kurzbz): </u>\n";
+			$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->uid."', '".$row->nachname."', '".$row->vorname."' ($row->status_kurzbz): </u>\n";
 			if($error_log!='')
 			{
 				$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fehler: ".$error_log."\n";
@@ -455,12 +454,12 @@ if($result = $db->db_query($qry))
 		else
 		{
 			$anzahl_gemeldet++;
-			$tabelle.='<tr><td>'.$row->student_uid.'</td><td>'.$row->nachname.'</td><td>'.$row->vorname.'</td><td>'.$row->matrikelnr.'</td></tr>';
+			$tabelle.='<tr><td>'.$row->uid.'</td><td>'.$row->nachname.'</td><td>'.$row->vorname.'</td><td>'.$row->perskz.'</td></tr>';
 
 			//Erstellung der XML-Datei
 				$datei.="
 			<StudentIn>
-            	  <PersKz>".trim($row->matrikelnr)."</PersKz>
+            	  <PersKz>".trim($row->perskz)."</PersKz>
             	  <GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
             	  <Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
 				if(($row->svnr!='')&&($row->ersatzkennzeichen!=''))

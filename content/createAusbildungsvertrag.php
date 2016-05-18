@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /* Erstellt einen Lehrauftrag im PDF Format
  *
@@ -64,7 +65,7 @@ else
 			else 
 				$uids = $_GET['uid'];
 
-			$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($uids[1]);
+			$qry = "SELECT uid, studiengang_kz FROM public.tbl_prestudent WHERE uid=".$db->db_add_param($uids[1]);
 			if($result_std = $db->db_query($qry))
 				if($db->db_num_rows($result_std)==1)
 				{

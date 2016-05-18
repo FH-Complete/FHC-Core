@@ -88,7 +88,7 @@ if(isset($_GET['prestudent_id']))
 			$idstring.=',';
 		$idstring.="'$id'";	
 	}
-	$qry = "SELECT distinct on(person_id) foto, vorname, nachname, person_id, prestudent_id, tbl_prestudent.studiengang_kz, semester, verband, gruppe FROM public.tbl_person JOIN public.tbl_prestudent USING(person_id) LEFT JOIN public.tbl_student USING(prestudent_id) WHERE prestudent_id in($idstring)";
+	$qry = "SELECT distinct on(person_id) foto, vorname, nachname, person_id, prestudent_id, tbl_prestudent.studiengang_kz, semester, verband, gruppe FROM public.tbl_person JOIN public.tbl_prestudent USING(person_id) WHERE prestudent_id in($idstring)";
 }
 else
 {
@@ -96,7 +96,8 @@ else
 			distinct on(person_id) foto, vorname, nachname, person_id, tbl_studentlehrverband.studiengang_kz, tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe
 		FROM 
 			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
-			JOIN public.tbl_person USING(person_id) JOIN public.tbl_student ON(uid=student_uid)
+			JOIN public.tbl_person USING(person_id)
+			JOIN public.tbl_prestudent ON(tbl_prestudent.uid=tbl_benutzer.uid)
 			LEFT JOIN public.tbl_studentlehrverband USING(prestudent_id)
 		WHERE 
 			lehrveranstaltung_id='".addslashes($lvid)."' AND 

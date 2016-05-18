@@ -58,16 +58,16 @@ if(isset($_REQUEST['xmlformat']) && $_REQUEST['xmlformat']=="xml")
 		echo "<sammelzeugnis>"; 
 	
 		
-		$qry = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.projektarbeit_note_anzeige, 
+		$qry = "SELECT tbl_prestudent.perskz, tbl_prestudent.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.projektarbeit_note_anzeige,
 						tbl_studiengang.bezeichnung, tbl_studiengang.english, tbl_studentlehrverband.semester, 
 						tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, 
 						tbl_person.titelpost, tbl_person.anrede, tbl_studiensemester.bezeichnung as sembezeichnung, 
-						tbl_studiensemester.studiensemester_kurzbz as stsem, tbl_student.prestudent_id 
-					FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester 
-					WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz 
-					AND tbl_student.student_uid = tbl_benutzer.uid AND tbl_benutzer.person_id = tbl_person.person_id 
-					AND tbl_student.student_uid = ".$db->db_add_param($uid)."
-					AND tbl_studentlehrverband.prestudent_id=tbl_student.prestudent_id
+						tbl_studiensemester.studiensemester_kurzbz as stsem, tbl_prestudent.prestudent_id
+					FROM tbl_person, tbl_prestudent, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester
+					WHERE tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz
+					AND tbl_prestudent.uid = tbl_benutzer.uid AND tbl_benutzer.person_id = tbl_person.person_id
+					AND tbl_prestudent.uid = ".$db->db_add_param($uid)."
+					AND tbl_studentlehrverband.prestudent_id=tbl_prestudent.prestudent_id
 					AND tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz 
 					order by semester;"; 
 	
@@ -91,7 +91,7 @@ if(isset($_REQUEST['xmlformat']) && $_REQUEST['xmlformat']=="xml")
 				echo ' <nachname>'.$row_person->nachname.'</nachname>';
 				echo ' <name>'.trim($row_person->titelpre.' '.trim($row_person->vorname.' '.$row_person->vornamen).' '.mb_strtoupper($row_person->nachname).($row_person->titelpost!=''?', '.$row_person->titelpost:'')).'</name>';
 				echo ' <gebdatum>'.$gebdatum.'</gebdatum>';
-				echo ' <matrikelnr>'.$row_person->matrikelnr.'</matrikelnr>';
+				echo ' <matrikelnr>'.$row_person->perskz.'</matrikelnr>';
 				echo ' <studiengang>'.$row_person->bezeichnung.'</studiengang>';
 				echo ' <studiengang_englisch>'.$row_person->english.'</studiengang_englisch>';
 				echo " <studiengang_kz>".sprintf('%04s', $row_person->studiengang_kz)."</studiengang_kz>";

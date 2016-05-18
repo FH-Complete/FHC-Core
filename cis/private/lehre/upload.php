@@ -16,15 +16,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >,
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at > and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 	require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/basis_db.class.php');			
-    require_once('../../../include/functions.inc.php');
-    require_once('../../../include/benutzerberechtigung.class.php');
-    require_once ('../../../include/phrasen.class.php');
+	require_once('../../../include/basis_db.class.php');
+	require_once('../../../include/functions.inc.php');
+	require_once('../../../include/benutzerberechtigung.class.php');
+	require_once ('../../../include/phrasen.class.php');
 
 
     $sprache = getSprache(); 
@@ -97,7 +98,7 @@
 	}
 	else
 	{
-		$sql_query = "SELECT student_uid FROM public.tbl_student WHERE student_uid=".$db->db_add_param($user);
+		$sql_query = "SELECT uid FROM public.tbl_prestudent WHERE uid=".$db->db_add_param($user);
 		if($result_student = $db->db_query($sql_query))
 		{
 			$num_rows_student = $db->db_num_rows($result_student);
@@ -539,8 +540,7 @@
 				}
 				else
 				{
-					//$sql_query = "SELECT DISTINCT ON(bz2, lehrevz) tbl_student.studiengang_kz AS id, kurzbzlang, lehrevz AS kuerzel, (tbl_lehrfach.bezeichnung || '; XX') AS bezeichnung, SUBSTRING(tbl_lehrfach.bezeichnung || '; XX', 1, CHAR_LENGTH(tbl_lehrfach.bezeichnung || '; XX') - 4) AS bz2 FROM tbl_lehrfach, public.tbl_studiengang, public.tbl_student WHERE tbl_student.studiengang_kz='$course_id' AND tbl_student.semester='$term_id' AND lehrevz='$short' AND tbl_student.uid='$user' AND tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz LIMIT 1";
-					$sql_query = "SELECT DISTINCT tbl_lehrveranstaltung.bezeichnung, lehreverzeichnis, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_student, lehre.tbl_lehrveranstaltung, public.tbl_studiengang WHERE lehreverzeichnis=".$db->db_add_param($short)." AND tbl_student.studiengang_kz=".$db->db_add_param($course_id)." AND tbl_student.semester=".$db->db_add_param($term_id)." AND  tbl_student.student_uid=".$db->db_add_param($user)." AND tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz AND tbl_lehrveranstaltung.studiengang_kz=tbl_student.studiengang_kz AND tbl_lehrveranstaltung.semester=tbl_student.semester AND tbl_lehrveranstaltung.lehre=true LIMIT 1";
+					$sql_query = "SELECT DISTINCT tbl_lehrveranstaltung.bezeichnung, lehreverzeichnis, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_prestudent, lehre.tbl_lehrveranstaltung, public.tbl_studiengang WHERE lehreverzeichnis=".$db->db_add_param($short)." AND tbl_prestudent.studiengang_kz=".$db->db_add_param($course_id)." AND tbl_student.semester=".$db->db_add_param($term_id)." AND  tbl_prestudent.uid=".$db->db_add_param($user)." AND tbl_studiengang.studiengang_kz=tbl_prestudent.studiengang_kz AND tbl_lehrveranstaltung.studiengang_kz=tbl_prestudent.studiengang_kz AND tbl_lehrveranstaltung.semester=tbl_student.semester AND tbl_lehrveranstaltung.lehre=true LIMIT 1";
 
 					if(!$result_path_elements = $db->db_query($sql_query))
 						die('<p align="center"><strong>'.$p->t('upload/benutzerKonnteNichtZugeordnetWerden',array($user)).'</strong>!</p>');

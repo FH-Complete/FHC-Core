@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >,
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >,
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >,
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at > and
+ *          Andreas Moik 	< moik@technikum-wien.at >.
  */ 
 /*
  * Fuehrt eine Kollisionspruefung im Stundenplan auf Studentenebene durch
@@ -126,22 +127,22 @@ if($dontloadcontent)
 
 if($stg_kz=='')
 {
-	$qry = "SELECT datum, stunde, student_uid, count(student_uid) AS anzahl
+	$qry = "SELECT datum, stunde, uid, count(uid) AS anzahl
 			FROM lehre.vw_".$db_stpl_table."_student_unr
 			WHERE datum>=".$db->db_add_param($beginn)." AND datum<=".$db->db_add_param($ende)."
-			GROUP BY datum, stunde, student_uid
-			HAVING count(student_uid)>1
-			ORDER BY datum, stunde, student_uid LIMIT 30; 
+			GROUP BY datum, stunde, uid
+			HAVING count(uid)>1
+			ORDER BY datum, stunde, uid LIMIT 30;
 		   ";
 }
 else 
 {
-	$qry = "SELECT datum, stunde, student_uid, count(student_uid) AS anzahl
-			FROM lehre.vw_".$db_stpl_table."_student_unr JOIN public.tbl_student USING(student_uid)
+	$qry = "SELECT datum, stunde, uid, count(uid) AS anzahl
+			FROM lehre.vw_".$db_stpl_table."_student_unr JOIN public.tbl_prestudent USING(uid)
 			WHERE datum>=".$db->db_add_param($beginn)." AND datum<=".$db->db_add_param($ende)." AND studiengang_kz=".$db->db_add_param($stg_kz)."
-			GROUP BY datum, stunde, student_uid
-			HAVING count(student_uid)>1
-			ORDER BY datum, stunde, student_uid LIMIT 30; 
+			GROUP BY datum, stunde, uid
+			HAVING count(uid)>1
+			ORDER BY datum, stunde, uid LIMIT 30;
 		   ";
 }
 //echo $qry;
@@ -165,10 +166,10 @@ if($result = $db->db_query($qry))
 		echo "<tr>";
 		echo "<td class='table-sortable:default' align='center'>$row->datum</td>";
 		echo "<td class='table-sortable:default' align='center'>$row->stunde</td>";
-		echo "<td class='table-sortable:default' align='center'>$row->student_uid</td>";
+		echo "<td class='table-sortable:default' align='center'>$row->uid</td>";
 		echo "<td class='table-sortable:default' align='center'>$row->anzahl</td>";
 		echo "<td class='table-sortable:default' align='center'><a href='stpl_benutzer_kollision_details.php?datum=$row->datum&stunde=$row->stunde' target='kollision_detail'>Stundenplan</a></td>";
-		echo "<td class='table-sortable:default' align='center'><a href='stpl_benutzer_kollision_details.php?datum=$row->datum&stunde=$row->stunde&uid=$row->student_uid' target='kollision_detail'>UNR</a></td>";
+		echo "<td class='table-sortable:default' align='center'><a href='stpl_benutzer_kollision_details.php?datum=$row->datum&stunde=$row->stunde&uid=$row->uid' target='kollision_detail'>UNR</a></td>";
 		echo "</tr>";
 	}
 }

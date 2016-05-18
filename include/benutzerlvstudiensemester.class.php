@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
@@ -69,7 +70,7 @@ class benutzerlvstudiensemester extends basis_db
 		$qry = "SELECT tbl_benutzerlvstudiensemester.uid, vw_benutzer.nachname, vw_benutzer.vorname, COALESCE (public.get_rolle_prestudent(prestudent_id,NULL),'-') AS status 
 				FROM campus.tbl_benutzerlvstudiensemester 
 				LEFT JOIN campus.vw_benutzer USING(uid)
-				LEFT JOIN public.tbl_student ON (uid=student_uid) 
+				LEFT JOIN public.tbl_prestudent ON (tbl_prestudent.uid=campus.vw_benutzer.uid)
 				WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)." 
 					AND lehrveranstaltung_id = ".$this->db_add_param($lehrveranstaltung_id)." 
 					ORDER BY nachname";

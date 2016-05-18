@@ -81,7 +81,7 @@ if ($num_rows==1)
 	$email_alias=$db->db_result($erg,0,"alias");
 	$hp=$db->db_result($erg,0,"homepage");
 }
-if(!($erg_stud=$db->db_query("SELECT studiengang_kz, semester, verband, gruppe, matrikelnr, typ::varchar(1) || kurzbz AS stgkz, tbl_studiengang.bezeichnung AS stgbz FROM public.tbl_student JOIN public.tbl_studiengang USING(studiengang_kz) WHERE student_uid='".addslashes($uid)."'")))
+if(!($erg_stud=$db->db_query("SELECT studiengang_kz, semester, verband, gruppe, perskz, typ::varchar(1) || kurzbz AS stgkz, tbl_studiengang.bezeichnung AS stgbz FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE student_uid='".addslashes($uid)."'")))
 	die($db->db_last_error());
 $stud_num_rows=$db->db_num_rows($erg_stud);
 
@@ -93,7 +93,7 @@ if ($stud_num_rows==1)
 	$semester=$db->db_result($erg_stud,0,"semester");
 	$verband=$db->db_result($erg_stud,0,"verband");
 	$gruppe=$db->db_result($erg_stud,0,"gruppe");
-	$matrikelnr=$db->db_result($erg_stud,0,"matrikelnr");
+	$matrikelnr=$db->db_result($erg_stud,0,"perskz");
 }
 if(!($erg_lekt=$db->db_query("SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($uid)."'")))
 	die($db->db_last_error());

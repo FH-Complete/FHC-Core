@@ -231,7 +231,7 @@ if($xsl=='AccountInfo')
 			}
 		}
 
-		$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE student_uid='".addslashes($uid)."'";
+		$qry = "SELECT uid, studiengang_kz FROM public.tbl_prestudent WHERE uid='".addslashes($uid)."'";
 		if($result_std = $db->db_query($qry))
 		{
 			if($db->db_num_rows($result_std)==1)

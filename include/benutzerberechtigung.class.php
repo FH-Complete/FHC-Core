@@ -17,8 +17,9 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *          Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/organisationseinheit.class.php');
@@ -424,7 +425,7 @@ class benutzerberechtigung extends basis_db
 					system.tbl_benutzerrolle
 				WHERE 
 					tbl_benutzerrolle.funktion_kurzbz='Student' AND 
-					EXISTS (SELECT student_uid FROM public.tbl_student WHERE student_uid=".$this->db_add_param($uid).")
+					EXISTS (SELECT uid FROM public.tbl_prestudent WHERE uid=".$this->db_add_param($uid).")
 								
 				ORDER BY negativ DESC";
 		

@@ -135,13 +135,13 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 		$jahr = $jahr-1;
 	$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
 
-	$qry = "SELECT matrikelnr FROM public.tbl_student WHERE matrikelnr LIKE '$matrikelnummer%' ORDER BY matrikelnr DESC LIMIT 1";
+	$qry = "SELECT perskz FROM public.tbl_prestudent WHERE perskz LIKE '$matrikelnummer%' ORDER BY perskz DESC LIMIT 1";
 
 	if($result = $db->db_query($qry))
 	{
 		if($row = $db->db_fetch_object($result))
 		{
-			$max = substr($row->matrikelnr, (strlen(trim($row->matrikelnr))-3));
+			$max = substr($row->perskz, (strlen(trim($row->perskz))-3));
 		}
 		else
 			$max = 0;
@@ -1112,7 +1112,7 @@ if(!$error)
 						if($_POST['status_kurzbz']=='Student')
 						{
 							//Die Rolle Student darf nur eingefuegt werden, wenn schon eine Studentenrolle vorhanden ist
-							$qry = "SELECT count(*) as anzahl FROM public.tbl_student WHERE prestudent_id=".$db->db_add_param($_POST['prestudent_id'], FHC_INTEGER);
+							$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($_POST['prestudent_id'], FHC_INTEGER);
 							if($result = $db->db_query($qry))
 							{
 								if($row = $db->db_fetch_object($result))
@@ -1248,7 +1248,7 @@ if(!$error)
 						if($_POST['status_kurzbz']=='Student')
 						{
 							//Die Rolle Student darf nur eingefuegt werden, wenn schon eine Studentenrolle vorhanden ist
-							$qry = "SELECT count(*) as anzahl FROM public.tbl_student WHERE prestudent_id=".$db->db_add_param($_POST['prestudent_id'], FHC_INTEGER);
+							$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($_POST['prestudent_id'], FHC_INTEGER);
 							if($result = $db->db_query($qry))
 							{
 								if($row = $db->db_fetch_object($result))
@@ -3871,8 +3871,12 @@ if(!$error)
 	else
 	{
 		$return = false;
-		$errormsg = 'Unkown type: "'.$db->convert_html_chars($_POST['type']).'"';
 		$data = '';
+
+		if(isset($_POST['type']))
+			$errormsg = 'Unkown type: "'.$db->convert_html_chars($_POST['type']).'"';
+		else
+			$errormsg = 'no type provided';
 	}
 }
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

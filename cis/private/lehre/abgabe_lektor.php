@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ * Authors: Christian Paminger       < christian.paminger@technikum-wien.at >,
+ *          Andreas Oesterreicher    < andreas.oesterreicher@technikum-wien.at >,
+ *          Rudolf Hangl             < rudolf.hangl@technikum-wien.at >,
+ *          Gerald Simane-Sequens    < gerald.simane-sequens@technikum-wien.at > and
+ *          Andreas Moik             <moik@technikum-wien.at>.
  */
 /*******************************************************************************************************
  *				abgabe_lektor
@@ -50,17 +51,18 @@ $showall=isset($_GET['showall']);
 $sql_query = "SELECT 
 				*
 			FROM 
-			(SELECT tbl_person.vorname, tbl_person.nachname, tbl_studiengang.typ, tbl_studiengang.kurzbz,
-			tbl_projektarbeit.projekttyp_kurzbz, tbl_projekttyp.bezeichnung, tbl_projektarbeit.titel, tbl_projektarbeit.projektarbeit_id,
-			tbl_projektbetreuer.betreuerart_kurzbz, tbl_benutzer.uid, tbl_student.matrikelnr, tbl_lehreinheit.studiensemester_kurzbz
-			 FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
-			LEFT JOIN public.tbl_benutzer on(uid=student_uid)
-			LEFT JOIN public.tbl_student on(public.tbl_benutzer.uid=public.tbl_student.student_uid)
-			LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
-			LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id) 
-			LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id) 
-			LEFT JOIN public.tbl_studiengang on(lehre.tbl_lehrveranstaltung.studiengang_kz=public.tbl_studiengang.studiengang_kz)
-			LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
+				(SELECT tbl_person.vorname, tbl_person.nachname, tbl_studiengang.typ, tbl_studiengang.kurzbz,
+				tbl_projektarbeit.projekttyp_kurzbz, tbl_projekttyp.bezeichnung, tbl_projektarbeit.titel, tbl_projektarbeit.projektarbeit_id,
+				tbl_projektbetreuer.betreuerart_kurzbz, tbl_benutzer.uid, tbl_prestudent.perskz, tbl_lehreinheit.studiensemester_kurzbz
+				FROM lehre.tbl_projektarbeit
+					LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id)
+					LEFT JOIN public.tbl_prestudent on(tbl_projektarbeit.prestudent_id=tbl_prestudent.prestudent_id)
+					LEFT JOIN public.tbl_benutzer on(tbl_prestudent.uid=tbl_benutzer.uid)
+					LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
+					LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id)
+					LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
+					LEFT JOIN public.tbl_studiengang on(lehre.tbl_lehrveranstaltung.studiengang_kz=public.tbl_studiengang.studiengang_kz)
+					LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 			WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
 			AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_benutzer 
 				WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id 
@@ -95,7 +97,7 @@ else
 	{
 		$htmlstr .= "   <tr>\n"; //class='liste".($i%2)."'
 		$htmlstr .= "		<td><input type='checkbox' name='mc_".$row->projektarbeit_id."' ></td>";
-		$htmlstr .= "       <td><a href='abgabe_lektor_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&betreuerart=".$row->betreuerart_kurzbz."' target='al_detail' title='Details anzeigen'>".$row->uid."</a> / ".$row->matrikelnr."</td>\n";
+		$htmlstr .= "       <td><a href='abgabe_lektor_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&betreuerart=".$row->betreuerart_kurzbz."' target='al_detail' title='Details anzeigen'>".$row->uid."</a> / ".$row->perskz."</td>\n";
 		$htmlstr .= "	    <td align= center><a href='mailto:$row->uid@".DOMAIN."?subject=Betreuung%20".$row->bezeichnung."'><img src='../../../skin/images/email.png' alt='email' title='Email an Studenten'></a></td>";
 		$htmlstr .= "       <td>".$db->convert_html_chars($row->vorname)."</td>\n";
 		$htmlstr .= "       <td>".$db->convert_html_chars($row->nachname)."</td>\n";

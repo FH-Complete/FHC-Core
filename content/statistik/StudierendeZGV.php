@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
+ * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/studiengang.class.php');
@@ -140,8 +141,7 @@ if($result_zgv = $db->db_query($qry))
 		FROM 
 			public.tbl_prestudent a
 			JOIN public.tbl_person USING(person_id)
-			JOIN public.tbl_student USING(prestudent_id)
-		WHERE 
+		WHERE
 			bismelden=true
 			AND EXISTS (
 				SELECT 
@@ -150,7 +150,6 @@ if($result_zgv = $db->db_query($qry))
 					public.tbl_prestudentstatus 
 				WHERE 
 					status_kurzbz='Student' 
-					AND prestudent_id=a.prestudent_id 
 					AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
 				) 
 			AND a.studiengang_kz=".$db->db_add_param($studiengang_kz,FHC_INTEGER)."

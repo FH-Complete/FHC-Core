@@ -204,7 +204,7 @@ elseif ($xmlformat=='xml')
 	{
 		global $datum, $btyp;
 		$rueckerstattung=false;
-		
+
 		echo "
   		<buchung>
 			<buchungsnr><![CDATA[".$row->buchungsnr."]]></buchungsnr>
@@ -226,7 +226,7 @@ elseif ($xmlformat=='xml')
 				$rueckerstattung=true;
 		}
 		
-		if($rueckerstattung)			
+		if($rueckerstattung)
 				echo "<rueckerstattung><![CDATA[true]]></rueckerstattung>";
 		echo "
 			<buchungsdatum><![CDATA[".$datum->convertISODate($row->buchungsdatum)."]]></buchungsdatum>
@@ -293,11 +293,15 @@ elseif ($xmlformat=='xml')
 	$btyp = array();
 	
 	foreach ($buchungstyp->result as $row)
-		$btyp[$row->buchungstyp_kurzbz]=$row->beschreibung;	
+		$btyp[$row->buchungstyp_kurzbz]=$row->beschreibung;
 	
 	if($person_id!='')
 		foreach ($konto->result as $buchung)
+		{
+			if($xmlformat == "xml")
+				die("Die Kombination aus xml und person_id ist nicht zulässig!");
 			drawrow_xml($buchung);
+		}
 	elseif($buchungsnummern!='')
 	{
 		$buchungsnr = explode(';',$buchungsnummern);
@@ -311,7 +315,7 @@ elseif ($xmlformat=='xml')
 				{
 					drawperson_xml($konto);
 					$drawperson=false;
-				}				
+				}
 				drawrow_xml($konto);
 			}
 		}

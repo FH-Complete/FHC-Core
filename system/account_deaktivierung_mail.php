@@ -102,7 +102,7 @@ if($result = $db->db_query($qry))
 // Letzte Warnung vor Accountloeschung verschicken
 
 // Abbrecher
-$qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE
+$qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_prestudent USING(uid) WHERE
 		aktiv=false AND updateaktivam=CURRENT_DATE- interval '".DEL_ABBRECHER_WEEKS." week'
 		AND get_rolle_prestudent (prestudent_id, NULL)='Abbrecher'  ";
 if($result = $db->db_query($qry))
@@ -136,7 +136,7 @@ if($result = $db->db_query($qry))
 
 
 // Abbrecher an Bibliothek melden wenn diese inaktiv gesetzt wurden
-$qry = "SELECT uid, vorname, nachname, titelpre, titelpost FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) JOIN public.tbl_person USING(person_id) WHERE
+$qry = "SELECT uid, vorname, nachname, titelpre, titelpost FROM public.tbl_benutzer JOIN public.tbl_prestudent USING(uid) JOIN public.tbl_person ON(tbl_person.person_id = tbl_benutzer.person_id) WHERE
 		tbl_benutzer.aktiv=false AND tbl_benutzer.updateaktivam=(CURRENT_DATE - '1 day'::interval)::date
 		AND get_rolle_prestudent (prestudent_id, NULL)='Abbrecher'  ";
 if($result = $db->db_query($qry))
@@ -164,7 +164,7 @@ if($result = $db->db_query($qry))
 }
 
 // Studenten
-$qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE
+$qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_prestudent USING(uid) WHERE
 		aktiv=false AND updateaktivam=CURRENT_DATE- interval '".DEL_STUDENT_WEEKS." week'
 		AND get_rolle_prestudent (prestudent_id, NULL)<>'Abbrecher'";
 if($result = $db->db_query($qry))

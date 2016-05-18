@@ -28,7 +28,6 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
-require_once('../../include/student.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/authentication.class.php');
@@ -200,19 +199,11 @@ if($searchstr!='')
 
 							while($row_student = $db->db_fetch_object($result_student))
 							{
-								$stsem = new studiensemester();
-								$stsem_kurzbz = $stsem->getaktorNext();
-								$qry_sem = "SELECT gruppe, verband, semester from tbl_studentlehrverband WHERE studiensemester_kurzbz=".$db->db_add_param($stsem_kurzbz);
-								if(!$res_sem = $db->db_query($qry_sem))
-									die("Fehler beim holen des Lehrverbandes");
-
-
-								$gruppe='';
-								$student = new prestudent();var_dump($row_student->prestudent_id);
-								$student->getLastStatus($row_student->prestudent_id);
-
-								if($vrb = $student->getStudentLehrverband())
-									$gruppe = $vrb->semester.$vrb->verband.$vrb->gruppe;
+								$prestudent = new prestudent();
+								$prestudent->getLastStatus($row_student->prestudent_id);
+								$studiensemester = new studiensemester();
+								$studiensemester_kurzbz = $studiensemester->getaktorNext();
+								$prestudent->load_studentlehrverband($studiensemester_kurzbz);
 
 								$content.= '<tr>';
 								$content.= '<td></td>';
@@ -220,7 +211,7 @@ if($searchstr!='')
 								$content.= '<td></td>';
 								$content.= '<td></td>';
 								$content.= '<td></td>';
-								$content.= "<td>$student->status_kurzbz</td>";
+								$content.= "<td>$prestudent->status_kurzbz</td>";
 								$content.= "<td><a href='personen_details.php?uid=$row_student->uid'>$row_student->uid</a></td>";
 								$content.= "<td>".($row_student->aktiv=='t'?'Ja':'Nein')."</td>";
 
@@ -238,7 +229,7 @@ if($searchstr!='')
 								$content.= "<td></td>";
 								$content.= "<td></td>";
 								$content.= "<td>".$stg_arr[$row_student->studiengang_kz]."</td>";
-								$content.= "<td>$gruppe</td>";
+								$content.= "<td>$prestudent->semester$prestudent->verband$prestudent->gruppe</td>";
 								$content.= "<td>".($row_student->supdateamum!=''?date('d.m.Y H:i:s', $datum_obj->mktime_fromtimestamp($row_student->supdateamum)):'')."</td>";
 								$content.= "<td>$row_student->supdatevon</td>";
 								$content.= '</tr>';

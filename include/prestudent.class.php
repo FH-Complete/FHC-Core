@@ -22,7 +22,6 @@
  */
 require_once(dirname(__FILE__).'/person.class.php');
 require_once(dirname(__FILE__).'/log.class.php');
-require_once(dirname(__FILE__).'/studiensemester.class.php');
 
 class prestudent extends person
 {
@@ -77,6 +76,10 @@ class prestudent extends person
 	public $bestaetigtam;
 	public $bestaetigtvon;
 	public $bewerbung_abgeschicktamum;
+
+	public $semester;
+	public $verband;
+	public $gruppe;
 
 	public $studiensemester_old = '';
 	public $ausbildungssemester_old = '';
@@ -1803,25 +1806,52 @@ class prestudent extends person
 			return false;
 		}
 	}
-
 	/**
-	 * Liefert den studentlehrverband des Prestudenten im aktuellen oder nächsten Semester
-	 * @return Objekt mit gruppe, verband und semester
+	 * Laedt die StudentLehrverband Zuteilung
+	 * @param prestudent_id
+	 * @param studiensemester_kurzbz
+	 * @return true wenn vorhanden, false wenn nicht
 	 */
-	public function getStudentLehrverband()
+	public function load_studentlehrverband($studiensemester_kurzbz)
 	{
-		$studiensemester = new studiensemester();
-		$studiensemester_kurzbz = $studiensemester->getaktorNext();
-
-		$qry_sem = "SELECT gruppe, verband, semester from tbl_studentlehrverband WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)." AND prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER);
-		if(!$res_sem = $this->db_query($qry_sem))
-			$this->errormsg = 'Fehler beim Laden der Daten';
-
-		if($this->db_num_rows($res_sem) == 1)
+		if(!is_numeric($this->prestudent_id))
 		{
-			$row_sem = $this->db_fetch_object($res_sem);
-			return $row_sem;
+			$this->errormsg = 'PrestudentID ist ungueltig';
+			return false;
 		}
-		return false;
+		if($studiensemester_kurzbz == "")
+		{
+			$this->errormsg = 'studiensemester_kurzbz muss angegeben werden';
+			return false;
+		}
+
+
+		$qry = "SELECT * FROM public.tbl_studentlehrverband
+				WHERE prestudent_id=".$this->db_add_param($this->prestudent_id)."
+				AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->semester = $row->semester;
+				$this->verband = $row->verband;
+				$this->gruppe = $row->gruppe;
+
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Ermitteln des Lehrverbandes';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg ='Fehler beim Ermitteln des Lehrverbandes';
+			return false;
+		}
 	}
 }

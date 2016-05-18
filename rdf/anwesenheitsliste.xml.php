@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Nikolaus Krondraf <nikolaus.krondraf@technikum-wien.at>
+ * Authors: Nikolaus Krondraf <nikolaus.krondraf@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Erstellt das XML fuer die Anwesenheitsliste
@@ -54,7 +55,7 @@ $qry = "SELECT le.lehreinheit_id, le.lehrveranstaltung_id, lv.lvnr, lv.bezeichnu
 	. "JOIN lehre.tbl_stundenplan sp ON (sp.lehreinheit_id=le.lehreinheit_id) "
 	. "JOIN lehre.tbl_stunde stu ON stu.stunde = sp.stunde "
 	. "WHERE 1=1";
-//echo "<sql>".var_dump($qry)."</sql>";
+//echo "<sql>".$qry."</sql>";
 if($studiengang!='')
 	$qry.=" AND stg.studiengang_kz = " . $db->db_add_param($studiengang) . " ";
 
@@ -83,9 +84,9 @@ else
 }
 $qry .= " ORDER BY datum, beginn";
 
-if($db->db_query($qry))
+if($res = $db->db_query($qry))
 {
-	while($row = $db->db_fetch_object())
+	while($row = $db->db_fetch_object($res))
 	{
 		if(empty($row))
 			die("Lehreinheit $lehreinheit am $von nicht gefunden");
@@ -115,18 +116,18 @@ foreach($data as $key => $value)
 
 	// Daten der Studenten ermitteln
 	$qry = "SELECT pe.person_id, vorname, nachname, titelpre, titelpost, note, "
-		. "get_rolle_prestudent(tbl_student.prestudent_id, " . $db->db_add_param($studiensemester) . ") AS laststatus "
+		. "get_rolle_prestudent(tbl_prestudent.prestudent_id, " . $db->db_add_param($studiensemester) . ") AS laststatus "
 		. "FROM campus.vw_student_lehrveranstaltung stlv "
 		. "JOIN public.tbl_benutzer be ON be.uid = stlv.uid "
 		. "JOIN public.tbl_person pe ON pe.person_id = be.person_id "
-		. "JOIN public.tbl_student ON be.uid = tbl_student.student_uid "
-		. "LEFT JOIN lehre.tbl_zeugnisnote zn ON (zn.lehrveranstaltung_id = stlv.lehrveranstaltung_id AND zn.student_uid = stlv.uid AND zn.studiensemester_kurzbz = " . $db->db_add_param($studiensemester) . ") "
+		. "JOIN public.tbl_prestudent ON be.uid = tbl_prestudent.uid "
+		. "LEFT JOIN lehre.tbl_zeugnisnote zn ON (zn.lehrveranstaltung_id = stlv.lehrveranstaltung_id AND zn.prestudent_id = stlv.prestudent_id AND zn.studiensemester_kurzbz = " . $db->db_add_param($studiensemester) . ") "
 		. "WHERE stlv.lehreinheit_id = " . $db->db_add_param($key) . " "
-		. "AND get_rolle_prestudent(tbl_student.prestudent_id, " . $db->db_add_param($studiensemester) . ") NOT IN ('Abbrecher', 'Unterbrecher') "
-        . "AND tbl_student.student_uid NOT IN ("
-            . "SELECT stud.student_uid "
+		. "AND get_rolle_prestudent(tbl_prestudent.prestudent_id, " . $db->db_add_param($studiensemester) . ") NOT IN ('Abbrecher', 'Unterbrecher') "
+        . "AND tbl_prestudent.uid NOT IN ("
+            . "SELECT pre.uid "
             . "FROM bis.tbl_bisio bis "
-            . "JOIN public.tbl_student stud ON bis.prestudent_id = stud.prestudent_id "
+            . "JOIN public.tbl_prestudent pre ON bis.prestudent_id = pre.prestudent_id "
             . "WHERE bis.von <= " . $db->db_add_param($currentDay) . "::DATE AND bis.bis >= " . $db->db_add_param($currentDay) . "::DATE) "
 		. "ORDER BY nachname ASC";
 

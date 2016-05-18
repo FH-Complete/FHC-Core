@@ -206,7 +206,7 @@ if($method=="lehrveranstaltungen")
 						FROM 
 							campus.vw_student_lehrveranstaltung 
 						JOIN public.tbl_benutzer using(uid)
-						JOIN public.tbl_student ON(uid=student_uid) 
+						JOIN public.tbl_student ON(uid=student_uid)
 						JOIN public.tbl_prestudentstatus USING(prestudent_id)
 						WHERE
 							lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id 

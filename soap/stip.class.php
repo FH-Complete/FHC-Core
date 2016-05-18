@@ -120,12 +120,12 @@ class stip extends basis_db
 	function searchPersonKz($PersonKz)
 	{
 		$qry = "SELECT
-			 prestudent_id, vorname, nachname, svnr, matrikelnr
+			 prestudent_id, vorname, nachname, svnr, perskz
 			FROM
-				public.tbl_student student
-				JOIN public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
-				JOIN public.tbl_person person using(person_id)
-			WHERE student.matrikelnr = ".$this->db_add_param($PersonKz).";";
+				public.tbl_prestudent prestudent
+				JOIN public.tbl_benutzer benutzer on(benutzer.uid=prestudent.uid)
+				JOIN public.tbl_person person on(person.person_id = prestudent.person_id)
+			WHERE prestudent.perskz = ".$this->db_add_param($PersonKz).";";
 
 		if($this->db_query($qry))
 		{
@@ -134,7 +134,7 @@ class stip extends basis_db
 				$this->Vorname_Antwort = $row->vorname;
 				$this->Familienname_Antwort = $row->nachname;
 				$this->SVNR_Antwort = $row->svnr;
-				$this->PersKz_Antwort = trim($row->matrikelnr);
+				$this->PersKz_Antwort = trim($row->perskz);
 				$this->AntwortStatusCode = 1;
 				return $row->prestudent_id;
 			}
@@ -158,10 +158,10 @@ class stip extends basis_db
 	function searchSvnr($Svnr)
 	{
 		$qry = "SELECT
-					prestudent_id, vorname, nachname, svnr, matrikelnr
+					prestudent_id, vorname, nachname, svnr, perskz
 				FROM
-					public.tbl_student student
-					JOIN public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
+					public.tbl_prestudent prestudent
+					JOIN public.tbl_benutzer benutzer on(benutzer.uid=prestudent.uid)
 					JOIN public.tbl_person person using(person_id)
 				WHERE person.svnr = ".$this->db_add_param($Svnr).";";
 
@@ -175,7 +175,7 @@ class stip extends basis_db
 					$this->Vorname_Antwort = $row->vorname;
 					$this->Familienname_Antwort = $row->nachname;
 					$this->SVNR_Antwort = $row->svnr;
-					$this->PersKz_Antwort = trim($row->matrikelnr);
+					$this->PersKz_Antwort = trim($row->perskz);
 					$this->AntwortStatusCode = 1;
 					return $row->prestudent_id;
 				}
@@ -207,7 +207,7 @@ class stip extends basis_db
 	function searchVorNachname($Vorname, $Nachname)
 	{
 		$qry = "SELECT
-					prestudent_id, vorname, nachname, svnr, matrikelnr
+					prestudent_id, vorname, nachname, svnr, perskz
 				FROM
 					public.tbl_student student
 					JOIN public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
@@ -226,7 +226,7 @@ class stip extends basis_db
 					$this->Vorname_Antwort = $row->vorname;
 					$this->Familienname_Antwort = $row->nachname;
 					$this->SVNR_Antwort = $row->svnr;
-					$this->PersKz_Antwort = trim($row->matrikelnr);
+					$this->PersKz_Antwort = trim($row->perskz);
 					$this->AntwortStatusCode = 1;
 					return $row->prestudent_id;
 				}
@@ -253,24 +253,23 @@ class stip extends basis_db
 
 	/**
 	 *
-	 * Gibt den orgform_code zurück für übergebene StudentUID und Semester
+	 * Gibt den orgform_code zurück für übergebene prestudent_id und Semester
 	 * z.B. 1 für Vollzeit
 	 * z.B. 2 für Berufsbegleitend
-	 * @param $studentUID
+	 * @param $prestudent_id
 	 * @param $studSemester
 	 */
-	function getOrgFormTeilCode($studentUID, $studSemester, $prestudentID)
+	function getOrgFormTeilCode($prestudent_id, $studSemester)
 	{
-
 		// hole mischform von studenten
 		$qry_mischform = "
 			SELECT
 				studiengang.mischform
 			FROM
+
 				public.tbl_studiengang studiengang
-				JOIN public.tbl_student student using(studiengang_kz)
-				JOIN public.tbl_prestudent prestudent using(prestudent_id)
-			WHERE student_uid=".$this->db_add_param($studentUID);
+				JOIN public.tbl_prestudent prestudent using(studiengang_kz)
+			WHERE prestudent_id=".$this->db_add_param($prestudent_id);
 
 		if($this->db_query($qry_mischform))
 		{
@@ -287,15 +286,14 @@ class stip extends basis_db
 
 			$qry = "
 			SELECT
-				orgform.code, studiengang.orgform_kurzbz as studorgkz, student.student_uid, student.studiengang_kz studiengang
+				orgform.code, studiengang.orgform_kurzbz as studorgkz, prestudent.uid, student.studiengang_kz studiengang
 			FROM
 				public.tbl_studiengang studiengang
-				JOIN public.tbl_student student using(studiengang_kz)
-				JOIN public.tbl_prestudent prestudent using(prestudent_id)
+				JOIN public.tbl_prestudent prestudent using(studiengang_kz)
 				JOIN public.tbl_prestudentstatus status using(prestudent_id)
 				JOIN bis.tbl_orgform orgform on(orgform.orgform_kurzbz = studiengang.orgform_kurzbz)
 			WHERE
-				student_uid=".$this->db_add_param($studentUID)."
+				prestudent_id=".$this->db_add_param($prestudent_id)."
 				AND status.studiensemester_kurzbz =".$this->db_add_param($studSemester);
 
 			// Wenn kein Status gefunden wurde -> null
@@ -317,7 +315,7 @@ class stip extends basis_db
 
 			$prestudentStatus = new prestudent();
 			// wenn status vorhanden übernehme OrgForm
-			if($prestudentStatus->getLastStatus($prestudentID,$studSemester))
+			if($prestudentStatus->getLastStatus($prestudent_id,$studSemester))
 			{
 				$statusOrgForm = $prestudentStatus->orgform_kurzbz;
 				$this->OrgFormTeilCode = $this->getOrgFormCodeFromKurzbz($statusOrgForm);

@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and 
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Klasse Ampel
@@ -465,7 +466,7 @@ class ampel extends basis_db
 				// Alle Mitarbeiter/Studenten dazu holen
 				$qry = "SELECT 
 							distinct on (tbl_ampel_benutzer_bestaetigt.ampel_benutzer_bestaetigt_id, a.uid) *,
-							tbl_ampel_benutzer_bestaetigt.insertamum,tbl_ampel_benutzer_bestaetigt.insertvon							
+							tbl_ampel_benutzer_bestaetigt.insertamum,tbl_ampel_benutzer_bestaetigt.insertvon
 						FROM 
 							(".$row->benutzer_select.") a 
 							JOIN campus.vw_benutzer USING(uid)
@@ -479,8 +480,8 @@ class ampel extends basis_db
 								OR
 								(funktion_kurzbz is null 
 								 AND (SELECT oe_kurzbz FROM 
-								 	  public.tbl_studiengang JOIN public.tbl_student USING(studiengang_kz) 
-								 	  WHERE vw_benutzer.uid=tbl_student.student_uid)
+								 	  public.tbl_studiengang JOIN public.tbl_prestudent USING(studiengang_kz)
+								 	  WHERE vw_benutzer.uid=tbl_prestudent.uid)
 								 	 in(".$this->implode4SQL($oe_arr).")
 								)
 							)

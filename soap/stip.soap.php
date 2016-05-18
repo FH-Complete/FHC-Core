@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors:		Karl Burkhart <burkhart@technikum-wien.at>.
+ * Authors:		Karl Burkhart <burkhart@technikum-wien.at> and
+ *               Andreas Moik <moik@technikum-wien.at>.
  */
  
 require_once('../config/vilesci.config.inc.php');
@@ -45,13 +46,13 @@ $SOAPServer->handle();
  * @param $parameters -> XML SOAP File
  */
 function GetStipendienbezieherStip($parameters)
-{ 	
+{
 	$anfrageDaten = $parameters->anfrageDaten; 
 	$Stipendiumsbezieher = $anfrageDaten->Stipendiumsbezieher; 
-	
-	$ErhalterKz = $anfrageDaten->ErhKz; 
-	$AnfrageDatenID = $anfrageDaten->AnfragedatenID; 
-		
+
+	$ErhalterKz = $anfrageDaten->ErhKz;
+	$AnfrageDatenID = $anfrageDaten->AnfragedatenID;
+
 	// Eintrag in der LogTabelle anlegen
 	$log = new webservicelog(); 
 	$log->request_data = file_get_contents('php://input'); 
@@ -100,7 +101,7 @@ function GetStipendienbezieherStip($parameters)
 			$StipBezieher->Familienname = $BezieherStip->Familienname; 
 			$StipBezieher->Vorname = $BezieherStip->Vorname; 
 			$StipBezieher->Typ = $BezieherStip->Typ; 
-			
+
 			// Studiensemester_kurzbz auslesen
 			if($BezieherStip->Semester == "WS" || $BezieherStip->Semester == "ws")
 			{
@@ -112,7 +113,7 @@ function GetStipendienbezieherStip($parameters)
 				$year = mb_substr($BezieherStip->Studienjahr, 0,2).mb_substr($BezieherStip->Studienjahr, 5,7); 
 				$studSemester = "SS".$year; 
 			}
-			
+
 			if(!$prestudentID = $StipBezieher->searchPersonKz($BezieherStip->PersKz))
 				if(!$prestudentID = $StipBezieher->searchSvnr($BezieherStip->SVNR))
 					$prestudentID = $StipBezieher->searchVorNachname($BezieherStip->Vorname, $BezieherStip->Familienname);
@@ -153,10 +154,10 @@ function GetStipendienbezieherStip($parameters)
 					else
 						$StipBezieher->Inskribiert = 'j';
 				}
-					
+
 				if($BezieherStip->Typ == "as" || $BezieherStip->Typ == "AS")
 				{
-					$StipBezieher->getOrgFormTeilCode($studentUID, $studSemester, $prestudentID);
+					$StipBezieher->getOrgFormTeilCode($prestudentID, $studSemester);
 					$StipBezieher->Studienbeitrag = $studGebuehr; 
 
 					// Wenn letzter Status von Semester Interessent ist -> Semester = null

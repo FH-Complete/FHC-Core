@@ -125,9 +125,9 @@ class akadgrad extends basis_db
 	{
 		//laden des Datensatzes
 		$qry = "SELECT * FROM lehre.tbl_akadgrad WHERE 
-				studiengang_kz = (	SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$this->db_add_param($student_uid).") AND
-				(	geschlecht = (	SELECT geschlecht FROM public.tbl_student 
-								JOIN public.tbl_benutzer ON (student_uid=uid) 
+				studiengang_kz = (	SELECT studiengang_kz FROM public.tbl_prestudent WHERE uid=".$this->db_add_param($student_uid).") AND
+				(	geschlecht = (	SELECT geschlecht FROM public.tbl_prestudent
+								JOIN public.tbl_benutzer ON (tbl_prestudent.uid=tbl_benutzer.uid)
 								JOIN public.tbl_person USING (person_id) 
 								WHERE student_uid=".$this->db_add_param($student_uid).") 
 					OR geschlecht IS NULL)

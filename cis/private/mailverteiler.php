@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once('../../config/cis.config.inc.php');
 require_once('../../include/functions.inc.php');
@@ -232,7 +233,7 @@ if(!$is_lector)
 		  	//StudentenListe Rausschreiben
 		  	if($row->studiengang_kz!=0) //0 ist für ganzes TW
 		  	{				
-		  		$qry_stud = "SELECT count(*) as anzahl FROM public.tbl_student WHERE studiengang_kz='$row->studiengang_kz' AND student_uid NOT LIKE '_Dummy%'";
+		  		$qry_stud = "SELECT count(*) as anzahl FROM public.tbl_prestudent WHERE studiengang_kz='$row->studiengang_kz' AND uid NOT LIKE '_Dummy%'";
 
 				if(!$row_stud=$db->db_fetch_object($db->db_query($qry_stud)))
 					echo $p->t('mailverteiler/fehlerBeimLadenDerStudenten');
@@ -250,7 +251,7 @@ if(!$is_lector)
 		  		{
 		  			if((!is_null($row1->semester)) && !empty($row1->semester) && ($row1->semester != "") && ($row1->semester<=$row->max_semester) && ($row1->semester>'0')) //($row1->semester<'10'))
 		  			{
-		  				$qry_cnt = "SELECT count(*) as anzahl FROM public.tbl_student WHERE studiengang_kz='$row1->studiengang_kz' AND semester='$row1->semester' AND student_uid NOT LIKE '_Dummy%'";
+		  				$qry_cnt = "SELECT count(*) as anzahl FROM public.tbl_prestudent WHERE studiengang_kz='$row1->studiengang_kz' AND semester='$row1->semester' AND uid NOT LIKE '_Dummy%'";
 		  				if(trim($row1->verband)!='')
 		  				{
 			  				$qry_cnt .= " AND verband='$row1->verband'";

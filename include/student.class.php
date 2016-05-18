@@ -424,6 +424,18 @@ class student extends benutzer
 	 */
 	public function load_studentlehrverband($prestudent_id, $studiensemester_kurzbz)
 	{
+		if(!is_numeric($prestudent_id))
+		{
+			$this->errormsg = 'PrestudentID ist ungueltig';
+			return false;
+		}
+		if($studiensemester_kurzbz == "")
+		{
+			$this->errormsg = 'studiensemester_kurzbz muss angegeben werden';
+			return false;
+		}
+
+
 		$qry = "SELECT * FROM public.tbl_studentlehrverband
 				WHERE prestudent_id=".$this->db_add_param($prestudent_id)."
 				AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
@@ -432,8 +444,6 @@ class student extends benutzer
 		{
 			if($row = $this->db_fetch_object())
 			{
-				$this->uid = $this->getUid($row->prestudent_id);
-
 				$this->prestudent_id = $row->prestudent_id;
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$this->studiengang_kz = $row->studiengang_kz;

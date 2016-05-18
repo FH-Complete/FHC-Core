@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ * Authors: Christian Paminger 	<christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl 		<rudolf.hangl@technikum-wien.at>,
+ *          Gerald Simane-Sequens 	<gerald.simane-sequens@technikum-wien.at> and
+ *          Andreas Moik 	<moik@technikum-wien.at>.
  */
 	
 // ------------------------------------------------------------------------------------------
@@ -904,7 +905,7 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 		$foto=$db->db_result($erg,0,"foto");
 	}
 	
-	if(!($erg_stud=$db->db_query("SELECT studiengang_kz, semester, verband, gruppe, matrikelnr, typ::varchar(1) || kurzbz AS stgkz, tbl_studiengang.bezeichnung AS stgbz FROM public.tbl_student JOIN public.tbl_studiengang USING(studiengang_kz) WHERE student_uid=".$db->db_add_param($uid, FHC_STRING))))
+	if(!($erg_stud=$db->db_query("SELECT studiengang_kz, semester, verband, gruppe, perskz, typ::varchar(1) || kurzbz AS stgkz, tbl_studiengang.bezeichnung AS stgbz FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE uid=".$db->db_add_param($uid, FHC_STRING))))
 		die($db->db_last_error());
 	$stud_num_rows=$db->db_num_rows($erg_stud);
 	if ($stud_num_rows==1)
@@ -915,7 +916,7 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 		$semester=$db->db_result($erg_stud,0,"semester");
 		$verband=$db->db_result($erg_stud,0,"verband");
 		$gruppe=$db->db_result($erg_stud,0,"gruppe");
-		$matrikelnr=$db->db_result($erg_stud,0,"matrikelnr");
+		$matrikelnr=$db->db_result($erg_stud,0,"perskz");
 	}
 	
 	$ort='';

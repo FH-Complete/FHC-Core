@@ -122,7 +122,7 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 	elseif($filter2=='zgvohnedatum')
 	{
 		//Alle Personen die den ZGV Typ eingetragen haben aber noch kein Datum
-		$qry = "SELECT zgv_code, zgvdatum, zgvmas_code, zgvmadatum FROM public.tbl_prestudent WHERE prestudent_id='$row->prestudent_id'";
+		$qry = "SELECT zgv_code, zgvdatum, zgvmas_code, zgvmadatum FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($row->prestudent_id, FHC_INTEGER);
 		if($db->db_query($qry))
 		{
 			if($row_filter = $db->db_fetch_object())
@@ -168,7 +168,7 @@ function draw_content_liste($row)
 			<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:'').']]></STUDENT:semester>
     		<STUDENT:verband><![CDATA['.(isset($row->verband)?$row->verband:'').']]></STUDENT:verband>
     		<STUDENT:gruppe><![CDATA['.(isset($row->gruppe)?$row->gruppe:'').']]></STUDENT:gruppe>
-			<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
+			<STUDENT:matrikelnummer><![CDATA['.(isset($row->perskz)?$row->perskz:'').']]></STUDENT:matrikelnummer>
     		<STUDENT:mail_privat><![CDATA['.$row->email_privat.']]></STUDENT:mail_privat>
     		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 			<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
@@ -287,7 +287,7 @@ function draw_content($row)
 
     		<STUDENT:aktiv><![CDATA['.$aktiv.']]></STUDENT:aktiv>
     		<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
-    		<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
+    		<STUDENT:matrikelnummer><![CDATA['.(isset($row->perskz)?$row->perskz:'').']]></STUDENT:matrikelnummer>
 			<STUDENT:alias><![CDATA['.(isset($row->alias)?$row->alias:'').']]></STUDENT:alias>
     		<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:$semester_prestudent).']]></STUDENT:semester>
     		<STUDENT:verband><![CDATA['.(isset($row->verband)?$row->verband:'').']]></STUDENT:verband>
@@ -446,25 +446,25 @@ if($xmlformat=='rdf')
 		//$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz'";
 
 		$sql_query="SELECT p.person_id, tbl_prestudent.prestudent_id, tbl_prestudent.uid, titelpre, titelpost,	vorname, vornamen, geschlecht,
-						nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
+						nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_prestudent.perskz, p.anmerkung as anmerkungen,
 						tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-						tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, mentor, public.tbl_benutzer.aktiv AS bnaktiv,
+						tbl_prestudent.studiengang_kz, aufmerksamdurch_kurzbz, mentor, public.tbl_benutzer.aktiv AS bnaktiv,
 						(	SELECT kontakt
 							FROM public.tbl_kontakt
 							WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung
 							LIMIT 1
 						)
 						AS email_privat,
-						(SELECT rt_gesamtpunkte as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as punkte,
-						(SELECT rt_punkte1 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte1,
-						(SELECT rt_punkte2 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte2,
-						(SELECT rt_punkte3 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte3,
+						(SELECT rt_gesamtpunkte as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_prestudent.prestudent_id) as punkte,
+						(SELECT rt_punkte1 as punkte FROM public.tbl_prestudent psrt1 WHERE psrt1.prestudent_id=ps.prestudent_id) as rt_punkte1,
+						(SELECT rt_punkte2 as punkte FROM public.tbl_prestudent psrt2 WHERE psrt2.prestudent_id=ps.prestudent_id) as rt_punkte2,
+						(SELECT rt_punkte3 as punkte FROM public.tbl_prestudent psrt3 WHERE psrt3.prestudent_id=ps.prestudent_id) as rt_punkte3,
 						 tbl_prestudent.dual as dual, p.matr_nr
-						FROM public.tbl_student
-							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id)  JOIN public.tbl_prestudent USING(prestudent_id) ";
+						FROM public.tbl_prestudent ps
+							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id)";
 		if($gruppe_kurzbz!=null)
 			$sql_query.= "JOIN public.tbl_benutzergruppe USING (uid) ";
-		$sql_query.="LEFT JOIN public.tbl_studentlehrverband ON (tbl_studentlehrverband.prestudent_id=tbl_student.prestudent_id AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz')";
+		$sql_query.="LEFT JOIN public.tbl_studentlehrverband ON (tbl_studentlehrverband.prestudent_id=ps.prestudent_id AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz')";
 		$sql_query.="WHERE ".$where.' ORDER BY nachname, vorname';
 
 
@@ -577,77 +577,77 @@ if($xmlformat=='rdf')
 	{
 		if($filter!='')
 		{
-		    if(substr_compare($filter, "#ref", 0, 4,true)==0)
-		    {
-			$zahlungsreferenz = explode(" ", $filter);
-			unset($zahlungsreferenz[0]);
-
-			foreach($zahlungsreferenz as $ref)
+			if(substr_compare($filter, "#ref", 0, 4,true)==0)
 			{
-			    $konto = new konto();
-			    $konto->loadFromZahlungsreferenz($ref);
-			    $prestudent=new prestudent();
-			    $prestudent->getPrestudenten($konto->person_id);
-			    if(!empty($prestudent->result))
-			    {
-				$prestudent_temp = new prestudent($prestudent->result[0]->prestudent_id);
-				$student = new student();
-				$uid = $student->getUid($prestudent_temp->prestudent_id);
+				$zahlungsreferenz = explode(" ", $filter);
+				unset($zahlungsreferenz[0]);
 
-				if($uid!='' && $uid != false)
+				foreach($zahlungsreferenz as $ref)
 				{
-				    if(!$student->load($uid, $studiensemester_kurzbz))
-					$student->load($uid);
-				    draw_content($student);
-				    draw_prestudent($prestudent_temp);
+					  $konto = new konto();
+					  $konto->loadFromZahlungsreferenz($ref);
+					  $prestudent=new prestudent();
+					  $prestudent->getPrestudenten($konto->person_id);
+					  if(!empty($prestudent->result))
+					  {
+					$prestudent_temp = new prestudent($prestudent->result[0]->prestudent_id);
+					$student = new student();
+					$uid = $student->getUid($prestudent_temp->prestudent_id);
+
+					if($uid!='' && $uid != false)
+					{
+						  if(!$student->load($uid, $studiensemester_kurzbz))
+						$student->load($uid);
+						  draw_content($student);
+						  draw_prestudent($prestudent_temp);
+					}
+					else
+					{
+						  draw_content($prestudent_temp);
+						  draw_prestudent($prestudent_temp);
+					}
+					  }
 				}
-				else
-				{
-				    draw_content($prestudent_temp);
-				    draw_prestudent($prestudent_temp);
-				}
-			    }
 			}
-		    }
-		    else
-		    {
-			//$filter = utf8_decode($filter);
-			$qry = "SELECT prestudent_id
-				FROM
-				    public.tbl_person JOIN tbl_prestudent USING (person_id) LEFT JOIN tbl_student using(prestudent_id)
-				WHERE
-				    COALESCE(nachname,'')||' '||COALESCE(vorname,'') ~* '".addslashes($filter)."' OR
-				    COALESCE(vorname,'')||' '||COALESCE(nachname,'') ~* '".addslashes($filter)."' OR
-				    student_uid ~* '".addslashes($filter)."' OR
-				    matrikelnr = '".addslashes($filter)."' OR
-				    svnr = '".addslashes($filter)."';";
-			if($db->db_query($qry))
+			else
 			{
-			    while($row = $db->db_fetch_object())
-			    {
-				$student=new student();
-				if($uid = $student->getUid($row->prestudent_id))
+				//$filter = utf8_decode($filter);
+				$qry = "SELECT prestudent_id
+					FROM
+						  public.tbl_person JOIN tbl_prestudent USING (person_id)
+					WHERE
+						  COALESCE(nachname,'')||' '||COALESCE(vorname,'') ~* '".addslashes($filter)."' OR
+						  COALESCE(vorname,'')||' '||COALESCE(nachname,'') ~* '".addslashes($filter)."' OR
+						  uid ~* '".addslashes($filter)."' OR
+						  perskz = '".addslashes($filter)."' OR
+						  svnr = '".addslashes($filter)."';";
+				if($db->db_query($qry))
 				{
-				    //Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
-				    //nochmal laden aber ohne studiensemester
-				    if(!$student->load($uid, $studiensemester_kurzbz))
-					$student->load($uid);
+					while($row = $db->db_fetch_object())
+					{
+						$student=new student();
+						if($uid = $student->getUid($row->prestudent_id))
+						{
+								//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
+								//nochmal laden aber ohne studiensemester
+								if(!$student->load($uid, $studiensemester_kurzbz))
+							$student->load($uid);
+						}
+						$prestd = new prestudent();
+						$prestd->load($row->prestudent_id);
+						if($uid!='')
+						{
+								draw_content($student);
+								draw_prestudent($prestd);
+						}
+						else
+						{
+								draw_content($prestd);
+								draw_prestudent($prestd);
+						}
+					}
 				}
-				$prestd = new prestudent();
-				$prestd->load($row->prestudent_id);
-				if($uid!='')
-				{
-				    draw_content($student);
-				    draw_prestudent($prestd);
-				}
-				else
-				{
-				    draw_content($prestd);
-				    draw_prestudent($prestd);
-				}
-			    }
 			}
-		    }
 		}
 		elseif(isset($prestudent_id))
 		{
@@ -672,11 +672,7 @@ if($xmlformat=='rdf')
 				draw_prestudent($prestd);
 			}
 		}
-
-
 	}
-
-
 	echo "</RDF:Seq>\n</RDF:RDF>";
 }
 else

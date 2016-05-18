@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Martin Tatzber <tatzberm@technikum-wien.at
+ * Authors: Martin Tatzber <tatzberm@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../config/vilesci.config.inc.php');
@@ -80,8 +81,7 @@ $output .= '</select>
 $limit=20;
 $qry_from_where=" FROM public.tbl_prestudent
 	JOIN public.tbl_person USING(person_id)
-	JOIN public.tbl_student USING(prestudent_id)
-	JOIN public.tbl_benutzer ON(student_uid=uid)
+	JOIN public.tbl_benutzer USING(uid)
 	WHERE NOT EXISTS(
 		SELECT 1 FROM public.tbl_prestudentstatus
 		WHERE tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id
