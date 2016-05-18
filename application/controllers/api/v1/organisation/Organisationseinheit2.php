@@ -14,30 +14,30 @@
 
 if(!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Geschaeftsjahr extends APIv1_Controller
+class Organisationseinheit2 extends APIv1_Controller
 {
 	/**
-	 * Geschaeftsjahr API constructor.
+	 * Organisationseinheit API constructor.
 	 */
 	public function __construct()
 	{
 		parent::__construct();
-		// Load model GeschaeftsjahrModel
-		$this->load->model('organisation/geschaeftsjahr_model', 'GeschaeftsjahrModel');
+		// Load model OrganisationseinheitModel
+		$this->load->model('organisation/organisationseinheit_model', 'OrganisationseinheitModel');
 		// Load set the uid of the model to let to check the permissions
-		$this->GeschaeftsjahrModel->setUID($this->_getUID());
+		$this->OrganisationseinheitModel->setUID($this->_getUID());
 	}
 
 	/**
 	 * @return void
 	 */
-	public function getGeschaeftsjahr()
+	public function getOrganisationseinheit()
 	{
-		$geschaeftsjahrID = $this->get('geschaeftsjahr_id');
+		$oe_kurzbz = $this->get('oe_kurzbz');
 		
-		if(isset($geschaeftsjahrID))
+		if(isset($oe_kurzbz))
 		{
-			$result = $this->GeschaeftsjahrModel->load($geschaeftsjahrID);
+			$result = $this->OrganisationseinheitModel->load($oe_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -50,17 +50,17 @@ class Geschaeftsjahr extends APIv1_Controller
 	/**
 	 * @return void
 	 */
-	public function postGeschaeftsjahr()
+	public function postOrganisationseinheit()
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['geschaeftsjahr_id']))
+			if(isset($this->post()['organisationseinheit_id']))
 			{
-				$result = $this->GeschaeftsjahrModel->update($this->post()['geschaeftsjahr_id'], $this->post());
+				$result = $this->OrganisationseinheitModel->update($this->post()['organisationseinheit_id'], $this->post());
 			}
 			else
 			{
-				$result = $this->GeschaeftsjahrModel->insert($this->post());
+				$result = $this->OrganisationseinheitModel->insert($this->post());
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
@@ -71,7 +71,7 @@ class Geschaeftsjahr extends APIv1_Controller
 		}
 	}
 	
-	private function _validate($geschaeftsjahr = NULL)
+	private function _validate($organisationseinheit = NULL)
 	{
 		return true;
 	}

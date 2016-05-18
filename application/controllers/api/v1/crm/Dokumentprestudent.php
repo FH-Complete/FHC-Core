@@ -33,11 +33,12 @@ class Dokumentprestudent extends APIv1_Controller
 	 */
 	public function getDokumentprestudent()
 	{
-		$dokumentprestudentID = $this->get('dokumentprestudent_id');
+		$prestudent_id = $this->get('prestudent_id');
+		$dokument_kurzbz = $this->get('dokument_kurzbz');
 		
-		if(isset($dokumentprestudentID))
+		if(isset($prestudent_id) && isset($dokument_kurzbz))
 		{
-			$result = $this->DokumentprestudentModel->load($dokumentprestudentID);
+			$result = $this->DokumentprestudentModel->load(array($prestudent_id, $dokument_kurzbz));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

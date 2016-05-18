@@ -14,30 +14,30 @@
 
 if(!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Sprache extends APIv1_Controller
+class Fachbereich2 extends APIv1_Controller
 {
 	/**
-	 * Sprache API constructor.
+	 * Fachbereich API constructor.
 	 */
 	public function __construct()
 	{
 		parent::__construct();
-		// Load model SpracheModel
-		$this->load->model('system/sprache_model', 'SpracheModel');
+		// Load model FachbereichModel
+		$this->load->model('organisation/fachbereich_model', 'FachbereichModel');
 		// Load set the uid of the model to let to check the permissions
-		$this->SpracheModel->setUID($this->_getUID());
+		$this->FachbereichModel->setUID($this->_getUID());
 	}
 
 	/**
 	 * @return void
 	 */
-	public function getSprache()
+	public function getFachbereich()
 	{
-		$spracheID = $this->get('sprache_id');
+		$fachbereich_kurzbz = $this->get('fachbereich_kurzbz');
 		
-		if(isset($spracheID))
+		if(isset($fachbereich_kurzbz))
 		{
-			$result = $this->SpracheModel->load($spracheID);
+			$result = $this->FachbereichModel->load($fachbereich_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -50,17 +50,17 @@ class Sprache extends APIv1_Controller
 	/**
 	 * @return void
 	 */
-	public function postSprache()
+	public function postFachbereich()
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['sprache_id']))
+			if(isset($this->post()['fachbereich_id']))
 			{
-				$result = $this->SpracheModel->update($this->post()['sprache_id'], $this->post());
+				$result = $this->FachbereichModel->update($this->post()['fachbereich_id'], $this->post());
 			}
 			else
 			{
-				$result = $this->SpracheModel->insert($this->post());
+				$result = $this->FachbereichModel->insert($this->post());
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
@@ -71,7 +71,7 @@ class Sprache extends APIv1_Controller
 		}
 	}
 	
-	private function _validate($sprache = NULL)
+	private function _validate($fachbereich = NULL)
 	{
 		return true;
 	}

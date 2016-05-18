@@ -33,11 +33,12 @@ class Dokumentstudiengang extends APIv1_Controller
 	 */
 	public function getDokumentstudiengang()
 	{
-		$dokumentstudiengangID = $this->get('dokumentstudiengang_id');
+		$studiengang_kz = $this->get('studiengang_kz');
+		$dokument_kurzbz = $this->get('dokument_kurzbz');
 		
-		if(isset($dokumentstudiengangID))
+		if(isset($studiengang_kz) && isset($dokument_kurzbz))
 		{
-			$result = $this->DokumentstudiengangModel->load($dokumentstudiengangID);
+			$result = $this->DokumentstudiengangModel->load(array($studiengang_kz, $dokument_kurzbz));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

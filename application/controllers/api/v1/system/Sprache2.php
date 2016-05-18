@@ -14,30 +14,30 @@
 
 if(!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Betriebsmittelperson extends APIv1_Controller
+class Sprache2 extends APIv1_Controller
 {
 	/**
-	 * Betriebsmittelperson API constructor.
+	 * Sprache API constructor.
 	 */
 	public function __construct()
 	{
 		parent::__construct();
-		// Load model BetriebsmittelpersonModel
-		$this->load->model('ressource/betriebsmittelperson_model', 'BetriebsmittelpersonModel');
+		// Load model SpracheModel
+		$this->load->model('system/sprache_model', 'SpracheModel');
 		// Load set the uid of the model to let to check the permissions
-		$this->BetriebsmittelpersonModel->setUID($this->_getUID());
+		$this->SpracheModel->setUID($this->_getUID());
 	}
 
 	/**
 	 * @return void
 	 */
-	public function getBetriebsmittelperson()
+	public function getSprache()
 	{
-		$betriebsmittelpersonID = $this->get('betriebsmittelperson_id');
+		$sprache = $this->get('sprache');
 		
-		if(isset($betriebsmittelpersonID))
+		if(isset($sprache))
 		{
-			$result = $this->BetriebsmittelpersonModel->load($betriebsmittelpersonID);
+			$result = $this->SpracheModel->load($sprache);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -50,17 +50,17 @@ class Betriebsmittelperson extends APIv1_Controller
 	/**
 	 * @return void
 	 */
-	public function postBetriebsmittelperson()
+	public function postSprache()
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['betriebsmittelperson_id']))
+			if(isset($this->post()['sprache_id']))
 			{
-				$result = $this->BetriebsmittelpersonModel->update($this->post()['betriebsmittelperson_id'], $this->post());
+				$result = $this->SpracheModel->update($this->post()['sprache_id'], $this->post());
 			}
 			else
 			{
-				$result = $this->BetriebsmittelpersonModel->insert($this->post());
+				$result = $this->SpracheModel->insert($this->post());
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
@@ -71,7 +71,7 @@ class Betriebsmittelperson extends APIv1_Controller
 		}
 	}
 	
-	private function _validate($betriebsmittelperson = NULL)
+	private function _validate($sprache = NULL)
 	{
 		return true;
 	}

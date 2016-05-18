@@ -33,11 +33,12 @@ class Bestellungtag extends APIv1_Controller
 	 */
 	public function getBestellungtag()
 	{
-		$bestellungtagID = $this->get('bestellungtag_id');
+		$bestellung_id = $this->get('bestellung_id');
+		$tag = $this->get('tag');
 		
-		if(isset($bestellungtagID))
+		if(isset($bestellung_id) && isset($tag))
 		{
-			$result = $this->BestellungtagModel->load($bestellungtagID);
+			$result = $this->BestellungtagModel->load(array($bestellung_id, $tag));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

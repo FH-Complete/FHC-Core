@@ -33,11 +33,12 @@ class Bisfunktion extends APIv1_Controller
 	 */
 	public function getBisfunktion()
 	{
-		$bisfunktionID = $this->get('bisfunktion_id');
+		$studiengang_kz = $this->get('studiengang_kz');
+		$bisverwendung_id = $this->get('bisverwendung_id');
 		
-		if(isset($bisfunktionID))
+		if(isset($studiengang_kz) && isset($bisverwendung_id))
 		{
-			$result = $this->BisfunktionModel->load($bisfunktionID);
+			$result = $this->BisfunktionModel->load(array($studiengang_kz, $bisverwendung_id));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

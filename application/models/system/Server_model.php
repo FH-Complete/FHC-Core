@@ -9,6 +9,6 @@ class Server_model extends DB_Model
 	{
 		parent::__construct();
 		$this->dbTable = 'system.tbl_server';
-		$this->pk = '';
+		$this->pk = 'server_kurzbz';
 	}
 }

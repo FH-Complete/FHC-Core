@@ -33,11 +33,14 @@ class Zeitfenster extends APIv1_Controller
 	 */
 	public function getZeitfenster()
 	{
-		$zeitfensterID = $this->get('zeitfenster_id');
+		$wochentag = $this->get('wochentag');
+		$studiengang_kz = $this->get('studiengang_kz');
+		$ort_kurzbz = $this->get('ort_kurzbz');
+		$stunde = $this->get('stunde');
 		
-		if(isset($zeitfensterID))
+		if(isset($wochentag) && isset($studiengang_kz) && isset($ort_kurzbz) && isset($stunde))
 		{
-			$result = $this->ZeitfensterModel->load($zeitfensterID);
+			$result = $this->ZeitfensterModel->load(array($wochentag, $studiengang_kz, $ort_kurzbz, $stunde));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

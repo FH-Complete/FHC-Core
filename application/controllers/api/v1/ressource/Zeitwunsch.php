@@ -33,11 +33,13 @@ class Zeitwunsch extends APIv1_Controller
 	 */
 	public function getZeitwunsch()
 	{
-		$zeitwunschID = $this->get('zeitwunsch_id');
+		$tag = $this->get('tag');
+		$mitarbeiter_uid = $this->get('mitarbeiter_uid');
+		$stunde = $this->get('stunde');
 		
-		if(isset($zeitwunschID))
+		if(isset($tag) && isset($mitarbeiter_uid) && isset($stunde))
 		{
-			$result = $this->ZeitwunschModel->load($zeitwunschID);
+			$result = $this->ZeitwunschModel->load(array($tag, $mitarbeiter_uid, $stunde));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

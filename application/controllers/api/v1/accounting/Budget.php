@@ -33,11 +33,12 @@ class Budget extends APIv1_Controller
 	 */
 	public function getBudget()
 	{
-		$budgetID = $this->get('budget_id');
+		$kostenstelle_id = $this->get('kostenstelle_id');
+		$geschaeftsjahr_kurzbz = $this->get('geschaeftsjahr_kurzbz');
 		
-		if(isset($budgetID))
+		if(isset($kostenstelle_id) && isset($geschaeftsjahr_kurzbz))
 		{
-			$result = $this->BudgetModel->load($budgetID);
+			$result = $this->BudgetModel->load(array($kostenstelle_id, $geschaeftsjahr_kurzbz));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

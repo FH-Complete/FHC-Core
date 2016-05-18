@@ -224,6 +224,8 @@ $config['fhc_acl'] = array
 	'wawi.tbl_rechnungstyp' => 'basis/rechnungstyp',
 	'wawi.tbl_zahlungstyp' => 'basis/zahlungstyp',
 	
+	'lehre.vw_studienplan' => 'basis/studienplan',
+	
 	'public.tbl_sprache' => 'admin',
 	'public.tbl_msg_thread' => 'admin',
 	'public.tbl_msg_message' => 'admin'

@@ -33,11 +33,14 @@ class Lehrverband extends APIv1_Controller
 	 */
 	public function getLehrverband()
 	{
-		$lehrverbandID = $this->get('lehrverband_id');
+		$gruppe = $this->get('gruppe');
+		$verband = $this->get('verband');
+		$semester = $this->get('semester');
+		$studiengang_kz = $this->get('studiengang_kz');
 		
-		if(isset($lehrverbandID))
+		if(isset($gruppe) && isset($verband) && isset($semester) && isset($studiengang_kz))
 		{
-			$result = $this->LehrverbandModel->load($lehrverbandID);
+			$result = $this->LehrverbandModel->load(array($gruppe, $verband, $semester, $studiengang_kz));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

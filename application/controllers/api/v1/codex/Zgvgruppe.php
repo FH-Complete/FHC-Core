@@ -33,11 +33,11 @@ class Zgvgruppe extends APIv1_Controller
 	 */
 	public function getZgvgruppe()
 	{
-		$zgvgruppeID = $this->get('zgvgruppe_id');
+		$gruppe_kurzbz = $this->get('gruppe_kurzbz');
 		
-		if(isset($zgvgruppeID))
+		if(isset($gruppe_kurzbz))
 		{
-			$result = $this->ZgvgruppeModel->load($zgvgruppeID);
+			$result = $this->ZgvgruppeModel->load($gruppe_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

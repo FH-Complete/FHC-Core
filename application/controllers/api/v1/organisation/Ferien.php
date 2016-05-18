@@ -33,11 +33,12 @@ class Ferien extends APIv1_Controller
 	 */
 	public function getFerien()
 	{
-		$ferienID = $this->get('ferien_id');
+		$studiengang_kz = $this->get('studiengang_kz');
+		$bezeichnung = $this->get('bezeichnung');
 		
-		if(isset($ferienID))
+		if(isset($studiengang_kz) && isset($bezeichnung))
 		{
-			$result = $this->FerienModel->load($ferienID);
+			$result = $this->FerienModel->load(array($studiengang_kz, $bezeichnung));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

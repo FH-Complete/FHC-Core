@@ -33,11 +33,12 @@ class Variable extends APIv1_Controller
 	 */
 	public function getVariable()
 	{
-		$variableID = $this->get('variable_id');
+		$uid = $this->get('uid');
+		$name = $this->get('name');
 		
-		if(isset($variableID))
+		if(isset($uid) && isset($name))
 		{
-			$result = $this->VariableModel->load($variableID);
+			$result = $this->VariableModel->load(array($uid, $name));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

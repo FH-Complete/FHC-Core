@@ -33,11 +33,12 @@ class Ortraumtyp extends APIv1_Controller
 	 */
 	public function getOrtraumtyp()
 	{
-		$ortraumtypID = $this->get('ortraumtyp_id');
+		$hierarchie = $this->get('hierarchie');
+		$ort_kurzbz = $this->get('ort_kurzbz');
 		
-		if(isset($ortraumtypID))
+		if(isset($hierarchie) && isset($ort_kurzbz))
 		{
-			$result = $this->OrtraumtypModel->load($ortraumtypID);
+			$result = $this->OrtraumtypModel->load(array($hierarchie, $ort_kurzbz));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

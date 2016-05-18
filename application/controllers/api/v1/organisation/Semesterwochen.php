@@ -33,11 +33,12 @@ class Semesterwochen extends APIv1_Controller
 	 */
 	public function getSemesterwochen()
 	{
-		$semesterwochenID = $this->get('semesterwochen_id');
+		$studiengang_kz = $this->get('studiengang_kz');
+		$semester = $this->get('semester');
 		
-		if(isset($semesterwochenID))
+		if(isset($studiengang_kz) && isset($semester))
 		{
-			$result = $this->SemesterwochenModel->load($semesterwochenID);
+			$result = $this->SemesterwochenModel->load(array($studiengang_kz, $semester));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
