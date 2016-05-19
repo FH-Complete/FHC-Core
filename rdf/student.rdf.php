@@ -436,7 +436,7 @@ if($xmlformat=='rdf')
 			//die Orgform keine ruecksicht genommen
 			if($verband=='' && $gruppe=='' && $orgform!='')
 			{
-				$where.=" AND '$orgform' = (SELECT orgform_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id";
+				$where.=" AND '$orgform' = (SELECT orgform_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=ps.prestudent_id";
 				if($studiensemester_kurzbz!=null)
 					$where.=" AND studiensemester_kurzbz='$studiensemester_kurzbz'";
 				$where.=" ORDER BY datum desc, insertamum desc, ext_id desc LIMIT 1)";
@@ -445,23 +445,24 @@ if($xmlformat=='rdf')
 
 		//$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz'";
 
-		$sql_query="SELECT p.person_id, tbl_prestudent.prestudent_id, tbl_prestudent.uid, titelpre, titelpost,	vorname, vornamen, geschlecht,
-						nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_prestudent.perskz, p.anmerkung as anmerkungen,
-						tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-						tbl_prestudent.studiengang_kz, aufmerksamdurch_kurzbz, mentor, public.tbl_benutzer.aktiv AS bnaktiv,
-						(	SELECT kontakt
-							FROM public.tbl_kontakt
-							WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung
-							LIMIT 1
-						)
-						AS email_privat,
-						(SELECT rt_gesamtpunkte as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_prestudent.prestudent_id) as punkte,
-						(SELECT rt_punkte1 as punkte FROM public.tbl_prestudent psrt1 WHERE psrt1.prestudent_id=ps.prestudent_id) as rt_punkte1,
-						(SELECT rt_punkte2 as punkte FROM public.tbl_prestudent psrt2 WHERE psrt2.prestudent_id=ps.prestudent_id) as rt_punkte2,
-						(SELECT rt_punkte3 as punkte FROM public.tbl_prestudent psrt3 WHERE psrt3.prestudent_id=ps.prestudent_id) as rt_punkte3,
-						 tbl_prestudent.dual as dual, p.matr_nr
-						FROM public.tbl_prestudent ps
-							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id)";
+		$sql_query="SELECT p.person_id, ps.prestudent_id, tbl_benutzer.uid, titelpre, titelpost, vorname, vornamen, geschlecht,
+			nachname, gebdatum, ps.anmerkung,ersatzkennzeichen,svnr, ps.perskz, p.anmerkung as anmerkungen,
+			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
+			ps.studiengang_kz, aufmerksamdurch_kurzbz, mentor, public.tbl_benutzer.aktiv AS bnaktiv,
+			(	SELECT kontakt
+				FROM public.tbl_kontakt
+				WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung
+				LIMIT 1
+			)
+			AS email_privat,
+			(SELECT rt_gesamtpunkte as punkte FROM public.tbl_prestudent WHERE prestudent_id=ps.prestudent_id) as punkte,
+			(SELECT rt_punkte1 as punkte FROM public.tbl_prestudent WHERE prestudent_id=ps.prestudent_id) as rt_punkte1,
+			(SELECT rt_punkte2 as punkte FROM public.tbl_prestudent WHERE prestudent_id=ps.prestudent_id) as rt_punkte2,
+			(SELECT rt_punkte3 as punkte FROM public.tbl_prestudent WHERE prestudent_id=ps.prestudent_id) as rt_punkte3,
+			 ps.dual as dual, p.matr_nr
+			FROM public.tbl_prestudent ps
+				JOIN public.tbl_benutzer ON (ps.uid=tbl_benutzer.uid) JOIN public.tbl_person p ON (p.person_id=tbl_benutzer.person_id)";
+
 		if($gruppe_kurzbz!=null)
 			$sql_query.= "JOIN public.tbl_benutzergruppe USING (uid) ";
 		$sql_query.="LEFT JOIN public.tbl_studentlehrverband ON (tbl_studentlehrverband.prestudent_id=ps.prestudent_id AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz')";
@@ -830,7 +831,7 @@ else
 				<vornamen><![CDATA['.$student->vornamen.']]></vornamen>
 				<vorname><![CDATA['.$student->vorname.']]></vorname>
 				<nachname><![CDATA['.$student->nachname.']]></nachname>
-				<matrikelnummer><![CDATA['.$student->matrikelnr.']]></matrikelnummer>
+				<matrikelnummer><![CDATA['.$student->perskz.']]></matrikelnummer>
 				<geburtsdatum><![CDATA['.$datum_obj->convertISODate($student->gebdatum).']]></geburtsdatum>
 				<geburtsdatum_iso><![CDATA['.$student->gebdatum.']]></geburtsdatum_iso>
 				<semester><![CDATA['.$semester.']]></semester>

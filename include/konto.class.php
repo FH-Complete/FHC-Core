@@ -648,7 +648,7 @@ class konto extends basis_db
 						AND tbl_konto.buchungstyp_kurzbz in(".$this->db_implode4SQL($buchungstyp_kurzbz_array).")";
 		if(!is_null($studiensemester_kurzbz))
 			$subqry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
-			
+
 		$subqry.="
 					ORDER BY tbl_studiensemester.start DESC";
 

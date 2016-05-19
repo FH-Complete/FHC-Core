@@ -33,7 +33,6 @@ require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/variable.class.php');
-require_once('../include/student.class.php');
 
 $uid = get_uid();
 $rechte = new benutzerberechtigung();
@@ -42,10 +41,11 @@ $rechte->getBerechtigungen($uid);
 if(!$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('admin'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
-if(isset($_GET['student_uid']))
-	$student_uid = $_GET['student_uid'];
-else
-	$student_uid = '';
+if(!isset($_GET['prestudent_id']))
+	die('Es wurde keine prestudent_id übergeben!');
+
+$prestudent_id = $_GET["prestudent_id"];
+
 
 if(isset($_GET['pruefung_id']))
 	$pruefung_id = $_GET['pruefung_id'];
@@ -86,9 +86,8 @@ else
 		$stsem = $variable->variable->semester_aktuell;
 	}
 	
-	$student = new student($student_uid);
-	
-	$pruefung->getPruefungen($student->prestudent_id, null, null, $stsem);
+
+	$pruefung->getPruefungen($prestudent_id, null, null, $stsem);
 	foreach ($pruefung->result as $row)
 		draw_rdf($row);
 }
@@ -102,7 +101,7 @@ function draw_rdf($row)
          <RDF:Description  id="'.$row->pruefung_id.'"  about="'.$rdf_url.'/'.$row->pruefung_id.'" >
             <PRUEFUNG:pruefung_id><![CDATA['.$row->pruefung_id.']]></PRUEFUNG:pruefung_id>
             <PRUEFUNG:lehreinheit_id><![CDATA['.$row->lehreinheit_id.']]></PRUEFUNG:lehreinheit_id>
-            <PRUEFUNG:student_uid><![CDATA['.$row->student_uid.']]></PRUEFUNG:student_uid>
+            <PRUEFUNG:prestudent_id><![CDATA['.$row->prestudent_id.']]></PRUEFUNG:prestudent_id>
             <PRUEFUNG:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></PRUEFUNG:mitarbeiter_uid>
             <PRUEFUNG:note NC:parseType="Integer"><![CDATA['.$row->note.']]></PRUEFUNG:note>
             <PRUEFUNG:pruefungstyp_kurzbz><![CDATA['.$row->pruefungstyp_kurzbz.']]></PRUEFUNG:pruefungstyp_kurzbz>

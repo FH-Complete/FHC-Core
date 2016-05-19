@@ -1446,7 +1446,7 @@ function StudentAuswahl()
 	// ***** Betriebsmittel *****
 	document.getElementById('student-betriebsmittel').setAttribute('src','betriebsmitteloverlay.xul.php?person_id='+person_id+'&uid='+uid);
 
-	if(uid!='')
+	if(prestudent_id && parseInt(prestudent_id))
 	{
 		// ***** Pruefungen *****
 		pruefungtree = document.getElementById('student-pruefung-tree');
@@ -1455,7 +1455,8 @@ function StudentAuswahl()
 		var pruefungstsemall='';
 		if(document.getElementById('student-pruefung-button-filterstsem').checked)
 			pruefungstsemall='&all_stsem';
-		url='<?php echo APP_ROOT;?>rdf/pruefung.rdf.php?student_uid='+uid+pruefungstsemall+"&"+gettimestamp();
+
+		url='<?php echo APP_ROOT;?>rdf/pruefung.rdf.php?prestudent_id='+prestudent_id+pruefungstsemall+"&"+gettimestamp();
 
 
 		try
@@ -3922,13 +3923,13 @@ function StudentNotenPunkteChange()
 function pruefungTreeRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var uid = document.getElementById('student-detail-textbox-uid').value;
+	var prestudent_id = document.getElementById('student-detail-textbox-prestudent_id').value;
 	var pruefungtree = document.getElementById('student-pruefung-tree');
 
 	var pruefungstsemall='';
 	if(document.getElementById('student-pruefung-button-filterstsem').checked)
 		pruefungstsemall='&all_stsem';
-	url='<?php echo APP_ROOT;?>rdf/pruefung.rdf.php?student_uid='+uid+pruefungstsemall+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/pruefung.rdf.php?prestudent_id='+prestudent_id+pruefungstsemall+"&"+gettimestamp();
 
 	try
 	{

@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/basis_db.class.php');
@@ -81,7 +82,7 @@ if ($num_rows==1)
 	$email_alias=$db->db_result($erg,0,"alias");
 	$hp=$db->db_result($erg,0,"homepage");
 }
-if(!($erg_stud=$db->db_query("SELECT studiengang_kz, semester, verband, gruppe, perskz, typ::varchar(1) || kurzbz AS stgkz, tbl_studiengang.bezeichnung AS stgbz FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE student_uid='".addslashes($uid)."'")))
+if(!($erg_stud=$db->db_query("SELECT studiengang_kz, perskz, typ::varchar(1) || kurzbz AS stgkz, tbl_studiengang.bezeichnung AS stgbz FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE uid=".$db->db_add_param($uid))))
 	die($db->db_last_error());
 $stud_num_rows=$db->db_num_rows($erg_stud);
 
@@ -90,9 +91,6 @@ if ($stud_num_rows==1)
 	$stg=$db->db_result($erg_stud,0,"studiengang_kz");
 	$stgbez=$db->db_result($erg_stud,0,"stgbz");
 	$stgkz=$db->db_result($erg_stud,0,"stgkz");
-	$semester=$db->db_result($erg_stud,0,"semester");
-	$verband=$db->db_result($erg_stud,0,"verband");
-	$gruppe=$db->db_result($erg_stud,0,"gruppe");
 	$matrikelnr=$db->db_result($erg_stud,0,"perskz");
 }
 if(!($erg_lekt=$db->db_query("SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($uid)."'")))
@@ -121,12 +119,12 @@ echo '
 <script language="JavaScript" type="text/javascript">
 	function MM_jumpMenu(targ, selObj, restore)
 	{
-	  eval(targ + ".location=\'" + selObj.options[selObj.selectedIndex].value + "'.$getParam.'\'");
+		eval(targ + ".location=\'" + selObj.options[selObj.selectedIndex].value + "'.$getParam.'\'");
 
-	  if(restore)
-	  {
-	  	selObj.selectedIndex = 0;
-	  }
+		if(restore)
+		{
+			selObj.selectedIndex = 0;
+		}
 	}
 </script>
 </head>
@@ -158,7 +156,7 @@ $konto = new konto();
 $buchungstypen = array();
 if(defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))
 {
-    $buchungstypen = unserialize (CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN);
+	$buchungstypen = unserialize (CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN);
 }
 
 $stsem_zahlung = $konto->getLastStSemBuchungstypen($uid, $buchungstypen, $stsem);

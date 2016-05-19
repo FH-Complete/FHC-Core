@@ -135,7 +135,7 @@ if($stg_kz=='')
 			ORDER BY datum, stunde, uid LIMIT 30;
 		   ";
 }
-else 
+else
 {
 	$qry = "SELECT datum, stunde, uid, count(uid) AS anzahl
 			FROM lehre.vw_".$db_stpl_table."_student_unr JOIN public.tbl_prestudent USING(uid)

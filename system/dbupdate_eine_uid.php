@@ -127,7 +127,20 @@ else if($_POST["action"] == "Starten")
 			echo "<p>Could not ADD COLUMN perskz TO public.tbl_prestudent: " . $db->db_last_error()."</p>";
 		}
 	}
-	
+
+	//********************************tbl_benutzergruppe CHANGES********************************
+	if(!$result = @$db->db_query("SELECT prestudent_id FROM public.tbl_benutzergruppe LIMIT 1;"))
+	{
+		$prestudent_qry = "ALTER TABLE public.tbl_benutzergruppe ADD COLUMN prestudent_id int;
+			ALTER TABLE public.tbl_benutzergruppe ADD CONSTRAINT fk_tbl_benutzergruppe_tbl_prestudent_prestudent_id FOREIGN KEY (prestudent_id) REFERENCES public.tbl_prestudent (prestudent_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+			UPDATE public.tbl_benutzergruppe SET prestudent_id = (SELECT prestudent_id FROM public.tbl_prestudent WHERE tbl_prestudent.uid = tbl_benutzergruppe.uid);
+		";
+		if(!$result = @$db->db_query($prestudent_qry))
+		{
+			echo "<p>Could not ADD COLUMN prestudent_id TO public.tbl_benutzergruppe: " . $db->db_last_error()."</p>";
+		}
+	}
+
 
 
 
@@ -278,7 +291,8 @@ else if($_POST["action"] == "Starten")
 	{
 		$create_view_qry = "
 			CREATE VIEW campus.vw_student_lehrveranstaltung AS
-				SELECT tbl_benutzergruppe.uid,
+				SELECT tbl_benutzergruppe.prestudent_id,
+					tbl_benutzergruppe.uid,
 					tbl_lehrveranstaltung.zeugnis,
 					tbl_lehrveranstaltung.sort,
 					tbl_lehrveranstaltung.lehrveranstaltung_id,
@@ -320,6 +334,7 @@ else if($_POST["action"] == "Starten")
 				WHERE tbl_lehreinheitgruppe.gruppe_kurzbz::text = tbl_benutzergruppe.gruppe_kurzbz::text AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id AND tbl_lehreinheit.studiensemester_kurzbz::text = tbl_benutzergruppe.studiensemester_kurzbz::text
 					UNION
 					SELECT tbl_studentlehrverband.prestudent_id,
+					tbl_prestudent.uid,
 					tbl_lehrveranstaltung.zeugnis,
 					tbl_lehrveranstaltung.sort,
 					tbl_lehrveranstaltung.lehrveranstaltung_id,
@@ -357,8 +372,9 @@ else if($_POST["action"] == "Starten")
 					FROM lehre.tbl_lehreinheitgruppe,
 					tbl_studentlehrverband,
 					lehre.tbl_lehreinheit,
-					lehre.tbl_lehrveranstaltung
-					WHERE tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id AND tbl_lehreinheit.studiensemester_kurzbz::text = tbl_studentlehrverband.studiensemester_kurzbz::text AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND tbl_studentlehrverband.studiengang_kz = tbl_lehreinheitgruppe.studiengang_kz AND tbl_studentlehrverband.semester = tbl_lehreinheitgruppe.semester AND (btrim(tbl_studentlehrverband.verband::text) = btrim(tbl_lehreinheitgruppe.verband::text) OR (tbl_lehreinheitgruppe.verband IS NULL OR btrim(tbl_lehreinheitgruppe.verband::text) = ''::text) AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL) AND (btrim(tbl_studentlehrverband.gruppe::text) = btrim(tbl_lehreinheitgruppe.gruppe::text) OR (tbl_lehreinheitgruppe.gruppe IS NULL OR btrim(tbl_lehreinheitgruppe.gruppe::text) = ''::text) AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL);
+					lehre.tbl_lehrveranstaltung,
+					public.tbl_prestudent
+					WHERE tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id AND tbl_lehreinheit.studiensemester_kurzbz::text = tbl_studentlehrverband.studiensemester_kurzbz::text AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND tbl_studentlehrverband.studiengang_kz = tbl_lehreinheitgruppe.studiengang_kz AND tbl_studentlehrverband.semester = tbl_lehreinheitgruppe.semester AND (btrim(tbl_studentlehrverband.verband::text) = btrim(tbl_lehreinheitgruppe.verband::text) OR (tbl_lehreinheitgruppe.verband IS NULL OR btrim(tbl_lehreinheitgruppe.verband::text) = ''::text) AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL) AND (btrim(tbl_studentlehrverband.gruppe::text) = btrim(tbl_lehreinheitgruppe.gruppe::text) OR (tbl_lehreinheitgruppe.gruppe IS NULL OR btrim(tbl_lehreinheitgruppe.gruppe::text) = ''::text) AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL) AND tbl_studentlehrverband.prestudent_id = tbl_prestudent.prestudent_id;
 		";
 		if(!$db->db_query($create_view_qry))
 		{
@@ -376,29 +392,32 @@ else if($_POST["action"] == "Starten")
 				SELECT sub_stpl_uid.unr,
 					sub_stpl_uid.datum,
 					sub_stpl_uid.stunde,
-					sub_stpl_uid.student_uid
+					sub_stpl_uid.uid
 				FROM ( SELECT stpl.unr,
 								stpl.datum,
 								stpl.stunde,
-								tbl_benutzergruppe.uid AS student_uid
-							 FROM tbl_stundenplandev stpl
+								tbl_benutzergruppe.uid,
+								tbl_benutzergruppe.prestudent_id
+							 FROM lehre.tbl_stundenplandev stpl
 								 JOIN tbl_benutzergruppe USING (gruppe_kurzbz)
 							WHERE tbl_benutzergruppe.studiensemester_kurzbz::text = ((( SELECT tbl_studiensemester.studiensemester_kurzbz
 								       FROM tbl_studiensemester
 								      WHERE stpl.datum <= tbl_studiensemester.ende AND stpl.datum >= tbl_studiensemester.start))::text)
-							GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.uid
+							GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.uid, tbl_benutzergruppe.prestudent_id
 						UNION
 						 SELECT stpl.unr,
 								stpl.datum,
 								stpl.stunde,
-								tbl_studentlehrverband.student_uid
-							 FROM tbl_stundenplandev stpl
-								 JOIN tbl_studentlehrverband ON stpl.gruppe_kurzbz IS NULL AND stpl.studiengang_kz = tbl_studentlehrverband.studiengang_kz AND stpl.semester = tbl_studentlehrverband.semester AND (stpl.verband = tbl_studentlehrverband.verband OR stpl.verband = ' '::bpchar AND stpl.verband <> tbl_studentlehrverband.verband) AND (stpl.gruppe = tbl_studentlehrverband.gruppe OR stpl.gruppe = ' '::bpchar AND stpl.gruppe <> tbl_studentlehrverband.gruppe)
+								tbl_prestudent.uid,
+								tbl_studentlehrverband.prestudent_id
+							FROM lehre.tbl_stundenplandev stpl
+								JOIN tbl_studentlehrverband ON stpl.gruppe_kurzbz IS NULL AND stpl.studiengang_kz = tbl_studentlehrverband.studiengang_kz AND stpl.semester = tbl_studentlehrverband.semester AND (stpl.verband = tbl_studentlehrverband.verband OR stpl.verband = ' '::bpchar AND stpl.verband <> tbl_studentlehrverband.verband) AND (stpl.gruppe = tbl_studentlehrverband.gruppe OR stpl.gruppe = ' '::bpchar AND stpl.gruppe <> tbl_studentlehrverband.gruppe)
+								JOIN tbl_prestudent on(tbl_prestudent.prestudent_id = tbl_studentlehrverband.prestudent_id)
 							WHERE tbl_studentlehrverband.studiensemester_kurzbz::text = ((( SELECT tbl_studiensemester.studiensemester_kurzbz
 								       FROM tbl_studiensemester
 								      WHERE stpl.datum <= tbl_studiensemester.ende AND stpl.datum >= tbl_studiensemester.start))::text)
-							GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.student_uid) sub_stpl_uid
-				GROUP BY sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.student_uid;
+							GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.prestudent_id, tbl_prestudent.uid) sub_stpl_uid
+				GROUP BY sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.uid;
 			";
 		if(!$db->db_query($create_view_qry))
 		{
@@ -416,6 +435,7 @@ else if($_POST["action"] == "Starten")
 				SELECT tbl_gruppe.gid,
 					tbl_gruppe.gruppe_kurzbz,
 					tbl_benutzergruppe.uid,
+					tbl_benutzergruppe.prestudent_id,
 					tbl_gruppe.mailgrp,
 					tbl_gruppe.beschreibung,
 					tbl_gruppe.studiengang_kz,
@@ -430,6 +450,7 @@ else if($_POST["action"] == "Starten")
 					upper(btrim((((( SELECT tbl_studiengang.typ::text || tbl_studiengang.kurzbz::text
 								 FROM tbl_studiengang
 								WHERE tbl_studiengang.studiengang_kz = tbl_lehrverband.studiengang_kz)) || tbl_lehrverband.semester) || tbl_lehrverband.verband::text) || tbl_lehrverband.gruppe::text)) AS gruppe_kurzbz,
+					tbl_prestudent.uid,
 					tbl_studentlehrverband.prestudent_id,
 					true AS mailgrp,
 					tbl_lehrverband.bezeichnung AS beschreibung,
@@ -440,6 +461,7 @@ else if($_POST["action"] == "Starten")
 					tbl_lehrverband.gruppe
 				 FROM tbl_lehrverband
 					 LEFT JOIN tbl_studentlehrverband USING (studiengang_kz, semester)
+					 JOIN tbl_prestudent ON(tbl_prestudent.prestudent_id=tbl_studentlehrverband.prestudent_id)
 				WHERE (tbl_lehrverband.verband = tbl_studentlehrverband.verband OR tbl_lehrverband.verband IS NULL OR btrim(tbl_lehrverband.verband::text) = ''::text OR tbl_studentlehrverband.verband IS NULL) AND (tbl_lehrverband.gruppe = tbl_studentlehrverband.gruppe OR tbl_lehrverband.gruppe IS NULL OR btrim(tbl_lehrverband.gruppe::text) = ''::text OR tbl_studentlehrverband.gruppe IS NULL);
 			";
 		if(!$db->db_query($create_view_qry))

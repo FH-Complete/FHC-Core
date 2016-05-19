@@ -202,17 +202,17 @@ if($method=="lehrveranstaltungen")
 					Select count(*) 
 					FROM (
 						SELECT
-							person_id
+							tbl_benutzer.person_id
 						FROM 
 							campus.vw_student_lehrveranstaltung 
 						JOIN public.tbl_benutzer using(uid)
-						JOIN public.tbl_student ON(uid=student_uid)
-						JOIN public.tbl_prestudentstatus USING(prestudent_id)
+						JOIN public.tbl_prestudent ON(vw_student_lehrveranstaltung.prestudent_id=tbl_prestudent.prestudent_id)
+						JOIN public.tbl_prestudentstatus ON(tbl_prestudentstatus.prestudent_id=tbl_prestudent.prestudent_id)
 						WHERE
 							lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id 
 							AND
 							lehreinheit_id in (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
-						WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id						
+						WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
 							AND 
 							tbl_lehreinheit.studiensemester_kurzbz='$stsem->studiensemester_kurzbz')
 							AND

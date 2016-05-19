@@ -21,6 +21,7 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at > and
  *          Andreas Moik <moik@technikum-wien.at>.
  */
+
 	require_once('../../../config/cis.config.inc.php');
 	require_once('../../../include/basis_db.class.php');
 	require_once('../../../include/functions.inc.php');
@@ -28,9 +29,9 @@
 	require_once ('../../../include/phrasen.class.php');
 
 
-    $sprache = getSprache(); 
-	$p=new phrasen($sprache); 
-    
+	$sprache = getSprache();
+	$p=new phrasen($sprache);
+
 	if (!$db = new basis_db())
 		die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 	$user = get_uid();
@@ -77,13 +78,13 @@
 	$rechte->getBerechtigungen($user);
 
 	if(check_lektor($user))
-       $is_lector=true;
-    else
-    	$is_lector=false;
+		$is_lector=true;
+	else
+		$is_lector=false;
 
 	$upload_root = DOC_ROOT.'/documents';//"../../../documents";
 	$link_cut = DOC_ROOT.'/documents';
-	
+
 	if(isset($subdir))
 	{
 		if(substr_count($subdir, '..') > 0 || substr_count($subdir, '.') > 0)
@@ -526,7 +527,7 @@
 
 					   if(!isset($short_short) || !$short_short)
 					   {
-					   		$row_lesson = $db->db_fetch_object($result_lector_dispatch, 0);
+								$row_lesson = $db->db_fetch_object($result_lector_dispatch, 0);
 
 							$short_short = $row_lesson->kuerzel;
 					   }
@@ -540,7 +541,7 @@
 				}
 				else
 				{
-					$sql_query = "SELECT DISTINCT tbl_lehrveranstaltung.bezeichnung, lehreverzeichnis, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_prestudent, lehre.tbl_lehrveranstaltung, public.tbl_studiengang WHERE lehreverzeichnis=".$db->db_add_param($short)." AND tbl_prestudent.studiengang_kz=".$db->db_add_param($course_id)." AND tbl_student.semester=".$db->db_add_param($term_id)." AND  tbl_prestudent.uid=".$db->db_add_param($user)." AND tbl_studiengang.studiengang_kz=tbl_prestudent.studiengang_kz AND tbl_lehrveranstaltung.studiengang_kz=tbl_prestudent.studiengang_kz AND tbl_lehrveranstaltung.semester=tbl_student.semester AND tbl_lehrveranstaltung.lehre=true LIMIT 1";
+					$sql_query = "SELECT DISTINCT tbl_lehrveranstaltung.bezeichnung, lehreverzeichnis, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_prestudent, lehre.tbl_lehrveranstaltung, public.tbl_studiengang, public.tbl_studentlehrverband WHERE lehreverzeichnis=".$db->db_add_param($short)." AND tbl_studentlehrverband.prestudent_id=tbl_prestudent.prestudent_id AND tbl_prestudent.studiengang_kz=".$db->db_add_param($course_id)." AND tbl_studentlehrverband.semester=".$db->db_add_param($term_id)." AND  tbl_prestudent.uid=".$db->db_add_param($user)." AND tbl_studiengang.studiengang_kz=tbl_prestudent.studiengang_kz AND tbl_lehrveranstaltung.studiengang_kz=tbl_prestudent.studiengang_kz AND tbl_lehrveranstaltung.semester=tbl_studentlehrverband.semester AND tbl_lehrveranstaltung.lehre=true LIMIT 1";
 
 					if(!$result_path_elements = $db->db_query($sql_query))
 						die('<p align="center"><strong>'.$p->t('upload/benutzerKonnteNichtZugeordnetWerden',array($user)).'</strong>!</p>');
@@ -564,27 +565,27 @@
 							.'</td></tr></table>');
 						}
 					}
-					$row = $db->db_fetch_object($result_path_elements, 0);
+					$row = $db->db_fetch_object($result_path_elements, 0);var_dump($row);//TODO
 					$uploaddir = mb_strtolower($row->kurzbz).'/'.$term_id.'/'.mb_strtolower($row->lehreverzeichnis).'/upload';
 				}
-			  ?>
-			  <tr>
-              <td align="center" colSpan="5" height="36">
-              <center>
-                <table>
-                  <tr>
-                    <td><div align="center"><b><font face="Arial" size="2">
-                        <?php
-						  if($islector)
-						  {
-						  	if(!isset($link_cut))
-						  		$link_cut = '';
-						  	$link_path = mb_substr(mb_substr($upload_root.'/'.$uploaddir, mb_strlen($link_cut)), 0, mb_strlen(mb_substr($upload_root.'/'.$uploaddir, mb_strlen($link_cut))) - mb_strlen('download')).'upload';
-						  }
+				?>
+				<tr>
+					<td align="center" colSpan="5" height="36">
+						<center>
+							<table>
+								<tr>
+									<td><div align="center"><b><font face="Arial" size="2">
+										<?php
+											if($islector)
+											{
+												if(!isset($link_cut))
+													$link_cut = '';
+												$link_path = mb_substr(mb_substr($upload_root.'/'.$uploaddir, mb_strlen($link_cut)), 0, mb_strlen(mb_substr($upload_root.'/'.$uploaddir, mb_strlen($link_cut))) - mb_strlen('download')).'upload';
+											}
 
-						  $numoffile = 5;
+							$numoffile = 5;
 
-						  // Upload von neuen Dateien
+							// Upload von neuen Dateien
 						  if(isset($_POST['upload']) && $_POST['upload'] == "Upload")
 						  {
 						      for($i = 0; $i < $numoffile; $i++)
@@ -1077,7 +1078,7 @@
 										}
 									}
 
-									
+
 									if(isset($_POST["new_dir_name".$dir_count]))
 										$new_dir_name_ = $_POST["new_dir_name".$dir_count];
 
