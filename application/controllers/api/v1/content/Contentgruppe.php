@@ -55,9 +55,9 @@ class Contentgruppe extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['contentgruppe_id']))
+			if(isset($this->post()['gruppe_kurzbz']) && isset($this->post()['content_id']))
 			{
-				$result = $this->ContentgruppeModel->update($this->post()['contentgruppe_id'], $this->post());
+				$result = $this->ContentgruppeModel->update(array($this->post()['gruppe_kurzbz'], $this->post()['content_id']), $this->post());
 			}
 			else
 			{

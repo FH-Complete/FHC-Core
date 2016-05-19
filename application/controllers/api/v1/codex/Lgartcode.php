@@ -33,11 +33,11 @@ class Lgartcode extends APIv1_Controller
 	 */
 	public function getLgartcode()
 	{
-		$lgartcodeID = $this->get('lgartcode_id');
+		$lgartcode = $this->get('lgartcode');
 		
-		if(isset($lgartcodeID))
+		if(isset($lgartcode))
 		{
-			$result = $this->LgartcodeModel->load($lgartcodeID);
+			$result = $this->LgartcodeModel->load($lgartcode);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Lgartcode extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lgartcode_id']))
+			if(isset($this->post()['lgartcode']))
 			{
-				$result = $this->LgartcodeModel->update($this->post()['lgartcode_id'], $this->post());
+				$result = $this->LgartcodeModel->update($this->post()['lgartcode'], $this->post());
 			}
 			else
 			{

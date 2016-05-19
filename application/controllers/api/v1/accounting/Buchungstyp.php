@@ -33,11 +33,11 @@ class Buchungstyp extends APIv1_Controller
 	 */
 	public function getBuchungstyp()
 	{
-		$buchungstypID = $this->get('buchungstyp_id');
+		$buchungstyp_kurzbz = $this->get('buchungstyp_kurzbz');
 		
-		if(isset($buchungstypID))
+		if(isset($buchungstyp_kurzbz))
 		{
-			$result = $this->BuchungstypModel->load($buchungstypID);
+			$result = $this->BuchungstypModel->load($buchungstyp_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Buchungstyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['buchungstyp_id']))
+			if(isset($this->post()['buchungstyp_kurzbz']))
 			{
-				$result = $this->BuchungstypModel->update($this->post()['buchungstyp_id'], $this->post());
+				$result = $this->BuchungstypModel->update($this->post()['buchungstyp_kurzbz'], $this->post());
 			}
 			else
 			{

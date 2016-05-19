@@ -33,11 +33,11 @@ class Benutzer extends APIv1_Controller
 	 */
 	public function getBenutzer()
 	{
-		$benutzerID = $this->get('benutzer_id');
+		$uid = $this->get('uid');
 		
-		if(isset($benutzerID))
+		if(isset($uid))
 		{
-			$result = $this->BenutzerModel->load($benutzerID);
+			$result = $this->BenutzerModel->load($uid);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Benutzer extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['benutzer_id']))
+			if(isset($this->post()['uid']))
 			{
-				$result = $this->BenutzerModel->update($this->post()['benutzer_id'], $this->post());
+				$result = $this->BenutzerModel->update($this->post()['uid'], $this->post());
 			}
 			else
 			{

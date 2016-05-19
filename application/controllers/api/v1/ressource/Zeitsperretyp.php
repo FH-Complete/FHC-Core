@@ -33,11 +33,11 @@ class Zeitsperretyp extends APIv1_Controller
 	 */
 	public function getZeitsperretyp()
 	{
-		$zeitsperretypID = $this->get('zeitsperretyp_id');
+		$zeitsperretyp_kurzbz = $this->get('zeitsperretyp_kurzbz');
 		
-		if(isset($zeitsperretypID))
+		if(isset($zeitsperretyp_kurzbz))
 		{
-			$result = $this->ZeitsperretypModel->load($zeitsperretypID);
+			$result = $this->ZeitsperretypModel->load($zeitsperretyp_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Zeitsperretyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zeitsperretyp_id']))
+			if(isset($this->post()['zeitsperretyp_kurzbz']))
 			{
-				$result = $this->ZeitsperretypModel->update($this->post()['zeitsperretyp_id'], $this->post());
+				$result = $this->ZeitsperretypModel->update($this->post()['zeitsperretyp_kurzbz'], $this->post());
 			}
 			else
 			{

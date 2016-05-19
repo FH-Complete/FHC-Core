@@ -55,9 +55,9 @@ class Ferien extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['ferien_id']))
+			if(isset($this->post()['studiengang_kz']) && isset($this->post()['bezeichnung']))
 			{
-				$result = $this->FerienModel->update($this->post()['ferien_id'], $this->post());
+				$result = $this->FerienModel->update(array($this->post()['ferien_id'], $this->post()['bezeichnung']), $this->post());
 			}
 			else
 			{

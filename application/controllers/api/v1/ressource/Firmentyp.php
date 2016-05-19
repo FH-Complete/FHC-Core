@@ -33,11 +33,11 @@ class Firmentyp extends APIv1_Controller
 	 */
 	public function getFirmentyp()
 	{
-		$firmentypID = $this->get('firmentyp_id');
+		$firmentyp_kurzbz = $this->get('firmentyp_kurzbz');
 		
-		if(isset($firmentypID))
+		if(isset($firmentyp_kurzbz))
 		{
-			$result = $this->FirmentypModel->load($firmentypID);
+			$result = $this->FirmentypModel->load($firmentyp_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Firmentyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['firmentyp_id']))
+			if(isset($this->post()['firmentyp_kurzbz']))
 			{
-				$result = $this->FirmentypModel->update($this->post()['firmentyp_id'], $this->post());
+				$result = $this->FirmentypModel->update($this->post()['firmentyp_kurzbz'], $this->post());
 			}
 			else
 			{

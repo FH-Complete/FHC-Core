@@ -33,11 +33,11 @@ class Berufstaetigkeit extends APIv1_Controller
 	 */
 	public function getBerufstaetigkeit()
 	{
-		$berufstaetigkeitID = $this->get('berufstaetigkeit_id');
+		$berufstaetigkeit_code = $this->get('berufstaetigkeit_code');
 		
-		if(isset($berufstaetigkeitID))
+		if(isset($berufstaetigkeit_code))
 		{
-			$result = $this->BerufstaetigkeitModel->load($berufstaetigkeitID);
+			$result = $this->BerufstaetigkeitModel->load($berufstaetigkeit_code);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Berufstaetigkeit extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['berufstaetigkeit_id']))
+			if(isset($this->post()['berufstaetigkeit_code']))
 			{
-				$result = $this->BerufstaetigkeitModel->update($this->post()['berufstaetigkeit_id'], $this->post());
+				$result = $this->BerufstaetigkeitModel->update($this->post()['berufstaetigkeit_code'], $this->post());
 			}
 			else
 			{

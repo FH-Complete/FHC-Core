@@ -33,11 +33,11 @@ class Note extends APIv1_Controller
 	 */
 	public function getNote()
 	{
-		$noteID = $this->get('note_id');
+		$note = $this->get('note');
 		
-		if(isset($noteID))
+		if(isset($note))
 		{
-			$result = $this->NoteModel->load($noteID);
+			$result = $this->NoteModel->load($note);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Note extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['note_id']))
+			if(isset($this->post()['note']))
 			{
-				$result = $this->NoteModel->update($this->post()['note_id'], $this->post());
+				$result = $this->NoteModel->update($this->post()['note'], $this->post());
 			}
 			else
 			{

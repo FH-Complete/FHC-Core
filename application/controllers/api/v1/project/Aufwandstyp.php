@@ -33,11 +33,11 @@ class Aufwandstyp extends APIv1_Controller
 	 */
 	public function getAufwandstyp()
 	{
-		$aufwandstypID = $this->get('aufwandstyp_id');
+		$aufwandstyp_kurzbz = $this->get('aufwandstyp_kurzbz');
 		
-		if(isset($aufwandstypID))
+		if(isset($aufwandstyp_kurzbz))
 		{
-			$result = $this->AufwandstypModel->load($aufwandstypID);
+			$result = $this->AufwandstypModel->load($aufwandstyp_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Aufwandstyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['aufwandstyp_id']))
+			if(isset($this->post()['aufwandstyp_kurzbz']))
 			{
-				$result = $this->AufwandstypModel->update($this->post()['aufwandstyp_id'], $this->post());
+				$result = $this->AufwandstypModel->update($this->post()['aufwandstyp_kurzbz'], $this->post());
 			}
 			else
 			{

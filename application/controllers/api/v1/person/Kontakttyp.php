@@ -33,11 +33,11 @@ class Kontakttyp extends APIv1_Controller
 	 */
 	public function getKontakttyp()
 	{
-		$kontakttypID = $this->get('kontakttyp_id');
+		$kontakttyp = $this->get('kontakttyp');
 		
-		if(isset($kontakttypID))
+		if(isset($kontakttyp))
 		{
-			$result = $this->KontakttypModel->load($kontakttypID);
+			$result = $this->KontakttypModel->load($kontakttyp);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Kontakttyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['kontakttyp_id']))
+			if(isset($this->post()['kontakttyp']))
 			{
-				$result = $this->KontakttypModel->update($this->post()['kontakttyp_id'], $this->post());
+				$result = $this->KontakttypModel->update($this->post()['kontakttyp'], $this->post());
 			}
 			else
 			{

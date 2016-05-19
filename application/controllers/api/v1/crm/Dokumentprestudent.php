@@ -55,9 +55,9 @@ class Dokumentprestudent extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['dokumentprestudent_id']))
+			if(isset($this->post()['prestudent_id']) && isset($this->post()['dokument_kurzbz']))
 			{
-				$result = $this->DokumentprestudentModel->update($this->post()['dokumentprestudent_id'], $this->post());
+				$result = $this->DokumentprestudentModel->update(array($this->post()['prestudent_id'], $this->post()['dokument_kurzbz']), $this->post());
 			}
 			else
 			{

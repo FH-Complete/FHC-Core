@@ -33,11 +33,11 @@ class Verwendung extends APIv1_Controller
 	 */
 	public function getVerwendung()
 	{
-		$verwendungID = $this->get('verwendung_id');
+		$verwendung_code = $this->get('verwendung_code');
 		
-		if(isset($verwendungID))
+		if(isset($verwendung_code))
 		{
-			$result = $this->VerwendungModel->load($verwendungID);
+			$result = $this->VerwendungModel->load($verwendung_code);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Verwendung extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['verwendung_id']))
+			if(isset($this->post()['verwendung_code']))
 			{
-				$result = $this->VerwendungModel->update($this->post()['verwendung_id'], $this->post());
+				$result = $this->VerwendungModel->update($this->post()['verwendung_code'], $this->post());
 			}
 			else
 			{

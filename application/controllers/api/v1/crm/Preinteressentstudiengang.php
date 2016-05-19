@@ -55,9 +55,9 @@ class Preinteressentstudiengang extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['preinteressentstudiengang_id']))
+			if(isset($this->post()['preinteressent_id']) && isset($this->post()['studiengang_kz']))
 			{
-				$result = $this->PreinteressentstudiengangModel->update($this->post()['preinteressentstudiengang_id'], $this->post());
+				$result = $this->PreinteressentstudiengangModel->update(array($this->post()['preinteressent_id'], $this->post()['studiengang_kz']), $this->post());
 			}
 			else
 			{

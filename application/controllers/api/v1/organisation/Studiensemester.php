@@ -33,11 +33,11 @@ class Studiensemester extends APIv1_Controller
 	 */
 	public function getStudiensemester()
 	{
-		$studiensemesterID = $this->get('studiensemester_id');
+		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
 		
-		if(isset($studiensemesterID))
+		if(isset($studiensemester_kurzbz))
 		{
-			$result = $this->StudiensemesterModel->load($studiensemesterID);
+			$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Studiensemester extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studiensemester_id']))
+			if(isset($this->post()['studiensemester_kurzbz']))
 			{
-				$result = $this->StudiensemesterModel->update($this->post()['studiensemester_id'], $this->post());
+				$result = $this->StudiensemesterModel->update($this->post()['studiensemester_kurzbz'], $this->post());
 			}
 			else
 			{

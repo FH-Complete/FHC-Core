@@ -57,9 +57,16 @@ class Lehrverband extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lehrverband_id']))
+			if(isset($this->post()['gruppe']) && isset($this->post()['verband']) &&
+				isset($this->post()['semester']) && isset($this->post()['studiengang_kz']))
 			{
-				$result = $this->LehrverbandModel->update($this->post()['lehrverband_id'], $this->post());
+				$pksArray = array($this->post()['gruppe'],
+									$this->post()['verband'],
+									$this->post()['semester'],
+									$this->post()['studiengang_kz']
+								);
+				
+				$result = $this->LehrverbandModel->update($pksArray, $this->post());
 			}
 			else
 			{

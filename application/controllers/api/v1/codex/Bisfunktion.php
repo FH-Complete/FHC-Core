@@ -55,9 +55,9 @@ class Bisfunktion extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['bisfunktion_id']))
+			if(isset($this->post()['studiengang_kz']) && isset($this->post()['bisverwendung_id']))
 			{
-				$result = $this->BisfunktionModel->update($this->post()['bisfunktion_id'], $this->post());
+				$result = $this->BisfunktionModel->update(array($this->post()['studiengang_kz'], $this->post()['bisverwendung_id']), $this->post());
 			}
 			else
 			{

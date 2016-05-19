@@ -33,11 +33,11 @@ class Dokument extends APIv1_Controller
 	 */
 	public function getDokument()
 	{
-		$dokumentID = $this->get('dokument_id');
+		$dokument_kurzbz = $this->get('dokument_kurzbz');
 		
-		if(isset($dokumentID))
+		if(isset($dokument_kurzbz))
 		{
-			$result = $this->DokumentModel->load($dokumentID);
+			$result = $this->DokumentModel->load($dokument_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Dokument extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['dokument_id']))
+			if(isset($this->post()['dokument_kurzbz']))
 			{
-				$result = $this->DokumentModel->update($this->post()['dokument_id'], $this->post());
+				$result = $this->DokumentModel->update($this->post()['dokument_kurzbz'], $this->post());
 			}
 			else
 			{

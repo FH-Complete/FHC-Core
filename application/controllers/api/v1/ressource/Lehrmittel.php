@@ -33,11 +33,11 @@ class Lehrmittel extends APIv1_Controller
 	 */
 	public function getLehrmittel()
 	{
-		$lehrmittelID = $this->get('lehrmittel_id');
+		$lehrmittel_kurzbz = $this->get('lehrmittel_kurzbz');
 		
-		if(isset($lehrmittelID))
+		if(isset($lehrmittel_kurzbz))
 		{
-			$result = $this->LehrmittelModel->load($lehrmittelID);
+			$result = $this->LehrmittelModel->load($lehrmittel_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Lehrmittel extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lehrmittel_id']))
+			if(isset($this->post()['lehrmittel_kurzbz']))
 			{
-				$result = $this->LehrmittelModel->update($this->post()['lehrmittel_id'], $this->post());
+				$result = $this->LehrmittelModel->update($this->post()['lehrmittel_kurzbz'], $this->post());
 			}
 			else
 			{

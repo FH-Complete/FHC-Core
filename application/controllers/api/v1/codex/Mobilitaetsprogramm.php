@@ -33,11 +33,11 @@ class Mobilitaetsprogramm extends APIv1_Controller
 	 */
 	public function getMobilitaetsprogramm()
 	{
-		$mobilitaetsprogrammID = $this->get('mobilitaetsprogramm_id');
+		$mobilitaetsprogramm_code = $this->get('mobilitaetsprogramm_code');
 		
-		if(isset($mobilitaetsprogrammID))
+		if(isset($mobilitaetsprogramm_code))
 		{
-			$result = $this->MobilitaetsprogrammModel->load($mobilitaetsprogrammID);
+			$result = $this->MobilitaetsprogrammModel->load($mobilitaetsprogramm_code);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Mobilitaetsprogramm extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['mobilitaetsprogramm_id']))
+			if(isset($this->post()['mobilitaetsprogramm_code']))
 			{
-				$result = $this->MobilitaetsprogrammModel->update($this->post()['mobilitaetsprogramm_id'], $this->post());
+				$result = $this->MobilitaetsprogrammModel->update($this->post()['mobilitaetsprogramm_code'], $this->post());
 			}
 			else
 			{

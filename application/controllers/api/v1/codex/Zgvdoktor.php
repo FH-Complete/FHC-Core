@@ -33,11 +33,11 @@ class Zgvdoktor extends APIv1_Controller
 	 */
 	public function getZgvdoktor()
 	{
-		$zgvdoktorID = $this->get('zgvdoktor_id');
+		$zgvdoktor_code = $this->get('zgvdoktor_code');
 		
-		if(isset($zgvdoktorID))
+		if(isset($zgvdoktor_code))
 		{
-			$result = $this->ZgvdoktorModel->load($zgvdoktorID);
+			$result = $this->ZgvdoktorModel->load($zgvdoktor_code);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Zgvdoktor extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zgvdoktor_id']))
+			if(isset($this->post()['zgvdoktor_code']))
 			{
-				$result = $this->ZgvdoktorModel->update($this->post()['zgvdoktor_id'], $this->post());
+				$result = $this->ZgvdoktorModel->update($this->post()['zgvdoktor_code'], $this->post());
 			}
 			else
 			{

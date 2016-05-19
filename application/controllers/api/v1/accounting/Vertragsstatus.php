@@ -33,11 +33,11 @@ class Vertragsstatus extends APIv1_Controller
 	 */
 	public function getVertragsstatus()
 	{
-		$vertragsstatusID = $this->get('vertragsstatus_id');
+		$vertragsstatus_kurzbz = $this->get('vertragsstatus_kurzbz');
 		
-		if(isset($vertragsstatusID))
+		if(isset($vertragsstatus_kurzbz))
 		{
-			$result = $this->VertragsstatusModel->load($vertragsstatusID);
+			$result = $this->VertragsstatusModel->load($vertragsstatus_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Vertragsstatus extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['vertragsstatus_id']))
+			if(isset($this->post()['vertragsstatus_kurzbz']))
 			{
-				$result = $this->VertragsstatusModel->update($this->post()['vertragsstatus_id'], $this->post());
+				$result = $this->VertragsstatusModel->update($this->post()['vertragsstatus_kurzbz'], $this->post());
 			}
 			else
 			{

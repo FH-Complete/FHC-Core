@@ -33,11 +33,11 @@ class Stunde extends APIv1_Controller
 	 */
 	public function getStunde()
 	{
-		$stundeID = $this->get('stunde_id');
+		$stunde = $this->get('stunde');
 		
-		if(isset($stundeID))
+		if(isset($stunde))
 		{
-			$result = $this->StundeModel->load($stundeID);
+			$result = $this->StundeModel->load($stunde);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Stunde extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['stunde_id']))
+			if(isset($this->post()['stunde']))
 			{
-				$result = $this->StundeModel->update($this->post()['stunde_id'], $this->post());
+				$result = $this->StundeModel->update($this->post()['stunde'], $this->post());
 			}
 			else
 			{

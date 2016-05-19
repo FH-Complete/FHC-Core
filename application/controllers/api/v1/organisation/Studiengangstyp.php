@@ -33,11 +33,11 @@ class Studiengangstyp extends APIv1_Controller
 	 */
 	public function getStudiengangstyp()
 	{
-		$studiengangstypID = $this->get('studiengangstyp_id');
+		$typ = $this->get('typ');
 		
-		if(isset($studiengangstypID))
+		if(isset($typ))
 		{
-			$result = $this->StudiengangstypModel->load($studiengangstypID);
+			$result = $this->StudiengangstypModel->load($typ);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Studiengangstyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studiengangstyp_id']))
+			if(isset($this->post()['typ']))
 			{
-				$result = $this->StudiengangstypModel->update($this->post()['studiengangstyp_id'], $this->post());
+				$result = $this->StudiengangstypModel->update($this->post()['typ'], $this->post());
 			}
 			else
 			{

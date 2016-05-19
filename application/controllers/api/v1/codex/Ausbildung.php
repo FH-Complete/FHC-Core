@@ -33,11 +33,11 @@ class Ausbildung extends APIv1_Controller
 	 */
 	public function getAusbildung()
 	{
-		$ausbildungID = $this->get('ausbildung_id');
+		$ausbildungcode = $this->get('ausbildungcode');
 		
-		if(isset($ausbildungID))
+		if(isset($ausbildungcode))
 		{
-			$result = $this->AusbildungModel->load($ausbildungID);
+			$result = $this->AusbildungModel->load($ausbildungcode);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Ausbildung extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['ausbildung_id']))
+			if(isset($this->post()['ausbildungcode']))
 			{
-				$result = $this->AusbildungModel->update($this->post()['ausbildung_id'], $this->post());
+				$result = $this->AusbildungModel->update($this->post()['ausbildungcode'], $this->post());
 			}
 			else
 			{

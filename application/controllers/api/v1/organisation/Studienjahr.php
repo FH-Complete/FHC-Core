@@ -33,11 +33,11 @@ class Studienjahr extends APIv1_Controller
 	 */
 	public function getStudienjahr()
 	{
-		$studienjahrID = $this->get('studienjahr_id');
+		$studienjahr_kurzbz = $this->get('studienjahr_kurzbz');
 		
-		if(isset($studienjahrID))
+		if(isset($studienjahr_kurzbz))
 		{
-			$result = $this->StudienjahrModel->load($studienjahrID);
+			$result = $this->StudienjahrModel->load($studienjahr_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Studienjahr extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studienjahr_id']))
+			if(isset($this->post()['studienjahr_kurzbz']))
 			{
-				$result = $this->StudienjahrModel->update($this->post()['studienjahr_id'], $this->post());
+				$result = $this->StudienjahrModel->update($this->post()['studienjahr_kurzbz'], $this->post());
 			}
 			else
 			{

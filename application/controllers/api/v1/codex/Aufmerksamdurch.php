@@ -33,11 +33,11 @@ class Aufmerksamdurch extends APIv1_Controller
 	 */
 	public function getAufmerksamdurch()
 	{
-		$aufmerksamdurchID = $this->get('aufmerksamdurch_id');
+		$aufmerksamdurch_kurzbz = $this->get('aufmerksamdurch_kurzbz');
 		
-		if(isset($aufmerksamdurchID))
+		if(isset($aufmerksamdurch_kurzbz))
 		{
-			$result = $this->AufmerksamdurchModel->load($aufmerksamdurchID);
+			$result = $this->AufmerksamdurchModel->load($aufmerksamdurch_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Aufmerksamdurch extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['aufmerksamdurch_id']))
+			if(isset($this->post()['aufmerksamdurch_kurzbz']))
 			{
-				$result = $this->AufmerksamdurchModel->update($this->post()['aufmerksamdurch_id'], $this->post());
+				$result = $this->AufmerksamdurchModel->update($this->post()['aufmerksamdurch_kurzbz'], $this->post());
 			}
 			else
 			{

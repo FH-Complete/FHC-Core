@@ -33,11 +33,11 @@ class Betriebsmitteltyp extends APIv1_Controller
 	 */
 	public function getBetriebsmitteltyp()
 	{
-		$betriebsmitteltypID = $this->get('betriebsmitteltyp_id');
+		$betriebsmitteltyp = $this->get('betriebsmitteltyp');
 		
-		if(isset($betriebsmitteltypID))
+		if(isset($betriebsmitteltyp))
 		{
-			$result = $this->BetriebsmitteltypModel->load($betriebsmitteltypID);
+			$result = $this->BetriebsmitteltypModel->load($betriebsmitteltyp);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Betriebsmitteltyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['betriebsmitteltyp_id']))
+			if(isset($this->post()['betriebsmitteltyp']))
 			{
-				$result = $this->BetriebsmitteltypModel->update($this->post()['betriebsmitteltyp_id'], $this->post());
+				$result = $this->BetriebsmitteltypModel->update($this->post()['betriebsmitteltyp'], $this->post());
 			}
 			else
 			{

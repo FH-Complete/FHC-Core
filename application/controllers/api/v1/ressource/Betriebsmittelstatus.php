@@ -33,11 +33,11 @@ class Betriebsmittelstatus extends APIv1_Controller
 	 */
 	public function getBetriebsmittelstatus()
 	{
-		$betriebsmittelstatusID = $this->get('betriebsmittelstatus_id');
+		$betriebsmittelstatus_kurzbz = $this->get('betriebsmittelstatus_kurzbz');
 		
-		if(isset($betriebsmittelstatusID))
+		if(isset($betriebsmittelstatus_kurzbz))
 		{
-			$result = $this->BetriebsmittelstatusModel->load($betriebsmittelstatusID);
+			$result = $this->BetriebsmittelstatusModel->load($betriebsmittelstatus_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Betriebsmittelstatus extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['betriebsmittelstatus_id']))
+			if(isset($this->post()['betriebsmittelstatus_kurzbz']))
 			{
-				$result = $this->BetriebsmittelstatusModel->update($this->post()['betriebsmittelstatus_id'], $this->post());
+				$result = $this->BetriebsmittelstatusModel->update($this->post()['betriebsmittelstatus_kurzbz'], $this->post());
 			}
 			else
 			{

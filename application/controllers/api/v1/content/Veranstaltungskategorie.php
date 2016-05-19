@@ -33,11 +33,11 @@ class Veranstaltungskategorie extends APIv1_Controller
 	 */
 	public function getVeranstaltungskategorie()
 	{
-		$veranstaltungskategorieID = $this->get('veranstaltungskategorie_id');
+		$veranstaltungskategorie_kurzbz = $this->get('veranstaltungskategorie_kurzbz');
 		
-		if(isset($veranstaltungskategorieID))
+		if(isset($veranstaltungskategorie_kurzbz))
 		{
-			$result = $this->VeranstaltungskategorieModel->load($veranstaltungskategorieID);
+			$result = $this->VeranstaltungskategorieModel->load($veranstaltungskategorie_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Veranstaltungskategorie extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['veranstaltungskategorie_id']))
+			if(isset($this->post()['veranstaltungskategorie_kurzbz']))
 			{
-				$result = $this->VeranstaltungskategorieModel->update($this->post()['veranstaltungskategorie_id'], $this->post());
+				$result = $this->VeranstaltungskategorieModel->update($this->post()['veranstaltungskategorie_kurzbz'], $this->post());
 			}
 			else
 			{

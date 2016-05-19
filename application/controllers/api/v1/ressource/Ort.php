@@ -33,11 +33,11 @@ class Ort extends APIv1_Controller
 	 */
 	public function getOrt()
 	{
-		$ortID = $this->get('ort_id');
+		$ort_kurzbz = $this->get('ort_kurzbz');
 		
-		if(isset($ortID))
+		if(isset($ort_kurzbz))
 		{
-			$result = $this->OrtModel->load($ortID);
+			$result = $this->OrtModel->load($ort_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Ort extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['ort_id']))
+			if(isset($this->post()['ort_kurzbz']))
 			{
-				$result = $this->OrtModel->update($this->post()['ort_id'], $this->post());
+				$result = $this->OrtModel->update($this->post()['ort_kurzbz'], $this->post());
 			}
 			else
 			{

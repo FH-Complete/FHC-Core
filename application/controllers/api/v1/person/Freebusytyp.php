@@ -33,11 +33,11 @@ class Freebusytyp extends APIv1_Controller
 	 */
 	public function getFreebusytyp()
 	{
-		$freebusytypID = $this->get('freebusytyp_id');
+		$freebusytyp_kurzbz = $this->get('freebusytyp_kurzbz');
 		
-		if(isset($freebusytypID))
+		if(isset($freebusytyp_kurzbz))
 		{
-			$result = $this->FreebusytypModel->load($freebusytypID);
+			$result = $this->FreebusytypModel->load($freebusytyp_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Freebusytyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['freebusytyp_id']))
+			if(isset($this->post()['freebusytyp_kurzbz']))
 			{
-				$result = $this->FreebusytypModel->update($this->post()['freebusytyp_id'], $this->post());
+				$result = $this->FreebusytypModel->update($this->post()['freebusytyp_kurzbz'], $this->post());
 			}
 			else
 			{

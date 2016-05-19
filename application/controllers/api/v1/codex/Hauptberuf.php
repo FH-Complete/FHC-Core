@@ -33,11 +33,11 @@ class Hauptberuf extends APIv1_Controller
 	 */
 	public function getHauptberuf()
 	{
-		$hauptberufID = $this->get('hauptberuf_id');
+		$hauptberufcode = $this->get('hauptberufcode');
 		
-		if(isset($hauptberufID))
+		if(isset($hauptberufcode))
 		{
-			$result = $this->HauptberufModel->load($hauptberufID);
+			$result = $this->HauptberufModel->load($hauptberufcode);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Hauptberuf extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['hauptberuf_id']))
+			if(isset($this->post()['hauptberufcode']))
 			{
-				$result = $this->HauptberufModel->update($this->post()['hauptberuf_id'], $this->post());
+				$result = $this->HauptberufModel->update($this->post()['hauptberufcode'], $this->post());
 			}
 			else
 			{

@@ -33,11 +33,11 @@ class Berechtigung extends APIv1_Controller
 	 */
 	public function getBerechtigung()
 	{
-		$berechtigungID = $this->get('berechtigung_id');
+		$berechtigung_kurzbz = $this->get('berechtigung_kurzbz');
 		
-		if(isset($berechtigungID))
+		if(isset($berechtigung_kurzbz))
 		{
-			$result = $this->BerechtigungModel->load($berechtigungID);
+			$result = $this->BerechtigungModel->load($berechtigung_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Berechtigung extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['berechtigung_id']))
+			if(isset($this->post()['berechtigung_kurzbz']))
 			{
-				$result = $this->BerechtigungModel->update($this->post()['berechtigung_id'], $this->post());
+				$result = $this->BerechtigungModel->update($this->post()['berechtigung_kurzbz'], $this->post());
 			}
 			else
 			{

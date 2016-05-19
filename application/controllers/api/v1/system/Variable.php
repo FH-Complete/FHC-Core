@@ -55,9 +55,9 @@ class Variable extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['variable_id']))
+			if(isset($this->post()['uid']) && isset($this->post()['name']))
 			{
-				$result = $this->VariableModel->update($this->post()['variable_id'], $this->post());
+				$result = $this->VariableModel->update(array($this->post()['uid'], $this->post()['name']), $this->post());
 			}
 			else
 			{

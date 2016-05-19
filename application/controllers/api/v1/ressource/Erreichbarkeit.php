@@ -33,11 +33,11 @@ class Erreichbarkeit extends APIv1_Controller
 	 */
 	public function getErreichbarkeit()
 	{
-		$erreichbarkeitID = $this->get('erreichbarkeit_id');
+		$erreichbarkeit_kurzbz = $this->get('erreichbarkeit_kurzbz');
 		
-		if(isset($erreichbarkeitID))
+		if(isset($erreichbarkeit_kurzbz))
 		{
-			$result = $this->ErreichbarkeitModel->load($erreichbarkeitID);
+			$result = $this->ErreichbarkeitModel->load($erreichbarkeit_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Erreichbarkeit extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['erreichbarkeit_id']))
+			if(isset($this->post()['erreichbarkeit_kurzbz']))
 			{
-				$result = $this->ErreichbarkeitModel->update($this->post()['erreichbarkeit_id'], $this->post());
+				$result = $this->ErreichbarkeitModel->update($this->post()['erreichbarkeit_kurzbz'], $this->post());
 			}
 			else
 			{

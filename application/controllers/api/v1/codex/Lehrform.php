@@ -33,11 +33,11 @@ class Lehrform extends APIv1_Controller
 	 */
 	public function getLehrform()
 	{
-		$lehrformID = $this->get('lehrform_id');
+		$lehrform_kurzbz = $this->get('lehrform_kurzbz');
 		
-		if(isset($lehrformID))
+		if(isset($lehrform_kurzbz))
 		{
-			$result = $this->LehrformModel->load($lehrformID);
+			$result = $this->LehrformModel->load($lehrform_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Lehrform extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lehrform_id']))
+			if(isset($this->post()['lehrform_kurzbz']))
 			{
-				$result = $this->LehrformModel->update($this->post()['lehrform_id'], $this->post());
+				$result = $this->LehrformModel->update($this->post()['lehrform_kurzbz'], $this->post());
 			}
 			else
 			{

@@ -33,11 +33,11 @@ class Aktivitaet extends APIv1_Controller
 	 */
 	public function getAktivitaet()
 	{
-		$aktivitaetID = $this->get('aktivitaet_id');
+		$aktivitaet_kurzbz = $this->get('aktivitaet_kurzbz');
 		
-		if(isset($aktivitaetID))
+		if(isset($aktivitaet_kurzbz))
 		{
-			$result = $this->AktivitaetModel->load($aktivitaetID);
+			$result = $this->AktivitaetModel->load($aktivitaet_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Aktivitaet extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['aktivitaet_id']))
+			if(isset($this->post()['aktivitaet_kurzbz']))
 			{
-				$result = $this->AktivitaetModel->update($this->post()['aktivitaet_id'], $this->post());
+				$result = $this->AktivitaetModel->update($this->post()['aktivitaet_kurzbz'], $this->post());
 			}
 			else
 			{

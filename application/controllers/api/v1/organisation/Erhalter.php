@@ -33,11 +33,11 @@ class Erhalter extends APIv1_Controller
 	 */
 	public function getErhalter()
 	{
-		$erhalterID = $this->get('erhalter_id');
+		$erhalter_kz = $this->get('erhalter_kz');
 		
-		if(isset($erhalterID))
+		if(isset($erhalter_kz))
 		{
-			$result = $this->ErhalterModel->load($erhalterID);
+			$result = $this->ErhalterModel->load($erhalter_kz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Erhalter extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['erhalter_id']))
+			if(isset($this->post()['erhalter_kz']))
 			{
-				$result = $this->ErhalterModel->update($this->post()['erhalter_id'], $this->post());
+				$result = $this->ErhalterModel->update($this->post()['erhalter_kz'], $this->post());
 			}
 			else
 			{

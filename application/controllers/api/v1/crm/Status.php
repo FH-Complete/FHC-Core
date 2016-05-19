@@ -33,11 +33,11 @@ class Status extends APIv1_Controller
 	 */
 	public function getStatus()
 	{
-		$statusID = $this->get('status_id');
+		$status_kurzbz = $this->get('status_kurzbz');
 		
-		if(isset($statusID))
+		if(isset($status_kurzbz))
 		{
-			$result = $this->StatusModel->load($statusID);
+			$result = $this->StatusModel->load($status_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Status extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['status_id']))
+			if(isset($this->post()['status_kurzbz']))
 			{
-				$result = $this->StatusModel->update($this->post()['status_id'], $this->post());
+				$result = $this->StatusModel->update($this->post()['status_kurzbz'], $this->post());
 			}
 			else
 			{

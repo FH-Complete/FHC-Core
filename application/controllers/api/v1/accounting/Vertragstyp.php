@@ -33,11 +33,11 @@ class Vertragstyp extends APIv1_Controller
 	 */
 	public function getVertragstyp()
 	{
-		$vertragstypID = $this->get('vertragstyp_id');
+		$vertragstyp_kurzbz = $this->get('vertragstyp_kurzbz');
 		
-		if(isset($vertragstypID))
+		if(isset($vertragstyp_kurzbz))
 		{
-			$result = $this->VertragstypModel->load($vertragstypID);
+			$result = $this->VertragstypModel->load($vertragstyp_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Vertragstyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['vertragstyp_id']))
+			if(isset($this->post()['vertragstyp_kurzbz']))
 			{
-				$result = $this->VertragstypModel->update($this->post()['vertragstyp_id'], $this->post());
+				$result = $this->VertragstypModel->update($this->post()['vertragstyp_kurzbz'], $this->post());
 			}
 			else
 			{

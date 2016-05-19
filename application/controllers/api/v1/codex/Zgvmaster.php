@@ -33,11 +33,11 @@ class Zgvmaster extends APIv1_Controller
 	 */
 	public function getZgvmaster()
 	{
-		$zgvmasterID = $this->get('zgvmaster_id');
+		$zgvmas_code = $this->get('zgvmas_code');
 		
-		if(isset($zgvmasterID))
+		if(isset($zgvmas_code))
 		{
-			$result = $this->ZgvmasterModel->load($zgvmasterID);
+			$result = $this->ZgvmasterModel->load($zgvmas_code);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Zgvmaster extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zgvmaster_id']))
+			if(isset($this->post()['zgvmas_code']))
 			{
-				$result = $this->ZgvmasterModel->update($this->post()['zgvmaster_id'], $this->post());
+				$result = $this->ZgvmasterModel->update($this->post()['zgvmas_code'], $this->post());
 			}
 			else
 			{

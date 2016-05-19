@@ -55,9 +55,9 @@ class Firmatag extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['firmatag_id']))
+			if(isset($this->post()['tag']) && isset($this->post()['firma_id']))
 			{
-				$result = $this->FirmatagModel->update($this->post()['firmatag_id'], $this->post());
+				$result = $this->FirmatagModel->update(array($this->post()['tag'], $this->post()['firma_id']), $this->post());
 			}
 			else
 			{

@@ -33,11 +33,11 @@ class Kontaktmedium extends APIv1_Controller
 	 */
 	public function getKontaktmedium()
 	{
-		$kontaktmediumID = $this->get('kontaktmedium_id');
+		$kontaktmedium_kurzbz = $this->get('kontaktmedium_kurzbz');
 		
-		if(isset($kontaktmediumID))
+		if(isset($kontaktmedium_kurzbz))
 		{
-			$result = $this->KontaktmediumModel->load($kontaktmediumID);
+			$result = $this->KontaktmediumModel->load($kontaktmedium_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Kontaktmedium extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['kontaktmedium_id']))
+			if(isset($this->post()['kontaktmedium_kurzbz']))
 			{
-				$result = $this->KontaktmediumModel->update($this->post()['kontaktmedium_id'], $this->post());
+				$result = $this->KontaktmediumModel->update($this->post()['kontaktmedium_kurzbz'], $this->post());
 			}
 			else
 			{

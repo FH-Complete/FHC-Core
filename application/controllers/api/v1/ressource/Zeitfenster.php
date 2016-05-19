@@ -57,9 +57,16 @@ class Zeitfenster extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zeitfenster_id']))
+			if(isset($this->post()['wochentag']) && isset($this->post()['studiengang_kz']) &&
+				isset($this->post()['ort_kurzbz']) && isset($this->post()['stunde']))
 			{
-				$result = $this->ZeitfensterModel->update($this->post()['zeitfenster_id'], $this->post());
+				$pksArray = array($this->post()['wochentag'],
+									$this->post()['studiengang_kz'],
+									$this->post()['ort_kurzbz'],
+									$this->post()['stunde']
+								);
+				
+				$result = $this->ZeitfensterModel->update($pksArray, $this->post());
 			}
 			else
 			{

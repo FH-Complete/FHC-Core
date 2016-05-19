@@ -55,9 +55,9 @@ class Ortraumtyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['ortraumtyp_id']))
+			if(isset($this->post()['hierarchie']) && isset($this->post()['ort_kurzbz']))
 			{
-				$result = $this->OrtraumtypModel->update($this->post()['ortraumtyp_id'], $this->post());
+				$result = $this->OrtraumtypModel->update(array($this->post()['hierarchie'], $this->post()['ort_kurzbz']), $this->post());
 			}
 			else
 			{

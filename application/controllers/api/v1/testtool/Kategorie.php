@@ -33,11 +33,11 @@ class Kategorie extends APIv1_Controller
 	 */
 	public function getKategorie()
 	{
-		$kategorieID = $this->get('kategorie_id');
+		$kategorie_kurzbz = $this->get('kategorie_kurzbz');
 		
-		if(isset($kategorieID))
+		if(isset($kategorie_kurzbz))
 		{
-			$result = $this->KategorieModel->load($kategorieID);
+			$result = $this->KategorieModel->load($kategorie_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Kategorie extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['kategorie_id']))
+			if(isset($this->post()['kategorie_kurzbz']))
 			{
-				$result = $this->KategorieModel->update($this->post()['kategorie_id'], $this->post());
+				$result = $this->KategorieModel->update($this->post()['kategorie_kurzbz'], $this->post());
 			}
 			else
 			{

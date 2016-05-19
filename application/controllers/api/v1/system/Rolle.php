@@ -33,11 +33,11 @@ class Rolle extends APIv1_Controller
 	 */
 	public function getRolle()
 	{
-		$rolleID = $this->get('rolle_id');
+		$rolle_kurzbz = $this->get('rolle_kurzbz');
 		
-		if(isset($rolleID))
+		if(isset($rolle_kurzbz))
 		{
-			$result = $this->RolleModel->load($rolleID);
+			$result = $this->RolleModel->load($rolle_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Rolle extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['rolle_id']))
+			if(isset($this->post()['rolle_kurzbz']))
 			{
-				$result = $this->RolleModel->update($this->post()['rolle_id'], $this->post());
+				$result = $this->RolleModel->update($this->post()['rolle_kurzbz'], $this->post());
 			}
 			else
 			{
