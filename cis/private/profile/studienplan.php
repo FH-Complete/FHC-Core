@@ -469,23 +469,43 @@ function drawTree($tree, $depth)
 		//check if compatible course has grade
 		elseif(count($kompatibleLVs) > 0)
 		{
-		    foreach($kompatibleLVs as $komp)
-		    {
-			if(isset($noten_arr[$komp]))
-			{
-			    $positiv=false;
-			    foreach($noten_arr[$komp] as $note)
-			    {
-				    if($note_pruef_arr[$note]->positiv)
-					    $positiv=true;
-			    }
-
-			    if($positiv)
-				    echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
-			    else
-				    echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
-			}
-		    }
+                    $positiv = false;                 
+                    $found = false;
+                    $i = 0;
+                    while(!$found && $i < count($kompatibleLVs))
+                    {
+                        for($i; $i < (count($kompatibleLVs)); $i++)
+                        {
+                            if(isset($noten_arr[$kompatibleLVs[$i]]))
+                            {
+                                $positiv=false;
+                                foreach($noten_arr[$kompatibleLVs[$i]] as $note)
+                                {
+                                    if($note_pruef_arr[$note]->positiv)
+                                        $positiv=true;
+                                }
+                                
+                                $found = true;
+                            }
+                        }
+                        $i++;
+                    }
+                    if($found)
+                    {
+                        if($positiv)
+                        echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
+                        else
+                            echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
+                    }
+                    elseif(!$found)
+                    {
+                        if($abgeschlossen)
+                            echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
+			elseif(!$row_tree->stpllv_pflicht)
+                            echo '<span>'.$p->t('studienplan/optional').'</span>';
+			else
+                            echo '<span>'.$p->t('studienplan/offen').'</span>';
+                    }
 		}
 		else
 		{
