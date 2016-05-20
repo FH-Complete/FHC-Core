@@ -177,6 +177,7 @@ INSERT INTO lehre.tbl_studienplan VALUES (2, 1, 'VZ', 'A', '01234', 6, 'English'
 INSERT INTO lehre.tbl_studienplan VALUES (3, 1, 'VZ', 'A', '01234', 6, 'English', 't', 15, 't', NOW(), 'codeception', NOW(), NULL, NULL, NULL, NULL, NULL);
 INSERT INTO lehre.tbl_studienplan VALUES (4, 1, 'VZ', 'A', '01234', 6, 'English', 't', 15, 't', NOW(), 'codeception', NOW(), NULL, NULL, NULL, NULL, NULL);
 
+-- Permissions
 INSERT INTO tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/archiv', 'Tbl_archiv');
 INSERT INTO tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/ausbildung', 'Tbl_ausbildung');
 INSERT INTO tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/berufstaetigkeit', 'Tbl_berufstaetigkeit');
@@ -395,7 +396,6 @@ INSERT INTO tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/r
 INSERT INTO tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/rechnungstyp', 'Tbl_rechnungstyp');
 INSERT INTO tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/zahlungstyp', 'Tbl_zahlungstyp'); 
 
--- Permissions
 INSERT INTO tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/archiv', 'admin', 'suid');
 INSERT INTO tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/ausbildung', 'admin', 'suid');
 INSERT INTO tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/berufstaetigkeit', 'admin', 'suid');
