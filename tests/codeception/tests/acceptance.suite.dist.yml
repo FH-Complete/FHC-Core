@@ -12,7 +12,7 @@ modules:
         - Db
     config:
         PhpBrowser:
-            url: 'http://admin:1q2w3@localhost/build/'
+            url: 'http://admin:1q2w3@localhost/build/fhcomplete/'
         Db:
             dsn: 'pgsql:host=localhost;port=5432;dbname=fhctest'
             user: 'fhcomplete'
