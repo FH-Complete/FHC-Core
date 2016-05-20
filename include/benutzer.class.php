@@ -83,7 +83,7 @@ class benutzer extends person
 	 * auf Gueltigkeit.
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	protected function validate()
+	public function validate()
 	{
 		if(mb_strlen($this->uid)>32)
 		{
