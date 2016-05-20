@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Bestelldetail extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Bestelldetail extends APIv1_Controller
 	{
 		$bestelldetailID = $this->get('bestelldetail_id');
 		
-		if(isset($bestelldetailID))
+		if (isset($bestelldetailID))
 		{
 			$result = $this->BestelldetailModel->load($bestelldetailID);
 			
@@ -52,9 +52,9 @@ class Bestelldetail extends APIv1_Controller
 	 */
 	public function postBestelldetail()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['bestelldetail_id']))
+			if (isset($this->post()['bestelldetail_id']))
 			{
 				$result = $this->BestelldetailModel->update($this->post()['bestelldetail_id'], $this->post());
 			}

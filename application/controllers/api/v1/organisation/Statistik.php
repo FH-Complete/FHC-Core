@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Statistik extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Statistik extends APIv1_Controller
 	{
 		$statistik_kurzbz = $this->get('statistik_kurzbz');
 		
-		if(isset($statistik_kurzbz))
+		if (isset($statistik_kurzbz))
 		{
 			$result = $this->StatistikModel->load($statistik_kurzbz);
 			
@@ -52,9 +52,9 @@ class Statistik extends APIv1_Controller
 	 */
 	public function postStatistik()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['statistik_kurzbz']))
+			if (isset($this->post()['statistik_kurzbz']))
 			{
 				$result = $this->StatistikModel->update($this->post()['statistik_kurzbz'], $this->post());
 			}

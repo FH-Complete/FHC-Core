@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Webservicelog extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Webservicelog extends APIv1_Controller
 	{
 		$webservicelogID = $this->get('webservicelog_id');
 		
-		if(isset($webservicelogID))
+		if (isset($webservicelogID))
 		{
 			$result = $this->WebservicelogModel->load($webservicelogID);
 			
@@ -52,9 +52,9 @@ class Webservicelog extends APIv1_Controller
 	 */
 	public function postWebservicelog()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['webservicelog_id']))
+			if (isset($this->post()['webservicelog_id']))
 			{
 				$result = $this->WebservicelogModel->update($this->post()['webservicelog_id'], $this->post());
 			}

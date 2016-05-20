@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Tag extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Tag extends APIv1_Controller
 	{
 		$tag = $this->get('tag');
 		
-		if(isset($tag))
+		if (isset($tag))
 		{
 			$result = $this->TagModel->load($tag);
 			
@@ -52,9 +52,9 @@ class Tag extends APIv1_Controller
 	 */
 	public function postTag()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['tag']))
+			if (isset($this->post()['tag']))
 			{
 				$result = $this->TagModel->update($this->post()['tag'], $this->post());
 			}

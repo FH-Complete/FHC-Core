@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Filter extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Filter extends APIv1_Controller
 	{
 		$filterID = $this->get('filter_id');
 		
-		if(isset($filterID))
+		if (isset($filterID))
 		{
 			$result = $this->FilterModel->load($filterID);
 			
@@ -52,9 +52,9 @@ class Filter extends APIv1_Controller
 	 */
 	public function postFilter()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['filter_id']))
+			if (isset($this->post()['filter_id']))
 			{
 				$result = $this->FilterModel->update($this->post()['filter_id'], $this->post());
 			}

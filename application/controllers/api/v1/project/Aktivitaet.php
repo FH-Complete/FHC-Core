@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Aktivitaet extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Aktivitaet extends APIv1_Controller
 	{
 		$aktivitaet_kurzbz = $this->get('aktivitaet_kurzbz');
 		
-		if(isset($aktivitaet_kurzbz))
+		if (isset($aktivitaet_kurzbz))
 		{
 			$result = $this->AktivitaetModel->load($aktivitaet_kurzbz);
 			
@@ -52,9 +52,9 @@ class Aktivitaet extends APIv1_Controller
 	 */
 	public function postAktivitaet()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['aktivitaet_kurzbz']))
+			if (isset($this->post()['aktivitaet_kurzbz']))
 			{
 				$result = $this->AktivitaetModel->update($this->post()['aktivitaet_kurzbz'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Benutzerfunktion extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Benutzerfunktion extends APIv1_Controller
 	{
 		$benutzerfunktionID = $this->get('benutzerfunktion_id');
 		
-		if(isset($benutzerfunktionID))
+		if (isset($benutzerfunktionID))
 		{
 			$result = $this->BenutzerfunktionModel->load($benutzerfunktionID);
 			
@@ -52,9 +52,9 @@ class Benutzerfunktion extends APIv1_Controller
 	 */
 	public function postBenutzerfunktion()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['benutzerfunktion_id']))
+			if (isset($this->post()['benutzerfunktion_id']))
 			{
 				$result = $this->BenutzerfunktionModel->update($this->post()['benutzerfunktion_id'], $this->post());
 			}

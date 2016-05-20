@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Kontaktmedium extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Kontaktmedium extends APIv1_Controller
 	{
 		$kontaktmedium_kurzbz = $this->get('kontaktmedium_kurzbz');
 		
-		if(isset($kontaktmedium_kurzbz))
+		if (isset($kontaktmedium_kurzbz))
 		{
 			$result = $this->KontaktmediumModel->load($kontaktmedium_kurzbz);
 			
@@ -52,9 +52,9 @@ class Kontaktmedium extends APIv1_Controller
 	 */
 	public function postKontaktmedium()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['kontaktmedium_kurzbz']))
+			if (isset($this->post()['kontaktmedium_kurzbz']))
 			{
 				$result = $this->KontaktmediumModel->update($this->post()['kontaktmedium_kurzbz'], $this->post());
 			}

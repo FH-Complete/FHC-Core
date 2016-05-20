@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Kriterien extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Kriterien extends APIv1_Controller
 	{
 		$kriterienID = $this->get('kriterien_id');
 		
-		if(isset($kriterienID))
+		if (isset($kriterienID))
 		{
 			$result = $this->KriterienModel->load($kriterienID);
 			
@@ -52,9 +52,9 @@ class Kriterien extends APIv1_Controller
 	 */
 	public function postKriterien()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['kriterien_id']))
+			if (isset($this->post()['kriterien_id']))
 			{
 				$result = $this->KriterienModel->update($this->post()['kriterien_id'], $this->post());
 			}

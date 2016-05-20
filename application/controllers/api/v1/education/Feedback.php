@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Feedback extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Feedback extends APIv1_Controller
 	{
 		$feedback_id = $this->get('feedback_id');
 		
-		if(isset($feedback_id))
+		if (isset($feedback_id))
 		{
 			$result = $this->FeedbackModel->load($feedback_id);
 			
@@ -52,9 +52,9 @@ class Feedback extends APIv1_Controller
 	 */
 	public function postFeedback()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['feedback_id']))
+			if (isset($this->post()['feedback_id']))
 			{
 				$result = $this->FeedbackModel->update($this->post()['feedback_id'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Paabgabetyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Paabgabetyp extends APIv1_Controller
 	{
 		$paabgabetyp_kurzbz = $this->get('paabgabetyp_kurzbz');
 		
-		if(isset($paabgabetyp_kurzbz))
+		if (isset($paabgabetyp_kurzbz))
 		{
 			$result = $this->PaabgabetypModel->load($paabgabetyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Paabgabetyp extends APIv1_Controller
 	 */
 	public function postPaabgabetyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['paabgabetyp_kurzbz']))
+			if (isset($this->post()['paabgabetyp_kurzbz']))
 			{
 				$result = $this->PaabgabetypModel->update($this->post()['paabgabetyp_kurzbz'], $this->post());
 			}

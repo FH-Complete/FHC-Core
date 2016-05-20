@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Kategorie extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Kategorie extends APIv1_Controller
 	{
 		$kategorie_kurzbz = $this->get('kategorie_kurzbz');
 		
-		if(isset($kategorie_kurzbz))
+		if (isset($kategorie_kurzbz))
 		{
 			$result = $this->KategorieModel->load($kategorie_kurzbz);
 			
@@ -52,9 +52,9 @@ class Kategorie extends APIv1_Controller
 	 */
 	public function postKategorie()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['kategorie_kurzbz']))
+			if (isset($this->post()['kategorie_kurzbz']))
 			{
 				$result = $this->KategorieModel->update($this->post()['kategorie_kurzbz'], $this->post());
 			}

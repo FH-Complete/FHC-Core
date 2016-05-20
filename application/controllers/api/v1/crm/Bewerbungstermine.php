@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Bewerbungstermine extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Bewerbungstermine extends APIv1_Controller
 	{
 		$bewerbungstermineID = $this->get('bewerbungstermine_id');
 		
-		if(isset($bewerbungstermineID))
+		if (isset($bewerbungstermineID))
 		{
 			$result = $this->BewerbungstermineModel->load($bewerbungstermineID);
 			
@@ -52,9 +52,9 @@ class Bewerbungstermine extends APIv1_Controller
 	 */
 	public function postBewerbungstermine()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['bewerbungstermine_id']))
+			if (isset($this->post()['bewerbungstermine_id']))
 			{
 				$result = $this->BewerbungstermineModel->update($this->post()['bewerbungstermine_id'], $this->post());
 			}

@@ -35,7 +35,7 @@ class Person_model extends DB_Model
 		
 		$result = NULL;
 		
-		if(is_null($studiensemester_kurzbz))
+		if (is_null($studiensemester_kurzbz))
 		{
 			$checkBewerbungQuery = "SELECT DISTINCT p.person_id, p.zugangscode, p.insertamum
  									  FROM public.tbl_person p JOIN public.tbl_kontakt k ON p.person_id = k.person_id
@@ -63,7 +63,7 @@ class Person_model extends DB_Model
 			$result = $this->db->query($checkBewerbungQuery, array($email, $email, $email, $studiensemester_kurzbz));
 		}
 		
-		if(is_object($result))
+		if (is_object($result))
 			return $this->_success($result->result());
 		else
 			return $this->_error($this->db->error(), FHC_DB_ERROR);

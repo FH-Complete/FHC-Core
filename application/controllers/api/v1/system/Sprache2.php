@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Sprache2 extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Sprache2 extends APIv1_Controller
 	{
 		$sprache = $this->get('sprache');
 		
-		if(isset($sprache))
+		if (isset($sprache))
 		{
 			$result = $this->SpracheModel->load($sprache);
 			
@@ -52,9 +52,9 @@ class Sprache2 extends APIv1_Controller
 	 */
 	public function postSprache()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['sprache_id']))
+			if (isset($this->post()['sprache_id']))
 			{
 				$result = $this->SpracheModel->update($this->post()['sprache_id'], $this->post());
 			}

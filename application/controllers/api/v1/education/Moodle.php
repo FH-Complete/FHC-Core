@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Moodle extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Moodle extends APIv1_Controller
 	{
 		$moodle_id = $this->get('moodle_id');
 		
-		if(isset($moodle_id))
+		if (isset($moodle_id))
 		{
 			$result = $this->MoodleModel->load($moodle_id);
 			
@@ -52,9 +52,9 @@ class Moodle extends APIv1_Controller
 	 */
 	public function postMoodle()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['moodle_id']))
+			if (isset($this->post()['moodle_id']))
 			{
 				$result = $this->MoodleModel->update($this->post()['moodle_id'], $this->post());
 			}

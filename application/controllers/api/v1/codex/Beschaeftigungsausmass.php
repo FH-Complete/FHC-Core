@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Beschaeftigungsausmass extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Beschaeftigungsausmass extends APIv1_Controller
 	{
 		$beschausmasscode = $this->get('beschausmasscode');
 		
-		if(isset($beschausmasscode))
+		if (isset($beschausmasscode))
 		{
 			$result = $this->BeschaeftigungsausmassModel->load($beschausmasscode);
 			
@@ -52,9 +52,9 @@ class Beschaeftigungsausmass extends APIv1_Controller
 	 */
 	public function postBeschaeftigungsausmass()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['beschausmasscode']))
+			if (isset($this->post()['beschausmasscode']))
 			{
 				$result = $this->BeschaeftigungsausmassModel->update($this->post()['beschausmasscode'], $this->post());
 			}

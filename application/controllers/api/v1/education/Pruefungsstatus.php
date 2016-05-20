@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Pruefungsstatus extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Pruefungsstatus extends APIv1_Controller
 	{
 		$status_kurzbz = $this->get('status_kurzbz');
 		
-		if(isset($status_kurzbz))
+		if (isset($status_kurzbz))
 		{
 			$result = $this->PruefungsstatusModel->load($status_kurzbz);
 			
@@ -52,9 +52,9 @@ class Pruefungsstatus extends APIv1_Controller
 	 */
 	public function postPruefungsstatus()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['status_kurzbz']))
+			if (isset($this->post()['status_kurzbz']))
 			{
 				$result = $this->PruefungsstatusModel->update($this->post()['status_kurzbz'], $this->post());
 			}

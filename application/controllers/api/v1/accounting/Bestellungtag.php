@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Bestellungtag extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Bestellungtag extends APIv1_Controller
 		$bestellung_id = $this->get('bestellung_id');
 		$tag = $this->get('tag');
 		
-		if(isset($bestellung_id) && isset($tag))
+		if (isset($bestellung_id) && isset($tag))
 		{
 			$result = $this->BestellungtagModel->load(array($bestellung_id, $tag));
 			
@@ -53,9 +53,9 @@ class Bestellungtag extends APIv1_Controller
 	 */
 	public function postBestellungtag()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['bestellungtag_id']))
+			if (isset($this->post()['bestellungtag_id']))
 			{
 				$result = $this->BestellungtagModel->update($this->post()['bestellungtag_id'], $this->post());
 			}

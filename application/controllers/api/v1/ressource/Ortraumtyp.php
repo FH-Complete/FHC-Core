@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Ortraumtyp extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Ortraumtyp extends APIv1_Controller
 		$hierarchie = $this->get('hierarchie');
 		$ort_kurzbz = $this->get('ort_kurzbz');
 		
-		if(isset($hierarchie) && isset($ort_kurzbz))
+		if (isset($hierarchie) && isset($ort_kurzbz))
 		{
 			$result = $this->OrtraumtypModel->load(array($hierarchie, $ort_kurzbz));
 			
@@ -53,9 +53,9 @@ class Ortraumtyp extends APIv1_Controller
 	 */
 	public function postOrtraumtyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['hierarchie']) && isset($this->post()['ort_kurzbz']))
+			if (isset($this->post()['hierarchie']) && isset($this->post()['ort_kurzbz']))
 			{
 				$result = $this->OrtraumtypModel->update(array($this->post()['hierarchie'], $this->post()['ort_kurzbz']), $this->post());
 			}

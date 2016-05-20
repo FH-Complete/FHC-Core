@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Abschlussbeurteilung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Abschlussbeurteilung extends APIv1_Controller
 	{
 		$abschlussbeurteilung_kurzbz = $this->get('abschlussbeurteilung_kurzbz');
 		
-		if(isset($abschlussbeurteilung_kurzbz))
+		if (isset($abschlussbeurteilung_kurzbz))
 		{
 			$result = $this->AbschlussbeurteilungModel->load($abschlussbeurteilung_kurzbz);
 			
@@ -52,9 +52,9 @@ class Abschlussbeurteilung extends APIv1_Controller
 	 */
 	public function postAbschlussbeurteilung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['$abschlussbeurteilung_kurzbz']))
+			if (isset($this->post()['$abschlussbeurteilung_kurzbz']))
 			{
 				$result = $this->AbschlussbeurteilungModel->update($this->post()['$abschlussbeurteilung_kurzbz'], $this->post());
 			}

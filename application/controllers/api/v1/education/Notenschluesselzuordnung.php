@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Notenschluesselzuordnung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Notenschluesselzuordnung extends APIv1_Controller
 	{
 		$notenschluesselzuordnung_id = $this->get('notenschluesselzuordnung_id');
 		
-		if(isset($notenschluesselzuordnung_id))
+		if (isset($notenschluesselzuordnung_id))
 		{
 			$result = $this->NotenschluesselzuordnungModel->load($notenschluesselzuordnung_id);
 			
@@ -52,9 +52,9 @@ class Notenschluesselzuordnung extends APIv1_Controller
 	 */
 	public function postNotenschluesselzuordnung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['notenschluesselzuordnung_id']))
+			if (isset($this->post()['notenschluesselzuordnung_id']))
 			{
 				$result = $this->NotenschluesselzuordnungModel->update($this->post()['notenschluesselzuordnung_id'], $this->post());
 			}

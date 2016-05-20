@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Studentuebung extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Studentuebung extends APIv1_Controller
 		$uebung_id = $this->get('uebung_id');
 		$student_uid = $this->get('student_uid');
 		
-		if(isset($uebung_id) && isset($student_uid))
+		if (isset($uebung_id) && isset($student_uid))
 		{
 			$result = $this->StudentuebungModel->load(array($uebung_id, $student_uid));
 			
@@ -53,9 +53,9 @@ class Studentuebung extends APIv1_Controller
 	 */
 	public function postStudentuebung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['uebung_id']) && isset($this->post()['student_uid']))
+			if (isset($this->post()['uebung_id']) && isset($this->post()['student_uid']))
 			{
 				$result = $this->StudentuebungModel->update(array($this->post()['uebung_id'], $this->post()['student_uid']), $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Lehrfach extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Lehrfach extends APIv1_Controller
 	{
 		$lehrfach_id = $this->get('lehrfach_id');
 		
-		if(isset($lehrfach_id))
+		if (isset($lehrfach_id))
 		{
 			$result = $this->LehrfachModel->load($lehrfach_id);
 			
@@ -52,9 +52,9 @@ class Lehrfach extends APIv1_Controller
 	 */
 	public function postLehrfach()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lehrfach_id']))
+			if (isset($this->post()['lehrfach_id']))
 			{
 				$result = $this->LehrfachModel->update($this->post()['lehrfach_id'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Server extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Server extends APIv1_Controller
 	{
 		$server_kurzbz = $this->get('server_kurzbz');
 		
-		if(isset($server_kurzbz))
+		if (isset($server_kurzbz))
 		{
 			$result = $this->ServerModel->load($server_kurzbz);
 			
@@ -52,9 +52,9 @@ class Server extends APIv1_Controller
 	 */
 	public function postServer()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['server_id']))
+			if (isset($this->post()['server_id']))
 			{
 				$result = $this->ServerModel->update($this->post()['server_id'], $this->post());
 			}

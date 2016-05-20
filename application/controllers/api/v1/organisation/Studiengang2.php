@@ -11,7 +11,7 @@
  * @filesource
  */
 // ------------------------------------------------------------------------
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Studiengang2 extends APIv1_Controller
 {
@@ -31,7 +31,7 @@ class Studiengang2 extends APIv1_Controller
 	{
 		$studiengang_kz = $this->get('studiengang_kz');
 		
-		if(isset($studiengang_kz))
+		if (isset($studiengang_kz))
 		{
 			$result = $this->StudiengangModel->load($studiengang_kz);
 			

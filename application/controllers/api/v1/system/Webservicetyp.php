@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Webservicetyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Webservicetyp extends APIv1_Controller
 	{
 		$webservicetyp_kurzbz = $this->get('webservicetyp_kurzbz');
 		
-		if(isset($webservicetyp_kurzbz))
+		if (isset($webservicetyp_kurzbz))
 		{
 			$result = $this->WebservicetypModel->load($webservicetyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Webservicetyp extends APIv1_Controller
 	 */
 	public function postWebservicetyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['webservicetyp_kurzbz']))
+			if (isset($this->post()['webservicetyp_kurzbz']))
 			{
 				$result = $this->WebservicetypModel->update($this->post()['webservicetyp_kurzbz'], $this->post());
 			}

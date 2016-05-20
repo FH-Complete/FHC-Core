@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Gebiet extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Gebiet extends APIv1_Controller
 	{
 		$gebietID = $this->get('gebiet_id');
 		
-		if(isset($gebietID))
+		if (isset($gebietID))
 		{
 			$result = $this->GebietModel->load($gebietID);
 			
@@ -52,9 +52,9 @@ class Gebiet extends APIv1_Controller
 	 */
 	public function postGebiet()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['gebiet_id']))
+			if (isset($this->post()['gebiet_id']))
 			{
 				$result = $this->GebietModel->update($this->post()['gebiet_id'], $this->post());
 			}

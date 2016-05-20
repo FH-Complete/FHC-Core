@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Rechnungstyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Rechnungstyp extends APIv1_Controller
 	{
 		$rechnungstyp_kurzbz = $this->get('rechnungstyp_kurzbz');
 		
-		if(isset($rechnungstyp_kurzbz))
+		if (isset($rechnungstyp_kurzbz))
 		{
 			$result = $this->RechnungstypModel->load($rechnungstyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Rechnungstyp extends APIv1_Controller
 	 */
 	public function postRechnungstyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['rechnungstyp_kurzbz']))
+			if (isset($this->post()['rechnungstyp_kurzbz']))
 			{
 				$result = $this->RechnungstypModel->update($this->post()['rechnungstyp_kurzbz'], $this->post());
 			}

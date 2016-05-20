@@ -10,7 +10,7 @@
  * @since	Version 1.0.0
  * @filesource
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 require_once FCPATH.'include/authentication.class.php';
 require_once FCPATH.'include/AddonAuthentication.php';
 
@@ -38,7 +38,7 @@ class FHC_Auth
 	public function basicAuthentication($username, $password)
 	{
 		$auth = new authentication();
-		if($auth->checkpassword($username, $password))
+		if ($auth->checkpassword($username, $password))
 		{
 			return true;
 		}

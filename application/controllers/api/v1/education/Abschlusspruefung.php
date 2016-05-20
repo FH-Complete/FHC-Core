@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Abschlusspruefung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Abschlusspruefung extends APIv1_Controller
 	{
 		$abschlusspruefung_id = $this->get('abschlusspruefung_id');
 		
-		if(isset($abschlusspruefung_id))
+		if (isset($abschlusspruefung_id))
 		{
 			$result = $this->AbschlusspruefungModel->load($abschlusspruefung_id);
 			
@@ -52,9 +52,9 @@ class Abschlusspruefung extends APIv1_Controller
 	 */
 	public function postAbschlusspruefung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['abschlusspruefung_id']))
+			if (isset($this->post()['abschlusspruefung_id']))
 			{
 				$result = $this->AbschlusspruefungModel->update($this->post()['abschlusspruefung_id'], $this->post());
 			}

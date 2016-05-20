@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Nation extends APIv1_Controller
 {
@@ -30,7 +30,7 @@ class Nation extends APIv1_Controller
 	
 	public function getAll()
 	{
-		if(!$this->get('orderEnglish'))
+		if (!$this->get('orderEnglish'))
 		{
 			$result = $this->NationModel->addOrder('kurztext');
 		}
@@ -39,9 +39,9 @@ class Nation extends APIv1_Controller
 			$result = $this->NationModel->addOrder('engltext');
 		}
 		
-		if($result->error == EXIT_SUCCESS)
+		if ($result->error == EXIT_SUCCESS)
 		{
-			if($this->get('ohnesperre'))
+			if ($this->get('ohnesperre'))
 			{
 				$result = $this->NationModel->loadWhere('sperre IS NULL');
 			}

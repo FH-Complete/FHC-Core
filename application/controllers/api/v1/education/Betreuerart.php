@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Betreuerart extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Betreuerart extends APIv1_Controller
 	{
 		$betreuerart_id = $this->get('betreuerart_kurzbz');
 		
-		if(isset($betreuerart_id))
+		if (isset($betreuerart_id))
 		{
 			$result = $this->BetreuerartModel->load($betreuerart_id);
 			
@@ -52,9 +52,9 @@ class Betreuerart extends APIv1_Controller
 	 */
 	public function postBetreuerart()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['betreuerart_kurzbz']))
+			if (isset($this->post()['betreuerart_kurzbz']))
 			{
 				$result = $this->BetreuerartModel->update($this->post()['betreuerart_kurzbz'], $this->post());
 			}

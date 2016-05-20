@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Rolle extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Rolle extends APIv1_Controller
 	{
 		$rolle_kurzbz = $this->get('rolle_kurzbz');
 		
-		if(isset($rolle_kurzbz))
+		if (isset($rolle_kurzbz))
 		{
 			$result = $this->RolleModel->load($rolle_kurzbz);
 			
@@ -52,9 +52,9 @@ class Rolle extends APIv1_Controller
 	 */
 	public function postRolle()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['rolle_kurzbz']))
+			if (isset($this->post()['rolle_kurzbz']))
 			{
 				$result = $this->RolleModel->update($this->post()['rolle_kurzbz'], $this->post());
 			}

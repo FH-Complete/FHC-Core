@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Raumtyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Raumtyp extends APIv1_Controller
 	{
 		$raumtyp_kurzbz = $this->get('raumtyp_kurzbz');
 		
-		if(isset($raumtyp_kurzbz))
+		if (isset($raumtyp_kurzbz))
 		{
 			$result = $this->RaumtypModel->load($raumtyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Raumtyp extends APIv1_Controller
 	 */
 	public function postRaumtyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['raumtyp_kurzbz']))
+			if (isset($this->post()['raumtyp_kurzbz']))
 			{
 				$result = $this->RaumtypModel->update($this->post()['raumtyp_kurzbz'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Pruefungsfenster extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Pruefungsfenster extends APIv1_Controller
 	{
 		$pruefungsfenster_id = $this->get('pruefungsfenster_id');
 		
-		if(isset($pruefungsfenster_id))
+		if (isset($pruefungsfenster_id))
 		{
 			$result = $this->PruefungsfensterModel->load($pruefungsfenster_id);
 			
@@ -52,9 +52,9 @@ class Pruefungsfenster extends APIv1_Controller
 	 */
 	public function postPruefungsfenster()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['pruefungsfenster_id']))
+			if (isset($this->post()['pruefungsfenster_id']))
 			{
 				$result = $this->PruefungsfensterModel->update($this->post()['pruefungsfenster_id'], $this->post());
 			}

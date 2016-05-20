@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Lvangebot extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Lvangebot extends APIv1_Controller
 	{
 		$lvangebot_id = $this->get('lvangebot_id');
 		
-		if(isset($lvangebot_id))
+		if (isset($lvangebot_id))
 		{
 			$result = $this->LvangebotModel->load($lvangebot_id);
 			
@@ -52,9 +52,9 @@ class Lvangebot extends APIv1_Controller
 	 */
 	public function postLvangebot()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lvangebot_id']))
+			if (isset($this->post()['lvangebot_id']))
 			{
 				$result = $this->LvangebotModel->update($this->post()['lvangebot_id'], $this->post());
 			}

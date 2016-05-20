@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Firmatag extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Firmatag extends APIv1_Controller
 		$tag = $this->get('tag');
 		$firma_id = $this->get('firma_id');
 		
-		if(isset($tag) && isset($firma_id))
+		if (isset($tag) && isset($firma_id))
 		{
 			$result = $this->FirmatagModel->load(array($tag, $firma_id));
 			
@@ -53,9 +53,9 @@ class Firmatag extends APIv1_Controller
 	 */
 	public function postFirmatag()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['tag']) && isset($this->post()['firma_id']))
+			if (isset($this->post()['tag']) && isset($this->post()['firma_id']))
 			{
 				$result = $this->FirmatagModel->update(array($this->post()['tag'], $this->post()['firma_id']), $this->post());
 			}

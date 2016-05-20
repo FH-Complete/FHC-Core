@@ -3,7 +3,7 @@
  * FH-Complete
  *
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 $lang['seed_none_found'] = 'No seeds were found.';
 $lang['seed_not_found'] = 'No seed could be found with the version number: %s.';

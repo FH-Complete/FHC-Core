@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Projektphase extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Projektphase extends APIv1_Controller
 	{
 		$projektphaseID = $this->get('projektphase_id');
 		
-		if(isset($projektphaseID))
+		if (isset($projektphaseID))
 		{
 			$result = $this->ProjektphaseModel->load($projektphaseID);
 			
@@ -52,9 +52,9 @@ class Projektphase extends APIv1_Controller
 	 */
 	public function postProjektphase()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['projektphase_id']))
+			if (isset($this->post()['projektphase_id']))
 			{
 				$result = $this->ProjektphaseModel->update($this->post()['projektphase_id'], $this->post());
 			}

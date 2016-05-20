@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Projekt_ressource extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Projekt_ressource extends APIv1_Controller
 	{
 		$projekt_ressourceID = $this->get('projekt_ressource_id');
 		
-		if(isset($projekt_ressourceID))
+		if (isset($projekt_ressourceID))
 		{
 			$result = $this->Projekt_ressourceModel->load($projekt_ressourceID);
 			
@@ -52,9 +52,9 @@ class Projekt_ressource extends APIv1_Controller
 	 */
 	public function postProjekt_ressource()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['projekt_ressource_id']))
+			if (isset($this->post()['projekt_ressource_id']))
 			{
 				$result = $this->Projekt_ressourceModel->update($this->post()['projekt_ressource_id'], $this->post());
 			}

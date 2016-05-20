@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Pruefungstermin extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Pruefungstermin extends APIv1_Controller
 	{
 		$pruefungstermin_id = $this->get('pruefungstermin_id');
 		
-		if(isset($pruefungstermin_id))
+		if (isset($pruefungstermin_id))
 		{
 			$result = $this->PruefungsterminModel->load($pruefungstermin_id);
 			
@@ -52,9 +52,9 @@ class Pruefungstermin extends APIv1_Controller
 	 */
 	public function postPruefungstermin()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['pruefungstermin_id']))
+			if (isset($this->post()['pruefungstermin_id']))
 			{
 				$result = $this->PruefungsterminModel->update($this->post()['pruefungstermin_id'], $this->post());
 			}

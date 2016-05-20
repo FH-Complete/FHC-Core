@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Contentchild extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Contentchild extends APIv1_Controller
 	{
 		$contentchildID = $this->get('contentchild_id');
 		
-		if(isset($contentchildID))
+		if (isset($contentchildID))
 		{
 			$result = $this->ContentchildModel->load($contentchildID);
 			
@@ -52,9 +52,9 @@ class Contentchild extends APIv1_Controller
 	 */
 	public function postContentchild()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['contentchild_id']))
+			if (isset($this->post()['contentchild_id']))
 			{
 				$result = $this->ContentchildModel->update($this->post()['contentchild_id'], $this->post());
 			}

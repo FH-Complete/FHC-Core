@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Studienplatz extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Studienplatz extends APIv1_Controller
 	{
 		$studienplatzID = $this->get('studienplatz_id');
 		
-		if(isset($studienplatzID))
+		if (isset($studienplatzID))
 		{
 			$result = $this->StudienplatzModel->load($studienplatzID);
 			
@@ -52,9 +52,9 @@ class Studienplatz extends APIv1_Controller
 	 */
 	public function postStudienplatz()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studienplatz_id']))
+			if (isset($this->post()['studienplatz_id']))
 			{
 				$result = $this->StudienplatzModel->update($this->post()['studienplatz_id'], $this->post());
 			}

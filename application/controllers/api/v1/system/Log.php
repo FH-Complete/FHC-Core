@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Log extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Log extends APIv1_Controller
 	{
 		$logID = $this->get('log_id');
 		
-		if(isset($logID))
+		if (isset($logID))
 		{
 			$result = $this->LogModel->load($logID);
 			
@@ -52,9 +52,9 @@ class Log extends APIv1_Controller
 	 */
 	public function postLog()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['log_id']))
+			if (isset($this->post()['log_id']))
 			{
 				$result = $this->LogModel->update($this->post()['log_id'], $this->post());
 			}

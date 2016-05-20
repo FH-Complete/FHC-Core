@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Stundenplandev extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Stundenplandev extends APIv1_Controller
 	{
 		$stundenplandevID = $this->get('stundenplandev_id');
 		
-		if(isset($stundenplandevID))
+		if (isset($stundenplandevID))
 		{
 			$result = $this->StundenplandevModel->load($stundenplandevID);
 			
@@ -52,9 +52,9 @@ class Stundenplandev extends APIv1_Controller
 	 */
 	public function postStundenplandev()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['stundenplandev_id']))
+			if (isset($this->post()['stundenplandev_id']))
 			{
 				$result = $this->StundenplandevModel->update($this->post()['stundenplandev_id'], $this->post());
 			}

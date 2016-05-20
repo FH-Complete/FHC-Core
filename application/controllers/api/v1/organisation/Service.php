@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Service extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Service extends APIv1_Controller
 	{
 		$serviceID = $this->get('service_id');
 		
-		if(isset($serviceID))
+		if (isset($serviceID))
 		{
 			$result = $this->ServiceModel->load($serviceID);
 			
@@ -52,9 +52,9 @@ class Service extends APIv1_Controller
 	 */
 	public function postService()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['service_id']))
+			if (isset($this->post()['service_id']))
 			{
 				$result = $this->ServiceModel->update($this->post()['service_id'], $this->post());
 			}

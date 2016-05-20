@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Buchungstyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Buchungstyp extends APIv1_Controller
 	{
 		$buchungstyp_kurzbz = $this->get('buchungstyp_kurzbz');
 		
-		if(isset($buchungstyp_kurzbz))
+		if (isset($buchungstyp_kurzbz))
 		{
 			$result = $this->BuchungstypModel->load($buchungstyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Buchungstyp extends APIv1_Controller
 	 */
 	public function postBuchungstyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['buchungstyp_kurzbz']))
+			if (isset($this->post()['buchungstyp_kurzbz']))
 			{
 				$result = $this->BuchungstypModel->update($this->post()['buchungstyp_kurzbz'], $this->post());
 			}

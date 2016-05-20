@@ -30,7 +30,7 @@
   echo $this->load->view('rdf/html_tag_helpers');
 
 
-  if(isset($_REQUEST['uri'])): ?>
+  if (isset($_REQUEST['uri'])): ?>
 
 
 
@@ -92,7 +92,7 @@
 
 
     <tr>
-      <?php if($friend->isBNode()): ?>
+      <?php if ($friend->isBNode()): ?>
           <td><?= $label ?></td>
     <?php else: ?>
 

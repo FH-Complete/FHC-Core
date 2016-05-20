@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Benutzergruppe extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Benutzergruppe extends APIv1_Controller
 		$gruppe_kurzbz = $this->get('gruppe_kurzbz');
 		$uid = $this->get('uid');
 		
-		if(isset($gruppe_kurzbz) && isset($uid))
+		if (isset($gruppe_kurzbz) && isset($uid))
 		{
 			$result = $this->BenutzergruppeModel->load(array($gruppe_kurzbz, $uid));
 			
@@ -53,9 +53,9 @@ class Benutzergruppe extends APIv1_Controller
 	 */
 	public function postBenutzergruppe()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['benutzergruppe_id']))
+			if (isset($this->post()['benutzergruppe_id']))
 			{
 				$result = $this->BenutzergruppeModel->update($this->post()['benutzergruppe_id'], $this->post());
 			}

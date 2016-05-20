@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Pruefungstyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Pruefungstyp extends APIv1_Controller
 	{
 		$pruefungstyp_kurzbz = $this->get('pruefungstyp_kurzbz');
 		
-		if(isset($pruefungstyp_kurzbz))
+		if (isset($pruefungstyp_kurzbz))
 		{
 			$result = $this->PruefungstypModel->load($pruefungstyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Pruefungstyp extends APIv1_Controller
 	 */
 	public function postPruefungstyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['pruefungstyp_kurzbz']))
+			if (isset($this->post()['pruefungstyp_kurzbz']))
 			{
 				$result = $this->PruefungstypModel->update($this->post()['pruefungstyp_kurzbz'], $this->post());
 			}

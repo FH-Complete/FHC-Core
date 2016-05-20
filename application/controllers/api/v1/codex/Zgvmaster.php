@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Zgvmaster extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Zgvmaster extends APIv1_Controller
 	{
 		$zgvmas_code = $this->get('zgvmas_code');
 		
-		if(isset($zgvmas_code))
+		if (isset($zgvmas_code))
 		{
 			$result = $this->ZgvmasterModel->load($zgvmas_code);
 			
@@ -52,9 +52,9 @@ class Zgvmaster extends APIv1_Controller
 	 */
 	public function postZgvmaster()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zgvmas_code']))
+			if (isset($this->post()['zgvmas_code']))
 			{
 				$result = $this->ZgvmasterModel->update($this->post()['zgvmas_code'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Betriebsmittelstatus extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Betriebsmittelstatus extends APIv1_Controller
 	{
 		$betriebsmittelstatus_kurzbz = $this->get('betriebsmittelstatus_kurzbz');
 		
-		if(isset($betriebsmittelstatus_kurzbz))
+		if (isset($betriebsmittelstatus_kurzbz))
 		{
 			$result = $this->BetriebsmittelstatusModel->load($betriebsmittelstatus_kurzbz);
 			
@@ -52,9 +52,9 @@ class Betriebsmittelstatus extends APIv1_Controller
 	 */
 	public function postBetriebsmittelstatus()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['betriebsmittelstatus_kurzbz']))
+			if (isset($this->post()['betriebsmittelstatus_kurzbz']))
 			{
 				$result = $this->BetriebsmittelstatusModel->update($this->post()['betriebsmittelstatus_kurzbz'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Bisio extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Bisio extends APIv1_Controller
 	{
 		$bisioID = $this->get('bisio_id');
 		
-		if(isset($bisioID))
+		if (isset($bisioID))
 		{
 			$result = $this->BisioModel->load($bisioID);
 			
@@ -52,9 +52,9 @@ class Bisio extends APIv1_Controller
 	 */
 	public function postBisio()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['bisio_id']))
+			if (isset($this->post()['bisio_id']))
 			{
 				$result = $this->BisioModel->update($this->post()['bisio_id'], $this->post());
 			}

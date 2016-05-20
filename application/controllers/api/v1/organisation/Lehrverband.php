@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Lehrverband extends APIv1_Controller
 {
@@ -38,7 +38,7 @@ class Lehrverband extends APIv1_Controller
 		$semester = $this->get('semester');
 		$studiengang_kz = $this->get('studiengang_kz');
 		
-		if(isset($gruppe) && isset($verband) && isset($semester) && isset($studiengang_kz))
+		if (isset($gruppe) && isset($verband) && isset($semester) && isset($studiengang_kz))
 		{
 			$result = $this->LehrverbandModel->load(array($gruppe, $verband, $semester, $studiengang_kz));
 			
@@ -55,9 +55,9 @@ class Lehrverband extends APIv1_Controller
 	 */
 	public function postLehrverband()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['gruppe']) && isset($this->post()['verband']) &&
+			if (isset($this->post()['gruppe']) && isset($this->post()['verband']) &&
 				isset($this->post()['semester']) && isset($this->post()['studiengang_kz']))
 			{
 				$pksArray = array($this->post()['gruppe'],

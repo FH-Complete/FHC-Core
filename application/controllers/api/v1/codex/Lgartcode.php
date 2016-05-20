@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Lgartcode extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Lgartcode extends APIv1_Controller
 	{
 		$lgartcode = $this->get('lgartcode');
 		
-		if(isset($lgartcode))
+		if (isset($lgartcode))
 		{
 			$result = $this->LgartcodeModel->load($lgartcode);
 			
@@ -52,9 +52,9 @@ class Lgartcode extends APIv1_Controller
 	 */
 	public function postLgartcode()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lgartcode']))
+			if (isset($this->post()['lgartcode']))
 			{
 				$result = $this->LgartcodeModel->update($this->post()['lgartcode'], $this->post());
 			}

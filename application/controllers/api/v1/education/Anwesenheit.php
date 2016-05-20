@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Anwesenheit extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Anwesenheit extends APIv1_Controller
 	{
 		$anwesenheit_id = $this->get('anwesenheit_id');
 		
-		if(isset($anwesenheit_id))
+		if (isset($anwesenheit_id))
 		{
 			$result = $this->AnwesenheitModel->load($anwesenheit_id);
 			
@@ -52,9 +52,9 @@ class Anwesenheit extends APIv1_Controller
 	 */
 	public function postAnwesenheit()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['anwesenheit_id']))
+			if (isset($this->post()['anwesenheit_id']))
 			{
 				$result = $this->AnwesenheitModel->update($this->post()['anwesenheit_id'], $this->post());
 			}

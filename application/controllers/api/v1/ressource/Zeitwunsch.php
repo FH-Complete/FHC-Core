@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Zeitwunsch extends APIv1_Controller
 {
@@ -37,7 +37,7 @@ class Zeitwunsch extends APIv1_Controller
 		$mitarbeiter_uid = $this->get('mitarbeiter_uid');
 		$stunde = $this->get('stunde');
 		
-		if(isset($tag) && isset($mitarbeiter_uid) && isset($stunde))
+		if (isset($tag) && isset($mitarbeiter_uid) && isset($stunde))
 		{
 			$result = $this->ZeitwunschModel->load(array($tag, $mitarbeiter_uid, $stunde));
 			
@@ -54,9 +54,9 @@ class Zeitwunsch extends APIv1_Controller
 	 */
 	public function postZeitwunsch()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['tag']) && isset($this->post()['mitarbeiter_uid']) && isset($this->post()['stunde']))
+			if (isset($this->post()['tag']) && isset($this->post()['mitarbeiter_uid']) && isset($this->post()['stunde']))
 			{
 				$pksArray = array($this->post()['tag'],
 									$this->post()['mitarbeiter_uid'],

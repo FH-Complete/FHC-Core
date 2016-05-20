@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Aufnahmeschluessel extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Aufnahmeschluessel extends APIv1_Controller
 	{
 		$aufnahmeschluessel = $this->get('aufnahmeschluessel');
 		
-		if(isset($aufnahmeschluessel))
+		if (isset($aufnahmeschluessel))
 		{
 			$result = $this->AufnahmeschluesselModel->load($aufnahmeschluessel);
 			
@@ -52,9 +52,9 @@ class Aufnahmeschluessel extends APIv1_Controller
 	 */
 	public function postAufnahmeschluessel()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['aufnahmeschluessel']))
+			if (isset($this->post()['aufnahmeschluessel']))
 			{
 				$result = $this->AufnahmeschluesselModel->update($this->post()['aufnahmeschluessel'], $this->post());
 			}

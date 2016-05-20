@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Vertrag extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Vertrag extends APIv1_Controller
 	{
 		$vertragID = $this->get('vertrag_id');
 		
-		if(isset($vertragID))
+		if (isset($vertragID))
 		{
 			$result = $this->VertragModel->load($vertragID);
 			
@@ -52,9 +52,9 @@ class Vertrag extends APIv1_Controller
 	 */
 	public function postVertrag()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['vertrag_id']))
+			if (isset($this->post()['vertrag_id']))
 			{
 				$result = $this->VertragModel->update($this->post()['vertrag_id'], $this->post());
 			}

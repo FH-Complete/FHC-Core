@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Freebusytyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Freebusytyp extends APIv1_Controller
 	{
 		$freebusytyp_kurzbz = $this->get('freebusytyp_kurzbz');
 		
-		if(isset($freebusytyp_kurzbz))
+		if (isset($freebusytyp_kurzbz))
 		{
 			$result = $this->FreebusytypModel->load($freebusytyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Freebusytyp extends APIv1_Controller
 	 */
 	public function postFreebusytyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['freebusytyp_kurzbz']))
+			if (isset($this->post()['freebusytyp_kurzbz']))
 			{
 				$result = $this->FreebusytypModel->update($this->post()['freebusytyp_kurzbz'], $this->post());
 			}

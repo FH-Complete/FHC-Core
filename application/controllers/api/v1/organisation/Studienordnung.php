@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Studienordnung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Studienordnung extends APIv1_Controller
 	{
 		$studienordnungID = $this->get('studienordnung_id');
 		
-		if(isset($studienordnungID))
+		if (isset($studienordnungID))
 		{
 			$result = $this->StudienordnungModel->load($studienordnungID);
 			
@@ -52,9 +52,9 @@ class Studienordnung extends APIv1_Controller
 	 */
 	public function postStudienordnung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studienordnung_id']))
+			if (isset($this->post()['studienordnung_id']))
 			{
 				$result = $this->StudienordnungModel->update($this->post()['studienordnung_id'], $this->post());
 			}

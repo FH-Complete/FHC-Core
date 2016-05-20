@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Lehrform extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Lehrform extends APIv1_Controller
 	{
 		$lehrform_kurzbz = $this->get('lehrform_kurzbz');
 		
-		if(isset($lehrform_kurzbz))
+		if (isset($lehrform_kurzbz))
 		{
 			$result = $this->LehrformModel->load($lehrform_kurzbz);
 			
@@ -52,9 +52,9 @@ class Lehrform extends APIv1_Controller
 	 */
 	public function postLehrform()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lehrform_kurzbz']))
+			if (isset($this->post()['lehrform_kurzbz']))
 			{
 				$result = $this->LehrformModel->update($this->post()['lehrform_kurzbz'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Benutzerrolle extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Benutzerrolle extends APIv1_Controller
 	{
 		$benutzerrolleID = $this->get('benutzerrolle_id');
 		
-		if(isset($benutzerrolleID))
+		if (isset($benutzerrolleID))
 		{
 			$result = $this->BenutzerrolleModel->load($benutzerrolleID);
 			
@@ -52,9 +52,9 @@ class Benutzerrolle extends APIv1_Controller
 	 */
 	public function postBenutzerrolle()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['benutzerrolle_id']))
+			if (isset($this->post()['benutzerrolle_id']))
 			{
 				$result = $this->BenutzerrolleModel->update($this->post()['benutzerrolle_id'], $this->post());
 			}

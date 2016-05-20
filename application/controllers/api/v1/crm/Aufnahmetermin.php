@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Aufnahmetermin extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Aufnahmetermin extends APIv1_Controller
 	{
 		$aufnahmeterminID = $this->get('aufnahmetermin_id');
 		
-		if(isset($aufnahmeterminID))
+		if (isset($aufnahmeterminID))
 		{
 			$result = $this->AufnahmeterminModel->load($aufnahmeterminID);
 			
@@ -52,9 +52,9 @@ class Aufnahmetermin extends APIv1_Controller
 	 */
 	public function postAufnahmetermin()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['aufnahmetermin_id']))
+			if (isset($this->post()['aufnahmetermin_id']))
 			{
 				$result = $this->AufnahmeterminModel->update($this->post()['aufnahmetermin_id'], $this->post());
 			}

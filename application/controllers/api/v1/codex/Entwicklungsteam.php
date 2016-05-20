@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Entwicklungsteam extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Entwicklungsteam extends APIv1_Controller
 		$studiengang_kz = $this->get('studiengang_kz');
 		$mitarbeiter_uid = $this->get('mitarbeiter_uid');
 		
-		if(isset($studiengang_kz) && isset($mitarbeiter_uid))
+		if (isset($studiengang_kz) && isset($mitarbeiter_uid))
 		{
 			$result = $this->EntwicklungsteamModel->load(array($studiengang_kz, $mitarbeiter_uid));
 			
@@ -53,9 +53,9 @@ class Entwicklungsteam extends APIv1_Controller
 	 */
 	public function postEntwicklungsteam()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studiengang_kz']) && isset($this->post()['mitarbeiter_uid']))
+			if (isset($this->post()['studiengang_kz']) && isset($this->post()['mitarbeiter_uid']))
 			{
 				$result = $this->EntwicklungsteamModel->update(array($this->post()['entwicklungsteam_id'], $this->post()['mitarbeiter_uid']), $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Lvgesamtnote extends APIv1_Controller
 {
@@ -37,7 +37,7 @@ class Lvgesamtnote extends APIv1_Controller
 		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
 		$lehrveranstaltung_id = $this->get('lehrveranstaltung_id');
 		
-		if(isset($student_uid) && isset($studiensemester_kurzbz) && isset($lehrveranstaltung_id))
+		if (isset($student_uid) && isset($studiensemester_kurzbz) && isset($lehrveranstaltung_id))
 		{
 			$result = $this->LvgesamtnoteModel->load(array($student_uid, $studiensemester_kurzbz, $lehrveranstaltung_id));
 			
@@ -54,9 +54,9 @@ class Lvgesamtnote extends APIv1_Controller
 	 */
 	public function postLvgesamtnote()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['student_uid']) && isset($this->post()['studiensemester_kurzbz']) && isset($this->post()['lehrveranstaltung_id']))
+			if (isset($this->post()['student_uid']) && isset($this->post()['studiensemester_kurzbz']) && isset($this->post()['lehrveranstaltung_id']))
 			{
 				$pksArray = array($this->post()['student_uid'],
 									$this->post()['studiensemester_kurzbz'],

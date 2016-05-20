@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Erhalter extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Erhalter extends APIv1_Controller
 	{
 		$erhalter_kz = $this->get('erhalter_kz');
 		
-		if(isset($erhalter_kz))
+		if (isset($erhalter_kz))
 		{
 			$result = $this->ErhalterModel->load($erhalter_kz);
 			
@@ -52,9 +52,9 @@ class Erhalter extends APIv1_Controller
 	 */
 	public function postErhalter()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['erhalter_kz']))
+			if (isset($this->post()['erhalter_kz']))
 			{
 				$result = $this->ErhalterModel->update($this->post()['erhalter_kz'], $this->post());
 			}

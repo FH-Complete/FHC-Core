@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Prestudent extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Prestudent extends APIv1_Controller
 	{
 		$prestudentID = $this->get('prestudent_id');
 		
-		if(isset($prestudentID))
+		if (isset($prestudentID))
 		{
 			$result = $this->PrestudentModel->load($prestudentID);
 			
@@ -52,9 +52,9 @@ class Prestudent extends APIv1_Controller
 	 */
 	public function postPrestudent()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['prestudent_id']))
+			if (isset($this->post()['prestudent_id']))
 			{
 				$result = $this->PrestudentModel->update($this->post()['prestudent_id'], $this->post());
 			}

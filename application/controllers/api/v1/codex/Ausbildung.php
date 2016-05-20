@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Ausbildung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Ausbildung extends APIv1_Controller
 	{
 		$ausbildungcode = $this->get('ausbildungcode');
 		
-		if(isset($ausbildungcode))
+		if (isset($ausbildungcode))
 		{
 			$result = $this->AusbildungModel->load($ausbildungcode);
 			
@@ -52,9 +52,9 @@ class Ausbildung extends APIv1_Controller
 	 */
 	public function postAusbildung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['ausbildungcode']))
+			if (isset($this->post()['ausbildungcode']))
 			{
 				$result = $this->AusbildungModel->update($this->post()['ausbildungcode'], $this->post());
 			}

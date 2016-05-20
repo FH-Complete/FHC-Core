@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Notenschluesselaufteilung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Notenschluesselaufteilung extends APIv1_Controller
 	{
 		$notenschluesselaufteilung_id = $this->get('notenschluesselaufteilung_id');
 		
-		if(isset($notenschluesselaufteilung_id))
+		if (isset($notenschluesselaufteilung_id))
 		{
 			$result = $this->NotenschluesselaufteilungModel->load($notenschluesselaufteilung_id);
 			
@@ -52,9 +52,9 @@ class Notenschluesselaufteilung extends APIv1_Controller
 	 */
 	public function postNotenschluesselaufteilung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['notenschluesselaufteilung_id']))
+			if (isset($this->post()['notenschluesselaufteilung_id']))
 			{
 				$result = $this->NotenschluesselaufteilungModel->update($this->post()['notenschluesselaufteilung_id'], $this->post());
 			}

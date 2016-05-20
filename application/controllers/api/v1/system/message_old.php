@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class message_old extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class message_old extends APIv1_Controller
 	{
 		$message_oldID = $this->get('message_old_id');
 		
-		if(isset($message_oldID))
+		if (isset($message_oldID))
 		{
 			$result = $this->message_oldModel->load($message_oldID);
 			
@@ -52,9 +52,9 @@ class message_old extends APIv1_Controller
 	 */
 	public function postmessage_old()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['message_old_id']))
+			if (isset($this->post()['message_old_id']))
 			{
 				$result = $this->message_oldModel->update($this->post()['message_old_id'], $this->post());
 			}

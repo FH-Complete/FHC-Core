@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Infoscreen extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Infoscreen extends APIv1_Controller
 	{
 		$infoscreenID = $this->get('infoscreen_id');
 		
-		if(isset($infoscreenID))
+		if (isset($infoscreenID))
 		{
 			$result = $this->InfoscreenModel->load($infoscreenID);
 			
@@ -52,9 +52,9 @@ class Infoscreen extends APIv1_Controller
 	 */
 	public function postInfoscreen()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['infoscreen_id']))
+			if (isset($this->post()['infoscreen_id']))
 			{
 				$result = $this->InfoscreenModel->update($this->post()['infoscreen_id'], $this->post());
 			}

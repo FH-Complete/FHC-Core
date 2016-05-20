@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Betriebsmittel extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Betriebsmittel extends APIv1_Controller
 	{
 		$betriebsmittelID = $this->get('betriebsmittel_id');
 		
-		if(isset($betriebsmittelID))
+		if (isset($betriebsmittelID))
 		{
 			$result = $this->BetriebsmittelModel->load($betriebsmittelID);
 			
@@ -52,9 +52,9 @@ class Betriebsmittel extends APIv1_Controller
 	 */
 	public function postBetriebsmittel()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['betriebsmittel_id']))
+			if (isset($this->post()['betriebsmittel_id']))
 			{
 				$result = $this->BetriebsmittelModel->update($this->post()['betriebsmittel_id'], $this->post());
 			}

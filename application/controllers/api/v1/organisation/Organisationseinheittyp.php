@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Organisationseinheittyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Organisationseinheittyp extends APIv1_Controller
 	{
 		$organisationseinheittyp_kurzbz = $this->get('organisationseinheittyp_kurzbz');
 		
-		if(isset($organisationseinheittyp_kurzbz))
+		if (isset($organisationseinheittyp_kurzbz))
 		{
 			$result = $this->OrganisationseinheittypModel->load($organisationseinheittyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Organisationseinheittyp extends APIv1_Controller
 	 */
 	public function postOrganisationseinheittyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['organisationseinheittyp_kurzbz']))
+			if (isset($this->post()['organisationseinheittyp_kurzbz']))
 			{
 				$result = $this->OrganisationseinheittypModel->update($this->post()['organisationseinheittyp_kurzbz'], $this->post());
 			}

@@ -101,7 +101,7 @@ Enable Rapper? <?= check_box_tag('enable_rapper') ?><br />
         $graph->addLiteral($_REQUEST['uri'], 'foaf:nick', $_REQUEST['nickname']);
 
         # Add friends
-        for($i=1; $i<=4; $i++) {
+        for ($i=1; $i<=4; $i++) {
             if ($_REQUEST["person_$i"]) {
                 $person = $graph->resource($_REQUEST["person_$i"]);
                 $graph->add($me, 'foaf:knows', $person);

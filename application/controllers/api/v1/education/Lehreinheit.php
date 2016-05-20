@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Lehreinheit extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Lehreinheit extends APIv1_Controller
 	{
 		$lehreinheit_id = $this->get('lehreinheit_id');
 		
-		if(isset($lehreinheit_id))
+		if (isset($lehreinheit_id))
 		{
 			$result = $this->LehreinheitModel->load($lehreinheit_id);
 			
@@ -52,9 +52,9 @@ class Lehreinheit extends APIv1_Controller
 	 */
 	public function postLehreinheit()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lehreinheit_id']))
+			if (isset($this->post()['lehreinheit_id']))
 			{
 				$result = $this->LehreinheitModel->update($this->post()['lehreinheit_id'], $this->post());
 			}

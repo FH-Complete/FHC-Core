@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Dokumentstudiengang extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Dokumentstudiengang extends APIv1_Controller
 		$studiengang_kz = $this->get('studiengang_kz');
 		$dokument_kurzbz = $this->get('dokument_kurzbz');
 		
-		if(isset($studiengang_kz) && isset($dokument_kurzbz))
+		if (isset($studiengang_kz) && isset($dokument_kurzbz))
 		{
 			$result = $this->DokumentstudiengangModel->load(array($studiengang_kz, $dokument_kurzbz));
 			
@@ -53,9 +53,9 @@ class Dokumentstudiengang extends APIv1_Controller
 	 */
 	public function postDokumentstudiengang()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studiengang_kz']) && isset($this->post()['dokument_kurzbz']))
+			if (isset($this->post()['studiengang_kz']) && isset($this->post()['dokument_kurzbz']))
 			{
 				$result = $this->DokumentstudiengangModel->update(array($this->post()['studiengang_kz'], $this->post()['dokument_kurzbz']), $this->post());
 			}

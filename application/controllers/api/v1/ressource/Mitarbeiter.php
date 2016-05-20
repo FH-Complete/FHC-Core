@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Mitarbeiter extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Mitarbeiter extends APIv1_Controller
 	{
 		$mitarbeiter_uid = $this->get('mitarbeiter_uid');
 		
-		if(isset($mitarbeiter_uid))
+		if (isset($mitarbeiter_uid))
 		{
 			$result = $this->MitarbeiterModel->load($mitarbeiter_uid);
 			
@@ -52,9 +52,9 @@ class Mitarbeiter extends APIv1_Controller
 	 */
 	public function postMitarbeiter()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['mitarbeiter_uid']))
+			if (isset($this->post()['mitarbeiter_uid']))
 			{
 				$result = $this->MitarbeiterModel->update($this->post()['mitarbeiter_uid'], $this->post());
 			}

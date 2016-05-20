@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Beispiel extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Beispiel extends APIv1_Controller
 	{
 		$beispiel_id = $this->get('beispiel_id');
 		
-		if(isset($beispiel_id))
+		if (isset($beispiel_id))
 		{
 			$result = $this->BeispielModel->load($beispiel_id);
 			
@@ -52,9 +52,9 @@ class Beispiel extends APIv1_Controller
 	 */
 	public function postBeispiel()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['beispiel_id']))
+			if (isset($this->post()['beispiel_id']))
 			{
 				$result = $this->BeispielModel->update($this->post()['beispiel_id'], $this->post());
 			}

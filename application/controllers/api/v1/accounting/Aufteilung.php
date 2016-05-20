@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Aufteilung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Aufteilung extends APIv1_Controller
 	{
 		$aufteilungID = $this->get('aufteilung_id');
 		
-		if(isset($aufteilungID))
+		if (isset($aufteilungID))
 		{
 			$result = $this->AufteilungModel->load($aufteilungID);
 			
@@ -52,9 +52,9 @@ class Aufteilung extends APIv1_Controller
 	 */
 	public function postAufteilung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['aufteilung_id']))
+			if (isset($this->post()['aufteilung_id']))
 			{
 				$result = $this->AufteilungModel->update($this->post()['aufteilung_id'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Variable extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Variable extends APIv1_Controller
 		$uid = $this->get('uid');
 		$name = $this->get('name');
 		
-		if(isset($uid) && isset($name))
+		if (isset($uid) && isset($name))
 		{
 			$result = $this->VariableModel->load(array($uid, $name));
 			
@@ -53,9 +53,9 @@ class Variable extends APIv1_Controller
 	 */
 	public function postVariable()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['uid']) && isset($this->post()['name']))
+			if (isset($this->post()['uid']) && isset($this->post()['name']))
 			{
 				$result = $this->VariableModel->update(array($this->post()['uid'], $this->post()['name']), $this->post());
 			}

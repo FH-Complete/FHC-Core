@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Organisationseinheit2 extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Organisationseinheit2 extends APIv1_Controller
 	{
 		$oe_kurzbz = $this->get('oe_kurzbz');
 		
-		if(isset($oe_kurzbz))
+		if (isset($oe_kurzbz))
 		{
 			$result = $this->OrganisationseinheitModel->load($oe_kurzbz);
 			
@@ -52,9 +52,9 @@ class Organisationseinheit2 extends APIv1_Controller
 	 */
 	public function postOrganisationseinheit()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['organisationseinheit_id']))
+			if (isset($this->post()['organisationseinheit_id']))
 			{
 				$result = $this->OrganisationseinheitModel->update($this->post()['organisationseinheit_id'], $this->post());
 			}

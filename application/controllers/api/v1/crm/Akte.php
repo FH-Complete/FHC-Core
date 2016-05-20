@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Akte extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Akte extends APIv1_Controller
 	{
 		$akteID = $this->get('akte_id');
 		
-		if(isset($akteID))
+		if (isset($akteID))
 		{
 			$result = $this->AkteModel->load($akteID);
 			
@@ -52,9 +52,9 @@ class Akte extends APIv1_Controller
 	 */
 	public function postAkte()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['akte_id']))
+			if (isset($this->post()['akte_id']))
 			{
 				$result = $this->AkteModel->update($this->post()['akte_id'], $this->post());
 			}

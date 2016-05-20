@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Buchung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Buchung extends APIv1_Controller
 	{
 		$buchungID = $this->get('buchung_id');
 		
-		if(isset($buchungID))
+		if (isset($buchungID))
 		{
 			$result = $this->BuchungModel->load($buchungID);
 			
@@ -52,9 +52,9 @@ class Buchung extends APIv1_Controller
 	 */
 	public function postBuchung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['buchung_id']))
+			if (isset($this->post()['buchung_id']))
 			{
 				$result = $this->BuchungModel->update($this->post()['buchung_id'], $this->post());
 			}

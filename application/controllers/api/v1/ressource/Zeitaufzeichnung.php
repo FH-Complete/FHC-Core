@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Zeitaufzeichnung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Zeitaufzeichnung extends APIv1_Controller
 	{
 		$zeitaufzeichnungID = $this->get('zeitaufzeichnung_id');
 		
-		if(isset($zeitaufzeichnungID))
+		if (isset($zeitaufzeichnungID))
 		{
 			$result = $this->ZeitaufzeichnungModel->load($zeitaufzeichnungID);
 			
@@ -52,9 +52,9 @@ class Zeitaufzeichnung extends APIv1_Controller
 	 */
 	public function postZeitaufzeichnung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zeitaufzeichnung_id']))
+			if (isset($this->post()['zeitaufzeichnung_id']))
 			{
 				$result = $this->ZeitaufzeichnungModel->update($this->post()['zeitaufzeichnung_id'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Prestudentstatus extends APIv1_Controller
 {
@@ -38,7 +38,7 @@ class Prestudentstatus extends APIv1_Controller
 		$status_kurzbz = $this->get('status_kurzbz');
 		$prestudent_id = $this->get('prestudent_id');
 		
-		if(isset($ausbildungssemester) && isset($studiensemester_kurzbz) && isset($status_kurzbz) && isset($prestudent_id))
+		if (isset($ausbildungssemester) && isset($studiensemester_kurzbz) && isset($status_kurzbz) && isset($prestudent_id))
 		{
 			$result = $this->PrestudentstatusModel->load(array($ausbildungssemester, $studiensemester_kurzbz, $status_kurzbz, $prestudent_id));
 			
@@ -55,9 +55,9 @@ class Prestudentstatus extends APIv1_Controller
 	 */
 	public function postPrestudentstatus()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['ausbildungssemester']) && isset($this->post()['studiensemester_kurzbz']) &&
+			if (isset($this->post()['ausbildungssemester']) && isset($this->post()['studiensemester_kurzbz']) &&
 				isset($this->post()['status_kurzbz']) && isset($this->post()['prestudent_id']))
 			{
 				$pksArray = array($this->post()['ausbildungssemester'],

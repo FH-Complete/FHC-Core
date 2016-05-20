@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Template extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Template extends APIv1_Controller
 	{
 		$template_kurzbz = $this->get('template_kurzbz');
 		
-		if(isset($template_kurzbz))
+		if (isset($template_kurzbz))
 		{
 			$result = $this->TemplateModel->load($template_kurzbz);
 			
@@ -52,9 +52,9 @@ class Template extends APIv1_Controller
 	 */
 	public function postTemplate()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['template_kurzbz']))
+			if (isset($this->post()['template_kurzbz']))
 			{
 				$result = $this->TemplateModel->update($this->post()['template_kurzbz'], $this->post());
 			}

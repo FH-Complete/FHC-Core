@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Dms extends APIv1_Controller
 {
@@ -36,18 +36,18 @@ class Dms extends APIv1_Controller
 		$dms_id = $this->get('dms_id');
 		$version = $this->get('version');
 		
-		if(isset($dms_id))
+		if (isset($dms_id))
 		{
 			$result = $this->DmsModel->addJoin('campus.tbl_dms_version', 'dms_id');
-			if($result->error == EXIT_SUCCESS)
+			if ($result->error == EXIT_SUCCESS)
 			{
 				$result = $this->DmsModel->addOrder('version', 'DESC');
-				if($result->error == EXIT_SUCCESS)
+				if ($result->error == EXIT_SUCCESS)
 				{
 					$result = $this->DmsModel->addLimit(1);
-					if($result->error == EXIT_SUCCESS)
+					if ($result->error == EXIT_SUCCESS)
 					{
-						if(!isset($version))
+						if (!isset($version))
 						{
 							$result = $this->DmsModel->loadWhere(array('dms_id' => $dms_id));
 						}
@@ -72,9 +72,9 @@ class Dms extends APIv1_Controller
 	 */
 	public function postDms()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['contentsprache_id']))
+			if (isset($this->post()['contentsprache_id']))
 			{
 				$result = $this->ContentspracheModel->update($this->post()['contentsprache_id'], $this->post());
 			}
