@@ -46,6 +46,25 @@ class Prestudent extends APIv1_Controller
 			$this->response();
 		}
 	}
+	
+	/**
+	 * @return void
+	 */
+	public function getPrestudentByPersonID()
+	{
+		$person_id = $this->get('person_id');
+		
+		if (isset($person_id))
+		{
+			$result = $this->PrestudentModel->load(array('person_id' => $person_id));
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
 
 	/**
 	 * @return void
