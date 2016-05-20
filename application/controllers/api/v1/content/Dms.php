@@ -66,4 +66,33 @@ class Dms extends APIv1_Controller
 			$this->response();
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	public function postDms()
+	{
+		if($this->_validate($this->post()))
+		{
+			if(isset($this->post()['contentsprache_id']))
+			{
+				$result = $this->ContentspracheModel->update($this->post()['contentsprache_id'], $this->post());
+			}
+			else
+			{
+				$result = $this->ContentspracheModel->insert($this->post());
+			}
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	private function _validate($dms = NULL)
+	{
+		return true;
+	}
 }

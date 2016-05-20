@@ -33,11 +33,11 @@ class Organisationseinheittyp extends APIv1_Controller
 	 */
 	public function getOrganisationseinheittyp()
 	{
-		$organisationseinheittypID = $this->get('organisationseinheittyp_id');
+		$organisationseinheittyp_kurzbz = $this->get('organisationseinheittyp_kurzbz');
 		
-		if(isset($organisationseinheittypID))
+		if(isset($organisationseinheittyp_kurzbz))
 		{
-			$result = $this->OrganisationseinheittypModel->load($organisationseinheittypID);
+			$result = $this->OrganisationseinheittypModel->load($organisationseinheittyp_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Organisationseinheittyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['organisationseinheittyp_id']))
+			if(isset($this->post()['organisationseinheittyp_kurzbz']))
 			{
-				$result = $this->OrganisationseinheittypModel->update($this->post()['organisationseinheittyp_id'], $this->post());
+				$result = $this->OrganisationseinheittypModel->update($this->post()['organisationseinheittyp_kurzbz'], $this->post());
 			}
 			else
 			{

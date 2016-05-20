@@ -55,9 +55,9 @@ class Rolleberechtigung extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['rolleberechtigung_id']))
+			if(isset($this->post()['rolle_kurzbz']) && isset($this->post()['berechtigung_kurzbz']))
 			{
-				$result = $this->RolleberechtigungModel->update($this->post()['rolleberechtigung_id'], $this->post());
+				$result = $this->RolleberechtigungModel->update(array($this->post()['rolle_kurzbz'], $this->post()['berechtigung_kurzbz']), $this->post());
 			}
 			else
 			{

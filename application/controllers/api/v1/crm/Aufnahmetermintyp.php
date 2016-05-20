@@ -33,11 +33,11 @@ class Aufnahmetermintyp extends APIv1_Controller
 	 */
 	public function getAufnahmetermintyp()
 	{
-		$aufnahmetermintypID = $this->get('aufnahmetermintyp_id');
+		$aufnahmetermintyp_kurzbz = $this->get('aufnahmetermintyp_kurzbz');
 		
-		if(isset($aufnahmetermintypID))
+		if(isset($aufnahmetermintyp_kurzbz))
 		{
-			$result = $this->AufnahmetermintypModel->load($aufnahmetermintypID);
+			$result = $this->AufnahmetermintypModel->load($aufnahmetermintyp_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Aufnahmetermintyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['aufnahmetermintyp_id']))
+			if(isset($this->post()['aufnahmetermintyp_kurzbz']))
 			{
-				$result = $this->AufnahmetermintypModel->update($this->post()['aufnahmetermintyp_id'], $this->post());
+				$result = $this->AufnahmetermintypModel->update($this->post()['aufnahmetermintyp_kurzbz'], $this->post());
 			}
 			else
 			{

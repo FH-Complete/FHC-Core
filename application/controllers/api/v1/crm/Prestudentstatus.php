@@ -57,9 +57,16 @@ class Prestudentstatus extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['prestudentstatus_id']))
+			if(isset($this->post()['ausbildungssemester']) && isset($this->post()['studiensemester_kurzbz']) &&
+				isset($this->post()['status_kurzbz']) && isset($this->post()['prestudent_id']))
 			{
-				$result = $this->PrestudentstatusModel->update($this->post()['prestudentstatus_id'], $this->post());
+				$pksArray = array($this->post()['ausbildungssemester'],
+									$this->post()['studiensemester_kurzbz'],
+									$this->post()['status_kurzbz'],
+									$this->post()['prestudent_id']
+								);
+				
+				$result = $this->PrestudentstatusModel->update($pksArray, $this->post());
 			}
 			else
 			{

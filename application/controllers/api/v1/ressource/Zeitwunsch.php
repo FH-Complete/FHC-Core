@@ -56,9 +56,14 @@ class Zeitwunsch extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zeitwunsch_id']))
+			if(isset($this->post()['tag']) && isset($this->post()['mitarbeiter_uid']) && isset($this->post()['stunde']))
 			{
-				$result = $this->ZeitwunschModel->update($this->post()['zeitwunsch_id'], $this->post());
+				$pksArray = array($this->post()['tag'],
+									$this->post()['mitarbeiter_uid'],
+									$this->post()['stunde']
+								);
+				
+				$result = $this->ZeitwunschModel->update($pksArray, $this->post());
 			}
 			else
 			{

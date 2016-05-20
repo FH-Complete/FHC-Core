@@ -33,11 +33,11 @@ class Orgform extends APIv1_Controller
 	 */
 	public function getOrgform()
 	{
-		$orgformID = $this->get('orgform_id');
+		$orgform_kurzbz = $this->get('orgform_kurzbz');
 		
-		if(isset($orgformID))
+		if(isset($orgform_kurzbz))
 		{
-			$result = $this->OrgformModel->load($orgformID);
+			$result = $this->OrgformModel->load($orgform_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Orgform extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['orgform_id']))
+			if(isset($this->post()['orgform_kurzbz']))
 			{
-				$result = $this->OrgformModel->update($this->post()['orgform_id'], $this->post());
+				$result = $this->OrgformModel->update($this->post()['orgform_kurzbz'], $this->post());
 			}
 			else
 			{

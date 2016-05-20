@@ -33,11 +33,11 @@ class Bestellstatus extends APIv1_Controller
 	 */
 	public function getBestellstatus()
 	{
-		$bestellstatusID = $this->get('bestellstatus_id');
+		$bestellstatus_kurzbz = $this->get('bestellstatus_kurzbz');
 		
-		if(isset($bestellstatusID))
+		if(isset($bestellstatus_kurzbz))
 		{
-			$result = $this->BestellstatusModel->load($bestellstatusID);
+			$result = $this->BestellstatusModel->load($bestellstatus_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Bestellstatus extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['bestellstatus_id']))
+			if(isset($this->post()['bestellstatus_kurzbz']))
 			{
-				$result = $this->BestellstatusModel->update($this->post()['bestellstatus_id'], $this->post());
+				$result = $this->BestellstatusModel->update($this->post()['bestellstatus_kurzbz'], $this->post());
 			}
 			else
 			{

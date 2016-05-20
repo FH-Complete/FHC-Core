@@ -55,9 +55,9 @@ class Budget extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['budget_id']))
+			if(isset($this->post()['budget_id']) && isset($this->post()['geschaeftsjahr_kurzbz']))
 			{
-				$result = $this->BudgetModel->update($this->post()['budget_id'], $this->post());
+				$result = $this->BudgetModel->update(array($this->post()['budget_id'], $this->post()['geschaeftsjahr_kurzbz']), $this->post());
 			}
 			else
 			{

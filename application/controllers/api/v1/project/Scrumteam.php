@@ -33,11 +33,11 @@ class Scrumteam extends APIv1_Controller
 	 */
 	public function getScrumteam()
 	{
-		$scrumteamID = $this->get('scrumteam_id');
+		$scrumteam_kurzbz = $this->get('scrumteam_kurzbz');
 		
-		if(isset($scrumteamID))
+		if(isset($scrumteam_kurzbz))
 		{
-			$result = $this->ScrumteamModel->load($scrumteamID);
+			$result = $this->ScrumteamModel->load($scrumteam_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Scrumteam extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['scrumteam_id']))
+			if(isset($this->post()['scrumteam_kurzbz']))
 			{
-				$result = $this->ScrumteamModel->update($this->post()['scrumteam_id'], $this->post());
+				$result = $this->ScrumteamModel->update($this->post()['scrumteam_kurzbz'], $this->post());
 			}
 			else
 			{

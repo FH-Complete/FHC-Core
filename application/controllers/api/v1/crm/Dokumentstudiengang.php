@@ -55,9 +55,9 @@ class Dokumentstudiengang extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['dokumentstudiengang_id']))
+			if(isset($this->post()['studiengang_kz']) && isset($this->post()['dokument_kurzbz']))
 			{
-				$result = $this->DokumentstudiengangModel->update($this->post()['dokumentstudiengang_id'], $this->post());
+				$result = $this->DokumentstudiengangModel->update(array($this->post()['studiengang_kz'], $this->post()['dokument_kurzbz']), $this->post());
 			}
 			else
 			{

@@ -33,11 +33,11 @@ class Zgv extends APIv1_Controller
 	 */
 	public function getZgv()
 	{
-		$zgvID = $this->get('zgv_id');
+		$zgv_code = $this->get('zgv_code');
 		
-		if(isset($zgvID))
+		if(isset($zgv_code))
 		{
-			$result = $this->ZgvModel->load($zgvID);
+			$result = $this->ZgvModel->load($zgv_code);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Zgv extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zgv_id']))
+			if(isset($this->post()['zgv_code']))
 			{
-				$result = $this->ZgvModel->update($this->post()['zgv_id'], $this->post());
+				$result = $this->ZgvModel->update($this->post()['zgv_code'], $this->post());
 			}
 			else
 			{

@@ -33,11 +33,11 @@ class Aufnahmeschluessel extends APIv1_Controller
 	 */
 	public function getAufnahmeschluessel()
 	{
-		$aufnahmeschluesselID = $this->get('aufnahmeschluessel_id');
+		$aufnahmeschluessel = $this->get('aufnahmeschluessel');
 		
-		if(isset($aufnahmeschluesselID))
+		if(isset($aufnahmeschluessel))
 		{
-			$result = $this->AufnahmeschluesselModel->load($aufnahmeschluesselID);
+			$result = $this->AufnahmeschluesselModel->load($aufnahmeschluessel);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Aufnahmeschluessel extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['aufnahmeschluessel_id']))
+			if(isset($this->post()['aufnahmeschluessel']))
 			{
-				$result = $this->AufnahmeschluesselModel->update($this->post()['aufnahmeschluessel_id'], $this->post());
+				$result = $this->AufnahmeschluesselModel->update($this->post()['aufnahmeschluessel'], $this->post());
 			}
 			else
 			{

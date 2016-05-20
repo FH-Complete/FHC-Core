@@ -33,11 +33,11 @@ class Template extends APIv1_Controller
 	 */
 	public function getTemplate()
 	{
-		$templateID = $this->get('template_id');
+		$template_kurzbz = $this->get('template_kurzbz');
 		
-		if(isset($templateID))
+		if(isset($template_kurzbz))
 		{
-			$result = $this->TemplateModel->load($templateID);
+			$result = $this->TemplateModel->load($template_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Template extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['template_id']))
+			if(isset($this->post()['template_kurzbz']))
 			{
-				$result = $this->TemplateModel->update($this->post()['template_id'], $this->post());
+				$result = $this->TemplateModel->update($this->post()['template_kurzbz'], $this->post());
 			}
 			else
 			{

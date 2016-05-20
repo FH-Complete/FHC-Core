@@ -33,11 +33,11 @@ class Gruppe extends APIv1_Controller
 	 */
 	public function getGruppe()
 	{
-		$gruppeID = $this->get('gruppe_id');
+		$gruppe_kurzbz = $this->get('gruppe_kurzbz');
 		
-		if(isset($gruppeID))
+		if(isset($gruppe_kurzbz))
 		{
-			$result = $this->GruppeModel->load($gruppeID);
+			$result = $this->GruppeModel->load($gruppe_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Gruppe extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['gruppe_id']))
+			if(isset($this->post()['gruppe_kurzbz']))
 			{
-				$result = $this->GruppeModel->update($this->post()['gruppe_id'], $this->post());
+				$result = $this->GruppeModel->update($this->post()['gruppe_kurzbz'], $this->post());
 			}
 			else
 			{

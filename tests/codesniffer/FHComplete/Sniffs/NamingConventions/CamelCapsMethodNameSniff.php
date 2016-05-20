@@ -71,7 +71,7 @@ class FHComplete_Sniffs_NamingConventions_CamelCapsMethodNameSniff extends Gener
             $error     = 'Method name "%s" is not in camel caps format';
             $className = $phpcsFile->getDeclarationName($currScope);
             $errorData = array($className.'::'.$methodName);
-            $phpcsFile->addError($error, $stackPtr, 'NotCamelCaps', $errorData);
+            $phpcsFile->addWarning($error, $stackPtr, 'NotCamelCaps', $errorData);
             $phpcsFile->recordMetric($stackPtr, 'CamelCase method name', 'no');
         } else {
             $phpcsFile->recordMetric($stackPtr, 'CamelCase method name', 'yes');

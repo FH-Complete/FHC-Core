@@ -90,19 +90,19 @@ class person extends Person_model
 	public function load($personId)
 	{
 		//person_id auf gueltigkeit pruefen
-		if(is_numeric($personId) && $personId != '')
+		if (is_numeric($personId) && $personId != '')
 		{
 			$result = $this->getPerson($personId);
 			
-			if(!is_object($result))
+			if (!is_object($result))
 			{
 				$this->errormsg = "Fehler beim Lesen der Personendaten\n";
-				return FALSE;
+				return false;
 			}
 
 			$row = $result->row();
 			
-			if(isset($row))
+			if (isset($row))
 			{
 				$this->person_id = $row->person_id;
 				$this->sprache = $row->sprache;
@@ -177,7 +177,7 @@ class person extends Person_model
 	 * auf Gueltigkeit.
 	 * @return true wenn ok, false im Fehlerfall
 	 **/
-	protected function validate()
+	public function validate()
 	{
 		$this->nachname = trim($this->nachname);
 		$this->vorname = trim($this->vorname);
@@ -271,8 +271,10 @@ class person extends Person_model
 			$gewichtung = array(3, 7, 9, 0, 5, 8, 4, 2, 1, 6);
 			$erg = 0;
 			//Quersumme bilden
-			for($i = 0; $i < 10; $i++)
+			for ($i = 0; $i < 10; $i++)
+			{
 				$erg += $gewichtung[$i] * $this->svnr{$i};
+			}
 
 			if ($this->svnr{3} != ($erg % 11)) //Vergleichen der Pruefziffer mit Quersumme Modulo 11
 			{
@@ -280,7 +282,7 @@ class person extends Person_model
 				return false;
 			}
 		}
-
+		
 		if ($this->svnr != '')
 		{
 			//Pruefen ob bereits ein Eintrag mit dieser SVNR vorhanden ist
@@ -501,7 +503,6 @@ class person extends Person_model
 				}
 			}
 			return true;
-
 		}
 		else
 		{

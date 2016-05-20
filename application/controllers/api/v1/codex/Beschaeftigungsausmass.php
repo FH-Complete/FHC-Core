@@ -33,11 +33,11 @@ class Beschaeftigungsausmass extends APIv1_Controller
 	 */
 	public function getBeschaeftigungsausmass()
 	{
-		$beschaeftigungsausmassID = $this->get('beschaeftigungsausmass_id');
+		$beschausmasscode = $this->get('beschausmasscode');
 		
-		if(isset($beschaeftigungsausmassID))
+		if(isset($beschausmasscode))
 		{
-			$result = $this->BeschaeftigungsausmassModel->load($beschaeftigungsausmassID);
+			$result = $this->BeschaeftigungsausmassModel->load($beschausmasscode);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Beschaeftigungsausmass extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['beschaeftigungsausmass_id']))
+			if(isset($this->post()['beschausmasscode']))
 			{
-				$result = $this->BeschaeftigungsausmassModel->update($this->post()['beschaeftigungsausmass_id'], $this->post());
+				$result = $this->BeschaeftigungsausmassModel->update($this->post()['beschausmasscode'], $this->post());
 			}
 			else
 			{

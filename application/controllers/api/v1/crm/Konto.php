@@ -33,11 +33,11 @@ class Konto extends APIv1_Controller
 	 */
 	public function getKonto()
 	{
-		$kontoID = $this->get('konto_id');
+		$buchungsnr = $this->get('buchungsnr');
 		
-		if(isset($kontoID))
+		if(isset($buchungsnr))
 		{
-			$result = $this->KontoModel->load($kontoID);
+			$result = $this->KontoModel->load($buchungsnr);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Konto extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['konto_id']))
+			if(isset($this->post()['buchungsnr']))
 			{
-				$result = $this->KontoModel->update($this->post()['konto_id'], $this->post());
+				$result = $this->KontoModel->update($this->post()['buchungsnr'], $this->post());
 			}
 			else
 			{

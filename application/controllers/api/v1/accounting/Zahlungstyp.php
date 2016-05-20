@@ -33,11 +33,11 @@ class Zahlungstyp extends APIv1_Controller
 	 */
 	public function getZahlungstyp()
 	{
-		$zahlungstypID = $this->get('zahlungstyp_id');
+		$zahlungstyp_kurzbz = $this->get('zahlungstyp_kurzbz');
 		
-		if(isset($zahlungstypID))
+		if(isset($zahlungstyp_kurzbz))
 		{
-			$result = $this->ZahlungstypModel->load($zahlungstypID);
+			$result = $this->ZahlungstypModel->load($zahlungstyp_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Zahlungstyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zahlungstyp_id']))
+			if(isset($this->post()['zahlungstyp_kurzbz']))
 			{
-				$result = $this->ZahlungstypModel->update($this->post()['zahlungstyp_id'], $this->post());
+				$result = $this->ZahlungstypModel->update($this->post()['zahlungstyp_kurzbz'], $this->post());
 			}
 			else
 			{

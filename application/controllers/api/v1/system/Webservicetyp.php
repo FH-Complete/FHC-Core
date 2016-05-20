@@ -33,11 +33,11 @@ class Webservicetyp extends APIv1_Controller
 	 */
 	public function getWebservicetyp()
 	{
-		$webservicetypID = $this->get('webservicetyp_id');
+		$webservicetyp_kurzbz = $this->get('webservicetyp_kurzbz');
 		
-		if(isset($webservicetypID))
+		if(isset($webservicetyp_kurzbz))
 		{
-			$result = $this->WebservicetypModel->load($webservicetypID);
+			$result = $this->WebservicetypModel->load($webservicetyp_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Webservicetyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['webservicetyp_id']))
+			if(isset($this->post()['webservicetyp_kurzbz']))
 			{
-				$result = $this->WebservicetypModel->update($this->post()['webservicetyp_id'], $this->post());
+				$result = $this->WebservicetypModel->update($this->post()['webservicetyp_kurzbz'], $this->post());
 			}
 			else
 			{

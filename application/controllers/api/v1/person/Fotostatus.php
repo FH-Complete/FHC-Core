@@ -33,11 +33,11 @@ class Fotostatus extends APIv1_Controller
 	 */
 	public function getFotostatus()
 	{
-		$fotostatusID = $this->get('fotostatus_id');
+		$fotostatus_kurzbz = $this->get('fotostatus_kurzbz');
 		
-		if(isset($fotostatusID))
+		if(isset($fotostatus_kurzbz))
 		{
-			$result = $this->FotostatusModel->load($fotostatusID);
+			$result = $this->FotostatusModel->load($fotostatus_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Fotostatus extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['fotostatus_id']))
+			if(isset($this->post()['fotostatus_kurzbz']))
 			{
-				$result = $this->FotostatusModel->update($this->post()['fotostatus_id'], $this->post());
+				$result = $this->FotostatusModel->update($this->post()['fotostatus_kurzbz'], $this->post());
 			}
 			else
 			{

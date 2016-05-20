@@ -12,6 +12,7 @@
     <exclude name="PSR1.Files.SideEffects" />
 	<exclude name="Generic.WhiteSpace.DisallowTabIndent" />
 	<exclude name="Squiz.ControlStructures.ControlSignature" />
+	<exclude name="Squiz.Classes.ValidClassName" />
 	<exclude name="Generic.ControlStructures.InlineControlStructure" />
   </rule>
 
@@ -22,7 +23,13 @@
   	</properties>
   </rule>
 
+
+
+
   <!--
+<rule ref="Squiz.Classes.ValidClassName">
+    <type>warning</type>
+  </rule>
   Temporarily ignore until API docblock formatting and line length issues in core code are fixed.
   <rule ref="FHComplete.Commenting.FunctionComment.ParamCommentNotCapital">
     <severity>0</severity>

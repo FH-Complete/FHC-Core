@@ -33,11 +33,11 @@ class Tag extends APIv1_Controller
 	 */
 	public function getTag()
 	{
-		$tagID = $this->get('tag_id');
+		$tag = $this->get('tag');
 		
-		if(isset($tagID))
+		if(isset($tag))
 		{
-			$result = $this->TagModel->load($tagID);
+			$result = $this->TagModel->load($tag);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Tag extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['tag_id']))
+			if(isset($this->post()['tag']))
 			{
-				$result = $this->TagModel->update($this->post()['tag_id'], $this->post());
+				$result = $this->TagModel->update($this->post()['tag'], $this->post());
 			}
 			else
 			{

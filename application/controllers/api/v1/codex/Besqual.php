@@ -33,11 +33,11 @@ class Besqual extends APIv1_Controller
 	 */
 	public function getBesqual()
 	{
-		$besqualID = $this->get('besqual_id');
+		$besqualcode = $this->get('besqualcode');
 		
-		if(isset($besqualID))
+		if(isset($besqualcode))
 		{
-			$result = $this->BesqualModel->load($besqualID);
+			$result = $this->BesqualModel->load($besqualcode);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Besqual extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['besqual_id']))
+			if(isset($this->post()['besqualcode']))
 			{
-				$result = $this->BesqualModel->update($this->post()['besqual_id'], $this->post());
+				$result = $this->BesqualModel->update($this->post()['besqualcode'], $this->post());
 			}
 			else
 			{

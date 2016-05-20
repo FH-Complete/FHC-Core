@@ -33,11 +33,11 @@ class Raumtyp extends APIv1_Controller
 	 */
 	public function getRaumtyp()
 	{
-		$raumtypID = $this->get('raumtyp_id');
+		$raumtyp_kurzbz = $this->get('raumtyp_kurzbz');
 		
-		if(isset($raumtypID))
+		if(isset($raumtyp_kurzbz))
 		{
-			$result = $this->RaumtypModel->load($raumtypID);
+			$result = $this->RaumtypModel->load($raumtyp_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Raumtyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['raumtyp_id']))
+			if(isset($this->post()['raumtyp_kurzbz']))
 			{
-				$result = $this->RaumtypModel->update($this->post()['raumtyp_id'], $this->post());
+				$result = $this->RaumtypModel->update($this->post()['raumtyp_kurzbz'], $this->post());
 			}
 			else
 			{

@@ -33,11 +33,11 @@ class Rechnungstyp extends APIv1_Controller
 	 */
 	public function getRechnungstyp()
 	{
-		$rechnungstypID = $this->get('rechnungstyp_id');
+		$rechnungstyp_kurzbz = $this->get('rechnungstyp_kurzbz');
 		
-		if(isset($rechnungstypID))
+		if(isset($rechnungstyp_kurzbz))
 		{
-			$result = $this->RechnungstypModel->load($rechnungstypID);
+			$result = $this->RechnungstypModel->load($rechnungstyp_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Rechnungstyp extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['rechnungstyp_id']))
+			if(isset($this->post()['rechnungstyp_kurzbz']))
 			{
-				$result = $this->RechnungstypModel->update($this->post()['rechnungstyp_id'], $this->post());
+				$result = $this->RechnungstypModel->update($this->post()['rechnungstyp_kurzbz'], $this->post());
 			}
 			else
 			{

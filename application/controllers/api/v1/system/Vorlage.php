@@ -33,11 +33,11 @@ class Vorlage extends APIv1_Controller
 	 */
 	public function getVorlage()
 	{
-		$vorlageID = $this->get('vorlage_id');
+		$vorlage_kurzbz = $this->get('vorlage_kurzbz');
 		
-		if(isset($vorlageID))
+		if(isset($vorlage_kurzbz))
 		{
-			$result = $this->VorlageModel->load($vorlageID);
+			$result = $this->VorlageModel->load($vorlage_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Vorlage extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['vorlage_id']))
+			if(isset($this->post()['vorlage_kurzbz']))
 			{
-				$result = $this->VorlageModel->update($this->post()['vorlage_id'], $this->post());
+				$result = $this->VorlageModel->update($this->post()['vorlage_kurzbz'], $this->post());
 			}
 			else
 			{

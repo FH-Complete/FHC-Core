@@ -33,11 +33,11 @@ class Mitarbeiter extends APIv1_Controller
 	 */
 	public function getMitarbeiter()
 	{
-		$mitarbeiterID = $this->get('mitarbeiter_id');
+		$mitarbeiter_uid = $this->get('mitarbeiter_uid');
 		
-		if(isset($mitarbeiterID))
+		if(isset($mitarbeiter_uid))
 		{
-			$result = $this->MitarbeiterModel->load($mitarbeiterID);
+			$result = $this->MitarbeiterModel->load($mitarbeiter_uid);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Mitarbeiter extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['mitarbeiter_id']))
+			if(isset($this->post()['mitarbeiter_uid']))
 			{
-				$result = $this->MitarbeiterModel->update($this->post()['mitarbeiter_id'], $this->post());
+				$result = $this->MitarbeiterModel->update($this->post()['mitarbeiter_uid'], $this->post());
 			}
 			else
 			{

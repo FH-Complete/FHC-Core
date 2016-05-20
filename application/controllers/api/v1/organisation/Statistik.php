@@ -33,11 +33,11 @@ class Statistik extends APIv1_Controller
 	 */
 	public function getStatistik()
 	{
-		$statistikID = $this->get('statistik_id');
+		$statistik_kurzbz = $this->get('statistik_kurzbz');
 		
-		if(isset($statistikID))
+		if(isset($statistik_kurzbz))
 		{
-			$result = $this->StatistikModel->load($statistikID);
+			$result = $this->StatistikModel->load($statistik_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Statistik extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['statistik_id']))
+			if(isset($this->post()['statistik_kurzbz']))
 			{
-				$result = $this->StatistikModel->update($this->post()['statistik_id'], $this->post());
+				$result = $this->StatistikModel->update($this->post()['statistik_kurzbz'], $this->post());
 			}
 			else
 			{

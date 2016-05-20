@@ -55,9 +55,9 @@ class Entwicklungsteam extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['entwicklungsteam_id']))
+			if(isset($this->post()['studiengang_kz']) && isset($this->post()['mitarbeiter_uid']))
 			{
-				$result = $this->EntwicklungsteamModel->update($this->post()['entwicklungsteam_id'], $this->post());
+				$result = $this->EntwicklungsteamModel->update(array($this->post()['entwicklungsteam_id'], $this->post()['mitarbeiter_uid']), $this->post());
 			}
 			else
 			{

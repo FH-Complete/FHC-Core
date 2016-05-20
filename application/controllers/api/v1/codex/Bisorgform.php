@@ -33,11 +33,11 @@ class Bisorgform extends APIv1_Controller
 	 */
 	public function getBisorgform()
 	{
-		$bisorgformID = $this->get('bisorgform_id');
+		$bisorgform_kurzbz = $this->get('bisorgform_kurzbz');
 		
-		if(isset($bisorgformID))
+		if(isset($bisorgform_kurzbz))
 		{
-			$result = $this->BisorgformModel->load($bisorgformID);
+			$result = $this->BisorgformModel->load($bisorgform_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Bisorgform extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['bisorgform_id']))
+			if(isset($this->post()['bisorgform_kurzbz']))
 			{
-				$result = $this->BisorgformModel->update($this->post()['bisorgform_id'], $this->post());
+				$result = $this->BisorgformModel->update($this->post()['bisorgform_kurzbz'], $this->post());
 			}
 			else
 			{

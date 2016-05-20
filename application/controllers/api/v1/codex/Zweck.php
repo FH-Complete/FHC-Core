@@ -33,11 +33,11 @@ class Zweck extends APIv1_Controller
 	 */
 	public function getZweck()
 	{
-		$zweckID = $this->get('zweck_id');
+		$zweck_code = $this->get('zweck_code');
 		
-		if(isset($zweckID))
+		if(isset($zweck_code))
 		{
-			$result = $this->ZweckModel->load($zweckID);
+			$result = $this->ZweckModel->load($zweck_code);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Zweck extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zweck_id']))
+			if(isset($this->post()['zweck_code']))
 			{
-				$result = $this->ZweckModel->update($this->post()['zweck_id'], $this->post());
+				$result = $this->ZweckModel->update($this->post()['zweck_code'], $this->post());
 			}
 			else
 			{

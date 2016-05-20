@@ -55,9 +55,9 @@ class Semesterwochen extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['semesterwochen_id']))
+			if(isset($this->post()['studiengang_kz']) && isset($this->post()['semester']))
 			{
-				$result = $this->SemesterwochenModel->update($this->post()['semesterwochen_id'], $this->post());
+				$result = $this->SemesterwochenModel->update(array($this->post()['studiengang_kz'], $this->post()['semester']), $this->post());
 			}
 			else
 			{

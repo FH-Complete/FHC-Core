@@ -33,11 +33,11 @@ class Studienordnungstatus extends APIv1_Controller
 	 */
 	public function getStudienordnungstatus()
 	{
-		$studienordnungstatusID = $this->get('studienordnungstatus_id');
+		$status_kurzbz = $this->get('status_kurzbz');
 		
-		if(isset($studienordnungstatusID))
+		if(isset($status_kurzbz))
 		{
-			$result = $this->StudienordnungstatusModel->load($studienordnungstatusID);
+			$result = $this->StudienordnungstatusModel->load($status_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Studienordnungstatus extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studienordnungstatus_id']))
+			if(isset($this->post()['status_kurzbz']))
 			{
-				$result = $this->StudienordnungstatusModel->update($this->post()['studienordnungstatus_id'], $this->post());
+				$result = $this->StudienordnungstatusModel->update($this->post()['status_kurzbz'], $this->post());
 			}
 			else
 			{

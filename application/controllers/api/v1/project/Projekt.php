@@ -33,11 +33,11 @@ class Projekt extends APIv1_Controller
 	 */
 	public function getProjekt()
 	{
-		$projektID = $this->get('projekt_id');
+		$projekt_kurzbz = $this->get('projekt_kurzbz');
 		
-		if(isset($projektID))
+		if(isset($projekt_kurzbz))
 		{
-			$result = $this->ProjektModel->load($projektID);
+			$result = $this->ProjektModel->load($projekt_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Projekt extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['projekt_id']))
+			if(isset($this->post()['projekt_kurzbz']))
 			{
-				$result = $this->ProjektModel->update($this->post()['projekt_id'], $this->post());
+				$result = $this->ProjektModel->update($this->post()['projekt_kurzbz'], $this->post());
 			}
 			else
 			{

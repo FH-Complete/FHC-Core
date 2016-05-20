@@ -33,11 +33,11 @@ class Funktion extends APIv1_Controller
 	 */
 	public function getFunktion()
 	{
-		$funktionID = $this->get('funktion_id');
+		$funktion_kurzbz = $this->get('funktion_kurzbz');
 		
-		if(isset($funktionID))
+		if(isset($funktion_kurzbz))
 		{
-			$result = $this->FunktionModel->load($funktionID);
+			$result = $this->FunktionModel->load($funktion_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -54,9 +54,9 @@ class Funktion extends APIv1_Controller
 	{
 		if($this->_validate($this->post()))
 		{
-			if(isset($this->post()['funktion_id']))
+			if(isset($this->post()['funktion_kurzbz']))
 			{
-				$result = $this->FunktionModel->update($this->post()['funktion_id'], $this->post());
+				$result = $this->FunktionModel->update($this->post()['funktion_kurzbz'], $this->post());
 			}
 			else
 			{
