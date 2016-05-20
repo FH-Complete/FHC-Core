@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Bestellstatus extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Bestellstatus extends APIv1_Controller
 	{
 		$bestellstatus_kurzbz = $this->get('bestellstatus_kurzbz');
 		
-		if(isset($bestellstatus_kurzbz))
+		if (isset($bestellstatus_kurzbz))
 		{
 			$result = $this->BestellstatusModel->load($bestellstatus_kurzbz);
 			
@@ -52,9 +52,9 @@ class Bestellstatus extends APIv1_Controller
 	 */
 	public function postBestellstatus()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['bestellstatus_kurzbz']))
+			if (isset($this->post()['bestellstatus_kurzbz']))
 			{
 				$result = $this->BestellstatusModel->update($this->post()['bestellstatus_kurzbz'], $this->post());
 			}

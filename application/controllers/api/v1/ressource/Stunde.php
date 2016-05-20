@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Stunde extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Stunde extends APIv1_Controller
 	{
 		$stunde = $this->get('stunde');
 		
-		if(isset($stunde))
+		if (isset($stunde))
 		{
 			$result = $this->StundeModel->load($stunde);
 			
@@ -52,9 +52,9 @@ class Stunde extends APIv1_Controller
 	 */
 	public function postStunde()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['stunde']))
+			if (isset($this->post()['stunde']))
 			{
 				$result = $this->StundeModel->update($this->post()['stunde'], $this->post());
 			}

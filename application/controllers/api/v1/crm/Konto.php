@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Konto extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Konto extends APIv1_Controller
 	{
 		$buchungsnr = $this->get('buchungsnr');
 		
-		if(isset($buchungsnr))
+		if (isset($buchungsnr))
 		{
 			$result = $this->KontoModel->load($buchungsnr);
 			
@@ -52,9 +52,9 @@ class Konto extends APIv1_Controller
 	 */
 	public function postKonto()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['buchungsnr']))
+			if (isset($this->post()['buchungsnr']))
 			{
 				$result = $this->KontoModel->update($this->post()['buchungsnr'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Lvinfo extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Lvinfo extends APIv1_Controller
 		$sprache = $this->get('sprache');
 		$lehrveranstaltung_id = $this->get('lehrveranstaltung_id');
 		
-		if(isset($sprache) && isset($lehrveranstaltung_id))
+		if (isset($sprache) && isset($lehrveranstaltung_id))
 		{
 			$result = $this->LvinfoModel->load(array($sprache, $lehrveranstaltung_id));
 			
@@ -53,9 +53,9 @@ class Lvinfo extends APIv1_Controller
 	 */
 	public function postLvinfo()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['sprache']) && isset($this->post()['lehrveranstaltung_id']))
+			if (isset($this->post()['sprache']) && isset($this->post()['lehrveranstaltung_id']))
 			{
 				$result = $this->LvinfoModel->update(array($this->post()['sprache'], $this->post()['lehrveranstaltung_id']), $this->post());
 			}

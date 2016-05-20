@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Lehrveranstaltung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Lehrveranstaltung extends APIv1_Controller
 	{
 		$lehrveranstaltung_id = $this->get('lehrveranstaltung_id');
 		
-		if(isset($lehrveranstaltung_id))
+		if (isset($lehrveranstaltung_id))
 		{
 			$result = $this->LehrveranstaltungModel->load($lehrveranstaltung_id);
 			
@@ -52,9 +52,9 @@ class Lehrveranstaltung extends APIv1_Controller
 	 */
 	public function postLehrveranstaltung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lehrveranstaltung_id']))
+			if (isset($this->post()['lehrveranstaltung_id']))
 			{
 				$result = $this->LehrveranstaltungModel->update($this->post()['lehrveranstaltung_id'], $this->post());
 			}

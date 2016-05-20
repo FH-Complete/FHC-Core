@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Rolleberechtigung extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Rolleberechtigung extends APIv1_Controller
 		$rolle_kurzbz = $this->get('rolle_kurzbz');
 		$berechtigung_kurzbz = $this->get('berechtigung_kurzbz');
 		
-		if(isset($rolle_kurzbz) && isset($berechtigung_kurzbz))
+		if (isset($rolle_kurzbz) && isset($berechtigung_kurzbz))
 		{
 			$result = $this->RolleberechtigungModel->load(array($rolle_kurzbz, $berechtigung_kurzbz));
 			
@@ -53,9 +53,9 @@ class Rolleberechtigung extends APIv1_Controller
 	 */
 	public function postRolleberechtigung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['rolle_kurzbz']) && isset($this->post()['berechtigung_kurzbz']))
+			if (isset($this->post()['rolle_kurzbz']) && isset($this->post()['berechtigung_kurzbz']))
 			{
 				$result = $this->RolleberechtigungModel->update(array($this->post()['rolle_kurzbz'], $this->post()['berechtigung_kurzbz']), $this->post());
 			}

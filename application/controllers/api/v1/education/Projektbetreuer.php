@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Projektbetreuer extends APIv1_Controller
 {
@@ -37,7 +37,7 @@ class Projektbetreuer extends APIv1_Controller
 		$projektarbeit_id = $this->get('projektarbeit_id');
 		$person_id = $this->get('person_id');
 		
-		if(isset($betreuerart_kurzbz) && isset($projektarbeit_id) && isset($person_id))
+		if (isset($betreuerart_kurzbz) && isset($projektarbeit_id) && isset($person_id))
 		{
 			$result = $this->ProjektbetreuerModel->load(array($betreuerart_kurzbz, $projektarbeit_id, $person_id));
 			
@@ -54,9 +54,9 @@ class Projektbetreuer extends APIv1_Controller
 	 */
 	public function postProjektbetreuer()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['betreuerart_kurzbz']) && isset($this->post()['projektarbeit_id']) && isset($this->post()['person_id']))
+			if (isset($this->post()['betreuerart_kurzbz']) && isset($this->post()['projektarbeit_id']) && isset($this->post()['person_id']))
 			{
 				$pksArray = array($this->post()['betreuerart_kurzbz'],
 									$this->post()['projektarbeit_id'],

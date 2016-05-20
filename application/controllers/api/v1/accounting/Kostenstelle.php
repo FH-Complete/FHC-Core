@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Kostenstelle extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Kostenstelle extends APIv1_Controller
 	{
 		$kostenstelleID = $this->get('kostenstelle_id');
 		
-		if(isset($kostenstelleID))
+		if (isset($kostenstelleID))
 		{
 			$result = $this->KostenstelleModel->load($kostenstelleID);
 			
@@ -52,9 +52,9 @@ class Kostenstelle extends APIv1_Controller
 	 */
 	public function postKostenstelle()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['kostenstelle_id']))
+			if (isset($this->post()['kostenstelle_id']))
 			{
 				$result = $this->KostenstelleModel->update($this->post()['kostenstelle_id'], $this->post());
 			}

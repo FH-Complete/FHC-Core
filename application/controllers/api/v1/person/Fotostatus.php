@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Fotostatus extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Fotostatus extends APIv1_Controller
 	{
 		$fotostatus_kurzbz = $this->get('fotostatus_kurzbz');
 		
-		if(isset($fotostatus_kurzbz))
+		if (isset($fotostatus_kurzbz))
 		{
 			$result = $this->FotostatusModel->load($fotostatus_kurzbz);
 			
@@ -52,9 +52,9 @@ class Fotostatus extends APIv1_Controller
 	 */
 	public function postFotostatus()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['fotostatus_kurzbz']))
+			if (isset($this->post()['fotostatus_kurzbz']))
 			{
 				$result = $this->FotostatusModel->update($this->post()['fotostatus_kurzbz'], $this->post());
 			}

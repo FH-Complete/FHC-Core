@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Fachbereich2 extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Fachbereich2 extends APIv1_Controller
 	{
 		$fachbereich_kurzbz = $this->get('fachbereich_kurzbz');
 		
-		if(isset($fachbereich_kurzbz))
+		if (isset($fachbereich_kurzbz))
 		{
 			$result = $this->FachbereichModel->load($fachbereich_kurzbz);
 			
@@ -52,9 +52,9 @@ class Fachbereich2 extends APIv1_Controller
 	 */
 	public function postFachbereich()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['fachbereich_id']))
+			if (isset($this->post()['fachbereich_id']))
 			{
 				$result = $this->FachbereichModel->update($this->post()['fachbereich_id'], $this->post());
 			}

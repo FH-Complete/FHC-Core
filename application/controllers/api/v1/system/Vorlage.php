@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Vorlage extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Vorlage extends APIv1_Controller
 	{
 		$vorlage_kurzbz = $this->get('vorlage_kurzbz');
 		
-		if(isset($vorlage_kurzbz))
+		if (isset($vorlage_kurzbz))
 		{
 			$result = $this->VorlageModel->load($vorlage_kurzbz);
 			
@@ -52,9 +52,9 @@ class Vorlage extends APIv1_Controller
 	 */
 	public function postVorlage()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['vorlage_kurzbz']))
+			if (isset($this->post()['vorlage_kurzbz']))
 			{
 				$result = $this->VorlageModel->update($this->post()['vorlage_kurzbz'], $this->post());
 			}

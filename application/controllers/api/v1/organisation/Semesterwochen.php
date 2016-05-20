@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Semesterwochen extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Semesterwochen extends APIv1_Controller
 		$studiengang_kz = $this->get('studiengang_kz');
 		$semester = $this->get('semester');
 		
-		if(isset($studiengang_kz) && isset($semester))
+		if (isset($studiengang_kz) && isset($semester))
 		{
 			$result = $this->SemesterwochenModel->load(array($studiengang_kz, $semester));
 			
@@ -53,9 +53,9 @@ class Semesterwochen extends APIv1_Controller
 	 */
 	public function postSemesterwochen()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studiengang_kz']) && isset($this->post()['semester']))
+			if (isset($this->post()['studiengang_kz']) && isset($this->post()['semester']))
 			{
 				$result = $this->SemesterwochenModel->update(array($this->post()['studiengang_kz'], $this->post()['semester']), $this->post());
 			}

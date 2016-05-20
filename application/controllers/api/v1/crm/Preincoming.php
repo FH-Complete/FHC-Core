@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Preincoming extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Preincoming extends APIv1_Controller
 	{
 		$preincomingID = $this->get('preincoming_id');
 		
-		if(isset($preincomingID))
+		if (isset($preincomingID))
 		{
 			$result = $this->PreincomingModel->load($preincomingID);
 			
@@ -52,9 +52,9 @@ class Preincoming extends APIv1_Controller
 	 */
 	public function postPreincoming()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['preincoming_id']))
+			if (isset($this->post()['preincoming_id']))
 			{
 				$result = $this->PreincomingModel->update($this->post()['preincoming_id'], $this->post());
 			}

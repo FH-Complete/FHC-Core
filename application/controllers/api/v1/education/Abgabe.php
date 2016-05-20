@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Abgabe extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Abgabe extends APIv1_Controller
 	{
 		$abgabe_id = $this->get('abgabe_id');
 		
-		if(isset($abgabe_id))
+		if (isset($abgabe_id))
 		{
 			$result = $this->AbgabeModel->load($abgabe_id);
 			
@@ -52,9 +52,9 @@ class Abgabe extends APIv1_Controller
 	 */
 	public function postAbgabe()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['abgabe_id']))
+			if (isset($this->post()['abgabe_id']))
 			{
 				$result = $this->AbgabeModel->update($this->post()['abgabe_id'], $this->post());
 			}

@@ -13,7 +13,7 @@
  */
 // ------------------------------------------------------------------------
 
-defined('BASEPATH') || exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Kontakt extends APIv1_Controller
 {
@@ -33,7 +33,7 @@ class Kontakt extends APIv1_Controller
     {
 		$personID = $this->get("person_id");
 		
-		if(isset($personID))
+		if (isset($personID))
 		{
 			$result = $this->KontaktModel->loadWhere(array('person_id' => $personID));
 			
@@ -49,9 +49,9 @@ class Kontakt extends APIv1_Controller
     {
                 $post = $this->_parseData($this->post());
 		
-		if(is_array($post))
+		if (is_array($post))
 		{
-			if(isset($post['kontakt_id']))
+			if (isset($post['kontakt_id']))
 			{
 				$result = $this->KontaktModel->update($post['kontakt_id'], $post);
 			}

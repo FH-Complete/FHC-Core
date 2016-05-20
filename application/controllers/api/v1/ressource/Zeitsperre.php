@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Zeitsperre extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Zeitsperre extends APIv1_Controller
 	{
 		$zeitsperreID = $this->get('zeitsperre_id');
 		
-		if(isset($zeitsperreID))
+		if (isset($zeitsperreID))
 		{
 			$result = $this->ZeitsperreModel->load($zeitsperreID);
 			
@@ -52,9 +52,9 @@ class Zeitsperre extends APIv1_Controller
 	 */
 	public function postZeitsperre()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zeitsperre_id']))
+			if (isset($this->post()['zeitsperre_id']))
 			{
 				$result = $this->ZeitsperreModel->update($this->post()['zeitsperre_id'], $this->post());
 			}

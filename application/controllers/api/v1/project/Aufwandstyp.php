@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Aufwandstyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Aufwandstyp extends APIv1_Controller
 	{
 		$aufwandstyp_kurzbz = $this->get('aufwandstyp_kurzbz');
 		
-		if(isset($aufwandstyp_kurzbz))
+		if (isset($aufwandstyp_kurzbz))
 		{
 			$result = $this->AufwandstypModel->load($aufwandstyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Aufwandstyp extends APIv1_Controller
 	 */
 	public function postAufwandstyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['aufwandstyp_kurzbz']))
+			if (isset($this->post()['aufwandstyp_kurzbz']))
 			{
 				$result = $this->AufwandstypModel->update($this->post()['aufwandstyp_kurzbz'], $this->post());
 			}

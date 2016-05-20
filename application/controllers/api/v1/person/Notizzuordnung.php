@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Notizzuordnung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Notizzuordnung extends APIv1_Controller
 	{
 		$notizzuordnungID = $this->get('notizzuordnung_id');
 		
-		if(isset($notizzuordnungID))
+		if (isset($notizzuordnungID))
 		{
 			$result = $this->NotizzuordnungModel->load($notizzuordnungID);
 			
@@ -52,9 +52,9 @@ class Notizzuordnung extends APIv1_Controller
 	 */
 	public function postNotizzuordnung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['notizzuordnung_id']))
+			if (isset($this->post()['notizzuordnung_id']))
 			{
 				$result = $this->NotizzuordnungModel->update($this->post()['notizzuordnung_id'], $this->post());
 			}

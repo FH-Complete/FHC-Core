@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Vorlagestudiengang extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Vorlagestudiengang extends APIv1_Controller
 	{
 		$vorlagestudiengangID = $this->get('vorlagestudiengang_id');
 		
-		if(isset($vorlagestudiengangID))
+		if (isset($vorlagestudiengangID))
 		{
 			$result = $this->VorlagestudiengangModel->load($vorlagestudiengangID);
 			
@@ -52,9 +52,9 @@ class Vorlagestudiengang extends APIv1_Controller
 	 */
 	public function postVorlagestudiengang()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['vorlagestudiengang_id']))
+			if (isset($this->post()['vorlagestudiengang_id']))
 			{
 				$result = $this->VorlagestudiengangModel->update($this->post()['vorlagestudiengang_id'], $this->post());
 			}

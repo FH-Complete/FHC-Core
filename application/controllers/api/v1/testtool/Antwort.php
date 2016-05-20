@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Antwort extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Antwort extends APIv1_Controller
 	{
 		$antwortID = $this->get('antwort_id');
 		
-		if(isset($antwortID))
+		if (isset($antwortID))
 		{
 			$result = $this->AntwortModel->load($antwortID);
 			
@@ -52,9 +52,9 @@ class Antwort extends APIv1_Controller
 	 */
 	public function postAntwort()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['antwort_id']))
+			if (isset($this->post()['antwort_id']))
 			{
 				$result = $this->AntwortModel->update($this->post()['antwort_id'], $this->post());
 			}

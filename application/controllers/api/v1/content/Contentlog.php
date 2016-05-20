@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Contentlog extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Contentlog extends APIv1_Controller
 	{
 		$contentlogID = $this->get('contentlog_id');
 		
-		if(isset($contentlogID))
+		if (isset($contentlogID))
 		{
 			$result = $this->ContentlogModel->load($contentlogID);
 			
@@ -52,9 +52,9 @@ class Contentlog extends APIv1_Controller
 	 */
 	public function postContentlog()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['contentlog_id']))
+			if (isset($this->post()['contentlog_id']))
 			{
 				$result = $this->ContentlogModel->update($this->post()['contentlog_id'], $this->post());
 			}

@@ -189,7 +189,7 @@ class Examples extends CI_Controller
 
 		$output = $crud->render();
 
-		if($crud->getState() != 'list') {
+		if ($crud->getState() != 'list') {
 			$this->_example_output($output);
 		} else {
 			return $output;
@@ -214,7 +214,7 @@ class Examples extends CI_Controller
 
 		$output = $crud->render();
 
-		if($crud->getState() != 'list') {
+		if ($crud->getState() != 'list') {
 			$this->_example_output($output);
 		} else {
 			return $output;
@@ -237,7 +237,7 @@ class Examples extends CI_Controller
 
 		$output = $crud->render();
 
-		if($crud->getState() != 'list') {
+		if ($crud->getState() != 'list') {
 			$this->_example_output($output);
 		} else {
 			return $output;

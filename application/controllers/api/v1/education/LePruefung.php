@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class LePruefung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class LePruefung extends APIv1_Controller
 	{
 		$lepruefung_id = $this->get('lepruefung_id');
 		
-		if(isset($lepruefung_id))
+		if (isset($lepruefung_id))
 		{
 			$result = $this->LePruefungModel->load($lepruefung_id);
 			
@@ -52,9 +52,9 @@ class LePruefung extends APIv1_Controller
 	 */
 	public function postLePruefung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lepruefung_id']))
+			if (isset($this->post()['lepruefung_id']))
 			{
 				$result = $this->LePruefungModel->update($this->post()['lepruefung_id'], $this->post());
 			}

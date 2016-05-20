@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Studienjahr extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Studienjahr extends APIv1_Controller
 	{
 		$studienjahr_kurzbz = $this->get('studienjahr_kurzbz');
 		
-		if(isset($studienjahr_kurzbz))
+		if (isset($studienjahr_kurzbz))
 		{
 			$result = $this->StudienjahrModel->load($studienjahr_kurzbz);
 			
@@ -52,9 +52,9 @@ class Studienjahr extends APIv1_Controller
 	 */
 	public function postStudienjahr()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studienjahr_kurzbz']))
+			if (isset($this->post()['studienjahr_kurzbz']))
 			{
 				$result = $this->StudienjahrModel->update($this->post()['studienjahr_kurzbz'], $this->post());
 			}

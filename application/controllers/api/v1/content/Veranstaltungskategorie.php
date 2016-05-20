@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Veranstaltungskategorie extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Veranstaltungskategorie extends APIv1_Controller
 	{
 		$veranstaltungskategorie_kurzbz = $this->get('veranstaltungskategorie_kurzbz');
 		
-		if(isset($veranstaltungskategorie_kurzbz))
+		if (isset($veranstaltungskategorie_kurzbz))
 		{
 			$result = $this->VeranstaltungskategorieModel->load($veranstaltungskategorie_kurzbz);
 			
@@ -52,9 +52,9 @@ class Veranstaltungskategorie extends APIv1_Controller
 	 */
 	public function postVeranstaltungskategorie()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['veranstaltungskategorie_kurzbz']))
+			if (isset($this->post()['veranstaltungskategorie_kurzbz']))
 			{
 				$result = $this->VeranstaltungskategorieModel->update($this->post()['veranstaltungskategorie_kurzbz'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Pruefungsanmeldung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Pruefungsanmeldung extends APIv1_Controller
 	{
 		$pruefungsanmeldung_id = $this->get('pruefungsanmeldung_id');
 		
-		if(isset($pruefungsanmeldung_id))
+		if (isset($pruefungsanmeldung_id))
 		{
 			$result = $this->PruefungsanmeldungModel->load($pruefungsanmeldung_id);
 			
@@ -52,9 +52,9 @@ class Pruefungsanmeldung extends APIv1_Controller
 	 */
 	public function postPruefungsanmeldung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['pruefungsanmeldung_id']))
+			if (isset($this->post()['pruefungsanmeldung_id']))
 			{
 				$result = $this->PruefungsanmeldungModel->update($this->post()['pruefungsanmeldung_id'], $this->post());
 			}

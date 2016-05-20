@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Message extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Message extends APIv1_Controller
 	{
 		$messageID = $this->get('message_id');
 		
-		if(isset($messageID))
+		if (isset($messageID))
 		{
 			$result = $this->MessageModel->load($messageID);
 			
@@ -52,9 +52,9 @@ class Message extends APIv1_Controller
 	 */
 	public function postMessage()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['message_id']))
+			if (isset($this->post()['message_id']))
 			{
 				$result = $this->MessageModel->update($this->post()['message_id'], $this->post());
 			}

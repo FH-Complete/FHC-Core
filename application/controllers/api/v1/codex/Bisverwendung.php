@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Bisverwendung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Bisverwendung extends APIv1_Controller
 	{
 		$bisverwendungID = $this->get('bisverwendung_id');
 		
-		if(isset($bisverwendungID))
+		if (isset($bisverwendungID))
 		{
 			$result = $this->BisverwendungModel->load($bisverwendungID);
 			
@@ -52,9 +52,9 @@ class Bisverwendung extends APIv1_Controller
 	 */
 	public function postBisverwendung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['bisverwendung_id']))
+			if (isset($this->post()['bisverwendung_id']))
 			{
 				$result = $this->BisverwendungModel->update($this->post()['bisverwendung_id'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Orgform extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Orgform extends APIv1_Controller
 	{
 		$orgform_kurzbz = $this->get('orgform_kurzbz');
 		
-		if(isset($orgform_kurzbz))
+		if (isset($orgform_kurzbz))
 		{
 			$result = $this->OrgformModel->load($orgform_kurzbz);
 			
@@ -52,9 +52,9 @@ class Orgform extends APIv1_Controller
 	 */
 	public function postOrgform()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['orgform_kurzbz']))
+			if (isset($this->post()['orgform_kurzbz']))
 			{
 				$result = $this->OrgformModel->update($this->post()['orgform_kurzbz'], $this->post());
 			}

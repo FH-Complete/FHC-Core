@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Firma extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Firma extends APIv1_Controller
 	{
 		$firmaID = $this->get('firma_id');
 		
-		if(isset($firmaID))
+		if (isset($firmaID))
 		{
 			$result = $this->FirmaModel->load($firmaID);
 			
@@ -52,9 +52,9 @@ class Firma extends APIv1_Controller
 	 */
 	public function postFirma()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['firma_id']))
+			if (isset($this->post()['firma_id']))
 			{
 				$result = $this->FirmaModel->update($this->post()['firma_id'], $this->post());
 			}

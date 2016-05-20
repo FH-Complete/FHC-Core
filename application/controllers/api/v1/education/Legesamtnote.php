@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Legesamtnote extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Legesamtnote extends APIv1_Controller
 		$lehreinheit_id = $this->get('lehreinheit_id');
 		$student_uid = $this->get('student_uid');
 		
-		if(isset($lehreinheit_id) && isset($student_uid))
+		if (isset($lehreinheit_id) && isset($student_uid))
 		{
 			$result = $this->LegesamtnoteModel->load(array($lehreinheit_id, $student_uid));
 			
@@ -53,9 +53,9 @@ class Legesamtnote extends APIv1_Controller
 	 */
 	public function postLegesamtnote()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lehreinheit_id']) && isset($this->post()['student_uid']))
+			if (isset($this->post()['lehreinheit_id']) && isset($this->post()['student_uid']))
 			{
 				$result = $this->LegesamtnoteModel->update(array($this->post()['lehreinheit_id'], $this->post()['student_uid']), $this->post());
 			}

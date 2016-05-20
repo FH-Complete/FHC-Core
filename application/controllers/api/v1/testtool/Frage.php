@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Frage extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Frage extends APIv1_Controller
 	{
 		$frageID = $this->get('frage_id');
 		
-		if(isset($frageID))
+		if (isset($frageID))
 		{
 			$result = $this->FrageModel->load($frageID);
 			
@@ -52,9 +52,9 @@ class Frage extends APIv1_Controller
 	 */
 	public function postFrage()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['frage_id']))
+			if (isset($this->post()['frage_id']))
 			{
 				$result = $this->FrageModel->update($this->post()['frage_id'], $this->post());
 			}

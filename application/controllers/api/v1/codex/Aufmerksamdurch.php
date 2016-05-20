@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Aufmerksamdurch extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Aufmerksamdurch extends APIv1_Controller
 	{
 		$aufmerksamdurch_kurzbz = $this->get('aufmerksamdurch_kurzbz');
 		
-		if(isset($aufmerksamdurch_kurzbz))
+		if (isset($aufmerksamdurch_kurzbz))
 		{
 			$result = $this->AufmerksamdurchModel->load($aufmerksamdurch_kurzbz);
 			
@@ -52,9 +52,9 @@ class Aufmerksamdurch extends APIv1_Controller
 	 */
 	public function postAufmerksamdurch()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['aufmerksamdurch_kurzbz']))
+			if (isset($this->post()['aufmerksamdurch_kurzbz']))
 			{
 				$result = $this->AufmerksamdurchModel->update($this->post()['aufmerksamdurch_kurzbz'], $this->post());
 			}

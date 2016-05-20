@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Ferien extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Ferien extends APIv1_Controller
 		$studiengang_kz = $this->get('studiengang_kz');
 		$bezeichnung = $this->get('bezeichnung');
 		
-		if(isset($studiengang_kz) && isset($bezeichnung))
+		if (isset($studiengang_kz) && isset($bezeichnung))
 		{
 			$result = $this->FerienModel->load(array($studiengang_kz, $bezeichnung));
 			
@@ -53,9 +53,9 @@ class Ferien extends APIv1_Controller
 	 */
 	public function postFerien()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studiengang_kz']) && isset($this->post()['bezeichnung']))
+			if (isset($this->post()['studiengang_kz']) && isset($this->post()['bezeichnung']))
 			{
 				$result = $this->FerienModel->update(array($this->post()['ferien_id'], $this->post()['bezeichnung']), $this->post());
 			}

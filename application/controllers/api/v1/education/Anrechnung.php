@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Anrechnung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Anrechnung extends APIv1_Controller
 	{
 		$anrechnung_id = $this->get('anrechnung_id');
 		
-		if(isset($anrechnung_id))
+		if (isset($anrechnung_id))
 		{
 			$result = $this->AnrechnungModel->load($anrechnung_id);
 			
@@ -52,9 +52,9 @@ class Anrechnung extends APIv1_Controller
 	 */
 	public function postAnrechnung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['anrechnung_id']))
+			if (isset($this->post()['anrechnung_id']))
 			{
 				$result = $this->AnrechnungModel->update($this->post()['anrechnung_id'], $this->post());
 			}

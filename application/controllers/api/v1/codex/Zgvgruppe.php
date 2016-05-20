@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Zgvgruppe extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Zgvgruppe extends APIv1_Controller
 	{
 		$gruppe_kurzbz = $this->get('gruppe_kurzbz');
 		
-		if(isset($gruppe_kurzbz))
+		if (isset($gruppe_kurzbz))
 		{
 			$result = $this->ZgvgruppeModel->load($gruppe_kurzbz);
 			
@@ -52,9 +52,9 @@ class Zgvgruppe extends APIv1_Controller
 	 */
 	public function postZgvgruppe()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zgvgruppe_id']))
+			if (isset($this->post()['zgvgruppe_id']))
 			{
 				$result = $this->ZgvgruppeModel->update($this->post()['zgvgruppe_id'], $this->post());
 			}

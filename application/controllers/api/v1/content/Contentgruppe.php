@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Contentgruppe extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Contentgruppe extends APIv1_Controller
 		$gruppe_kurzbz = $this->get('gruppe_kurzbz');
 		$content_id = $this->get('content_id');
 		
-		if(isset($gruppe_kurzbz) && isset($content_id))
+		if (isset($gruppe_kurzbz) && isset($content_id))
 		{
 			$result = $this->ContentgruppeModel->load(array($gruppe_kurzbz, $content_id));
 			
@@ -53,9 +53,9 @@ class Contentgruppe extends APIv1_Controller
 	 */
 	public function postContentgruppe()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['gruppe_kurzbz']) && isset($this->post()['content_id']))
+			if (isset($this->post()['gruppe_kurzbz']) && isset($this->post()['content_id']))
 			{
 				$result = $this->ContentgruppeModel->update(array($this->post()['gruppe_kurzbz'], $this->post()['content_id']), $this->post());
 			}

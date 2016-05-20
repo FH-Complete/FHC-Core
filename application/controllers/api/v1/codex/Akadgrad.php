@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Akadgrad extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Akadgrad extends APIv1_Controller
 	{
 		$akadgradID = $this->get('akadgrad_id');
 		
-		if(isset($akadgradID))
+		if (isset($akadgradID))
 		{
 			$result = $this->AkadgradModel->load($akadgradID);
 			
@@ -52,9 +52,9 @@ class Akadgrad extends APIv1_Controller
 	 */
 	public function postAkadgrad()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['akadgrad_id']))
+			if (isset($this->post()['akadgrad_id']))
 			{
 				$result = $this->AkadgradModel->update($this->post()['akadgrad_id'], $this->post());
 			}

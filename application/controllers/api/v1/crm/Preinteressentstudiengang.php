@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Preinteressentstudiengang extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Preinteressentstudiengang extends APIv1_Controller
 		$preinteressent_id = $this->get('preinteressent_id');
 		$studiengang_kz = $this->get('studiengang_kz');
 		
-		if(isset($preinteressent_id) && isset($studiengang_kz))
+		if (isset($preinteressent_id) && isset($studiengang_kz))
 		{
 			$result = $this->PreinteressentstudiengangModel->load(array($preinteressent_id, $studiengang_kz));
 			
@@ -53,9 +53,9 @@ class Preinteressentstudiengang extends APIv1_Controller
 	 */
 	public function postPreinteressentstudiengang()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['preinteressent_id']) && isset($this->post()['studiengang_kz']))
+			if (isset($this->post()['preinteressent_id']) && isset($this->post()['studiengang_kz']))
 			{
 				$result = $this->PreinteressentstudiengangModel->update(array($this->post()['preinteressent_id'], $this->post()['studiengang_kz']), $this->post());
 			}

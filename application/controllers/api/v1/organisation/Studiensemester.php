@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Studiensemester extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Studiensemester extends APIv1_Controller
 	{
 		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
 		
-		if(isset($studiensemester_kurzbz))
+		if (isset($studiensemester_kurzbz))
 		{
 			$result = $this->StudiensemesterModel->load($studiensemester_kurzbz);
 			
@@ -52,9 +52,9 @@ class Studiensemester extends APIv1_Controller
 	 */
 	public function postStudiensemester()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studiensemester_kurzbz']))
+			if (isset($this->post()['studiensemester_kurzbz']))
 			{
 				$result = $this->StudiensemesterModel->update($this->post()['studiensemester_kurzbz'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Thread extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Thread extends APIv1_Controller
 	{
 		$threadID = $this->get('thread_id');
 		
-		if(isset($threadID))
+		if (isset($threadID))
 		{
 			$result = $this->ThreadModel->load($threadID);
 			
@@ -52,9 +52,9 @@ class Thread extends APIv1_Controller
 	 */
 	public function postThread()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['thread_id']))
+			if (isset($this->post()['thread_id']))
 			{
 				$result = $this->ThreadModel->update($this->post()['thread_id'], $this->post());
 			}

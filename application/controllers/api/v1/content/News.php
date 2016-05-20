@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class News extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class News extends APIv1_Controller
 	{
 		$newsID = $this->get('news_id');
 		
-		if(isset($newsID))
+		if (isset($newsID))
 		{
 			$result = $this->NewsModel->load($newsID);
 			
@@ -52,9 +52,9 @@ class News extends APIv1_Controller
 	 */
 	public function postNews()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['news_id']))
+			if (isset($this->post()['news_id']))
 			{
 				$result = $this->NewsModel->update($this->post()['news_id'], $this->post());
 			}

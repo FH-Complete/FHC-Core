@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Rechnung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Rechnung extends APIv1_Controller
 	{
 		$rechnungID = $this->get('rechnung_id');
 		
-		if(isset($rechnungID))
+		if (isset($rechnungID))
 		{
 			$result = $this->RechnungModel->load($rechnungID);
 			
@@ -52,9 +52,9 @@ class Rechnung extends APIv1_Controller
 	 */
 	public function postRechnung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['rechnung_id']))
+			if (isset($this->post()['rechnung_id']))
 			{
 				$result = $this->RechnungModel->update($this->post()['rechnung_id'], $this->post());
 			}

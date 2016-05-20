@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Mobilitaetsprogramm extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Mobilitaetsprogramm extends APIv1_Controller
 	{
 		$mobilitaetsprogramm_code = $this->get('mobilitaetsprogramm_code');
 		
-		if(isset($mobilitaetsprogramm_code))
+		if (isset($mobilitaetsprogramm_code))
 		{
 			$result = $this->MobilitaetsprogrammModel->load($mobilitaetsprogramm_code);
 			
@@ -52,9 +52,9 @@ class Mobilitaetsprogramm extends APIv1_Controller
 	 */
 	public function postMobilitaetsprogramm()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['mobilitaetsprogramm_code']))
+			if (isset($this->post()['mobilitaetsprogramm_code']))
 			{
 				$result = $this->MobilitaetsprogrammModel->update($this->post()['mobilitaetsprogramm_code'], $this->post());
 			}

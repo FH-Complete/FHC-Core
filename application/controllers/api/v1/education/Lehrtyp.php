@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Lehrtyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Lehrtyp extends APIv1_Controller
 	{
 		$lehrtyp_kurzbz = $this->get('lehrtyp_kurzbz');
 		
-		if(isset($lehrtyp_kurzbz))
+		if (isset($lehrtyp_kurzbz))
 		{
 			$result = $this->LehrtypModel->load($lehrtyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Lehrtyp extends APIv1_Controller
 	 */
 	public function postLehrtyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lehrtyp_kurzbz']))
+			if (isset($this->post()['lehrtyp_kurzbz']))
 			{
 				$result = $this->LehrtypModel->update($this->post()['lehrtyp_kurzbz'], $this->post());
 			}

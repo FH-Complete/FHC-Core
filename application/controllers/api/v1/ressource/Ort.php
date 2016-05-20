@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Ort extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Ort extends APIv1_Controller
 	{
 		$ort_kurzbz = $this->get('ort_kurzbz');
 		
-		if(isset($ort_kurzbz))
+		if (isset($ort_kurzbz))
 		{
 			$result = $this->OrtModel->load($ort_kurzbz);
 			
@@ -52,9 +52,9 @@ class Ort extends APIv1_Controller
 	 */
 	public function postOrt()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['ort_kurzbz']))
+			if (isset($this->post()['ort_kurzbz']))
 			{
 				$result = $this->OrtModel->update($this->post()['ort_kurzbz'], $this->post());
 			}

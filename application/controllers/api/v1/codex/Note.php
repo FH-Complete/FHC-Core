@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Note extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Note extends APIv1_Controller
 	{
 		$note = $this->get('note');
 		
-		if(isset($note))
+		if (isset($note))
 		{
 			$result = $this->NoteModel->load($note);
 			
@@ -52,9 +52,9 @@ class Note extends APIv1_Controller
 	 */
 	public function postNote()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['note']))
+			if (isset($this->post()['note']))
 			{
 				$result = $this->NoteModel->update($this->post()['note'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Funktion extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Funktion extends APIv1_Controller
 	{
 		$funktion_kurzbz = $this->get('funktion_kurzbz');
 		
-		if(isset($funktion_kurzbz))
+		if (isset($funktion_kurzbz))
 		{
 			$result = $this->FunktionModel->load($funktion_kurzbz);
 			
@@ -52,9 +52,9 @@ class Funktion extends APIv1_Controller
 	 */
 	public function postFunktion()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['funktion_kurzbz']))
+			if (isset($this->post()['funktion_kurzbz']))
 			{
 				$result = $this->FunktionModel->update($this->post()['funktion_kurzbz'], $this->post());
 			}

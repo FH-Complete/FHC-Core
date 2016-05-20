@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Aufnahmetermintyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Aufnahmetermintyp extends APIv1_Controller
 	{
 		$aufnahmetermintyp_kurzbz = $this->get('aufnahmetermintyp_kurzbz');
 		
-		if(isset($aufnahmetermintyp_kurzbz))
+		if (isset($aufnahmetermintyp_kurzbz))
 		{
 			$result = $this->AufnahmetermintypModel->load($aufnahmetermintyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Aufnahmetermintyp extends APIv1_Controller
 	 */
 	public function postAufnahmetermintyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['aufnahmetermintyp_kurzbz']))
+			if (isset($this->post()['aufnahmetermintyp_kurzbz']))
 			{
 				$result = $this->AufnahmetermintypModel->update($this->post()['aufnahmetermintyp_kurzbz'], $this->post());
 			}

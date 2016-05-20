@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Lehrfunktion extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Lehrfunktion extends APIv1_Controller
 	{
 		$lehrfunktion_kurzbz = $this->get('lehrfunktion_kurzbz');
 		
-		if(isset($lehrfunktion_kurzbz))
+		if (isset($lehrfunktion_kurzbz))
 		{
 			$result = $this->LehrfunktionModel->load($lehrfunktion_kurzbz);
 			
@@ -52,9 +52,9 @@ class Lehrfunktion extends APIv1_Controller
 	 */
 	public function postLehrfunktion()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lehrfunktion_kurzbz']))
+			if (isset($this->post()['lehrfunktion_kurzbz']))
 			{
 				$result = $this->LehrfunktionModel->update($this->post()['lehrfunktion_kurzbz'], $this->post());
 			}

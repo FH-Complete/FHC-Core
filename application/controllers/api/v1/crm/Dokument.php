@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Dokument extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Dokument extends APIv1_Controller
 	{
 		$dokument_kurzbz = $this->get('dokument_kurzbz');
 		
-		if(isset($dokument_kurzbz))
+		if (isset($dokument_kurzbz))
 		{
 			$result = $this->DokumentModel->load($dokument_kurzbz);
 			
@@ -52,9 +52,9 @@ class Dokument extends APIv1_Controller
 	 */
 	public function postDokument()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['dokument_kurzbz']))
+			if (isset($this->post()['dokument_kurzbz']))
 			{
 				$result = $this->DokumentModel->update($this->post()['dokument_kurzbz'], $this->post());
 			}

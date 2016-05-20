@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Geschaeftsjahr2 extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Geschaeftsjahr2 extends APIv1_Controller
 	{
 		$geschaeftsjahr_kurzbz = $this->get('geschaeftsjahr_kurzbz');
 		
-		if(isset($geschaeftsjahr_kurzbz))
+		if (isset($geschaeftsjahr_kurzbz))
 		{
 			$result = $this->GeschaeftsjahrModel->load($geschaeftsjahr_kurzbz);
 			
@@ -52,9 +52,9 @@ class Geschaeftsjahr2 extends APIv1_Controller
 	 */
 	public function postGeschaeftsjahr()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['geschaeftsjahr_id']))
+			if (isset($this->post()['geschaeftsjahr_id']))
 			{
 				$result = $this->GeschaeftsjahrModel->update($this->post()['geschaeftsjahr_id'], $this->post());
 			}

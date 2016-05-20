@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Zahlungstyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Zahlungstyp extends APIv1_Controller
 	{
 		$zahlungstyp_kurzbz = $this->get('zahlungstyp_kurzbz');
 		
-		if(isset($zahlungstyp_kurzbz))
+		if (isset($zahlungstyp_kurzbz))
 		{
 			$result = $this->ZahlungstypModel->load($zahlungstyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Zahlungstyp extends APIv1_Controller
 	 */
 	public function postZahlungstyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zahlungstyp_kurzbz']))
+			if (isset($this->post()['zahlungstyp_kurzbz']))
 			{
 				$result = $this->ZahlungstypModel->update($this->post()['zahlungstyp_kurzbz'], $this->post());
 			}

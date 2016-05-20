@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Lvregel extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Lvregel extends APIv1_Controller
 	{
 		$lvregel_id = $this->get('lvregel_id');
 		
-		if(isset($lvregel_id))
+		if (isset($lvregel_id))
 		{
 			$result = $this->LvregelModel->load($lvregel_id);
 			
@@ -52,9 +52,9 @@ class Lvregel extends APIv1_Controller
 	 */
 	public function postLvregel()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lvregel_id']))
+			if (isset($this->post()['lvregel_id']))
 			{
 				$result = $this->LvregelModel->update($this->post()['lvregel_id'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Notenschluesseluebung extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Notenschluesseluebung extends APIv1_Controller
 		$note = $this->get('note');
 		$uebung_id = $this->get('uebung_id');
 		
-		if(isset($note) && isset($uebung_id))
+		if (isset($note) && isset($uebung_id))
 		{
 			$result = $this->NotenschluesseluebungModel->load(array($note, $uebung_id));
 			
@@ -53,9 +53,9 @@ class Notenschluesseluebung extends APIv1_Controller
 	 */
 	public function postNotenschluesseluebung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['note']) && isset($this->post()['uebung_id']))
+			if (isset($this->post()['note']) && isset($this->post()['uebung_id']))
 			{
 				$result = $this->NotenschluesseluebungModel->update(array($this->post()['note'], $this->post()['uebung_id']), $this->post());
 			}

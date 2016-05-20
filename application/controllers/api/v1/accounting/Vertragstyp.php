@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Vertragstyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Vertragstyp extends APIv1_Controller
 	{
 		$vertragstyp_kurzbz = $this->get('vertragstyp_kurzbz');
 		
-		if(isset($vertragstyp_kurzbz))
+		if (isset($vertragstyp_kurzbz))
 		{
 			$result = $this->VertragstypModel->load($vertragstyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Vertragstyp extends APIv1_Controller
 	 */
 	public function postVertragstyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['vertragstyp_kurzbz']))
+			if (isset($this->post()['vertragstyp_kurzbz']))
 			{
 				$result = $this->VertragstypModel->update($this->post()['vertragstyp_kurzbz'], $this->post());
 			}

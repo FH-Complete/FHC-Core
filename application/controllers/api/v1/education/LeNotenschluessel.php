@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class LeNotenschluessel extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class LeNotenschluessel extends APIv1_Controller
 		$note = $this->get('note');
 		$lehreinheit_id = $this->get('lehreinheit_id');
 		
-		if(isset($note) && isset($lehreinheit_id))
+		if (isset($note) && isset($lehreinheit_id))
 		{
 			$result = $this->LeNotenschluesselModel->load(array($note, $lehreinheit_id));
 			
@@ -53,9 +53,9 @@ class LeNotenschluessel extends APIv1_Controller
 	 */
 	public function postLeNotenschluessel()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['note']) && isset($this->post()['lehreinheit_id']))
+			if (isset($this->post()['note']) && isset($this->post()['lehreinheit_id']))
 			{
 				$result = $this->LeNotenschluesselModel->update(array($this->post()['note'], $this->post()['lehreinheit_id']), $this->post());
 			}

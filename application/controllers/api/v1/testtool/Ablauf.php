@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Ablauf extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Ablauf extends APIv1_Controller
 	{
 		$ablaufID = $this->get('ablauf_id');
 		
-		if(isset($ablaufID))
+		if (isset($ablaufID))
 		{
 			$result = $this->AblaufModel->load($ablaufID);
 			
@@ -52,9 +52,9 @@ class Ablauf extends APIv1_Controller
 	 */
 	public function postAblauf()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['ablauf_id']))
+			if (isset($this->post()['ablauf_id']))
 			{
 				$result = $this->AblaufModel->update($this->post()['ablauf_id'], $this->post());
 			}

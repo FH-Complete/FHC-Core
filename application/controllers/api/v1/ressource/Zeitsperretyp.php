@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Zeitsperretyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Zeitsperretyp extends APIv1_Controller
 	{
 		$zeitsperretyp_kurzbz = $this->get('zeitsperretyp_kurzbz');
 		
-		if(isset($zeitsperretyp_kurzbz))
+		if (isset($zeitsperretyp_kurzbz))
 		{
 			$result = $this->ZeitsperretypModel->load($zeitsperretyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Zeitsperretyp extends APIv1_Controller
 	 */
 	public function postZeitsperretyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zeitsperretyp_kurzbz']))
+			if (isset($this->post()['zeitsperretyp_kurzbz']))
 			{
 				$result = $this->ZeitsperretypModel->update($this->post()['zeitsperretyp_kurzbz'], $this->post());
 			}

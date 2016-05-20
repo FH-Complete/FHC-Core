@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Vorschlag extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Vorschlag extends APIv1_Controller
 	{
 		$vorschlagID = $this->get('vorschlag_id');
 		
-		if(isset($vorschlagID))
+		if (isset($vorschlagID))
 		{
 			$result = $this->VorschlagModel->load($vorschlagID);
 			
@@ -52,9 +52,9 @@ class Vorschlag extends APIv1_Controller
 	 */
 	public function postVorschlag()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['vorschlag_id']))
+			if (isset($this->post()['vorschlag_id']))
 			{
 				$result = $this->VorschlagModel->update($this->post()['vorschlag_id'], $this->post());
 			}

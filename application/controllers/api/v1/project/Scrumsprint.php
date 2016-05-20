@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Scrumsprint extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Scrumsprint extends APIv1_Controller
 	{
 		$scrumsprintID = $this->get('scrumsprint_id');
 		
-		if(isset($scrumsprintID))
+		if (isset($scrumsprintID))
 		{
 			$result = $this->ScrumsprintModel->load($scrumsprintID);
 			
@@ -52,9 +52,9 @@ class Scrumsprint extends APIv1_Controller
 	 */
 	public function postScrumsprint()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['scrumsprint_id']))
+			if (isset($this->post()['scrumsprint_id']))
 			{
 				$result = $this->ScrumsprintModel->update($this->post()['scrumsprint_id'], $this->post());
 			}

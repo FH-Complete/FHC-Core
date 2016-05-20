@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Firmentyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Firmentyp extends APIv1_Controller
 	{
 		$firmentyp_kurzbz = $this->get('firmentyp_kurzbz');
 		
-		if(isset($firmentyp_kurzbz))
+		if (isset($firmentyp_kurzbz))
 		{
 			$result = $this->FirmentypModel->load($firmentyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Firmentyp extends APIv1_Controller
 	 */
 	public function postFirmentyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['firmentyp_kurzbz']))
+			if (isset($this->post()['firmentyp_kurzbz']))
 			{
 				$result = $this->FirmentypModel->update($this->post()['firmentyp_kurzbz'], $this->post());
 			}

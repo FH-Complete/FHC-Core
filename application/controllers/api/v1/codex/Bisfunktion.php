@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Bisfunktion extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Bisfunktion extends APIv1_Controller
 		$studiengang_kz = $this->get('studiengang_kz');
 		$bisverwendung_id = $this->get('bisverwendung_id');
 		
-		if(isset($studiengang_kz) && isset($bisverwendung_id))
+		if (isset($studiengang_kz) && isset($bisverwendung_id))
 		{
 			$result = $this->BisfunktionModel->load(array($studiengang_kz, $bisverwendung_id));
 			
@@ -53,9 +53,9 @@ class Bisfunktion extends APIv1_Controller
 	 */
 	public function postBisfunktion()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studiengang_kz']) && isset($this->post()['bisverwendung_id']))
+			if (isset($this->post()['studiengang_kz']) && isset($this->post()['bisverwendung_id']))
 			{
 				$result = $this->BisfunktionModel->update(array($this->post()['studiengang_kz'], $this->post()['bisverwendung_id']), $this->post());
 			}

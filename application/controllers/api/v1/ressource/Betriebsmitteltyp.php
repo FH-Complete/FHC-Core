@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Betriebsmitteltyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Betriebsmitteltyp extends APIv1_Controller
 	{
 		$betriebsmitteltyp = $this->get('betriebsmitteltyp');
 		
-		if(isset($betriebsmitteltyp))
+		if (isset($betriebsmitteltyp))
 		{
 			$result = $this->BetriebsmitteltypModel->load($betriebsmitteltyp);
 			
@@ -52,9 +52,9 @@ class Betriebsmitteltyp extends APIv1_Controller
 	 */
 	public function postBetriebsmitteltyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['betriebsmitteltyp']))
+			if (isset($this->post()['betriebsmitteltyp']))
 			{
 				$result = $this->BetriebsmitteltypModel->update($this->post()['betriebsmitteltyp'], $this->post());
 			}

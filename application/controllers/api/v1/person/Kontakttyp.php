@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Kontakttyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Kontakttyp extends APIv1_Controller
 	{
 		$kontakttyp = $this->get('kontakttyp');
 		
-		if(isset($kontakttyp))
+		if (isset($kontakttyp))
 		{
 			$result = $this->KontakttypModel->load($kontakttyp);
 			
@@ -52,9 +52,9 @@ class Kontakttyp extends APIv1_Controller
 	 */
 	public function postKontakttyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['kontakttyp']))
+			if (isset($this->post()['kontakttyp']))
 			{
 				$result = $this->KontakttypModel->update($this->post()['kontakttyp'], $this->post());
 			}

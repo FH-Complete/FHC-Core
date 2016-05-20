@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Standort extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Standort extends APIv1_Controller
 	{
 		$standortID = $this->get('standort_id');
 		
-		if(isset($standortID))
+		if (isset($standortID))
 		{
 			$result = $this->StandortModel->load($standortID);
 			
@@ -52,9 +52,9 @@ class Standort extends APIv1_Controller
 	 */
 	public function postStandort()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['standort_id']))
+			if (isset($this->post()['standort_id']))
 			{
 				$result = $this->StandortModel->update($this->post()['standort_id'], $this->post());
 			}

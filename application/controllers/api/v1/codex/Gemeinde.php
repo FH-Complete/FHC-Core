@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Gemeinde extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Gemeinde extends APIv1_Controller
 	{
 		$gemeindeID = $this->get('gemeinde_id');
 		
-		if(isset($gemeindeID))
+		if (isset($gemeindeID))
 		{
 			$result = $this->GemeindeModel->load($gemeindeID);
 			
@@ -52,9 +52,9 @@ class Gemeinde extends APIv1_Controller
 	 */
 	public function postGemeinde()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['gemeinde_id']))
+			if (isset($this->post()['gemeinde_id']))
 			{
 				$result = $this->GemeindeModel->update($this->post()['gemeinde_id'], $this->post());
 			}

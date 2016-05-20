@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Reihungstest extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Reihungstest extends APIv1_Controller
 	{
 		$reihungstestID = $this->get('reihungstest_id');
 		
-		if(isset($reihungstestID))
+		if (isset($reihungstestID))
 		{
 			$result = $this->ReihungstestModel->load($reihungstestID);
 			
@@ -52,9 +52,9 @@ class Reihungstest extends APIv1_Controller
 	 */
 	public function postReihungstest()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['reihungstest_id']))
+			if (isset($this->post()['reihungstest_id']))
 			{
 				$result = $this->ReihungstestModel->update($this->post()['reihungstest_id'], $this->post());
 			}

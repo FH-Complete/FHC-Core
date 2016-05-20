@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Notiz extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Notiz extends APIv1_Controller
 	{
 		$notizID = $this->get('notiz_id');
 		
-		if(isset($notizID))
+		if (isset($notizID))
 		{
 			$result = $this->NotizModel->load($notizID);
 			
@@ -52,9 +52,9 @@ class Notiz extends APIv1_Controller
 	 */
 	public function postNotiz()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['notiz_id']))
+			if (isset($this->post()['notiz_id']))
 			{
 				$result = $this->NotizModel->update($this->post()['notiz_id'], $this->post());
 			}

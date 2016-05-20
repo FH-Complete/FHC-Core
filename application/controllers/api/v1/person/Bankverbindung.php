@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Bankverbindung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Bankverbindung extends APIv1_Controller
 	{
 		$bankverbindungID = $this->get('bankverbindung_id');
 		
-		if(isset($bankverbindungID))
+		if (isset($bankverbindungID))
 		{
 			$result = $this->BankverbindungModel->load($bankverbindungID);
 			
@@ -52,9 +52,9 @@ class Bankverbindung extends APIv1_Controller
 	 */
 	public function postBankverbindung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['bankverbindung_id']))
+			if (isset($this->post()['bankverbindung_id']))
 			{
 				$result = $this->BankverbindungModel->update($this->post()['bankverbindung_id'], $this->post());
 			}

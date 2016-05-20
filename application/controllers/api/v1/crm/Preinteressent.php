@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Preinteressent extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Preinteressent extends APIv1_Controller
 	{
 		$preinteressent_id = $this->get('preinteressent_id');
 		
-		if(isset($preinteressent_id))
+		if (isset($preinteressent_id))
 		{
 			$result = $this->PreinteressentModel->load($preinteressent_id);
 			
@@ -54,7 +54,7 @@ class Preinteressent extends APIv1_Controller
 	{
 		$person_id = $this->get('person_id');
 		
-		if(isset($person_id))
+		if (isset($person_id))
 		{
 			$result = $this->PreinteressentModel->load(array('person_id' => $person_id));
 			
@@ -71,9 +71,9 @@ class Preinteressent extends APIv1_Controller
 	 */
 	public function postPreinteressent()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['preinteressent_id']))
+			if (isset($this->post()['preinteressent_id']))
 			{
 				$result = $this->PreinteressentModel->update($this->post()['preinteressent_id'], $this->post());
 			}
@@ -92,13 +92,13 @@ class Preinteressent extends APIv1_Controller
 	
 	private function _validate($preinteressent)
 	{
-		if($preinteressent['person_id'] == '')
+		if ($preinteressent['person_id'] == '')
 		{
 			//$this->errormsg = 'Person_id muss angegeben werden';
 			return false;
 		}
 		
-		if($preinteressent['aufmerksamdurch_kurzbz'] == '')
+		if ($preinteressent['aufmerksamdurch_kurzbz'] == '')
 		{
 			//$this->errormsg = 'Aufmerksamdurch muss angegeben werden';
 			return false;

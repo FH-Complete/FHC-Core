@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Verwendung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Verwendung extends APIv1_Controller
 	{
 		$verwendung_code = $this->get('verwendung_code');
 		
-		if(isset($verwendung_code))
+		if (isset($verwendung_code))
 		{
 			$result = $this->VerwendungModel->load($verwendung_code);
 			
@@ -52,9 +52,9 @@ class Verwendung extends APIv1_Controller
 	 */
 	public function postVerwendung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['verwendung_code']))
+			if (isset($this->post()['verwendung_code']))
 			{
 				$result = $this->VerwendungModel->update($this->post()['verwendung_code'], $this->post());
 			}

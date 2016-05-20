@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Erreichbarkeit extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Erreichbarkeit extends APIv1_Controller
 	{
 		$erreichbarkeit_kurzbz = $this->get('erreichbarkeit_kurzbz');
 		
-		if(isset($erreichbarkeit_kurzbz))
+		if (isset($erreichbarkeit_kurzbz))
 		{
 			$result = $this->ErreichbarkeitModel->load($erreichbarkeit_kurzbz);
 			
@@ -52,9 +52,9 @@ class Erreichbarkeit extends APIv1_Controller
 	 */
 	public function postErreichbarkeit()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['erreichbarkeit_kurzbz']))
+			if (isset($this->post()['erreichbarkeit_kurzbz']))
 			{
 				$result = $this->ErreichbarkeitModel->update($this->post()['erreichbarkeit_kurzbz'], $this->post());
 			}

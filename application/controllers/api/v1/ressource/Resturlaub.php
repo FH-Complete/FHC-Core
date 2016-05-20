@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Resturlaub extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Resturlaub extends APIv1_Controller
 	{
 		$resturlaubID = $this->get('resturlaub_id');
 		
-		if(isset($resturlaubID))
+		if (isset($resturlaubID))
 		{
 			$result = $this->ResturlaubModel->load($resturlaubID);
 			
@@ -52,9 +52,9 @@ class Resturlaub extends APIv1_Controller
 	 */
 	public function postResturlaub()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['resturlaub_id']))
+			if (isset($this->post()['resturlaub_id']))
 			{
 				$result = $this->ResturlaubModel->update($this->post()['resturlaub_id'], $this->post());
 			}

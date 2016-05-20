@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Dokumentprestudent extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Dokumentprestudent extends APIv1_Controller
 		$prestudent_id = $this->get('prestudent_id');
 		$dokument_kurzbz = $this->get('dokument_kurzbz');
 		
-		if(isset($prestudent_id) && isset($dokument_kurzbz))
+		if (isset($prestudent_id) && isset($dokument_kurzbz))
 		{
 			$result = $this->DokumentprestudentModel->load(array($prestudent_id, $dokument_kurzbz));
 			
@@ -53,9 +53,9 @@ class Dokumentprestudent extends APIv1_Controller
 	 */
 	public function postDokumentprestudent()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['prestudent_id']) && isset($this->post()['dokument_kurzbz']))
+			if (isset($this->post()['prestudent_id']) && isset($this->post()['dokument_kurzbz']))
 			{
 				$result = $this->DokumentprestudentModel->update(array($this->post()['prestudent_id'], $this->post()['dokument_kurzbz']), $this->post());
 			}

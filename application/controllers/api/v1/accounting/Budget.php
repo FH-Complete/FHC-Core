@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Budget extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Budget extends APIv1_Controller
 		$kostenstelle_id = $this->get('kostenstelle_id');
 		$geschaeftsjahr_kurzbz = $this->get('geschaeftsjahr_kurzbz');
 		
-		if(isset($kostenstelle_id) && isset($geschaeftsjahr_kurzbz))
+		if (isset($kostenstelle_id) && isset($geschaeftsjahr_kurzbz))
 		{
 			$result = $this->BudgetModel->load(array($kostenstelle_id, $geschaeftsjahr_kurzbz));
 			
@@ -53,9 +53,9 @@ class Budget extends APIv1_Controller
 	 */
 	public function postBudget()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['budget_id']) && isset($this->post()['geschaeftsjahr_kurzbz']))
+			if (isset($this->post()['budget_id']) && isset($this->post()['geschaeftsjahr_kurzbz']))
 			{
 				$result = $this->BudgetModel->update(array($this->post()['budget_id'], $this->post()['geschaeftsjahr_kurzbz']), $this->post());
 			}

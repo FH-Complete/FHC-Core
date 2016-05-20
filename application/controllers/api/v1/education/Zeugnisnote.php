@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Zeugnisnote extends APIv1_Controller
 {
@@ -37,7 +37,7 @@ class Zeugnisnote extends APIv1_Controller
 		$student_uid = $this->get('student_uid');
 		$lehrveranstaltung_id = $this->get('lehrveranstaltung_id');
 		
-		if(isset($studiensemester_kurzbz) && isset($student_uid) && isset($lehrveranstaltung_id))
+		if (isset($studiensemester_kurzbz) && isset($student_uid) && isset($lehrveranstaltung_id))
 		{
 			$result = $this->ZeugnisnoteModel->load(array($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id));
 			
@@ -54,9 +54,9 @@ class Zeugnisnote extends APIv1_Controller
 	 */
 	public function postZeugnisnote()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studiensemester_kurzbz']) && isset($this->post()['student_uid']) && isset($this->post()['lehrveranstaltung_id']))
+			if (isset($this->post()['studiensemester_kurzbz']) && isset($this->post()['student_uid']) && isset($this->post()['lehrveranstaltung_id']))
 			{
 				$pksArray = array($this->post()['studiensemester_kurzbz'],
 									$this->post()['student_uid'],

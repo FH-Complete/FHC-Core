@@ -13,7 +13,7 @@
  */
 // ------------------------------------------------------------------------
 
-defined('BASEPATH') || exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Adresse extends APIv1_Controller
 {
@@ -33,7 +33,7 @@ class Adresse extends APIv1_Controller
     {
 		$personID = $this->get("person_id");
 		
-		if(isset($personID))
+		if (isset($personID))
 		{
 			$result = $this->AdresseModel->loadWhere(array('person_id' => $personID));
 			
@@ -49,9 +49,9 @@ class Adresse extends APIv1_Controller
     {
 		$post = $this->post();
 		
-		if(is_array($post))
+		if (is_array($post))
 		{
-			if(isset($post['adresse_id']))
+			if (isset($post['adresse_id']))
 			{
 				$result = $this->AdresseModel->update($post['adresse_id'], $post);
 			}

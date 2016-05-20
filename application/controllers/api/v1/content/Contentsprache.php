@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Contentsprache extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Contentsprache extends APIv1_Controller
 	{
 		$contentspracheID = $this->get('contentsprache_id');
 		
-		if(isset($contentspracheID))
+		if (isset($contentspracheID))
 		{
 			$result = $this->ContentspracheModel->load($contentspracheID);
 			
@@ -52,9 +52,9 @@ class Contentsprache extends APIv1_Controller
 	 */
 	public function postContentsprache()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['contentsprache_id']))
+			if (isset($this->post()['contentsprache_id']))
 			{
 				$result = $this->ContentspracheModel->update($this->post()['contentsprache_id'], $this->post());
 			}

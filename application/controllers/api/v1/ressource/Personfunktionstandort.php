@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Personfunktionstandort extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Personfunktionstandort extends APIv1_Controller
 	{
 		$personfunktionstandortID = $this->get('personfunktionstandort_id');
 		
-		if(isset($personfunktionstandortID))
+		if (isset($personfunktionstandortID))
 		{
 			$result = $this->PersonfunktionstandortModel->load($personfunktionstandortID);
 			
@@ -52,9 +52,9 @@ class Personfunktionstandort extends APIv1_Controller
 	 */
 	public function postPersonfunktionstandort()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['personfunktionstandort_id']))
+			if (isset($this->post()['personfunktionstandort_id']))
 			{
 				$result = $this->PersonfunktionstandortModel->update($this->post()['personfunktionstandort_id'], $this->post());
 			}

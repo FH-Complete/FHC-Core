@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Paabgabe extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Paabgabe extends APIv1_Controller
 	{
 		$paabgabe_id = $this->get('paabgabe_id');
 		
-		if(isset($paabgabe_id))
+		if (isset($paabgabe_id))
 		{
 			$result = $this->PaabgabeModel->load($paabgabe_id);
 			
@@ -52,9 +52,9 @@ class Paabgabe extends APIv1_Controller
 	 */
 	public function postPaabgabe()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['paabgabe_id']))
+			if (isset($this->post()['paabgabe_id']))
 			{
 				$result = $this->PaabgabeModel->update($this->post()['paabgabe_id'], $this->post());
 			}

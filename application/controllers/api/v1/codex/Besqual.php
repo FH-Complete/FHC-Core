@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Besqual extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Besqual extends APIv1_Controller
 	{
 		$besqualcode = $this->get('besqualcode');
 		
-		if(isset($besqualcode))
+		if (isset($besqualcode))
 		{
 			$result = $this->BesqualModel->load($besqualcode);
 			
@@ -52,9 +52,9 @@ class Besqual extends APIv1_Controller
 	 */
 	public function postBesqual()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['besqualcode']))
+			if (isset($this->post()['besqualcode']))
 			{
 				$result = $this->BesqualModel->update($this->post()['besqualcode'], $this->post());
 			}

@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Freebusy extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Freebusy extends APIv1_Controller
 	{
 		$freebusyID = $this->get('freebusy_id');
 		
-		if(isset($freebusyID))
+		if (isset($freebusyID))
 		{
 			$result = $this->FreebusyModel->load($freebusyID);
 			
@@ -52,9 +52,9 @@ class Freebusy extends APIv1_Controller
 	 */
 	public function postFreebusy()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['freebusy_id']))
+			if (isset($this->post()['freebusy_id']))
 			{
 				$result = $this->FreebusyModel->update($this->post()['freebusy_id'], $this->post());
 			}

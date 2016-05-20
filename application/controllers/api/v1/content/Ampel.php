@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Ampel extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Ampel extends APIv1_Controller
 	{
 		$ampelID = $this->get('ampel_id');
 		
-		if(isset($ampelID))
+		if (isset($ampelID))
 		{
 			$result = $this->AmpelModel->load($ampelID);
 			
@@ -52,9 +52,9 @@ class Ampel extends APIv1_Controller
 	 */
 	public function postAmpel()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['ampel_id']))
+			if (isset($this->post()['ampel_id']))
 			{
 				$result = $this->AmpelModel->update($this->post()['ampel_id'], $this->post());
 			}

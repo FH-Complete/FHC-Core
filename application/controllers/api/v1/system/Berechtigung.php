@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Berechtigung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Berechtigung extends APIv1_Controller
 	{
 		$berechtigung_kurzbz = $this->get('berechtigung_kurzbz');
 		
-		if(isset($berechtigung_kurzbz))
+		if (isset($berechtigung_kurzbz))
 		{
 			$result = $this->BerechtigungModel->load($berechtigung_kurzbz);
 			
@@ -52,9 +52,9 @@ class Berechtigung extends APIv1_Controller
 	 */
 	public function postBerechtigung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['berechtigung_kurzbz']))
+			if (isset($this->post()['berechtigung_kurzbz']))
 			{
 				$result = $this->BerechtigungModel->update($this->post()['berechtigung_kurzbz'], $this->post());
 			}

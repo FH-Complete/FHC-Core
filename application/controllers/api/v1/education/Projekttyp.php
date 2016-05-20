@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Projekttyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Projekttyp extends APIv1_Controller
 	{
 		$projekttyp_kurzbz = $this->get('projekttyp_kurzbz');
 		
-		if(isset($projekttyp_kurzbz))
+		if (isset($projekttyp_kurzbz))
 		{
 			$result = $this->ProjekttypModel->load($projekttyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Projekttyp extends APIv1_Controller
 	 */
 	public function postProjekttyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['projekttyp_kurzbz']))
+			if (isset($this->post()['projekttyp_kurzbz']))
 			{
 				$result = $this->ProjekttypModel->update($this->post()['projekttyp_kurzbz'], $this->post());
 			}

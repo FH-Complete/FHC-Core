@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Bisorgform extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Bisorgform extends APIv1_Controller
 	{
 		$bisorgform_kurzbz = $this->get('bisorgform_kurzbz');
 		
-		if(isset($bisorgform_kurzbz))
+		if (isset($bisorgform_kurzbz))
 		{
 			$result = $this->BisorgformModel->load($bisorgform_kurzbz);
 			
@@ -52,9 +52,9 @@ class Bisorgform extends APIv1_Controller
 	 */
 	public function postBisorgform()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['bisorgform_kurzbz']))
+			if (isset($this->post()['bisorgform_kurzbz']))
 			{
 				$result = $this->BisorgformModel->update($this->post()['bisorgform_kurzbz'], $this->post());
 			}

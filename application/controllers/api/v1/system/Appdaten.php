@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Appdaten extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Appdaten extends APIv1_Controller
 	{
 		$appdatenID = $this->get('appdaten_id');
 		
-		if(isset($appdatenID))
+		if (isset($appdatenID))
 		{
 			$result = $this->AppdatenModel->load($appdatenID);
 			
@@ -52,9 +52,9 @@ class Appdaten extends APIv1_Controller
 	 */
 	public function postAppdaten()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['appdaten_id']))
+			if (isset($this->post()['appdaten_id']))
 			{
 				$result = $this->AppdatenModel->update($this->post()['appdaten_id'], $this->post());
 			}

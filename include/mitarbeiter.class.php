@@ -112,7 +112,7 @@ class mitarbeiter extends benutzer
 	 * ueberprueft die Variablen auf Gueltigkeit
 	 * @return true wenn gueltig, false im Fehlerfall
 	 */
-	protected function validate()
+	public function validate()
 	{
 		//if(mb_strlen($this->uid)>16)
 		//{

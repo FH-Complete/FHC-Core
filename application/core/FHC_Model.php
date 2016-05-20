@@ -12,7 +12,7 @@ class FHC_Model extends CI_Model
 		$this->lang->load('fhcomplete');
 		
 		$uid = NULL;
-		if(is_null($uid) && isset($this->session->uid))
+		if (is_null($uid) && isset($this->session->uid))
 		{
 			$uid = $this->session->uid;
 		}

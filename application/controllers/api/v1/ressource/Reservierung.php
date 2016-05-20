@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Reservierung extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Reservierung extends APIv1_Controller
 	{
 		$reservierungID = $this->get('reservierung_id');
 		
-		if(isset($reservierungID))
+		if (isset($reservierungID))
 		{
 			$result = $this->ReservierungModel->load($reservierungID);
 			
@@ -52,9 +52,9 @@ class Reservierung extends APIv1_Controller
 	 */
 	public function postReservierung()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['reservierung_id']))
+			if (isset($this->post()['reservierung_id']))
 			{
 				$result = $this->ReservierungModel->update($this->post()['reservierung_id'], $this->post());
 			}

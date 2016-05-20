@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Studentlehrverband extends APIv1_Controller
 {
@@ -36,7 +36,7 @@ class Studentlehrverband extends APIv1_Controller
 		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
 		$student_uid = $this->get('student_uid');
 		
-		if(isset($studiensemester_kurzbz) && isset($student_uid))
+		if (isset($studiensemester_kurzbz) && isset($student_uid))
 		{
 			$result = $this->StudentlehrverbandModel->load(array($studiensemester_kurzbz, $student_uid));
 			
@@ -53,9 +53,9 @@ class Studentlehrverband extends APIv1_Controller
 	 */
 	public function postStudentlehrverband()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['studiensemester_kurzbz']) && isset($this->post()['student_uid']))
+			if (isset($this->post()['studiensemester_kurzbz']) && isset($this->post()['student_uid']))
 			{
 				$result = $this->StudentlehrverbandModel->update(array($this->post()['studiensemester_kurzbz'], $this->post()['student_uid']), $this->post());
 			}

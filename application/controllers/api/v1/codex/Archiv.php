@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Archiv extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Archiv extends APIv1_Controller
 	{
 		$archivID = $this->get('archiv_id');
 		
-		if(isset($archivID))
+		if (isset($archivID))
 		{
 			$result = $this->ArchivModel->load($archivID);
 			
@@ -52,9 +52,9 @@ class Archiv extends APIv1_Controller
 	 */
 	public function postArchiv()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['archiv_id']))
+			if (isset($this->post()['archiv_id']))
 			{
 				$result = $this->ArchivModel->update($this->post()['archiv_id'], $this->post());
 			}

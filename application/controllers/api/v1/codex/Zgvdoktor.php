@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Zgvdoktor extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Zgvdoktor extends APIv1_Controller
 	{
 		$zgvdoktor_code = $this->get('zgvdoktor_code');
 		
-		if(isset($zgvdoktor_code))
+		if (isset($zgvdoktor_code))
 		{
 			$result = $this->ZgvdoktorModel->load($zgvdoktor_code);
 			
@@ -52,9 +52,9 @@ class Zgvdoktor extends APIv1_Controller
 	 */
 	public function postZgvdoktor()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zgvdoktor_code']))
+			if (isset($this->post()['zgvdoktor_code']))
 			{
 				$result = $this->ZgvdoktorModel->update($this->post()['zgvdoktor_code'], $this->post());
 			}

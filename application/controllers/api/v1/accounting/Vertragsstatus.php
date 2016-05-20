@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Vertragsstatus extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Vertragsstatus extends APIv1_Controller
 	{
 		$vertragsstatus_kurzbz = $this->get('vertragsstatus_kurzbz');
 		
-		if(isset($vertragsstatus_kurzbz))
+		if (isset($vertragsstatus_kurzbz))
 		{
 			$result = $this->VertragsstatusModel->load($vertragsstatus_kurzbz);
 			
@@ -52,9 +52,9 @@ class Vertragsstatus extends APIv1_Controller
 	 */
 	public function postVertragsstatus()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['vertragsstatus_kurzbz']))
+			if (isset($this->post()['vertragsstatus_kurzbz']))
 			{
 				$result = $this->VertragsstatusModel->update($this->post()['vertragsstatus_kurzbz'], $this->post());
 			}

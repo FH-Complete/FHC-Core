@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Gruppe extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Gruppe extends APIv1_Controller
 	{
 		$gruppe_kurzbz = $this->get('gruppe_kurzbz');
 		
-		if(isset($gruppe_kurzbz))
+		if (isset($gruppe_kurzbz))
 		{
 			$result = $this->GruppeModel->load($gruppe_kurzbz);
 			
@@ -52,9 +52,9 @@ class Gruppe extends APIv1_Controller
 	 */
 	public function postGruppe()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['gruppe_kurzbz']))
+			if (isset($this->post()['gruppe_kurzbz']))
 			{
 				$result = $this->GruppeModel->update($this->post()['gruppe_kurzbz'], $this->post());
 			}

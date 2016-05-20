@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Projektarbeit extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Projektarbeit extends APIv1_Controller
 	{
 		$projektarbeit_id = $this->get('projektarbeit_id');
 		
-		if(isset($projektarbeit_id))
+		if (isset($projektarbeit_id))
 		{
 			$result = $this->ProjektarbeitModel->load($projektarbeit_id);
 			
@@ -52,9 +52,9 @@ class Projektarbeit extends APIv1_Controller
 	 */
 	public function postProjektarbeit()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['projektarbeit_id']))
+			if (isset($this->post()['projektarbeit_id']))
 			{
 				$result = $this->ProjektarbeitModel->update($this->post()['projektarbeit_id'], $this->post());
 			}

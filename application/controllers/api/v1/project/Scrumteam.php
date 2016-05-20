@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Scrumteam extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Scrumteam extends APIv1_Controller
 	{
 		$scrumteam_kurzbz = $this->get('scrumteam_kurzbz');
 		
-		if(isset($scrumteam_kurzbz))
+		if (isset($scrumteam_kurzbz))
 		{
 			$result = $this->ScrumteamModel->load($scrumteam_kurzbz);
 			
@@ -52,9 +52,9 @@ class Scrumteam extends APIv1_Controller
 	 */
 	public function postScrumteam()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['scrumteam_kurzbz']))
+			if (isset($this->post()['scrumteam_kurzbz']))
 			{
 				$result = $this->ScrumteamModel->update($this->post()['scrumteam_kurzbz'], $this->post());
 			}

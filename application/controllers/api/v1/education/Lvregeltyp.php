@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Lvregeltyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Lvregeltyp extends APIv1_Controller
 	{
 		$lvregeltyp_kurzbz = $this->get('lvregeltyp_kurzbz');
 		
-		if(isset($lvregeltyp_kurzbz))
+		if (isset($lvregeltyp_kurzbz))
 		{
 			$result = $this->LvregeltypModel->load($lvregeltyp_kurzbz);
 			
@@ -52,9 +52,9 @@ class Lvregeltyp extends APIv1_Controller
 	 */
 	public function postLvregeltyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lvregeltyp_kurzbz']))
+			if (isset($this->post()['lvregeltyp_kurzbz']))
 			{
 				$result = $this->LvregeltypModel->update($this->post()['lvregeltyp_kurzbz'], $this->post());
 			}

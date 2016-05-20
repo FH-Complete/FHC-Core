@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Webservicerecht extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Webservicerecht extends APIv1_Controller
 	{
 		$webservicerechtID = $this->get('webservicerecht_id');
 		
-		if(isset($webservicerechtID))
+		if (isset($webservicerechtID))
 		{
 			$result = $this->WebservicerechtModel->load($webservicerechtID);
 			
@@ -52,9 +52,9 @@ class Webservicerecht extends APIv1_Controller
 	 */
 	public function postWebservicerecht()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['webservicerecht_id']))
+			if (isset($this->post()['webservicerecht_id']))
 			{
 				$result = $this->WebservicerechtModel->update($this->post()['webservicerecht_id'], $this->post());
 			}

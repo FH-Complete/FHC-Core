@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Zeugnis extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Zeugnis extends APIv1_Controller
 	{
 		$zeugnis_id = $this->get('zeugnis_id');
 		
-		if(isset($zeugnis_id))
+		if (isset($zeugnis_id))
 		{
 			$result = $this->ZeugnisModel->load($zeugnis_id);
 			
@@ -52,9 +52,9 @@ class Zeugnis extends APIv1_Controller
 	 */
 	public function postZeugnis()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zeugnis_id']))
+			if (isset($this->post()['zeugnis_id']))
 			{
 				$result = $this->ZeugnisModel->update($this->post()['zeugnis_id'], $this->post());
 			}

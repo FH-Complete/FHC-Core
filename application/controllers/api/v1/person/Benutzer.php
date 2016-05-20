@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Benutzer extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Benutzer extends APIv1_Controller
 	{
 		$uid = $this->get('uid');
 		
-		if(isset($uid))
+		if (isset($uid))
 		{
 			$result = $this->BenutzerModel->load($uid);
 			
@@ -52,9 +52,9 @@ class Benutzer extends APIv1_Controller
 	 */
 	public function postBenutzer()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['uid']))
+			if (isset($this->post()['uid']))
 			{
 				$result = $this->BenutzerModel->update($this->post()['uid'], $this->post());
 			}

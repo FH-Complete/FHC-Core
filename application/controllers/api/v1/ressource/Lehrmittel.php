@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Lehrmittel extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Lehrmittel extends APIv1_Controller
 	{
 		$lehrmittel_kurzbz = $this->get('lehrmittel_kurzbz');
 		
-		if(isset($lehrmittel_kurzbz))
+		if (isset($lehrmittel_kurzbz))
 		{
 			$result = $this->LehrmittelModel->load($lehrmittel_kurzbz);
 			
@@ -52,9 +52,9 @@ class Lehrmittel extends APIv1_Controller
 	 */
 	public function postLehrmittel()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['lehrmittel_kurzbz']))
+			if (isset($this->post()['lehrmittel_kurzbz']))
 			{
 				$result = $this->LehrmittelModel->update($this->post()['lehrmittel_kurzbz'], $this->post());
 			}

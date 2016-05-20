@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Zeitfenster extends APIv1_Controller
 {
@@ -38,7 +38,7 @@ class Zeitfenster extends APIv1_Controller
 		$ort_kurzbz = $this->get('ort_kurzbz');
 		$stunde = $this->get('stunde');
 		
-		if(isset($wochentag) && isset($studiengang_kz) && isset($ort_kurzbz) && isset($stunde))
+		if (isset($wochentag) && isset($studiengang_kz) && isset($ort_kurzbz) && isset($stunde))
 		{
 			$result = $this->ZeitfensterModel->load(array($wochentag, $studiengang_kz, $ort_kurzbz, $stunde));
 			
@@ -55,9 +55,9 @@ class Zeitfenster extends APIv1_Controller
 	 */
 	public function postZeitfenster()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['wochentag']) && isset($this->post()['studiengang_kz']) &&
+			if (isset($this->post()['wochentag']) && isset($this->post()['studiengang_kz']) &&
 				isset($this->post()['ort_kurzbz']) && isset($this->post()['stunde']))
 			{
 				$pksArray = array($this->post()['wochentag'],

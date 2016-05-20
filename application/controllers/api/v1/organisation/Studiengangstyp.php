@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Studiengangstyp extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Studiengangstyp extends APIv1_Controller
 	{
 		$typ = $this->get('typ');
 		
-		if(isset($typ))
+		if (isset($typ))
 		{
 			$result = $this->StudiengangstypModel->load($typ);
 			
@@ -52,9 +52,9 @@ class Studiengangstyp extends APIv1_Controller
 	 */
 	public function postStudiengangstyp()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['typ']))
+			if (isset($this->post()['typ']))
 			{
 				$result = $this->StudiengangstypModel->update($this->post()['typ'], $this->post());
 			}

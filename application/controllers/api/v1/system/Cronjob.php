@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Cronjob extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Cronjob extends APIv1_Controller
 	{
 		$cronjobID = $this->get('cronjob_id');
 		
-		if(isset($cronjobID))
+		if (isset($cronjobID))
 		{
 			$result = $this->CronjobModel->load($cronjobID);
 			
@@ -52,9 +52,9 @@ class Cronjob extends APIv1_Controller
 	 */
 	public function postCronjob()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['cronjob_id']))
+			if (isset($this->post()['cronjob_id']))
 			{
 				$result = $this->CronjobModel->update($this->post()['cronjob_id'], $this->post());
 			}

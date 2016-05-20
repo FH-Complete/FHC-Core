@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Coodle extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Coodle extends APIv1_Controller
 	{
 		$coodleID = $this->get('coodle_id');
 		
-		if(isset($coodleID))
+		if (isset($coodleID))
 		{
 			$result = $this->CoodleModel->load($coodleID);
 			
@@ -52,9 +52,9 @@ class Coodle extends APIv1_Controller
 	 */
 	public function postCoodle()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['coodle_id']))
+			if (isset($this->post()['coodle_id']))
 			{
 				$result = $this->CoodleModel->update($this->post()['coodle_id'], $this->post());
 			}

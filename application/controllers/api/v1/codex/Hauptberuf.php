@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Hauptberuf extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Hauptberuf extends APIv1_Controller
 	{
 		$hauptberufcode = $this->get('hauptberufcode');
 		
-		if(isset($hauptberufcode))
+		if (isset($hauptberufcode))
 		{
 			$result = $this->HauptberufModel->load($hauptberufcode);
 			
@@ -52,9 +52,9 @@ class Hauptberuf extends APIv1_Controller
 	 */
 	public function postHauptberuf()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['hauptberufcode']))
+			if (isset($this->post()['hauptberufcode']))
 			{
 				$result = $this->HauptberufModel->update($this->post()['hauptberufcode'], $this->post());
 			}

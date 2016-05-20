@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Zweck extends APIv1_Controller
 {
@@ -35,7 +35,7 @@ class Zweck extends APIv1_Controller
 	{
 		$zweck_code = $this->get('zweck_code');
 		
-		if(isset($zweck_code))
+		if (isset($zweck_code))
 		{
 			$result = $this->ZweckModel->load($zweck_code);
 			
@@ -52,9 +52,9 @@ class Zweck extends APIv1_Controller
 	 */
 	public function postZweck()
 	{
-		if($this->_validate($this->post()))
+		if ($this->_validate($this->post()))
 		{
-			if(isset($this->post()['zweck_code']))
+			if (isset($this->post()['zweck_code']))
 			{
 				$result = $this->ZweckModel->update($this->post()['zweck_code'], $this->post());
 			}
