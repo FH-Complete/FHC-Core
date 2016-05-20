@@ -67,19 +67,4 @@ class Kontakt extends APIv1_Controller
 			$this->response();
 		}
     }
-    
-    private function _parseData($person)
-    {
-        if(is_array($person))
-        {
-            foreach($person as $key=>$value)
-            {
-                if($value === "")
-                {
-                    $person[$key] = null;
-                }
-            }
-            return $person;
-        }
-    }
 }

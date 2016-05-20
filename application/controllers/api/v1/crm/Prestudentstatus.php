@@ -55,22 +55,26 @@ class Prestudentstatus extends APIv1_Controller
 	 */
 	public function postPrestudentstatus()
 	{
-		if ($this->_validate($this->post()))
+            $prestudentstatus = $this->_parseData($this->post());
+            
+            $this->response($prestudentstatus);
+            
+		if ($this->_validate($prestudentstatus))
 		{
-			if (isset($this->post()['ausbildungssemester']) && isset($this->post()['studiensemester_kurzbz']) &&
-				isset($this->post()['status_kurzbz']) && isset($this->post()['prestudent_id']))
+			if (isset($prestudentstatus['ausbildungssemester']) && isset($prestudentstatus['studiensemester_kurzbz']) &&
+				isset($prestudentstatus['status_kurzbz']) && isset($prestudentstatus['prestudent_id']))
 			{
-				$pksArray = array($this->post()['ausbildungssemester'],
-									$this->post()['studiensemester_kurzbz'],
-									$this->post()['status_kurzbz'],
-									$this->post()['prestudent_id']
+				$pksArray = array($prestudentstatus['ausbildungssemester'],
+									$prestudentstatus['studiensemester_kurzbz'],
+									$prestudentstatus['status_kurzbz'],
+									$prestudentstatus['prestudent_id']
 								);
 				
-				$result = $this->PrestudentstatusModel->update($pksArray, $this->post());
+				$result = $this->PrestudentstatusModel->update($pksArray, $prestudentstatus);
 			}
 			else
 			{
-				$result = $this->PrestudentstatusModel->insert($this->post());
+				$result = $this->PrestudentstatusModel->insert($prestudentstatus);
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
