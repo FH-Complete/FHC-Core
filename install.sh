@@ -53,6 +53,8 @@ echo "Database ..."
 #sudo -u postgres psql template1 -c 'DROP DATABASE IF EXISTS fhctest;'
 #echo "Database fhctest dropped!"
 sudo -u postgres createdb -O fhcomplete fhctest
+sudo -u postgres psql fhctest -c 'CREATE SCHEMA IF NOT EXISTS system;'
+sudo -u postgres psql fhctest -c 'ALTER SCHEMA system OWNER TO fhcomplete;'
 
 echo "Installing FH-Complete..."
 # cp index.ci.php index.php		# Maybe somtimes
