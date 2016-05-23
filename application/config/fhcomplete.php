@@ -39,6 +39,7 @@ $config['fhc_acl'] = array
 	'campus.tbl_contentsprache' => 'basis/contentsprache',
 	'campus.tbl_coodle' => 'basis/coodle',
 	'campus.tbl_dms' => 'basis/dms',
+	'campus.tbl_dms_version' => 'basis/dms_version',
 	'campus.tbl_erreichbarkeit' => 'basis/erreichbarkeit',
 	'campus.tbl_feedback' => 'basis/feedback',
 	'campus.tbl_freebusy' => 'basis/freebusy',
@@ -110,9 +111,7 @@ $config['fhc_acl'] = array
 	'lehre.tbl_studienordnungstatus' => 'basis/studienordnungstatus',
 	'lehre.tbl_studienplan' => 'basis/studienplan',
 	'lehre.tbl_studienplatz' => 'basis/studienplatz',
-	
 	'lehre.tbl_studienplan_semester' => 'basis/studienplan_semester',
-	
 	'lehre.tbl_stunde' => 'basis/stunde',
 	'lehre.tbl_stundenplan' => 'basis/stundenplan',
 	'lehre.tbl_stundenplandev' => 'basis/stundenplandev',
@@ -122,6 +121,7 @@ $config['fhc_acl'] = array
 	'lehre.tbl_zeitfenster' => 'basis/zeitfenster',
 	'lehre.tbl_zeugnis' => 'basis/zeugnis',
 	'lehre.tbl_zeugnisnote' => 'basis/zeugnisnote',
+	'lehre.vw_studienplan' => 'basis/studienplan',
 	'public.tbl_adresse' => 'basis/adresse',
 	'public.tbl_akte' => 'basis/akte',
 	'public.tbl_ampel' => 'basis/ampel',
@@ -226,8 +226,6 @@ $config['fhc_acl'] = array
 	'wawi.tbl_rechnungsbetrag' => 'basis/rechnungsbetrag',
 	'wawi.tbl_rechnungstyp' => 'basis/rechnungstyp',
 	'wawi.tbl_zahlungstyp' => 'basis/zahlungstyp',
-	
-	'lehre.vw_studienplan' => 'basis/studienplan',
 	
 	'public.tbl_sprache' => 'admin',
 	'public.tbl_msg_thread' => 'admin',

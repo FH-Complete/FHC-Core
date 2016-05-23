@@ -74,13 +74,23 @@ class Dms extends APIv1_Controller
 	{
 		if ($this->_validate($this->post()))
 		{
-			if (isset($this->post()['contentsprache_id']))
+			if (isset($this->post()['dms_id']))
 			{
-				$result = $this->ContentspracheModel->update($this->post()['contentsprache_id'], $this->post());
+				$result = $this->DmsModel->update($this->post()['dms_id'], $this->post());
+				
+				if ($result->error == EXIT_SUCCESS)
+				{
+					$result = $this->DmsModel->updateDmsVersion($this->post()['dms_id'], $this->post());
+				}
 			}
 			else
 			{
-				$result = $this->ContentspracheModel->insert($this->post());
+				$result = $this->DmsModel->insert($this->post());
+				
+				if ($result->error == EXIT_SUCCESS)
+				{
+					$result = $this->DmsModel->insertDmsVersion($this->post());
+				}
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
