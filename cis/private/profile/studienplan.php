@@ -365,7 +365,7 @@ function drawTree($tree, $depth)
 {
 	global $uid, $stsem_arr, $noten_arr, $lvangebot_arr;
 	global $datum_obj, $db, $lv_arr, $p, $note_pruef_arr;
-
+        
 	foreach($tree as $row_tree)
 	{
 		$style='';
@@ -498,7 +498,7 @@ function drawTree($tree, $depth)
                     elseif(!$found)
                     {
                         if($abgeschlossen)
-                            echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
+                            echo '<span class="ok">'.$p->t('studienplan/regelabgeschlossen'),'</span>';
 			elseif(!$row_tree->stpllv_pflicht)
                             echo '<span>'.$p->t('studienplan/optional').'</span>';
 			else
@@ -508,7 +508,7 @@ function drawTree($tree, $depth)
 		else
 		{
 			if($abgeschlossen)
-				echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
+				echo '<span class="ok">'.$p->t('studienplan/regelabgeschlossen'),'</span>';
 			elseif(!$row_tree->stpllv_pflicht)
 				echo '<span>'.$p->t('studienplan/optional').'</span>';
 			else
@@ -529,9 +529,10 @@ function drawTree($tree, $depth)
 //				if($semester==$empfohlenesSemester)
 //					$tdclass[]='empfehlung';
 //			}
+                        
+                        
 
 			$tdinhalt='';
-
 			// Ist bereits eine Note für diese LV in diesem Stsem vorhanden?
 			if(isset($noten_arr[$row_tree->lehrveranstaltung_id][$stsem]))
 			{
@@ -542,16 +543,23 @@ function drawTree($tree, $depth)
 			}
 			elseif(count($kompatibleLVs) > 0)
 			{
+                            $found = false;
 			    foreach($kompatibleLVs as $komp)
 			    {
 				if(isset($noten_arr[$komp][$stsem]))
 				{
-					if($note_pruef_arr[$noten_arr[$komp][$stsem]]->positiv)
-						$tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$komp][$stsem]]->anmerkung.'</span>';
-					else
-						$tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$komp][$stsem]]->anmerkung.'</span>';
+                                    $found = true;
+                                    if($note_pruef_arr[$noten_arr[$komp][$stsem]]->positiv)
+                                            $tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$komp][$stsem]]->anmerkung.'</span>';
+                                    else
+                                            $tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$komp][$stsem]]->anmerkung.'</span>';
 				}
 			    }
+                            
+                            if(!$found)
+                            {
+                                $tdinhalt.= '-';
+                            }     
 			}
 			else
 			{
