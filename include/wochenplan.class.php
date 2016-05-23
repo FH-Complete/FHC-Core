@@ -1286,26 +1286,26 @@ class wochenplan extends basis_db
 						$kollision=0;
 						$studiensemester = getStudiensemesterFromDatum(date('Y-m-d',$datum));
 
-						$qry = "SELECT datum, stunde, student_uid, count(student_uid) AS anzahl
+						$qry = "SELECT datum, stunde, prestudent_id, count(prestudent_id) AS anzahl
 								FROM (
-									SELECT sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.student_uid
-									FROM (  SELECT stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.uid AS student_uid
+									SELECT sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.prestudent_id
+									FROM (  SELECT stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.prestudent_id AS prestudent_id
 									               FROM lehre.tbl_stundenplandev stpl
 									          JOIN public.tbl_benutzergruppe USING (gruppe_kurzbz)
 									         WHERE tbl_benutzergruppe.studiensemester_kurzbz::text = ".$this->db_add_param($studiensemester)."
-									         GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.uid
+									         GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.prestudent_id
 									UNION
-									             SELECT stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.student_uid
+									             SELECT stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.prestudent_id
 									               FROM lehre.tbl_stundenplandev stpl
 									          JOIN public.tbl_studentlehrverband ON stpl.gruppe_kurzbz IS NULL AND stpl.studiengang_kz = tbl_studentlehrverband.studiengang_kz AND stpl.semester = tbl_studentlehrverband.semester AND (stpl.verband = tbl_studentlehrverband.verband OR stpl.verband = ' '::bpchar AND stpl.verband <> tbl_studentlehrverband.verband) AND (stpl.gruppe = tbl_studentlehrverband.gruppe OR stpl.gruppe = ' '::bpchar AND stpl.gruppe <> tbl_studentlehrverband.gruppe)
 									         WHERE tbl_studentlehrverband.studiensemester_kurzbz::text = ".$this->db_add_param($studiensemester)."
-											GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.student_uid) sub_stpl_uid
-									GROUP BY sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.student_uid
+											GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.prestudent_id) sub_stpl_uid
+									GROUP BY sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.prestudent_id
 
 								) as a
 								WHERE datum='".date('Y-m-d',$datum)."' AND stunde=".$this->db_add_param($j)."
-								GROUP BY datum, stunde, student_uid
-								HAVING count(student_uid)>1 ";
+								GROUP BY datum, stunde, prestudent_id
+								HAVING count(prestudent_id)>1 ";
 
 								if(count($a_unr)>0)
 								{
@@ -1317,7 +1317,7 @@ class wochenplan extends basis_db
 									$qry.=" AND array_agg(unr) && ARRAY[".implode('::bigint,',$a_unr)."::bigint] ";
 									// ==>  AND array_agg(unr) && ARRAY[123::bigint,345::bigint]
 								}
-								$qry.="ORDER BY datum, stunde, student_uid LIMIT 1;";
+								$qry.="ORDER BY datum, stunde, prestudent_id LIMIT 1;";
 
 						if($stud_result = $this->db_query($qry))
 						{
@@ -1326,7 +1326,7 @@ class wochenplan extends basis_db
 								$kollision++;
 								$stud_row = $this->db_fetch_object($stud_result);
 								foreach($a_unr as $kollision_unr)
-									$kollisionsmeldungen[$kollision_unr][]=' Studentenkollision '.$stud_row->student_uid;
+									$kollisionsmeldungen[$kollision_unr][]=' Studentenkollision '.$stud_row->prestudent_id;
 							}
 						}
 

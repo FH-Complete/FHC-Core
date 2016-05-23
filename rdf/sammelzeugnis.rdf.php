@@ -42,17 +42,17 @@ $bez = '';
 
 if(isset($_REQUEST['xmlformat']) && $_REQUEST['xmlformat']=="xml")
 {
-	$uid_arr = (isset($_REQUEST['uid'])?$_REQUEST['uid']:null);
+	$preid_arr = (isset($_REQUEST['prestudent_id'])?$_REQUEST['prestudent_id']:null);
 	
-	$uid_arr = explode(";",$uid_arr);
+	$preid_arr = explode(";",$preid_arr);
 	
 	echo "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"; 
 	echo "<sammelzeugnisse>";
-	foreach($uid_arr as $uid)
+	foreach($preid_arr as $preid)
 	{
 		$xml_fussnote=0;
 		$anzahl_fussnoten=0;
-		if($uid=='')
+		if($preid=='')
 			continue;
 			 
 		echo "<sammelzeugnis>"; 
@@ -66,7 +66,7 @@ if(isset($_REQUEST['xmlformat']) && $_REQUEST['xmlformat']=="xml")
 					FROM tbl_person, tbl_prestudent, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester
 					WHERE tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz
 					AND tbl_prestudent.uid = tbl_benutzer.uid AND tbl_benutzer.person_id = tbl_person.person_id
-					AND tbl_prestudent.uid = ".$db->db_add_param($uid)."
+					AND tbl_prestudent.prestudent_id = ".$db->db_add_param($preid)."
 					AND tbl_studentlehrverband.prestudent_id=tbl_prestudent.prestudent_id
 					AND tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz 
 					order by semester;"; 
@@ -126,13 +126,11 @@ if(isset($_REQUEST['xmlformat']) && $_REQUEST['xmlformat']=="xml")
 			}
 		}
 
-		if(!$student = new student($uid))
-			die("Student nicht gefunden");
-		
+
 		$qry_projektarbeit = "SELECT lehrveranstaltung_id, titel, themenbereich, note, titel_english
-		FROM lehre.tbl_projektarbeit 
+		FROM lehre.tbl_projektarbeit
 		JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
-		WHERE prestudent_id=".$db->db_add_param($student->prestudent_id,FHC_INTEGER)."
+		WHERE prestudent_id=".$db->db_add_param($preid,FHC_INTEGER)."
 		AND projekttyp_kurzbz in('Bachelor', 'Diplom') 
 		ORDER BY beginn ASC, projektarbeit_id ASC;";
 		
@@ -151,14 +149,13 @@ if(isset($_REQUEST['xmlformat']) && $_REQUEST['xmlformat']=="xml")
 		
 		$qry ="Select distinct(student.lehrveranstaltung_id), student.uid, student.studiengang_kz, student.kurzbz, student.bezeichnung, student.bezeichnung_english, student.semester, student.semesterstunden, student.ects, student.studiensemester_kurzbz, zeugnis.note, note.bezeichnung note_bezeichnung, note.anmerkung
 		from campus.vw_student_lehrveranstaltung student
-		left join lehre.tbl_zeugnisnote zeugnis on(student.lehrveranstaltung_id = zeugnis.lehrveranstaltung_id AND student.uid = zeugnis.student_uid AND student.studiensemester_kurzbz = zeugnis.studiensemester_kurzbz)
+		left join lehre.tbl_zeugnisnote zeugnis on(student.lehrveranstaltung_id = zeugnis.lehrveranstaltung_id AND student.prestudent_id = zeugnis.prestudent_id AND student.studiensemester_kurzbz = zeugnis.studiensemester_kurzbz)
 		join lehre.tbl_note note using(note)
-		
-		where uid = '$uid' and zeugnis = true order by semester;"; 
-		
-	
-		$i = 0; 
-		$wochen = 15; 
+		where zeugnis.prestudent_id = ".$db->db_add_param($preid, FHC_INTEGER)." and zeugnis = true order by semester;";
+
+
+		$i = 0;
+		$wochen = 15;
 		if($result_stud = $db->db_query($qry))
 		{
 			while($row_stud = $db->db_fetch_object($result_stud))

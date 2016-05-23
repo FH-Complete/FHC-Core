@@ -100,9 +100,9 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#note" />
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-noten-tree-student_uid" label="Uid" flex="2" hidden="true" persist="hidden, width, ordinal"
+			<treecol id="lehrveranstaltung-noten-tree-prestudent_id" label="PreID" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_uid" />
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#prestudent_id" />
 			<splitter class="tree-splitter"/>
 			<treecol id="lehrveranstaltung-noten-tree-lehrveranstaltung_id" label="LehrveranstaltungID" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
@@ -139,7 +139,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#benotungsdatum_iso"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiensemester_kurzbz"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#note"/>
-						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_uid"/>
+						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#prestudent_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_kz"/>
@@ -206,9 +206,9 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#note" />
 			<splitter class="tree-splitter"/>
-			<treecol id="lehrveranstaltung-lvgesamtnoten-tree-student_uid" label="StudentUID" flex="2" hidden="true"
+			<treecol id="lehrveranstaltung-lvgesamtnoten-tree-prestudent_id" label="PreID" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#student_uid" />
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#prestudent_id" />
 			<splitter class="tree-splitter"/>
 			<treecol id="lehrveranstaltung-lvgesamtnoten-tree-lehrveranstaltung_id" label="LehrveranstaltungID" flex="2" hidden="true"
 				class="sortDirectionIndicator"
@@ -234,7 +234,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#freigabedatum"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#studiensemester_kurzbz"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#note"/>
-						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#student_uid"/>
+						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#prestudent_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#lehrveranstaltung_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#punkte"/>
 					</treerow>

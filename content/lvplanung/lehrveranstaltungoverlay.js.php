@@ -1581,8 +1581,8 @@ function LehrveranstaltungGesamtNotenTreeSelectDifferent()
 		for(var i=0;i<lvgesamtitems;i++)
 	   	{
 	   		//Daten aus LVGesamtNotenTree holen
-			col = lvgesamttree.columns ? lvgesamttree.columns["lehrveranstaltung-lvgesamtnoten-tree-student_uid"] : "lehrveranstaltung-lvgesamtnoten-tree-student_uid";
-			var lvgesamtuid=lvgesamttree.view.getCellText(i,col);
+			col = lvgesamttree.columns ? lvgesamttree.columns["lehrveranstaltung-lvgesamtnoten-tree-prestudent_id"] : "lehrveranstaltung-lvgesamtnoten-tree-prestudent_id";
+			var lvgesamt_preId=lvgesamttree.view.getCellText(i,col);
 			col = lvgesamttree.columns ? lvgesamttree.columns["lehrveranstaltung-lvgesamtnoten-tree-note"] : "lehrveranstaltung-lvgesamtnoten-tree-note";
 			var lvgesamtnote=lvgesamttree.view.getCellText(i,col);
 			col = lvgesamttree.columns ? lvgesamttree.columns["lehrveranstaltung-lvgesamtnoten-tree-benotungsdatum-iso"] : "lehrveranstaltung-lvgesamtnoten-tree-benotungsdatum-iso";
@@ -1592,15 +1592,15 @@ function LehrveranstaltungGesamtNotenTreeSelectDifferent()
 			//Schauen ob die gleiche Zeile im Zeugnisnoten Tree vorkommt
 			for(var j=0;j<zeugnisitems;j++)
 			{
-				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
-				var zeugnisuid=zeugnistree.view.getCellText(j,col);
+				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-prestudent_id"] : "lehrveranstaltung-noten-tree-prestudent_id";
+				var zeugnis_preId=zeugnistree.view.getCellText(j,col);
 				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-note"] : "lehrveranstaltung-noten-tree-note";
 				var zeugnisnote=zeugnistree.view.getCellText(j,col);
 				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-benotungsdatum-iso"] : "lehrveranstaltung-noten-tree-benotungsdatum-iso";
 				var zeugnisbenotungsdatum=zeugnistree.view.getCellText(j,col);
 
-				//debug(zeugnisuid+'=='+lvgesamtuid+' && '+zeugnisnote+'=='+lvgesamtnote);
-				if(zeugnisuid==lvgesamtuid && zeugnisnote==lvgesamtnote && zeugnisbenotungsdatum==lvgesamtbenotungsdatum)
+				//debug(zeugnis_preId+'=='+lvgesamt_preId+' && '+zeugnisnote+'=='+lvgesamtnote);
+				if(zeugnis_preId==lvgesamt_preId && zeugnisnote==lvgesamtnote && zeugnisbenotungsdatum==lvgesamtbenotungsdatum)
 				{
 					found=true;
 					break;
@@ -1610,7 +1610,7 @@ function LehrveranstaltungGesamtNotenTreeSelectDifferent()
 				//nach dem benotungsdatum des lektors liegt, dann wird die zeile auch nicht markiert.
 				//damit wird verhindert, dass pruefungsnoten die nur von der assistenz eingetragen wurden,
 				//durch den alten eintrag des lektors wieder ueberschrieben werden
-				if(zeugnisuid==lvgesamtuid
+				if(zeugnis_preId==lvgesamt_preId
 				   && zeugnisnote!=lvgesamtnote
 				   && zeugnisbenotungsdatum>lvgesamtbenotungsdatum)
 				{
@@ -1683,7 +1683,7 @@ function LehrveranstaltungNotenTreeSelectID()
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ID der row holen
-			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
+			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-prestudent_id"] : "lehrveranstaltung-noten-tree-prestudent_id";
 			var uid=tree.view.getCellText(i,col);
 
 			//wenn dies die zu selektierende Zeile
@@ -1832,22 +1832,22 @@ function LehrveranstaltungNotenAuswahl()
 	LehrveranstaltungNotenDetailDisableFields(false);
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
+	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
 	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
-	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
-	var student_uid=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-prestudent_id"] : "lehrveranstaltung-noten-tree-prestudent_id";
+	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
 	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiensemester_kurzbz"] : "lehrveranstaltung-noten-tree-studiensemester_kurzbz";
 	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-
+alert(prestudent_id + " LVOVERLAY.JS");//TODO EINE (testen, ob prestudent_id eingetragen ist!)
 	//Daten holen
-	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&uid='+student_uid+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
+	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&prestudent_id='+prestudent_id+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
 
     var dsource = rdfService.GetDataSourceBlocking(url);
 
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/zeugnisnote/" + lehrveranstaltung_id+'/'+student_uid+'/'+studiensemester_kurzbz);
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/zeugnisnote/" + lehrveranstaltung_id+'/'+prestudent_id+'/'+studiensemester_kurzbz);
 
 	var predicateNS = "http://www.technikum-wien.at/zeugnisnote/rdf";
 
@@ -2000,7 +2000,7 @@ function LehrveranstaltungFFZertifikatPrint(event)
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
+			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-prestudent_id"] : "lehrveranstaltung-noten-tree-prestudent_id";
 			uid = tree.view.getCellText(v,col);
 			paramList += ';'+uid;
 			anzahl = anzahl+1;
@@ -2043,9 +2043,9 @@ function LehrveranstaltungLVZeugnisPrint(event)
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
-			uid = tree.view.getCellText(v,col);
-			paramList += ';'+uid;
+			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-prestudent_id"] : "lehrveranstaltung-noten-tree-prestudent_id";
+			prestudent_id = tree.view.getCellText(v,col);
+			paramList += ';'+prestudent_id;
 			anzahl = anzahl+1;
 			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
 			lvid = tree.view.getCellText(v,col);
@@ -2056,13 +2056,13 @@ function LehrveranstaltungLVZeugnisPrint(event)
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
 
 	if (event.shiftKey)
-	    var output='odt';
+		var output='odt';
 	else if (event.ctrlKey)
 		var output='doc';
 	else
 		var output='pdf';
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl=LVZeugnis&stg_kz='+stg_kz+'&uid='+paramList+'&output='+output+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl=LVZeugnis&stg_kz='+stg_kz+'&prestudent_id='+paramList+'&output='+output+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
 	window.location.href = url;
 	//prompt('test:',url);
 }

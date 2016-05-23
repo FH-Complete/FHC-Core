@@ -34,6 +34,7 @@ require_once('../include/datum.class.php');
 require_once('../include/note.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/mitarbeiter.class.php');
+require_once('../include/studiensemester.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -88,7 +89,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	if(isset($_GET['ss']))
 		$studiensemester_kurzbz = $_GET['ss'];
 	else
-		$studiensemester_kurzbz = $semester_aktuell;
+	{
+		$stsem = new studiensemester();
+		$studiensemester_kurzbz = $stsem->getaktorNext();
+	}
 
 	//Daten holen
 	$xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>";

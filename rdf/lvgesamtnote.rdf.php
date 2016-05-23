@@ -34,7 +34,6 @@ require_once('../include/lvgesamtnote.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/benutzerberechtigung.class.php');
-require_once('../include/student.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
@@ -55,10 +54,10 @@ $stg_obj->getAll(null, false);
 foreach ($stg_obj->result as $stg) 
 	$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;
 
-if(isset($_GET['uid']))
-	$uid = $_GET['uid'];
+if(isset($_GET['prestudent_id']))
+	$prestudent_id = $_GET['prestudent_id'];
 else 
-	$uid = null;
+	$prestudent_id = null;
 
 if(isset($_GET['lehrveranstaltung_id']))
 	$lehrveranstaltung_id = $_GET['lehrveranstaltung_id'];
@@ -78,9 +77,8 @@ echo '
 //Daten holen
 $obj = new lvgesamtnote();
 
-$student = new student($uid);
 
-$obj->getLvGesamtNoten($lehrveranstaltung_id, $student->prestudent_id, $semester_aktuell);
+$obj->getLvGesamtNoten($lehrveranstaltung_id, $prestudent_id, $semester_aktuell);
 $db = new basis_db();
 
 foreach ($obj->result as $row)
@@ -98,16 +96,13 @@ foreach ($obj->result as $row)
 				$nachname = $row_name->nachname;
 			}
 		}
-		
-		//TODO EINE_UID
-		$student = new student();
-		$uid = $student->getUid($row->prestudent_id);
+
 
 		echo '
 		<RDF:li>
-			<RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$uid.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$uid.'/'.$row->studiensemester_kurzbz.'" >
+			<RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$prestudent_id.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$prestudent_id.'/'.$row->studiensemester_kurzbz.'" >
 				<NOTE:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></NOTE:lehrveranstaltung_id>
-				<NOTE:student_uid><![CDATA['.$uid.']]></NOTE:student_uid>
+				<NOTE:prestudent_id><![CDATA['.$row->prestudent_id.']]></NOTE:prestudent_id>
 				<NOTE:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></NOTE:mitarbeiter_uid>
 				<NOTE:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></NOTE:studiensemester_kurzbz>
 				<NOTE:note><![CDATA['.$row->note.']]></NOTE:note>

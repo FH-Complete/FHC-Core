@@ -33,8 +33,7 @@ require_once('../include/functions.inc.php');
 require_once('../include/zeugnisnote.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/person.class.php');
-require_once('../include/benutzer.class.php');
-require_once('../include/student.class.php');
+require_once('../include/prestudent.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/lehrveranstaltung.class.php');
 require_once('../include/benutzerberechtigung.class.php');
@@ -87,11 +86,11 @@ echo '
 $obj = new zeugnisnote();
 
 $obj->getZeugnisnoten($lehrveranstaltung_id, $prestudent_id, $studiensemester_kurzbz);
-$benutzer = new student();
+$prestudent = new prestudent();
 
 foreach ($obj->result as $row)
 {
-	$benutzer->load($row->student_uid);
+	$prestudent->load($row->prestudent_id);
 	$lv_obj = new lehrveranstaltung();
 	$lv_obj->load($row->lehrveranstaltung_id);
 
@@ -102,9 +101,8 @@ foreach ($obj->result as $row)
 
 	echo '
 		  <RDF:li>
-	         <RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'" >
+	         <RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->prestudent_id.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->prestudent_id.'/'.$row->studiensemester_kurzbz.'" >
 				<NOTE:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></NOTE:lehrveranstaltung_id>
-				<NOTE:student_uid><![CDATA['.$row->student_uid.']]></NOTE:student_uid>
 				<NOTE:prestudent_id><![CDATA['.$row->prestudent_id.']]></NOTE:prestudent_id>
 				<NOTE:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></NOTE:studiensemester_kurzbz>
 				<NOTE:note><![CDATA['.$row->note.']]></NOTE:note>
@@ -116,14 +114,14 @@ foreach ($obj->result as $row)
 				<NOTE:lehrveranstaltung_bezeichnung><![CDATA['.$row->lehrveranstaltung_bezeichnung.']]></NOTE:lehrveranstaltung_bezeichnung>
 				<NOTE:lehrveranstaltung_lehrform><![CDATA['.$lv_obj->lehrform_kurzbz.']]></NOTE:lehrveranstaltung_lehrform>
 				<NOTE:lehrveranstaltung_kurzbz><![CDATA['.$lv_obj->kurzbz.']]></NOTE:lehrveranstaltung_kurzbz>
-				<NOTE:student_nachname><![CDATA['.$benutzer->nachname.']]></NOTE:student_nachname>
-				<NOTE:student_vorname><![CDATA['.$benutzer->vorname.']]></NOTE:student_vorname>
-				<NOTE:studiengang><![CDATA['.$stg_arr[$benutzer->studiengang_kz].']]></NOTE:studiengang>
-				<NOTE:studiengang_kz><![CDATA['.$benutzer->studiengang_kz.']]></NOTE:studiengang_kz>
+				<NOTE:student_nachname><![CDATA['.$prestudent->nachname.']]></NOTE:student_nachname>
+				<NOTE:student_vorname><![CDATA['.$prestudent->vorname.']]></NOTE:student_vorname>
+				<NOTE:studiengang><![CDATA['.$stg_arr[$prestudent->studiengang_kz].']]></NOTE:studiengang>
+				<NOTE:studiengang_kz><![CDATA['.$prestudent->studiengang_kz.']]></NOTE:studiengang_kz>
 				<NOTE:studiengang_lv><![CDATA['.$stg_arr[$lv_obj->studiengang_kz].']]></NOTE:studiengang_lv>
 				<NOTE:semester_lv><![CDATA['.$lv_obj->semester.']]></NOTE:semester_lv>
 				<NOTE:ects_lv><![CDATA['.$lv_obj->ects.']]></NOTE:ects_lv>
-				<NOTE:student_semester><![CDATA['.$benutzer->semester.']]></NOTE:student_semester>
+				<NOTE:student_semester><![CDATA['.$prestudent->semester.']]></NOTE:student_semester>
 				<NOTE:punkte><![CDATA['.($row->punkte!=''?(float)$row->punkte:'').']]></NOTE:punkte>
 				<NOTE:zeugnis><![CDATA['.$zeugnis.']]></NOTE:zeugnis>
 	         </RDF:Description>

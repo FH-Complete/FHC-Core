@@ -252,7 +252,7 @@ class zeugnisnote extends basis_db
 			$where2.=" AND tbl_prestudent.prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
 		if($studiensemester_kurzbz!=null)
 			$where2.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
-		$qry = "SELECT vw_student_lehrveranstaltung.lehrveranstaltung_id, campus.vw_student_lehrveranstaltung.prestudent_id, campus.vw_student_lehrveranstaltung.uid,
+		$qry = "SELECT vw_student_lehrveranstaltung.lehrveranstaltung_id, campus.vw_student_lehrveranstaltung.prestudent_id,
 						vw_student_lehrveranstaltung.studiensemester_kurzbz, note, punkte, uebernahmedatum, benotungsdatum,
 						vw_student_lehrveranstaltung.ects, vw_student_lehrveranstaltung.semesterstunden,
 						tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
@@ -275,10 +275,10 @@ class zeugnisnote extends basis_db
 						)
 				)
 				LEFT JOIN lehre.tbl_note USING(note)
-				LEFT JOIN public.tbl_prestudent ON( public.tbl_prestudent.uid=vw_student_lehrveranstaltung.uid)
+				LEFT JOIN public.tbl_prestudent ON( public.tbl_prestudent.prestudent_id=vw_student_lehrveranstaltung.prestudent_id)
 				WHERE true $where
 			UNION
-				SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,lehre.tbl_zeugnisnote.prestudent_id, tbl_prestudent.uid, studiensemester_kurzbz, note, punkte,
+				SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,lehre.tbl_zeugnisnote.prestudent_id, studiensemester_kurzbz, note, punkte,
 					uebernahmedatum, benotungsdatum,lehre.tbl_lehrveranstaltung.ects,lehre.tbl_lehrveranstaltung.semesterstunden, tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
 					tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id, lehre.tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, lehre.tbl_lehrveranstaltung.bezeichnung_english as lehrveranstaltung_bezeichnung_english,
 					tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung as bemerkung, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.studiengang_kz,
@@ -296,7 +296,6 @@ class zeugnisnote extends basis_db
 			{
 				$obj = new zeugnisnote();
 				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
-				$obj->student_uid = $row->uid;
 				$obj->prestudent_id = $row->prestudent_id;
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->note = $row->note;
@@ -352,7 +351,7 @@ class zeugnisnote extends basis_db
 			FROM
 			(
 				campus.vw_student_lehrveranstaltung LEFT JOIN lehre.tbl_zeugnisnote
-					ON(uid=student_uid
+					ON(vw_student_lehrveranstaltung.prestudent_id=tbl_zeugnisnote.prestudent_id
 						AND vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_zeugnisnote.studiensemester_kurzbz
 						AND vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
 					)
@@ -360,7 +359,7 @@ class zeugnisnote extends basis_db
 			LEFT JOIN lehre.tbl_note USING(note)
 			LEFT JOIN lehre.tbl_studienplan_lehrveranstaltung ON(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id)
 			WHERE
-				uid=".$this->db_add_param($student_uid)."
+				prestudent_id=".$this->db_add_param($prestudent_id)."
 				AND vw_student_lehrveranstaltung.studiensemester_kurzbz IN(".$stsem.")
 				AND tbl_studienplan_lehrveranstaltung.studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER)."
 			UNION
@@ -373,7 +372,7 @@ class zeugnisnote extends basis_db
 				JOIN lehre.tbl_note USING(note)
 				LEFT JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
 			WHERE
-				student_uid=".$this->db_add_param($student_uid)."
+				prestudent_id=".$this->db_add_param($prestudent_id)."
 				AND studiensemester_kurzbz IN(".$stsem.")
 				AND tbl_studienplan_lehrveranstaltung.studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER)."
 			UNION ALL
@@ -392,7 +391,7 @@ class zeugnisnote extends basis_db
 			tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung, tbl_lehrveranstaltung.lvnr, tbl_studienplan_lehrveranstaltung.sort as studienplan_lehrveranstaltung_sort
 		FROM
 			lehre.tbl_lehrveranstaltung
-			LEFT JOIN lehre.tbl_zeugnisnote ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=".$this->db_add_param($student_uid)." AND tbl_zeugnisnote.studiensemester_kurzbz IN(".$stsem."))
+			LEFT JOIN lehre.tbl_zeugnisnote ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.prestudent_id=".$this->db_add_param($prestudent_id)." AND tbl_zeugnisnote.studiensemester_kurzbz IN(".$stsem."))
 			LEFT JOIN lehre.tbl_studienplan_lehrveranstaltung ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id AND tbl_studienplan_lehrveranstaltung.studienplan_id=".$this->db_add_param($studienplan_id).")
 			LEFT JOIN lehre.tbl_note USING(note)
 		WHERE

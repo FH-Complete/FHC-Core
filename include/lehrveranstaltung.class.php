@@ -518,17 +518,17 @@ class lehrveranstaltung extends basis_db
 
 	/**
 	 * Liefert alle Lehrveranstaltungen eines Studenten (alle Semester)
-	 * @param $student_uid
+	 * @param $prestudent_id
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_lva_student($student_uid, $studiensemester_kurzbz=NULL)
+	public function load_lva_student($prestudent_id, $studiensemester_kurzbz=NULL)
 	{
 		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung
 				WHERE lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung
-											  WHERE uid=" . $this->db_add_param($student_uid);
+											  WHERE prestudent_id=" . $this->db_add_param($prestudent_id);
 		if($studiensemester_kurzbz !== NULL)
 		    $qry .= " AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
-		$qry .= ") OR lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote WHERE student_uid=" . $this->db_add_param($student_uid);
+		$qry .= ") OR lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote WHERE prestudent_id=" . $this->db_add_param($prestudent_id);
 		if($studiensemester_kurzbz !== NULL)
 		    $qry .= ' AND studiensemester_kurzbz='.$this->db_add_param ($studiensemester_kurzbz);
 		$qry .= ") ORDER BY semester, bezeichnung";
@@ -1894,11 +1894,11 @@ class lehrveranstaltung extends basis_db
 	/**
 	 * Liefert die Anzahl der ECTS Punkte die ein Student in einem Studiensemester
 	 * bereits verbraucht hat (fuer reduzierte Studiengebuehr)
-	 * @param $uid UID
+	 * @param $prestudent_id
 	 * @param $studiensemester_kurzbz
 	 * @return numeric - Anzahl der ECTS Punkte
 	 */
-	public function getUsedECTS($uid, $studiensemester_kurzbz)
+	public function getUsedECTS($prestudent_id, $studiensemester_kurzbz)
 	{
 		$qry = "
 		SELECT sum(ects) as ectssumme FROM (
@@ -1916,7 +1916,7 @@ class lehrveranstaltung extends basis_db
 				lehre.tbl_zeugnisnote
 				JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 			WHERE
-				student_uid=".$this->db_add_param($uid)."
+				prestudent_id=".$this->db_add_param($prestudent_id)."
 				AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 		) a";
 

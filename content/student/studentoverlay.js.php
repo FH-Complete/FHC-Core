@@ -400,7 +400,7 @@ function StudentFFZertifikatPrint(event)
 //	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-noten-tree');
 
-	col = tree.columns ? tree.columns["student-noten-tree-student_uid"] : "student-noten-tree-student_uid";
+	col = tree.columns ? tree.columns["student-noten-tree-prestudent_id"] : "student-noten-tree-prestudent_id";
 	uid = tree.view.getCellText(tree.currentIndex,col);
 
 	col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
@@ -433,9 +433,9 @@ function StudentLVZeugnisPrint(event)
 //	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-noten-tree');
 
-	col = tree.columns ? tree.columns["student-noten-tree-student_uid"] : "student-noten-tree-student_uid";
-	uid = tree.view.getCellText(tree.currentIndex,col);
-
+	col = tree.columns ? tree.columns["student-noten-tree-prestudent_id"] : "student-noten-tree-prestudent_id";
+	prestudent_id = tree.view.getCellText(tree.currentIndex,col);
+alert(prestudent_id + " studentoverlay(studentlvzeugnisprint)");//TODO EINE
 	col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
 	lvid = tree.view.getCellText(tree.currentIndex,col);
 
@@ -446,14 +446,14 @@ function StudentLVZeugnisPrint(event)
 	stg_kz = tree.view.getCellText(tree.currentIndex,col);
 
 	if (event.shiftKey)
-	    var output='odt';
+		var output='odt';
 	else if (event.ctrlKey)
 		var output='doc';
 	else
 		var output='pdf';
 
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl=LVZeugnis&stg_kz='+stg_kz+'&uid=;'+uid+'&output='+output+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl=LVZeugnis&stg_kz='+stg_kz+'&prestudent_id=;'+prestudent_id+'&output='+output+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
 
 	window.location.href = url;
 }
@@ -1377,8 +1377,8 @@ function StudentAuswahl()
 		bisiotree.builder.addListener(StudentIOTreeListener);
 	}
 
-	if(uid!='')
-	{
+	if(parseInt(prestudent_id))
+	{alert(prestudent_id + " zeugnisnote/lvgesamtnote"); // TODO EINE
 		// *** ZeugnisNoten ***
 		notentree = document.getElementById('student-noten-tree');
 
@@ -1412,7 +1412,7 @@ function StudentAuswahl()
 		// *** LvGesamtNoten ***
 		lvgesamtnotentree = document.getElementById('student-lvgesamtnoten-tree');
 
-		url='<?php echo APP_ROOT;?>rdf/lvgesamtnote.rdf.php?uid='+uid+"&"+gettimestamp();
+		url='<?php echo APP_ROOT;?>rdf/lvgesamtnote.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
 
 		try
 		{
@@ -2846,8 +2846,8 @@ function StudentCreateZeugnis(xsl,event)
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			var uid = getTreeCellText(tree, 'student-treecol-uid', v);
-			paramList += ';'+uid;
+			var prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
+			paramList += ';'+prestudent_id;
 		}
 	}
 	//Studiensemester holen
@@ -2864,7 +2864,7 @@ function StudentCreateZeugnis(xsl,event)
 	{
 		if (event.shiftKey)
 		{
-		    var output = 'odt';
+			var output = 'odt';
 		}
 		else if (event.ctrlKey)
 		{
@@ -2876,7 +2876,7 @@ function StudentCreateZeugnis(xsl,event)
 		}
 	}
 	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zeugnis.rdf.php&output='+output+'&xsl='+xsl+'&uid='+paramList+'&ss='+ss+'&xsl_stg_kz='+xsl_stg_kz,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zeugnis.rdf.php&output='+output+'&xsl='+xsl+'&prestudent_id='+paramList+'&ss='+ss+'&xsl_stg_kz='+xsl_stg_kz,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -2899,8 +2899,8 @@ function StudentCreateSammelzeugnis(xsl)
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			var uid = getTreeCellText(tree, 'student-treecol-uid', v);
-			paramList += ';'+uid;
+			var prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
+			paramList += ';'+prestudent_id;
 		}
 	}
 	var xsl_stg_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value
@@ -2912,7 +2912,7 @@ function StudentCreateSammelzeugnis(xsl)
 	}
 
 	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=sammelzeugnis.rdf.php&xsl='+xsl+'&uid='+paramList+'&xsl_stg_kz='+xsl_stg_kz,'Sammelzeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=sammelzeugnis.rdf.php&xsl='+xsl+'&prestudent_id='+paramList+'&xsl_stg_kz='+xsl_stg_kz,'Sammelzeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 // ****
 // * Laedt ein Zeugnis dass in der DB gespeichert ist
@@ -3019,31 +3019,31 @@ function StudentZeugnisArchivieren(lang)
 	var start = new Object();
 	var end = new Object();
 	var anzfault=0;
-	var uid='';
+	var prestudent_id=0;
 	var errormsg = '';
 	var stsem = getStudiensemester();
 
 	//Zeugnis fuer alle markierten Studenten archivieren
 	for (var t=0; t<numRanges; t++)
 	{
-  		tree.view.selection.getRangeAt(t,start,end);
-  		for (v=start.value; v<=end.value; v++)
-  		{
-  			uid = getTreeCellText(tree, 'student-treecol-uid', v);
+			tree.view.selection.getRangeAt(t,start,end);
+			for (v=start.value; v<=end.value; v++)
+			{
+				prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
 
 			var xsl_vorlage;
 			if(lang=='eng')
 				xsl_vorlage = 'ZeugnisEng';
 			else
 				xsl_vorlage = 'Zeugnis';
-  			url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl='+xsl_vorlage+'&xml=zeugnis.rdf.php&uid='+uid+'&ss='+stsem+'&archive=1';
+				url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl='+xsl_vorlage+'&xml=zeugnis.rdf.php&prestudent_id='+prestudent_id+'&ss='+stsem+'&archive=1';
 
 			var req = new phpRequest(url,'','');
 
 			var response = req.execute();
 			if(response!='')
 				errormsg = errormsg + response;
-  		}
+			}
 	}
 
 	if(errormsg!='')
@@ -3089,7 +3089,7 @@ function StudentIOAuswahl()
 	var von = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#von" ));
 	var bis = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bis" ));
 	var zweck_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zweck_code" ));
-	var student_uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#student_uid" ));
+	var student_uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#student_uid" ));// TODO EINE gibts die noch?
 	var prestudent_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#prestudent_id" ));
 	var lehreinheit_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehreinheit_id" ));
 	var lehrveranstaltung_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrveranstaltung_id" ));
@@ -3550,8 +3550,8 @@ function StudentNotenTreeSelectDifferent()
 			return false;
 
 		for(var i=0;i<lvgesamtitems;i++)
-	   	{
-	   		//Daten aus LVGesamtNotenTree holen
+		{
+			//Daten aus LVGesamtNotenTree holen
 			col = lvgesamttree.columns ? lvgesamttree.columns["student-lvgesamtnoten-tree-lehrveranstaltung_id"] : "student-lvgesamtnoten-tree-lehrveranstaltung_id";
 			var lvgesamtlehrveranstaltung_id=lvgesamttree.view.getCellText(i,col);
 			col = lvgesamttree.columns ? lvgesamttree.columns["student-lvgesamtnoten-tree-note"] : "student-lvgesamtnoten-tree-note";
@@ -3633,7 +3633,7 @@ function StudentLvGesamtNotenTreeSelectID()
 				StudentNotenSelectStudentUID=null;
 				return true;
 			}
-	   	}
+		}
 	}*/
 }
 
@@ -3668,30 +3668,30 @@ function StudentNotenAuswahl()
 	StudentNoteDetailDisableFields(false);
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
+	var col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
 	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
-	var col = tree.columns ? tree.columns["student-noten-tree-student_uid"] : "student-noten-tree-student_uid";
-	var student_uid=tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["student-noten-tree-prestudent_id"] : "student-noten-tree-prestudent_id";
+	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
 	var col = tree.columns ? tree.columns["student-noten-tree-studiensemester_kurzbz"] : "student-noten-tree-studiensemester_kurzbz";
 	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 
 	//Falls einer der Parameter leer ist wird abgebrochen da sonst ein sehr grosses rdf geladen wird
 	//Sollte eigentlich nie eintreffen, tut es aber trotzdem
-	if(lehrveranstaltung_id=='' || student_uid=='' || studiensemester_kurzbz=='')
+	if(lehrveranstaltung_id=='' || !parseInt(prestudent_id) || studiensemester_kurzbz=='')
 	{
 		debug('unerwarteter Fehler in StudentNotenAuswahl() in studentoverlay.js.php');
 		return false;
 	}
 
 	//Daten holen
-	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&uid='+student_uid+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
+	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&prestudent_id='+prestudent_id+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                    getService(Components.interfaces.nsIRDFService);
 
     var dsource = rdfService.GetDataSourceBlocking(url);
 
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/zeugnisnote/" + lehrveranstaltung_id+'/'+student_uid+'/'+studiensemester_kurzbz);
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/zeugnisnote/" + lehrveranstaltung_id+'/'+prestudent_id+'/'+studiensemester_kurzbz);
 
 	var predicateNS = "http://www.technikum-wien.at/zeugnisnote/rdf";
 

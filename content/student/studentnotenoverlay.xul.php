@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 header("Cache-Control: no-cache");
@@ -94,10 +95,6 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#note" />
 			<splitter class="tree-splitter"/>
-			<treecol id="student-noten-tree-student_uid" label="Uid" flex="2" hidden="true" persist="hidden, width, ordinal"
-				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_uid" />
-			<splitter class="tree-splitter"/>
 			<treecol id="student-noten-tree-prestudent_id" label="Pid" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#prestudent_id" />
@@ -152,7 +149,6 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#benotungsdatum_iso"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiensemester_kurzbz"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#note"/>
-						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_uid"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#prestudent_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang"/>
@@ -218,9 +214,9 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#note" />
 			<splitter class="tree-splitter"/>
-			<treecol id="student-lvgesamtnoten-tree-student_uid" label="StudentUID" flex="2" hidden="true"
+			<treecol id="student-lvgesamtnoten-tree-prestudent_id" label="StudentUID" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#student_uid" />
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#prestudent_id" />
 			<splitter class="tree-splitter"/>
 			<treecol id="student-lvgesamtnoten-tree-lehrveranstaltung_id" label="LehrveranstaltungID" flex="2" hidden="true"
 				class="sortDirectionIndicator"
@@ -244,7 +240,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#freigabedatum"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#studiensemester_kurzbz"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#note"/>
-						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#student_uid"/>
+						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#prestudent_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#lehrveranstaltung_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#punkte"/>
 					</treerow>
