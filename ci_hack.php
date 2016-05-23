@@ -370,4 +370,3 @@ $model=new CI_Model();
 
 // Traits
 require_once(dirname(__FILE__).'/ci_db_extra.php');
-

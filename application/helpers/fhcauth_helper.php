@@ -10,7 +10,7 @@
  * @since	Version 1.0.0
  * @filesource
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 require_once 'include/authentication.class.php';
 
 /**

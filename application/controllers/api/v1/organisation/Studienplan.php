@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if(!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Studienplan extends APIv1_Controller
 {
@@ -32,10 +32,10 @@ class Studienplan extends APIv1_Controller
 	{
 		$studiengang_kz = $this->get('studiengang_kz');
 		
-		if(isset($studiengang_kz))
+		if (isset($studiengang_kz))
 		{
 			$result = $this->StudienplanModel->addJoin('lehre.tbl_studienordnung', 'studienordnung_id');
-			if($result->error == EXIT_SUCCESS)
+			if ($result->error == EXIT_SUCCESS)
 			{
 				$result = $this->StudienplanModel->loadWhere(array('studiengang_kz' => $this->get('studiengang_kz')));
 			}

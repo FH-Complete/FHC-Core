@@ -194,7 +194,7 @@ class Template
         }
         
         // new widget
-        if(!class_exists($class)) {
+        if (!class_exists($class)) {
             // try both lowercase and capitalized versions
             foreach (array(ucfirst($class), strtolower($class)) as $class) {
                 if (file_exists($path . $class . '.php')) {

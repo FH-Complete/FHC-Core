@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') || exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Vilesci extends FHC_Controller
 {

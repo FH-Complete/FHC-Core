@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /*
 |--------------------------------------------------------------------------
@@ -23,7 +23,7 @@ $config['migration_enabled'] = TRUE;
 | be upgraded / downgraded to.
 |
 */
-$config['migration_version'] = 008;
+$config['migration_version'] = 007;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,7 +55,7 @@ $config['migration_type'] = 'sequential';
 | will migrate up. This must be set.
 |
 */
-$config['migration_table'] = 'ci_migrations';
+$config['migration_table'] = 'system.ci_migrations';
 
 /*
 |--------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * CodeIgniter Rest Controller
@@ -1299,7 +1299,7 @@ abstract class REST_Controller extends CI_Controller {
         if (!empty($auth_override_class_method_http))
         {
             // check for wildcard flag for rules for classes
-            if(!empty($auth_override_class_method_http[$this->router->class]['*'][$this->request->method]))
+            if (!empty($auth_override_class_method_http[$this->router->class]['*'][$this->request->method]))
             {
                 // None auth override found, prepare nothing but send back a TRUE override flag
                 if ($auth_override_class_method_http[$this->router->class]['*'][$this->request->method] === 'none')
@@ -1341,7 +1341,7 @@ abstract class REST_Controller extends CI_Controller {
             }
 
             // Check to see if there's an override value set for the current class/method/HTTP-method being called
-            if(!empty($auth_override_class_method_http[$this->router->class][$this->router->method][$this->request->method]))
+            if (!empty($auth_override_class_method_http[$this->router->class][$this->router->method][$this->request->method]))
             {
                 // None auth override found, prepare nothing but send back a TRUE override flag
                 if ($auth_override_class_method_http[$this->router->class][$this->router->method][$this->request->method] === 'none')
@@ -1911,7 +1911,7 @@ abstract class REST_Controller extends CI_Controller {
 	 */
 	private function _setUID($username)
 	{
-		if(!isset($this->_uid) && isset($username))
+		if (!isset($this->_uid) && isset($username))
 		{
 			$this->_uid = $username;
 		}

@@ -24,7 +24,7 @@ class DB_Model extends FHC_Model
 	public function insert($data)
 	{
 		// Check Class-Attributes
-		if(is_null($this->dbTable))
+		if (is_null($this->dbTable))
 			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
 
 		// Check rights
@@ -47,7 +47,7 @@ class DB_Model extends FHC_Model
 	public function replace($data)
 	{
 		// Check Class-Attributes
-		if(is_null($this->dbTable))
+		if (is_null($this->dbTable))
 			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
 		
 		// Check rights
@@ -71,9 +71,9 @@ class DB_Model extends FHC_Model
 	public function update($id, $data)
 	{
 		// Check Class-Attributes
-		if(is_null($this->dbTable))
+		if (is_null($this->dbTable))
 			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
-		if(is_null($this->pk))
+		if (is_null($this->pk))
 			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
 		
 		// Check rights
@@ -106,9 +106,9 @@ class DB_Model extends FHC_Model
 	public function load($id)
 	{
 		// Check Class-Attributes
-		if(is_null($this->dbTable))
+		if (is_null($this->dbTable))
 			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
-		if(is_null($this->pk))
+		if (is_null($this->pk))
 			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
 		
 		
@@ -142,7 +142,7 @@ class DB_Model extends FHC_Model
 	public function loadWhere($where = null)
 	{
 		// Check Class-Attributes
-		if(is_null($this->dbTable))
+		if (is_null($this->dbTable))
 			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
 		
 		// Check rights
@@ -169,9 +169,9 @@ class DB_Model extends FHC_Model
 	public function loadWhole()
 	{
 		// Check Class-Attributes
-		if(is_null($this->dbTable))
+		if (is_null($this->dbTable))
 			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
-		if(is_null($this->pk))
+		if (is_null($this->pk))
 			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
 		
 		
@@ -196,7 +196,7 @@ class DB_Model extends FHC_Model
 	public function addJoin($joinTable = null, $cond = null, $type = '')
 	{
 		// Check parameters
-		if(is_null($joinTable) || is_null($cond) || !in_array($type, array('', 'LEFT', 'RIGHT', 'OUTER', 'INNER', 'LEFT OUTER', 'RIGHT OUTER')))
+		if (is_null($joinTable) || is_null($cond) || !in_array($type, array('', 'LEFT', 'RIGHT', 'OUTER', 'INNER', 'LEFT OUTER', 'RIGHT OUTER')))
 			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
 		
 		// Check rights for joined table
@@ -216,10 +216,43 @@ class DB_Model extends FHC_Model
 	public function addOrder($field = null, $type = 'ASC')
 	{
 		// Check Class-Attributes and parameters
-		if(is_null($field) || !in_array($type, array('ASC', 'DESC')))
+		if (is_null($field) || !in_array($type, array('ASC', 'DESC')))
 			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
 		
 		$this->db->order_by($field, $type);
+		
+		return $this->_success(TRUE);
+	}
+	
+	/** ---------------------------------------------------------------
+	 * Add distinct clause
+	 *
+	 * @return  void
+	 */
+	public function addDistinct()
+	{
+		$this->db->distinct();
+	}
+	
+	/** ---------------------------------------------------------------
+	 * Add limit clause
+	 *
+	 * @return  void
+	 */
+	public function addLimit($start = null, $end = null)
+	{
+		// Check Class-Attributes and parameters
+		if (!is_numeric($start) || (is_numeric($start) && $start <= 0))
+			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+		
+		if (is_numeric($end) && $end > $start)
+		{
+			$this->db->limit($start, $end);
+		}
+		else
+		{
+			$this->db->limit($start);
+		}
 		
 		return $this->_success(TRUE);
 	}
@@ -233,9 +266,9 @@ class DB_Model extends FHC_Model
 	public function delete($id)
 	{
 		// Check Class-Attributes
-		if(is_null($this->dbTable))
+		if (is_null($this->dbTable))
 			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
-		if(is_null($this->pk))
+		if (is_null($this->pk))
 			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
 		
 		// Check rights
@@ -302,7 +335,7 @@ class DB_Model extends FHC_Model
 		$quote='';
 		$len = strlen($s);
 		$v = '';
-		for($i=$start+1; $i<$len;$i++)
+		for ($i=$start+1; $i<$len;$i++)
 		{
 		    $ch = $s[$i];
 		    if (!$string && $ch=='}')

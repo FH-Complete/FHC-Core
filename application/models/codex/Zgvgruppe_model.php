@@ -8,6 +8,6 @@ class Zgvgruppe_model extends DB_Model
 	{
 		parent::__construct();
 		$this->dbTable = 'bis.tbl_zgvgruppe';
-		$this->pk = '';
+		$this->pk = 'gruppe_kurzbz';
 	}
 }

@@ -40,16 +40,16 @@ class FHComplete_Sniffs_ControlStructures_ControlSignatureSniff extends PHP_Code
     protected function getPatterns()
     {
         return array(
-            'try {EOL...}\s+catch (...)EOL...{EOL...EOL...}',
-            'do+EOL...{EOL...EOL...} while (...);EOL',
+            'tryEOL...{EOL...}EOL...catch (...)EOL...{EOL...}EOL',
+            'doEOL...{EOL...EOL...}EOL...while (...);EOL',
             'while (...)EOL...{EOL',
-            'for (...) {EOL',
+            'for (...)EOL...{EOL',
             'if (...)EOL...{EOL',
             'foreach (...)EOL...{EOL',
             '}EOL...\s+else if (...)EOL...{EOL',
             '}EOL...\s+elseif (...)EOL...{EOL',
             '}EOL...\s+else+EOL...{EOL',
-            'do+EOL...{EOL',
+            'doEOL...{EOL',
        );
 
     }//end getPatterns()

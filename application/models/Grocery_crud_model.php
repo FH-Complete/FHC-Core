@@ -47,13 +47,13 @@ class Grocery_crud_model  extends CI_Model  {
 
     function get_list()
     {
-    	if($this->table_name === null)
+    	if ($this->table_name === null)
     		return false;
 
     	$select = "{$this->table_name}.*";
 
     	//set_relation special queries
-    	if(!empty($this->relation))
+    	if (!empty($this->relation))
     	{
     		foreach($this->relation as $relation)
     		{
@@ -61,7 +61,7 @@ class Grocery_crud_model  extends CI_Model  {
     			$unique_join_name = $this->_unique_join_name($field_name);
     			$unique_field_name = $this->_unique_field_name($field_name);
 
-				if(strstr($related_field_title,'{'))
+				if (strstr($related_field_title,'{'))
 				{
 					$related_field_title = str_replace(" ","&nbsp;",$related_field_title);
     				$select .= ", CONCAT('".str_replace(array('{','}'),array("',COALESCE({$unique_join_name}.",", ''),'"),str_replace("'","\\'",$related_field_title))."') as $unique_field_name";
@@ -71,13 +71,13 @@ class Grocery_crud_model  extends CI_Model  {
     				$select .= ", $unique_join_name.$related_field_title AS $unique_field_name";
     			}
 
-    			if($this->field_exists($related_field_title))
+    			if ($this->field_exists($related_field_title))
     				$select .= ", {$this->table_name}.$related_field_title AS {$this->table_name}.$related_field_title";
     		}
     	}
 
     	//set_relation_n_n special queries. We prefer sub queries from a simple join for the relation_n_n as it is faster and more stable on big tables.
-    	if(!empty($this->relation_n_n))
+    	if (!empty($this->relation_n_n))
     	{
 			$select = $this->relation_n_n_queries($select);
     	}
@@ -116,7 +116,7 @@ class Grocery_crud_model  extends CI_Model  {
 	    	$field = "";
 	    	$use_template = strpos($title_field_selection_table,'{') !== false;
 	    	$field_name_hash = $this->_unique_field_name($title_field_selection_table);
-	    	if($use_template)
+	    	if ($use_template)
 	    	{
 	    		$title_field_selection_table = str_replace(" ", "&nbsp;", $title_field_selection_table);
 	    		$field .= "CONCAT('".str_replace(array('{','}'),array("',COALESCE(",", ''),'"),str_replace("'","\\'",$title_field_selection_table))."')";
@@ -178,7 +178,7 @@ class Grocery_crud_model  extends CI_Model  {
     function get_total_results()
     {
     	//set_relation_n_n special queries. We prefer sub queries from a simple join for the relation_n_n as it is faster and more stable on big tables.
-    	if(!empty($this->relation_n_n))
+    	if (!empty($this->relation_n_n))
     	{
     		$select = "{$this->table_name}.*";
     		$select = $this->relation_n_n_queries($select);
@@ -191,7 +191,7 @@ class Grocery_crud_model  extends CI_Model  {
 
     function set_basic_table($table_name = null)
     {
-    	if( !($this->db->table_exists($table_name)) )
+    	if ( !($this->db->table_exists($table_name)) )
     		return false;
 
     	$this->table_name = $table_name;
@@ -211,7 +211,7 @@ class Grocery_crud_model  extends CI_Model  {
     {
 		$related_primary_key = $this->get_primary_key($related_table);
 
-		if($related_primary_key !== false)
+		if ($related_primary_key !== false)
 		{
 			$unique_name = $this->_unique_join_name($field_name);
 			$this->db->join( $related_table.' as '.$unique_name , "$unique_name.$related_primary_key = {$this->table_name}.$field_name",'left');
@@ -248,7 +248,7 @@ class Grocery_crud_model  extends CI_Model  {
 
     	$select = "$related_table.$related_primary_key, ";
 
-    	if(strstr($related_field_title,'{'))
+    	if (strstr($related_field_title,'{'))
     	{
     		$related_field_title = str_replace(" ", "&nbsp;", $related_field_title);
     		$select .= "CONCAT('".str_replace(array('{','}'),array("',COALESCE(",", ''),'"),str_replace("'","\\'",$related_field_title))."') as $field_name_hash";
@@ -259,16 +259,16 @@ class Grocery_crud_model  extends CI_Model  {
     	}
 
     	$this->db->select($select,false);
-    	if($where_clause !== null)
+    	if ($where_clause !== null)
     		$this->db->where($where_clause);
 
-    	if($where_clause !== null)
+    	if ($where_clause !== null)
     		$this->db->where($where_clause);
 
-    	if($limit !== null)
+    	if ($limit !== null)
     		$this->db->limit($limit);
 
-    	if($search_like !== null)
+    	if ($search_like !== null)
     		$this->db->having("$field_name_hash LIKE '%".$this->db->escape_like_str($search_like)."%'");
 
     	$order_by !== null
@@ -292,7 +292,7 @@ class Grocery_crud_model  extends CI_Model  {
 
     function get_relation_total_rows($field_name , $related_table , $related_field_title, $where_clause)
     {
-    	if($where_clause !== null)
+    	if ($where_clause !== null)
     		$this->db->where($where_clause);
 
     	return $this->db->count_all_results($related_table);
@@ -304,7 +304,7 @@ class Grocery_crud_model  extends CI_Model  {
     	$related_field_title = $field_info->title_field_selection_table;
     	$use_template = strpos($related_field_title,'{') !== false;;
     	$field_name_hash = $this->_unique_field_name($related_field_title);
-    	if($use_template)
+    	if ($use_template)
     	{
     		$related_field_title = str_replace(" ", "&nbsp;", $related_field_title);
     		$select .= "CONCAT('".str_replace(array('{','}'),array("',COALESCE(",", ''),'"),str_replace("'","\\'",$related_field_title))."') as $field_name_hash";
@@ -317,9 +317,9 @@ class Grocery_crud_model  extends CI_Model  {
 
     	$selection_primary_key = $this->get_primary_key($field_info->selection_table);
 
-    	if(empty($field_info->priority_field_relation_table))
+    	if (empty($field_info->priority_field_relation_table))
     	{
-    		if(!$use_template){
+    		if (!$use_template){
     			$this->db->order_by("{$field_info->selection_table}.{$field_info->title_field_selection_table}");
     		}
     	}
@@ -352,7 +352,7 @@ class Grocery_crud_model  extends CI_Model  {
     	$use_template = strpos($related_field_title,'{') !== false;
     	$field_name_hash = $this->_unique_field_name($related_field_title);
 
-    	if($use_template)
+    	if ($use_template)
     	{
     		$related_field_title = str_replace(" ", "&nbsp;", $related_field_title);
     		$select .= "CONCAT('".str_replace(array('{','}'),array("',COALESCE(",", ''),'"),str_replace("'","\\'",$related_field_title))."') as $field_name_hash";
@@ -363,19 +363,19 @@ class Grocery_crud_model  extends CI_Model  {
     	}
     	$this->db->select('*, '.$select,false);
 
-    	if($use_where_clause){
+    	if ($use_where_clause){
     		$this->db->where($field_info->where_clause);
     	}
 
     	$selection_primary_key = $this->get_primary_key($field_info->selection_table);
-        if(!$use_template)
+        if (!$use_template)
         	$this->db->order_by("{$field_info->selection_table}.{$field_info->title_field_selection_table}");
         $results = $this->db->get($field_info->selection_table)->result();
 
         $results_array = array();
         foreach($results as $row)
         {
-            if(!isset($selected_values[$row->$selection_primary_key]))
+            if (!isset($selected_values[$row->$selection_primary_key]))
                 $results_array[$row->$selection_primary_key] = $row->{$field_name_hash};
         }
 
@@ -385,12 +385,12 @@ class Grocery_crud_model  extends CI_Model  {
     function db_relation_n_n_update($field_info, $post_data ,$main_primary_key)
     {
     	$this->db->where($field_info->primary_key_alias_to_this_table, $main_primary_key);
-    	if(!empty($post_data))
+    	if (!empty($post_data))
     		$this->db->where_not_in($field_info->primary_key_alias_to_selection_table , $post_data);
     	$this->db->delete($field_info->relation_table);
 
     	$counter = 0;
-    	if(!empty($post_data))
+    	if (!empty($post_data))
     	{
     		foreach($post_data as $primary_key_value)
 	    	{
@@ -402,14 +402,14 @@ class Grocery_crud_model  extends CI_Model  {
 	    		$this->db->where($where_array);
 				$count = $this->db->from($field_info->relation_table)->count_all_results();
 
-				if($count == 0)
+				if ($count == 0)
 				{
-					if(!empty($field_info->priority_field_relation_table))
+					if (!empty($field_info->priority_field_relation_table))
 						$where_array[$field_info->priority_field_relation_table] = $counter;
 
 					$this->db->insert($field_info->relation_table, $where_array);
 
-				}elseif($count >= 1 && !empty($field_info->priority_field_relation_table))
+				}elseif ($count >= 1 && !empty($field_info->priority_field_relation_table))
 				{
 					$this->db->update( $field_info->relation_table, array($field_info->priority_field_relation_table => $counter) , $where_array);
 				}
@@ -441,9 +441,9 @@ WHERE table_name = '."'{$this->table_name}'")->result() as $db_field_type)
     		$type = explode("(",$db_field_type->Type);
     		$db_type = $type[0];
 
-    		if(isset($type[1]))
+    		if (isset($type[1]))
     		{
-    			if(substr($type[1],-1) == ')')
+    			if (substr($type[1],-1) == ')')
     			{
     				$length = substr($type[1],0,-1);
     			}
@@ -491,7 +491,7 @@ WHERE table_name = '."'{$this->table_name}'")->result() as $db_field_type)
     function db_insert($post_array)
     {
     	$insert = $this->db->insert($this->table_name,$post_array);
-    	if($insert)
+    	if ($insert)
     	{
     		return $this->db->insert_id();
     	}
@@ -502,12 +502,12 @@ WHERE table_name = '."'{$this->table_name}'")->result() as $db_field_type)
     {
     	$primary_key_field = $this->get_primary_key();
 
-    	if($primary_key_field === false)
+    	if ($primary_key_field === false)
     		return false;
 
     	$this->db->limit(1);
     	$this->db->delete($this->table_name,array( $primary_key_field => $primary_key_value));
-    	if( $this->db->affected_rows() != 1)
+    	if ( $this->db->affected_rows() != 1)
     		return false;
     	else
     		return true;
@@ -515,7 +515,7 @@ WHERE table_name = '."'{$this->table_name}'")->result() as $db_field_type)
 
     function db_file_delete($field_name, $filename)
     {
-    	if( $this->db->update($this->table_name,array($field_name => ''),array($field_name => $filename)) )
+    	if ( $this->db->update($this->table_name,array($field_name => ''),array($field_name => $filename)) )
     	{
     		return true;
     	}
@@ -527,7 +527,7 @@ WHERE table_name = '."'{$this->table_name}'")->result() as $db_field_type)
 
     function field_exists($field,$table_name = null)
     {
-    	if(empty($table_name))
+    	if (empty($table_name))
     	{
     		$table_name = $this->table_name;
     	}
@@ -536,20 +536,20 @@ WHERE table_name = '."'{$this->table_name}'")->result() as $db_field_type)
 
     function get_primary_key($table_name = null)
     {
-    	if($table_name == null)
+    	if ($table_name == null)
     	{
-    		if(isset($this->primary_keys[$this->table_name]))
+    		if (isset($this->primary_keys[$this->table_name]))
     		{
     			return $this->primary_keys[$this->table_name];
     		}
 
-	    	if(empty($this->primary_key))
+	    	if (empty($this->primary_key))
 	    	{
 		    	$fields = $this->get_field_types_basic_table();
 
 		    	foreach($fields as $field)
 		    	{
-		    		if($field->primary_key == 1)
+		    		if ($field->primary_key == 1)
 		    		{
 		    			return $field->name;
 		    		}
@@ -564,7 +564,7 @@ WHERE table_name = '."'{$this->table_name}'")->result() as $db_field_type)
     	}
     	else
     	{
-    		if(isset($this->primary_keys[$table_name]))
+    		if (isset($this->primary_keys[$table_name]))
     		{
     			return $this->primary_keys[$table_name];
     		}
@@ -573,7 +573,7 @@ WHERE table_name = '."'{$this->table_name}'")->result() as $db_field_type)
 
 	    	foreach($fields as $field)
 	    	{
-	    		/*if($field->primary_key == 1)
+	    		/*if ($field->primary_key == 1)
 	    		{
 	    			return $field->name;
 	    		}*/

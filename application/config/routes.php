@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------------
@@ -49,8 +49,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-$route['person/(:any)'] = 'person/view/$1';
-$route['person'] = 'person';
 $route['default_controller'] = 'Vilesci';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+// Class name conflicts
+$route['api/v1/organisation/studiengang/(:any)'] = 'api/v1/organisation/studiengang2/$1';
+$route['api/v1/ressource/betriebsmittelperson/(:any)'] = 'api/v1/ressource/betriebsmittelperson2/$1';
+$route['api/v1/organisation/fachbereich/(:any)'] = 'api/v1/organisation/fachbereich2/$1';
+$route['api/v1/organisation/geschaeftsjahr/(:any)'] = 'api/v1/organisation/geschaeftsjahr2/$1';
+$route['api/v1/organisation/organisationseinheit/(:any)'] = 'api/v1/organisation/organisationseinheit2/$1';
+$route['api/v1/system/sprache/(:any)'] = 'api/v1/system/sprache2/$1';

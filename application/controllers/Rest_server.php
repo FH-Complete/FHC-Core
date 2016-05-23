@@ -21,7 +21,7 @@
 * @return some value on success.
 */
 
-defined('BASEPATH') || exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * @class Rest_server

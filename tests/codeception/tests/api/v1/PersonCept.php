@@ -25,8 +25,8 @@ $I->sendGET('v1/person/person/Person', array('code' => '12345'));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson([
-	'success' => false,
-	'message' => 'Person not found']);
+	'error' => 0,
+	'retval' => array()]);
 
 $I->sendGET('v1/person/person/Person', array('code' => '01234567C', 'email' => 'harvey.joshuah@calva.dev'));
 $I->seeResponseCodeIs(200);

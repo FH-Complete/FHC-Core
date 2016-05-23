@@ -5,7 +5,7 @@ modules:
         - Db
         - REST:
             # API URL
-            url: http://localhost/build/index.ci.php/api/
+            url: http://localhost/build/fhcomplete/index.ci.php/api/
             # Can also be a framework module name
             depends: PhpBrowser
             # Limits PhpBrowser to JSON or XML

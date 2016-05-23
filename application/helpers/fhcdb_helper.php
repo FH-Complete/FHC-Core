@@ -10,7 +10,7 @@
  * @since	Version 1.0.0
  * @filesource
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 //require_once 'include/basis.class.php';
 
 /**
@@ -44,12 +44,12 @@ class basis_db
 		//Connection Herstellen
 		if (DB_CONNECT_PERSISTENT)
 		{
-			if(!basis_db::$db_conn = pg_pconnect($conn_str))
+			if (!basis_db::$db_conn = pg_pconnect($conn_str))
 				die('Fehler beim Oeffnen der Datenbankverbindung');
 		}
 		else
 		{
-			if(!basis_db::$db_conn = pg_connect($conn_str))
+			if (!basis_db::$db_conn = pg_connect($conn_str))
 				die('Fehler beim Oeffnen der Datenbankverbindung');
 		}
 	}
@@ -67,7 +67,7 @@ class basis_db
 
 	public function db_num_rows($result=null)
 	{
-		if(is_null($result))
+		if (is_null($result))
 			return pg_num_rows($this->db_result);
 		else
 			return pg_num_rows($result);
@@ -75,16 +75,16 @@ class basis_db
 
 	public function db_fetch_object($result = null, $i=null)
 	{
-		if(is_null($result))
+		if (is_null($result))
 		{
-			if(is_null($i))
+			if (is_null($i))
 				return pg_fetch_object($this->db_result);
 			else
 				return pg_fetch_object($this->db_result, $i);
 		}
 		else
 		{
-			if(is_null($i))
+			if (is_null($i))
 				return pg_fetch_object($result);
 			else
 				return pg_fetch_object($result, $i);
@@ -93,16 +93,16 @@ class basis_db
 
 	public function db_fetch_row($result = null, $i=null)
 	{
-		if(is_null($result))
+		if (is_null($result))
 		{
-			if(is_null($i))
+			if (is_null($i))
 				return pg_fetch_row($this->db_result);
 			else
 				return pg_fetch_row($this->db_result, $i);
 		}
 		else
 		{
-			if(is_null($i))
+			if (is_null($i))
 				return pg_fetch_row($result);
 			else
 				return pg_fetch_row($result, $i);
@@ -111,16 +111,16 @@ class basis_db
 
 	public function db_fetch_assoc($result = null, $i=null)
 	{
-		if(is_null($result))
+		if (is_null($result))
 		{
-			if(is_null($i))
+			if (is_null($i))
 				return pg_fetch_assoc($this->db_result);
 			else
 				return pg_fetch_assoc($this->db_result, $i);
 		}
 		else
 		{
-			if(is_null($i))
+			if (is_null($i))
 				return pg_fetch_row($result);
 			else
 				return pg_fetch_row($result, $i);
@@ -129,7 +129,7 @@ class basis_db
 
 	public function db_result($result = null, $i,$item)
 	{
-		if(is_null($result))
+		if (is_null($result))
 		{
 			return pg_result($this->db_result, $i,$item);
 		}
@@ -142,9 +142,9 @@ class basis_db
 	public function db_getResultJSON($result = null)
 	{
 		$rows=array();
-		if(is_null($result))
+		if (is_null($result))
 		{
-			while($r = pg_fetch_assoc($this->db_result))
+			while ($r = pg_fetch_assoc($this->db_result))
 				$rows[] = $r;
 
 			//print json_encode($rows);
@@ -153,7 +153,7 @@ class basis_db
 		{
 			pg_result_seek($result, 0);
 			//var_dump($result);
-			while($r = pg_fetch_assoc($result))
+			while ($r = pg_fetch_assoc($result))
 			{
 				$rows[] = $r;
 			}
@@ -170,7 +170,7 @@ class basis_db
 
 	public function db_affected_rows($result=null)
 	{
-		if(is_null($result))
+		if (is_null($result))
 			return pg_affected_rows($this->db_result);
 		else
 			return pg_affected_rows($result);
@@ -178,7 +178,7 @@ class basis_db
 
 	public function db_result_seek($result=null, $offset)
 	{
-		if(is_null($result))
+		if (is_null($result))
 			return pg_result_seek($this->db_result, $offset);
 		else
 			return pg_result_seek($result, $offset);
@@ -186,7 +186,7 @@ class basis_db
 
 	public function db_fetch_array($result=null)
 	{
-		if(is_null($result))
+		if (is_null($result))
 			return pg_fetch_array($this->db_result);
 		else
 			return pg_fetch_array($result);
@@ -194,7 +194,7 @@ class basis_db
 
 	public function db_num_fields($result=null)
 	{
-		if(is_null($result))
+		if (is_null($result))
 			return pg_num_fields($this->db_result);
 		else
 			return pg_num_fields($result);
@@ -205,7 +205,7 @@ class basis_db
 	 */
 	public function db_field_name($result=null, $i)
 	{
-		if(is_null($result))
+		if (is_null($result))
 			return pg_field_name($this->db_result, $i);
 		else
 			return pg_field_name($result, $i);
@@ -217,7 +217,7 @@ class basis_db
 	 */
 	public function db_free_result($result = null)
 	{
-		if(is_null($result))
+		if (is_null($result))
 		{
 			return pg_free_result($this->db_result);
 		}
@@ -256,7 +256,7 @@ class basis_db
 	 */
 	public function db_null_value($var, $qoute=true)
 	{
-		if($qoute)
+		if ($qoute)
 			return ($var!==''?$this->db_qoute($var):'null');
 		else
 			return ($var!==''?$var:'null');
@@ -288,9 +288,9 @@ class basis_db
 	 */
 	public function db_add_param($var, $type=FHC_STRING, $nullable=true)
 	{
-		if(($var==='' || is_null($var)) && $type!=FHC_BOOLEAN)
+		if (($var==='' || is_null($var)) && $type!=FHC_BOOLEAN)
 		{
-			if($nullable)
+			if ($nullable)
 				return 'null';
 			else
 				return "''";
@@ -300,7 +300,7 @@ class basis_db
 		{
 			case FHC_INTEGER:
 				$var = $this->db_escape($var);
-				if(!is_numeric($var) && $var!=='')
+				if (!is_numeric($var) && $var!=='')
 					die('Invalid Integer Parameter detected:'.$var);
 				$var = $this->db_null_value($var, false);
 				break;
@@ -315,7 +315,7 @@ class basis_db
 
 				foreach($languages as $sk => $sp)
 				{
-					if(!$sp || !isset($buf[$sp]))
+					if (!$sp || !isset($buf[$sp]))
 						$var[$sk] = "";
 					else
 						$var[$sk] = $this->db_escape($buf[$sp]);
@@ -327,11 +327,11 @@ class basis_db
 				break;
 
 			case FHC_BOOLEAN:
-				if($var===true)
+				if ($var===true)
 					$var='true';
-				elseif($var===false)
+				elseif ($var===false)
 					$var='false';
-				elseif($var=='' && $nullable)
+				elseif ($var=='' && $nullable)
 					$var = 'null';
 				else
 					die('Invalid Boolean Parameter detected');
@@ -351,11 +351,11 @@ class basis_db
 	 */
 	public function db_parse_bool($var)
 	{
-		if($var=='t')
+		if ($var=='t')
 			return true;
-		elseif($var=='f')
+		elseif ($var=='f')
 			return false;
-		elseif($var=='')
+		elseif ($var=='')
 			return '';
 		else
 			die('Invalid DB Boolean. Wrong DB-Engine?');
@@ -370,7 +370,7 @@ class basis_db
 		$string = '';
 		foreach($array as $row)
 		{
-			if($string!='')
+			if ($string!='')
 				$string.=',';
 			$string.=$this->db_add_param($row);
 		}
@@ -439,7 +439,7 @@ function dbImplode4SQL($array)
 	
 	foreach($array as $row)
 	{
-		if($string != '')
+		if ($string != '')
 		{
 			$string.=',';
 		}

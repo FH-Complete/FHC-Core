@@ -22,8 +22,8 @@ setup:
 #        - "pkill -f fhctest &"
 #        - "sudo -u postgres psql fhctest -c 'DROP DATABASE IF EXISTS fhctest;'"
         - "cd %BUILD_PATH% && chmod u+x install.sh && ./install.sh fhctest" # Install Database
-        - "rm -f /var/www/html/build" # SymLink löschen falls vorhanden
-        - "ln -s %BUILD_PATH% /var/www/html/build" # SymLink to the actual build
+        - "rm -f /var/www/html/build/fhcomplete" # SymLink löschen falls vorhanden
+        - "ln -s %BUILD_PATH% /var/www/html/build/fhcomplete" # SymLink to the actual build
 #        - "php index.ci.php DBTools migrate" # DB-Migration
 
 test:
