@@ -211,9 +211,9 @@ switch($action)
 					$maxlength[$spalte]=mb_strlen("");
 			}
 
-			$worksheet->writeNumber($zeile,++$spalte, $s->seqPlace);
-			if(mb_strlen($s->seqPlace)>$maxlength[$spalte])
-				$maxlength[$spalte]=mb_strlen($s->seqPlace);
+			$worksheet->writeNumber($zeile,++$spalte, (isset($s->seqPlace)?$s->seqPlace:''));
+			if(mb_strlen((isset($s->seqPlace)?$s->seqPlace:''))>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen((isset($s->seqPlace)?$s->seqPlace:''));
 
 			if(isset($s->rt_gesamtpunkte) && $s->rt_gesamtpunkte)
 			{
@@ -272,7 +272,10 @@ switch($action)
 
 function studentsSort($a, $b)
 {
-	return $a->seqPlace > $b->seqPlace;
+	if(isset($a->seqPlace))
+		return $a->seqPlace > $b->seqPlace;
+	else
+		return false;
 }
 
 

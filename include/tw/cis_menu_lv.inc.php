@@ -439,17 +439,20 @@ function checkZeilenUmbruch()
 		    }
 	    }
 	}
-	$menu[]=array
-	(
-		'id'=>'core_menu_moodle',
-		'position'=>'70',
-		'name'=>$p->t('lehre/moodle'),
-		'icon'=>'../../../skin/images/button_moodle.png',
-		'link'=>$link,
-		'link_target'=>$link_target,
-		'link_onclick'=>$link_onclick,
-		'text'=>$text
-	);
+	if (MOODLE)
+	{
+		$menu[]=array
+		(
+			'id'=>'core_menu_moodle',
+			'position'=>'70',
+			'name'=>$p->t('lehre/moodle'),
+			'icon'=>'../../../skin/images/button_moodle.png',
+			'link'=>$link,
+			'link_target'=>$link_target,
+			'link_onclick'=>$link_onclick,
+			'text'=>$text
+		);
+	}
 
 	//Gesamtnote
 	if($is_lector && ((!defined('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN) && $angemeldet))

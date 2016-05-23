@@ -16,4 +16,6 @@ $this->phrasen['semesterplan/speichernSieDasDokument']='Speichern Sie das Dokume
 $this->phrasen['semesterplan/inMSWord']='(In MS Word: "Datei" -> "Speichern unter" -> Dateiname: index.html, Dateityp: Webseite )';
 $this->phrasen['semesterplan/ladenSieDieDateiHoch']='Laden Sie diese Datei nun über den "Upload"-Knopf hoch.';
 $this->phrasen['semesterplan/fertig']='Fertig';
+$this->phrasen['semesterplan/ErstellungDesSemesterplans']='Erstellung des Semesterplanes';
+$this->phrasen['semesterplan/schliessen']='schließen';
 ?>
