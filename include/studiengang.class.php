@@ -232,18 +232,25 @@ class studiengang extends basis_db
 		return true;
 	}
 
-    /**
-     * Gibt alle Studiengaenge zurueck, fuer die man sich online bewerben kann
-     * @return boolean
-     */
-    public function getAllForBewerbung()
-    {
-        $qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch, lgartcode, tbl_lgartcode.bezeichnung '
-                . 'FROM lehre.vw_studienplan '
-                . 'LEFT JOIN bis.tbl_lgartcode USING (lgartcode) '
-                . 'WHERE onlinebewerbung IS TRUE '
-                . 'AND aktiv IS TRUE '
-                . 'ORDER BY typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC';
+	/**
+	 * Gibt alle Studiengaenge zurueck, fuer die man sich online bewerben kann
+	 * @param array $studiensemester_kurzbz default: null Array aus Studiensemestern fuer die man sich onlinebewerben kann
+	 * @return boolean
+	 */
+	public function getAllForBewerbung($studiensemester_kurzbz_arr=null)
+	{
+		$qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch, lgartcode, tbl_lgartcode.bezeichnung '
+				. 'FROM lehre.vw_studienplan '
+				. 'LEFT JOIN bis.tbl_lgartcode USING (lgartcode) '
+				. 'WHERE onlinebewerbung IS TRUE '
+				. 'AND aktiv IS TRUE ';
+		
+		/*if (!is_null($studiensemester_kurzbz_arr))
+		{
+			$studiensemester_kurzbz_arr = $this->implode4SQL($studiensemester_kurzbz_arr);
+			$qry .= ' AND studiensemester_kurzbz IN('.$studiensemester_kurzbz_arr.')';
+		}*/
+		$qry .= ' ORDER BY typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC';
 
 		if(!$result = $this->db_query($qry))
 		{
@@ -257,7 +264,7 @@ class studiengang extends basis_db
 		}
 
 		return true;
-    }
+	}
 
 	/**
 	 * Laedt alle Studientypen in das Attribut studiengang_typ_array
