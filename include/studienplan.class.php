@@ -703,7 +703,42 @@ class studienplan extends basis_db
 	function getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester="", $orgform_kurzbz = "")
 	{
 		$qry = "SELECT
-					*
+					studienplan_id, 
+					studienordnung_id, 
+					orgform_kurzbz, 
+					tbl_studienplan.version AS version_studienplan, 
+					tbl_studienplan.bezeichnung AS bezeichnung_studienplan, 
+					regelstudiendauer, 
+					sprache, 
+					aktiv, 
+					semesterwochen, 
+					testtool_sprachwahl, 
+					tbl_studienplan.insertamum AS insertamum_studienplan, 
+					tbl_studienplan.insertvon AS insertvon_studienplan, 
+					tbl_studienplan.updateamum AS updateamum_studienplan, 
+					tbl_studienplan.updatevon AS updatevon_studienplan, 
+					ects_stpl, 
+					pflicht_sws, 
+					pflicht_lvs, 
+					studiengang_kz, 
+					tbl_studienordnung.version AS version_studienordnung,
+					gueltigvon, 
+					gueltigbis, 
+					tbl_studienordnung.bezeichnung AS bezeichnung_studienordnung, 
+					ects, 
+					studiengangbezeichnung, 
+					studiengangbezeichnung_englisch, 
+					studiengangkurzbzlang, 
+					akadgrad_id, 
+					tbl_studienordnung.insertamum AS insertamum_studienordnung, 
+					tbl_studienordnung.insertvon AS insertvon_studienordnung, 
+					tbl_studienordnung.updateamum AS updateamum_studienordnung, 
+					tbl_studienordnung.updatevon AS updatevon_studienordnung, 
+					status_kurzbz, 
+					standort_id, 
+					studienplan_semester_id, 
+					studiensemester_kurzbz, 
+					semester				
 				FROM
 					lehre.tbl_studienplan
 					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
@@ -720,7 +755,6 @@ class studienplan extends basis_db
 		{
 			$qry.=" AND orgform_kurzbz=".$this->db_add_param($orgform_kurzbz);
 		}
-
 
 		$res = array();
 
