@@ -69,15 +69,17 @@ class Person extends APIv1_Controller
 	 */
 	public function postPerson()
 	{
-		if ($this->_validate($this->post()))
+                $person = $this->_parseData($this->post());
+            
+		if($this->_validate($this->post()))
 		{
-			if (isset($this->post()['person_id']))
+			if(isset($person['person_id']) && !(is_null($person["person_id"])) && ($person["person_id"] != ""))
 			{
-				$result = $this->PersonModel->update($this->post()['person_id'], $this->post());
+				$result = $this->PersonModel->update($person['person_id'], $person);
 			}
 			else
 			{
-				$result = $this->PersonModel->insert($this->post());
+				$result = $this->PersonModel->insert($person);
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
@@ -114,7 +116,10 @@ class Person extends APIv1_Controller
 		{
 			return false;
 		}
-		
+                
+                //TODO
+                return true;
+                
 		$person['nachname'] = trim($person['nachname']);
 		$person['vorname'] = trim($person['vorname']);
 		$person['vornamen'] = trim($person['vornamen']);

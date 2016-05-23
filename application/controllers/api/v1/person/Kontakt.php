@@ -41,13 +41,13 @@ class Kontakt extends APIv1_Controller
 		}
 		else
 		{
-			$this->response();
+                    $this->response();
 		}
     }
     
     public function postKontakt()
     {
-		$post = $this->post();
+                $post = $this->_parseData($this->post());
 		
 		if (is_array($post))
 		{
