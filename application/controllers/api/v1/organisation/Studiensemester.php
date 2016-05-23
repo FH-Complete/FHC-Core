@@ -46,6 +46,33 @@ class Studiensemester extends APIv1_Controller
 			$this->response();
 		}
 	}
+	
+	/**
+	 * @return void
+	 */
+	public function getNextStudiensemester()
+	{
+		$art = $this->get('art');
+		
+		$result = $this->StudiensemesterModel->addOrder('start');
+		if ($result->error == EXIT_SUCCESS)
+		{
+			$result = $this->StudiensemesterModel->addLimit(1);
+			if ($result->error == EXIT_SUCCESS)
+			{
+				if (isset($art))
+				{
+					$result = $this->StudiensemesterModel->loadWhere(array('start >' => 'NOW()', 'SUBSTRING(studiensemester_kurzbz FROM 1 FOR 2) = ' => $art));
+				}
+				else
+				{
+					$result = $this->StudiensemesterModel->loadWhere(array('start >' => 'NOW()'));
+				}
+			}
+		}
+
+		$this->response($result, REST_Controller::HTTP_OK);
+	}
 
 	/**
 	 * @return void

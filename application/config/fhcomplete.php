@@ -110,6 +110,9 @@ $config['fhc_acl'] = array
 	'lehre.tbl_studienordnungstatus' => 'basis/studienordnungstatus',
 	'lehre.tbl_studienplan' => 'basis/studienplan',
 	'lehre.tbl_studienplatz' => 'basis/studienplatz',
+	
+	'lehre.tbl_studienplan_semester' => 'basis/studienplan_semester',
+	
 	'lehre.tbl_stunde' => 'basis/stunde',
 	'lehre.tbl_stundenplan' => 'basis/stundenplan',
 	'lehre.tbl_stundenplandev' => 'basis/stundenplandev',

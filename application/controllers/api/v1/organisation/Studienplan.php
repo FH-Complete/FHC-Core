@@ -47,4 +47,46 @@ class Studienplan extends APIv1_Controller
 			$this->response();
 		}
 	}
+	
+	public function getStudienplaeneFromSem()
+	{
+		$studiengang_kz = $this->get('studiengang_kz');
+		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
+		$ausbildungssemester = $this->get('ausbildungssemester');
+		$orgform_kurzbz = $this->get('orgform_kurzbz');
+		
+		if (isset($studiengang_kz) && isset($studiensemester_kurzbz))
+		{
+			$result = $this->StudienplanModel->addJoin('lehre.tbl_studienordnung', 'studienordnung_id');
+			if ($result->error == EXIT_SUCCESS)
+			{
+				$result = $this->StudienplanModel->addJoin('lehre.tbl_studienplan_semester', 'studienplan_id');
+				if ($result->error == EXIT_SUCCESS)
+				{
+					$whereArray = array('tbl_studienplan.aktiv' => 'TRUE',
+										'tbl_studienordnung.studiengang_kz' => $studiengang_kz,
+										'tbl_studienplan_semester.studiensemester_kurzbz' => $studiensemester_kurzbz
+									);
+					
+					if(isset($ausbildungssemester))
+					{
+						$whereArray['tbl_studienplan_semester.semester'] = $ausbildungssemester;
+					}
+					
+					if(isset($orgform_kurzbz))
+					{
+						$whereArray['orgform_kurzbz'] = $orgform_kurzbz;
+					}
+					
+					$result = $this->StudienplanModel->loadWhere($whereArray);
+				}
+			}
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
 }
