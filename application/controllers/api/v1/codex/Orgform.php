@@ -70,6 +70,13 @@ class Orgform extends APIv1_Controller
 			$this->response();
 		}
 	}
+        
+        public function getAll()
+	{
+		$result = $this->OrgformModel->loadWhole();
+		
+		$this->response($result, REST_Controller::HTTP_OK);
+	}
 	
 	private function _validate($orgform = NULL)
 	{
