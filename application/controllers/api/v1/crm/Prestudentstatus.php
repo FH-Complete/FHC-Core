@@ -55,26 +55,23 @@ class Prestudentstatus extends APIv1_Controller
 	 */
 	public function postPrestudentstatus()
 	{
-            $prestudentstatus = $this->_parseData($this->post());
-            
-            $this->response($prestudentstatus);
-            
+		$prestudentstatus = $this->_parseData($this->post());
+		
 		if ($this->_validate($prestudentstatus))
 		{
-			if (isset($prestudentstatus['ausbildungssemester']) && isset($prestudentstatus['studiensemester_kurzbz']) &&
-				isset($prestudentstatus['status_kurzbz']) && isset($prestudentstatus['prestudent_id']))
+			if(isset($prestudentstatus['new']) && $prestudentstatus['new'] == true)
+			{
+				$result = $this->PrestudentstatusModel->insert($prestudentstatus);
+			}
+			else
 			{
 				$pksArray = array($prestudentstatus['ausbildungssemester'],
 									$prestudentstatus['studiensemester_kurzbz'],
 									$prestudentstatus['status_kurzbz'],
 									$prestudentstatus['prestudent_id']
 								);
-				
+
 				$result = $this->PrestudentstatusModel->update($pksArray, $prestudentstatus);
-			}
-			else
-			{
-				$result = $this->PrestudentstatusModel->insert($prestudentstatus);
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
@@ -85,7 +82,7 @@ class Prestudentstatus extends APIv1_Controller
 		}
 	}
 	
-	private function _validate($prestudentstatus = NULL)
+	private function _validate($prestudentstatus = null)
 	{
 		return true;
 	}

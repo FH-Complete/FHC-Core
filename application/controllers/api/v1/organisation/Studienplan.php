@@ -28,6 +28,22 @@ class Studienplan extends APIv1_Controller
 		$this->StudienplanModel->setUID($this->_getUID());
 	}
 	
+	public function getStudienplan()
+	{
+		$studienplan_id = $this->get('studienplan_id');
+		
+		if (isset($studienplan_id))
+		{
+			$result = $this->StudienplanModel->load($studienplan_id);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
 	public function getStudienplaene()
 	{
 		$studiengang_kz = $this->get('studiengang_kz');
