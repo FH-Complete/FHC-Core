@@ -33,7 +33,21 @@ class DB_Model extends FHC_Model
 
 		// DB-INSERT
 		if ($this->db->insert($this->dbTable, $data))
-			return $this->_success($this->db->insert_id());
+		{
+			// Avoid to use method insert_id() from CI because it forces to have a sequence
+			// and doesn't return the primary key when it's composed by more columns
+			$primaryKeysArray = array();
+			
+			foreach ($this->pk as $key => $value)
+			{
+				if(isset($data[$value]))
+				{
+					$primaryKeysArray[$value] = $data[$value];
+				}
+			}
+			
+			return $this->_success($primaryKeysArray);
+		}
 		else
 			return $this->_error($this->db->error(), FHC_DB_ERROR);
 	}

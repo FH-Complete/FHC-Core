@@ -61,6 +61,9 @@ class Prestudentstatus extends APIv1_Controller
 		{
 			if(isset($prestudentstatus['new']) && $prestudentstatus['new'] == true)
 			{
+				// Remove new parameter to avoid DB insert errors
+				unset($prestudentstatus['new']);
+				
 				$result = $this->PrestudentstatusModel->insert($prestudentstatus);
 			}
 			else
