@@ -25,9 +25,9 @@ require_once(dirname(__FILE__).'/datum.class.php');
 
 // CI
 require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/person/Person_model.php');
+require_once(dirname(__FILE__).'/../application/models/crm/Prestudent_model.php');
 
-class prestudent extends Person_model
+class prestudent extends Prestudent_model
 {
 	use db_extra; //CI Hack
 	public $errormsg;			// string

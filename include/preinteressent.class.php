@@ -19,10 +19,13 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/datum.class.php');
 
-class preinteressent extends basis_db
+// CI
+require_once(dirname(__FILE__).'/../ci_hack.php');
+require_once(dirname(__FILE__).'/../application/models/crm/Preinteressent_model.php');
+
+class preinteressent extends Preinteressent_model
 {
 	public $new;		// boolean
 	public $result = array();

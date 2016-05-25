@@ -29,7 +29,7 @@ require_once(dirname(__FILE__).'/datum.class.php');
 
 // CI
 require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/lehre/Studienplan_model.php');
+require_once(dirname(__FILE__).'/../application/models/organisation/Studienplan_model.php');
 
 class studienplan extends Studienplan_model
 {

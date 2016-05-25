@@ -23,9 +23,13 @@
  * Klasse kontakt
  * @create 20-12-2006
  */
-require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/datum.class.php');
 
-class kontakt extends basis_db
+// CI
+require_once(dirname(__FILE__).'/../ci_hack.php');
+require_once(dirname(__FILE__).'/../application/models/person/Kontakt_model.php');
+
+class kontakt extends Kontakt_model
 {
 	public $new;       // boolean
 	public $result = array(); // adresse Objekt

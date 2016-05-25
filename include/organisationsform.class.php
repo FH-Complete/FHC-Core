@@ -23,8 +23,14 @@
 /**
  * Klasse Organisationsform
  */
+
+require_once(dirname(__FILE__).'/datum.class.php');
+
+// CI
+require_once(dirname(__FILE__).'/../ci_hack.php');
+require_once(dirname(__FILE__).'/../application/models/codex/Orgform_model.php');
  
-class organisationsform extends basis_db
+class organisationsform extends Orgform_model
 {
 	public $orgform_kurzbz; 
 	public $code; 

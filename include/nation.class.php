@@ -28,7 +28,7 @@ require_once(dirname(__FILE__).'/datum.class.php');
 
 // CI
 require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/Nation_model.php');
+require_once(dirname(__FILE__).'/../application/models/codex/Nation_model.php');
 
 class nation extends Nation_model
 {

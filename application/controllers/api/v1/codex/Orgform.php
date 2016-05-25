@@ -71,7 +71,7 @@ class Orgform extends APIv1_Controller
 		}
 	}
         
-        public function getAll()
+	public function getAll()
 	{
 		$result = $this->OrgformModel->loadWhole();
 		
