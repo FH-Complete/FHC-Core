@@ -47,7 +47,7 @@ class Adresse extends APIv1_Controller
     
     public function postAdresse()
     {
-		$post = $this->post();
+		$post = $this->_parseData($this->post());
 		
 		if (is_array($post))
 		{
