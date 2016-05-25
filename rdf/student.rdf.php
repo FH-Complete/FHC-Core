@@ -823,6 +823,10 @@ else
 			}
 			else
 				$stg_kz = sprintf("%04s", abs($student->studiengang_kz));
+			if (($semester % 2) == 0)
+				$studienjahr =  $semester/2;
+			else
+				$studienjahr = intval($semester/2)+1;
 
 			echo '
 			<student>
@@ -840,6 +844,7 @@ else
 				<semester><![CDATA['.$semester.']]></semester>
 				<verband><![CDATA['.$student->verband.']]></verband>
 				<gruppe><![CDATA['.$student->gruppe.']]></gruppe>
+				<studienjahr><![CDATA['.$studienjahr.']]></studienjahr>
 				<student_orgform_kurzbz><![CDATA['.$prestudent->orgform_kurzbz.']]></student_orgform_kurzbz>
                 <student_orgform_bezeichnung><![CDATA['.$orgform_student_bezeichnung->bezeichnung.']]></student_orgform_bezeichnung>
 				<studiengang_kz><![CDATA['.$stg_kz.']]></studiengang_kz>
