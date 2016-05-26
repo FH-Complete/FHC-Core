@@ -229,6 +229,8 @@ $rechte->getBerechtigungen($uid);
 			<th><?php echo $p->t('global/nachname'); ?></th>
 			<th><?php echo $p->t('global/matrikelnummer'); ?></th>
 			<th><?php echo $p->t('global/datum'); ?></th>
+			<th><?php echo $p->t('benotungstool/note'); ?></th>
+			<th><?php echo $p->t('global/anmerkung'); ?></th>
 		    </tr>
 		</thead>
 		<tbody>
@@ -258,6 +260,8 @@ $rechte->getBerechtigungen($uid);
 				echo '<td>'.$student->nachname.'</td>';
 				echo '<td>'.$student->matrikelnr.'</td>';
 				echo '<td>'.$date.'</td>';
+				echo '<td></td>';
+				echo '<td></td>';
 			    echo '</tr>';
 			}
 		    ?>
