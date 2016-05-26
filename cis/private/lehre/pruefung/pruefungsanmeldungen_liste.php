@@ -258,7 +258,7 @@ $rechte->getBerechtigungen($uid);
 				echo '<td>'.$anmeldung->reihung.'</td>';
 				echo '<td>'.$student->vorname.'</td>';
 				echo '<td>'.$student->nachname.'</td>';
-				echo '<td>'.$student->matrikelnr.'</td>';
+				echo '<td>'.$student->matr_nr.'</td>';
 				echo '<td>'.$date.'</td>';
 				echo '<td></td>';
 				echo '<td></td>';
@@ -278,6 +278,19 @@ $rechte->getBerechtigungen($uid);
 	}
 	?>
 	    </table>
+		<br>
+		<table width="100%">
+			<tr>
+				<td><?php echo $p->t('pruefung/derLektor'); ?></td>
+				<td><?php echo $mitarbeiter->getFullName(FALSE); ?></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td><?php echo $p->t('pruefung/dieKommission'); ?></td>
+				<td></td>
+				<td></td>
+			</tr
+		</table>
 	    </div>
 	</div>
     </body>

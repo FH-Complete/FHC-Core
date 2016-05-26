@@ -138,6 +138,7 @@ $this->phrasen['pruefung/emailLektorAm'] = 'am';
 $this->phrasen['pruefung/emailLektorVon'] = 'von';
 $this->phrasen['pruefung/emailLektorUhrBis'] = 'Uhr bis';
 $this->phrasen['pruefung/emailLektorUhrAngemeldet'] = 'Uhr angemeldet.';
-
+$this->phrasen['pruefung/derLektor'] = 'LektorIn';
+$this->phrasen['pruefung/dieKommission'] = 'Kommission';
 
 ?>
