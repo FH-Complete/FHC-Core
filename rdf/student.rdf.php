@@ -838,6 +838,7 @@ else
 				<vorname><![CDATA['.$student->vorname.']]></vorname>
 				<nachname><![CDATA['.$student->nachname.']]></nachname>
 				<matrikelnummer><![CDATA['.$student->matrikelnr.']]></matrikelnummer>
+				<matr_nr><![CDATA['.$student->matr_nr.']]></matr_nr>
 				<geburtsdatum><![CDATA['.$datum_obj->convertISODate($student->gebdatum).']]></geburtsdatum>
 				<geburtsdatum_iso><![CDATA['.$student->gebdatum.']]></geburtsdatum_iso>
 				<geburtsort><![CDATA['.$student->gebort.']]></geburtsort>
