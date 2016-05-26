@@ -279,11 +279,11 @@ $rechte->getBerechtigungen($uid);
 	?>
 	    </table>
 		<br>
-		<table width="100%">
+		<table width="100%" id="liste">
 			<tr>
-				<td><?php echo $p->t('pruefung/derLektor'); ?></td>
-				<td><?php echo $mitarbeiter->getFullName(FALSE); ?></td>
-				<td></td>
+				<td width="26%"><?php echo $p->t('pruefung/derLektor'); ?></td>
+				<td width="37%"><?php echo $mitarbeiter->getFullName(FALSE); ?></td>
+				<td width="37%"></td>
 			</tr>
 			<tr>
 				<td><?php echo $p->t('pruefung/dieKommission'); ?></td>
