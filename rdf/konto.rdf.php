@@ -31,6 +31,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/konto.class.php');
 require_once('../include/person.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/studiensemester.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/student.class.php');
@@ -204,13 +205,15 @@ elseif ($xmlformat=='xml')
 	{
 		global $datum, $btyp;
 		$rueckerstattung=false;
-		
+		$stg = new studiensemester($row->studiensemester_kurzbz);
+
 		echo "
   		<buchung>
 			<buchungsnr><![CDATA[".$row->buchungsnr."]]></buchungsnr>
 			<person_id><![CDATA[".$row->person_id."]]></person_id>
 			<studiengang_kz><![CDATA[".$row->studiengang_kz."]]></studiengang_kz>
 			<studiensemester_kurzbz><![CDATA[".$row->studiensemester_kurzbz."]]></studiensemester_kurzbz>
+			<studienjahr_kurzbz><![CDATA[".$row->studienjahr_kurzbz."]]></studienjahr_kurzbz>
 			<buchungsnr_verweis><![CDATA[".$row->buchungsnr_verweis."]]></buchungsnr_verweis>
 			<betrag><![CDATA[".sprintf('%.2f',abs($row->betrag))."]]></betrag>";
 		if($row->buchungsnr_verweis!='')
