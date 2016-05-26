@@ -275,6 +275,7 @@ elseif ($xmlformat=='xml')
 			<nachname><![CDATA[".$pers->nachname."]]></nachname>
 			<vorname><![CDATA[".$pers->vorname."]]></vorname>
 			<vornamen><![CDATA[".$pers->vornamen."]]></vornamen>
+			<matr_nr><![CDATA[".$pers->matr_nr."]]></matr_nr>
 			<name_gesamt><![CDATA[".trim($pers->anrede.' '.$pers->titelpre.' '.$pers->vorname.' '.$pers->nachname.' '.$pers->titelpost)."]]></name_gesamt>
 			<name_titel><![CDATA[".trim($pers->titelpre.' '.$pers->vorname.' '.$pers->nachname.' '.$pers->titelpost)."]]></name_titel>
 			<geburtsdatum><![CDATA[".$datum->convertISODate($pers->gebdatum)."]]></geburtsdatum>
