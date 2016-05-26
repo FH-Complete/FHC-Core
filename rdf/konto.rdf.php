@@ -213,7 +213,7 @@ elseif ($xmlformat=='xml')
 			<person_id><![CDATA[".$row->person_id."]]></person_id>
 			<studiengang_kz><![CDATA[".$row->studiengang_kz."]]></studiengang_kz>
 			<studiensemester_kurzbz><![CDATA[".$row->studiensemester_kurzbz."]]></studiensemester_kurzbz>
-			<studienjahr_kurzbz><![CDATA[".$row->studienjahr_kurzbz."]]></studienjahr_kurzbz>
+			<studienjahr_kurzbz><![CDATA[".$stg->studienjahr_kurzbz."]]></studienjahr_kurzbz>
 			<buchungsnr_verweis><![CDATA[".$row->buchungsnr_verweis."]]></buchungsnr_verweis>
 			<betrag><![CDATA[".sprintf('%.2f',abs($row->betrag))."]]></betrag>";
 		if($row->buchungsnr_verweis!='')
