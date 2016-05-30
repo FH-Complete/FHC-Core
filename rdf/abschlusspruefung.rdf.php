@@ -33,7 +33,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/abschlusspruefung.class.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzer.class.php');
-require_once('../include/student.class.php');
+require_once('../include/prestudent.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/nation.class.php');
 require_once('../include/datum.class.php');
@@ -77,26 +77,27 @@ if($db->db_query($qry))
 		$pruefer1= '';
 		$pruefer2= '';
 		$pruefer3= '';
+		$vorsitz_geschlecht = '';
 
 		//Nachnamen der Pruefer holden
 		$person = new person();
 		$mitarbeiter = new mitarbeiter();
-		$student= new student($row->student_uid);
+		$prestudent= new prestudent($row->prestudent_id);
 
-		$nation=new nation($student->geburtsnation);
+		$nation=new nation($prestudent->geburtsnation);
 		$geburtsnation=$nation->kurztext;
 		$geburtsnation_engl=$nation->engltext;
-		$nation->load($student->staatsbuergerschaft);
+		$nation->load($prestudent->staatsbuergerschaft);
 		$staatsbuergerschaft=$nation->kurztext;
 		$staatsbuergerschaft_engl=$nation->engltext;
 
-		$studiengang = new studiengang($student->studiengang_kz);
+		$studiengang = new studiengang($prestudent->studiengang_kz);
 		$akadgrad = new akadgrad($row->akadgrad_id);
 
 		if($mitarbeiter->load($row->vorsitz))
 		{
-		    $vorsitz = trim($mitarbeiter->titelpre.' '.$mitarbeiter->vorname.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost);
-		    $vorsitz_geschlecht = $mitarbeiter->geschlecht;
+			$vorsitz = trim($mitarbeiter->titelpre.' '.$mitarbeiter->vorname.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost);
+			$vorsitz_geschlecht = $mitarbeiter->geschlecht;
 		}
 		if($person->load($row->pruefer1))
 			$pruefer1 = trim($person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost);
@@ -113,7 +114,7 @@ if($db->db_query($qry))
 			if($row_rek = $db->db_fetch_object())
 				$rektor = $row_rek->titelpre.' '.$row_rek->vorname.' '.$row_rek->nachname.' '.$row_rek->titelpost;
 		$qry = "SELECT * FROM (SELECT titel as themenbereich, ende, projektarbeit_id, note, beginn FROM lehre.tbl_projektarbeit a
-							WHERE prestudent_id='$student->prestudent_id' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom' OR projekttyp_kurzbz='Master' OR projekttyp_kurzbz='Dissertation' OR projekttyp_kurzbz='Lizenziat' OR projekttyp_kurzbz='Magister')
+							WHERE prestudent_id='$prestudent->prestudent_id' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom' OR projekttyp_kurzbz='Master' OR projekttyp_kurzbz='Dissertation' OR projekttyp_kurzbz='Lizenziat' OR projekttyp_kurzbz='Magister')
 							ORDER BY beginn DESC, projektarbeit_id ASC LIMIT 2) as a ORDER BY beginn asc";
 		$themenbereich='';
 		$datum_projekt='';
@@ -155,17 +156,17 @@ if($db->db_query($qry))
 			}
 		}
 
-		switch($student->anrede)
+		switch($prestudent->anrede)
 		{
 			case 'Herr': $anrede_engl = 'Mr'; break;
 			case 'Frau': $anrede_engl = 'Ms'; break;
 			default: $anrede_engl = ''; break;
 		}
 
-		if($student->anrede == 'Herr')
+		if($prestudent->anrede == 'Herr')
 			$anrede = 'Herrn';
 		else
-			$anrede = $student->anrede;
+			$anrede = $prestudent->anrede;
 
 
 
@@ -194,32 +195,34 @@ if($db->db_query($qry))
 
 		foreach ($parents as $parent)
 		{
-		    $oe_temp = new organisationseinheit();
-		    $oe_temp->load($parent);
-		    if($oe_temp->organisationseinheittyp_kurzbz == 'Fakultät')
-		    {
-			$oe_parent = $oe_temp->bezeichnung;
-			break;
-		    }
+			$oe_temp = new organisationseinheit();
+			$oe_temp->load($parent);
+			if($oe_temp->organisationseinheittyp_kurzbz == 'Fakultät')
+			{
+				$oe_parent = $oe_temp->bezeichnung;
+				break;
+			}
 		}
 
-		$studiengang_bezeichnung2 = explode(" ", $studiengang->bezeichnung, 2);
-		$name = trim($student->titelpre.' '.trim($student->vorname.' '.$student->vornamen).' '.$student->nachname.($student->titelpost!=''?', '.$student->titelpost:''));
+		$stg_b2 = explode(" ", $studiengang->bezeichnung, 2);
+		$studiengang_bezeichnung2 = (isset($stg_b2[1])?$stg_b2[1]:'');
+
+		$name = trim($prestudent->titelpre.' '.trim($prestudent->vorname.' '.$prestudent->vornamen).' '.$prestudent->nachname.($prestudent->titelpost!=''?', '.$prestudent->titelpost:''));
 
 		//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
-		if ($student->studiengang_kz<0)
+		if ($prestudent->studiengang_kz<0)
 		{
 			$stg = new studiengang();
-			$stg->load($student->studiengang_kz);
+			$stg->load($prestudent->studiengang_kz);
 
-			$studiengang_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($student->studiengang_kz));
+			$studiengang_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($prestudent->studiengang_kz));
 		}
 		else
-			$studiengang_kz = sprintf("%04s", abs($student->studiengang_kz));
+			$studiengang_kz = sprintf("%04s", abs($prestudent->studiengang_kz));
 
 		echo "\t<pruefung>".'
 		<abschlusspruefung_id><![CDATA['.$row->abschlusspruefung_id.']]></abschlusspruefung_id>
-		<student_uid><![CDATA['.$row->student_uid.']]></student_uid>
+		<prestudent_id><![CDATA['.$row->prestudent_id.']]></prestudent_id>
 		<vorsitz><![CDATA['.$row->vorsitz.']]></vorsitz>
 		<vorsitz_nachname><![CDATA['.$vorsitz.']]></vorsitz_nachname>
 		<vorsitz_geschlecht><![CDATA['.$vorsitz_geschlecht.']]></vorsitz_geschlecht>
@@ -242,23 +245,23 @@ if($db->db_query($qry))
 		<anrede><![CDATA['.$anrede.']]></anrede>
 		<anrede_engl><![CDATA['.$anrede_engl.']]></anrede_engl>
 		<name><![CDATA['.$name.']]></name>
-		<titelpre><![CDATA['.$student->titelpre.']]></titelpre>
-		<vorname><![CDATA['.$student->vorname.']]></vorname>
-		<vornamen><![CDATA['.$student->vornamen.']]></vornamen>
-		<nachname><![CDATA['.$student->nachname.']]></nachname>
-		<titelpost><![CDATA['.$student->titelpost.']]></titelpost>
-		<matrikelnr><![CDATA['.trim($student->matrikelnr).']]></matrikelnr>
-		<gebdatum_iso><![CDATA['.$student->gebdatum.']]></gebdatum_iso>
-		<geschlecht><![CDATA['.$student->geschlecht.']]></geschlecht>
-		<gebdatum><![CDATA['.$datum_obj->convertISODate($student->gebdatum).']]></gebdatum>
-		<gebort><![CDATA['.$student->gebort.']]></gebort>
+		<titelpre><![CDATA['.$prestudent->titelpre.']]></titelpre>
+		<vorname><![CDATA['.$prestudent->vorname.']]></vorname>
+		<vornamen><![CDATA['.$prestudent->vornamen.']]></vornamen>
+		<nachname><![CDATA['.$prestudent->nachname.']]></nachname>
+		<titelpost><![CDATA['.$prestudent->titelpost.']]></titelpost>
+		<matrikelnr><![CDATA['.trim($prestudent->perskz).']]></matrikelnr>
+		<gebdatum_iso><![CDATA['.$prestudent->gebdatum.']]></gebdatum_iso>
+		<geschlecht><![CDATA['.$prestudent->geschlecht.']]></geschlecht>
+		<gebdatum><![CDATA['.$datum_obj->convertISODate($prestudent->gebdatum).']]></gebdatum>
+		<gebort><![CDATA['.$prestudent->gebort.']]></gebort>
 		<staatsbuergerschaft><![CDATA['.$staatsbuergerschaft.']]></staatsbuergerschaft>
 		<staatsbuergerschaft_engl><![CDATA['.$staatsbuergerschaft_engl.']]></staatsbuergerschaft_engl>
 		<geburtsnation><![CDATA['.$geburtsnation.']]></geburtsnation>
 		<geburtsnation_engl><![CDATA['.$geburtsnation_engl.']]></geburtsnation_engl>
 		<studiengang_kz><![CDATA['.$studiengang_kz.']]></studiengang_kz>
 		<stg_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></stg_bezeichnung>
-		<stg_bezeichnung2><![CDATA['.$studiengang_bezeichnung2[1].']]></stg_bezeichnung2>
+		<stg_bezeichnung2><![CDATA['.$studiengang_bezeichnung2.']]></stg_bezeichnung2>
 		<stg_bezeichnung_engl><![CDATA['.$studiengang->english.']]></stg_bezeichnung_engl>
 		<stg_oe_parent><![CDATA['.$oe_parent.']]></stg_oe_parent>
 		<stg_art><![CDATA['.$stg_art.']]></stg_art>
@@ -356,12 +359,10 @@ if ($xmlformat=='rdf')
 		<RDF:Seq about="'.$rdf_url.'/liste">
 	';
 
-	if(isset($_GET['student_uid']))
+	if(isset($_GET['prestudent_id']))
 	{
-		if(!$student=new student($_GET['student_uid']))
-			die($student->errormsg);
-
-		$pruefung->getAbschlusspruefungen($student->prestudent_id);
+		$prestudent_id = $_GET['prestudent_id'];
+		$pruefung->getAbschlusspruefungen($prestudent_id);
 
 		foreach ($pruefung->result as $row)
 			draw_content($row);
@@ -374,7 +375,7 @@ if ($xmlformat=='rdf')
 			die('Eintrag wurde nicht gefunden');
 	}
 	else
-		die('Student_uid oder Abschlusspruefung_id muss uebergeben werden');
+		die('Prestudent_id oder Abschlusspruefung_id muss uebergeben werden');
 
 
 	echo '	</RDF:Seq>';
@@ -386,29 +387,24 @@ elseif ($xmlformat=='xml')
 	$pruefung = new abschlusspruefung();
 	echo "\n<abschlusspruefung>\n";
 
-	if(isset($_GET['uid']))
+	if(isset($_GET['prestudent_ids']))
 	{
-		$uids = explode(';',$_GET['uid']);
+		$pids = explode(';',$_GET['prestudent_ids']);
 
-		foreach ($uids as $uid)
+		foreach ($pids as $pid)
 		{
-			if($student=new student($uid))
+			$pruefung = new abschlusspruefung();
+			if($pruefung->getAbschlusspruefungen($pid))
 			{
-				$pruefung = new abschlusspruefung();
-				if($pruefung->getAbschlusspruefungen($student->prestudent_id))
-				{
-					foreach ($pruefung->result as $row)
-						draw_content_xml($row);
-				}
+				foreach ($pruefung->result as $row)
+					draw_content_xml($row);
 			}
 		}
 	}
-	elseif(isset($_GET['student_uid']))
+	elseif(isset($_GET['prestudent_id']))
 	{
-		if(!$student=new student($_GET['student_uid']))
-			die($student->errormsg);
-
-		$pruefung->getAbschlusspruefungen($student->prestudent_id);
+		$prestudent_id = $_GET['prestudent_id'];
+		$pruefung->getAbschlusspruefungen($prestudent_id);
 
 		foreach ($pruefung->result as $row)
 			draw_content_xml($row);
@@ -421,7 +417,7 @@ elseif ($xmlformat=='xml')
 			die('Eintrag wurde nicht gefunden');
 	}
 	else
-		die('Student_uid oder Abschlusspruefung_id muss uebergeben werden');
+		die('Prestudent_id oder Abschlusspruefung_id muss uebergeben werden');
 
 	echo "\n</abschlusspruefung>";
 }	//endof xmlformat==xml

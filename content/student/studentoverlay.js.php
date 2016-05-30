@@ -1523,11 +1523,11 @@ function StudentAuswahl()
         anrechnungtree.builder.addListener(StudentAnrechnungTreeListener);
     }
 
-	if(uid!='')
+	if(parseInt(prestudent_id))
 	{
 		// ****** Abschlusspruefung ******** //
 		StudentAbschlusspruefungDetailDisableFields(true);
-		StudentAbschlusspruefungTreeLoad(uid);
+		StudentAbschlusspruefungTreeLoad(prestudent_id);
 	}
 
 	if(uid!='')
@@ -3089,7 +3089,6 @@ function StudentIOAuswahl()
 	var von = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#von" ));
 	var bis = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bis" ));
 	var zweck_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zweck_code" ));
-	var student_uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#student_uid" ));// TODO EINE gibts die noch?
 	var prestudent_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#prestudent_id" ));
 	var lehreinheit_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehreinheit_id" ));
 	var lehrveranstaltung_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrveranstaltung_id" ));
@@ -3163,7 +3162,6 @@ function StudentIOAuswahl()
 	document.getElementById('student-io-textbox-von').value=von;
 	document.getElementById('student-io-textbox-bis').value=bis;
 	document.getElementById('student-io-menulist-zweck').value=zweck_code;
-	document.getElementById('student-io-detail-textbox-uid').value=student_uid;
 	document.getElementById('student-io-detail-textbox-prestudent_id').value=prestudent_id;
 	document.getElementById('student-io-detail-checkbox-neu').checked=false;
 	document.getElementById('student-io-detail-textbox-bisio_id').value=bisio_id;
@@ -3226,7 +3224,6 @@ function StudentIODetailSpeichern()
 	mobilitaetsprogramm = document.getElementById('student-io-menulist-mobilitaetsprogramm').value;
 	nation_code = document.getElementById('student-io-menulist-nation').value;
 	zweck_code = document.getElementById('student-io-menulist-zweck').value;
-	uid = document.getElementById('student-io-detail-textbox-uid').value;
 	prestudent_id = document.getElementById('student-io-detail-textbox-prestudent_id').value;
 	neu = document.getElementById('student-io-detail-checkbox-neu').checked;
 	bisio_id = document.getElementById('student-io-detail-textbox-bisio_id').value;
@@ -3360,8 +3357,7 @@ function StudentIONeu()
 	if(tag<10)
 		tag='0'+tag;
 
-	//UID ins Textfeld schreiben
-	document.getElementById('student-io-detail-textbox-uid').value=document.getElementById('student-detail-textbox-uid').value;
+	//prestudent_id ins Textfeld schreiben
 	document.getElementById('student-io-detail-textbox-prestudent_id').value=document.getElementById('student-detail-textbox-prestudent_id').value;
 	document.getElementById('student-io-detail-checkbox-neu').checked=true;
 	document.getElementById('student-io-textbox-von').value=tag+'.'+monat+'.'+jahr;
