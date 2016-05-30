@@ -696,34 +696,65 @@ class studienplan extends basis_db
 
 	/**
 	 * Holt die aktiven Studienplaene eines Studiensemester / Ausbildungssemesters
-	 * @param $studiengang_kz
-	 * @param $studiensemester_kurzbz optional
-	 * @param $ausbildungssemester optional
-	 * @param $orgform_kurzbz optional
+	 * @param studiensemester_kurzbz
+	 * @param $ausbuldungssemester
+	 * @param $orgform_kurzbz
 	 */
-	function getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz = '', $ausbildungssemester = '', $orgform_kurzbz = '')
+	function getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester="", $orgform_kurzbz = "")
 	{
 		$qry = "SELECT
-					tbl_studienplan.*, tbl_studienplan_semester.semester, tbl_studienplan_semester.studiensemester_kurzbz
+					studienplan_id, 
+					studienordnung_id, 
+					orgform_kurzbz, 
+					tbl_studienplan.version AS version_studienplan, 
+					tbl_studienplan.bezeichnung AS bezeichnung_studienplan, 
+					regelstudiendauer, 
+					sprache, 
+					aktiv, 
+					semesterwochen, 
+					testtool_sprachwahl, 
+					tbl_studienplan.insertamum AS insertamum_studienplan, 
+					tbl_studienplan.insertvon AS insertvon_studienplan, 
+					tbl_studienplan.updateamum AS updateamum_studienplan, 
+					tbl_studienplan.updatevon AS updatevon_studienplan, 
+					ects_stpl, 
+					pflicht_sws, 
+					pflicht_lvs, 
+					studiengang_kz, 
+					tbl_studienordnung.version AS version_studienordnung,
+					gueltigvon, 
+					gueltigbis, 
+					tbl_studienordnung.bezeichnung AS bezeichnung_studienordnung, 
+					ects, 
+					studiengangbezeichnung, 
+					studiengangbezeichnung_englisch, 
+					studiengangkurzbzlang, 
+					akadgrad_id, 
+					tbl_studienordnung.insertamum AS insertamum_studienordnung, 
+					tbl_studienordnung.insertvon AS insertvon_studienordnung, 
+					tbl_studienordnung.updateamum AS updateamum_studienordnung, 
+					tbl_studienordnung.updatevon AS updatevon_studienordnung, 
+					status_kurzbz, 
+					standort_id, 
+					studienplan_semester_id, 
+					studiensemester_kurzbz, 
+					semester				
 				FROM
 					lehre.tbl_studienplan
 					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
 					JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
 				WHERE
 					tbl_studienplan.aktiv
-					AND tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
-
-		if($studiensemester_kurzbz != '')
-			$qry .= " AND tbl_studienplan_semester.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz);
+					AND tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)."
+					AND tbl_studienplan_semester.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz);
 
 		if($ausbildungssemester!='')
-			$qry .= " AND tbl_studienplan_semester.semester=".$this->db_add_param($ausbildungssemester);
+			$qry.=" AND tbl_studienplan_semester.semester=".$this->db_add_param($ausbildungssemester);
 
 		if($orgform_kurzbz!='')
 		{
-			$qry .= " AND orgform_kurzbz=".$this->db_add_param($orgform_kurzbz);
+			$qry.=" AND orgform_kurzbz=".$this->db_add_param($orgform_kurzbz);
 		}
-
 
 		$res = array();
 

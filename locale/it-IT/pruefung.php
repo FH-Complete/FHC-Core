@@ -137,4 +137,9 @@ $this->phrasen['pruefung/emailLektorAm'] = 'del';
 $this->phrasen['pruefung/emailLektorVon'] = 'dalle';
 $this->phrasen['pruefung/emailLektorUhrBis'] = 'alle';
 $this->phrasen['pruefung/emailLektorUhrAngemeldet'] = '.';
+$this->phrasen['pruefung/derLektor'] = 'Il docente';
+$this->phrasen['pruefung/dieKommission'] = 'La commissione';
+
+
+
 ?>
