@@ -66,16 +66,16 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	orient="vertical"
 	width="800"
-  	height="600"
-  	persist="screenX screenY width height sizemode"
-  	onload="onLoad()"
-  	>
+		height="600"
+		persist="screenX screenY width height sizemode"
+		onload="onLoad()"
+		>
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/tempus.js.php" />
 <script type="application/x-javascript" src="chrome://global/content/nsTransferable.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php"/>
-<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jquery.js"></script>
+<?php require_once("../include/meta/jquery.php"); ?>
 <script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqSOAPClient.js"></script>
 <script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqXMLUtils.js"></script>
 
