@@ -583,7 +583,7 @@ class pruefungCis extends basis_db
         }
         return true;
     }
-    
+
     /**
      * Lädt alle Prüfungen zur angebenen Lehrveranstaltung
      * @param String|Array $lehrveranstaltung_IDs einzelne ID einer Lehrveranstaltung oder ein Array von IDs

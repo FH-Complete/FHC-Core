@@ -64,7 +64,7 @@ if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('a
 	
 function showFarbcodes()
 {
- 	$farbcodes = '';
+	$farbcodes = '';
 
 	$farbcodes.= "<table>";
 	$farbcodes.="<tr><td style=\"background-color:#FFFFFF; width:35px;\"></td><td style=\"padding-left:5px;\">Termin noch mehr als 12 Tage entfernt</tr>";
@@ -75,7 +75,7 @@ function showFarbcodes()
 	$farbcodes.="</table>";
 	return $farbcodes; 
 }
- 
+
 $trenner = new variable();
 $trenner->loadVariables($getuid);
 

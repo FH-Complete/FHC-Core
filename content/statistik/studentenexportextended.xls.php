@@ -469,9 +469,9 @@ function draw_content($row)
 
 	//Spezialgruppen
 	$grps='';
-	$qry_1 = "SELECT gruppe_kurzbz FROM public.tbl_student JOIN public.tbl_benutzergruppe ON (student_uid=uid)
-			  WHERE tbl_student.prestudent_id='".addslashes($row->prestudent_id)."'
-			  AND tbl_benutzergruppe.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+	$qry_1 = "SELECT gruppe_kurzbz FROM public.tbl_prestudent JOIN public.tbl_benutzergruppe USING(prestudent_id)
+			  WHERE tbl_prestudent.prestudent_id=".$db->db_add_param($row->prestudent_id, FHC_INTEGER)."
+			  AND tbl_benutzergruppe.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
 	if($db->db_query($qry_1))
 	{
 		while($row_1 = $db->db_fetch_object())

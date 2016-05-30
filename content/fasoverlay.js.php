@@ -17,8 +17,9 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *          Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');

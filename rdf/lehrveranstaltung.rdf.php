@@ -36,6 +36,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/lehrveranstaltung.class.php');
+require_once('../include/student.class.php');
 
 $uid=get_uid();
 
@@ -73,7 +74,11 @@ else
 $lehrveranstaltung=new lehrveranstaltung();
 
 if($student_uid!='')
-	$lehrveranstaltung->load_lva_student($student_uid);
+{
+	//TODO EINE
+	$student = new student($student_uid);
+	$lehrveranstaltung->load_lva_student($student->prestudent_id);
+}
 elseif($lehrveranstaltung_kompatibel_id!='')
 {
 	// Laedt die Lehrveranstaltung und alle die dazu kompatibel sind

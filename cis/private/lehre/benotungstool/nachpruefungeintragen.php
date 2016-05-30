@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >,
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at > and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../../../config/cis.config.inc.php');
@@ -165,9 +166,10 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 
 	$pr = new Pruefung();
 
+	$student = new student($student_uid);//TODO EINE
 	// Wenn eine Pruefung angelegt wird, wird  zuerst eine Pruefung mit 1. Termin angelegt
 	// und dort die Zeugnisnote gespeichert
-	if($pr->getPruefungen($student_uid, "Termin1", $lvid, $stsem))
+	if($pr->getPruefungen($student->prestudent_id, "Termin1", $lvid, $stsem))
 	{
 		if ($pr->result)
 			$termin1 = 1;
@@ -210,8 +212,9 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 	$prTermin2 = new Pruefung();
 	$pr_2 = new Pruefung();
 
+	$student = new student($student_uid);//TODO EINE
 	// Die Pruefung wird als Termin2 eingetragen
-	if ($prTermin2->getPruefungen($student_uid, $typ, $lvid, $stsem))
+	if ($prTermin2->getPruefungen($student->prestudent_id, $typ, $lvid, $stsem))
 	{
 		if	($prTermin2->result)
 		{

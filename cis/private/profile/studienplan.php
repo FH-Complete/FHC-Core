@@ -34,6 +34,7 @@ require_once('../../../include/lvregel.class.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/prestudent.class.php');
+require_once('../../../include/student.class.php');
 require_once('../../../include/zeugnisnote.class.php');
 require_once('../../../include/lvangebot.class.php');
 require_once('../../../include/datum.class.php');
@@ -104,7 +105,8 @@ if(isset($_GET['getAnmeldung']))
 					//Pruefen ob genug Credit Points zur Verfuegung stehen zur Anmeldung
 
 					$konto = new konto();
-					$cp = $konto->getCreditPoints($uid, $stsem);
+					$student = new student($uid); // TODO EINE
+					$cp = $konto->getCreditPoints($student->prestudent_id, $stsem);
 					if($cp===false || $cp>=$lv->ects)
 						echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung.' (Anmeldung bis '.$datum->formatDatum($angebot->anmeldefenster_ende,"d.m.Y").')';
 					else
@@ -203,7 +205,8 @@ if(isset($_POST['action']) && $_POST['action']=='anmeldung')
 
 				// Pruefen ob genug CP zur Verfuegung stehen falls diese reduziert sind
 				$konto = new konto();
-				$cp = $konto->getCreditPoints($uid, $stsem);
+				$student = new student($uid); // TODO EINE
+				$cp = $konto->getCreditPoints($student->prestudent_id, $stsem);
 				if($cp===false || $cp>=$lv->ects)
 				{
 					$bngruppe->uid = $uid;
@@ -349,7 +352,8 @@ foreach($stsem_arr as $stsem)
 
 	echo $stsem;
 	$konto = new konto();
-	$cp = $konto->getCreditPoints($uid, $stsem);
+	$student = new student($uid); // TODO EINE
+	$cp = $konto->getCreditPoints($student->prestudent_id, $stsem);
 	if($cp!==false)
 		echo '<span  title="'.$p->t('studienplan/reduzierteCP',array($cp)).'" ><br><img src="../../../skin/images/information.png" alt="Information"/></span>';
 	echo '</th>';

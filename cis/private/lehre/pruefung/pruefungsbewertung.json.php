@@ -236,58 +236,58 @@ function saveBeurteilung($lehrveranstaltung_id, $student_uid, $mitarbeiter_uid, 
 	$student = new student($student_uid);
 	
 	global $p;
-    $pruefungCis = new pruefungCis($pruefung_id);
-    $lehrveranstaltung = new lehrveranstaltung();
-    $lehreinheiten = $lehrveranstaltung->getLehreinheitenOfLv($lehrveranstaltung_id, $student_uid);
-    $pruefung = new pruefung();
-    $pruefung->new = true;
-    if(!empty($lehreinheiten))
-    {
-	$pruefungsanmeldung = new pruefungsanmeldung($pruefungsanmeldung_id);
-	$pruefungstermin = new pruefungstermin($pruefungsanmeldung->pruefungstermin_id);
-
-	$pruefung->lehreinheit_id = $lehreinheiten[0];
-	$pruefung->prestudent_id = $student->prestudent_id;
-	$pruefung->mitarbeiter_uid = $mitarbeiter_uid;
-	$pruefung->note = $note;
-	$pruefung->pruefungstyp_kurzbz = $pruefungsanmeldung->pruefungstyp_kurzbz;
-	$pruefung->datum = $datum;
-	$pruefung->anmerkung = $anmerkung;
-	$pruefung->pruefungsanmeldung_id = $pruefungsanmeldung_id;
-	$pruefung->insertvon = $uid;
-	$pruefung->insertamum = date('Y-m-d H:i:s');
-
-	$datum = new datum();
-//	var_dump(date("Y-m-d", time()));
-//	var_dump($pruefungstermin->von);
-	if($datum->between("", date("Y-m-d", time()), $pruefungstermin->von))
+	$pruefungCis = new pruefungCis($pruefung_id);
+	$lehrveranstaltung = new lehrveranstaltung();
+	$lehreinheiten = $lehrveranstaltung->getLehreinheitenOfLv($lehrveranstaltung_id, $student_uid);
+	$pruefung = new pruefung();
+	$pruefung->new = true;
+	if(!empty($lehreinheiten))
 	{
-	    if($pruefung->save())
-	    {
-		$data['result']=$pruefung->pruefung_id;
-		$data['error']='false';
-		$data['errormsg']='';
-	    }
-	    else
-	    {
-		$data['error']='true';
-		$data['errormsg']=$pruefung->errormsg;
-	    }
+		$pruefungsanmeldung = new pruefungsanmeldung($pruefungsanmeldung_id);
+		$pruefungstermin = new pruefungstermin($pruefungsanmeldung->pruefungstermin_id);
+
+		$pruefung->lehreinheit_id = $lehreinheiten[0];
+		$pruefung->prestudent_id = $student->prestudent_id;
+		$pruefung->mitarbeiter_uid = $mitarbeiter_uid;
+		$pruefung->note = $note;
+		$pruefung->pruefungstyp_kurzbz = $pruefungsanmeldung->pruefungstyp_kurzbz;
+		$pruefung->datum = $datum;
+		$pruefung->anmerkung = $anmerkung;
+		$pruefung->pruefungsanmeldung_id = $pruefungsanmeldung_id;
+		$pruefung->insertvon = $uid;
+		$pruefung->insertamum = date('Y-m-d H:i:s');
+
+		$datum = new datum();
+	//	var_dump(date("Y-m-d", time()));
+	//	var_dump($pruefungstermin->von);
+		if($datum->between("", date("Y-m-d", time()), $pruefungstermin->von))
+		{
+			if($pruefung->save())
+			{
+				$data['result']=$pruefung->pruefung_id;
+				$data['error']='false';
+				$data['errormsg']='';
+			}
+			else
+			{
+				$data['error']='true';
+				$data['errormsg']=$pruefung->errormsg;
+			}
+		}
+		else
+		{
+			$data['error']='true';
+			$data['errormsg']=$p->t('pruefung/terminNichtInDerVergangenheit');
+			//$data['errormsg']='Nicht in der Vergangenheit';
+		}
 	}
 	else
 	{
-	    $data['error']='true';
-	    $data['errormsg']=$p->t('pruefung/terminNichtInDerVergangenheit');
-		//$data['errormsg']='Nicht in der Vergangenheit';
+		$data['error']='true';
+		$data['errormsg']=$p->t('pruefung/keineLehreinheitenVorhanden');
 	}
-    }
-    else
-    {
-	$data['error']='true';
-	$data['errormsg']=$p->t('pruefung/keineLehreinheitenVorhanden');
-    }
 
-    return $data;
+	return $data;
 }
 
 /**

@@ -17,8 +17,9 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *          Gerald Raab <gerald.raab@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 // header für no cache
 header("Cache-Control: no-cache");

@@ -217,36 +217,36 @@ class pruefung extends basis_db
 		    return false;
 	    }
 
-	    if($this->new)
-	    {
-		    //Neuen Datensatz anlegen
-		    $qry = 'BEGIN;INSERT INTO lehre.tbl_pruefung (lehreinheit_id, prestudent_id, mitarbeiter_uid, note, pruefungstyp_kurzbz,
-				datum, anmerkung, insertamum, insertvon, updateamum, updatevon, pruefungsanmeldung_id, vertrag_id, punkte) VALUES ('.
-			    $this->db_add_param($this->lehreinheit_id).', '.
-			    $this->db_add_param($this->prestudent_id).', '.
-			    $this->db_add_param($this->mitarbeiter_uid).', '.
-			    $this->db_add_param($this->note).', '.
-			    $this->db_add_param($this->pruefungstyp_kurzbz).', '.
-			    $this->db_add_param($this->datum).', '.
-			    $this->db_add_param($this->anmerkung).', '.
-			    $this->db_add_param($this->insertamum).', '.
-			    $this->db_add_param($this->insertvon).', '.
-			    $this->db_add_param($this->updateamum).', '.
-			    $this->db_add_param($this->updatevon).', '.
-			    $this->db_add_param($this->pruefungsanmeldung_id).','.
-				$this->db_add_param($this->vertrag_id).','.
-				$this->db_add_param($this->punkte).');';
-	    }
-	    else
-	    {
-		    //bestehenden Datensatz akualisieren
+			if($this->new)
+			{
+				//Neuen Datensatz anlegen
+				$qry = 'BEGIN;INSERT INTO lehre.tbl_pruefung (lehreinheit_id, prestudent_id, mitarbeiter_uid, note, pruefungstyp_kurzbz,
+					datum, anmerkung, insertamum, insertvon, updateamum, updatevon, pruefungsanmeldung_id, vertrag_id, punkte) VALUES ('.
+					$this->db_add_param($this->lehreinheit_id).', '.
+					$this->db_add_param($this->prestudent_id).', '.
+					$this->db_add_param($this->mitarbeiter_uid).', '.
+					$this->db_add_param($this->note).', '.
+					$this->db_add_param($this->pruefungstyp_kurzbz).', '.
+					$this->db_add_param($this->datum).', '.
+					$this->db_add_param($this->anmerkung).', '.
+					$this->db_add_param($this->insertamum).', '.
+					$this->db_add_param($this->insertvon).', '.
+					$this->db_add_param($this->updateamum).', '.
+					$this->db_add_param($this->updatevon).', '.
+					$this->db_add_param($this->pruefungsanmeldung_id).','.
+					$this->db_add_param($this->vertrag_id).','.
+					$this->db_add_param($this->punkte).');';
+			}
+			else
+			{
+			//bestehenden Datensatz akualisieren
 
-		    //Pruefen ob pruefung_id gueltig ist
-		    if(!is_numeric($this->pruefung_id))
-		    {
-			    $this->errormsg = 'pruefung_id ist ungueltig.';
-			    return false;
-		    }
+			//Pruefen ob pruefung_id gueltig ist
+			if(!is_numeric($this->pruefung_id))
+			{
+				$this->errormsg = 'pruefung_id ist ungueltig.';
+				return false;
+			}
 
 		    $qry = 'UPDATE lehre.tbl_pruefung SET '.
 			    'lehreinheit_id='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).', '.

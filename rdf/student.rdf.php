@@ -760,7 +760,7 @@ else
 			$lv_studiengang_art='';
 
 			$lv=new lehrveranstaltung();
-			$lv->load_lva_student($student->uid);
+			$lv->load_lva_student($student->prestudent_id);
 			if(count($lv->lehrveranstaltungen)>0)
 			{
 				$lv_studiengang_kz=$lv->lehrveranstaltungen[0]->studiengang_kz;

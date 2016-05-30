@@ -42,9 +42,9 @@ if(!$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('admin'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
 if(!isset($_GET['prestudent_id']))
-	die('Es wurde keine prestudent_id übergeben!');
-
-$prestudent_id = $_GET["prestudent_id"];
+	$prestudent_id = "";
+else
+	$prestudent_id = $_GET["prestudent_id"];
 
 
 if(isset($_GET['pruefung_id']))

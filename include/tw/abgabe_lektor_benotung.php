@@ -46,6 +46,12 @@ require_once('../../include/pdf/fpdf.php');
 require_once('../../include/pdf.inc.php');
 
 $getuid=get_uid();
+/*TODO EINE
+ auf etwa zeile 720: public.tbl_prestudent.uid
+ sollte wohl eher auf die prestudent_id eingeschränkt werden!
+ dazu müsste diese hier mit perstudent->loadActualFromStg($stg_kz) geladen werden
+ hierfür wiederum müsste man hier die stg_kz übergeben
+*/
 $datum_obj = new datum();
 $htmlstr = "";
 $qualitaet='';

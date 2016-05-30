@@ -323,7 +323,7 @@ if ($xmlformat=='rdf')
 				<RDF:li>
 					<RDF:Description id="'.$row->abschlusspruefung_id.'"  about="'.$rdf_url.'/'.$row->abschlusspruefung_id.'" >
 						<ABSCHLUSSPRUEFUNG:abschlusspruefung_id><![CDATA['.$row->abschlusspruefung_id.']]></ABSCHLUSSPRUEFUNG:abschlusspruefung_id>
-						<ABSCHLUSSPRUEFUNG:student_uid><![CDATA['.$row->student_uid.']]></ABSCHLUSSPRUEFUNG:student_uid>
+						<ABSCHLUSSPRUEFUNG:prestudent_id><![CDATA['.$row->prestudent_id.']]></ABSCHLUSSPRUEFUNG:prestudent_id>
 						<ABSCHLUSSPRUEFUNG:vorsitz><![CDATA['.$row->vorsitz.']]></ABSCHLUSSPRUEFUNG:vorsitz>
 						<ABSCHLUSSPRUEFUNG:vorsitz_nachname><![CDATA['.$vorsitz.']]></ABSCHLUSSPRUEFUNG:vorsitz_nachname>
 						<ABSCHLUSSPRUEFUNG:pruefer1><![CDATA['.$row->pruefer1.']]></ABSCHLUSSPRUEFUNG:pruefer1>

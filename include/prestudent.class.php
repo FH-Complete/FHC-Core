@@ -26,6 +26,7 @@ require_once(dirname(__FILE__).'/log.class.php');
 require_once(dirname(__FILE__).'/phrasen.class.php');
 require_once(dirname(__FILE__).'/globals.inc.php');
 require_once(dirname(__FILE__).'/sprache.class.php');
+require_once(dirname(__FILE__).'/authentication.class.php');
 
 $sprache = getSprache();
 $lang = new sprache();
@@ -1865,5 +1866,49 @@ class prestudent extends person
 			$this->errormsg ='Fehler beim Ermitteln des Lehrverbandes';
 			return false;
 		}
+	}
+
+	/**
+	 * Laedt die Rolle
+	 *
+	 * @param $studiengang_kz
+	 * @return boolean
+	 */
+	public function loadActualFromStg($studiengang_kz)
+	{
+
+		if(!is_numeric($studiengang_kz))
+		{
+			$this->errormsg = 'studiengang_kz ist ungueltig';
+			return false;
+		}
+
+		$auth = new authentication();
+		$uid = $auth->getUser();
+
+
+		$qry = "SELECT prestudent_id FROM tbl_prestudent WHERE uid=".$this->db_add_param($uid)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+		$result = $this->db_query($qry);
+		$count = $this->db_num_rows($result);
+
+		switch($count)
+		{
+			case 0:
+				$this->errormsg = 'es wurde kein Prestudent gefunden';
+				break;
+			case 1:
+				if(!$row = $this->db_fetch_object($result))
+				{
+					$this->errormsg = 'Fehler beim Ermitteln des Prestudenten';
+					break;
+				}
+				$this->load($row->prestudent_id);
+				return true;
+			default:
+				$this->errormsg = 'der Prestudent ist nicht eindeutig';
+				break;
+		}
+
+		return false;
 	}
 }

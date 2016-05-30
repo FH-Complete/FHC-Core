@@ -1163,7 +1163,7 @@ $qry="SELECT *, tbl_lehreinheit.studiensemester_kurzbz, tbl_projektarbeit.prestu
 	JOIN lehre.tbl_lehrveranstaltung ON(tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)
 	JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
 	JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz)
-	LEFT JOIN lehre.tbl_zeugnisnote ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz AND tbl_projektarbeit.student_uid=tbl_zeugnisnote.student_uid)
+	LEFT JOIN lehre.tbl_zeugnisnote ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz AND tbl_projektarbeit.prestudent_id=tbl_zeugnisnote.prestudent_id)
 	WHERE ((tbl_projektarbeit.note>0 AND tbl_projektarbeit.note<5) OR (tbl_zeugnisnote.note>0 AND tbl_zeugnisnote.note<5)) AND projekttyp_kurzbz='Diplom'
 	AND to_char(tbl_projektarbeit.abgabedatum,'YYYYMMDD')>'".date('Ymd',mktime(0, 0, 0, date('m')-6, date('d'), date('Y')))."'
 	AND (tbl_projektarbeit.freigegeben OR (to_char(tbl_projektarbeit.gesperrtbis,'YYYYMMDD')<'".date('Ymd',mktime(0, 0, 0, date('m'), date('d'), date('Y')))."'))";

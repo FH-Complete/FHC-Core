@@ -1378,7 +1378,7 @@ function StudentAuswahl()
 	}
 
 	if(parseInt(prestudent_id))
-	{alert(prestudent_id + " zeugnisnote/lvgesamtnote"); // TODO EINE
+	{
 		// *** ZeugnisNoten ***
 		notentree = document.getElementById('student-noten-tree');
 
@@ -4307,7 +4307,7 @@ function StudentPruefungAuswahl()
 	StudentPruefungDetailDisableFields(false);
 
 	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["student-pruefung-tree-pruefung_id"] : "student-pruefung-tree-pruefung_id";
+	var col = tree.columns ? tree.columns["student-pruefung-tree-pruefung_id"] : "student-pruefung-tree-pruefung_id";
 	var pruefung_id=tree.view.getCellText(tree.currentIndex,col);
 
 	//Daten holen

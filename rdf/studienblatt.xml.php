@@ -15,9 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
- *          Karl Burkhart <burkhart@technikum-wien.at>
- *          Manfred Kindl <kindlm@technikum-wien.at>
+ * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Karl Burkhart <burkhart@technikum-wien.at>,
+ *          Manfred Kindl <manfred.kindl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 header("Content-type: application/xhtml+xml");
 require_once('../config/vilesci.config.inc.php');
@@ -264,7 +265,7 @@ foreach($uid_arr as $uid)
 
 			$stg_typ=new studiengang();
 			$lv=new lehrveranstaltung();
-			$lv->load_lva_student($student->uid);
+			$lv->load_lva_student($student->prestudent_id);
 			if(count($lv->lehrveranstaltungen)>0)
 			{
 				$lv_studiengang_kz=$lv->lehrveranstaltungen[0]->studiengang_kz;

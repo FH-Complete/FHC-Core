@@ -761,14 +761,15 @@ class konto extends basis_db
 	 * Die Gegenbuchung wird nicht beruecksichtigt.
 	 * @return Anzahl der Verfuegbaren CreditPoints oder false falls unbeschraenkt
 	 */
-	public function getCreditPoints($uid, $studiensemester_kurzbz)
+	public function getCreditPoints($prestudent_id, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT sum(credit_points) as cp
 				FROM
 					public.tbl_konto
 					JOIN public.tbl_benutzer USING(person_id)
+					JOIN public.tbl_prestudent USING(uid)
 				WHERE
-					uid=".$this->db_add_param($uid)."
+					prestudent_id=".$this->db_add_param($prestudent_id)."
 					AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 					AND buchungsnr_verweis is null
 					AND credit_points is not null";
@@ -783,7 +784,7 @@ class konto extends basis_db
 				{
 					// Bereits verwendete CreditPoints ermitteln
 					$lehrveranstaltung = new lehrveranstaltung();
-					$verwendet = $lehrveranstaltung->getUsedECTS($uid, $studiensemester_kurzbz);
+					$verwendet = $lehrveranstaltung->getUsedECTS($prestudent_id, $studiensemester_kurzbz);
 					return ($creditpoints-($verwendet));
 				}
 				else
