@@ -33,6 +33,7 @@ require_once('../../include/studienplan.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/lehrtyp.class.php');
+require_once('../../include/log.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -111,12 +112,12 @@ if (isset($_REQUEST['compare']))
 		$msg .= '</tr></thead><tbody><tr>';
 		foreach ($lv_diff1 as $key => $value)
 		{
-			$msg .= '<td>'.$value.'</td>';
+			$msg .= '<td>'.(is_bool($value)?($value?'<img src="../../skin/images/true.png" alt="true">':'<img src="../../skin/images/false.png" alt="false">'):$value).'</td>';
 		}
 		$msg .= '</tr><tr>';
 		foreach ($lv_diff2 as $key => $value)
 		{
-			$msg .= '<td>'.$value.'</td>';
+			$msg .= '<td>'.(is_bool($value)?($value?'<img src="../../skin/images/true.png" alt="true">':'<img src="../../skin/images/false.png" alt="false">'):$value).'</td>';
 		}
 		$msg .= '</tr></tbody></table>';
 	}
@@ -259,6 +260,24 @@ if((isset($_REQUEST['transfer']) || isset($_REQUEST['mergeDelete'])) && isset($c
 			$msg_qry = str_replace('*/', '', $msg_qry);
 			$msg .= "<br>".$msg_qry;
 			$db->db_query("COMMIT;");
+			
+			//Log schreiben
+			$log = new log();
+				
+			$log->new = true;
+			$log->sql = $update_qry;
+			$log->sqlundo = 'No undo statement implemented yet';
+			$log->executetime = date('Y-m-d H:i:s');
+			$log->mitarbeiter_uid = $uid;
+			if (isset($_REQUEST['transfer']))
+				$log->beschreibung = "lv_merge.php: Merge of course $courseLeft to $courseRight";
+			elseif (isset($_REQUEST['mergeDelete']))
+				$log->beschreibung = "lv_merge.php: Deletion of course $courseLeft. Merged with $courseRight";
+			
+			if(!$log->save())
+			{
+				$msg .= "<span style='color: red'><b>Error while writing log-file</b></span><br>";
+			}
 		}
 		else
 		{
@@ -634,7 +653,7 @@ echo "<th>ID</th>";
 echo "<th>Name</th>";
 echo "<th>Type</th>";
 if ($select_stg_kz_left=='')
-	echo "<th>DP</th>";
+	echo "<th title='Degree Program'>DP</th>";
 echo "<th>Semester</th>";
 echo "<th>Language</th>";
 echo "<th>ECTS</th>";
@@ -720,7 +739,7 @@ echo "<th>ID</th>";
 echo "<th>Name</th>";
 echo "<th>Type</th>";
 if ($select_stg_kz_right=='')
-	echo "<th>DP</th>";
+	echo "<th title='Degree Program'>DP</th>";
 echo "<th>Semester</th>";
 echo "<th>Language</th>";
 echo "<th>ECTS</th>";

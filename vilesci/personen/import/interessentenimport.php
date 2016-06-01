@@ -129,41 +129,46 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 	exit;
 }
 
-function getStudienplanDropDown($studiengang_kz, $orgform_kurzbz='', $studienplan_id='')
+function getStudienplanDropDown($studiengang_kz, $orgform_kurzbz='', $studienplan_id='', $studiensemester_kurzbz, $ausbildungssemester='')
 {
 	$db = new basis_db();
 
-	$content= '<SELECT id="studienplan_id" name="studienplan_id">
-	<OPTION value="">-- keine Auswahl --</OPTION>';
+	$content= '<SELECT id="studienplan_id" name="studienplan_id">';
 	$studienplan = new studienplan();
-	$studienplan->getStudienplaene($studiengang_kz);
-	
-	foreach($studienplan->result as $row)
+	$studienplan->getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester, $orgform_kurzbz);
+	//var_dump($studienplan->result);
+	if (count($studienplan->result)==0)
+		$content.="<option value=''>Kein Studienplan vorhanden</option>";
+	else 
 	{
-		if($studienplan_id=='')
-			$studienplan_id=$row->studienplan_id;
-		
-		if($studienplan_id==$row->studienplan_id)
-			$selected='selected';
-		else
-			$selected='';
-		
-		if($row->aktiv)
+		$content .= '<OPTION value="">-- keine Auswahl --</OPTION>';
+		foreach($studienplan->result as $row)
 		{
-			if($orgform_kurzbz=='' || $row->orgform_kurzbz=='' || $row->orgform_kurzbz==$orgform_kurzbz)			
-				$content.="<option value='$row->studienplan_id' $selected>$row->bezeichnung</option>";
+			if($studienplan_id=='')
+				$studienplan_id=$row->studienplan_id;
+			
+			if($studienplan_id==$row->studienplan_id)
+				$selected='selected';
+			else
+				$selected='';
+			
+			if($row->aktiv)
+			{
+				if($orgform_kurzbz=='' || $row->orgform_kurzbz=='' || $row->orgform_kurzbz==$orgform_kurzbz)			
+					$content.="<option value='$row->studienplan_id' $selected>$row->bezeichnung_studienplan</option>";
+			}
 		}
-	}
+	}	
 
 	$content.= '</SELECT>';
 	return $content;
 }
 
-if(isset($_GET['type']) && $_GET['type']=='getstudienplancontent' && isset($_GET['studiengang_kz']) && isset($_GET['orgform_kurzbz']))
+if(isset($_GET['type']) && $_GET['type']=='getstudienplancontent' && isset($_GET['studiengang_kz']) && isset($_GET['orgform_kurzbz']) && isset ($_GET['studiensemester_kurzbz']) && isset ($_GET['ausbildungssemester']))
 {
 	header('Content-Type: text/html; charset=UTF-8');
 
-	echo getStudienplanDropDown($_GET['studiengang_kz'], $_GET['orgform_kurzbz']);
+	echo getStudienplanDropDown($_GET['studiengang_kz'], $_GET['orgform_kurzbz'], '', $_GET['studiensemester_kurzbz'], $_GET['ausbildungssemester']);
 	exit;
 }
 ?><!DOCTYPE HTML>
@@ -389,8 +394,10 @@ function loadStudienplanData()
 	var ts = jetzt.getTime();
 	var studiengang_kz = document.getElementById('studiengang_kz').value;
 	var orgform_kurzbz = document.getElementById('orgform_kurzbz').value;
+	var studiensemester_kurzbz = document.getElementById('studiensemester_kurzbz').value;
+	var ausbildungssemester = document.getElementById('ausbildungssemester').value;
     var url= '<?php echo $_SERVER['PHP_SELF']."?type=getstudienplancontent"?>';
-    url += '&studiengang_kz='+encodeURIComponent(studiengang_kz)+"&orgform_kurzbz="+encodeURIComponent(orgform_kurzbz)+"&"+ts;
+    url += '&studiengang_kz='+encodeURIComponent(studiengang_kz)+"&orgform_kurzbz="+encodeURIComponent(orgform_kurzbz)+"&studiensemester_kurzbz="+encodeURIComponent(studiensemester_kurzbz)+"&ausbildungssemester="+encodeURIComponent(ausbildungssemester)+"&"+ts;
     anfrage.open("GET", url, true);
     anfrage.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
     anfrage.onreadystatechange = setStudienplanData;
@@ -1124,14 +1131,14 @@ foreach ($stg_obj->result as $row)
 }
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>Studiensemester *</td><td><SELECT id="studiensemester_kurzbz" name="studiensemester_kurzbz">';
+echo '<tr><td>Studiensemester *</td><td><SELECT id="studiensemester_kurzbz" name="studiensemester_kurzbz" onchange="loadStudienplanData()">';
 $stsem = new studiensemester();
 $stsem->getAll();
 foreach ($stsem->studiensemester as $row)
 	echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.($row->studiensemester_kurzbz==$studiensemester_kurzbz?'selected':'').'>'.$row->studiensemester_kurzbz.'</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>Ausbildungssemester *</td><td><SELECT id="ausbildungssemester" name="ausbildungssemester" '.($incoming?'disabled':'').'>';
+echo '<tr><td>Ausbildungssemester *</td><td><SELECT id="ausbildungssemester" name="ausbildungssemester" '.($incoming?'disabled':'').' onchange="loadStudienplanData()">';
 for ($i=1;$i<9;$i++)
 	echo '<OPTION value="'.$i.'" '.($i==$ausbildungssemester?'selected':'').'>'.$i.'. Semester</OPTION>';
 echo '</SELECT>';
@@ -1150,8 +1157,8 @@ echo '</SELECT>';
 echo '</td></tr>';
 echo "\n";
 echo '<tr><td>Studienplan</td><td><div id="studienplandiv">';
-if($studiengang_kz!='')
-	echo getStudienplanDropDown($studiengang_kz, $orgform_kurzbz, $studienplan_id);
+if($studiengang_kz!='' && $studiensemester_kurzbz!='')
+	echo getStudienplanDropDown($studiengang_kz, $orgform_kurzbz, $studienplan_id, $studiensemester_kurzbz);
 else
 	echo '<font color="gray">Bitte zuerst einen Studiengang waehlen</font>';
 echo '</div></td>
