@@ -229,6 +229,8 @@ $rechte->getBerechtigungen($uid);
 			<th><?php echo $p->t('global/nachname'); ?></th>
 			<th><?php echo $p->t('global/matrikelnummer'); ?></th>
 			<th><?php echo $p->t('global/datum'); ?></th>
+			<th><?php echo $p->t('benotungstool/note'); ?></th>
+			<th><?php echo $p->t('global/anmerkung'); ?></th>
 		    </tr>
 		</thead>
 		<tbody>
@@ -256,8 +258,10 @@ $rechte->getBerechtigungen($uid);
 				echo '<td>'.$anmeldung->reihung.'</td>';
 				echo '<td>'.$student->vorname.'</td>';
 				echo '<td>'.$student->nachname.'</td>';
-				echo '<td>'.$student->matrikelnr.'</td>';
+				echo '<td>'.$student->matr_nr.'</td>';
 				echo '<td>'.$date.'</td>';
+				echo '<td></td>';
+				echo '<td></td>';
 			    echo '</tr>';
 			}
 		    ?>
@@ -274,6 +278,19 @@ $rechte->getBerechtigungen($uid);
 	}
 	?>
 	    </table>
+		<br>
+		<table width="100%" id="liste">
+			<tr>
+				<td width="26%"><?php echo $p->t('pruefung/derLektor'); ?></td>
+				<td width="37%"><?php echo $mitarbeiter->getFullName(FALSE); ?></td>
+				<td width="37%"></td>
+			</tr>
+			<tr>
+				<td><?php echo $p->t('pruefung/dieKommission'); ?></td>
+				<td></td>
+				<td></td>
+			</tr
+		</table>
 	    </div>
 	</div>
     </body>

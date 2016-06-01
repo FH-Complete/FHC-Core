@@ -26,5 +26,8 @@ $this->phrasen['passwort/CaptchaEingabe']='Tippen Sie die angezeigten<br>Zeichen
 $this->phrasen['passwort/ReloadCaptcha']='Ich kann das Bild nicht lesen - neu laden';
 $this->phrasen['passwort/PasswortWaehlen']='Bitte wählen Sie ein Passwort für Ihren Account.';
 $this->phrasen['passwort/AccountAktivierung']='Account Aktivierung';
-
+$this->phrasen['passwort/CodeOderUsernameFalsch']='Code oder Username falsch';
+$this->phrasen['passwort/CaptchaCodeFalsch']='Captcha Code falsch';
+$this->phrasen['passwort/AccountErfolgreichAktiviert']='Ihr Account wurde erfolgreich aktiviert';
+$this->phrasen['passwort/WeiterZumLogin']='Weiter zum Login';
 ?>
