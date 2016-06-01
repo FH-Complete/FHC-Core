@@ -16,7 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Authors: Robert Hofer <robert.hofer@technikum-wien.at>,
- *			Andreas Oestereicher <oesi@technikum-wien.at>
+ *          Andreas Oestereicher <oesi@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 /*
@@ -29,11 +30,20 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/anwesenheit.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/studiensemester.class.php');
-require_once('../../../include/student.class.php');
 require_once('../../../include/prestudent.class.php');
+require_once('../../../include/benutzer.class.php');
 require_once('../../../include/stundenplan.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/studiengang.class.php');
+
+
+function cmp($prestudent1, $prestudent2)
+{
+	return $prestudent1->prestudent_id > $prestudent2->prestudent_id;
+}
+
+
 
 $datum_obj = new datum();
 $uid = get_uid();
@@ -57,7 +67,6 @@ if(!$benutzer->load($uid))
 
 $p = new phrasen(getSprache());
 $db = new basis_db();
-$student = new student;
 $stundenplan = new stundenplan('stundenplan');
 $anwesenheit = new anwesenheit;
 
@@ -71,8 +80,6 @@ if(!$semester || !array_key_exists($semester, $alle_semester))
 	end($alle_semester);
 	$semester = key($alle_semester);
 }
-
-//$student->get_lv($uid, $semester);
 ?>
 <!DOCTYPE html>
 <html>
@@ -83,7 +90,7 @@ if(!$semester || !array_key_exists($semester, $alle_semester))
 		<link rel="stylesheet" href="../../../skin/jquery.css" type="text/css"/>
 		<script type="text/javascript" src="../../../include/js/jquery.min.1.11.1.js"></script>
 	</head>
-	<body class="anwesenheit">
+	<body class="anwesenheit" style="margin:1%;width:98%">
 <?php
 		echo '<h1>'.$p->t('anwesenheitsliste/anwesenheit').' - '.$db->convert_html_chars($benutzer->titelpre.' '.$benutzer->vorname.' '.$benutzer->nachname.' '.$benutzer->titelpost).'</h1>';
 		
@@ -101,69 +108,90 @@ if(!$semester || !array_key_exists($semester, $alle_semester))
 			</form>';
 
 		$anwesenheit = new anwesenheit();
-		$anwesenheit->loadAnwesenheitStudiensemester($semester, $uid);
-		if($anwesenheit->result)
-		{
+		$prestudent = new prestudent();
+		$prestudent->getPrestudentsFromUid($uid);
+		usort($prestudent->result, "cmp");
 
-			foreach($anwesenheit->result as $aw)
+		foreach($prestudent->result as $pre)
+		{
+			if(!$pre->statusExists($pre->prestudent_id, $semester))
+				continue;
+
+			$studiengang = new studiengang($pre->studiengang_kz);
+
+			$anwesenheit->result = array();
+			$anwesenheit->loadAnwesenheitStudiensemester($semester, $pre->prestudent_id);
+
+
+
+			echo "<div style='margin-top:10px;margin-bottom:10px;padding:10px;border-radius:10px;background-color:#EEE;'>";
+			echo "<h1>".$studiengang->bezeichnung."</h1>";
+
+			if($anwesenheit->result)
 			{
-				if(!$aw->gesamtstunden)
-					continue;
+				foreach($anwesenheit->result as $aw)
+				{
+					if(!$aw->gesamtstunden)
+						continue;
 
-				$fehlstunden = $aw->nichtanwesend;
-				$le_erledigt = $aw->erfassteanwesenheit;
-				$anwesenheit_relativ = $aw->prozent;
-				
-				echo '
-				<div class="lv">
-					<div>
-						'.$db->convert_html_chars($aw->bezeichnung).'
-					</div>
-					<div>
-						<div class="progress-wrapper">
-							<div class="progress '.$anwesenheit->getAmpel($anwesenheit_relativ).'" style="width: '.round($anwesenheit_relativ).'%;">
-							
-							</div>
-						</div>'.round($anwesenheit_relativ, 1).'%
-						'.$p->t('anwesenheitsliste/leAbgeschlossen').' ['.$le_erledigt.'/'.$aw->gesamtstunden.']';
+					$fehlstunden = $aw->nichtanwesend;
+					$le_erledigt = $aw->erfassteanwesenheit;
+					$anwesenheit_relativ = $aw->prozent;
 
-						if($fehlstunden)
-						{
-							echo '
-							<span class="fehlstunden-details" title="'.$p->t('anwesenheitsliste/fehlstunden').'">&gt;&gt;</span>
-							<div style="display: none;">
-							<table><tr><td>'.$p->t('global/datum').'</td><td>'.$p->t('anwesenheitsliste/fehlstunden').'</td></tr>';
-							$anwesenheit_termine = new anwesenheit();
-							$anwesenheit_termine->getAnwesenheitLehrveranstaltung($uid, $aw->lehrveranstaltung_id, $semester, false);
-							foreach($anwesenheit_termine->result as $termin)
+					echo '
+					<div class="lv">
+						<div>
+							'.$db->convert_html_chars($aw->bezeichnung).'
+						</div>
+						<div>
+							<div class="progress-wrapper">
+								<div class="progress '.$anwesenheit->getAmpel($anwesenheit_relativ).'" style="width: '.round($anwesenheit_relativ).'%;">
+
+								</div>
+							</div>'.round($anwesenheit_relativ, 1).'%
+							'.$p->t('anwesenheitsliste/leAbgeschlossen').' ['.$le_erledigt.'/'.$aw->gesamtstunden.']';
+
+							if($fehlstunden)
 							{
-								echo '	<tr>
-											<td>'.$datum_obj->formatDatum($termin->datum,'d.m.Y').'</td>
-											<td>'.(float)$termin->einheiten.'</td>
-										</tr>';
+								echo '
+								<span class="fehlstunden-details" title="'.$p->t('anwesenheitsliste/fehlstunden').'">&gt;&gt;</span>
+								<div style="display: none;">
+								<table><tr><td>'.$p->t('global/datum').'</td><td>'.$p->t('anwesenheitsliste/fehlstunden').'</td></tr>';
+								$anwesenheit_termine = new anwesenheit();
+								$anwesenheit_termine->getAnwesenheitLehrveranstaltung($uid, $aw->lehrveranstaltung_id, $semester, false);
+								foreach($anwesenheit_termine->result as $termin)
+								{
+									echo '	<tr>
+												<td>'.$datum_obj->formatDatum($termin->datum,'d.m.Y').'</td>
+												<td>'.(float)$termin->einheiten.'</td>
+											</tr>';
+								}
+								echo '
+									</table>
+								</div>';
 							}
-							echo '
-								</table>
-							</div>';
-						}
 
-				echo '
-					</div>
-				</div>';
+					echo '
+						</div>
+					</div>';
+				}
 			}
-		}
-		else
-		{
-			echo $p->t('anwesenheitsliste/keineLVsGefunden');
+			else
+			{
+				echo $p->t('anwesenheitsliste/keineLVsGefunden');
+			}
+			echo "</div>";
 		}
 
 		?>
 		<script type="text/javascript">
-			$('span.fehlstunden-details').on('click', function() {
+			$('span.fehlstunden-details').on('click', function()
+			{
 				$(this).next().toggle();
 			});
 
-			$('#anwesenheitAuswahl > *').on('change', function() {
+			$('#anwesenheitAuswahl > *').on('change', function()
+			{
 				$('#anwesenheitAuswahl').trigger('submit');
 			});
 		</script>

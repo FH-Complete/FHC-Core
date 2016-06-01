@@ -740,7 +740,7 @@ function StudentDetailSave()
 		req.add('do','update');
 	}
 
-	if(!prestudent_id || !parseInt(prestudent_id))
+	if(parseInt(prestudent_id) !== false)
 		req.add('type', 'saveperson');
 	else
 		req.add('type', 'savestudent');
@@ -1377,7 +1377,7 @@ function StudentAuswahl()
 		bisiotree.builder.addListener(StudentIOTreeListener);
 	}
 
-	if(parseInt(prestudent_id))
+	if(parseInt(prestudent_id) !== false)
 	{
 		// *** ZeugnisNoten ***
 		notentree = document.getElementById('student-noten-tree');
@@ -1446,7 +1446,7 @@ function StudentAuswahl()
 	// ***** Betriebsmittel *****
 	document.getElementById('student-betriebsmittel').setAttribute('src','betriebsmitteloverlay.xul.php?person_id='+person_id+'&uid='+uid);
 
-	if(prestudent_id && parseInt(prestudent_id))
+	if(parseInt(prestudent_id) !== false)
 	{
 		// ***** Pruefungen *****
 		pruefungtree = document.getElementById('student-pruefung-tree');
@@ -1523,7 +1523,7 @@ function StudentAuswahl()
         anrechnungtree.builder.addListener(StudentAnrechnungTreeListener);
     }
 
-	if(parseInt(prestudent_id))
+	if(parseInt(prestudent_id) !== false)
 	{
 		// ****** Abschlusspruefung ******** //
 		StudentAbschlusspruefungDetailDisableFields(true);
@@ -1549,7 +1549,7 @@ function StudentAuswahl()
 		}
 	}
 
-	if(uid!='')
+	if(uid!='' && parseInt(prestudent_id) !== false)
 	{
 		// ******* FUNKTIONEN ********* //
 		if(document.getElementById('student-content-tabs').selectedItem==document.getElementById('student-tab-funktionen'))
@@ -1566,8 +1566,8 @@ function StudentAuswahl()
 
 		// ***** Anwesenheit *****
 		if(document.getElementById('student-content-tabs').selectedItem==document.getElementById('student-tab-anwesenheit'))
-		{
-			document.getElementById('student-anwesenheit').setAttribute('src','anwesenheit.xul.php?student_uid='+uid);
+		{alert(prestudent_id); // TODO EINE
+			document.getElementById('student-anwesenheit').setAttribute('src','anwesenheit.xul.php?prestudent_id='+prestudent_id);
 		}
 
 	}
@@ -3673,7 +3673,7 @@ function StudentNotenAuswahl()
 
 	//Falls einer der Parameter leer ist wird abgebrochen da sonst ein sehr grosses rdf geladen wird
 	//Sollte eigentlich nie eintreffen, tut es aber trotzdem
-	if(lehrveranstaltung_id=='' || !parseInt(prestudent_id) || studiensemester_kurzbz=='')
+	if(lehrveranstaltung_id=='' || parseInt(prestudent_id) == false || studiensemester_kurzbz=='')
 	{
 		debug('unerwarteter Fehler in StudentNotenAuswahl() in studentoverlay.js.php');
 		return false;
@@ -5418,9 +5418,9 @@ function StudentAnwesenheitIFrameLoad()
 {
 	var uid = document.getElementById('student-detail-textbox-uid').value;
 	var prestudent_id = document.getElementById('student-detail-textbox-prestudent_id').value;
-	if(uid!='')
-	{
-		url = 'anwesenheit.xul.php?student_uid='+uid+'&ts='+gettimestamp();
+	if(parseInt(prestudent_id) !== false)
+	{alert(prestudent_id); // TODO EINE
+		url = 'anwesenheit.xul.php?prestudent_id='+prestudent_id+'&ts='+gettimestamp();
 		document.getElementById('student-anwesenheit').setAttribute('src',url);
 	}
 }

@@ -291,7 +291,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 		}
 
-		if(!$student = new student($uid_arr[$i]))
+		if(!$student = new student($uid_arr[$i]))	// TODO EINE
 			die("Student nicht gefunden");
 
 		$akadgrad_id='';
@@ -330,7 +330,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$praktikum = false;
 		$auslandssemester = false;
 
-		if(!$student = new student($uid_arr[$i]))
+		if(!$student = new student($uid_arr[$i]))	// TODO EINE
 			die($student->errormsg);
 
 		$qry = "SELECT projektarbeit_id FROM lehre.tbl_projektarbeit WHERE prestudent_id=".$db->db_add_param($student->prestudent_id)." AND (projekttyp_kurzbz='Praxis' OR projekttyp_kurzbz='Praktikum')";
@@ -344,7 +344,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
 
 
-		if(!$std = new student($uid_arr[$i]))
+		if(!$std = new student($uid_arr[$i]))	// TODO EINE
 			die("Student nicht gefunden");
 
 		$qry = "SELECT von, bis FROM bis.tbl_bisio WHERE prestudent_id=".$db->db_add_param($std->prestudent_id);
@@ -383,7 +383,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo "		<stgl>$stgl</stgl>";
 
 
-		if(!$student = new student($uid_arr[$i]))
+		if(!$student = new student($uid_arr[$i]))	// TODO EINE
 			die("Student nicht gefunden!");
 
         $abschlussbeurteilung='';
@@ -420,7 +420,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		/*
 		 * Hole Notendurchschnitt vom Jahr nach dem letzten Status und 2 Jahre davor,
 		*/
-		if(!$student = new student($uid_arr[$i]))
+		if(!$student = new student($uid_arr[$i]))	// TODO EINE
 			die("Student nicht gefunden");
 
 		$prestudent = new prestudent();
@@ -520,7 +520,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo "  <gradePrevLastYearNb>".sprintf("%01.1f",($noteArrayPrev[7]/$noten_anzahl*100))."</gradePrevLastYearNb>";
 		echo "  <gradePrevLastYearEa>".sprintf("%01.1f",($noteArrayPrev[12]/$noten_anzahl*100))."</gradePrevLastYearEa>";
 
-		if(!$student = new student($uid_arr[$i]))
+		if(!$student = new student($uid_arr[$i]))	// TODO EINE
 			die("Student nicht gefunden");
 
 		//Projektarbeiten
@@ -555,7 +555,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
             $semester_ects = 0;
 			//$thesis_beschreibung = '';
 			echo "<semesters>";
-			$student = new student($uid_arr[$i]);
+			$student = new student($uid_arr[$i]);	// TODO EINE
 
             // alle semester für das ausbildungssemester holen
             // Semester wo Unterbrecher nicht holen
@@ -595,7 +595,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$semester_kurzbz = 'Winter Semester '.$year.'/'.$helpyear;
 			}
 
-            $sqlStudent = new student($uid_arr[$i]);
+            $sqlStudent = new student($uid_arr[$i]);	// TODO EINE
 
 			echo "   <semesterKurzbz>Semester $start | $semester_kurzbz</semesterKurzbz>";
 
@@ -747,7 +747,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					}
                     $arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['lehrform_kurzbz']= $lehrform_kurzbz;
 //					echo "   <lehrform_kurzbz>$lehrform_kurzbz</lehrform_kurzbz>";
-					$student = new student($uid_arr[$i]);
+					$student = new student($uid_arr[$i]);	// TODO EINE
 					//  hole benotungsdatum von aktueller LV
 					$qry_benotung = "SELECT benotungsdatum FROM
 					lehre.tbl_zeugnisnote WHERE lehrveranstaltung_id = ".$db->db_add_param($row_stud->lehrveranstaltung_id)."
@@ -768,7 +768,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                     $bezeichnung_englisch = $row_stud->bezeichnung_english;
                     $bezeichnung = $row_stud->bezeichnung;
 
-					if(!$student = new student($uid_arr[$i]))
+					if(!$student = new student($uid_arr[$i]))	// TODO EINE
 						die("Student nicht gefunden");
 
                     // Check ob Lehrveranstaltung ein Praktikum mit eingetragener Firma besitzt
@@ -794,7 +794,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                         }
                     }
 
-							if(!$student = new student($uid_arr[$i]))
+							if(!$student = new student($uid_arr[$i]))	// TODO EINE
 								die("Student nicht gefunden");
 
                     // Check ob an Lehrveranstaltung eine Thesis hängt
@@ -876,7 +876,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                         </lv>';
                 }
 
-							if(!$student = new student($uid_arr[$i]))
+							if(!$student = new student($uid_arr[$i]))	// TODO EINE
 								die("Student nicht gefunden");
 
                 // Ist er Outgoing in diesem semester
@@ -896,7 +896,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                             $note_outgoing = 'ar';
                             $benotungsdatum_outgoing = '';
                             $lehrform_kurzbz_outgoing = '';
-														$student = new student($uid_arr[$i]);
+														$student = new student($uid_arr[$i]);	// TODO EINE
 
                             $qry_outgoing_note = "SELECT anmerkung, benotungsdatum, lehrform_kurzbz
                                 FROM lehre.tbl_zeugnisnote

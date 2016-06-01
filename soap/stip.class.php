@@ -486,8 +486,6 @@ class stip extends basis_db
 	 */
 	public function getErfolg($prestudent_id, $studiensemester_kurzbz)
 	{
-		$student = new student();
-
 		$noten = new note();
 		$noten->getAll();
 

@@ -48,7 +48,7 @@ if(isset($_GET['uid']))
 	//Rechte Pruefen
 	$allowed=false;
 	
-	$student = new student();
+	$student = new student();		// TODO EINE
 	if(!$student->load($uid))
 		die($p->t('global/fehlerBeimErmittelnDerUID'));
 	
@@ -90,7 +90,7 @@ $htmlstr1 = '';
 $vorname='';
 $nachname='';
 
-if(!$student = new student($uid))
+if(!$student = new student($uid))	// TODO EINE
 	die("Student nicht gefunden");
 
 $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tbl_projektbetreuer.person_id) AS bnachname,

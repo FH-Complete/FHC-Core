@@ -316,7 +316,7 @@ class lehrstunde extends basis_db
 			if(!isset($this->ssnext))
 				$this->ssnext = $this->ss;
 
-			if(!$student = new student($uid))
+			if(!$student = new student($uid))	// TODO EINE
 				$this->errormsg = $student->errormsg;
 
 

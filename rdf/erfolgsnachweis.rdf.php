@@ -76,10 +76,10 @@ $lehrveranstaltungen = array();
 	
 	$xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>";
 	$xml .= "<zeugnisse>";
-	
+
 	foreach($uid_arr as $uid)
-	{	
-		$student = new student();
+	{
+		$student = new student();// TODO EINE in der query weiter unten sollte prestudent_id nicht eindeutig sein!
 		if(!$student->load($uid))
 			die($student->errormsg);
 		

@@ -113,7 +113,7 @@ $betreuer = $person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$pe
 
 if($uid!=$user)
 {
-	$student = new student();
+	$student = new student();	// TODO EINE
 	if(!$student->load($uid))
 		die($p->t('global/userNichtGefunden'));
 	
@@ -157,7 +157,7 @@ if($uid!=$user)
 }	
 else
 {
-	$student = new student($uid);
+	$student = new student($uid); // TODO EINE
 
 	if($student->prestudent_id!=$projektarbeit_obj->prestudent_id)
 		die('Sie haben keine Berechtigung fuer diese Seite');

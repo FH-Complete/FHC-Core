@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Andreas Oesterreicher <oesi@technikum-wien.at>
+ * Authors: Andreas Oesterreicher <oesi@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/rdf.class.php');
@@ -42,7 +43,7 @@ $datum_obj = new datum();
 
 $oRdf = new rdf('ANWESENHEIT','http://www.technikum-wien.at/anwesenheit');
 
-$student_uid = filter_input(INPUT_GET,'student_uid');
+$prestudent_id = filter_input(INPUT_GET,'prestudent_id');
 $lehrveranstaltung_id = filter_input(INPUT_GET,'lehrveranstaltung_id');
 $studiensemester_kurzbz = filter_input(INPUT_GET,'studiensemester_kurzbz');
 if($studiensemester_kurzbz=='')
@@ -52,10 +53,13 @@ $oRdf->sendHeader();
 $db = new basis_db();
 
 $anwesenheit = new anwesenheit();
-if($student_uid!='')
-	$anwesenheit->loadAnwesenheitStudiensemester($studiensemester_kurzbz, $student_uid);
+if(is_numeric($prestudent_id))
+	$anwesenheit->loadAnwesenheitStudiensemester($studiensemester_kurzbz, $prestudent_id);
 elseif($lehrveranstaltung_id!='')
+{
 	$anwesenheit->loadAnwesenheitStudiensemester($studiensemester_kurzbz,null,$lehrveranstaltung_id);
+	var_dump("TODO EINE");// TODO EINE TOTEST!
+}
 
 $i=0;
 if(isset($anwesenheit->result) && is_array($anwesenheit->result))

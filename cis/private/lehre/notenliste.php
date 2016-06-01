@@ -173,7 +173,7 @@ else
     else
         $sqlFilter = "";
 
-		$student = new student($user);
+		$student = new student($user);	// TODO EINE
 
     $qry = "SELECT
 				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_zeugnisnote.note, tbl_zeugnisnote.punkte,
@@ -265,7 +265,7 @@ else
 
 			$tbl .= '<td>'.$datum_obj->formatDatum($row->benotungsdatum,'d.m.Y').'</td>';
 
-			$student = new student($user);
+			$student = new student($user);	// TODO EINE
 			$pruefung = new pruefung();
 			$pruefung->getPruefungen($student->prestudent_id, null,$row->lehrveranstaltung_id,$stsem);
 

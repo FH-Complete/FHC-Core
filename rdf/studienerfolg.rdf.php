@@ -70,7 +70,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 
 	$studiensemester = new studiensemester();
 	$studiensemester_aktuell = $studiensemester->getNearest();
-	$student = new student();
+	$student = new student();	// TODO EINE
 	$student->load($uid);
 	$prestudentstatus = new prestudent();
 	$prestudentstatus->getLastStatus($student->prestudent_id,'','Student');

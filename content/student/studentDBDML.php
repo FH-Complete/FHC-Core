@@ -158,23 +158,23 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 /**
  * Wenn die Anwesenheit und einen bestimmten Prozentsatz faellt, wird ein Pruefungstermin abgezogen
  * @param $studiensemester_kurzbz
- * @param $student_uid
+ * @param $prestudent_id
  * @param $lehrveranstaltung_id
  * @param $note
  * @return null, error wird direkt in globale Variable geschrieben
  */
-function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $note)
+function NotePruefungAnlegen($studiensemester_kurzbz, $prestudent_id, $lehrveranstaltung_id, $note)
 {
 	global $return, $error, $errormsg;
 
 	$db = new basis_db();
 	$anwesenheit = new anwesenheit();
-	$anwesenheit->loadAnwesenheitStudiensemester($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id);
+	$anwesenheit->loadAnwesenheitStudiensemester($studiensemester_kurzbz, $prestudent_id, $lehrveranstaltung_id);
 
 	// Lehreinheit ermitteln
 	$error = false;
 	$qry = "SELECT lehreinheit_id FROM campus.vw_student_lehrveranstaltung "
-		. "WHERE uid=".$db->db_add_param($student_uid)." AND lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id)." "
+		. "WHERE prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER)." AND lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id)." "
 		. "ORDER BY lehreinheit_id ASC "
 		. "LIMIT 1";
 
@@ -209,9 +209,10 @@ function NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranst
 		$stsem_obj = new studiensemester();
 		$stsem_obj->load($studiensemester_kurzbz);
 
+		$prestudent = new prestudent($prestudent_id);
 		// In Benutzerfunktion nachsehen ob eine Anwesenheitsbefreiung eingetragen ist
 		$benutzerfunktion = new benutzerfunktion();
-		$benutzerfunktion->getBenutzerFunktionByUid($student_uid, 'awbefreit', $stsem_obj->start, $stsem_obj->ende);
+		$benutzerfunktion->getBenutzerFunktionByUid($prestudent->uid, 'awbefreit', $stsem_obj->start, $stsem_obj->ende);
 
 		$anwesenheitsbefreit=false;
 		if(count($benutzerfunktion->result)>0)
@@ -398,7 +399,7 @@ if(!$error)
 
 								if(count($prestudentobj->result)>0)
 								{
-									$tmpStudent = new student($_POST['uid']);
+									$tmpStudent = new student($_POST['uid']);	// TODO EINE
 
 									if($student_lvb->studentlehrverband_exists($tmpStudent->prestudent_id, $semester_aktuell))
 										$student_lvb->new = false;
@@ -877,7 +878,7 @@ if(!$error)
 										if($_POST['status_kurzbz']=='Student')
 										{
 											$student = new student();
-											$uid = $student->getUid($prestudent_id);
+											$uid = $student->getUid($prestudent_id);//TODO EINE
 											$student->load($uid);
 											$student->studiensemester_kurzbz=$semester_aktuell;
 											$student->semester = $_POST['semester'];
@@ -900,7 +901,7 @@ if(!$error)
 										if($_POST['status_kurzbz']=='Abbrecher' || $_POST['status_kurzbz']=='Absolvent')
 										{
 											$student = new student();
-											$uid = $student->getUid($prestudent_id);
+											$uid = $student->getUid($prestudent_id);//TODO EINE
 
 											$benutzer = new benutzer();
 											if($benutzer->load($uid))
@@ -2744,7 +2745,7 @@ if(!$error)
 
 					if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $return == true && $noten->new == true)
 					{
-						NotePruefungAnlegen($studiensemester_kurzbz, $student_uid, $lehrveranstaltung_id, $noten->note);
+						NotePruefungAnlegen($studiensemester_kurzbz, $prestudent_id, $lehrveranstaltung_id, $noten->note);
 					}
 				}
 			}
@@ -2790,7 +2791,7 @@ if(!$error)
 				$errormsg = 'Fehler beim Ermitteln der LVA';
 			}
 
-			$qry = "SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($_POST['prestudent_id'.$i]);
+			$qry = "SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($_POST['prestudent_id_'.$i]);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2821,9 +2822,9 @@ if(!$error)
 				}
 				else
 				{
-					if($lvgesamtnote->load($_POST['lehrveranstaltung_id_'.$i], $_POST['prestudent_id'.$i], $_POST['studiensemester_kurzbz_'.$i]))
+					if($lvgesamtnote->load($_POST['lehrveranstaltung_id_'.$i], $_POST['prestudent_id_'.$i], $_POST['studiensemester_kurzbz_'.$i]))
 					{
-						if($zeugnisnote->load($_POST['lehrveranstaltung_id_'.$i], $_POST['prestudent_id'.$i], $_POST['studiensemester_kurzbz_'.$i]))
+						if($zeugnisnote->load($_POST['lehrveranstaltung_id_'.$i], $_POST['prestudent_id_'.$i], $_POST['studiensemester_kurzbz_'.$i]))
 						{
 							$zeugnisnote->new = false;
 							$zeugnisnote->updateamum = date('Y-m-d H:i:s');
@@ -2841,7 +2842,7 @@ if(!$error)
 							$zeugnisnote->insertamum = date('Y-m-d H:i:s');
 							$zeugnisnote->insertvon = $user;
 							$zeugnisnote->lehrveranstaltung_id = $_POST['lehrveranstaltung_id_'.$i];
-							$zeugnisnote->prestudent_id = $_POST['prestudent_id'.$i];
+							$zeugnisnote->prestudent_id = $_POST['prestudent_id_'.$i];
 							$zeugnisnote->studiensemester_kurzbz = $_POST['studiensemester_kurzbz_'.$i];
 						}
 
@@ -3018,7 +3019,7 @@ if(!$error)
 							{
 								if(defined('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN') && FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN && $zeugnisnote->new == true)
 								{
-									NotePruefungAnlegen($semester_aktuell, $uid, $_POST['lehrveranstaltung_id'], $zeugnisnote->note);
+									NotePruefungAnlegen($semester_aktuell, $prestudent_id, $_POST['lehrveranstaltung_id'], $zeugnisnote->note);
 								}
 							}
 						}

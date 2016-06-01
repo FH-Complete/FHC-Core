@@ -233,7 +233,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "\n		<ort_datum>Wien, am ".$datum_aktuell."</ort_datum>";
 
-		$student = new student($uid_arr[$i]);
+		$student = new student($uid_arr[$i]);	// TODO EINE
 
 		$obj = new zeugnisnote();
 		$obj->load($lehrveranstaltung_id, $student->prestudent_id, $studiensemester_kurzbz);

@@ -592,7 +592,7 @@ class lvregel extends basis_db
 				// Ausbildungssemester wird nur beim 1. durchlauf ermittelt
 				if(!isset($this->cache[$prestudent_id]) && !isset($this->cache[$prestudent_id][$studiensemester_kurzbz]))
 				{
-					$student = new student($prestudent_id);
+					$student = new student($prestudent_id); // TODO EINE
 
 					// Ausbildungssemester aus dem Status holen
 					$prestudent = new prestudent();

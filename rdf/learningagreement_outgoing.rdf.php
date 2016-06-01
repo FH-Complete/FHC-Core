@@ -59,7 +59,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
     $preoutgoingFirma = new preoutgoing(); 
     $preoutgoingFirma->loadAuswahl($preoutgoing_id);
     $preoutgoing_firma = $preoutgoingFirma->firma_id;
-    $prestudent->getLastStatus($student->prestudent_id);
+    $prestudent->getLastStatus($student->prestudent_id);		// TODO EINE NICHT EINDEUTIG
     
     $firma = new firma(); 
     $nation = new nation();

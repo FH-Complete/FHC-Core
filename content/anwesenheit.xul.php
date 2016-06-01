@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
@@ -30,14 +31,14 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>';
 
-$student_uid = filter_input(INPUT_GET,'student_uid');
+$prestudent_id = filter_input(INPUT_GET,'prestudent_id');
 $lehrveranstaltung_id= filter_input(INPUT_GET,'lehrveranstaltung_id');
-        
+
 ?>
 
 <window id="anwesenheit-window" title="anwesenheit"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        onload="loadanwesenheit('<?php echo $student_uid;?>','<?php echo $lehrveranstaltung_id;?>');">
+        onload="loadanwesenheit('<?php echo $prestudent_id;?>','<?php echo $lehrveranstaltung_id;?>');">
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/anwesenheit.js.php" />
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />

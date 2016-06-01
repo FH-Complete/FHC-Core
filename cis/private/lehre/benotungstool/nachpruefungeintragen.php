@@ -175,7 +175,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 			$termin1 = 1;
 		else
 		{
-			$student = new student($student_uid);
+			$student = new student($student_uid);	// TODO EINE
 			$lvnote = new lvgesamtnote();
 			if ($lvnote->load($lvid, $student->prestudent_id, $stsem))
 			{
@@ -255,7 +255,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 
 	$lvid = $_REQUEST["lvid"];
 
-	$student = new student($student_uid);
+	$student = new student($student_uid);// TODO EINE
 	$lvgesamtnote = new lvgesamtnote();
 	if (!$lvgesamtnote->load($lvid, $student->prestudent_id, $stsem))
 	{

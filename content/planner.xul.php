@@ -60,7 +60,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/planner.js.php" />
 <script type="application/x-javascript" src="chrome://global/content/nsTransferable.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
-<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jquery.js"></script>
+<?php require_once("../include/meta/jquery.php"); ?>
 <script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqSOAPClient.js"></script>
 <script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqXMLUtils.js"></script>
 

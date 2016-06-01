@@ -238,7 +238,7 @@ if(isset($_POST['action']) && $_POST['action']=='anmeldung')
 $db = new basis_db();
 $datum_obj = new datum();
 // Student Laden
-$student = new student();
+$student = new student();	// TODO EINE
 $student->load($uid);
 
 // ersten Status holen
@@ -415,7 +415,7 @@ function drawTree($tree, $depth)
 		$lvregel = new lvregel();
 		if($lvregel->exists($row_tree->studienplan_lehrveranstaltung_id))
 		{
-			$student = new student($uid);
+			$student = new student($uid);	// TODO EINE
 			if($lvregel->isAbgeschlossen($student->prestudent_id, $row_tree->studienplan_lehrveranstaltung_id))
 				$abgeschlossen=true;
 			else
@@ -579,7 +579,7 @@ function drawTree($tree, $depth)
 				}
 				else
 				{
-					$student = new student($uid);
+					$student = new student($uid);// TODO EINE
 					if(!$lvregel->isZugangsberechtigt($student->prestudent_id, $row_tree->studienplan_lehrveranstaltung_id, $stsem))
 					{
 						$regelerfuellt=false;

@@ -1868,6 +1868,72 @@ class prestudent extends person
 		}
 	}
 
+
+
+	/**
+	 * Laden aller Prestudenten zu einer UID
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function getPrestudentsFromUid($uid)
+	{
+		if(!isset($uid) || $uid == "")
+		{
+			$this->errormsg = "Diese UID ist ungueltig";
+			return false;
+		}
+
+		$qry='SELECT prestudent_id FROM public.tbl_prestudent WHERE uid='.$this->db_add_param($uid);
+
+
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Laden der Prestudenten';
+			return false;
+		}
+
+		while($row = $this->db_fetch_object())
+		{
+			$ps=new prestudent($row->prestudent_id);
+			$this->result[]=$ps;
+		}
+		return true;
+	}
+
+	public function statusExists($prestudent_id, $studiensemester_kurzbz, $status_kurzbz = null)
+	{
+		if(!isset($studiensemester_kurzbz) && $studiensemester_kurzbz == "")
+		{
+			$this->errormsg = "studiensemester_kurzbz ist ungueltig";
+			return false;
+		}
+
+		$qry = "SELECT status_kurzbz FROM tbl_prestudentstatus
+			WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)."
+			AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+
+		if(isset($status_kurzbz))
+			$qry .= " AND status_kurzbz=".$this->db_add_param($status_kurzbz);
+
+		if($res = $this->db_query($qry))
+		{
+			if($row = $this->db_num_rows($res) > 0)
+			{
+				return true;
+			}
+			else
+			{
+				$this->errormsg = "Es wurde kein Status gefunden";
+				return false;
+			}
+		}
+
+		$this->errormsg = "Fehler bei der Datenabfrage";
+		return false;
+	}
+
+
+
+
 	/**
 	 * Laedt die Rolle
 	 *

@@ -489,7 +489,7 @@ function StudentProjektarbeitSpeichern()
 	prestudent_id =document.getElementById('student-detail-textbox-prestudent_id').value;
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	
-	if(!parseInt(prestudent_id))
+	if(parseInt(prestudent_id) !== false)
 	{
 		alert('prestudent_id dieser Person konnte nicht ermittelt werden');
 		return false;

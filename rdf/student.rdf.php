@@ -403,7 +403,7 @@ if($xmlformat=='rdf')
 
 	if(isset($uid))
 	{
-		$student=new student();
+		$student=new student();	// TODO EINE eindeutig?
 		$student->load($uid, $studiensemester_kurzbz);
 		$prestd = new prestudent();
 

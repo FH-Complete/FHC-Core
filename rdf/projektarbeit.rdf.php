@@ -53,7 +53,7 @@ $projektarbeit = new projektarbeit();
 if(isset($_GET['student_uid']))
 {
 
-	$student = new student($_GET['student_uid']);
+	$student = new student($_GET['student_uid']);	// TODO EINE
 
 	$projektarbeit->getProjektarbeit($student->prestudent_id);
 	
