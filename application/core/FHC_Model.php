@@ -11,11 +11,19 @@ class FHC_Model extends CI_Model
 		$this->lang->load('fhc_model');
 		$this->lang->load('fhcomplete');
 		
-		$uid = NULL;
-		if (is_null($uid) && isset($this->session->uid))
+		$uid = null;
+		
+		// Get UID from CI session
+		if(isset($this->session->uid))
 		{
 			$uid = $this->session->uid;
 		}
+		// Get UID from the environment (HTTP authentication via authentication.class.php)
+		else if(isset($_SERVER['PHP_AUTH_USER']))
+		{
+			$uid = $_SERVER['PHP_AUTH_USER'];
+		}
+		
 		$this->load->library('FHC_DB_ACL', array('uid' => $uid));
 	}
 

@@ -92,18 +92,18 @@ class person extends Person_model
 		//person_id auf gueltigkeit pruefen
 		if (is_numeric($personId) && $personId != '')
 		{
-			$result = $this->getPerson($personId);
+			$result = parent::load($personId);
 			
-			if (!is_object($result))
+			if (!is_object($result) || (is_object($result) && $result->error != EXIT_SUCCESS))
 			{
 				$this->errormsg = "Fehler beim Lesen der Personendaten\n";
 				return false;
 			}
-
-			$row = $result->row();
 			
-			if (isset($row))
+			if(is_array($result->retval) && count($result->retval) == 1)
 			{
+				$row = $result->retval[0];
+				
 				$this->person_id = $row->person_id;
 				$this->sprache = $row->sprache;
 				$this->anrede = $row->anrede;

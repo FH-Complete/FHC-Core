@@ -1,5 +1,7 @@
 <?php
 
+// TO BE UPDATED
+
 /* 
  * This class requires only DB functionalities from CI
  * CI_Hack couldn't be included here because this class is called every time an addon

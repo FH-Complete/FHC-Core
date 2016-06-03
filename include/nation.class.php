@@ -70,17 +70,19 @@ class nation extends Nation_model
 	public function load($code)
 	{
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM bis.tbl_nation WHERE nation_code=".$this->db_add_param($code).';';
+		$result = parent::loadWhere(array('nation_code' => $code));
 		
-		if(!$this->db_query($qry))
+		if (!is_object($result) || (is_object($result) && $result->error != EXIT_SUCCESS))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
 			return false;
 		}
 
-		if($row = $this->db_fetch_object())
+		if(is_array($result->retval) && count($result->retval) == 1)
 		{
 			$this->code = $code;
+			
+			$row = $result->retval[0];
 
 			$this->sperre = $this->db_parse_bool($row->sperre);
 			$this->kontinent = $row->kontinent;
@@ -104,19 +106,40 @@ class nation extends Nation_model
 	 * @param ohnesperre wenn dieser Parameter auf true gesetzt ist werden
 	 *        nur die nationen geliefert dessen Buerger bei uns studieren duerfen
 	 */
-	public function getAll($ohnesperre=false, $orderEnglish=false)
+	public function getAll($ohnesperre = false, $orderEnglish = false)
 	{
 		//Lesen der Daten aus der Datenbank
-        $qry = $this->_getNationQuery($ohnesperre, $orderEnglish);
+        if (!$orderEnglish)
+		{
+			$result = parent::addOrder('kurztext');
+		}
+		else
+		{
+			$result = parent::addOrder('engltext');
+		}
+		
+		if ($result->error == EXIT_SUCCESS)
+		{
+			if ($ohnesperre)
+			{
+				$result = parent::loadWhere('sperre IS NULL');
+			}
+			else
+			{
+				$result = parent::loadWhole();
+			}
+		}
 			
-		if(!$this->db_query($qry))
+		if (!is_object($result) || (is_object($result) && ($result->error != EXIT_SUCCESS || !is_array($result->retval))))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
 			return false;
 		}
 
-		while($row = $this->db_fetch_object())
+		for ($i = 0; $i < count($result->retval); $i++)
 		{
+			$row = $result->retval[$i];
+			
 			$nation = new nation();
 
 			$nation->code = $row->nation_code;

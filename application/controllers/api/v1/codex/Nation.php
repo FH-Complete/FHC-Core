@@ -28,6 +28,22 @@ class Nation extends APIv1_Controller
 		$this->NationModel->setUID($this->_getUID());
 	}
 	
+	public function getNation()
+    {
+		$nation_code = $this->get("nation_code");
+		
+		if (isset($nation_code))
+		{
+			$result = $this->NationModel->loadWhere(array('nation_code' => $nation_code));
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+    }
+	
 	public function getAll()
 	{
 		if (!$this->get('orderEnglish'))

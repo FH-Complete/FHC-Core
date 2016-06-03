@@ -15,7 +15,7 @@ class Person_model extends DB_Model
 	/**
 	 * 
 	 */
-	public function checkBewerbung($email, $studiensemester_kurzbz = NULL)
+	public function checkBewerbung($email, $studiensemester_kurzbz = null)
 	{
 		// Checks if the operation is permitted by the API caller
 		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_person'], 's'))
@@ -33,9 +33,9 @@ class Person_model extends DB_Model
 		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_prestudentstatus'], 's'))
 			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_prestudentstatus'], FHC_MODEL_ERROR);
 		
-		$result = NULL;
+		$result = null;
 		
-		if(is_null($studiensemester_kurzbz))
+		if (is_null($studiensemester_kurzbz))
 		{
 			$checkBewerbungQuery = "SELECT DISTINCT p.person_id, p.zugangscode, p.insertamum
  									  FROM public.tbl_person p JOIN public.tbl_kontakt k ON p.person_id = k.person_id
@@ -63,7 +63,7 @@ class Person_model extends DB_Model
 			$result = $this->db->query($checkBewerbungQuery, array($email, $email, $email, $studiensemester_kurzbz));
 		}
 		
-		if(is_object($result))
+		if (is_object($result))
 			return $this->_success($result->result());
 		else
 			return $this->_error($this->db->error(), FHC_DB_ERROR);

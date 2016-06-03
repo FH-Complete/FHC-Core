@@ -59,30 +59,34 @@ class studiensemester extends Studiensemester_model
 	 */
 	public function load($studiensemester_kurzbz)
 	{
-		$qry = "SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+		$result = parent::load($studiensemester_kurzbz);
+			
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
+		{
+			if (count($result->retval) > 0)
+			{
+				$row = $result->retval[0];
+				
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->start = $row->start;
+				$this->ende = $row->ende;
+				$this->bezeichnung = $row->bezeichnung;
+				$this->studienjahr_kurzbz = $row->studienjahr_kurzbz;
+				$this->beschreibung = $row->beschreibung;
 
-		if(!$this->db_query($qry))
+				return true;
+			}
+			else
+			{
+				$this->errormsg = "Es ist kein Studiensemester mit dieser Kurzbezeichung vorhanden";
+				return false;
+			}
+		}
+		else
 		{
 			$this->errormsg = 'Fehler beim Lesen des Studiensemesters';
 			return false;
 		}
-
-		if($row = $this->db_fetch_object())
-		{
-			$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
-			$this->start = $row->start;
-			$this->ende = $row->ende;
-			$this->bezeichnung = $row->bezeichnung;
-			$this->studienjahr_kurzbz = $row->studienjahr_kurzbz;
-			$this->beschreibung = $row->beschreibung;
-		}
-		else
-		{
-			$this->errormsg = "Es ist kein Studiensemester mit dieser Kurzbezeichung vorhanden";
-			return false;
-		}
-
-		return true;
 	}
 
 	/**
@@ -158,22 +162,23 @@ class studiensemester extends Studiensemester_model
 	 */
 	public function getakt()
 	{
-		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start <= now() AND ende >= now()";
+		$result = parent::loadWhere(array('start <=' => 'NOW()', 'ende >=' => 'NOW()'));
 
-		if(!$this->db_query($qry))
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
 		{
-			$this->errormsg = $this->db_last_error();
-			return false;
-		}
-
-		if($this->db_num_rows()>0)
-		{
-		   $erg = $this->db_fetch_object();
-		   return $erg->studiensemester_kurzbz;
+			if (count($result->retval) > 0)
+			{
+			   return $result->retval[0]->studiensemester_kurzbz;
+			}
+			else
+			{
+				$this->errormsg = "Kein aktuelles Studiensemester vorhanden";
+				return false;
+			}
 		}
 		else
 		{
-			$this->errormsg = "Kein aktuelles Studiensemester vorhanden";
+			$this->errormsg = $result->msg;
 			return false;
 		}
 	}
@@ -210,38 +215,50 @@ class studiensemester extends Studiensemester_model
 	 *                  geliefert die in dieses semester fallen (Bei geradem semester nur SS sonst WS)
 	 * @return Studiensemester oder false wenn es keines gibt
 	 */
-	public function getaktorNext($semester='')
+	public function getaktorNext($semester = '')
 	{
-		if(($stsem=$this->getakt()) && $semester=='')
-			return $stsem;
+		if (($result = $this->getakt()) && !is_numeric($semester))
+		{
+			return $result;
+		}
 		else
 		{
-			$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE true";
-
-			if($semester!='')
+			parent::addOrder('ende');
+			parent::addLimit(1);
+			
+			$whereArray = array('ende >=' => 'NOW()');
+			
+			if (is_numeric($semester))
 			{
-				if($semester%2==0)
-					$ss='SS';
+				if ($semester %2 == 0)
+				{
+					$ss = 'SS';
+				}
 				else
-					$ss='WS';
+				{
+					$ss = 'WS';
+				}
 
-				$qry.= " AND substring(studiensemester_kurzbz from 1 for 2)='$ss' ";
+				$whereArray['SUBSTRING(studiensemester_kurzbz FROM 1 FOR 2) ='] = $ss;
 			}
-			$qry.= " AND ende >= now() ORDER BY ende LIMIT 1";
-
-			if(!$this->db_query($qry))
+			
+			$result = parent::loadWhere($whereArray);
+			
+			if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
 			{
-				$this->errormsg = $this->db_last_error();
-				return false;
-			}
-
-			if($erg = $this->db_fetch_object())
-			{
-				return $erg->studiensemester_kurzbz;
+				if (count($result->retval) > 0)
+				{
+				   return $result->retval[0]->studiensemester_kurzbz;
+				}
+				else
+				{
+					$this->errormsg = "Kein aktuelles Studiensemester vorhanden";
+					return false;
+				}
 			}
 			else
 			{
-				$this->errormsg = "Kein aktuelles Studiensemester vorhanden";
+				$this->errormsg = $result->msg;
 				return false;
 			}
 		}
@@ -254,36 +271,31 @@ class studiensemester extends Studiensemester_model
 	 *                  geliefert die in dieses semester fallen (Bei geradem semester nur SS sonst WS)
 	 * @return Studiensemester oder false wenn es keines gibt
 	 */
-	public function getNearest($semester='')
+	public function getNearest($semester = '')
 	{
-		$qry = "SELECT studiensemester_kurzbz, start, ende FROM public.vw_studiensemester ";
-		if($semester!='')
+		$result = parent::getNearest($semester);
+
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
 		{
-			if($semester%2==0)
-				$ss='SS';
+			if(count($result->retval) > 0)
+			{
+				$row = $result->retval[0];
+				
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->start = $row->start;
+				$this->ende = $row->ende;
+				
+				return $row->studiensemester_kurzbz;
+			}
 			else
-				$ss='WS';
-
-			$qry.= " WHERE substring(studiensemester_kurzbz from 1 for 2)='$ss' ";
-		}
-		$qry.=' ORDER BY delta LIMIT 1';
-
-		if(!$this->db_query($qry))
-		{
-			$this->errormsg = $this->db_last_error();
-			return false;
-		}
-
-		if($erg = $this->db_fetch_object())
-		{
-			$this->studiensemester_kurzbz=$erg->studiensemester_kurzbz;
-			$this->start=$erg->start;
-			$this->ende=$erg->ende;
-			return $erg->studiensemester_kurzbz;
+			{
+				$this->errormsg = "Kein aktuelles Studiensemester vorhanden";
+				return false;
+			}
 		}
 		else
 		{
-			$this->errormsg = "Kein aktuelles Studiensemester vorhanden";
+			$this->errormsg = $this->db_last_error();
 			return false;
 		}
 	}
@@ -295,17 +307,25 @@ class studiensemester extends Studiensemester_model
 	 */
 	public function getAll($order = null)
 	{
-		$qry = "SELECT * FROM public.tbl_studiensemester ORDER BY ende";
-
-        if($order == "desc")
-            $qry .= " DESC";
-
-		if($this->db_query($qry))
+		if (strcasecmp($order, 'DESC') == 0)
 		{
-			while($row = $this->db_fetch_object())
-			{
-				$stsem_obj = new studiensemester();
+			parent::addOrder('ende', 'DESC');
+		}
+		else
+		{
+			parent::addOrder('ende', 'ASC');
+		}
+		
+		$result = parent::loadWhole();
 
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
+		{
+			for ($i = 0; $i < count($result->retval); $i++)
+			{
+				$row = $result->retval[$i];
+				
+				$stsem_obj = new studiensemester();
+				
 				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$stsem_obj->start = $row->start;
 				$stsem_obj->ende = $row->ende;
@@ -331,34 +351,47 @@ class studiensemester extends Studiensemester_model
 	 *             Wenn art=SS dann wird das naechste Sommersemester geliefert
 	 * @return true wenn ok, false wenn kein entsprechendes vorhanden ist
 	 */
-	public function getNextStudiensemester($art='')
+	public function getNextStudiensemester($art = '')
 	{
-		$qry = "SELECT * FROM public.tbl_studiensemester WHERE start>now() ";
+		parent::addOrder('start');
+		parent::addLimit(1);
+				
+		if (isset($art))
+		{
+			$result = parent::loadWhere(
+				array('start >' => 'NOW()',
+						'SUBSTRING(studiensemester_kurzbz FROM 1 FOR 2) = ' => $art
+				)
+			);
+		}
+		else
+		{
+			$result = parent::loadWhere(array('start >' => 'NOW()'));
+		}
 
-		if($art!='')
-			$qry.= " AND substring(studiensemester_kurzbz from 1 for 2)=".$this->db_add_param($art);
-
-		$qry.=" ORDER BY start LIMIT 1";
-
-		if(!$this->db_query($qry))
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
+		{
+			if (count($result->retval) > 0)
+			{
+				$row = $result->retval[0];
+				
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->start = $row->start;
+				$this->ende = $row->ende;
+				
+				return true;
+			}
+			else
+			{
+				$this->errormsg = "Es wurde kein entsprechendes Studiensemester gefunden";
+				return false;
+			}
+		}
+		else
 		{
 			$this->errormsg = 'Fehler beim Lesen des Studiensemesters';
 			return false;
 		}
-
-		if($row = $this->db_fetch_object())
-		{
-			$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
-			$this->start = $row->start;
-			$this->ende = $row->ende;
-		}
-		else
-		{
-			$this->errormsg = "Es wurde kein entsprechendes Studiensemester gefunden";
-			return false;
-		}
-
-		return true;
 	}
 
 	/**
@@ -413,13 +446,16 @@ class studiensemester extends Studiensemester_model
 	 */
 	public function getPrevious()
 	{
-		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende<now() ORDER BY ende DESC LIMIT 1";
+		parent::addOrder('ende', 'DESC');
+		parent::addLimit(1);
+		
+		$result = parent::loadWhere(array('ende <' => 'NOW()'));
 
-		if($this->db_query($qry))
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
 		{
-			if($row = $this->db_fetch_object())
+			if (count($result->retval) > 0)
 			{
-				return $row->studiensemester_kurzbz;
+				return $result->retval[0]->studiensemester_kurzbz;
 			}
 			else
 			{
@@ -510,18 +546,18 @@ class studiensemester extends Studiensemester_model
 	 */
 	public function getNextFrom($studiensemester_kurzbz)
 	{
-		$qry = "SELECT studiensemester_kurzbz, start, ende FROM public.tbl_studiensemester
-				WHERE start>(SELECT ende FROM public.tbl_studiensemester
-				            WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz).")
-		        ORDER BY start LIMIT 1";
+		$result = parent::getNextFrom($studiensemester_kurzbz);
 
-		if($this->db_query($qry))
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
 		{
-			if($row = $this->db_fetch_object())
+			if (count($result->retval) > 0)
 			{
+				$row = $result->retval[0];
+				
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$this->start = $row->start;
 				$this->ende = $row->ende;
+				
 				return $row->studiensemester_kurzbz;
 			}
 			else
@@ -633,24 +669,28 @@ class studiensemester extends Studiensemester_model
 	 * @param limit maximale Anzahl
 	 * @return true wenn ok, sonst false
 	 */
-	public function getFinished($limit=null)
+	public function getFinished($limit = null)
 	{
-		$qry = "SELECT * FROM public.tbl_studiensemester where start<=now() ORDER BY ende DESC";
-		if(!is_null($limit) && is_numeric($limit))
-			$qry.=' LIMIT '.$limit;
+		parent::addOrder('ende', 'DESC');
+		parent::addLimit($limit);
+		
+		$result = parent::loadWhere(array('start <=' => 'NOW()'));
 
-		if($this->db_query($qry))
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
 		{
-			while($row = $this->db_fetch_object())
+			for ($i = 0; $i < count($result->retval); $i++)
 			{
 				$stsem_obj = new studiensemester();
 
+				$row = $result->retval[$i];
+				
 				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$stsem_obj->start = $row->start;
 				$stsem_obj->ende = $row->ende;
 
 				$this->studiensemester[] = $stsem_obj;
 			}
+			
 			return true;
 		}
 		else
@@ -667,15 +707,15 @@ class studiensemester extends Studiensemester_model
 	 *
 	 * @return studiensemester_kurzbz oder false wenn keines vorhanden
 	 */
-	public function getLastOrAktSemester($days=60)
+	public function getLastOrAktSemester($days = 60)
 	{
-		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start<now()-'".$days." days'::interval ORDER BY start desc limit 1";
+		$result = parent::getLastOrAktSemester($days);
 
-		if($this->db_query($qry))
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
 		{
-			if($row = $this->db_fetch_object())
+			if (count($result->retval) > 0)
 			{
-				return $row->studiensemester_kurzbz;
+				return $result->retval[0]->studiensemester_kurzbz;
 			}
 			else
 			{
@@ -727,19 +767,32 @@ class studiensemester extends Studiensemester_model
 	 */
 	public function getTimestamp($studiensemester_kurzbz)
 	{
-		$qry = "SELECT start,ende,studiensemester_kurzbz FROM public.tbl_studiensemester
-				WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."";
+		$result = parent::load($studiensemester_kurzbz);
 
-		if($this->db_query($qry))
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
 		{
-			if($row = $this->db_fetch_object())
+			if (count($result->retval))
 			{
-				if(!isset($this->begin))
-					$this->begin=new stdclass();
-				$this->begin->start=mktime(0,0,0,mb_substr($row->start,5,2),mb_substr($row->start,8,2),mb_substr($row->start,0,4));
-				if(!isset($this->end))
-					$this->ende=new stdclass();
-				$this->ende->ende=mktime(0,0,0,mb_substr($row->ende,5,2),mb_substr($row->ende,8,2),mb_substr($row->ende,0,4));
+				$row = $result->retval[0];
+				
+				if (!isset($this->begin))
+					$this->begin = new stdclass();
+				
+				$this->begin->start = mktime(0, 0, 0,
+					mb_substr($row->start, 5, 2),
+					mb_substr($row->start, 8, 2),
+					mb_substr($row->start, 0, 4)
+				);
+				
+				if (!isset($this->end))
+					$this->ende = new stdclass();
+				
+				$this->ende->ende = mktime(0, 0, 0,
+					mb_substr($row->ende, 5, 2),
+					mb_substr($row->ende, 8, 2),
+					mb_substr($row->ende, 0, 4)
+				);
+				
 				return true;
 			}
 			else
