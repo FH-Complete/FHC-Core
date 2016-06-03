@@ -99,5 +99,9 @@ function getmax($val1,$val2)
 	return ($val1>$val2)?$val1:$val2;
 
 }
-require_once('../../../include/'.EXT_FKT_PATH.'/anwesenheitsliste_bilder.inc.php');
+if (file_exists('../../../addons/sfu-milano/include/'.EXT_FKT_PATH.'/anwesenheitsliste_bilder.inc.php'))
+	require_once('../../../addons/sfu-milano/include/'.EXT_FKT_PATH.'/anwesenheitsliste_bilder.inc.php');
+else
+	require_once('../../../include/'.EXT_FKT_PATH.'/anwesenheitsliste_bilder.inc.php');
+
 ?>

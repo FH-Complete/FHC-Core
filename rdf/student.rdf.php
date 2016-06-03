@@ -825,6 +825,10 @@ else
 			}
 			else
 				$stg_kz = sprintf("%04s", abs($student->studiengang_kz));
+			if (($semester % 2) == 0)
+				$studienjahr =  $semester/2;
+			else
+				$studienjahr = intval($semester/2)+1;
 
 			echo '
 			<student>
@@ -836,11 +840,14 @@ else
 				<vorname><![CDATA['.$student->vorname.']]></vorname>
 				<nachname><![CDATA['.$student->nachname.']]></nachname>
 				<matrikelnummer><![CDATA['.$student->perskz.']]></matrikelnummer>
+				<matr_nr><![CDATA['.$student->matr_nr.']]></matr_nr>
 				<geburtsdatum><![CDATA['.$datum_obj->convertISODate($student->gebdatum).']]></geburtsdatum>
 				<geburtsdatum_iso><![CDATA['.$student->gebdatum.']]></geburtsdatum_iso>
+				<geburtsort><![CDATA['.$student->gebort.']]></geburtsort>
 				<semester><![CDATA['.$semester.']]></semester>
 				<verband><![CDATA['.$student->verband.']]></verband>
 				<gruppe><![CDATA['.$student->gruppe.']]></gruppe>
+				<studienjahr><![CDATA['.$studienjahr.']]></studienjahr>
 				<student_orgform_kurzbz><![CDATA['.$prestudent->orgform_kurzbz.']]></student_orgform_kurzbz>
                 <student_orgform_bezeichnung><![CDATA['.$orgform_student_bezeichnung->bezeichnung.']]></student_orgform_bezeichnung>
 				<studiengang_kz><![CDATA['.$stg_kz.']]></studiengang_kz>
@@ -863,6 +870,7 @@ else
 				<studienbeginn_beginn><![CDATA['.$datum_obj->convertISODate($studienbeginn).']]></studienbeginn_beginn>
 				<studiensemester_beginn><![CDATA['.$studiensemester.']]></studiensemester_beginn>
 				<studiensemester_aktuell><![CDATA['.$stsem->studiensemester_kurzbz.']]></studiensemester_aktuell>
+				<studienjahr_kurzbz><![CDATA['.$stsem->studienjahr_kurzbz.']]></studienjahr_kurzbz>
 				<studiensemester_aktuell_bezeichnung><![CDATA['.$stsem->bezeichnung.']]></studiensemester_aktuell_bezeichnung>
 				<studienbeginn_aktuell><![CDATA['.$datum_obj->convertISODate($stsem->start).']]></studienbeginn_aktuell>
 				<tagesdatum><![CDATA['.date('d.m.Y').']]></tagesdatum>

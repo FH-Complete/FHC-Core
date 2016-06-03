@@ -374,6 +374,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
+			$lv_obj->bezeichnung_arr['Italian'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
 			if ($lv_obj->bezeichnung_arr['English'] == '')
 				$lv_obj->bezeichnung_arr['English'] = $lv_obj->bezeichnung_arr['German'];

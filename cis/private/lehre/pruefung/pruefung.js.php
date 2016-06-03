@@ -968,10 +968,17 @@ function loadPruefungStudiengang(studiengang_kz, studiensemester)
 				var liste = "";
 				data.result.forEach(function(e){
 					liste += "<ul><li>"+e.bezeichnung+"<ul>";
-					e.pruefung[0].termine.forEach(function(d){
-						liste += "<li> <a onclick='showAnmeldungen(\""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung_id+"\");'>"+convertDateTime(d.von)+" "+convertDateTime(d.von, "time")+" - "+convertDateTime(d.bis, "time")+"</a></li>";
-					});
-					liste += "</li></ul></ul>";
+					try
+					{
+						e.pruefung[0].termine.forEach(function(d){
+							liste += "<li> <a onclick='showAnmeldungen(\""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung_id+"\");'>"+convertDateTime(d.von)+" "+convertDateTime(d.von, "time")+" - "+convertDateTime(d.bis, "time")+"</a></li>";
+						});
+					}
+					catch(err)
+					{
+						var errmsg = err.message;
+					}
+					liste += "</ul></li></ul>";
 				});
 				$("#pruefungenListe").append(liste);
 			}

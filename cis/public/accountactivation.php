@@ -36,10 +36,10 @@ if(isset($_GET['sprache']))
 }
 
 $erfolgreichaktiviert=false;
-$sprache = getSprache(); 
+$sprache = getSprache();
 
 $p = new phrasen($sprache);
-$securimage = new Securimage(); 
+$securimage = new Securimage();
 $errormsg='';
 $db = new basis_db();
 
@@ -55,9 +55,9 @@ else
 
 
 if(isset($_POST['submit']))
-{    
-	// Captcha Pruefen    	
-	if ($securimage->check($_POST['captcha_code']) == true) 
+{
+	// Captcha Pruefen
+	if ($securimage->check($_POST['captcha_code']) == true)
 	{
 		// Benutzer laden
 		$benutzer = new benutzer();
@@ -68,7 +68,7 @@ if(isset($_POST['submit']))
 			{
 				$passwort = $_POST['passwort'];
 				$passwort2 = $_POST['passwort2'];
-				
+
 				// Vergleichen ob beide Passwoerter gleich sind
 				if($passwort==$passwort2)
 				{
@@ -89,22 +89,22 @@ if(isset($_POST['submit']))
 				}
 				else
 				{
-					$errormsg='Passwoerter stimmen nicht ueberein';
+					$errormsg = $p->t('passwort/NichtUebereinstimmend');
 				}
 			}
 			else
 			{
-				$errormsg='Code oder Username falsch';
+				$errormsg = $p->t('passwort/CodeOderUsernameFalsch');
 			}
 		}
 		else
 		{
-			$errormsg='Code oder Username falsch';
+			$errormsg = $p->t('passwort/CodeOderUsernameFalsch');
 		}
 	}
 	else
 	{
-    	$errormsg= 'Captcha Code falsch';
+    	$errormsg= $p->t('passwort/CaptchaCodeFalsch');
 	}
 }
 
@@ -118,7 +118,7 @@ echo '<!doctype html>
 
 		<script type="text/javascript">
 		function changeSprache(sprache)
-		{		
+		{
 			window.location.href="accountactivation.php?sprache="+sprache;
 		}
 		</script>
@@ -132,8 +132,8 @@ echo '<!doctype html>
 
 if($erfolgreichaktiviert)
 {
-	echo '<br><br><h1>Ihr Account wurde erfolgreich aktiviert</h1><br><br>
-	<a href="'.APP_ROOT.'">&gt;&gt; Weiter zum Login</a>';
+	echo '<br><br><h1>'.$p->t('passwort/AccountErfolgreichAktiviert').'</h1><br><br>
+	<a href="'.APP_ROOT.'">&gt;&gt; '.$p->t('passwort/WeiterZumLogin').'</a>';
 }
 else
 {
@@ -159,7 +159,7 @@ else
 	<br><br>';
 	if(!isset($_SERVER['HTTPS']) || (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='off'))
 	{
-	
+
 		$httpspath = str_replace('http://','https://',APP_ROOT).'cis/public/accountactivation.php';
 		echo '<div style="border: 2px solid red; text-align:center">'.$p->t('passwort/NoHttps').'<br>
 		<a href="'.$httpspath.'">'.$p->t('passwort/ZuHttpsWechseln').'</a></div><br>';

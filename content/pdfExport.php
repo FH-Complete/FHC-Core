@@ -186,7 +186,7 @@ if (isset($_GET['output']) && $_GET['output']!='pdf')
 	else
 		$output = $_GET['output'];
 }
-else 
+else
 	$output = 'pdf';
 
 
@@ -278,7 +278,7 @@ elseif(in_array($xsl,array('Ressource')))
 		exit;
 	}
 }
-elseif(in_array($xsl,array('Inskription','Studienerfolg','OutgoingLearning','OutgoingChangeL','LearningAgree','Zahlung')))
+elseif(in_array($xsl,array('Inskription','Studienerfolg','OutgoingLearning','OutgoingChangeL','LearningAgree','Zahlung','DichiaSost')))
 {
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
 	{

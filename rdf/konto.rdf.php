@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 // header fuer no cache
 header("Cache-Control: no-store, no-cache, must-revalidate");
@@ -31,6 +32,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/konto.class.php');
 require_once('../include/person.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/studiensemester.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/student.class.php');
@@ -204,13 +206,15 @@ elseif ($xmlformat=='xml')
 	{
 		global $datum, $btyp;
 		$rueckerstattung=false;
+		$stg = new studiensemester($row->studiensemester_kurzbz);
 
 		echo "
-  		<buchung>
+			<buchung>
 			<buchungsnr><![CDATA[".$row->buchungsnr."]]></buchungsnr>
 			<person_id><![CDATA[".$row->person_id."]]></person_id>
 			<studiengang_kz><![CDATA[".$row->studiengang_kz."]]></studiengang_kz>
 			<studiensemester_kurzbz><![CDATA[".$row->studiensemester_kurzbz."]]></studiensemester_kurzbz>
+			<studienjahr_kurzbz><![CDATA[".$stg->studienjahr_kurzbz."]]></studienjahr_kurzbz>
 			<buchungsnr_verweis><![CDATA[".$row->buchungsnr_verweis."]]></buchungsnr_verweis>
 			<betrag><![CDATA[".sprintf('%.2f',abs($row->betrag))."]]></betrag>";
 		if($row->buchungsnr_verweis!='')
@@ -275,6 +279,7 @@ elseif ($xmlformat=='xml')
 			<nachname><![CDATA[".$pers->nachname."]]></nachname>
 			<vorname><![CDATA[".$pers->vorname."]]></vorname>
 			<vornamen><![CDATA[".$pers->vornamen."]]></vornamen>
+			<matr_nr><![CDATA[".$pers->matr_nr."]]></matr_nr>
 			<name_gesamt><![CDATA[".trim($pers->anrede.' '.$pers->titelpre.' '.$pers->vorname.' '.$pers->nachname.' '.$pers->titelpost)."]]></name_gesamt>
 			<name_titel><![CDATA[".trim($pers->titelpre.' '.$pers->vorname.' '.$pers->nachname.' '.$pers->titelpost)."]]></name_titel>
 			<geburtsdatum><![CDATA[".$datum->convertISODate($pers->gebdatum)."]]></geburtsdatum>

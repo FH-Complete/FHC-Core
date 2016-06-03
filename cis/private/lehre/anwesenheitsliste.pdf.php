@@ -129,7 +129,7 @@ $qry = "SELECT
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 			tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis, tbl_prestudent.studiengang_kz AS stg_kz_student,
-			tbl_zeugnisnote.note, tbl_mitarbeiter.mitarbeiter_uid
+			tbl_zeugnisnote.note, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr
 		FROM 
 			campus.vw_student_lehrveranstaltung
 			JOIN public.tbl_benutzer USING(uid)
@@ -188,6 +188,7 @@ if($result = $db->db_query($qry))
 							'vorname'=>$row->vorname,
 							'nachname'=>$row->nachname,
 							'personenkennzeichen'=>trim($row->perskz),
+							'matr_nr'=>$row->matr_nr,
 							'semester'=>$row->semester,
 							'verband'=>trim($row->verband),
 							'gruppe'=>trim($row->gruppe),
