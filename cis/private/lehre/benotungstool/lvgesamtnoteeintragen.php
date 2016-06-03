@@ -114,20 +114,19 @@ if(!$rechte->isBerechtigt('admin',0) &&
 	}
 }
 
-function savenote($db,$lvid, $student_uid, $note, $punkte=null)
+function savenote($db,$lvid, $prestudent_id, $note, $punkte=null)
 {
 	global $stsem, $user, $p, $noten_anmerkung;
 	$jetzt = date("Y-m-d H:i:s");
 	$punkte = str_replace(',','.',$punkte);
 	//Ermitteln ob der Student diesem Kurs zugeteilt ist
-	$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung WHERE uid=".$db->db_add_param($student_uid)." AND lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
+	$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung WHERE prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER)." AND lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
 	if($result = $db->db_query($qry))
 	{
 		if($db->db_num_rows($result)==0)
 		{
-			$student = new student();// TODO EINE
-			$student->load($student_uid);
-			return $p->t('benotungstool/studentIstLvNichtZugeordnet', array($student->nachname, $student->vorname, trim($student->matrikelnr)))."\n";
+			$prestudent = new prestudent($prestudent_id);
+			return $p->t('benotungstool/studentIstLvNichtZugeordnet', array($prestudent->nachname, $prestudent->vorname, trim($prestudent->perskz)))."\n";
 		}
 	}
 
@@ -156,13 +155,11 @@ function savenote($db,$lvid, $student_uid, $note, $punkte=null)
 	}
 
 
-		$student = new student();
-		$student->load($student_uid);	// TODO EINE
 
 	$lvgesamtnote = new lvgesamtnote();
-	if (!$lvgesamtnote->load($lvid, $student->prestudent_id, $stsem))
+	if (!$lvgesamtnote->load($lvid, $prestudent_id, $stsem))
 	{
-		$lvgesamtnote->prestudent_id = $student->prestudent_id;
+		$lvgesamtnote->prestudent_id = $prestudent_id;
 		$lvgesamtnote->lehrveranstaltung_id = $lvid;
 		$lvgesamtnote->studiensemester_kurzbz = $stsem;
 		$lvgesamtnote->note = trim($note);
@@ -202,13 +199,13 @@ function savenote($db,$lvid, $student_uid, $note, $punkte=null)
 if (isset($_REQUEST["submit"]))
 {
 	$lvid = $_REQUEST["lvid"];
-	if(isset($_REQUEST["student_uid"]) && $_REQUEST["student_uid"] != '')
+	if(isset($_REQUEST["prestudent_id"]) && is_numeric($_REQUEST["prestudent_id"]))
 	{
-		$student_uid = $_REQUEST["student_uid"];
+		$prestudent_id = $_REQUEST["prestudent_id"];
 		$note = $_REQUEST["note"];
 		$punkte = (isset($_REQUEST["punkte"])?$_REQUEST["punkte"]:'');
 
-		$response = savenote($db,$lvid, $student_uid, $note, $punkte);
+		$response = savenote($db,$lvid, $prestudent_id, $note, $punkte);
 		echo $response;
 	}
 	else
@@ -235,8 +232,7 @@ if (isset($_REQUEST["submit"]))
 					}
 					$punkte=str_replace(',','.', $punkte);
 					//UID ermitteln
-					$student = new student();// TODO EINE? auf prestudent ändern?
-					if(!$student_uid = $student->getUidFromMatrikelnummer($matrikelnummer))
+					if(!$student_uid = $student->getUidFromMatrikelnummer($matrikelnummer))	// TODO EINE! hier brauchen wir für savenote eine prestudent_id!
 					{
 						$response.="\n".$p->t('benotungstool/studentMitMatrikelnummerExistiertNicht',array($matrikelnummer));
 						continue;
@@ -244,8 +240,7 @@ if (isset($_REQUEST["submit"]))
 
 					// Hole Zeugnisnote wenn schon eine eingetragen ist
 					/*
-					$student = new student($student_uid);// TODO EINE ändern?
-					if ($zeugnisnote = new zeugnisnote($lvid, $student->prestudent_id, $stsem))
+					if ($zeugnisnote = new zeugnisnote($lvid, $prestudent_id, $stsem))
 						$znote = $zeugnisnote->note;
 					else
 						$znote = null;

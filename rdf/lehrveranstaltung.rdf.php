@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /*
  * Created on 02.12.2004
@@ -58,10 +59,10 @@ if (isset($_GET['sem']) && is_numeric($_GET['sem']))
 	$sem=$_GET['sem'];
 else
 	$sem=null;
-if(isset($_GET['uid']))
-	$student_uid = $_GET['uid'];
+if(isset($_GET['prestudent_id']))
+	$prestudent_id = $_GET['prestudent_id'];
 else
-	$student_uid=null;
+	$prestudent_id=null;
 
 if(isset($_GET['lehrveranstaltung_kompatibel_id']))
 {
@@ -73,11 +74,9 @@ else
 
 $lehrveranstaltung=new lehrveranstaltung();
 
-if($student_uid!='')
+if($prestudent_id!='')
 {
-	//TODO EINE
-	$student = new student($student_uid);
-	$lehrveranstaltung->load_lva_student($student->prestudent_id);
+	$lehrveranstaltung->load_lva_student($prestudent_id);
 }
 elseif($lehrveranstaltung_kompatibel_id!='')
 {

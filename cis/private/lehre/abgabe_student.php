@@ -41,21 +41,22 @@ if (!$db = new basis_db())
 $getuid=get_uid();
 $uid=$getuid;
 
-if(isset($_GET['uid']))
+// TODO EINE get_prestudent_id
+// WICHTIG TODO EINE: $uid und $getuid müssen im ganzen script noch umgeschrieben werden!
+
+if(isset($_GET['prestudent_id']))
 {
 	//Studentenansicht
-	$uid = $_GET['uid'];
+	$prestudent_id = $_GET['prestudent_id'];
 	//Rechte Pruefen
 	$allowed=false;
-	
-	$student = new student();		// TODO EINE
-	if(!$student->load($uid))
-		die($p->t('global/fehlerBeimErmittelnDerUID'));
-	
+
+	$prestudent = new prestudent($prestudent_id);
+
 	$stg_obj = new studiengang();
-	if(!$stg_obj->load($student->studiengang_kz))
+	if(!$stg_obj->load($prestudent->studiengang_kz))
 		die($p->t('global/fehlerBeimLesenAusDatenbank'));
-	
+
 	//Berechtigung ueber das Berechtigungssystem
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($getuid);
@@ -69,7 +70,7 @@ if(isset($_GET['uid']))
 				JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id) 
 				JOIN campus.vw_benutzer on(vw_benutzer.person_id=tbl_projektbetreuer.person_id)
 			WHERE
-				tbl_projektarbeit.prestudent_id=".$db->db_add_param($student->prestudent_id, FHC_INTEGER)." AND
+				tbl_projektarbeit.prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER)." AND
 				vw_benutzer.uid=".$db->db_add_param($getuid).";";
 	
 	if($result = $db->db_query($qry))
@@ -90,8 +91,6 @@ $htmlstr1 = '';
 $vorname='';
 $nachname='';
 
-if(!$student = new student($uid))	// TODO EINE
-	die("Student nicht gefunden");
 
 $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tbl_projektbetreuer.person_id) AS bnachname,
 			(SELECT vorname FROM public.tbl_person WHERE person_id=tbl_projektbetreuer.person_id) AS bvorname, 
@@ -109,7 +108,7 @@ $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tb
 		LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 		WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') 
 		AND (tbl_projektbetreuer.betreuerart_kurzbz='Betreuer' OR tbl_projektbetreuer.betreuerart_kurzbz='Begutachter' OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbetreuer' OR tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter') 
-		AND tbl_projektarbeit.prestudent_id=".$db->db_add_param($student->prestudent_id, FHC_INTEGER)."
+		AND tbl_projektarbeit.prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER)."
 		AND public.tbl_benutzer.aktiv 
 		AND lehre.tbl_projektarbeit.note IS NULL 
 		ORDER BY studiensemester_kurzbz desc, tbl_lehrveranstaltung.kurzbz";

@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 header("Cache-Control: no-cache");
@@ -104,9 +105,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#lehreinheit_id" />
 				<splitter class="tree-splitter"/>
-				<treecol id="student-projektarbeit-tree-student_uid" label="StudentUID" flex="2" hidden="true"
+				<treecol id="student-projektarbeit-tree-prestudent_id" label="PrestudentID" flex="2" hidden="true"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#student_uid" />
+					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#prestudent_id" />
 				<splitter class="tree-splitter"/>
 				<treecol id="student-projektarbeit-tree-firma_id" label="FirmaID" flex="2" hidden="true"
 					class="sortDirectionIndicator"
@@ -130,7 +131,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#anmerkung"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#projektarbeit_id"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#lehreinheit_id"/>
-							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#student_uid"/>
+							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#prestudent_id"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#firma_id"/>
 						</treerow>
 					</treeitem>

@@ -40,7 +40,6 @@ require_once('../../../../include/pruefung.class.php');
 require_once('../../../../include/mail.class.php');
 require_once('../../../../include/benutzerfunktion.class.php');
 require_once('../../../../include/benutzer.class.php');
-require_once('../../../../include/student.class.php');
 require_once('../../../../include/notenschluessel.class.php');
 
 if (!$db = new basis_db())
@@ -88,14 +87,14 @@ else
 	$stsem = '';
 
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
-$uid = (isset($_GET['uid'])?$_GET['uid']:'');
+$prestudent_id = (isset($_GET['prestudent_id'])?$_GET['prestudent_id']:'');
 
 //Studiensemester laden
 $stsem_obj = new studiensemester();
 if($stsem=='')
 	$stsem = $stsem_obj->getaktorNext();
 
-$student_uid = $_REQUEST["student_uid"];
+$prestudent_id = $_REQUEST["prestudent_id"];
 
 $note = $_REQUEST["note"];
 if(isset($_REQUEST['punkte']))
@@ -135,7 +134,7 @@ if($note=='')
 $old_note = $note;
 
 // lvgesamtnote für studenten speichern
-if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
+if (isset($_REQUEST["submit"]) && (is_numeric($_REQUEST["prestudent_id"]))  )
 {
 	// Die Pruefung muss einer Lehreinheit zugeordnet werden
 	// deshalb wird hier versucht eine passende Lehreinheit zu ermitteln.
@@ -143,11 +142,11 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 	$qry_stud = "SELECT DISTINCT lehreinheit_id, lehrform_kurzbz
 		FROM
 			campus.vw_student_lehrveranstaltung
-			JOIN campus.vw_student using(uid)
+			JOIN campus.vw_student using(prestudent_id)
 		WHERE
 			studiensemester_kurzbz = ".$db->db_add_param($stsem)."
 			AND lehrveranstaltung_id = ".$db->db_add_param($lvid, FHC_INTEGER)."
-			AND uid=".$db->db_add_param($student_uid)."
+			AND prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER)."
 		ORDER BY lehrform_kurzbz DESC";
 
 	if($result_stud = $db->db_query($qry_stud))
@@ -166,18 +165,16 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 
 	$pr = new Pruefung();
 
-	$student = new student($student_uid);//TODO EINE
 	// Wenn eine Pruefung angelegt wird, wird  zuerst eine Pruefung mit 1. Termin angelegt
 	// und dort die Zeugnisnote gespeichert
-	if($pr->getPruefungen($student->prestudent_id, "Termin1", $lvid, $stsem))
+	if($pr->getPruefungen($prestudent_id, "Termin1", $lvid, $stsem))
 	{
 		if ($pr->result)
 			$termin1 = 1;
 		else
 		{
-			$student = new student($student_uid);	// TODO EINE
 			$lvnote = new lvgesamtnote();
-			if ($lvnote->load($lvid, $student->prestudent_id, $stsem))
+			if ($lvnote->load($lvid, $prestudent_id, $stsem))
 			{
 				$pr_note = $lvnote->note;
 				$pr_punkte = $lvnote->punkte;
@@ -191,7 +188,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 
 			$pr_1 = new Pruefung();
 			$pr_1->lehreinheit_id = $lehreinheit_id;
-			$pr_1->student_uid = $student_uid;
+			$pr_1->prestudent_id = $prestudent_id;
 			$pr_1->mitarbeiter_uid = $user;
 			$pr_1->note = $pr_note;
 			$pr_1->punkte = $pr_punkte;
@@ -212,9 +209,8 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 	$prTermin2 = new Pruefung();
 	$pr_2 = new Pruefung();
 
-	$student = new student($student_uid);//TODO EINE
 	// Die Pruefung wird als Termin2 eingetragen
-	if ($prTermin2->getPruefungen($student->prestudent_id, $typ, $lvid, $stsem))
+	if ($prTermin2->getPruefungen($prestudent_id, $typ, $lvid, $stsem))
 	{
 		if	($prTermin2->result)
 		{
@@ -231,7 +227,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 		else
 		{
 			$pr_2->lehreinheit_id = $lehreinheit_id;
-			$pr_2->student_uid = $student_uid;
+			$pr_2->prestudent_id = $prestudent_id;
 			$pr_2->mitarbeiter_uid = $user;
 			$pr_2->note = $note;
 			$pr_2->punkte = $punkte;
@@ -255,9 +251,8 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
 
 	$lvid = $_REQUEST["lvid"];
 
-	$student = new student($student_uid);// TODO EINE
 	$lvgesamtnote = new lvgesamtnote();
-	if (!$lvgesamtnote->load($lvid, $student->prestudent_id, $stsem))
+	if (!$lvgesamtnote->load($lvid, $prestudent_id, $stsem))
 	{
 		$lvgesamtnote->prestudent_id = $prestudent_id;
 		$lvgesamtnote->lehrveranstaltung_id = $lvid;

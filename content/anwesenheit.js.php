@@ -31,7 +31,7 @@ function loadanwesenheit(prestudent_id,lehrveranstaltung_id)
 
 	//anwesenheit laden
 	url = "<?php echo APP_ROOT; ?>rdf/anwesenheit.rdf.php?ts="+gettimestamp();
-alert(prestudent_id); // TODO EINE
+
 	if(parseInt(prestudent_id) !== false)
 		url=url+"&prestudent_id="+prestudent_id;
 	if(lehrveranstaltung_id!='')

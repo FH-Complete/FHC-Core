@@ -209,9 +209,9 @@ class stip extends basis_db
 		$qry = "SELECT
 					prestudent_id, vorname, nachname, svnr, perskz
 				FROM
-					public.tbl_student student
-					JOIN public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
-					JOIN public.tbl_person person using(person_id)
+					public.tbl_prestudent prestudent
+					JOIN public.tbl_benutzer benutzer on(benutzer.uid=prestudent.uid)
+					JOIN public.tbl_person person on(benutzer.person_id=person.person_id)
 				WHERE
 					person.vorname = ".$this->db_add_param($Vorname)."
 					AND person.nachname = ".$this->db_add_param($Nachname).";";

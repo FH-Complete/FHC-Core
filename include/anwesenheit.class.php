@@ -480,88 +480,82 @@ class anwesenheit extends basis_db
 	 */
 	public function loadAnwesenheitStudiensemester($studiensemester_kurzbz, $prestudent_id=null, $lehrveranstaltung_id=null)
 	{
-		if(!is_null($prestudent_id) && !is_numeric($prestudent_id))
+
+		$qry = "SELECT lehrveranstaltung_id, bezeichnung, vorname, nachname, uid, prestudent_id, sum(anwesend) as anwesend, sum(nichtanwesend) as nichtanwesend, sum(gesamtstunden) as gesamtstunden FROM (
+				SELECT
+					lehrveranstaltung_id, bezeichnung, vorname, nachname, uid, prestudent_id,
+					(
+					SELECT
+						sum(einheiten)
+					FROM
+						campus.tbl_anwesenheit
+					WHERE
+						lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id
+						AND uid=vw_student_lehrveranstaltung.uid
+						AND anwesend
+					) as anwesend,
+					(
+					SELECT
+						sum(einheiten)
+					FROM
+						campus.tbl_anwesenheit
+					WHERE
+						lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id
+						AND uid=vw_student_lehrveranstaltung.uid
+						AND NOT anwesend
+					) as nichtanwesend,
+					(
+					SELECT count(*) anzahl FROM
+						(SELECT datum, stunde FROM campus.vw_stundenplan
+						WHERE lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id
+						AND (vw_stundenplan.titel not like '%Nebenprüfung%' OR vw_stundenplan.titel is null) GROUP BY datum, stunde) as a
+					) as gesamtstunden
+				FROM
+					campus.vw_student_lehrveranstaltung
+					JOIN public.tbl_benutzer USING(uid)
+					JOIN public.tbl_person USING(person_id)
+				WHERE
+					studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+
+			if(!is_numeric($lehrveranstaltung_id))
+				$qry.="	AND lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id);
+			if(is_numeric($prestudent_id))
+				$qry.=" AND prestudent_id=".$this->db_add_param($prestudent_id);
+
+			$qry.=") as b GROUP BY lehrveranstaltung_id, bezeichnung, vorname, nachname, prestudent_id, uid";
+
+			if($lehrveranstaltung_id!='')
+				$qry.=" order by nachname, vorname ";
+			elseif(is_numeric($prestudent_id))
+				$qry.=" order by bezeichnung";
+
+		if($result = $this->db_query($qry))
 		{
-			$this->errormsg = "Prestudent_id ist ungueltig";
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->anwesend = $row->anwesend;
+				$obj->nichtanwesend = $row->nichtanwesend;
+				$obj->gesamtstunden = $row->gesamtstunden;
+
+				$obj->erfassteanwesenheit = $row->anwesend+$row->nichtanwesend;
+				if($row->gesamtstunden=='' || $obj->erfassteanwesenheit=='')
+					$obj->prozent=100;
+				else
+					$obj->prozent = number_format(100-(100/$obj->gesamtstunden*$row->nichtanwesend),2);
+				$obj->vorname = $row->vorname;
+				$obj->nachname = $row->nachname;
+				$obj->uid = $row->uid;
+				$obj->prestudent_id = $row->prestudent_id;
+				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$this->result[] = $obj;
+			}
+			return true;
 		}
 		else
 		{
-			$qry = "SELECT lehrveranstaltung_id, bezeichnung, vorname, nachname, uid, prestudent_id, sum(anwesend) as anwesend, sum(nichtanwesend) as nichtanwesend, sum(gesamtstunden) as gesamtstunden FROM (
-					SELECT
-						lehrveranstaltung_id, bezeichnung, vorname, nachname, uid, prestudent_id,
-						(
-						SELECT
-							sum(einheiten)
-						FROM
-							campus.tbl_anwesenheit
-						WHERE
-							lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id
-							AND uid=vw_student_lehrveranstaltung.uid
-							AND anwesend
-						) as anwesend,
-						(
-						SELECT
-							sum(einheiten)
-						FROM
-							campus.tbl_anwesenheit
-						WHERE
-							lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id
-							AND uid=vw_student_lehrveranstaltung.uid
-							AND NOT anwesend
-						) as nichtanwesend,
-						(
-						SELECT count(*) anzahl FROM
-							(SELECT datum, stunde FROM campus.vw_stundenplan
-							WHERE lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id
-							AND (vw_stundenplan.titel not like '%Nebenprüfung%' OR vw_stundenplan.titel is null) GROUP BY datum, stunde) as a
-						) as gesamtstunden
-					FROM
-						campus.vw_student_lehrveranstaltung
-						JOIN public.tbl_benutzer USING(uid)
-						JOIN public.tbl_person USING(person_id)
-					WHERE
-						studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
-
-				if(!is_null($lehrveranstaltung_id))
-					$qry.="	AND lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id);
-				if(!is_null($prestudent_id))
-					$qry.=" AND prestudent_id=".$this->db_add_param($prestudent_id);
-
-				$qry.=") as b GROUP BY lehrveranstaltung_id, bezeichnung, vorname, nachname, prestudent_id, uid";
-
-				if($lehrveranstaltung_id!='')
-					$qry.=" order by nachname, vorname ";
-				elseif(is_numeric($prestudent_id))
-					$qry.=" order by bezeichnung";
-
-			if($result = $this->db_query($qry))
-			{
-				while($row = $this->db_fetch_object($result))
-				{
-					$obj = new stdClass();
-					$obj->bezeichnung = $row->bezeichnung;
-					$obj->anwesend = $row->anwesend;
-					$obj->nichtanwesend = $row->nichtanwesend;
-					$obj->gesamtstunden = $row->gesamtstunden;
-
-					$obj->erfassteanwesenheit = $row->anwesend+$row->nichtanwesend;
-					if($row->gesamtstunden=='' || $obj->erfassteanwesenheit=='')
-						$obj->prozent=100;
-					else
-						$obj->prozent = number_format(100-(100/$obj->gesamtstunden*$row->nichtanwesend),2);
-					$obj->vorname = $row->vorname;
-					$obj->nachname = $row->nachname;
-					$obj->uid = $row->uid;
-					$obj->prestudent_id = $row->prestudent_id;
-					$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
-					$this->result[] = $obj;
-				}
-				return true;
-			}
-			else
-			{
-				$this->errormsg='Fehler beim Laden der Daten';
-			}
+			$this->errormsg='Fehler beim Laden der Daten';
 		}
 		return false;
 	}

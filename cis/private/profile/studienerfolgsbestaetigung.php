@@ -17,8 +17,9 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Raab <gerald.raab@technikum-wien.at>.
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *          Gerald Raab <gerald.raab@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../../config/cis.config.inc.php');
@@ -36,7 +37,7 @@ if (!$db = new basis_db())
 	
 $uid=get_uid();
 
-if(isset($_GET['uid']))
+if(isset($_GET['uid']))	// TODO EINE get_uid / _GET['uid'] für studienerfolg.rdf.php wird die prestudent_id benötigt!
 {
 	// Administratoren duerfen die UID als Parameter uebergeben um die Studienerfolgsbestätigung
 	// von anderen Personen anzuzeigen

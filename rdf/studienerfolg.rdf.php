@@ -31,12 +31,11 @@ require_once('../include/studiensemester.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/prestudent.class.php');
-require_once('../include/student.class.php');
 
 $datum = new datum();
 $db = new basis_db();
 
-function draw_studienerfolg($uid, $studiensemester_kurzbz)
+function draw_studienerfolg($prestudent_id, $studiensemester_kurzbz)
 {
 	global $xml, $note_arr, $datum, $note_wert;
 
@@ -55,7 +54,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz
 				and tbl_prestudent.uid = tbl_benutzer.uid
 				and tbl_benutzer.person_id = tbl_person.person_id
-				and tbl_prestudent.uid = ".$db->db_add_param($uid)."
+				and tbl_prestudent.prestudent_id = ".$db->db_add_param($prestudent_id, FHC_INTEGER)."
 				and tbl_studentlehrverband.prestudent_id=tbl_prestudent.prestudent_id
 				and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz
 				and tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz);
@@ -70,10 +69,8 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 
 	$studiensemester = new studiensemester();
 	$studiensemester_aktuell = $studiensemester->getNearest();
-	$student = new student();	// TODO EINE
-	$student->load($uid);
 	$prestudentstatus = new prestudent();
-	$prestudentstatus->getLastStatus($student->prestudent_id,'','Student');
+	$prestudentstatus->getLastStatus($prestudent_id,'','Student');
 
 	if($studiensemester_aktuell!=$prestudentstatus->studiensemester_kurzbz)
 		$studiensemester_aktuell = $prestudentstatus->studiensemester_kurzbz;
@@ -85,7 +82,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 					WHERE tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id
 						AND tbl_prestudentstatus.status_kurzbz in('Student','Incoming','Outgoing','Praktikant','Diplomand')
 						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_aktuell)."
-						AND tbl_prestudent.uid = ".$db->db_add_param($uid);
+						AND tbl_prestudent.prestudent_id = ".$db->db_add_param($prestudent_id, FHC_INTEGER);
 
 	if($db->db_query($qry_semester))
 		if($row_semester = $db->db_fetch_object())
@@ -98,7 +95,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 					WHERE tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id
 						AND tbl_prestudentstatus.status_kurzbz in('Student','Incoming','Outgoing','Praktikant','Diplomand')
 						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
-						AND tbl_prestudent.uid = ".$db->db_add_param($uid);
+						AND tbl_prestudent.prestudent_id = ".$db->db_add_param($prestudent_id, FHC_INTEGER);
 
 	$orgform='';
 	if($db->db_query($qry_semester))
@@ -167,7 +164,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 
 	$obj = new zeugnisnote();
 
-	if(!$obj->getZeugnisnoten($lehrveranstaltung_id=null, $student->prestudent_id, $studiensemester_kurzbz))
+	if(!$obj->getZeugnisnoten($lehrveranstaltung_id=null, $prestudent_id, $studiensemester_kurzbz))
 		die('Fehler beim Laden der Noten:'.$obj->errormsg);
 
 
@@ -240,17 +237,18 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 {
 
-	if(isset($_GET['uid']))
-		$uid = $_GET['uid'];
+	if(isset($_GET['prestudent_id']))
+
+		$prestudent_id = $_GET['prestudent_id'];
 	else
-		$uid = null;
+		$prestudent_id = null;
 
-	$uid_arr = explode(";",$uid);
+	$prestudent_id_arr = explode(";",$prestudent_id);
 
-	if ($uid_arr[0] == "")
+	if ($prestudent_id_arr[0] == "")
 	{
-		unset($uid_arr[0]);
-		$uid_arr = array_values($uid_arr);
+		unset($prestudent_id_arr[0]);
+		$prestudent_id_arr = array_values($prestudent_id_arr);
 	}
 
 	$note_arr = array();
@@ -275,26 +273,26 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 	if(isset($_GET['all']))
 	{
-		for ($i = 0; $i < sizeof($uid_arr); $i++)
+		for ($i = 0; $i < sizeof($prestudent_id_arr); $i++)
 		{
 			//Studienbestaetigung fuer alle Semester dieses Studenten
 			$qry = "SELECT * FROM public.tbl_studiensemester
 					WHERE studiensemester_kurzbz in(
 						SELECT studiensemester_kurzbz
 						FROM public.tbl_prestudentstatus JOIN public.tbl_prestudent USING(prestudent_id)
-						WHERE uid='".addslashes($uid_arr[$i])."')
+						WHERE tbl_prestudent.prestudent_id=".$db->db_add_param($prestudent_id_arr[$i], FHC_INTEGER).")
 					ORDER BY start";
 			if($db->db_query($qry))
 				while($row = $db->db_fetch_object())
-					draw_studienerfolg($uid_arr[$i], $row->studiensemester_kurzbz);
+					draw_studienerfolg($prestudent_id_arr[$i], $row->studiensemester_kurzbz);
 		}
 	}
 	else
 	{
 		//Studienbestaetigung fuer ein bestimmtes Semester
-		for ($i = 0; $i < sizeof($uid_arr); $i++)
+		for ($i = 0; $i < sizeof($prestudent_id_arr); $i++)
 		{
-			draw_studienerfolg($uid_arr[$i], $studiensemester_kurzbz);
+			draw_studienerfolg($prestudent_id_arr[$i], $studiensemester_kurzbz);
 		}
 	}
 

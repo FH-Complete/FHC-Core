@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien>.
  */
 // header for no cache
 header("Cache-Control: no-cache");
@@ -39,7 +40,7 @@ loadVariables($user);
 
 if(isset($_GET['filter']))
 	$filter = $_GET['filter'];
-else 
+else
 	die('Filter muss uebergeben werden');
 
 $rdf_url='http://www.technikum-wien.at/person';
@@ -55,11 +56,11 @@ echo '
   <RDF:Seq RDF:about="'.$rdf_url.'/liste">
 ';
 //$filter = utf8_encode($filter);
-$qry = "SELECT 
+$qry = "SELECT
 			distinct person_id, vorname, nachname, titelpre, titelpost,
-			CASE 
+			CASE
 				WHEN (SELECT count(*) FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE person_id=tbl_person.person_id)>0 THEN 'Mitarbeiter'
-				WHEN (SELECT count(*) FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE person_id=tbl_person.person_id)>0 THEN 'Student'
+				WHEN (SELECT count(*) FROM public.tbl_benutzer JOIN public.tbl_prestudent USING(uid) WHERE tbl_prestudent.person_id=tbl_person.person_id)>0 THEN 'Student'
 				ELSE 'Person'
 			END as status
 		FROM public.tbl_person WHERE nachname ~* '".addslashes($filter).".*' ORDER BY nachname, vorname, titelpre, titelpost";

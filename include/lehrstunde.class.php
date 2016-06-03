@@ -233,8 +233,11 @@ class lehrstunde extends basis_db
 	 * @param ver
 	 * @param grp
 	 * @param gruppe_kurzbz
-	 *
+	 * TODO EINE:
+	 * Dickes Problem: uid kann hier ein MA, oder ein Student sein. Für den späteren join auf tbl_studentlehrverband
+	 * wird jedoch eine prestudent_id benötigt, welche nicht eindeutig ist, wenn sie per uid geholt wird.
 	 */
+
 	public function load_lehrstunden($type, $datum_von, $datum_bis, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe_kurzbz=NULL, $stpl_view='stundenplan', $idList=null, $fachbereich_kurzbz=null, $lva=NULL, $alle_unr_mitladen=false)
 	{
 		$num_rows_einheit=0;

@@ -34,7 +34,6 @@ require_once('../../../include/lvregel.class.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/prestudent.class.php');
-require_once('../../../include/student.class.php');
 require_once('../../../include/zeugnisnote.class.php');
 require_once('../../../include/lvangebot.class.php');
 require_once('../../../include/datum.class.php');
@@ -47,8 +46,9 @@ require_once('../../../include/lvinfo.class.php');
 require_once('../../../include/addon.class.php');
 
 $uid = get_uid();
-
-if(isset($_GET['uid']))
+// TODO EINE get_uid auf get_prestudent_id!?!
+// TODO EINE strg + f "uid" im ganzen skript!
+if(isset($_GET['$prestudent']))
 {
 	// Administratoren duerfen die UID als Parameter uebergeben um den Studienplan
 	// von anderen Personen anzuzeigen
@@ -105,8 +105,7 @@ if(isset($_GET['getAnmeldung']))
 					//Pruefen ob genug Credit Points zur Verfuegung stehen zur Anmeldung
 
 					$konto = new konto();
-					$student = new student($uid); // TODO EINE
-					$cp = $konto->getCreditPoints($student->prestudent_id, $stsem);
+					$cp = $konto->getCreditPoints($prestudent_id, $stsem);
 					if($cp===false || $cp>=$lv->ects)
 						echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung.' (Anmeldung bis '.$datum->formatDatum($angebot->anmeldefenster_ende,"d.m.Y").')';
 					else
@@ -205,8 +204,7 @@ if(isset($_POST['action']) && $_POST['action']=='anmeldung')
 
 				// Pruefen ob genug CP zur Verfuegung stehen falls diese reduziert sind
 				$konto = new konto();
-				$student = new student($uid); // TODO EINE
-				$cp = $konto->getCreditPoints($student->prestudent_id, $stsem);
+				$cp = $konto->getCreditPoints($prestudent_id, $stsem);
 				if($cp===false || $cp>=$lv->ects)
 				{
 					$bngruppe->uid = $uid;
@@ -238,18 +236,15 @@ if(isset($_POST['action']) && $_POST['action']=='anmeldung')
 $db = new basis_db();
 $datum_obj = new datum();
 // Student Laden
-$student = new student();	// TODO EINE
-$student->load($uid);
-
+$prestudent = new prestudent($prestudent_id);
 // ersten Status holen
-$prestudent = new prestudent();
-$prestudent->getFirstStatus($student->prestudent_id, 'Student');
+$prestudent->getFirstStatus($prestudent_id, 'Student');
 
 $studiensemester_start = $prestudent->studiensemester_kurzbz;
 $ausbildungssemester_start = $prestudent->ausbildungssemester;
 $orgform_kurzbz = $prestudent->orgform_kurzbz;
 
-$prestudent->getLastStatus($student->prestudent_id, 'Student');
+$prestudent->getLastStatus($prestudent_id, 'Student');
 $studienplan_id = $prestudent->studienplan_id;
 
 $studienplan = new studienplan();
@@ -304,7 +299,7 @@ if(!in_array($stsemToShow,$stsem_arr))
 // Noten des Studierenden holen
 $noten_arr=array();
 $zeugnisnote = new zeugnisnote();
-if($zeugnisnote->getZeugnisnoten('',$student->prestudent_id,''))
+if($zeugnisnote->getZeugnisnoten('',$prestudent_id,''))
 {
 	foreach($zeugnisnote->result as $row_note)
 	{
@@ -333,7 +328,7 @@ $lv->loadLehrveranstaltungStudienplan($studienplan_id);
 foreach($lv->lehrveranstaltungen as $row_lva)
 	$lv_arr[$row_lva->lehrveranstaltung_id]=$row_lva;
 
-echo '<h1>'.$p->t('studienplan/studienplan').": $studienplan->bezeichnung ($studienplan_id) - $student->vorname $student->nachname ( $student->uid )</h1>";
+echo '<h1>'.$p->t('studienplan/studienplan').": $studienplan->bezeichnung ($studienplan_id) - $prestudent->vorname $prestudent->nachname ( $prestudent->uid )</h1>";
 
 echo '<table style="border: 1px solid black">
 	<thead>
@@ -352,8 +347,7 @@ foreach($stsem_arr as $stsem)
 
 	echo $stsem;
 	$konto = new konto();
-	$student = new student($uid); // TODO EINE
-	$cp = $konto->getCreditPoints($student->prestudent_id, $stsem);
+	$cp = $konto->getCreditPoints($prestudent_id, $stsem);
 	if($cp!==false)
 		echo '<span  title="'.$p->t('studienplan/reduzierteCP',array($cp)).'" ><br><img src="../../../skin/images/information.png" alt="Information"/></span>';
 	echo '</th>';
@@ -415,8 +409,7 @@ function drawTree($tree, $depth)
 		$lvregel = new lvregel();
 		if($lvregel->exists($row_tree->studienplan_lehrveranstaltung_id))
 		{
-			$student = new student($uid);	// TODO EINE
-			if($lvregel->isAbgeschlossen($student->prestudent_id, $row_tree->studienplan_lehrveranstaltung_id))
+			if($lvregel->isAbgeschlossen($prestudent_id, $row_tree->studienplan_lehrveranstaltung_id))
 				$abgeschlossen=true;
 			else
 				$abgeschlossen=false;
@@ -579,8 +572,7 @@ function drawTree($tree, $depth)
 				}
 				else
 				{
-					$student = new student($uid);// TODO EINE
-					if(!$lvregel->isZugangsberechtigt($student->prestudent_id, $row_tree->studienplan_lehrveranstaltung_id, $stsem))
+					if(!$lvregel->isZugangsberechtigt($prestudent_id, $row_tree->studienplan_lehrveranstaltung_id, $stsem))
 					{
 						$regelerfuellt=false;
 					}
@@ -600,7 +592,7 @@ function drawTree($tree, $depth)
 						{
 							// Pruefen ob bereits angemeldet
 							$bngruppe = new benutzergruppe();
-							if($bngruppe->load($uid, $angebot->gruppe_kurzbz, $stsem))
+							if($bngruppe->load($prestudent->uid, $angebot->gruppe_kurzbz, $stsem))	// TODO EINE gibts hier überhaupt einen prestudenten?
 							{
 								// Bereits angemeldet
 								$angemeldet=true;

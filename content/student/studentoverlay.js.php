@@ -401,7 +401,7 @@ function StudentFFZertifikatPrint(event)
 	var tree = document.getElementById('student-noten-tree');
 
 	col = tree.columns ? tree.columns["student-noten-tree-prestudent_id"] : "student-noten-tree-prestudent_id";
-	uid = tree.view.getCellText(tree.currentIndex,col);
+	prestudent_id = tree.view.getCellText(tree.currentIndex,col);
 
 	col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
 	lvid = tree.view.getCellText(tree.currentIndex,col);
@@ -419,7 +419,7 @@ function StudentFFZertifikatPrint(event)
 	else
 		var output='pdf';
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid=;'+uid+'&output='+output+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&prestudent_id=;'+prestudent_id+'&output='+output+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
 
 //	alert('url: '+url);
 	window.location.href = url;
@@ -435,7 +435,7 @@ function StudentLVZeugnisPrint(event)
 
 	col = tree.columns ? tree.columns["student-noten-tree-prestudent_id"] : "student-noten-tree-prestudent_id";
 	prestudent_id = tree.view.getCellText(tree.currentIndex,col);
-alert(prestudent_id + " studentoverlay(studentlvzeugnisprint)");//TODO EINE
+
 	col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
 	lvid = tree.view.getCellText(tree.currentIndex,col);
 
@@ -1530,12 +1530,12 @@ function StudentAuswahl()
 		StudentAbschlusspruefungTreeLoad(prestudent_id);
 	}
 
-	if(uid!='')
+	if(parseInt(prestudent_id) !== false)
 	{
 		// ****** Projektarbeit ********* //
 		StudentProjektarbeitDetailDisableFields(true);
 		StudentProjektbetreuerDisableFields(true);
-		StudentProjektarbeitTreeLoad(uid);
+		StudentProjektarbeitTreeLoad(prestudent_id);
 	}
 
 
@@ -1565,8 +1565,8 @@ function StudentAuswahl()
 		}
 
 		// ***** Anwesenheit *****
-		if(document.getElementById('student-content-tabs').selectedItem==document.getElementById('student-tab-anwesenheit'))
-		{alert(prestudent_id); // TODO EINE
+		if(document.getElementById('student-content-tabs').selectedItem==document.getElementById('student-tab-anwesenheit'))	// TODO EINE: PPPFAAAHH, is des schiach(id gibts nicht, wenn man keine berechtigungen hat!) (in content/student/studentenoverlay.xul.php)
+		{
 			document.getElementById('student-anwesenheit').setAttribute('src','anwesenheit.xul.php?prestudent_id='+prestudent_id);
 		}
 
@@ -4091,9 +4091,8 @@ function StudentPruefungNeu()
 	{
 		//Lehrveranstaltung Drop Down laden
 		var LVDropDown = document.getElementById('student-pruefung-menulist-lehrveranstaltung');
-		var uid = document.getElementById('student-detail-textbox-uid').value;
 		var prestudent_id = document.getElementById('student-detail-textbox-prestudent_id').value;
-		url="<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?uid="+uid+"&"+gettimestamp();
+		url="<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?prestudent_id="+prestudent_id+"&"+gettimestamp();
 
 		//Alte DS entfernen
 		var oldDatasources = LVDropDown.database.GetDataSources();
@@ -4350,9 +4349,8 @@ function StudentPruefungAuswahl()
 	//Lehrveranstaltung Drop Down laden
 	var LVDropDown = document.getElementById('student-pruefung-menulist-lehrveranstaltung');
 	//url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&"+gettimestamp();
-	var uid = document.getElementById('student-detail-textbox-uid').value;
 	var prestudent_id = document.getElementById('student-detail-textbox-prestudent_id').value;
-	url="<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?uid="+uid+"&"+gettimestamp();
+	url="<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?prestudent_id="+prestudent_id+"&"+gettimestamp();
 
 
 	//Alte DS entfernen
@@ -5152,9 +5150,9 @@ function StudentCreateDiplSupplement(event)
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-			var uid=tree.view.getCellText(v,col);
-			paramList += ';'+uid;
+			var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			var prestudent_id=tree.view.getCellText(v,col);
+			paramList += ';'+prestudent_id;
 			stg_kz=getTreeCellText(tree,"student-treecol-studiengang_kz", v);
 		}
 	}
@@ -5166,7 +5164,7 @@ function StudentCreateDiplSupplement(event)
 	}
 	if (event.shiftKey)
 	{
-	    var output='odt';
+		var output='odt';
 	}
 	else if (event.ctrlKey)
 	{
@@ -5177,7 +5175,7 @@ function StudentCreateDiplSupplement(event)
 		var output='pdf';
 	}
 	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=diplomasupplement.xml.php&output='+output+'&xsl=DiplSupplement&xsl_stg_kz='+stg_kz+'&uid='+paramList,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=diplomasupplement.xml.php&output='+output+'&xsl=DiplSupplement&xsl_stg_kz='+stg_kz+'&prestudent_id='+paramList,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -5203,11 +5201,11 @@ function StudentDiplomasupplementArchivieren()
   		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-			var uid=tree.view.getCellText(v,col);
+			var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			var prestudent_id=tree.view.getCellText(v,col);
 			stg_kz=getTreeCellText(tree,"student-treecol-studiengang_kz", v);
 
-			url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=diplomasupplement.xml.php&output=pdf&xsl=DiplSupplement&xsl_stg_kz='+stg_kz+'&uid='+uid+'&archive=true';
+			url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=diplomasupplement.xml.php&output=pdf&xsl=DiplSupplement&xsl_stg_kz='+stg_kz+'&prestudent_id='+prestudent_id+'&archive=true';
 			var req = new phpRequest(url,'','');
 
 			var response = req.execute();
@@ -5335,12 +5333,12 @@ function StudentCreateStudienerfolg(event, xsl, finanzamt, studiensemester, all)
 
 	for (var t = 0; t < numRanges; t++)
 	{
-  		tree.view.selection.getRangeAt(t,start,end);
+		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-			var uid=tree.view.getCellText(v,col);
-			paramList += ';'+uid;
+			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-prestudent_id";
+			var prestudent_id=tree.view.getCellText(v,col);
+			paramList += ';'+prestudent_id;
 		}
 	}
 
@@ -5363,7 +5361,7 @@ function StudentCreateStudienerfolg(event, xsl, finanzamt, studiensemester, all)
 
 	if (event.shiftKey)
 	{
-	    var output='odt';
+		var output='odt';
 	}
 	else if (event.ctrlKey)
 	{
@@ -5375,7 +5373,7 @@ function StudentCreateStudienerfolg(event, xsl, finanzamt, studiensemester, all)
 	}
 
 	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=studienerfolg.rdf.php&xsl='+xsl+'&uid='+paramList+'&ss='+studiensemester+'&typ='+finanzamt+all+'&output='+output,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=studienerfolg.rdf.php&xsl='+xsl+'&prestudent_id='+paramList+'&ss='+studiensemester+'&typ='+finanzamt+all+'&output='+output,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ************* FUNKTIONEN ***************** //
@@ -5419,7 +5417,7 @@ function StudentAnwesenheitIFrameLoad()
 	var uid = document.getElementById('student-detail-textbox-uid').value;
 	var prestudent_id = document.getElementById('student-detail-textbox-prestudent_id').value;
 	if(parseInt(prestudent_id) !== false)
-	{alert(prestudent_id); // TODO EINE
+	{
 		url = 'anwesenheit.xul.php?prestudent_id='+prestudent_id+'&ts='+gettimestamp();
 		document.getElementById('student-anwesenheit').setAttribute('src',url);
 	}

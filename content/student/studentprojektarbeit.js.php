@@ -121,10 +121,10 @@ var StudentProjektbetreuerTreeListener =
 // ****
 // * Laedt die Daten fuer den Projektarbeiten Tree
 // ****
-function StudentProjektarbeitTreeLoad(uid)
+function StudentProjektarbeitTreeLoad(prestudent_id)
 {
 	var tree = document.getElementById('student-projektarbeit-tree');
-	var url='<?php echo APP_ROOT;?>rdf/projektarbeit.rdf.php?student_uid='+uid+"&"+gettimestamp();
+	var url='<?php echo APP_ROOT;?>rdf/projektarbeit.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
 
 	//Alte Observer entfernen
 	try

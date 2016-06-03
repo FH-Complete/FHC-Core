@@ -313,6 +313,7 @@ if(!$error)
 
 			if(!$error)
 			{
+				$prestudent->prestudent_id = $_POST['prestudent_id'];
 				$prestudent->uid = $_POST['uid'];
 				$prestudent->perskz = $_POST['perskz'];
 				$prestudent->updateamum = date('Y-m-d H:i:s');
@@ -399,14 +400,13 @@ if(!$error)
 
 								if(count($prestudentobj->result)>0)
 								{
-									$tmpStudent = new student($_POST['uid']);	// TODO EINE
 
-									if($student_lvb->studentlehrverband_exists($tmpStudent->prestudent_id, $semester_aktuell))
+									if($student_lvb->studentlehrverband_exists($_POST['prestudent_id'], $semester_aktuell))
 										$student_lvb->new = false;
 									else
 										$student_lvb->new = true;
 
-									$student_lvb->uid = $_POST['uid'];
+									$student_lvb->uid = $_POST['uid'];	// TODO EINE
 									$student_lvb->studiensemester_kurzbz = $semester_aktuell;
 									$student_lvb->studiengang_kz = $_POST['studiengang_kz'];
 									$student_lvb->semester = $_POST['semester'];
@@ -808,11 +808,10 @@ if(!$error)
 										//Unterbrecher und Abbrecher werden ins 0. Semester verschoben
 										if($_POST['status_kurzbz']=='Unterbrecher' || $_POST['status_kurzbz']=='Abbrecher')
 										{
-											$student = new student();
-											$uid = $student->getUid($prestudent_id);
-											$student->load($uid);
-											$student->studiensemester_kurzbz=$studiensemester;
-											$student->semester = '0';
+											$prestudent = new prestudent($prestudent_id);
+
+											$prestudent->studiensemester_kurzbz=$studiensemester;
+											$student->semester = '0';// TODO EINE
 											if($_POST['status_kurzbz']=='Abbrecher')
 											{
 												$student->verband='A';
@@ -838,7 +837,7 @@ if(!$error)
 
 											//Nachschauen ob dieser Lehrverband schon existiert, falls nicht dann anlegen
 											$lehrverband = new lehrverband();
-											if(!$lehrverband->exists($student->studiengang_kz, $student->semester, $student->verband, ''))
+											if(!$lehrverband->exists($prestudent->studiengang_kz, $student->semester, $student->verband, ''))
 											{
 												//Pruefen ob der uebergeordnete Lehrverband existiert, falls nicht dann anlegen
 												if(!$lehrverband->exists($student->studiengang_kz, $student->semester, '', ''))
@@ -877,15 +876,14 @@ if(!$error)
 										//Verband und Gruppe wird entfernt.
 										if($_POST['status_kurzbz']=='Student')
 										{
-											$student = new student();
-											$uid = $student->getUid($prestudent_id);//TODO EINE
-											$student->load($uid);
-											$student->studiensemester_kurzbz=$semester_aktuell;
-											$student->semester = $_POST['semester'];
-											$student->verband = '';
-											$student->gruppe = '';
-											$student->save(false, false);
-											$student->save_studentlehrverband(false);
+											$prestudent = new prestudent($prestudent_id);
+
+											$prestudent->studiensemester_kurzbz=$semester_aktuell;	// TODO EINE
+											$prestudent->semester = $_POST['semester'];
+											$prestudent->verband = '';
+											$prestudent->gruppe = '';
+											$prestudent->save(false, false);
+											$prestudent->save_studentlehrverband(false);
 											//Aktiv Status setzen
 											$benutzer = new benutzer();
 											if($benutzer->load($uid))
@@ -900,11 +898,10 @@ if(!$error)
 										//bei Abbrechern und Absolventen wird der Aktiv Status auf false gesetzt
 										if($_POST['status_kurzbz']=='Abbrecher' || $_POST['status_kurzbz']=='Absolvent')
 										{
-											$student = new student();
-											$uid = $student->getUid($prestudent_id);//TODO EINE
+											$prestudent = new prestudent($prestudent_id);
 
 											$benutzer = new benutzer();
-											if($benutzer->load($uid))
+											if($benutzer->load($prestudent_uid))
 											{
 												$benutzer->updateamum = date('Y-m-d H:i:s');
 												$benutzer->updatevon = $user;
@@ -1149,28 +1146,28 @@ if(!$error)
 								$stdsem_new = filter_input(INPUT_POST, "studiensemester_kurzbz");
 								$semester = filter_input(INPUT_POST, "ausbildungssemester");
 
-								$prestudent_temp = new prestudent();
-								$prestudent_temp->getLastStatus($rolle->prestudent_id, "", "Student");
-								if($student->load_studentlehrverband($rolle->prestudent_id, $prestudent_temp->studiensemester_kurzbz))
-									$student->new=false;
+								$prestudent = new prestudent($prestudent_id);
+								$prestudent->getLastStatus($rolle->prestudent_id, "", "Student");
+								if($prestudent->load_studentlehrverband($prestudent->studiensemester_kurzbz))
+									$prestudent->new=false;
 								else
-									$student->new=true;
+									$prestudent->new=true;
 
 								$lehrverband = new lehrverband();
-								if(!$lehrverband->exists($student->studiengang_kz, $semester, $student->verband, $student->gruppe))
+								if(!$lehrverband->exists($prestudent->studiengang_kz, $semester, $prestudent->verband, $prestudent->gruppe))
 								{
-									$student->studiensemester_kurzbz = $stdsem_new;
+									$prestudent->studiensemester_kurzbz = $stdsem_new;
 									$return = false;
 									$errormsg = $student->errormsg;
 								}
 								else
 								{
-									$student->studiensemester_kurzbz = $stdsem_new;
-									$student->semester = $semester;
-									$student->updatevon = $user;
+									$prestudent->studiensemester_kurzbz = $stdsem_new;
+									$prestudent->semester = $semester;
+									$prestudent->updatevon = $user;
 								}
 
-								$student->save_studentlehrverband();
+								$prestudent->save_studentlehrverband();// TODO EINE
 							}
 						}
 
@@ -1272,26 +1269,25 @@ if(!$error)
 						$return = false;
 					}
 
-					$student = new student();
-					$temp_uid = $student->getUid($rolle->prestudent_id);
+					$prestudent = new prestudent($prestudent_id);
 
 					if(!$error)
 					{
-						$student->load_studentlehrverband($rolle->prestudent_id, $_POST["studiensemester_kurzbz"]);
+						$prestudent->load_studentlehrverband($rolle->prestudent_id, $_POST["studiensemester_kurzbz"]);
 						$lehrverband = new lehrverband();
-						if(!$lehrverband->exists($student->studiengang_kz, $semester, $student->verband, $student->gruppe))
+						if(!$lehrverband->exists($prestudent->studiengang_kz, $semester, $prestudent->verband, $prestudent->gruppe))
 						{
-							$student->studiensemester_kurzbz = $stdsem;
+							$prestudent->studiensemester_kurzbz = $stdsem;
 							$return = false;
-							$errormsg = $student->errormsg;
+							$errormsg = $prestudent->errormsg;
 						}
 						else
 						{
-							$student->studiensemester_kurzbz = $stdsem;
-							$student->semester = $semester;
+							$prestudent->studiensemester_kurzbz = $stdsem;
+							$prestudent->semester = $semester;
 						}
 
-						$student->save_studentlehrverband(true);
+						$prestudent->save_studentlehrverband(true);	// TODO EINE gibts beim prestudenten nicht!
 						$rolle->ausbildungssemester = $semester;
 						$rolle->studiensemester_kurzbz = $stdsem;
 						$rolle->datum = date("Y-m-d");
@@ -1604,7 +1600,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='gruppenzuteilung')
 	{
-		if(isset($_POST['uid']) && isset($_POST['gruppe_kurzbz']))
+		if(isset($_POST['prestudent_id']) && isset($_POST['gruppe_kurzbz']))
 		{
 			$gruppe = new gruppe();
 			if(!$gruppe->load($_POST['gruppe_kurzbz']))
@@ -1624,19 +1620,20 @@ if(!$error)
 			}
 			$benutzergruppe = new benutzergruppe();
 
-			$uids = explode(';',$_POST['uid']);
+			$prestudent_ids = explode(';',$_POST['prestudent_id']);
 			$errormsg = '';
-			foreach ($uids as $uid)
+			foreach ($prestudent_ids as $prestudent_id)
 			{
-				if($uid!='')
+				if(is_numeric($prestudent_id))
 				{
 					if($_POST['gruppe_kurzbz']!='')
 					{
+						$prestudent = new prestudent($prestudent_id);
 						//Zuteilung zu einer Spezialgruppe
 
-						if(!$benutzergruppe->load($uid, $_POST['gruppe_kurzbz']))
+						if(!$benutzergruppe->load($prestudent->uid, $_POST['gruppe_kurzbz']))
 						{
-							$benutzergruppe->uid = $uid;
+							$benutzergruppe->uid = $prestudent->uid;
 							$benutzergruppe->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
 							$benutzergruppe->studiensemester_kurzbz = $semester_aktuell;
 							$benutzergruppe->insertamum = date('Y-m-d H:i:s');
@@ -1645,11 +1642,11 @@ if(!$error)
 
 							if(!$benutzergruppe->save())
 							{
-								$errormsg .= "$uid konnte nicht hinzugefuegt werden\n";
+								$errormsg .= "$prestudent->uid($prestudent->prestudent_id) konnte nicht hinzugefuegt werden\n";
 							}
 						}
 						else
-							$errormsg .= "Der Student $uid ist bereits in dieser Gruppe\n";
+							$errormsg .= "Der Student $prestudent->prestudent_id ist bereits in dieser Gruppe\n";
 					}
 					else
 					{
@@ -1673,16 +1670,16 @@ if(!$error)
 						if($semester_aktuell == $stsem_kurzbz)
 						{
 							//Eintrag in der Tabelle Student aendern
-							$student = new student();
+							$prestudent = new prestudent();
 
-							if(!$student->load($uid))
+							if(!$prestudent->load($prestudent_id))
 							{
 								$errormsg .= 'Fehler beim Laden des Studenten';
 								$error = true;
 								$return = false;
 							}
 
-							if($student->studiengang_kz!=$_POST['stg_kz'])
+							if($prestudent->studiengang_kz!=$_POST['stg_kz'])
 							{
 								$errormsg.='Ein Student kann nicht in eine Lehrverbandsgruppe eines anderen Studienganges verschoben werden';
 								$return = false;
@@ -1691,13 +1688,13 @@ if(!$error)
 
 							if(!$error)
 							{
-								$student->studiengang_kz = $_POST['stg_kz'];
-								$student->semester = $_POST['semester'];
-								$student->verband = ($_POST['verband']==''?' ':$_POST['verband']);
-								$student->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
-								$student->new=false;
+								$prestudent->studiengang_kz = $_POST['stg_kz'];
+								$prestudent->semester = $_POST['semester'];	// TODO EINE
+								$prestudent->verband = ($_POST['verband']==''?' ':$_POST['verband']);
+								$prestudent->gruppe = ($_POST['gruppe']==''?' ':$_POST['gruppe']);
+								$prestudent->new=false;
 
-								if(!$student->save())
+								if(!$prestudent->save())
 								{
 									$errormsg .= 'Fehler beim Speichern des Studenteneintrages';
 									$return = false;
@@ -1709,16 +1706,16 @@ if(!$error)
 						if(!$error)
 						{
 							//Eintrag in der Tabelle Student aendern
-							$student = new student();
+							$prestudent = new student();
 
-							if(!$student->load($uid))
+							if(!$prestudent->load($prestudent_id))
 							{
 								$errormsg .= 'Fehler beim Laden des Studenten';
 								$error = true;
 								$return = false;
 							}
 
-							if($student->studiengang_kz!=$_POST['stg_kz'])
+							if($prestudent->studiengang_kz!=$_POST['stg_kz'])
 							{
 								$errormsg.='Ein Student kann nicht in eine Lehrverbandsgruppe eines anderen Studienganges verschoben werden';
 								$return = false;
@@ -1730,7 +1727,7 @@ if(!$error)
 								//Eintrag in der Tabelle Studentlehrverband aendern
 								$student_lvb = new student();
 
-								if($student_lvb->studentlehrverband_exists($student->prestudent_id, $semester_aktuell))
+								if($student_lvb->studentlehrverband_exists($prestudent_id, $semester_aktuell))
 									$student_lvb->new = false;
 								else
 									$student_lvb->new = true;
@@ -2508,7 +2505,7 @@ if(!$error)
 					$bmp->ausgegebenam = $_POST['ausgegebenam'];
 					$bmp->retouram = $_POST['retouram'];
 					if($bmp->new)
-						$bmp->uid = $_POST['uid'];
+						$bmp->uid = $_POST['uid'];	// TODO EINE prestudent_id?
 
 					if($bmp->save())
 					{

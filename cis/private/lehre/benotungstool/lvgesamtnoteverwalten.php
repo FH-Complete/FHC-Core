@@ -325,13 +325,13 @@ foreach($noten_obj->result as $row)
 				document.nachpruefung_form.note.value = "9";
 				note = "9";
 			}
-			var uid = document.nachpruefung_form.uid.value;
+			var prestudent_id = document.nachpruefung_form.prestudent_id.value;
 			var lehreinheit_id = document.nachpruefung_form.le_id.value;
-
+alert(prestudent_id + " TODO EINE pachpruefungeintragen.php");
 		    var jetzt = new Date();
 			var ts = jetzt.getTime();
 		    var url= '<?php echo "nachpruefungeintragen.php?lvid=$lvid&stsem=$stsem"; ?>';
-		    url += '&submit=1&student_uid='+uid+'&note='+note+'&datum='+datum+'&lehreinheit_id_pr='+lehreinheit_id+'&punkte='+punkte+'&typ='+typ+'&'+ts;
+		    url += '&submit=1&prestudent_id='+prestudent_id+'&note='+note+'&datum='+datum+'&lehreinheit_id_pr='+lehreinheit_id+'&punkte='+punkte+'&typ='+typ+'&'+ts;
 
 			$.ajax({
 				type:"GET",

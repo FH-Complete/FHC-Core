@@ -29,7 +29,6 @@ require_once('../include/mitarbeiter.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/studienordnung.class.php');
 require_once('../include/studienplan.class.php');
-require_once('../include/student.class.php');
 require_once('../include/prestudent.class.php');
 
 $datum = new datum();
@@ -37,17 +36,17 @@ $db = new basis_db();
 
 $lehrveranstaltungen = array();
 
-	if(isset($_GET['uid']))
-		$uid = $_GET['uid'];
+	if(isset($_GET['prestudent_id']))
+		$prestudent_id = $_GET['prestudent_id'];
 	else 
-		$uid = null;
+		$prestudent_id = null;
 	
-	$uid_arr = explode(";",$uid);
+	$prestudent_id_arr = explode(";",$prestudent_id);
 
-	if ($uid_arr[0] == "")
+	if ($prestudent_id_arr[0] == "")
 	{
-		unset($uid_arr[0]);
-		$uid_arr = array_values($uid_arr);
+		unset($prestudent_id_arr[0]);
+		$prestudent_id_arr = array_values($prestudent_id_arr);
 	} 	
 	
 	// Noten laden
@@ -77,14 +76,12 @@ $lehrveranstaltungen = array();
 	$xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>";
 	$xml .= "<zeugnisse>";
 
-	foreach($uid_arr as $uid)
+	foreach($prestudent_id_arr as $prestudent_id)
 	{
-		$student = new student();// TODO EINE in der query weiter unten sollte prestudent_id nicht eindeutig sein!
-		if(!$student->load($uid))
-			die($student->errormsg);
-		
+		$prestudent = new prestudent($prestudent_id);
+
 		$studiengang = new studiengang();
-		$stgleiter = $studiengang->getLeitung($student->studiengang_kz);
+		$stgleiter = $studiengang->getLeitung($prestudent->studiengang_kz);
 		$stgl='';
 		foreach ($stgleiter as $stgleiter_uid)
 		{
@@ -98,7 +95,7 @@ $lehrveranstaltungen = array();
 		//damit bei Outgoing Studenten die im 0. Semester angelegt sind das richtige Semester aufscheint
 		$qry ="SELECT ausbildungssemester as semester FROM public.tbl_prestudentstatus 
 				WHERE 
-				prestudent_id=".$db->db_add_param($student->prestudent_id)." AND 
+				prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER)." AND
 				studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
 				status_kurzbz not in('Incoming','Aufgenommener','Bewerber','Wartender', 'Interessent')
 				ORDER BY DATUM DESC LIMIT 1";
@@ -112,7 +109,7 @@ $lehrveranstaltungen = array();
 
 		$qry ="SELECT ausbildungssemester as semester FROM public.tbl_prestudentstatus 
 				WHERE 
-				prestudent_id=".$db->db_add_param($student->prestudent_id)." AND 
+				prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER)." AND
 				studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz2)." AND
 				status_kurzbz not in('Incoming','Aufgenommener','Bewerber','Wartender', 'Interessent')
 				ORDER BY DATUM DESC LIMIT 1";
@@ -138,14 +135,13 @@ $lehrveranstaltungen = array();
 		$studienjahr = ($jahr1>$jahr2?$jahr2.'/'.$jahr1:$jahr1.'/'.$jahr2); 
 		
 		$studiengang = new studiengang();
-		$studiengang->load($student->studiengang_kz);
-		
-		$prestudent = new prestudent();
-		$prestudent->getLastStatus($student->prestudent_id, $studiensemester_kurzbz);
-		
+		$studiengang->load($prestudent->studiengang_kz);
+
+		$prestudent->getLastStatus($prestudent_id, $studiensemester_kurzbz);
+
 		if($prestudent->studienplan_id=='')
 		{
-			die('keine Studienplan Zuordnung fuer '.$student->nachname);
+			die('keine Studienplan Zuordnung fuer '.$prestudent->nachname);
 		}
 		$studienplan = new studienplan();
 		if(!$studienplan->loadStudienplan($prestudent->studienplan_id))
@@ -164,13 +160,13 @@ $lehrveranstaltungen = array();
 		$xml .= "\n		<studiengang_englisch>".$studienordnung->studiengangbezeichnung_englisch."</studiengang_englisch>";
 		$xml .= "\n		<studiengang_typ>".$studiengang->typ."</studiengang_typ>";
 		$xml .= "\n		<studiengang_kz>".sprintf('%04s', abs($studiengang->studiengang_kz))."</studiengang_kz>";
-		$xml .= "\n		<anrede>".$student->anrede."</anrede>";
-		$xml .= "\n		<vorname>".$student->vorname."</vorname>";
-		$xml .= "\n		<nachname>".$student->nachname."</nachname>";
-		$xml .= "\n		<name>".trim($student->titelpre.' '.trim($student->vorname.' '.$student->vornamen).' '.mb_strtoupper($student->nachname).($student->titelpost!=''?', '.$student->titelpost:''))."</name>";
-		$gebdatum = date('d.m.Y',strtotime($student->gebdatum));
+		$xml .= "\n		<anrede>".$prestudent->anrede."</anrede>";
+		$xml .= "\n		<vorname>".$prestudent->vorname."</vorname>";
+		$xml .= "\n		<nachname>".$prestudent->nachname."</nachname>";
+		$xml .= "\n		<name>".trim($prestudent->titelpre.' '.trim($prestudent->vorname.' '.$prestudent->vornamen).' '.mb_strtoupper($prestudent->nachname).($prestudent->titelpost!=''?', '.$prestudent->titelpost:''))."</name>";
+		$gebdatum = date('d.m.Y',strtotime($prestudent->gebdatum));
 		$xml .= "\n		<gebdatum>".$gebdatum."</gebdatum>";
-		$xml .= "\n		<personenkennzeichen>".$student->matrikelnr."</personenkennzeichen>";
+		$xml .= "\n		<personenkennzeichen>".$prestudent->perskz."</personenkennzeichen>";
 		$xml .= "\n		<studiengangsleiter>".$stgl."</studiengangsleiter>";
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "\n		<datum_aktuell>".$datum_aktuell."</datum_aktuell>";

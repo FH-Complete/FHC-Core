@@ -79,7 +79,7 @@ echo '
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:NOTE="'.$rdf_url.'/rdf#"
 >
-   <RDF:Seq about="'.$rdf_url.'/liste">
+	<RDF:Seq about="'.$rdf_url.'/liste">
 ';
 
 //Daten holen
@@ -100,8 +100,8 @@ foreach ($obj->result as $row)
 		$zeugnis='';
 
 	echo '
-		  <RDF:li>
-	         <RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->prestudent_id.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->prestudent_id.'/'.$row->studiensemester_kurzbz.'" >
+		<RDF:li>
+			<RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->prestudent_id.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->prestudent_id.'/'.$row->studiensemester_kurzbz.'" >
 				<NOTE:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></NOTE:lehrveranstaltung_id>
 				<NOTE:prestudent_id><![CDATA['.$row->prestudent_id.']]></NOTE:prestudent_id>
 				<NOTE:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></NOTE:studiensemester_kurzbz>
@@ -124,8 +124,8 @@ foreach ($obj->result as $row)
 				<NOTE:student_semester><![CDATA['.$prestudent->semester.']]></NOTE:student_semester>
 				<NOTE:punkte><![CDATA['.($row->punkte!=''?(float)$row->punkte:'').']]></NOTE:punkte>
 				<NOTE:zeugnis><![CDATA['.$zeugnis.']]></NOTE:zeugnis>
-	         </RDF:Description>
-	      </RDF:li>';
+			</RDF:Description>
+		</RDF:li>';
 }
 ?>
    </RDF:Seq>

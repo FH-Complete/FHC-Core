@@ -403,7 +403,11 @@ if($xmlformat=='rdf')
 
 	if(isset($uid))
 	{
-		$student=new student();	// TODO EINE eindeutig?
+		/* TODO EINE
+		 * Hier wird der Student und der Prestudent gezeichnet
+		 * der Student ist aber nicht eindeutig!
+		 */
+		$student=new student();
 		$student->load($uid, $studiensemester_kurzbz);
 		$prestd = new prestudent();
 

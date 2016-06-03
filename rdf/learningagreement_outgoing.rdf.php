@@ -16,7 +16,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Karl Burkhart 	<burkhart@technikum-wien.at>
+ * Authors: Karl Burkhart 	<burkhart@technikum-wien.at> and
+ *          Andreas Moik  <moik@technikum-wien.at>.
  */
 
 require_once('../config/vilesci.config.inc.php');
@@ -53,15 +54,15 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
     
     if(!$student->load($preoutgoing->uid))
         die('Konnte Student nicht laden!');
-    
-    $projektarbeittitel = $preoutgoing->projektarbeittitel; 
+
+    $projektarbeittitel = $preoutgoing->projektarbeittitel;
     $studiengang->load($student->studiengang_kz);
     $preoutgoingFirma = new preoutgoing(); 
     $preoutgoingFirma->loadAuswahl($preoutgoing_id);
     $preoutgoing_firma = $preoutgoingFirma->firma_id;
     $prestudent->getLastStatus($student->prestudent_id);		// TODO EINE NICHT EINDEUTIG
-    
-    $firma = new firma(); 
+
+    $firma = new firma();
     $nation = new nation();
     if($preoutgoing_firma != '')
     {

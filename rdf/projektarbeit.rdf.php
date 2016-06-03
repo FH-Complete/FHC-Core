@@ -50,12 +50,12 @@ echo '
 $datum_obj = new datum();
 $projektarbeit = new projektarbeit();
 
-if(isset($_GET['student_uid']))
+if(isset($_GET['prestudent_id']))
 {
 
-	$student = new student($_GET['student_uid']);	// TODO EINE
+	$prestudent_id = $_GET['prestudent_id'];
 
-	$projektarbeit->getProjektarbeit($student->prestudent_id);
+	$projektarbeit->getProjektarbeit($prestudent_id);
 	
 	foreach ($projektarbeit->result as $row)
 		draw_content($row);
@@ -68,15 +68,13 @@ elseif(isset($_GET['projektarbeit_id']) && is_numeric($_GET['projektarbeit_id'])
 		die('Eintrag wurde nicht gefunden');
 }
 else 
-	die('Student_uid oder Projektarbeit_id muss uebergeben werden');
+	die('Prestudent_id oder Projektarbeit_id muss uebergeben werden');
 	
 	
 function draw_content($row)
 {
 	global $rdf_url, $datum_obj;
 	$lehreinheit = new lehreinheit($row->lehreinheit_id);
-	$stud = new student();//EINE_UID TODO
-	$uid = $stud->getUid($row->prestudent_id);
 
 	echo '
       <RDF:li>
@@ -89,7 +87,7 @@ function draw_content($row)
             <PROJEKTARBEIT:lehreinheit_id><![CDATA['.$row->lehreinheit_id.']]></PROJEKTARBEIT:lehreinheit_id>
             <PROJEKTARBEIT:lehreinheit_stsem><![CDATA['.$lehreinheit->studiensemester_kurzbz.']]></PROJEKTARBEIT:lehreinheit_stsem>
             <PROJEKTARBEIT:lehrveranstaltung_id><![CDATA['.$lehreinheit->lehrveranstaltung_id.']]></PROJEKTARBEIT:lehrveranstaltung_id>
-            <PROJEKTARBEIT:student_uid><![CDATA['.$uid.']]></PROJEKTARBEIT:student_uid>
+            <PROJEKTARBEIT:prestudent_id><![CDATA['.$row->prestudent_id.']]></PROJEKTARBEIT:prestudent_id>
             <PROJEKTARBEIT:firma_id><![CDATA['.$row->firma_id.']]></PROJEKTARBEIT:firma_id>
             <PROJEKTARBEIT:note><![CDATA['.$row->note.']]></PROJEKTARBEIT:note>
             <PROJEKTARBEIT:punkte><![CDATA['.$row->punkte.']]></PROJEKTARBEIT:punkte>

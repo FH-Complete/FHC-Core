@@ -58,7 +58,6 @@ if(is_numeric($prestudent_id))
 elseif($lehrveranstaltung_id!='')
 {
 	$anwesenheit->loadAnwesenheitStudiensemester($studiensemester_kurzbz,null,$lehrveranstaltung_id);
-	var_dump("TODO EINE");// TODO EINE TOTEST!
 }
 
 $i=0;

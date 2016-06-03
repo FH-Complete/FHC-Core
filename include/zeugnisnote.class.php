@@ -359,7 +359,7 @@ class zeugnisnote extends basis_db
 			LEFT JOIN lehre.tbl_note USING(note)
 			LEFT JOIN lehre.tbl_studienplan_lehrveranstaltung ON(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id)
 			WHERE
-				prestudent_id=".$this->db_add_param($prestudent_id)."
+				lehre.tbl_zeugnisnote.prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)."
 				AND vw_student_lehrveranstaltung.studiensemester_kurzbz IN(".$stsem.")
 				AND tbl_studienplan_lehrveranstaltung.studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER)."
 			UNION
@@ -372,7 +372,7 @@ class zeugnisnote extends basis_db
 				JOIN lehre.tbl_note USING(note)
 				LEFT JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
 			WHERE
-				prestudent_id=".$this->db_add_param($prestudent_id)."
+				lehre.tbl_zeugnisnote.prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)."
 				AND studiensemester_kurzbz IN(".$stsem.")
 				AND tbl_studienplan_lehrveranstaltung.studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER)."
 			UNION ALL
@@ -391,7 +391,7 @@ class zeugnisnote extends basis_db
 			tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung, tbl_lehrveranstaltung.lvnr, tbl_studienplan_lehrveranstaltung.sort as studienplan_lehrveranstaltung_sort
 		FROM
 			lehre.tbl_lehrveranstaltung
-			LEFT JOIN lehre.tbl_zeugnisnote ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.prestudent_id=".$this->db_add_param($prestudent_id)." AND tbl_zeugnisnote.studiensemester_kurzbz IN(".$stsem."))
+			LEFT JOIN lehre.tbl_zeugnisnote ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)." AND tbl_zeugnisnote.studiensemester_kurzbz IN(".$stsem."))
 			LEFT JOIN lehre.tbl_studienplan_lehrveranstaltung ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id AND tbl_studienplan_lehrveranstaltung.studienplan_id=".$this->db_add_param($studienplan_id).")
 			LEFT JOIN lehre.tbl_note USING(note)
 		WHERE

@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 // header für no cache
 header("Cache-Control: no-cache");
@@ -97,6 +98,7 @@ if($db->db_query($qry))
 					  <GRP:bezeichnung><![CDATA['.$row->bezeichnung.']]></GRP:bezeichnung>
 					  <GRP:generiert><![CDATA['.($row->generiert=='t'?'Ja':'Nein').']]></GRP:generiert>
 					  <GRP:uid><![CDATA['.$row->uid.']]></GRP:uid>
+					  <GRP:prestudent_id><![CDATA['.$row->prestudent_id.']]></GRP:prestudent_id>
 					  <GRP:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></GRP:studiensemester_kurzbz>
 				   </RDF:Description>
 				</RDF:li>
@@ -105,5 +107,5 @@ if($db->db_query($qry))
 	}
 }
 ?>
-   </RDF:Seq>
+	</RDF:Seq>
 </RDF:RDF>

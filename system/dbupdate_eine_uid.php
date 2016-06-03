@@ -18,18 +18,41 @@
  * Authors: Andreas Moik <moik@technikum-wien.at>,
  *
  * Beschreibung:
- * Dieses Skript prueft die Datenbank auf Aenderungen bezueglich eine_uid, dabei werden fehlende Attribute angelegt.
+ * Dieses Skript prueft die Datenbank auf Aenderungen bezueglich eine_uid, dabei werden fehlende Attribute, usw angelegt.
  */
 require_once('../config/system.config.inc.php');
 require_once('../include/basis_db.class.php');
 $db = new basis_db();
-echo '<html>
+?>
+
+<html>
 <head>
 	<title>CS-EineUid</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<link rel="stylesheet" href="../skin/vilesci.css" type="text/css" />
+
+	<script>
+		function startScript()
+		{
+			document.getElementById('startButton').disabled = true;
+			var form = document.createElement('form');
+			form.setAttribute('method', 'POST');
+			form.setAttribute('action', 'dbupdate_eine_uid.php');
+
+			var hiddenField = document.createElement('input');
+			hiddenField.setAttribute('type', 'hidden');
+			hiddenField.setAttribute('value', 'Starten');
+			hiddenField.setAttribute('name', 'action');
+			form.appendChild(hiddenField);
+
+			document.body.appendChild(form);
+			form.submit();
+		}
+	</script>
+
 </head>
-<body>';
+<body>
+<?php
 
 $all_tables_to_update =
 array
@@ -87,9 +110,9 @@ if(!isset($_POST["action"]))
 
 		echo "</p>";
 		echo "
-		<form action='dbupdate_eine_uid.php' method='POST' name='startform'>
-			<input type='submit' value='Starten' name='action'>
-		</form>";
+		<h1 style='margin-top:50px;color:#F44'>ACHTUNG: Dieser Vorgang kann mehrere Minuten dauern!</h1>
+
+			<input id='startButton' type='button' value='Starten' onclick='startScript()'>";
 	}
 	else
 	{
@@ -117,8 +140,8 @@ else if($_POST["action"] == "Starten")
 		{
 			echo "<p>Could not ADD COLUMN uid TO public.tbl_prestudent: " . $db->db_last_error()."</p>";
 		}
-		
-		
+
+
 		$prestudent_qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN perskz character(15);
 		UPDATE public.tbl_prestudent SET perskz = (SELECT matrikelnr FROM public.tbl_student WHERE tbl_student.prestudent_id = tbl_prestudent.prestudent_id);
 		";
@@ -141,77 +164,230 @@ else if($_POST["action"] == "Starten")
 		}
 	}
 
-
-
-
-
-	//********************************DROP ALL VIEWS********************************
-	//bis.vw_bisio
-	if($result = @$db->db_query("SELECT 1 FROM bis.vw_bisio LIMIT 1;"))
-	{
-		if(!$db->db_query("DROP VIEW bis.vw_bisio"))
-		{
-			echo "<p>Could not DROP view bis.vw_bisio: " . $create_view_qry."</p>";
-		}
-	}
-
-	//campus.vw_student_lehrveranstaltung
-	if($result = @$db->db_query("SELECT 1 FROM campus.vw_student_lehrveranstaltung LIMIT 1;"))
-	{
-		if(!$db->db_query("DROP VIEW campus.vw_student_lehrveranstaltung"))
-		{
-			echo "<p>Could not DROP view campus.vw_student_lehrveranstaltung: " . $create_view_qry."</p>";
-		}
-	}
-
-	//lehre.vw_stundenplandev_student_unr
-	if($result = @$db->db_query("SELECT 1 FROM lehre.vw_stundenplandev_student_unr LIMIT 1;"))
-	{
-		if(!$db->db_query("DROP VIEW lehre.vw_stundenplandev_student_unr"))
-		{
-			echo "<p>Could not DROP view lehre.vw_stundenplandev_student_unr: " . $create_view_qry."</p>";
-		}
-	}
-
-	//public.vw_gruppen
-	if($result = @$db->db_query("SELECT 1 FROM public.vw_gruppen LIMIT 1;"))
-	{
-		if(!$db->db_query("DROP VIEW public.vw_gruppen"))
-		{
-			echo "<p>Could not DROP view public.vw_gruppen: " . $create_view_qry."</p>";
-		}
-	}
-	
-	//lehre.vw_zeugnisnote
-	if($result = @$db->db_query("SELECT 1 FROM lehre.vw_zeugnisnote LIMIT 1;"))
-	{
-		if(!$db->db_query("DROP VIEW lehre.vw_zeugnisnote"))
-		{
-			echo "<p>Could not DROP view lehre.vw_zeugnisnote: " . $create_view_qry."</p>";
-		}
-	}
-	
-	//testtool.vw_reihungstest_zeugnisnoten
-	if($result = @$db->db_query("SELECT 1 FROM testtool.vw_reihungstest_zeugnisnoten LIMIT 1;"))
-	{
-		if(!$db->db_query("DROP VIEW testtool.vw_reihungstest_zeugnisnoten"))
-		{
-			echo "<p>Could not DROP view testtool.vw_reihungstest_zeugnisnoten: " . $create_view_qry."</p>";
-		}
-	}
-
-
-
-
+	dropViews($db);
 
 	//modify all tables
 	foreach($all_tables_to_update as $t)
 		modifyOneTable($db, $t);
 
+	createViews($db);
+}
+
+
+
+echo '</body></html>';
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* FUNCTIONS */
+function describeOneChange($db, $table)
+{
+
+	if(!$result = @$db->db_query('SELECT '.$table["to"].' FROM '.$table["schema"].'.'.$table["name"].' LIMIT 1;'))
+	{
+		echo "<div>".$table["schema"].".".$table["name"].": ".$table["from"]." wird <strong style='color:red;'>gelöscht</strong>!</div>";
+		echo "<div>".$table["schema"].".".$table["name"].": ".$table["to"]." wird <strong style='color:green;'>eingefügt</strong>!</div>";
+	}
+}
+
+function checkForUpdates($db, $table)
+{
+	if(!$result = @$db->db_query('SELECT '.$table["to"].' FROM '.$table["schema"].'.'.$table["name"].' LIMIT 1;'))
+	{
+		return true;
+	}
+	return false;
+}
+
+
+function modifyOneTable($db, $table)
+{
+	if(!$result = @$db->db_query('SELECT '.$table["to"].' FROM '.$table["schema"].'.'.$table["name"].' LIMIT 1;'))
+	{
+		$db->db_query("BEGIN;");
+
+		$indices = array();
+		$primary_keys = array();
+
+
+		$index_search_result = $db->db_query("SELECT * FROM pg_indexes WHERE schemaname=".$db->db_add_param($table["schema"])." AND tablename=".$db->db_add_param($table["name"]));
+		while($row = $db->db_fetch_object($index_search_result))
+		{
+			if(strpos($row->indexdef, $table["from"]) !== false)		//only if the pk is affected
+			{
+				$check_if_pk_result = $db->db_query("select * from pg_constraint where conname=".$db->db_add_param($row->indexname));
+
+				if($db->db_num_rows($check_if_pk_result) == 1)
+				{
+					$get_definition_result = $db->db_query(
+						"SELECT conrelid::regclass AS table_from
+							,conname
+							,pg_get_constraintdef(c.oid)
+							FROM pg_constraint c
+							JOIN pg_namespace n ON n.oid = c.connamespace
+						WHERE contype IN ('f', 'p ')
+							AND n.nspname = ".$db->db_add_param($row->schemaname)."
+							AND conname = ".$db->db_add_param($row->indexname)."
+							ORDER BY conrelid::regclass::text, contype DESC;");
+					$def = $db->db_fetch_object($get_definition_result);
+
+					if(!$pk_drop_result = $db->db_query('ALTER TABLE '.$table["schema"].".".$table["name"].' DROP CONSTRAINT '.$row->indexname))
+					{
+						echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen</p>";
+						$db->db_query("ROLLBACK;");
+						return;
+					}
+
+					$constraint_add_query = str_replace ($table["from"], $table["to"], $def->pg_get_constraintdef );
+					$primary_keys[] = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT '.$row->indexname.' '.$constraint_add_query;
+				}
+				else
+				{
+					if(!$index_drop_result = $db->db_query('DROP INDEX '.$table["schema"].".".$row->indexname))
+					{
+						echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von INDEX ".$row->indexname." fehlgeschlagen</p>";
+						$db->db_query("ROLLBACK;");
+						return;
+					}
+
+					$index_add_query = str_replace ($table["from"], $table["to"], $row->indexdef );
+					$indices[] = $index_add_query;
+				}
+			}
+		}
+
+
+
+		//spalte einfuegen
+		$alter_update_qry = 'ALTER TABLE '.$table["schema"].'.'.$table["name"].' ADD COLUMN '.$table["to"].' '.$table["datatype"].';
+		UPDATE '.$table["schema"].".".$table["name"].' SET '.$table["to"].' = (SELECT '.$table["to"].' FROM '.$table["newTargetSchema"].'.'.$table["pickDataFrom"].' WHERE '.$table["pickDataFromCol"].'='.$table["schema"].'.'.$table["name"].'.'.$table["from"].');';
+		$db->db_query($alter_update_qry);
+
+		$constraint_qry = "";
+
+		//constraints: $TO FK, $TO
+		if($table["constraint"] != "")
+			$constraint_qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ALTER COLUMN '.$table["to"].' '.$table["constraint"].";";
+
+		$constraint_qry.=' ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT fk_'.$table["name"].'_'.$table["newTarget"].'_'.$table["to"].' FOREIGN KEY ('.$table["to"].') REFERENCES '.$table["newTargetSchema"].'.'.$table["newTarget"].' ('.$table["to"].');';
+
+		if(!$db->db_query($constraint_qry))
+		{
+			echo '<strong>'.$table["schema"].".".$table["name"].': '.$db->db_last_error().'</strong><br>';
+		}
+		else
+		{
+			echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["to"].' hinzugefuegt!<br>';
+			echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["from"].' auf '.$table["to"].' geändert!<br>';
+			echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["to"].' constraints eingefuegt!<br>';
+
+		//FROM löschen
+			$qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' DROP COLUMN '.$table["from"].';';
+
+			if(!$db->db_query($qry))
+			{
+				echo '<strong>'.$table["schema"].".".$table["name"].': '.$db->db_last_error().'</strong><br>';
+				echo '<strong>'.$table["schema"].".".$table["name"].': ACHTUNG! In diesem Fall sollte '.$table["to"].' ordnungsgemäß eingetragen sein, jedoch '.$table["from"].' nicht gelöscht worden sein. Das Skript erneut zu starten wird nicht funktionieren!</strong><br>';
+			}
+			else
+			{
+				echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["from"].' gelöscht!<br>';
+
+				foreach( $primary_keys as $pk)
+				{
+					if(!$pk_add_result = $db->db_query($pk))
+					{
+						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen</p>";
+						$db->db_query("ROLLBACK;");
+						return;
+					}
+				}
+				foreach( $indices as $ind)
+				{
+					if(!$index_add_result = $db->db_query($ind))
+					{
+						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von INDEX ".$row->indexname." fehlgeschlagen</p>";
+						$db->db_query("ROLLBACK;");
+						return;
+					}
+				}
+
+				$db->db_query("COMMIT;");
+				return;
+			}
+		}
+	}
+}
+
+
+
+function dropViews($db)
+{
+	//********************************DROP ALL VIEWS********************************
+	//bis.vw_bisio
+
+	if(!$db->db_query("DROP VIEW bis.vw_bisio"))
+	{
+		echo "<p>Could not DROP view bis.vw_bisio: " . $create_view_qry."</p>";
+	}
+
+	//campus.vw_student_lehrveranstaltung
+
+	if(!$db->db_query("DROP VIEW campus.vw_student_lehrveranstaltung"))
+	{
+		echo "<p>Could not DROP view campus.vw_student_lehrveranstaltung: " . $create_view_qry."</p>";
+	}
+
+	//lehre.vw_stundenplandev_student_unr
+	if(!$db->db_query("DROP VIEW lehre.vw_stundenplandev_student_unr"))
+	{
+		echo "<p>Could not DROP view lehre.vw_stundenplandev_student_unr: " . $create_view_qry."</p>";
+	}
+
+	//public.vw_gruppen
+	if(!$db->db_query("DROP VIEW public.vw_gruppen"))
+	{
+		echo "<p>Could not DROP view public.vw_gruppen: " . $create_view_qry."</p>";
+	}
+
+	//lehre.vw_zeugnisnote
+	if(!$db->db_query("DROP VIEW lehre.vw_zeugnisnote"))
+	{
+		echo "<p>Could not DROP view lehre.vw_zeugnisnote: " . $create_view_qry."</p>";
+	}
+
+	//testtool.vw_reihungstest_zeugnisnoten
+	if(!$db->db_query("DROP VIEW testtool.vw_reihungstest_zeugnisnoten"))
+	{
+		echo "<p>Could not DROP view testtool.vw_reihungstest_zeugnisnoten: " . $create_view_qry."</p>";
+	}
+}
+
+
+
+
+function createViews($db)
+{
 
 	//********************************CREATE ALL VIEWS********************************
 
@@ -401,8 +577,8 @@ else if($_POST["action"] == "Starten")
 							 FROM lehre.tbl_stundenplandev stpl
 								 JOIN tbl_benutzergruppe USING (gruppe_kurzbz)
 							WHERE tbl_benutzergruppe.studiensemester_kurzbz::text = ((( SELECT tbl_studiensemester.studiensemester_kurzbz
-								       FROM tbl_studiensemester
-								      WHERE stpl.datum <= tbl_studiensemester.ende AND stpl.datum >= tbl_studiensemester.start))::text)
+									     FROM tbl_studiensemester
+									    WHERE stpl.datum <= tbl_studiensemester.ende AND stpl.datum >= tbl_studiensemester.start))::text)
 							GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.uid, tbl_benutzergruppe.prestudent_id
 						UNION
 						 SELECT stpl.unr,
@@ -414,8 +590,8 @@ else if($_POST["action"] == "Starten")
 								JOIN tbl_studentlehrverband ON stpl.gruppe_kurzbz IS NULL AND stpl.studiengang_kz = tbl_studentlehrverband.studiengang_kz AND stpl.semester = tbl_studentlehrverband.semester AND (stpl.verband = tbl_studentlehrverband.verband OR stpl.verband = ' '::bpchar AND stpl.verband <> tbl_studentlehrverband.verband) AND (stpl.gruppe = tbl_studentlehrverband.gruppe OR stpl.gruppe = ' '::bpchar AND stpl.gruppe <> tbl_studentlehrverband.gruppe)
 								JOIN tbl_prestudent on(tbl_prestudent.prestudent_id = tbl_studentlehrverband.prestudent_id)
 							WHERE tbl_studentlehrverband.studiensemester_kurzbz::text = ((( SELECT tbl_studiensemester.studiensemester_kurzbz
-								       FROM tbl_studiensemester
-								      WHERE stpl.datum <= tbl_studiensemester.ende AND stpl.datum >= tbl_studiensemester.start))::text)
+									     FROM tbl_studiensemester
+									    WHERE stpl.datum <= tbl_studiensemester.ende AND stpl.datum >= tbl_studiensemester.start))::text)
 							GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.prestudent_id, tbl_prestudent.uid) sub_stpl_uid
 				GROUP BY sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.uid;
 			";
@@ -531,9 +707,9 @@ else if($_POST["action"] == "Starten")
 			CREATE VIEW testtool.vw_reihungstest_zeugnisnoten AS
 				SELECT tbl_zeugnisnote.studiensemester_kurzbz,
 								CASE
-								    WHEN tbl_zeugnisnote.note IS NULL THEN 5
-								    WHEN tbl_zeugnisnote.note = ANY (ARRAY[7, 13, 14, 15]) THEN 5
-								    ELSE tbl_zeugnisnote.note::integer
+									  WHEN tbl_zeugnisnote.note IS NULL THEN 5
+									  WHEN tbl_zeugnisnote.note = ANY (ARRAY[7, 13, 14, 15]) THEN 5
+									  ELSE tbl_zeugnisnote.note::integer
 								END AS note,
 						tbl_zeugnisnote.lehrveranstaltung_id,
 						tbl_zeugnisnote.benotungsdatum,
@@ -573,7 +749,7 @@ else if($_POST["action"] == "Starten")
 						tbl_prestudent.rt_gesamtpunkte,
 						tbl_studiensemester.ende
 					 FROM tbl_student
-						 JOIN lehre.tbl_zeugnisnote USING (student_uid)
+						 JOIN lehre.tbl_zeugnisnote USING (prestudent_id)
 						 JOIN tbl_benutzer ON tbl_student.student_uid::text = tbl_benutzer.uid::text
 						 JOIN tbl_person USING (person_id)
 						 JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
@@ -586,200 +762,9 @@ else if($_POST["action"] == "Starten")
 			echo "<p>Could not CREATE view testtool.vw_reihungstest_zeugnisnoten: " . $create_view_qry."</p>";
 		}
 	}
-
-/* TODO:SCHEMA.TODO:VIEW TEMPLATE
-	//SCHEMA.TODO:VIEW
-	if(!$result = @$db->db_query("SELECT 1 FROM TODO:SCHEMA.TODO:VIEW LIMIT 1;"))
-	{
-		$create_view_qry = "
-			CREATE VIEW TODO:SCHEMA.TODO:VIEW AS
-				TODO:DEFINITION
-			";
-		if(!$db->db_query($create_view_qry))
-		{
-			echo "<p>Could not CREATE view TODO:SCHEMA.TODO:VIEW: " . $create_view_qry."</p>";
-		}
-	}
-
-*/
-
-
-
-
-
-
-
-
-
-
-
 }
 
 
-
-echo '</body></html>';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* FUNCTIONS */
-function describeOneChange($db, $table)
-{
-
-	if(!$result = @$db->db_query('SELECT '.$table["to"].' FROM '.$table["schema"].'.'.$table["name"].' LIMIT 1;'))
-	{
-		echo "<div>".$table["schema"].".".$table["name"].": ".$table["from"]." wird <strong style='color:red;'>gelöscht</strong>!</div>";
-		echo "<div>".$table["schema"].".".$table["name"].": ".$table["to"]." wird <strong style='color:green;'>eingefügt</strong>!</div>";
-	}
-}
-
-function checkForUpdates($db, $table)
-{
-	if(!$result = @$db->db_query('SELECT '.$table["to"].' FROM '.$table["schema"].'.'.$table["name"].' LIMIT 1;'))
-	{
-		return true;
-	}
-	return false;
-}
-
-
-function modifyOneTable($db, $table)
-{
-	if(!$result = @$db->db_query('SELECT '.$table["to"].' FROM '.$table["schema"].'.'.$table["name"].' LIMIT 1;'))
-	{
-		$db->db_query("BEGIN;");
-
-		$indices = array();
-		$primary_keys = array();
-
-
-		$index_search_result = $db->db_query("SELECT * FROM pg_indexes WHERE schemaname=".$db->db_add_param($table["schema"])." AND tablename=".$db->db_add_param($table["name"]));
-		while($row = $db->db_fetch_object($index_search_result))
-		{
-			if(strpos($row->indexdef, $table["from"]) !== false)		//only if the pk is affected
-			{
-				$check_if_pk_result = $db->db_query("select * from pg_constraint where conname=".$db->db_add_param($row->indexname));
-
-				if($db->db_num_rows($check_if_pk_result) == 1)
-				{
-					$get_definition_result = $db->db_query(
-						"SELECT conrelid::regclass AS table_from
-							,conname
-							,pg_get_constraintdef(c.oid)
-							FROM pg_constraint c
-							JOIN pg_namespace n ON n.oid = c.connamespace
-						WHERE contype IN ('f', 'p ')
-							AND n.nspname = ".$db->db_add_param($row->schemaname)."
-							AND conname = ".$db->db_add_param($row->indexname)."
-							ORDER BY conrelid::regclass::text, contype DESC;");
-					$def = $db->db_fetch_object($get_definition_result);
-
-					if(!$pk_drop_result = $db->db_query('ALTER TABLE '.$table["schema"].".".$table["name"].' DROP CONSTRAINT '.$row->indexname))
-					{
-						echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen</p>";
-						$db->db_query("ROLLBACK;");
-						return;
-					}
-
-					$constraint_add_query = str_replace ($table["from"], $table["to"], $def->pg_get_constraintdef );
-					$primary_keys[] = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT '.$row->indexname.' '.$constraint_add_query;
-				}
-				else
-				{
-					if(!$index_drop_result = $db->db_query('DROP INDEX '.$table["schema"].".".$row->indexname))
-					{
-						echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von INDEX ".$row->indexname." fehlgeschlagen</p>";
-						$db->db_query("ROLLBACK;");
-						return;
-					}
-
-					$index_add_query = str_replace ($table["from"], $table["to"], $row->indexdef );
-					$indices[] = $index_add_query;
-				}
-			}
-		}
-
-
-
-		//spalte einfuegen
-		$alter_update_qry = 'ALTER TABLE '.$table["schema"].'.'.$table["name"].' ADD COLUMN '.$table["to"].' '.$table["datatype"].';
-		UPDATE '.$table["schema"].".".$table["name"].' SET '.$table["to"].' = (SELECT '.$table["to"].' FROM '.$table["newTargetSchema"].'.'.$table["pickDataFrom"].' WHERE '.$table["pickDataFromCol"].'='.$table["schema"].'.'.$table["name"].'.'.$table["from"].');';
-		$db->db_query($alter_update_qry);
-
-		$constraint_qry = "";
-
-		//constraints: $TO FK, $TO
-		if($table["constraint"] != "")
-			$constraint_qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ALTER COLUMN '.$table["to"].' '.$table["constraint"].";";
-
-		$constraint_qry.=' ALTER TABLE '.$table["schema"].".".$table["name"].' ADD CONSTRAINT fk_'.$table["name"].'_'.$table["newTarget"].'_'.$table["to"].' FOREIGN KEY ('.$table["to"].') REFERENCES '.$table["newTargetSchema"].'.'.$table["newTarget"].' ('.$table["to"].');';
-
-		if(!$db->db_query($constraint_qry))
-		{
-			echo '<strong>'.$table["schema"].".".$table["name"].': '.$db->db_last_error().'</strong><br>';
-		}
-		else
-		{
-			echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["to"].' hinzugefuegt!<br>';
-			echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["from"].' auf '.$table["to"].' geändert!<br>';
-			echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["to"].' constraints eingefuegt!<br>';
-
-		//FROM löschen
-			$qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' DROP COLUMN '.$table["from"].';';
-
-			if(!$db->db_query($qry))
-			{
-				echo '<strong>'.$table["schema"].".".$table["name"].': '.$db->db_last_error().'</strong><br>';
-				echo '<strong>'.$table["schema"].".".$table["name"].': ACHTUNG! In diesem Fall sollte '.$table["to"].' ordnungsgemäß eingetragen sein, jedoch '.$table["from"].' nicht gelöscht worden sein. Das Skript erneut zu starten wird nicht funktionieren!</strong><br>';
-			}
-			else
-			{
-				echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["from"].' gelöscht!<br>';
-
-				foreach( $primary_keys as $pk)
-				{
-					if(!$pk_add_result = $db->db_query($pk))
-					{
-						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen</p>";
-						$db->db_query("ROLLBACK;");
-						return;
-					}
-				}
-				foreach( $indices as $ind)
-				{
-					if(!$index_add_result = $db->db_query($ind))
-					{
-						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von INDEX ".$row->indexname." fehlgeschlagen</p>";
-						$db->db_query("ROLLBACK;");
-						return;
-					}
-				}
-
-				$db->db_query("COMMIT;");
-				return;
-			}
-		}
-	}
-}
 
 
 ?>

@@ -25,7 +25,6 @@
  *  - Vollstaendigkeit von Modulen etc
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
-require_once(dirname(__FILE__).'/student.class.php');
 require_once(dirname(__FILE__).'/prestudent.class.php');
 require_once(dirname(__FILE__).'/studiensemester.class.php');
 require_once(dirname(__FILE__).'/studienplan.class.php');
@@ -592,8 +591,6 @@ class lvregel extends basis_db
 				// Ausbildungssemester wird nur beim 1. durchlauf ermittelt
 				if(!isset($this->cache[$prestudent_id]) && !isset($this->cache[$prestudent_id][$studiensemester_kurzbz]))
 				{
-					$student = new student($prestudent_id); // TODO EINE
-
 					// Ausbildungssemester aus dem Status holen
 					$prestudent = new prestudent();
 					if($prestudent->getLastStatus($prestudent_id, $studiensemester_kurzbz))

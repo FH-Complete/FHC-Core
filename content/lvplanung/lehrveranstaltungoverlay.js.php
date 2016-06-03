@@ -1838,7 +1838,7 @@ function LehrveranstaltungNotenAuswahl()
 	var prestudent_id=tree.view.getCellText(tree.currentIndex,col);
 	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiensemester_kurzbz"] : "lehrveranstaltung-noten-tree-studiensemester_kurzbz";
 	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-alert(prestudent_id + " LVOVERLAY.JS");//TODO EINE (testen, ob prestudent_id eingetragen ist!)
+
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&prestudent_id='+prestudent_id+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
 
@@ -2001,8 +2001,8 @@ function LehrveranstaltungFFZertifikatPrint(event)
 		for (var v = start.value; v <= end.value; v++)
 		{
 			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-prestudent_id"] : "lehrveranstaltung-noten-tree-prestudent_id";
-			uid = tree.view.getCellText(v,col);
-			paramList += ';'+uid;
+			prestudent_id = tree.view.getCellText(v,col);
+			paramList += ';'+prestudent_id;
 			anzahl = anzahl+1;
 			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
 			lvid = tree.view.getCellText(v,col);
@@ -2019,7 +2019,7 @@ function LehrveranstaltungFFZertifikatPrint(event)
 	else
 		var output='pdf';
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid='+paramList+'&output='+output+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&prestudent_id='+paramList+'&output='+output+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
 	window.location.href = url;
 	//prompt('test:',url);
 }

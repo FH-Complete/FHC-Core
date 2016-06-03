@@ -19,7 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
  *          Gerald Raab <gerald.raab@technikum-wien.at> and
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>.
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -64,17 +64,17 @@ function breaktext($text, $zeichen)
 if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 {
 
-	if(isset($_GET['uid']))
-		$uid = $_GET['uid'];
+	if(isset($_GET['prestudent_id']))
+		$prestudent_id = $_GET['prestudent_id'];
 	else 
-		$uid = null;
+		$prestudent_id = null;
 	
-	$uid_arr = explode(";",$uid);
+	$prestudent_id_arr = explode(";",$prestudent_id);
 
-	if ($uid_arr[0] == "")
+	if ($prestudent_id_arr[0] == "")
 	{
-		unset($uid_arr[0]);
-		$uid_arr = array_values($uid_arr);
+		unset($prestudent_id_arr[0]);
+		$prestudent_id_arr = array_values($prestudent_id_arr);
 	}
 	
 	$note_arr = array();
@@ -179,14 +179,14 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	$studiensemester = new studiensemester();
 	$studiensemester->load($studiensemester_kurzbz);
 			
-	for ($i = 0; $i < sizeof($uid_arr); $i++)
+	for ($i = 0; $i < sizeof($prestudent_id_arr); $i++)
 	{	
 		$anzahl_fussnoten=0;
 		$studiengang_typ='';
 		$xml_fussnote='';
 		
-		$query = "	SELECT 	tbl_student.matrikelnr, 
-							tbl_student.studiengang_kz, 
+		$query = "	SELECT 	tbl_prestudent.perskz,
+							tbl_prestudent.studiengang_kz,
 							tbl_studiengang.typ, 
 							tbl_studiengang.bezeichnung, 
 							tbl_person.vorname, 
@@ -196,13 +196,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							tbl_person.titelpost, 
 							tbl_person.geschlecht 
 					FROM 	tbl_person, 
-							tbl_student, 
+							tbl_prestudent,
 							tbl_studiengang, 
 							tbl_benutzer 
-					WHERE 	tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz 
-					AND 	tbl_student.student_uid = tbl_benutzer.uid 
+					WHERE 	tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz
+					AND 	tbl_prestudent.uid = tbl_benutzer.uid
 					AND 	tbl_benutzer.person_id = tbl_person.person_id 
-					AND 	tbl_student.student_uid = '".$uid_arr[$i]."'";
+					AND 	tbl_prestudent.prestudent_id = ".$db->db_add_param($prestudent_id_arr[$i], FHC_INTEGER);
 
 		if($db->db_query($query))
 		{
@@ -228,15 +228,14 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 		$xml .= "\n		<gebdatum>".$gebdatum."</gebdatum>";
 		$xml .= "\n		<geschlecht>".$row->geschlecht."</geschlecht>";
-		$xml .= "\n		<matrikelnr>".trim($row->matrikelnr)."</matrikelnr>";
+		$xml .= "\n		<matrikelnr>".trim($row->perskz)."</matrikelnr>";
 		$xml .= "\n		<studiengangsleiter>".$stgl."</studiengangsleiter>";
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "\n		<ort_datum>Wien, am ".$datum_aktuell."</ort_datum>";
 
-		$student = new student($uid_arr[$i]);	// TODO EINE
 
 		$obj = new zeugnisnote();
-		$obj->load($lehrveranstaltung_id, $student->prestudent_id, $studiensemester_kurzbz);
+		$obj->load($lehrveranstaltung_id, $prestudent_id_arr[$i], $studiensemester_kurzbz);
 
 		if ($obj->note)
 		{
