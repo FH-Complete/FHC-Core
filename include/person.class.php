@@ -31,7 +31,7 @@ require_once(dirname(__FILE__).'/../application/models/person/Person_model.php')
 class person extends Person_model
 {
 	use db_extra; //CI Hack
-
+	
 	public $errormsg;			// string
 	public $new;				// boolean
 	public $personen = array();	// person Objekt

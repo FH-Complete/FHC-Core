@@ -28,6 +28,8 @@ require_once(dirname(__FILE__).'/../application/models/organisation/Studiensemes
 
 class studiensemester extends Studiensemester_model
 {
+	use db_extra; //CI Hack
+	
 	public $new;      // boolean
 	public $studiensemester = array(); // studiensemester Objekt
 

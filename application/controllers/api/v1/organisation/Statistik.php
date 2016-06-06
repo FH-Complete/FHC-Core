@@ -46,6 +46,32 @@ class Statistik extends APIv1_Controller
 			$this->response();
 		}
 	}
+	
+	/**
+	 * @return void
+	 */
+	public function getAll()
+	{
+		$this->StatistikModel->addOrder($this->get('order'));
+		
+		$result = $this->StatistikModel->loadWhole();
+		
+		$this->response($result, REST_Controller::HTTP_OK);
+	}
+	
+	/**
+	 * @return void
+	 */
+	public function getMenueArray()
+	{
+		$this->StatistikModel->addOrder('gruppe');
+		$this->StatistikModel->addOrder('bezeichnung');
+		$this->StatistikModel->addOrder('statistik_kurzbz');
+		
+		$result = $this->StatistikModel->loadWhole();
+		
+		$this->response($result, REST_Controller::HTTP_OK);
+	}
 
 	/**
 	 * @return void

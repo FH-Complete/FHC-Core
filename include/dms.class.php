@@ -32,6 +32,8 @@ require_once(dirname(__FILE__).'/../application/models/content/Dms_model.php');
 
 class dms extends Dms_model
 {
+	use db_extra; //CI Hack
+	
 	public $new;
 	public $result=array();
 

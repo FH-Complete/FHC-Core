@@ -32,6 +32,8 @@ require_once(dirname(__FILE__).'/../application/models/codex/Orgform_model.php')
  
 class organisationsform extends Orgform_model
 {
+	use db_extra; //CI Hack
+	
 	public $orgform_kurzbz; 
 	public $code; 
 	public $bezeichnung; 

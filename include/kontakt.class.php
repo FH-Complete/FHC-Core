@@ -31,6 +31,8 @@ require_once(dirname(__FILE__).'/../application/models/person/Kontakt_model.php'
 
 class kontakt extends Kontakt_model
 {
+	use db_extra; //CI Hack
+	
 	public $new;       // boolean
 	public $result = array(); // adresse Objekt
 

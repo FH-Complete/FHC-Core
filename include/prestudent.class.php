@@ -30,6 +30,7 @@ require_once(dirname(__FILE__).'/../application/models/crm/Prestudent_model.php'
 class prestudent extends Prestudent_model
 {
 	use db_extra; //CI Hack
+	
 	public $errormsg;			// string
 	
 	//Tabellenspalten

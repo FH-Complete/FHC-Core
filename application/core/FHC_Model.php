@@ -23,6 +23,12 @@ class FHC_Model extends CI_Model
 		{
 			$uid = $_SERVER['PHP_AUTH_USER'];
 		}
+
+		// After getting UID for the first time, it saves it in CI session
+		if (isset($uid) && !isset($this->session->uid))
+		{
+			$this->session->uid = $uid;
+		}
 		
 		$this->load->library('FHC_DB_ACL', array('uid' => $uid));
 	}
