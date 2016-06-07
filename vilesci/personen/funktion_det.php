@@ -289,7 +289,10 @@ if (!$funktion->load($kurzbz))
 
 
 	$funktion = new funktion();
-	$funktion->load($funktion_kurzbz);
+	if (isset($funktion_kurzbz)) // Prevents notice "Undefined variable: funktion_kurzbz"
+	{
+		$funktion->load($funktion_kurzbz);
+	}
 
 	if($funktion->fachbereich)
 	{

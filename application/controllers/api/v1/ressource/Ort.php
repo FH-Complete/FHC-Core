@@ -46,6 +46,31 @@ class Ort extends APIv1_Controller
 			$this->response();
 		}
 	}
+	
+	/**
+	 * @return void
+	 */
+	public function getAll()
+	{
+		$raumtyp_kurzbz = $this->get('raumtyp_kurzbz');
+
+		$this->OrtModel->addOrder('ort_kurzbz');
+		
+		if (!is_null($raumtyp_kurzbz) && $raumtyp_kurzbz != '')
+		{
+			$result = $this->OrtModel->addJoin('public.tbl_ortraumtyp', 'ort_kurzbz');
+			if ($result->error == EXIT_SUCCESS)
+			{
+				$result = $this->OrtModel->loadWhere(array('raumtyp_kurzbz' => $raumtyp_kurzbz));
+			}
+		}
+		else
+		{
+			$result = $this->OrtModel->loadWhole();
+		}
+		
+		$this->response($result, REST_Controller::HTTP_OK);
+	}
 
 	/**
 	 * @return void

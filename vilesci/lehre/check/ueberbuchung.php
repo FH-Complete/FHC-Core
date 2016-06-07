@@ -120,6 +120,7 @@ $ort = array();
 
 foreach ($ort_obj->result as $row)
 {
+	$ort[$row->ort_kurzbz] = new stdClass(); // Prevents the warning "Creating default object from empty value"
 	$ort[$row->ort_kurzbz]->max_person = $row->max_person;
 }
 $qry = "SELECT DISTINCT vw_".$db_stpl_table.".unr,datum, stunde, ort_kurzbz, studiensemester_kurzbz, vw_".$db_stpl_table.".studiengang_kz, vw_".$db_stpl_table.".semester, verband, gruppe, gruppe_kurzbz, UPPER(stg_typ || stg_kurzbz) as stg_kurzbz, lehrfach, lehrfach_bez 

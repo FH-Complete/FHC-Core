@@ -59,10 +59,10 @@ if(!($erg=$db->db_query($qry)))
 	die($db->db_last_error());
 
 $num_rows=$db->db_num_rows($erg);
-for ($i=0;$i<$num_rows;$i++)
+for ($i = 0; $i < $num_rows; $i++)
 {
-	$row=$db->db_fetch_object($erg,$i);
-	$wunsch[$row->tag][$row->stunde][$row->gewicht]=$row->anz;
+	$row = $db->db_fetch_object($erg, $i);
+	$wunsch[$row->tag][$row->stunde][$row->gewicht] = $row->anz;
 }
 
 ?>
@@ -98,18 +98,21 @@ Anzahl der Lektoren: <?PHP echo $anz_lektoren; ?>
 	for ($j=1; $j<7; $j++)
 	{
 		echo '<TR><TD>'.$tagbez[1][$j].'</TD>';
-	  	for ($i=0;$i<$num_rows_stunde;$i++)
+		if (isset($wunsch)) // Prevents warnings if no data are present
 		{
-			$pos=$wunsch[$j][$i+1][4]+$wunsch[$j][$i+1][5];
-			$neg=(isset($wunsch[$j][$i+1][3])?$wunsch[$j][$i+1][3]:0)+
-			     (isset($wunsch[$j][$i+1][2])?$wunsch[$j][$i+1][2]:0)+
-			     (isset($wunsch[$j][$i+1][1])?$wunsch[$j][$i+1][1]:0)+
-			     (isset($wunsch[$j][$i+1][0])?$wunsch[$j][$i+1][0]:0);
-			$bgcolor=isset($cfgStdBgcolor[round(14/$anz_lektoren*$pos)-4])?$cfgStdBgcolor[round(14/$anz_lektoren*$pos)-4]:'';
-			echo '<TD bgcolor="'.$bgcolor.'">';
-			echo '+:'.round(100/$anz_lektoren*$pos).'%<BR>';
-			echo '-:'.round(100/$anz_lektoren*$neg).'%';
-			echo '</TD>';
+			for ($i=0;$i<$num_rows_stunde;$i++)
+			{
+				$pos=$wunsch[$j][$i+1][4]+$wunsch[$j][$i+1][5];
+				$neg=(isset($wunsch[$j][$i+1][3])?$wunsch[$j][$i+1][3]:0)+
+					 (isset($wunsch[$j][$i+1][2])?$wunsch[$j][$i+1][2]:0)+
+					 (isset($wunsch[$j][$i+1][1])?$wunsch[$j][$i+1][1]:0)+
+					 (isset($wunsch[$j][$i+1][0])?$wunsch[$j][$i+1][0]:0);
+				$bgcolor=isset($cfgStdBgcolor[round(14/$anz_lektoren*$pos)-4])?$cfgStdBgcolor[round(14/$anz_lektoren*$pos)-4]:'';
+				echo '<TD bgcolor="'.$bgcolor.'">';
+				echo '+:'.round(100/$anz_lektoren*$pos).'%<BR>';
+				echo '-:'.round(100/$anz_lektoren*$neg).'%';
+				echo '</TD>';
+			}
 		}
 		echo '</TR>';
 	}
