@@ -97,7 +97,7 @@ else
 $user = get_uid();
 if($uid=='-1' || $projektarbeit_id=='-1')
 {
-	exit;		
+	exit;
 }
 
 // Bei Studierenden pruefen ob die Uebergebene Projektarbeit zu dem Studierenden passt.

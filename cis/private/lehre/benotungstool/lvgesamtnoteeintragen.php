@@ -38,7 +38,6 @@ require_once('../../../../include/lvgesamtnote.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
 require_once('../../../../include/person.class.php');
 require_once('../../../../include/benutzer.class.php');
-require_once('../../../../include/student.class.php');
 require_once('../../../../include/phrasen.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
 require_once('../../../../include/notenschluessel.class.php');
@@ -210,7 +209,6 @@ if (isset($_REQUEST["submit"]))
 	}
 	else
 	{
-
 		foreach ($_POST as $row=>$val)
 		{
 			if(mb_strstr(mb_strtolower($row), 'matrikelnr_'))
@@ -231,8 +229,10 @@ if (isset($_REQUEST["submit"]))
 						continue;
 					}
 					$punkte=str_replace(',','.', $punkte);
-					//UID ermitteln
-					if(!$student_uid = $student->getUidFromMatrikelnummer($matrikelnummer))	// TODO EINE! hier brauchen wir für savenote eine prestudent_id!
+
+					//PreID ermitteln
+					$prestudent = new prestudent();
+					if(!$prestudent_id = $prestudent->getPreIdFromPerskz($matrikelnummer))
 					{
 						$response.="\n".$p->t('benotungstool/studentMitMatrikelnummerExistiertNicht',array($matrikelnummer));
 						continue;
@@ -245,7 +245,7 @@ if (isset($_REQUEST["submit"]))
 					else
 						$znote = null;
 					*/
-					$val=savenote($db,$lvid, $student_uid, $note, $punkte);
+					$val=savenote($db,$lvid, $prestudent_id, $note, $punkte);
 					if($val!='neu' && $val!='update' && $val!='update_f')
 						$response.=$val;
 				}

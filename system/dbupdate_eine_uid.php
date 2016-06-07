@@ -69,6 +69,7 @@ array
 	array("schema" => "lehre",  "name" => "tbl_pruefung",             "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid", "constraint" => "SET NOT NULL"),
 	array("schema" => "lehre",  "name" => "tbl_zeugnis",              "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid", "constraint" => "SET NOT NULL"),
 	array("schema" => "lehre",  "name" => "tbl_zeugnisnote",          "from" => "student_uid", "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid", "constraint" => "SET NOT NULL"),
+	array("schema" => "public", "name" => "tbl_preoutgoing",          "from" => "uid",         "to" => "prestudent_id", "datatype" => "int",         "newTarget" => "tbl_prestudent", "newTargetSchema" => "public", "pickDataFrom" => "tbl_student",  "pickDataFromCol" => "student_uid", "constraint" => "SET NOT NULL"),
 
 );
 
@@ -121,6 +122,8 @@ if(!isset($_POST["action"]))
 }
 else if($_POST["action"] == "Starten")
 {
+	$db->db_query("BEGIN;");
+	$error = false;
 
 	echo '<H1>Systemcheck!</H1>';
 	echo '<H2>DB-Updates!</H2>';
@@ -130,7 +133,10 @@ else if($_POST["action"] == "Starten")
 	echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
 	//********************************tbl_prestudent CHANGES********************************
-	if(!$result = @$db->db_query("SELECT perskz FROM public.tbl_prestudent LIMIT 1;"))
+	if(!$db->db_num_rows($db->db_query("SELECT * FROM information_schema.columns WHERE
+		table_schema='public' AND
+		table_name='tbl_prestudent' AND
+		column_name='perskz';")))
 	{
 		$prestudent_qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN uid varchar(32);
 			ALTER TABLE public.tbl_prestudent ADD CONSTRAINT fk_tbl_prestudent_tbl_benutzer_uid FOREIGN KEY (uid) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -138,21 +144,25 @@ else if($_POST["action"] == "Starten")
 		";
 		if(!$result = @$db->db_query($prestudent_qry))
 		{
+			$error = true;
 			echo "<p>Could not ADD COLUMN uid TO public.tbl_prestudent: " . $db->db_last_error()."</p>";
 		}
-
 
 		$prestudent_qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN perskz character(15);
 		UPDATE public.tbl_prestudent SET perskz = (SELECT matrikelnr FROM public.tbl_student WHERE tbl_student.prestudent_id = tbl_prestudent.prestudent_id);
 		";
 		if(!$result = @$db->db_query($prestudent_qry))
 		{
+			$error = true;
 			echo "<p>Could not ADD COLUMN perskz TO public.tbl_prestudent: " . $db->db_last_error()."</p>";
 		}
 	}
 
 	//********************************tbl_benutzergruppe CHANGES********************************
-	if(!$result = @$db->db_query("SELECT prestudent_id FROM public.tbl_benutzergruppe LIMIT 1;"))
+	if(!$db->db_num_rows($db->db_query("SELECT * FROM information_schema.columns WHERE
+		table_schema='public' AND
+		table_name='tbl_benutzergruppe' AND
+		column_name='prestudent_id';")))
 	{
 		$prestudent_qry = "ALTER TABLE public.tbl_benutzergruppe ADD COLUMN prestudent_id int;
 			ALTER TABLE public.tbl_benutzergruppe ADD CONSTRAINT fk_tbl_benutzergruppe_tbl_prestudent_prestudent_id FOREIGN KEY (prestudent_id) REFERENCES public.tbl_prestudent (prestudent_id) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -160,17 +170,40 @@ else if($_POST["action"] == "Starten")
 		";
 		if(!$result = @$db->db_query($prestudent_qry))
 		{
+			$error = true;
 			echo "<p>Could not ADD COLUMN prestudent_id TO public.tbl_benutzergruppe: " . $db->db_last_error()."</p>";
 		}
 	}
 
-	dropViews($db);
+
+	//********************************tbl_preoutgoing - MA - testdaten entfernen(uid wird auf prestudent_id geändert)********************************
+
+	$qry = "DELETE FROM public.tbl_preoutgoing where uid in(select uid from tbl_mitarbeiter where tbl_mitarbeiter.mitarbeiter_uid = tbl_preoutgoing.uid);
+	";
+	if(!$result = @$db->db_query($qry))
+	{
+		$error = true;
+		echo "<p>Could not ADD COLUMN prestudent_id TO public.tbl_benutzergruppe: " . $db->db_last_error()."</p>";
+	}
+
+	if(!dropViews($db, $error))
+		$error = true;
 
 	//modify all tables
 	foreach($all_tables_to_update as $t)
-		modifyOneTable($db, $t);
+		if(!modifyOneTable($db, $t, $error))
+			$error = true;
 
-	createViews($db);
+	if(!createViews($db, $error))
+		$error = true;
+
+	if($error)
+	{
+		$db->db_query("ROLLBACK;");
+		echo "<p style='color:red;'>Rolled Back because of errors</p>";
+	}
+	else
+	$db->db_query("COMMIT;");
 }
 
 
@@ -220,17 +253,31 @@ function checkForUpdates($db, $table)
 }
 
 
-function modifyOneTable($db, $table)
+function modifyOneTable($db, $table, $error)
 {
-	if(!$result = @$db->db_query('SELECT '.$table["to"].' FROM '.$table["schema"].'.'.$table["name"].' LIMIT 1;'))
-	{
-		$db->db_query("BEGIN;");
+	if($error)
+		return false;
 
+	$qry_count = 'SELECT 1
+		FROM information_schema.columns
+		WHERE table_name='.$db->db_add_param($table["name"]).'
+		AND column_name='.$db->db_add_param($table["to"]).'
+		AND table_schema='.$db->db_add_param($table["schema"]).'
+		LIMIT 1';
+	$result_count = $db->db_query($qry_count);
+	$row_count = $db->db_num_rows($result_count);
+
+	if($row_count < 1)
+	{
 		$indices = array();
 		$primary_keys = array();
 
-
 		$index_search_result = $db->db_query("SELECT * FROM pg_indexes WHERE schemaname=".$db->db_add_param($table["schema"])." AND tablename=".$db->db_add_param($table["name"]));
+		if(!$index_search_result)
+		{
+			echo "<p>ERROR: ".$db->getErrorMsg()."</p>";
+			return false;
+		}
 		while($row = $db->db_fetch_object($index_search_result))
 		{
 			if(strpos($row->indexdef, $table["from"]) !== false)		//only if the pk is affected
@@ -253,9 +300,8 @@ function modifyOneTable($db, $table)
 
 					if(!$pk_drop_result = $db->db_query('ALTER TABLE '.$table["schema"].".".$table["name"].' DROP CONSTRAINT '.$row->indexname))
 					{
-						echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen</p>";
-						$db->db_query("ROLLBACK;");
-						return;
+						echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen: " . $db->db_last_error() . "</p>";
+						return false;
 					}
 
 					$constraint_add_query = str_replace ($table["from"], $table["to"], $def->pg_get_constraintdef );
@@ -265,9 +311,8 @@ function modifyOneTable($db, $table)
 				{
 					if(!$index_drop_result = $db->db_query('DROP INDEX '.$table["schema"].".".$row->indexname))
 					{
-						echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von INDEX ".$row->indexname." fehlgeschlagen</p>";
-						$db->db_query("ROLLBACK;");
-						return;
+						echo "<p><span style='color:red;'>ACHTUNG:</span> DROPPEN von INDEX ".$row->indexname." fehlgeschlagen: " . $db->db_last_error() . "</p>";
+						return false;
 					}
 
 					$index_add_query = str_replace ($table["from"], $table["to"], $row->indexdef );
@@ -283,9 +328,8 @@ function modifyOneTable($db, $table)
 		UPDATE '.$table["schema"].".".$table["name"].' SET '.$table["to"].' = (SELECT '.$table["to"].' FROM '.$table["newTargetSchema"].'.'.$table["pickDataFrom"].' WHERE '.$table["pickDataFromCol"].'='.$table["schema"].'.'.$table["name"].'.'.$table["from"].');';
 		$db->db_query($alter_update_qry);
 
-		$constraint_qry = "";
 
-		//constraints: $TO FK, $TO
+		$constraint_qry = "";
 		if($table["constraint"] != "")
 			$constraint_qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' ALTER COLUMN '.$table["to"].' '.$table["constraint"].";";
 
@@ -297,11 +341,8 @@ function modifyOneTable($db, $table)
 		}
 		else
 		{
-			echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["to"].' hinzugefuegt!<br>';
-			echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["from"].' auf '.$table["to"].' geändert!<br>';
-			echo ' '.$table["schema"].".".$table["name"].': Spalte '.$table["to"].' constraints eingefuegt!<br>';
+			echo "<p><span style='color:green;'>Added</span>: ".$table["schema"].".".$table["name"].".".$table["to"]."</p>";
 
-		//FROM löschen
 			$qry = 'ALTER TABLE '.$table["schema"].".".$table["name"].' DROP COLUMN '.$table["from"].';';
 
 			if(!$db->db_query($qry))
@@ -317,82 +358,71 @@ function modifyOneTable($db, $table)
 				{
 					if(!$pk_add_result = $db->db_query($pk))
 					{
-						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen</p>";
-						$db->db_query("ROLLBACK;");
-						return;
+						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von PRIMARY KEY ".$row->indexname." fehlgeschlagen: " . $db->db_last_error() . "</p>";
+						return false;
 					}
 				}
 				foreach( $indices as $ind)
 				{
 					if(!$index_add_result = $db->db_query($ind))
 					{
-						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von INDEX ".$row->indexname." fehlgeschlagen</p>";
-						$db->db_query("ROLLBACK;");
-						return;
+						echo "<p><span style='color:red;'>ACHTUNG:</span> ADDEN von INDEX ".$row->indexname." fehlgeschlagen: " . $db->db_last_error() . "</p>";
+						return false;
 					}
 				}
-
-				$db->db_query("COMMIT;");
-				return;
 			}
 		}
 	}
+	return true;
 }
 
 
 
-function dropViews($db)
+function dropViews($db, $error)
 {
+	if($error)
+		return false;
+
+	$viewsToDrop = array
+	(
+		array("schema" => "bis", "name" => "vw_bisio"),
+		array("schema" => "campus", "name" => "vw_student_lehrveranstaltung"),
+		array("schema" => "lehre", "name" => "vw_stundenplandev_student_unr"),
+		array("schema" => "public", "name" => "vw_gruppen"),
+		array("schema" => "lehre", "name" => "vw_zeugnisnote"),
+		array("schema" => "testtool", "name" => "vw_reihungstest_zeugnisnoten"),
+		array("schema" => "reports", "name" => "vw_outgoing"),
+	);
+
 	//********************************DROP ALL VIEWS********************************
-	//bis.vw_bisio
-
-	if(!$db->db_query("DROP VIEW bis.vw_bisio"))
+	foreach($viewsToDrop as $v)
 	{
-		echo "<p>Could not DROP view bis.vw_bisio: " . $create_view_qry."</p>";
+		if(!@$db->db_query("DROP VIEW ".$v["schema"].".".$v["name"]))
+		{
+			echo "<p>Could not DROP view ".$v["schema"].".".$v["name"].": " . $db->db_last_error() . "</p>";
+			return false;
+		} else
+		{
+			echo "<p><span style='color:green;'>Dropped</span>: ".$v["schema"].".".$v["name"]."</p>";
+		}
 	}
-
-	//campus.vw_student_lehrveranstaltung
-
-	if(!$db->db_query("DROP VIEW campus.vw_student_lehrveranstaltung"))
-	{
-		echo "<p>Could not DROP view campus.vw_student_lehrveranstaltung: " . $create_view_qry."</p>";
-	}
-
-	//lehre.vw_stundenplandev_student_unr
-	if(!$db->db_query("DROP VIEW lehre.vw_stundenplandev_student_unr"))
-	{
-		echo "<p>Could not DROP view lehre.vw_stundenplandev_student_unr: " . $create_view_qry."</p>";
-	}
-
-	//public.vw_gruppen
-	if(!$db->db_query("DROP VIEW public.vw_gruppen"))
-	{
-		echo "<p>Could not DROP view public.vw_gruppen: " . $create_view_qry."</p>";
-	}
-
-	//lehre.vw_zeugnisnote
-	if(!$db->db_query("DROP VIEW lehre.vw_zeugnisnote"))
-	{
-		echo "<p>Could not DROP view lehre.vw_zeugnisnote: " . $create_view_qry."</p>";
-	}
-
-	//testtool.vw_reihungstest_zeugnisnoten
-	if(!$db->db_query("DROP VIEW testtool.vw_reihungstest_zeugnisnoten"))
-	{
-		echo "<p>Could not DROP view testtool.vw_reihungstest_zeugnisnoten: " . $create_view_qry."</p>";
-	}
+	return true;
 }
 
 
 
 
-function createViews($db)
+function createViews($db, $error)
 {
+	if($error)
+		return false;
 
 	//********************************CREATE ALL VIEWS********************************
 
 	//bis.vw_bisio
-	if(!$result = @$db->db_query("SELECT 1 FROM bis.vw_bisio LIMIT 1;"))
+	if(!$db->db_num_rows($db->db_query("SELECT * FROM information_schema.tables WHERE table_type='VIEW'
+		AND table_schema='bis'
+		AND table_name='vw_bisio';")))
 	{
 		$create_view_qry = "
 			CREATE VIEW bis.vw_bisio AS SELECT tbl_prestudentstatus.studiensemester_kurzbz,
@@ -456,14 +486,20 @@ function createViews($db)
 			COMMENT ON VIEW bis.vw_bisio IS 'Incoming Outgoing';";
 		if(!$db->db_query($create_view_qry))
 		{
-			echo "<p>Could not CREATE view bis.vw_bisio: " . $create_view_qry."</p>";
+			echo "<p>Could not CREATE view bis.vw_bisio: " . $db->db_last_error() . "</p>";
+			return false;
+		}
+		else
+		{
+			echo "<p><span style='color:green;'>Created</span>: bis.vw_bisio</p>";
 		}
 	}
 
 
-
 	//campus.vw_student_lehrveranstaltung
-	if(!$result = @$db->db_query("SELECT 1 FROM campus.vw_student_lehrveranstaltung LIMIT 1;"))
+	if(!$db->db_num_rows($db->db_query("SELECT * FROM information_schema.tables WHERE table_type='VIEW'
+		AND table_schema='campus'
+		AND table_name='vw_student_lehrveranstaltung';")))
 	{
 		$create_view_qry = "
 			CREATE VIEW campus.vw_student_lehrveranstaltung AS
@@ -554,14 +590,21 @@ function createViews($db)
 		";
 		if(!$db->db_query($create_view_qry))
 		{
-			echo "<p>Could not CREATE view campus.vw_student_lehrveranstaltung: " . $create_view_qry."</p>";
+			echo "<p>Could not CREATE view campus.vw_student_lehrveranstaltung: " . $db->db_last_error() . "</p>";
+			return false;
+		}
+		else
+		{
+			echo "<p><span style='color:green;'>Created</span>: campus.vw_student_lehrveranstaltung</p>";
 		}
 	}
 
 
 
 	//lehre.vw_stundenplandev_student_unr
-	if(!$result = @$db->db_query("SELECT 1 FROM lehre.vw_stundenplandev_student_unr LIMIT 1;"))
+	if(!$db->db_num_rows($db->db_query("SELECT * FROM information_schema.tables WHERE table_type='VIEW'
+		AND table_schema='lehre'
+		AND table_name='vw_stundenplandev_student_unr';")))
 	{
 		$create_view_qry = "
 			CREATE VIEW lehre.vw_stundenplandev_student_unr AS
@@ -597,14 +640,21 @@ function createViews($db)
 			";
 		if(!$db->db_query($create_view_qry))
 		{
-			echo "<p>Could not CREATE view lehre.vw_stundenplandev_student_unr: " . $create_view_qry."</p>";
+			echo "<p>Could not CREATE view lehre.vw_stundenplandev_student_unr: " . $db->db_last_error() . "</p>";
+			return false;
+		}
+		else
+		{
+			echo "<p><span style='color:green;'>Created</span>: lehre.vw_stundenplandev_student_unr</p>";
 		}
 	}
 
 
 
 	//public.vw_gruppen
-	if(!$result = @$db->db_query("SELECT 1 FROM public.vw_gruppen LIMIT 1;"))
+	if(!$db->db_num_rows($db->db_query("SELECT * FROM information_schema.tables WHERE table_type='VIEW'
+		AND table_schema='public'
+		AND table_name='vw_gruppen';")))
 	{
 		$create_view_qry = "
 			CREATE VIEW public.vw_gruppen AS
@@ -642,14 +692,21 @@ function createViews($db)
 			";
 		if(!$db->db_query($create_view_qry))
 		{
-			echo "<p>Could not CREATE view public.vw_gruppen: " . $create_view_qry."</p>";
+			echo "<p>Could not CREATE view public.vw_gruppen: " . $db->db_last_error() . "</p>";
+			return false;
+		}
+		else
+		{
+			echo "<p><span style='color:green;'>Created</span>: public.vw_gruppen</p>";
 		}
 	}
 
 
 
 	//lehre.vw_zeugnisnote
-	if(!$result = @$db->db_query("SELECT 1 FROM lehre.vw_zeugnisnote LIMIT 1;"))
+	if(!$db->db_num_rows($db->db_query("SELECT * FROM information_schema.tables WHERE table_type='VIEW'
+		AND table_schema='lehre'
+		AND table_name='vw_zeugnisnote';")))
 	{
 		$create_view_qry = "
 			CREATE VIEW lehre.vw_zeugnisnote AS
@@ -696,12 +753,19 @@ function createViews($db)
 			";
 		if(!$db->db_query($create_view_qry))
 		{
-			echo "<p>Could not CREATE view lehre.vw_zeugnisnote: " . $create_view_qry."</p>";
+			echo "<p>Could not CREATE view lehre.vw_zeugnisnote: " . $db->db_last_error() . "</p>";
+			return false;
+		}
+		else
+		{
+			echo "<p><span style='color:green;'>Created</span>: lehre.vw_zeugnisnote</p>";
 		}
 	}
 
-	//testtool.VIEW
-	if(!$result = @$db->db_query("SELECT 1 FROM testtool.vw_reihungstest_zeugnisnoten LIMIT 1;"))
+	//testtool.vw_reihungstest_zeugnisnoten
+	if(!$db->db_num_rows($db->db_query("SELECT * FROM information_schema.tables WHERE table_type='VIEW'
+		AND table_schema='testtool'
+		AND table_name='vw_reihungstest_zeugnisnoten';")))
 	{
 		$create_view_qry = "
 			CREATE VIEW testtool.vw_reihungstest_zeugnisnoten AS
@@ -759,9 +823,106 @@ function createViews($db)
 			";
 		if(!$db->db_query($create_view_qry))
 		{
-			echo "<p>Could not CREATE view testtool.vw_reihungstest_zeugnisnoten: " . $create_view_qry."</p>";
+			echo "<p>Could not CREATE view testtool.vw_reihungstest_zeugnisnoten: " . $db->db_last_error() . "</p>";
+			return false;
+		}
+		else
+		{
+			echo "<p><span style='color:green;'>Created</span>: testtool.vw_reihungstest_zeugnisnoten</p>";
 		}
 	}
+
+	//reports.vw_outgoing
+	if(!$db->db_num_rows($db->db_query("SELECT * FROM information_schema.tables WHERE table_type='VIEW'
+		AND table_schema='reports'
+		AND table_name='vw_outgoing';")))
+	{
+		$create_view_qry = "
+			CREATE VIEW reports.vw_outgoing AS
+				SELECT 'Outgoing'::character varying AS status_kurzbz,
+					tbl_preoutgoing_firma.mobilitaetsprogramm_code,
+					tbl_benutzer.person_id,
+					tbl_preoutgoing.prestudent_id,
+					tbl_preoutgoing_firma.firma_id,
+					tbl_preoutgoing.preoutgoing_id,
+					tbl_preoutgoing.dauer_von,
+					tbl_preoutgoing.dauer_bis,
+					tbl_preoutgoing.ansprechperson,
+					tbl_preoutgoing.bachelorarbeit,
+					tbl_preoutgoing.masterarbeit,
+					tbl_preoutgoing.betreuer,
+					tbl_preoutgoing.sprachkurs,
+					tbl_preoutgoing.intensivsprachkurs,
+					tbl_preoutgoing.sprachkurs_von,
+					tbl_preoutgoing.sprachkurs_bis,
+					tbl_preoutgoing.praktikum,
+					tbl_preoutgoing.praktikum_von,
+					tbl_preoutgoing.praktikum_bis,
+					tbl_preoutgoing.behinderungszuschuss,
+					tbl_preoutgoing.studienbeihilfe,
+					tbl_preoutgoing.studienrichtung_gastuniversitaet,
+					tbl_preoutgoing.projektarbeittitel,
+					tbl_preoutgoing_firma.preoutgoing_firma_id,
+					tbl_preoutgoing_firma.name AS partneruniname,
+					tbl_preoutgoing_firma.auswahl,
+					tbl_firma.name AS firmenname,
+					tbl_firma.firmentyp_kurzbz,
+					tbl_firma.schule,
+					tbl_firma.steuernummer,
+					tbl_firma.gesperrt,
+					tbl_firma.aktiv AS firmaaktiv,
+					tbl_benutzer.alias,
+					tbl_person.staatsbuergerschaft,
+					tbl_person.geburtsnation,
+					tbl_person.sprache,
+					tbl_person.anrede,
+					tbl_person.titelpost,
+					tbl_person.titelpre,
+					tbl_person.nachname,
+					tbl_person.vorname,
+					tbl_person.vornamen,
+					tbl_person.gebdatum,
+					tbl_person.gebort,
+					tbl_person.gebzeit,
+					tbl_person.homepage,
+					tbl_person.svnr,
+					tbl_person.ersatzkennzeichen,
+					tbl_person.familienstand,
+					tbl_person.geschlecht,
+					tbl_person.anzahlkinder,
+					tbl_person.bundesland_code,
+					tbl_person.kompetenzen,
+					tbl_person.kurzbeschreibung,
+					tbl_person.zugangscode,
+					tbl_person.foto_sperre,
+					tbl_person.matr_nr,
+					tbl_mobilitaetsprogramm.kurzbz,
+					tbl_mobilitaetsprogramm.beschreibung,
+					tbl_mobilitaetsprogramm.sichtbar,
+					tbl_mobilitaetsprogramm.sichtbar_outgoing
+				FROM tbl_preoutgoing
+					JOIN tbl_preoutgoing_firma USING (preoutgoing_id)
+					LEFT JOIN tbl_firma USING (firma_id)
+					JOIN tbl_prestudent USING (prestudent_id)
+					JOIN tbl_benutzer USING (uid)
+					JOIN tbl_person ON (tbl_benutzer.person_id = tbl_person.person_id)
+					LEFT JOIN bis.tbl_mobilitaetsprogramm USING (mobilitaetsprogramm_code)
+				WHERE tbl_firma.firmentyp_kurzbz::text = 'Partneruniversität'::text OR tbl_firma.firmentyp_kurzbz IS NULL;
+			";
+		if(!$db->db_query($create_view_qry))
+		{
+			echo "<p>Could not CREATE view reports.vw_outgoing: " . $db->db_last_error() . "</p>";
+			return false;
+		}
+		else
+		{
+			echo "<p><span style='color:green;'>Created</span>: reports.vw_outgoing</p>";
+		}
+	}
+
+
+
+	return true;
 }
 
 

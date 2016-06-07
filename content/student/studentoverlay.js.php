@@ -2137,11 +2137,11 @@ function StudentPrintInskriptionsbestaetigung(event)
 
 	for (var t = 0; t < numRanges; t++)
 	{
-  		tree.view.selection.getRangeAt(t,start,end);
+		tree.view.selection.getRangeAt(t,start,end);
 		for (var v = start.value; v <= end.value; v++)
 		{
-			uid = getTreeCellText(tree, 'student-treecol-uid', v);
-			paramList += ';'+uid;
+			prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
+			paramList += ';'+prestudent_id;
 			stg_kz = getTreeCellText(tree, 'student-treecol-studiengang_kz', v);
 			anzahl = anzahl+1;
 		}
@@ -2162,7 +2162,7 @@ function StudentPrintInskriptionsbestaetigung(event)
 		var output='pdf';
 
 	if(anzahl>0)
-		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&stg_kz='+stg_kz+'&uid='+paramList+'&ss='+stsem+'&output='+output,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&stg_kz='+stg_kz+'&prestudent_id='+paramList+'&ss='+stsem+'&output='+output,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	else
 		alert('Bitte einen Studenten auswaehlen');
 }

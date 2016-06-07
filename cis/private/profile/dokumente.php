@@ -27,6 +27,7 @@ require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/konto.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/student.class.php');
+require_once('../../../include/prestudent.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 
 $sprache = getSprache();
@@ -46,27 +47,31 @@ if(isset($_GET['uid']))
 {
 	// Administratoren duerfen die UID als Parameter uebergeben um die Notenliste
 	// von anderen Personen anzuzeigen
-
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($uid);
 	if($rechte->isBerechtigt('admin'))
-    {
+	{
 		$uid = $_GET['uid'];
-        $getParam = "&uid=" . $uid;
-    }
-    else
-        $getParam = "";
+		$getParam = "&uid=" . $uid;
+	}
+	else
+		$getParam = "";
 }
 else
 	$getParam='';
 
-$student_studiengang = new student();
-$student_studiengang->load($uid);
-$xsl_stg_kz = $student_studiengang->studiengang_kz;
+$prestudent_id = null;
+if(isset($_GET['prestudent_id']))
+{
+	$prestudent_id = $_GET['prestudent_id'];
+	$prestudent = new prestudent($prestudent_id);
+	$xsl_stg_kz = $prestudent->studiengang_kz;
+}
+
 
 $stg = '';
 
-if(!($erg=$db->db_query("SELECT * FROM campus.vw_benutzer WHERE uid='".addslashes($uid)."'")))
+if(!($erg=$db->db_query("SELECT * FROM campus.vw_benutzer WHERE uid=".$db->db_add_param($uid))))
 	die($db->db_last_error());
 $num_rows=$db->db_num_rows($erg);
 if ($num_rows==1)
@@ -93,7 +98,7 @@ if ($stud_num_rows==1)
 	$stgkz=$db->db_result($erg_stud,0,"stgkz");
 	$matrikelnr=$db->db_result($erg_stud,0,"perskz");
 }
-if(!($erg_lekt=$db->db_query("SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($uid)."'")))
+if(!($erg_lekt=$db->db_query("SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=".$db->db_add_param($uid))))
 	die($db->db_last_error());
 $lekt_num_rows=$db->db_num_rows($erg_lekt);
 if ($lekt_num_rows==1)
@@ -104,7 +109,7 @@ if ($lekt_num_rows==1)
 }
 
 // Mail-Groups
-if(!($erg_mg=$db->db_query("SELECT gruppe_kurzbz, beschreibung FROM campus.vw_persongruppe WHERE mailgrp AND uid='".addslashes($uid)."' ORDER BY gruppe_kurzbz")))
+if(!($erg_mg=$db->db_query("SELECT gruppe_kurzbz, beschreibung FROM campus.vw_persongruppe WHERE mailgrp AND uid=".$db->db_add_param($uid)." ORDER BY gruppe_kurzbz")))
 	die($db->db_last_error());
 $nr_mg=$db->db_num_rows($erg_mg);
 
@@ -127,10 +132,16 @@ echo '
 		}
 	}
 </script>
+<style>
+	.contentBox
+	{
+		margin : 10px;
+	}
+</style>
 </head>
 
 <body>
-<h1>'.$p->t('tools/dokumente').'</h1>';
+<h1 class="contentBox">'.$p->t('tools/dokumente').'</h1>';
 
 
 //Aktuelles Studiensemester oder gewaehltes Studiensemester
@@ -140,57 +151,99 @@ $stsem_obj = new studiensemester();
 
 $stsem_obj->getAll();
 
-echo "<br><hr>";
-echo $p->t('global/studiensemester')."</b> <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">";
-	foreach ($stsem_obj->studiensemester as $semrow)
+/*** dropdown fuer studiengang ***/
+$prestudent = new prestudent();
+$prestudent->getPrestudentsFromUid($uid);
+
+if(count($prestudent->result) > 0)
+{
+	echo "<div class='contentBox'>";
+	echo "<hr>";
+	echo "<span>".$p->t('global/studiengang')."</span>";
+	echo "<SELECT name='stg' onChange=\"MM_jumpMenu('self',this,0)\">";
+	echo "<option disabled ".($prestudent_id ? "" : "selected")." value>".$p->t('global/auswaehlen')."</option>";
+
+	foreach ($prestudent->result as $pres)
 	{
-		if($stsem == $semrow->studiensemester_kurzbz)
-			echo "<OPTION value='dokumente.php?stsem=$semrow->studiensemester_kurzbz' selected>$semrow->studiensemester_kurzbz</OPTION>";
-		else
-			echo "<OPTION value='dokumente.php?stsem=$semrow->studiensemester_kurzbz'>$semrow->studiensemester_kurzbz</OPTION>";
+		$studiengang = new studiengang($pres->studiengang_kz);
+		echo "<OPTION ".(isset($prestudent_id) && $prestudent_id == $pres->prestudent_id ? "selected" : "")." value='dokumente.php?prestudent_id=$pres->prestudent_id'>$studiengang->bezeichnung</OPTION>";
 	}
-	echo "</SELECT><br />";
+	echo "</SELECT>";
 
-$konto = new konto();
-
-$buchungstypen = array();
-if(defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))
-{
-	$buchungstypen = unserialize (CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN);
-}
-
-$stsem_zahlung = $konto->getLastStSemBuchungstypen($uid, $buchungstypen, $stsem);
-if ($stsem_zahlung != FALSE && $stsem == $stsem_zahlung)
-{
-	echo "<a href='../pdfExport.php?xsl=Inskription&xml=student.rdf.php&ss=".$stsem."&uid=".$uid."&xsl_stg_kz=".$xsl_stg_kz."'>".$p->t('tools/inskriptionsbestaetigung')."</a>";
-	echo ' - '.$p->t('tools/studienbeitragFuerSSBezahlt',array($stsem));
+	if(isset($prestudent_id))
+	{
+		$semester = array();
+		$prestudent->result = array();
+		$prestudent->getPrestudentRolle($prestudent_id);
+		foreach($prestudent->result as $rolle)
+		{
+			if($rolle->status_kurzbz == "Student" || $rolle->status_kurzbz == "Absolvent" || $rolle->status_kurzbz == "Diplomand")
+			{
+				$semester[$rolle->studiensemester_kurzbz] = 1;
+			}
+		}
+		echo "<span style='margin-left:15px;'>".$p->t('global/studiensemester')."</span>";
+		echo "<SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">";
+		echo "<option disabled ".($stsem == "" ? "selected" : "")." value>".$p->t('global/auswaehlen')."</option>";
+		foreach ($semester as $semk => $semr)
+		{
+			echo "<OPTION ".($stsem == $semk ? "selected" : "")." value='dokumente.php?stsem=$semk&prestudent_id=".$prestudent_id."'>$semk</OPTION>";
+		}
+			echo "</SELECT>";
+	}
+	echo "</div>";
 }
 else
-	echo $p->t('tools/inskriptionsbestaetigung')." - ".$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem));
-
-echo "<hr>";
-
-if(defined('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN') && CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN)
 {
-    if ($stsem_zahlung != FALSE && $stsem == $stsem_zahlung)
-    {
-	    echo "<a href='../pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&ss=".$stsem."&uid=".$uid."'>".$p->t('tools/studienbuchblatt')."</a>";
-	    echo ' - '.$p->t('tools/studienbeitragFuerSSBezahlt',array($stsem));
-    }
-    else
-	    echo $p->t('tools/studienbuchblatt')." - ".$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem));
-
-    echo "<hr>";
+	echo "<div class='contentBox'>";
+	echo	 $p->t("upload/keineStudiengaengeDefiniert");
+	echo "</div>";
 }
 
-if(defined('CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN') && CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN)
+if(isset($xsl_stg_kz))
 {
-	echo "<a href='studienerfolgsbestaetigung.php?".$getParam."' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Deutsch</a><br>";
-	echo "<a href='studienerfolgsbestaetigung.php?lang=en".$getParam."' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Englisch</a>";
+	echo "<div class='contentBox'>";
+
+	$konto = new konto();
+
+	$buchungstypen = array();
+	if(defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))
+	{
+		$buchungstypen = unserialize (CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN);
+	}
+
+	$stsem_zahlung = $konto->getLastStSemBuchungstypen($uid, $buchungstypen, $stsem);
+	if ($stsem_zahlung != FALSE && $stsem == $stsem_zahlung)
+	{
+		echo "<a href='../pdfExport.php?xsl=Inskription&xml=student.rdf.php&ss=".$stsem."&uid=".$uid."&xsl_stg_kz=".$xsl_stg_kz."'>".$p->t('tools/inskriptionsbestaetigung')."</a>";
+		echo ' - '.$p->t('tools/studienbeitragFuerSSBezahlt',array($stsem));
+	}
+	else
+		echo $p->t('tools/inskriptionsbestaetigung')." - ".$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem));
+
 	echo "<hr>";
-}
-echo "<br>";
 
+	if(defined('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN') && CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN)
+	{
+		if ($stsem_zahlung != FALSE && $stsem == $stsem_zahlung)
+		{
+			echo "<a href='../pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&ss=".$stsem."&uid=".$uid."'>".$p->t('tools/studienbuchblatt')."</a>";
+			echo ' - '.$p->t('tools/studienbeitragFuerSSBezahlt',array($stsem));
+		}
+		else
+			echo $p->t('tools/studienbuchblatt')." - ".$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem));
+
+		echo "<hr>";
+	}
+
+	if(defined('CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN') && CIS_DOKUMENTE_STUDIENERFOLGSBESTAETIGUNG_DRUCKEN)
+	{
+		echo "<a href='studienerfolgsbestaetigung.php?".$getParam."' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Deutsch</a><br>";
+		echo "<a href='studienerfolgsbestaetigung.php?lang=en".$getParam."' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Englisch</a>";
+		echo "<hr>";
+	}
+	echo "</div>";
+}
 echo '</body>
 </html>
 ';

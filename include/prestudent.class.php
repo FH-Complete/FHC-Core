@@ -36,7 +36,7 @@ $p = new phrasen($sprache);
 class prestudent extends person
 {
 	//Tabellenspalten
-	public $prestudent_id;	// varchar(16)
+	public $prestudent_id;	// int
 	public $uid;
 	public $perskz;
 	public $aufmerksamdurch_kurzbz;
@@ -2008,5 +2008,34 @@ class prestudent extends person
 		}
 
 		return false;
+	}
+
+
+	/**
+	 * Laedt die Prestudent_id anhand des Personenkennzeichens
+	 * @param Personenkennzeichen
+	 * @return prestudent_id wenn ok, false wenn Fehler
+	 */
+	function getPreIdFromPerskz($perskz)
+	{
+		$qry = "SELECT prestudent_id FROM public.tbl_prestudent WHERE perskz=".$this->db_add_param($perskz);
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->prestudent_id;
+			}
+			else
+			{
+				$this->errormsg = 'Prestudent nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 }

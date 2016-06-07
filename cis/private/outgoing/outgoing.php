@@ -41,7 +41,7 @@ $outgoing->loadUid($uid);
 
 // speichert outgoing
 if(isset($_REQUEST['submitOutgoing']))
-{  
+{
     $ansprechpersonUid = (isset($_REQUEST['ansprechperson_uid']))?$_REQUEST['ansprechperson_uid']:'';
 
     $datum=new datum(); 

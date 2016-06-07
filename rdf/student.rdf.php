@@ -358,7 +358,6 @@ $verband=(isset($_GET['verband'])?$_GET['verband']:null);
 $semester=(isset($_GET['semester'])?$_GET['semester']:null);
 $studiengang_kz=(isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:null);
 $studiensemester_kurzbz = (isset($_GET['studiensemester_kurzbz'])?$_GET['studiensemester_kurzbz']:null);
-$uid = (isset($_GET['uid'])?$_GET['uid']:null);
 $typ = (isset($_GET['typ'])?$_GET['typ']:null);
 $prestudent_id = (isset($_GET['prestudent_id'])?$_GET['prestudent_id']:null);
 $filter = (isset($_GET['filter'])?$_GET['filter']:null);
@@ -401,15 +400,12 @@ if($xmlformat=='rdf')
 	  <RDF:Seq about="'.$rdf_url.'/alle">
 	';
 
-	if(isset($uid))
+	if(isset($prestudent_id))
 	{
-		/* TODO EINE
-		 * Hier wird der Student und der Prestudent gezeichnet
-		 * der Student ist aber nicht eindeutig!
-		 */
+		$prestd = new prestudent($prestudent_id);
 		$student=new student();
+		$uid = $student->getUid($prestudent_id);
 		$student->load($uid, $studiensemester_kurzbz);
-		$prestd = new prestudent();
 
 		draw_content($student);
 		$prestd->load($student->prestudent_id);
@@ -849,17 +845,17 @@ else
 				<gruppe><![CDATA['.$student->gruppe.']]></gruppe>
 				<studienjahr><![CDATA['.$studienjahr.']]></studienjahr>
 				<student_orgform_kurzbz><![CDATA['.$prestudent->orgform_kurzbz.']]></student_orgform_kurzbz>
-                <student_orgform_bezeichnung><![CDATA['.$orgform_student_bezeichnung->bezeichnung.']]></student_orgform_bezeichnung>
+				<student_orgform_bezeichnung><![CDATA['.$orgform_student_bezeichnung->bezeichnung.']]></student_orgform_bezeichnung>
 				<studiengang_kz><![CDATA['.$stg_kz.']]></studiengang_kz>
 				<studiengang_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></studiengang_bezeichnung>
 				<studiengang_art><![CDATA['.$typ.']]></studiengang_art>
-                <studiengang_typ><![CDATA['.$studiengang->typ.']]></studiengang_typ>
-                <studiengang_orgform_kurzbz><![CDATA['.$studiengang->orgform_kurzbz.']]></studiengang_orgform_kurzbz>
-                <studiengang_orgform_bezeichnung><![CDATA['.$orgform_bezeichnung->bezeichnung.']]></studiengang_orgform_bezeichnung>
-                <studiengang_studiengangsleitung><![CDATA['.$stgl.']]></studiengang_studiengangsleitung>
+				<studiengang_typ><![CDATA['.$studiengang->typ.']]></studiengang_typ>
+				<studiengang_orgform_kurzbz><![CDATA['.$studiengang->orgform_kurzbz.']]></studiengang_orgform_kurzbz>
+				<studiengang_orgform_bezeichnung><![CDATA['.$orgform_bezeichnung->bezeichnung.']]></studiengang_orgform_bezeichnung>
+				<studiengang_studiengangsleitung><![CDATA['.$stgl.']]></studiengang_studiengangsleitung>
 				<lv_studiengang_kz><![CDATA['.$lv_studiengang_kz.']]></lv_studiengang_kz>
 				<lv_studiengang_bezeichnung><![CDATA['.$lv_studiengang_bezeichnung.']]></lv_studiengang_bezeichnung>
-                <lv_studiengang_typ><![CDATA['.$lv_studiengang_typ.']]></lv_studiengang_typ>
+				<lv_studiengang_typ><![CDATA['.$lv_studiengang_typ.']]></lv_studiengang_typ>
 				<lv_studiengang_art><![CDATA['.$lv_studiengang_art.']]></lv_studiengang_art>
 				<anrede><![CDATA['.$student->anrede.']]></anrede>
 				<geschlecht><![CDATA['.$student->geschlecht.']]></geschlecht>
@@ -877,7 +873,7 @@ else
 				<max_semester><![CDATA['.$studiengang->max_semester.']]></max_semester>
 				<anmerkungpre><![CDATA['.$prestudent->anmerkung.']]></anmerkungpre>
 				<aktiv><![CDATA['.$student->aktiv.']]></aktiv>
-	    	</student>';
+			</student>';
 		}
 	}
 	echo '</studenten>';

@@ -20,7 +20,7 @@ Ein Beispiel wie sie die RDFs per PHP auslesen k&ouml;nnen finden Sie <a
 <br>
 <h2>Student</h2>
 <span style="font-weight: bold;">Aufruf:</span>
-student.rdf.php?studiengang_kz=...&amp;semester=...&amp;verband=...&amp;gruppe=...&amp;gruppe_kurzbz=...&amp;uid=...&amp;studiensemester_kurzbz=...<br>
+student.rdf.php?studiengang_kz=...&amp;semester=...&amp;verband=...&amp;gruppe=...&amp;gruppe_kurzbz=...&amp;prestudent_id=...&amp;studiensemester_kurzbz=...<br>
 Beispiel: <a target="_blank"
  href="student.rdf.php?studiengang_kz=227&amp;semester=1&amp;studiensemester_kurzbz=WS2008&amp;typ=student">student.rdf.php?studiengang_kz=227&amp;semester=1&amp;studiensemester_kurzbz=WS2008&amp;typ=student</a><br>
 <span style="font-weight: bold;"><br>
@@ -36,7 +36,7 @@ WS2009,...)<br>
   <li>verband: Verband (optional)</li>
   <li>gruppe: Gruppe (optional)</li>
   <li>gruppe_kurzbz: Spezialgruppen, Module, ... (optional)</li>
-  <li>uid: UID eines bestimmten Studenten (Wenn gesetzt werden alle
+  <li>prestudent_id: prestudent_id eines bestimmten Studenten (Wenn gesetzt werden alle
 anderen Parameter nicht verwendet)</li>
   <li>typ: Typ der gelieferten Personen (student, prestudent,
 interressent, bewerber, aufgenommen, warteliste, absage, zgv,
@@ -53,6 +53,7 @@ Attribute:</span><br>
 </ul>
 <ul>
   <li>person_id</li>
+  <li>prestudent_id</li>
   <li>titelpre</li>
   <li>titelpost</li>
   <li>vornamen</li>
@@ -177,7 +178,7 @@ lvinfo.rdf.php?stg_kz=...&amp;semester=...<br><br>
 	<li>tbl_lvinfo.aktiv=true</li>
 	<li>tbl_lvinfo.genehmigt=true</li
 	<li>tbl_lehreinheitmitarbeiter muss gesetzt sein</li>
-</ul> 
+</ul>
 <span style="font-weight: bold;">Parameter</span>: <br>
 <ul>
   <li>stg_kz - Studiengangskennzahl (optional wenn Mitarbeiter gesetzt)</li>
@@ -278,7 +279,7 @@ Ein Mitarbeiter ist immer nur einer Organisationseinheit zugeordnet<br>
 &nbsp;&nbsp;&nbsp; lektoren.rdf.php?studiengang_kz=...<br>
 &nbsp;&nbsp;&nbsp; lektoren.rdf.php?institut=...<br>
 Beispiel: <a target="_blank" href="lektoren.rdf.php?institut=Mechatronics">institut.rdf.php?institut=Mechatronics</a>
-<span style="font-weight: bold;"><br><br>Parameter</span>: 
+<span style="font-weight: bold;"><br><br>Parameter</span>:
 <br>
 <ul>
   <li>studiengang_kz oder<br>

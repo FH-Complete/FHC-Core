@@ -23,13 +23,13 @@
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/preoutgoing.class.php');
 require_once('../include/benutzer.class.php');
-require_once('../include/student.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/firma.class.php');
 require_once('../include/standort.class.php');
 require_once('../include/adresse.class.php');
 require_once('../include/nation.class.php');
 require_once('../include/prestudent.class.php');
+require_once('../include/lehrverband.class.php');
 
 header("Content-type: application/xhtml+xml");
 
@@ -37,30 +37,28 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 {
     if(!isset($_REQUEST['preoutgoing_id']))
         die('Parameter preoutgoing_id is missing!');
-    
+
     $preoutgoing_id = $_REQUEST['preoutgoing_id'];
-    
-    $preoutgoing = new preoutgoing(); 
-    $benutzer = new benutzer(); 
-    $student = new student(); 
-    $studiengang = new studiengang(); 
-    $prestudent = new prestudent(); 
-    
+
+    $preoutgoing = new preoutgoing();
+    $studiengang = new studiengang();
+    $prestudent = new prestudent();
+    $lehrverband = new lehrverband();
+
     if(!$preoutgoing->load($preoutgoing_id))
         die('Konnte Outgoing nicht finden!');
     
-    if(!$benutzer->load($preoutgoing->uid))
-        die('Konnte Benutzer nicht laden!');
     
-    if(!$student->load($preoutgoing->uid))
-        die('Konnte Student nicht laden!');
+    if(!$prestudent->load($preoutgoing->prestudent_id))
+        die('Konnte Prestudent nicht laden!');
 
     $projektarbeittitel = $preoutgoing->projektarbeittitel;
-    $studiengang->load($student->studiengang_kz);
-    $preoutgoingFirma = new preoutgoing(); 
+    $studiengang->load($prestudent->studiengang_kz);
+    $preoutgoingFirma = new preoutgoing();
     $preoutgoingFirma->loadAuswahl($preoutgoing_id);
     $preoutgoing_firma = $preoutgoingFirma->firma_id;
-    $prestudent->getLastStatus($student->prestudent_id);		// TODO EINE NICHT EINDEUTIG
+    $prestudent->getLastStatus($preoutgoing->prestudent_id);
+    $prestudent->load_studentlehrverband($prestudent->studiensemester_kurzbz);
 
     $firma = new firma();
     $nation = new nation();
@@ -81,17 +79,17 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
     echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?> ';
     echo '<learningagreement_outgoing>';
     echo '  <outgoing>';
-    echo '      <vorname><![CDATA['.$benutzer->vorname.']]></vorname>';
-    echo '      <nachname><![CDATA['.$benutzer->nachname.']]></nachname>';
-    echo '      <titel_pre><![CDATA['.$benutzer->titelpre.']]></titel_pre>';
-    echo '      <titel_post><![CDATA['.$benutzer->titelpost.']]></titel_post>';
-    echo '      <email><![CDATA['.$benutzer->uid.'@'.DOMAIN.']]></email>';
+    echo '      <vorname><![CDATA['.$prestudent->vorname.']]></vorname>';
+    echo '      <nachname><![CDATA['.$prestudent->nachname.']]></nachname>';
+    echo '      <titel_pre><![CDATA['.$prestudent->titelpre.']]></titel_pre>';
+    echo '      <titel_post><![CDATA['.$prestudent->titelpost.']]></titel_post>';
+    echo '      <email><![CDATA['.$prestudent->uid.'@'.DOMAIN.']]></email>';
     echo '      <sending_institution>FH Technikum Wien</sending_institution>';
     echo '      <sending_institution_nation>Austria</sending_institution_nation>';
     echo '      <studiengang><![CDATA['.$studiengang->english.']]></studiengang>';
     echo '      <receiving_institution><![CDATA['.$firma->name.']]></receiving_institution>';
     echo '      <receiving_institution_nation><![CDATA['.$nation->engltext.']]></receiving_institution_nation>';
-    echo '      <semester><![CDATA['.$student->semester.']]></semester>';
+    echo '      <semester><![CDATA['.$prestudent->semester.']]></semester>';
     echo '      <studiensemester><![CDATA['.$prestudent->studiensemester_kurzbz.']]></studiensemester>';
     echo '		<datum>'.date('d.m.Y').'</datum>';
     echo '      <lehrveranstaltungen>';
