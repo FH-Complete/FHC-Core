@@ -518,7 +518,7 @@ function drawTree($tree, $depth)
                     elseif(!$found)
                     {
                         if($abgeschlossen)
-                            echo '<span class="ok">'.$p->t('studienplan/regelabgeschlossen'),'</span>';
+                            echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
 			elseif(!$row_tree->stpllv_pflicht)
                             echo '<span>'.$p->t('studienplan/optional').'</span>';
 			else
@@ -528,7 +528,7 @@ function drawTree($tree, $depth)
 		else
 		{
 			if($abgeschlossen)
-				echo '<span class="ok">'.$p->t('studienplan/regelabgeschlossen'),'</span>';
+				echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
 			elseif(!$row_tree->stpllv_pflicht)
 				echo '<span>'.$p->t('studienplan/optional').'</span>';
 			else
@@ -549,10 +549,9 @@ function drawTree($tree, $depth)
 //				if($semester==$empfohlenesSemester)
 //					$tdclass[]='empfehlung';
 //			}
-                        
-                        
 
 			$tdinhalt='';
+
 			// Ist bereits eine Note für diese LV in diesem Stsem vorhanden?
 			if(isset($noten_arr[$row_tree->lehrveranstaltung_id][$stsem]))
 			{

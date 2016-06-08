@@ -1756,7 +1756,38 @@ class prestudent extends person
 			return false;
 		}
 
-		$qry = "SELECT DISTINCT prestudent_id, vorname, nachname, gebdatum, rt_gesamtpunkte, tbl_prestudent.studiengang_kz, bis.tbl_zgvgruppe.bezeichnung, get_rolle_prestudent(prestudent_id, null) as laststatus
+		$stg_obj = new studiengang();
+		$stg_obj->load($studiengang_kz);
+
+		if($stg_obj->typ=='m')
+		{
+			$qry = "SELECT DISTINCT prestudent_id, vorname, nachname, gebdatum, rt_gesamtpunkte, tbl_prestudent.studiengang_kz, bis.tbl_zgvgruppe.bezeichnung, get_rolle_prestudent(prestudent_id, null) as laststatus
+			FROM
+				public.tbl_prestudent
+				JOIN public.tbl_person USING(person_id)
+				LEFT JOIN bis.tbl_zgvgruppe_zuordnung USING(zgvmas_code)
+				LEFT JOIN bis.tbl_zgvgruppe USING(gruppe_kurzbz)
+			WHERE
+				tbl_prestudent.studiengang_kz=". $this->db_add_param($studiengang_kz)."
+				AND EXISTS(
+					SELECT
+						1
+					FROM
+						public.tbl_prestudentstatus
+					WHERE
+						tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id
+						AND studiensemester_kurzbz=". $this->db_add_param($studiensemester_kurzbz)."
+						AND status_kurzbz='Bewerber'
+						AND (
+							studienplan_id=". $this->db_add_param($studienplan_id)."
+							OR
+							(anmerkung like '%' || (SELECT orgform_kurzbz || '_' || sprache FROM lehre.tbl_studienplan WHERE studienplan_id=". $this->db_add_param($studienplan_id).") || '%')
+					)
+			);";
+		}
+		else
+		{
+			$qry = "SELECT DISTINCT prestudent_id, vorname, nachname, gebdatum, rt_gesamtpunkte, tbl_prestudent.studiengang_kz, bis.tbl_zgvgruppe.bezeichnung, get_rolle_prestudent(prestudent_id, null) as laststatus
 			FROM
 				public.tbl_prestudent
 					JOIN public.tbl_person USING(person_id)
@@ -1779,6 +1810,7 @@ class prestudent extends person
 							(anmerkung like '%' || (SELECT orgform_kurzbz || '_' || sprache FROM lehre.tbl_studienplan WHERE studienplan_id=". $this->db_add_param($studienplan_id).") || '%')
 					)
 			);";
+		}
 
 
 		if($result = $this->db_query($qry))

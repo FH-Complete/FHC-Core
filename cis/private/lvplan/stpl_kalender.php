@@ -231,7 +231,8 @@ if(!isset($begin) || !isset($ende))
 	}
 }
 
-if($ende-$begin>31536000)
+
+if($ende-$begin>34560000) // = 400 Tage
 {
 	die($p->t('lvplan/datumsbereichZuGross')."!");
 }

@@ -497,8 +497,17 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 				if ($angabedatei_up)
 				{
 					$name_up = pathinfo($_FILES["angabedatei"]["name"]);
+					//Handle double file extensions (e.g.: .tar.gz)
+					//Array of possible double extensions
+					$ext_array = array('.tar.gz','.tar.bz2','.tar.xz','.tar.lzma','.tar.Z');
+					//Find occurence of extensions ending with ".tar."
+					if (in_array(substr($_FILES["angabedatei"]["name"], strripos($_FILES["angabedatei"]["name"], '.tar.')), $ext_array))
+						$extension = substr($_FILES["angabedatei"]["name"], strripos($_FILES["angabedatei"]["name"]+1, '.tar.'));
+					else 
+						$extension = $name_up["extension"];
+
 					$name_neu = makeUploadName($db, $which='angabe', $lehreinheit_id=$lehreinheit_id, $uebung_id=$uebung_id, $ss=$stsem);
-					$angabedatei = $name_neu.".".$name_up["extension"];
+					$angabedatei = $name_neu.".".$extension;
 					
 					$angabepfad = BENOTUNGSTOOL_PATH."angabe/".$angabedatei;
 					//$angabepfad = BENOTUNGSTOOL_PATH.$angabedatei;
@@ -661,8 +670,16 @@ if(isset($_POST['uebung_edit']))
 		if ($angabedatei_up)
 		{
 			$name_up = pathinfo($_FILES["angabedatei"]["name"]);
+			//Handle double file extensions (e.g.: .tar.gz)
+			//Array of possible double extensions
+			$ext_array = array('.tar.gz','.tar.bz2','.tar.xz','.tar.lzma','.tar.Z');
+			//Find occurence of extensions ending with ".tar."
+			if (in_array(substr($_FILES["angabedatei"]["name"], strripos($_FILES["angabedatei"]["name"], '.tar.')), $ext_array))
+				$extension = substr($_FILES["angabedatei"]["name"], strripos($_FILES["angabedatei"]["name"]+1, '.tar.'));
+			else
+				$extension = $name_up["extension"];
 			$name_neu = makeUploadName($db, $which='angabe', $lehreinheit_id=$lehreinheit_id, $uebung_id=$uebung_id, $ss=$stsem);
-			$angabedatei_neu = $name_neu.".".$name_up["extension"];
+			$angabedatei_neu = $name_neu.".".$extension;
 			
 			$angabepfad = BENOTUNGSTOOL_PATH."angabe/".$angabedatei_neu;
 			//$angabepfad = BENOTUNGSTOOL_PATH.$angabedatei;

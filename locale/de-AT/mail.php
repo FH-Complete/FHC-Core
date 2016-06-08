@@ -42,8 +42,7 @@ These pages will give you a detailed overview of all services available.
 
 $this->phrasen['mail/incomingRegistrationEmail']='Dies ist eine automatisch generierte E-Mail.<br><br>
 Vielen Dank für Ihre Registrierung.<br><br>Sie wurden erfolgreich am System registriert.
-<br><br><br>Mit Hilfe Ihrer UID: <b>%s</b> können Sie sich in unserem
-System (<a href="'.APP_ROOT.'cis/public/incoming">Link zur Anmeldung</a>) anmelden und Ihre Daten bearbeiten.<br><br><br>
+<br><br><br>Mit der UserID: <b>%s</b> können Sie sich in <a href="'.APP_ROOT.'cis/public/incoming">unserem System</a> anmelden und Ihre Daten bearbeiten.<br><br><br>
 Mit freundlichen Grüßen,
 Ihre Hochschule';
 
