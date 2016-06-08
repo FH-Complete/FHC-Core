@@ -12,7 +12,7 @@ class Dms_model extends DB_Model
 		$this->pk = 'dms_id';
 	}
 	
-	protected function insertDmsVersion($data)
+	public function insertDmsVersion($data)
 	{
 		$tableName = 'campus.tbl_dms_version';
 		
@@ -27,7 +27,7 @@ class Dms_model extends DB_Model
 			return $this->_error($this->db->error(), FHC_DB_ERROR);
 	}
 	
-	protected function updateDmsVersion($id, $data)
+	public function updateDmsVersion($id, $data)
 	{
 		$tableName = 'campus.tbl_dms_version';
 		

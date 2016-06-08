@@ -38,6 +38,32 @@ class Dms extends APIv1_Controller
 		
 		if (isset($dms_id))
 		{
+			$result = $this->_getDms($dms_id, $version);
+			if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
+			{
+				if (($fileContent = $this->_readFile($result->retval[0]->filename)) != false)
+				{
+					$result->retval[0]->file_content = $fileContent;
+				}
+			}
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private function _getDms($dms_id, $version)
+	{
+		$result = null;
+		
+		if (isset($dms_id))
+		{
 			$result = $this->DmsModel->addJoin('campus.tbl_dms_version', 'dms_id');
 			if ($result->error == EXIT_SUCCESS)
 			{
@@ -58,6 +84,40 @@ class Dms extends APIv1_Controller
 					}
 				}
 			}
+		}
+		
+		return $result;
+	}
+	
+	/**
+	 * 
+	 */
+	public function postDms()
+	{
+		if ($this->_validate($this->post()))
+		{
+			if (isset($this->post()['dms_id']))
+			{
+				if ($this->_saveFileOnUpdate($this->post()))
+				{
+					$result = $this->DmsModel->update($this->post()['dms_id'], $this->_dmsFieldsArray($this->post()));
+					if ($result->error == EXIT_SUCCESS)
+					{
+						$result = $this->DmsModel->updateDmsVersion($this->post()['dms_id'], $this->_dmsVersionFieldsArray($this->post()));
+					}
+				}
+			}
+			else
+			{
+				if (($fileName = $this->_saveFileOnInsert($this->post())) !== false)
+				{
+					$result = $this->DmsModel->insert($this->_dmsFieldsArray($this->post()));
+					if ($result->error == EXIT_SUCCESS)
+					{
+						$result = $this->DmsModel->insertDmsVersion($this->_dmsVersionFieldsArray($this->post(), $result->retval, $fileName));
+					}
+				}
+			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -70,39 +130,139 @@ class Dms extends APIv1_Controller
 	/**
 	 * 
 	 */
-	public function postDms()
+	private function _dmsFieldsArray($dms)
 	{
-		if ($this->_validate($this->post()))
+		$fieldsArray = array('oe_kurzbz', 'dokument_kurzbz', 'kategorie_kurzbz');
+		$returnArray = array();
+		
+		foreach ($fieldsArray as $value)
 		{
-			if (isset($this->post()['dms_id']))
+			if (isset($dms[$value]))
 			{
-				$result = $this->DmsModel->update($this->post()['dms_id'], $this->post());
-				
-				if ($result->error == EXIT_SUCCESS)
-				{
-					$result = $this->DmsModel->updateDmsVersion($this->post()['dms_id'], $this->post());
-				}
+				$returnArray[$value] = $dms[$value];
 			}
-			else
-			{
-				$result = $this->DmsModel->insert($this->post());
-				
-				if ($result->error == EXIT_SUCCESS)
-				{
-					$result = $this->DmsModel->insertDmsVersion($this->post());
-				}
-			}
-			
-			$this->response($result, REST_Controller::HTTP_OK);
 		}
-		else
-		{
-			$this->response();
-		}
+		
+		return $returnArray;
 	}
 	
+	/**
+	 * 
+	 */
+	private function _dmsVersionFieldsArray($dms, $dms_id = null, $fileName = null)
+	{
+		$fieldsArray = array(
+			'version',
+			'mimetype',
+			'name',
+			'beschreibung',
+			'letzterzugriff',
+			'insertamum',
+			'insertvon',
+			'updateamum',
+			'updatevon'
+		);
+		$returnArray = array();
+		
+		foreach ($fieldsArray as $value)
+		{
+			if (isset($dms[$value]))
+			{
+				$returnArray[$value] = $dms[$value];
+			}
+		}
+		
+		if (isset($dms_id))
+		{
+			$returnArray['dms_id'] = $dms_id;
+		}
+		if (isset($fileName))
+		{
+			$returnArray['filename'] = $fileName;
+		}
+		
+		return $returnArray;
+	}
+	
+	/**
+	 * 
+	 */
+	private function _saveFileOnUpdate($dms)
+	{
+		$result = $this->_getDms($dms['dms_id'], $dms['version']);
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
+		{
+			$fileName = DMS_PATH . $result->retval[0]->filename;
+
+			if (($fileContent = base64_decode($dms['file_content'])))
+			{
+				if (file_put_contents($fileName, $fileContent))
+				{
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 
+	 */
+	private function _saveFileOnInsert($dms)
+	{
+		$fileName = uniqid() . '.' . pathinfo($dms['name'], PATHINFO_EXTENSION);
+		$FileNamePath = DMS_PATH . $fileName;
+
+		if (($fileContent = base64_decode($dms['file_content'])))
+		{
+			if ($fileHandle = fopen($FileNamePath, 'w'))
+			{
+				if(fwrite($fileHandle, $fileContent))
+				{
+					fclose($fileHandle);
+					return $fileName;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 
+	 */
+	private function _readFile($fileName)
+	{
+		$fileNamePath = DMS_PATH . $fileName;
+		if (file_exists($fileNamePath))
+		{
+			if ($fileHandle = fopen($fileNamePath, 'r'))
+			{
+				$cTmpHEX = '';
+				while (!feof($fileHandle))
+				{
+					$cTmpHEX .= fread($fileHandle, 8192);
+				}
+				fclose($fileHandle);
+				return base64_encode($cTmpHEX);
+			}
+		}
+
+		return false;
+	}
+
 	private function _validate($dms = NULL)
 	{
+		if (!isset($dms['file_content']) || (isset($dms['file_content']) && $dms['file_content'] == ''))
+		{
+			return false;
+		}
+		if (!isset($dms['name']) || (isset($dms['name']) && $dms['name'] == ''))
+		{
+			return false;
+		}
+		
 		return true;
 	}
 }
