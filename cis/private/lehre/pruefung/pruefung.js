@@ -475,7 +475,7 @@ function openDialog(lehrveranstaltung_id, termin_id, lvBezeichnung, terminVon, t
  */
 function saveAnmeldung(lehrveranstaltung_id, termin_id)
 {
-	var uid = $("#anmeldung_hinzufuegen_uid").val();
+	var prestudent_id = $("#anmeldung_hinzufuegen_uid").val();
 	if(lehrveranstaltung_id === undefined)
 		lehrveranstaltung_id = $("#lehrveranstaltungHidden").val();
 	if(termin_id === undefined)
@@ -497,7 +497,7 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 			termin_id: termin_id,
 			lehrveranstaltung_id: lehrveranstaltung_id,
 			bemerkung: bemerkungen,
-			uid: uid,
+			prestudent_id: prestudent_id,
 			studienverpflichtung_id: studienverpflichtung_id
 		},
 		error: loadError

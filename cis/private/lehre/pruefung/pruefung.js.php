@@ -18,7 +18,8 @@
  * MA 02110-1301, USA.
  *
  *
- * Authors: Stefan Puraner	<puraner@technikum-wien.at>
+ * Authors: Stefan Puraner	<puraner@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../../../config/cis.config.inc.php');
@@ -238,7 +239,8 @@ function loadPruefungen()
 		$("#pruefungen").empty();
 		if(data.error === 'false')
 		{
-			data.result.pruefungen.forEach(function(e){
+			data.result.pruefungen.forEach(function(e)
+			{
 				if(e.pruefung.storniert === false)
 				{
 					var table = writePruefungsTable(e, data, true);
@@ -519,7 +521,7 @@ function openDialog(lehrveranstaltung_id, termin_id, lvBezeichnung, terminVon, t
  */
 function saveAnmeldung(lehrveranstaltung_id, termin_id)
 {
-	var uid = $("#anmeldung_hinzufuegen_uid").val();
+	var prestudent_id = $("#anmeldung_hinzufuegen_uid").val();
 	if(lehrveranstaltung_id === undefined)
 		lehrveranstaltung_id = $("#lehrveranstaltungHidden").val();
 	if(termin_id === undefined)
@@ -541,7 +543,7 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 			termin_id: termin_id,
 			lehrveranstaltung_id: lehrveranstaltung_id,
 			bemerkung: bemerkungen,
-			uid: uid,
+			prestudent_id: prestudent_id,
 			studienverpflichtung_id: studienverpflichtung_id
 		},
 		error: loadError
@@ -558,7 +560,7 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 	}).complete(function(event, xhr, settings){
 		$("#saveDialog").dialog("close");
 
-		if(uid === undefined)
+		if(prestudent_id === undefined)
 		{
 			//Wenn Anmeldung durch Student
 			refresh();

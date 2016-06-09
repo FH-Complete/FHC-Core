@@ -35,75 +35,76 @@ header("Content-type: application/xhtml+xml");
 
 if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 {
-    if(!isset($_REQUEST['preoutgoing_id']))
-        die('Parameter preoutgoing_id is missing!');
+	if(!isset($_REQUEST['preoutgoing_id']))
+		die('Parameter preoutgoing_id is missing!');
 
-    $preoutgoing_id = $_REQUEST['preoutgoing_id'];
+	$preoutgoing_id = $_REQUEST['preoutgoing_id'];
 
-    $preoutgoing = new preoutgoing();
-    $studiengang = new studiengang();
-    $prestudent = new prestudent();
-    $lehrverband = new lehrverband();
+	$preoutgoing = new preoutgoing();
+	$studiengang = new studiengang();
+	$prestudent = new prestudent();
+	$lehrverband = new lehrverband();
 
-    if(!$preoutgoing->load($preoutgoing_id))
-        die('Konnte Outgoing nicht finden!');
-    
-    
-    if(!$prestudent->load($preoutgoing->prestudent_id))
-        die('Konnte Prestudent nicht laden!');
+	if(!$preoutgoing->load($preoutgoing_id))
+		die('Konnte Outgoing nicht finden!');
 
-    $projektarbeittitel = $preoutgoing->projektarbeittitel;
-    $studiengang->load($prestudent->studiengang_kz);
-    $preoutgoingFirma = new preoutgoing();
-    $preoutgoingFirma->loadAuswahl($preoutgoing_id);
-    $preoutgoing_firma = $preoutgoingFirma->firma_id;
-    $prestudent->getLastStatus($preoutgoing->prestudent_id);
-    $prestudent->load_studentlehrverband($prestudent->studiensemester_kurzbz);
 
-    $firma = new firma();
-    $nation = new nation();
-    if($preoutgoing_firma != '')
-    {
-        $standort = new standort(); 
-        $adresse = new adresse(); 
+	if(!$prestudent->load($preoutgoing->prestudent_id))
+		die('Konnte Prestudent nicht laden!');
 
-        $firma->load($preoutgoing_firma);
-        $standort->load_firma($firma->firma_id);
-        $adresse->load($standort->adresse_id);
-        $nation->load($adresse->nation);
-    }
-    
-    $preoutgoingLv = new preoutgoing(); 
-    $preoutgoingLv->loadLvs($preoutgoing_id);
-    
-    echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?> ';
-    echo '<learningagreement_outgoing>';
-    echo '  <outgoing>';
-    echo '      <vorname><![CDATA['.$prestudent->vorname.']]></vorname>';
-    echo '      <nachname><![CDATA['.$prestudent->nachname.']]></nachname>';
-    echo '      <titel_pre><![CDATA['.$prestudent->titelpre.']]></titel_pre>';
-    echo '      <titel_post><![CDATA['.$prestudent->titelpost.']]></titel_post>';
-    echo '      <email><![CDATA['.$prestudent->uid.'@'.DOMAIN.']]></email>';
-    echo '      <sending_institution>FH Technikum Wien</sending_institution>';
-    echo '      <sending_institution_nation>Austria</sending_institution_nation>';
-    echo '      <studiengang><![CDATA['.$studiengang->english.']]></studiengang>';
-    echo '      <receiving_institution><![CDATA['.$firma->name.']]></receiving_institution>';
-    echo '      <receiving_institution_nation><![CDATA['.$nation->engltext.']]></receiving_institution_nation>';
-    echo '      <semester><![CDATA['.$prestudent->semester.']]></semester>';
-    echo '      <studiensemester><![CDATA['.$prestudent->studiensemester_kurzbz.']]></studiensemester>';
-    echo '		<datum>'.date('d.m.Y').'</datum>';
-    echo '      <lehrveranstaltungen>';
-    foreach($preoutgoingLv->lehrveranstaltungen as $lv)
-        echo'       <lehrveranstaltung><lv>'.$lv->bezeichnung.'</lv><ects>'.$lv->ects.'</ects><wochenstunden>'.$lv->wochenstunden.'</wochenstunden><unitcode>'.$lv->unitcode.'</unitcode></lehrveranstaltung>';
-    echo '      </lehrveranstaltungen>';
-    if($preoutgoing->bachelorarbeit) // Topic fehlt noch
-        echo '       <bachelorarbeit><projektarbeittitel><![CDATA['.$projektarbeittitel.']]></projektarbeittitel></bachelorarbeit>';
-    if($preoutgoing->masterarbeit) // Topic fehlt noch
-        echo '       <masterarbeit><projektarbeittitel><![CDATA['.$projektarbeittitel.']]></projektarbeittitel></masterarbeit>';
-    echo '  </outgoing>';
-    echo '</learningagreement_outgoing>';
-}else
-    die('Parameter xmlformat not set!');
+	$projektarbeittitel = $preoutgoing->projektarbeittitel;
+	$studiengang->load($prestudent->studiengang_kz);
+	$preoutgoingFirma = new preoutgoing();
+	$preoutgoingFirma->loadAuswahl($preoutgoing_id);
+	$preoutgoing_firma = $preoutgoingFirma->firma_id;
+	$prestudent->getLastStatus($preoutgoing->prestudent_id);
+	$prestudent->load_studentlehrverband($prestudent->studiensemester_kurzbz);
+
+	$firma = new firma();
+	$nation = new nation();
+	if($preoutgoing_firma != '')
+	{
+		$standort = new standort();
+		$adresse = new adresse();
+
+		$firma->load($preoutgoing_firma);
+		$standort->load_firma($firma->firma_id);
+		$adresse->load($standort->adresse_id);
+		$nation->load($adresse->nation);
+	}
+
+	$preoutgoingLv = new preoutgoing();
+	$preoutgoingLv->loadLvs($preoutgoing_id);
+
+	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?> ';
+	echo '<learningagreement_outgoing>';
+	echo '  <outgoing>';
+	echo '      <vorname><![CDATA['.$prestudent->vorname.']]></vorname>';
+	echo '      <nachname><![CDATA['.$prestudent->nachname.']]></nachname>';
+	echo '      <titel_pre><![CDATA['.$prestudent->titelpre.']]></titel_pre>';
+	echo '      <titel_post><![CDATA['.$prestudent->titelpost.']]></titel_post>';
+	echo '      <email><![CDATA['.$prestudent->uid.'@'.DOMAIN.']]></email>';
+	echo '      <sending_institution>FH Technikum Wien</sending_institution>';
+	echo '      <sending_institution_nation>Austria</sending_institution_nation>';
+	echo '      <studiengang><![CDATA['.$studiengang->english.']]></studiengang>';
+	echo '      <receiving_institution><![CDATA['.$firma->name.']]></receiving_institution>';
+	echo '      <receiving_institution_nation><![CDATA['.$nation->engltext.']]></receiving_institution_nation>';
+	echo '      <semester><![CDATA['.$prestudent->semester.']]></semester>';
+	echo '      <studiensemester><![CDATA['.$prestudent->studiensemester_kurzbz.']]></studiensemester>';
+	echo '		<datum>'.date('d.m.Y').'</datum>';
+	echo '      <lehrveranstaltungen>';
+	foreach($preoutgoingLv->lehrveranstaltungen as $lv)
+	echo'       <lehrveranstaltung><lv>'.$lv->bezeichnung.'</lv><ects>'.$lv->ects.'</ects><wochenstunden>'.$lv->wochenstunden.'</wochenstunden><unitcode>'.$lv->unitcode.'</unitcode></lehrveranstaltung>';
+	echo '      </lehrveranstaltungen>';
+	if($preoutgoing->bachelorarbeit) // Topic fehlt noch
+		echo '       <bachelorarbeit><projektarbeittitel><![CDATA['.$projektarbeittitel.']]></projektarbeittitel></bachelorarbeit>';
+	if($preoutgoing->masterarbeit) // Topic fehlt noch
+		echo '       <masterarbeit><projektarbeittitel><![CDATA['.$projektarbeittitel.']]></projektarbeittitel></masterarbeit>';
+	echo '  </outgoing>';
+	echo '</learningagreement_outgoing>';
+}
+else
+	die('Parameter xmlformat not set!');
 
 
 ?>

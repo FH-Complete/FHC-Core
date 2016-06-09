@@ -182,10 +182,10 @@ class pruefungsanmeldung extends basis_db
 	 */
 	public function getAnmeldungenByStudent($uid, $studiensemester_kurbz=null, $status_kurzbz=null)
 	{
-		$qry = 'SELECT * FROM campus.tbl_pruefungsanmeldung pa '
-			. 'JOIN campus.tbl_pruefungstermin pt ON pa.pruefungstermin_id=pt.pruefungstermin_id '
-			. 'JOIN campus.tbl_pruefung p ON p.pruefung_id=pt.pruefung_id '
-			. 'WHERE uid='.$this->db_add_param($uid).';';
+		$qry = 'SELECT * FROM campus.tbl_pruefungsanmeldung pa
+			JOIN campus.tbl_pruefungstermin pt ON pa.pruefungstermin_id=pt.pruefungstermin_id
+			JOIN campus.tbl_pruefung p ON p.pruefung_id=pt.pruefung_id
+				WHERE uid='.$this->db_add_param($uid).';';
 
 		if(!$this->db_query($qry))
 		{

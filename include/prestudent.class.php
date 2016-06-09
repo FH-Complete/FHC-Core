@@ -1787,9 +1787,9 @@ class prestudent extends person
 			$qry = "SELECT DISTINCT prestudent_id, vorname, nachname, gebdatum, rt_gesamtpunkte, tbl_prestudent.studiengang_kz, bis.tbl_zgvgruppe.bezeichnung, get_rolle_prestudent(prestudent_id, null) as laststatus
 			FROM
 				public.tbl_prestudent
-				JOIN public.tbl_person USING(person_id)
-				LEFT JOIN bis.tbl_zgvgruppe_zuordnung USING(zgvmas_code)
-				LEFT JOIN bis.tbl_zgvgruppe USING(gruppe_kurzbz)
+					JOIN public.tbl_person USING(person_id)
+					LEFT JOIN bis.tbl_zgvgruppe_zuordnung USING(zgvmas_code)
+					LEFT JOIN bis.tbl_zgvgruppe USING(gruppe_kurzbz)
 			WHERE
 				tbl_prestudent.studiengang_kz=". $this->db_add_param($studiengang_kz)."
 				AND EXISTS(
@@ -1964,51 +1964,6 @@ class prestudent extends person
 	}
 
 
-
-
-	/**
-	 * Laedt die Rolle
-	 *
-	 * @param $studiengang_kz
-	 * @return boolean
-	 */
-	public function loadActualFromStg($studiengang_kz)
-	{
-
-		if(!is_numeric($studiengang_kz))
-		{
-			$this->errormsg = 'studiengang_kz ist ungueltig';
-			return false;
-		}
-
-		$auth = new authentication();
-		$uid = $auth->getUser();
-
-
-		$qry = "SELECT prestudent_id FROM tbl_prestudent WHERE uid=".$this->db_add_param($uid)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
-		$result = $this->db_query($qry);
-		$count = $this->db_num_rows($result);
-
-		switch($count)
-		{
-			case 0:
-				$this->errormsg = 'es wurde kein Prestudent gefunden';
-				break;
-			case 1:
-				if(!$row = $this->db_fetch_object($result))
-				{
-					$this->errormsg = 'Fehler beim Ermitteln des Prestudenten';
-					break;
-				}
-				$this->load($row->prestudent_id);
-				return true;
-			default:
-				$this->errormsg = 'der Prestudent ist nicht eindeutig';
-				break;
-		}
-
-		return false;
-	}
 
 
 	/**

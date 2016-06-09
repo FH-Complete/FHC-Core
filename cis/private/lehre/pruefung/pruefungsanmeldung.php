@@ -19,7 +19,8 @@
  * MA 02110-1301, USA.
  *
  *
- * Authors: Stefan Puraner	<puraner@technikum-wien.at>
+ * Authors: Stefan Puraner	<puraner@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../../../config/cis.config.inc.php');

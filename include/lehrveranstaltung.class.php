@@ -527,11 +527,11 @@ class lehrveranstaltung extends basis_db
 		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung
 				WHERE lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung
 											  WHERE prestudent_id=" . $this->db_add_param($prestudent_id);
-		if($studiensemester_kurzbz !== NULL)
+		/*if($studiensemester_kurzbz !== NULL) TODO EINE alles wieder einkommentieren
 			$qry .= " AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		$qry .= ") OR lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote WHERE prestudent_id=" . $this->db_add_param($prestudent_id);
 		if($studiensemester_kurzbz !== NULL)
-		    $qry .= ' AND studiensemester_kurzbz='.$this->db_add_param ($studiensemester_kurzbz);
+		    $qry .= ' AND studiensemester_kurzbz='.$this->db_add_param ($studiensemester_kurzbz);*/
 		$qry .= ") ORDER BY semester, bezeichnung";
 
 		//Datensaetze laden
