@@ -55,7 +55,8 @@ $config['migration_type'] = 'sequential';
 | will migrate up. This must be set.
 |
 */
-$config['migration_table'] = 'system.ci_migrations';
+//$config['migration_table'] = 'system.ci_migrations'; // A missing feature or a bug cannot use another schema than public. Bug: tableExists only looks in the public schema.
+$config['migration_table'] = 'ci_migrations';
 
 /*
 |--------------------------------------------------------------------------

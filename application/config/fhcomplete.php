@@ -155,8 +155,10 @@ $config['fhc_acl'] = array
 	'public.tbl_lehrverband' => 'basis/lehrverband',
 	'public.tbl_log' => 'basis/log',
 	'public.tbl_mitarbeiter' => 'basis/mitarbeiter',
-	'public.tbl_msg_message' => 'basis/msg_message',
-	'public.tbl_msg_thread' => 'basis/msg_thread',
+	'public.tbl_msg_message' => 'basis/message',
+	'public.tbl_msg_recipient' => 'basis/message',
+	'public.tbl_msg_status' => 'basis/message',
+	'public.tbl_msg_attachment' => 'basis/message',
 	'public.tbl_notiz' => 'basis/notiz',
 	'public.tbl_notizzuordnung' => 'basis/notizzuordnung',
 	'public.tbl_organisationseinheit' => 'basis/organisationseinheit',
@@ -228,7 +230,5 @@ $config['fhc_acl'] = array
 	'wawi.tbl_rechnungstyp' => 'basis/rechnungstyp',
 	'wawi.tbl_zahlungstyp' => 'basis/zahlungstyp',
 	
-	'public.tbl_sprache' => 'admin',
-	'public.tbl_msg_thread' => 'admin',
-	'public.tbl_msg_message' => 'admin'
+	'public.tbl_sprache' => 'admin'
 );

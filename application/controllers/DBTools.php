@@ -91,16 +91,16 @@ class DBTools extends FHC_Controller
 	 */
 	public function migrate($version = 'latest')
     {
-	    if ($this->cli && $this->migration->current() === false)
-	    {
-	            show_error($this->migration->error_string());
-	    }
-		elseif ($version != 'latest' && $version != 'current')
+		echo 'DB-Migration';
+	    if ($version != 'latest' && $version != 'current')
 		{
 			$this->__failed('Migration version must be either latest or current');
 		}
-
-		if (!$this->migration->$version())
+		elseif ($this->cli && !$this->migration->$version())
+	    {
+	        show_error($this->migration->error_string());
+	    }
+		elseif (!$this->migration->$version())
 		{
 			$this->__failed();
 		}
@@ -181,6 +181,8 @@ class DBTools extends FHC_Controller
 
 		$method = 'seed';
 		$pending = array();
+
+		
 		foreach ($seeds as $number => $file)
 		{
 			include_once($file);
@@ -203,13 +205,24 @@ class DBTools extends FHC_Controller
 
 			$pending[$number] = array($class, $method);
 		}
+		
 		// Now just run the necessary seeds
 		foreach ($pending as $number => $seed)
 		{
-			log_message('debug', 'Seeding '.$method);
-
-			$seed[0] = new $seed[0];
-			call_user_func($seed);
+			if (is_null($name))
+			{
+				log_message('debug', 'Seeding '.$method);
+			
+				$seed[0] = new $seed[0];
+				call_user_func($seed);
+			}
+			elseif ($seed[0] == 'Seed_'.$name)
+			{
+				log_message('debug', 'Seeding '.$method);
+			
+				$seed[0] = new $seed[0];
+				call_user_func($seed);
+			}
 		}
 	}
  

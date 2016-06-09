@@ -10,6 +10,6 @@
 | 'cache_ttl' = the time all partials should be cache in seconds, 0 means no global caching
 */
 
-$config['parser']    = FALSE;
-$config['template']  = 'template';
+$config['parser']    = TRUE;
+$config['template']  = 'templates/vilesci';
 $config['cache_ttl'] = 0;
