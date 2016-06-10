@@ -10,7 +10,7 @@ $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(['error' => 0]);
 
-$I->sendGET('v1/crm/prestudent/PrestudentByPersonID', array('person_id' => 1));
+$I->sendGET('v1/crm/prestudent/PrestudentByPersonID', array('person_id' => 3));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(['error' => 0]);

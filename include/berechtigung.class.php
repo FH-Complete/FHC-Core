@@ -19,10 +19,16 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/datum.class.php');
 
-class berechtigung extends basis_db
+// CI
+require_once(dirname(__FILE__).'/../ci_hack.php');
+require_once(dirname(__FILE__).'/../application/models/system/Berechtigung_model.php');
+
+class berechtigung extends Berechtigung_model
 {
+	use db_extra; //CI Hack
+	
 	public $result=array();
 	public $new;
 
@@ -46,13 +52,13 @@ class berechtigung extends basis_db
 	 */
 	public function load($berechtigung_kurzbz)
 	{
-		$qry = "SELECT * FROM system.tbl_berechtigung WHERE berechtigung_kurzbz=".$this->db_add_param($berechtigung_kurzbz);
+		$result = parent::load($berechtigung_kurzbz);
 		
-		if($result = $this->db_query($qry))
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
 		{
-			if($row = $this->db_fetch_object($result))
+			if (count($result->retval) > 0)
 			{
-				$this->berechtigung_kurzbz=$row->berechtigung_kurzbz;
+				$this->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				$this->beschreibung = $row->beschreibung;
 				return true;
 			}

@@ -27,6 +27,8 @@ require_once(dirname(__FILE__).'/../application/models/crm/Preinteressent_model.
 
 class preinteressent extends Preinteressent_model
 {
+	use db_extra; //CI Hack
+	
 	public $new;		// boolean
 	public $result = array();
 	

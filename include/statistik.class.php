@@ -19,10 +19,16 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
  *          Karl Burkhart <burkhart@technikum-wien.at>.
  */
-require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/datum.class.php');
 
-class statistik extends basis_db
+// CI
+require_once(dirname(__FILE__).'/../ci_hack.php');
+require_once(dirname(__FILE__).'/../application/models/organisation/Statistik_model.php');
+
+class statistik extends Statistik_model
 {
+	use db_extra; //CI Hack
+	
 	public $new;
 	public $statistik_obj=array();
 	public $result;
@@ -76,17 +82,14 @@ class statistik extends basis_db
 	 */
 	public function load($statistik_kurzbz)
 	{
-		$qry = "SELECT 
-					*
-				FROM
-					public.tbl_statistik
-				WHERE
-					statistik_kurzbz = " . $this->db_add_param($statistik_kurzbz);
+		$result = parent::load($statistik_kurzbz);
 		
-		if($result = $this->db_query($qry))
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
 		{
-			if($row = $this->db_fetch_object($result))
+			if(count($result->retval) > 0)
 			{
+				$row = $result->retval[0];
+				
 				$this->statistik_kurzbz = $row->statistik_kurzbz;
 				$this->content_id = $row->content_id;
 				$this->bezeichnung = $row->bezeichnung;
@@ -125,15 +128,19 @@ class statistik extends basis_db
 	 */
 	public function getAll($order = FALSE)
 	{
-		$qry = 'SELECT * FROM public.tbl_statistik';
-
-		if($order) 
-			$qry .= ' ORDER BY ' . $order;
-		
-		if($result = $this->db_query($qry))
+		if ($order)
 		{
-			while($row = $this->db_fetch_object($result))
+			parent::addOrder($order);
+		}
+		
+		$result = parent::loadWhole();
+		
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
+		{
+			for ($i = 0; $i < count($result->retval); $i++)
 			{
+				$row = $result->retval[$i];
+				
 				$obj = new statistik();
 				
 				$obj->statistik_kurzbz = $row->statistik_kurzbz;
@@ -328,17 +335,19 @@ class statistik extends basis_db
 	{
 		$arr = array();
 				
-		$qry = "SELECT 
-					*
-				FROM
-					public.tbl_statistik
-				ORDER BY gruppe, bezeichnung, statistik_kurzbz";
+		parent::addOrder('gruppe');
+		parent::addOrder('bezeichnung');
+		parent::addOrder('statistik_kurzbz');
+		
+		$result = parent::loadWhole();
 			
-		if($result = $this->db_query($qry))
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
 		{
 			$lastgruppe='';
-			while($row = $this->db_fetch_object($result))
+			for ($i = 0; $i < count($result->retval); $i++)
 			{
+				$row = $result->retval[$i];
+				
 				if($row->gruppe!='' && $row->gruppe!=$lastgruppe)
 				{
 					$arr[$row->gruppe]=array('name'=>$row->gruppe);

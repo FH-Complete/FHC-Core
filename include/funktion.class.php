@@ -23,10 +23,16 @@
  * Klasse funktion (FAS-Online)
  * @create 14-03-2006
  */
-require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/datum.class.php');
 
-class funktion extends basis_db
+// CI
+require_once(dirname(__FILE__).'/../ci_hack.php');
+require_once(dirname(__FILE__).'/../application/models/ressource/Funktion_model.php');
+
+class funktion extends Funktion_model
 {
+	use db_extra; //CI Hack
+	
 	public $new;     			//  boolean
 	public $result = array(); 	//  fachbereich Objekt
 
@@ -105,22 +111,24 @@ class funktion extends basis_db
 	 */
 	public function load($funktion_kurzbz)
 	{
-		if($funktion_kurzbz == '')
+		if ($funktion_kurzbz == '')
 		{
 			$this->errormsg = 'funktion_bz darf nicht leer sein';
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_funktion WHERE funktion_kurzbz = ".$this->db_add_param($funktion_kurzbz).";";
-
-		if(!$this->db_query($qry))
+		$result = parent::load($funktion_kurzbz);
+			
+		if (!is_object($result) || (is_object($result) && $result->error != EXIT_SUCCESS))
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 
-		if($row = $this->db_fetch_object())
+		if (is_array($result->retval) && count($result->retval) == 1)
 		{
+			$row = $result->retval[0];
+			
 			$this->funktion_kurzbz = $row->funktion_kurzbz;
 			$this->beschreibung = $row->beschreibung;
 			$this->aktiv = $this->db_parse_bool($row->aktiv);

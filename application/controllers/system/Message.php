@@ -1,14 +1,15 @@
 <?php
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Message extends FHC_Controller {
+class Message extends FHC_Controller 
+{
 
 	public function __construct()
     {
         parent::__construct();
-        //$this->load->library('Messaging');
-		$this->load->model('person/Person_model');
-		$this->load->model('system/Message_model');
+        $this->load->library('messaging');
+		//$this->load->model('person/Person_model');
+		//$this->load->model('system/Message_model');
     }
 
 	public function index()
@@ -25,20 +26,20 @@ class Message extends FHC_Controller {
 		$v = $this->load->view('test.php', $data);
 	}
 
-	public function view($id)
+	public function view($msg_id)
 	{
-		//$messages = $this->Message_model->getMessages();
-		$msg = $this->Message_model->load($id);
+		$msg = $this->messaging->getMessage($msg_id);
+		//var_dump($msg);
 		if ($msg->error)
 			show_error($msg->retval);
 		if (count($msg->retval) != 1)
-			show_error('Nachricht nicht vorhanden! ID: '.$id);
+			show_error('Nachricht nicht vorhanden! ID: '.$msg_id);
 
 		$data = array
 		(
 			'message' => $msg->retval[0]
 		);
-		var_dump($data);
+		var_dump($data['message']);
 		$v = $this->load->view('system/message', $data);
 	}
 	
