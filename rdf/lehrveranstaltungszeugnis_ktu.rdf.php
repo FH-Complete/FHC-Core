@@ -300,6 +300,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		
 		$stg = new studiengang();
 		$stg->load($lvstg);
+                
+                $xml .= "				<stg_studiengang_bezeichnung>".$stg_oe_obj->bezeichnung."</stg_studiengang_bezeichnung>";
 		$xml .= "				<lv_studiengang_bezeichnung>".$stg->bezeichnung."</lv_studiengang_bezeichnung>";
 		$xml .= "				<lv_studiengang_typ>".$stg->typ."</lv_studiengang_typ>";
 		$xml .= "				<lv_studiengang_kennzahl>".sprintf('%04s',$lvstg)."</lv_studiengang_kennzahl>";
