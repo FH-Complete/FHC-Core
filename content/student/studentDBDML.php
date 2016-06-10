@@ -280,7 +280,6 @@ if(!$error)
 		//Studentendaten speichern
 		if(!$error)
 		{
-
 			$prestudent = new prestudent();
 			if(!$prestudent->load($_POST['prestudent_id']))
 			{
@@ -314,7 +313,6 @@ if(!$error)
 			if(!$error)
 			{
 				$prestudent->prestudent_id = $_POST['prestudent_id'];
-				$prestudent->uid = $_POST['uid'];
 				$prestudent->perskz = $_POST['perskz'];
 				$prestudent->updateamum = date('Y-m-d H:i:s');
 				$prestudent->updatevon = $user;
@@ -406,7 +404,7 @@ if(!$error)
 									else
 										$student_lvb->new = true;
 
-									$student_lvb->uid = $_POST['uid'];	// TODO EINE
+									$student_lvb->prestudent_id = $_POST['prestudent_id'];
 									$student_lvb->studiensemester_kurzbz = $semester_aktuell;
 									$student_lvb->studiengang_kz = $_POST['studiengang_kz'];
 									$student_lvb->semester = $_POST['semester'];
@@ -419,7 +417,7 @@ if(!$error)
 									{
 										$return = true;
 										$error=false;
-										$data = $prestudent->prestudent_id;
+										$data = $_POST['prestudent_id'];
 									}
 									else
 									{
@@ -1080,7 +1078,7 @@ if(!$error)
 				if(!$rolle->load($_POST['prestudent_id']))
 				{
 					$error = true;
-					$errormsg = 'Prestudent wurde nicht gefunden';
+					$errormsg = 'Fehler beim Laden:'.$rolle->errormsg;
 				}
 				else
 				{
@@ -1140,34 +1138,31 @@ if(!$error)
 						// Bei Studenten wird der Studentlehrverband Eintrag angelegt/korrigiert
 						$student = new student();
 						if($temp_uid = $student->getUid($rolle->prestudent_id))
-						{
+						{// TODO EINE student wird geladen!
 							if($student->load($temp_uid))
 							{
 								$stdsem_new = filter_input(INPUT_POST, "studiensemester_kurzbz");
 								$semester = filter_input(INPUT_POST, "ausbildungssemester");
-
-								$prestudent = new prestudent($prestudent_id);
-								$prestudent->getLastStatus($rolle->prestudent_id, "", "Student");
-								if($prestudent->load_studentlehrverband($prestudent->studiensemester_kurzbz))
-									$prestudent->new=false;
+								$prestudent_temp = new prestudent();
+								$prestudent_temp->getLastStatus($rolle->prestudent_id, "", "Student");
+								if($student->load_studentlehrverband($temp_uid, $prestudent_temp->studiensemester_kurzbz))
+									$student->new=false;
 								else
-									$prestudent->new=true;
-
+									$student->new=true;
 								$lehrverband = new lehrverband();
-								if(!$lehrverband->exists($prestudent->studiengang_kz, $semester, $prestudent->verband, $prestudent->gruppe))
+								if(!$lehrverband->exists($student->studiengang_kz, $semester, $student->verband, $student->gruppe))
 								{
-									$prestudent->studiensemester_kurzbz = $stdsem_new;
+									$student->studiensemester_kurzbz = $stdsem_new;
 									$return = false;
 									$errormsg = $student->errormsg;
 								}
 								else
 								{
-									$prestudent->studiensemester_kurzbz = $stdsem_new;
-									$prestudent->semester = $semester;
-									$prestudent->updatevon = $user;
+									$student->studiensemester_kurzbz = $stdsem_new;
+									$student->semester = $semester;
+									$student->updatevon = $user;
 								}
-
-								$prestudent->save_studentlehrverband();// TODO EINE
+								$student->save_studentlehrverband();
 							}
 						}
 
@@ -1211,7 +1206,7 @@ if(!$error)
 				if(!$rolle->load($_POST['prestudent_id']))
 				{
 					$error = true;
-					$errormsg = 'Prestudent wurde nicht gefunden';
+					$errormsg = 'Fehler beim Laden:'.$rolle->errormsg;
 				}
 				else
 				{
@@ -1269,25 +1264,25 @@ if(!$error)
 						$return = false;
 					}
 
-					$prestudent = new prestudent($prestudent_id);
+					$student = new student();	// TODO EINE studentlehrverband
 
 					if(!$error)
 					{
-						$prestudent->load_studentlehrverband($rolle->prestudent_id, $_POST["studiensemester_kurzbz"]);
+						$student->load_studentlehrverband($rolle->prestudent_id, $_POST["studiensemester_kurzbz"]);
 						$lehrverband = new lehrverband();
-						if(!$lehrverband->exists($prestudent->studiengang_kz, $semester, $prestudent->verband, $prestudent->gruppe))
+						if(!$lehrverband->exists($student->studiengang_kz, $semester, $student->verband, $student->gruppe))
 						{
-							$prestudent->studiensemester_kurzbz = $stdsem;
+							$student->studiensemester_kurzbz = $stdsem;
 							$return = false;
-							$errormsg = $prestudent->errormsg;
+							$errormsg = $student->errormsg;
 						}
 						else
 						{
-							$prestudent->studiensemester_kurzbz = $stdsem;
-							$prestudent->semester = $semester;
+							$student->studiensemester_kurzbz = $stdsem;
+							$student->semester = $semester;
 						}
 
-						$prestudent->save_studentlehrverband(true);	// TODO EINE gibts beim prestudenten nicht!
+						$student->save_studentlehrverband(true);
 						$rolle->ausbildungssemester = $semester;
 						$rolle->studiensemester_kurzbz = $stdsem;
 						$rolle->datum = date("Y-m-d");
@@ -2504,18 +2499,36 @@ if(!$error)
 					$bmp->kaution = trim(str_replace(',','.',$_POST['kaution']));
 					$bmp->ausgegebenam = $_POST['ausgegebenam'];
 					$bmp->retouram = $_POST['retouram'];
-					if($bmp->new)
-						$bmp->uid = $_POST['uid'];	// TODO EINE prestudent_id?
 
-					if($bmp->save())
+					$prestdent = new prestudent();
+
+					if(!isset($_POST['prestudent_id']))
 					{
-						$return = true;
-						$data = $bmp->betriebsmittelperson_id;
+						$error = true;
+						$return = false;
+						$errormsg = 'Es wurde keine prestudent_id uebergeben';
+					}
+					else if(!$prestudent->load($_POST['prestudent_id']))
+					{
+						$error = true;
+						$return = false;
+						$errormsg = 'Fehler beim Laden:'.$prestudent->errormsg;
 					}
 					else
 					{
-						$return = false;
-						$errormsg = $bmp->errormsg;
+						if($bmp->new)
+							$bmp->uid = $prestudent->uid;	// TODO EINE passt?
+
+						if($bmp->save())
+						{
+							$return = true;
+							$data = $bmp->betriebsmittelperson_id;
+						}
+						else
+						{
+							$return = false;
+							$errormsg = $bmp->errormsg;
+						}
 					}
 				}
 			}

@@ -38,7 +38,7 @@ $sprache = getSprache();
 $lang = new sprache();
 $lang->load($sprache);
 $p = new phrasen($sprache);
-//TODO
+//TODO EINE RECHTE?
 $uid = get_uid();
 
 $db = new basis_db();

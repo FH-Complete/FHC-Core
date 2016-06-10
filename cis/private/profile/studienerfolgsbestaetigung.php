@@ -38,7 +38,7 @@ if (!$db = new basis_db())
 	
 $uid=get_uid();
 
-if(isset($_GET['uid']))	// TODO EINE get_uid / _GET['uid'] für studienerfolg.rdf.php wird die prestudent_id benötigt!
+if(isset($_GET['uid']))
 {
 	// Administratoren duerfen die UID als Parameter uebergeben um die Studienerfolgsbestätigung
 	// von anderen Personen anzuzeigen

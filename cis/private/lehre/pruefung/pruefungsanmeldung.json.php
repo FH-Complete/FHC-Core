@@ -43,6 +43,9 @@ $p = new phrasen($sprache);
 $uid = get_uid();
 $rechte = new benutzerberechtigung(); 	// TODO EINE RECHTE!
 $rechte->getBerechtigungen($uid);
+if(!$rechte->isBerechtigt('admin',0))
+	die($p->t('global/keineBerechtigungFuerDieseSeite'));
+
 $studiensemester = new studiensemester();
 $aktStudiensemester = $studiensemester->getaktorNext();
 $method = isset($_REQUEST['method'])?$_REQUEST['method']:'';
