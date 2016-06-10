@@ -25,6 +25,8 @@ require_once(dirname(__FILE__).'/functions.inc.php');
 
 class mitarbeiter extends benutzer
 {
+	use db_extra; //CI Hack
+	
 	public $new;
 	public $errormsg;
 	public $result=array();

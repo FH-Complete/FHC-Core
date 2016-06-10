@@ -37,7 +37,7 @@ class Ort extends APIv1_Controller
 		
 		if (isset($ort_kurzbz))
 		{
-			$result = $this->OrtModel->load($ort_kurzbz);
+			$result = $this->OrtModel->load(trim($ort_kurzbz));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

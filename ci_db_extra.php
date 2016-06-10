@@ -1,7 +1,12 @@
 <?php
 trait db_extra
 {
-	protected $db_result=null;
+	/*
+	 * Moved to private to avoid to violate "Strict standards"
+	 * This property must be used only in the methods of this trait
+	 * and access to it should only be done through the methods of this trait
+	 */
+	private $db_result = null;
 
 	public function db_query($sql)
 	{

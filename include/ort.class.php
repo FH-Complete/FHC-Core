@@ -35,6 +35,7 @@ class ort extends Ort_model
 	
 	public $new;     			// boolean
 	public $result = array(); 	// ort Objekt
+	public $errormsg;			// string
 
 	//Tabellenspalten
 	public $ort_kurzbz;		// string
@@ -137,22 +138,23 @@ class ort extends Ort_model
 	 */
 	public function load($ort_kurzbz)
 	{
-		if($ort_kurzbz == '')
+		if ($ort_kurzbz == '')
 		{
 			$this->errormsg = 'kurzbz darf nicht leer sein';
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_ort WHERE trim(ort_kurzbz) = ".$this->db_add_param(trim($ort_kurzbz)).";";
-
-		if(!$this->db_query($qry))
+		$result = parent::load(trim($ort_kurzbz));
+		if (!is_object($result) || (is_object($result) && $result->error != EXIT_SUCCESS))
 		{
 			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 
-		if($row = $this->db_fetch_object())
+		if(is_array($result->retval) && count($result->retval) > 0)
 		{
+			$row = $result->retval[0];
+			
 			$this->ort_kurzbz 		= $row->ort_kurzbz;
 			$this->bezeichnung 		= $row->bezeichnung;
 			$this->planbezeichnung 	= $row->planbezeichnung;
