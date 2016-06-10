@@ -42,6 +42,7 @@ $getuid=get_uid();
 $uid=$getuid;
 $vorname='';
 $nachname='';
+$htmlstr = '';
 
 if(isset($_GET['uid']))
 {
@@ -54,7 +55,6 @@ if(isset($_GET['uid']))
 	$prestudent->getPrestudentsFromUid($uid);
 
 
-	$htmlstr = '';
 
 	$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='tablesorter'>\n";
 	$htmlstr .= "<thead><tr>\n";
@@ -170,8 +170,8 @@ if(isset($_GET['uid']))
 			}
 		}
 	}
+	$htmlstr .= "</tbody></table>\n";
 }
-$htmlstr .= "</tbody></table>\n";
 
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">

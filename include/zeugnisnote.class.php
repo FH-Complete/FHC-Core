@@ -289,7 +289,7 @@ class zeugnisnote extends basis_db
 					JOIN lehre.tbl_note USING(note)
 					LEFT JOIN public.tbl_prestudent ON( public.tbl_prestudent.prestudent_id=lehre.tbl_zeugnisnote.prestudent_id )
 				WHERE true $where2
-				ORDER BY sort";
+				ORDER BY sort LIMIT 1";
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())

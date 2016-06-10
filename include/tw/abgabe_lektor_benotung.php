@@ -46,10 +46,7 @@ require_once('../../include/pdf/fpdf.php');
 require_once('../../include/pdf.inc.php');
 
 $getuid=get_uid();
-/*TODO EINE
- auf etwa zeile 720: public.tbl_prestudent.uid
- sollte wohl eher auf die prestudent_id eingeschränkt werden!
-*/
+
 $datum_obj = new datum();
 $htmlstr = "";
 $qualitaet='';
@@ -73,7 +70,7 @@ $projekttyp_kurzbz='';
 
 $projektarbeit_id='';
 $uid='';
-$matrikelnr='';
+$perskz='';
 $titel='';
 $beurteiler='';
 $ende='';
@@ -109,7 +106,7 @@ else
 {
 	$projektarbeit_id=(isset($_POST['projektarbeit_id'])?$_POST['projektarbeit_id']:'-1');
 	$uid=(isset($_POST['uid'])?$_POST['uid']:'-1');
-	$matrikelnr=(isset($_POST['matrikelnr'])?$_POST['matrikelnr']:'-1');
+	$perskz=(isset($_POST['matrikelnr'])?$_POST['matrikelnr']:'-1');
 	$studiengang=(isset($_POST['studiengang'])?$_POST['studiengang']:'');
 	$stgtyp=(isset($_POST['stgtyp'])?$_POST['stgtyp']:'');
 	$projekttyp_kurzbz=(isset($_POST['projekttyp_kurzbz'])?$_POST['projekttyp_kurzbz']:'');
@@ -719,9 +716,9 @@ $sql_query = "SELECT *,(SELECT abgabedatum FROM campus.tbl_paabgabe WHERE projek
 	LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
 	LEFT JOIN public.tbl_studiengang on(tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz)
 	WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
-	AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_prestudent
-							WHERE public.tbl_prestudent.person_id=lehre.tbl_projektbetreuer.person_id
-							AND public.tbl_prestudent.uid=".$db->db_add_param($getuid).")
+	AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_benutzer
+							WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id
+							AND public.tbl_benutzer.uid=".$db->db_add_param($getuid).")
 	AND lehre.tbl_projektarbeit.note IS NULL
 	AND lehre.tbl_projektarbeit.projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
 	ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy
@@ -919,13 +916,13 @@ else
 		$htmlstr = "<br>";
 		$htmlstr .= "<table border='1'  class='detail'>\n";
 		$htmlstr .= '<form action="'.htmlspecialchars($_SERVER['PHP_SELF']).'" method="POST" onsubmit="return inputcheck()">';
-		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Student: <b>".$row->matrikelnr.", ".trim($row->titelpre." ".$row->vorname." ".$row->nachname." ".$row->titelpost)."</b></td>";
+		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Student: <b>".$row->perskz.", ".trim($row->titelpre." ".$row->vorname." ".$row->nachname." ".$row->titelpost)."</b></td>";
 		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Titel: <b>".$db->convert_html_chars($titel)."</b>";
 		$htmlstr .= '<input type="hidden" name="projektarbeit_id" value="'.$db->convert_html_chars($projektarbeit_id).'">';
 		$htmlstr .= '<input type="hidden" name="uid" value="'.$db->convert_html_chars($uid).'">';
-		$htmlstr .= '<input type="hidden" name="matrikelnr" value="'.$db->convert_html_chars($matrikelnr).'">';
+		$htmlstr .= '<input type="hidden" name="matrikelnr" value="'.$db->convert_html_chars($perskz).'">';
 		$htmlstr .= '<input type="hidden" name="titel" value="'.$db->convert_html_chars($titel).'">';
-		$htmlstr .= '<input type="hidden" name="perskz" value="'.$db->convert_html_chars($row->matrikelnr).'">';
+		$htmlstr .= '<input type="hidden" name="perskz" value="'.$db->convert_html_chars($row->perskz).'">';
 		$htmlstr .= '<input type="hidden" name="studiengang" value="'.$db->convert_html_chars($row->stgbezeichnung).'">';
 		$htmlstr .= '<input type="hidden" name="titelpre" value="'.$db->convert_html_chars($row->titelpre).'">';
 		$htmlstr .= '<input type="hidden" name="titelpost" value="'.$db->convert_html_chars($row->titelpost).'">';
@@ -1081,7 +1078,7 @@ else
 		//-->
 		</script>';
 	}
-	else 
+	else
 	{
 		die('Betreuung nicht gefunden!');
 	}	

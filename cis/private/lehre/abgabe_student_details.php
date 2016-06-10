@@ -29,6 +29,7 @@
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiengang.class.php');
+require_once('../../../include/prestudent.class.php');
 require_once('../../../include/student.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/mail.class.php');
@@ -111,26 +112,27 @@ $person = new person();
 $person->load($bid);
 $betreuer = $person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost;
 
+//Rechte Pruefen
+$allowed=false;
 if($uid!=$user)
 {
-	$student = new student();	// TODO EINE
-	if(!$student->load($uid))
-		die($p->t('global/userNichtGefunden'));
-	
-	$stg_obj = new studiengang();
-	if(!$stg_obj->load($student->studiengang_kz))
+	$prestudent = new prestudent();
+	if(!$prestudent->getPrestudentsFromUid($uid))
 		die($p->t('global/fehlerBeimLesenAusDatenbank'));
-	
+
 	//Studentenansicht
-	//Rechte Pruefen
-	$allowed=false;
-	
 	//Berechtigung ueber das Berechtigungssystem
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 
-	if($rechte->isBerechtigt('lehre/abgabetool',$stg_obj->oe_kurzbz, 's'))
-		$allowed=true;
+	foreach($prestudent->result as $ps)
+	{
+		$stg_obj = new studiengang();
+		if(!$stg_obj->load($ps->studiengang_kz))
+			die($p->t('global/fehlerBeimLesenAusDatenbank'));
+		if($rechte->isBerechtigt('lehre/abgabetool',$stg_obj->oe_kurzbz, 's'))
+			$allowed=true;
+	}
 
 	//oder Lektor mit Betreuung dieses Studenten
 	$qry = "SELECT 1
@@ -138,8 +140,9 @@ if($uid!=$user)
 				lehre.tbl_projektarbeit 
 				JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id) 
 				JOIN campus.vw_benutzer on(vw_benutzer.person_id=tbl_projektbetreuer.person_id)
+				JOIN tbl_prestudent USING(prestudent_id)
 			WHERE
-				tbl_projektarbeit.prestudent_id=".$db->db_add_param($student->prestudent_id, FHC_INTEGER)." AND
+				tbl_prestudent.uid=".$db->db_add_param($uid)." AND
 				vw_benutzer.uid=".$db->db_add_param($user).";";
 	
 	if($result = $db->db_query($qry))
@@ -150,17 +153,23 @@ if($uid!=$user)
 		}
 	}
 	
-	if(!$allowed)
-	{
-		die($p->t('abgabetool/keineBerechtigungStudentenansicht'));
-	}
-}	
+}
 else
 {
-	$student = new student($uid); // TODO EINE
+	$ps = new prestudent();
+	$ps->getPrestudentsFromUid($uid);
+	foreach($ps->result as $p)
+	{
+		if($student->prestudent_id === $projektarbeit_obj->prestudent_id)
+			$allowed = true;
+	}
+}
 
-	if($student->prestudent_id!=$projektarbeit_obj->prestudent_id)
-		die('Sie haben keine Berechtigung fuer diese Seite');
+
+
+if(!$allowed)
+{
+	die($p->t('abgabetool/keineBerechtigungStudentenansicht'));
 }
 
 echo '<!DOCTYPE HTML>

@@ -285,7 +285,7 @@ function getPruefungByLvFromStudiengang($aktStudiensemester = null, $uid = null)
 			}
 
 			$anmeldung = new pruefungsanmeldung();
-			$anmeldungen = $anmeldung->getAnmeldungenByStudent($prestudent->uid, $aktStudiensemester);
+			$anmeldungen = $anmeldung->getAnmeldungenByStudent($uid, $aktStudiensemester);
 
 			foreach($anmeldungen as $anm)
 			{
@@ -526,7 +526,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 			$anmeldung->lehrveranstaltung_id = $_REQUEST["lehrveranstaltung_id"];
 			$anmeldung->pruefungstermin_id = $_REQUEST["termin_id"];
 			$anmeldung->wuensche = $_REQUEST["bemerkung"];
-			$anmeldung->uid = $prestudent->uid;
+			$anmeldung->uid = $uid;
 			$anmeldung->reihung = $reihung+1;
 			$anmeldung->status_kurzbz = "angemeldet";
 			$anmeldung->pruefungstyp_kurzbz = $pruefungstyp_kurzbz;
@@ -545,7 +545,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 			}
 
 			//Kollisionsprüfung
-			$anmeldungen = $anmeldung->getAnmeldungenByStudent($prestudent->uid, $aktStudiensemester);
+			$anmeldungen = $anmeldung->getAnmeldungenByStudent($uid, $aktStudiensemester);
 			foreach($anmeldungen as $temp)
 			{
 				$datum = new datum();
@@ -578,7 +578,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	$anrechnung = new anrechnung();
 	$lv_komp = new lehrveranstaltung($studienverpflichtung_id);
 	$person = new person();
-	$person->getPersonFromBenutzer($prestudent->uid);
+	$person->getPersonFromBenutzer($uid);
 	$prestudent = new prestudent();
 	$prestudent->getPrestudenten($person->person_id);
 
@@ -598,7 +598,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 		if($prestudent_id != "")
 		{
 			$anrechungSaveResult = false;
-			if(!defined('CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG') || CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG == true)
+			if((!defined('CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG') || CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG == true) && defined('CIS_PRUEFUNGSANMELDUNG_USER'))
 			{
 				$anrechnung->lehrveranstaltung_id = $lehrveranstaltung->lehrveranstaltung_id;
 				$anrechnung->lehrveranstaltung_id_kompatibel = $lv_komp->lehrveranstaltung_id;

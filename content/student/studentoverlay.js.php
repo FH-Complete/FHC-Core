@@ -1565,7 +1565,7 @@ function StudentAuswahl()
 		}
 
 		// ***** Anwesenheit *****
-		if(document.getElementById('student-content-tabs').selectedItem==document.getElementById('student-tab-anwesenheit'))	// TODO EINE: PPPFAAAHH, is des schiach(id gibts nicht, wenn man keine berechtigungen hat!) (in content/student/studentenoverlay.xul.php)
+		if(document.getElementById('student-content-tabs').selectedItem==document.getElementById('student-tab-anwesenheit'))
 		{
 			document.getElementById('student-anwesenheit').setAttribute('src','anwesenheit.xul.php?prestudent_id='+prestudent_id);
 		}
@@ -5546,14 +5546,14 @@ function StudentCisStudienplan(event)
 function StudentCisNotenliste(event)
 {
 	var tree = document.getElementById('student-tree');
-    if (tree.currentIndex == -1)
-    {
-        alert("Bitte wählen Sie einen Studenten aus.");
-        return false;
-    }
+	if (tree.currentIndex == -1)
+	{
+		alert("Bitte wählen Sie einen Studenten aus.");
+		return false;
+	}
 
-    var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
-	var uid = tree.view.getCellText(tree.currentIndex,col);
+	var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+	var prestudent_id = tree.view.getCellText(tree.currentIndex,col);
 
-    window.open('<?php echo CIS_ROOT; ?>cis/private/lehre/notenliste.php?stsem=alle&uid='+uid);
+	window.open('<?php echo CIS_ROOT; ?>cis/private/lehre/notenliste.php?stsem=alle&prestudent_id='+prestudent_id);
 }

@@ -233,9 +233,6 @@ class lehrstunde extends basis_db
 	 * @param ver
 	 * @param grp
 	 * @param gruppe_kurzbz
-	 * TODO EINE:
-	 * Dickes Problem: uid kann hier ein MA, oder ein Student sein. Für den späteren join auf tbl_studentlehrverband
-	 * wird jedoch eine prestudent_id benötigt, welche nicht eindeutig ist, wenn sie per uid geholt wird.
 	 */
 
 	public function load_lehrstunden($type, $datum_von, $datum_bis, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe_kurzbz=NULL, $stpl_view='stundenplan', $idList=null, $fachbereich_kurzbz=null, $lva=NULL, $alle_unr_mitladen=false)
@@ -319,14 +316,11 @@ class lehrstunde extends basis_db
 			if(!isset($this->ssnext))
 				$this->ssnext = $this->ss;
 
-			if(!$student = new student($uid))	// TODO EINE
-				$this->errormsg = $student->errormsg;
-
-
 			// Lehrverbandszuordnungen der betreffenden Studiensemester laden
-			$sql_query="SELECT studiengang_kz, semester, verband, gruppe
+			$sql_query="SELECT tbl_studentlehrverband.studiengang_kz, tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe
 				FROM public.tbl_studentlehrverband
-				WHERE prestudent_id=".$this->db_add_param($student->prestudent_id)."
+				JOIN tbl_prestudent USING(prestudent_id)
+				WHERE uid=".$this->db_add_param($uid)."
 				AND studiensemester_kurzbz in(".$this->db_add_param($this->ss).",".$this->db_add_param($this->ssnext).")";
 
 			$verbaende=array();

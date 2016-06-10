@@ -151,12 +151,12 @@ $stsem_obj = new studiensemester();
 
 $stsem_obj->getAll();
 
-/*** dropdown fuer studiengang ***/
 $prestudent = new prestudent();
 $prestudent->getPrestudentsFromUid($uid);
 
 if(count($prestudent->result) > 0)
 {
+	/*** dropdown fuer studiengang ***/
 	echo "<div class='contentBox'>";
 	echo "<hr>";
 	echo "<span>".$p->t('global/studiengang')."</span>";
