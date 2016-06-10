@@ -8,12 +8,12 @@ class DB_Model extends FHC_Model
 							// True if this table has a primary key that uses a sequence
 	protected $acl;  // Name of the PrimaryKey for DB-Update, Load, ...
 	
-	function __construct($dbTable = null, $pk = null)
+	function __construct($dbTable = null, $pk = null, $hasSequence = true)
 	{
 		parent::__construct();
 		$this->dbTable = $dbTable;
 		$this->pk = $pk;
-		$this->hasSequence = true;
+		$this->hasSequence = $hasSequence;
 		$this->load->database();
 		$this->acl = $this->config->item('fhc_acl');
 	}

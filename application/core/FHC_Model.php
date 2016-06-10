@@ -14,15 +14,11 @@ class FHC_Model extends CI_Model
 		$uid = null;
 		
 		// Get UID from CI session
-		if(isset($this->session->uid))
-		{
+		if(isset($_SESSION['uid']))
 			$uid = $this->session->uid;
-		}
 		// Get UID from the environment (HTTP authentication via authentication.class.php)
-		else if(isset($_SERVER['PHP_AUTH_USER']))
-		{
+		elseif(isset($_SERVER['PHP_AUTH_USER']))
 			$uid = $_SERVER['PHP_AUTH_USER'];
-		}
 
 		// After getting UID for the first time, it saves it in CI session
 		if (isset($uid) && !isset($this->session->uid))

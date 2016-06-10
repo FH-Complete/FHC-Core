@@ -24,7 +24,7 @@ class Adresse extends APIv1_Controller
     {
 		parent::__construct();
 		// Load model PersonModel
-		$this->load->model('person/adresse_model', 'AdresseModel');
+		$this->load->model('person/Adresse_model', 'AdresseModel');
 		// Load set the uid of the model to let to check the permissions
 		$this->AdresseModel->setUID($this->_getUID());
     }

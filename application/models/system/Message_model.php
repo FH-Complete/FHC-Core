@@ -23,29 +23,19 @@ class Message_model extends DB_Model
      * @param   integer  $person_id  REQUIRED
      * @return  array
      */
-    function getMessage($msg_id, $person_id)
+    /*function getMessage($msg_id)
     {
 		// Validate
 		if (empty($msg_id))
-        {
             return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
-        }
-        if (empty($person_id))
-        {
-            return $this->_invalid_id(MSG_ERR_INVALID_USER_ID);
-        }
-        $sql = 'SELECT m.*, s.status, t.subject, ' . "CONCAT(vorname, ' ', nachname) as user_name" .
-        ' FROM ' . $this->db->dbprefix . 'tbl_msg_message m ' .
-        ' JOIN ' . $this->db->dbprefix . 'tbl_msg_thread t ON (m.thread_id = t.thread_id) ' .
-        ' JOIN ' . $this->db->dbprefix . 'public.tbl_person' . ' ON (' . 'tbl_person.person_id' . ' = m.sender_id) '.
-        ' JOIN ' . $this->db->dbprefix . 'tbl_msg_status s ON (s.message_id = m.message_id AND s.person_id = ? ) ' .
-        ' WHERE m.message_id = ? ' ;
-        $result = $this->db->query($sql, array($person_id, $msg_id));
+       
+        $sql = 'SELECT * FROM tbl_msg_message JOIN tbl_person USING (person_id) WHERE message_id=?' ;
+        $result = $this->db->query($sql, array($msg_id));
         if ($result)
-			return $this->_success($result->result_array());
+			return $this->_success($result->result());
 		else
-			return $this->_general_error();
-    }
+			return $this->_error($this->db->error(), FHC_DB_ERROR);
+    }*/
  	/** -----------------------------------------------------------------
      * Get a Full Thread
      * get_full_thread() - will return a entire thread, including the status for specified user.
