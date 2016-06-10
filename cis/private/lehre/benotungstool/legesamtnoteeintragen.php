@@ -97,7 +97,8 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["prestudent_id"] != '') && ((($note
 	$jetzt = date("Y-m-d H:i:s");	
 	$prestudent_id = $_REQUEST["prestudent_id"];
 
-	if(!$student = new student($user))
+	$student = new student();
+	if(!$student->load($user))	// TODO EINE
 		die("Der Student wurde nicht gefunden!");
 
 	$legesamtnote = new legesamtnote($lehreinheit_id);
@@ -113,9 +114,9 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["prestudent_id"] != '') && ((($note
 		$legesamtnote->insertvon = $user;
 		$legesamtnote->new = true;
 		$response = "neu";
-    }
-    else
-    {
+	}
+	else
+	{
 		$legesamtnote->note = $_REQUEST["note"];
 		$legesamtnote->benotungsdatum = $jetzt;
 		$legesamtnote->updateamum = $jetzt;
