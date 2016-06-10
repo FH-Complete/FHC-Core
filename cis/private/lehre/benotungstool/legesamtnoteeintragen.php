@@ -35,7 +35,7 @@ require_once('../../../../include/datum.class.php');
 require_once('../../../../include/legesamtnote.class.php');
 require_once('../../../../include/lvgesamtnote.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
-require_once('../../../../include/student.class.php');
+require_once('../../../../include/prestudent.class.php');
 
 $user = get_uid();
 
@@ -72,7 +72,7 @@ else
 $datum_obj = new datum();
 
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
-$uid = (isset($_GET['uid'])?$_GET['uid']:'');
+$prestudent_id = (isset($_GET['prestudent_id'])?$_GET['prestudent_id']:'');
 
 //Kopfzeile
 
@@ -90,19 +90,14 @@ if($lehreinheit_id=='')
 
 $note = $_REQUEST["note"];
 
-// lvgesamtnote für studenten speichern
+// lvgesamtnote für prestudenten speichern
+if (isset($_REQUEST["submit"]) && ($prestudent_id != '') && ((($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16))  ){
 
-if (isset($_REQUEST["submit"]) && ($_REQUEST["prestudent_id"] != '') && ((($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16))  ){
-	
-	$jetzt = date("Y-m-d H:i:s");	
-	$prestudent_id = $_REQUEST["prestudent_id"];
+	$jetzt = date("Y-m-d H:i:s");
 
-	$student = new student();
-	if(!$student->load($user))	// TODO EINE
-		die("Der Student wurde nicht gefunden!");
-
+	//a new entry
 	$legesamtnote = new legesamtnote($lehreinheit_id);
-	if (!$legesamtnote->load($student->prestudent_id,$lehreinheit_id))
+	if (!$legesamtnote->load($prestudent_id,$lehreinheit_id))
 	{
 		$legesamtnote->prestudent_id = $prestudent_id;
 		$legesamtnote->lehreinheit_id = $lehreinheit_id;
@@ -115,6 +110,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["prestudent_id"] != '') && ((($note
 		$legesamtnote->new = true;
 		$response = "neu";
 	}
+	//update
 	else
 	{
 		$legesamtnote->note = $_REQUEST["note"];

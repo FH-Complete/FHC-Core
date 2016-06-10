@@ -327,7 +327,7 @@ foreach($noten_obj->result as $row)
 			}
 			var prestudent_id = document.nachpruefung_form.prestudent_id.value;
 			var lehreinheit_id = document.nachpruefung_form.le_id.value;
-alert(prestudent_id + " TODO EINE pachpruefungeintragen.php");
+
 		    var jetzt = new Date();
 			var ts = jetzt.getTime();
 		    var url= '<?php echo "nachpruefungeintragen.php?lvid=$lvid&stsem=$stsem"; ?>';
