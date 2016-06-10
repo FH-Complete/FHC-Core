@@ -403,6 +403,7 @@
 						<th ts-criteria="seqPlace|parseInt" ts-default="ascending">Reihung</th>
 						<th ts-criteria="rt_gesamtpunkte|parseFloat" ts-default="ascending">RT Gesamt</th>
 						<th ts-criteria="interviewbogen">Interviewbogen</th>
+						<th ts-criteria="anmerkung">Anmerkung/Prio</th>
 						<th ts-criteria="laststatus">Status</th>
 						<th ng-if="aqr.selectedStudienplatz.apz">{{aqr.choosenStuds}}/{{aqr.selectedStudienplatz.apz}}</th>
 						<th ng-if="!aqr.selectedStudienplatz.apz">{{aqr.choosenStuds}}/Keine APZ</th>
@@ -418,6 +419,7 @@
 						<td>{{stud.seqPlace}}</td>
 						<td>{{stud.rt_gesamtpunkte}}</td>
 						<td>{{stud.interviewbogen?'vorhanden':'nicht vorhanden'}}</td>
+						<td>{{stud.anmerkung}}</td>
 						<td>{{stud.laststatus}}</td>
 						<td>
 							<input ng-if="stud.applicant" type="checkbox" ng-model="stud.selected"/>
@@ -441,6 +443,7 @@
 						<th ts-criteria="seqPlace|parseInt" ts-default="ascending">Reihung</th>
 						<th ts-criteria="rt_gesamtpunkte|parseFloat">RT Gesamt</th>
 						<th ts-criteria="interviewbogen">Interviewbogen</th>
+						<th ts-criteria="anmerkung">Anmerkung/Prio</th>
 						<th ts-criteria="laststatus">Status</th>
 						<th></th>
 					</tr>
@@ -455,6 +458,7 @@
 						<td>{{stud.seqPlace}}</td>
 						<td>{{stud.rt_gesamtpunkte}}</td>
 						<td>{{stud.interviewbogen?'vorhanden':'nicht vorhanden'}}</td>
+						<td>{{stud.anmerkung}}</td>
 						<td>{{stud.laststatus}}</td>
 						<td>
 							<input ng-if="stud.applicant" type="checkbox" ng-model="stud.selected"/>

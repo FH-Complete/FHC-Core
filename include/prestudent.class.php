@@ -1761,7 +1761,9 @@ class prestudent extends person
 
 		if($stg_obj->typ=='m')
 		{
-			$qry = "SELECT DISTINCT prestudent_id, vorname, nachname, gebdatum, rt_gesamtpunkte, tbl_prestudent.studiengang_kz, bis.tbl_zgvgruppe.bezeichnung, get_rolle_prestudent(prestudent_id, null) as laststatus
+			$qry = "SELECT DISTINCT prestudent_id, vorname, nachname, gebdatum, rt_gesamtpunkte, tbl_prestudent.studiengang_kz, bis.tbl_zgvgruppe.bezeichnung, get_rolle_prestudent(prestudent_id, null) as laststatus,
+					(Select anmerkung from public.tbl_prestudentstatus where prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $this->db_add_param($studiensemester_kurzbz)."
+						AND status_kurzbz='Bewerber') as anmerkung
 			FROM
 				public.tbl_prestudent
 				JOIN public.tbl_person USING(person_id)
@@ -1787,7 +1789,9 @@ class prestudent extends person
 		}
 		else
 		{
-			$qry = "SELECT DISTINCT prestudent_id, vorname, nachname, gebdatum, rt_gesamtpunkte, tbl_prestudent.studiengang_kz, bis.tbl_zgvgruppe.bezeichnung, get_rolle_prestudent(prestudent_id, null) as laststatus
+			$qry = "SELECT DISTINCT prestudent_id, vorname, nachname, gebdatum, rt_gesamtpunkte, tbl_prestudent.studiengang_kz, bis.tbl_zgvgruppe.bezeichnung, get_rolle_prestudent(prestudent_id, null) as laststatus,
+				(Select anmerkung from public.tbl_prestudentstatus where prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $this->db_add_param($studiensemester_kurzbz)."
+						AND status_kurzbz='Bewerber') as anmerkung
 			FROM
 				public.tbl_prestudent
 					JOIN public.tbl_person USING(person_id)
