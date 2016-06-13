@@ -25,7 +25,7 @@ require_once(dirname(__FILE__).'/benutzer.class.php');
 class student extends benutzer
 {
 
-    //Tabellenspalten
+	//Tabellenspalten
 	public $matrikelnr;
 	public $prestudent_id;
 	public $studiengang_kz;
