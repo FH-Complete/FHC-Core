@@ -121,4 +121,28 @@ trait db_extra
 		}
 		return $string;
 	}
+	
+	public function db_num_fields($result=null)
+	{
+		if(is_null($result))
+			return pg_num_fields($this->db_result);
+		else
+			return pg_num_fields($result);
+	}
+	
+	public function convert_html_chars($value)
+	{
+		return htmlspecialchars($value);
+	}
+	
+	/**
+	 * Liefert den Feldnamen mit index i
+	 */
+	public function db_field_name($result=null, $i)
+	{
+		if(is_null($result))
+			return pg_field_name($this->db_result, $i);
+		else
+			return pg_field_name($result, $i);
+	}
 }
