@@ -74,6 +74,7 @@
 				aqr.studiengaenge = [];
 				aqr.studiensemester = [];
 				aqr.studienplaetze = [];
+				aqr.zgvElems = [];
 				aqr.actualSequence = 1;
 				SERVICE_TARGET = "aliquote_reduktion.json.php";
 
@@ -112,6 +113,12 @@
 						if(!confirm("Es wurden zu viel Studenten gewählt!"))
 							return;
 					}
+					else
+					{
+						if(!confirm("Sind Sie sicher, dass Sie die ausgewählten Personen aufnehmen wollen?"))
+							return;
+					}
+
 					var prestudent_ids = [];
 
 					aqr.studenten.forEach(function(i)
@@ -190,7 +197,7 @@
 							aqr.studenten=res;
 							aqr.studenten.forEach(function(i)
 							{
-								if(i.laststatus=='Wartender'||i.laststatus=='Bewerber')
+								if((i.laststatus=='Wartender'||i.laststatus=='Bewerber') && i.rt_gesamtpunkte !== null)
 									i.applicant = true;
 								else if(i.laststatus=='Student'||i.laststatus=='Aufgenommener')
 									i.selected=true;
@@ -212,12 +219,12 @@
 					return ret;
 				}
 
-				aqr.getAcceptedCount = function()
+				aqr.getAcceptedCount = function(zgvGruppe)
 				{
 					var ret = 0;
 					aqr.studenten.forEach(function(i)
 					{
-						if(i.laststatus=='Student'||i.laststatus=='Aufgenommener')
+						if((i.laststatus=='Student'||i.laststatus=='Aufgenommener') && (zgvGruppe === undefined || zgvGruppe === i.bezeichnung))
 							ret++;
 					});
 					return ret;
@@ -225,24 +232,55 @@
 
 				aqr.doPreselection = function()
 				{
-					if(parseInt(aqr.selectedStudienplatz.apz) >= 0)
+					aqr.zgvElems = [];
+					if(parseInt(aqr.selectedStudienplatz.apz) >= 0)    // we only preselect, if we have an APZ
 					{
 						aqr.studenten.sort(sortStudentenRTP);
 
 						var zgvs = aqr.getZGVArray();
 						var neededStudentsCount = aqr.selectedStudienplatz.apz - aqr.getAcceptedCount();
-						var perZGV = parseInt(neededStudentsCount / zgvs.length);
+						var perZGV = aqr.studenten.length;
 						var zgvElems = [];
+						var allApplicants = [];
+
+						aqr.studenten.forEach(function(j)
+						{
+							if(j.applicant)
+								allApplicants.push(j);
+						});
 
 						zgvs.forEach(function(i)
 						{
-							zgvElems.push({name:i,needed:perZGV});
+							var applicantsFromZGV = [];
+							aqr.studenten.forEach(function(j)
+							{
+								if(j.applicant && j.bezeichnung === i)
+									applicantsFromZGV.push(j);
+							});
+
+							// calculate the aliquote reduction for every ZGV
+							var percent = applicantsFromZGV.length / allApplicants.length * 100;
+							var neededFromZGV = (aqr.selectedStudienplatz.apz / 100 * percent) - aqr.getAcceptedCount(i);
+
+							if(neededFromZGV < 0)
+								neededFromZGV = 0;
+
+							zgvElems.push({name:i, needed:neededFromZGV, percent:percent, accepted: aqr.getAcceptedCount(i), neededSum: (aqr.selectedStudienplatz.apz / 100 * percent)});
 						});
-						var residual = perZGV * zgvs.length;
+						aqr.zgvElems = JSON.parse(JSON.stringify(zgvElems));
+
+						// calculate the already distributed students
+						var residual = 0;
+						zgvElems.forEach(function(i)
+						{
+							residual += i.needed;
+						});
+
+						// calculate the difference from needed to already distributed
 						var resDiff = neededStudentsCount - residual;
 
 						// distribute the remaining places on the present ZGVs
-						while(resDiff > 0)
+						while(resDiff > 0 && zgvElems.length > 0/*if there are no zgvs(to prevent a deadlock)*/)
 						{
 							zgvElems.forEach(function(i)
 							{
@@ -284,9 +322,10 @@
 							if(
 									 aqr.studenten[j].laststatus!='Abgewiesener'
 								&& aqr.studenten[j].laststatus!='Abbrecher'
-								&& zgvElems[i].needed > 0
+								&& parseInt(zgvElems[i].needed) > 0
 								&& aqr.studenten[j].bezeichnung == zgvElems[i].name
-								&& !aqr.studenten[j].seqPlace)
+								&& !aqr.studenten[j].seqPlace
+								&& !aqr.studenten[j].selected)
 							{
 								aqr.setSequence(aqr.studenten[j]);
 								zgvElems[i].needed --;
@@ -431,6 +470,34 @@
 
 			<input style="float:right;" type="button" value="Annehmen" ng-click="aqr.submit()"/>
 			<input style="float:right;" type="button" value="Download" ng-click="aqr.download()"/>
+			<h3>ZGV Informationen</h3>
+			<table ts-wrapper>
+				<thead>
+					<tr>
+						<th ts-criteria="name" ts-default="ascending">Name</th>
+						<th ts-criteria="percent">Prozent</th>
+						<th ts-criteria="neededSum">Insgesamt benötigt</th>
+						<th ts-criteria="accepted">Bereits aufgenommen</th>
+						<th ts-criteria="needed">Noch benötigte Personen</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="zgv in aqr.zgvElems" ts-repeat ts-hide-no-data>
+						<td>{{zgv.name}}</td>
+						<td>{{zgv.percent | number: 2}}%</td>
+						<td>{{zgv.neededSum | parseInt}}</td>
+						<td>{{zgv.accepted}}</td>
+						<td>{{zgv.needed | parseInt}}</td>
+					</tr>
+					<tr>
+						<th>Summe</th>
+						<th></th>
+						<th>{{aqr.selectedStudienplatz.apz}}</th>
+						<th>{{aqr.getAcceptedCount()}}</th>
+						<th>{{aqr.selectedStudienplatz.apz - aqr.getAcceptedCount()}}</th>
+					</tr>
+				</tbody>
+			</table>
 
 			<h3>Bereits aufgenommene</h3>
 			<table ts-wrapper>
