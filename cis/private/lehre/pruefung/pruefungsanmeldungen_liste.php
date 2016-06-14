@@ -66,7 +66,7 @@ $rechte->getBerechtigungen($uid);
 	       min-height: 297mm;
 	       padding: 20mm;
 	       margin: 10mm auto;
-	       border: 1px #D3D3D3 solid;
+	       border: 1px #ffffff solid;
 	       border-radius: 5px;
 	       background: white;
 	       box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
@@ -75,7 +75,7 @@ $rechte->getBerechtigungen($uid);
 
 	    #subpage {
 		padding: 10mm;
-		border: 1px black solid;
+		border: 1px white solid;
 		height: 256mm;
 		outline: 20mm
 	    }

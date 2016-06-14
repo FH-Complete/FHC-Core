@@ -486,8 +486,8 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
     {
 	if($termin->teilnehmer_max > $termin->getNumberOfParticipants() || $termin->teilnehmer_max == NULL)
 	{
-	    $pruefung = new pruefungCis();
-	    $reihung = $pruefung->getLastOfReihung($_REQUEST["termin_id"]);
+		$pruefung = new pruefungCis();
+		$reihung = $pruefung->getLastOfReihung($_REQUEST["termin_id"]);
 	    $anmeldung = new pruefungsanmeldung();
 	    $anmeldung->lehrveranstaltung_id = $_REQUEST["lehrveranstaltung_id"];
 	    $anmeldung->pruefungstermin_id = $_REQUEST["termin_id"];
@@ -500,7 +500,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 
 	    $konto = new konto();
 	    $creditpoints = $konto->getCreditPoints($uid, $aktStudiensemester);
-            
+
 	    if($creditpoints !== false)
 	    {
 		if($creditpoints < $lehrveranstaltung->ects)
@@ -550,6 +550,8 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
     $prestudent->getPrestudenten($person->person_id);
     $studiensemester = new studiensemester();
     $stdsem = $studiensemester->getaktorNext();
+	if ($aktStudiensemester)
+		$stdsem = $aktStudiensemester;
 
     if(count($prestudent->result) > 0)
     {
@@ -588,7 +590,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
             {
                 $anrechungSaveResult = true;
             }
-            
+
 	    if($anrechungSaveResult)
 	    {
                 if($anrechnung->anrechnung_id == "")
