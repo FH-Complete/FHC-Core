@@ -197,7 +197,7 @@
 							aqr.studenten=res;
 							aqr.studenten.forEach(function(i)
 							{
-								if((i.laststatus=='Wartender'||i.laststatus=='Bewerber') && i.rt_gesamtpunkte !== null)
+								if((i.laststatus=='Wartender'||i.laststatus=='Bewerber') && i.rt_gesamtpunkte !== null  && i.rt_gesamtpunkte > 0)
 									i.applicant = true;
 								else if(i.laststatus=='Student'||i.laststatus=='Aufgenommener')
 									i.selected=true;
@@ -249,6 +249,11 @@
 								allApplicants.push(j);
 						});
 
+						var applicantCount = aqr.selectedStudienplatz.apz;
+						if(applicantCount > allApplicants.length)
+							applicantCount = allApplicants.length;
+
+
 						zgvs.forEach(function(i)
 						{
 							var applicantsFromZGV = [];
@@ -260,12 +265,12 @@
 
 							// calculate the aliquote reduction for every ZGV
 							var percent = applicantsFromZGV.length / allApplicants.length * 100;
-							var neededFromZGV = (aqr.selectedStudienplatz.apz / 100 * percent) - aqr.getAcceptedCount(i);
+							var neededFromZGV = (applicantCount / 100 * percent) - aqr.getAcceptedCount(i);
 
 							if(neededFromZGV < 0)
 								neededFromZGV = 0;
 
-							zgvElems.push({name:i, needed:neededFromZGV, percent:percent, accepted: aqr.getAcceptedCount(i), neededSum: (aqr.selectedStudienplatz.apz / 100 * percent)});
+							zgvElems.push({name:i, needed:neededFromZGV, percent:percent, accepted: aqr.getAcceptedCount(i), neededSum: (applicantCount / 100 * percent)});
 						});
 						aqr.zgvElems = JSON.parse(JSON.stringify(zgvElems));
 
@@ -314,7 +319,7 @@
 				{
 					var beginNeeded = needed;
 
-					//distribute the remainig applicants to the present ZGVs
+					//distribute the applicants to the present ZGVs
 					for(var i=0; i < zgvElems.length; i++)
 					{
 						for(var j in aqr.studenten)
@@ -325,7 +330,8 @@
 								&& parseInt(zgvElems[i].needed) > 0
 								&& aqr.studenten[j].bezeichnung == zgvElems[i].name
 								&& !aqr.studenten[j].seqPlace
-								&& !aqr.studenten[j].selected)
+								&& !aqr.studenten[j].selected
+								&& aqr.studenten[j].applicant)
 							{
 								aqr.setSequence(aqr.studenten[j]);
 								zgvElems[i].needed --;
@@ -342,7 +348,7 @@
 						//distribute the rest of the applicants, WITH a ZGV group
 						for(var j in aqr.studenten)
 						{
-							if(!aqr.studenten[j].selected && aqr.studenten[j].bezeichnung)
+							if(!aqr.studenten[j].selected && aqr.studenten[j].bezeichnung && aqr.studenten[j].applicant)
 							{
 								aqr.setSequence(aqr.studenten[j]);
 								if(needed > 0 && (aqr.studenten[j].laststatus=='Wartender'||aqr.studenten[j].laststatus=='Bewerber'))
@@ -355,7 +361,7 @@
 						//distribute the rest of the applicants, WITHOUT a ZGV group
 						for(var j in aqr.studenten)
 						{
-							if(!aqr.studenten[j].selected && !aqr.studenten[j].bezeichnung)
+							if(!aqr.studenten[j].selected && !aqr.studenten[j].bezeichnung && aqr.studenten[j].applicant)
 							{
 								aqr.setSequence(aqr.studenten[j]);
 								if(needed > 0 && (aqr.studenten[j].laststatus=='Wartender'||aqr.studenten[j].laststatus=='Bewerber'))
@@ -490,7 +496,7 @@
 						<td>{{zgv.needed | parseInt}}</td>
 					</tr>
 					<tr>
-						<th>Summe</th>
+						<th>Gesamt</th>
 						<th></th>
 						<th>{{aqr.selectedStudienplatz.apz}}</th>
 						<th>{{aqr.getAcceptedCount()}}</th>
@@ -499,7 +505,7 @@
 				</tbody>
 			</table>
 
-			<h3>Bereits aufgenommene</h3>
+			<h3>Restliche Studenten</h3>
 			<table ts-wrapper>
 				<thead>
 					<tr>
