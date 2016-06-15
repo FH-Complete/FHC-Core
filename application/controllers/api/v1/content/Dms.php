@@ -94,27 +94,28 @@ class Dms extends APIv1_Controller
 	 */
 	public function postDms()
 	{
-		if ($this->_validate($this->post()))
+            $dms = $this->_parseData($this->post());
+		if ($this->_validate($dms))
 		{
-			if (isset($this->post()['dms_id']))
+			if (isset($dms['dms_id']))
 			{
-				if ($this->_saveFileOnUpdate($this->post()))
+				if ($this->_saveFileOnUpdate($dms))
 				{
-					$result = $this->DmsModel->update($this->post()['dms_id'], $this->_dmsFieldsArray($this->post()));
+					$result = $this->DmsModel->update($this->post()['dms_id'], $this->_dmsFieldsArray($dms));
 					if ($result->error == EXIT_SUCCESS)
 					{
-						$result = $this->DmsModel->updateDmsVersion($this->post()['dms_id'], $this->_dmsVersionFieldsArray($this->post()));
+						$result = $this->DmsModel->updateDmsVersion($dms['dms_id'], $this->_dmsVersionFieldsArray($dms));
 					}
 				}
 			}
 			else
 			{
-				if (($fileName = $this->_saveFileOnInsert($this->post())) !== false)
+				if (($fileName = $this->_saveFileOnInsert($dms)) !== false)
 				{
-					$result = $this->DmsModel->insert($this->_dmsFieldsArray($this->post()));
+					$result = $this->DmsModel->insert($this->_dmsFieldsArray($dms));
 					if ($result->error == EXIT_SUCCESS)
 					{
-						$result = $this->DmsModel->insertDmsVersion($this->_dmsVersionFieldsArray($this->post(), $result->retval, $fileName));
+						$result = $this->DmsModel->insertDmsVersion($this->_dmsVersionFieldsArray($dms, $result->retval, $fileName));
 					}
 				}
 			}
