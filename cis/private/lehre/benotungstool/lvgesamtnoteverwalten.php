@@ -840,9 +840,15 @@ echo "
 			<th></th>
 			<th>".$p->t('global/uid')."</th>
 			<th>".$p->t('global/nachname')."</th>
-			<th>".$p->t('global/vorname')."</th>
-			<th>".($grade_from_moodle?''.$p->t('benotungstool/moodleNote').'':''.$p->t('benotungstool/leNoten').' (LE-ID)')."</th>
-			<th>".$p->t('benotungstool/punkte').' / '.$p->t('benotungstool/note')."</th>
+			<th>".$p->t('global/vorname')."</th>";
+
+                        if(defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE)
+                        {
+                            echo "<th>".($grade_from_moodle?''.$p->t('benotungstool/moodleNote').'':''.$p->t('benotungstool/leNoten').' (LE-ID)')."</th>";
+                        }
+                                
+                                
+                    echo "<th>".$p->t('benotungstool/punkte').' / '.$p->t('benotungstool/note')."</th>
 			<th rowspan=2>".$p->t('benotungstool/lvNote')."<br>
 				<input type='button' onclick='GradeImport()' value='".$p->t('benotungstool/importieren')."'>
 			</th>
@@ -853,26 +859,38 @@ echo "
 				<br><input type='submit' name='frei' value='Freigabe'>
 				</form>
 			</th>
-			<th>".$p->t('benotungstool/zeugnisnote')."</th>
-			<th colspan='2'>".$p->t('benotungstool/nachpruefung')."</th>";
+			<th>".$p->t('benotungstool/zeugnisnote')."</th>";
+
+                        if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
+			{
+				echo "<th colspan='2'>".$p->t('benotungstool/nachpruefung')."</th>";
+			}
 			if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
 			{
 				echo "<th colspan='2' nowrap>".$p->t('benotungstool/nachpruefung2')."</th>";
 			}
+                        if(defined('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF') && CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF)
+                        {
+                            echo "<th colspan='2'>".$p->t('benotungstool/kommissionellePruefung')."</th>";
+                        }
 			echo "
-			<th colspan='2'>".$p->t('benotungstool/kommissionellePruefung')."</th>
+			
 		</tr>
 			<tr>
-				<th colspan='9'>&nbsp;</th>
-				<th colspan='2'>
-					<table>
-					<tr>
-						<td class='td_datum'>".$p->t('global/datum')."</td>
-						<td class='td_note'>".$p->t('benotungstool/note')."</td>
-						<td></td>
-					</tr>
-					</table>
-				</th>";
+				<th colspan='9'>&nbsp;</th>";
+                                if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
+				{
+                                    echo "<th colspan='2'>
+                                                <table>
+                                                <tr>
+                                                        <td class='td_datum'>".$p->t('global/datum')."</td>
+                                                        <td class='td_note'>".$p->t('benotungstool/note')."</td>
+                                                        <td></td>
+                                                </tr>
+                                                </table>
+                                        </th>";
+                                }
+                                
 				if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
 				{
 					echo "<th colspan='2'>
@@ -885,66 +903,73 @@ echo "
 						</table>
 					</th>";
 				}
-				echo "
-				<th colspan='2'>
-					<table>
-					<tr>
-						<td class='td_datum'>".$p->t('global/datum')."</td>
-						<td class='td_note'>".$p->t('benotungstool/note')."</td>
-						<td></td>
-					</tr>
-					</table>
-				</th>
+                                
+                                if(defined('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF') && CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF)
+                                {
+                                    echo "
+                                    <th colspan='2'>
+                                            <table>
+                                            <tr>
+                                                    <td class='td_datum'>".$p->t('global/datum')."</td>
+                                                    <td class='td_note'>".$p->t('benotungstool/note')."</td>
+                                                    <td></td>
+                                            </tr>
+                                            </table>
+                                    </th>";
+                                }
+                                echo "
 			</tr>
 			";
 
+                if(defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE)
+                {
+                    if($grade_from_moodle)
+                    {
+                            flush();
+                            ob_flush();
 
-		if($grade_from_moodle)
-		{
-			flush();
-			ob_flush();
+                            $moodle24 = new moodle24_course();
+                            $moodle24->loadNoten($lvid, $stsem);
 
-			$moodle24 = new moodle24_course();
-			$moodle24->loadNoten($lvid, $stsem);
+                            $moodle24_course_bezeichnung=array();
 
-			$moodle24_course_bezeichnung=array();
+                            if(count($moodle24->result)>0)
+                            {
+                                    // Bezeichnungen der Moodlekurse laden
+                                    foreach($moodle24->result as $obj)
+                                    {
+                                            if(!isset($moodle24_course_bezeichnung[$obj->mdl_course_id]))
+                                            {
+                                                    $moodle24course = new moodle24_course();
+                                                    $moodle24course->load($obj->mdl_course_id);
 
-			if(count($moodle24->result)>0)
-			{
-				// Bezeichnungen der Moodlekurse laden
-				foreach($moodle24->result as $obj)
-				{
-					if(!isset($moodle24_course_bezeichnung[$obj->mdl_course_id]))
-					{
-						$moodle24course = new moodle24_course();
-						$moodle24course->load($obj->mdl_course_id);
+                                                    $moodle24_course_bezeichnung[$obj->mdl_course_id]=$moodle24course->mdl_shortname;
+                                            }
 
-						$moodle24_course_bezeichnung[$obj->mdl_course_id]=$moodle24course->mdl_shortname;
-					}
+                                            if(!isset($moodle24_course_gewicht[$obj->mdl_course_id]))
+                                            {
+                                                    $mdl_obj = new moodle24_course();
+                                                    $mdl_lehreinheiten=$mdl_obj->getLeFromCourse($obj->mdl_course_id);
 
-					if(!isset($moodle24_course_gewicht[$obj->mdl_course_id]))
-					{
-						$mdl_obj = new moodle24_course();
-						$mdl_lehreinheiten=$mdl_obj->getLeFromCourse($obj->mdl_course_id);
+                                                    foreach($mdl_lehreinheiten as $row_mdl_lehreinheit)
+                                                    {
+                                                            if($row_mdl_lehreinheit!='')
+                                                            {
+                                                                    $lehreinheit_gewicht_obj = new lehreinheit();
+                                                                    $lehreinheit_gewicht_obj->load($row_mdl_lehreinheit);
 
-						foreach($mdl_lehreinheiten as $row_mdl_lehreinheit)
-						{
-							if($row_mdl_lehreinheit!='')
-							{
-								$lehreinheit_gewicht_obj = new lehreinheit();
-								$lehreinheit_gewicht_obj->load($row_mdl_lehreinheit);
-
-								if($lehreinheit_gewicht_obj->gewicht!='')
-								{
-									$moodle24_course_gewicht[$obj->mdl_course_id]=$lehreinheit_gewicht_obj->gewicht;
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+                                                                    if($lehreinheit_gewicht_obj->gewicht!='')
+                                                                    {
+                                                                            $moodle24_course_gewicht[$obj->mdl_course_id]=$lehreinheit_gewicht_obj->gewicht;
+                                                                            break;
+                                                                    }
+                                                            }
+                                                    }
+                                            }
+                                    }
+                            }
+                    }
+                }
 
 		// studentenquery
 		$qry_stud = "SELECT
@@ -978,165 +1003,168 @@ echo "
 				$note_le_gewichtet=0;
 				$gewichtsumme=0;
 				$note=0;
-				if($grade_from_moodle)
-				{
-					//Moodle 1.9
+                                if(defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE)
+                                {
+                                    if($grade_from_moodle)
+                                    {
+                                            //Moodle 1.9
 
-					// Alle Moodlekursdaten zu Lehreinheit und Semester lesen wenn noch nicht belegt.
-					if (is_null($mdldaten) && defined('CONN_STRING_MOODLE'))
-					{
-						//Noten aus Moodle
-						if (!isset($moodle_course))
-							$moodle_course = new moodle19_course();
+                                            // Alle Moodlekursdaten zu Lehreinheit und Semester lesen wenn noch nicht belegt.
+                                            if (is_null($mdldaten) && defined('CONN_STRING_MOODLE'))
+                                            {
+                                                    //Noten aus Moodle
+                                                    if (!isset($moodle_course))
+                                                            $moodle_course = new moodle19_course();
 
-						if (!$mdldaten = $moodle_course->loadNoten($lvid, $stsem, '', true,$debg))
-							$mdldaten='';
-					}
-					// Verarbeitet die Kursdaten
-					if (!is_null($mdldaten) && is_array($mdldaten))
-					{
-							reset($mdldaten);
-							$title="";
-							$mdl_shortname='';
-	    					for ($imdldaten=0;$imdldaten<count($mdldaten) ;$imdldaten++)
-							{
+                                                    if (!$mdldaten = $moodle_course->loadNoten($lvid, $stsem, '', true,$debg))
+                                                            $mdldaten='';
+                                            }
+                                            // Verarbeitet die Kursdaten
+                                            if (!is_null($mdldaten) && is_array($mdldaten))
+                                            {
+                                                            reset($mdldaten);
+                                                            $title="";
+                                                            $mdl_shortname='';
+                                                    for ($imdldaten=0;$imdldaten<count($mdldaten) ;$imdldaten++)
+                                                            {
 
-								$mdldata=$mdldaten[$imdldaten]->result;
-								$kursArr=(isset($mdldata[2])?$mdldata[2]:array());
-								$kursasObj=(isset($mdldata[3])?$mdldata[3]:array());
-								$kursname=(isset($mdldata[7])?$mdldata[7]:'');
-								$shortname=(isset($mdldata[8])?$mdldata[8]:'');
+                                                                    $mdldata=$mdldaten[$imdldaten]->result;
+                                                                    $kursArr=(isset($mdldata[2])?$mdldata[2]:array());
+                                                                    $kursasObj=(isset($mdldata[3])?$mdldata[3]:array());
+                                                                    $kursname=(isset($mdldata[7])?$mdldata[7]:'');
+                                                                    $shortname=(isset($mdldata[8])?$mdldata[8]:'');
 
-								$note=0;
-								$userGef=false;
+                                                                    $note=0;
+                                                                    $userGef=false;
 
-								reset($kursArr);
-		    					for ($iKurs=0;$iKurs<count($kursArr) ;$iKurs++)
-								{
-									if (isset($kursArr[$iKurs]) && isset($kursArr[$iKurs][2]) && isset($kursArr[$iKurs][6]) && strtolower(trim($row_stud->uid))==strtolower(trim($kursArr[$iKurs][2])) )
-									{
-									    $note=trim($kursArr[$iKurs][6]);
-										$userGef=true;
+                                                                    reset($kursArr);
+                                                            for ($iKurs=0;$iKurs<count($kursArr) ;$iKurs++)
+                                                                    {
+                                                                            if (isset($kursArr[$iKurs]) && isset($kursArr[$iKurs][2]) && isset($kursArr[$iKurs][6]) && strtolower(trim($row_stud->uid))==strtolower(trim($kursArr[$iKurs][2])) )
+                                                                            {
+                                                                                $note=trim($kursArr[$iKurs][6]);
+                                                                                    $userGef=true;
 
-									   	if (is_numeric($note)  || $debg)
-									   	{
-										   	if (is_numeric($note))
-										   	{
-										   		$note_le += $note;
-												$note_le_gewichtet +=$note*$gewichtung;
-												$gewichtsumme+=$gewichtung;
-					    			   			$le_anz += 1;
-											}
-						    				if ($note == 5)
-						    					$leneg = " style='color:red; font-weight:bold'";
-				    						else
-		    									$leneg = " style='font-weight:bold'";
+                                                                                    if (is_numeric($note)  || $debg)
+                                                                                    {
+                                                                                            if (is_numeric($note))
+                                                                                            {
+                                                                                                    $note_le += $note;
+                                                                                                    $note_le_gewichtet +=$note*$gewichtung;
+                                                                                                    $gewichtsumme+=$gewichtung;
+                                                                                            $le_anz += 1;
+                                                                                            }
+                                                                                    if ($note == 5)
+                                                                                            $leneg = " style='color:red; font-weight:bold'";
+                                                                                    else
+                                                                                            $leneg = " style='font-weight:bold'";
 
-										   $mdl_shortname=$mdldaten[$imdldaten]->mdl_shortname;
-			  							   $title="\r\nMoodle 1.9 KursID: ".$mdldaten[$imdldaten]->mdl_course_id ."\r\n\r\n".$kursname.', '.$mdl_shortname."\r\n";
-									       foreach ($kursasObj[$iKurs] as $key => $value)
-										   {
-												$title.=$key."=>".$value."\r\n";
-											}
+                                                                                       $mdl_shortname=$mdldaten[$imdldaten]->mdl_shortname;
+                                                                                       $title="\r\nMoodle 1.9 KursID: ".$mdldaten[$imdldaten]->mdl_course_id ."\r\n\r\n".$kursname.', '.$mdl_shortname."\r\n";
+                                                                                   foreach ($kursasObj[$iKurs] as $key => $value)
+                                                                                       {
+                                                                                                    $title.=$key."=>".$value."\r\n";
+                                                                                            }
 
 
-											$note_les_str .= "<span ".$leneg.">".$note."</span> <span  title='".$title."' style='font-size:10px'>(".$mdl_shortname.")</span> ";
-										}
-									}	// ende If Richtiger User
+                                                                                            $note_les_str .= "<span ".$leneg.">".$note."</span> <span  title='".$title."' style='font-size:10px'>(".$mdl_shortname.")</span> ";
+                                                                                    }
+                                                                            }	// ende If Richtiger User
 
-									if ($userGef)
-									{
-										$iKurs=count($kursArr)+1; // diesen USER for beenden - user wurde gefunden
-									}
+                                                                            if ($userGef)
+                                                                            {
+                                                                                    $iKurs=count($kursArr)+1; // diesen USER for beenden - user wurde gefunden
+                                                                            }
 
-								} // ende Kursschleife
-							} // MoodleKurse abarbeiten
+                                                                    } // ende Kursschleife
+                                                            } // MoodleKurse abarbeiten
 
-				#echo "<p><h1> $title Anzahl Noten gef. $le_anz $note_le </h1></p>";
-					}
-					else
-					{
-						if(defined('CONN_STRING_MOODLE'))
-						{
-							//den Error nur einmal anzeigen und nicht fuer jeden Studenten
-							$moodle_course->errormsg=trim($moodle_course->errormsg);
-							if(!$errorshown && !empty($moodle_course->errormsg) )
-							{
-								//echo '<br><b>'.$moodle_course->errormsg.'</b><br>';
-								$errorshown=true;
-							}
-						}
-					}
+                                    #echo "<p><h1> $title Anzahl Noten gef. $le_anz $note_le </h1></p>";
+                                            }
+                                            else
+                                            {
+                                                    if(defined('CONN_STRING_MOODLE'))
+                                                    {
+                                                            //den Error nur einmal anzeigen und nicht fuer jeden Studenten
+                                                            $moodle_course->errormsg=trim($moodle_course->errormsg);
+                                                            if(!$errorshown && !empty($moodle_course->errormsg) )
+                                                            {
+                                                                    //echo '<br><b>'.$moodle_course->errormsg.'</b><br>';
+                                                                    $errorshown=true;
+                                                            }
+                                                    }
+                                            }
 
-					// Moodle 2.4
-					if(isset($moodle24) && count($moodle24->result)>0)
-					{
-						foreach($moodle24->result as $moodle24_noten)
-						{
-							if($moodle24_noten->uid==$row_stud->uid)
-							{
-								$gewichtung=1;
-								$note_le+=$moodle24_noten->note;
-								if(isset($moodle24_course_gewicht[$moodle24_noten->mdl_course_id]))
-									$gewichtung=$moodle24_course_gewicht[$moodle24_noten->mdl_course_id];
+                                            // Moodle 2.4
+                                            if(isset($moodle24) && count($moodle24->result)>0)
+                                            {
+                                                    foreach($moodle24->result as $moodle24_noten)
+                                                    {
+                                                            if($moodle24_noten->uid==$row_stud->uid)
+                                                            {
+                                                                    $gewichtung=1;
+                                                                    $note_le+=$moodle24_noten->note;
+                                                                    if(isset($moodle24_course_gewicht[$moodle24_noten->mdl_course_id]))
+                                                                            $gewichtung=$moodle24_course_gewicht[$moodle24_noten->mdl_course_id];
 
-								if($gewichtung=='')
-									$gewichtung=1;
-								$note_le_gewichtet+=$moodle24_noten->note*$gewichtung;
-								$gewichtsumme+=$gewichtung;
-								$le_anz+=1;
-								//if ($moodle24_noten->note == 5)
-								//	$leneg = " style='color:red; font-weight:bold'";
-								//else
-									$leneg = ' style="font-weight: bold;"';
-								$title="Moodle KursID: ".$moodle24_noten->mdl_course_id.
-								"\nKursbezeichnung: ".$moodle24_course_bezeichnung[$moodle24_noten->mdl_course_id].
-								"\nUser: ".$moodle24_noten->uid.
-								"\nNote: ".$moodle24_noten->note;
-								if(defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG)
-									$title.="\nGewichtung: ".$gewichtung;
-								$note_les_str .= "<br><span".$leneg.">".$moodle24_noten->note."</span><span  title='".$title."' style='font-size:10px'> (".$moodle24_course_bezeichnung[$moodle24_noten->mdl_course_id].")</span> ";
+                                                                    if($gewichtung=='')
+                                                                            $gewichtung=1;
+                                                                    $note_le_gewichtet+=$moodle24_noten->note*$gewichtung;
+                                                                    $gewichtsumme+=$gewichtung;
+                                                                    $le_anz+=1;
+                                                                    //if ($moodle24_noten->note == 5)
+                                                                    //	$leneg = " style='color:red; font-weight:bold'";
+                                                                    //else
+                                                                            $leneg = ' style="font-weight: bold;"';
+                                                                    $title="Moodle KursID: ".$moodle24_noten->mdl_course_id.
+                                                                    "\nKursbezeichnung: ".$moodle24_course_bezeichnung[$moodle24_noten->mdl_course_id].
+                                                                    "\nUser: ".$moodle24_noten->uid.
+                                                                    "\nNote: ".$moodle24_noten->note;
+                                                                    if(defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG)
+                                                                            $title.="\nGewichtung: ".$gewichtung;
+                                                                    $note_les_str .= "<br><span".$leneg.">".$moodle24_noten->note."</span><span  title='".$title."' style='font-size:10px'> (".$moodle24_course_bezeichnung[$moodle24_noten->mdl_course_id].")</span> ";
 
-							}
-						}
-					}
-				}
-				else
-				{
-					//Noten aus Uebungstool
-					$le = new lehreinheit();
-					$le->load_lehreinheiten($lvid, $stsem);
-					foreach($le->lehreinheiten as $l)
-					{
-						$legesamtnote = new legesamtnote($l->lehreinheit_id);
+                                                            }
+                                                    }
+                                            }
+                                    }
+                                    else
+                                    {
+                                        //Noten aus Uebungstool
+                                        $le = new lehreinheit();
+                                        $le->load_lehreinheiten($lvid, $stsem);
+                                        foreach($le->lehreinheiten as $l)
+                                        {
+                                                $legesamtnote = new legesamtnote($l->lehreinheit_id);
 
-		    			if (!$legesamtnote->load($row_stud->uid,$l->lehreinheit_id))
-						{
-		    				//$note_les_str .= "- (".$l->lehreinheit_id.")";
-		    			}
-		    			else
-		    			{
-		    				$note_le += $legesamtnote->note;
+                                            if (!$legesamtnote->load($row_stud->uid,$l->lehreinheit_id))
+                                                    {
+                                                    //$note_les_str .= "- (".$l->lehreinheit_id.")";
+                                            }
+                                            else
+                                            {
+                                                    $note_le += $legesamtnote->note;
 
-							$gewicht = $l->gewicht;
-							if($l->gewicht=='')
-								$gewicht = 1;
-							$note_le_gewichtet+=$legesamtnote->note*$gewicht;
-							$gewichtsumme+=$gewicht;
+                                                            $gewicht = $l->gewicht;
+                                                            if($l->gewicht=='')
+                                                                    $gewicht = 1;
+                                                            $note_le_gewichtet+=$legesamtnote->note*$gewicht;
+                                                            $gewichtsumme+=$gewicht;
 
-							$le_anz += 1;
-		    				if ($legesamtnote->note == 5)
-		    					$leneg = " style='color:red; font-weight:bold'";
-		    				else
-		    					$leneg = "";
-							if(defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG)
-								$title='Gewichtung: '.$l->gewicht;
-							else
-								$title='';
-		    				$note_les_str .= '<span title="'.$title.'"><span'.$leneg.'>'.$legesamtnote->note.'</span> ('.$l->lehreinheit_id.') </span>';
-		    			}
-		    		}
-				}
+                                                            $le_anz += 1;
+                                                    if ($legesamtnote->note == 5)
+                                                            $leneg = " style='color:red; font-weight:bold'";
+                                                    else
+                                                            $leneg = "";
+                                                            if(defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG)
+                                                                    $title='Gewichtung: '.$l->gewicht;
+                                                            else
+                                                                    $title='';
+                                                    $note_les_str .= '<span title="'.$title.'"><span'.$leneg.'>'.$legesamtnote->note.'</span> ('.$l->lehreinheit_id.') </span>';
+                                            }
+                                        }
+                                    }
+                                }
 
     			if ($lvgesamtnote = new lvgesamtnote($lvid,$row_stud->uid,$stsem))
     			{
@@ -1190,8 +1218,10 @@ echo "
 				else
 					$znote = null;
 
-
-				echo "<td style='white-space: nowrap;'>".$note_les_str."&nbsp;</td>";
+                                if(defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE)
+                                {
+                                    echo "<td style='white-space: nowrap;'>".$note_les_str."&nbsp;</td>";
+                                }
 
 				if (key_exists($row_stud->uid,$studpruef_arr))
 					$hide = "style='display:none;visibility:hidden;'";
@@ -1275,43 +1305,46 @@ echo "
 				if(isset($noten_array[$znote]) && $noten_array[$znote]['positiv']==false)
 					$summe_ng++;
 
-				// Pruefung 2. Termin
-				if (key_exists($row_stud->uid, $studpruef_arr))
+                                if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
 				{
-					echo "<td colspan='2'>";
-					echo "<span id='span_Termin2_".$row_stud->uid."'>";
-					echo "<table>";
-					$le_id_arr = array();
-					$le_id_arr = array_keys($studpruef_arr[$row_stud->uid]);
-					foreach ($le_id_arr as $le_id_stud)
-					{
-						$pr_note = $studpruef_arr[$row_stud->uid][$le_id_stud]["note"];
-						$pr_punkte = $studpruef_arr[$row_stud->uid][$le_id_stud]["punkte"];
-						$pr_datum = $studpruef_arr[$row_stud->uid][$le_id_stud]["datum"];
-						$pr_le_id = $le_id_stud;
+                                    // Pruefung 2. Termin
+                                    if (key_exists($row_stud->uid, $studpruef_arr))
+                                    {
+                                            echo "<td colspan='2'>";
+                                            echo "<span id='span_Termin2_".$row_stud->uid."'>";
+                                            echo "<table>";
+                                            $le_id_arr = array();
+                                            $le_id_arr = array_keys($studpruef_arr[$row_stud->uid]);
+                                            foreach ($le_id_arr as $le_id_stud)
+                                            {
+                                                    $pr_note = $studpruef_arr[$row_stud->uid][$le_id_stud]["note"];
+                                                    $pr_punkte = $studpruef_arr[$row_stud->uid][$le_id_stud]["punkte"];
+                                                    $pr_datum = $studpruef_arr[$row_stud->uid][$le_id_stud]["datum"];
+                                                    $pr_le_id = $le_id_stud;
 
-						if($pr_punkte!='')
-							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'].' ('.number_format($pr_punkte,2).')';
-						else
-							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'];
+                                                    if($pr_punkte!='')
+                                                            $pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'].' ('.number_format($pr_punkte,2).')';
+                                                    else
+                                                            $pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'];
 
-						echo '<tr>
-								<td class="td_datum">'.$pr_datum.'</td>
-								<td class="td_note">'.$pr_notenbezeichnung.'</td>
-								<td><input type="button" name="anlegen" value="'.$p->t('global/aendern').'" onclick="pruefungAnlegen(\''.$row_stud->uid.'\',\''.$pr_datum.'\',\''.$pr_note.'\',\''.$pr_le_id.'\',\''.$pr_punkte.'\')"><td>
-							</tr>';
-					}
-					echo "</table>";
-					echo "</span>";
-					echo "</td>";
-				}
-				else
-				{
-					if (!is_null($note_lv) || !is_null($znote))
-						echo "<td colspan='2'><span id='span_Termin2_".$row_stud->uid."'><input type='button' name='anlegen' value='".$p->t('benotungstool/anlegen')."' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"\",\"\",\"\",\"\")'></span></td>";
-					else
-						echo "<td colspan='2'></td>";
-				}
+                                                    echo '<tr>
+                                                                    <td class="td_datum">'.$pr_datum.'</td>
+                                                                    <td class="td_note">'.$pr_notenbezeichnung.'</td>
+                                                                    <td><input type="button" name="anlegen" value="'.$p->t('global/aendern').'" onclick="pruefungAnlegen(\''.$row_stud->uid.'\',\''.$pr_datum.'\',\''.$pr_note.'\',\''.$pr_le_id.'\',\''.$pr_punkte.'\')"><td>
+                                                            </tr>';
+                                            }
+                                            echo "</table>";
+                                            echo "</span>";
+                                            echo "</td>";
+                                    }
+                                    else
+                                    {
+                                            if (!is_null($note_lv) || !is_null($znote))
+                                                    echo "<td colspan='2'><span id='span_Termin2_".$row_stud->uid."'><input type='button' name='anlegen' value='".$p->t('benotungstool/anlegen')."' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"\",\"\",\"\",\"\")'></span></td>";
+                                            else
+                                                    echo "<td colspan='2'></td>";
+                                    }
+                                }
 
 				if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
 				{
@@ -1354,39 +1387,42 @@ echo "
 					}
 				}
 
-				// komm Pruefung
-				if (key_exists($row_stud->uid,$studpruef_komm))
+                                if(defined('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF') && CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF)
 				{
-					echo "<td colspan='2'>";
-					echo "<span id='span_".$row_stud->uid."'>";
-					echo "<table>";
-					$le_id_arr = array();
-					$le_id_arr = array_keys($studpruef_komm[$row_stud->uid]);
-					foreach ($le_id_arr as $le_id_stud)
-					{
-						$pr_note = $studpruef_komm[$row_stud->uid][$le_id_stud]["note"];
-						$pr_punkte = $studpruef_komm[$row_stud->uid][$le_id_stud]["punkte"];
-						$pr_datum = $studpruef_komm[$row_stud->uid][$le_id_stud]["datum"];
-						$pr_le_id = $le_id_stud;
+                                    // komm Pruefung
+                                    if (key_exists($row_stud->uid,$studpruef_komm))
+                                    {
+                                            echo "<td colspan='2'>";
+                                            echo "<span id='span_".$row_stud->uid."'>";
+                                            echo "<table>";
+                                            $le_id_arr = array();
+                                            $le_id_arr = array_keys($studpruef_komm[$row_stud->uid]);
+                                            foreach ($le_id_arr as $le_id_stud)
+                                            {
+                                                    $pr_note = $studpruef_komm[$row_stud->uid][$le_id_stud]["note"];
+                                                    $pr_punkte = $studpruef_komm[$row_stud->uid][$le_id_stud]["punkte"];
+                                                    $pr_datum = $studpruef_komm[$row_stud->uid][$le_id_stud]["datum"];
+                                                    $pr_le_id = $le_id_stud;
 
-						if($pr_punkte!='')
-							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'].' ('.number_format($pr_punkte,2).')';
-						else
-							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'];
+                                                    if($pr_punkte!='')
+                                                            $pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'].' ('.number_format($pr_punkte,2).')';
+                                                    else
+                                                            $pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'];
 
-						echo '<tr>
-								<td class="td_datum">'.$pr_datum.'</td>
-								<td class="td_note">'.$pr_notenbezeichnung.'</td>
-							</tr>';
-					}
-					echo "</table>";
-					echo "</span>";
-					echo "</td>";
-				}
-				else
-				{
-						echo "<td colspan='2'></td>";
-				}
+                                                    echo '<tr>
+                                                                    <td class="td_datum">'.$pr_datum.'</td>
+                                                                    <td class="td_note">'.$pr_notenbezeichnung.'</td>
+                                                            </tr>';
+                                            }
+                                            echo "</table>";
+                                            echo "</span>";
+                                            echo "</td>";
+                                    }
+                                    else
+                                    {
+                                                    echo "<td colspan='2'></td>";
+                                    }
+                                }
 
 				echo "</tr>";
 				$i++;
@@ -1397,12 +1433,27 @@ echo "
 echo "
 	<tr style='font-weight:bold;' align='center'>
 		<th style='font-weight:bold;'>&Sigma;</th>
-		<th style='font-weight:bold;' title='".$p->t('benotungstool/anzahlDerStudenten')."'>$summe_stud</th>
-		<th colspan='6'></td>
-		<th style='color:red; font-weight:bold;' title='".$p->t('benotungstool/anzahlNegativerBeurteilungen')."'>$summe_ng</th>
-		<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlNachpruefungen')."'>$summe_t2</th>
-		<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlNachpruefungen')."'>$summe_t3</th>
-		<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlKommisionellePruefungen')."'>$summe_komm</th>
+		<th style='font-weight:bold;' title='".$p->t('benotungstool/anzahlDerStudenten')."'>$summe_stud</th>";
+                if(defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && (!CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE))
+                {
+                    echo "<th colspan='5'></td>";
+                }
+                else
+                {
+                    echo "<th colspan='6'></td>";
+                }
+		echo "<th style='color:red; font-weight:bold;' title='".$p->t('benotungstool/anzahlNegativerBeurteilungen')."'>$summe_ng</th>";
+		
+                if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2): ?>
+                    <th style='font-weight:bold;' colspan='2' title='"<?php echo $p->t('benotungstool/anzahlNachpruefungen'); ?>"'>$summe_t2</th>;
+                <?php endif;
+                if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3): ?>
+                    <th style='font-weight:bold;' colspan='2' title='"<?php echo $p->t('benotungstool/anzahlNachpruefungen'); ?>"'>$summe_t3</th>";
+                <?php endif;
+		if(defined('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF') && CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF): ?>
+                    <th style='font-weight:bold;' colspan='2' title='"<?php echo $p->t('benotungstool/anzahlKommisionellePruefungen'); ?>"'>$summe_komm</th>
+                <?php endif; 
+        echo "
 	</tr>
 </table>
 </td></tr>

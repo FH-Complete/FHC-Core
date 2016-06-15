@@ -10,6 +10,8 @@
 - **[CIS]** LVPlan Export für Excel
 - **[FAS]** Termine Karteireiter im FAS zeigt die Anmerkung aus dem LVPlan an
 - **[CIS]** Onlinebewerbungstool greift auf mehrsprachige Statusbezeichnungen zu.
+- **[CIS]** Config-Einträge für die Tabellenspalten beim Eintragen der Gesamtnote hinzugefügt.
+- **[CIS]** Prüfungsverwaltung: Config-Eintrag hinzugefügt um die Accordion-Elemente ein- und auszublenden.
 
 ### Changed
 - **[FAS]** Dokumente Menü im FAS neu sortiert um den Lebenszyklus des Studierenden abzubilden
@@ -18,6 +20,8 @@
 - **[CIS]** LVPlan Begrenzung der 4er Blockung aufgehoben.
 - **[CIS]** Im Menü 'Zeitsperren' Link zu Resturlaubsübersicht entfernt. Falls benötigt Verlinkung über CMS möglich.
 - **[CORE]** Removed NOT NULL constraint on 'verfasser\_uid' from public.tbl\_notiz
+- **[CIS]** Studienplanansicht: Wenn eine LV nicht benotet ist, aber eine kompatible LV mit vorhandener Anrechnung benotet ist wird diese Note angezeigt.
+- **[FAS]** Die RDF-Schnittstelle für das Zeugnis prüft bei Anrechnungen ob, die ECTS-Punkte übereinstimmen und wählt bei ungleichen Werten jene der angerechneten LV.
 
 ### Updateinfo
 - **[FAS]** Für Lehraufträge muss eine Unoconv-Vorlage erstellt werden, da der für xsl-fo notwendige Seitenumbruch-Tag aus dem RDF entfernt wurde.

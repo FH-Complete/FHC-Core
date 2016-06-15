@@ -1714,6 +1714,42 @@ $error_msg='';
 			$error_msg.=$db->db_last_error().$sql_query;
 		}
 	}
+
+	// **************************************************************
+	// Alle MA mit Funktion Leitung oder stvLeitung oder gfLtg
+	$mlist_name='TW_LEITUNG';
+
+	$grp = new gruppe();
+	setGeneriert($mlist_name);
+				
+	// Personen holen die nicht mehr in den Verteiler gehoeren
+	echo '<br>'.$mlist_name.' wird abgeglichen!';
+	flush();
+			
+	$sql_query = "SELECT DISTINCT uid FROM tbl_person JOIN tbl_benutzer
+					USING (person_id) JOIN tbl_benutzerfunktion USING (uid)
+					WHERE funktion_kurzbz in('Leitung','stvLtg','gLtg')
+					AND (tbl_benutzerfunktion.datum_von<=now() OR tbl_benutzerfunktion.datum_von is null)
+					AND (tbl_benutzerfunktion.datum_bis>=now() OR tbl_benutzerfunktion.datum_bis is null)";
+			
+	$sql_querys="DELETE FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='$mlist_name' AND uid NOT IN ($sql_query)";
+	if(!$db->db_query($sql_querys))
+	{
+		$error_msg.=$db->db_last_error().' '.$sql_querys;
+	}
+			
+	$sql_query.=" AND uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='$mlist_name')";
+	if(!($result_oe = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error().' '.$sql_query;
+	// Personen holen die nicht im Verteiler sind
+	while($row_oe = $db->db_fetch_object($result_oe))
+	{
+	   	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
+		if(!$db->db_query($sql_query))
+		{
+			$error_msg.=$db->db_last_error().$sql_query;
+		}
+	}
 	
 	echo $error_msg;
 	?>
