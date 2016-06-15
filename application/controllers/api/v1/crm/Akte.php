@@ -46,6 +46,28 @@ class Akte extends APIv1_Controller
 			$this->response();
 		}
 	}
+	
+	/**
+	 * @return void
+	 */
+	public function getAkten()
+	{
+		$person_id = $this->get('person_id');
+		$dokument_kurzbz = $this->get('dokument_kurzbz');
+		$stg_kz = $this->get('stg_kz');
+		$prestudent_id = $this->get('prestudent_id');
+		
+		if (isset($person_id))
+		{
+			$result = $this->AkteModel->getAkten($person_id, $dokument_kurzbz, $stg_kz, $prestudent_id);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
 
 	/**
 	 * @return void

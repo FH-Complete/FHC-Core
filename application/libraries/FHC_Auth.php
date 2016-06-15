@@ -26,8 +26,16 @@ require_once FCPATH.'include/AddonAuthentication.php';
 
 // ------------------------------------------------------------------------
 
-class FHC_Auth
+class FHC_Auth extends authentication
 {
+	/**
+	 * Construct
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+	}
+	
 	/**
 	 * Auth Username, Password over FH-Complete
 	 *
@@ -37,8 +45,7 @@ class FHC_Auth
 	 */
 	public function basicAuthentication($username, $password)
 	{
-		$auth = new authentication();
-		if ($auth->checkpassword($username, $password))
+		if ($this->checkpassword($username, $password))
 		{
 			return true;
 		}
@@ -49,6 +56,9 @@ class FHC_Auth
 	}
 	
 	/**
+	 * 
+	 * TO BE UPDATED
+	 * 
 	 * Get the md5 hashed password by the addon username
 	 *
 	 * @param	string	$username addon username
