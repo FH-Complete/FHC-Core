@@ -58,7 +58,7 @@ class Dms extends APIv1_Controller
 	/**
 	 * 
 	 */
-	private function _getDms($dms_id, $version)
+	private function _getDms($dms_id, $version = null)
 	{
 		$result = null;
 		
@@ -189,7 +189,15 @@ class Dms extends APIv1_Controller
 	 */
 	private function _saveFileOnUpdate($dms)
 	{
-		$result = $this->_getDms($dms['dms_id'], $dms['version']);
+		if(isset($dms['version']))
+		{
+			$result = $this->_getDms($dms['dms_id'], $dms['version']);
+		}
+		else
+		{
+			$result = $this->_getDms($dms['dms_id']);
+		}
+		
 		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
 		{
 			$fileName = DMS_PATH . $result->retval[0]->filename;
