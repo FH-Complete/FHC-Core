@@ -101,7 +101,7 @@ class Dms extends APIv1_Controller
 			{
 				if ($this->_saveFileOnUpdate($dms))
 				{
-					$result = $this->DmsModel->update($this->post()['dms_id'], $this->_dmsFieldsArray($dms));
+					$result = $this->DmsModel->update($dms['dms_id'], $this->_dmsFieldsArray($dms));
 					if ($result->error == EXIT_SUCCESS)
 					{
 						$result = $this->DmsModel->updateDmsVersion($dms['dms_id'], $this->_dmsVersionFieldsArray($dms));
