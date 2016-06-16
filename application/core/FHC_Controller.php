@@ -8,7 +8,6 @@ class FHC_Controller extends CI_Controller
     function __construct()  
 	{
         parent::__construct();
-		$this->load->library('template');
 		$this->load->library('session');
 		//$this->load->helper('language');
 		

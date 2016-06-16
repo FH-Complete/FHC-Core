@@ -11,7 +11,7 @@
  */  
   require_once APPPATH."../vendor/easyrdf/easyrdf/lib/EasyRdf.php"; 
   
-class Rdf 
+class RdfLib
 { 
   
 
