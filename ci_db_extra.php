@@ -145,4 +145,9 @@ trait db_extra
 		else
 			return pg_field_name($result, $i);
 	}
+	
+	public function db_last_error()
+	{
+		return pg_last_error();
+	}
 }

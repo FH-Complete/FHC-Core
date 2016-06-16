@@ -1,4 +1,4 @@
-<?php  
+<?php
 	if (! defined('BASEPATH'))
 		exit('No direct script access allowed');
 
@@ -167,6 +167,8 @@ $config['fhc_acl'] = array
 	'public.tbl_ortraumtyp' => 'basis/ortraumtyp',
 	'public.tbl_person' => 'basis/person',
 	'public.tbl_personfunktionstandort' => 'basis/personfunktionstandort',
+	'public.tbl_phrase' => 'basis/phrase',
+	'public.tbl_phrase_inhalt' => 'basis/phrase',
 	'public.tbl_preincoming' => 'basis/preincoming',
 	'public.tbl_preinteressent' => 'basis/preinteressent',
 	'public.tbl_preinteressentstudiengang' => 'basis/preinteressentstudiengang',
@@ -229,6 +231,6 @@ $config['fhc_acl'] = array
 	'wawi.tbl_rechnungsbetrag' => 'basis/rechnungsbetrag',
 	'wawi.tbl_rechnungstyp' => 'basis/rechnungstyp',
 	'wawi.tbl_zahlungstyp' => 'basis/zahlungstyp',
-	
+
 	'public.tbl_sprache' => 'admin'
 );
