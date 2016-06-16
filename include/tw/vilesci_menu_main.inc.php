@@ -224,6 +224,8 @@ $menu=array
 		'name'=>'Admin', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('basis/cronjob'), 'image'=>'vilesci_admin.png',
 		'link'=>'left.php?categorie=Admin', 'target'=>'nav',
 		'Cronjobs'=>array('name'=>'Cronjobs', 'link'=>'stammdaten/cronjobverwaltung.php', 'target'=>'main','permissions'=>array('basis/cronjob')),
+		'Vorlagen'=>array('name'=>'Vorlagen', 'link'=>'../index.ci.php/system/Templates', 'target'=>'main','permissions'=>array('basis/cronjob')),
+		'Messages'=>array('name'=>'Nachrichten', 'link'=>'../index.ci.php/system/Messages', 'target'=>'main','permissions'=>array('basis/cronjob'))
 	),
 	'SD-Tools'=>	array
 	(
