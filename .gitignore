@@ -21,3 +21,4 @@ tests/codeception/_output/*
 composer.lock
 bin
 /tests/codeception/api.suite.yml
+/application/logs/
