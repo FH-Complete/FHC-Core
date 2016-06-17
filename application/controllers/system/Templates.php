@@ -100,7 +100,7 @@ class Templates extends FHC_Controller
 		$vorlage_kurzbz = $this->input->post('vorlage_kurzbz', TRUE);
 		$data = array
 		(
-			'vorlage_kurzbz' => $vorlage_kurzbz;
+			'vorlage_kurzbz' => $vorlage_kurzbz
 		);
 		$vorlagetext = $this->vorlagelib->insertVorlagetext($data);
 		if ($vorlage->error)
