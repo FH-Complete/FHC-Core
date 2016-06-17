@@ -4,7 +4,8 @@
 <div class="row">
 	<div class="span4">
 	  <h2>Vorlagen</h2>
-MimeType <form method="post" action="">
+<form method="post" action="">
+MimeType 
 <?php 
     // This is an example to show that you can load stuff from inside the template file
     echo $this->templatelib->widget("mimetype_widget", array('mimetype' => $mimetype));
@@ -26,7 +27,7 @@ MimeType <form method="post" action="">
 			<td><?php echo $v->bezeichnung; ?></td>
 			<td><?php echo $v->anmerkung; ?></td>
 			<td><?php echo $v->mimetype; ?></td>
-			<td><a href="edit/<?php echo $v->vorlage_kurzbz; ?>" target="TemplatesBottom">Edit</a></td>
+			<td><a href="view/<?php echo $v->vorlage_kurzbz; ?>">View</a></td>
 		</tr>
 	<?php endforeach ?>
 	</tbody>

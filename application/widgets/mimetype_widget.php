@@ -21,8 +21,7 @@ class mimetype_widget extends Widget
 				$item['selected'] = false;
 			$data['items'][] = $item;
         }
-
-        $this->view('widgets/mimetype', $data);
+		$this->view('widgets/mimetype', $data);
     }
     
 }

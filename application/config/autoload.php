@@ -114,7 +114,7 @@ $autoload['config'] = array('fhcomplete');
 | "codeigniter_lang.php" would be referenced as array('codeigniter');
 |
 */
-$autoload['language'] = array();
+$autoload['language'] = array('fhcomplete');
 
 /*
 | -------------------------------------------------------------------

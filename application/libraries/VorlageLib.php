@@ -17,8 +17,9 @@ class VorlageLib
 
 		$this->ci =& get_instance();
 		$this->ci->load->model('system/Vorlage_model', 'VorlageModel');
+		$this->ci->load->model('system/Vorlagestudiengang_model', 'VorlageStudiengangModel');
         $this->ci->load->helper('language');
-        $this->ci->lang->load('message');
+        //$this->ci->lang->load('fhcomplete');
     }
 
    	/**
@@ -48,6 +49,7 @@ class VorlageLib
         return $vorlage;
     }
  	
+
 	/**
      * saveVorlage() - will save a spezific Template.
      *
@@ -62,13 +64,29 @@ class VorlageLib
         $vorlage = $this->ci->VorlageModel->update($vorlage_kurzbz, $data);
         return $vorlage;
     }
+
+
+	/**
+     * getVorlagentextByVorlage() - will load tbl_vorlagestudiengang for a spezific Template.
+     *
+     * @param   string  $vorlage_kurzbz    REQUIRED
+     * @return  array
+     */
+    function getVorlagentextByVorlage($vorlage_kurzbz)
+	{
+        if (empty($vorlage_kurzbz))
+        	return $this->_error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+		
+        $vorlage = $this->ci->VorlageStudiengangModel->loadWhere(array('vorlage_kurzbz' =>$vorlage_kurzbz));
+        return $vorlage;
+    }
     /** ---------------------------------------------------------------
 	 * Success
 	 *
 	 * @param   mixed  $retval
 	 * @return  array
 	 */
-	protected function _success($retval, $message = MSG_SUCCESS)
+	protected function _success($retval, $message = FHC_SUCCESS)
 	{
 		$return = new stdClass();
 		$return->error = EXIT_SUCCESS;
@@ -83,7 +101,7 @@ class VorlageLib
 	 *
 	 * @return  array
 	 */
-	protected function _error($retval = '', $message = MSG_ERROR_GENERAL)
+	protected function _error($retval = '', $message = FHC_ERROR)
 	{
 		$return = new stdClass();
 		$return->error = EXIT_ERROR;
