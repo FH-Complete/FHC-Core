@@ -19,7 +19,8 @@ class organisationseinheit_widget extends Widget
 				$item['selected'] = false;
 			$data['items'][] = $item;
         }
-
+		if (! isset($data['name']))
+			$data['name'] = 'oe_kurzbz';
         $this->view('widgets/organisationseinheit', $data);
     }
     

@@ -8,7 +8,7 @@ Betreff: <?php echo $message->subject; ?><br/>
 Text: <?php echo $message->body; ?><br/>
 <?php 
     // This is an example to show that you can load stuff from inside the template file
-    echo $this->template->widget("organisationseinheit_widget", array('title' => 'Organisationseinheit', 'oe_kurzbz' => $message->oe_kurzbz));
+    echo $this->templatelib->widget("organisationseinheit_widget", array('title' => 'Organisationseinheit', 'oe_kurzbz' => $message->oe_kurzbz));
 ?>
  
 </div>

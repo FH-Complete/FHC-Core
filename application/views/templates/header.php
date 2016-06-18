@@ -7,6 +7,7 @@ isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
 !isset($sortList) ? $sortList = '0,0' : $sortList = $sortList;
 !isset($widgets) ? $widgets = 'zebra' : $widgets = $widgets;
 !isset($headers) ? $headers = '' : $headers = $headers;
+!isset($tinymce) ? $tinymce = false : $tinymce = $tinymce;
 
 if ($tablesort)
 	$jquery = true;
@@ -39,6 +40,10 @@ if ($tablesort)
 			}); 
 		});
 	</script>
+<?php endif ?>
+
+<?php if($tinymce) : ?>
+	<script type="text/javascript" src="<?php echo base_url('vendor/tinymce/tinymce/tinymce.min.js');?>"></script>
 <?php endif ?>
 
 </head>

@@ -16,6 +16,7 @@ class VorlageLib
         require_once APPPATH.'config/message.php';
 
 		$this->ci =& get_instance();
+		$this->ci->load->library('parser');
 		$this->ci->load->model('system/Vorlage_model', 'VorlageModel');
 		$this->ci->load->model('system/Vorlagestudiengang_model', 'VorlageStudiengangModel');
         $this->ci->load->helper('language');
@@ -67,12 +68,12 @@ class VorlageLib
 
 
 	/**
-     * getVorlagentextByVorlage() - will load tbl_vorlagestudiengang for a spezific Template.
+     * getVorlagetextByVorlage() - will load tbl_vorlagestudiengang for a spezific Template.
      *
      * @param   string  $vorlage_kurzbz    REQUIRED
      * @return  array
      */
-    function getVorlagentextByVorlage($vorlage_kurzbz)
+    function getVorlagetextByVorlage($vorlage_kurzbz)
 	{
         if (empty($vorlage_kurzbz))
         	return $this->_error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
@@ -80,34 +81,72 @@ class VorlageLib
         $vorlage = $this->ci->VorlageStudiengangModel->loadWhere(array('vorlage_kurzbz' =>$vorlage_kurzbz));
         return $vorlage;
     }
-    /** ---------------------------------------------------------------
-	 * Success
-	 *
-	 * @param   mixed  $retval
-	 * @return  array
-	 */
-	protected function _success($retval, $message = FHC_SUCCESS)
-	{
-		$return = new stdClass();
-		$return->error = EXIT_SUCCESS;
-		$return->Code = $message;
-		$return->msg = lang('message_' . $message);
-		$return->retval = $retval;
-		return $return;
-	}
 
-	/** ---------------------------------------------------------------
-	 * General Error
-	 *
-	 * @return  array
-	 */
-	protected function _error($retval = '', $message = FHC_ERROR)
+	/**
+     * loadVorlagetext() - will load the best fitting Template.
+     *
+     * @param   string  $vorlage_kurzbz REQUIRED
+     * @param   string  $oe_kurzbz    	OPTIONAL
+     * @param   string  $orgform_kurzbz OPTIONAL
+     * @return  array
+     */
+    function loadVorlagetext($vorlage_kurzbz, $oe_kurzbz=null, $orgform_kurzbz=null)
 	{
-		$return = new stdClass();
-		$return->error = EXIT_ERROR;
-		$return->Code = $message;
-		$return->msg = lang('message_' . $message);
-		$return->retval = $retval;
-		return $return;
-	}
+        if (empty($vorlage_kurzbz))
+        	return $this->_error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+		
+        $vorlage = $this->ci->VorlageStudiengangModel->getVorlageStudiengang($vorlage_kurzbz, $oe_kurzbz, $orgform_kurzbz);
+        return $vorlage;
+    }
+
+	/**
+     * insertVorlagetext() - will load tbl_vorlagestudiengang for a spezific Template.
+     *
+     * @param   string  $vorlage_kurzbz    REQUIRED
+     * @return  array
+     */
+    function insertVorlagetext($data)
+	{
+        $vorlagetext = $this->ci->VorlageStudiengangModel->insert($data);
+        return $vorlagetext;
+    }
+
+	/**
+     * loadVorlagetext() - will load tbl_vorlagestudiengang for a spezific Template.
+     *
+     * @param   string  $vorlage_kurzbz    REQUIRED
+     * @return  array
+     */
+    function getVorlagetextById($vorlagestudiengang_id)
+	{
+        $vorlagetext = $this->ci->VorlageStudiengangModel->load($vorlagestudiengang_id);
+        return $vorlagetext;
+    }
+
+	/**
+     * saveVorlagetext() - will load tbl_vorlagestudiengang for a spezific Template.
+     *
+     * @param   string  $vorlage_kurzbz    REQUIRED
+     * @return  array
+     */
+    function updateVorlagetext($vorlagestudiengang_id, $data)
+	{
+        $vorlagetext = $this->ci->VorlageStudiengangModel->update($vorlagestudiengang_id, $data);
+        return $vorlagetext;
+    }
+
+	/**
+     * parseVorlagetext() - will parse a Vorlagetext.
+     *
+     * @param   string  $text    REQUIRED
+     * @param   array  $data    REQUIRED
+     * @return  string
+     */
+    function parseVorlagetext($text, $data = array())
+	{
+        if (empty($text))
+        	return $this->_error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+		$text = $this->ci->parser->parse_string($text, $data, TRUE);
+		return $text;
+    }
 }

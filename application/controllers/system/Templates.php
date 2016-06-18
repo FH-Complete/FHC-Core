@@ -39,7 +39,7 @@ class Templates extends FHC_Controller
 	{
 		if (empty($vorlage_kurzbz))
 			exit;
-		$vorlagentext = $this->vorlagelib->getVorlagentextByVorlage($vorlage_kurzbz);
+		$vorlagentext = $this->vorlagelib->getVorlagetextByVorlage($vorlage_kurzbz);
 		if ($vorlagentext->error)
 			show_error($vorlagentext->retval);
 		//var_dump($vorlage);
@@ -95,18 +95,61 @@ class Templates extends FHC_Controller
 		redirect('/system/Templates/edit/'.$vorlage_kurzbz);
 	}
 
-	public function newtext()
+	public function newText()
 	{
 		$vorlage_kurzbz = $this->input->post('vorlage_kurzbz', TRUE);
 		$data = array
 		(
-			'vorlage_kurzbz' => $vorlage_kurzbz
+			'vorlage_kurzbz' => $vorlage_kurzbz,
+			'studiengang_kz' => 0,
+			'version' => 1,
+			'oe_kurzbz' => 'etw'
 		);
 		$vorlagetext = $this->vorlagelib->insertVorlagetext($data);
-		if ($vorlage->error)
-			show_error($vorlage->retval);
-		$vorlage_kurzbz = $vorlage->retval;
+		if ($vorlagetext->error)
+			show_error($vorlagetext->retval);
+		$vorlagestudiengang_id = $vorlagetext->retval;
 
-		redirect('/system/Templates/edit/'.$vorlage_kurzbz);
+		redirect('/system/Templates/editText/'.$vorlagestudiengang_id);
+	}
+
+	public function editText($vorlagestudiengang_id)
+	{
+		$vorlagetext = $this->vorlagelib->getVorlagetextById($vorlagestudiengang_id);
+		if ($vorlagetext->error)
+			show_error($vorlagetext->retval);
+		$this->load->view('system/templatetextEdit', $vorlagetext->retval[0]);
+	}
+
+	public function saveText()
+	{
+		$vorlagestudiengang_id = $this->input->post('vorlagestudiengang_id', TRUE);
+		$data['studiengang_kz'] = $this->input->post('studiengang_kz', TRUE);
+		$data['version'] = $this->input->post('version', TRUE);
+		$data['oe_kurzbz'] = $this->input->post('oe_kurzbz', TRUE);
+		$data['text'] = $this->input->post('text', TRUE);
+		$data['aktiv'] = $this->input->post('aktiv', TRUE);
+		$vorlagetext = $this->vorlagelib->updateVorlagetext($vorlagestudiengang_id, $data);
+		if ($vorlagetext->error)
+			show_error($vorlagetext->retval);
+		$data['vorlagestudiengang_id'] = $vorlagestudiengang_id;
+		//redirect('/system/Templates/editText/'.$vorlagestudiengang_id);
+		$this->load->view('system/templatetextEdit', $data);
+	}
+
+	public function preview($vorlagestudiengang_id)
+	{
+		$vorlagetext = $this->vorlagelib->getVorlagetextById($vorlagestudiengang_id);
+		if ($vorlagetext->error)
+			show_error($vorlagetext->retval);
+		$daten = array
+		(
+			'vorname' => 'Christian'
+		);
+		$data = array
+		(
+			'text' => $this->vorlagelib->parseVorlagetext($vorlagetext->retval[0]->text, $daten)
+		);
+		$this->load->view('system/templatetextPreview', $data);
 	}
 }
