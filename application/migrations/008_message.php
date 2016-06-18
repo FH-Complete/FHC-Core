@@ -19,12 +19,12 @@ class Migration_Message extends CI_Migration {
 				$query= "
 					CREATE TABLE public.tbl_msg_message (
 					  message_id serial,
-					  person_id bigint NOT NULL,
+					  person_id bigint NOT NULL references public.tbl_person(person_id),
 					  subject varchar(256) NOT NULL,
 					  body text NOT NULL,
 					  priority smallint NOT NULL DEFAULT 0,
-					  relationmessage_id bigint,
-					  oe_kurzbz varchar(32),
+					  relationmessage_id bigint references public.tbl_msg_message(message_id),
+					  oe_kurzbz varchar(32) references public.tbl_organisationseinheit(oe_kurzbz),
 					  insertamum timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					  insertvon varchar(32),
 					  PRIMARY KEY (message_id)
@@ -39,8 +39,8 @@ class Migration_Message extends CI_Migration {
 					GRANT SELECT, UPDATE ON SEQUENCE public.tbl_msg_message_message_id_seq TO vilesci;
 
 					CREATE TABLE public.tbl_msg_recipient (
-					  person_id bigint NOT NULL,
-					  message_id bigint NOT NULL,
+					  person_id bigint NOT NULL references public.tbl_person(person_id),
+					  message_id bigint NOT NULL references public.tbl_msg_message(message_id),
 					  insertamum timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					  insertvon varchar(32),
 					  PRIMARY KEY (person_id,message_id)
@@ -50,15 +50,15 @@ class Migration_Message extends CI_Migration {
 					GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.tbl_msg_recipient TO vilesci;
 
 					CREATE TABLE public.tbl_msg_status (
-					  message_id bigint NOT NULL,
-					  person_id bigint NOT NULL,
+					  message_id bigint NOT NULL references public.tbl_msg_message(message_id),
+					  person_id bigint NOT NULL references public.tbl_person(person_id),
 					  status smallint NOT NULL,
 					  statusinfo text,
 					  insertamum timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					  insertvon varchar(32),
 					  updateamum timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					  updatevon varchar(32),
-					  PRIMARY KEY (message_id,person_id)
+					  PRIMARY KEY (message_id,person_id, status)
 					);
 					GRANT SELECT ON TABLE public.tbl_msg_status TO web;
 					GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.tbl_msg_status TO admin;
@@ -66,10 +66,10 @@ class Migration_Message extends CI_Migration {
 
 					CREATE TABLE public.tbl_msg_attachment (
 					attachment_id serial,
-					message_id bigint NOT NULL,
+					message_id bigint NOT NULL references public.tbl_msg_message(message_id),
 					name text,
 					filename text,
-					PRIMARY KEY (message_id)
+					PRIMARY KEY (attachment_id)
 				);
 					GRANT SELECT ON TABLE public.tbl_msg_attachment TO web;
 					GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.tbl_msg_attachment TO admin;

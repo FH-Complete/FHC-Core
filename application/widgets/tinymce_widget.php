@@ -9,6 +9,12 @@ class tinymce_widget extends Widget
 	{
 		if (! isset($data['selector']))
 			$data['selector'] = 'textarea';
+		if (! isset($data['name']))
+			$data['name'] = 'text';
+		if (! isset($data['text']))
+			$data['text'] = '';
+		if (! isset($data['style']))
+			$data['style'] = 'width:100%';
 		if (! isset($data['plugins']))
 			$data['plugins'] = '
 				"advlist autolink lists link image charmap print preview anchor",
