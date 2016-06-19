@@ -8,6 +8,8 @@ isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
 !isset($widgets) ? $widgets = 'zebra' : $widgets = $widgets;
 !isset($headers) ? $headers = '' : $headers = $headers;
 !isset($tinymce) ? $tinymce = false : $tinymce = $tinymce;
+!isset($jsoneditor) ? $jsoneditor = false : $jsoneditor = $jsoneditor;
+!isset($jsonforms) ? $jsonforms = false : $jsonforms = $jsonforms;
 
 if ($tablesort)
 	$jquery = true;
@@ -46,6 +48,15 @@ if ($tablesort)
 	<script type="text/javascript" src="<?php echo base_url('vendor/tinymce/tinymce/tinymce.min.js');?>"></script>
 <?php endif ?>
 
+<?php if($jsoneditor) : ?>
+	<link href="<?php echo base_url('vendor/jsoneditor/dist/jsoneditor.css');?>" rel="stylesheet" type="text/css">
+  <script src="<?php echo base_url('vendor/jsoneditor/dist/jsoneditor.js');?>"></script>
+<?php endif ?>
+
+<?php if($jsonforms) : ?>
+	<link rel="stylesheet" href="<?php echo base_url('vendor/json-forms/dist/css/brutusin-json-forms.min.css'); ?>"/>
+	<script src="<?php echo base_url('vendor/json-forms/dist/js/brutusin-json-forms.min.js'); ?>"></script>
+<?php endif ?>
 </head>
 
 <body>

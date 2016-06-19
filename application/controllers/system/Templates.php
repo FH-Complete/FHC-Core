@@ -87,6 +87,7 @@ class Templates extends FHC_Controller
 		$data['bezeichnung'] = $this->input->post('bezeichnung', TRUE);
 		$data['anmerkung'] = $this->input->post('anmerkung', TRUE);
 		$data['mimetype'] = $this->input->post('mimetype', TRUE);
+		$data['attribute'] = $this->input->post('attribute', TRUE);
 		$vorlage = $this->vorlagelib->saveVorlage($vorlage_kurzbz, $data);
 		if ($vorlage->error)
 			show_error($vorlage->retval);
@@ -139,13 +140,11 @@ class Templates extends FHC_Controller
 
 	public function preview($vorlagestudiengang_id)
 	{
+		$formdata = $this->input->post('formdata', FALSE);
+		$daten = json_decode($formdata, TRUE);
 		$vorlagetext = $this->vorlagelib->getVorlagetextById($vorlagestudiengang_id);
 		if ($vorlagetext->error)
 			show_error($vorlagetext->retval);
-		$daten = array
-		(
-			'vorname' => 'Christian'
-		);
 		$data = array
 		(
 			'text' => $this->vorlagelib->parseVorlagetext($vorlagetext->retval[0]->text, $daten)

@@ -1,5 +1,5 @@
 <?php
-	$this->load->view('templates/header', array('title' => 'TemplateEdit', 'tinymce' => true));
+	$this->load->view('templates/header', array('title' => 'TemplateEdit', 'tinymce' => true, 'jsonforms' => true));
 ?>
 
 <div class="row">
@@ -18,12 +18,23 @@ StudiengangKZ: <?=$studiengang_kz?>
 	?>
 	<button type="submit">Save</button>
 </form>
-
+<hr/><h2>Preview-Data</h2>
 <form method="post" action="../preview/<?=$vorlagestudiengang_id?>" target="TemplatePreview">
-	<button type="submit">Preview</button>
+	<?php echo $this->templatelib->widget("jsonforms_widget", array('id' => 'dataform')); ?>
+	<input type="hidden" name="formdata" id="formdata" value="" />
+	<button type="submit" onclick="getFormdata(this.form);">Preview</button>
 </form>
 </div>
 </div>
+
+<script type="text/javascript" >
+	// get json
+    function getFormdata(form) 
+	{
+        form.elements["formdata"].value = JSON.stringify(bf.getData(), null, 2);
+		//alert(form.elements["formdata"].value);
+    }
+</script>
 
 <iframe name="TemplatePreview" width="100%" src="../preview/<?=$vorlagestudiengang_id?>"/>
 </body>
