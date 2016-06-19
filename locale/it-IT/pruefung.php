@@ -73,6 +73,9 @@ $this->phrasen['pruefung/lvErfolgreichEntfernt'] = 'Insegnamento tolto con succe
 $this->phrasen['pruefung/pruefungStorniert'] = 'Esame cancellato';
 $this->phrasen['pruefung/terminGeloescht'] = 'Appello eliminato';
 $this->phrasen['pruefung/unbegrenzt'] = '';
+$this->phrasen['pruefung/bewertungenZu'] = 'Bewertungen zu';
+$this->phrasen['pruefung/keineAuswahl'] = 'Keine Auswahl';
+
 // pruefungsbewertung
 $this->phrasen['pruefung/pruefungsbewertungTitle'] = 'Voti d’esame';
 $this->phrasen['pruefung/pruefungsbewertungAnmeldungen'] = 'Iscrizioni';
