@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
+ * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Menue Addon zur Auswahl von LVs
@@ -35,7 +36,7 @@ require_once(dirname(__FILE__).'/../../include/lehrveranstaltung.class.php');
 require_once(dirname(__FILE__).'/../../include/organisationsform.class.php');
 require_once(dirname(__FILE__).'/../../include/functions.inc.php');
 require_once(dirname(__FILE__).'/../../include/phrasen.class.php');
-require_once(dirname(__FILE__).'/../../include/student.class.php');
+require_once(dirname(__FILE__).'/../../include/prestudent.class.php');
 
 class menu_addon_lehrveranstaltungen extends menu_addon
 {
@@ -49,11 +50,13 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 
 		$sprache = getSprache();
 		$user = get_uid();
-		$student = new student();
-		if($student->load($user))
+		$prestudent = new prestudent();
+		$prestudent->getPrestudentsFromUid($user);
+
+		if(count($prestudent->result) > 0)
 		{
-			$studiengang_kz=$student->studiengang_kz;
-			$semester=$student->semester;
+			$studiengang_kz=$prestudent->result[0]->studiengang_kz;
+			$semester=$prestudent->result[0]->semester;
 		}
 
 		$p = new phrasen($sprache);
@@ -158,7 +161,7 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 			</table>
 		<table>';
 		$this->block.= '<script language="JavaScript" type="text/javascript">';
-		$this->block.= '	parent.content.location.href="../cms/news.php?studiengang_kz='.$studiengang_kz.'&semester='.$semester.'"';
+		$this->block.= '	parent.content.location.href="../cms/news.php?newsReq='.json_encode(array(array("studiengang_kz" => $studiengang_kz, "semester" => $semester)));
 		$this->block.= '</script>';
 		$this->block.='
 		<tr>

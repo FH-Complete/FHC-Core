@@ -35,7 +35,7 @@ require_once('../include/datum.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/konto.class.php');
 require_once('../include/studiensemester.class.php');
-require_once('../include/student.class.php');
+require_once('../include/prestudent.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/benutzerfunktion.class.php');
 require_once('../include/organisationseinheit.class.php');
@@ -140,50 +140,54 @@ if(copy($zipfile, $tempname_zip))
 			}
 			else
 			{
-				$student = new student();
-				$student->load($bn->uid);
-				$konto = new konto();
-				$studiengang = new studiengang();
-				$studiengang->load($student->studiengang_kz);
-				
-				$stsem_obj = new studiensemester();
-				$stsem = $stsem_obj->getaktorNext();
-				$stsem_obj->load($stsem);
-				
-				if($konto->checkStudienbeitrag($bn->uid, $stsem_obj->studiensemester_kurzbz))
+				$prestudent = new prestudent();
+				$prestudent->getPrestudentsFromUid($bn->uid);
+
+				foreach($prestudent->result as $ps)
 				{
-					$gueltigbis=$stsem_obj->ende;
-				}
-				else
-				{
-					// Studiengebuehr noch nicht bezahlt
-					$gueltigbis=$stsem_obj->ende;
-				}
-				
-				if($type=='datum')
-				{
-					//Nur der Datumsstempel wird erstellt
-					$xml.="
-					<datum>
-						<gueltigbis><![CDATA[".$datum_obj->formatDatum($gueltigbis,'d/m/Y')."]]></gueltigbis>
-					</datum>";
-				}
-				else
-				{					
-					//Student
-					$xml.="
-					<student>
-						<uid><![CDATA[".$bn->uid."]]></uid>
-						<vorname><![CDATA[".$bn->vorname."]]></vorname>
-						<nachname><![CDATA[".$bn->nachname."]]></nachname>
-						<titelpre><![CDATA[".$bn->titelpre."]]></titelpre>
-						<titelpost><![CDATA[".$bn->titelpost."]]></titelpost>
-						<studiengang><![CDATA[".$studiengang->kurzbzlang."]]></studiengang>
-						<gebdatum><![CDATA[".$datum_obj->formatDatum($bn->gebdatum,'d.m.Y')."]]></gebdatum>
-						<matrikelnummer><![CDATA[".$student->matrikelnr."]]></matrikelnummer>
-						<ausstellungsdatum><![CDATA[".date('M.Y')."]]></ausstellungsdatum>
-						<gueltigbis><![CDATA[".$datum_obj->formatDatum($gueltigbis,'d.m.Y')."]]></gueltigbis>
-					</student>";
+					$konto = new konto();
+					$studiengang = new studiengang();
+					$studiengang->load($ps->studiengang_kz);
+
+					$stsem_obj = new studiensemester();
+					$stsem = $stsem_obj->getaktorNext();
+					$stsem_obj->load($stsem);
+
+					if($konto->checkStudienbeitrag($bn->uid, $stsem_obj->studiensemester_kurzbz))
+					{
+						$gueltigbis=$stsem_obj->ende;
+					}
+					else
+					{
+						// Studiengebuehr noch nicht bezahlt
+						$gueltigbis=$stsem_obj->ende;
+					}
+
+					if($type=='datum')
+					{
+						//Nur der Datumsstempel wird erstellt
+						$xml.="
+						<datum>
+							<gueltigbis><![CDATA[".$datum_obj->formatDatum($gueltigbis,'d/m/Y')."]]></gueltigbis>
+						</datum>";
+					}
+					else
+					{
+						//Student
+						$xml.="
+						<student>
+							<uid><![CDATA[".$bn->uid."]]></uid>
+							<vorname><![CDATA[".$bn->vorname."]]></vorname>
+							<nachname><![CDATA[".$bn->nachname."]]></nachname>
+							<titelpre><![CDATA[".$bn->titelpre."]]></titelpre>
+							<titelpost><![CDATA[".$bn->titelpost."]]></titelpost>
+							<studiengang><![CDATA[".$studiengang->kurzbzlang."]]></studiengang>
+							<gebdatum><![CDATA[".$datum_obj->formatDatum($bn->gebdatum,'d.m.Y')."]]></gebdatum>
+							<matrikelnummer><![CDATA[".$ps->perskz."]]></matrikelnummer>
+							<ausstellungsdatum><![CDATA[".date('M.Y')."]]></ausstellungsdatum>
+							<gueltigbis><![CDATA[".$datum_obj->formatDatum($gueltigbis,'d.m.Y')."]]></gueltigbis>
+						</student>";
+					}
 				}
 			}
 		}

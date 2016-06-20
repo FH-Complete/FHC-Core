@@ -26,12 +26,12 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/gruppe.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
-require_once('../../include/student.class.php');
+require_once('../../include/prestudent.class.php');
 require_once('../../include/lehrverband.class.php');
 require_once('../../include/benutzerfunktion.class.php');
 require_once('../../include/phrasen.class.php');
-	
-$sprache = getSprache(); 
+
+$sprache = getSprache();
 $p=new phrasen($sprache); 
 
 if (!$db = new basis_db())
@@ -41,7 +41,9 @@ $user=get_uid();
 
 $is_lector=check_lektor($user);
 $is_stdv=false;
-$std_obj = new student($user);   
+$prestudent = new prestudent();
+$prestudent->getPrestudentsFromUid($user);
+
 //Studentenvertreter duerfen den Verteiler tw_std oeffnen
 
 if(!$is_lector)
@@ -107,7 +109,7 @@ if(!$is_lector)
 			} else if (document.all && document.all[x]) {      
 			   	document.all[x].visibility = 'visible';
 				document.all[x].style.display='inline';
-		      	} else if (document.layers && document.layers[x]) {                          
+		      	} else if (document.layers && document.layers[x]) {
 		           	 document.layers[x].visibility = 'show';
 				 document.layers[x].style.display='inline';
 		          }
@@ -123,10 +125,10 @@ if(!$is_lector)
 			{
 			   	document.getElementById(x).style.visibility = 'hidden';
 				document.getElementById(x).style.display = 'none';
-	       	} else if (document.all && document.all[x]) {                                
+	       	} else if (document.all && document.all[x]) {
 				document.all[x].visibility = 'hidden';
 				document.all[x].style.display='none';
-	       	} else if (document.layers && document.layers[x]) {                          
+	       	} else if (document.layers && document.layers[x]) {
 		           	 document.layers[x].visibility = 'hide';
 				 document.layers[x].style.display='none';
 		          }
@@ -309,30 +311,38 @@ if(!$is_lector)
 		  		}
 		  		echo "</table></td></tr>";
 			}
-		  	if($row->studiengang_kz!=0 && $row_stud->anzahl>0)
-		  		{
-		  			echo "<tr><td width=\"420\" style=\"padding-left: 12px;\">".$p->t('mailverteiler/alleStudentenDiesesStudienganges')."</td>";
+			if($row->studiengang_kz!=0 && $row_stud->anzahl>0)
+			{
+			echo "<tr><td width=\"420\" style=\"padding-left: 12px;\">".$p->t('mailverteiler/alleStudentenDiesesStudienganges')."</td>";
 
-					// ffe, 20060508: Display the opening link for department dispatchers only for students of the particular department
-					if($is_lector || $std_obj->studiengang_kz==$row->studiengang_kz || !MAILVERTEILER_SPERRE)
-					{
-						echo " <td width=\"20\">";
-						if(MAILVERTEILER_SPERRE)
-							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row->kuerzel).'_std&amp;desc='.$p->t('mailverteiler/alleStudentenVon').' '.strtolower($row->kuerzel).'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img valign="bottom" alt="'.$p->t('mailverteiler/verteilerOeffnen').'" src="../../skin/images/lock.png" title="'.$p->t('mailverteiler/verteilerOeffnen').'"></a></td>';
-						/* open a popup containing the final dispatcher address */
-					    echo " <td width=\"300\" ><a href=\"mailto:".strtolower($row->kuerzel)."_std@".DOMAIN."\" class=\"Item\">".strtolower($row->kuerzel)."_std@".DOMAIN."</a></td>";
-					}
-					else
-					{
-						echo " <td width=\"20\">&nbsp</td>";
-			  			echo " <td width=\"300\" >gesperrt</td>";
-					}
+			$hasStudiengang_kz = false;
+			foreach($prestudent->result as $ps)
+			{
+				if($row->studiengang_kz == $ps->studiengang_kz)
+					$hasStudiengang_kz = true;
+			}
 
-				    echo ' <td width="100" align="right"><a href="#" onClick="javascript:window.open(\'stud_in_grp.php?kz='.$row->studiengang_kz.'&amp;all=true\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item">'.$p->t('mailverteiler/personen').'</a>&nbsp;';
-					echo "</tr>\n";
-		  		}
-	  			echo "\n";
-		  	foreach($grp_obj->result as $row1)
+
+			// ffe, 20060508: Display the opening link for department dispatchers only for students of the particular department
+			if($is_lector || $hasStudiengang_kz || !MAILVERTEILER_SPERRE)
+			{
+				echo " <td width=\"20\">";
+				if(MAILVERTEILER_SPERRE)
+					echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row->kuerzel).'_std&amp;desc='.$p->t('mailverteiler/alleStudentenVon').' '.strtolower($row->kuerzel).'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img valign="bottom" alt="'.$p->t('mailverteiler/verteilerOeffnen').'" src="../../skin/images/lock.png" title="'.$p->t('mailverteiler/verteilerOeffnen').'"></a></td>';
+				/* open a popup containing the final dispatcher address */
+				echo " <td width=\"300\" ><a href=\"mailto:".strtolower($row->kuerzel)."_std@".DOMAIN."\" class=\"Item\">".strtolower($row->kuerzel)."_std@".DOMAIN."</a></td>";
+			}
+			else
+			{
+				echo " <td width=\"20\">&nbsp</td>";
+				echo " <td width=\"300\" >gesperrt</td>";
+			}
+
+			echo ' <td width="100" align="right"><a href="#" onClick="javascript:window.open(\'stud_in_grp.php?kz='.$row->studiengang_kz.'&amp;all=true\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item">'.$p->t('mailverteiler/personen').'</a>&nbsp;';
+			echo "</tr>\n";
+			}
+			echo "\n";
+			foreach($grp_obj->result as $row1)
 			{
 				if(!$row1->aktiv)
 					continue;

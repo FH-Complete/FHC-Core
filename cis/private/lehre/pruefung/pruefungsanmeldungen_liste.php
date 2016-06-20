@@ -19,7 +19,8 @@
  * MA 02110-1301, USA.
  *
  *
- * Authors: Stefan Puraner	<puraner@technikum-wien.at>
+ * Authors: Stefan Puraner	<puraner@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../../../config/cis.config.inc.php');
@@ -171,16 +172,17 @@ $rechte->getBerechtigungen($uid);
     </head>
     <body>
 	<script>
-	    $(document).ready(function(){
+	$(document).ready(function()
+	{
 		window.print();
-	    });
+	});
 	</script>
 	<div id="page">
-	    <div id="subpage">
-	    <h1><?php echo $p->t('pruefung/anmeldungsliste'); ?></h1>
+	<div id="subpage">
+	<h1><?php echo $p->t('pruefung/anmeldungsliste'); ?></h1>
 	<?php
 	if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungAdmin'))
-	    die('Sie haben keine Berechtigung für diese Seite');
+		die('Sie haben keine Berechtigung für diese Seite');
 
 	$termin_id = filter_input(INPUT_GET,"termin_id");
 	$lehrveranstaltung_id = filter_input(INPUT_GET,"lehrveranstaltung_id");
@@ -188,96 +190,101 @@ $rechte->getBerechtigungen($uid);
 
 	if(is_null($lehrveranstaltung_id))
 	{
-	    die($p->t('pruefung/fehlenderParam_lvid'));
+		die($p->t('pruefung/fehlenderParam_lvid'));
 	}
 	else if(is_null($termin_id))
 	{
-	    die($p->t('pruefung/fehlenderParam_terminid'));
+		die($p->t('pruefung/fehlenderParam_terminid'));
 	}
 	else if(is_null($studiensemester))
 	{
-	    die($p->t('pruefung/fehlenderParam_studiensemester'));
+		die($p->t('pruefung/fehlenderParam_studiensemester'));
 	}
 	else
 	{
-	    $datum = new datum();
-	    $stdsem = new studiensemester($studiensemester);
-	    $pruefungsanmeldung = new pruefungsanmeldung();
-	    $anmeldungen = $pruefungsanmeldung->getAnmeldungenByTermin($termin_id, $lehrveranstaltung_id, $studiensemester, "bestaetigt");
-	    $lehrveranstaltung = new lehrveranstaltung($lehrveranstaltung_id);
-	    $einzeln = FALSE;
-	    if(!empty($anmeldungen))
-	    {
-		$pruefung = new pruefungCis($anmeldungen[0]->pruefung_id);
-		$pruefungstermin = new pruefungstermin($anmeldungen[0]->pruefungstermin_id);
-		$mitarbeiter = new mitarbeiter($pruefung->mitarbeiter_uid);
-		if($pruefung->einzeln)
+		$datum = new datum();
+		$stdsem = new studiensemester($studiensemester);
+		$pruefungsanmeldung = new pruefungsanmeldung();
+		$anmeldungen = $pruefungsanmeldung->getAnmeldungenByTermin($termin_id, $lehrveranstaltung_id, $studiensemester, "bestaetigt");
+		$lehrveranstaltung = new lehrveranstaltung($lehrveranstaltung_id);
+		$einzeln = FALSE;
+		if(!empty($anmeldungen))
 		{
-		    $einzeln = TRUE;
-		    $pruefungsintervall = $pruefung->pruefungsintervall;
-		}
+			$pruefung = new pruefungCis($anmeldungen[0]->pruefung_id);
+			$pruefungstermin = new pruefungstermin($anmeldungen[0]->pruefungstermin_id);
+			$mitarbeiter = new mitarbeiter($pruefung->mitarbeiter_uid);
+			if($pruefung->einzeln)
+			{
+				$einzeln = TRUE;
+				$pruefungsintervall = $pruefung->pruefungsintervall;
+			}
 
-	    ?>
-	    <span class="bold"><?php echo $p->t('global/lehrveranstaltung'); ?>: </span><span><?=$lehrveranstaltung->bezeichnung?></span><br/>
-	    <span class="bold"><?php echo $p->t('global/studiensemester'); ?>: </span><span><?=$stdsem->bezeichnung?></span><br/>
-	    <span class="bold"><?php echo $p->t('pruefung/pruefer'); ?>: </span><span><?=$mitarbeiter->getFullName(FALSE)?></span><br/>
-	    <table id="liste">
+		?>
+		<span class="bold"><?php echo $p->t('global/lehrveranstaltung'); ?>: </span><span><?=$lehrveranstaltung->bezeichnung?></span><br/>
+		<span class="bold"><?php echo $p->t('global/studiensemester'); ?>: </span><span><?=$stdsem->bezeichnung?></span><br/>
+		<span class="bold"><?php echo $p->t('pruefung/pruefer'); ?>: </span><span><?=$mitarbeiter->getFullName(FALSE)?></span><br/>
+		<table id="liste">
 		<thead>
-		    <tr>
-			<th>#</th>
-			<th><?php echo $p->t('global/vorname'); ?></th>
-			<th><?php echo $p->t('global/nachname'); ?></th>
-			<th><?php echo $p->t('global/matrikelnummer'); ?></th>
-			<th><?php echo $p->t('global/datum'); ?></th>
-			<th><?php echo $p->t('benotungstool/note'); ?></th>
-			<th><?php echo $p->t('global/anmerkung'); ?></th>
-		    </tr>
+			<tr>
+				<th>#</th>
+				<th><?php echo $p->t('global/vorname'); ?></th>
+				<th><?php echo $p->t('global/nachname'); ?></th>
+				<th><?php echo $p->t('global/matrikelnummer'); ?></th>
+				<th><?php echo $p->t('global/datum'); ?></th>
+				<th><?php echo $p->t('benotungstool/note'); ?></th>
+				<th><?php echo $p->t('global/anmerkung'); ?></th>
+			</tr>
 		</thead>
 		<tbody>
-		    <?php
+		<?php
 			$count = 0;
 			/*@var $anmeldung pruefungsanmeldung */
 			foreach($anmeldungen as $anmeldung)
 			{
-			    $student = new student($anmeldung->uid);
-			    $prfTermin = new pruefungstermin($anmeldung->pruefungstermin_id);
+				$prestudent = new prestudent();
+				$prestudent->getPrestudentsById($anmeldung->uid);
 
-			    if($einzeln)
-			    {
-				$date = $datum->formatDatum($prfTermin->von, "Y-m-d H:i:s");
-				$date = strtotime($date);
-				$date = $date+(60*$pruefungsintervall*($count));
-				$date = $datum->formatDatum($prfTermin->von,"d.m.Y").' - '.date("h:i",$date);
-				$count++;
-			    }
-			    else
-			    {
-				$date =  $datum->formatDatum($prfTermin->von,"d.m.Y - H:i");
-			    }
-			    echo '<tr>';
+				foreach($prestudent->result as $ps)
+				{
+				$prfTermin = new pruefungstermin($anmeldung->pruefungstermin_id);
+
+				if($einzeln)
+				{
+					$date = $datum->formatDatum($prfTermin->von, "Y-m-d H:i:s");
+					$date = strtotime($date);
+					$date = $date+(60*$pruefungsintervall*($count));
+					$date = $datum->formatDatum($prfTermin->von,"d.m.Y").' - '.date("h:i",$date);
+					$count++;
+				}
+				else
+				{
+					$date =  $datum->formatDatum($prfTermin->von,"d.m.Y - H:i");
+				}
+				echo '<tr>';
 				echo '<td>'.$anmeldung->reihung.'</td>';
-				echo '<td>'.$student->vorname.'</td>';
-				echo '<td>'.$student->nachname.'</td>';
-				echo '<td>'.$student->matr_nr.'</td>';
+				echo '<td>'.$ps->vorname.'</td>';
+				echo '<td>'.$ps->nachname.'</td>';
+				echo '<td>'.$ps->matr_nr.'</td>';
 				echo '<td>'.$date.'</td>';
 				echo '<td></td>';
 				echo '<td></td>';
-			    echo '</tr>';
+				echo '</tr>';
+				}
 			}
-		    ?>
+		?>
 		</tbody>
-	    <?php
-	    }
-	    else
-	    {
+		<?php
+		}
+		else
+		{
 		?>
 
 		<span><?php echo $p->t('pruefung/keineBestaetigtenAnmeldungenVorhanden'); ?></span><br/>
 		<?php
-	    }
+		}
 	}
 	?>
-	    </table>
+		</table>
 		<br>
 		<table width="100%" id="liste">
 			<tr>

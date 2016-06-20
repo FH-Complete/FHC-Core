@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
+ * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Diese Seite dient zum Anlegen und aendern von Newseintraegen 
@@ -599,11 +600,11 @@ echo '<hr>
 <tr>
 	<td style="height:100%;" valign="top">
 		<h3>Nicht veröffentlicht</h3>
-		<iframe src="news.php?studiengang_kz='.$studiengang_kz.'&semester='.$semester.'&edit=true&sichtbar=false" style="width: 95%;height:100%;"></iframe>
+		<iframe src="news.php?edit=true&sichtbar=false&newsReq='.json_encode(array(array("studiengang_kz" => $studiengang_kz, "semester" => $semester))).'" style="width: 95%;height:100%;"></iframe>
 	</td>
 	<td valign="top">
 		<h3>Veröffentlicht</h3>
-		<iframe src="news.php?studiengang_kz='.$studiengang_kz.'&semester='.$semester.'&edit=true" style="width: 95%;height:100%;"></iframe>
+		<iframe src="news.php?edit=true&newsReq='.json_encode(array(array("studiengang_kz" => $studiengang_kz, "semester" => $semester))).'" style="width: 95%;height:100%;"></iframe>
 	</td>
 </tr></table>';
 echo '</body>

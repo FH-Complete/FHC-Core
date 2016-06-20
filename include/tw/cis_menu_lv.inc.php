@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * LV Details fuer CIS Seite
@@ -578,7 +579,7 @@ function checkZeilenUmbruch()
 			'position'=>'110',
 			'name'=>$p->t('lehre/pinboard'),
 			'icon'=>'../../../skin/images/button_pinboard.png',
-			'link'=>'../../../cms/news.php?studiengang_kz='.urlencode($studiengang_kz).'&semester='.urlencode($semester),
+			'link'=>'../../../cms/news.php?newsReq='.json_encode(array(array("studiengang_kz" => $studiengang_kz, "semester" => $semester))),
 			'text'=>$text
 		);
 

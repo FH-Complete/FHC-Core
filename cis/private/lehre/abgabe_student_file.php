@@ -15,14 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ * Authors: Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at > and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/phrasen.class.php');
-require_once('../../../include/student.class.php');
+require_once('../../../include/prestudent.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -36,7 +37,7 @@ if(isset($_GET['student_uid']))
 	$uid = $_GET['student_uid'];
 else
 	die($p->t('global/fehlerBeiDerParameteruebergabe'));
-	
+
 if(isset($_GET['abgabe_id']))
 	$id = $_GET['abgabe_id'];
 else
@@ -44,10 +45,10 @@ else
 	
 if(!is_numeric($id) || $id=='')
 	die($p->t('global/fehlerBeiDerParameteruebergabe'));
-	
-$student = new student();
-if(!$student->load($uid))
-	die('Student wurde nicht gefunden');
+
+$prestudent = new prestudent();
+if(!$prestudent->getPrestudentsFromUid($uid) || count($prestudent->result) < 1)
+	die('Keinen Studenten gefunden');
 	
 if($getuid!=$uid)
 {

@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
+ * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Menue Addon fuer die Darstellung der Freifaecher
@@ -50,12 +51,12 @@ class menu_addon_freifaecher extends menu_addon
 		}
 		
 		$this->block.= '<script language="JavaScript" type="text/javascript">';
-		$this->block.= '	parent.content.location.href="../cms/news.php?studiengang_kz=0&semester=0"';
+		$this->block.= '	parent.content.location.href="../cms/news.php?newsReq='.json_encode(array(array("studiengang_kz" => 0, "semester" => 0)));
 		$this->block.= '</script>';
 		
 		$this->output();
 	}
-	
+
 	private function CutString($strVal, $limit)
 	{
 		if(mb_strlen($strVal) > $limit+3)

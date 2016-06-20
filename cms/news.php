@@ -16,20 +16,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Karl Burkhart <karl.burkhart@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Karl Burkhart <karl.burkhart@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Laedt die News und zeigt diese an
- * 
+ *
  * Wenn kein Parameter uebergeben wird, werden nur die allgemeinen News angezeigt
  * Wenn ein Studiengang uebergeben wird, werden rechts neben den News Studiengangsdetails angezeigt
- * 
+ *
  * Parameter:
- * stg_kz   Studiengangskennzahl 
+ * stg_kz   Studiengangskennzahl
  * semester Semester
  * edit     Edit Buttons anzeigen
- * 
+ *
  */
 require_once('../config/cis.config.inc.php');
 require_once('../include/content.class.php');
@@ -54,84 +55,92 @@ $datum_obj = new datum();
 $content = new content();
 $db = new basis_db();
 
+
+$newsReq = array();
+if(isset($_GET["newsReq"]))
+	if($buf = json_decode($_GET["newsReq"]))
+		$newsReq = $buf;
+
 $infoscreen = isset($_GET['infoscreen']);
 
-if(!$infoscreen)
+
+
+if($infoscreen || count($newsReq) < 1)
+{
+	$newsReq[] = getNRObj(0,null);
+}
+else
 {
 	$user = get_uid();
-	
+
 	//Zum anzeigen der Studiengang-Details neben den News
 	$student = new student();
 	if($student->load($user))
 	{
-		$stg_kz=$student->studiengang_kz;
-		$sem=$student->semester;
-		$ver=$student->verband;
-	}
-	else
-	{
-		$stg_kz=0;
-		$sem=NULL;
-		$ver=NULL;
+		$newsReq[] = getNRObj($student->studiengang_kz,$student->semester);
 	}
 }
-else
-{
-		$stg_kz=0;
-		$sem=NULL;
-		$ver=NULL;
-}
-$studiengang_kz = (isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:$stg_kz);
-$semester = (isset($_GET['semester'])?$_GET['semester']:$sem);
+
 $mischen = (isset($_GET['mischen'])?$_GET['mischen']:true);
 $titel = (isset($_GET['titel'])?$_GET['titel']:'');
 $editable = isset($_GET['edit']);
 $news = new news();
 $all=false;
 
+
+
 if(isset($_GET['sichtbar']) && ($_GET['sichtbar'])=="false")
 	$sichtbar = false;
-else 
+else
 	$sichtbar = true;
-	
+
 //Im Editiermodus werden auch die zukuenftigen News angezeigt
 if($editable)
 	$all=true;
-	
-$news->getnews(MAXNEWSALTER, $studiengang_kz, $semester, $all, null, MAXNEWS, $mischen);
+
+$newsArr = array();
 
 $xml = '<?xml version="1.0" encoding="UTF-8"?><content>';
 
-foreach($news->result as $row)
+foreach($newsReq as $nr)
 {
-	$content = new content();
-	$content->getContent($row->content_id, $sprache,null, $sichtbar, true);
-	
-	//das Datum des News Eintrages ist nicht im XML enthalten, es muss extra hinzugefuegt werden
-	$datum = '<datum><![CDATA['.$datum_obj->formatDatum($row->datum,'d.m.Y').']]></datum>';
-	
-	if($studiengang_kz<>0 && $editable && $row->studiengang_kz==0)
+	$news->getnews(MAXNEWSALTER, $nr->studiengang_kz, $nr->semester, $all, null, MAXNEWS, $mischen);
+	foreach($news->result as $nws)
 	{
-		continue;
+		$found = false;
+		foreach($newsArr as $oldN)
+		{
+			if($oldN->news_id == $nws->news_id)
+				$found = true;
+		}
+		if(!$found)
+		{
+			$content = new content();
+			$content->getContent($nws->content_id, $sprache,null, $sichtbar, true);
+
+			//das Datum des News Eintrages ist nicht im XML enthalten, es muss extra hinzugefuegt werden
+			$datum = '<datum><![CDATA['.$datum_obj->formatDatum($nws->datum,'d.m.Y').']]></datum>';
+
+			if(!($nr->studiengang_kz<>0 && $editable && $nws->studiengang_kz==0))
+			{
+				//Wenn der Parameter edit uebergeben wird, dann wird neben dem Datum ein Link zum Editieren des Eintrags angezeigt
+				if($editable)
+					$id = '<news_id><![CDATA['.$nws->news_id.']]></news_id>';
+				else
+					$id='';
+				$xml .= mb_substr($content->content,0,mb_strlen($content->content)-7).$datum.$id.mb_substr($content->content,-7);
+				//$xml .= $content->content;
+				$newsArr[] = $nws;
+			}
+			if($nr->studiengang_kz != 0)
+			{
+				if(!$editable && !$infoscreen)
+					$xml.=getStgContent($nr->studiengang_kz, $nr->semester, $sprache);
+			}
+		}
 	}
-	//Wenn der Parameter edit uebergeben wird, dann wird neben dem Datum ein Link zum Editieren des Eintrags angezeigt
-	if($editable) 
-		$id = '<news_id><![CDATA['.$row->news_id.']]></news_id>';
-	else
-		$id='';
-	$xml .= mb_substr($content->content,0,mb_strlen($content->content)-7).$datum.$id.mb_substr($content->content,-7);
-	//$xml .= $content->content;
 }
 
-if($studiengang_kz!=0 && !$editable && !$infoscreen) // && $studiengang_kz==10006 && !$semester)
-	$xml.=getStgContent($studiengang_kz, $semester, $sprache);
-
-if($studiengang_kz!=0)
-{
-	$stg_obj = new studiengang();
-	$stg_obj->load($studiengang_kz);
-	$xml.='<studiengang_bezeichnung>'.$stg_obj->bezeichnung.'</studiengang_bezeichnung>';
-}
 
 if($titel!='')
 {
@@ -167,9 +176,9 @@ $processor->importStylesheet($xsltemplate);
 echo $processor->transformToXML($doc);
 
 /**
- * Liefert ein XML mit den Details eines Studiengangs 
+ * Liefert ein XML mit den Details eines Studiengangs
  * welche dann neben den News angezeigt werden
- * 
+ *
  * @param $studiengang_kz
  * @param $semester
  * @param $sprache
@@ -177,26 +186,28 @@ echo $processor->transformToXML($doc);
 function getStgContent($studiengang_kz, $semester, $sprache)
 {
 	$p = new phrasen($sprache);
-	
+
 	$xml = '<stg_extras>';
-	
+
 	$studiengang = new studiengang();
 	$studiengang->load($studiengang_kz);
-	
-	
+
+	$xml.='<stg_name_name><![CDATA['.$p->t('global/studiengang').']]></stg_name_name>';
+	$xml.='<studiengang_bezeichnung>'.$studiengang->bezeichnung.'</studiengang_bezeichnung>';
+
 	//Studiengangsleitung
-	$stg_oe_obj = new studiengang();                
+	$stg_oe_obj = new studiengang();
 	$stgl = $stg_oe_obj->getLeitung($studiengang_kz);
-    //$xml.='<stg_header><![CDATA['.$p->t('global/studiengangsmanagement').']]></stg_header>';
+	//$xml.='<stg_header><![CDATA['.$p->t('global/studiengangsmanagement').']]></stg_header>';
 	$xml.='<stg_ltg_name><![CDATA['.$p->t('global/studiengangsleitung').']]></stg_ltg_name>';
 	if(count($stgl)>0)
-    {
-		foreach ($stgl as $uid) 
-	    {
+	{
+		foreach ($stgl as $uid)
+		{
 			$row_course_leader = new mitarbeiter($uid);
 			$xml.='<stg_ltg>';
-		    $xml.='<name><![CDATA['.$row_course_leader->titelpre.' '.$row_course_leader->vorname.' '.$row_course_leader->nachname.' '.$row_course_leader->titelpost.']]></name>';
-		    
+			$xml.='<name><![CDATA['.$row_course_leader->titelpre.' '.$row_course_leader->vorname.' '.$row_course_leader->nachname.' '.$row_course_leader->titelpost.']]></name>';
+
 			if(isset($row_course_leader) && $row_course_leader->uid != "")
 			{
 				$alias = new benutzer();
@@ -206,19 +217,19 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 				else
 					$xml.='<email><![CDATA['.$row_course_leader->uid.'@'.DOMAIN.']]></email>';
 				$xml.='<uid><![CDATA['.$row_course_leader->uid.']]></uid>';
-			}		
-		
-		  	if(isset($row_course_leader) && $row_course_leader->telefonklappe != "")
+			}
+
+			if(isset($row_course_leader) && $row_course_leader->telefonklappe != "")
 			{
 				$hauptnummer='';
-								
+
 				if($row_course_leader->standort_id!='')
 				{
 					$kontakt = new kontakt();
 					$kontakt->loadFirmaKontakttyp($row_course_leader->standort_id, 'telefon');
 					$hauptnummer = $kontakt->kontakt;
 				}
-												
+
 				$xml.= '<telefon><![CDATA['.$hauptnummer.' - '.$row_course_leader->telefonklappe.']]></telefon>';
 			}
 		    if(isset($row_course_leader) && $row_course_leader->ort_kurzbz != "")
@@ -230,7 +241,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 			$xml.='</stg_ltg>';
 	    }
     }
-    
+
 	//geschaeftsf. Leitung auselesen
 	$xml.='<gf_ltg_name><![CDATA['.$p->t('global/geschaeftsfuehrendeltg').']]></gf_ltg_name>';
 	$benutzerfkt = new benutzerfunktion();
@@ -239,20 +250,20 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 	{
 		$ma = new mitarbeiter();
 		$ma->load($row->uid);
-		
+
 		if($ma->uid!='' && $ma->bnaktiv)
 		{
 			$xml.='<gf_ltg>';
-			
+
 			$xml.='<name><![CDATA['.$ma->titelpre.' '.$ma->vorname.' '.$ma->nachname.' '.$ma->titelpost.']]></name>';
 			$alias = new benutzer();
 			$alias->load($ma->uid);
 			if($alias->alias!='')
 				$xml.='<email><![CDATA['.$alias->alias.'@'.DOMAIN.']]></email>';
-			else 
+			else
 				$xml.='<email><![CDATA['.$ma->uid.'@'.DOMAIN.']]></email>';
 			$xml.='<uid><![CDATA['.$ma->uid.']]></uid>';
-			
+
 			if($ma->telefonklappe != '')
 			{
 				if($ma->standort_id!='')
@@ -269,11 +280,11 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 				$ort->load($ma->ort_kurzbz);
 				$xml.='<ort><![CDATA['.$ort->planbezeichnung.']]></ort>';
 			}
-			
+
 			$xml.='</gf_ltg>';
 		}
 	}
-		
+
 	//Studiengangsleiter Stellvertreter auslesen
 	$benutzerfkt = new benutzerfunktion();
 	$benutzerfkt->getBenutzerFunktionen('stvLtg', $studiengang->oe_kurzbz);
@@ -282,20 +293,20 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 	{
 		$ma = new mitarbeiter();
 		$ma->load($row->uid);
-		
+
 		if($ma->uid!='' && $ma->bnaktiv)
 		{
 			$xml.='<stv_ltg>';
-			
+
 			$xml.='<name><![CDATA['.$ma->titelpre.' '.$ma->vorname.' '.$ma->nachname.' '.$ma->titelpost.']]></name>';
 			$alias = new benutzer();
 			$alias->load($ma->uid);
 			if($alias->alias!='')
 				$xml.='<email><![CDATA['.$alias->alias.'@'.DOMAIN.']]></email>';
-			else 
+			else
 				$xml.='<email><![CDATA['.$ma->uid.'@'.DOMAIN.']]></email>';
 			$xml.='<uid><![CDATA['.$ma->uid.']]></uid>';
-			
+
 			if($ma->telefonklappe != '')
 			{
 				if($ma->standort_id!='')
@@ -312,11 +323,11 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 				$ort->load($ma->ort_kurzbz);
 				$xml.='<ort><![CDATA['.$ort->planbezeichnung.']]></ort>';
 			}
-			
+
 			$xml.='</stv_ltg>';
 		}
-	}	
-	
+	}
+
 	//Assistenz
 	$benutzerfkt = new benutzerfunktion();
 	$benutzerfkt->getBenutzerFunktionen('ass', $studiengang->oe_kurzbz);
@@ -325,20 +336,20 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 	{
 		$ma = new mitarbeiter();
 		$ma->load($row->uid);
-		
+
 		if($ma->uid!='' && $ma->bnaktiv)
 		{
 			$xml.='<ass>';
-			
+
 			$xml.='<name><![CDATA['.$ma->titelpre.' '.$ma->vorname.' '.$ma->nachname.' '.$ma->titelpost.']]></name>';
 			$alias = new benutzer();
 			$alias->load($ma->uid);
 			if($alias->alias!='')
 				$xml.='<email><![CDATA['.$alias->alias.'@'.DOMAIN.']]></email>';
-			else 
+			else
 				$xml.='<email><![CDATA['.$ma->uid.'@'.DOMAIN.']]></email>';
 			$xml.='<uid><![CDATA['.$ma->uid.']]></uid>';
-			
+
 			if($ma->telefonklappe != '')
 			{
 				if($ma->standort_id!='')
@@ -355,14 +366,14 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 				$ort->load($ma->ort_kurzbz);
 				$xml.='<ort><![CDATA['.$ort->planbezeichnung.']]></ort>';
 			}
-			
+
 			$xml.='</ass>';
 		}
-	}	
+	}
 
 	//Zusatzinfo (Oeffnungszeiten etc)
 	$xml.='<zusatzinfo><![CDATA['.$studiengang->zusatzinfo_html.']]></zusatzinfo>';
-				
+
 	//Hochschulvertretung
 	$benutzerfkt = new benutzerfunktion();
 	$benutzerfkt->getBenutzerFunktionen('hsv');
@@ -371,7 +382,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 	{
 		$bn = new benutzer();
 		$bn->load($row->uid);
-		
+
 		$funktion = new funktion();
 		$funktion->load($row->funktion_kurzbz);
 		if($bn->uid!='' && $bn->bnaktiv)
@@ -383,7 +394,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 			$xml.='</hochschulvertr>';
 		}
 	}
-	
+
 	//Studentenvertretung
 	$benutzerfkt = new benutzerfunktion();
 	$benutzerfkt->getBenutzerFunktionen('stdv', $studiengang->oe_kurzbz);
@@ -392,7 +403,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 	{
 		$bn = new benutzer();
 		$bn->load($row->uid);
-		
+
 		$funktion = new funktion();
 		$funktion->load($row->funktion_kurzbz);
 		if($bn->uid!='' && $bn->bnaktiv)
@@ -404,7 +415,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 			$xml.='</stdv>';
 		}
 	}
-	
+
 	//Jahrgangsvertretung
 	$benutzerfkt = new benutzerfunktion();
 	$benutzerfkt->getBenutzerFunktionen('jgv', $studiengang->oe_kurzbz, $semester);
@@ -413,19 +424,19 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 	{
 		$bn = new benutzer();
 		$bn->load($row->uid);
-		
+
 		$funktion = new funktion();
 		$funktion->load($row->funktion_kurzbz);
 		if($bn->uid!='' && $bn->bnaktiv)
 		{
-			$xml.='<jahrgangsvertr>';			
+			$xml.='<jahrgangsvertr>';
 			$xml.='<name><![CDATA['.$bn->titelpre.' '.$bn->vorname.' '.$bn->nachname.' '.$bn->titelpost.' '.($row->bezeichnung!='' && $row->bezeichnung!=$funktion->beschreibung?'('.$row->bezeichnung.')':'').']]></name>';
 			$xml.='<email><![CDATA['.$bn->uid.'@'.DOMAIN.']]></email>';
 			$xml.='<uid><![CDATA['.$bn->uid.']]></uid>';
 			$xml.='</jahrgangsvertr>';
 		}
 	}
-	
+
 	if(CIS_EXT_MENU)
 	{
 		$xml.='<cis_ext_menu>
@@ -440,4 +451,13 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 	$xml.='</stg_extras>';
 	return $xml;
 }
+
+function getNRObj($stg_kz, $sem)
+{
+	$ret = new stdClass();
+	$ret->studiengang_kz = $stg_kz;
+	$ret->semester = $sem;
+	return $ret;
+}
+
 ?>

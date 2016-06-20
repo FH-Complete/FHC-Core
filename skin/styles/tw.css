@@ -502,6 +502,17 @@ td.menubox p
 {
 	line-height: 110%;
 }
+.menubox /* Navigationsboxen in den CIS-Contentseiten */
+{
+	background-color: #eeeeee;
+	padding: 15px 5px 5px 15px;
+	margin-bottom: 15px;
+	vertical-align: middle;
+}
+.menubox p
+{
+	line-height: 110%;
+}
 td.cmscontent
 {
 	vertical-align: top;

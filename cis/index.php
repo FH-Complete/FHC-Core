@@ -16,9 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >,
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at > and
+ *          Andreas Moik <moik@technikum-wien.at>.
  *
  */
 require_once('../config/cis.config.inc.php');
@@ -27,6 +28,8 @@ require_once('../include/sprache.class.php');
 require_once('../include/phrasen.class.php');
 require_once('../include/mail.class.php');
 require_once('../include/student.class.php');
+require_once('../include/prestudent.class.php');
+require_once('../include/studiensemester.class.php');
 
 /**
  * Prueft die URL damit keine boesen URLS uebergeben werden koennen
@@ -84,18 +87,26 @@ else
 	$menu = 'menu.php?content_id='.$id;
 	
 $user = get_uid();
-$student = new student();
-if($student->load($user))
+$prestudent = new prestudent();
+$prestudent->getPrestudentsFromUid($user);
+
+$newsGetArr = array();
+
+if(count($prestudent->result) > 0)
 {
-	$studiengang_kz=$student->studiengang_kz;
-	$semester=$student->semester;
-	$verband=$student->verband;
-}
-else
-{
-	$studiengang_kz='';
-	$semester='';
-	$verband='';
+	foreach($prestudent->result as $ps)
+	{
+		$student = new student();
+		$studsem = new studiensemester();
+
+		$student->load_studentlehrverband($ps->prestudent_id, $studsem->getaktorNext());
+		$newsGetArr[] = array("studiengang_kz" => $ps->studiengang_kz,"semester" => $student->semester);
+
+		if($student->verband == "I" && $student->semester == "0")
+		{
+			$newsGetArr[] = array("studiengang_kz" => "10006","semester" => 0);
+		}
+	}
 }
 
 if(isset($_GET['content']))
@@ -105,15 +116,9 @@ if(isset($_GET['content']))
 }
 else
 {
-	if($studiengang_kz=='' && $semester=='' && $verband=='' )
-		$content = '../cms/news.php';
-	else
-		if ($semester=='0' && $verband=='I')
-			$content = '../cms/news.php?studiengang_kz=10006&semester=0';
-		else
-			$content = '../cms/news.php?studiengang_kz='.$studiengang_kz.'&semester='.$semester.'';
+	$content = '../cms/news.php?newsReq='.json_encode($newsGetArr);
 }
-	
+
 $sprache = getSprache();
 $p = new phrasen($sprache);
 $db = new basis_db();
@@ -230,7 +235,7 @@ function loadampel()
 					</td>
 					</tr>
 				
-				</table>				
+				</table>
 			</div>
 		</div>
 	</div>-->';*/

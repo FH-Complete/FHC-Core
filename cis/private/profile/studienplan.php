@@ -292,8 +292,8 @@ if(isset($prestudent_id))
 	$db = new basis_db();
 	$datum_obj = new datum();
 	// Student Laden
-	$student = new student();
-	$student->load($uid);
+	$benutzer = new benutzer();
+	$benutzer->load($uid);
 	// ersten Status holen
 	$prestudent = new prestudent();
 	$prestudent->getFirstStatus($prestudent_id, 'Student');
@@ -375,7 +375,7 @@ if(isset($prestudent_id))
 	$lv->loadLehrveranstaltungStudienplan($studienplan_id);
 	foreach($lv->lehrveranstaltungen as $row_lva)
 		$lv_arr[$row_lva->lehrveranstaltung_id]=$row_lva;
-	echo '<h1>'.$p->t('studienplan/studienplan').": $studienplan->bezeichnung ($studienplan_id) - $student->vorname $student->nachname ( $student->uid )</h1>";
+	echo '<h1>'.$p->t('studienplan/studienplan').": $studienplan->bezeichnung ($studienplan_id) - $benutzer->vorname $benutzer->nachname ( $benutzer->uid )</h1>";
 	echo '<table style="border: 1px solid black">
 		<thead>
 		<tr style="border: 1px solid black" valign="top">
@@ -449,7 +449,7 @@ echo '</body>
 	function drawTree($tree, $depth)
 	{
 		global $uid, $stsem_arr, $noten_arr, $lvangebot_arr;
-		global $datum_obj, $db, $lv_arr, $p, $note_pruef_arr, $student;
+		global $datum_obj, $db, $lv_arr, $p, $note_pruef_arr, $benutzer;
 
 		foreach($tree as $row_tree)
 		{

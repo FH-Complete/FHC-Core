@@ -17,8 +17,9 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Simane-Sequens <gerald.simane@technikum-wien.at>.
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *          Gerald Simane-Sequens <gerald.simane@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 	require_once('../../../config/cis.config.inc.php');
 	require_once('../../../include/functions.inc.php');
@@ -284,19 +285,18 @@
 						$max_person=$row_anz->max_person+$max_person;	
 						$row_anz->verband=trim($row_anz->verband);
 						$row_anz->gruppe=trim($row_anz->gruppe);
-						$row_anz->gruppe_kurzbz=trim($row_anz->gruppe_kurzbz);						
+						$row_anz->gruppe_kurzbz=trim($row_anz->gruppe_kurzbz);
 
 						$stsem=$ss;
 						
-						$gruppe=($row_anz->gruppe_kurzbz?$row_anz->gruppe_kurzbz:null);						
-						$student=new student();
-					
+						$gruppe=($row_anz->gruppe_kurzbz?$row_anz->gruppe_kurzbz:null);
+
 						$row_anz->anz=0;
 						if ($result=$student->getStudents($row_anz->studiengang_kz,$row_anz->semester,$row_anz->verband,$row_anz->gruppe,$gruppe, $stsem))
 							$row_anz->anz=count($result);
 								
 
-						if (empty($row_anz->anz))														
+						if (empty($row_anz->anz))
 							$fehler=true;
 
 						$lvb=$row_anz->kurzbzlang.'-'.$row_anz->semester;
