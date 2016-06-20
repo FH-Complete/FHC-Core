@@ -119,7 +119,13 @@ class Templates extends FHC_Controller
 		$vorlagetext = $this->vorlagelib->getVorlagetextById($vorlagestudiengang_id);
 		if ($vorlagetext->error)
 			show_error($vorlagetext->retval);
-		$this->load->view('system/templatetextEdit', $vorlagetext->retval[0]);
+		$data = $vorlagetext->retval[0];
+
+		// Preview-Data
+		$schema = $this->vorlagelib->getVorlage($data->vorlage_kurzbz);
+		$data->schema = $schema->retval[0]->attribute;
+
+		$this->load->view('system/templatetextEdit', $data);
 	}
 
 	public function saveText()
@@ -134,8 +140,8 @@ class Templates extends FHC_Controller
 		if ($vorlagetext->error)
 			show_error($vorlagetext->retval);
 		$data['vorlagestudiengang_id'] = $vorlagestudiengang_id;
-		//redirect('/system/Templates/editText/'.$vorlagestudiengang_id);
-		$this->load->view('system/templatetextEdit', $data);
+		redirect('/system/Templates/editText/'.$vorlagestudiengang_id);
+		//$this->load->view('system/templatetextEdit', $data);
 	}
 
 	public function preview($vorlagestudiengang_id)

@@ -20,7 +20,7 @@ StudiengangKZ: <?=$studiengang_kz?>
 </form>
 <hr/><h2>Preview-Data</h2>
 <form method="post" action="../preview/<?=$vorlagestudiengang_id?>" target="TemplatePreview">
-	<?php echo $this->templatelib->widget("jsonforms_widget", array('id' => 'dataform')); ?>
+	<?php echo $this->templatelib->widget("jsonforms_widget", array('id' => 'dataform', 'schema' => $schema)); ?>
 	<input type="hidden" name="formdata" id="formdata" value="" />
 	<button type="submit" onclick="getFormdata(this.form);">Preview</button>
 </form>
@@ -36,6 +36,6 @@ StudiengangKZ: <?=$studiengang_kz?>
     }
 </script>
 
-<iframe name="TemplatePreview" width="100%" src="../preview/<?=$vorlagestudiengang_id?>"/>
+<iframe name="TemplatePreview" width="100%" src=""/>
 </body>
 </html>
