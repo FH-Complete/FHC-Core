@@ -297,6 +297,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		
 		$stg = new studiengang();
 		$stg->load($lvstg);
+                
+                $xml .= "				<stg_studiengang_bezeichnung>".$stg_oe_obj->bezeichnung."</stg_studiengang_bezeichnung>";
 		$xml .= "				<lv_studiengang_bezeichnung>".$stg->bezeichnung."</lv_studiengang_bezeichnung>";
 		$xml .= "				<lv_studiengang_typ>".$stg->typ."</lv_studiengang_typ>";
 		$xml .= "				<lv_studiengang_kennzahl>".sprintf('%04s',$lvstg)."</lv_studiengang_kennzahl>";
@@ -312,7 +314,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "				<lehrform_kurzbz>".$lehrform_kurzbz."</lehrform_kurzbz>";
 		$xml .= "				<lehrform_bezeichnung>".$lehrform_bezeichnung."</lehrform_bezeichnung>";
 		$xml .= "				<sws>".($sws==0?'':number_format(sprintf('%.1F',$sws),1))."</sws>";
-		$xml .= "				<ects>".number_format($ects,1)."</ects>";
+		
 		$xml .= "				<lvleiter>".$leiter_titel." ".$leiter_vorname." ".$leiter_nachname.($leiter_titelpost!=''?', '.$leiter_titelpost:'')."</lvleiter>";
 		$xml .= "				<lehrinhalte><![CDATA[".clearHtmlTags($lehrinhalte)."]]></lehrinhalte>";
 		$xml .= "				<kompatible_lvs>";
@@ -324,6 +326,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
 
 		$xml .= "	</kompatible_lvs>";
+                
 		
 		$anrechnung = new anrechnung();
 		$anrechnung->getAnrechnungPrestudent($student->prestudent_id, null, $lehrveranstaltung_id);
@@ -336,6 +339,17 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		    $xml .= $anrechnung->result[0]->lehrveranstaltung_bez;
 		}
 		$xml .= "</studienverpflichtung>";
+                
+                if($lehrveranstaltung_id_kompatibel != "")
+                {
+                    $lv = new lehrveranstaltung($lehrveranstaltung_id_kompatibel);
+                    if(($lv->ects !== $ects) && ($lv->ects != "") && ($lv->ects != null))
+                    {
+                        $ects = $lv->ects;
+                    }
+                }
+                
+                $xml .= "				<ects>".number_format($ects,1)."</ects>";
 
 		$lehrveranstaltung->loadLehrveranstaltungStudienplan($studienplan_id);
 		

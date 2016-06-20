@@ -548,8 +548,10 @@ class jahresplan extends basis_db
 		$qry.=", to_char(tbl_veranstaltung.start, 'Q') as \"start_quartal\" ";
 		$qry.=", to_char(tbl_veranstaltung.ende, 'Q') as \"ende_quartal\" ";
 		
-		$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.start) as \"start_timestamp\" ";
-		$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.ende) as \"ende_timestamp\" ";
+		$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.start::TIMESTAMP WITHOUT TIME
+ZONE at time zone 'CEST' ) as \"start_timestamp\" ";
+		$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.ende::TIMESTAMP WITHOUT TIME
+ZONE at time zone 'CEST' ) as \"ende_timestamp\" ";
 
 
 		$qry.=", to_char(tbl_veranstaltung.start, 'DD.MM.YYYY') as \"start_datum\" ";

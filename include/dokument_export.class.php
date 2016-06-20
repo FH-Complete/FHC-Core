@@ -291,6 +291,9 @@ class dokument_export
 
 		if($download)
 		{
+			if(headers_sent())
+				exit('Header wurden bereits gesendet -> Abbruch');
+
 			switch($this->outputformat)
 			{
 				case 'pdf':
@@ -310,6 +313,8 @@ class dokument_export
 		            header('Content-Disposition: attachment; filename="'.$this->filename.'.odt"');
 		            header('Content-Length: '.$fsize);
 					break;
+				default:
+					exit('Outputformat is not defined');
 			}
 
 			while (!feof($handle))
@@ -388,6 +393,12 @@ class dokument_export
 		        $_xml_data->addChild("$key",htmlspecialchars("$value"));
 		}
 		return $_xml_data->asXML();
+	}
+
+	public function getXML()
+	{
+		$this->xml_data->formatOutput=true;
+		return $this->xml_data->saveXML();
 	}
 }
 ?>

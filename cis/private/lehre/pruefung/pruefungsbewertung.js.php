@@ -96,8 +96,8 @@ function showTeilnehmer(pruefungstermin_id, lehrveranstaltung_id, lehrveranstalt
 {
 	$("#modalOverlay").addClass("modalOverlay");
 	$("#anmeldeDaten").empty();
-	$("#anmeldungen").children("h2").text("Bewertungen zu "+lehrveranstaltung+" ("+datum+")");
-	var noten = "<select onchange='markAsUnsaved(this);'><option value='null'>Keine Auswahl</option>";
+	$("#anmeldungen").children("h2").text("<?php echo $p->t('pruefung/bewertungenZu'); ?> "+lehrveranstaltung+" ("+datum+")");
+	var noten = "<select onchange='markAsUnsaved(this);'><option value='null'><?php echo $p->t('pruefung/keineAuswahl'); ?></option>";
 	$.ajax({
 		dataType: 'json',
 		url: "./pruefungsbewertung.json.php",
@@ -138,15 +138,15 @@ function showTeilnehmer(pruefungstermin_id, lehrveranstaltung_id, lehrveranstalt
 				data.result.forEach(function(d)
 				{
 					if(d.status_kurzbz === "bestaetigt")
-					{	
-						var datum = d.von.split(" ");	
+					{
+						var datum = d.von.split(" ");
 						if(d.pruefung.note===null)
 						{
-							entry = "<div class='anmeldung' id="+d.student.uid+"><div>"+d.student.vorname+" "+d.student.nachname+"</div>"+notenSelect+"<input type='button' onclick='saveBeurteilung(this,\""+datum[0]+"\",\""+d.pruefungsanmeldung_id+"\",\""+d.pruefung_id+"\",\""+d.lehrveranstaltung_id+"\");' value='speichern'/></br><input id='note_anmerkung_"+d.student.uid+"' placeholder='Anmerkung' /></div>";
+							entry = "<div class='anmeldung' id="+d.student.uid+"><div>"+d.student.vorname+" "+d.student.nachname+"</div>"+notenSelect+"<input type='button' onclick='saveBeurteilung(this,\""+datum[0]+"\",\""+d.pruefungsanmeldung_id+"\",\""+d.pruefung_id+"\",\""+d.lehrveranstaltung_id+"\");' value='<?php echo $p->t('global/speichern'); ?>'/></br><input id='note_anmerkung_"+d.student.uid+"' placeholder='<?php echo $p->t('global/anmerkung'); ?>' /></div>";
 						}
 						else
 						{
-							entry = "<div class='anmeldung' id="+d.student.uid+"><div>"+d.student.vorname+" "+d.student.nachname+"</div>"+notenSelect+"<input type='button' onclick='updateBeurteilung(this,\""+d.pruefung.pruefung_id+"\");' value='speichern'/></br><input id='note_anmerkung_"+d.student.uid+"' placeholder='Anmerkung' value='"+d.pruefung.anmerkung+"' /></div>";
+							entry = "<div class='anmeldung' id="+d.student.uid+"><div>"+d.student.vorname+" "+d.student.nachname+"</div>"+notenSelect+"<input type='button' onclick='updateBeurteilung(this,\""+d.pruefung.pruefung_id+"\");' value='<?php echo $p->t('global/speichern'); ?>'/></br><input id='note_anmerkung_"+d.student.uid+"' placeholder='<?php echo $p->t('global/anmerkung'); ?>' value='"+d.pruefung.anmerkung+"' /></div>";
 						}
 						$("#anmeldeDaten").append(entry);
 						if(d.pruefung.note!==null)
@@ -199,7 +199,7 @@ function saveBeurteilung(ele, datum, pruefungsanmeldung_id, pruefung_id, lehrver
 		return false;
 	}
 	var anmerkung = $("#note_anmerkung_"+student_uid).val();
-	
+
 	$.ajax({
 		dataType: 'json',
 		url: "./pruefungsbewertung.json.php",
@@ -229,7 +229,7 @@ function saveBeurteilung(ele, datum, pruefungsanmeldung_id, pruefung_id, lehrver
 			$(ele).parent().find("select").val(null);
 		}
 	}).complete(function(event, xhr, settings){
-		
+
 	});
 }
 
@@ -270,8 +270,8 @@ function updateBeurteilung(ele, pruefung_id)
 		{
 			messageBox("message",data.errormsg, "red", "highlight", 1000);
 		}
-		
-		
+
+
 	}).complete(function(event, xhr, settings){
 
 	});

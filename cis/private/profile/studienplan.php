@@ -433,19 +433,6 @@ if(isset($prestudent_id))
 }
 echo '</body>
 </html>';
-
-
-
-
-
-
-
-
-
-
-
-
-
 	function drawTree($tree, $depth)
 	{
 		global $uid, $stsem_arr, $noten_arr, $lvangebot_arr;
@@ -557,12 +544,12 @@ echo '</body>
 		                              $lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
 		                              if(isset($noten_arr[$lv]))
 		                              {
-		                                  $positiv=false;
-		                                  foreach($noten_arr[$lv] as $note)
-		                                  {
-		                                      if($note_pruef_arr[$note]->positiv)
-		                                          $positiv=true;
-		                                  }
+							$positiv=false;
+							foreach($noten_arr[$lv] as $note)
+							{
+								if($note_pruef_arr[$note]->positiv)
+									$positiv=true;
+							}
 		                                  $found = true;
 		                              }
 		                              else

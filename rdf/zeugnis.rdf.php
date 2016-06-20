@@ -34,6 +34,7 @@ require_once('../include/datum.class.php');
 require_once('../include/note.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/mitarbeiter.class.php');
+require_once('../include/anrechnung.class.php');
 require_once('../include/studiensemester.class.php');
 
 $datum = new datum();
@@ -374,6 +375,19 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$xml .= "				<sws>".($row->semesterstunden==0?'':number_format(sprintf('%.1F',$row->semesterstunden/$wochen),1))."</sws>";
 				$ectspunkte='';
 
+
+                                $anrechnung = new anrechnung();
+                                $anrechnung->getAnrechnungPrestudent($prestudent_id_arr[$i], null, $row->lehrveranstaltung_id);
+
+                                if($anrechnung->result != null)
+                                {
+                                    $lv = new lehrveranstaltung($anrechnung->result[0]->lehrveranstaltung_id);
+                                    if(($lv->ects !== $row->ects) && ($lv->ects != "") && ($lv->ects != null))
+                                    {
+                                        $row->ects = $lv->ects;
+                                    }
+                                }
+
 				if($row->ects==0 || $row->ects=='')
 					$ectspunkte='';
 				else
@@ -406,4 +420,3 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	echo $xml;
 }
 ?>
-

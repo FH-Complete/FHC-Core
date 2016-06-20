@@ -635,19 +635,22 @@ function resetForm()
  */
 function setTablesorter(tableId)
 {
-	if($("#"+tableId)[0].hasInitialized !== true)
-	{
-		$("#"+tableId).tablesorter({
-			widgets: ["zebra"],
-			sortList: [[1,0]]
-		});
-	}
-	else
-	{
-		$("#"+tableId).trigger("updateAll");
-		var sorting = [[1,0],[0,0]];
-		$("#"+tableId).trigger("sorton",[sorting]);
-	}
+    if($("#"+tableId).length != 0)
+    {
+        if($("#"+tableId)[0].hasInitialized !== true)
+        {
+                $("#"+tableId).tablesorter({
+                        widgets: ["zebra"],
+                        sortList: [[1,0]]
+                });
+        }
+        else
+        {
+                $("#"+tableId).trigger("updateAll");
+                var sorting = [[1,0],[0,0]];
+                $("#"+tableId).trigger("sorton",[sorting]);
+        }
+    }
 }
 
 /**
@@ -734,7 +737,6 @@ function showAnmeldungen(pruefungstermin_id, lehrveranstaltung_id)
 
 function writeAnmeldungen(data)
 {
-	console.log(data);
 	if(data.error === 'false')
 	{
 		var terminId = data.result.anmeldungen[0].pruefungstermin_id;

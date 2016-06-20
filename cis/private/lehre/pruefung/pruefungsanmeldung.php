@@ -231,6 +231,7 @@ $studiensemester->getAll();
 		    </tbody>
 		</table>
 	    </div>
+            <?php if(!defined('CIS_PRUEFUNGSANMELDUNG_LEHRVERANSTALTUNGEN_AUS_STUDIENGANG') || CIS_PRUEFUNGSANMELDUNG_LEHRVERANSTALTUNGEN_AUS_STUDIENGANG == true): ?>
 	    <h2><?php echo $p->t('pruefung/lvVonStudiengang'); ?></h2>
 	    <div>
 		<table id="table2" class="tablesorter">
@@ -247,6 +248,7 @@ $studiensemester->getAll();
 		    </tbody>
 		</table>
 	    </div>
+            <?php endif; ?>
 	    <h2><?php echo $p->t('pruefung/lvAlle'); ?></h2>
 	    <div>
 		<table id="table3" class="tablesorter">

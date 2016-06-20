@@ -46,7 +46,7 @@ $this->phrasen['pruefung/anmeldenMoeglichBis'] = 'Possibilità di iscrizione ent
 $this->phrasen['pruefung/stornoNichtMehrMoeglich'] = 'Non è più possibile annullare l’iscrizione.';
 $this->phrasen['pruefung/zurLvAnmeldung'] = 'iscriversi al corso';
 $this->phrasen['pruefung/zuerstPruefungAuswaehlen'] = 'Scegliere prima l’esame.';
-$this->phrasen['pruefung/bemerkungVonLektorHinzugefuegt'] = 'inserito da docente';
+$this->phrasen['pruefung/bemerkungVonLektorHinzugefuegt'] = 'iscrizione da segreteria';
 $this->phrasen['pruefung/bestaetigen'] = 'Confermare';
 $this->phrasen['pruefung/anmerkungDesStudenten'] = 'Osservazioni dello studente:</br>';
 $this->phrasen['pruefung/bestaetigt'] = 'confermato';
@@ -73,6 +73,9 @@ $this->phrasen['pruefung/lvErfolgreichEntfernt'] = 'Insegnamento tolto con succe
 $this->phrasen['pruefung/pruefungStorniert'] = 'Esame cancellato';
 $this->phrasen['pruefung/terminGeloescht'] = 'Appello eliminato';
 $this->phrasen['pruefung/unbegrenzt'] = '';
+$this->phrasen['pruefung/bewertungenZu'] = 'Bewertungen zu';
+$this->phrasen['pruefung/keineAuswahl'] = 'Keine Auswahl';
+
 // pruefungsbewertung
 $this->phrasen['pruefung/pruefungsbewertungTitle'] = 'Voti d’esame';
 $this->phrasen['pruefung/pruefungsbewertungAnmeldungen'] = 'Iscrizioni';
@@ -102,7 +105,7 @@ $this->phrasen['pruefung/keineLvAngegeben'] = 'Nessun corso definito.';
 $this->phrasen['pruefung/kollisionMitAnderemTermin'] = 'Date sovrapposte.';
 $this->phrasen['pruefung/terminNichtInDerVergangenheit'] = 'La data dell’appello non è nel passato.';
 $this->phrasen['pruefung/keineLehreinheitenVorhanden'] = 'Nessun corso disponibile.';
-$this->phrasen['pruefung/keineAnmeldungenVorhanden'] = 'Nessuna registrazione disponibile.';
+$this->phrasen['pruefung/keineAnmeldungenVorhanden'] = 'Nessuna studente iscritto.';
 
 // anmeldungen Verwalten
 $this->phrasen['pruefung/anmeldungenVerwaltenTitle'] = 'Gestione delle prenotazioni degli appelli';
