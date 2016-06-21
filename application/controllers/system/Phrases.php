@@ -47,23 +47,23 @@ class Phrases extends FHC_Controller
 		$v = $this->load->view('system/phrasesinhaltList.php', $data);
 	}
 
-	public function edit($vorlage_kurzbz = null)
+	public function edit($phrase_id = null)
 	{
-		if (empty($vorlage_kurzbz))
+		if (empty($phrase_id))
 			exit;
-		$vorlage = $this->vorlagelib->getVorlage($vorlage_kurzbz);
+		$phrase = $this->phraseslib->getPhrase($phrase_id);
 		//var_dump($vorlage);
-		if ($vorlage->error)
-			show_error($vorlage->retval);
-		if (count($vorlage->retval) != 1)
-			show_error('Nachricht nicht vorhanden! ID: '.$vorlage_kurzbz);
+		if ($phrase->error)
+			show_error($phrase->retval);
+		if (count($phrase->retval) != 1)
+			show_error('Phrase nicht vorhanden! ID: '.$phrase_id);
 
 		$data = array
 		(
-			'vorlage' => $vorlage->retval[0]
+			'phrase' => $phrase->retval[0]
 		);
 		//var_dump($data['message']);
-		$v = $this->load->view('system/templatesEdit', $data);
+		$v = $this->load->view('system/phrasesEdit', $data);
 	}
 
 	public function write($vorlage_kurzbz = null)
@@ -78,17 +78,14 @@ class Phrases extends FHC_Controller
 
 	public function save()
 	{
-		$vorlage_kurzbz = $this->input->post('vorlage_kurzbz', TRUE);
-		$data['bezeichnung'] = $this->input->post('bezeichnung', TRUE);
-		$data['anmerkung'] = $this->input->post('anmerkung', TRUE);
-		$data['mimetype'] = $this->input->post('mimetype', TRUE);
-		$data['attribute'] = $this->input->post('attribute', TRUE);
-		$vorlage = $this->vorlagelib->saveVorlage($vorlage_kurzbz, $data);
-		if ($vorlage->error)
-			show_error($vorlage->retval);
-		$vorlage_kurzbz = $vorlage->retval;
+		$phrase_id = $this->input->post('phrase_id', TRUE);
+		$data['phrase'] = $this->input->post('phrase', TRUE);
+		$phrase = $this->phraseslib->savePhrase($phrase_id, $data);
+		if ($phrase->error)
+			show_error($phrase->retval);
+		$phrase_id = $phrase->retval;
 
-		redirect('/system/Templates/edit/'.$vorlage_kurzbz);
+		redirect('/system/Phrases/edit/'.$phrase_id);
 	}
 
 	public function newText()
@@ -109,33 +106,28 @@ class Phrases extends FHC_Controller
 		redirect('/system/Templates/editText/'.$vorlagestudiengang_id);
 	}
 
-	public function editText($vorlagestudiengang_id)
+	public function editText($phrase_inhalt_id)
 	{
-		$vorlagetext = $this->vorlagelib->getVorlagetextById($vorlagestudiengang_id);
-		if ($vorlagetext->error)
-			show_error($vorlagetext->retval);
-		$data = $vorlagetext->retval[0];
+		$phrase_inhalt = $this->phraseslib->getPhraseInhaltById($phrase_inhalt_id);
+		if ($phrase_inhalt->error)
+			show_error($phrase_inhalt->retval);
+		$data = $phrase_inhalt->retval[0];
 
-		// Preview-Data
-		$schema = $this->vorlagelib->getVorlage($data->vorlage_kurzbz);
-		$data->schema = $schema->retval[0]->attribute;
-
-		$this->load->view('system/templatetextEdit', $data);
+		$this->load->view('system/phraseinhaltEdit', $data);
 	}
 
 	public function saveText()
 	{
-		$vorlagestudiengang_id = $this->input->post('vorlagestudiengang_id', TRUE);
-		$data['studiengang_kz'] = $this->input->post('studiengang_kz', TRUE);
-		$data['version'] = $this->input->post('version', TRUE);
-		$data['oe_kurzbz'] = $this->input->post('oe_kurzbz', TRUE);
+		$phrase_inhalt_id = $this->input->post('phrase_inhalt_id', TRUE);
+		$data['orgeinheit_kurzbz'] = $this->input->post('oe_kurzbz', TRUE);
 		$data['text'] = $this->input->post('text', TRUE);
-		$data['aktiv'] = $this->input->post('aktiv', TRUE);
-		$vorlagetext = $this->vorlagelib->updateVorlagetext($vorlagestudiengang_id, $data);
-		if ($vorlagetext->error)
-			show_error($vorlagetext->retval);
-		$data['vorlagestudiengang_id'] = $vorlagestudiengang_id;
-		redirect('/system/Templates/editText/'.$vorlagestudiengang_id);
+		$data['description'] = $this->input->post('description', TRUE);
+		$data['sprache'] = $this->input->post('sprache', TRUE);
+		$phrase_inhalt = $this->phraseslib->updatePhraseInhalt($phrase_inhalt_id, $data);
+		if ($phrase_inhalt->error)
+			show_error($phrase_inhalt->retval);
+		$data['phrase_inhalt_id'] = $phrase_inhalt_id;
+		redirect('/system/Phrases/editText/'.$phrase_inhalt_id);
 		//$this->load->view('system/templatetextEdit', $data);
 	}
 

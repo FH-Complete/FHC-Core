@@ -30,10 +30,10 @@ class PhrasesLib
      */
     function getPhrase($phrase_id)
     {
-        if (empty($vorlage_kurzbz))
+        if (empty($phrase_id))
         	return $this->_error(MSG_ERR_INVALID_MSG_ID);
 
-        $Phrase = $this->ci->PhraseModel->load($phrase_id);
+        $phrase = $this->ci->PhraseModel->load($phrase_id);
         return $phrase;
     }
 
@@ -59,18 +59,18 @@ class PhrasesLib
     }
 
 	/**
-     * saveVorlage() - will save a spezific Template.
+     * savePhrase() - will save a spezific Phrase.
      *
      * @param   array  $data    REQUIRED
      * @return  array
      */
-    function saveVorlage($vorlage_kurzbz, $data)
+    function savePhrase($phrase_id, $data)
     {
         if (empty($data))
         	return $this->_error(MSG_ERR_INVALID_MSG_ID);
 
-        $vorlage = $this->ci->VorlageModel->update($vorlage_kurzbz, $data);
-        return $vorlage;
+        $phrase = $this->ci->PhraseModel->update($phrase_id, $data);
+        return $phrase;
     }
 
 
@@ -80,13 +80,13 @@ class PhrasesLib
      * @param   string  $vorlage_kurzbz    REQUIRED
      * @return  array
      */
-    function getVorlagetextByVorlage($vorlage_kurzbz)
+    function getPhraseInhaltById($phrase_inhalt_id)
 	{
-        if (empty($vorlage_kurzbz))
+        if (empty($phrase_inhalt_id))
         	return $this->_error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
 
-        $vorlage = $this->ci->VorlageStudiengangModel->loadWhere(array('vorlage_kurzbz' =>$vorlage_kurzbz));
-        return $vorlage;
+        $phrase_inhalt = $this->ci->PhraseInhaltModel->loadWhere(array('phrase_inhalt_id' =>$phrase_inhalt_id));
+        return $phrase_inhalt;
     }
 
 	/**
@@ -136,10 +136,10 @@ class PhrasesLib
      * @param   string  $vorlage_kurzbz    REQUIRED
      * @return  array
      */
-    function updateVorlagetext($vorlagestudiengang_id, $data)
+    function updatePhraseInhalt($phrase_inhalt_id, $data)
 	{
-        $vorlagetext = $this->ci->VorlageStudiengangModel->update($vorlagestudiengang_id, $data);
-        return $vorlagetext;
+        $phrase_inhalt = $this->ci->PhraseInhaltModel->update($phrase_inhalt_id, $data);
+        return $phrase_inhalt;
     }
 
 	/**

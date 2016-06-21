@@ -18,6 +18,7 @@
 			<th class='table-sortable:default'>OrgForm</th>
 			<th class='table-sortable:default'>Text</th>
 			<th>Beschreibung</th>
+			<th></th>
 		</tr>
 	  </thead>
 	  <tbody>
@@ -28,6 +29,7 @@
 				<td><?php echo $v->orgform_kurzbz; ?></td>
 				<td><?php echo $v->text; ?></td>
 				<td><?php echo $v->description; ?></td>
+				<td><a href="../edittext/<?php echo $v->phrase_inhalt_id; ?>" target="PhrasesBottom">edit</a></td>
 			</tr>
 		<?php endforeach ?>
 	  </tbody>
