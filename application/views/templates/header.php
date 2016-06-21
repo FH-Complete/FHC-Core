@@ -58,5 +58,3 @@ if ($tablesort)
 	<script src="<?php echo base_url('vendor/json-forms/dist/js/brutusin-json-forms.min.js'); ?>"></script>
 <?php endif ?>
 </head>
-
-<body>

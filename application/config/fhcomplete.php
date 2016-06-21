@@ -231,6 +231,8 @@ $config['fhc_acl'] = array
 	'wawi.tbl_rechnungsbetrag' => 'basis/rechnungsbetrag',
 	'wawi.tbl_rechnungstyp' => 'basis/rechnungstyp',
 	'wawi.tbl_zahlungstyp' => 'basis/zahlungstyp',
+	
+	DMS_PATH => 'fs/dms',
 
 	'public.tbl_sprache' => 'admin'
 );
