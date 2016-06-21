@@ -92,7 +92,7 @@ WHERE person_id = ?';
 		if (! $all)
 			$sql .= ' AND status<2';
 		$result = $this->db->query($sql, array($person_id));
-		var_dump($result);
+		//var_dump($result);
 		if (is_object($result))
 			return $this->_success($result->result());
 		else
