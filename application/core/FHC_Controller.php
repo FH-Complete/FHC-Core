@@ -3,21 +3,23 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class FHC_Controller extends CI_Controller
 {
-	public $uid;
-
-    function __construct()
+	protected $_uid; // needs to be changed to protected $_uid
+	
+    public function __construct()  
 	{
         parent::__construct();
 		$this->load->library('session');
-		//$this->load->helper('language');
+		$this->load->helper('fhcauth');
+		
+		$this->_uid = getAuthUID();
+	}
 
-		// look if User is logged in and set uid
-		if (isset($_SERVER['PHP_AUTH_USER']))
-			$this->uid = $_SERVER['PHP_AUTH_USER'];
-		if (isset($_SESSION['uid']))
-			$this->uid = $_SESSION['uid'];
-		$this->session->set_userdata('uid', 'pam');
-
+	public function getUID()
+	{
+		if (empty($this->_uid))
+			return false;
+		else
+			return $this->_uid;
 	}
 
 }

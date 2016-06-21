@@ -68,4 +68,14 @@ class FHC_DB_ACL
 	{
 		return $this->_uid = $uid;
 	}
+	
+	/** ---------------------------------------------------------------
+	 * get UID
+	 *
+	 * @return  string or (bool)false
+	 */
+	public function getUID()
+	{
+		return $this->_uid;
+	}
 }

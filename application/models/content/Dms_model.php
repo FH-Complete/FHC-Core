@@ -12,39 +12,22 @@ class Dms_model extends DB_Model
 		$this->pk = 'dms_id';
 	}
 	
-	public function insertDmsVersion($data)
+	/**
+	 * 
+	 */
+	public function filterFields($dms)
 	{
-		$tableName = 'campus.tbl_dms_version';
+		$fieldsArray = array('oe_kurzbz', 'dokument_kurzbz', 'kategorie_kurzbz');
+		$returnArray = array();
 		
-		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$tableName], 'i'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$tableName], FHC_MODEL_ERROR);
-
-		// DB-INSERT
-		if ($this->db->insert($tableName, $data))
-			return $this->_success($this->db->insert_id());
-		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
-	}
-	
-	public function updateDmsVersion($id, $data)
-	{
-		$tableName = 'campus.tbl_dms_version';
+		foreach ($fieldsArray as $value)
+		{
+			if (isset($dms[$value]))
+			{
+				$returnArray[$value] = $dms[$value];
+			}
+		}
 		
-		// Check Class-Attributes
-		if (is_null($this->pk))
-			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
-		
-		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$tableName], 'u'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$tableName], FHC_MODEL_ERROR);
-
-		// DB-UPDATE
-		$this->db->where('dms_id', $id);
-		
-		if ($this->db->update($tableName, $data))
-			return $this->_success($id);
-		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
+		return $returnArray;
 	}
 }

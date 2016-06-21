@@ -48,4 +48,20 @@ if ( ! function_exists('auth'))
 			return false;
 		}
 	}
+
+	/**
+	 * Look if User is logged in and return uid
+	 * Otherwise return false
+	 *
+	 * @return	string or (bool)false
+	 */
+	function getAuthUID()
+	{
+		// look if User is logged in and return uid
+		if (isset($_SERVER['PHP_AUTH_USER']))
+			return $_SERVER['PHP_AUTH_USER'];
+		if (isset($_SESSION['uid']))
+			return $_SESSION['uid'];
+		return false;
+	}
 }

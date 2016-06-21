@@ -1,34 +1,43 @@
 <?php
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Messages extends FHC_Controller 
+class Messages extends VileSci_Controller 
 {
 
 	public function __construct()
     {
         parent::__construct();
-        $this->load->library('messaging');
+        $this->load->library('MessageLib');
 		//$this->load->model('person/Person_model');
 		//$this->load->model('system/Message_model');
     }
 
 	public function index()
 	{
-		//$messages = $this->Message_model->getMessages();
-		$msg = $this->Message_model->load(1);
+		$this->load->view('system/messages.php');
+	}
+
+	public function table()
+	{
+		$person_id = $this->input->post('person_id', TRUE);
+		if ($person_id)
+			$msg = $this->messagelib->getMessagesByPerson($person_id);
+		else
+			$msg = $this->messagelib->getMessagesByUID($this->getUID());
 		if ($msg->error)
 			show_error($msg->retval);
 		
 		$data = array
 		(
-			'message' => $msg->retval[0]
+			'messages' => $msg->retval
 		);
-		$v = $this->load->view('message.php', $data);
+		var_dump ($data);
+		$this->load->view('system/messagesList.php', $data);
 	}
 
 	public function view($msg_id)
 	{
-		$msg = $this->messaging->getMessage($msg_id);
+		$msg = $this->messagelib->getMessage($msg_id);
 		//var_dump($msg);
 		if ($msg->error)
 			show_error($msg->retval);
@@ -57,9 +66,9 @@ class Messages extends FHC_Controller
 	{
 		$body = $this->input->post('body', TRUE);
 		$subject = $this->input->post('subject', TRUE);
-		if (! $this->messaging->addRecipient(1))
+		if (! $this->messagelib->addRecipient(1))
 			show_error('Error: AddRecipient');
-		$msg = $this->messaging->sendMessage(1,$body ,$subject);
+		$msg = $this->messagelib->sendMessage(1,$body ,$subject);
 		if ($msg->error)
 			show_error($msg->retval);
 		$msg_id = $msg->retval;

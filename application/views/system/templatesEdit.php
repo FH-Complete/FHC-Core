@@ -22,7 +22,7 @@
 
 <script type="text/javascript" >
 	// get json
-    function getJSON(form) 
+    function getJSON(form)
 	{
         form.elements["attribute"].value = JSON.stringify(jsoneditor.get(), null, 2);
 		//alert(form.elements["attribute"].value);
