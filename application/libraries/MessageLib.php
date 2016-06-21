@@ -53,6 +53,40 @@ class MessageLib
         return $msg;
     }
 
+	/**
+     * getMessagesByUID() - will return all messages, including the latest status for specified user. It don´t returns Attachments.
+     *
+     * @param   string  $uid   REQUIRED
+     * @return  array
+     */
+    function getMessagesByUID($uid, $all = false)
+    {
+        if (empty($uid))
+        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+		
+		$msg = $this->ci->MessageModel->getMessagesByUID($uid, $all);		
+
+        // General Error Occurred
+        return $msg;
+    }
+
+	/**
+     * getMessagesByPerson() - will return all messages, including the latest status for specified user. It don´t returns Attachments.
+     *
+     * @param   bigint  $person_id   REQUIRED
+     * @return  array
+     */
+    function getMessagesByPerson($person_id, $all = false)
+    {
+        if (empty($person_id))
+        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+		
+		$msg = $this->ci->MessageModel->getMessagesByPerson($person_id, $all);		
+
+        // General Error Occurred
+        return $msg;
+    }
+
     // ------------------------------------------------------------------------
 
     /**
@@ -66,8 +100,7 @@ class MessageLib
         if (!is_numeric($msg_id))
         	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
 		
-        $msg = $this->getMessage($msg_id);
-        return $msg;
+        return $this->getMessage($msg_id);
     }
 
     // ------------------------------------------------------------------------

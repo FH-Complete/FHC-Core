@@ -40,6 +40,16 @@ class FHC_Model extends CI_Model
 	{
 		return $this->fhc_db_acl->setUID($uid);
 	}
+
+	/** ---------------------------------------------------------------
+	 * get UID
+	 *
+	 * @return  string or (bool)false
+	 */
+	public function getUID()
+	{
+		return $this->fhc_db_acl->getUID();
+	}
 	
 	/** ---------------------------------------------------------------
 	 * Success

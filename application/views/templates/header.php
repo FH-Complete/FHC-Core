@@ -59,4 +59,3 @@ if ($tablesort)
 <?php endif ?>
 </head>
 
-<body>
