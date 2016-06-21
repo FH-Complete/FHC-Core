@@ -54,4 +54,3 @@ class Migration_Add_apikey extends CI_Migration {
                 $this->dbforge->drop_table('ci_apikey');
         }
 }
-
