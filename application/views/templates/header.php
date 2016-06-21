@@ -57,5 +57,6 @@ if ($tablesort)
 	<link rel="stylesheet" href="<?php echo base_url('vendor/json-forms/dist/css/brutusin-json-forms.min.css'); ?>"/>
 	<script src="<?php echo base_url('vendor/json-forms/dist/js/brutusin-json-forms.min.js'); ?>"></script>
 <?php endif ?>
+
 </head>
 

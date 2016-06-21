@@ -23,9 +23,13 @@ class Dms extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PersonModel
-		$this->load->model('content/dms_model', 'DmsModel');
-		// Load set the uid of the model to let to check the permissions
+		$this->load->model('content/Dms_model', 'DmsModel');
+		$this->load->model('content/DmsVersion_model', 'DmsVersionModel');
+		$this->load->model('content/DmsFS_model', 'DmsFSModel');
+		// Set the uid of the model to let to check the permissions
 		$this->DmsModel->setUID($this->_getUID());
+		$this->DmsVersionModel->setUID($this->_getUID());
+		$this->DmsFSModel->setUID($this->_getUID());
 	}
 	
 	/**
@@ -41,9 +45,52 @@ class Dms extends APIv1_Controller
 			$result = $this->_getDms($dms_id, $version);
 			if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
 			{
-				if (($fileContent = $this->_readFile($result->retval[0]->filename)) != false)
+				$resultFS = $this->DmsFSModel->read($result->retval[0]->filename);
+				if (is_object($resultFS) && $resultFS->error == EXIT_SUCCESS)
 				{
-					$result->retval[0]->file_content = $fileContent;
+					$result->retval[0]->file_content = $resultFS->retval;
+				}
+			}
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public function postDms()
+	{
+		$dms = $this->_parseData($this->post());
+		
+		if ($this->_validate($dms))
+		{
+			$result = null;
+			
+			if (isset($dms['dms_id']))
+			{
+				if ($this->_saveFileOnUpdate($dms))
+				{
+					$result = $this->DmsModel->update($dms['dms_id'], $this->DmsModel->filterFields($dms));
+					if ($result->error == EXIT_SUCCESS)
+					{
+						$result = $this->DmsVersionModel->update(array($dms['dms_id'], $dms['version']), $this->DmsVersionModel->filterFields($dms));
+					}
+				}
+			}
+			else
+			{
+				if (($filename = $this->_saveFileOnInsert($dms)) !== false)
+				{
+					$result = $this->DmsModel->insert($this->DmsModel->filterFields($dms));
+					if ($result->error == EXIT_SUCCESS)
+					{
+						$result = $this->DmsVersionModel->insert($this->DmsVersionModel->filterFields($dms, $result->retval, $filename));
+					}
 				}
 			}
 			
@@ -92,120 +139,16 @@ class Dms extends APIv1_Controller
 	/**
 	 * 
 	 */
-	public function postDms()
-	{
-            $dms = $this->_parseData($this->post());
-		if ($this->_validate($dms))
-		{
-			if (isset($dms['dms_id']))
-			{
-				if ($this->_saveFileOnUpdate($dms))
-				{
-					$result = $this->DmsModel->update($dms['dms_id'], $this->_dmsFieldsArray($dms));
-					if ($result->error == EXIT_SUCCESS)
-					{
-						$result = $this->DmsModel->updateDmsVersion($dms['dms_id'], $this->_dmsVersionFieldsArray($dms));
-					}
-				}
-			}
-			else
-			{
-				if (($fileName = $this->_saveFileOnInsert($dms)) !== false)
-				{
-					$result = $this->DmsModel->insert($this->_dmsFieldsArray($dms));
-					if ($result->error == EXIT_SUCCESS)
-					{
-						$result = $this->DmsModel->insertDmsVersion($this->_dmsVersionFieldsArray($dms, $result->retval, $fileName));
-					}
-				}
-			}
-			
-			$this->response($result, REST_Controller::HTTP_OK);
-		}
-		else
-		{
-			$this->response();
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	private function _dmsFieldsArray($dms)
-	{
-		$fieldsArray = array('oe_kurzbz', 'dokument_kurzbz', 'kategorie_kurzbz');
-		$returnArray = array();
-		
-		foreach ($fieldsArray as $value)
-		{
-			if (isset($dms[$value]))
-			{
-				$returnArray[$value] = $dms[$value];
-			}
-		}
-		
-		return $returnArray;
-	}
-	
-	/**
-	 * 
-	 */
-	private function _dmsVersionFieldsArray($dms, $dms_id = null, $fileName = null)
-	{
-		$fieldsArray = array(
-			'version',
-			'mimetype',
-			'name',
-			'beschreibung',
-			'letzterzugriff',
-			'insertamum',
-			'insertvon',
-			'updateamum',
-			'updatevon'
-		);
-		$returnArray = array();
-		
-		foreach ($fieldsArray as $value)
-		{
-			if (isset($dms[$value]))
-			{
-				$returnArray[$value] = $dms[$value];
-			}
-		}
-		
-		if (isset($dms_id))
-		{
-			$returnArray['dms_id'] = $dms_id;
-		}
-		if (isset($fileName))
-		{
-			$returnArray['filename'] = $fileName;
-		}
-		
-		return $returnArray;
-	}
-	
-	/**
-	 * 
-	 */
 	private function _saveFileOnUpdate($dms)
 	{
 		if(isset($dms['version']))
 		{
 			$result = $this->_getDms($dms['dms_id'], $dms['version']);
-		}
-		else
-		{
-			$result = $this->_getDms($dms['dms_id']);
-		}
 		
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
-		{
-			$fileName = DMS_PATH . $result->retval[0]->filename;
-
-			if (($fileContent = base64_decode($dms['file_content'])))
+			if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
 			{
-				if (file_put_contents($fileName, $fileContent))
+				$result = $this->DmsFSModel->write($result->retval[0]->filename, $dms['file_content']);
+				if (is_object($result) && $result->error == EXIT_SUCCESS)
 				{
 					return true;
 				}
@@ -220,47 +163,17 @@ class Dms extends APIv1_Controller
 	 */
 	private function _saveFileOnInsert($dms)
 	{
-		$fileName = uniqid() . '.' . pathinfo($dms['name'], PATHINFO_EXTENSION);
-		$FileNamePath = DMS_PATH . $fileName;
+		$filename = uniqid() . '.' . pathinfo($dms['name'], PATHINFO_EXTENSION);
 
-		if (($fileContent = base64_decode($dms['file_content'])))
+		$result = $this->DmsFSModel->write($filename, $dms['file_content']);
+		if (is_object($result) && $result->error == EXIT_SUCCESS)
 		{
-			if ($fileHandle = fopen($FileNamePath, 'w'))
-			{
-				if(fwrite($fileHandle, $fileContent))
-				{
-					fclose($fileHandle);
-					return $fileName;
-				}
-			}
+			return $filename;
 		}
 		
 		return false;
 	}
 	
-	/**
-	 * 
-	 */
-	private function _readFile($fileName)
-	{
-		$fileNamePath = DMS_PATH . $fileName;
-		if (file_exists($fileNamePath))
-		{
-			if ($fileHandle = fopen($fileNamePath, 'r'))
-			{
-				$cTmpHEX = '';
-				while (!feof($fileHandle))
-				{
-					$cTmpHEX .= fread($fileHandle, 8192);
-				}
-				fclose($fileHandle);
-				return base64_encode($cTmpHEX);
-			}
-		}
-
-		return false;
-	}
-
 	private function _validate($dms = NULL)
 	{
 		if (!isset($dms['file_content']) || (isset($dms['file_content']) && $dms['file_content'] == ''))
