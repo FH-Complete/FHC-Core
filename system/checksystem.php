@@ -97,6 +97,8 @@ $berechtigungen = array(
 	array('basis/testtool','Administrationseite, Gebiete löschen/zurücksetzen'),
 	array('basis/variable','Variablenverwaltung'),
 	array('basis/vilesci','Grundrecht, um in VileSci irgendwelche Menüpunkte zu sehen'),
+	array('basis/vorlage','Erstellen und Bearbeiten von Vorlagen'),
+	array('basis/vorlagestudiengang','Bearbeiten der Texte zu den Vorlagen'),
 	array('buchung/typen','Verwaltung von Buchungstypen'),
 	array('buchung/mitarbeiter','Verwaltung von Buchungen fuer Mitarbeiter'),
 	array('inout/incoming','Incomingverwaltung'),

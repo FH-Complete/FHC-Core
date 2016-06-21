@@ -8,17 +8,37 @@ class Migration_Vorlage extends CI_Migration {
     {
 		if (! @$this->db->simple_query('SELECT attribute FROM public.tbl_vorlage'))
 		{
+			$this->db->insert('system.tbl_berechtigung', array(
+					'berechtigung_kurzbz' => 'basis/vorlage',
+					'beschreibung' => 'Vorlagen fuer Dokumente (DOC, PDF, eMail, ...'));
+			$this->db->insert('system.tbl_rolleberechtigung', array(
+					'berechtigung_kurzbz' => 'basis/vorlage',
+					'rolle_kurzbz' => 'admin',
+					'art' => 'suid'));
 			$query= "ALTER TABLE public.tbl_vorlage 
 				ADD COLUMN attribute json;
                 ";
   			if ($this->db->simple_query($query))
+			{
 				echo 'Column public.tbl_vorlage.attribute added!';
+				// Insert Demo Data
+				$query= "INSERT INTO public.tbl_vorlage VALUES ('MailRegistration', 'eMail zur Registrierung', NULL, 'text/html', '{  \"\$schema\": \"http://json-schema.org/draft-03/schema#\",  \"title\": \"Person\",  \"type\": \"object\",  \"properties\": {    \"anrede\": {      \"type\": \"string\",      \"enum\": [        \"Herr\",        \"Frau\"      ],      \"default\": \"Herr\"    },    \"vorname\": {      \"type\": \"string\",      \"description\": \"Firstname\",      \"minLength\": 2,      \"default\": \"Vorname\"    },    \"nachname\": {      \"type\": \"string\",      \"description\": \"Surename\",      \"minLength\": 2,      \"default\": \"Nachname\"    },    \"code\": {      \"type\": \"string\",      \"description\": \"Accesscode\",      \"minLength\": 6,      \"default\": \"1q2w3e4r5t6z7u8i9o0\"    },    \"link\": {      \"type\": \"string\",      \"description\": \"LoginURL\",      \"minLength\": 6,      \"default\": \"https://cis.fhcomplete.org/addon/aufnahme/cis/login/\"    }  }}');
+		            ";
+	  			$this->db->simple_query($query);
+			}
 			else
 				echo "Error adding public.tbl_vorlage.attribute!";
 		}
 		
 		if (! @$this->db->simple_query('SELECT subject FROM public.tbl_vorlagestudiengang'))
 		{
+			$this->db->insert('system.tbl_berechtigung', array(
+					'berechtigung_kurzbz' => 'basis/vorlagestudiengang',
+					'beschreibung' => 'Vorlagen fuer Dokumente (DOC, PDF, eMail, ...'));
+			$this->db->insert('system.tbl_rolleberechtigung', array(
+					'berechtigung_kurzbz' => 'basis/vorlagestudiengang',
+					'rolle_kurzbz' => 'admin',
+					'art' => 'suid'));
 			$query= "ALTER TABLE public.tbl_vorlagestudiengang
 				ADD COLUMN subject text;
                 ";
@@ -34,7 +54,17 @@ class Migration_Vorlage extends CI_Migration {
 				ADD COLUMN orgform_kurzbz varchar(3) references bis.tbl_orgform(orgform_kurzbz);
                 ";
   			if ($this->db->simple_query($query))
+			{
 				echo 'Column public.tbl_vorlagestudiengang.orgform_kurzbz added!';
+				// Insert Demo Data
+				$query= "INSERT INTO public.tbl_vorlagestudiengang VALUES ('MailRegistration', 0, 1, '<p>Sehr geehrte/r {anrede} <strong>{vorname} {nachname}</strong>,</p>
+<p>vielen Dank für Ihre Registrierung an unserer Hochschule. Im Anhang senden wir ihnen den Zugangscode.</p>
+<p>Code: <code>{code}</code></p>
+<p>Unter folgenden Link können sie sich direkt für unser Service einloggen: <a title=\"LoginLink\" href=\"{link}{code}\">{link}{code}</a></p>
+<p>Mit freundlichen Grüßen,<br>FH Technikum Wien</p>', 'etw');
+		            ";
+	  			$this->db->simple_query($query);
+			}
 			else
 				echo "Error adding public.tbl_vorlagestudiengang.orgform_kurzbz!";
 		}
@@ -44,6 +74,12 @@ class Migration_Vorlage extends CI_Migration {
     {
 		try
 		{
+			$this->db->delete('system.tbl_rolleberechtigung', array('berechtigung_kurzbz' => 'basis/vorlage'));
+			$this->db->delete('system.tbl_berechtigung', array('berechtigung_kurzbz' => 'basis/vorlage'));
+			$this->db->delete('system.tbl_rolleberechtigung', array('berechtigung_kurzbz' => 'basis/vorlagestudiengang'));
+			$this->db->delete('system.tbl_berechtigung', array('berechtigung_kurzbz' => 'basis/vorlagestudiengang'));
+			$this->db->delete('public.tbl_vorlagestudiengang', array('vorlage_kurzbz' => 'MailRegistration'));
+			$this->db->delete('public.tbl_vorlage', array('vorlage_kurzbz' => 'MailRegistration'));
 			$this->dbforge->drop_column('public.tbl_vorlage', 'attribute');
 			$this->dbforge->drop_column('public.tbl_vorlagestudiengang', 'subject');
 			$this->dbforge->drop_column('public.tbl_vorlagestudiengang', 'orgform_kurzbz');
