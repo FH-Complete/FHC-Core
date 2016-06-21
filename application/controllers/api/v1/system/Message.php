@@ -58,8 +58,8 @@ class Message extends APIv1_Controller
 				$this->post()['person_id'],
 				$this->post()['subject'],
 				$this->post()['body'],
-				$this->post()['priority'],
-				$this->post()['relationmessage_id'],
+				PRIORITY_NORMAL,
+				NULL,
 				$this->post()['oe_kurzbz']
 			);
 			
@@ -73,7 +73,8 @@ class Message extends APIv1_Controller
 	
 	private function _validate($message = null)
 	{
-		if (!isset($message['person_id']) || !isset($message['subject']) || !isset($message['body']))
+		if (!isset($message['person_id']) || !isset($message['subject']) ||
+			!isset($message['body']) || !isset($message['oe_kurzbz']))
 		{
 			return false;
 		}
