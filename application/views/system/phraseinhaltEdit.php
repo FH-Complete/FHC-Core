@@ -14,7 +14,7 @@
 		<td><?php echo $this->templatelib->widget("organisationseinheit_widget", array('oe_kurzbz' => $orgeinheit_kurzbz)); ?></td>
 		<td>Preview</td>
 	</tr>
-	<tr><td>Sprache</td><td><input type="text" name="sprache" value="<?php echo $sprache?>"></td><td></td></tr>
+	<tr><td>Sprache</td><td><?php echo $this->templatelib->widget("sprache_widget", array('sprache' => $sprache)); ?></td><td></td></tr>
 	<tr><td>Text</td><td><textarea name="text" style="width:500px; height:300px;" id="markitup"><?php echo $text ?></textarea></td>
 		<td valign="top">
 			<div id="textile-preview" style="width:500px; height:300px; border: 1px solid gray; overflow: auto;"></div>
