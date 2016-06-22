@@ -49,6 +49,26 @@ class Message extends APIv1_Controller
 	/**
 	 * @return void
 	 */
+	public function getMessagesByUID()
+	{
+		$uid = $this->get('uid');
+		$all = $this->get('all');
+		
+		if (isset($uid))
+		{
+			$result = $this->messagelib->getMessagesByUID($uid, $all);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	/**
+	 * @return void
+	 */
 	public function postMessage()
 	{
 		$validation = $this->_validate($this->post());
