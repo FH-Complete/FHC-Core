@@ -11,12 +11,11 @@ class MessageLib
 {
 	private $recipients = array();
 	
-    public function __construct($params)
+    public function __construct($params = null)
     {
         $this->ci =& get_instance();
 		$this->ci->config->load('message');
 
-		//$this->ci->load->model('person/Person_model', 'PersonModel');
 		$this->ci->load->model('system/Message_model', 'MessageModel');
 		if (is_array($params) && isset($params['uid']))
 		{

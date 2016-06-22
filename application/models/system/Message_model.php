@@ -10,8 +10,7 @@ class Message_model extends DB_Model
 	public function __construct()
 	{
 		parent::__construct();
-		require_once APPPATH.'config/message.php';
-		//$this->lang->load('message');
+		//require_once APPPATH.'config/message.php';
 		$this->dbTable = 'public.tbl_msg_message';
 		$this->pk = 'message_id';
 	}
