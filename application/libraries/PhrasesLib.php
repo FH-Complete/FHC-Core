@@ -9,16 +9,27 @@
 
 class PhrasesLib
 {
-
-    public function __construct()
+	/*
+	 * 
+	 */
+    public function __construct($params = null)
     {
         //require_once APPPATH.'config/message.php';
 
 		$this->ci =& get_instance();
 		$this->ci->load->library('parser');
+		
 		$this->ci->load->model('system/Phrase_model', 'PhraseModel');
 		$this->ci->load->model('system/Phrase_inhalt_model', 'PhraseInhaltModel');
+		
+		if (is_array($params) && isset($params['uid']))
+		{
+			$this->ci->PhraseModel->setUID($params['uid']);
+			$this->ci->PhraseInhaltModel->setUID($params['uid']);
+		}
+		
         $this->ci->load->helper('language');
+		$this->ci->load->helper('Message');
         //$this->ci->lang->load('fhcomplete');
     }
 
@@ -88,6 +99,25 @@ class PhrasesLib
         $phrase_inhalt = $this->ci->PhraseInhaltModel->loadWhere(array('phrase_inhalt_id' =>$phrase_inhalt_id));
         return $phrase_inhalt;
     }
+	
+	/**
+     * getPhrases() - 
+     *
+     * @return  struct
+     */
+    function getPhrases($app, $sprache, $phrase = null, $orgeinheit_kurzbz = null, $orgform_kurzbz = null)
+    {
+		if (isset($app) && isset($sprache))
+		{
+			$result = $this->ci->PhraseModel->getPhrases($app, $sprache, $phrase, $orgeinheit_kurzbz, $orgform_kurzbz);
+		}
+		else
+		{
+			$result = $this->_error('app and sprache parameters are required');
+		}
+		
+		return $result;
+    }
 
 	/**
      * loadVorlagetext() - will load the best fitting Template.
@@ -156,4 +186,20 @@ class PhrasesLib
 		$text = $this->ci->parser->parse_string($text, $data, TRUE);
 		return $text;
     }
+	
+	/*
+	 * 
+	 */
+	protected function _error($retval = '', $message = EXIT_ERROR)
+	{
+		return error($retval, $message);
+	}
+	
+	/*
+	 * 
+	 */
+	protected function _success($retval, $message = EXIT_SUCCESS)
+	{
+		return success($retval, $message);
+	}
 }
