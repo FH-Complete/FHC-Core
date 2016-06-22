@@ -128,6 +128,7 @@ $this->phrasen['global/stellvertreter']='supplenza ';
 $this->phrasen['global/strasse']='via';
 $this->phrasen['global/studentenvertreter']='rappresentanti degli studendi';
 $this->phrasen['global/studiengang']='Corso di studi';
+$this->phrasen['global/studiengaenge']='Corso di studio';
 $this->phrasen['global/studiengangKonnteNichtGefundenWerden ']='impossibile trovare corso di studi digitato';
 $this->phrasen['global/studiengangsleitung']='Direzione del corso di studi';
 $this->phrasen['global/studiengangsmanagement']='Management del corso di studi';

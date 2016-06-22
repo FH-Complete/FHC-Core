@@ -811,13 +811,11 @@ class prestudent extends person
 				return false;
 			}
 
-			$qry = 'INSERT INTO public.tbl_prestudentstatus (prestudent_id, uid, perskz, status_kurzbz,
+			$qry = 'INSERT INTO public.tbl_prestudentstatus (prestudent_id, status_kurzbz,
 					studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon,
 					updateamum, updatevon, ext_id, orgform_kurzbz, bestaetigtam, bestaetigtvon, anmerkung,
 					bewerbung_abgeschicktamum, studienplan_id) VALUES('.
 			       $this->db_add_param($this->prestudent_id, FHC_INTEGER).",".
-			       $this->db_add_param($this->uid).",".
-			       $this->db_add_param($this->perskz).",".
 			       $this->db_add_param($this->status_kurzbz).",".
 			       $this->db_add_param($this->studiensemester_kurzbz).",".
 			       $this->db_add_param($this->ausbildungssemester).",".
@@ -1122,6 +1120,81 @@ class prestudent extends person
 		}
 
 		$qry = "SELECT * FROM public.tbl_prestudent WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)." ORDER BY prestudent_id";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new prestudent();
+
+				$obj->prestudent_id = $row->prestudent_id;
+				$obj->uid = $row->uid;
+				$obj->perskz = $row->perskz;
+				$obj->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->berufstaetigkeit_code = $row->berufstaetigkeit_code;
+				$obj->ausbildungcode = $row->ausbildungcode;
+				$obj->zgv_code = $row->zgv_code;
+				$obj->zgvort = $row->zgvort;
+				$obj->zgvdatum = $row->zgvdatum;
+				$obj->zgvnation = $row->zgvnation;
+				$obj->zgvmas_code = $row->zgvmas_code;
+				$obj->zgvmaort = $row->zgvmaort;
+				$obj->zgvmadatum = $row->zgvmadatum;
+				$obj->zgvmanation = $row->zgvmanation;
+				$obj->aufnahmeschluessel = $row->aufnahmeschluessel;
+				$obj->facheinschlberuf = $this->db_parse_bool($row->facheinschlberuf);
+				$obj->anmeldungreihungstest = $row->anmeldungreihungstest;
+				$obj->reihungstestangetreten = $this->db_parse_bool($row->reihungstestangetreten);
+				$obj->reihungstest_id = $row->reihungstest_id;
+				$obj->punkte = $row->rt_gesamtpunkte;
+				$obj->rt_punkte1 = $row->rt_punkte1;
+				$obj->rt_punkte2 = $row->rt_punkte2;
+				$obj->rt_punkte3 = $row->rt_punkte3;
+				$obj->bismelden = $this->db_parse_bool($row->bismelden);
+				$obj->person_id = $row->person_id;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->mentor = $row->mentor;
+				$obj->ext_id_prestudent = $row->ext_id;
+				$obj->dual = $this->db_parse_bool($row->dual);
+				$obj->ausstellungsstaat = $row->ausstellungsstaat;
+				$obj->zgvdoktor_code = $row->zgvdoktor_code;
+				$obj->zgvdoktorort = $row->zgvdoktorort;
+				$obj->zgvdoktordatum = $row->zgvdoktordatum;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = "Fehler beim Laden";
+			return false;
+		}
+	}
+
+
+	/**
+	 * Laedt alle Prestudenten der Person
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getPrestudentenFromStg($person_id, $studiengang_kz)
+	{
+		if(!is_numeric($person_id) || $person_id=='')
+		{
+			$this->errormsg='ID ist ungueltig';
+			return false;
+		}
+		if(!is_numeric($studiengang_kz) || $studiengang_kz=='')
+		{
+			$this->errormsg='studiengang_kz ist ungueltig';
+			return false;
+		}
+
+		$qry = "SELECT * FROM public.tbl_prestudent
+			WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
+			AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)."
+			ORDER BY prestudent_id DESC";
 
 		if($this->db_query($qry))
 		{
@@ -1904,6 +1977,99 @@ class prestudent extends person
 		}
 	}
 
+	/**
+	 * Rueckgabewert ist die Anzahl der Ergebnisse. Bei Fehler negativ und die
+	 * Fehlermeldung liegt in errormsg.
+	 * Wenn der Parameter stg_kz NULL ist tritt gruppe in Kraft.
+	 * @param string $einheit_kurzbz    Einheit
+	 * @param string grp    Gruppe
+	 * @param string ver    Verband
+	 * @param integer sem    Semester
+	 * @param integer stg_kz    Kennzahl des Studiengangs
+	 * @return integer Anzahl der gefundenen Einträge; <b>negativ</b> bei Fehler
+	 */
+	public function getPrestudents($stg_kz,$sem=null,$ver=null,$grp=null,$gruppe=null, $stsem=null)
+	{
+		$where = '';
+		if ($gruppe!=null)
+		{
+			$where=" gruppe_kurzbz=".$this->db_add_param($gruppe)." AND tbl_benutzer.uid=tbl_benutzergruppe.uid";
+			if($stsem!=null)
+				$where.=" AND tbl_benutzergruppe.studiensemester_kurzbz=".$this->db_add_param($stsem);
+		}
+		else
+		{
+			$where.=" tbl_studentlehrverband.studiengang_kz=".$this->db_add_param($stg_kz);
+			if ($sem!=null)
+				$where.=" AND tbl_studentlehrverband.semester=".$this->db_add_param($sem);
+			if ($ver!=null)
+				$where.=" AND tbl_studentlehrverband.verband=".$this->db_add_param($ver);
+			if ($grp!=null)
+				$where.=" AND tbl_studentlehrverband.gruppe=".$this->db_add_param($grp);
+		}
+
+		if($stsem!=null)
+				$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz=".$this->db_add_param($stsem);
+
+		$sql_query = "SELECT *
+					  FROM public.tbl_person, public.tbl_prestudent, public.tbl_benutzer, public.tbl_studentlehrverband";
+		if($gruppe!=null)
+			$sql_query.= ",public.tbl_benutzergruppe";
+		$sql_query.= " WHERE tbl_person.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid = tbl_prestudent.uid AND tbl_studentlehrverband.prestudent_id=tbl_prestudent.prestudent_id AND $where ORDER BY nachname, vorname";
+	    //echo $sql_query;
+		if(!$this->db_query($sql_query))
+		{
+			$this->errormsg=$this->db_last_error();
+			return false;
+		}
+		$result=array();
+
+		while($row = $this->db_fetch_object())
+		{
+			$l=new prestudent();
+
+			// Personendaten
+			$l->uid=$row->uid;
+			$l->person_id=$row->person_id;
+			$l->prestudent_id=$row->prestudent_id;
+			$l->titelpre=$row->titelpre;
+			$l->titelpost=$row->titelpost;
+			$l->vornamen=$row->vornamen;
+			$l->vorname=$row->vorname;
+			$l->nachname=$row->nachname;
+			$l->gebdatum=$row->gebdatum;
+			$l->gebort=$row->gebort;
+			$l->gebzeit=$row->gebzeit;
+			$l->familienstand = $row->familienstand;
+			$l->svnr=$row->svnr;
+			$l->foto=$row->foto;
+			$l->anmerkungen=$row->anmerkung;
+			$l->aktiv=$this->db_parse_bool($row->aktiv);
+			$l->alias=$row->alias;
+			$l->homepage=$row->homepage;
+			$l->updateamum=(isset($row->updateamum)?$row->updateamum:'');
+			$l->updatevon=(isset($row->updatevon)?$row->updatevon:'');
+
+			// Studentendaten
+			$l->matrikelnr=$row->matrikelnr;
+			$l->gruppe=$row->lvb_gruppe;
+			$l->verband=$row->lvb_verband;
+			$l->semester=$row->lvb_semester;
+			$l->studiengang_kz=$row->lvb_studiengang_kz;
+			$l->staatsbuergerschaft = $row->staatsbuergerschaft;
+
+			$l->zgv_code = $row->zgv_code;
+			$l->zgvort = $row->zgvort;
+			$l->zgvdatum = $row->zgvdatum;
+			$l->zgvmas_code = $row->zgvmas_code;
+			$l->zgvmaort = $row->zgvmaort;
+			$l->zgvmadatum = $row->zgvmadatum;
+
+			$result[]=$l;
+
+		}
+		return $result;
+	}
 
 
 	/**
@@ -1962,7 +2128,6 @@ class prestudent extends person
 				return false;
 			}
 		}
-
 		$this->errormsg = "Fehler bei der Datenabfrage";
 		return false;
 	}
@@ -1970,20 +2135,26 @@ class prestudent extends person
 
 
 
+
 	/**
-	 * Laedt die Prestudent_id anhand des Personenkennzeichens
-	 * @param Personenkennzeichen
-	 * @return prestudent_id wenn ok, false wenn Fehler
+	 * Laedt Prestudent mit dem uebergebenen Personenkennzeichen
+	 * @param $perskz Personenkennzeichen des Prestudenten, der geladen werden soll
 	 */
-	function getPreIdFromPerskz($perskz)
+	public function loadFromPerskz($perskz)
 	{
+		if(!is_numeric($perskz))
+		{
+			$this->errormsg = 'perskz ist ungueltig';
+			return false;
+		}
+
 		$qry = "SELECT prestudent_id FROM public.tbl_prestudent WHERE perskz=".$this->db_add_param($perskz);
 
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
-				return $row->prestudent_id;
+				return $this->load($row->prestudent_id);
 			}
 			else
 			{
@@ -1996,5 +2167,83 @@ class prestudent extends person
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
+	}
+
+	/**
+	 * Liefert die Tabellenelemente die den Kriterien der Parameter entsprechen
+	 * Ueberschreibt die Methode aus der Klasse Person
+	 * @param $filter String mit Vorname oder Nachname
+	 * @param $order Sortierkriterium
+	 * @return array mit Personen oder false wenn ein Fehler auftritt
+	 */
+	public function getTab($filter, $order='person_id')
+	{
+		$sql_query = "SELECT
+							tbl_prestudent.person_id, staatsbuergerschaft, geburtsnation, sprache, anrede, titelpost, titelpre,
+							nachname, vorname, vornamen, gebdatum, gebort, gebzeit, tbl_prestudent.anmerkung, homepage, svnr,
+							ersatzkennzeichen, familienstand, geschlecht, anzahlkinder, tbl_person.aktiv, kurzbeschreibung,
+							tbl_benutzer.aktiv as bnaktiv, tbl_prestudent.studiengang_kz, tbl_studentlehrverband.semester, tbl_studentlehrverband.verband,
+							tbl_studentlehrverband.gruppe, tbl_prestudent.prestudent_id
+						FROM
+							public.tbl_person
+						JOIN public.tbl_benutzer ON(tbl_person.person_id=tbl_benutzer.person_id)
+						JOIN public.tbl_prestudent ON(tbl_benutzer.uid=tbl_prestudent.uid)
+						JOIN public.tbl_studentlehrverband ON(tbl_studentlehrverband.prestudent_id = tbl_prestudent.prestudent_id)
+					WHERE true ";
+
+		if($filter!='')
+		{
+			$sql_query.=" AND 	nachname ~* ".$this->db_add_param($filter)." OR
+								vorname ~* ".$this->db_add_param($filter)." OR
+								(nachname || ' ' || vorname) ~* ".$this->db_add_param($filter)." OR
+								(vorname || ' ' || nachname) ~* ".$this->db_add_param($filter);
+		}
+
+		$sql_query .= " ORDER BY $order";
+		if($filter=='')
+		   $sql_query .= " LIMIT 30";
+
+		if($this->db_query($sql_query))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$l = new prestudent();
+				$l->person_id = $row->person_id;
+				$l->staatsbuergerschaft = $row->staatsbuergerschaft;
+				$l->geburtsnation = $row->geburtsnation;
+				$l->sprache = $row->sprache;
+				$l->anrede = $row->anrede;
+				$l->titelpost = $row->titelpost;
+				$l->titelpre = $row->titelpre;
+				$l->nachname = $row->nachname;
+				$l->vorname = $row->vorname;
+				$l->vornamen = $row->vornamen;
+				$l->gebdatum = $row->gebdatum;
+				$l->gebort = $row->gebort;
+				$l->gebzeit = $row->gebzeit;
+				$l->anmerkungen = $row->anmerkung;
+				$l->homepage = $row->homepage;
+				$l->svnr = $row->svnr;
+				$l->ersatzkennzeichen = $row->ersatzkennzeichen;
+				$l->familienstand = $row->familienstand;
+				$l->geschlecht = $row->geschlecht;
+				$l->anzahlkinder = $row->anzahlkinder;
+				$l->aktiv = $this->db_parse_bool($row->aktiv);
+				$l->kurzbeschreibung = $row->kurzbeschreibung;
+				$l->bnaktiv = $this->db_parse_bool($row->bnaktiv);
+				$l->studiengang_kz = $row->studiengang_kz;
+				$l->semester = $row->semester;
+				$l->verband = $row->verband;
+				$l->gruppe = $row->gruppe;
+				$l->prestudent_id = $row->prestudent_id;
+				$this->result[]=$l;
+			}
+		}
+		else
+		{
+			$this->errormsg = $this->db_last_error();
+			return false;
+		}
+		return true;
 	}
 }

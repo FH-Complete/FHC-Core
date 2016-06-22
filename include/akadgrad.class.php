@@ -121,15 +121,14 @@ class akadgrad extends basis_db
 	 * Liefert den Akademischen Grad eines Studenten aus der Tabelle Akadgrad
 	 * @param student_uid
 	 */
-	public function getAkadgradStudent($student_uid)
+	public function getAkadgradStudent($prestudent_id)
 	{
 		//laden des Datensatzes
 		$qry = "SELECT * FROM lehre.tbl_akadgrad WHERE 
-				studiengang_kz = (	SELECT studiengang_kz FROM public.tbl_prestudent WHERE uid=".$this->db_add_param($student_uid).") AND
+				studiengang_kz = (	SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER).") AND
 				(	geschlecht = (	SELECT geschlecht FROM public.tbl_prestudent
-								JOIN public.tbl_benutzer ON (tbl_prestudent.uid=tbl_benutzer.uid)
-								JOIN public.tbl_person USING (person_id) 
-								WHERE student_uid=".$this->db_add_param($student_uid).") 
+								JOIN public.tbl_person ON (tbl_person.person_id = tbl_prestudent.person_id)
+								WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER).")
 					OR geschlecht IS NULL)
 				LIMIT 1";
 		

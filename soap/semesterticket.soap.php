@@ -15,11 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Karl Burkhart <burkhart@technikum-wien.at>.
+ * Authors: Karl Burkhart <burkhart@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
- 
-require_once('../config/vilesci.config.inc.php'); 
-require_once('../include/student.class.php'); 
+
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/prestudent.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/adresse.class.php'); 
 require_once('../include/person.class.php'); 
@@ -64,21 +65,18 @@ function verifyData($parameters)
 	}
 	else
 	{
-		$student = new student(); 
-		$student_uid = $student->getUidFromMatrikelnummer($parameters->Matrikelnummer); 
-		
-		// überprüfe ob Benutzer aktiv ist
-		$benutzer = new benutzer(); 
-		$benutzer->load($student_uid); 
-		if(!$benutzer->bnaktiv)
+		$prestudent = new prestudent();
+		if(!$prestudent->loadFromPerskz($parameters->Matrikelnummer))
 		{
+			// es wurde kein student gefunden
 			$obj->result = 'false';
-			$obj->fehler ='1';
-			return $obj; 
-		}	
-		
+			$obj->fehler = '3';
+			return $obj;
+		}
+
+
 		// überprüfe vorname
-		if($benutzer->vorname != $parameters->Vorname)
+		if($prestudent->vorname != $parameters->Vorname)
 		{
 			// es wurde keine übereinstimmung gefunden
 			$obj->result = 'false';
@@ -86,7 +84,7 @@ function verifyData($parameters)
 			return $obj; 
 		}
 		
-		if($benutzer->nachname != $parameters->Name)
+		if($prestudent->nachname != $parameters->Name)
 		{
 			// es wurde keine übereinstimmung gefunden
 			$obj->result = 'false';
@@ -96,7 +94,7 @@ function verifyData($parameters)
 		
 		// Überprüfe PLZ
 		$adresse = new adresse(); 
-		$adresse->load_pers($benutzer->person_id); 
+		$adresse->load_pers($prestudent->person_id);
 		
 		$foundAdr = false; 
 		foreach($adresse->result as $adr)
@@ -113,47 +111,36 @@ function verifyData($parameters)
 		}
 		
 		// Überprüfe Geburtsdatum
-		$person = new person(); 
-		$person->load($benutzer->person_id); 
-		if($person->gebdatum != $parameters->Geburtsdatum)
+		if($prestudent->gebdatum != $parameters->Geburtsdatum)
 		{
-			$obj->result = 'false'; 
-			$obj->fehler = '4';
-			return $obj; 
-		}	
-	
-		// hole prestudentID
-		$student->load($student_uid); 
-		if($student->prestudent_id == '')
-		{
-			// es wurde kein student gefunden
 			$obj->result = 'false';
-			$obj->fehler = '3'; 
-			return $obj; 
-		}
-		
+			$obj->fehler = '4';
+			return $obj;
+		}	
+
+
 		// Übergabe von studiensemester -> z.b 11W, 12S auf WS2011, SS2012
-		$year = mb_substr($parameters->Semesterkuerzel, 0,2); 
-		$semester = mb_substr($parameters->Semesterkuerzel,2,1); 
+		$year = mb_substr($parameters->Semesterkuerzel, 0,2);
+		$semester = mb_substr($parameters->Semesterkuerzel,2,1);
 		if($semester == 'S')
 		{
-			$semester = 'SS'; 
+			$semester = 'SS';
 		}
 		else if($semester == 'W')
 		{
-			$semester= 'WS'; 
+			$semester= 'WS';
 		}
 		else
 		{
 			// ungültiges Semester
 			$obj->result = 'false';
 			$obj->fehler = '8'; 
-			return $obj; 
+			return $obj;
 		}
 		$studiensemester = $semester.'20'.$year; 
 		
 		// letzten Status holen
-		$qry = "Select public.get_rolle_prestudent ('".$student->prestudent_id."', '".$studiensemester."')"; 
+		$qry = "Select public.get_rolle_prestudent ('".$prestudent->prestudent_id."', '".$studiensemester."')";
 		
 		if($db->db_query($qry))
 		{

@@ -232,7 +232,7 @@ if (isset($_REQUEST["submit"]))
 
 					//PreID ermitteln
 					$prestudent = new prestudent();
-					if(!$prestudent_id = $prestudent->getPreIdFromPerskz($matrikelnummer))
+					if(!$prestudent->loadFromPerskz($matrikelnummer))
 					{
 						$response.="\n".$p->t('benotungstool/studentMitMatrikelnummerExistiertNicht',array($matrikelnummer));
 						continue;
@@ -240,12 +240,12 @@ if (isset($_REQUEST["submit"]))
 
 					// Hole Zeugnisnote wenn schon eine eingetragen ist
 					/*
-					if ($zeugnisnote = new zeugnisnote($lvid, $prestudent_id, $stsem))
+					if ($zeugnisnote = new zeugnisnote($lvid, $prestudent->prestudent_id, $stsem))
 						$znote = $zeugnisnote->note;
 					else
 						$znote = null;
 					*/
-					$val=savenote($db,$lvid, $prestudent_id, $note, $punkte);
+					$val=savenote($db,$lvid, $prestudent->prestudent_id, $note, $punkte);
 					if($val!='neu' && $val!='update' && $val!='update_f')
 						$response.=$val;
 				}

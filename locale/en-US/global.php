@@ -1,5 +1,6 @@
 <?php
 $this->phrasen['global/studiengang']='Degree-Program';
+$this->phrasen['global/studiengaenge']='Degree-Programs';
 $this->phrasen['global/studienrichtung']='Degree-Program';
 $this->phrasen['global/institut']='Institute';
 $this->phrasen['global/semester']='Semester';

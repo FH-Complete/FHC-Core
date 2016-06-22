@@ -295,7 +295,7 @@ if(isset($_REQUEST['submit_matrikelnummer']))
 	
 	try
 	{
-        $authentifizierung = new foo();
+        $authentifizierung = new stdClass();
         $authentifizierung->username=$_REQUEST['username'];
         $authentifizierung->passwort=$_REQUEST['passwort'];
 		$response = $client->getStudentFromMatrikelnummer($matrikelnummer = $_REQUEST['matrikelnummer'], $authentifizierung);
@@ -314,7 +314,7 @@ if(isset($_REQUEST['submit_uid']))
 	
 	try
 	{
-        $authentifizierung = new foo();
+        $authentifizierung = new stdClass();
         $authentifizierung->username=$_REQUEST['username'];
         $authentifizierung->passwort=$_REQUEST['passwort'];
 		$response = $client->getStudentFromUid($student_uid = $_REQUEST['student_uid'], $authentifizierung);
@@ -325,29 +325,26 @@ if(isset($_REQUEST['submit_uid']))
 	{
     	echo "SOAP Fault: (faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring})", E_USER_ERROR;
 	}
-
 }
 
 if(isset($_REQUEST['submit_studiengang']))
 {
-    $client = new SoapClient(APP_ROOT."soap/student.wsdl.php?".microtime(true)); 
-	
+	$client = new SoapClient(APP_ROOT."soap/student.wsdl.php?".microtime(true));
+
 	try
 	{
-        $authentifizierung = new foo();
-        $authentifizierung->username=$_REQUEST['username'];
-        $authentifizierung->passwort=$_REQUEST['passwort'];
+		$authentifizierung = new stdClass();
+		$authentifizierung->username=$_REQUEST['username'];
+		$authentifizierung->passwort=$_REQUEST['passwort'];
 		$response = $client->getStudentFromStudiengang($studiengang = $_REQUEST['studiengang'], $semester=$_REQUEST['semester'], $verband=$_REQUEST['verband'], $gruppe=$_REQUEST['gruppe'], $authentifizierung);
 		
 		var_dump($response);
 	}
 	catch(SoapFault $fault) 
 	{
-    	echo "SOAP Fault: (faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring})", E_USER_ERROR;
+		echo "SOAP Fault: (faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring})", E_USER_ERROR;
 	}
 }
-
-class foo{}
- ?>   
+?>
 </body>
 </html>

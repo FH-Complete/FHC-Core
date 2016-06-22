@@ -17,8 +17,9 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Simane-Sequens <	gerald.simane-sequens@technikum-wien.at>.
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *          Gerald Simane-Sequens <	gerald.simane-sequens@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../config/global.config.inc.php');
@@ -34,12 +35,14 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/betriebsmittel_betriebsmittelstatus.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
+require_once('../../../include/prestudent.class.php');
 require_once('../../../include/student.class.php');
 require_once('../../../include/kontakt.class.php');
 require_once('../../../include/fotostatus.class.php');
 require_once('../../../include/addon.class.php'); 
 require_once('../../../include/gruppe.class.php');
 require_once('../../../include/adresse.class.php');
+require_once('../../../include/studiensemester.class.php');
 
 $sprache = getSprache(); 
 $p=new phrasen($sprache);
@@ -107,7 +110,7 @@ if(check_lektor($uid))
 }
 else
 {
-	$user = new student();
+	$user = new benutzer();
 	$type='student';
 }
 
@@ -147,6 +150,11 @@ echo '<!DOCTYPE HTML>
 				widgets: ["zebra"]
 			}); 
 			$("#t2").tablesorter(
+			{
+				sortList: [[0,0]],
+				widgets: ["zebra"]
+			});
+			$("#t3").tablesorter(
 			{
 				sortList: [[0,0]],
 				widgets: ["zebra"]
@@ -282,24 +290,11 @@ if(!$ansicht)
     }
 }
 
-$studiengang = new studiengang();
-if ($type=='student' && (!defined('CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN') || CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN))
-{	
-	$studiengang->load($user->studiengang_kz);
-	
-	echo "
-	".$p->t('global/studiengang').": $studiengang->bezeichnung<br>
-	".$p->t('global/semester').": $user->semester <a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$user->studiengang_kz&sem=$user->semester\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$p->t('benotungstool/liste')."</a><br>
-	".$p->t('global/verband').": $user->verband ".($user->verband!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$user->studiengang_kz&sem=$user->semester&verband=$user->verband\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$p->t('benotungstool/liste')."</a>":"")."<br>
-	".$p->t('global/gruppe').": $user->gruppe ".($user->gruppe!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$user->studiengang_kz&sem=$user->semester&verband=$user->verband&grp=$user->gruppe\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$p->t('benotungstool/liste')."</a>":"")."<br>
-	".$p->t('profil/martrikelnummer').": $user->matrikelnr<br />";
-}
-		
 if ($type=='mitarbeiter')
 {
 	echo "<br>
 	".$p->t('profil/kurzzeichen').": $user->kurzbz<BR>";
-				
+
 	if($user->telefonklappe!='')
 	{
 		echo $p->t('profil/telefonTw').": $vorwahl - $user->telefonklappe<BR>";
@@ -307,7 +302,7 @@ if ($type=='mitarbeiter')
 	}
 	if ($user->ort_kurzbz!='')
 		echo $p->t('profil/buero').': '.$user->ort_kurzbz.'<br>';
-}  
+}
 echo '</td>';
 echo '<td valign="top">';
 if(!$ansicht && (!defined('CIS_PROFIL_FHAUSWEIS_ANZEIGEN') || CIS_PROFIL_FHAUSWEIS_ANZEIGEN))
@@ -408,18 +403,32 @@ $mail = MAIL_ADMIN;
 		{
 			$user->studiengang_kz = 0;
 		}
-		
-		//Wenn eine Assistentin fuer diesen Studiengang eingetragen ist,
-		//dann werden die aenderungswuesche an diese Adresse gesendet
-		if($studiengang->email!='')
-			$mail = $studiengang->email;
+
+		if($type=='student')
+		{
+			$ps = new prestudent();
+			$ps->getPrestudentsFromUid($user->uid);
+
+
+			if(count($ps->result) < 1)
+				$mail = MAIL_ADMIN;
+			else
+			{
+				//Wenn eine Assistentin fuer diesen Studiengang eingetragen ist,
+				//dann werden die aenderungswuesche an diese Adresse gesendet
+				$stg = new studiengang();
+				$stg->load($ps->result[count($ps->result)-1]->studiengang_kz);
+
+				if($stg->email=='')
+					$mail = MAIL_ADMIN;
+				else
+					$mail = $stg->email;
+			}
+		}
 		else
-			$mail = MAIL_ADMIN;
-		
-		if($user->studiengang_kz=='0')
 			$mail = MAIL_GST;
 			
-if(!$ansicht)
+		if(!$ansicht)
 		{
 			echo "
 			".$p->t('profil/solltenDatenNichtStimmen')." <a class='Item' href=\"mailto:$mail?subject=Datenkorrektur&body=Die%20Profildaten%20fuer%20User%20'$user->uid'%20sind%20nicht%20korrekt.%0D
@@ -428,24 +437,24 @@ if(!$ansicht)
 			%0A%0A***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***\">".$p->t('profil/zustaendigeAssistenz')."</a><br><br>";
 		}
 
-echo '<table width="100%">';	
+echo '<table width="100%">';
 
 echo '<tr>
 		<td valign="top">';
 
 if(!defined('CIS_PROFIL_FUNKTIONEN_ANZEIGEN') || CIS_PROFIL_FUNKTIONEN_ANZEIGEN)
-{	
+{
 
-	
+
 	//Funktionen
-	$qry = "SELECT 
+	$qry = "SELECT
 				*, tbl_benutzerfunktion.oe_kurzbz as oe_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung,
 				 tbl_benutzerfunktion.semester, tbl_benutzerfunktion.bezeichnung as bf_bezeichnung
-			FROM 
-				public.tbl_benutzerfunktion 
-				JOIN public.tbl_funktion USING(funktion_kurzbz) 
+			FROM
+				public.tbl_benutzerfunktion
+				JOIN public.tbl_funktion USING(funktion_kurzbz)
 				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
-			WHERE 
+			WHERE
 				uid=".$db->db_add_param($uid)." AND 
 				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
@@ -464,6 +473,46 @@ if(!defined('CIS_PROFIL_FUNKTIONEN_ANZEIGEN') || CIS_PROFIL_FUNKTIONEN_ANZEIGEN)
 		}
 	}
 }
+
+
+
+if ($type=='student' && (!defined('CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN') || CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN))
+{
+	$studiengang = new studiengang();
+	echo '<b>'.$p->t('global/studiengaenge').'</b>
+		<table class="tablesorter" id="t3">
+		<thead>
+			<tr>
+				<th>'.$p->t('global/studiengang').'</th>
+				<th>'.$p->t('profil/martrikelnummer').'</th>
+				<th>'.$p->t('global/semester').'</th>
+				<th>'.$p->t('global/verband').'</th>
+				<th>'.$p->t('global/gruppe').'</th>
+			</tr>
+		</thead><tbody>';
+
+	$prestudent = new prestudent();
+	$prestudent->getPrestudentsFromUid($user->uid);
+	foreach($prestudent->result as $ps)
+	{
+		$studiengang->load($ps->studiengang_kz);
+		$stsem = new studiensemester();
+		$student = new student();
+		$student->load_studentlehrverband($ps->prestudent_id, $stsem->getaktorNext());
+
+		echo "<tr>
+						<td>".$studiengang->bezeichnung."</td>
+						<td>".$ps->perskz."</td>
+						<td>".($student->semester!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$ps->studiengang_kz&sem=$student->semester\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$student->semester."</a>":"")."</td>
+						<td>".($student->verband!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$ps->studiengang_kz&sem=$student->semester&verband=$student->verband\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$student->verband."</a>":"")."</td>
+						<td>".($student->gruppe!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$ps->studiengang_kz&sem=$student->semester&verband=$ps->verband&grp=$student->gruppe\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$student->gruppe."</a>":"")."</td>
+					</tr>";
+
+	}
+	echo '</tbody></table>';
+}
+
+
 
 if(!$ansicht && (!defined('CIS_PROFIL_BETRIEBSMITTEL_ANZEIGEN') || CIS_PROFIL_BETRIEBSMITTEL_ANZEIGEN))
 {

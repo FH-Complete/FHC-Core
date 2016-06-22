@@ -16,11 +16,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors:		Karl Burkhart <burkhart@technikum-wien.at>.
+ * Authors:        Karl Burkhart <burkhart@technikum-wien.at> and
+ *                 Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../config/vilesci.config.inc.php');
-require_once('../include/student.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/webservicerecht.class.php');
 require_once('../include/studiensemester.class.php');
@@ -39,43 +39,44 @@ $SOAPServer->handle();
  */
 function getStudentFromUid($student_uid, $authentifizierung)
 {
-    $recht = new webservicerecht(); 
-    $user = $authentifizierung->username;
-    $passwort = $authentifizierung->passwort; 
-    
-    // User authentifizieren
-    if(!check_user($user, $passwort))
-        return new SoapFault("Server", "Invalid Credentials");	
- 
-    // darf User überhaupt Methode verwenden
-    $recht = new webservicerecht(); 
-    if(!$recht->isUserAuthorized($user, 'getStudentFromUid'))
-        return new SoapFault("Server", "No permission");
-    
-    $studentObj = new student(); // Studentendaten
-    $student = new foo();       // Rückgabeobjekt
-    $preStudent = new prestudent(); // StudentenStatus
+	$recht = new webservicerecht();
+	$user = $authentifizierung->username;
+	$passwort = $authentifizierung->passwort;
 
-    if(!$studentObj->load($student_uid))
-        return new SoapFault("Server", "Kein Student mit übergebener Uid gefunden");	
-    
-    $preStudent->getLastStatus($studentObj->prestudent_id);
-    
-    $student->studiengang_kz = $studentObj->studiengang_kz;
-    $student->person_id = $studentObj->person_id; 
-    $student->semester = $studentObj->semester; 
-    $student->verband = $studentObj->verband; 
-    $student->gruppe = $studentObj->gruppe; 
-    $student->vorname = $studentObj->vorname; 
-    $student->nachname = $studentObj->nachname; 
-    $student->uid = $studentObj->uid; 
-    $student->status = $preStudent->status_kurzbz;
-    $student->personenkennzeichen = $studentObj->matrikelnr;
-    $student->email = $student->uid.'@'.DOMAIN;
-    
-    $student = $recht->clearResponse($user, 'getStudentFromUid', $student);
-    
-    return $student; 
+	// User authentifizieren
+	if(!check_user($user, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");
+
+	// darf User überhaupt Methode verwenden
+	$recht = new webservicerecht();
+	if(!$recht->isUserAuthorized($user, 'getStudentFromUid'))
+		return new SoapFault("Server", "No permission");
+
+	$obj = new stdClass();       // Rückgabeobjekt
+	$prestudent = new prestudent();
+
+	if(!$prestudent->getPrestudentsFromUid($student_uid) || count($prestudent->result) < 1)
+		return new SoapFault("Server", "Kein Student mit übergebener Uid gefunden");
+
+	$ps = $prestudent->result[count($prestudent->result)-1];		// TODO EINE hier wird nur der letzte prestudent zurückgegeben(muss noch abgeklärt werden, wer diese schnittstelle verwendet)
+
+	$prestudent->getLastStatus($ps->prestudent_id);
+
+	$obj->studiengang_kz = $ps->studiengang_kz;
+	$obj->person_id = $ps->person_id;
+	$obj->semester = $ps->semester;
+	$obj->verband = $ps->verband;
+	$obj->gruppe = $ps->gruppe;
+	$obj->vorname = $ps->vorname;
+	$obj->nachname = $ps->nachname;
+	$obj->uid = $ps->uid;
+	$obj->status = $prestudent->status_kurzbz;
+	$obj->personenkennzeichen = $ps->perskz;
+	$obj->email = $obj->uid.'@'.DOMAIN;
+
+	$obj = $recht->clearResponse($user, 'getStudentFromUid', $obj);
+
+	return $obj;
 }
 
 /**
@@ -85,44 +86,42 @@ function getStudentFromUid($student_uid, $authentifizierung)
  */
 function getStudentFromMatrikelnummer($matrikelnummer, $authentifizierung)
 {
-    $recht = new webservicerecht(); 
-    $user = $authentifizierung->username;
-    $passwort = $authentifizierung->passwort; 
-    
-    // User authentifizieren
-    if(!check_user($user, $passwort))
-        return new SoapFault("Server", "Invalid Credentials");	
- 
-    // darf User überhaupt Methode verwenden
-    $recht = new webservicerecht(); 
-    if(!$recht->isUserAuthorized($user, 'getStudentFromMatrikelnummer'))
-        return new SoapFault("Server", "No permission");
-    
-    $studentObj = new student(); // Studentendaten
-    $student = new foo();       // Rückgabeobjekt
-    $preStudent = new prestudent(); // StudentenStatus
-    
-    $student_uid = $studentObj->getUidFromMatrikelnummer($matrikelnummer);
-    if(!$studentObj->load($student_uid))
-        return new SoapFault("Server", "Kein Student mit übergebener Matrikelnummer gefunden");	
-    
-    $preStudent->getLastStatus($studentObj->prestudent_id);
-    
-    $student->studiengang_kz = $studentObj->studiengang_kz;
-    $student->person_id = $studentObj->person_id; 
-    $student->semester = $studentObj->semester; 
-    $student->verband = $studentObj->verband; 
-    $student->gruppe = $studentObj->gruppe; 
-    $student->vorname = $studentObj->vorname; 
-    $student->nachname = $studentObj->nachname; 
-    $student->uid = $studentObj->uid; 
-    $student->status = $preStudent->status_kurzbz;
-    $student->personenkennzeichen = $studentObj->matrikelnr;
-    $student->email = $student->uid.'@'.DOMAIN;
-    
-    $student = $recht->clearResponse($user, 'getStudentFromMatrikelnummer', $student);
-    
-    return $student; 
+	$recht = new webservicerecht();
+	$user = $authentifizierung->username;
+	$passwort = $authentifizierung->passwort;
+
+	// User authentifizieren
+	if(!check_user($user, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");
+
+	// darf User überhaupt Methode verwenden
+	$recht = new webservicerecht();
+	if(!$recht->isUserAuthorized($user, 'getStudentFromMatrikelnummer'))
+		return new SoapFault("Server", "No permission");
+
+	$student = new stdClass();       // Rückgabeobjekt
+	$prestudent = new prestudent(); // Studentendaten
+
+	if(!$prestudent->loadFromPerskz($matrikelnummer))
+		return new SoapFault("Server", "Kein Student mit übergebener Matrikelnummer gefunden");
+
+	$prestudent->getLastStatus($prestudent->prestudent_id);
+
+	$student->studiengang_kz = $prestudent->studiengang_kz;
+	$student->person_id = $prestudent->person_id;
+	$student->semester = $prestudent->semester;
+	$student->verband = $prestudent->verband;
+	$student->gruppe = $prestudent->gruppe;
+	$student->vorname = $prestudent->vorname;
+	$student->nachname = $prestudent->nachname;
+	$student->uid = $prestudent->uid;
+	$student->status = $prestudent->status_kurzbz;
+	$student->personenkennzeichen = $prestudent->perskz;
+	$student->email = $student->uid.'@'.DOMAIN;
+
+	$student = $recht->clearResponse($user, 'getStudentFromMatrikelnummer', $student);
+
+	return $student;
 }
 
 /**
@@ -134,51 +133,49 @@ function getStudentFromMatrikelnummer($matrikelnummer, $authentifizierung)
  * @param $authentifizierung
  */
 function getStudentFromStudiengang($studiengang, $semester = null, $verband = null, $gruppe = null, $authentifizierung)
-{    
-    $recht = new webservicerecht(); 
-    $user = $authentifizierung->username;
-    $passwort = $authentifizierung->passwort; 
-  
-    // User authentifizieren
-    if(!check_user($user, $passwort))
-        return new SoapFault("Server", "Invalid Credentials");	
+{
+	$recht = new webservicerecht();
+	$user = $authentifizierung->username;
+	$passwort = $authentifizierung->passwort;
 
-    // darf User überhaupt Methode verwenden
-    $recht = new webservicerecht(); 
-    if(!$recht->isUserAuthorized($user, 'getStudentFromStudiengang'))
-        return new SoapFault("Server", "No permission");
+	// User authentifizieren
+	if(!check_user($user, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");
 
-    $studentObj = new student(); // Studentendaten
-    $preStudent = new prestudent(); // StudentenStatus
-    
-    $studiensemester = new studiensemester(); // aktuelles Studiensemester
-    $studSemester = $studiensemester->getakt();
-    
-    $studentObj->result = $studentObj->getStudents($studiengang, $semester, $verband, $gruppe, null, $studSemester);
-    
-    $studentArray = array(); 
-    
-    foreach($studentObj->result as $stud)
-    {   
-        $student = new foo();       // Rückgabeobjekt
-        $preStudent->getLastStatus($stud->prestudent_id);
-        
-        $student->studiengang_kz = $stud->studiengang_kz;
-        $student->person_id = $stud->person_id; 
-        $student->semester = $stud->semester; 
-        $student->verband = $stud->verband; 
-        $student->gruppe = $stud->gruppe; 
-        $student->vorname = $stud->vorname; 
-        $student->nachname = $stud->nachname; 
-        $student->uid = $stud->uid; 
-        $student->status = $preStudent->status_kurzbz; 
-        $student->personenkennzeichen = $stud->matrikelnr;
-        $student->email = $stud->uid.'@'.DOMAIN;
-        
-        $student = $recht->clearResponse($user, 'getStudentFromStudiengang', $student);
-        $studentArray[] = $student; 
-    }
-    return $studentArray; 
+	// darf User überhaupt Methode verwenden
+	$recht = new webservicerecht();
+	if(!$recht->isUserAuthorized($user, 'getStudentFromStudiengang'))
+		return new SoapFault("Server", "No permission");
+
+	$prestudent = new prestudent();
+
+	$studiensemester = new studiensemester(); // aktuelles Studiensemester
+	$studSemester = $studiensemester->getakt();
+
+	$prestudent->result = $prestudent->getPrestudents($studiengang, $semester, $verband, $gruppe, null, $studSemester);
+
+	$ret = array();
+
+	foreach($prestudent->result as $ps)
+	{
+		$obj = new stdClass();       // Rückgabeobjekt
+		$prestudent->getLastStatus($ps->prestudent_id);
+
+		$obj->studiengang_kz = $ps->studiengang_kz;
+		$obj->person_id = $ps->person_id;
+		$obj->semester = $ps->semester;
+		$obj->verband = $ps->verband;
+		$obj->gruppe = $ps->gruppe;
+		$obj->vorname = $ps->vorname;
+		$obj->nachname = $ps->nachname;
+		$obj->uid = $ps->uid;
+		$obj->status = $prestudent->status_kurzbz;
+		$obj->personenkennzeichen = $ps->matrikelnr;
+		$obj->email = $ps->uid.'@'.DOMAIN;
+
+		$obj = $recht->clearResponse($user, 'getStudentFromStudiengang', $obj);
+		$ret[] = $obj;
+	}
+	return $ret;
 }
 
-class foo{}

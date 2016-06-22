@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >,
+ *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >,
+ *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >,
+ *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at > and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
@@ -285,35 +286,6 @@ if(isset($_POST['savemitarbeiter']))
 	}
 }
 
-if(isset($_POST['savestudent']))
-{
-	$student = new student();
-	if(!$student->load($uid))
-		die('Student konnte nicht geladen werden');
-
-	$studiengang = new studiengang();
-	if(!$studiengang->load($student->studiengang_kz))
-		die('Fehler beim Laden des Studienganges');
-		
-	if(!$rechte->isBerechtigt('student/stammdaten', $studiengang->oe_kurzbz, 'su'))
-		die('Sie haben keine Berechtigung fuer diese Aktion');
-	
-	$student->matrikelnr = $matrikelnummer;
-	$student->semester = $semester;
-	$student->verband = $verband;
-	$student->gruppe = $gruppe;
-	$student->updateamum = date('Y-m-d H:i:s');
-	$student->updatevon = $user;
-	$student->new = false;
-	
-	if($student->save(null, false))
-		$msg = '<h3>Daten wurden erfolgreich gespeichert</h3>';
-	else 
-	{
-		$msg = "<h3>Fehler beim Speichern der Daten: $student->errormsg</h3>";
-		$error_student_save = true;
-	}	
-}
 
 $person = new person();
 if(!$person->load($person_id))
@@ -641,48 +613,6 @@ if(isset($uid) && $uid!='')
 				<td></td>
 				<td valign='bottom'><input type='submit' name='savemitarbeiter' value='Speichern'></td>
 			</tr>
-			</table>
-			</form>
-			</fieldset>
-			</td></tr>
-			";
-	}
-	else 
-	{
-		$student = new student();
-		if(!$student->load($uid))
-			die('Fehler beim Laden des Studenten');
-			
-		if(!$error_student_save)
-		{
-			$semester = $student->semester;
-			$verband = $student->verband;
-			$gruppe = $student->gruppe;
-			$matrikelnummer = $student->matrikelnr;
-		}
-		
-		//STUDENT
-		echo "<tr><td>
-			<fieldset>
-			<legend>Studentendaten</legend>
-			<form method='POST'>
-			<table>
-			<tr>
-				<td>Semester</td>
-				<td><input type='text' size='3' name='semester' value='".$semester."'></td>
-				<td>Verband</td>
-				<td><input type='text' size='3' name='verband' value='".$verband."'></td>
-				<td>Gruppe</td>
-				<td><input type='text' size='3' name='gruppe' value='".$gruppe."'></td>
-			</tr>
-			<tr>
-				<td>Matrikelnummer</td>
-				<td colspan='3'><input type='text' name='matrikelnummer' value='".$matrikelnummer."'></td>
-				<td></td>
-				<td></td>
-				<td><input type='submit' value='Speichern' name='savestudent'></td>
-			</tr>
-
 			</table>
 			</form>
 			</fieldset>

@@ -576,7 +576,6 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$helpyear = sprintf("%02d",$helpyear);
 				$semester_kurzbz = 'Winter Semester '.$year.'/'.$helpyear;
 			}
-			$sqlStudent = new student();
 
 			echo "   <semesterKurzbz>Semester $start | $semester_kurzbz</semesterKurzbz>";
 
@@ -590,7 +589,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
             join lehre.tbl_note note using(note)
             join lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 			where prestudent_id = ".$db->db_add_param($prestudent_id_arr[$i], FHC_INTEGER)." AND zeugnis = true AND
-			studiensemester_kurzbz in (".$sqlStudent->implode4SQL($aktuellesSemester).")
+			studiensemester_kurzbz in (".$db->db_implode4SQL($aktuellesSemester).")
             ORDER BY sort, tbl_lehrveranstaltung.bezeichnung;";
 
 

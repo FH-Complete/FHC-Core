@@ -130,7 +130,7 @@ if(isset($_POST['filter']))
 	$filter = $_POST['filter'];
 	$stg_obj = new studiengang();
 	$stg_obj->getAll('typ, kurzbz',false);
-	$std_obj = new student();
+	$std_obj = new prestudent();
 	$stsem_obj = new studiensemester();
 	$stsem = $stsem_obj->getaktorNext();
 	$stsem_obj->getAll();

@@ -38,23 +38,23 @@ require_once('../include/organisationsform.class.php');
 require_once('../include/zgv.class.php');
 require_once('../include/konto.class.php');
 
-$uid_arr = (isset($_REQUEST['uid'])?$_REQUEST['uid']:null);
+$pid_arr = (isset($_REQUEST['prestudent_id'])?$_REQUEST['prestudent_id']:null);
 $studiensemester = (isset($_REQUEST['ss'])?$_REQUEST['ss']:null);
 
-$uid_arr = explode(";",$uid_arr);
+$pid_arr = explode(";",$pid_arr);
 
 echo "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>\n"; 
 echo "<studienblaetter>\n";
 
-$uid = isset($uid_arr[1])?$uid_arr[1]:$uid_arr[0];
+$pid = isset($pid_arr[1])?$pid_arr[1]:$pid_arr[0];
 
 $konto =  new konto();
-$student_help = new student(); 
+$ps_help = new prestudent();
 // an 2ter stelle da im Aufruf vom FAS ;<uid>; der erste immer '' ist
-if($student_help->load($uid))
+if($ps_help->load($pid))
 {
     $studiengang = new studiengang();
-    $studiengang->load($student_help->studiengang_kz);
+    $studiengang->load($ps_help->studiengang_kz);
 	switch($studiengang->typ)
     {
         case 'b':
@@ -82,20 +82,20 @@ if($student_help->load($uid))
     echo "\t<studiengang>".$studiengang->bezeichnung."</studiengang>\n";
 }
 
-foreach($uid_arr as $uid)
+foreach($pid_arr as $pid)
 {
-	if($uid=='')
+	if(!is_numeric($pid))
 		continue;
-		 
-	echo "\t<studienblatt>\n"; 
 
-	$student = new student();
-	if($student->load($uid))
+	echo "\t<studienblatt>\n";
+
+	$ps = new prestudent();
+	if($ps->load($pid))
 	{
 			$datum_aktuell = date('d.m.Y');
-			$gebdatum = date('d.m.Y',strtotime($student->gebdatum));
-			$prestudent = new prestudent($student->prestudent_id);
-			$prestudent->getLastStatus($student->prestudent_id,$studiensemester,'Student');
+			$gebdatum = date('d.m.Y',strtotime($ps->gebdatum));
+			$prestudent = new prestudent($ps->prestudent_id);
+			$prestudent->getLastStatus($ps->prestudent_id,$studiensemester,'Student');
 			$studienordnung = new studienordnung();
 			$studienordnung->getStudienordnungFromStudienplan($prestudent->studienplan_id);
 			$studiengang = new studiengang();
@@ -103,12 +103,12 @@ foreach($uid_arr as $uid)
 			$studienplan = new studienplan();
 			$studienplan->loadStudienplan($prestudent->studienplan_id);
 			$staatsbuergerschaft = new nation();
-			$staatsbuergerschaft->load($student->staatsbuergerschaft);
+			$staatsbuergerschaft->load($ps->staatsbuergerschaft);
 			
 			
-            $svnr = ($student->svnr == '')?'Ersatzkennzeichen: '.$student->ersatzkennzeichen:$student->svnr; 
+            $svnr = ($ps->svnr == '')?'Ersatzkennzeichen: '.$ps->ersatzkennzeichen:$ps->svnr;
 			
-			switch($student->geschlecht)
+			switch($ps->geschlecht)
             {
                 case 'm':
                     $geschlecht = 'Männlich'; 
@@ -134,20 +134,20 @@ foreach($uid_arr as $uid)
             else
             	$studiengang_kz = sprintf("%04s", abs($studienordnung->studiengang_kz));
             
-			echo "\t\t<quote>1</quote>\n"; 
-			echo "\t\t<personenkz>".$uid."</personenkz>\n";
+			echo "\t\t<quote>1</quote>\n"; // TODO EINE ergibt das einen sinn?
+			echo "\t\t<personenkz>".$ps->uid."</personenkz>\n";// TODO EINE ergibt das einen sinn?
 			echo "\t\t<geschlecht>".$geschlecht."</geschlecht>\n";
-			echo "\t\t<anrede>".$student->anrede."</anrede>\n";
-			echo "\t\t<vorname>".$student->vorname." ".$student->vornamen."</vorname>\n";
-			echo "\t\t<vornamen>".$student->vornamen."</vornamen>\n";
-			echo "\t\t<nachname>".$student->nachname."</nachname>\n";
-			echo "\t\t<titelpre>".$student->titelpre."</titelpre>\n";
-			echo "\t\t<titelpost>".$student->titelpost."</titelpost>\n";
+			echo "\t\t<anrede>".$ps->anrede."</anrede>\n";
+			echo "\t\t<vorname>".$ps->vorname." ".$ps->vornamen."</vorname>\n";
+			echo "\t\t<vornamen>".$ps->vornamen."</vornamen>\n";
+			echo "\t\t<nachname>".$ps->nachname."</nachname>\n";
+			echo "\t\t<titelpre>".$ps->titelpre."</titelpre>\n";
+			echo "\t\t<titelpost>".$ps->titelpost."</titelpost>\n";
 			echo "\t\t<gebdatum>".$gebdatum."</gebdatum>\n";
-			echo "\t\t<gebort>".$student->gebort."</gebort>\n";
+			echo "\t\t<gebort>".$ps->gebort."</gebort>\n";
 			echo "\t\t<staatsbuergerschaft>".$staatsbuergerschaft->langtext."</staatsbuergerschaft>\n";
 			echo "\t\t<svnr>".$svnr."</svnr>\n";
-			echo "\t\t<matrikelnr>".trim($student->matrikelnr)."</matrikelnr>\n";
+			echo "\t\t<matrikelnr>".trim($ps->perskz)."</matrikelnr>\n";
 			echo "\t\t<studiengang>".$studienordnung->studiengangbezeichnung."</studiengang>\n";
 			echo "\t\t<studiengang_englisch>".$studienordnung->studiengangbezeichnung_englisch."</studiengang_englisch>\n";
             echo "\t\t<studiengang_kurzbz>".$studienordnung->studiengangkurzbzlang."</studiengang_kurzbz>\n";
@@ -166,21 +166,21 @@ foreach($uid_arr as $uid)
             echo "\t\t<studiensemester_aktuell>".$studiensemester_aktuell->bezeichnung."</studiensemester_aktuell>";
 			
 			// check ob Oeh-Beitrag bezahlt wurde
-			$oehbeitrag = $konto->getOehBeitragGesamt($uid, $studiensemester_aktuell->studiensemester_kurzbz);
+			$oehbeitrag = $konto->getOehBeitragGesamt($ps->uid, $studiensemester_aktuell->studiensemester_kurzbz);
 			echo "\t\t<oehbeitrag>".str_replace('.', ',', $oehbeitrag)."</oehbeitrag>";
             
             // check ob Quereinsteiger
-            $ausbildungssemester = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->ausbildungssemester:'';           
+            $ausbildungssemester = ($prestudent->getFirstStatus($ps->prestudent_id, 'Student'))?$prestudent->ausbildungssemester:'';
             echo "\t\t<semesterStudent>".$ausbildungssemester."</semesterStudent>";
             
             $studiensemester_beginn = new studiensemester();
-            $studienbeginn = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->studiensemester_kurzbz:'';
+            $studienbeginn = ($prestudent->getFirstStatus($ps->prestudent_id, 'Student'))?$prestudent->studiensemester_kurzbz:'';
             $studiensemester_beginn->load($studienbeginn);
             
             echo "\t\t<studiensemester_beginn>".$studiensemester_beginn->bezeichnung."</studiensemester_beginn>";
             echo "\t\t<studiensemester_beginndatum>".date('d.m.Y',strtotime($studiensemester_beginn->start))."</studiensemester_beginndatum>";
 	
-            $prestudent->getLastStatus($student->prestudent_id,$studiensemester,'Student');
+            $prestudent->getLastStatus($ps->prestudent_id,$studiensemester,'Student');
             $studiensemester_abschluss = new studiensemester();
             $abschluss = $studiensemester_abschluss->jump($prestudent->studiensemester_kurzbz, $studienplan->regelstudiendauer-$prestudent->ausbildungssemester);
             $studiensemester_abschluss->load($abschluss);
@@ -192,7 +192,7 @@ foreach($uid_arr as $uid)
             
             echo "\t\t<studiensemester_endedatum>".date('d.m.Y',strtotime($studiensemester_endedatum->ende))."</studiensemester_endedatum>";
             
-            $status_aktuell = ($prestudent->getLastStatus($student->prestudent_id,null,null))?$prestudent->status_kurzbz:'';
+            $status_aktuell = ($prestudent->getLastStatus($ps->prestudent_id,null,null))?$prestudent->status_kurzbz:'';
             
 			switch($status_aktuell)
             {
@@ -253,7 +253,7 @@ foreach($uid_arr as $uid)
 			echo "\t\t<regelstudiendauer>".$studienplan->regelstudiendauer."</regelstudiendauer>\n";
 			
 			$akadgrad = new akadgrad();
-			$akadgrad->getAkadgradStudent($student->uid);
+			$akadgrad->getAkadgradStudent($ps->prestudent_id);
 			
 			echo "\t\t<akadgrad>".$akadgrad->titel."</akadgrad>\n";
 			echo "\t\t<akadgrad_kurzbz>".$akadgrad->akadgrad_kurzbz."</akadgrad_kurzbz>\n";
@@ -265,7 +265,7 @@ foreach($uid_arr as $uid)
 
 			$stg_typ=new studiengang();
 			$lv=new lehrveranstaltung();
-			$lv->load_lva_student($student->prestudent_id);
+			$lv->load_lva_student($ps->prestudent_id);
 			if(count($lv->lehrveranstaltungen)>0)
 			{
 				$lv_studiengang_kz=$lv->lehrveranstaltungen[0]->studiengang_kz;
@@ -283,7 +283,7 @@ foreach($uid_arr as $uid)
 			echo "\t\t<datum_aktuell>".$datum_aktuell."</datum_aktuell>\n";
 
 			$adresse = new adresse();
-			$adresse->load_pers($student->person_id);
+			$adresse->load_pers($ps->person_id);
 			
 			foreach($adresse->result as $row_adresse)
 			{
@@ -306,7 +306,7 @@ foreach($uid_arr as $uid)
 				}
 			}
 			$prestudent = new prestudent();
-			$prestudent->getLastStatus($student->prestudent_id, null, 'Student');
+			$prestudent->getLastStatus($ps->prestudent_id, null, 'Student');
 			
 			if($prestudent->orgform_kurzbz!='')
 				$orgform = $prestudent->orgform_kurzbz;
@@ -322,7 +322,7 @@ foreach($uid_arr as $uid)
 			//Studiengangsleiter auslesen
 			$stg_oe_obj = new studiengang($studienordnung->studiengang_kz);
 			if ($studienordnung->studiengang_kz=='')
-				$stgleiter = $stg_oe_obj->getLeitung($student_help->studiengang_kz);
+				$stgleiter = $stg_oe_obj->getLeitung($ps_help->studiengang_kz);
 			else
 				$stgleiter = $stg_oe_obj->getLeitung($studienordnung->studiengang_kz);
 			$stgl='';

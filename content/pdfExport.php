@@ -71,22 +71,9 @@ else
 		$xsl_stg_kz=$_GET['stg_kz'];
 	else
 	{
-		// Werden UIDs oder Prestudent_IDs uebergeben, wird die Vorlage des Studiengangs genommen
+		// Werden Prestudent_IDs uebergeben, wird die Vorlage des Studiengangs genommen
 		// in dem der 1. Studierende in der Liste ist
-		if(isset($_GET['uid']) && $_GET['uid']!='')
-		{
-			if(strstr($_GET['uid'],';'))
-				$uids = explode(';',$_GET['uid']);
-			else
-				$uids[1] = $_GET['uid'];
-
-			$student_obj = new student();
-			if($student_obj->load($uids[1]))
-			{
-				$xsl_stg_kz=$student_obj->studiengang_kz;
-			}
-		}
-		elseif(isset($_GET['prestudent_id']) && $_GET['prestudent_id']!='')
+		if(isset($_GET['prestudent_id']) && $_GET['prestudent_id']!='')
 		{
 			if(strstr($_GET['prestudent_id'],';'))
 				$prestudent_ids = explode(';',$_GET['prestudent_id']);
@@ -154,10 +141,10 @@ if(isset($_GET['mitarbeiter_uid']))
 	$params.='&mitarbeiter_uid='.urlencode($_GET['mitarbeiter_uid']);
 if(isset($_GET['vertrag_id']))
 {
-    foreach($_GET['vertrag_id'] as $id)
-    {
-	$params.='&vertrag_id[]='.urlencode($id);
-    }
+	foreach($_GET['vertrag_id'] as $id)
+	{
+		$params.='&vertrag_id[]='.urlencode($id);
+	}
 }
 if(isset($_GET['studienordnung_id']))
 	$params.='&studienordnung_id='.urlencode($_GET['studienordnung_id']);
@@ -590,19 +577,21 @@ if (!isset($_REQUEST["archive"]))
 else
 {
 	// Archivieren von Dokumenten
-	$uid = $_REQUEST["uid"];
+	$prestudent_id = $_REQUEST["prestudent_id"];
 	$heute = date('Y-m-d');
 
-	$student=new student();
-	$student->load($uid);
+	$prestudent = new prestudent();
+	$prestudent->load($prestudent_id);
+	$student = new student();
+	$uid = $student->getUid($prestudent_id);
 
 	if(isset($_REQUEST['ss']))
 	{
 		$ss = $_REQUEST["ss"];
 
-		$prestudent=new prestudent();
-		$prestudent->getLastStatus($student->prestudent_id,$ss);
-		$semester=$prestudent->ausbildungssemester;
+		$ps=new prestudent();
+		$ps->getLastStatus($student->prestudent_id,$ss);
+		$semester=$ps->ausbildungssemester;
 
 		$query = "
 			SELECT
@@ -615,7 +604,7 @@ else
 				tbl_studentlehrverband.prestudent_id = tbl_prestudent.prestudent_id
 				AND tbl_prestudent.person_id = tbl_person.person_id
 				AND tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz
-				AND tbl_studentlehrverband.prestudent_id = ".$db->db_add_param($prestudent->prestudent_id, FHC_INTEGER)."
+				AND tbl_studentlehrverband.prestudent_id = ".$db->db_add_param($ps->prestudent_id, FHC_INTEGER)."
 				AND tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($ss);
 
 		if($result = $db->db_query($query))

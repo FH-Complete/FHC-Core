@@ -302,11 +302,11 @@ class benutzer extends person
 						distinct on (uid) vorname, nachname, uid, mitarbeiter_uid, titelpre, titelpost, lektor, fixangestellt, alias, tbl_benutzer.aktiv,
 							(SELECT UPPER
 								(tbl_studiengang.typ || tbl_studiengang.kurzbz)
-					 		FROM public.tbl_prestudent
-					 		JOIN public.tbl_studiengang USING(studiengang_kz)
+							FROM public.tbl_prestudent
+							JOIN public.tbl_studiengang USING(studiengang_kz)
 							WHERE uid=tbl_benutzer.uid) as studiengang,
 
-					 		(SELECT studiengang_kz FROM public.tbl_prestudent
+							(SELECT studiengang_kz FROM public.tbl_prestudent
 							WHERE uid=tbl_benutzer.uid) as studiengang_kz,
 
 							(SELECT tbl_kontakt.kontakt || ' - ' ||telefonklappe

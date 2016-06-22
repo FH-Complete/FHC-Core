@@ -403,12 +403,7 @@ if($xmlformat=='rdf')
 	if(isset($prestudent_id))
 	{
 		$prestd = new prestudent($prestudent_id);
-		$student=new student();
-		$uid = $student->getUid($prestudent_id);
-		$student->load($uid, $studiensemester_kurzbz);
-
-		draw_content($student);
-		$prestd->load($student->prestudent_id);
+		draw_content($prestd);
 		draw_prestudent($prestd);
 	}
 	if($typ=='student')
@@ -508,26 +503,10 @@ if($xmlformat=='rdf')
 		{
 			while($row = $db->db_fetch_object())
 			{
-				$student=new student();
-				if($uid = $student->getUid($row->prestudent_id))
-				{
-					//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
-					//nochmal laden aber ohne studiensemester
-					if(!$student->load($uid, $studiensemester_kurzbz))
-						$student->load($uid);
-				}
 				$prestd = new prestudent();
 				$prestd->load($row->prestudent_id);
-				if($uid!='')
-				{
-					draw_content($student);
-					draw_prestudent($prestd);
-				}
-				else
-				{
-					draw_content($prestd);
-					draw_prestudent($prestd);
-				}
+				draw_content($prestd);
+				draw_prestudent($prestd);
 			}
 		}
 	}
@@ -543,19 +522,8 @@ if($xmlformat=='rdf')
 			{
 				foreach ($prestd->result as $row)
 				{
-					if(checkfilter($row, $filter2))
-					{
-						$student=new student();
-						if($uid = $student->getUid($row->prestudent_id))
-						{
-							if(!$student->load($uid, $studiensemester_kurzbz))
-								$student->load($uid);
-							draw_content($student);
-						}
-						else
-							draw_content($row);
-						draw_prestudent($row);
-					}
+					draw_content($row);
+					draw_prestudent($row);
 				}
 			}
 		}
@@ -585,29 +553,16 @@ if($xmlformat=='rdf')
 
 				foreach($zahlungsreferenz as $ref)
 				{
-					  $konto = new konto();
-					  $konto->loadFromZahlungsreferenz($ref);
-					  $prestudent=new prestudent();
-					  $prestudent->getPrestudenten($konto->person_id);
-					  if(!empty($prestudent->result))
-					  {
-					$prestudent_temp = new prestudent($prestudent->result[0]->prestudent_id);
-					$student = new student();
-					$uid = $student->getUid($prestudent_temp->prestudent_id);
-
-					if($uid!='' && $uid != false)
+					$konto = new konto();
+					$konto->loadFromZahlungsreferenz($ref);
+					$prestudent=new prestudent();
+					$prestudent->getPrestudenten($konto->person_id);
+					if(!empty($prestudent->result))
 					{
-						  if(!$student->load($uid, $studiensemester_kurzbz))
-						$student->load($uid);
-						  draw_content($student);
-						  draw_prestudent($prestudent_temp);
+						$prestudent_temp = new prestudent($prestudent->result[0]->prestudent_id);
+						draw_content($prestudent_temp);
+						draw_prestudent($prestudent_temp);
 					}
-					else
-					{
-						  draw_content($prestudent_temp);
-						  draw_prestudent($prestudent_temp);
-					}
-					  }
 				}
 			}
 			else
@@ -626,52 +581,20 @@ if($xmlformat=='rdf')
 				{
 					while($row = $db->db_fetch_object())
 					{
-						$student=new student();
-						if($uid = $student->getUid($row->prestudent_id))
-						{
-								//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
-								//nochmal laden aber ohne studiensemester
-								if(!$student->load($uid, $studiensemester_kurzbz))
-							$student->load($uid);
-						}
 						$prestd = new prestudent();
 						$prestd->load($row->prestudent_id);
-						if($uid!='')
-						{
-								draw_content($student);
-								draw_prestudent($prestd);
-						}
-						else
-						{
-								draw_content($prestd);
-								draw_prestudent($prestd);
-						}
+						draw_content($prestd);
+						draw_prestudent($prestd);
 					}
 				}
 			}
 		}
 		elseif(isset($prestudent_id))
 		{
-			$student=new student();
-			if($uid = $student->getUid($prestudent_id))
-			{
-				//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
-				//nochmal laden aber ohne studiensemester
-				if(!$student->load($uid, $studiensemester_kurzbz))
-					$student->load($uid);
-			}
 			$prestd = new prestudent();
 			$prestd->load($prestudent_id);
-			if($uid!='')
-			{
-				draw_content($student);
-				draw_prestudent($prestd);
-			}
-			else
-			{
-				draw_content($prestd);
-				draw_prestudent($prestd);
-			}
+			draw_content($prestd);
+			draw_prestudent($prestd);
 		}
 	}
 	echo "</RDF:Seq>\n</RDF:RDF>";
@@ -679,19 +602,19 @@ if($xmlformat=='rdf')
 else
 {
 	//XML
-	$uids = explode(';',$uid);
+	$prestudent_ids = explode(';',$prestudent_id);
 	echo '<studenten>';
-	foreach ($uids as $uid)
+	foreach ($prestudent_ids as $prestudent_id)
 	{
-		if($uid!='')
+		if(is_numeric($prestudent_id))
 		{
-			$student = new student();
-			$student->load($uid);
+			$prestudent = new prestudent();
+			$prestudent->load($prestudent_id);
 
 			$studiengang = new studiengang();
-			$studiengang->load($student->studiengang_kz);
+			$studiengang->load($prestudent->studiengang_kz);
 
-			$stgleiter = $studiengang->getLeitung($student->studiengang_kz);
+			$stgleiter = $studiengang->getLeitung($prestudent->studiengang_kz);
 			$stgl='';
 			$i = 0;
 			foreach ($stgleiter as $stgleiter_uid)
@@ -728,7 +651,7 @@ else
 			$studiengbeginn = '';
 			$studiensemester_kurzbz='';
 			$qry = "SELECT * FROM public.tbl_prestudentstatus JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
-					WHERE prestudent_id='$student->prestudent_id' AND status_kurzbz in('Student','Incoming') ORDER BY datum LIMIT 1";
+					WHERE prestudent_id='$prestudent->prestudent_id' AND status_kurzbz in('Student','Incoming') ORDER BY datum LIMIT 1";
 			if($db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object())
@@ -743,7 +666,7 @@ else
 
 			$stsem->load($ss);
 
-			$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$student->prestudent_id' AND studiensemester_kurzbz='$ss' ORDER BY datum DESC";
+			$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$prestudent->prestudent_id' AND studiensemester_kurzbz='$ss' ORDER BY datum DESC";
 			$semester=0;
 			if($db->db_query($qry))
 			{
@@ -760,7 +683,7 @@ else
 			$lv_studiengang_art='';
 
 			$lv=new lehrveranstaltung();
-			$lv->load_lva_student($student->prestudent_id);
+			$lv->load_lva_student($prestudent->prestudent_id);
 			if(count($lv->lehrveranstaltungen)>0)
 			{
 				$lv_studiengang_kz=$lv->lehrveranstaltungen[0]->studiengang_kz;
@@ -792,7 +715,7 @@ else
 				}
 			}
 			$prestudent = new prestudent();
-			$prestudent->getLastStatus($student->prestudent_id);
+			$prestudent->getLastStatus($prestudent->prestudent_id);
 
 			$orgform_bezeichnung = new organisationsform();
 			$orgform_bezeichnung->load($studiengang->orgform_kurzbz);
@@ -812,15 +735,15 @@ else
 				$lv_studiengang_kz = sprintf("%04s", abs($lv_studiengang_kz));
 
 			//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
-			if ($student->studiengang_kz<0)
+			if ($prestudent->studiengang_kz<0)
 			{
 				$stg = new studiengang();
-				$stg->load($student->studiengang_kz);
+				$stg->load($prestudent->studiengang_kz);
 
-				$stg_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($student->studiengang_kz));
+				$stg_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($prestudent->studiengang_kz));
 			}
 			else
-				$stg_kz = sprintf("%04s", abs($student->studiengang_kz));
+				$stg_kz = sprintf("%04s", abs($prestudent->studiengang_kz));
 			if (($semester % 2) == 0)
 				$studienjahr =  $semester/2;
 			else
@@ -828,21 +751,21 @@ else
 
 			echo '
 			<student>
-				<uid><![CDATA['.$student->uid.']]></uid>
-				<person_id><![CDATA['.$student->person_id.']]></person_id>
-				<titelpre><![CDATA['.$student->titelpre.']]></titelpre>
-				<titelpost><![CDATA['.$student->titelpost.']]></titelpost>
-				<vornamen><![CDATA['.$student->vornamen.']]></vornamen>
-				<vorname><![CDATA['.$student->vorname.']]></vorname>
-				<nachname><![CDATA['.$student->nachname.']]></nachname>
-				<matrikelnummer><![CDATA['.$student->perskz.']]></matrikelnummer>
-				<matr_nr><![CDATA['.$student->matr_nr.']]></matr_nr>
-				<geburtsdatum><![CDATA['.$datum_obj->convertISODate($student->gebdatum).']]></geburtsdatum>
-				<geburtsdatum_iso><![CDATA['.$student->gebdatum.']]></geburtsdatum_iso>
-				<geburtsort><![CDATA['.$student->gebort.']]></geburtsort>
+				<uid><![CDATA['.$prestudent->uid.']]></uid>
+				<person_id><![CDATA['.$prestudent->person_id.']]></person_id>
+				<titelpre><![CDATA['.$prestudent->titelpre.']]></titelpre>
+				<titelpost><![CDATA['.$prestudent->titelpost.']]></titelpost>
+				<vornamen><![CDATA['.$prestudent->vornamen.']]></vornamen>
+				<vorname><![CDATA['.$prestudent->vorname.']]></vorname>
+				<nachname><![CDATA['.$prestudent->nachname.']]></nachname>
+				<matrikelnummer><![CDATA['.$prestudent->perskz.']]></matrikelnummer>
+				<matr_nr><![CDATA['.$prestudent->matr_nr.']]></matr_nr>
+				<geburtsdatum><![CDATA['.$datum_obj->convertISODate($prestudent->gebdatum).']]></geburtsdatum>
+				<geburtsdatum_iso><![CDATA['.$prestudent->gebdatum.']]></geburtsdatum_iso>
+				<geburtsort><![CDATA['.$prestudent->gebort.']]></geburtsort>
 				<semester><![CDATA['.$semester.']]></semester>
-				<verband><![CDATA['.$student->verband.']]></verband>
-				<gruppe><![CDATA['.$student->gruppe.']]></gruppe>
+				<verband><![CDATA['.$prestudent->verband.']]></verband>
+				<gruppe><![CDATA['.$prestudent->gruppe.']]></gruppe>
 				<studienjahr><![CDATA['.$studienjahr.']]></studienjahr>
 				<student_orgform_kurzbz><![CDATA['.$prestudent->orgform_kurzbz.']]></student_orgform_kurzbz>
 				<student_orgform_bezeichnung><![CDATA['.$orgform_student_bezeichnung->bezeichnung.']]></student_orgform_bezeichnung>
@@ -857,11 +780,11 @@ else
 				<lv_studiengang_bezeichnung><![CDATA['.$lv_studiengang_bezeichnung.']]></lv_studiengang_bezeichnung>
 				<lv_studiengang_typ><![CDATA['.$lv_studiengang_typ.']]></lv_studiengang_typ>
 				<lv_studiengang_art><![CDATA['.$lv_studiengang_art.']]></lv_studiengang_art>
-				<anrede><![CDATA['.$student->anrede.']]></anrede>
-				<geschlecht><![CDATA['.$student->geschlecht.']]></geschlecht>
-				<svnr><![CDATA['.$student->svnr.']]></svnr>
-				<ersatzkennzeichen><![CDATA['.$student->ersatzkennzeichen.']]></ersatzkennzeichen>
-				<familienstand><![CDATA['.$student->familienstand.']]></familienstand>
+				<anrede><![CDATA['.$prestudent->anrede.']]></anrede>
+				<geschlecht><![CDATA['.$prestudent->geschlecht.']]></geschlecht>
+				<svnr><![CDATA['.$prestudent->svnr.']]></svnr>
+				<ersatzkennzeichen><![CDATA['.$prestudent->ersatzkennzeichen.']]></ersatzkennzeichen>
+				<familienstand><![CDATA['.$prestudent->familienstand.']]></familienstand>
 				<rektor><![CDATA['.$rektor.']]></rektor>
 				<studienbeginn_beginn><![CDATA['.$datum_obj->convertISODate($studienbeginn).']]></studienbeginn_beginn>
 				<studiensemester_beginn><![CDATA['.$studiensemester.']]></studiensemester_beginn>
@@ -872,7 +795,7 @@ else
 				<tagesdatum><![CDATA['.date('d.m.Y').']]></tagesdatum>
 				<max_semester><![CDATA['.$studiengang->max_semester.']]></max_semester>
 				<anmerkungpre><![CDATA['.$prestudent->anmerkung.']]></anmerkungpre>
-				<aktiv><![CDATA['.$student->aktiv.']]></aktiv>
+				<aktiv><![CDATA['.$prestudent->aktiv.']]></aktiv>
 			</student>';
 		}
 	}

@@ -445,16 +445,15 @@ foreach($ausgabe as $stg_kz=>$value)
 		}
 
 		foreach ($uid as $student_id)
-		{	
+		{
 			echo "<tr>"; 
-			$student = new student(); 
-			if($student->load($student_id))
-				echo '<td>'.$student->vorname.'</td><td>'.$student->nachname.'</td><td>'.$student->uid.'</td>';
+			$benutzer = new benutzer();
+			if($benutzer->load($student_id))
+				echo '<td>'.$benutzer->vorname.'</td><td>'.$benutzer->nachname.'</td><td>'.$benutzer->uid.'</td>';
 			else
 				echo '<td colspan="3">'.$student_id,'</td>'; 
 			echo "</tr>"; 
 		}
-		
 	}
 	echo "</table>"; 
 }
@@ -487,4 +486,4 @@ function getDateForInscription ($semester)
 }
 ?>	
 	</body>
-	</html>
+</html>
