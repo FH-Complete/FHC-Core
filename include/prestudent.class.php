@@ -1961,6 +1961,10 @@ class prestudent extends person
 				$this->semester = $row->semester;
 				$this->verband = $row->verband;
 				$this->gruppe = $row->gruppe;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
 
 				return true;
 			}
