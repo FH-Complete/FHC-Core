@@ -90,20 +90,21 @@ class Phrases extends FHC_Controller
 
 	public function newText()
 	{
-		$vorlage_kurzbz = $this->input->post('vorlage_kurzbz', TRUE);
+		$phrase_id = $this->input->post('phrase_id', TRUE);
 		$data = array
 		(
-			'vorlage_kurzbz' => $vorlage_kurzbz,
-			'studiengang_kz' => 0,
-			'version' => 1,
-			'oe_kurzbz' => 'etw'
+			'phrase_id' => $phrase_id,
+			'sprache' => 'German',
+			'text' => '',
+			'description' => '',
+			'orgeinheit_kurzbz' => 'etw'
 		);
-		$vorlagetext = $this->vorlagelib->insertVorlagetext($data);
-		if ($vorlagetext->error)
-			show_error($vorlagetext->retval);
-		$vorlagestudiengang_id = $vorlagetext->retval;
+		$phrase_inhalt = $this->phraseslib->insertPhraseinhalt($data);
+		if ($phrase_inhalt->error)
+			show_error($phrase_inhalt->retval);
+		$phrase_inhalt_id = $phrase_inhalt->retval;
 
-		redirect('/system/Templates/editText/'.$vorlagestudiengang_id);
+		redirect('/system/Phrases/editText/'.$phrase_inhalt_id);
 	}
 
 	public function editText($phrase_inhalt_id)
@@ -131,17 +132,4 @@ class Phrases extends FHC_Controller
 		//$this->load->view('system/templatetextEdit', $data);
 	}
 
-	public function preview($vorlagestudiengang_id)
-	{
-		$formdata = $this->input->post('formdata', FALSE);
-		$daten = json_decode($formdata, TRUE);
-		$vorlagetext = $this->vorlagelib->getVorlagetextById($vorlagestudiengang_id);
-		if ($vorlagetext->error)
-			show_error($vorlagetext->retval);
-		$data = array
-		(
-			'text' => $this->vorlagelib->parseVorlagetext($vorlagetext->retval[0]->text, $daten)
-		);
-		$this->load->view('system/templatetextPreview', $data);
-	}
 }
