@@ -1178,7 +1178,7 @@ class lehrveranstaltung extends basis_db
 	 * @param $semeser Semester optional
 	 * @return boolean true wenn ok, false im Fehlerfall
 	 */
-	public function loadLehrveranstaltungStudienplan($studienplan_id, $semester = null)
+	public function loadLehrveranstaltungStudienplan($studienplan_id, $semester = null, $order=null)
 	{
 		if (!is_numeric($studienplan_id) || $studienplan_id === '')
 		{
@@ -1205,7 +1205,10 @@ class lehrveranstaltung extends basis_db
 		{
 			$qry.=" AND tbl_studienplan_lehrveranstaltung.semester=" . $this->db_add_param($semester, FHC_INTEGER);
 		}
-		$qry.=" ORDER BY stpllv_sort, semester, sort";
+		if(is_null($order))
+			$qry.=" ORDER BY stpllv_sort, semester, sort";
+		else
+			$qry.=' ORDER BY '.$order;
 		$this->lehrveranstaltungen = array();
 		if ($result = $this->db_query($qry))
 		{
