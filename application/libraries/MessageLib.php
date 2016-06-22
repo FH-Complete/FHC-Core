@@ -13,15 +13,15 @@ class MessageLib
 	
     public function __construct()
     {
-        require_once APPPATH.'config/message.php';
+        $this->ci =& get_instance();
+		$this->ci->config->load('message');
 
-		$this->ci =& get_instance();
 		//$this->ci->load->model('person/Person_model', 'PersonModel');
 		$this->ci->load->model('system/Message_model', 'MessageModel');
 		$this->ci->load->model('system/MsgStatus_model', 'MsgStatusModel');
 		$this->ci->load->model('system/Recipient_model', 'RecipientModel');
 		$this->ci->load->model('system/Attachment_model', 'AttachmentModel');
-        $this->ci->load->helper('language');
+        //$this->ci->load->helper('language');
         $this->ci->lang->load('message');
     }
 
@@ -318,7 +318,7 @@ class MessageLib
 	 *
 	 * @return  array
 	 */
-	protected function _error($retval = '', $message = MSG_ERROR_GENERAL)
+	protected function _error($retval = '', $message = MSG_ERROR)
 	{
 		$return = new stdClass();
 		$return->error = EXIT_ERROR;

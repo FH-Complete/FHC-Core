@@ -39,7 +39,7 @@ status, statusinfo, s.insertamum AS statusamum
 FROM public.tbl_msg_message m
 JOIN public.tbl_person USING (person_id)
 JOIN public.tbl_benutzer USING (person_id)
-LEFT JOIN 
+LEFT OUTER JOIN 
 (
 	SELECT message_id, person_id, status, statusinfo, tbl_msg_status.insertamum 
 	FROM public.tbl_msg_status
@@ -55,7 +55,7 @@ LEFT JOIN
 USING (message_id, person_id)
 WHERE uid = ?';
 		if (! $all)
-			$sql .= ' AND status<2';
+			$sql .= ' AND (status<3 OR status IS NULL)';
 		$result = $this->db->query($sql, array($uid));
 		if (is_object($result))
 			return $this->_success($result->result());
@@ -67,14 +67,16 @@ public function getMessagesByPerson($person_id, $all)
 	{
 		// Check wrights
 		if (! $this->fhc_db_acl->isBerechtigt('basis/message', 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> system/message', FHC_MODEL_ERROR);
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> basis/message', FHC_MODEL_ERROR);
 
+		// prepare parameters
+		$person_id = (int)$person_id;
 		// get Data
 		$sql = 'SELECT person_id, message_id, subject, priority, relationmessage_id, oe_kurzbz, m.insertamum, anrede, titelpost, titelpre, nachname, vorname, vornamen,
 status, statusinfo, s.insertamum AS statusamum
 FROM public.tbl_msg_message m
 JOIN public.tbl_person USING (person_id)
-LEFT JOIN 
+LEFT OUTER JOIN 
 (
 	SELECT message_id, person_id, status, statusinfo, tbl_msg_status.insertamum 
 	FROM public.tbl_msg_status
@@ -90,9 +92,9 @@ LEFT JOIN
 USING (message_id, person_id)
 WHERE person_id = ?';
 		if (! $all)
-			$sql .= ' AND status<2';
+			$sql .= ' AND (status<3 OR status IS NULL)';
 		$result = $this->db->query($sql, array($person_id));
-		var_dump($result);
+		//var_dump($result);
 		if (is_object($result))
 			return $this->_success($result->result());
 		else

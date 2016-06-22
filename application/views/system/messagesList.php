@@ -12,19 +12,28 @@ Person
 
 <table id="t1" class="tablesorter">
 	<thead>
-		<tr><th class='table-sortable:default'>Vorlage</th>
-			<th class='table-sortable:default'>Bezeichnung</th>
-			<th>Anmerkung</th><th>MimeType</th>
+		<tr><th>MessageID</th>
+			<th class='table-sortable:default'>Sender</th>
+			<th>Erstellt</th>
+			<th>Priorität</th>
+			<th>Status</th>
+			<th>StatusInfo</th>
+			<th>OE</th>
+			<th>Relation</th>
 			<th></th>
 		</tr>
 	</thead>
 	<tbody>
-	<?php foreach ($vorlage as $v): ?>
-		<tr><td><a href="edit/<?php echo $v->vorlage_kurzbz; ?>" target="MessagesBottom"><?php echo $v->vorlage_kurzbz; ?></a></td>
-			<td><?php echo $v->bezeichnung; ?></td>
-			<td><?php echo $v->anmerkung; ?></td>
-			<td><?php echo $v->mimetype; ?></td>
-			<td><a href="view/<?php echo $v->vorlage_kurzbz; ?>">View</a></td>
+	<?php foreach ($messages as $m): ?>
+		<tr><td><a href="view/<?php echo $m->message_id; ?>" target="MessagesBottom"><?php echo $m->message_id; ?></a></td>
+			<td><?php echo $m->titelpost.' '.$m->vorname.' '.$m->nachname.' '.$m->titelpre; ?></td>
+			<td><?php echo $m->insertamum; ?></td>
+			<td><?php echo $m->priority; ?></td>
+			<td><?php echo $m->status; ?></td>
+			<td><?php echo $m->statusinfo; ?></td>
+			<td><?php echo $m->oe_kurzbz; ?></td>
+			<td><?php echo $m->relationmessage_id; ?></td>
+			<td><a href="view/<?php echo $m->message_id; ?>">View</a></td>
 		</tr>
 	<?php endforeach ?>
 	</tbody>

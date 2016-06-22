@@ -12,18 +12,20 @@ class Messages extends VileSci_Controller
 		//$this->load->model('system/Message_model');
     }
 
-	public function index()
+	public function index($person_id = null)
 	{
-		$this->load->view('system/messages.php');
+		$data = array('person_id' => $person_id);
+		$this->load->view('system/messages.php', $data);
 	}
 
-	public function table()
+	public function table($person_id = null)
 	{
-		$person_id = $this->input->post('person_id', TRUE);
-		if ($person_id)
-			$msg = $this->messagelib->getMessagesByPerson($person_id);
-		else
+		if (empty($person_id))
+			$person_id = $this->input->post('person_id', TRUE);
+		if (empty($person_id))
 			$msg = $this->messagelib->getMessagesByUID($this->getUID());
+		else
+			$msg = $this->messagelib->getMessagesByPerson($person_id);
 		if ($msg->error)
 			show_error($msg->retval);
 		
@@ -31,7 +33,7 @@ class Messages extends VileSci_Controller
 		(
 			'messages' => $msg->retval
 		);
-		var_dump ($data);
+		//var_dump ($data);
 		$this->load->view('system/messagesList.php', $data);
 	}
 

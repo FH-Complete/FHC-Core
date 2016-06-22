@@ -1,16 +1,24 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-
-// application's Users table - define your user table and columns here
-
-define('USER_TABLE_TABLENAME', 'tbl_person p');
-define('USER_TABLE_ID', 'p.person_id');
-define('USER_TABLE_USERNAME', "CONCAT(p.vorname, ' ', p.nachname) as user_name");
+<?php  
+if ( ! defined('BASEPATH')) 
+	exit('No direct script access allowed');
 
 
+$config['msg_delivery'] = true;
+/*
+|--------------------------------------------------------------------------
+| Constants for Messaging System
+|--------------------------------------------------------------------------
+|
+| Statuses
+| Priority
+| Return Codes
+|
+*/
 // message statuses
 define('MSG_STATUS_UNREAD', 0);
 define('MSG_STATUS_READ', 1);
 define('MSG_STATUS_ARCHIVED', 2);
+define('MSG_STATUS_DELETED', 3);
 
 // priority
 define('PRIORITY_LOW', 1);
@@ -20,7 +28,7 @@ define('PRIORITY_URGENT', 4);
 
 // status return message codes
 define('MSG_SUCCESS', 0);
-define('MSG_ERR_GENERAL', 1);
+define('MSG_ERROR', 1);
 define('MSG_ERR_INVALID_USER_ID', 2);
 define('MSG_ERR_INVALID_MSG_ID', 3);
 define('MSG_ERR_INVALID_THREAD_ID', 4);
