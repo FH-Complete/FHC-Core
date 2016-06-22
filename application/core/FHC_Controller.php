@@ -21,4 +21,5 @@ class FHC_Controller extends CI_Controller
 		else
 			return $this->_uid;
 	}
+
 }

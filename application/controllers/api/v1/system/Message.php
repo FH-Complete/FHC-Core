@@ -23,45 +23,20 @@ class Message extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model MessageModel
-		$this->load->model('system/message_model', 'MessageModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->MessageModel->setUID($this->_getUID());
+		$this->load->library('MessageLib', array('uid' => $this->_getUID()));
 	}
 
 	/**
 	 * @return void
 	 */
-	public function getMessage()
+	public function getMessagesByPersonID()
 	{
-		$messageID = $this->get('message_id');
+		$person_id = $this->get('person_id');
+		$all = $this->get('all');
 		
-		if (isset($messageID))
+		if (isset($person_id))
 		{
-			$result = $this->MessageModel->load($messageID);
-			
-			$this->response($result, REST_Controller::HTTP_OK);
-		}
-		else
-		{
-			$this->response();
-		}
-	}
-
-	/**
-	 * @return void
-	 */
-	public function postMessage()
-	{
-		if ($this->_validate($this->post()))
-		{
-			if (isset($this->post()['message_id']))
-			{
-				$result = $this->MessageModel->update($this->post()['message_id'], $this->post());
-			}
-			else
-			{
-				$result = $this->MessageModel->insert($this->post());
-			}
+			$result = $this->messagelib->getMessagesByPerson($person_id, $all);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -71,8 +46,39 @@ class Message extends APIv1_Controller
 		}
 	}
 	
-	private function _validate($message = NULL)
+	/**
+	 * @return void
+	 */
+	public function postMessage()
 	{
+		if ($this->_validate($this->post()))
+		{
+			$this->messagelib->addRecipient($this->post()['person_id']);
+			$result = $this->messagelib->sendMessage(
+				$this->post()['person_id'],
+				$this->post()['subject'],
+				$this->post()['body'],
+				PRIORITY_NORMAL,
+				NULL,
+				$this->post()['oe_kurzbz']
+			);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	private function _validate($message = null)
+	{
+		if (!isset($message['person_id']) || !isset($message['subject']) ||
+			!isset($message['body']) || !isset($message['oe_kurzbz']))
+		{
+			return false;
+		}
+		
 		return true;
 	}
 }

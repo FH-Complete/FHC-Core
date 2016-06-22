@@ -44,9 +44,10 @@ class Migration_Phrase extends CI_Migration {
 				  phrase_inhalt_id serial,
 				  phrase_id bigint NOT NULL,
                   sprache varchar(32) NOT NULL,
-                  orgeinheit_kurzbz varchar(32) NOT NULL,
-                  orgform_kurzbz varchar(32) NOT NULL,
+                  orgeinheit_kurzbz varchar(32),
+                  orgform_kurzbz varchar(32),
                   text text,
+				  description text,
 				  insertamum timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				  insertvon varchar(32),
 				  PRIMARY KEY (phrase_inhalt_id)
@@ -64,7 +65,7 @@ class Migration_Phrase extends CI_Migration {
 			}
 		}
 	}
-
+    
     public function down()
     {
 		try
