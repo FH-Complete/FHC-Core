@@ -10,6 +10,7 @@ isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
 !isset($tinymce) ? $tinymce = false : $tinymce = $tinymce;
 !isset($jsoneditor) ? $jsoneditor = false : $jsoneditor = $jsoneditor;
 !isset($jsonforms) ? $jsonforms = false : $jsonforms = $jsonforms;
+!isset($textile) ? $textile = false : $textile = $textile;
 
 if ($tablesort)
 	$jquery = true;
@@ -32,20 +33,24 @@ if ($tablesort)
 
 <?php if($tablesort && !empty($tableid)) : ?>
 	<script language="Javascript" type="text/javascript">
-		$(document).ready(function() 
-		{ 
+		$(document).ready(function()
+		{
 			$("#<?php echo $tableid; ?>").tablesorter(
 			{
 				sortList: [[<?php echo $sortList; ?>]],
 				widgets: ["<?php echo $widgets; ?>"],
 				headers: {<?php echo $headers; ?>}
-			}); 
+			});
 		});
 	</script>
 <?php endif ?>
 
 <?php if($tinymce) : ?>
 	<script type="text/javascript" src="<?php echo base_url('vendor/tinymce/tinymce/tinymce.min.js');?>"></script>
+<?php endif ?>
+
+<?php if($textile) : ?>
+	<script type="text/javascript" src="<?php echo base_url('include/js/textile.min.js');?>"></script>
 <?php endif ?>
 
 <?php if($jsoneditor) : ?>
@@ -59,4 +64,3 @@ if ($tablesort)
 <?php endif ?>
 
 </head>
-
