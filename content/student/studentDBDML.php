@@ -40,7 +40,6 @@ require_once('../../include/benutzergruppe.class.php');
 require_once('../../include/log.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
-require_once('../../include/student.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/akte.class.php');
@@ -389,7 +388,7 @@ if(!$error)
 						{
 							if($prestudent->save() && $benutzer->save() && $person->save())
 							{
-								$studLvb = new student();
+								$studLvb = new prestudent();
 
 								// Studentlehrverband Eintrag nur Speichern, wenn der Student in diesem Studiensemester
 								// einen Status besitzt da es sonst beim Bearbeiten von alten Studenten immer in das
@@ -863,7 +862,7 @@ if(!$error)
 											//Verband und Gruppe wird entfernt.
 											if($_POST['status_kurzbz']=='Student')
 											{
-												$studLvb = new student();
+												$studLvb = new prestudent();
 
 												$studLvb->studiensemester_kurzbz=$semester_aktuell;
 												$studLvb->semester = $_POST['semester'];
@@ -884,7 +883,7 @@ if(!$error)
 											//bei Abbrechern und Absolventen wird der Aktiv Status auf false gesetzt
 											if($_POST['status_kurzbz']=='Abbrecher' || $_POST['status_kurzbz']=='Absolvent')
 											{
-												$studLvb = new student();
+												$studLvb = new prestudent();
 												$uid = $studLvb->getUid($prestudent_id);
 												$benutzer = new benutzer();
 												if($benutzer->load($uid))
@@ -986,7 +985,7 @@ if(!$error)
 								$return = true;
 								if($return)
 								{
-									$studLvb = new student();
+									$studLvb = new prestudent();
 									if(!$studLvb->delete_studentLehrverband($rolle->prestudent_id, $_POST['studiengang_kz'], $rolle->studiensemester_kurzbz, $rolle->ausbildungssemester))
 									{
 										$return = false;
@@ -1251,7 +1250,7 @@ if(!$error)
 						$return = false;
 					}
 
-					$studLvb = new student();
+					$studLvb = new prestudent();
 
 					if(!$error)
 					{
@@ -1445,7 +1444,7 @@ if(!$error)
 																$prestudent->updatevon = $user;
 
 																//Studentlehrverband
-																$studLvb = new student();
+																$studLvb = new prestudent();
 																$studLvb->prestudent_id = $prestd->prestudent_id;
 																$studLvb->studiengang_kz = $prestd->studiengang_kz;
 																$studLvb->semester = $hlp->result[0]->ausbildungssemester;
@@ -1493,7 +1492,7 @@ if(!$error)
 																		if($rolle->save_rolle())
 																		{
 																			//StudentLehrverband anlegen
-																			$studLvb = new student();
+																			$studLvb = new prestudent();
 																			$studLvb->prestudent_id = $prestudent->prestudent_id;
 																			$studLvb->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
 																			$studLvb->studiengang_kz = $prestd->studiengang_kz;
@@ -1668,7 +1667,7 @@ if(!$error)
 						if(!$error)
 						{
 							//Eintrag in der Tabelle Studentlehrverband aendern
-							$studLvb = new student();
+							$studLvb = new prestudent();
 
 							if($studLvb->studentlehrverband_exists($prestudent_id, $semester_aktuell))
 								$studLvb->new = false;

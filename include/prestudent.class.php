@@ -1928,6 +1928,8 @@ class prestudent extends person
 			return false;
 		}
 	}
+
+
 	/**
 	 * Laedt die StudentLehrverband Zuteilung
 	 * @param prestudent_id
@@ -1977,6 +1979,117 @@ class prestudent extends person
 		else
 		{
 			$this->errormsg ='Fehler beim Ermitteln des Lehrverbandes';
+			return false;
+		}
+	}
+
+	/**
+	 * Löscht die Zuordnung eines Studenten zu einer Lehrverbandsgruppe
+	 * @param type $prestudent_id
+	 * @param type $studiengang_kz
+	 * @param type $studiensemester
+	 * @param type $semester
+	 * @param type $verband
+	 * @param type $gruppe
+	 */
+	public function delete_studentLehrverband($prestudent_id, $studiengang_kz, $studiensemester, $semester)
+	{
+		$qry = 'DELETE FROM public.tbl_studentlehrverband '
+			. 'WHERE prestudent_id='.$this->db_add_param($prestudent_id, FHC_INTEGER)
+			. ' AND studiensemester_kurzbz='.$this->db_add_param($studiensemester)
+			. ' AND studiengang_kz='.$this->db_add_param($studiengang_kz)
+			. ' AND semester='.$this->db_add_param($semester).';';
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'StudentLehrverband konnte nicht gelöscht werden.';
+			return false;
+		}
+	}
+
+	/**
+	 * Speichert die Zuteilung von Student zu Lehrverband
+	 * @param $new
+	 * @return boolean
+	 */
+	public function save_studentlehrverband($new=null)
+	{
+		if($new==null)
+			$new = $this->new;
+
+		if($new)
+		{
+			$qry = "INSERT INTO public.tbl_studentlehrverband (prestudent_id, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, updateamum, updatevon, insertamum, insertvon)
+					VALUES(".
+					$this->db_add_param($this->prestudent_id).','.
+					$this->db_add_param($this->studiensemester_kurzbz).','.
+					$this->db_add_param($this->studiengang_kz).','.
+					$this->db_add_param($this->semester).','.
+					$this->db_add_param(($this->verband==''?' ':$this->verband)).','.
+					$this->db_add_param(($this->gruppe==''?' ':$this->gruppe)).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).');';
+		}
+		else
+		{
+			$qry = "UPDATE public.tbl_studentlehrverband SET".
+					" studiengang_kz=".$this->db_add_param($this->studiengang_kz).",".
+					" prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER).",".
+					" semester=".$this->db_add_param($this->semester).",".
+					" verband=".$this->db_add_param(($this->verband==''?' ':$this->verband)).",".
+					" gruppe=".$this->db_add_param(($this->gruppe==''?' ':$this->gruppe)).",".
+					" updateamum=".$this->db_add_param($this->updateamum).",".
+					" updatevon=".$this->db_add_param($this->updatevon).
+					" WHERE prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER)." AND studiensemester_kurzbz=".$this->db_add_param($this->studiensemester_kurzbz);
+		}
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der Studentlehrverbandzuordnung';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt die UID anhand der Prestudent_id
+	 * @param prestudent_id
+	 * @return uid wenn ok, false wenn Fehler
+	 */
+	public function getUid($prestudent_id)
+	{
+		if(!is_numeric($prestudent_id))
+		{
+			$this->errormsg = 'PrestudentID ist ungueltig';
+			return false;
+		}
+
+		$qry = "SELECT student_uid FROM public.tbl_prestudent WHERE prestudent_id=".$this->db_add_param($prestudent_id);
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->student_uid;
+			}
+			else
+			{
+				$this->errormsg = 'Student nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
