@@ -51,7 +51,9 @@ class Message extends APIv1_Controller
 	 */
 	public function postMessage()
 	{
-		if ($this->_validate($this->post()))
+		$validation = $this->_validate($this->post());
+		
+		if (is_object($validation) && $validation->error == EXIT_SUCCESS)
 		{
 			$this->messagelib->addRecipient($this->post()['person_id']);
 			$result = $this->messagelib->sendMessage(
@@ -67,18 +69,33 @@ class Message extends APIv1_Controller
 		}
 		else
 		{
-			$this->response();
+			$this->response($validation, REST_Controller::HTTP_OK);
 		}
 	}
 	
 	private function _validate($message = null)
 	{
-		if (!isset($message['person_id']) || !isset($message['subject']) ||
-			!isset($message['body']) || !isset($message['oe_kurzbz']))
+		if (!isset($message))
 		{
-			return false;
+			return $this->_error('Parameter is null');
+		}
+		if (!isset($message['person_id']))
+		{
+			return $this->_error('person_id is not set');
+		}
+		if (!isset($message['subject']))
+		{
+			return $this->_error('subject is not set');
+		}
+		if( !isset($message['body']))
+		{
+			return $this->_error('body is not set');
+		}
+		if (!isset($message['oe_kurzbz']))
+		{
+			return $this->_error('oe_kurzbz is not set');
 		}
 		
-		return true;
+		return $this->_success('Input data are valid');
 	}
 }
