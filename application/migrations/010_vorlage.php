@@ -59,7 +59,8 @@ class Migration_Vorlage extends CI_Migration {
 			{
 				echo 'Column public.tbl_vorlagestudiengang.orgform_kurzbz added!';
 				// Insert Demo Data
-				$query= "INSERT INTO public.tbl_vorlagestudiengang VALUES ('MailRegistration', 0, 1, '<p>Sehr geehrte/r {anrede} <strong>{vorname} {nachname}</strong>,</p>
+				$query = "SELECT setval('seq_vorlagestudiengang_vorlagestudiengang_id', (SELECT MAX(vorlagestudiengang_id) FROM public.tbl_vorlagestudiengang));";
+				$query .= "INSERT INTO public.tbl_vorlagestudiengang VALUES ('MailRegistration', 0, 1, '<p>Sehr geehrte/r {anrede} <strong>{vorname} {nachname}</strong>,</p>
 <p>vielen Dank für Ihre Registrierung an unserer Hochschule. Im Anhang senden wir ihnen den Zugangscode.</p>
 <p>Code: <code>{code}</code></p>
 <p>Unter folgenden Link können sie sich direkt für unser Service einloggen: <a title=\"LoginLink\" href=\"{link}{code}\">{link}{code}</a></p>

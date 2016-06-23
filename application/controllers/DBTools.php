@@ -16,7 +16,7 @@ class DBTools extends FHC_Controller
 	 *
 	 * @var string
 	 */
-	protected $seed_path = APPPATH.'seeds/';
+	protected $seed_path;
 
 	/**
 	 * Seed basename regex
@@ -34,6 +34,8 @@ class DBTools extends FHC_Controller
     {
         parent::__construct();
  		
+		$seed_path = APPPATH.'seeds/';
+		
 		if ($this->input->is_cli_request())
 		{
 			$cli = true;
