@@ -311,7 +311,7 @@ elseif($oe_kurzbz!='')
 				lehrfach.oe_kurzbz=".$db->db_add_param($oe_kurzbz)." AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0 AND
 				lehre.tbl_projektarbeit.prestudent_id = public.tbl_prestudent.prestudent_id AND
-				public.tbl_benutzer.person_id = public.tbl_prestudent.person_id
+				public.tbl_benutzer.uid = public.tbl_prestudent.uid
 				";
 }
 else 

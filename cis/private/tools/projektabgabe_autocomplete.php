@@ -87,7 +87,7 @@ cellSeparator (default value: "|")
 					FROM lehre.tbl_projektarbeit 
 							JOIN campus.tbl_paabgabe USING(projektarbeit_id)
 							LEFT JOIN public.tbl_prestudent ON(tbl_prestudent.prestudent_id=tbl_projektarbeit.prestudent_id)
-							LEFT JOIN public.tbl_benutzer ON(tbl_benutzer.person_id=tbl_prestudent.person_id)
+							LEFT JOIN public.tbl_benutzer ON(tbl_benutzer.uid=tbl_prestudent.uid)
 							LEFT JOIN public.tbl_person ON(tbl_benutzer.person_id=tbl_person.person_id)
 							LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 							LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 

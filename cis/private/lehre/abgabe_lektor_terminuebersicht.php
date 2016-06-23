@@ -91,7 +91,7 @@ $sql_query = "
 		JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
 		JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id)
 		JOIN public.tbl_prestudent ON(tbl_projektarbeit.prestudent_id = tbl_projektarbeit.prestudent_id)
-		JOIN public.tbl_benutzer bn_student ON(tbl_prestudent.person_id=bn_student.person_id)
+		JOIN public.tbl_benutzer bn_student ON(tbl_prestudent.uid=bn_student.uid)
 		JOIN public.tbl_person person_student ON(bn_student.person_id=person_student.person_id)
 		JOIN lehre.tbl_lehreinheit ON(tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id)
 		JOIN lehre.tbl_lehrveranstaltung ON(tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)
