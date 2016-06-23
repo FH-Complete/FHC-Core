@@ -2,13 +2,20 @@
 	$this->load->view('templates/header', array('title' => 'MessagesList', 'tablesort' => true, 'tableid' => 't1', 'headers' => '4:{sorter:false}'));
 ?>
 <div class="row">
-	<div class="span4">
-	  <h2>Vorlagen</h2>
-<form method="post" action="">
-Person
-<input name="person_id"></input>
- <button type="submit">Filter</button> 
-</form> 
+  <div class="span4">
+	<h2>Inbox <?php if (empty($person))
+						echo $uid;
+					else
+						echo ' -> Person '.$person->person_id.' ('.$person->vorname.')';
+		 ?><br /><br />
+	<form method="post" action="outbox">
+		<button type="submit">Outbox</button>
+	</form></h2>
+
+	<form method="post" action="">
+		Person <input name="person_id"></input>
+		<button type="submit">show Mails</button> 
+	</form> 
 
 <table id="t1" class="tablesorter">
 	<thead>

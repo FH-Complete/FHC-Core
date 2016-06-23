@@ -10,6 +10,7 @@ StudiengangKZ: <?=$studiengang_kz?>
 	Version: <input type="text" name="version" value="<?php echo $version; ?>" />
 	Aktiv: <input type="text" name="aktiv" value="<?php echo $aktiv; ?>" />
 	OE:<?php echo $this->templatelib->widget("organisationseinheit_widget", array('oe_kurzbz' => $oe_kurzbz)); ?>
+	OrgForm:<?php echo $this->templatelib->widget("orgform_widget", array('orgform' => $orgform_kurzbz)); ?>
 	<input type="hidden" name="vorlagestudiengang_id" value="<?php echo $vorlagestudiengang_id; ?>" />
 	<input type="hidden" name="studiengang_kz" value="<?php echo $studiengang_kz; ?>" />
  	<?php 

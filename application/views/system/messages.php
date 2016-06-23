@@ -7,7 +7,7 @@
 </head>
 
 <frameset rows="30%,*">
-  	<frame src="Messages/table<?php if (! empty($person_id)) echo '/'.$person_id; ?>" id="MessagesTop" name="MessagesTop" frameborder="0" />
+  	<frame src="Messages/inbox<?php if (! empty($person_id)) echo '/'.$person_id; ?>" id="MessagesTop" name="MessagesTop" frameborder="0" />
   	<frame src="Messages/edit" id="MessagesBottom" name="MessagesBottom" frameborder="0" />
 	<noframes>
 		<body bgcolor="#FFFFFF">

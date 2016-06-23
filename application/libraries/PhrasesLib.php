@@ -142,10 +142,10 @@ class PhrasesLib
      * @param   string  $vorlage_kurzbz    REQUIRED
      * @return  array
      */
-    function insertVorlagetext($data)
+    function insertPhraseinhalt($data)
 	{
-        $vorlagetext = $this->ci->VorlageStudiengangModel->insert($data);
-        return $vorlagetext;
+        $phrase_inhalt = $this->ci->PhraseInhaltModel->insert($data);
+        return $phrase_inhalt;
     }
 
 	/**

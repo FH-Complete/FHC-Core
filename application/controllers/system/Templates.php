@@ -134,6 +134,10 @@ class Templates extends FHC_Controller
 		$data['studiengang_kz'] = $this->input->post('studiengang_kz', TRUE);
 		$data['version'] = $this->input->post('version', TRUE);
 		$data['oe_kurzbz'] = $this->input->post('oe_kurzbz', TRUE);
+		if ($this->input->post('orgform_kurzbz') == '')
+			$data['orgform_kurzbz'] = null;
+		else
+			$data['orgform_kurzbz'] = $this->input->post('orgform_kurzbz', TRUE);
 		$data['text'] = $this->input->post('text', TRUE);
 		$data['aktiv'] = $this->input->post('aktiv', TRUE);
 		$vorlagetext = $this->vorlagelib->updateVorlagetext($vorlagestudiengang_id, $data);

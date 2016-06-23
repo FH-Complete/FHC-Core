@@ -5,7 +5,7 @@
 <div class="row">
   <div class="span4">
 	<h2>Phrase Inhalt - <?php echo $phrase_id; ?></h2>
-	<form method="post" action="../newtext" target="TemplatesBottom">
+	<form method="post" action="../newtext" target="PhrasesBottom">
 	  <input type="hidden" name="phrase_id" value="<?php echo $phrase_id; ?>"/>
 	  <button type="submit">Neu</button>
 	</form>

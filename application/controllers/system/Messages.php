@@ -8,8 +8,7 @@ class Messages extends VileSci_Controller
     {
         parent::__construct();
         $this->load->library('MessageLib');
-		//$this->load->model('person/Person_model');
-		//$this->load->model('system/Message_model');
+		$this->load->model('person/Person_model', 'PersonModel');
     }
 
 	public function index($person_id = null)
@@ -18,7 +17,7 @@ class Messages extends VileSci_Controller
 		$this->load->view('system/messages.php', $data);
 	}
 
-	public function table($person_id = null)
+	public function inbox($person_id = null)
 	{
 		if (empty($person_id))
 			$person_id = $this->input->post('person_id', TRUE);
@@ -31,12 +30,43 @@ class Messages extends VileSci_Controller
 		
 		$data = array
 		(
+			'uid' => $this->getUID(),
 			'messages' => $msg->retval
 		);
-		//var_dump ($data);
-		$this->load->view('system/messagesList.php', $data);
+		if (!empty($person_id))
+		{
+			$person = $this->PersonModel->load($person_id);
+			$data['person'] = $person->retval[0];
+		}
+		// var_dump ($data);
+		$this->load->view('system/messagesInbox.php', $data);
 	}
 
+	public function outbox($person_id = null)
+	{
+		if (empty($person_id))
+			$person_id = $this->input->post('person_id', TRUE);
+		if (empty($person_id))
+			$msg = $this->messagelib->getMessagesByUID($this->getUID());
+		else
+			$msg = $this->messagelib->getMessagesByPerson($person_id);
+		if ($msg->error)
+			show_error($msg->retval);
+		
+		$data = array
+		(
+			'uid' => $this->getUID(),
+			'messages' => $msg->retval
+		);
+		if (!empty($person_id))
+		{
+			$person = $this->PersonModel->load($person_id);
+			$data['person'] = $person->retval[0];
+		}
+		//var_dump ($data);
+		$this->load->view('system/messagesOutbox.php', $data);
+	}
+	
 	public function view($msg_id)
 	{
 		$msg = $this->messagelib->getMessage($msg_id);

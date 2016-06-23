@@ -25,7 +25,7 @@ App: aufnahme
 	<?php foreach ($phrases as $p): ?>
 		<tr><td><a href="edit/<?php echo $p->phrase_id; ?>" target="PhrasesBottom"><?php echo $p->phrase_id; ?></a></td>
 			<td><?php echo $p->phrase; ?></td>
-			<td><a href="view/<?php echo $p->phrase_id; ?>" target="PhrasesBottom">View</a></td>
+			<td><a href="view/<?php echo $p->phrase_id; ?>" target="PhrasesBottom">Inhalte anzeigen</a></td>
 
 		</tr>
 	<?php endforeach ?>

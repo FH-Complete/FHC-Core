@@ -117,7 +117,7 @@ class studiengang extends Studiengang_model
 	 * @param studiengang_kz KZ des Studienganges der zu Laden ist
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load($studiengang_kz)
+	public function load($studiengang_kz = null)
 	{
 		if(!is_numeric($studiengang_kz))
 		{

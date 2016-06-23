@@ -29,7 +29,8 @@ class Migration_Vorlage extends CI_Migration {
 			else
 				echo "Error adding public.tbl_vorlage.attribute!";
 		}
-		
+
+		// tbl_vorlagestudiengang->Subject
 		if (! @$this->db->simple_query('SELECT subject FROM public.tbl_vorlagestudiengang'))
 		{
 			$this->db->insert('system.tbl_berechtigung', array(
@@ -48,6 +49,7 @@ class Migration_Vorlage extends CI_Migration {
 				echo "Error adding public.tbl_vorlagestudiengang.subject!";
 		}
 
+		// tbl_vorlagestudiengang->OrgForm
 		if (! @$this->db->simple_query('SELECT orgform_kurzbz FROM public.tbl_vorlagestudiengang'))
 		{
 			$query= "ALTER TABLE public.tbl_vorlagestudiengang
