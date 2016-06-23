@@ -352,7 +352,7 @@ class vertrag extends basis_db
 			(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
 			tbl_lehreinheit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
-			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) JOIN public.tbl_prestudent_id ON(tbl_benutzer.person_id=tbl_prestudent.person_id) WHERE tbl_prestudent.prestudent_id=tbl_projektarbeit.prestudent_id)
+			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) JOIN public.tbl_prestudent ON(tbl_benutzer.uid=tbl_prestudent.uid) WHERE tbl_prestudent.prestudent_id=tbl_projektarbeit.prestudent_id)
 			as bezeichnung
 		FROM
 			lehre.tbl_projektbetreuer
