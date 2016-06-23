@@ -3572,12 +3572,11 @@ function StudentNotenTreeSelectDifferent()
 					break;
 				}
 
-				//Wenn die Noten unterschiedlich sind, aber das benotungsdatum im Zeugnis
+				//Wenn das benotungsdatum im Zeugnis
 				//nach dem benotungsdatum des lektors liegt, dann wird die zeile auch nicht markiert.
 				//damit wird verhindert, dass pruefungsnoten die nur von der assistenz eingetragen wurden,
 				//durch den alten eintrag des lektors wieder ueberschrieben werden
 				if(zeugnislehrveranstaltung_id==lvgesamtlehrveranstaltung_id
-					&& zeugnisnote!=lvgesamtnote
 					&& zeugnisbenotungsdatum>lvgesamtbenotungsdatum)
 				{
 					found=true;
