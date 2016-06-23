@@ -43,7 +43,7 @@ require_once('../include/studiengang.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/phrasen.class.php');
-require_once('../include/student.class.php');
+require_once('../include/prestudent.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/ort.class.php');
 require_once('../include/funktion.class.php');
@@ -74,10 +74,11 @@ else
 	$user = get_uid();
 
 	//Zum anzeigen der Studiengang-Details neben den News
-	$student = new student();
-	if($student->load($user))
+	$prestudent = new prestudent();
+	$prestudent->getPrestudentsFromUid($user);
+	foreach($prestudent->result as $ps)
 	{
-		$newsReq[] = getNRObj($student->studiengang_kz,$student->semester);
+		$newsReq[] = getNRObj($ps->studiengang_kz,$ps->semester);
 	}
 }
 

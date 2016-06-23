@@ -27,7 +27,6 @@ require_once('../include/functions.inc.php');
 require_once('../include/sprache.class.php');
 require_once('../include/phrasen.class.php');
 require_once('../include/mail.class.php');
-require_once('../include/student.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/studiensemester.class.php');
 
@@ -96,13 +95,13 @@ if(count($prestudent->result) > 0)
 {
 	foreach($prestudent->result as $ps)
 	{
-		$student = new student();
+		$lvb = new prestudent();
 		$studsem = new studiensemester();
 
-		$student->load_studentlehrverband($ps->prestudent_id, $studsem->getaktorNext());
-		$newsGetArr[] = array("studiengang_kz" => $ps->studiengang_kz,"semester" => $student->semester);
+		$lvb->load_studentlehrverband($ps->prestudent_id, $studsem->getaktorNext());
+		$newsGetArr[] = array("studiengang_kz" => $ps->studiengang_kz,"semester" => $lvb->semester);
 
-		if($student->verband == "I" && $student->semester == "0")
+		if($lvb->verband == "I" && $lvb->semester == "0")
 		{
 			$newsGetArr[] = array("studiengang_kz" => "10006","semester" => 0);
 		}

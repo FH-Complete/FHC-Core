@@ -16,7 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Karl Burkhart 	<burkhart@technikum-wien.at>,
- *			Andreas Österreicher <oesi@technikum-wien.at>
+ *          Andreas Österreicher <oesi@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 
 require_once('../../config/vilesci.config.inc.php');
@@ -202,16 +203,17 @@ if(isset($_REQUEST['btn_submitStudent']))
 	$uids = '';
 	if($semester == 'alle')
 		$semester = null;
-	
-	$studenten = new student(); 
+	if($studiengang_kz == "")
+		$studiengang_kz = null;
+
+	$prestudenten = new prestudent();
 
 	if($studiengang_kz=='incoming')
-		$studenten->getIncoming();
+		$prestudenten->getIncoming();
 	else
-		$studenten->getStudentsStudiengang($studiengang_kz, $semester);
-	$studentenArray = $studenten->result; 
-	
-	// $studentenArray = $studenten->getStudents($studiengang_kz,$semester,null,null,null,'WS2011');
+		$prestudenten->getStudentsStudiengang($studiengang_kz, $semester);
+	$psArray = $prestudenten->result;
+
 	echo '
 		<form method="POST" name="form_studentenkarten" action="kartezuweisen.php">
 		<table id="myTableFiles" class="tablesorter">
@@ -226,73 +228,73 @@ if(isset($_REQUEST['btn_submitStudent']))
 		</thead>
 		<tbody>';
 	
-	foreach($studentenArray as $stud)
+	foreach($psArray as $ps)
 	{
-		if($stud->studiengang_kz>10000  && $stud->studiengang_kz !='10007'  && $stud->studiengang_kz!='10004')
+		if($ps->studiengang_kz>10000  && $ps->studiengang_kz !='10007'  && $ps->studiengang_kz!='10004')
 			continue;
 
 		// Wenn letzter Status nich Student ist -> nicht anzeigen
 		$prestudent = new prestudent(); 
-		$prestudent->getLastStatus($stud->prestudent_id);
+		$prestudent->getLastStatus($ps->prestudent_id);
 		if($prestudent->status_kurzbz == 'Student' || ($studiengang_kz=='incoming' && $prestudent->status_kurzbz='Incoming'))
 		{
 			if($statusStudent=='gedrucktNichtAusgegeben')
 			{
 				// gedruckt aber noch nicht ausgegeben
 				$fotostatus = new fotostatus();
-				$fotostatus->getLastFotoStatus($stud->person_id); 
+				$fotostatus->getLastFotoStatus($ps->person_id);
 				$betriebsmittel = new betriebsmittel(); 
 
 				// status akzeptiert und noch nicht gedruckt
-				if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == true && $betriebsmittel->zutrittskarteAusgegeben($stud->uid) == false)
+				if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($ps->uid) == true && $betriebsmittel->zutrittskarteAusgegeben($ps->uid) == false)
 				{
-					echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
-					$uids.=';'.$stud->uid;
-					$mails[]=$stud->uid.'@'.DOMAIN;
+					echo '<tr><td>'.$ps->nachname.' '.$ps->vorname.'</td><td>'.$ps->gebdatum.'</td><td>'.$ps->perskz.'</td><td>'.$ps->uid.'</td><td>'.$ps->person_id.'<input type="hidden" name="users[]" value="'.$ps->uid.'"></td></tr>';
+					$uids.=';'.$ps->uid;
+					$mails[]=$ps->uid.'@'.DOMAIN;
 				}
 			}
 			else if($statusStudent == 'nichtGedrucktAkzept')
 			{
 				// akzeptiert und nicht gedruckt
 				$fotostatus = new fotostatus();
-				$fotostatus->getLastFotoStatus($stud->person_id); 
+				$fotostatus->getLastFotoStatus($ps->person_id);
 				$betriebsmittel = new betriebsmittel(); 
 
 				// status akzeptiert und noch nicht gedruckt
-				if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == false)
+				if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($ps->uid) == false)
 				{
-					echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
-					$uids.=';'.$stud->uid;
-					$mails[]=$stud->uid.'@'.DOMAIN;
+					echo '<tr><td>'.$ps->nachname.' '.$ps->vorname.'</td><td>'.$ps->gebdatum.'</td><td>'.$ps->perskz.'</td><td>'.$ps->uid.'</td><td>'.$ps->person_id.'<input type="hidden" name="users[]" value="'.$ps->uid.'"></td></tr>';
+					$uids.=';'.$ps->uid;
+					$mails[]=$ps->uid.'@'.DOMAIN;
 				}
 			}
 			else if($statusStudent == 'nichtGedruckt')
 			{
 				// akzeptiert und nicht gedruckt
 				$fotostatus = new fotostatus();
-				$fotostatus->getLastFotoStatus($stud->person_id); 
+				$fotostatus->getLastFotoStatus($ps->person_id);
 				$betriebsmittel = new betriebsmittel(); 
 
 				// noch nicht gedruckt
-				if($betriebsmittel->zutrittskartePrinted($stud->uid) == false)
+				if($betriebsmittel->zutrittskartePrinted($ps->uid) == false)
 				{
-					echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.' ('.$fotostatus->fotostatus_kurzbz.')</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
-					$uids.=';'.$stud->uid;
-					$mails[]=$stud->uid.'@'.DOMAIN;
+					echo '<tr><td>'.$ps->nachname.' '.$ps->vorname.' ('.$fotostatus->fotostatus_kurzbz.')</td><td>'.$ps->gebdatum.'</td><td>'.$ps->perskz.'</td><td>'.$ps->uid.'</td><td>'.$ps->person_id.'<input type="hidden" name="users[]" value="'.$ps->uid.'"></td></tr>';
+					$uids.=';'.$ps->uid;
+					$mails[]=$ps->uid.'@'.DOMAIN;
 				}
 			}
 			else
 			{
 				// letzten Status anzeigen
 				$fotostatus = new fotostatus();
-				$fotostatus->getLastFotoStatus($stud->person_id); 
+				$fotostatus->getLastFotoStatus($ps->person_id);
 
 				// überprüfen ob letzer Status der gesuchte ist
 				if($fotostatus->fotostatus_kurzbz == $statusStudent)
 				{
-					echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
-					$uids.=';'.$stud->uid;
-					$mails[]=$stud->uid.'@'.DOMAIN;
+					echo '<tr><td>'.$ps->nachname.' '.$ps->vorname.'</td><td>'.$ps->gebdatum.'</td><td>'.$ps->perskz.'</td><td>'.$ps->uid.'</td><td>'.$ps->person_id.'<input type="hidden" name="users[]" value="'.$ps->uid.'"></td></tr>';
+					$uids.=';'.$ps->uid;
+					$mails[]=$ps->uid.'@'.DOMAIN;
 				}
 			}
 		}
@@ -330,7 +332,7 @@ if(isset($_REQUEST['btn_submitStudent']))
 					loop=false;
 					mailto=mails;
 				}
-	
+
 				if(art=='to')
 					window.location.href='mailto:'+mailto;
 				else

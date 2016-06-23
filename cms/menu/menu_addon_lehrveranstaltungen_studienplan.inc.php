@@ -40,7 +40,7 @@ require_once(dirname(__FILE__).'/../../include/lehrveranstaltung.class.php');
 require_once(dirname(__FILE__).'/../../include/organisationsform.class.php');
 require_once(dirname(__FILE__).'/../../include/functions.inc.php');
 require_once(dirname(__FILE__).'/../../include/phrasen.class.php');
-require_once(dirname(__FILE__).'/../../include/student.class.php');
+require_once(dirname(__FILE__).'/../../include/prestudent.class.php');
 
 class menu_addon_lehrveranstaltungen_studienplan extends menu_addon
 {
@@ -54,17 +54,19 @@ class menu_addon_lehrveranstaltungen_studienplan extends menu_addon
 
 		$sprache = getSprache();
 		$user = get_uid();
-		$student = new student();
 		$studiengang_kz='';
 		$semester='';
 		$studienplan_id='';
 		$studienordnung_id='';
 		$db = new basis_db();
 
-		if($student->load($user))
+		$prestudent = new prestudent();
+		$prestudent->getPrestudentsFromUid($user);
+
+		if(count($prestudent->result) > 0)
 		{
-			$studiengang_kz=$student->studiengang_kz;
-			$semester=$student->semester;
+			$studiengang_kz=$prestudent->result[0]->studiengang_kz;
+			$semester=$prestudent->result[0]->semester;
 		}
 
 		$p = new phrasen($sprache);

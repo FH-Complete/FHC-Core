@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Andreas Moik 	< moik@technikum-wien.at >
  */
 		require_once('../../config/vilesci.config.inc.php');
 		require_once('../../include/basis_db.class.php');
@@ -31,7 +32,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/projektarbeit.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
-require_once('../../include/student.class.php');
+require_once('../../include/prestudent.class.php');
 require_once('../../include/projektbetreuer.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/note.class.php');
@@ -171,14 +172,14 @@ echo "<tbody>";
 foreach ($projekt->result as $row)
 {
 	echo '<tr>';
-	
-	$student = new student();
-	$student->load($row->student_uid);
-	echo "<td nowrap>$student->nachname $student->vorname $student->titelpre $student->titelpost</td>";
+
+	$ps = new prestudent();
+	$ps->load($row->prestudent_id);
+	echo "<td nowrap>$ps->nachname $ps->vorname $ps->titelpre $ps->titelpost</td>";
 	echo "<td>$row->bezeichnung</td>";
 	echo "<td>$row->titel".($row->titel_english!=''?'<br>'.$row->titel_english:'')."</td>";
 	echo "<td>$row->themenbereich</td>";
-	
+
 	echo '<td nowrap>';
 	$qry = "SELECT distinct vorname, nachname, titelpre, titelpost, (SELECT uid FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter on(uid=mitarbeiter_uid) WHERE person_id=tbl_person.person_id LIMIT 1) as uid, betreuerart_kurzbz FROM public.tbl_person JOIN lehre.tbl_projektbetreuer USING(person_id) WHERE projektarbeit_id='".$row->projektarbeit_id."'";
 	if($result_betreuer = $db->db_query($qry))
@@ -228,5 +229,4 @@ echo '</form>';
 <br>
 </body>
 </html>
-?>
 

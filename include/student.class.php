@@ -384,7 +384,7 @@ class student extends benutzer
 	/**
 	 * Prueft ob die StudentLehrverband Zuteilung
 	 * bereits existiert
-	 * @param student_uid
+	 * @param prestudent_id
 	 * @param studiensemester_kurzbz
 	 * @return true wenn vorhanden, false wenn nicht
 	 */

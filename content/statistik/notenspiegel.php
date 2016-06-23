@@ -77,8 +77,8 @@ foreach ($stg->result as $studiengang)
 $stg = new studiengang();
 $stg->load($studiengang_kz);
 
-$student = new student();
-$result_student = $student->getStudents($studiengang_kz,$semester,null,null,null, $semester_aktuell);
+$prestudent = new prestudent();
+$result_student = $prestudent->getStudents($studiengang_kz,$semester,null,null,null, $semester_aktuell);
 $preids='';
 foreach ($result_student as $row) 
 {

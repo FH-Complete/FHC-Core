@@ -1931,12 +1931,46 @@ class prestudent extends person
 
 
 	/**
+	 * Prueft ob die StudentLehrverband Zuteilung
+	 * bereits existiert
+	 * @param prestudent_id
+	 * @param studiensemester_kurzbz
+	 * @return true wenn vorhanden, false wenn nicht
+	 */
+	public function studentlehrverband_exists($prestudent_id, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_studentlehrverband
+				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)." AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				if($row->anzahl>0)
+					return true;
+				else
+					return false;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Ermitteln des Lehrverbandes';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg ='Fehler beim Ermitteln des Lehrverbandes';
+			return false;
+		}
+	}
+
+	/**
 	 * Laedt die StudentLehrverband Zuteilung
 	 * @param prestudent_id
 	 * @param studiensemester_kurzbz
 	 * @return true wenn vorhanden, false wenn nicht
 	 */
-	public function load_studentlehrverband($studiensemester_kurzbz)
+	public function load_studentlehrverband($studiensemester_kurzbz = "")
 	{
 		if(!is_numeric($this->prestudent_id))
 		{
@@ -1979,6 +2013,101 @@ class prestudent extends person
 		else
 		{
 			$this->errormsg ='Fehler beim Ermitteln des Lehrverbandes';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt alle Incoming
+	 * @return boolean
+	 */
+	public function getIncoming()
+	{
+		$qry = "
+		SELECT
+			distinct tbl_prestudent.*, tbl_benutzer.*, tbl_person.*
+		FROM
+			public.tbl_prestudent
+			JOIN public.tbl_benutzer USING (uid)
+			JOIN public.tbl_person ON (tbl_benutzer.person_id=tbl_person.person_id)
+			JOIN public.tbl_prestudentstatus USING(prestudent_id)
+		WHERE
+			tbl_benutzer.aktiv AND
+			tbl_prestudentstatus.status_kurzbz='Incoming'
+		";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$ps = new prestudent();
+				$ps->uid = $row->uid;
+				$ps->perskz = $row->perskz;
+				$ps->prestudent_id = $row->prestudent_id;
+				$ps->studiengang_kz = $row->studiengang_kz;
+				$ps->person_id = $row->person_id;
+				$ps->vorname = $row->vorname;
+				$ps->nachname = $row->nachname;
+				$ps->gebdatum = $row->gebdatum;
+
+				$this->result[] = $ps;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten";
+			return false;
+		}
+	}
+
+
+	/**
+	 * Gibt Studenten zurück die im übergebenen Studiengang und semester sind
+	 * @param $studiengang_kz
+	 * @param $semester
+	 * @return boolean
+	 */
+	public function getStudentsStudiengang($studiengang_kz = null, $semester = null)
+	{
+
+		$qry = "SELECT distinct on(tbl_prestudent.uid) * FROM public.tbl_prestudent
+			JOIN public.tbl_benutzer USING (uid)
+			JOIN public.tbl_person ON (tbl_benutzer.person_id=tbl_person.person_id)
+			LEFT JOIN public.tbl_studentlehrverband USING (prestudent_id)
+		WHERE tbl_benutzer.aktiv = 'true'";
+		if(!is_null($studiengang_kz))
+			$qry.=" AND tbl_prestudent.studiengang_kz =".$this->db_add_param($studiengang_kz,FHC_INTEGER);
+
+		if(!is_null($semester))
+			$qry .= " AND semester =".$this->db_add_param($semester, FHC_INTEGER);
+		$qry.=" ORDER BY tbl_prestudent.uid, nachname, vorname";
+
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new prestudent();
+				$obj->uid = $row->uid;
+				$obj->perskz = $row->perskz;
+				$obj->prestudent_id = $row->prestudent_id;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->semester = $row->semester;
+				$obj->verband = $row->verband;
+				$obj->gruppe = $row->gruppe;
+				$obj->person_id = $row->person_id;
+				$obj->vorname = $row->vorname;
+				$obj->nachname = $row->nachname;
+				$obj->gebdatum = $row->gebdatum;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten";
 			return false;
 		}
 	}
@@ -2073,17 +2202,17 @@ class prestudent extends person
 			return false;
 		}
 
-		$qry = "SELECT student_uid FROM public.tbl_prestudent WHERE prestudent_id=".$this->db_add_param($prestudent_id);
+		$qry = "SELECT uid FROM public.tbl_prestudent WHERE prestudent_id=".$this->db_add_param($prestudent_id);
 
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
-				return $row->student_uid;
+				return $row->uid;
 			}
 			else
 			{
-				$this->errormsg = 'Student nicht gefunden';
+				$this->errormsg = 'Prestudent nicht gefunden';
 				return false;
 			}
 		}

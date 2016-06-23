@@ -34,7 +34,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
-require_once('../../include/student.class.php');
+require_once('../../include/prestudent.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Herstellen der Datenbankverbindung');
@@ -90,8 +90,8 @@ if(!$projektarbeit_obj->load($_REQUEST['projektarbeit_id']))
 
 $titel = $projektarbeit_obj->titel;
 $benutzer_autor = new benutzer();
-$student = new student();
-$uid = $student->getUid($projektarbeit_obj->prestudent_id);
+$prestudent = new prestudent();
+$uid = $prestudent->getUid($projektarbeit_obj->prestudent_id);
 
 if(!$benutzer_autor->load($uid))
 	die('Studierender kann nicht geladen werden');

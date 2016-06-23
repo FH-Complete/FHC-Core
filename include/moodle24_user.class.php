@@ -26,7 +26,7 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/moodle.class.php');
-require_once(dirname(__FILE__).'/student.class.php');
+require_once(dirname(__FILE__).'/prestudent.class.php');
 
 class moodle24_user extends basis_db
 {
@@ -349,8 +349,8 @@ class moodle24_user extends basis_db
 					{
 						if(isset($row_user->prestudent_id))
 						{
-							$student = new student();
-							$uid = $student->getUid($row_user->prestudent_id);
+							$guidps = new prestudent();
+							$uid = $guidps->getUid($row_user->prestudent_id);
 						}
 						else
 						{

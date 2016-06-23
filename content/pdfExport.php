@@ -35,7 +35,6 @@ require_once('../include/xslfo2pdf/xslfo2pdf.php');
 require_once('../include/fop.class.php');
 require_once('../include/akte.class.php');
 require_once('../include/vorlage.class.php');
-require_once('../include/student.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/variable.class.php');
 require_once('../include/addon.class.php');
@@ -582,15 +581,14 @@ else
 
 	$prestudent = new prestudent();
 	$prestudent->load($prestudent_id);
-	$student = new student();
-	$uid = $student->getUid($prestudent_id);
+	$uid = $prestudent->getUid($prestudent_id);
 
 	if(isset($_REQUEST['ss']))
 	{
 		$ss = $_REQUEST["ss"];
 
 		$ps=new prestudent();
-		$ps->getLastStatus($student->prestudent_id,$ss);
+		$ps->getLastStatus($prestudent->prestudent_id,$ss);
 		$semester=$ps->ausbildungssemester;
 
 		$query = "
@@ -625,9 +623,9 @@ else
 	else
 	{
 		$studiengang = new studiengang();
-		$studiengang->load($student->studiengang_kz);
-		$studiengang_kz=$student->studiengang_kz;
-		$person_id = $student->person_id;
+		$studiengang->load($prestudent->studiengang_kz);
+		$studiengang_kz=$prestudent->studiengang_kz;
+		$person_id = $prestudent->person_id;
 		$titel = $vorlage->bezeichnung.'_'.$studiengang->kuerzel;
 		$bezeichnung = $vorlage->bezeichnung.'_'.$studiengang->kuerzel;
 	}

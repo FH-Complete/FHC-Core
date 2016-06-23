@@ -32,7 +32,6 @@ require_once(dirname(__FILE__).'/../config/vilesci.config.inc.php');
 require_once(dirname(__FILE__).'/../include/studiensemester.class.php');
 require_once(dirname(__FILE__).'/../include/person.class.php');
 require_once(dirname(__FILE__).'/../include/benutzer.class.php');
-require_once(dirname(__FILE__).'/../include/student.class.php');
 require_once(dirname(__FILE__).'/../include/prestudent.class.php');
 require_once(dirname(__FILE__).'/../include/lehrverband.class.php');
 require_once(dirname(__FILE__).'/../include/mail.class.php');
@@ -91,46 +90,46 @@ if($result = $db->db_query($qry))
 		if($prestd->status_kurzbz=='Unterbrecher' || $prestd->status_kurzbz=='Abbrecher')
 		{
 			//Studentlehrverbandeintrag aktualisieren
-			$student = new student();
-			if($student->studentlehrverband_exists($row->prestudent_id, $row->studiensemester_kurzbz))
-				$student->new = false;
+			$lvb = new prestudent();
+			if($lvb->studentlehrverband_exists($row->prestudent_id, $row->studiensemester_kurzbz))
+				$lvb->new = false;
 			else
 			{
-				$student->new = true;
-				$student->insertamum = date('Y-m-d H:i:s');
-				$student->insertvon = 'chkstudentlvb';
+				$lvb->new = true;
+				$lvb->insertamum = date('Y-m-d H:i:s');
+				$lvb->insertvon = 'chkstudentlvb';
 			}
 
-			$student->uid = $row->uid;
-			$student->studiensemester_kurzbz=$row->studiensemester_kurzbz;
-			$student->studiengang_kz = $row->studiengang_kz;
-			$student->semester = '0';
-			$student->verband = ($prestd->status_kurzbz=='Unterbrecher'?'B':'A');
-			$student->gruppe = ' ';
-			$student->updateamum = date('Y-m-d H:i:s');
-			$student->updatevon = 'chkstudentlvb';
+			$lvb->uid = $row->uid;
+			$lvb->studiensemester_kurzbz=$row->studiensemester_kurzbz;
+			$lvb->studiengang_kz = $row->studiengang_kz;
+			$lvb->semester = '0';
+			$lvb->verband = ($prestd->status_kurzbz=='Unterbrecher'?'B':'A');
+			$lvb->gruppe = ' ';
+			$lvb->updateamum = date('Y-m-d H:i:s');
+			$lvb->updatevon = 'chkstudentlvb';
 
 			//Pruefen ob der Lehrverband exisitert, wenn nicht dann wird er angelegt
 			$lehrverband = new lehrverband();
-			if(!$lehrverband->exists($student->studiengang_kz, $student->semester, $student->verband, $student->gruppe))
+			if(!$lehrverband->exists($lvb->studiengang_kz, $lvb->semester, $lvb->verband, $lvb->gruppe))
 			{
-				$lehrverband->studiengang_kz = $student->studiengang_kz;
-				$lehrverband->semester = $student->semester;
-				$lehrverband->verband = $student->verband;
-				$lehrverband->gruppe = $student->gruppe;
-				$lehrverband->bezeichnung = ($student->verband=='A'?'Abbrecher':'Unterbrecher');
+				$lehrverband->studiengang_kz = $lvb->studiengang_kz;
+				$lehrverband->semester = $lvb->semester;
+				$lehrverband->verband = $lvb->verband;
+				$lehrverband->gruppe = $lvb->gruppe;
+				$lehrverband->bezeichnung = ($lvb->verband=='A'?'Abbrecher':'Unterbrecher');
 
 				$lehrverband->save(true);
 			}
 
-			if($student->save_studentlehrverband())
+			if($lvb->save_studentlehrverband())
 			{
-				$text.="Student $student->uid wurde im $row->studiensemester_kurzbz in die Gruppe $student->semester$student->verband verschoben\n";
+				$text.="Student $lvb->uid wurde im $row->studiensemester_kurzbz in die Gruppe $lvb->semester$lvb->verband verschoben\n";
 				$abunterbrecher_verschoben++;
 			}
 			else
 			{
-				$text.="Fehler biem Speichern des Lehrverbandeintrages bei $student->uid:".$student->errormsg."\n";
+				$text.="Fehler biem Speichern des Lehrverbandeintrages bei $lvb->uid:".$lvb->errormsg."\n";
 				$abunterbrecher_verschoben_error++;
 			}
 		}

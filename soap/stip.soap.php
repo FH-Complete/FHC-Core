@@ -126,8 +126,7 @@ function GetStipendienbezieherStip($parameters)
 				$prestudent->getLastStatus($prestudentID); 
 				$prestudentStatus = new prestudent();
 
-				$student = new student(); 
-				$studentUID = $student->getUID($prestudentID); 
+				$studentUID = $prestudent->getUid($prestudentID);
 
 				$abschlusspruefung = new abschlusspruefung();
 				$abschlusspruefung->getLastAbschlusspruefung($prestudentID);

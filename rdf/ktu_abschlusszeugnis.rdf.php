@@ -26,7 +26,6 @@ require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/abschlusspruefung.class.php');
-require_once('../include/student.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/studienplan.class.php');
 require_once('../include/prestudent.class.php');
@@ -67,10 +66,9 @@ $studienplan->loadStudienplan($prestudent->studienplan_id);
 $lehrveranstaltung = new lehrveranstaltung();
 $tree = $lehrveranstaltung->getLvTree($prestudent->studienplan_id);
 
-$student = new student();
-$student_uid = $student->getUid($prestudent->prestudent_id);
+$student_uid = $prestudent->getUid($prestudent->prestudent_id);
 if(!$student_uid)
-	die($student->errormsg);
+	die($prestudent->errormsg);
 
 $pruefung = new pruefung();
 $pruefung->getPruefungen($prestudent->prestudent_id, "fachpruefung");

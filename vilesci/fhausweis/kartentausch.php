@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
+ * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * GUI zum Tauschen der Zutrittskarte
@@ -24,7 +25,8 @@ require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
-require_once('../../include/student.class.php');
+require_once('../../include/prestudent.class.php');
+require_once('../../include/studiensemester.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/betriebsmittel.class.php');
 require_once('../../include/betriebsmittelperson.class.php');
@@ -44,6 +46,17 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
 	<script type="text/javascript" src="../../include/js/jquery.js"></script>
+	<link href="../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
+	<script type="text/javascript">
+		$(document).ready(function()
+		{
+			$("#t1").tablesorter(
+			{
+				sortList: [[0,0]],
+				widgets: ["zebra"]
+			});
+		});
+	</script>
 	<title>Kartentausch</title>
 </head>
 <body>
@@ -230,17 +243,43 @@ if($karten_user!='')
 		else
 		{
 			//Student
-			$student = new student();
-			if($student->load($karten_user))
+			$prestudent = new prestudent();
+			$prestudent->getPrestudentsFromUid($karten_user);
+
+			if(count($prestudent->result) > 0)
 			{
-				$stg = new studiengang();
-				$stg->load($student->studiengang_kz);
-				echo '<br><b>Student</b><br>';
-				echo '<b>Studiengang:</b> '.$stg->kuerzel.' - '.$stg->bezeichnung.'<br>';
-				echo '<b>Semester:</b> '.$student->semester.'<br>';
+				//echo '<br><b>Student</b><br>';
+				echo '<b>UID:</b> '.$karten_user.'<br>';
+
+				echo '<table id="t1" class="tablesorter">';
+				echo '<thead>';
+				echo '<tr>';
+				echo '<th>Studiengang</th>';
+				echo '<th>Semester</th>';
+				echo '</tr>';
+				echo '</thead>';
+				echo '<tbody>';
+
+				foreach($prestudent->result as $ps)
+				{
+					echo '<tr>';
+
+					$stg = new studiengang();
+					$stg->load($ps->studiengang_kz);
+					echo '<td>'.$stg->kuerzel.' - '.$stg->bezeichnung.'</td>';
+
+					$stsem = new studiensemester();
+					$akt = $stsem->getaktorNext();
+					$ps->load_studentlehrverband($akt);
+					echo '<td>'.$ps->semester.'</td>';
+
+					echo '</tr>';
+				}
+				echo '</tbody>';
+				echo '</table>';
 			}
 		}
-			
+
 		echo '
 				</td>
 			</tr>

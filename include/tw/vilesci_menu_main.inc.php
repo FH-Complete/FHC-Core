@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 /**
  * Enthaelt das Array fuer die Menuepunkt der Vilesci-Seite
@@ -175,7 +176,6 @@ $menu=array
 			'Verlaengerung'=>array('name'=>'Verlängerung','link'=>'fhausweis/verlaengerung.php','target'=>'main'),
 			'Suche'=>array('name'=>'Suche','link'=>'fhausweis/search.php','target'=>'main'),
 			'Synchronisation'=>array('name'=>'Syncronisation', 'link'=>'stammdaten/imexport/zutrittskarten/index.html', 'target'=>'main'),
-			'Korrektur'=>array('name'=>'Kartenkorrektur','link'=>'fhausweis/kartenkorrektur.php','target'=>'main')
 		)
 	),
 	'Wartung'=>	array

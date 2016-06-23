@@ -36,7 +36,6 @@ require_once('../../../include/betriebsmittel_betriebsmittelstatus.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/prestudent.class.php');
-require_once('../../../include/student.class.php');
 require_once('../../../include/kontakt.class.php');
 require_once('../../../include/fotostatus.class.php');
 require_once('../../../include/addon.class.php'); 
@@ -497,15 +496,14 @@ if ($type=='student' && (!defined('CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN') || C
 	{
 		$studiengang->load($ps->studiengang_kz);
 		$stsem = new studiensemester();
-		$student = new student();
-		$student->load_studentlehrverband($ps->prestudent_id, $stsem->getaktorNext());
+		$ps->load_studentlehrverband($ps->prestudent_id, $stsem->getaktorNext());
 
 		echo "<tr>
 						<td>".$studiengang->bezeichnung."</td>
 						<td>".$ps->perskz."</td>
-						<td>".($student->semester!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$ps->studiengang_kz&sem=$student->semester\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$student->semester."</a>":"")."</td>
-						<td>".($student->verband!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$ps->studiengang_kz&sem=$student->semester&verband=$student->verband\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$student->verband."</a>":"")."</td>
-						<td>".($student->gruppe!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$ps->studiengang_kz&sem=$student->semester&verband=$ps->verband&grp=$student->gruppe\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$student->gruppe."</a>":"")."</td>
+						<td>".($ps->semester!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$ps->studiengang_kz&sem=$ps->semester\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$ps->semester."</a>":"")."</td>
+						<td>".($ps->verband!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$ps->studiengang_kz&sem=$ps->semester&verband=$ps->verband\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$ps->verband."</a>":"")."</td>
+						<td>".($ps->gruppe!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$ps->studiengang_kz&sem=$ps->semester&verband=$ps->verband&grp=$ps->gruppe\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$ps->gruppe."</a>":"")."</td>
 					</tr>";
 
 	}
