@@ -23,13 +23,13 @@ class Message_model extends DB_Model
 		if ($uid === $this->getUID())
 		{
 			if (! $this->fhc_db_acl->isBerechtigt('basis/message', 's'))
-				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> system/message', FHC_MODEL_ERROR);
+				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> basis/message', FHC_MODEL_ERROR);
 		}
 		// if different user, for reading messages from other users
 		else
 		{
 			if (! $this->fhc_db_acl->isBerechtigt('basis/message', 's'))
-				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> system/message:all', FHC_MODEL_ERROR);
+				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> basis/message:all', FHC_MODEL_ERROR);
 		}
 
 		// get Data

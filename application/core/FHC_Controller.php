@@ -3,7 +3,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class FHC_Controller extends CI_Controller
 {
-	protected $_uid; // needs to be changed to protected $_uid
+	protected $_uid; 
 	
     public function __construct()  
 	{

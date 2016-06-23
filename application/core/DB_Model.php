@@ -128,7 +128,7 @@ class DB_Model extends FHC_Model
 	 * @param   string $id  ID (Primary Key) for SELECT ... WHERE
 	 * @return  array
 	 */
-	public function load($id)
+	public function load($id = null)
 	{
 		// Check Class-Attributes
 		if (is_null($this->dbTable))
@@ -150,6 +150,8 @@ class DB_Model extends FHC_Model
 			else
 				$result = $this->db->get_where($this->dbTable, $id);
 		}
+		elseif (empty($id))
+			$result = $this->db->get($this->dbTable);
 		else
 			$result = $this->db->get_where($this->dbTable, array($this->pk => $id));
 		
@@ -185,6 +187,8 @@ class DB_Model extends FHC_Model
 			return $this->_error($this->db->error(), FHC_DB_ERROR);
 	}
 	
+	
+	
 	/** ---------------------------------------------------------------
 	 * Load single data from DB-Table
 	 *
@@ -212,7 +216,7 @@ class DB_Model extends FHC_Model
 		else
 			return $this->_error($this->db->error(), FHC_DB_ERROR);
 	}
-	
+
 	/** ---------------------------------------------------------------
 	 * Add a table to join with
 	 *
