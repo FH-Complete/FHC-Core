@@ -22,7 +22,7 @@ class Message extends APIv1_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		// Load model MessageModel
+		// Load library MessageLib
 		$this->load->library('MessageLib', array('uid' => $this->_getUID()));
 	}
 
@@ -71,7 +71,7 @@ class Message extends APIv1_Controller
 	 */
 	public function postMessage()
 	{
-		$validation = $this->_validate($this->post());
+		$validation = $this->_validatePostMessage($this->post());
 		
 		if (is_object($validation) && $validation->error == EXIT_SUCCESS)
 		{
@@ -93,7 +93,33 @@ class Message extends APIv1_Controller
 		}
 	}
 	
-	private function _validate($message = null)
+	/**
+	 * @return void
+	 */
+	public function postMessageVorlage()
+	{
+		$validation = $this->_validatePostMessageVorlage($this->post());
+		
+		if (is_object($validation) && $validation->error == EXIT_SUCCESS)
+		{
+			$result = $this->messagelib->sendMessageVorlage(
+				$this->post()['sender_id'],
+				$this->post()['receiver_id'],
+				$this->post()['vorlage_kurzbz'],
+				$this->post()['oe_kurzbz'],
+				$this->post()['data'],
+				$this->post()['orgform_kurzbz']
+			);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response($validation, REST_Controller::HTTP_OK);
+		}
+	}
+	
+	private function _validatePostMessage($message = null)
 	{
 		if (!isset($message))
 		{
@@ -114,6 +140,36 @@ class Message extends APIv1_Controller
 		if (!isset($message['oe_kurzbz']))
 		{
 			return $this->_error('oe_kurzbz is not set');
+		}
+		
+		return $this->_success('Input data are valid');
+	}
+	
+	private function _validatePostMessageVorlage($message = null)
+	{
+		if (!isset($message))
+		{
+			return $this->_error('Parameter is null');
+		}
+		if (!isset($message['sender_id']))
+		{
+			return $this->_error('person_id of sender is not set');
+		}
+		if (!isset($message['receiver_id']))
+		{
+			return $this->_error('person_id of receiver is not set');
+		}
+		if (!isset($message['vorlage_kurzbz']))
+		{
+			return $this->_error('vorlage_kurzbz is not set');
+		}
+		if( !isset($message['oe_kurzbz']))
+		{
+			return $this->_error('oe_kurzbz is not set');
+		}
+		if (!isset($message['data']))
+		{
+			return $this->_error('data is not set');
 		}
 		
 		return $this->_success('Input data are valid');

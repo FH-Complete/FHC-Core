@@ -5,7 +5,7 @@
  *
  * @return  array
  */
-function success($retval, $message = FHC_SUCCESS)
+function success($retval, $message = EXIT_SUCCESS)
 {
 	$return = new stdClass();
 	$return->error = EXIT_SUCCESS;
@@ -20,10 +20,10 @@ function success($retval, $message = FHC_SUCCESS)
  *
  * @return  array
  */
-function error($retval = '', $message = FHC_MODEL_ERROR)
+function error($retval = '', $message = EXIT_ERROR)
 {
 	$return = new stdClass();
-	$return->error = EXIT_MODEL;
+	$return->error = EXIT_ERROR;
 	$return->fhcCode = $message;
 	$return->msg = lang('fhc_' . $message);
 	$return->retval = $retval;

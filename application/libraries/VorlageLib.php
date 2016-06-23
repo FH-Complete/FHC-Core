@@ -11,7 +11,7 @@ class VorlageLib
 {
 	private $recipients = array();
 	
-    public function __construct()
+    public function __construct($params = null)
     {
         require_once APPPATH.'config/message.php';
 
@@ -19,6 +19,13 @@ class VorlageLib
 		$this->ci->load->library('parser');
 		$this->ci->load->model('system/Vorlage_model', 'VorlageModel');
 		$this->ci->load->model('system/Vorlagestudiengang_model', 'VorlageStudiengangModel');
+		
+		if (is_array($params) && isset($params['uid']))
+		{
+			$this->ci->VorlageModel->setUID($params['uid']);
+			$this->ci->VorlageStudiengangModel->setUID($params['uid']);
+		}
+		
         $this->ci->load->helper('language');
         //$this->ci->lang->load('fhcomplete');
     }
@@ -149,4 +156,35 @@ class VorlageLib
 		$text = $this->ci->parser->parse_string($text, $data, TRUE);
 		return $text;
     }
+	
+	/** ---------------------------------------------------------------
+	 * Success
+	 *
+	 * @param   mixed  $retval
+	 * @return  array
+	 */
+	protected function _success($retval, $message = EXIT_SUCCESS)
+	{
+		$return = new stdClass();
+		$return->error = EXIT_SUCCESS;
+		$return->Code = $message;
+		$return->msg = lang('message_' . $message);
+		$return->retval = $retval;
+		return $return;
+	}
+	
+	/** ---------------------------------------------------------------
+	 * General Error
+	 *
+	 * @return  array
+	 */
+	protected function _error($retval = '', $message = EXIT_ERROR)
+	{
+		$return = new stdClass();
+		$return->error = EXIT_ERROR;
+		$return->Code = $message;
+		$return->msg = lang('message_' . $message);
+		$return->retval = $retval;
+		return $return;
+	}
 }
