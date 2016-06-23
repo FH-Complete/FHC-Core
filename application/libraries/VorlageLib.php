@@ -102,7 +102,11 @@ class VorlageLib
         if (empty($vorlage_kurzbz))
         	return $this->_error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
 		
-        $vorlage = $this->ci->VorlageStudiengangModel->getVorlageStudiengang($vorlage_kurzbz, $oe_kurzbz, $orgform_kurzbz);
+        $vorlage = $this->ci->VorlageStudiengangModel->loadWhere(array(
+			'vorlage_kurzbz' => $vorlage_kurzbz,
+			'oe_kurzbz' => $oe_kurzbz,
+			'orgform_kurzbz' => $orgform_kurzbz)
+		);
         return $vorlage;
     }
 

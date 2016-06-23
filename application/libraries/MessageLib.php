@@ -236,27 +236,21 @@ class MessageLib
      */
     function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $orgform_kurzbz = null)
     {
-		var_dump($data);
-		
-		exit;
-		
         if (!is_numeric($sender_id) || !is_numeric($receiver_id))
         	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
 
-		$result = $this->ci->vorlagelib->getVorlage($vorlage_kurzbz);
+		$result = $this->ci->vorlagelib->loadVorlagetext($vorlage_kurzbz, $oe_kurzbz, $orgform_kurzbz);
 		if (is_object($result) && $result->error == EXIT_SUCCESS)
 		{
 			if (is_array($result->retval) && count($result->retval) > 0)
 			{
 				$parsedText = $this->ci->vorlagelib->parseVorlagetext($result->retval[0]->text, $data);
 				
-				error_log($parsedText);
-				
 				$this->ci->db->trans_start(false);
 				//save Message
 				$msgData = array(
 					'person_id' => $sender_id,
-					//'subject' => $subject,
+					'subject' => $result->retval[0]->subject,
 					'body' => $parsedText,
 					'priority' => PRIORITY_NORMAL,
 					//'relationmessage_id' => $relationmessage_id,
@@ -272,22 +266,27 @@ class MessageLib
 						'message_id' => $msg_id
 					);
 					$result = $this->ci->RecipientModel->insert($recipientData);
-					/*if (is_object($result) && $result->error == EXIT_SUCCESS)
+					if (is_object($result) && $result->error == EXIT_SUCCESS)
 					{
-						
-					}*/
+						$statusData = array(
+							'message_id' => $msg_id,
+							'person_id' => $receiver_id,
+							'status' => MSG_STATUS_UNREAD
+						);
+						$result = $this->ci->MsgStatusModel->insert($statusData);
+					}
 				}
 				
 				$this->ci->db->trans_complete();
 				
-				if ($this->ci->db->trans_status() === FALSE)
+				if ($this->ci->db->trans_status() === FALSE || (is_object($result) && $result->error != EXIT_SUCCESS))
 				{
-					$this->db->trans_rollback();
+					$this->ci->db->trans_rollback();
 					return $this->_error($result->msg, EXIT_ERROR);
 				}
 				else
 				{
-					$this->db->trans_commit();
+					$this->ci->db->trans_commit();
 					return $this->_success($msg_id);
 				}
 			}
