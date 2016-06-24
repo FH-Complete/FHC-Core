@@ -446,6 +446,8 @@
 						<th ts-criteria="vorname">Vorname</th>
 						<th ts-criteria="bezeichnung">ZGV Gruppe</th>
 						<th ts-criteria="seqPlace|parseInt" ts-default="ascending">Reihung</th>
+						<th ts-criteria="rt_punkte1|parseFloat">RT Punkte 1</th>
+						<th ts-criteria="rt_punkte2|parseFloat">RT Punkte 2</th>
 						<th ts-criteria="rt_gesamtpunkte|parseFloat" ts-default="ascending">RT Gesamt</th>
 						<th ts-criteria="interviewbogen">Interviewbogen</th>
 						<th ts-criteria="anmerkung">Anmerkung/Prio</th>
@@ -462,6 +464,8 @@
 						<td ng-if="stud.bezeichnung">{{stud.bezeichnung}}</td>
 						<td ng-if="!stud.bezeichnung" style="font-weight: bold;">Keine Angabe</td>
 						<td>{{stud.seqPlace}}</td>
+						<td>{{stud.rt_punkte1}}</td>
+						<td>{{stud.rt_punkte2}}</td>
 						<td>{{stud.rt_gesamtpunkte}}</td>
 						<td>{{stud.interviewbogen?'vorhanden':'nicht vorhanden'}}</td>
 						<td>{{stud.anmerkung}}</td>
@@ -514,6 +518,8 @@
 						<th ts-criteria="vorname">Vorname</th>
 						<th ts-criteria="bezeichnung">ZGV Gruppe</th>
 						<th ts-criteria="seqPlace|parseInt" ts-default="ascending">Reihung</th>
+						<th ts-criteria="rt_punkte1|parseFloat">RT Punkte 1</th>
+						<th ts-criteria="rt_punkte2|parseFloat">RT Punkte 2</th>
 						<th ts-criteria="rt_gesamtpunkte|parseFloat">RT Gesamt</th>
 						<th ts-criteria="interviewbogen">Interviewbogen</th>
 						<th ts-criteria="anmerkung">Anmerkung/Prio</th>
@@ -529,6 +535,8 @@
 						<td ng-if="stud.bezeichnung">{{stud.bezeichnung}}</td>
 						<td ng-if="!stud.bezeichnung" style="font-weight: bold;">Keine Angabe</td>
 						<td>{{stud.seqPlace}}</td>
+						<td>{{stud.rt_punkte1}}</td>
+						<td>{{stud.rt_punkte2}}</td>
 						<td>{{stud.rt_gesamtpunkte}}</td>
 						<td>{{stud.interviewbogen?'vorhanden':'nicht vorhanden'}}</td>
 						<td>{{stud.anmerkung}}</td>
