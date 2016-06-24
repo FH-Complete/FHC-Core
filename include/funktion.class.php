@@ -111,7 +111,8 @@ class funktion extends Funktion_model
 	 */
 	public function load($funktion_kurzbz = null)
 	{
-		if ($funktion_kurzbz == '')
+		
+		if (empty($funktion_kurzbz) || $funktion_kurzbz == '')
 		{
 			$this->errormsg = 'funktion_bz darf nicht leer sein';
 			return false;

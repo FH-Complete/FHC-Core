@@ -51,6 +51,12 @@ class benutzer extends person
 	 */
 	public function load($uid = null)
 	{
+		if (empty($uid))
+		{
+			$this->errormsg = "UID not set!";
+			return false;
+		}
+
 		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid=".$this->db_add_param($uid);
 
 		if($this->db_query($qry))

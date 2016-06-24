@@ -52,6 +52,12 @@ class berechtigung extends Berechtigung_model
 	 */
 	public function load($berechtigung_kurzbz = null)
 	{
+		if (empty($berechtigung_kurzbz))
+		{
+			$this->errormsg = "berechtigung not set!";
+			return false;
+		}
+
 		$result = parent::load($berechtigung_kurzbz);
 		
 		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
