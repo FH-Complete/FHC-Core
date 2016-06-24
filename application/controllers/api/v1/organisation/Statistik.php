@@ -54,7 +54,7 @@ class Statistik extends APIv1_Controller
 	{
 		$this->StatistikModel->addOrder($this->get('order'));
 		
-		$result = $this->StatistikModel->loadWhole();
+		$result = $this->StatistikModel->load();
 		
 		$this->response($result, REST_Controller::HTTP_OK);
 	}
@@ -68,7 +68,7 @@ class Statistik extends APIv1_Controller
 		$this->StatistikModel->addOrder('bezeichnung');
 		$this->StatistikModel->addOrder('statistik_kurzbz');
 		
-		$result = $this->StatistikModel->loadWhole();
+		$result = $this->StatistikModel->load();
 		
 		$this->response($result, REST_Controller::HTTP_OK);
 	}

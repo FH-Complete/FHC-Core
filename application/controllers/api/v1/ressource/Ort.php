@@ -66,7 +66,7 @@ class Ort extends APIv1_Controller
 		}
 		else
 		{
-			$result = $this->OrtModel->loadWhole();
+			$result = $this->OrtModel->load();
 		}
 		
 		$this->response($result, REST_Controller::HTTP_OK);

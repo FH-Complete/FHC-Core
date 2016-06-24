@@ -17,16 +17,26 @@ class MessageLib
 		$this->ci->config->load('message');
 
 		$this->ci->load->model('system/Message_model', 'MessageModel');
-		if (is_array($params) && isset($params['uid']))
-		{
-			$this->ci->MessageModel->setUID($params['uid']);
-		}
-		
 		$this->ci->load->model('system/MsgStatus_model', 'MsgStatusModel');
 		$this->ci->load->model('system/Recipient_model', 'RecipientModel');
 		$this->ci->load->model('system/Attachment_model', 'AttachmentModel');
+		
+		if (is_array($params) && isset($params['uid']))
+		{
+			$this->ci->load->library('VorlageLib', array('uid' => $params['uid']));
+			$this->ci->MessageModel->setUID($params['uid']);
+			$this->ci->MsgStatusModel->setUID($params['uid']);
+			$this->ci->RecipientModel->setUID($params['uid']);
+			$this->ci->AttachmentModel->setUID($params['uid']);
+		}
+		else
+		{
+			$this->ci->load->library('VorlageLib');
+		}
+		
         //$this->ci->load->helper('language');
         $this->ci->lang->load('message');
+		
     }
 
     // ------------------------------------------------------------------------
@@ -212,6 +222,85 @@ class MessageLib
 		else
 			return $this->_success($msg_id);
 		
+    }
+	
+	/**
+     * sendMessage() - sends new internal message. This function will create a new thread
+     *
+     * @param   integer  $sender_id   REQUIRED
+     * @param   mixed    $recipients  REQUIRED - a single integer or an array of integers, representing user_ids
+     * @param   string   $subject
+     * @param   string   $body
+     * @param   integer  $priority
+     * @return  array
+     */
+    function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $orgform_kurzbz = null)
+    {
+        if (!is_numeric($sender_id) || !is_numeric($receiver_id))
+        	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
+
+		$result = $this->ci->vorlagelib->loadVorlagetext($vorlage_kurzbz, $oe_kurzbz, $orgform_kurzbz);
+		if (is_object($result) && $result->error == EXIT_SUCCESS)
+		{
+			if (is_array($result->retval) && count($result->retval) > 0)
+			{
+				$parsedText = $this->ci->vorlagelib->parseVorlagetext($result->retval[0]->text, $data);
+				
+				$this->ci->db->trans_start(false);
+				//save Message
+				$msgData = array(
+					'person_id' => $sender_id,
+					'subject' => $result->retval[0]->subject,
+					'body' => $parsedText,
+					'priority' => PRIORITY_NORMAL,
+					//'relationmessage_id' => $relationmessage_id,
+					'oe_kurzbz' => $oe_kurzbz
+				);
+				
+				$result = $this->ci->MessageModel->insert($msgData);
+				if (is_object($result) && $result->error == EXIT_SUCCESS)
+				{
+					$msg_id = $result->retval;
+					$recipientData = array(
+						'person_id' => $receiver_id,
+						'message_id' => $msg_id
+					);
+					$result = $this->ci->RecipientModel->insert($recipientData);
+					if (is_object($result) && $result->error == EXIT_SUCCESS)
+					{
+						$statusData = array(
+							'message_id' => $msg_id,
+							'person_id' => $receiver_id,
+							'status' => MSG_STATUS_UNREAD
+						);
+						$result = $this->ci->MsgStatusModel->insert($statusData);
+					}
+				}
+				
+				$this->ci->db->trans_complete();
+				
+				if ($this->ci->db->trans_status() === FALSE || (is_object($result) && $result->error != EXIT_SUCCESS))
+				{
+					$this->ci->db->trans_rollback();
+					return $this->_error($result->msg, EXIT_ERROR);
+				}
+				else
+				{
+					$this->ci->db->trans_commit();
+					return $this->_success($msg_id);
+				}
+			}
+			else
+			{
+				$result = $this->_error('Vorlage not found', EXIT_ERROR);
+			}
+		}
+		else
+		{
+			$result = $this->_error($result->msg, EXIT_ERROR);
+		}
+		
+		return $result;
     }
 
     // ------------------------------------------------------------------------

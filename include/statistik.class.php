@@ -133,7 +133,7 @@ class statistik extends Statistik_model
 			parent::addOrder($order);
 		}
 		
-		$result = parent::loadWhole();
+		$result = parent::load();
 		
 		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
 		{
@@ -339,7 +339,7 @@ class statistik extends Statistik_model
 		parent::addOrder('bezeichnung');
 		parent::addOrder('statistik_kurzbz');
 		
-		$result = parent::loadWhole();
+		$result = parent::load();
 			
 		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
 		{

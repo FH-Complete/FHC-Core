@@ -30,7 +30,7 @@ class Bundesland extends APIv1_Controller
 	
 	public function getAll()
 	{
-		$result = $this->BundeslandModel->loadWhole();
+		$result = $this->BundeslandModel->load();
 		
 		$this->response($result, REST_Controller::HTTP_OK);
 	}

@@ -82,7 +82,7 @@ public function getMessagesByPerson($person_id, $all)
 		// prepare parameters
 		$person_id = (int)$person_id;
 		// get Data
-		$sql = 'SELECT person_id,
+		/*$sql = 'SELECT person_id,
 						message_id,
 						subject,
 						body,
@@ -109,10 +109,23 @@ public function getMessagesByPerson($person_id, $all)
 									) status USING (message_id, person_id)
 							 WHERE tbl_msg_status.insertamum=status.insertamum
 						) s USING (message_id, person_id)
-				 WHERE person_id = ?';
+				 WHERE person_id = ?';*/
 		
-		if (! $all)
-			$sql .= ' AND (status < 3 OR status IS NULL)';
+		$sql = 'SELECT r.message_id,
+						m.subject,
+						m.body,
+						m.insertamum,
+						m.oe_kurzbz,
+						s.status,
+						s.statusinfo,
+						s.updateamum
+				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_message m USING (message_id)
+						JOIN public.tbl_person p ON (p.person_id = m.person_id)
+						JOIN public.tbl_msg_status s USING (message_id)
+				 WHERE r.person_id = ?';
+		
+		/*if (! $all)
+			$sql .= ' AND (status < 3 OR status IS NULL)';*/
 		$result = $this->db->query($sql, array($person_id));
 		//var_dump($result);
 		if (is_object($result))

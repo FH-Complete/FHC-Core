@@ -191,38 +191,6 @@ class DB_Model extends FHC_Model
 		else
 			return $this->_error($this->db->error(), FHC_DB_ERROR);
 	}
-	
-	
-	
-	/** ---------------------------------------------------------------
-	 * Load single data from DB-Table
-	 *
-	 * @param   string $id  ID (Primary Key) for SELECT ... WHERE
-	 * @return  array
-	 */
-	public function loadWhole()
-	{
-		// Check Class-Attributes
-		if (is_null($this->dbTable))
-			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
-		if (is_null($this->pk))
-			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
-		
-		
-		// Check rights only if this method is called from a model
-		//var_dump(get_called_class());
-		if (substr(get_called_class(), -6) == '_model')
-			if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 's'))
-				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
-
-		// DB-SELECT
-		$result = $this->db->get($this->dbTable);
-		
-		if ($result)
-			return $this->_success($result->result());
-		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
-	}
 
 	/** ---------------------------------------------------------------
 	 * Add a table to join with

@@ -52,7 +52,7 @@ class Orgform extends APIv1_Controller
 	 */
 	public function getAll()
 	{
-		$result = $this->OrgformModel->loadWhole();
+		$result = $this->OrgformModel->load();
 		
 		$this->response($result, REST_Controller::HTTP_OK);
 	}

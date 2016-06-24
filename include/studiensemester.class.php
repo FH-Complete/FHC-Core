@@ -324,7 +324,7 @@ class studiensemester extends Studiensemester_model
 			parent::addOrder('ende', 'ASC');
 		}
 		
-		$result = parent::loadWhole();
+		$result = parent::load();
 
 		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
 		{
