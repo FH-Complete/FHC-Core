@@ -49,8 +49,14 @@ class benutzer extends person
 	 * Laedt Benutzer mit der uebergebenen ID
 	 * @param $uid ID der Person die geladen werden soll
 	 */
-	public function load($uid)
+	public function load($uid = null)
 	{
+		if (empty($uid))
+		{
+			$this->errormsg = "UID not set!";
+			return false;
+		}
+
 		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid=".$this->db_add_param($uid);
 
 		if($this->db_query($qry))

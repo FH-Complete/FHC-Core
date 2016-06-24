@@ -87,7 +87,7 @@ class person extends Person_model
 	 * @param	int	$personId	ID der Person die geladen werden soll.
 	 * @return bool
 	 **/
-	public function load($personId)
+	public function load($personId = null)
 	{
 		//person_id auf gueltigkeit pruefen
 		if (is_numeric($personId) && $personId != '')
