@@ -421,7 +421,8 @@ DELETE FROM system.tbl_rolleberechtigung WHERE berechtigung_kurzbz IN (
 	'lehre/reservierung',
 	'lehre/reihungstest',
 	'wawi/inventar:begrenzt',
-	'fs/dms'
+	'fs/dms',
+	'basis/phrase'
 );
 
 -- DELETE FROM system.tbl_berechtigung
@@ -648,7 +649,8 @@ DELETE FROM system.tbl_berechtigung WHERE berechtigung_kurzbz IN (
 	'lehre/reservierung',
 	'lehre/reihungstest',
 	'wawi/inventar:begrenzt',
-	'fs/dms'
+	'fs/dms',
+	'basis/phrase'
 );
 
 -- INSERT Permissions
@@ -875,6 +877,7 @@ INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('wawi/inventar:begrenzt', '');
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('fs/dms', '');
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/message', '');
+INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/phrase', '');
 
 -- INSERT link between user admin and permissions
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/archiv', 'admin', 'suid');
@@ -1100,6 +1103,7 @@ INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('wawi/inventar:begrenzt', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('fs/dms', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/message', 'admin', 'suid');
+INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/phrase', 'admin', 'suid');
 
 -- EMPTY public.tbl_statistik
 DELETE FROM public.tbl_statistik;

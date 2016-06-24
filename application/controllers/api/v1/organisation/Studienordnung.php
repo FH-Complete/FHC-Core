@@ -24,8 +24,8 @@ class Studienordnung extends APIv1_Controller
 		parent::__construct();
 		// Load model StudienordnungModel
 		$this->load->model('organisation/studienordnung_model', 'StudienordnungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->StudienordnungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

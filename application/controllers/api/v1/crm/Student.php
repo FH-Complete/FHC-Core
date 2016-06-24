@@ -24,8 +24,8 @@ class Student extends APIv1_Controller
 		parent::__construct();
 		// Load model StudentModel
 		$this->load->model('crm/student_model', 'StudentModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->StudentModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

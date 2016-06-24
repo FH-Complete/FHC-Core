@@ -24,8 +24,8 @@ class Reihungstest extends APIv1_Controller
 		parent::__construct();
 		// Load model ReihungstestModel
 		$this->load->model('crm/reihungstest_model', 'ReihungstestModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ReihungstestModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

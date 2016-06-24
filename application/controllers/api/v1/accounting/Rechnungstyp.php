@@ -24,8 +24,6 @@ class Rechnungstyp extends APIv1_Controller
 		parent::__construct();
 		// Load model RechnungstypModel
 		$this->load->model('accounting/rechnungstyp_model', 'RechnungstypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->RechnungstypModel->setUID($this->_getUID());
 	}
 
 	/**

@@ -24,8 +24,8 @@ class Feedback extends APIv1_Controller
 		parent::__construct();
 		// Load model FeedbackModel
 		$this->load->model('education/feedback', 'FeedbackModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->FeedbackModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

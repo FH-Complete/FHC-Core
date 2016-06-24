@@ -24,8 +24,6 @@ class News extends APIv1_Controller
 		parent::__construct();
 		// Load model NewsModel
 		$this->load->model('content/news_model', 'NewsModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->NewsModel->setUID($this->_getUID());
 	}
 
 	/**

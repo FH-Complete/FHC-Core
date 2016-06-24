@@ -24,8 +24,8 @@ class Fachbereich2 extends APIv1_Controller
 		parent::__construct();
 		// Load model FachbereichModel
 		$this->load->model('organisation/fachbereich_model', 'FachbereichModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->FachbereichModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

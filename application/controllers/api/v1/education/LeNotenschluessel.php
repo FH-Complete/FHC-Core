@@ -24,8 +24,8 @@ class LeNotenschluessel extends APIv1_Controller
 		parent::__construct();
 		// Load model LeNotenschluesselModel
 		$this->load->model('education/lenotenschluessel', 'LeNotenschluesselModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LeNotenschluesselModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

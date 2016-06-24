@@ -24,8 +24,8 @@ class Studentuebung extends APIv1_Controller
 		parent::__construct();
 		// Load model StudentuebungModel
 		$this->load->model('education/studentuebung', 'StudentuebungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->StudentuebungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

@@ -24,8 +24,8 @@ class Paabgabetyp extends APIv1_Controller
 		parent::__construct();
 		// Load model PaabgabetypModel
 		$this->load->model('education/paabgabetyp', 'PaabgabetypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->PaabgabetypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

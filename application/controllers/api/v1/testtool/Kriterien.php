@@ -24,8 +24,8 @@ class Kriterien extends APIv1_Controller
 		parent::__construct();
 		// Load model KriterienModel
 		$this->load->model('testtool/kriterien_model', 'KriterienModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->KriterienModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

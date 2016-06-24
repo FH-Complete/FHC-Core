@@ -24,8 +24,8 @@ class Statistik extends APIv1_Controller
 		parent::__construct();
 		// Load model StatistikModel
 		$this->load->model('organisation/statistik_model', 'StatistikModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->StatistikModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

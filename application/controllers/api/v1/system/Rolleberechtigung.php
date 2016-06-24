@@ -24,8 +24,8 @@ class Rolleberechtigung extends APIv1_Controller
 		parent::__construct();
 		// Load model RolleberechtigungModel
 		$this->load->model('system/rolleberechtigung_model', 'RolleberechtigungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->RolleberechtigungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

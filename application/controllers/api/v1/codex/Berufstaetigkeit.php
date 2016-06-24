@@ -24,8 +24,6 @@ class Berufstaetigkeit extends APIv1_Controller
 		parent::__construct();
 		// Load model BerufstaetigkeitModel
 		$this->load->model('codex/berufstaetigkeit_model', 'BerufstaetigkeitModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BerufstaetigkeitModel->setUID($this->_getUID());
 	}
 
 	/**

@@ -1,32 +1,26 @@
 <?php
-	if (! defined('BASEPATH'))
-		exit('No direct script access allowed');
+
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
 * Name:        Messaging Library for FH-Complete
 *
 *
 */
-
 class PhrasesLib
 {
 	/*
 	 * 
 	 */
-    public function __construct($params = null)
+    public function __construct()
     {
         //require_once APPPATH.'config/message.php';
 
 		$this->ci =& get_instance();
+		
 		$this->ci->load->library('parser');
 		
 		$this->ci->load->model('system/Phrase_model', 'PhraseModel');
 		$this->ci->load->model('system/Phrase_inhalt_model', 'PhraseInhaltModel');
-		
-		if (is_array($params) && isset($params['uid']))
-		{
-			$this->ci->PhraseModel->setUID($params['uid']);
-			$this->ci->PhraseInhaltModel->setUID($params['uid']);
-		}
 		
         $this->ci->load->helper('language');
 		$this->ci->load->helper('Message');

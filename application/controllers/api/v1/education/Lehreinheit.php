@@ -24,8 +24,8 @@ class Lehreinheit extends APIv1_Controller
 		parent::__construct();
 		// Load model LehreinheitModel
 		$this->load->model('education/lehreinheit', 'LehreinheitModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LehreinheitModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

@@ -24,8 +24,8 @@ class Dokumentstudiengang extends APIv1_Controller
 		parent::__construct();
 		// Load model DokumentstudiengangModel
 		$this->load->model('crm/dokumentstudiengang_model', 'DokumentstudiengangModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->DokumentstudiengangModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

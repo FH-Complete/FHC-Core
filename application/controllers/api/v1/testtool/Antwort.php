@@ -24,8 +24,8 @@ class Antwort extends APIv1_Controller
 		parent::__construct();
 		// Load model AntwortModel
 		$this->load->model('testtool/antwort_model', 'AntwortModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->AntwortModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

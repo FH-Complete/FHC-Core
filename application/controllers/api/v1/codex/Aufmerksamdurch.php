@@ -24,8 +24,6 @@ class Aufmerksamdurch extends APIv1_Controller
 		parent::__construct();
 		// Load model AufmerksamdurchModel
 		$this->load->model('codex/aufmerksamdurch_model', 'AufmerksamdurchModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->AufmerksamdurchModel->setUID($this->_getUID());
 	}
 
 	/**

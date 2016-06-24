@@ -24,8 +24,8 @@ class Projekt_ressource extends APIv1_Controller
 		parent::__construct();
 		// Load model Projekt_ressourceModel
 		$this->load->model('project/projekt_ressource_model', 'Projekt_ressourceModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->Projekt_ressourceModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

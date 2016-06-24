@@ -24,8 +24,8 @@ class Ortraumtyp extends APIv1_Controller
 		parent::__construct();
 		// Load model OrtraumtypModel
 		$this->load->model('ressource/ortraumtyp_model', 'OrtraumtypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->OrtraumtypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

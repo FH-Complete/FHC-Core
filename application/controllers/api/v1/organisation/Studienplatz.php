@@ -24,8 +24,8 @@ class Studienplatz extends APIv1_Controller
 		parent::__construct();
 		// Load model StudienplatzModel
 		$this->load->model('organisation/studienplatz_model', 'StudienplatzModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->StudienplatzModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

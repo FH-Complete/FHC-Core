@@ -24,8 +24,8 @@ class Lvangebot extends APIv1_Controller
 		parent::__construct();
 		// Load model LvangebotModel
 		$this->load->model('education/lvangebot', 'LvangebotModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LvangebotModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

@@ -24,8 +24,6 @@ class Vertragstyp extends APIv1_Controller
 		parent::__construct();
 		// Load model VertragstypModel
 		$this->load->model('accounting/vertragstyp_model', 'VertragstypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->VertragstypModel->setUID($this->_getUID());
 	}
 
 	/**

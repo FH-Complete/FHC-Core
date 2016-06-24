@@ -24,8 +24,8 @@ class Benutzergruppe extends APIv1_Controller
 		parent::__construct();
 		// Load model BenutzergruppeModel
 		$this->load->model('person/benutzergruppe_model', 'BenutzergruppeModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BenutzergruppeModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

@@ -24,8 +24,8 @@ class Vorschlag extends APIv1_Controller
 		parent::__construct();
 		// Load model VorschlagModel
 		$this->load->model('testtool/vorschlag_model', 'VorschlagModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->VorschlagModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

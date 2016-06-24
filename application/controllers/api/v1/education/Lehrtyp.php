@@ -24,8 +24,8 @@ class Lehrtyp extends APIv1_Controller
 		parent::__construct();
 		// Load model LehrtypModel
 		$this->load->model('education/lehrtyp', 'LehrtypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LehrtypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

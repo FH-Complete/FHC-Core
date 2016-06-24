@@ -24,8 +24,8 @@ class Uebung extends APIv1_Controller
 		parent::__construct();
 		// Load model UebungModel
 		$this->load->model('education/uebung', 'UebungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->UebungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

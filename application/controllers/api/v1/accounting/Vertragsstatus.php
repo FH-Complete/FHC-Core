@@ -24,8 +24,6 @@ class Vertragsstatus extends APIv1_Controller
 		parent::__construct();
 		// Load model VertragsstatusModel
 		$this->load->model('accounting/vertragsstatus_model', 'VertragsstatusModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->VertragsstatusModel->setUID($this->_getUID());
 	}
 
 	/**

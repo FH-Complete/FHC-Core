@@ -24,8 +24,8 @@ class Bankverbindung extends APIv1_Controller
 		parent::__construct();
 		// Load model BankverbindungModel
 		$this->load->model('person/bankverbindung_model', 'BankverbindungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BankverbindungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

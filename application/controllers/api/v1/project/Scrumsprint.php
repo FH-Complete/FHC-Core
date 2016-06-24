@@ -24,8 +24,8 @@ class Scrumsprint extends APIv1_Controller
 		parent::__construct();
 		// Load model ScrumsprintModel
 		$this->load->model('project/scrumsprint_model', 'ScrumsprintModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ScrumsprintModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

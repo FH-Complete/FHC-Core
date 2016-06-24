@@ -24,8 +24,6 @@ class Archiv extends APIv1_Controller
 		parent::__construct();
 		// Load model ArchivModel
 		$this->load->model('codex/archiv_model', 'ArchivModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ArchivModel->setUID($this->_getUID());
 	}
 
 	/**

@@ -24,7 +24,6 @@ class ModelTest extends FHC_Controller
 	{
 		//$this->session->uid='admin';	// Should normaly be set through auth
 		$this->load->model('person/Person_model');
-		$this->Person_model->setUID('admin');	// Should normaly be set through auth
 		$res = $this->Person_model->getPerson(null, 'asdf\' OR person_id=1; SELECT 1; --');
 		var_dump($res->result_object());
 

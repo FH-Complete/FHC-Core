@@ -24,8 +24,6 @@ class Bestelldetail extends APIv1_Controller
 		parent::__construct();
 		// Load model BestelldetailModel
 		$this->load->model('accounting/bestelldetail_model', 'BestelldetailModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BestelldetailModel->setUID($this->_getUID());
 	}
 
 	/**

@@ -353,11 +353,6 @@ abstract class REST_Controller extends CI_Controller {
     ];
 	
 	/**
-	 * 
-	 */
-	protected $_uid = NULL;
-
-	/**
      * Extend this function to apply additional checking early on in the process
      *
      * @access protected
@@ -1906,25 +1901,6 @@ abstract class REST_Controller extends CI_Controller {
         }
     }
 	
-	/**
-	 * TO BE COMMENTED
-	 */
-	private function _setUID($username)
-	{
-		if (!isset($this->_uid) && isset($username))
-		{
-			$this->_uid = $username;
-		}
-	}
-
-	/**
-	 * @return int ID of the authenticated caller
-	 */
-	protected function _getUID()
-	{
-		return $this->_uid;
-	}
-
     /**
      * Prepares for basic authentication
      *
@@ -1964,10 +1940,6 @@ abstract class REST_Controller extends CI_Controller {
         {
             $this->_force_login();
         }
-		else // If logged
-		{
-			$this->_setUID($username);
-		}
     }
 
     /**

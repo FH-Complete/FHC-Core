@@ -24,8 +24,8 @@ class Lehrverband extends APIv1_Controller
 		parent::__construct();
 		// Load model LehrverbandModel
 		$this->load->model('organisation/lehrverband_model', 'LehrverbandModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LehrverbandModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

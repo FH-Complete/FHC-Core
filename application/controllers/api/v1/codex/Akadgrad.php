@@ -24,8 +24,6 @@ class Akadgrad extends APIv1_Controller
 		parent::__construct();
 		// Load model AkadgradModel
 		$this->load->model('codex/akadgrad_model', 'AkadgradModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->AkadgradModel->setUID($this->_getUID());
 	}
 
 	/**

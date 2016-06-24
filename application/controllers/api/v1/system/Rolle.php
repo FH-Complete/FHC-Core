@@ -24,8 +24,8 @@ class Rolle extends APIv1_Controller
 		parent::__construct();
 		// Load model RolleModel
 		$this->load->model('system/rolle_model', 'RolleModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->RolleModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

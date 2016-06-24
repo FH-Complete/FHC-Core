@@ -24,8 +24,8 @@ class Notenschluesselaufteilung extends APIv1_Controller
 		parent::__construct();
 		// Load model NotenschluesselaufteilungModel
 		$this->load->model('education/notenschluesselaufteilung', 'NotenschluesselaufteilungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->NotenschluesselaufteilungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

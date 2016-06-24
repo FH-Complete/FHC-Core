@@ -24,8 +24,8 @@ class Preinteressentstudiengang extends APIv1_Controller
 		parent::__construct();
 		// Load model PreinteressentstudiengangModel
 		$this->load->model('crm/preinteressentstudiengang_model', 'PreinteressentstudiengangModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->PreinteressentstudiengangModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

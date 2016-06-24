@@ -24,8 +24,8 @@ class Abschlusspruefung extends APIv1_Controller
 		parent::__construct();
 		// Load model AbschlusspruefungModel
 		$this->load->model('education/abschlusspruefung', 'AbschlusspruefungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->AbschlusspruefungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

@@ -24,8 +24,6 @@ class Zahlungstyp extends APIv1_Controller
 		parent::__construct();
 		// Load model ZahlungstypModel
 		$this->load->model('accounting/zahlungstyp_model', 'ZahlungstypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ZahlungstypModel->setUID($this->_getUID());
 	}
 
 	/**

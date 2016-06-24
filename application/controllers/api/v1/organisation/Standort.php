@@ -24,8 +24,8 @@ class Standort extends APIv1_Controller
 		parent::__construct();
 		// Load model StandortModel
 		$this->load->model('organisation/standort_model', 'StandortModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->StandortModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

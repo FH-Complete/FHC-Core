@@ -24,8 +24,6 @@ class Bisorgform extends APIv1_Controller
 		parent::__construct();
 		// Load model BisorgformModel
 		$this->load->model('codex/bisorgform_model', 'BisorgformModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BisorgformModel->setUID($this->_getUID());
 	}
 
 	/**

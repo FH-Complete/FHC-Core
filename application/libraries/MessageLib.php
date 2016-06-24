@@ -1,19 +1,19 @@
 <?php  
-	if (! defined('BASEPATH'))
-		exit('No direct script access allowed');
+
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
 * Name:        Messaging Library for FH-Complete
 *
 *
 */
-
 class MessageLib
 {
 	private $recipients = array();
 	
-    public function __construct($params = null)
+    public function __construct()
     {
         $this->ci =& get_instance();
+		
 		$this->ci->config->load('message');
 
 		$this->ci->load->model('system/Message_model', 'MessageModel');
@@ -21,22 +21,10 @@ class MessageLib
 		$this->ci->load->model('system/Recipient_model', 'RecipientModel');
 		$this->ci->load->model('system/Attachment_model', 'AttachmentModel');
 		
-		if (is_array($params) && isset($params['uid']))
-		{
-			$this->ci->load->library('VorlageLib', array('uid' => $params['uid']));
-			$this->ci->MessageModel->setUID($params['uid']);
-			$this->ci->MsgStatusModel->setUID($params['uid']);
-			$this->ci->RecipientModel->setUID($params['uid']);
-			$this->ci->AttachmentModel->setUID($params['uid']);
-		}
-		else
-		{
-			$this->ci->load->library('VorlageLib');
-		}
+		$this->ci->load->library('VorlageLib');
 		
         //$this->ci->load->helper('language');
         $this->ci->lang->load('message');
-		
     }
 
     // ------------------------------------------------------------------------

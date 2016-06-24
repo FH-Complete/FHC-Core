@@ -24,8 +24,8 @@ class Legesamtnote extends APIv1_Controller
 		parent::__construct();
 		// Load model LegesamtnoteModel
 		$this->load->model('education/legesamtnote', 'LegesamtnoteModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LegesamtnoteModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

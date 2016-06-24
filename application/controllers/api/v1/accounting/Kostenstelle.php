@@ -24,8 +24,6 @@ class Kostenstelle extends APIv1_Controller
 		parent::__construct();
 		// Load model KostenstelleModel
 		$this->load->model('accounting/kostenstelle_model', 'KostenstelleModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->KostenstelleModel->setUID($this->_getUID());
 	}
 
 	/**

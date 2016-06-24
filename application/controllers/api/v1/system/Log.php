@@ -24,8 +24,8 @@ class Log extends APIv1_Controller
 		parent::__construct();
 		// Load model LogModel
 		$this->load->model('system/log_model', 'LogModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LogModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

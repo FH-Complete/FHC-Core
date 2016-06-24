@@ -24,8 +24,6 @@ class Vertrag extends APIv1_Controller
 		parent::__construct();
 		// Load model VertragModel
 		$this->load->model('accounting/vertrag_model', 'VertragModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->VertragModel->setUID($this->_getUID());
 	}
 
 	/**

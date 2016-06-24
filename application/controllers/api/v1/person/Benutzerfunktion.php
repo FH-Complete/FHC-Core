@@ -24,8 +24,8 @@ class Benutzerfunktion extends APIv1_Controller
 		parent::__construct();
 		// Load model BenutzerfunktionModel
 		$this->load->model('person/benutzerfunktion_model', 'BenutzerfunktionModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BenutzerfunktionModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

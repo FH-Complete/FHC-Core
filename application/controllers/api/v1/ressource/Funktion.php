@@ -24,8 +24,8 @@ class Funktion extends APIv1_Controller
 		parent::__construct();
 		// Load model FunktionModel
 		$this->load->model('ressource/funktion_model', 'FunktionModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->FunktionModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

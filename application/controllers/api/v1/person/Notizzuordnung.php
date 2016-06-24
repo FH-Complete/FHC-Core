@@ -24,8 +24,8 @@ class Notizzuordnung extends APIv1_Controller
 		parent::__construct();
 		// Load model NotizzuordnungModel
 		$this->load->model('person/notizzuordnung_model', 'NotizzuordnungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->NotizzuordnungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

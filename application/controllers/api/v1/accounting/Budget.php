@@ -24,8 +24,6 @@ class Budget extends APIv1_Controller
 		parent::__construct();
 		// Load model BudgetModel
 		$this->load->model('accounting/budget_model', 'BudgetModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BudgetModel->setUID($this->_getUID());
 	}
 
 	/**

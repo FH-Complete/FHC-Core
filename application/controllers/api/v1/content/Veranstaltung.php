@@ -24,8 +24,6 @@ class Veranstaltung extends APIv1_Controller
 		parent::__construct();
 		// Load model VeranstaltungModel
 		$this->load->model('content/veranstaltung_model', 'VeranstaltungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->VeranstaltungModel->setUID($this->_getUID());
 	}
 
 	/**

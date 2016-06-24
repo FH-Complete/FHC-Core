@@ -24,8 +24,8 @@ class Lehrfach extends APIv1_Controller
 		parent::__construct();
 		// Load model LehrfachModel
 		$this->load->model('education/lehrfach', 'LehrfachModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LehrfachModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

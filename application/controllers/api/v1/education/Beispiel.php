@@ -24,8 +24,8 @@ class Beispiel extends APIv1_Controller
 		parent::__construct();
 		// Load model BeispielModel
 		$this->load->model('education/beispiel', 'BeispielModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BeispielModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

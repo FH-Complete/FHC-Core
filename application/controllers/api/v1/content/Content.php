@@ -24,8 +24,6 @@ class Content extends APIv1_Controller
 		parent::__construct();
 		// Load model ContentModel
 		$this->load->model('content/content_model', 'ContentModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ContentModel->setUID($this->_getUID());
 	}
 
 	/**

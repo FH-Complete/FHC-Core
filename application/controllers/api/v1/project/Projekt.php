@@ -24,8 +24,8 @@ class Projekt extends APIv1_Controller
 		parent::__construct();
 		// Load model ProjektModel
 		$this->load->model('project/projekt_model', 'ProjektModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ProjektModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

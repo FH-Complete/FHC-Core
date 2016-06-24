@@ -24,8 +24,8 @@ class Betriebsmittelstatus extends APIv1_Controller
 		parent::__construct();
 		// Load model BetriebsmittelstatusModel
 		$this->load->model('ressource/betriebsmittelstatus_model', 'BetriebsmittelstatusModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BetriebsmittelstatusModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

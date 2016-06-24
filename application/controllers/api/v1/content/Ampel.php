@@ -24,8 +24,6 @@ class Ampel extends APIv1_Controller
 		parent::__construct();
 		// Load model AmpelModel
 		$this->load->model('content/ampel_model', 'AmpelModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->AmpelModel->setUID($this->_getUID());
 	}
 
 	/**

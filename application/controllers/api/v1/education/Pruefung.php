@@ -24,8 +24,8 @@ class Pruefung extends APIv1_Controller
 		parent::__construct();
 		// Load model PruefungModel
 		$this->load->model('education/pruefung', 'PruefungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->PruefungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

@@ -24,8 +24,8 @@ class Preinteressent extends APIv1_Controller
 		parent::__construct();
 		// Load model PersonModel
 		$this->load->model('crm/preinteressent_model', 'PreinteressentModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->PreinteressentModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

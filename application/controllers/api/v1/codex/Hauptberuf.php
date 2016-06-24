@@ -24,8 +24,6 @@ class Hauptberuf extends APIv1_Controller
 		parent::__construct();
 		// Load model HauptberufModel
 		$this->load->model('codex/hauptberuf_model', 'HauptberufModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->HauptberufModel->setUID($this->_getUID());
 	}
 
 	/**

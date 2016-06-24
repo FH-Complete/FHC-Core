@@ -24,8 +24,8 @@ class Erreichbarkeit extends APIv1_Controller
 		parent::__construct();
 		// Load model ErreichbarkeitModel
 		$this->load->model('ressource/erreichbarkeit_model', 'ErreichbarkeitModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ErreichbarkeitModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

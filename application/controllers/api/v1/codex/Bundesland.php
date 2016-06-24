@@ -24,8 +24,6 @@ class Bundesland extends APIv1_Controller
 		parent::__construct();
 		// Load model PersonModel
 		$this->load->model('codex/bundesland_model', 'BundeslandModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BundeslandModel->setUID($this->_getUID());
 	}
 	
 	public function getAll()

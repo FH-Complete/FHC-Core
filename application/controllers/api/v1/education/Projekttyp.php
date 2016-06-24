@@ -24,8 +24,8 @@ class Projekttyp extends APIv1_Controller
 		parent::__construct();
 		// Load model ProjekttypModel
 		$this->load->model('education/projekttyp', 'ProjekttypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ProjekttypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

@@ -24,8 +24,8 @@ class Firmentyp extends APIv1_Controller
 		parent::__construct();
 		// Load model FirmentypModel
 		$this->load->model('ressource/firmentyp_model', 'FirmentypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->FirmentypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

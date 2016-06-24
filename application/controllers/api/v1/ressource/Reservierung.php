@@ -24,8 +24,8 @@ class Reservierung extends APIv1_Controller
 		parent::__construct();
 		// Load model ReservierungModel
 		$this->load->model('ressource/reservierung_model', 'ReservierungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ReservierungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

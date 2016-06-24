@@ -24,8 +24,8 @@ class Moodle extends APIv1_Controller
 		parent::__construct();
 		// Load model MoodleModel
 		$this->load->model('education/moodle', 'MoodleModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->MoodleModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

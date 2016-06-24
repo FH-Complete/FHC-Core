@@ -24,8 +24,8 @@ class Lehrmittel extends APIv1_Controller
 		parent::__construct();
 		// Load model LehrmittelModel
 		$this->load->model('ressource/lehrmittel_model', 'LehrmittelModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LehrmittelModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

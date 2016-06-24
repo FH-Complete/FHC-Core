@@ -24,8 +24,6 @@ class Template extends APIv1_Controller
 		parent::__construct();
 		// Load model TemplateModel
 		$this->load->model('content/template_model', 'TemplateModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->TemplateModel->setUID($this->_getUID());
 	}
 
 	/**

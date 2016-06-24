@@ -24,8 +24,8 @@ class Zeugnisnote extends APIv1_Controller
 		parent::__construct();
 		// Load model ZeugnisnoteModel
 		$this->load->model('education/zeugnisnote', 'ZeugnisnoteModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ZeugnisnoteModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

@@ -24,8 +24,6 @@ class Contentsprache extends APIv1_Controller
 		parent::__construct();
 		// Load model ContentspracheModel
 		$this->load->model('content/contentsprache_model', 'ContentspracheModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ContentspracheModel->setUID($this->_getUID());
 	}
 
 	/**

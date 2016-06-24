@@ -24,8 +24,8 @@ class Lehreinheitgruppe extends APIv1_Controller
 		parent::__construct();
 		// Load model LehreinheitgruppeModel
 		$this->load->model('education/lehreinheitgruppe', 'LehreinheitgruppeModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LehreinheitgruppeModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

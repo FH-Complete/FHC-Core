@@ -24,8 +24,8 @@ class Zeitaufzeichnung extends APIv1_Controller
 		parent::__construct();
 		// Load model ZeitaufzeichnungModel
 		$this->load->model('ressource/zeitaufzeichnung_model', 'ZeitaufzeichnungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ZeitaufzeichnungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

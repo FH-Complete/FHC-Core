@@ -24,8 +24,8 @@ class Anrechnung extends APIv1_Controller
 		parent::__construct();
 		// Load model AnrechnungModel
 		$this->load->model('education/anrechnung', 'AnrechnungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->AnrechnungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

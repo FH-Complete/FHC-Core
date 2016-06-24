@@ -24,8 +24,8 @@ class Thread extends APIv1_Controller
 		parent::__construct();
 		// Load model ThreadModel
 		$this->load->model('system/thread_model', 'ThreadModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ThreadModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

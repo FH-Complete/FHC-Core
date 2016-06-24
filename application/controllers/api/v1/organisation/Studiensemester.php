@@ -24,8 +24,8 @@ class Studiensemester extends APIv1_Controller
 		parent::__construct();
 		// Load model StudiensemesterModel
 		$this->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->StudiensemesterModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

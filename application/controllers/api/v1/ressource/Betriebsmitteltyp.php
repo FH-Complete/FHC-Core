@@ -24,8 +24,8 @@ class Betriebsmitteltyp extends APIv1_Controller
 		parent::__construct();
 		// Load model BetriebsmitteltypModel
 		$this->load->model('ressource/betriebsmitteltyp_model', 'BetriebsmitteltypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BetriebsmitteltypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

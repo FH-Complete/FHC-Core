@@ -24,8 +24,8 @@ class Frage extends APIv1_Controller
 		parent::__construct();
 		// Load model FrageModel
 		$this->load->model('testtool/frage_model', 'FrageModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->FrageModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

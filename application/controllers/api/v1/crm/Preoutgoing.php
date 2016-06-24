@@ -24,8 +24,8 @@ class Preoutgoing extends APIv1_Controller
 		parent::__construct();
 		// Load model PreoutgoingModel
 		$this->load->model('crm/preoutgoing_model', 'PreoutgoingModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->PreoutgoingModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

@@ -24,8 +24,8 @@ class Notenschluesselzuordnung extends APIv1_Controller
 		parent::__construct();
 		// Load model NotenschluesselzuordnungModel
 		$this->load->model('education/notenschluesselzuordnung', 'NotenschluesselzuordnungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->NotenschluesselzuordnungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

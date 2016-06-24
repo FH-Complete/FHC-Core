@@ -24,8 +24,8 @@ class Prestudentstatus extends APIv1_Controller
 		parent::__construct();
 		// Load model PrestudentstatusModel
 		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->PrestudentstatusModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

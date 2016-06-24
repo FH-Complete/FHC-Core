@@ -24,8 +24,8 @@ class Geschaeftsjahr2 extends APIv1_Controller
 		parent::__construct();
 		// Load model GeschaeftsjahrModel
 		$this->load->model('organisation/geschaeftsjahr_model', 'GeschaeftsjahrModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->GeschaeftsjahrModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

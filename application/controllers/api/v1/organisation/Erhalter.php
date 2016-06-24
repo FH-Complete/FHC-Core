@@ -24,8 +24,8 @@ class Erhalter extends APIv1_Controller
 		parent::__construct();
 		// Load model ErhalterModel
 		$this->load->model('organisation/erhalter_model', 'ErhalterModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ErhalterModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

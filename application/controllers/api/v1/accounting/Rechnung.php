@@ -24,8 +24,6 @@ class Rechnung extends APIv1_Controller
 		parent::__construct();
 		// Load model RechnungModel
 		$this->load->model('accounting/rechnung_model', 'RechnungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->RechnungModel->setUID($this->_getUID());
 	}
 
 	/**

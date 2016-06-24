@@ -24,8 +24,8 @@ class Dokumentprestudent extends APIv1_Controller
 		parent::__construct();
 		// Load model DokumentprestudentModel
 		$this->load->model('crm/dokumentprestudent_model', 'DokumentprestudentModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->DokumentprestudentModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

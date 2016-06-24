@@ -24,8 +24,8 @@ class Kontaktmedium extends APIv1_Controller
 		parent::__construct();
 		// Load model KontaktmediumModel
 		$this->load->model('person/kontaktmedium_model', 'KontaktmediumModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->KontaktmediumModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

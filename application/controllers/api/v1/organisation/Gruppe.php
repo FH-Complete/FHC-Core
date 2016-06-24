@@ -24,8 +24,8 @@ class Gruppe extends APIv1_Controller
 		parent::__construct();
 		// Load model GruppeModel
 		$this->load->model('organisation/gruppe_model', 'GruppeModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->GruppeModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

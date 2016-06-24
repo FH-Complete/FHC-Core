@@ -24,8 +24,6 @@ class Zgvdoktor extends APIv1_Controller
 		parent::__construct();
 		// Load model ZgvdoktorModel
 		$this->load->model('codex/zgvdoktor_model', 'ZgvdoktorModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ZgvdoktorModel->setUID($this->_getUID());
 	}
 
 	/**

@@ -24,8 +24,6 @@ class Bestellungtag extends APIv1_Controller
 		parent::__construct();
 		// Load model BestellungtagModel
 		$this->load->model('accounting/bestellungtag_model', 'BestellungtagModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BestellungtagModel->setUID($this->_getUID());
 	}
 
 	/**

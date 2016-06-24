@@ -24,8 +24,8 @@ class Variable extends APIv1_Controller
 		parent::__construct();
 		// Load model VariableModel
 		$this->load->model('system/variable_model', 'VariableModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->VariableModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

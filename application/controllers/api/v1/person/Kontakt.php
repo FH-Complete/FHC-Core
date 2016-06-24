@@ -25,8 +25,8 @@ class Kontakt extends APIv1_Controller
 		parent::__construct();
 		// Load model PersonModel
 		$this->load->model('person/kontakt_model', 'KontaktModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->KontaktModel->setUID($this->_getUID());
+		
+		
     }
 
 	public function getKontakt()

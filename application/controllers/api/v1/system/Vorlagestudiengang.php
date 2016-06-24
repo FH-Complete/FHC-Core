@@ -24,8 +24,8 @@ class Vorlagestudiengang extends APIv1_Controller
 		parent::__construct();
 		// Load model VorlagestudiengangModel
 		$this->load->model('system/vorlagestudiengang_model', 'VorlagestudiengangModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->VorlagestudiengangModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

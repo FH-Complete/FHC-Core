@@ -24,8 +24,8 @@ class Abschlussbeurteilung extends APIv1_Controller
 		parent::__construct();
 		// Load model AbschlussbeurteilungModel
 		$this->load->model('education/abschlussbeurteilung', 'AbschlussbeurteilungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->AbschlussbeurteilungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

@@ -24,8 +24,8 @@ class Lvgesamtnote extends APIv1_Controller
 		parent::__construct();
 		// Load model LvgesamtnoteModel
 		$this->load->model('education/lvgesamtnote', 'LvgesamtnoteModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LvgesamtnoteModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

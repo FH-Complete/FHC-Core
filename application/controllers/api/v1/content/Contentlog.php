@@ -24,8 +24,6 @@ class Contentlog extends APIv1_Controller
 		parent::__construct();
 		// Load model ContentlogModel
 		$this->load->model('content/contentlog_model', 'ContentlogModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ContentlogModel->setUID($this->_getUID());
 	}
 
 	/**

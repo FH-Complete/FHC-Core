@@ -24,8 +24,8 @@ class Pruefungstyp extends APIv1_Controller
 		parent::__construct();
 		// Load model PruefungstypModel
 		$this->load->model('education/pruefungstyp', 'PruefungstypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->PruefungstypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

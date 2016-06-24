@@ -24,8 +24,6 @@ class Rechnungsbetrag extends APIv1_Controller
 		parent::__construct();
 		// Load model RechnungsbetragModel
 		$this->load->model('accounting/rechnungsbetrag_model', 'RechnungsbetragModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->RechnungsbetragModel->setUID($this->_getUID());
 	}
 
 	/**

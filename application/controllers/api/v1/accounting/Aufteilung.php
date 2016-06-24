@@ -24,8 +24,6 @@ class Aufteilung extends APIv1_Controller
 		parent::__construct();
 		// Load model AufteilungModel
 		$this->load->model('accounting/aufteilung_model', 'AufteilungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->AufteilungModel->setUID($this->_getUID());
 	}
 
 	/**

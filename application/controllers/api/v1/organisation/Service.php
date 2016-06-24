@@ -24,8 +24,8 @@ class Service extends APIv1_Controller
 		parent::__construct();
 		// Load model ServiceModel
 		$this->load->model('organisation/service_model', 'ServiceModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ServiceModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

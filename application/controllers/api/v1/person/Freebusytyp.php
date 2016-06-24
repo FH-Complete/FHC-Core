@@ -24,8 +24,8 @@ class Freebusytyp extends APIv1_Controller
 		parent::__construct();
 		// Load model FreebusytypModel
 		$this->load->model('person/freebusytyp_model', 'FreebusytypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->FreebusytypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

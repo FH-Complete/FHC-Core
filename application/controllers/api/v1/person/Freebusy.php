@@ -24,8 +24,8 @@ class Freebusy extends APIv1_Controller
 		parent::__construct();
 		// Load model FreebusyModel
 		$this->load->model('person/freebusy_model', 'FreebusyModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->FreebusyModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

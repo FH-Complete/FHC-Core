@@ -24,8 +24,8 @@ class Kontakttyp extends APIv1_Controller
 		parent::__construct();
 		// Load model KontakttypModel
 		$this->load->model('person/kontakttyp_model', 'KontakttypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->KontakttypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

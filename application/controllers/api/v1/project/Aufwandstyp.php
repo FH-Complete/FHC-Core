@@ -24,8 +24,8 @@ class Aufwandstyp extends APIv1_Controller
 		parent::__construct();
 		// Load model AufwandstypModel
 		$this->load->model('project/aufwandstyp_model', 'AufwandstypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->AufwandstypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

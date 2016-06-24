@@ -24,8 +24,6 @@ class Bisio extends APIv1_Controller
 		parent::__construct();
 		// Load model BisioModel
 		$this->load->model('codex/bisio_model', 'BisioModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BisioModel->setUID($this->_getUID());
 	}
 
 	/**

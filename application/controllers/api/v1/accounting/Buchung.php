@@ -24,8 +24,6 @@ class Buchung extends APIv1_Controller
 		parent::__construct();
 		// Load model BuchungModel
 		$this->load->model('accounting/buchung_model', 'BuchungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BuchungModel->setUID($this->_getUID());
 	}
 
 	/**

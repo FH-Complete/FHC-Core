@@ -24,8 +24,8 @@ class Aufnahmetermintyp extends APIv1_Controller
 		parent::__construct();
 		// Load model AufnahmetermintypModel
 		$this->load->model('crm/aufnahmetermintyp_model', 'AufnahmetermintypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->AufnahmetermintypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

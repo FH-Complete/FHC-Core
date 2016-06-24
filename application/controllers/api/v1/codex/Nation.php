@@ -22,10 +22,8 @@ class Nation extends APIv1_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		// Load model PersonModel
+		// Load model NationModel
 		$this->load->model('codex/nation_model', 'NationModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->NationModel->setUID($this->_getUID());
 	}
 	
 	public function getNation()

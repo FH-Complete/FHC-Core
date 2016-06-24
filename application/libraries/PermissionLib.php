@@ -10,8 +10,7 @@
  * @since	Version 1.0.0
  * @filesource
  */
-if (! defined('FCPATH'))
-	exit('No direct script access allowed');
+if (! defined('FCPATH')) exit('No direct script access allowed');
 
 require_once(FCPATH.'include/basis_db.class.php');
 require_once(FCPATH.'include/organisationseinheit.class.php');
@@ -36,7 +35,6 @@ require_once(FCPATH.'include/benutzerberechtigung.class.php');
 class PermissionLib
 {
 	public $bb;
-	protected $_uid;
 
 	/**
 	 * Auth Username, Password over FH-Complete
@@ -45,16 +43,16 @@ class PermissionLib
 	 * @param	string	$password
 	 * @return	bool
 	 */
-	function __construct($param = null)
+	function __construct()
 	{
-		if (is_array($param) && isset($param['uid']))
-			$this->_uid = $param['uid'];
+		$this->CI =& get_instance();
+		$this->CI->load->helper('fhcauth');
 	}
 
-	function isBerechtigt($berechtigung_kurzbz, $art=null,  $oe_kurzbz=null,  $kostenstelle_id=null)
+	function isBerechtigt($berechtigung_kurzbz, $art = null,  $oe_kurzbz = null,  $kostenstelle_id = null)
 	{
-		$this->bb->getBerechtigungen($this->_uid);
-		return $this->bb->isBerechtigt($berechtigung_kurzbz, $oe_kurzbz=null, $art=null, $kostenstelle_id=null);
+		$this->bb->getBerechtigungen(getAuthUID());
+		return $this->bb->isBerechtigt($berechtigung_kurzbz, $oe_kurzbz, $art, $kostenstelle_id);
 	}
 
 	function getPermissions($uid)
@@ -63,16 +61,5 @@ class PermissionLib
 	
 	function isEntitled($berechtigung_kurzbz, $oe_kurzbz=null, $art=null, $kostenstelle_id=null)
 	{
-	}
-
-	/** ---------------------------------------------------------------
-	 * Set UID
-	 *
-	 * @param   string  $uid
-	 * @return  bool
-	 */
-	public function setUID($uid)
-	{
-		return $this->_uid = $uid;
 	}
 }

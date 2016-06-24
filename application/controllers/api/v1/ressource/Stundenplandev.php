@@ -24,8 +24,8 @@ class Stundenplandev extends APIv1_Controller
 		parent::__construct();
 		// Load model StundenplandevModel
 		$this->load->model('ressource/stundenplandev_model', 'StundenplandevModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->StundenplandevModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

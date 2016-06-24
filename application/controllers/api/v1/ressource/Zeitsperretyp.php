@@ -24,8 +24,8 @@ class Zeitsperretyp extends APIv1_Controller
 		parent::__construct();
 		// Load model ZeitsperretypModel
 		$this->load->model('ressource/zeitsperretyp_model', 'ZeitsperretypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ZeitsperretypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

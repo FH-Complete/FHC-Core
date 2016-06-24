@@ -24,8 +24,8 @@ class Bewerbungstermine extends APIv1_Controller
 		parent::__construct();
 		// Load model BewerbungstermineModel
 		$this->load->model('crm/bewerbungstermine_model', 'BewerbungstermineModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BewerbungstermineModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

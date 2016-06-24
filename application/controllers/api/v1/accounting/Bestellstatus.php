@@ -24,8 +24,6 @@ class Bestellstatus extends APIv1_Controller
 		parent::__construct();
 		// Load model BestellstatusModel
 		$this->load->model('accounting/bestellstatus_model', 'BestellstatusModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BestellstatusModel->setUID($this->_getUID());
 	}
 
 	/**

@@ -24,8 +24,6 @@ class Ausbildung extends APIv1_Controller
 		parent::__construct();
 		// Load model AusbildungModel
 		$this->load->model('codex/ausbildung_model', 'AusbildungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->AusbildungModel->setUID($this->_getUID());
 	}
 
 	/**

@@ -24,8 +24,8 @@ class Benutzerrolle extends APIv1_Controller
 		parent::__construct();
 		// Load model BenutzerrolleModel
 		$this->load->model('system/benutzerrolle_model', 'BenutzerrolleModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BenutzerrolleModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

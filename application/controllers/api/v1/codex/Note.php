@@ -24,8 +24,6 @@ class Note extends APIv1_Controller
 		parent::__construct();
 		// Load model NoteModel
 		$this->load->model('codex/note_model', 'NoteModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->NoteModel->setUID($this->_getUID());
 	}
 
 	/**

@@ -24,8 +24,8 @@ class Organisationseinheittyp extends APIv1_Controller
 		parent::__construct();
 		// Load model OrganisationseinheittypModel
 		$this->load->model('organisation/organisationseinheittyp_model', 'OrganisationseinheittypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->OrganisationseinheittypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

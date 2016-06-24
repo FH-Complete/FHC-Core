@@ -24,8 +24,6 @@ class Orgform extends APIv1_Controller
 		parent::__construct();
 		// Load model OrgformModel
 		$this->load->model('codex/orgform_model', 'OrgformModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->OrgformModel->setUID($this->_getUID());
 	}
 
 	/**

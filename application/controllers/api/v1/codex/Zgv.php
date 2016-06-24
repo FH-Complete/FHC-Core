@@ -24,8 +24,6 @@ class Zgv extends APIv1_Controller
 		parent::__construct();
 		// Load model ZgvModel
 		$this->load->model('codex/zgv_model', 'ZgvModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ZgvModel->setUID($this->_getUID());
 	}
 
 	/**

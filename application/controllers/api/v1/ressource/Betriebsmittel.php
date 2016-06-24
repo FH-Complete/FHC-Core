@@ -24,8 +24,8 @@ class Betriebsmittel extends APIv1_Controller
 		parent::__construct();
 		// Load model BetriebsmittelModel
 		$this->load->model('ressource/betriebsmittel_model', 'BetriebsmittelModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BetriebsmittelModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

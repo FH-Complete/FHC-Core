@@ -22,7 +22,7 @@ class Messages extends VileSci_Controller
 		if (empty($person_id))
 			$person_id = $this->input->post('person_id', TRUE);
 		if (empty($person_id))
-			$msg = $this->messagelib->getMessagesByUID($this->getUID());
+			$msg = $this->messagelib->getMessagesByUID(getAuthUID());
 		else
 			$msg = $this->messagelib->getMessagesByPerson($person_id);
 		if ($msg->error)
@@ -30,7 +30,7 @@ class Messages extends VileSci_Controller
 		
 		$data = array
 		(
-			'uid' => $this->getUID(),
+			'uid' => getAuthUID(),
 			'messages' => $msg->retval
 		);
 		if (!empty($person_id))
@@ -47,7 +47,7 @@ class Messages extends VileSci_Controller
 		if (empty($person_id))
 			$person_id = $this->input->post('person_id', TRUE);
 		if (empty($person_id))
-			$msg = $this->messagelib->getMessagesByUID($this->getUID());
+			$msg = $this->messagelib->getMessagesByUID(getAuthUID());
 		else
 			$msg = $this->messagelib->getMessagesByPerson($person_id);
 		if ($msg->error)
@@ -55,7 +55,7 @@ class Messages extends VileSci_Controller
 		
 		$data = array
 		(
-			'uid' => $this->getUID(),
+			'uid' => getAuthUID(),
 			'messages' => $msg->retval
 		);
 		if (!empty($person_id))

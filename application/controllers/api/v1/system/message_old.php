@@ -24,8 +24,8 @@ class message_old extends APIv1_Controller
 		parent::__construct();
 		// Load model message_oldModel
 		$this->load->model('system/message_old_model', 'message_oldModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->message_oldModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

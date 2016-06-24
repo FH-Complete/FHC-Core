@@ -24,8 +24,8 @@ class Firmatag extends APIv1_Controller
 		parent::__construct();
 		// Load model FirmatagModel
 		$this->load->model('ressource/firmatag_model', 'FirmatagModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->FirmatagModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

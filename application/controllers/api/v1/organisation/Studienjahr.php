@@ -24,8 +24,8 @@ class Studienjahr extends APIv1_Controller
 		parent::__construct();
 		// Load model StudienjahrModel
 		$this->load->model('organisation/studienjahr_model', 'StudienjahrModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->StudienjahrModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

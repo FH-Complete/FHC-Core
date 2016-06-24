@@ -24,8 +24,8 @@ class Aktivitaet extends APIv1_Controller
 		parent::__construct();
 		// Load model AktivitaetModel
 		$this->load->model('project/aktivitaet_model', 'AktivitaetModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->AktivitaetModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

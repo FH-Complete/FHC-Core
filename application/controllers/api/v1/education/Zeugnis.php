@@ -24,8 +24,8 @@ class Zeugnis extends APIv1_Controller
 		parent::__construct();
 		// Load model ZeugnisModel
 		$this->load->model('education/zeugnis', 'ZeugnisModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ZeugnisModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

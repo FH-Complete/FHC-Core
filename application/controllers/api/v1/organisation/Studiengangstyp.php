@@ -24,8 +24,8 @@ class Studiengangstyp extends APIv1_Controller
 		parent::__construct();
 		// Load model StudiengangstypModel
 		$this->load->model('organisation/studiengangstyp_model', 'StudiengangstypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->StudiengangstypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

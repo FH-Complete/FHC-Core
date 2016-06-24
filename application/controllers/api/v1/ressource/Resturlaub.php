@@ -24,8 +24,8 @@ class Resturlaub extends APIv1_Controller
 		parent::__construct();
 		// Load model ResturlaubModel
 		$this->load->model('ressource/resturlaub_model', 'ResturlaubModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ResturlaubModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

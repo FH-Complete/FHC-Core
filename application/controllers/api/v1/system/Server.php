@@ -24,8 +24,8 @@ class Server extends APIv1_Controller
 		parent::__construct();
 		// Load model ServerModel
 		$this->load->model('system/server_model', 'ServerModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ServerModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

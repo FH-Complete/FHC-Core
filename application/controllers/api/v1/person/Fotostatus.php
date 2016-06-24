@@ -24,8 +24,8 @@ class Fotostatus extends APIv1_Controller
 		parent::__construct();
 		// Load model FotostatusModel
 		$this->load->model('person/fotostatus_model', 'FotostatusModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->FotostatusModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

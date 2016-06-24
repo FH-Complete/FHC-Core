@@ -24,8 +24,6 @@ class Contentgruppe extends APIv1_Controller
 		parent::__construct();
 		// Load model ContentgruppeModel
 		$this->load->model('content/contentgruppe_model', 'ContentgruppeModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ContentgruppeModel->setUID($this->_getUID());
 	}
 
 	/**

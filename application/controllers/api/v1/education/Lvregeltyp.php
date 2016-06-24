@@ -24,8 +24,8 @@ class Lvregeltyp extends APIv1_Controller
 		parent::__construct();
 		// Load model LvregeltypModel
 		$this->load->model('education/lvregeltyp', 'LvregeltypModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LvregeltypModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

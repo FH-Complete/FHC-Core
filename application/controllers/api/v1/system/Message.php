@@ -23,7 +23,7 @@ class Message extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load library MessageLib
-		$this->load->library('MessageLib', array('uid' => $this->_getUID()));
+		$this->load->library('MessageLib');
 	}
 
 	/**

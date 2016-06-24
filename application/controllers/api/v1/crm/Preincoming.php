@@ -24,8 +24,8 @@ class Preincoming extends APIv1_Controller
 		parent::__construct();
 		// Load model PreincomingModel
 		$this->load->model('crm/preincoming_model', 'PreincomingModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->PreincomingModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

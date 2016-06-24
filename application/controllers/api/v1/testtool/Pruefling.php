@@ -24,8 +24,8 @@ class Pruefling extends APIv1_Controller
 		parent::__construct();
 		// Load model PrueflingModel
 		$this->load->model('testtool/pruefling_model', 'PrueflingModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->PrueflingModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

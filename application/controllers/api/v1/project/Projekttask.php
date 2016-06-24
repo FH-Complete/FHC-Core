@@ -24,8 +24,8 @@ class Projekttask extends APIv1_Controller
 		parent::__construct();
 		// Load model ProjekttaskModel
 		$this->load->model('project/projekttask_model', 'ProjekttaskModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ProjekttaskModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

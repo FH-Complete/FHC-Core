@@ -24,8 +24,8 @@ class Ressource extends APIv1_Controller
 		parent::__construct();
 		// Load model RessourceModel
 		$this->load->model('project/ressource_model', 'RessourceModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->RessourceModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

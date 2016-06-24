@@ -24,8 +24,8 @@ class Zeitwunsch extends APIv1_Controller
 		parent::__construct();
 		// Load model ZeitwunschModel
 		$this->load->model('ressource/zeitwunsch_model', 'ZeitwunschModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ZeitwunschModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

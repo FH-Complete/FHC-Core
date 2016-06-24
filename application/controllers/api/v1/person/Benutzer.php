@@ -24,8 +24,8 @@ class Benutzer extends APIv1_Controller
 		parent::__construct();
 		// Load model BenutzerModel
 		$this->load->model('person/benutzer_model', 'BenutzerModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BenutzerModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

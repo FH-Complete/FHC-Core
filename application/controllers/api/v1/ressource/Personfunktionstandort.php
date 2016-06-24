@@ -24,8 +24,8 @@ class Personfunktionstandort extends APIv1_Controller
 		parent::__construct();
 		// Load model PersonfunktionstandortModel
 		$this->load->model('ressource/personfunktionstandort_model', 'PersonfunktionstandortModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->PersonfunktionstandortModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

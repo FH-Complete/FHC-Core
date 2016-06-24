@@ -24,8 +24,8 @@ class Notiz extends APIv1_Controller
 		parent::__construct();
 		// Load model NotizModel
 		$this->load->model('person/notiz_model', 'NotizModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->NotizModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

@@ -11,7 +11,7 @@
  * @filesource
  */
 if (! defined('BASEPATH')) exit('No direct script access allowed');
-require_once 'include/authentication.class.php';
+require_once FCPATH.'include/authentication.class.php';
 
 /**
  * FHC-Auth Helpers
@@ -48,20 +48,38 @@ if ( ! function_exists('auth'))
 			return false;
 		}
 	}
+}
 
-	/**
-	 * Look if User is logged in and return uid
-	 * Otherwise return false
-	 *
-	 * @return	string or (bool)false
-	 */
-	function getAuthUID()
+/**
+ * Look if User is logged in and return uid
+ * it tries to work always with CI session
+ * Otherwise return false
+ *
+ * @return	string or (bool)false
+*/
+function getAuthUID()
+{
+	$uid = false;
+	$ci =& get_instance(); // get CI instance
+	$ci->load->library('session'); // load session library
+
+	// If uid hasn't never been set and is present in CI session
+	if ($uid === false && isset($ci->session->uid))
+		$uid = $ci->session->uid;
+	else
 	{
-		// look if User is logged in and return uid
+		// Try to check if uid is stored elsewhere
 		if (isset($_SERVER['PHP_AUTH_USER']))
-			return $_SERVER['PHP_AUTH_USER'];
-		if (isset($_SESSION['uid']))
-			return $_SESSION['uid'];
-		return false;
+			$uid = $_SERVER['PHP_AUTH_USER'];
+		else if (isset($_SESSION['uid']))
+			$uid = $_SESSION['uid'];
 	}
+	
+	// If uid is set and uid in CI session is not set
+	if ($uid !== false && !isset($ci->session->uid))
+	{
+		$ci->session->uid = $uid;
+	}
+	
+	return $uid;
 }

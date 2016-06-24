@@ -26,10 +26,6 @@ class Dms extends APIv1_Controller
 		$this->load->model('content/Dms_model', 'DmsModel');
 		$this->load->model('content/DmsVersion_model', 'DmsVersionModel');
 		$this->load->model('content/DmsFS_model', 'DmsFSModel');
-		// Set the uid of the model to let to check the permissions
-		$this->DmsModel->setUID($this->_getUID());
-		$this->DmsVersionModel->setUID($this->_getUID());
-		$this->DmsFSModel->setUID($this->_getUID());
 	}
 	
 	/**

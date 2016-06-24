@@ -24,8 +24,8 @@ class Lehrveranstaltung extends APIv1_Controller
 		parent::__construct();
 		// Load model LehrveranstaltungModel
 		$this->load->model('education/lehrveranstaltung', 'LehrveranstaltungModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LehrveranstaltungModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

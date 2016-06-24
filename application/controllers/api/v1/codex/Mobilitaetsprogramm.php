@@ -24,8 +24,6 @@ class Mobilitaetsprogramm extends APIv1_Controller
 		parent::__construct();
 		// Load model MobilitaetsprogrammModel
 		$this->load->model('codex/mobilitaetsprogramm_model', 'MobilitaetsprogrammModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->MobilitaetsprogrammModel->setUID($this->_getUID());
 	}
 
 	/**

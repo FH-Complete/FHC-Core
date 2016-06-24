@@ -24,8 +24,6 @@ class Lgartcode extends APIv1_Controller
 		parent::__construct();
 		// Load model LgartcodeModel
 		$this->load->model('codex/lgartcode_model', 'LgartcodeModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LgartcodeModel->setUID($this->_getUID());
 	}
 
 	/**

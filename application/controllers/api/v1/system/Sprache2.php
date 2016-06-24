@@ -24,8 +24,8 @@ class Sprache2 extends APIv1_Controller
 		parent::__construct();
 		// Load model SpracheModel
 		$this->load->model('system/sprache_model', 'SpracheModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->SpracheModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

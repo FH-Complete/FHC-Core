@@ -24,8 +24,6 @@ class Bisfunktion extends APIv1_Controller
 		parent::__construct();
 		// Load model BisfunktionModel
 		$this->load->model('codex/bisfunktion_model', 'BisfunktionModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BisfunktionModel->setUID($this->_getUID());
 	}
 
 	/**

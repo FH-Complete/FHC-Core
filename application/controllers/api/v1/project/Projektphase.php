@@ -24,8 +24,8 @@ class Projektphase extends APIv1_Controller
 		parent::__construct();
 		// Load model ProjektphaseModel
 		$this->load->model('project/projektphase_model', 'ProjektphaseModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ProjektphaseModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

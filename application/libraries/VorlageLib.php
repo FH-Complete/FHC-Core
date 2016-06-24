@@ -1,6 +1,6 @@
 <?php  
-	if (! defined('BASEPATH'))
-		exit('No direct script access allowed');
+
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
 * Name:        Messaging Library for FH-Complete
 *
@@ -11,20 +11,16 @@ class VorlageLib
 {
 	private $recipients = array();
 	
-    public function __construct($params = null)
+    public function __construct()
     {
         require_once APPPATH.'config/message.php';
 
 		$this->ci =& get_instance();
+		
 		$this->ci->load->library('parser');
+		
 		$this->ci->load->model('system/Vorlage_model', 'VorlageModel');
 		$this->ci->load->model('system/Vorlagestudiengang_model', 'VorlageStudiengangModel');
-		
-		if (is_array($params) && isset($params['uid']))
-		{
-			$this->ci->VorlageModel->setUID($params['uid']);
-			$this->ci->VorlageStudiengangModel->setUID($params['uid']);
-		}
 		
         $this->ci->load->helper('language');
         //$this->ci->lang->load('fhcomplete');

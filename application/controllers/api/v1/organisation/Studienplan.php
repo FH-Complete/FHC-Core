@@ -24,8 +24,8 @@ class Studienplan extends APIv1_Controller
 		parent::__construct();
 		// Load model PersonModel
 		$this->load->model('organisation/studienplan_model', 'StudienplanModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->StudienplanModel->setUID($this->_getUID());
+		
+		
 	}
 	
 	public function getStudienplan()

@@ -24,8 +24,6 @@ class Lehrform extends APIv1_Controller
 		parent::__construct();
 		// Load model LehrformModel
 		$this->load->model('codex/lehrform_model', 'LehrformModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LehrformModel->setUID($this->_getUID());
 	}
 
 	/**

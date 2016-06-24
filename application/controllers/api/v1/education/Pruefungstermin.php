@@ -24,8 +24,8 @@ class Pruefungstermin extends APIv1_Controller
 		parent::__construct();
 		// Load model PruefungsterminModel
 		$this->load->model('education/pruefungstermin', 'PruefungsterminModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->PruefungsterminModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

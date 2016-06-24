@@ -1,6 +1,6 @@
 <?php 
-if ( ! defined('BASEPATH')) 
-	exit('No direct script access allowed');
+
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Message_model extends DB_Model
 {
@@ -20,7 +20,7 @@ class Message_model extends DB_Model
 		// Check wrights
 		// @ToDo: Define the special wright for reading own messages "basis/message:own"
 		// if same user
-		if ($uid === $this->getUID())
+		if ($uid === getAuthUID())
 		{
 			if (! $this->fhc_db_acl->isBerechtigt('basis/message', 's'))
 				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> basis/message', FHC_MODEL_ERROR);

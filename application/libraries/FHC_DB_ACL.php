@@ -35,8 +35,7 @@ require_once(FCPATH.'include/benutzerberechtigung.class.php');
 
 class FHC_DB_ACL
 {
-	public $bb;
-	protected $_uid;
+	protected $bb;
 
 	/**
 	 * Auth Username, Password over FH-Complete
@@ -45,37 +44,17 @@ class FHC_DB_ACL
 	 * @param	string	$password
 	 * @return	bool
 	 */
-	function __construct($param = null)
+	function __construct()
 	{
+		$this->CI =& get_instance();
+		$this->CI->load->helper('fhcauth');
+		
 		$this->bb = new benutzerberechtigung();
-		if (is_array($param) && isset($param['uid']))
-			$this->_uid = $param['uid'];
 	}
 
-	function isBerechtigt($berechtigung_kurzbz, $art=null,  $oe_kurzbz=null,  $kostenstelle_id=null)
+	function isBerechtigt($berechtigung_kurzbz, $art = null,  $oe_kurzbz = null,  $kostenstelle_id = null)
 	{
-		$this->bb->getBerechtigungen($this->_uid);
-		return $this->bb->isBerechtigt($berechtigung_kurzbz, $oe_kurzbz=null, $art=null, $kostenstelle_id=null);
-	}
-
-	/** ---------------------------------------------------------------
-	 * Set UID
-	 *
-	 * @param   string  $uid
-	 * @return  bool
-	 */
-	public function setUID($uid)
-	{
-		return $this->_uid = $uid;
-	}
-	
-	/** ---------------------------------------------------------------
-	 * get UID
-	 *
-	 * @return  string or (bool)false
-	 */
-	public function getUID()
-	{
-		return $this->_uid;
+		$this->bb->getBerechtigungen(getAuthUID());
+		return $this->bb->isBerechtigt($berechtigung_kurzbz, $oe_kurzbz, $art, $kostenstelle_id);
 	}
 }

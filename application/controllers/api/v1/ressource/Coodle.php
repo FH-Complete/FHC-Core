@@ -24,8 +24,8 @@ class Coodle extends APIv1_Controller
 		parent::__construct();
 		// Load model CoodleModel
 		$this->load->model('ressource/coodle_model', 'CoodleModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->CoodleModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

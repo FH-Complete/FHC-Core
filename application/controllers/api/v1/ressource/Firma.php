@@ -24,8 +24,8 @@ class Firma extends APIv1_Controller
 		parent::__construct();
 		// Load model FirmaModel
 		$this->load->model('ressource/firma_model', 'FirmaModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->FirmaModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

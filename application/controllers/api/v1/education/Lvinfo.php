@@ -24,8 +24,8 @@ class Lvinfo extends APIv1_Controller
 		parent::__construct();
 		// Load model LvinfoModel
 		$this->load->model('education/lvinfo', 'LvinfoModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->LvinfoModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

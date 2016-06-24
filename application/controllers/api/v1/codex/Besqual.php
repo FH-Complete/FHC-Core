@@ -24,8 +24,6 @@ class Besqual extends APIv1_Controller
 		parent::__construct();
 		// Load model BesqualModel
 		$this->load->model('codex/besqual_model', 'BesqualModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BesqualModel->setUID($this->_getUID());
 	}
 
 	/**

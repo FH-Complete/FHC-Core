@@ -24,8 +24,8 @@ class Cronjob extends APIv1_Controller
 		parent::__construct();
 		// Load model CronjobModel
 		$this->load->model('system/cronjob_model', 'CronjobModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->CronjobModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

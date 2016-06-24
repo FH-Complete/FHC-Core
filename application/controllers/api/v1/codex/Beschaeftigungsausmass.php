@@ -24,8 +24,6 @@ class Beschaeftigungsausmass extends APIv1_Controller
 		parent::__construct();
 		// Load model BeschaeftigungsausmassModel
 		$this->load->model('codex/beschaeftigungsausmass_model', 'BeschaeftigungsausmassModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->BeschaeftigungsausmassModel->setUID($this->_getUID());
 	}
 
 	/**

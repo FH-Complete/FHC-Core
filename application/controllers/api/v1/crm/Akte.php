@@ -24,8 +24,8 @@ class Akte extends APIv1_Controller
 		parent::__construct();
 		// Load model AkteModel
 		$this->load->model('crm/akte_model', 'AkteModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->AkteModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

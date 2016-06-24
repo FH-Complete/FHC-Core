@@ -24,8 +24,8 @@ class Webservicelog extends APIv1_Controller
 		parent::__construct();
 		// Load model WebservicelogModel
 		$this->load->model('system/webservicelog_model', 'WebservicelogModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->WebservicelogModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

@@ -24,8 +24,8 @@ class Tag extends APIv1_Controller
 		parent::__construct();
 		// Load model TagModel
 		$this->load->model('system/tag_model', 'TagModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->TagModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

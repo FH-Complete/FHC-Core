@@ -24,8 +24,6 @@ class Zweck extends APIv1_Controller
 		parent::__construct();
 		// Load model ZweckModel
 		$this->load->model('codex/zweck_model', 'ZweckModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ZweckModel->setUID($this->_getUID());
 	}
 
 	/**

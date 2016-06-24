@@ -24,8 +24,8 @@ class Stunde extends APIv1_Controller
 		parent::__construct();
 		// Load model StundeModel
 		$this->load->model('ressource/stunde_model', 'StundeModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->StundeModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

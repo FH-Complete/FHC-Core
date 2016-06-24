@@ -24,8 +24,8 @@ class Projektarbeit extends APIv1_Controller
 		parent::__construct();
 		// Load model ProjektarbeitModel
 		$this->load->model('education/projektarbeit', 'ProjektarbeitModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ProjektarbeitModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

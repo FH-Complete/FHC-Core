@@ -24,8 +24,6 @@ class Konto extends APIv1_Controller
 		parent::__construct();
 		// Load model KontoModel
 		$this->load->model('accounting/konto_model', 'KontoModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->KontoModel->setUID($this->_getUID());
 	}
 
 	/**

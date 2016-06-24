@@ -24,8 +24,8 @@ class Status extends APIv1_Controller
 		parent::__construct();
 		// Load model StatusModel
 		$this->load->model('crm/status_model', 'StatusModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->StatusModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

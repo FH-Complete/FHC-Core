@@ -24,8 +24,8 @@ class Zeitsperre extends APIv1_Controller
 		parent::__construct();
 		// Load model ZeitsperreModel
 		$this->load->model('ressource/zeitsperre_model', 'ZeitsperreModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->ZeitsperreModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

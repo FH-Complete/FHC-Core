@@ -24,8 +24,8 @@ class Mitarbeiter extends APIv1_Controller
 		parent::__construct();
 		// Load model MitarbeiterModel
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->MitarbeiterModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**

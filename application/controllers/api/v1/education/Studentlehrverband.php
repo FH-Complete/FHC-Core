@@ -24,8 +24,8 @@ class Studentlehrverband extends APIv1_Controller
 		parent::__construct();
 		// Load model StudentlehrverbandModel
 		$this->load->model('education/studentlehrverband', 'StudentlehrverbandModel');
-		// Load set the uid of the model to let to check the permissions
-		$this->StudentlehrverbandModel->setUID($this->_getUID());
+		
+		
 	}
 
 	/**
