@@ -104,7 +104,7 @@ class prestudent extends Prestudent_model
 	 * Laedt Prestudent mit der uebergebenen ID
 	 * @param $prestudent_id ID des Prestudenten der geladen werden soll
 	 */
-	public function load($prestudent_id)
+	public function load($prestudent_id = null)
 	{
 		if (!is_numeric($prestudent_id))
 		{

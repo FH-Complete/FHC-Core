@@ -63,7 +63,7 @@ class Nation extends APIv1_Controller
 			}
 			else
 			{
-				$result = $this->NationModel->loadWhole();
+				$result = $this->NationModel->load();
 			}
 		}
 		

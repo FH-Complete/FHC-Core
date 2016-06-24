@@ -72,7 +72,7 @@ class preinteressent extends Preinteressent_model
 	 * Laedt einen Datensatz
 	 * @param preinteressent_id ID des zu ladenden Datensatzes
 	 */
-	public function load($preinteressent_id)
+	public function load($preinteressent_id = null)
 	{
 		//id auf Gueltigkeit pruefen
 		if(!is_numeric($preinteressent_id) || $preinteressent_id == '')

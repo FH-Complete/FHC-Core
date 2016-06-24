@@ -54,7 +54,7 @@ class organisationsform extends Orgform_model
 	 * Laedt eine Organisationsform
 	 * @param $orgform_kurzbz
 	 */
-	public function load($orgform_kurzbz)
+	public function load($orgform_kurzbz = null)
 	{
 		$qry = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz=".$this->db_add_param($orgform_kurzbz).';'; 
 		

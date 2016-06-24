@@ -89,7 +89,7 @@ class Studiensemester extends APIv1_Controller
 			$this->StudiensemesterModel->addOrder('ende', 'ASC');
 		}
 		
-		$result = $this->StudiensemesterModel->loadWhole();
+		$result = $this->StudiensemesterModel->load();
 		
 		$this->response($result, REST_Controller::HTTP_OK);
 	}

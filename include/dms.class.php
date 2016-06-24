@@ -71,7 +71,7 @@ class dms extends Dms_model
 	 * @param dms_id
 	 * @param version optional
 	 */
-	public function load($dms_id, $version=null)
+	public function load($dms_id = null, $version=null)
 	{
 		$qry = "SELECT tbl_dms.dms_id, * FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id) WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER);
 		

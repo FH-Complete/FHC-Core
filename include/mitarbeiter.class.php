@@ -67,7 +67,7 @@ class mitarbeiter extends benutzer
 	 * @param $uid
 	 * @return true wenn ok, sonst false
 	 */
-	public function load($uid)
+	public function load($uid = null)
 	{
 		if(!benutzer::load($uid))
 			return false;

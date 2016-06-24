@@ -93,7 +93,7 @@ class ort extends Ort_model
 		}
 		else
 		{
-			$result = parent::loadWhole();
+			$result = parent::load();
 		}
 		
 		if (!is_object($result) || (is_object($result) && ($result->error != EXIT_SUCCESS || !is_array($result->retval))))
@@ -136,7 +136,7 @@ class ort extends Ort_model
 	 * @param $fachb_id ID des zu ladenden Ortes
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load($ort_kurzbz)
+	public function load($ort_kurzbz = null)
 	{
 		if ($ort_kurzbz == '')
 		{

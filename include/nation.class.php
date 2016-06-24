@@ -67,7 +67,7 @@ class nation extends Nation_model
 	 * @param  $code code der zu ladenden Nation
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load($code)
+	public function load($code = null)
 	{
 		//Lesen der Daten aus der Datenbank
 		$result = parent::loadWhere(array('nation_code' => $code));
@@ -126,7 +126,7 @@ class nation extends Nation_model
 			}
 			else
 			{
-				$result = parent::loadWhole();
+				$result = parent::load();
 			}
 		}
 			

@@ -58,7 +58,7 @@ class student extends benutzer
 	 * 		studiensemester_kurzbz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load($uid, $studiensemester_kurzbz=null)
+	public function load($uid = null, $studiensemester_kurzbz=null)
 	{
 		if(!benutzer::load($uid))
 			return false;

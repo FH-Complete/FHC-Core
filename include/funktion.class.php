@@ -109,7 +109,7 @@ class funktion extends Funktion_model
 	 * @param $funktion_kurzbz ID der zu ladenden Funktion
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load($funktion_kurzbz)
+	public function load($funktion_kurzbz = null)
 	{
 		if ($funktion_kurzbz == '')
 		{

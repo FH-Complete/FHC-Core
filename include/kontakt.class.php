@@ -80,7 +80,7 @@ class kontakt extends Kontakt_model
 	 * @param  $kontakt_id ID des zu ladenden Kontaktes
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load($kontakt_id)
+	public function load($kontakt_id = null)
 	{
 		if(!is_numeric($kontakt_id))
 		{
