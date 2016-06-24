@@ -241,17 +241,17 @@
 						var neededStudentsCount = aqr.selectedStudienplatz.apz - aqr.getAcceptedCount();
 						var perZGV = aqr.studenten.length;
 						var zgvElems = [];
-						var allApplicants = [];
+						var allCountedStudents = [];
 
 						aqr.studenten.forEach(function(j)
 						{
-							if(j.applicant)
-								allApplicants.push(j);
+							if((j.applicant || j.selected))
+								allCountedStudents.push(j);
 						});
 
 						var applicantCount = aqr.selectedStudienplatz.apz;
-						if(applicantCount > allApplicants.length)
-							applicantCount = allApplicants.length;
+						if(applicantCount > allCountedStudents.length)
+							applicantCount = allCountedStudents.length;
 
 
 						zgvs.forEach(function(i)
@@ -259,12 +259,12 @@
 							var applicantsFromZGV = [];
 							aqr.studenten.forEach(function(j)
 							{
-								if(j.applicant && j.bezeichnung === i)
+								if((j.applicant || j.selected) && j.bezeichnung === i)
 									applicantsFromZGV.push(j);
 							});
 
 							// calculate the aliquote reduction for every ZGV
-							var percent = applicantsFromZGV.length / allApplicants.length * 100;
+							var percent = applicantsFromZGV.length / allCountedStudents.length * 100;
 							var neededFromZGV = (applicantCount / 100 * percent) - aqr.getAcceptedCount(i);
 
 							if(neededFromZGV < 0)
