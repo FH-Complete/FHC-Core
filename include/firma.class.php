@@ -747,11 +747,7 @@ class firma extends basis_db
 			$this->errormsg = 'Organisationseinheit/Firma_id ist ungueltig';
 			return false;
 		}
-		$qry = "delete from public.tbl_firma_organisationseinheit WHERE firma_organisationseinheit_id>0";
-		if ($firma_organisationseinheit_id)
-			$qry.=" and firma_organisationseinheit_id=".$this->db_add_param($firma_organisationseinheit_id, FHC_INTEGER);
-
-        $qry.=';';
+		$qry = "DELETE FROM public.tbl_firma_organisationseinheit WHERE firma_organisationseinheit_id=".$this->db_add_param($firma_organisationseinheit_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 			return true;
