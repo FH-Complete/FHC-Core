@@ -119,6 +119,28 @@ class Message extends APIv1_Controller
 		}
 	}
 	
+	/**
+	 * @return void
+	 */
+	public function postChangeStatus()
+	{
+		$person_id = $this->post()['person_id'];
+		$message_id = $this->post()['message_id'];
+		$status = $this->post()['status'];
+		
+		if (isset($person_id) && isset($message_id) && isset($status) &&
+			in_array($status, array(MSG_STATUS_UNREAD, MSG_STATUS_READ, MSG_STATUS_ARCHIVED, MSG_STATUS_DELETED)))
+		{
+			$result = $this->messagelib->updateMessageStatus($message_id, $person_id, $status);
+
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
 	private function _validatePostMessage($message = null)
 	{
 		if (!isset($message))
