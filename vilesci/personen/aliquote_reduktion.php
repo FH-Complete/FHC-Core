@@ -129,7 +129,7 @@
 						}
 					});
 
-					AJAXCall({action:"setAufgenommene",studiengang_kz:aqr.selectedStudiengang.studiengang_kz,prestudent_ids:JSON.stringify(prestudent_ids)},function(res){aqr.loadStudenten();});
+					AJAXCall({action:"setAufgenommene",studiengang_kz:aqr.selectedStudiengang.studiengang_kz,prestudent_ids:JSON.stringify(prestudent_ids),studienplan_id:aqr.selectedStudienplatz.studienplan_id},function(res){aqr.loadStudenten();});
 				}
 
 				aqr.countChoosen = function()

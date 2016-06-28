@@ -30,6 +30,7 @@ require_once(dirname(__FILE__).'/../../include/prestudent.class.php');
 require_once(dirname(__FILE__).'/../../include/studienplatz.class.php');
 require_once(dirname(__FILE__).'/../../include/Excel/excel.php');
 require_once(dirname(__FILE__).'/../../include/dokument.class.php');
+require_once(dirname(__FILE__).'/../../include/studienplan.class.php');
 
 
 $user = get_uid();
@@ -115,12 +116,20 @@ switch($action)
 		if(!isset($_REQUEST["prestudent_ids"]))
 			die("keine Studenten erhalten");
 
+		if(!isset($_REQUEST["studienplan_id"]))
+			die("keine Studienplan_id erhalten");
+
+		$stpl = new studienplan();
+		$stpl->loadStudienplan($_REQUEST["studienplan_id"]);
+
 		$prestudent_ids = json_decode($_REQUEST["prestudent_ids"]);
 		foreach($prestudent_ids as $i)
 		{
 			$prestudent = new prestudent($i);
 			$prestudent->getLastStatus($i);
+			$prestudent->studienplan_id = $_REQUEST["studienplan_id"];
 			$prestudent->status_kurzbz = "Aufgenommener";
+			$prestudent->orgform_kurzbz = $stpl->orgform_kurzbz;
 			$prestudent->new = true;
 			$prestudent->datum = date("Y-m-d H:i:s");
 			$prestudent->updatevon = $user;
