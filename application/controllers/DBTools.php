@@ -47,7 +47,7 @@ class DBTools extends FHC_Controller
 		}
 		
         // can only be run in the development environment
-        if (ENVIRONMENT !== 'development')
+        if (ENVIRONMENT == 'production')
             exit('Wowsers! You don\'t want to do that!');
  		$this->load->database('system'); //Use the system-Connection for DB-Manipulation
 		$this->config->load('migration');
