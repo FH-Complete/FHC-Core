@@ -199,7 +199,7 @@
 							{
 								if((i.laststatus=='Wartender'||i.laststatus=='Bewerber') && i.rt_gesamtpunkte !== null  && i.rt_gesamtpunkte > 0)
 									i.applicant = true;
-								else if(i.laststatus=='Student'||i.laststatus=='Aufgenommener')
+								else if((i.laststatus=='Student'||i.laststatus=='Aufgenommener') && aqr.selectedStudienplatz.studienplan_id == i.studienplan_id)
 									i.selected=true;
 							});
 							aqr.doPreselection();
@@ -428,7 +428,7 @@
 	</head>
 	<body class="Background_main">
 		<div ng-controller="aliqRedController as aqr" ng-app="aliqRed">
-			<h2>{{aqr.name}} {{aqr.selectedStudiengang.studiengang_kz}}/{{aqr.selectedStudienplatz.studienplatz_id}}</h2>
+			<h2>{{aqr.name}} {{aqr.selectedStudiengang.studiengang_kz}}/{{aqr.selectedStudienplatz.studienplan_id}}</h2>
 
 			<select data-ng-options="stg.kurzbzlang for stg in aqr.studiengaenge" data-ng-model="aqr.selectedStudiengang"></select>
 			<select data-ng-options="stsem.studiensemester_kurzbz for stsem in aqr.studiensemester" data-ng-model="aqr.selectedStudiensemester"></select>

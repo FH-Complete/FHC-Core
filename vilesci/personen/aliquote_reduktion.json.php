@@ -352,7 +352,8 @@ function getAllStudentenFromStudienplanAndStudsem($studienplan_id, $studiensemes
 	if($stg_obj->typ=='m')
 	{
 		$qry = "SELECT DISTINCT prestudent_id, vorname, nachname, gebdatum, rt_gesamtpunkte, tbl_prestudent.studiengang_kz, bis.tbl_zgvgruppe.bezeichnung, get_rolle_prestudent(prestudent_id, null) as laststatus,
-				(Select anmerkung from public.tbl_prestudentstatus where prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)."
+				(SELECT studienplan_id FROM tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)." ORDER BY datum desc LIMIT 1) as studienplan_id,
+				(SELECT anmerkung FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)."
 					AND status_kurzbz='Bewerber') as anmerkung, rt_punkte1, rt_punkte2,
 				(SELECT kontakt FROM public.tbl_kontakt where kontakttyp='email' AND zustellung AND person_id=tbl_person.person_id limit 1) as email_privat
 		FROM
@@ -381,7 +382,8 @@ function getAllStudentenFromStudienplanAndStudsem($studienplan_id, $studiensemes
 	else
 	{
 		$qry = "SELECT DISTINCT prestudent_id, vorname, nachname, gebdatum, rt_gesamtpunkte, tbl_prestudent.studiengang_kz, bis.tbl_zgvgruppe.bezeichnung, get_rolle_prestudent(prestudent_id, null) as laststatus,
-			(Select anmerkung from public.tbl_prestudentstatus where prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)."
+				(SELECT studienplan_id FROM tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)." ORDER BY datum desc LIMIT 1) as studienplan_id,
+			(SELECT anmerkung FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)."
 					AND status_kurzbz='Bewerber') as anmerkung, rt_punkte1, rt_punkte2,
 			(SELECT kontakt FROM public.tbl_kontakt where kontakttyp='email' AND zustellung AND person_id=tbl_person.person_id limit 1) as email_privat
 		FROM
