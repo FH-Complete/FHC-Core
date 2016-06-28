@@ -19,6 +19,14 @@ trait db_extra
 		}
 	}
 
+	public function db_num_rows($result=null)
+	{
+		if(is_null($result))
+			return pg_num_rows($this->db_result);
+		else
+			return pg_num_rows($result);
+	}
+
 	public function db_fetch_object($result = null, $i=null)
 	{
 		if(is_null($result))

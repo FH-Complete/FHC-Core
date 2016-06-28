@@ -34,7 +34,7 @@ class DBTools extends FHC_Controller
     {
         parent::__construct();
  		
-		$seed_path = APPPATH.'seeds/';
+		$this->seed_path = APPPATH.'seeds/';
 		
 		if ($this->input->is_cli_request())
 		{
@@ -54,9 +54,9 @@ class DBTools extends FHC_Controller
 		$this->load->library('migration');
  
 		// If not set, set it
-		//$this->seed_path !== '' OR $this->seed_path = APPPATH.'seeds/';
+		$this->seed_path !== '' OR $this->seed_path = APPPATH.'seeds/';
 		// Add trailing slash if not set
-		//$this->seed_path = rtrim($this->seed_path, '/').'/';
+		$this->seed_path = rtrim($this->seed_path, '/').'/';
 
 		// Load seed language
 		$this->lang->load('seed');
@@ -78,9 +78,9 @@ class DBTools extends FHC_Controller
     public function index()
 	{
         $result = "The following are the available command line interface commands\n\n";
-        $result .= "php index.ci.php DBTools migrate [\"version_number\"]    Run all migrations. ";
+        $result .= "php index.ci.php DBTools migrate [\"version_number\"]    Run migrations. (latest/current) ";
 		$result .= "The version number is optional.\n";
-        $result .= "php index.ci.php DBTools seed \"file_name\"              Run the specified seed file.\n";
+        $result .= "php index.ci.php DBTools seed [\"file_name\"]              Run the specified seed (Name of Seed. expl: 'Organisation').\n";
 
         echo $result.PHP_EOL;
     }
@@ -262,6 +262,68 @@ class DBTools extends FHC_Controller
 		return $seeds;
 	}
 
+/**
+	 * Truncate DB from Testdata
+	 *
+	 * @param	string	$name Name of the seed file.
+	 * @return	bool
+	 */
+	public function truncate($name)
+	{
+		$seeds = $this->findSeeds();
+
+		if (empty($name))
+		{
+			$this->_error_string = $this->lang->line('seed_none_found');
+			return false;
+		}
+
+		$method = 'truncate';
+		$pending = array();
+
+		
+		foreach ($seeds as $number => $file)
+		{
+			include_once($file);
+			$class = 'Seed_'.ucfirst(strtolower($this->_getSeedName(basename($file, '.php'))));
+
+			// Validate the seed file structure
+			if (! class_exists($class, false))
+			{
+				$this->_error_string = sprintf($this->lang->line('seed_class_doesnt_exist'), $class);
+				return false;
+			}
+			// method_exists() returns true for non-public methods,
+			// while is_callable() can't be used without instantiating.
+			// Only get_class_methods() satisfies both conditions.
+			elseif (! in_array($method, array_map('strtolower', get_class_methods($class))))
+			{
+				$this->_error_string = sprintf($this->lang->line('seed_missing_'.$method.'_method'), $class);
+				return false;
+			}
+
+			$pending[$number] = array($class, $method);
+		}
+		
+		// Now just run the necessary seeds
+		foreach ($pending as $number => $seed)
+		{
+			if (is_null($name))
+			{
+				log_message('debug', 'Seeding '.$method);
+			
+				$seed[0] = new $seed[0];
+				call_user_func($seed);
+			}
+			elseif ($seed[0] == 'Seed_'.$name)
+			{
+				log_message('debug', 'Seeding '.$method);
+			
+				$seed[0] = new $seed[0];
+				call_user_func($seed);
+			}
+		}
+	}
 	/**
 	 * Extracts the seed number from a filename
 	 *

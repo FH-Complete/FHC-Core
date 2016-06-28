@@ -17,6 +17,9 @@
 	define("DB_CONNECT_PERSISTENT",FALSE);
 	define('CONN_CLIENT_ENCODING','UTF-8' );
 	
+	// Dokumentenmanagement
+	define('DMS_PATH','/var/fhcomplete/documents/dms/');
+
 	// Fuer Mails etc
 	define('DOMAIN','technikum-wien.at');
 	

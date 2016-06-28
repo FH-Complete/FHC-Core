@@ -21,6 +21,18 @@
  * Dieses Skript prueft die Datenbank auf aktualitaet, dabei werden fehlende Attribute angelegt.
  */
 
+// Defaultwerte in tbl_studiengang
+$qry = "ALTER TABLE public.tbl_studiengang ALTER COLUMN testtool_sprachwahl SET DEFAULT true;
+ALTER TABLE public.tbl_studiengang ALTER COLUMN projektarbeit_note_anzeige SET DEFAULT true;
+ALTER TABLE lehre.tbl_studienplan ALTER COLUMN testtool_sprachwahl SET DEFAULT true;
+ALTER TABLE lehre.tbl_studienplan ALTER COLUMN aktiv SET DEFAULT true;";
+
+if(!$db->db_query($qry))
+	echo '<strong>public.tbl_studiengang: '.$db->db_last_error().'</strong><br>';
+else
+	echo 'Defaultwerte für tbl_studiengang und tbl_studienplan gesetzt.';
+
+
 //Spalte studiensemester_kurzbz für Reihungstest
 if(!$result = @$db->db_query("SELECT studiensemester_kurzbz FROM public.tbl_reihungstest LIMIT 1"))
 {

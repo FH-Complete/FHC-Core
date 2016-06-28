@@ -124,6 +124,7 @@ $berechtigungen = array(
 	array('lehre/reservierung:begrenzt','normale Raumreservierung im CIS'),
 	array('lehre/studienordnung','Studienordnung'),
 	array('lehre/studienordnungInaktiv','Studienordnung Inaktiv'),
+	array('lehre/studienplan','Studienplan'),
 	array('lehre/vorrueckung','Lehreinheitenvorrückung'),
 	array('lv-plan','Stundenplan'),
 	array('lv-plan/gruppenentfernen','Erlaut das Entfernen von Gruppen aus LVPlan vom FAS aus'),
