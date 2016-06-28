@@ -22,7 +22,7 @@ class Phrase extends APIv1_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->library('PhrasesLib', array('uid' => $this->_getUID()));
+		$this->load->library('PhrasesLib');
 	}
 
 	/**
