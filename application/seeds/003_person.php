@@ -5,10 +5,14 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class Seed_Person
 {
 
-        public function seed($limit = 25)
+        public function __construct()
+		{
+			$this->fhc =& get_instance();
+		}
+		
+        public function seed($limit = 200)
         {
 			echo "Seeding $limit persons ";
-			$this->fhc =& get_instance();
 			$this->fhc->load->model('person/Person_model');
  
 		    for ($i = 0; $i < $limit; $i++)
@@ -41,7 +45,7 @@ class Seed_Person
 
         public function truncate()
         {
-              //$this->db->query('EMPTY TABLE public.person;');
+              $this->fhc->db->query('DELETE FROM public.tbl_person WHERE person_id>2;');
         }
 }
 

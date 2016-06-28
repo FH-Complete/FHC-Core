@@ -5,15 +5,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Seed_Message
 {
 
+        public function __construct()
+		{
+			$this->fhc =& get_instance();
+		}
+		
         public function seed($limit = 25)
         {
 			echo "Seeding $limit messages ";
-			$this->fhc =& get_instance();
-			$this->fhc->load->model('system/Recipient_model');
-			$this->fhc->Recipient_model->setUid('admin');
-			$this->fhc->load->model('system/Message_model');
- 
-		    for ($i = 0; $i < $limit; $i++)
+			for ($i = 0; $i < $limit; $i++)
 			{
 		        echo ".";
 		        
@@ -23,17 +23,18 @@ class Seed_Message
 					'body' => $this->fhc->faker->text(400),
 					'person_id' => $i%5+1
 		        );
-		        $message = $this->fhc->Message_model->insert($data);
+		        $this->fhc->db->insert('public.tbl_msg_message', $data);
+				$message_id = $this->fhc->db->insert_id();
 
 				$data = array
 				(
-		            'message_id' => $message->retval,
+		            'message_id' => $message_id,
 					'person_id' => $i%5+2,
 					'insertvon' => 'seed'
 		        );
-		        $recipient = $this->fhc->Recipient_model->insert($data);
-				if ($recipient->error)
-					show_error($recipient->retval);
+		        $recipient = $this->fhc->db->insert('public.tbl_msg_recipient', $data);
+				if (!$recipient)
+					show_error($recipient);
 				//for ($j=1; $j<10; $j++)
 				//	$this->fhc->Message_model->addRecipient($thread->retval, $i+$j+5);
 		    }
@@ -44,7 +45,7 @@ class Seed_Message
 
         public function truncate()
         {
-              //$this->db->query('EMPTY TABLE public.person;');
+              $this->fhc->db->query('DELETE FROM public.msg_message;');
         }
 }
 

@@ -41,6 +41,7 @@ class Migration_Message extends CI_Migration {
 					CREATE TABLE public.tbl_msg_recipient (
 					  person_id bigint NOT NULL references public.tbl_person(person_id),
 					  message_id bigint NOT NULL references public.tbl_msg_message(message_id),
+						token varchar(128) UNIQUE,
 					  insertamum timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					  insertvon varchar(32),
 					  PRIMARY KEY (person_id,message_id)

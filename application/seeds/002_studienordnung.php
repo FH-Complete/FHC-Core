@@ -16,9 +16,13 @@ class Seed_Studienordnung
 			$this->fhc->load->model('organisation/Studienplan_model', 'StudienplanModel');
 
 			// Studienordnung
-			echo "Seeding about $limit Studienordnungen ";
+			echo "Seeding about $limit Studienordnungen<br/>";
 			$data = array('studiengang_kz' =>3, 'bezeichnung' => 'BUM-WS2016-VZ');
-			$studienordnung_id = $this->fhc->StudienordnungModel->insert($data)->retval;
+			$res = $this->fhc->StudienordnungModel->insert($data);
+			if ($res->error)
+				die($res->retval);
+			else
+				$studienordnung_id = $res->retval;
 			$data = array('studiengang_kz' =>4, 'bezeichnung' => 'BDI-WS2016-VZ');
 			$this->fhc->StudienordnungModel->insert($data);
 			$data = array('studiengang_kz' =>5, 'bezeichnung' => 'BPT-WS2016-VZ');
@@ -71,7 +75,7 @@ class Seed_Studienordnung
 			$this->fhc->StudienordnungModel->insert($data);
 			
 			//Studienplan
-			echo "Seeding about $limit Studienplaene ";
+			echo "Seeding about $limit Studienplaene<br/>";
 			$data = array('studienordnung_id' => $studienordnung_id, 'bezeichnung' => 'BUM-WS2016-VZ');
 			$this->fhc->StudienplanModel->insert($data);
 			$data = array('studienordnung_id' => $studienordnung_id+1, 'bezeichnung' => 'BDI-WS2016-VZ');

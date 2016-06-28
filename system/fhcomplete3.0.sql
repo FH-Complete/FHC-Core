@@ -28697,7 +28697,6 @@ INSERT INTO tbl_gemeinde VALUES (20674, 1210, 'Wien', 17243, 'Wien,Floridsdorf',
 INSERT INTO tbl_gemeinde VALUES (20675, 1220, 'Wien', 17244, 'Wien,Donaustadt', 9, 'W', 90001);
 INSERT INTO tbl_gemeinde VALUES (20676, 1230, 'Wien', 17245, 'Wien,Liesing', 9, 'W', 90001);
 
-
 --
 -- Data for Name: tbl_hauptberuf; Type: TABLE DATA; Schema: bis; Owner: postgres
 --
