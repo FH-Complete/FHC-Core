@@ -118,31 +118,30 @@ class MessageLib
      * @param   integer  $status_id  REQUIRED - should come from config/message.php list of constants
      * @return  array
      */
-    function updateMessageStatus($msg_id, $user_id, $status_id )
+    function updateMessageStatus($message_id, $person_id, $status)
     {
-        if (empty($msg_id))
+        if (empty($message_id))
         {
             return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
         }
 
-        if (empty($user_id))
+        if (empty($person_id))
         {
             return $this->_invalid_id(MSG_ERR_INVALID_USER_ID);
         }
 
-        if (empty($status_id))
+		// Not use empty otherwise if status is 0 it returns an error
+        if (!isset($status))
         {
             return $this->_invalid_id(MSG_ERR_INVALID_STATUS_ID);
         }
 
-        if ($this->ci->message_model->update_message_status($msg_id, $user_id, $status_id))
-        {
-            return $this->_success(NULL, MSG_STATUS_UPDATE);
-        }
-
-        // General Error Occurred
-        return $this->_general_error();
-
+		$result = $this->ci->MsgStatusModel->update(
+			array('message_id' => $message_id, 'person_id' => $person_id),
+			array('status' => $status)
+		);
+		
+		return $result;
     }
 
     // ------------------------------------------------------------------------
