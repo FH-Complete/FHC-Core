@@ -224,7 +224,7 @@
 					var ret = 0;
 					aqr.studenten.forEach(function(i)
 					{
-						if((i.laststatus=='Student'||i.laststatus=='Aufgenommener') && (zgvGruppe === undefined || zgvGruppe === i.bezeichnung))
+						if((i.laststatus=='Student'||i.laststatus=='Aufgenommener') && aqr.selectedStudienplatz.studienplan_id == i.studienplan_id && (zgvGruppe === undefined || zgvGruppe === i.bezeichnung))
 							ret++;
 					});
 					return ret;
