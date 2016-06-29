@@ -41,7 +41,7 @@ require_once('../include/addon.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/studienordnung.class.php');
-
+var_dump("hihasifdhlasdhfl");// TODO EINE
 $user = get_uid();
 $db = new basis_db();
 
@@ -79,7 +79,7 @@ else
 			else
 				$prestudent_ids[1] = $_GET['prestudent_id'];
 
-			$prestudent_obj = new prestudent();
+			$prestudent_obj = new prestudent();var_dump($prestudent_ids[1]);// TODO EINE
 			if($prestudent_obj->load($prestudent_ids[1]))
 			{
 				$xsl_stg_kz=$prestudent_obj->studiengang_kz;
@@ -579,7 +579,7 @@ else
 	$prestudent_id = $_REQUEST["prestudent_id"];
 	$heute = date('Y-m-d');
 
-	$prestudent = new prestudent();
+	$prestudent = new prestudent();var_dump($prestudent_id);// TODO EINE
 	$prestudent->load($prestudent_id);
 	$uid = $prestudent->getUid($prestudent_id);
 

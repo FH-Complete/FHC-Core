@@ -329,7 +329,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                 
 		
 		$anrechnung = new anrechnung();
-		$anrechnung->getAnrechnungPrestudent($student->prestudent_id, null, $lehrveranstaltung_id);
+		$anrechnung->getAnrechnungPrestudent($prestudent_id, null, $lehrveranstaltung_id);
 
 		$xml .= "<studienverpflichtung>";
 		$lehrveranstaltung_id_kompatibel = "";
