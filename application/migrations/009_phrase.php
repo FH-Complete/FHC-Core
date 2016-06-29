@@ -41,8 +41,8 @@ class Migration_Phrase extends CI_Migration {
 				GRANT SELECT, UPDATE ON SEQUENCE system.tbl_phrase_phrase_id_seq TO admin;
 				GRANT SELECT, UPDATE ON SEQUENCE system.tbl_phrase_phrase_id_seq TO vilesci;
 
-				CREATE TABLE system.tbl_phrase_inhalt (
-				  phrase_inhalt_id serial,
+				CREATE TABLE system.tbl_phrasentext (
+				  phrasentext_id serial,
 				  phrase_id bigint NOT NULL,
                   sprache varchar(32) NOT NULL,
                   orgeinheit_kurzbz varchar(32),
@@ -51,14 +51,14 @@ class Migration_Phrase extends CI_Migration {
 				  description text,
 				  insertamum timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				  insertvon varchar(32),
-				  PRIMARY KEY (phrase_inhalt_id)
+				  PRIMARY KEY (phrasentext_id)
 				);
-				GRANT SELECT ON TABLE system.tbl_phrase_inhalt TO web;
-				GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE system.tbl_phrase_inhalt TO admin;
-				GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE system.tbl_phrase_inhalt TO vilesci;
-                GRANT SELECT, UPDATE ON SEQUENCE system.tbl_phrase_inhalt_phrase_inhalt_id_seq TO web;
-                GRANT SELECT, UPDATE ON SEQUENCE system.tbl_phrase_inhalt_phrase_inhalt_id_seq TO admin;
-                GRANT SELECT, UPDATE ON SEQUENCE system.tbl_phrase_inhalt_phrase_inhalt_id_seq TO vilesci;
+				GRANT SELECT ON TABLE system.tbl_phrasentext TO web;
+				GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE system.tbl_phrasentext TO admin;
+				GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE system.tbl_phrasentext TO vilesci;
+                GRANT SELECT, UPDATE ON SEQUENCE system.tbl_phrasentext_phrasentext_id_seq TO web;
+                GRANT SELECT, UPDATE ON SEQUENCE system.tbl_phrasentext_phrasentext_id_seq TO admin;
+                GRANT SELECT, UPDATE ON SEQUENCE system.tbl_phrasentext_phrasentext_id_seq TO vilesci;
                 ";
   			if (!$this->db->simple_query($query))
 			{
@@ -71,10 +71,10 @@ class Migration_Phrase extends CI_Migration {
     {
 		try
 		{
-			$this->dbforge->drop_table('system.tbl_phrase_inhalt');
+			$this->dbforge->drop_table('system.tbl_phrasentext');
             $this->dbforge->drop_table('system.tbl_phrase');
 			$this->dbforge->drop_table('system.tbl_app');
-            echo "Table system.tbl_phrase_inhalt, system.tbl_phrase and system.tbl_app dropped!";
+            echo "Table system.tbl_phrasentext, system.tbl_phrase and system.tbl_app dropped!";
 		}
 		catch(Exception $e)
 		{

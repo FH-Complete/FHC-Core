@@ -20,7 +20,7 @@ class PhrasesLib
 		$this->ci->load->library('parser');
 		
 		$this->ci->load->model('system/Phrase_model', 'PhraseModel');
-		$this->ci->load->model('system/Phrase_inhalt_model', 'PhraseInhaltModel');
+		$this->ci->load->model('system/Phrasetext_model', 'PhrasentextModel');
 		
         $this->ci->load->helper('language');
 		$this->ci->load->helper('Message');
@@ -59,8 +59,8 @@ class PhrasesLib
         if (empty($phrase_id))
         	return $this->_error(MSG_ERR_INVALID_MSG_ID);
 
-        $phrase_inhalt = $this->ci->PhraseInhaltModel->loadWhere(array('phrase_id' => $phrase_id));
-        return $phrase_inhalt;
+        $phrasentext = $this->ci->PhrasentextModel->loadWhere(array('phrase_id' => $phrase_id));
+        return $phrasentext;
     }
 
 	/**
@@ -85,13 +85,13 @@ class PhrasesLib
      * @param   string  $vorlage_kurzbz    REQUIRED
      * @return  array
      */
-    function getPhraseInhaltById($phrase_inhalt_id)
+    function getPhrasentextById($phrasentext_id)
 	{
-        if (empty($phrase_inhalt_id))
+        if (empty($phrasentext_id))
         	return $this->_error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
 
-        $phrase_inhalt = $this->ci->PhraseInhaltModel->loadWhere(array('phrase_inhalt_id' =>$phrase_inhalt_id));
-        return $phrase_inhalt;
+        $phrasentext = $this->ci->PhrasentextModel->load($phrasentext_id);
+        return $phrasentext;
     }
 	
 	/**
@@ -138,8 +138,8 @@ class PhrasesLib
      */
     function insertPhraseinhalt($data)
 	{
-        $phrase_inhalt = $this->ci->PhraseInhaltModel->insert($data);
-        return $phrase_inhalt;
+        $phrasentext = $this->ci->PhrasentextModel->insert($data);
+        return $phrasentext;
     }
 
 	/**
@@ -160,10 +160,10 @@ class PhrasesLib
      * @param   string  $vorlage_kurzbz    REQUIRED
      * @return  array
      */
-    function updatePhraseInhalt($phrase_inhalt_id, $data)
+    function updatePhraseInhalt($phrasentext_id, $data)
 	{
-        $phrase_inhalt = $this->ci->PhraseInhaltModel->update($phrase_inhalt_id, $data);
-        return $phrase_inhalt;
+        $phrasentext = $this->ci->PhrasentextModel->update($phrasentext_id, $data);
+        return $phrasentext;
     }
 
 	/**
