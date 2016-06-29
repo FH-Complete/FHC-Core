@@ -8,14 +8,6 @@ class Migration_Phrase extends CI_Migration {
     {
 		if (! $this->db->table_exists('public.tbl_phrase'))
 		{
-			$this->db->insert('system.tbl_berechtigung', array(
-				'berechtigung_kurzbz' => 'basis/phrase',
-				'beschreibung' => 'Phrase System'));
-			$this->db->insert('system.tbl_rolleberechtigung', array(
-				'berechtigung_kurzbz' => 'basis/phrase',
-				'rolle_kurzbz' => 'admin',
-				'art' => 'suid'));
-
 			$query= "
                 CREATE TABLE public.tbl_app (
                   app varchar(32),
@@ -70,8 +62,6 @@ class Migration_Phrase extends CI_Migration {
     {
 		try
 		{
-			$this->db->delete('system.tbl_rolleberechtigung', array('berechtigung_kurzbz' => 'basis/phrase'));
-			$this->db->delete('system.tbl_berechtigung', array('berechtigung_kurzbz' => 'basis/phrase'));
 			$this->dbforge->drop_table('public.tbl_phrase_inhalt');
             $this->dbforge->drop_table('public.tbl_phrase');
 			$this->dbforge->drop_table('public.tbl_app');

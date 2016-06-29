@@ -8,13 +8,6 @@ class Migration_Vorlage extends CI_Migration {
     {
 		if (! @$this->db->simple_query('SELECT attribute FROM public.tbl_vorlage'))
 		{
-			$this->db->insert('system.tbl_berechtigung', array(
-					'berechtigung_kurzbz' => 'basis/vorlage',
-					'beschreibung' => 'Vorlagen fuer Dokumente (DOC, PDF, eMail, ...'));
-			$this->db->insert('system.tbl_rolleberechtigung', array(
-					'berechtigung_kurzbz' => 'basis/vorlage',
-					'rolle_kurzbz' => 'admin',
-					'art' => 'suid'));
 			$query= "ALTER TABLE public.tbl_vorlage 
 				ADD COLUMN attribute json;
                 ";
@@ -77,10 +70,6 @@ class Migration_Vorlage extends CI_Migration {
     {
 		try
 		{
-			$this->db->delete('system.tbl_rolleberechtigung', array('berechtigung_kurzbz' => 'basis/vorlage'));
-			$this->db->delete('system.tbl_berechtigung', array('berechtigung_kurzbz' => 'basis/vorlage'));
-			$this->db->delete('system.tbl_rolleberechtigung', array('berechtigung_kurzbz' => 'basis/vorlagestudiengang'));
-			$this->db->delete('system.tbl_berechtigung', array('berechtigung_kurzbz' => 'basis/vorlagestudiengang'));
 			$this->db->delete('public.tbl_vorlagestudiengang', array('vorlage_kurzbz' => 'MailRegistration'));
 			$this->db->delete('public.tbl_vorlage', array('vorlage_kurzbz' => 'MailRegistration'));
 			$this->dbforge->drop_column('public.tbl_vorlage', 'attribute');
