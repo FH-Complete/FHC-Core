@@ -182,33 +182,42 @@ class MessageLib
         if (!is_numeric($sender_id))
         	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
 		
-        if (empty($this->recipients))
-        	return $this->_error('No Recipients! Use addRecipient()', MSG_ERR_INVALID_RECIPIENTS);
-
 		// Start sending Message
 		$this->ci->db->trans_start(false);
-        
 		//save Message
 		$data = array(
 			'person_id' => $sender_id,
 			'subject' => $subject,
 			'body' => $body,
 			'priority' => $priority,
-			'relationmessage_id' => $relationmessage_id,
-			'oe_kurzbz' => $oe_kurzbz);
-		if (! $msg = $this->ci->MessageModel->insert($data))
-        	return $this->_error($msg->msg.$msg->retval, MSG_ERR_GENERAL);
-		$msg_id = $msg->retval;
-		$this->ci->db->trans_complete();
-        if ($this->ci->db->trans_status() === FALSE)
+			//'relationmessage_id' => $relationmessage_id,
+			'oe_kurzbz' => $oe_kurzbz
+		);
+		
+		$result = $this->ci->MessageModel->insert($data);
+		if (is_object($result) && $result->error == EXIT_SUCCESS)
 		{
-        	// generate an error... or use the log_message() function to log your error
-			// General Error Occurred
-        	return $this->_error();
+			$msg_id = $result->retval;
+			$statusData = array(
+				'message_id' => $msg_id,
+				'person_id' => $sender_id,
+				'status' => MSG_STATUS_UNREAD
+			);
+			$result = $this->ci->MsgStatusModel->insert($statusData);
+		}
+
+		$this->ci->db->trans_complete();
+
+		if ($this->ci->db->trans_status() === FALSE || (is_object($result) && $result->error != EXIT_SUCCESS))
+		{
+			$this->ci->db->trans_rollback();
+			return $this->_error($result->msg, EXIT_ERROR);
 		}
 		else
+		{
+			$this->ci->db->trans_commit();
 			return $this->_success($msg_id);
-		
+		}
     }
 	
 	/**

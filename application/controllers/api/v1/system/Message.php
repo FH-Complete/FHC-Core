@@ -75,7 +75,6 @@ class Message extends APIv1_Controller
 		
 		if (is_object($validation) && $validation->error == EXIT_SUCCESS)
 		{
-			$this->messagelib->addRecipient($this->post()['person_id']);
 			$result = $this->messagelib->sendMessage(
 				$this->post()['person_id'],
 				$this->post()['subject'],
