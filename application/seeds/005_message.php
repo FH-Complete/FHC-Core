@@ -8,7 +8,7 @@ class Seed_Message
         public function __construct()
 		{
 			$this->fhc =& get_instance();
-			$this->fhc->load->library('MessageLib');
+			$this->fhc->load->helper('fhc');
 		}
 		
         public function seed($limit = 50)
@@ -36,7 +36,7 @@ class Seed_Message
 				(
 		            'message_id' => $message_id,
 					'person_id' => $person[$i%($num_persons-1)+1]->person_id,
-					'token' => $this->fhc->messagelib->generateToken(),
+					'token' => generateToken(),
 					'insertvon' => 'seed'
 		        );
 		        $recipient = $this->fhc->db->insert('public.tbl_msg_recipient', $data);

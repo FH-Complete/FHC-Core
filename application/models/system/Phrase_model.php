@@ -8,7 +8,7 @@ class Phrase_model extends DB_Model
 	public function __construct()
 	{
 		parent::__construct();
-		$this->dbTable = 'public.tbl_phrase';
+		$this->dbTable = 'system.tbl_phrase';
 		$this->pk = 'phrase_id';
 	}
 
@@ -18,10 +18,10 @@ class Phrase_model extends DB_Model
 	public function getPhrases($app, $sprache, $phrase = null, $orgeinheit_kurzbz = null, $orgform_kurzbz = null)
 	{
 		// Checks if the operation is permitted by the API caller
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_phrase'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_phrase'], FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_phrase_inhalt'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_phrase_inhalt'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['system.tbl_phrase'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['system.tbl_phrase'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['system.tbl_phrase_inhalt'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['system.tbl_phrase_inhalt'], FHC_MODEL_ERROR);
 		
 		$parametersArray = array('app' => $app, 'sprache' => $sprache);
 
@@ -30,7 +30,7 @@ class Phrase_model extends DB_Model
 						 orgeinheit_kurzbz,
 						 orgform_kurzbz,
 						 text
-					FROM public.tbl_phrase JOIN public.tbl_phrase_inhalt USING (phrase_id)
+					FROM system.tbl_phrase JOIN system.tbl_phrase_inhalt USING (phrase_id)
 				   WHERE app = ? AND sprache = ?';
 
 		if (isset($phrase))

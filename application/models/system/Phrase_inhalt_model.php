@@ -8,7 +8,7 @@ class Phrase_inhalt_model extends DB_Model
 	public function __construct()
 	{
 		parent::__construct();
-		$this->dbTable = 'public.tbl_phrase_inhalt';
+		$this->dbTable = 'system.tbl_phrase_inhalt';
 		$this->pk = 'phrase_inhalt_id';
 	}
 
