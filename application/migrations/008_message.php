@@ -2,20 +2,13 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Migration_Message extends CI_Migration {
+class Migration_Message extends CI_Migration 
+{
 
         public function up()
         {  
 			if (! $this->db->table_exists('public.tbl_msg_message'))
 			{
-				$this->db->insert('system.tbl_berechtigung', array(
-					'berechtigung_kurzbz' => 'basis/message',
-					'beschreibung' => 'Nachrichtensystem von FH-Complete'));
-				$this->db->insert('system.tbl_rolleberechtigung', array(
-					'berechtigung_kurzbz' => 'basis/message',
-					'rolle_kurzbz' => 'admin',
-					'art' => 'suid'));
-
 				$query= "
 					CREATE TABLE public.tbl_msg_message (
 					  message_id serial,
@@ -90,8 +83,6 @@ class Migration_Message extends CI_Migration {
         {
 			try
 			{	
-				$this->db->delete('system.tbl_rolleberechtigung', array('berechtigung_kurzbz' => 'basis/message'));
-				$this->db->delete('system.tbl_berechtigung', array('berechtigung_kurzbz' => 'basis/message'));
 				$this->dbforge->drop_table('public.tbl_msg_recipient');
 	            $this->dbforge->drop_table('public.tbl_msg_status');
 				$this->dbforge->drop_table('public.tbl_msg_attachment');

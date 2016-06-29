@@ -8,11 +8,17 @@ class Seed_Message
         public function __construct()
 		{
 			$this->fhc =& get_instance();
+			$this->fhc->load->library('MessageLib');
 		}
 		
-        public function seed($limit = 25)
+        public function seed($limit = 50)
         {
 			echo "Seeding $limit messages ";
+			// fetch some persons
+			$db = $this->fhc->db->query('SELECT person_id FROM public.tbl_person LIMIT 100;');
+			$person = $db->result();
+			$num_persons = $db->num_rows();
+			
 			for ($i = 0; $i < $limit; $i++)
 			{
 		        echo ".";
@@ -21,7 +27,7 @@ class Seed_Message
 				(
 		            'subject' => $this->fhc->faker->sentence(4, true),
 					'body' => $this->fhc->faker->text(400),
-					'person_id' => $i%5+1
+					'person_id' => $person[$i%$num_persons]->person_id
 		        );
 		        $this->fhc->db->insert('public.tbl_msg_message', $data);
 				$message_id = $this->fhc->db->insert_id();
@@ -29,14 +35,13 @@ class Seed_Message
 				$data = array
 				(
 		            'message_id' => $message_id,
-					'person_id' => $i%5+2,
+					'person_id' => $person[$i%($num_persons-1)+1]->person_id,
+					'token' => $this->fhc->messagelib->generateToken(),
 					'insertvon' => 'seed'
 		        );
 		        $recipient = $this->fhc->db->insert('public.tbl_msg_recipient', $data);
 				if (!$recipient)
 					show_error($recipient);
-				//for ($j=1; $j<10; $j++)
-				//	$this->fhc->Message_model->addRecipient($thread->retval, $i+$j+5);
 		    }
 	 
 		    echo PHP_EOL;
