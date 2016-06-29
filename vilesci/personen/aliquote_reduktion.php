@@ -257,6 +257,7 @@
 						zgvs.forEach(function(i)
 						{
 							var applicantsFromZGV = [];
+
 							aqr.studenten.forEach(function(j)
 							{
 								if((j.applicant || j.selected) && j.bezeichnung === i)
@@ -265,12 +266,12 @@
 
 							// calculate the aliquote reduction for every ZGV
 							var percent = applicantsFromZGV.length / allCountedStudents.length * 100;
-							var neededFromZGV = (applicantCount / 100 * percent) - aqr.getAcceptedCount(i);
+							var neededFromZGV = (applicantCount / 100 * percent);
 
 							if(neededFromZGV < 0)
 								neededFromZGV = 0;
 
-							zgvElems.push({name:i, needed:neededFromZGV, percent:percent, accepted: aqr.getAcceptedCount(i), neededSum: (applicantCount / 100 * percent)});
+							zgvElems.push({name:i, needed:neededFromZGV, percent:percent, accepted: aqr.getAcceptedCount(i), overallNeeded: (applicantCount / 100 * percent) + aqr.getAcceptedCount(i)});
 						});
 						aqr.zgvElems = JSON.parse(JSON.stringify(zgvElems));
 
@@ -486,7 +487,7 @@
 					<tr>
 						<th ts-criteria="name" ts-default="ascending">Name</th>
 						<th ts-criteria="percent">Prozent</th>
-						<th ts-criteria="neededSum">Insgesamt benötigt</th>
+						<th ts-criteria="overallNeeded">Insgesamt benötigt</th>
 						<th ts-criteria="accepted">Bereits aufgenommen</th>
 						<th ts-criteria="needed">Noch benötigte Personen</th>
 					</tr>
@@ -495,7 +496,7 @@
 					<tr ng-repeat="zgv in aqr.zgvElems" ts-repeat ts-hide-no-data>
 						<td>{{zgv.name}}</td>
 						<td>{{zgv.percent | number: 2}}%</td>
-						<td>{{zgv.neededSum | parseInt}}</td>
+						<td>{{zgv.overallNeeded | parseInt}}</td>
 						<td>{{zgv.accepted}}</td>
 						<td>{{zgv.needed | parseInt}}</td>
 					</tr>
