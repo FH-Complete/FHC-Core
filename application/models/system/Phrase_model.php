@@ -20,8 +20,8 @@ class Phrase_model extends DB_Model
 		// Checks if the operation is permitted by the API caller
 		if (! $this->fhc_db_acl->isBerechtigt($this->acl['system.tbl_phrase'], 's'))
 			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['system.tbl_phrase'], FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['system.tbl_phrase_inhalt'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['system.tbl_phrase_inhalt'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['system.tbl_phrasentext'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['system.tbl_phrasentext'], FHC_MODEL_ERROR);
 		
 		$parametersArray = array('app' => $app, 'sprache' => $sprache);
 
@@ -30,7 +30,7 @@ class Phrase_model extends DB_Model
 						 orgeinheit_kurzbz,
 						 orgform_kurzbz,
 						 text
-					FROM system.tbl_phrase JOIN system.tbl_phrase_inhalt USING (phrase_id)
+					FROM system.tbl_phrase JOIN system.tbl_phrasentext USING (phrase_id)
 				   WHERE app = ? AND sprache = ?';
 
 		if (isset($phrase))
