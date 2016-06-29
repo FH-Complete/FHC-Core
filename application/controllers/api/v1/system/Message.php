@@ -69,6 +69,25 @@ class Message extends APIv1_Controller
 	/**
 	 * @return void
 	 */
+	public function getMessagesByToken()
+	{
+		$token = $this->get('token');
+		
+		if (isset($token))
+		{
+			$result = $this->messagelib->getMessagesByToken($token);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	/**
+	 * @return void
+	 */
 	public function postMessage()
 	{
 		$validation = $this->_validatePostMessage($this->post());
@@ -80,7 +99,7 @@ class Message extends APIv1_Controller
 				$this->post()['subject'],
 				$this->post()['body'],
 				PRIORITY_NORMAL,
-				NULL,
+				$this->post()['relationmessage_id'],
 				$this->post()['oe_kurzbz']
 			);
 			
@@ -107,6 +126,7 @@ class Message extends APIv1_Controller
 				$this->post()['vorlage_kurzbz'],
 				$this->post()['oe_kurzbz'],
 				$this->post()['data'],
+				$this->post()['relationmessage_id'],
 				$this->post()['orgform_kurzbz']
 			);
 			
