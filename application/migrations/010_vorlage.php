@@ -26,13 +26,6 @@ class Migration_Vorlage extends CI_Migration {
 		// tbl_vorlagestudiengang->Subject
 		if (! @$this->db->simple_query('SELECT subject FROM public.tbl_vorlagestudiengang'))
 		{
-			$this->db->insert('system.tbl_berechtigung', array(
-					'berechtigung_kurzbz' => 'basis/vorlagestudiengang',
-					'beschreibung' => 'Vorlagen fuer Dokumente (DOC, PDF, eMail, ...'));
-			$this->db->insert('system.tbl_rolleberechtigung', array(
-					'berechtigung_kurzbz' => 'basis/vorlagestudiengang',
-					'rolle_kurzbz' => 'admin',
-					'art' => 'suid'));
 			$query= "ALTER TABLE public.tbl_vorlagestudiengang
 				ADD COLUMN subject text;
                 ";
