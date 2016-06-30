@@ -10,7 +10,6 @@ class Message_model extends DB_Model
 	public function __construct()
 	{
 		parent::__construct();
-		//require_once APPPATH.'config/message.php';
 		$this->dbTable = 'public.tbl_msg_message';
 		$this->pk = 'message_id';
 	}
@@ -73,48 +72,24 @@ class Message_model extends DB_Model
 			return $this->_error($this->db->error(), FHC_DB_ERROR);
 	}
 
-public function getMessagesByPerson($person_id, $all)
+	public function getMessagesByPerson($person_id, $all)
 	{
 		// Check wrights
-		if (! $this->fhc_db_acl->isBerechtigt('basis/message', 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> basis/message', FHC_MODEL_ERROR);
-
-		// prepare parameters
-		$person_id = (int)$person_id;
-		// get Data
-		/*$sql = 'SELECT person_id,
-						message_id,
-						subject,
-						body,
-						priority,
-						relationmessage_id,
-						oe_kurzbz,
-						m.insertamum,
-						anrede,
-						titelpost,
-						titelpre,
-						nachname,
-						vorname,
-						vornamen,
-						status,
-						statusinfo,
-						s.insertamum AS statusamum
-				  FROM public.tbl_msg_message m JOIN public.tbl_person USING (person_id)
-						LEFT OUTER JOIN (
-							SELECT message_id, person_id, status, statusinfo, tbl_msg_status.insertamum
-							  FROM public.tbl_msg_status INNER JOIN (
-										SELECT message_id, person_id, max(insertamum) AS insertamum
-										  FROM public.tbl_msg_status
-									  GROUP BY message_id, person_id
-									) status USING (message_id, person_id)
-							 WHERE tbl_msg_status.insertamum=status.insertamum
-						) s USING (message_id, person_id)
-				 WHERE person_id = ?';*/
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_msg_recipient'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_msg_recipient'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_msg_message'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_msg_message'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_person'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_person'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_msg_status'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_msg_status'], FHC_MODEL_ERROR);
 		
 		$sql = 'SELECT r.message_id,
+						m.person_id,
 						m.subject,
 						m.body,
 						m.insertamum,
+						m.relationmessage_id,
 						m.oe_kurzbz,
 						s.status,
 						s.statusinfo,
@@ -124,10 +99,40 @@ public function getMessagesByPerson($person_id, $all)
 						JOIN public.tbl_msg_status s USING (message_id)
 				 WHERE r.person_id = ?';
 		
-		/*if (! $all)
-			$sql .= ' AND (status < 3 OR status IS NULL)';*/
 		$result = $this->db->query($sql, array($person_id));
-		//var_dump($result);
+		if (is_object($result))
+			return $this->_success($result->result());
+		else
+			return $this->_error($this->db->error(), FHC_DB_ERROR);
+	}
+	
+	public function getMessagesByToken($token)
+	{
+		// Check wrights
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_msg_recipient'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_msg_recipient'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_msg_message'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_msg_message'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_msg_status'], 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_msg_status'], FHC_MODEL_ERROR);
+		
+		$sql = 'SELECT r.message_id,
+						r.person_id as receiver_id,
+						m.person_id as sender_id,
+						m.subject,
+						m.body,
+						m.insertamum,
+						m.relationmessage_id,
+						m.oe_kurzbz,
+						s.status,
+						s.statusinfo,
+						s.updateamum
+				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_message m USING (message_id)
+						JOIN public.tbl_msg_status s USING (message_id)
+				 WHERE r.token = ?
+				   AND status < ?';
+		
+		$result = $this->db->query($sql, array($token, MSG_STATUS_DELETED));
 		if (is_object($result))
 			return $this->_success($result->result());
 		else

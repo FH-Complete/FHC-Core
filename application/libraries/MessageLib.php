@@ -23,6 +23,8 @@ class MessageLib
 		
 		$this->ci->load->library('VorlageLib');
 		
+		$this->ci->load->helper('fhc');
+		
         //$this->ci->load->helper('language');
         $this->ci->lang->load('message');
     }
@@ -104,6 +106,42 @@ class MessageLib
 		
         return $this->getMessage($msg_id);
     }
+	
+	/**
+     * getMessagesByToken
+     *
+     * @param	token string
+     * @return	array
+     */
+    function getMessagesByToken($token)
+    {
+        if (empty($token))
+        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+		
+		$result = $this->ci->MessageModel->getMessagesByToken($token);
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
+		{
+			if ($result->retval[0]->status == MSG_STATUS_UNREAD)
+			{
+				$statusKey = array(
+					'message_id' => $result->retval[0]->message_id,
+					'person_id' => $result->retval[0]->receiver_id,
+					'status' => MSG_STATUS_UNREAD
+				);
+				$resTmp = $this->ci->MsgStatusModel->update($statusKey, array('status' => MSG_STATUS_READ));
+				if (!is_object($resTmp) || (is_object($resTmp) && $resTmp->error != EXIT_SUCCESS))
+				{
+					$result = $resTmp;
+				}
+				else
+				{
+					$result->retval[0]->status = MSG_STATUS_READ;
+				}
+			}
+		}
+
+        return $result;
+    }
 
     // ------------------------------------------------------------------------
 
@@ -182,12 +220,8 @@ class MessageLib
         if (!is_numeric($sender_id))
         	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
 		
-        if (empty($this->recipients))
-        	return $this->_error('No Recipients! Use addRecipient()', MSG_ERR_INVALID_RECIPIENTS);
-
 		// Start sending Message
 		$this->ci->db->trans_start(false);
-        
 		//save Message
 		$data = array(
 			'person_id' => $sender_id,
@@ -195,20 +229,33 @@ class MessageLib
 			'body' => $body,
 			'priority' => $priority,
 			'relationmessage_id' => $relationmessage_id,
-			'oe_kurzbz' => $oe_kurzbz);
-		if (! $msg = $this->ci->MessageModel->insert($data))
-        	return $this->_error($msg->msg.$msg->retval, MSG_ERR_GENERAL);
-		$msg_id = $msg->retval;
-		$this->ci->db->trans_complete();
-        if ($this->ci->db->trans_status() === FALSE)
+			'oe_kurzbz' => $oe_kurzbz
+		);
+		
+		$result = $this->ci->MessageModel->insert($data);
+		if (is_object($result) && $result->error == EXIT_SUCCESS)
 		{
-        	// generate an error... or use the log_message() function to log your error
-			// General Error Occurred
-        	return $this->_error();
+			$msg_id = $result->retval;
+			$statusData = array(
+				'message_id' => $msg_id,
+				'person_id' => $sender_id,
+				'status' => MSG_STATUS_UNREAD
+			);
+			$result = $this->ci->MsgStatusModel->insert($statusData);
+		}
+
+		$this->ci->db->trans_complete();
+
+		if ($this->ci->db->trans_status() === FALSE || (is_object($result) && $result->error != EXIT_SUCCESS))
+		{
+			$this->ci->db->trans_rollback();
+			return $this->_error($result->msg, EXIT_ERROR);
 		}
 		else
+		{
+			$this->ci->db->trans_commit();
 			return $this->_success($msg_id);
-		
+		}
     }
 	
 	/**
@@ -221,7 +268,7 @@ class MessageLib
      * @param   integer  $priority
      * @return  array
      */
-    function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $orgform_kurzbz = null)
+    function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $relationmessage_id = null, $orgform_kurzbz = null)
     {
         if (!is_numeric($sender_id) || !is_numeric($receiver_id))
         	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
@@ -229,7 +276,8 @@ class MessageLib
 		$result = $this->ci->vorlagelib->loadVorlagetext($vorlage_kurzbz, $oe_kurzbz, $orgform_kurzbz);
 		if (is_object($result) && $result->error == EXIT_SUCCESS)
 		{
-			if (is_array($result->retval) && count($result->retval) > 0)
+			if (is_array($result->retval) && count($result->retval) > 0 &&
+				!empty($result->retval[0]->text) && !empty($result->retval[0]->subject))
 			{
 				$parsedText = $this->ci->vorlagelib->parseVorlagetext($result->retval[0]->text, $data);
 				
@@ -240,7 +288,7 @@ class MessageLib
 					'subject' => $result->retval[0]->subject,
 					'body' => $parsedText,
 					'priority' => PRIORITY_NORMAL,
-					//'relationmessage_id' => $relationmessage_id,
+					'relationmessage_id' => $relationmessage_id,
 					'oe_kurzbz' => $oe_kurzbz
 				);
 				
@@ -250,7 +298,8 @@ class MessageLib
 					$msg_id = $result->retval;
 					$recipientData = array(
 						'person_id' => $receiver_id,
-						'message_id' => $msg_id
+						'message_id' => $msg_id,
+						'token' => generateToken()
 					);
 					$result = $this->ci->RecipientModel->insert($recipientData);
 					if (is_object($result) && $result->error == EXIT_SUCCESS)
@@ -284,7 +333,7 @@ class MessageLib
 		}
 		else
 		{
-			$result = $this->_error($result->msg, EXIT_ERROR);
+			$result = $this->_error($result->retval, EXIT_ERROR);
 		}
 		
 		return $result;

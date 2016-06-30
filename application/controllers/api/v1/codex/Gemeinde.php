@@ -33,16 +33,16 @@ class Gemeinde extends APIv1_Controller
 	{
 		$gemeindeID = $this->get('gemeinde_id');
 		
+		$this->GemeindeModel->addOrder('plz');
 		if (isset($gemeindeID))
 		{
 			$result = $this->GemeindeModel->load($gemeindeID);
-			
-			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
 		{
-			$this->response();
+			$result = $this->GemeindeModel->load();
 		}
+		$this->response($result, REST_Controller::HTTP_OK);
 	}
 
 	/**
