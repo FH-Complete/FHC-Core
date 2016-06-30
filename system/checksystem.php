@@ -83,6 +83,7 @@ $berechtigungen = array(
 	array('basis/firma','Firmenverwaltung'),
 	array('basis/firma:begrenzt','Firmenverwaltung'),
 	array('basis/infoscreen','Infoscreenverwaltung'),
+	array('basis/message','Nachrichten'),
 	array('basis/moodle','basis/moodle'),
 	array('basis/news','Newsverwaltung'),
 	array('basis/notiz','Notizen'),
