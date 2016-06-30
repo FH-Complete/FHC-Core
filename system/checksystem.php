@@ -43,7 +43,7 @@ $rechte->getBerechtigungen($uid);
 
 if(!$rechte->isBerechtigt('admin'))
 {
-	exit('Sie haben keine Berechtigung');
+	exit('Sie ('.$uid.') haben keine Berechtigung');
 }
 
 echo '<H1>Systemcheck!</H1>';

@@ -20,7 +20,7 @@ class PhrasesLib
 		$this->ci->load->library('parser');
 		
 		$this->ci->load->model('system/Phrase_model', 'PhraseModel');
-		$this->ci->load->model('system/Phrasetext_model', 'PhrasentextModel');
+		$this->ci->load->model('system/Phrasentext_model', 'PhrasentextModel');
 		
         $this->ci->load->helper('language');
 		$this->ci->load->helper('Message');
