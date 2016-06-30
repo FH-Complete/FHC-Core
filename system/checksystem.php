@@ -41,10 +41,8 @@ $uid = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('admin'))
-{
+if(! $rechte->isBerechtigt('admin'))
 	exit('Sie ('.$uid.') haben keine Berechtigung');
-}
 
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
