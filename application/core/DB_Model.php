@@ -232,6 +232,22 @@ class DB_Model extends FHC_Model
 	}
 	
 	/** ---------------------------------------------------------------
+	 * Add select clause
+	 *
+	 * @return  void
+	 */
+	public function addSelect($select)
+	{
+		// Check Class-Attributes and parameters
+		if (is_null($select) || $select == '')
+			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+		
+		$this->db->select($select);
+		
+		return $this->_success(TRUE);
+	}
+	
+	/** ---------------------------------------------------------------
 	 * Add distinct clause
 	 *
 	 * @return  void
