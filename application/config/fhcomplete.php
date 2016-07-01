@@ -191,6 +191,7 @@ $config['fhc_acl'] = array
 	'public.tbl_variable' => 'basis/variable',
 	'public.tbl_vorlage' => 'system/vorlage',
 	'public.tbl_vorlagestudiengang' => 'system/vorlagestudiengang',
+	'public.tbl_rt_person' => 'basis/person',
 	'public.vw_studiensemester' => 'basis/vw_studiensemester',
 	'system.tbl_app' => 'system/app',
 	'system.tbl_appdaten' => 'system/appdaten',

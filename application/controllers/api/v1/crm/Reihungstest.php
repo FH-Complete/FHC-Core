@@ -24,8 +24,6 @@ class Reihungstest extends APIv1_Controller
 		parent::__construct();
 		// Load model ReihungstestModel
 		$this->load->model('crm/reihungstest_model', 'ReihungstestModel');
-		
-		
 	}
 
 	/**
@@ -63,6 +61,37 @@ class Reihungstest extends APIv1_Controller
 				$parameters['studiensemester_kurzbz'] = $studiensemester_kurzbz;
 			}
 			$result = $this->ReihungstestModel->loadWhere($parameters);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	/**
+	 * @return void
+	 */
+	public function getReihungstestByPersonID()
+	{
+		$person_id = $this->get('person_id');
+		
+		if (isset($person_id))
+		{
+			$result = $this->ReihungstestModel->addJoin('public.tbl_rt_person', 'reihungstest_id = rt_id');
+			if ($result->error == EXIT_SUCCESS)
+			{
+				$result = $this->ReihungstestModel->addJoin('public.tbl_person', 'person_id');
+				if ($result->error == EXIT_SUCCESS)
+				{
+					$result = $this->ReihungstestModel->addJoin('public.tbl_ort', 'tbl_ort.ort_kurzbz = tbl_rt_person.ort_kurzbz');
+					if ($result->error == EXIT_SUCCESS)
+					{
+						$result = $this->ReihungstestModel->loadWhere(array('person_id' => $person_id));
+					}
+				}
+			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

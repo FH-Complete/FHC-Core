@@ -24,8 +24,6 @@ class Prestudent extends APIv1_Controller
 		parent::__construct();
 		// Load model PrestudentModel
 		$this->load->model('crm/prestudent_model', 'PrestudentModel');
-		
-		
 	}
 
 	/**
@@ -111,8 +109,52 @@ class Prestudent extends APIv1_Controller
 		}
 	}
 	
+	/**
+	 * @return void
+	 */
+	public function postAddReihungstest()
+	{
+		$ddReihungstest = $this->_parseData($this->post());
+		
+		if ($this->_validateAddReihungstest($ddReihungstest))
+		{
+			$this->load->model('crm/RtPerson_model', 'RtPersonModel');
+			
+			if(isset($ddReihungstest['new']) && $ddReihungstest['new'] === true)
+			{
+				// Remove new parameter to avoid DB insert errors
+				unset($ddReihungstest['new']);
+				
+				$result = $this->RtPersonModel->insert($ddReihungstest);
+			}
+			else
+			{
+				$pksArray = array($ddReihungstest['person_id'], $ddReihungstest['rt_id']);
+				
+				$result = $this->RtPersonModel->update($pksArray, $ddReihungstest);
+			}
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
 	private function _validate($prestudent = NULL)
 	{
+		return true;
+	}
+	
+	private function _validateAddReihungstest($ddReihungstest = NULL)
+	{
+		if (!isset($ddReihungstest['person_id']) || !isset($ddReihungstest['rt_id']) ||
+			!isset($ddReihungstest['ort_kurzbz']))
+		{
+			return false;
+		}
+		
 		return true;
 	}
 }

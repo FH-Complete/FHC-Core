@@ -42,7 +42,7 @@ class Migration_Reihungstest extends CI_Migration {
 			$query= "CREATE TABLE public.tbl_rt_studienplan (
 						reihungstest_id integer,
 						stundenplan_id integer,
-						PRIMARY KEY (reihungstest_id, stundenplan_id),
+						CONSTRAINT pk_tbl_rt_studienplan PRIMARY KEY (reihungstest_id, stundenplan_id),
 						CONSTRAINT fk_rt_studienplan_reihungstest_id FOREIGN KEY (reihungstest_id) REFERENCES public.tbl_reihungstest(reihungstest_id) ON UPDATE CASCADE ON DELETE RESTRICT,
 						CONSTRAINT fk_rt_studienplan_stundenplan_id FOREIGN KEY (stundenplan_id) REFERENCES lehre.tbl_stundenplan(stundenplan_id) ON UPDATE CASCADE ON DELETE RESTRICT
 					);
@@ -62,9 +62,9 @@ class Migration_Reihungstest extends CI_Migration {
 			$query= "CREATE TABLE public.tbl_rt_person (
 						person_id integer,
 						rt_id integer,
-						anmeldedatum date DEFAULT NOW(),
+						anmeldedatum date,
 						teilgenommen boolean DEFAULT FALSE,
-						ort_kurzbz varchar(16),
+						ort_kurzbz varchar(16) NOT NULL,
 						CONSTRAINT pk_tbl_rt_person PRIMARY KEY (person_id, rt_id),
 						CONSTRAINT fk_rt_person_ort_kurzbz FOREIGN KEY (ort_kurzbz) REFERENCES public.tbl_ort(ort_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT,
 						CONSTRAINT fk_rt_person_reihungstest_id FOREIGN KEY (rt_id) REFERENCES public.tbl_reihungstest(reihungstest_id) ON UPDATE CASCADE ON DELETE RESTRICT
