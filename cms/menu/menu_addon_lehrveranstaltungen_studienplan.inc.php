@@ -131,7 +131,7 @@ class menu_addon_lehrveranstaltungen_studienplan extends menu_addon
 			<tr>
 				<td class="tdwrap">
 				Studiensemester<br>
-					<select name="stsem" onChange="MM_jumpMenu(\'self\',this,0)" style="width:150px">';
+					<select name="stsem" onChange="MM_jumpMenu(\'self\',this,0)" style="width:100%">';
 
 		//Anzeigen des DropDown Menues mit Studiensemester
 		$studiensemester = new studiensemester();
@@ -165,7 +165,7 @@ class menu_addon_lehrveranstaltungen_studienplan extends menu_addon
 			<tr>
 				<td class="nowrap">
   			  Studiengang<br>
-  			  		<select name="course" onChange="MM_jumpMenu(\'self\',this,0)" style="width:150px">';
+  			  		<select name="course" onChange="MM_jumpMenu(\'self\',this,0)" style="width:100%">';
 
 		$stg_obj = new studiengang();
 		$stg_obj->loadStudiengangFromStudiensemester($studiensemester_kurzbz);
@@ -201,7 +201,7 @@ class menu_addon_lehrveranstaltungen_studienplan extends menu_addon
 			  <tr>
 			  <td class="nowrap">
 			  Semester<br>
-			  	<select name="term" onChange="MM_jumpMenu(\'self\',this,0)" style="width:150px">';
+			  	<select name="term" onChange="MM_jumpMenu(\'self\',this,0)" style="width:100%">';
 
 		$vorhandenesemester=array();
 
@@ -241,7 +241,7 @@ class menu_addon_lehrveranstaltungen_studienplan extends menu_addon
 			  <tr>
 			  <td class="nowrap">
 			  Studienplan<br>
-			  <select name="studienplan_id" onChange="MM_jumpMenu(\'self\',this,0)" style="width:150px">';
+			  <select name="studienplan_id" onChange="MM_jumpMenu(\'self\',this,0)" style="width:100%">';
 
 		// Studienplan
 		$studienplan_obj = new studienplan();
@@ -309,7 +309,7 @@ class menu_addon_lehrveranstaltungen_studienplan extends menu_addon
 		if($lv_obj->loadLehrveranstaltungStudienplan($studienplan_id, $semester,'bezeichnung'))
 		{
 			$tree = $lv_obj->getLehrveranstaltungTree();
-			$this->printTree($tree, $sprache);
+			$this->printTree($tree, $sprache, $studiensemester_kurzbz);
 		}
 
 		$this->output();
@@ -318,7 +318,7 @@ class menu_addon_lehrveranstaltungen_studienplan extends menu_addon
 	/**
 	 * Stellt die Lehrveranstaltungen in einer Baumstruktur dar.
 	 */
-	private function printTree($tree, $sprache)
+	private function printTree($tree, $sprache, $studiensemester_kurzbz)
 	{
 		$this->block.='<ul>';
 		foreach ($tree as $row)
@@ -329,9 +329,9 @@ class menu_addon_lehrveranstaltungen_studienplan extends menu_addon
 				$bold='font-weight:bold;';
 			else
 				$bold='';
-			$this->block.= "<li style='display:inline-block;white-space: nowrap;padding: 0px; margin:0px; $bold'><a title=\"".$row->bezeichnung_arr[$sprache]."\" href=\"private/lehre/lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$this->CutString($row->bezeichnung_arr[$sprache], 21).' '.$row->lehrform_kurzbz."</a></li>";
+			$this->block.= "<li style='display:inline-block;white-space: nowrap;padding: 0px; margin:0px; $bold'><a title=\"".$row->bezeichnung_arr[$sprache]."\" href=\"private/lehre/lesson.php?lvid=$row->lehrveranstaltung_id&studiensemester_kurzbz=$studiensemester_kurzbz\" target=\"content\">".$this->CutString($row->bezeichnung_arr[$sprache], 21).' '.$row->lehrform_kurzbz."</a></li>";
 			if(isset($row->childs))
-				$this->printTree($row->childs, $sprache);
+				$this->printTree($row->childs, $sprache, $studiensemester_kurzbz);
 		}
 		$this->block.="</ul>";
 	}
