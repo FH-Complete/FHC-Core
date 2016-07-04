@@ -16,8 +16,8 @@ class Migration_Reihungstest extends MigrationLib
 		// Add anmeldefrist to public.tbl_reihungstest
 		$this->addColumn('public', 'tbl_reihungstest', 'anmeldefrist', 'date');
 		
-		// Add rt_stufe to public.tbl_prestudentstatus
-		$this->addColumn('public', 'tbl_prestudentstatus', 'rt_stufe', 'smallint DEFAULT 1');
+		// Add rt_stufe and punkte to public.tbl_prestudentstatus
+		$this->addColumn('public', 'tbl_prestudentstatus', 'rt_stufe', 'smallint DEFAULT NULL');
 		
 		// Create table public.tbl_rt_studienplan
 		$this->createTable('public', 'tbl_rt_studienplan',
@@ -38,6 +38,7 @@ class Migration_Reihungstest extends MigrationLib
 			anmeldedatum date,
 			teilgenommen boolean DEFAULT FALSE,
 			ort_kurzbz varchar(16) NOT NULL,
+			punkte numeric(8,4) DEFAULT NULL,
 			CONSTRAINT pk_tbl_rt_person PRIMARY KEY (person_id, rt_id),
 			CONSTRAINT fk_rt_person_ort_kurzbz FOREIGN KEY (ort_kurzbz) REFERENCES public.tbl_ort(ort_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT,
 			CONSTRAINT fk_rt_person_reihungstest_id FOREIGN KEY (rt_id) REFERENCES public.tbl_reihungstest(reihungstest_id) ON UPDATE CASCADE ON DELETE RESTRICT'
