@@ -4,10 +4,10 @@
 
 <div class="row">
 	<div class="span4">
-	  <h2>Phrase Inhalt: <?=$phrase_inhalt_id?></h2>
+	  <h2>Phrase Inhalt: <?=$phrasentext_id?></h2>
 
-<form method="post" action="../saveText/<?=$phrase_inhalt_id?>">
-	<input type="hidden" name="phrase_inhalt_id" value="<?php echo $phrase_inhalt_id; ?>" />
+<form method="post" action="../saveText/<?=$phrasentext_id?>">
+	<input type="hidden" name="phrase_inhalt_id" value="<?php echo $phrasentext_id; ?>" />
 	<table>
 	<tr>
 		<td>OE</td>

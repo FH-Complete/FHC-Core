@@ -47,6 +47,18 @@ class Phrases extends FHC_Controller
 		$v = $this->load->view('system/phrasesinhaltList.php', $data);
 	}
 
+	public function deltext($phrasentext_id=null, $phrase_id = null)
+	{
+		if (empty($phrase_id) or empty($phrasentext_id))
+			exit;
+		$phrase_inhalt = $this->phraseslib->delPhrasentext($phrasentext_id);
+		if ($phrase_inhalt->error)
+			show_error($phrase_inhalt->retval);
+		//var_dump($vorlage);
+
+		redirect('/system/Phrases/view/'.$phrase_id);
+	}
+
 	public function edit($phrase_id = null)
 	{
 		if (empty($phrase_id))
@@ -107,9 +119,9 @@ class Phrases extends FHC_Controller
 		redirect('/system/Phrases/editText/'.$phrase_inhalt_id);
 	}
 
-	public function editText($phrase_inhalt_id)
+	public function editText($phrasentext_id)
 	{
-		$phrase_inhalt = $this->phraseslib->getPhraseInhaltById($phrase_inhalt_id);
+		$phrase_inhalt = $this->phraseslib->getPhrasentextById($phrasentext_id);
 		if ($phrase_inhalt->error)
 			show_error($phrase_inhalt->retval);
 		$data = $phrase_inhalt->retval[0];

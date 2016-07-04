@@ -19,17 +19,19 @@
 			<th class='table-sortable:default'>Text</th>
 			<th>Beschreibung</th>
 			<th></th>
+			<th></th>
 		</tr>
 	  </thead>
 	  <tbody>
 		<?php foreach ($phrase_inhalt as $v): ?>
-			<tr><td><a href="../edittext/<?php echo $v->phrase_inhalt_id; ?>" target="PhrasesBottom"><?php echo $v->phrase_inhalt_id; ?></a></td>
+			<tr><td><a href="../edittext/<?php echo $v->phrasentext_id; ?>" target="PhrasesBottom"><?php echo $v->phrasentext_id; ?></a></td>
 				<td><?php echo $v->sprache; ?></td>
 				<td><?php echo $v->orgeinheit_kurzbz; ?></td>
 				<td><?php echo $v->orgform_kurzbz; ?></td>
 				<td><?php echo $v->text; ?></td>
 				<td><?php echo $v->description; ?></td>
-				<td><a href="../edittext/<?php echo $v->phrase_inhalt_id; ?>" target="PhrasesBottom">edit</a></td>
+				<td><a href="../edittext/<?php echo $v->phrasentext_id; ?>" target="PhrasesBottom">edit</a></td>
+				<td><a href="../deltext/<?php echo $v->phrasentext_id; ?>/<?php echo $phrase_id ?>" target="PhrasesBottom">delete</a></td>
 			</tr>
 		<?php endforeach ?>
 	  </tbody>

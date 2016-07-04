@@ -9,19 +9,19 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class PhrasesLib
 {
 	/*
-	 * 
+	 *
 	 */
     public function __construct()
     {
         //require_once APPPATH.'config/message.php';
 
 		$this->ci =& get_instance();
-		
+
 		$this->ci->load->library('parser');
-		
+
 		$this->ci->load->model('system/Phrase_model', 'PhraseModel');
 		$this->ci->load->model('system/Phrasentext_model', 'PhrasentextModel');
-		
+
         $this->ci->load->helper('language');
 		$this->ci->load->helper('Message');
         //$this->ci->lang->load('fhcomplete');
@@ -63,6 +63,15 @@ class PhrasesLib
         return $phrasentext;
     }
 
+    function delPhrasentext($phrasentext_id)
+    {
+        if (empty($phrasentext_id))
+        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+
+        $phrasentext = $this->ci->PhrasentextModel->delete(array('phrasentext_id' => $phrasentext_id));
+        return $phrasentext;
+    }
+
 	/**
      * savePhrase() - will save a spezific Phrase.
      *
@@ -93,9 +102,9 @@ class PhrasesLib
         $phrasentext = $this->ci->PhrasentextModel->load($phrasentext_id);
         return $phrasentext;
     }
-	
+
 	/**
-     * getPhrases() - 
+     * getPhrases() -
      *
      * @return  struct
      */
@@ -109,7 +118,7 @@ class PhrasesLib
 		{
 			$result = $this->_error('app and sprache parameters are required');
 		}
-		
+
 		return $result;
     }
 
@@ -180,17 +189,17 @@ class PhrasesLib
 		$text = $this->ci->parser->parse_string($text, $data, TRUE);
 		return $text;
     }
-	
+
 	/*
-	 * 
+	 *
 	 */
 	protected function _error($retval = '', $message = EXIT_ERROR)
 	{
 		return error($retval, $message);
 	}
-	
+
 	/*
-	 * 
+	 *
 	 */
 	protected function _success($retval, $message = EXIT_SUCCESS)
 	{
