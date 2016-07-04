@@ -68,6 +68,7 @@ $berechtigungen = array(
 	array('basis/addon','Addons verwalten'),
 	array('basis/ampel','Ampeln Administrieren'),
 	array('basis/ampeluebersicht','Ampel Übersicht für Leiter'),
+	array('basis/benutzer','API-Recht zur Benutzer-Auth'),
 	array('basis/berechtigung','Berechtigungsverwaltung'),
 	array('basis/betriebsmittel','Betriebsmittel'),
 	array('basis/cms','CMS Administration'),
