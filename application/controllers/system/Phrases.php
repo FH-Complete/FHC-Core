@@ -35,6 +35,7 @@ class Phrases extends FHC_Controller
 		if (empty($phrase_id))
 			exit;
 		$phrase_inhalt = $this->phraseslib->getPhraseInhalt($phrase_id);
+		$phrase = $this->phraseslib->getPhrase($phrase_id);
 		if ($phrase_inhalt->error)
 			show_error($phrase_inhalt->retval);
 		//var_dump($vorlage);
@@ -42,6 +43,7 @@ class Phrases extends FHC_Controller
 		$data = array
 		(
 			'phrase_id' => $phrase_id,
+			'phrase' => $phrase->retval[0]->phrase,
 			'phrase_inhalt' => $phrase_inhalt->retval
 		);
 		$v = $this->load->view('system/phrasesinhaltList.php', $data);

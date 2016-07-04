@@ -4,7 +4,7 @@
 
 <div class="row">
   <div class="span4">
-	<h2>Phrase Inhalt - <?php echo $phrase_id; ?></h2>
+	<h2>Phrase Inhalt - <?php echo $phrase; ?></h2>
 	<form method="post" action="../newtext" target="PhrasesBottom">
 	  <input type="hidden" name="phrase_id" value="<?php echo $phrase_id; ?>"/>
 	  <button type="submit">Neu</button>
@@ -31,13 +31,23 @@
 				<td><?php echo $v->text; ?></td>
 				<td><?php echo $v->description; ?></td>
 				<td><a href="../edittext/<?php echo $v->phrasentext_id; ?>" target="PhrasesBottom">edit</a></td>
-				<td><a href="../deltext/<?php echo $v->phrasentext_id; ?>/<?php echo $phrase_id ?>" target="PhrasesBottom">delete</a></td>
+				<td>
+					<a href="javascript:void(0);" onclick="delPhrasentext(<?php echo $v->phrasentext_id; ?>, <?php echo $phrase_id; ?>)">delete</a>
+				</td>
 			</tr>
 		<?php endforeach ?>
 	  </tbody>
 	</table>
   </div>
 </div>
+<script>
+function delPhrasentext(id,pid)
+{
+	var c = confirm("Wirklich löschen?");
+	if (c == true)
+		window.location.href = "../deltext/"+id+"/"+pid;
+}
+</script>
 
 <?php
 	$this->load->view('templates/footer');
