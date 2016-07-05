@@ -37,7 +37,7 @@ class Migration_Reihungstest extends MigrationLib
 			rt_id integer,
 			anmeldedatum date,
 			teilgenommen boolean DEFAULT FALSE,
-			ort_kurzbz varchar(16) NOT NULL,
+			ort_kurzbz varchar(16),
 			punkte numeric(8,4) DEFAULT NULL,
 			CONSTRAINT pk_tbl_rt_person PRIMARY KEY (person_id, rt_id),
 			CONSTRAINT fk_rt_person_ort_kurzbz FOREIGN KEY (ort_kurzbz) REFERENCES public.tbl_ort(ort_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT,
