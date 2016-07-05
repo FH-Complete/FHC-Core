@@ -33,16 +33,16 @@ trait db_extra
 		{
 			if(is_null($i))
 				return pg_fetch_object($this->db_result);
-			else 
+			else
 				return pg_fetch_object($this->db_result, $i);
 		}
-		else 
+		else
 		{
 			if(is_null($i))
 				return pg_fetch_object($result);
-			else 
+			else
 				return pg_fetch_object($result, $i);
-		}			
+		}
 	}
 
 	public function db_add_param($var, $type=FHC_STRING, $nullable=true)
@@ -57,7 +57,7 @@ trait db_extra
 
 		switch($type)
 		{
-			case FHC_INTEGER: 
+			case FHC_INTEGER:
 				$var = $this->db_escape($var);
 				if(!is_numeric($var) && $var!=='')
 					die('Invalid Integer Parameter detected:'.$var);
@@ -76,14 +76,14 @@ trait db_extra
 				break;
 
 			case FHC_STRING:
-			default: 
+			default:
 				$var = $this->db_escape($var);
 				$var = $this->db_null_value($var);
 				break;
 		}
-		return $var;		
+		return $var;
 	}
-	
+
 	public function db_escape($var)
 	{
 		return pg_escape_string($var);
@@ -94,14 +94,14 @@ trait db_extra
 		if($qoute)
 			return ($var!==''?$this->db_qoute($var):'null');
 		else
-			return ($var!==''?$var:'null');	
+			return ($var!==''?$var:'null');
 	}
-	
+
 	public function db_qoute($var)
 	{
 		return "'".$var."'";
 	}
-	
+
 	public function db_parse_bool($var)
 	{
 		if($var=='t')
@@ -113,7 +113,7 @@ trait db_extra
 		else
 			die('Invalid DB Boolean. Wrong DB-Engine?');
 	}
-	
+
 	/**
 	 * Bereitet ein Array von Elementen auf, damit es in der IN-Klausel eines
 	 * Select Befehls verwendet werden kann.
@@ -129,7 +129,7 @@ trait db_extra
 		}
 		return $string;
 	}
-	
+
 	public function db_num_fields($result=null)
 	{
 		if(is_null($result))
@@ -137,12 +137,12 @@ trait db_extra
 		else
 			return pg_num_fields($result);
 	}
-	
+
 	public function convert_html_chars($value)
 	{
 		return htmlspecialchars($value);
 	}
-	
+
 	/**
 	 * Liefert den Feldnamen mit index i
 	 */
@@ -153,9 +153,37 @@ trait db_extra
 		else
 			return pg_field_name($result, $i);
 	}
-	
+
 	public function db_last_error()
 	{
 		return pg_last_error();
+	}
+	
+	/**
+	 * Erstellt aus einem DB Array ein PHP Array
+	 * @param $var DB Result Array Spalte
+	 * @return php array
+	 */
+	public function db_parse_lang_array($var)
+	{
+
+		if ($var == '')
+			return;
+		preg_match_all('/(?<=^\{|,)(([^,"{]*)|\s*"((?:[^"\\\\]|\\\\(?:.|[0-9]+|x[0-9a-f]+))*)"\s*)(,|(?<!^\{)(?=\}$))/i', $var, $matches, PREG_SET_ORDER);
+		$values = array();
+
+		$sprache = new sprache();
+		$sprache->loadIndexArray();
+
+		$sprache = new sprache();
+		$sprache->getAll(true);
+		$languages = $sprache->getAllIndexesSorted();
+
+
+		foreach ($matches as $mk => $match)
+		{
+			$values[$languages[$mk+1]] = $match[3] != '' ? stripcslashes($match[3]) : (strtolower($match[2]) == 'null' ? null : $match[2]);
+		}
+		return $values;
 	}
 }

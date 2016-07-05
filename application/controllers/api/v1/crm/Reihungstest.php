@@ -85,7 +85,7 @@ class Reihungstest extends APIv1_Controller
 				$result = $this->ReihungstestModel->addJoin('public.tbl_person', 'person_id');
 				if ($result->error == EXIT_SUCCESS)
 				{
-					$result = $this->ReihungstestModel->addJoin('public.tbl_ort', 'tbl_ort.ort_kurzbz = tbl_rt_person.ort_kurzbz');
+					$result = $this->ReihungstestModel->addJoin('public.tbl_ort', 'tbl_ort.ort_kurzbz = tbl_rt_person.ort_kurzbz', 'LEFT');
 					if ($result->error == EXIT_SUCCESS)
 					{
 						$result = $this->ReihungstestModel->loadWhere(array('person_id' => $person_id));

@@ -94,6 +94,7 @@ class reihungstest extends basis_db
 				$this->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$this->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				$this->studiensemester_kurzbz =$row->studiensemester_kurzbz;
+				$this->stufe = $row->stufe;
 				return true;
 			}
 			else
@@ -433,5 +434,72 @@ class reihungstest extends basis_db
 	    }
 
 	    return true;
+	}
+
+	public function getReihungstestPerson($person_id)
+	{
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_rt_person
+				WHERE
+					tbl_rt_person.person_id=".$this->db_add_param($person_id);
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+
+				$obj->rt_id = $row->rt_id;
+				$obj->person_id = $row->person_id;
+				$obj->anmeldedatum = $row->anmeldedatum;
+				$obj->teilgenommen = $this->db_parse_bool($row->teilgenommen);
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->punkte = $row->punkte;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	public function getPersonReihungstest($person_id, $rt_id)
+	{
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_rt_person
+				WHERE
+					tbl_rt_person.person_id=".$this->db_add_param($person_id)."
+					AND rt_id=".$this->db_add_param($rt_id);
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+
+				$this->rt_id = $row->rt_id;
+				$this->person_id = $row->person_id;
+				$this->anmeldedatum = $row->anmeldedatum;
+				$this->teilgenommen = $this->db_parse_bool($row->teilgenommen);
+				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->punkte = $row->punkte;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Eintrag nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 }

@@ -9,19 +9,45 @@ class MigrationLib extends CI_Migration
 	private $ERROR_PREFIX = "[E]";
 	private $SEPARATOR = "------------------------------";
 	
+	private $cli;
+	
+	public function __construct()
+	{
+		if ($this->input->is_cli_request())
+		{
+			$this->cli = true;
+		}
+		else
+		{
+			$this->cli = false;
+		}
+	}
+	
+	private function getEOL()
+	{
+		if ($this->cli === true)
+		{
+			return PHP_EOL;
+		}
+		else
+		{
+			return "<br>";
+		}
+	}
+	
 	private function printMessage($message)
 	{
-		printf("%s %s" . PHP_EOL, $this->MSG_PREFIX, $message);
+		printf("%s %s" . $this->getEOL(), $this->MSG_PREFIX, $message);
 	}
 	
 	private function printInfo($info)
 	{
-		printf("%s %s" . PHP_EOL, $this->INFO_PREFIX, $info);
+		printf("%s %s" . $this->getEOL(), $this->INFO_PREFIX, $info);
 	}
 	
 	private function printError($error)
 	{
-		printf("%s %s" . PHP_EOL, $this->ERROR_PREFIX, $error);
+		printf("%s %s" . $this->getEOL(), $this->ERROR_PREFIX, $error);
 	}
 	
 	protected function startUP()

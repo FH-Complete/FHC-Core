@@ -135,6 +135,7 @@ class Phrases extends FHC_Controller
 	{
 		$phrase_inhalt_id = $this->input->post('phrase_inhalt_id', TRUE);
 		$data['orgeinheit_kurzbz'] = $this->input->post('oe_kurzbz', TRUE);
+		$data['orgform_kurzbz'] = $this->input->post('orgform_kurzbz', TRUE);
 		$data['text'] = $this->input->post('text', TRUE);
 		$data['description'] = $this->input->post('description', TRUE);
 		$data['sprache'] = $this->input->post('sprache', TRUE);

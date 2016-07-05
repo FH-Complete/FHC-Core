@@ -1555,7 +1555,18 @@ function StudentAuswahl()
 		{
 			document.getElementById('student-anwesenheit').setAttribute('src','anwesenheit.xul.php?student_uid='+uid);
 		}
+	}
 
+	// ***** Aufnahme-Termine *****
+	if(document.getElementById('student-content-tabs').selectedItem==document.getElementById('student-tab-aufnahmetermine'))
+	{
+		document.getElementById('student-aufnahmetermine').setAttribute('src','student/aufnahmetermine.xul.php?prestudent_id='+prestudent_id);
+	}
+
+	// ***** Messages *****
+	if(document.getElementById('student-content-tabs').selectedItem==document.getElementById('student-tab-messages'))
+	{
+		document.getElementById('student-messages').setAttribute('src','messages.xul.php?person_id='+person_id);
 	}
 
 	// Notizen laden
@@ -3557,12 +3568,11 @@ function StudentNotenTreeSelectDifferent()
 					break;
 				}
 
-				//Wenn die Noten unterschiedlich sind, aber das benotungsdatum im Zeugnis
+				//Wenn das benotungsdatum im Zeugnis
 				//nach dem benotungsdatum des lektors liegt, dann wird die zeile auch nicht markiert.
 				//damit wird verhindert, dass pruefungsnoten die nur von der assistenz eingetragen wurden,
 				//durch den alten eintrag des lektors wieder ueberschrieben werden
 				if(zeugnislehrveranstaltung_id==lvgesamtlehrveranstaltung_id
-					&& zeugnisnote!=lvgesamtnote
 					&& zeugnisbenotungsdatum>lvgesamtbenotungsdatum)
 				{
 					found=true;
@@ -5389,6 +5399,50 @@ function StudentTermineIFrameLoad()
 	{
 		url = 'termine.xul.php?student_uid='+uid+'&ts='+gettimestamp();
 		document.getElementById('student-termine').setAttribute('src',url);
+	}
+}
+
+// ****
+// * Laedt den AufnahmeTermine IFrame
+// ****
+function StudentAufnahmeTermineIFrameLoad()
+{
+	var tree = document.getElementById('student-tree');
+
+	if (tree.currentIndex==-1) return;
+
+	try
+	{
+		//Ausgewaehlte prestudent_id holen
+		var prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', tree.currentIndex);
+
+		url = 'student/aufnahmetermine.xul.php?prestudent_id='+prestudent_id+'&ts='+gettimestamp();
+		document.getElementById('student-aufnahmetermine').setAttribute('src',url);
+	}
+	catch(e)
+	{
+	}
+}
+
+// ****
+// * Laedt den Messages IFrame
+// ****
+function StudentMessagesIFrameLoad()
+{
+	var tree = document.getElementById('student-tree');
+
+	if (tree.currentIndex==-1) return;
+
+	try
+	{
+		//Ausgewaehlte prestudent_id holen
+		var person_id = getTreeCellText(tree, 'student-treecol-person_id', tree.currentIndex);
+
+		url = 'messages.xul.php?person_id='+person_id+'&ts='+gettimestamp();
+		document.getElementById('student-messages').setAttribute('src',url);
+	}
+	catch(e)
+	{
 	}
 }
 
