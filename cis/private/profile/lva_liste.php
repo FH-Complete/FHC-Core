@@ -35,6 +35,7 @@ require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/lvangebot.class.php');
+require_once('../../../include/addon.class.php');
 
 
 	if (!$db = new basis_db())
@@ -56,6 +57,12 @@ require_once('../../../include/lvangebot.class.php');
 		$stdsem=$studiensemester->getaktorNext();
 	
 	$datum = new datum();
+
+	$addon = new addon();
+	if(in_array('lvinfo',$addon->aktive_addons))
+		$lvinfo=true;
+	else
+		$lvinfo=false;
 
 	//Studiensemester abfragen. Letzten 5, aktuelles und naechstes.
 	$sql_query='SELECT * FROM public.tbl_studiensemester WHERE (start<=(now()::date+240) AND ende>=(now()::date-900)) ORDER BY start';
@@ -161,6 +168,11 @@ require_once('../../../include/lvangebot.class.php');
 			<tr>';
 		if(!defined('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN') || CIS_LVALISTE_NOTENEINGABE_ANZEIGEN)
 			echo '<th>'.$p->t('lvaliste/gesamtnote').'</th>';
+
+
+		if($lvinfo)
+			echo '<th>'.$p->t('lvaliste/lvinfo').'</th>';
+
 		echo '
 				<th>'.$p->t('lvaliste/lehrfach').'</th>
 				<th>'.$p->t('lvaliste/lehrform').'</th>
@@ -192,6 +204,10 @@ require_once('../../../include/lvangebot.class.php');
 			echo '<tr>';
 			if(!defined('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN') || CIS_LVALISTE_NOTENEINGABE_ANZEIGEN)
 				echo '<td nowrap><a href="../lehre/benotungstool/lvgesamtnoteverwalten.php?lvid='.$row->lehrveranstaltung_id.'&stsem='.$stdsem.'">'.$p->t('lvaliste/gesamtnote').'</a></td>';
+
+			if($lvinfo)
+				echo '<td><a href="../../../addons/lvinfo/cis/lvinfo.php?lv_id='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$stdsem.'" target="_blank">'.$p->t('lvaliste/lvinfo').'</a></td>';
+
 			echo '<td>'.$row->lehrfach.'</td>';
 			echo '<td>'.$row->le_lehrform_kurzbz.'</td>';	
 			if ($row->lehrfach_bez!=$row->lv_bezeichnung)			
@@ -228,6 +244,11 @@ require_once('../../../include/lvangebot.class.php');
 			    echo '<td>'.$datum->formatDatum($lvangebot->result[0]->anmeldefenster_start, "d.m.Y").'</td>';
 			    echo '<td>'.$datum->formatDatum($lvangebot->result[0]->anmeldefenster_ende, "d.m.Y").'</td>';
 			}
+			else
+			{
+				echo '<td>&nbsp;</td>
+				<td>&nbsp;</td>';
+			}
 			//echo '<td>'.$row->le_anmerkung.'</td>'; Lektoren sollen die Anmerkung dzt. nicht sehen, da nur für intern gedacht
 
 			echo '</tr>';
@@ -238,8 +259,12 @@ require_once('../../../include/lvangebot.class.php');
 		echo '<tr>';
 		if(!defined('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN') || CIS_LVALISTE_NOTENEINGABE_ANZEIGEN)
 			echo '<td>&nbsp;</td>';
+		if($lvinfo)
+			echo '<td>&nbsp;</td>';
+
 		echo '<td>&nbsp;</td>';
 		echo '<td>&nbsp;</td>';
+
 		echo '<td>&nbsp;</td>';
 		echo '<td>&nbsp;</td>';
 		echo '<td>&nbsp;</td>';
