@@ -389,11 +389,13 @@ else
 							<tab id="student-tab-gruppen" label="Gruppen" onclick="StudentGruppenLoadData();"/>
 							<tab id="student-tab-funktionen" label="Funktionen" onclick="StudentFunktionIFrameLoad();"/>
 							<tab id="student-tab-notizen" label="Notizen"/>
-							<tab id="student-tab-termine" label="Termine" onclick="StudentTermineIFrameLoad();"/>
+							<tab id="student-tab-termine" label="LV-Termine" onclick="StudentTermineIFrameLoad();"/>
 							<?php
                             if($rechte->isBerechtigt('student/anwesenheit'))
 								echo '<tab id="student-tab-anwesenheit" label="Anwesenheit" onclick="StudentAnwesenheitIFrameLoad();"/>';
                             ?>
+							<tab id="student-tab-aufnahmetermine" label="Aufnahme-Termine" onclick="StudentAufnahmeTermineIFrameLoad();"/>
+							<tab id="student-tab-messages" label="Messages" onclick="StudentMessagesIFrameLoad();"/>
 
 						</tabs>
 						<tabpanels id="student-tabpanels-main" flex="1">
@@ -423,7 +425,8 @@ else
                             if($rechte->isBerechtigt('student/anwesenheit'))
 								echo '<iframe id="student-anwesenheit" src="" style="margin-top:10px;" />';
                             ?>
-
+							<iframe id="student-aufnahmetermine" style="margin: 0px;" src="" />
+							<iframe id="student-messages" style="margin: 0px;" src="" />
 						</tabpanels>
 					</tabbox>
 				</vbox>

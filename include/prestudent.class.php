@@ -19,19 +19,20 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-require_once(dirname(__FILE__).'/datum.class.php');
 require_once(dirname(__FILE__).'/person.class.php');
+require_once(dirname(__FILE__).'/log.class.php');
 
-// CI
-require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/crm/Prestudent_model.php');
+require_once(dirname(__FILE__).'/phrasen.class.php');
+require_once(dirname(__FILE__).'/globals.inc.php');
+require_once(dirname(__FILE__).'/sprache.class.php');
 
-class prestudent extends Prestudent_model
+$sprache = getSprache();
+$lang = new sprache();
+$lang->load($sprache);
+$p = new phrasen($sprache);
+
+class prestudent extends person
 {
-	use db_extra; //CI Hack
-	
-	public $errormsg;			// string
-	
 	//Tabellenspalten
 	public $prestudent_id;	// varchar(16)
 	public $aufmerksamdurch_kurzbz;
@@ -105,22 +106,22 @@ class prestudent extends Prestudent_model
 	 * Laedt Prestudent mit der uebergebenen ID
 	 * @param $prestudent_id ID des Prestudenten der geladen werden soll
 	 */
-	public function load($prestudent_id = null)
+	public function load($prestudent_id=null)
 	{
-		if (!is_numeric($prestudent_id))
+		if(!is_numeric($prestudent_id))
 		{
 			$this->errormsg = 'ID ist ungueltig';
 			return false;
 		}
 
-		$result = parent::load($prestudent_id);
+		$qry = 'SELECT * '
+				. 'FROM public.tbl_prestudent '
+				. 'WHERE prestudent_id = '.$this->db_add_param($prestudent_id, FHC_INTEGER);
 
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
+		if($this->db_query($qry))
 		{
-			if (count($result->retval) > 0)
+			if($row = $this->db_fetch_object())
 			{
-				$row = $result->retval[0];
-				
 				$this->prestudent_id = $row->prestudent_id;
 				$this->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;
 				$this->studiengang_kz = $row->studiengang_kz;
@@ -155,8 +156,10 @@ class prestudent extends Prestudent_model
                 $this->zgvdoktordatum = $row->zgvdoktordatum;
                 $this->zgvdoktornation = $row->zgvdoktornation;
 
-				$person = new person();
-                return $person->load($row->person_id);
+                if(!person::load($row->person_id))
+					return false;
+				else
+					return true;
 			}
 			else
 			{
@@ -176,7 +179,7 @@ class prestudent extends Prestudent_model
 	 * auf Gueltigkeit.
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	protected function validate()
+	public function validate()
 	{
 		if($this->punkte>9999.9999)
 		{
@@ -331,7 +334,7 @@ class prestudent extends Prestudent_model
 			return false;
 		}
 	}
-	
+
     /**
      * Falls ZGV vorhanden, setze Ausstellungsstaat (für BIS-Meldung)
      * auf Nation der höchsten angegebenen ZGV
@@ -779,12 +782,14 @@ class prestudent extends Prestudent_model
 	 */
 	public function save_rolle()
 	{
+		global $p;
 		if($this->new)
 		{
 			//pruefen ob die Rolle schon vorhanden ist
 			if($this->load_rolle($this->prestudent_id, $this->status_kurzbz, $this->studiensemester_kurzbz, $this->ausbildungssemester))
 			{
-				$this->errormsg = 'Diese Rolle existiert bereits';
+				//$this->errormsg = 'Diese Rolle existiert bereits';
+				$this->errormsg = $p->t('errors/rolleExistiertBereits');
 				return false;
 			}
 
@@ -821,7 +826,8 @@ class prestudent extends Prestudent_model
 			{
 				if($this->load_rolle($this->prestudent_id, $this->status_kurzbz, $this->studiensemester_kurzbz, $this->ausbildungssemester))
 				{
-					$this->errormsg = 'Diese Rolle existiert bereits';
+					//$this->errormsg = 'Diese Rolle existiert bereits';
+					$this->errormsg = $p->t('errors/rolleExistiertBereits');
 					return false;
 				}
 			}
@@ -971,22 +977,33 @@ class prestudent extends Prestudent_model
 	 * @param $studiensemester_kurzbz
 	 * @return boolean
 	 */
-	public function getLastStatus($prestudent_id, $studiensemester_kurzbz = '', $status_kurzbz = '')
+	public function getLastStatus($prestudent_id, $studiensemester_kurzbz='', $status_kurzbz = '')
 	{
-		if ($prestudent_id == '' || !is_numeric($prestudent_id))
+		if($prestudent_id=='' || !is_numeric($prestudent_id))
 		{
 			$this->errormsg = 'Prestudent_id ist ungueltig';
 			return false;
 		}
 
-		$result = parent::getLastStatus($prestudent_id, $studiensemester_kurzbz, $status_kurzbz);
-		
-		if (is_object($result) && $result->error != EXIT_SUCCESS && is_array($result->retval))
+		$qry = "SELECT tbl_prestudentstatus.*, bezeichnung AS studienplan_bezeichnung,
+                tbl_status.bezeichnung_mehrsprachig
+                FROM public.tbl_prestudentstatus
+                LEFT JOIN lehre.tbl_studienplan USING (studienplan_id)
+                JOIN public.tbl_status USING (status_kurzbz)
+                WHERE tbl_status.status_kurzbz = tbl_prestudentstatus.status_kurzbz
+                AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
+
+		if($studiensemester_kurzbz!='')
+			$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+
+		if($status_kurzbz !='')
+			$qry.= " AND status_kurzbz =".$this->db_add_param($status_kurzbz);
+
+		$qry.=" ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1";
+		if($this->db_query($qry))
 		{
-			if (count($result->retval) > 0)
+			if($row = $this->db_fetch_object())
 			{
-				$row = $result->retval[0];
-				
 				$this->prestudent_id = $row->prestudent_id;
 				$this->status_kurzbz = $row->status_kurzbz;
 				$this->status_mehrsprachig = $this->db_parse_lang_array($row->bezeichnung_mehrsprachig);
@@ -1709,69 +1726,6 @@ class prestudent extends Prestudent_model
 				$semester[$row->studiensemester_kurzbz] = $row->bezeichnung;
 
 			return $semester;
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Laden der Daten';
-			return false;
-		}
-	}
-
-
-	/**
-	 * Laedt alle Studenten eines Studienplans und eines Studiensemesters
-	 * @param $studienplan_id
-	 * @param $studiensemester_kurzbz
-	 * @param $studiengang_kz
-	 * @return array mit allen Prestudenten, welche sich für den angegebenen Studienplan im angegebenen Semester beworben haben
-	 */
-	public function getAllStudentenFromStudienplanAndStudsem($studienplan_id, $studiensemester_kurzbz, $studiengang_kz)
-	{
-		if(!is_numeric($studienplan_id))
-		{
-			$this->errormsg = 'studienplan_id ist ungueltig';
-			return false;
-		}
-
-		if(!$studiensemester_kurzbz || $studiensemester_kurzbz == "")
-		{
-			$this->errormsg = 'studiensemester_kurzbz ist ungueltig';
-			return false;
-		}
-
-		$qry = "SELECT DISTINCT prestudent_id, vorname, nachname, gebdatum, rt_gesamtpunkte, tbl_prestudent.studiengang_kz, bis.tbl_zgvgruppe.bezeichnung, get_rolle_prestudent(prestudent_id, null) as laststatus
-			FROM
-				public.tbl_prestudent
-					JOIN public.tbl_person USING(person_id)
-					LEFT JOIN bis.tbl_zgvgruppe_zuordnung USING(zgv_code)
-					LEFT JOIN bis.tbl_zgvgruppe USING(gruppe_kurzbz)
-			WHERE
-				tbl_prestudent.studiengang_kz=". $this->db_add_param($studiengang_kz)."
-				AND EXISTS(
-					SELECT
-						1
-					FROM
-						public.tbl_prestudentstatus
-					WHERE
-						tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id
-						AND studiensemester_kurzbz=". $this->db_add_param($studiensemester_kurzbz)."
-						AND status_kurzbz='Bewerber'
-						AND (
-							studienplan_id=". $this->db_add_param($studienplan_id)."
-							OR
-							(anmerkung like '%' || (SELECT orgform_kurzbz || '_' || sprache FROM lehre.tbl_studienplan WHERE studienplan_id=". $this->db_add_param($studienplan_id).") || '%')
-					)
-			);";
-
-
-		if($result = $this->db_query($qry))
-		{
-			$ret = array();
-
-			while($row = $this->db_fetch_object($result))
-				$ret[] = $row;
-
-			return $ret;
 		}
 		else
 		{
