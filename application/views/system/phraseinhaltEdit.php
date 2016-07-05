@@ -23,15 +23,15 @@
 	</tr>
 	<tr><td>Beschreibung</td><td><textarea name="description" style="width:500px; height:100px;"><?php echo $description ?></textarea></td>
 	<td><h3>Formatierung (Textile) Hilfe:</h3><br/>
-		<pre>
-			<code>_emphasis_
-			*strong*
-			??citation??
-			-deleted text-
-			+inserted text+
-			^superscript^
-			</code>
-		</pre>
+			<code>
+				_emphasis_
+				*strong*
+				??citation??
+				-deleted text-
+				+inserted text+
+				^superscript^
+			</code><br/>
+		<a href="https://warpedvisions.org/projects/textile-cheat-sheet/" target="_blank">Textile CheatSheet</a>
 	</td></tr>
  	<?php
 		// This is an example to show that you can load stuff from inside the template file

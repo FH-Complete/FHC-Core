@@ -382,4 +382,182 @@ class DBTools extends FHC_Controller
 		$row = $this->db->get($this->config->item('migration_table'))->row();
 		return $row ? $row->version : 0;
 	}
+
+	/**
+	 * Check DB for different things like permissions or roles
+	 *
+	 * @param  string $action What to check.
+	 * @return	void
+	 */
+	public function check($action = 'schema')
+    {
+		echo 'DB-Check';
+	    switch ($action)
+		{
+			// **** Permission ****
+			// ToDo: Check Persmissions in the bottom of this file
+			case 'permissions':
+				//var_dump($this->config->item('fhc_acl'));
+				echo ' Permissions!';
+				//$this->config->load('roles');
+				foreach ($this->config->item('fhc_acl') as $b)
+				{
+					$qry = "SELECT * FROM system.tbl_berechtigung
+							WHERE berechtigung_kurzbz='".$b."';";
+
+					if($result = $this->db->query($qry))
+					{
+						if($result->num_rows($result)==0)
+						{
+							// Nicht vorhanden -> anlegen
+							$qry_insert="INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz) VALUES('".$b."');";
+
+							if($this->db->query($qry_insert))
+							{
+								echo '<br>Recht '.$b.' <b>hinzugefügt</b>';
+								$neue=true;
+							}
+							else
+								echo '<br><span class="error">Fehler: Recht '.$b.' hinzufügen nicht möglich</span>';
+						}
+					}
+				}
+				break;
+			// **** Roles ****
+			case 'roles':
+				echo ' Roles!';
+				$this->config->load('roles');
+				foreach ($this->config->item('roles') as $role)
+					foreach ($role['berechtigung'] as $b)
+					{
+						$qry = "SELECT * FROM system.tbl_rolleberechtigung
+								WHERE rolle_kurzbz='".$role['rolle_kurzbz']."' 
+								AND berechtigung_kurzbz='".$b."';";
+
+						if($result = $this->db->query($qry))
+						{
+							if($result->num_rows($result)==0)
+							{
+								// Nicht vorhanden -> anlegen
+								$qry_insert="INSERT INTO system.tbl_rolleberechtigung (rolle_kurzbz, berechtigung_kurzbz, art) VALUES ('".$role['rolle_kurzbz']."','".$b."', 'suid');";
+
+								if($this->db->query($qry_insert))
+								{
+									echo '<br>'.$role['rolle_kurzbz'].' -> '.$b.' <b>hinzugefügt</b>';
+									$neue=true;
+								}
+								else
+									echo '<br><span class="error">Fehler: '.$role['rolle_kurzbz'].' -> '.$b.' hinzufügen nicht möglich</span>';
+							}
+						}
+					}
+		}
+
+		exit('Succesfully checked!');
+    }
+
+	/**
+	 * Create User in DB
+	 *
+	 * @param  string $action What to check.
+	 * @return	void
+	 */
+	public function createadminuser($uid, $person_id = 1)
+    {
+		echo 'Create User!';
+	    $qry = "SELECT * FROM public.tbl_benutzer
+							WHERE uid='".$uid."';";
+		if ($result = $this->db->query($qry))
+		{
+			if ($result->num_rows($result)==0)
+			{
+				// Nicht vorhanden -> anlegen
+				$qry_insert="INSERT INTO public.tbl_benutzer (uid, person_id) VALUES('".$uid."', ".$person_id.");";
+				if($this->db->query($qry_insert))
+					echo '<br>User '.$uid.' <b>angelegt</b>';
+				else
+					echo '<br><span class="error">Fehler: User '.$uid.' anlegen nicht möglich!</span>';
+				// Join Role Admin
+				$qry_insert="INSERT INTO system.tbl_benutzerrolle (rolle_kurzbz, uid) VALUES('admin','".$uid."');";
+				if($this->db->query($qry_insert))
+					echo '<br>Rolle Admin für User '.$uid.' <b>hinzugefügt</b>';
+				else
+					echo '<br><span class="error">Rolle Admin hinzufügen für User '.$b.' hinzufügen nicht möglich</span>';
+			}
+		}
+
+		exit('Succesfully created User!');
+    }
 }
+
+/* Check also this permissions:
+basis/fhausweis -> Verwaltungstools für FH Ausweis – Kartentausch, Bildpruefung, Druck hinzugefügt
+buchung/typen -> Verwaltung von Buchungstypen hinzugefügt
+buchung/mitarbeiter -> Verwaltung von Buchungen fuer Mitarbeiter hinzugefügt
+inout/incoming -> Incomingverwaltung hinzugefügt
+inout/outgoing -> Outgoingverwaltung hinzugefügt
+inout/uebersicht -> Verbandsanzeige fuer Incoming/Outgoing im FAS hinzugefügt
+lehre/lehrfach:begrenzt -> Lehrfachverwaltung - nur aktiv aenderbar, nur aktive LF werden angezeigt hinzugefügt
+lehre/pruefungsanmeldungAdmin -> Erlaubt die Verwaltung der Prüfungsanmeldungen. hinzugefügt
+lehre/pruefungsbeurteilung -> Erlaubt dem Benutzer Beurteilungen zu Prüfungen einzutragen. hinzugefügt
+lehre/pruefungsbeurteilungAdmin -> Erlaubt dem Benutzer für alle Prüfungen Beurteilungen einzutragen. hinzugefügt
+lehre/pruefungsterminAdmin -> Recht für jeden Lektor eine Prüfung anzulegen hinzugefügt
+lehre/pruefungsfenster -> Erlaubt dem Benutzer Prüfungsfenster anzulegen. hinzugefügt
+lv-plan/gruppenentfernen -> Erlaut das Entfernen von Gruppen aus LVPlan vom FAS aus hinzugefügt
+lv-plan/lektorentfernen -> Erlaut das Entfernen von Lektoren aus LVPlan vom FAS aus hinzugefügt
+mitarbeiter/bankdaten -> Bankdaten für Mitarbeiter und Studierende anzeigen hinzugefügt
+mitarbeiter/personalnummer -> Editieren der Personalnummer im FAS hinzugefügt
+mitarbeiter/urlaube -> Mit diesem Recht werden im CIS die Urlaube von allen Mitarbeiter sichtbar hinzugefügt
+planner -> Planner Verwaltung hinzugefügt
+reihungstest -> Recht für Anzeige des Reihungstests im Vilesci hinzugefügt
+sdTools -> Recht für Anzeige der SD-Tools im Vilesci hinzugefügt
+soap/lv -> Recht für LV Webservice hinzugefügt
+soap/lvplan -> Recht für LV-Plan Webservice hinzugefügt
+soap/mitarbeiter -> Recht für Mitarbeiter-Webservice hinzugefügt
+soap/ort -> Recht für Ort Webservice hinzugefügt
+soap/pruefungsfenster -> Recht für Pruefungsfenster Webservice hinzugefügt
+soap/student -> Recht für Student Webservice hinzugefügt
+soap/studienordnung -> Recht für Studienordnung Webservice hinzugefügt
+soap/benutzer -> Berechtigung für Bentutzerabfrage Addon Kontoimport hinzugefügt
+soap/buchungen -> Berechtigung für Buchungsabfrage Addon Kontoimport hinzugefügt
+student/bankdaten -> Bankdaten des Studenten hinzugefügt
+student/anrechnung -> Anrechnungen des Studenten hinzugefügt
+student/anwesenheit -> Anwesenheiten im FAS hinzugefügt
+system/developer -> Anzeige zusätzlicher Developerinfos hinzugefügt
+system/loginasuser -> Berechtigung zum Einloggen als anderer User hinzugefügt
+vertrag/mitarbeiter -> Verwalten von Vertraegen hinzugefügt
+vertrag/typen -> Verwalten von Vertragstypen hinzugefügt
+wawi/berichte -> Alle Berichte anzeigen hinzugefügt
+wawi/delete_advanced -> Loeschen von freigegebenen Bestellungen hinzugefügt
+Webservice Berechtigungen pruefen
+
+soap/studienordnung/load_lva_oe->lehrveranstaltung hinzugefügt
+soap/studienordnung/load->lehrveranstaltung hinzugefügt
+soap/studienordnung/deleteStudienplanLehrveranstaltung->studienplan hinzugefügt
+soap/studienordnung/containsLehrveranstaltung->studienplan hinzugefügt
+soap/studienordnung/loadStudienplanLehrveranstaltung->studienplan hinzugefügt
+soap/studienordnung/saveStudienplanLehrveranstaltung->studienplan hinzugefügt
+soap/studienordnung/loadStudienordnung->studienordnung hinzugefügt
+soap/studienordnung/delete->lvregel hinzugefügt
+soap/studienordnung/save->lvregel hinzugefügt
+soap/studienordnung/load->lvregel hinzugefügt
+soap/studienordnung/loadLVRegelTypen->lvregel hinzugefügt
+soap/studienordnung/load_lva->lehrveranstaltung hinzugefügt
+soap/studienordnung/getAll->lehrtyp hinzugefügt
+soap/studienordnung/getAll->organisationseinheit hinzugefügt
+soap/studienordnung/getLVRegelTree->lvregel hinzugefügt
+soap/studienordnung/save->studienplan hinzugefügt
+soap/studienordnung/save->studienordnung hinzugefügt
+soap/studienordnung/loadStudienplanSTO->studienplan hinzugefügt
+soap/studienordnung/loadStudienordnungSTG->studienordnung hinzugefügt
+soap/studienordnung/loadStudienordnungSTGInaktiv->studienordnung hinzugefügt
+soap/studienordnung/loadStudienplan->studienplan hinzugefügt
+soap/studienordnung/saveSemesterZuordnung->studienordnung hinzugefügt
+soap/studienordnung/deleteSemesterZuordnung->studienordnung hinzugefügt
+soap/studienordnung/getLVkompatibel->lehrveranstaltung hinzugefügt
+soap/studienordnung/getLvTree->lehrveranstaltung hinzugefügt
+soap/pruefungsfenster/getByStudiensemester->pruefungsfenster hinzugefügt
+soap/studienordnung/exists->lvregel hinzugefügt
+soap/studienordnung/saveSortierung->studienplan hinzugefügt
+soap/benutzer/search->benutzer hinzugefügt
+soap/buchungen/getBuchungen-> */

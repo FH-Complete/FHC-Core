@@ -13,8 +13,7 @@ class Seed_Person
         public function seed($limit = 200)
         {
 			echo "Seeding $limit persons ";
-			$this->fhc->load->model('person/Person_model');
- 
+			
 		    for ($i = 0; $i < $limit; $i++)
 			{
 		        echo ".";
@@ -36,7 +35,7 @@ class Seed_Person
 		            //'ip_address' => mt_rand(0, 1) ? $this->faker->ipv4 : $this->faker->ipv6,
 		        );
 	 
-		        $this->fhc->Person_model->insert($data);
+		        $this->fhc->db->insert('public.tbl_person', $data);
 		    }
 	 
 		    echo PHP_EOL;
