@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/datum.class.php');
+require_once(dirname(__FILE__).'/person.class.php');
 
 // CI
 require_once(dirname(__FILE__).'/../ci_hack.php');

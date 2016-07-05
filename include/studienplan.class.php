@@ -34,41 +34,41 @@ require_once(dirname(__FILE__).'/../application/models/organisation/Studienplan_
 class studienplan extends Studienplan_model
 {
 	use db_extra; //CI Hack
-	
+
     public $new = true;			// boolean
     public $result = array();		// Objekte
 	public $errormsg;			// string
 
     //Tabellenspalten
-    protected $studienplan_id;			// integer (PK)
-    protected $studienordnung_id;		// integer FK Studienordnung
-    protected $orgform_kurzbz; 			// varchar (3)
-    protected $version;					// varchar (256)
-    protected $bezeichnung;				// varchar (256)
-    protected $regelstudiendauer;		// integer
-    protected $sprache;					// varchar (16) FK Sprache
-    protected $aktiv=false;				// boolean
-    protected $semesterwochen;			// smallint
-    protected $testtool_sprachwahl=true;// boolean
-    protected $updateamum;				// timestamp
-    protected $updatevon;				// varchar
-    protected $insertamum;				// timestamp
-    protected $insertvon;				// varchar
-    protected $ects_stpl;
-    protected $pflicht_sws;
-    protected $pflicht_lvs;
+    public $studienplan_id;			// integer (PK)
+    public $studienordnung_id;		// integer FK Studienordnung
+    public $orgform_kurzbz; 			// varchar (3)
+    public $version;					// varchar (256)
+    public $bezeichnung;				// varchar (256)
+    public $regelstudiendauer;		// integer
+    public $sprache;					// varchar (16) FK Sprache
+    public $aktiv=false;				// boolean
+    public $semesterwochen;			// smallint
+    public $testtool_sprachwahl=true;// boolean
+    public $updateamum;				// timestamp
+    public $updatevon;				// varchar
+    public $insertamum;				// timestamp
+    public $insertvon;				// varchar
+    public $ects_stpl;
+    public $pflicht_sws;
+    public $pflicht_lvs;
 
     //Tabellenspalten für Zwischentabelle tbl_studienplan_lehrveranstaltung
-    protected $studienplan_lehrveranstaltung_id;		//integer
-    protected $lehrveranstaltung_id;					//integer
-    protected $semester;								//smallint
-    protected $studienplan_lehrveranstaltung_id_parent;	//integer
-    protected $pflicht;									//boolean
-    protected $koordinator;								//varchar(32)
-    protected $sort;
-	protected $curriculum=true;
-	protected $export=true;
-	protected $genehmigung=true;
+    public $studienplan_lehrveranstaltung_id;		//integer
+    public $lehrveranstaltung_id;					//integer
+    public $semester;								//smallint
+    public $studienplan_lehrveranstaltung_id_parent;	//integer
+    public $pflicht;									//boolean
+    public $koordinator;								//varchar(32)
+    public $sort;
+	public $curriculum=true;
+	public $export=true;
+	public $genehmigung=true;
 
 	/**
      * Konstruktor
@@ -82,12 +82,12 @@ class studienplan extends Studienplan_model
 	{
 		$this->$name=$value;
 	}
-
+/*
 	public function __get($name)
 	{
 		return $this->$name;
 	}
-
+*/
 	/**
 	 * Laedt Studienplan mit der ID $studienplan_id
 	 * @param  $studienplan_id ID des zu ladenden Studienplanes
