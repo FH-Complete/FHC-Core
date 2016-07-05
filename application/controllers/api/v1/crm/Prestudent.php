@@ -120,7 +120,7 @@ class Prestudent extends APIv1_Controller
 		{
 			$this->load->model('crm/RtPerson_model', 'RtPersonModel');
 			
-			if(isset($ddReihungstest['new']) && $ddReihungstest['new'] === true)
+			if(isset($ddReihungstest['new']) && $ddReihungstest['new'] == true)
 			{
 				// Remove new parameter to avoid DB insert errors
 				unset($ddReihungstest['new']);
@@ -149,8 +149,7 @@ class Prestudent extends APIv1_Controller
 	
 	private function _validateAddReihungstest($ddReihungstest = NULL)
 	{
-		if (!isset($ddReihungstest['person_id']) || !isset($ddReihungstest['rt_id']) ||
-			!isset($ddReihungstest['ort_kurzbz']))
+		if (!isset($ddReihungstest['person_id']) || !isset($ddReihungstest['rt_id']))
 		{
 			return false;
 		}

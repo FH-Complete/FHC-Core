@@ -3,11 +3,11 @@
 /*
  * OrgForm widget
  */
-class orgform_widget extends Widget 
+class orgform_widget extends Widget
 {
 	protected $_htmltagname = 'orgform_kurzbz';
 
-    public function display($data) 
+    public function display($data)
 	{
 		$this->load->model('codex/Orgform_model', 'OrgFormModel');
 		$res = $this->OrgFormModel->load();
@@ -33,10 +33,10 @@ class orgform_widget extends Widget
 		{
 			$item = array
 			(
-				'name' => $obj->orgform_kurzbz.' ('.$obj->bezeichnung.')', 
+				'name' => $obj->orgform_kurzbz.' ('.$obj->bezeichnung.')',
 				'value' => $obj->orgform_kurzbz
 			);
-			if (isset($data['orgform']) && $obj->orgform_kurzbz == $data['orgform'])
+			if (isset($data['orgform_kurzbz']) && $obj->orgform_kurzbz == $data['orgform_kurzbz'])
 				$item['selected'] = true;
 			else
 				$item['selected'] = false;

@@ -87,6 +87,7 @@ $berechtigungen = array(
 	array('basis/news','Newsverwaltung'),
 	array('basis/notiz','Notizen'),
 	array('basis/organisationseinheit','Organisationseinheiten Verwalten'),
+	array('basis/orgform','Orgformen Verwalten'),
 	array('basis/ort','Raum-/Ortverwaltung'),
 	array('basis/person','Personen Zusammenlegen, Stg-Wiederholer anlegen, etc'),
 	array('basis/planner','Planner Zugriff'),
