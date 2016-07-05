@@ -6,6 +6,11 @@ require_once APPPATH . '/libraries/MigrationLib.php';
 
 class Migration_Reihungstest extends MigrationLib
 {
+	public function __construct()
+	{
+		parent::__construct();
+	}
+	
     public function up()
     {
 		$this->startUP();
