@@ -27,7 +27,7 @@ App: aufnahme
 		<tr><td><a href="edit/<?php echo $p->phrase_id; ?>" target="PhrasesBottom"><?php echo $p->phrase_id; ?></a></td>
 			<td><?php echo $p->app; ?></td>
 			<td><a href="edit/<?php echo $p->phrase_id; ?>" target="PhrasesBottom"><?php echo $p->phrase; ?></a></td>
-			<td><a href="view/<?php echo $p->phrase_id; ?>" target="PhrasesBottom">Inhalte anzeigen</a></td>
+			<td><a href="view/<?php echo $p->phrase_id; ?>" target="PhrasesTop">Phrasentexte bearbeiten</a></td>
 		</tr>
 	<?php endforeach ?>
 	</tbody>

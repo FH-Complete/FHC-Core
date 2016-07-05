@@ -4,7 +4,7 @@
 
 <div class="row">
 	<div class="span4">
-	  <h2>Phrase Inhalt: <?=$phrasentext_id?></h2>
+	  <h2>Phrasentext: <?=$phrasentext_id?></h2>
 
 <form method="post" action="../saveText/<?=$phrasentext_id?>">
 	<input type="hidden" name="phrase_inhalt_id" value="<?php echo $phrasentext_id; ?>" />
@@ -21,7 +21,18 @@
 			<div id="textile-preview" style="width:500px; height:300px; border: 1px solid gray; overflow: auto;"></div>
 		</td>
 	</tr>
-	<tr><td>Beschreibung</td><td><textarea name="description" style="width:500px; height:100px;"><?php echo $description ?></textarea></td><td></td></tr>
+	<tr><td>Beschreibung</td><td><textarea name="description" style="width:500px; height:100px;"><?php echo $description ?></textarea></td>
+	<td><h3>Formatierung (Textile) Hilfe:</h3><br/>
+		<pre>
+			<code>_emphasis_
+			*strong*
+			??citation??
+			-deleted text-
+			+inserted text+
+			^superscript^
+			</code>
+		</pre>
+	</td></tr>
  	<?php
 		// This is an example to show that you can load stuff from inside the template file
 		//echo $this->templatelib->widget("tinymce_widget", array('name' => 'text', 'text' => $text));
