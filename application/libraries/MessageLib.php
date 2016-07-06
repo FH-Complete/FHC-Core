@@ -328,7 +328,22 @@ class MessageLib
 			}
 			else
 			{
-				$result = $this->_error('Vorlage not found', EXIT_ERROR);
+				// Better message error
+				if (!is_array($result->retval) || (is_array($result->retval) && count($result->retval) == 0))
+				{
+					$result = $this->_error('Vorlage not found', EXIT_ERROR);
+				}
+				else if (is_array($result->retval) && count($result->retval) > 0)
+				{
+					if (empty($result->retval[0]->text))
+					{
+						$result = $this->_error('Vorlage has an empty text', EXIT_ERROR);
+					}
+					else if (empty($result->retval[0]->subject))
+					{
+						$result = $this->_error('Vorlage has an empty subject', EXIT_ERROR);
+					}
+				}
 			}
 		}
 		else
