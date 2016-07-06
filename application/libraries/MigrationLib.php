@@ -13,6 +13,8 @@ class MigrationLib extends CI_Migration
 	
 	public function __construct()
 	{
+		parent::__construct();
+		
 		if ($this->input->is_cli_request())
 		{
 			$this->cli = true;
@@ -60,51 +62,91 @@ class MigrationLib extends CI_Migration
 		$this->printInfo(sprintf("%s End method up of class %s %s", $this->SEPARATOR, get_called_class(), $this->SEPARATOR));
 	}
 	
-	protected function columnExists($column, $schema, $table)
+    protected function addColumn($schema, $table, $fields)
 	{
-		$query = sprintf("SELECT COUNT(%s) FROM %s.%s", $column, $schema, $table);
-		
-		if (! @$this->db->simple_query($query))
+		foreach($fields as $name => $definition)
 		{
-			return false;
-		}
-		
-		return true;
-	}
-	
-    protected function addColumn($schema, $table, $column, $type)
-	{
-		if (!$this->columnExists($column, $schema, $table))
-		{
-			$query = sprintf("ALTER TABLE %s.%s ADD COLUMN %s %s", $schema, $table, $column, $type);
-  			if (@$this->db->simple_query($query))
+			if (!$this->db->field_exists($name, $schema . '.' . $table))
 			{
-				$this->printMessage(sprintf("Column %s.%s.%s of type %s added", $schema, $table, $column, $type));
+				if ($this->dbforge->add_column($schema . '.' . $table, array($name => $definition)))
+				{
+					$this->printMessage(sprintf("Column %s.%s.%s of type %s added", $schema, $table, $name, $definition["type"]));
+				}
+				else
+				{
+					$this->printError(sprintf("Error while adding column %s.%s.%s of type %s", $schema, $table, $name, $definition["type"]));
+				}
 			}
 			else
 			{
-				$this->printError(sprintf("Error while adding column %s.%s.%s of type %s", $schema, $table, $column, $type));
+				$this->printInfo(sprintf("Column %s.%s.%s already exists", $schema, $table, $name));
+			}
+		}
+	}
+	
+	protected function addPrimaryKey($schema, $table, $name, $fields)
+	{
+		$stringFields = null;
+
+		if (is_array($fields))
+		{
+			if (count($fields) > 0)
+			{
+				$stringFields = "";
+				for ($i = 0; $i < count($fields); $i++)
+				{
+					$stringFields .= $fields[$i];
+					if ($i != count($fields) - 1)
+					{
+						$stringFields .= ", ";
+					}
+				}
+				$query = sprintf("ALTER TABLE %s.%s ADD CONSTRAINT %s PRIMARY KEY (%s)", $schema, $table, $name, $stringFields);
 			}
 		}
 		else
 		{
-			$this->printInfo(sprintf("Column %s.%s.%s already exists", $schema, $table, $column));
+			$query = sprintf("ALTER TABLE %s.%s ADD CONSTRAINT %s PRIMARY KEY (%s)", $schema, $table, $name, $fields);
+		}
+		
+		if (@$this->db->simple_query($query))
+		{
+			$this->printMessage(sprintf("Added primary key %s on table %s.%s", $name, $schema, $table));
+		}
+		else
+		{
+			$this->printError(sprintf("Adding primary key %s on table %s.%s", $name, $schema, $table));
 		}
 	}
 	
-	protected function grantTable($permission, $schema, $table, $user)
+	protected function addForeingKey($schema, $table, $name, $field, $schemaDest, $tableDest, $fieldDest, $attributes)
+	{
+		$query = sprintf("ALTER TABLE %s.%s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s.%s (%s) %s",
+						$schema, $table, $name, $field, $schemaDest, $tableDest, $fieldDest, $attributes);
+		
+		if (@$this->db->simple_query($query))
+		{
+			$this->printMessage(sprintf("Added foreign key %s on table %s.%s", $name, $schema, $table));
+		}
+		else
+		{
+			$this->printError(sprintf("Adding foreign key %s on table %s.%s", $name, $schema, $table));
+		}
+	}
+	
+	protected function grantTable($permissions, $schema, $table, $user)
 	{
 		$stringPermission = null;
 
-		if (is_array($permission))
+		if (is_array($permissions))
 		{
-			if (count($permission) > 0)
+			if (count($permissions) > 0)
 			{
 				$stringPermission = "";
-				for ($i = 0; $i < count($permission); $i++)
+				for ($i = 0; $i < count($permissions); $i++)
 				{
-					$stringPermission .= $permission[$i];
-					if ($i != count($permission) - 1)
+					$stringPermission .= $permissions[$i];
+					if ($i != count($permissions) - 1)
 					{
 						$stringPermission .= ", ";
 					}
@@ -114,14 +156,14 @@ class MigrationLib extends CI_Migration
 		}
 		else
 		{
-			$query = sprintf("GRANT %s ON TABLE %s.%s TO %s", $permission, $schema, $table, $user);
+			$query = sprintf("GRANT %s ON TABLE %s.%s TO %s", $permissions, $schema, $table, $user);
 		}
 
 		if (@$this->db->simple_query($query))
 		{
 			$this->printMessage(
 				sprintf("Granted permissions %s on table %s.%s to user %s",
-						is_null($stringPermission) ? $permission : $stringPermission,
+						is_null($stringPermission) ? $permissions : $stringPermission,
 						$schema,
 						$table,
 						$user
@@ -131,7 +173,7 @@ class MigrationLib extends CI_Migration
 		{
 			$this->printError(
 				sprintf("Granting permissions %s on table %s.%s to user %s",
-						is_null($stringPermission) ? $permission : $stringPermission,
+						is_null($stringPermission) ? $permissions : $stringPermission,
 						$schema,
 						$table,
 						$user
@@ -141,22 +183,15 @@ class MigrationLib extends CI_Migration
 	
 	protected function createTable($schema, $table, $fields)
 	{
-		if (! $this->db->table_exists($schema . "." . $table))
+		$this->dbforge->add_field($fields);
+		
+		if ($this->dbforge->create_table($schema . '.' . $table, true))
 		{
-			$query = sprintf("CREATE TABLE %s.%s (%s)", $schema, $table, $fields);
-			
-			if (@$this->db->simple_query($query))
-			{
-				$this->printMessage(sprintf("Table %s.%s created", $schema, $table));
-			}
-			else
-			{
-				$this->printError(sprintf("Creating table %s.%s", $schema, $table));
-			}
+			$this->printMessage(sprintf("Table %s.%s created or existing", $schema, $table));
 		}
 		else
 		{
-			$this->printInfo(sprintf("Table %s.%s already exists", $schema, $table));
+			$this->printError(sprintf("Creating table %s.%s", $schema, $table));
 		}
 	}
 	
