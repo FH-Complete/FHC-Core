@@ -422,7 +422,7 @@ DELETE FROM system.tbl_rolleberechtigung WHERE berechtigung_kurzbz IN (
 	'lehre/reihungstest',
 	'wawi/inventar:begrenzt',
 	'fs/dms',
-	'basis/phrase',
+	'system/phrase',
 	'system/vorlagestudiengang'
 );
 
@@ -651,7 +651,7 @@ DELETE FROM system.tbl_berechtigung WHERE berechtigung_kurzbz IN (
 	'lehre/reihungstest',
 	'wawi/inventar:begrenzt',
 	'fs/dms',
-	'basis/phrase',
+	'system/phrase',
 	'system/vorlagestudiengang'
 );
 
@@ -879,7 +879,7 @@ INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('wawi/inventar:begrenzt', '');
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('fs/dms', '');
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/message', '');
-INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/phrase', '');
+INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('system/phrase', '');
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('system/vorlagestudiengang', '');
 
 -- INSERT link between user admin and permissions
@@ -1106,7 +1106,7 @@ INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('wawi/inventar:begrenzt', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('fs/dms', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/message', 'admin', 'suid');
-INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/phrase', 'admin', 'suid');
+INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('system/phrase', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('system/vorlagestudiengang', 'admin', 'suid');
 
 -- EMPTY public.tbl_statistik
