@@ -502,4 +502,59 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
+
+	public function savePersonReihungstest()
+	{
+		if($this->new)
+		{
+			$qry = "INSERT INTO public.tbl_rt_person(person_id, rt_id, anmeldedatum, teilgenommen, ort_kurzbz, punkte) VALUES(".
+				$this->db_add_param($this->person_id, FHC_INTEGER).','.
+				$this->db_add_param($this->rt_id, FHC_INTEGER).','.
+				$this->db_add_param($this->anmeldedatum).','.
+				$this->db_add_param($this->teilgenommen, FHC_BOOLEAN).','.
+				$this->db_add_param($this->ort_kurzbz).','.
+				$this->db_add_param($this->punkte).');';
+		}
+		else
+		{
+			$qry = "UPDATE public.tbl_rt_person SET ".
+			 ' rt_id = '.$this->db_add_param($this->rt_id).','.
+			 ' anmeldedatum='.$this->db_add_param($this->anmeldedatum).','.
+			 ' teilgenommen='.$this->db_add_param($this->teilgenommen, FHC_BOOLEAN).','.
+			 ' ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).','.
+			 ' punkte='.$this->db_add_param($this->punkte).' '.
+			 ' WHERE person_id='.$this->db_add_param($this->person_id, FHC_INTEGER).' AND '.
+			 ' rt_id='.$this->db_add_param($this->rt_id_old);
+		 }
+
+		 if($this->db_query($qry))
+		 {
+			 return true;
+		 }
+		 else
+		 {
+			 $this->errormsg = 'Fehler beim Speichern der Daten';
+			 return false;
+		 }
+	}
+
+	/**
+	 * Loescht einen Person Reihungstest Eintrag
+	 */
+	public function deletePersonReihungstest($person_id, $rt_id)
+	{
+		$qry = "DELETE FROM public.tbl_rt_person
+		 	WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
+			AND rt_id=".$this->db_add_param($rt_id, FHC_INTEGER);
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->erromsg='Fehler beim Löschen der Daten';
+			return false;
+		}
+	}
 }

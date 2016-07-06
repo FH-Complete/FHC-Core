@@ -70,6 +70,24 @@ function loadAufnahmeTermine(prestudent_id, studiengang_kz)
 	var myDatasource = rdfService.GetDataSourceBlocking(url);
 	reihungstestmenulist.database.AddDataSource(myDatasource);
 	reihungstestmenulist.builder.rebuild();
+
+	// OrtDropDown laden
+	var ortmenulist = document.getElementById('aufnahmetermine-menulist-ort');
+	var url="<?php echo APP_ROOT ?>rdf/orte.rdf.php?optional=true";
+
+	//Alte DS entfernen
+	var oldDatasources = ortmenulist.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		ort.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	ortmenulist.builder.rebuild();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var myDatasource = rdfService.GetDataSourceBlocking(url);
+	ortmenulist.database.AddDataSource(myDatasource);
+	ortmenulist.builder.rebuild();
 }
 
 /**
@@ -89,24 +107,69 @@ function AufnahmeTermineLoadTree()
 	{
 		treeAufnahmeTermine.database.RemoveDataSource(oldDatasources.getNext());
 	}
+	treeAufnahmeTermine.builder.rebuild();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var AufnahmeTerminTreeDatasource = rdfService.GetDataSource(url);
 	AufnahmeTerminTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	treeAufnahmeTermine.database.AddDataSource(AufnahmeTerminTreeDatasource);
-
 }
 
+/**
+ * Speichert die Gesamtpunkte
+ */
 function AufnahmeTermineSaveGesamtpunkte()
 {
-	// TODO
-	alert('Dieses Feature ist noch nicht implementiert');
+	var punkte = document.getElementById('aufnahmetermine-textbox-gesamtpunkte').value;
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'AufnahmeTermineSaveGesamtpunkte');
+
+	req.add('prestudent_id', AufnahmeTerminePrestudentID);
+	req.add('punkte', punkte);
+
+	var response = req.executePOST();
+	var val = new ParseReturnValue(response);
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 function AufnahmeTermineCalculateTotal()
 {
-	// TODO
-	alert('Dieses Feature ist noch nicht implementiert');
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'AufnahmeTermineBerechneGesamtpunkte');
+	req.add('prestudent_id', AufnahmeTerminePrestudentID);
+
+	var response = req.executePOST();
+	var val = new ParseReturnValue(response);
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		document.getElementById('aufnahmetermine-textbox-gesamtpunkte').value=val.dbdml_data;
+		return true;
+	}
 }
 
 /**
@@ -139,17 +202,19 @@ function AufnahmeTermineAuswahl()
 
 	//Daten holen
 
-	person_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_id" ));
-	rt_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#rt_id" ));
-	anmeldedatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmeldedatum" ));
-	teilgenommen = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#teilgenommen" ));
-	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
+	var person_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_id" ));
+	var rt_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#rt_id" ));
+	var anmeldedatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmeldedatum" ));
+	var teilgenommen = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#teilgenommen" ));
+	var punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
+	var ort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ort_kurzbz" ));
 
 	document.getElementById('aufnahmetermine-textbox-rt_id').value=rt_id;
 	document.getElementById('aufnahmetermine-textbox-person_id').value=person_id;
 	document.getElementById('aufnahmetermine-checkbox-neu').checked=false;
 	document.getElementById('aufnahmetermine-textbox-anmeldungreihungstest').value=anmeldedatum;
 	MenulistSelectItemOnValue('aufnahmetermine-menulist-reihungstest', rt_id);
+	MenulistSelectItemOnValue('aufnahmetermine-menulist-ort', ort);
 	if(teilgenommen=='Ja')
 		document.getElementById('aufnahmetermine-checkbox-teilgenommen').checked=true;
 	else
@@ -163,9 +228,42 @@ function AufnahmeTermineNeu()
 	AufnahmeTermineResetFields();
 }
 
+/**
+ * Loescht einen Aufnahmetermin
+ */
 function AufnahmeTermineDelete()
 {
-	// TODO
+	var rt_id = document.getElementById('aufnahmetermine-textbox-rt_id').value;
+	var person_id = document.getElementById('aufnahmetermine-textbox-person_id').value;
+
+	if(!confirm("Wollen Sie diesen Eintrag wirklich löschen?"))
+		return;
+
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'AufnahmeTermineDelete');
+
+	req.add('rt_id', rt_id);
+	req.add('person_id', person_id);
+	req.add('prestudent_id', AufnahmeTerminePrestudentID);
+
+	var response = req.executePOST();
+	var val = new ParseReturnValue(response);
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		AufnahmeTermineLoadTree();
+		return true;
+	}
 }
 
 function AufnahemTermineReihungstestPunkteTransmit()
@@ -173,9 +271,51 @@ function AufnahemTermineReihungstestPunkteTransmit()
 	// TODO
 }
 
+/**
+ * Speichert einen AufnahmeTermin
+ */
 function AufnahmeTermineSpeichern()
 {
-	// TODO
+	var rt_id = document.getElementById('aufnahmetermine-textbox-rt_id').value;
+	var person_id = document.getElementById('aufnahmetermine-textbox-person_id').value;
+	var neu = document.getElementById('aufnahmetermine-checkbox-neu').checked;
+	var anmeldedatum = document.getElementById('aufnahmetermine-textbox-anmeldungreihungstest').iso;
+	var rt_id_new = document.getElementById('aufnahmetermine-menulist-reihungstest').value;
+	var teilgenommen = document.getElementById('aufnahmetermine-checkbox-teilgenommen').checked;
+	var punkte = document.getElementById('aufnahmetermine-textbox-punkte').value;
+	var ort = document.getElementById('aufnahmetermine-menulist-ort').value;
+
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'AufnahmeTermineSave');
+
+	req.add('rt_id_old', rt_id);
+	req.add('rt_id_new', rt_id_new);
+	req.add('person_id', person_id);
+	req.add('prestudent_id', AufnahmeTerminePrestudentID);
+	req.add('neu', neu);
+	req.add('anmeldedatum', anmeldedatum);
+	req.add('teilgenommen', teilgenommen);
+	req.add('punkte', punkte);
+	req.add('ort_kurzbz', ort);
+
+	var response = req.executePOST();
+	var val = new ParseReturnValue(response);
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		AufnahmeTermineLoadTree();
+		return true;
+	}
 }
 
 /**
@@ -189,6 +329,7 @@ function AufnahmeTermineDisableFields(val)
 	document.getElementById('aufnahmetermine-checkbox-teilgenommen').disabled=val;
 	document.getElementById('aufnahmetermine-textbox-anmeldungreihungstest').disabled=val;
 	document.getElementById('aufnahmetermine-menulist-reihungstest').disabled=val;
+	document.getElementById('aufnahmetermine-menulist-ort').disabled=val;
 	document.getElementById('aufnahmetermine-button-anmeldungreihungstest-heute').disabled=val;
 }
 
@@ -201,6 +342,7 @@ function AufnahmeTermineResetFields()
 	document.getElementById('aufnahmetermine-checkbox-teilgenommen').checked=false;
 	document.getElementById('aufnahmetermine-textbox-anmeldungreihungstest').value='';
 	document.getElementById('aufnahmetermine-menulist-reihungstest').value='';
+	document.getElementById('aufnahmetermine-menulist-ort').value='';
 	document.getElementById('aufnahmetermine-textbox-rt_id').value='';
 	document.getElementById('aufnahmetermine-textbox-person_id').value='';
 	document.getElementById('aufnahmetermine-checkbox-neu').checked=true;
@@ -223,8 +365,25 @@ function AufnahmeTermineAnmeldungreihungstestHeute()
 	document.getElementById('aufnahmetermine-textbox-anmeldungreihungstest').value=tag+'.'+monat+'.'+jahr;
 }
 
+/**
+ * Refresht das DropDown mit den Reihungstestterminen
+ */
 function AufnahmeTermineReihungstestDropDownRefresh()
 {
-	// TODO
-	alert("Dieses Feature ist noch nicht implementiert");
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('aufnahmetermine-menulist-reihungstest');
+	var url="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true&"+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasources = tree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		tree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	tree.builder.rebuild();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var myDatasource = rdfService.GetDataSource(url);
+	tree.database.AddDataSource(myDatasource);
 }

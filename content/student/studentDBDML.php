@@ -70,6 +70,7 @@ require_once('../../include/benutzerfunktion.class.php');
 require_once('../../include/note.class.php');
 require_once('../../include/standort.class.php');
 require_once('../../include/adresse.class.php');
+require_once('../../include/reihungstest.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -3827,6 +3828,222 @@ if(!$error)
 				{
 					$errormsg = $anrechnung->errormsg;
 					$return = false;
+				}
+			}
+		}
+		else
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='AufnahmeTermineSave')  // **** AufnahmeTermine **** //
+	{
+		//Speichert einen Aufnahmetermin einer Person
+		if(isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']))
+		{
+			$prestudent = new prestudent();
+			if(!$prestudent->load($_POST['prestudent_id']))
+			{
+				$return = false;
+				$error = true;
+				$errormsg = $prestudent->errormsg;
+			}
+			else
+			{
+				if(!$rechte->isBerechtigt('admin', $prestudent->studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $prestudent->studiengang_kz, 'suid'))
+				{
+					$return = false;
+					$error = true;
+					$errormsg = 'Sie haben keine Berechtigung';
+				}
+				else
+				{
+					$rt_id_old = $_POST['rt_id_old'];
+					$rt_id_new = $_POST['rt_id_new'];
+					$person_id = $_POST['person_id'];
+					if($person_id=='')
+						$person_id=$prestudent->person_id;
+					$punkte = $_POST['punkte'];
+					$ort_kurzbz = $_POST['ort_kurzbz'];
+					$teilgenommen = ($_POST['teilgenommen']=='true'?true:false);
+					$anmeldedatum = $_POST['anmeldedatum'];
+
+					$reihungstest = new reihungstest();
+					if($rt_id_old!='')
+					{
+						$reihungstest->getPersonReihungstest($person_id, $rt_id_old);
+						$reihungstest->rt_id_old = $rt_id_old;
+						$reihungstest->new=false;
+					}
+					else
+					{
+						$reihungstest->new=true;
+					}
+
+					$reihungstest->rt_id = $rt_id_new;
+					$reihungstest->person_id = $person_id;
+					$reihungstest->punkte = $punkte;
+					$reihungstest->teilgenommen = $teilgenommen;
+					$reihungstest->anmeldedatum = $anmeldedatum;
+					$reihungstest->ort_kurzbz = $ort_kurzbz;
+
+					if($reihungstest->savePersonReihungstest())
+					{
+						$return = true;
+						$error = false;
+						$errormsg = 'Erfolgreich gespeichert';
+					}
+					else
+					{
+						$return = false;
+						$error = true;
+						$errormsg = $reihungstest->errormsg;
+					}
+				}
+			}
+		}
+		else
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='AufnahmeTermineDelete')
+	{
+		//Speichert einen Aufnahmetermin einer Person
+		if(isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']))
+		{
+			$prestudent = new prestudent();
+			if(!$prestudent->load($_POST['prestudent_id']))
+			{
+				$return = false;
+				$error = true;
+				$errormsg = $prestudent->errormsg;
+			}
+			else
+			{
+				if(!$rechte->isBerechtigt('admin', $prestudent->studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $prestudent->studiengang_kz, 'suid'))
+				{
+					$return = false;
+					$error = true;
+					$errormsg = 'Sie haben keine Berechtigung';
+				}
+				else
+				{
+					$rt_id = $_POST['rt_id'];
+					$person_id = $_POST['person_id'];
+
+					$reihungstest = new reihungstest();
+
+					if($reihungstest->deletePersonReihungstest($person_id, $rt_id))
+					{
+						$return = true;
+						$error = false;
+						$errormsg = 'Erfolgreich geloescht';
+					}
+					else
+					{
+						$return = false;
+						$error = true;
+						$errormsg = $reihungstest->errormsg;
+					}
+				}
+			}
+		}
+		else
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='AufnahmeTermineSaveGesamtpunkte')
+	{
+		//Speichert einen Aufnahmetermin einer Person
+		if(isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']))
+		{
+			$prestudent = new prestudent();
+			if(!$prestudent->load($_POST['prestudent_id']))
+			{
+				$return = false;
+				$error = true;
+				$errormsg = $prestudent->errormsg;
+			}
+			else
+			{
+				if(!$rechte->isBerechtigt('admin', $prestudent->studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $prestudent->studiengang_kz, 'suid'))
+				{
+					$return = false;
+					$error = true;
+					$errormsg = 'Sie haben keine Berechtigung';
+				}
+				else
+				{
+					$punkte = $_POST['punkte'];
+					$prestudent->punkte = $punkte;
+					$prestudent->new=false;
+
+					if($prestudent->save())
+					{
+						$return = true;
+						$error = false;
+						$errormsg = 'Erfolgreich gespeichert';
+					}
+					else
+					{
+						$return = false;
+						$error = true;
+						$errormsg = $reihungstest->errormsg;
+					}
+				}
+			}
+		}
+		else
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='AufnahmeTermineBerechneGesamtpunkte')
+	{
+		//Speichert einen Aufnahmetermin einer Person
+		if(isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']))
+		{
+			$prestudent = new prestudent();
+			if(!$prestudent->load($_POST['prestudent_id']))
+			{
+				$return = false;
+				$error = true;
+				$errormsg = $prestudent->errormsg;
+			}
+			else
+			{
+				if(!$rechte->isBerechtigt('admin', $prestudent->studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $prestudent->studiengang_kz, 'suid'))
+				{
+					$return = false;
+					$error = true;
+					$errormsg = 'Sie haben keine Berechtigung';
+				}
+				else
+				{
+					$gesamtpunkte=0;
+					$reihungstest = new reihungstest();
+					if($reihungstest->getReihungstestPerson($prestudent->person_id))
+					{
+						foreach($reihungstest->result as $row)
+							$gesamtpunkte += $row->punkte;
+
+						$return = true;
+						$error = false;
+						$data = $gesamtpunkte;
+						$errormsg = 'Erfolgreich gespeichert';
+					}
+					else
+					{
+						$return = false;
+						$error = true;
+						$errormsg = $reihungstest->errormsg;
+					}
 				}
 			}
 		}

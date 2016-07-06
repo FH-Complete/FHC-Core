@@ -82,6 +82,7 @@ function drawrow($row)
 	$oRdf->obj[$i]->setAttribut('anmeldedatum_iso',$row->anmeldedatum,true);
 	$oRdf->obj[$i]->setAttribut('teilgenommen',($row->teilgenommen?'Ja':'Nein'),true);
 	$oRdf->obj[$i]->setAttribut('punkte',$row->punkte,true);
+	$oRdf->obj[$i]->setAttribut('ort_kurzbz',$row->ort_kurzbz,true);
 	$oRdf->obj[$i]->setAttribut('reihungstest',$reihungstest_obj->datum.' '.$reihungstest_obj->anmerkung,true);
 	$oRdf->obj[$i]->setAttribut('stufe',$reihungstest_obj->stufe,true);
 
