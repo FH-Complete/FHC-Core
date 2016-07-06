@@ -118,6 +118,8 @@ class Message extends APIv1_Controller
 	{
 		$validation = $this->_validatePostMessageVorlage($this->post());
 		
+//		$this->response($this->post(), REST_Controller::HTTP_OK);
+		
 		if (is_object($validation) && $validation->error == EXIT_SUCCESS)
 		{
 			$result = $this->messagelib->sendMessageVorlage(
@@ -126,8 +128,8 @@ class Message extends APIv1_Controller
 				$this->post()['vorlage_kurzbz'],
 				$this->post()['oe_kurzbz'],
 				$this->post()['data'],
-				$this->post()['relationmessage_id'],
-				$this->post()['orgform_kurzbz']
+				isset($this->post()['relationmessage_id']) ? $this->post()['relationmessage_id'] : null,
+				isset($this->post()['orgform_kurzbz']) ? $this->post()['orgform_kurzbz'] : null
 			);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
