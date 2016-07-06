@@ -22,3 +22,4 @@ composer.lock
 bin
 /tests/codeception/api.suite.yml
 /application/logs/
+/sparks/*

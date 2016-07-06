@@ -113,6 +113,16 @@ class PhrasesLib
 		if (isset($app) && isset($sprache))
 		{
 			$result = $this->ci->PhraseModel->getPhrases($app, $sprache, $phrase, $orgeinheit_kurzbz, $orgform_kurzbz);
+			
+			if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
+			{
+				$parser = new \Netcarver\Textile\Parser();
+				
+				for ($i = 0; $i < count($result->retval); $i++)
+				{
+					$result->retval[$i]->text = $parser->textileThis($result->retval[$i]->text);
+				}
+			}
 		}
 		else
 		{

@@ -84,7 +84,8 @@
 	"zetacomponents/workflow-database-tiein": "1.*",
 	"zetacomponents/workflow-event-log-tiein": "1.*",
 	"json-forms": "1.4.0",
-    "wikimedia/composer-merge-plugin": "^1.3"
+    "wikimedia/composer-merge-plugin": "^1.3",
+    "netcarver/textile": "3.5.*"
   },
   "require-dev": 
   {
