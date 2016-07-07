@@ -66,7 +66,7 @@ echo ']>
 <hbox style="padding-top: 10px">
 
 <tree id="messages-tree" seltype="single" hidecolumnpicker="false" flex="1"
-	datasources="rdf:null" ref="http://www.technikum-wien.at/messages"
+	datasources="<?php echo APP_ROOT; ?>rdf/messages.rdf.php?foo=<?php echo time(); ?>" ref="http://www.technikum-wien.at/messages/alle"
 	style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
 	onselect="messagesAuswahl()"
 	context="messages-tree-popup"
@@ -78,7 +78,12 @@ echo ']>
 		class="sortDirectionIndicator"
 		sortActive="true"
 		sortDirection="ascending"
-		sort="rdf:http://www.technikum-wien.at/messages/rdf#betreff"/>
+		sort="rdf:http://www.technikum-wien.at/messages/rdf#subject"/>
+		<treecol id="messages-tree-body" label="Body" flex="2" hidden="false" primary="true"
+		class="sortDirectionIndicator"
+		sortActive="true"
+		sortDirection="ascending"
+		sort="rdf:http://www.technikum-wien.at/messages/rdf#body"/>
 		<treecol id="messages-tree-message_id" label="MessageID" flex="2" hidden="false"
 			class="sortDirectionIndicator"
 			sort="rdf:http://www.technikum-wien.at/messages/rdf#message_id"/>
@@ -89,7 +94,8 @@ echo ']>
 		<treechildren flex="1" >
 				<treeitem uri="rdf:*">
 				<treerow>
-					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#betreff"/>
+					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#subject"/>
+					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#body"/>
 					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#message_id"/>
 				</treerow>
 			</treeitem>

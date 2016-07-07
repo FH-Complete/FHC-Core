@@ -20,7 +20,35 @@
 require_once('../config/vilesci.config.inc.php');
 ?>
 // ********** FUNKTIONEN ********** //
-var MessagePersonID='';
+var MessagePersonID=null;
+var MessagesTreeDatasource=''; // Datasource des Adressen Trees
+var MessagesSelectID='';
+
+
+var MessagesTreeSinkObserver =
+{
+	onBeginLoad : function(pSink) {},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('messages-tree').builder.rebuild();
+	}
+};
+
+var MessagesTreeListener =
+{
+  willRebuild : function(builder) {  },
+  didRebuild : function(builder)
+  {
+  	  //timeout nur bei Mozilla notwendig da sonst die rows
+  	  //noch keine values haben. Ab Seamonkey funktionierts auch
+  	  //ohne dem setTimeout
+      //window.setTimeout(KontaktAdressenTreeSelectID,10);
+  }
+};
 
 // ****
 // * Laedt die Trees
@@ -29,4 +57,31 @@ function loadMessages(person_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	MessagePersonID = person_id;
+
+	//Adressen laden
+	url = "<?php echo APP_ROOT; ?>rdf/messages.rdf.php?person_id="+person_id+"&"+gettimestamp();
+	var tree=document.getElementById('messages-tree');
+	try
+	{
+		MessagesTreeDatasource.removeXMLSinkObserver(MessagesTreeSinkObserver);
+		tree.builder.removeListener(MessagesTreeListener);
+	}
+	catch(e)
+	{}
+
+	//Alte DS entfernen
+	var oldDatasources = tree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		tree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	MessagesTreeDatasource = rdfService.GetDataSource(url);
+	MessagesTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	MessagesTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	tree.database.AddDataSource(MessagesTreeDatasource);
+	MessagesTreeDatasource.addXMLSinkObserver(MessagesTreeSinkObserver);
+	tree.builder.addListener(MessagesTreeListener);
+
 }
