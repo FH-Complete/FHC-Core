@@ -62,7 +62,7 @@ class DBTools extends FHC_Controller
 		$this->lang->load('seed');
 
         // initiate faker
-        $this->faker = Faker\Factory::create();
+        $this->faker = \Faker\Factory::create();
  
         // load any required models
         //$this->load->model('person/Person_model');
