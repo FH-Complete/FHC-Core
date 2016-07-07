@@ -21,7 +21,7 @@ $config['roles'] = array
 			'basis/fas', 'basis/ferien', 'basis/fhausweis','basis/firma',
 			'basis/infoscreen',	'basis/moodle', 'basis/moodle','basis/news', 'basis/notiz',
 			'basis/organisationseinheit', 'basis/ort', 'basis/person', 'basis/planner',
-			'basis/service', 'basis/statistik', 'basis/studiengang', 'basis/tempus',
+			'basis/service', 'basis/statistik', 'basis/studiengang', 'basis/studiensemester', 'basis/tempus',
 			'basis/testtool', 'basis/variable', 'basis/vilesci', 'buchung/typen',
 			'buchung/mitarbeiter', 'inout/incoming', 'inout/outgoing', 'inout/uebersicht',
 			'lehre', 'lehre/abgabetool', 'lehre/freifach', 'lehre/lehrfach',

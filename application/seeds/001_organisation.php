@@ -15,8 +15,8 @@ class Seed_Organisation
 			$pre = 'INSERT INTO public.tbl_organisationseinheit VALUES (';
 			$post = '; ';
 
-			$sql = "INSERT INTO public.tbl_organisationseinheittyp VALUES ('Seminar'); ";
-			$sql .= "INSERT INTO public.tbl_organisationseinheittyp VALUES ('Lehrgang'); ";
+			//$sql .= "INSERT INTO public.tbl_organisationseinheittyp VALUES ('Seminar'); ";
+			$sql = "INSERT INTO public.tbl_organisationseinheittyp VALUES ('Lehrgang'); ";
 			$sql .= "INSERT INTO public.tbl_studiengangstyp VALUES ('d', 'Diplom'); ";
 
 			$sql .= "$pre 'fhstp', NULL, 'Fachhochschule St. Pölten', 'Erhalter', true, true, NULL, NULL, false, NULL, NULL, NULL, NULL)$post";

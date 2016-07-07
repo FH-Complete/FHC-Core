@@ -420,6 +420,8 @@ class DBTools extends FHC_Controller
 							else
 								echo '<br><span class="error">Fehler: Recht '.$b.' hinzufügen nicht möglich</span>';
 						}
+						else
+							echo "- $b -";
 					}
 				}
 				break;
@@ -449,8 +451,13 @@ class DBTools extends FHC_Controller
 								else
 									echo '<br><span class="error">Fehler: '.$role['rolle_kurzbz'].' -> '.$b.' hinzufügen nicht möglich</span>';
 							}
+							else
+								echo "- $b -";
 						}
 					}
+				break;
+			// **** Default ****
+			default: echo ' what? roles or permisssions?';
 		}
 
 		exit('Succesfully checked!');

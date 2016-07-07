@@ -6,6 +6,18 @@ class Migration_Vorlage extends CI_Migration {
 
     public function up()
     {
+		// Change PK to varchar 32
+		$query = "ALTER TABLE public.tbl_vorlage 
+					ALTER COLUMN vorlage_kurzbz TYPE varchar(32);
+				ALTER TABLE public.tbl_vorlagestudiengang 
+					ALTER COLUMN vorlage_kurzbz TYPE varchar(32);
+                ";
+		if ($this->db->simple_query($query))
+			echo 'Column public.tbl_vorlage.vorlage_kurzbz altered!';
+		else
+			echo "Error altering vorlage_kurzbz!";
+
+		
 		if (! @$this->db->simple_query('SELECT attribute FROM public.tbl_vorlage'))
 		{
 			$query = "ALTER TABLE public.tbl_vorlage 

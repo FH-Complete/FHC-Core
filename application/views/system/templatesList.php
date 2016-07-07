@@ -27,7 +27,7 @@ MimeType
 			<td><?php echo $v->bezeichnung; ?></td>
 			<td><?php echo $v->anmerkung; ?></td>
 			<td><?php echo $v->mimetype; ?></td>
-			<td><a href="view/<?php echo $v->vorlage_kurzbz; ?>">View</a></td>
+			<td><a href="view/<?php echo $v->vorlage_kurzbz; ?>">Vorlagenexte bearbeiten</a></td>
 		</tr>
 	<?php endforeach ?>
 	</tbody>
