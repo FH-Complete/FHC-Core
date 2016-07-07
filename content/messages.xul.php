@@ -60,6 +60,7 @@ echo ']>
 <vbox flex="1">
 <popupset>
 	<menupopup id="messages-tree-popup">
+		<menuitem label="Antwort" oncommand="MessagesSendAnswer();" id="messages-tree-popup-answer" hidden="false"/>
 		<menuitem label="Entfernen" oncommand="messagesDelete();" id="messages-tree-popup-delete" hidden="false"/>
 	</menupopup>
 </popupset>
@@ -102,6 +103,11 @@ echo ']>
 		</treechildren>
 	</template>
 </tree>
+</hbox>
+<hbox>
+	<button oncommand="MessagesNewMessage()" label="Neue Nachricht schicken"/>
+	<button oncommand="MessagesSendAnswer()" label="Antworten"/>
+	<spacer flex="1" />
 </hbox>
 <spacer flex="1" />
 </vbox>
