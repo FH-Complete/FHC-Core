@@ -15,8 +15,8 @@ class Studiensemester_model extends DB_Model
 	public function getLastOrAktSemester($days = 60)
 	{
 		// Checks if the operation is permitted by the API caller
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_studiensemester'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_studiensemester'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_studiensemester'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_studiensemester'), FHC_MODEL_ERROR);
 		
 		if (!is_numeric($days))
 		{
@@ -40,8 +40,8 @@ class Studiensemester_model extends DB_Model
 	public function getNextFrom($studiensemester_kurzbz)
 	{
 		// Checks if the operation is permitted by the API caller
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_studiensemester'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_studiensemester'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_studiensemester'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_studiensemester'), FHC_MODEL_ERROR);
 		
 		$query = "SELECT studiensemester_kurzbz,
 						 start,
@@ -69,8 +69,8 @@ class Studiensemester_model extends DB_Model
 	public function getNearest($semester = '')
 	{
 		// Checks if the operation is permitted by the API caller
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.vw_studiensemester'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.vw_studiensemester'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.vw_studiensemester'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.vw_studiensemester'), FHC_MODEL_ERROR);
 		
 		$query = "SELECT studiensemester_kurzbz,
 						 start,

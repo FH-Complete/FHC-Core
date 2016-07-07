@@ -18,14 +18,14 @@ class Prestudent_model extends DB_Model
 	public function getLastStatus($prestudent_id, $studiensemester_kurzbz = '', $status_kurzbz = '')
 	{
 		// Checks if the operation is permitted by the API caller
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_prestudentstatus'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_prestudentstatus'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_prestudentstatus'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_prestudentstatus'), FHC_MODEL_ERROR);
 		
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['lehre.tbl_studienplan'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['lehre.tbl_studienplan'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('lehre.tbl_studienplan'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('lehre.tbl_studienplan'), FHC_MODEL_ERROR);
 		
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_status'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_status'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_status'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_status'), FHC_MODEL_ERROR);
 		
 		$query = "SELECT tbl_prestudentstatus.*,
 						 bezeichnung AS studienplan_bezeichnung,

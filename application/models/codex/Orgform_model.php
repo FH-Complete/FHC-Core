@@ -15,8 +15,8 @@ class Orgform_model extends DB_Model
 	public function getOrgformLV()
 	{
 		// Checks if the operation is permitted by the API caller
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['bis.tbl_orgform'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['bis.tbl_orgform'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
 		
 		$query = "SELECT *
 					FROM bis.tbl_orgform

@@ -18,17 +18,17 @@ class Akte_model extends DB_Model
 	public function getAkten($person_id, $dokument_kurzbz = null, $stg_kz = null, $prestudent_id = null)
 	{
 		// Checks if the operation is permitted by the API caller
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_akte'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_akte'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
 		
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_dokument'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_dokument'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_dokument'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_dokument'), FHC_MODEL_ERROR);
 		
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_dokumentstudiengang'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_dokumentstudiengang'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_dokumentstudiengang'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_dokumentstudiengang'), FHC_MODEL_ERROR);
 		
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_dokumentprestudent'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_dokumentprestudent'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_dokumentprestudent'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_dokumentprestudent'), FHC_MODEL_ERROR);
 		
 		$query = 'SELECT akte_id,
 						 person_id,

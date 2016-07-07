@@ -6,7 +6,6 @@ class DB_Model extends FHC_Model
 	protected $pk;  		// Name of the PrimaryKey for DB-Update, Load, ...
 	protected $hasSequence;	// False if this table has a composite primary key that is not using a sequence
 							// True if this table has a primary key that uses a sequence
-	protected $acl;  		// Name of the PrimaryKey for DB-Update, Load, ...
 	
 	function __construct($dbTable = null, $pk = null, $hasSequence = true)
 	{
@@ -15,7 +14,6 @@ class DB_Model extends FHC_Model
 		$this->pk = $pk;
 		$this->hasSequence = $hasSequence;
 		$this->load->database();
-		$this->acl = $this->config->item('fhc_acl');
 	}
 
 	/** ---------------------------------------------------------------
@@ -31,8 +29,8 @@ class DB_Model extends FHC_Model
 			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
 
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 'i'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 'i'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
 
 		// DB-INSERT
 		if ($this->db->insert($this->dbTable, $data))
@@ -76,8 +74,8 @@ class DB_Model extends FHC_Model
 			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
 		
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 'ui'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 'ui'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
 
 		// DB-REPLACE
 		if ($this->db->replace($this->dbTable, $data))
@@ -102,8 +100,8 @@ class DB_Model extends FHC_Model
 			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
 		
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 'u'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 'u'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
 
 		// DB-UPDATE
 		// Check for composite Primary Key
@@ -140,8 +138,8 @@ class DB_Model extends FHC_Model
 		// Check rights only if this method is called from a model
 		//var_dump(get_called_class());
 		if (substr(get_called_class(), -6) == '_model')
-			if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 's'))
-				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
+			if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 's'))
+				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
 
 		// DB-SELECT
 		// Check for composite Primary Key
@@ -178,8 +176,8 @@ class DB_Model extends FHC_Model
 		// Check rights only if this method is called from a model
 		//var_dump(get_called_class());
 		if (substr(get_called_class(), -6) == '_model')
-			if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 's'))
-				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
+			if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 's'))
+				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
 
 		// DB-SELECT
 		if (is_null($where))
@@ -207,8 +205,8 @@ class DB_Model extends FHC_Model
 		// Check rights only if this method is called from a model
 		//var_dump(get_called_class());
 		if (substr(get_called_class(), -6) == '_model')
-			if (! $this->fhc_db_acl->isBerechtigt($this->acl[$joinTable], 's'))
-			 return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$joinTable], FHC_MODEL_ERROR);
+			if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($joinTable), 's'))
+			 return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($joinTable), FHC_MODEL_ERROR);
 
 		$this->db->join($joinTable, $cond, $type);
 		
@@ -297,8 +295,8 @@ class DB_Model extends FHC_Model
 		// Check rights only if this method is called from a model
 		//var_dump(get_called_class());
 		if (substr(get_called_class(), -6) == '_model')
-			if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->dbTable], 'd'))
-				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->dbTable], FHC_MODEL_ERROR);
+			if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 'd'))
+				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
 
 		// DB-DELETE
 		// Check for composite Primary Key

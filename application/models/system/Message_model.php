@@ -75,14 +75,14 @@ class Message_model extends DB_Model
 	public function getMessagesByPerson($person_id, $all)
 	{
 		// Check wrights
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_msg_recipient'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_msg_recipient'], FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_msg_message'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_msg_message'], FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_person'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_person'], FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_msg_status'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_msg_status'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_msg_recipient'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_msg_recipient'), FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_msg_message'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_msg_message'), FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_person'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_person'), FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_msg_status'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_msg_status'), FHC_MODEL_ERROR);
 		
 		$sql = 'SELECT r.message_id,
 						m.person_id,
@@ -109,12 +109,12 @@ class Message_model extends DB_Model
 	public function getMessagesByToken($token)
 	{
 		// Check wrights
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_msg_recipient'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_msg_recipient'], FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_msg_message'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_msg_message'], FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl['public.tbl_msg_status'], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl['public.tbl_msg_status'], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_msg_recipient'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_msg_recipient'), FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_msg_message'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_msg_message'), FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_msg_status'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_msg_status'), FHC_MODEL_ERROR);
 		
 		$sql = 'SELECT r.message_id,
 						r.person_id as receiver_id,

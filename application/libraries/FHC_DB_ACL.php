@@ -54,7 +54,14 @@ class FHC_DB_ACL
 
 	function isBerechtigt($berechtigung_kurzbz, $art = null,  $oe_kurzbz = null,  $kostenstelle_id = null)
 	{
-		$this->bb->getBerechtigungen(getAuthUID());
-		return $this->bb->isBerechtigt($berechtigung_kurzbz, $oe_kurzbz, $art, $kostenstelle_id);
+		if (!is_null($berechtigung_kurzbz))
+		{
+			$this->bb->getBerechtigungen(getAuthUID());
+			return $this->bb->isBerechtigt($berechtigung_kurzbz, $oe_kurzbz, $art, $kostenstelle_id);
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

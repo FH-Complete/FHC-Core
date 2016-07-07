@@ -9,7 +9,6 @@ class FS_Model extends FHC_Model
 	{
 		parent::__construct();
 		$this->load->library('FilesystemLib');
-		$this->acl = $this->config->item('fhc_acl');
 		$this->filepath = $filepath;
 	}
 	
@@ -29,8 +28,8 @@ class FS_Model extends FHC_Model
 			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
 
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->filepath], 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->filepath], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->filepath), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->filepath), FHC_MODEL_ERROR);
 		
 		if (!is_null($data = $this->filesystemlib->read($this->filepath, $filename)))
 		{
@@ -61,8 +60,8 @@ class FS_Model extends FHC_Model
 			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
 
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->filepath], 'i'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->filepath], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->filepath), 'i'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->filepath), FHC_MODEL_ERROR);
 
 		if ($this->filesystemlib->write($this->filepath, $filename, base64_decode($content)) === true)
 		{
@@ -93,8 +92,8 @@ class FS_Model extends FHC_Model
 			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
 
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->filepath], 'i'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->filepath], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->filepath), 'i'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->filepath), FHC_MODEL_ERROR);
 
 		if ($this->filesystemlib->append($this->filepath, $filename, base64_decode($content)) === true)
 		{
@@ -123,8 +122,8 @@ class FS_Model extends FHC_Model
 			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
 
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->filepath], 'd'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->filepath], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->filepath), 'd'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->filepath), FHC_MODEL_ERROR);
 
 		if ($this->filesystemlib->remove($this->filepath, $filename) === true)
 		{
@@ -155,8 +154,8 @@ class FS_Model extends FHC_Model
 			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
 		
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->acl[$this->filepath], 'u'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->acl[$this->filepath], FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->filepath), 'u'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->filepath), FHC_MODEL_ERROR);
 
 		if ($this->filesystemlib->rename($this->filepath, $filename, $this->filepath, $newFilename) === true)
 		{
