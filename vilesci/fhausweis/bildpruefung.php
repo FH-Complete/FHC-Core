@@ -322,11 +322,11 @@ $qry_anzahl_mitarbeiter = "
 						WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 		AND uid IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)
 	";
-$anzahl = '';
+$anzahl_ma = '';
 if($result_anzahl = $db->db_query($qry_anzahl_mitarbeiter))
 	if($row_anzahl = $db->db_fetch_object($result_anzahl))
-		$anzahl = $row_anzahl->anzahl;
-echo '<br>Mitarbeiter: '.$anzahl;
+		$anzahl_ma = $row_anzahl->anzahl;
+echo '<br>Mitarbeiter: '.$anzahl_ma;
 
 //anzahl studenten
 $qry_anzahl_studenten = "
@@ -345,11 +345,11 @@ $qry_anzahl_studenten = "
 						WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 		AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)
 	";
-$anzahl = '';
+$anzahl_std = '';
 if($result_anzahl = $db->db_query($qry_anzahl_studenten))
 	if($row_anzahl = $db->db_fetch_object($result_anzahl))
-		$anzahl = $row_anzahl->anzahl;
-echo '<br>Studenten: '.$anzahl;
+		$anzahl_std = $row_anzahl->anzahl;
+echo '<br>Studenten: '.$anzahl_std;
 
 //anzahl gesamt
 $qry_anzahl_gesamt = "
@@ -366,11 +366,11 @@ $qry_anzahl_gesamt = "
 		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
 						WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 	";
-$anzahl = '';
+$anzahl_gesamt = '';
 if($result_anzahl = $db->db_query($qry_anzahl_gesamt))
 	if($row_anzahl = $db->db_fetch_object($result_anzahl))
-		$anzahl = $row_anzahl->anzahl;
-	echo '<br>Gesamt: '.$anzahl.'<br />';
+		$anzahl_gesamt = $row_anzahl->anzahl;
+	echo '<br>Gesamt: '.$anzahl_gesamt.'<br />';
 
 echo '<form action="'.$_SERVER['PHP_SELF'].'?ansicht=mitarbeiter" method="POST" style="float:left; margin-left:44%">
 		<input type="submit" name="MitarbeiterSubmit" id="MitarbeiterSubmit" value="Mitarbeiter" ';  if (isset($_GET['ansicht']) && $_GET['ansicht'] == 'mitarbeiter') echo 'disabled'; echo '/></form>';
@@ -403,7 +403,7 @@ else
 {
 	// Wenn es weniger als 100 Eintraege sind kommen die Bilder nicht mehr Random, da es sonst
 	// vorkommen kann, dass kein Ergebnis geliefert wird
-	if($anzahl>100)
+	if(isset($_GET['ansicht']) && (($_GET['ansicht'] == 'mitarbeiter' && $anzahl_ma>100) || ($_GET['ansicht'] == 'studenten' && $anzahl_std>100)) || ($ansicht == '' && $anzahl_gesamt>100))
 	{
 		// Zufaellige Reihenfolge
 		$qry.=" AND random() <0.05";
@@ -438,7 +438,7 @@ if($result = $db->db_query($qry))
 				<td>
 				Vorname: '.$db->convert_html_chars($row->vorname).'<br>
 				Nachname: '.$db->convert_html_chars($row->nachname).'<br>
-				'.($row->mitarbeiter=='1'?'Mitarbeiter':'Student').'
+				'.($row->mitarbeiter=='1'?'MitarbeiterIn':'StudentIn').'
 				</td>
 			</tr>
 		</table>';
