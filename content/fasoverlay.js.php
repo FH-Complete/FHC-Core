@@ -1185,6 +1185,24 @@ function StatistikPrintStudentExportExtended()
 }
 
 // ****
+// * Zeigt HTML Seite zum Erstellen neuer Nachrichten
+// ****
+function MessageNew()
+{
+	var tree = document.getElementById('student-tree');
+
+	if(tree.currentIndex==-1)
+	{
+		alert("Bitte markieren Sie zuerst eine Person");
+	}
+	else
+	{
+		var person_id = getTreeCellText(tree, 'student-treecol-person_id', tree.currentIndex);
+		window.open('<?php echo APP_ROOT ?>/index.ci.php/system/Messages/outbox/'+person_id,'Outbox','');
+	}
+}
+
+// ****
 // * Zeigt HTML Seite zur Bearbeitung der Reihungstests an
 // ****
 function ExtrasShowReihungstest()
@@ -1767,7 +1785,7 @@ function PrintStudienblatt(event)
 {
 	var tree = document.getElementById('student-prestudent-tree-rolle');
 	var ss = document.getElementById('statusbarpanel-semester').label;
-	
+
 	var items = tree.view.rowCount;
 
 	try

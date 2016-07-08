@@ -1,5 +1,5 @@
-<!ENTITY window.title			"FAS"> 
-<!ENTITY window.version			"3.2a"> 
+<!ENTITY window.title			"FAS">
+<!ENTITY window.version			"3.2a">
 
 <!-- MENUE -->
 
@@ -296,6 +296,15 @@
 <!ENTITY menu-cis-notenliste.key		"N">
 <!ENTITY menu-cis-notenliste.label		"Notenliste">
 <!ENTITY menu-cis-notenliste.accesskey	"N">
+
+<!-- MESSAGES -->
+<!ENTITY menu-messages.label		"Nachrichten">
+<!ENTITY menu-messages.accesskey	"N">
+
+<!ENTITY menu-messages-new.key		"N">
+<!ENTITY menu-messages-new.label		"Neue Nachricht erstellen">
+<!ENTITY menu-messages-new.accesskey	"N">
+
 
 <!-- Extras -->
 <!ENTITY menu-extras.label		"Extras">

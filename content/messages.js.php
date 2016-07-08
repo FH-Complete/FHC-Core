@@ -85,3 +85,29 @@ function loadMessages(person_id)
 	tree.builder.addListener(MessagesTreeListener);
 
 }
+
+
+// ****
+// * Zeigt HTML Seite zum Erstellen neuer Nachrichten
+// ****
+function MessagesNewMessage()
+{
+	window.open('<?php echo APP_ROOT ?>/index.ci.php/system/Messages/outbox/'+MessagePersonID,'Outbox','');
+}
+
+/**
+ * Oeffnet Nachrichtenseite um eine Antwort auf eine Nachricht zu schicken
+ */
+function MessagesSendAnswer()
+{
+	var tree=document.getElementById('messages-tree');
+	if(tree.currentIndex==-1)
+	{
+		alert("Bitte markieren Sie zuerst eine Nachricht");
+	}
+	else
+	{
+		var MessageId = getTreeCellText(tree, 'messages-tree-message_id', tree.currentIndex);
+		window.open('<?php echo APP_ROOT ?>/index.ci.php/system/Messages/outbox/'+MessagePersonID+'/'+MessageId,'Outbox','');
+	}
+}

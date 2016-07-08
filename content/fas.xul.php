@@ -149,6 +149,7 @@ foreach($addon_obj->result as $addon)
   <command id="menu-dokumente-ausbildungsvertrag_englisch:command" oncommand="StudentPrintAusbildungsvertragEnglisch(event);"/>
   <command id="menu-cis-studienplan:command" oncommand="StudentCisStudienplan(event);"/>
   <command id="menu-cis-notenliste:command" oncommand="StudentCisNotenliste(event);"/>
+  <command id="menu-messages-new:command" oncommand="MessageNew(event);"/>
   <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>
   <command id="menu-extras-firma:command" oncommand="ExtrasShowFirmenverwaltung();"/>
   <command id="menu-extras-lvverwaltung:command" oncommand="ExtrasShowLVverwaltung();"/>
@@ -741,6 +742,17 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-cis-notenliste.label;"
                command   =  "menu-cis-notenliste:command"
                accesskey = "&menu-cis-notenliste.accesskey;"/>
+          </menupopup>
+    </menu>
+	<!-- ***** CIS ***** -->
+    <menu id="menu-messages" label="&menu-messages.label;" accesskey="&menu-messages.accesskey;">
+          <menupopup id="menu-messages-popup">
+            <menuitem
+               id        =  "menu-messages-new"
+               key       =  "menu-messages-new:key"
+               label     = "&menu-messages-new.label;"
+               command   =  "menu-messages-new:command"
+               accesskey = "&menu-messages-new.accesskey;"/>
           </menupopup>
     </menu>
     <!-- ***** Zusatzmenues inkludieren ***** -->
