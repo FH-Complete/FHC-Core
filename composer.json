@@ -85,11 +85,11 @@
 	"zetacomponents/workflow-event-log-tiein": "1.*",
 	"json-forms": "1.4.0",
     "wikimedia/composer-merge-plugin": "^1.3",
+	"fzaninotto/faker": "1.*",
     "netcarver/textile": "3.5.*"
   },
   "require-dev": 
   {
-    "fzaninotto/faker": "1.*",
     "squizlabs/php_codesniffer": "2.*"
   },
   "config":
