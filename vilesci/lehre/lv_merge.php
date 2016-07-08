@@ -112,12 +112,22 @@ if (isset($_REQUEST['compare']))
 		$msg .= '</tr></thead><tbody><tr>';
 		foreach ($lv_diff1 as $key => $value)
 		{
-			$msg .= '<td>'.(is_bool($value)?($value?'<img src="../../skin/images/true.png" alt="true">':'<img src="../../skin/images/false.png" alt="false">'):$value).'</td>';
+			if (is_bool($value))
+				$msg .= '<td>'.($value?'<img src="../../skin/images/true.png" alt="true">':'<img src="../../skin/images/false.png" alt="false">').'</td>';
+			elseif ($key == 'farbe')
+				$msg .= '<td>'.$value.' <span id="farbevorschau" style="background-color: #'.$value.'; border: 1px solid #999999; cursor: default;">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>';
+			else
+				$msg .= '<td>'.$value.'</td>';
 		}
 		$msg .= '</tr><tr>';
 		foreach ($lv_diff2 as $key => $value)
 		{
-			$msg .= '<td>'.(is_bool($value)?($value?'<img src="../../skin/images/true.png" alt="true">':'<img src="../../skin/images/false.png" alt="false">'):$value).'</td>';
+			if (is_bool($value))
+				$msg .= '<td>'.($value?'<img src="../../skin/images/true.png" alt="true">':'<img src="../../skin/images/false.png" alt="false">').'</td>';
+			elseif ($key == 'farbe')
+				$msg .= '<td>'.$value.' <span id="farbevorschau" style="background-color: #'.$value.'; border: 1px solid #999999; cursor: default;">&nbsp;&nbsp;&nbsp;&nbsp;</span></td>';
+			else
+				$msg .= '<td>'.$value.'</td>';
 		}
 		$msg .= '</tr></tbody></table>';
 	}
@@ -133,6 +143,9 @@ if((isset($_REQUEST['transfer']) || isset($_REQUEST['mergeDelete'])) && isset($c
 	}
 	else
 	{
+		if(!$rechte->isBerechtigt('lehre/lehrveranstaltung', NULL, 'sui'))
+			die($rechte->errormsg);
+		
 		$msg='';
 		$update_qry="BEGIN;";
 
@@ -208,6 +221,9 @@ if((isset($_REQUEST['transfer']) || isset($_REQUEST['mergeDelete'])) && isset($c
 		
 		if (isset($_REQUEST['mergeDelete']))
 		{
+			if(!$rechte->isBerechtigt('lehre/lehrveranstaltung', NULL, 'suid'))
+				die($rechte->errormsg);
+
 			$update_qry.="UPDATE campus.tbl_benutzerlvstudiensemester SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
 			$update_qry.="UPDATE campus.tbl_feedback SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
 			$update_qry.="UPDATE campus.tbl_lehrveranstaltung_pruefung SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
@@ -623,22 +639,25 @@ echo '<input type="hidden" name="select_orgform_right" value="'.$select_orgform_
 echo '<input type="hidden" name="select_lehrtyp_right" value="'.$select_lehrtyp_right.'">';
 echo '<input type="hidden" name="select_studienplan_right" value="'.$select_studienplan_right.'">';
 
-echo '	<input type="submit" name="transfer" value="Transfer for" style="margin: 3px 0 3px 0; background-color: #faebcc; color: #8a6d3b;" onclick="return confirm(\'Are you sure you want to transfer the these courses?\')">';
-
-echo '	<select name="studiensemester_kurzbz" id="studiensemester_kurzbz">';
-$studiensemester = new studiensemester();
-$studiensemester->getAll();
-foreach ($studiensemester->studiensemester as $row)
+if($rechte->isBerechtigt('lehre/lehrveranstaltung', NULL, 'sui'))
 {
-	if($studiensemester_kurzbz==$row->studiensemester_kurzbz)
-		$selected = 'selected';
-		else
-			$selected = '';
-			echo '<option value="'.$db->convert_html_chars($row->studiensemester_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row->studiensemester_kurzbz).'</option>';
+	echo '	<input type="submit" name="transfer" value="Transfer for" style="margin: 3px 0 3px 0; background-color: #faebcc; color: #8a6d3b;" onclick="return confirm(\'Are you sure you want to transfer the these courses?\')">';
+	
+	echo '	<select name="studiensemester_kurzbz" id="studiensemester_kurzbz">';
+	$studiensemester = new studiensemester();
+	$studiensemester->getAll();
+	foreach ($studiensemester->studiensemester as $row)
+	{
+		if($studiensemester_kurzbz==$row->studiensemester_kurzbz)
+			$selected = 'selected';
+			else
+				$selected = '';
+				echo '<option value="'.$db->convert_html_chars($row->studiensemester_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row->studiensemester_kurzbz).'</option>';
+	}
+	echo '</select> | ';
 }
-echo '</select> | ';
-
-echo '	<input type="submit" name="mergeDelete" value="Merge and Delete" style="width: 200px; margin: 3px 0 3px 0; background-color: #f2dede; color: #a94442;" onclick="return confirm(\'Are you sure you want to merge these courses?\nThe left course will be deleted\')"> | ';
+if($rechte->isBerechtigt('lehre/lehrveranstaltung', NULL, 'suid'))
+	echo '	<input type="submit" name="mergeDelete" value="Merge and Delete" style="width: 200px; margin: 3px 0 3px 0; background-color: #f2dede; color: #a94442;" onclick="return confirm(\'Are you sure you want to merge these courses?\nThe left course will be deleted\')"> | ';
 
 echo '	<input type="submit" name="compare" value="Compare" style="width: 200px; margin: 3px 0 3px 0; background-color: #dff0d8; color: #3c763d;">';
 
