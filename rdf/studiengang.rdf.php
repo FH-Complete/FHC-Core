@@ -54,15 +54,15 @@ foreach ($studiengangDAO->result as $sg)
 	?>
   <RDF:li>
       	<RDF:Description  id="<?php echo $sg->studiengang_kz; ?>"  about="<?php echo $rdf_url.'/'.$sg->studiengang_kz; ?>" >
-        	<STUDIENGANG:studiengang_kz><?php echo $sg->studiengang_kz  ?></STUDIENGANG:studiengang_kz>
-    		<STUDIENGANG:kurzbz><?php echo $sg->kurzbz  ?></STUDIENGANG:kurzbz>
-    		<STUDIENGANG:kurzbzlang><?php echo $sg->kurzbzlang  ?></STUDIENGANG:kurzbzlang>
-			<STUDIENGANG:bezeichnung><?php echo $sg->bezeichnung  ?></STUDIENGANG:bezeichnung>
-			<STUDIENGANG:max_semester><?php echo $sg->max_semester  ?></STUDIENGANG:max_semester>
-			<STUDIENGANG:typ><?php echo $sg->typ  ?></STUDIENGANG:typ>
-			<STUDIENGANG:farbe><?php echo $sg->farbe  ?></STUDIENGANG:farbe>
-			<STUDIENGANG:email><?php echo $sg->email  ?></STUDIENGANG:email>
-			<STUDIENGANG:kuerzel><?php echo $sg->kuerzel  ?></STUDIENGANG:kuerzel>
+        	<STUDIENGANG:studiengang_kz><![CDATA[<?php echo $sg->studiengang_kz  ?>]]></STUDIENGANG:studiengang_kz>
+    		<STUDIENGANG:kurzbz><![CDATA[<?php echo $sg->kurzbz  ?>]]></STUDIENGANG:kurzbz>
+    		<STUDIENGANG:kurzbzlang><![CDATA[<?php echo $sg->kurzbzlang  ?>]]></STUDIENGANG:kurzbzlang>
+			<STUDIENGANG:bezeichnung><![CDATA[<?php echo $sg->bezeichnung  ?>]]></STUDIENGANG:bezeichnung>
+			<STUDIENGANG:max_semester><![CDATA[<?php echo $sg->max_semester  ?>]]></STUDIENGANG:max_semester>
+			<STUDIENGANG:typ><![CDATA[<?php echo $sg->typ  ?>]]></STUDIENGANG:typ>
+			<STUDIENGANG:farbe><![CDATA[<?php echo $sg->farbe  ?>]]></STUDIENGANG:farbe>
+			<STUDIENGANG:email><![CDATA[<?php echo $sg->email  ?>]]></STUDIENGANG:email>
+			<STUDIENGANG:kuerzel><![CDATA[<?php echo $sg->kuerzel  ?>]]></STUDIENGANG:kuerzel>
       	</RDF:Description>
   </RDF:li>
 	  <?php
