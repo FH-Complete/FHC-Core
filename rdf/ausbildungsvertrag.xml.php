@@ -307,7 +307,34 @@ foreach($prestudent_arr as $prest_id)
 					echo "\t\t<studiengangSprache>".$studiengang->sprache."</studiengangSprache>";
 	
 					echo "\t\t<aktuellesJahr>".date('Y')."</aktuellesJahr>";
-	
+					
+					$prestudent_orgform = new prestudent();
+					$prestudent_orgform->getLastStatus($prest_id, null, null);
+						
+					if($prestudent_orgform->orgform_kurzbz!='')
+						$orgform = $prestudent_orgform->orgform_kurzbz;
+					else
+						$orgform = $studiengang->orgform_kurzbz;
+						
+					echo "\t\t<orgform>".$orgform."</orgform>\n";
+					
+					// check ob Quereinsteiger
+					$ausbildungssemester = ($prestudent_orgform->ausbildungssemester!='')?$prestudent_orgform->ausbildungssemester:'1';
+					echo "\t\t<semesterStudent>".$ausbildungssemester."</semesterStudent>";
+
+					$prestudent = new prestudent();
+
+					$studiensemester_beginn = new studiensemester();
+					$studienbeginn = ($prestudent->getFirstStatus($prest_id, 'Student'))?$prestudent->studiensemester_kurzbz:'';
+					$studiensemester_beginn->load($studienbeginn);
+					
+					echo "\t\t<studiensemester_beginn>".$studiensemester_beginn->bezeichnung."</studiensemester_beginn>";
+					
+					$studiensemester_endedatum = new studiensemester();
+					$studiensemester_endedatum->load($studiensemester_endedatum->getaktorNext(1));
+					
+					echo "\t\t<studiensemester_endedatum>".date('d.m.Y',strtotime($studiensemester_endedatum->ende))."</studiensemester_endedatum>";
+
 					switch($studiengang->typ)
 					{
 						case 'b':
@@ -332,6 +359,10 @@ foreach($prestudent_arr as $prest_id)
 					echo "\t\t<studiengang_maxsemester>".$studiengang->max_semester."</studiengang_maxsemester>\n";
 					echo "\t\t<studiengang_anzahljahre>".($studiengang->max_semester/2)."</studiengang_anzahljahre>\n";
 					
+					//Wenn Quereinsteiger stimmt studiengang_maxsemester nicht mit der tatsaechlichen Ausbildungsdauer ueberein
+					$student_maxsemester = ($studiengang->max_semester-$ausbildungssemester)+1;
+					echo "\t\t<student_maxsemester>".$student_maxsemester."</student_maxsemester>\n";
+					echo "\t\t<student_anzahljahre>".($student_maxsemester/2)."</student_anzahljahre>\n";
 					
 					//Bis die Akadgrad-Tabelle an die Studienordnung angepasst ist, wird der Akadgrad hier ermittelt
 					
@@ -370,18 +401,6 @@ foreach($prestudent_arr as $prest_id)
 							break;
 						}
 					}
-					$prestudent_orgform = new prestudent();
-					$prestudent_orgform->getLastStatus($prest_id, null, null);
-						
-					if($prestudent_orgform->orgform_kurzbz!='')
-						$orgform = $prestudent_orgform->orgform_kurzbz;
-					else
-						$orgform = $studiengang->orgform_kurzbz;
-						
-					echo "\t\t<orgform>".$orgform."</orgform>\n";
-					
-					$ausbildungssemester = ($prestudent_orgform->ausbildungssemester!='')?$prestudent_orgform->ausbildungssemester:'1';
-					echo "\t\t<semesterStudent>".$ausbildungssemester."</semesterStudent>";
 			}
 		}
 		echo "\t</ausbildungsvertrag>\n";
