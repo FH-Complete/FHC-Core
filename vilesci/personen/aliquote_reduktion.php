@@ -245,7 +245,7 @@
 
 						aqr.studenten.forEach(function(j)
 						{
-							if((j.applicant || j.selected))
+							if(j.rt_gesamtpunkte !== null  && j.rt_gesamtpunkte > 0)
 								allCountedStudents.push(j);
 						});
 
@@ -253,33 +253,31 @@
 						if(applicantCount > allCountedStudents.length)
 							applicantCount = allCountedStudents.length;
 
-
 						zgvs.forEach(function(i)
 						{
 							var applicantsFromZGV = [];
 
 							aqr.studenten.forEach(function(j)
 							{
-								if((j.applicant || j.selected) && j.bezeichnung === i)
+								if((j.rt_gesamtpunkte !== null  && j.rt_gesamtpunkte > 0) && j.bezeichnung === i)
 									applicantsFromZGV.push(j);
 							});
 
 							// calculate the aliquote reduction for every ZGV
 							var percent = applicantsFromZGV.length / allCountedStudents.length * 100;
-							var neededFromZGV = (applicantCount / 100 * percent);
+							var neededFromZGV = (applicantCount / 100 * percent) - aqr.getAcceptedCount(i);
 
 							if(neededFromZGV < 0)
 								neededFromZGV = 0;
 
-							zgvElems.push({name:i, needed:neededFromZGV, percent:percent, accepted: aqr.getAcceptedCount(i), overallNeeded: (applicantCount / 100 * percent) + aqr.getAcceptedCount(i)});
+							zgvElems.push({name:i, needed:neededFromZGV, percent:percent, accepted: aqr.getAcceptedCount(i), overallNeeded: neededFromZGV + aqr.getAcceptedCount(i)});
 						});
-						aqr.zgvElems = JSON.parse(JSON.stringify(zgvElems));
 
 						// calculate the already distributed students
 						var residual = 0;
 						zgvElems.forEach(function(i)
 						{
-							residual += i.needed;
+							residual += parseInt(i.needed);
 						});
 
 						// calculate the difference from needed to already distributed
@@ -292,11 +290,13 @@
 							{
 								if(resDiff > 0)
 								{
+									i.overallNeeded ++;
 									i.needed ++;
 									resDiff --;
 								}
 							});
 						}
+						aqr.zgvElems = JSON.parse(JSON.stringify(zgvElems));
 						aqr.recursiveChoose(neededStudentsCount, zgvElems);
 					}
 				}

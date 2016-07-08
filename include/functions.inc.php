@@ -366,7 +366,7 @@ function getStudiensemesterFromDatum($datum, $naechstes=true)
 	$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE";
 
 	if($naechstes)
-		$qry.= " ende>".$db->db_add_param($datum)." ORDER BY ende ASC ";
+		$qry.= " ende>=".$db->db_add_param($datum)." ORDER BY ende ASC ";
 	else
 		$qry.= " start<".$db->db_add_param($datum)." ORDER BY ende DESC ";
 
