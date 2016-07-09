@@ -57,11 +57,11 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
 ';
 }
 if (isset($_GET['person_id']) && is_numeric($_GET['person_id']))
-	$where = " where person_id = ".$_GET['person_id'];
+	$where = " where r.person_id = ".$_GET['person_id'];
 else
 	$where = '';
 
-$qry = "SELECT * FROM public.tbl_msg_message".$where." ORDER BY message_id";
+$qry = "SELECT m.* FROM public.tbl_msg_message m join public.tbl_msg_recipient r using(message_id)".$where." ORDER BY message_id";
 $db = new basis_db();
 
 if($db->db_query($qry))
