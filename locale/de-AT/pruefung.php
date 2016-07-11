@@ -106,6 +106,8 @@ $this->phrasen['pruefung/kollisionMitAnderemTermin'] = 'Kollision mit anderem Te
 $this->phrasen['pruefung/terminNichtInDerVergangenheit'] = 'Prüfungstermin liegt nicht in der Vergangenheit.';
 $this->phrasen['pruefung/keineLehreinheitenVorhanden'] = 'Keine Lehreinheiten vorhanden.';
 $this->phrasen['pruefung/keineAnmeldungenVorhanden'] = 'Keine Anmeldungen vorhanden.';
+$this->phrasen['pruefung/derLektor'] = 'Lektor';
+$this->phrasen['pruefung/dieKommission'] = 'Kommission';
 
 // anmeldungen Verwalten
 $this->phrasen['pruefung/anmeldungenVerwaltenTitle'] = 'Prüfungsanmeldung Verwaltung';

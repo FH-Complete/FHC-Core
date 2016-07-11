@@ -754,6 +754,11 @@ function getAnmeldungenTermin()
     $pruefungstermin = new pruefungstermin($pruefungstermin_id);
     $pruefungsanmeldung = new pruefungsanmeldung();
     $pruefungstermin->anmeldungen = $pruefungsanmeldung->getAnmeldungenByTermin($pruefungstermin_id, $lehrveranstaltung_id);
+	$lv = new lehrveranstaltung($lehrveranstaltung_id);
+	$pruefungstermin->lv_bezeichnung = $lv->bezeichnung;
+	$pruefungstermin->lv_lehrtyp = $lv->lehrtyp_kurzbz;
+	$datum = new DateTime($pruefungstermin->von);
+	$pruefungstermin->datum = $datum->format('d.m.Y');
     foreach($pruefungstermin->anmeldungen as $a)
     {
 	$student = new student($a->uid);
