@@ -741,6 +741,9 @@ function writeAnmeldungen(data)
 		var pruefung_id = data.result.anmeldungen[0].pruefung_id;
 		var lehrveranstaltung_id = data.result.anmeldungen[0].lehrveranstaltung_id;
 		var ort_kurzbz = data.result.ort_kurzbz;
+		var lv_bezeichnung = data.result.lv_bezeichnung;
+		var lv_lehrtyp = data.result.lv_lehrtyp;
+		var prf_termin = data.result.datum;
 		var liste = "<ul id='sortable'>";
 		var count = 0;
 		var studiensemester = $("#filter_studiensemester option:selected").val();
@@ -776,6 +779,7 @@ function writeAnmeldungen(data)
 		liste += "</ul>";
 		$("#anmeldung_hinzufuegen").html("<input id='anmeldung_hinzufuegen_uid' type='text' placeholder='StudentIn-UID' /><input type='button' value='<?php echo $p->t('global/hinzufuegen'); ?>' onclick='saveAnmeldung(\""+lehrveranstaltung_id+"\",\""+terminId+"\");'/>");
 		$("#reihungSpeichernButton").html("<input type='button' value='<?php echo $p->t('pruefung/reihungSpeichern'); ?>' onclick='saveReihung(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'>");
+		$("#lvdaten").html(lv_bezeichnung+" ("+prf_termin+")");
 		$("#anmeldeDaten").html(liste);
 		$("#listeDrucken").html("<a href='./pruefungsanmeldungen_liste.php?termin_id="+terminId+"&lehrveranstaltung_id="+lehrveranstaltung_id+"&studiensemester="+studiensemester+"' target='_blank'><?php echo $p->t('pruefung/listeDrucken'); ?></a>");
 		if(ort_kurzbz !== null)

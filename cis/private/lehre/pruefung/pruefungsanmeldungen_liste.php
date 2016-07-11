@@ -253,9 +253,10 @@ $rechte->getBerechtigungen($uid);
 			    else
 			    {
 				$date =  $datum->formatDatum($prfTermin->von,"d.m.Y - H:i");
+				$count++;
 			    }
 			    echo '<tr>';
-				echo '<td>'.$anmeldung->reihung.'</td>';
+				echo '<td>'.$count.'</td>';
 				echo '<td>'.$student->vorname.'</td>';
 				echo '<td>'.$student->nachname.'</td>';
 				echo '<td>'.$student->matr_nr.'</td>';
