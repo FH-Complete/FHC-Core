@@ -106,6 +106,8 @@ $this->phrasen['pruefung/kollisionMitAnderemTermin'] = 'Date sovrapposte.';
 $this->phrasen['pruefung/terminNichtInDerVergangenheit'] = 'La data dell’appello non è nel passato.';
 $this->phrasen['pruefung/keineLehreinheitenVorhanden'] = 'Nessun corso disponibile.';
 $this->phrasen['pruefung/keineAnmeldungenVorhanden'] = 'Nessun studente iscritto.';
+$this->phrasen['pruefung/derLektor'] = 'Docente';
+$this->phrasen['pruefung/dieKommission'] = 'Commissione';
 
 // anmeldungen Verwalten
 $this->phrasen['pruefung/anmeldungenVerwaltenTitle'] = 'Gestione delle prenotazioni degli appelli';
