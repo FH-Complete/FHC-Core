@@ -11,9 +11,7 @@ documents/
 .buildpath
 application/config/development/
 tests/codeception/_output/*
-tests/codeception/_support/*
 tests/codeception/tests/_output/*
-tests/codeception/tests/_support/*
 tests/codeception/codeception.yml
 tests/codeception/tests/api.suite.yml
 tests/codeception/tests/functional.suite.yml
