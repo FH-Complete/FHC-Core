@@ -31,6 +31,7 @@ require_once('../include/akadgrad.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/nation.class.php');
 require_once('../include/prestudent.class.php');
+require_once('../include/studienplan.class.php');
 
 $uid_arr = (isset($_REQUEST['uid'])?$_REQUEST['uid']:null);
 $prestudent_arr = (isset($_REQUEST['prestudent_id'])?$_REQUEST['prestudent_id']:null);
@@ -317,6 +318,12 @@ foreach($prestudent_arr as $prest_id)
 						$orgform = $studiengang->orgform_kurzbz;
 						
 					echo "\t\t<orgform>".$orgform."</orgform>\n";
+					
+					//Sprache des Studienplans holen
+					$studienplan = new studienplan();
+					$studienplan->loadStudienplan($prestudent_orgform->studienplan_id);
+					
+					echo "\t\t<studienplan_sprache>".$studienplan->sprache."</studienplan_sprache>\n";
 					
 					// check ob Quereinsteiger
 					$ausbildungssemester = ($prestudent_orgform->ausbildungssemester!='')?$prestudent_orgform->ausbildungssemester:'1';
