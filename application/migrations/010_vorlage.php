@@ -2,7 +2,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Migration_Vorlage extends CI_Migration {
+class Migration_Vorlage extends CI_Migration
+{
 
     public function up()
     {
@@ -17,7 +18,19 @@ class Migration_Vorlage extends CI_Migration {
 		else
 			echo "Error altering vorlage_kurzbz!";
 
-		
+		// Attribut public.tbl_vorlagestudiengang.sprache 
+		if (! @$this->db->simple_query('SELECT sprache FROM public.tbl_vorlagestudiengang'))
+		{
+			$query = "ALTER TABLE public.tbl_vorlagestudiengang 
+				ADD COLUMN sprache varchar(16) references public.tbl_sprache(sprache);
+                ";
+  			if ($this->db->simple_query($query))
+				echo 'Column public.tbl_vorlagestudiengang.sprache added!';
+			else
+				echo "Error adding public.tbl_vorlagestudiengang.sprache!";
+		}
+
+		// Attribut public.tbl_vorlage.attribute
 		if (! @$this->db->simple_query('SELECT attribute FROM public.tbl_vorlage'))
 		{
 			$query = "ALTER TABLE public.tbl_vorlage 
