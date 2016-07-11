@@ -1,7 +1,6 @@
 class_name: ApiTester
 modules:
     enabled:
-        - \Helper\Api
         - Db
         - REST:
             # API URL

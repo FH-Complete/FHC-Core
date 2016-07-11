@@ -7,12 +7,10 @@
 class_name: AcceptanceTester
 modules:
     enabled:
-        - PhpBrowser
-        - AcceptanceHelper
         - Db
+        - PhpBrowser:
+            url: 'http://admin:1q2w3@demo.fhcomplete.org/fhcomplete/'
     config:
-        PhpBrowser:
-            url: 'http://admin:1q2w3@localhost/build/fhcomplete/'
         Db:
             dsn: 'pgsql:host=localhost;port=5432;dbname=fhctest'
             user: 'fhcomplete'
