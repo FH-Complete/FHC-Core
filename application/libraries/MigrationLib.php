@@ -52,6 +52,18 @@ class MigrationLib extends CI_Migration
 		printf("%s %s" . $this->getEOL(), $this->ERROR_PREFIX, $error);
 	}
 	
+	private function columnExists($name, $schema, $table)
+	{
+		$query = sprintf('SELECT %s FROM %s.%s LIMIT 1', $name, $schema, $table);
+		
+		if (@$this->db->simple_query($query))
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
 	protected function startUP()
 	{
 		$this->printInfo(sprintf("%s Start method up of class %s %s", $this->SEPARATOR, get_called_class(), $this->SEPARATOR));
@@ -66,7 +78,7 @@ class MigrationLib extends CI_Migration
 	{
 		foreach($fields as $name => $definition)
 		{
-			if (!$this->db->field_exists($name, $schema . '.' . $table))
+			if (!$this->columnExists($name, $schema, $table))
 			{
 				if ($this->dbforge->add_column($schema . '.' . $table, array($name => $definition)))
 				{
