@@ -47,6 +47,11 @@ if(isset($_GET['searchstr']))
 else
 	$searchstr = '';
 
+if(isset($_GET['filter']))
+	$filter = $_GET['filter'];
+else
+	$filter = '';
+
 $datum_obj = new datum();
 
 echo '
@@ -70,20 +75,31 @@ echo '
 	<form accept-charset="UTF-8" name="search" method="GET">
   		Bitte Suchbegriff eingeben:
   		<input type="text" name="searchstr" size="30" value="'.$db->convert_html_chars($searchstr).'">
+  		<input type="radio" name="filter" value="mitarbeiter" '.($filter=='mitarbeiter'?'checked="checked"':'').'> Nur MitarbeiterInnen
+  		<input type="radio" name="filter" value="student"  '.($filter=='student'?'checked="checked"':'').'> Nur Studierende
   		<input type="submit" value="Suchen">
   	</form>';
 
 if($searchstr!='')
 {
-	$qry = "SELECT person_id FROM public.tbl_person WHERE person_id in(
-			SELECT distinct person_id FROM public.tbl_person LEFT JOIN public.tbl_benutzer USING(person_id) WHERE
-			nachname ~* '".$db->db_escape($searchstr)."' OR
-			vorname ~* '".$db->db_escape($searchstr)."' OR
-			alias ~* '".$db->db_escape($searchstr)."' OR
-			COALESCE(nachname,'') || ' ' || COALESCE(vorname,'') = '".$db->db_escape($searchstr)."' OR
-			COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') = '".$db->db_escape($searchstr)."' OR
-			uid ~* '".$db->db_escape($searchstr)."'
-			) ORDER BY nachname, vorname;";
+	$qry = "SELECT
+				distinct on (nachname, vorname, person_id) *
+			FROM
+				public.tbl_person
+				LEFT JOIN public.tbl_benutzer USING(person_id)";
+	
+			if ($filter=='mitarbeiter')
+				$qry .= " JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid) ";
+			elseif ($filter=='student')
+				$qry .= " JOIN public.tbl_prestudent USING (person_id) ";
+						
+			$qry .= " WHERE true 
+			AND 	nachname ~* '".$db->db_escape($searchstr)."' OR
+					vorname ~* '".$db->db_escape($searchstr)."' OR
+					(nachname || ' ' || vorname) ~* '".$db->db_escape($searchstr)."' OR
+					(vorname || ' ' || nachname) ~* '".$db->db_escape($searchstr)."' OR
+					uid=".$db->db_add_param($searchstr)."
+			ORDER BY nachname, vorname;";
 
 	if($result = $db->db_query($qry))
 	{

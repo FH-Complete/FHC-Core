@@ -346,6 +346,10 @@ if(!$error_person_save)
 	$kurzbeschreibung = $person->kurzbeschreibung;
 }
 
+$akte = new akte();
+if($akte->getAkten($person_id, 'Lichtbil'))
+	$dms_id_lichtbild = $akte->result[0]->dms_id;
+
 // PERSON
 echo "<table><tr><td>
 <fieldset>
@@ -464,7 +468,7 @@ echo "
 	<td valign='top'>Anmerkungen</td>
 	<td valign='top'><textarea name='anmerkungen'>".$anmerkungen."</textarea></td>
 	<td></td>
-	<td><img id='personimage' src='../../content/bild.php?src=person&person_id=$person_id' height='100'></td>
+	<td><a href='".APP_ROOT."cms/dms.php?id=".$dms_id_lichtbild."' target='_blank'><img id='personimage' src='../../content/bild.php?src=person&person_id=$person_id' height='100'></a></td>
 	<td colspan='2'>
 		<a href='#foo' onclick='window.open(\"../../content/bildupload.php?person_id=$person_id\",\"BildUpload\", \"height=50,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\"); return false;'>Bild hochladen</a>
 		<br><br>
