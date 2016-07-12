@@ -268,12 +268,12 @@ class MessageLib
      * @param   integer  $priority
      * @return  array
      */
-    function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $relationmessage_id = null, $orgform_kurzbz = null)
+    function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $sprache, $relationmessage_id = null, $orgform_kurzbz = null)
     {
         if (!is_numeric($sender_id) || !is_numeric($receiver_id))
         	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
 
-		$result = $this->ci->vorlagelib->loadVorlagetext($vorlage_kurzbz, $oe_kurzbz, $orgform_kurzbz);
+		$result = $this->ci->vorlagelib->loadVorlagetext($vorlage_kurzbz, $oe_kurzbz, $orgform_kurzbz, $sprache);
 		if (is_object($result) && $result->error == EXIT_SUCCESS)
 		{
 			if (is_array($result->retval) && count($result->retval) > 0 &&

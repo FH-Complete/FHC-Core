@@ -118,8 +118,6 @@ class Message extends APIv1_Controller
 	{
 		$validation = $this->_validatePostMessageVorlage($this->post());
 		
-//		$this->response($this->post(), REST_Controller::HTTP_OK);
-		
 		if (is_object($validation) && $validation->error == EXIT_SUCCESS)
 		{
 			$result = $this->messagelib->sendMessageVorlage(
@@ -128,6 +126,7 @@ class Message extends APIv1_Controller
 				$this->post()['vorlage_kurzbz'],
 				$this->post()['oe_kurzbz'],
 				$this->post()['data'],
+				$this->post()['sprache'],
 				isset($this->post()['relationmessage_id']) ? $this->post()['relationmessage_id'] : null,
 				isset($this->post()['orgform_kurzbz']) ? $this->post()['orgform_kurzbz'] : null
 			);
@@ -213,6 +212,10 @@ class Message extends APIv1_Controller
 		if (!isset($message['data']))
 		{
 			return $this->_error('data is not set');
+		}
+		if (!isset($message['sprache']))
+		{
+			return $this->_error('sprache is not set');
 		}
 		
 		return $this->_success('Input data are valid');

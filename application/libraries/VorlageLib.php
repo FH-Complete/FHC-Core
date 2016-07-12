@@ -88,12 +88,13 @@ class VorlageLib
 	/**
      * loadVorlagetext() - will load the best fitting Template.
      *
-     * @param   string  $vorlage_kurzbz REQUIRED
-     * @param   string  $oe_kurzbz    	OPTIONAL
-     * @param   string  $orgform_kurzbz OPTIONAL
+     * @param   string  $vorlage_kurzbz	REQUIRED
+     * @param   string  $oe_kurzbz		OPTIONAL
+     * @param   string  $orgform_kurzbz	OPTIONAL
+	 * @param   string  $sprache		OPTIONAL
      * @return  array
      */
-    function loadVorlagetext($vorlage_kurzbz, $oe_kurzbz=null, $orgform_kurzbz=null)
+    function loadVorlagetext($vorlage_kurzbz, $oe_kurzbz = null, $orgform_kurzbz = null, $sprache = null)
 	{
         if (empty($vorlage_kurzbz))
         	return $this->_error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
@@ -101,7 +102,8 @@ class VorlageLib
         $vorlage = $this->ci->VorlageStudiengangModel->loadWhere(array(
 			'vorlage_kurzbz' => $vorlage_kurzbz,
 			'oe_kurzbz' => $oe_kurzbz,
-			'orgform_kurzbz' => $orgform_kurzbz)
+			'orgform_kurzbz' => $orgform_kurzbz,
+			'sprache' => $sprache)
 		);
         return $vorlage;
     }
