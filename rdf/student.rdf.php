@@ -189,6 +189,7 @@ function draw_content_liste($row)
 		<STUDENT:punkte2><![CDATA['.$row->rt_punkte2.']]></STUDENT:punkte2>
 		<STUDENT:punkte3><![CDATA['.$row->rt_punkte3.']]></STUDENT:punkte3>
 		<STUDENT:rt_datum><![CDATA['.$rt_datum.']]></STUDENT:rt_datum>
+		<STUDENT:rt_anmeldung><![CDATA['.$row->anmeldungreihungstest.']]></STUDENT:rt_anmeldung>
 		<STUDENT:dual><![CDATA['.($row->dual=='t'?'true':'false').']]></STUDENT:dual>
 		<STUDENT:dual_bezeichnung><![CDATA['.($row->dual=='t'?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
 		<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
@@ -338,6 +339,7 @@ function draw_prestudent($row)
 			<STUDENT:punkte2><![CDATA['.$row->rt_punkte2.']]></STUDENT:punkte2>
 			<STUDENT:punkte3><![CDATA['.$row->rt_punkte3.']]></STUDENT:punkte3>
 			<STUDENT:rt_datum><![CDATA['.$rt_datum.']]></STUDENT:rt_datum>
+			<STUDENT:rt_anmeldung><![CDATA['.$row->anmeldungreihungstest.']]></STUDENT:rt_anmeldung>
 			<STUDENT:bismelden><![CDATA['.($row->bismelden?'true':'false').']]></STUDENT:bismelden>
 			<STUDENT:dual><![CDATA['.($row->dual?'true':'false').']]></STUDENT:dual>
 			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
@@ -464,7 +466,7 @@ if($xmlformat=='rdf')
 						(SELECT rt_punkte1 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte1,
 						(SELECT rt_punkte2 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte2,
 						(SELECT rt_punkte3 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte3,
-						 tbl_prestudent.dual as dual, tbl_prestudent.reihungstest_id, p.matr_nr
+						 tbl_prestudent.dual as dual, tbl_prestudent.reihungstest_id, tbl_prestudent.anmeldungreihungstest, p.matr_nr
 						FROM public.tbl_student
 							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id)  JOIN public.tbl_prestudent USING(prestudent_id) ";
 		if($gruppe_kurzbz!=null)

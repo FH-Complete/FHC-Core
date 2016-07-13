@@ -288,6 +288,10 @@ else
 							class="sortDirectionIndicator"
 							sort="rdf:http://www.technikum-wien.at/student/rdf#rt_datum" onclick="StudentTreeSort()"/>
 						<splitter class="tree-splitter"/>
+						<treecol id="student-treecol-rt_anmeldung" label="RT Anmeldung" flex="1" hidden="true" persist="hidden, width, ordinal"
+							class="sortDirectionIndicator"
+							sort="rdf:http://www.technikum-wien.at/student/rdf#rt_anmeldung" onclick="StudentTreeSort()"/>
+						<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-dual" label="Dual" flex="1" hidden="true" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#dual_bezeichnung" onclick="StudentTreeSort()"/>
@@ -349,6 +353,7 @@ else
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#punkte2" />
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#punkte3" />
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#rt_datum" />
+									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#rt_anmeldung" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#dual_bezeichnung" />
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#matr_nr" />
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#studienplan_bezeichnung" />
