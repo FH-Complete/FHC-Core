@@ -142,6 +142,27 @@ class Prestudent extends APIv1_Controller
 		}
 	}
 	
+	/**
+	 * @return void
+	 */
+	public function postDelReihungstest()
+	{
+		$ddReihungstest = $this->_parseData($this->post());
+		
+		if ($this->_validateAddReihungstest($ddReihungstest))
+		{
+			$this->load->model('crm/RtPerson_model', 'RtPersonModel');
+			
+			$result = $this->RtPersonModel->delete(array($ddReihungstest['person_id'], $ddReihungstest['rt_id']), $ddReihungstest);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
 	private function _validate($prestudent = NULL)
 	{
 		return true;
