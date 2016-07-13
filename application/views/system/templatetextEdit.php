@@ -5,12 +5,13 @@
 <div class="row">
 	<div class="span4">
 	  <h2>Vorlagetext: <?=$vorlagestudiengang_id?></h2>
-StudiengangKZ: <?=$studiengang_kz?>
+	<!--StudiengangKZ: <?=$studiengang_kz?>-->
 <form method="post" action="../saveText/<?=$vorlagestudiengang_id?>">
-	Version: <input type="text" name="version" value="<?php echo $version; ?>" />
-	Aktiv: <input type="text" name="aktiv" value="<?php echo $aktiv; ?>" />
-	OE:<?php echo $this->templatelib->widget("organisationseinheit_widget", array('oe_kurzbz' => $oe_kurzbz)); ?>
+	OE:<?php echo $this->templatelib->widget("organisationseinheit_widget", array('oe_kurzbz' => $oe_kurzbz, 'typ' => "'Erhalter','Studienzentrum','Studiengang','Lehrgang'")); ?>
+	Sprache:<?php echo $this->templatelib->widget("sprache_widget", array('sprache' => $sprache)); ?>
 	OrgForm:<?php echo $this->templatelib->widget("orgform_widget", array('orgform' => $orgform_kurzbz)); ?>
+	Version: <input type="text" name="version" value="<?php echo $version; ?>" size="1" />
+	Aktiv: <input type="text" name="aktiv" value="<?php echo $aktiv; ?>" size="1" />
 	<input type="hidden" name="vorlagestudiengang_id" value="<?php echo $vorlagestudiengang_id; ?>" />
 	<input type="hidden" name="studiengang_kz" value="<?php echo $studiengang_kz; ?>" />
  	<?php 

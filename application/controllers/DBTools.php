@@ -458,6 +458,7 @@ class DBTools extends FHC_Controller
 				break;
 			// **** Default ****
 			default: echo ' what? roles or permisssions?';
+			exit();
 		}
 
 		exit('Succesfully checked!');

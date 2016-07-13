@@ -11,7 +11,11 @@ class organisationseinheit_widget extends Widget
     public function display($data) 
 	{
 		$this->load->model('organisation/Organisationseinheit_model');
-		$res = $this->Organisationseinheit_model->getRecursiveList();
+		if (isset($data['typ']))
+			$typ = $data['typ'];
+		else 
+			$typ = null;
+		$res = $this->Organisationseinheit_model->getRecursiveList($typ);
 
 		// *** set data ***
 		if (isset($data['htmltagname']))
