@@ -203,7 +203,14 @@ if($method =="austauschprogram")
 									$selected="";
 									if($mob->mobilitaetsprogramm_code == $preincoming->mobilitaetsprogramm_code)
 										$selected = "selected";
-									echo '<option value="'.$mob->mobilitaetsprogramm_code.'" '.$selected.'>'.$mob->kurzbz."</option>\n";
+									$anzeigetext="";
+									if ($mob->kurzbz=='Austausch' && $sprache=='English')
+										$anzeigetext = 'Exchange';
+									elseif ($mob->kurzbz=='selbst')
+										$anzeigetext = 'Freemover';
+									else 
+										$anzeigetext = $mob->kurzbz;
+									echo '<option value="'.$mob->mobilitaetsprogramm_code.'" '.$selected.'>'.$anzeigetext."</option>\n";
 							}
 	echo '					</td>
 						</tr>
@@ -556,7 +563,7 @@ else if($method=="lehrveranstaltungen")
 
 			echo'</SELECT><br>';
 			echo $p->t('global/studiengang').':<SELECT name="filterStudiengang" onchange=selectChange()>
-			<option value="">Alle Studiengänge</option>';
+			<option value="">'.$p->t('incoming/alleStudiengaenge').'</option>';
 
 				// Vorauswahl der Übergebenen Filter
 
@@ -569,7 +576,8 @@ else if($method=="lehrveranstaltungen")
 					if(isset($_GET['studiengang']) && $_GET['studiengang'] == $row->studiengang_kz)
 						$selected='selected';
 
-					echo '<option value="'.$row->studiengang_kz.'" '.$selected.'>'.strtoupper($row->typ.$row->kurzbz).' - '.$row->bezeichnung.'</option>';
+					$studiengang_language = ($sprache == 'German') ? $row->bezeichnung : $row->english;
+					echo '<option value="'.$row->studiengang_kz.'" '.$selected.'>'.strtoupper($row->typ.$row->kurzbz).' - '.$studiengang_language.'</option>';
 				}
 
 			echo'</SELECT>';
@@ -606,6 +614,17 @@ else if($method=="lehrveranstaltungen")
 
 
 		//Uebersicht LVs
+		/* Erklaerung der Datumszeitraeume ab Zeile 650:
+		 *		|=============== Studiensemester ===============|
+		 *	|--------------| 											Incoming beginnt vor SS-Beginn und endet VOR SS-Ende jedoch ueberwiegend innerhalb SS
+		 *											|--------------| 	Incoming beginnt VOR SS-Ende und endet NACH SS-Ende, jedoch ueberwiegend innerhalb SS 
+		 * 				|------------------------------| 				Incoming ist innerhalb oder GENAU SS da
+		 *	|------------------------------------------------------|	Incoming ist VOR SS-Anfang und NACH SS-Ende da, jedoch ueberwiegend ueberlappend mit SS 
+		 * ---------------------------------------------------------	Von und Bis ist NULL
+		 * -------------------|											Von ist NULL und bis innerhalb SS
+		 *									|-----------------------	Bis ist NULL und von innerhalb SS 
+		 */
+		
 		$qry = "SELECT
 					tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.ects,
 					tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache,
@@ -638,9 +657,15 @@ else if($method=="lehrveranstaltungen")
 						JOIN public.tbl_preincoming using(preincoming_id)
 						WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
 						AND
-						(von is null OR von <= '$stsem->start')
-						AND
-						(bis is null OR bis >= (DATE '$stsem->ende'))
+						(
+							(bis - '$stsem->start' > '$stsem->start' - von) OR
+							('$stsem->start' <= von AND bis >= '$stsem->ende' AND '$stsem->ende' - von > bis - '$stsem->ende') OR
+							(von >= '$stsem->start' AND bis <= '$stsem->ende') OR
+							(von <= '$stsem->start' AND bis >= '$stsem->ende') OR
+							(von IS NULL AND bis IS NULL) OR
+							(von IS NULL AND bis <= '$stsem->ende' AND bis > '$stsem->start') OR
+							(bis IS NULL AND von < '$stsem->ende' AND von >= '$stsem->start')
+						)
 						AND aktiv = true
 						)a ) as anzahl 
 					FROM
@@ -697,6 +722,8 @@ else if($method=="lehrveranstaltungen")
 						$typ = 'BA';
 					else if ($studiengang->typ == 'm')
 						$typ = 'MA';
+					else
+						$typ = '-';
 					echo '<tr>';
                     echo '<td style="display:none">'.$row->lehrveranstaltung_id.'</td>';
 					if(!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id) && $freieplaetze>0)
@@ -1806,7 +1833,7 @@ else
 					<td>4. <a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/lehrveranstaltungenauswählen').'</a></td>
 				</tr>
 				<tr>
-					<td>5. <a href="learningAgreementPdf.php?id='.$preincoming->preincoming_id.'">'.$p->t('incoming/learningagreementerstellen').'</a></td>
+					<td>5. <a href="'.APP_ROOT.'cms/dms.php?id=8270">'.$p->t('incoming/downloadLearningAgreement').'</a></td>
 				</tr>
 				<tr>
 					<td>6. <a href="'.APP_ROOT.'cis/public/incoming/akteupload.php?person_id='.$person->person_id.'&dokumenttyp=LearnAgr" onclick="FensterOeffnen(this.href); return false;">'.$p->t("incoming/uploadLearningAgreement").'</a></td>
