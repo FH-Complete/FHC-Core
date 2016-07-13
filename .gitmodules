@@ -4,3 +4,6 @@
 [submodule "submodules/pivottable"]
 	path = submodules/pivottable
 	url = https://github.com/nicolaskruchten/pivottable.git
+[submodule "submodules/tablesorter"]
+	path = submodules/tablesorter
+	url = https://github.com/test/tablesorter.git
