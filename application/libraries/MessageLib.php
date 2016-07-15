@@ -268,87 +268,109 @@ class MessageLib
      * @param   integer  $priority
      * @return  array
      */
-    function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $sprache, $relationmessage_id = null, $orgform_kurzbz = null)
+    function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $relationmessage_id = null, $orgform_kurzbz = null)
     {
         if (!is_numeric($sender_id) || !is_numeric($receiver_id))
         	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
 
-		$result = $this->ci->vorlagelib->loadVorlagetext($vorlage_kurzbz, $oe_kurzbz, $orgform_kurzbz, $sprache);
-		if (is_object($result) && $result->error == EXIT_SUCCESS)
+		// Load reveiver data to get its relative language
+		$this->ci->load->model('person/Person_model', 'PersonModel');
+		$result = $this->ci->PersonModel->load($receiver_id);
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
 		{
-			if (is_array($result->retval) && count($result->retval) > 0 &&
-				!empty($result->retval[0]->text) && !empty($result->retval[0]->subject))
+			// Set the language with the global value
+			$sprache = DEFAULT_LEHREINHEIT_SPRACHE;
+			// If the receiver has a prefered language use this
+			if (isset($result->retval[0]->sprache) && $result->retval[0]->sprache != '')
 			{
-				$parsedText = $this->ci->vorlagelib->parseVorlagetext($result->retval[0]->text, $data);
-				
-				$this->ci->db->trans_start(false);
-				//save Message
-				$msgData = array(
-					'person_id' => $sender_id,
-					'subject' => $result->retval[0]->subject,
-					'body' => $parsedText,
-					'priority' => PRIORITY_NORMAL,
-					'relationmessage_id' => $relationmessage_id,
-					'oe_kurzbz' => $oe_kurzbz
-				);
-				
-				$result = $this->ci->MessageModel->insert($msgData);
-				if (is_object($result) && $result->error == EXIT_SUCCESS)
+				$sprache = $result->retval[0]->sprache;
+			}
+			
+			// Loads template data
+			$result = $this->ci->vorlagelib->loadVorlagetext($vorlage_kurzbz, $oe_kurzbz, $orgform_kurzbz, $sprache);
+			if (is_object($result) && $result->error == EXIT_SUCCESS)
+			{
+				// If the text and the subject of the template are not empty
+				if (is_array($result->retval) && count($result->retval) > 0 &&
+					!empty($result->retval[0]->text) && !empty($result->retval[0]->subject))
 				{
-					$msg_id = $result->retval;
-					$recipientData = array(
-						'person_id' => $receiver_id,
-						'message_id' => $msg_id,
-						'token' => generateToken()
+					// Parses template text
+					$parsedText = $this->ci->vorlagelib->parseVorlagetext($result->retval[0]->text, $data);
+
+					$this->ci->db->trans_start(false);
+					// Save Message
+					$msgData = array(
+						'person_id' => $sender_id,
+						'subject' => $result->retval[0]->subject,
+						'body' => $parsedText,
+						'priority' => PRIORITY_NORMAL,
+						'relationmessage_id' => $relationmessage_id,
+						'oe_kurzbz' => $oe_kurzbz
 					);
-					$result = $this->ci->RecipientModel->insert($recipientData);
+					$result = $this->ci->MessageModel->insert($msgData);
 					if (is_object($result) && $result->error == EXIT_SUCCESS)
 					{
-						$statusData = array(
-							'message_id' => $msg_id,
+						// Link the message with the receiver
+						$msg_id = $result->retval;
+						$recipientData = array(
 							'person_id' => $receiver_id,
-							'status' => MSG_STATUS_UNREAD
+							'message_id' => $msg_id,
+							'token' => generateToken()
 						);
-						$result = $this->ci->MsgStatusModel->insert($statusData);
+						$result = $this->ci->RecipientModel->insert($recipientData);
+						if (is_object($result) && $result->error == EXIT_SUCCESS)
+						{
+							// Save message status
+							$statusData = array(
+								'message_id' => $msg_id,
+								'person_id' => $receiver_id,
+								'status' => MSG_STATUS_UNREAD
+							);
+							$result = $this->ci->MsgStatusModel->insert($statusData);
+						}
 					}
-				}
-				
-				$this->ci->db->trans_complete();
-				
-				if ($this->ci->db->trans_status() === FALSE || (is_object($result) && $result->error != EXIT_SUCCESS))
-				{
-					$this->ci->db->trans_rollback();
-					return $this->_error($result->msg, EXIT_ERROR);
+
+					$this->ci->db->trans_complete();
+
+					if ($this->ci->db->trans_status() === FALSE || (is_object($result) && $result->error != EXIT_SUCCESS))
+					{
+						$this->ci->db->trans_rollback();
+						return $this->_error($result->msg, EXIT_ERROR);
+					}
+					else
+					{
+						$this->ci->db->trans_commit();
+						return $this->_success($msg_id);
+					}
 				}
 				else
 				{
-					$this->ci->db->trans_commit();
-					return $this->_success($msg_id);
+					// Better message error
+					if (!is_array($result->retval) || (is_array($result->retval) && count($result->retval) == 0))
+					{
+						$result = $this->_error('Vorlage not found', EXIT_ERROR);
+					}
+					else if (is_array($result->retval) && count($result->retval) > 0)
+					{
+						if (is_null($result->retval[0]->oe_kurzbz))
+						{
+							$result = $this->_error('Vorlage not found', EXIT_ERROR);
+						}
+						else if (empty($result->retval[0]->text))
+						{
+							$result = $this->_error('Vorlage has an empty text', EXIT_ERROR);
+						}
+						else if (empty($result->retval[0]->subject))
+						{
+							$result = $this->_error('Vorlage has an empty subject', EXIT_ERROR);
+						}
+					}
 				}
 			}
 			else
 			{
-				// Better message error
-				if (!is_array($result->retval) || (is_array($result->retval) && count($result->retval) == 0))
-				{
-					$result = $this->_error('Vorlage not found', EXIT_ERROR);
-				}
-				else if (is_array($result->retval) && count($result->retval) > 0)
-				{
-					if (empty($result->retval[0]->text))
-					{
-						$result = $this->_error('Vorlage has an empty text', EXIT_ERROR);
-					}
-					else if (empty($result->retval[0]->subject))
-					{
-						$result = $this->_error('Vorlage has an empty subject', EXIT_ERROR);
-					}
-				}
+				$result = $this->_error($result->retval, EXIT_ERROR);
 			}
-		}
-		else
-		{
-			$result = $this->_error($result->retval, EXIT_ERROR);
 		}
 		
 		return $result;

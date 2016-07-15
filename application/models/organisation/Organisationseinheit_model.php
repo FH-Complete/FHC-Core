@@ -42,4 +42,50 @@ class Organisationseinheit_model extends DB_Model
 		else
 			return $this->_error($this->db->error());
 	}
+	
+	/**
+     * getOneLevel
+     *
+	 * This method get one level of the organisation tree, using the given parameters.
+	 * It returns even the data from another table linked by the oe_kurzbz
+	 * 
+     * @param	string	$schema		REQUIRED
+     * @param	string	$table		REQUIRED
+	 * @param	mixed	$fields		REQUIRED
+	 * @param	string	$where		REQUIRED
+	 * @param	string	$orderby	REQUIRED
+	 * @param	string	$oe_kurzbz	REQUIRED
+     * @return  array
+     */
+	public function getOneLevel($schema, $table, $fields, $where, $orderby, $oe_kurzbz)
+	{
+		$query = "WITH RECURSIVE organizations(_pk, _ppk) AS
+					(
+						SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+						  FROM public.tbl_organisationseinheit o
+						  WHERE o.oe_parent_kurzbz IS NULL
+					  UNION ALL
+						SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+						  FROM public.tbl_organisationseinheit o INNER JOIN organizations orgs ON (o.oe_parent_kurzbz = orgs._pk)
+					)
+					SELECT orgs._pk, orgs._ppk, _joined_table.*
+					FROM organizations orgs LEFT JOIN (
+						SELECT %s.oe_kurzbz as _pk, %s
+						  FROM %s.%s
+						 WHERE %s
+					) _joined_table ON (orgs._pk = _joined_table._pk)
+					WHERE orgs._pk = ?
+					ORDER BY %s";
+		
+		$query = sprintf($query, $table, $fields, $schema, $table, $where, $orderby);
+		
+		if ($result = $this->db->query($query, array($oe_kurzbz)))
+		{
+			return $this->_success($result->result());
+		}
+		else
+		{
+			return $this->_error($this->db->error());
+		}
+	}
 }

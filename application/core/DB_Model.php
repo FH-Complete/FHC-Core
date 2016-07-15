@@ -324,6 +324,18 @@ class DB_Model extends FHC_Model
 	{
 		$this->db->reset_query();
 	}
+	
+	/** ---------------------------------------------------------------
+	 * This method call the method escape from class CI_DB_driver, therefore:
+	 * this method determines the data type so that it can escape only string data.
+	 * It also automatically adds single quotes around the data so you don’t have to
+	 *
+	 * @return  void
+	 */
+	public function escape($value)
+	{
+		return $this->db->escape($value);
+	}
 
 	/** ---------------------------------------------------------------
 	 * Convert PG-Boolean to PHP-Boolean

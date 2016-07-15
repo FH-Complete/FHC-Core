@@ -133,24 +133,7 @@ class PhrasesLib
     }
 
 	/**
-     * loadVorlagetext() - will load the best fitting Template.
-     *
-     * @param   string  $vorlage_kurzbz REQUIRED
-     * @param   string  $oe_kurzbz    	OPTIONAL
-     * @param   string  $orgform_kurzbz OPTIONAL
-     * @return  array
-     */
-    function loadVorlagetext($vorlage_kurzbz, $oe_kurzbz=null, $orgform_kurzbz=null)
-	{
-        if (empty($vorlage_kurzbz))
-        	return $this->_error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
-
-        $vorlage = $this->ci->VorlageStudiengangModel->getVorlageStudiengang($vorlage_kurzbz, $oe_kurzbz, $orgform_kurzbz);
-        return $vorlage;
-    }
-
-	/**
-     * insertVorlagetext() - will load tbl_vorlagestudiengang for a spezific Template.
+     * insertPhraseinhalt() - will load tbl_vorlagestudiengang for a spezific Template.
      *
      * @param   string  $vorlage_kurzbz    REQUIRED
      * @return  array
@@ -162,7 +145,7 @@ class PhrasesLib
     }
 
 	/**
-     * loadVorlagetext() - will load tbl_vorlagestudiengang for a spezific Template.
+     * getVorlagetextById() - will load tbl_vorlagestudiengang for a spezific Template.
      *
      * @param   string  $vorlage_kurzbz    REQUIRED
      * @return  array
