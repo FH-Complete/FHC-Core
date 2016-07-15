@@ -1,95 +1,84 @@
 <?php
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (! defined("BASEPATH")) exit("No direct script access allowed");
 
-class Migration_Vorlage extends CI_Migration
+require_once APPPATH . "/libraries/MigrationLib.php";
+
+class Migration_Vorlage extends MigrationLib
 {
-
+	public function __construct()
+	{
+		parent::__construct();
+	}
+	
     public function up()
     {
-		// Change PK to varchar 32
-		$query = "ALTER TABLE public.tbl_vorlage 
-					ALTER COLUMN vorlage_kurzbz TYPE varchar(32);
-				ALTER TABLE public.tbl_vorlagestudiengang 
-					ALTER COLUMN vorlage_kurzbz TYPE varchar(32);
-                ";
-		if ($this->db->simple_query($query))
-			echo 'Column public.tbl_vorlage.vorlage_kurzbz altered!';
-		else
-			echo "Error altering vorlage_kurzbz!";
+		$this->startUP();
 
-		// Attribut public.tbl_vorlagestudiengang.sprache 
-		if (! @$this->db->simple_query('SELECT sprache FROM public.tbl_vorlagestudiengang'))
-		{
-			$query = "ALTER TABLE public.tbl_vorlagestudiengang 
-				ADD COLUMN sprache varchar(16) references public.tbl_sprache(sprache);
-                ";
-  			if ($this->db->simple_query($query))
-				echo 'Column public.tbl_vorlagestudiengang.sprache added!';
-			else
-				echo "Error adding public.tbl_vorlagestudiengang.sprache!";
-		}
-
-		// Attribut public.tbl_vorlage.attribute
-		if (! @$this->db->simple_query('SELECT attribute FROM public.tbl_vorlage'))
-		{
-			$query = "ALTER TABLE public.tbl_vorlage 
-				ADD COLUMN attribute json;
-                ";
-  			if ($this->db->simple_query($query))
-				echo 'Column public.tbl_vorlage.attribute added!';
-			else
-				echo "Error adding public.tbl_vorlage.attribute!";
-		}
-
-		// OEen ohne Eltern holen
-		$query = 'SELECT oe_kurzbz FROM public.tbl_organisationseinheit WHERE oe_parent_kurzbz IS NULL;';
-		$oe = $this->db->query($query)->result();
-
-			
-		// tbl_vorlagestudiengang->Subject
-		if (! @$this->db->simple_query('SELECT subject FROM public.tbl_vorlagestudiengang'))
-		{
-			$query= "ALTER TABLE public.tbl_vorlagestudiengang
-				ADD COLUMN subject text;
-                ";
-  			if ($this->db->simple_query($query))
-				echo 'Column public.tbl_vorlagestudiengang.subject added!';
-			else
-				echo "Error adding public.tbl_vorlagestudiengang.subject!";
-		}
-
-		// tbl_vorlagestudiengang->OrgForm
-		if (! @$this->db->simple_query('SELECT orgform_kurzbz FROM public.tbl_vorlagestudiengang'))
-		{
-			$query= "ALTER TABLE public.tbl_vorlagestudiengang
-				ADD COLUMN orgform_kurzbz varchar(3) references bis.tbl_orgform(orgform_kurzbz);
-                ";
-  			if ($this->db->simple_query($query))
-			{
-				echo 'Column public.tbl_vorlagestudiengang.orgform_kurzbz added!';
-				// Insert Demo Data
-				$query = "SELECT setval('seq_vorlagestudiengang_vorlagestudiengang_id', (SELECT MAX(vorlagestudiengang_id) FROM public.tbl_vorlagestudiengang));";
-				$this->db->simple_query($query);
-			}
-			else
-				echo "Error adding public.tbl_vorlagestudiengang.orgform_kurzbz!";
-		}
+		// Change vorlage_kurzbz to varchar 32		
+		$columns = array(
+			"vorlage_kurzbz" => array("type" => "varchar(32)")
+		);
+		$this->modifyColumn("public", "tbl_vorlage", $columns);
+		
+		// Change vorlage_kurzbz to varchar 32
+		$columns = array(
+			"vorlage_kurzbz" => array("type" => "varchar(32)")
+		);
+		$this->modifyColumn("public", "tbl_vorlagestudiengang", $columns);
+		
+		// Add attribute to public.tbl_vorlage
+		$columns = array(
+			"attribute" => array("type" => "json")
+		);
+		$this->addColumn("public", "tbl_vorlage", $columns);
+		
+		// Add sprache, subject and orgform_kurzbz to public.tbl_vorlagestudiengang
+		$columns = array(
+			"sprache" => array("type" => "varchar(16)"),
+			"subject" => array("type" => "text"),
+			"orgform_kurzbz" => array("type" => "varchar(3)")
+		);
+		$this->addColumn("public", "tbl_vorlagestudiengang", $columns);
+		
+		$this->initializeSequence(
+			"public", "seq_vorlagestudiengang_vorlagestudiengang_id", "public",
+			"tbl_vorlagestudiengang", "vorlagestudiengang_id"
+		);
+		
+		// Add foreign keys to tbl_vorlagestudiengang
+		$this->addForeingKey(
+			"public",
+			"tbl_vorlagestudiengang",
+			"fk_vorlagestudiengang_sprache",
+			"sprache",
+			"public",
+			"tbl_sprache",
+			"sprache",
+			"ON UPDATE CASCADE ON DELETE RESTRICT"
+		);
+		$this->addForeingKey(
+			"public",
+			"tbl_vorlagestudiengang",
+			"fk_vorlagestudiengang_orgform_kurzbz",
+			"orgform_kurzbz",
+			"bis",
+			"tbl_orgform",
+			"orgform_kurzbz",
+			"ON UPDATE CASCADE ON DELETE RESTRICT"
+		);
+		
+		$this->endUP();
 	}
 
     public function down()
     {
-		try
-		{
-			$this->dbforge->drop_column('public.tbl_vorlage', 'attribute');
-			$this->dbforge->drop_column('public.tbl_vorlagestudiengang', 'subject');
-			$this->dbforge->drop_column('public.tbl_vorlagestudiengang', 'orgform_kurzbz');
-            echo "Column public.tbl_vorlage.attribute, public.tbl_vorlagestudiengang.subject, public.tbl_vorlagestudiengang.orgform_kurzbz dropped!";
-		}
-		catch(Exception $e)
-		{
-			echo 'Exception abgefangen: ',  $e->getMessage(), "\n";
-			echo $this->db->error();
-		}
+		$this->startDown();
+		
+		$this->dropColumn("public", "tbl_vorlage", "attribute");
+		$this->dropColumn("public", "tbl_vorlagestudiengang", "subject");
+		$this->dropColumn("public", "tbl_vorlagestudiengang", "orgform_kurzbz");
+		
+		$this->endDown();
     }
 }

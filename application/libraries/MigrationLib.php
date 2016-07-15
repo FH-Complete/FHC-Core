@@ -2,19 +2,35 @@
 
 if (! defined("BASEPATH")) exit("No direct script access allowed");
 
+/**
+ * Utility class to be used in the database migration process
+ */
 class MigrationLib extends CI_Migration
 {
+	// Prefixes and separator for messages
 	private $MSG_PREFIX = "[-]";
 	private $INFO_PREFIX = "[I]";
 	private $ERROR_PREFIX = "[E]";
 	private $SEPARATOR = "------------------------------";
 	
+	// Used to set if the migration process is called via command line or via browser
 	private $cli;
 	
+	/**
+	 * Object initialization
+	 */
 	public function __construct()
 	{
 		parent::__construct();
-		
+		$this->setCli();
+	}
+	
+	/**
+	 * Set property cli to false if the migration process is called via command line
+	 * otherwise to false if it's called via browser
+	 */
+	private function setCli()
+	{
 		if ($this->input->is_cli_request())
 		{
 			$this->cli = true;
@@ -25,6 +41,11 @@ class MigrationLib extends CI_Migration
 		}
 	}
 	
+	/**
+	 * Returns the character of end of line
+	 * PHP_EOL platform dependent if cli is true
+	 * Tag <br> if cli is false
+	 */
 	private function getEOL()
 	{
 		if ($this->cli === true)
@@ -37,24 +58,36 @@ class MigrationLib extends CI_Migration
 		}
 	}
 	
+	/**
+	 * Prints a formatted message
+	 */
 	private function printMessage($message)
 	{
 		printf("%s %s" . $this->getEOL(), $this->MSG_PREFIX, $message);
 	}
 	
+	/**
+	 * Prints a formatted info
+	 */
 	private function printInfo($info)
 	{
 		printf("%s %s" . $this->getEOL(), $this->INFO_PREFIX, $info);
 	}
 	
+	/**
+	 * Prints a formatted error
+	 */
 	private function printError($error)
 	{
 		printf("%s %s" . $this->getEOL(), $this->ERROR_PREFIX, $error);
 	}
 	
+	/**
+	 * Check if a column exists in a table and schema
+	 */
 	private function columnExists($name, $schema, $table)
 	{
-		$query = sprintf('SELECT %s FROM %s.%s LIMIT 1', $name, $schema, $table);
+		$query = sprintf("SELECT %s FROM %s.%s LIMIT 1", $name, $schema, $table);
 		
 		if (@$this->db->simple_query($query))
 		{
@@ -64,26 +97,41 @@ class MigrationLib extends CI_Migration
 		return false;
 	}
 	
+	/**
+	 * Print an info about the starting of method up
+	 */
 	protected function startUP()
 	{
 		$this->printInfo(sprintf("%s Start method up of class %s %s", $this->SEPARATOR, get_called_class(), $this->SEPARATOR));
 	}
 	
+	/**
+	 * Print an info about the ending of method up
+	 */
 	protected function endUP()
 	{
 		$this->printInfo(sprintf("%s End method up of class %s %s", $this->SEPARATOR, get_called_class(), $this->SEPARATOR));
 	}
 	
+	/**
+	 * Print an info about the starting of method down
+	 */
 	protected function startDown()
 	{
 		$this->printInfo(sprintf("%s Start method down of class %s %s", $this->SEPARATOR, get_called_class(), $this->SEPARATOR));
 	}
 	
+	/**
+	 * Print an info about the ending of method down
+	 */
 	protected function endDown()
 	{
 		$this->printInfo(sprintf("%s End method down of class %s %s", $this->SEPARATOR, get_called_class(), $this->SEPARATOR));
 	}
 	
+	/**
+	 * Adds a column, with attributes, to a table and schema
+	 */
     protected function addColumn($schema, $table, $fields)
 	{
 		foreach($fields as $name => $definition)
@@ -106,6 +154,34 @@ class MigrationLib extends CI_Migration
 		}
 	}
 	
+	/**
+	 * Modifies a column, and its attributes, of a table and schema
+	 */
+	protected function modifyColumn($schema, $table, $fields)
+	{
+		foreach($fields as $name => $definition)
+		{
+			if ($this->columnExists($name, $schema, $table))
+			{
+				if ($this->dbforge->modify_column($schema . '.' . $table, array($name => $definition)))
+				{
+					$this->printMessage(sprintf("Column %s.%s.%s has been modified", $schema, $table, $name));
+				}
+				else
+				{
+					$this->printError(sprintf("Error while modifying column %s.%s.%s", $schema, $table, $name));
+				}
+			}
+			else
+			{
+				$this->printInfo(sprintf("Column %s.%s.%s doesn't exist", $schema, $table, $name));
+			}
+		}
+	}
+	
+	/**
+	 * Drops a column from a table and schema
+	 */
 	protected function dropColumn($schema, $table, $field)
 	{
 		if ($this->columnExists($field, $schema, $table))
@@ -125,6 +201,9 @@ class MigrationLib extends CI_Migration
 		}
 	}
 	
+	/**
+	 * Sets a column as primary key of a table and schema
+	 */
 	protected function addPrimaryKey($schema, $table, $name, $fields)
 	{
 		$stringFields = null;
@@ -160,6 +239,9 @@ class MigrationLib extends CI_Migration
 		}
 	}
 	
+	/**
+	 * Sets a column as foreign key of a table and schema
+	 */
 	protected function addForeingKey($schema, $table, $name, $field, $schemaDest, $tableDest, $fieldDest, $attributes)
 	{
 		$query = sprintf("ALTER TABLE %s.%s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s.%s (%s) %s",
@@ -175,6 +257,9 @@ class MigrationLib extends CI_Migration
 		}
 	}
 	
+	/**
+	 * Grants permissions to a user on a table and schema
+	 */
 	protected function grantTable($permissions, $schema, $table, $user)
 	{
 		$stringPermission = null;
@@ -222,6 +307,9 @@ class MigrationLib extends CI_Migration
 		}
 	}
 	
+	/**
+	 * Creates a table in a schema with columns
+	 */
 	protected function createTable($schema, $table, $fields)
 	{
 		$this->dbforge->add_field($fields);
@@ -236,6 +324,9 @@ class MigrationLib extends CI_Migration
 		}
 	}
 	
+	/**
+	 * Drops a table from a schema
+	 */
 	protected function dropTable($schema, $table)
 	{
 		if ($this->dbforge->drop_table($schema . "." . $table))
@@ -248,6 +339,26 @@ class MigrationLib extends CI_Migration
 		}
 	}
 	
+	/**
+	 * Initializes a sequence with the max value of a column
+	 */
+	protected function initializeSequence($schemaSrc, $sequence, $schemaDst, $table, $field)
+	{
+		$query = sprintf("SELECT SETVAL('%s.%s', (SELECT MAX(%s) FROM %s.%s))", $schemaSrc, $sequence, $field, $schemaDst, $table);
+		
+		if (@$this->db->simple_query($query))
+		{
+			$this->printMessage(sprintf("Sequence %s.%s has been initialized", $schemaSrc, $sequence));
+		}
+		else
+		{
+			$this->printError(sprintf("Initializing sequence %s.%s", $schemaSrc, $sequence));
+		}
+	}
+	
+	/**
+	 * Executes the given query
+	 */
 	protected function execQuery($query)
 	{
 		if (! @$this->db->simple_query($query))
