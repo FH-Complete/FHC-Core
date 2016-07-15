@@ -178,24 +178,16 @@ class Migration_Reihungstest extends MigrationLib
 
     public function down()
     {
-		try
-		{
-			$this->dbforge->drop_column("public.tbl_reihungstest", "stufe");
-			$this->dbforge->drop_column("public.tbl_reihungstest", "anmeldefrist");
-			$this->dbforge->drop_column("public.tbl_prestudentstatus", "rt_stufe");
+		$this->startDown();
 
-            echo "Columns public.tbl_reihungstest.stufe, public.tbl_reihungstest.anmeldefrist, public.tbl_prestudentstatus.rt_stufe dropped!";
+		$this->dropColumn("public", "tbl_reihungstest", "stufe");
+		$this->dropColumn("public", "tbl_reihungstest", "anmeldefrist");
+		$this->dropColumn("public", "tbl_prestudentstatus", "rt_stufe");
 
-			$this->dbforge->drop_table("public.tbl_rt_studienplan");
-			$this->dbforge->drop_table("public.tbl_rt_person");
-			$this->dbforge->drop_table("public.tbl_rt_ort");
+		$this->dropTable("public", "tbl_rt_studienplan");
+		$this->dropTable("public", "tbl_rt_person");
+		$this->dropTable("public", "tbl_rt_ort");
 
-			echo "Tables public.tbl_rt_studienplan, public.tbl_rt_person, public.tbl_rt_ort dropped!";
-		}
-		catch(Exception $e)
-		{
-			echo "Exception: ",  $e->getMessage(), "\n";
-			echo $this->db->error();
-		}
+		$this->endDown();
     }
 }

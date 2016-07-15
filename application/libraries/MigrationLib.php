@@ -74,6 +74,16 @@ class MigrationLib extends CI_Migration
 		$this->printInfo(sprintf("%s End method up of class %s %s", $this->SEPARATOR, get_called_class(), $this->SEPARATOR));
 	}
 	
+	protected function startDown()
+	{
+		$this->printInfo(sprintf("%s Start method down of class %s %s", $this->SEPARATOR, get_called_class(), $this->SEPARATOR));
+	}
+	
+	protected function endDown()
+	{
+		$this->printInfo(sprintf("%s End method down of class %s %s", $this->SEPARATOR, get_called_class(), $this->SEPARATOR));
+	}
+	
     protected function addColumn($schema, $table, $fields)
 	{
 		foreach($fields as $name => $definition)
@@ -93,6 +103,25 @@ class MigrationLib extends CI_Migration
 			{
 				$this->printInfo(sprintf("Column %s.%s.%s already exists", $schema, $table, $name));
 			}
+		}
+	}
+	
+	protected function dropColumn($schema, $table, $field)
+	{
+		if ($this->columnExists($field, $schema, $table))
+		{
+			if ($this->dbforge->drop_column($schema . '.' . $table, $field))
+			{
+				$this->printMessage(sprintf("Column %s.%s.%s has been dropped", $schema, $table, $field));
+			}
+			else
+			{
+				$this->printError(sprintf("Error while dropping column %s.%s.%s", $schema, $table, $field));
+			}
+		}
+		else
+		{
+			$this->printInfo(sprintf("Column %s.%s.%s doesn't exist", $schema, $table, $field));
 		}
 	}
 	
@@ -204,6 +233,18 @@ class MigrationLib extends CI_Migration
 		else
 		{
 			$this->printError(sprintf("Creating table %s.%s", $schema, $table));
+		}
+	}
+	
+	protected function dropTable($schema, $table)
+	{
+		if ($this->dbforge->drop_table($schema . "." . $table))
+		{
+			$this->printMessage(sprintf("Table %s.%s has been dropped", $schema, $table));
+		}
+		else
+		{
+			$this->printError(sprintf("Dropping table %s.%s", $schema, $table));
 		}
 	}
 	
