@@ -294,11 +294,11 @@ if (isset($_GET['ansicht']))
 {
 	if ($_GET['ansicht'] == 'mitarbeiter')
 	{
-		$ansicht = 'AND uid IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)';
+		$ansicht = 'AND tbl_benutzer.uid IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)';
 		$mitarbeiterSubmit = '<input type="submit" name="MitarbeiterSubmit" sytle="background-color:#F5F5F5" value="Mitarbeiter" />';
 	}
 	if ($_GET['ansicht'] == 'studenten')
-		$ansicht = 'AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)';
+		$ansicht = 'AND tbl_benutzer.uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)';
 }
 else
 {
@@ -320,7 +320,7 @@ $qry_anzahl_mitarbeiter = "
 					WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
 						WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
-		AND uid IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)
+		AND tbl_benutzer.uid IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)
 	";
 $anzahl_ma = '';
 if($result_anzahl = $db->db_query($qry_anzahl_mitarbeiter))
@@ -388,9 +388,11 @@ $qry = "
 	FROM 
 		public.tbl_person 
 		JOIN public.tbl_benutzer USING(person_id)
+		JOIN public.tbl_akte USING (person_id)
 	WHERE 
 		foto is not NULL
 		AND tbl_benutzer.aktiv
+		AND tbl_akte.dokument_kurzbz='Lichtbil'
 		".$ansicht;
 		
 
@@ -453,6 +455,8 @@ if($result = $db->db_query($qry))
 		echo '</form>';
 		echo '<br><br><br>';
 		echo '<a href="#FotoUpload" onclick="window.open(\'../../content/bildupload.php?person_id='.$row->person_id.'\',\'BildUpload\', \'height=50,width=600,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\'); return false;">Bild Upload</a>';
+		echo '<br><br>';
+		echo '<a href="#dms_download" onclick="window.open(\''.APP_ROOT.'cms/dms.php?id='.$row->dms_id.'\',\'DmsDownload\', \'height=800,width=900,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\'); return false;">DMS Download</a>';
 		echo '</center>';
 	}
 	else
