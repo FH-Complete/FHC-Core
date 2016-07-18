@@ -515,7 +515,11 @@ else if($method=="lehrveranstaltungen")
 		<br><br>
 		';*/
 
-		echo '
+		echo '<table width="90%" border="1" align="center">
+			<tr style="text-align: center">
+				<td style="padding: 20px; color: red"><b>Course application is currently disabled. Please contact the office to apply for courses.</b></td>
+			</tr></table>';
+		/*echo '
 		<form name="filterSemester">
 		<table width="90%" border="0" align="center">
 			<tr>
@@ -625,7 +629,7 @@ else if($method=="lehrveranstaltungen")
 		 *									|-----------------------	Bis ist NULL und von innerhalb SS 
 		 */
 		
-		$qry = "SELECT
+		/*$qry = "SELECT
 					tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.ects,
 					tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache,
 					tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.incoming, tbl_lehrveranstaltung.orgform_kurzbz,
@@ -749,7 +753,7 @@ else if($method=="lehrveranstaltungen")
 				//}
 			}
 		}
-		echo '</tbody></table>';
+		echo '</tbody></table>';*/
 	}
 }
 else if ($method == "university")
