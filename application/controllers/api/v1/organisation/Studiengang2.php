@@ -81,7 +81,7 @@ class Studiengang2 extends APIv1_Controller
 						{
 							if ($prevStudiengang_kz == $resultStudienplan->retval[$i]->studiengang_kz)
 							{
-								array_push($studiengangArray[$studiengangCount - 1]->studienpleane, $resultStudienplan->retval[$i]);
+								array_push($studiengangArray[$studiengangCount - 1]->studienplaene, $resultStudienplan->retval[$i]);
 							}
 							else
 							{
@@ -89,7 +89,7 @@ class Studiengang2 extends APIv1_Controller
 								if (is_object($resultStudiengang) && $resultStudiengang->error == EXIT_SUCCESS &&
 									is_array($resultStudiengang->retval) && count($resultStudiengang->retval) > 0)
 								{
-									$resultStudiengang->retval[0]->studienpleane = array($resultStudienplan->retval[$i]);
+									$resultStudiengang->retval[0]->studienplaene = array($resultStudienplan->retval[$i]);
 									$studiengangArray[$studiengangCount++] = $resultStudiengang->retval[0];
 								}
 								$prevStudiengang_kz = $resultStudienplan->retval[$i]->studiengang_kz;
