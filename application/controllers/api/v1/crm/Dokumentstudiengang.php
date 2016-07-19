@@ -51,7 +51,7 @@ class Dokumentstudiengang extends APIv1_Controller
 	/**
 	 * @return void
 	 */
-	public function getDokumentstudiengangByStudiengang_bz()
+	public function getDokumentstudiengangByStudiengang_kz()
 	{
 		$studiengang_kz = $this->get('studiengang_kz');
 		$onlinebewerbung = $this->get('onlinebewerbung');
