@@ -50,6 +50,8 @@ class Studiengang2 extends APIv1_Controller
 	{
 		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
 		$ausbildungssemester = $this->get('ausbildungssemester');
+		$aktiv = $this->get('aktiv');
+		$onlinebewerbung = $this->get('onlinebewerbung');
 		
 		if (isset($studiensemester_kurzbz) && isset($ausbildungssemester))
 		{
@@ -60,43 +62,51 @@ class Studiengang2 extends APIv1_Controller
 				$result = $this->StudienplanModel->addJoin('lehre.tbl_studienordnung', 'studienordnung_id');
 				if ($result->error == EXIT_SUCCESS)
 				{
-					$this->StudienplanModel->addSelect('tbl_studienplan.*, lehre.tbl_studienordnung.studiengang_kz');
-					
-					$this->StudienplanModel->addOrder('lehre.tbl_studienordnung.studiengang_kz');
-					
-					$resultStudienplan = $this->StudienplanModel->loadWhere(
-							array('semester' => $ausbildungssemester,
-									'studiensemester_kurzbz' => $studiensemester_kurzbz,
-									'tbl_studienplan.aktiv' => 'TRUE')
-					);
-					
-					if (is_object($resultStudienplan) && $resultStudienplan->error == EXIT_SUCCESS &&
-						is_array($resultStudienplan->retval) && count($resultStudienplan->retval) > 0)
+					$result = $this->StudienplanModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
+					if ($result->error == EXIT_SUCCESS)
 					{
-						$studiengangCount = 0;
-						$prevStudiengang_kz = '';
-						$studiengangArray = array();
-						
-						for ($i = 0; $i < count($resultStudienplan->retval); $i++)
+						$this->StudienplanModel->addSelect('tbl_studienplan.*, lehre.tbl_studienordnung.studiengang_kz');
+
+						$this->StudienplanModel->addOrder('lehre.tbl_studienordnung.studiengang_kz');
+
+						if (!isset($aktiv)) $aktiv = 'TRUE';
+						if (!isset($onlinebewerbung)) $onlinebewerbung = 'TRUE';
+
+						$resultStudienplan = $this->StudienplanModel->loadWhere(
+								array('semester' => $ausbildungssemester,
+										'studiensemester_kurzbz' => $studiensemester_kurzbz,
+										'public.tbl_studiengang.aktiv' => $aktiv,
+										'public.tbl_studiengang.onlinebewerbung' => $onlinebewerbung)
+						);
+
+						if (is_object($resultStudienplan) && $resultStudienplan->error == EXIT_SUCCESS &&
+							is_array($resultStudienplan->retval) && count($resultStudienplan->retval) > 0)
 						{
-							if ($prevStudiengang_kz == $resultStudienplan->retval[$i]->studiengang_kz)
+							$studiengangCount = 0;
+							$prevStudiengang_kz = '';
+							$studiengangArray = array();
+
+							for ($i = 0; $i < count($resultStudienplan->retval); $i++)
 							{
-								array_push($studiengangArray[$studiengangCount - 1]->studienplaene, $resultStudienplan->retval[$i]);
-							}
-							else
-							{
-								$resultStudiengang = $this->StudiengangModel->load($resultStudienplan->retval[$i]->studiengang_kz);
-								if (is_object($resultStudiengang) && $resultStudiengang->error == EXIT_SUCCESS &&
-									is_array($resultStudiengang->retval) && count($resultStudiengang->retval) > 0)
+								if ($prevStudiengang_kz == $resultStudienplan->retval[$i]->studiengang_kz)
 								{
-									$resultStudiengang->retval[0]->studienplaene = array($resultStudienplan->retval[$i]);
-									$studiengangArray[$studiengangCount++] = $resultStudiengang->retval[0];
+									array_push($studiengangArray[$studiengangCount - 1]->studienplaene, $resultStudienplan->retval[$i]);
 								}
-								$prevStudiengang_kz = $resultStudienplan->retval[$i]->studiengang_kz;
+								else
+								{
+									$resultStudiengang = $this->StudiengangModel->load($resultStudienplan->retval[$i]->studiengang_kz);
+									if (is_object($resultStudiengang) && $resultStudiengang->error == EXIT_SUCCESS &&
+										is_array($resultStudiengang->retval) && count($resultStudiengang->retval) > 0)
+									{
+										$resultStudiengang->retval[0]->studienplaene = array($resultStudienplan->retval[$i]);
+										$studiengangArray[$studiengangCount++] = $resultStudiengang->retval[0];
+									}
+									$prevStudiengang_kz = $resultStudienplan->retval[$i]->studiengang_kz;
+								}
 							}
+
+							$result = $this->_success($studiengangArray);
 						}
-						
-						$result = $this->_success($studiengangArray);
 					}
 				}
 			}
