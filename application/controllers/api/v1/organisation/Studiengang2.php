@@ -62,51 +62,54 @@ class Studiengang2 extends APIv1_Controller
 				$result = $this->StudienplanModel->addJoin('lehre.tbl_studienordnung', 'studienordnung_id');
 				if ($result->error == EXIT_SUCCESS)
 				{
-					$result = $this->StudienplanModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
-					if ($result->error == EXIT_SUCCESS)
+					$this->StudienplanModel->addSelect('tbl_studienplan.*, lehre.tbl_studienordnung.studiengang_kz');
+
+					$this->StudienplanModel->addOrder('lehre.tbl_studienordnung.studiengang_kz');
+
+					if (!isset($aktiv)) $aktiv = 'TRUE';
+					if (!isset($onlinebewerbung)) $onlinebewerbung = 'TRUE';
+
+					$resultStudienplan = $this->StudienplanModel->loadWhere(
+						array('semester' => $ausbildungssemester,
+								'studiensemester_kurzbz' => $studiensemester_kurzbz)
+					);
+					
+					if (is_object($resultStudienplan) && $resultStudienplan->error == EXIT_SUCCESS &&
+						is_array($resultStudienplan->retval) && count($resultStudienplan->retval) > 0)
 					{
-						$this->StudienplanModel->addSelect('tbl_studienplan.*, lehre.tbl_studienordnung.studiengang_kz');
+						$studiengangCount = 0;
+						$prevStudiengang_kz = '';
+						$studiengangArray = array();
 
-						$this->StudienplanModel->addOrder('lehre.tbl_studienordnung.studiengang_kz');
-
-						if (!isset($aktiv)) $aktiv = 'TRUE';
-						if (!isset($onlinebewerbung)) $onlinebewerbung = 'TRUE';
-
-						$resultStudienplan = $this->StudienplanModel->loadWhere(
-								array('semester' => $ausbildungssemester,
-										'studiensemester_kurzbz' => $studiensemester_kurzbz,
-										'public.tbl_studiengang.aktiv' => $aktiv,
-										'public.tbl_studiengang.onlinebewerbung' => $onlinebewerbung)
-						);
-
-						if (is_object($resultStudienplan) && $resultStudienplan->error == EXIT_SUCCESS &&
-							is_array($resultStudienplan->retval) && count($resultStudienplan->retval) > 0)
+						for ($i = 0; $i < count($resultStudienplan->retval); $i++)
 						{
-							$studiengangCount = 0;
-							$prevStudiengang_kz = '';
-							$studiengangArray = array();
-
-							for ($i = 0; $i < count($resultStudienplan->retval); $i++)
+							if ($prevStudiengang_kz == $resultStudienplan->retval[$i]->studiengang_kz)
 							{
-								if ($prevStudiengang_kz == $resultStudienplan->retval[$i]->studiengang_kz)
+								if (isset($studiengangArray[$studiengangCount - 1]) && is_array($studiengangArray[$studiengangCount - 1]->studienplaene))
 								{
 									array_push($studiengangArray[$studiengangCount - 1]->studienplaene, $resultStudienplan->retval[$i]);
 								}
-								else
-								{
-									$resultStudiengang = $this->StudiengangModel->load($resultStudienplan->retval[$i]->studiengang_kz);
-									if (is_object($resultStudiengang) && $resultStudiengang->error == EXIT_SUCCESS &&
-										is_array($resultStudiengang->retval) && count($resultStudiengang->retval) > 0)
-									{
-										$resultStudiengang->retval[0]->studienplaene = array($resultStudienplan->retval[$i]);
-										$studiengangArray[$studiengangCount++] = $resultStudiengang->retval[0];
-									}
-									$prevStudiengang_kz = $resultStudienplan->retval[$i]->studiengang_kz;
-								}
 							}
-
-							$result = $this->_success($studiengangArray);
+							else
+							{
+								$resultStudiengang = $this->StudiengangModel->loadWhere(
+									array('studiengang_kz' => $resultStudienplan->retval[$i]->studiengang_kz,
+											'aktiv' => $aktiv,
+											'onlinebewerbung' => $onlinebewerbung)
+								);
+								
+								if (is_object($resultStudiengang) && $resultStudiengang->error == EXIT_SUCCESS &&
+									is_array($resultStudiengang->retval) && count($resultStudiengang->retval) > 0)
+								{
+									$resultStudiengang->retval[0]->studienplaene = array($resultStudienplan->retval[$i]);
+									$studiengangArray[$studiengangCount++] = $resultStudiengang->retval[0];
+								}
+								
+								$prevStudiengang_kz = $resultStudienplan->retval[$i]->studiengang_kz;
+							}
 						}
+
+						$result = $this->_success($studiengangArray);
 					}
 				}
 			}
