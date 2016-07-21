@@ -17,7 +17,8 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>
+ *          Manfred Kindl		< manfred.kindl@technikum-wien.at >
  */
 /**
  * Klasse Reihungstest
@@ -47,6 +48,8 @@ class reihungstest extends basis_db
 	public $oeffentlich=false;	//  boolean
 	public $max_teilnehmer;	//  integer
 	public $studiensemester_kurzbz; //string
+	public $stufe; //smallint
+	public $anmeldefrist; //date
 
 	/**
 	 * Konstruktor
@@ -95,6 +98,7 @@ class reihungstest extends basis_db
 				$this->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				$this->studiensemester_kurzbz =$row->studiensemester_kurzbz;
 				$this->stufe = $row->stufe;
+				$this->anmeldefrist = $row->anmeldefrist;
 				return true;
 			}
 			else
@@ -143,6 +147,8 @@ class reihungstest extends basis_db
 				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				$obj->studiensemester_kurzbz =$row->studiensemester_kurzbz;
+				$obj->stufe = $row->stufe;
+				$obj->anmeldefrist = $row->anmeldefrist;
 
 				$this->result[] = $obj;
 			}
@@ -199,7 +205,7 @@ class reihungstest extends basis_db
 			//Neuen Datensatz einfuegen
 
 			$qry='BEGIN; INSERT INTO public.tbl_reihungstest (studiengang_kz, ort_kurzbz, anmerkung, datum, uhrzeit,
-				 insertamum, insertvon, updateamum, updatevon, max_teilnehmer, oeffentlich, freigeschaltet, studiensemester_kurzbz) VALUES('.
+				 insertamum, insertvon, updateamum, updatevon, max_teilnehmer, oeffentlich, freigeschaltet, studiensemester_kurzbz, stufe, anmeldefrist) VALUES('.
 			     $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 			     $this->db_add_param($this->ort_kurzbz).', '.
 			     $this->db_add_param($this->anmerkung).', '.
@@ -210,7 +216,9 @@ class reihungstest extends basis_db
 			     $this->db_add_param($this->max_teilnehmer).','.
 			     $this->db_add_param($this->oeffentlich, FHC_BOOLEAN).','.
 			     $this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).','.
-			     $this->db_add_param($this->studiensemester_kurzbz).');';
+			     $this->db_add_param($this->studiensemester_kurzbz).','.
+			     $this->db_add_param($this->stufe, FHC_INTEGER).','.
+			     $this->db_add_param($this->anmeldefrist).');';
 		}
 		else
 		{
@@ -225,7 +233,9 @@ class reihungstest extends basis_db
 		     	'max_teilnehmer='.$this->db_add_param($this->max_teilnehmer).', '.
 				'oeffentlich='.$this->db_add_param($this->oeffentlich, FHC_BOOLEAN).', '.
 				'freigeschaltet='.$this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).', '.
-				'studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).' '.
+				'studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).', '.
+				'stufe='.$this->db_add_param($this->stufe, FHC_INTEGER).', '.
+				'anmeldefrist='.$this->db_add_param($this->anmeldefrist).' '.
 				'WHERE reihungstest_id='.$this->db_add_param($this->reihungstest_id, FHC_INTEGER, false).';';
 		}
 
@@ -305,7 +315,9 @@ class reihungstest extends basis_db
 				$obj->max_teilnehmer = $row->max_teilnehmer;
 				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
-				$obj->studiensemester_kurzbz =$row->studiensemester_kurzbz;
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$obj->stufe = $row->stufe;
+				$obj->anmeldefrist = $row->anmeldefrist;
 
 				$this->result[] = $obj;
 			}
@@ -360,6 +372,8 @@ class reihungstest extends basis_db
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				$obj->studiensemester_kurzbz =$row->studiensemester_kurzbz;
 				$obj->angemeldete_teilnehmer = $row->angemeldete_teilnehmer;
+				$obj->stufe = $row->stufe;
+				$obj->anmeldefrist = $row->anmeldefrist;
 
 				$this->result[] = $obj;
 			}
@@ -400,7 +414,9 @@ class reihungstest extends basis_db
 				$obj->max_teilnehmer = $row->max_teilnehmer;
 				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
-				$obj->studiensemester_kurzbz =$row->studiensemester_kurzbz;
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$obj->stufe = $row->stufe;
+				$obj->anmeldefrist = $row->anmeldefrist;
 
 				$this->result[] = $obj;
 			}
@@ -547,6 +563,146 @@ class reihungstest extends basis_db
 		 	WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
 			AND rt_id=".$this->db_add_param($rt_id, FHC_INTEGER);
 
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->erromsg='Fehler beim Löschen der Daten';
+			return false;
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * Liefert die Orte, die einem Reihungstest zugeordnet sind
+	 * @param integer $reihungstest_id ID des Reihungstests, dessen Ort zurueckgegeben werden sollen
+	 * @return true wenn ok, sonst false
+	 */
+	public function getOrteReihungstest($reihungstest_id)
+	{
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_rt_ort
+				WHERE
+					tbl_rt_ort.rt_id=".$this->db_add_param($reihungstest_id)."
+				ORDER BY
+					ort_kurzbz";
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+	
+				$obj->rt_id = $row->rt_id;
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->uid = $row->uid;
+	
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	/*
+	public function getPersonReihungstest($person_id, $rt_id)
+	{
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_rt_person
+				WHERE
+					tbl_rt_person.person_id=".$this->db_add_param($person_id)."
+					AND rt_id=".$this->db_add_param($rt_id);
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+	
+				$this->rt_id = $row->rt_id;
+				$this->person_id = $row->person_id;
+				$this->anmeldedatum = $row->anmeldedatum;
+				$this->teilgenommen = $this->db_parse_bool($row->teilgenommen);
+				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->punkte = $row->punkte;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Eintrag nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}*/
+	
+	/**
+	 * Speichert eine Raumzuteilung zu einem Reihungstesttermin
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID $reihungstest_id und $ort_kurzbz aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function saveOrtReihungstest()
+	{
+		if($this->new)
+		{
+			$qry = "INSERT INTO public.tbl_rt_ort(rt_id, ort_kurzbz, uid) VALUES(".
+					$this->db_add_param($this->rt_id, FHC_INTEGER).','.
+					$this->db_add_param($this->ort_kurzbz).','.
+					$this->db_add_param($this->uid).');';
+		}
+		else
+		{
+			$qry = "UPDATE public.tbl_rt_ort SET ".
+				 ' ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).','.
+				 ' uid='.$this->db_add_param($this->uid).' '.
+				 ' WHERE rt_id='.$this->db_add_param($this->rt_id, FHC_INTEGER).' AND '.
+				 ' ort_kurzbz='.$this->db_add_param($this->ort_kurzbz);
+		}
+	
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Loescht einen Ort zu einem Reihungstest Eintrag
+	 */
+	public function deleteOrtReihungstest($reihungstest_id, $ort_kurzbz)
+	{
+		$qry = "DELETE FROM public.tbl_rt_ort
+		 	WHERE rt_id=".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
+			AND ort_kurzbz=".$this->db_add_param($ort_kurzbz);
+	
 		if($this->db_query($qry))
 		{
 			return true;
