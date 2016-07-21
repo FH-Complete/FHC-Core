@@ -47,6 +47,43 @@ class Dokumentstudiengang extends APIv1_Controller
 			$this->response();
 		}
 	}
+	
+	/**
+	 * @return void
+	 */
+	public function getDokumentstudiengangByStudiengang_kz()
+	{
+		$studiengang_kz = $this->get('studiengang_kz');
+		$onlinebewerbung = $this->get('onlinebewerbung');
+		$pflicht = $this->get('pflicht');
+		
+		if (isset($studiengang_kz))
+		{
+			$result = $this->DokumentstudiengangModel->addJoin("public.tbl_dokument", "dokument_kurzbz");
+			if(is_object($result) && $result->error == EXIT_SUCCESS)
+			{
+				$parameterArray = array("studiengang_kz" => $studiengang_kz);
+			
+				if( isset($onlinebewerbung))
+				{
+					$parameterArray["onlinebewerbung"] = $onlinebewerbung;
+				}
+
+				if( isset($pflicht))
+				{
+					$parameterArray["pflicht"] = $pflicht;
+				}
+				
+				$result = $this->DokumentstudiengangModel->loadWhere($parameterArray);
+			}
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
 
 	/**
 	 * @return void

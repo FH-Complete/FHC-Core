@@ -46,6 +46,29 @@ class Bewerbungstermine extends APIv1_Controller
 			$this->response();
 		}
 	}
+	
+	/**
+	 * @return void
+	 */
+	public function getByStudiengangStudiensemester()
+	{
+		$studiengang_kz = $this->get('studiengang_kz');
+		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
+		
+		if (isset($studiengang_kz) && isset($studiensemester_kurzbz))
+		{
+			$result = $this->BewerbungstermineModel->loadWhere(array(
+				'studiengang_kz' => $studiengang_kz,
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			));
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
 
 	/**
 	 * @return void
