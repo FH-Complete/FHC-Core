@@ -66,6 +66,7 @@
 	$oe_kurzbz='';
 	$gebteil='';
 	$m2='';
+	$arbeitsplaetze='';
 	
 	$neu = "true";
 	
@@ -91,6 +92,7 @@
 		$m2 = str_replace(',','.',$_POST["m2"]);
 		$oe_kurzbz = $_POST["oe_kurzbz"];
 		$gebteil = $_POST["gebteil"];
+		$arbeitsplaetze = $_POST["arbeitsplaetze"];
 		
 		$sg_update = new ort();
 		$sg_update->ort_kurzbz = $ort_kurzbz;
@@ -112,6 +114,7 @@
 		$sg_update->m2 = $m2;
 		$sg_update->gebteil = $gebteil;
 		$sg_update->oe_kurzbz = $oe_kurzbz;
+		$sg_update->arbeitsplaetze = $arbeitsplaetze;
 		
 		if ($_POST["neu"] == "true")
 			$sg_update->new = 1;
@@ -151,6 +154,7 @@
 		$gebteil = $sg->gebteil;
 		$m2 = $sg->m2;
 		$oe_kurzbz = $sg->oe_kurzbz;
+		$arbeitsplaetze = $sg->arbeitsplaetze;
 		$neu = "false";
 	}
 
@@ -374,6 +378,8 @@
 					<tr>
 						<td>Telefonklappe</td>
 						<td><input class="detail" type="text" name="telefonklappe" size="3" maxlength="8" value="'.$telefonklappe.'" onchange="submitable()"></td>
+						<td>Anz. Arbeitsplätze</td>
+						<td><input class="detail" type="text" name="arbeitsplaetze" size="3" maxlength="8" value="'.$arbeitsplaetze.'" onchange="submitable()"></td>
 					</tr>
 					<tr>
 						<td valign="top">Lageplan</td>

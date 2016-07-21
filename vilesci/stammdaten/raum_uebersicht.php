@@ -117,6 +117,7 @@ $htmlstr = "
 		<th>Bezeichnung</th>
 		<th>Planbezeichnung</th>
 		<th>Max. Person</th>
+		<th>Arbeitsplaetze</th>
 		<th>Lehre</th>
 		<th>Reservieren</th>
 		<th>Aktiv</th>
@@ -134,6 +135,7 @@ foreach ($sg->result as $twraum)
 	$htmlstr .= "       <td>".$twraum->bezeichnung."</td>\n";
 	$htmlstr .= "       <td>".$twraum->planbezeichnung."</td>\n";
 	$htmlstr .= "       <td>".$twraum->max_person."</td>\n";
+	$htmlstr .= "       <td>".$twraum->arbeitsplaetze."</td>\n";
 	
 	// Lehre boolean setzen
 	
