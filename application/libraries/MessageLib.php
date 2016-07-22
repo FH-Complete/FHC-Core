@@ -8,21 +8,34 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 */
 class MessageLib
 {
-	private $recipients = array();
+	private $recipients = array(); // not used anymore
 	
     public function __construct()
     {
         $this->ci =& get_instance();
-		
-		$this->ci->config->load('message');
 
+		// Loads message configuration
+		$this->ci->config->load('message');
+		// The second parameter is used to avoiding name collisions in the config array
+		$this->ci->config->load("mail", true);
+
+		// CI Email library
+		$this->ci->load->library("email");
+		// CI Parser library
+		$this->ci->load->library("parser");
+		// Loads VorlageLib
+		$this->ci->load->library('VorlageLib');
+		
+		// Initializing email library with the loaded configurations
+		$this->ci->email->initialize($this->ci->config->config["mail"]);
+		
+		// Loading models
 		$this->ci->load->model('system/Message_model', 'MessageModel');
 		$this->ci->load->model('system/MsgStatus_model', 'MsgStatusModel');
 		$this->ci->load->model('system/Recipient_model', 'RecipientModel');
 		$this->ci->load->model('system/Attachment_model', 'AttachmentModel');
-		
-		$this->ci->load->library('VorlageLib');
-		
+
+		// Loads fhc helper
 		$this->ci->load->helper('fhc');
 		
         //$this->ci->load->helper('language');
@@ -185,7 +198,7 @@ class MessageLib
     // ------------------------------------------------------------------------
 
     /**
-     * add_participant() - adds user to existing thread
+     * add_participant() - adds user to existing thread - NOT used anymore
      *
      * @param   integer  $thread_id  REQUIRED
      * @param   integer  $user_id    REQUIRED
@@ -425,4 +438,138 @@ class MessageLib
             'msg'  => lang('message_'.$error)
         );
     }
+	
+	/**
+	 * Gets an item from the email configuration array
+	 */
+	private function getEmailCfgItem($itemName)
+	{
+		return $this->ci->config->item($itemName, EMAIL_CONFIG_INDEX);
+	}
+	
+	/**
+	 * Sends a single email
+	 */
+	private function sendOne($from, $to, $subject, $message, $alias = "", $cc = null, $bcc = null)
+	{
+		$this->ci->email->from($from, $alias);
+		$this->ci->email->to($to);
+		if (!is_null($cc)) $this->ci->email->cc($cc);
+		if (!is_null($bcc)) $this->ci->email->bcc($bcc);
+		$this->ci->email->subject($subject);
+		$this->ci->email->message($message);
+
+		// Avoid printing ugly error messages
+		return @$this->ci->email->send();
+	}
+	
+	/**
+	 * Gets all the messages from DB and sends them via email
+	 */
+	public function sendAll($numberToSent = null, $numberPerTimeRange = null, $email_time_range = null)
+	{
+		$sent = true; // optimistic expectation
+		
+		// Gets a number (email_number_to_sent) of unread messages from DB
+		// having EMAIL_KONTAKT_TYPE as relative contact type
+		$result = $this->ci->MsgStatusModel->getMessages(
+				EMAIL_KONTAKT_TYPE,
+				MSG_STATUS_UNREAD,
+				$this->getEmailCfgItem("email_number_to_sent")
+		);
+		// Checks if errors were occurred
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
+		{
+			// If data are present
+			if (count($result->retval) > 0)
+			{
+				// Iterating through the result set, if no errors occurred in the previous iteration
+				for ($i = 0; $i < count($result->retval) && $sent; $i++)
+				{
+					// If the person has an email account
+					if (!is_null($result->retval[$i]->receiver) && $result->retval[$i]->receiver != "")
+					{
+						// Using a template as email body
+						$body = $this->ci->parser->parse("templates/mail", array("body" => $result->retval[$i]->body), true);
+						if (is_null($body) || $body == "")
+						{
+							// Error while parsing the mail template
+							// $body = $result->retval[$i]->body;
+						}
+						
+						// If the sender kontakt does not exist, then use system
+						$sender = $this->getEmailCfgItem("email_from_system");
+						if (!is_null($result->retval[$i]->sender) && $result->retval[$i]->sender != "")
+						{
+							$sender = $result->retval[$i]->sender;
+						}
+						
+						// Sending email
+						$sent = $this->sendOne(
+							$sender,
+							$result->retval[$i]->receiver,
+							$result->retval[$i]->subject,
+							$body
+						);
+						
+						// If errors were occurred while sending the email
+						if (!$sent)
+						{
+							// Error while sending emails
+						}
+						else
+						{
+							// Changes the status of the message from unread to read
+							$resultUpdate = $this->ci->MsgStatusModel->update(
+									array($result->retval[$i]->message_id, $result->retval[$i]->person_id),
+									array("status" => MSG_STATUS_READ)
+							);
+							// Checks if errors were occurred
+							if (is_object($resultUpdate) && $resultUpdate->error == EXIT_SUCCESS && is_array($resultUpdate->retval))
+							{
+								// Error while updating DB
+								$sent = false;
+							}
+							
+							// If the email has been sent
+							if ($sent)
+							{
+							// If it has been sent a specified number of emails, then it has to wait
+								if ((is_numeric($numberPerTimeRange) && $numberPerTimeRange == $i + 1) ||
+									$this->getEmailCfgItem("email_number_per_time_range") == $i + 1)
+								{
+									// Gets the number of seconds to wait until the next send
+									$seconds = 0;
+
+									if (is_numeric($email_time_range))
+										$seconds = $email_time_range;
+									else
+										$seconds = $this->getEmailCfgItem("email_time_range");
+
+									sleep($seconds); // Wait!!!
+								}
+							}
+						}
+					}
+					else
+					{
+						// This person does not have an email account
+						$sent = false;
+					}
+				}
+			}
+			else
+			{
+				// No emails to send
+				$sent = false;
+			}
+		}
+		else
+		{
+			// Something went wrong while getting data from DB
+			$sent = false;
+		}
+		
+		return $sent;
+	}
 }
