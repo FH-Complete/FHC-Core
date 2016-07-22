@@ -36,11 +36,11 @@ test:
 #        path: "application/controllers/"
 #        allowed_warnings: 100
 #        skip_classes: false
-    php_code_sniffer:
-        path: "application/controllers/"
-        standard: "tests/codesniffer/FHComplete"
-        allowed_errors: 200
-        allowed_warnings: 200
+#    php_code_sniffer:
+#        path: "application/controllers/"
+#        standard: "tests/codesniffer/FHComplete"
+#        allowed_errors: 200
+#        allowed_warnings: 200
     codeception:
         config: "tests/codeception/"
         path: "tests/codeception/_output/"
