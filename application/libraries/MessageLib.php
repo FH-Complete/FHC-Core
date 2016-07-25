@@ -23,6 +23,8 @@ class MessageLib
 		$this->ci->load->library("email");
 		// CI Parser library
 		$this->ci->load->library("parser");
+		// Loads LogLib
+		$this->ci->load->library('LogLib');
 		// Loads VorlageLib
 		$this->ci->load->library('VorlageLib');
 		
@@ -65,8 +67,6 @@ class MessageLib
 		$attm = $this->ci->AttachmentModel->loadWhere(array('message_id' => $msg_id));
 		$msg->retval[0]->attm = $attm->retval;
 		
-
-        // General Error Occurred
         return $msg;
     }
 
@@ -83,7 +83,6 @@ class MessageLib
 		
 		$msg = $this->ci->MessageModel->getMessagesByUID($uid, $all);		
 
-        // General Error Occurred
         return $msg;
     }
 
@@ -100,7 +99,6 @@ class MessageLib
 		
 		$msg = $this->ci->MessageModel->getMessagesByPerson($person_id, $all);		
 
-        // General Error Occurred
         return $msg;
     }
 
@@ -478,10 +476,10 @@ class MessageLib
 				$this->getEmailCfgItem("email_number_to_sent")
 		);
 		// Checks if errors were occurred
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
+		if (is_object($result) && $result->error == EXIT_SUCCESS)
 		{
 			// If data are present
-			if (count($result->retval) > 0)
+			if (is_array($result->retval) && count($result->retval) > 0)
 			{
 				// Iterating through the result set, if no errors occurred in the previous iteration
 				for ($i = 0; $i < count($result->retval) && $sent; $i++)
@@ -493,8 +491,8 @@ class MessageLib
 						$body = $this->ci->parser->parse("templates/mail", array("body" => $result->retval[$i]->body), true);
 						if (is_null($body) || $body == "")
 						{
-							// Error while parsing the mail template
 							// $body = $result->retval[$i]->body;
+							$this->ci->loglib->logError("Error while parsing the mail template");
 						}
 						
 						// If the sender kontakt does not exist, then use system
@@ -515,7 +513,7 @@ class MessageLib
 						// If errors were occurred while sending the email
 						if (!$sent)
 						{
-							// Error while sending emails
+							$this->ci->loglib->logError("Error while sending emails");
 						}
 						else
 						{
@@ -527,7 +525,7 @@ class MessageLib
 							// Checks if errors were occurred
 							if (is_object($resultUpdate) && $resultUpdate->error == EXIT_SUCCESS && is_array($resultUpdate->retval))
 							{
-								// Error while updating DB
+								$this->ci->loglib->logError("Error while updating DB");
 								$sent = false;
 							}
 							
@@ -553,20 +551,20 @@ class MessageLib
 					}
 					else
 					{
-						// This person does not have an email account
+						$this->ci->loglib->logError("This person does not have an email account");
 						$sent = false;
 					}
 				}
 			}
 			else
 			{
-				// No emails to send
+				$this->ci->loglib->logInfo("There are no email to be sent");
 				$sent = false;
 			}
 		}
 		else
 		{
-			// Something went wrong while getting data from DB
+			$this->ci->loglib->logError("Something went wrong while getting data from DB");
 			$sent = false;
 		}
 		
