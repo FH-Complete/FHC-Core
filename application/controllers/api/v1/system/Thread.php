@@ -23,9 +23,7 @@ class Thread extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model ThreadModel
-		$this->load->model('system/thread_model', 'ThreadModel');
-		
-		
+		$this->load->model('system/Thread_model', 'ThreadModel');
 	}
 
 	/**

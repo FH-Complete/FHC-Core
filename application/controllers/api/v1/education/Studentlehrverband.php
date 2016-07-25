@@ -23,9 +23,7 @@ class Studentlehrverband extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model StudentlehrverbandModel
-		$this->load->model('education/studentlehrverband', 'StudentlehrverbandModel');
-		
-		
+		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 	}
 
 	/**

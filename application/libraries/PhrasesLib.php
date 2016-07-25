@@ -17,8 +17,11 @@ class PhrasesLib
 
 		$this->ci =& get_instance();
 
+		// Loads message configuration
+		$this->ci->config->load('message');
+		
 		$this->ci->load->library('parser');
-
+		
 		$this->ci->load->model('system/Phrase_model', 'PhraseModel');
 		$this->ci->load->model('system/Phrasentext_model', 'PhrasentextModel');
 

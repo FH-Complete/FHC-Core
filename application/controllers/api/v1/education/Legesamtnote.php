@@ -23,9 +23,7 @@ class Legesamtnote extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model LegesamtnoteModel
-		$this->load->model('education/legesamtnote', 'LegesamtnoteModel');
-		
-		
+		$this->load->model('education/Legesamtnote_model', 'LegesamtnoteModel');
 	}
 
 	/**

@@ -23,9 +23,7 @@ class Notenschluesselzuordnung extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model NotenschluesselzuordnungModel
-		$this->load->model('education/notenschluesselzuordnung', 'NotenschluesselzuordnungModel');
-		
-		
+		$this->load->model('education/Notenschluesselzuordnung_model', 'NotenschluesselzuordnungModel');
 	}
 
 	/**

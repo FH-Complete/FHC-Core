@@ -23,9 +23,7 @@ class Lvinfo extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model LvinfoModel
-		$this->load->model('education/lvinfo', 'LvinfoModel');
-		
-		
+		$this->load->model('education/Lvinfo_model', 'LvinfoModel');
 	}
 
 	/**

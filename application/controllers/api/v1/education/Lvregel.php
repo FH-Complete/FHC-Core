@@ -23,9 +23,7 @@ class Lvregel extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model LvregelModel
-		$this->load->model('education/lvregel', 'LvregelModel');
-		
-		
+		$this->load->model('education/Lvregel_model', 'LvregelModel');
 	}
 
 	/**

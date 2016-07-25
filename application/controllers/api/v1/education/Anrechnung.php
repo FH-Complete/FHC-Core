@@ -23,9 +23,7 @@ class Anrechnung extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model AnrechnungModel
-		$this->load->model('education/anrechnung', 'AnrechnungModel');
-		
-		
+		$this->load->model('education/Anrechnung_model', 'AnrechnungModel');
 	}
 
 	/**

@@ -23,9 +23,7 @@ class Abschlussbeurteilung extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model AbschlussbeurteilungModel
-		$this->load->model('education/abschlussbeurteilung', 'AbschlussbeurteilungModel');
-		
-		
+		$this->load->model('education/Abschlussbeurteilung_model', 'AbschlussbeurteilungModel');
 	}
 
 	/**

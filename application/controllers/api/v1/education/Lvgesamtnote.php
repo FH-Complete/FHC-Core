@@ -23,9 +23,7 @@ class Lvgesamtnote extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model LvgesamtnoteModel
-		$this->load->model('education/lvgesamtnote', 'LvgesamtnoteModel');
-		
-		
+		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
 	}
 
 	/**

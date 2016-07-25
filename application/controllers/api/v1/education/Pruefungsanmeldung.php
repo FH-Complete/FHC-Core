@@ -23,9 +23,7 @@ class Pruefungsanmeldung extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PruefungsanmeldungModel
-		$this->load->model('education/pruefungsanmeldung', 'PruefungsanmeldungModel');
-		
-		
+		$this->load->model('education/Pruefungsanmeldung_model', 'PruefungsanmeldungModel');
 	}
 
 	/**

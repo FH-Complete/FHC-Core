@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class LePruefung extends APIv1_Controller
+class Lepruefung extends APIv1_Controller
 {
 	/**
 	 * LePruefung API constructor.
@@ -23,9 +23,7 @@ class LePruefung extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model LePruefungModel
-		$this->load->model('education/lepruefung', 'LePruefungModel');
-		
-		
+		$this->load->model('education/LePruefung_model', 'LePruefungModel');
 	}
 
 	/**

@@ -23,9 +23,7 @@ class Pruefungstermin extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PruefungsterminModel
-		$this->load->model('education/pruefungstermin', 'PruefungsterminModel');
-		
-		
+		$this->load->model('education/Pruefungstermin_model', 'PruefungsterminModel');
 	}
 
 	/**

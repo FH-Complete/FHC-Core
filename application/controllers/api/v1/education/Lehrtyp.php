@@ -23,9 +23,7 @@ class Lehrtyp extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model LehrtypModel
-		$this->load->model('education/lehrtyp', 'LehrtypModel');
-		
-		
+		$this->load->model('education/Lehrtyp_model', 'LehrtypModel');
 	}
 
 	/**

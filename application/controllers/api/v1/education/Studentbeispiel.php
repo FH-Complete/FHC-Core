@@ -23,9 +23,7 @@ class Studentbeispiel extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model StudentbeispielModel
-		$this->load->model('education/studentbeispiel', 'StudentbeispielModel');
-		
-		
+		$this->load->model('education/Studentbeispiel_model', 'StudentbeispielModel');
 	}
 
 	/**

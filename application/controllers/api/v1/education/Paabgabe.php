@@ -23,9 +23,7 @@ class Paabgabe extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PaabgabeModel
-		$this->load->model('education/paabgabe', 'PaabgabeModel');
-		
-		
+		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 	}
 
 	/**

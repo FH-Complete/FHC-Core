@@ -423,7 +423,9 @@ DELETE FROM system.tbl_rolleberechtigung WHERE berechtigung_kurzbz IN (
 	'wawi/inventar:begrenzt',
 	'fs/dms',
 	'system/phrase',
-	'system/vorlagestudiengang'
+	'system/vorlagestudiengang',
+	'system/vorlage',
+	'system/appdaten'
 );
 
 -- DELETE FROM system.tbl_berechtigung
@@ -652,7 +654,9 @@ DELETE FROM system.tbl_berechtigung WHERE berechtigung_kurzbz IN (
 	'wawi/inventar:begrenzt',
 	'fs/dms',
 	'system/phrase',
-	'system/vorlagestudiengang'
+	'system/vorlagestudiengang',
+	'system/vorlage',
+	'system/appdaten'
 );
 
 -- INSERT Permissions
@@ -881,6 +885,8 @@ INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('basis/message', '');
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('system/phrase', '');
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('system/vorlagestudiengang', '');
+INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('system/vorlage', '');
+INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('system/appdaten', '');
 
 -- INSERT link between user admin and permissions
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/archiv', 'admin', 'suid');
@@ -1108,6 +1114,8 @@ INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/message', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('system/phrase', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('system/vorlagestudiengang', 'admin', 'suid');
+INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('system/vorlage', 'admin', 'suid');
+INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('system/appdaten', 'admin', 'suid');
 
 -- EMPTY public.tbl_statistik
 DELETE FROM public.tbl_statistik;

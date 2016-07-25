@@ -23,9 +23,7 @@ class Pruefungsfenster extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PruefungsfensterModel
-		$this->load->model('education/pruefungsfenster', 'PruefungsfensterModel');
-		
-		
+		$this->load->model('education/Pruefungsfenster_model', 'PruefungsfensterModel');
 	}
 
 	/**

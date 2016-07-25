@@ -23,9 +23,7 @@ class Pruefungsstatus extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PruefungsstatusModel
-		$this->load->model('education/pruefungsstatus', 'PruefungsstatusModel');
-		
-		
+		$this->load->model('education/Pruefungsstatus_model', 'PruefungsstatusModel');
 	}
 
 	/**

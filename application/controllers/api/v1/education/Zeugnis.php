@@ -23,9 +23,7 @@ class Zeugnis extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model ZeugnisModel
-		$this->load->model('education/zeugnis', 'ZeugnisModel');
-		
-		
+		$this->load->model('education/Zeugnis_model', 'ZeugnisModel');
 	}
 
 	/**

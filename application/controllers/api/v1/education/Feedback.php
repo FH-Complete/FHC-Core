@@ -23,9 +23,7 @@ class Feedback extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model FeedbackModel
-		$this->load->model('education/feedback', 'FeedbackModel');
-		
-		
+		$this->load->model('education/Feedback_model', 'FeedbackModel');
 	}
 
 	/**

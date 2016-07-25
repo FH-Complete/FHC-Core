@@ -23,9 +23,7 @@ class Lehreinheitmitarbeiter extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model LehreinheitmitarbeiterModel
-		$this->load->model('education/lehreinheitmitarbeiter', 'LehreinheitmitarbeiterModel');
-		
-		
+		$this->load->model('education/Lehreinheitmitarbeiter_model', 'LehreinheitmitarbeiterModel');
 	}
 
 	/**

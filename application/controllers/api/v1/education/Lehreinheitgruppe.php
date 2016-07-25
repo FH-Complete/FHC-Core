@@ -23,9 +23,7 @@ class Lehreinheitgruppe extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model LehreinheitgruppeModel
-		$this->load->model('education/lehreinheitgruppe', 'LehreinheitgruppeModel');
-		
-		
+		$this->load->model('education/Lehreinheitgruppe_model', 'LehreinheitgruppeModel');
 	}
 
 	/**

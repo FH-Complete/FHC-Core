@@ -23,9 +23,7 @@ class Lehrfunktion extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model LehrfunktionModel
-		$this->load->model('education/lehrfunktion', 'LehrfunktionModel');
-		
-		
+		$this->load->model('education/Lehrfunktion_model', 'LehrfunktionModel');
 	}
 
 	/**

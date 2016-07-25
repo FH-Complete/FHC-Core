@@ -23,9 +23,7 @@ class Abgabe extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model AbgabeModel
-		$this->load->model('education/abgabe', 'AbgabeModel');
-		
-		
+		$this->load->model('education/Abgabe_model', 'AbgabeModel');
 	}
 
 	/**

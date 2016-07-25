@@ -23,9 +23,7 @@ class Zeugnisnote extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model ZeugnisnoteModel
-		$this->load->model('education/zeugnisnote', 'ZeugnisnoteModel');
-		
-		
+		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
 	}
 
 	/**

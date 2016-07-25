@@ -23,9 +23,7 @@ class Abschlusspruefung extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model AbschlusspruefungModel
-		$this->load->model('education/abschlusspruefung', 'AbschlusspruefungModel');
-		
-		
+		$this->load->model('education/Abschlusspruefung_model', 'AbschlusspruefungModel');
 	}
 
 	/**

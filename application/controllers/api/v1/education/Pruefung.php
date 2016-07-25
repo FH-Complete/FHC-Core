@@ -23,9 +23,7 @@ class Pruefung extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PruefungModel
-		$this->load->model('education/pruefung', 'PruefungModel');
-		
-		
+		$this->load->model('education/Pruefung_model', 'PruefungModel');
 	}
 
 	/**

@@ -23,9 +23,7 @@ class Betreuerart extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model BetreuerartModel
-		$this->load->model('education/betreuerart', 'BetreuerartModel');
-		
-		
+		$this->load->model('education/Betreuerart_model', 'BetreuerartModel');
 	}
 
 	/**

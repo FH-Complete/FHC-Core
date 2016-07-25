@@ -23,9 +23,7 @@ class Moodle extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model MoodleModel
-		$this->load->model('education/moodle', 'MoodleModel');
-		
-		
+		$this->load->model('education/Moodle_model', 'MoodleModel');
 	}
 
 	/**

@@ -23,9 +23,7 @@ class Paabgabetyp extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PaabgabetypModel
-		$this->load->model('education/paabgabetyp', 'PaabgabetypModel');
-		
-		
+		$this->load->model('education/Paabgabetyp_model', 'PaabgabetypModel');
 	}
 
 	/**

@@ -23,9 +23,7 @@ class Appdaten extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model AppdatenModel
-		$this->load->model('system/appdaten_model', 'AppdatenModel');
-		
-		
+		$this->load->model('system/Appdaten_model', 'AppdatenModel');
 	}
 
 	/**

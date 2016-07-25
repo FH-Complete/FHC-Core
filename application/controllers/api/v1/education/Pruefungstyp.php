@@ -23,9 +23,7 @@ class Pruefungstyp extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PruefungstypModel
-		$this->load->model('education/pruefungstyp', 'PruefungstypModel');
-		
-		
+		$this->load->model('education/Pruefungstyp_model', 'PruefungstypModel');
 	}
 
 	/**

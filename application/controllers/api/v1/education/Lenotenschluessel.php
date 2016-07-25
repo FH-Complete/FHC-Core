@@ -14,7 +14,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class LeNotenschluessel extends APIv1_Controller
+class Lenotenschluessel extends APIv1_Controller
 {
 	/**
 	 * LeNotenschluessel API constructor.
@@ -23,7 +23,7 @@ class LeNotenschluessel extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model LeNotenschluesselModel
-		$this->load->model('education/lenotenschluessel', 'LeNotenschluesselModel');
+		$this->load->model('education/LeNotenschluessel_model', 'LeNotenschluesselModel');
 		
 		
 	}

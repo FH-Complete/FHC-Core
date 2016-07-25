@@ -23,9 +23,7 @@ class Projekttyp extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model ProjekttypModel
-		$this->load->model('education/projekttyp', 'ProjekttypModel');
-		
-		
+		$this->load->model('education/Projekttyp_model', 'ProjekttypModel');
 	}
 
 	/**

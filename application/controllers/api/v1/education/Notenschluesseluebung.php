@@ -23,9 +23,7 @@ class Notenschluesseluebung extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model NotenschluesseluebungModel
-		$this->load->model('education/notenschluesseluebung', 'NotenschluesseluebungModel');
-		
-		
+		$this->load->model('education/Notenschluesseluebung_model', 'NotenschluesseluebungModel');
 	}
 
 	/**

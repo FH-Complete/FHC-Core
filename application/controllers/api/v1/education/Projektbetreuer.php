@@ -23,9 +23,7 @@ class Projektbetreuer extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model ProjektbetreuerModel
-		$this->load->model('education/projektbetreuer', 'ProjektbetreuerModel');
-		
-		
+		$this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
 	}
 
 	/**

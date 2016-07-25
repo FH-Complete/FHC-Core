@@ -23,9 +23,7 @@ class Beispiel extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model BeispielModel
-		$this->load->model('education/beispiel', 'BeispielModel');
-		
-		
+		$this->load->model('education/Beispiel_model', 'BeispielModel');
 	}
 
 	/**

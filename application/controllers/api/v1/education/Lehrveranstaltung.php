@@ -23,9 +23,7 @@ class Lehrveranstaltung extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model LehrveranstaltungModel
-		$this->load->model('education/lehrveranstaltung', 'LehrveranstaltungModel');
-		
-		
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 	}
 
 	/**

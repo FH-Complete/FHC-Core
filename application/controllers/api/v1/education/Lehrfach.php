@@ -23,9 +23,7 @@ class Lehrfach extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model LehrfachModel
-		$this->load->model('education/lehrfach', 'LehrfachModel');
-		
-		
+		$this->load->model('education/Lehrfach_model', 'LehrfachModel');
 	}
 
 	/**

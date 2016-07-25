@@ -23,9 +23,7 @@ class Lvangebot extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model LvangebotModel
-		$this->load->model('education/lvangebot', 'LvangebotModel');
-		
-		
+		$this->load->model('education/Lvangebot_model', 'LvangebotModel');
 	}
 
 	/**

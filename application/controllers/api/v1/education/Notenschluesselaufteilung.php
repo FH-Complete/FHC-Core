@@ -23,9 +23,7 @@ class Notenschluesselaufteilung extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model NotenschluesselaufteilungModel
-		$this->load->model('education/notenschluesselaufteilung', 'NotenschluesselaufteilungModel');
-		
-		
+		$this->load->model('education/Notenschluesselaufteilung_model', 'NotenschluesselaufteilungModel');
 	}
 
 	/**

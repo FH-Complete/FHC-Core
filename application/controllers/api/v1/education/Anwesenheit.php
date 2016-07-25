@@ -23,9 +23,7 @@ class Anwesenheit extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model AnwesenheitModel
-		$this->load->model('education/anwesenheit', 'AnwesenheitModel');
-		
-		
+		$this->load->model('education/Anwesenheit_model', 'AnwesenheitModel');
 	}
 
 	/**

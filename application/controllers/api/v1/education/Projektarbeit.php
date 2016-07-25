@@ -23,9 +23,7 @@ class Projektarbeit extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model ProjektarbeitModel
-		$this->load->model('education/projektarbeit', 'ProjektarbeitModel');
-		
-		
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 	}
 
 	/**
