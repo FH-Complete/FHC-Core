@@ -23,15 +23,23 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/preoutgoing.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/prestudent.class.php');
+require_once('../../../include/studiengang.class.php');
 
-$uid = get_uid(); 
+$uid = get_uid();
 
-$sprache = getSprache(); 
-$p=new phrasen($sprache); 
+$sprache = getSprache();
+$p=new phrasen($sprache);
 
-$outgoing = new preoutgoing(); 
-if($outgoing->loadUid($uid))
-    header("Location: outgoing.php?ansicht=auswahl"); 
+$prestudent = new prestudent();
+$prestudent->getPrestudentsFromUid($uid);
+
+if(isset($_REQUEST["prestudent_id"]))
+	$prestudent_id = $_REQUEST["prestudent_id"];
+
+$outgoing = new preoutgoing();
+if(isset($prestudent_id) && $outgoing->loadPrestudent_id($prestudent_id))
+	header("Location: outgoing.php?ansicht=auswahl");
 
 
 ?>
@@ -40,21 +48,49 @@ if($outgoing->loadUid($uid))
     <head>
 		<title><?php echo $p->t('incoming/outgoingRegistration'); ?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+		<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+
+		<script language="JavaScript" type="text/javascript">
+			function MM_jumpMenu(targ, selObj, restore)
+			{
+				eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
+
+				if(restore)
+				{
+					selObj.selectedIndex = 0;
+				}
+			}
+		</script>
 	</head>
 	<body>
-        <h1><?php echo $p->t('incoming/outgoingRegistration'); ?></h1>
-        <br>
-        <div id="test" style="margin-left:50px; margin-right:50px; font-size:16px;"><?php echo $p->t('incoming/willkommenBeiOutgoingAnmeldung');?></div>
-        <table width="100%">
-            <tr>
-                <td align="center"> <form action ="outgoing.php?method=new&ansicht=auswahl" method="POST">
-                    <input type="submit" value="<?php echo $p->t('incoming/zurAnmeldung');?>"/>
-                     </form>
-                </td>
-            </tr>
-        </table>
-        
-    </body>
+		<h1><?php echo $p->t('incoming/outgoingRegistration'); ?></h1>
+		<br>
+		<div id="test" style="margin-left:50px; margin-right:50px; font-size:16px;">
+			<?php echo $p->t('incoming/willkommenBeiOutgoingAnmeldung');?>
+
+			<span><?php echo $p->t('global/studiengang')?>:</span>
+			<SELECT name='stg' onChange="MM_jumpMenu('self',this,0)">
+			<option disabled <?php echo (isset($prestudent_id) ? "" : "selected") ?> value><?php echo $p->t('global/auswaehlen')?></option>
+				<?php
+					foreach ($prestudent->result as $pres)
+					{
+						$studiengang = new studiengang($pres->studiengang_kz);
+						echo "<OPTION ".(isset($prestudent_id) && $prestudent_id == $pres->prestudent_id ? "selected" : "")." value='registration.php?prestudent_id=$pres->prestudent_id'>$studiengang->bezeichnung</OPTION>";
+					}
+				?>
+			</SELECT>
+		</div>
+		<table width="100%">
+			<tr>
+				<td align="center">
+					<?php if(isset($prestudent_id)):?>
+						<form action ="outgoing.php?method=new&ansicht=auswahl&prestudent_id=<?php echo $prestudent_id ?>" method="POST">
+							<input type="submit" value="<?php echo $p->t('incoming/zurAnmeldung');?>"/>
+						</form>
+					<?php endif;?>
+				</td>
+			</tr>
+		</table>
+	</body>
 </html>
 

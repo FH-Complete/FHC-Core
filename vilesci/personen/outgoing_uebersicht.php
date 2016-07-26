@@ -23,6 +23,7 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/preoutgoing.class.php');
 require_once('../../include/benutzer.class.php');
+require_once('../../include/prestudent.class.php');
 
 $method=isset($_POST['action'])?$_POST['action']:'';
 
@@ -134,7 +135,11 @@ $aktOutgoing = new preoutgoing();
 $aktOutgoing->getAktuellOutgoing(); 
 $mailto_link = 'mailto:';
 foreach($aktOutgoing->result as $outg)
-    $mailto_link.= $outg->uid.'@'.DOMAIN.';';
+{
+	$ps = new prestudent();
+	$ps->load($outg->prestudent_id);
+	$mailto_link.= $ps->uid.'@'.DOMAIN.';';
+}
 
 echo'     <td>&nbsp;<input type="submit" value="Anzeigen"/></td></tr>
       <tr><td colspan="6"><a href="'.$mailto_link.'">Email</a> an alle zur Zeit im Ausland befindlichen Studenten senden</td>
@@ -159,12 +164,15 @@ echo '
 	<tbody>';
 foreach($out->result as $row)
 {
-    $user = new benutzer(); 
-    $user->load($row->uid);
+	$ps = new prestudent();
+	$ps->load($row->prestudent_id);
+
+	$user = new benutzer();
+	$user->load($ps->uid);
 	echo "\n";
 	echo '<tr>';
 	echo '<td>'.$row->preoutgoing_id.'</td>';
-    echo '<td>'.$row->uid.'</td>';
+	echo '<td>'.$ps->uid.'</td>';
 	echo '<td>'.$user->vorname.'</td>';
 	echo '<td>'.$user->nachname.'</td>';
 	echo '<td>'.$row->dauer_von.'</td>';

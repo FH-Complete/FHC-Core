@@ -348,17 +348,17 @@ if($method!='')
 						{
 							$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER(".$db->db_add_param($vorname_clean.".".$nachname_clean).")";
 							$result_alias = $db->db_query($qry_alias);
-							if($db->db_num_rows($result_alias)==0)								
+							if($db->db_num_rows($result_alias)==0)
 								$benutzer->alias =$vorname_clean.'.'.$nachname_clean;
 							else 
 								$benutzer->alias = '';
 						}
 						else
 							$benutzer->alias='';
-									
+
 						$benutzer->insertamum = date('Y-m-d H:i:s');
 						$benutzer->insertvon = $user;
-										
+
 						if($benutzer->save(true, false))
 						{
 							//Studentendatensatz anlegen

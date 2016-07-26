@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Karl Burkhart <burkhart@technikum-wien.at>
+ * Authors: Karl Burkhart <burkhart@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  * 
  */
 
@@ -30,14 +31,25 @@ require_once('../../../include/mobilitaetsprogramm.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/mail.class.php');
 require_once('../../../include/akte.class.php');
+require_once('../../../include/prestudent.class.php');
 
 $method = (isset($_GET['method'])?$_GET['method']:'');
 $message = '';
 $uid=get_uid();
-$sprache = getSprache(); 
+
+if(!isset($_REQUEST["prestudent_id"]))
+	die("es wurde kine Prestudent_id uebergeben!");
+
+$prestudent = new prestudent();
+$prestudent_id = $_REQUEST["prestudent_id"];
+$prestudent->load($prestudent_id);
+if($prestudent->uid != $uid)
+	die($p->t('global/keineBerechtigungFuerDieseSeite'));
+
+$sprache = getSprache();
 $p=new phrasen($sprache);
 $outgoing = new preoutgoing(); 
-$outgoing->loadUid($uid); 
+$outgoing->loadPrestudent_id($prestudent_id);
 
 // speichert outgoing
 if(isset($_REQUEST['submitOutgoing']))
@@ -49,7 +61,7 @@ if(isset($_REQUEST['submitOutgoing']))
     $zeitraum_bis = $datum->formatDatum($_REQUEST['zeitraum_bis'], 'Y-m-d');
     
     $preoutgoing = new preoutgoing(); 
-    $preoutgoing->loadUid($outgoing->uid);
+    $preoutgoing->loadPrestudent_id($outgoing->prestudent_id);
     
     // löschen der Ansprechperson
     if($_POST['ansprechperson']==' ' || $_POST['ansprechperson']=='' || $_POST['ansprechperson_uid'] == '')
@@ -122,7 +134,7 @@ if(isset($_REQUEST['zDaten']))
 if($method=='new')
 {
     $preoutgoing = new preoutgoing(); 
-    $preoutgoing->uid = $uid; 
+    $preoutgoing->prestudent_id = $prestudent_id;
     $preoutgoing->new = true; 
     $preoutgoing->bachelorarbeit = false; 
     $preoutgoing->masterarbeit = false; 
@@ -341,7 +353,7 @@ if($method =="deleteFirma")
 $benutzer = new benutzer(); 
 $benutzer->load($uid); 
 $outgoing = new preoutgoing(); 
-$outgoing->loadUid($uid); 
+$outgoing->loadPrestudent_id($prestudent_id);
 $datum = new datum(); 
 $zeitraum_von = $datum->formatDatum($outgoing->dauer_von, 'd.m.Y');
 $zeitraum_bis = $datum->formatDatum($outgoing->dauer_bis, 'd.m.Y');
@@ -355,14 +367,15 @@ $name.= $benutzer->vorname.' '.$benutzer->nachname.' '.$benutzer->titelpost;
 // 
 if(isset($_GET['ansicht']) == 'auswahl')
 {
-
+	$ps = new prestudent();
+	$ps->load($outgoing->prestudent_id);
 ?>  
     <table border ="0" width="100%">
         <tr>
-            <td align="left" colspan="4"><b><h1><div style="display:block; text-align:left; float:left;"><?php echo $p->t('incoming/outgoingRegistration'); ?></div><div style="display:block; text-align:right; margin-right:6px; "><?php echo((check_lektor($outgoing->uid)!='0')?"Mitarbeiter: ":"Student: ").$name; ?></div></h1></b></td>
+            <td align="left" colspan="4"><b><h1><div style="display:block; text-align:left; float:left;"><?php echo $p->t('incoming/outgoingRegistration'); ?></div><div style="display:block; text-align:right; margin-right:6px; "><?php echo((check_lektor($ps->uid)!='0')?"Mitarbeiter: ":"Student: ").$name; ?></div></h1></b></td>
         </tr>
         <tr><td><?php echo $message; ?></td></tr>
-        <tr><td><h3><?php echo $p->t('incoming/programmAuswahl');?>:</h3></td><td><div style="display:block; text-align:right; margin-right:6px; "><a href="<?php echo $_SERVER['PHP_SELF']; ?>?method=new&ansicht=auswahl" align ="left"><?php echo $p->t('incoming/neuenOutgoingAnlegen'); ?></a></div></td></tr>
+        <tr><td><h3><?php echo $p->t('incoming/programmAuswahl');?>:</h3></td><td><div style="display:block; text-align:right; margin-right:6px; "><a href="<?php echo $_SERVER['PHP_SELF']; ?>?method=new&ansicht=auswahl&prestudent_id=<?php echo $prestudent_id; ?>" align ="left"><?php echo $p->t('incoming/neuenOutgoingAnlegen'); ?></a></div></td></tr>
     </table>
         
     <table border="0"  width="100%">
@@ -461,14 +474,14 @@ if(isset($_GET['ansicht']) == 'auswahl')
                             if($fi->name == '')
                             {
                                 if(!$outgoing->checkStatus($outgoing->preoutgoing_id, 'freigabe'))
-                                    $link = "<a href='".$_SERVER['PHP_SELF']."?method=deleteFirma&outgoingFirma_id=".$fi->preoutgoing_firma_id."&ansicht=auswahl'>delete</a>";
+                                    $link = "<a href='".$_SERVER['PHP_SELF']."?method=deleteFirma&outgoingFirma_id=".$fi->preoutgoing_firma_id."&ansicht=auswahl&prestudent_id=".$prestudent_id."'>delete</a>";
                                 
                                 echo " <tr><td ".$style.">".$i.": ".$firmaAuswahl->name." [".$mobprogramm."] $link </td></tr>";
                             }
                             else // freemover
                             {
                                 if(!$outgoing->checkStatus($outgoing->preoutgoing_id, 'freigabe'))
-                                    $link = "<a href='".$_SERVER['PHP_SELF']."?method=deleteFirma&outgoingFirma_id=".$fi->preoutgoing_firma_id."&ansicht=auswahl'>delete</a>";
+                                    $link = "<a href='".$_SERVER['PHP_SELF']."?method=deleteFirma&outgoingFirma_id=".$fi->preoutgoing_firma_id."&ansicht=auswahl&prestudent_id=".$prestudent_id."'>delete</a>";
                                 echo " <tr><td ".$style.">".$i.": ".$fi->name." [Freemover] $link </td></tr>";
                             }
                             $i++;
@@ -476,7 +489,7 @@ if(isset($_GET['ansicht']) == 'auswahl')
                         ?>
                         
                     </table>
-                    <form action="<?php echo $_SERVER['PHP_SELF']."?ansicht=auswahl"; ?>" method ="POST">
+                    <form action="<?php echo $_SERVER['PHP_SELF']."?ansicht=auswahl&prestudent_id=".$prestudent_id; ?>" method ="POST">
                         <table width="100%" style="border: thin solid black; border-spacing:5px; background-color: lightgray; margin-top:5px; margin-bottom:5px;" >
                                 <tr><td><?php echo $p->t('incoming/zeitraumVon');?>:</td><td><input type="text" size="25" maxlength="40" name="zeitraum_von" id="datepicker_zeitraumvon" value="<?php echo($zeitraum_von); ?>"/></td></tr>
                                 <tr><td><?php echo $p->t('incoming/zeitraumBis');?>:</td><td><input type="text" size="25" maxlength="40" name="zeitraum_bis" id="datepicker_zeitraumbis" value="<?php echo($zeitraum_bis); ?>"/></td></tr>
@@ -552,16 +565,18 @@ else
         $intensivSprachkursSelect = $outgoing->intensivsprachkurs?'selected':'';
         $betreuer = new benutzer();
         $betreuer->load($outgoing->betreuer);
+				$ps = new prestudent();
+				$ps->load($outgoing->prestudent_id);
 
         ?><table border ="0" width="100%">
     <tr>
-        <td align="left" colspan="4"><b><h1><div style="display:block; text-align:left; float:left;"><?php echo $p->t('incoming/outgoingRegistration'); ?></div><div style="display:block; text-align:right; margin-right:6px; "><?php echo((check_lektor($outgoing->uid)!='0')?"Mitarbeiter: ":"Student: ").$name; ?></div></h1></b></td>
+        <td align="left" colspan="4"><b><h1><div style="display:block; text-align:left; float:left;"><?php echo $p->t('incoming/outgoingRegistration'); ?></div><div style="display:block; text-align:right; margin-right:6px; "><?php echo((check_lektor($ps->uid)!='0')?"Mitarbeiter: ":"Student: ").$name; ?></div></h1></b></td>
     </tr>
     <tr><td><?php echo $message; ?></td></tr>
     <tr><td><h3><?php echo $p->t('incoming/zusaetzlicheDaten');?>:</h3></td><td></td></tr>
     </table><?php
 
-        echo '<form name="zusaetzlicheDaten" method="POST" action="'.$_SERVER['PHP_SELF'].'">';
+        echo '<form name="zusaetzlicheDaten" method="POST" action="'.$_SERVER['PHP_SELF'].'&prestudent_id='.$prestudent_id.'">';
         echo '<table width="90%" style="border: thin solid black; border-spacing:10px; background-color: lightgray; margin-top:5px; margin-bottom:5px;">';
         echo '<tr><td><table>';
            
@@ -593,11 +608,11 @@ else
         echo '</form>';
         
         // Bei Mitarbeiter Lehrveranstaltung ausblenden
-        if(check_lektor($outgoing->uid)=='0')
+        if(check_lektor($ps->uid)=='0')
         {
             echo '<hr>';
             echo '<p width="100%" align="center"><h3>'.$p->t('incoming/auswahlDerLv').'</h2></p>';
-            echo '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
+            echo '<form method="POST" action="'.$_SERVER['PHP_SELF'].'&prestudent_id='.$prestudent_id.'">';
             echo '<table width="90%" style="border: thin solid black; border-spacing:10px; background-color: lightgray; margin-top:5px; margin-bottom:5px;">';
             echo '<tr><td>'.$p->t('global/bezeichnung').': <input type="text" name="lv_bezeichnung" size="50" id="lv_bezeichnung"></td><td>Wochenstunden: <input type="text" name="lv_wochenstunden" id="lv_wochenstunden" size="4"></td><td>ECTS: <input type="text" name="lv_ects" size="4" id="lv_ects"></td><td>Unit Code: <input tpye="text" size="4" name="lv_unitcode" id="lv_unitcode"></td><td><input type="submit" value="add" name="saveLv"></tr>';
             echo '</table>';
@@ -619,7 +634,7 @@ else
             <tbody>';
             foreach($preoutgoingLv->lehrveranstaltungen as $lv)
             {
-                echo '<tr><td>'.$lv->bezeichnung.'</td><td>'.$lv->ects.'</td><td>'.$lv->wochenstunden.'</td><td>'.$lv->unitcode.'</td><td><a href="'.$_SERVER['PHP_SELF'].'?method=deleteLv&lv_id='.$lv->preoutgoing_lehrveranstaltung_id.'">'.$p->t('incoming/loeschen').'</a></td></tr>';
+                echo '<tr><td>'.$lv->bezeichnung.'</td><td>'.$lv->ects.'</td><td>'.$lv->wochenstunden.'</td><td>'.$lv->unitcode.'</td><td><a href="'.$_SERVER['PHP_SELF'].'?method=deleteLv&lv_id='.$lv->preoutgoing_lehrveranstaltung_id.'$prestudent_id='.$prestudent_id.'">'.$p->t('incoming/loeschen').'</a></td></tr>';
 
             }
             echo '</table>';
@@ -650,7 +665,7 @@ else
             {	
                 echo '<tr>
                         <td><a href="'.APP_ROOT.'cis/private/outgoing/akte.php?id='.$ak->akte_id.'">'.$ak->titel.'</a></td>
-                        <td><a href="'.$_SERVER['PHP_SELF'].'?method=files&mode=delete&id='.$ak->akte_id.'" title="delete">'.$p->t('incoming/loeschen').'</a></td>
+                        <td><a href="'.$_SERVER['PHP_SELF'].'?method=files&mode=delete&id='.$ak->akte_id.'&prestudent_id='.$prestudent_id.'" title="delete">'.$p->t('incoming/loeschen').'</a></td>
                     </tr>';
             }
             echo '</table>'; 
@@ -665,23 +680,23 @@ else
     <script type="text/javascript">
         function saveFirma(firma_id, programm)
         {
-            window.location.href="<?php echo $_SERVER['PHP_SELF'] ?>?method=saveFirma&ansicht=auswahl&firma_id="+firma_id+"&programm="+programm;
+            window.location.href="<?php echo $_SERVER['PHP_SELF'] ?>?method=saveFirma&ansicht=auswahl&firma_id="+firma_id+"&programm="+programm + "<?php echo '&prestudent_id='.$prestudent_id; ?>";
         }
         function saveFreemover()
         {
-            window.location.href="<?php echo $_SERVER['PHP_SELF'] ?>?method=saveFirma&ansicht=auswahl&name="+document.getElementById("freemover").value;
+            window.location.href="<?php echo $_SERVER['PHP_SELF'] ?>?method=saveFirma&ansicht=auswahl&name="+document.getElementById("freemover").value + "<?php echo '&prestudent_id='.$prestudent_id; ?>";
         }
         function saveLv()
         {
-            window.location.href="<?php echo $_SERVER['PHP_SELF'] ?>?method=saveLv&ects="+document.getElementById("lv_ects").value+"&bezeichnung="+document.getElementById("lv_bezeichnung").value;
+            window.location.href="<?php echo $_SERVER['PHP_SELF'] ?>?method=saveLv&ects="+document.getElementById("lv_ects").value+"&bezeichnung="+document.getElementById("lv_bezeichnung").value + "<?php echo '&prestudent_id='.$prestudent_id; ?>";
         }
         function clickWeiter()
         {
-            window.location.href="<?php echo $_SERVER['PHP_SELF'] ?>";
+            window.location.href="<?php echo $_SERVER['PHP_SELF'].'?prestudent_id='.$prestudent_id; ?>";
         }
         function clickZurueck()
         {
-            window.location.href="<?php echo $_SERVER['PHP_SELF'] ?>?ansicht=auswahl";
+            window.location.href="<?php echo $_SERVER['PHP_SELF'] ?>?ansicht=auswahl" + "<?php echo '&prestudent_id='.$prestudent_id; ?>";
         }
         function FensterOeffnen (adresse) 
 		{

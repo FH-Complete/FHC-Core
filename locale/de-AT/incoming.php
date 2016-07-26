@@ -70,7 +70,7 @@ $this->phrasen['incoming/heimatuniversitaet']='Heimatuniversität';
 $this->phrasen['incoming/fehlerBeimLoeschenDerLv']='Fehler beim löschen der Lehrveranstaltung aufgetreten';
 $this->phrasen['incoming/nichtMehrAlsDreiUniversitaeten']='Es dürfen nicht mehr als 3 Universitäten eingetragen werden';
 $this->phrasen['incoming/ungueltigeIdUebergeben']='Ungültige Id Übergeben';
-$this->phrasen['incoming/willkommenBeiOutgoingAnmeldung']='<p><b>Willkommen bei der Outgoing-Registrierung. Um sich als Outgoing anzumelden, benutzen Sie den Button “Zur Anmeldung“. </b></p>
+$this->phrasen['incoming/willkommenBeiOutgoingAnmeldung']='<p><b>Willkommen bei der Outgoing-Registrierung. Um sich als Outgoing anzumelden, wählen Sie bitte einen Studiengang und benutzen Sie anschließend den Button “Zur Anmeldung“. </b></p>
 <p>Sie können die Anmeldung bereits ein Semester vor dem geplanten Auslandssemester vornehmen, jedoch spätestens zwei Monate vor der Bewerbungsfrist der ausgewählten Gasthochschule. Die Bewerbungsfristen für Austauschstudierende sind in der Regel im April/Mai für das Wintersemester und im Oktober/November für das Sommersemester.  </p>
 <p>Sie haben folgende Möglichkeiten für einen Auslandsstudienaufenthalt: Unsere europäischen Partnerhochschulen im Rahmen der ERASMUS- und CEEPUS-Mobilitätsprogramme, unsere außereuropäischen Partnerinstitutionen, andere Hochschulen (Freemover) und Summer Schools. </p>
 <p>Bis zu 12 Monaten können Sie im Ausland studieren und ein Förderprogram ausnützen. An unseren Partnerhochschulen bezahlen Sie keine Studiengebühren und die Abwicklung Ihres Bewerbungsprozesses wird von TW International unterstützt. Eine Liste der Partnerinstitutionen befindet sich auf unserer Homepage. </p>

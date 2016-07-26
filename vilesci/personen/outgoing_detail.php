@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Karl Burkhart 			< burkhart@technikum-wien.at >
+ * Authors: Karl Burkhart 			< burkhart@technikum-wien.at > and
+ *          Andreas Moik <moik@technikum-wien.at>.
  * 
  */
 
@@ -31,7 +32,6 @@ require_once('../../include/firma.class.php');
 require_once('../../include/mobilitaetsprogramm.class.php');
 require_once('../../include/adresse.class.php');
 require_once('../../include/nation.class.php');
-require_once('../../include/student.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/akte.class.php');
 require_once('../../include/prestudent.class.php');
@@ -78,7 +78,9 @@ if($method == 'setAuswahl')
     if($preoutgoing->setStatus($preoutgoing_id, 'freigabe'))
     {
         $message = "<span class='ok'>E-Mail an Studenten geschickt</span>";
-        sendMailStudent($preoutgoing->uid);
+        $ps = new prestudent();
+        $ps->load($preoutgoing->prestudent_id);
+        sendMailStudent($ps->uid);
     }
     else
         $message="<span class='error'>Fehler beim Speichern aufgetreten</span>"; 
@@ -90,7 +92,7 @@ if($method == 'setAuswahl')
     $preoutgoingFirma->auswahl = true; 
     $preoutgoingFirma->new = false; 
     if($preoutgoingFirma->saveFirma())
-        $message = $preoutgoingFirma->errormsg;        
+        $message = $preoutgoingFirma->errormsg;
 }
 
 // löscht eine Universität
@@ -160,11 +162,13 @@ if(isset($_POST['StatusSetzen']))
     // mail an assistenz senden
     if($status =='genehmigt')
     {
+        $ps = new prestudent();
+        $ps->load($preoutgoing->prestudent_id);
         // wenn Student dann Email an zuständige Assistenz
-        if(check_student($preoutgoing->uid))
+        if(check_student($ps->uid))
         {
-            sendMailAssistenz($preoutgoing->uid);
-        }      
+            sendMailAssistenz($preoutgoing->prestudent_id);
+        }
     }
     $outgoing= new preoutgoing();
     if($outgoing->setStatus($preoutgoing_id, $status))
@@ -250,7 +254,9 @@ $out = new preoutgoing();
 if(!$out->load($preoutgoing_id))
 	$message.= '<span class="error">'.$out->errormsg.'</span>';
 $person = new benutzer();
-if(!$person->load($out->uid))
+$ps = new prestudent();
+
+if(!$ps->load($out->prestudent_id) || !$person->load($ps->uid))
 	$message.='<span class="error">'.$person->errormsg.'</span>';
 
 echo '<h2>Details - '.$person->vorname.' '.$person->nachname.'</h2>';
@@ -283,6 +289,8 @@ function print_personendetails()
     global $out; 
     
     $datum = new datum(); 
+    $prestudent = new prestudent();
+    $prestudent->load($out->prestudent_id);
     
     $outgoingFirma = new preoutgoing(); 
     $outgoingFirma->loadAuswahlFirmen($out->preoutgoing_id);
@@ -304,17 +312,15 @@ function print_personendetails()
     $sprachkursSelect = $out->sprachkurs?'selected':'';
     $intensivSprachkursSelect = $out->intensivsprachkurs?'selected':'';
     $benutzer = new benutzer(); 
-    $benutzer->load($out->uid);
+    $benutzer->load($prestudent->uid);
     $adresse = new adresse(); 
     $adresse->load_pers($benutzer->person_id);
     $nation = new nation(); 
     $nation->load($benutzer->staatsbuergerschaft);
-    $student = new student(); 
-    $student->load($benutzer->uid);
-    $prestudent = new prestudent(); 
-    $prestudent->getLastStatus($student->prestudent_id);
-    $studiengang = new studiengang(); 
-    $studiengang->load($student->studiengang_kz);
+
+    $prestudent->getLastStatus($out->prestudent_id);
+    $studiengang = new studiengang();
+    $studiengang->load($prestudent->studiengang_kz);
     $adr_strasse='';
     $adr_plz = '';
     $adr_ort ='';
@@ -371,7 +377,7 @@ function print_personendetails()
         </tr>
         <tr>
             <td>Geburtsort:</td><td><input type="text" name="gebort" value="'.$benutzer->gebort.'" disabled></td>
-            <td>Personenkennzeichen:</d><td><input type="text" name="pers_kz" value="'.$student->matrikelnr.'" disabled></td>
+            <td>Personenkennzeichen:</d><td><input type="text" name="pers_kz" value="'.$prestudent->perskz.'" disabled></td>
         </tr>
         <tr>
             <td>Studiensemester:</td><td><input type="text" name="studienjahr" value="'.$prestudent->ausbildungssemester.'" disabled></td>
@@ -379,7 +385,7 @@ function print_personendetails()
         </tr>
         <tr>
             <td>Studientyp:</td><td><input type="text" name="studientyp" value="'.$studiengang->typ.'" disabled></td>
-            <td><a href ="mailto:'.$out->uid.'@'.DOMAIN.'">E-Mail schicken</a></td>
+            <td><a href ="mailto:'.$prestudent->uid.'@'.DOMAIN.'">E-Mail schicken</a></td>
         </tr>
         <tr>
             <td>&nbsp;</td>
@@ -447,7 +453,7 @@ else
             </tr>
             <tr>
                 <td>Geburtsort:</td><td><input type="text" name="gebort" value="'.$benutzer->gebort.'" disabled></td>
-                <td>Personenkennzeichen:</d><td><input type="text" name="pers_kz" value="'.$student->matrikelnr.'" disabled></td>
+                <td>Personenkennzeichen:</d><td><input type="text" name="pers_kz" value="'.$prestudent->perskz.'" disabled></td>
             </tr>
             <tr>
                 <td>Studiensemester:</td><td><input type="text" name="studienjahr" value="'.$prestudent->ausbildungssemester.'" disabled></td>
@@ -455,7 +461,7 @@ else
             </tr>
             <tr>
                 <td>Studientyp:</td><td><input type="text" name="studientyp" value="'.$studiengang->typ.'" disabled></td>
-                <td><a href ="mailto:'.$out->uid.'@'.DOMAIN.'">E-Mail schicken</a></td>
+                <td><a href ="mailto:'.$prestudent->uid.'@'.DOMAIN.'">E-Mail schicken</a></td>
             </tr>
             <tr>
                 <td>&nbsp;</td>
@@ -604,33 +610,33 @@ function print_menu($name, $value)
 }
 
 // sendet eine EMail an die Studiengangsssistenz des Outgoings
-function sendMailAssistenz($uid)
+function sendMailAssistenz($prestudent_id)
 {
-    $student = new student(); 
-    $student->load($uid);
-    $studiengang = new studiengang(); 
-    $studiengang->load($student->studiengang_kz);
-    $out = new preoutgoing(); 
-    $out->loadUid($uid); 
-    $out_auswahl = new preoutgoing(); 
-    $out_auswahl->loadAuswahl($out->preoutgoing_id); 
-    $mob = new mobilitaetsprogramm(); 
-    $mob->load($out_auswahl->mobilitaetsprogramm_code); 
-    $firm = new firma(); 
-    $firm->load($out_auswahl->firma_id); 
-    
-    $emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
-    $emailtext.= "Ein Student ist für den Aufenthalt im Ausland gemeldet.<br>";
-    $emailtext.= "Uid: ".$student->uid."<br>";
-    $emailtext.= "Name: ".$student->vorname." ".$student->nachname."<br>";
-    $emailtext.= "Zeitraum-Von: ".$out->dauer_von."<br>";
-    $emailtext.= "Zeitraum-Bis: ".$out->dauer_bis."<br>";
-    $emailtext.= "Mobilitätsprogramm: ".$mob->kurzbz."<br>";
-    $emailtext.= "Universität: ".$firm->name."<br>";
-    
-    $mail = new mail($studiengang->email, 'no-reply', 'New Outgoing', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
-    $mail->setHTMLContent($emailtext); 
-    $mail->send(); 
+	$prestudent = new prestudent();
+	$prestudent->load($prestudent_id);
+	$studiengang = new studiengang();
+	$studiengang->load($prestudent->studiengang_kz);
+	$out = new preoutgoing();
+	$out->loadPrestudent_id($prestudent_id);
+	$out_auswahl = new preoutgoing();
+	$out_auswahl->loadAuswahl($out->preoutgoing_id);
+	$mob = new mobilitaetsprogramm();
+	$mob->load($out_auswahl->mobilitaetsprogramm_code);
+	$firm = new firma();
+	$firm->load($out_auswahl->firma_id);
+
+	$emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
+	$emailtext.= "Ein Student ist für den Aufenthalt im Ausland gemeldet.<br>";
+	$emailtext.= "Uid: ".$prestudent->uid."<br>";
+	$emailtext.= "Name: ".$prestudent->vorname." ".$prestudent->nachname."<br>";
+	$emailtext.= "Zeitraum-Von: ".$out->dauer_von."<br>";
+	$emailtext.= "Zeitraum-Bis: ".$out->dauer_bis."<br>";
+	$emailtext.= "Mobilitätsprogramm: ".$mob->kurzbz."<br>";
+	$emailtext.= "Universität: ".$firm->name."<br>";
+
+	$mail = new mail($studiengang->email, 'no-reply', 'New Outgoing', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+	$mail->setHTMLContent($emailtext);
+	$mail->send();
 }
 
 // sendet eine EMail an den Studenten dass Universität ausgewählt wurde
