@@ -35,30 +35,30 @@ class Migration_Bewerbungsfrist extends MigrationLib
 			),
 			"nachfrist" => array(
 				"type" => "boolean DEFAULT FALSE",
-				"null" => TRUE
+				"null" => true
 			),
 			"nachfristende" => array(
 				"type" => "date",
-				"null" => TRUE
+				"null" => true
 			),
 			"anmerkung" => array(
 				"type" => "text"
 			),
 			"insertamum" => array(
 				"type" => "timestamp DEFAULT NOW()",
-				"null" => TRUE
+				"null" => true
 			),
 			"insertvon" => array(
 				"type" => "varchar(32)",
-				"null" => TRUE
+				"null" => true
 			),
 			"updateamum" => array(
 				"type" => "timestamp DEFAULT NOW()",
-				"null" => TRUE
+				"null" => true
 			),
 			"updatevon" => array(
 				"type" => "varchar(32)",
-				"null" => TRUE
+				"null" => true
 			)
 		);
 		$this->createTable("lehre", "tbl_bewerbungsfrist", $fields);

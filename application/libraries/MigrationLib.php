@@ -258,6 +258,44 @@ class MigrationLib extends CI_Migration
 	}
 	
 	/**
+	 * Sets a column as unique key of a table and schema
+	 */
+	protected function addUniqueKey($schema, $table, $name, $fields)
+	{
+		$stringFields = null;
+
+		if (is_array($fields))
+		{
+			if (count($fields) > 0)
+			{
+				$stringFields = "";
+				for ($i = 0; $i < count($fields); $i++)
+				{
+					$stringFields .= $fields[$i];
+					if ($i != count($fields) - 1)
+					{
+						$stringFields .= ", ";
+					}
+				}
+				$query = sprintf("CREATE UNIQUE INDEX %s ON %s.%s (%s)", $name, $schema, $table, $stringFields);
+			}
+		}
+		else
+		{
+			$query = sprintf("CREATE UNIQUE INDEX %s ON %s.%s (%s)", $name, $schema, $table, $fields);
+		}
+		
+		if (@$this->db->simple_query($query))
+		{
+			$this->printMessage(sprintf("Added unique key %s on table %s.%s", $name, $schema, $table));
+		}
+		else
+		{
+			$this->printError(sprintf("Adding unique key %s on table %s.%s", $name, $schema, $table));
+		}
+	}
+	
+	/**
 	 * Grants permissions to a user on a table and schema
 	 */
 	protected function grantTable($permissions, $schema, $table, $user)
@@ -355,6 +393,90 @@ class MigrationLib extends CI_Migration
 			$this->printError(sprintf("Initializing sequence %s.%s", $schemaSrc, $sequence));
 		}
 	}
+	
+	/**
+	 * Add comment to a column
+	 */
+	protected function addCommentToColumn($schema, $table, $field, $comment)
+	{
+		$query = sprintf("COMMENT ON COLUMN %s.%s.%s IS ?", $schema, $table, $field);
+		
+		if (@$this->db->query($query, array($comment)))
+		{
+			$this->printMessage(sprintf("Comment added to %s.%s.%s", $schema, $table, $field));
+		}
+		else
+		{
+			$this->printError(sprintf("Error while adding comment to %s.%s.%s", $schema, $table, $field));
+		}
+	}
+	
+	/**
+	 * Add comment to a table
+	 */
+	protected function addCommentToTable($schema, $table, $comment)
+	{
+		$query = sprintf("COMMENT ON TABLE %s.%s IS ?", $schema, $table, $field);
+		
+		if (@$this->db->query($query, array($comment)))
+		{
+			$this->printMessage(sprintf("Comment added to %s.%s", $schema, $table));
+		}
+		else
+		{
+			$this->printError(sprintf("Error while adding comment to %s.%s", $schema, $table));
+		}
+	}
+	/**
+	 * Grants permissions to a user on a sequence
+	 */
+	protected function grantSequence($permissions, $schema, $sequence, $user)
+	{
+		$stringPermission = null;
+
+		if (is_array($permissions))
+		{
+			if (count($permissions) > 0)
+			{
+				$stringPermission = "";
+				for ($i = 0; $i < count($permissions); $i++)
+				{
+					$stringPermission .= $permissions[$i];
+					if ($i != count($permissions) - 1)
+					{
+						$stringPermission .= ", ";
+					}
+				}
+				$query = sprintf("GRANT %s ON SEQUENCE %s.%s TO %s", $stringPermission, $schema, $sequence, $user);
+			}
+		}
+		else
+		{
+			$query = sprintf("GRANT %s ON SEQUENCE %s.%s TO %s", $permissions, $schema, $sequence, $user);
+		}
+
+		if (@$this->db->simple_query($query))
+		{
+			$this->printMessage(
+				sprintf("Granted permissions %s on sequence %s.%s to user %s",
+						is_null($stringPermission) ? $permissions : $stringPermission,
+						$schema,
+						$sequence,
+						$user
+			));
+		}
+		else
+		{
+			$this->printError(
+				sprintf("Granting permissions %s on sequence %s.%s to user %s",
+						is_null($stringPermission) ? $permissions : $stringPermission,
+						$schema,
+						$sequence,
+						$user
+			));
+		}
+	}
+	
 	
 	/**
 	 * Executes the given query
