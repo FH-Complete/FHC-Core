@@ -3,6 +3,7 @@
 // Define constants
 define("EMAIL_CONFIG_INDEX", "mail");
 define("EMAIL_KONTAKT_TYPE", "email");
+define("SENT_INFO_NEWLINE", "\n");
 
 // Define configuration parameters
 $config["email_number_to_sent"] = 1000; // Number of emails to sent each time sendAll is called

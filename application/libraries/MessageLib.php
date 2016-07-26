@@ -246,6 +246,9 @@ class MessageLib
 		$result = $this->ci->MessageModel->insert($data);
 		if (is_object($result) && $result->error == EXIT_SUCCESS)
 		{
+			/**
+			 * @TODO: sender_id must be a receiver_id
+			 */
 			$msg_id = $result->retval;
 			$statusData = array(
 				'message_id' => $msg_id,
@@ -457,8 +460,51 @@ class MessageLib
 		$this->ci->email->subject($subject);
 		$this->ci->email->message($message);
 
-		// Avoid printing ugly error messages
+		// Avoid printing on standard output ugly error messages
 		return @$this->ci->email->send();
+	}
+	
+	/**
+	 * Update the table tbl_message_recipient
+	 */
+	private function _updateMessageRecipient($message_id, $receiver_id, $parameters)
+	{
+		$updated = false;
+		
+		// Changes the status of the message from unread to read
+		$resultUpdate = $this->ci->RecipientModel->update(array($receiver_id, $message_id), $parameters);
+		// Checks if errors were occurred
+		if (is_object($resultUpdate) && $resultUpdate->error == EXIT_SUCCESS && is_array($resultUpdate->retval))
+		{
+			$updated = true;
+		}
+		
+		return $updated;
+	}
+	
+	/**
+	 * Changes the status of the message from unsent to sent
+	 */
+	private function setMessageSent($message_id, $receiver_id)
+	{
+		$parameters = array("sent" => "NOW()", "sentinfo" => null);
+		
+		return $this->_updateMessageRecipient($message_id, $receiver_id, $parameters);
+	}
+	
+	/**
+	 * Sets the sentInfo with the error
+	 */
+	private function setMessageError($message_id, $receiver_id, $sentInfo, $prevSentInfo = null)
+	{
+		if (!is_null($prevSentInfo) && $prevSentInfo != "")
+		{
+			$sentInfo = $prevSentInfo . SENT_INFO_NEWLINE . $sentInfo;
+		}
+		
+		$parameters = array("sent" => null, "sentinfo" => $sentInfo);
+		
+		return $this->_updateMessageRecipient($message_id, $receiver_id, $parameters);
 	}
 	
 	/**
@@ -468,11 +514,11 @@ class MessageLib
 	{
 		$sent = true; // optimistic expectation
 		
-		// Gets a number (email_number_to_sent) of unread messages from DB
+		// Gets a number (email_number_to_sent) of unsent messages from DB
 		// having EMAIL_KONTAKT_TYPE as relative contact type
-		$result = $this->ci->MsgStatusModel->getMessages(
+		$result = $this->ci->RecipientModel->getMessages(
 				EMAIL_KONTAKT_TYPE,
-				MSG_STATUS_UNREAD,
+				null,
 				$this->getEmailCfgItem("email_number_to_sent")
 		);
 		// Checks if errors were occurred
@@ -509,27 +555,27 @@ class MessageLib
 							$result->retval[$i]->subject,
 							$body
 						);
-						
 						// If errors were occurred while sending the email
 						if (!$sent)
 						{
-							$this->ci->loglib->logError("Error while sending emails");
+							$this->ci->loglib->logError("Error while sending an email");
+							// Writing errors in tbl_message_status
+							$sme = $this->setMessageError(
+									$result->retval[$i]->message_id,
+									$result->retval[$i]->receiver_id,
+									"Error while sending an email",
+									$result->retval[$i]->sentinfo
+							);
+							if (!$sme)
+							{
+								$this->ci->loglib->logError("Error while updating DB");
+							}
 						}
 						else
 						{
-							// Changes the status of the message from unread to read
-							$resultUpdate = $this->ci->MsgStatusModel->update(
-									array($result->retval[$i]->message_id, $result->retval[$i]->person_id),
-									array("status" => MSG_STATUS_READ)
-							);
-							// Checks if errors were occurred
-							if (is_object($resultUpdate) && $resultUpdate->error == EXIT_SUCCESS && is_array($resultUpdate->retval))
-							{
-								$this->ci->loglib->logError("Error while updating DB");
-								$sent = false;
-							}
-							
-							// If the email has been sent
+							// Setting the message as sent in DB
+							$sent = $this->setMessageSent($result->retval[$i]->message_id, $result->retval[$i]->receiver_id);
+							// If the email has been sent and the DB updated
 							if ($sent)
 							{
 							// If it has been sent a specified number of emails, then it has to wait
@@ -547,12 +593,27 @@ class MessageLib
 									sleep($seconds); // Wait!!!
 								}
 							}
+							else
+							{
+								$this->ci->loglib->logError("Error while updating DB");
+							}
 						}
 					}
 					else
 					{
 						$this->ci->loglib->logError("This person does not have an email account");
-						$sent = false;
+						// Writing errors in tbl_message_status
+						$sme = $this->setMessageError(
+								$result->retval[$i]->message_id,
+								$result->retval[$i]->receiver_id,
+								"This person does not have an email account",
+								$result->retval[$i]->sentinfo
+						);
+						if (!$sme)
+						{
+							$this->ci->loglib->logError("Error while updating DB");
+						}
+						$sent = true; // Non blocking error
 					}
 				}
 			}

@@ -5,12 +5,12 @@
  *
  * @return  array
  */
-function success($retval, $message = EXIT_SUCCESS)
+function success($retval, $message = null)
 {
 	$return = new stdClass();
 	$return->error = EXIT_SUCCESS;
 	$return->fhcCode = $message;
-	$return->msg = lang('fhc_' . $message);
+	if (!is_null($message)) $return->msg = lang('fhc_' . $message);
 	$return->retval = $retval;
 	return $return;
 }
@@ -20,12 +20,12 @@ function success($retval, $message = EXIT_SUCCESS)
  *
  * @return  array
  */
-function error($retval = '', $message = EXIT_ERROR)
+function error($retval = '', $message = null)
 {
 	$return = new stdClass();
 	$return->error = EXIT_ERROR;
 	$return->fhcCode = $message;
-	$return->msg = lang('fhc_' . $message);
+	if (!is_null($message)) $return->msg = lang('fhc_' . $message);
 	$return->retval = $retval;
 	return $return;
 }
