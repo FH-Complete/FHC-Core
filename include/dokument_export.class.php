@@ -325,7 +325,7 @@ class dokument_export
 		}
 		else
 		{
-			$data = fread($handle, filesize($file));
+			$data = fread($handle, $fsize);
 			fclose($handle);
 			return $data;
 		}

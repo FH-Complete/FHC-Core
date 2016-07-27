@@ -77,9 +77,11 @@ foreach($prestudent_ids as $pid)
 
 	if(!$doc->create('pdf'))
 		die($doc->errormsg);
-	$doc->temp_filename = $filename;
-	$doc->output(false);
-	//$doc->close();
+//	$doc->temp_filename = $filename;
+	$document = $doc->output(false);
+	$filename = $tmpDir.'/'.uniqid();
+	file_put_contents($filename, $document);
+	$doc->close();
 	$allDocs[] = $filename;
 
 
