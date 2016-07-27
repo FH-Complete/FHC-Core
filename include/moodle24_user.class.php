@@ -63,6 +63,13 @@ class moodle24_user extends basis_db
 			$client = new SoapClient($this->serverurl);
 			$response = $client->fhcomplete_user_get_users(array(array('key'=>'username', 'value'=>$uid)));
 
+			if(is_object($response))
+			{
+				$response_obj = $response;
+				unset($response);
+				$response['users']=$response_obj->users;
+			}
+
 			if(isset($response['users'][0]))
 			{
 				$this->mdl_user_id = $response['users'][0]['id'];
