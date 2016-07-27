@@ -2165,6 +2165,45 @@ function StudentPrintInskriptionsbestaetigung(event)
 }
 
 // ****
+// * Druckt den Bewerberakt
+// ****
+function StudentPrintBewerberakt(event)
+{
+	tree = document.getElementById('student-tree');
+	//Alle markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
+
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			var prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', v);
+			if(paramList!='')
+				paramList = paramList+";";
+			paramList += prestudent_id;
+			anzahl = anzahl+1;
+		}
+	}
+
+	if (event.shiftKey)
+	    var output='odt';
+	else if (event.ctrlKey)
+		var output='doc';
+	else
+		var output='pdf';
+
+	if(anzahl>0)
+		window.open('<?php echo APP_ROOT; ?>content/dokumentenakt.pdf.php?prestudent_ids='+paramList+'&output='+output+'&vorlage_kurzbz=Bewerberakt','Bewerberakt', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	else
+		alert('Bitte markieren Sie zuerst eine oder mehrere Personen');
+}
+
+// ****
 // * Excel Export der Studentendaten
 // ****
 function StudentExport()

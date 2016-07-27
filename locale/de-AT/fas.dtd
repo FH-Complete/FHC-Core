@@ -191,6 +191,10 @@
 <!ENTITY menu-dokumente-inskriptionsbestaetigung.label		"Inskriptionsbestätigung">
 <!ENTITY menu-dokumente-inskriptionsbestaetigung.accesskey	"I">
 
+<!ENTITY menu-dokumente-bewerberakt.key		"B">
+<!ENTITY menu-dokumente-bewerberakt.label		"Bewerberakt">
+<!ENTITY menu-dokumente-bewerberakt.accesskey	"B">
+
 <!ENTITY menu-dokumente-zeugnis.key		"Z">
 <!ENTITY menu-dokumente-zeugnis.label		"Zeugnis Deutsch">
 <!ENTITY menu-dokumente-zeugnis.accesskey	"Z">
