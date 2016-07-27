@@ -24,8 +24,6 @@ class Prestudentstatus extends APIv1_Controller
 		parent::__construct();
 		// Load model PrestudentstatusModel
 		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
-		
-		
 	}
 
 	/**
