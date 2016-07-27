@@ -24,7 +24,7 @@ class Recipient_model extends DB_Model
 	 */
 	public function getMessages($kontaktType, $sent, $limit = null)
 	{
-		// Check wrights
+		// Check rights
 		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_msg_recipient"), "s"))
 			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_msg_recipient"), FHC_MODEL_ERROR);
 		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_msg_message"), "s"))
@@ -67,8 +67,6 @@ class Recipient_model extends DB_Model
 			array_push($parametersArray, $limit);
 		}
 		
-		
-
 		// Get data of the messages to sent
 		$result = $this->db->query($query, $parametersArray);
 		if (is_object($result))

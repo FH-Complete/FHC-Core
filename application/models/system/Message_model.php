@@ -1,6 +1,6 @@
 <?php 
 
-if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+if ( ! defined("BASEPATH")) exit("No direct script access allowed");
 
 class Message_model extends DB_Model
 {
@@ -10,8 +10,8 @@ class Message_model extends DB_Model
 	public function __construct()
 	{
 		parent::__construct();
-		$this->dbTable = 'public.tbl_msg_message';
-		$this->pk = 'message_id';
+		$this->dbTable = "public.tbl_msg_message";
+		$this->pk = "message_id";
 	}
 	
 	public function getMessagesByUID($uid, $all)
@@ -21,50 +21,46 @@ class Message_model extends DB_Model
 		// if same user
 		if ($uid === getAuthUID())
 		{
-			if (! $this->fhc_db_acl->isBerechtigt('basis/message', 's'))
-				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> basis/message', FHC_MODEL_ERROR);
+			if (! $this->fhc_db_acl->isBerechtigt("basis/message", "s"))
+				return $this->_error(lang("fhc_".FHC_NORIGHT)." -> basis/message", FHC_MODEL_ERROR);
 		}
 		// if different user, for reading messages from other users
 		else
 		{
-			if (! $this->fhc_db_acl->isBerechtigt('basis/message', 's'))
-				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> basis/message:all', FHC_MODEL_ERROR);
+			if (! $this->fhc_db_acl->isBerechtigt("basis/message", "s"))
+				return $this->_error(lang("fhc_".FHC_NORIGHT)." -> basis/message:all", FHC_MODEL_ERROR);
 		}
 
 		// get Data
-		$sql = 'SELECT uid,
-						person_id,
-						message_id,
-						subject,
-						body,
-						priority,
-						relationmessage_id,
-						oe_kurzbz,
+		$sql = "SELECT b.uid,
+						m.person_id,
+						m.message_id,
+						m.subject,
+						m.body,
+						m.priority,
+						m.relationmessage_id,
+						m.oe_kurzbz,
 						m.insertamum,
-						anrede,
-						titelpost,
-						titelpre,
-						nachname,
-						vorname,
-						vornamen,
-						status,
-						statusinfo,
+						p.anrede,
+						p.titelpost,
+						p.titelpre,
+						p.nachname,
+						p.vorname,
+						p.vornamen,
+						s.status,
+						s.statusinfo,
 						s.insertamum AS statusamum
-				  FROM public.tbl_msg_message m JOIN public.tbl_person USING (person_id)
-						JOIN public.tbl_benutzer USING (person_id)
-						LEFT OUTER JOIN (
-							SELECT message_id, person_id, status, statusinfo, tbl_msg_status.insertamum
-							  FROM public.tbl_msg_status INNER JOIN	(
-										SELECT message_id, person_id, max(insertamum) AS insertamum
-										  FROM public.tbl_msg_status
-									  GROUP BY message_id, person_id
-									) status USING (message_id, person_id)
-							 WHERE tbl_msg_status.insertamum=status.insertamum
-						) s USING (message_id, person_id)
-				 WHERE uid = ?';
+				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_message m USING (message_id)
+						JOIN public.tbl_person p ON (r.person_id = p.person_id)
+						JOIN public.tbl_benutzer b ON (r.person_id = b.person_id)
+						JOIN (
+							SELECT * FROM public.tbl_msg_status ORDER BY insertamum DESC LIMIT 1
+						) s ON (r.message_id = s.message_id AND r.person_id = s.person_id)
+				 WHERE b.uid = ?";
 		
 		if (! $all)
-			$sql .= ' AND (status < 3 OR status IS NULL)';
+			$sql .= " AND (status < 3 OR status IS NULL)";
+		
 		$result = $this->db->query($sql, array($uid));
 		if (is_object($result))
 			return $this->_success($result->result());
@@ -75,16 +71,16 @@ class Message_model extends DB_Model
 	public function getMessagesByPerson($person_id, $all)
 	{
 		// Check wrights
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_msg_recipient'), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_msg_recipient'), FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_msg_message'), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_msg_message'), FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_person'), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_person'), FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_msg_status'), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_msg_status'), FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_msg_recipient"), "s"))
+			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_msg_recipient"), FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_msg_message"), "s"))
+			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_msg_message"), FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_person"), "s"))
+			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_person"), FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_msg_status"), "s"))
+			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_msg_status"), FHC_MODEL_ERROR);
 		
-		$sql = 'SELECT r.message_id,
+		$sql = "SELECT r.message_id,
 						m.person_id,
 						m.subject,
 						m.body,
@@ -93,11 +89,13 @@ class Message_model extends DB_Model
 						m.oe_kurzbz,
 						s.status,
 						s.statusinfo,
-						s.updateamum
+						s.insertamum AS statusamum
 				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_message m USING (message_id)
 						JOIN public.tbl_person p ON (p.person_id = m.person_id)
-						JOIN public.tbl_msg_status s USING (message_id)
-				 WHERE r.person_id = ?';
+						JOIN (
+							SELECT * FROM public.tbl_msg_status ORDER BY insertamum DESC LIMIT 1
+						) s ON (m.message_id = s.message_id AND r.person_id = s.person_id)
+				 WHERE r.person_id = ?";
 		
 		$result = $this->db->query($sql, array($person_id));
 		if (is_object($result))
@@ -109,14 +107,14 @@ class Message_model extends DB_Model
 	public function getMessagesByToken($token)
 	{
 		// Check wrights
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_msg_recipient'), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_msg_recipient'), FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_msg_message'), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_msg_message'), FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_msg_status'), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_msg_status'), FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_msg_recipient"), "s"))
+			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_msg_recipient"), FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_msg_message"), "s"))
+			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_msg_message"), FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_msg_status"), "s"))
+			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_msg_status"), FHC_MODEL_ERROR);
 		
-		$sql = 'SELECT r.message_id,
+		$sql = "SELECT r.message_id,
 						r.person_id as receiver_id,
 						m.person_id as sender_id,
 						m.subject,
@@ -126,11 +124,12 @@ class Message_model extends DB_Model
 						m.oe_kurzbz,
 						s.status,
 						s.statusinfo,
-						s.updateamum
+						s.insertamum
 				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_message m USING (message_id)
-						JOIN public.tbl_msg_status s USING (message_id)
+						JOIN public.tbl_msg_status s ON (r.message_id = s.message_id AND r.person_id = s.person_id)
 				 WHERE r.token = ?
-				   AND status < ?';
+				   AND status < ?
+			  ORDER BY s.insertamum DESC";
 		
 		$result = $this->db->query($sql, array($token, MSG_STATUS_DELETED));
 		if (is_object($result))
