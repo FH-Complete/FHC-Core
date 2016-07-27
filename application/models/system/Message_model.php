@@ -124,9 +124,11 @@ class Message_model extends DB_Model
 						m.oe_kurzbz,
 						s.status,
 						s.statusinfo,
-						s.insertamum
+						s.insertamum as statusamum
 				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_message m USING (message_id)
-						JOIN public.tbl_msg_status s ON (r.message_id = s.message_id AND r.person_id = s.person_id)
+						JOIN (
+							SELECT * FROM public.tbl_msg_status ORDER BY insertamum DESC LIMIT 1
+						) s ON (r.message_id = s.message_id AND r.person_id = s.person_id)
 				 WHERE r.token = ?
 				   AND status < ?
 			  ORDER BY s.insertamum DESC";
