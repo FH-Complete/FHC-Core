@@ -9,3 +9,8 @@ $I->sendGET("v1/crm/Prestudentstatus/Prestudentstatus", array("ausbildungssemest
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+
+$I->sendGET("v1/crm/Prestudentstatus/LastStatus", array("prestudent_id" => 3));
+$I->seeResponseCodeIs(200);
+$I->seeResponseIsJson();
+$I->seeResponseContainsJson(["error" => 0]);
