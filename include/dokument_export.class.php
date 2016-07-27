@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *          Andreas Moik <moik@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/vorlage.class.php');
 require_once(dirname(__FILE__).'/addon.class.php');
@@ -37,8 +38,11 @@ class dokument_export
 	/**
 	 * Konstruktor
 	 */
-	public function __construct($vorlage, $oe_kurzbz=0, $version=null)
+	public function __construct($vorlage = null, $oe_kurzbz=0, $version=null)
 	{
+		if(!isset($vorlage))
+			return;
+
 		//Vorlage aus der Datenbank holen
 		$this->vorlage = new vorlage();
 		if(!$this->vorlage->getAktuelleVorlage($oe_kurzbz, $vorlage, $version))
@@ -388,6 +392,29 @@ class dokument_export
 		        $_xml_data->addChild("$key",htmlspecialchars("$value"));
 		}
 		return $_xml_data->asXML();
+	}
+
+	/**
+	* Konvertiert ein Dokument in ein anderes Format
+	* @param string $inFile Origin File Path
+	* @param string $outFile Output file
+	* @param string $format Format to export To
+	* @return boolean
+	*/
+	public function convert($inFile, $outFile, $format = "pdf")
+	{
+		$command = 'unoconv --format %s --output %s %s';
+		$command = sprintf($command, $format, $outFile, $inFile);
+
+
+		exec($command, $out, $ret);
+		if($ret!=0)
+		{
+			$this->errormsg = 'Dokumentenkonvertierung ist derzeit nicht möglich. Bitte informieren Sie den Administrator';
+			return false;
+		}
+
+		return true;
 	}
 }
 ?>
