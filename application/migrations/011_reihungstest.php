@@ -21,6 +21,11 @@ class Migration_Reihungstest extends MigrationLib
 			"anmeldefrist" => array("type" => "date")
 		);
 		$this->addColumn("public", "tbl_reihungstest", $columns);
+		
+		// Add arbeitsplaetze to public.tbl_ort
+		$columns = array(
+		);
+		$this->addColumn("public", "tbl_ort", $columns);
 
 		// Add rt_stufe and punkte to public.tbl_prestudentstatus
 		$columns = array(
@@ -129,7 +134,7 @@ class Migration_Reihungstest extends MigrationLib
 				"type" => "varchar(16)"
 			),
 			"uid" => array(
-				"type" => "varchar(32)"
+				"type" => "varchar(32)",
 			)
 		);
 		$this->createTable("public", "tbl_rt_ort", $fields);
