@@ -1149,7 +1149,7 @@ echo "<SELECT name='studiensemester' onchange='window.location.href=this.value'>
 else
 	$selected='';*/
 
-echo "<OPTION value='".$_SERVER['PHP_SELF']."?studiensemester_kurzbz=0'>Alle Studiensemester</OPTION>";
+echo "<OPTION value='".$_SERVER['PHP_SELF']."?studiensemester_kurzbz='>Alle Studiensemester</OPTION>";
 foreach ($studiensemester->studiensemester as $row)
 {
 	if($row->studiensemester_kurzbz == $studiensemester_kurzbz)
