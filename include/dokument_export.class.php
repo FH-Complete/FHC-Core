@@ -168,7 +168,7 @@ class dokument_export
 
 		$contentbuffer = $proc->transformToXml($this->xml_data);
 
-		$this->temp_folder = '/tmp/fhcunoconv-'.uniqid();
+		$this->temp_folder = sys_get_temp_dir().'/fhcunoconv-'.uniqid();
 		mkdir($this->temp_folder);
 		chdir($this->temp_folder);
 		file_put_contents('content.xml', $contentbuffer);
@@ -201,7 +201,8 @@ class dokument_export
 		if(!$vorlage_found)
 			$zipfile = DOC_ROOT.'system/vorlage_zip/'.$this->vorlage_file;
 
-		$tempname_zip = 'out.zip';
+		$tempname_zip = $this->temp_folder . '/out.zip';
+
 		if(!copy($zipfile, $tempname_zip))
 			die('copy failed');
 
@@ -254,7 +255,7 @@ class dokument_export
 		switch($this->outputformat)
 		{
 			case 'pdf':
-				$this->temp_filename='out.pdf';
+				$this->temp_filename = $this->temp_folder . '/out.pdf';
 				exec("unoconv -e IsSkipEmptyPages=false --stdout -f pdf $tempname_zip > ".$this->temp_filename, $out, $ret);
 
 				if($ret!=0)
@@ -407,7 +408,6 @@ class dokument_export
 	{
 		$command = 'unoconv --format %s --output %s %s';
 		$command = sprintf($command, $format, $outFile, $inFile);
-
 
 		exec($command, $out, $ret);
 		if($ret!=0)

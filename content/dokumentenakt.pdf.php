@@ -69,7 +69,6 @@ foreach($prestudent_ids as $pid)
 		cleanUpAndDie($p->t('tools/studentWurdeNichtGefunden')."(".$pid.")", $tmpDir);
 
 
-
 	/*
 	 * Get all Documents
 	 */
@@ -107,7 +106,6 @@ foreach($prestudent_ids as $pid)
 
 		if($filename == "")
 			continue;
-
 
 		/*
 		 * Determine the filetype
@@ -148,14 +146,13 @@ foreach($prestudent_ids as $pid)
 	if(!$doc->create('pdf'))
 		die($doc->errormsg);
 
-	$document = $doc->output(false);
 	$filename = $tmpDir.'/'.uniqid();
-	file_put_contents($filename, $document);
+	file_put_contents($filename, $doc->output(false));
 	$doc->close();
 	$allDocs[] = $filename;
 	$allDocs = array_merge($allDocs, $preDocs);
+	unset($doc);
 }
-
 
 /*
  * generate the merged PDF
