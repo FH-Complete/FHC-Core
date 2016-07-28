@@ -43,6 +43,10 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<style:paragraph-properties fo:line-height="122%" fo:text-align="center" style:justify-single-word="false"/>
 			<style:text-properties style:font-name="Arial" fo:font-size="16pt" officeooo:rsid="0006c6a3" officeooo:paragraph-rsid="0006c6a3" style:font-size-asian="16pt" style:font-size-complex="16pt"/>
 		</style:style>
+		<style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard">
+			<style:paragraph-properties fo:line-height="122%" fo:text-align="center" style:justify-single-word="false"/>
+			<style:text-properties style:font-name="Arial" fo:color="#ff3333" fo:font-weight="bold" fo:font-size="16pt" officeooo:rsid="0006c6a3" officeooo:paragraph-rsid="0006c6a3" style:font-size-asian="16pt" style:font-size-complex="16pt"/>
+		</style:style>
 		<style:style style:name="Seitenumbruch" style:family="paragraph" style:parent-style-name="Standard">
 			<style:paragraph-properties fo:break-before="page" fo:line-height="122%" fo:text-align="center" style:justify-single-word="false"/>
 			<style:paragraph-properties fo:line-height="122%" fo:text-align="center" style:justify-single-word="false"/>
@@ -65,6 +69,11 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
 			<text:p text:style-name="Seitenumbruch">Diploma</text:p>
+				<!-- Ueberprueft ob benoetigte Datenfelder leer sind -->
+				<xsl:if test="staatsbuergerschaft = ''"><text:p text:style-name="P4">Staatsbürgerschaft nicht angegeben</text:p></xsl:if>
+				<xsl:if test="datum = ''"><text:p text:style-name="P4">Datum der Abschlussprüfung nicht gesetzt</text:p></xsl:if>
+				<xsl:if test="titel = ''"><text:p text:style-name="P4">Kein akademischer Grad ausgewählt</text:p></xsl:if>
+				<xsl:if test="sponsion = ''"><text:p text:style-name="P4">Sponsionsdatum nicht gesetzt</text:p></xsl:if>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P1"/>

@@ -31,7 +31,7 @@
 */
 require_once('../../../../config/cis.config.inc.php');
 require_once('../../../../config/global.config.inc.php');
-require_once('../../../../include/basis_db.class.php');	
+require_once('../../../../include/basis_db.class.php');
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/studiengang.class.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
@@ -49,16 +49,16 @@ $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-$sprache1 = getSprache(); 
+$sprache1 = getSprache();
 $p=new phrasen($sprache1);
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
-   
+
    $output = '';
    $errormsg = '';
    $okmsg='';
-   
+
 $lv = '';
 
 ?>
@@ -93,6 +93,7 @@ textarea
 </head>
 <body style="padding: 10px">
 <?php
+	$oe_kurzbz='';
 	function Cut($string)
 	{
 		if(strlen($string)>50)
@@ -126,7 +127,7 @@ textarea
 		if(!isset($sem))
 			$sem = $lv_obj->semester;
 	}
-	else 
+	else
 	{
 		$stg = '';
 	}
@@ -143,9 +144,9 @@ textarea
 	}
 
 	if(!isset($sem) && isset($_POST['sem']))
-		$sem = $_POST['sem'];	
-		
-	
+		$sem = $_POST['sem'];
+
+
 	if(isset($_POST['changed'])) //Gibt an welches der Auswahlfelder geaendert wurde
 		$changed = $_POST['changed'];
 
@@ -157,12 +158,12 @@ textarea
 
 	if(isset($_POST['sprache'])) //Sprache fuer dieses Lehrfach
 		$sprache = $_POST['sprache'];
-	
+
 	// Berechtigungen ueberpruefen
 	$lektor_der_lv = false;
 	$lektor = new lehreinheitmitarbeiter();
 	$lektor_der_lv = $lektor->existsLV($lv, null, $user);
-	
+
 	// Bearbeiten nur moeglich, wenn Lektor der LV und bearbeiten fuer Lektoren aktiviert ist
 	// Oder Berechtigung zum Bearbeiten eingetragen ist
 	$berechtigt = true;
@@ -189,7 +190,7 @@ textarea
 	$freig_de = (isset($_POST['freig_de'])?($_POST['freig_de']=='on' && ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz) || $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))?true:false):'');
 	$methodik_de = (isset($_POST['methodik_de'])?$_POST['methodik_de']:'');
 	//$titel_de = (isset($_POST['titel_de'])?$_POST['titel_de']:'');
-	
+
 	$parser = new SafeHTML();
  	$lehrziele_de = $parser->parse($lehrziele_de);
  	$parser = new SafeHTML();
@@ -210,7 +211,7 @@ textarea
 	$freig_de = $parser->parse($freig_de);
 	$parser = new SafeHTML();
 	$methodik_de = $parser->parse($methodik_de);
- 	
+
 	$lehrziele_en = (isset($_POST['lehrziele_en'])?$_POST['lehrziele_en']:'');
 	$lehrinhalte_en = (isset($_POST['lehrinhalte_en'])?$_POST['lehrinhalte_en']:'');
 	$voraussetzungen_en = (isset($_POST['voraussetzungen_en'])?$_POST['voraussetzungen_en']:'');
@@ -243,7 +244,7 @@ textarea
 	$freig_en = $parser->parse($freig_en);
 	$parser = new SafeHTML();
 	$methodik_en = $parser->parse($methodik_en);
-	
+
 	/* WriteLog($qry,$uid)
 	* @brief Schreib die Querys im format: uid - datum - qry ins LogFile
 	* @param $qry Query anweisung
@@ -284,7 +285,7 @@ textarea
 			$lv_obj_sav->anmerkungen=mb_eregi_replace("\r\n", "<br>", $anmerkungen_de);
 			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_de);
 			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_de);
-			
+
 			$lv_obj_sav->genehmigt = ($freig_de==true && ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz) || $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))?true:false);
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
@@ -344,7 +345,7 @@ textarea
 				$errormsg.= $p->t('courseInformation/achtungFehlerBeimSpeichern');
 			else
 				$okmsg.= $p->t('global/erfolgreichgespeichert');
-				
+
 			if($save_log_error)
 				$errormsg.= $p->t('courseInformation/fehlerLogFile');
 		}
@@ -352,7 +353,7 @@ textarea
 		{
 			if ($berechtigt==false)
 				die($p->t('global/keineBerechtigungFuerDieseSeite'));
-			
+
 			//Speichert die aenderungen in der Datenbank (de und en)
 			$lv_obj_sav= new lvinfo();
 			$save_error=false;
@@ -366,7 +367,7 @@ textarea
 			$lv_obj_sav->anmerkungen=mb_eregi_replace("\r\n", "<br>", $anmerkungen_de);
 			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_de);
 			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_de);
-				
+
 			$lv_obj_sav->genehmigt = ($freig_de==true && ($rechte->isBerechtigt('lehre/lvinfo_freigabe',$oe_kurzbz) || $rechte->isBerechtigt('lehre/lvinfo_freigabe',$stg))?true:false);
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
 			$lv_obj_sav->updatevon=$user;
@@ -375,21 +376,21 @@ textarea
 			$lv_obj_sav->lehrveranstaltung_id=$lv;
 			$lv_obj_sav->methodik = mb_eregi_replace("\r\n", "<br>", $methodik_de);
 			//$lv_obj_sav->titel = mb_eregi_replace("\r\n", "<br>", $titel_de);
-		
+
 			$lv_obj1 = new lvinfo();
 			$vorhanden=$lv_obj1->exists($lv, ATTR_SPRACHE_DE);
-		
+
 			if(!$vorhanden)
 				$lv_obj_sav->new=true;
 			else
 				$lv_obj_sav->new=false;
-		
+
 			if(!$lv_obj_sav->save())
 				$save_error=true;
 			else
 				if(!WriteLog($lv_obj_sav->lastqry,$user))
 					$save_log_error=true;
-		
+
 			//Englisch
 			$lv_obj_sav->lehrziele=mb_eregi_replace("\r\n", "<br>", $lehrziele_en);
 			$lv_obj_sav->lehrinhalte=mb_eregi_replace("\r\n", "<br>", $lehrinhalte_en);
@@ -407,33 +408,33 @@ textarea
 			$lv_obj_sav->lehrveranstaltung_id=$lv;
 			$lv_obj_sav->methodik = mb_eregi_replace("\r\n", "<br>", $methodik_en);
 			//$lv_obj_sav->titel = mb_eregi_replace("\r\n", "<br>", $titel_en);
-	
+
 			$lv_obj1 = new lvinfo();
 			$vorhanden = $lv_obj1->exists($lv, ATTR_SPRACHE_EN);
-	
+
 			if(!$vorhanden)
 				$lv_obj_sav->new=true;
 			else
 				$lv_obj_sav->new=false;
-	
+
 			if(!$lv_obj_sav->save())
 				$save_error=true;
 			else
 				if(!WriteLog($lv_obj_sav->lastqry,$user))
 					$save_log_error=true;
-	
+
 				if($save_error)
 					$errormsg.= $p->t('courseInformation/achtungFehlerBeimSpeichern');
 				else
 					$okmsg.= $p->t('global/erfolgreichgespeichert');
-	
+
 				if($save_log_error)
 					$errormsg.= $p->t('courseInformation/fehlerLogFile');
-			
+
 			//Mail an Studiengangsleiter
 			$studiengangsleiter = new studiengang();
-			$stgleiter = $studiengangsleiter->getLeitung($stg);			
-			
+			$stgleiter = $studiengangsleiter->getLeitung($stg);
+
 			if($stgleiter)
 			{
 				$to='';
@@ -448,19 +449,19 @@ textarea
 						$to.=$leiter.'@'.DOMAIN;
 					}
 				}
-				
+
 				$benutzer = new benutzer();
 				$benutzer->load($user);
-				
+
 				$bezeichnung = new lehrveranstaltung();
-				$bezeichnung->load($lv);				
-				
+				$bezeichnung->load($lv);
+
 				$message = $p->t('courseInformation/diesIstEineAutomatischeMail').".\n".
 						$p->t('courseInformation/lvinfoWurdeUeberarbeitet',array($benutzer->nachname.' '.$benutzer->vorname,$bezeichnung->bezeichnung)).":\n";
-				
+
 				$message.="\n".$p->t('courseInformation/sieKoennenDieseUnterFolgenderAdresseFreigeben').":\n".
 				APP_ROOT."cis/private/lehre/ects/freigabe.php?stg=".$stg."&sem=".$sem."&lv=".$lv;
-									
+
 				$mail = new mail($to, 'vilesci@'.DOMAIN,$p->t('courseInformation/freigabeLvinfo'), $message);
 				if($mail->send())
 				{
@@ -475,7 +476,7 @@ textarea
 			{
 				$okmsg.="<br><span class='error'>".$p->t('courseInformation/konnteKeinFreigabemailVersendetWerden')."</span>";
 			}
-			
+
 		}
 	}
 
@@ -523,8 +524,8 @@ textarea
 	{
 		$errormsg .= "$stg_obj->errormsg";
 	}
-	
-	
+
+
 
 	//Anzeigen des DropDown Menues mit Semester
 	if(isset($changed) && $changed=='stg')
@@ -630,7 +631,7 @@ textarea
 	//Kopfzeile hinausschreiben und $output ausgeben
 	echo "<h1>&nbsp;".$p->t('courseInformation/lvInfoSemester',array($stg_obj->kuerzel, $sem))."</h1>";
 	echo $output;
-	
+
 	if ($berechtigt==false)
 		die($p->t('global/keineBerechtigungFuerDieseSeite'));
 
@@ -667,7 +668,7 @@ textarea
 			$freig_de = $lv_de->genehmigt;
 			$titel_de = $lv_de->titel;
 			$methodik_de = $lv_de->methodik;
-			
+
 			//Fuegt den Satz "Nach erfolgreichem Abschluss sind die Studierenden in der Lage, " vor den Lehrzielen ein, falls noch nicht vorhanden
 			if (substr_count($lehrziele_de, 'Nach erfolgreichem Abschluss sind die Studierenden in der Lage')==0)
 				$lehrziele_de = 'Nach erfolgreichem Abschluss sind die Studierenden in der Lage, '.$lehrziele_de;
@@ -686,7 +687,7 @@ textarea
 			$freig_en = $lv_en->genehmigt;
 			$titel_en = $lv_en->titel;
 			$methodik_en = $lv_en->methodik;
-			
+
 			//Fuegt den Satz "Nach erfolgreichem Abschluss sind die Studierenden in der Lage, " vor den Lehrzielen ein, falls noch nicht vorhanden
 			if (substr_count($lehrziele_en, 'After passing this course successfully students are able to')==0)
 				$lehrziele_en = 'After passing this course successfully students are able to '.$lehrziele_en;
@@ -702,14 +703,14 @@ textarea
 		$stsem_obj = new studiensemester();
 		$stsem = $stsem_obj->getaktorNext();
 		//Namen der Lehrenden Auslesen
-		$qry = "SELECT 
-					* 
-				FROM 
-					campus.vw_mitarbeiter, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit 
-				WHERE 
-					lehrveranstaltung_id=".$db->db_add_param($lv, FHC_INTEGER)." 
-					AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id 
-					AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id=".$db->db_add_param($lv)." ORDER BY ende DESC LIMIT 1) 
+		$qry = "SELECT
+					*
+				FROM
+					campus.vw_mitarbeiter, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit
+				WHERE
+					lehrveranstaltung_id=".$db->db_add_param($lv, FHC_INTEGER)."
+					AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id
+					AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id=".$db->db_add_param($lv)." ORDER BY ende DESC LIMIT 1)
 					AND mitarbeiter_uid=uid";
 
 		echo "<tr><td class='tdvertical' nowrap><b>".$p->t('courseInformation/lehrendeLautLehrauftrag')."</b></td><td nowrap>";
@@ -728,27 +729,27 @@ textarea
 		echo "</td></tr>";
 
 	//FB Leiter auslesen
-	$qry = "	SELECT 
-					distinct titelpre, titelpost, vorname, nachname 
-				FROM 
-					public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) 
-				WHERE 
-					funktion_kurzbz='Leitung' AND 
+	$qry = "	SELECT
+					distinct titelpre, titelpost, vorname, nachname
+				FROM
+					public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid)
+				WHERE
+					funktion_kurzbz='Leitung' AND
 					(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 					(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
-					oe_kurzbz in (SELECT distinct lehrfach.oe_kurzbz 
-									FROM 
-										lehre.tbl_lehreinheit 
+					oe_kurzbz in (SELECT distinct lehrfach.oe_kurzbz
+									FROM
+										lehre.tbl_lehreinheit
 										JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
-									WHERE 
-										tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lv, FHC_INTEGER)." AND 
-										studiensemester_kurzbz=(SELECT studiensemester_kurzbz 
-																FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
+									WHERE
+										tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lv, FHC_INTEGER)." AND
+										studiensemester_kurzbz=(SELECT studiensemester_kurzbz
+																FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
 																WHERE tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lv, FHC_INTEGER)."
 																ORDER BY ende DESC LIMIT 1
-																)												
+																)
 								 )";
-	
+
 	echo "<tr><td class='tdvertical'><b>".$p->t('courseInformation/institutsleiter')."</b></td><td>";
 	if($result=$db->db_query($qry))
 	{
@@ -762,7 +763,7 @@ textarea
 
 	//FB Koordinator auslesen
 		//$qry = "SELECT distinct vorname, nachname FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in (SELECT fachbereich_kurzbz FROM lehre.tbl_lehrfach, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1))";
-	$qry = "SELECT 
+	$qry = "SELECT
 				distinct titelpre, titelpost, vorname, nachname, tbl_fachbereich.fachbereich_kurzbz
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_benutzerfunktion, campus.vw_mitarbeiter, public.tbl_fachbereich
@@ -772,12 +773,12 @@ textarea
 				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND
 				tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz AND
 				tbl_fachbereich.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
-				tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
+				tbl_benutzerfunktion.funktion_kurzbz='fbk' AND
 				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
 				vw_mitarbeiter.uid=COALESCE(tbl_lehrveranstaltung.koordinator, tbl_benutzerfunktion.uid) AND
 				tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1)";
-	
+
 		echo "<tr><td class='tdvertical'><b>".$p->t('courseInformation/institutskoordinator')."</b></td><td>";
 	if($result=$db->db_query($qry))
 	{
@@ -802,9 +803,9 @@ textarea
 	//Sprache ausgeben
 	echo "<tr><td><b>".$p->t('courseInformation/unterrichtssprache')."</b></td><td>$lv_obj->sprache";
 	echo "</td></tr>";
-	
+
 	//Anz. Incoming ausgeben
-		
+
 	if ($lv_obj->incoming > -1)
 		{
 			echo "<tr><td valign='top'><b>".$p->t('courseInformation/incomingplaetze')."</b></td><td valign='top'>$lv_obj->incoming";
@@ -831,7 +832,7 @@ textarea
 	echo '<tr>
 		<td colspan="5">&nbsp;</td>
 		</tr>';
-	 
+
 	echo '
 	<tr class="liste0">
 		<td><i>'.$p->t('lvinfo/kurzbeschreibung').' <font style="color:black">(Pflichtfeld)</font></i> </td>
@@ -893,7 +894,7 @@ textarea
 					<td align=center colspan=2><input type="checkbox" name="freig_en" '. (isset($freig_en) && ($freig_en==true || $freig_en=='1')?'checked':'').'/><i>'.$p->t('courseInformation/englischFreigeben').'</i> </td>
 					<td ></td>
 				</tr>';
-	
+
 	echo "</table><br>";
 	echo "<div align='left'>";
 	echo "<input type='button' value='".$p->t('global/speichern')."' onClick='save();'>";

@@ -1,22 +1,22 @@
 <?php
 /*
  * Copyright 2013 fhcomplete.org
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
+ *
  *
  * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
  *
@@ -42,6 +42,8 @@ require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/benutzergruppe.class.php');
 require_once('../../../include/konto.class.php');
 require_once('../../../include/lvinfo.class.php');
+require_once('../../../include/addon.class.php');
+require_once('../../../include/anrechnung.class.php');
 
 $uid = get_uid();
 
@@ -76,7 +78,7 @@ if(isset($_GET['getAnmeldung']))
 
 	// Die Anmeldung ist zur Lehrveranstaltung selbst und zu den dazu kompatiblen Lehrveranstaltungen moeglich
 	$kompatibel = $lehrveranstaltung->loadLVkompatibel($lehrveranstaltung_id);
-	
+
 	$datum = new datum();
 	$kompatibel[]=$lehrveranstaltung_id;
 	$kompatibel = array_unique($kompatibel);
@@ -121,7 +123,7 @@ if(isset($_GET['getAnmeldung']))
 			}*/
 		}
 	}
-	
+
 	if($anzahl>0)
 		echo '<br><br><input type="submit" value="'.$p->t('studienplan/anmelden').'" /></form>';
 	else
@@ -137,8 +139,34 @@ echo '<!DOCTYPE html>
 	<link rel="stylesheet" href="../../../skin/style.css.php" />
 	<link rel="stylesheet" href="../../../skin/jquery.css" />
 	<link rel="stylesheet" href="../../../skin/jquery-ui-1.9.2.custom.min.css" />
-	<script type="text/javascript" src="../../../include/js/jquery1.9.min.js"></script>
+	<script type="text/javascript" src="../../../include/js/jquery1.9.min.js"></script>';
 
+	// ADDONS laden
+	$addon_obj = new addon();
+	$addon_obj->loadAddons();
+	foreach($addon_obj->result as $addon)
+	{
+	    if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
+	        echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+	}
+
+	// Wenn Seite fertig geladen ist Addons aufrufen
+	echo '
+	<script>
+	$( document ).ready(function()
+	{
+	    if(typeof addon  !== \'undefined\')
+	    {
+	        for(i in addon)
+	        {
+	            addon[i].init("cis/private/profile/studienplan.php", {});
+	        }
+	    }
+	});
+	</script>
+	';
+
+echo '
 	<script type="text/javascript">
 	$(document).ready(function() {
 		$("#dialog").dialog({ autoOpen: false, width: "auto" });
@@ -231,7 +259,7 @@ $tree = $lehrveranstaltung->getLehrveranstaltungTree();
 
 
 /*
- Vom Semesterstart des Studierenden ausgehend werden die Studiensemester geladen. 
+ Vom Semesterstart des Studierenden ausgehend werden die Studiensemester geladen.
  Es werden mindestens so viele Studiensemester geladen wie die Regelstudiendauer des
  Studienplanes angibt.
 */
@@ -257,7 +285,11 @@ if(!in_array($stsemToShow,$stsem_arr))
 {
 	for($i=count($stsem_arr);$i<50;$i++)
 	{
-		$stsem_arr[$i]=$stsem->getNextFrom($studiensemester_prev);
+		if(!$stsem_arr[$i]=$stsem->getNextFrom($studiensemester_prev))
+		{
+			unset($stsem_arr[$i]);
+			break;
+		}
 		$studiensemester_prev=$stsem_arr[$i];
 		if($stsemToShow==$studiensemester_prev)
 		{
@@ -274,7 +306,9 @@ if($zeugnisnote->getZeugnisnoten('',$uid,''))
 	foreach($zeugnisnote->result as $row_note)
 	{
 		if($row_note->note!='')
+                {
 			$noten_arr[$row_note->lehrveranstaltung_id][$row_note->studiensemester_kurzbz]=$row_note->note;
+                }
 	}
 }
 
@@ -307,7 +341,7 @@ echo '<table style="border: 1px solid black">
 
 if(CIS_STUDIENPLAN_SEMESTER_ANZEIGEN)
 	echo '<th>'.$p->t('global/semester').'</th>';
-  
+
 echo '<th>'.$p->t('studienplan/ects').'</th>
 	  <th>'.$p->t('studienplan/status').'</th>';
 
@@ -333,8 +367,8 @@ drawTree($tree,0);
 function drawTree($tree, $depth)
 {
 	global $uid, $stsem_arr, $noten_arr, $lvangebot_arr;
-	global $datum_obj, $db, $lv_arr, $p, $note_pruef_arr;
-
+	global $datum_obj, $db, $lv_arr, $p, $note_pruef_arr, $student;
+        
 	foreach($tree as $row_tree)
 	{
 		$style='';
@@ -362,7 +396,7 @@ function drawTree($tree, $depth)
 			default:
 				$icon='';
 		}
-		
+
 
 		echo '<tr'.$style.'>
 			<td>'.$bstart;
@@ -391,7 +425,7 @@ function drawTree($tree, $depth)
 			$sprache = 'de';
 			break;
 		    case 'English':
-			$sprach = 'en';
+			$sprache = 'en';
 			break;
 		    default:
 			$sprache = 'de';
@@ -400,20 +434,24 @@ function drawTree($tree, $depth)
 		    echo $icon." ".$termine." <a href=\"#\" class='Item' onClick=\"javascript:window.open('../lehre/ects/preview.php?lv=$row_tree->lehrveranstaltung_id&language=$sprache','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">".$row_tree->kurzbz.' - '.$row_tree->bezeichnung."</a>";
 		else
 		// Bezeichnung der Lehrveranstaltung
-		    echo $icon." ".$termine." ".$row_tree->kurzbz.' - '.$row_tree->bezeichnung;
+		    echo $icon." ".$termine." ".$row_tree->kurzbz.' - '.$row_tree->bezeichnung.'('.$row_tree->lehrveranstaltung_id.')';
 		echo $bende.'</td>';
-		
+
 		// Semester
 		if(CIS_STUDIENPLAN_SEMESTER_ANZEIGEN)
 			echo '<td>'.$row_tree->semester.'</td>';
-		
+
 		// ECTS Punkte
 		echo '<td>'.$row_tree->ects.'</td>';
-		
+
 		// Status der LV (absolviert, offen)
 		echo '<td>';
 
 		// Note zu dieser LV vorhanden?
+		
+		$lv_kompatibel = new lehrveranstaltung();
+		$kompatibleLVs = $lv_kompatibel->loadLVkompatibel($row_tree->lehrveranstaltung_id);
+                
 		if(isset($noten_arr[$row_tree->lehrveranstaltung_id]))
 		{
 			// Positive Note fuer diese LV vorhanden?
@@ -429,6 +467,64 @@ function drawTree($tree, $depth)
 			else
 				echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
 		}
+		//check if compatible course has grade
+		elseif(count($kompatibleLVs) > 0)
+		{
+                    $positiv = false;                 
+                    $found = false;
+                    $i = 0;
+                    while(!$found && $i < count($kompatibleLVs))
+                    {   
+                        foreach($kompatibleLVs as $komp)
+                        {
+                            
+                            $anrechnung = new anrechnung();
+                            $anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);    
+                            
+                            if(count($anrechnung->result) == 1)
+                            {
+                                $lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
+                                if(isset($noten_arr[$lv]))
+                                {
+                                    $positiv=false;
+                                    foreach($noten_arr[$lv] as $note)
+                                    {
+                                        if($note_pruef_arr[$note]->positiv)
+                                            $positiv=true;
+                                    }
+
+                                    $found = true;
+                                }
+                                else
+                                {
+                                    /* wenn zu mehreren kompatiblen lvs eine Anrechnung existiert
+                                     * darf found nicht auf false gesetzt werden wenn es zuvor bereits auf true gesetzt wurde
+                                     */
+                                    if(!$found)
+                                        $found = false;
+                                }
+                            }
+                            $i++;
+                        }
+                    }
+                    
+                    if($found)
+                    {
+                        if($positiv)
+                        echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
+                        else
+                            echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
+                    }
+                    elseif(!$found)
+                    {
+                        if($abgeschlossen)
+                            echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
+			elseif(!$row_tree->stpllv_pflicht)
+                            echo '<span>'.$p->t('studienplan/optional').'</span>';
+			else
+                            echo '<span>'.$p->t('studienplan/offen').'</span>';
+                    }
+		}
 		else
 		{
 			if($abgeschlossen)
@@ -440,11 +536,11 @@ function drawTree($tree, $depth)
 		}
 		echo '</td>';
 
-		// Spalten für die einzelnen Studiensemester		
+		// Spalten für die einzelnen Studiensemester
 		foreach($stsem_arr as $key=>$stsem)
 		{
 			$semester=$key+1;
-			
+
 			$tdclass=array();
 			//Empfehlung holen
 //			if(isset($lv_arr[$row_tree->lehrveranstaltung_id]))
@@ -463,6 +559,38 @@ function drawTree($tree, $depth)
 					$tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$row_tree->lehrveranstaltung_id][$stsem]]->anmerkung.'</span>';
 				else
 					$tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$row_tree->lehrveranstaltung_id][$stsem]]->anmerkung.'</span>';
+			}
+			elseif(count($kompatibleLVs) > 0)
+			{
+                            $found = false;
+                            $i = 0;
+                            while(!$found && $i < count($kompatibleLVs))
+                            {   
+                                foreach($kompatibleLVs as $komp)
+                                {
+                                    $anrechnung = new anrechnung();
+                                    $anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);
+                                    
+                                    if(count($anrechnung->result) == 1)
+                                    {
+                                        $lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
+                                        if(isset($noten_arr[$lv][$stsem]))
+                                        {
+                                            $found = true;
+                                            if($note_pruef_arr[$noten_arr[$lv][$stsem]]->positiv)
+                                                    $tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
+                                            else
+                                                    $tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
+                                        }
+                                    }
+                                    $i++;
+                                }
+
+                                if(!$found)
+                                {
+                                    $tdinhalt.= '-';
+                                }   
+                            }
 			}
 			else
 			{
@@ -495,7 +623,7 @@ function drawTree($tree, $depth)
 					// Angebot der LV pruefen
 					if(isset($lvangebot_arr[$row_lvid])
 					&& isset($lvangebot_arr[$row_lvid][$stsem]))
-					{				
+					{
 						$angebot_vorhanden=true;
 						// LV findet statt
 						$angebot = $lvangebot_arr[$row_lvid][$stsem];
@@ -533,11 +661,11 @@ function drawTree($tree, $depth)
 						$tdclass[]='angebot';
 						if($angemeldet)
 						{
-							$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/anmelden.png" title="angemeldet" /></a>';
+							$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/ja.png" title="'.$p->t('studienplan/legendeAngemeldet').'" /></a>';
 						}
 						else
 						{
-							if($anmeldungmoeglich)		
+							if($anmeldungmoeglich)
 								$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/anmelden.png" title="'.$p->t('studienplan/anmelden').'" height="15px" /></a>';
 							else
 								$tdinhalt.= '<span title="'.$anmeldeinformation.'">-</a>';
@@ -559,7 +687,7 @@ function drawTree($tree, $depth)
 			echo '</td>';
 		}
 		echo '</tr>';
-		
+
 		// Wenn Subtree vorhanden, dann anzeigen
 		if(!empty($row_tree->childs))
 			drawTree($row_tree->childs, $depth+1);
@@ -583,6 +711,10 @@ echo '<br><br>'.$p->t('studienplan/legende').':<br>
 <tr>
 	<td align="center"><img src="../../../skin/images/anmelden.png"></td>
 	<td>'.$p->t('studienplan/Anmeldung').'</td>
+</tr>
+<tr>
+	<td align="center"><img src="../../../skin/images/ja.png"></td>
+	<td>'.$p->t('studienplan/legendeAngemeldet').'</td>
 </tr>
 <tr>
 	<td align="center"><img src="../../../skin/images/not-available.png"></td>

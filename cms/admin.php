@@ -42,7 +42,75 @@ $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('basis/cms'))
 	die($rechte->errormsg);
 	
-$berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
+$berechtigte_oe = $rechte->getOEkurzbz('basis/cms');
+
+// Speichern eines Contents per Ajax Request ,
+// daher wird nach dem Speichern mittels exit beendet
+if(isset($_POST['NewContent']))
+{
+	if($rechte->isBerechtigt('basis/cms', null, 'sui'))
+	{
+		$templateContentId = isset($_POST['templateContent']) && $_POST['templateContent'] != 0?$_POST['templateContent']:'';
+		$titel = isset($_POST['titel'])?$_POST['titel']:'Neuer Eintrag';
+		
+		if ($templateContentId != '')
+		{
+			$templateContent = new content();
+			$templateContent->getContent($templateContentId);
+		}
+		
+		$template = new template();
+		$template->getAll();
+		if(!isset($template->result[0]))
+			exit('Es ist kein Template vorhanden');
+			
+		if(in_array('etw',$berechtigte_oe))
+			$oe = 'etw';
+		else
+			$oe = $berechtigte_oe[0];
+		
+		$content = new content();
+		$content->new = true;
+		$content->oe_kurzbz= $templateContentId != ''?$templateContent->oe_kurzbz:$oe;
+		$content->template_kurzbz=$templateContentId != ''?$templateContent->template_kurzbz:$template->result[0]->template_kurzbz;
+		$content->titel = $titel;
+		$content->aktiv=true;
+		$content->menu_open=false;
+		$content->content = $templateContentId != ''?$templateContent->content:'<?xml version="1.0" encoding="UTF-8" ?><content></content>';		
+		$content->sichtbar=true;
+		$content->version='1';
+		$content->sprache=$templateContentId != ''?$templateContent->sprache:DEFAULT_LANGUAGE;
+		$content->insertvon = $user;
+		$content->insertamum = date('Y-m-d H:i:s');
+		$content->beschreibung = $templateContentId != ''?$templateContent->beschreibung:'';
+		
+		if($content->save())
+		{
+			if($content->saveContentSprache())
+			{
+				if ($templateContentId!='')
+				{
+					$parent_content = new content();
+					$parent_content->content_id = $templateContentId;
+					$parent_content->child_content_id = $content->content_id;
+					$parent_content->insertamum = date('Y-m-d');
+					$parent_content->insertvon = $user;
+					$parent_content->sort=$parent_content->getMaxSort($templateContentId)+1;
+					
+					if(!$parent_content->addChild())
+						exit('AddChild '.$content->errormsg);
+				}					
+				exit($content->content_id);
+			}
+			else
+				exit('ContentSpracheSave '.$content->errormsg);
+		}
+		else
+			exit('ContentSave '.$content->errormsg);
+	}
+	else 
+		exit('Sie haben keine Berechtigung fuer diese Aktion');
+}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -96,12 +164,13 @@ $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
 	);
 	function FHCFileBrowser(field_name, url, type, win) 
 	{
-		cmsURL = "<?php echo APP_ROOT;?>cms/tinymce_dms.php?type="+type;
+		dms_id = url.substring(url.indexOf("=") +1);
+		cmsURL = "<?php echo APP_ROOT;?>cms/tinymce_dms.php?type="+type+"&searchstring="+dms_id;
 		tinyMCE.activeEditor.windowManager.open({
 			file: cmsURL,
 			title : "FHComplete File Browser",
-			width: 800,
-			height: 600,
+			width: 1400,
+			height: 850,
 			resizable: "yes",
 			close_previous: "no",
 			scrollbars: "yes",

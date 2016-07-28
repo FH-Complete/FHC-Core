@@ -314,7 +314,7 @@ class jahresplan extends basis_db
 		$this->inhalt='';
 		
 		$this->start=''; 
-       	$this->ende='';	
+		$this->ende='';
 
 		$this->insertamum='';
 		$this->insertvon='';
@@ -324,17 +324,17 @@ class jahresplan extends basis_db
 		$this->freigabevon='';
 		
 		// Suchfelder
-       	$this->start_jahr='';	
-       	$this->ende_jahr='';	
-		
-       	$this->start_jahr_monat='';
-       	$this->ende_jahr_monat=''; 
-		
-       	$this->start_jahr_woche=''; 
-       	$this->ende_jahr_woche=''; 
-		
-       	$this->suchtext=''; 
-    	$this->freigabe=false; 
+		$this->start_jahr='';
+		$this->ende_jahr='';
+
+		$this->start_jahr_monat='';
+		$this->ende_jahr_monat='';
+
+		$this->start_jahr_woche='';
+		$this->ende_jahr_woche='';
+
+		$this->suchtext='';
+		$this->freigabe=false;
 			
 		$this->result=array();
 	}
@@ -395,10 +395,11 @@ class jahresplan extends basis_db
 			$fildsValue.="'".addslashes($this->updatevon)."',";
 			$fildsValue.=(is_null($this->freigabeamum) || empty($this->freigabeamum)?'null':"'".addslashes($this->freigabeamum)."'").",";
 			$fildsValue.=(is_null($this->freigabevon) || empty($this->freigabevon)?'null':"'".addslashes($this->freigabevon)."'");
-	   		$qry.=" insert into ".$this->schemaSQL.".tbl_veranstaltung (".$fildsList.") values (".$fildsValue.") ";
+			$qry.=" insert into ".$this->schemaSQL.".tbl_veranstaltung (".$fildsList.") values (".$fildsValue.") ";
 		}
 		else
 		{
+
 			$fildsValue.=(!empty($fildsValue)?',':'')."veranstaltungskategorie_kurzbz='".addslashes($this->veranstaltungskategorie_kurzbz)."'";
 			$fildsValue.=(!empty($fildsValue)?',':'')."beschreibung='".addslashes($this->beschreibung)."'";
 			$fildsValue.=(!empty($fildsValue)?',':'')."inhalt='".addslashes($this->inhalt)."'";
@@ -410,41 +411,40 @@ class jahresplan extends basis_db
 				$fildsValue.=(!empty($fildsValue)?',':'')."freigabeamum=null";
 			else
 				$fildsValue.=(!empty($fildsValue)?',':'')."freigabeamum='".addslashes($this->freigabeamum)."'";
-			$fildsValue.=(!empty($fildsValue)?',':'')."freigabevon='".addslashes($this->freigabevon)."'";
+			$fildsValue.=(!empty($fildsValue)?',':'').(is_null($this->freigabevon) || empty($this->freigabevon)?"freigabevon=null":"freigabevon='".addslashes($this->freigabevon)."'");
 			$qry.=" update ".$this->schemaSQL.".tbl_veranstaltung set ";
 			$qry.=$fildsValue;
 			$qry.=" where veranstaltung_id='".addslashes($this->veranstaltung_id)."' ";
-		}	
+		}
 
 		if(!$this->db_query($qry))
 		{
 			if (empty($this->errormsg))
 				$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
-		}	
+		}
 		
 		if($this->new)
-		{		
+		{
 			$qry=" select max(".$this->schemaSQL.".tbl_veranstaltung.veranstaltung_id) from ".$this->schemaSQL.".tbl_veranstaltung; "; 
 			if(!$this->db_query($qry))
 			{
 				if (empty($this->errormsg))
 					$this->errormsg = 'Fehler beim lesen des neuen Datensatzes';
 				return false;
-			}	
+			}
 
 			if (!$row = $this->db_fetch_object())
 			{
 				if (empty($this->errormsg))
 					$this->errormsg = 'Fehler beim ermitteln des neuen Datensatzes';
-        	 		return false;
+				return false;
 			}
 			$this->veranstaltung_id=$row->max;
 		}
 		// Beim Lesen ist ein Fehler aufgetreten
-		
-		$this->freigabe=false; 
-		$veranstaltung_id=$this->veranstaltung_id;		
+		$this->freigabe=false;
+		$veranstaltung_id=$this->veranstaltung_id;
 		$this->InitVeranstaltung();
 		$this->veranstaltung_id=$veranstaltung_id;
 		if (!$this->loadVeranstaltung()) 
@@ -489,7 +489,7 @@ class jahresplan extends basis_db
 			$qry.=" WHERE veranstaltung_id =".$this->veranstaltung_id."; ";
 	
 		$qry.=" COMMIT; ";
-			
+
 		if($this->db_query($qry))
 			return true;
 		else
@@ -499,11 +499,11 @@ class jahresplan extends basis_db
 			return false;
 		}	
 	}
-	   
+
 	/**
 	 * Lesen der Veranstaltung 
 	 * @return Array mit Veranstaltungs-Objekt wenn ok, false im Fehlerfall
-	 */	    
+	 */
 	public function loadVeranstaltung($veranstaltungskategorie_kurzbz="",$veranstaltung_id="",$freigabe="",$show_only_public_kategorie="")
 	{
 		//Init
@@ -512,19 +512,19 @@ class jahresplan extends basis_db
 		$this->errormsg='';
 		$this->result=array();
 
-       	if ($veranstaltung_id!='')
+		if ($veranstaltung_id!='')
 			$this->veranstaltung_id=$veranstaltung_id;
 
 		if (!empty($veranstaltungskategorie_kurzbz))
 			$this->veranstaltungskategorie_kurzbz=$veranstaltungskategorie_kurzbz;
 			
-       	if ($freigabe!='')
+		if ($freigabe!='')
 			$this->freigabe=$freigabe;
 
-       	if ($show_only_public_kategorie!='')
+		if ($show_only_public_kategorie!='')
 			$this->show_only_public_kategorie=$show_only_public_kategorie;
 		
- 		$qry.="SELECT tbl_veranstaltung.* ";
+		$qry.="SELECT tbl_veranstaltung.* ";
 
 		$qry.=", to_char(tbl_veranstaltung.start, 'YYYYMMDD') as \"start_jjjjmmtt\" ";
 		$qry.=", to_char(tbl_veranstaltung.ende, 'YYYYMMDD') as \"ende_jjjjmmtt\" ";
@@ -548,8 +548,10 @@ class jahresplan extends basis_db
 		$qry.=", to_char(tbl_veranstaltung.start, 'Q') as \"start_quartal\" ";
 		$qry.=", to_char(tbl_veranstaltung.ende, 'Q') as \"ende_quartal\" ";
 		
-		$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.start) as \"start_timestamp\" ";
-		$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.ende) as \"ende_timestamp\" ";
+		$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.start::TIMESTAMP WITHOUT TIME
+ZONE at time zone 'CEST' ) as \"start_timestamp\" ";
+		$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.ende::TIMESTAMP WITHOUT TIME
+ZONE at time zone 'CEST' ) as \"ende_timestamp\" ";
 
 
 		$qry.=", to_char(tbl_veranstaltung.start, 'DD.MM.YYYY') as \"start_datum\" ";
@@ -570,71 +572,71 @@ class jahresplan extends basis_db
 		$qry.=", to_char(tbl_veranstaltung.freigabeamum, 'HH24:MI') as \"freigabeamum_zeit\" ";
 		$qry.=", EXTRACT(EPOCH FROM tbl_veranstaltung.freigabeamum) as \"freigabeamum_timestamp\" ";
 
- 		$qry.=",tbl_veranstaltungskategorie.*,tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz as kategorie_kurzbz  ";
+		$qry.=",tbl_veranstaltungskategorie.*,tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz as kategorie_kurzbz  ";
 
 			$qry.=" FROM ".$this->schemaSQL.".tbl_veranstaltungskategorie  ";
-   		$qry.=" LEFT JOIN ".$this->schemaSQL.".tbl_veranstaltung ON ".$this->schemaSQL.".tbl_veranstaltung.veranstaltungskategorie_kurzbz=".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz ";
+			$qry.=" LEFT JOIN ".$this->schemaSQL.".tbl_veranstaltung ON ".$this->schemaSQL.".tbl_veranstaltung.veranstaltungskategorie_kurzbz=".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz ";
 		$qry.=" WHERE ".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz>'' ";
 	
 		if ($this->freigabe)
 		{
 			$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.freigabevon>'' ";
 		}
-       	// Suche nach einer einzigen Veranstaltung_id
-	    if (!is_array($this->veranstaltung_id) && !empty($this->veranstaltung_id) )
+			// Suche nach einer einzigen Veranstaltung_id
+			if (!is_array($this->veranstaltung_id) && !empty($this->veranstaltung_id) )
 		{
 			if(!is_numeric($this->veranstaltung_id))
 			{
 				$this->errormsg = 'Veranstaltung_id ist ungueltig';
 				return false;
 			}
-   			$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.veranstaltung_id='".addslashes($this->veranstaltung_id)."' ";	
-       	}
-		elseif (is_array($this->veranstaltung_id) && count($this->veranstaltung_id)>0 )
-   		{
-   	   		$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.veranstaltung_id in (".addslashes(implode(",",$this->veranstaltung_id)).") ";	
-   		}
-	
-   		// Suche nach einer einzigen Veranstaltungskategorie_kurzbz
-       	if (!is_array($this->veranstaltungskategorie_kurzbz) && $this->veranstaltungskategorie_kurzbz!='' )
-	   	{
-   			$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz='".addslashes($this->veranstaltungskategorie_kurzbz)."' ";	
-	    }
-	   	elseif (is_array($this->veranstaltungskategorie_kurzbz) && count($this->veranstaltungskategorie_kurzbz)>0 )
-       	{
-	   		$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz in ('".implode("','",$this->veranstaltungskategorie_kurzbz)."') ";	
+			$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.veranstaltung_id='".addslashes($this->veranstaltung_id)."' ";
 		}
+		elseif (is_array($this->veranstaltung_id) && count($this->veranstaltung_id)>0 )
+		{
+			$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.veranstaltung_id in (".addslashes(implode(",",$this->veranstaltung_id)).") ";
+		}
+
+			// Suche nach einer einzigen Veranstaltungskategorie_kurzbz
+			if (!is_array($this->veranstaltungskategorie_kurzbz) && $this->veranstaltungskategorie_kurzbz!='' )
+			{
+				$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz='".addslashes($this->veranstaltungskategorie_kurzbz)."' ";
+			}
+			elseif (is_array($this->veranstaltungskategorie_kurzbz) && count($this->veranstaltungskategorie_kurzbz)>0 )
+			{
+				$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltungskategorie.veranstaltungskategorie_kurzbz in ('".implode("','",$this->veranstaltungskategorie_kurzbz)."') ";
+			}
 
 
 		if (!empty($this->start) && empty($this->ende) )
-	   		$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.start=to_timestamp(".$this->start.") ";	
+			$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.start=to_timestamp(".$this->start.") ";
 		else if (empty($this->start) && !empty($this->ende) )
-	   		$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.ende=to_timestamp(".$this->ende.") ";	
+			$qry.=" AND ".$this->schemaSQL.".tbl_veranstaltung.ende=to_timestamp(".$this->ende.") ";
 		else if (!empty($this->start) && !empty($this->ende) )
 		{
-	   		$qry.=" AND to_timestamp(".$this->start.") >=to_timestamp(".$this->schemaSQL.".tbl_veranstaltung.start) ";	
-	   		$qry.=" AND to_timestamp(".$this->ende.") <= to_timestamp(".$this->schemaSQL.".tbl_veranstaltung.ende) ";	
-		}	
+			$qry.=" AND to_timestamp(".$this->start.") >=to_timestamp(".$this->schemaSQL.".tbl_veranstaltung.start) ";
+			$qry.=" AND to_timestamp(".$this->ende.") <= to_timestamp(".$this->schemaSQL.".tbl_veranstaltung.ende) ";
+		}
 
 		if (!empty($this->start_jahr) && empty($this->ende_jahr))
-	   		$qry.=" AND to_char(".$this->schemaSQL.".tbl_veranstaltung.start, 'YYYY')='".addslashes($this->start_jahr)."'";	
+			$qry.=" AND to_char(".$this->schemaSQL.".tbl_veranstaltung.start, 'YYYY')='".addslashes($this->start_jahr)."'";
 		elseif (empty($this->start_jahr) && !empty($this->ende_jahr) )
-	   		$qry.=" AND to_char(".$this->schemaSQL.".tbl_veranstaltung.ende, 'YYYY')='".addslashes($this->ende_jahr)."'";
+			$qry.=" AND to_char(".$this->schemaSQL.".tbl_veranstaltung.ende, 'YYYY')='".addslashes($this->ende_jahr)."'";
 		elseif (empty($this->start_jahr) && !empty($this->ende_jahr) )
 		{
-	   		$qry.=" AND '".addslashes($this->start_jahr)."' between to_char(".$this->schemaSQL.".tbl_veranstaltung.start, 'YYYY') AND to_char(".$this->schemaSQL.".tbl_veranstaltung.ende, 'YYYY') ";
-	   		$qry.=" AND '".addslashes($this->ende_jahr)."' between to_char(".$this->schemaSQL.".tbl_veranstaltung.start, 'YYYY') AND to_char(".$this->schemaSQL.".tbl_veranstaltung.ende, 'YYYY') ";
+			$qry.=" AND '".addslashes($this->start_jahr)."' between to_char(".$this->schemaSQL.".tbl_veranstaltung.start, 'YYYY') AND to_char(".$this->schemaSQL.".tbl_veranstaltung.ende, 'YYYY') ";
+			$qry.=" AND '".addslashes($this->ende_jahr)."' between to_char(".$this->schemaSQL.".tbl_veranstaltung.start, 'YYYY') AND to_char(".$this->schemaSQL.".tbl_veranstaltung.ende, 'YYYY') ";
 		}
 
 
 		if (!empty($this->start_jahr_monat) && empty($this->ende_jahr_monat) )
-	   		$qry.=" AND '".addslashes($this->start_jahr_monat)."' between to_char(".$this->schemaSQL.".tbl_veranstaltung.start, 'YYYYMM') and  to_char(".$this->schemaSQL.".tbl_veranstaltung.ende, 'YYYYMM')";	
+			$qry.=" AND '".addslashes($this->start_jahr_monat)."' between to_char(".$this->schemaSQL.".tbl_veranstaltung.start, 'YYYYMM') and  to_char(".$this->schemaSQL.".tbl_veranstaltung.ende, 'YYYYMM')";
 		elseif (empty($this->start_jahr_monat) && !empty($this->ende_jahr_monat) )
-	   		$qry.=" AND '".addslashes($this->start_jahr_monat)."' between to_char(".$this->schemaSQL.".tbl_veranstaltung.start, 'YYYYMM') and  to_char(".$this->schemaSQL.".tbl_veranstaltung.ende, 'YYYYMM')";	
+			$qry.=" AND '".addslashes($this->start_jahr_monat)."' between to_char(".$this->schemaSQL.".tbl_veranstaltung.start, 'YYYYMM') and  to_char(".$this->schemaSQL.".tbl_veranstaltung.ende, 'YYYYMM')";
 		elseif (!empty($this->start_jahr_monat) && !empty($this->ende_jahr_monat) )
 		{
-	   		$qry.=" AND '".addslashes($this->start_jahr_monat)."' between to_char(".$this->schemaSQL.".tbl_veranstaltung.start, 'YYYYMM') AND to_char(".$this->schemaSQL.".tbl_veranstaltung.ende, 'YYYYMM') ";	
-	   		$qry.=" AND '".addslashes($this->ende_jahr_monat)."' between to_char(".$this->schemaSQL.".tbl_veranstaltung.start, 'YYYYMM') AND to_char(".$this->schemaSQL.".tbl_veranstaltung.ende, 'YYYYMM') ";	
+			$qry.=" AND '".addslashes($this->start_jahr_monat)."' between to_char(".$this->schemaSQL.".tbl_veranstaltung.start, 'YYYYMM') AND to_char(".$this->schemaSQL.".tbl_veranstaltung.ende, 'YYYYMM') ";
+			$qry.=" AND '".addslashes($this->ende_jahr_monat)."' between to_char(".$this->schemaSQL.".tbl_veranstaltung.start, 'YYYYMM') AND to_char(".$this->schemaSQL.".tbl_veranstaltung.ende, 'YYYYMM') ";
 		}
 			
 		if (!empty($this->start_jahr_woche) && empty($this->ende_jahr_woche) )

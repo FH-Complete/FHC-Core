@@ -89,10 +89,13 @@ if(isset($_GET['deleteadresse']))
 //Loeschen einer Organisationseinheit
 if(isset($_GET['deleteorganisationseinheit']))
 {
-	if(!$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
-		die('Sie haben keine Berechtigung fuer diese Aktion');
 	if(!empty($firma_organisationseinheit_id))
 	{
+		$firma = new firma();
+		$firma->load_firmaorganisationseinheit($firma_organisationseinheit_id);
+		$oe_kurzbz = $firma->oe_kurzbz;
+		if(!$rechte->isBerechtigt('basis/firma:begrenzt',$oe_kurzbz, 'suid'))
+			die($rechte->errormsg);
 		$firma = new firma();
 		if(!$firma->deleteorganisationseinheit($firma_organisationseinheit_id))
 		{

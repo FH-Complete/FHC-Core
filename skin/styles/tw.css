@@ -2,7 +2,7 @@
 /* Allgemein */
 body
 {
-	background-color: white;	
+	background-color: white;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 13px;
 	width: 100%;
@@ -34,7 +34,7 @@ iframe
 	margin:0px;
 	padding:0px;
 	height: 100%;
-	
+
 	 /* border-width:1px;
 	border-style:solid;  */
 }
@@ -89,7 +89,7 @@ li.ui-menu-item
 	z-index: 10;
 	padding: 0px;
 	margin: 0px;
-} 
+}
 html>body #menue
 {
 	position:absolute;
@@ -106,7 +106,7 @@ html>body #menue
 	margin: 0px;
 }
 #content /* Hack für IE8 */
-{	
+{
 	*width: 75\%;
 	*left: 21\%;
 }
@@ -116,7 +116,7 @@ html>body #content
 }
 
 /*   Druckausgabe */
-@media print 
+@media print
 {
 	#menue
 	{
@@ -129,23 +129,23 @@ html>body #content
 	left:1%;
 	}
 }
-input.TextBox					
+input.TextBox
 {
 	background-color: White;
 }
-/* 
-==== Formularfelder und Buttons ==== 
+/*
+==== Formularfelder und Buttons ====
 */
 
 /* Such-Feld CIS-Suche */
-input.search input.text					
+input.search input.text
 {
 	background-color: #E9ECEE;
 	border-width: 1px;
 	border-style:solid;
 	border-color: #A5AFB6;
 }
-#globalsearch					
+#globalsearch
 {
 	background-color: #E9ECEE;
 	border-width: 1px;
@@ -160,8 +160,8 @@ input.cis_login
 	color: #666666;
 	border: 1px solid #A5AFB6;
 	background-color: #E9ECEE;
-	width: 150px; 
-	height: 35px; 
+	width: 150px;
+	height: 35px;
 	font-size: 20px;
 }
 #GlobalMenu
@@ -172,6 +172,7 @@ input.cis_login
 .home_logo
 {
 	background-image:url(styles/tw/TWLogo_klein.jpg);
+	background-repeat: no-repeat;
 	width:170px;
 	height:53px;
 }
@@ -191,8 +192,8 @@ div.tip
 	vertical-align:middle;
 }
 
-/* 
-==== Links ==== 
+/*
+==== Links ====
 */
 a /*allgmeiner Link, Hauptmenuelinks*/
 {
@@ -202,7 +203,7 @@ a /*allgmeiner Link, Hauptmenuelinks*/
 }
 a:hover /*link ohne Item-Definition*/
 {
-	color: #0086CC; /*tw-blau*/ 
+	color: #0086CC; /*tw-blau*/
 	text-decoration: underline;
 }
 a.ItemTesttool
@@ -225,7 +226,7 @@ a.ItemTesttoolBeendet
 	line-height: 25px;
 	display:block;
 	padding: 0 10px 0 10px;
-	cursor: default; 
+	cursor: default;
 	text-decoration: none;
 }
 a:hover.ItemTesttool
@@ -251,7 +252,7 @@ a[onClick]:hover.Item /* ? */
 }
 a:hover.Item /*allgemeine Links, Hauptmenuelink*/
 {
-	color: #0086CC; /*tw-blau*/ 
+	color: #0086CC; /*tw-blau*/
 	text-decoration: underline;
 }
 a.Item2 /* zB in den Lehrveranstaltungen (Buttons) verwendet bei den Lektoren */
@@ -269,26 +270,26 @@ a.MenuItem /* Hauptmenuelink zum aufklappen */
 }
 a:hover.MenuItem /* Hauptmenuelink zum aufklappen */
 {
-	color: #0086CC; /*tw-blau*/ 
+	color: #0086CC; /*tw-blau*/
 	text-decoration: none;
 	font-weight: bold;
 }
 a:focus.MenuItem /* Hauptmenuelink zum aufklappen */
 {
-	color: #0086CC; /*tw-blau*/ 
+	color: #0086CC; /*tw-blau*/
 	text-decoration: none;
 	font-weight: bold;
 }
-A.stpl_detail 
-{ 
-	font-size:x-small; 
+A.stpl_detail
+{
+	font-size:x-small;
 	color:#000000;
 	text-decoration:none;
 }
 A.stpl_detail:hover
-{ 
+{
 	font-size:x-small;
-	color:#000000; 
+	color:#000000;
 	text-decoration:underline;
 	/*cursor:hand;*/
 }
@@ -302,7 +303,7 @@ a.head:hover
 }
 
 
-/* 
+/*
 ==== Tables ====
 */
 TABLE
@@ -313,26 +314,26 @@ TABLE.header
 {
 	width:100%;
 	height:100%;
-	/* background-image:url(../skin/images/header.png); */ 
-	/* background-repeat:no-repeat; */ 
+	/* background-image:url(../skin/images/header.png); */
+	/* background-repeat:no-repeat; */
 	background-color: white;
 	position: relative;
 }
 TABLE.header_content
 {
-	height: 13%; 
+	height: 13%;
 	width: 100%;
-	position: absolute; 
-	z-index:4;	
+	position: absolute;
+	z-index:4;
 }
 /* Firefox Hack, da er den absolute-Wert der position als einziger nicht richtig dargestellt hat*/
 @-moz-document url-prefix()
 {
-    TABLE.header_content 
+    TABLE.header_content
     {
-        height: 13%; 
+        height: 13%;
 		width: 100%;
-		position: relative; 
+		position: relative;
 		z-index:4;
     }
 }
@@ -411,17 +412,17 @@ td.ContentHeader2
 	color: #0086CC; /*tw-blau */
 	font-weight: normal;
 }
-td.ContentHeader3					
+td.ContentHeader3
 {
 	color: #0086CC;; /*tw-blau */
 	font-weight: bold;
 }
 td.MarkLine
 {
-	background-color: #F2F2F2; /*wie EEEEEE; also grau fast weiss */ 
+	background-color: #F2F2F2; /*wie EEEEEE; also grau fast weiss */
 }
-td.Inaktiv  /*fuer Inaktive Items bei der Raumbeschreibung */ 
-{ 
+td.Inaktiv  /*fuer Inaktive Items bei der Raumbeschreibung */
+{
   background-color: #F2F2F2; /*wie EEEEEE; also grau fast weiss */
   color: #CFCFCF;
   text-decoration: line-through;
@@ -516,11 +517,11 @@ TR.liste
 {
 	background-color: #D3DCE3; /*grau wie #DDDDDD*/
 }
-TR.liste0						
+TR.liste0
 {
 	background-color: #FFFFFF; /*wei�*/
 }
-TR.liste1						
+TR.liste1
 {
 	background-color: #EEEEEE; /*grau fast wei�*/
 }
@@ -531,7 +532,7 @@ TR.tryellow
 
 /* private/profile/zeitsperre.php */
 TABLE#zeitsperren
-{  
+{
 	/*border: 1px solid black; foo*/
 	width:100%;
 }
@@ -552,15 +553,15 @@ TABLE#zeitsperren TD
 	background-color: #EEEEEE; /*grau fast wei�*/
 }
 
-/* 
-==== Stundenplan ==== 
+/*
+==== Stundenplan ====
 */
 
 TABLE.stdplan
-{  
+{
 	margin: 0px;
 	padding: 0px;
-	/* border: 1px solid; */	
+	/* border: 1px solid; */
 	width: 100%;
 	background-color: white;
 	vertical-align: top;
@@ -582,13 +583,13 @@ TABLE.stdplan TD
   background-color:#ffffff;
 }
 
-/* 
+/*
 ==== Fonts ====
 */
 
 h1
-{ 
-	color: black; 
+{
+	color: black;
 	padding: 0px;
 	padding-bottom: 20px;
 	/* padding-left: 10px; */
@@ -601,12 +602,12 @@ h1
 	font-weight:normal;
 }
 h1 td
-{ 
-	color: #ffffff; 
+{
+	color: #ffffff;
 	background-color: #009e84;
 }
 h2
-{ 
+{
 	margin: 0px;
 	padding-top: 0px;
 	padding-bottom: 15px;
@@ -614,21 +615,21 @@ h2
 	font-weight: bold;
 	font-size: 15px;
 }
-h3 
-{ 
+h3
+{
 	margin: 0px;
 	padding-top: 0px; /* 20px */
 	padding-bottom: 2px;
 	font-weight: bold;
 	font-size:13px;
 }
-h4 
-{ 	
+h4
+{
 	margin: 0px;
-	padding: 0px;  
+	padding: 0px;
 	text-decoration: underline;
 	font-weight: normal;
-	font-size:13px; 
+	font-size:13px;
 }
 .error
 {
@@ -663,7 +664,7 @@ h4
 	margin-bottom:0px;
 }
 
-/* 
+/*
 ==== Images ====
 */
 img.testtoolfrage
@@ -721,14 +722,14 @@ img.header_logo
 }
 img.screenshot_boxshadow
 {
-	border: 1px solid grey; 
-	box-shadow: 0px 0px 5px 5px #888888; 
+	border: 1px solid grey;
+	box-shadow: 0px 0px 5px 5px #888888;
 	margin-left: 10px;
 }
 a:hover img.screenshot_boxshadow
 {
-	border: 1px solid grey; 
-	box-shadow: 0px 0px 5px 5px #0086CC; 
+	border: 1px solid grey;
+	box-shadow: 0px 0px 5px 5px #0086CC;
 	margin-left: 10px;
 }
 /*
@@ -739,31 +740,31 @@ a:hover img.screenshot_boxshadow
 {
 	color: #999999;
 }
-#bgcolor0					
+#bgcolor0
 {
 	background-color: #CC0000;
 }
-#bgcolor1					
+#bgcolor1
 {
 	background-color: #FF2200;
 }
-#bgcolor2					
+#bgcolor2
 {
 	background-color: #FF9922;
 }
-#bgcolor3					
+#bgcolor3
 {
 	background-color: #FFFF55;
 }
-#bgcolor4					
+#bgcolor4
 {
 	background-color: #88FF88;
 }
-#bgcolor5					
+#bgcolor5
 {
 	background-color: #AAFFAA;
 }
-#bgcolor6					
+#bgcolor6
 {
 	background-color: #CCFFCC;
 }
@@ -796,7 +797,7 @@ a:hover img.screenshot_boxshadow
 	color: green;
 }
 .ausblenden {display:none;}
-.einblenden {display:block;}	
+.einblenden {display:block;}
 
 /* Inaktive Elemente in einem DropDown */
 option.inactive
@@ -846,8 +847,8 @@ option.inactive
 	cursor:pointer;
 	cursor:hand;
 }
-	
-/* 
+
+/*
 ==== Kalender-Jump-Effekt im LV-Plan ====
 */
 div.hoverbox div.preview div.hoverbox_inhalt
@@ -905,21 +906,21 @@ ul.menu
 	width:200px;
 	list-style-type:none;
 }
-#menu a 
+#menu a
 {
 	display:block;
 	padding:0 0 0 5px;
 	outline:none;
 	text-decoration:none;
 }
-#menu li 
+#menu li
 {
 	margin:0 0 0 10px;
 	padding: 5px 0 0 0;
 	display:block;
 	border:1px solid #FFFFFF;
 }
-#menu a.selected 
+#menu a.selected
 {
 	padding:0 0 0 5px;
 }
@@ -927,7 +928,7 @@ ul.menu
 {
 	text-decoration: underline;
 }
-#menu a.leaf 
+#menu a.leaf
 {
 	color: #616B71;
 	padding-left: 5px;
@@ -941,7 +942,7 @@ ul.menu
 }
 
 /* Empfehlung im Studienplan */
-.empfehlung 
+.empfehlung
 {
 	border: 1px solid green;
 }
@@ -961,7 +962,7 @@ div.preview
 	position:relative;
 }
 
-	
+
 div.hoverbox div.preview:hover div.hoverbox_inhalt
 {
 	display: block;
@@ -975,7 +976,7 @@ div.hoverbox div.preview:hover div.hoverbox_inhalt
 }
 table.hoverbox
 {
-	
+
 	border:1px;
 	border-style:solid;
 	border-color:grey;

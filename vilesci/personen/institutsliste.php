@@ -47,7 +47,19 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script type="text/javascript" src="../../include/js/jquery.js"></script>
+		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+		<script type="text/javascript">
+			$(document).ready(function() 
+			{ 
+				$("#t1").tablesorter(
+				{
+					sortList: [[1,0]],
+					widgets: ["zebra"],
+					headers: {11: {sorter: false}, 12: {sorter: false}, 13: {sorter: false}}
+				}); 
+			});
+		</script>
 	</head>
 	<body class="Background_main">
 		<h2>Liste der MitarbeiterInnen der Institute</h2>';
@@ -85,7 +97,7 @@ else
 
 //Alle aktiven Mitarbeiter holen mit den ALVS-Stunden und der Hauptinstitutszuteilung
 $qry = "SELECT 
-			vorname, nachname, fixangestellt, mitarbeiter_uid, kompetenzen, 
+			personalnummer, vorname, nachname, fixangestellt, mitarbeiter_uid, kompetenzen, 
 			(
 				SELECT 
 					sum(semesterstunden) 
@@ -123,27 +135,21 @@ $qry = "SELECT
 
 if($result = $db->db_query($qry))
 {
-	echo "<br><br><table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
+	$count = $db->db_num_rows($result);
+	echo $count.' MitarbeiterInnen';
+	echo "<br><br><table class='tablesorter' id='t1'>
 				<thead>
-					<tr>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th></th>
-						<th colspan='2'>ALVS</th>
-						<th></th>
-						<th colspan='2'>Institute</th>
-					</tr>
 					<tr class='liste'>
-						<th class='table-sortable:default'>Nachname</th>
-						<th class='table-sortable:default'>Vorname</th>
-						<th class='table-sortable:default'>Fix / Frei</th>
-						<th class='table-sortable:default'>Kompetenzen</th>
-						<th class='table-sortable:numeric'>".$db->convert_html_chars($ws)."</th>
-						<th class='table-sortable:numeric'>".$db->convert_html_chars($ss)."</th>
-						<th class='table-sortable:default'>Studiengang</th>
-						<th class='table-sortable:default'>Hauptzuteilung</th>
-						<th class='table-sortable:default'>Sonstige</th>
+						<th>PNr</th>
+						<th>Nachname</th>
+						<th>Vorname</th>
+						<th>Fix / Frei</th>
+						<th>Kompetenzen</th>
+						<th>ALVS<br>".$db->convert_html_chars($ws)."</th>
+						<th>ALVS<br>".$db->convert_html_chars($ss)."</th>
+						<th>Studiengang</th>
+						<th>Institut Hauptzuteilung</th>
+						<th>Sonstige Institutszuteilungen</th>
 					</tr>
 				</thead>
 				<tbody>";
@@ -151,6 +157,7 @@ if($result = $db->db_query($qry))
 	while($row = $db->db_fetch_object($result))
 	{
 		echo '<tr>';
+		echo "<td>".$db->convert_html_chars($row->personalnummer)."</td>";
 		echo "<td>".$db->convert_html_chars($row->nachname)."</td>";
 		echo "<td>".$db->convert_html_chars($row->vorname)."</td>";
 		echo "<td>".($row->fixangestellt=='t'?'fix':'frei')."</td>";

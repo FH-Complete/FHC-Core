@@ -47,7 +47,7 @@ class person extends basis_db
 	public $foto;              	// text
 	public $anmerkungen;       	// varchar(256)
 	public $homepage;          	// varchar(256)
-	public $svnr;				// char(10)
+	public $svnr;				// varchar(16)
 	public $ersatzkennzeichen; 	// char(10)
 	public $familienstand;     	// char(1)
 	public $anzahlkinder;      	// smalint
@@ -239,9 +239,9 @@ class person extends basis_db
 			$this->errormsg = 'Homepage darf nicht laenger als 256 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->svnr)>10)
+		if(mb_strlen($this->svnr)>16)
 		{
-			$this->errormsg = 'SVNR darf nicht laenger als 10 Zeichen sein';
+			$this->errormsg = 'SVNR darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 
@@ -251,13 +251,14 @@ class person extends basis_db
 			return false;
 		}
 
-		if($this->svnr!='')
+		if($this->svnr!='' && mb_strlen($this->svnr) != 16 && mb_strlen($this->svnr) != 10)
 		{
-			if(mb_strlen($this->svnr)!=10)
-			{
-				$this->errormsg = 'Sozialversicherungsnummer muss 10stellig sein';
-				return false;
-			}
+			$this->errormsg = 'SVNR muss 10 oder 16 Zeichen lang sein';
+			return false;
+		}
+
+		if($this->svnr!='' && mb_strlen($this->svnr)==10)
+		{
 			//SVNR mit Pruefziffer pruefen
 			//Die 4. Stelle in der SVNR ist die Pruefziffer
 			//(Summe von (gewichtung[i]*svnr[i])) modulo 11 ergibt diese Pruefziffer

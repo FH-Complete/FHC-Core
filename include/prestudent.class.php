@@ -20,6 +20,16 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/person.class.php');
+require_once(dirname(__FILE__).'/log.class.php');
+
+require_once(dirname(__FILE__).'/phrasen.class.php');
+require_once(dirname(__FILE__).'/globals.inc.php');
+require_once(dirname(__FILE__).'/sprache.class.php');
+
+$sprache = getSprache();
+$lang = new sprache();
+$lang->load($sprache);
+$p = new phrasen($sprache);
 
 class prestudent extends person
 {
@@ -46,17 +56,17 @@ class prestudent extends person
 	public $punkte; //rt_gesamtpunkte
 	public $rt_punkte1;
 	public $rt_punkte2;
-    public $rt_punkte3 = 0;
-    public $bismelden = true;
+	public $rt_punkte3 = 0;
+	public $bismelden = true;
 	public $anmerkung;
 	public $anmerkung_status;
 	public $mentor;
 	public $ext_id_prestudent;
-    public $dual = false;
-    public $zgvdoktor_code;
-    public $zgvdoktorort;
-    public $zgvdoktordatum;
-    public $zgvdoktornation;
+	public $dual = false;
+	public $zgvdoktor_code;
+	public $zgvdoktorort;
+	public $zgvdoktordatum;
+	public $zgvdoktornation;
 
 	public $status_kurzbz;
 	public $studiensemester_kurzbz;
@@ -565,8 +575,8 @@ class prestudent extends person
 					(
 						SELECT
 							*, (SELECT status_kurzbz FROM tbl_prestudentstatus
-							    WHERE prestudent_id=prestudent.prestudent_id $stsemqry
-							    ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) AS rolle
+								WHERE prestudent_id=prestudent.prestudent_id $stsemqry
+								ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) AS rolle
 						FROM tbl_prestudent prestudent ORDER BY prestudent_id
 					) a, tbl_prestudentstatus, tbl_person
 				WHERE a.rolle=tbl_prestudentstatus.status_kurzbz AND
@@ -772,12 +782,14 @@ class prestudent extends person
 	 */
 	public function save_rolle()
 	{
+		global $p;
 		if($this->new)
 		{
 			//pruefen ob die Rolle schon vorhanden ist
 			if($this->load_rolle($this->prestudent_id, $this->status_kurzbz, $this->studiensemester_kurzbz, $this->ausbildungssemester))
 			{
-				$this->errormsg = 'Diese Rolle existiert bereits';
+				//$this->errormsg = 'Diese Rolle existiert bereits';
+				$this->errormsg = $p->t('errors/rolleExistiertBereits');
 				return false;
 			}
 
@@ -814,7 +826,8 @@ class prestudent extends person
 			{
 				if($this->load_rolle($this->prestudent_id, $this->status_kurzbz, $this->studiensemester_kurzbz, $this->ausbildungssemester))
 				{
-					$this->errormsg = 'Diese Rolle existiert bereits';
+					//$this->errormsg = 'Diese Rolle existiert bereits';
+					$this->errormsg = $p->t('errors/rolleExistiertBereits');
 					return false;
 				}
 			}
@@ -972,9 +985,13 @@ class prestudent extends person
 			return false;
 		}
 
-		$qry = "SELECT tbl_prestudentstatus.*, bezeichnung AS studienplan_bezeichnung
-			FROM public.tbl_prestudentstatus LEFT JOIN lehre.tbl_studienplan USING (studienplan_id)
-			 WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
+		$qry = "SELECT tbl_prestudentstatus.*, bezeichnung AS studienplan_bezeichnung,
+                tbl_status.bezeichnung_mehrsprachig
+                FROM public.tbl_prestudentstatus
+                LEFT JOIN lehre.tbl_studienplan USING (studienplan_id)
+                JOIN public.tbl_status USING (status_kurzbz)
+                WHERE tbl_status.status_kurzbz = tbl_prestudentstatus.status_kurzbz
+                AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
 
 		if($studiensemester_kurzbz!='')
 			$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
@@ -989,6 +1006,7 @@ class prestudent extends person
 			{
 				$this->prestudent_id = $row->prestudent_id;
 				$this->status_kurzbz = $row->status_kurzbz;
+				$this->status_mehrsprachig = $this->db_parse_lang_array($row->bezeichnung_mehrsprachig);
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$this->ausbildungssemester = $row->ausbildungssemester;
 				$this->datum = $row->datum;
@@ -1118,9 +1136,9 @@ class prestudent extends person
 				$obj->ext_id_prestudent = $row->ext_id;
 				$obj->dual = $this->db_parse_bool($row->dual);
 				$obj->ausstellungsstaat = $row->ausstellungsstaat;
-                $obj->zgvdoktor_code = $row->zgvdoktor_code;
-                $obj->zgvdoktorort = $row->zgvdoktorort;
-                $obj->zgvdoktordatum = $row->zgvdoktordatum;
+				$obj->zgvdoktor_code = $row->zgvdoktor_code;
+				$obj->zgvdoktorort = $row->zgvdoktorort;
+				$obj->zgvdoktordatum = $row->zgvdoktordatum;
 
 				$this->result[] = $obj;
 			}
@@ -1133,56 +1151,60 @@ class prestudent extends person
 		}
 	}
 
-    /**
-     * Gibt die eingetragenen ZGV zurück
-     * @return array
-     */
-    public function getZgv() {
+	/**
+	 * Gibt die eingetragenen ZGV zurück
+	 * @return array
+	 */
+	public function getZgv()
+	{
 
-        $zgv = array(
-            'bachelor' => array(),
-            'master' => array(),
-//            'doktor' => array(),
-        );
-        $attribute = array(
-            'art',
-            'ort',
-            'datum',
-            'nation',
-        );
-        $db_attribute = array(
-            'zgv_code',
-            'zgvort',
-            'zgvdatum',
-            'zgvnation',
-            'zgvmas_code',
-            'zgvmaort',
-            'zgvmadatum',
-            'zgvmanation',
-            'zgvdoktor_code',
-            'zgvdoktorort',
-            'zgvdoktordatum',
-            'zgvdoktornation',
-        );
+		$zgv = array
+		(
+			'bachelor' => array(),
+			'master' => array(),
+			//'doktor' => array(),
+		);
+		$attribute = array
+		(
+			'art',
+			'ort',
+			'datum',
+			'nation',
+		);
+		$db_attribute = array
+		(
+			'zgv_code',
+			'zgvort',
+			'zgvdatum',
+			'zgvnation',
+			'zgvmas_code',
+			'zgvmaort',
+			'zgvmadatum',
+			'zgvmanation',
+			'zgvdoktor_code',
+			'zgvdoktorort',
+			'zgvdoktordatum',
+			'zgvdoktornation',
+		);
 
-        foreach($this->result as $prestudent) {
-
-            foreach($zgv as &$value) {
-
-                foreach($attribute as $attribut) {
-                    $db_attribute_name = current($db_attribute);
-
-                    if($prestudent->$db_attribute_name) {
-                        $value[$attribut] = $prestudent->$db_attribute_name;
-                    }
-                    next($db_attribute);
-                }
-            }
-            reset($db_attribute);
-        }
-
-        return $zgv;
-    }
+		foreach($this->result as $prestudent)
+		{
+			foreach($zgv as &$value)
+			{
+				foreach($attribute as $attribut)
+				{
+					$db_attribute_name = current($db_attribute);
+					if($prestudent->$db_attribute_name)
+					{
+						$value[$attribut] = $prestudent->$db_attribute_name;
+					}
+					next($db_attribute);
+				}
+			}
+			reset($db_attribute);
+		}
+	return $zgv;
+	}
 
 	/**
 	 * Liefert die Anzahl der Bewerber im ausgewaehlten Bereich

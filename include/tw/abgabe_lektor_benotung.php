@@ -33,6 +33,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Herstellen der Datenbankverbindung');
@@ -44,6 +45,20 @@ require_once('../../include/pdf/fpdf.php');
 require_once('../../include/pdf.inc.php');
 
 $getuid=get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($getuid);
+
+if (isset($_GET['user']))
+{
+	if ($rechte->isBerechtigt('admin',null,'suid'))
+		$getuid = $_GET['user'];
+	else 
+		$getuid=get_uid();
+}
+else 
+	$getuid=get_uid();
+
 $datum_obj = new datum();
 $htmlstr = "";
 $qualitaet='';
@@ -153,7 +168,7 @@ else
 		$pdf->SetXY(30,30);
 	
 		//Logo
-		$pdf->Image("../../skin/images/logo.jpg","400","25","160","54","jpg","");
+		$pdf->Image("../../skin/styles/tw/logo.jpg","400","25","150","78","jpg","");
 
 		$pdf->SetFont('Arial','',12);
 		$pdf->SetFillColor(190,190,190);
@@ -426,7 +441,7 @@ else
 		$pdf->MultiCell(0,15,$stgtyp.'studiengang '.$studiengang);
 		$pdf->SetFont('Arial','',14);
 		$pdf->SetXY(30,150-$titelabzug);
-		$pdf->MultiCell(0,15,'Beurteilung Master Thesis - 1. BegutachterIn');
+		$pdf->MultiCell(0,15,'Beurteilung Masterarbeit - 1. BegutachterIn');
 
 		$qry_beu="SELECT * FROM public.tbl_person JOIN public.tbl_benutzer using(person_id) WHERE uid=".$db->db_add_param($getuid).";";
 		if(!$erg_beu=@$db->db_query($qry_beu))
@@ -490,7 +505,7 @@ else
 		$maxX +=291;
 		$pdf->SetFont('Arial','',9);
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(159,18,'Datum (dd.MM.yyyy): ',1,'L',0);
+		$pdf->MultiCell(159,18,'Datum (dd.mm.yyyy): ',1,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(159,18,date('d.m.Y',mktime(0, 0, 0, date("m")  , date("d"), date("Y"))),1,'R',0);
 		
@@ -561,7 +576,7 @@ else
 		$pdf->MultiCell(170,12,mb_convert_encoding("Form / Stil\n\n\n\n\n\n\n",'ISO-8859-15','UTF-8'),0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->SetFont('Arial','',9);
-		$pdf->MultiCell(170,12,mb_convert_encoding("\n - Hat die Master Thesis eine klare\n   Struktur, entspricht der Vorgabe\n - Wird einwandfrei zitiert?\n - Abbildungen?\n - Sprache: benötigte Überarbeitung\n   seitens seitens des Betreuers/ der\n   Betreuerin",'ISO-8859-15','UTF-8'),0,'L',0);
+		$pdf->MultiCell(170,12,mb_convert_encoding("\n - Hat die Masterarbeit eine klare\n   Struktur, entspricht der Vorgabe\n - Wird einwandfrei zitiert?\n - Abbildungen?\n - Sprache: benötigte Überarbeitung\n   seitens seitens des Betreuers/ der\n   Betreuerin",'ISO-8859-15','UTF-8'),0,'L',0);
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(170,100,'',1,'L',0);
 		$maxX +=170;
@@ -660,7 +675,7 @@ else
 		$maxY=$pdf->GetY();
 		$maxX=160;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(240,12,'1 Gruppe < 50 Punkte => Master Thesis gesamt negativ','LB','L',0);	
+		$pdf->MultiCell(240,12,'1 Gruppe < 50 Punkte => Masterarbeit gesamt negativ','LB','L',0);	
 		$maxX +=240;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(80,12,'','TB','C',0);
@@ -981,7 +996,7 @@ else
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
 			$htmlstr .= '<td width="40%"><b>Form / Stil</b><br>
-			Hat die Diplomarbeit eine klare Stuktur, entspricht der Vorgabe?<br>
+			Hat die Masterarbeit eine klare Stuktur, entspricht der Vorgabe?<br>
 			Wird einwandfrei zitiert?<br>
 			Abbildungen<br>
 			Sprache: ben&ouml;tigte &Uuml;berarbeitungen seitens der Betreuerin / des Betreuers</td>
@@ -1046,7 +1061,7 @@ else
 		$htmlstr .= "<tr><td>Ergebnis <=50 Punkte : Note 5</td><td>50< Ergebnis <65 : Note 4</td><td>65<= Ergebnis <78 : Note 3</td><td>78<= Ergebnis <91 : Note 2</td><td>91<= Ergebnis : Note 1</td></tr>";
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
-			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkten &rArr; Diplomarbeit gesamt negativ</td></tr>";
+			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkten &rArr; Masterarbeit gesamt negativ</td></tr>";
 		}
 		else 
 		{

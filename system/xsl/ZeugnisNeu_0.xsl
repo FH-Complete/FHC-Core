@@ -417,13 +417,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                         <text:p text:style-name="P14">Lehrveranstaltung</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-                        <text:p text:style-name="P15">Note</text:p>
-                    </table:table-cell>
-                    <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
                         <text:p text:style-name="P15">SWS</text:p>
                     </table:table-cell>
-                    <table:table-cell table:style-name="Tabelle1.D1" office:value-type="string">
+                    <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
                         <text:p text:style-name="P15">ECTS</text:p>
+                    </table:table-cell>
+                    <table:table-cell table:style-name="Tabelle1.D1" office:value-type="string">
+                        <text:p text:style-name="P15">Note</text:p>
                     </table:table-cell>
                 </table:table-row>
                 <xsl:apply-templates select="unterrichtsfach"/>
@@ -435,10 +435,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                         <text:p text:style-name="P13">-</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.C7" office:value-type="string">
-                        <text:p text:style-name="P13">-</text:p>
+                        <text:p text:style-name="P13"><xsl:value-of select="ects_gesamt"/></text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.D7" office:value-type="string">
-                        <text:p text:style-name="P9"><xsl:value-of select="ects_gesamt"/></text:p>
+                        <text:p text:style-name="P9">-</text:p>
                     </table:table-cell>
                 </table:table-row>            
                 <xsl:apply-templates select="fussnote"/> 
@@ -494,26 +494,26 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     </table:table-cell>
     <table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
         <text:p text:style-name="P9">
-        <xsl:if test="note=''">
+        <xsl:if test="sws=''">
 			<xsl:text>-</xsl:text>
 		</xsl:if>
-		<xsl:value-of select="note"/>
+		<xsl:value-of select="sws"/>
         </text:p>
     </table:table-cell>
     <table:table-cell table:style-name="Tabelle1.C2" office:value-type="string">
-        <text:p text:style-name="P9">
-	        <xsl:if test="sws=''">
-				<xsl:text>-</xsl:text>
-			</xsl:if>
-			<xsl:value-of select="sws"/>
-		</text:p>
-    </table:table-cell>
-    <table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
         <text:p text:style-name="P9">
 	        <xsl:if test="ects=''">
 				<xsl:text>-</xsl:text>
 			</xsl:if>
 			<xsl:value-of select="ects"/>
+		</text:p>
+    </table:table-cell>
+    <table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
+        <text:p text:style-name="P9">
+	        <xsl:if test="note=''">
+				<xsl:text>-</xsl:text>
+			</xsl:if>
+			<xsl:value-of select="note"/>
 		</text:p>
     </table:table-cell>
 </table:table-row>
@@ -542,19 +542,19 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     </table:table-cell>
     <table:table-cell table:style-name="Tabelle1.B8" office:value-type="string">
         <text:p text:style-name="P13">
-        	<xsl:if test="../projektarbeit_note_anzeige='true'">
-				<xsl:value-of select="note"/>
-			</xsl:if>
+        	<xsl:value-of select="sws"/>
 		</text:p>
     </table:table-cell>
     <table:table-cell table:style-name="Tabelle1.C8" office:value-type="string">
         <text:p text:style-name="P13">
-        	<xsl:value-of select="sws"/>
+        	<xsl:value-of select="ects"/>
         </text:p>
     </table:table-cell>
     <table:table-cell table:style-name="Tabelle1.D8" office:value-type="string">
         <text:p text:style-name="P13">
-        	<xsl:value-of select="ects"/>
+        	<xsl:if test="../projektarbeit_note_anzeige='true'">
+				<xsl:value-of select="note"/>
+			</xsl:if>
         </text:p>
     </table:table-cell>
 </table:table-row>

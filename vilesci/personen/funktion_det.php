@@ -21,7 +21,7 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
- 
+
 /*******************************************************************************
 	File: 	funktion_det.php
 	Descr: 	Hier werden Personen aufgelistet, die zur in funktion.php ausgewählten
@@ -35,6 +35,7 @@ require_once('../../include/person.class.php');
 require_once('../../include/funktion.class.php');
 require_once('../../include/benutzerfunktion.class.php');
 require_once('../../include/fachbereich.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -42,51 +43,58 @@ if (!$db = new basis_db())
 // Datenbankverbindung herstellen
 
 $user=get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('mitarbeiter',null,'suid'))
+    die($rechte->errormsg);
+
 $type='';
 if (isset($_POST['type']))
 	$type=$_POST['type'];
 
 if (isset($_GET['type']))
 	$type=$_GET['type'];
-	
+
 if(isset($_GET['kurzbz']))
 	$funktion_kurzbz=$_GET['kurzbz'];
 
 if(isset($_GET['datumvon']))
 	$datumvon=$_GET['datumvon'];
-else 
+else
 	$datumvon='';
 
 if(isset($_GET['datumbis']))
 	$datumbis=$_GET['datumbis'];
-else 
+else
 	$datumbis='';
 
 // Neue Funktionszuweisung speichern
 if ($type=='new' || $type=='editsave')
 {
 	//Einfügen in die Datenbank
-	
+
 	$funktion=new benutzerfunktion();
 	$funktion->uid=$_POST['uid'];
 	$funktion->funktion_kurzbz=$_POST['kurzbz'];
 	if (isset($_POST['oe_kurzbz']) && $_POST['oe_kurzbz']!=-1)
 	{
 		$funktion->oe_kurzbz=$_POST['oe_kurzbz'];
-		
+
 		if (isset($_POST['fb_kurzbz']) && $_POST['fb_kurzbz']!=-1)
 		{
 			$funktion->fachbereich_kurzbz=$_POST['fb_kurzbz'];
-		} 
+		}
 		else
 		{
 			$funktion->fachbereich_kurzbz=null;
 		}
-		
+
 		$funktion->semester = (isset($_POST['semester'])?$_POST['semester']:'');
 		$funktion->datum_von = $_POST['datumvon'];
 		$funktion->datum_bis = $_POST['datumbis'];
-		
+
 		if($type=='editsave')
 		{
 			$funktion->new=false;
@@ -94,21 +102,21 @@ if ($type=='new' || $type=='editsave')
 			$funktion->updateamum=date('Y-m-d H:i:s');
 			$funktion->updatevon=$user;
 		}
-		else 
+		else
 		{
 			$funktion->new=true;
 			$funktion->updateamum=date('Y-m-d H:i:s');
 			$funktion->updatevon=$user;
 			$funktion->insertamum=date('Y-m-d H:i:s');
 			$funktion->insertvon=$user;
-		}	
-		
+		}
+
 		if (!$funktion->save())
 		{
 			echo "Fehler: ".$funktion->errormsg;
 		}
 	}
-	else 
+	else
 		echo "Studiengang muss angegeben werden";
 
 }
@@ -122,7 +130,7 @@ if ($type=='delete')
 	{
 		echo "Benutzer_funktion_id ist keine Zahl";
 	}
-	else 
+	else
 	{
 		if (!$funktion->delete($bn_funktion_id))
 		{
@@ -171,23 +179,23 @@ if (!$funktion->load($kurzbz))
 	if ($type!='edit')
 	{
 		// Personen holen
-		$qry = "SELECT 
+		$qry = "SELECT
 					tbl_organisationseinheit.bezeichnung as oebezeichnung,
-					tbl_organisationseinheit.organisationseinheittyp_kurzbz as oetyp, 
-					tbl_benutzer.uid as uid, * 
-				FROM 
-					public.tbl_benutzerfunktion, 
-					public.tbl_person, 
-					public.tbl_benutzer, 
+					tbl_organisationseinheit.organisationseinheittyp_kurzbz as oetyp,
+					tbl_benutzer.uid as uid, *
+				FROM
+					public.tbl_benutzerfunktion,
+					public.tbl_person,
+					public.tbl_benutzer,
 					public.tbl_organisationseinheit
-				WHERE 
+				WHERE
 					funktion_kurzbz=".$db->db_add_param($kurzbz)." AND
 					tbl_benutzerfunktion.uid=tbl_benutzer.uid AND
 					tbl_benutzer.person_id=tbl_person.person_id AND
 					tbl_benutzerfunktion.oe_kurzbz=tbl_organisationseinheit.oe_kurzbz";
 
 		if($result = $db->db_query($qry))
-		{			
+		{
 			echo "<thead>
 					<tr class='liste'>
 						<th class='table-sortable:default'>Name</th>
@@ -200,10 +208,10 @@ if (!$funktion->load($kurzbz))
 						<th colspan=\"2\">Aktion</th>
 					</tr>
 				  </thead>";
-			$j=0;	
+			$j=0;
 			echo '<tbody>';
 			while($row = $db->db_fetch_object($result))
-			{				
+			{
 				$j++;
 				echo "<tr>";
 				echo "<td>".$row->nachname.", ".$row->vorname."</td>";
@@ -219,21 +227,21 @@ if (!$funktion->load($kurzbz))
 
 			}
 			echo '</tbody>';
-		} 
+		}
 		else
 		{
 			echo "Fehler: ".	$db->db_last_error();
 		}
 	}
-	
+
 	echo '
-	
+
 	</table>
 	<hr>
 	<form action="funktion_det.php" method="post" name="persfunk_neu" id="persfunk_neu">
   	<p>
   	';
-	
+
 	if ($type=='edit')
 	{
 		echo '<INPUT type="hidden" name="type" value="editsave">';
@@ -241,8 +249,8 @@ if (!$funktion->load($kurzbz))
 	}
 	else
 		echo '<INPUT type="hidden" name="type" value="new">';
-	
-	echo '    
+
+	echo '
     <INPUT type="hidden" name="kurzbz" value="'.$kurzbz.'">
     <table>
     <tr>
@@ -261,13 +269,13 @@ if (!$funktion->load($kurzbz))
 	}
 
 	echo '</SELECT></td></tr>';
-	
+
 	echo '<tr>
 			<td>Organisationseinheit: </td>
 			<td>
 		    	<SELECT name="oe_kurzbz">
 		      	<option value="-1">- auswählen -</option>';
-      
+
 	// Auswahl der Organisationseinheit
 	$num_rows=$db->db_num_rows($result_oe);
 	while($row=$db->db_fetch_object($result_oe))
@@ -278,11 +286,11 @@ if (!$funktion->load($kurzbz))
 		echo ">$row->kurzbz $row->bezeichnung</option>";
 	}
 	echo '</SELECT></td></tr>';
-	
-	
+
+
 	$funktion = new funktion();
 	$funktion->load($funktion_kurzbz);
-	
+
 	if($funktion->fachbereich)
 	{
 		echo '
@@ -291,10 +299,10 @@ if (!$funktion->load($kurzbz))
 	    	<td>
 			    <SELECT name="fb_kurzbz">
 			     <option value="-1">- auswählen -</option>';
-	      
+
 		// Auswahl Fachbereich
 		$fachbereich=new fachbereich();
-	    if ($fachbereich->getAll()) 
+	    if ($fachbereich->getAll())
 	    {
 			foreach($fachbereich->result as $fb)
 	      	{
@@ -308,10 +316,10 @@ if (!$funktion->load($kurzbz))
 		{
 			echo "Fehler: ".$fb->errormsg;
 		}
-	    
+
 		echo '</SELECT></td></tr>';
 	}
-	
+
 	if($funktion->semester)
 	{
 		echo '
@@ -320,7 +328,7 @@ if (!$funktion->load($kurzbz))
 	    	<td>
 			    <SELECT name="semester">
 			     <option value="">- auswählen -</option>';
-	      
+
 		for($i=1;$i<=8;$i++)
 		{
 			echo "<option value=\"$i\" ";
@@ -328,16 +336,16 @@ if (!$funktion->load($kurzbz))
 					echo 'selected ';
 			echo ">$i</option>";
 		}
-	    
+
 		echo '</SELECT></td></tr>';
 	}
-	
+
 	echo '<tr><td>Datum Von:</td><td><input type="text" name="datumvon" value="'.$datumvon.'"></td></tr>';
 	echo '<tr><td>Datum Bis:</td><td><input type="text" name="datumbis" value="'.$datumbis.'"></td></tr>';
 	echo '</table>';
-	
+
 	echo '<input type="submit" name="Submit" value="'.($type!='edit'?'Hinzufügen':'Speichern').'">';
-	
+
 	echo '</p></form>';
 ?>
 </body>

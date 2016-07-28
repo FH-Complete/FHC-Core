@@ -2,7 +2,7 @@
 $this->phrasen['lehre/keineLektorenZugeordnet']='Derzeit sind keine Lektoren für dieses Fach zugeteilt';
 
 $this->phrasen['lehre/lehrveranstaltungsinformation']='Lehrveranstaltungsinformation';
-$this->phrasen['lehre/Lehrbeauftrager']='Lehrbeauftrage(r)';
+$this->phrasen['lehre/lehrbeauftragter']='Lehrbeauftragte(r)';
 $this->phrasen['lehre/lvInfoBearbeiten']='Bearbeiten';
 
 $this->phrasen['lehre/semesterplan']='Semesterplan';
@@ -41,4 +41,7 @@ $this->phrasen['lehre/AbmeldungErfolgreich']='Sie wurden erfolgreich von der Leh
 $this->phrasen['lehre/AbmeldungAusGruppeNichtMoeglich']='Sie können sich nicht von dieser Lehrveranstaltung abmelden';
 $this->phrasen['lehre/confirmAbmeldung']='Wollen Sie sich wirklich von der Lehrveranstaltung "%s" abmelden?';
 $this->phrasen['lehre/nichtzugeteilt']='Sie sind nicht zu dieser Lehrveranstaltung zugeteilt';
+
+$this->phrasen['lehre/studienordnung']='Studienordnung';
+$this->phrasen['lehre/studienplan']='Studienplan';
 ?>

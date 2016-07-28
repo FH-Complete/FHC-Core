@@ -1074,6 +1074,7 @@ function print_lehrveranstaltungen()
 	<table class="tablesorter" id="lehrveranstaltungen">
 		<thead>
 			<tr>
+				<th>ID</th>
 				<th>Bezeichnung</th>
 				<th>Studiengang</th>
 				<th>Semester</th>
@@ -1083,6 +1084,7 @@ function print_lehrveranstaltungen()
 	foreach($lv->lehrveranstaltungen as $row)
 	{
 		echo '<tr>';
+		echo '<td>'.$row->lehrveranstaltung_id.'</td>';
 		echo '<td>'.$row->bezeichnung.'</td>';
 		echo '<td>'.$stg->kuerzel_arr[$row->studiengang_kz].'</td>';
 		echo '<td>'.$row->semester.'. Semester</td>';

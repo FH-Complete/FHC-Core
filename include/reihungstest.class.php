@@ -227,7 +227,7 @@ class reihungstest extends basis_db
 				'studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).' '.
 				'WHERE reihungstest_id='.$this->db_add_param($this->reihungstest_id, FHC_INTEGER, false).';';
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			if($this->new)
@@ -277,11 +277,11 @@ class reihungstest extends basis_db
 
 		if ($studiensemester_kurzbz!=null)
 			$qry .=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz, FHC_STRING, false);
-		
+
 		if ($order!=null)
 			$qry .=" ORDER BY ".$order;
-		
-		
+
+
 		$qry.= ";";
 
 		if($this->db_query($qry))
@@ -326,12 +326,16 @@ class reihungstest extends basis_db
 	 */
 	public function getZukuenftige($include_id, $studiengang_kz)
 	{
-		$qry = "SELECT *, '1' as sortierung,(SELECT upper(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_reihungstest.studiengang_kz) as stg FROM public.tbl_reihungstest WHERE datum>=now()-'1 days'::interval AND studiengang_kz=".$this->db_add_param($studiengang_kz)."
+		$qry = "
+		SELECT *, (SELECT count(*) FROM public.tbl_prestudent WHERE reihungstest_id=a.reihungstest_id) as angemeldete_teilnehmer
+		FROM (
+			SELECT *, '1' as sortierung,(SELECT upper(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_reihungstest.studiengang_kz) as stg FROM public.tbl_reihungstest WHERE datum>=now()-'1 days'::interval AND studiengang_kz=".$this->db_add_param($studiengang_kz)."
 			UNION
 			SELECT *, '2' as sortierung,(SELECT upper(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_reihungstest.studiengang_kz) as stg FROM public.tbl_reihungstest WHERE datum>=now()-'1 days'::interval AND studiengang_kz!=".$this->db_add_param($studiengang_kz)."
 			UNION
 			SELECT *, '0' as sortierung,(SELECT upper(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_reihungstest.studiengang_kz) as stg FROM public.tbl_reihungstest WHERE reihungstest_id=".$this->db_add_param($include_id)."
-			ORDER BY sortierung, stg, datum";
+			ORDER BY sortierung, stg, datum
+			) a";
 
 		if($this->db_query($qry))
 		{
@@ -354,6 +358,7 @@ class reihungstest extends basis_db
 				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				$obj->studiensemester_kurzbz =$row->studiensemester_kurzbz;
+				$obj->angemeldete_teilnehmer = $row->angemeldete_teilnehmer;
 
 				$this->result[] = $obj;
 			}
@@ -416,17 +421,17 @@ class reihungstest extends basis_db
 
 		return $obj->anzahl;
 	}
-	
+
 	public function delete($reihungstest_id)
 	{
 	    $qry = "DELETE from public.tbl_reihungstest WHERE reihungstest_id=".$this->db_add_param($reihungstest_id);
-	    
+
 	    if(!$this->db_query($qry))
 	    {
 		$this->errormsg = 'Fehler beim Löschen der Daten';
 		return false;
 	    }
-	    
+
 	    return true;
 	}
 }

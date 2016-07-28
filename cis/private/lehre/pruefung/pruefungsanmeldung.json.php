@@ -31,6 +31,14 @@ require_once('../../../../include/mail.class.php');
 require_once('../../../../include/anrechnung.class.php');
 require_once('../../../../include/prestudent.class.php');
 require_once('../../../../include/person.class.php');
+require_once('../../../../include/phrasen.class.php');
+require_once('../../../../include/globals.inc.php');
+require_once('../../../../include/sprache.class.php');
+
+$sprache = getSprache();
+$lang = new sprache();
+$lang->load($sprache);
+$p = new phrasen($sprache);
 
 $uid = get_uid();
 
@@ -49,7 +57,7 @@ switch($method)
 	    $data = getPruefungByLv($studiensemester, $uid);
             break;
 	case 'getPruefungByLvFromStudiengang':
-	    $studiensemester = isset($_REQUEST['studiensemester']) ? $_REQUEST['studiensemester'] : NULL;	    
+	    $studiensemester = isset($_REQUEST['studiensemester']) ? $_REQUEST['studiensemester'] : NULL;
 	    $data = getPruefungByLvFromStudiengang($studiensemester, $uid);
             break;
         case 'loadPruefung':
@@ -64,7 +72,7 @@ switch($method)
 	    {
 		$uid = $student_uid;
 	    }
-	    
+
 	    if($student_uid === "")
 	    {
 		$data['result']="";
@@ -361,6 +369,7 @@ function loadTermine()
  */
 function saveAnmeldung($aktStudiensemester = null, $uid = null)
 {
+	global $p;
     $termin = new pruefungstermin($_REQUEST["termin_id"]);
     $pruefung = new pruefung();
     $lehrveranstaltung = new lehrveranstaltung($_REQUEST["lehrveranstaltung_id"]);
@@ -368,19 +377,19 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
     $stdsem = $studiensemester->getLastOrAktSemester(0);
     $lv_besucht = false;
     $studienverpflichtung_id = filter_input(INPUT_POST, "studienverpflichtung_id");
-    
+
     //Defaulteinstellung für Anzahlprüfungsversuche (wird durch Addon "ktu" überschrieben)
     $maxAnzahlVersuche = 0;
-    
+
     //Defaulteinstellung für Code Note "unetnschuldigt ferngeblieben" (wird durch Addon "ktu" überschrieben)
     $noteCode_uef = -1;
-    
+
     $addon = new addon();
     foreach ($addon->aktive_addons as $a)
     {
-	if($a === "ktu")
+	if($a === "ku")
 	{
-	    require '../../../../addons/ktu/cis/prfVerwaltung_array.php';
+	    require '../../../../addons/'.$a.'/cis/prfVerwaltung_array.php';
 	    switch($lehrveranstaltung->oe_kurzbz)
 	    {
 		case $fakultaeten[0]["fakultaet"]:
@@ -389,7 +398,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 		case $fakultaeten[1]["fakultaet"]:
 		    $semCounter = $fakultaeten[1]["sem"];
 		    break;
-		default: 
+		default:
 		    $semCounter = 2;
 		    break;
 	    }
@@ -415,17 +424,33 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	$i++;
     }
     while($i<=$semCounter && $lv_besucht === FALSE);
-    
+
     if(!$lv_besucht)
     {
 	$data['error']='true';
 	$data['errormsg']='Besuch der Lehrveranstaltung liegt zu weit in der Vergangenheit.';
 	return $data;
     }
-    
+
     $pruefung->getPruefungen($uid, NULL, $lehrveranstaltung->lehrveranstaltung_id);
     $anmeldung_moeglich = true;
     $anzahlPruefungen = count($pruefung->result);
+
+	// Defaulteinstellung für Prüfungstypen - schauen, ob bereits aus KTU-Addon geladen
+	if(!isset($pruefungstyp_kurzbzArray))
+		$pruefungstyp_kurzbzArray = array("Termin1","Termin2","kommPruef");
+    if(isset($pruefungstyp_kurzbzArray))
+    {
+	if($anzahlPruefungen < count($pruefungstyp_kurzbzArray))
+	{
+	    $pruefungstyp_kurzbz = $pruefungstyp_kurzbzArray[$anzahlPruefungen];
+	}
+    }
+    else
+    {
+	$pruefungstyp_kurzbz = null;
+    }
+
     foreach($pruefung->result as $prf)
     {
 	$note = new note($prf->note);
@@ -433,8 +458,8 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	{
 	    $pruefungsanmeldung = new pruefungsanmeldung($prf->pruefungsanmeldung_id);
 	    $pruefungstermin = new pruefungstermin($pruefungsanmeldung->pruefungstermin_id);
-	    $p = new pruefungCis($pruefungstermin->pruefung_id);
-	    $pruefungsfenster = new pruefungsfenster($p->pruefungsfenster_id);
+	    $pf = new pruefungCis($pruefungstermin->pruefung_id);
+	    $pruefungsfenster = new pruefungsfenster($pf->pruefungsfenster_id);
 	    $studiensemester = new studiensemester();
 	    $stdsem = $studiensemester->getaktorNext();
 	    $i=0;
@@ -456,13 +481,13 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	    }
 	}
     }
-    
+
     if($anmeldung_moeglich)
     {
 	if($termin->teilnehmer_max > $termin->getNumberOfParticipants() || $termin->teilnehmer_max == NULL)
 	{
-	    $pruefung = new pruefungCis();
-	    $reihung = $pruefung->getLastOfReihung($_REQUEST["termin_id"]);
+		$pruefung = new pruefungCis();
+		$reihung = $pruefung->getLastOfReihung($_REQUEST["termin_id"]);
 	    $anmeldung = new pruefungsanmeldung();
 	    $anmeldung->lehrveranstaltung_id = $_REQUEST["lehrveranstaltung_id"];
 	    $anmeldung->pruefungstermin_id = $_REQUEST["termin_id"];
@@ -470,16 +495,18 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	    $anmeldung->uid = $uid;
 	    $anmeldung->reihung = $reihung+1;
 	    $anmeldung->status_kurzbz = "angemeldet";
+	    $anmeldung->pruefungstyp_kurzbz = $pruefungstyp_kurzbz;
 	    $lehrveranstaltung = new lehrveranstaltung($_REQUEST["lehrveranstaltung_id"]);
 
 	    $konto = new konto();
 	    $creditpoints = $konto->getCreditPoints($uid, $aktStudiensemester);
+
 	    if($creditpoints !== false)
 	    {
 		if($creditpoints < $lehrveranstaltung->ects)
 		{
 		$data['error'] = 'true';
-		$data['errormsg'] = 'Credit-Points-Guthaben ist zu gering.';
+		$data['errormsg'] = $p->t('pruefung/zuWenigeCreditPoints');
 		return $data;
 		}
 	    }
@@ -493,7 +520,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 		{
 		    $data['result'][$temp->pruefungstermin_id] = "true";
 		    $data['error'] = 'true';
-		    $data['errormsg'] = 'Kollision mit anderer Anmeldung.';
+		    $data['errormsg'] = $p->t('pruefung/kollisionMitAndererAnmeldung');
 		}
 	    }
 	    if(isset($data['error']) && $data['error'] = 'true')
@@ -504,23 +531,27 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	else
 	{
 	    $data['error']='true';
-	    $data['errormsg']='Keine freien Plätze vorhanden.';
+	    $data['errormsg']=$p->t('pruefung/keineFreienPlaetzeVorhanden');
 	    return $data;
 	}
     }
     else
     {
 	$data['error']='true';
-	$data['errormsg']='Anmeldung auf Grund von Sperre nicht möglich.';
+	$data['errormsg']=$p->t('pruefung/anmeldungAufgrundVonSperreNichtMoeglich');
 	return $data;
     }
-    
+
     $anrechnung = new anrechnung();
     $lv_komp = new lehrveranstaltung($studienverpflichtung_id);
     $person = new person();
     $person->getPersonFromBenutzer($uid);
     $prestudent = new prestudent();
     $prestudent->getPrestudenten($person->person_id);
+    $studiensemester = new studiensemester();
+    $stdsem = $studiensemester->getaktorNext();
+	if ($aktStudiensemester)
+		$stdsem = $aktStudiensemester;
 
     if(count($prestudent->result) > 0)
     {
@@ -537,58 +568,65 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	}
 	if($prestudent_id != "")
 	{
-        $anrechungSaveResult = false;
-	    if(!defined('CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG') || CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG == true)
-        {
-            $anrechnung->lehrveranstaltung_id = $lehrveranstaltung->lehrveranstaltung_id;
-            $anrechnung->lehrveranstaltung_id_kompatibel = $lv_komp->lehrveranstaltung_id;
-            $anrechnung->prestudent_id = $prestudent_id;
-            $anrechnung->begruendung_id = "2";
-            $anrechnung->genehmigt_von = CIS_PRUEFUNGSANMELDUNG_USER;
-            $anrechnung->new = true;
-            $anrechungSaveResult = $anrechnung->save();
-        }
-        else 
-        {
-            $anrechungSaveResult = true;
-        }
-        
+            $anrechungSaveResult = false;
+            if(!defined('CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG') || CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG == true)
+            {
+                if($lv_komp->lehrveranstaltung_id != null && ($lv_komp->lehrveranstaltung_id != $lehrveranstaltung->lehrveranstaltung_id))
+                {
+                    $anrechnung->lehrveranstaltung_id = $lv_komp->lehrveranstaltung_id;
+                    $anrechnung->lehrveranstaltung_id_kompatibel = $lehrveranstaltung->lehrveranstaltung_id;
+                    $anrechnung->prestudent_id = $prestudent_id;
+                    $anrechnung->begruendung_id = "2";
+                    $anrechnung->genehmigt_von = CIS_PRUEFUNGSANMELDUNG_USER;
+                    $anrechnung->new = true;
+                    $anrechungSaveResult = $anrechnung->save();
+                }
+                else
+                {
+                    $anrechungSaveResult = true;
+                }
+            }
+            else
+            {
+                $anrechungSaveResult = true;
+            }
+
 	    if($anrechungSaveResult)
 	    {
-            if($anrechnung->anrechnung_id == "")
-                $anmeldung->anrechnung_id = null;
-            else
-                $anmeldung->anrechnung_id = $anrechnung->anrechnung_id;
-            
-            if($anmeldung->save(true))
-            {
-                $pruefung = new pruefungCis($termin->pruefung_id);
-                if(defined('CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG') && (CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG !== ""))
-                $to = CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG."@".DOMAIN;
+                if($anrechnung->anrechnung_id == "")
+                    $anmeldung->anrechnung_id = null;
                 else
-                $to = $pruefung->mitarbeiter_uid."@".DOMAIN;
-                $from = "noreply@".DOMAIN;
-                $subject = "Anmeldung zur Prüfung";
-                $mail = new mail($to, $from, $subject, "Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.");
+                    $anmeldung->anrechnung_id = $anrechnung->anrechnung_id;
 
-                $student = new student($uid);
-                $datum = new datum();
+                if($anmeldung->save(true))
+                {
+                    $pruefung = new pruefungCis($termin->pruefung_id);
+                    if(defined('CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG') && (CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG !== ""))
+                    $to = CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG."@".DOMAIN;
+                    else
+                    $to = $pruefung->mitarbeiter_uid."@".DOMAIN;
+                    $from = "noreply@".DOMAIN;
+                    $subject = $p->t('pruefung/emailLektorSubjectAnmeldung');
+                    $mail = new mail($to, $from, $subject, $p->t('pruefung/emailBodyBitteHtmlSicht'));
 
-                $lv = new lehrveranstaltung($anmeldung->lehrveranstaltung_id);
+                    $student = new student($uid);
+                    $datum = new datum();
 
-                $html = "StudentIn ".$student->vorname." ".$student->nachname." hat sich zur Prüfung ".$lv->bezeichnung." am ".$datum->formatDatum($termin->von, "m.d.Y")." von ".$datum->formatDatum($termin->von,"h:i")." Uhr bis ".$datum->formatDatum($termin->bis,"h:i")." Uhr angemeldet.";
-                $mail->setHTMLContent($html);
-                $mail->send();
+                    $lv = new lehrveranstaltung($anmeldung->lehrveranstaltung_id);
 
-                $data['result'] = "Anmeldung erfolgreich!";
-                $data['error']='false';
-                $data['errormsg']='';
-            }
-            else
-            {
-                $data['error']='true';
-                $data['errormsg']=$anmeldung->errormsg;
-            }
+                    $html = $p->t('pruefung/emailLektorStudentIn')." ".$student->vorname." ".$student->nachname." ".$p->t('pruefung/emailLektorHatSichZurPruefung')." ".$lv->bezeichnung." ".$p->t('pruefung/emailLektorAm')." ".$datum->formatDatum($termin->von, "m.d.Y")." ".$p->t('pruefung/emailLektorVon')." ".$datum->formatDatum($termin->von,"h:i")." ".$p->t('pruefung/emailLektorUhrBis')." ".$datum->formatDatum($termin->bis,"h:i")." ".$p->t('pruefung/emailLektorUhrAngemeldet');
+                    $mail->setHTMLContent($html);
+                    $mail->send();
+
+                    $data['result'] = $p->t('pruefung/anmeldungErfolgreich');
+                    $data['error']='false';
+                    $data['errormsg']='';
+                }
+                else
+                {
+                    $data['error']='true';
+                    $data['errormsg']=$anmeldung->errormsg;
+                }
 	    }
 	    else
 	    {
@@ -599,13 +637,13 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	else
 	{
 	    $data['error']='true';
-	    $data['errormsg']="Prestudent nicht gefunden.";
+	    $data['errormsg']=$p->t('pruefung/prestudentNichtGefunden');
 	}
     }
     else
     {
 	$data['error']='true';
-	$data['errormsg']="Prestudent nicht gefunden.";
+	$data['errormsg']=$p->t('pruefung/prestudentNichtGefunden');
     }
     return $data;
 }
@@ -681,6 +719,7 @@ function getAllPruefungen($aktStudiensemester = null, $uid = null)
  */
 function stornoAnmeldung($uid = null)
 {
+	global $p;
     $pruefungsanmeldung_id=$_REQUEST['pruefungsanmeldung_id'];
     $pruefungsanmeldung = new pruefungsanmeldung($pruefungsanmeldung_id);
     $anrechnung = new anrechnung($pruefungsanmeldung->anrechnung_id);
@@ -688,7 +727,7 @@ function stornoAnmeldung($uid = null)
     {
 	if($anrechnung->delete($anrechnung->anrechnung_id))
 	{
-	    $data['result'] = 'Anmeldung erfolgreich gelöscht.';
+	    $data['result'] = $p->t('pruefung/anmeldungErfolgreichGeloescht');
 	    $data['error'] = 'false';
 	    $data['errormsg'] = '';
 	}
@@ -709,11 +748,17 @@ function stornoAnmeldung($uid = null)
  */
 function getAnmeldungenTermin()
 {
+	global $p;
     $lehrveranstaltung_id = $_REQUEST["lehrveranstaltung_id"];
     $pruefungstermin_id = $_REQUEST["pruefungstermin_id"];
     $pruefungstermin = new pruefungstermin($pruefungstermin_id);
     $pruefungsanmeldung = new pruefungsanmeldung();
     $pruefungstermin->anmeldungen = $pruefungsanmeldung->getAnmeldungenByTermin($pruefungstermin_id, $lehrveranstaltung_id);
+	$lv = new lehrveranstaltung($lehrveranstaltung_id);
+	$pruefungstermin->lv_bezeichnung = $lv->bezeichnung;
+	$pruefungstermin->lv_lehrtyp = $lv->lehrtyp_kurzbz;
+	$datum = new DateTime($pruefungstermin->von);
+	$pruefungstermin->datum = $datum->format('d.m.Y');
     foreach($pruefungstermin->anmeldungen as $a)
     {
 	$student = new student($a->uid);
@@ -738,7 +783,7 @@ function getAnmeldungenTermin()
 	}
 	else
 	{
-	    $data['errormsg']= 'Keine Anmeldungen vorhanden';
+	    $data['errormsg']= $p->t('pruefung/keineAnmeldungenVorhanden');
 	}
     }
     return $data;
@@ -772,6 +817,7 @@ function saveReihung()
  */
 function anmeldungBestaetigen($uid)
 {
+	global $p;
     $pruefungsanmeldung_id = $_REQUEST["pruefungsanmeldung_id"];
     $status = "bestaetigt";
     $anmeldung = new pruefungsanmeldung();
@@ -784,33 +830,33 @@ function anmeldungBestaetigen($uid)
 	$datum = new datum();
 	$ort = new ort($termin->ort_kurzbz);
 	$pruefung = new pruefungCis($termin->pruefung_id);
-	
+
 	$to = $anmeldung->uid."@".DOMAIN;
 	$from = "noreply@".DOMAIN;
-	$subject = "Anmeldungsbestätigung zur Prüfung";
-	$html = "Ihre Anmeldung zur Prüfung wurde von ".$ma->vorname." ".$ma->nachname." bestätigt.<br>";
+	$subject = $p->t('pruefung/emailSubjectAnmeldungBestaetigung');
+	$html = $p->t('pruefung/emailBody1')." ".$ma->vorname." ".$ma->nachname." ".$p->t('pruefung/emailBody2')."<br>";
 	$html .= "<br>";
-	$html .= "Prüfung: ".$lv->bezeichnung."<br>";
+	$html .= $p->t('pruefung/emailBodyPruefung')." ".$lv->bezeichnung."<br>";
 	if($pruefung->einzeln)
 	{
 	    $date = $datum->formatDatum($termin->von, "Y-m-d h:i:s");
 	    $date = strtotime($date);
 	    $date = $date+(60*$pruefung->pruefungsintervall*($anmeldung->reihung-1));
 	    $von = date("h:i",$date);
-	    $html .= "Termin: ".$datum->formatDatum($termin->von, "d.m.Y")." um ".$von."<br>";
-	    $html .= "Dauer: ".$pruefung->pruefungsintervall." Minuten</br>";
+	    $html .= $p->t('pruefung/emailBodyTermin')." ".$datum->formatDatum($termin->von, "d.m.Y")." ".$p->t('pruefung/emailBodyUm')." ".$von."<br>";
+	    $html .= $p->t('pruefung/emailBodyDauer')." ".$pruefung->pruefungsintervall." ".$p->t('pruefung/emailBodyMinuten')."</br>";
 	}
 	else
-	    $html .= "Termin: ".$datum->formatDatum($termin->von, "d.m.Y")." um ".$datum->formatDatum($termin->von, "h:i")."<br>";
-	$html .= "Ort: ".$ort->bezeichnung."<br>";
+	    $html .= $p->t('pruefung/emailBodyTermin')." ".$datum->formatDatum($termin->von, "d.m.Y")." ".$p->t('pruefung/emailBodyUm')." ".$datum->formatDatum($termin->von, "h:i")."<br>";
+	$html .= $p->t('pruefung/anmeldungErfolgreich')." ".$ort->bezeichnung."<br>";
 	$html .= "<br>";
-	$html .= "<a href='".APP_ROOT."cis/private/lehre/pruefung/pruefungsanmeldung.php'>Link zur Anmeldung</a><br>";
+	$html .= "<a href='".APP_ROOT."cis/private/lehre/pruefung/pruefungsanmeldung.php'>".$p->t('pruefung/emailBodyLinkZurAnmeldung')."</a><br>";
 	$html .= "<br>";
-	
-	$mail = new mail($to, $from, $subject,"Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.");
+
+	$mail = new mail($to, $from, $subject,$p->t('pruefung/emailBodyBitteHtmlSicht'));
 	$mail->setHTMLContent($html);
 	$mail->send();
-	
+
 	$data['result']=true;
 	$data['error']='false';
 	$data['errormsg']='';
@@ -896,18 +942,18 @@ function getPruefungenStudiengang($uid, $aktStudiensemester)
 }
 
 /**
- * 
+ *
  * @return typespeichert ein Kommentar zu einer Prüfungsanmeldung
  */
 function saveKommentar()
 {
     $kommentar = $_REQUEST["kommentar"];
     $pruefungsanmeldung_id = $_REQUEST["pruefungsanmeldung_id"];
-    
+
     $pruefungsanmeldung = new pruefungsanmeldung($pruefungsanmeldung_id);
     $pruefungsanmeldung->kommentar = $kommentar;
     if($pruefungsanmeldung->save())
-    {	
+    {
 	$data['result']=true;
 	$data['error']='false';
 	$data['errormsg']='';
@@ -933,9 +979,9 @@ function getAllFreieRaeume($terminId)
     $teilnehmer = $pruefungstermin->getNumberOfParticipants();
     $teilnehmer = $teilnehmer !== false ? $teilnehmer : 0;
     $pruefungstermin->getAll($pruefungstermin->von, $pruefungstermin->bis, TRUE);
-    
+
     if($ort->search($datum_von[0], $datum_von[1], $datum_bis[1], null, $teilnehmer, true))
-    {	
+    {
 	foreach($pruefungstermin->result as $termin)
 	{
 	    if($termin->pruefungstermin_id != $pruefungstermin->pruefungstermin_id && !is_null($termin->ort_kurzbz))
@@ -945,7 +991,7 @@ function getAllFreieRaeume($terminId)
 		array_push($ort->result, $o);
 	    }
 	}
-	
+
 	usort($ort->result, "compareRaeume");
 	$data['result']=$ort->result;
 	$data['error']='false';
@@ -985,7 +1031,7 @@ function saveRaum($terminId, $ort_kurzbz, $uid)
 	    $reserviert = true;
     }
     if(!$reserviert || $pruefungstermin->sammelklausur == TRUE)
-    {	
+    {
 	$pruefung = new pruefungCis($pruefungstermin->pruefung_id);
 	$mitarbeiter = new mitarbeiter($pruefung->mitarbeiter_uid);
 	if($ort_kurzbz === "buero")
@@ -1018,7 +1064,7 @@ function saveRaum($terminId, $ort_kurzbz, $uid)
 	    $reservierung->insertamum = date('Y-m-d G:i:s');
 	    $reservierung->insertvon = $uid;
 	    $reservierungError = false;
-	    
+
 	    foreach($stunden as $h)
 	    {
 		$reservierung->stunde = $h;
@@ -1028,7 +1074,7 @@ function saveRaum($terminId, $ort_kurzbz, $uid)
 		}
 	    }
 	    if(!$reservierungError)
-	    {	
+	    {
 		$pruefungstermin->ort_kurzbz = $reservierung->ort_kurzbz;
 		if($pruefungstermin->save(false))
 		{

@@ -2,22 +2,22 @@
 <?php
 /*
  * Copyright 2014 fhcomplete.org
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
+ *
  *
  * Authors: Stefan Puraner	<puraner@technikum-wien.at>
  */
@@ -33,6 +33,14 @@ require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/mitarbeiter.class.php');
 require_once('../../../../include/student.class.php');
 require_once('../../../../include/datum.class.php');
+require_once('../../../../include/phrasen.class.php');
+require_once('../../../../include/globals.inc.php');
+require_once('../../../../include/sprache.class.php');
+
+$sprache = getSprache();
+$lang = new sprache();
+$lang->load($sprache);
+$p = new phrasen($sprache);
 
 $uid = get_uid();
 $rechte = new benutzerberechtigung();
@@ -42,32 +50,32 @@ $rechte->getBerechtigungen($uid);
     <head>
 	 <meta charset="UTF-8">
 	 <script src="../../../../include/js/jquery1.9.min.js"></script>
-	 <style type="text/css">	     
+	 <style type="text/css">
 	    body {
 		margin: 0;
 		padding: 0;
 	    }
-	    
+
 	    * {
 		box-sizing: border-box;
 		-moz-box-sizing: border-box;
 	    }
-	     
+
 	    #page {
 	       width: 210mm;
 	       min-height: 297mm;
 	       padding: 20mm;
 	       margin: 10mm auto;
-	       border: 1px #D3D3D3 solid;
+	       border: 1px #ffffff solid;
 	       border-radius: 5px;
 	       background: white;
 	       box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 	       font-family: Arial, Helvetica;
 	    }
-	     
+
 	    #subpage {
 		padding: 10mm;
-		border: 1px black solid;
+		border: 1px white solid;
 		height: 256mm;
 		outline: 20mm
 	    }
@@ -109,12 +117,12 @@ $rechte->getBerechtigungen($uid);
 		line-height: 16pt;
 		font-size: 12pt;
 	    }
-	    
+
 	    @page {
 		 size: A4;
 		 margin: 0;
 	    }
-	    
+
 	    @media print {
 		html, body {
 		     width: 210mm;
@@ -130,7 +138,7 @@ $rechte->getBerechtigungen($uid);
 		    background: initial;
 		    page-break-after: auto;
 		}
-		
+
 		/*
 		* Workaround um beim Drucken jede zweite Zeile der Tabelle
 		* grau darzustellen. Standardmäßig werden von Browsern keine
@@ -139,14 +147,14 @@ $rechte->getBerechtigungen($uid);
 		tr:nth-child(odd) > td{
 		    box-shadow: inset 0 0 0 1000px lightgrey;
 		}
-		
+
 		//Veranlasst Chrome Hintergrundfarben zu drucken
 		body{
 		    -webkit-print-color-adjust:exact;
 		    background-color: #FFFFFF;
 		    margin: 0;
 		}
-		
+
 		//Anweisungen nur für Firefox
 		@-moz-document url-prefix() {
 		    html, body {
@@ -169,26 +177,26 @@ $rechte->getBerechtigungen($uid);
 	</script>
 	<div id="page">
 	    <div id="subpage">
-	    <h1>Anmeldungsliste</h1>
+	    <h1><?php echo $p->t('pruefung/anmeldungsliste'); ?></h1>
 	<?php
 	if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungAdmin'))
 	    die('Sie haben keine Berechtigung für diese Seite');
-	
+
 	$termin_id = filter_input(INPUT_GET,"termin_id");
 	$lehrveranstaltung_id = filter_input(INPUT_GET,"lehrveranstaltung_id");
 	$studiensemester = filter_input(INPUT_GET, "studiensemester");
-	
+
 	if(is_null($lehrveranstaltung_id))
 	{
-	    die('Fehlender Parameter lehrveranstaltung_id');
+	    die($p->t('pruefung/fehlenderParam_lvid'));
 	}
 	else if(is_null($termin_id))
 	{
-	    die('Fehlender Parameter termin_id');
+	    die($p->t('pruefung/fehlenderParam_terminid'));
 	}
 	else if(is_null($studiensemester))
 	{
-	    die('Fehlender Parameter studiensemester');
+	    die($p->t('pruefung/fehlenderParam_studiensemester'));
 	}
 	else
 	{
@@ -208,19 +216,21 @@ $rechte->getBerechtigungen($uid);
 		    $einzeln = TRUE;
 		    $pruefungsintervall = $pruefung->pruefungsintervall;
 		}
-	    }
+
 	    ?>
-	    <span class="bold">Lehrveranstaltung: </span><span><?=$lehrveranstaltung->bezeichnung?></span><br/>
-	    <span class="bold">Studiensemester: </span><span><?=$stdsem->bezeichnung?></span><br/>
-	    <span class="bold">Prüfer: </span><span><?=$mitarbeiter->getFullName(FALSE)?></span><br/>
+	    <span class="bold"><?php echo $p->t('global/lehrveranstaltung'); ?>: </span><span><?=$lehrveranstaltung->bezeichnung?></span><br/>
+	    <span class="bold"><?php echo $p->t('global/studiensemester'); ?>: </span><span><?=$stdsem->bezeichnung?></span><br/>
+	    <span class="bold"><?php echo $p->t('pruefung/pruefer'); ?>: </span><span><?=$mitarbeiter->getFullName(FALSE)?></span><br/>
 	    <table id="liste">
 		<thead>
 		    <tr>
 			<th>#</th>
-			<th>Vorname</th>
-			<th>Nachname</th>
-			<th>Matrikelnummer</th>
-			<th>Datum</th>
+			<th><?php echo $p->t('global/vorname'); ?></th>
+			<th><?php echo $p->t('global/nachname'); ?></th>
+			<th><?php echo $p->t('global/matrikelnummer'); ?></th>
+			<th><?php echo $p->t('global/datum'); ?></th>
+			<th><?php echo $p->t('benotungstool/note'); ?></th>
+			<th><?php echo $p->t('global/anmerkung'); ?></th>
 		    </tr>
 		</thead>
 		<tbody>
@@ -231,7 +241,7 @@ $rechte->getBerechtigungen($uid);
 			{
 			    $student = new student($anmeldung->uid);
 			    $prfTermin = new pruefungstermin($anmeldung->pruefungstermin_id);
-			    
+
 			    if($einzeln)
 			    {
 				$date = $datum->formatDatum($prfTermin->von, "Y-m-d H:i:s");
@@ -243,21 +253,45 @@ $rechte->getBerechtigungen($uid);
 			    else
 			    {
 				$date =  $datum->formatDatum($prfTermin->von,"d.m.Y - H:i");
+				$count++;
 			    }
 			    echo '<tr>';
-				echo '<td>'.$anmeldung->reihung.'</td>';
+				echo '<td>'.$count.'</td>';
 				echo '<td>'.$student->vorname.'</td>';
 				echo '<td>'.$student->nachname.'</td>';
-				echo '<td>'.$student->matrikelnr.'</td>';
+				echo '<td>'.$student->matr_nr.'</td>';
 				echo '<td>'.$date.'</td>';
+				echo '<td></td>';
+				echo '<td></td>';
 			    echo '</tr>';
 			}
 		    ?>
 		</tbody>
 	    <?php
+	    }
+	    else
+	    {
+		?>
+
+		<span><?php echo $p->t('pruefung/keineBestaetigtenAnmeldungenVorhanden'); ?></span><br/>
+		<?php
+	    }
 	}
 	?>
 	    </table>
+		<br>
+		<table width="100%" id="liste">
+			<tr>
+				<td width="26%"><?php echo $p->t('pruefung/derLektor'); ?></td>
+				<td width="37%"><?php echo $mitarbeiter->getFullName(FALSE); ?></td>
+				<td width="37%"></td>
+			</tr>
+			<tr>
+				<td><?php echo $p->t('pruefung/dieKommission'); ?></td>
+				<td></td>
+				<td></td>
+			</tr
+		</table>
 	    </div>
 	</div>
     </body>

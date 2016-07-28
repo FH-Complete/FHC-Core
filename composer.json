@@ -5,5 +5,14 @@
     "components/bootstrap": "3.3.5",
     "michelf/php-markdown": "1.5.0"
     
+  },
+  "require-dev": 
+  {
+    "squizlabs/php_codesniffer": "2.*",
+    "fzaninotto/faker": "1.*"
+  },
+  "config":
+  {
+    "bin-dir": "bin"
   }
 }

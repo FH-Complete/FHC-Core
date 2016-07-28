@@ -341,6 +341,10 @@
 <!ENTITY menu-extras-projektarbeitsabgaben.label		"Projektarbeitstermine">
 <!ENTITY menu-extras-projektarbeitsabgaben.accesskey	"A">
 
+<!ENTITY menu-extras-aliquote_reduktion.key			"Q">
+<!ENTITY menu-extras-aliquote_reduktion.label		"Aliquote Reduktion">
+<!ENTITY menu-extras-aliquote_reduktion.accesskey	"Q">
+
 <!-- BIS -->
 <!ENTITY menu-bis.label		"BIS">
 <!ENTITY menu-bis.accesskey	"I">

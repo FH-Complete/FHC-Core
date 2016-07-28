@@ -3,7 +3,7 @@
 //Dokumente
 $this->phrasen['tools/dokumente']='Dokumente';
 $this->phrasen['tools/inskriptionsbestaetigung']='Inskriptionsbestätigung';
-$this->phrasen['tools/studienbeitragFuerSSBezahltAmDatum']='Studienbeitrag für das %1$s bezahlt am %2$s';
+$this->phrasen['tools/studienbeitragFuerSSBezahlt']='Studienbeitrag für das %1$s bezahlt';
 $this->phrasen['tools/studienbeitragFuerSSNochNichtBezahlt']='Studienbeitrag für das %1$s noch nicht bezahlt';
 $this->phrasen['tools/studienerfolgsbestaetigung']='Studienerfolgsbestätigung';
 $this->phrasen['tools/studiensemesterAuswaehlen']='Bitte wählen Sie das entsprechende Studiensemester aus';
@@ -17,6 +17,7 @@ $this->phrasen['tools/mussAlsStudentEingeloggtSein']='Sie müssen als Student ei
 $this->phrasen['tools/nochKeineBeurteilungEingetragen']='Es wurden noch keine Beurteilungen eingetragen';
 $this->phrasen['tools/fehlerBeimAuslesenDerNoten']='Fehler beim Auslesen der Noten';
 $this->phrasen['tools/benotungsdatumDerZeugnisnote']='Benotungsdatum der Zeugnisnote';
+$this->phrasen['tools/hinweistextMarkierung']='Kennzeichnet jene Einträge, bei denen sich die LV-Note von der Zeugnisnote unterscheidet. <b>Letztgültig ist die Zeugnisnote</b>.<br>Sollten diese Angaben nicht stimmen, wenden Sie sich bitte an Ihre zuständige Assistenz.';
 
 //Zahlungen
 $this->phrasen['tools/zahlungen']='Zahlungen';

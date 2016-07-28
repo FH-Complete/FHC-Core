@@ -70,7 +70,7 @@ else
 		$xsl_stg_kz=$_GET['stg_kz'];
 	else
 	{
-		// Werden UIDs uebergeben, wird die Vorlage des Studiengangs genommen
+		// Werden UIDs oder Prestudent_IDs uebergeben, wird die Vorlage des Studiengangs genommen
 		// in dem der 1. Studierende in der Liste ist
 		if(isset($_GET['uid']) && $_GET['uid']!='')
 		{
@@ -83,6 +83,19 @@ else
 			if($student_obj->load($uids[1]))
 			{
 				$xsl_stg_kz=$student_obj->studiengang_kz;
+			}
+		}
+		elseif(isset($_GET['prestudent_id']) && $_GET['prestudent_id']!='')
+		{
+			if(strstr($_GET['prestudent_id'],';'))
+				$prestudent_ids = explode(';',$_GET['prestudent_id']);
+			else
+				$prestudent_ids[1] = $_GET['prestudent_id'];
+
+			$prestudent_obj = new prestudent();
+			if($prestudent_obj->load($prestudent_ids[1]))
+			{
+				$xsl_stg_kz=$prestudent_obj->studiengang_kz;
 			}
 		}
 	}
@@ -185,7 +198,7 @@ if (isset($_GET['output']) && $_GET['output']!='pdf')
 	else
 		$output = $_GET['output'];
 }
-else 
+else
 	$output = 'pdf';
 
 
@@ -277,7 +290,7 @@ elseif(in_array($xsl,array('Ressource')))
 		exit;
 	}
 }
-elseif(in_array($xsl,array('Inskription','Studienerfolg','OutgoingLearning','OutgoingChangeL','LearningAgree','Zahlung')))
+elseif(in_array($xsl,array('Inskription','Studienerfolg','OutgoingLearning','OutgoingChangeL','LearningAgree','Zahlung','DichiaSost')))
 {
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
 	{
@@ -662,7 +675,7 @@ else
 
 			// Wenn ein Style XSL uebergeben wurde wird ein zweites XML File erstellt mit den
 			// Styleanweisungen und ebenfalls zum Zip hinzugefuegt
-			if(isset($_GET['style_xsl']))
+			if(isset($_GET['style_xsl']) || $vorlage->style!='')
 			{
 				//Wenn die Spalte style in der DB befuellt ist, wird dieses verwendet
 				if($vorlage->style!='')

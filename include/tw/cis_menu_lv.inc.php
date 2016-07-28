@@ -103,6 +103,10 @@ function checkZeilenUmbruch()
 				$text.= "<br>";
 			$text.= "<a href='ects/index.php?lvid=$lvid' target='_blank' class='Item'>".$p->t('lehre/lvInfoBearbeiten')."</a>";
 		}
+		elseif ($is_lector)
+		{
+			$text.= "<br>Bearbeiten der LV-Infos derzeit gesperrt";
+		}
 
 		$menu[]=array
 		(
@@ -155,6 +159,7 @@ function checkZeilenUmbruch()
 			'name'=>$p->t('lehre/semesterplan'),
 			'icon'=>'../../../skin/images/button_semplan.png',
 			'link'=>$link,
+			'link_target'=>'_blank',
 			'text'=>$text
 		);
 	}
@@ -434,17 +439,20 @@ function checkZeilenUmbruch()
 		    }
 	    }
 	}
-	$menu[]=array
-	(
-		'id'=>'core_menu_moodle',
-		'position'=>'70',
-		'name'=>$p->t('lehre/moodle'),
-		'icon'=>'../../../skin/images/button_moodle.png',
-		'link'=>$link,
-		'link_target'=>$link_target,
-		'link_onclick'=>$link_onclick,
-		'text'=>$text
-	);
+	if (MOODLE)
+	{
+		$menu[]=array
+		(
+			'id'=>'core_menu_moodle',
+			'position'=>'70',
+			'name'=>$p->t('lehre/moodle'),
+			'icon'=>'../../../skin/images/button_moodle.png',
+			'link'=>$link,
+			'link_target'=>$link_target,
+			'link_onclick'=>$link_onclick,
+			'text'=>$text
+		);
+	}
 
 	//Gesamtnote
 	if($is_lector && ((!defined('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN) && $angemeldet))

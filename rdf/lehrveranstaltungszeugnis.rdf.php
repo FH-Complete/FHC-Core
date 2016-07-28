@@ -152,6 +152,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	}
 	
 	$lehrinhalte = '';
+	$lehrziele = '';
 	$infoqry = "SELECT * FROM campus.tbl_lvinfo WHERE sprache='German' AND lehrveranstaltung_id = ".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 	if($db->db_query($infoqry))
 	{
@@ -161,6 +162,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			for ($i = 0; $i < sizeof($lehrinhalte_arr); $i++)
 			{
 				$lehrinhalte .= $lehrinhalte_arr[$i].'\n';			
+			}
+			$lehrziele_arr = explode("<br>",$inforow->lehrziele);
+			for ($i = 0; $i < sizeof($lehrziele_arr); $i++)
+			{
+				$lehrziele .= $lehrziele_arr[$i].'\n';
 			}
 		}		
 	}	
@@ -177,7 +183,24 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$studiengang_typ='';
 		$xml_fussnote='';
 		
-		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.bezeichnung, tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, tbl_person.titelpost, tbl_person.geschlecht FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."'";
+		$query = "	SELECT 	tbl_student.matrikelnr, 
+							tbl_student.studiengang_kz, 
+							tbl_studiengang.typ, 
+							tbl_studiengang.bezeichnung, 
+							tbl_person.vorname, 
+							tbl_person.nachname,
+							tbl_person.gebdatum,
+							tbl_person.titelpre, 
+							tbl_person.titelpost, 
+							tbl_person.geschlecht 
+					FROM 	tbl_person, 
+							tbl_student, 
+							tbl_studiengang, 
+							tbl_benutzer 
+					WHERE 	tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz 
+					AND 	tbl_student.student_uid = tbl_benutzer.uid 
+					AND 	tbl_benutzer.person_id = tbl_person.person_id 
+					AND 	tbl_student.student_uid = '".$uid_arr[$i]."'";
 
 		if($db->db_query($query))
 		{
@@ -187,7 +210,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		else
 			die('Student not found');
 		$stg_oe_obj = new studiengang($row->studiengang_kz);
-		$stgleiter = $stg_oe_obj->getLeitung($row->studiengang_kz);
+		$stgleiter = $stg_oe_obj->getLeitung($lvstg);
 		$stgl='';
 		foreach ($stgleiter as $stgleiter_uid)
 		{
@@ -203,7 +226,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 		$xml .= "\n		<gebdatum>".$gebdatum."</gebdatum>";
 		$xml .= "\n		<geschlecht>".$row->geschlecht."</geschlecht>";
-		$xml .= "\n		<matrikelnr>".$row->matrikelnr."</matrikelnr>";
+		$xml .= "\n		<matrikelnr>".trim($row->matrikelnr)."</matrikelnr>";
 		$xml .= "\n		<studiengangsleiter>".$stgl."</studiengangsleiter>";
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "\n		<ort_datum>Wien, am ".$datum_aktuell."</ort_datum>";
@@ -226,7 +249,16 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		
 		$stg = new studiengang();
 		$stg->load($lvstg);
+		if($stg->typ=='b')
+			$stg_art='Bachelor';
+		elseif($stg->typ=='m')
+			$stg_art='Master';
+		elseif($stg->typ=='d')
+			$stg_art='Diplom';
+		else
+			$stg_art='';
 		$xml .= "				<lv_studiengang_bezeichnung>".$stg->bezeichnung."</lv_studiengang_bezeichnung>";
+		$xml .= "				<lv_studiengang_art>".$stg_art."</lv_studiengang_art>";
 		$xml .= "				<lv_studiengang_typ>".$stg->typ."</lv_studiengang_typ>";
 		$xml .= "				<lv_studiengang_kennzahl>".sprintf('%04s',$lvstg)."</lv_studiengang_kennzahl>";
 
@@ -237,7 +269,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "				<ects>".number_format($ects,1)."</ects>";
 		$xml .= "				<lvleiter>".$leiter_titel." ".$leiter_vorname." ".$leiter_nachname.($leiter_titelpost!=''?', '.$leiter_titelpost:'')."</lvleiter>";
 		$xml .= "				<lehrinhalte><![CDATA[".clearHtmlTags($lehrinhalte)."]]></lehrinhalte>";
-
+		$xml .= "				<lehrziele><![CDATA[".clearHtmlTags($lehrziele)."]]></lehrziele>";
 		
 		$xml .= "	</zertifikat>";
 	}

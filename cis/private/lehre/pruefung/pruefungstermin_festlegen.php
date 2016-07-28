@@ -2,22 +2,22 @@
 <?php
 /*
  * Copyright 2014 fhcomplete.org
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
+ *
  *
  * Authors: Stefan Puraner	<puraner@technikum-wien.at>
  */
@@ -33,6 +33,14 @@ require_once('../../../../include/pruefungstermin.class.php');
 require_once('../../../../include/studiengang.class.php');
 require_once('../../../../include/pruefungCis.class.php');
 require_once('../../../../include/mitarbeiter.class.php');
+require_once('../../../../include/phrasen.class.php');
+require_once('../../../../include/globals.inc.php');
+require_once('../../../../include/sprache.class.php');
+
+$sprache = getSprache();
+$lang = new sprache();
+$lang->load($sprache);
+$p = new phrasen($sprache);
 
 $uid = get_uid();
 $db = new basis_db();
@@ -49,11 +57,11 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Prüfungstermin festlegen</title>
+        <title><?php echo $p->t('pruefung/titlePruefungstermin'); ?></title>
         <script src="../../../../include/js/datecheck.js"></script>
         <script src="../../../../include/js/jquery1.9.min.js"></script>
 	<script src="../../../../include/js/jquery.tablesorter.min.js"></script>
-        <script src="./pruefung.js"></script>
+        <script src="./pruefung.js.php"></script>
         <link rel="stylesheet" href="../../../../skin/jquery-ui-1.9.2.custom.min.css">
         <link rel="stylesheet" href="../../../../skin/fhcomplete.css">
         <link rel="stylesheet" href="../../../../skin/style.css.php">
@@ -68,12 +76,12 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
 		font-size: 1.5em;
 		font-weight: bold;
 	    }
-	    
+
 	    .missingFormData {
 		border: 2px solid red;
 		outline: 2px solid red;
 	    }
-	    
+
 	    .modalOverlay {
 		position: fixed;
 		width: 100%;
@@ -82,7 +90,7 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
 		left: 0px;
 		background-color: rgba(0,0,0,0.3); /* black semi-transparent */
 	    }
-	    
+
 	    #prfDetails, #prfVerwaltung {
 		margin: 1em;
 	    }
@@ -142,7 +150,7 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
            });
         </script>
         <div id="prfVerwaltung">
-	    <h1>Prüfungen verwalten</h1>
+	    <h1><?php echo $p->t('pruefung/pruefungenVerwalten'); ?></h1>
 	    <table>
 		<tr>
 		    <?php
@@ -160,7 +168,7 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
 			}
 			else
 			{
-			    echo '<td width="116px">Lektor:</td>';
+			    echo '<td width="116px">'.$p->t('pruefung/pruefungLektor').':</td>';
 			    echo '<td width="250px"><input placeholder="UID" type="text" id="lektor" value="" size="30"/></td>';
 			    echo '<input type="hidden" id="uid" value="" />';
 			    echo '<input type="hidden" id="mitarbeiter_uid" value="" />';
@@ -169,54 +177,54 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
 		</tr>
 	    </table>
             <form method="post" action="pruefungstermin_festlegen.php" style="display: none;">
-		
+
                 <input type="hidden" name="method" value="save">
                 <table>
                     <tr>
-                        <td>Titel:</td>
+                        <td><?php echo $p->t('pruefung/pruefungTitel'); ?>:</td>
                         <td>
                             <input id='titel' type="text" name="titel" size="30">
                         </td>
                     </tr>
                     <tr>
-                        <td style="vertical-align: top;">Beschreibung:</td>
+                        <td style="vertical-align: top;"><?php echo $p->t('global/beschreibung'); ?>:</td>
                         <td>
                             <textarea id='beschreibung' name="beschreibung" rows="5" cols="20"></textarea>
                         </td>
                     </tr>
                     <tr>
-                        <td>Studiensemester:</td>
+                        <td><?php echo $p->t('global/studiensemester'); ?>:</td>
                         <td>
-                            <select id="studiensemester" name="studiensemester" onchange="loadPruefungsfenster();" onload="loadPruefungsfenster();">
+                            <select id="studiensemester" name="studiensemester" onchange="loadPruefungsfenster(); loadLehrveranstaltungen();" onload="loadPruefungsfenster();">
                             </select>
                         </td>
                     </tr>
                     <tr>
-                        <td>Prüfungsfenster:</td>
+                        <td><?php echo $p->t('pruefung/pruefungsfenster'); ?>:</td>
                         <td>
                             <select id="pruefungsfenster" name="pruefungsfenster" onchange="setDatePicker(this);">
                                 <!--Daten werden durch JavaScript geladen-->
                             </select>
                         </td>
                     </tr>
-                    <tr>
+                    <!--<tr>
                         <td>Prüfungstyp:</td>
                         <td>
                             <select id='pruefungsTyp' name="pruefungsTyp">
-<!--				Daten werden per JavaScript geladen-->
+
                             </select>
                         </td>
-                    </tr>
+                    </tr>-->
                     <tr>
-                        <td style="vertical-align: top;">Methode:</td>
+                        <td style="vertical-align: top;"><?php echo $p->t('pruefung/pruefungMethode'); ?>:</td>
                         <td><textarea id='methode' placeholder="Multiple Choice, etc." rows="5" cols="20" name="methode"></textarea></td>
                     </tr>
                     <tr>
-                        <td>Einzelprüfung:</td>
+                        <td><?php echo $p->t('pruefung/pruefungEinzelpruefung'); ?>:</td>
                         <td><input id='einzeln' type="checkbox" name="einzelpruefung"></td>
                     </tr>
 		    <tr  style="visibility:hidden;">
-			<td>Prüfungsintervall:</td>
+			<td><?php echo $p->t('pruefung/pruefungIntervall'); ?>:</td>
 			<td>
 			    <select id="pruefungsintervall">
 				<option value="15">15</option>
@@ -226,7 +234,7 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
 			</td>
 		    </tr>
                     <tr>
-                        <td style="vertical-align: top;">Lehrveranstaltungen:</td>
+                        <td style="vertical-align: top;"><?php echo $p->t('global/lehrveranstaltung'); ?>:</td>
                         <td>
                             <div id="lvDropdowns">
                                 <select id="lvDropdown1" onchange="lehrveranstaltungDropdownhinzufuegen(this, false);" name="lv[]">
@@ -236,18 +244,18 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
                         </td>
                     </tr>
                     <tr>
-                        <td style="vertical-align: top;"><a name="termin">Termin:</a></td>
+                        <td style="vertical-align: top;"><a name="termin"><?php echo $p->t('pruefung/pruefungTermin'); ?>:</a></td>
                         <td>
                             <div>
                                 <table width="500px" style="text-align: right;">
                                     <thead>
                                         <tr>
-                                            <th>Datum</th>
-                                            <th>Von</th>
-                                            <th>bis</th>
-                                            <th>min. Teilnehmer</th>
-                                            <th>max. Teilnehmer</th>
-					    <th>Sammelklausur</th>
+                                            <th><?php echo $p->t('global/datum'); ?></th>
+                                            <th><?php echo $p->t('global/von'); ?></th>
+                                            <th><?php echo $p->t('global/bis'); ?></th>
+                                            <th><?php echo $p->t('pruefung/pruefungMinTeilnehmer'); ?></th>
+                                            <th><?php echo $p->t('pruefung/pruefungMaxTeilnehmer'); ?></th>
+					    <th><?php echo $p->t('pruefung/pruefungSammelklausur'); ?></th>
 					    <th></th>
                                         </tr>
                                     </thead>
@@ -278,30 +286,30 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
                                     </tbody>
                                 </table>
                             </div>
-                            <a href="#termin" onclick="terminHinzufuegen();">Termin hinzufügen</a>
+                            <a href="#termin" onclick="terminHinzufuegen();"><?php echo $p->t('pruefung/pruefungTerminHinzufuegen'); ?></a>
                         </td>
                     </tr>
                     <tr>
-                        <td>&nbsp;</td><td><input id="buttonSave" type="button" value="Speichern" onclick='savePruefungstermin();'></td>
+                        <td>&nbsp;</td><td><input id="buttonSave" type="button" value="<?php echo $p->t('global/speichern'); ?>" onclick='savePruefungstermin();'></td>
                     </tr>
                 </table>
             </form>
         </div>
         <div id="prfDetails">
-            <h2>Prüfungen</h2>
+            <h2><?php echo $p->t('pruefung/pruefungPruefungenTitle'); ?></h2>
             <div style="width: 75%;">
                 <table class="tablesorter" id="prfTable">
                     <thead>
                         <tr>
-                            <th>Titel</th>
-                            <th>Studiensemester</th>
-                            <th>Lehrveranstaltungen</th>
-                            <th>Termine</th>
-                            <th>Methode</th>
-                            <th>Prüfungstyp</th>
-                            <th>Einzelprüfung</th>
-                            <th>Mitarbeiter</th>
-                            <th>storniert</th>
+                            <th><?php echo $p->t('pruefung/pruefungTitel'); ?></th>
+                            <th><?php echo $p->t('global/studiensemester'); ?></th>
+                            <th><?php echo $p->t('global/lehrveranstaltung'); ?></th>
+                            <th><?php echo $p->t('pruefung/pruefungTermin'); ?></th>
+                            <th><?php echo $p->t('pruefung/pruefungMethode'); ?></th>
+                            <th><?php echo $p->t('pruefung/pruefungTyp'); ?></th>
+                            <th><?php echo $p->t('pruefung/pruefungEinzelpruefung'); ?></th>
+                            <th><?php echo $p->t('pruefung/pruefungMitarbeiter'); ?></th>
+                    <th><?php echo $p->t('pruefung/storniert'); ?></th>
                         </tr>
                     </thead>
                     <tbody>

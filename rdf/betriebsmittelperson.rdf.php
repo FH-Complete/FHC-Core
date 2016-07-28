@@ -114,18 +114,23 @@ else
 	<betriebsmittelperson>
 		<beschreibung><![CDATA['.$bmp->beschreibung.']]></beschreibung>
 		<inventarnummer><![CDATA['.$bmp->inventarnummer.']]></inventarnummer>
-		<kaution><![CDATA['.$bmp->kaution.']]></kaution>
+		<kaution><![CDATA['.number_format($bmp->kaution,2,",",".").']]></kaution>
 		<ausgegebenam><![CDATA['.$datum->convertISODate($bmp->ausgegebenam).']]></ausgegebenam>
 		<retouram><![CDATA['.$datum->convertISODate($bmp->retouram).']]></retouram>
-		<organisationseinheit><![CDATA['.$organisationseinheit.']]></organisationseinheit>
+		<organisationseinheit><![CDATA['.trim($organisationseinheit).']]></organisationseinheit>
 		<titelpre><![CDATA['.$person->titelpre.']]></titelpre>
 		<vorname><![CDATA['.$person->vorname.']]></vorname>
 		<nachname><![CDATA['.$person->nachname.']]></nachname>
 		<titelpost><![CDATA['.$person->titelpost.']]></titelpost>
+		<name_gesamt><![CDATA['.trim($person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost).']]></name_gesamt>
+		<geschlecht><![CDATA['.$person->geschlecht.']]></geschlecht>
+		<geburtsdatum><![CDATA['.$datum->convertISODate($person->gebdatum).']]></geburtsdatum>
+		<svnr><![CDATA['.$person->svnr.']]></svnr>
 		<nummer><![CDATA['.$bmp->nummer.']]></nummer>
 		<nummer2><![CDATA['.$bmp->nummer2.']]></nummer2>
 		<betriebsmitteltyp><![CDATA['.$bmp->betriebsmitteltyp.']]></betriebsmitteltyp>
 		<typ><![CDATA['.$typ.']]></typ>
+		<datum><![CDATA['.date("d.m.Y").']]></datum>
 	</betriebsmittelperson>
 	';
 		

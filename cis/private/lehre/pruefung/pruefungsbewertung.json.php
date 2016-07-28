@@ -5,18 +5,32 @@ header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 header( 'Pragma: no-cache' );
 header('Content-Type: text/html;charset=UTF-8');
 
-require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../config/global.config.inc.php');
+if (defined('CIS_PRUEFUNG_SET_ZEUGNISNOTE') && CIS_PRUEFUNG_SET_ZEUGNISNOTE)
+	require_once('../../../../config/vilesci.config.inc.php');
+else
+	require_once('../../../../config/cis.config.inc.php');
+
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/pruefungCis.class.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/benutzerberechtigung.class.php');
 require_once('../../../../include/studiensemester.class.php');
 require_once('../../../../include/note.class.php');
+require_once('../../../../include/zeugnisnote.class.php');
 require_once('../../../../include/pruefung.class.php');
 require_once('../../../../include/pruefungsanmeldung.class.php');
 require_once('../../../../include/student.class.php');
 require_once('../../../../include/pruefungstermin.class.php');
 require_once('../../../../include/datum.class.php');
+require_once('../../../../include/phrasen.class.php');
+require_once('../../../../include/globals.inc.php');
+require_once('../../../../include/sprache.class.php');
+
+$sprache = getSprache();
+$lang = new sprache();
+$lang->load($sprache);
+$p = new phrasen($sprache);
 
 $uid = get_uid();
 
@@ -43,7 +57,7 @@ switch($method)
 	    {
 		$data['result']='false';
 		$data['error']='true';
-		$data['errormsg']='Sie haben keine Berechtigung.';
+		$data['errormsg']=$p->t('global/keineBerechtigung');
 		break;
 	    }
 	    $data = getPruefungMitarbeiter($mitarbeiter_uid);
@@ -53,7 +67,7 @@ switch($method)
 	    {
 		$data['result']='false';
 		$data['error']='true';
-		$data['errormsg']='Sie haben keine Berechtigung.';
+		$data['errormsg']=$p->t('global/keineBerechtigung');
 		break;
 	    }
 	    $data = getNoten();
@@ -73,7 +87,7 @@ switch($method)
 	    {
 		$data['result']='false';
 		$data['error']='true';
-		$data['errormsg']='Sie haben keine Berechtigung.';
+		$data['errormsg']=$p->t('global/keineBerechtigung');
 		break;
 	    }
 	    $note = filter_input(INPUT_POST, 'note');
@@ -96,7 +110,7 @@ switch($method)
 	    {
 		$data['result']='false';
 		$data['error']='true';
-		$data['errormsg']='Sie haben keine Berechtigung.';
+		$data['errormsg']=$p->t('global/keineBerechtigung');
 		break;
 	    }
 	    $pruefung_id = filter_input(INPUT_POST, 'pruefung_id');
@@ -109,7 +123,7 @@ switch($method)
 	    {
 		$data['result']='false';
 		$data['error']='true';
-		$data['errormsg']='Sie haben keine Berechtigung.';
+		$data['errormsg']=$p->t('global/keineBerechtigung');
 		break;
 	    }
 	    $pruefung_id = filter_input(INPUT_POST, 'pruefung_id');
@@ -120,7 +134,7 @@ switch($method)
 	    {
 		$data['result']='false';
 		$data['error']='true';
-		$data['errormsg']='Sie haben keine Berechtigung.';
+		$data['errormsg']=$p->t('global/keineBerechtigung');
 		break;
 	    }
 	    $pruefungsanmeldung_id = filter_input(INPUT_POST, 'pruefungsanmeldung_id');
@@ -131,7 +145,7 @@ switch($method)
 	    {
 		$data['result']='false';
 		$data['error']='true';
-		$data['errormsg']='Sie haben keine Berechtigung.';
+		$data['errormsg']=$p->t('global/keineBerechtigung');
 		break;
 	    }
 	    $lehrveranstaltung_id = filter_input(INPUT_POST, 'lehrveranstaltung_id');
@@ -150,7 +164,8 @@ echo json_encode($data);
  * @return Array
  */
 function getPruefungMitarbeiter($uid = null)
-{   
+{
+	global $p;
     $lehrveranstaltung = new lehrveranstaltung();
     if($uid !== null)
     {
@@ -183,7 +198,7 @@ function getPruefungMitarbeiter($uid = null)
     else
     {
 	$data['error']='true';
-	$data['errormsg']="Keine Prüfungen vorhanden.";
+	$data['errormsg']=$p->t('pruefung/keinePruefungenVorhanden');
     }
     return $data;
 }
@@ -224,6 +239,7 @@ function getNoten()
  */
 function saveBeurteilung($lehrveranstaltung_id, $student_uid, $mitarbeiter_uid, $note, $pruefung_id, $datum, $anmerkung, $pruefungsanmeldung_id, $uid)
 {
+	global $p;
     $pruefungCis = new pruefungCis($pruefung_id);
     $lehrveranstaltung = new lehrveranstaltung();
     $lehreinheiten = $lehrveranstaltung->getLehreinheitenOfLv($lehrveranstaltung_id, $student_uid);
@@ -231,19 +247,19 @@ function saveBeurteilung($lehrveranstaltung_id, $student_uid, $mitarbeiter_uid, 
     $pruefung->new = true;
     if(!empty($lehreinheiten))
     {
+	$pruefungsanmeldung = new pruefungsanmeldung($pruefungsanmeldung_id);
+	$pruefungstermin = new pruefungstermin($pruefungsanmeldung->pruefungstermin_id);
+
 	$pruefung->lehreinheit_id = $lehreinheiten[0];
 	$pruefung->student_uid = $student_uid;
 	$pruefung->mitarbeiter_uid = $mitarbeiter_uid;
 	$pruefung->note = $note;
-	$pruefung->pruefungstyp_kurzbz = $pruefungCis->pruefungstyp_kurzbz;
+	$pruefung->pruefungstyp_kurzbz = $pruefungsanmeldung->pruefungstyp_kurzbz;
 	$pruefung->datum = $datum;
 	$pruefung->anmerkung = $anmerkung;
 	$pruefung->pruefungsanmeldung_id = $pruefungsanmeldung_id;
 	$pruefung->insertvon = $uid;
 	$pruefung->insertamum = date('Y-m-d H:i:s');
-
-	$pruefungsanmeldung = new pruefungsanmeldung($pruefungsanmeldung_id);
-	$pruefungstermin = new pruefungstermin($pruefungsanmeldung->pruefungstermin_id);
 
 	$datum = new datum();
 //	var_dump(date("Y-m-d", time()));
@@ -261,19 +277,42 @@ function saveBeurteilung($lehrveranstaltung_id, $student_uid, $mitarbeiter_uid, 
 		$data['error']='true';
 		$data['errormsg']=$pruefung->errormsg;
 	    }
+		if (defined('CIS_PRUEFUNG_SET_ZEUGNISNOTE') && CIS_PRUEFUNG_SET_ZEUGNISNOTE)
+		{
+			$zeugnisnote = new zeugnisnote();
+			$zeugnisnote->new = true;
+			$zeugnisnote->lehrveranstaltung_id = $lehrveranstaltung_id;
+			$zeugnisnote->student_uid = $student_uid;
+			$zeugnisnote->studiensemester_kurzbz = $pruefungCis->studiensemester_kurzbz;
+			$zeugnisnote->note = $note;
+			$zeugnisnote->benotungsdatum = $pruefung->datum;
+			$zeugnisnote->insertamum = date('Y-m-d H:i:s');
+			$zeugnisnote->insertvon = $uid;
+			$zeugnisnote_check = new zeugnisnote();
+			if (!$zeugnisnote_check->load($zeugnisnote->lehrveranstaltung_id, $zeugnisnote->student_uid, $zeugnisnote->studiensemester_kurzbz))
+			{
+				$zeugnisnote->save(true);
+			}
+			else
+			{
+				$data['error'] = 'true';
+				$data['errormsg'] = 'Existing Grade';
+			}
+		}
 	}
 	else
 	{
 	    $data['error']='true';
-	    $data['errormsg']="Prüfungstermin liegt nicht in der Vergangenheit.";
+	    $data['errormsg']=$p->t('pruefung/terminNichtInDerVergangenheit');
+		//$data['errormsg']='Nicht in der Vergangenheit';
 	}
     }
-    else	
+    else
     {
 	$data['error']='true';
-	$data['errormsg']="Keine Lehreinheiten vorhanden.";
+	$data['errormsg']=$p->t('pruefung/keineLehreinheitenVorhanden');
     }
-    
+
     return $data;
 }
 
@@ -286,6 +325,7 @@ function saveBeurteilung($lehrveranstaltung_id, $student_uid, $mitarbeiter_uid, 
  */
 function updateBeurteilung($pruefung_id, $note, $uid, $anmerkung)
 {
+	global $p;
     $pruefung = new pruefung($pruefung_id);
     $pruefung->new = FALSE;
     $pruefung->note = $note;
@@ -334,6 +374,7 @@ function getBeurteilung($pruefungsanmeldung_id)
  */
 function getAnmeldungenTermin($lehrveranstaltung_id, $pruefungstermin_id)
 {
+	global $p;
     $pruefungsanmeldung = new pruefungsanmeldung();
     $anmeldungen = $pruefungsanmeldung->getAnmeldungenByTermin($pruefungstermin_id, $lehrveranstaltung_id);
     foreach($anmeldungen as $a)
@@ -363,7 +404,7 @@ function getAnmeldungenTermin($lehrveranstaltung_id, $pruefungstermin_id)
 	}
 	else
 	{
-	    $data['errormsg']= 'Keine Anmeldungen vorhanden';
+	    $data['errormsg']= $p->t('pruefung/keineAnmeldungenVorhanden');
 	}
     }
     return $data;

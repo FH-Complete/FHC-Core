@@ -270,7 +270,7 @@ if($importFile != '')
     	    	
     	if($dms->save(true))
     	{
-    		echo 'File wurde erfolgreich hochgeladen. Filename:'.$filename.' ID:'.$dms->dms_id;
+    		echo 'File wurde erfolgreich hochgeladen. <br>Filename:'.$filename.' <br>ID: <a href="id://'.$dms->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$dms->dms_id.'); return false;" style="font-size: small">'.$dms->dms_id.'</a>';
     		$dms_id=$dms->dms_id;
     		
     		if($projekt_kurzbz!='' || $projektphase_id!='')
@@ -282,10 +282,10 @@ if($importFile != '')
     	else
     		echo 'Fehler beim Speichern der Daten';
     	
-    	if(!chgrp(DMS_PATH.$filename,'dms'))
-			echo 'CHGRP failed';
-		if(!chmod(DMS_PATH.$filename, 0774))
-			echo 'CHMOD failed';
+    	if(!@chgrp(DMS_PATH.$filename,'dms'))
+			echo '<br>CHGRP failed';
+		if(!@chmod(DMS_PATH.$filename, 0774))
+			echo '<br>CHMOD failed';
 		exec('sudo chown wwwrun '.$filename);	
     		
     	// Lösche File aus Verzeichnis nachdem es raufgeladen wurde
@@ -308,10 +308,10 @@ if(isset($_POST['fileupload']))
 	
 	if(move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) 
 	{
-		if(!chgrp($uploadfile,'dms'))
-			echo 'CHGRP failed<br>';
-		if(!chmod($uploadfile, 0774))
-			echo 'CHMOD failed<br>';
+		if(!@chgrp($uploadfile,'dms'))
+			echo '<br>CHGRP failed';
+		if(!@chmod($uploadfile, 0774))
+			echo '<br>CHMOD failed';
 		exec('sudo chown wwwrun '.$uploadfile);	
 		
     	$dms = new dms();
@@ -831,32 +831,43 @@ function drawFilesFromImport()
 
 	if ($handle = opendir(IMPORT_PATH)) 
 	{
+		echo '<script>
+		$(document).ready(function()
+		{
+			$("#t3").tablesorter(
+			{	
+				sortList: [[0,0]], headers: {1:{sorter:false}},
+				widgets: ["zebra"]
+			});
+		});
+		</script>';
 		echo '	<h3>Files im Import Ordner</h3>
-				<table> <form action ="'.$_SERVER['PHP_SELF'].'" method="POST" name="import" >'; 
+				<table class="tablesorter" id="t3" style="width: auto"> <form action ="'.$_SERVER['PHP_SELF'].'" method="POST" name="import" >
+    			<thead><th>File</th><th></th></thead><tbody>'; 
 
-	    while (false !== ($file = readdir($handle))) 
-	    {
-	    	if($file != '.' && $file != '..')
-	    	{
-	    		echo'
-	    		<tr>
-			    	<td><img src="../skin/images/blank.png" style="height: 15px">
-			       		<span> '.$file.'</span>
-			       	</td>
-			        <td>
-			        	| <a onclick="document.import.importFile.value=\''.$file.'\';document.import.submit();" style="font-size:small">Upload</a>
-			        </td>
-		     	</tr>';  
-	    	}
-	    }
-	    echo'	
-	    	<input type="hidden" name="dms_id_import" id="dms_id_import" value="">
+		while (false !== ($file = readdir($handle))) 
+		{
+			if($file != '.' && $file != '..')
+			{
+				echo'
+				<tr>
+					<td>
+						<span> '.$file.'</span>
+					</td>
+					<td>
+						<a onclick="window.location=\'#divupload\'; document.import.importFile.value=\''.$file.'\';document.import.submit();"  style="font-size:small">Upload</a>
+					</td>
+				</tr>';  
+			}
+		}
+		echo'	
+			<input type="hidden" name="dms_id_import" id="dms_id_import" value="">
 			<input type="hidden" name="importFile" value="">
 			<input type="hidden" name="kategorie_kurzbz" id="kategorie_kurzbz" value="'.$kategorie_kurzbz.'">
 			<input type="hidden" name="projekt_kurzbz" value="'.$projekt_kurzbz.'">
 			<input type="hidden" name="projektphase_id" value="'.$projektphase_id.'">
-		 </form></table>';
-	    closedir($handle);
+		 </form></tbody></table>';
+		closedir($handle);
 	}
 }
 /**
@@ -1018,7 +1029,7 @@ function drawFilesList($rows)
 						<li><a href="dms.php?id='.$row->dms_id.'&version='.$row->version.'" style="font-size:small" target="_blank">Herunterladen</a></li>';
 						if($rechte->isberechtigt('basis/dms',null, 'sui', null))
 						{
-							echo '	<li><a href="id://'.$row->dms_id.'/Upload" onclick=" updateBeschreibung(\'';
+							echo '	<li><a href="id://'.$row->dms_id.'/Upload" onclick="window.location=\'#divupload\'; updateBeschreibung(\'';
 										$beschreibungstext = $row->beschreibung;
 										$beschreibungstext = str_replace("'","4nführungsze1ch3n",$beschreibungstext);
 										$beschreibungstext = str_replace('"',"D4n7ührung",$beschreibungstext);

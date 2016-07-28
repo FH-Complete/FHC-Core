@@ -59,9 +59,20 @@ define('CIS_GESAMTNOTE_UEBERSCHREIBEN',true);
 // Gewichtung der Lehreinheiten bei Noteneintragung true|false
 define('CIS_GESAMTNOTE_GEWICHTUNG', true);
 
+// Bei Gesamtnote eine zusaetzliche Spalte fuer den 2. Termin anzeigen
+define('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2',true);
+
 // Bei Gesamtnote eine zusaetzliche Spalte fuer den 3. Termin anzeigen
 define('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3',true);
 
+// Bei Gesamtnote eine zusaetzliche Spalte fuer die kommissionelle Pruefung anlegen
+define('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF', true);
+
+// Bei Gesamtnote eine zusaetzliche Spalte fuer die kommissionelle Pruefung anlegen
+define('CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE', true);
+
+// Bei Gesamtnote die Spalte fuer die Quelle der Noten anzeigen (Moodle oder LE)
+define('CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE', true);
 
 // Gibt an ob im FAS bei den Lehrveranstaltungsnoten ein zusaetzliches Formular angezeigt wird um
 // Vertraege fuer Pruefungshonorare anzulegen
@@ -73,6 +84,10 @@ define('FAS_ANWESENHEIT_GELB', 90);
 
 // Legt einen Prüfungstermin an wenn eine neue Note erfasst wird
 define('FAS_PRUEFUNG_BEI_NOTENEINGABE_ANLEGEN',false);
+
+// Legt fest ob bei der Uebernahme der Reihungstestpunkte die Punkte
+//oder Prozentpunkte uebernommen werden true=Punkte, false=Prozentpunkte
+define('FAS_REIHUNGSTEST_PUNKTE', false);
 
 // Anzeigeoptionen für LV-Plan Menü
 define('CIS_LVPLAN_EXPORT_ANZEIGEN',true);

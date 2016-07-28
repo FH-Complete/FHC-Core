@@ -1,0 +1,23 @@
+/* tables */
+table {
+	background-color: #EFEFEF;
+	margin:10px 0pt 15px;
+	width: 100%;
+	text-align: left;
+}
+table thead tr th, table tfoot tr th {
+	border: 1px solid #FFF;
+	padding: 4px;
+	vertical-align: middle;
+}
+th[ts-criteria]{
+	background-color: #DCE4EF;
+	cursor: pointer;
+}
+th.tablesort-asc,th.tablesort-desc{
+	border-bottom: #000 2px solid;
+}
+
+tbody tr:nth-child(2n){
+	background-color: #D3D3D3;
+}

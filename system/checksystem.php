@@ -25,6 +25,7 @@
 require_once('../config/system.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../version.php');
+require_once('../include/benutzerberechtigung.class.php');
 
 // Datenbank Verbindung
 $db = new basis_db();
@@ -36,15 +37,26 @@ echo '<html>
 </head>
 <body>';
 
+$uid = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+
+if(!$rechte->isBerechtigt('admin'))
+{
+	exit('Sie haben keine Berechtigung');
+}
+
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';
 
+
+
 echo '<div>';
-  $dbupdStr = 'dbupdate_'.$fhcomplete_version.'.php';
-  echo $dbupdStr . ' wird aufgerufen...';
+	$dbupdStr = 'dbupdate_'.$fhcomplete_version.'.php';
+	echo $dbupdStr . ' wird aufgerufen...';
 echo '</div>';
 echo '<div>';
-  require_once($dbupdStr);
+	require_once($dbupdStr);
 echo '</div>';
 
 // ******** Berechtigungen Prüfen ************/
@@ -136,8 +148,8 @@ $berechtigungen = array(
 	array('soap/benutzer','Berechtigung für Bentutzerabfrage Addon Kontoimport'),
 	array('soap/buchungen','Berechtigung für Buchungsabfrage Addon Kontoimport'),
 	array('student/bankdaten','Bankdaten des Studenten'),
-    array('student/anrechnung','Anrechnungen des Studenten'),
-    array('student/anwesenheit','Anwesenheiten im FAS'),
+	array('student/anrechnung','Anrechnungen des Studenten'),
+	array('student/anwesenheit','Anwesenheiten im FAS'),
 	array('student/dokumente','Wenn SUID dann dürfen Dokumente auch wieder entfernt werden'),
 	array('student/noten','Notenverwaltung'),
 	array('student/stammdaten','Stammdaten der Studenten'),

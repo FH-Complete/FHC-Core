@@ -23,15 +23,16 @@
  */
 /**
  * Reihungstest
- * 
+ *
  * - Anlegen und Bearbeiten von Terminen
  * - Export von Anwesenheitslisten als Excel
  * - Uebertragung der Ergebniss-Punkte ins FAS
- * 
+ *
  * Parameter:
  * excel ... wenn gesetzt, dann wird die Anwesenheitsliste als Excel exportiert
  */
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/reihungstest.class.php');
@@ -42,6 +43,7 @@ require_once('../../include/pruefling.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/Excel/excel.php');
+require_once('../../include/adresse.class.php');
 
 if (!$db = new basis_db())
 {
@@ -71,7 +73,7 @@ $studiengang->getAll('typ, kurzbz', false);
 
 //Studierende als Excel Exportieren
 if(isset($_GET['excel']))
-{	
+{
 	$reihungstest = new reihungstest();
 	if($reihungstest->load($_GET['reihungstest_id']))
 	{
@@ -112,7 +114,18 @@ if(isset($_GET['excel']))
 		$worksheet->write(2,++$i,"ORT", $format_bold);
 		$maxlength[$i] = 3;
 
-		$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id AND zustellung=true LIMIT 1) as email,(SELECT ausbildungssemester FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND datum=(SELECT MAX(datum) FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND status_kurzbz='Interessent') LIMIT 1) as ausbildungssemester FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest->reihungstest_id' ORDER BY nachname, vorname";
+		$qry = "SELECT *,
+			(SELECT kontakt FROM tbl_kontakt
+			WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id AND zustellung=true LIMIT 1) as email,
+			(SELECT ausbildungssemester FROM public.tbl_prestudentstatus
+			WHERE prestudent_id=tbl_prestudent.prestudent_id
+				AND datum=(SELECT MAX(datum) FROM public.tbl_prestudentstatus
+							WHERE prestudent_id=tbl_prestudent.prestudent_id
+							AND status_kurzbz='Interessent') LIMIT 1) as ausbildungssemester
+			FROM
+				public.tbl_prestudent
+				JOIN public.tbl_person USING(person_id)
+			WHERE reihungstest_id=".$db->db_add_param($reihungstest->reihungstest_id, FHC_INTEGER)." ORDER BY nachname, vorname";
 
 		if($result = $db->db_query($qry))
 		{
@@ -129,12 +142,14 @@ if(isset($_GET['excel']))
 				{
 					if($item->prestudent_id!=$row->prestudent_id)
 					{
-						$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id);
+						if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+							$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id, true);
+						else
+							$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id);
 						if($erg!=0)
 						{
-							$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz]."\n";
+							$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz]."; ";
 						}
-
 					}
 				}
 
@@ -166,24 +181,21 @@ if(isset($_GET['excel']))
 				if(strlen($row->ausbildungssemester)>$maxlength[$i])
 					$maxlength[$i] = mb_strlen($row->ausbildungssemester);
 
-				$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' AND zustelladresse=true LIMIT 1";
-				if($result_adresse = $db->db_query($qry))
-				{
-					if($row_adresse = $db->db_fetch_object($result_adresse))
-					{
-						$worksheet->write($zeile,++$i,$row_adresse->strasse);
-						if(strlen($row_adresse->strasse)>$maxlength[$i])
-							$maxlength[$i] = mb_strlen($row_adresse->strasse);
+ 				$adresse = new adresse();
+				$adresse->loadZustellAdresse($row->person_id);
 
-						$worksheet->write($zeile,++$i,$row_adresse->plz);
-						if(strlen($row_adresse->plz)>$maxlength[$i])
-							$maxlength[$i] = mb_strlen($row_adresse->plz);
+				$worksheet->write($zeile,++$i,$adresse->strasse);
+				if(strlen($adresse->strasse)>$maxlength[$i])
+					$maxlength[$i] = mb_strlen($adresse->strasse);
 
-						$worksheet->write($zeile,++$i,$row_adresse->ort);
-						if(strlen($row_adresse->ort)>$maxlength[$i])
-							$maxlength[$i] = mb_strlen($row_adresse->ort);
-					}
-				}
+				$worksheet->write($zeile,++$i,$adresse->plz);
+				if(strlen($adresse->plz)>$maxlength[$i])
+					$maxlength[$i] = mb_strlen($adresse->plz);
+
+				$worksheet->write($zeile,++$i,$adresse->ort);
+				if(strlen($adresse->ort)>$maxlength[$i])
+					$maxlength[$i] = mb_strlen($adresse->ort);
+
 				$zeile++;
 			}
 		}
@@ -199,7 +211,7 @@ if(isset($_GET['excel']))
 	}
 	return;
 } ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE HTML>
 <html>
 	<head>
 		<title>Reihungstest</title>
@@ -351,7 +363,10 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 				$prestudent->load($row->prestudent_id);
 
 				$pruefling = new pruefling();
-				$rtpunkte = $pruefling->getReihungstestErgebnis($row->prestudent_id);
+				if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+					$rtpunkte = $pruefling->getReihungstestErgebnis($row->prestudent_id,true);
+				else
+					$rtpunkte = $pruefling->getReihungstestErgebnis($row->prestudent_id);
 
 				$prestudent->rt_punkte1 = str_replace(',','.',$rtpunkte);
 				$prestudent->punkte = str_replace(',','.',$prestudent->rt_punkte1 + $prestudent->rt_punkte2);
@@ -377,11 +392,11 @@ echo '<br><table width="100%"><tr><td>';
 echo "<SELECT name='studiengang' onchange='window.location.href=this.value'>";
 if($stg_kz==-1)
 	$selected='selected';
-else 
+else
 	$selected='';
 
 echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=-1' $selected>Alle Studiengaenge</OPTION>";
-foreach ($studiengang->result as $row) 
+foreach ($studiengang->result as $row)
 {
 	$stg_arr[$row->studiengang_kz] = $row->kuerzel;
 	if($stg_kz=='')
@@ -403,7 +418,7 @@ else
 	$reihungstest->getReihungstest($stg_kz,'datum DESC,uhrzeit DESC');
 
 echo "<SELECT name='reihungstest' id='reihungstest' onchange='window.location.href=this.value'>";
-foreach ($reihungstest->result as $row) 
+foreach ($reihungstest->result as $row)
 {
 	//if($reihungstest_id=='')
 	//	$reihungstest_id=$row->reihungstest_id;
@@ -437,7 +452,7 @@ if(!$neu)
 	if(!$reihungstest->load($reihungstest_id))
 		die('Reihungstest existiert nicht');
 }
-else 
+else
 {
 	if($stg_kz!=-1 && $stg_kz!='')
 		$reihungstest->studiengang_kz = $stg_kz;
@@ -565,7 +580,10 @@ if($reihungstest_id!='')
 				<tbody>";
 		while($row = $db->db_fetch_object($result))
 		{
-			$rtergebnis = $pruefling->getReihungstestErgebnis($row->prestudent_id);
+			if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+				$rtergebnis = $pruefling->getReihungstestErgebnis($row->prestudent_id,true);
+			else
+				$rtergebnis = $pruefling->getReihungstestErgebnis($row->prestudent_id);
 			$prestudent = new prestudent();
 			$prestudent->getPrestudenten($row->person_id);
 			$rt_in_anderen_stg='';
@@ -573,7 +591,10 @@ if($reihungstest_id!='')
 			{
 				if($item->prestudent_id!=$row->prestudent_id)
 				{
-					$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id);
+					if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+						$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id, true);
+					else
+						$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id);
 					if($erg!=0)
 					{
 						$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz].'<br>';
@@ -595,7 +616,7 @@ if($reihungstest_id!='')
 					<td align="right">'.($rtergebnis!=0 && $row->rt_punkte1==''?'<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&prestudent_id='.$row->prestudent_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>':$row->rt_punkte1).'</td>
 				</tr>';
 
-			$mailto.= ($mailto!=''?',':'').$row->email;
+			$mailto.= ($mailto!=''?DEFAULT_EMAILADRESSENTRENNZEICHEN:'').$row->email;
 		}
 		echo "</tbody></table>";
 		echo "<span style='font-size: 9pt'><a href='mailto:?bcc=$mailto'>Mail an alle senden</a></span>";

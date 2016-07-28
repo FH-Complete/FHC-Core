@@ -33,6 +33,7 @@ require_once('../include/datum.class.php');
 require_once('../include/note.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/mitarbeiter.class.php');
+require_once('../include/anrechnung.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -186,7 +187,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "\n		<anrede>".$row->anrede."</anrede>";
 		$xml .= "\n		<vorname>".$row->vorname."</vorname>";
 		$xml .= "		<nachname>".$row->nachname."</nachname>";
-		$xml .= "		<name>".trim($row->titelpre.' '.trim($row->vorname.' '.$row->vornamen).' '.mb_strtoupper($row->nachname).($row->titelpost!=''?', '.$row->titelpost:''))."</name>";
+		$xml .= "		<name>".trim($row->titelpre.' '.trim($row->vorname.' '.$row->vornamen).' '.$row->nachname.($row->titelpost!=''?', '.$row->titelpost:''))."</name>";
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 		$xml .= "		<gebdatum>".$gebdatum."</gebdatum>";
 		$xml .= "		<matrikelnr>".trim($row->matrikelnr)."</matrikelnr>";
@@ -241,6 +242,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid_arr[$i], $studiensemester_kurzbz);
 
         $ects_gesamt = 0; 
+        $prestudent_id = $row->prestudent_id;
 		foreach ($obj->result as $row)	
 		{
 			if($row->zeugnis)
@@ -368,7 +370,20 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$xml .= "				<note>".$note2."</note>";
 				$xml .= "				<sws>".($row->semesterstunden==0?'':number_format(sprintf('%.1F',$row->semesterstunden/$wochen),1))."</sws>";
 				$ectspunkte='';
-				
+                                
+                                
+                                $anrechnung = new anrechnung();
+                                $anrechnung->getAnrechnungPrestudent($prestudent_id, null, $row->lehrveranstaltung_id);
+
+                                if($anrechnung->result != null)
+                                {
+                                    $lv = new lehrveranstaltung($anrechnung->result[0]->lehrveranstaltung_id);                                  
+                                    if(($lv->ects !== $row->ects) && ($lv->ects != "") && ($lv->ects != null))
+                                    {
+                                        $row->ects = $lv->ects;
+                                    }
+                                }
+                                
 				if($row->ects==0 || $row->ects=='')
 					$ectspunkte='';
 				else
@@ -379,7 +394,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					else 	
 						$ectspunkte=number_format($row->ects,2);
 				}
-                $ects_gesamt+=$ectspunkte; 
+                $ects_gesamt+=$ectspunkte;
                 
 				$xml .= "				<ects>".$ectspunkte."</ects>";
 				$xml .= "				<lv_lehrform_kurzbz>".$row->lv_lehrform_kurzbz."</lv_lehrform_kurzbz>";

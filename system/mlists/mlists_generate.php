@@ -233,6 +233,7 @@ $error_msg='';
 	
 	// **************************************************************
 	// Studiengangsleiter-Verteiler abgleichen
+	// Es werden auch StellvertreterInnen hinzugefügt
 	$mlist_name='tw_stgl';
 	setGeneriert($mlist_name);
 	// Personen holen die nicht mehr in den Verteiler gehoeren
@@ -247,9 +248,10 @@ $error_msg='';
 									JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) 
 									JOIN public.tbl_benutzerfunktion USING(uid) 
 									JOIN public.tbl_studiengang USING(oe_kurzbz)
-								WHERE tbl_benutzer.aktiv AND (funktion_kurzbz='Leitung' OR funktion_kurzbz='gLtg') AND
+								WHERE tbl_benutzer.aktiv AND (funktion_kurzbz='Leitung' OR funktion_kurzbz='gLtg' OR funktion_kurzbz='stvLtg') AND
 								(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-								(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()))";
+								(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
+								AND tbl_studiengang.aktiv=true)";
 	if(!($result = $db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error();
 	while($row=$db->db_fetch_object($result))
@@ -262,7 +264,7 @@ $error_msg='';
 	}
 	// Personen holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT mitarbeiter_uid AS uid 
+	$sql_query="SELECT DISTINCT mitarbeiter_uid AS uid 
 				FROM 
 					public.tbl_mitarbeiter 
 					JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) 
@@ -270,10 +272,11 @@ $error_msg='';
 					JOIN public.tbl_studiengang USING(oe_kurzbz)
 				WHERE 
 					tbl_benutzer.aktiv AND 
-					(tbl_benutzerfunktion.funktion_kurzbz='Leitung' OR funktion_kurzbz='gLtg') AND 
+					(tbl_benutzerfunktion.funktion_kurzbz='Leitung' OR funktion_kurzbz='gLtg' OR funktion_kurzbz='stvLtg') AND 
 					(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 					(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
-					mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
+					mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))
+					AND tbl_studiengang.aktiv=true";
 	if(!($result = $db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error();
 	while($row=$db->db_fetch_object($result))
@@ -500,12 +503,10 @@ $error_msg='';
 
 	// Studierende holen, die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT uid, tbl_gruppe.gruppe_kurzbz
+	$sql_query="SELECT uid
 				FROM 
 					public.tbl_benutzerfunktion 
 					JOIN public.tbl_benutzer USING(uid)
-					JOIN public.tbl_studiengang USING(oe_kurzbz)
-					JOIN public.tbl_gruppe ON(tbl_gruppe.studiengang_kz=tbl_studiengang.studiengang_kz AND gruppe_kurzbz = 'TW_HSV')
 				WHERE 
 					funktion_kurzbz='hsv' 
 					AND tbl_benutzer.aktiv AND 
@@ -519,10 +520,10 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-		if($row->gruppe_kurzbz!='')
+		if($row->uid!='')
 		{
-			setGeneriert($row->gruppe_kurzbz);
-	     	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".mb_strtoupper($row->gruppe_kurzbz)."', now(), 'mlists_generate')";
+			setGeneriert('TW_HSV');
+	     	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES (".$db->db_add_param($row->uid).",'TW_HSV', now(), 'mlists_generate')";
 			if(!$db->db_query($sql_query))
 				$error_msg.=$db->db_last_error().$sql_query;
 			echo '-';
@@ -584,7 +585,7 @@ $error_msg='';
 		echo '-';
 		flush();
 	}
-
+	ob_flush();
 	// Studierende holen, die nicht im Verteiler sind
 	echo '<BR>';
 	$sql_query="SELECT uid, tbl_gruppe.gruppe_kurzbz
@@ -637,6 +638,7 @@ $error_msg='';
 		echo "<br>Fehler:$sql_query";
 	
     flush();
+	ob_flush();
     setGeneriert('TW_STDV');
 	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe 
 				WHERE gruppe_kurzbz='TW_STDV' 
@@ -782,6 +784,7 @@ $error_msg='';
 		echo "<br>Fehler:$sql_query";
 	// Studierende holen, die nicht mehr in den Verteiler gehoeren
     flush();
+	ob_flush();
     setGeneriert('TW_JGV');
 	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe 
 				WHERE gruppe_kurzbz='TW_JGV' 
@@ -869,6 +872,7 @@ $error_msg='';
 	// ***************************
 	// TW_STD_M abgleichen. Alle maennlichen Studenten
     flush();
+	ob_flush();
     setGeneriert('TW_STD_M');
     echo 'TW_STD_M wird abgeglichen!<br>';
 
@@ -915,6 +919,7 @@ $error_msg='';
 	// ***************************
 	// TW_STD_W abgleichen. Alle weiblichen Studentinnen
     flush();
+	ob_flush();
     setGeneriert('TW_STD_W');
     echo 'TW_STD_W wird abgeglichen!<br>';
 
@@ -965,6 +970,7 @@ $error_msg='';
 	// Lektoren holen die nicht mehr in den Verteiler gehoeren
 	echo $mlist_name.' wird abgeglichen!<BR>';
 	flush();
+	ob_flush();
 	
 	$sql_query = "SELECT distinct mitarbeiter_uid uid 
 				from lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_moodle ,campus.vw_lehreinheit 
@@ -1382,6 +1388,7 @@ $error_msg='';
 	// Personen holen die nicht mehr in den Verteiler gehoeren
 	echo $mlist_name.' wird abgeglichen!<BR>';
 	flush();
+	ob_flush();
 	$sql_query="SELECT uid FROM public.tbl_benutzergruppe 
 				WHERE 
 					UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND 
@@ -1689,6 +1696,42 @@ $error_msg='';
 					WHERE funktion_kurzbz='fue' 
 					AND geschlecht='w'
 					AND tbl_benutzer.aktiv
+					AND (tbl_benutzerfunktion.datum_von<=now() OR tbl_benutzerfunktion.datum_von is null)
+					AND (tbl_benutzerfunktion.datum_bis>=now() OR tbl_benutzerfunktion.datum_bis is null)";
+			
+	$sql_querys="DELETE FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='$mlist_name' AND uid NOT IN ($sql_query)";
+	if(!$db->db_query($sql_querys))
+	{
+		$error_msg.=$db->db_last_error().' '.$sql_querys;
+	}
+			
+	$sql_query.=" AND uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='$mlist_name')";
+	if(!($result_oe = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error().' '.$sql_query;
+	// Personen holen die nicht im Verteiler sind
+	while($row_oe = $db->db_fetch_object($result_oe))
+	{
+	   	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
+		if(!$db->db_query($sql_query))
+		{
+			$error_msg.=$db->db_last_error().$sql_query;
+		}
+	}
+
+	// **************************************************************
+	// Alle MA mit Funktion Leitung oder stvLeitung oder gfLtg
+	$mlist_name='TW_LEITUNG';
+
+	$grp = new gruppe();
+	setGeneriert($mlist_name);
+				
+	// Personen holen die nicht mehr in den Verteiler gehoeren
+	echo '<br>'.$mlist_name.' wird abgeglichen!';
+	flush();
+			
+	$sql_query = "SELECT DISTINCT uid FROM tbl_person JOIN tbl_benutzer
+					USING (person_id) JOIN tbl_benutzerfunktion USING (uid)
+					WHERE funktion_kurzbz in('Leitung','stvLtg','gLtg')
 					AND (tbl_benutzerfunktion.datum_von<=now() OR tbl_benutzerfunktion.datum_von is null)
 					AND (tbl_benutzerfunktion.datum_bis>=now() OR tbl_benutzerfunktion.datum_bis is null)";
 			

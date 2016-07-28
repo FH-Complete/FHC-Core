@@ -34,20 +34,22 @@ require_once(dirname(__FILE__).'/../../../include/functions.inc.php');
 require_once(dirname(__FILE__).'/../../../include/wochenplan.class.php');
 require_once(dirname(__FILE__).'/../../../include/datum.class.php');
 require_once(dirname(__FILE__).'/../../../include/studiensemester.class.php');
-require_once(dirname(__FILE__).'/../../../include/phrasen.class.php'); 
+require_once(dirname(__FILE__).'/../../../include/lehrveranstaltung.class.php');
+require_once(dirname(__FILE__).'/../../../include/phrasen.class.php');
+require_once(dirname(__FILE__).'/../../../include/Excel/excel.php');
 
 if(!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
-$sprache = getSprache(); 
-$p=new phrasen($sprache); 
-	
+$sprache = getSprache();
+$p=new phrasen($sprache);
+
 //Startwerte setzen
 if(!isset($_GET['db_stpl_table']))
 	$db_stpl_table='stundenplan';
 else
 	$db_stpl_table=$_GET['db_stpl_table'];
-	
+
 if(!in_array($db_stpl_table,array('stundenplan','stundenplandev')))
 	die('db_stpl_table invalid');
 if(isset($_GET['type']))
@@ -83,16 +85,16 @@ if(isset($_GET["cal"]))
 	// fuer Abonnierung im Google ueber /webdav/google.php
 	$cal = $_GET["cal"];
 	$uid=decryptData($cal,LVPLAN_CYPHER_KEY);
-	//Wenn der Key manuell geaendert wird koennen Fehlerhaft kodierte Zeichen 
+	//Wenn der Key manuell geaendert wird koennen Fehlerhaft kodierte Zeichen
 	//entstehen und fuehren zu DB fehlern deshalb werden falsch kodierte uids hier aussortiert
 	if(!check_utf8($uid))
 		die('Fehlerhafter Parameter');
-	
+
 	//Pruefen ob dieser Benutzer auch wirklich existiert
 	$benutzer = new benutzer();
 	if(!$benutzer->load($uid))
 		die('Ungueltiger Benutzername');
-		
+
 	//Output-Format wird auf ical geaendert
 	$target='ical';
 	$format='ical';
@@ -114,11 +116,11 @@ if(!isset($begin))
 	$objSS->load($ss);
 	$datum_obj = new datum();
 	$begin = $datum_obj->mktime_fromdate($objSS->start);
-	
+
 	// Ein Monat vor ende des Studiensemester soll zusaetzlich das kommende angezeigt werden
 	$datum_obj = new datum();
 	$diff = $datum_obj->DateDiff($objSS->ende, date('Y-m-d H:i:s'));
-	
+
 	if($diff>=-30)
 	{
 		$objSS->getNextFrom($ss);
@@ -126,21 +128,6 @@ if(!isset($begin))
 	}
 	else
 		$ende = $datum_obj->mktime_fromdate($objSS->ende);
-}
-
-
-
-// for spezial friends
-if($uid=='maderdon')
-{
-	if(!isset($_GET['format']))
-	{
-		$format='ical';
-		$version=2;
-		$target='ical';
-		$begin=1188597600;
-		$ende=1202166000;
-	}
 }
 
 $jahr=date("Y",$begin);
@@ -194,6 +181,10 @@ TZOFFSETTO:+0100
 END:STANDARD
 END:VTIMEZONE';
 }
+elseif($format=='excel')
+{
+	$exceldata=array();
+}
 // Print in HTML-File
 else
 {
@@ -240,7 +231,8 @@ if(!isset($begin) || !isset($ende))
 	}
 }
 
-if($ende-$begin>31536000)
+
+if($ende-$begin>34560000) // = 400 Tage
 {
 	die($p->t('lvplan/datumsbereichZuGross')."!");
 }
@@ -299,7 +291,7 @@ while($begin<$ende)
 	$i++;
 	if(!date("w",$begin))
 		$begin=jump_day($begin,1);
-	
+
 	$stdplan->init_stdplan();
 	$datum=$begin;
 	$begin+=604800;	// eine Woche
@@ -312,8 +304,13 @@ while($begin<$ende)
 
 	// Stundenplan der Woche drucken
 	if($format=='csv' || $format=='ical')
-	{		
+	{
 		$stdplan->draw_week_csv($target, LVPLAN_KATEGORIE);
+	}
+	elseif($format=='excel')
+	{
+		$data = $stdplan->draw_week_csv('return', LVPLAN_KATEGORIE);
+		$exceldata = array_merge($exceldata, $data);
 	}
 	else
 	{
@@ -335,10 +332,108 @@ elseif($format=='ical')
 {
 	echo $crlf.'END:VCALENDAR';
 }
+elseif($format=='excel')
+{
+	OutputKalenderAsExcel($exceldata);
+}
 // Print in HTML-File
 else
 {
 	echo '<P class="dont-print">'.$p->t('lvplan/fehlerUndFeedback').' <A class="Item" href="mailto:'.MAIL_LVPLAN.'">'.$p->t('lvplan/lvKoordinationsstelle').'</A></P>';
 	echo '</body></html>';
 }
+
+
+/**
+ *
+ */
+function OutputKalenderAsExcel($exceldata)
+{
+	// Creating a workbook
+	$workbook = new Spreadsheet_Excel_Writer();
+
+	// sending HTTP headers
+	$workbook->send("Termine". "_" . date("d_m_Y") . ".xls");
+	$workbook->setVersion(8);
+	// Creating a worksheet
+	$worksheet =& $workbook->addWorksheet("Termine");
+	$worksheet->setInputEncoding('utf-8');
+
+	$format_bold =& $workbook->addFormat();
+	$format_bold->setBold();
+
+	$format_title =& $workbook->addFormat();
+	$format_title->setBold();
+	// let's merge
+	$format_title->setAlign('merge');
+
+	//Zeilenueberschriften ausgeben
+	$headline=array('Datum','Von','Bis','Ort','Lektoren','Gruppen','Lehrfach','Anmerkung','StundeVon','StundeBis');
+
+	$i=0;
+	foreach ($headline as $title)
+	{
+		$worksheet->write(0,$i,$title, $format_bold);
+			$maxlength[$i]=mb_strlen($title);
+		$i++;
+	}
+
+	$zeile=1;
+	if(is_array($exceldata))
+	{
+		foreach($exceldata as $row)
+		{
+			$i=0;
+
+			writecol($worksheet, $maxlength,$zeile, $i++, $row['start_date']);
+			writecol($worksheet, $maxlength,$zeile, $i++, $row['start_time']);
+			writecol($worksheet, $maxlength,$zeile, $i++, $row['end_time']);
+			writecol($worksheet, $maxlength,$zeile, $i++, $row['ort']);
+			$lkt='';
+			foreach($row['lektor_uid'] as $row_lkt)
+			{
+				$bn = new benutzer();
+				$bn->load($row_lkt);
+
+				$lkt.=$bn->vorname.' '.$bn->nachname.', ';
+			}
+			$lkt = mb_substr($lkt, 0, -2);
+			writecol($worksheet, $maxlength,$zeile, $i++, $lkt);
+			writecol($worksheet, $maxlength,$zeile, $i++, implode(',',$row['gruppen']));
+
+			if($row['lehrfach_id']!='')
+			{
+				$lv = new lehrveranstaltung();
+				$lv->load($row['lehrfach_id']);
+				$bezeichnung = $lv->bezeichnung;
+			}
+			else
+				$bezeichnung = $row['Summary'];
+
+			writecol($worksheet, $maxlength,$zeile, $i++, $bezeichnung);
+			writecol($worksheet, $maxlength,$zeile, $i++, $row['titel']);
+
+			writecol($worksheet, $maxlength,$zeile, $i++, min($row['stunden']));
+			writecol($worksheet, $maxlength,$zeile, $i++, max($row['stunden']));
+
+
+			$zeile++;
+		}
+	}
+
+	//Die Breite der Spalten setzen
+	foreach($maxlength as $i=>$breite)
+		$worksheet->setColumn($i, $i, $breite+2);
+
+	$workbook->close();
+}
+function writecol($worksheet, &$maxlength, $zeile, $i, $content)
+{
+	$worksheet->write($zeile, $i, $content);
+
+	if(isset($maxlength[$i]))
+		if(mb_strlen($content)>$maxlength[$i])
+			$maxlength[$i]=mb_strlen($content);
+}
+
 ?>

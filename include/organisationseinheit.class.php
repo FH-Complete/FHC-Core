@@ -632,42 +632,29 @@ class organisationseinheit extends basis_db
 				organisationseinheittyp_kurzbz,
 				aktiv,
 				lehre,
-				sum(a.anzahl) AS anzahl FROM (
-					SELECT 
-					tbl_organisationseinheit.oe_kurzbz,
-					tbl_organisationseinheit.oe_parent_kurzbz,
-					tbl_organisationseinheit.bezeichnung,
-					tbl_organisationseinheit.organisationseinheittyp_kurzbz,
-					tbl_organisationseinheit.aktiv,		
-					tbl_organisationseinheit.lehre,			
-					  (SELECT COUNT (tbl_zeitaufzeichnung.*) FROM campus.tbl_zeitaufzeichnung 
-					   WHERE tbl_organisationseinheit.oe_kurzbz IN (tbl_zeitaufzeichnung.oe_kurzbz_1,tbl_zeitaufzeichnung.oe_kurzbz_2) AND tbl_zeitaufzeichnung.uid=".$this->db_add_param($user)." 
-					   $zeit) AS anzahl
-					FROM public.tbl_organisationseinheit
-					WHERE 
-					  (SELECT COUNT (tbl_zeitaufzeichnung.*) FROM campus.tbl_zeitaufzeichnung 
-					   WHERE tbl_organisationseinheit.oe_kurzbz IN (tbl_zeitaufzeichnung.oe_kurzbz_1,tbl_zeitaufzeichnung.oe_kurzbz_2) AND tbl_zeitaufzeichnung.uid=".$this->db_add_param($user)." 
-					   $zeit) > $anzahl_ereignisse
-					GROUP BY tbl_organisationseinheit.oe_kurzbz, tbl_organisationseinheit.oe_parent_kurzbz, tbl_organisationseinheit.bezeichnung, tbl_organisationseinheit.organisationseinheittyp_kurzbz, tbl_organisationseinheit.aktiv, tbl_organisationseinheit.lehre, anzahl
-					
-					UNION
-					
-					SELECT
-					tbl_organisationseinheit.oe_kurzbz,
-					tbl_organisationseinheit.oe_parent_kurzbz,
-					tbl_organisationseinheit.bezeichnung,
-					tbl_organisationseinheit.organisationseinheittyp_kurzbz,
-					tbl_organisationseinheit.aktiv,		
-					tbl_organisationseinheit.lehre,	
-					'0' AS anzahl
-					FROM public.tbl_organisationseinheit";
+				count(tbl_zeitaufzeichnung.zeitaufzeichnung_id)
+				FROM campus.tbl_zeitaufzeichnung
+				JOIN public.tbl_organisationseinheit ON(oe_kurzbz IN (oe_kurzbz_1,oe_kurzbz_2))
+				WHERE tbl_zeitaufzeichnung.uid=".$this->db_add_param($user)."
+				$zeit
+				GROUP BY tbl_organisationseinheit.oe_kurzbz HAVING COUNT(*) > $anzahl_ereignisse
+				
+				UNION
+				
+				SELECT 
+				oe_kurzbz,
+				oe_parent_kurzbz,
+				bezeichnung,
+				organisationseinheittyp_kurzbz,
+				aktiv,
+				lehre,
+				'0'
+				FROM public.tbl_organisationseinheit";
 
 		if(!is_null($aktiv))
 			$qry.=" WHERE aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
 
-		$qry .=" ) AS a
-				GROUP BY oe_kurzbz,oe_parent_kurzbz,bezeichnung,organisationseinheittyp_kurzbz,aktiv,lehre
-				ORDER BY anzahl DESC, bezeichnung";
+		$qry .=" ORDER BY count DESC,bezeichnung,oe_kurzbz";
 
 	    if($this->db_query($qry))
 	    {
@@ -681,7 +668,7 @@ class organisationseinheit extends basis_db
 				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 				$obj->lehre = $this->db_parse_bool($row->lehre);
-				$obj->anzahl = $row->anzahl;
+				$obj->anzahl = $row->count;
 
 				$this->result[] = $obj;
 			}

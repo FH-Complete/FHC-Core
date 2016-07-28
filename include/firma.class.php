@@ -464,13 +464,13 @@ class firma extends basis_db
 	 */
 	public function getFirmen($firmentyp_kurzbz='', $aktiv=null)
 	{
-		$qry = "SElECT * FROM public.tbl_firma";
+		$qry = "SELECT * FROM public.tbl_firma";
 
 		if($firmentyp_kurzbz!='')
 			$qry.=" WHERE firmentyp_kurzbz=".$this->db_add_param($firmentyp_kurzbz);
 
 		if(!is_null($aktiv))
-		        $qry.=" AND aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
+			$qry.=" AND aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
 
 		$qry.=" ORDER BY name;";
 

@@ -31,7 +31,7 @@
 
 	if (!$db = new basis_db())
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-	
+
 	$user = get_uid();
 	$reloadstr = "";  // neuladen der liste im oberen frame
 	$errorstr='';
@@ -44,7 +44,7 @@
 	$lehrform_arr = array();
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-	
+
 	if(!$rechte->isBerechtigt('lehre/lehrveranstaltung:begrenzt',null,'s'))
 		die('Sie haben keine Berechtigung fuer diese Seite');
 
@@ -52,7 +52,7 @@
 	{
 		if(!$rechte->isBerechtigt('lehre/lehrveranstaltung',null,'sui') && !$rechte->isBerechtigt('lehre/lehrveranstaltungAnlegen',null,'sui'))
 			die('Sie haben keine Berechtigung fuer diese Aktion');
-		
+
 		$lv = new lehrveranstaltung();
 
 		if(isset($_POST["schick_neu"]))
@@ -67,7 +67,7 @@
 			{
 				$lv->new=false;
 			}
-			else 
+			else
 			{
 				die('Fehler beim Laden der Lehrveranstaltung');
 			}
@@ -116,7 +116,10 @@
 		$lv->alvs = $_POST['alvs'];
 		$lv->lvps = $_POST['lvps'];
 		$lv->las = $_POST['las'];
-		
+		$lv->benotung = isset($_POST['benotung']);
+		$lv->lvinfo = isset($_POST['lvinfo']);
+		$lv->lehrauftrag = isset($_POST['lehrauftrag']);
+
 		if(!$lv->save())
 			$errorstr = "Fehler beim Speichern der Daten: $lv->errormsg";
 		else
@@ -176,7 +179,7 @@
 		if(!isset($_POST['schick']) && !isset($_POST["schick_neu"]))
 		{
 			$lv = new lehrveranstaltung();
-	
+
 			if (isset($_REQUEST['lv_id']))
 			{
 				$lvid = $_REQUEST['lv_id'];
@@ -231,7 +234,7 @@
 				$sel = '';
 			$htmlstr .= '<option value="'.$stg_key.'" '.$sel.'>'.$stg_kurzbz.'</option>';
 		}
-	
+
 		$htmlstr .= '</select></td>
 			<td>Semester</td>
 			<td><select name="semester">';
@@ -244,7 +247,7 @@
 				$sel = '';
 			$htmlstr .= '<option value="'.$i.'" '.$sel.'>'.$i.'</option>';
 		}
-	
+
 		$htmlstr .= '</select></td>
 			<td>Lehrform*</td>
 			<td><select name="lehrform"><option value="">-- keine Auswahl --</option>';
@@ -266,7 +269,7 @@
 			<td><input type="text" name="semesterstunden" value="'.$lv->semesterstunden.'" maxlength="3"></td>
 			<td>Lehrtyp*</td>
 			<td><select name="lehrtyp_kurzbz"><option value="">-- keine Auswahl --</option>';
-	
+
 		$lehrtyp_arr=new lehrtyp();
 		$lehrtyp_arr->getAll();
 		foreach ($lehrtyp_arr->result as $lehrtyp)
@@ -313,7 +316,7 @@
 			<td>Organisationsform</td>
 			<td>
 			<SELECT name="orgform_kurzbz" '.($lv->lehrveranstaltung_id==''?'onchange="copyToLehreVz();"':'onchange="return copyToLehreVzAsk();"').'><OPTION value="">-- keine Auswahl --</OPTION>';
-	
+
 		$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
 		if($result_orgform = $db->db_query($qry_orgform))
 		{
@@ -321,9 +324,9 @@
 			{
 				if($row_orgform->orgform_kurzbz==$lv->orgform_kurzbz)
 					$selected='selected';
-				else 
+				else
 					$selected='';
-				
+
 				$htmlstr .= '<OPTION value="'.$row_orgform->orgform_kurzbz.'" '.$selected.'>'.$row_orgform->bezeichnung.'</OPTION>';
 			}
 		}
@@ -335,7 +338,7 @@
 			<td><input type="text" name="lvnr" value="'.$lv->lvnr.'" /></td>
 			<td>Organisationseinheit</td>
 			<td colspan="3"><SELECT name="oe_kurzbz" ><option value="">--keine Auswahl --</option>';
-	
+
 		$qry = "SELECT * FROM public.tbl_organisationseinheit ORDER BY organisationseinheittyp_kurzbz, oe_kurzbz";
 		if($result = $db->db_query($qry))
 		{
@@ -343,14 +346,14 @@
 			{
 				if($row->oe_kurzbz==$lv->oe_kurzbz)
 					$selected='selected';
-				else 
+				else
 					$selected='';
-				
+
 				if($row->aktiv=='f')
 				{
 					$htmlstr .= '<option value="'.$row->oe_kurzbz.'" '.$selected.' style="color: red;">'.$row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung.'</option>';
 				}
-				else 
+				else
 				{
 					$htmlstr .= '<option value="'.$row->oe_kurzbz.'" '.$selected.'>'.$row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung.'</option>';
 				}
@@ -369,7 +372,7 @@
 			{
 				if($row->raumtyp_kurzbz==$lv->raumtyp_kurzbz)
 					$selected='selected';
-				else 
+				else
 					$selected='';
 				$htmlstr .= '<option value="'.$row->raumtyp_kurzbz.'" '.$selected.'>'.$row->raumtyp_kurzbz.'</option>';
 			}
@@ -403,19 +406,27 @@
 			<td></td>
 		</tr>
 		<tr>
+			<td>Benotung</td>
+			<td><input type="checkbox" name="benotung" '.($lv->benotung?'checked':'').'></td>
+			<td>LVInfo</td>
+			<td><input type="checkbox" name="lvinfo" '.($lv->lvinfo?'checked':'').'></td>
+			<td>Lehrauftrag</td>
+			<td><input type="checkbox" name="lehrauftrag" '.($lv->lehrauftrag?'checked':'').'></td>
+		</tr>
+		<tr>
 			<td></td>
 			<td></td>
 			<td></td>
 			<td></td>';
 			if ($lv->lehrveranstaltung_id=='')
-				$htmlstr .= '<td colspan="2" align="right"><input type="submit" value="Speichern" name="schick" style="cursor: pointer;"></td>';								
-			else 
-				$htmlstr .= '<td colspan="2" align="right"><input type="submit" value="Als neue LV speichern" name="schick_neu" style="font-size: smaller; cursor: pointer;">&nbsp;&nbsp;<input type="submit" value="Speichern" name="schick" style="cursor: pointer;"></td>';	
+				$htmlstr .= '<td colspan="2" align="right"><input type="submit" value="Speichern" name="schick" style="cursor: pointer;"></td>';
+			else
+				$htmlstr .= '<td colspan="2" align="right"><input type="submit" value="Als neue LV speichern" name="schick_neu" style="font-size: smaller; cursor: pointer;">&nbsp;&nbsp;<input type="submit" value="Speichern" name="schick" style="cursor: pointer;"></td>';
 		$htmlstr .= '<td></td>
 		</tr>
 		</table>
 		</form>';
-		
+
 
 		// Details
 			$htmlstr.='<span style="font-size:small">';
@@ -423,9 +434,9 @@
 			<b>Anlage</b>: '.$lv->insertamum.' '.$lv->insertvon.' <b>/ Letzte Aenderung:</b> '.$lv->updateamum.' '.$lv->updatevon.'<br>
 			<b>Lehraufträge zu dieser LV</b>: ';
 			$qry ="SELECT distinct studiensemester_kurzbz, tbl_studiensemester.start
-					FROM 
+					FROM
 						lehre.tbl_lehreinheit
-						JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
+						JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
 					WHERE lehrveranstaltung_id=".$db->db_add_param($lv->lehrveranstaltung_id).'
 					ORDER BY tbl_studiensemester.start desc';
 			if($result = $db->db_query($qry))
@@ -437,9 +448,9 @@
 			}
 			$htmlstr.='<br><b>Noten zu dieser LV</b>: ';
 			$qry ="SELECT distinct studiensemester_kurzbz, tbl_studiensemester.start
-					FROM 
+					FROM
 						lehre.tbl_zeugnisnote
-						JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
+						JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
 					WHERE lehrveranstaltung_id=".$db->db_add_param($lv->lehrveranstaltung_id).'
 					ORDER BY tbl_studiensemester.start desc';
 			if($result = $db->db_query($qry))
@@ -452,9 +463,9 @@
 
 			$htmlstr.='<br><b>Verwendung als Lehrfach</b>: ';
 			$qry ="SELECT distinct studiensemester_kurzbz, tbl_studiensemester.start
-					FROM 
+					FROM
 						lehre.tbl_lehreinheit
-						JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
+						JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
 					WHERE lehrfach_id=".$db->db_add_param($lv->lehrveranstaltung_id).'
 					ORDER BY tbl_studiensemester.start desc';
 			if($result = $db->db_query($qry))
@@ -544,7 +555,7 @@
 			{
 			    $("form").submit(function(e){
 					$(".missingFormData").each(function(i,v){
-					   $(v).removeClass("missingFormData"); 
+					   $(v).removeClass("missingFormData");
 					});
 					var self = this;
 					//e.preventDefault();
@@ -585,13 +596,13 @@
 
 			$("#farbe").ColorPicker(
 				{
-					onSubmit: function(hsb, hex, rgb, el) 
+					onSubmit: function(hsb, hex, rgb, el)
 					{
 						$(el).val(hex);
 						$(el).ColorPickerHide();
 						document.getElementById("farbevorschau").style.backgroundColor=hex;
 					},
-					onBeforeShow: function () 
+					onBeforeShow: function ()
 					{
 						$(this).ColorPickerSetColor(this.value);
 					}
