@@ -24,6 +24,7 @@ class Migration_Reihungstest extends MigrationLib
 		
 		// Add arbeitsplaetze to public.tbl_ort
 		$columns = array(
+				"arbeitsplaetze" => array("type" => "integer", "null" => true)
 		);
 		$this->addColumn("public", "tbl_ort", $columns);
 
@@ -135,6 +136,7 @@ class Migration_Reihungstest extends MigrationLib
 			),
 			"uid" => array(
 				"type" => "varchar(32)",
+				"null" => true
 			)
 		);
 		$this->createTable("public", "tbl_rt_ort", $fields);
