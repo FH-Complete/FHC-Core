@@ -256,6 +256,7 @@ class dokument_export
 			case 'pdf':
 				$this->temp_filename='out.pdf';
 				exec("unoconv -e IsSkipEmptyPages=false --stdout -f pdf $tempname_zip > ".$this->temp_filename, $out, $ret);
+
 				if($ret!=0)
 				{
 					$this->errormsg = 'Dokumentenkonvertierung ist derzeit nicht möglich. Bitte informieren Sie den Administrator';
@@ -341,8 +342,9 @@ class dokument_export
 		if($this->styles_xsl!='')
 			unlink('styles.xml');
 
-		unlink('out.zip');
 		unlink($this->temp_filename);
+		if(file_exists("out.zip"))
+			unlink('out.zip');
 
 		if(count($this->images)>0)
 		{
