@@ -63,27 +63,6 @@ class Prestudent extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
-	/**
-	 * @return void
-	 */
-	public function getLastStatus()
-	{
-		$prestudent_id = $this->get('prestudent_id');
-		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
-		$status_kurzbz = $this->get('status_kurzbz');
-		
-		if (isset($prestudent_id))
-		{
-			$result = $this->PrestudentModel->getLastStatus($prestudent_id, $studiensemester_kurzbz, $status_kurzbz);
-			
-			$this->response($result, REST_Controller::HTTP_OK);
-		}
-		else
-		{
-			$this->response();
-		}
-	}
 
 	/**
 	 * @return void

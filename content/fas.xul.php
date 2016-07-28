@@ -120,6 +120,7 @@ foreach($addon_obj->result as $addon)
   <command id="menu-statistic-studentendetails:command" oncommand="StatistikPrintStudentExportExtended();"/>
   <command id="menu-statistic-lektorenstatistik:command" oncommand="StatistikPrintLektorenstatistik();"/>
   <command id="menu-statistic-stromanalyse:command" oncommand="StatistikPrintStromanalyse();"/>
+  <command id="menu-dokumente-bewerberakt:command" oncommand="StudentPrintBewerberakt(event);"/>
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung(event);"/>
   <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis('Zeugnis',event);"/>
   <command id="menu-dokumente-zeugniseng:command" oncommand="StudentCreateZeugnis('ZeugnisEng',event);"/>
@@ -475,6 +476,12 @@ foreach($addon_obj->result as $addon)
     <!-- ********** DOKUMENTE ********** -->
     <menu id="menu-dokumente" label="&menu-dokumente.label;" accesskey="&menu-dokumente.accesskey;">
           <menupopup id="menu-dokumente-popup">
+          <menuitem
+               id        =  "menu-dokumente-bewerberakt"
+               key       =  "menu-dokumente-bewerberakt:key"
+               label     = "&menu-dokumente-bewerberakt.label;"
+               command   =  "menu-dokumente-bewerberakt:command"
+               accesskey = "&menu-dokumente-bewerberakt.accesskey;"/>
           <menuitem
                id        =  "menu-dokumente-accountinfoblatt"
                key       =  "menu-dokumente-accountinfoblatt:key"

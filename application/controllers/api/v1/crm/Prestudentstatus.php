@@ -24,8 +24,6 @@ class Prestudentstatus extends APIv1_Controller
 		parent::__construct();
 		// Load model PrestudentstatusModel
 		$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
-		
-		
 	}
 
 	/**
@@ -41,6 +39,27 @@ class Prestudentstatus extends APIv1_Controller
 		if (isset($ausbildungssemester) && isset($studiensemester_kurzbz) && isset($status_kurzbz) && isset($prestudent_id))
 		{
 			$result = $this->PrestudentstatusModel->load(array($ausbildungssemester, $studiensemester_kurzbz, $status_kurzbz, $prestudent_id));
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	/**
+	 * @return void
+	 */
+	public function getLastStatus()
+	{
+		$prestudent_id = $this->get("prestudent_id");
+		$studiensemester_kurzbz = $this->get("studiensemester_kurzbz");
+		$status_kurzbz = $this->get("status_kurzbz");
+		
+		if (isset($prestudent_id))
+		{
+			$result = $this->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz, $status_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

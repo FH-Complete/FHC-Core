@@ -8,11 +8,16 @@ if (! defined("BASEPATH")) exit("No direct script access allowed");
 class MigrationLib extends CI_Migration
 {
 	// Prefixes and separator for messages
-	private $MSG_PREFIX = "[-]";
-	private $INFO_PREFIX = "[I]";
-	private $ERROR_PREFIX = "[E]";
-	private $SEPARATOR = "------------------------------";
+	const MSG_PREFIX = "[-]";
+	const INFO_PREFIX = "[I]";
+	const ERROR_PREFIX = "[E]";
+	const SEPARATOR = "------------------------------";
+	// Console colors codes
+	const ERROR_COLOR = 31;
+	const INFO_COLOR = 33;
 	
+	// HTML colors names
+	private $HTML_COLORS = array(31 => "red", 33 => "orange");
 	// Used to set if the migration process is called via command line or via browser
 	private $cli;
 	
@@ -59,11 +64,41 @@ class MigrationLib extends CI_Migration
 	}
 	
 	/**
+	 * Returns the string needed to color the output
+	 */
+	private function getColored($color)
+	{
+		$colored = "%s";
+		
+		if (!is_null($color))
+		{
+			if ($this->cli === true)
+			{
+				$colored = "\033[" . $color . "m%s\033[37m";
+			}
+			else
+			{
+				$colored = "<font color=\"" . $this->HTML_COLORS[$color] . "\">%s</font>";
+			}
+		}
+		
+		return $colored;
+	}
+	
+	/**
+	 * Print a message, even colored if specified
+	 */
+	private function _print($prefix, $text, $color = null)
+	{
+		printf($this->getColored($color), sprintf("%s %s" . $this->getEOL(), $prefix, $text));
+	}
+	
+	/**
 	 * Prints a formatted message
 	 */
 	private function printMessage($message)
 	{
-		printf("%s %s" . $this->getEOL(), $this->MSG_PREFIX, $message);
+		$this->_print(MigrationLib::MSG_PREFIX, $message);
 	}
 	
 	/**
@@ -71,7 +106,7 @@ class MigrationLib extends CI_Migration
 	 */
 	private function printInfo($info)
 	{
-		printf("%s %s" . $this->getEOL(), $this->INFO_PREFIX, $info);
+		$this->_print(MigrationLib::INFO_PREFIX, $info, MigrationLib::INFO_COLOR);
 	}
 	
 	/**
@@ -79,7 +114,7 @@ class MigrationLib extends CI_Migration
 	 */
 	private function printError($error)
 	{
-		printf("%s %s" . $this->getEOL(), $this->ERROR_PREFIX, $error);
+		$this->_print(MigrationLib::ERROR_PREFIX, $error, MigrationLib::ERROR_COLOR);
 	}
 	
 	/**
@@ -102,7 +137,9 @@ class MigrationLib extends CI_Migration
 	 */
 	protected function startUP()
 	{
-		$this->printInfo(sprintf("%s Start method up of class %s %s", $this->SEPARATOR, get_called_class(), $this->SEPARATOR));
+		$this->printInfo(sprintf("%s Start method up of class %s %s",
+			MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
+		);
 	}
 	
 	/**
@@ -110,7 +147,9 @@ class MigrationLib extends CI_Migration
 	 */
 	protected function endUP()
 	{
-		$this->printInfo(sprintf("%s End method up of class %s %s", $this->SEPARATOR, get_called_class(), $this->SEPARATOR));
+		$this->printInfo(sprintf("%s End method up of class %s %s",
+			MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
+		);
 	}
 	
 	/**
@@ -118,7 +157,9 @@ class MigrationLib extends CI_Migration
 	 */
 	protected function startDown()
 	{
-		$this->printInfo(sprintf("%s Start method down of class %s %s", $this->SEPARATOR, get_called_class(), $this->SEPARATOR));
+		$this->printInfo(sprintf("%s Start method down of class %s %s",
+			MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
+		);
 	}
 	
 	/**
@@ -126,7 +167,9 @@ class MigrationLib extends CI_Migration
 	 */
 	protected function endDown()
 	{
-		$this->printInfo(sprintf("%s End method down of class %s %s", $this->SEPARATOR, get_called_class(), $this->SEPARATOR));
+		$this->printInfo(sprintf("%s End method down of class %s %s",
+			MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
+		);
 	}
 	
 	/**
@@ -476,7 +519,6 @@ class MigrationLib extends CI_Migration
 			));
 		}
 	}
-	
 	
 	/**
 	 * Executes the given query
