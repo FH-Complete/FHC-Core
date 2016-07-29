@@ -518,6 +518,45 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Liefert die Personen, die einem Ort des Reihungstests zugeteilt sind
+	 * @param integer $rt_id ID des Reihungstests
+	 * @param string $ort_kurzbz Ort des Reihungstests mit der ID $rt_id
+	 * @return true wenn ok, sonst false
+	 */
+	public function getPersonReihungstestOrt($rt_id, $ort_kurzbz)
+	{
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_rt_person
+				WHERE
+					tbl_rt_person.rt_id=".$this->db_add_param($rt_id)."
+					AND tbl_rt_person.ort_kurzbz=".$this->db_add_param($ort_kurzbz);
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+
+				$obj->rt_id = $row->rt_id;
+				$obj->person_id = $row->person_id;
+				$obj->anmeldedatum = $row->anmeldedatum;
+				$obj->teilgenommen = $this->db_parse_bool($row->teilgenommen);
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->punkte = $row->punkte;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 
 	public function savePersonReihungstest()
 	{
@@ -573,21 +612,7 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	/**
 	 * Liefert die Orte, die einem Reihungstest zugeordnet sind
 	 * @param integer $reihungstest_id ID des Reihungstests, dessen Ort zurueckgegeben werden sollen
@@ -623,42 +648,7 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
-	/*
-	public function getPersonReihungstest($person_id, $rt_id)
-	{
-		$qry = "SELECT
-					*
-				FROM
-					public.tbl_rt_person
-				WHERE
-					tbl_rt_person.person_id=".$this->db_add_param($person_id)."
-					AND rt_id=".$this->db_add_param($rt_id);
-		if($result = $this->db_query($qry))
-		{
-			if($row = $this->db_fetch_object($result))
-			{
-	
-				$this->rt_id = $row->rt_id;
-				$this->person_id = $row->person_id;
-				$this->anmeldedatum = $row->anmeldedatum;
-				$this->teilgenommen = $this->db_parse_bool($row->teilgenommen);
-				$this->ort_kurzbz = $row->ort_kurzbz;
-				$this->punkte = $row->punkte;
-				return true;
-			}
-			else
-			{
-				$this->errormsg = 'Eintrag nicht gefunden';
-				return false;
-			}
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Laden der Daten';
-			return false;
-		}
-	}*/
-	
+
 	/**
 	 * Speichert eine Raumzuteilung zu einem Reihungstesttermin
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
