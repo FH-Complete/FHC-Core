@@ -111,7 +111,7 @@ class PhrasesLib
      *
      * @return  struct
      */
-    function getPhrases($app, $sprache, $phrase = null, $orgeinheit_kurzbz = null, $orgform_kurzbz = null)
+    function getPhrases($app, $sprache, $phrase = null, $orgeinheit_kurzbz = null, $orgform_kurzbz = null, $blockTags = null)
     {
 		if (isset($app) && isset($sprache))
 		{
@@ -123,7 +123,19 @@ class PhrasesLib
 				
 				for ($i = 0; $i < count($result->retval); $i++)
 				{
-					$result->retval[$i]->text = $parser->textileThis($result->retval[$i]->text);
+					// If no <p> tags required
+					if ($blockTags == "no")
+					{
+						// Removes tags <p> and </p> from the beginning and from the end of the string
+						$tmpText = $parser->textileThis($result->retval[$i]->text);
+						$tmpText = substr($tmpText, 3, strlen($tmpText));
+						$tmpText = substr($tmpText, 0, strlen($tmpText) - 4);
+						$result->retval[$i]->text = $tmpText;
+					}
+					else
+					{
+						$result->retval[$i]->text = $parser->textileThis($result->retval[$i]->text);
+					}
 				}
 			}
 		}
