@@ -34,6 +34,7 @@ class dokument_export
 	private $temp_filename;
 	private $temp_folder;
 	private $images=array();
+	public $errormsg;
 
 	/**
 	 * Konstruktor
