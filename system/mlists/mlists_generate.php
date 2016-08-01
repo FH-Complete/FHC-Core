@@ -419,10 +419,10 @@ $error_msg='';
 		tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND
 		(studiensemester_kurzbz='$studiensemester' OR
 		 studiensemester_kurzbz='$stsem2') AND
-		mitarbeiter_uid NOT LIKE '\\_%' AND tbl_studiengang.studiengang_kz!=0 AND
+		mitarbeiter_uid NOT LIKE '\\\\_%' AND tbl_studiengang.studiengang_kz!=0 AND
 		(mitarbeiter_uid,UPPER(typ::varchar(1) || tbl_studiengang.kurzbz || '_lkt')) NOT IN
 		(SELECT uid, UPPER(gruppe_kurzbz) FROM public.tbl_benutzergruppe
-			WHERE gruppe_kurzbz LIKE '%\\_LKT' AND UPPER(gruppe_kurzbz)!=UPPER('tw_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_fix_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_ext_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('moodle_lkt'))";
+			WHERE gruppe_kurzbz LIKE '%\\\\_LKT' AND UPPER(gruppe_kurzbz)!=UPPER('tw_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_fix_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_ext_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('moodle_lkt'))";
 	//echo $sql_query;
 	if(!($result=$db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error().$sql_query;
