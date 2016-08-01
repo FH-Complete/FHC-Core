@@ -1286,6 +1286,10 @@ else
 					echo '&nbsp;<button type="submit" name="speichern"><img src="../../skin/images/list-add.png" alt="Ort hinzufügen" height="13px"></button>';
 					echo '</td></tr>';
 				}
+				else 
+				{
+					echo '<tr><td colspan="2">Keine Berechtigung zum zuteilen von Räumen</td></tr>';
+				}
 				foreach ($orte->result AS $row)
 				{
 					//echo '<tr><td>&nbsp;</td><td>';
