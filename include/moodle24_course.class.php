@@ -734,6 +734,15 @@ class moodle24_course extends basis_db
 		$data = array($mdl_course_id);
 
 		$response = $client->core_course_delete_courses(array($mdl_course_id));
+
+		if(is_object($response))
+		{
+			$response_obj = $response;
+			unset($response);
+			if(isset($response_obj->warnings) && isset($response_obj->warnings->message))
+				$response[0] = $response_obj->warnings->message;
+		}
+
 		if(isset($response[0]))
 		{
             $this->errormsg = $response[0];
