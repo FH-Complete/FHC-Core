@@ -104,6 +104,12 @@ foreach($prestudent_ids as $pid)
 			$dms->load($row->dms_id);
 
 			$filename = DMS_PATH . $dms->filename;
+
+			if(!file_exists($filename))
+			{
+				$errors[] = "'" . $filename . "': Datei nicht gefunden";
+				continue;
+			}
 		}
 
 		// this should never happen
