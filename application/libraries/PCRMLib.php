@@ -20,8 +20,7 @@ class PCRMLib
 		"PCRMLib", // disabled self loading
 		"LogLib", // hardly usefull and virtually dangerous
 		"MigrationLib", // virtually dangerous, DB manipulation
-		"FilesystemLib", // virtually dangerous, direct access to file system
-		"REST_Controller" // recursion issues (?)
+		"FilesystemLib" // virtually dangerous, direct access to file system
 	);
 	
 	/**
@@ -323,8 +322,9 @@ class PCRMLib
 		{
 			// Get informations about the function
 			$reflectionMethod = new ReflectionMethod($resourceName, $function);
-			// If the number of given parameters is equal to the number of parameters required by the function
-			if ($reflectionMethod->getNumberOfRequiredParameters() == count($parameters))
+			// If the number of given parameters is greater or equal to the number of
+			// parameters required by the function
+			if (count($parameters) >= $reflectionMethod->getNumberOfRequiredParameters())
 			{
 				// If the function is static
 				if ($reflectionMethod->isStatic() === true)
@@ -345,6 +345,8 @@ class PCRMLib
 					// @ was applied to prevent really ugly and unmanageable errors
 					$resultCall = @call_user_func_array($classMethod, $parameters);
 					// If errors occurred while running it
+					// NOTE: if the called function via call_user_func_array returns a boolean set as false,
+					// it will be recognized like a running error. A little bit tricky ;)
 					if ($resultCall === false)
 					{
 						$result = $this->_error("Error running " . $resourceName . "->" . $function . "()");
@@ -362,7 +364,10 @@ class PCRMLib
 			}
 			else
 			{
-				$result = $this->_error("Wrong parameters number!");
+				$result = $this->_error(
+					"Number of required parameters: " . $reflectionMethod->getNumberOfRequiredParameters() .
+					". Given: " . count($parameters)
+				);
 			}
 		}
 		catch (Exception $e)
