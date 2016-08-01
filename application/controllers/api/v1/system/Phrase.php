@@ -54,10 +54,11 @@ class Phrase extends APIv1_Controller
 		$phrase = $this->get('phrase');
 		$orgeinheit_kurzbz = $this->get('orgeinheit_kurzbz');
 		$orgform_kurzbz = $this->get('orgform_kurzbz');
+		$blockTags = $this->get('blockTags');
 		
 		if (isset($app) && isset($sprache))
 		{
-			$result = $this->phraseslib->getPhrases($app, $sprache, $phrase, $orgeinheit_kurzbz, $orgform_kurzbz);
+			$result = $this->phraseslib->getPhrases($app, $sprache, $phrase, $orgeinheit_kurzbz, $orgform_kurzbz, $blockTags);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

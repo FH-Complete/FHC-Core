@@ -44,7 +44,7 @@ class Pdf
 			}
 			if(finfo_file($finfo, $f) != "application/pdf")
 			{
-				$this->errormsg = "Wrong format: '$f'";
+				$this->errormsg = "Wrong format(".finfo_file($finfo, $f)."): '$f'";
 				return false;
 			}
 		}

@@ -68,22 +68,6 @@ foreach($prestudent_ids as $pid)
 	if(!$prestudent->load($pid))
 		cleanUpAndDie($p->t('tools/studentWurdeNichtGefunden')."(".$pid.")", $tmpDir);
 
-	/*
-	 * Deckblatt
-	 */
-	$filename = $tmpDir . "/".uniqid();
-	$doc = new dokument_export('Bewerberakt');
-	$doc->addDataArray(array('vorname' => $prestudent->vorname, 'nachname' => $prestudent->nachname),'bewerberakt');
-
-	if(!$doc->create('pdf'))
-		die($doc->errormsg);
-//	$doc->temp_filename = $filename;
-	$document = $doc->output(false);
-	$filename = $tmpDir.'/'.uniqid();
-	file_put_contents($filename, $document);
-	$doc->close();
-	$allDocs[] = $filename;
-
 
 	/*
 	 * Get all Documents
@@ -100,30 +84,28 @@ foreach($prestudent_ids as $pid)
 			AND prestudent_id='.$db->db_add_param($pid, FHC_INTEGER).';
 	';
 
+	$preDocs = array();
 	$result = $db->db_query($query);
 	while($row = $db->db_fetch_object($result))
 	{
-
-
 		$filename = "";
-		if($row->dms_id != null)
+		if($row->inhalt != null)
+		{
+			$filename = $tmpDir . "/".uniqid();
+			$fileData = base64_decode($row->inhalt);
+			file_put_contents($filename, $fileData);
+		}
+		else if($row->dms_id != null)
 		{
 			$dms = new dms();
 			$dms->load($row->dms_id);
 
 			$filename = DMS_PATH . $dms->filename;
 		}
-		else if($row->inhalt != null)
-		{
-			$filename = $tmpDir . "/".uniqid();
-			$fileData = base64_decode($row->inhalt);
-			file_put_contents($filename, $fileData);
-		}
 
 
 		if($filename == "")
 			continue;
-
 
 		/*
 		 * Determine the filetype
@@ -146,18 +128,31 @@ foreach($prestudent_ids as $pid)
 		{
 			$fullFilename = $row->titel;
 		}
-		else
-			cleanUpAndDie("falscher typ TODO", $tmpDir);
 
 		// only filled, if the file is supported
 		if($fullFilename != "")
 		{
-			$allDocs[] = $fullFilename;
+			$preDocs[] = $fullFilename;
 		}
-
 	}
-}
 
+	/*
+	 * Deckblatt
+	 */
+	$filename = $tmpDir . "/".uniqid();
+	$doc = new dokument_export($_GET["vorlage_kurzbz"]);
+	$doc->addDataArray(array('vorname' => $prestudent->vorname, 'nachname' => $prestudent->nachname),"bewerberakt");
+
+	if(!$doc->create('pdf'))
+		die($doc->errormsg);
+
+	$filename = $tmpDir.'/'.uniqid();
+	file_put_contents($filename, $doc->output(false));
+	$doc->close();
+	$allDocs[] = $filename;
+	$allDocs = array_merge($allDocs, $preDocs);
+	unset($doc);
+}
 
 /*
  * generate the merged PDF
