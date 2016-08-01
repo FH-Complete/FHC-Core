@@ -25,6 +25,9 @@ define('CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN',false);
 define('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN', true);
 
+// Im CIS Menue Links bei Modulen anzeigen wenn Lehrauftrag
+define('CIS_LEHRVERANSTALTUNG_MODULE_LINK',true);
+
 // Legt fest, ob bei den LV-Infos der Block mit den Terminen zu den einzelnen LVs (laut Stundenplan) angezeigt werden soll
 define ('CIS_LVINFO_TERMINE_ANZEIGEN', false);
 
