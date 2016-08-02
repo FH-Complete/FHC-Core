@@ -304,7 +304,6 @@ function cleanUpAndDie($msg, $tmpDir)
 
 function removeFolder($dir)
 {
-return;
 	if($dir == "/")
 		return false;
 	if (is_dir($dir) === true)
