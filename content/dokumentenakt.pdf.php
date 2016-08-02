@@ -68,6 +68,7 @@ foreach($prestudent_ids as $pid)
 {
 	$preErrors = array();
 	$prestudent = new prestudent();
+	$dokumente = array();
 	if(!$prestudent->load($pid))
 	{
 		$preErrors[] = $p->t('tools/studentWurdeNichtGefunden')."(".$pid.")";
@@ -80,7 +81,7 @@ foreach($prestudent_ids as $pid)
 		 */
 		$query= '
 			SELECT
-				titel, dms_id, inhalt, mimetype
+				titel, dms_id, inhalt, mimetype, dokument_kurzbz, bezeichnung
 			FROM
 				public.tbl_dokumentstudiengang
 				JOIN public.tbl_prestudent USING(studiengang_kz)
@@ -174,7 +175,13 @@ foreach($prestudent_ids as $pid)
 				if($fullFilename != "")
 				{
 					if(file_exists($fullFilename))
+					{
 						$preDocs[] = $fullFilename;
+						if(isset($row->bezeichnung) && $row->bezeichnung && $row->bezeichnung != "")
+							$dokumente[] = array("name" => $row->bezeichnung);
+						else
+							$dokumente[] = array("name" => $row->dokument_kurzbz);
+					}
 					else
 					{
 						$addString = "";
@@ -196,7 +203,7 @@ foreach($prestudent_ids as $pid)
 		 */
 		$filename = $tmpDir . "/".uniqid();
 		$doc = new dokument_export($_GET["vorlage_kurzbz"]);
-		$doc->addDataArray(array('vorname' => $prestudent->vorname, 'nachname' => $prestudent->nachname),"dokumentenakt");
+		$doc->addDataArray(array('vorname' => $prestudent->vorname, 'nachname' => $prestudent->nachname, array('dokumente'=> $dokumente)),"dokumentenakt");
 
 		if(!$doc->create('pdf'))
 			die($doc->errormsg);
@@ -243,7 +250,9 @@ else
 {
 ?>
 	<html>
-	<head></head>
+		<head>
+			<link rel="stylesheet" href="../skin/vilesci.css" type="text/css">
+		</head>
 		<body>
 <?php
 	echo "<h1>Es sind folgende Fehler aufgetreten:</h1>";
@@ -262,6 +271,7 @@ else
 		}
 		echo "</ul>";
 	}
+	echo "<p>Fehlerhafte Dokumente können übersprungen werden:</p>";
 	echo "<form action='dokumentenakt.pdf.php' method='GET'>";
 	echo '<input type="hidden" name="prestudent_ids" value="'.$_GET["prestudent_ids"].'"/>';
 	echo '<input type="hidden" name="vorlage_kurzbz" value="'.$_GET["vorlage_kurzbz"].'"/>';
