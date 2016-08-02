@@ -101,8 +101,46 @@ if(copy($zipfile, $tempname_zip))
 			$cTmpHEX='/9j/4AAQSkZJRgABAQEASABIAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD//gAXQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q/9sAQwAFAwQEBAMFBAQEBQUFBgcMCAcHBwcPCwsJDBEPEhIRDxERExYcFxMUGhURERghGBodHR8fHxMXIiQiHiQcHh8e/9sAQwEFBQUHBgcOCAgOHhQRFB4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4e/8AAEQgAAQABAwEiAAIRAQMRAf/EABUAAQEAAAAAAAAAAAAAAAAAAAAI/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCywAf/2Q==';			
 			if($result = $db->db_query($qry))
 			{
-				if($row = $db->db_fetch_object($result))	
-					$cTmpHEX=$row->foto;
+				//Wenn kein Lichtbild in den Akten vorhanden ist, Foto aus tbl_person holen
+				if ($db->db_num_rows($result) == 0)
+				{
+					$qry_person = "SELECT foto FROM public.tbl_person WHERE person_id=".$db->db_add_param($bn->person_id, FHC_INTEGER);
+						
+					if($result_person = $db->db_query($qry_person))
+					{
+						if($row_person = $db->db_fetch_object($result_person))
+						{
+							//Wenn auch kein Foto in tbl_person gespeichert ist, mit der naechsten UID fortfahren
+							if($row_person->foto == '')
+								continue;
+							else
+								$cTmpHEX = $row_person->foto;
+						}
+					}
+				}
+				
+				if($row = $db->db_fetch_object($result))
+				{
+					//Wenn der Inhalt des Lichtbilds leer ist, Foto aus tbl_person holen
+					if ($row->foto =='')
+					{
+						$qry_person = "SELECT foto FROM public.tbl_person WHERE person_id=".$db->db_add_param($bn->person_id, FHC_INTEGER);
+							
+						if($result_person = $db->db_query($qry_person))
+						{
+							if($row_person = $db->db_fetch_object($result_person))
+							{
+								//Wenn auch kein Foto in tbl_person gespeichert ist, mit der naechsten UID fortfahren 
+								if($row_person->foto == '')
+									continue;
+								else 
+									$cTmpHEX = $row_person->foto;
+							}								
+						}
+					}
+					else
+						$cTmpHEX = $row->foto;
+				}
 			}
 
 			// Bild in den Temp Ordner zwischenspeichern
