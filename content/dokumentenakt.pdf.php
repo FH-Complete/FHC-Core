@@ -40,7 +40,7 @@ if(!isset($_GET["prestudent_ids"]) || !isset($_GET["vorlage_kurzbz"]))
 
 $prestudent_ids = explode(";", $_GET["prestudent_ids"]);
 
-if(count($prestudent_ids) < 1)
+if(empty($prestudent_ids))
 	die($p->t('anwesenheitsliste/fehlerhafteParameteruebergabe'));
 
 ( isset($_GET["force"]) ? $force = true : $force = false);
@@ -66,141 +66,153 @@ $docExp = new dokument_export();
 $allDocs = array();
 foreach($prestudent_ids as $pid)
 {
+	$preErrors = array();
 	$prestudent = new prestudent();
 	if(!$prestudent->load($pid))
-		$errors[] = $p->t('tools/studentWurdeNichtGefunden')."(".$pid.")";
-
-
-	/*
-	 * Get all Documents
-	 */
-	$query= '
-		SELECT
-			titel, dms_id, inhalt, mimetype
-		FROM
-			public.tbl_dokumentstudiengang
-			JOIN public.tbl_prestudent USING(studiengang_kz)
-			JOIN public.tbl_akte USING(person_id,dokument_kurzbz)
-		WHERE
-			onlinebewerbung
-			AND prestudent_id='.$db->db_add_param($pid, FHC_INTEGER).';
-	';
-
-	$preDocs = array();
-	$result = $db->db_query($query);
-	while($row = $db->db_fetch_object($result))
 	{
-		$convertSuccess = true;
-		$filename = "";
-		if($row->inhalt != null)
-		{
-			$filename = $tmpDir . "/".uniqid();
-			$fileData = base64_decode($row->inhalt);
-			file_put_contents($filename, $fileData);
-		}
-		else if($row->dms_id != null)
-		{
-			$dms = new dms();
-			$dms->load($row->dms_id);
-
-			$filename = DMS_PATH . $dms->filename;
-
-			if(!file_exists($filename))
-			{
-				$errors[] = "'" . $filename . "': Datei nicht gefunden";
-				continue;
-			}
-		}
-
-		// this should never happen
-		if($filename == "")
-			continue;
-
-		/*
-		 * Determine the filetype
-		 * and convert if nessecary
-		 */
-		 $fullFilename = "";
-		$explodedTitle = explode(".", $row->titel);
-		$type = $explodedTitle[count($explodedTitle)-1];
-
-		if(
-		   $type == "jpg"
-		|| $type == "jpeg"
-		|| $row->mimetype == "image/jpeg"
-		|| $row->mimetype == "image/jpg"
-		|| $row->mimetype == "image/pjpeg"
-	)
-		{
-			$fullFilename = $tmpDir . "/".uniqid() . ".pdf";
-			if(!$pdf->jpegToPdf($filename, $fullFilename))
-				cleanUpAndDie($pdf->errormsg, $tmpDir);
-		}
-		else if
-		(
-		   $type == "odt"
-		|| $type == "doc"
-		|| $type == "docx"
-		|| $row->mimetype == "application/vnd.oasis.opendocument.spreadsheet"
-		|| $row->mimetype == "application/msword"
-		|| $row->mimetype == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-		|| $row->mimetype == "application/haansoftdocx"
-		|| $row->mimetype == "application/vnd.ms-word"
-		|| $row->mimetype == "application/vnd.oasis.opendocument.text"
-		)
-		{
-			$fullFilename = $tmpDir . "/".uniqid() . ".pdf";
-
-			if(!$docExp->convert($filename, $fullFilename, "pdf"))
-			{
-				$convertSuccess = false;
-				$errors[] ="'$row->titel': Konvertierung fehlgeschlagen(".$row->mimetype.")";
-			}
-		}
-		else if(
-		   $type == "pdf"
-		|| $row->mimetype == "application/pdf"
-		)
-		{
-			$fullFilename = $filename;
-		}
-
-		// only filled, if the file is supported
-		if($fullFilename != "")
-		{
-			if(file_exists($fullFilename))
-				$preDocs[] = $fullFilename;
-			else
-			{
-				$addString = "";
-				if($row->dms_id)
-					$addString = "(DMS)";
-				else
-					$addString = "(DB)";
-				if($convertSuccess)
-					$errors[] = '"' . $row->titel . '":' . $addString . ' Dokument nicht gefunden';
-			}
-		}
-		else
-			$errors[] ="'$row->titel' hat einen nicht unterstützten mimetype: $row->mimetype";
+		$preErrors[] = $p->t('tools/studentWurdeNichtGefunden')."(".$pid.")";
 	}
 
-	/*
-	 * Deckblatt
-	 */
-	$filename = $tmpDir . "/".uniqid();
-	$doc = new dokument_export($_GET["vorlage_kurzbz"]);
-	$doc->addDataArray(array('vorname' => $prestudent->vorname, 'nachname' => $prestudent->nachname),"dokumentenakt");
+	if(empty($preErrors))
+	{
+		/*
+		 * Get all Documents
+		 */
+		$query= '
+			SELECT
+				titel, dms_id, inhalt, mimetype
+			FROM
+				public.tbl_dokumentstudiengang
+				JOIN public.tbl_prestudent USING(studiengang_kz)
+				JOIN public.tbl_akte USING(person_id,dokument_kurzbz)
+			WHERE
+				onlinebewerbung
+				AND prestudent_id='.$db->db_add_param($pid, FHC_INTEGER).';
+		';
 
-	if(!$doc->create('pdf'))
-		die($doc->errormsg);
+		$preDocs = array();
+		$result = $db->db_query($query);
+		while($row = $db->db_fetch_object($result))
+		{
+			$convertSuccess = true;
+			$filename = "";
+			if($row->inhalt != null)
+			{
+				$filename = $tmpDir . "/".uniqid();
+				$fileData = base64_decode($row->inhalt);
+				file_put_contents($filename, $fileData);
+			}
+			else if($row->dms_id != null)
+			{
+				$dms = new dms();
+				$dms->load($row->dms_id);
 
-	$filename = $tmpDir.'/'.uniqid();
-	file_put_contents($filename, $doc->output(false));
-	$doc->close();
-	$allDocs[] = $filename;
-	$allDocs = array_merge($allDocs, $preDocs);
-	unset($doc);
+				$filename = DMS_PATH . $dms->filename;
+
+				if(!file_exists($filename))
+				{
+					$preErrors[] = "'" . $filename . "': Datei nicht gefunden";
+				}
+			}
+
+			// this should never happen
+			if($filename == "")
+				$preErrors[] = "'" . $row->titel . "': Diese Datei hat keinen Inhalt und keine dms_id";
+
+			if(empty($preErrors))
+			{
+				/*
+				 * Determine the filetype
+				 * and convert if nessecary
+				 */
+				 $fullFilename = "";
+				$explodedTitle = explode(".", $row->titel);
+				$type = $explodedTitle[count($explodedTitle)-1];
+
+				if(
+					 $type == "jpg"
+				|| $type == "jpeg"
+				|| $row->mimetype == "image/jpeg"
+				|| $row->mimetype == "image/jpg"
+				|| $row->mimetype == "image/pjpeg"
+			)
+				{
+					$fullFilename = $tmpDir . "/".uniqid() . ".pdf";
+					if(!$pdf->jpegToPdf($filename, $fullFilename))
+						cleanUpAndDie($pdf->errormsg, $tmpDir);
+				}
+				else if
+				(
+					 $type == "odt"
+				|| $type == "doc"
+				|| $type == "docx"
+				|| $row->mimetype == "application/vnd.oasis.opendocument.spreadsheet"
+				|| $row->mimetype == "application/msword"
+				|| $row->mimetype == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+				|| $row->mimetype == "application/haansoftdocx"
+				|| $row->mimetype == "application/vnd.ms-word"
+				|| $row->mimetype == "application/vnd.oasis.opendocument.text"
+				)
+				{
+					$fullFilename = $tmpDir . "/".uniqid() . ".pdf";
+
+					if(!$docExp->convert($filename, $fullFilename, "pdf"))
+					{
+						$convertSuccess = false;
+						$preErrors[] ="'$row->titel': Konvertierung fehlgeschlagen(".$row->mimetype.")";
+					}
+				}
+				else if(
+					 $type == "pdf"
+				|| $row->mimetype == "application/pdf"
+				)
+				{
+					$fullFilename = $filename;
+				}
+
+				// only filled, if the file is supported
+				if($fullFilename != "")
+				{
+					if(file_exists($fullFilename))
+						$preDocs[] = $fullFilename;
+					else
+					{
+						$addString = "";
+						if($row->dms_id)
+							$addString = "(DMS)";
+						else
+							$addString = "(DB)";
+						if($convertSuccess)
+							$preErrors[] = '"' . $row->titel . '":' . $addString . ' Dokument nicht gefunden';
+					}
+				}
+				else
+					$preErrors[] ="'$row->titel' hat einen nicht unterstützten mimetype: $row->mimetype";
+			}
+		}
+
+		/*
+		 * Deckblatt
+		 */
+		$filename = $tmpDir . "/".uniqid();
+		$doc = new dokument_export($_GET["vorlage_kurzbz"]);
+		$doc->addDataArray(array('vorname' => $prestudent->vorname, 'nachname' => $prestudent->nachname),"dokumentenakt");
+
+		if(!$doc->create('pdf'))
+			die($doc->errormsg);
+
+		$filename = $tmpDir.'/'.uniqid();
+		file_put_contents($filename, $doc->output(false));
+		$doc->close();
+		$allDocs[] = $filename;
+		$allDocs = array_merge($allDocs, $preDocs);
+		unset($doc);
+	}
+
+	if(!empty($preErrors))
+	{
+		$errors[$pid] = $preErrors;
+	}
 }
 
 
@@ -235,9 +247,20 @@ else
 		<body>
 <?php
 	echo "<h1>Es sind folgende Fehler aufgetreten:</h1>";
-	foreach($errors as $e)
+
+	foreach($errors as $pid => $pre)
 	{
-		echo "<p>$e</p>";
+		$ps = new prestudent();
+		if(!$ps->load($pid))
+			echo "<h2>$pid</h2>";
+		else
+			echo "<h2>$ps->vorname $ps->nachname</h2>";
+		echo "<ul>";
+		foreach($pre as $pe)
+		{
+			echo "<li>$pe</li>";
+		}
+		echo "</ul>";
 	}
 	echo "<form action='dokumentenakt.pdf.php' method='GET'>";
 	echo '<input type="hidden" name="prestudent_ids" value="'.$_GET["prestudent_ids"].'"/>';
