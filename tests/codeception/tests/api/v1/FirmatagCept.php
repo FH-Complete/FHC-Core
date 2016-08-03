@@ -9,3 +9,4 @@ $I->sendGET("v1/ressource/Firmatag/Firmatag", array("tag" => "0", "firma_id" => 
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

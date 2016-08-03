@@ -9,3 +9,4 @@ $I->sendGET("v1/testtool/Frage/Frage", array("frage_id" => "0"));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

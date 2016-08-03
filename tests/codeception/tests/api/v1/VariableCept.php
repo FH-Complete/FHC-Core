@@ -9,3 +9,4 @@ $I->sendGET("v1/system/Variable/Variable", array("uid" => "0", "name" => "0"));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

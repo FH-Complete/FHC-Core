@@ -9,3 +9,4 @@ $I->sendGET("v1/codex/Entwicklungsteam/Entwicklungsteam", array("studiengang_kz"
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

@@ -9,3 +9,4 @@ $I->sendGET("TO_BE_REPLACED_NAME", array(TO_BE_REPLACED_PARAMETERS));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

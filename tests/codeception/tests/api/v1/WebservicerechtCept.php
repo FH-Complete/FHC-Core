@@ -9,3 +9,4 @@ $I->sendGET("v1/system/Webservicerecht/Webservicerecht", array("webservicerecht_
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

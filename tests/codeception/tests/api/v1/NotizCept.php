@@ -9,3 +9,4 @@ $I->sendGET("v1/person/Notiz/Notiz", array("notiz_id" => "0"));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

@@ -9,3 +9,4 @@ $I->sendGET("v1/crm/Akte/Akte", array("akte_id" => "0", "person_id" => "0", "dok
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

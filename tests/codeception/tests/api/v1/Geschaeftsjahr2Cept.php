@@ -9,3 +9,4 @@ $I->sendGET("v1/organisation/geschaeftsjahr/Geschaeftsjahr", array("geschaeftsja
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

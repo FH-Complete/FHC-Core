@@ -9,3 +9,4 @@ $I->sendGET("v1/education/Zeugnisnote/Zeugnisnote", array("studiensemester_kurzb
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

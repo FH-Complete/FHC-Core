@@ -9,3 +9,4 @@ $I->sendGET("v1/accounting/Buchungstyp/Buchungstyp", array("buchungstyp_kurzbz" 
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

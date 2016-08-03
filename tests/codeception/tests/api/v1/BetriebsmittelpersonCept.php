@@ -9,3 +9,4 @@ $I->sendGET("v1/ressource/betriebsmittelperson/Betriebsmittelperson", array("bet
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

@@ -9,3 +9,4 @@ $I->sendGET("v1/accounting/Kostenstelle/Kostenstelle", array("kostenstelle_id" =
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

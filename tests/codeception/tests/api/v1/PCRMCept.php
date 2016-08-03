@@ -11,6 +11,7 @@ $I->sendGET("v1/system/PCRM/Call", array(
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();
 
 $I->sendGET("v1/system/PCRM/Call", array(
 	"resource" => "PermissionLib", "function" => "hasPermission",
@@ -19,3 +20,4 @@ $I->sendGET("v1/system/PCRM/Call", array(
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();
