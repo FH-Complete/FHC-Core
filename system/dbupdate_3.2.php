@@ -1310,7 +1310,10 @@ if($result = $db->db_query("SELECT * FROM public.tbl_vorlage WHERE vorlage_kurzb
 			$qry = "INSERT INTO public.tbl_vorlage(vorlage_kurzbz, bezeichnung, anmerkung,mimetype)
 			VALUES('Bewerberakt','Bewerberakt Deckblatt', 'wird als Deckblatt fuer den Bewerberakt verwendet', 'application/vnd.oasis.opendocument.text');";
 
-			$text = file_get_contents('xsl/Bewerberakt.xsl');
+			$testQuery = "SELECT setval('seq_vorlagestudiengang_vorlagestudiengang_id', max(vorlagestudiengang_id)) FROM tbl_vorlagestudiengang;";
+			$testResult = $db->db_query($testQuery);
+			
+			$text = file_get_contents('./system/xsl/Bewerberakt.xsl');
 
 			while($row = $db->db_fetch_object($result))
 			{
