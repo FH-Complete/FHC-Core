@@ -81,14 +81,16 @@ foreach($prestudent_ids as $pid)
 		 */
 		$query= '
 			SELECT
-				titel, dms_id, inhalt, mimetype, dokument_kurzbz, bezeichnung
+				titel, dms_id, inhalt, mimetype, dokument_kurzbz, tbl_dokument.bezeichnung, sort
 			FROM
-				public.tbl_dokumentstudiengang
+				public.tbl_vorlagedokument
+				JOIN public.tbl_vorlagestudiengang USING(vorlagestudiengang_id)
+				JOIN public.tbl_dokument USING(dokument_kurzbz)
 				JOIN public.tbl_prestudent USING(studiengang_kz)
 				JOIN public.tbl_akte USING(person_id,dokument_kurzbz)
 			WHERE
-				onlinebewerbung
-				AND prestudent_id='.$db->db_add_param($pid, FHC_INTEGER).';
+				prestudent_id='.$db->db_add_param($pid, FHC_INTEGER).'
+			ORDER BY sort asc;
 		';
 
 		$preDocs = array();
