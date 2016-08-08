@@ -9,3 +9,4 @@ $I->sendGET("v1/ressource/Zeitaufzeichnung/Zeitaufzeichnung", array("zeitaufzeic
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

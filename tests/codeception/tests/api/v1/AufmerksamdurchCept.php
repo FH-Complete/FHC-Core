@@ -9,3 +9,4 @@ $I->sendGET("v1/codex/Aufmerksamdurch/Aufmerksamdurch", array("aufmerksamdurch_k
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

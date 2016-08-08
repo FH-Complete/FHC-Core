@@ -9,3 +9,4 @@ $I->sendGET("v1/organisation/Studienplatz/Studienplatz", array("studienplatz_id"
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

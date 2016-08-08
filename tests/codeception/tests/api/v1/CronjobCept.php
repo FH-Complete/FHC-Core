@@ -9,3 +9,4 @@ $I->sendGET("v1/system/Cronjob/Cronjob", array("cronjob_id" => "0"));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

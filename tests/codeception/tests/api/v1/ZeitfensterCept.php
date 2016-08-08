@@ -9,3 +9,4 @@ $I->sendGET("v1/ressource/Zeitfenster/Zeitfenster", array("wochentag" => "0", "s
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

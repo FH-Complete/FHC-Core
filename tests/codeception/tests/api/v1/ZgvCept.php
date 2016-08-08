@@ -9,3 +9,4 @@ $I->sendGET("v1/codex/Zgv/Zgv", array("zgv_code" => "0"));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

@@ -9,3 +9,4 @@ $I->sendGET("v1/testtool/Gebiet/Gebiet", array("gebiet_id" => "0"));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

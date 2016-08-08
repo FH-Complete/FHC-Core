@@ -9,3 +9,4 @@ $I->sendGET("v1/ressource/Mitarbeiter/Mitarbeiter", array("mitarbeiter_uid" => "
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

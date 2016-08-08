@@ -9,3 +9,4 @@ $I->sendGET("v1/system/Vorlage/Vorlage", array("vorlage_kurzbz" => "0"));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

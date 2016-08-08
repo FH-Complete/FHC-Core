@@ -9,3 +9,4 @@ $I->sendGET("v1/ressource/Lehrmittel/Lehrmittel", array("lehrmittel_kurzbz" => "
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

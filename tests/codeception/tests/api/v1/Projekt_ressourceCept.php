@@ -9,3 +9,4 @@ $I->sendGET("v1/project/Projekt_ressource/Projekt_ressource", array("projekt_res
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

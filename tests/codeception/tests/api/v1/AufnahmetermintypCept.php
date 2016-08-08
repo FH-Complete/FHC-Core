@@ -9,3 +9,4 @@ $I->sendGET("v1/crm/Aufnahmetermintyp/Aufnahmetermintyp", array("aufnahmetermint
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

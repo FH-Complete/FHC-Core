@@ -9,3 +9,4 @@ $I->sendGET("v1/accounting/Bestellstatus/Bestellstatus", array("bestellstatus_ku
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

@@ -40,6 +40,7 @@ class studiensemester extends Studiensemester_model
 	public $bezeichnung;			// varchar(32)
 	public $studienjahr_kurzbz;			// varchar(16)
 	public $beschreibung;			// varchar(16)
+	public $onlinebewerbung;		// boolean
 
 	/**
 	 * Konstruktor - Laedt optional ein StSem
@@ -81,6 +82,7 @@ class studiensemester extends Studiensemester_model
 				$this->bezeichnung = $row->bezeichnung;
 				$this->studienjahr_kurzbz = $row->studienjahr_kurzbz;
 				$this->beschreibung = $row->beschreibung;
+				$this->onlinebewerbung = $row->onlinebewerbung;
 
 				return true;
 			}
@@ -138,16 +140,24 @@ class studiensemester extends Studiensemester_model
 
 		if($this->new)
 		{
-			$qry = "INSERT INTO public.tbl_studiensemester (studiensemester_kurzbz, start, ende)
+			$qry = "INSERT INTO public.tbl_studiensemester (studiensemester_kurzbz, start, ende, bezeichnung, studienjahr_kurzbz, beschreibung, onlinebewerbung)
 			        VALUES(".$this->db_add_param($this->studiensemester_kurzbz).",".
 					$this->db_add_param($this->start).','.
-					$this->db_add_param($this->ende).');';
+					$this->db_add_param($this->ende).','.
+					$this->db_add_param($this->bezeichnung).','.
+					$this->db_add_param($this->studienjahr_kurzbz).','.
+					$this->db_add_param($this->beschreibung).','.
+					$this->db_add_param($this->onlinebewerbung, FHC_BOOLEAN).');';
 		}
 		else
 		{
 			$qry = 'UPDATE public.tbl_studiensemester SET'.
 			       ' start='.$this->db_add_param($this->start).','.
-			       ' ende='.$this->db_add_param($this->ende).
+			       ' ende='.$this->db_add_param($this->ende).','.
+			       ' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
+			       ' studienjahr_kurzbz='.$this->db_add_param($this->studienjahr_kurzbz).','.
+			       ' beschreibung='.$this->db_add_param($this->beschreibung).','.
+			       ' onlinebewerbung='.$this->db_add_param($this->onlinebewerbung, FHC_BOOLEAN).
 			       " WHERE studiensemester_kurzbz=".$this->db_add_param($this->studiensemester_kurzbz);
 		}
 
@@ -340,6 +350,7 @@ class studiensemester extends Studiensemester_model
 				$stsem_obj->bezeichnung = $row->bezeichnung;
 				$stsem_obj->studienjahr_kurzbz = $row->studienjahr_kurzbz;
 				$stsem_obj->beschreibung = $row->beschreibung;
+				$stsem_obj->onlinebewerbung = $row->onlinebewerbung;
 
 				$this->studiensemester[] = $stsem_obj;
 			}

@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Inherited Methods
  * @method void wantToTest($text)
@@ -18,9 +17,23 @@
 */
 class ApiTester extends \Codeception\Actor
 {
+	const WAIT = 70000; // 0.07 seconds
+	
     use _generated\ApiTesterActions;
 
    /**
     * Define custom actions here
     */
+	
+	public function wait($micro_seconds = null)
+	{
+		if (!is_null($micro_seconds))
+		{
+			usleep($micro_seconds);
+		}
+		else
+		{
+			usleep(ApiTester::WAIT);
+		}
+	}
 }
