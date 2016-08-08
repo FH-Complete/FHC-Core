@@ -42,7 +42,7 @@ class Templates extends FHC_Controller
 		$vorlagentext = $this->vorlagelib->getVorlagetextByVorlage($vorlage_kurzbz);
 		if ($vorlagentext->error)
 			show_error($vorlagentext->retval);
-		//var_dump($vorlage);
+		//var_dump($vorlagentext);
 		
 		$data = array
 		(
@@ -126,6 +126,43 @@ class Templates extends FHC_Controller
 		$data->schema = $schema->retval[0]->attribute;
 
 		$this->load->view('system/templatetextEdit', $data);
+	}
+
+	public function linkDocuments($vorlagestudiengang_id)
+	{
+		$this->load->model('system/vorlagedokument_model');
+		$return = $this->vorlagedokument_model->loadDokumenteFromVorlagestudiengang($vorlagestudiengang_id);
+		$data['documents'] = $return->retval;
+
+		$this->load->model('system/dokument_model');
+		$this->dokument_model->addOrder("bezeichnung");
+		$return = $this->dokument_model->load();
+		$data['allDocuments'] = $return->retval;
+
+		$data['vorlagestudiengang_id'] = $vorlagestudiengang_id;
+
+		$this->load->view('system/templateLinkDocuments', $data);
+	}
+
+	public function saveDocuments($vorlagestudiengang_id, $dokument_kurzbz, $sort)
+	{
+		$this->load->model('system/vorlagedokument_model');
+		$insert['vorlagestudiengang_id'] = $vorlagestudiengang_id;
+		$insert['dokument_kurzbz'] = $dokument_kurzbz;
+		$insert['sort']      = $sort;
+		$this->vorlagedokument_model->insert($insert);
+	}
+
+	public function deleteDocumentLink($vorlagestudiengang_id)
+	{
+		$this->load->model('system/vorlagedokument_model');
+		$this->vorlagedokument_model->delete($vorlagestudiengang_id);
+	}
+
+	public function changeSort($vorlagestudiengang_id, $sort)
+	{
+		$this->load->model('system/vorlagedokument_model');
+		$this->vorlagedokument_model->update($vorlagestudiengang_id, array("sort"=>$sort));
 	}
 
 	public function saveText()
