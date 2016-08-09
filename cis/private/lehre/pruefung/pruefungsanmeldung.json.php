@@ -614,7 +614,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 
                     $lv = new lehrveranstaltung($anmeldung->lehrveranstaltung_id);
 
-                    $html = $p->t('pruefung/emailLektorStudentIn')." ".$student->vorname." ".$student->nachname." ".$p->t('pruefung/emailLektorHatSichZurPruefung')." ".$lv->bezeichnung." ".$p->t('pruefung/emailLektorAm')." ".$datum->formatDatum($termin->von, "m.d.Y")." ".$p->t('pruefung/emailLektorVon')." ".$datum->formatDatum($termin->von,"h:i")." ".$p->t('pruefung/emailLektorUhrBis')." ".$datum->formatDatum($termin->bis,"h:i")." ".$p->t('pruefung/emailLektorUhrAngemeldet');
+                    $html = $p->t('pruefung/emailLektorStudentIn')." ".$student->vorname." ".$student->nachname." ".$p->t('pruefung/emailLektorHatSichZurPruefung')." ".$lv->bezeichnung." ".$p->t('pruefung/emailLektorAm')." ".$datum->formatDatum($termin->von, "d.m.Y")." ".$p->t('pruefung/emailLektorVon')." ".$datum->formatDatum($termin->von,"H:i")." ".$p->t('pruefung/emailLektorUhrBis')." ".$datum->formatDatum($termin->bis,"H:i")." ".$p->t('pruefung/emailLektorUhrAngemeldet');
                     $mail->setHTMLContent($html);
                     $mail->send();
 
@@ -839,15 +839,15 @@ function anmeldungBestaetigen($uid)
 	$html .= $p->t('pruefung/emailBodyPruefung')." ".$lv->bezeichnung."<br>";
 	if($pruefung->einzeln)
 	{
-	    $date = $datum->formatDatum($termin->von, "Y-m-d h:i:s");
+	    $date = $datum->formatDatum($termin->von, "Y-m-d H:i:s");
 	    $date = strtotime($date);
 	    $date = $date+(60*$pruefung->pruefungsintervall*($anmeldung->reihung-1));
-	    $von = date("h:i",$date);
+	    $von = date("H:i",$date);
 	    $html .= $p->t('pruefung/emailBodyTermin')." ".$datum->formatDatum($termin->von, "d.m.Y")." ".$p->t('pruefung/emailBodyUm')." ".$von."<br>";
 	    $html .= $p->t('pruefung/emailBodyDauer')." ".$pruefung->pruefungsintervall." ".$p->t('pruefung/emailBodyMinuten')."</br>";
 	}
 	else
-	    $html .= $p->t('pruefung/emailBodyTermin')." ".$datum->formatDatum($termin->von, "d.m.Y")." ".$p->t('pruefung/emailBodyUm')." ".$datum->formatDatum($termin->von, "h:i")."<br>";
+	    $html .= $p->t('pruefung/emailBodyTermin')." ".$datum->formatDatum($termin->von, "d.m.Y")." ".$p->t('pruefung/emailBodyUm')." ".$datum->formatDatum($termin->von, "H:i")."<br>";
 	$html .= $p->t('pruefung/anmeldungErfolgreich')." ".$ort->bezeichnung."<br>";
 	$html .= "<br>";
 	$html .= "<a href='".APP_ROOT."cis/private/lehre/pruefung/pruefungsanmeldung.php'>".$p->t('pruefung/emailBodyLinkZurAnmeldung')."</a><br>";
