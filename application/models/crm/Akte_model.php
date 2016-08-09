@@ -47,6 +47,7 @@ class Akte_model extends DB_Model
 						 dms_id,
 						 anmerkung,
 						 nachgereicht,
+						 nachgereicht_am,
 						 CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden
 					FROM public.tbl_akte
 				   WHERE person_id = ?';
