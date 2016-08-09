@@ -78,7 +78,6 @@ foreach($prestudent_ids as $pid)
 
 	if(empty($preErrors))
 	{
-
 		/*
 		 * Determine the oe_kurzbz
 		 */
@@ -97,8 +96,8 @@ foreach($prestudent_ids as $pid)
 		if(!$row = $db->db_fetch_object($res))
 			die("Es ist ein Fehler bei der Ermittlung der Organisationseinheit aufgetreten");
 
-		$vorlagestudiengang_id = recursiveGetVorlagestudiengang_id($row->oe_kurzbz, $pid, $db);
-
+		$vorlagestudiengang_id = recursiveGetVorlagestudiengang_id($row->oe_kurzbz, $db);
+		$oe_kurzbz = $row->oe_kurzbz;
 		/*
 		 * Get all Documents
 		 */
@@ -229,7 +228,7 @@ foreach($prestudent_ids as $pid)
 		 * Deckblatt
 		 */
 		$filename = $tmpDir . "/".uniqid();
-		$doc = new dokument_export($vorlage_kurzbz);
+		$doc = new dokument_export($vorlage_kurzbz, $oe_kurzbz);
 		$doc->addDataArray(array('vorname' => $prestudent->vorname, 'nachname' => $prestudent->nachname, array('dokumente'=> $dokumente)),"dokumentenakt");
 
 		if(!$doc->create('pdf'))
@@ -346,7 +345,7 @@ function removeFolder($dir)
 }
 
 
-function recursiveGetVorlagestudiengang_id($oe_kurzbz, $prestudent_id, $db)
+function recursiveGetVorlagestudiengang_id($oe_kurzbz, $db)
 {
 	$query= '
 		SELECT
@@ -356,6 +355,8 @@ function recursiveGetVorlagestudiengang_id($oe_kurzbz, $prestudent_id, $db)
 			JOIN public.tbl_vorlagedokument USING(vorlagestudiengang_id)
 		WHERE
 			oe_kurzbz='.$db->db_add_param($oe_kurzbz).'
+			AND aktiv
+		ORDER BY version DESC LIMIT 1
 	';
 
 	if(!$res = $db->db_query($query))
@@ -381,7 +382,7 @@ function recursiveGetVorlagestudiengang_id($oe_kurzbz, $prestudent_id, $db)
 		if(!$rowParent = $db->db_fetch_object($resultParent))
 			die("Fehler beim holen der Dokumentenliste");
 
-		return recursiveGetVorlagestudiengang_id($rowParent->oe_parent_kurzbz, $prestudent_id, $db);
+		return recursiveGetVorlagestudiengang_id($rowParent->oe_parent_kurzbz, $db);
 	}
 	else
 	{
