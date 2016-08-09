@@ -9,3 +9,4 @@ $I->sendGET("v1/system/Vorlagestudiengang/Vorlagestudiengang", array("vorlagestu
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

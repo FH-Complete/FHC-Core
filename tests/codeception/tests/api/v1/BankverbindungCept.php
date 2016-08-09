@@ -9,3 +9,4 @@ $I->sendGET("v1/person/Bankverbindung/Bankverbindung", array("bankverbindung_id"
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

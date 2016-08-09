@@ -9,3 +9,4 @@ $I->sendGET("v1/education/Moodle/Moodle", array("moodle_id" => "0"));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

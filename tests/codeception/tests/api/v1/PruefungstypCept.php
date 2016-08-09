@@ -9,3 +9,4 @@ $I->sendGET("v1/education/Pruefungstyp/Pruefungstyp", array("pruefungstyp_kurzbz
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

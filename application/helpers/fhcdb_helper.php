@@ -36,6 +36,14 @@ class basis_db
 	public function __construct($ci)
 	{
 		$this->ci=$ci;
+		
+		if (!defined('FHC_INTEGER'))
+		{
+			define('FHC_INTEGER',1);
+			define('FHC_STRING',2);
+			define('FHC_BOOLEAN',3);
+			define('FHC_LANG_ARRAY',4);
+		}
 	}
 
 	public function db_connect()

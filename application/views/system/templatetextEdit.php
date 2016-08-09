@@ -14,7 +14,7 @@
 	Aktiv: <input type="text" name="aktiv" value="<?php echo $aktiv; ?>" size="1" />
 	<input type="hidden" name="vorlagestudiengang_id" value="<?php echo $vorlagestudiengang_id; ?>" />
 	<input type="hidden" name="studiengang_kz" value="<?php echo $studiengang_kz; ?>" />
- 	<?php 
+ 	<?php
 		// This is an example to show that you can load stuff from inside the template file
 		echo $this->templatelib->widget("tinymce_widget", array('name' => 'text', 'text' => $text));
 	?>
@@ -31,7 +31,7 @@
 
 <script type="text/javascript" >
 	// get json
-    function getFormdata(form) 
+    function getFormdata(form)
 	{
         form.elements["formdata"].value = JSON.stringify(bf.getData(), null, 2);
 		//alert(form.elements["formdata"].value);

@@ -9,3 +9,4 @@ $I->sendGET("v1/crm/Reihungstest/Reihungstest", array("reihungstest_id" => "0", 
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

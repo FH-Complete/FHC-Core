@@ -9,3 +9,4 @@ $I->sendGET("v1/crm/Preincoming/Preincoming", array("preincoming_id" => "0"));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

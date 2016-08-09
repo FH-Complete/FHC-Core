@@ -9,3 +9,4 @@ $I->sendGET("v1/education/Lvinfo/Lvinfo", array("sprache" => "0", "lehrveranstal
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

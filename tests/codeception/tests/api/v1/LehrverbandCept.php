@@ -9,3 +9,4 @@ $I->sendGET("v1/organisation/Lehrverband/Lehrverband", array("gruppe" => "0", "v
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

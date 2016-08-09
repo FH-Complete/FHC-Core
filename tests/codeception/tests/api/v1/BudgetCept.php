@@ -9,3 +9,4 @@ $I->sendGET("v1/accounting/Budget/Budget", array("kostenstelle_id" => "0", "gesc
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

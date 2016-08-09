@@ -9,3 +9,4 @@ $I->sendGET("v1/ressource/Funktion/Funktion", array("funktion_kurzbz" => "0"));
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
 $I->seeResponseContainsJson(["error" => 0]);
+$I->wait();

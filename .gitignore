@@ -11,15 +11,13 @@ documents/
 .buildpath
 application/config/development/
 tests/codeception/_output/*
-tests/codeception/tests/_output/*
+!/tests/codeception/_output/.placeholder
 tests/codeception/codeception.yml
 tests/codeception/tests/api.suite.yml
 tests/codeception/tests/functional.suite.yml
 tests/codeception/tests/acceptance.suite.yml
-!/tests/codeception/_output/.placeholder
 /submodules/d3
 composer.lock
 bin
-/tests/codeception/api.suite.yml
 /application/logs/
 /sparks/*

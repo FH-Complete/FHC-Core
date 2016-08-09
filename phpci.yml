@@ -8,10 +8,11 @@ build_settings:
         host: 'localhost;dbname=template1'
         user: 'fhcomplete'
         pass: 'fhcomplete'
+
 setup:
     composer:
 #        directory: ""
-#        action: "install"
+        action: "install"
         prefer_dist: true
         no_dev: true
     pgsql:
@@ -31,7 +32,10 @@ test:
         directories:
         - "application/"
         recursive: true
-    php_loc:
+    codeception:
+        config: "tests/codeception/"
+        path: "tests/codeception/_output/"
+#    php_loc:
 #    php_docblock_checker:
 #        path: "application/controllers/"
 #        allowed_warnings: 100
@@ -41,13 +45,17 @@ test:
 #        standard: "tests/codesniffer/FHComplete"
 #        allowed_errors: 200
 #        allowed_warnings: 200
-    codeception:
-        config: "tests/codeception/"
-        path: "tests/codeception/_output/"
 #    php_unit:
 #        directory: "tests/phpunit/"
 
 complete:
+    clean_build:
+        remove:
+            - index.php
+            - config/global.config.inc.php
+            - config/cis.config.inc.php
+            - config/vilesci.config.inc.php
+            - config/system.config.inc.php
 #    xmpp:
 #        username: "fhcomplete"
 #        password: "fhcomplete1q2w3blah.im"
@@ -60,17 +68,9 @@ complete:
 #        tls: 1
 #        alias: "jabber.blah.im"
 #        date_format: "%d.%m.%Y"
-    clean_build:
-        remove:
-            - index.php
-            - config/global.config.inc.php
-            - config/cis.config.inc.php
-            - config/vilesci.config.inc.php
-            - config/system.config.inc.php
 
 success:
 #    shell:
 #        - "cd %BUILD_PATH% && chmod u+x copyBuild.sh && ./copyBuild.sh" # Copy Build
 #        - "curl 'http://localhost/backend/Migrate/'" # DB-Installation
 #        - "cd /var/www/html/ && sudo -u wsp doxygen Doxyfile" # Doxygen
-
