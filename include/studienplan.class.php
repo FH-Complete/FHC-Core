@@ -708,7 +708,42 @@ class studienplan extends Studienplan_model
 	function getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester="", $orgform_kurzbz = "")
 	{
 		$qry = "SELECT
-					*
+					studienplan_id,
+					studienordnung_id,
+					orgform_kurzbz,
+					tbl_studienplan.version AS version_studienplan,
+					tbl_studienplan.bezeichnung AS bezeichnung_studienplan,
+					regelstudiendauer,
+					sprache,
+					aktiv,
+					semesterwochen,
+					testtool_sprachwahl,
+					tbl_studienplan.insertamum AS insertamum_studienplan,
+					tbl_studienplan.insertvon AS insertvon_studienplan,
+					tbl_studienplan.updateamum AS updateamum_studienplan,
+					tbl_studienplan.updatevon AS updatevon_studienplan,
+					ects_stpl,
+					pflicht_sws,
+					pflicht_lvs,
+					studiengang_kz,
+					tbl_studienordnung.version AS version_studienordnung,
+					gueltigvon,
+					gueltigbis,
+					tbl_studienordnung.bezeichnung AS bezeichnung_studienordnung,
+					ects,
+					studiengangbezeichnung,
+					studiengangbezeichnung_englisch,
+					studiengangkurzbzlang,
+					akadgrad_id,
+					tbl_studienordnung.insertamum AS insertamum_studienordnung,
+					tbl_studienordnung.insertvon AS insertvon_studienordnung,
+					tbl_studienordnung.updateamum AS updateamum_studienordnung,
+					tbl_studienordnung.updatevon AS updatevon_studienordnung,
+					status_kurzbz,
+					standort_id,
+					studienplan_semester_id,
+					studiensemester_kurzbz,
+					semester
 				FROM
 					lehre.tbl_studienplan
 					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
@@ -1109,6 +1144,59 @@ class studienplan extends Studienplan_model
 			return false;
 		}
 		return false;
+	}
+	
+	/**
+	 * Sucht nach Studienordnungen, die den Kriterien entsprechen
+	 * @param string $searchItems Array aus Suchstrings
+	 */
+	public function searchStudienplaene($searchItems)
+	{
+		$qry= "
+				SELECT DISTINCT 
+					studienplan_id, tbl_studienplan.bezeichnung
+				FROM 
+					lehre.tbl_studienplan
+				JOIN 
+					lehre.tbl_studienordnung USING (studienordnung_id)
+				JOIN 
+					lehre.tbl_studienplan_semester USING (studienplan_id)
+				JOIN 
+					public.tbl_studiengang USING (studiengang_kz)
+				WHERE
+					tbl_studienplan.aktiv=true
+				AND
+					tbl_studienordnung.status_kurzbz IN ('approved')";
+				
+			foreach($searchItems as $value)
+			$qry.=" AND
+					(
+						lower(tbl_studienplan.bezeichnung) LIKE lower('%".$this->db_escape($value)."%')
+						OR
+						lower(tbl_studienplan_semester.studiensemester_kurzbz) LIKE lower('%".$this->db_escape($value)."%')
+						OR
+						lower(tbl_studiengang.typ||tbl_studiengang.kurzbz) LIKE lower('%".$this->db_escape($value)."%')
+						OR
+						lower(tbl_studienplan.orgform_kurzbz) LIKE lower('%".$this->db_escape($value)."%')
+						OR
+						tbl_studienplan.studienplan_id::text = '".$this->db_escape($value)."'
+					)";
+			$qry.=" ORDER BY studienplan_id DESC";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new studienplan();
+	
+				$obj->studienplan_id = $row->studienplan_id;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->new=false;
+	
+				$this->result[] = $obj;
+			}
+			return true;
+		}
 	}
 }
 ?>
