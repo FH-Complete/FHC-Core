@@ -801,7 +801,7 @@ else
 								break;
 				}
 			}
-			$prestudent = new prestudent();
+			$prestudent = new prestudent($student->prestudent_id);
 			$prestudent->getLastStatus($student->prestudent_id);
 
 			$orgform_bezeichnung = new organisationsform();
