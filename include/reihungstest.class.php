@@ -284,8 +284,10 @@ class reihungstest extends basis_db
 	 */
 	public function getReihungstest($studiengang_kz,$order=null,$studiensemester_kurzbz=null)
 	{
-		$qry = "SELECT * FROM public.tbl_reihungstest WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
+		$qry = "SELECT * FROM public.tbl_reihungstest WHERE 1=1 ";
 
+		if (is_numeric($studiengang_kz) && $studiengang_kz!='')
+			$qry .=" AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
 		if ($studiensemester_kurzbz!=null)
 			$qry .=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz, FHC_STRING, false);
 
@@ -466,8 +468,10 @@ class reihungstest extends basis_db
 			{
 				$obj = new stdClass();
 
+				$obj->rt_person_id = $row->rt_person_id;
 				$obj->rt_id = $row->rt_id;
 				$obj->person_id = $row->person_id;
+				$obj->studienplan_id = $row->studienplan_id;
 				$obj->anmeldedatum = $row->anmeldedatum;
 				$obj->teilgenommen = $this->db_parse_bool($row->teilgenommen);
 				$obj->ort_kurzbz = $row->ort_kurzbz;
@@ -497,9 +501,10 @@ class reihungstest extends basis_db
 		{
 			if($row = $this->db_fetch_object($result))
 			{
-
+				$this->rt_person_id = $row->rt_person_id;
 				$this->rt_id = $row->rt_id;
 				$this->person_id = $row->person_id;
+				$this->studienplan_id = $row->studienplan_id;
 				$this->anmeldedatum = $row->anmeldedatum;
 				$this->teilgenommen = $this->db_parse_bool($row->teilgenommen);
 				$this->ort_kurzbz = $row->ort_kurzbz;
@@ -540,8 +545,10 @@ class reihungstest extends basis_db
 			{
 				$obj = new stdClass();
 
+				$obj->rt_person_id = $row->rt_person_id;
 				$obj->rt_id = $row->rt_id;
 				$obj->person_id = $row->person_id;
+				$obj->studienplan_id = $row->studienplan_id;
 				$obj->anmeldedatum = $row->anmeldedatum;
 				$obj->teilgenommen = $this->db_parse_bool($row->teilgenommen);
 				$obj->ort_kurzbz = $row->ort_kurzbz;
@@ -562,9 +569,10 @@ class reihungstest extends basis_db
 	{
 		if($this->new)
 		{
-			$qry = "INSERT INTO public.tbl_rt_person(person_id, rt_id, anmeldedatum, teilgenommen, ort_kurzbz, punkte) VALUES(".
+			$qry = "INSERT INTO public.tbl_rt_person(person_id, rt_id, studienplan_id, anmeldedatum, teilgenommen, ort_kurzbz, punkte) VALUES(".
 				$this->db_add_param($this->person_id, FHC_INTEGER).','.
 				$this->db_add_param($this->rt_id, FHC_INTEGER).','.
+				$this->db_add_param($this->studienplan_id, FHC_INTEGER).','.
 				$this->db_add_param($this->anmeldedatum).','.
 				$this->db_add_param($this->teilgenommen, FHC_BOOLEAN).','.
 				$this->db_add_param($this->ort_kurzbz).','.
@@ -574,12 +582,12 @@ class reihungstest extends basis_db
 		{
 			$qry = "UPDATE public.tbl_rt_person SET ".
 			 ' rt_id = '.$this->db_add_param($this->rt_id).','.
+			 ' studienplan_id = '.$this->db_add_param($this->studienplan_id).','.
 			 ' anmeldedatum='.$this->db_add_param($this->anmeldedatum).','.
 			 ' teilgenommen='.$this->db_add_param($this->teilgenommen, FHC_BOOLEAN).','.
 			 ' ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).','.
 			 ' punkte='.$this->db_add_param($this->punkte).' '.
-			 ' WHERE person_id='.$this->db_add_param($this->person_id, FHC_INTEGER).' AND '.
-			 ' rt_id='.$this->db_add_param($this->rt_id_old);
+			 ' WHERE rt_person_id='.$this->db_add_param($this->rt_person_id, FHC_INTEGER);
 		 }
 
 		 if($this->db_query($qry))
@@ -700,6 +708,95 @@ class reihungstest extends basis_db
 		else
 		{
 			$this->erromsg='Fehler beim Löschen der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Speichert eine Studienplanzuordnung zu einem Reihungstesttermin
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID $reihungstest_id und $studienplan_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function saveStudienplanReihungstest()
+	{
+		if($this->new)
+		{
+			$qry = "INSERT INTO public.tbl_rt_studienplan(reihungstest_id, studienplan_id) VALUES(".
+					$this->db_add_param($this->rt_id, FHC_INTEGER).','.
+					$this->db_add_param($this->studienplan_id).');';
+		}
+		else
+		{
+			$qry = "UPDATE public.tbl_rt_studienplan SET ".
+					' studienplan_id='.$this->db_add_param($this->studienplan_id).' '.
+					' WHERE reihungstest_id='.$this->db_add_param($this->rt_id, FHC_INTEGER).' AND '.
+					' studienplan_id='.$this->db_add_param($this->studienplan_id);
+		}
+	
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Laedt alle Studienplan IDs, die einem Reihungstest zugeordnet sind
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getStudienplaeneReihungstest($reihungstest_id)
+	{
+		$qry = "SELECT
+					studienplan_id
+				FROM
+					public.tbl_rt_studienplan
+				WHERE
+					tbl_rt_studienplan.reihungstest_id=".$this->db_add_param($reihungstest_id)."
+				ORDER BY
+					studienplan_id";
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+	
+				$obj->studienplan_id = $row->studienplan_id;
+	
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Loescht eine Studienplanzuordnung zu einem Reihungstest Eintrag
+	 * @param $reihungstest_id integer ID des Reihungstests
+	 * @param $studienplan_id integer ID des Studienplans
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function deleteStudienplanReihungstest($reihungstest_id, $studienplan_id)
+	{
+		$qry = "DELETE FROM public.tbl_rt_studienplan
+		 	WHERE reihungstest_id=".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
+			AND studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER);
+	
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->erromsg='Fehler beim Löschen der Studienplanzuordnung';
 			return false;
 		}
 	}
