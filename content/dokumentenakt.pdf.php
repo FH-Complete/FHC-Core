@@ -38,6 +38,8 @@ $user = get_uid();
 if(!isset($_GET["prestudent_ids"]) || !isset($_GET["vorlage_kurzbz"]))
 	die($p->t('anwesenheitsliste/fehlerhafteParameteruebergabe'));
 
+
+$vorlage_kurzbz = $_GET["vorlage_kurzbz"];
 $prestudent_ids = explode(";", $_GET["prestudent_ids"]);
 
 if(empty($prestudent_ids))
@@ -76,20 +78,41 @@ foreach($prestudent_ids as $pid)
 
 	if(empty($preErrors))
 	{
+
+		/*
+		 * Determine the oe_kurzbz
+		 */
+		$query= '
+			SELECT
+				oe_kurzbz
+			FROM
+				public.tbl_prestudent
+				JOIN public.tbl_studiengang USING(studiengang_kz)
+			WHERE
+				prestudent_id='.$db->db_add_param($pid, FHC_INTEGER).'
+		';
+		if(!$res = $db->db_query($query))
+			die("Es ist ein Fehler bei der Ermittlung der Organisationseinheit aufgetreten");
+
+		if(!$row = $db->db_fetch_object($res))
+			die("Es ist ein Fehler bei der Ermittlung der Organisationseinheit aufgetreten");
+
+		$vorlagestudiengang_id = recursiveGetVorlagestudiengang_id($row->oe_kurzbz, $pid, $db);
+
 		/*
 		 * Get all Documents
 		 */
 		$query= '
 			SELECT
-				titel, dms_id, inhalt, mimetype, dokument_kurzbz, tbl_dokument.bezeichnung, sort
+				titel, dms_id, inhalt, mimetype, dokument_kurzbz, tbl_dokument.bezeichnung, sort, akte_id
 			FROM
 				public.tbl_vorlagedokument
-				JOIN public.tbl_vorlagestudiengang USING(vorlagestudiengang_id)
 				JOIN public.tbl_dokument USING(dokument_kurzbz)
-				JOIN public.tbl_prestudent USING(studiengang_kz)
-				JOIN public.tbl_akte USING(person_id,dokument_kurzbz)
+				JOIN public.tbl_akte USING(dokument_kurzbz)
+				JOIN public.tbl_prestudent USING(person_id)
 			WHERE
-				prestudent_id='.$db->db_add_param($pid, FHC_INTEGER).'
+				vorlagestudiengang_id='.$db->db_add_param($vorlagestudiengang_id).'
+				AND prestudent_id='.$db->db_add_param($pid).'
 			ORDER BY sort asc;
 		';
 
@@ -101,7 +124,7 @@ foreach($prestudent_ids as $pid)
 			$filename = "";
 			if($row->inhalt != null)
 			{
-				$filename = $tmpDir . "/".uniqid();
+				$filename = $tmpDir . "/" . uniqid();
 				$fileData = base64_decode($row->inhalt);
 				file_put_contents($filename, $fileData);
 			}
@@ -120,13 +143,15 @@ foreach($prestudent_ids as $pid)
 
 			// this should never happen
 			if($filename == "")
-				$preErrors[] = "'" . $row->titel . "': Diese Datei hat keinen Inhalt und keine dms_id";
+			{
+				$preErrors[] = "'" . $row->akte_id . "': Diese Akte hat keinen Inhalt und keine dms_id";
+			}
 
 			if(empty($preErrors))
 			{
 				/*
 				 * Determine the filetype
-				 * and convert if nessecary
+				 * and convert, if nessecary
 				 */
 				 $fullFilename = "";
 				$explodedTitle = explode(".", $row->titel);
@@ -204,7 +229,7 @@ foreach($prestudent_ids as $pid)
 		 * Deckblatt
 		 */
 		$filename = $tmpDir . "/".uniqid();
-		$doc = new dokument_export($_GET["vorlage_kurzbz"]);
+		$doc = new dokument_export($vorlage_kurzbz);
 		$doc->addDataArray(array('vorname' => $prestudent->vorname, 'nachname' => $prestudent->nachname, array('dokumente'=> $dokumente)),"dokumentenakt");
 
 		if(!$doc->create('pdf'))
@@ -276,7 +301,7 @@ else
 	echo "<p>Fehlerhafte Dokumente können übersprungen werden:</p>";
 	echo "<form action='dokumentenakt.pdf.php' method='GET'>";
 	echo '<input type="hidden" name="prestudent_ids" value="'.$_GET["prestudent_ids"].'"/>';
-	echo '<input type="hidden" name="vorlage_kurzbz" value="'.$_GET["vorlage_kurzbz"].'"/>';
+	echo '<input type="hidden" name="vorlage_kurzbz" value="'.$vorlage_kurzbz.'"/>';
 	echo '<input type="submit" name="force" value="Fortfahren" title="Fehlerhafte Dokumente auslassen"/>';
 	echo "</form>";
 	?>
@@ -316,6 +341,52 @@ function removeFolder($dir)
 			unlink($dir . "/" . $file);
 		}
 		return rmdir($dir);
+	}
+	return false;
+}
+
+
+function recursiveGetVorlagestudiengang_id($oe_kurzbz, $prestudent_id, $db)
+{
+	$query= '
+		SELECT
+			vorlagedokument_id, vorlagestudiengang_id
+		FROM
+			public.tbl_vorlagestudiengang
+			JOIN public.tbl_vorlagedokument USING(vorlagestudiengang_id)
+		WHERE
+			oe_kurzbz='.$db->db_add_param($oe_kurzbz).'
+	';
+
+	if(!$res = $db->db_query($query))
+		die("Fehler beim holen der Dokumentenliste");
+
+
+	if(!$db->db_num_rows($res))
+	{
+		/*
+		 * Nothing found, so we determine the
+		 * oe_parent_kurzbz and try it again
+		 */
+		$queryParent= '
+			SELECT
+				oe_parent_kurzbz
+			FROM
+				public.tbl_organisationseinheit
+			WHERE
+				oe_kurzbz='.$db->db_add_param($oe_kurzbz).'
+		';
+		if(!$resultParent = $db->db_query($queryParent))
+			die("Fehler beim holen der Dokumentenliste");
+		if(!$rowParent = $db->db_fetch_object($resultParent))
+			die("Fehler beim holen der Dokumentenliste");
+
+		return recursiveGetVorlagestudiengang_id($rowParent->oe_parent_kurzbz, $prestudent_id, $db);
+	}
+	else
+	{
+		$row = $db->db_fetch_object($res);
+		return $row->vorlagestudiengang_id;
 	}
 	return false;
 }

@@ -493,6 +493,5 @@ class vorlage extends basis_db
 			return false;
 		}
 	}
-
 }
 ?>
