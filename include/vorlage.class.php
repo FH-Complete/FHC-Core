@@ -457,7 +457,7 @@ class vorlage extends basis_db
 				$this->style = $row->style;
 				$this->berechtigung = $this->db_parse_array($row->berechtigung);
 				$this->anmerkung_vorlagestudiengang = $row->anmerkung_vorlagestudiengang;
-				$this->aktiv = $this->db_parse_bool($row->aktiv);echo $oe_kurzbz;
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
 
 				return true;
 			}
