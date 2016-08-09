@@ -47,7 +47,11 @@ require_once('../../include/adresse.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/studienplan.class.php');
+require_once('../../include/sprache.class.php');
+require_once('../../include/organisationsform.class.php');
 
+// @todo Allgemein: Beim kopierenauch die Studienplanzuordnungen übernehmen
+//					"Teilgenommen" und "Punkte" werden immer mit false bzw. 0 gespeichert
 
 define('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND', '5');
 define('REIHUNGSTEST_ERGEBNISSE_BERECHNEN', false);
@@ -58,13 +62,14 @@ if (!$db = new basis_db())
 }
 
 $stsem_akt = new studiensemester();
-$stsem_akt = $stsem_akt->getakt();
+$stsem_akt = $stsem_akt->getaktorNext();
 
 $user = get_uid();
 $datum_obj = new datum();
 $stg_kz = (isset($_GET['stg_kz']) ? $_GET['stg_kz'] : '');
 $reihungstest_id = (isset($_GET['reihungstest_id']) ? $_GET['reihungstest_id'] : '');
-$studiensemester_kurzbz = (isset($_GET['studiensemester_kurzbz']) ? $_GET['studiensemester_kurzbz'] : '');
+$studiensemester_kurzbz = (isset($_GET['studiensemester_kurzbz']) ? $_GET['studiensemester_kurzbz'] : $stsem_akt);
+$studienplan_id = (isset($_GET['studienplan_id']) ? $_GET['studienplan_id'] : '');
 $prestudent_id = (isset($_GET['prestudent_id']) ? $_GET['prestudent_id'] : '');
 $rtpunkte = (isset($_GET['rtpunkte']) ? $_GET['rtpunkte'] : '');
 $neu = (isset($_GET['neu']) ? true : false);
@@ -74,7 +79,7 @@ $error = false;
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if ($studiensemester_kurzbz == '' && ($reihungstest_id != '' || isset($_POST['reihungstest_id'])))
+if ($reihungstest_id != '' || isset($_POST['reihungstest_id']))
 {
 	if ($reihungstest_id != '')
 	{
@@ -121,6 +126,23 @@ $studiengang->getAll('typ, kurzbz', false);
 $studiensemester = new Studiensemester();
 $studiensemester->getAll('DESC');
 
+$sprachen_obj = new sprache();
+$sprachen_obj->getAll();
+$sprachen_arr=array();
+
+foreach($sprachen_obj->result as $row)
+{
+	if(isset($row->bezeichnung_arr[$sprache]))
+		$sprachen_arr[$row->sprache]=$row->bezeichnung_arr[$sprache];
+	else
+		$sprachen_arr[$row->sprache]=$row->sprache;
+}
+
+$orgform_obj = new organisationsform();
+$orgform_obj->getAll();
+$orgform_arr=array();
+foreach($orgform_obj->result as $row)
+	$orgform_arr[$row->orgform_kurzbz]=$row->bezeichnung;
 
 //Studierende als Excel Exportieren
 if(isset($_GET['excel']))
@@ -129,49 +151,49 @@ if(isset($_GET['excel']))
 	if($reihungstest->load($_GET['reihungstest_id']))
 	{
 		$qry = "SELECT 
-	 			prestudent_id,
-	 			person_id,
-	 			vorname,
-	 			nachname,
-	 			ort_kurzbz,
-	 			studiengang_kz,
-	 			gebdatum,
-	 			geschlecht,
-	 			rt_punkte1
-					,(
-						SELECT kontakt
-						FROM tbl_kontakt
-						WHERE kontakttyp = 'email'
-							AND person_id = tbl_prestudent.person_id
-							AND zustellung = true LIMIT 1
-						) AS email
-					,(
-						SELECT ausbildungssemester
-						FROM public.tbl_prestudentstatus
-						WHERE prestudent_id = tbl_prestudent.prestudent_id
-							AND datum = (
-								SELECT MAX(datum)
-								FROM public.tbl_prestudentstatus
-								WHERE prestudent_id = tbl_prestudent.prestudent_id
-									AND status_kurzbz = 'Interessent'
-								) LIMIT 1
-						) AS ausbildungssemester
-	 				,(
-						SELECT orgform_kurzbz
-						FROM public.tbl_prestudentstatus
-						WHERE prestudent_id = tbl_prestudent.prestudent_id
-							AND datum = (
-								SELECT MAX(datum)
-								FROM public.tbl_prestudentstatus
-								WHERE prestudent_id = tbl_prestudent.prestudent_id
-									AND status_kurzbz = 'Interessent'
-								) LIMIT 1
-						) AS orgform_kurzbz
+				prestudent_id,
+				person_id,
+				vorname,
+				nachname,
+				(SELECT ort_kurzbz FROM public.tbl_rt_person WHERE rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)." AND person_id=tbl_person.person_id) AS ort_kurzbz,
+	 			(SELECT studienplan_id FROM public.tbl_rt_person WHERE rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)." AND person_id=tbl_person.person_id) AS studienplan_id,
+				studiengang_kz,
+				gebdatum,
+				geschlecht,
+				rt_punkte1
+				,(
+					SELECT kontakt
+					FROM tbl_kontakt
+					WHERE kontakttyp = 'email'
+						AND person_id = tbl_prestudent.person_id
+						AND zustellung = true LIMIT 1
+					) AS email
+				,(
+					SELECT ausbildungssemester
+					FROM public.tbl_prestudentstatus
+					WHERE prestudent_id = tbl_prestudent.prestudent_id
+						AND datum = (
+							SELECT MAX(datum)
+							FROM public.tbl_prestudentstatus
+							WHERE prestudent_id = tbl_prestudent.prestudent_id
+								AND status_kurzbz = 'Interessent'
+							) LIMIT 1
+					) AS ausbildungssemester
+				,(
+					SELECT orgform_kurzbz
+					FROM public.tbl_prestudentstatus
+					WHERE prestudent_id = tbl_prestudent.prestudent_id
+						AND datum = (
+							SELECT MAX(datum)
+							FROM public.tbl_prestudentstatus
+							WHERE prestudent_id = tbl_prestudent.prestudent_id
+								AND status_kurzbz = 'Interessent'
+							) LIMIT 1
+					) AS orgform_kurzbz
 				FROM public.tbl_prestudent
 				JOIN public.tbl_person USING (person_id)
-	 			LEFT JOIN public.tbl_rt_person USING (person_id)
 				WHERE reihungstest_id = ".$db->db_add_param($reihungstest->reihungstest_id, FHC_INTEGER)."
-				ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname";
+				ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname ";
 
 		// Creating a workbook
 		$workbook = new Spreadsheet_Excel_Writer();
@@ -363,7 +385,7 @@ if(isset($_GET['excel']))
 				});
 
 				$("#ort").autocomplete({
-					source: "../lehre/reservierung_autocomplete.php?autocomplete=ort_aktiv",
+					source: "reihungstestverwaltung_autocomplete.php?autocomplete=ort_aktiv",
 					minLength:2,
 					response: function(event, ui)
 					{
@@ -382,7 +404,7 @@ if(isset($_GET['excel']))
 				});
 
 				$(".aufsicht_uid").autocomplete({
-					source: "../../cis/private/tools/zeitaufzeichnung_autocomplete.php?autocomplete=kunde",
+					source: "reihungstestverwaltung_autocomplete.php?autocomplete=kunde",
 					minLength:2,
 					response: function(event, ui)
 					{
@@ -398,19 +420,45 @@ if(isset($_GET['excel']))
 					{
 						//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
 						$(this.id).val(ui.item.uid);
+					}	
+				});
+
+				$("#studienplan_autocomplete").autocomplete({
+					source: "reihungstestverwaltung_autocomplete.php?autocomplete=studienplan",
+					minLength:2,
+					response: function(event, ui)
+					{
+						//Value und Label fuer die Anzeige setzen
+						for(i in ui.content)
+						{
+							ui.content[i].value=ui.content[i].bezeichnung;
+							ui.content[i].label=ui.content[i].bezeichnung;
+						}
+					},
+					select: function(event, ui)
+					{
+						//Ausgewaehlte Ressource zuweisen und Textfeld wieder leeren
+						$("#studienplan_id").val(ui.item.studienplan_id);
 					}
-					
-					});
+				});
 
 				if (typeof(Storage) !== 'undefined') 
 				{
-					if (localStorage.getItem('clm_id') != null) 
+					if (localStorage.getItem('clm_prestudent_id') != null) 
 					{
-						$('.clm_id').css('display', localStorage.getItem('clm_id'));
-						if (localStorage.getItem('clm_id') == 'none')
-							document.getElementById('clm_id').className = 'inactive';
+						$('.clm_prestudent_id').css('display', localStorage.getItem('clm_prestudent_id'));
+						if (localStorage.getItem('clm_prestudent_id') == 'none')
+							document.getElementById('clm_prestudent_id').className = 'inactive';
 						else
-							document.getElementById('clm_id').className = 'active';
+							document.getElementById('clm_prestudent_id').className = 'active';
+					}
+					if (localStorage.getItem('clm_person_id') != null) 
+					{
+						$('.clm_person_id').css('display', localStorage.getItem('clm_person_id'));
+						if (localStorage.getItem('clm_person_id') == 'none')
+							document.getElementById('clm_person_id').className = 'inactive';
+						else
+							document.getElementById('clm_person_id').className = 'active';
 					}
 					if (localStorage.getItem('clm_geschlecht') != null) 
 					{
@@ -427,6 +475,14 @@ if(isset($_GET['excel']))
 							document.getElementById('clm_studiengang').className = 'inactive';
 						else
 							document.getElementById('clm_studiengang').className = 'active';
+					}
+					if (localStorage.getItem('clm_studienplan') != null) 
+					{
+						$('.clm_studienplan').css('display', localStorage.getItem('clm_studienplan'));
+						if (localStorage.getItem('clm_studienplan') == 'none')
+							document.getElementById('clm_studienplan').className = 'inactive';
+						else
+							document.getElementById('clm_studienplan').className = 'active';
 					}
 					if (localStorage.getItem('clm_orgform') != null) 
 					{
@@ -534,6 +590,40 @@ if(isset($_GET['excel']))
 						document.getElementById(column).className = 'active';
 				}
 			}
+
+			function LoadStudienplan(type)
+			{
+				if(typeof type=='undefined')
+					type='';
+
+				var studiengang_kz = $('#studiengang_dropdown'+type).val();
+				var studiensemester_kurzbz = $('#studiensemester_dropdown'+type).val();
+				
+				$.ajax({
+					url: "reihungstestverwaltung_autocomplete.php",
+					data: { 'autocomplete':'getStudienplan',
+							'stg_kz':studiengang_kz,
+							'studiensemester_kurzbz': studiensemester_kurzbz
+						 },
+					type: "POST",
+					dataType: "json",
+					success: function(data) 
+					{
+						$("#studienplan_dropdown"+type).empty();
+						$("#studienplan_dropdown"+type).append('<option value="">Studienplan auswaehlen</option>');
+						$.each(data, function(i, data){
+							if (typeof data['sto_bezeichnung']!='undefined')
+								$("#studienplan_dropdown"+type).append('<option value="" disabled>Studienordnung: '+data['sto_bezeichnung']+'</option>');
+
+							$("#studienplan_dropdown"+type).append('<option value="'+data['stpid']+'">'+data['bezeichnung']+'</option>');
+						});
+					},
+					error: function(data) 
+					{
+						alert("Fehler beim Laden der Daten: "+data);
+					}
+				});
+			}
 		</script>
 		<style type="text/css">
 		.active
@@ -602,7 +692,24 @@ if(isset($_GET['excel']))
 			display: inline-block;
 			vertical-align: middle;
 		}
-
+		.listitem
+		{
+			background-color: lightgray;
+			padding: 0 5px 0 6px; 
+			border-radius: 3px; 
+			-webkit-border-radius: 3px; 
+			-moz-border-radius: 3px; 
+			vertical-align: middle;
+		}
+		.feldtitel
+		{
+			text-align: right;
+			padding-right: 5px;
+		}
+		input
+		{
+			padding-left: 6px;
+		}
 		</style>
 	</head>
 	<body class="Background_main">
@@ -727,6 +834,37 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 						die($rechte->errormsg);
 				}
 			}
+			if (isset($_POST['studienplan_id']) && $_POST['studienplan_id']!='')
+			{
+				/*$rt_stpl = new reihungstest();
+				$rt_stpl->getOrteReihungstest($reihungstest->reihungstest_id);
+				$zugeteilt = false;
+				foreach ($orte_zugeteilt->result AS $row)
+				{
+					if ($row->ort_kurzbz == $_POST['ort_kurzbz'])
+					{
+						$zugeteilt = true;
+						break;
+					}
+				}
+				// Check, ob der Raum schon diesem RT zugeteilt ist
+				if ($zugeteilt == false)
+				{*/
+					$rt_stpl = new reihungstest();
+					$rt_stpl->new = true;
+					$rt_stpl->rt_id = $reihungstest->reihungstest_id;
+					$rt_stpl->studienplan_id = $_POST['studienplan_id'];
+					
+					if ($rt_stpl->saveStudienplanReihungstest())
+					{
+						echo '<b>Daten wurden erfolgreich gespeichert</b> <script>window.opener.StudentReihungstestDropDownRefresh();</script>';
+					}
+					else
+						echo '<span class="input_error">Fehler beim Speichern des Studienplans: '.$db->convert_html_chars($rt_stpl->errormsg).'</span>';
+				/*}
+				else 
+					echo '<span class="input_error">Der Raum '.$_POST['ort_kurzbz'].' ist bereits diesem Reihungstest zugeteilt</span>';*/
+			}
 			$reihungstest_id = $reihungstest->reihungstest_id;
 			$stg_kz = $reihungstest->studiengang_kz;
 			$studiensemester_kurzbz = $reihungstest->studiensemester_kurzbz;
@@ -792,21 +930,47 @@ if(isset($_POST['raumzuteilung_speichern']))
 				//Pruefen ob Person schon Zuteilung in tbl_rt_person hat @todo: Kann weggelassen werden, wenn sichergestellt ist, dass das schon uebers FAS passiert
 				$checkperson = new Reihungstest();
 				$checkperson->getReihungstestPerson($key);
-				if ($checkperson->result)
+				foreach ($checkperson->result as $row)
+				{
+					if ($row->rt_id == $_POST['reihungstest_id'])
+					{
+						$raumzuteilung->new = false;
+						break;
+					}
+					else
+						$raumzuteilung->new = true;	
+				}
+				
+				$load_person = new reihungstest();
+				if ($load_person->getPersonReihungstest($key, $_POST['reihungstest_id']))
+				{
 					$raumzuteilung->new = false;
+					$raumzuteilung->rt_person_id = $load_person->rt_person_id;
+					$raumzuteilung->anmeldedatum = $load_person->anmeldedatum;
+					$raumzuteilung->teilgenommen = $load_person->teilgenommen;
+					$raumzuteilung->punkte = $load_person->punkte;
+					$raumzuteilung->studienplan_id = $load_person->studienplan_id;
+					
+					$raumzuteilung->rt_id = $load_person->rt_id;
+					$raumzuteilung->rt_id_old = $load_person->rt_id;
+					$raumzuteilung->person_id = $key;
+					$raumzuteilung->ort_kurzbz = $_POST['raumzuteilung'];
+				}
 				else 
 				{
 					$raumzuteilung->new = true;
+					$raumzuteilung->anmeldedatum = date('Y-m-d H:i:s');
+					$raumzuteilung->teilgenommen = false;
+					$raumzuteilung->punkte = 0;
+					$raumzuteilung->studienplan_id = '1'; //@todo: Falls noch kein rt_person-Eintrag vorhanden ist, muss ein Studienplan ermittelt werden. Kann das vorkommen? Wenn ja, welchen Studienplan sollen wir nehmen?
+						
+					$raumzuteilung->rt_id = $_POST['reihungstest_id'];
+					$raumzuteilung->rt_id_old = $_POST['reihungstest_id'];
+					$raumzuteilung->person_id = $key;
+					$raumzuteilung->ort_kurzbz = $_POST['raumzuteilung'];
 				}
 				
-				$raumzuteilung->anmeldedatum = date('Y-m-d H:i:s'); // @todo: Anmeldedatum, teilgenommen und Punkte nicht immer auf defaultwerte setzen sondern nur, wenn tatsächlich neu
-				$raumzuteilung->teilgenommen = false;
-				$raumzuteilung->punkte = 0;
 				
-				$raumzuteilung->rt_id = $_POST['reihungstest_id'];
-				$raumzuteilung->rt_id_old = $_POST['reihungstest_id'];
-				$raumzuteilung->person_id = $key;
-				$raumzuteilung->ort_kurzbz = $_POST['raumzuteilung'];
 				
 				if (!$raumzuteilung->savePersonReihungstest())
 				{
@@ -936,14 +1100,34 @@ if(isset($_GET['type']) && $_GET['type']=='verteilen')
 						{
 							$raumzuteilung->new = true;
 						}
-						$raumzuteilung->anmeldedatum = date('Y-m-d H:i:s');
-						$raumzuteilung->teilgenommen = false;
-						$raumzuteilung->punkte = 0;
-						
-						$raumzuteilung->rt_id = $reihungstest_id;
-						$raumzuteilung->rt_id_old = $reihungstest_id;
-						$raumzuteilung->person_id = $row->person_id;
-						$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
+						$load_person = new reihungstest();
+						if ($load_person->getPersonReihungstest($row->person_id, $reihungstest_id))
+						{
+							$raumzuteilung->new = false;
+							$raumzuteilung->rt_person_id = $load_person->rt_person_id;
+							$raumzuteilung->anmeldedatum = $load_person->anmeldedatum;
+							$raumzuteilung->teilgenommen = $load_person->teilgenommen;
+							$raumzuteilung->punkte = $load_person->punkte;
+							$raumzuteilung->studienplan_id = $load_person->studienplan_id;
+								
+							$raumzuteilung->rt_id = $load_person->rt_id;
+							$raumzuteilung->rt_id_old = $load_person->rt_id;
+							$raumzuteilung->person_id = $row->person_id;
+							$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
+						}
+						else
+						{
+							$raumzuteilung->new = true;
+							$raumzuteilung->anmeldedatum = date('Y-m-d H:i:s');
+							$raumzuteilung->teilgenommen = false;
+							$raumzuteilung->punkte = 0;
+							$raumzuteilung->studienplan_id = '1'; //@todo: Falls noch kein rt_person-Eintrag vorhanden ist, muss ein Studienplan ermittelt werden. Kann das vorkommen? Wenn ja, welchen Studienplan sollen wir nehmen?
+							
+							$raumzuteilung->rt_id = $reihungstest_id;
+							$raumzuteilung->rt_id_old = $reihungstest_id;
+							$raumzuteilung->person_id = $row->person_id;
+							$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
+						}
 						if (!$raumzuteilung->savePersonReihungstest())
 						{
 							echo '<span class="input_error">Fehler beim Speichern der Daten: '.$db->convert_html_chars($raumzuteilung->errormsg).'</span>';
@@ -1018,14 +1202,33 @@ if(isset($_GET['type']) && $_GET['type']=='auffuellen')
 					{
 						$raumzuteilung->new = true;
 					}
-					$raumzuteilung->anmeldedatum = date('Y-m-d H:i:s');
-					$raumzuteilung->teilgenommen = false;
-					$raumzuteilung->punkte = 0;
+					$load_person = new reihungstest();
+					if ($load_person->getPersonReihungstest($row->person_id, $reihungstest_id))
+					{
+						$raumzuteilung->new = false;
+						$raumzuteilung->rt_person_id = $load_person->rt_person_id;
+						$raumzuteilung->anmeldedatum = $load_person->anmeldedatum;
+						$raumzuteilung->teilgenommen = $load_person->teilgenommen;
+						$raumzuteilung->punkte = $load_person->punkte;
+						$raumzuteilung->studienplan_id = $load_person->studienplan_id;
 					
-					$raumzuteilung->rt_id = $reihungstest_id;
-					$raumzuteilung->rt_id_old = $reihungstest_id;
-					$raumzuteilung->person_id = $row->person_id;
-					$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
+						$raumzuteilung->rt_id = $load_person->rt_id;
+						$raumzuteilung->rt_id_old = $load_person->rt_id;
+						$raumzuteilung->person_id = $row->person_id;
+						$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
+					}
+					else
+					{
+						$raumzuteilung->new = true;
+						$raumzuteilung->anmeldedatum = date('Y-m-d H:i:s');
+						$raumzuteilung->teilgenommen = false;
+						$raumzuteilung->punkte = 0;
+						
+						$raumzuteilung->rt_id = $reihungstest_id;
+						$raumzuteilung->rt_id_old = $reihungstest_id;
+						$raumzuteilung->person_id = $row->person_id;
+						$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
+					}
 					if (!$raumzuteilung->savePersonReihungstest())
 					{
 						echo '<span class="input_error">Fehler beim Speichern der Daten: '.$db->convert_html_chars($raumzuteilung->errormsg).'</span>';
@@ -1116,6 +1319,21 @@ if(isset($_POST['delete_ort']))
 	}
 	$neu=false;
 }
+
+if(isset($_POST['delete_studienplan'])) //@todo: Check, ob Zuordnungen zu diesem Studienplan vorhanden sind. Wenn ja, nicht loeschen! 
+{
+	if(isset($_POST['reihungstest_id']) && $_POST['reihungstest_id']!='')
+	{
+		$delete_studienplan = new reihungstest();
+
+		if (!$delete_studienplan->deleteStudienplanReihungstest($_POST['reihungstest_id'], $_POST['delete_studienplan']))
+			echo '<span class="input_error">Fehler beim löschen der Studienplanzuteilung: '.$db->convert_html_chars($delete_studienplan->errormsg).'</span>';
+
+		$reihungstest_id = $_POST['reihungstest_id'];
+		$studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+	}
+	$neu=false;
+}
 //var_dump($_POST);
 
 echo '<table width="100%"><tr><td>';
@@ -1127,7 +1345,7 @@ if($stg_kz==-1)
 else
 	$selected='';
 
-echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=-1' $selected>Alle Studiengaenge</OPTION>";
+echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=-1&studiensemester_kurzbz=".$studiensemester_kurzbz."' $selected>Alle Studiengaenge</OPTION>";
 foreach ($studiengang->result as $row)
 {
 	$stg_arr[$row->studiengang_kz] = $row->kuerzel;
@@ -1141,15 +1359,71 @@ foreach ($studiengang->result as $row)
 	echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz&studiensemester_kurzbz=$studiensemester_kurzbz' $selected>".$db->convert_html_chars($row->kuerzel)."</OPTION>"."\n";
 }
 echo "</SELECT>";
+$studienplan_obj = new studienplan();
+$studienplan_obj->getStudienplaeneFromSem($stg_kz, $studiensemester_kurzbz);
+$studienordnung_arr = array();
+$studienplan_arr = array();
+$studienplaene_verwendet = array();
 
+foreach($studienplan_obj->result as $row_sto)
+{
+	$studienordnung_arr[$row_sto->studienordnung_id]['bezeichnung']=$row_sto->bezeichnung_studienordnung;
+	$studienplan_arr[$row_sto->studienordnung_id][$row_sto->studienplan_id]['bezeichnung']=$row_sto->bezeichnung_studienplan;
+
+	$studienplan_arr[$row_sto->studienordnung_id][$row_sto->studienplan_id]['orgform_kurzbz']=$row_sto->orgform_kurzbz;
+	$studienplan_arr[$row_sto->studienordnung_id][$row_sto->studienplan_id]['sprache']=$sprachen_arr[$row_sto->sprache];
+	$studienplaene_verwendet[$row_sto->studienplan_id] = $row_sto->bezeichnung_studienplan;
+}
+
+// Pruefen ob uebergebene StudienplanID in Auswahl enthalten
+// ist und ggf auf leer setzen
+if($studienplan_id!='')
+{
+	$studienplan_found=false;
+	foreach($studienplan_arr as $stoid=>$row_sto)
+	{
+		if(array_key_exists($studienplan_id, $studienplan_arr[$stoid]))
+		{
+			$studienplan_found=true;
+			break;
+		}
+	}
+	if(!$studienplan_found)
+	{
+		$studienplan_id='';
+	}
+}
+/*
+// Studienplan DropDown
+echo "<SELECT name='studienplan' onchange='window.location.href=this.value'>";
+
+echo "<OPTION value='".$_SERVER['PHP_SELF']."?studienplan_id='>Studienplan auswaehlen</OPTION>";
+
+
+foreach($studienordnung_arr as $stoid=>$row_sto)
+{
+	$selected='';
+
+	echo '<option value="" disabled>Studienordnung: '.$db->convert_html_chars($row_sto['bezeichnung']).'</option>';
+
+	foreach ($studienplan_arr[$stoid] as $stpid=>$row_stp)
+	{
+		$selected='';
+		if($studienplan_id=='')
+			$studienplan_id=$stpid;
+		if($stpid == $studienplan_id)
+			$selected='selected';
+	
+		//echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz&studiensemester_kurzbz=$studiensemester_kurzbz' $selected>".$db->convert_html_chars($row->kuerzel)."</OPTION>"."\n";
+		echo '<option value="?stg_kz='.$stg_kz.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&studienplan_id='.$stpid.'" '.$selected.'>'.$db->convert_html_chars($row_stp['bezeichnung']).' ('.$orgform_arr[$row_stp['orgform_kurzbz']].', '.$row_stp['sprache'].') </option>';
+	}
+}
+echo "</SELECT>";
+*/
 // Studiensemester DropDown
 echo "<SELECT name='studiensemester' onchange='window.location.href=this.value'>";
-/*if($stg_kz==-1)
-	$selected='selected';
-else
-	$selected='';*/
 
-echo "<OPTION value='".$_SERVER['PHP_SELF']."?studiensemester_kurzbz='>Alle Studiensemester</OPTION>";
+echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=".$stg_kz."&studiensemester_kurzbz='>Alle Studiensemester</OPTION>";
 foreach ($studiensemester->studiensemester as $row)
 {
 	if($row->studiensemester_kurzbz == $studiensemester_kurzbz)
@@ -1163,10 +1437,13 @@ echo "</SELECT>";
 
 //Reihungstest DropDown
 $reihungstest = new reihungstest();
-if($stg_kz==-1)
+if($stg_kz==-1 && $studiensemester_kurzbz=='')
 	$reihungstest->getAll(date('Y').'-01-01'); //Alle Reihungstests ab diesem Jahr laden
+elseif($stg_kz==-1 && $studiensemester_kurzbz!='')
+	$reihungstest->getReihungstest('','datum DESC,uhrzeit DESC',$studiensemester_kurzbz);
 else
 	$reihungstest->getReihungstest($stg_kz,'datum DESC,uhrzeit DESC',$studiensemester_kurzbz);
+	
 
 echo "<SELECT name='reihungstest' id='reihungstest' onchange='window.location.href=this.value'>";
 foreach ($reihungstest->result as $row)
@@ -1184,8 +1461,8 @@ foreach ($reihungstest->result as $row)
 	echo "\n";
 }
 echo '</SELECT>';
-echo "<INPUT type='button' value='Anzeigen' onclick='window.location.href=document.getElementById(\"reihungstest\").value;'>";
-echo '&nbsp;&nbsp;<input type="button" value="Neuen Termin anlegen" onclick="window.location.href=\''.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&neu=true\'" >';
+echo "<button onclick='window.location.href=document.getElementById(\"reihungstest\").value;'>Anzeigen</button>";
+echo '&nbsp;&nbsp;<button onclick="window.location.href=\''.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&neu=true\'" >Neuen Termin anlegen</button>';
 echo "</td></tr></table>";
 
 if($reihungstest_id=='')
@@ -1207,6 +1484,18 @@ else
 	$reihungstest->anmeldefrist = date('Y-m-d', time() - 60 * 60 * 24);
 }
 
+$studienplaene_arr = array();
+$studienplaene = new reihungstest();
+$studienplaene->getStudienplaeneReihungstest($reihungstest->reihungstest_id);
+foreach ($studienplaene->result AS $row)
+{
+	$studienplan = new studienplan();
+	$studienplan->loadStudienplan($row->studienplan_id);
+	$studienplaene_arr[ $row->studienplan_id] = $studienplan->bezeichnung;
+}
+
+$studienplaene_list = implode(',', array_keys($studienplaene_arr));
+
 //Formular zum Bearbeiten des Reihungstests
 ?>
 <hr>
@@ -1218,9 +1507,9 @@ else
 		<td style="vertical-align: top">
 		<table>
 		<tr>
-			<td>Studiengang</td>
+			<td class="feldtitel">Studiengang</td>
 			<td>
-				<select name='studiengang_kz'>
+				<select id='studiengang_dropdown' name='studiengang_kz' onchange='LoadStudienplan()'>
 				<?php if($reihungstest->studiengang_kz)
 						$selected = '';
 					else
@@ -1240,7 +1529,7 @@ else
 			</td>
 		</tr>
 		<tr>
-			<td>Stufe</td>
+			<td class="feldtitel">Stufe</td>
 			<td>
 				<select name='stufe'>
 				<option value=''>-- keine Auswahl --</option>
@@ -1255,7 +1544,7 @@ else
 					<?php } ?>
 				</select>
 				&nbsp;&nbsp;Studiensemester
-				<select name='studiensemester_kurzbz'>
+				<select id='studiensemester_dropdown' name='studiensemester_kurzbz'>
 				<option value=''>-- keine Auswahl --</option>
 					<?php 
 						foreach ($studiensemester->studiensemester as $row)
@@ -1271,81 +1560,155 @@ else
 				</select>
 			</td>
 		</tr>
-		<tr>
-			<td style="vertical-align: top">Ort</td>
-			<?php 
-			$arbeitsplaetze_sum = 0;
+		<?php 
+		if($neu)
+		{
+			echo '<tr>';
+			echo '<td class="feldtitel">Studienplan</td>';
+			echo '<td>';
+			
+			// Studienplan DropDown
+			echo "<SELECT id='studienplan_dropdown' name='studienplan_id'>";
+			
+			echo "<OPTION value=''>Studienplan auswaehlen</OPTION>";
+			// Pruefen ob uebergebene StudienplanID in Auswahl enthalten
+			// ist und ggf auf leer setzen
+			if($studienplan_id!='')
+			{
+				$studienplan_found=false;
+				foreach($studienplan_arr as $stoid=>$row_sto)
+				{
+					if(array_key_exists($studienplan_id, $studienplan_arr[$stoid]))
+					{
+						$studienplan_found=true;
+						break;
+					}
+				}
+				if(!$studienplan_found)
+				{
+					$studienplan_id='';
+				}
+			}
+			foreach($studienordnung_arr as $stoid=>$row_sto)
+			{
+				$selected='';
+			
+				echo '<option value="" disabled>Studienordnung: '.$db->convert_html_chars($row_sto['bezeichnung']).'</option>';
+			
+				foreach ($studienplan_arr[$stoid] as $stpid=>$row_stp)
+				{
+					$selected='';
+					if($studienplan_id=='')
+						$studienplan_id=$stpid;
+					if($stpid == $studienplan_id)
+						$selected='selected';
+				
+					echo '<option value="'.$stpid.'" '.$selected.'>'.$db->convert_html_chars($row_stp['bezeichnung']).' ('.$orgform_arr[$row_stp['orgform_kurzbz']].', '.$row_stp['sprache'].') </option>';
+				}
+			}
+			echo "</SELECT>";
+			echo '</td></tr>';
+		}
+		else 
+		{		
+			echo '<td class="feldtitel">Studienpläne</td>';
+			
 			if(!$neu)
 			{
-				$orte = new Reihungstest();
-				$orte->getOrteReihungstest($reihungstest->reihungstest_id);
-				echo '<td><table>';
-				if ($rechte->isBerechtigt('lehre/reihungstestOrt', null, 'sui'))
+				//echo '<td><table>';
+				echo '<td>';
+				echo '<input id="studienplan_id" type="hidden" name="studienplan_id" value="">';
+				echo '<input id="studienplan_autocomplete" type="text" name="studienplan" size="40" placeholder="Weiterer Studienplan" value="">';
+				echo '<button type="submit" name="speichern"><img src="../../skin/images/list-add.png" alt="Studienplan hinzufügen" height="13px"></button></td>';
+				echo '</tr>';
+				
+				foreach ($studienplaene->result AS $row)
 				{
-					echo '<tr><td colspan="2"><input id="ort" type="text" name="ort_kurzbz" placeholder="Ort eingeben" value="">';
-					echo '&nbsp;<button type="submit" name="speichern"><img src="../../skin/images/list-add.png" alt="Ort hinzufügen" height="13px"></button>';
-					echo '</td></tr>';
+					$studienplan = new studienplan();
+					$studienplan->loadStudienplan($row->studienplan_id);
+					
+					echo '<tr><td>&nbsp;</td>';
+					echo '<td class="listitem">'.$studienplan->bezeichnung.' ('.$studienplan->studienplan_id.')</td>';
+					echo '<td><button type="submit" name="delete_studienplan" value="'.$row->studienplan_id.'"><img src="../../skin/images/delete_x.png" alt="Studienplan entfernen" height="13px"></button></td>';
+					echo '</tr>';
 				}
-				else 
-				{
-					echo '<tr><td colspan="2">Keine Berechtigung zum zuteilen von Räumen</td></tr>';
-				}
-				foreach ($orte->result AS $row)
-				{
-					//echo '<tr><td>&nbsp;</td><td>';
-					//echo '<br>';
-					$person = new Person();
-					$person->getPersonFromBenutzer($row->uid);
-					if ($row->uid != '')
-						$anzeigename = $person->vorname.' '.$person->nachname.' ('.$row->uid.')';
-					else 
-						$anzeigename = '';
-					//echo '<div style="border: 1px solid grey; padding: 2px; margin: 2px; -webkit-border-radius: 5px; -moz-border-radius: 5px; border-radius: 5px; width: content;">'.$row->ort_kurzbz;
-					echo '<tr><td>'.$row->ort_kurzbz.' ('.$orte_array[$row->ort_kurzbz].' Personen)</td><td>';
-					//echo ' <input type="hidden" id="aufsicht_'.$row->ort_kurzbz.'" name="aufsicht['.$row->ort_kurzbz.']" value="'.$db->convert_html_chars($row->uid).'">';
-					echo ' <input type="text" id="aufsicht_'.$row->ort_kurzbz.'" class="aufsicht_uid" name="aufsicht['.$row->ort_kurzbz.']" value="'.$anzeigename.'" placeholder="Aufsichtsperson" size="32">';
-					if ($rechte->isBerechtigt('lehre/reihungstestOrt', null, 'suid'))
-						echo '<button type="submit" name="delete_ort" value="'.$row->ort_kurzbz.'"><img src="../../skin/images/delete_x.png" alt="Ort hinzufügen" height="13px"></button>';
-					//echo '</div></td></tr>';
-					echo '</td></tr>';
-					$arbeitsplaetze_sum = $arbeitsplaetze_sum + $orte_array[$row->ort_kurzbz];
-				}
-				echo '</table></td>';
-				//echo '<td><input id="ort" type="text" name="ort_kurzbz" placeholder="Ort eingeben" value="'.$db->convert_html_chars($reihungstest->ort_kurzbz).'"></td>';
+				//echo '</table></td>';
 			}
 			else 
-				echo '<td>Nach dem Anlegen eines Termins, können Sie Räume zuordnen</td>';
-			?>
-		</tr>
+				echo '<td colspan="2">Nach dem Anlegen eines Termins, können Sie weitere Studienpläne zuordnen</td>';
+		}
+
+		$arbeitsplaetze_sum = 0;
+		if(!$neu)
+		{
+			echo '<tr><td class="feldtitel">Ort</td>';
+			//echo '<td>';
+			if ($rechte->isBerechtigt('lehre/reihungstestOrt', null, 'sui'))
+			{
+				echo '<td><input id="ort" type="text" name="ort_kurzbz" placeholder="Ort eingeben" value="">';
+				echo '<button type="submit" name="speichern"><img src="../../skin/images/list-add.png" alt="Ort hinzufügen" height="13px"></button></td>';
+				echo '</td></tr>';
+			}
+			else 
+			{
+				echo '<td colspan="2">Keine Berechtigung zum zuteilen von Räumen</td>';
+			}
+			$orte = new Reihungstest();
+			$orte->getOrteReihungstest($reihungstest->reihungstest_id);
+			foreach ($orte->result AS $row)
+			{
+				$person = new Person();
+				$person->getPersonFromBenutzer($row->uid);
+				if ($row->uid != '')
+					$anzeigename = $person->vorname.' '.$person->nachname.' ('.$row->uid.')';
+				else 
+					$anzeigename = '';
+
+				echo '<tr><td>&nbsp;</td>';
+				echo '<td class="listitem">'.$row->ort_kurzbz.' ('.$orte_array[$row->ort_kurzbz].' Personen)';
+				echo ' <input type="text" id="aufsicht_'.$row->ort_kurzbz.'" class="aufsicht_uid" name="aufsicht['.$row->ort_kurzbz.']" value="'.$anzeigename.'" placeholder="Aufsichtsperson" size="32">';
+				if ($rechte->isBerechtigt('lehre/reihungstestOrt', null, 'suid'))
+					echo '</td><td><button type="submit" name="delete_ort" value="'.$row->ort_kurzbz.'"><img src="../../skin/images/delete_x.png" alt="Ort hinzufügen" height="13px"></button>';
+				echo '</td></tr>';
+				$arbeitsplaetze_sum = $arbeitsplaetze_sum + $orte_array[$row->ort_kurzbz];
+			}
+			//echo '</table></td>';
+		}
+		else 
+		{
+			echo '<tr><td class="feldtitel">Ort</td>';
+			echo '<td colspan="2">Nach dem Anlegen eines Termins, können Sie Räume zuordnen</td></tr>';
+		}
+		?>
 		</table>
 		</td>
 		<td style="padding-left: 20px; vertical-align: top">
 		<table>
 		<tr>
-			<td>Anmerkung</td>
+			<td class="feldtitel">Anmerkung</td>
 			<td><input type="text" size="64" maxlength="64" name="anmerkung" value="<?php echo $db->convert_html_chars($reihungstest->anmerkung) ?>"> (max. 64 Zeichen)</td>
 		</tr>
 		<tr>
-			<td>Datum</td>
+			<td class="feldtitel">Datum</td>
 			<td><input class="datepicker_datum" type="text" name="datum" value="<?php echo $datum_obj->convertISODate($reihungstest->datum) ?>"></td>
 		</tr>
 		<tr>
-			<td>Uhrzeit</td>
+			<td class="feldtitel">Uhrzeit</td>
 			<td><input type="text" class="timepicker" name="uhrzeit" value="<?php echo $db->convert_html_chars($datum_obj->formatDatum($reihungstest->uhrzeit,'H:i')) ?>" placeholder="HH:MM"> (Format: HH:MM)</td>
 		</tr>
 		<tr>
-			<td>Anmeldefrist</td>
+			<td class="feldtitel">Anmeldefrist</td>
 			<td><input class="datepicker_datum" type="text" name="anmeldefrist" value="<?php echo $datum_obj->convertISODate($reihungstest->anmeldefrist) ?>"></td>
 		</tr>
 		<tr>
-			<td>Max TeilnehmerInnen</td>
+			<td class="feldtitel">Max TeilnehmerInnen</td>
 			<td>
 				<input type="number" name="max_teilnehmer" id="max_teilnehmer" value="<?php echo ($reihungstest->max_teilnehmer!=''?$reihungstest->max_teilnehmer:'') ?>">
 				(optional; <?php echo $arbeitsplaetze_sum; ?> laut Raumkapazität)
 			</td>
 		</tr>
 		<tr>
-			<td>Öffentlich</td>
+			<td class="feldtitel">Öffentlich</td>
 			<td>
 				<input type="hidden" name="oeffentlich" value="0">
 				<input type="checkbox" name="oeffentlich" value="1" <?php echo $reihungstest->oeffentlich ? 'checked="checked"' : '' ?>>
@@ -1353,7 +1716,7 @@ else
 			</td>
 		</tr>
 		<tr>
-			<td>Freigeschaltet</td>
+			<td class="feldtitel">Freigeschaltet</td>
 			<td>
 				<input type="checkbox" name="freigeschaltet"<?php echo $reihungstest->freigeschaltet ? 'checked="checked"' : '' ?>>
 				(Kurz vor Testbeginn aktivieren)
@@ -1388,53 +1751,120 @@ else
 
 <hr>
 <?php
+echo '<table width="100%"><tr><td>';
+if($reihungstest_id!='')
+{
+	echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&excel=true">Excel Export</a>';
+	echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&type=saveallrtpunkte">Punkte ins FAS &uuml;bertragen</a>';
+}
+echo '<a class="buttongreen" href="../../cis/testtool/admin/auswertung.php?'.($reihungstest_id!=''?"reihungstest=$reihungstest_id":'').'" target="_blank">Auswertung</a>';
+echo '<a class="buttonorange" href="reihungstest_zusammenlegung.php">Anmeldungen zusammenlegen</a>';
+if($rechte->isBerechtigt('basis/testtool', null, 'suid'))
+{
+	echo '<a class="buttonorange" href="reihungstest_administration.php">Administration</a><br>';
+}
+echo '</td></tr>';
+echo '</td></tr></table>';
 if($reihungstest_id!='')
 {
 //Liste der Interessenten die zum Reihungstest angemeldet sind
-	$qry = "SELECT 
-			prestudent_id,
-			person_id,
-			vorname,
-			nachname,
-			ort_kurzbz,
-			studiengang_kz,
-			gebdatum,
-			geschlecht,
-			rt_punkte1
-				,(
-					SELECT kontakt
-					FROM tbl_kontakt
-					WHERE kontakttyp = 'email'
-						AND person_id = tbl_prestudent.person_id
-						AND zustellung = true LIMIT 1
-					) AS email
-				,(
-					SELECT ausbildungssemester
-					FROM public.tbl_prestudentstatus
-					WHERE prestudent_id = tbl_prestudent.prestudent_id
-						AND datum = (
-							SELECT MAX(datum)
-							FROM public.tbl_prestudentstatus
-							WHERE prestudent_id = tbl_prestudent.prestudent_id
-								AND status_kurzbz = 'Interessent'
-							) LIMIT 1
-					) AS ausbildungssemester
-				,(
-					SELECT orgform_kurzbz
-					FROM public.tbl_prestudentstatus
-					WHERE prestudent_id = tbl_prestudent.prestudent_id
-						AND datum = (
-							SELECT MAX(datum)
-							FROM public.tbl_prestudentstatus
-							WHERE prestudent_id = tbl_prestudent.prestudent_id
-								AND status_kurzbz = 'Interessent'
-							) LIMIT 1
-					) AS orgform_kurzbz
-			FROM public.tbl_prestudent
-			JOIN public.tbl_person USING (person_id)
-			LEFT JOIN public.tbl_rt_person USING (person_id)
-			WHERE reihungstest_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)."
-			ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname ";
+	$qry = "
+
+SELECT 
+rt_id,
+prestudent_id,
+tbl_rt_person.person_id,
+vorname,
+nachname,
+ort_kurzbz,
+studienplan_id,
+studiengang_kz,
+gebdatum,
+geschlecht,
+rt_punkte1
+,(
+	SELECT kontakt
+	FROM tbl_kontakt
+	WHERE kontakttyp = 'email'
+		AND person_id = tbl_rt_person.person_id
+		AND zustellung = true LIMIT 1
+	) AS email
+,(
+	SELECT ausbildungssemester
+	FROM public.tbl_prestudentstatus
+	WHERE prestudent_id = tbl_prestudent.prestudent_id
+		AND datum = (
+			SELECT MAX(datum)
+			FROM public.tbl_prestudentstatus
+			WHERE prestudent_id = tbl_prestudent.prestudent_id
+				AND status_kurzbz = 'Interessent'
+			) LIMIT 1
+	) AS ausbildungssemester
+,(
+	SELECT orgform_kurzbz
+	FROM public.tbl_prestudentstatus
+	WHERE prestudent_id = tbl_prestudent.prestudent_id
+		AND datum = (
+			SELECT MAX(datum)
+			FROM public.tbl_prestudentstatus
+			WHERE prestudent_id = tbl_prestudent.prestudent_id
+				AND status_kurzbz = 'Interessent'
+			) LIMIT 1
+	) AS orgform_kurzbz
+FROM public.tbl_rt_person
+JOIN public.tbl_person USING (person_id)
+JOIN public.tbl_prestudent ON (tbl_rt_person.person_id=tbl_prestudent.person_id AND tbl_rt_person.rt_id=tbl_prestudent.reihungstest_id)
+WHERE rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)."
+AND tbl_rt_person.studienplan_id IN (".$studienplaene_list.")
+ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname
+
+/*
+SELECT 
+prestudent_id,
+person_id,
+vorname,
+nachname,
+ort_kurzbz,
+studienplan_id,
+studiengang_kz,
+gebdatum,
+geschlecht,
+rt_punkte1
+,(
+	SELECT kontakt
+	FROM tbl_kontakt
+	WHERE kontakttyp = 'email'
+		AND person_id = tbl_prestudent.person_id
+		AND zustellung = true LIMIT 1
+	) AS email
+,(
+	SELECT ausbildungssemester
+	FROM public.tbl_prestudentstatus
+	WHERE prestudent_id = tbl_prestudent.prestudent_id
+		AND datum = (
+			SELECT MAX(datum)
+			FROM public.tbl_prestudentstatus
+			WHERE prestudent_id = tbl_prestudent.prestudent_id
+				AND status_kurzbz = 'Interessent'
+			) LIMIT 1
+	) AS ausbildungssemester
+,(
+	SELECT orgform_kurzbz
+	FROM public.tbl_prestudentstatus
+	WHERE prestudent_id = tbl_prestudent.prestudent_id
+		AND datum = (
+			SELECT MAX(datum)
+			FROM public.tbl_prestudentstatus
+			WHERE prestudent_id = tbl_prestudent.prestudent_id
+				AND status_kurzbz = 'Interessent'
+			) LIMIT 1
+	) AS orgform_kurzbz
+FROM public.tbl_rt_person
+JOIN public.tbl_person USING (person_id)
+JOIN public.tbl_prestudent USING (person_id)
+WHERE reihungstest_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)."
+AND tbl_rt_person.studienplan_id IN (".$studienplaene_list.")
+ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname */";
 //echo $qry;
 $mailto = '';
 $result_arr = array();
@@ -1459,20 +1889,17 @@ if($result = $db->db_query($qry))
 	}
 }
 
-	echo '<span style="font-size: 9pt">Anzahl: '.$db->db_num_rows($result).'/'.($reihungstest->max_teilnehmer!=''?$reihungstest->max_teilnehmer:$arbeitsplaetze_sum).'</span>';
 	echo '<table width="100%"><tr><td>';
-	echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&excel=true">Excel Export</a>';
-	echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&type=saveallrtpunkte">Punkte ins FAS &uuml;bertragen</a>';
-	echo '<a class="buttongreen" href="../../cis/testtool/admin/auswertung.php?'.($reihungstest_id!=''?"reihungstest=$reihungstest_id":'').'" target="_blank">Auswertung</a>';
-	if($rechte->isBerechtigt('basis/testtool', null, 'suid'))
-	{
-		echo '<a class="buttonorange" href="reihungstest_administration.php">Administration</a><br>';
-	}
-	echo '</td></tr><tr><td>';
-	echo '<div id="clm_id" class="active" onclick="hideColumn(\'clm_id\')">ID</div>';
+	echo '<tr><td>';
+	echo '<span style="font-size: 9pt">Anzahl: '.$db->db_num_rows($result).'/'.($reihungstest->max_teilnehmer!=''?$reihungstest->max_teilnehmer:$arbeitsplaetze_sum).'</span>';
+	echo '</td></tr>';
+	echo '<tr><td>';
+	echo '<div id="clm_prestudent_id" class="active" onclick="hideColumn(\'clm_prestudent_id\')">Prestudent ID</div>';
+	echo '<div id="clm_person_id" class="active" onclick="hideColumn(\'clm_person_id\')">Person ID</div>';
 	echo '<div id="clm_geschlecht" class="active" onclick="hideColumn(\'clm_geschlecht\')">Geschlecht</div>';
 	echo '<div id="clm_studiengang" class="active" onclick="hideColumn(\'clm_studiengang\')">Studiengang</div>';
 	echo '<div id="clm_orgform" class="active" onclick="hideColumn(\'clm_orgform\')">OrgForm</div>';
+	echo '<div id="clm_studienplan" class="active" onclick="hideColumn(\'clm_studienplan\')">Studienplan</div>';
 	echo '<div id="clm_einstiegssemester" class="active" onclick="hideColumn(\'clm_einstiegssemester\')">Einstiegssemester</div>';
 	echo '<div id="clm_geburtsdatum" class="active" onclick="hideColumn(\'clm_geburtsdatum\')">Geburtsdatum</div>';
 	echo '<div id="clm_email" class="active" onclick="hideColumn(\'clm_email\')">EMail</div>';
@@ -1504,12 +1931,14 @@ if($result = $db->db_query($qry))
 						<a href="#" data-toggle="checkboxes" data-action="uncheck" id="uncheck_t'.$cnt.'"><img src="../../skin/images/checkbox_uncheck.png" name="toggle"></a>
 					</nobr>
 					</th>
-					<th style="display: table-cell" class="clm_id" title="PrestudentID">ID</th>
+					<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>
+					<th style="display: table-cell" class="clm_person_id" title="PersonID">Person ID</th>
 					<th>Nachname</th>
 					<th>Vorname</th>
 					<th style="display: table-cell" class="clm_geschlecht">Geschlecht</th>
 					<th style="display: table-cell" class="clm_studiengang">Studiengang</th>
  					<th style="display: table-cell" class="clm_orgform">OrgForm</th>
+					<th style="display: table-cell" class="clm_studienplan">Studienplan</th>
 					<th style="display: table-cell" class="clm_einstiegssemester">Einstiegssemester</th>
 					<th style="display: table-cell" class="clm_geburtsdatum">Geburtsdatum</th>
 					<th style="display: table-cell" class="clm_email">EMail</th>
@@ -1553,12 +1982,14 @@ if($result = $db->db_query($qry))
 				echo '
 					<tr>
 						<td style="text-align: center"><input type="checkbox" class="chkbox" id="checkbox_'.$row->person_id.'" name="checkbox['.$row->person_id.']"></td>
-						<td style="display: table-cell" class="clm_id">'.$db->convert_html_chars($row->prestudent_id).'</td>
+						<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>
+						<td style="display: table-cell" class="clm_person_id">'.$db->convert_html_chars($row->person_id).'</td>
 						<td>'.$db->convert_html_chars($row->nachname).'</td>
 						<td>'.$db->convert_html_chars($row->vorname).'</td>
 						<td style="display: table-cell" class="clm_geschlecht">'.$db->convert_html_chars($row->geschlecht).'</td>
 						<td style="display: table-cell" class="clm_studiengang">'.$db->convert_html_chars($stg_arr[$row->studiengang_kz]).'</td>
 						<td style="display: table-cell" class="clm_orgform">'.$db->convert_html_chars($row->orgform_kurzbz!=''?$row->orgform_kurzbz:' ').'</td>
+						<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplaene_arr[$row->studienplan_id]).' ('.$row->studienplan_id.')</td>
 						<td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
 						<td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
 						<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
@@ -1612,12 +2043,14 @@ if($result = $db->db_query($qry))
 							<a href="#" data-toggle="checkboxes" data-action="uncheck" id="uncheck_t'.$cnt.'"><img src="../../skin/images/checkbox_uncheck.png" name="toggle"></a>
 						</nobr>
 						</th>
-						<th style="display: table-cell" class="clm_id" title="PrestudentID">ID</th>
+						<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>
+						<th style="display: table-cell" class="clm_person_id" title="PersonID">Person ID</th>
 						<th>Nachname</th>
 						<th>Vorname</th>
 						<th style="display: table-cell" class="clm_geschlecht">Geschlecht</th>
 						<th style="display: table-cell" class="clm_studiengang">Studiengang</th>
 	 					<th style="display: table-cell" class="clm_orgform">OrgForm</th>
+						<th style="display: table-cell" class="clm_studienplan">Studienplan</th>
 						<th style="display: table-cell" class="clm_einstiegssemester">Einstiegssemester</th>
 						<th style="display: table-cell" class="clm_geburtsdatum">Geburtsdatum</th>
 						<th style="display: table-cell" class="clm_email">EMail</th>
@@ -1663,12 +2096,14 @@ if($result = $db->db_query($qry))
 					echo '
 						<tr>
 							<td style="text-align: center"><input class="chkbox" type="checkbox" id="checkbox_'.$row->person_id.'" name="checkbox['.$row->person_id.']"></td>
-							<td style="display: table-cell" class="clm_id">'.$db->convert_html_chars($row->prestudent_id).'</td>
+							<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>
+							<td style="display: table-cell" class="clm_person_id">'.$db->convert_html_chars($row->person_id).'</td>
 							<td>'.$db->convert_html_chars($row->nachname).'</td>
 							<td>'.$db->convert_html_chars($row->vorname).'</td>
 							<td style="display: table-cell" class="clm_geschlecht">'.$db->convert_html_chars($row->geschlecht).'</td>
 							<td style="display: table-cell" class="clm_studiengang">'.$db->convert_html_chars($stg_arr[$row->studiengang_kz]).'</td>
 							<td style="display: table-cell" class="clm_orgform">'.$db->convert_html_chars($row->orgform_kurzbz!=''?$row->orgform_kurzbz:' ').'</td>
+							<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplaene_arr[$row->studienplan_id]).' ('.$row->studienplan_id.')</td>
 							<td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
 							<td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
 							<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
@@ -1685,12 +2120,14 @@ if($result = $db->db_query($qry))
 				echo '
 					<tr>
 						<td style="text-align: center">-</td>
-						<td style="display: table-cell" class="clm_id">-</td>
+						<td style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">-</td>
+						<td style="display: table-cell" class="clm_person_id" title="PersonID">-</td>
 						<td>-</td>
 						<td>-</td>
 						<td style="display: table-cell" class="clm_geschlecht">-</td>
 						<td style="display: table-cell" class="clm_studiengang">-</td>
 						<td style="display: table-cell" class="clm_orgform">-</td>
+						<td style="display: table-cell" class="clm_studienplan">-</td>
 						<td style="display: table-cell" class="clm_einstiegssemester">-</td>
 						<td style="display: table-cell" class="clm_geburtsdatum">-</td>
 						<td style="display: table-cell; align: center" class="clm_email">-</td>
@@ -1725,7 +2162,7 @@ if($result = $db->db_query($qry))
 	
 	
 	echo '</tr></table>';
-	echo "<span style='font-size: 9pt'><a href='mailto:?bcc=$mailto'>Mail an alle senden</a></span>";
+	//echo "<span style='font-size: 9pt'><a href='mailto:?bcc=$mailto'>Mail an alle senden</a></span>"; //@todo: Braucht man das noch oder eventuell gleich raumweise?
 } ?>
 
 	</body>
