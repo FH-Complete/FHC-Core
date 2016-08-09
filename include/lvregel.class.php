@@ -778,7 +778,7 @@ class lvregel extends basis_db
 		$lv->load($stpllv->lehrveranstaltung_id);
 
 		$this->debug('Abgeschlossen:'.$retval.' ECTS:'.$ects,1);
-		if($ects>=$lv->ects)
+		if($retval && ($ects>=$lv->ects))
 			return true;
 		else
 			return false;
