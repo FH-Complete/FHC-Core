@@ -380,7 +380,7 @@ function recursiveGetVorlagestudiengang_id($oe_kurzbz, $db)
 		if(!$resultParent = $db->db_query($queryParent))
 			die("Fehler beim holen der Dokumentenliste");
 		if(!$rowParent = $db->db_fetch_object($resultParent))
-			die("Fehler beim holen der Dokumentenliste");
+			return false;
 
 		return recursiveGetVorlagestudiengang_id($rowParent->oe_parent_kurzbz, $db);
 	}

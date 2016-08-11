@@ -172,7 +172,7 @@ class dokument_export
 		$this->temp_folder = sys_get_temp_dir().'/fhcunoconv-'.uniqid();
 		mkdir($this->temp_folder);
 		chdir($this->temp_folder);
-		file_put_contents('content.xml', $contentbuffer);
+		file_put_contents($this->temp_folder . '/content.xml', $contentbuffer);
 
 		// styles.xml erstellen
 		if(!is_null($this->styles_xsl))
@@ -182,7 +182,7 @@ class dokument_export
 
 			$stylesbuffer = $style_proc->transformToXml($this->xml_data);
 
-			file_put_contents('styles.xml', $stylesbuffer);
+			file_put_contents($this->temp_folder . '/styles.xml', $stylesbuffer);
 		}
 
 		// Template holen
