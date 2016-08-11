@@ -50,7 +50,7 @@ require_once('../../include/studienplan.class.php');
 require_once('../../include/sprache.class.php');
 require_once('../../include/organisationsform.class.php');
 
-// @todo Allgemein: Beim kopierenauch die Studienplanzuordnungen übernehmen
+// @todo Allgemein: Beim kopieren auch die Studienplanzuordnungen übernehmen
 //					"Teilgenommen" und "Punkte" werden immer mit false bzw. 0 gespeichert
 
 define('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND', '5');
@@ -78,7 +78,7 @@ $error = false;
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-
+/*
 if ($reihungstest_id != '' || isset($_POST['reihungstest_id']))
 {
 	if ($reihungstest_id != '')
@@ -95,7 +95,7 @@ if ($reihungstest_id != '' || isset($_POST['reihungstest_id']))
 	}
 	else
 		$studiensemester_kurzbz = $stsem_akt;
-}
+}*/
 
 if ($stg_kz == '' && ($reihungstest_id != '' || isset($_POST['reihungstest_id'])))
 {
@@ -150,7 +150,68 @@ if(isset($_GET['excel']))
 	$reihungstest = new reihungstest();
 	if($reihungstest->load($_GET['reihungstest_id']))
 	{
-		$qry = "SELECT 
+		$studienplaene_arr = array();
+		$studienplaene = new reihungstest();
+		$studienplaene->getStudienplaeneReihungstest($reihungstest->reihungstest_id);
+		foreach ($studienplaene->result AS $row)
+		{
+			$studienplan = new studienplan();
+			$studienplan->loadStudienplan($row->studienplan_id);
+			$studienplaene_arr[ $row->studienplan_id] = $studienplan->bezeichnung;
+		}
+		
+		$studienplaene_list = implode(',', array_keys($studienplaene_arr));
+		$qry = "
+				SELECT 
+				rt_id,
+				prestudent_id,
+				tbl_rt_person.person_id,
+				vorname,
+				nachname,
+				ort_kurzbz,
+				studienplan_id,
+				studiengang_kz,
+				gebdatum,
+				geschlecht,
+				rt_punkte1
+				,(
+					SELECT kontakt
+					FROM tbl_kontakt
+					WHERE kontakttyp = 'email'
+						AND person_id = tbl_rt_person.person_id
+						AND zustellung = true LIMIT 1
+					) AS email
+				,(
+					SELECT ausbildungssemester
+					FROM public.tbl_prestudentstatus
+					WHERE prestudent_id = tbl_prestudent.prestudent_id
+						AND datum = (
+							SELECT MAX(datum)
+							FROM public.tbl_prestudentstatus
+							WHERE prestudent_id = tbl_prestudent.prestudent_id
+								AND status_kurzbz = 'Interessent'
+							) LIMIT 1
+					) AS ausbildungssemester
+				,(
+					SELECT orgform_kurzbz
+					FROM public.tbl_prestudentstatus
+					WHERE prestudent_id = tbl_prestudent.prestudent_id
+						AND datum = (
+							SELECT MAX(datum)
+							FROM public.tbl_prestudentstatus
+							WHERE prestudent_id = tbl_prestudent.prestudent_id
+								AND status_kurzbz = 'Interessent'
+							) LIMIT 1
+					) AS orgform_kurzbz
+				FROM public.tbl_rt_person
+				JOIN public.tbl_person USING (person_id)
+				JOIN public.tbl_prestudent ON (tbl_rt_person.person_id=tbl_prestudent.person_id AND tbl_rt_person.rt_id=tbl_prestudent.reihungstest_id)
+				WHERE rt_id = ".$db->db_add_param($reihungstest->reihungstest_id, FHC_INTEGER)."
+				AND tbl_rt_person.studienplan_id IN (".$studienplaene_list.")
+				ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname
+						
+				/*		
+				SELECT 
 				prestudent_id,
 				person_id,
 				vorname,
@@ -193,13 +254,23 @@ if(isset($_GET['excel']))
 				FROM public.tbl_prestudent
 				JOIN public.tbl_person USING (person_id)
 				WHERE reihungstest_id = ".$db->db_add_param($reihungstest->reihungstest_id, FHC_INTEGER)."
-				ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname ";
+				ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname */";
+		
+		$gebietbezeichnungen = array();
+		$qry_gebiete = "SELECT gebiet_id, reihung, bezeichnung FROM testtool.tbl_ablauf JOIN testtool.tbl_gebiet USING (gebiet_id) WHERE studienplan_id = ".$db->db_add_param($row->studienplan_id)." ORDER BY reihung";
+		if($result_gebiete = $db->db_query($qry_gebiete))
+		{
+			while($row_gebiete = $db->db_fetch_object($result_gebiete))
+			{
+				$gebietbezeichnungen[$row_gebiete->gebiet_id] = $row_gebiete->bezeichnung;
+			}
+		}
 
 		// Creating a workbook
 		$workbook = new Spreadsheet_Excel_Writer();
 		$workbook->setVersion(8);
 		// sending HTTP headers
-		$workbook->send("Anwesenheitsliste_Reihungstest_".$reihungstest->datum.".xls");
+		$workbook->send("Anwesenheitsliste_Aufnahmetermin_".$reihungstest->datum.".xls");
 		
 		//Formate Definieren
 		$format_bold =& $workbook->addFormat();
@@ -207,6 +278,14 @@ if(isset($_GET['excel']))
 		
 		$format_border =& $workbook->addFormat();
 		$format_border->setBorder(1);
+		$format_border->setTextWrap();
+		$format_border->setVAlign ('top');
+		
+		$format_border_center =& $workbook->addFormat();
+		$format_border_center->setBorder(1);
+		$format_border_center->setTextWrap();
+		$format_border_center->setVAlign ('top');
+		$format_border_center->setHAlign ('center');
 		
 		if($result = $db->db_query($qry))
 		{
@@ -230,38 +309,49 @@ if(isset($_GET['excel']))
 					$worksheet->setMargins_LR (0.4);
 					$worksheet->setMarginTop (0.79);
 					$worksheet->setMarginBottom (0.59);
+
+					// Titelzeilen
+					$worksheet->write(0,0,'Anwesenheitsliste Aufnahmetermin vom '.$datum_obj->convertISODate($reihungstest->datum).' '.$reihungstest->uhrzeit.' Uhr, '.$reihungstest->anmerkung.', erstellt am '.date('d.m.Y'), $format_bold);
+					if ($row->ort_kurzbz=='')
+						$worksheet->write(1,0,'Ohne Raumzuteilung', $format_bold);
+					else 
+						$worksheet->write(1,0,'Raum '.$row->ort_kurzbz, $format_bold);
+					$worksheet->write(2,0,'Studienpläne: '.implode(', ', $studienplaene_arr));
+					$worksheet->write(3,0,'Stufe: '.$reihungstest->stufe);
+					$worksheet->write(4,0,'Testmodule: '.implode(', ', $gebietbezeichnungen));
 					
-					
-					$worksheet->write(0,0,'Anwesenheitsliste Reihungstest '.$datum_obj->convertISODate($reihungstest->datum).' '.$reihungstest->uhrzeit.' Uhr, '.$reihungstest->anmerkung.', erstellt am '.date('d.m.Y'), $format_bold);
 					//Ueberschriften
+					$zeile=6;
 					$col=0;
-					$worksheet->write(2,$col,"Vorname", $format_bold);
+					$worksheet->write($zeile,$col,"Vorname", $format_bold);
 					$maxlength[$col] = 7;
-					$worksheet->write(2,++$col,"Nachname", $format_bold);
+					$worksheet->write($zeile,++$col,"Nachname", $format_bold);
 					$maxlength[$col] = 8;
-					$worksheet->write(2,++$col,"Geschlecht", $format_bold);
-					$maxlength[$col] = 8;
-					$worksheet->write(2,++$col,"Geburtsdatum", $format_bold);
+					$worksheet->write($zeile,++$col,"G", $format_bold);
+					$maxlength[$col] = 2;
+					$worksheet->write($zeile,++$col,"Geburtsdatum", $format_bold);
 					$maxlength[$col] = 12;
-					$worksheet->write(2,++$col,"Studiengang", $format_bold);
+					$worksheet->write($zeile,++$col,"Studiengang", $format_bold);
 					$maxlength[$col] = 11;
-					$worksheet->write(2,++$col,"Bereits absolvierte RTs", $format_bold);
-					$maxlength[$col] = 18;
-					$worksheet->write(2,++$col,"EMail", $format_bold);
+					$worksheet->write($zeile,++$col,"S", $format_bold);
+					$maxlength[$col] = 2;
+					$worksheet->write($zeile,++$col,"Bereits absolvierte RTs", $format_bold);
+					$maxlength[$col] = 20;
+					$worksheet->write($zeile,++$col,"Sonstige Termine", $format_bold);
+					$maxlength[$col] = 20;
+					$worksheet->write($zeile,++$col,"EMail", $format_bold);
 					$maxlength[$col] = 5;
-					$worksheet->write(2,++$col,"Einstiegssemester", $format_bold);
-					$maxlength[$col] = 15;
-					$worksheet->write(2,++$col,"Strasse", $format_bold);
+					$worksheet->write($zeile,++$col,"Strasse", $format_bold);
 					$maxlength[$col] = 6;
-					$worksheet->write(2,++$col,"PLZ", $format_bold);
+					$worksheet->write($zeile,++$col,"PLZ", $format_bold);
 					$maxlength[$col] = 3;
-					$worksheet->write(2,++$col,"Ort", $format_bold);
+					$worksheet->write($zeile,++$col,"Ort", $format_bold);
 					$maxlength[$col] = 3;
-					$worksheet->write(2,++$col,"Unterschrift", $format_bold);
+					$worksheet->write($zeile,++$col,"Unterschrift", $format_bold);
 					$maxlength[$col] = 30;
 					
 					$ort_kurzbz = $row->ort_kurzbz;
-					$zeile=3;
+					$zeile++;
 				}
 				
 				$pruefling = new pruefling();
@@ -287,63 +377,106 @@ if(isset($_GET['excel']))
 						}
 					}
 				}
+				$weitere_zuteilungen = array();
+				/*$qry_zuteilungen = "SELECT DISTINCT	tbl_studienplan.bezeichnung,tbl_reihungstest.datum,tbl_rt_person.studienplan_id
+								FROM public.tbl_rt_person JOIN public.tbl_reihungstest ON (rt_id = reihungstest_id)
+								JOIN lehre.tbl_studienplan USING (studienplan_id)
+								JOIN testtool.tbl_ablauf USING (studienplan_id)
+								WHERE person_id=62563
+								AND studiensemester_kurzbz='SS2017'
+								ORDER BY bezeichnung";*/
+				$qry_zuteilungen = "SELECT DISTINCT	tbl_studienplan.bezeichnung,tbl_reihungstest.datum,tbl_rt_person.studienplan_id
+								FROM public.tbl_rt_person JOIN public.tbl_reihungstest ON (rt_id = reihungstest_id)
+								JOIN lehre.tbl_studienplan USING (studienplan_id)
+								JOIN testtool.tbl_ablauf USING (studienplan_id)
+								WHERE person_id=".$db->db_add_param($row->person_id)."
+								AND studiensemester_kurzbz=".$db->db_add_param($reihungstest->studiensemester_kurzbz)."
+								ORDER BY bezeichnung";
+				
+				if($result_zuteilungen = $db->db_query($qry_zuteilungen))
+				{
+					while($row_zuteilungen = $db->db_fetch_object($result_zuteilungen))
+					{
+						$testmodule = array();
+						$qry_gebiete = "SELECT gebiet_id, bezeichnung, reihung FROM testtool.tbl_ablauf JOIN testtool.tbl_gebiet USING (gebiet_id) WHERE studienplan_id = ".$db->db_add_param($row_zuteilungen->studienplan_id)." ORDER BY reihung";
+						if($result_gebiete = $db->db_query($qry_gebiete))
+						{
+							while($row_gebiete = $db->db_fetch_object($result_gebiete))
+							{
+								$testmodule[$row_gebiete->gebiet_id] = $row_gebiete->bezeichnung;
+							}
+						}
+						$weitere_zuteilungen[] = $row_zuteilungen->bezeichnung.' am '.$datum_obj->formatDatum($row_zuteilungen->datum, 'd.m.Y').' ('.implode(', ', $testmodule).')';
+					}
+				}
+
 				$col=0;
 				$worksheet->write($zeile,$col, $row->vorname, $format_border);
 				if(strlen($row->vorname)>$maxlength[$col])
-					$maxlength[$col] = mb_strlen($row->vorname);
+					$maxlength[$col] = strlen($row->vorname);
 
 				$worksheet->write($zeile,++$col,$row->nachname, $format_border);
 				if(strlen($row->nachname)>$maxlength[$col])
-					$maxlength[$col] = mb_strlen($row->nachname);
+					$maxlength[$col] = strlen($row->nachname);
 				
-				$worksheet->write($zeile,++$col, $row->geschlecht, $format_border);
+				$worksheet->write($zeile,++$col, $row->geschlecht, $format_border_center);
 				if(strlen($row->geschlecht)>$maxlength[$col])
-					$maxlength[$col] = mb_strlen($row->geschlecht);
+					$maxlength[$col] = strlen($row->geschlecht);
 
 				$worksheet->write($zeile,++$col,$datum_obj->convertISODate($row->gebdatum), $format_border);
 				if(strlen($row->gebdatum)>$maxlength[$col])
-					$maxlength[$col] = mb_strlen($row->gebdatum);
+					$maxlength[$col] = strlen($row->gebdatum);
 
 				$worksheet->write($zeile,++$col,$studiengang->kuerzel_arr[$row->studiengang_kz], $format_border);
 				if(strlen($studiengang->kuerzel_arr[$row->studiengang_kz])>$maxlength[$col])
-					$maxlength[$col] = mb_strlen($studiengang->kuerzel_arr[$row->studiengang_kz]);
+					$maxlength[$col] = strlen($studiengang->kuerzel_arr[$row->studiengang_kz]);
+
+				$worksheet->write($zeile,++$col,$row->ausbildungssemester, $format_border_center);
+				if(strlen($row->ausbildungssemester)>$maxlength[$col])
+					$maxlength[$col] = strlen($row->ausbildungssemester);
 
 				$worksheet->write($zeile,++$col,$rt_in_anderen_stg, $format_border);
 				if(strlen($rt_in_anderen_stg)>$maxlength[$col])
-					$maxlength[$col] = mb_strlen($rt_in_anderen_stg);
+					$maxlength[$col] = strlen($rt_in_anderen_stg);
+
+				$worksheet->write($zeile,++$col,implode("\n", $weitere_zuteilungen), $format_border);
+				foreach ($weitere_zuteilungen as $items)
+				{
+					if (strlen($items)>$maxlength[$col])
+						$maxlength[$col] = strlen($items);
+				}
 
 				$worksheet->write($zeile,++$col,$row->email, $format_border);
 				if(strlen($row->email)>$maxlength[$col])
-					$maxlength[$col] = mb_strlen($row->email);
-
-				$worksheet->write($zeile,++$col,$row->ausbildungssemester, $format_border);
-				if(strlen($row->ausbildungssemester)>$maxlength[$col])
-					$maxlength[$col] = mb_strlen($row->ausbildungssemester);
+					$maxlength[$col] = strlen($row->email);
 
  				$adresse = new adresse();
 				$adresse->loadZustellAdresse($row->person_id);
 
 				$worksheet->write($zeile,++$col,$adresse->strasse, $format_border);
 				if(strlen($adresse->strasse)>$maxlength[$col])
-					$maxlength[$col] = mb_strlen($adresse->strasse);
+					$maxlength[$col] = strlen($adresse->strasse);
 
 				$worksheet->write($zeile,++$col,$adresse->plz, $format_border);
 				if(strlen($adresse->plz)>$maxlength[$col])
-					$maxlength[$col] = mb_strlen($adresse->plz);
+					$maxlength[$col] = strlen($adresse->plz);
 
 				$worksheet->write($zeile,++$col,$adresse->ort, $format_border);
 				if(strlen($adresse->ort)>$maxlength[$col])
-					$maxlength[$col] = mb_strlen($adresse->ort);
+					$maxlength[$col] = strlen($adresse->ort);
 				
 				$worksheet->write($zeile,++$col,'', $format_border);
 				
-				$worksheet->setRow($zeile, 35);
-			
+				if(count($weitere_zuteilungen)>2)
+					$worksheet->setRow($zeile, count($weitere_zuteilungen)*14);
+				else
+					$worksheet->setRow($zeile, 35);
+
+				$zeile++;
+				
 				//Die Breite der Spalten setzen
 				foreach($maxlength as $col=>$breite)
 					$worksheet->setColumn($col, $col, $breite+2);
-
-				$zeile++;
 			}
 		}
 		$workbook->close();
@@ -444,101 +577,17 @@ if(isset($_GET['excel']))
 
 				if (typeof(Storage) !== 'undefined') 
 				{
-					if (localStorage.getItem('clm_prestudent_id') != null) 
+					let arr = ['clm_prestudent_id','clm_person_id','clm_geschlecht','clm_studiengang','clm_studienplan','clm_orgform','clm_einstiegssemester','clm_geburtsdatum','clm_email','clm_absolviert','clm_ergebnis','clm_fas'];
+					for (let i of arr) 
 					{
-						$('.clm_prestudent_id').css('display', localStorage.getItem('clm_prestudent_id'));
-						if (localStorage.getItem('clm_prestudent_id') == 'none')
-							document.getElementById('clm_prestudent_id').className = 'inactive';
-						else
-							document.getElementById('clm_prestudent_id').className = 'active';
-					}
-					if (localStorage.getItem('clm_person_id') != null) 
-					{
-						$('.clm_person_id').css('display', localStorage.getItem('clm_person_id'));
-						if (localStorage.getItem('clm_person_id') == 'none')
-							document.getElementById('clm_person_id').className = 'inactive';
-						else
-							document.getElementById('clm_person_id').className = 'active';
-					}
-					if (localStorage.getItem('clm_geschlecht') != null) 
-					{
-						$('.clm_geschlecht').css('display', localStorage.getItem('clm_geschlecht'));
-						if (localStorage.getItem('clm_geschlecht') == 'none')
-							document.getElementById('clm_geschlecht').className = 'inactive';
-						else
-							document.getElementById('clm_geschlecht').className = 'active';
-					}
-					if (localStorage.getItem('clm_studiengang') != null) 
-					{
-						$('.clm_studiengang').css('display', localStorage.getItem('clm_studiengang'));
-						if (localStorage.getItem('clm_studiengang') == 'none')
-							document.getElementById('clm_studiengang').className = 'inactive';
-						else
-							document.getElementById('clm_studiengang').className = 'active';
-					}
-					if (localStorage.getItem('clm_studienplan') != null) 
-					{
-						$('.clm_studienplan').css('display', localStorage.getItem('clm_studienplan'));
-						if (localStorage.getItem('clm_studienplan') == 'none')
-							document.getElementById('clm_studienplan').className = 'inactive';
-						else
-							document.getElementById('clm_studienplan').className = 'active';
-					}
-					if (localStorage.getItem('clm_orgform') != null) 
-					{
-						$('.clm_orgform').css('display', localStorage.getItem('clm_orgform'));
-						if (localStorage.getItem('clm_orgform') == 'none')
-							document.getElementById('clm_orgform').className = 'inactive';
-						else
-							document.getElementById('clm_orgform').className = 'active';
-					}
-					if (localStorage.getItem('clm_einstiegssemester') != null) 
-					{
-						$('.clm_einstiegssemester').css('display', localStorage.getItem('clm_einstiegssemester'));
-						if (localStorage.getItem('clm_einstiegssemester') == 'none')
-							document.getElementById('clm_einstiegssemester').className = 'inactive';
-						else
-							document.getElementById('clm_einstiegssemester').className = 'active';
-					}
-					if (localStorage.getItem('clm_geburtsdatum') != null) 
-					{
-						$('.clm_geburtsdatum').css('display', localStorage.getItem('clm_geburtsdatum'));
-						if (localStorage.getItem('clm_geburtsdatum') == 'none')
-							document.getElementById('clm_geburtsdatum').className = 'inactive';
-						else
-							document.getElementById('clm_geburtsdatum').className = 'active';
-					}
-					if (localStorage.getItem('clm_email') != null) 
-					{
-						$('.clm_email').css('display', localStorage.getItem('clm_email'));
-						if (localStorage.getItem('clm_email') == 'none')
-							document.getElementById('clm_email').className = 'inactive';
-						else
-							document.getElementById('clm_email').className = 'active';
-					}
-					if (localStorage.getItem('clm_absolviert') != null) 
-					{
-						$('.clm_absolviert').css('display', localStorage.getItem('clm_absolviert'));
-						if (localStorage.getItem('clm_absolviert') == 'none')
-							document.getElementById('clm_absolviert').className = 'inactive';
-						else
-							document.getElementById('clm_absolviert').className = 'active';
-					}
-					if (localStorage.getItem('clm_ergebnis') != null) 
-					{
-						$('.clm_ergebnis').css('display', localStorage.getItem('clm_ergebnis'));
-						if (localStorage.getItem('clm_ergebnis') == 'none')
-							document.getElementById('clm_ergebnis').className = 'inactive';
-						else
-							document.getElementById('clm_ergebnis').className = 'active';
-					}
-					if (localStorage.getItem('clm_fas') != null) 
-					{
-						$('.clm_fas').css('display', localStorage.getItem('clm_fas'));
-						if (localStorage.getItem('clm_fas') == 'none')
-							document.getElementById('clm_fas').className = 'inactive';
-						else
-							document.getElementById('clm_fas').className = 'active';
+						if (localStorage.getItem(i) != null) 
+						{
+							$('.'+i).css('display', localStorage.getItem(i));
+							if (localStorage.getItem(i) == 'none')
+								document.getElementById(i).className = 'inactive';
+							else
+								document.getElementById(i).className = 'active';
+						}
 					}
 				} 
 				else 
@@ -1814,9 +1863,11 @@ rt_punkte1
 FROM public.tbl_rt_person
 JOIN public.tbl_person USING (person_id)
 JOIN public.tbl_prestudent ON (tbl_rt_person.person_id=tbl_prestudent.person_id AND tbl_rt_person.rt_id=tbl_prestudent.reihungstest_id)
-WHERE rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)."
-AND tbl_rt_person.studienplan_id IN (".$studienplaene_list.")
-ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname
+WHERE rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER);
+if ($studienplaene_list != '')
+$qry .= "AND tbl_rt_person.studienplan_id IN (".$studienplaene_list.")";
+
+$qry .= "ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname
 
 /*
 SELECT 
