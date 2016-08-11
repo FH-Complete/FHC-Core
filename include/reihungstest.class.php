@@ -454,6 +454,48 @@ class reihungstest extends basis_db
 	    return true;
 	}
 
+	/**
+	 * Laedt den Reihungstest-Person-Datensatz mit der ID $rt_person_id
+	 * @param integer $rt_person_id ID des zu ladenden Datensatzes
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function loadReihungstestPerson($rt_person_id)
+	{
+		if(!is_numeric($rt_person_id))
+		{
+			$this->errormsg = 'rt_person_id ist ungueltig';
+			return false;
+		}
+	
+		$qry = "SELECT * FROM public.tbl_rt_person WHERE rt_person_id=".$this->db_add_param($rt_person_id, FHC_INTEGER, false);
+	
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$this->rt_person_id = $row->rt_person_id;
+				$this->rt_id = $row->rt_id;
+				$this->person_id = $row->person_id;
+				$this->studienplan_id = $row->studienplan_id;
+				$this->anmeldedatum = $row->anmeldedatum;
+				$this->teilgenommen = $this->db_parse_bool($row->teilgenommen);
+				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->punkte = $row->punkte;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Eintrag nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden des rt_person_id Datensatzes';
+			return false;
+		}
+	}
+	
 	public function getReihungstestPerson($person_id)
 	{
 		$qry = "SELECT
