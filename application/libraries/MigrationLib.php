@@ -527,7 +527,16 @@ class MigrationLib extends CI_Migration
 	{
 		if (! @$this->db->simple_query($query))
 		{
-			$this->printError($this->db->error());
+			$error = $this->db->error();
+			
+			if (is_array($error) && isset($error["message"]))
+			{
+				$this->printError($error["message"]);
+			}
+			else
+			{
+				$this->printError("Error while executing a query");
+			}
 		}
 		
 		$this->printInfo("Query correctly executed");
