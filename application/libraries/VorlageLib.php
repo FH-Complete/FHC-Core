@@ -122,8 +122,23 @@ class VorlageLib
 			$where .= "sprache = " . $this->ci->VorlageModel->escape($sprache);
 		}
 		
-		// Try to search the template with the given vorlage_kurzbz
-		$vorlage = $this->ci->VorlageStudiengangModel->loadWhere(array("vorlage_kurzbz" => $vorlage_kurzbz));
+		// Try to search the template with the given vorlage_kurzbz and other parameters if present
+		$queryParameters = array("vorlage_kurzbz" => $vorlage_kurzbz);
+
+		if (isset($oe_kurzbz))
+		{
+			$queryParameters["oe_kurzbz"] = $oe_kurzbz;
+		}
+		if (isset($orgform_kurzbz))
+		{
+			$queryParameters["orgform_kurzbz"] = $orgform_kurzbz;
+		}
+		if (isset($sprache))
+		{
+			$queryParameters["sprache"] = $sprache;
+		}
+		
+		$vorlage = $this->ci->VorlageStudiengangModel->loadWhere($queryParameters);
 		// If the searched template was not found
 		if (is_object($vorlage) && $vorlage->error == EXIT_SUCCESS && is_array($vorlage->retval) && count($vorlage->retval) == 0)
 		{
