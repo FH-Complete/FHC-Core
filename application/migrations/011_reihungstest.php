@@ -188,6 +188,9 @@ class Migration_Reihungstest extends MigrationLib
 		$this->grantTable("SELECT", "public", "tbl_rt_person", "web");
 		$this->grantTable(array("SELECT", "INSERT", "DELETE", "UPDATE"), "public", "tbl_rt_person", "admin");
 		$this->grantTable(array("SELECT", "INSERT", "DELETE", "UPDATE"), "public", "tbl_rt_person", "vilesci");
+		$this->grantSequence(array("SELECT", "UPDATE"), "public", "tbl_rt_person_rt_person_id_seq", "web");
+		$this->grantSequence(array("SELECT", "UPDATE"), "public", "tbl_rt_person_rt_person_id_seq", "admin");
+		$this->grantSequence(array("SELECT", "UPDATE"), "public", "tbl_rt_person_rt_person_id_seq", "vilesci");
 		
 		// Create table public.tbl_rt_ort
 		$fields = array(
