@@ -1021,6 +1021,47 @@ if(!$error)
 				{
 					if($rolle->bestaetige_rolle($_POST['prestudent_id'],$_POST['status_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester'],$user))
 					{
+						// Message verschicken
+						$prestudent = new prestudent();
+						$prestudent->load($_POST['prestudent_id']);
+
+						$url =APP_ROOT.'/index.ci.php/api/v1/system/Message/MessageVorlage';
+						$ch = curl_init();
+						curl_setopt($ch, CURLOPT_URL,$url);
+						curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST"); 
+
+						$header=array();
+						$auth = base64_encode(FHC_REST_USER.':'.FHC_REST_PASSWORD);
+						$header[]="Authorization: Basic $auth";
+						$header[]='FHC-API-KEY:'.FHC_REST_API_KEY;
+
+						curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+						curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+						$studiengang = new studiengang();
+						$studiengang->load($prestudent->studiengang_kz);
+						$studiengang->getAllTypes();
+
+						$curl_post_data = array(
+						"sender_id" => 1, // TODO
+						"receiver_id" => $prestudent->person_id,
+						"oe_kurzbz" => $studiengang->oe_kurzbz,
+						"vorlage_kurzbz" => 'MailApplicationConfirmationInteressent',
+						"data" => array(
+							'typ'=>$studiengang->studiengang_typ_arr[$studiengang->typ],
+							'studiengang'=>$studiengang->bezeichnung,
+							'vorname'=>$prestudent->vorname,
+							'nachname'=>$prestudent->nachname,
+							'anrede'=>$prestudent->anrede
+						 )
+						);
+
+						curl_setopt($ch, CURLOPT_POST, true);
+						curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($curl_post_data));
+
+						$result = curl_exec($ch);
+						$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+						curl_close($ch);
+						
 						$return = true;
 					}
 					else
