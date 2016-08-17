@@ -28,7 +28,7 @@ class Seed_Vorlage
 			foreach ($oe as $o)
 			{
 				$query = "INSERT INTO public.tbl_vorlagestudiengang VALUES ('MailRegistrationConfirmation', 0, 1, '<p>Vielen Dank für Ihre Anmeldung!</p>
-<p>Bitte klicken Sie folgenden Link, um Ihre Anmeldung zu bestätigen:<br /><a title=\"LoginLink\" href=\"{link}{code}\">{link}{code}</a></p>
+<p>Bitte klicken Sie folgenden Link, um Ihre Anmeldung zu bestätigen:<br /><a title=\"LoginLink\" href=\"{link}\">{link}</a></p>
 <p>Ihre Anmeldedaten:<br/>
 Code: <code>{code}</code><br/>
 eMail: <code>{eMailAdresse}</code></p>
