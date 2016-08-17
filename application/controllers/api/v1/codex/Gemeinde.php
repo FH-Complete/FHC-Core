@@ -31,9 +31,9 @@ class Gemeinde extends APIv1_Controller
 	 */
 	public function getGemeinde()
 	{
-		$gemeindeID = $this->get('gemeinde_id');
+		$gemeindeID = $this->get("gemeinde_id");
 		
-		$this->GemeindeModel->addOrder('plz');
+		$this->GemeindeModel->addOrder("plz");
 		if (isset($gemeindeID))
 		{
 			$result = $this->GemeindeModel->load($gemeindeID);
@@ -42,7 +42,27 @@ class Gemeinde extends APIv1_Controller
 		{
 			$result = $this->GemeindeModel->load();
 		}
+		
 		$this->response($result, REST_Controller::HTTP_OK);
+	}
+	
+	/**
+	 * @return void
+	 */
+	public function getGemeindeByPlz()
+	{
+		$plz = $this->get("plz");
+		
+		if (is_numeric($plz))
+		{
+			$result = $this->GemeindeModel->loadWhere(array('plz' => $plz));
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
 	}
 
 	/**
