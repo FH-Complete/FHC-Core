@@ -401,6 +401,10 @@ class MessageLib
 				$result = $this->_error($result->retval, EXIT_ERROR);
 			}
 		}
+		else
+		{
+			$result = $this->_error("Receiver not present", EXIT_ERROR);
+		}
 		
 		return $result;
     }

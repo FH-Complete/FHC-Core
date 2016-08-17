@@ -122,16 +122,22 @@ class VorlageLib
 			$where .= "sprache = " . $this->ci->VorlageModel->escape($sprache);
 		}
 		
-		$vorlage = $this->ci->organisationseinheitlib->treeSearch(
-				'public',
-				'tbl_vorlagestudiengang',
-				array("vorlage_kurzbz", "studiengang_kz", "version", "text", "oe_kurzbz",
-						"vorlagestudiengang_id", "style", "berechtigung", "anmerkung_vorlagestudiengang", 
-						"aktiv", "sprache", "subject", "orgform_kurzbz"),
-				$where,
-				"version DESC",
-				$oe_kurzbz
-		);
+		// Try to search the template with the given vorlage_kurzbz
+		$vorlage = $this->ci->VorlageStudiengangModel->loadWhere(array("vorlage_kurzbz" => $vorlage_kurzbz));
+		// If the searched template was not found
+		if (is_object($vorlage) && $vorlage->error == EXIT_SUCCESS && is_array($vorlage->retval) && count($vorlage->retval) == 0)
+		{
+			$vorlage = $this->ci->organisationseinheitlib->treeSearch(
+					'public',
+					'tbl_vorlagestudiengang',
+					array("vorlage_kurzbz", "studiengang_kz", "version", "text", "oe_kurzbz",
+							"vorlagestudiengang_id", "style", "berechtigung", "anmerkung_vorlagestudiengang", 
+							"aktiv", "sprache", "subject", "orgform_kurzbz"),
+					$where,
+					"version DESC",
+					$oe_kurzbz
+			);
+		}
 		
         return $vorlage;
     }
