@@ -1313,7 +1313,7 @@ if($result = $db->db_query("SELECT * FROM public.tbl_vorlage WHERE vorlage_kurzb
 			$testQuery = "SELECT setval('seq_vorlagestudiengang_vorlagestudiengang_id', max(vorlagestudiengang_id)) FROM tbl_vorlagestudiengang;";
 			$testResult = $db->db_query($testQuery);
 			
-			$text = file_get_contents('../system/xsl/Bewerberakt.xsl');
+			$text = file_get_contents(DOC_ROOT . '/system/xsl/Bewerberakt.xsl');
 
 			while($row = $db->db_fetch_object($result))
 			{

@@ -19,16 +19,11 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/datum.class.php');
 
-// CI
-require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/crm/Preinteressent_model.php');
-
-class preinteressent extends Preinteressent_model
+class preinteressent extends basis_db
 {
-	use db_extra; //CI Hack
-	
 	public $new;		// boolean
 	public $result = array();
 	
@@ -72,7 +67,7 @@ class preinteressent extends Preinteressent_model
 	 * Laedt einen Datensatz
 	 * @param preinteressent_id ID des zu ladenden Datensatzes
 	 */
-	public function load($preinteressent_id = null)
+	public function load($preinteressent_id)
 	{
 		//id auf Gueltigkeit pruefen
 		if(!is_numeric($preinteressent_id) || $preinteressent_id == '')

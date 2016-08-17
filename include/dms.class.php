@@ -24,16 +24,8 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
-require_once(dirname(__FILE__).'/datum.class.php');
-
-// CI
-require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/content/Dms_model.php');
-
-class dms extends Dms_model
+class dms extends basis_db
 {
-	use db_extra; //CI Hack
-	
 	public $new;
 	public $result=array();
 
@@ -71,18 +63,20 @@ class dms extends Dms_model
 	 * @param dms_id
 	 * @param version optional
 	 */
-	public function load($dms_id = null, $version=null)
+	public function load($dms_id, $version = null)
 	{
-		$qry = "SELECT tbl_dms.dms_id, * FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id) WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER);
+		$qry = "SELECT tbl_dms.dms_id, *
+				  FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id)
+				 WHERE dms_id = " . $this->db_add_param($dms_id, FHC_INTEGER);
 		
-		if(!is_null($version))
-			$qry.=" AND version=".$this->db_add_param($version, FHC_INTEGER);
+		if (!is_null($version))
+			$qry .= " AND version=".$this->db_add_param($version, FHC_INTEGER);
 			
-		$qry.=" ORDER BY version DESC LIMIT 1;";
+		$qry .= " ORDER BY version DESC LIMIT 1;";
 		
-		if($result = $this->db_query($qry))
+		if ($result = $this->db_query($qry))
 		{
-			if($row = $this->db_fetch_object($result))
+			if ($row = $this->db_fetch_object($result))
 			{
 				$this->dms_id = $row->dms_id;
 				$this->version = $row->version;

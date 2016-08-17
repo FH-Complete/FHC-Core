@@ -24,16 +24,8 @@
  * Klasse Organisationsform
  */
 
-require_once(dirname(__FILE__).'/datum.class.php');
-
-// CI
-require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/codex/Orgform_model.php');
- 
-class organisationsform extends Orgform_model
+class organisationsform extends basis_db
 {
-	use db_extra; //CI Hack
-	
 	public $orgform_kurzbz; 
 	public $code; 
 	public $bezeichnung; 
@@ -54,7 +46,7 @@ class organisationsform extends Orgform_model
 	 * Laedt eine Organisationsform
 	 * @param $orgform_kurzbz
 	 */
-	public function load($orgform_kurzbz = null)
+	public function load($orgform_kurzbz)
 	{
 		$qry = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz=".$this->db_add_param($orgform_kurzbz).';'; 
 		
@@ -141,22 +133,23 @@ class organisationsform extends Orgform_model
 	 */
 	public function getOrgformLV()
 	{
-		$result = parent::getOrgformLV();
+		$qry = "SELECT *
+				  FROM bis.tbl_orgform
+				 WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS')
+			  ORDER BY orgform_kurzbz";
 		
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
+		if ($result = $this->db_query($qry))
 		{
-			for ($i = 0; $i < count($result->retval); $i++)
+			while ($row = $this->db_fetch_object($result))	
 			{
-				$row = $result->retval[$i];
+				$orgform = new organisationsform(); 
 				
-				$orgform = new organisationsform();
+				$orgform->orgform_kurzbz = $row->orgform_kurzbz; 
+				$orgform->code = $row->code; 
+				$orgform->bezeichnung = $row->bezeichnung; 
+				$orgform->rolle = $row->rolle; 
 				
-				$orgform->orgform_kurzbz = $row->orgform_kurzbz;
-				$orgform->code = $row->code;
-				$orgform->bezeichnung = $row->bezeichnung;
-				$orgform->rolle = $row->rolle;
-				
-				$this->result[] = $orgform;
+				$this->result[] = $orgform; 
 			}
 			return true;
 		}

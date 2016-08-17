@@ -19,16 +19,10 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
  *          Karl Burkhart <burkhart@technikum-wien.at>.
  */
-require_once(dirname(__FILE__).'/datum.class.php');
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-// CI
-require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/organisation/Statistik_model.php');
-
-class statistik extends Statistik_model
+class statistik extends basis_db
 {
-	use db_extra; //CI Hack
-	
 	public $new;
 	public $statistik_obj=array();
 	public $result;
@@ -80,16 +74,19 @@ class statistik extends Statistik_model
 	 * Laedt eine Statistik
 	 * @param $statistik_kurzbz
 	 */
-	public function load($statistik_kurzbz = null)
+	public function load($statistik_kurzbz)
 	{
-		$result = parent::load($statistik_kurzbz);
+		$qry = "SELECT 
+					*
+				FROM
+					public.tbl_statistik
+				WHERE
+					statistik_kurzbz = " . $this->db_add_param($statistik_kurzbz);
 		
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
+		if($result = $this->db_query($qry))
 		{
-			if(count($result->retval) > 0)
+			if($row = $this->db_fetch_object($result))
 			{
-				$row = $result->retval[0];
-				
 				$this->statistik_kurzbz = $row->statistik_kurzbz;
 				$this->content_id = $row->content_id;
 				$this->bezeichnung = $row->bezeichnung;
@@ -119,7 +116,7 @@ class statistik extends Statistik_model
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
-		}			
+		}
 	}
 	
 	/**
@@ -128,19 +125,15 @@ class statistik extends Statistik_model
 	 */
 	public function getAll($order = FALSE)
 	{
-		if ($order)
-		{
-			parent::addOrder($order);
-		}
+		$qry = 'SELECT * FROM public.tbl_statistik';
+
+		if($order) 
+			$qry .= ' ORDER BY ' . $order;
 		
-		$result = parent::load();
-		
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
+		if($result = $this->db_query($qry))
 		{
-			for ($i = 0; $i < count($result->retval); $i++)
+			while($row = $this->db_fetch_object($result))
 			{
-				$row = $result->retval[$i];
-				
 				$obj = new statistik();
 				
 				$obj->statistik_kurzbz = $row->statistik_kurzbz;
@@ -168,7 +161,7 @@ class statistik extends Statistik_model
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
-		}			
+		}
 	}
 	/**
 	 * Laedt alle Statistiken einer Gruppe, Parameter publish zum Filtern.
@@ -335,19 +328,17 @@ class statistik extends Statistik_model
 	{
 		$arr = array();
 				
-		parent::addOrder('gruppe');
-		parent::addOrder('bezeichnung');
-		parent::addOrder('statistik_kurzbz');
-		
-		$result = parent::load();
+		$qry = "SELECT 
+					*
+				FROM
+					public.tbl_statistik
+				ORDER BY gruppe, bezeichnung, statistik_kurzbz";
 			
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
+		if($result = $this->db_query($qry))
 		{
 			$lastgruppe='';
-			for ($i = 0; $i < count($result->retval); $i++)
+			while($row = $this->db_fetch_object($result))
 			{
-				$row = $result->retval[$i];
-				
 				if($row->gruppe!='' && $row->gruppe!=$lastgruppe)
 				{
 					$arr[$row->gruppe]=array('name'=>$row->gruppe);
@@ -367,7 +358,7 @@ class statistik extends Statistik_model
 				}
 			}
 		}
-		return $arr; 
+		return $arr;
 	}
 	
 	/**

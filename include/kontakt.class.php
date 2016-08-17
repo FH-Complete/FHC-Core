@@ -23,16 +23,10 @@
  * Klasse kontakt
  * @create 20-12-2006
  */
-require_once(dirname(__FILE__).'/datum.class.php');
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-// CI
-require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/person/Kontakt_model.php');
-
-class kontakt extends Kontakt_model
+class kontakt extends basis_db
 {
-	use db_extra; //CI Hack
-	
 	public $new;       // boolean
 	public $result = array(); // adresse Objekt
 
@@ -80,9 +74,9 @@ class kontakt extends Kontakt_model
 	 * @param  $kontakt_id ID des zu ladenden Kontaktes
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load($kontakt_id = null)
+	public function load($kontakt_id)
 	{
-		if(!is_numeric($kontakt_id))
+		if (!is_numeric($kontakt_id))
 		{
 			$this->errormsg = 'Kontakt_id ist ungueltig';
 			return false;
@@ -93,11 +87,11 @@ class kontakt extends Kontakt_model
 					public.tbl_kontakt
 					LEFT JOIN public.tbl_standort USING(standort_id)
 					LEFT JOIN public.tbl_firma USING(firma_id)
-				WHERE kontakt_id=".$this->db_add_param($kontakt_id, FHC_INTEGER).";";
+				WHERE kontakt_id = " . $this->db_add_param($kontakt_id, FHC_INTEGER) . ";";
 
-		if($this->db_query($qry))
+		if ($this->db_query($qry))
 		{
-			if($row = $this->db_fetch_object())
+			if ($row = $this->db_fetch_object())
 			{
 				$this->kontakt_id = $row->kontakt_id;
 				$this->person_id = $row->person_id;

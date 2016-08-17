@@ -25,19 +25,12 @@
  * 			Andreas Moik	<moik@technikum-wien.at>
  */
 
-require_once(dirname(__FILE__).'/datum.class.php');
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-// CI
-require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/organisation/Studienplan_model.php');
-
-class studienplan extends Studienplan_model
+class studienplan extends basis_db
 {
-	use db_extra; //CI Hack
-
     public $new = true;			// boolean
     public $result = array();		// Objekte
-	public $errormsg;			// string
 
     //Tabellenspalten
     public $studienplan_id;			// integer (PK)
@@ -82,12 +75,12 @@ class studienplan extends Studienplan_model
 	{
 		$this->$name=$value;
 	}
-/*
+	
 	public function __get($name)
 	{
 		return $this->$name;
 	}
-*/
+	
 	/**
 	 * Laedt Studienplan mit der ID $studienplan_id
 	 * @param  $studienplan_id ID des zu ladenden Studienplanes

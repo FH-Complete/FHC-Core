@@ -23,8 +23,6 @@ require_once(dirname(__FILE__).'/person.class.php');
 
 class benutzer extends person
 {
-	use db_extra; //CI Hack
-	
 	//Tabellenspalten
 	public $uid;			// varchar(32)
 	public $bnaktiv=true;	// boolean

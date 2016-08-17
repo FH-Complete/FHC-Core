@@ -20,26 +20,12 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *          Gerald Raab <gerald.raab@technikum-wien.at>.
  */
-//require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-require_once(dirname(__FILE__).'/datum.class.php');
-
-// CI
-// look if get_instance() is declared
-if (function_exists('get_instance'))
-	require_once(dirname(__FILE__).'/../ci_db_extra.php');
-else
-	require_once(dirname(__FILE__).'/../ci_hack.php');
-
-require_once(dirname(__FILE__).'/../application/models/organisation/Studiengang_model.php');
-
-class studiengang extends Studiengang_model
+class studiengang extends basis_db
 {
-	use db_extra; //CI Hack
-	
 	public $new;      			// boolean
 	public $result = array();	// studiengang Objekt
-	public $errormsg;			// string
 
 	public $studiengang_kz;		// integer
 	public $kurzbz;				// varchar(5)
@@ -99,7 +85,7 @@ class studiengang extends Studiengang_model
 		$this->studiengang_typ_arr["e"] = "Erhalter"; */
 	}
 
-	/*public function __get($value)
+	public function __get($value)
 	{
 		switch($value)
 		{
@@ -110,14 +96,14 @@ class studiengang extends Studiengang_model
 				}
 		}
 		return $this->$value;
-	}*/
+	}
 
 	/**
 	 * Laedt einen Studiengang
 	 * @param studiengang_kz KZ des Studienganges der zu Laden ist
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load($studiengang_kz = null)
+	public function load($studiengang_kz)
 	{
 		if(!is_numeric($studiengang_kz))
 		{
@@ -253,19 +239,25 @@ class studiengang extends Studiengang_model
      */
     public function getAllForBewerbung()
     {
-		error_log("getAllForBewerbung called!!!");
-		
-		$result = parent::getAllForBewerbung();
-		
-		if(!is_object($result))
+		$qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch, lgartcode, tbl_lgartcode.bezeichnung '
+                . 'FROM lehre.vw_studienplan '
+                . 'LEFT JOIN bis.tbl_lgartcode USING (lgartcode) '
+                . 'WHERE onlinebewerbung IS TRUE '
+                . 'AND aktiv IS TRUE '
+                . 'ORDER BY typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC';
+
+		if(!$result = $this->db_query($qry))
 		{
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
-			return FALSE;
+			return false;
 		}
 
-		$this->result = $result->result();
+		while($row = $this->db_fetch_object($result))
+		{
+			$this->result[] = $row;
+		}
 
-		return TRUE;
+		return true;
     }
 
 	/**
@@ -350,7 +342,7 @@ class studiengang extends Studiengang_model
 		if(count($kennzahlen)==0)
 			return true;
 
-		$kennzahlen = $this->db_implode4SQL($kennzahlen);
+		$kennzahlen = $this->implode4SQL($kennzahlen);
 
 		$qry = 'SELECT * FROM public.tbl_studiengang WHERE studiengang_kz in('.$kennzahlen.')';
 		if ($aktiv)

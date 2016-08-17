@@ -19,16 +19,10 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-require_once(dirname(__FILE__).'/datum.class.php');
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-// CI
-require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/system/Berechtigung_model.php');
-
-class berechtigung extends Berechtigung_model
+class berechtigung extends basis_db
 {
-	use db_extra; //CI Hack
-	
 	public $result=array();
 	public $new;
 
@@ -50,21 +44,17 @@ class berechtigung extends Berechtigung_model
 	 * @param $berechtigung_kurzbz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load($berechtigung_kurzbz = null)
+	public function load($berechtigung_kurzbz)
 	{
-		if (empty($berechtigung_kurzbz))
-		{
-			$this->errormsg = "berechtigung not set!";
-			return false;
-		}
-
-		$result = parent::load($berechtigung_kurzbz);
+		$qry = "SELECT *
+				  FROM system.tbl_berechtigung
+				 WHERE berechtigung_kurzbz = " . $this->db_add_param($berechtigung_kurzbz);
 		
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval))
+		if ($result = $this->db_query($qry))
 		{
-			if (count($result->retval) > 0)
+			if ($row = $this->db_fetch_object($result))
 			{
-				$this->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				$this->berechtigung_kurzbz=$row->berechtigung_kurzbz;
 				$this->beschreibung = $row->beschreibung;
 				return true;
 			}

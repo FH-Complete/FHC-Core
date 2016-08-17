@@ -24,19 +24,12 @@
  * Klasse Nation (FAS-Online)
  * @create 06-04-2006
  */
-require_once(dirname(__FILE__).'/datum.class.php');
+require_once(dirname(__FILE__).'/basis_db.class.php');
 
-// CI
-require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/codex/Nation_model.php');
-
-class nation extends Nation_model
+class nation extends basis_db
 {
-	use db_extra; //CI Hack
-	
 	public $new;      // boolean
 	public $nation = array(); // nation Objekt
-	public $errormsg;			// string
 
 	//Tabellenspalten
 	public $code;
@@ -67,22 +60,20 @@ class nation extends Nation_model
 	 * @param  $code code der zu ladenden Nation
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load($code = null)
+	public function load($code)
 	{
 		//Lesen der Daten aus der Datenbank
-		$result = parent::loadWhere(array('nation_code' => $code));
+		$qry = "SELECT * FROM bis.tbl_nation WHERE nation_code=".$this->db_add_param($code).';';
 		
-		if (!is_object($result) || (is_object($result) && $result->error != EXIT_SUCCESS))
+		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
 			return false;
 		}
 
-		if(is_array($result->retval) && count($result->retval) == 1)
+		if($row = $this->db_fetch_object())
 		{
 			$this->code = $code;
-			
-			$row = $result->retval[0];
 
 			$this->sperre = $this->db_parse_bool($row->sperre);
 			$this->kontinent = $row->kontinent;
@@ -109,37 +100,26 @@ class nation extends Nation_model
 	public function getAll($ohnesperre = false, $orderEnglish = false)
 	{
 		//Lesen der Daten aus der Datenbank
-        if (!$orderEnglish)
-		{
-			$result = parent::addOrder('kurztext');
-		}
-		else
-		{
-			$result = parent::addOrder('engltext');
-		}
+		$qry = "SELECT * FROM bis.tbl_nation";
 		
-		if ($result->error == EXIT_SUCCESS)
-		{
-			if ($ohnesperre)
-			{
-				$result = parent::loadWhere('sperre IS NULL');
-			}
-			else
-			{
-				$result = parent::load();
-			}
-		}
+		if ($ohnesperre)
+			$qry .= " WHERE sperre is null";
+		
+		if ($orderEnglish == false)
+			$qry .= " ORDER BY kurztext";
+		else 
+			$qry .= " ORDER BY engltext";
+        
+        $qry .= ';';
 			
-		if (!is_object($result) || (is_object($result) && ($result->error != EXIT_SUCCESS || !is_array($result->retval))))
+		if (!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
 			return false;
 		}
 
-		for ($i = 0; $i < count($result->retval); $i++)
+		while ($row = $this->db_fetch_object())
 		{
-			$row = $result->retval[$i];
-			
 			$nation = new nation();
 
 			$nation->code = $row->nation_code;
@@ -154,6 +134,7 @@ class nation extends Nation_model
 
 			$this->nation[] = $nation;
 		}
+		
 		return true;
 	}
 	

@@ -19,6 +19,9 @@
 	
 	// Dokumentenmanagement
 	define('DMS_PATH','/var/fhcomplete/documents/dms/');
+	
+	// Pfad zu Document Root
+	define('DOC_ROOT','/var/www/html/build/');
 
 	// Fuer Mails etc
 	define('DOMAIN','technikum-wien.at');

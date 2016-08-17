@@ -22,17 +22,11 @@
 /*
  * Benoetigt functions.inc.php
  */
+require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/datum.class.php');
 
-// CI
-require_once(dirname(__FILE__).'/../ci_hack.php');
-require_once(dirname(__FILE__).'/../application/models/person/Person_model.php');
-
-class person extends Person_model
+class person extends basis_db
 {
-	use db_extra; //CI Hack
-	
-	public $errormsg;			// string
 	public $new;				// boolean
 	public $personen = array();	// person Objekt
 	public $done = false;		// boolean
@@ -87,23 +81,26 @@ class person extends Person_model
 	 * @param	int	$personId	ID der Person die geladen werden soll.
 	 * @return bool
 	 **/
-	public function load($personId = null)
+	public function load($personId)
 	{
 		//person_id auf gueltigkeit pruefen
 		if (is_numeric($personId) && $personId != '')
 		{
-			$result = parent::load($personId);
-			
-			if (!is_object($result) || (is_object($result) && $result->error != EXIT_SUCCESS))
+			$qry = "SELECT person_id, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
+							gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
+							familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
+							geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung, zugangscode, foto_sperre, matr_nr
+					  FROM public.tbl_person
+					 WHERE person_id = " . $this->db_add_param($personId, FHC_INTEGER);
+
+			if (!$this->db_query($qry))
 			{
 				$this->errormsg = "Fehler beim Lesen der Personendaten\n";
 				return false;
 			}
 			
-			if(is_array($result->retval) && count($result->retval) == 1)
+			if ($row = $this->db_fetch_object())
 			{
-				$row = $result->retval[0];
-				
 				$this->person_id = $row->person_id;
 				$this->sprache = $row->sprache;
 				$this->anrede = $row->anrede;
@@ -735,7 +732,7 @@ class person extends Person_model
 				public.tbl_preincoming
 			WHERE
 				person_id = (SELECT person_id FROM public.tbl_person
-							 WHERE zugangscode=".$this->db_add_param($zugangscode).")
+							 WHERE zugangscode = " . $this->db_add_param($zugangscode) . ")
 			ORDER BY insertamum DESC;";
 
 		if ($this->db_query($qry))
