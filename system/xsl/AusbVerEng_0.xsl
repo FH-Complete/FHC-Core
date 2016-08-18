@@ -808,6 +808,9 @@
 						<xsl:when test="orgform = 'VZ'" >
 							Vollzeitstudiums.
 						</xsl:when>
+						<xsl:when test="orgform = 'PT'" >
+							berufsbegleitenden Studiums.
+						</xsl:when>
 						<xsl:otherwise>
 							Fernstudiums.
 						</xsl:otherwise>
