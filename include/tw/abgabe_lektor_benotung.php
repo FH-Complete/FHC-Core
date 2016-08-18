@@ -33,6 +33,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Herstellen der Datenbankverbindung');
@@ -44,6 +45,20 @@ require_once('../../include/pdf/fpdf.php');
 require_once('../../include/pdf.inc.php');
 
 $getuid=get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($getuid);
+
+if (isset($_GET['user']))
+{
+	if ($rechte->isBerechtigt('admin',null,'suid'))
+		$getuid = $_GET['user'];
+	else 
+		$getuid=get_uid();
+}
+else 
+	$getuid=get_uid();
+
 $datum_obj = new datum();
 $htmlstr = "";
 $qualitaet='';
@@ -153,7 +168,7 @@ else
 		$pdf->SetXY(30,30);
 	
 		//Logo
-		$pdf->Image("../../skin/images/logo.jpg","400","25","160","54","jpg","");
+		$pdf->Image("../../skin/styles/tw/logo.jpg","400","25","150","78","jpg","");
 
 		$pdf->SetFont('Arial','',12);
 		$pdf->SetFillColor(190,190,190);

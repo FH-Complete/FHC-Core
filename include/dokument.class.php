@@ -450,19 +450,22 @@ class dokument extends basis_db
 
 	/**
 	 * Liefert alle Dokumenttypen
-	 * @param string $not_in Kommagetrennter String von dokument_kurzbz. Optional. Um bestimmte Dokumente (zB Zeugnis, welcher fix im Core vorhanden sein muss) auszuschließen. 
+	 * @param string $not_in Kommagetrennter String von dokument_kurzbz. Optional. Um bestimmte Dokumente (zB Zeugnis, welcher fix im Core vorhanden sein muss) auszuschließen.
 	 * @return true wenn ok false im Fehlerfall
 	 */
 	public function getAllDokumente($not_in='')
 	{
-		$qry = "SELECT * FROM public.tbl_dokument ";
-		
+		$sprache = new sprache();
+		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
+		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
+		$qry = "SELECT dokument_kurzbz, bezeichnung, $bezeichnung_mehrsprachig, $dokumentbeschreibung_mehrsprachig FROM public.tbl_dokument ";
+
 		if($not_in!='')
 		{
 			$qry .= " WHERE dokument_kurzbz NOT IN (".$this->implode4SQL(explode(',', $not_in)).")";
 		}
 		$qry .= " ORDER BY bezeichnung;";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -471,6 +474,8 @@ class dokument extends basis_db
 
 				$dok->dokument_kurzbz = $row->dokument_kurzbz;
 				$dok->bezeichnung = $row->bezeichnung;
+				$dok->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
+				$dok->dokumentbeschreibung_mehrsprachig = $sprache->parseSprachResult('dokumentbeschreibung_mehrsprachig', $row);
 
 				$this->result[] = $dok;
 			}
@@ -691,6 +696,8 @@ class dokument extends basis_db
 	 */
 	public function getBeschreibungenDokumente($studiengangs_kz, $dokument_kurzbz)
 	{
+		if(count($studiengangs_kz)==0)
+			return true;
 		$sprache = new sprache();
 		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
 		$beschreibung_mehrsprachig = $sprache->getSprachQuery('beschreibung_mehrsprachig');
@@ -773,7 +780,7 @@ class dokument extends basis_db
 					AND tbl_prestudent.person_id=".$this->db_add_param($person_id);
 		if ($studiengang_kz!='')
 			$qry .= " AND studiengang_kz IN (".$studiengang_kz.")";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			if($this->db_num_rows($result)>0)

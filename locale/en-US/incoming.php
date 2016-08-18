@@ -121,4 +121,7 @@ $this->phrasen['incoming/bereitsAusgewaehlt']='This universtity has already been
 $this->phrasen['incoming/anfrageAbschicken']='Send request to CIR';
 $this->phrasen['incoming/captcha']='Please enter the characters shown in the picture (spam protection).';
 $this->phrasen['incoming/andereGrafik']='Reload picture';
+$this->phrasen['incoming/noVacancies']='No vacancies';
+$this->phrasen['incoming/alleStudiengaenge']='All Degree Programs';
+$this->phrasen['incoming/downloadLearningAgreement']='Download Learning Agreement';
 ?>

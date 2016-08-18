@@ -66,7 +66,7 @@ $rechte->getBerechtigungen($uid);
 	       min-height: 297mm;
 	       padding: 20mm;
 	       margin: 10mm auto;
-	       border: 1px #D3D3D3 solid;
+	       border: 1px #ffffff solid;
 	       border-radius: 5px;
 	       background: white;
 	       box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
@@ -75,7 +75,7 @@ $rechte->getBerechtigungen($uid);
 
 	    #subpage {
 		padding: 10mm;
-		border: 1px black solid;
+		border: 1px white solid;
 		height: 256mm;
 		outline: 20mm
 	    }
@@ -229,6 +229,8 @@ $rechte->getBerechtigungen($uid);
 			<th><?php echo $p->t('global/nachname'); ?></th>
 			<th><?php echo $p->t('global/matrikelnummer'); ?></th>
 			<th><?php echo $p->t('global/datum'); ?></th>
+			<th><?php echo $p->t('benotungstool/note'); ?></th>
+			<th><?php echo $p->t('global/anmerkung'); ?></th>
 		    </tr>
 		</thead>
 		<tbody>
@@ -245,19 +247,22 @@ $rechte->getBerechtigungen($uid);
 				$date = $datum->formatDatum($prfTermin->von, "Y-m-d H:i:s");
 				$date = strtotime($date);
 				$date = $date+(60*$pruefungsintervall*($count));
-				$date = $datum->formatDatum($prfTermin->von,"d.m.Y").' - '.date("h:i",$date);
+				$date = $datum->formatDatum($prfTermin->von,"d.m.Y").' - '.date("H:i",$date);
 				$count++;
 			    }
 			    else
 			    {
 				$date =  $datum->formatDatum($prfTermin->von,"d.m.Y - H:i");
+				$count++;
 			    }
 			    echo '<tr>';
-				echo '<td>'.$anmeldung->reihung.'</td>';
+				echo '<td>'.$count.'</td>';
 				echo '<td>'.$student->vorname.'</td>';
 				echo '<td>'.$student->nachname.'</td>';
-				echo '<td>'.$student->matrikelnr.'</td>';
+				echo '<td>'.$student->matr_nr.'</td>';
 				echo '<td>'.$date.'</td>';
+				echo '<td></td>';
+				echo '<td></td>';
 			    echo '</tr>';
 			}
 		    ?>
@@ -274,6 +279,19 @@ $rechte->getBerechtigungen($uid);
 	}
 	?>
 	    </table>
+		<br>
+		<table width="100%" id="liste">
+			<tr>
+				<td width="26%"><?php echo $p->t('pruefung/derLektor'); ?></td>
+				<td width="37%"><?php echo $mitarbeiter->getFullName(FALSE); ?></td>
+				<td width="37%"></td>
+			</tr>
+			<tr>
+				<td><?php echo $p->t('pruefung/dieKommission'); ?></td>
+				<td></td>
+				<td></td>
+			</tr
+		</table>
 	    </div>
 	</div>
     </body>

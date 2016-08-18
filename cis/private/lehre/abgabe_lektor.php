@@ -33,11 +33,20 @@ require_once('../../../include/person.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Herstellen der Datenbankverbindung');
 	
 $getuid=get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($getuid);
+
+if (isset($_GET['user']))
+{
+	if ($rechte->isBerechtigt('admin',null,'suid'))
+		$getuid = $_GET['user'];
+}
 
 $sprache = getSprache();
 

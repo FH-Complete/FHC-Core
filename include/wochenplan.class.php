@@ -1616,7 +1616,7 @@ class wochenplan extends basis_db
 					{
 						if($anzahl<=$max_kollision)
 						{
-							echo '<label value="'.$f_ort.($anzahl>0?'('.$anzahl.')':'').'"
+							echo '<label value="'.$f_ort.($anzahl>0?' ('.$anzahl.')':'').'"
 								styleOrig=""
 								ondragenter="nsDragAndDrop.dragEnter(event,boardObserver)"
 								ondragexit="nsDragAndDrop.dragExit(event,boardObserver)"

@@ -25,6 +25,9 @@ define('CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN',false);
 define('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN', true);
 
+// Im CIS Menue Links bei Modulen anzeigen wenn Lehrauftrag
+define('CIS_LEHRVERANSTALTUNG_MODULE_LINK',true);
+
 // Legt fest, ob bei den LV-Infos der Block mit den Terminen zu den einzelnen LVs (laut Stundenplan) angezeigt werden soll
 define ('CIS_LVINFO_TERMINE_ANZEIGEN', false);
 
@@ -59,9 +62,20 @@ define('CIS_GESAMTNOTE_UEBERSCHREIBEN',true);
 // Gewichtung der Lehreinheiten bei Noteneintragung true|false
 define('CIS_GESAMTNOTE_GEWICHTUNG', true);
 
+// Bei Gesamtnote eine zusaetzliche Spalte fuer den 2. Termin anzeigen
+define('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2',true);
+
 // Bei Gesamtnote eine zusaetzliche Spalte fuer den 3. Termin anzeigen
 define('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3',true);
 
+// Bei Gesamtnote eine zusaetzliche Spalte fuer die kommissionelle Pruefung anlegen
+define('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF', true);
+
+// Bei Gesamtnote eine zusaetzliche Spalte fuer die kommissionelle Pruefung anlegen
+define('CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE', true);
+
+// Bei Gesamtnote die Spalte fuer die Quelle der Noten anzeigen (Moodle oder LE)
+define('CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE', true);
 
 // Gibt an ob im FAS bei den Lehrveranstaltungsnoten ein zusaetzliches Formular angezeigt wird um
 // Vertraege fuer Pruefungshonorare anzulegen

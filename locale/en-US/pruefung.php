@@ -42,6 +42,7 @@ $this->phrasen['pruefung/keinFensterVorhanden'] = 'Keine Prüfungsfenster vorhan
 $this->phrasen['pruefung/keineDatenVorhanden'] = 'Keine Daten vorhanden.';
 $this->phrasen['pruefung/anmeldefristAbgelaufen'] = 'Anmeldefrist abgelaufen';
 $this->phrasen['pruefung/stornierenMoeglichBis'] = 'Stornieren möglich bis';
+$this->phrasen['pruefung/stornoNichtMehrMoeglich'] = 'Storno nicht mehr möglich.';
 $this->phrasen['pruefung/anmeldenMoeglichBis'] = 'Anmeldung möglich bis';
 $this->phrasen['pruefung/zurLvAnmeldung'] = 'zur LV-Anmeldung';
 $this->phrasen['pruefung/zuerstPruefungAuswaehlen'] = 'Zuerst Prüfung auswählen.';
@@ -71,6 +72,9 @@ $this->phrasen['pruefung/pruefungStornieren'] = 'Prüfung stornieren';
 $this->phrasen['pruefung/lvErfolgreichEntfernt'] = 'Lehrveranstaltung erfolgreich entfernt';
 $this->phrasen['pruefung/pruefungStorniert'] = 'Prüfung storniert';
 $this->phrasen['pruefung/terminGeloescht'] = 'Termin gelöscht';
+$this->phrasen['pruefung/unbegrenzt'] = 'unlimited';
+$this->phrasen['pruefung/bewertungenZu'] = 'Bewertungen zu';
+$this->phrasen['pruefung/keineAuswahl'] = 'Keine Auswahl';
 
 // pruefungsbewertung
 $this->phrasen['pruefung/pruefungsbewertungTitle'] = 'Prüfungsbewertung';
@@ -102,12 +106,42 @@ $this->phrasen['pruefung/kollisionMitAnderemTermin'] = 'Kollision mit anderem Te
 $this->phrasen['pruefung/terminNichtInDerVergangenheit'] = 'Prüfungstermin liegt nicht in der Vergangenheit.';
 $this->phrasen['pruefung/keineLehreinheitenVorhanden'] = 'Keine Lehreinheiten vorhanden.';
 $this->phrasen['pruefung/keineAnmeldungenVorhanden'] = 'Keine Anmeldungen vorhanden.';
+$this->phrasen['pruefung/derLektor'] = 'Lektor';
+$this->phrasen['pruefung/dieKommission'] = 'Kommission';
 
 // anmeldungen Verwalten
 $this->phrasen['pruefung/anmeldungenVerwaltenTitle'] = 'Prüfungsanmeldung Verwaltung';
 $this->phrasen['pruefung/anmeldungenVerwalten'] = 'Anmeldungen Verwalten';
 
+// prüfungsanmeldung.json.php
+$this->phrasen['pruefung/anmeldungErfolgreich'] = 'Registration successful.';
+$this->phrasen['pruefung/zuWenigeCreditPoints'] = 'Credit-Points-Guthaben ist zu gering.';
+$this->phrasen['pruefung/kollisionMitAndererAnmeldung'] = 'Kollision mit anderer Anmeldung.';
+$this->phrasen['pruefung/keineFreienPlaetzeVorhanden'] = 'Keine freien Plätze vorhanden.';
+$this->phrasen['pruefung/anmeldungAufgrundVonSperreNichtMoeglich'] = 'Anmeldung auf Grund von Sperre nicht möglich.';
+$this->phrasen['pruefung/prestudentNichtGefunden'] = 'Prestudent nicht gefunden.';
+$this->phrasen['pruefung/anmeldungErfolgreichGeloescht'] = 'Registration cancelled.';
 
+// Mailtexte
+$this->phrasen['pruefung/emailSubjectAnmeldungBestaetigung'] = 'Anmeldungsbestätigung zur Prüfung';
+$this->phrasen['pruefung/emailBody1'] = 'Ihre Anmeldung zur Prüfung wurde von';
+$this->phrasen['pruefung/emailBody2'] = 'bestätigt.';
+$this->phrasen['pruefung/emailBodyPruefung'] = 'Prüfung:';
+$this->phrasen['pruefung/emailBodyTermin'] = 'Termin:';
+$this->phrasen['pruefung/emailBodyDauer'] = 'Dauer:';
+$this->phrasen['pruefung/emailBodyUm'] = 'um';
+$this->phrasen['pruefung/emailBodyMinuten'] = 'Minuten';
+$this->phrasen['pruefung/emailBodyOrt'] = 'Ort:';
+$this->phrasen['pruefung/emailBodyLinkZurAnmeldung'] = 'Link zur Anmeldung';
+$this->phrasen['pruefung/emailBodyBitteHtmlSicht'] = 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.';
+
+$this->phrasen['pruefung/emailLektorSubjectAnmeldung'] = 'Anmeldung zur Prüfung';
+$this->phrasen['pruefung/emailLektorStudentIn'] = 'StudentIn';
+$this->phrasen['pruefung/emailLektorHatSichZurPruefung'] = 'hat sich zur Prüfung';
+$this->phrasen['pruefung/emailLektorAm'] = 'am';
+$this->phrasen['pruefung/emailLektorVon'] = 'von';
+$this->phrasen['pruefung/emailLektorUhrBis'] = 'Uhr bis';
+$this->phrasen['pruefung/emailLektorUhrAngemeldet'] = 'Uhr angemeldet.';
 
 
 ?>

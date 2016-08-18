@@ -76,6 +76,13 @@ $stg_arr = array();
 $error = false;
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
+
+if (isset($_GET['user']))
+{
+	if ($rechte->isBerechtigt('admin',null,'suid'))
+		$user = $_GET['user'];
+}
+
 $htmlstr='';
 
 if(!check_lektor($user))

@@ -43,6 +43,7 @@ require_once('../../../include/benutzergruppe.class.php');
 require_once('../../../include/konto.class.php');
 require_once('../../../include/lvinfo.class.php');
 require_once('../../../include/addon.class.php');
+require_once('../../../include/anrechnung.class.php');
 
 $uid = get_uid();
 
@@ -305,7 +306,9 @@ if($zeugnisnote->getZeugnisnoten('',$uid,''))
 	foreach($zeugnisnote->result as $row_note)
 	{
 		if($row_note->note!='')
+                {
 			$noten_arr[$row_note->lehrveranstaltung_id][$row_note->studiensemester_kurzbz]=$row_note->note;
+                }
 	}
 }
 
@@ -364,8 +367,8 @@ drawTree($tree,0);
 function drawTree($tree, $depth)
 {
 	global $uid, $stsem_arr, $noten_arr, $lvangebot_arr;
-	global $datum_obj, $db, $lv_arr, $p, $note_pruef_arr;
-
+	global $datum_obj, $db, $lv_arr, $p, $note_pruef_arr, $student;
+        
 	foreach($tree as $row_tree)
 	{
 		$style='';
@@ -448,7 +451,7 @@ function drawTree($tree, $depth)
 		
 		$lv_kompatibel = new lehrveranstaltung();
 		$kompatibleLVs = $lv_kompatibel->loadLVkompatibel($row_tree->lehrveranstaltung_id);
-		
+                
 		if(isset($noten_arr[$row_tree->lehrveranstaltung_id]))
 		{
 			// Positive Note fuer diese LV vorhanden?
@@ -467,23 +470,60 @@ function drawTree($tree, $depth)
 		//check if compatible course has grade
 		elseif(count($kompatibleLVs) > 0)
 		{
-		    foreach($kompatibleLVs as $komp)
-		    {
-			if(isset($noten_arr[$komp]))
-			{
-			    $positiv=false;
-			    foreach($noten_arr[$komp] as $note)
-			    {
-				    if($note_pruef_arr[$note]->positiv)
-					    $positiv=true;
-			    }
+                    $positiv = false;                 
+                    $found = false;
+                    $i = 0;
+                    while(!$found && $i < count($kompatibleLVs))
+                    {   
+                        foreach($kompatibleLVs as $komp)
+                        {
+                            
+                            $anrechnung = new anrechnung();
+                            $anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);    
+                            
+                            if(count($anrechnung->result) == 1)
+                            {
+                                $lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
+                                if(isset($noten_arr[$lv]))
+                                {
+                                    $positiv=false;
+                                    foreach($noten_arr[$lv] as $note)
+                                    {
+                                        if($note_pruef_arr[$note]->positiv)
+                                            $positiv=true;
+                                    }
 
-			    if($positiv)
-				    echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
-			    else
-				    echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
-			}
-		    }
+                                    $found = true;
+                                }
+                                else
+                                {
+                                    /* wenn zu mehreren kompatiblen lvs eine Anrechnung existiert
+                                     * darf found nicht auf false gesetzt werden wenn es zuvor bereits auf true gesetzt wurde
+                                     */
+                                    if(!$found)
+                                        $found = false;
+                                }
+                            }
+                            $i++;
+                        }
+                    }
+                    
+                    if($found)
+                    {
+                        if($positiv)
+                        echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
+                        else
+                            echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
+                    }
+                    elseif(!$found)
+                    {
+                        if($abgeschlossen)
+                            echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
+			elseif(!$row_tree->stpllv_pflicht)
+                            echo '<span>'.$p->t('studienplan/optional').'</span>';
+			else
+                            echo '<span>'.$p->t('studienplan/offen').'</span>';
+                    }
 		}
 		else
 		{
@@ -522,16 +562,35 @@ function drawTree($tree, $depth)
 			}
 			elseif(count($kompatibleLVs) > 0)
 			{
-			    foreach($kompatibleLVs as $komp)
-			    {
-				if(isset($noten_arr[$komp][$stsem]))
-				{
-					if($note_pruef_arr[$noten_arr[$komp][$stsem]]->positiv)
-						$tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$komp][$stsem]]->anmerkung.'</span>';
-					else
-						$tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$komp][$stsem]]->anmerkung.'</span>';
-				}
-			    }
+                            $found = false;
+                            $i = 0;
+                            while(!$found && $i < count($kompatibleLVs))
+                            {   
+                                foreach($kompatibleLVs as $komp)
+                                {
+                                    $anrechnung = new anrechnung();
+                                    $anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);
+                                    
+                                    if(count($anrechnung->result) == 1)
+                                    {
+                                        $lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
+                                        if(isset($noten_arr[$lv][$stsem]))
+                                        {
+                                            $found = true;
+                                            if($note_pruef_arr[$noten_arr[$lv][$stsem]]->positiv)
+                                                    $tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
+                                            else
+                                                    $tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
+                                        }
+                                    }
+                                    $i++;
+                                }
+
+                                if(!$found)
+                                {
+                                    $tdinhalt.= '-';
+                                }   
+                            }
 			}
 			else
 			{

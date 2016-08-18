@@ -215,6 +215,9 @@ define('CIS_PRUEFUNGSANMELDUNG_USER','p.pruefungsanmeldung');
 // Soll für die Prüfungsanmeldungen eine Anrechnung erstellt werden
 define('CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG', true);
 
+//Gibt an, ob der Bereich zur Anmeldung zu Pruefungen des gesamten Studiengangs angezeigt werden soll
+define('CIS_PRUEFUNGSANMELDUNG_LEHRVERANSTALTUNGEN_AUS_STUDIENGANG', true); 
+
 //Gibt an, wie viele Semester aus der Vergangenheit unter Meine LV angezeigt werden
 define('CIS_MEINELV_ANZAHL_SEMESTER_PAST', 3);
 

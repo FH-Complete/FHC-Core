@@ -97,4 +97,7 @@ define('MAIL_ZENTRALEINKAUF','info@technikum-wien.at');
 //Gibt an welche Funktion zur generierung des PDF Files herangezogen wird
 //moegliche Werte: FOP | XSLFO2PDF
 define ('PDF_CREATE_FUNCTION','XSLFO2PDF');
+
+// Ordner für DMS Dokumente 
+define('DMS_PATH','/var/www/fhcomplete/dms/');
 ?>

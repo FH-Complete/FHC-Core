@@ -195,7 +195,7 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
                     <tr>
                         <td><?php echo $p->t('global/studiensemester'); ?>:</td>
                         <td>
-                            <select id="studiensemester" name="studiensemester" onchange="loadPruefungsfenster();" onload="loadPruefungsfenster();">
+                            <select id="studiensemester" name="studiensemester" onchange="loadPruefungsfenster(); loadLehrveranstaltungen();" onload="loadPruefungsfenster();">
                             </select>
                         </td>
                     </tr>

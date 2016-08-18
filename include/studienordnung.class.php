@@ -149,23 +149,29 @@ class studienordnung extends basis_db
 
 		if(is_null($studiensemester_kurzbz))
 		{
-			$qry = 'SELECT sto.*, s.bezeichnung as status_bezeichnung FROM lehre.tbl_studienordnung sto
+			$qry = 'SELECT sto.*, s.bezeichnung as status_bezeichnung, tbl_studiensemester.start as gueltig_startdatum
+					FROM lehre.tbl_studienordnung sto
 					LEFT JOIN lehre.tbl_studienordnungstatus s USING(status_kurzbz)
+					LEFT JOIN public.tbl_studiensemester ON(sto.gueltigvon=tbl_studiensemester.studiensemester_kurzbz)
 					WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
 		}
 		else
 		{
-			$qry = 'SELECT distinct sto.*, s.bezeichnung as status_bezeichnung, sem.* FROM lehre.tbl_studienordnung sto
+			$qry = 'SELECT distinct sto.*, s.bezeichnung as status_bezeichnung, sem.*, tbl_studiensemester.start as gueltig_startdatum
+					FROM lehre.tbl_studienordnung sto
 					JOIN lehre.tbl_studienordnungstatus s USING(status_kurzbz)
 					LEFT JOIN lehre.tbl_studienplan USING(studienordnung_id)
 					LEFT JOIN lehre.tbl_studienplan_semester sem USING (studienplan_id)
+					LEFT JOIN public.tbl_studiensemester ON(sto.gueltigvon=tbl_studiensemester.studiensemester_kurzbz)
 					WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
 
 			if (!is_null($studiensemester_kurzbz))
-				$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz, FHC_STRING,false);
+				$qry.=" AND sem.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz, FHC_STRING,false);
 			if (!is_null($semester))
 				$qry.=" AND semester=".$this->db_add_param($semester, FHC_INTEGER,false);
 		}
+
+		$qry.=" ORDER BY gueltig_startdatum desc";
 
 		if(!$this->db_query($qry))
 		{

@@ -203,7 +203,14 @@ if($method =="austauschprogram")
 									$selected="";
 									if($mob->mobilitaetsprogramm_code == $preincoming->mobilitaetsprogramm_code)
 										$selected = "selected";
-									echo '<option value="'.$mob->mobilitaetsprogramm_code.'" '.$selected.'>'.$mob->kurzbz."</option>\n";
+									$anzeigetext="";
+									if ($mob->kurzbz=='Austausch' && $sprache=='English')
+										$anzeigetext = 'Exchange';
+									elseif ($mob->kurzbz=='selbst')
+										$anzeigetext = 'Freemover';
+									else 
+										$anzeigetext = $mob->kurzbz;
+									echo '<option value="'.$mob->mobilitaetsprogramm_code.'" '.$selected.'>'.$anzeigetext."</option>\n";
 							}
 	echo '					</td>
 						</tr>
@@ -508,7 +515,11 @@ else if($method=="lehrveranstaltungen")
 		<br><br>
 		';*/
 
-		echo '
+		echo '<table width="90%" border="1" align="center">
+			<tr style="text-align: center">
+				<td style="padding: 20px; color: red"><b>Course application is currently disabled. Please contact the office to apply for courses.</b></td>
+			</tr></table>';
+		/*echo '
 		<form name="filterSemester">
 		<table width="90%" border="0" align="center">
 			<tr>
@@ -556,7 +567,7 @@ else if($method=="lehrveranstaltungen")
 
 			echo'</SELECT><br>';
 			echo $p->t('global/studiengang').':<SELECT name="filterStudiengang" onchange=selectChange()>
-			<option value="">Alle Studiengänge</option>';
+			<option value="">'.$p->t('incoming/alleStudiengaenge').'</option>';
 
 				// Vorauswahl der Übergebenen Filter
 
@@ -569,7 +580,8 @@ else if($method=="lehrveranstaltungen")
 					if(isset($_GET['studiengang']) && $_GET['studiengang'] == $row->studiengang_kz)
 						$selected='selected';
 
-					echo '<option value="'.$row->studiengang_kz.'" '.$selected.'>'.strtoupper($row->typ.$row->kurzbz).' - '.$row->bezeichnung.'</option>';
+					$studiengang_language = ($sprache == 'German') ? $row->bezeichnung : $row->english;
+					echo '<option value="'.$row->studiengang_kz.'" '.$selected.'>'.strtoupper($row->typ.$row->kurzbz).' - '.$studiengang_language.'</option>';
 				}
 
 			echo'</SELECT>';
@@ -606,7 +618,18 @@ else if($method=="lehrveranstaltungen")
 
 
 		//Uebersicht LVs
-		$qry = "SELECT
+		/* Erklaerung der Datumszeitraeume ab Zeile 650:
+		 *		|=============== Studiensemester ===============|
+		 *	|--------------| 											Incoming beginnt vor SS-Beginn und endet VOR SS-Ende jedoch ueberwiegend innerhalb SS
+		 *											|--------------| 	Incoming beginnt VOR SS-Ende und endet NACH SS-Ende, jedoch ueberwiegend innerhalb SS 
+		 * 				|------------------------------| 				Incoming ist innerhalb oder GENAU SS da
+		 *	|------------------------------------------------------|	Incoming ist VOR SS-Anfang und NACH SS-Ende da, jedoch ueberwiegend ueberlappend mit SS 
+		 * ---------------------------------------------------------	Von und Bis ist NULL
+		 * -------------------|											Von ist NULL und bis innerhalb SS
+		 *									|-----------------------	Bis ist NULL und von innerhalb SS 
+		 */
+		
+		/*$qry = "SELECT
 					tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.ects,
 					tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache,
 					tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.incoming, tbl_lehrveranstaltung.orgform_kurzbz,
@@ -638,18 +661,32 @@ else if($method=="lehrveranstaltungen")
 						JOIN public.tbl_preincoming using(preincoming_id)
 						WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
 						AND
-						(von is null OR von <= '$stsem->start')
-						AND
-						(bis is null OR bis >= (DATE '$stsem->ende'))
+						(
+							(bis - '$stsem->start' > '$stsem->start' - von) OR
+							('$stsem->start' <= von AND bis >= '$stsem->ende' AND '$stsem->ende' - von > bis - '$stsem->ende') OR
+							(von >= '$stsem->start' AND bis <= '$stsem->ende') OR
+							(von <= '$stsem->start' AND bis >= '$stsem->ende') OR
+							(von IS NULL AND bis IS NULL) OR
+							(von IS NULL AND bis <= '$stsem->ende' AND bis > '$stsem->start') OR
+							(bis IS NULL AND von < '$stsem->ende' AND von >= '$stsem->start')
+						)
 						AND aktiv = true
-						)a ) as anzahl
+						)a ) as anzahl 
 					FROM
-						lehre.tbl_lehrveranstaltung JOIN public.tbl_studiengang USING(studiengang_kz)
+						lehre.tbl_lehrveranstaltung 
+					JOIN 
+						public.tbl_studiengang USING(studiengang_kz) 
 					WHERE
-						tbl_lehrveranstaltung.incoming>0 AND
-						tbl_lehrveranstaltung.aktiv AND
-						tbl_lehrveranstaltung.lehre
-						AND ((tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000) OR tbl_lehrveranstaltung.studiengang_kz=10006)";
+						tbl_lehrveranstaltung.incoming>0 AND 
+						tbl_lehrveranstaltung.aktiv AND 
+						tbl_lehrveranstaltung.lehre AND 
+						tbl_lehrveranstaltung.lehrveranstaltung_id IN (
+							SELECT lehrveranstaltung_id FROM lehre.tbl_studienplan_lehrveranstaltung 
+							JOIN lehre.tbl_studienplan USING (studienplan_id) 
+							JOIN lehre.tbl_studienordnung USING (studienordnung_id) 
+							WHERE tbl_studienordnung.status_kurzbz='approved' 
+							AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id) AND 
+						((tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000) OR tbl_lehrveranstaltung.studiengang_kz=10006)";
 
 					if (isset($_GET['studiengang']) && $_GET['studiengang'] !='')
 						$qry .= "AND tbl_lehrveranstaltung.studiengang_kz=".$_GET['studiengang'];
@@ -679,8 +716,8 @@ else if($method=="lehrveranstaltungen")
 			while($row = $db->db_fetch_object($result))
 			{
 				$freieplaetze = $row->incoming - $row->anzahl;
-				if($freieplaetze>0)
-				{
+				//if($freieplaetze>0)
+				//{
 					$studiengang = new studiengang();
 					$studiengang->load($row->studiengang_kz);
 					$studiengang_language = ($sprache == 'German') ? $studiengang->bezeichnung : $studiengang->english;
@@ -689,10 +726,14 @@ else if($method=="lehrveranstaltungen")
 						$typ = 'BA';
 					else if ($studiengang->typ == 'm')
 						$typ = 'MA';
+					else
+						$typ = '-';
 					echo '<tr>';
                     echo '<td style="display:none">'.$row->lehrveranstaltung_id.'</td>';
-					if(!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id))
+					if(!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id) && $freieplaetze>0)
 						echo '<td><a href="incoming.php?method=lehrveranstaltungen&mode=add&id='.$row->lehrveranstaltung_id.'">'.$p->t('global/anmelden').'</a></td>';
+					elseif (!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id) && $freieplaetze==0)
+						echo '<td>'.$p->t('incoming/noVacancies').'</td>';
 					else
 						echo '<td>'.$p->t('global/angemeldet').'</td>';
 					echo '<td>',$studiengang_language,'</td>';
@@ -709,10 +750,10 @@ else if($method=="lehrveranstaltungen")
 						  </td>';
 					echo '<td>',($freieplaetze<$row->incoming?'<strong>'.$freieplaetze.'/'.$row->incoming.'</strong>':$freieplaetze.'/'.$row->incoming),'</td>';
 					echo '</tr>';
-				}
+				//}
 			}
 		}
-		echo '</tbody></table>';
+		echo '</tbody></table>';*/
 	}
 }
 else if ($method == "university")
@@ -1796,7 +1837,7 @@ else
 					<td>4. <a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/lehrveranstaltungenauswählen').'</a></td>
 				</tr>
 				<tr>
-					<td>5. <a href="learningAgreementPdf.php?id='.$preincoming->preincoming_id.'">'.$p->t('incoming/learningagreementerstellen').'</a></td>
+					<td>5. <a href="'.APP_ROOT.'cms/dms.php?id=8270">'.$p->t('incoming/downloadLearningAgreement').'</a></td>
 				</tr>
 				<tr>
 					<td>6. <a href="'.APP_ROOT.'cis/public/incoming/akteupload.php?person_id='.$person->person_id.'&dokumenttyp=LearnAgr" onclick="FensterOeffnen(this.href); return false;">'.$p->t("incoming/uploadLearningAgreement").'</a></td>

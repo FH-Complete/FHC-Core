@@ -11,10 +11,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<style:font-face style:name="Wingdings" svg:font-family="Wingdings" style:font-pitch="variable" style:font-charset="x-symbol"/>
 		<style:font-face style:name="Symbol" svg:font-family="Symbol" style:font-family-generic="roman" style:font-pitch="variable" style:font-charset="x-symbol"/>
 		<style:font-face style:name="Mangal1" svg:font-family="Mangal"/>
-		<style:font-face style:name="Courier New" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern"/>
+		<style:font-face style:name="Courier New1" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern"/>
 		<style:font-face style:name="Lucida Grande" svg:font-family="&apos;Lucida Grande&apos;, &apos;Times New Roman&apos;" style:font-family-generic="roman"/>
 		<style:font-face style:name="ヒラギノ角ゴ Pro W3" svg:font-family="&apos;ヒラギノ角ゴ Pro W3&apos;" style:font-family-generic="roman"/>
-		<style:font-face style:name="Courier New1" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-pitch="fixed"/>
+		<style:font-face style:name="Courier New" svg:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-pitch="fixed"/>
 		<style:font-face style:name="Liberation Serif" svg:font-family="&apos;Liberation Serif&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
 		<style:font-face style:name="Times New Roman" svg:font-family="&apos;Times New Roman&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
 		<style:font-face style:name="Arial" svg:font-family="Arial" style:font-family-generic="swiss" style:font-pitch="variable"/>
@@ -48,7 +48,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:text-properties style:use-window-font-color="true" style:font-name="Arial" fo:font-family="Arial" style:font-family-generic="swiss" style:font-pitch="variable" fo:font-size="12pt" fo:language="de" fo:country="DE" style:font-name-asian="Times New Roman" style:font-family-asian="&apos;Times New Roman&apos;" style:font-family-generic-asian="roman" style:font-pitch-asian="variable" style:font-size-asian="12pt" style:font-name-complex="Arial" style:font-family-complex="Arial" style:font-family-generic-complex="swiss" style:font-pitch-complex="variable" style:font-size-complex="10pt" style:language-complex="ar" style:country-complex="SA"/>
 		</style:style>
 		<style:style style:name="Heading" style:family="paragraph" style:parent-style-name="Standard" style:next-style-name="Text_20_body" style:class="text">
-			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.212cm" style:contextual-spacing="false" fo:keep-with-next="always"/>
+			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.212cm" loext:contextual-spacing="false" fo:keep-with-next="always"/>
 			<style:text-properties style:font-name="Liberation Sans" fo:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="swiss" style:font-pitch="variable" fo:font-size="14pt" style:font-name-asian="Microsoft YaHei" style:font-family-asian="&apos;Microsoft YaHei&apos;" style:font-family-generic-asian="system" style:font-pitch-asian="variable" style:font-size-asian="14pt" style:font-name-complex="Mangal" style:font-family-complex="Mangal" style:font-family-generic-complex="system" style:font-pitch-complex="variable" style:font-size-complex="14pt"/>
 		</style:style>
 		<style:style style:name="Text_20_body" style:display-name="Text body" style:family="paragraph" style:parent-style-name="Standard" style:class="text">
@@ -58,7 +58,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:text-properties style:font-size-asian="12pt" style:font-name-complex="Mangal1" style:font-family-complex="Mangal"/>
 		</style:style>
 		<style:style style:name="Caption" style:family="paragraph" style:parent-style-name="Standard" style:class="extra">
-			<style:paragraph-properties fo:margin-top="0.212cm" fo:margin-bottom="0.212cm" style:contextual-spacing="false" text:number-lines="false" text:line-number="0"/>
+			<style:paragraph-properties fo:margin-top="0.212cm" fo:margin-bottom="0.212cm" loext:contextual-spacing="false" text:number-lines="false" text:line-number="0"/>
 			<style:text-properties fo:font-size="12pt" fo:font-style="italic" style:font-size-asian="12pt" style:font-style-asian="italic" style:font-name-complex="Mangal1" style:font-family-complex="Mangal" style:font-size-complex="12pt" style:font-style-complex="italic"/>
 		</style:style>
 		<style:style style:name="Index" style:family="paragraph" style:parent-style-name="Standard" style:class="index">
@@ -66,39 +66,39 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:text-properties style:font-size-asian="12pt" style:font-name-complex="Mangal1" style:font-family-complex="Mangal"/>
 		</style:style>
 		<style:style style:name="Heading_20_1" style:display-name="Heading 1" style:family="paragraph" style:parent-style-name="Standard" style:next-style-name="Standard" style:default-outline-level="1" style:list-style-name="WW8Num1" style:class="text">
-			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" style:contextual-spacing="false" fo:keep-with-next="always"/>
+			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" loext:contextual-spacing="false" fo:keep-with-next="always"/>
 			<style:text-properties fo:font-size="16pt" fo:language="de" fo:country="AT" fo:font-weight="bold" style:letter-kerning="true" style:font-size-asian="16pt" style:font-weight-asian="bold" style:font-name-complex="Arial" style:font-family-complex="Arial" style:font-family-generic-complex="swiss" style:font-pitch-complex="variable" style:font-size-complex="16pt" style:font-weight-complex="bold"/>
 		</style:style>
 		<style:style style:name="Heading_20_2" style:display-name="Heading 2" style:family="paragraph" style:parent-style-name="Standard" style:next-style-name="Standard" style:list-style-name="WW8Num9" style:class="text">
-			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" style:contextual-spacing="false" fo:keep-with-next="always"/>
+			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" loext:contextual-spacing="false" fo:keep-with-next="always"/>
 			<style:text-properties fo:font-size="11pt" fo:font-style="italic" fo:font-weight="bold" style:font-size-asian="11pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-name-complex="Arial" style:font-family-complex="Arial" style:font-family-generic-complex="swiss" style:font-pitch-complex="variable" style:font-size-complex="14pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
 		</style:style>
 		<style:style style:name="Heading_20_3" style:display-name="Heading 3" style:family="paragraph" style:parent-style-name="Standard" style:next-style-name="Standard" style:class="text">
-			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" style:contextual-spacing="false" fo:keep-with-next="always"/>
+			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" loext:contextual-spacing="false" fo:keep-with-next="always"/>
 			<style:text-properties fo:font-size="13pt" fo:font-weight="bold" style:font-size-asian="13pt" style:font-weight-asian="bold" style:font-name-complex="Arial" style:font-family-complex="Arial" style:font-family-generic-complex="swiss" style:font-pitch-complex="variable" style:font-size-complex="13pt" style:font-weight-complex="bold"/>
 		</style:style>
 		<style:style style:name="Heading_20_4" style:display-name="Heading 4" style:family="paragraph" style:parent-style-name="Standard" style:next-style-name="Standard" style:class="text">
-			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" style:contextual-spacing="false" fo:keep-with-next="always"/>
+			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" loext:contextual-spacing="false" fo:keep-with-next="always"/>
 			<style:text-properties style:font-name="Times New Roman" fo:font-family="&apos;Times New Roman&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="14pt" fo:font-weight="bold" style:font-size-asian="14pt" style:font-weight-asian="bold" style:font-name-complex="Times New Roman" style:font-family-complex="&apos;Times New Roman&apos;" style:font-family-generic-complex="roman" style:font-pitch-complex="variable" style:font-size-complex="14pt" style:font-weight-complex="bold"/>
 		</style:style>
 		<style:style style:name="Heading_20_5" style:display-name="Heading 5" style:family="paragraph" style:parent-style-name="Standard" style:next-style-name="Standard" style:default-outline-level="5" style:list-style-name="WW8Num1" style:class="text">
-			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" style:contextual-spacing="false"/>
+			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" loext:contextual-spacing="false"/>
 			<style:text-properties fo:font-size="13pt" fo:font-style="italic" fo:font-weight="bold" style:font-size-asian="13pt" style:font-style-asian="italic" style:font-weight-asian="bold" style:font-size-complex="13pt" style:font-style-complex="italic" style:font-weight-complex="bold"/>
 		</style:style>
 		<style:style style:name="Heading_20_6" style:display-name="Heading 6" style:family="paragraph" style:parent-style-name="Standard" style:next-style-name="Standard" style:default-outline-level="6" style:list-style-name="WW8Num1" style:class="text">
-			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" style:contextual-spacing="false"/>
+			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" loext:contextual-spacing="false"/>
 			<style:text-properties style:font-name="Times New Roman" fo:font-family="&apos;Times New Roman&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-size="11pt" fo:font-weight="bold" style:font-size-asian="11pt" style:font-weight-asian="bold" style:font-name-complex="Times New Roman" style:font-family-complex="&apos;Times New Roman&apos;" style:font-family-generic-complex="roman" style:font-pitch-complex="variable" style:font-size-complex="11pt" style:font-weight-complex="bold"/>
 		</style:style>
 		<style:style style:name="Heading_20_7" style:display-name="Heading 7" style:family="paragraph" style:parent-style-name="Standard" style:next-style-name="Standard" style:default-outline-level="7" style:list-style-name="WW8Num1" style:class="text">
-			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" style:contextual-spacing="false"/>
+			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" loext:contextual-spacing="false"/>
 			<style:text-properties style:font-name="Times New Roman" fo:font-family="&apos;Times New Roman&apos;" style:font-family-generic="roman" style:font-pitch="variable" style:font-name-complex="Times New Roman" style:font-family-complex="&apos;Times New Roman&apos;" style:font-family-generic-complex="roman" style:font-pitch-complex="variable" style:font-size-complex="12pt"/>
 		</style:style>
 		<style:style style:name="Heading_20_8" style:display-name="Heading 8" style:family="paragraph" style:parent-style-name="Standard" style:next-style-name="Standard" style:default-outline-level="8" style:list-style-name="WW8Num1" style:class="text">
-			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" style:contextual-spacing="false"/>
+			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" loext:contextual-spacing="false"/>
 			<style:text-properties style:font-name="Times New Roman" fo:font-family="&apos;Times New Roman&apos;" style:font-family-generic="roman" style:font-pitch="variable" fo:font-style="italic" style:font-style-asian="italic" style:font-name-complex="Times New Roman" style:font-family-complex="&apos;Times New Roman&apos;" style:font-family-generic-complex="roman" style:font-pitch-complex="variable" style:font-size-complex="12pt" style:font-style-complex="italic"/>
 		</style:style>
 		<style:style style:name="Heading_20_9" style:display-name="Heading 9" style:family="paragraph" style:parent-style-name="Standard" style:next-style-name="Standard" style:default-outline-level="9" style:list-style-name="WW8Num1" style:class="text">
-			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" style:contextual-spacing="false"/>
+			<style:paragraph-properties fo:margin-top="0.423cm" fo:margin-bottom="0.106cm" loext:contextual-spacing="false"/>
 			<style:text-properties fo:font-size="11pt" style:font-size-asian="11pt" style:font-name-complex="Arial" style:font-family-complex="Arial" style:font-family-generic-complex="swiss" style:font-pitch-complex="variable" style:font-size-complex="11pt"/>
 		</style:style>
 		<style:style style:name="Header" style:family="paragraph" style:parent-style-name="Standard" style:class="extra">
@@ -139,11 +139,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:text-properties style:font-name="Tahoma" fo:font-family="Tahoma" style:font-family-generic="swiss" style:font-pitch="variable" fo:font-size="8pt" style:font-size-asian="8pt" style:font-name-complex="Tahoma" style:font-family-complex="Tahoma" style:font-family-generic-complex="swiss" style:font-pitch-complex="variable" style:font-size-complex="8pt"/>
 		</style:style>
 		<style:style style:name="Standard_20__28_Web_29_" style:display-name="Standard (Web)" style:family="paragraph" style:parent-style-name="Standard">
-			<style:paragraph-properties fo:margin-top="0.176cm" fo:margin-bottom="0.176cm" style:contextual-spacing="false"/>
+			<style:paragraph-properties fo:margin-top="0.176cm" fo:margin-bottom="0.176cm" loext:contextual-spacing="false"/>
 			<style:text-properties fo:color="#000000" style:font-name="Times New Roman" fo:font-family="&apos;Times New Roman&apos;" style:font-family-generic="roman" style:font-pitch="variable" style:font-name-complex="Times New Roman" style:font-family-complex="&apos;Times New Roman&apos;" style:font-family-generic-complex="roman" style:font-pitch-complex="variable" style:font-size-complex="12pt"/>
 		</style:style>
 		<style:style style:name="Tabelleninhalt" style:family="paragraph" style:parent-style-name="Standard">
-			<style:paragraph-properties fo:margin-top="0.141cm" fo:margin-bottom="0.141cm" style:contextual-spacing="false"/>
+			<style:paragraph-properties fo:margin-top="0.141cm" fo:margin-bottom="0.141cm" loext:contextual-spacing="false"/>
 			<style:text-properties fo:font-size="9pt" fo:language="en" fo:country="GB" style:font-size-asian="9pt"/>
 		</style:style>
 		<style:style style:name="Aufzählungen" style:family="paragraph" style:parent-style-name="Standard" style:list-style-name="WW8Num6"/>
@@ -159,9 +159,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:text-properties fo:font-size="10pt" style:font-size-asian="10pt"/>
 		</style:style>
 		<style:style style:name="Dokumentstruktur" style:family="paragraph" style:parent-style-name="Standard">
-			<style:paragraph-properties fo:background-color="#000080">
-				<style:background-image/>
-			</style:paragraph-properties>
+			<loext:graphic-properties draw:fill="solid" draw:fill-color="#000080" draw:opacity="100%"/>
+			<style:paragraph-properties fo:background-color="#000080"/>
 			<style:text-properties style:font-name="Tahoma" fo:font-family="Tahoma" style:font-family-generic="swiss" style:font-pitch="variable" fo:font-size="10pt" style:font-size-asian="10pt" style:font-name-complex="Tahoma" style:font-family-complex="Tahoma" style:font-family-generic-complex="swiss" style:font-pitch-complex="variable"/>
 		</style:style>
 		<style:style style:name="Table_20_Contents" style:display-name="Table Contents" style:family="paragraph" style:parent-style-name="Standard" style:class="extra">
@@ -195,7 +194,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:text-properties style:font-name="Arial" fo:font-family="Arial" style:font-family-generic="swiss" style:font-pitch="variable" style:font-name-complex="Arial" style:font-family-complex="Arial" style:font-family-generic-complex="swiss" style:font-pitch-complex="variable"/>
 		</style:style>
 		<style:style style:name="WW8Num3z1" style:family="text">
-			<style:text-properties style:font-name="Courier New" fo:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-name-complex="Courier New" style:font-family-complex="&apos;Courier New&apos;" style:font-family-generic-complex="modern"/>
+			<style:text-properties style:font-name="Courier New1" fo:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-name-complex="Courier New1" style:font-family-complex="&apos;Courier New&apos;" style:font-family-generic-complex="modern"/>
 		</style:style>
 		<style:style style:name="WW8Num3z2" style:family="text">
 			<style:text-properties style:font-name="Wingdings" fo:font-family="Wingdings" style:font-pitch="variable" style:font-charset="x-symbol" style:font-name-complex="Wingdings" style:font-family-complex="Wingdings" style:font-pitch-complex="variable" style:font-charset-complex="x-symbol"/>
@@ -207,7 +206,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:text-properties fo:font-variant="normal" fo:text-transform="none" fo:color="#000000" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:text-position="-8% 100%" style:font-name="Wingdings" fo:font-family="Wingdings" style:font-pitch="variable" style:font-charset="x-symbol" fo:font-size="12pt" fo:font-style="normal" fo:text-shadow="none" fo:font-weight="normal" style:font-size-asian="12pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-name-complex="Wingdings" style:font-family-complex="Wingdings" style:font-pitch-complex="variable" style:font-charset-complex="x-symbol" text:display="true"/>
 		</style:style>
 		<style:style style:name="WW8Num4z1" style:family="text">
-			<style:text-properties style:font-name="Courier New" fo:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-name-complex="Courier New" style:font-family-complex="&apos;Courier New&apos;" style:font-family-generic-complex="modern"/>
+			<style:text-properties style:font-name="Courier New1" fo:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-name-complex="Courier New1" style:font-family-complex="&apos;Courier New&apos;" style:font-family-generic-complex="modern"/>
 		</style:style>
 		<style:style style:name="WW8Num4z2" style:family="text">
 			<style:text-properties style:font-name="Wingdings" fo:font-family="Wingdings" style:font-pitch="variable" style:font-charset="x-symbol" style:font-name-complex="Wingdings" style:font-family-complex="Wingdings" style:font-pitch-complex="variable" style:font-charset-complex="x-symbol"/>
@@ -230,7 +229,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:text-properties fo:color="#008462" style:text-position="super 58%" style:font-name="Wingdings" fo:font-family="Wingdings" style:font-pitch="variable" style:font-charset="x-symbol" fo:font-size="20pt" style:font-size-asian="20pt" style:font-name-complex="Wingdings" style:font-family-complex="Wingdings" style:font-pitch-complex="variable" style:font-charset-complex="x-symbol" style:font-size-complex="20pt"/>
 		</style:style>
 		<style:style style:name="WW8Num6z1" style:family="text">
-			<style:text-properties style:font-name="Courier New" fo:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-name-complex="Courier New" style:font-family-complex="&apos;Courier New&apos;" style:font-family-generic-complex="modern"/>
+			<style:text-properties style:font-name="Courier New1" fo:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-name-complex="Courier New1" style:font-family-complex="&apos;Courier New&apos;" style:font-family-generic-complex="modern"/>
 		</style:style>
 		<style:style style:name="WW8Num6z2" style:family="text">
 			<style:text-properties style:font-name="Wingdings" fo:font-family="Wingdings" style:font-pitch="variable" style:font-charset="x-symbol" style:font-name-complex="Wingdings" style:font-family-complex="Wingdings" style:font-pitch-complex="variable" style:font-charset-complex="x-symbol"/>
@@ -242,7 +241,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:text-properties style:font-name="Symbol" fo:font-family="Symbol" style:font-family-generic="roman" style:font-pitch="variable" style:font-charset="x-symbol" style:font-name-complex="Symbol" style:font-family-complex="Symbol" style:font-family-generic-complex="roman" style:font-pitch-complex="variable" style:font-charset-complex="x-symbol"/>
 		</style:style>
 		<style:style style:name="WW8Num7z1" style:family="text">
-			<style:text-properties style:font-name="Courier New" fo:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-name-complex="Courier New" style:font-family-complex="&apos;Courier New&apos;" style:font-family-generic-complex="modern"/>
+			<style:text-properties style:font-name="Courier New1" fo:font-family="&apos;Courier New&apos;" style:font-family-generic="modern" style:font-name-complex="Courier New1" style:font-family-complex="&apos;Courier New&apos;" style:font-family-generic-complex="modern"/>
 		</style:style>
 		<style:style style:name="WW8Num7z2" style:family="text">
 			<style:text-properties style:font-name="Wingdings" fo:font-family="Wingdings" style:font-pitch="variable" style:font-charset="x-symbol" style:font-name-complex="Wingdings" style:font-family-complex="Wingdings" style:font-pitch-complex="variable" style:font-charset-complex="x-symbol"/>
@@ -285,6 +284,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</style:style>
 		<style:style style:name="Footnote_20_anchor" style:display-name="Footnote anchor" style:family="text">
 			<style:text-properties style:text-position="super 58%"/>
+		</style:style>
+		<style:style style:name="Internet_20_link" style:display-name="Internet link" style:family="text">
+			<style:text-properties fo:color="#000080" fo:language="zxx" fo:country="none" style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color" style:language-asian="zxx" style:country-asian="none" style:language-complex="zxx" style:country-complex="none"/>
 		</style:style>
 		<style:style style:name="Frame" style:family="graphic">
 			<style:graphic-properties text:anchor-type="paragraph" svg:x="0cm" svg:y="0cm" style:wrap="parallel" style:number-wrapped-paragraphs="no-limit" style:wrap-contour="false" style:vertical-pos="top" style:vertical-rel="paragraph-content" style:horizontal-pos="center" style:horizontal-rel="paragraph-content"/>
@@ -463,7 +465,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
 					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.54cm" fo:text-indent="-0.635cm" fo:margin-left="2.54cm"/>
 				</style:list-level-properties>
-				<style:text-properties style:font-name="Courier New1"/>
+				<style:text-properties style:font-name="Courier New"/>
 			</text:list-level-style-bullet>
 			<text:list-level-style-bullet text:level="3" text:style-name="WW8Num3z2" style:num-suffix="." text:bullet-char="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
@@ -481,7 +483,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
 					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="6.35cm" fo:text-indent="-0.635cm" fo:margin-left="6.35cm"/>
 				</style:list-level-properties>
-				<style:text-properties style:font-name="Courier New1"/>
+				<style:text-properties style:font-name="Courier New"/>
 			</text:list-level-style-bullet>
 			<text:list-level-style-bullet text:level="6" text:style-name="WW8Num3z2" style:num-suffix="." text:bullet-char="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
@@ -499,7 +501,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
 					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="10.16cm" fo:text-indent="-0.635cm" fo:margin-left="10.16cm"/>
 				</style:list-level-properties>
-				<style:text-properties style:font-name="Courier New1"/>
+				<style:text-properties style:font-name="Courier New"/>
 			</text:list-level-style-bullet>
 			<text:list-level-style-bullet text:level="9" text:style-name="WW8Num3z2" style:num-suffix="." text:bullet-char="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
@@ -524,7 +526,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
 					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.54cm" fo:text-indent="-0.635cm" fo:margin-left="2.54cm"/>
 				</style:list-level-properties>
-				<style:text-properties style:font-name="Courier New1"/>
+				<style:text-properties style:font-name="Courier New"/>
 			</text:list-level-style-bullet>
 			<text:list-level-style-bullet text:level="3" text:style-name="WW8Num4z2" style:num-suffix="." text:bullet-char="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
@@ -542,7 +544,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
 					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="6.35cm" fo:text-indent="-0.635cm" fo:margin-left="6.35cm"/>
 				</style:list-level-properties>
-				<style:text-properties style:font-name="Courier New1"/>
+				<style:text-properties style:font-name="Courier New"/>
 			</text:list-level-style-bullet>
 			<text:list-level-style-bullet text:level="6" text:style-name="WW8Num4z2" style:num-suffix="." text:bullet-char="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
@@ -560,7 +562,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
 					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="10.16cm" fo:text-indent="-0.635cm" fo:margin-left="10.16cm"/>
 				</style:list-level-properties>
-				<style:text-properties style:font-name="Courier New1"/>
+				<style:text-properties style:font-name="Courier New"/>
 			</text:list-level-style-bullet>
 			<text:list-level-style-bullet text:level="9" text:style-name="WW8Num4z2" style:num-suffix="." text:bullet-char="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
@@ -638,7 +640,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
 					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.54cm" fo:text-indent="-0.635cm" fo:margin-left="2.54cm"/>
 				</style:list-level-properties>
-				<style:text-properties style:font-name="Courier New1"/>
+				<style:text-properties style:font-name="Courier New"/>
 			</text:list-level-style-bullet>
 			<text:list-level-style-bullet text:level="3" text:style-name="WW8Num6z2" style:num-suffix="." text:bullet-char="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
@@ -656,7 +658,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
 					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="6.35cm" fo:text-indent="-0.635cm" fo:margin-left="6.35cm"/>
 				</style:list-level-properties>
-				<style:text-properties style:font-name="Courier New1"/>
+				<style:text-properties style:font-name="Courier New"/>
 			</text:list-level-style-bullet>
 			<text:list-level-style-bullet text:level="6" text:style-name="WW8Num6z2" style:num-suffix="." text:bullet-char="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
@@ -674,7 +676,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
 					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="10.16cm" fo:text-indent="-0.635cm" fo:margin-left="10.16cm"/>
 				</style:list-level-properties>
-				<style:text-properties style:font-name="Courier New1"/>
+				<style:text-properties style:font-name="Courier New"/>
 			</text:list-level-style-bullet>
 			<text:list-level-style-bullet text:level="9" text:style-name="WW8Num6z2" style:num-suffix="." text:bullet-char="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
@@ -699,7 +701,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
 					<style:list-level-label-alignment text:label-followed-by="listtab" fo:text-indent="-0.635cm" fo:margin-left="2.54cm"/>
 				</style:list-level-properties>
-				<style:text-properties style:font-name="Courier New1"/>
+				<style:text-properties style:font-name="Courier New"/>
 			</text:list-level-style-bullet>
 			<text:list-level-style-bullet text:level="3" text:style-name="WW8Num7z2" style:num-suffix="." text:bullet-char="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
@@ -717,7 +719,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
 					<style:list-level-label-alignment text:label-followed-by="listtab" fo:text-indent="-0.635cm" fo:margin-left="6.35cm"/>
 				</style:list-level-properties>
-				<style:text-properties style:font-name="Courier New1"/>
+				<style:text-properties style:font-name="Courier New"/>
 			</text:list-level-style-bullet>
 			<text:list-level-style-bullet text:level="6" text:style-name="WW8Num7z2" style:num-suffix="." text:bullet-char="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
@@ -735,7 +737,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
 					<style:list-level-label-alignment text:label-followed-by="listtab" fo:text-indent="-0.635cm" fo:margin-left="10.16cm"/>
 				</style:list-level-properties>
-				<style:text-properties style:font-name="Courier New1"/>
+				<style:text-properties style:font-name="Courier New"/>
 			</text:list-level-style-bullet>
 			<text:list-level-style-bullet text:level="9" text:style-name="WW8Num7z2" style:num-suffix="." text:bullet-char="">
 				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
@@ -858,7 +860,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:notes-configuration text:note-class="endnote" style:num-format="i" text:start-value="0"/>
 		<text:linenumbering-configuration text:number-lines="false" text:offset="0.499cm" style:num-format="1" text:number-position="left" text:increment="5"/>
 		<style:default-page-layout>
-			<style:page-layout-properties style:layout-grid-standard-mode="true"/>
+			<style:page-layout-properties style:writing-mode="lr-tb" style:layout-grid-standard-mode="true"/>
 		</style:default-page-layout>
 	</office:styles>
 	<office:automatic-styles>
@@ -871,21 +873,19 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<style:style style:name="MT2" style:family="text">
 			<style:text-properties fo:font-size="8pt" fo:background-color="transparent" loext:char-shading-value="0" style:font-size-asian="8pt" style:font-size-complex="8pt"/>
 		</style:style>
-		<style:style style:name="MT3" style:family="text">
-			<style:text-properties fo:font-size="8pt" fo:font-weight="bold" fo:background-color="transparent" loext:char-shading-value="0" style:font-size-asian="8pt" style:font-weight-asian="bold" style:font-size-complex="8pt"/>
-		</style:style>
+		<style:style style:name="MT3" style:family="text"/>
 		<style:style style:name="Mfr1" style:family="graphic" style:parent-style-name="Graphics">
 			<style:graphic-properties fo:margin-left="0.319cm" fo:margin-right="0.319cm" style:run-through="background" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" fo:padding="0.002cm" fo:border="none" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
 		</style:style>
 		<style:page-layout style:name="Mpm1">
-			<style:page-layout-properties fo:page-width="21.001cm" fo:page-height="29.7cm" style:num-format="1" style:print-orientation="portrait" fo:margin-top="1.27cm" fo:margin-bottom="1.229cm" fo:margin-left="2.501cm" fo:margin-right="2.501cm" style:writing-mode="lr-tb" style:layout-grid-color="#c0c0c0" style:layout-grid-lines="42" style:layout-grid-base-height="0.635cm" style:layout-grid-ruby-height="0cm" style:layout-grid-mode="none" style:layout-grid-ruby-below="false" style:layout-grid-print="false" style:layout-grid-display="false" style:layout-grid-base-width="0.423cm" style:layout-grid-snap-to="true" style:layout-grid-snap-to-characters="true" style:footnote-max-height="0cm">
+			<style:page-layout-properties fo:page-width="21.001cm" fo:page-height="29.7cm" style:num-format="1" style:print-orientation="portrait" fo:margin-top="1.27cm" fo:margin-bottom="1.229cm" fo:margin-left="2.501cm" fo:margin-right="2.501cm" style:writing-mode="lr-tb" style:layout-grid-color="#c0c0c0" style:layout-grid-lines="42" style:layout-grid-base-height="0.635cm" style:layout-grid-ruby-height="0cm" style:layout-grid-mode="none" style:layout-grid-ruby-below="false" style:layout-grid-print="false" style:layout-grid-display="false" style:layout-grid-base-width="0.423cm" style:layout-grid-snap-to="true" style:footnote-max-height="0cm">
 				<style:footnote-sep style:width="0.018cm" style:distance-before-sep="0.101cm" style:distance-after-sep="0.101cm" style:line-style="solid" style:adjustment="left" style:rel-width="25%" style:color="#000000"/>
 			</style:page-layout-properties>
 			<style:header-style>
-				<style:header-footer-properties fo:min-height="3.48cm" fo:margin-bottom="3.381cm" style:dynamic-spacing="true"/>
+				<style:header-footer-properties fo:min-height="3.48cm" fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-bottom="3.381cm" style:dynamic-spacing="true"/>
 			</style:header-style>
 			<style:footer-style>
-				<style:header-footer-properties fo:min-height="0.771cm" fo:margin-top="0.672cm" style:dynamic-spacing="true"/>
+				<style:header-footer-properties fo:min-height="0.771cm" fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-top="0.672cm" style:dynamic-spacing="true"/>
 			</style:footer-style>
 		</style:page-layout>
 	</office:automatic-styles>
@@ -893,16 +893,16 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<style:master-page style:name="Standard" style:page-layout-name="Mpm1">
 			<style:header>
 				<text:p text:style-name="MP1">
-				  <draw:frame draw:style-name="Mfr1" draw:name="Grafik1" text:anchor-type="char" svg:x="13.26cm" svg:y="-0.24cm" svg:width="4.192cm" svg:height="2.17cm" draw:z-index="5">
-					<draw:image xlink:href="Pictures/tw_logo.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-				  </draw:frame>
+					<draw:frame draw:style-name="Mfr1" draw:name="Grafik1" text:anchor-type="char" svg:x="13.259cm" svg:y="-0.24cm" svg:width="4.193cm" svg:height="2.17cm" draw:z-index="9">
+						<draw:image xlink:href="Pictures/10000201000000FD000000821F8BE35A4B4BEF78.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+					</draw:frame>
 				</text:p>
 			</style:header>
 			<style:header-first>
-			   <text:p text:style-name="MP1">
-				  <draw:frame draw:style-name="Mfr1" draw:name="Grafik1" text:anchor-type="char" svg:x="13.26cm" svg:y="-0.24cm" svg:width="4.192cm" svg:height="2.17cm" draw:z-index="5">
-					<draw:image xlink:href="Pictures/tw_logo.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-				  </draw:frame>
+				<text:p text:style-name="MP1">
+					<draw:frame draw:style-name="Mfr1" draw:name="Bild1" text:anchor-type="char" svg:x="13.259cm" svg:y="-0.24cm" svg:width="4.193cm" svg:height="2.17cm" draw:z-index="11">
+						<draw:image xlink:href="Pictures/10000201000000FD000000821F8BE35A4B4BEF78.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+					</draw:frame>
 				</text:p>
 			</style:header-first>
 			<style:footer>
@@ -912,14 +912,18 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 					</text:span>
 					<text:span text:style-name="Page_20_Number">
 						<text:span text:style-name="MT1">
-							<text:page-number text:select-page="current">11</text:page-number>
+							<text:page-number text:select-page="current">12</text:page-number>
 						</text:span>
+					</text:span>
+					<text:span text:style-name="Page_20_Number">
+						<text:span text:style-name="MT1"> </text:span>
 					</text:span>
 				</text:p>
 				<text:p text:style-name="Footer">
 					<text:span text:style-name="Page_20_Number">
 						<text:span text:style-name="MT2"><xsl:value-of select="studiengang_typ"/>-Studiengang (Degree Program) <xsl:value-of select="studiengang"/> (<xsl:value-of select="studiengang_englisch"/>)</text:span>
 					</text:span>
+					<text:span text:style-name="Page_20_Number"> </text:span>
 				</text:p>
 			</style:footer>
 			<style:footer-first>
@@ -932,11 +936,15 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 							<text:page-number text:select-page="current">1</text:page-number>
 						</text:span>
 					</text:span>
+					<text:span text:style-name="Page_20_Number">
+						<text:span text:style-name="MT1"> </text:span>
+					</text:span>
 				</text:p>
 				<text:p text:style-name="Footer">
 					<text:span text:style-name="Page_20_Number">
 						<text:span text:style-name="MT2"><xsl:value-of select="studiengang_typ"/>-Studiengang (Degree Program) <xsl:value-of select="studiengang"/> (<xsl:value-of select="studiengang_englisch"/>)</text:span>
 					</text:span>
+					<text:span text:style-name="Page_20_Number"> </text:span>
 				</text:p>
 			</style:footer-first>
 		</style:master-page>

@@ -5,13 +5,19 @@ header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 header( 'Pragma: no-cache' );
 header('Content-Type: text/html;charset=UTF-8');
 
-require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../config/global.config.inc.php');
+if (defined('CIS_PRUEFUNG_SET_ZEUGNISNOTE') && CIS_PRUEFUNG_SET_ZEUGNISNOTE)
+	require_once('../../../../config/vilesci.config.inc.php');
+else
+	require_once('../../../../config/cis.config.inc.php');
+
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/pruefungCis.class.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/benutzerberechtigung.class.php');
 require_once('../../../../include/studiensemester.class.php');
 require_once('../../../../include/note.class.php');
+require_once('../../../../include/zeugnisnote.class.php');
 require_once('../../../../include/pruefung.class.php');
 require_once('../../../../include/pruefungsanmeldung.class.php');
 require_once('../../../../include/student.class.php');
@@ -271,6 +277,28 @@ function saveBeurteilung($lehrveranstaltung_id, $student_uid, $mitarbeiter_uid, 
 		$data['error']='true';
 		$data['errormsg']=$pruefung->errormsg;
 	    }
+		if (defined('CIS_PRUEFUNG_SET_ZEUGNISNOTE') && CIS_PRUEFUNG_SET_ZEUGNISNOTE)
+		{
+			$zeugnisnote = new zeugnisnote();
+			$zeugnisnote->new = true;
+			$zeugnisnote->lehrveranstaltung_id = $lehrveranstaltung_id;
+			$zeugnisnote->student_uid = $student_uid;
+			$zeugnisnote->studiensemester_kurzbz = $pruefungCis->studiensemester_kurzbz;
+			$zeugnisnote->note = $note;
+			$zeugnisnote->benotungsdatum = $pruefung->datum;
+			$zeugnisnote->insertamum = date('Y-m-d H:i:s');
+			$zeugnisnote->insertvon = $uid;
+			$zeugnisnote_check = new zeugnisnote();
+			if (!$zeugnisnote_check->load($zeugnisnote->lehrveranstaltung_id, $zeugnisnote->student_uid, $zeugnisnote->studiensemester_kurzbz))
+			{
+				$zeugnisnote->save(true);
+			}
+			else
+			{
+				$data['error'] = 'true';
+				$data['errormsg'] = 'Existing Grade';
+			}
+		}
 	}
 	else
 	{

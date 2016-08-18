@@ -275,7 +275,7 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 	</div>
 	<div id='anmWrapper'>
 	    <div id="anmeldungen">
-		<h2><?php echo $p->t('pruefung/pruefungsbewertungAnmeldungen'); ?></h2>
+		<h2><?php echo $p->t('pruefung/pruefungsbewertungAnmeldungen'); ?> <span id='lvdaten'></span></h2>
 		<div id="anmeldung_hinzufuegen">
 
 		</div>

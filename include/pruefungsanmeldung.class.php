@@ -114,7 +114,7 @@ class pruefungsanmeldung extends basis_db {
 		    . 'wuensche='.$this->db_add_param($this->wuensche).', '
 		    . 'reihung='.$this->db_add_param($this->reihung).', '
 		    . 'kommentar='.$this->db_add_param($this->kommentar).', '
-		    . 'anrechnung_id='.$this->db_add_param($this->anrechnung_id)
+		    . 'anrechnung_id='.$this->db_add_param($this->anrechnung_id).', '
 		    . 'pruefungstyp_kurzbz='.$this->db_add_param($this->pruefungstyp_kurzbz)
 		    . ' WHERE pruefungsanmeldung_id='.$this->db_add_param($this->pruefungsanmeldung_id).';';
         }

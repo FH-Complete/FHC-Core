@@ -298,6 +298,9 @@ class dokument_export
 
 		if($download)
 		{
+			if(headers_sent())
+				exit('Header wurden bereits gesendet -> Abbruch');
+
 			switch($this->outputformat)
 			{
 				case 'pdf':
@@ -317,6 +320,8 @@ class dokument_export
 		            header('Content-Disposition: attachment; filename="'.$this->filename.'.odt"');
 		            header('Content-Length: '.$fsize);
 					break;
+				default:
+					exit('Outputformat is not defined');
 			}
 
 			while (!feof($handle))

@@ -36,6 +36,7 @@ class firma extends basis_db
 	public $firma_id;		// integer
 	public $name;			// string
 	public $anmerkung;		// string
+    public $lieferbedingungen;	// string
 	public $ext_id;			// integer
 	public $insertamum;		// timestamp
 	public $insertvon;		// bigint
@@ -56,7 +57,7 @@ class firma extends basis_db
 
 	public $bezeichnung; 		// string
 	public $kundennummer; 		// integer
-	public $oe_aktiv; 			// boolean
+	public $oe_aktiv; 		// boolean
 	public $mailverteiler; 		// string
 	public $tags = array();
 
@@ -95,6 +96,7 @@ class firma extends basis_db
 				$this->firma_id = $row->firma_id;
 				$this->name = $row->name;
 				$this->anmerkung = $row->anmerkung;
+                $this->lieferbedingungen = $row->lieferbedingungen;
 				$this->firmentyp_kurzbz = $row->firmentyp_kurzbz;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
@@ -147,7 +149,11 @@ class firma extends basis_db
 			$this->errormsg = 'Anmerkung darf nicht länger als 256 Zeichen sein';
 			return false;
 		}
-
+                if(mb_strlen($this->lieferbedingungen)>256)
+		{
+			$this->errormsg = 'Lieferbedingungen darf nicht länger als 256 Zeichen sein';
+			return false;
+		}
 		$this->errormsg = '';
 		return true;
 	}
@@ -167,11 +173,12 @@ class firma extends basis_db
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='INSERT INTO public.tbl_firma (name,  anmerkung,
+			$qry='INSERT INTO public.tbl_firma (name,  anmerkung, lieferbedingungen,
 					firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon, schule,steuernummer,
 					gesperrt,aktiv,finanzamt) VALUES('.
 			     $this->db_add_param($this->name).', '.
 			     $this->db_add_param($this->anmerkung).', '.
+                 $this->db_add_param($this->lieferbedingungen).', '.
 			     $this->db_add_param($this->firmentyp_kurzbz).', '.
 			     $this->db_add_param($this->updateamum).', '.
 			     $this->db_add_param($this->updatevon).', '.
@@ -197,6 +204,7 @@ class firma extends basis_db
 				'firma_id='.$this->db_add_param($this->firma_id).', '.
 				'name='.$this->db_add_param($this->name).', '.
 				'anmerkung='.$this->db_add_param($this->anmerkung).', '.
+                'lieferbedingungen='.$this->db_add_param($this->lieferbedingungen).', '.
 				'updateamum= now(), '.
 		     	'updatevon='.$this->db_add_param($this->updatevon).', '.
 		     	'firmentyp_kurzbz='.$this->db_add_param($this->firmentyp_kurzbz).', '.
@@ -368,14 +376,14 @@ class firma extends basis_db
 			$qry = "
 
 				SELECT
-					firma_id, name, anmerkung, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon,
+					firma_id, name, anmerkung, lieferbedingungen, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon,
 					ext_id, schule, steuernummer, gesperrt, aktiv, finanzamt, '1' as sort
 				FROM public.tbl_firma
 				WHERE
 				UPPER(trim(public.tbl_firma.name)) like '".$this->db_escape($matchcode)."%'
 				UNION
 				SELECT
-					firma_id, name, anmerkung, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon,
+					firma_id, name, anmerkung, lieferbedingungen, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon,
 					ext_id, schule, steuernummer, gesperrt, aktiv, finanzamt, '2' as sort
 				FROM public.tbl_firma
 				WHERE
@@ -398,6 +406,7 @@ class firma extends basis_db
 				$fa->firma_id = $row->firma_id;
 				$fa->name = $row->name;
 				$fa->anmerkung = $row->anmerkung;
+				$fa->lieferbedingungen = $row->lieferbedingungen;
 				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
 				$fa->updateamum = $row->updateamum;
 				$fa->updatevon = $row->updatevon;
@@ -459,10 +468,10 @@ class firma extends basis_db
 
 		if($firmentyp_kurzbz!='')
 			$qry.=" WHERE firmentyp_kurzbz=".$this->db_add_param($firmentyp_kurzbz);
-		
+
 		if(!is_null($aktiv))
 			$qry.=" AND aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
-			
+
 		$qry.=" ORDER BY name;";
 
 		if($this->db_query($qry))
@@ -474,6 +483,7 @@ class firma extends basis_db
 				$fa->firma_id = $row->firma_id;
 				$fa->name = $row->name;
 				$fa->anmerkung = $row->anmerkung;
+				$fa->lieferbedingungen = $row->lieferbedingungen;
 				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
 				$fa->updateamum = $row->updateamum;
 				$fa->updatevon = $row->updatevon;
@@ -485,6 +495,144 @@ class firma extends basis_db
 				$fa->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$fa->aktiv = $this->db_parse_bool($row->aktiv);
 				$fa->finanzamt = $row->finanzamt;
+
+				$this->result[] = $fa;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
+	}
+
+	public function getLatestChanges($tage = 7) {
+		$this->result = array();
+		$this->errormsg = '';
+
+		$qry ="SELECT * FROM (SElECT ";		
+		$qry.=" distinct on(firma_id)";
+		$qry.=" tbl_firma.firma_id,tbl_firma.* ,tbl_standort.kurzbz,tbl_standort.adresse_id,tbl_standort.standort_id,tbl_standort.bezeichnung  ";
+		$qry.=" ,person_id,	tbl_adresse.name as adress_name, strasse, plz, ort, gemeinde,nation,typ,heimatadresse,zustelladresse  ";
+		$qry.=" FROM public.tbl_firma";
+		$qry.=" LEFT JOIN public.tbl_standort USING(firma_id) ";
+		$qry.=" LEFT JOIN public.tbl_adresse  on ( tbl_adresse.adresse_id=tbl_standort.adresse_id ) ";
+		$qry.=" WHERE 1=1";
+		$qry.=")  as a  WHERE (updateamum is not null and updateamum > (now()::date - $tage)) or insertamum > (now()::date - $tage)  ORDER BY name;";
+		//echo $qry;
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$fa = new firma();
+
+				$fa->firma_id = $row->firma_id;
+				$fa->name = $row->name;
+				$fa->anmerkung = $row->anmerkung;
+				$fa->lieferbedingungen = $row->lieferbedingungen;
+				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
+				$fa->updateamum = $row->updateamum;
+				$fa->updatevon = $row->updatevon;
+				$fa->insertamum = $row->insertamum;
+				$fa->insertvon = $row->insertvon;
+				$fa->ext_id = $row->ext_id;
+				$fa->schule = $this->db_parse_bool($row->schule);
+				$fa->steuernummer = $row->steuernummer;
+				$fa->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$fa->aktiv = $this->db_parse_bool($row->aktiv);
+				$fa->finanzamt = $row->finanzamt;
+				$fa->kurzbz = $row->kurzbz;
+				$fa->adresse_id = $row->adresse_id;
+				$fa->standort_id = $row->standort_id;
+				$fa->bezeichnung = $row->bezeichnung;
+				$fa->person_id = $row->person_id;
+				$fa->adresse_id = $row->adresse_id;
+				$fa->strasse = $row->strasse;
+				$fa->plz = $row->plz;
+				$fa->ort = $row->ort;
+				$fa->gemeinde = $row->gemeinde;
+				$fa->nation = $row->nation;
+				$fa->typ = $row->typ;
+				$fa->adress_name = $row->adress_name;
+				$fa->heimatadresse = $this->db_parse_bool($row->heimatadresse);
+				$fa->zustelladresse = $this->db_parse_bool($row->zustelladresse);
+
+				$this->result[] = $fa;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
+	}
+
+
+	/**
+	 * Suche nur nach Firmennamen für die abgespeckte Firmenverwaltung 
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function searchByName($filter) 
+	{
+		$this->result = array();
+		$this->errormsg = '';
+
+		$qry ="SELECT * FROM (SElECT ";		
+		$qry.=" distinct on(firma_id)";
+		$qry.=" tbl_firma.firma_id,tbl_firma.* ,tbl_standort.kurzbz,tbl_standort.adresse_id,tbl_standort.standort_id,tbl_standort.bezeichnung  ";
+		$qry.=" ,person_id,	tbl_adresse.name as adress_name, strasse, plz, ort, gemeinde,nation,typ,heimatadresse,zustelladresse  ";
+		$qry.=" FROM public.tbl_firma";
+		$qry.=" LEFT JOIN public.tbl_standort USING(firma_id) ";
+		$qry.=" LEFT JOIN public.tbl_adresse  on ( tbl_adresse.adresse_id=tbl_standort.adresse_id ) ";
+		$qry.=" WHERE 1=1";
+
+		if($filter!='')
+			$qry.= " and ( lower(tbl_firma.name) like lower('%".$this->db_escape($filter)."%')
+					
+				   ) ";
+		
+		//if($filter=='' && $firmentyp_kurzbz=='')
+		//	$qry.=" limit 500 ";
+		$qry.=") as a ORDER BY name;";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$fa = new firma();
+
+				$fa->firma_id = $row->firma_id;
+				$fa->name = $row->name;
+				$fa->anmerkung = $row->anmerkung;
+				$fa->lieferbedingungen = $row->lieferbedingungen;
+				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
+				$fa->updateamum = $row->updateamum;
+				$fa->updatevon = $row->updatevon;
+				$fa->insertamum = $row->insertamum;
+				$fa->insertvon = $row->insertvon;
+				$fa->ext_id = $row->ext_id;
+				$fa->schule = $this->db_parse_bool($row->schule);
+				$fa->steuernummer = $row->steuernummer;
+				$fa->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$fa->aktiv = $this->db_parse_bool($row->aktiv);
+				$fa->finanzamt = $row->finanzamt;
+				$fa->kurzbz = $row->kurzbz;
+				$fa->adresse_id = $row->adresse_id;
+				$fa->standort_id = $row->standort_id;
+				$fa->bezeichnung = $row->bezeichnung;
+				$fa->person_id = $row->person_id;
+				$fa->adresse_id = $row->adresse_id;
+				$fa->strasse = $row->strasse;
+				$fa->plz = $row->plz;
+				$fa->ort = $row->ort;
+				$fa->gemeinde = $row->gemeinde;
+				$fa->nation = $row->nation;
+				$fa->typ = $row->typ;
+				$fa->adress_name = $row->adress_name;
+				$fa->heimatadresse = $this->db_parse_bool($row->heimatadresse);
+				$fa->zustelladresse = $this->db_parse_bool($row->zustelladresse);
 
 				$this->result[] = $fa;
 			}
@@ -548,6 +696,7 @@ class firma extends basis_db
 				$fa->firma_id = $row->firma_id;
 				$fa->name = $row->name;
 				$fa->anmerkung = $row->anmerkung;
+				$fa->lieferbedingungen = $row->lieferbedingungen;
 				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
 				$fa->updateamum = $row->updateamum;
 				$fa->updatevon = $row->updatevon;
@@ -662,6 +811,7 @@ class firma extends basis_db
 				$fa->firma_id = $row->firma_id;
 				$fa->name = $row->name;
 				$fa->anmerkung = $row->anmerkung;
+				$fa->lieferbedingungen = $row->lieferbedingungen;
 				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
 				$fa->updateamum = $row->updateamum;
 				$fa->updatevon = $row->updatevon;
@@ -747,11 +897,7 @@ class firma extends basis_db
 			$this->errormsg = 'Organisationseinheit/Firma_id ist ungueltig';
 			return false;
 		}
-		$qry = "delete from public.tbl_firma_organisationseinheit WHERE firma_organisationseinheit_id>0";
-		if ($firma_organisationseinheit_id)
-			$qry.=" and firma_organisationseinheit_id=".$this->db_add_param($firma_organisationseinheit_id, FHC_INTEGER);
-
-        $qry.=';';
+		$qry = "DELETE FROM public.tbl_firma_organisationseinheit WHERE firma_organisationseinheit_id=".$this->db_add_param($firma_organisationseinheit_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 			return true;
@@ -931,6 +1077,7 @@ class firma extends basis_db
 				$fi->firma_id = $row->firma_id;
 				$fi->name = $row->name;
 				$fi->anmerkung = $row->anmerkung;
+                $fi->lieferbedingungen = $row->lieferbedingungen;
 				$fi->firmentyp_kurzbz = $row->firmentyp_kurzbz;
 				$fi->updateamum = $row->updateamum;
 				$fi->updatevon = $row->updatevon;

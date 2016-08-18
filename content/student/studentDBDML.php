@@ -933,10 +933,10 @@ if(!$error)
 				{
 					if($row = $db->db_fetch_object($result))
 					{
-						if($row->anzahl<=1)
+						if($row->anzahl<=1 && !$rechte->isBerechtigt('admin', null, 'suid'))
 						{
 							$return = false;
-							$errormsg = 'Die letzte Rolle darf nicht geloescht werden';
+							$errormsg = 'Die letzte Rolle kann nur durch den Administrator geloescht werden';
 							$error = true;
 						}
 					}

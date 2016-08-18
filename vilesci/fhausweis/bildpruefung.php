@@ -294,11 +294,11 @@ if (isset($_GET['ansicht']))
 {
 	if ($_GET['ansicht'] == 'mitarbeiter')
 	{
-		$ansicht = 'AND uid IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)';
+		$ansicht = 'AND tbl_benutzer.uid IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)';
 		$mitarbeiterSubmit = '<input type="submit" name="MitarbeiterSubmit" sytle="background-color:#F5F5F5" value="Mitarbeiter" />';
 	}
 	if ($_GET['ansicht'] == 'studenten')
-		$ansicht = 'AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)';
+		$ansicht = 'AND tbl_benutzer.uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)';
 }
 else
 {
@@ -320,13 +320,13 @@ $qry_anzahl_mitarbeiter = "
 					WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
 						WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
-		AND uid IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)
+		AND tbl_benutzer.uid IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)
 	";
-$anzahl = '';
+$anzahl_ma = '';
 if($result_anzahl = $db->db_query($qry_anzahl_mitarbeiter))
 	if($row_anzahl = $db->db_fetch_object($result_anzahl))
-		$anzahl = $row_anzahl->anzahl;
-echo '<br>Mitarbeiter: '.$anzahl;
+		$anzahl_ma = $row_anzahl->anzahl;
+echo '<br>Mitarbeiter: '.$anzahl_ma;
 
 //anzahl studenten
 $qry_anzahl_studenten = "
@@ -345,11 +345,11 @@ $qry_anzahl_studenten = "
 						WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 		AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)
 	";
-$anzahl = '';
+$anzahl_std = '';
 if($result_anzahl = $db->db_query($qry_anzahl_studenten))
 	if($row_anzahl = $db->db_fetch_object($result_anzahl))
-		$anzahl = $row_anzahl->anzahl;
-echo '<br>Studenten: '.$anzahl;
+		$anzahl_std = $row_anzahl->anzahl;
+echo '<br>Studenten: '.$anzahl_std;
 
 //anzahl gesamt
 $qry_anzahl_gesamt = "
@@ -366,11 +366,11 @@ $qry_anzahl_gesamt = "
 		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
 						WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 	";
-$anzahl = '';
+$anzahl_gesamt = '';
 if($result_anzahl = $db->db_query($qry_anzahl_gesamt))
 	if($row_anzahl = $db->db_fetch_object($result_anzahl))
-		$anzahl = $row_anzahl->anzahl;
-	echo '<br>Gesamt: '.$anzahl.'<br />';
+		$anzahl_gesamt = $row_anzahl->anzahl;
+	echo '<br>Gesamt: '.$anzahl_gesamt.'<br />';
 
 echo '<form action="'.$_SERVER['PHP_SELF'].'?ansicht=mitarbeiter" method="POST" style="float:left; margin-left:44%">
 		<input type="submit" name="MitarbeiterSubmit" id="MitarbeiterSubmit" value="Mitarbeiter" ';  if (isset($_GET['ansicht']) && $_GET['ansicht'] == 'mitarbeiter') echo 'disabled'; echo '/></form>';
@@ -388,9 +388,11 @@ $qry = "
 	FROM 
 		public.tbl_person 
 		JOIN public.tbl_benutzer USING(person_id)
+		JOIN public.tbl_akte USING (person_id)
 	WHERE 
 		foto is not NULL
 		AND tbl_benutzer.aktiv
+		AND tbl_akte.dokument_kurzbz='Lichtbil'
 		".$ansicht;
 		
 
@@ -403,7 +405,7 @@ else
 {
 	// Wenn es weniger als 100 Eintraege sind kommen die Bilder nicht mehr Random, da es sonst
 	// vorkommen kann, dass kein Ergebnis geliefert wird
-	if($anzahl>100)
+	if(isset($_GET['ansicht']) && (($_GET['ansicht'] == 'mitarbeiter' && $anzahl_ma>100) || ($_GET['ansicht'] == 'studenten' && $anzahl_std>100)) || ($ansicht == '' && $anzahl_gesamt>100))
 	{
 		// Zufaellige Reihenfolge
 		$qry.=" AND random() <0.05";
@@ -438,7 +440,7 @@ if($result = $db->db_query($qry))
 				<td>
 				Vorname: '.$db->convert_html_chars($row->vorname).'<br>
 				Nachname: '.$db->convert_html_chars($row->nachname).'<br>
-				'.($row->mitarbeiter=='1'?'Mitarbeiter':'Student').'
+				'.($row->mitarbeiter=='1'?'MitarbeiterIn':'StudentIn').'
 				</td>
 			</tr>
 		</table>';
@@ -453,6 +455,8 @@ if($result = $db->db_query($qry))
 		echo '</form>';
 		echo '<br><br><br>';
 		echo '<a href="#FotoUpload" onclick="window.open(\'../../content/bildupload.php?person_id='.$row->person_id.'\',\'BildUpload\', \'height=50,width=600,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\'); return false;">Bild Upload</a>';
+		echo '<br><br>';
+		echo '<a href="#dms_download" onclick="window.open(\''.APP_ROOT.'cms/dms.php?id='.$row->dms_id.'\',\'DmsDownload\', \'height=800,width=900,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\'); return false;">DMS Download</a>';
 		echo '</center>';
 	}
 	else

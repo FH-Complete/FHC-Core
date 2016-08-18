@@ -207,6 +207,16 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 						<text:p text:style-name="P17"><xsl:value-of select="typ" /><xsl:text> </xsl:text><xsl:value-of select="beschreibung" /></text:p>
 					</table:table-cell>
 				</table:table-row>
+				<xsl:if test="typ = 'Schluessel'">
+				<table:table-row>
+					<table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
+						<text:p text:style-name="P18">Nummer</text:p>
+					</table:table-cell>
+					<table:table-cell table:style-name="Tabelle2.B1" office:value-type="string">
+						<text:p text:style-name="P17"><xsl:value-of select="nummer" /></text:p>
+					</table:table-cell>
+				</table:table-row>
+				</xsl:if>
 				<table:table-row>
 					<table:table-cell table:style-name="Tabelle2.A2" office:value-type="string">
 						<text:p text:style-name="P18">Inventarnummer</text:p>
