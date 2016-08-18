@@ -304,7 +304,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-pitch="variable" fo:font-size="9pt" style:font-size-asian="9pt" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="normal"/>
 	</style:style>
 	 <style:style style:name="P43" style:family="paragraph" style:parent-style-name="Heading_20_2">
-		<style:paragraph-properties fo:break-before="page" fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-top="0.071cm" fo:margin-bottom="0.212cm" fo:line-height="130%" fo:text-align="justify" style:justify-single-word="false" fo:text-indent="-0.635cm" style:auto-text-indent="false">
+		<style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:margin-top="0.071cm" fo:margin-bottom="0.212cm" fo:line-height="130%" fo:text-align="justify" style:justify-single-word="false" fo:text-indent="-0.635cm" style:auto-text-indent="false">
         <style:tab-stops>
           <style:tab-stop style:position="0.751cm"/>
         </style:tab-stops>
@@ -458,7 +458,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
                   <text:span text:style-name="T4">
                     <text:s/>
                   </text:span>
-                  <text:span text:style-name="T5">Gemäß § 3 Absatz 1 des Bildungsdokumentationsgesetzes (BGBl. I Nr. 12/2002 idgF) und der Bildungsdokumentationsverordnung-Fachhochschulen <text:s/>(BGBl. II Nr. 29/2004 idgF) hat der Erhalter die Sozialversicherungsnummer zu erfassen und gemäß § 7 Absatz 2 im Wege der Agentur für Qualitätssicherung und Akkreditierung Austria an das zuständige Bundesministerium und die Bundesanstalt Statistik Österreich zu übermitteln.</text:span>
+                  <text:span text:style-name="T5">Gemäß § 3 Absatz 1 des Bildungsdokumentationsgesetzes und der Bildungsdokumentationsverordnung-Fachhochschulen <text:s/>hat der Erhalter die Sozialversicherungsnummer zu erfassen und gemäß § 7 Absatz 2 im Wege der Agentur für Qualitätssicherung und Akkreditierung Austria an das zuständige Bundesministerium und die Bundesanstalt Statistik Österreich zu übermitteln.</text:span>
                 </text:p>
                 <text:p text:style-name="P10"/>
               </text:note-body>
@@ -466,7 +466,6 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
           </text:span>
         </text:span><text:tab/><xsl:value-of select="svnr"/></text:span>
       </text:p>
-      <text:p text:style-name="P7">Personenkennzeichen:<text:tab/><xsl:value-of select="matrikelnr"/></text:p>
       <text:p text:style-name="P11"/>
       <text:p text:style-name="P4">(kurz „a.o. Studentin“ bzw. „a.o. Student“ genannt) andererseits, im Rahmen des Lehrgangs zur Weiterbildung nach §9 FHStG idgF</text:p>
       <text:p text:style-name="P11"/>
@@ -491,6 +490,8 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 		</xsl:otherwise>
 	</xsl:choose>
 </text:p>
+      <text:p text:style-name="P4">Dieser Lehrgang wird von der Technikum Wien GmbH organisiert und gemeinsam mit der Fachhochschule Technikum Wien durchgeführt. Es gelten die AGB der Technikum Wien GmbH, diese sind unter https://academy.technikum-wien.at/agb jederzeit abrufbar.
+</text:p>
       <text:p text:style-name="P13"/>
       <text:list xml:id="list305698312" text:continue-numbering="false" text:style-name="WW8Num7">
         <text:list-item>
@@ -501,7 +502,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
           </text:list>
         </text:list-item>
       </text:list>
-      <text:p text:style-name="P5">Studienort sind die Räumlichkeiten der FH Technikum Wien, 1200 Wien, Höchstädtplatz. Bei Bedarf kann der Erhalter einen anderen Studienort festlegen.</text:p>
+      <text:p text:style-name="P5">Studienort sind die Räumlichkeiten der FH Technikum Wien, 1200 Wien, Höchstädtplatz. Bei Bedarf kann der Erhalter einen anderen Studienort in Wien festlegen, außerhochschulische Aktivitäten (z.B.: Exkursionen) können auch außerhalb von Wien stattfinden.</text:p>
       <text:p text:style-name="P14"/>
       <text:list xml:id="list932404618" text:continue-numbering="true" text:style-name="WW8Num7">
         <text:list-item>
@@ -512,7 +513,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
           </text:list>
         </text:list-item>
       </text:list>
-      <text:p text:style-name="P5">Die Ausbildung erfolgt auf der Grundlage des Fachhochschul-Studiengesetzes, BGBl. Nr. 340/1993 idgF und des Hochschul-Qualitätssicherungsgesetzes, BGBl. I Nr. 74/2011 idgF.</text:p>
+      <text:p text:style-name="P5">Die Ausbildung erfolgt auf der Grundlage des Fachhochschul-Studiengesetzes, BGBl. Nr. 340/1993 idgF und des Hochschul-Qualitätssicherungsgesetzes, BGBl. I Nr. 74/2011 idgF und der Satzung der Fachhochschule Technikum Wien idgF.</text:p>
       <text:p text:style-name="P14"/>
       <text:list xml:id="list636990326" text:continue-numbering="true" text:style-name="WW8Num7">
         <text:list-item>
@@ -525,7 +526,8 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       </text:list>
       <text:p text:style-name="P5">Die Ausbildungsdauer beträgt <draw:control text:anchor-type="as-char" draw:z-index="7" draw:style-name="gr3" draw:text-style-name="P141" svg:y="-0.45cm" svg:width="0.4cm" svg:height="0.5cm" draw:control="control2"/> Semester.</text:p>
       <text:p text:style-name="P5"/>
-      <text:p text:style-name="P5">Nachgewiesene erworbene Kenntnisse können auf einzelne Lehrveranstaltungen angerechnet werden bzw. zum Erlass einer Lehrveranstaltung führen. Hierzu bedarf es eines Antrages der a.o. Studentin bzw. des a.o. Studenten und der nachfolgenden Feststellung der inhaltlichen und umfänglichen Gleichwertigkeit durch die Lehrgangsleitung.</text:p>
+      <text:p text:style-name="P5">Die a.o. Studentin bzw. der a.o. Student hat das Recht, eine Anerkennung nachgewiesener Kenntnisse beim Lehrgang zu beantragen. Eine solche Anerkennung setzt voraus, dass die erworbenen Kenntnisse mit dem Inhalt und dem Umfang der Lehrveranstaltung sind und bewirkt die Anrechnung der entsprechenden Lehrveranstaltung.</text:p>
+		<text:p text:style-name="P5"/>
       <text:p text:style-name="P14"/>
       <text:list xml:id="list107841840" text:continue-numbering="true" text:style-name="WW8Num7">
         <text:list-item>
@@ -537,6 +539,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
         </text:list-item>
       </text:list>
       <text:p text:style-name="P36"><draw:control text:anchor-type="as-char" draw:z-index="8" draw:style-name="gr4" draw:text-style-name="P142" svg:width="16cm" svg:height="1.5cm" draw:control="control3"/></text:p>
+
       <text:p text:style-name="P36"/>
       <text:list xml:id="list890989597" text:continue-numbering="true" text:style-name="WW8Num7">
         <text:list-item>
@@ -559,10 +562,10 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       <text:p text:style-name="P27">5.2 Pflichten</text:p>
       <text:list xml:id="list1245891399" text:continue-numbering="true" text:style-name="WW8Num4">
         <text:list-item>
-          <text:p text:style-name="P40">Der Erhalter ist verpflichtet, all jene Voraussetzungen zu bieten, damit der Lehrgang zur Weiterbildung innerhalb der Ausbildungsdauer (Pkt. 3) erfolgreich abgeschlossen werden kann. Die Voraussetzungen zur Erfüllung dieser Verpflichtung sind Gegenstand des vom Kollegium genehmigten Lehrgangs idgF, der Satzung der FH Technikum Wien idgf und der Hausordnung idgF. </text:p>
+          <text:p text:style-name="P40">Der Erhalter verpflichtet sich zur ordnungsgemäßen Planung und Durchführung des Lehrgangs. Der Erhalter ist verpflichtet, allfällige Änderungen des Lehrgangs zeitgerecht bekannt zu geben.</text:p>
         </text:list-item>
         <text:list-item>
-          <text:p text:style-name="P40">Der Erhalter ist weiters verpflichtet, den Lehrgang zur Weiterbildung auf der Grundlage höchster Qualitätsansprüche hinsichtlich der Erreichung der Ausbildungsziele zu gestalten und allfällige Änderungen des akkreditierten Studienganges bekannt zu geben.</text:p>
+          <text:p text:style-name="P40">Der Erhalter verpflichtet sich, jedenfalls folgende Dokumente zur Verfügung zu stellen: Studierendenausweis, Diploma Supplement, Urkunde über die Verleihung des akademischen Grades, Studienerfolgsbestätigung, Inskriptionsbestätigung.</text:p>
         </text:list-item>
         <text:list-item>
           <text:p text:style-name="P40">Der Erhalter verpflichtet sich zur sorgfaltsgemäßen Verwendung der personenbezogenen Daten der a.o. Studierenden. Die Daten werden nur im Rahmen der gesetzlichen und vertraglichen Verpflichtungen sowie des Studienbetriebes verwendet und nicht an nicht berechtigte Dritte weitergegeben.</text:p>
@@ -579,49 +582,57 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
         </text:list-item>
       </text:list>
       <text:p text:style-name="P27">6.1 Rechte</text:p>
-      <text:p text:style-name="P5">Die a.o. Studentin bzw. der a.o. Student hat das Recht auf </text:p>
-      <text:list xml:id="list1358297633" text:continue-list="list1245891399" text:style-name="WW8Num4">
+      <text:p text:style-name="P5">Die a.o. Studentin bzw. der a.o. Student hat das Recht auf einen Studienbetrieb gemäß den im Lehrgang zur Weiterbildung idgf und in der Satzung der FH Technikum Wien idgF festgelegten Bedingungen.</text:p>
+      <text:p text:style-name="P5"/>
+      <text:p text:style-name="P28">6.2 Pflichten</text:p>
+      <text:p text:style-name="P29"><text:span text:style-name="T10">6.2.1 Einhaltung studienrelevanter Bestimmungen</text:span></text:p>
+      <text:p text:style-name="P5">
+	      Die a.o. Studentin bzw. der a.o. Student ist verpflichtet, insbesondere folgende Bestimmungen einzuhalten:
+      </text:p>
+		<text:list xml:id="listausbver621" text:continue-numbering="true" text:style-name="WW8Num4">
         <text:list-item>
-          <text:p text:style-name="P40">einen Studienbetrieb gemäß den im Lehrgang zur Weiterbildung idgf und in der Satzung der FH Technikum Wien idgF festgelegten Bedingungen und</text:p>
+          <text:p text:style-name="P40">Studienordnung und Prüfungsordnung für Lehrgänge idgF</text:p>
         </text:list-item>
         <text:list-item>
-          <text:p text:style-name="P40">ein Zeugnis über die im laufenden Semester abgelegten Prüfungen.</text:p>
+          <text:p text:style-name="P40">Hausordnung idgF</text:p>
+        </text:list-item>
+        <text:list-item>
+          <text:p text:style-name="P40">Brandschutzordnung idgF</text:p>
+        </text:list-item>
+        <text:list-item>
+          <text:p text:style-name="P40">Bibliotheksordnung idgF</text:p>
+        </text:list-item>
+        <text:list-item>
+          <text:p text:style-name="P40">Die für den jeweiligen Lehrgang geltende/n Laborordnung/en idgF</text:p>
         </text:list-item>
       </text:list>
-      <text:p text:style-name="P28">6.2 Pflichten</text:p>
-      <text:p text:style-name="P29"><text:span text:style-name="T10">6.2.1 Lehrgangskosten inkl. Studierendenbeitrag ("ÖH-Beitrag")</text:span>
-	      <text:span text:style-name="Footnote_20_Symbol">
-	          <text:span text:style-name="T10">
-	            <text:note text:id="ftn2" text:note-class="footnote">
-	             <text:note-citation text:label="2">2</text:note-citation>
-	              <text:note-body>
-	                <text:p text:style-name="Standard">
-	                  <text:span text:style-name="T4">
-	                    <text:s/>
-	                  </text:span>
-	                  <text:span text:style-name="T5">Gemäß § 4 Abs. 10 des Fachhochschul-Studiengesetzes (BGBl. Nr. 340/1993 idgF und der Bundesministeriengesetz-Novelle 2007, BGBl. I Nr. 6/2007) gehören ordentliche und außerordentliche Studierende an Fachhochschul-Studiengängen 
-	                  der Österreichischen HochschülerInnenschaft (ÖH) gemäß Hochschülerinnen- und Hochschülerschaftsgesetz (HSG 2014) an. Daraus resultiert die Verpflichtung der Studentin oder des Studenten zur Entrichtung des ÖH-Beitrags. Dies gilt auch in 
-	                  Semestern mit DiplomandInnenstatus. Der Studierendenbeitrag kann jährlich durch die ÖH indexiert werden; die genaue Höhe des Studierendenbeitrags wird von der ÖH jährlich für das folgende Studienjahr bekannt gegeben. Die Einhebung des 
-	                  Betrags erfolgt durch die Fachhochschule. Der Erhalter überweist in Folge die eingezahlten Beträge der Studierenden ohne Abzüge an die ÖH. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum Studium bzw. für dessen Fortsetzung.</text:span>
-	                </text:p>
-	                <text:p text:style-name="P10"/>
-	              </text:note-body>
-	            </text:note>
-	          </text:span>
-	      </text:span>
+		<text:p text:style-name="P29">
+		Diese Dokumente sind öffentlich zugänglich unter www.technikum-wien.at.</text:p>
+		<text:p text:style-name="P29">
+		Darüber hinaus sind die AGB der Technikum Wien GmbH Bestandteil dieses Vertrages (https://academy.technikum-wien.at/agb).
+		</text:p>
+      <text:p text:style-name="P29"><text:span text:style-name="T10">6.2.2 Lehrgangskosten inkl. Studierendenbeitrag ("ÖH-Beitrag")</text:span>
       </text:p>
-      <text:p text:style-name="P5">Voraussetzung für die Geltung dieses Ausbildungsvertrages und für die Teilnahme am Lehrgang ist die erfolgte vollständige Bezahlung der Lehrgangskosten zu den jeweiligen Zahlungsterminen. Bezüglich der Möglichkeiten (teilweiser) Rückerstattungen gelten die AGBs der Technikum Wien GmbH für Lehrgänge zur Weiterbildung.</text:p>
-      <text:p text:style-name="P32">6.2.2 Beibringung persönlicher Daten</text:p>
+      <text:p text:style-name="P5">Voraussetzung für die Geltung dieses Ausbildungsvertrages und für die Teilnahme am Lehrgang ist die erfolgte vollständige Bezahlung der Lehrgangskosten zu den jeweiligen Zahlungsterminen. Bezüglich der Möglichkeiten (teilweiser) Rückerstattungen gelten die AGB der Technikum Wien GmbH für Lehrgänge zur Weiterbildung.
+		Gemäß § 4 Abs 10 FHStG sind a.o. Studierende an Fachhochschulen Mitglieder der Österreichischen HochschülerInnenschaft (ÖH). Der/Die a.o. Studierende hat semesterweise einen ÖH-Beitrag an den Erhalter zu entrichten, der diesen an die ÖH abführt. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum Studium bzw. für dessen Fortsetzung.
+	</text:p>
+
+      <text:p text:style-name="P32">6.2.3 Beibringung persönlicher Daten</text:p>
       <text:p text:style-name="P35">Die a.o. Studentin bzw. der a.o. Student ist verpflichtet, persönliche Daten beizubringen, die auf Grund eines Gesetzes, einer Verordnung oder eines Bescheides vom Erhalter erfasst werden müssen oder zur Erfüllung des Ausbildungsvertrages bzw für den Studienbetrieb unerlässlich sind.</text:p>
-      <text:p text:style-name="P32">6.2.3 Aktualisierung eigener Daten und Bezug von Informationen</text:p>
+      <text:p text:style-name="P32">6.2.4 Aktualisierung eigener Daten und Bezug von Informationen</text:p>
       <text:p text:style-name="P35">Die a.o. Studentin bzw. der a.o. Student hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Lehrgangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.</text:p>
-      <text:p text:style-name="P32">6.2.4 Verwertungsrechte</text:p>
+      <text:p text:style-name="P32">6.2.5 Verwertungsrechte</text:p>
       <text:p text:style-name="P35">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der a.o. Studentin oder dem a.o. Studenten getroffen wurden, ist die a.o. Studentin oder der a.o. Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen auf dessen schriftliche Anfrage hin anzubieten.</text:p>
-      <text:p text:style-name="P32">6.2.5 Aufzeichnungen und Mitschnitte</text:p>
+      <text:p text:style-name="P32">6.2.6 Aufzeichnungen und Mitschnitte</text:p>
       <text:p text:style-name="P35">Es ist der/dem a.o. Studierenden ausdrücklich untersagt, Lehrveranstaltungen als Ganzes oder nur Teile davon aufzuzeichnen und/oder mitzuschneiden (z.B. durch Film- und/oder Tonaufnahmen oder sonstige hierfür geeignete audiovisuelle Mittel). Darüber hinaus ist jede Form der öffentlichen Zurverfügungstellung (drahtlos oder drahtgebunden) der vorgenannten Aufnahmen z.B. in sozialen Netzwerken wie Facebook, WhatsAPP, LinkedIn, Xing etc, aber auch auf Youtube, Instagram usw. oder durch sonstige für diese Zwecke geeignete Kommunikationsmittel untersagt. Diese Regelungen gelten sinngemäß auch für Skripten, sonstige Lernbehelfe und Prüfungsangaben.</text:p>
       <text:p text:style-name="P35">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und zum privaten Gebrauch, sofern hierfür der Vortragende vorab ausdrücklich seine schriftliche Zustimmung erteilt hat.</text:p>
-      <text:p text:style-name="P31">6.2.6 Geheimhaltungspflicht</text:p>
+      <text:p text:style-name="P31">6.2.7 Geheimhaltungspflicht</text:p>
       <text:p text:style-name="P5">Die a.o. Studentin bzw. der a.o. Student ist zur Geheimhaltung von Forschungs- und Entwicklungsaktivitäten und -ergebnissen gegenüber Dritten verpflichtet. </text:p>
+      <text:p text:style-name="P31">6.2.8 Schadensmeldung</text:p>
+      <text:p text:style-name="P5">Im Falle des Eintretens eines Schadens am Inventar der Fachhochschule ist der/die a.o. Studierende verpflichtet, diesen innerhalb von drei Tagen dem Lehrgangssekretariat zu melden. Allfällige Haftungsansprüche bleiben hiervon unberührt.</text:p>
+      <text:p text:style-name="P31">6.2.9 Rückgabeverpflichtung bei Studienende</text:p>
+      <text:p text:style-name="P5">Die a.o. Studentin bzw. der a.o. Student ist verpflichtet, bei einer Beendigung des Lehrgangs unverzüglich alle zur Verfügung gestellten Gerätschaften, Bücher, Schlüssel und sonstige Materialien zurückzugeben.</text:p>
+
       <text:p text:style-name="P38"/>
       <text:list xml:id="list866389060" text:continue-list="list1403787711" text:style-name="WW8Num7">
         <text:list-item>
@@ -636,9 +647,12 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       <text:p text:style-name="P8">Im beiderseitigen Einvernehmen ist die Auflösung des Ausbildungsvertrages jederzeit ohne Angabe von Gründen möglich. Die einvernehmliche Auflösung bedarf der Schriftform.</text:p>
       <text:p text:style-name="P3"/>
       <text:p text:style-name="P27">7.2 Kündigung durch die a.o. Studentin bzw. den a.o. Studenten</text:p>
-      <text:p text:style-name="P8">Die a.o. Studentin bzw. der a.o. Student kann den Ausbildungsvertrag schriftlich jeweils zum Ende eines Semesters kündigen.</text:p>
+      <text:p text:style-name="P8">Die a.o. Studentin bzw. der a.o. Student kann den Ausbildungsvertrag schriftlich jeweils zum Ende eines Semesters kündigen. Die Verpflichtung zur vollständigen Leistung der Lehrgangskosten wird von einer Kündigung durch die a.o. Studentin bzw. den a.o. Studenten nicht berührt.</text:p>
       <text:p text:style-name="P3"/>
-      <text:p text:style-name="P27">7.3 Ausschluss durch den Erhalter</text:p>
+      <text:p text:style-name="P27">7.3 Automatische Beendigung des Vertrages</text:p>
+      <text:p text:style-name="P8">Der Ausbildungsvertrag erlischt mit dem Abschluss des Lehrgangs. Der Vertrag endet automatisch durch die negative Beurteilung der letztmöglichen Prüfungswiederholung, in diesem Fall bleibt die Verpflichtung zur vollständigen Leistung der Lehrgangskosten unberührt.</text:p>
+      <text:p text:style-name="P3"/>
+      <text:p text:style-name="P27">7.4 Ausschluss durch den Erhalter</text:p>
       <text:p text:style-name="P5">Der Erhalter kann die a.o. Studentin bzw. den a.o. Studenten aus wichtigem Grund mit sofortiger Wirkung vom weiteren Studium ausschließen, und zwar beispielsweise wegen</text:p>
       <text:list xml:id="list1474649563" text:continue-list="list1358297633" text:style-name="WW8Num4">
         <text:list-item>
@@ -657,13 +671,13 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
           <text:p text:style-name="P40">persönlichem Verhalten, das zu einer Beeinträchtigung des Images und/oder Betriebes des Lehrgangs, der Fachhochschule bzw. des Erhalters oder von Personen führt, die für die Fachhochschule bzw. den Erhalter tätig sind;</text:p>
         </text:list-item>
         <text:list-item>
-          <text:p text:style-name="P40">Weigerung zur Beibringung von Daten (siehe Pkt. 6.2.2)</text:p>
+          <text:p text:style-name="P40">Weigerung zur Beibringung von Daten (siehe Pkt. 6.2.3)</text:p>
         </text:list-item>
         <text:list-item>
-          <text:p text:style-name="P40">Verletzung der Verpflichtung, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen anzubieten (siehe Pkt. 6.2.4);</text:p>
+          <text:p text:style-name="P40">Verletzung der Verpflichtung, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen anzubieten (siehe Pkt. 6.2.5);</text:p>
         </text:list-item>
         <text:list-item>
-          <text:p text:style-name="P40">Verletzung der Geheimhaltungspflicht (siehe Pkt. 6.2.6); </text:p>
+          <text:p text:style-name="P40">Verletzung der Geheimhaltungspflicht (siehe Pkt. 6.2.7); </text:p>
         </text:list-item>
         <text:list-item>
           <text:p text:style-name="P40">strafgerichtlicher Verurteilung (wobei die Art des Deliktes und der Grad der Schuld berücksichtigt werden);</text:p>
@@ -677,10 +691,8 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       </text:list>
       <text:p text:style-name="P12"/>
       <text:p text:style-name="P5">Der Ausschluss kann mündlich erklärt werden. Mit Ausspruch des Ausschlusses endet der Ausbildungsvertrag, es sei denn, es wird ausdrücklich auf einen anderen Endtermin hingewiesen. Eine schriftliche Bestätigung des Ausschlusses wird innerhalb von zwei Wochen nach dessen Ausspruch per Post an die bekannt gegebene Adresse abgeschickt oder auf andere geeignete Weise übermittelt.</text:p>
-      <text:p text:style-name="P5">Gleichzeitig mit dem Ausspruch des Ausschlusses kann auch ein Hausverbot verhängt werden.</text:p>
+      <text:p text:style-name="P5">Gleichzeitig mit dem Ausspruch des Ausschlusses kann auch ein Hausverbot verhängt werden. Die Verpflichtung zur vollständigen Leistung der Lehrgangskosten wird von einem Ausschluss nicht berührt.</text:p>
       <text:p text:style-name="P5"/>
-      <text:p text:style-name="P27">7.4 Erlöschen</text:p>
-      <text:p text:style-name="P5">Der Ausbildungsvertrag erlischt mit dem Abschluss des Lehrgangs.</text:p>
       <text:p text:style-name="P27"/>
       <text:list xml:id="list422793909" text:continue-list="list866389060" text:style-name="WW8Num7">
 		<text:list-item>
@@ -702,27 +714,26 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
         <text:list-item>
           <text:list>
             <text:list-item>
-              <text:p text:style-name="P26"><text:soft-page-break/>Unwirksamkeit von Vertragsbestimmungen, Vertragslücke </text:p>
+              <text:p text:style-name="P26"><text:soft-page-break/>Unwirksamkeit von Vertragsbestimmungen </text:p>
             </text:list-item>
           </text:list>
         </text:list-item>
       </text:list>
       <text:p text:style-name="P5">Sollten einzelne Bestimmungen dieses Vertrages unwirksam oder nichtig sein oder werden, so berührt dies die Gültigkeit der übrigen Bestimmungen dieses Vertrages nicht.</text:p>
       <text:p text:style-name="P5"/>
-      <text:p text:style-name="P5">Die Vertragsparteien verpflichten sich, unwirksame oder nichtige Bestimmungen durch neue Bestimmungen zu ersetzen, die dem in den unwirksamen oder nichtigen Bestimmungen enthaltenen Regelungsgehalt in rechtlich zulässiger Weise gerecht werden. Zur Ausfüllung einer allfälligen Lücke verpflichten sich die Vertragsparteien, auf die Etablierung angemessener Regelungen in diesem Vertrag hinzuwirken, die dem am nächsten kommen, was sie nach dem Sinn und Zweck des Vertrages bestimmt hätten, wenn der Punkt von ihnen bedacht worden wäre.</text:p>
 	<text:p text:style-name="P5"/>
       <text:list xml:id="list118967672" text:continue-list="list866389060" text:style-name="WW8Num7">
         <text:list-item>
           <text:list>
             <text:list-item>
-              <text:p text:style-name="P26">Ausfertigungen, Gebühren, Gerichtsstand</text:p>
+              <text:p text:style-name="P26">Ausfertigungen, Gebühren, Gerichtsstand, geltendes Recht</text:p>
             </text:list-item>
           </text:list>
         </text:list-item>
       </text:list>
       <text:p text:style-name="P5">Die Ausfertigung dieses Vertrages erfolgt in zweifacher Ausführung. Ein Original verbleibt im zuständigen Administrationsbüro des Lehrgangs. Eine Ausfertigung wird der a.o. Studentin bzw. dem a.o. Studenten übergeben.</text:p>
+      <text:p text:style-name="P5">Für Streitigkeiten aus diesem Vertrag gilt österreichisches Recht als vereinbart, allfällige Klagen sind beim sachlich zuständigen Gericht in Wien einzubringen.</text:p>
       <text:p text:style-name="P5">Der Ausbildungsvertrag ist gebührenfrei.</text:p>
-      <text:p text:style-name="P5">Gerichtsstand ist Wien, Innere Stadt.</text:p>
       <text:p text:style-name="P5"/>
       <text:p text:style-name="P5"/>
       <text:p text:style-name="P5"/>
