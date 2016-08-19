@@ -96,7 +96,7 @@ FN 146616m, LG St. Pölten, DVR 1028669F</code>', '$o->oe_kurzbz');
 	  		if (! $this->fhc->db->simple_query($query))
 				echo "Error adding Template MailAppointmentConfirmation!";
 
-			// Insert Vorlagetext for MailApplicationConfirmation
+			// Insert Vorlagetext for MailAppointmentConfirmation
 			foreach ($oe as $o)
 			{
 				$query = "INSERT INTO public.tbl_vorlagestudiengang VALUES ('MailAppointmentConfirmation', 0, 1, '<p>Vielen Dank für Ihre Anmeldung zum Aufnahmetermin des {typ}-Studiengangs {studiengang} ({orgform})!</p>
@@ -129,6 +129,41 @@ Bitte wenden Sie sich direkt an das zuständige Studiengangssekretariat.', '$o->
 					echo 'Added Tamplate MailAppointmentConfirmation for OE:'.$o->oe_kurzbz.' ';
 			}
 
+
+// ************** Mail Status Confirmation Interessent ******************
+			// Insert Template MailStatConfirmInteressent
+			$query= "INSERT INTO public.tbl_vorlage VALUES ('MailStatConfirmInteressent', 'Zulassung zum Aufnahmeverfahren', NULL, 'text/html', '{  \"\$schema\": \"http://json-schema.org/draft-03/schema#\",  \"title\": \"Person\",  \"type\": \"object\",  \"properties\": {    \"anrede\": {      \"type\": \"string\",      \"enum\": [        \"Herr\",        \"Frau\"      ],      \"default\": \"Herr\"    },    \"vorname\": {      \"type\": \"string\",      \"description\": \"Firstname\",      \"minLength\": 2,      \"default\": \"Vorname\"    },    \"nachname\": {      \"type\": \"string\",      \"description\": \"Surename\",      \"minLength\": 2,      \"default\": \"Nachname\"    },    \"typ\": {      \"type\": \"string\",      \"description\": \"Studiengangstyp\",      \"minLength\": 1,      \"default\": \"Bachelor\"    },    \"studiengang\": {      \"type\": \"string\",      \"description\": \"Studiengangsbezeichnung\",      \"minLength\": 3,      \"default\": \"Medientechnik\"    },    \"orgform\": {      \"type\": \"string\",      \"description\": \"Organisationsform\",      \"minLength\": 2,      \"default\": \"Vollzeit\"    },    \"stgMail\": {      \"type\": \"string\",      \"description\": \"StudiengangsMailAdresse\",      \"minLength\": 1,      \"default\": \"xxx@fhstp.ac.at\"    }  }}');
+		            ";
+	  		if (! $this->fhc->db->simple_query($query))
+				echo "Error adding Template MailAppointmentConfirmation!";
+
+			// Insert Vorlagetext for MailAppointmentConfirmation
+			foreach ($oe as $o)
+			{
+				$query = "INSERT INTO public.tbl_vorlagestudiengang VALUES ('MailStatConfirmInteressent', 0, 1, 'Sehr geehrte/r {anrede} {vorname} {nachname},
+
+Sie haben die notwendigen Zugangsvoraussetzungen zum {typ}-Studiengang {studiengang} ({orgform}) erfüllt und sind nun für das Aufnahmeverfahren zugelassen. 
+Bitte wählen Sie Ihren gewünschten Termin in der Online Bewerbung unter dem Menüpunkt „Aufnahmetermine“ aus.
+Bei Fragen stehen wir Ihnen gerne unter {stgMail} zur Verfügung!
+
+Mit freundlichen Grüßen,
+Studiengang {studiengang}
+<code>
+Fachhochschule St. Pölten GmbH<br/>
+Matthias Corvinus-Straße 15,<br/>
+3100 St. Pölten<br/>
+T: +43/2742/313 228 - 610<br/>
+E: bmt@fhstp.ac.at<br/>
+I: http://www.fhstp.ac.at<br/>
+<br/>
+FN 146616m, LG St. Pölten, DVR 1028669F</code>
+<p>Achtung!<br/>
+Antworten Sie nicht direkt auf diese Mail, da diese Mailadresse nur dem Versenden von Mails dient.<br/>
+Bitte wenden Sie sich direkt an das zuständige Studiengangssekretariat. ({stgMail})', '$o->oe_kurzbz');
+	            ";
+  				if ($this->fhc->db->simple_query($query))
+					echo 'Added Tamplate MailAppointmentConfirmation for OE:'.$o->oe_kurzbz.' ';
+			}
 			echo PHP_EOL;
           
 		}
