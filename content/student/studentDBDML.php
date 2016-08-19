@@ -71,6 +71,7 @@ require_once('../../include/note.class.php');
 require_once('../../include/standort.class.php');
 require_once('../../include/adresse.class.php');
 require_once('../../include/reihungstest.class.php');
+require_once('../../include/studienplan.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -1025,10 +1026,10 @@ if(!$error)
 						$prestudent = new prestudent();
 						$prestudent->load($_POST['prestudent_id']);
 
-						$url =APP_ROOT.'/index.ci.php/api/v1/system/Message/MessageVorlage';
+						$url =APP_ROOT.'index.ci.php/api/v1/system/Message/MessageVorlage';
 						$ch = curl_init();
 						curl_setopt($ch, CURLOPT_URL,$url);
-						curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST"); 
+						curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
 
 						$header=array();
 						$auth = base64_encode(FHC_REST_USER.':'.FHC_REST_PASSWORD);
@@ -1041,17 +1042,28 @@ if(!$error)
 						$studiengang->load($prestudent->studiengang_kz);
 						$studiengang->getAllTypes();
 
+						$orgform='';
+						if($rolle->studienplan_id!='')
+						{
+							$studienplan = new studienplan();
+							$studienplan->loadStudienplan($rolle->studienplan_id);
+							$orgform = $studienplan->orgform_kurzbz;
+						}
+						else
+							$orgform = $rolle->orgform_kurzbz;
 						$curl_post_data = array(
 						"sender_id" => 1, // TODO
 						"receiver_id" => $prestudent->person_id,
 						"oe_kurzbz" => $studiengang->oe_kurzbz,
-						"vorlage_kurzbz" => 'MailApplicationConfirmationInteressent',
+						"vorlage_kurzbz" => 'MailStatConfirm'.$_POST['status_kurzbz'],
 						"data" => array(
-							'typ'=>$studiengang->studiengang_typ_arr[$studiengang->typ],
-							'studiengang'=>$studiengang->bezeichnung,
+							'anrede'=>$prestudent->anrede,
 							'vorname'=>$prestudent->vorname,
 							'nachname'=>$prestudent->nachname,
-							'anrede'=>$prestudent->anrede
+							'typ'=>$studiengang->studiengang_typ_arr[$studiengang->typ],
+							'studiengang'=>$studiengang->bezeichnung,
+							'orgform'=>$orgform,
+							'stgMail'=>$studiengang->email
 						 )
 						);
 
@@ -1061,8 +1073,17 @@ if(!$error)
 						$result = curl_exec($ch);
 						$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 						curl_close($ch);
-						
-						$return = true;
+
+						$jsonresult = json_decode($result);
+						if(isset($jsonresult->error) && $jsonresult->error==1)
+						{
+							$return = false;
+							$errormsg = $jsonresult->retval;
+						}
+						else
+						{
+							$return = true;
+						}
 					}
 					else
 					{
