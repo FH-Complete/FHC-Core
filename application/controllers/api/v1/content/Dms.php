@@ -67,25 +67,36 @@ class Dms extends APIv1_Controller
 		{
 			$result = null;
 			
-			if (isset($dms['dms_id']))
+			if(isset($dms['new']) && $dms['new'] == true)
+			{
+				// Remove new parameter to avoid DB insert errors
+				unset($dms['new']);
+				
+				if (($filename = $this->_saveFileOnInsert($dms)) !== false)
+				{
+					$result = $this->DmsModel->insert($this->DmsModel->filterFields($dms));
+					if ($result->error == EXIT_SUCCESS)
+					{
+						$result = $this->DmsVersionModel->insert(
+								$this->DmsVersionModel->filterFields($dms, $result->retval, $filename)
+						);
+					}
+				}
+			}
+			else
 			{
 				if ($this->_saveFileOnUpdate($dms))
 				{
 					$result = $this->DmsModel->update($dms['dms_id'], $this->DmsModel->filterFields($dms));
 					if ($result->error == EXIT_SUCCESS)
 					{
-						$result = $this->DmsVersionModel->update(array($dms['dms_id'], $dms['version']), $this->DmsVersionModel->filterFields($dms));
-					}
-				}
-			}
-			else
-			{
-				if (($filename = $this->_saveFileOnInsert($dms)) !== false)
-				{
-					$result = $this->DmsModel->insert($this->DmsModel->filterFields($dms));
-					if ($result->error == EXIT_SUCCESS)
-					{
-						$result = $this->DmsVersionModel->insert($this->DmsVersionModel->filterFields($dms, $result->retval, $filename));
+						$result = $this->DmsVersionModel->update(
+								array(
+									$dms['dms_id'],
+									$dms['version']
+								),
+								$this->DmsVersionModel->filterFields($dms)
+						);
 					}
 				}
 			}
