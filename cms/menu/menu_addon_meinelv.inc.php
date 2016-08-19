@@ -62,7 +62,7 @@ class menu_addon_meinelv extends menu_addon
 					$stsem_arr[] = $stsemobj->getNearest();
 				}
 				$qry = "SELECT distinct lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, lehre,
-							lehreverzeichnis from campus.vw_student_lehrveranstaltung
+							lehreverzeichnis, studiensemester_kurzbz from campus.vw_student_lehrveranstaltung
 						WHERE uid=".$this->db_add_param($user)." AND studiensemester_kurzbz in(".$this->db_implode4SQL($stsem_arr).")
 						AND lehre=true AND lehreverzeichnis<>'' ORDER BY studiengang_kz, semester, bezeichnung";
 				if($result = $this->db_query($qry))
@@ -84,7 +84,7 @@ class menu_addon_meinelv extends menu_addon
 						{
 							$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 							 'target'=>'content',
-							 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id,
+							 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$row->studiensemester_kurzbz,
 							 'name'=>$studiengang_obj->kuerzel_arr[$row->studiengang_kz].$row->semester.' '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
 							);
 						}
@@ -114,7 +114,7 @@ class menu_addon_meinelv extends menu_addon
 				{
 					$stsem_arr[] = $stsemobj->getNearest();
 				}
-				$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.orgform_kurzbz  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
+				$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.orgform_kurzbz, studiensemester_kurzbz  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
 				        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 				        mitarbeiter_uid=".$this->db_add_param($user)." AND tbl_lehreinheit.studiensemester_kurzbz in(".$this->db_implode4SQL($stsem_arr).")
@@ -148,7 +148,7 @@ class menu_addon_meinelv extends menu_addon
 
 							$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 							 'target'=>'content',
-							 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id,
+							 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$row->studiensemester_kurzbz,
 							 'name'=>$kurzbz.' '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
 							);
 						}
