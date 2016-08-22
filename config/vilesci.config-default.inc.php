@@ -15,7 +15,7 @@ setlocale (LC_ALL, 'de_DE.UTF8','de_DE@euro', 'de_DE', 'de','DE', 'ge','German')
 
 // Zeitzone
 date_default_timezone_set('Europe/Vienna');
-	
+
 // Connection Strings zur Datenbank
 define("DB_SYSTEM","pgsql");
 define("DB_HOST","localhost");
@@ -29,10 +29,10 @@ define('CONN_CLIENT_ENCODING','UTF-8' );
 //Connection String Infoscreen
 define("INFOSCREEN_USER","");
 define("INFOSCREEN_PASSWORD","");
-	
+
 // Name des Servers (benoetigt fuer Cronjobs
 define('SERVER_NAME','localhost');
-	
+
 // URL zu FHComplete Root
 define('APP_ROOT','http://www.fhcomlete.org/build/');
 // URL zu RDF Verzeichnis
@@ -44,15 +44,15 @@ define('CIS_ROOT','http://www.fhcomlete.org/build/cis/');
 
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH','tw');
-	
+
 // Fuer Mails etc
 define('DOMAIN','technikum-wien.at');
 
-// Ordner für DMS Dokumente 
+// Ordner für DMS Dokumente
 define('DMS_PATH','/var/fhcomplete/documents/dms/');
 
-// Authentifizierungsmethode 
-// Moegliche Werte: 
+// Authentifizierungsmethode
+// Moegliche Werte:
 // auth_mixed    - htaccess mit LDAP (Default)
 // auth_demo     - Demo Modus (.htaccess)
 // auth_session  - Sessions mit LDAP (Testbetrieb)
@@ -115,8 +115,8 @@ define('WARN_SEMESTERSTD_FREI','120');
 // Fixangestellte Lektoren
 define('WARN_SEMESTERSTD_FIX','320');
 
-//Wochen als Grundlage zur Berechnung der Lektorenmeldung 
-define('BIS_SWS_WOCHEN', 40); 
+//Wochen als Grundlage zur Berechnung der Lektorenmeldung
+define('BIS_SWS_WOCHEN', 40);
 
 // E-Mail Einstellungen
 // Mail-Adressen (Angabe von mehreren Addressen mit ',' getrennt moeglich)
@@ -146,10 +146,10 @@ define ('LEHREINHEIT_ANMERKUNG_DEFAULT', '');
 //Gibt an welche Funktion zur generierung des PDF Files herangezogen wird
 //moegliche Werte: FOP | XSLFO2PDF
 define ('PDF_CREATE_FUNCTION','XSLFO2PDF');
-	
+
 //Pfad zu den Projektarbeitsabgaben
 define('PAABGABE_PATH','/var/fhcomplete/documents/paabgabe/');
-	
+
 // ***** Mantis Bugtracker *****
 define('MANTIS_PFAD','http://www.example.com/mantis/api/soap/mantisconnect.php?wsdl');
 define('MANTIS_USERNAME',(isset($_SERVER['PHP_AUTH_USER'])?$_SERVER['PHP_AUTH_USER']:''));
@@ -174,5 +174,9 @@ define('VIEW_BEGIN','vw_');
 
 //Legt fest ob die Personalnummer beim Anlegen NULL sein soll
 define('FAS_PERSONALNUMMER_GENERATE_NULL', false);
-	
+
+// API Informationen
+define('FHC_REST_API_KEY','testapikey@fhcomplete.org');
+define('FHC_REST_USER','username');
+define('FHC_REST_PASSWORD','password');
 ?>
