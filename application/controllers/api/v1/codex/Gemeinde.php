@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if (!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined("BASEPATH")) exit("No direct script access allowed");
 
 class Gemeinde extends APIv1_Controller
 {
@@ -23,7 +23,7 @@ class Gemeinde extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model GemeindeModel
-		$this->load->model('codex/gemeinde_model', 'GemeindeModel');
+		$this->load->model("codex/gemeinde_model", "GemeindeModel");
 	}
 
 	/**
@@ -55,7 +55,10 @@ class Gemeinde extends APIv1_Controller
 		
 		if (is_numeric($plz))
 		{
-			$result = $this->GemeindeModel->loadWhere(array('plz' => $plz));
+			$this->GemeindeModel->addSelect("DISTINCT ON (ortschaftsname) ortschaftsname, gemeinde_id, plz, name, ortschaftskennziffer, bulacode, bulabez, kennziffer");
+			$this->GemeindeModel->addOrder("ortschaftsname");
+			
+			$result = $this->GemeindeModel->loadWhere(array("plz" => $plz));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -72,9 +75,9 @@ class Gemeinde extends APIv1_Controller
 	{
 		if ($this->_validate($this->post()))
 		{
-			if (isset($this->post()['gemeinde_id']))
+			if (isset($this->post()["gemeinde_id"]))
 			{
-				$result = $this->GemeindeModel->update($this->post()['gemeinde_id'], $this->post());
+				$result = $this->GemeindeModel->update($this->post()["gemeinde_id"], $this->post());
 			}
 			else
 			{
