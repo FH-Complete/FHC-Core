@@ -93,7 +93,7 @@ class Message_model extends DB_Model
 				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_message m USING (message_id)
 						JOIN public.tbl_person p ON (p.person_id = m.person_id)
 						JOIN (
-							SELECT * FROM public.tbl_msg_status ORDER BY insertamum DESC LIMIT 1
+							SELECT * FROM public.tbl_msg_status ORDER BY insertamum DESC
 						) s ON (m.message_id = s.message_id AND r.person_id = s.person_id)
 				 WHERE r.person_id = ?";
 		
