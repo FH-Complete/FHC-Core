@@ -275,7 +275,7 @@ class MessageLib
 
 		$this->ci->db->trans_complete();
 
-		if ($this->ci->db->trans_status() === FALSE || (is_object($result) && $result->error != EXIT_SUCCESS))
+		if ($this->ci->db->trans_status() === false || (is_object($result) && $result->error != EXIT_SUCCESS))
 		{
 			$this->ci->db->trans_rollback();
 			return $this->_error($result->msg, EXIT_ERROR);
@@ -325,12 +325,13 @@ class MessageLib
 				{
 					// Parses template text
 					$parsedText = $this->ci->vorlagelib->parseVorlagetext($result->retval[0]->text, $data);
+					$subject = $result->retval[0]->subject;
 
 					$this->ci->db->trans_start(false);
 					// Save Message
 					$msgData = array(
 						"person_id" => $sender_id,
-						"subject" => $result->retval[0]->subject,
+						"subject" => $subject,
 						"body" => $parsedText,
 						"priority" => PRIORITY_NORMAL,
 						"relationmessage_id" => $relationmessage_id,
@@ -356,12 +357,23 @@ class MessageLib
 								"status" => MSG_STATUS_UNREAD
 							);
 							$result = $this->ci->MsgStatusModel->insert($statusData);
+							
+							// If no errors were occurred
+							if (is_object($result) && $result->error == EXIT_SUCCESS)
+							{
+								// If the system is configured to send emails immediately
+								if ($this->getEmailCfgItem("email_send_immediately") === true)
+								{
+									// Send message by email!
+									$result = $this->sendOne($msg_id, $subject, $parsedText);
+								}
+							}
 						}
 					}
 
 					$this->ci->db->trans_complete();
 
-					if ($this->ci->db->trans_status() === FALSE || (is_object($result) && $result->error != EXIT_SUCCESS))
+					if ($this->ci->db->trans_status() === false || (is_object($result) && $result->error != EXIT_SUCCESS))
 					{
 						$this->ci->db->trans_rollback();
 						return $this->_error($result->msg, EXIT_ERROR);
@@ -451,7 +463,7 @@ class MessageLib
 						}
 						
 						// Sending email
-						$sent = $this->sendOne(
+						$sent = $this->sendEmail(
 							$sender,
 							$result->retval[$i]->receiver,
 							$result->retval[$i]->subject,
@@ -533,6 +545,117 @@ class MessageLib
 		
 		return $sent;
 	}
+	
+	/**
+	 * One messages from DB and sends it via email
+	 */
+	public function sendOne($message_id, $subject = null, $body = null)
+	{
+		$sent = true; // optimistic expectation
+		
+		// Get a specific message from DB having EMAIL_KONTAKT_TYPE as relative contact type
+		$result = $this->ci->RecipientModel->getMessages(
+				EMAIL_KONTAKT_TYPE,
+				null,
+				null,
+				$message_id
+		);
+		// Checks if errors were occurred
+		if (is_object($result) && $result->error == EXIT_SUCCESS)
+		{
+			// If data are present
+			if (is_array($result->retval) && count($result->retval) > 0)
+			{
+				// If the person has an email account
+				if (!is_null($result->retval[0]->receiver) && $result->retval[0]->receiver != "")
+				{
+					// Using a template as email body if it is not given as method parameter
+					if (is_null($body))
+					{
+						$bodyMsg = $this->ci->parser->parse("templates/mail", array("body" => $result->retval[0]->body), true);
+						if (is_null($bodyMsg) || $bodyMsg == "")
+						{
+							// $body = $result->retval[0]->body;
+							$this->ci->loglib->logError("Error while parsing the mail template");
+						}
+					}
+					else
+					{
+						$bodyMsg = $body;
+					}
+					
+					// If the sender kontakt does not exist, then use system
+					$sender = $this->getEmailCfgItem("email_from_system");
+					if (!is_null($result->retval[0]->sender) && $result->retval[0]->sender != "")
+					{
+						$sender = $result->retval[0]->sender;
+					}
+					
+					// Sending email
+					$sent = $this->sendEmail(
+						$sender,
+						$result->retval[0]->receiver,
+						is_null($subject) ? $result->retval[0]->subject : $subject, // if parameter subject is not null, use it!
+						$bodyMsg
+					);
+					// If errors were occurred while sending the email
+					if (!$sent)
+					{
+						$this->ci->loglib->logError("Error while sending an email");
+						// Writing errors in tbl_message_status
+						$sme = $this->setMessageError(
+								$result->retval[0]->message_id,
+								$result->retval[0]->receiver_id,
+								"Error while sending an email",
+								$result->retval[0]->sentinfo
+						);
+						if (!$sme)
+						{
+							$this->ci->loglib->logError("Error while updating DB");
+						}
+					}
+					else
+					{
+						// Setting the message as sent in DB
+						$sent = $this->setMessageSent($result->retval[0]->message_id, $result->retval[0]->receiver_id);
+						// If the email has been sent and the DB updated
+						if (!$sent)
+						{
+							$this->ci->loglib->logError("Error while updating DB");
+						}
+					}
+				}
+				else
+				{
+					$this->ci->loglib->logError("This person does not have an email account");
+					// Writing errors in tbl_message_status
+					$sme = $this->setMessageError(
+							$result->retval[0]->message_id,
+							$result->retval[0]->receiver_id,
+							"This person does not have an email account",
+							$result->retval[0]->sentinfo
+					);
+					if (!$sme)
+					{
+						$this->ci->loglib->logError("Error while updating DB");
+					}
+					$sent = true; // Non blocking error
+				}
+			}
+			else
+			{
+				$this->ci->loglib->logInfo("There are no email to be sent");
+				$sent = false;
+			}
+		}
+		else
+		{
+			$this->ci->loglib->logError("Something went wrong while getting data from DB");
+			$sent = false;
+		}
+		
+		return $sent;
+	}
     
     // ------------------------------------------------------------------------
     // Private Functions from here out!
@@ -594,7 +717,7 @@ class MessageLib
 	/**
 	 * Sends a single email
 	 */
-	private function sendOne($from, $to, $subject, $message, $alias = "", $cc = null, $bcc = null)
+	private function sendEmail($from, $to, $subject, $message, $alias = "", $cc = null, $bcc = null)
 	{
 		$this->ci->email->from($from, $alias);
 		$this->ci->email->to($to);

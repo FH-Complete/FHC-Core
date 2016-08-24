@@ -21,8 +21,9 @@ class Recipient_model extends DB_Model
 	 * @param kontaktType specifies the type of the kontakt to get
 	 * @param sent specifies the status of the messages to get (NULL never sent, otherwise the shipping date)
 	 * @param limit specifies the number of messages to get
+	 * @param message_id specifies a single message
 	 */
-	public function getMessages($kontaktType, $sent, $limit = null)
+	public function getMessages($kontaktType, $sent, $limit = null, $message_id = null)
 	{
 		// Check rights
 		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_msg_recipient"), "s"))
@@ -57,6 +58,12 @@ class Recipient_model extends DB_Model
 		{
 			array_push($parametersArray, $sent);
 			$query .= " WHERE mr.sent = ?";
+		}
+		
+		if (!is_null($message_id))
+		{
+			array_push($parametersArray, $message_id);
+			$query .= " AND mm.message_id = ?";
 		}
 		
 		$query .= " ORDER BY mr.insertamum ASC";
