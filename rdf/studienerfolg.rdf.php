@@ -31,6 +31,8 @@ require_once('../include/studiengang.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/student.class.php');
+require_once('../include/studienordnung.class.php');
+require_once('../include/studienplan.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -40,23 +42,23 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	global $xml, $note_arr, $datum, $note_wert;
 
 	$db = new basis_db();
-	$query = "SELECT 
-				tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.bezeichnung, 
-				tbl_studentlehrverband.semester, tbl_person.titelpre, tbl_person.titelpost, 
-				tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum, 
+	$query = "SELECT
+				tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.bezeichnung,
+				tbl_studentlehrverband.semester, tbl_person.titelpre, tbl_person.titelpost,
+				tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum,
 				tbl_studiensemester.bezeichnung as sembezeichnung,
 				tbl_studiengang.english as bezeichnung_englisch,
 				tbl_studiengang.orgform_kurzbz
-			FROM 
-				public.tbl_person, public.tbl_student, public.tbl_studiengang, public.tbl_benutzer, 
-				public.tbl_studentlehrverband, public.tbl_studiensemester 
-			WHERE 
-				tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz 
-				and tbl_student.student_uid = tbl_benutzer.uid 
-				and tbl_benutzer.person_id = tbl_person.person_id 
-				and tbl_student.student_uid = ".$db->db_add_param($uid)." 
-				and tbl_studentlehrverband.student_uid=tbl_student.student_uid 
-				and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz 
+			FROM
+				public.tbl_person, public.tbl_student, public.tbl_studiengang, public.tbl_benutzer,
+				public.tbl_studentlehrverband, public.tbl_studiensemester
+			WHERE
+				tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz
+				and tbl_student.student_uid = tbl_benutzer.uid
+				and tbl_benutzer.person_id = tbl_person.person_id
+				and tbl_student.student_uid = ".$db->db_add_param($uid)."
+				and tbl_studentlehrverband.student_uid=tbl_student.student_uid
+				and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz
 				and tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz);
 
 	if($db->db_query($query))
@@ -73,46 +75,57 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$student->load($uid);
 	$prestudentstatus = new prestudent();
 	$prestudentstatus->getLastStatus($student->prestudent_id,'','Student');
-	
+
 	if($studiensemester_aktuell!=$prestudentstatus->studiensemester_kurzbz)
 		$studiensemester_aktuell = $prestudentstatus->studiensemester_kurzbz;
-	
+
 	$studiensemester->load($studiensemester_aktuell);
-	
+
 	$semester_aktuell='';
-	$qry_semester = "SELECT tbl_prestudentstatus.ausbildungssemester as semester FROM public.tbl_student, public.tbl_prestudentstatus 
-					WHERE tbl_student.prestudent_id=tbl_prestudentstatus.prestudent_id 
-						AND tbl_prestudentstatus.status_kurzbz in('Student','Incoming','Outgoing','Praktikant','Diplomand') 
-						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_aktuell)." 
+	$qry_semester = "SELECT tbl_prestudentstatus.ausbildungssemester as semester FROM public.tbl_student, public.tbl_prestudentstatus
+					WHERE tbl_student.prestudent_id=tbl_prestudentstatus.prestudent_id
+						AND tbl_prestudentstatus.status_kurzbz in('Student','Incoming','Outgoing','Praktikant','Diplomand')
+						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_aktuell)."
 						AND tbl_student.student_uid = ".$db->db_add_param($uid);
-	
+
 	if($db->db_query($qry_semester))
 		if($row_semester = $db->db_fetch_object())
 			$semester_aktuell=$row_semester->semester;
 
 	if($semester_aktuell=='')
 		$studiensemester_aktuell='';
-		
-	$qry_semester = "SELECT tbl_prestudentstatus.ausbildungssemester as semester, tbl_prestudentstatus.orgform_kurzbz FROM public.tbl_student, public.tbl_prestudentstatus 
-					WHERE tbl_student.prestudent_id=tbl_prestudentstatus.prestudent_id 
-						AND tbl_prestudentstatus.status_kurzbz in('Student','Incoming','Outgoing','Praktikant','Diplomand') 
-						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." 
+
+	$qry_semester = "SELECT tbl_prestudentstatus.ausbildungssemester as semester, tbl_prestudentstatus.orgform_kurzbz, tbl_prestudentstatus.studienplan_id FROM public.tbl_student, public.tbl_prestudentstatus
+					WHERE tbl_student.prestudent_id=tbl_prestudentstatus.prestudent_id
+						AND tbl_prestudentstatus.status_kurzbz in('Student','Incoming','Outgoing','Praktikant','Diplomand')
+						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
 						AND tbl_student.student_uid = ".$db->db_add_param($uid);
-		
+
 	$orgform='';
+	$studiengang_bezeichnung_sto='';
+	$studiengang_bezeichnung_sto_englisch='';
+
 	if($db->db_query($qry_semester))
 	{
 		if($row_semester = $db->db_fetch_object())
 		{
 			$row->semester=$row_semester->semester;
 			$orgform = $row_semester->orgform_kurzbz;
+
+			$stpl = new studienplan();
+			$stpl->loadStudienplan($row_semester->studienplan_id);
+			$sto = new studienordnung();
+			$sto->loadStudienordnung($stpl->studienordnung_id);
+
+			$studiengang_bezeichnung_sto = $sto->studiengangbezeichnung;
+			$studiengang_bezeichnung_sto_englisch = $sto->studiengangbezeichnung_englisch;
 		}
 	}
 
 	// Wenn der Studiernede keine Orgform eingetragen hat, wird die Orgform des Studiengang genommen
 	if($orgform=='')
 		$orgform = $row->orgform_kurzbz;
-	
+
 	$studiengang = new studiengang();
 	$stgleiter = $studiengang->getLeitung($row->studiengang_kz);
 	$stgl='';
@@ -126,14 +139,14 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	{
 		$stg = new studiengang();
 		$stg->load($row->studiengang_kz);
-	
+
 		$studiengang_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($row->studiengang_kz));
 	}
 	else
 		$studiengang_kz = sprintf("%04s", abs($row->studiengang_kz));
-	
+
 	$stdsem = new studiensemester($studiensemester_kurzbz);
-	
+
 	$xml .= "	<studienerfolg>";
 	$xml .= "		<logopath>".DOC_ROOT."skin/images/</logopath>";
 	$xml .= "		<studiensemester>".$row->sembezeichnung."</studiensemester>";
@@ -144,6 +157,8 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$xml .=	"		<semester_aktuell_semester>".$semester_aktuell."</semester_aktuell_semester>";
 	$xml .= "		<studiengang>".$row->bezeichnung."</studiengang>";
 	$xml .= "		<studiengang_englisch>".$row->bezeichnung_englisch."</studiengang_englisch>";
+	$xml .= "		<studiengang_bezeichnung_sto>".$studiengang_bezeichnung_sto."</studiengang_bezeichnung_sto>";
+	$xml .= "		<studiengang_bezeichnung_sto_englisch>".$studiengang_bezeichnung_sto_englisch."</studiengang_bezeichnung_sto_englisch>";
 	$xml .= "		<studiengang_kz>".$studiengang_kz."</studiengang_kz>";
 	$xml .= "		<titelpre>".$row->titelpre."</titelpre>";
 	$xml .= "		<titelpost>".$row->titelpost."</titelpost>";
@@ -168,7 +183,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	if(!$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid, $studiensemester_kurzbz))
 		die('Fehler beim Laden der Noten:'.$obj->errormsg);
 
-	
+
 
 	$gesamtstunden=0;
 	$gesamtects=0;
@@ -185,12 +200,12 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				$note = "";
 			if($note!='')
 			{
-				$qry = "SELECT 
-							wochen 
-						FROM 
+				$qry = "SELECT
+							wochen
+						FROM
 							public.tbl_semesterwochen
 							JOIN lehre.tbl_lehrveranstaltung USING(studiengang_kz, semester)
-						WHERE 
+						WHERE
 							tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($row->lehrveranstaltung_id);
 
 				$wochen = 15;
@@ -276,11 +291,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		for ($i = 0; $i < sizeof($uid_arr); $i++)
 		{
 			//Studienbestaetigung fuer alle Semester dieses Studenten
-			$qry = "SELECT * FROM public.tbl_studiensemester 
+			$qry = "SELECT * FROM public.tbl_studiensemester
 					WHERE studiensemester_kurzbz in(
-						SELECT studiensemester_kurzbz 
-						FROM public.tbl_prestudentstatus JOIN public.tbl_student USING(prestudent_id) 
-						WHERE student_uid='".addslashes($uid_arr[$i])."') 
+						SELECT studiensemester_kurzbz
+						FROM public.tbl_prestudentstatus JOIN public.tbl_student USING(prestudent_id)
+						WHERE student_uid='".addslashes($uid_arr[$i])."')
 					ORDER BY start";
 			if($db->db_query($qry))
 				while($row = $db->db_fetch_object())
