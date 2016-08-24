@@ -15,6 +15,8 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
 
 class Studiengang2 extends APIv1_Controller
 {
+	private static $PROPERTIES_SEPARATOR = "properties_separator";
+
 	/**
 	 * Course API constructor.
 	 */
@@ -46,196 +48,120 @@ class Studiengang2 extends APIv1_Controller
 		$this->response($this->StudiengangModel->getAllForBewerbung(), REST_Controller::HTTP_OK);
 	}
 	
+	/**
+	 * Method getStudiengangStudienplan
+	 */
 	public function getStudiengangStudienplan()
 	{
+		// Getting HTTP GET parameters
 		$studiensemester_kurzbz = $this->get("studiensemester_kurzbz");
 		$ausbildungssemester = $this->get("ausbildungssemester");
 		$aktiv = $this->get("aktiv");
 		$onlinebewerbung = $this->get("onlinebewerbung");
 		
+		// If $studiensemester_kurzbz and $ausbildungssemester are present
 		if (isset($studiensemester_kurzbz) && isset($ausbildungssemester))
 		{
-			$this->load->model("organisation/Studienplan_model", "StudienplanModel");
-			$result = $this->StudienplanModel->addJoin("lehre.tbl_studienplan_semester", "studienplan_id");
-			if ($result->error == EXIT_SUCCESS)
+			$result = null; // return variable
+			
+			// Check & set
+			if (!isset($aktiv)) $aktiv = "TRUE";
+			if (!isset($onlinebewerbung)) $onlinebewerbung = "TRUE";
+			
+			// Join table public.tbl_studiengang with table lehre.tbl_studienordnung on column studiengang_kz
+			$result = $this->StudiengangModel->addJoin("lehre.tbl_studienordnung", "studiengang_kz");
+			if ($result->error == EXIT_SUCCESS) // If the API caller has the rights
 			{
-				$result = $this->StudienplanModel->addJoin("lehre.tbl_studienordnung", "studienordnung_id");
-				if ($result->error == EXIT_SUCCESS)
+				// Then join with table lehre.tbl_studienplan on column studienordnung_id
+				$result = $this->StudiengangModel->addJoin("lehre.tbl_studienplan", "studienordnung_id");
+				if ($result->error == EXIT_SUCCESS) // If the API caller has the rights
 				{
-					$this->StudienplanModel->addSelect("tbl_studienplan.*, lehre.tbl_studienordnung.studiengang_kz");
-
-					$this->StudienplanModel->addOrder("lehre.tbl_studienordnung.studiengang_kz");
-
-					if (!isset($aktiv)) $aktiv = "TRUE";
-					if (!isset($onlinebewerbung)) $onlinebewerbung = "TRUE";
-
-					$resultStudienplan = $this->StudienplanModel->loadWhere(
-						array("semester" => $ausbildungssemester,
-								"studiensemester_kurzbz" => $studiensemester_kurzbz)
-					);
-					
-					if (is_object($resultStudienplan) && $resultStudienplan->error == EXIT_SUCCESS &&
-						is_array($resultStudienplan->retval) && count($resultStudienplan->retval) > 0)
+					// Then join with table lehre.tbl_studienplan_semester on column studienplan_id
+					$result = $this->StudiengangModel->addJoin("lehre.tbl_studienplan_semester", "studienplan_id");
+					if ($result->error == EXIT_SUCCESS) // If the API caller has the rights
 					{
-						$studiengangCount = 0;
-						$prevStudiengang_kz = "";
-						$studiengangArray = array();
-
-						for ($i = 0; $i < count($resultStudienplan->retval); $i++)
-						{
-							if ($prevStudiengang_kz == $resultStudienplan->retval[$i]->studiengang_kz)
-							{
-								if (isset($studiengangArray[$studiengangCount - 1]) && is_array($studiengangArray[$studiengangCount - 1]->studienplaene))
-								{
-									array_push($studiengangArray[$studiengangCount - 1]->studienplaene, $resultStudienplan->retval[$i]);
-								}
-							}
-							else
-							{
-								$resultStudiengang = $this->StudiengangModel->loadWhere(
-									array("studiengang_kz" => $resultStudienplan->retval[$i]->studiengang_kz,
-											"aktiv" => $aktiv,
-											"onlinebewerbung" => $onlinebewerbung)
-								);
-								
-								if (is_object($resultStudiengang) && $resultStudiengang->error == EXIT_SUCCESS &&
-									is_array($resultStudiengang->retval) && count($resultStudiengang->retval) > 0)
-								{
-									$resultStudiengang->retval[0]->studienplaene = array($resultStudienplan->retval[$i]);
-									$studiengangArray[$studiengangCount++] = $resultStudiengang->retval[0];
-								}
-								
-								$prevStudiengang_kz = $resultStudienplan->retval[$i]->studiengang_kz;
-							}
-						}
-
-						$result = $this->_success($studiengangArray);
+						// Select all fields from table public.tbl_studiengang and table lehre.tbl_studienplan
+						// The separator is used to keep data separated between table public.tbl_studiengang
+						// and table lehre.tbl_studienplan (keep 'em separated!)
+						$this->StudiengangModel->addSelect(
+							"public.tbl_studiengang.*,
+							'' as " . Studiengang2::$PROPERTIES_SEPARATOR . ",
+							lehre.tbl_studienplan.*"
+						);
+						
+						// Ordering by studiengang_kz and studienplan_id
+						$this->StudiengangModel->addOrder("public.tbl_studiengang.studiengang_kz");
+						$this->StudiengangModel->addOrder("lehre.tbl_studienplan.studienplan_id");
+						
+						// Execute the query
+						$result = $this->StudiengangModel->loadWhere(array(
+							"lehre.tbl_studienplan_semester.studiensemester_kurzbz" => $studiensemester_kurzbz,
+							"lehre.tbl_studienplan_semester.semester" => $ausbildungssemester,
+							"public.tbl_studiengang.aktiv" => $aktiv,
+							"public.tbl_studiengang.onlinebewerbung" => $onlinebewerbung
+						));
 					}
 				}
 			}
 			
-			$this->response($result, REST_Controller::HTTP_OK);
-		}
-		else
-		{
-			$this->response();
-		}
-	}
-	
-	private function _getStudienplaene($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester)
-	{
-		$studienplaene = null;
-		
-		// Loading model for Studienplan
-		$this->load->model("organisation/Studienplan_model", "StudienplanModel");
-		
-		$result = $this->StudienplanModel->addJoin("lehre.tbl_studienplan_semester", "studienplan_id");
-		if ($result->error == EXIT_SUCCESS)
-		{
-			$result = $this->StudienplanModel->addJoin("lehre.tbl_studienordnung", "studienordnung_id");
-			if ($result->error == EXIT_SUCCESS)
+			// If everything went ok...
+			if (is_object($result) && $result->error == EXIT_SUCCESS &&
+				is_array($result->retval) && count($result->retval) > 0)
 			{
-				$this->StudienplanModel->addSelect("tbl_studienplan.*, lehre.tbl_studienordnung.studiengang_kz");
-
-				$resultStudienplan = $this->StudienplanModel->loadWhere(array(
-					"studiengang_kz" => $studiengang_kz,
-					"semester" => $ausbildungssemester,
-					"studiensemester_kurzbz" => $studiensemester_kurzbz
-				));
-				if (is_object($resultStudienplan) && $resultStudienplan->error == EXIT_SUCCESS &&
-					is_array($resultStudienplan->retval))
+				$studiengangArray = array();	// Array that will contain all the studiengang
+				$countReturnArray = 0;			// Array counter
+				$prevStudiengang_kz = null;		// Previous studiengang key
+				
+				// Iterates the array that contains data from database
+				for ($i = 0; $i < count($result->retval); $i++)
 				{
-					$studienplaene = $resultStudienplan->retval;
-				}
-			}
-		}
-		
-		return $studienplaene;
-	}
-	
-	private function _getBewerbungstermine($studiengang_kz, $studiensemester_kurzbz)
-	{
-		$bewerbungstermine = null;
-		
-		// Loading model for Bewerbungstermine
-		$this->load->model("crm/bewerbungstermine_model", "BewerbungstermineModel");
-		
-		$resultBewerbungstermine = $this->BewerbungstermineModel->loadWhere(array(
-			"studiengang_kz" => $studiengang_kz,
-			"studiensemester_kurzbz" => $studiensemester_kurzbz
-		));
-		if (is_object($resultBewerbungstermine) && $resultBewerbungstermine->error == EXIT_SUCCESS &&
-			is_array($resultBewerbungstermine->retval))
-		{
-			$bewerbungstermine = $resultBewerbungstermine->retval;
-		}
-		
-		return $bewerbungstermine;
-	}
-	
-	private function _getReihungstests($studiengang_kz, $studiensemester_kurzbz)
-	{
-		$reihungstests = null;
-		
-		// Loading model for Reihungstests
-		$this->load->model("crm/reihungstest_model", "ReihungstestModel");
-		
-		$resultReihungstests = $this->ReihungstestModel->loadWhere(array(
-			"studiengang_kz" => $studiengang_kz,
-			"studiensemester_kurzbz" => $studiensemester_kurzbz
-		));
-		if (is_object($resultReihungstests) && $resultReihungstests->error == EXIT_SUCCESS &&
-			is_array($resultReihungstests->retval))
-		{
-			$reihungstests = $resultReihungstests->retval;
-		}
-		
-		return $reihungstests;
-	}
-	
-	public function getCompleteStudiengang()
-	{
-		$studiensemester_kurzbz = $this->get("studiensemester_kurzbz");
-		$ausbildungssemester = $this->get("ausbildungssemester");
-		$aktiv = $this->get("aktiv");
-		$onlinebewerbung = $this->get("onlinebewerbung");
-		
-		if (isset($studiensemester_kurzbz) && isset($ausbildungssemester))
-		{
-			if (!isset($aktiv)) $aktiv = "TRUE";
-			if (!isset($onlinebewerbung)) $onlinebewerbung = "TRUE";
-			
-			$resultStudiengang = $this->StudiengangModel->loadWhere(
-				array("aktiv" => $aktiv,
-					  "onlinebewerbung" => $onlinebewerbung)
-			);
-			if (is_object($resultStudiengang) && $resultStudiengang->error == EXIT_SUCCESS &&
-				is_array($resultStudiengang->retval))
-			{
-				for ($i = 0; $i < count($resultStudiengang->retval); $i++)
-				{
-					$studiengang_kz = $resultStudiengang->retval[$i]->studiengang_kz;
+					$objStudiengang = new stdClass(); // New object that represent a studiengang
+					$objStudienplan = new stdClass(); // New object that represent a studienplan
+					$separator = false;
 					
-					// Getting all studienplaene for this studiengang
-					$resultStudiengang->retval[$i]->studienplaene = $this->_getStudienplaene(
-						$studiengang_kz,
-						$studiensemester_kurzbz,
-						$ausbildungssemester
-					);
-					// Getting all bewerbungstermine for this studiengang
-					$resultStudiengang->retval[$i]->bewerbungstermine = $this->_getBewerbungstermine(
-						$studiengang_kz,
-						$studiensemester_kurzbz
-					);
-					// Getting all reihungstests for this studiengang
-					$resultStudiengang->retval[$i]->reihungstests = $this->_getReihungstests(
-						$studiengang_kz,
-						$studiensemester_kurzbz
-					);
+					// Getting all the properties as an array, of an element of the array that
+					// represents a single studiengang with its own studienplan
+					foreach (get_object_vars($result->retval[$i]) as $key => $value)
+					{
+						// If the current element is the separator then ignore it!
+						if ($key != Studiengang2::$PROPERTIES_SEPARATOR)
+						{
+							// Before the separator: studiengang
+							if (!$separator)
+							{
+								$objStudiengang->{$key} = $value;
+							}
+							else // After the separator: studienplan
+							{
+								$objStudienplan->{$key} = $value;
+							}
+						}
+						else
+						{
+							$separator = true;
+						}
+					}
+					
+					// If the current studiengang is the same as before, adds to it the studienplan
+					if ($prevStudiengang_kz == $objStudiengang->studiengang_kz)
+					{
+						array_push($studiengangArray[$countReturnArray - 1]->studienplaene, $objStudienplan);
+					}
+					// Otherwise creates the property studienplaene and adds the first studienplan,
+					// then adds the new studiengang to studiengangArray and sets prevStudiengang_kz
+					else
+					{
+						$objStudiengang->studienplaene = array($objStudienplan);
+						$studiengangArray[$countReturnArray++] = $objStudiengang;
+						$prevStudiengang_kz = $objStudiengang->studiengang_kz;
+					}
 				}
+				
+				// Sets result with the standard success object that contains all the studiengang
+				$result = $this->_success($studiengangArray);
 			}
 			
-			$this->response($resultStudiengang, REST_Controller::HTTP_OK);
+			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
 		{
