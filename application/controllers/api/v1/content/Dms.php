@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if (!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined("BASEPATH")) exit("No direct script access allowed");
 
 class Dms extends APIv1_Controller
 {
@@ -23,9 +23,9 @@ class Dms extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PersonModel
-		$this->load->model('content/Dms_model', 'DmsModel');
-		$this->load->model('content/DmsVersion_model', 'DmsVersionModel');
-		$this->load->model('content/DmsFS_model', 'DmsFSModel');
+		$this->load->model("content/Dms_model", "DmsModel");
+		$this->load->model("content/DmsVersion_model", "DmsVersionModel");
+		$this->load->model("content/DmsFS_model", "DmsFSModel");
 	}
 	
 	/**
@@ -33,8 +33,8 @@ class Dms extends APIv1_Controller
 	 */
 	public function getDms()
 	{
-		$dms_id = $this->get('dms_id');
-		$version = $this->get('version');
+		$dms_id = $this->get("dms_id");
+		$version = $this->get("version");
 		
 		if (isset($dms_id))
 		{
@@ -67,19 +67,28 @@ class Dms extends APIv1_Controller
 		{
 			$result = null;
 			
-			if(isset($dms['new']) && $dms['new'] == true)
+			if(isset($dms["new"]) && $dms["new"] == true)
 			{
 				// Remove new parameter to avoid DB insert errors
-				unset($dms['new']);
+				unset($dms["new"]);
 				
 				if (($filename = $this->_saveFileOnInsert($dms)) !== false)
 				{
-					$result = $this->DmsModel->insert($this->DmsModel->filterFields($dms));
-					if ($result->error == EXIT_SUCCESS)
+					if(isset($dms["dms_id"]) && $dms["dms_id"] != "")
 					{
 						$result = $this->DmsVersionModel->insert(
-								$this->DmsVersionModel->filterFields($dms, $result->retval, $filename)
+							$this->DmsVersionModel->filterFields($dms, $dms["dms_id"], $filename)
 						);
+					}
+					else
+					{
+						$result = $this->DmsModel->insert($this->DmsModel->filterFields($dms));
+						if ($result->error == EXIT_SUCCESS)
+						{
+							$result = $this->DmsVersionModel->insert(
+								$this->DmsVersionModel->filterFields($dms, $result->retval, $filename)
+							);
+						}
 					}
 				}
 			}
@@ -87,13 +96,13 @@ class Dms extends APIv1_Controller
 			{
 				if ($this->_saveFileOnUpdate($dms))
 				{
-					$result = $this->DmsModel->update($dms['dms_id'], $this->DmsModel->filterFields($dms));
+					$result = $this->DmsModel->update($dms["dms_id"], $this->DmsModel->filterFields($dms));
 					if ($result->error == EXIT_SUCCESS)
 					{
 						$result = $this->DmsVersionModel->update(
 								array(
-									$dms['dms_id'],
-									$dms['version']
+									$dms["dms_id"],
+									$dms["version"]
 								),
 								$this->DmsVersionModel->filterFields($dms)
 						);
@@ -118,10 +127,10 @@ class Dms extends APIv1_Controller
 		
 		if (isset($dms_id))
 		{
-			$result = $this->DmsModel->addJoin('campus.tbl_dms_version', 'dms_id');
+			$result = $this->DmsModel->addJoin("campus.tbl_dms_version", "dms_id");
 			if ($result->error == EXIT_SUCCESS)
 			{
-				$result = $this->DmsModel->addOrder('version', 'DESC');
+				$result = $this->DmsModel->addOrder("version", "DESC");
 				if ($result->error == EXIT_SUCCESS)
 				{
 					$result = $this->DmsModel->addLimit(1);
@@ -129,11 +138,11 @@ class Dms extends APIv1_Controller
 					{
 						if (!isset($version))
 						{
-							$result = $this->DmsModel->loadWhere(array('dms_id' => $dms_id));
+							$result = $this->DmsModel->loadWhere(array("dms_id" => $dms_id));
 						}
 						else
 						{
-							$result = $this->DmsModel->loadWhere(array('dms_id' => $dms_id, 'version' => $version));
+							$result = $this->DmsModel->loadWhere(array("dms_id" => $dms_id, "version" => $version));
 						}
 					}
 				}
@@ -148,13 +157,13 @@ class Dms extends APIv1_Controller
 	 */
 	private function _saveFileOnUpdate($dms)
 	{
-		if(isset($dms['version']))
+		if(isset($dms["version"]))
 		{
-			$result = $this->_getDms($dms['dms_id'], $dms['version']);
+			$result = $this->_getDms($dms["dms_id"], $dms["version"]);
 		
 			if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
 			{
-				$result = $this->DmsFSModel->write($result->retval[0]->filename, $dms['file_content']);
+				$result = $this->DmsFSModel->write($result->retval[0]->filename, $dms["file_content"]);
 				if (is_object($result) && $result->error == EXIT_SUCCESS)
 				{
 					return true;
@@ -170,9 +179,9 @@ class Dms extends APIv1_Controller
 	 */
 	private function _saveFileOnInsert($dms)
 	{
-		$filename = uniqid() . '.' . pathinfo($dms['name'], PATHINFO_EXTENSION);
+		$filename = uniqid() . "." . pathinfo($dms["name"], PATHINFO_EXTENSION);
 
-		$result = $this->DmsFSModel->write($filename, $dms['file_content']);
+		$result = $this->DmsFSModel->write($filename, $dms["file_content"]);
 		if (is_object($result) && $result->error == EXIT_SUCCESS)
 		{
 			return $filename;
@@ -183,11 +192,11 @@ class Dms extends APIv1_Controller
 	
 	private function _validate($dms = NULL)
 	{
-		if (!isset($dms['file_content']) || (isset($dms['file_content']) && $dms['file_content'] == ''))
+		if (!isset($dms["file_content"]) || (isset($dms["file_content"]) && $dms["file_content"] == ""))
 		{
 			return false;
 		}
-		if (!isset($dms['name']) || (isset($dms['name']) && $dms['name'] == ''))
+		if (!isset($dms["name"]) || (isset($dms["name"]) && $dms["name"] == ""))
 		{
 			return false;
 		}

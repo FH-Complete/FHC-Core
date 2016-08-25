@@ -93,16 +93,26 @@ class Message_model extends DB_Model
 				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_message m USING (message_id)
 						JOIN public.tbl_person p ON (p.person_id = m.person_id)
 						JOIN (
-							SELECT * FROM public.tbl_msg_status ORDER BY insertamum DESC
+							SELECT message_id, person_id, status, statusinfo, insertamum
+							  FROM public.tbl_msg_status
+							 %s
+						  ORDER BY insertamum DESC
 						) s ON (m.message_id = s.message_id AND r.person_id = s.person_id)
 				 WHERE r.person_id = ?";
 		
-		if ($all != "true")
+		$parametersArray = array($person_id);
+		
+		if ($all == "true")
 		{
-			$sql .= " AND (s.status < 3 OR s.status IS NULL)";
+			$sql = sprintf($sql, "");
+		}
+		else
+		{
+			array_push($parametersArray, $person_id, $person_id);
+			$sql = sprintf($sql, "WHERE person_id = ? AND message_id NOT IN (SELECT message_id FROM public.tbl_msg_status WHERE status >= 3 AND person_id = ?)");
 		}
 		
-		$result = $this->db->query($sql, array($person_id));
+		$result = $this->db->query($sql, $parametersArray);
 		if (is_object($result))
 			return $this->_success($result->result());
 		else
