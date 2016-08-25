@@ -365,7 +365,7 @@ class MessageLib
 								if ($this->getEmailCfgItem("email_send_immediately") === true)
 								{
 									// Send message by email!
-									$result = $this->sendOne($msg_id, $subject, $parsedText);
+									$resultSendEmail = $this->sendOne($msg_id, $subject, $parsedText);
 								}
 							}
 						}

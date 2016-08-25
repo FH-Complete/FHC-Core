@@ -97,6 +97,11 @@ class Message_model extends DB_Model
 						) s ON (m.message_id = s.message_id AND r.person_id = s.person_id)
 				 WHERE r.person_id = ?";
 		
+		if ($all != "true")
+		{
+			$sql .= " AND (s.status < 3 OR s.status IS NULL)";
+		}
+		
 		$result = $this->db->query($sql, array($person_id));
 		if (is_object($result))
 			return $this->_success($result->result());
