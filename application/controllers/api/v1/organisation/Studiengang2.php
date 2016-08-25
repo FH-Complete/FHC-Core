@@ -86,7 +86,24 @@ class Studiengang2 extends APIv1_Controller
 						$this->StudiengangModel->addSelect(
 							"public.tbl_studiengang.*,
 							'' as " . Studiengang2::$PROPERTIES_SEPARATOR . ",
-							lehre.tbl_studienplan.*"
+							lehre.tbl_studienplan.studienplan_id as tbl_sp_studienplan_id,
+							lehre.tbl_studienplan.studienordnung_id as tbl_sp_studienordnung_id,
+							lehre.tbl_studienplan.orgform_kurzbz as tbl_sp_orgform_kurzbz,
+							lehre.tbl_studienplan.version as tbl_sp_version,
+							lehre.tbl_studienplan.bezeichnung as tbl_sp_bezeichnung,
+							lehre.tbl_studienplan.regelstudiendauer as tbl_sp_regelstudiendauer,
+							lehre.tbl_studienplan.sprache as tbl_sp_sprache,
+							lehre.tbl_studienplan.aktiv as tbl_sp_aktiv,
+							lehre.tbl_studienplan.semesterwochen as tbl_sp_semesterwochen,
+							lehre.tbl_studienplan.testtool_sprachwahl as tbl_sp_testtool_sprachwahl,
+							lehre.tbl_studienplan.insertamum as tbl_sp_insertamum,
+							lehre.tbl_studienplan.insertvon as tbl_sp_insertvon,
+							lehre.tbl_studienplan.updateamum as tbl_sp_updateamum,
+							lehre.tbl_studienplan.updatevon as tbl_sp_updatevon,
+							lehre.tbl_studienplan.ext_id as tbl_sp_ext_id,
+							lehre.tbl_studienplan.ects_stpl as tbl_sp_ects_stpl,
+							lehre.tbl_studienplan.pflicht_sws as tbl_sp_pflicht_sws,
+							lehre.tbl_studienplan.pflicht_lvs as tbl_sp_pflicht_lvs"
 						);
 						
 						// Ordering by studiengang_kz and studienplan_id
@@ -133,7 +150,7 @@ class Studiengang2 extends APIv1_Controller
 							}
 							else // After the separator: studienplan
 							{
-								$objStudienplan->{$key} = $value;
+								$objStudienplan->{str_replace("tbl_sp_", "", $key)} = $value;
 							}
 						}
 						else
