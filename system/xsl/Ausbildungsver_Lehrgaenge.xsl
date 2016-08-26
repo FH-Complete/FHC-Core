@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet 
-xmlns:fo="http://www.w3.org/1999/XSL/Format" 
-xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+<xsl:stylesheet
+xmlns:fo="http://www.w3.org/1999/XSL/Format"
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 version="1.0"
-xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" 
-xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" 
-xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" 
-xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" 
+xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
 xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"
-xmlns:xlink="http://www.w3.org/1999/xlink" 
-xmlns:dc="http://purl.org/dc/elements/1.1/" 
-xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" 
-xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" 
-xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" 
-xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" 
+xmlns:xlink="http://www.w3.org/1999/xlink"
+xmlns:dc="http://purl.org/dc/elements/1.1/"
+xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
+xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0"
+xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0"
+xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 >
 
 <xsl:output method="xml" version="1.0" indent="yes"/>
@@ -467,7 +467,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
         </text:span><text:tab/><xsl:value-of select="svnr"/></text:span>
       </text:p>
       <text:p text:style-name="P11"/>
-      <text:p text:style-name="P4">(kurz „a.o. Studentin“ bzw. „a.o. Student“ genannt) andererseits, im Rahmen des Lehrgangs zur Weiterbildung nach §9 FHStG idgF</text:p>
+      <text:p text:style-name="P4">(kurz „ao. Studentin“ bzw. „ao. Student“ genannt) andererseits, im Rahmen des Lehrgangs zur Weiterbildung nach §9 FHStG idgF</text:p>
       <text:p text:style-name="P11"/>
       <xsl:variable select="studiengang" name="studiengang"/>
 	  <xsl:variable name="stglaenge" select="format-number((string-length($studiengang)*0.23), '#.00')"/>
@@ -477,7 +477,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       		</text:span>
       </text:p>
       <text:p text:style-name="P11"/>
-      <text:p text:style-name="P4"> in der Organisationsform eines 
+      <text:p text:style-name="P4"> in der Organisationsform eines
 	<xsl:choose>
 		<xsl:when test="orgform = 'BB'" >
 			berufsbegleitenden Lehrgangs zur Weiterbildung.
@@ -526,7 +526,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       </text:list>
       <text:p text:style-name="P5">Die Ausbildungsdauer beträgt <draw:control text:anchor-type="as-char" draw:z-index="7" draw:style-name="gr3" draw:text-style-name="P141" svg:y="-0.45cm" svg:width="0.4cm" svg:height="0.5cm" draw:control="control2"/> Semester.</text:p>
       <text:p text:style-name="P5"/>
-      <text:p text:style-name="P5">Die a.o. Studentin bzw. der a.o. Student hat das Recht, eine Anerkennung nachgewiesener Kenntnisse beim Lehrgang zu beantragen. Eine solche Anerkennung setzt voraus, dass die erworbenen Kenntnisse mit dem Inhalt und dem Umfang der Lehrveranstaltung sind und bewirkt die Anrechnung der entsprechenden Lehrveranstaltung.</text:p>
+      <text:p text:style-name="P5">Die ao. Studentin bzw. der ao. Student hat das Recht, eine Anerkennung nachgewiesener Kenntnisse beim Lehrgang zu beantragen. Eine solche Anerkennung setzt voraus, dass die erworbenen Kenntnisse mit dem Inhalt und dem Umfang der Lehrveranstaltung gleichwertig sind und bewirkt die Anrechnung der entsprechenden Lehrveranstaltung.</text:p>
 		<text:p text:style-name="P5"/>
       <text:p text:style-name="P14"/>
       <text:list xml:id="list107841840" text:continue-numbering="true" text:style-name="WW8Num7">
@@ -553,7 +553,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       <text:p text:style-name="P27">5.1 Rechte</text:p>
       <text:p text:style-name="P5">Der Erhalter führt eine periodische Überprüfung des Studiums im Hinblick auf Relevanz und Aktualität durch und ist im Einvernehmen mit dem FH-Kollegium berechtigt, daraus Änderungen des Lehrgangs zur Weiterbildung abzuleiten.</text:p>
       <text:p text:style-name="P5"/>
-      <text:p text:style-name="P5">Der Erhalter ist berechtigt, die Daten der/des a.o. Studierenden an den FH Technikum Wien Alumni Club zu übermitteln. Der Alumni Club ist der AbsolventInnenverein der FH Technikum Wien. Er hat zum Ziel, AbsolventInnen, Studierende und Lehrende miteinander zu vernetzen sowie AbsolventInnen laufend über Aktivitäten an der FH Technikum Wien zu informieren. Einer Zusendung von Informationen durch den Alumni Club kann jederzeit widersprochen werden.</text:p>
+      <text:p text:style-name="P5">Der Erhalter ist berechtigt, die Daten der/des ao. Studierenden an den FH Technikum Wien Alumni Club zu übermitteln. Der Alumni Club ist der AbsolventInnenverein der FH Technikum Wien. Er hat zum Ziel, AbsolventInnen, Studierende und Lehrende miteinander zu vernetzen sowie AbsolventInnen laufend über Aktivitäten an der FH Technikum Wien zu informieren. Einer Zusendung von Informationen durch den Alumni Club kann jederzeit widersprochen werden.</text:p>
       <text:list xml:id="list1539722475" text:style-name="WW8Num4">
         <text:list-header>
           <text:p text:style-name="P39"/>
@@ -568,7 +568,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
           <text:p text:style-name="P40">Der Erhalter verpflichtet sich, jedenfalls folgende Dokumente zur Verfügung zu stellen: Studierendenausweis, Diploma Supplement, Urkunde über die Verleihung des akademischen Grades, Studienerfolgsbestätigung, Inskriptionsbestätigung.</text:p>
         </text:list-item>
         <text:list-item>
-          <text:p text:style-name="P40">Der Erhalter verpflichtet sich zur sorgfaltsgemäßen Verwendung der personenbezogenen Daten der a.o. Studierenden. Die Daten werden nur im Rahmen der gesetzlichen und vertraglichen Verpflichtungen sowie des Studienbetriebes verwendet und nicht an nicht berechtigte Dritte weitergegeben.</text:p>
+          <text:p text:style-name="P40">Der Erhalter verpflichtet sich zur sorgfaltsgemäßen Verwendung der personenbezogenen Daten der ao. Studierenden. Die Daten werden nur im Rahmen der gesetzlichen und vertraglichen Verpflichtungen sowie des Studienbetriebes verwendet und nicht an nicht berechtigte Dritte weitergegeben.</text:p>
         </text:list-item>
       </text:list>
       <text:p text:style-name="P38"/>
@@ -576,18 +576,18 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
         <text:list-item>
           <text:list>
             <text:list-item>
-              <text:p text:style-name="P26">Rechte und Pflichten der a.o. Studierenden</text:p>
+              <text:p text:style-name="P26">Rechte und Pflichten der ao. Studierenden</text:p>
             </text:list-item>
           </text:list>
         </text:list-item>
       </text:list>
       <text:p text:style-name="P27">6.1 Rechte</text:p>
-      <text:p text:style-name="P5">Die a.o. Studentin bzw. der a.o. Student hat das Recht auf einen Studienbetrieb gemäß den im Lehrgang zur Weiterbildung idgf und in der Satzung der FH Technikum Wien idgF festgelegten Bedingungen.</text:p>
+      <text:p text:style-name="P5">Die ao. Studentin bzw. der ao. Student hat das Recht auf einen Studienbetrieb gemäß den im Lehrgang zur Weiterbildung idgf und in der Satzung der FH Technikum Wien idgF festgelegten Bedingungen.</text:p>
       <text:p text:style-name="P5"/>
       <text:p text:style-name="P28">6.2 Pflichten</text:p>
       <text:p text:style-name="P29"><text:span text:style-name="T10">6.2.1 Einhaltung studienrelevanter Bestimmungen</text:span></text:p>
       <text:p text:style-name="P5">
-	      Die a.o. Studentin bzw. der a.o. Student ist verpflichtet, insbesondere folgende Bestimmungen einzuhalten:
+	      Die ao. Studentin bzw. der ao. Student ist verpflichtet, insbesondere folgende Bestimmungen einzuhalten:
       </text:p>
 		<text:list xml:id="listausbver621" text:continue-numbering="true" text:style-name="WW8Num4">
         <text:list-item>
@@ -614,24 +614,24 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       <text:p text:style-name="P29"><text:span text:style-name="T10">6.2.2 Lehrgangskosten inkl. Studierendenbeitrag ("ÖH-Beitrag")</text:span>
       </text:p>
       <text:p text:style-name="P5">Voraussetzung für die Geltung dieses Ausbildungsvertrages und für die Teilnahme am Lehrgang ist die erfolgte vollständige Bezahlung der Lehrgangskosten zu den jeweiligen Zahlungsterminen. Bezüglich der Möglichkeiten (teilweiser) Rückerstattungen gelten die AGB der Technikum Wien GmbH für Lehrgänge zur Weiterbildung.
-		Gemäß § 4 Abs 10 FHStG sind a.o. Studierende an Fachhochschulen Mitglieder der Österreichischen HochschülerInnenschaft (ÖH). Der/Die a.o. Studierende hat semesterweise einen ÖH-Beitrag an den Erhalter zu entrichten, der diesen an die ÖH abführt. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum Studium bzw. für dessen Fortsetzung.
+		Gemäß § 4 Abs 10 FHStG sind ao. Studierende an Fachhochschulen Mitglieder der Österreichischen HochschülerInnenschaft (ÖH). Der/Die ao. Studierende hat semesterweise einen ÖH-Beitrag an den Erhalter zu entrichten, der diesen an die ÖH abführt. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum Studium bzw. für dessen Fortsetzung.
 	</text:p>
 
       <text:p text:style-name="P32">6.2.3 Beibringung persönlicher Daten</text:p>
-      <text:p text:style-name="P35">Die a.o. Studentin bzw. der a.o. Student ist verpflichtet, persönliche Daten beizubringen, die auf Grund eines Gesetzes, einer Verordnung oder eines Bescheides vom Erhalter erfasst werden müssen oder zur Erfüllung des Ausbildungsvertrages bzw für den Studienbetrieb unerlässlich sind.</text:p>
+      <text:p text:style-name="P35">Die ao. Studentin bzw. der ao. Student ist verpflichtet, persönliche Daten beizubringen, die auf Grund eines Gesetzes, einer Verordnung oder eines Bescheides vom Erhalter erfasst werden müssen oder zur Erfüllung des Ausbildungsvertrages bzw für den Studienbetrieb unerlässlich sind.</text:p>
       <text:p text:style-name="P32">6.2.4 Aktualisierung eigener Daten und Bezug von Informationen</text:p>
-      <text:p text:style-name="P35">Die a.o. Studentin bzw. der a.o. Student hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Lehrgangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.</text:p>
+      <text:p text:style-name="P35">Die ao. Studentin bzw. der ao. Student hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Lehrgangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.</text:p>
       <text:p text:style-name="P32">6.2.5 Verwertungsrechte</text:p>
-      <text:p text:style-name="P35">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der a.o. Studentin oder dem a.o. Studenten getroffen wurden, ist die a.o. Studentin oder der a.o. Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen auf dessen schriftliche Anfrage hin anzubieten.</text:p>
+      <text:p text:style-name="P35">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der ao. Studentin oder dem ao. Studenten getroffen wurden, ist die ao. Studentin oder der ao. Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen auf dessen schriftliche Anfrage hin anzubieten.</text:p>
       <text:p text:style-name="P32">6.2.6 Aufzeichnungen und Mitschnitte</text:p>
-      <text:p text:style-name="P35">Es ist der/dem a.o. Studierenden ausdrücklich untersagt, Lehrveranstaltungen als Ganzes oder nur Teile davon aufzuzeichnen und/oder mitzuschneiden (z.B. durch Film- und/oder Tonaufnahmen oder sonstige hierfür geeignete audiovisuelle Mittel). Darüber hinaus ist jede Form der öffentlichen Zurverfügungstellung (drahtlos oder drahtgebunden) der vorgenannten Aufnahmen z.B. in sozialen Netzwerken wie Facebook, WhatsAPP, LinkedIn, Xing etc, aber auch auf Youtube, Instagram usw. oder durch sonstige für diese Zwecke geeignete Kommunikationsmittel untersagt. Diese Regelungen gelten sinngemäß auch für Skripten, sonstige Lernbehelfe und Prüfungsangaben.</text:p>
-      <text:p text:style-name="P35">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und zum privaten Gebrauch, sofern hierfür der Vortragende vorab ausdrücklich seine schriftliche Zustimmung erteilt hat.</text:p>
+      <text:p text:style-name="P35">Es ist der/dem ao. Studierenden ausdrücklich untersagt, Lehrveranstaltungen als Ganzes oder nur Teile davon aufzuzeichnen und/oder mitzuschneiden (z.B. durch Film- und/oder Tonaufnahmen oder sonstige hierfür geeignete audiovisuelle Mittel). Darüber hinaus ist jede Form der öffentlichen Zurverfügungstellung (drahtlos oder drahtgebunden) der vorgenannten Aufnahmen z.B. in sozialen Netzwerken wie Facebook, WhatsAPP, LinkedIn, Xing etc, aber auch auf Youtube, Instagram usw. oder durch sonstige für diese Zwecke geeignete Kommunikationsmittel untersagt. Diese Regelungen gelten sinngemäß auch für Skripten, sonstige Lernbehelfe und Prüfungsangaben.</text:p>
+      <text:p text:style-name="P35">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und zum privaten Gebrauch, sofern hierfür der/die Vortragende vorab ausdrücklich seine/ihre schriftliche Zustimmung erteilt hat.</text:p>
       <text:p text:style-name="P31">6.2.7 Geheimhaltungspflicht</text:p>
-      <text:p text:style-name="P5">Die a.o. Studentin bzw. der a.o. Student ist zur Geheimhaltung von Forschungs- und Entwicklungsaktivitäten und -ergebnissen gegenüber Dritten verpflichtet. </text:p>
+      <text:p text:style-name="P5">Die ao. Studentin bzw. der ao. Student ist zur Geheimhaltung von Forschungs- und Entwicklungsaktivitäten und -ergebnissen gegenüber Dritten verpflichtet. </text:p>
       <text:p text:style-name="P31">6.2.8 Schadensmeldung</text:p>
-      <text:p text:style-name="P5">Im Falle des Eintretens eines Schadens am Inventar der Fachhochschule ist der/die a.o. Studierende verpflichtet, diesen innerhalb von drei Tagen dem Lehrgangssekretariat zu melden. Allfällige Haftungsansprüche bleiben hiervon unberührt.</text:p>
+      <text:p text:style-name="P5">Im Falle des Eintretens eines Schadens am Inventar der Fachhochschule ist der/die ao. Studierende verpflichtet, diesen innerhalb von drei Tagen dem Lehrgangssekretariat zu melden. Allfällige Haftungsansprüche bleiben hiervon unberührt.</text:p>
       <text:p text:style-name="P31">6.2.9 Rückgabeverpflichtung bei Studienende</text:p>
-      <text:p text:style-name="P5">Die a.o. Studentin bzw. der a.o. Student ist verpflichtet, bei einer Beendigung des Lehrgangs unverzüglich alle zur Verfügung gestellten Gerätschaften, Bücher, Schlüssel und sonstige Materialien zurückzugeben.</text:p>
+      <text:p text:style-name="P5">Die ao. Studentin bzw. der ao. Student ist verpflichtet, bei einer Beendigung des Lehrgangs unverzüglich alle zur Verfügung gestellten Gerätschaften, Bücher, Schlüssel und sonstige Materialien zurückzugeben.</text:p>
 
       <text:p text:style-name="P38"/>
       <text:list xml:id="list866389060" text:continue-list="list1403787711" text:style-name="WW8Num7">
@@ -646,14 +646,14 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       <text:p text:style-name="P27">7.1 Auflösung im beiderseitigen Einvernehmen</text:p>
       <text:p text:style-name="P8">Im beiderseitigen Einvernehmen ist die Auflösung des Ausbildungsvertrages jederzeit ohne Angabe von Gründen möglich. Die einvernehmliche Auflösung bedarf der Schriftform.</text:p>
       <text:p text:style-name="P3"/>
-      <text:p text:style-name="P27">7.2 Kündigung durch die a.o. Studentin bzw. den a.o. Studenten</text:p>
-      <text:p text:style-name="P8">Die a.o. Studentin bzw. der a.o. Student kann den Ausbildungsvertrag schriftlich jeweils zum Ende eines Semesters kündigen. Die Verpflichtung zur vollständigen Leistung der Lehrgangskosten wird von einer Kündigung durch die a.o. Studentin bzw. den a.o. Studenten nicht berührt.</text:p>
+      <text:p text:style-name="P27">7.2 Kündigung durch die ao. Studentin bzw. den ao. Studenten</text:p>
+      <text:p text:style-name="P8">Die ao. Studentin bzw. der ao. Student kann den Ausbildungsvertrag schriftlich jeweils zum Ende eines Semesters kündigen. Die Verpflichtung zur vollständigen Leistung der Lehrgangskosten wird von einer Kündigung durch die ao. Studentin bzw. den ao. Studenten nicht berührt.</text:p>
       <text:p text:style-name="P3"/>
       <text:p text:style-name="P27">7.3 Automatische Beendigung des Vertrages</text:p>
       <text:p text:style-name="P8">Der Ausbildungsvertrag erlischt mit dem Abschluss des Lehrgangs. Der Vertrag endet automatisch durch die negative Beurteilung der letztmöglichen Prüfungswiederholung, in diesem Fall bleibt die Verpflichtung zur vollständigen Leistung der Lehrgangskosten unberührt.</text:p>
       <text:p text:style-name="P3"/>
       <text:p text:style-name="P27">7.4 Ausschluss durch den Erhalter</text:p>
-      <text:p text:style-name="P5">Der Erhalter kann die a.o. Studentin bzw. den a.o. Studenten aus wichtigem Grund mit sofortiger Wirkung vom weiteren Studium ausschließen, und zwar beispielsweise wegen</text:p>
+      <text:p text:style-name="P5">Der Erhalter kann die ao. Studentin bzw. den ao. Studenten aus wichtigem Grund mit sofortiger Wirkung vom weiteren Studium ausschließen, und zwar beispielsweise wegen</text:p>
       <text:list xml:id="list1474649563" text:continue-list="list1358297633" text:style-name="WW8Num4">
         <text:list-item>
           <text:p text:style-name="P40">nicht genügender Leistung im Sinne der Prüfungsordnung;</text:p>
@@ -706,7 +706,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
         </text:list-item>
       </text:list>
       <text:p text:style-name="P5">
-        A.o. Studierende des Programms sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehrelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet und e-mail) trägt der a.o. Student bzw. die a.o. Studentin.
+        Ao. Studierende des Programms sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehrelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet und e-mail) trägt der ao. Student bzw. die ao. Studentin.
       </text:p>
       <text:p text:style-name="P5"/>
 
@@ -731,7 +731,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
           </text:list>
         </text:list-item>
       </text:list>
-      <text:p text:style-name="P5">Die Ausfertigung dieses Vertrages erfolgt in zweifacher Ausführung. Ein Original verbleibt im zuständigen Administrationsbüro des Lehrgangs. Eine Ausfertigung wird der a.o. Studentin bzw. dem a.o. Studenten übergeben.</text:p>
+      <text:p text:style-name="P5">Die Ausfertigung dieses Vertrages erfolgt in zweifacher Ausführung. Ein Original verbleibt im zuständigen Administrationsbüro des Lehrgangs. Eine Ausfertigung wird der ao. Studentin bzw. dem ao. Studenten übergeben.</text:p>
       <text:p text:style-name="P5">Für Streitigkeiten aus diesem Vertrag gilt österreichisches Recht als vereinbart, allfällige Klagen sind beim sachlich zuständigen Gericht in Wien einzubringen.</text:p>
       <text:p text:style-name="P5">Der Ausbildungsvertrag ist gebührenfrei.</text:p>
       <text:p text:style-name="P5"/>
@@ -760,7 +760,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.1">
           <table:table-cell table:style-name="Tabelle1.A2" office:value-type="string">
-            <text:p text:style-name="P20">Die a.o. Studentin/der a.o. Student<text:line-break/>ggf. gesetzliche VertreterInnen</text:p>
+            <text:p text:style-name="P20">Die ao. Studentin/der ao. Student<text:line-break/>ggf. gesetzliche VertreterInnen</text:p>
           </table:table-cell>
           <table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
             <text:p text:style-name="P21"/>
