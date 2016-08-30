@@ -55,10 +55,7 @@ class Gemeinde extends APIv1_Controller
 		
 		if (is_numeric($plz))
 		{
-			$this->GemeindeModel->addSelect("DISTINCT ON (ortschaftsname) ortschaftsname, gemeinde_id, plz, name, ortschaftskennziffer, bulacode, bulabez, kennziffer");
-			$this->GemeindeModel->addOrder("ortschaftsname");
-			
-			$result = $this->GemeindeModel->loadWhere(array("plz" => $plz));
+			$result = $this->GemeindeModel->getGemeindeByPlz($plz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

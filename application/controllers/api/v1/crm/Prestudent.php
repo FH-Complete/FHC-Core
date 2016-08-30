@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if (!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined("BASEPATH")) exit("No direct script access allowed");
 
 class Prestudent extends APIv1_Controller
 {
@@ -23,7 +23,9 @@ class Prestudent extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PrestudentModel
-		$this->load->model('crm/prestudent_model', 'PrestudentModel');
+		$this->load->model("crm/prestudent_model", "PrestudentModel");
+		// Load library ReihungstestLib
+		$this->load->library("ReihungstestLib");
 	}
 
 	/**
@@ -31,7 +33,7 @@ class Prestudent extends APIv1_Controller
 	 */
 	public function getPrestudent()
 	{
-		$prestudentID = $this->get('prestudent_id');
+		$prestudentID = $this->get("prestudent_id");
 		
 		if (isset($prestudentID))
 		{
@@ -50,11 +52,11 @@ class Prestudent extends APIv1_Controller
 	 */
 	public function getPrestudentByPersonID()
 	{
-		$person_id = $this->get('person_id');
+		$person_id = $this->get("person_id");
 		
 		if (isset($person_id))
 		{
-			$result = $this->PrestudentModel->load(array('person_id' => $person_id));
+			$result = $this->PrestudentModel->load(array("person_id" => $person_id));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -71,9 +73,9 @@ class Prestudent extends APIv1_Controller
 	{
 		if ($this->_validate($this->post()))
 		{
-			if (isset($this->post()['prestudent_id']))
+			if (isset($this->post()["prestudent_id"]))
 			{
-				$result = $this->PrestudentModel->update($this->post()['prestudent_id'], $this->post());
+				$result = $this->PrestudentModel->update($this->post()["prestudent_id"], $this->post());
 			}
 			else
 			{
@@ -95,22 +97,18 @@ class Prestudent extends APIv1_Controller
 	{
 		$ddReihungstest = $this->_parseData($this->post());
 		
-		if ($this->_validateAddReihungstest($ddReihungstest))
+		if ($this->_validateReihungstest($ddReihungstest))
 		{
-			$this->load->model('crm/RtPerson_model', 'RtPersonModel');
-			
-			if(isset($ddReihungstest['new']) && $ddReihungstest['new'] == true)
+			if(isset($ddReihungstest["new"]) && $ddReihungstest["new"] == true)
 			{
 				// Remove new parameter to avoid DB insert errors
-				unset($ddReihungstest['new']);
+				unset($ddReihungstest["new"]);
 				
-				$result = $this->RtPersonModel->insert($ddReihungstest);
+				$result = $this->reihungstestlib->insertPersonReihungstest($ddReihungstest);
 			}
 			else
 			{
-				$pksArray = array($ddReihungstest['person_id'], $ddReihungstest['rt_id']);
-				
-				$result = $this->RtPersonModel->update($pksArray, $ddReihungstest);
+				$result = $this->reihungstestlib->updatePersonReihungstest($ddReihungstest);
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
@@ -128,11 +126,9 @@ class Prestudent extends APIv1_Controller
 	{
 		$ddReihungstest = $this->_parseData($this->post());
 		
-		if ($this->_validateAddReihungstest($ddReihungstest))
+		if (isset($ddReihungstest["rt_person_id"]))
 		{
-			$this->load->model('crm/RtPerson_model', 'RtPersonModel');
-			
-			$result = $this->RtPersonModel->delete($ddReihungstest['rt_person_id'], $ddReihungstest);
+			$result = $this->reihungstestlib->deletePersonReihungstest($ddReihungstest);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -147,9 +143,9 @@ class Prestudent extends APIv1_Controller
 		return true;
 	}
 	
-	private function _validateAddReihungstest($ddReihungstest = NULL)
+	private function _validateReihungstest($ddReihungstest = NULL)
 	{
-		if (!isset($ddReihungstest['person_id']) || !isset($ddReihungstest['rt_id']))
+		if (!isset($ddReihungstest["person_id"]) || !isset($ddReihungstest["rt_id"]) || !isset($ddReihungstest["studienplan_id"]))
 		{
 			return false;
 		}

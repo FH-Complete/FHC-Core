@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if (!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined("BASEPATH")) exit("No direct script access allowed");
 
 class Reihungstest extends APIv1_Controller
 {
@@ -23,7 +23,9 @@ class Reihungstest extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model ReihungstestModel
-		$this->load->model('crm/reihungstest_model', 'ReihungstestModel');
+		$this->load->model("crm/reihungstest_model", "ReihungstestModel");
+		// Load library ReihungstestLib
+		$this->load->library("ReihungstestLib");
 	}
 
 	/**
@@ -31,7 +33,7 @@ class Reihungstest extends APIv1_Controller
 	 */
 	public function getReihungstest()
 	{
-		$reihungstestID = $this->get('reihungstest_id');
+		$reihungstestID = $this->get("reihungstest_id");
 		
 		if (isset($reihungstestID))
 		{
@@ -50,15 +52,15 @@ class Reihungstest extends APIv1_Controller
 	 */
 	public function getByStudiengangStudiensemester()
 	{
-		$studiengang_kz = $this->get('studiengang_kz');
-		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
+		$studiengang_kz = $this->get("studiengang_kz");
+		$studiensemester_kurzbz = $this->get("studiensemester_kurzbz");
 		
 		if (isset($studiengang_kz))
 		{
-			$parameters = array('studiengang_kz' => $studiengang_kz);
+			$parameters = array("studiengang_kz" => $studiengang_kz);
 			if (isset($studiensemester_kurzbz))
 			{
-				$parameters['studiensemester_kurzbz'] = $studiensemester_kurzbz;
+				$parameters["studiensemester_kurzbz"] = $studiensemester_kurzbz;
 			}
 			$result = $this->ReihungstestModel->loadWhere($parameters);
 			
@@ -75,23 +77,11 @@ class Reihungstest extends APIv1_Controller
 	 */
 	public function getReihungstestByPersonID()
 	{
-		$person_id = $this->get('person_id');
+		$person_id = $this->get("person_id");
 		
 		if (isset($person_id))
 		{
-			$result = $this->ReihungstestModel->addJoin('public.tbl_rt_person', 'reihungstest_id = rt_id');
-			if ($result->error == EXIT_SUCCESS)
-			{
-				$result = $this->ReihungstestModel->addJoin('public.tbl_person', 'person_id');
-				if ($result->error == EXIT_SUCCESS)
-				{
-					$result = $this->ReihungstestModel->addJoin('public.tbl_ort', 'tbl_ort.ort_kurzbz = tbl_rt_person.ort_kurzbz', 'LEFT');
-					if ($result->error == EXIT_SUCCESS)
-					{
-						$result = $this->ReihungstestModel->loadWhere(array('person_id' => $person_id));
-					}
-				}
-			}
+			$result = $this->reihungstestlib->getReihungstestByPersonID($person_id);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -108,9 +98,9 @@ class Reihungstest extends APIv1_Controller
 	{
 		if ($this->_validate($this->post()))
 		{
-			if (isset($this->post()['reihungstest_id']))
+			if (isset($this->post()["reihungstest_id"]))
 			{
-				$result = $this->ReihungstestModel->update($this->post()['reihungstest_id'], $this->post());
+				$result = $this->ReihungstestModel->update($this->post()["reihungstest_id"], $this->post());
 			}
 			else
 			{
