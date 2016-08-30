@@ -16,6 +16,8 @@ class MigrationLib extends CI_Migration
 	const ERROR_COLOR = 31;
 	const INFO_COLOR = 33;
 	
+	const PRINT_QUERY_LEN = 60;
+	
 	// HTML colors names
 	private $HTML_COLORS = array(31 => "red", 33 => "orange");
 	// Used to set if the migration process is called via command line or via browser
@@ -539,6 +541,10 @@ class MigrationLib extends CI_Migration
 			}
 		}
 		
-		$this->printInfo("Query correctly executed");
+		$this->printInfo(
+			"Query correctly executed: " .
+			substr(preg_replace("/\s+/", " ", trim($query)), 0, MigrationLib::PRINT_QUERY_LEN) .
+			(strlen($query) > MigrationLib::PRINT_QUERY_LEN ? "..." : "")
+		);
 	}
 }
