@@ -74,17 +74,20 @@ class Person extends APIv1_Controller
 		{
 			if(isset($person["person_id"]) && !(is_null($person["person_id"])) && ($person["person_id"] != ""))
 			{
-				$result = $this->PersonModel->update($person["person_id"], $person);
-			}
-			else
-			{
-				$result =  $this->PersonModel->loadWhere(array("SUBSTRING(svnr FROM 1 FOR 10) = " => $person["svnr"]));
+				$result =  $this->PersonModel->loadWhere(array(
+					"person_id != " => $person["person_id"],
+					"SUBSTRING(svnr FROM 1 FOR 10) = " => $person["svnr"])
+				);
 				if (is_object($result) && $result->error == EXIT_SUCCESS &&
 					is_array($result->retval) && count($result->retval) > 0)
 				{
 					$person["svnr"] = $person["svnr"] . "v" . count($result->retval);
 				}
 				
+				$result = $this->PersonModel->update($person["person_id"], $person);
+			}
+			else
+			{
 				$result = $this->PersonModel->insert($person);
 			}
 			
