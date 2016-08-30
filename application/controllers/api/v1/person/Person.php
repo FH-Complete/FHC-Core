@@ -74,6 +74,7 @@ class Person extends APIv1_Controller
 		{
 			if(isset($person["person_id"]) && !(is_null($person["person_id"])) && ($person["person_id"] != ""))
 			{
+				$this->PersonModel->addOrder("svnr", "DESC");
 				$result =  $this->PersonModel->loadWhere(array(
 					"person_id != " => $person["person_id"],
 					"SUBSTRING(svnr FROM 1 FOR 10) = " => $person["svnr"])
@@ -81,7 +82,14 @@ class Person extends APIv1_Controller
 				if (is_object($result) && $result->error == EXIT_SUCCESS &&
 					is_array($result->retval) && count($result->retval) > 0)
 				{
-					$person["svnr"] = $person["svnr"] . "v" . count($result->retval);
+					if (count($result->retval) == 1)
+					{
+						$person["svnr"] = $person["svnr"] . "v1";
+					}
+					else
+					{
+						$person["svnr"] = $person["svnr"] . "v" . ($result->retval[0]->svnr{11} + 1);
+					}
 				}
 				
 				$result = $this->PersonModel->update($person["person_id"], $person);
