@@ -13,7 +13,7 @@
  */
 // ------------------------------------------------------------------------
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (! defined("BASEPATH")) exit("No direct script access allowed");
 
 class Kontakt extends APIv1_Controller
 {
@@ -24,9 +24,7 @@ class Kontakt extends APIv1_Controller
     {
 		parent::__construct();
 		// Load model PersonModel
-		$this->load->model('person/kontakt_model', 'KontaktModel');
-		
-		
+		$this->load->model("person/kontakt_model", "KontaktModel");
     }
 
 	public function getKontakt()
@@ -35,15 +33,7 @@ class Kontakt extends APIv1_Controller
 		
 		if (isset($kontakt_id))
 		{
-			$result = $this->KontaktModel->addJoin('public.tbl_standort', 'standort_id', 'LEFT');
-			if ($result->error == EXIT_SUCCESS)
-			{
-				$result = $this->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT');
-				if ($result->error == EXIT_SUCCESS)
-				{
-					$result = $this->KontaktModel->loadWhere(array('kontakt_id' => $kontakt_id));
-				}
-			}
+			$result = $this->KontaktModel->getWholeKontakt($kontakt_id);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -59,7 +49,7 @@ class Kontakt extends APIv1_Controller
 		
 		if (isset($kontakt_id))
 		{
-			$result = $this->KontaktModel->loadWhere(array('kontakt_id' => $kontakt_id));
+			$result = $this->KontaktModel->load($kontakt_id);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -75,15 +65,7 @@ class Kontakt extends APIv1_Controller
 		
 		if (isset($person_id))
 		{
-			$result = $this->KontaktModel->addJoin('public.tbl_standort', 'standort_id', 'LEFT');
-			if ($result->error == EXIT_SUCCESS)
-			{
-				$result = $this->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT');
-				if ($result->error == EXIT_SUCCESS)
-				{
-					$result = $this->KontaktModel->loadWhere(array('person_id' => $person_id));
-				}
-			}
+			$result = $this->KontaktModel->getWholeKontakt(null, $person_id);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -99,7 +81,7 @@ class Kontakt extends APIv1_Controller
 		
 		if (isset($person_id))
 		{
-			$result = $this->KontaktModel->loadWhere(array('person_id' => $person_id));
+			$result = $this->KontaktModel->loadWhere(array("person_id" => $person_id));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -116,15 +98,7 @@ class Kontakt extends APIv1_Controller
 		
 		if (isset($person_id) && isset($kontakttyp))
 		{
-			$result = $this->KontaktModel->addJoin('public.tbl_standort', 'standort_id', 'LEFT');
-			if ($result->error == EXIT_SUCCESS)
-			{
-				$result = $this->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT');
-				if ($result->error == EXIT_SUCCESS)
-				{
-					$result = $this->KontaktModel->loadWhere(array('person_id' => $person_id, 'kontakttyp' => $kontakttyp));
-				}
-			}
+			$result = $this->KontaktModel->getWholeKontakt(null, $person_id, $kontakttyp);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -140,9 +114,9 @@ class Kontakt extends APIv1_Controller
 		
 		if (is_array($post))
 		{
-			if (isset($post['kontakt_id']))
+			if (isset($post["kontakt_id"]))
 			{
-				$result = $this->KontaktModel->update($post['kontakt_id'], $post);
+				$result = $this->KontaktModel->update($post["kontakt_id"], $post);
 			}
 			else
 			{

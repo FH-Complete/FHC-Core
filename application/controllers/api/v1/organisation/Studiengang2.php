@@ -15,8 +15,6 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
 
 class Studiengang2 extends APIv1_Controller
 {
-	private static $PROPERTIES_SEPARATOR = "properties_separator";
-
 	/**
 	 * Course API constructor.
 	 */

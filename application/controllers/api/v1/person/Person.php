@@ -31,28 +31,51 @@ class Person extends APIv1_Controller
 	 */
 	public function getPerson()
 	{
-		$personID = $this->get("person_id");
+		$person_id = $this->get("person_id");
 		$code = $this->get("code");
 		$email = $this->get("email");
 		
-		if (isset($code) || isset($email) || isset($personID))
+		if (isset($code) || isset($email) || isset($person_id))
 		{
 			if (isset($code) && isset($email))
 			{
-				$result = $this->PersonModel->addJoin("public.tbl_kontakt", "person_id");
-				if ($result->error == EXIT_SUCCESS)
-				{
-					$result = $this->PersonModel->loadWhere(array("zugangscode" => $code, "kontakt" => $email));
-				}
-			}
-			elseif (isset($code))
-			{
-				$result = $this->PersonModel->loadWhere(array("zugangscode" => $code));
+				$result = $this->PersonModel->getPersonKontaktByZugangscode($code, $email);
 			}
 			else
 			{
-				$result = $this->PersonModel->load($personID);
+				$parametersArray = array();
+				
+				if (isset($code))
+				{
+					$parametersArray["zugangscode"] = $code;
+				}
+				else
+				{
+					$parametersArray["person_id"] = $person_id;
+				}
+				
+				$result = $this->PersonModel->loadWhere($parametersArray);
 			}
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	/**
+	 * @return void
+	 */
+	public function getCheckBewerbung()
+	{
+		$email = $this->get("email");
+		$studiensemester_kurzbz = $this->get("studiensemester_kurzbz");
+		
+		if (isset($email))
+		{
+			$result = $this->PersonModel->checkBewerbung($email, $studiensemester_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -74,28 +97,7 @@ class Person extends APIv1_Controller
 		{
 			if(isset($person["person_id"]) && !(is_null($person["person_id"])) && ($person["person_id"] != ""))
 			{
-				if (isset($person["svnr"]) && $person["svnr"] != "")
-				{
-					$this->PersonModel->addOrder("svnr", "DESC");
-					$result =  $this->PersonModel->loadWhere(array(
-						"person_id != " => $person["person_id"],
-						"SUBSTRING(svnr FROM 1 FOR 10) = " => $person["svnr"])
-					);
-					if (is_object($result) && $result->error == EXIT_SUCCESS &&
-						is_array($result->retval) && count($result->retval) > 0)
-					{
-						if (count($result->retval) == 1)
-						{
-							$person["svnr"] = $person["svnr"] . "v1";
-						}
-						else
-						{
-							$person["svnr"] = $person["svnr"] . "v" . ($result->retval[0]->svnr{11} + 1);
-						}
-					}
-				}
-				
-				$result = $this->PersonModel->update($person["person_id"], $person);
+				$result = $this->PersonModel->updatePerson($person);
 			}
 			else
 			{
@@ -107,26 +109,6 @@ class Person extends APIv1_Controller
 		else
 		{
 			$this->response($validation, REST_Controller::HTTP_OK);
-		}
-	}
-	
-	/**
-	 * @return void
-	 */
-	public function getCheckBewerbung()
-	{
-		$email = $this->get("email");
-		$studiensemester_kurzbz = $this->get("studiensemester_kurzbz");
-		
-		if (isset($email))
-		{
-			$result = $this->PersonModel->checkBewerbung($email, $studiensemester_kurzbz);
-			
-			$this->response($result, REST_Controller::HTTP_OK);
-		}
-		else
-		{
-			$this->response();
 		}
 	}
 	

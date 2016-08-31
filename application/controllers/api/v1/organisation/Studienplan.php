@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if (!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined("BASEPATH")) exit("No direct script access allowed");
 
 class Studienplan extends APIv1_Controller
 {
@@ -23,14 +23,12 @@ class Studienplan extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PersonModel
-		$this->load->model('organisation/studienplan_model', 'StudienplanModel');
-		
-		
+		$this->load->model("organisation/studienplan_model", "StudienplanModel");
 	}
 	
 	public function getStudienplan()
 	{
-		$studienplan_id = $this->get('studienplan_id');
+		$studienplan_id = $this->get("studienplan_id");
 		
 		if (isset($studienplan_id))
 		{
@@ -46,15 +44,11 @@ class Studienplan extends APIv1_Controller
 	
 	public function getStudienplaene()
 	{
-		$studiengang_kz = $this->get('studiengang_kz');
+		$studiengang_kz = $this->get("studiengang_kz");
 		
 		if (isset($studiengang_kz))
 		{
-			$result = $this->StudienplanModel->addJoin('lehre.tbl_studienordnung', 'studienordnung_id');
-			if ($result->error == EXIT_SUCCESS)
-			{
-				$result = $this->StudienplanModel->loadWhere(array('studiengang_kz' => $this->get('studiengang_kz')));
-			}
+			$result = $this->StudienplanModel->getStudienplaene($studiengang_kz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -66,37 +60,19 @@ class Studienplan extends APIv1_Controller
 	
 	public function getStudienplaeneFromSem()
 	{
-		$studiengang_kz = $this->get('studiengang_kz');
-		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
-		$ausbildungssemester = $this->get('ausbildungssemester');
-		$orgform_kurzbz = $this->get('orgform_kurzbz');
+		$studiengang_kz = $this->get("studiengang_kz");
+		$studiensemester_kurzbz = $this->get("studiensemester_kurzbz");
+		$ausbildungssemester = $this->get("ausbildungssemester");
+		$orgform_kurzbz = $this->get("orgform_kurzbz");
 		
 		if (isset($studiengang_kz) && isset($studiensemester_kurzbz))
 		{
-			$result = $this->StudienplanModel->addJoin('lehre.tbl_studienordnung', 'studienordnung_id');
-			if ($result->error == EXIT_SUCCESS)
-			{
-				$result = $this->StudienplanModel->addJoin('lehre.tbl_studienplan_semester', 'studienplan_id');
-				if ($result->error == EXIT_SUCCESS)
-				{
-					$whereArray = array('tbl_studienplan.aktiv' => 'TRUE',
-										'tbl_studienordnung.studiengang_kz' => $studiengang_kz,
-										'tbl_studienplan_semester.studiensemester_kurzbz' => $studiensemester_kurzbz
-									);
-					
-					if(isset($ausbildungssemester))
-					{
-						$whereArray['tbl_studienplan_semester.semester'] = $ausbildungssemester;
-					}
-					
-					if(isset($orgform_kurzbz))
-					{
-						$whereArray['orgform_kurzbz'] = $orgform_kurzbz;
-					}
-					
-					$result = $this->StudienplanModel->loadWhere($whereArray);
-				}
-			}
+			$result = $this->StudienplanModel->getStudienplaeneBySemester(
+				$studiengang_kz,
+				$studiensemester_kurzbz,
+				$ausbildungssemester,
+				$orgform_kurzbz
+			);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

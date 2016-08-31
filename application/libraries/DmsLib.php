@@ -119,7 +119,7 @@ class DmsLib
 	{
 		$filename = uniqid() . "." . pathinfo($dms["name"], PATHINFO_EXTENSION);
 		
-		return $this->ci->DmsFSModel->write($filename, $dms["file_content"]);
+		$result = $this->ci->DmsFSModel->write($filename, $dms["file_content"]);
 		if (is_object($result) && $result->error == EXIT_SUCCESS)
 		{
 			$result->retval = $filename;
