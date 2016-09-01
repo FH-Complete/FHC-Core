@@ -894,14 +894,14 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<style:header>
 				<text:p text:style-name="MP1">
 					<draw:frame draw:style-name="Mfr1" draw:name="Grafik1" text:anchor-type="char" svg:x="13.259cm" svg:y="-0.24cm" svg:width="4.193cm" svg:height="2.17cm" draw:z-index="10">
-						<draw:image xlink:href="Pictures/10000201000000FD000000821F8BE35A4B4BEF78.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+						<draw:image xlink:href="Pictures/tw_logo.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 					</draw:frame>
 				</text:p>
 			</style:header>
 			<style:header-first>
 				<text:p text:style-name="MP1">
 					<draw:frame draw:style-name="Mfr1" draw:name="Bild1" text:anchor-type="char" svg:x="13.259cm" svg:y="-0.24cm" svg:width="4.193cm" svg:height="2.17cm" draw:z-index="11">
-						<draw:image xlink:href="Pictures/10000201000000FD000000821F8BE35A4B4BEF78.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+						<draw:image xlink:href="Pictures/tw_logo.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 					</draw:frame>
 				</text:p>
 			</style:header-first>
