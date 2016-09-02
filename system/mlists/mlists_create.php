@@ -35,11 +35,7 @@
 	$num_rows=$db->db_num_rows($result_stg);
 	$ss=new studiensemester();
 	$ss_nearest=$ss->getNearest();
-	$ss_akt=$ss->getAkt();
-	if($ss_akt=='')
-		$ss_nearest2=$ss->getNearestFrom($ss_nearest);
-	else
-		$ss_nearest2=$ss_nearest;
+	$ss_nearest_to_akt=$ss->getNearestFrom($ss_nearest);
 
 ?>
 <HTML>
@@ -72,13 +68,13 @@
 			$mg_kurzbz=$row_mg->gruppe_kurzbz;
 			if($row_mg->studiengang_kz==10005 && mb_stripos($mg_kurzbz,'EWU')===0)
 			{
-				echo "EWU Gruppe $mg_kurzbz wird fuer STSEM ".$ss_nearest2." erstellt";
+				echo "EWU Gruppe $mg_kurzbz wird fuer STSEM ".$ss_nearest." und ".$ss_nearest_to_akt." erstellt";
 				// FHTW Warm Up Kurse enthaelt die Teilnehmer des SS auch wenn das WS schon gestartet hat
 			$sql_query='SELECT tbl_benutzergruppe.uid, nachname, vorname '.
 				       'FROM campus.vw_benutzer, public.tbl_benutzergruppe '.
 				       'WHERE vw_benutzer.uid=tbl_benutzergruppe.uid AND '.
 				       "UPPER(gruppe_kurzbz)=UPPER('$mg_kurzbz') AND tbl_benutzergruppe.uid NOT LIKE '\\\\_%' ".
-					   "AND (studiensemester_kurzbz IS NULL OR studiensemester_kurzbz='$ss_nearest2') AND aktiv ORDER BY nachname;";
+					   "AND (studiensemester_kurzbz IS NULL OR studiensemester_kurzbz in(".$db->db_add_param($ss_nearest).",".$db->db_add_param($ss_nearest_to_akt).")) AND aktiv ORDER BY nachname;";
 			}
 			else
 			{
