@@ -614,7 +614,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       <text:p text:style-name="P29"><text:span text:style-name="T10">6.2.2 Lehrgangskosten inkl. Studierendenbeitrag ("ÖH-Beitrag")</text:span>
       </text:p>
       <text:p text:style-name="P5">Voraussetzung für die Geltung dieses Ausbildungsvertrages und für die Teilnahme am Lehrgang ist die erfolgte vollständige Bezahlung der Lehrgangskosten zu den jeweiligen Zahlungsterminen. Bezüglich der Möglichkeiten (teilweiser) Rückerstattungen gelten die AGB der Technikum Wien GmbH für Lehrgänge zur Weiterbildung.
-		Gemäß § 4 Abs 10 FHStG sind ao. Studierende an Fachhochschulen Mitglieder der Österreichischen HochschülerInnenschaft (ÖH). Der/Die ao. Studierende hat semesterweise einen ÖH-Beitrag an den Erhalter zu entrichten, der diesen an die ÖH abführt. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum Studium bzw. für dessen Fortsetzung.
+		Gemäß § 4 Abs. 10 FHStG sind ao. Studierende an Fachhochschulen Mitglieder der Österreichischen HochschülerInnenschaft (ÖH). Der/Die ao. Studierende hat semesterweise einen ÖH-Beitrag an den Erhalter zu entrichten, der diesen an die ÖH abführt. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum Studium bzw. für dessen Fortsetzung.
 	</text:p>
 
       <text:p text:style-name="P32">6.2.3 Beibringung persönlicher Daten</text:p>

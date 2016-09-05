@@ -798,7 +798,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P10"/>
 				<text:p text:style-name="P47">This contract governs the legal relationship between </text:p>
 				<text:p text:style-name="P47">
-					<text:span text:style-name="T6">the University of Applied Sciences Technikum Wien Association,</text:span> 1060 Vienna, Mariahilferstraße 37-39 (referred to as &quot;operator&quot;) on the one hand <text:span text:style-name="T6">and</text:span>
+					<text:span text:style-name="T6">the University of Applied Sciences Technikum Wien Association,</text:span> 1060 Vienna, Mariahilfer Straße 37-39 (referred to as &quot;operator&quot;) on the one hand <text:span text:style-name="T6">and</text:span>
 				</text:p>
 				<text:p text:style-name="P58"/>
 				<text:p text:style-name="P47"/>
@@ -1247,7 +1247,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P34">Die a.o. Studentin bzw. der a.o. Student hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Studiengangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.</text:p>
 				<text:p text:style-name="P36"/>
 				<text:p text:style-name="P48">6.2.2 Providing Personal Data</text:p>
-				<text:p text:style-name="P55">The external student is obliged to produce personal data which must be registered because of a law, regulation or a decision by the operator, or is essential fort he fulfilling of the training contract or fort he program of studies.</text:p>
+				<text:p text:style-name="P55">The external student is obliged to produce personal data which must be registered because of a law, regulation or a decision by the operator, or is essential for the fulfilling of the training contract or for the program of studies.</text:p>
 				<text:p text:style-name="P55"/>
 				<text:p text:style-name="P55"/>
 				<text:p text:style-name="P55">6.2.3 Updating personal data and the retrieval of information</text:p>
@@ -1263,7 +1263,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P32"/>
 				<text:p text:style-name="P35">6.2.5 Aufzeichnungen und Mitschnitte</text:p>
 				<text:p text:style-name="P32">Es ist der/dem a.o. Studierenden ausdrücklich untersagt, Lehrveranstaltungen als Ganzes oder nur Teile davon aufzuzeichnen und/oder mitzuschneiden (z.B. durch Film- und/oder Tonaufnahmen oder sonstige hierfür geeignete audiovisuelle Mittel). Darüber hinaus ist jede Form der öffentlichen Zurverfügungstellung (drahtlos oder drahtgebunden) der vorgenannten Aufnahmen z.B. in sozialen Netzwerken wie Facebook, WhatsAPP, LinkedIn, XING etc, aber auch auf Youtube, Instagram usw. oder durch sonstige für diese Zwecke geeignete Kommunikations-mittel untersagt. Diese Regelungen gelten sinngemäß auch für Skripten, sonstige Lernbehelfe und Prüfungsangaben. </text:p>
-				<text:p text:style-name="P32">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und zum privaten Gebrauch, sofern hierfür der Vortragende vorab ausdrücklich seine schriftliche Zustimmung erteilt hat. </text:p>
+				<text:p text:style-name="P32">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und zum privaten Gebrauch, sofern hierfür der / die Vortragende vorab ausdrücklich seine / ihre schriftliche Zustimmung erteilt hat. </text:p>
 				<text:p text:style-name="P32"/>
 				<text:p text:style-name="P32"/>
 				<text:p text:style-name="P32">

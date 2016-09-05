@@ -733,7 +733,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P54">for external students (attending individual courses of a degree program)</text:p>
 				<text:p text:style-name="P7"/>
 				<text:p text:style-name="P7"/>
-				<text:p text:style-name="P14">This contract governs the legal relationship between <text:span text:style-name="T7">the University of Applied Sciences Technikum Wien Association,</text:span> 1060 Vienna, Mariahilferstraße 37-39 (referred to as &quot;operator&quot;) on the one hand <text:span text:style-name="T7">and</text:span>
+				<text:p text:style-name="P14">This contract governs the legal relationship between <text:span text:style-name="T7">the University of Applied Sciences Technikum Wien Association,</text:span> 1060 Vienna, Mariahilfer Straße 37-39 (referred to as &quot;operator&quot;) on the one hand <text:span text:style-name="T7">and</text:span>
 				</text:p>
 				<text:p text:style-name="P19"/>
 				<text:p text:style-name="P14"/>
@@ -844,7 +844,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 					<text:span text:style-name="Strong_20_Emphasis"> </text:span>
 				</text:p>
 				<text:p text:style-name="P38"/>
-				<text:p text:style-name="P49">Die Ausbildung endet mit der positiven Absolvierung der das jeweilige Studium abschließenden kommissionellen Prüfung. Nach dem Abschluss der vorgeschriebenen Prüfungen wird der akademische Grad Bachelor of Science in Engineering (BSc) durch das FH-Kollegium verliehen. </text:p>
+				<text:p text:style-name="P49">Das außerordentliche Studium endet mit der positiven Absolvierung der in den jeweiligen Lehrveranstaltungen vorgesehenen Leistungsanforderungen. Nach dem positiven Abschluss wird der für die jeweilige Lehrveranstaltung vorgesehene Leistungsnachweis ausgestellt.</text:p>
 				<text:p text:style-name="P26">
 					<text:span text:style-name="Strong_20_Emphasis">
 						<text:span text:style-name="T21">1. Place of Training</text:span>
@@ -1103,7 +1103,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P46">These documents are publically available at www.technikum-wien.at.</text:p>
 				<text:p text:style-name="P74">6.2.2 Studienbeitrag </text:p>
 				<text:p text:style-name="P40">
-					<text:span text:style-name="T51">Die ao. Studentin bzw. der ao. Student</text:span> ist verpflichtet, zwei Wochen vor Beginn jedes Semesters (StudienanfängerInnen: bis 20. August vor Studienbeginn) einen Studienbeitrag gemäß Fachhochschul-Studiengesetz in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Im Falle einer Erhöhung des gesetzlichen Studienbeitragssatzes erhöht sich der angeführte Betrag entsprechend. </text:p>
+					<text:span text:style-name="T51">Die ao. Studentin bzw. der ao. Student</text:span> ist verpflichtet, zwei Wochen vor Beginn jedes Semesters einen Studienbeitrag gemäß Fachhochschul-Studiengesetz in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Im Falle einer Erhöhung des gesetzlichen Studienbeitragssatzes erhöht sich der angeführte Betrag entsprechend. </text:p>
 				<text:p text:style-name="P40">Die vollständige Bezahlung des Studienbeitrags ist Voraussetzung für die Aufnahme bzw. die Fortsetzung des ao. Studiums. Bei Nichtantritt des ao. Studiums oder Abbruch zu Beginn oder während des Semesters verfällt der Studienbeitrag. </text:p>
 				<text:p text:style-name="P40"/>
 				<text:p text:style-name="P47">6.2.3 ÖH-Beitrag</text:p>
@@ -1113,7 +1113,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P47">6.2.4 Unkostenbeitrag </text:p>
 				<text:p text:style-name="P47">Pro Semester ist ein Unkostenbeitrag zu entrichten, wobei es sich nicht um einen Pauschalbetrag handelt. Der Unkostenbeitrag stellt eine Abgeltung für über das Normalmaß hinausgehende Serviceleistungen der FH dar, z.B. Freifächer, Beratung/Info Auslands-studium, Sponsionsfeiern, Vorträge / Job-börse, Mensa etc. </text:p>
 				<text:p text:style-name="P68">6.2.2 Tuition Fees</text:p>
-				<text:p text:style-name="P40">Two weeks before the beginning of each semester (new students: up to August 20 before taking up studies) the external student undertakes to pay tuition fees according to the University of Applied Sciences Studies Act currently to the sum of € 363.36 net payable per semester. In the event of an increase in the legal tuition fees rate, the amount quoted will increase accordingly. </text:p>
+				<text:p text:style-name="P40">Two weeks before the beginning of each semester the external student undertakes to pay tuition fees according to the University of Applied Sciences Studies Act currently to the sum of € 363.36 net payable per semester. In the event of an increase in the legal tuition fees rate, the amount quoted will increase accordingly. </text:p>
 				<text:p text:style-name="P40"/>
 				<text:p text:style-name="P40">Full payment of the tuition fees is a prerequisite both for enrolling on the course and continuing with the degree program. For non-commencement or termination of the <text:span text:style-name="T51">external <text:s/>
 					</text:span>study at the beginning or during the semester, the tuition fee is forfeited. </text:p>
@@ -1147,7 +1147,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P47"/>
 				<text:p text:style-name="P47"/>
 				<text:p text:style-name="P47">6.2.6 Providing Personal Data</text:p>
-				<text:p text:style-name="P47">The external student is obliged to produce personal data which must be registered because of a law, regulation or a decision by the operator, or is essential fort he fulfilling of the training contract or fort he program of studies.</text:p>
+				<text:p text:style-name="P47">The external student is obliged to produce personal data which must be registered because of a law, regulation or a decision by the operator, or is essential for the fulfilling of the training contract or for the program of studies.</text:p>
 				<text:p text:style-name="P96">6.2.<text:span text:style-name="T52">7</text:span> Aktualisierung eigener Daten und Bezug von Informationen</text:p>
 				<text:p text:style-name="P50">
 					<text:span text:style-name="T52">Die ao. Studentin bzw. der ao. Student</text:span> hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Studiengangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.</text:p>
@@ -1171,7 +1171,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P48"/>
 				<text:p text:style-name="P48">6.2.9 Recordings </text:p>
 				<text:p text:style-name="P48">It is expressly forbidden for the external student to record lectures in part or in total (e.g. by using film and / or sound recordings or other audio-visual means suitable for this purpose). In addition, any form of making the aforementioned recordings publically available (wired or wireless) for example in social networks such as Facebook, StudiVZ etc, but also on Youtube, etc., or by other means of communication designed for these purposes is strictly prohibited. These regulations shall apply correspondingly to scripts, other learning aids and examination data. </text:p>
-				<text:p text:style-name="P97">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und zum privaten Gebrauch, sofern hierfür der Vortragende vorab ausdrücklich seine schriftliche Zustimmung erteilt hat.</text:p>
+				<text:p text:style-name="P97">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und zum privaten Gebrauch, sofern hierfür der / die Vortragende vorab ausdrücklich seine / ihre schriftliche Zustimmung erteilt hat.</text:p>
 				<text:p text:style-name="P48"/>
 				<text:p text:style-name="P48">6.2.10 Geheimhaltungspflicht</text:p>				
 				<text:p text:style-name="P48">Die ao. Studentin bzw. der ao. Student ist zur Geheimhaltung von Forschungs- und Entwicklungsaktivitäten und -ergebnissen gegenüber Dritten verpflichtet. </text:p>
@@ -1352,13 +1352,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<xsl:if test="studienplan_sprache = 'English' or ((studiengang_kurzbz ='BEW' or studiengang_kurzbz='BWI') and orgform ='DL')">
 					<text:p text:style-name="P95">8. Ergänzende Vereinbarungen</text:p>
 					<text:p text:style-name="P90"/>
-					<text:p text:style-name="P90">Das gesamte Studienprogramm wird in englischer Sprache angeboten. Die ao. Studentin bzw. der ao. Student erklärt, die englische Sprache in Wort und Schrift in dem für eine akademische Ausbildung erforderlichen Ausmaß zu beherrschen.</text:p>
+					<text:p text:style-name="P90">Falls das gesamte Studienprogramm in englischer Sprache angeboten wird, erklärt die ao. Studentin bzw. der ao. Student, die englische Sprache in Wort und Schrift in dem für eine akademische Ausbildung erforderlichen Ausmaß zu beherrschen.</text:p>
 					<text:p text:style-name="P90"/>
 					<text:p text:style-name="P90">Ao. Studierende des Studiengangs sind verpflichtet, eine EDV-Ausstattung zu beschaffen und zu unterhalten, die es ermöglicht, an den Fernlehrelementen teilzunehmen. Die gesamten Kosten der Anschaffung und des Betriebs (inkl. Kosten für Internet und e-mail) trägt der ao. Student bzw. die ao. Studentin.</text:p>
 					<text:p text:style-name="P90"/>
 					<text:p text:style-name="P94">8. Supplementary Agreements </text:p>
 					<text:p text:style-name="P90"/>
-					<text:p text:style-name="P90">The entire degree program is offered in English. The external student declares he / she masters the English language in word and in writing to the extent necessary for an academic degree program.</text:p>
+					<text:p text:style-name="P90">If the degree program is offered in English, the external student declares to master the English language in word and in writing to the extent necessary for an academic degree program.</text:p>
 					<text:p text:style-name="P90"/>
 					<text:p text:style-name="P90"/>
 					<text:p text:style-name="P90">External students in the program are required to obtain and maintain computer equipment which allows them to participate in the distance learning elements. The total cost of acquisition and operation (including costs for Internet and e-mail) shall be borne by the external student. </text:p>
