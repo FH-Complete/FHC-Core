@@ -85,6 +85,7 @@ if(!$rechte->isBerechtigt('admin'))
 	exit('Sie haben keine Berechtigung');
 }
 
+$startString = "Starten";
 
 if(isset($_POST["start"]) && $_POST["start"] == "start")
 {
@@ -402,6 +403,8 @@ if(isset($_POST["start"]) && $_POST["start"] == "start")
 			echo "</table>";
 		}
 	}
+
+	$startString = "Neu Starten";
 }
 else
 {
@@ -412,10 +415,11 @@ else
 	<p>Hinweis:</p>
 	<p style="color:orange;">Vor diesem Skript sollte <a style="color:red;text-decoration: underline;" href="checksystem.php">Checksystem</a> ausgef&uuml;hrt werden!</p>
 
-	<input type="button" id="startButton" value="Starten" onclick="startScript()"/>
 <?php
 }
-
+?>
+<input style="margin-top: 10px;" type="button" id="startButton" value="<?php echo $startString; ?>" onclick="startScript()"/>
+<?php
 echo '</body></html>';
 
 
