@@ -361,7 +361,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P32"/>
 			<text:p text:style-name="P32"><xsl:value-of select="mitarbeiter/name_gesamt" /></text:p>
 			<text:p text:style-name="P32"><xsl:value-of select="mitarbeiter/anschrift" /></text:p>
-			<text:p text:style-name="P32"><xsl:value-of select="mitarbeiter/plz" /> <xsl:value-of select="mitarbeiter/ort" /></text:p>
+			<text:p text:style-name="P32"><xsl:value-of select="mitarbeiter/plz" /><xsl:text> </xsl:text><xsl:value-of select="mitarbeiter/ort" /></text:p>
 			<xsl:if test="string-length(mitarbeiter/zuhanden)!=0">
 				<text:p text:style-name="P32"><xsl:value-of select="mitarbeiter/zuhanden" /></text:p>
 			</xsl:if>
