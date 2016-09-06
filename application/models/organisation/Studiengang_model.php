@@ -117,7 +117,7 @@ class Studiengang_model extends DB_Model
 		$this->addOrder("public.tbl_studiengang.studiengang_kz");
 		$this->addOrder("lehre.tbl_studienplan.studienplan_id");
 		
-		$result = $this->loadList(
+		$result = $this->loadTree(
 			"tbl_studiengang",
 			array(
 				"tbl_studienplan"
@@ -127,6 +127,43 @@ class Studiengang_model extends DB_Model
 				"lehre.tbl_studienplan_semester.semester" => $ausbildungssemester,
 				"public.tbl_studiengang.aktiv" => $aktiv,
 				"public.tbl_studiengang.onlinebewerbung" => $onlinebewerbung
+			),
+			array(
+				"studienplaene"
+			)
+		);
+		
+		return $result;
+	}
+	
+	/**
+	 * 
+	 */
+	public function getStudiengangBewerbung()
+	{
+		// Join table public.tbl_studiengang with table lehre.tbl_studienordnung on column studiengang_kz
+		$this->addJoin("lehre.tbl_studienordnung", "studiengang_kz");
+		// Then join with table lehre.tbl_studienplan on column studienordnung_id
+		$this->addJoin("lehre.tbl_studienplan", "studienordnung_id");
+		// Then join with table lehre.tbl_studienplan_semester on column studienplan_id
+		$this->addJoin("lehre.tbl_studienplan_semester", "studienplan_id");
+		// Then join with table lehre.tbl_bewerbungsfrist on column studiensemester_kurzbz
+		$this->addJoin("public.tbl_bewerbungstermine", "studiensemester_kurzbz");
+		
+		// Ordering by studiengang_kz and studienplan_id
+		$this->addOrder("public.tbl_studiengang.studiengang_kz");
+		$this->addOrder("lehre.tbl_studienplan.studienplan_id");
+		
+		$result = $this->loadTree(
+			"tbl_studiengang",
+			array(
+				"tbl_studienplan"
+			),
+			array(
+				"public.tbl_studiengang.aktiv" => "true",
+				"public.tbl_studiengang.onlinebewerbung" => "true",
+				"public.tbl_bewerbungstermine.beginn <= " => "NOW()",
+				"public.tbl_bewerbungstermine.ende >= " => "NOW()"
 			),
 			array(
 				"studienplaene"

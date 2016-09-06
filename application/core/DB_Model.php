@@ -192,11 +192,11 @@ class DB_Model extends FHC_Model
 	 *
 	 * TODO:
 	 * - Adding support for composed primary key
-	 * - Adding support for cascading side tables
+	 * - Adding support for cascading side tables (?)
 	 *
 	 * @return  array
 	 */
-	public function loadList($mainTable, $sideTables, $where = null, $sideTablesAliases = null)
+	public function loadTree($mainTable, $sideTables, $where = null, $sideTablesAliases = null)
 	{
 		// Check Class-Attributes
 		if (is_null($this->dbTable))
@@ -247,7 +247,6 @@ class DB_Model extends FHC_Model
 			// of a side table
 			$returnArray = array();
 			$returnArrayCounter = 0;	// Array counter
-			$prevPK = null;				// Previous primary key
 			
 			// Iterates the array that contains data from DB
 			for ($i = 0; $i < count($resultArray); $i++)
@@ -282,17 +281,18 @@ class DB_Model extends FHC_Model
 						$sideTableProperty = $sideTablesAliases[$t -1];
 					}
 					
-					if ($prevPK == $mainTableObj->{$this->pk})
-					{
-						array_push($returnArray[$returnArrayCounter - 1]->{$sideTableProperty}, $sideTableObj);
-					}
-					else
+					if (($k = $this->findMainTable($mainTableObj, $returnArray)) === false)
 					{
 						$mainTableObj->{$sideTableProperty} = array($sideTableObj);
 						$returnArray[$returnArrayCounter++] = $mainTableObj;
 					}
-					
-					$prevPK = $mainTableObj->{$this->pk};
+					else
+					{
+						if (array_search($sideTableObj, $returnArray[$k]->{$sideTableProperty}) === false)
+						{
+							array_push($returnArray[$k]->{$sideTableProperty}, $sideTableObj);
+						}
+					}
 				}
 			}
 			
@@ -305,6 +305,22 @@ class DB_Model extends FHC_Model
 		}
 		
 		return $result;
+	}
+	
+	/**
+	 * Used in loadTree
+	 */
+	private function findMainTable($mainTableObj, $mainTableArray)
+	{
+		for ($i = 0; $i < count($mainTableArray); $i++)
+		{
+			if ($mainTableObj->{$this->pk} == $mainTableArray[$i]->{$this->pk})
+			{
+				return $i;
+			}
+		}
+		
+		return false;
 	}
 
 	/** ---------------------------------------------------------------

@@ -73,4 +73,11 @@ class Studiengang2 extends APIv1_Controller
 			$this->response();
 		}
 	}
+	
+	public function getStudiengangBewerbung()
+	{
+		$result = $this->StudiengangModel->getStudiengangBewerbung();
+			
+		$this->response($result, REST_Controller::HTTP_OK);
+	}
 }
