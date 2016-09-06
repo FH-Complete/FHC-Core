@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if (!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined("BASEPATH")) exit("No direct script access allowed");
 
 class MailJob extends FHC_Controller
 {
@@ -24,11 +24,11 @@ class MailJob extends FHC_Controller
 		parent::__construct();
 		
 		// Loads MessageLib
-		$this->load->library('MessageLib');
+		$this->load->library("MessageLib");
 	}
 	
-	public function sendMessages($numberToSent = null, $numberPerTimeRange = null, $email_time_range = null)
+	public function sendMessages($numberToSent = null, $numberPerTimeRange = null, $email_time_range = null, $email_from_system = null)
 	{
-		$this->messagelib->sendAll($numberToSent, $numberPerTimeRange, $email_time_range);
+		$this->messagelib->sendAll($numberToSent, $numberPerTimeRange, $email_time_range, $email_from_system);
 	}
 }

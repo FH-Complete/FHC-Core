@@ -9,33 +9,28 @@ class MessageLib
 {
 	private $recipients = array(); // not used anymore
 	
-    public function __construct()
-    {
+	public function __construct()
+	{
         $this->ci =& get_instance();
-
+		
 		// Loads message configuration
-		$this->ci->config->load('message');
-		// The second parameter is used to avoiding name collisions in the config array
-		$this->ci->config->load("mail", true);
-
-		// CI Email library
-		$this->ci->load->library("email");
+		$this->ci->config->load("message");
+		
 		// CI Parser library
 		$this->ci->load->library("parser");
 		// Loads LogLib
 		$this->ci->load->library("LogLib");
 		// Loads VorlageLib
 		$this->ci->load->library("VorlageLib");
-		
-		// Initializing email library with the loaded configurations
-		$this->ci->email->initialize($this->ci->config->config["mail"]);
+		// Loads Mail library
+		$this->ci->load->library("MailLib");
 		
 		// Loading models
 		$this->ci->load->model("system/Message_model", "MessageModel");
 		$this->ci->load->model("system/MsgStatus_model", "MsgStatusModel");
 		$this->ci->load->model("system/Recipient_model", "RecipientModel");
 		$this->ci->load->model("system/Attachment_model", "AttachmentModel");
-
+		
 		// Loads fhc helper
 		$this->ci->load->helper("fhc");
 		
@@ -361,8 +356,8 @@ class MessageLib
 							// If no errors were occurred
 							if (is_object($result) && $result->error == EXIT_SUCCESS)
 							{
-								// If the system is configured to send emails immediately
-								if ($this->getEmailCfgItem("email_send_immediately") === true)
+								// If the system is configured to send messages immediately
+								if ($this->ci->config->item("send_immediately") === true)
 								{
 									// Send message by email!
 									$resultSendEmail = $this->sendOne($msg_id, $subject, $parsedText);
@@ -424,16 +419,26 @@ class MessageLib
 	/**
 	 * Gets all the messages from DB and sends them via email
 	 */
-	public function sendAll($numberToSent = null, $numberPerTimeRange = null, $email_time_range = null)
+	public function sendAll($numberToSent = null, $numberPerTimeRange = null, $email_time_range = null, $email_from_system = null)
 	{
 		$sent = true; // optimistic expectation
 		
-		// Gets a number (email_number_to_sent) of unsent messages from DB
+		// Gets standard configs
+		$cfg = $this->ci->maillib->getConfigs();
+		$cfg->email_number_to_sent = $numberToSent;
+		$cfg->email_number_per_time_range = $numberPerTimeRange;
+		$cfg->email_time_range = $email_time_range;
+		$cfg->email_from_system = $email_from_system;
+		
+		// Overrides configs with the parameters
+		$this->ci->maillib->overrideConfigs($cfg);
+		
+		// Gets a number ($this->ci->maillib->getMaxEmailToSent()) of unsent messages from DB
 		// having EMAIL_KONTAKT_TYPE as relative contact type
 		$result = $this->ci->RecipientModel->getMessages(
-				EMAIL_KONTAKT_TYPE,
-				null,
-				$this->getEmailCfgItem("email_number_to_sent")
+			EMAIL_KONTAKT_TYPE,
+			null,
+			$this->ci->maillib->getConfigs()->email_number_to_sent
 		);
 		// Checks if errors were occurred
 		if (is_object($result) && $result->error == EXIT_SUCCESS)
@@ -456,14 +461,13 @@ class MessageLib
 						}
 						
 						// If the sender kontakt does not exist, then use system
-						$sender = $this->getEmailCfgItem("email_from_system");
-						if (!is_null($result->retval[$i]->sender) && $result->retval[$i]->sender != "")
+						$sender = $this->ci->maillib->getConfigs()->email_from_system;
+						if (!is_null($result->retval[0]->sender) && $result->retval[0]->sender != "")
 						{
-							$sender = $result->retval[$i]->sender;
+							$sender = $result->retval[0]->sender;
 						}
-						
 						// Sending email
-						$sent = $this->sendEmail(
+						$sent = $this->ci->maillib->send(
 							$sender,
 							$result->retval[$i]->receiver,
 							$result->retval[$i]->subject,
@@ -489,25 +493,8 @@ class MessageLib
 						{
 							// Setting the message as sent in DB
 							$sent = $this->setMessageSent($result->retval[$i]->message_id, $result->retval[$i]->receiver_id);
-							// If the email has been sent and the DB updated
-							if ($sent)
-							{
-							// If it has been sent a specified number of emails, then it has to wait
-								if ((is_numeric($numberPerTimeRange) && $numberPerTimeRange == $i + 1) ||
-									$this->getEmailCfgItem("email_number_per_time_range") == $i + 1)
-								{
-									// Gets the number of seconds to wait until the next send
-									$seconds = 0;
-
-									if (is_numeric($email_time_range))
-										$seconds = $email_time_range;
-									else
-										$seconds = $this->getEmailCfgItem("email_time_range");
-
-									sleep($seconds); // Wait!!!
-								}
-							}
-							else
+							// If some errors occurred
+							if (!$sent)
 							{
 								$this->ci->loglib->logError("Error while updating DB");
 							}
@@ -585,14 +572,14 @@ class MessageLib
 					}
 					
 					// If the sender kontakt does not exist, then use system
-					$sender = $this->getEmailCfgItem("email_from_system");
+					$sender = $this->ci->maillib->getConfigs()->email_from_system;
 					if (!is_null($result->retval[0]->sender) && $result->retval[0]->sender != "")
 					{
 						$sender = $result->retval[0]->sender;
 					}
 					
 					// Sending email
-					$sent = $this->sendEmail(
+					$sent = $this->ci->maillib->send(
 						$sender,
 						$result->retval[0]->receiver,
 						is_null($subject) ? $result->retval[0]->subject : $subject, // if parameter subject is not null, use it!
@@ -705,30 +692,6 @@ class MessageLib
             "msg"  => lang("message_".$error)
         );
     }
-	
-	/**
-	 * Gets an item from the email configuration array
-	 */
-	private function getEmailCfgItem($itemName)
-	{
-		return $this->ci->config->item($itemName, EMAIL_CONFIG_INDEX);
-	}
-	
-	/**
-	 * Sends a single email
-	 */
-	private function sendEmail($from, $to, $subject, $message, $alias = "", $cc = null, $bcc = null)
-	{
-		$this->ci->email->from($from, $alias);
-		$this->ci->email->to($to);
-		if (!is_null($cc)) $this->ci->email->cc($cc);
-		if (!is_null($bcc)) $this->ci->email->bcc($bcc);
-		$this->ci->email->subject($subject);
-		$this->ci->email->message($message);
-
-		// Avoid printing on standard output ugly error messages
-		return @$this->ci->email->send();
-	}
 	
 	/**
 	 * Update the table tbl_message_recipient
