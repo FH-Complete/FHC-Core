@@ -28,7 +28,7 @@ $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('assistenz', null, 'suid'))
+if(!$rechte->isBerechtigt('lehre/studienordnung', null, 's'))
 	die('keine Berechtigung für diese Seite!');
 
 $studiengang_kz = isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:'';
@@ -83,7 +83,7 @@ if($studiengang_kz!='')
 	{
 		if($max_semester < $row->semester)
 			$max_semester = $row->semester;
-		$gueltigkeit[$row->studiensemester_kurzbz][$row->semester][]=$row->bezeichnung;
+		$gueltigkeit[$row->studiensemester_kurzbz][$row->semester][]=$row->bezeichnung_studienplan;
 	}
 }
 
