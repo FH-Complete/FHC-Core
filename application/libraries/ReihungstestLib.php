@@ -15,6 +15,7 @@ class ReihungstestLib
 		$this->ci =& get_instance();
 		
 		$this->ci->load->model("crm/RtPerson_model", "RtPersonModel");
+		$this->ci->load->model("crm/Reihungstest_model", "ReihungstestModel");
 	}
 	
 	/**
@@ -46,12 +47,19 @@ class ReihungstestLib
 	/**
 	 * @return void
 	 */
-	public function getReihungstestByPersonID($person_id)
+	public function getReihungstestByPersonID($person_id, $available = null)
 	{
 		$this->ci->ReihungstestModel->addJoin("public.tbl_rt_person", "reihungstest_id = rt_id");
 		$this->ci->ReihungstestModel->addJoin("public.tbl_person", "person_id");
 		$this->ci->ReihungstestModel->addJoin("public.tbl_ort", "tbl_ort.ort_kurzbz = tbl_rt_person.ort_kurzbz", "LEFT");
 		
-		return $this->ci->ReihungstestModel->loadWhere(array("person_id" => $person_id));
+		$parametersArray = array("person_id" => $person_id);
+		
+		if (isset($available))
+		{
+			$parametersArray["anmeldefrist >="] = "NOW()";
+		}
+		
+		return $this->ci->ReihungstestModel->loadWhere($parametersArray);
 	}
 }

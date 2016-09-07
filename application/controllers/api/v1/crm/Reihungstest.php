@@ -23,7 +23,7 @@ class Reihungstest extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model ReihungstestModel
-		$this->load->model("crm/reihungstest_model", "ReihungstestModel");
+		$this->load->model("crm/Reihungstest_model", "ReihungstestModel");
 		// Load library ReihungstestLib
 		$this->load->library("ReihungstestLib");
 	}
@@ -54,15 +54,20 @@ class Reihungstest extends APIv1_Controller
 	{
 		$studiengang_kz = $this->get("studiengang_kz");
 		$studiensemester_kurzbz = $this->get("studiensemester_kurzbz");
+		$available = $this->get("available");
 		
 		if (isset($studiengang_kz))
 		{
-			$parameters = array("studiengang_kz" => $studiengang_kz);
+			$parametersArray = array("studiengang_kz" => $studiengang_kz);
 			if (isset($studiensemester_kurzbz))
 			{
-				$parameters["studiensemester_kurzbz"] = $studiensemester_kurzbz;
+				$parametersArray["studiensemester_kurzbz"] = $studiensemester_kurzbz;
 			}
-			$result = $this->ReihungstestModel->loadWhere($parameters);
+			if (isset($available))
+			{
+				$parametersArray["anmeldefrist >="] = "NOW()";
+			}
+			$result = $this->ReihungstestModel->loadWhere($parametersArray);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -78,10 +83,11 @@ class Reihungstest extends APIv1_Controller
 	public function getReihungstestByPersonID()
 	{
 		$person_id = $this->get("person_id");
+		$available = $this->get("available");
 		
 		if (isset($person_id))
 		{
-			$result = $this->reihungstestlib->getReihungstestByPersonID($person_id);
+			$result = $this->reihungstestlib->getReihungstestByPersonID($person_id, $available);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
