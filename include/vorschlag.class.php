@@ -32,6 +32,7 @@ class vorschlag extends basis_db
 	public $frage_id;
 	public $nummer;
 	public $punkte;
+	public $aktiv;
 	
 	public $text;
 	public $bild;
@@ -75,6 +76,7 @@ class vorschlag extends basis_db
 				$this->frage_id = $row->frage_id;
 				$this->punkte = $row->punkte;
 				$this->nummer = $row->nummer;
+				$this->aktiv = $row->aktiv;
 				$this->loadVorschlagSprache($vorschlag_id, $sprache);
 				return true;
 			}
@@ -142,14 +144,15 @@ class vorschlag extends basis_db
 
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'BEGIN;INSERT INTO testtool.tbl_vorschlag (frage_id, nummer, punkte, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			$qry = 'BEGIN;INSERT INTO testtool.tbl_vorschlag (frage_id, nummer, punkte, insertamum, insertvon, updateamum, updatevon, aktiv) VALUES('.
 			       $this->db_add_param($this->frage_id, FHC_INTEGER).','.
 			       $this->db_add_param($this->nummer).','.
 				   $this->db_add_param($this->punkte).','.
 				   $this->db_add_param($this->insertamum).','.
 				   $this->db_add_param($this->insertvon).','.
 				   $this->db_add_param($this->updateamum).','.
-				   $this->db_add_param($this->updatevon).');';
+				   $this->db_add_param($this->updatevon).','.
+				   $this->db_add_param($this->aktiv, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -158,7 +161,8 @@ class vorschlag extends basis_db
 			       ' nummer='.$this->db_add_param($this->nummer).','.
 			       ' punkte='.$this->db_add_param($this->punkte).','.
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
-			       ' updatevon='.$this->db_add_param($this->updatevon).
+			       ' updatevon='.$this->db_add_param($this->updatevon).','.
+			       ' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).
 					" WHERE vorschlag_id=".$this->db_add_param($this->vorschlag_id, FHC_INTEGER, false).";";
 		}
 

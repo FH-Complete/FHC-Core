@@ -29,12 +29,18 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/gebiet.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/studiengang.class.php');
+require_once('../../../include/sprache.class.php');
 
 if (!$user=get_uid())
 	die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
+$db = new basis_db();
+
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
+
+$sprache = new sprache();
+$sprache->getAll(true);
 
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -85,7 +91,7 @@ if(!$rechte->isBerechtigt('basis/testtool'))
 $gebiet = new gebiet();
 $gebiet->getAll();
 
-echo '<a href="index.php?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'" class="Item">Zurück zur Admin Seite</a><br /><br />';
+echo '<a href="index.php?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'" class="Item">Zur&uuml;ck zur Admin Seite</a><br /><br />';
 
 //Liste der Gebiete anzeigen
 echo '<form id="gebiet_form" action="'.$_SERVER['PHP_SELF'].'" method="GET">';
@@ -159,6 +165,14 @@ if(isset($_POST['speichern']))
 	$gebiet = new gebiet();
 	if($gebiet->load($gebiet_id))
 	{
+		$bezeichnung_mehrsprachig=array();
+		foreach($sprache->result as $row_sprache)
+		{
+			if(isset($_POST['bezeichnung_mehrsprachig_'.$row_sprache->sprache]) && $_POST['bezeichnung_mehrsprachig_'.$row_sprache->sprache]!='')
+				$bezeichnung_mehrsprachig[$row_sprache->sprache]=$_POST['bezeichnung_mehrsprachig_'.$row_sprache->sprache];
+		}
+		$gebiet->bezeichnung_mehrsprachig = $bezeichnung_mehrsprachig;
+		
 		$gebiet->kurzbz = $_POST['kurzbz'];
 		$gebiet->bezeichnung = $_POST['bezeichnung'];
 		$gebiet->beschreibung = $_POST['beschreibung'];
@@ -202,14 +216,20 @@ if($gebiet_id!='')
 
 	echo '<tr>';
 	//ID
-	echo '<td>ID</td><td>'.$gebiet_id.'</td>';
+	echo '<td>ID</td><td><input type="text" disabled value="'.$gebiet_id.'" size="10" /></td>';
 	echo '</tr><tr>';
 	//Kurzbz
-	echo '<td>Kurzbz</td><td><input type="text" maxlength="10" size="10" name="kurzbz" value="'.$gebiet->kurzbz.'"></td>';
+	echo '<td>Kurzbz</td><td><input type="text" maxlength="10" size="10" name="" value="'.$gebiet->kurzbz.'" disabled /><input type="hidden" name="kurzbz" value="'.$gebiet->kurzbz.'"/></td>';
 	echo '</tr><tr>';
 	//Bezeichnung
-	echo '<td>Bezeichnung</td><td><input type="text" maxlength="50" name="bezeichnung" value="'.$gebiet->bezeichnung.'"></td>';
+	echo '<td>Bezeichnung</td><td><input type="text" name="bezeichnung" value="'.$gebiet->bezeichnung.'" /></td>';
 	echo '</tr><tr>';
+	foreach($sprache->result as $s)
+	{
+		echo '<td>Bezeichnung '.$s->sprache.'</td>';
+		echo '<td><input type="text" maxlength="50" name="bezeichnung_mehrsprachig_'.$s->sprache.'"  value="'.(isset($gebiet->bezeichnung_mehrsprachig[$s->sprache])?$db->convert_html_chars($gebiet->bezeichnung_mehrsprachig[$s->sprache]):'').'" /></td>';
+		echo '</tr><tr>';
+	}
 	//Beschreibung
 	echo '<td>Beschreibung</td><td><textarea name="beschreibung">'.$gebiet->beschreibung.'</textarea></td>';
 	echo '</tr><tr>';
@@ -258,7 +278,6 @@ if($gebiet_id!='')
 	$studiengang = new studiengang();
 	$studiengang->getAll('typ, kurzbz',false);
 
-	echo '<form action="edit_gebiet.php" method="POST">';
 	echo '<table id="t1" class="tablesorter">
 	<thead>
 	<tr>
