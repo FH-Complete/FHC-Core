@@ -146,9 +146,12 @@ class Studiengang_model extends DB_Model
 		// Then join with table lehre.tbl_studienplan on column studienordnung_id
 		$this->addJoin("lehre.tbl_studienplan", "studienordnung_id");
 		// Then join with table lehre.tbl_studienplan_semester on column studienplan_id
-		$this->addJoin("lehre.tbl_studienplan_semester", "studienplan_id");
+		$this->addJoin("lehre.tbl_studienplan_semester ss", "studienplan_id");
 		// Then join with table lehre.tbl_bewerbungsfrist on column studiensemester_kurzbz
-		$this->addJoin("public.tbl_bewerbungstermine", "studiensemester_kurzbz");
+		$this->addJoin(
+			"public.tbl_bewerbungstermine b",
+			"b.studiensemester_kurzbz = ss.studiensemester_kurzbz AND b.studienplan_id = ss.studienplan_id"
+		);
 		
 		// Ordering by studiengang_kz and studienplan_id
 		$this->addOrder("public.tbl_studiengang.studiengang_kz");
@@ -162,8 +165,8 @@ class Studiengang_model extends DB_Model
 			array(
 				"public.tbl_studiengang.aktiv" => "true",
 				"public.tbl_studiengang.onlinebewerbung" => "true",
-				"public.tbl_bewerbungstermine.beginn <= " => "NOW()",
-				"public.tbl_bewerbungstermine.ende >= " => "NOW()"
+				"b.beginn <= " => "NOW()",
+				"b.ende >= " => "NOW()"
 			),
 			array(
 				"studienplaene"
