@@ -2,7 +2,7 @@
 class Studiengang_model extends DB_Model
 {
 	/**
-	 * 
+	 *
 	 */
 	public function __construct()
 	{
@@ -10,19 +10,19 @@ class Studiengang_model extends DB_Model
 		$this->dbTable = 'public.tbl_studiengang';
 		$this->pk = 'studiengang_kz';
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function getAllForBewerbung()
 	{
 		// Checks if the operation is permitted by the API caller
 		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('lehre.vw_studienplan'), 's'))
 			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('lehre.vw_studienplan'), FHC_MODEL_ERROR);
-		
+
 		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('bis.tbl_lgartcode'), 's'))
 			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('bis.tbl_lgartcode'), FHC_MODEL_ERROR);
-		
+
 		$allForBewerbungQuery = "SELECT DISTINCT studiengang_kz,
 										typ,
 										organisationseinheittyp_kurzbz,
@@ -95,14 +95,14 @@ class Studiengang_model extends DB_Model
 								  WHERE t1.onlinebewerbung IS TRUE
 									AND t1.aktiv IS TRUE
 							   ORDER BY typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC";
-		
+
 		$result = $this->db->query($allForBewerbungQuery);
-		
+
 		return $this->_success($result->result());
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function getStudienplan($studiensemester_kurzbz, $ausbildungssemester, $aktiv, $onlinebewerbung)
 	{
@@ -112,11 +112,11 @@ class Studiengang_model extends DB_Model
 		$this->addJoin("lehre.tbl_studienplan", "studienordnung_id");
 		// Then join with table lehre.tbl_studienplan_semester on column studienplan_id
 		$this->addJoin("lehre.tbl_studienplan_semester", "studienplan_id");
-		
+
 		// Ordering by studiengang_kz and studienplan_id
 		$this->addOrder("public.tbl_studiengang.studiengang_kz");
 		$this->addOrder("lehre.tbl_studienplan.studienplan_id");
-		
+
 		$result = $this->loadTree(
 			"tbl_studiengang",
 			array(
@@ -132,12 +132,12 @@ class Studiengang_model extends DB_Model
 				"studienplaene"
 			)
 		);
-		
+
 		return $result;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function getStudiengangBewerbung()
 	{
@@ -149,30 +149,30 @@ class Studiengang_model extends DB_Model
 		$this->addJoin("lehre.tbl_studienplan_semester ss", "studienplan_id");
 		// Then join with table lehre.tbl_bewerbungsfrist on column studiensemester_kurzbz
 		$this->addJoin(
-			"public.tbl_bewerbungstermine b",
-			"b.studiensemester_kurzbz = ss.studiensemester_kurzbz AND b.studienplan_id = ss.studienplan_id"
+			"public.tbl_bewerbungstermine",
+			"tbl_bewerbungstermine.studiensemester_kurzbz = ss.studiensemester_kurzbz AND tbl_bewerbungstermine.studienplan_id = ss.studienplan_id",
+			"LEFT"
 		);
-		
 		// Ordering by studiengang_kz and studienplan_id
 		$this->addOrder("public.tbl_studiengang.studiengang_kz");
 		$this->addOrder("lehre.tbl_studienplan.studienplan_id");
-		
+
 		$result = $this->loadTree(
 			"tbl_studiengang",
 			array(
 				"tbl_studienplan"
 			),
-			array(
-				"public.tbl_studiengang.aktiv" => "true",
-				"public.tbl_studiengang.onlinebewerbung" => "true",
-				"b.beginn <= " => "NOW()",
-				"b.ende >= " => "NOW()"
-			),
+			"public.tbl_studiengang.aktiv=true AND
+			public.tbl_studiengang.onlinebewerbung=true
+			AND ((tbl_bewerbungstermine.beginn <= now() AND tbl_bewerbungstermine.ende>=now()) OR tbl_bewerbungstermine.beginn is null)
+			AND ss.studiensemester_kurzbz IN(SELECT distinct studiensemester_kurzbz FROM public.tbl_bewerbungstermine where beginn<=now() and ende>=now())
+			AND ss.semester=1"
+			,
 			array(
 				"studienplaene"
 			)
 		);
-		
+
 		return $result;
 	}
 }

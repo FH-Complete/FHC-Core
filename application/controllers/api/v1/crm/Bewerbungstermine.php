@@ -24,8 +24,8 @@ class Bewerbungstermine extends APIv1_Controller
 		parent::__construct();
 		// Load model BewerbungstermineModel
 		$this->load->model('crm/bewerbungstermine_model', 'BewerbungstermineModel');
-		
-		
+
+
 	}
 
 	/**
@@ -34,11 +34,11 @@ class Bewerbungstermine extends APIv1_Controller
 	public function getBewerbungstermine()
 	{
 		$bewerbungstermineID = $this->get('bewerbungstermine_id');
-		
+
 		if (isset($bewerbungstermineID))
 		{
 			$result = $this->BewerbungstermineModel->load($bewerbungstermineID);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -46,7 +46,7 @@ class Bewerbungstermine extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -54,20 +54,54 @@ class Bewerbungstermine extends APIv1_Controller
 	{
 		$studiengang_kz = $this->get('studiengang_kz');
 		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
-		
+
 		if (isset($studiengang_kz) && isset($studiensemester_kurzbz))
 		{
 			$result = $this->BewerbungstermineModel->loadWhere(array(
 				'studiengang_kz' => $studiengang_kz,
 				'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
 		{
 			$this->response();
 		}
+	}
+
+	/**
+	 * @return void
+	 */
+	public function getByStudienplan()
+	{
+		$studienplan_id = $this->get('studienplan_id');
+
+		if (isset($studienplan_id) && isset($studienplan_id))
+		{
+			$result = $this->BewerbungstermineModel->loadWhere(array(
+				'studienplan_id' => $studienplan_id
+			));
+
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+
+	/**
+	 * @return void
+	 */
+	public function getCurrent()
+	{
+		$result = $this->BewerbungstermineModel->loadWhere(array(
+				'beginn <=' => 'now()',
+				'ende >=' => 'now()',
+			));
+
+		$this->response($result, REST_Controller::HTTP_OK);
 	}
 
 	/**
@@ -85,7 +119,7 @@ class Bewerbungstermine extends APIv1_Controller
 			{
 				$result = $this->BewerbungstermineModel->insert($this->post());
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -93,7 +127,7 @@ class Bewerbungstermine extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($bewerbungstermine = NULL)
 	{
 		return true;
