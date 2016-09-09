@@ -483,9 +483,48 @@ function casDeleteMitarbeiter($db, $mitarbeiter_uid, $trans=true)
 
 	if(!$error)
 	{
-		$qry = '
-			DELETE FROM addon.tbl_lvevaluierung_selbstevaluierung
-				WHERE lvevaluierung_id IN (SELECT lvevaluierung_id FROM addon.tbl_lvevaluierung_antwort
+		$tqry = "SELECT 1
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE table_type='BASE TABLE'
+				AND table_schema='addon'
+				AND table_name='tbl_lvevaluierung_selbstevaluierung';";
+
+		if(!$result = $db->db_query($tqry))
+			$error = true;
+
+		if($db->db_num_rows($result))
+		{
+			$qry = '
+				DELETE FROM addon.tbl_lvevaluierung_selbstevaluierung
+					WHERE lvevaluierung_id IN (SELECT lvevaluierung_id FROM addon.tbl_lvevaluierung_antwort
+						WHERE lvevaluierung_code_id IN (SELECT lvevaluierung_code_id FROM addon.tbl_lvevaluierung_code
+							WHERE lvevaluierung_id IN (SELECT lvevaluierung_id FROM addon.tbl_lvevaluierung
+								WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM campus.tbl_studentbeispiel
+									WHERE beispiel_id IN (SELECT beispiel_id FROM campus.tbl_beispiel
+										WHERE uebung_id IN (SELECT uebung_id FROM campus.tbl_uebung
+											WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
+												WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung
+													WHERE koordinator='.$db->db_add_param($mitarbeiter_uid).'))))))))';
+			if(!$db->db_query($qry))
+				$error = true;
+		}
+	}
+
+	if(!$error)
+	{
+		$tqry = "SELECT 1
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE table_type='BASE TABLE'
+				AND table_schema='addon'
+				AND table_name='tbl_lvevaluierung_antwort';";
+
+		if(!$result = $db->db_query($tqry))
+			$error = true;
+
+		if($db->db_num_rows($result))
+		{
+			$qry = '
+				DELETE FROM addon.tbl_lvevaluierung_antwort
 					WHERE lvevaluierung_code_id IN (SELECT lvevaluierung_code_id FROM addon.tbl_lvevaluierung_code
 						WHERE lvevaluierung_id IN (SELECT lvevaluierung_id FROM addon.tbl_lvevaluierung
 							WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM campus.tbl_studentbeispiel
@@ -493,55 +532,64 @@ function casDeleteMitarbeiter($db, $mitarbeiter_uid, $trans=true)
 									WHERE uebung_id IN (SELECT uebung_id FROM campus.tbl_uebung
 										WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
 											WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung
-												WHERE koordinator='.$db->db_add_param($mitarbeiter_uid).'))))))))';
-		if(!$db->db_query($qry))
-			$error = true;
+												WHERE koordinator='.$db->db_add_param($mitarbeiter_uid).')))))))';
+			if(!$db->db_query($qry))
+				$error = true;
+		}
 	}
+
 
 	if(!$error)
 	{
-		$qry = '
-			DELETE FROM addon.tbl_lvevaluierung_antwort
-				WHERE lvevaluierung_code_id IN (SELECT lvevaluierung_code_id FROM addon.tbl_lvevaluierung_code
+		$tqry = "SELECT 1
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE table_type='BASE TABLE'
+				AND table_schema='addon'
+				AND table_name='tbl_lvevaluierung_code';";
+
+		if(!$result = $db->db_query($tqry))
+			$error = true;
+
+		if($db->db_num_rows($result))
+		{
+			$qry = '
+				DELETE FROM addon.tbl_lvevaluierung_code
 					WHERE lvevaluierung_id IN (SELECT lvevaluierung_id FROM addon.tbl_lvevaluierung
 						WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM campus.tbl_studentbeispiel
 							WHERE beispiel_id IN (SELECT beispiel_id FROM campus.tbl_beispiel
 								WHERE uebung_id IN (SELECT uebung_id FROM campus.tbl_uebung
 									WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
 										WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung
-											WHERE koordinator='.$db->db_add_param($mitarbeiter_uid).')))))))';
-		if(!$db->db_query($qry))
-			$error = true;
+											WHERE koordinator='.$db->db_add_param($mitarbeiter_uid).'))))))';
+			if(!$db->db_query($qry))
+				$error = true;
+		}
 	}
-
 
 	if(!$error)
 	{
-		$qry = '
-			DELETE FROM addon.tbl_lvevaluierung_code
-				WHERE lvevaluierung_id IN (SELECT lvevaluierung_id FROM addon.tbl_lvevaluierung
+		$tqry = "SELECT 1
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE table_type='BASE TABLE'
+				AND table_schema='addon'
+				AND table_name='tbl_lvevaluierung';";
+
+		if(!$result = $db->db_query($tqry))
+			$error = true;
+
+		if($db->db_num_rows($result))
+		{
+			$qry = '
+				DELETE FROM addon.tbl_lvevaluierung
 					WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM campus.tbl_studentbeispiel
 						WHERE beispiel_id IN (SELECT beispiel_id FROM campus.tbl_beispiel
 							WHERE uebung_id IN (SELECT uebung_id FROM campus.tbl_uebung
 								WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
 									WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung
-										WHERE koordinator='.$db->db_add_param($mitarbeiter_uid).'))))))';
-		if(!$db->db_query($qry))
-			$error = true;
-	}
-
-	if(!$error)
-	{
-		$qry = '
-			DELETE FROM addon.tbl_lvevaluierung
-				WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM campus.tbl_studentbeispiel
-					WHERE beispiel_id IN (SELECT beispiel_id FROM campus.tbl_beispiel
-						WHERE uebung_id IN (SELECT uebung_id FROM campus.tbl_uebung
-							WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
-								WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung
-									WHERE koordinator='.$db->db_add_param($mitarbeiter_uid).')))))';
-		if(!$db->db_query($qry))
-			$error = true;
+										WHERE koordinator='.$db->db_add_param($mitarbeiter_uid).')))))';
+			if(!$db->db_query($qry))
+				$error = true;
+		}
 	}
 
 	if(!$error)
@@ -1112,29 +1160,65 @@ function casDeletePerson($db, $person_id, $trans=true)
 
 	if(!$error)
 	{
-		$qry = '
-			DELETE FROM addon.tbl_casetime_gruppen
-				WHERE uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).')';
-		if(!$db->db_query($qry))
+		$tqry = "SELECT 1
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE table_type='BASE TABLE'
+				AND table_schema='addon'
+				AND table_name='tbl_casetime_gruppen';";
+
+		if(!$result = $db->db_query($tqry))
 			$error = true;
+
+		if($db->db_num_rows($result))
+		{
+			$qry = '
+				DELETE FROM addon.tbl_casetime_gruppen
+					WHERE uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).')';
+			if(!$db->db_query($qry))
+				$error = true;
+		}
 	}
 
 	if(!$error)
 	{
-		$qry = '
-			DELETE FROM addon.tbl_casetime_zeitaufzeichnung
-				WHERE uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).')';
-		if(!$db->db_query($qry))
+		$tqry = "SELECT 1
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE table_type='BASE TABLE'
+				AND table_schema='addon'
+				AND table_name='tbl_casetime_zeitaufzeichnung';";
+
+		if(!$result = $db->db_query($tqry))
 			$error = true;
+
+		if($db->db_num_rows($result))
+		{
+			$qry = '
+				DELETE FROM addon.tbl_casetime_zeitaufzeichnung
+					WHERE uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).')';
+			if(!$db->db_query($qry))
+				$error = true;
+		}
 	}
 
 	if(!$error)
 	{
-		$qry = '
-			DELETE FROM addon.tbl_casetime_zeitsperre
-				WHERE uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).')';
-		if(!$db->db_query($qry))
+		$tqry = "SELECT 1
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE table_type='BASE TABLE'
+				AND table_schema='addon'
+				AND table_name='tbl_casetime_zeitsperre';";
+
+		if(!$result = $db->db_query($tqry))
 			$error = true;
+
+		if($db->db_num_rows($result))
+		{
+			$qry = '
+				DELETE FROM addon.tbl_casetime_zeitsperre
+					WHERE uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).')';
+			if(!$db->db_query($qry))
+				$error = true;
+		}
 	}
 
 	if(!$error)
@@ -1374,21 +1458,45 @@ function casDeletePerson($db, $person_id, $trans=true)
 
 	if(!$error)
 	{
-		$qry = '
-			DELETE FROM addon.tbl_lvevaluierung_selbstevaluierung
-				WHERE uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).')';
-		if(!$db->db_query($qry))
+		$tqry = "SELECT 1
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE table_type='BASE TABLE'
+				AND table_schema='addon'
+				AND table_name='tbl_lvevaluierung_selbstevaluierung';";
+
+		if(!$result = $db->db_query($tqry))
 			$error = true;
+
+		if($db->db_num_rows($result))
+		{
+			$qry = '
+				DELETE FROM addon.tbl_lvevaluierung_selbstevaluierung
+					WHERE uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).')';
+			if(!$db->db_query($qry))
+				$error = true;
+		}
 	}
 
 	if(!$error)
 	{
-		$qry = '
-			DELETE FROM addon.tbl_software
-				WHERE ansprechperson_uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).')';
-		if(!$db->db_query($qry))
-		{
+		$tqry = "SELECT 1
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE table_type='BASE TABLE'
+				AND table_schema='addon'
+				AND table_name='tbl_software';";
+
+		if(!$result = $db->db_query($tqry))
 			$error = true;
+
+		if($db->db_num_rows($result))
+		{
+			$qry = '
+				DELETE FROM addon.tbl_software
+					WHERE ansprechperson_uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).')';
+			if(!$db->db_query($qry))
+			{
+				$error = true;
+			}
 		}
 	}
 
