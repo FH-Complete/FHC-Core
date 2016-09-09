@@ -551,6 +551,7 @@ function drawTree($tree, $depth)
 //			}
 
 			$tdinhalt='';
+			$found = false;
 
 			// Ist bereits eine Note für diese LV in diesem Stsem vorhanden?
 			if(isset($noten_arr[$row_tree->lehrveranstaltung_id][$stsem]))
@@ -559,40 +560,37 @@ function drawTree($tree, $depth)
 					$tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$row_tree->lehrveranstaltung_id][$stsem]]->anmerkung.'</span>';
 				else
 					$tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$row_tree->lehrveranstaltung_id][$stsem]]->anmerkung.'</span>';
+				$found=true;
 			}
 			elseif(count($kompatibleLVs) > 0)
 			{
-                            $found = false;
-                            $i = 0;
-                            while(!$found && $i < count($kompatibleLVs))
-                            {   
-                                foreach($kompatibleLVs as $komp)
-                                {
-                                    $anrechnung = new anrechnung();
-                                    $anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);
-                                    
-                                    if(count($anrechnung->result) == 1)
-                                    {
-                                        $lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
-                                        if(isset($noten_arr[$lv][$stsem]))
-                                        {
-                                            $found = true;
-                                            if($note_pruef_arr[$noten_arr[$lv][$stsem]]->positiv)
-                                                    $tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
-                                            else
-                                                    $tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
-                                        }
-                                    }
-                                    $i++;
-                                }
-
-                                if(!$found)
-                                {
-                                    $tdinhalt.= '-';
-                                }   
+                            
+                $i = 0;
+                while(!$found && $i < count($kompatibleLVs))
+                {   
+                    foreach($kompatibleLVs as $komp)
+                    {
+                        $anrechnung = new anrechnung();
+                        $anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);
+                        
+                        if(count($anrechnung->result) == 1)
+                        {
+                            $lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
+                            if(isset($noten_arr[$lv][$stsem]))
+                            {
+                                $found = true;
+                                if($note_pruef_arr[$noten_arr[$lv][$stsem]]->positiv)
+                                        $tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
+                                else
+                                        $tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
                             }
+                        }
+                        $i++;
+                    }
+                }
 			}
-			else
+
+			if(!$found)
 			{
 				// Angebot der LV und der Kompatiblen pruefen
 				$anmeldungmoeglich=false;
