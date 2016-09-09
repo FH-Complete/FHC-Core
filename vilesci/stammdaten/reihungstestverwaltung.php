@@ -287,6 +287,12 @@ if(isset($_GET['excel']))
 		$format_border_center->setVAlign ('top');
 		$format_border_center->setHAlign ('center');
 		
+		$format_border_left =& $workbook->addFormat();
+		$format_border_left->setBorder(1);
+		$format_border_left->setTextWrap();
+		$format_border_left->setVAlign ('top');
+		$format_border_left->setHAlign ('left');
+		
 		if($result = $db->db_query($qry))
 		{
 			$ort_kurzbz = '0';
@@ -457,7 +463,7 @@ if(isset($_GET['excel']))
 				if(strlen($adresse->strasse)>$maxlength[$col])
 					$maxlength[$col] = strlen($adresse->strasse);
 
-				$worksheet->write($zeile,++$col,$adresse->plz, $format_border);
+				$worksheet->write($zeile,++$col,$adresse->plz, $format_border_left);
 				if(strlen($adresse->plz)>$maxlength[$col])
 					$maxlength[$col] = strlen($adresse->plz);
 
