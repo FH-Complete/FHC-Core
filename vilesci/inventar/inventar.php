@@ -954,17 +954,17 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 			$bestellung_ivalid_style='style="color: red;"';
 					
 		
-		//$htmlstring.='<td align="right"><a href="bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellnr.'</a>&nbsp;</td>';
+		//$htmlstring.='<td align="right"><a href="../../addons/wawi/vilesci/bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellnr.'</a>&nbsp;</td>';
 		$htmlstring.='<td align="right">';
 		
 		//Wenn Rechnungen vorhanden sind, einen Link dazu anzeigen
 		$rechnung = new wawi_rechnung();
 		if($resultBetriebsmittel[$pos]->bestellung_id!='' && $rechnung->count($resultBetriebsmittel[$pos]->bestellung_id)>0)
 		{
-			$htmlstring.='&nbsp;<a href="../../wawi/rechnung.php?method=suche&amp;submit=true&amp;bestellnummer='.$resultBetriebsmittel[$pos]->bestellnr.'" target="_blank" '.$bestellung_ivalid_style.'><img src="../../skin/images/Calculator.png"></a>';
+			$htmlstring.='&nbsp;<a href="../../addons/wawi/vilesci/rechnung.php?method=suche&amp;submit=true&amp;bestellnummer='.$resultBetriebsmittel[$pos]->bestellnr.'" target="_blank" '.$bestellung_ivalid_style.'><img src="../../skin/images/Calculator.png"></a>';
 		}
 		
-		$htmlstring.='<a href="../../wawi/bestellung.php?method=update&amp;id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellnr.'</a>';
+		$htmlstring.='<a href="../../addons/wawi/vilesci/bestellung.php?method=update&amp;id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellnr.'</a>';
 		
 		echo '</td>';
 
@@ -1075,7 +1075,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 
 			$htmlstring.='<tr>';
 			$htmlstring.='<th align="right">Bestellnr.&nbsp;:&nbsp;</th>
-						<td><a href="../../wawi/bestellung.php?method=update&amp;id='.$resBetriebsmittel->bestellung_id.'">'.$resBetriebsmittel->bestellnr.'</a></td>';
+						<td><a href="../../addons/wawi/vilesci/bestellung.php?method=update&amp;id='.$resBetriebsmittel->bestellung_id.'">'.$resBetriebsmittel->bestellnr.'</a></td>';
 
 			$htmlstring.='<th align="right" nowrap>Bestell ID.&nbsp;:&nbsp;</th>';
 
@@ -1125,8 +1125,8 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 				  });
 			});
 		*/
-		else		
-			$htmlstring.='<td><a href="../../wawi/bestellung.php?method=update&amp;id='.$resBetriebsmittel->bestellung_id.'">'.$resBetriebsmittel->bestellung_id.'</a></td>';
+		else
+			$htmlstring.='<td><a href="../../addons/wawi/vilesci/bestellung.php?method=update&amp;id='.$resBetriebsmittel->bestellung_id.'">'.$resBetriebsmittel->bestellung_id.'</a></td>';
 
 		$htmlstring.='<th align="right" nowrap>Bestellpos. ID.&nbsp;:&nbsp;</th>';
 		if ($schreib_recht && $resBetriebsmittel->bestellung_id)
