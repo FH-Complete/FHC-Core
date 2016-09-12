@@ -249,25 +249,25 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
-			
-			<xsl:call-template name="abschnitt"/>			
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
-			<text:p text:style-name="P1"/>
-			<xsl:call-template name="abschnitt"/>	
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
-			<text:p text:style-name="P1"/>
-			<xsl:call-template name="abschnitt"/>	
-			<text:p text:style-name="P1"/>
-			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
-			<text:p text:style-name="P1"/>
-			<xsl:call-template name="abschnitt"/>	
+
+			<xsl:call-template name="abschnitt"/>
 			<text:p text:style-name="P1"/>
 			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
 			<text:p text:style-name="P1"/>
 			<xsl:call-template name="abschnitt"/>
-			
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
+			<text:p text:style-name="P1"/>
+			<xsl:call-template name="abschnitt"/>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
+			<text:p text:style-name="P1"/>
+			<xsl:call-template name="abschnitt"/>
+			<text:p text:style-name="P1"/>
+			<text:p text:style-name="P4">---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------</text:p>
+			<text:p text:style-name="P1"/>
+			<xsl:call-template name="abschnitt"/>
+
 		 </office:text>
 </xsl:template>
 <xsl:template name="abschnitt">
@@ -300,7 +300,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P1">
 			geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
 			ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
-			als 
+			als
 			<xsl:choose>
 				<xsl:when test="geschlecht='m'">
 					<xsl:text>ordentlicher Studierender </xsl:text>
@@ -313,7 +313,16 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</xsl:otherwise>
 			</xsl:choose>
 			(Studienbeginn<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" />, Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
-			<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
+			<text:line-break />der Studienrichtung <xsl:text> </xsl:text><xsl:value-of select="studiengang_kz" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text>
+			<xsl:choose>
+				<xsl:when test="studiengang_bezeichnung_sto=''">
+					<xsl:value-of select="studiengang_bezeichnung" />
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="studiengang_bezeichnung_sto" />
+				</xsl:otherwise>
+			</xsl:choose>
+			 im
 			<xsl:text> </xsl:text><xsl:value-of select="semester" />. Semester gemeldet.
 		</text:p>
 		<text:p text:style-name="P1"/>

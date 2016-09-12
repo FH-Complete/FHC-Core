@@ -2343,11 +2343,13 @@ if(!$error)
 		//ein Student oder Mitarbeiter ist
 		if(($_POST['studiengang_kz']!='' &&
 			!$rechte->isBerechtigt('assistenz',$_POST['studiengang_kz'],'suid') &&
-			!$rechte->isBerechtigt('admin',$_POST['studiengang_kz'], 'suid')
+			!$rechte->isBerechtigt('admin',$_POST['studiengang_kz'], 'suid') &&
+			!$rechte->isBerechtigt('basis/betriebsmittel',$_POST['studiengang_kz'], 'suid')
 		   ) ||
 		   ($_POST['studiengang_kz']=='' &&
 		    !$rechte->isBerechtigt('admin', null, 'suid') &&
-		    !$rechte->isBerechtigt('mitarbeiter', null, 'suid')
+		    !$rechte->isBerechtigt('mitarbeiter', null, 'suid') &&
+		    !$rechte->isBerechtigt('basis/betriebsmittel', null, 'suid')
 		   ))
 		{
 			$error = true;
@@ -2386,11 +2388,13 @@ if(!$error)
 		//ein Student oder Mitarbeiter ist
 		if(($_POST['studiengang_kz']!='' &&
 			!$rechte->isBerechtigt('assistenz',$_POST['studiengang_kz'],'suid') &&
-			!$rechte->isBerechtigt('admin',$_POST['studiengang_kz'], 'suid')
+			!$rechte->isBerechtigt('admin',$_POST['studiengang_kz'], 'suid') &&
+			!$rechte->isBerechtigt('basis/betriebsmittel',$_POST['studiengang_kz'], 'suid')
 		   ) ||
 		   ($_POST['studiengang_kz']=='' &&
 		    !$rechte->isBerechtigt('admin', null, 'suid') &&
-		    !$rechte->isBerechtigt('mitarbeiter', null, 'suid')
+		    !$rechte->isBerechtigt('mitarbeiter', null, 'suid') &&
+		    !$rechte->isBerechtigt('basis/betriebsmittel', null, 'suid')
 		   ))
 		{
 			$error = true;

@@ -49,53 +49,54 @@ class menu_addon_meinelv extends menu_addon
 			$studiengang_obj = new studiengang();
 			$studiengang_obj->getAll();
 
-			if ($stsemobj = new studiensemester())
+			$stsemobj = new studiensemester();
+
+			$stsem_arr=array();
+			$stsem_arr[]=$stsemobj->getNearest();
+			$stsem_arr[]=$stsemobj->getNearestFrom($stsem_arr[0]);
+
+			foreach($stsem_arr as $stsem)
 			{
-				$stsem_arr=array();
-				if(!$stsemobj->getakt())
-				{
-					$stsem_arr[]=$stsemobj->getNearest();
-					$stsem_arr[]=$stsemobj->getNearestFrom($stsem_arr[0]);
-				}
-				else
-				{
-					$stsem_arr[] = $stsemobj->getNearest();
-				}
 				$qry = "SELECT distinct lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, lehre,
-							lehreverzeichnis from campus.vw_student_lehrveranstaltung
-						WHERE uid=".$this->db_add_param($user)." AND studiensemester_kurzbz in(".$this->db_implode4SQL($stsem_arr).")
+							lehreverzeichnis, studiensemester_kurzbz from campus.vw_student_lehrveranstaltung
+						WHERE uid=".$this->db_add_param($user)." AND studiensemester_kurzbz=".$this->db_add_param($stsem)."
 						AND lehre=true AND lehreverzeichnis<>'' ORDER BY studiengang_kz, semester, bezeichnung";
 				if($result = $this->db_query($qry))
 				{
-					while($row = $this->db_fetch_object($result))
+					if($this->db_num_rows($result)>0)
 					{
-						$lv_obj = new lehrveranstaltung();
-						$lv_obj->load($row->lehrveranstaltung_id);
+						$this->items[] = array('title'=>$stsem,
+								'target'=>'_self',
+								'link'=>'#'.$stsem,
+								'name'=>'<b>'.$stsem.'</b>');
 
-						if($row->studiengang_kz==0 && $row->semester==0) // Freifach
+						while($row = $this->db_fetch_object($result))
 						{
-							$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
-							 'target'=>'content',
-							 'link'=>'private/freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id,
-							 'name'=>'FF '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
-							);
-						}
-						else
-						{
-							$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
-							 'target'=>'content',
-							 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id,
-							 'name'=>$studiengang_obj->kuerzel_arr[$row->studiengang_kz].$row->semester.' '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
-							);
+							$lv_obj = new lehrveranstaltung();
+							$lv_obj->load($row->lehrveranstaltung_id);
+
+							if($row->studiengang_kz==0 && $row->semester==0) // Freifach
+							{
+								$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
+								 'target'=>'content',
+								 'link'=>'private/freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$row->studiensemester_kurzbz,
+								 'name'=>'FF '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
+								);
+							}
+							else
+							{
+								$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
+								 'target'=>'content',
+								 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$row->studiensemester_kurzbz,
+								 'name'=>$studiengang_obj->kuerzel_arr[$row->studiengang_kz].$row->semester.' '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
+								);
+							}
 						}
 					}
 				}
 				else
 					echo "Fehler beim Auslesen der LV";
-			}
-			else
-			{
-				echo "Fehler Semester beim Auslesen der LV";
+
 			}
 		}
 
@@ -105,57 +106,73 @@ class menu_addon_meinelv extends menu_addon
 			if ($stsemobj = new studiensemester())
 			{
 				$stsem_arr=array();
-				if(!$stsemobj->getakt())
-				{
-					$stsem_arr[]=$stsemobj->getNearest();
-					$stsem_arr[]=$stsemobj->getNearestFrom($stsem_arr[0]);
-				}
-				else
-				{
-					$stsem_arr[] = $stsemobj->getNearest();
-				}
-				$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.orgform_kurzbz  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
-				        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-				        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-				        mitarbeiter_uid=".$this->db_add_param($user)." AND tbl_lehreinheit.studiensemester_kurzbz in(".$this->db_implode4SQL($stsem_arr).")
-				        ORDER BY studiengang_kz, semester, bezeichnung";
+				$stsem_arr[]=$stsemobj->getNearest();
+				$stsem_arr[]=$stsemobj->getNearestFrom($stsem_arr[0]);
 
-				if($result = $this->db_query($qry))
-				{
-					$this->items[] = array('title'=>$p->t("lvaliste/titel"),
-							'target'=>'content',
-							'link'=>'private/profile/lva_liste.php',
-							'name'=>$p->t("lvaliste/titel"));
+				$this->items[] = array('title'=>$p->t("lvaliste/titel"),
+						'target'=>'content',
+						'link'=>'private/profile/lva_liste.php',
+						'name'=>$p->t("lvaliste/titel"));
 
-					while($row = $this->db_fetch_object($result))
+				foreach($stsem_arr as $stsem)
+				{
+					$stsementry=array();
+					$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.orgform_kurzbz, studiensemester_kurzbz  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
+					        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+					        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+					        mitarbeiter_uid=".$this->db_add_param($user)." AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($stsem)."
+					        ORDER BY studiengang_kz, semester, bezeichnung";
+
+					if($result = $this->db_query($qry))
 					{
-						$lv_obj = new lehrveranstaltung();
-						$lv_obj->load($row->lehrveranstaltung_id);
-
-						if($row->studiengang_kz==0 AND $row->semester==0)
+						if($this->db_num_rows($result)>0)
 						{
-							$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
-							 'target'=>'content',
-							 'link'=>'private/freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id,
-							 'name'=>'FF '.$this->CutString($row->lehreverzeichnis, $cutlength)
-							);
-						}
-						else
-						{
-							$stg_obj = new studiengang();
-							$stg_obj->load($row->studiengang_kz);
-							$kurzbz = $stg_obj->kuerzel.'-'.$row->semester.' '.$row->orgform_kurzbz;
+							$this->items[] = array('title'=>$stsem,
+									'target'=>'_self',
+									'link'=>'#'.$stsem,
+									'name'=>'<b>'.$stsem.'</b>');
 
-							$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
-							 'target'=>'content',
-							 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id,
-							 'name'=>$kurzbz.' '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
-							);
+							while($row = $this->db_fetch_object($result))
+							{
+								$lv_obj = new lehrveranstaltung();
+								$lv_obj->load($row->lehrveranstaltung_id);
+
+								if($row->studiengang_kz==0 AND $row->semester==0)
+								{
+									$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
+									 'target'=>'content',
+									 'link'=>'private/freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id,
+									 'name'=>'FF '.$this->CutString($row->lehreverzeichnis, $cutlength)
+									);
+								}
+								else
+								{
+									$stg_obj = new studiengang();
+									$stg_obj->load($row->studiengang_kz);
+									$kurzbz = $stg_obj->kuerzel.'-'.$row->semester.' '.$row->orgform_kurzbz;
+
+									$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
+									 'target'=>'content',
+									 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$row->studiensemester_kurzbz,
+									 'name'=>$kurzbz.' '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
+									);
+								}
+							}
 						}
 					}
+					else
+						echo "Fehler beim Auslesen des Lehrfaches";
+/*
+					if(count($stsementry)>0)
+					{
+						$this->items[] = array('title'=>$stsem,
+								'target'=>'',
+								'link'=>'#',
+								'name'=>$stsem,
+								'childs'=>$stsementry
+						);
+					}*/
 				}
-				else
-					echo "Fehler beim Auslesen des Lehrfaches";
 			}
 			else
 			{

@@ -304,7 +304,7 @@ elseif(in_array($xsl,array('Inskription','Studienerfolg','OutgoingLearning','Out
 }
 elseif($xsl=='Uebernahme')
 {
-	if(!$rechte->isBerechtigt('wawi/inventar') && !$rechte->isBerechtigt('assistenz'))
+	if(!$rechte->isBerechtigt('wawi/inventar') && !$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('basis/betriebsmittel'))
 	{
 		echo 'Sie haben keine Berechtigung dieses Dokument zu erstellen';
 		exit;

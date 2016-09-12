@@ -47,6 +47,8 @@ require_once('../include/mitarbeiter.class.php');
 require_once('../include/organisationsform.class.php');
 require_once('../include/konto.class.php');
 require_once('../include/reihungstest.class.php');
+require_once('../include/studienordnung.class.php');
+require_once('../include/studienplan.class.php');
 
 // *********** Funktionen *************************
 function convdate($date)
@@ -760,7 +762,25 @@ else
 				if($row = $db->db_fetch_object())
 				{
 					$semester = $row->ausbildungssemester;
+					$studienplan_id = $row->studienplan_id;
 				}
+			}
+
+			if($studienplan_id!='')
+			{
+				$stpl = new studienplan();
+				$stpl->loadStudienplan($studienplan_id);
+
+				$sto = new studienordnung();
+				$sto->loadStudienordnung($stpl->studienordnung_id);
+
+				$sto_studiengang_bezeichnung = $sto->studiengangbezeichnung;
+				$sto_studiengang_bezeichnung_englisch = $sto->studiengangbezeichnung_englisch;
+			}
+			else
+			{
+				$sto_studiengang_bezeichnung='';
+				$sto_studiengang_bezeichnung_englisch='';
 			}
 
 			//für ao. Studierende wird der Studiengang der Lehrveranstaltungen benötigt, die sie besuchen
@@ -863,6 +883,8 @@ else
                 <studiengang_orgform_kurzbz><![CDATA['.$studiengang->orgform_kurzbz.']]></studiengang_orgform_kurzbz>
                 <studiengang_orgform_bezeichnung><![CDATA['.$orgform_bezeichnung->bezeichnung.']]></studiengang_orgform_bezeichnung>
                 <studiengang_studiengangsleitung><![CDATA['.$stgl.']]></studiengang_studiengangsleitung>
+				<studiengang_bezeichnung_sto><![CDATA['.$sto_studiengang_bezeichnung.']]></studiengang_bezeichnung_sto>
+				<studiengang_bezeichnung_sto_englisch><![CDATA['.$sto_studiengang_bezeichnung_englisch.']]></studiengang_bezeichnung_sto_englisch>
 				<lv_studiengang_kz><![CDATA['.$lv_studiengang_kz.']]></lv_studiengang_kz>
 				<lv_studiengang_bezeichnung><![CDATA['.$lv_studiengang_bezeichnung.']]></lv_studiengang_bezeichnung>
                 <lv_studiengang_typ><![CDATA['.$lv_studiengang_typ.']]></lv_studiengang_typ>

@@ -24,7 +24,7 @@ $db = new basis_db();
 		  <table border="0" cellpadding="5" cellspacing="0" bgcolor="#E0E0E0">
 		    <tr>
 		      <td align="right">token:</td>
-		      <td><input name="token" type="text" size="30" maxlength="15" value="<?php echo $db->convert_html_chars((isset($_REQUEST['token']) ? $_REQUEST['token'] : ""));?>"></td>
+		      <td><input name="token" type="text" size="30" maxlength="15" value="<?php echo $db->convert_html_chars((isset($_REQUEST['token']) ? $_REQUEST['token'] : ""));?>"> Anfrage ID - zufälliger Text</td>
 		    </tr>
 		    <tr>
 		      <td align="right">Matrikelnummer:</td>
@@ -40,7 +40,7 @@ $db = new basis_db();
 		    </tr>
 		  	<tr>
 		      <td align="right">Geburtsdatum:</td>
-		      <td><input name="geburtsdatum" type="text" size="30" maxlength="10" value="<?php echo $db->convert_html_chars((isset($_REQUEST['geburtsdatum']) ? $_REQUEST['geburtsdatum'] : ""));?>"></td>
+		      <td><input name="geburtsdatum" type="text" size="30" maxlength="10" value="<?php echo $db->convert_html_chars((isset($_REQUEST['geburtsdatum']) ? $_REQUEST['geburtsdatum'] : ""));?>"> Format: YYYY-MM-DD</td>
 		    </tr>
 		   <tr>
 		      <td align="right">Postleitzahl:</td>
@@ -48,7 +48,7 @@ $db = new basis_db();
 		    </tr>
 		        <tr>
 		      <td align="right">Semesterkuerzel:</td>
-		      <td><input name="semesterkuerzel" type="text" size="30" maxlength="3" value="<?php echo $db->convert_html_chars((isset($_REQUEST['semester']) ? $_REQUEST['semester'] : "11W"));?>"></td>
+		      <td><input name="semesterkuerzel" type="text" size="30" maxlength="3" value="<?php echo $db->convert_html_chars((isset($_REQUEST['semesterkuerzel']) ? $_REQUEST['semesterkuerzel'] : "16W"));?>"> Format 16W für WS2016; 16S für SS2016</td>
 		    </tr>
 		    <tr>
 		      <td align="right"></td>
@@ -91,5 +91,17 @@ if(isset($_REQUEST['submit']))
 }
 
 ?>
+<pre>
+* mögliche Fehlercodes
+ * 	1: Kein aufrechtes Studium
+ *	2: Fehlerhafter Request
+ *	3: Student wurde nicht gefunden
+ *	4: Fehler Geburtsdatum
+ *	5: Fehler Postleitzahl
+ *	6: Fehler Vorname
+ *	7: Fehler Nachname
+ *	8: Fehler Semester
+ *	9: Fehler Matrikelnummer
+</pre>
 </body>
 </html>

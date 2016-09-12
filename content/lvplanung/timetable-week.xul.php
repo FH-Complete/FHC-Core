@@ -376,22 +376,50 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 		
 		if(isset($res_id))
 		{
-			$reservierung=new reservierung();
 			foreach ($res_id as $reservierung_id)
 			{
+				$reservierung = new reservierung();
+				$reservierung->load($reservierung_id);
+				$deletetext = ' AND datum='.$reservierung->datum.' AND stunde='.$reservierung->stunde.' AND titel='.$reservierung->titel.' AND beschreibung='.$reservierung->beschreibung.' AND uid='.$reservierung->uid.';';
 				$reservierung->delete($reservierung_id);
 				$error_msg.=$reservierung->errormsg;
+				//UNDO Befehl zum mitloggen von geloeschten Reservierungen
+				if($error_msg=='')
+				{
+					$log = new log();
+					$log->executetime = date('Y-m-d H:i:s');
+					$log->sqlundo = '';
+					$log->sql = 'DELETE FROM campus.tbl_reservierung WHERE reservierung_id='.$reservierung_id.$deletetext;
+					$log->beschreibung = 'Löschen der Reservierung '.$reservierung_id;
+					$log->mitarbeiter_uid = $uid;
+					if(!$log->save(true))
+						$error_msg.='Fehler: '.$log->errormsg;
+				}
 			}
 		}
 		
 		//Loeschen von mehreren Reservierungen
 		if(isset($res_idx))
 		{
-			$reservierung=new reservierung();
 			foreach ($res_idx as $reservierung_id)
 			{
+				$reservierung = new reservierung();
+				$reservierung->load($reservierung_id);
+				$deletetext = ' AND datum='.$reservierung->datum.' AND stunde='.$reservierung->stunde.' AND titel='.$reservierung->titel.' AND beschreibung='.$reservierung->beschreibung.' AND uid='.$reservierung->uid.';';
 				$reservierung->delete($reservierung_id);
 				$error_msg.=$reservierung->errormsg;
+				//UNDO Befehl zum mitloggen von geloeschten Reservierungen
+				if($error_msg=='')
+				{
+					$log = new log();
+					$log->executetime = date('Y-m-d H:i:s');
+					$log->sqlundo = '';
+					$log->sql = 'DELETE FROM campus.tbl_reservierung WHERE reservierung_id='.$reservierung_id.$deletetext;
+					$log->beschreibung = 'Löschen der Reservierung '.$reservierung_id;
+					$log->mitarbeiter_uid = $uid;
+					if(!$log->save(true))
+						$error_msg.='Fehler: '.$log->errormsg;
+				}
 			}
 		}
 	}

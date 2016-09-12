@@ -29,12 +29,14 @@
 	require_once('../../include/studiensemester.class.php');
 
 	$db = new basis_db();
-	
+
 	if(!($result_stg = $db->db_query("SELECT studiengang_kz, bezeichnung, lower(typ::varchar(1) || kurzbz) as kurzbz FROM public.tbl_studiengang ORDER BY kurzbz ASC")))
 		die($db->db_last_error());
 	$num_rows=$db->db_num_rows($result_stg);
 	$ss=new studiensemester();
 	$ss_nearest=$ss->getNearest();
+	$ss_nearest_to_akt=$ss->getNearestFrom($ss_nearest);
+
 ?>
 <HTML>
 <HEAD>
@@ -54,7 +56,7 @@
      	$stg_id=$row->studiengang_kz;
 		$stg_kzbz=$row->kurzbz;
 		$sql_query="SELECT * FROM public.tbl_gruppe WHERE studiengang_kz='".addslashes($stg_id)."' AND mailgrp=true ORDER BY gruppe_kurzbz";
-		
+
 		if(!($result_mg = $db->db_query($sql_query)))
 			die($db->db_last_error());
 		$nr_mg=$db->db_num_rows($result_mg);
@@ -64,12 +66,24 @@
 		{
 			$row_mg = $db->db_fetch_object($result_mg, $j);
 			$mg_kurzbz=$row_mg->gruppe_kurzbz;
+			if($row_mg->studiengang_kz==10005 && mb_stripos($mg_kurzbz,'EWU')===0)
+			{
+				echo "EWU Gruppe $mg_kurzbz wird fuer STSEM ".$ss_nearest." und ".$ss_nearest_to_akt." erstellt";
+				// FHTW Warm Up Kurse enthaelt die Teilnehmer des SS auch wenn das WS schon gestartet hat
+			$sql_query='SELECT tbl_benutzergruppe.uid, nachname, vorname '.
+				       'FROM campus.vw_benutzer, public.tbl_benutzergruppe '.
+				       'WHERE vw_benutzer.uid=tbl_benutzergruppe.uid AND '.
+				       "UPPER(gruppe_kurzbz)=UPPER('$mg_kurzbz') AND tbl_benutzergruppe.uid NOT LIKE '\\\\_%' ".
+					   "AND (studiensemester_kurzbz IS NULL OR studiensemester_kurzbz in(".$db->db_add_param($ss_nearest).",".$db->db_add_param($ss_nearest_to_akt).")) AND aktiv ORDER BY nachname;";
+			}
+			else
+			{
 			$sql_query='SELECT tbl_benutzergruppe.uid, nachname, vorname '.
 				       'FROM campus.vw_benutzer, public.tbl_benutzergruppe '.
 				       'WHERE vw_benutzer.uid=tbl_benutzergruppe.uid AND '.
 				       "UPPER(gruppe_kurzbz)=UPPER('$mg_kurzbz') AND tbl_benutzergruppe.uid NOT LIKE '\\\\_%' ".
 					   "AND (studiensemester_kurzbz IS NULL OR studiensemester_kurzbz='$ss_nearest') AND aktiv ORDER BY nachname;";
-			
+			}
 			if(!($result_person = $db->db_query($sql_query)))
 				die($db->db_last_error());
 
@@ -102,14 +116,14 @@
 
 	//$qry = "SELECT vornamen, nachname, uid, alias FROM tbl_person where alias<>'' ORDER BY nachname, vornamen";
 	$qry = "SELECT vorname, nachname, uid, alias FROM (public.tbl_person JOIN public.tbl_benutzer USING(person_id)) LEFT JOIN public.tbl_student on(uid=student_uid)
-	        WHERE 
+	        WHERE
 	        	alias<>''";
 	if($noalias_kz!='')
 		$qry.=" AND (studiengang_kz NOT IN($noalias_kz) OR studiengang_kz is null)";
 
-	$qry.="	AND (tbl_benutzer.aktiv OR 
-	        		(tbl_benutzer.aktiv=false 
-	        		AND updateaktivam >= now()-(SELECT CASE public.get_rolle_prestudent (prestudent_id,null) 
+	$qry.="	AND (tbl_benutzer.aktiv OR
+	        		(tbl_benutzer.aktiv=false
+	        		AND updateaktivam >= now()-(SELECT CASE public.get_rolle_prestudent (prestudent_id,null)
 	        										WHEN 'Abbrecher' THEN '".DEL_ABBRECHER_WEEKS." weeks'::interval
 	        										WHEN 'Absolvent' THEN '".DEL_STUDENT_WEEKS." weeks'::interval
 	        										ELSE '".DEL_MITARBEITER_WEEKS." weeks'::interval
@@ -117,7 +131,7 @@
 	        									  )
 	        		))
 	        ORDER BY nachname, vorname";
-	
+
 	if($result = $db->db_query($qry))
 	{
 		$fp=fopen('../../../mlists/tw_alias.txt',"w");
