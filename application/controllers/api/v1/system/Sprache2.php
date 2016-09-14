@@ -35,16 +35,9 @@ class Sprache2 extends APIv1_Controller
 	{
 		$sprache = $this->get('sprache');
 		
-		if (isset($sprache))
-		{
-			$result = $this->SpracheModel->load($sprache);
+		$result = $this->SpracheModel->load($sprache);
 			
-			$this->response($result, REST_Controller::HTTP_OK);
-		}
-		else
-		{
-			$this->response();
-		}
+		$this->response($result, REST_Controller::HTTP_OK);
 	}
 
 	/**
