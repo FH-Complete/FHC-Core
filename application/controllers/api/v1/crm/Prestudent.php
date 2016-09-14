@@ -93,6 +93,23 @@ class Prestudent extends APIv1_Controller
 	/**
 	 * @return void
 	 */
+	public function deletePrestudent()
+	{
+		if ($this->_validate($this->delete()))
+		{
+			$result = $this->PrestudentModel->delete($this->delete()["prestudent_id"]);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	/**
+	 * @return void
+	 */
 	public function postAddReihungstest()
 	{
 		$ddReihungstest = $this->_parseData($this->post());

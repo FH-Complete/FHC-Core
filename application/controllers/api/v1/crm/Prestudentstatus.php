@@ -104,6 +104,31 @@ class Prestudentstatus extends APIv1_Controller
 		}
 	}
 	
+	/**
+	 * @return void
+	 */
+	public function deletePrestudentstatus()
+	{
+		$prestudentstatus = $this->_parseData($this->delete());
+		
+		if ($this->_validate($prestudentstatus))
+		{
+			$pksArray = array($prestudentstatus['ausbildungssemester'],
+								$prestudentstatus['studiensemester_kurzbz'],
+								$prestudentstatus['status_kurzbz'],
+								$prestudentstatus['prestudent_id']
+							);
+
+			$result = $this->PrestudentstatusModel->delete($pksArray);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
 	private function _validate($prestudentstatus = null)
 	{
 		return true;
