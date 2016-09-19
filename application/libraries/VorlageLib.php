@@ -121,9 +121,11 @@ class VorlageLib
 		{
 			$where .= "sprache = " . $this->ci->VorlageModel->escape($sprache);
 		}
+		
+		$where .= " AND aktiv = true";
 
 		// Try to search the template with the given vorlage_kurzbz and other parameters if present
-		$queryParameters = array("vorlage_kurzbz" => $vorlage_kurzbz);
+		$queryParameters = array("vorlage_kurzbz" => $vorlage_kurzbz, "aktiv" => true);
 
 		if (isset($oe_kurzbz))
 		{
