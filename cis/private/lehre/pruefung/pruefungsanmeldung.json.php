@@ -409,27 +409,30 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	}
     }
     $i=0;
+	$stdsem_lv_besuch = null;
     do
     {
-	$lehrveranstaltung->load_lva_student($uid, $stdsem);
-	foreach($lehrveranstaltung->lehrveranstaltungen as $lv)
-	{
-	    if($lv->lehrveranstaltung_id === $lehrveranstaltung->lehrveranstaltung_id)
-	    {
-		$lv_besucht = true;
-	    }
-	}
-	$stdsem = $studiensemester->getPreviousFrom($stdsem);
-	$lehrveranstaltung->lehrveranstaltungen = array();
-	$i++;
+		$lehrveranstaltung->load_lva_student($uid, $stdsem);
+		foreach($lehrveranstaltung->lehrveranstaltungen as $lv)
+		{
+			if($lv->lehrveranstaltung_id === $lehrveranstaltung->lehrveranstaltung_id)
+			{
+				$lv_besucht = true;
+				$stdsem_lv_besuch = $stdsem;
+			}
+		}
+		
+		$stdsem = $studiensemester->getPreviousFrom($stdsem);
+		$lehrveranstaltung->lehrveranstaltungen = array();
+		$i++;
     }
     while($i<=$semCounter && $lv_besucht === FALSE);
 
     if(!$lv_besucht)
     {
-	$data['error']='true';
-	$data['errormsg']='Besuch der Lehrveranstaltung liegt zu weit in der Vergangenheit.';
-	return $data;
+		$data['error']='true';
+		$data['errormsg']='Besuch der Lehrveranstaltung liegt zu weit in der Vergangenheit.';
+		return $data;
     }
 
     $pruefung->getPruefungen($uid, NULL, $lehrveranstaltung->lehrveranstaltung_id);
@@ -555,95 +558,115 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 
     if(count($prestudent->result) > 0)
     {
-	$prestudent_id = "";
-	foreach($prestudent->result as $ps)
-	{
-	    if($ps->getLaststatus($ps->prestudent_id, $stdsem))
-	    {
-		if(($ps->status_kurzbz == "Student"))
+		$prestudent_id = "";
+		foreach($prestudent->result as $ps)
 		{
-		    $prestudent_id = $ps->prestudent_id;
+			if($ps->getLaststatus($ps->prestudent_id, $stdsem))
+			{
+				if(($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+				{
+					$prestudent_id = $ps->prestudent_id;
+				}
+				else
+				{
+					if($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
+					{
+						if(($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+						{
+							$prestudent_id = $ps->prestudent_id;
+						}
+					}
+				}
+			}
+			else
+			{
+				if($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
+				{
+					if(($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+					{
+						$prestudent_id = $ps->prestudent_id;
+					}
+				}
+			}
 		}
-	    }
-	}
-	if($prestudent_id != "")
-	{
-            $anrechungSaveResult = false;
-            if(!defined('CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG') || CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG == true)
-            {
-                if($lv_komp->lehrveranstaltung_id != null && ($lv_komp->lehrveranstaltung_id != $lehrveranstaltung->lehrveranstaltung_id))
-                {
-                    $anrechnung->lehrveranstaltung_id = $lv_komp->lehrveranstaltung_id;
-                    $anrechnung->lehrveranstaltung_id_kompatibel = $lehrveranstaltung->lehrveranstaltung_id;
-                    $anrechnung->prestudent_id = $prestudent_id;
-                    $anrechnung->begruendung_id = "2";
-                    $anrechnung->genehmigt_von = CIS_PRUEFUNGSANMELDUNG_USER;
-                    $anrechnung->new = true;
-                    $anrechungSaveResult = $anrechnung->save();
-                }
-                else
-                {
-                    $anrechungSaveResult = true;
-                }
-            }
-            else
-            {
-                $anrechungSaveResult = true;
-            }
+		if($prestudent_id != "")
+		{
+				$anrechungSaveResult = false;
+				if(!defined('CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG') || CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG == true)
+				{
+					if($lv_komp->lehrveranstaltung_id != null && ($lv_komp->lehrveranstaltung_id != $lehrveranstaltung->lehrveranstaltung_id))
+					{
+						$anrechnung->lehrveranstaltung_id = $lv_komp->lehrveranstaltung_id;
+						$anrechnung->lehrveranstaltung_id_kompatibel = $lehrveranstaltung->lehrveranstaltung_id;
+						$anrechnung->prestudent_id = $prestudent_id;
+						$anrechnung->begruendung_id = "2";
+						$anrechnung->genehmigt_von = CIS_PRUEFUNGSANMELDUNG_USER;
+						$anrechnung->new = true;
+						$anrechungSaveResult = $anrechnung->save();
+					}
+					else
+					{
+						$anrechungSaveResult = true;
+					}
+				}
+				else
+				{
+					$anrechungSaveResult = true;
+				}
 
-	    if($anrechungSaveResult)
-	    {
-                if($anrechnung->anrechnung_id == "")
-                    $anmeldung->anrechnung_id = null;
-                else
-                    $anmeldung->anrechnung_id = $anrechnung->anrechnung_id;
+			if($anrechungSaveResult)
+			{
+					if($anrechnung->anrechnung_id == "")
+						$anmeldung->anrechnung_id = null;
+					else
+						$anmeldung->anrechnung_id = $anrechnung->anrechnung_id;
 
-                if($anmeldung->save(true))
-                {
-                    $pruefung = new pruefungCis($termin->pruefung_id);
-                    if(defined('CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG') && (CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG !== ""))
-                    $to = CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG."@".DOMAIN;
-                    else
-                    $to = $pruefung->mitarbeiter_uid."@".DOMAIN;
-                    $from = "noreply@".DOMAIN;
-                    $subject = $p->t('pruefung/emailLektorSubjectAnmeldung');
-                    $mail = new mail($to, $from, $subject, $p->t('pruefung/emailBodyBitteHtmlSicht'));
+					if($anmeldung->save(true))
+					{
+						$pruefung = new pruefungCis($termin->pruefung_id);
+						if(defined('CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG') && (CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG !== ""))
+						$to = CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG."@".DOMAIN;
+						else
+						$to = $pruefung->mitarbeiter_uid."@".DOMAIN;
+						$from = "noreply@".DOMAIN;
+						$subject = $p->t('pruefung/emailLektorSubjectAnmeldung');
+						$mail = new mail($to, $from, $subject, $p->t('pruefung/emailBodyBitteHtmlSicht'));
 
-                    $student = new student($uid);
-                    $datum = new datum();
+						$student = new student($uid);
+						$datum = new datum();
 
-                    $lv = new lehrveranstaltung($anmeldung->lehrveranstaltung_id);
+						$lv = new lehrveranstaltung($anmeldung->lehrveranstaltung_id);
 
-                    $html = $p->t('pruefung/emailLektorStudentIn')." ".$student->vorname." ".$student->nachname." ".$p->t('pruefung/emailLektorHatSichZurPruefung')." ".$lv->bezeichnung." ".$p->t('pruefung/emailLektorAm')." ".$datum->formatDatum($termin->von, "d.m.Y")." ".$p->t('pruefung/emailLektorVon')." ".$datum->formatDatum($termin->von,"H:i")." ".$p->t('pruefung/emailLektorUhrBis')." ".$datum->formatDatum($termin->bis,"H:i")." ".$p->t('pruefung/emailLektorUhrAngemeldet');
-                    $mail->setHTMLContent($html);
-                    $mail->send();
+						$html = $p->t('pruefung/emailLektorStudentIn')." ".$student->vorname." ".$student->nachname." ".$p->t('pruefung/emailLektorHatSichZurPruefung')." ".$lv->bezeichnung." ".$p->t('pruefung/emailLektorAm')." ".$datum->formatDatum($termin->von, "d.m.Y")." ".$p->t('pruefung/emailLektorVon')." ".$datum->formatDatum($termin->von,"H:i")." ".$p->t('pruefung/emailLektorUhrBis')." ".$datum->formatDatum($termin->bis,"H:i")." ".$p->t('pruefung/emailLektorUhrAngemeldet');
+						$mail->setHTMLContent($html);
+						$mail->send();
 
-                    $data['result'] = $p->t('pruefung/anmeldungErfolgreich');
-                    $data['error']='false';
-                    $data['errormsg']='';
-                }
-                else
-                {
-                    $data['error']='true';
-                    $data['errormsg']=$anmeldung->errormsg;
-                }
-	    }
-	    else
-	    {
-	    $data['error']='true';
-	    $data['errormsg']=$anrechnung->errormsg;
-	    }
-	}
-	else
-	{
-	    $data['error']='true';
-	    $data['errormsg']=$p->t('pruefung/prestudentNichtGefunden');
-	}
+						$data['result'] = $p->t('pruefung/anmeldungErfolgreich');
+						$data['error']='false';
+						$data['errormsg']='';
+					}
+					else
+					{
+						$data['error']='true';
+						$data['errormsg']=$anmeldung->errormsg;
+					}
+			}
+			else
+			{
+			$data['error']='true';
+			$data['errormsg']=$anrechnung->errormsg;
+			}
+		}
+		else
+		{
+			$data['error']='true';
+			$data['errormsg']=$p->t('pruefung/prestudentNichtGefunden');
+		}
     }
     else
     {
-	$data['error']='true';
-	$data['errormsg']=$p->t('pruefung/prestudentNichtGefunden');
+		$data['error']='true';
+		$data['errormsg']=$p->t('pruefung/prestudentNichtGefunden');
     }
     return $data;
 }
