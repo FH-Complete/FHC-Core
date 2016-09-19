@@ -1411,7 +1411,7 @@ foreach ($studiengang->result as $row)
 	else
 		$selected='';
 
-	echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz&studiensemester_kurzbz=$studiensemester_kurzbz' $selected>".$db->convert_html_chars($row->kuerzel)."</OPTION>"."\n";
+	echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz&studiensemester_kurzbz=$studiensemester_kurzbz' $selected>".$db->convert_html_chars($row->kuerzel)." (".$db->convert_html_chars($row->bezeichnung).")</OPTION>"."\n";
 }
 echo "</SELECT>";
 $studienplan_obj = new studienplan();
