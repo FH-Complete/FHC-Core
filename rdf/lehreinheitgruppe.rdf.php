@@ -47,7 +47,7 @@ $DAO_obj = new lehreinheitgruppe();
 $DAO_obj->getLehreinheitgruppe($lehreinheit_id);
 
 $stg_obj = new studiengang();
-$stg_obj->getAll();
+$stg_obj->getAll(null,null);
 $stg = array();
 foreach ($stg_obj->result as $row)
 	$stg[$row->studiengang_kz]=$row->kuerzel;
