@@ -1,14 +1,12 @@
-<?php  
+<?php
 
 if (! defined("BASEPATH")) exit("No direct script access allowed");
 
 /**
-* Name:        Messaging Library for FH-Complete
+* Name:	Messaging Library for FH-Complete
 */
 class MessageLib
 {
-	private $recipients = array(); // not used anymore
-	
 	public function __construct()
 	{
         $this->ci =& get_instance();
@@ -37,36 +35,7 @@ class MessageLib
         //$this->ci->load->helper('language');
         $this->ci->lang->load("message");
     }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * get_message() - will return a single message, including the status for specified user.
-     *
-     * @param   integer  $msg_id   REQUIRED
-     * @return  array
-     */
-    public function getMessage($msg_id)
-    {
-        if (!is_numeric($msg_id))
-        	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
-		
-		$this->ci->MessageModel->addJoin("public.tbl_person", "person_id");
-		$msg = $this->ci->MessageModel->loadWhere(array("message_id" => $msg_id));
-		
-		// Sorts the statuses by the insert date, so the first in the array is the most updated
-		$this->ci->MsgStatusModel->addOrder("insertamum", "DESC");
-		$stat = $this->ci->MsgStatusModel->loadWhere(array("message_id" => $msg_id));
-		$msg->retval[0]->stat = $stat->retval;
-		
-		$recp = $this->ci->RecipientModel->loadWhere(array("message_id" => $msg_id));
-		$msg->retval[0]->recp = $recp->retval;
-		$attm = $this->ci->AttachmentModel->loadWhere(array("message_id" => $msg_id));
-		$msg->retval[0]->attm = $attm->retval;
-		
-        return $msg;
-    }
-
+	
 	/**
      * getMessagesByUID() - will return all messages, including the latest status for specified user. It don´t returns Attachments.
      *
@@ -82,7 +51,7 @@ class MessageLib
 
         return $msg;
     }
-
+	
 	/**
      * getMessagesByPerson() - will return all messages, including the latest status for specified user. It don´t returns Attachments.
      *
@@ -97,22 +66,6 @@ class MessageLib
 		$msg = $this->ci->MessageModel->getMessagesByPerson($person_id, $all);		
 
         return $msg;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * getSubMessages() - will return all Messages subordinated from a specified message.
-     *
-     * @param   integer  $msg_id    REQUIRED
-     * @return  array
-     */
-    public function getSubMessages($msg_id)
-    {
-        if (!is_numeric($msg_id))
-        	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
-		
-        return $this->getMessage($msg_id);
     }
 	
 	/**
@@ -152,12 +105,10 @@ class MessageLib
 				$result = $this->ci->MsgStatusModel->insert($statusKey);
 			}
 		}
-
+		
         return $result;
     }
-
-    // ------------------------------------------------------------------------
-
+	
     /**
      * updateMessageStatus() - will change status on message for particular user
      *
@@ -172,18 +123,18 @@ class MessageLib
         {
             return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
         }
-
+		
         if (empty($person_id))
         {
             return $this->_invalid_id(MSG_ERR_INVALID_USER_ID);
         }
-
+		
 		// Not use empty otherwise if status is 0 it returns an error
         if (!isset($status))
         {
             return $this->_invalid_id(MSG_ERR_INVALID_STATUS_ID);
         }
-
+		
 		// Searches if the status is already present
 		$result = $this->ci->MsgStatusModel->load(array($message_id, $person_id, $status));
 		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
@@ -204,28 +155,7 @@ class MessageLib
 		
 		return $result;
     }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * add_participant() - adds user to existing thread - NOT used anymore
-     *
-     * @param   integer  $thread_id  REQUIRED
-     * @param   integer  $user_id    REQUIRED
-     * @return  array
-     */
-    public function addRecipient($person_id)
-    {
-        if (!is_numeric($person_id))
-        	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
-		
-		$this->recipients[] = $person_id;
-		
-		return true;
-    }
-
-    // ------------------------------------------------------------------------
-
+	
     /**
      * sendMessage() - sends new internal message. This function will create a new thread
      *
@@ -296,7 +226,7 @@ class MessageLib
     {
         if (!is_numeric($sender_id) || !is_numeric($receiver_id))
         	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
-
+		
 		// Load reveiver data to get its relative language
 		$this->ci->load->model("person/Person_model", "PersonModel");
 		$result = $this->ci->PersonModel->load($receiver_id);
@@ -678,6 +608,7 @@ class MessageLib
 		$return->retval = $retval;
 		return $return;
 	}
+	
     /**
      * Invalid ID
      *
