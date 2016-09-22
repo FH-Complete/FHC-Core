@@ -16,12 +16,16 @@ class DmsLib
 	public function __construct()
 	{
 		$this->ci =& get_instance();
-
+		
+		$this->ci->load->model("crm/Akte_model", "AkteModel");
 		$this->ci->load->model("content/Dms_model", "DmsModel");
 		$this->ci->load->model("content/DmsVersion_model", "DmsVersionModel");
 		$this->ci->load->model("content/DmsFS_model", "DmsFSModel");
 	}
 
+	/**
+	 *
+	 */
 	public function read($dms_id, $version = null)
 	{
 		$result = null;
@@ -59,6 +63,9 @@ class DmsLib
 		return $result;
 	}
 
+	/**
+	 *
+	 */
 	public function save($dms)
 	{
 		$result = null;
@@ -111,6 +118,76 @@ class DmsLib
 
 		return $result;
 	}
+	
+	/**
+	 *
+	 */
+	public function delete($person_id, $dms_id)
+	{
+		$result = null;
+		
+		// If the parameters are valid
+		if (is_numeric($person_id) && is_numeric($dms_id))
+		{
+			// Start DB transaction
+			$this->ci->db->trans_start(false);
+			
+			// Get akte_id from table tbl_akte
+			$result = $this->ci->AkteModel->loadWhere(array("person_id" => $person_id, "dms_id" => $dms_id));
+			if (is_object($result) && $result->error == EXIT_SUCCESS)
+			{
+				// Delete all entries in tbl_akte
+				for ($i = 0; $i < count($result->retval); $i++)
+				{
+					$this->ci->AkteModel->delete($result->retval[$i]->akte_id);
+				}
+				
+				// Get all filenames related to this dms
+				$resultFileNames = $this->ci->DmsVersionModel->loadWhere(array("dms_id" => $dms_id));
+				if (is_object($resultFileNames) && $resultFileNames->error == EXIT_SUCCESS)
+				{
+					// Delete from tbl_dms_version
+					$result = $this->ci->DmsVersionModel->delete(array("dms_id" => $dms_id));
+					if (is_object($result) && $result->error == EXIT_SUCCESS)
+					{
+						// Delete from tbl_dms
+						$result = $this->ci->DmsModel->delete($dms_id);
+					}
+				}
+			}
+			
+			// Transaction complete!
+			$this->ci->db->trans_complete();
+			
+			// Check if everything went ok during the transaction
+			if ($this->ci->db->trans_status() === false || (is_object($result) && $result->error != EXIT_SUCCESS))
+			{
+				$this->ci->db->trans_rollback();
+				$result = $this->_error($result->msg, EXIT_ERROR);
+			}
+			else
+			{
+				$this->ci->db->trans_commit();
+				$result = $this->_success("Dms successfully removed from DB");
+			}
+			
+			// If everything is ok
+			if (is_object($result) && $result->error == EXIT_SUCCESS)
+			{
+				// Remove all files related to this person and dms
+				for ($i = 0; $i < count($resultFileNames->retval); $i++)
+				{
+					$this->ci->DmsFSModel->remove($resultFileNames->retval[$i]->filename);
+				}
+			}
+		}
+		else
+		{
+			$result = $this->_error("Invalid parameters");
+		}
+		
+		return $result;
+	}
 
 	/**
 	 *
@@ -146,5 +223,31 @@ class DmsLib
 		}
 
 		return $result;
+	}
+	
+	/**
+	 * Success
+	 */
+	private function _success($retval, $message = FHC_SUCCESS)
+	{
+		$return = new stdClass();
+		$return->error = EXIT_SUCCESS;
+		$return->Code = $message;
+		$return->msg = lang("message_" . $message);
+		$return->retval = $retval;
+		return $return;
+	}
+
+	/**
+	 * Error
+	 */
+	private function _error($retval = "", $message = FHC_ERROR)
+	{
+		$return = new stdClass();
+		$return->error = EXIT_ERROR;
+		$return->Code = $message;
+		$return->msg = lang("message_" . $message);
+		$return->retval = $retval;
+		return $return;
 	}
 }

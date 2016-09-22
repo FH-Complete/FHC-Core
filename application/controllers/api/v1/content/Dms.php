@@ -53,7 +53,7 @@ class Dms extends APIv1_Controller
 	{
 		$dms = $this->_parseData($this->post());
 		
-		if ($this->_validate($dms))
+		if ($this->_validatePost($dms))
 		{
 			$result = $this->dmslib->save($dms);
 			
@@ -65,13 +65,54 @@ class Dms extends APIv1_Controller
 		}
 	}
 	
-	private function _validate($dms = NULL)
+	/**
+	 * 
+	 */
+	public function postDelDms()
 	{
+		$dms = $this->_parseData($this->post());
+		
+		if ($this->_validateDelete($dms))
+		{
+			$result = $this->dmslib->delete($dms["person_id"], $dms["dms_id"]);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	private function _validatePost($dms = null)
+	{
+		if (!isset($dms))
+		{
+			return false;
+		}
 		if (!isset($dms["file_content"]) || (isset($dms["file_content"]) && $dms["file_content"] == ""))
 		{
 			return false;
 		}
 		if (!isset($dms["name"]) || (isset($dms["name"]) && $dms["name"] == ""))
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private function _validateDelete($dms = null)
+	{
+		if (!isset($dms))
+		{
+			return false;
+		}
+		if (!isset($dms["person_id"]) || !is_numeric($dms["person_id"]))
+		{
+			return false;
+		}
+		if (!isset($dms["dms_id"]) || !is_numeric($dms["dms_id"]))
 		{
 			return false;
 		}
