@@ -1,110 +1,118 @@
 <?php
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+
+if (! defined("BASEPATH")) exit("No direct script access allowed");
 
 class Messages extends VileSci_Controller 
 {
-
 	public function __construct()
     {
         parent::__construct();
-        $this->load->library('MessageLib');
-		$this->load->model('person/Person_model', 'PersonModel');
+        $this->load->library("MessageLib");
+		$this->load->model("person/Person_model", "PersonModel");
     }
 
-	public function index($person_id = null)
+	public function index()
 	{
-		$data = array('person_id' => $person_id);
-		$this->load->view('system/messages.php', $data);
+		$this->load->view("system/messages.php", array("person_id" => $this->getPersonId()));
 	}
 
-	public function inbox($person_id = null)
+	public function inbox($person_id)
 	{
-		if (empty($person_id))
-			$person_id = $this->input->post('person_id', TRUE);
-		if (empty($person_id))
-			$msg = $this->messagelib->getMessagesByUID(getAuthUID());
-		else
-			$msg = $this->messagelib->getMessagesByPerson($person_id);
+		$msg = $this->messagelib->getMessagesByPerson($person_id);
 		if ($msg->error)
-			show_error($msg->retval);
-		
-		$data = array
-		(
-			'uid' => getAuthUID(),
-			'messages' => $msg->retval
-		);
-		if (!empty($person_id))
 		{
-			$person = $this->PersonModel->load($person_id);
-			$data['person'] = $person->retval[0];
+			show_error($msg->retval);
 		}
-		// var_dump ($data);
-		$this->load->view('system/messagesInbox.php', $data);
+		
+		$person = $this->PersonModel->load($person_id);
+		if ($person->error)
+		{
+			show_error($person->retval);
+		}
+		
+		$data = array (
+			"messages" => $msg->retval,
+			"person" => $person->retval[0]
+		);
+			
+		$this->load->view("system/messagesInbox.php", $data);
 	}
 
-	public function outbox($person_id = null)
+	public function outbox($person_id)
 	{
-		if (empty($person_id))
-			$person_id = $this->input->post('person_id', TRUE);
-		if (empty($person_id))
-			$msg = $this->messagelib->getMessagesByUID(getAuthUID());
-		else
-			$msg = $this->messagelib->getMessagesByPerson($person_id);
+		$msg = $this->messagelib->getMessagesByPerson($person_id);
 		if ($msg->error)
-			show_error($msg->retval);
-		
-		$data = array
-		(
-			'uid' => getAuthUID(),
-			'messages' => $msg->retval
-		);
-		if (!empty($person_id))
 		{
-			$person = $this->PersonModel->load($person_id);
-			$data['person'] = $person->retval[0];
+			show_error($msg->retval);
 		}
-		//var_dump ($data);
-		$this->load->view('system/messagesOutbox.php', $data);
+		
+		$person = $this->PersonModel->load($person_id);
+		if ($person->error)
+		{
+			show_error($person->retval);
+		}
+		
+		$data = array (
+			"messages" => $msg->retval,
+			"person" => $person->retval[0]
+		);
+		
+		$this->load->view("system/messagesOutbox.php", $data);
 	}
 	
-	public function view($msg_id)
+	public function view($msg_id, $person_id)
 	{
-		$msg = $this->messagelib->getMessage($msg_id);
-		//var_dump($msg);
+		$msg = $this->messagelib->getMessage($msg_id, $person_id);
 		if ($msg->error)
+		{
 			show_error($msg->retval);
-		if (count($msg->retval) != 1)
-			show_error('Nachricht nicht vorhanden! ID: '.$msg_id);
-
-		$data = array
-		(
-			'message' => $msg->retval[0]
-		);
-		//var_dump($data['message']);
-		$v = $this->load->view('system/messageView', $data);
+		}
+		
+		$v = $this->load->view("system/messageView", array("message" => $msg->retval[0]));
 	}
 
 	public function write($vorlage_kurzbz = null)
 	{
 		$data = array
 		(
-			'subject' => 'TestSubject',
-			'body' => 'TestDevelopmentBodyText'
+			"subject" => "TestSubject",
+			"body" => "TestDevelopmentBodyText"
 		);		
-		$v = $this->load->view('system/messageWrite', $data);
+		$v = $this->load->view("system/messageWrite", $data);
 	}
 	
 	public function send()
 	{
-		$body = $this->input->post('body', TRUE);
-		$subject = $this->input->post('subject', TRUE);
+		$body = $this->input->post("body", TRUE);
+		$subject = $this->input->post("subject", TRUE);
 		if (! $this->messagelib->addRecipient(1))
-			show_error('Error: AddRecipient');
+			show_error("Error: AddRecipient");
 		$msg = $this->messagelib->sendMessage(1,$body ,$subject);
 		if ($msg->error)
 			show_error($msg->retval);
 		$msg_id = $msg->retval;
 
-		redirect('/system/Message/view/'.$msg_id);
+		redirect("/system/Message/view/".$msg_id);
+	}
+	
+	private function getPersonId()
+	{
+		$person_id = null;
+		
+		if ($this->input->get("person_id") !== null)
+		{
+			$person_id = $this->input->get("person_id");
+		}
+		else if ($this->input->post("person_id") !== null)
+		{
+			$person_id = $this->input->get("person_id");
+		}
+		
+		if (!is_numeric($person_id))
+		{
+			show_error("Person_id is not numeric");
+		}
+		
+		return $person_id;
 	}
 }

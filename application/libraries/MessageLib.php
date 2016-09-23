@@ -35,6 +35,26 @@ class MessageLib
         //$this->ci->load->helper('language');
         $this->ci->lang->load("message");
     }
+    
+    /**
+     * getMessage() - returns the spicified message for a specified person
+     *
+     * @param	string	$msg_id		REQUIRED
+     * @param	string	$person_id	REQUIRED
+     * @return	object
+     */
+    public function getMessage($msg_id, $person_id)
+    {
+        if (empty($msg_id))
+        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+		if (empty($person_id))
+        	return $this->_error(MSG_ERR_INVALID_RECIPIENTS);
+		
+		$this->ci->RecipientModel->addJoin("public.tbl_msg_message m", "message_id");
+		$msg = $this->ci->RecipientModel->loadWhere(array("message_id" => $msg_id, "public.tbl_msg_recipient.person_id" => $person_id));
+		
+        return $msg;
+    }
 	
 	/**
      * getMessagesByUID() - will return all messages, including the latest status for specified user. It don´t returns Attachments.
@@ -63,8 +83,8 @@ class MessageLib
         if (empty($person_id))
         	return $this->_error(MSG_ERR_INVALID_MSG_ID);
 		
-		$msg = $this->ci->MessageModel->getMessagesByPerson($person_id, $all);		
-
+		$msg = $this->ci->MessageModel->getMessagesByPerson($person_id, $all);
+		
         return $msg;
     }
 	

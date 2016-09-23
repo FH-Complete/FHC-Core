@@ -100,11 +100,11 @@ class Migration_Message extends MigrationLib
 		
 		// Create table public.tbl_msg_recipient
 		$fields = array(
-			"person_id" => array(
+			"message_id" => array(
 				"type" => "bigint",
 				"null" => false
 			),
-			"message_id" => array(
+			"person_id" => array(
 				"type" => "bigint",
 				"null" => false
 			),
