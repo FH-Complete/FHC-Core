@@ -108,7 +108,7 @@ class Recipient_model extends DB_Model
 		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_msg_status"), "s"))
 			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_msg_status"), FHC_MODEL_ERROR);
 		
-		$sql = "SELECT r.message_id,
+		$sql = "SELECT DISTINCT ON (r.message_id) r.message_id,
 						m.person_id,
 						m.subject,
 						m.body,
@@ -133,7 +133,8 @@ class Recipient_model extends DB_Model
 							 %s
 						  ORDER BY insertamum DESC
 						) s ON (m.message_id = s.message_id AND r.person_id = s.person_id)
-				 WHERE r.person_id = ?";
+				 WHERE r.person_id = ?
+			  ORDER BY r.message_id DESC, s.status DESC";
 		
 		$parametersArray = array($person_id);
 		
