@@ -71,7 +71,7 @@ class Messages extends VileSci_Controller
 		$v = $this->load->view("system/messageView", array("message" => $msg->retval[0]));
 	}
 
-	public function write($msg_id, $person_id)
+	public function reply($msg_id, $person_id)
 	{
 		$msg = $this->messagelib->getMessage($msg_id, $person_id);
 		if ($msg->error)
@@ -79,10 +79,10 @@ class Messages extends VileSci_Controller
 			show_error($msg->retval);
 		}
 		
-		$v = $this->load->view("system/messageWrite", array("message" => $msg->retval[0]));
+		$v = $this->load->view("system/messageReply", array("message" => $msg->retval[0]));
 	}
 	
-	public function send($msg_id, $person_id)
+	public function sendReply($msg_id, $person_id)
 	{
 		$subject = $this->input->post("subject");
 		$body = $this->input->post("body");
@@ -101,6 +101,44 @@ class Messages extends VileSci_Controller
 		}
 		
 		redirect("/system/Messages/view/" . $msg->retval . "/" . $originMsg->retval[0]->person_id);
+	}
+	
+	public function write($sender_id, $receiver_id)
+	{
+		$person = $this->PersonModel->load($receiver_id);
+		if ($person->error)
+		{
+			show_error($person->retval);
+		}
+		
+		$data = array (
+			"sender_id" => $sender_id,
+			"receiver_id" => $receiver_id,
+			"receiver" => $person->retval[0]
+		);
+		
+		$v = $this->load->view("system/messageWrite", $data);
+	}
+	
+	public function send($sender_id, $receiver_id)
+	{
+		$subject = $this->input->post("subject");
+		$body = $this->input->post("body");
+		
+		$this->load->model("system/Message_model", "MessageModel");
+		$originMsg = $this->MessageModel->load($msg_id);
+		if ($originMsg->error)
+		{
+			show_error($originMsg->retval);
+		}
+		
+		$msg = $this->messagelib->sendMessage($sender_id, $receiver_id, $subject, $body, PRIORITY_NORMAL);
+		if ($msg->error)
+		{
+			show_error($msg->retval);
+		}
+		
+		redirect("/system/Messages/view/" . $msg->retval . "/" . $receiver_id);
 	}
 	
 	private function getPersonId()

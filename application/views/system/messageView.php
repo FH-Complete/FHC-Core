@@ -15,7 +15,7 @@
 
 		<div class="row">
 			<div class="span4">
-				<button type="submit" onClick="parent.document.getElementById('MessagesBottom').src = 'Messages/write/<?php echo $message->message_id; ?>/<?php echo $message->person_id; ?>'">
+				<button type="submit" onClick="parent.document.getElementById('MessagesBottom').src = 'Messages/reply/<?php echo $message->message_id; ?>/<?php echo $message->person_id; ?>'">
 					Reply
 				</button>
 			</div>
