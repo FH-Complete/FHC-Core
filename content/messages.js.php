@@ -23,7 +23,7 @@ require_once('../config/vilesci.config.inc.php');
 var MessagePersonID=null;
 var MessagesTreeDatasource=''; // Datasource des Adressen Trees
 var MessagesSelectID='';
-
+var MessageSenderPersonID='';
 
 var MessagesTreeSinkObserver =
 {
@@ -53,11 +53,12 @@ var MessagesTreeListener =
 // ****
 // * Laedt die Trees
 // ****
-function loadMessages(person_id)
+function loadMessages(person_id, fas_person_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	MessagePersonID = person_id;
-
+	MessageSenderPersonID=fas_person_id;
+	
 	//Adressen laden
 	url = "<?php echo APP_ROOT; ?>rdf/messages.rdf.php?person_id="+person_id+"&"+gettimestamp();
 	var tree=document.getElementById('messages-tree');
@@ -92,7 +93,7 @@ function loadMessages(person_id)
 // ****
 function MessagesNewMessage()
 {
-	window.open('<?php echo APP_ROOT ?>/index.ci.php/system/Messages/outbox/'+MessagePersonID,'Outbox','');
+	window.open('<?php echo APP_ROOT ?>/index.ci.php/system/Messages/write/'+MessageSenderPersonID+'/'+MessagePersonID,'Message','');
 }
 
 /**
@@ -108,6 +109,21 @@ function MessagesSendAnswer()
 	else
 	{
 		var MessageId = getTreeCellText(tree, 'messages-tree-message_id', tree.currentIndex);
-		window.open('<?php echo APP_ROOT ?>/index.ci.php/system/Messages/outbox/'+MessagePersonID+'/'+MessageId,'Outbox','');
+		var RecipientID = getTreeCellText(tree, 'messages-tree-recipient_id', tree.currentIndex);
+		window.open('<?php echo APP_ROOT ?>/index.ci.php/system/Messages/reply/'+MessageId+'/'+RecipientID,'Reply','');
 	}
+}
+
+function MessageAuswahl()
+{
+	var tree=document.getElementById('messages-tree');
+	if(tree.currentIndex==-1)
+	{
+		alert("Bitte markieren Sie zuerst eine Nachricht");
+	}
+	else
+	{
+		var text = getTreeCellText(tree, 'messages-tree-body', tree.currentIndex);
+	}
+	document.getElementById('message-wysiwyg').value=text;
 }

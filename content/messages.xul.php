@@ -26,6 +26,7 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/variable.class.php');
+require_once('../include/benutzer.class.php');
 
 $user=get_uid();
 $variable = new variable();
@@ -33,6 +34,9 @@ if(!$variable->loadVariables($user))
 {
 	die('Fehler beim Laden der Variablen:'.$variable->errormsg);
 }
+
+$benutzer = new benutzer();
+$benutzer->load($user);
 
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
@@ -50,7 +54,7 @@ echo ']>
 
 <window id="messages-window" title="messages"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        onload="loadMessages(<?php echo "'".$person_id."'"; ?>);"
+        onload="loadMessages(<?php echo "'".$person_id."','".$benutzer->person_id."'"; ?>);"
         >
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/messages.js.php" />
@@ -65,11 +69,16 @@ echo ']>
 	</menupopup>
 </popupset>
 <hbox style="padding-top: 10px">
+	<button oncommand="MessagesNewMessage()" label="Neue Nachricht schicken"/>
+	<button oncommand="MessagesSendAnswer()" label="Antworten"/>
+</hbox>
+
+<hbox>
 
 <tree id="messages-tree" seltype="single" hidecolumnpicker="false" flex="1"
-	datasources="<?php echo APP_ROOT; ?>rdf/messages.rdf.php?foo=<?php echo time(); ?>" ref="http://www.technikum-wien.at/messages/alle"
+	datasources="rdf:null" ref="http://www.technikum-wien.at/messages"
 	style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
-	onselect="messagesAuswahl()"
+	onselect="MessageAuswahl()"
 	context="messages-tree-popup"
 	flags="dont-build-content"
 >
@@ -80,14 +89,34 @@ echo ']>
 		sortActive="true"
 		sortDirection="ascending"
 		sort="rdf:http://www.technikum-wien.at/messages/rdf#subject"/>
-		<treecol id="messages-tree-body" label="Body" flex="2" hidden="false" primary="true"
-		class="sortDirectionIndicator"
-		sortActive="true"
-		sortDirection="ascending"
-		sort="rdf:http://www.technikum-wien.at/messages/rdf#body"/>
-		<treecol id="messages-tree-message_id" label="MessageID" flex="2" hidden="false"
+		<splitter class="tree-splitter"/>
+		<treecol id="messages-tree-body" label="Body" flex="2" hidden="true"
+			class="sortDirectionIndicator"
+			sort="rdf:http://www.technikum-wien.at/messages/rdf#body"/>
+		<splitter class="tree-splitter"/>
+		<treecol id="messages-tree-message_id" label="MessageID" flex="2" hidden="true"
 			class="sortDirectionIndicator"
 			sort="rdf:http://www.technikum-wien.at/messages/rdf#message_id"/>
+		<splitter class="tree-splitter"/>
+		<treecol id="messages-tree-insertamum" label="Datum" flex="2" hidden="false"
+			class="sortDirectionIndicator"
+			sort="rdf:http://www.technikum-wien.at/messages/rdf#insertamum"/>
+		<splitter class="tree-splitter"/>
+		<treecol id="messages-tree-sender" label="Sender" flex="2" hidden="false"
+			class="sortDirectionIndicator"
+			sort="rdf:http://www.technikum-wien.at/messages/rdf#sender"/>
+		<splitter class="tree-splitter"/>
+		<treecol id="messages-tree-recipient" label="Empfänger" flex="2" hidden="false"
+			class="sortDirectionIndicator"
+			sort="rdf:http://www.technikum-wien.at/messages/rdf#recipient"/>
+		<splitter class="tree-splitter"/>
+		<treecol id="messages-tree-sender_id" label="SenderID" flex="2" hidden="true"
+			class="sortDirectionIndicator"
+			sort="rdf:http://www.technikum-wien.at/messages/rdf#sender"/>
+		<splitter class="tree-splitter"/>
+		<treecol id="messages-tree-recipient_id" label="EmpfängerID" flex="2" hidden="true"
+			class="sortDirectionIndicator"
+			sort="rdf:http://www.technikum-wien.at/messages/rdf#recipient_id"/>
 		<splitter class="tree-splitter"/>
 	</treecols>
 
@@ -98,17 +127,18 @@ echo ']>
 					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#subject"/>
 					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#body"/>
 					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#message_id"/>
+					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#insertamum"/>
+					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#sender"/>
+					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#recipient"/>
+					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#sender_id"/>
+					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#recipient_id"/>
 				</treerow>
 			</treeitem>
 		</treechildren>
 	</template>
 </tree>
 </hbox>
-<hbox>
-	<button oncommand="MessagesNewMessage()" label="Neue Nachricht schicken"/>
-	<button oncommand="MessagesSendAnswer()" label="Antworten"/>
-	<spacer flex="1" />
-</hbox>
+<box class="WYSIWYG" id="message-wysiwyg" flex="1"/>
 <spacer flex="1" />
 </vbox>
 </window>
