@@ -75,7 +75,7 @@ class Message extends APIv1_Controller
 		
 		if (isset($token))
 		{
-			$result = $this->messagelib->getMessagesByToken($token);
+			$result = $this->messagelib->getMessageByToken($token);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -96,6 +96,7 @@ class Message extends APIv1_Controller
 		{
 			$result = $this->messagelib->sendMessage(
 				$this->post()['person_id'],
+				$this->post()['receiver_id'],
 				$this->post()['subject'],
 				$this->post()['body'],
 				PRIORITY_NORMAL,

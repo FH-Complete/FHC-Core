@@ -37,7 +37,7 @@ class MessageLib
     }
     
     /**
-     * getMessage() - returns the spicified message for a specified person
+     * getMessage() - returns the spicified received message for a specified person
      *
      * @param	string	$msg_id		REQUIRED
      * @param	string	$person_id	REQUIRED
@@ -50,12 +50,11 @@ class MessageLib
 		if (empty($person_id))
         	return $this->_error(MSG_ERR_INVALID_RECIPIENTS);
 		
-		$this->ci->RecipientModel->addJoin("public.tbl_msg_message m", "message_id");
-		$msg = $this->ci->RecipientModel->loadWhere(array("message_id" => $msg_id, "public.tbl_msg_recipient.person_id" => $person_id));
+		$msg = $this->ci->RecipientModel->getMessage($msg_id, $person_id);
 		
         return $msg;
     }
-	
+    
 	/**
      * getMessagesByUID() - will return all messages, including the latest status for specified user. It don´t returns Attachments.
      *
@@ -67,7 +66,7 @@ class MessageLib
         if (empty($uid))
         	return $this->_error(MSG_ERR_INVALID_MSG_ID);
 		
-		$msg = $this->ci->MessageModel->getMessagesByUID($uid, $all);		
+		$msg = $this->ci->RecipientModel->getMessagesByUID($uid, $all);
 
         return $msg;
     }
@@ -83,23 +82,39 @@ class MessageLib
         if (empty($person_id))
         	return $this->_error(MSG_ERR_INVALID_MSG_ID);
 		
+		$msg = $this->ci->RecipientModel->getMessagesByPerson($person_id, $all);
+		
+        return $msg;
+    }
+	
+	/**
+     * getSentMessagesByPerson() - Get all sent messages from a person identified by person_id
+     *
+     * @param   bigint  $person_id   REQUIRED
+     * @return  array
+     */
+    public function getSentMessagesByPerson($person_id, $all = false)
+    {
+        if (empty($person_id))
+        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+		
 		$msg = $this->ci->MessageModel->getMessagesByPerson($person_id, $all);
 		
         return $msg;
     }
 	
 	/**
-     * getMessagesByToken
+     * getMessageByToken
      *
      * @param	token string
      * @return	array
      */
-    public function getMessagesByToken($token)
+    public function getMessageByToken($token)
     {
         if (empty($token))
         	return $this->_error(MSG_ERR_INVALID_MSG_ID);
 		
-		$result = $this->ci->MessageModel->getMessagesByToken($token);
+		$result = $this->ci->RecipientModel->getMessageByToken($token);
 		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
 		{
 			// Searches for a status that is different from unread
@@ -179,61 +194,94 @@ class MessageLib
     /**
      * sendMessage() - sends new internal message. This function will create a new thread
      *
-     * @param   integer  $sender_id   REQUIRED
-     * @param   mixed    $recipients  REQUIRED - a single integer or an array of integers, representing user_ids
-     * @param   string   $subject
-     * @param   string   $body
-     * @param   integer  $priority
-     * @return  array
      */
-    public function sendMessage($sender_id, $subject = "", $body = "", $priority = PRIORITY_NORMAL, $relationmessage_id = null, $oe_kurzbz = null)
+    public function sendMessage($sender_id, $receiver_id, $subject, $body, $priority = PRIORITY_NORMAL, $relationmessage_id = null, $oe_kurzbz = null)
     {
-        if (!is_numeric($sender_id))
+        if (!is_numeric($sender_id) || !is_numeric($receiver_id))
         	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
 		
-		// Start sending Message
-		$this->ci->db->trans_start(false);
-		//save Message
-		$data = array(
-			"person_id" => $sender_id,
-			"subject" => $subject,
-			"body" => $body,
-			"priority" => $priority,
-			"relationmessage_id" => $relationmessage_id,
-			"oe_kurzbz" => $oe_kurzbz
-		);
-		
-		$result = $this->ci->MessageModel->insert($data);
-		if (is_object($result) && $result->error == EXIT_SUCCESS)
+		// Checks if the receiver exists
+		$this->ci->load->model("person/Person_model", "PersonModel");
+		$result = $this->ci->PersonModel->load($receiver_id);
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
 		{
-			/**
-			 * @TODO: sender_id must be a receiver_id
-			 */
-			$msg_id = $result->retval;
-			$statusData = array(
-				"message_id" => $msg_id,
-				"person_id" => $sender_id,
-				"status" => MSG_STATUS_UNREAD
-			);
-			$result = $this->ci->MsgStatusModel->insert($statusData);
-		}
-
-		$this->ci->db->trans_complete();
-
-		if ($this->ci->db->trans_status() === false || (is_object($result) && $result->error != EXIT_SUCCESS))
-		{
-			$this->ci->db->trans_rollback();
-			return $this->_error($result->msg, EXIT_ERROR);
+			// If the text and the subject of the template are not empty
+			if (!empty($subject) && !empty($body))
+			{
+				$this->ci->db->trans_start(false);
+				// Save Message
+				$msgData = array(
+					"person_id" => $sender_id,
+					"subject" => $subject,
+					"body" => $body,
+					"priority" => PRIORITY_NORMAL,
+					"relationmessage_id" => $relationmessage_id,
+					"oe_kurzbz" => $oe_kurzbz
+				);
+				$result = $this->ci->MessageModel->insert($msgData);
+				if (is_object($result) && $result->error == EXIT_SUCCESS)
+				{
+					// Link the message with the receiver
+					$msg_id = $result->retval;
+					$recipientData = array(
+						"person_id" => $receiver_id,
+						"message_id" => $msg_id
+					);
+					$result = $this->ci->RecipientModel->insert($recipientData);
+					if (is_object($result) && $result->error == EXIT_SUCCESS)
+					{
+						// Save message status
+						$statusData = array(
+							"message_id" => $msg_id,
+							"person_id" => $receiver_id,
+							"status" => MSG_STATUS_UNREAD
+						);
+						$result = $this->ci->MsgStatusModel->insert($statusData);
+						
+						// If no errors were occurred
+						/**
+						 * TODO: different config item???
+						 */
+						/*if (is_object($result) && $result->error == EXIT_SUCCESS)
+						{
+							// If the system is configured to send messages immediately
+							if ($this->ci->config->item("send_immediately") === true)
+							{
+								// Send message by email!
+								$resultSendEmail = $this->sendOne($msg_id, $subject, $parsedText);
+							}
+						}*/
+					}
+				}
+				
+				$this->ci->db->trans_complete();
+				
+				if ($this->ci->db->trans_status() === false || (is_object($result) && $result->error != EXIT_SUCCESS))
+				{
+					$this->ci->db->trans_rollback();
+					return $this->_error($result->msg, EXIT_ERROR);
+				}
+				else
+				{
+					$this->ci->db->trans_commit();
+					return $this->_success($msg_id);
+				}
+			}
+			else
+			{
+				$result = $this->_error("Subject or body empty", EXIT_ERROR);
+			}
 		}
 		else
 		{
-			$this->ci->db->trans_commit();
-			return $this->_success($msg_id);
+			$result = $this->_error("Receiver not present", EXIT_ERROR);
 		}
+		
+		return $result;
     }
 	
 	/**
-     * sendMessage() - sends new internal message. This function will create a new thread
+     * sendMessageVorlage() - sends new internal message using a template
      *
      * @param   integer  $sender_id   REQUIRED
      * @param   mixed    $recipients  REQUIRED - a single integer or an array of integers, representing user_ids
@@ -484,7 +532,7 @@ class MessageLib
 	}
 	
 	/**
-	 * One messages from DB and sends it via email
+	 * Gets one message from DB and sends it via email
 	 */
 	public function sendOne($message_id, $subject = null, $body = null)
 	{

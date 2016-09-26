@@ -40,7 +40,7 @@ class Messages extends VileSci_Controller
 
 	public function outbox($person_id)
 	{
-		$msg = $this->messagelib->getMessagesByPerson($person_id);
+		$msg = $this->messagelib->getSentMessagesByPerson($person_id);
 		if ($msg->error)
 		{
 			show_error($msg->retval);
@@ -71,28 +71,36 @@ class Messages extends VileSci_Controller
 		$v = $this->load->view("system/messageView", array("message" => $msg->retval[0]));
 	}
 
-	public function write($vorlage_kurzbz = null)
+	public function write($msg_id, $person_id)
 	{
-		$data = array
-		(
-			"subject" => "TestSubject",
-			"body" => "TestDevelopmentBodyText"
-		);		
-		$v = $this->load->view("system/messageWrite", $data);
+		$msg = $this->messagelib->getMessage($msg_id, $person_id);
+		if ($msg->error)
+		{
+			show_error($msg->retval);
+		}
+		
+		$v = $this->load->view("system/messageWrite", array("message" => $msg->retval[0]));
 	}
 	
-	public function send()
+	public function send($msg_id, $person_id)
 	{
-		$body = $this->input->post("body", TRUE);
-		$subject = $this->input->post("subject", TRUE);
-		if (! $this->messagelib->addRecipient(1))
-			show_error("Error: AddRecipient");
-		$msg = $this->messagelib->sendMessage(1,$body ,$subject);
+		$subject = $this->input->post("subject");
+		$body = $this->input->post("body");
+		
+		$this->load->model("system/Message_model", "MessageModel");
+		$originMsg = $this->MessageModel->load($msg_id);
+		if ($originMsg->error)
+		{
+			show_error($originMsg->retval);
+		}
+		
+		$msg = $this->messagelib->sendMessage($person_id, $originMsg->retval[0]->person_id, $subject, $body, PRIORITY_NORMAL, $msg_id);
 		if ($msg->error)
+		{
 			show_error($msg->retval);
-		$msg_id = $msg->retval;
-
-		redirect("/system/Message/view/".$msg_id);
+		}
+		
+		redirect("/system/Messages/view/" . $msg->retval . "/" . $originMsg->retval[0]->person_id);
 	}
 	
 	private function getPersonId()

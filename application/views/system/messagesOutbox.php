@@ -6,7 +6,7 @@
 					Outbox <?php echo $person->vorname . " " . $person->nachname; ?>
 					<br />
 					<br />
-					<button type="submit" onClick="parent.document.getElementById('MessagesTop').src = 'Messages/inbox/<?php echo $person->person_id; ?>'">
+					<button type="button" onClick="parent.document.getElementById('MessagesTop').src = 'Messages/inbox/<?php echo $person->person_id; ?>'">
 						Inbox
 					</button>
 					<br />
