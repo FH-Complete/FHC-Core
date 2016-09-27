@@ -181,6 +181,7 @@ $config['fhc_acl'] = array
 	'public.tbl_standort' => 'basis/standort',
 	'public.tbl_statistik' => 'basis/statistik',
 	'public.tbl_status' => 'basis/status',
+	'public.tbl_status_grund' => 'basis/status',
 	'public.tbl_student' => 'basis/student',
 	'public.tbl_studentlehrverband' => 'basis/studentlehrverband',
 	'public.tbl_studiengang' => 'basis/studiengang',
