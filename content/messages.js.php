@@ -58,7 +58,7 @@ function loadMessages(person_id, fas_person_id)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	MessagePersonID = person_id;
 	MessageSenderPersonID=fas_person_id;
-	
+
 	//Adressen laden
 	url = "<?php echo APP_ROOT; ?>rdf/messages.rdf.php?person_id="+person_id+"&"+gettimestamp();
 	var tree=document.getElementById('messages-tree');
@@ -93,7 +93,7 @@ function loadMessages(person_id, fas_person_id)
 // ****
 function MessagesNewMessage()
 {
-	window.open('<?php echo APP_ROOT ?>/index.ci.php/system/Messages/write/'+MessageSenderPersonID+'/'+MessagePersonID,'Message','');
+	window.open('<?php echo APP_ROOT ?>index.ci.php/system/Messages/write/'+MessageSenderPersonID+'/'+MessagePersonID,'Message','');
 }
 
 /**
@@ -110,7 +110,7 @@ function MessagesSendAnswer()
 	{
 		var MessageId = getTreeCellText(tree, 'messages-tree-message_id', tree.currentIndex);
 		var RecipientID = getTreeCellText(tree, 'messages-tree-recipient_id', tree.currentIndex);
-		window.open('<?php echo APP_ROOT ?>/index.ci.php/system/Messages/reply/'+MessageId+'/'+RecipientID,'Reply','');
+		window.open('<?php echo APP_ROOT ?>index.ci.php/system/Messages/reply/'+MessageId+'/'+RecipientID,'Reply','');
 	}
 }
 
