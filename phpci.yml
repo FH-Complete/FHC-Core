@@ -8,10 +8,6 @@ build_settings:
 setup:
 
 test:
-    lint:
-        directories:
-        - "application/"
-        recursive: true
     codeception:
         config: "tests/codeception/"
         path: "tests/codeception/_output/"
