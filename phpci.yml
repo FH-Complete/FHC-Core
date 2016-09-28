@@ -1,22 +1,19 @@
 build_settings:
     verbose: false
     prefer_symlink: false
+    ignore:
+        - "vendor"
+        - "tests"
 
 setup:
 
 test:
-    codeception:
-        config: "tests"
     lint:
-    php_loc:
-    php_docblock_checker:
-       allowed_warnings: -1
-#    phing:
-#        build_file: 'build.xml'
-#        targets:
-#         - "deploy"
-#    php_unit:
-#        directory: "tests/phpunit/"
-#        args: "--bootstrap 'test/phpunit/bootstrap.php' --configuration 'tests/phpunit/phpunit.xml'"
+        directories:
+        - "application/"
+        recursive: true
+    codeception:
+        config: "tests/codeception/"
+        path: "tests/codeception/_output/"
 
 complete:
