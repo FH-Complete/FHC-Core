@@ -88,6 +88,26 @@ class Message extends APIv1_Controller
 	/**
 	 * @return void
 	 */
+	public function getSentMessagesByPerson()
+	{
+		$person_id = $this->get("person_id");
+		$all = $this->get("all");
+		
+		if (isset($person_id))
+		{
+			$result = $this->messagelib->getSentMessagesByPerson($person_id, $all);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	/**
+	 * @return void
+	 */
 	public function getRedirectByToken()
 	{
 		$token = $this->get("token");

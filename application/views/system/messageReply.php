@@ -41,7 +41,7 @@
 				url: "<?php echo $url; ?>",
 				data: {"vorlage_kurzbz": vorlage_kurzbz},
 				success: function(data, textStatus, jqXHR) {
-					tinyMCE.activeEditor.setContent(data.retval[0].text);
+					tinyMCE.activeEditor.setContent(data.retval[0].text + "<?php echo $message->body; ?>");
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					alert(textStatus + " - " + errorThrown);
