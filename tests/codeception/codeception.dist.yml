@@ -1,0 +1,20 @@
+actor: Tester
+paths:
+    tests: tests
+    log: _output
+    data: _data
+    helpers: _support
+settings:
+    bootstrap: _bootstrap.php
+    colors: true
+    memory_limit: 1024M
+modules:
+    enabled:
+        - Db:
+            dsn: 'pgsql:host=localhost;port=5432;dbname=fhctest'
+            user: 'fhcomplete'
+            password: 'fhcomplete'
+            dump: _data/dump.sql
+            populate: true
+            cleanup: false
+            reconnect: false
