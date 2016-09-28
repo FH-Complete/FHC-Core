@@ -161,4 +161,19 @@ class Messages extends VileSci_Controller
 		
 		return $person_id;
 	}
+	
+	public function getVorlage()
+	{
+		$vorlage_kurzbz = $this->input->get("vorlage_kurzbz");
+		
+		if (isset($vorlage_kurzbz))
+		{
+			$this->load->model("system/Vorlagestudiengang_model", "VorlagestudiengangModel");
+			$result = $this->VorlagestudiengangModel->loadWhere(array("vorlage_kurzbz" => $vorlage_kurzbz));
+			
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($result));
+		}
+	}
 }
