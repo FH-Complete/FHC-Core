@@ -49,6 +49,8 @@ $this->phrasen['tools/ampelBereitsBestaetigt']='Diese Ampel wurde bereits bestä
 $this->phrasen['tools/dasAmpelsystemIstEinErinnerungsystem']='Das Ampelsystem ist ein ERINNERUNGS- und BESTÄTIGUNGSSYSTEM, welches Sie auf ausstehende Aufgaben aufmerksam machen soll.';
 $this->phrasen['tools/waehlenSieEineOEoderAmpel']='Bitte wählen Sie ein Organisationseinheit und/oder eine Ampel aus dem Dropdown';
 $this->phrasen['tools/uebersichtLeitung']='Ampel-Übersicht für LeiterInnen';
+$this->phrasen['tools/ampelAlleAnzeigen']='Alle anzeigen';
+$this->phrasen['tools/ampelNurAktuellesStudiensemester']='Nur aktuelles Studiensemester anzeigen';
 
 //Software fuer Lehre -> Softgrid
 $this->phrasen['tools/applikationsliste']='Applikationsliste';
@@ -76,4 +78,5 @@ $this->phrasen['tools/esWurdenKeineErgebnisseGefunden']='Es wurden keine Ergebni
 //Partnerhochschulen
 $this->phrasen['tools/partnerhochschulenUebersicht']='Übersicht der Partnerhochschulen';
 $this->phrasen['tools/partnerhochschulenKeinEintrag']='Für diesen Studiengang ist keine Partnerhochschule zugeordnet';
+$this->phrasen['tools/partnerhochschulenEinleitung']='Sollten Sie an einer Partnerhochschule studieren wollen, die sich nicht auf dieser Liste befindet, kontaktieren Sie bitte das <a href="../../../cms/content.php?content_id=6952">Center for International Relations (CIR)</a>.';
 ?>

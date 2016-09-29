@@ -34,7 +34,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 	
 if(!$rechte->isBerechtigt('basis/ampel'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+	die($rechte->errormsg);
 	
 $datum_obj = new datum();
 ?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -44,6 +44,18 @@ $datum_obj = new datum();
 	<title>Ampel - Details</title>
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
+	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		$(document).ready(function() 
+			{ 
+				$( ".datepicker_datum" ).datepicker({
+					 changeMonth: true,
+					 changeYear: true, 
+					 dateFormat: 'dd.mm.yy',
+					 });
+			});
+	</script>
 </head>
 <body>
 
@@ -55,7 +67,8 @@ $datum_obj = new datum();
 	if($action=='save')
 	{
 		$kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:die('Kurzbz fehlt'));
-		
+		$beschreibung = '';
+		$buttontext = '';
 		foreach ($_POST as $key=>$value)
 		{
 			if(mb_strstr($key,'beschreibung'))
@@ -63,12 +76,18 @@ $datum_obj = new datum();
 				$idx = mb_substr($key, mb_strlen('beschreibung'));
 				$beschreibung[$idx] = $value;
 			}
+			elseif(mb_strstr($key,'buttontext'))
+			{
+				$idx = mb_substr($key, mb_strlen('buttontext'));
+				$buttontext[$idx] = $value;
+			}
 		}
 		$benutzer_select = (isset($_POST['benutzer_select'])?$_POST['benutzer_select']:die('Benutzer_select fehlt'));
 		$deadline = (isset($_POST['deadline'])?$_POST['deadline']:die('Deadline fehlt'));
 		$vorlaufzeit = (isset($_POST['vorlaufzeit'])?$_POST['vorlaufzeit']:die('Vorlaufzeit fehlt'));
 		$verfallszeit = (isset($_POST['verfallszeit'])?$_POST['verfallszeit']:die('verfallszeit fehlt'));
 		$email = isset($_POST['email']);
+		$verpflichtend = isset($_POST['verpflichtend']);
 		$new = (isset($_POST['new'])?$_POST['new']:'true');
 		if($new=='true')
 		{
@@ -91,6 +110,8 @@ $datum_obj = new datum();
 		$ampel->vorlaufzeit = $vorlaufzeit;
 		$ampel->verfallszeit = $verfallszeit;
 		$ampel->email = $email;
+		$ampel->verpflichtend = $verpflichtend;
+		$ampel->buttontext = $buttontext;
 		$ampel->updateamum = date('Y-m-d H:i:s');
 		$ampel->updatevon = $user;
 		
@@ -140,46 +161,63 @@ $datum_obj = new datum();
 		<input type="hidden" name="ampel_id" value="'.htmlspecialchars($ampel->ampel_id).'">
 		<table>
 			<tr>
-				<td>Kurzbz</td>
-				<td><input type="text" name="kurzbz" size="30" maxlength="64" value="'.htmlspecialchars($ampel->kurzbz).'"></td>
+				<td>Kurzbz (64)</td>
+				<td><input type="text" name="kurzbz" size="60" maxlength="64" value="'.htmlspecialchars($ampel->kurzbz).'" required></td>
 				<td></td>
 				<td>Deadline</td>
-				<td><input type="text" name="deadline" size="10" maxlength="10" value="'.htmlspecialchars($datum_obj->formatDatum($ampel->deadline,'d.m.Y')).'"></td>
+				<td><input type="text" class="datepicker_datum" name="deadline" size="10" maxlength="10" value="'.htmlspecialchars($datum_obj->formatDatum($ampel->deadline,'d.m.Y')).'" required></td>
 			</tr>
 			<tr valign="top">
 				<td rowspan="3">Benutzer Select</td>
-				<td rowspan="3"><textarea name="benutzer_select" cols="60" rows="5">'.htmlspecialchars($ampel->benutzer_select).'</textarea></td>
+				<td rowspan="3"><textarea name="benutzer_select" cols="60" rows="5" required>'.htmlspecialchars($ampel->benutzer_select).'</textarea></td>
 				<td></td>
 				<td valign="middle">Vorlaufzeit (in Tagen)</td>
-				<td valign="middle"><input type="text" name="vorlaufzeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->vorlaufzeit).'"></td>
+				<td valign="middle"><input type="text" name="vorlaufzeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->vorlaufzeit).'" required></td>
 			</tr>
 			<tr valign="top">
 				<td></td>
 				<td>Verfallszeit (in Tagen)</td>
-				<td><input type="text" name="verfallszeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->verfallszeit).'"></td>
+				<td><input type="text" name="verfallszeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->verfallszeit).'" required></td>
 			</tr>
 			<tr valign="top">
 				<td></td>
 				<td>Erinnerung per Email</td>
 				<td><input type="checkbox" name="email" '.($db->db_parse_bool($ampel->email)?'checked':'').'></td>
+			</tr>
+			<tr valign="top">
+				<td></td>
+				<td></td>
+				<td></td>
+				<td>Verpflichtend</td>
+				<td><input type="checkbox" name="verpflichtend" '.($db->db_parse_bool($ampel->verpflichtend)?'checked':'').'></td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>Beschreibung</td>
+				<td>&nbsp;</td>
+				<td>Buttonbeschriftung (64)</td>
+				<td>&nbsp;</td>
 			</tr>';
 	
+	
 	$sprache = new sprache();
-	$sprache->getAll();
+	$sprache->getAll(null, 'index');
 	foreach($sprache->result as $lang)
 	{
 		echo '
 			<tr valign="top">
-				<td>Beschreibung '.$lang->sprache.'</td>
+				<td>'.$lang->sprache.'</td>
 				<td><textarea name="beschreibung'.$lang->sprache.'" cols="60" rows="5">'.htmlspecialchars((isset($ampel->beschreibung[$lang->sprache])?$ampel->beschreibung[$lang->sprache]:'')).'</textarea></td>
 				<td></td>
+				<td colspan="2"><input size="70" maxlength="64" name="buttontext'.$lang->sprache.'" value="'.htmlspecialchars((isset($ampel->buttontext[$lang->sprache])?$ampel->buttontext[$lang->sprache]:'')).'"></td>
 			</tr>';
 	}
 	echo '
 		<tr valign="bottom">
-			<td></td>
-			<td></td>
-			<td><input type="submit" value="Speichern" name="save"></td>
+			<td colspan="5"><input type="submit" value="Speichern" name="save"></td>
 		</tr>
 	</table></form>';
 	

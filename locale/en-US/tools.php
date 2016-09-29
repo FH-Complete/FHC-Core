@@ -49,6 +49,8 @@ $this->phrasen['tools/ampelBereitsBestaetigt']='This notification has already be
 $this->phrasen['tools/dasAmpelsystemIstEinErinnerungsystem']='The notification system is a REMINDER and CONFIRMATION SYSTEM that is provided to remind you of outstanding tasks.';
 $this->phrasen['tools/waehlenSieEineOEoderAmpel']='Please select an organizational unit and/or a notification from the drop down menu.';
 $this->phrasen['tools/uebersichtLeitung']='Overview of notifications for Heads of Departments';
+$this->phrasen['tools/alleAnzeigen']='Show all';
+$this->phrasen['tools/nurAktuellesStudiensemester']='Show current semester only';
 
 //Software fuer Lehre -> Softgrid
 $this->phrasen['tools/applikationsliste']='List of Applications';
@@ -76,4 +78,5 @@ $this->phrasen['tools/esWurdenKeineErgebnisseGefunden']='Your search did not ret
 //Partnerhochschulen
 $this->phrasen['tools/partnerhochschulenUebersicht']='Partner Universities';
 $this->phrasen['tools/partnerhochschulenKeinEintrag']='No entry found';
+$this->phrasen['tools/partnerhochschulenEinleitung']='In case you would like to study at a partner university that isn´t listed - please contact the <a href="../../../cms/content.php?content_id=6952">Center for International Relations (CIR)</a>.';
 ?>
