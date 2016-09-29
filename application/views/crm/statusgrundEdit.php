@@ -6,8 +6,8 @@
 
 		<div class="row">
 			<div class="span4">
-				<h2>Status: <?php echo $sg->status_kurzbz; ?></h2>
-				<form method="post" action="../saveGrund">
+				<h2>Status grund: <?php echo $sg->status_kurzbz; ?></h2>
+				<form method="post" action="<?php echo APP_ROOT . "index.ci.php/crm/Statusgrund/saveGrund";?>">
 					<table>
 						<tr>
 							<td colspan="2">
@@ -112,9 +112,20 @@
 						</tr>
 					</table>
 					<input type="hidden" name="statusgrund_kurzbz" value="<?php echo isset($sg->statusgrund_kurzbz) ? $sg->statusgrund_kurzbz : ""; ?>" />
-					<input type="hidden" name="status_kurzbz" value="<?php echo $sg->status_kurzbz; ?>" />
 				</form>
 			</div>
 		</div>
 	</body>
+	
+	<?php
+		if (!is_null($update))
+		{
+	?>
+			<script>
+				parent.document.getElementById("StatusgrundTop").contentWindow.location.reload(true);
+			</script>
+	<?php
+		}
+	?>
+	
 </html>
