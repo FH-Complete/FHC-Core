@@ -20,8 +20,6 @@ class Message_model extends DB_Model
 	public function getMessagesByPerson($person_id, $all)
 	{
 		// Check wrights
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_msg_recipient"), "s"))
-			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_msg_recipient"), FHC_MODEL_ERROR);
 		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_msg_message"), "s"))
 			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_msg_message"), FHC_MODEL_ERROR);
 		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_person"), "s"))
@@ -46,14 +44,13 @@ class Message_model extends DB_Model
 						s.status,
 						s.statusinfo,
 						s.insertamum AS statusamum
-				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_message m USING (message_id)
-						JOIN public.tbl_person p ON (p.person_id = m.person_id)
+				  FROM public.tbl_msg_message m JOIN public.tbl_person p ON (p.person_id = m.person_id)
 						LEFT JOIN (
 							SELECT message_id, person_id, status, statusinfo, insertamum
 							  FROM public.tbl_msg_status
 							 %s
 						  ORDER BY insertamum DESC
-						) s ON (m.message_id = s.message_id AND r.person_id = s.person_id)
+						) s ON (m.message_id = s.message_id AND m.person_id = s.person_id)
 				 WHERE m.person_id = ?";
 		
 		$parametersArray = array($person_id);
