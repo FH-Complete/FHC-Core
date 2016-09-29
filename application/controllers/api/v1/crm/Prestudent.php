@@ -71,15 +71,17 @@ class Prestudent extends APIv1_Controller
 	 */
 	public function postPrestudent()
 	{
-		if ($this->_validate($this->post()))
+		$prestudent = $this->_parseData($this->post());
+		
+		if ($this->_validate($prestudent))
 		{
-			if (isset($this->post()["prestudent_id"]))
+			if (isset($prestudent["prestudent_id"]))
 			{
-				$result = $this->PrestudentModel->update($this->post()["prestudent_id"], $this->post());
+				$result = $this->PrestudentModel->update($prestudent["prestudent_id"], $prestudent);
 			}
 			else
 			{
-				$result = $this->PrestudentModel->insert($this->post());
+				$result = $this->PrestudentModel->insert($prestudent);
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
