@@ -54,7 +54,7 @@ class moodle24_user extends basis_db
 	 * Laedt einen Moodle User
 	 *
 	 * @param $uid
-	 * @return boolean
+	 * @return boolean oder -1 bei SOAP Fehler
 	 */
 	public function loaduser($uid)
 	{
@@ -87,7 +87,7 @@ class moodle24_user extends basis_db
 		catch (SoapFault $E)
 		{
 			$this->errormsg.="SOAP Fehler beim Laden des Users: ".$E->faultstring;
-			return false;
+			return -1;
 		}
 	}
 
@@ -209,8 +209,9 @@ class moodle24_user extends basis_db
 				if(!$user_zugeteilt)
 				{
 
+					$retval = $this->loaduser($row_ma->mitarbeiter_uid);
 					//MoodleID des Users holen bzw ggf neu anlegen
-					if(!$this->loaduser($row_ma->mitarbeiter_uid))
+					if($retval===false)
 					{
 						//User anlegen
 						if(!$this->createUser($row_ma->mitarbeiter_uid))
@@ -222,29 +223,32 @@ class moodle24_user extends basis_db
 							$this->errormsg = '';
 					}
 
-					if($mitarbeiter!='')
-						$mitarbeiter.=',';
-					$mitarbeiter.=$this->mdl_user_id;
-
-					//Mitarbeiter ist noch nicht zugeteilt.
-					$data = new stdClass();
-					$data->roleid=3; // 3=Lektor
-					$data->userid=$this->mdl_user_id;
-					$data->courseid=$mdl_course_id;
-
-					try
+					if($retval!==-1)
 					{
-						$client = new SoapClient($this->serverurl);
-						$client->enrol_manual_enrol_users(array($data));
+						if($mitarbeiter!='')
+							$mitarbeiter.=',';
+						$mitarbeiter.=$this->mdl_user_id;
 
-						$this->log.="\nLektorIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
-						$this->log_public.="\nLektorIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
-						$this->sync_create++;
-					}
-					catch (SoapFault $E)
-					{
-						$this->errormsg.="SOAP Fehler beim zuteilen der Teilnehmer des Kurses: ".$E->faultstring;
-						return false;
+						//Mitarbeiter ist noch nicht zugeteilt.
+						$data = new stdClass();
+						$data->roleid=3; // 3=Lektor
+						$data->userid=$this->mdl_user_id;
+						$data->courseid=$mdl_course_id;
+
+						try
+						{
+							$client = new SoapClient($this->serverurl);
+							$client->enrol_manual_enrol_users(array($data));
+
+							$this->log.="\nLektorIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+							$this->log_public.="\nLektorIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+							$this->sync_create++;
+						}
+						catch (SoapFault $E)
+						{
+							$this->errormsg.="SOAP Fehler beim zuteilen der Teilnehmer des Kurses: ".$E->faultstring;
+							return false;
+						}
 					}
 				}
 			}
@@ -369,8 +373,9 @@ class moodle24_user extends basis_db
 						if(!$user_zugeteilt)
 						{
 
+							$retval = $this->loaduser($row_user->student_uid);
 							//MoodleID des Users holen bzw ggf neu anlegen
-							if(!$this->loaduser($row_user->student_uid))
+							if($retval===false)
 							{
 								//User anlegen
 								if(!$this->createUser($row_user->student_uid))
@@ -382,23 +387,26 @@ class moodle24_user extends basis_db
 									$this->errormsg = '';
 							}
 
-							if($studenten!='')
-								$studenten.=',';
-							$studenten.=$this->mdl_user_id;
+							if($retval!==-1)
+							{
+								if($studenten!='')
+									$studenten.=',';
+								$studenten.=$this->mdl_user_id;
 
 
-							//Student ist noch nicht zugeteilt.
+								//Student ist noch nicht zugeteilt.
 
-							$data = new stdClass();
-							$data->roleid=5; // 5=Teilnehmer/Student
-							$data->userid=$this->mdl_user_id;
-							$data->courseid=$mdl_course_id;
+								$data = new stdClass();
+								$data->roleid=5; // 5=Teilnehmer/Student
+								$data->userid=$this->mdl_user_id;
+								$data->courseid=$mdl_course_id;
 
-							$userstoenroll[]=$data;
+								$userstoenroll[]=$data;
 
-							$this->log.="\nStudentIn $row_user->student_uid wurde zum Kurs hinzugefügt";
-							$this->log_public.="\nStudentIn $row_user->student_uid wurde zum Kurs hinzugefügt";
-							$this->sync_create++;
+								$this->log.="\nStudentIn $row_user->student_uid wurde zum Kurs hinzugefügt";
+								$this->log_public.="\nStudentIn $row_user->student_uid wurde zum Kurs hinzugefügt";
+								$this->sync_create++;
+							}
 						}
 
 						//Gruppenzuteilung
@@ -685,8 +693,9 @@ class moodle24_user extends basis_db
 
 		foreach ($users as $row_user)
 		{
+			$retval = $this->loaduser($row_user);
 			//MoodleID des Users holen
-			if(!$this->loaduser($row_user))
+			if($retval!==true)
 			{
 				$this->errormsg = "Fehler beim Laden des Users $row_user: $this->errormsg";
 				return false;
@@ -825,9 +834,9 @@ class moodle24_user extends basis_db
 
 				if(!$user_zugeteilt)
 				{
-
+					$retval = $this->loaduser($row_ma->mitarbeiter_uid);
 					//MoodleID des Users holen bzw ggf neu anlegen
-					if(!$this->loaduser($row_ma->mitarbeiter_uid))
+					if($retval===false)
 					{
 						//User anlegen
 						if(!$this->createUser($row_ma->mitarbeiter_uid))
@@ -839,29 +848,32 @@ class moodle24_user extends basis_db
 							$this->errormsg = '';
 					}
 
-					if($mitarbeiter!='')
-						$mitarbeiter.=',';
-					$mitarbeiter.=$this->mdl_user_id;
-
-					//Mitarbeiter ist noch nicht zugeteilt.
-					$data = new stdClass();
-					$data->roleid=11; // 11=Fachbereichsleiter (selbst definierte rolle)
-					$data->userid=$this->mdl_user_id;
-					$data->courseid=$mdl_course_id;
-
-					try
+					if($retval!==-1)
 					{
+						if($mitarbeiter!='')
+							$mitarbeiter.=',';
+						$mitarbeiter.=$this->mdl_user_id;
 
-						$client = new SoapClient($this->serverurl);
-						$client->enrol_manual_enrol_users(array($data));
+						//Mitarbeiter ist noch nicht zugeteilt.
+						$data = new stdClass();
+						$data->roleid=11; // 11=Fachbereichsleiter (selbst definierte rolle)
+						$data->userid=$this->mdl_user_id;
+						$data->courseid=$mdl_course_id;
 
-						$this->log.="\nFachbereitsleiterIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
-						$this->log_public.="\nFachbereichsleiterIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
-						$this->sync_create++;
-					}
-					catch (SoapFault $E)
-					{
-						$this->log.="Fehler beim hinzufügen von FBL: ".$E->faultstring;
+						try
+						{
+
+							$client = new SoapClient($this->serverurl);
+							$client->enrol_manual_enrol_users(array($data));
+
+							$this->log.="\nFachbereitsleiterIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+							$this->log_public.="\nFachbereichsleiterIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+							$this->sync_create++;
+						}
+						catch (SoapFault $E)
+						{
+							$this->log.="Fehler beim hinzufügen von FBL: ".$E->faultstring;
+						}
 					}
 				}
 			}
