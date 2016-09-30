@@ -1193,6 +1193,7 @@ if(!$result = @$db->db_query("SELECT studienplan_id FROM public.tbl_bewerbungste
 		echo '<br>Neue Spalte studienplan_id in Tabelle public.tbl_bewerbungstermine hinzugefügt<br>';
 }
 
+
 // Attribute verpflichtend und buttontext in public.tbl_ampel
 if(!$result = @$db->db_query("SELECT verpflichtend FROM public.tbl_ampel LIMIT 1"))
 {
@@ -1203,6 +1204,17 @@ if(!$result = @$db->db_query("SELECT verpflichtend FROM public.tbl_ampel LIMIT 1
 		echo '<strong>public.tbl_ampel '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>Neue Spalten "verpflichtend" und "buttontext" in Tabelle public.tbl_ampel hinzugefügt<br>';
+
+// Neue Spalte studienplan_id in public.tbl_bewerbungstermine
+if(!$result = @$db->db_query("SELECT lieferbedingungen FROM public.tbl_firma LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_firma ADD COLUMN lieferbedingungen varchar(256);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_firma '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte lieferbedingungen in Tabelle public.tbl_firma hinzugefügt<br>';
+
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
