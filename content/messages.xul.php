@@ -69,8 +69,8 @@ echo ']>
 	</menupopup>
 </popupset>
 <hbox style="padding-top: 10px">
-	<button oncommand="MessagesNewMessage()" label="Neue Nachricht schicken"/>
-	<button oncommand="MessagesSendAnswer()" label="Antworten"/>
+	<button oncommand="MessagesNewMessage()" id="messages-button-new" label="Neue Nachricht schicken"/>
+	<button oncommand="MessagesSendAnswer()" id="messages-button-answer" label="Antworten"/>
 </hbox>
 
 <hbox>

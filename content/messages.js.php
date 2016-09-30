@@ -124,6 +124,18 @@ function MessageAuswahl()
 	else
 	{
 		var text = getTreeCellText(tree, 'messages-tree-body', tree.currentIndex);
+		var recipient_id = getTreeCellText(tree, 'messages-tree-recipient_id', tree.currentIndex);
+		// Antworten ist nur moeglich wenn die Message vom User kommt
+		if(recipient_id==MessagePersonID)
+		{
+			document.getElementById('messages-tree-popup-answer').disabled=true;
+			document.getElementById('messages-button-answer').disabled=true;
+		}
+		else
+		{
+			document.getElementById('messages-tree-popup-answer').disabled=false;
+			document.getElementById('messages-button-answer').disabled=false;
+		}
 	}
 	document.getElementById('message-wysiwyg').value=text;
 }
