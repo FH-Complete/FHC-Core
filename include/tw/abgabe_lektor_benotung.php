@@ -168,7 +168,7 @@ else
 		$pdf->SetXY(30,30);
 	
 		//Logo
-		$pdf->Image("../../skin/styles/tw/logo.jpg","400","25","150","78","jpg","");
+		$pdf->Image("../../skin/styles/".DEFAULT_STYLE."/logo.jpg","400","25","150","78","jpg","");
 
 		$pdf->SetFont('Arial','',12);
 		$pdf->SetFillColor(190,190,190);
@@ -430,7 +430,7 @@ else
 		$pdf->SetXY(30,30);
 	
 		//Logo
-		$pdf->Image("../../skin/images/logo.jpg","400","25","160","54","jpg","");
+		$pdf->Image("../../skin/styles/".DEFAULT_STYLE."/logo.jpg","400","25","150","78","jpg","");
 		$pdf->SetFont('Arial','',12);
 		$pdf->SetFillColor(190,190,190);
 		$pdf->SetXY(30,110-$titelabzug);
