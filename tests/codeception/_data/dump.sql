@@ -1133,3 +1133,8 @@ INSERT INTO public.tbl_statistik VALUES ('Verplanungsübersicht', 'Verplanungsü
 INSERT INTO public.tbl_statistik VALUES ('Zeitwünsche', 'Zeitwünsche', 5, '../lehre/zeitwuensche.php', 'LV-Plan', NULL, NULL, NULL, '2011-04-01 10:52:37', 'oesi', '2011-04-01 11:15:27', 'oesi', NULL, false, NULL);
 INSERT INTO public.tbl_statistik VALUES ('AnzahlStudierende', 'Aktuell Studierende im Haus', 16, '../../cis/private/lvplan/stpl_week_anzahl_studenten.php', 'Studierende', NULL, NULL, NULL, '2011-04-01 11:11:52', 'oesi', '2012-02-20 19:09:16', 'kindlm', NULL, false, NULL);
 INSERT INTO public.tbl_statistik VALUES ('ALVS-Statistik', 'ALVS-Statistik', 7, '../../content/statistik/alvsstatistik.php', 'Lehre', NULL, NULL, NULL, '2011-04-01 10:54:03', 'oesi', '2011-04-01 11:23:12', 'oesi', NULL, false, NULL);
+
+GRANT SELECT ON TABLE wawi.tbl_konto TO vilesci;
+GRANT SELECT ON TABLE campus.tbl_pruefungsstatus TO vilesci;
+GRANT SELECT ON TABLE fue.tbl_scrumsprint TO vilesci;
+GRANT SELECT ON TABLE fue.tbl_scrumteam TO vilesci;
