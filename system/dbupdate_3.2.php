@@ -1206,7 +1206,7 @@ if(!$result = @$db->db_query("SELECT verpflichtend FROM public.tbl_ampel LIMIT 1
 		echo '<br>Neue Spalten "verpflichtend" und "buttontext" in Tabelle public.tbl_ampel hinzugefügt<br>';
 }
 
-// Neue Spalte studienplan_id in public.tbl_bewerbungstermine
+// Neue Spalte lieferbedingungen in public.tbl_firma
 if(!$result = @$db->db_query("SELECT lieferbedingungen FROM public.tbl_firma LIMIT 1"))
 {
 	$qry = "ALTER TABLE public.tbl_firma ADD COLUMN lieferbedingungen varchar(256);";
