@@ -1202,8 +1202,9 @@ if(!$result = @$db->db_query("SELECT verpflichtend FROM public.tbl_ampel LIMIT 1
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_ampel '.$db->db_last_error().'</strong><br>';
-		else
-			echo '<br>Neue Spalten "verpflichtend" und "buttontext" in Tabelle public.tbl_ampel hinzugefügt<br>';
+	else
+		echo '<br>Neue Spalten "verpflichtend" und "buttontext" in Tabelle public.tbl_ampel hinzugefügt<br>';
+}
 
 // Neue Spalte studienplan_id in public.tbl_bewerbungstermine
 if(!$result = @$db->db_query("SELECT lieferbedingungen FROM public.tbl_firma LIMIT 1"))
