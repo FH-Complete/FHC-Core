@@ -108,6 +108,7 @@ $this->phrasen['pruefung/keineLehreinheitenVorhanden'] = 'Nessun corso disponibi
 $this->phrasen['pruefung/keineAnmeldungenVorhanden'] = 'Nessun studente iscritto.';
 $this->phrasen['pruefung/derLektor'] = 'Docente';
 $this->phrasen['pruefung/dieKommission'] = 'Commissione';
+$this->phrasen['pruefung/matrikelnummer']='Matricola';
 
 // anmeldungen Verwalten
 $this->phrasen['pruefung/anmeldungenVerwaltenTitle'] = 'Gestione delle prenotazioni degli appelli';
