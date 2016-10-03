@@ -20,16 +20,18 @@
 /**
  * Seite zur Aenderung des Studiengangsnamens
  */
-require_once('../../config/vilesci.config.inc.php');		
+require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/globals.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/organisationsform.class.php');
+require_once('../../include/benutzerfunktion.class.php');
+require_once('../../include/benutzer.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-	
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -53,7 +55,7 @@ if(isset($_GET['studiengang_kz']))
 	$stg_kz = $_GET['studiengang_kz'];
 else
 	$stg_kz='';
-	
+
 if(isset($_GET['action']) && $_GET['action']=='save')
 {
 	$studiengang_kz = $_POST['studiengang_kz'];
@@ -61,13 +63,13 @@ if(isset($_GET['action']) && $_GET['action']=='save')
 	$studiengang->load($studiengang_kz);
 	if(!$rechte->isBerechtigt('assistenz', $studiengang->oe_kurzbz, 'suid'))
 		die('Sie haben keine Berechtigung fuer diese Seite');
-		
+
 	$bezeichnung = $_POST['bezeichnung'];
 	$english = $_POST['english'];
 	$max_semester = $_POST['max_semester'];
 	$orgform_kurzbz = $_POST['orgform_kurzbz'];
 	$stg_kz=$studiengang_kz;
-	
+
 	$stg = new studiengang();
 	if($stg->load($studiengang_kz))
 	{
@@ -80,13 +82,46 @@ if(isset($_GET['action']) && $_GET['action']=='save')
 			echo '<span class="ok">Erfolgreich geändert</span>';
 		else
 			echo '<span clasS="error">Fehler beim Speichern: '.$stg->errormsg.'</span>';
-			
+
+	}
+
+	if($studiengang_kz==334)
+	{
+		$benutzerfunktion = new benutzerfunktion();
+		$benutzerfunktion->getOeFunktionen($stg->oe_kurzbz, 'Leitung');
+
+		foreach($benutzerfunktion->result as $row)
+		{
+			if(isset($_POST['ltg_'.$row->benutzerfunktion_id]))
+			{
+				// Leitung wird gesetzt
+				if($row->datum_bis!='')
+				{
+					$row->datum_bis='';
+					$row->updateamum = date('Y-m-d H:i:s');
+					$row->updatevon = $user;
+					$row->save(false);
+				}
+			}
+			else
+			{
+				// Leitung wird entfernt
+				if($row->datum_bis=='' || $row->datum_bis>date('Y-m-d'))
+				{
+					$row->datum_bis=date('Y-m-d',mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+					$row->updateamum = date('Y-m-d H:i:s');
+					$row->updatevon = $user;
+					$row->save(false);
+				}
+			}
+
+		}
 	}
 }
 
-$stg = new studiengang();	
+$stg = new studiengang();
 $stg_arr = $rechte->getStgKz('assistenz');
-$stg->loadArray($stg_arr,'typ, kurzbz',true);	
+$stg->loadArray($stg_arr,'typ, kurzbz',true);
 
 echo '<form method="GET">
 Studiengang: <SELECT name="studiengang_kz">';
@@ -94,12 +129,12 @@ foreach($stg->result as $row)
 {
 	if($stg_kz=='')
 		$stg_kz=$row->studiengang_kz;
-		
+
 	if($stg_kz==$row->studiengang_kz)
 		$selected='selected';
 	else
 		$selected='';
-		
+
 	echo '<OPTION value="'.$row->studiengang_kz.'" '.$selected.'>'.$row->kuerzel.' - '.$row->kurzbzlang.'</OPTION>';
 }
 echo '</SELECT><input type="submit" value="Anzeigen" /></form>';
@@ -136,15 +171,47 @@ foreach($orgform->result as $row)
 		$selected='selected';
 	else
 		$selected='';
-		
+
 	echo '<OPTION value="'.$row->orgform_kurzbz.'" '.$selected.'>'.$row->bezeichnung.'</OPTION>';
 }
 
 echo '
 		</SELECT>
 	</td>
-</tr>
+</tr>';
 
+if($stg->studiengang_kz==334)
+{
+	// Studiengang MIT / MSC kann auch die Leitung aktivieren/deaktivieren
+	echo '<tr>';
+	echo '<td valign="top">Leitung</td>';
+	echo '<td>';
+
+	$benutzerfunktion = new benutzerfunktion();
+	$benutzerfunktion->getOeFunktionen($stg->oe_kurzbz, 'Leitung');
+
+	foreach($benutzerfunktion->result as $row)
+	{
+		if($row->datum_bis=='' || $row->datum_bis>date('Y-m-d'))
+			$checked='checked="checked"';
+		else
+			$checked='';
+
+		echo '<input type="checkbox" name="ltg_'.$row->benutzerfunktion_id.'" '.$checked.'>';
+		$bn = new benutzer();
+		$bn->load($row->uid);
+		echo $bn->vorname.' '.$bn->nachname.'<br>';
+	}
+
+	echo '</td>';
+	echo '</tr>';
+}
+
+echo '
+<tr>
+	<td>&nbsp;</td>
+	<td>&nbsp;</td>
+</tr>
 <tr>
 	<td></td>
 	<td><input type="submit" value="Speichern" /></td>

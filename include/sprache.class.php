@@ -85,15 +85,17 @@ class sprache extends basis_db
 	/**
 	 *
 	 * Lädt alle verfügbaren Sprachen
+	 * @param boolean $content Default:null Ist die Sprache relevant fuer die Sprachauswahl
+	 * @param string $order Default:sprache Spalte, nach der die Ergebnisse sortiert werden
 	 * @return true bei Erfolg, false wenn ein Fehler aufgetreten ist.
 	 */
-	public function getAll($content=null)
+	public function getAll($content=null, $order='sprache')
 	{
 		$qry = "SELECT *,".$this->getSprachQuery('bezeichnung')." FROM public.tbl_sprache";
 
 		if(!is_null($content))
 			$qry.= " WHERE content=".$this->db_add_param($content, FHC_BOOLEAN);
-		$qry.=" ORDER BY sprache";
+		$qry.=" ORDER BY ".$order;
 
 		if(!$this->db_query($qry))
 		{

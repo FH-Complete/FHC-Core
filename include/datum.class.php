@@ -23,7 +23,7 @@
 class datum
 {
 	public $ts_day=86400;	// Timestamp eines Tages
-	
+
 	/**
 	 * Konstruktor
 	 *
@@ -103,13 +103,12 @@ class datum
 	 */
 	public function jump_week($datum, $wochen)
 	{
-		$stunde_vor=date("G",$datum);
-		// Eine Woche sind 604800 Sekunden
-		$datum+=604800*$wochen;
-		$stunde_nach=date("G",$datum);
-		if ($stunde_nach!=$stunde_vor)
-			$datum+=3600;
-		return $datum;
+		$days = $wochen * 7;
+
+		$datetime=new DateTime();
+		$datetime->setTimestamp($datum);
+		$datetime->modify($days.' day');
+		return $datetime->format("U");
 	}
 
 	/**
@@ -159,7 +158,7 @@ class datum
 		else
 			return false;
 	}
-	
+
 	/**
 	 * Zieht ein Datum von einem anderen ab, und gibt die differenz in Tagen zurueck (mit Vorzeichen)
 	 * @param $datum1
@@ -196,7 +195,7 @@ class datum
 		if($start=='' && $ende!='' && $dateende>=$dateref)
 			return true;
 
-		// Ende nicht gesetzt; Start gesetzt		
+		// Ende nicht gesetzt; Start gesetzt
 		if($ende=='' && $start!='' && $datestart<=$dateref)
 			return true;
 
@@ -237,7 +236,7 @@ class datum
 
 		return $h1.':'.$m1;
 	}
-	
+
 	/**
 	 * Subtrahiert 2 Zeiten ($zeit1-$zeit2) Stunde:Minute
 	 * Es liefert keine Uhrzeit zurueck sondern Stunden und Minuten
@@ -268,7 +267,7 @@ class datum
 
 		return $h1.':'.$m1;
 	}
-	
+
 	/**
 	 * Prueft und Liefert ein Datum im angegeben Format
 	 *   		fuer die Formatierung wird die Funktion formatDatum verwendet
@@ -278,9 +277,9 @@ class datum
 	 * 				  Eintraege wie zB 'last Monday' oder 'a' auch in ein Datum umgewandelt werden.
 	 * @return Formatierten Timestamp wenn ok, false im Fehlerfall
 	 */
-	function checkformatDatum($datum, $format='Y-m-d H:i:s', $strict=false) 
+	function checkformatDatum($datum, $format='Y-m-d H:i:s', $strict=false)
 	{
-				
+
 			@list($day, $month, $year) = @explode(".", $datum);
 			if (@checkdate($month, $day, $year))
 				return $this->formatDatum($datum, $format, $strict);
@@ -293,7 +292,7 @@ class datum
 			@list($year, $month, $day) = @explode("-", $datum);
 			if (@checkdate($month, $day, $year))
 				return $this->formatDatum($datum, $format, $strict);
-				
+
 			if (strlen($datum)==6)
 			{
 				$year="20".substr($datum,0,2);
@@ -301,7 +300,7 @@ class datum
 				$day=substr($datum,4,2);
 				if (@checkdate($month, $day, $year))
 					return $this->formatDatum($datum, $format, $strict);
-			}		
+			}
 			else if (strlen($datum)==8)
 			{
 				$year=substr($datum,0,4);
@@ -309,15 +308,15 @@ class datum
 				$day=substr($datum,	6,2);
 				if (@checkdate($month, $day, $year))
 					return $this->formatDatum($datum, $format, $strict);
-				
-				$year=substr($datum,5,4);		
+
+				$year=substr($datum,5,4);
 				$month=substr($datum,3,2);
 				$day=substr($datum,	0,2);
 				if (@checkdate($month, $day, $year))
 					return $this->formatDatum($datum, $format, $strict);
-			}		
-			return false;	
-		}		
+			}
+			return false;
+		}
 
 
 	/**
@@ -334,18 +333,18 @@ class datum
 	{
 		if(trim($datum)=='')
 			return '';
-		
+
 		$ts='';
 		$error=false;
-		
+
 		//2008-12-31
 		if(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$datum, $regs))
 			$ts = mktime(0,0,0,$regs[2],$regs[3],$regs[1]);
-		
+
 		//2008-12-31 12:30
 		if(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2})",$datum, $regs))
 			$ts = mktime($regs[4],$regs[5],0,$regs[2],$regs[3],$regs[1]);
-		
+
 		//2008-12-31 12:30:15
 		if(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$datum, $regs))
 			$ts = mktime($regs[4],$regs[5],$regs[6],$regs[2],$regs[3],$regs[1]);
@@ -355,20 +354,20 @@ class datum
 			//1.12.2008
 			if(mb_ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})",$datum, $regs))
 				$ts = mktime(0,0,0,$regs[2],$regs[1],$regs[3]);
-			
+
 			//1.12.2008 12:30
 			if(mb_ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4}) ([0-9]{2}):([0-9]{2})",$datum, $regs))
 				$ts = mktime($regs[4],$regs[5],0,$regs[2],$regs[1],$regs[3]);
-				
+
 			//1.12.2008 12:30:15
 			if(mb_ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})",$datum, $regs))
 				$ts = mktime($regs[4],$regs[5],$regs[6],$regs[2],$regs[1],$regs[3]);
 		}
-		
+
 		if($ts=='' && !$strict)
 		{
 			$ts = strtotime($datum);
-			
+
 			if(!$ts || $ts==-1)
 			{
 				//wenn strtotime fehlschlaegt liefert diese -1 zurueck, ab php5.1.0 jedoch false
@@ -378,9 +377,9 @@ class datum
 
 		if($ts!='' && !$error)
 			return date($format, $ts);
-			
+
 		return false;
 	}
-	
+
 }
 ?>

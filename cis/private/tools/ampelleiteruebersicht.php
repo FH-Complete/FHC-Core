@@ -99,6 +99,25 @@ if(isset($_POST['ampel_id']))
 else
 	$ampel_id = '';
 
+if (isset($_GET['ampel_benutzer_bestaetigt_id']) && isset($_GET['delete']))
+{
+	if ($rechte->isBerechtigt('admin', null, 'suid'))
+	{
+		$delete_bestaetigung = new ampel();
+		if($delete_bestaetigung->deleteAmpelBenutzer($_GET['ampel_benutzer_bestaetigt_id']))
+		{
+			echo '<span class="ok">Ampelbestaetigung erfolgreich geloescht</span>';
+		}
+		else
+		{
+			$action='new';
+			echo '<span class="error">'.$delete_bestaetigung->errormsg.'</span>';
+		}
+	}
+}
+
+
+echo '<p><a href="ampelverwaltung.php">'.($p->t('tools/ampelsystem')).'</a></p>';
 echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
 echo $p->t('global/organisationseinheit').': <SELECT name="oe_kurzbz">';
 echo '<OPTION value="">'.$p->t('global/alle').'</OPTION>';
@@ -161,8 +180,10 @@ echo '
 			<th>'.$p->t('global/organisationseinheit').'</th>
 			<th>'.$p->t('tools/ampelBestaetigtAm').'</th>
 			<th>'.$p->t('tools/ampelDeadline').'</th>
-			<th>'.$p->t('tools/ampelRestdauer').'</th>
-		</tr>
+			<th>'.$p->t('tools/ampelRestdauer').'</th>';
+			if ($rechte->isBerechtigt('admin', null, 'suid'))
+				echo '<th>'.$p->t('global/loeschen').'</th>';
+echo '	</tr>
 	</thead>
 	<tbody>
 ';
@@ -228,6 +249,17 @@ foreach($ampel->result as $row)
 		echo '<td></td>';
 	else
 		echo '<td>'.(($ts_deadline-$ts_now)/86400).'</td>';
+	if ($rechte->isBerechtigt('admin', null, 'suid'))
+	{
+		if($bestaetigt)
+			echo '<form action="'.$_SERVER['PHP_SELF'].'?ampel_benutzer_bestaetigt_id='.$row->ampel_benutzer_bestaetigt_id.'&delete" method="POST"><td>
+					<input type="hidden" name="oe_kurzbz" value="'.$_POST['oe_kurzbz'].'">
+					<input type="hidden" name="ampel_id" value="'.$_POST['ampel_id'].'">
+					<button type="submit">'.$p->t('global/loeschen').'</button></td></form>';
+		else	
+			echo '<td></td>';
+			
+	}
 	echo '</tr>';
 }
 echo '</tbody></table>';

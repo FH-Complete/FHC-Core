@@ -46,9 +46,6 @@ class menu_addon_meinelv extends menu_addon
 		//Meine LVs Student
 		if(!$is_lector)
 		{
-			$studiengang_obj = new studiengang();
-			$studiengang_obj->getAll();
-
 			$stsemobj = new studiensemester();
 
 			$stsem_arr=array();
@@ -57,10 +54,30 @@ class menu_addon_meinelv extends menu_addon
 
 			foreach($stsem_arr as $stsem)
 			{
-				$qry = "SELECT distinct lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, lehre,
-							lehreverzeichnis, studiensemester_kurzbz from campus.vw_student_lehrveranstaltung
-						WHERE uid=".$this->db_add_param($user)." AND studiensemester_kurzbz=".$this->db_add_param($stsem)."
-						AND lehre=true AND lehreverzeichnis<>'' ORDER BY studiengang_kz, semester, bezeichnung";
+				$qry = "SELECT
+							distinct
+							tbl_studiengang.typ,
+							tbl_studiengang.kurzbz,
+							vw_student_lehrveranstaltung.lehrveranstaltung_id,
+							vw_student_lehrveranstaltung.bezeichnung,
+							vw_student_lehrveranstaltung.studiengang_kz,
+							vw_student_lehrveranstaltung.semester,
+							vw_student_lehrveranstaltung.lehre,
+							vw_student_lehrveranstaltung.lehreverzeichnis,
+							vw_student_lehrveranstaltung.studiensemester_kurzbz
+						FROM
+							campus.vw_student_lehrveranstaltung
+							JOIN public.tbl_studiengang USING(studiengang_kz)
+						WHERE
+							uid=".$this->db_add_param($user)."
+							AND studiensemester_kurzbz=".$this->db_add_param($stsem)."
+							AND lehre=true
+							AND lehreverzeichnis<>''
+						ORDER BY
+							tbl_studiengang.typ,
+							tbl_studiengang.kurzbz,
+							semester,
+							bezeichnung";
 				if($result = $this->db_query($qry))
 				{
 					if($this->db_num_rows($result)>0)
@@ -88,7 +105,7 @@ class menu_addon_meinelv extends menu_addon
 								$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 								 'target'=>'content',
 								 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$row->studiensemester_kurzbz,
-								 'name'=>$studiengang_obj->kuerzel_arr[$row->studiengang_kz].$row->semester.' '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
+								 'name'=>strtoupper($row->typ.$row->kurzbz).$row->semester.' '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
 								);
 							}
 						}
@@ -96,7 +113,6 @@ class menu_addon_meinelv extends menu_addon
 				}
 				else
 					echo "Fehler beim Auslesen der LV";
-
 			}
 		}
 
@@ -117,11 +133,33 @@ class menu_addon_meinelv extends menu_addon
 				foreach($stsem_arr as $stsem)
 				{
 					$stsementry=array();
-					$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.orgform_kurzbz, studiensemester_kurzbz  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
-					        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-					        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-					        mitarbeiter_uid=".$this->db_add_param($user)." AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($stsem)."
-					        ORDER BY studiengang_kz, semester, bezeichnung";
+					$qry = "SELECT
+								distinct
+								tbl_studiengang.typ,
+								tbl_studiengang.kurzbz,
+								tbl_lehrveranstaltung.bezeichnung,
+								tbl_lehrveranstaltung.studiengang_kz,
+								tbl_lehrveranstaltung.semester,
+								tbl_lehrveranstaltung.lehreverzeichnis,
+								tbl_lehrveranstaltung.lehrveranstaltung_id,
+								tbl_lehrveranstaltung.orgform_kurzbz,
+								tbl_lehreinheit.studiensemester_kurzbz
+							FROM
+								lehre.tbl_lehrveranstaltung,
+								lehre.tbl_lehreinheit,
+								lehre.tbl_lehreinheitmitarbeiter,
+								public.tbl_studiengang
+							WHERE
+								tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
+								tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND
+								tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+								mitarbeiter_uid=".$this->db_add_param($user)." AND
+								tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($stsem)."
+							ORDER BY
+								tbl_studiengang.typ,
+								tbl_studiengang.kurzbz,
+								tbl_lehrveranstaltung.semester,
+								tbl_lehrveranstaltung.bezeichnung";
 
 					if($result = $this->db_query($qry))
 					{
@@ -147,9 +185,7 @@ class menu_addon_meinelv extends menu_addon
 								}
 								else
 								{
-									$stg_obj = new studiengang();
-									$stg_obj->load($row->studiengang_kz);
-									$kurzbz = $stg_obj->kuerzel.'-'.$row->semester.' '.$row->orgform_kurzbz;
+									$kurzbz = strtoupper($row->typ.$row->kurzbz).'-'.$row->semester.' '.$row->orgform_kurzbz;
 
 									$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 									 'target'=>'content',
@@ -162,16 +198,6 @@ class menu_addon_meinelv extends menu_addon
 					}
 					else
 						echo "Fehler beim Auslesen des Lehrfaches";
-/*
-					if(count($stsementry)>0)
-					{
-						$this->items[] = array('title'=>$stsem,
-								'target'=>'',
-								'link'=>'#',
-								'name'=>$stsem,
-								'childs'=>$stsementry
-						);
-					}*/
 				}
 			}
 			else

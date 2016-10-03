@@ -1193,6 +1193,31 @@ if(!$result = @$db->db_query("SELECT studienplan_id FROM public.tbl_bewerbungste
 		echo '<br>Neue Spalte studienplan_id in Tabelle public.tbl_bewerbungstermine hinzugefügt<br>';
 }
 
+
+// Attribute verpflichtend und buttontext in public.tbl_ampel
+if(!$result = @$db->db_query("SELECT verpflichtend FROM public.tbl_ampel LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_ampel ADD COLUMN verpflichtend boolean NOT NULL DEFAULT FALSE;
+			ALTER TABLE public.tbl_ampel ADD COLUMN buttontext varchar(64)[];";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_ampel '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalten "verpflichtend" und "buttontext" in Tabelle public.tbl_ampel hinzugefügt<br>';
+}
+
+// Neue Spalte lieferbedingungen in public.tbl_firma
+if(!$result = @$db->db_query("SELECT lieferbedingungen FROM public.tbl_firma LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_firma ADD COLUMN lieferbedingungen varchar(256);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_firma '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte lieferbedingungen in Tabelle public.tbl_firma hinzugefügt<br>';
+
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -1344,7 +1369,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern"),
-	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email"),
+	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email","verpflichtend"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id","bezeichnung", "aktiv"),
 	"public.tbl_aufnahmeschluessel"  => array("aufnahmeschluessel"),

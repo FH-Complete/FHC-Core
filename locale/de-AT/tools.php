@@ -46,9 +46,11 @@ $this->phrasen['tools/ampelMitarbeiter']='Mitarbeiter';
 $this->phrasen['tools/ampelRestdauer']='Restdauer in Tagen';
 $this->phrasen['tools/ampelBestaetigtAm']='Bestätigt am';
 $this->phrasen['tools/ampelBereitsBestaetigt']='Diese Ampel wurde bereits bestätigt';
-$this->phrasen['tools/dasAmpelsystemIstEinErinnerungsystem']='Das Ampelsystem ist ein ERINNERUNGS- und BESTÄTIGUNGSSYSTEM, welches Sie auf ausstehende Aufgaben aufmerksam machen soll.<br/>Die Ampel überprüft NICHT, ob die Aufgabe tatsächlich erledigt wurde. Weitere Details entnehmen Sie bitte dem CIS-Handbuch';
+$this->phrasen['tools/dasAmpelsystemIstEinErinnerungsystem']='Das Ampelsystem ist ein ERINNERUNGS- und BESTÄTIGUNGSSYSTEM, welches Sie auf ausstehende Aufgaben aufmerksam machen soll.';
 $this->phrasen['tools/waehlenSieEineOEoderAmpel']='Bitte wählen Sie ein Organisationseinheit und/oder eine Ampel aus dem Dropdown';
 $this->phrasen['tools/uebersichtLeitung']='Ampel-Übersicht für LeiterInnen';
+$this->phrasen['tools/ampelAlleAnzeigen']='Alle anzeigen';
+$this->phrasen['tools/ampelNurAktuellesStudiensemester']='Nur aktuelles Studiensemester anzeigen';
 
 //Software fuer Lehre -> Softgrid
 $this->phrasen['tools/applikationsliste']='Applikationsliste';
@@ -72,4 +74,9 @@ $this->phrasen['tools/telefonklappe']='Telefonklappe';
 $this->phrasen['tools/reservieren']='Reservieren';
 $this->phrasen['tools/maxPersonen']='Max. Personen';
 $this->phrasen['tools/esWurdenKeineErgebnisseGefunden']='Es wurden keine Ergebnisse gefunden.';
+
+//Partnerhochschulen
+$this->phrasen['tools/partnerhochschulenUebersicht']='Übersicht der Partnerhochschulen';
+$this->phrasen['tools/partnerhochschulenKeinEintrag']='Für diesen Studiengang ist keine Partnerhochschule zugeordnet';
+$this->phrasen['tools/partnerhochschulenEinleitung']='Sollten Sie an einer Partnerhochschule studieren wollen, die sich nicht auf dieser Liste befindet, kontaktieren Sie bitte das <a href="../../../cms/content.php?content_id=6952">Center for International Relations (CIR)</a>.';
 ?>
