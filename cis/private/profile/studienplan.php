@@ -511,28 +511,40 @@ function drawTree($tree, $depth)
                     if($found)
                     {
                         if($positiv)
-                        echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
+						{
+							echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
+						}
                         else
+						{
                             echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
+						}
                     }
                     elseif(!$found)
                     {
-                        if($abgeschlossen)
-                            echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
-			elseif(!$row_tree->stpllv_pflicht)
+                        if(!$row_tree->stpllv_pflicht)
+						{
                             echo '<span>'.$p->t('studienplan/optional').'</span>';
-			else
+						}
+						else
+						{
                             echo '<span>'.$p->t('studienplan/offen').'</span>';
+						}
                     }
 		}
 		else
 		{
 			if($abgeschlossen)
+			{
 				echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
+			}
 			elseif(!$row_tree->stpllv_pflicht)
+			{
 				echo '<span>'.$p->t('studienplan/optional').'</span>';
+			}
 			else
+			{
 				echo '<span>'.$p->t('studienplan/offen').'</span>';
+			}
 		}
 		echo '</td>';
 
