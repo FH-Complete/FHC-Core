@@ -4,6 +4,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 $config['msg_delivery'] = true;
 $config['send_immediately'] = false; // If the message should be sent immediately
+$config['system_person_id'] = 1; // Dummy sender, used for sending messages from the system
 
 define('EMAIL_KONTAKT_TYPE', 'email'); // Email kontakt type
 define('SENT_INFO_NEWLINE', '\n'); // tbl_msg_recipient->sentInfo separator

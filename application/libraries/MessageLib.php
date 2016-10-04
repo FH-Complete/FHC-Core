@@ -199,7 +199,9 @@ class MessageLib
     public function sendMessage($sender_id, $receiver_id, $subject, $body, $priority = PRIORITY_NORMAL, $relationmessage_id = null, $oe_kurzbz = null)
     {
         if (!is_numeric($sender_id))
-        	return $this->_error('', MSG_ERR_INVALID_SENDER_ID);
+        {
+			$sender_id = $this->ci->config->item('system_person_id');
+        }
 		
 		$receivers = null;
 		

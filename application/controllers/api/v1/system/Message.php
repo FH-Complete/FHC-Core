@@ -132,7 +132,7 @@ class Message extends APIv1_Controller
 		if (is_object($validation) && $validation->error == EXIT_SUCCESS)
 		{
 			$result = $this->messagelib->sendMessage(
-				$this->post()['person_id'],
+				isset($this->post()['person_id']) ? $this->post()['person_id'] : null,
 				isset($this->post()['receiver_id']) ? $this->post()['receiver_id'] : null,
 				$this->post()['subject'],
 				$this->post()['body'],
@@ -203,10 +203,6 @@ class Message extends APIv1_Controller
 		if (!isset($message))
 		{
 			return $this->_error('Parameter is null');
-		}
-		if (!isset($message['person_id']))
-		{
-			return $this->_error('person_id is not set');
 		}
 		if (!isset($message['subject']))
 		{
