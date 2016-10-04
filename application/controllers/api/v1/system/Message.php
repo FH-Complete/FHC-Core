@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if (!defined("BASEPATH")) exit("No direct script access allowed");
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Message extends APIv1_Controller
 {
@@ -23,7 +23,7 @@ class Message extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load library MessageLib
-		$this->load->library("MessageLib");
+		$this->load->library('MessageLib');
 	}
 
 	/**
@@ -31,8 +31,8 @@ class Message extends APIv1_Controller
 	 */
 	public function getMessagesByPersonID()
 	{
-		$person_id = $this->get("person_id");
-		$all = $this->get("all");
+		$person_id = $this->get('person_id');
+		$all = $this->get('all');
 		
 		if (isset($person_id))
 		{
@@ -51,8 +51,8 @@ class Message extends APIv1_Controller
 	 */
 	public function getMessagesByUID()
 	{
-		$uid = $this->get("uid");
-		$all = $this->get("all");
+		$uid = $this->get('uid');
+		$all = $this->get('all');
 		
 		if (isset($uid))
 		{
@@ -71,7 +71,7 @@ class Message extends APIv1_Controller
 	 */
 	public function getMessagesByToken()
 	{
-		$token = $this->get("token");
+		$token = $this->get('token');
 		
 		if (isset($token))
 		{
@@ -90,8 +90,8 @@ class Message extends APIv1_Controller
 	 */
 	public function getSentMessagesByPerson()
 	{
-		$person_id = $this->get("person_id");
-		$all = $this->get("all");
+		$person_id = $this->get('person_id');
+		$all = $this->get('all');
 		
 		if (isset($person_id))
 		{
@@ -110,7 +110,7 @@ class Message extends APIv1_Controller
 	 */
 	public function getRedirectByToken()
 	{
-		$token = $this->get("token");
+		$token = $this->get('token');
 		
 		if (isset($token))
 		{
@@ -132,13 +132,13 @@ class Message extends APIv1_Controller
 		if (is_object($validation) && $validation->error == EXIT_SUCCESS)
 		{
 			$result = $this->messagelib->sendMessage(
-				$this->post()["person_id"],
-				$this->post()["receiver_id"],
-				$this->post()["subject"],
-				$this->post()["body"],
+				$this->post()['person_id'],
+				isset($this->post()['receiver_id']) ? $this->post()['receiver_id'] : null,
+				$this->post()['subject'],
+				$this->post()['body'],
 				PRIORITY_NORMAL,
-				$this->post()["relationmessage_id"],
-				$this->post()["oe_kurzbz"]
+				isset($this->post()['relationmessage_id']) ? $this->post()['relationmessage_id'] : null,
+				isset($this->post()['oe_kurzbz']) ? $this->post()['oe_kurzbz'] : null
 			);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
@@ -159,13 +159,13 @@ class Message extends APIv1_Controller
 		if (is_object($validation) && $validation->error == EXIT_SUCCESS)
 		{
 			$result = $this->messagelib->sendMessageVorlage(
-				$this->post()["sender_id"],
-				$this->post()["receiver_id"],
-				$this->post()["vorlage_kurzbz"],
-				$this->post()["oe_kurzbz"],
-				$this->post()["data"],
-				isset($this->post()["relationmessage_id"]) ? $this->post()["relationmessage_id"] : null,
-				isset($this->post()["orgform_kurzbz"]) ? $this->post()["orgform_kurzbz"] : null
+				$this->post()['sender_id'],
+				$this->post()['receiver_id'],
+				$this->post()['vorlage_kurzbz'],
+				$this->post()['oe_kurzbz'],
+				$this->post()['data'],
+				isset($this->post()['relationmessage_id']) ? $this->post()['relationmessage_id'] : null,
+				isset($this->post()['orgform_kurzbz']) ? $this->post()['orgform_kurzbz'] : null
 			);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
@@ -181,9 +181,9 @@ class Message extends APIv1_Controller
 	 */
 	public function postChangeStatus()
 	{
-		$person_id = $this->post()["person_id"];
-		$message_id = $this->post()["message_id"];
-		$status = $this->post()["status"];
+		$person_id = $this->post()['person_id'];
+		$message_id = $this->post()['message_id'];
+		$status = $this->post()['status'];
 		
 		if (isset($person_id) && isset($message_id) && isset($status) &&
 			in_array($status, array(MSG_STATUS_UNREAD, MSG_STATUS_READ, MSG_STATUS_ARCHIVED, MSG_STATUS_DELETED)))
@@ -202,55 +202,55 @@ class Message extends APIv1_Controller
 	{
 		if (!isset($message))
 		{
-			return $this->_error("Parameter is null");
+			return $this->_error('Parameter is null');
 		}
-		if (!isset($message["person_id"]))
+		if (!isset($message['person_id']))
 		{
-			return $this->_error("person_id is not set");
+			return $this->_error('person_id is not set');
 		}
-		if (!isset($message["subject"]))
+		if (!isset($message['subject']))
 		{
-			return $this->_error("subject is not set");
+			return $this->_error('subject is not set');
 		}
-		if( !isset($message["body"]))
+		if( !isset($message['body']))
 		{
-			return $this->_error("body is not set");
+			return $this->_error('body is not set');
 		}
-		if (!isset($message["oe_kurzbz"]))
+		if (!isset($message['receiver_id']) && !isset($message['oe_kurzbz']))
 		{
-			return $this->_error("oe_kurzbz is not set");
+			return $this->_error('If a receiver_id is not given a oe_kurzbz must be specified');
 		}
 		
-		return $this->_success("Input data are valid");
+		return $this->_success('Input data are valid');
 	}
 	
 	private function _validatePostMessageVorlage($message = null)
 	{
 		if (!isset($message))
 		{
-			return $this->_error("Parameter is null");
+			return $this->_error('Parameter is null');
 		}
-		if (!isset($message["sender_id"]))
+		if (!isset($message['sender_id']))
 		{
-			return $this->_error("person_id of sender is not set");
+			return $this->_error('person_id of sender is not set');
 		}
-		if (!isset($message["receiver_id"]))
+		if (!isset($message['receiver_id']))
 		{
-			return $this->_error("person_id of receiver is not set");
+			return $this->_error('person_id of receiver is not set');
 		}
-		if (!isset($message["vorlage_kurzbz"]))
+		if (!isset($message['vorlage_kurzbz']))
 		{
-			return $this->_error("vorlage_kurzbz is not set");
+			return $this->_error('vorlage_kurzbz is not set');
 		}
-		if( !isset($message["oe_kurzbz"]))
+		if( !isset($message['oe_kurzbz']))
 		{
-			return $this->_error("oe_kurzbz is not set");
+			return $this->_error('oe_kurzbz is not set');
 		}
-		if (!isset($message["data"]))
+		if (!isset($message['data']))
 		{
-			return $this->_error("data is not set");
+			return $this->_error('data is not set');
 		}
 		
-		return $this->_success("Input data are valid");
+		return $this->_success('Input data are valid');
 	}
 }

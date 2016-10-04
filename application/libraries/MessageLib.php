@@ -1,39 +1,40 @@
 <?php
 
-if (! defined("BASEPATH")) exit("No direct script access allowed");
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
-* Name:	Messaging Library for FH-Complete
+* Messaging Library for FH-Complete
 */
 class MessageLib
 {
 	public function __construct()
 	{
+		// Get code igniter instance
         $this->ci =& get_instance();
 		
 		// Loads message configuration
-		$this->ci->config->load("message");
+		$this->ci->config->load('message');
 		
 		// CI Parser library
-		$this->ci->load->library("parser");
+		$this->ci->load->library('parser');
 		// Loads LogLib
-		$this->ci->load->library("LogLib");
+		$this->ci->load->library('LogLib');
 		// Loads VorlageLib
-		$this->ci->load->library("VorlageLib");
+		$this->ci->load->library('VorlageLib');
 		// Loads Mail library
-		$this->ci->load->library("MailLib");
+		$this->ci->load->library('MailLib');
 		
 		// Loading models
-		$this->ci->load->model("system/Message_model", "MessageModel");
-		$this->ci->load->model("system/MsgStatus_model", "MsgStatusModel");
-		$this->ci->load->model("system/Recipient_model", "RecipientModel");
-		$this->ci->load->model("system/Attachment_model", "AttachmentModel");
+		$this->ci->load->model('system/Message_model', 'MessageModel');
+		$this->ci->load->model('system/MsgStatus_model', 'MsgStatusModel');
+		$this->ci->load->model('system/Recipient_model', 'RecipientModel');
+		$this->ci->load->model('system/Attachment_model', 'AttachmentModel');
 		
 		// Loads fhc helper
-		$this->ci->load->helper("fhc");
+		$this->ci->load->helper('fhc');
 		
-        //$this->ci->load->helper('language');
-        $this->ci->lang->load("message");
+		// Loads phrases
+        $this->ci->lang->load('message');
     }
     
     /**
@@ -46,9 +47,9 @@ class MessageLib
     public function getMessage($msg_id, $person_id)
     {
         if (empty($msg_id))
-        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+        	return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 		if (empty($person_id))
-        	return $this->_error(MSG_ERR_INVALID_RECIPIENTS);
+        	return $this->_error('', MSG_ERR_INVALID_RECIPIENTS);
 		
 		$msg = $this->ci->RecipientModel->getMessage($msg_id, $person_id);
 		
@@ -64,7 +65,7 @@ class MessageLib
     public function getMessagesByUID($uid, $all = false)
     {
         if (empty($uid))
-        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+        	return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 		
 		$msg = $this->ci->RecipientModel->getMessagesByUID($uid, $all);
 
@@ -80,7 +81,7 @@ class MessageLib
     public function getMessagesByPerson($person_id, $all = false)
     {
         if (empty($person_id))
-        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+        	return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 		
 		$msg = $this->ci->RecipientModel->getMessagesByPerson($person_id, $all);
 		
@@ -96,7 +97,7 @@ class MessageLib
     public function getSentMessagesByPerson($person_id, $all = false)
     {
         if (empty($person_id))
-        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+        	return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 		
 		$msg = $this->ci->MessageModel->getMessagesByPerson($person_id, $all);
 		
@@ -112,7 +113,7 @@ class MessageLib
     public function getMessageByToken($token)
     {
         if (empty($token))
-        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+        	return $this->_error('', MSG_ERR_INVALID_MSG_ID);
 		
 		$result = $this->ci->RecipientModel->getMessageByToken($token);
 		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
@@ -132,9 +133,9 @@ class MessageLib
 			if ($found == -1)
 			{
 				$statusKey = array(
-					"message_id" => $result->retval[0]->message_id,
-					"person_id" => $result->retval[0]->receiver_id,
-					"status" => MSG_STATUS_READ
+					'message_id' => $result->retval[0]->message_id,
+					'person_id' => $result->retval[0]->receiver_id,
+					'status' => MSG_STATUS_READ
 				);
 				
 				$result = $this->ci->MsgStatusModel->insert($statusKey);
@@ -156,18 +157,18 @@ class MessageLib
     {
         if (empty($message_id))
         {
-            return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
+            return $this->_error('', MSG_ERR_INVALID_MSG_ID);
         }
 		
         if (empty($person_id))
         {
-            return $this->_invalid_id(MSG_ERR_INVALID_USER_ID);
+            return $this->_error('', MSG_ERR_INVALID_USER_ID);
         }
 		
 		// Not use empty otherwise if status is 0 it returns an error
         if (!isset($status))
         {
-            return $this->_invalid_id(MSG_ERR_INVALID_STATUS_ID);
+            return $this->_error('', MSG_ERR_INVALID_STATUS_ID);
         }
 		
 		// Searches if the status is already present
@@ -180,9 +181,9 @@ class MessageLib
 		{
 			// Insert the new status
 			$statusKey = array(
-				"message_id" => $message_id,
-				"person_id" => $person_id,
-				"status" => $status
+				'message_id' => $message_id,
+				'person_id' => $person_id,
+				'status' => $status
 			);
 				
 			$result = $this->ci->MsgStatusModel->insert($statusKey);
@@ -197,89 +198,135 @@ class MessageLib
      */
     public function sendMessage($sender_id, $receiver_id, $subject, $body, $priority = PRIORITY_NORMAL, $relationmessage_id = null, $oe_kurzbz = null)
     {
-        if (!is_numeric($sender_id) || !is_numeric($receiver_id))
-        	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
+        if (!is_numeric($sender_id))
+        	return $this->_error('', MSG_ERR_INVALID_SENDER_ID);
 		
-		// Checks if the receiver exists
-		$this->ci->load->model("person/Person_model", "PersonModel");
-		$result = $this->ci->PersonModel->load($receiver_id);
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
+		$receivers = null;
+		
+		// If no receiver_id is given...
+		if (is_null($receiver_id))
 		{
-			// If the text and the subject of the template are not empty
-			if (!empty($subject) && !empty($body))
+			// ...a oe_kurzbz must be specified
+			if (is_null($oe_kurzbz))
 			{
-				$this->ci->db->trans_start(false);
-				// Save Message
-				$msgData = array(
-					"person_id" => $sender_id,
-					"subject" => $subject,
-					"body" => $body,
-					"priority" => PRIORITY_NORMAL,
-					"relationmessage_id" => $relationmessage_id,
-					"oe_kurzbz" => $oe_kurzbz
-				);
-				$result = $this->ci->MessageModel->insert($msgData);
-				if (is_object($result) && $result->error == EXIT_SUCCESS)
-				{
-					// Link the message with the receiver
-					$msg_id = $result->retval;
-					$recipientData = array(
-						"person_id" => $receiver_id,
-						"message_id" => $msg_id
-					);
-					$result = $this->ci->RecipientModel->insert($recipientData);
-					if (is_object($result) && $result->error == EXIT_SUCCESS)
-					{
-						// Save message status
-						$statusData = array(
-							"message_id" => $msg_id,
-							"person_id" => $receiver_id,
-							"status" => MSG_STATUS_UNREAD
-						);
-						$result = $this->ci->MsgStatusModel->insert($statusData);
-						
-						// If no errors were occurred
-						/**
-						 * TODO: different config item???
-						 */
-						/*if (is_object($result) && $result->error == EXIT_SUCCESS)
-						{
-							// If the system is configured to send messages immediately
-							if ($this->ci->config->item("send_immediately") === true)
-							{
-								// Send message by email!
-								$resultSendEmail = $this->sendOne($msg_id, $subject, $parsedText);
-							}
-						}*/
-					}
-				}
-				
-				$this->ci->db->trans_complete();
-				
-				if ($this->ci->db->trans_status() === false || (is_object($result) && $result->error != EXIT_SUCCESS))
-				{
-					$this->ci->db->trans_rollback();
-					return $this->_error($result->msg, EXIT_ERROR);
-				}
-				else
-				{
-					$this->ci->db->trans_commit();
-					return $this->_success($msg_id);
-				}
+				$receivers = $this->_error('', MSG_ERR_INVALID_OU);
 			}
 			else
 			{
-				$result = $this->_error("Subject or body empty", EXIT_ERROR);
+				$receivers = $this->_getReceiversByOekurzbz($oe_kurzbz);
 			}
 		}
+		// Else if the receiver id is given
 		else
 		{
-			$result = $this->_error("Receiver not present", EXIT_ERROR);
+			$receivers = $this->_success(array(new stdClass()));
+			$receivers->retval[0]->person_id = $receiver_id;
 		}
+		
+		// If everything went ok
+		if (is_object($receivers) && $receivers->error == EXIT_SUCCESS && is_array($receivers->retval))
+		{
+			// Looping on receivers
+			for ($i = 0; $i < count($receivers->retval); $i++)
+			{
+				$receiver_id = $receivers->retval[$i]->person_id;
+				
+				// Checks if the receiver exists
+				if ($this->_checkReceiverId($receiver_id))
+				{
+					// If the text and the subject of the template are not empty
+					if (!empty($subject) && !empty($body))
+					{
+						$this->ci->db->trans_start(false);
+						// Save Message
+						$msgData = array(
+							'person_id' => $sender_id,
+							'subject' => $subject,
+							'body' => $body,
+							'priority' => PRIORITY_NORMAL,
+							'relationmessage_id' => $relationmessage_id,
+							'oe_kurzbz' => $oe_kurzbz
+						);
+						$result = $this->ci->MessageModel->insert($msgData);
+						if (is_object($result) && $result->error == EXIT_SUCCESS)
+						{
+							// Link the message with the receiver
+							$msg_id = $result->retval;
+							$recipientData = array(
+								'person_id' => $receiver_id,
+								'message_id' => $msg_id
+							);
+							$result = $this->ci->RecipientModel->insert($recipientData);
+							if (is_object($result) && $result->error == EXIT_SUCCESS)
+							{
+								// Save message status
+								$statusData = array(
+									'message_id' => $msg_id,
+									'person_id' => $receiver_id,
+									'status' => MSG_STATUS_UNREAD
+								);
+								$result = $this->ci->MsgStatusModel->insert($statusData);
+								
+								// If no errors were occurred
+								/**
+								* TODO: different config item???
+								*/
+								/*if (is_object($result) && $result->error == EXIT_SUCCESS)
+								{
+									// If the system is configured to send messages immediately
+									if ($this->ci->config->item('send_immediately') === true)
+									{
+										// Send message by email!
+										$resultSendEmail = $this->sendOne($msg_id, $subject, $parsedText);
+									}
+								}*/
+							}
+						}
+						
+						$this->ci->db->trans_complete();
+						
+						if ($this->ci->db->trans_status() === false || (is_object($result) && $result->error != EXIT_SUCCESS))
+						{
+							$this->ci->db->trans_rollback();
+							$result = $this->_error($result->msg, EXIT_ERROR);
+							break;
+						}
+						else
+						{
+							$this->ci->db->trans_commit();
+							$result = $this->_success($msg_id);
+						}
+					}
+					else
+					{
+						if (!empty($subject))
+						{
+							$result = $this->_error('', MSG_ERR_SUBJECT_EMPTY);
+						}
+						else if (!empty($body))
+						{
+							$result = $this->_error('', MSG_ERR_BODY_EMPTY);
+						}
+						break;
+					}
+				}
+				else
+				{
+					$result = $this->_error('', MSG_ERR_INVALID_RECEIVER_ID);
+					break;
+				}
+			}
+		}
+		// If there was some errors then copy them into the returning variable
+		else
+		{
+			$result = $receivers;
+		}
+		
 		
 		return $result;
     }
-	
+    
 	/**
      * sendMessageVorlage() - sends new internal message using a template
      *
@@ -292,11 +339,16 @@ class MessageLib
      */
     public function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $relationmessage_id = null, $orgform_kurzbz = null)
     {
-        if (!is_numeric($sender_id) || !is_numeric($receiver_id))
-        	return $this->_invalid_id(MSG_ERR_INVALID_MSG_ID);
+        if (!is_numeric($sender_id))
+        	return $this->_error('', MSG_ERR_INVALID_SENDER_ID);
+		
+		if (!is_numeric($receiver_id))
+		{
+			return $this->_error('', MSG_ERR_INVALID_RECEIVER_ID);
+		}
 		
 		// Load reveiver data to get its relative language
-		$this->ci->load->model("person/Person_model", "PersonModel");
+		$this->ci->load->model('person/Person_model', 'PersonModel');
 		$result = $this->ci->PersonModel->load($receiver_id);
 		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
 		{
@@ -323,12 +375,12 @@ class MessageLib
 					$this->ci->db->trans_start(false);
 					// Save Message
 					$msgData = array(
-						"person_id" => $sender_id,
-						"subject" => $subject,
-						"body" => $parsedText,
-						"priority" => PRIORITY_NORMAL,
-						"relationmessage_id" => $relationmessage_id,
-						"oe_kurzbz" => $oe_kurzbz
+						'person_id' => $sender_id,
+						'subject' => $subject,
+						'body' => $parsedText,
+						'priority' => PRIORITY_NORMAL,
+						'relationmessage_id' => $relationmessage_id,
+						'oe_kurzbz' => $oe_kurzbz
 					);
 					$result = $this->ci->MessageModel->insert($msgData);
 					if (is_object($result) && $result->error == EXIT_SUCCESS)
@@ -336,18 +388,18 @@ class MessageLib
 						// Link the message with the receiver
 						$msg_id = $result->retval;
 						$recipientData = array(
-							"person_id" => $receiver_id,
-							"message_id" => $msg_id,
-							"token" => generateToken()
+							'person_id' => $receiver_id,
+							'message_id' => $msg_id,
+							'token' => generateToken()
 						);
 						$result = $this->ci->RecipientModel->insert($recipientData);
 						if (is_object($result) && $result->error == EXIT_SUCCESS)
 						{
 							// Save message status
 							$statusData = array(
-								"message_id" => $msg_id,
-								"person_id" => $receiver_id,
-								"status" => MSG_STATUS_UNREAD
+								'message_id' => $msg_id,
+								'person_id' => $receiver_id,
+								'status' => MSG_STATUS_UNREAD
 							);
 							$result = $this->ci->MsgStatusModel->insert($statusData);
 							
@@ -355,7 +407,7 @@ class MessageLib
 							if (is_object($result) && $result->error == EXIT_SUCCESS)
 							{
 								// If the system is configured to send messages immediately
-								if ($this->ci->config->item("send_immediately") === true)
+								if ($this->ci->config->item('send_immediately') === true)
 								{
 									// Send message by email!
 									$resultSendEmail = $this->sendOne($msg_id, $subject, $parsedText);
@@ -382,21 +434,21 @@ class MessageLib
 					// Better message error
 					if (!is_array($result->retval) || (is_array($result->retval) && count($result->retval) == 0))
 					{
-						$result = $this->_error("Vorlage not found", EXIT_ERROR);
+						$result = $this->_error('', MSG_ERR_TEMPLATE_NOT_FOUND);
 					}
 					else if (is_array($result->retval) && count($result->retval) > 0)
 					{
 						if (is_null($result->retval[0]->oe_kurzbz))
 						{
-							$result = $this->_error("Vorlage not found", EXIT_ERROR);
+							$result = $this->_error('', MSG_ERR_TEMPLATE_NOT_FOUND);
 						}
 						else if (empty($result->retval[0]->text))
 						{
-							$result = $this->_error("Vorlage has an empty text", EXIT_ERROR);
+							$result = $this->_error('', MSG_ERR_INVALID_TEMPLATE);
 						}
 						else if (empty($result->retval[0]->subject))
 						{
-							$result = $this->_error("Vorlage has an empty subject", EXIT_ERROR);
+							$result = $this->_error('', MSG_ERR_INVALID_TEMPLATE);
 						}
 					}
 				}
@@ -408,7 +460,7 @@ class MessageLib
 		}
 		else
 		{
-			$result = $this->_error("Receiver not present", EXIT_ERROR);
+			$result = $this->_error('', MSG_ERR_INVALID_RECEIVER_ID);
 		}
 		
 		return $result;
@@ -448,19 +500,19 @@ class MessageLib
 				for ($i = 0; $i < count($result->retval) && $sent; $i++)
 				{
 					// If the person has an email account
-					if (!is_null($result->retval[$i]->receiver) && $result->retval[$i]->receiver != "")
+					if (!is_null($result->retval[$i]->receiver) && $result->retval[$i]->receiver != '')
 					{
 						// Using a template as email body
-						$body = $this->ci->parser->parse("templates/mail", array("body" => $result->retval[$i]->body), true);
-						if (is_null($body) || $body == "")
+						$body = $this->ci->parser->parse('templates/mail', array('body' => $result->retval[$i]->body), true);
+						if (is_null($body) || $body == '')
 						{
 							// $body = $result->retval[$i]->body;
-							$this->ci->loglib->logError("Error while parsing the mail template");
+							$this->ci->loglib->logError('Error while parsing the mail template');
 						}
 						
 						// If the sender kontakt does not exist, then use system
 						$sender = $this->ci->maillib->getConfigs()->email_from_system;
-						if (!is_null($result->retval[0]->sender) && $result->retval[0]->sender != "")
+						if (!is_null($result->retval[0]->sender) && $result->retval[0]->sender != '')
 						{
 							$sender = $result->retval[0]->sender;
 						}
@@ -474,17 +526,17 @@ class MessageLib
 						// If errors were occurred while sending the email
 						if (!$sent)
 						{
-							$this->ci->loglib->logError("Error while sending an email");
+							$this->ci->loglib->logError('Error while sending an email');
 							// Writing errors in tbl_message_status
 							$sme = $this->setMessageError(
 									$result->retval[$i]->message_id,
 									$result->retval[$i]->receiver_id,
-									"Error while sending an email",
+									'Error while sending an email',
 									$result->retval[$i]->sentinfo
 							);
 							if (!$sme)
 							{
-								$this->ci->loglib->logError("Error while updating DB");
+								$this->ci->loglib->logError('Error while updating DB');
 							}
 						}
 						else
@@ -494,23 +546,23 @@ class MessageLib
 							// If some errors occurred
 							if (!$sent)
 							{
-								$this->ci->loglib->logError("Error while updating DB");
+								$this->ci->loglib->logError('Error while updating DB');
 							}
 						}
 					}
 					else
 					{
-						$this->ci->loglib->logError("This person does not have an email account");
+						$this->ci->loglib->logError('This person does not have an email account');
 						// Writing errors in tbl_message_status
 						$sme = $this->setMessageError(
 								$result->retval[$i]->message_id,
 								$result->retval[$i]->receiver_id,
-								"This person does not have an email account",
+								'This person does not have an email account',
 								$result->retval[$i]->sentinfo
 						);
 						if (!$sme)
 						{
-							$this->ci->loglib->logError("Error while updating DB");
+							$this->ci->loglib->logError('Error while updating DB');
 						}
 						$sent = true; // Non blocking error
 					}
@@ -518,13 +570,13 @@ class MessageLib
 			}
 			else
 			{
-				$this->ci->loglib->logInfo("There are no email to be sent");
+				$this->ci->loglib->logInfo('There are no email to be sent');
 				$sent = false;
 			}
 		}
 		else
 		{
-			$this->ci->loglib->logError("Something went wrong while getting data from DB");
+			$this->ci->loglib->logError('Something went wrong while getting data from DB');
 			$sent = false;
 		}
 		
@@ -552,16 +604,16 @@ class MessageLib
 			if (is_array($result->retval) && count($result->retval) > 0)
 			{
 				// If the person has an email account
-				if (!is_null($result->retval[0]->receiver) && $result->retval[0]->receiver != "")
+				if (!is_null($result->retval[0]->receiver) && $result->retval[0]->receiver != '')
 				{
 					// Using a template as email body if it is not given as method parameter
 					if (is_null($body))
 					{
-						$bodyMsg = $this->ci->parser->parse("templates/mail", array("body" => $result->retval[0]->body), true);
-						if (is_null($bodyMsg) || $bodyMsg == "")
+						$bodyMsg = $this->ci->parser->parse('templates/mail', array('body' => $result->retval[0]->body), true);
+						if (is_null($bodyMsg) || $bodyMsg == '')
 						{
 							// $body = $result->retval[0]->body;
-							$this->ci->loglib->logError("Error while parsing the mail template");
+							$this->ci->loglib->logError('Error while parsing the mail template');
 						}
 					}
 					else
@@ -571,7 +623,7 @@ class MessageLib
 					
 					// If the sender kontakt does not exist, then use system
 					$sender = $this->ci->maillib->getConfigs()->email_from_system;
-					if (!is_null($result->retval[0]->sender) && $result->retval[0]->sender != "")
+					if (!is_null($result->retval[0]->sender) && $result->retval[0]->sender != '')
 					{
 						$sender = $result->retval[0]->sender;
 					}
@@ -586,17 +638,17 @@ class MessageLib
 					// If errors were occurred while sending the email
 					if (!$sent)
 					{
-						$this->ci->loglib->logError("Error while sending an email");
+						$this->ci->loglib->logError('Error while sending an email');
 						// Writing errors in tbl_message_status
 						$sme = $this->setMessageError(
 								$result->retval[0]->message_id,
 								$result->retval[0]->receiver_id,
-								"Error while sending an email",
+								'Error while sending an email',
 								$result->retval[0]->sentinfo
 						);
 						if (!$sme)
 						{
-							$this->ci->loglib->logError("Error while updating DB");
+							$this->ci->loglib->logError('Error while updating DB');
 						}
 					}
 					else
@@ -606,36 +658,36 @@ class MessageLib
 						// If the email has been sent and the DB updated
 						if (!$sent)
 						{
-							$this->ci->loglib->logError("Error while updating DB");
+							$this->ci->loglib->logError('Error while updating DB');
 						}
 					}
 				}
 				else
 				{
-					$this->ci->loglib->logError("This person does not have an email account");
+					$this->ci->loglib->logError('This person does not have an email account');
 					// Writing errors in tbl_message_status
 					$sme = $this->setMessageError(
 							$result->retval[0]->message_id,
 							$result->retval[0]->receiver_id,
-							"This person does not have an email account",
+							'This person does not have an email account',
 							$result->retval[0]->sentinfo
 					);
 					if (!$sme)
 					{
-						$this->ci->loglib->logError("Error while updating DB");
+						$this->ci->loglib->logError('Error while updating DB');
 					}
 					$sent = true; // Non blocking error
 				}
 			}
 			else
 			{
-				$this->ci->loglib->logInfo("There are no email to be sent");
+				$this->ci->loglib->logInfo('There are no email to be sent');
 				$sent = false;
 			}
 		}
 		else
 		{
-			$this->ci->loglib->logError("Something went wrong while getting data from DB");
+			$this->ci->loglib->logError('Something went wrong while getting data from DB');
 			$sent = false;
 		}
 		
@@ -652,12 +704,12 @@ class MessageLib
 	 * @param   mixed  $retval
 	 * @return  array
 	 */
-	protected function _success($retval, $message = MSG_SUCCESS)
+	protected function _success($retval, $code = MSG_SUCCESS)
 	{
 		$return = new stdClass();
 		$return->error = EXIT_SUCCESS;
-		$return->Code = $message;
-		$return->msg = lang("message_" . $message);
+		$return->Code = $code;
+		$return->msg = lang('message_' . $code);
 		$return->retval = $retval;
 		return $return;
 	}
@@ -667,30 +719,15 @@ class MessageLib
 	 *
 	 * @return  array
 	 */
-	protected function _error($retval = "", $message = MSG_ERROR)
+	protected function _error($retval = '', $code = MSG_ERROR)
 	{
 		$return = new stdClass();
 		$return->error = EXIT_ERROR;
-		$return->Code = $message;
-		$return->msg = lang("message_" . $message);
+		$return->Code = $code;
+		$return->msg = lang('message_' . $code);
 		$return->retval = $retval;
 		return $return;
 	}
-	
-    /**
-     * Invalid ID
-     *
-     * @param   integer  config.php error code numbers
-     * @return  array
-     */
-    private function _invalid_id($error = "")
-    {
-        return array(
-            "err"  => 1,
-            "code" => $error,
-            "msg"  => lang("message_".$error)
-        );
-    }
 	
 	/**
 	 * Update the table tbl_message_recipient
@@ -715,7 +752,7 @@ class MessageLib
 	 */
 	private function setMessageSent($message_id, $receiver_id)
 	{
-		$parameters = array("sent" => "NOW()", "sentinfo" => null);
+		$parameters = array('sent' => 'NOW()', 'sentinfo' => null);
 		
 		return $this->_updateMessageRecipient($message_id, $receiver_id, $parameters);
 	}
@@ -725,13 +762,48 @@ class MessageLib
 	 */
 	private function setMessageError($message_id, $receiver_id, $sentInfo, $prevSentInfo = null)
 	{
-		if (!is_null($prevSentInfo) && $prevSentInfo != "")
+		if (!is_null($prevSentInfo) && $prevSentInfo != '')
 		{
 			$sentInfo = $prevSentInfo . SENT_INFO_NEWLINE . $sentInfo;
 		}
 		
-		$parameters = array("sent" => null, "sentinfo" => $sentInfo);
+		$parameters = array('sent' => null, 'sentinfo' => $sentInfo);
 		
 		return $this->_updateMessageRecipient($message_id, $receiver_id, $parameters);
 	}
+	
+	/**
+     * Gets the receivers id that are enabled to read messages for that oe_kurzbz
+     */
+    private function _getReceiversByOekurzbz($oe_kurzbz)
+    {
+		// Load Benutzerfunktion_model
+		$this->ci->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+		// Join with table public.tbl_benutzer on field uid
+		$this->ci->BenutzerfunktionModel->addJoin('public.tbl_benutzer', 'uid');
+		// Get all the valid receivers id using the oe_kurzbz
+		$receivers = $this->ci->BenutzerfunktionModel->loadWhere(
+			'oe_kurzbz = \'' . $oe_kurzbz . '\''.
+			' AND funktion_kurzbz = \'ass\'' .
+			' AND (NOW() BETWEEN COALESCE(datum_von, NOW()) AND COALESCE(datum_bis, NOW()))'
+		);
+		
+		return $receivers;
+    }
+    
+    /**
+     * Checks if the given receiver id is a valid person
+     */
+    private function _checkReceiverId($receiver_id)
+    {
+		// Load Person_model
+		$this->ci->load->model('person/Person_model', 'PersonModel');
+		$result = $this->ci->PersonModel->load($receiver_id);
+		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
+		{
+			return true;
+		}
+		
+		return false;
+    }
 }
