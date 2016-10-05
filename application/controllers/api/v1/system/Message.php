@@ -159,10 +159,10 @@ class Message extends APIv1_Controller
 		if (is_object($validation) && $validation->error == EXIT_SUCCESS)
 		{
 			$result = $this->messagelib->sendMessageVorlage(
-				$this->post()['sender_id'],
-				$this->post()['receiver_id'],
+				isset($this->post()['sender_id']) ? $this->post()['sender_id'] : null,
+				isset($this->post()['receiver_id']) ? $this->post()['receiver_id'] : null,
 				$this->post()['vorlage_kurzbz'],
-				$this->post()['oe_kurzbz'],
+				isset($this->post()['oe_kurzbz']) ? $this->post()['oe_kurzbz'] : null,
 				$this->post()['data'],
 				isset($this->post()['relationmessage_id']) ? $this->post()['relationmessage_id'] : null,
 				isset($this->post()['orgform_kurzbz']) ? $this->post()['orgform_kurzbz'] : null
@@ -226,25 +226,17 @@ class Message extends APIv1_Controller
 		{
 			return $this->_error('Parameter is null');
 		}
-		if (!isset($message['sender_id']))
-		{
-			return $this->_error('person_id of sender is not set');
-		}
-		if (!isset($message['receiver_id']))
-		{
-			return $this->_error('person_id of receiver is not set');
-		}
 		if (!isset($message['vorlage_kurzbz']))
 		{
 			return $this->_error('vorlage_kurzbz is not set');
 		}
-		if( !isset($message['oe_kurzbz']))
-		{
-			return $this->_error('oe_kurzbz is not set');
-		}
 		if (!isset($message['data']))
 		{
 			return $this->_error('data is not set');
+		}
+		if (!isset($message['receiver_id']) && !isset($message['oe_kurzbz']))
+		{
+			return $this->_error('If a receiver_id is not given a oe_kurzbz must be specified');
 		}
 		
 		return $this->_success('Input data are valid');
