@@ -45,7 +45,7 @@ class MailLib
 	/**
 	 * Sends a single email
 	 */
-	public function send($from, $to, $subject, $message, $alias = "", $cc = null, $bcc = null)
+	public function send($from, $to, $subject, $message, $alias = "", $cc = null, $bcc = null, $altMessage = '')
 	{
 		// If from is not specified then use the standard one
 		if (is_null($from) || $from == "")
@@ -59,6 +59,7 @@ class MailLib
 		if (!is_null($bcc)) $this->ci->email->bcc($bcc);
 		$this->ci->email->subject($subject);
 		$this->ci->email->message($message);
+		if (!empty($altMessage)) $this->ci->email->set_alt_message($altMessage);
 		
 		// Avoid printing on standard output ugly error messages
 		$result = @$this->ci->email->send();

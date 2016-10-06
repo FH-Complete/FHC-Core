@@ -113,7 +113,7 @@ class MessageLib
     public function getMessageByToken($token)
     {
         if (empty($token))
-        	return $this->_error('', MSG_ERR_INVALID_MSG_ID);
+        	return $this->_error('', MSG_ERR_INVALID_TOKEN);
 		
 		$result = $this->ci->RecipientModel->getMessageByToken($token);
 		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
@@ -138,7 +138,12 @@ class MessageLib
 					'status' => MSG_STATUS_READ
 				);
 				
-				$result = $this->ci->MsgStatusModel->insert($statusKey);
+				$resultIns = $this->ci->MsgStatusModel->insert($statusKey);
+				// If an error occured while writing on data base, then return it
+				if ($resultIns->error == EXIT_ERROR)
+				{
+					$result = $resultIns;
+				}
 			}
 		}
 		
@@ -236,7 +241,8 @@ class MessageLib
 							$msg_id = $result->retval;
 							$recipientData = array(
 								'person_id' => $receiver_id,
-								'message_id' => $msg_id
+								'message_id' => $msg_id,
+								'token' => generateToken()
 							);
 							$result = $this->ci->RecipientModel->insert($recipientData);
 							if (is_object($result) && $result->error == EXIT_SUCCESS)
@@ -259,7 +265,7 @@ class MessageLib
 									if ($this->ci->config->item('send_immediately') === true)
 									{
 										// Send message by email!
-										$resultSendEmail = $this->sendOne($msg_id, $subject, $parsedText);
+										$resultSendEmail = $this->sendOne($msg_id, $subject, $body);
 									}
 								}*/
 							}
@@ -506,11 +512,31 @@ class MessageLib
 					// If the person has an email account
 					if (!is_null($result->retval[$i]->receiver) && $result->retval[$i]->receiver != '')
 					{
-						// Using a template as email body
-						$body = $this->ci->parser->parse('templates/mail', array('body' => $result->retval[$i]->body), true);
+						$href = CIS_ROOT . $this->ci->config->item('cis_message_view_url') . '?token=' . $result->retval[$i]->token;
+						// Using a template for the html email body
+						$body = $this->ci->parser->parse(
+							'templates/mailHTML',
+							array(
+								'src' => APP_ROOT . $this->ci->config->item('message_html_view_url') . $result->retval[$i]->token,
+								'href' => $href
+							),
+							true
+						);
 						if (is_null($body) || $body == '')
 						{
-							// $body = $result->retval[$i]->body;
+							$this->ci->loglib->logError('Error while parsing the mail template');
+						}
+						
+						// Using a template for the plain text email body
+						$altBody = $this->ci->parser->parse(
+							'templates/mailTXT',
+							array(
+								'href' => $href
+							),
+							true
+						);
+						if (is_null($altBody) || $altBody == '')
+						{
 							$this->ci->loglib->logError('Error while parsing the mail template');
 						}
 						
@@ -525,7 +551,11 @@ class MessageLib
 							$sender,
 							$result->retval[$i]->receiver,
 							$result->retval[$i]->subject,
-							$body
+							$body,
+							null,
+							null,
+							null,
+							$altBody
 						);
 						// If errors were occurred while sending the email
 						if (!$sent)
@@ -533,10 +563,10 @@ class MessageLib
 							$this->ci->loglib->logError('Error while sending an email');
 							// Writing errors in tbl_message_status
 							$sme = $this->setMessageError(
-									$result->retval[$i]->message_id,
-									$result->retval[$i]->receiver_id,
-									'Error while sending an email',
-									$result->retval[$i]->sentinfo
+								$result->retval[$i]->message_id,
+								$result->retval[$i]->receiver_id,
+								'Error while sending an email',
+								$result->retval[$i]->sentinfo
 							);
 							if (!$sme)
 							{
@@ -613,16 +643,38 @@ class MessageLib
 					// Using a template as email body if it is not given as method parameter
 					if (is_null($body))
 					{
-						$bodyMsg = $this->ci->parser->parse('templates/mail', array('body' => $result->retval[0]->body), true);
+						// Using a template for the html email body
+						$href = CIS_ROOT . $this->ci->config->item('cis_message_view_url') . '?token=' . $result->retval[$i]->token;
+						$bodyMsg = $this->ci->parser->parse(
+							'templates/mailHTML',
+							array(
+								'src' => APP_ROOT . $this->ci->config->item('message_html_view_url') . $result->retval[$i]->token,
+								'href' => $href
+							),
+							true
+						);
 						if (is_null($bodyMsg) || $bodyMsg == '')
 						{
 							// $body = $result->retval[0]->body;
-							$this->ci->loglib->logError('Error while parsing the mail template');
+							$this->ci->loglib->logError('Error while parsing the html mail template');
+						}
+						
+						// Using a template for the plain text email body
+						$altBody = $this->ci->parser->parse(
+							'templates/mailTXT',
+							array(
+								'href' => $href
+							),
+							true
+						);
+						if (is_null($altBody) || $altBody == '')
+						{
+							$this->ci->loglib->logError('Error while parsing the plain text mail template');
 						}
 					}
 					else
 					{
-						$bodyMsg = $body;
+						$bodyMsg = $altBody = $body;
 					}
 					
 					// If the sender kontakt does not exist, then use system
@@ -637,7 +689,11 @@ class MessageLib
 						$sender,
 						$result->retval[0]->receiver,
 						is_null($subject) ? $result->retval[0]->subject : $subject, // if parameter subject is not null, use it!
-						$bodyMsg
+						$bodyMsg,
+						null,
+						null,
+						null,
+						$altBody
 					);
 					// If errors were occurred while sending the email
 					if (!$sent)

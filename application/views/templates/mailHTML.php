@@ -8,7 +8,8 @@
 		</div>
 		<div class="container">
 			<div class="body">
-				{body}
+				<iframe width="100%" frameborder="0" src="{src}"></iframe>
+				<a href="{href}">Click here!!!</a>
 			</div>
 		</div>
 		<div class="footer">

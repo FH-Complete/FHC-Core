@@ -68,8 +68,8 @@ class Recipient_model extends DB_Model
 			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_msg_status"), FHC_MODEL_ERROR);
 		
 		$sql = "SELECT r.message_id,
-						r.person_id as receiver_id,
 						m.person_id as sender_id,
+						r.person_id as receiver_id,
 						m.subject,
 						m.body,
 						m.insertamum,
@@ -80,13 +80,12 @@ class Recipient_model extends DB_Model
 						s.insertamum as statusamum
 				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_message m USING (message_id)
 						JOIN (
-							SELECT * FROM public.tbl_msg_status ORDER BY insertamum DESC LIMIT 1
+							SELECT * FROM public.tbl_msg_status WHERE status < ? ORDER BY insertamum DESC, status DESC
 						) s ON (r.message_id = s.message_id AND r.person_id = s.person_id)
 				 WHERE r.token = ?
-				   AND status < ?
-			  ORDER BY s.insertamum DESC";
+				 LIMIT 1";
 		
-		$result = $this->db->query($sql, array($token, MSG_STATUS_DELETED));
+		$result = $this->db->query($sql, array(MSG_STATUS_DELETED, $token));
 		if (is_object($result))
 			return $this->_success($result->result());
 		else
@@ -236,6 +235,7 @@ class Recipient_model extends DB_Model
 						 ks.kontakt as sender,
 						 kr.kontakt as receiver,
 						 mr.person_id as receiver_id,
+						 mr.token,
 						 mm.subject,
 						 mm.body,
 						 mr.sentinfo
