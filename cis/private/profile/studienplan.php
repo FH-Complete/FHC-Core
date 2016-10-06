@@ -102,14 +102,7 @@ if(isset($_GET['getAnmeldung']))
 				if(!$bngruppe->load($uid, $lvangebot->result[0]->gruppe_kurzbz, $stsem))
 				{
 					// User ist noch nicht angemeldet
-					//Pruefen ob genug Credit Points zur Verfuegung stehen zur Anmeldung
-
-					$konto = new konto();
-					$cp = $konto->getCreditPoints($uid, $stsem);
-					if($cp===false || $cp>=$lv->ects)
-						echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung.' (Anmeldung bis '.$datum->formatDatum($angebot->anmeldefenster_ende,"d.m.Y").')';
-					else
-						echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span style="color:gray;">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$p->t('studienplan/zuWenigCP').'" />';
+					echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung.' (Anmeldung bis '.$datum->formatDatum($angebot->anmeldefenster_ende,"d.m.Y").')';
 				}
 				else
 				{
@@ -201,25 +194,16 @@ if(isset($_POST['action']) && $_POST['action']=='anmeldung')
 
 			if(!$bngruppe->load($uid, $lvangebot->result[0]->gruppe_kurzbz, $stsem))
 			{
-
-				// Pruefen ob genug CP zur Verfuegung stehen falls diese reduziert sind
-				$konto = new konto();
-				$cp = $konto->getCreditPoints($uid, $stsem);
-				if($cp===false || $cp>=$lv->ects)
+				$bngruppe->uid = $uid;
+				$bngruppe->gruppe_kurzbz = $lvangebot->result[0]->gruppe_kurzbz;
+				$bngruppe->studiensemester_kurzbz = $stsem;
+				$bngruppe->new=true;
+				if($bngruppe->save())
 				{
-					$bngruppe->uid = $uid;
-					$bngruppe->gruppe_kurzbz = $lvangebot->result[0]->gruppe_kurzbz;
-					$bngruppe->studiensemester_kurzbz = $stsem;
-					$bngruppe->new=true;
-					if($bngruppe->save())
-					{
-						echo '<span class="ok">'.$p->t('studienplan/einschreibungErfolgreich').'</span>';
-						// Menue neu Laden damit die LV unter Meine LV gleich angezeigt wird
-						echo '<script>window.parent.menu.location.reload();</script>';
-					}
+					echo '<span class="ok">'.$p->t('studienplan/einschreibungErfolgreich').'</span>';
+					// Menue neu Laden damit die LV unter Meine LV gleich angezeigt wird
+					echo '<script>window.parent.menu.location.reload();</script>';
 				}
-				else
-					echo '<span class="error">'.$p->t('studienplan/zuWenigCP').'</span>';
 			}
 			else
 			{

@@ -800,6 +800,51 @@ class konto extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Liefert die CreditPoints die ein Studierender für ein Studiensemester zur Verfügung hat
+	 * falls dieser einschraenkungen eingetragen hat. Wenn keine Einschraenkung vorhanden ist,
+	 * wird false zurueckgeliefert. Es werden die Creditpoint der Belastungen herangezogen.
+	 * Die Gegenbuchung wird nicht beruecksichtigt.
+	 * @return Anzahl der gekauften CreditPoints oder false falls unbeschraenkt
+	 */
+	public function getCreditPointsOfStudiensemester($uid, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT sum(credit_points) as cp
+				FROM
+					public.tbl_konto
+					JOIN public.tbl_benutzer USING(person_id)
+				WHERE
+					uid=".$this->db_add_param($uid)."
+					AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					AND buchungsnr_verweis is null
+					AND credit_points is not null";
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$creditpoints = $row->cp;
+
+				if($creditpoints!='')
+				{
+					return $creditpoints;
+				}
+				else
+					return false;
+			}
+			else
+			{
+				// keine Einschraenkung vorhanden
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 
 	/**
 	 * Fügt zur erstellten Buchung eine Zahlungsreferenz hinzu
