@@ -1218,6 +1218,17 @@ if(!$result = @$db->db_query("SELECT lieferbedingungen FROM public.tbl_firma LIM
 
 }
 
+// 10.16 neuer webservicetyp reports
+$result = $db->db_query("SELECT 1 FROM system.tbl_webservicetyp WHERE webservicetyp_kurzbz='reports'");
+if($db->db_num_rows($result) < 1)
+{
+	$qry = "INSERT INTO system.tbl_webservicetyp (webservicetyp_kurzbz, beschreibung) VALUES('reports', 'Logtyp fuer reports');";
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neuen Eintrag "reports" in Tabelle system.tbl_webservicetyp eingefuegt<br>';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
