@@ -56,7 +56,7 @@ class Statusgrund extends VileSci_Controller
 			show_error($statusGrund->retval);
 		}
 		
-		$sprache = $this->SpracheModel->load();
+		$sprache = $this->SpracheModel->loadWhere(array('content' => true));
 		if ($sprache->error)
 		{
 			show_error($sprache->retval);
@@ -79,7 +79,7 @@ class Statusgrund extends VileSci_Controller
 			show_error($status->retval);
 		}
 		
-		$sprache = $this->SpracheModel->load();
+		$sprache = $this->SpracheModel->loadWhere(array('content' => true));
 		if ($sprache->error)
 		{
 			show_error($sprache->retval);
@@ -96,7 +96,7 @@ class Statusgrund extends VileSci_Controller
 	
 	public function newGrund($status_kurzbz)
 	{
-		$sprache = $this->SpracheModel->load();
+		$sprache = $this->SpracheModel->loadWhere(array('content' => true));
 		if ($sprache->error)
 		{
 			show_error($sprache->retval);
