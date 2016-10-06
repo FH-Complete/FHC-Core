@@ -1,8 +1,8 @@
 <?php
 
-if (! defined("BASEPATH")) exit("No direct script access allowed");
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once APPPATH . "/libraries/MigrationLib.php";
+require_once APPPATH . '/libraries/MigrationLib.php';
 
 class Migration_Status_grund extends MigrationLib
 {
@@ -16,44 +16,47 @@ class Migration_Status_grund extends MigrationLib
 		$this->startUP();
 		
 		$fields = array(
-			"statusgrund_kurzbz" => array(
-				"type" => "integer",
-				"auto_increment" => true
+			'statusgrund_kurzbz' => array(
+				'type' => 'integer',
+				'auto_increment' => true
 			),
-			"status_kurzbz" => array(
-				"type" => "varchar(20)"
+			'status_kurzbz' => array(
+				'type' => 'varchar(20)'
 			),
-			"aktiv" => array(
-				"type" => "boolean DEFAULT FALSE",
-				"null" => true
+			'aktiv' => array(
+				'type' => 'boolean DEFAULT FALSE',
+				'null' => true
 			),
-			"bezeichnung_mehrsprachig" => array(
-				"type" => "varchar(255)[]"
+			'bezeichnung_mehrsprachig' => array(
+				'type' => 'varchar(255)[]'
 			),
-			"beschreibung" => array(
-				"type" => "text[]"
+			'beschreibung' => array(
+				'type' => 'text[]'
 			)
 		);
-		$this->createTable("public", "tbl_status_grund", $fields);
+		$this->createTable('public', 'tbl_status_grund', $fields);
 		$this->addPrimaryKey(
-			"public",
-			"tbl_status_grund",
-			"pk_tbl_status_grund",
-			array("statusgrund_kurzbz")
+			'public',
+			'tbl_status_grund',
+			'pk_tbl_status_grund',
+			array('statusgrund_kurzbz')
 		);
 		$this->addForeingKey(
-			"public",
-			"tbl_status_grund",
-			"fk_status_grundstatus_kurzbz",
-			"status_kurzbz",
-			"public",
-			"tbl_status",
-			"status_kurzbz",
-			"ON UPDATE CASCADE ON DELETE RESTRICT"
+			'public',
+			'tbl_status_grund',
+			'fk_status_grundstatus_kurzbz',
+			'status_kurzbz',
+			'public',
+			'tbl_status',
+			'status_kurzbz',
+			'ON UPDATE CASCADE ON DELETE RESTRICT'
 		);
-		$this->grantTable("SELECT", "public", "tbl_status_grund", "web");
-		$this->grantTable(array("SELECT", "INSERT", "DELETE", "UPDATE"), "public", "tbl_status_grund", "admin");
-		$this->grantTable(array("SELECT", "INSERT", "DELETE", "UPDATE"), "public", "tbl_status_grund", "vilesci");
+		$this->grantTable('SELECT', 'public', 'tbl_status_grund', 'web');
+		$this->grantTable(array('SELECT', 'INSERT', 'DELETE', 'UPDATE'), 'public', 'tbl_status_grund', 'admin');
+		$this->grantTable(array('SELECT', 'INSERT', 'DELETE', 'UPDATE'), 'public', 'tbl_status_grund', 'vilesci');
+		$this->grantSequence(array('SELECT', 'UPDATE'), 'public', 'tbl_status_grund_statusgrund_kurzbz_seq', 'web');
+		$this->grantSequence(array('SELECT', 'UPDATE'), 'public', 'tbl_status_grund_statusgrund_kurzbz_seq', 'admin');
+		$this->grantSequence(array('SELECT', 'UPDATE'), 'public', 'tbl_status_grund_statusgrund_kurzbz_seq', 'vilesci');
 		
 		$this->endUP();
 	}
@@ -62,7 +65,7 @@ class Migration_Status_grund extends MigrationLib
     {
 		$this->startDown();
 		
-		$this->dropTable("public", "tbl_status_grund");
+		$this->dropTable('public', 'tbl_status_grund');
 		
 		$this->endDown();
     }
