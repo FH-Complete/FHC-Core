@@ -108,6 +108,7 @@ $this->phrasen['pruefung/keineLehreinheitenVorhanden'] = 'Keine Lehreinheiten vo
 $this->phrasen['pruefung/keineAnmeldungenVorhanden'] = 'Keine Anmeldungen vorhanden.';
 $this->phrasen['pruefung/derLektor'] = 'Lektor';
 $this->phrasen['pruefung/dieKommission'] = 'Kommission';
+$this->phrasen['pruefung/matrikelnummer'] = 'Personenkennzeichen';
 
 // anmeldungen Verwalten
 $this->phrasen['pruefung/anmeldungenVerwaltenTitle'] = 'Prüfungsanmeldung Verwaltung';

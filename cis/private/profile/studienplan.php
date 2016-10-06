@@ -19,6 +19,7 @@
  *
  *
  * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
+ *			Stefan Puraner <stefan.puraner@technikum-wien.at>
  *
  * Zeigt den Studienplan eines Studierenden an
  * und bietet die Möglichkeit zur Anmeldung zu Lehrveranstaltungen.
@@ -366,7 +367,7 @@ drawTree($tree,0);
 
 function drawTree($tree, $depth)
 {
-	global $uid, $stsem_arr, $noten_arr, $lvangebot_arr;
+	global $uid, $stsem_arr, $noten_arr, $lvangebot_arr, $aktornext;
 	global $datum_obj, $db, $lv_arr, $p, $note_pruef_arr, $student;
         
 	foreach($tree as $row_tree)
@@ -511,28 +512,40 @@ function drawTree($tree, $depth)
                     if($found)
                     {
                         if($positiv)
-                        echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
+						{
+							echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
+						}
                         else
+						{
                             echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
+						}
                     }
                     elseif(!$found)
                     {
-                        if($abgeschlossen)
-                            echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
-			elseif(!$row_tree->stpllv_pflicht)
+                        if(!$row_tree->stpllv_pflicht)
+						{
                             echo '<span>'.$p->t('studienplan/optional').'</span>';
-			else
+						}
+						else
+						{
                             echo '<span>'.$p->t('studienplan/offen').'</span>';
+						}
                     }
 		}
 		else
 		{
 			if($abgeschlossen)
+			{
 				echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
+			}
 			elseif(!$row_tree->stpllv_pflicht)
+			{
 				echo '<span>'.$p->t('studienplan/optional').'</span>';
+			}
 			else
+			{
 				echo '<span>'.$p->t('studienplan/offen').'</span>';
+			}
 		}
 		echo '</td>';
 
@@ -610,12 +623,16 @@ function drawTree($tree, $depth)
 				}
 				else
 				{
-					if(!$lvregel->isZugangsberechtigt($uid, $row_tree->studienplan_lehrveranstaltung_id, $stsem))
+					//check if rules are fulfilled just for actual or next studiensemester
+					if($stsem === $aktornext)
 					{
-						$regelerfuellt=false;
+						if($lvregel->isZugangsberechtigt($uid, $row_tree->studienplan_lehrveranstaltung_id, $stsem) !== true)
+						{
+							$regelerfuellt=false;
+						}
 					}
 				}
-
+				
 				foreach($lvkompatibel_arr as $row_lvid)
 				{
 					// Angebot der LV pruefen
@@ -669,7 +686,7 @@ function drawTree($tree, $depth)
 								$tdinhalt.= '<span title="'.$anmeldeinformation.'">-</a>';
 
 							if(!$regelerfuellt)
-								$tdinhalt.= '<span title="'.$p->t('studienplan/regelnichterfuellt').'">X</span>';
+								$tdinhalt= '<span title="'.$p->t('studienplan/regelnichterfuellt').'">X</span>';
 						}
 					}
 					else
