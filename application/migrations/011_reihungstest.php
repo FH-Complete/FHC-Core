@@ -54,7 +54,7 @@ class Migration_Reihungstest extends MigrationLib
 		
 		// Add bezeichnung_mehrsprachig to testtool.tbl_gebiet
 		$columns = array(
-				"bezeichnung_mehrsprachig" => array("type" => "varchar(255)")
+				"bezeichnung_mehrsprachig" => array("type" => "varchar(255)[]")
 		);
 		$this->addColumn("testtool", "tbl_gebiet", $columns);
 		$this->execQuery("UPDATE testtool.tbl_gebiet set bezeichnung_mehrsprachig = cast('{\"'||bezeichnung||'\",\"'||bezeichnung||'\"}' as varchar[]);");
