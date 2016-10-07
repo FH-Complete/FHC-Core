@@ -1,22 +1,22 @@
 <?php
-/* 
+/*
  * Copyright 2013 fhcomplete.org
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
+ *
  *
  * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
  * 			Stefan Puraner	<puraner@technikum-wien.at>
@@ -48,37 +48,41 @@ echo '<!DOCTYPE html>
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" />
 	<link rel="stylesheet" href="../../skin/vilesci.css" />
 	<link rel="stylesheet" href="../../include/js/treeGrid/css/jquery.treegrid.css">
-	
+
 	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
 	<script>var jqUi = jQuery.noConflict(true);</script>
 	<script type="text/javascript" src="../../include/js/jstree/_lib/jquery.js"></script>
 	<!-- Script zum erstellen des Trees-->
 	<script type="text/javascript" src="../../include/js/jstree/jquery.jstree.js"></script>
-	
+
 	<script type="text/javascript" src="../../include/js/treeGrid/jstreegrid.js"></script>
-	
+
 	<script type="text/javascript" src="../../include/js/colResizable-1.5.min.js"></script>
-	
+
 	<script src="studienordnung_lvregel.js" type="text/javascript"></script>
 	<script src="studienordnung.js" type="text/javascript"></script>
 	<style type="text/css">
 		.col_ects {
 			//width: auto;
 		}
-		
+
 		.col_lehrform {
 			width: auto !important;
 			align:center;
 			text-align:center;
 		}
-		
+		.col_left {
+			width: auto !important;
+			align:left;
+			text-align:left;
+		}
 		.header_ects {
 			//width: auto !important;
 		}
 	</style>
 
 	<script type="text/javascript">
-	$(function() 
+	$(function()
 	{';
 		//jqUi( "#menueLinks" ).accordion({
 		//	heightStyle: "content",
@@ -198,7 +202,7 @@ echo '
 				</div>
 			</div>
 	</td>
-	<td valign="top" style="max-width:900px">	
+	<td valign="top" style="max-width:900px">
 			<div id="header">
 			&nbsp;
 			</div>
@@ -208,15 +212,15 @@ echo '
 				</div>
 			</div>
 			<div id="jsonData"></div>
-			
+
 			<!-- Tabs -->
 			<script>
-			$(function() 
+			$(function()
 			{
 				jqUi( "#tabs" ).tabs();
 				$( "#tabs" ).hide();
 			});
-			
+
 			</script>
 			<div id="tabs">
 				<ul>
@@ -242,7 +246,7 @@ echo '
 	</td>
 	<td valign="top" width="20%" >
 		<!--script> colResizable plugin used instead
-			$(function() 
+			$(function()
 			{
 				jqUi("#menueRechts").resizable({
 					handles: "w",

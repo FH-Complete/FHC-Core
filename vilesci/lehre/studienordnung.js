@@ -245,7 +245,7 @@ function GenerateTreeChilds(data)
 	}
 	var obj = {
 	"data":data.bezeichnung,
-	"metadata":	{"lehrveranstaltung_id":data.lehrveranstaltung_id,"bezeichnung":data.bezeichnung,"ects":data.ects,"semesterstunden":data.semesterstunden,"lehrform_kurzbz":data.lehrform_kurzbz,"lvnr":data.lvnr,"sortierung":data.stpllv_sort},
+	"metadata":	{"lehrveranstaltung_id":data.lehrveranstaltung_id,"bezeichnung":data.bezeichnung,"ects":data.ects,"semesterstunden":data.semesterstunden,"lehrform_kurzbz":data.lehrform_kurzbz,"lvnr":data.lvnr,"sortierung":data.stpllv_sort,"pflicht":data.stpllv_pflicht,"export":data.export,"genehmigung":data.genehmigung},
 	"attr":{"id":data.studienplan_lehrveranstaltung_id,"rel":data.lehrtyp_kurzbz,"lvID":data.lehrveranstaltung_id,"studienplan_lehrveranstaltung_id":data.studienplan_lehrveranstaltung_id},
 	"children":children
 	};
@@ -423,10 +423,13 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					columns: [
 						{width: 300, header: "Lehrveranstaltung", value: "bezeichnung", source: "metadata", headerClass: "header_lv"},
 						{width: 50, header: "ECTS", value: "ects", source: "metadata", wideCellClass: "col_ects", headerClass: "header_ects"},
-						{width: 120, header: "Semesterstunden", value: "semesterstunden", source: "metadata", cellClass: "col_semesterstunden"},
+						{width: 60, header: "SemStd", value: "semesterstunden", source: "metadata", cellClass: "col_left"},
 						{width: 80, header: "Lehrform", value: "lehrform_kurzbz", source: "metadata", cellClass: "col_lehrform"},
-						{width: 80, header: "LVNR", value: "lvnr", source: "metadata", cellClass: "col_lvnr"},
-						{width: 80, header: "Sortierung", value: "sortierung", source: "metadata", cellClass: "col_sortierung"},
+						{width: 60, header: "StudPlan", value: "export", source: "metadata", cellClass: "col_left"},
+						{width: 60, header: "Pflicht", value: "pflicht", source: "metadata", cellClass: "col_left"},
+						{width: 60, header: "Gen", value: "genehmigung", source: "metadata", cellClass: "col_left"},
+						{width: 80, header: "LVNR", value: "lvnr", source: "metadata", cellClass: "col_left"},
+						{width: 60, header: "Sort", value: "sortierung", source: "metadata", cellClass: "col_left"},
 					],
 					resizable: true
 				},
@@ -486,39 +489,31 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 				plugins: ["themes", "ui", "dnd", "grid", "json_data", "crrm", "types", "sort", "contextmenu"]
 			}).bind("move_node.jstree", function(event, data)
 			{
-//				if(searchTree(data.rslt.r, data.rslt.o.attr("id")))
-//				{
-//					$("#treeData").jstree("remove", "#"+data.rslt.oc.attr("id"));
-//					alert("Lehrveranstaltung bereits vorhanden");
-//				}
-//				else
-//				{
-					// Verschieben eines Eintrages
+				// Verschieben eines Eintrages
 
-					// Studienplan_lehrveranstaltung_id ermitteln
-					var studienplan_lehrveranstaltung_id='';
-					if(data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id){
-						studienplan_lehrveranstaltung_id=data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id.value;
-						//$("#treeData").jstree('refresh');
-					}
+				// Studienplan_lehrveranstaltung_id ermitteln
+				var studienplan_lehrveranstaltung_id='';
+				if(data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id){
+					studienplan_lehrveranstaltung_id=data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id.value;
+					//$("#treeData").jstree('refresh');
+				}
 
-					// Aenderung speichern
-					saveJsondataFromTree(data.rslt.o[0].id, global_studienplan_id, studienplan_lehrveranstaltung_id);
+				// Aenderung speichern
+				saveJsondataFromTree(data.rslt.o[0].id, global_studienplan_id, studienplan_lehrveranstaltung_id);
 
-					// ECTS Summen neu berechnen
-					var root = data.inst.get_container_ul();
-					var nodes = root[0].childNodes;
-					for(var i=0; i<nodes.length; i++)
+				// ECTS Summen neu berechnen
+				var root = data.inst.get_container_ul();
+				var nodes = root[0].childNodes;
+				for(var i=0; i<nodes.length; i++)
+				{
+					if(nodes[i].getAttribute("rel") === "semester")
 					{
-						if(nodes[i].getAttribute("rel") === "semester")
-						{
-							writeEctsSum(nodes[i]);
-						}
-
+						writeEctsSum(nodes[i]);
 					}
-					hideAllTreeColumns();
-					writeOverallSum(nodes);
-//				}
+
+				}
+				hideAllTreeColumns();
+				writeOverallSum(nodes);
 			}).bind("loaded.jstree", function(event, data)
 			{
 				// Wenn der Tree geladen wird, die ECTS Summen der einzelnen Semester berechnen
@@ -560,7 +555,6 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 						lvid = lvid.substring(5);
 					}
 				}
-
 
 				// Lehrveranstaltungsdetails laden
 				if(data.rslt.obj.attr("rel") !== "semester")
