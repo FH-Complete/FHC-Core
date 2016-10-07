@@ -512,7 +512,7 @@ class MessageLib
 					// If the person has an email account
 					if (!is_null($result->retval[$i]->receiver) && $result->retval[$i]->receiver != '')
 					{
-						$href = CIS_ROOT . $this->ci->config->item('cis_message_view_url') . '?token=' . $result->retval[$i]->token;
+						$href = APP_ROOT . $this->ci->config->item('redirect_view_message_url') . $result->retval[$i]->token;
 						// Using a template for the html email body
 						$body = $this->ci->parser->parse(
 							'templates/mailHTML',
@@ -644,7 +644,7 @@ class MessageLib
 					if (is_null($body))
 					{
 						// Using a template for the html email body
-						$href = CIS_ROOT . $this->ci->config->item('cis_message_view_url') . '?token=' . $result->retval[$i]->token;
+						$href = APP_ROOT . $this->ci->config->item('redirect_view_message_url') . $result->retval[$i]->token;
 						$bodyMsg = $this->ci->parser->parse(
 							'templates/mailHTML',
 							array(

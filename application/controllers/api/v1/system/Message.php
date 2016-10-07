@@ -108,23 +108,6 @@ class Message extends APIv1_Controller
 	/**
 	 * @return void
 	 */
-	public function getRedirectByToken()
-	{
-		$token = $this->get('token');
-		
-		if (isset($token))
-		{
-			redirect(CIS_ROOT);
-		}
-		else
-		{
-			$this->response();
-		}
-	}
-	
-	/**
-	 * @return void
-	 */
 	public function postMessage()
 	{
 		$validation = $this->_validatePostMessage($this->post());

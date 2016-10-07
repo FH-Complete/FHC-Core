@@ -141,24 +141,6 @@ class Messages extends VileSci_Controller
 		redirect('/system/Messages/view/' . $msg->retval . '/' . $receiver_id);
 	}
 	
-	public function toHTML($token)
-	{
-		$msg = $this->messagelib->getMessageByToken($token);
-		if ($msg->error)
-		{
-			show_error($msg->retval);
-		}
-		
-		if (is_array($msg->retval) && count($msg->retval) > 0)
-		{
-			$data = array (
-				'message' => $msg->retval[0]
-			);
-			
-			$this->load->view('system/messageHTML.php', $data);
-		}
-	}
-	
 	private function getPersonId()
 	{
 		$person_id = null;

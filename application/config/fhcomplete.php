@@ -1,6 +1,6 @@
 <?php
-	if (! defined('BASEPATH'))
-		exit('No direct script access allowed');
+
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 $config['fhc_version'] = '3.2';
 
@@ -235,9 +235,10 @@ $config['fhc_acl'] = array
 	'wawi.tbl_rechnungsbetrag' => 'basis/rechnungsbetrag',
 	'wawi.tbl_rechnungstyp' => 'basis/rechnungstyp',
 	'wawi.tbl_zahlungstyp' => 'basis/zahlungstyp',
-    
 	
 	DMS_PATH => 'fs/dms',
-
+	
 	'public.tbl_sprache' => 'admin'
 );
+
+$config['addons_aufnahme_url'] = 'http://debian.dev/build/addons/aufnahme/cis/index.php';

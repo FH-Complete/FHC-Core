@@ -5,8 +5,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 $config['msg_delivery'] = true;
 $config['send_immediately'] = false; // If the message should be sent immediately
 $config['system_person_id'] = 1; // Dummy sender, used for sending messages from the system
-$config['cis_message_view_url'] = 'readMessageByToken.php'; // Dummy sender, used for sending messages from the system
-$config['message_html_view_url'] = 'index.ci.php/system/Messages/toHTML/';
+$config['redirect_view_message_url'] = 'index.ci.php/Redirect/redirectByToken/'; // 
+$config['message_html_view_url'] = 'index.ci.php/ViewMessage/toHTML/';
 
 define('EMAIL_KONTAKT_TYPE', 'email'); // Email kontakt type
 define('SENT_INFO_NEWLINE', '\n'); // tbl_msg_recipient->sentInfo separator
