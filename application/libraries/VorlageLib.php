@@ -24,6 +24,8 @@ class VorlageLib
 		$this->ci->load->model('system/Vorlagestudiengang_model', 'VorlageStudiengangModel');
 
         $this->ci->load->helper('language');
+        // Loads helper message to manage returning messages
+		$this->ci->load->helper('message');
         //$this->ci->lang->load('fhcomplete');
     }
 
@@ -36,7 +38,7 @@ class VorlageLib
     function getVorlage($vorlage_kurzbz)
     {
         if (empty($vorlage_kurzbz))
-        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+        	return error(MSG_ERR_INVALID_MSG_ID);
 
         $vorlage = $this->ci->VorlageModel->load($vorlage_kurzbz);
         return $vorlage;
@@ -64,7 +66,7 @@ class VorlageLib
     function saveVorlage($vorlage_kurzbz, $data)
     {
         if (empty($data))
-        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+        	return error(MSG_ERR_INVALID_MSG_ID);
 
         $vorlage = $this->ci->VorlageModel->update($vorlage_kurzbz, $data);
         return $vorlage;
@@ -80,7 +82,7 @@ class VorlageLib
     function getVorlagetextByVorlage($vorlage_kurzbz)
 	{
         if (empty($vorlage_kurzbz))
-        	return $this->_error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+        	return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
 
         $vorlage = $this->ci->VorlageStudiengangModel->loadWhere(array('vorlage_kurzbz' =>$vorlage_kurzbz));
         return $vorlage;
@@ -98,7 +100,7 @@ class VorlageLib
     function loadVorlagetext($vorlage_kurzbz, $oe_kurzbz = null, $orgform_kurzbz = null, $sprache = null)
 	{
         if (empty($vorlage_kurzbz))
-        	return $this->_error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+        	return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
 
 		// Builds where clause
 		$where = "vorlage_kurzbz=".$this->ci->VorlageModel->escape($vorlage_kurzbz);
@@ -205,39 +207,8 @@ class VorlageLib
     function parseVorlagetext($text, $data = array())
 	{
         if (empty($text))
-        	return $this->_error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+        	return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
 		$text = $this->ci->parser->parse_string($text, $data, TRUE);
 		return $text;
     }
-
-	/** ---------------------------------------------------------------
-	 * Success
-	 *
-	 * @param   mixed  $retval
-	 * @return  array
-	 */
-	protected function _success($retval, $message = EXIT_SUCCESS)
-	{
-		$return = new stdClass();
-		$return->error = EXIT_SUCCESS;
-		$return->Code = $message;
-		$return->msg = lang('message_' . $message);
-		$return->retval = $retval;
-		return $return;
-	}
-
-	/** ---------------------------------------------------------------
-	 * General Error
-	 *
-	 * @return  array
-	 */
-	protected function _error($retval = '', $message = EXIT_ERROR)
-	{
-		$return = new stdClass();
-		$return->error = EXIT_ERROR;
-		$return->Code = $message;
-		$return->msg = lang('message_' . $message);
-		$return->retval = $retval;
-		return $return;
-	}
 }

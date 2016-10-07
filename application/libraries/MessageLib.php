@@ -7,6 +7,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 */
 class MessageLib
 {
+	const MSG_INDX_PREFIX = 'message_';
+	
 	public function __construct()
 	{
 		// Get code igniter instance
@@ -32,6 +34,8 @@ class MessageLib
 		
 		// Loads fhc helper
 		$this->ci->load->helper('fhc');
+		// Loads helper message to manage returning messages
+		$this->ci->load->helper('message');
 		
 		// Loads phrases
         $this->ci->lang->load('message');
@@ -757,38 +761,7 @@ class MessageLib
     // ------------------------------------------------------------------------
     // Private Functions from here out!
     // ------------------------------------------------------------------------
-
-    /** ---------------------------------------------------------------
-	 * Success
-	 *
-	 * @param   mixed  $retval
-	 * @return  array
-	 */
-	protected function _success($retval, $code = MSG_SUCCESS)
-	{
-		$return = new stdClass();
-		$return->error = EXIT_SUCCESS;
-		$return->Code = $code;
-		$return->msg = lang('message_' . $code);
-		$return->retval = $retval;
-		return $return;
-	}
-
-	/** ---------------------------------------------------------------
-	 * General Error
-	 *
-	 * @return  array
-	 */
-	protected function _error($retval = '', $code = MSG_ERROR)
-	{
-		$return = new stdClass();
-		$return->error = EXIT_ERROR;
-		$return->Code = $code;
-		$return->msg = lang('message_' . $code);
-		$return->retval = $retval;
-		return $return;
-	}
-	
+    
 	/**
 	 * Update the table tbl_message_recipient
 	 */
@@ -895,5 +868,21 @@ class MessageLib
 		}
 		
 		return false;
+    }
+    
+    /**
+     * Wrapper for function error
+     */
+    private function _error($retval = '', $code = null)
+    {
+		return error($retval, $code, MessageLib::MSG_INDX_PREFIX);
+    }
+    
+    /**
+     * Wrapper for function success
+     */
+    private function _success($retval = '', $code = null)
+    {
+		return success($retval, $code, MessageLib::MSG_INDX_PREFIX);
     }
 }

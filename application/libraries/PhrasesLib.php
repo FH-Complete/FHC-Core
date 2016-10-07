@@ -26,7 +26,9 @@ class PhrasesLib
 		$this->ci->load->model('system/Phrasentext_model', 'PhrasentextModel');
 
         $this->ci->load->helper('language');
-		$this->ci->load->helper('Message');
+		// Loads helper message to manage returning messages
+		$this->ci->load->helper('message');
+		
         //$this->ci->lang->load('fhcomplete');
     }
 
@@ -39,7 +41,7 @@ class PhrasesLib
     function getPhrase($phrase_id)
     {
         if (empty($phrase_id))
-        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+        	return error(MSG_ERR_INVALID_MSG_ID);
 
         $phrase = $this->ci->PhraseModel->load($phrase_id);
         return $phrase;
@@ -60,7 +62,7 @@ class PhrasesLib
 	function getPhraseInhalt($phrase_id)
     {
         if (empty($phrase_id))
-        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+        	return error(MSG_ERR_INVALID_MSG_ID);
 
         $phrasentext = $this->ci->PhrasentextModel->loadWhere(array('phrase_id' => $phrase_id));
         return $phrasentext;
@@ -69,7 +71,7 @@ class PhrasesLib
     function delPhrasentext($phrasentext_id)
     {
         if (empty($phrasentext_id))
-        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+        	return error(MSG_ERR_INVALID_MSG_ID);
 
         $phrasentext = $this->ci->PhrasentextModel->delete(array('phrasentext_id' => $phrasentext_id));
         return $phrasentext;
@@ -84,7 +86,7 @@ class PhrasesLib
     function savePhrase($phrase_id, $data)
     {
         if (empty($data))
-        	return $this->_error(MSG_ERR_INVALID_MSG_ID);
+        	return error(MSG_ERR_INVALID_MSG_ID);
 
         $phrase = $this->ci->PhraseModel->update($phrase_id, $data);
         return $phrase;
@@ -100,7 +102,7 @@ class PhrasesLib
     function getPhrasentextById($phrasentext_id)
 	{
         if (empty($phrasentext_id))
-        	return $this->_error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+        	return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
 
         $phrasentext = $this->ci->PhrasentextModel->load($phrasentext_id);
         return $phrasentext;
@@ -141,7 +143,7 @@ class PhrasesLib
 		}
 		else
 		{
-			$result = $this->_error('app and sprache parameters are required');
+			$result = error('app and sprache parameters are required');
 		}
 
 		return $result;
@@ -193,24 +195,8 @@ class PhrasesLib
     function parseVorlagetext($text, $data = array())
 	{
         if (empty($text))
-        	return $this->_error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
+        	return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
 		$text = $this->ci->parser->parse_string($text, $data, TRUE);
 		return $text;
     }
-
-	/*
-	 *
-	 */
-	protected function _error($retval = '', $message = EXIT_ERROR)
-	{
-		return error($retval, $message);
-	}
-
-	/*
-	 *
-	 */
-	protected function _success($retval, $message = EXIT_SUCCESS)
-	{
-		return success($retval, $message);
-	}
 }

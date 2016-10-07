@@ -1,31 +1,33 @@
 <?php
 
-/** ---------------------------------------------------------------
- * General Error
+/**
+ * Success
  *
  * @return  array
  */
-function success($retval, $message = null)
+function success($retval, $code = null, $msg_indx_prefix = 'fhc_')
 {
-	$return = new stdClass();
-	$return->error = EXIT_SUCCESS;
-	$return->fhcCode = $message;
-	if (!is_null($message)) $return->msg = lang('fhc_' . $message);
-	$return->retval = $retval;
-	return $return;
+	$success = new stdClass();
+	$success->error = EXIT_SUCCESS;
+	$success->fhcCode = $code;
+	if (!is_null($code)) $success->msg = lang($msg_indx_prefix . $code);
+	$success->retval = $retval;
+	
+	return $success;
 }
 
-/** ---------------------------------------------------------------
- * General Error
+/**
+ * Error
  *
  * @return  array
  */
-function error($retval = '', $message = null)
+function error($retval = '', $code = null, $msg_indx_prefix = 'fhc_')
 {
-	$return = new stdClass();
-	$return->error = EXIT_ERROR;
-	$return->fhcCode = $message;
-	if (!is_null($message)) $return->msg = lang('fhc_' . $message);
-	$return->retval = $retval;
-	return $return;
+	$error = new stdClass();
+	$error->error = EXIT_ERROR;
+	$error->fhcCode = $code;
+	if (!is_null($code)) $error->msg = lang($msg_indx_prefix . $code);
+	$error->retval = $retval;
+	
+	return $error;
 }
