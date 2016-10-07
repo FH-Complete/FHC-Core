@@ -227,9 +227,11 @@ class studiengang extends basis_db
 
 	/**
 	 * Gibt alle Studiengaenge zurueck, fuer die man sich online bewerben kann
+	 * 
+	 * @param string $order Default: typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC. Spalten, nach denen Sortiert werden soll.
 	 * @return boolean
 	 */
-	public function getAllForBewerbung()
+	public function getAllForBewerbung($order = 'typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC')
 	{
 		$qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch, lgartcode, tbl_lgartcode.bezeichnung '
 				. 'FROM lehre.vw_studienplan '
@@ -237,7 +239,7 @@ class studiengang extends basis_db
 				. 'WHERE onlinebewerbung IS TRUE '
 				. 'AND aktiv IS TRUE ';
 
-		$qry .= ' ORDER BY typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC';
+		$qry .= ' ORDER BY '.$order;
 
 		if(!$result = $this->db_query($qry))
 		{
