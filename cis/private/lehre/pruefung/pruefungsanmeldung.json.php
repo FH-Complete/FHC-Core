@@ -522,11 +522,11 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 			
 			if($anmeldungen !== false)
 			{
-				$ects = $lehrveranstaltung->ects;
+				$ects_verwendet = 0;
 				foreach($anmeldungen as $temp)
 				{
 					$lehrveranstaltung = new lehrveranstaltung($temp->lehrveranstaltung_id);
-					$ects += $lehrveranstaltung->ects;
+					$ects_verwendet += $lehrveranstaltung->ects;
 
 					$datum = new datum();
 					if(($datum->between($termin->von, $termin->bis, $temp->von)) || ($datum->between($termin->von, $termin->bis, $temp->bis)))
@@ -539,7 +539,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 
 				$konto = new konto();
 				$creditPoints = $konto->getCreditPointsOfStudiensemester($uid, $pruefungsfenster->studiensemester_kurzbz);
-				if(($creditPoints != false) && ($ects >= ($creditPoints - $ects)))
+				if(($creditPoints != false) && ($lehrveranstaltung->ects > ($creditPoints - $ects_verwendet)))
 				{
 					$data['error'] = 'true';
 					$data['errormsg'] = $p->t('pruefung/zuWenigeCreditPoints');
