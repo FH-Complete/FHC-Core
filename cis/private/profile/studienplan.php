@@ -19,6 +19,7 @@
  *
  *
  * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
+ *			Stefan Puraner <stefan.puraner@technikum-wien.at>
  *
  * Zeigt den Studienplan eines Studierenden an
  * und bietet die Möglichkeit zur Anmeldung zu Lehrveranstaltungen.
@@ -101,14 +102,7 @@ if(isset($_GET['getAnmeldung']))
 				if(!$bngruppe->load($uid, $lvangebot->result[0]->gruppe_kurzbz, $stsem))
 				{
 					// User ist noch nicht angemeldet
-					//Pruefen ob genug Credit Points zur Verfuegung stehen zur Anmeldung
-
-					$konto = new konto();
-					$cp = $konto->getCreditPoints($uid, $stsem);
-					if($cp===false || $cp>=$lv->ects)
-						echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung.' (Anmeldung bis '.$datum->formatDatum($angebot->anmeldefenster_ende,"d.m.Y").')';
-					else
-						echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span style="color:gray;">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$p->t('studienplan/zuWenigCP').'" />';
+					echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung.' (Anmeldung bis '.$datum->formatDatum($angebot->anmeldefenster_ende,"d.m.Y").')';
 				}
 				else
 				{
@@ -200,25 +194,16 @@ if(isset($_POST['action']) && $_POST['action']=='anmeldung')
 
 			if(!$bngruppe->load($uid, $lvangebot->result[0]->gruppe_kurzbz, $stsem))
 			{
-
-				// Pruefen ob genug CP zur Verfuegung stehen falls diese reduziert sind
-				$konto = new konto();
-				$cp = $konto->getCreditPoints($uid, $stsem);
-				if($cp===false || $cp>=$lv->ects)
+				$bngruppe->uid = $uid;
+				$bngruppe->gruppe_kurzbz = $lvangebot->result[0]->gruppe_kurzbz;
+				$bngruppe->studiensemester_kurzbz = $stsem;
+				$bngruppe->new=true;
+				if($bngruppe->save())
 				{
-					$bngruppe->uid = $uid;
-					$bngruppe->gruppe_kurzbz = $lvangebot->result[0]->gruppe_kurzbz;
-					$bngruppe->studiensemester_kurzbz = $stsem;
-					$bngruppe->new=true;
-					if($bngruppe->save())
-					{
-						echo '<span class="ok">'.$p->t('studienplan/einschreibungErfolgreich').'</span>';
-						// Menue neu Laden damit die LV unter Meine LV gleich angezeigt wird
-						echo '<script>window.parent.menu.location.reload();</script>';
-					}
+					echo '<span class="ok">'.$p->t('studienplan/einschreibungErfolgreich').'</span>';
+					// Menue neu Laden damit die LV unter Meine LV gleich angezeigt wird
+					echo '<script>window.parent.menu.location.reload();</script>';
 				}
-				else
-					echo '<span class="error">'.$p->t('studienplan/zuWenigCP').'</span>';
 			}
 			else
 			{
@@ -366,7 +351,7 @@ drawTree($tree,0);
 
 function drawTree($tree, $depth)
 {
-	global $uid, $stsem_arr, $noten_arr, $lvangebot_arr;
+	global $uid, $stsem_arr, $noten_arr, $lvangebot_arr, $aktornext;
 	global $datum_obj, $db, $lv_arr, $p, $note_pruef_arr, $student;
         
 	foreach($tree as $row_tree)
@@ -511,28 +496,40 @@ function drawTree($tree, $depth)
                     if($found)
                     {
                         if($positiv)
-                        echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
+						{
+							echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
+						}
                         else
+						{
                             echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
+						}
                     }
                     elseif(!$found)
                     {
-                        if($abgeschlossen)
-                            echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
-			elseif(!$row_tree->stpllv_pflicht)
+                        if(!$row_tree->stpllv_pflicht)
+						{
                             echo '<span>'.$p->t('studienplan/optional').'</span>';
-			else
+						}
+						else
+						{
                             echo '<span>'.$p->t('studienplan/offen').'</span>';
+						}
                     }
 		}
 		else
 		{
 			if($abgeschlossen)
+			{
 				echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
+			}
 			elseif(!$row_tree->stpllv_pflicht)
+			{
 				echo '<span>'.$p->t('studienplan/optional').'</span>';
+			}
 			else
+			{
 				echo '<span>'.$p->t('studienplan/offen').'</span>';
+			}
 		}
 		echo '</td>';
 
@@ -610,12 +607,16 @@ function drawTree($tree, $depth)
 				}
 				else
 				{
-					if(!$lvregel->isZugangsberechtigt($uid, $row_tree->studienplan_lehrveranstaltung_id, $stsem))
+					//check if rules are fulfilled just for actual or next studiensemester
+					if($stsem === $aktornext)
 					{
-						$regelerfuellt=false;
+						if($lvregel->isZugangsberechtigt($uid, $row_tree->studienplan_lehrveranstaltung_id, $stsem) !== true)
+						{
+							$regelerfuellt=false;
+						}
 					}
 				}
-
+				
 				foreach($lvkompatibel_arr as $row_lvid)
 				{
 					// Angebot der LV pruefen
@@ -669,7 +670,7 @@ function drawTree($tree, $depth)
 								$tdinhalt.= '<span title="'.$anmeldeinformation.'">-</a>';
 
 							if(!$regelerfuellt)
-								$tdinhalt.= '<span title="'.$p->t('studienplan/regelnichterfuellt').'">X</span>';
+								$tdinhalt= '<span title="'.$p->t('studienplan/regelnichterfuellt').'">X</span>';
 						}
 					}
 					else

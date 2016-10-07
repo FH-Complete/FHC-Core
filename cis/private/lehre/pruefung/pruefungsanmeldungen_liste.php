@@ -227,7 +227,7 @@ $rechte->getBerechtigungen($uid);
 			<th>#</th>
 			<th><?php echo $p->t('global/vorname'); ?></th>
 			<th><?php echo $p->t('global/nachname'); ?></th>
-			<th><?php echo $p->t('global/matrikelnummer'); ?></th>
+			<th><?php echo $p->t('pruefung/matrikelnummer'); ?></th>
 			<th><?php echo $p->t('global/datum'); ?></th>
 			<th><?php echo $p->t('benotungstool/note'); ?></th>
 			<th><?php echo $p->t('global/anmerkung'); ?></th>
