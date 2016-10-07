@@ -515,11 +515,14 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 //			}
 
 			//Kollisionsprüfung und Prüfung auf ausreichen Creditpoints
-			$anmeldungen = $anmeldung->getAnmeldungenByStudent($uid, $aktStudiensemester);
+			$pruefungstermin = new pruefungstermin($_REQUEST["termin_id"]);
+			$pf = new pruefungCis($pruefungstermin->pruefung_id);
+			$pruefungsfenster = new pruefungsfenster($pf->pruefungsfenster_id);
+			$anmeldungen = $anmeldung->getAnmeldungenByStudent($uid, $pruefungsfenster->studiensemester_kurzbz);
 			
 			if($anmeldungen !== false)
 			{
-				$ects = 0;
+				$ects = $lehrveranstaltung->ects;
 				foreach($anmeldungen as $temp)
 				{
 					$lehrveranstaltung = new lehrveranstaltung($temp->lehrveranstaltung_id);
@@ -535,7 +538,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 				}
 
 				$konto = new konto();
-				$creditPoints = $konto->getCreditPointsOfStudiensemester($uid, $aktStudiensemester);
+				$creditPoints = $konto->getCreditPointsOfStudiensemester($uid, $pruefungsfenster->studiensemester_kurzbz);
 				if(($creditPoints != false) && ($ects >= ($creditPoints - $ects)))
 				{
 					$data['error'] = 'true';
