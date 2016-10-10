@@ -24,8 +24,6 @@ class Dokument extends APIv1_Controller
 		parent::__construct();
 		// Load model DokumentModel
 		$this->load->model('crm/dokument_model', 'DokumentModel');
-		
-		
 	}
 
 	/**
@@ -38,6 +36,9 @@ class Dokument extends APIv1_Controller
 		if (isset($dokument_kurzbz))
 		{
 			$result = $this->DokumentModel->load($dokument_kurzbz);
+			
+			// Workaround
+			$result = $this->escapeArrays($result, array('bezeichnung_mehrsprachig', 'dokumentbeschreibung_mehrsprachig'));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

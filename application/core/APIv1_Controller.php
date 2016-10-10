@@ -61,4 +61,54 @@ class APIv1_Controller extends REST_Controller
             }
         }
     }
+    
+    /** ----------------------------------------------------------------------------------------------------------------------------------
+     * Workaround for converting a pgsql array to a php array
+     * To be dropped as soon as possible :D
+     */
+    protected function escapeArrays($result, $fields_names)
+	{
+		if (is_object($result) && isset($result->retval) && is_array($result->retval))
+		{
+			for ($i = 0; $i < count($result->retval); $i++)
+			{
+				foreach($fields_names as $field_name)
+				{
+					if (isset($result->retval[$i]->{$field_name}))
+					{
+						$result->retval[$i]->{$field_name} = $this->_pgsqlArrayToPhpArray($result->retval[$i]->{$field_name});
+					}
+				}
+			}
+		}
+		
+		return $result;
+	}
+	
+	/**
+	* To be moved to DB_model
+	*/
+	private function _pgsqlArrayToPhpArray($string)
+	{
+		$result = array();
+		
+		if (!empty($string))
+		{
+			preg_match_all(
+				'/(?<=^\{|,)(([^,"{]*)|\s*"((?:[^"\\\\]|\\\\(?:.|[0-9]+|x[0-9a-f]+))*)"\s*)(,|(?<!^\{)(?=\}$))/i',
+				$string,
+				$matches,
+				PREG_SET_ORDER
+			);
+			
+			foreach ($matches as $match)
+			{
+				$result[] = $match[3] != '' ? stripcslashes($match[3]) : (strtolower($match[2]) == 'null' ? null : $match[2]);
+			}
+		}
+		
+		return $result;
+	}
+	
+	// --------------------------------------------------------------------------------------------------------------------------------------------
 }

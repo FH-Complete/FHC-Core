@@ -38,6 +38,9 @@ class Dokumentstudiengang extends APIv1_Controller
 		{
 			$result = $this->DokumentstudiengangModel->load(array($studiengang_kz, $dokument_kurzbz));
 			
+			// Workaround
+			$result = $this->escapeArrays($result, array('beschreibung_mehrsprachig'));
+			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
