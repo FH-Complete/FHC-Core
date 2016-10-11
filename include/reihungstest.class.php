@@ -466,9 +466,9 @@ class reihungstest extends basis_db
 			$this->errormsg = 'rt_person_id ist ungueltig';
 			return false;
 		}
-	
+
 		$qry = "SELECT * FROM public.tbl_rt_person WHERE rt_person_id=".$this->db_add_param($rt_person_id, FHC_INTEGER, false);
-	
+
 		if($result = $this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object($result))
@@ -481,6 +481,7 @@ class reihungstest extends basis_db
 				$this->teilgenommen = $this->db_parse_bool($row->teilgenommen);
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->punkte = $row->punkte;
+				$this->new = false;
 				return true;
 			}
 			else
@@ -495,7 +496,7 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
-	
+
 	public function getReihungstestPerson($person_id)
 	{
 		$qry = "SELECT
@@ -565,7 +566,7 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert die Personen, die einem Ort des Reihungstests zugeteilt sind
 	 * @param integer $rt_id ID des Reihungstests
@@ -611,7 +612,7 @@ class reihungstest extends basis_db
 	{
 		if($this->new)
 		{
-			$qry = "INSERT INTO public.tbl_rt_person(person_id, rt_id, studienplan_id, anmeldedatum, teilgenommen, ort_kurzbz, punkte) VALUES(".
+			$qry = "BEGIN;INSERT INTO public.tbl_rt_person(person_id, rt_id, studienplan_id, anmeldedatum, teilgenommen, ort_kurzbz, punkte) VALUES(".
 				$this->db_add_param($this->person_id, FHC_INTEGER).','.
 				$this->db_add_param($this->rt_id, FHC_INTEGER).','.
 				$this->db_add_param($this->studienplan_id, FHC_INTEGER).','.
@@ -634,6 +635,31 @@ class reihungstest extends basis_db
 
 		 if($this->db_query($qry))
 		 {
+			 if($this->new)
+			 {
+				 $qry = "SELECT currval('public.tbl_rt_person_rt_person_id_seq') as id";
+ 				if($this->db_query($qry))
+ 				{
+ 					if($row = $this->db_fetch_object())
+ 					{
+ 						$this->rt_person_id = $row->id;
+ 						$this->db_query('COMMIT');
+ 						return true;
+ 					}
+ 					else
+ 					{
+ 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+ 						$this->db_query('ROLLBACK');
+ 						return false;
+ 					}
+ 				}
+ 				else
+ 				{
+ 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+ 					$this->db_query('ROLLBACK');
+ 					return false;
+ 				}
+			 }
 			 return true;
 		 }
 		 else
@@ -646,11 +672,10 @@ class reihungstest extends basis_db
 	/**
 	 * Loescht einen Person Reihungstest Eintrag
 	 */
-	public function deletePersonReihungstest($person_id, $rt_id)
+	public function deletePersonReihungstest($rt_person_id)
 	{
 		$qry = "DELETE FROM public.tbl_rt_person
-		 	WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
-			AND rt_id=".$this->db_add_param($rt_id, FHC_INTEGER);
+		 	WHERE rt_person_id=".$this->db_add_param($rt_person_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -683,11 +708,11 @@ class reihungstest extends basis_db
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new stdClass();
-	
+
 				$obj->rt_id = $row->rt_id;
 				$obj->ort_kurzbz = $row->ort_kurzbz;
 				$obj->uid = $row->uid;
-	
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -722,7 +747,7 @@ class reihungstest extends basis_db
 				 ' WHERE rt_id='.$this->db_add_param($this->rt_id, FHC_INTEGER).' AND '.
 				 ' ort_kurzbz='.$this->db_add_param($this->ort_kurzbz);
 		}
-	
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -733,7 +758,7 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Loescht einen Ort zu einem Reihungstest Eintrag
 	 */
@@ -742,7 +767,7 @@ class reihungstest extends basis_db
 		$qry = "DELETE FROM public.tbl_rt_ort
 		 	WHERE rt_id=".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
 			AND ort_kurzbz=".$this->db_add_param($ort_kurzbz);
-	
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -753,7 +778,7 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Speichert eine Studienplanzuordnung zu einem Reihungstesttermin
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -775,7 +800,7 @@ class reihungstest extends basis_db
 					' WHERE reihungstest_id='.$this->db_add_param($this->rt_id, FHC_INTEGER).' AND '.
 					' studienplan_id='.$this->db_add_param($this->studienplan_id);
 		}
-	
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -786,7 +811,7 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt alle Studienplan IDs, die einem Reihungstest zugeordnet sind
 	 * @return true wenn ok, false im Fehlerfall
@@ -806,9 +831,9 @@ class reihungstest extends basis_db
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new stdClass();
-	
+
 				$obj->studienplan_id = $row->studienplan_id;
-	
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -819,7 +844,7 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Loescht eine Studienplanzuordnung zu einem Reihungstest Eintrag
 	 * @param $reihungstest_id integer ID des Reihungstests
@@ -831,7 +856,7 @@ class reihungstest extends basis_db
 		$qry = "DELETE FROM public.tbl_rt_studienplan
 		 	WHERE reihungstest_id=".$this->db_add_param($reihungstest_id, FHC_INTEGER)."
 			AND studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER);
-	
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -839,6 +864,50 @@ class reihungstest extends basis_db
 		else
 		{
 			$this->erromsg='Fehler beim Löschen der Studienplanzuordnung';
+			return false;
+		}
+	}
+
+	public function getReihungstestStudienplan($studienplan_arr)
+	{
+		$qry = "SELECT
+					distinct tbl_reihungstest.*
+				FROM
+					public.tbl_reihungstest
+					JOIN public.tbl_rt_studienplan USING(reihungstest_id)
+				WHERE studienplan_id IN(".$this->db_implode4Sql($studienplan_arr).")";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new reihungstest();
+
+				$obj->reihungstest_id = $row->reihungstest_id;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->datum = $row->datum;
+				$obj->uhrzeit = $row->uhrzeit;
+				$obj->ext_id = $row->ext_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->max_teilnehmer = $row->max_teilnehmer;
+				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
+				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
+				$obj->studiensemester_kurzbz =$row->studiensemester_kurzbz;
+				$obj->stufe = $row->stufe;
+				$obj->anmeldefrist = $row->anmeldefrist;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Reihungstests';
 			return false;
 		}
 	}

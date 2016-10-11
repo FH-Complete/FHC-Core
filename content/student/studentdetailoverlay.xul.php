@@ -47,9 +47,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <vbox id="student-detail" style="overflow:auto;margin:0px;" flex="1">
 		<vbox hidden="true">
 			<label value="Neu"/>
-			<checkbox id="student-detail-checkbox-new" checked="true" />      	
+			<checkbox id="student-detail-checkbox-new" checked="true" />
 			<label value="Person_id"/>
-      		<textbox id="student-detail-textbox-person_id" disabled="true"/>					
+      		<textbox id="student-detail-textbox-person_id" disabled="true"/>
 		</vbox>
 		<vbox flex="1">
 		<groupbox id="student-detail-groupbox-person">
@@ -84,7 +84,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<label value="Geburtsdatum" control="student-detail-textbox-geburtsdatum"/>
       						<hbox>
       							<box class="Datum" id="student-detail-textbox-geburtsdatum" disabled="true"/>
-      							<!--<textbox id="student-detail-textbox-geburtsdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
       						</hbox>
       						<label value="Geburtsort" control="student-detail-textbox-geburtsort"/>
       						<textbox id="student-detail-textbox-geburtsort" disabled="true" maxlength="128"/>
@@ -100,7 +99,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menupopup>
 								</template>
 							</menulist>
-      						
+
     					</row>
     					<row>
       						<label value="SVNR" control="student-detail-textbox-svnr"/>
@@ -127,35 +126,35 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<hbox><textbox id="student-detail-textbox-matr_nr" disabled="true" maxlength="32" size="15"/></hbox>
 							<label value="Sprache" control="student-detail-menulist-sprache" />
 							<menulist id="student-detail-menulist-sprache" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/sprache.rdf.php" flex="1"
-						              ref="http://www.technikum-wien.at/sprachen/liste" >
+									datasources="<?php echo APP_ROOT ?>rdf/sprache.rdf.php" flex="1"
+									ref="http://www.technikum-wien.at/sprachen/liste" >
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/sprachen/rdf#bezeichnung"
-							        		      label="rdf:http://www.technikum-wien.at/sprachen/rdf#bezeichnung"
-										  		  uri="rdf:*"/>
+											label="rdf:http://www.technikum-wien.at/sprachen/rdf#bezeichnung"
+											uri="rdf:*"/>
 										</menupopup>
 								</template>
 							</menulist>
 						</row>
-    					<row>
-      						<label value="Geschlecht" control="student-detail-menulist-geschlecht"/>
-      						<menulist id="student-detail-menulist-geschlecht" disabled="true">
+						<row>
+							<label value="Geschlecht" control="student-detail-menulist-geschlecht"/>
+							<menulist id="student-detail-menulist-geschlecht" disabled="true">
 								<menupopup>
 										<menuitem value="m" label="maennlich"/>
 										<menuitem value="w" label="weiblich"/>
 										<menuitem value="u" label="unbekannt"/>
-								</menupopup>								
+								</menupopup>
 							</menulist>
 							<label value="Familienstand" control="student-detail-menulist-familienstand"/>
-      						<menulist id="student-detail-menulist-familienstand" disabled="true">
+							<menulist id="student-detail-menulist-familienstand" disabled="true">
 								<menupopup>
 										<menuitem value="" label="--keine Auswahl--"/>
 										<menuitem value="g" label="geschieden"/>
 										<menuitem value="l" label="ledig"/>
 										<menuitem value="v" label="verheiratet"/>
 										<menuitem value="w" label="verwitwet"/>
-								</menupopup>								
+								</menupopup>
 							</menulist>
 							<label value="Anzahl der Kinder" control="student-detail-textbox-anzahlderkinder" hidden="true"/>
       						<textbox id="student-detail-textbox-anzahlderkinder" disabled="true" maxlength="2" hidden="true"/>
@@ -168,7 +167,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       								<button id="student-detail-button-image-delete" label="Delete" oncommand="StudentImageDelete();" disabled="true"/>
       								<spacer flex="1" />
       							</hbox>
-								<button id="student-detail-button-image-infomail" label="Infomail" oncommand="StudentImageInfomail();" disabled="true"/>      							
+								<button id="student-detail-button-image-infomail" label="Infomail" oncommand="StudentImageInfomail();" disabled="true"/>
       						</vbox>
    							<hbox>
    								<image src='' id="student-detail-image" style="margin-left:5px; width:90px; height:120px"/> <!--height="60" width="60"-->
@@ -182,7 +181,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</rows>
 			</grid>
 			</groupbox>
-			
+
 			<vbox flex="1" >
 				<groupbox id="student-detail-groupbox-student">
 				<caption label="Student" />
@@ -201,20 +200,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	      						<hbox><textbox id="student-detail-textbox-uid" readonly="true" maxlength="16" size="16"/></hbox>
 	    						<hbox><label id="student-detail-label-matrikelnummer" value="Personenkennzeichen" control="student-detail-textbox-matrikelnummer"/></hbox>
 	      						<hbox><textbox id="student-detail-textbox-matrikelnummer" readonly="true" maxlength="15" size="15"/></hbox>
-	      						<!--<label value="Studiengang" control="student-detail-textbox-studiengang_kz"/>-->
 	      						<textbox id="student-detail-menulist-studiengang_kz" disabled="true" hidden="true" />
-	      						<!--
-	      						<menulist id="student-detail-menulist-studiengang_kz" disabled="true"
-								          datasources="<?php echo APP_ROOT ?>rdf/studiengang.rdf.php" flex="1"
-							              ref="http://www.technikum-wien.at/studiengang/liste" >
-									<template>
-										<menupopup>
-											<menuitem value="rdf:http://www.technikum-wien.at/studiengang/rdf#studiengang_kz"
-								        		      label="rdf:http://www.technikum-wien.at/studiengang/rdf#kuerzel - rdf:http://www.technikum-wien.at/studiengang/rdf#bezeichnung"
-											  		  uri="rdf:*"/>
-											</menupopup>
-									</template>
-								</menulist>-->
 	      						<label value="Aktiv" control="student-detail-checkbox-aktiv"/>
       							<checkbox id="student-detail-checkbox-aktiv" checked="true" disabled="true"/>
 	    					</row>
@@ -233,14 +219,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	    				</rows>
 	    		</grid>
 	    		</groupbox>
-	    		
+
     			<hbox>
     				<spacer flex="1" />
     				<button id="student-detail-button-save" label="Speichern" oncommand="StudentDetailSave();" disabled="true"/>
     			</hbox>
-    			
+
     		</vbox>
-    		
+
 		</vbox>
 </vbox>
 
@@ -249,15 +235,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <popupset>
 	<menupopup id="student-prestudent-rolle-tree-popup">
 		<menuitem label="Bearbeiten" oncommand="StudentRolleBearbeiten();" id="student-prestudent-rolle-tree-popup-edit" hidden="false"/>
-		<menuitem label="Status bestaetigen" oncommand="StudentPrestudentRolleBestaetigen();" id="student-prestudent-rolle-tree-popup-approve" hidden="false"/>		
+		<menuitem label="Status bestaetigen" oncommand="StudentPrestudentRolleBestaetigen();" id="student-prestudent-rolle-tree-popup-approve" hidden="false"/>
 		<menuitem label="Neuen Status hinzufuegen" oncommand="StudentRolleAdd();" id="student-prestudent-rolle-tree-popup-add" hidden="false"/>
-		<menuitem label="Entfernen" oncommand="StudentPrestudentRolleDelete();" id="student-prestudent-rolle-tree-popup-delete" hidden="false"/>		
-		<menuitem label="Status vorrücken" oncommand="StudentPrestudentRolleVorruecken();" id="student-prestudent-rolle-tree-popup-move_forward" hidden="false"/>		
+		<menuitem label="Entfernen" oncommand="StudentPrestudentRolleDelete();" id="student-prestudent-rolle-tree-popup-delete" hidden="false"/>
+		<menuitem label="Status vorrücken" oncommand="StudentPrestudentRolleVorruecken();" id="student-prestudent-rolle-tree-popup-move_forward" hidden="false"/>
 	</menupopup>
 </popupset>
 		<vbox hidden="true">
 			<label value="Neu"/>
-			<checkbox id="student-prestudent-checkbox-new" checked="false" />      	
+			<checkbox id="student-prestudent-checkbox-new" checked="false" />
 			<label value="Person_id"/>
       		<textbox id="student-prestudent-textbox-person_id" disabled="true"/>
       		<label value="Prestudent_id"/>
@@ -265,7 +251,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       		<label value="studiengang_kz"/>
       		<textbox id="student-prestudent-textbox-studiengang_kz" disabled="true"/>
 		</vbox>
-		
+
    			<groupbox id="student-detail-groupbox-zgv">
 			<caption id="student-detail-groupbox-caption" label="Zugangsvoraussetzung" />
 				<grid id="student-prestudent-grid-zgv" style="margin:4px;" flex="1">
@@ -333,7 +319,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<label value="ZGV Master Datum" control="student-prestudent-textbox-zgvmasterdatum"/>
       						<hbox>
       							<box class='Datum' id="student-prestudent-textbox-zgvmasterdatum" disabled="true"/>
-      							<!--<textbox id="student-prestudent-textbox-zgvmasterdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
       						</hbox>
                             <label value="ZGV Master Nation" control="student-prestudent-menulist-zgvmasternation"/>
                             <hbox>
@@ -352,8 +337,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
                         </row>
     				</rows>
     			</grid>
-    			
+
     		</groupbox>
+			<!--
     		<groupbox id="student-detail-groupbox-reihungstest">
 			<caption label="&tab-prestudent-aufnahme.label;" />
 				<grid id="student-prestudent-grid-reihungstest" style="margin:4px;" flex="1">
@@ -363,22 +349,20 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					<column flex="1"/>
     					<column flex="5"/>
     					<column flex="1"/>
-    					<column flex="5"/>    					
+    					<column flex="5"/>
   					</columns>
   					<rows>
     					<row>
     						<label value="&tab-prestudent-aufnahme.anmeldung;" control="student-prestudent-textbox-anmeldungreihungstest"/>
       						<hbox>
       							<box class="Datum" id="student-prestudent-textbox-anmeldungreihungstest" disabled="true"/>
-      							<!--<textbox id="student-prestudent-textbox-zgvmasterdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
       							<button id="student-prestudent-button-anmeldungreihungstest-heute" label="Heute" oncommand="StudentAnmeldungreihungstestHeute()" disabled="true" style="margin:0px;"/>
       						</hbox>
       						<label value="&tab-prestudent-aufnahme.seminar;" control="student-prestudent-menulist-reihungstest"/>
       						<hbox>
-<!--								          datasources="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true" flex="1"-->
 	      						<menulist id="student-prestudent-menulist-reihungstest" disabled="true"
 								          datasources="rdf:null" flex="1"
-							              ref="http://www.technikum-wien.at/reihungstest/alle" 
+							              ref="http://www.technikum-wien.at/reihungstest/alle"
 							              oncommand="StudentReihungstestDropDownSelect()">
 									<template>
 										<menupopup>
@@ -388,9 +372,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menupopup>
 									</template>
 								</menulist>
-							
+
 								<toolbarbutton id="student-prestudent-button-reihungstest-refresh" image="../skin/images/refresh.png" tooltiptext="Liste neu laden" onclick="StudentReihungstestDropDownRefresh()"/>
-								
+
 							</hbox>
     					</row>
     					<row>
@@ -405,7 +389,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<label value="Punkte2" control="student-prestudent-textbox-punkte2"/>
       						<textbox id="student-prestudent-textbox-punkte2" disabled="true" maxlength="9" size="9" onchange="StudentReihungstestPunkteChange();" oninput="StudentReihungstestPunkteSum();"/>
 							<?php
-							// Das Eingebefeld fuer die 3. Reihungstestpunkte wird nur angezeigt, 
+							// Das Eingebefeld fuer die 3. Reihungstestpunkte wird nur angezeigt,
 							// wenn im dies im Config aktiviert wurde
 							if(defined('RT_PUNKTE3') && RT_PUNKTE3=='true')
 								$hidden='';
@@ -414,8 +398,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 	      					echo '
 								<label value="Punkte3" control="student-prestudent-textbox-punkte3" '.$hidden.'/>
-    	  						<textbox id="student-prestudent-textbox-punkte3" disabled="true" maxlength="9" size="9" onchange="StudentReihungstestPunkteChange();" oninput="StudentReihungstestPunkteSum();" '.$hidden.'/>
-								';							
+								<textbox id="student-prestudent-textbox-punkte3" disabled="true" maxlength="9" size="9" onchange="StudentReihungstestPunkteChange();" oninput="StudentReihungstestPunkteSum();" '.$hidden.'/>
+								';
 							?>
    	  						<label value="Gesamtpunkte" control="student-prestudent-textbox-punkte"/>
       						<textbox id="student-prestudent-textbox-punkte" disabled="true" maxlength="9" size="9" onchange="StudentReihungstestPunkteChange();"/>
@@ -424,6 +408,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     				</rows>
     			</grid>
     		</groupbox>
+		-->
     		<groupbox id="student-detail-groupbox-prestudent">
 		<caption label="Prestudent" />
 		<grid id="student-prestudent-grid-prestudent" style="margin:4px;" flex="1">
@@ -433,7 +418,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					<column flex="1"/>
     					<column flex="5"/>
     					<column flex="1"/>
-    					<column flex="5"/>    					
+    					<column flex="5"/>
   					</columns>
   					<rows>
   						<row>
@@ -499,10 +484,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menupopup>
 								</template>
 							</menulist>
-							
+
 							<label value="Facheinschlaegig berufstaetig" control="student-prestudent-checkbox-facheinschlberuf" hidden="true"/>
 							<checkbox id="student-prestudent-checkbox-facheinschlberuf" checked="true" disabled="true" hidden="true"/>
-							
+
     					</row>
     				</rows>
     			</grid>
@@ -531,7 +516,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<hbox><textbox id="student-prestudent-textbox-mentor" disabled="true" size="40" maxlength="256"/></hbox>
 						</row>
 					</rows>
-				</grid>      			
+				</grid>
     		</groupbox>
     		<groupbox id="student-detail-groupbox-rollen">
 			<caption label="Status" />
@@ -553,12 +538,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<splitter class="tree-splitter"/>
 							<treecol id="student-prestudent-tree-rolle-ausbildungssemester" label="Semester" flex="1" hidden="false" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester" 
+								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester"
                                 sorthints="integer"/>
 							<splitter class="tree-splitter"/>
 							<treecol id="student-prestudent-tree-rolle-datum" label="Datum" flex="2" hidden="false" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum" />									
+								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum" />
 							<splitter class="tree-splitter"/>
 							<treecol id="student-prestudent-tree-rolle-orgform_kurzbz" label="Organisationsform" flex="2" hidden="true" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
@@ -589,7 +574,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_Am" />
 							<splitter class="tree-splitter"/>
 						</treecols>
-			
+
 						<template>
 							<rule>
 								<treechildren flex="1" >

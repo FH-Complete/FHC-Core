@@ -54,7 +54,7 @@ require_once('../../include/organisationsform.class.php');
 //					"Teilgenommen" und "Punkte" werden immer mit false bzw. 0 gespeichert
 
 define('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND', '5');
-define('REIHUNGSTEST_ERGEBNISSE_BERECHNEN', false);
+define('REIHUNGSTEST_ERGEBNISSE_BERECHNEN', true);
 
 if (!$db = new basis_db())
 {
@@ -78,24 +78,6 @@ $error = false;
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-/*
-if ($reihungstest_id != '' || isset($_POST['reihungstest_id']))
-{
-	if ($reihungstest_id != '')
-	{
-		$rt = new Reihungstest();
-		$rt->load($reihungstest_id);
-		$studiensemester_kurzbz = $rt->studiensemester_kurzbz;
-	}
-	elseif (isset($_POST['reihungstest_id']))
-	{
-		$rt = new Reihungstest();
-		$rt->load($_POST['reihungstest_id']);
-		$studiensemester_kurzbz = $rt->studiensemester_kurzbz;
-	}
-	else
-		$studiensemester_kurzbz = $stsem_akt;
-}*/
 
 if ($stg_kz == '' && ($reihungstest_id != '' || isset($_POST['reihungstest_id'])))
 {
@@ -119,7 +101,7 @@ if(!$rechte->isBerechtigt('lehre/reihungstest'))
 {
 	die($rechte->errormsg);
 }
-	
+
 $studiengang = new studiengang();
 $studiengang->getAll('typ, kurzbz', false);
 
@@ -159,10 +141,10 @@ if(isset($_GET['excel']))
 			$studienplan->loadStudienplan($row->studienplan_id);
 			$studienplaene_arr[ $row->studienplan_id] = $studienplan->bezeichnung;
 		}
-		
+
 		$studienplaene_list = implode(',', array_keys($studienplaene_arr));
 		$qry = "
-				SELECT 
+				SELECT
 				rt_id,
 				prestudent_id,
 				tbl_rt_person.person_id,
@@ -173,7 +155,7 @@ if(isset($_GET['excel']))
 				studiengang_kz,
 				gebdatum,
 				geschlecht,
-				rt_punkte1
+				punkte,
 				,(
 					SELECT kontakt
 					FROM tbl_kontakt
@@ -205,57 +187,13 @@ if(isset($_GET['excel']))
 					) AS orgform_kurzbz
 				FROM public.tbl_rt_person
 				JOIN public.tbl_person USING (person_id)
-				JOIN public.tbl_prestudent ON (tbl_rt_person.person_id=tbl_prestudent.person_id AND tbl_rt_person.rt_id=tbl_prestudent.reihungstest_id)
+				JOIN public.tbl_prestudent ON (tbl_rt_person.person_id=tbl_prestudent.person_id)
 				WHERE rt_id = ".$db->db_add_param($reihungstest->reihungstest_id, FHC_INTEGER)."
 				AND tbl_rt_person.studienplan_id IN (".$studienplaene_list.")
+				AND tbl_rt_person.studienplan_id IN(SELECT studienplan_id FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id)
 				ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname
-						
-				/*		
-				SELECT 
-				prestudent_id,
-				person_id,
-				vorname,
-				nachname,
-				(SELECT ort_kurzbz FROM public.tbl_rt_person WHERE rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)." AND person_id=tbl_person.person_id) AS ort_kurzbz,
-	 			(SELECT studienplan_id FROM public.tbl_rt_person WHERE rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)." AND person_id=tbl_person.person_id) AS studienplan_id,
-				studiengang_kz,
-				gebdatum,
-				geschlecht,
-				rt_punkte1
-				,(
-					SELECT kontakt
-					FROM tbl_kontakt
-					WHERE kontakttyp = 'email'
-						AND person_id = tbl_prestudent.person_id
-						AND zustellung = true LIMIT 1
-					) AS email
-				,(
-					SELECT ausbildungssemester
-					FROM public.tbl_prestudentstatus
-					WHERE prestudent_id = tbl_prestudent.prestudent_id
-						AND datum = (
-							SELECT MAX(datum)
-							FROM public.tbl_prestudentstatus
-							WHERE prestudent_id = tbl_prestudent.prestudent_id
-								AND status_kurzbz = 'Interessent'
-							) LIMIT 1
-					) AS ausbildungssemester
-				,(
-					SELECT orgform_kurzbz
-					FROM public.tbl_prestudentstatus
-					WHERE prestudent_id = tbl_prestudent.prestudent_id
-						AND datum = (
-							SELECT MAX(datum)
-							FROM public.tbl_prestudentstatus
-							WHERE prestudent_id = tbl_prestudent.prestudent_id
-								AND status_kurzbz = 'Interessent'
-							) LIMIT 1
-					) AS orgform_kurzbz
-				FROM public.tbl_prestudent
-				JOIN public.tbl_person USING (person_id)
-				WHERE reihungstest_id = ".$db->db_add_param($reihungstest->reihungstest_id, FHC_INTEGER)."
-				ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname */";
-		
+				";
+
 		$gebietbezeichnungen = array();
 		$qry_gebiete = "SELECT gebiet_id, reihung, bezeichnung FROM testtool.tbl_ablauf JOIN testtool.tbl_gebiet USING (gebiet_id) WHERE studienplan_id = ".$db->db_add_param($row->studienplan_id)." ORDER BY reihung";
 		if($result_gebiete = $db->db_query($qry_gebiete))
@@ -271,28 +209,28 @@ if(isset($_GET['excel']))
 		$workbook->setVersion(8);
 		// sending HTTP headers
 		$workbook->send("Anwesenheitsliste_Aufnahmetermin_".$reihungstest->datum.".xls");
-		
+
 		//Formate Definieren
 		$format_bold =& $workbook->addFormat();
 		$format_bold->setBold();
-		
+
 		$format_border =& $workbook->addFormat();
 		$format_border->setBorder(1);
 		$format_border->setTextWrap();
 		$format_border->setVAlign ('top');
-		
+
 		$format_border_center =& $workbook->addFormat();
 		$format_border_center->setBorder(1);
 		$format_border_center->setTextWrap();
 		$format_border_center->setVAlign ('top');
 		$format_border_center->setHAlign ('center');
-		
+
 		$format_border_left =& $workbook->addFormat();
 		$format_border_left->setBorder(1);
 		$format_border_left->setTextWrap();
 		$format_border_left->setVAlign ('top');
 		$format_border_left->setHAlign ('left');
-		
+
 		if($result = $db->db_query($qry))
 		{
 			$ort_kurzbz = '0';
@@ -303,7 +241,7 @@ if(isset($_GET['excel']))
 					// Creating a worksheet
 					if ($row->ort_kurzbz=='')
 						$worksheet =& $workbook->addWorksheet("Ohne Raumzuteilung");
-					else 
+					else
 						$worksheet =& $workbook->addWorksheet("Raum ".$row->ort_kurzbz);
 					$worksheet->setInputEncoding('utf-8');
 					//$worksheet->setZoom (85);
@@ -320,12 +258,12 @@ if(isset($_GET['excel']))
 					$worksheet->write(0,0,'Anwesenheitsliste Aufnahmetermin vom '.$datum_obj->convertISODate($reihungstest->datum).' '.$reihungstest->uhrzeit.' Uhr, '.$reihungstest->anmerkung.', erstellt am '.date('d.m.Y'), $format_bold);
 					if ($row->ort_kurzbz=='')
 						$worksheet->write(1,0,'Ohne Raumzuteilung', $format_bold);
-					else 
+					else
 						$worksheet->write(1,0,'Raum '.$row->ort_kurzbz, $format_bold);
 					$worksheet->write(2,0,'Studienpläne: '.implode(', ', $studienplaene_arr));
 					$worksheet->write(3,0,'Stufe: '.$reihungstest->stufe);
 					$worksheet->write(4,0,'Testmodule: '.implode(', ', $gebietbezeichnungen));
-					
+
 					//Ueberschriften
 					$zeile=6;
 					$col=0;
@@ -355,11 +293,11 @@ if(isset($_GET['excel']))
 					$maxlength[$col] = 3;
 					$worksheet->write($zeile,++$col,"Unterschrift", $format_bold);
 					$maxlength[$col] = 30;
-					
+
 					$ort_kurzbz = $row->ort_kurzbz;
 					$zeile++;
 				}
-				
+
 				$pruefling = new pruefling();
 
 				$prestudent = new prestudent();
@@ -384,13 +322,6 @@ if(isset($_GET['excel']))
 					}
 				}
 				$weitere_zuteilungen = array();
-				/*$qry_zuteilungen = "SELECT DISTINCT	tbl_studienplan.bezeichnung,tbl_reihungstest.datum,tbl_rt_person.studienplan_id
-								FROM public.tbl_rt_person JOIN public.tbl_reihungstest ON (rt_id = reihungstest_id)
-								JOIN lehre.tbl_studienplan USING (studienplan_id)
-								JOIN testtool.tbl_ablauf USING (studienplan_id)
-								WHERE person_id=62563
-								AND studiensemester_kurzbz='SS2017'
-								ORDER BY bezeichnung";*/
 				$qry_zuteilungen = "SELECT DISTINCT	tbl_studienplan.bezeichnung,tbl_reihungstest.datum,tbl_rt_person.studienplan_id
 								FROM public.tbl_rt_person JOIN public.tbl_reihungstest ON (rt_id = reihungstest_id)
 								JOIN lehre.tbl_studienplan USING (studienplan_id)
@@ -398,7 +329,7 @@ if(isset($_GET['excel']))
 								WHERE person_id=".$db->db_add_param($row->person_id)."
 								AND studiensemester_kurzbz=".$db->db_add_param($reihungstest->studiensemester_kurzbz)."
 								ORDER BY bezeichnung";
-				
+
 				if($result_zuteilungen = $db->db_query($qry_zuteilungen))
 				{
 					while($row_zuteilungen = $db->db_fetch_object($result_zuteilungen))
@@ -424,7 +355,7 @@ if(isset($_GET['excel']))
 				$worksheet->write($zeile,++$col,$row->nachname, $format_border);
 				if(strlen($row->nachname)>$maxlength[$col])
 					$maxlength[$col] = strlen($row->nachname);
-				
+
 				$worksheet->write($zeile,++$col, $row->geschlecht, $format_border_center);
 				if(strlen($row->geschlecht)>$maxlength[$col])
 					$maxlength[$col] = strlen($row->geschlecht);
@@ -470,16 +401,16 @@ if(isset($_GET['excel']))
 				$worksheet->write($zeile,++$col,$adresse->ort, $format_border);
 				if(strlen($adresse->ort)>$maxlength[$col])
 					$maxlength[$col] = strlen($adresse->ort);
-				
+
 				$worksheet->write($zeile,++$col,'', $format_border);
-				
+
 				if(count($weitere_zuteilungen)>2)
 					$worksheet->setRow($zeile, count($weitere_zuteilungen)*14);
 				else
 					$worksheet->setRow($zeile, 35);
 
 				$zeile++;
-				
+
 				//Die Breite der Spalten setzen
 				foreach($maxlength as $col=>$breite)
 					$worksheet->setColumn($col, $col, $breite+2);
@@ -498,15 +429,13 @@ if(isset($_GET['excel']))
 	<head>
 		<title>Reihungstest</title>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<!--<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">-->
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<!--<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>-->
 		<script type="text/javascript" src="../../include/js/jquery.js"></script>
 		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 		<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
 		<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
 		<script src="../../include/js/jquery.checkboxes-1.0.7.min.js" type="text/javascript"></script>
-		
+
 		<link href="../../skin/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
 		<script src="../../include/js/jquery.ui.timepicker.js" type="text/javascript" ></script>
 
@@ -559,7 +488,7 @@ if(isset($_GET['excel']))
 					{
 						//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
 						$(this.id).val(ui.item.uid);
-					}	
+					}
 				});
 
 				$("#studienplan_autocomplete").autocomplete({
@@ -581,12 +510,12 @@ if(isset($_GET['excel']))
 					}
 				});
 
-				if (typeof(Storage) !== 'undefined') 
+				if (typeof(Storage) !== 'undefined')
 				{
 					let arr = ['clm_prestudent_id','clm_person_id','clm_geschlecht','clm_studiengang','clm_studienplan','clm_orgform','clm_einstiegssemester','clm_geburtsdatum','clm_email','clm_absolviert','clm_ergebnis','clm_fas'];
-					for (let i of arr) 
+					for (let i of arr)
 					{
-						if (localStorage.getItem(i) != null) 
+						if (localStorage.getItem(i) != null)
 						{
 							$('.'+i).css('display', localStorage.getItem(i));
 							if (localStorage.getItem(i) == 'none')
@@ -595,8 +524,8 @@ if(isset($_GET['excel']))
 								document.getElementById(i).className = 'active';
 						}
 					}
-				} 
-				else 
+				}
+				else
 				{
 					alert('Local Storage nicht unterstuetzt');
 				}
@@ -609,7 +538,7 @@ if(isset($_GET['excel']))
 						sortList: [[2,0],[3,0]],
 						headers: {0: { sorter: false}}
 					});
-					
+
 					$("#toggle_"+v.id).on('click', function(e) {
 						$("#"+v.id).checkboxes('toggle');
 						e.preventDefault();
@@ -619,7 +548,7 @@ if(isset($_GET['excel']))
 						$("#"+v.id).checkboxes('uncheck');
 						e.preventDefault();
 					});
-					
+
 					$("#"+v.id).checkboxes('range', true);
 				});
 			});
@@ -653,7 +582,7 @@ if(isset($_GET['excel']))
 
 				var studiengang_kz = $('#studiengang_dropdown'+type).val();
 				var studiensemester_kurzbz = $('#studiensemester_dropdown'+type).val();
-				
+
 				$.ajax({
 					url: "reihungstestverwaltung_autocomplete.php",
 					data: { 'autocomplete':'getStudienplan',
@@ -662,7 +591,7 @@ if(isset($_GET['excel']))
 						 },
 					type: "POST",
 					dataType: "json",
-					success: function(data) 
+					success: function(data)
 					{
 						$("#studienplan_dropdown"+type).empty();
 						$("#studienplan_dropdown"+type).append('<option value="">Studienplan auswaehlen</option>');
@@ -673,7 +602,7 @@ if(isset($_GET['excel']))
 							$("#studienplan_dropdown"+type).append('<option value="'+data['stpid']+'">'+data['bezeichnung']+'</option>');
 						});
 					},
-					error: function(data) 
+					error: function(data)
 					{
 						alert("Fehler beim Laden der Daten: "+data);
 					}
@@ -683,77 +612,77 @@ if(isset($_GET['excel']))
 		<style type="text/css">
 		.active
 		{
-			cursor: pointer; 
-			color: #000000; 
-			margin-right: 5px; 
-			text-decoration: none; 
-			border-radius: 3px; 
-			-webkit-border-radius: 3px; 
-			-moz-border-radius: 3px; 
-			background-color: #8dbdd8; 
-			border-top: 3px solid #8dbdd8; 
-			border-bottom: 3px solid #8dbdd8; 
-			border-right: 8px solid #8dbdd8; 
-			border-left: 8px solid #8dbdd8; 
+			cursor: pointer;
+			color: #000000;
+			margin-right: 5px;
+			text-decoration: none;
+			border-radius: 3px;
+			-webkit-border-radius: 3px;
+			-moz-border-radius: 3px;
+			background-color: #8dbdd8;
+			border-top: 3px solid #8dbdd8;
+			border-bottom: 3px solid #8dbdd8;
+			border-right: 8px solid #8dbdd8;
+			border-left: 8px solid #8dbdd8;
 			display: inline-block;
 		}
 		.inactive
 		{
-			cursor: pointer; 
-			color: #000000; 
-			margin-right: 5px; 
-			text-decoration: none; 
-			border-radius: 3px; 
-			-webkit-border-radius: 3px; 
-			-moz-border-radius: 3px; 
-			background-color: #DCE4EF; 
-			border-top: 3px solid #DCE4EF; 
-			border-bottom: 3px solid #DCE4EF; 
-			border-right: 8px solid #DCE4EF; 
-			border-left: 8px solid #DCE4EF; 
+			cursor: pointer;
+			color: #000000;
+			margin-right: 5px;
+			text-decoration: none;
+			border-radius: 3px;
+			-webkit-border-radius: 3px;
+			-moz-border-radius: 3px;
+			background-color: #DCE4EF;
+			border-top: 3px solid #DCE4EF;
+			border-bottom: 3px solid #DCE4EF;
+			border-right: 8px solid #DCE4EF;
+			border-left: 8px solid #DCE4EF;
 			display: inline-block;
 		}
 		.buttongreen, a.buttongreen
 		{
-			cursor: pointer; 
-			color: #FFFFFF; 
-			margin: 0 5px 5px 0; 
-			text-decoration: none; 
-			border-radius: 3px; 
-			-webkit-border-radius: 3px; 
-			-moz-border-radius: 3px; 
-			background-color: #5cb85c; 
-			border-top: 3px solid #5cb85c; 
-			border-bottom: 3px solid #5cb85c; 
-			border-right: 8px solid #5cb85c; 
-			border-left: 8px solid #5cb85c; 
+			cursor: pointer;
+			color: #FFFFFF;
+			margin: 0 5px 5px 0;
+			text-decoration: none;
+			border-radius: 3px;
+			-webkit-border-radius: 3px;
+			-moz-border-radius: 3px;
+			background-color: #5cb85c;
+			border-top: 3px solid #5cb85c;
+			border-bottom: 3px solid #5cb85c;
+			border-right: 8px solid #5cb85c;
+			border-left: 8px solid #5cb85c;
 			display: inline-block;
 			vertical-align: middle;
 		}
 		.buttonorange, a.buttonorange
 		{
-			cursor: pointer; 
-			color: #FFFFFF; 
-			margin: 0 5px 5px 0; 
-			text-decoration: none; 
-			border-radius: 3px; 
-			-webkit-border-radius: 3px; 
-			-moz-border-radius: 3px; 
-			background-color: #EC971F; 
-			border-top: 3px solid #EC971F; 
-			border-bottom: 3px solid #EC971F; 
-			border-right: 8px solid #EC971F; 
-			border-left: 8px solid #EC971F; 
+			cursor: pointer;
+			color: #FFFFFF;
+			margin: 0 5px 5px 0;
+			text-decoration: none;
+			border-radius: 3px;
+			-webkit-border-radius: 3px;
+			-moz-border-radius: 3px;
+			background-color: #EC971F;
+			border-top: 3px solid #EC971F;
+			border-bottom: 3px solid #EC971F;
+			border-right: 8px solid #EC971F;
+			border-left: 8px solid #EC971F;
 			display: inline-block;
 			vertical-align: middle;
 		}
 		.listitem
 		{
 			background-color: lightgray;
-			padding: 0 5px 0 6px; 
-			border-radius: 3px; 
-			-webkit-border-radius: 3px; 
-			-moz-border-radius: 3px; 
+			padding: 0 5px 0 6px;
+			border-radius: 3px;
+			-webkit-border-radius: 3px;
+			-moz-border-radius: 3px;
 			vertical-align: middle;
 		}
 		.feldtitel
@@ -768,7 +697,7 @@ if(isset($_GET['excel']))
 		</style>
 	</head>
 	<body class="Background_main">
-		<h2>Reihungstest - Verwaltung</h2>
+	<h2>Reihungstest - Verwaltung</h2>
 <?php
 
 // Speichern eines Termines
@@ -816,7 +745,6 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 	{
 		if (isset($_POST['kopieren']))
 		{
-			
 			$reihungstest->freigeschaltet = false;
 			$reihungstest->max_teilnehmer = '';
 			$reihungstest->oeffentlich = false;
@@ -841,17 +769,16 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 		$reihungstest->anmerkung = $_POST['anmerkung'];
 		$reihungstest->datum = $datum_obj->formatDatum($_POST['datum']);
 		$reihungstest->uhrzeit = $_POST['uhrzeit'];
-		
 
 		if($reihungstest->save())
 		{
 			if (isset($_POST['ort_kurzbz']) && $_POST['ort_kurzbz']!='')
 			{
 				$ort = new ort();
-				
+
 				if (!$ort->load($_POST['ort_kurzbz']))
 					echo '<span class="input_error">Die Bezeichnung des Ortes ist ungueltig oder wurde nicht gefunden</span>';
-				else 
+				else
 				{
 					if($rechte->isBerechtigt('lehre/reihungstestOrt', null, 'sui'))
 					{
@@ -874,7 +801,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 							$add_ort->rt_id = $reihungstest->reihungstest_id;
 							$add_ort->ort_kurzbz = $_POST['ort_kurzbz'];
 							$add_ort->uid = null;
-							
+
 							if ($add_ort->saveOrtReihungstest())
 							{
 								echo '<b>Daten wurden erfolgreich gespeichert</b> <script>window.opener.StudentReihungstestDropDownRefresh();</script>';
@@ -882,43 +809,26 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 							else
 								echo '<span class="input_error">Fehler beim Speichern der Raumzuordnung: '.$db->convert_html_chars($reihungstest->errormsg).'</span>';
 						}
-						else 
+						else
 							echo '<span class="input_error">Der Raum '.$_POST['ort_kurzbz'].' ist bereits diesem Reihungstest zugeteilt</span>';
 					}
-					else 
+					else
 						die($rechte->errormsg);
 				}
 			}
 			if (isset($_POST['studienplan_id']) && $_POST['studienplan_id']!='')
 			{
-				/*$rt_stpl = new reihungstest();
-				$rt_stpl->getOrteReihungstest($reihungstest->reihungstest_id);
-				$zugeteilt = false;
-				foreach ($orte_zugeteilt->result AS $row)
+				$rt_stpl = new reihungstest();
+				$rt_stpl->new = true;
+				$rt_stpl->rt_id = $reihungstest->reihungstest_id;
+				$rt_stpl->studienplan_id = $_POST['studienplan_id'];
+
+				if ($rt_stpl->saveStudienplanReihungstest())
 				{
-					if ($row->ort_kurzbz == $_POST['ort_kurzbz'])
-					{
-						$zugeteilt = true;
-						break;
-					}
+					echo '<b>Daten wurden erfolgreich gespeichert</b> <script>window.opener.StudentReihungstestDropDownRefresh();</script>';
 				}
-				// Check, ob der Raum schon diesem RT zugeteilt ist
-				if ($zugeteilt == false)
-				{*/
-					$rt_stpl = new reihungstest();
-					$rt_stpl->new = true;
-					$rt_stpl->rt_id = $reihungstest->reihungstest_id;
-					$rt_stpl->studienplan_id = $_POST['studienplan_id'];
-					
-					if ($rt_stpl->saveStudienplanReihungstest())
-					{
-						echo '<b>Daten wurden erfolgreich gespeichert</b> <script>window.opener.StudentReihungstestDropDownRefresh();</script>';
-					}
-					else
-						echo '<span class="input_error">Fehler beim Speichern des Studienplans: '.$db->convert_html_chars($rt_stpl->errormsg).'</span>';
-				/*}
-				else 
-					echo '<span class="input_error">Der Raum '.$_POST['ort_kurzbz'].' ist bereits diesem Reihungstest zugeteilt</span>';*/
+				else
+					echo '<span class="input_error">Fehler beim Speichern des Studienplans: '.$db->convert_html_chars($rt_stpl->errormsg).'</span>';
 			}
 			$reihungstest_id = $reihungstest->reihungstest_id;
 			$stg_kz = $reihungstest->studiengang_kz;
@@ -946,15 +856,15 @@ if ($reihungstest_id != '' || isset($_POST['reihungstest_id']))
 		{
 			if(defined('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND') || REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND > 0)
 				$orte_array[$row->ort_kurzbz] = $raum->arbeitsplaetze - ceil(($raum->arbeitsplaetze/100)*REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND);
-				else
-					$orte_array[$row->ort_kurzbz] = $raum->arbeitsplaetze;
+			else
+				$orte_array[$row->ort_kurzbz] = $raum->arbeitsplaetze;
 		}
 		else
 		{
 			if(defined('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND') || REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND > 0)
 				$orte_array[$row->ort_kurzbz] = $raum->max_person - ceil(($raum->max_person/100)*REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND);
-				else
-					$orte_array[$row->ort_kurzbz] = $raum->max_person;
+			else
+				$orte_array[$row->ort_kurzbz] = $raum->max_person;
 		}
 	}
 	$arbeitsplaetze_gesamt = array_sum($orte_array);
@@ -966,9 +876,9 @@ if(isset($_POST['raumzuteilung_speichern']))
 	{
 		die($rechte->errormsg);
 	}
-	
+
 	$raumzuteilung = new reihungstest();
-	
+
 	if(isset($_POST['reihungstest_id']) && $_POST['reihungstest_id']!='')
 	{
 		//Reihungstest laden
@@ -979,23 +889,9 @@ if(isset($_POST['raumzuteilung_speichern']))
 		if (isset($_POST['checkbox']))
 		{
 			$person_ids = $_POST['checkbox'];
-	
+
 			foreach ($person_ids AS $key=>$value)
 			{
-				//Pruefen ob Person schon Zuteilung in tbl_rt_person hat @todo: Kann weggelassen werden, wenn sichergestellt ist, dass das schon uebers FAS passiert
-				$checkperson = new Reihungstest();
-				$checkperson->getReihungstestPerson($key);
-				foreach ($checkperson->result as $row)
-				{
-					if ($row->rt_id == $_POST['reihungstest_id'])
-					{
-						$raumzuteilung->new = false;
-						break;
-					}
-					else
-						$raumzuteilung->new = true;	
-				}
-				
 				$load_person = new reihungstest();
 				if ($load_person->getPersonReihungstest($key, $_POST['reihungstest_id']))
 				{
@@ -1005,28 +901,15 @@ if(isset($_POST['raumzuteilung_speichern']))
 					$raumzuteilung->teilgenommen = $load_person->teilgenommen;
 					$raumzuteilung->punkte = $load_person->punkte;
 					$raumzuteilung->studienplan_id = $load_person->studienplan_id;
-					
+
 					$raumzuteilung->rt_id = $load_person->rt_id;
 					$raumzuteilung->rt_id_old = $load_person->rt_id;
 					$raumzuteilung->person_id = $key;
 					$raumzuteilung->ort_kurzbz = $_POST['raumzuteilung'];
 				}
-				else 
-				{
-					$raumzuteilung->new = true;
-					$raumzuteilung->anmeldedatum = date('Y-m-d H:i:s');
-					$raumzuteilung->teilgenommen = false;
-					$raumzuteilung->punkte = 0;
-					$raumzuteilung->studienplan_id = '1'; //@todo: Falls noch kein rt_person-Eintrag vorhanden ist, muss ein Studienplan ermittelt werden. Kann das vorkommen? Wenn ja, welchen Studienplan sollen wir nehmen?
-						
-					$raumzuteilung->rt_id = $_POST['reihungstest_id'];
-					$raumzuteilung->rt_id_old = $_POST['reihungstest_id'];
-					$raumzuteilung->person_id = $key;
-					$raumzuteilung->ort_kurzbz = $_POST['raumzuteilung'];
-				}
-				
-				
-				
+				else
+					die('PersonID '.$key.' hat keine korrekte Zuordnung -> Abbruch');
+
 				if (!$raumzuteilung->savePersonReihungstest())
 				{
 					echo '<span class="input_error">Fehler beim Speichern der Daten: '.$db->convert_html_chars($reihungstest->errormsg).'</span>';
@@ -1046,10 +929,14 @@ if(isset($_GET['type']) && $_GET['type']=='savertpunkte')
 
 	if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz', $prestudent->studiengang_kz, 'suid'))
 	{
-		$prestudent->rt_punkte1 = str_replace(',','.',$rtpunkte);
-		$prestudent->punkte = str_replace(',','.',$prestudent->rt_punkte1 + $prestudent->rt_punkte2);
-		$prestudent->reihungstestangetreten=true;
-		$prestudent->save(false);
+		$rtperson = new reihungstest();
+		$rtperson->loadReihungstestPerson($_GET['rt_person_id']);
+		$rtperson->punkte = $rtpunkte;
+		$rtperson->new=false;
+		if(!$rtperson->savePersonReihungstest())
+		{
+			echo '<span class="error">Fehler:'.$rtperson->errormsg.'</span>';
+		}
 	}
 	else
 	{
@@ -1061,10 +948,16 @@ if(isset($_GET['type']) && $_GET['type']=='savertpunkte')
 if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 {
 	$errormsg='';
-	$qry = "SELECT prestudent_id, tbl_prestudent.studiengang_kz, nachname, vorname, tbl_studiengang.oe_kurzbz
-			FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) JOIN public.tbl_studiengang USING(studiengang_kz)
-			WHERE reihungstest_id=".$db->db_add_param($reihungstest_id, FHC_INTEGER);
-	// AND (rt_punkte1='' OR rt_punkte1 is null)";
+	$qry = "SELECT
+				prestudent_id, tbl_prestudent.studiengang_kz, nachname, vorname, tbl_studiengang.oe_kurzbz, rt_person_id
+			FROM
+				public.tbl_prestudent
+				JOIN public.tbl_person USING(person_id)
+				JOIN public.tbl_studiengang USING(studiengang_kz)
+				JOIN public.tbl_rt_person USING(person_id)
+			WHERE
+				tbl_rt_person.rt_id=".$db->db_add_param($reihungstest_id, FHC_INTEGER);
+
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
@@ -1074,17 +967,24 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 				$prestudent = new prestudent();
 				$prestudent->load($row->prestudent_id);
 
-				$pruefling = new pruefling();
-				if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-					$rtpunkte = $pruefling->getReihungstestErgebnis($row->prestudent_id,true);
-				else
-					$rtpunkte = $pruefling->getReihungstestErgebnis($row->prestudent_id);
+				$reihungstest = new reihungstest();
+				if($reihungstest->loadReihungstestPerson($row->rt_person_id))
+				{
+					$pruefling = new pruefling();
+					if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+						$rtpunkte = $pruefling->getReihungstestErgebnis($row->prestudent_id,true);
+					else
+						$rtpunkte = $pruefling->getReihungstestErgebnis($row->prestudent_id);
+					$reihungstest->punkte = $rtpunkte;
+					$reihungstest->reihungstestangetreten=true;
+					$reihungstest->save(false);
+					$reihungstest->new=false;
 
-				$prestudent->rt_punkte1 = str_replace(',','.',$rtpunkte);
-				$prestudent->punkte = str_replace(',','.',$prestudent->rt_punkte1 + $prestudent->rt_punkte2);
-				$prestudent->reihungstestangetreten=true;
-
-				$prestudent->save(false);
+					if(!$reihungstest->savePersonReihungstest())
+					{
+						$errormsg .='<br>Fehler:'.$reihungstest->errorsmg;
+					}
+				}
 			}
 			else
 			{
@@ -1105,39 +1005,40 @@ if(isset($_GET['type']) && $_GET['type']=='verteilen')
 	{
 		die($rechte->errormsg);
 	}
-	
+
 	if($reihungstest_id!='')
 	{
 		$errormsg='';
-		$qry = "SELECT 
-				person_id,
-				vorname,
-				nachname,
-				ort_kurzbz
-				FROM public.tbl_prestudent
-				JOIN public.tbl_person USING (person_id)
-				LEFT JOIN public.tbl_rt_person USING (person_id)
-				WHERE reihungstest_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)."
-				/*AND tbl_rt_person.ort_kurzbz IS NULL*/
+		$qry = "SELECT
+					person_id,
+					vorname,
+					nachname,
+					ort_kurzbz
+				FROM
+					public.tbl_prestudent
+					JOIN public.tbl_person USING (person_id)
+					LEFT JOIN public.tbl_rt_person USING (person_id)
+				WHERE
+					tbl_rt_person.rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)."
+					AND tbl_rt_person.studienplan_id IN (SELECT studienplan_id FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id)
 				ORDER BY nachname,vorname ";
-		
+
 		$raumzuteilung = new reihungstest();
 		if($result = $db->db_query($qry))
 		{
 			$anz_personen = $db->db_num_rows($result);
-			
+
 			$multiplikator = $anz_personen/$arbeitsplaetze_gesamt;
 			foreach ($orte->result AS $ort)
 			{
 				$counter = 0;
-				
+
 				$anz_zugeteilte = new Reihungstest();
 				$anz_zugeteilte->getPersonReihungstestOrt($reihungstest_id, $ort->ort_kurzbz);
 				$anz_zugeteilte = count($anz_zugeteilte->result);
-				
+
 				$anteil = round(($orte_array[$ort->ort_kurzbz] * $multiplikator))-$anz_zugeteilte;
-				
-				//if ($orte_array[$ort->ort_kurzbz] == 0 || ($orte_array[$ort->ort_kurzbz]-$anz_zugeteilte)<=0)
+
 				if ($orte_array[$ort->ort_kurzbz] == 0 || ($anteil - $anz_zugeteilte)<=0)
 					continue;
 
@@ -1146,15 +1047,6 @@ if(isset($_GET['type']) && $_GET['type']=='verteilen')
 					//Nur Personen ohne Raumzuteilung verteilen
 					if ($row->ort_kurzbz == '')
 					{
-						//Pruefen ob Person schon Zuteilung in tbl_rt_person hat @todo: Kann weggelassen werden, wenn sichergestellt ist, dass das schon uebers FAS passiert
-						$checkperson = new Reihungstest();
-						$checkperson->getReihungstestPerson($row->person_id);
-						if ($checkperson->result)
-							$raumzuteilung->new = false;
-						else 
-						{
-							$raumzuteilung->new = true;
-						}
 						$load_person = new reihungstest();
 						if ($load_person->getPersonReihungstest($row->person_id, $reihungstest_id))
 						{
@@ -1164,7 +1056,7 @@ if(isset($_GET['type']) && $_GET['type']=='verteilen')
 							$raumzuteilung->teilgenommen = $load_person->teilgenommen;
 							$raumzuteilung->punkte = $load_person->punkte;
 							$raumzuteilung->studienplan_id = $load_person->studienplan_id;
-								
+
 							$raumzuteilung->rt_id = $load_person->rt_id;
 							$raumzuteilung->rt_id_old = $load_person->rt_id;
 							$raumzuteilung->person_id = $row->person_id;
@@ -1172,34 +1064,23 @@ if(isset($_GET['type']) && $_GET['type']=='verteilen')
 						}
 						else
 						{
-							$raumzuteilung->new = true;
-							$raumzuteilung->anmeldedatum = date('Y-m-d H:i:s');
-							$raumzuteilung->teilgenommen = false;
-							$raumzuteilung->punkte = 0;
-							$raumzuteilung->studienplan_id = '1'; //@todo: Falls noch kein rt_person-Eintrag vorhanden ist, muss ein Studienplan ermittelt werden. Kann das vorkommen? Wenn ja, welchen Studienplan sollen wir nehmen?
-							
-							$raumzuteilung->rt_id = $reihungstest_id;
-							$raumzuteilung->rt_id_old = $reihungstest_id;
-							$raumzuteilung->person_id = $row->person_id;
-							$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
+							die('Person zuteilung nicht gefunden');
 						}
+
 						if (!$raumzuteilung->savePersonReihungstest())
 						{
 							echo '<span class="input_error">Fehler beim Speichern der Daten: '.$db->convert_html_chars($raumzuteilung->errormsg).'</span>';
 						}
 						$counter++;
-						
+
 						//Wenn 0 Arbeitsplaetze vorhanden sind oder die max. Arbeitsplatzanzahl erreicht ist
 						if ($orte_array[$ort->ort_kurzbz] == 0 || ($anteil - $counter)<=0)
 							break;
-						
-						/*if ($counter==$pers_pro_raum || $counter==$arbeitsplaetze)
-							break;*/
 					}
 				}
 			}
 		}
-		
+
 	}
 	$neu=false;
 }
@@ -1211,53 +1092,47 @@ if(isset($_GET['type']) && $_GET['type']=='auffuellen')
 	{
 		die($rechte->errormsg);
 	}
-	
+
 	if($reihungstest_id!='')
 	{
 		$orte = new Reihungstest();
 		$orte->getOrteReihungstest($reihungstest_id);
-	
+
 		$errormsg='';
-		$qry = "SELECT 
-				person_id,
-				vorname,
-				nachname,
-				ort_kurzbz
-				FROM public.tbl_prestudent
-				JOIN public.tbl_person USING (person_id)
-				LEFT JOIN public.tbl_rt_person USING (person_id)
-				WHERE reihungstest_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)."
-				AND tbl_rt_person.ort_kurzbz IS NULL
+		$qry = "SELECT
+					person_id,
+					vorname,
+					nachname,
+					ort_kurzbz
+				FROM
+					public.tbl_prestudent
+				JOIN
+					public.tbl_person USING (person_id)
+					LEFT JOIN public.tbl_rt_person USING (person_id)
+				WHERE
+					tbl_rt_person.rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)."
+					AND tbl_rt_person.studienplan_id IN (SELECT studienplan_id FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id)
+					AND tbl_rt_person.ort_kurzbz IS NULL
 				ORDER BY nachname,vorname ";
-		
+
 		$raumzuteilung = new reihungstest();
 		if($result = $db->db_query($qry))
 		{
-			//$anz_personen = $db->db_num_rows($result);
-			//$pers_pro_raum = ceil($anz_personen/$anz_orte);
 			foreach ($orte->result AS $ort)
 			{
 				$counter = 0;
-				
+
 				$anz_zugeteilte = new Reihungstest();
 				$anz_zugeteilte->getPersonReihungstestOrt($reihungstest_id, $ort->ort_kurzbz);
-				$anz_zugeteilte = count($anz_zugeteilte->result);				
-				
+				$anz_zugeteilte = count($anz_zugeteilte->result);
+
 				if ($orte_array[$ort->ort_kurzbz] == 0 || ($orte_array[$ort->ort_kurzbz]-$anz_zugeteilte)<=0)
 					continue;
-				
+
 				while($row = $db->db_fetch_object($result))
 				{
-					//Pruefen ob Person schon Zuteilung in tbl_rt_person hat @todo: Kann weggelassen werden, wenn sichergestellt ist, dass das schon uebers FAS passiert
-					$checkperson = new Reihungstest();
-					$checkperson->getReihungstestPerson($row->person_id);
-					if ($checkperson->result)
-						$raumzuteilung->new = false;
-					else 
-					{
-						$raumzuteilung->new = true;
-					}
 					$load_person = new reihungstest();
+
 					if ($load_person->getPersonReihungstest($row->person_id, $reihungstest_id))
 					{
 						$raumzuteilung->new = false;
@@ -1266,37 +1141,28 @@ if(isset($_GET['type']) && $_GET['type']=='auffuellen')
 						$raumzuteilung->teilgenommen = $load_person->teilgenommen;
 						$raumzuteilung->punkte = $load_person->punkte;
 						$raumzuteilung->studienplan_id = $load_person->studienplan_id;
-					
+
 						$raumzuteilung->rt_id = $load_person->rt_id;
 						$raumzuteilung->rt_id_old = $load_person->rt_id;
 						$raumzuteilung->person_id = $row->person_id;
 						$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
 					}
 					else
-					{
-						$raumzuteilung->new = true;
-						$raumzuteilung->anmeldedatum = date('Y-m-d H:i:s');
-						$raumzuteilung->teilgenommen = false;
-						$raumzuteilung->punkte = 0;
-						
-						$raumzuteilung->rt_id = $reihungstest_id;
-						$raumzuteilung->rt_id_old = $reihungstest_id;
-						$raumzuteilung->person_id = $row->person_id;
-						$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
-					}
+						die('Personen zuteilung nicht gefunden');
+
 					if (!$raumzuteilung->savePersonReihungstest())
 					{
 						echo '<span class="input_error">Fehler beim Speichern der Daten: '.$db->convert_html_chars($raumzuteilung->errormsg).'</span>';
 					}
 					$counter++;
-					
+
 					//Wenn 0 Arbeitsplaetze vorhanden sind oder die max. Arbeitsplatzanzahl erreicht ist
 					if ($orte_array[$ort->ort_kurzbz] == 0 || ($orte_array[$ort->ort_kurzbz]-($anz_zugeteilte+$counter))<=0)
 						break;
 				}
 			}
 		}
-		
+
 	}
 	$neu=false;
 }
@@ -1325,11 +1191,11 @@ if(isset($_POST['aufsicht']) && $_POST['aufsicht']!='' && !isset($_POST['kopiere
 			// UID aus POST-String auslesen
 			$length = (strrpos($value, ')')) - (strpos($value, '('));
 			$uid = substr($value,strpos($value, '(')+1, $length-1);
-			
-			$benutzer = new benutzer();			
+
+			$benutzer = new benutzer();
 			if ($uid!='' && !$benutzer->load($uid))
 				echo '<span class="input_error">Die UID '.$value.' konnte nicht gefunden werden</span>';
-			else 
+			else
 			{
 				$save_aufsicht->new = false;
 				$save_aufsicht->rt_id = $_POST['reihungstest_id'];
@@ -1358,24 +1224,22 @@ if(isset($_POST['delete_ort']))
 	{
 		$delete_ort = new reihungstest();
 		$delete_ort->getPersonReihungstestOrt($_POST['reihungstest_id'], $_POST['delete_ort']);
-		
+
 		if (count($delete_ort->result) == 0)
 		{
 			if (!$delete_ort->deleteOrtReihungstest($_POST['reihungstest_id'], $_POST['delete_ort']))
 				echo '<span class="input_error">Fehler beim löschen der Raumzuordnung: '.$db->convert_html_chars($reihungstest->errormsg).'</span>';
 		}
-		else 
+		else
 			echo '<span class="input_error">Dem Raum '.$_POST['delete_ort'].' sind noch '.count($delete_ort->result).' Personen zugeteilt. Bitte entfernen Sie zuerst diese Zuteilungen</span>';
-		
-		
-		
+
 		$reihungstest_id = $_POST['reihungstest_id'];
 		$studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 	}
 	$neu=false;
 }
 
-if(isset($_POST['delete_studienplan'])) //@todo: Check, ob Zuordnungen zu diesem Studienplan vorhanden sind. Wenn ja, nicht loeschen! 
+if(isset($_POST['delete_studienplan'])) //@todo: Check, ob Zuordnungen zu diesem Studienplan vorhanden sind. Wenn ja, nicht loeschen!
 {
 	if(isset($_POST['reihungstest_id']) && $_POST['reihungstest_id']!='')
 	{
@@ -1389,7 +1253,6 @@ if(isset($_POST['delete_studienplan'])) //@todo: Check, ob Zuordnungen zu diesem
 	}
 	$neu=false;
 }
-//var_dump($_POST);
 
 echo '<table width="100%"><tr><td>';
 
@@ -1448,33 +1311,6 @@ if($studienplan_id!='')
 		$studienplan_id='';
 	}
 }
-/*
-// Studienplan DropDown
-echo "<SELECT name='studienplan' onchange='window.location.href=this.value'>";
-
-echo "<OPTION value='".$_SERVER['PHP_SELF']."?studienplan_id='>Studienplan auswaehlen</OPTION>";
-
-
-foreach($studienordnung_arr as $stoid=>$row_sto)
-{
-	$selected='';
-
-	echo '<option value="" disabled>Studienordnung: '.$db->convert_html_chars($row_sto['bezeichnung']).'</option>';
-
-	foreach ($studienplan_arr[$stoid] as $stpid=>$row_stp)
-	{
-		$selected='';
-		if($studienplan_id=='')
-			$studienplan_id=$stpid;
-		if($stpid == $studienplan_id)
-			$selected='selected';
-	
-		//echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz&studiensemester_kurzbz=$studiensemester_kurzbz' $selected>".$db->convert_html_chars($row->kuerzel)."</OPTION>"."\n";
-		echo '<option value="?stg_kz='.$stg_kz.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&studienplan_id='.$stpid.'" '.$selected.'>'.$db->convert_html_chars($row_stp['bezeichnung']).' ('.$orgform_arr[$row_stp['orgform_kurzbz']].', '.$row_stp['sprache'].') </option>';
-	}
-}
-echo "</SELECT>";
-*/
 // Studiensemester DropDown
 echo "<SELECT name='studiensemester' onchange='window.location.href=this.value'>";
 
@@ -1498,7 +1334,7 @@ elseif($stg_kz==-1 && $studiensemester_kurzbz!='')
 	$reihungstest->getReihungstest('','datum DESC,uhrzeit DESC',$studiensemester_kurzbz);
 else
 	$reihungstest->getReihungstest($stg_kz,'datum DESC,uhrzeit DESC',$studiensemester_kurzbz);
-	
+
 
 echo "<SELECT name='reihungstest' id='reihungstest' onchange='window.location.href=this.value'>";
 foreach ($reihungstest->result as $row)
@@ -1601,30 +1437,30 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				&nbsp;&nbsp;Studiensemester
 				<select id='studiensemester_dropdown' name='studiensemester_kurzbz'>
 				<option value=''>-- keine Auswahl --</option>
-					<?php 
+					<?php
 						foreach ($studiensemester->studiensemester as $row)
 						{
 							if($row->studiensemester_kurzbz == $studiensemester_kurzbz)
 								$selected='selected';
 							else
 								$selected='';
-						
+
 							echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.$selected.'>'.$db->convert_html_chars($row->studiensemester_kurzbz).'</OPTION>'.'\n';
 						}
 					?>
 				</select>
 			</td>
 		</tr>
-		<?php 
+		<?php
 		if($neu)
 		{
 			echo '<tr>';
 			echo '<td class="feldtitel">Studienplan</td>';
 			echo '<td>';
-			
+
 			// Studienplan DropDown
 			echo "<SELECT id='studienplan_dropdown' name='studienplan_id'>";
-			
+
 			echo "<OPTION value=''>Studienplan auswaehlen</OPTION>";
 			// Pruefen ob uebergebene StudienplanID in Auswahl enthalten
 			// ist und ggf auf leer setzen
@@ -1647,9 +1483,9 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			foreach($studienordnung_arr as $stoid=>$row_sto)
 			{
 				$selected='';
-			
+
 				echo '<option value="" disabled>Studienordnung: '.$db->convert_html_chars($row_sto['bezeichnung']).'</option>';
-			
+
 				foreach ($studienplan_arr[$stoid] as $stpid=>$row_stp)
 				{
 					$selected='';
@@ -1657,17 +1493,17 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 						$studienplan_id=$stpid;
 					if($stpid == $studienplan_id)
 						$selected='selected';
-				
+
 					echo '<option value="'.$stpid.'" '.$selected.'>'.$db->convert_html_chars($row_stp['bezeichnung']).' ('.$orgform_arr[$row_stp['orgform_kurzbz']].', '.$row_stp['sprache'].') </option>';
 				}
 			}
 			echo "</SELECT>";
 			echo '</td></tr>';
 		}
-		else 
-		{		
+		else
+		{
 			echo '<td class="feldtitel">Studienpläne</td>';
-			
+
 			if(!$neu)
 			{
 				//echo '<td><table>';
@@ -1676,12 +1512,12 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				echo '<input id="studienplan_autocomplete" type="text" name="studienplan" size="40" placeholder="Weiterer Studienplan" value="">';
 				echo '<button type="submit" name="speichern"><img src="../../skin/images/list-add.png" alt="Studienplan hinzufügen" height="13px"></button></td>';
 				echo '</tr>';
-				
+
 				foreach ($studienplaene->result AS $row)
 				{
 					$studienplan = new studienplan();
 					$studienplan->loadStudienplan($row->studienplan_id);
-					
+
 					echo '<tr><td>&nbsp;</td>';
 					echo '<td class="listitem">'.$studienplan->bezeichnung.' ('.$studienplan->studienplan_id.')</td>';
 					echo '<td><button type="submit" name="delete_studienplan" value="'.$row->studienplan_id.'"><img src="../../skin/images/delete_x.png" alt="Studienplan entfernen" height="13px"></button></td>';
@@ -1689,7 +1525,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				}
 				//echo '</table></td>';
 			}
-			else 
+			else
 				echo '<td colspan="2">Nach dem Anlegen eines Termins, können Sie weitere Studienpläne zuordnen</td>';
 		}
 
@@ -1704,7 +1540,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				echo '<button type="submit" name="speichern"><img src="../../skin/images/list-add.png" alt="Ort hinzufügen" height="13px"></button></td>';
 				echo '</td></tr>';
 			}
-			else 
+			else
 			{
 				echo '<td colspan="2">Keine Berechtigung zum zuteilen von Räumen</td>';
 			}
@@ -1716,7 +1552,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				$person->getPersonFromBenutzer($row->uid);
 				if ($row->uid != '')
 					$anzeigename = $person->vorname.' '.$person->nachname.' ('.$row->uid.')';
-				else 
+				else
 					$anzeigename = '';
 
 				echo '<tr><td>&nbsp;</td>';
@@ -1729,7 +1565,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			}
 			//echo '</table></td>';
 		}
-		else 
+		else
 		{
 			echo '<tr><td class="feldtitel">Ort</td>';
 			echo '<td colspan="2">Nach dem Anlegen eines Termins, können Sie Räume zuordnen</td></tr>';
@@ -1824,8 +1660,8 @@ if($reihungstest_id!='')
 {
 //Liste der Interessenten die zum Reihungstest angemeldet sind
 	$qry = "
-
-SELECT 
+SELECT
+rt_person_id,
 rt_id,
 prestudent_id,
 tbl_rt_person.person_id,
@@ -1836,7 +1672,7 @@ studienplan_id,
 studiengang_kz,
 gebdatum,
 geschlecht,
-rt_punkte1
+punkte
 ,(
 	SELECT kontakt
 	FROM tbl_kontakt
@@ -1868,61 +1704,14 @@ rt_punkte1
 	) AS orgform_kurzbz
 FROM public.tbl_rt_person
 JOIN public.tbl_person USING (person_id)
-JOIN public.tbl_prestudent ON (tbl_rt_person.person_id=tbl_prestudent.person_id AND tbl_rt_person.rt_id=tbl_prestudent.reihungstest_id)
+JOIN public.tbl_prestudent ON (tbl_rt_person.person_id=tbl_prestudent.person_id)
 WHERE rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER);
 if ($studienplaene_list != '')
 $qry .= "AND tbl_rt_person.studienplan_id IN (".$studienplaene_list.")";
 
-$qry .= "ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname
+$qry .= " AND tbl_rt_person.studienplan_id IN(SELECT studienplan_id FROM public.tbl_prestudentstatus where prestudent_id=tbl_prestudent.prestudent_id)
+ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname";
 
-/*
-SELECT 
-prestudent_id,
-person_id,
-vorname,
-nachname,
-ort_kurzbz,
-studienplan_id,
-studiengang_kz,
-gebdatum,
-geschlecht,
-rt_punkte1
-,(
-	SELECT kontakt
-	FROM tbl_kontakt
-	WHERE kontakttyp = 'email'
-		AND person_id = tbl_prestudent.person_id
-		AND zustellung = true LIMIT 1
-	) AS email
-,(
-	SELECT ausbildungssemester
-	FROM public.tbl_prestudentstatus
-	WHERE prestudent_id = tbl_prestudent.prestudent_id
-		AND datum = (
-			SELECT MAX(datum)
-			FROM public.tbl_prestudentstatus
-			WHERE prestudent_id = tbl_prestudent.prestudent_id
-				AND status_kurzbz = 'Interessent'
-			) LIMIT 1
-	) AS ausbildungssemester
-,(
-	SELECT orgform_kurzbz
-	FROM public.tbl_prestudentstatus
-	WHERE prestudent_id = tbl_prestudent.prestudent_id
-		AND datum = (
-			SELECT MAX(datum)
-			FROM public.tbl_prestudentstatus
-			WHERE prestudent_id = tbl_prestudent.prestudent_id
-				AND status_kurzbz = 'Interessent'
-			) LIMIT 1
-	) AS orgform_kurzbz
-FROM public.tbl_rt_person
-JOIN public.tbl_person USING (person_id)
-JOIN public.tbl_prestudent USING (person_id)
-WHERE reihungstest_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER)."
-AND tbl_rt_person.studienplan_id IN (".$studienplaene_list.")
-ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname */";
-//echo $qry;
 $mailto = '';
 $result_arr = array();
 
@@ -1938,10 +1727,10 @@ if($result = $db->db_query($qry))
 	while($row = $db->db_fetch_object($result))
 	{
 		$result_arr[] = $row;
-		
+
 		if (is_null($row->ort_kurzbz))
 			$orte_zuteilung_array['ohne']++;
-		else 
+		else
 			$orte_zuteilung_array[$row->ort_kurzbz]++;
 	}
 }
@@ -1967,9 +1756,9 @@ if($result = $db->db_query($qry))
 	echo '<br>';
 	echo '<table><tr>';
 
-	
+
 	$pruefling = new pruefling();
-	
+
 	$cnt = 0;
 	if ($orte_zuteilung_array['ohne']>0)
 	{
@@ -2030,7 +1819,7 @@ if($result = $db->db_query($qry))
 						{
 							$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz].'<br>';
 						}
-	
+
 					}
 				}
 			}
@@ -2052,17 +1841,17 @@ if($result = $db->db_query($qry))
 						<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
 						<td style="display: table-cell" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
 						<td style="display: table-cell; align: right" class="clm_ergebnis"">'.($rtergebnis==0?'-':number_format($rtergebnis,2,'.','')).'</td>
-						<td style="display: table-cell; align: right" class="clm_fas">'.($rtergebnis!=0 && $row->rt_punkte1==''?'<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&prestudent_id='.$row->prestudent_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>':$row->rt_punkte1).'</td>
+						<td style="display: table-cell; align: right" class="clm_fas">'.($rtergebnis!=0 && $row->punkte==''?'<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&rt_person_id='.$row->rt_person_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>':$row->punkte).'</td>
 					</tr>';
 
 				$mailto.= ($mailto!=''?',':'').$row->email;
 			}
 		}
 		echo '</tbody></table>';
-	
+
 		echo '<select name="raumzuteilung">';
 		echo '<option value="">Ohne Zuteilung</option>';
-	
+
 		foreach ($orte->result AS $item)
 		{
 			if($item->ort_kurzbz=='')
@@ -2079,14 +1868,14 @@ if($result = $db->db_query($qry))
 	foreach ($orte->result AS $ort)
 	{
 		$cnt++;
-		
+
 		echo '<td style="vertical-align: top">';
 		if ($orte_array[$ort->ort_kurzbz] - $orte_zuteilung_array[$ort->ort_kurzbz] < 0)
 			$style = 'text-align: center; margin: 0 5px 0 5px; color: red';
-		else 
+		else
 			$style = 'text-align: center; margin: 0 5px 0 5px;';
 		echo '<div style="'.$style.'"><b>'.$ort->ort_kurzbz.' ('.$orte_zuteilung_array[$ort->ort_kurzbz].'/'.$orte_array[$ort->ort_kurzbz].')</b></div>';
-		
+
 		if ($orte_zuteilung_array[$ort->ort_kurzbz]>0)
 		{
 			echo '<form id="raumzuteilung_form['.$ort->ort_kurzbz.']" method="POST" action="'.$_SERVER['PHP_SELF'].'">';
@@ -2143,7 +1932,7 @@ if($result = $db->db_query($qry))
 							{
 								$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz].'<br>';
 							}
-		
+
 						}
 					}
 				}
@@ -2166,38 +1955,17 @@ if($result = $db->db_query($qry))
 							<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
 							<td style="display: table-cell" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
 							<td style="display: table-cell; align: right" class="clm_ergebnis"">'.($rtergebnis==0?'-':number_format($rtergebnis,2,'.','')).'</td>
-							<td style="display: table-cell; align: right" class="clm_fas">'.($rtergebnis!=0 && $row->rt_punkte1==''?'<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&prestudent_id='.$row->prestudent_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>':$row->rt_punkte1).'</td>
+							<td style="display: table-cell; align: right" class="clm_fas">'.($rtergebnis!=0 && $row->punkte==''?'<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&rt_person_id='.$row->rt_person_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>':$row->punkte).'</td>
 						</tr>';
-		
+
 					$mailto.= ($mailto!=''?',':'').$row->email;
 				}
 			}
-			if (1==0)
-			{
-				echo '
-					<tr>
-						<td style="text-align: center">-</td>
-						<td style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">-</td>
-						<td style="display: table-cell" class="clm_person_id" title="PersonID">-</td>
-						<td>-</td>
-						<td>-</td>
-						<td style="display: table-cell" class="clm_geschlecht">-</td>
-						<td style="display: table-cell" class="clm_studiengang">-</td>
-						<td style="display: table-cell" class="clm_orgform">-</td>
-						<td style="display: table-cell" class="clm_studienplan">-</td>
-						<td style="display: table-cell" class="clm_einstiegssemester">-</td>
-						<td style="display: table-cell" class="clm_geburtsdatum">-</td>
-						<td style="display: table-cell; align: center" class="clm_email">-</td>
-						<td style="display: table-cell" class="clm_absolviert">-</td>
-						<td style="display: table-cell; align: right" class="clm_ergebnis"">-</td>
-						<td style="display: table-cell; align: right" class="clm_fas">-</td>
-					</tr>';
-			}
 			echo '</tbody></table>';
-			
+
 			echo '<select name="raumzuteilung">';
 			echo '<option value="">Zuteilung entfernen</option>';
-			
+
 			foreach ($orte->result AS $item)
 			{
 				if($item->ort_kurzbz==$ort->ort_kurzbz)
@@ -2210,14 +1978,12 @@ if($result = $db->db_query($qry))
 			echo '<button type="submit" name="raumzuteilung_speichern">Speichern</button>';
 			echo '</form>';
 		}
-		else 
+		else
 			echo '<table style="width: 100%; margin: 10px 0pt 15px;"><tr><td style="text-align: center; background: #DCE4EF; border: 1px solid white; padding: 4px; font-size: 8pt"><b>Leer</b></td></tr></table>';
-		
+
 		echo '</td>';
 	}
-	
-	
-	
+
 	echo '</tr></table>';
 	//echo "<span style='font-size: 9pt'><a href='mailto:?bcc=$mailto'>Mail an alle senden</a></span>"; //@todo: Braucht man das noch oder eventuell gleich raumweise?
 } ?>

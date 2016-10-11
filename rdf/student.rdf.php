@@ -153,52 +153,53 @@ function draw_content_liste($row)
 	$reihungstest = new reihungstest($row->reihungstest_id);
 	$rt_datum = $reihungstest->datum;
 	echo '
-	  <RDF:li>
-      	<RDF:Description  id="'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'" >
-        	<STUDENT:person_id><![CDATA['.$row->person_id.']]></STUDENT:person_id>
-        	<STUDENT:prestudent_id><![CDATA['.$row->prestudent_id.']]></STUDENT:prestudent_id>
-        	<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
-    		<STUDENT:titelpre><![CDATA['.$row->titelpre.']]></STUDENT:titelpre>
-    		<STUDENT:titelpost><![CDATA['.$row->titelpost.']]></STUDENT:titelpost>
-    		<STUDENT:vornamen><![CDATA['.$row->vornamen.']]></STUDENT:vornamen>
-    		<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
-    		<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
-    		<STUDENT:geschlecht><![CDATA['.$row->geschlecht.']]></STUDENT:geschlecht>
-    		<STUDENT:svnr>'.($row->svnr==''?'&#xA0;':'<![CDATA['.$row->svnr.']]>').'</STUDENT:svnr>
-    		<STUDENT:ersatzkennzeichen>'.($row->ersatzkennzeichen==''?'&#xA0;':'<![CDATA['.$row->ersatzkennzeichen.']]>').'</STUDENT:ersatzkennzeichen>
-    		<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
-    		<STUDENT:geburtsdatum_iso><![CDATA['.$row->gebdatum.']]></STUDENT:geburtsdatum_iso>
+	<RDF:li>
+		<RDF:Description  id="'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'" >
+			<STUDENT:person_id><![CDATA['.$row->person_id.']]></STUDENT:person_id>
+			<STUDENT:prestudent_id><![CDATA['.$row->prestudent_id.']]></STUDENT:prestudent_id>
+			<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
+			<STUDENT:titelpre><![CDATA['.$row->titelpre.']]></STUDENT:titelpre>
+			<STUDENT:titelpost><![CDATA['.$row->titelpost.']]></STUDENT:titelpost>
+			<STUDENT:vornamen><![CDATA['.$row->vornamen.']]></STUDENT:vornamen>
+			<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
+			<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
+			<STUDENT:geschlecht><![CDATA['.$row->geschlecht.']]></STUDENT:geschlecht>
+			<STUDENT:svnr>'.($row->svnr==''?'&#xA0;':'<![CDATA['.$row->svnr.']]>').'</STUDENT:svnr>
+			<STUDENT:ersatzkennzeichen>'.($row->ersatzkennzeichen==''?'&#xA0;':'<![CDATA['.$row->ersatzkennzeichen.']]>').'</STUDENT:ersatzkennzeichen>
+			<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
+			<STUDENT:geburtsdatum_iso><![CDATA['.$row->gebdatum.']]></STUDENT:geburtsdatum_iso>
 			<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:'').']]></STUDENT:semester>
-    		<STUDENT:verband><![CDATA['.(isset($row->verband)?$row->verband:'').']]></STUDENT:verband>
-    		<STUDENT:gruppe><![CDATA['.(isset($row->gruppe)?$row->gruppe:'').']]></STUDENT:gruppe>
+			<STUDENT:verband><![CDATA['.(isset($row->verband)?$row->verband:'').']]></STUDENT:verband>
+			<STUDENT:gruppe><![CDATA['.(isset($row->gruppe)?$row->gruppe:'').']]></STUDENT:gruppe>
 			<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
-    		<STUDENT:mail_privat><![CDATA['.$row->email_privat.']]></STUDENT:mail_privat>
-    		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
+			<STUDENT:mail_privat><![CDATA['.$row->email_privat.']]></STUDENT:mail_privat>
+			<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 			<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
 			<STUDENT:status_datum><![CDATA['.$datum_obj->formatDatum($prestudent->datum,'d.m.Y').']]></STUDENT:status_datum>
 			<STUDENT:status_bestaetigung><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'d.m.Y'):'-').']]></STUDENT:status_bestaetigung>
 			<STUDENT:status_datum_iso><![CDATA['.$datum_obj->formatDatum($prestudent->datum,'Y-m-d').']]></STUDENT:status_datum_iso>
 			<STUDENT:status_bestaetigung_iso><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'Y-m-d'):'-').']]></STUDENT:status_bestaetigung_iso>
-    		<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
-    		<STUDENT:anmerkungpre>'.($row->anmerkung==''?'&#xA0;':'<![CDATA['.$row->anmerkung.']]>').'</STUDENT:anmerkungpre>
-    		<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
-		<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
-		<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
-    		<STUDENT:studienplan_bezeichnung><![CDATA['.$studienplan_bezeichnung.']]></STUDENT:studienplan_bezeichnung>
-		<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
-		<STUDENT:punkte><![CDATA['.$row->punkte.']]></STUDENT:punkte>
-		<STUDENT:punkte1><![CDATA['.$row->rt_punkte1.']]></STUDENT:punkte1>
-		<STUDENT:punkte2><![CDATA['.$row->rt_punkte2.']]></STUDENT:punkte2>
-		<STUDENT:punkte3><![CDATA['.$row->rt_punkte3.']]></STUDENT:punkte3>
-		<STUDENT:rt_datum><![CDATA['.$rt_datum.']]></STUDENT:rt_datum>
-		<STUDENT:rt_anmeldung><![CDATA['.$row->anmeldungreihungstest.']]></STUDENT:rt_anmeldung>
-		<STUDENT:dual><![CDATA['.($row->dual=='t'?'true':'false').']]></STUDENT:dual>
-		<STUDENT:dual_bezeichnung><![CDATA['.($row->dual=='t'?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
-		<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
-		<STUDENT:mentor><![CDATA['.$row->mentor.']]></STUDENT:mentor>
-		<STUDENT:aktiv><![CDATA['.((isset($row->bnaktiv) && $row->bnaktiv=='t')?'true':'false').']]></STUDENT:aktiv>
-      	</RDF:Description>
-      </RDF:li>';
+			<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
+			<STUDENT:anmerkungpre>'.($row->anmerkung==''?'&#xA0;':'<![CDATA['.$row->anmerkung.']]>').'</STUDENT:anmerkungpre>
+			<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
+			<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
+			<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
+			<STUDENT:studienplan_bezeichnung><![CDATA['.$studienplan_bezeichnung.']]></STUDENT:studienplan_bezeichnung>
+			<STUDENT:studienplan_id><![CDATA['.$prestudent->studienplan_id.']]></STUDENT:studienplan_id>
+			<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
+			<STUDENT:punkte><![CDATA['.$row->punkte.']]></STUDENT:punkte>
+			<STUDENT:punkte1><![CDATA['.$row->rt_punkte1.']]></STUDENT:punkte1>
+			<STUDENT:punkte2><![CDATA['.$row->rt_punkte2.']]></STUDENT:punkte2>
+			<STUDENT:punkte3><![CDATA['.$row->rt_punkte3.']]></STUDENT:punkte3>
+			<STUDENT:rt_datum><![CDATA['.$rt_datum.']]></STUDENT:rt_datum>
+			<STUDENT:rt_anmeldung><![CDATA['.$row->anmeldungreihungstest.']]></STUDENT:rt_anmeldung>
+			<STUDENT:dual><![CDATA['.($row->dual=='t'?'true':'false').']]></STUDENT:dual>
+			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual=='t'?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
+			<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
+			<STUDENT:mentor><![CDATA['.$row->mentor.']]></STUDENT:mentor>
+			<STUDENT:aktiv><![CDATA['.((isset($row->bnaktiv) && $row->bnaktiv=='t')?'true':'false').']]></STUDENT:aktiv>
+		</RDF:Description>
+	</RDF:li>';
 }
 
 function draw_content($row)
@@ -257,46 +258,47 @@ function draw_content($row)
 		else
 			$semester_prestudent = '';
 	echo '
-	  <RDF:li>
-      	<RDF:Description  id="'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'" >
-        	<STUDENT:person_id><![CDATA['.$row->person_id.']]></STUDENT:person_id>
-    		<STUDENT:titelpre><![CDATA['.$row->titelpre.']]></STUDENT:titelpre>
-    		<STUDENT:titelpost><![CDATA['.$row->titelpost.']]></STUDENT:titelpost>
-    		<STUDENT:vornamen><![CDATA['.$row->vornamen.']]></STUDENT:vornamen>
-    		<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
-    		<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
-    		<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
-    		<STUDENT:geburtsdatum_iso><![CDATA['.$row->gebdatum.']]></STUDENT:geburtsdatum_iso>
-    		<STUDENT:homepage><![CDATA['.$row->homepage.']]></STUDENT:homepage>
-    		<STUDENT:gebort><![CDATA['.$row->gebort.']]></STUDENT:gebort>
-    		<STUDENT:gebzeit><![CDATA['.$row->gebzeit.']]></STUDENT:gebzeit>
-    		<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
-    		<STUDENT:anrede><![CDATA['.$row->anrede.']]></STUDENT:anrede>
-    		<STUDENT:svnr><![CDATA['.$row->svnr.']]></STUDENT:svnr>
-    		<STUDENT:ersatzkennzeichen><![CDATA['.$row->ersatzkennzeichen.']]></STUDENT:ersatzkennzeichen>
-    		<STUDENT:familienstand><![CDATA['.$row->familienstand.']]></STUDENT:familienstand>
-    		<STUDENT:geschlecht><![CDATA['.$row->geschlecht.']]></STUDENT:geschlecht>
-    		<STUDENT:anzahlkinder><![CDATA['.$row->anzahlkinder.']]></STUDENT:anzahlkinder>
-    		<STUDENT:staatsbuergerschaft><![CDATA['.$row->staatsbuergerschaft.']]></STUDENT:staatsbuergerschaft>
-    		<STUDENT:geburtsnation><![CDATA['.$row->geburtsnation.']]></STUDENT:geburtsnation>
-    		<STUDENT:sprache><![CDATA['.$row->sprache.']]></STUDENT:sprache>
-    		<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
+	<RDF:li>
+		<RDF:Description  id="'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'" >
+			<STUDENT:person_id><![CDATA['.$row->person_id.']]></STUDENT:person_id>
+			<STUDENT:titelpre><![CDATA['.$row->titelpre.']]></STUDENT:titelpre>
+			<STUDENT:titelpost><![CDATA['.$row->titelpost.']]></STUDENT:titelpost>
+			<STUDENT:vornamen><![CDATA['.$row->vornamen.']]></STUDENT:vornamen>
+			<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
+			<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
+			<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
+			<STUDENT:geburtsdatum_iso><![CDATA['.$row->gebdatum.']]></STUDENT:geburtsdatum_iso>
+			<STUDENT:homepage><![CDATA['.$row->homepage.']]></STUDENT:homepage>
+			<STUDENT:gebort><![CDATA['.$row->gebort.']]></STUDENT:gebort>
+			<STUDENT:gebzeit><![CDATA['.$row->gebzeit.']]></STUDENT:gebzeit>
+			<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
+			<STUDENT:anrede><![CDATA['.$row->anrede.']]></STUDENT:anrede>
+			<STUDENT:svnr><![CDATA['.$row->svnr.']]></STUDENT:svnr>
+			<STUDENT:ersatzkennzeichen><![CDATA['.$row->ersatzkennzeichen.']]></STUDENT:ersatzkennzeichen>
+			<STUDENT:familienstand><![CDATA['.$row->familienstand.']]></STUDENT:familienstand>
+			<STUDENT:geschlecht><![CDATA['.$row->geschlecht.']]></STUDENT:geschlecht>
+			<STUDENT:anzahlkinder><![CDATA['.$row->anzahlkinder.']]></STUDENT:anzahlkinder>
+			<STUDENT:staatsbuergerschaft><![CDATA['.$row->staatsbuergerschaft.']]></STUDENT:staatsbuergerschaft>
+			<STUDENT:geburtsnation><![CDATA['.$row->geburtsnation.']]></STUDENT:geburtsnation>
+			<STUDENT:sprache><![CDATA['.$row->sprache.']]></STUDENT:sprache>
+			<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
 			<STUDENT:status_datum><![CDATA['.$datum_obj->formatDatum($prestudent->datum,'d.m.Y').']]></STUDENT:status_datum>
 			<STUDENT:status_datum_iso><![CDATA['.$datum_obj->formatDatum($prestudent->datum,'Y-m-d').']]></STUDENT:status_datum_iso>
 			<STUDENT:status_bestaetigung><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'d.m.Y'):'-').']]></STUDENT:status_bestaetigung>
 			<STUDENT:status_bestaetigung_iso><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'Y-m-d'):'-').']]></STUDENT:status_bestaetigung_iso>
-    		<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
-    		<STUDENT:studienplan_bezeichnung><![CDATA['.$studienplan_bezeichnung.']]></STUDENT:studienplan_bezeichnung>
-    		<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
-    		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
+			<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
+			<STUDENT:studienplan_bezeichnung><![CDATA['.$studienplan_bezeichnung.']]></STUDENT:studienplan_bezeichnung>
+			<STUDENT:studienplan_id><![CDATA['.$prestudent->studienplan_id.']]></STUDENT:studienplan_id>
+			<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
+			<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 
-    		<STUDENT:aktiv><![CDATA['.$aktiv.']]></STUDENT:aktiv>
-    		<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
-    		<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
+			<STUDENT:aktiv><![CDATA['.$aktiv.']]></STUDENT:aktiv>
+			<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
+			<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
 			<STUDENT:alias><![CDATA['.(isset($row->alias)?$row->alias:'').']]></STUDENT:alias>
-    		<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:$semester_prestudent).']]></STUDENT:semester>
-    		<STUDENT:verband><![CDATA['.(isset($row->verband)?$row->verband:'').']]></STUDENT:verband>
-    		<STUDENT:gruppe><![CDATA['.(isset($row->gruppe)?$row->gruppe:'').']]></STUDENT:gruppe>
+			<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:$semester_prestudent).']]></STUDENT:semester>
+			<STUDENT:verband><![CDATA['.(isset($row->verband)?$row->verband:'').']]></STUDENT:verband>
+			<STUDENT:gruppe><![CDATA['.(isset($row->gruppe)?$row->gruppe:'').']]></STUDENT:gruppe>
 			<STUDENT:studiengang_kz_student><![CDATA['.(is_a($row,'student')?$row->studiengang_kz:'').']]></STUDENT:studiengang_kz_student>
 			<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
 			<STUDENT:studiengang_studiengangsleitung><![CDATA['.$stgl.']]></STUDENT:studiengang_studiengangsleitung>
@@ -313,7 +315,7 @@ function draw_prestudent($row)
 	{
 	echo '
 			<STUDENT:prestudent_id><![CDATA['.$row->prestudent_id.']]></STUDENT:prestudent_id>
-    		<STUDENT:studiengang_kz_prestudent><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz_prestudent>
+			<STUDENT:studiengang_kz_prestudent><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz_prestudent>
 			<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
 			<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
 			<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
@@ -347,8 +349,8 @@ function draw_prestudent($row)
 			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
 			<STUDENT:anmerkungpre><![CDATA['.$row->anmerkung.']]></STUDENT:anmerkungpre>
 			<STUDENT:mentor><![CDATA['.$row->mentor.']]></STUDENT:mentor>
-      	</RDF:Description>
-      </RDF:li>';
+		</RDF:Description>
+	</RDF:li>';
 	}
 }
 
