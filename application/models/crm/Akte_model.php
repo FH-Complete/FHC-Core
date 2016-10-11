@@ -89,7 +89,7 @@ class Akte_model extends DB_Model
 	/**
 	 * 
 	 */
-	public function getAktenAccepted($person_id, $dokument_kurzbz)
+	public function getAktenAccepted($person_id, $dokument_kurzbz = null)
 	{
 		// Checks if the operation is permitted by the API caller
 		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 's'))
@@ -98,7 +98,7 @@ class Akte_model extends DB_Model
 			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_prestudent'), FHC_MODEL_ERROR);
 		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_dokumentprestudent'), 's'))
 			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_dokumentprestudent'), FHC_MODEL_ERROR);
-		
+		//CASE WHEN dp.dokument_kurzbz IS NOT NULL THEN TRUE ELSE FALSE END AS accepted
 		$query = 'SELECT a.akte_id,
 						 a.person_id,
 						 a.dokument_kurzbz,
@@ -118,20 +118,23 @@ class Akte_model extends DB_Model
 						 a.anmerkung,
 						 a.nachgereicht,
 						 a.nachgereicht_am,
-						 CASE WHEN a.inhalt IS NOT NULL THEN TRUE ELSE FALSE END AS inhalt_vorhanden,
-						 (
-							SELECT CASE WHEN COUNT(dokument_kurzbz) > 0 THEN TRUE ELSE FALSE END
-							  FROM public.tbl_prestudent p
-						INNER JOIN public.tbl_dokumentprestudent dp USING(prestudent_id)
-							 WHERE p.person_id = ?
-							   AND dp.dokument_kurzbz = ?
-						 ) AS accepted
+						 CASE WHEN MAX(dp.dokument_kurzbz) IS NOT NULL THEN TRUE ELSE FALSE END AS accepted
 					FROM public.tbl_akte a
-				   WHERE a.person_id = ?
-					 AND a.dokument_kurzbz = ?
-				ORDER BY a.erstelltam';
+			  INNER JOIN public.tbl_prestudent p USING(person_id)
+			   LEFT JOIN public.tbl_dokumentprestudent dp USING(prestudent_id, dokument_kurzbz)
+				   WHERE a.person_id = ?';
 		
-		$result = $this->db->query($query, array($person_id, $dokument_kurzbz, $person_id, $dokument_kurzbz));
+		$parametersArray = array($person_id);
+		
+		if (!empty($dokument_kurzbz))
+		{
+			$query .= ' AND a.dokument_kurzbz = ?';
+			array_push($parametersArray, $dokument_kurzbz);
+		}
+		
+		$query .= ' GROUP BY a.akte_id ORDER BY a.erstelltam';
+		
+		$result = $this->db->query($query, $parametersArray);
 		
 		if (is_object($result))
 			return $this->_success($result->result());

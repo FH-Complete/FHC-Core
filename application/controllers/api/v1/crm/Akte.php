@@ -77,7 +77,7 @@ class Akte extends APIv1_Controller
 		$person_id = $this->get('person_id');
 		$dokument_kurzbz = $this->get('dokument_kurzbz');
 		
-		if (isset($person_id) && isset($dokument_kurzbz))
+		if (isset($person_id))
 		{
 			$result = $this->AkteModel->getAktenAccepted($person_id, $dokument_kurzbz);
 			
