@@ -415,3 +415,5 @@
 <!ENTITY tab-prestudent-aufnahme.anmeldung  "Anmeldung zum Reihungstest am">
 <!ENTITY tab-prestudent-aufnahme.absolviert  "Zum Reihungstest angetreten">
 <!ENTITY tab-prestudent-aufnahme.seminar  "Reihungstest">
+
+<!ENTITY aufnahmetermine-reihungstest.absolviert  "Reihungstest absolviert">

@@ -40,8 +40,7 @@ $oRdf = new rdf('AUFNAHMETERMINE','http://www.technikum-wien.at/aufnahmetermine'
 
 $prestudent_id = filter_input(INPUT_GET, 'prestudent_id');
 
-$person_id = filter_input(INPUT_GET, 'person_id');
-$rt_id = filter_input(INPUT_GET, 'rt_id');
+$rt_person_id = filter_input(INPUT_GET, 'rt_person_id');
 
 $oRdf->sendHeader();
 
@@ -59,10 +58,10 @@ if($prestudent_id!='')
 		drawrow($row);
 	}
 }
-elseif($person_id!='' && $rt_id!='')
+elseif($rt_person_id!='')
 {
 	$reihungstest = new reihungstest();
-	if($reihungstest->getPersonReihungstest($person_id, $rt_id))
+	if($reihungstest->loadReihungstestPerson($rt_person_id))
 		drawrow($reihungstest);
 	else
 		die($reihungstest->errormsg);
@@ -75,7 +74,8 @@ function drawrow($row)
 	$reihungstest_obj = new reihungstest();
 	$reihungstest_obj->load($row->rt_id);
 
-	$i=$oRdf->newObjekt($row->rt_id.'/'.$row->person_id);
+	$i=$oRdf->newObjekt($row->rt_person_id);
+	$oRdf->obj[$i]->setAttribut('rt_person_id',$row->rt_person_id,true);
 	$oRdf->obj[$i]->setAttribut('rt_id',$row->rt_id,true);
 	$oRdf->obj[$i]->setAttribut('person_id',$row->person_id,true);
 	$oRdf->obj[$i]->setAttribut('anmeldedatum',$datum_obj->formatDatum($row->anmeldedatum, 'd.m.Y'),true);
@@ -85,8 +85,9 @@ function drawrow($row)
 	$oRdf->obj[$i]->setAttribut('ort_kurzbz',$row->ort_kurzbz,true);
 	$oRdf->obj[$i]->setAttribut('reihungstest',$reihungstest_obj->datum.' '.$reihungstest_obj->anmerkung,true);
 	$oRdf->obj[$i]->setAttribut('stufe',$reihungstest_obj->stufe,true);
+	$oRdf->obj[$i]->setAttribut('studienplan_id',$row->studienplan_id,true);
 
-	$oRdf->addSequence($row->rt_id.'/'.$row->person_id);
+	$oRdf->addSequence($row->rt_person_id);
 }
 
 $oRdf->sendRdfText();

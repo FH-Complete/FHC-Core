@@ -509,61 +509,6 @@ if(!$error)
 
 			if(!$error)
 			{
-				if($prestudent->reihungstest_id=='' && $_POST['reihungstest_id']!='')
-				{
-					$stg = new studiengang($prestudent->studiengang_kz);
-					$datum_obj = new datum();
-					//Hinweis anzeigen, falls diese Person bereits in einem anderen Studiengang (des gleichen typs (b,m,d)
-					//einen RT absolviert hat bzw angemeldet ist
-					$qry = "SELECT tbl_studiengang.kurzbzlang, tbl_reihungstest.datum
-							FROM
-								public.tbl_prestudent
-								JOIN public.tbl_studiengang USING(studiengang_kz)
-								LEFT JOIN public.tbl_reihungstest USING(reihungstest_id)
-							WHERE
-								person_id=".$db->db_add_param($prestudent->person_id, FHC_INTEGER)."
-								AND reihungstest_id is not null
-								AND tbl_studiengang.typ=".$db->db_add_param($stg->typ);
-
-					if($result = $db->db_query($qry))
-					{
-						if($db->db_num_rows($result)>0)
-						{
-							$warning.= "Hinweis: Diese Person hat bereits Reihungstestzuordnungen in anderen Studiengängen:\n\n";
-							while($row = $db->db_fetch_object($result))
-							{
-								$warning.= $row->kurzbzlang.' am '.$datum_obj->formatDatum($row->datum,'d.m.Y')."\n";
-							}
-						}
-					}
-				}
-				if($prestudent->reihungstest_id != $_POST['reihungstest_id'])
-				{
-					$stg = new studiengang($prestudent->studiengang_kz);
-					$datum_obj = new datum();
-					//Hinweis anzeigen, falls diese Person bereits in einem anderen Studiengang (des gleichen typs (b,m,d)
-					//einen RT absolviert hat bzw angemeldet ist
-					$qry = "SELECT
-								reihungstest_id,
-								max_teilnehmer,
-								(SELECT count(*) FROM public.tbl_prestudent WHERE reihungstest_id=".$db->db_add_param($_POST['reihungstest_id'], FHC_INTEGER).") AS anzahl
-							FROM
-								public.tbl_reihungstest
-							WHERE
-								reihungstest_id=".$db->db_add_param($_POST['reihungstest_id'], FHC_INTEGER);
-
-					if($result = $db->db_query($qry))
-					{
-						//$warning.= "Hinweis: Diese Person hat bereits Reihungstestzuordnungen in anderen Studiengängen:\n\n";
-						if($row = $db->db_fetch_object($result))
-						{
-							if($row->max_teilnehmer!='' && $row->anzahl>$row->max_teilnehmer)
-							{
-								$warning.= "\n\n!!! Hinweis: Die maximale TeilnehmerInnenzahl für diesen Termin ($row->max_teilnehmer) wurde überschritten !!!";
-							}
-						}
-					}
-				}
 				$prestudent->prestudent_id = $_POST['prestudent_id'];
 				$prestudent->aufmerksamdurch_kurzbz = $_POST['aufmerksamdurch_kurzbz'];
 				$prestudent->person_id = $_POST['person_id'];
@@ -580,13 +525,6 @@ if(!$error)
 				$prestudent->zgvmanation = $_POST['zgvmanation'];
 				$prestudent->aufnahmeschluessel = $_POST['aufnahmeschluessel'];
 				$prestudent->facheinschlberuf = ($_POST['facheinschlberuf']=='true'?true:false);
-				$prestudent->reihungstest_id = $_POST['reihungstest_id'];
-				$prestudent->anmeldungreihungstest = $_POST['anmeldungreihungstest'];
-				$prestudent->reihungstestangetreten = ($_POST['reihungstestangetreten']=='true'?true:false);
-				$prestudent->punkte = str_replace(',','.',$_POST['punkte']);
-				$prestudent->rt_punkte1 = str_replace(',','.',$_POST['punkte1']);
-				$prestudent->rt_punkte2 = str_replace(',','.',$_POST['punkte2']);
-				$prestudent->rt_punkte3 = str_replace(',','.',$_POST['punkte3']);
 				$prestudent->bismelden = ($_POST['bismelden']=='true'?true:false);
 				$prestudent->dual = ($_POST['dual']=='true'?true:false);
 				$prestudent->anmerkung = $_POST['anmerkung'];
@@ -651,17 +589,29 @@ if(!$error)
 					// kann in Config abgestellt werden
 					if(REIHUNGSTEST_CHECK)
 					{
-						if($_POST['status_kurzbz']=='Bewerber' && !$prestd->anmeldungreihungstest)
+						$rt = new reihungstest();
+						$rt->getReihungstestPerson($prestd->person_id);
+						// Pruefen ob Person an zumindest einem RT-Termin teilgenommen hat
+						$reihungstestangetreten=false;
+						foreach($rt->result as $row_rt)
+						{
+							if($row_rt->teilgenommen)
+							{
+								$reihungstestangetreten=true;
+								break;
+							}
+						}
+						if($_POST['status_kurzbz']=='Bewerber' && count($rt->result)==0)
 						{
 							$error = true;
-							$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss das Reihungstestdatum gesetzt sein.";
+							$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss ein Reihungstest zugeteilt sein.";
 							$anzahl_fehler++;
 						}
 
-						if($_POST['status_kurzbz']=='Bewerber' && !$prestd->reihungstestangetreten)
+						if($_POST['status_kurzbz']=='Bewerber' && !$reihungstestangetreten)
 						{
 							$error = true;
-							$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss das Feld 'Zum Reihungstest angetreten' gesetzt sein.";
+							$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Person an einem Reihungstest teilgenommen haben";
 							$anzahl_fehler++;
 						}
 					}
@@ -3819,6 +3769,11 @@ if(!$error)
 				$data = $pruefling->getReihungstestErgebnis($_POST['prestudent_id']);
 			$return = true;
 		}
+		else
+		{
+			$return = false;
+			$errormsg = 'Fehlerhafte Parameteruebergabe';
+		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='getstundensatz')
 	{
@@ -3925,8 +3880,8 @@ if(!$error)
 				}
 				else
 				{
-					$rt_id_old = $_POST['rt_id_old'];
-					$rt_id_new = $_POST['rt_id_new'];
+					$rt_person_id = $_POST['rt_person_id'];
+					$rt_id = $_POST['rt_id'];
 					$person_id = $_POST['person_id'];
 					if($person_id=='')
 						$person_id=$prestudent->person_id;
@@ -3934,31 +3889,32 @@ if(!$error)
 					$ort_kurzbz = $_POST['ort_kurzbz'];
 					$teilgenommen = ($_POST['teilgenommen']=='true'?true:false);
 					$anmeldedatum = $_POST['anmeldedatum'];
+					$studienplan_id = $_POST['studienplan_id'];
 
 					$reihungstest = new reihungstest();
-					if($rt_id_old!='')
+					if($rt_person_id!='')
 					{
-						$reihungstest->getPersonReihungstest($person_id, $rt_id_old);
-						$reihungstest->rt_id_old = $rt_id_old;
-						$reihungstest->new=false;
+						$reihungstest->loadReihungstestPerson($rt_person_id);
 					}
 					else
 					{
 						$reihungstest->new=true;
 					}
 
-					$reihungstest->rt_id = $rt_id_new;
+					$reihungstest->rt_id = $rt_id;
 					$reihungstest->person_id = $person_id;
 					$reihungstest->punkte = $punkte;
 					$reihungstest->teilgenommen = $teilgenommen;
 					$reihungstest->anmeldedatum = $anmeldedatum;
 					$reihungstest->ort_kurzbz = $ort_kurzbz;
+					$reihungstest->studienplan_id = $studienplan_id;
 
 					if($reihungstest->savePersonReihungstest())
 					{
 						$return = true;
 						$error = false;
 						$errormsg = 'Erfolgreich gespeichert';
+						$data = $reihungstest->rt_person_id;
 					}
 					else
 					{
@@ -3977,42 +3933,60 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='AufnahmeTermineDelete')
 	{
-		//Speichert einen Aufnahmetermin einer Person
-		if(isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']))
+		//Loescht einen Aufnahmetermin einer Person
+		if(isset($_POST['rt_person_id']) && is_numeric($_POST['rt_person_id']))
 		{
-			$prestudent = new prestudent();
-			if(!$prestudent->load($_POST['prestudent_id']))
+			$rt_person_id = $_POST['rt_person_id'];
+			$reihungstest = new reihungstest();
+			if(!$reihungstest->loadReihungstestPerson($rt_person_id))
 			{
 				$return = false;
 				$error = true;
-				$errormsg = $prestudent->errormsg;
+				$errormsg = $reihungstest->errormsg;
 			}
 			else
 			{
-				if(!$rechte->isBerechtigt('admin', $prestudent->studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $prestudent->studiengang_kz, 'suid'))
+				$prestudent = new prestudent();
+				if(!$prestudent->getPrestudenten($reihungstest->person_id))
 				{
 					$return = false;
 					$error = true;
-					$errormsg = 'Sie haben keine Berechtigung';
+					$errormsg = $prestudent->errormsg;
 				}
 				else
 				{
-					$rt_id = $_POST['rt_id'];
-					$person_id = $_POST['person_id'];
-
-					$reihungstest = new reihungstest();
-
-					if($reihungstest->deletePersonReihungstest($person_id, $rt_id))
+					$berechtigt = false;
+					foreach($prestudent->result as $row_prest)
 					{
-						$return = true;
-						$error = false;
-						$errormsg = 'Erfolgreich geloescht';
+						if($rechte->isBerechtigt('admin', $row_prest->studiengang_kz, 'suid') || $rechte->isBerechtigt('assistenz', $row_prest->studiengang_kz, 'suid'))
+						{
+							$berechtigt = true;
+							break;
+						}
 					}
-					else
+
+					if(!$berechtigt)
 					{
 						$return = false;
 						$error = true;
-						$errormsg = $reihungstest->errormsg;
+						$errormsg = 'Sie haben keine Berechtigung';
+					}
+					else
+					{
+						$reihungstest = new reihungstest();
+
+						if($reihungstest->deletePersonReihungstest($rt_person_id))
+						{
+							$return = true;
+							$error = false;
+							$errormsg = 'Erfolgreich geloescht';
+						}
+						else
+						{
+							$return = false;
+							$error = true;
+							$errormsg = $reihungstest->errormsg;
+						}
 					}
 				}
 			}
@@ -4046,7 +4020,9 @@ if(!$error)
 				else
 				{
 					$punkte = $_POST['punkte'];
+					$reihungstestangetreten = ($_POST['reihungstestangetreten']=='true'?true:false);
 					$prestudent->punkte = $punkte;
+					$prestudent->reihungstestangetreten = $reihungstestangetreten;
 					$prestudent->new=false;
 
 					if($prestudent->save())

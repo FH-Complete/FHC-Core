@@ -42,8 +42,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type="text/css"?>';
 
 $prestudent_id = filter_input(INPUT_GET,'prestudent_id');
-$prestudent = new prestudent();
-$prestudent->load($prestudent_id);
+
 echo '
 <!DOCTYPE overlay [';
 require('../../locale/'.$variable->variable->locale.'/fas.dtd');
@@ -53,7 +52,7 @@ echo ']>
 
 <window id="aufnahmetermine-window" title="aufnahmetermine"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-	onload="loadAufnahmeTermine(<?php echo "'".$prestudent_id."','".$prestudent->studiengang_kz."'"; ?>);"
+	onload="loadAufnahmeTermine(<?php echo "'".$prestudent_id."'"; ?>);"
 >
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/student/aufnahmetermine.js.php" />
@@ -67,16 +66,17 @@ echo ']>
 	</menupopup>
 </popupset>
 <hbox style="padding-top: 10px">
-
-<label value="Gesamtpunkte" control="aufnahmetermine-textbox-gesamtpunkte"/>
-<textbox id="aufnahmetermine-textbox-gesamtpunkte" disabled="true" maxlength="8" size="8"/>
-<button id="aufnahmetermine-button-savegesamtpunkte" disabled="true" label="Speichern" oncommand="AufnahmeTermineSaveGesamtpunkte();"/>
-<button id="aufnahmetermine-button-calculatetotal" disabled="true" label="Gesamtpunkte berechnen" oncommand="AufnahmeTermineCalculateTotal();"/>
+	<label value="&aufnahmetermine-reihungstest.absolviert;" control="aufnahmetermine-checkbox-reihungstestangetreten"/>
+	<checkbox id="aufnahmetermine-checkbox-reihungstestangetreten" checked="true"/>
+	<label value="Gesamtpunkte" control="aufnahmetermine-textbox-gesamtpunkte"/>
+	<textbox id="aufnahmetermine-textbox-gesamtpunkte" disabled="true" maxlength="8" size="8"/>
+	<button id="aufnahmetermine-button-savegesamtpunkte" disabled="true" label="Speichern" oncommand="AufnahmeTermineSaveGesamtpunkte();"/>
+	<button id="aufnahmetermine-button-calculatetotal" disabled="true" label="Gesamtpunkte berechnen" oncommand="AufnahmeTermineCalculateTotal();"/>
 </hbox>
 
 <hbox flex="1">
 <grid id="aufnahmetermine-grid-detail" style="overflow:auto;margin:4px;" flex="1">
-		  	<columns  >
+			<columns  >
 				<column flex="1"/>
 				<column flex="1"/>
 			</columns>
@@ -96,7 +96,7 @@ echo ']>
 							sortActive="true"
 							sortDirection="ascending"
 							sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#reihungstest"/>
-							<treecol id="aufnahmetermine-tree-anmeldedatum" label="Anmeldedatum" flex="2" hidden="false"
+							<treecol id="aufnahmetermine-tree-anmeldedatum" label="Anmeldedatum" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#anmeldedatum"/>
 							<splitter class="tree-splitter"/>
@@ -116,7 +116,7 @@ echo ']>
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#teilgenommen" />
 							<splitter class="tree-splitter"/>
-							<treecol id="aufnahmetermine-tree-ort_kurzbz" label="Ort" flex="2" hidden="false"
+							<treecol id="aufnahmetermine-tree-ort_kurzbz" label="Ort" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#ort_kurzbz" />
 							<splitter class="tree-splitter"/>
@@ -127,6 +127,10 @@ echo ']>
 							<treecol id="aufnahmetermine-tree-person_id" label="PersonID" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#person_id" />
+							<splitter class="tree-splitter"/>
+							<treecol id="aufnahmetermine-tree-rt_person_id" label="RTPersonID" flex="2" hidden="true"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#rt_person_id" />
 							<splitter class="tree-splitter"/>
 						</treecols>
 
@@ -143,6 +147,7 @@ echo ']>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#ort_kurzbz"/>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#rt_id"/>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#person_id"/>
+										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#rt_person_id"/>
 									</treerow>
 								</treeitem>
 							</treechildren>
@@ -154,17 +159,19 @@ echo ']>
 							<button id="aufnahmetermine-button-loeschen" label="Loeschen" oncommand="AufnahmeTermineDelete();"/>
 						</hbox>
 						<vbox hidden="true">
-							<label value="rt_id" control="aufnahmetermine-textbox-rt_id"/>
-							<textbox id="aufnahmetermine-textbox-rt_id" disabled="true"/>
 							<label value="person_id" control="aufnahmetermine-textbox-person_id"/>
 							<textbox id="aufnahmetermine-textbox-person_id" disabled="true"/>
 							<label value="Neu" control="aufnahmetermine-checkbox-neu"/>
 							<checkbox id="aufnahmetermine-checkbox-neu" disabled="true" checked="false"/>
+							<label value="studienplan_id" control="aufnahmetermine-textbox-studienplan_id"/>
+							<textbox id="aufnahmetermine-textbox-studienplan_id" disabled="true"/>
+							<label value="rt_person_id" control="aufnahmetermine-textbox-rt_person_id"/>
+							<textbox id="aufnahmetermine-textbox-rt_person_id" disabled="true"/>
 						</vbox>
 						<groupbox id="aufnahmetermine-groupbox" flex="1">
 						<caption label="Details"/>
 							<grid id="aufnahmetermine-grid-detail" style="overflow:auto;margin:4px;" flex="1">
-							  	<columns  >
+								<columns  >
 									<column flex="1"/>
 									<column flex="5"/>
 								</columns>
@@ -173,8 +180,8 @@ echo ']>
 										<label value="Reihungstest" control="aufnahmetermine-menulist-reihungstest"/>
 										<hbox>
 										<menulist id="aufnahmetermine-menulist-reihungstest" disabled="true"
-										          datasources="rdf:null" flex="1"
-									              ref="http://www.technikum-wien.at/reihungstest/alle">
+												datasources="rdf:null" flex="1"
+												ref="http://www.technikum-wien.at/reihungstest/alle">
 											<template>
 												<menupopup>
 													<menuitem value="rdf:http://www.technikum-wien.at/reihungstest/rdf#reihungstest_id"
@@ -216,7 +223,7 @@ echo ']>
 										</hbox>
 									</row>
 									<row>
-		      							<label value="Punkte" control="aufnahmetermine-textbox-punkte" />
+										<label value="Punkte" control="aufnahmetermine-textbox-punkte" />
 										<hbox>
 											<textbox id="aufnahmetermine-textbox-punkte" disabled="true" maxlength="8" size="6"/>
 											<toolbarbutton id="aufnahmetermine-button-reihungstest-punktesync" image="../../skin/images/transmit.png" tooltiptext="Reihungstest Ergebnis holen" onclick="AufnahemTermineReihungstestPunkteTransmit()"/>
