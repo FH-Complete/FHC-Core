@@ -85,4 +85,57 @@ class Akte_model extends DB_Model
 		else
 			return $this->_error($this->db->error(), FHC_DB_ERROR);
 	}
+	
+	/**
+	 * 
+	 */
+	public function getAktenAccepted($person_id, $dokument_kurzbz)
+	{
+		// Checks if the operation is permitted by the API caller
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_prestudent'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_prestudent'), FHC_MODEL_ERROR);
+		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_dokumentprestudent'), 's'))
+			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_dokumentprestudent'), FHC_MODEL_ERROR);
+		
+		$query = 'SELECT a.akte_id,
+						 a.person_id,
+						 a.dokument_kurzbz,
+						 a.mimetype,
+						 a.erstelltam,
+						 a.gedruckt,
+						 a.titel_intern,
+						 a.anmerkung_intern,
+						 a.titel,
+						 a.bezeichnung,
+						 a.updateamum,
+						 a.insertamum,
+						 a.updatevon,
+						 a.insertvon,
+						 a.uid,
+						 a.dms_id,
+						 a.anmerkung,
+						 a.nachgereicht,
+						 a.nachgereicht_am,
+						 CASE WHEN a.inhalt IS NOT NULL THEN TRUE ELSE FALSE END AS inhalt_vorhanden,
+						 (
+							SELECT CASE WHEN COUNT(dokument_kurzbz) > 0 THEN TRUE ELSE FALSE END
+							  FROM public.tbl_prestudent p
+						INNER JOIN public.tbl_dokumentprestudent dp USING(prestudent_id)
+							 WHERE p.person_id = ?
+							   AND dp.dokument_kurzbz = ?
+						 ) AS accepted
+					FROM public.tbl_akte a
+				   WHERE a.person_id = ?
+					 AND a.dokument_kurzbz = ?
+				ORDER BY a.erstelltam';
+		
+		$result = $this->db->query($query, array($person_id, $dokument_kurzbz, $person_id, $dokument_kurzbz));
+		
+		if (is_object($result))
+			return $this->_success($result->result());
+		else
+			return $this->_error($this->db->error(), FHC_DB_ERROR);
+	}
 }
