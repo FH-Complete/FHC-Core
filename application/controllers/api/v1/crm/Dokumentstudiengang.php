@@ -62,6 +62,9 @@ class Dokumentstudiengang extends APIv1_Controller
 		{
 			$result = $this->DokumentstudiengangModel->getDokumentstudiengangByStudiengang_kz($studiengang_kz, $onlinebewerbung, $pflicht);
 			
+			// Workaround
+			$result = $this->escapeArrays($result, array('bezeichnung_mehrsprachig', 'dokumentbeschreibung_mehrsprachig'));
+			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
