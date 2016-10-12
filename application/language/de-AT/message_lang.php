@@ -25,3 +25,4 @@ $lang['message_' . MSG_PARTICIPANT_ADDED]			= 'Participant added';
 $lang['message_' . MSG_ERR_PARTICIPANT_EXISTS]		= 'User is already participating in this thread';
 $lang['message_' . MSG_ERR_PARTICIPANT_NONSYSTEM]	= 'This user id is not in the system';
 $lang['message_' . MSG_PARTICIPANT_REMOVED]			= 'Participant removed from thread';
+$lang['message_' . MSG_ERR_OU_CONTACTS_NOT_FOUND]	= 'No receivers found for this organization unit';

@@ -217,6 +217,12 @@ class MessageLib
 		// If everything went ok
 		if (is_object($receivers) && $receivers->error == EXIT_SUCCESS && is_array($receivers->retval))
 		{
+			// If no receivers were found for this organization unit
+			if (count($receivers->retval) == 0)
+			{
+				$result = $this->_error($receivers->retval, MSG_ERR_OU_CONTACTS_NOT_FOUND);
+			}
+			
 			// Looping on receivers
 			for ($i = 0; $i < count($receivers->retval); $i++)
 			{
@@ -341,8 +347,16 @@ class MessageLib
 		// If everything went ok
 		if (is_object($receivers) && $receivers->error == EXIT_SUCCESS && is_array($receivers->retval))
 		{
-			// Load reveiver data to get its relative language
-			$this->ci->load->model('person/Person_model', 'PersonModel');
+			// If no receivers were found for this organization unit
+			if (count($receivers->retval) == 0)
+			{
+				$result = $this->_error($receivers->retval, MSG_ERR_OU_CONTACTS_NOT_FOUND);
+			}
+			else
+			{
+				// Load reveiver data to get its relative language
+				$this->ci->load->model('person/Person_model', 'PersonModel');
+			}
 			
 			// Looping on receivers
 			for ($i = 0; $i < count($receivers->retval); $i++)
