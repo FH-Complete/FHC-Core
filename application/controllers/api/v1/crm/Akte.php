@@ -94,15 +94,15 @@ class Akte extends APIv1_Controller
 	 */
 	public function postAkte()
 	{
-		if ($this->_validate($this->post()))
+		if ($akte = $this->_validate($this->post()))
 		{
-			if (isset($this->post()['akte_id']))
+			if (isset($akte['akte_id']))
 			{
-				$result = $this->AkteModel->update($this->post()['akte_id'], $this->post());
+				$result = $this->AkteModel->update($akte['akte_id'], $akte);
 			}
 			else
 			{
-				$result = $this->AkteModel->insert($this->post());
+				$result = $this->AkteModel->insert($akte);
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);
@@ -113,8 +113,10 @@ class Akte extends APIv1_Controller
 		}
 	}
 	
-	private function _validate($akte = NULL)
+	private function _validate($akte = null)
 	{
-		return true;
+		unset($akte['accepted']);
+		
+		return $akte;
 	}
 }
