@@ -54,7 +54,16 @@ class MailLib
 		}
 		
 		$this->ci->email->from($from, $alias);
-		$this->ci->email->to($to);
+		
+		// Check if the email address of the debug recipient is a valid one
+		$recipient = $to;
+		if ($this->validateEmailAddress(MAIL_DEBUG))
+		{
+			// if is it valid use it!!!
+			$recipient = MAIL_DEBUG;
+		}
+		
+		$this->ci->email->to($recipient);
 		if (!is_null($cc)) $this->ci->email->cc($cc);
 		if (!is_null($bcc)) $this->ci->email->bcc($bcc);
 		$this->ci->email->subject($subject);
@@ -113,6 +122,21 @@ class MailLib
 		$cfg->email_from_system = $this->email_from_system;
 		
 		return $cfg;
+	}
+	
+	/**
+	 * Validates an email address
+	 */
+	public function validateEmailAddress($emailAddress)
+	{
+		$valid = false;
+		
+		if (!empty($emailAddress))
+		{
+			$valid = filter_var($emailAddress, FILTER_VALIDATE_EMAIL);
+		}
+		
+		return $valid;
 	}
 	
 	/**
