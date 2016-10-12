@@ -146,6 +146,7 @@ foreach($uid_arr as $uid)
 			echo "\t\t<gebort>".$student->gebort."</gebort>\n";
 			echo "\t\t<staatsbuergerschaft>".$staatsbuergerschaft->langtext."</staatsbuergerschaft>\n";
 			echo "\t\t<svnr>".$svnr."</svnr>\n";
+			echo "\t\t<matr_nr>".trim($student->matr_nr)."</matr_nr>\n";
 			echo "\t\t<matrikelnr>".trim($student->matrikelnr)."</matrikelnr>\n";
 			echo "\t\t<studiengang>".$studienordnung->studiengangbezeichnung."</studiengang>\n";
 			echo "\t\t<studiengang_englisch>".$studienordnung->studiengangbezeichnung_englisch."</studiengang_englisch>\n";
