@@ -66,7 +66,8 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 		</script>
 </head>
 <body>
-<h1>'.$p->t("tools/partnerhochschulenUebersicht").'</h1>';
+<h1>'.$p->t("tools/partnerhochschulenUebersicht").'</h1>
+<p>'.$p->t("tools/partnerhochschulenEinleitung").'</p>';
 
 $stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'');
 
@@ -83,19 +84,23 @@ $types = new studiengang();
 $types->getAllTypes();
 foreach($studiengaenge->result as $row)
 {
-	if ($typ != $row->typ || $typ=='')
+	if ($row->typ == 'b' || $row->typ == 'm')
 	{
-		if ($typ!='')
-			echo '</optgroup>';
-		echo '<optgroup label="'.($types->studiengang_typ_arr[$row->typ]!=''?$types->studiengang_typ_arr[$row->typ]:$row->typ).'">';
+		//Nur Bachelor, Master und CIR-Studiengang
+		if ($typ != $row->typ || $typ=='')
+		{
+			if ($typ!='')
+				echo '</optgroup>';
+			echo '<optgroup label="'.($types->studiengang_typ_arr[$row->typ]!=''?$types->studiengang_typ_arr[$row->typ]:$row->typ).'">';
+		}
+		if($row->studiengang_kz==$stg_kz)
+			$selected='selected';
+		else
+			$selected='';
+		
+		echo '<OPTION value="'.$row->studiengang_kz.'" '.$selected.'>'.$row->kuerzel.' ('.$row->bezeichnung_arr[$sprache].')</OPTION>';
+		$typ = $row->typ;
 	}
-	if($row->studiengang_kz==$stg_kz)
-		$selected='selected';
-	else
-		$selected='';
-	
-	echo '<OPTION value="'.$row->studiengang_kz.'" '.$selected.'>'.$row->kuerzel.' ('.$row->bezeichnung_arr[$sprache].')</OPTION>';
-	$typ = $row->typ;
 }
 echo '</SELECT>
 <input type="submit" value="'.$p->t("services/filtern").'" />
@@ -104,7 +109,7 @@ echo '</SELECT>
 if($stg_kz!='')
 {
 	$studiengaenge->load($stg_kz);
-	$firma->get_firmaorganisationseinheit('', $studiengaenge->oe_kurzbz);
+	$firma->get_firmaorganisationseinheit('', $studiengaenge->oe_kurzbz, 'Partneruniversität');
 }
 else
 {
