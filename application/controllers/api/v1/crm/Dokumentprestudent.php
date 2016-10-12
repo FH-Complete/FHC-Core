@@ -24,8 +24,6 @@ class Dokumentprestudent extends APIv1_Controller
 		parent::__construct();
 		// Load model DokumentprestudentModel
 		$this->load->model('crm/dokumentprestudent_model', 'DokumentprestudentModel');
-		
-		
 	}
 
 	/**
@@ -72,7 +70,24 @@ class Dokumentprestudent extends APIv1_Controller
 		}
 	}
 	
-	private function _validate($dokumentprestudent = NULL)
+	/**
+	 * @return void
+	 */
+	public function postSetAccepted()
+	{
+		if (isset($this->post()['prestudent_id']) && isset($this->post()['studiengang_kz']))
+		{
+			$result = $this->DokumentprestudentModel->setAccepted($this->post()['prestudent_id'], $this->post()['studiengang_kz']);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	private function _validate($dokumentprestudent = null)
 	{
 		return true;
 	}
