@@ -100,11 +100,16 @@ $date = new datum();
 $firma = new firma();
 $firma->getFirmen('Partneruniversität');
 
-$get_url = str_replace('lang='.$_GET['lang'].'&', '', $_SERVER['QUERY_STRING']);
+if (isset($_GET['lang']))
+	$get_url = str_replace('lang='.$_GET['lang'].'&', '', $_SERVER['QUERY_STRING']);
+else 
+	$get_url = $_SERVER['QUERY_STRING'];
 
 $filter_url = '';
 if (isset($_GET['filter']) || isset($_GET['unterrichtssprache']) || isset($_GET['studiengang'])) 
 	$filter_url = 'filter='.$_GET['filter'].'&unterrichtssprache='.$_GET['unterrichtssprache'].'&studiengang='.$_GET['studiengang'].'&go=Filter&';
+
+$message = '';
 ?>
 <html>
 	<head>
@@ -266,7 +271,8 @@ if($method =="austauschprogram")
 	{
 		$preincoming->von = $date->formatDatum($_REQUEST['von'],'Y-m-d');
 		$preincoming->bis = $date->formatDatum($_REQUEST['bis'],'Y-m-d');
-		$preincoming->code = $_REQUEST['code'];
+		if (isset($_REQUEST['code']))
+			$preincoming->code = $_REQUEST['code'];
 		if($_REQUEST['austausch_kz']== "austausch_auswahl")
 			$preincoming->mobilitaetsprogramm_code = '';
 		else
@@ -2005,6 +2011,7 @@ else if($method == 'files')
 else if($method == 'ende')
 {
 	$message = '';
+	$emailtext = '';
 	// Profil speichern
 	if(isset($_POST['submit_ende']))
 	{
