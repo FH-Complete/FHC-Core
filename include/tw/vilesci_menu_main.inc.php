@@ -195,6 +195,7 @@ $menu=array
 		'checkStudenten'=>array('name'=>'CheckStudenten', 'link'=>'../system/checkStudenten.php', 'target'=>'main'),
 		'StudienplanZuteilung'=>array('name'=>'Studienplan Zuteilung', 'link'=>'lehre/studienplan_zuteilung.php', 'target'=>'main','permissions'=>array('assistenz')),
 		'lv_merge'=>array('name'=>'LVs zusammenlegen', 'link'=>'lehre/lv_merge.php', 'target'=>'main','permissions'=>array('admin','lv-plan')),
+		'akteupdate'=>array('name'=>'Akten überschreiben', 'link'=>'personen/akteupdate.php', 'target'=>'main','permissions'=>array('admin')),
 	),
 	'Auswertung'=>	array
 	(
