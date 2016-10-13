@@ -18,11 +18,10 @@ class Studiengang_model extends DB_Model
 	public function getAllForBewerbung()
 	{
 		// Checks if the operation is permitted by the API caller
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('lehre.vw_studienplan'), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('lehre.vw_studienplan'), FHC_MODEL_ERROR);
-		
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('bis.tbl_lgartcode'), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('bis.tbl_lgartcode'), FHC_MODEL_ERROR);
+		if (($chkRights = $this->isEntitled('lehre.vw_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
+		if (($chkRights = $this->isEntitled('bis.tbl_lgartcode', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
 		
 		$allForBewerbungQuery = 'SELECT DISTINCT studiengang_kz,
 										typ,
@@ -99,7 +98,7 @@ class Studiengang_model extends DB_Model
 		
 		$result = $this->db->query($allForBewerbungQuery);
 		
-		return $this->_success($result->result());
+		return success($result->result());
 	}
 
 	/**

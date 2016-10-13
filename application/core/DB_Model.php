@@ -26,11 +26,11 @@ class DB_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->dbTable))
-			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 'i'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
+		if (($chkRights = $this->isEntitled($this->dbTable, PermissionLib::INSERT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
 
 		// DB-INSERT
 		if ($this->db->insert($this->dbTable, $data))
@@ -38,7 +38,7 @@ class DB_Model extends FHC_Model
 			// If the table has a primary key that uses a sequence
 			if ($this->hasSequence === true)
 			{
-				return $this->_success($this->db->insert_id());
+				return success($this->db->insert_id());
 			}
 			// Avoid to use method insert_id() from CI because it forces to have a sequence
 			// and doesn't return the primary key when it's composed by more columns
@@ -54,11 +54,11 @@ class DB_Model extends FHC_Model
 					}
 				}
 
-				return $this->_success($primaryKeysArray);
+				return success($primaryKeysArray);
 			}
 		}
 		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), FHC_DB_ERROR);
 	}
 
 	/** ---------------------------------------------------------------
@@ -71,17 +71,17 @@ class DB_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->dbTable))
-			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 'ui'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
+		if (($chkRights = $this->isEntitled($this->dbTable, PermissionLib::REPLACE_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
 
 		// DB-REPLACE
 		if ($this->db->replace($this->dbTable, $data))
-			return $this->_success($this->db->insert_id());
+			return success($this->db->insert_id());
 		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), FHC_DB_ERROR);
 	}
 
 	/** ---------------------------------------------------------------
@@ -95,13 +95,13 @@ class DB_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->dbTable))
-			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		if (is_null($this->pk))
-			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_NOPK);
 		
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 'u'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
+		if (($chkRights = $this->isEntitled($this->dbTable, PermissionLib::UPDATE_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
 
 		// DB-UPDATE
 		// Check for composite Primary Key
@@ -115,9 +115,9 @@ class DB_Model extends FHC_Model
 		else
 			$this->db->where($this->pk, $id);
 		if ($this->db->update($this->dbTable, $data))
-			return $this->_success($id);
+			return success($id);
 		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), FHC_DB_ERROR);
 	}
 
 	/** ---------------------------------------------------------------
@@ -130,16 +130,15 @@ class DB_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->dbTable))
-			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		if (is_null($this->pk))
-			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
-		
+			return error(FHC_MODEL_ERROR, FHC_NOPK);
 		
 		// Check rights only if this method is called from a model
 		if (substr(get_called_class(), -6) == '_model')
-			if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 's'))
-				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
-
+			if (($chkRights = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+				return $chkRights;
+		
 		// DB-SELECT
 		// Check for composite Primary Key
 		if (is_array($id))
@@ -155,9 +154,9 @@ class DB_Model extends FHC_Model
 			$result = $this->db->get_where($this->dbTable, array($this->pk => $id));
 		
 		if ($result)
-			return $this->_success($result->result());
+			return success($result->result());
 		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), FHC_DB_ERROR);
 	}
 
 	/** ---------------------------------------------------------------
@@ -169,21 +168,21 @@ class DB_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->dbTable))
-			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
 		// Check rights
 		// Check rights only if this method is called from a model
 		if (substr(get_called_class(), -6) == '_model')
-			if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 's'))
-				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
+			if (($chkRights = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+				return $chkRights;
 
 		// Execute query
 		$result = $this->db->get_where($this->dbTable, $where);
 		
 		if ($result)
-			return $this->_success($result->result());
+			return success($result->result());
 		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), FHC_DB_ERROR);
 	}
 	
 	/** ---------------------------------------------------------------
@@ -200,13 +199,13 @@ class DB_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->dbTable))
-			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
 		// Check rights
 		// Check rights only if this method is called from a model
 		if (substr(get_called_class(), -6) == '_model')
-			if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 's'))
-				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
+			if (($chkRights = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+				return $chkRights;
 		
 		// List of tables on which it will work
 		$tables = array_merge(array($mainTable), $sideTables);
@@ -214,7 +213,7 @@ class DB_Model extends FHC_Model
 		$tableColumnsCountArray = array();
 		
 		// Generates the select clause based on the columns of each table
-		$select = "";
+		$select = '';
 		for ($t = 0; $t < count($tables); $t++)
 		{
 			$fields = $this->db->list_fields($tables[$t]); // list of the columns of the current table
@@ -223,11 +222,11 @@ class DB_Model extends FHC_Model
 				// To avoid overwriting of the properties within the object returned by CI
 				// will be given an alias to every column, that will be composed with the following schema
 				// <table name>.<column name> AS <table_name>_<column name>
-				$select .= $tables[$t] . "." . $fields[$f] . " AS " . $tables[$t] . "_" . $fields[$f];
-				if ($f < count($fields) - 1) $select .= ", ";
+				$select .= $tables[$t] . '.' . $fields[$f] . ' AS ' . $tables[$t] . '_' . $fields[$f];
+				if ($f < count($fields) - 1) $select .= ', ';
 			}
 			
-			if ($t < count($tables) - 1) $select .= ", ";
+			if ($t < count($tables) - 1) $select .= ', ';
 			
 			$tableColumnsCountArray[$t] = count($fields);
 		}
@@ -263,7 +262,7 @@ class DB_Model extends FHC_Model
 					$objTmpArray[$f] = new stdClass(); // Object that will represent a data set of a table
 					foreach (array_slice($objectVars, $f == 0 ? 0 : $tableColumnsCountArray[$f - 1], $tableColumnsCountArray[$f]) as $key => $value)
 					{
-						$objTmpArray[$f]->{str_replace($tables[$f] . "_", "", $key)} = $value;
+						$objTmpArray[$f]->{str_replace($tables[$f] . '_', '', $key)} = $value;
 					}
 				}
 				
@@ -297,11 +296,11 @@ class DB_Model extends FHC_Model
 			}
 			
 			// Sets result with the standard success object that contains all the studiengang
-			$result = $this->_success($returnArray);
+			$result = success($returnArray);
 		}
 		else
 		{
-			$result = $this->_error($resultDB);
+			$result = error($resultDB);
 		}
 		
 		return $result;
@@ -332,17 +331,11 @@ class DB_Model extends FHC_Model
 	{
 		// Check parameters
 		if (is_null($joinTable) || is_null($cond) || !in_array($type, array('', 'LEFT', 'RIGHT', 'OUTER', 'INNER', 'LEFT OUTER', 'RIGHT OUTER')))
-			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
 		
-		// Check rights for joined table
-		// Check rights only if this method is called from a model
-// 		if (substr(get_called_class(), -6) == '_model')
-// 			if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($joinTable), 's'))
-// 			 return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($joinTable), FHC_MODEL_ERROR);
-
 		$this->db->join($joinTable, $cond, $type);
 		
-		return $this->_success(true);
+		return success(true);
 	}
 	
 	/** ---------------------------------------------------------------
@@ -354,11 +347,11 @@ class DB_Model extends FHC_Model
 	{
 		// Check Class-Attributes and parameters
 		if (is_null($field) || !in_array($type, array('ASC', 'DESC')))
-			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
 		
 		$this->db->order_by($field, $type);
 		
-		return $this->_success(true);
+		return success(true);
 	}
 	
 	/** ---------------------------------------------------------------
@@ -370,11 +363,11 @@ class DB_Model extends FHC_Model
 	{
 		// Check Class-Attributes and parameters
 		if (is_null($select) || $select == '')
-			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
 		
 		$this->db->select($select, $escape);
 		
-		return $this->_success(true);
+		return success(true);
 	}
 	
 	/** ---------------------------------------------------------------
@@ -396,7 +389,7 @@ class DB_Model extends FHC_Model
 	{
 		// Check Class-Attributes and parameters
 		if (!is_numeric($start) || (is_numeric($start) && $start <= 0))
-			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
 		
 		if (is_numeric($end) && $end > $start)
 		{
@@ -407,7 +400,7 @@ class DB_Model extends FHC_Model
 			$this->db->limit($start);
 		}
 		
-		return $this->_success(true);
+		return success(true);
 	}
 
 	/** ---------------------------------------------------------------
@@ -420,14 +413,14 @@ class DB_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->dbTable))
-			return $this->_error(lang('fhc_'.FHC_NODBTABLE), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		if (is_null($this->pk))
-			return $this->_error(lang('fhc_'.FHC_NOPK), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_NOPK);
 		
 		// Check rights only if this method is called from a model
 		if (substr(get_called_class(), -6) == '_model')
-			if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->dbTable), 'd'))
-				return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->dbTable), FHC_MODEL_ERROR);
+			if (($chkRights = $this->isEntitled($this->dbTable, PermissionLib::DELETE_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+				return $chkRights;
 
 		// DB-DELETE
 		// Check for composite Primary Key
@@ -441,9 +434,9 @@ class DB_Model extends FHC_Model
 		else
 			$result = $this->db->delete($this->dbTable, array($this->pk => $id));
 		if ($result)
-			return $this->_success($id);
+			return success($id);
 		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), FHC_DB_ERROR);
 	}
 	
 	/** ---------------------------------------------------------------
@@ -478,7 +471,7 @@ class DB_Model extends FHC_Model
 	{
 		if (is_null($b))
 			return null;
-		elseif ($b==='t')
+		elseif ($b === 't')
 			return true;
 		else
 			return false;
@@ -492,7 +485,7 @@ class DB_Model extends FHC_Model
 	 * @param   string	$end	end-point for recursive iterations
 	 * @return  array
 	 */
-	public function pgArrayPhp($s,$start=0,&$end=NULL)
+	public function pgArrayPhp($s, $start=0, &$end=NULL)
 	{
 		if (empty($s) || $s[0]!='{') return NULL;
 		$return = array();
@@ -521,16 +514,16 @@ class DB_Model extends FHC_Model
 				    	$v = '';
 					}
 					else
-						if (!$string && ($ch=='"' || $ch=="'"))
+						if (!$string && ($ch=='\'' || $ch=='\''))
 						{
 							$string = true;
 							$quote = $ch;
 						}
 						else
-							if ($string && $ch==$quote && $s[$i-1]=="\\")
+							if ($string && $ch==$quote && $s[$i-1]=='\\')
 								$v = substr($v,0,-1).$ch;
 							else
-								if ($string && $ch==$quote && $s[$i-1]!="\\")
+								if ($string && $ch==$quote && $s[$i-1]!='\\')
 									$string = FALSE;
 								else
 									$v .= $ch;
@@ -552,20 +545,5 @@ class DB_Model extends FHC_Model
 		for ($j=0; $j < count($i); $j++)
 			$a[$i[$j]] = $v[$j];
 		return $a;
-	}
-	
-	/** ---------------------------------------------------------------
-	 * Invalid ID
-	 *
-	 * @param   integer  config.php error code numbers
-	 * @return  array
-	 */
-	protected function _invalid_id($error = '')
-	{
-		return array(
-			'err' => 1,
-			'code' => $error,
-			'msg' => lang('fhc_' . $error)
-		);
 	}
 }

@@ -14,7 +14,7 @@ class Dokumentprestudent_model extends DB_Model
 	
 	public function setAccepted($prestudent_id, $studiengang_kz)
 	{
-		if (($chkRights = $this->isEntitled('public.tbl_dokumentprestudent', 'i', FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+		if (($chkRights = $this->isEntitled('public.tbl_dokumentprestudent', PermissionLib::INSERT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $chkRights;
 		
 		$result = null;
@@ -39,14 +39,14 @@ class Dokumentprestudent_model extends DB_Model
 		}
 		
 		if ($result)
-			return $this->_success($result);
+			return success($result);
 		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), FHC_DB_ERROR);
 	}
 	
 	public function setAcceptedDocuments($prestudent_id, $dokument_kurzbz)
 	{
-		if (($chkRights = $this->isEntitled('public.tbl_dokumentprestudent', 'i', FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+		if (($chkRights = $this->isEntitled('public.tbl_dokumentprestudent', PermissionLib::INSERT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $chkRights;
 		
 		$result = null;
@@ -70,8 +70,8 @@ class Dokumentprestudent_model extends DB_Model
 		}
 		
 		if ($result)
-			return $this->_success($result);
+			return success($result);
 		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), FHC_DB_ERROR);
 	}
 }

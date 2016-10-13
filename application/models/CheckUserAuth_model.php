@@ -13,6 +13,6 @@ class CheckUserAuth_model extends FHC_Model
 	
 	public function checkByUsernamePassword($username, $password)
 	{
-		return $this->_success($this->fhc_auth->checkpassword($username, $password));
+		return success($this->fhc_auth->checkpassword($username, $password));
 	}
 }

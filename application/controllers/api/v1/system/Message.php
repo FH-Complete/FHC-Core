@@ -185,43 +185,43 @@ class Message extends APIv1_Controller
 	{
 		if (!isset($message))
 		{
-			return $this->_error('Parameter is null');
+			return error('Parameter is null');
 		}
 		if (!isset($message['subject']))
 		{
-			return $this->_error('subject is not set');
+			return error('subject is not set');
 		}
 		if( !isset($message['body']))
 		{
-			return $this->_error('body is not set');
+			return error('body is not set');
 		}
 		if (!isset($message['receiver_id']) && !isset($message['oe_kurzbz']))
 		{
-			return $this->_error('If a receiver_id is not given a oe_kurzbz must be specified');
+			return error('If a receiver_id is not given a oe_kurzbz must be specified');
 		}
 		
-		return $this->_success('Input data are valid');
+		return success('Input data are valid');
 	}
 	
 	private function _validatePostMessageVorlage($message = null)
 	{
 		if (!isset($message))
 		{
-			return $this->_error('Parameter is null');
+			return error('Parameter is null');
 		}
 		if (!isset($message['vorlage_kurzbz']))
 		{
-			return $this->_error('vorlage_kurzbz is not set');
+			return error('vorlage_kurzbz is not set');
 		}
 		if (!isset($message['data']))
 		{
-			return $this->_error('data is not set');
+			return error('data is not set');
 		}
 		if (!isset($message['receiver_id']) && !isset($message['oe_kurzbz']))
 		{
-			return $this->_error('If a receiver_id is not given a oe_kurzbz must be specified');
+			return error('If a receiver_id is not given a oe_kurzbz must be specified');
 		}
 		
-		return $this->_success('Input data are valid');
+		return success('Input data are valid');
 	}
 }

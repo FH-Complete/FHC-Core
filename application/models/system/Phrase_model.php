@@ -18,10 +18,10 @@ class Phrase_model extends DB_Model
 	public function getPhrases($app, $sprache, $phrase = null, $orgeinheit_kurzbz = null, $orgform_kurzbz = null)
 	{
 		// Checks if the operation is permitted by the API caller
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('system.tbl_phrase'), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('system.tbl_phrase'), FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('system.tbl_phrasentext'), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('system.tbl_phrasentext'), FHC_MODEL_ERROR);
+		if (($chkRights = $this->isEntitled('system.tbl_phrase', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
+		if (($chkRights = $this->isEntitled('system.tbl_phrasentext', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
 		
 		$parametersArray = array('app' => $app, 'sprache' => $sprache);
 
@@ -61,8 +61,8 @@ class Phrase_model extends DB_Model
 		$result = $this->db->query($query, $parametersArray);
 		
 		if (is_object($result))
-			return $this->_success($result->result());
+			return success($result->result());
 		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), FHC_DB_ERROR);
 	}
 }

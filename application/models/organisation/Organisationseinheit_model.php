@@ -38,9 +38,9 @@ class Organisationseinheit_model extends DB_Model
 
 		
 		if ($res = $this->db->query($qry))
-			return $this->_success($res);
+			return success($res);
 		else
-			return $this->_error($this->db->error());
+			return error($this->db->error());
 	}
 	
 	/**
@@ -81,11 +81,11 @@ class Organisationseinheit_model extends DB_Model
 		
 		if ($result = $this->db->query($query, array($oe_kurzbz)))
 		{
-			return $this->_success($result->result());
+			return success($result->result());
 		}
 		else
 		{
-			return $this->_error($this->db->error());
+			return error($this->db->error());
 		}
 	}
 }

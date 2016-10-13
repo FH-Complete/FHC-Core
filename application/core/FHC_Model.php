@@ -1,67 +1,39 @@
 <?php
 
-if (! defined("BASEPATH")) exit("No direct script access allowed");
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class FHC_Model extends CI_Model
 {
-	protected $acl;
-	
 	function __construct()
 	{
 		parent::__construct();
 		
-		$this->lang->load("fhc_model");
-		$this->lang->load("fhcomplete");
+		// Load languages files
+		$this->lang->load('fhc_model');
+		$this->lang->load('fhcomplete');
 		
-		$this->load->helper("language");
-		$this->load->helper("Message");
-		$this->load->helper("fhcauth");
+		// Load return message helper
+		$this->load->helper('message');
 		
-		$this->load->library("FHC_DB_ACL");
-		
-		$this->acl = $this->config->item("fhc_acl");
-	}
-
-	/** ---------------------------------------------------------------
-	 * Success
-	 *
-	 * @param   mixed  $retval
-	 * @return  array
-	 */
-	protected function _success($retval, $message = null)
-	{
-		return success($retval, $message);
-	}
-
-	/** ---------------------------------------------------------------
-	 * General Error
-	 *
-	 * @return  array
-	 */
-	protected function _error($retval, $message = null)
-	{
-		return error($retval, $message);
+		// Loads the permission library
+		$this->load->library('PermissionLib');
 	}
 	
-	protected function getBerechtigungKurzbz($sourceName)
+	/**
+	 * Check if the user is entitled to get access to a source with the given access type
+	 * This is a wrapper for the same method present in the PermissionLib
+	 */
+	public function isEntitled($sourceName, $accessType, $languageMessageCode, $msgErrorCode)
 	{
-		if (isset($this->acl[$sourceName]))
+		if ($this->permissionlib->isEntitled($sourceName, $accessType) === false)
 		{
-			return $this->acl[$sourceName];
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	protected function isEntitled($sourceName, $accessType, $languageMessageCode, $msgErrorCode)
-	{
-		$fhc_acl = $this->getBerechtigungKurzbz($sourceName);
-		
-		if (! $this->fhc_db_acl->isBerechtigt($fhc_acl, $accessType))
-		{
-			return $this->_error(lang("fhc_" . $languageMessageCode)." -> " . $fhc_acl . ":" . $accessType, $msgErrorCode);
+			$retval = sprintf(
+				'%s -> %s:%s',
+				lang('fhc_' . $languageMessageCode),
+				$this->permissionlib->getBerechtigungKurzbz($sourceName),
+				$accessType
+			);
+			return error($retval, $msgErrorCode);
 		}
 		else
 		{

@@ -18,8 +18,8 @@ class Vorlage_model extends DB_Model
 
 		
 		if ($res = $this->db->query($qry))
-			return $this->_success($res);
+			return success($res);
 		else
-			return $this->_error($this->db->error());
+			return error($this->db->error());
 	}
 }

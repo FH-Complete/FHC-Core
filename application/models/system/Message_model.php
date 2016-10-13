@@ -1,6 +1,6 @@
 <?php 
 
-if ( ! defined("BASEPATH")) exit("No direct script access allowed");
+if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Message_model extends DB_Model
 {
@@ -10,8 +10,8 @@ class Message_model extends DB_Model
 	public function __construct()
 	{
 		parent::__construct();
-		$this->dbTable = "public.tbl_msg_message";
-		$this->pk = "message_id";
+		$this->dbTable = 'public.tbl_msg_message';
+		$this->pk = 'message_id';
 	}
 	
 	/**
@@ -19,15 +19,15 @@ class Message_model extends DB_Model
 	 */
 	public function getMessagesByPerson($person_id, $all)
 	{
-		// Check wrights
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_msg_message"), "s"))
-			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_msg_message"), FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_person"), "s"))
-			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_person"), FHC_MODEL_ERROR);
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz("public.tbl_msg_status"), "s"))
-			return $this->_error(lang("fhc_".FHC_NORIGHT)." -> ".$this->getBerechtigungKurzbz("public.tbl_msg_status"), FHC_MODEL_ERROR);
+		// Checks if the operation is permitted by the API caller
+		if (($chkRights = $this->isEntitled('public.tbl_msg_message', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
+		if (($chkRights = $this->isEntitled('public.tbl_person', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
+		if (($chkRights = $this->isEntitled('public.tbl_msg_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
 		
-		$sql = "SELECT m.message_id,
+		$sql = 'SELECT m.message_id,
 						m.person_id,
 						m.subject,
 						m.body,
@@ -51,23 +51,23 @@ class Message_model extends DB_Model
 							 %s
 						  ORDER BY insertamum DESC
 						) s ON (m.message_id = s.message_id AND m.person_id = s.person_id)
-				 WHERE m.person_id = ?";
+				 WHERE m.person_id = ?';
 		
 		$parametersArray = array($person_id);
 		
-		if ($all == "true")
+		if ($all == 'true')
 		{
-			$sql = sprintf($sql, "");
+			$sql = sprintf($sql, '');
 		}
 		else
 		{
-			$sql = sprintf($sql, "WHERE status >= 3");
+			$sql = sprintf($sql, 'WHERE status >= 3');
 		}
 		
 		$result = $this->db->query($sql, $parametersArray);
 		if (is_object($result))
-			return $this->_success($result->result());
+			return success($result->result());
 		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), FHC_DB_ERROR);
 	}
 }

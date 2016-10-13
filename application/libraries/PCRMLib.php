@@ -229,9 +229,9 @@ class PCRMLib
 		
 		$permissionPath .= $resourceName . '.' . $function;
 		
-		if ($this->ci->permissionlib->hasPermission($permissionPath, $permissionType) === false)
+		if ($this->ci->permissionlib->isEntitled($permissionPath, $permissionType) === false)
 		{
-			$result = error(lang('fhc_'.FHC_NORIGHT).' -> '.$permissionPath, FHC_NORIGHT);
+			$result = error(FHC_NORIGHT, FHC_NORIGHT);
 		}
 		else
 		{

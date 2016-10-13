@@ -68,9 +68,9 @@ class Person_model extends DB_Model
 		$result = $this->db->query($checkBewerbungQuery, $parametersArray);
 		
 		if (is_object($result))
-			return $this->_success($result->result());
+			return success($result->result());
 		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), FHC_DB_ERROR);
 	}
 	
 	public function updatePerson($person)

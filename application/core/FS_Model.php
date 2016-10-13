@@ -8,7 +8,13 @@ class FS_Model extends FHC_Model
 	function __construct($filepath = null)
 	{
 		parent::__construct();
+		
+		// Load the filesystem library
 		$this->load->library('FilesystemLib');
+		
+		// Load return message helper
+		$this->load->helper('message');
+		
 		$this->filepath = $filepath;
 	}
 	
@@ -21,23 +27,23 @@ class FS_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->filepath))
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		
 		// Check method parameters
 		if (is_null($filename))
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->filepath), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->filepath), FHC_MODEL_ERROR);
+		if (($chkRights = $this->isEntitled($this->filepath, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
 		
 		if (!is_null($data = $this->filesystemlib->read($this->filepath, $filename)))
 		{
-			return $this->_success(base64_encode($data));
+			return success(base64_encode($data));
 		}
 		else
 		{
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		}
 	}
 	
@@ -51,25 +57,25 @@ class FS_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->filepath))
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		
 		// Check method parameters
 		if (is_null($filename))
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		if (is_null($content))
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->filepath), 'i'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->filepath), FHC_MODEL_ERROR);
+		if (($chkRights = $this->isEntitled($this->filepath, PermissionLib::INSERT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
 
 		if ($this->filesystemlib->write($this->filepath, $filename, base64_decode($content)) === true)
 		{
-			return $this->_success(FHC_SUCCESS);
+			return success(FHC_SUCCESS);
 		}
 		else
 		{
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		}
 	}
 
@@ -83,25 +89,25 @@ class FS_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->filepath))
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		
 		// Check method parameters
 		if (is_null($filename))
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		if (is_null($content))
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->filepath), 'i'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->filepath), FHC_MODEL_ERROR);
+		if (($chkRights = $this->isEntitled($this->filepath, PermissionLib::INSERT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
 
 		if ($this->filesystemlib->append($this->filepath, $filename, base64_decode($content)) === true)
 		{
-			return $this->_success(FHC_SUCCESS);
+			return success(FHC_SUCCESS);
 		}
 		else
 		{
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		}
 	}
 
@@ -115,23 +121,23 @@ class FS_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->filepath))
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		
 		// Check method parameters
 		if (is_null($filename))
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->filepath), 'd'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->filepath), FHC_MODEL_ERROR);
+		if (($chkRights = $this->isEntitled($this->filepath, PermissionLib::DELETE_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
 
 		if ($this->filesystemlib->remove($this->filepath, $filename) === true)
 		{
-			return $this->_success(FHC_SUCCESS);
+			return success(FHC_SUCCESS);
 		}
 		else
 		{
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		}
 	}
 	
@@ -145,25 +151,25 @@ class FS_Model extends FHC_Model
 	{
 		// Check Class-Attributes
 		if (is_null($this->filepath))
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		
 		// Check method parameters
 		if (is_null($filename))
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		if (is_null($newFilename))
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		
 		// Check rights
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz($this->filepath), 'u'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz($this->filepath), FHC_MODEL_ERROR);
+		if (($chkRights = $this->isEntitled($this->filepath, PermissionLib::UPDATE_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
 
 		if ($this->filesystemlib->rename($this->filepath, $filename, $this->filepath, $newFilename) === true)
 		{
-			return $this->_success(FHC_SUCCESS);
+			return success(FHC_SUCCESS);
 		}
 		else
 		{
-			return $this->_error(lang('fhc_'.FHC_ERROR), FHC_MODEL_ERROR);
+			return error(FHC_MODEL_ERROR, FHC_ERROR);
 		}
 	}
 }

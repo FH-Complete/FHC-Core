@@ -19,22 +19,20 @@ class Prestudentstatus_model extends DB_Model
 	public function getLastStatus($prestudent_id, $studiensemester_kurzbz = '', $status_kurzbz = '')
 	{
 		// Checks if the operation is permitted by the API caller
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_prestudentstatus'), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_prestudentstatus'), FHC_MODEL_ERROR);
+		if (($chkRights = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
+		if (($chkRights = $this->isEntitled('lehre.tbl_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
+		if (($chkRights = $this->isEntitled('public.tbl_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $chkRights;
 		
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('lehre.tbl_studienplan'), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('lehre.tbl_studienplan'), FHC_MODEL_ERROR);
-		
-		if (! $this->fhc_db_acl->isBerechtigt($this->getBerechtigungKurzbz('public.tbl_status'), 's'))
-			return $this->_error(lang('fhc_'.FHC_NORIGHT).' -> '.$this->getBerechtigungKurzbz('public.tbl_status'), FHC_MODEL_ERROR);
-		
-		$query = "SELECT tbl_prestudentstatus.*,
+		$query = 'SELECT tbl_prestudentstatus.*,
 						 bezeichnung AS studienplan_bezeichnung,
 						 tbl_status.bezeichnung_mehrsprachig
 					FROM public.tbl_prestudentstatus LEFT JOIN lehre.tbl_studienplan USING (studienplan_id)
 						 JOIN public.tbl_status USING (status_kurzbz)
 				   WHERE tbl_status.status_kurzbz = tbl_prestudentstatus.status_kurzbz
-					 AND prestudent_id = ?";
+					 AND prestudent_id = ?';
 
 		$parametersArray = array($prestudent_id);
 		
@@ -54,8 +52,8 @@ class Prestudentstatus_model extends DB_Model
 		$result = $this->db->query($query, $parametersArray);
 		
 		if (is_object($result))
-			return $this->_success($result->result());
+			return success($result->result());
 		else
-			return $this->_error($this->db->error(), FHC_DB_ERROR);
+			return error($this->db->error(), FHC_DB_ERROR);
 	}
 }

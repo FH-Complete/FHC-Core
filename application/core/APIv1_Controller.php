@@ -7,30 +7,11 @@ class APIv1_Controller extends REST_Controller
     function __construct()  
     {
         parent::__construct();
-		$this->load->helper('Message');
+        
+        // Loads return messages
+		$this->load->helper('message');
     }
     
-	/** ---------------------------------------------------------------
-	 * Success
-	 *
-	 * @param   mixed  $retval
-	 * @return  array
-	 */
-	protected function _success($retval, $message = null)
-	{
-		return success($retval, $message);
-	}
-
-	/** ---------------------------------------------------------------
-	 * General Error
-	 *
-	 * @return  array
-	 */
-	protected function _error($retval, $message = null)
-	{
-		return error($retval, $message);
-	}
-	
     /**
      * 
      * @param type $data
