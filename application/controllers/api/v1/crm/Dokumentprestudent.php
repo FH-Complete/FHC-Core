@@ -87,6 +87,23 @@ class Dokumentprestudent extends APIv1_Controller
 		}
 	}
 	
+	/**
+	 * @return void
+	 */
+	public function postSetAcceptedDocuments()
+	{
+		if (isset($this->post()['prestudent_id']) && is_array($this->post()['dokument_kurzbz']))
+		{
+			$result = $this->DokumentprestudentModel->setAcceptedDocuments($this->post()['prestudent_id'], $this->post()['dokument_kurzbz']);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
 	private function _validate($dokumentprestudent = null)
 	{
 		return true;
