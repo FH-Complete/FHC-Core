@@ -7,6 +7,7 @@ $config['send_immediately'] = true; // If the message should be sent immediately
 $config['system_person_id'] = 1; // Dummy sender, used for sending messages from the system
 $config['redirect_view_message_url'] = 'index.ci.php/Redirect/redirectByToken/'; // 
 $config['message_html_view_url'] = 'index.ci.php/ViewMessage/toHTML/';
+$config['assistent_function'] = 'ass';
 
 define('EMAIL_KONTAKT_TYPE', 'email'); // Email kontakt type
 define('SENT_INFO_NEWLINE', '\n'); // tbl_msg_recipient->sentInfo separator

@@ -831,7 +831,7 @@ class MessageLib
 		// Get all the valid receivers id using the oe_kurzbz
 		$receivers = $this->ci->BenutzerfunktionModel->loadWhere(
 			'oe_kurzbz = \'' . $oe_kurzbz . '\''.
-			' AND funktion_kurzbz = \'ass\'' .
+			' AND funktion_kurzbz = \'' . $this->ci->config->item('assistent_function') . '\'' .
 			' AND (NOW() BETWEEN COALESCE(datum_von, NOW()) AND COALESCE(datum_bis, NOW()))'
 		);
 		
