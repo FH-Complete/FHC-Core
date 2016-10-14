@@ -57,15 +57,19 @@ class MailLib
 		
 		// Check if the email address of the debug recipient is a valid one
 		$recipient = $to;
+		$recipientCC = $cc;
+		$recipientBCC = $bcc;
 		if ($this->validateEmailAddress(MAIL_DEBUG))
 		{
 			// if is it valid use it!!!
 			$recipient = MAIL_DEBUG;
+			$recipientCC = MAIL_DEBUG;
+			$recipientBCC = MAIL_DEBUG;
 		}
 		
 		$this->ci->email->to($recipient);
-		if (!is_null($cc)) $this->ci->email->cc($cc);
-		if (!is_null($bcc)) $this->ci->email->bcc($bcc);
+		if (!is_null($recipientCC)) $this->ci->email->cc($recipientCC);
+		if (!is_null($recipientBCC)) $this->ci->email->bcc($recipientBCC);
 		$this->ci->email->subject($subject);
 		$this->ci->email->message($message);
 		if (!empty($altMessage)) $this->ci->email->set_alt_message($altMessage);
