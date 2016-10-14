@@ -88,7 +88,7 @@ class Studiensemester_model extends DB_Model
 				$ss = 'WS';
 			}
 
-			$query .= ' WHERE SUBSTRING(studiensemester_kurzbz FROM 1 FOR 2) = '' . $ss . ''';
+			$query .= ' WHERE SUBSTRING(studiensemester_kurzbz FROM 1 FOR 2) = \'' . $ss . '\'';
 		}
 		
 		$query .= ' ORDER BY delta LIMIT 1';

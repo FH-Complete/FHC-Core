@@ -234,65 +234,17 @@ class MessageLib
 					// If the text and the subject of the template are not empty
 					if (!empty($subject) && !empty($body))
 					{
-						$this->ci->db->trans_start(false);
-						// Save Message
-						$msgData = array(
-							'person_id' => $sender_id,
-							'subject' => $subject,
-							'body' => $body,
-							'priority' => PRIORITY_NORMAL,
-							'relationmessage_id' => $relationmessage_id,
-							'oe_kurzbz' => $oe_kurzbz
-						);
-						$result = $this->ci->MessageModel->insert($msgData);
+						$result = $this->_saveMessage($sender_id, $receiver_id, $subject, $body, $relationmessage_id, $oe_kurzbz);
+						// If no errors were occurred
+						// Leave the code commented
 						if (is_object($result) && $result->error == EXIT_SUCCESS)
 						{
-							// Link the message with the receiver
-							$msg_id = $result->retval;
-							$recipientData = array(
-								'person_id' => $receiver_id,
-								'message_id' => $msg_id,
-								'token' => generateToken()
-							);
-							$result = $this->ci->RecipientModel->insert($recipientData);
-							if (is_object($result) && $result->error == EXIT_SUCCESS)
+							// If the system is configured to send messages immediately
+							if ($this->ci->config->item('send_immediately') === true)
 							{
-								// Save message status
-								$statusData = array(
-									'message_id' => $msg_id,
-									'person_id' => $receiver_id,
-									'status' => MSG_STATUS_UNREAD
-								);
-								$result = $this->ci->MsgStatusModel->insert($statusData);
-								
-								// If no errors were occurred
-								/**
-								* TODO: different config item???
-								*/
-								/*if (is_object($result) && $result->error == EXIT_SUCCESS)
-								{
-									// If the system is configured to send messages immediately
-									if ($this->ci->config->item('send_immediately') === true)
-									{
-										// Send message by email!
-										$resultSendEmail = $this->sendOne($msg_id, $subject, $body);
-									}
-								}*/
+								// Send message by email!
+								$resultSendEmail = $this->sendOne($result->retval, $subject, $body);
 							}
-						}
-						
-						$this->ci->db->trans_complete();
-						
-						if ($this->ci->db->trans_status() === false || (is_object($result) && $result->error != EXIT_SUCCESS))
-						{
-							$this->ci->db->trans_rollback();
-							$result = $this->_error($result->msg, EXIT_ERROR);
-							break;
-						}
-						else
-						{
-							$this->ci->db->trans_commit();
-							$result = $this->_success($msg_id);
 						}
 					}
 					else
@@ -385,63 +337,18 @@ class MessageLib
 							// Parses template text
 							$parsedText = $this->ci->vorlagelib->parseVorlagetext($result->retval[0]->text, $data);
 							$subject = $result->retval[0]->subject;
-
-							$this->ci->db->trans_start(false);
-							// Save Message
-							$msgData = array(
-								'person_id' => $sender_id,
-								'subject' => $subject,
-								'body' => $parsedText,
-								'priority' => PRIORITY_NORMAL,
-								'relationmessage_id' => $relationmessage_id,
-								'oe_kurzbz' => $oe_kurzbz
-							);
-							$result = $this->ci->MessageModel->insert($msgData);
+							
+							// Save message
+							$result = $this->_saveMessage($sender_id, $receiver_id, $subject, $parsedText, $relationmessage_id, $oe_kurzbz);
+							// If no errors were occurred
 							if (is_object($result) && $result->error == EXIT_SUCCESS)
 							{
-								// Link the message with the receiver
-								$msg_id = $result->retval;
-								$recipientData = array(
-									'person_id' => $receiver_id,
-									'message_id' => $msg_id,
-									'token' => generateToken()
-								);
-								$result = $this->ci->RecipientModel->insert($recipientData);
-								if (is_object($result) && $result->error == EXIT_SUCCESS)
+								// If the system is configured to send messages immediately
+								if ($this->ci->config->item('send_immediately') === true)
 								{
-									// Save message status
-									$statusData = array(
-										'message_id' => $msg_id,
-										'person_id' => $receiver_id,
-										'status' => MSG_STATUS_UNREAD
-									);
-									$result = $this->ci->MsgStatusModel->insert($statusData);
-									
-									// If no errors were occurred
-									if (is_object($result) && $result->error == EXIT_SUCCESS)
-									{
-										// If the system is configured to send messages immediately
-										if ($this->ci->config->item('send_immediately') === true)
-										{
-											// Send message by email!
-											$resultSendEmail = $this->sendOne($msg_id, $subject, $parsedText);
-										}
-									}
+									// Send message by email!
+									$resultSendEmail = $this->sendOne($result->retval, $subject, $parsedText);
 								}
-							}
-
-							$this->ci->db->trans_complete();
-
-							if ($this->ci->db->trans_status() === false || (is_object($result) && $result->error != EXIT_SUCCESS))
-							{
-								$this->ci->db->trans_rollback();
-								$result = $this->_error($result->msg, EXIT_ERROR);
-								break;
-							}
-							else
-							{
-								$this->ci->db->trans_commit();
-								$result = $this->_success($msg_id);
 							}
 						}
 						else
@@ -882,6 +789,63 @@ class MessageLib
 		}
 		
 		return false;
+    }
+    
+    /**
+     * Save a message in DB
+     **/
+    private function _saveMessage($sender_id, $receiver_id, $subject, $body, $relationmessage_id, $oe_kurzbz)
+    {
+		// Starts db transaction
+		$this->ci->db->trans_start(false);
+		
+		// Save Message
+		$msgData = array(
+			'person_id' => $sender_id,
+			'subject' => $subject,
+			'body' => $body,
+			'priority' => PRIORITY_NORMAL,
+			'relationmessage_id' => $relationmessage_id,
+			'oe_kurzbz' => $oe_kurzbz
+		);
+		$result = $this->ci->MessageModel->insert($msgData);
+		if (is_object($result) && $result->error == EXIT_SUCCESS)
+		{
+			// Link the message with the receiver
+			$msg_id = $result->retval;
+			$recipientData = array(
+				'person_id' => $receiver_id,
+				'message_id' => $msg_id,
+				'token' => generateToken()
+			);
+			$result = $this->ci->RecipientModel->insert($recipientData);
+			if (is_object($result) && $result->error == EXIT_SUCCESS)
+			{
+				// Save message status
+				$statusData = array(
+					'message_id' => $msg_id,
+					'person_id' => $receiver_id,
+					'status' => MSG_STATUS_UNREAD
+				);
+				$result = $this->ci->MsgStatusModel->insert($statusData);
+			}
+		}
+		
+		$this->ci->db->trans_complete();
+		
+		if ($this->ci->db->trans_status() === false || (is_object($result) && $result->error != EXIT_SUCCESS))
+		{
+			$this->ci->db->trans_rollback();
+			$result = $this->_error($result->msg, EXIT_ERROR);
+			break;
+		}
+		else
+		{
+			$this->ci->db->trans_commit();
+			$result = $this->_success($msg_id);
+		}
+		
+		return $result;
     }
     
     /**
