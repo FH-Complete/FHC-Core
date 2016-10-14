@@ -112,7 +112,7 @@ class Message extends APIv1_Controller
 	{
 		$validation = $this->_validatePostMessage($this->post());
 		
-		if (is_object($validation) && $validation->error == EXIT_SUCCESS)
+		if (isSuccess($validation))
 		{
 			$result = $this->messagelib->sendMessage(
 				isset($this->post()['person_id']) ? $this->post()['person_id'] : null,
@@ -139,7 +139,7 @@ class Message extends APIv1_Controller
 	{
 		$validation = $this->_validatePostMessageVorlage($this->post());
 		
-		if (is_object($validation) && $validation->error == EXIT_SUCCESS)
+		if (isSuccess($validation))
 		{
 			$result = $this->messagelib->sendMessageVorlage(
 				isset($this->post()['sender_id']) ? $this->post()['sender_id'] : null,

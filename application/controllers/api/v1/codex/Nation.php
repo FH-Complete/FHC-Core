@@ -53,7 +53,7 @@ class Nation extends APIv1_Controller
 			$result = $this->NationModel->addOrder('engltext');
 		}
 		
-		if ($result->error == EXIT_SUCCESS)
+		if (isSuccess($result))
 		{
 			if ($this->get('ohnesperre'))
 			{

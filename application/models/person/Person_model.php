@@ -82,8 +82,7 @@ class Person_model extends DB_Model
 				"person_id != " => $person["person_id"],
 				"SUBSTRING(svnr FROM 1 FOR 10) = " => $person["svnr"])
 			);
-			if (is_object($result) && $result->error == EXIT_SUCCESS &&
-				is_array($result->retval) && count($result->retval) > 0)
+			if (hasData($result))
 			{
 				if (count($result->retval) == 1 && $result->retval[0]->svnr == $person["svnr"])
 				{

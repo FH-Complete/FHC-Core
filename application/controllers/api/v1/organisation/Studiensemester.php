@@ -118,12 +118,7 @@ class Studiensemester extends APIv1_Controller
 			$result = $this->StudiensemesterModel->loadWhere(array('start <=' => 'NOW()', 'ende >=' => 'NOW()'));
 		}
 		
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && 
-			count($result->retval) > 0)
-		{
-			// Return $result
-		}
-		else
+		if (!hasData($result))
 		{
 			$this->StudiensemesterModel->addOrder('ende');
 			$this->StudiensemesterModel->addLimit(1);

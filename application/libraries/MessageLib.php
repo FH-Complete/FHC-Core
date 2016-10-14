@@ -120,7 +120,7 @@ class MessageLib
         	return $this->_error('', MSG_ERR_INVALID_TOKEN);
 		
 		$result = $this->ci->RecipientModel->getMessageByToken($token);
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
+		if (hasData($result))
 		{
 			// Searches for a status that is different from unread
 			$found = -1;
@@ -144,7 +144,7 @@ class MessageLib
 				
 				$resultIns = $this->ci->MsgStatusModel->insert($statusKey);
 				// If an error occured while writing on data base, then return it
-				if ($resultIns->error == EXIT_ERROR)
+				if (isError($resultIns))
 				{
 					$result = $resultIns;
 				}
@@ -182,7 +182,7 @@ class MessageLib
 		
 		// Searches if the status is already present
 		$result = $this->ci->MsgStatusModel->load(array($message_id, $person_id, $status));
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
+		if (hasData($result))
 		{
 			// status already present
 		}
@@ -215,7 +215,7 @@ class MessageLib
 		$receivers = $this->_getReceivers($receiver_id, $oe_kurzbz);
 		
 		// If everything went ok
-		if (is_object($receivers) && $receivers->error == EXIT_SUCCESS && is_array($receivers->retval))
+		if (isSuccess($receivers) && is_array($receivers->retval))
 		{
 			// If no receivers were found for this organization unit
 			if (count($receivers->retval) == 0)
@@ -237,7 +237,7 @@ class MessageLib
 						$result = $this->_saveMessage($sender_id, $receiver_id, $subject, $body, $relationmessage_id, $oe_kurzbz);
 						// If no errors were occurred
 						// Leave the code commented
-						if (is_object($result) && $result->error == EXIT_SUCCESS)
+						if (isSuccess($result))
 						{
 							// If the system is configured to send messages immediately
 							if ($this->ci->config->item('send_immediately') === true)
@@ -297,7 +297,7 @@ class MessageLib
 		$receivers = $this->_getReceivers($receiver_id, $oe_kurzbz);
 		
 		// If everything went ok
-		if (is_object($receivers) && $receivers->error == EXIT_SUCCESS && is_array($receivers->retval))
+		if (isSuccess($receivers) && is_array($receivers->retval))
 		{
 			// If no receivers were found for this organization unit
 			if (count($receivers->retval) == 0)
@@ -316,7 +316,7 @@ class MessageLib
 				$receiver_id = $receivers->retval[$i]->person_id;
 				
 				$result = $this->ci->PersonModel->load($receiver_id);
-				if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
+				if (hasData($result))
 				{
 					// Set the language with the global value
 					$sprache = DEFAULT_LEHREINHEIT_SPRACHE;
@@ -328,7 +328,7 @@ class MessageLib
 					
 					// Loads template data
 					$result = $this->ci->vorlagelib->loadVorlagetext($vorlage_kurzbz, $oe_kurzbz, $orgform_kurzbz, $sprache);
-					if (is_object($result) && $result->error == EXIT_SUCCESS)
+					if (isSuccess($result))
 					{
 						// If the text and the subject of the template are not empty
 						if (is_array($result->retval) && count($result->retval) > 0 &&
@@ -341,7 +341,7 @@ class MessageLib
 							// Save message
 							$result = $this->_saveMessage($sender_id, $receiver_id, $subject, $parsedText, $relationmessage_id, $oe_kurzbz);
 							// If no errors were occurred
-							if (is_object($result) && $result->error == EXIT_SUCCESS)
+							if (isSuccess($result))
 							{
 								// If the system is configured to send messages immediately
 								if ($this->ci->config->item('send_immediately') === true)
@@ -426,7 +426,7 @@ class MessageLib
 			$this->ci->maillib->getConfigs()->email_number_to_sent
 		);
 		// Checks if errors were occurred
-		if (is_object($result) && $result->error == EXIT_SUCCESS)
+		if (isSuccess($result))
 		{
 			// If data are present
 			if (is_array($result->retval) && count($result->retval) > 0)
@@ -557,7 +557,7 @@ class MessageLib
 				$message_id
 		);
 		// Checks if errors were occurred
-		if (is_object($result) && $result->error == EXIT_SUCCESS)
+		if (isSuccess($result))
 		{
 			// If data are present
 			if (is_array($result->retval) && count($result->retval) > 0)
@@ -693,7 +693,7 @@ class MessageLib
 		// Changes the status of the message from unread to read
 		$resultUpdate = $this->ci->RecipientModel->update(array($receiver_id, $message_id), $parameters);
 		// Checks if errors were occurred
-		if (is_object($resultUpdate) && $resultUpdate->error == EXIT_SUCCESS && is_array($resultUpdate->retval))
+		if (isSuccess($resultUpdate) && is_array($resultUpdate->retval))
 		{
 			$updated = true;
 		}
@@ -783,7 +783,7 @@ class MessageLib
 		// Load Person_model
 		$this->ci->load->model('person/Person_model', 'PersonModel');
 		$result = $this->ci->PersonModel->load($receiver_id);
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
+		if (hasData($result))
 		{
 			return true;
 		}
@@ -809,7 +809,7 @@ class MessageLib
 			'oe_kurzbz' => $oe_kurzbz
 		);
 		$result = $this->ci->MessageModel->insert($msgData);
-		if (is_object($result) && $result->error == EXIT_SUCCESS)
+		if (isSuccess($result))
 		{
 			// Link the message with the receiver
 			$msg_id = $result->retval;
@@ -819,7 +819,7 @@ class MessageLib
 				'token' => generateToken()
 			);
 			$result = $this->ci->RecipientModel->insert($recipientData);
-			if (is_object($result) && $result->error == EXIT_SUCCESS)
+			if (isSuccess($result))
 			{
 				// Save message status
 				$statusData = array(
@@ -833,7 +833,7 @@ class MessageLib
 		
 		$this->ci->db->trans_complete();
 		
-		if ($this->ci->db->trans_status() === false || (is_object($result) && $result->error != EXIT_SUCCESS))
+		if ($this->ci->db->trans_status() === false || isError($result))
 		{
 			$this->ci->db->trans_rollback();
 			$result = $this->_error($result->msg, EXIT_ERROR);

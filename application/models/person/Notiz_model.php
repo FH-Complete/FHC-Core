@@ -36,7 +36,7 @@ class Notiz_model extends DB_Model
 		$this->db->trans_start(false);
 		
 		$result = $this->delete(array('notiz_id' => $notiz_id));
-		if (is_object($result) && $result->error == EXIT_SUCCESS)
+		if (isSuccess($result))
 		{
 			$result = $this->NotizzuordnungModel->delete(array('notiz_id' => $notiz_id));
 		}
@@ -45,7 +45,7 @@ class Notiz_model extends DB_Model
 		$this->db->trans_complete();
 		
 		// Check if everything went ok during the transaction
-		if ($this->db->trans_status() === false || (is_object($result) && $result->error != EXIT_SUCCESS))
+		if ($this->db->trans_status() === false || isError($result))
 		{
 			$this->db->trans_rollback();
 			$result = error($result->msg, EXIT_ERROR);
@@ -72,7 +72,7 @@ class Notiz_model extends DB_Model
 		
 		$result = $this->insert(array('titel' => $titel, 'text' => $text, 'erledigt' => true));
 		$notiz_id = $result->retval;
-		if (is_object($result) && $result->error == EXIT_SUCCESS)
+		if (isSuccess($result))
 		{
 			$result = $this->NotizzuordnungModel->insert(array('notiz_id' => $notiz_id, 'prestudent_id' => $prestudent_id));
 		}
@@ -81,7 +81,7 @@ class Notiz_model extends DB_Model
 		$this->db->trans_complete();
 		
 		// Check if everything went ok during the transaction
-		if ($this->db->trans_status() === false || (is_object($result) && $result->error != EXIT_SUCCESS))
+		if ($this->db->trans_status() === false || isError($result))
 		{
 			$this->db->trans_rollback();
 			$result = error($result->msg, EXIT_ERROR);

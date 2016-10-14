@@ -93,7 +93,7 @@ class Person extends APIv1_Controller
 		$person = $this->_parseData($this->post());
 		$validation = $this->_validate($this->post());
 		
-		if (is_object($validation) && $validation->error == EXIT_SUCCESS)
+		if (isSuccess($validation))
 		{
 			if(isset($person["person_id"]) && !(is_null($person["person_id"])) && ($person["person_id"] != ""))
 			{

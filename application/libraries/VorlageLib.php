@@ -144,7 +144,7 @@ class VorlageLib
 
 		$vorlage = $this->ci->VorlageStudiengangModel->loadWhere($queryParameters);
 		// If the searched template was not found
-		if (is_object($vorlage) && $vorlage->error == EXIT_SUCCESS && is_array($vorlage->retval) && count($vorlage->retval) == 0)
+		if (hasData($vorlage))
 		{
 			$vorlage = $this->ci->organisationseinheitlib->treeSearch(
 					'public',

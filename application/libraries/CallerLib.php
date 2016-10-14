@@ -33,7 +33,7 @@ class CallerLib
 		$this->ci =& get_instance();
 		
 		// Loads helper message to manage returning messages
-		$this->ci->load->helper('message');
+		$this->ci->load->helper('Message');
 		
 		// Loads permission library
 		$this->ci->load->library('PermissionLib');
@@ -65,7 +65,7 @@ class CallerLib
 		$validation = $this->_validateCall($parameters);
 		
 		// If the validation was passed
-		if ($validation->error == EXIT_SUCCESS)
+		if (isSuccess($validation))
 		{
 			$loaded = null;
 			// If the given resource is a model
@@ -73,7 +73,7 @@ class CallerLib
 			{
 				// Try to load the model
 				$result = $this->_loadModel($parameters->resourcePath, $parameters->resourceName);
-				if ($result->error == EXIT_SUCCESS)
+				if (isSuccess($result))
 				{
 					$loaded = $result->retval;
 				}
@@ -94,7 +94,7 @@ class CallerLib
 							$parameters->function,
 							$permissionType
 					);
-					if ($result->error == EXIT_ERROR)
+					if (isError($result))
 					{
 						$loaded = null;
 					}
@@ -102,7 +102,7 @@ class CallerLib
 					{
 						// Try to load the library
 						$result = $this->_loadLibrary($parameters->resourcePath, $parameters->resourceName);
-						if ($result->error == EXIT_SUCCESS)
+						if (isSuccess($result))
 						{
 							$loaded = $result->retval;
 						}

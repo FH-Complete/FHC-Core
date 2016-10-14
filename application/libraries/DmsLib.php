@@ -48,11 +48,11 @@ class DmsLib
 				$result = $this->ci->DmsModel->loadWhere(array('dms_id' => $dms_id, 'version' => $version));
 			}
 		}
-
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
+		
+		if (hasData($result))
 		{
 			$resultFS = $this->ci->DmsFSModel->read($result->retval[0]->filename);
-			if (is_object($resultFS) && $resultFS->error == EXIT_SUCCESS)
+			if (isSuccess($resultFS))
 			{
 				$result->retval[0]->{DmsLib::FILE_CONTENT_PROPERTY} = $resultFS->retval;
 			}
@@ -79,7 +79,7 @@ class DmsLib
 			unset($dms['new']);
 
 			$result = $this->_saveFileOnInsert($dms);
-			if (is_object($result) && $result->error == EXIT_SUCCESS)
+			if (isSuccess($result))
 			{
 				$filename = $result->retval;
 				if(isset($dms['dms_id']) && $dms['dms_id'] != '')
@@ -91,7 +91,7 @@ class DmsLib
 				else
 				{
 					$result = $this->ci->DmsModel->insert($this->ci->DmsModel->filterFields($dms));
-					if (is_object($result) && $result->error == EXIT_SUCCESS)
+					if (isSuccess($result))
 					{
 						$result = $this->ci->DmsVersionModel->insert(
 							$this->ci->DmsVersionModel->filterFields($dms, $result->retval, $filename)
@@ -103,10 +103,10 @@ class DmsLib
 		else
 		{
 			$result = $this->_saveFileOnUpdate($dms);
-			if (is_object($result) && $result->error == EXIT_SUCCESS)
+			if (isSuccess($result))
 			{
 				$result = $this->ci->DmsModel->update($dms['dms_id'], $this->ci->DmsModel->filterFields($dms));
-				if ($result->error == EXIT_SUCCESS)
+				if (isSuccess($result))
 				{
 					$result = $this->ci->DmsVersionModel->update(
 						array(
@@ -137,7 +137,7 @@ class DmsLib
 			
 			// Get akte_id from table tbl_akte
 			$result = $this->ci->AkteModel->loadWhere(array('person_id' => $person_id, 'dms_id' => $dms_id));
-			if (is_object($result) && $result->error == EXIT_SUCCESS)
+			if (isSuccess($result))
 			{
 				// Delete all entries in tbl_akte
 				for ($i = 0; $i < count($result->retval); $i++)
@@ -147,11 +147,11 @@ class DmsLib
 				
 				// Get all filenames related to this dms
 				$resultFileNames = $this->ci->DmsVersionModel->loadWhere(array('dms_id' => $dms_id));
-				if (is_object($resultFileNames) && $resultFileNames->error == EXIT_SUCCESS)
+				if (isSuccess($resultFileNames))
 				{
 					// Delete from tbl_dms_version
 					$result = $this->ci->DmsVersionModel->delete(array('dms_id' => $dms_id));
-					if (is_object($result) && $result->error == EXIT_SUCCESS)
+					if (isSuccess($result))
 					{
 						// Delete from tbl_dms
 						$result = $this->ci->DmsModel->delete($dms_id);
@@ -163,7 +163,7 @@ class DmsLib
 			$this->ci->db->trans_complete();
 			
 			// Check if everything went ok during the transaction
-			if ($this->ci->db->trans_status() === false || (is_object($result) && $result->error != EXIT_SUCCESS))
+			if ($this->ci->db->trans_status() === false || isError($result))
 			{
 				$this->ci->db->trans_rollback();
 				$result = error($result->msg, EXIT_ERROR);
@@ -175,7 +175,7 @@ class DmsLib
 			}
 			
 			// If everything is ok
-			if (is_object($result) && $result->error == EXIT_SUCCESS)
+			if (isSuccess($result))
 			{
 				// Remove all files related to this person and dms
 				for ($i = 0; $i < count($resultFileNames->retval); $i++)
@@ -200,7 +200,7 @@ class DmsLib
 		$filename = uniqid() . '.' . pathinfo($dms['name'], PATHINFO_EXTENSION);
 		
 		$result = $this->ci->DmsFSModel->write($filename, $dms['file_content']);
-		if (is_object($result) && $result->error == EXIT_SUCCESS)
+		if (isSuccess($result))
 		{
 			$result->retval = $filename;
 		}
@@ -219,7 +219,7 @@ class DmsLib
 		{
 			$result = $this->read($dms['dms_id'], $dms['version']);
 
-			if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
+			if (hasData($result))
 			{
 				$result = $this->ci->DmsFSModel->write($result->retval[0]->filename, $dms['file_content']);
 			}

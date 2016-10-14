@@ -31,3 +31,39 @@ function error($retval = '', $code = null, $msg_indx_prefix = 'fhc_')
 	
 	return $error;
 }
+
+/**
+ * Checks if the result represents a success
+ */
+function isSuccess($result)
+{
+	if (is_object($result) && isset($result->error) && $result->error == EXIT_SUCCESS)
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+/**
+ * Checks if the result represents a success and also if it contains data from DB
+ */
+function hasData($result)
+{
+	if (isSuccess($result) && isset($result->retval) &&
+		is_array($result->retval) && count($result->retval) > 0)
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+/**
+ * Checks if the result represents an error
+ * Wrapper function of isSuccess, more readable code
+ */
+function isError($result)
+{
+	return !isSuccess($result);
+}

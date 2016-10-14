@@ -7,7 +7,12 @@ class OrganisationseinheitLib
 	public function __construct()
 	{
 		$this->ci =& get_instance();
+		
+		// Loads model Organisationseinheit_model
 		$this->ci->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+		
+		// Loads helper message to manage returning messages
+		$this->ci->load->helper('Message');
 	}
 	
 	/**
@@ -47,7 +52,7 @@ class OrganisationseinheitLib
 
 		$result = $this->ci->OrganisationseinheitModel->getOneLevel($schema, $table, $select, $where, $orderby, $oe_kurzbz);
 		
-		if (is_object($result) && $result->error == EXIT_SUCCESS && is_array($result->retval) && count($result->retval) > 0)
+		if (hasData($result))
 		{
 			if ($result->retval[0]->_ppk != null && $result->retval[0]->oe_kurzbz == null)
 			{
