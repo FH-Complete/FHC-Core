@@ -12,9 +12,9 @@
  */
 // ------------------------------------------------------------------------
 
-if (!defined("BASEPATH")) exit("No direct script access allowed");
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class PCRM extends APIv1_Controller
+class CallerLibrary extends APIv1_Controller
 {
 	/**
 	 * API constructor
@@ -23,8 +23,8 @@ class PCRM extends APIv1_Controller
 	{
 		parent::__construct();
 		
-		// Loads the PCRMLib
-		$this->load->library("PCRMLib");
+		// Loads the CallerLib
+		$this->load->library('CallerLib');
 	}
 
 	/**
@@ -33,7 +33,7 @@ class PCRM extends APIv1_Controller
 	public function getCall()
 	{
 		// Start me up!
-		$result = $this->pcrmlib->start($this->get(), PermissionLib::SELECT_RIGHT);
+		$result = $this->callerlib->callLibrary($this->get(), PermissionLib::SELECT_RIGHT);
 
 		// Print the result
 		$this->response($result, REST_Controller::HTTP_OK);
@@ -45,7 +45,7 @@ class PCRM extends APIv1_Controller
 	public function postCall()
 	{
 		// Start me up!
-		$result = $this->pcrmlib->start($this->post(), PermissionLib::UPDATE_RIGHT);
+		$result = $this->callerlib->callLibrary($this->post(), PermissionLib::UPDATE_RIGHT);
 
 		// Print the result
 		$this->response($result, REST_Controller::HTTP_OK);
@@ -57,7 +57,7 @@ class PCRM extends APIv1_Controller
 	public function putCall()
 	{
 		// Start me up!
-		$result = $this->pcrmlib->start($this->put(), PermissionLib::INSERT_RIGHT);
+		$result = $this->callerlib->callLibrary($this->put(), PermissionLib::INSERT_RIGHT);
 
 		// Print the result
 		$this->response($result, REST_Controller::HTTP_OK);
@@ -69,7 +69,7 @@ class PCRM extends APIv1_Controller
 	public function deleteCall()
 	{
 		// Start me up!
-		$result = $this->pcrmlib->start($this->delete(), PermissionLib::DELETE_RIGHT);
+		$result = $this->callerlib->callLibrary($this->delete(), PermissionLib::DELETE_RIGHT);
 
 		// Print the result
 		$this->response($result, REST_Controller::HTTP_OK);

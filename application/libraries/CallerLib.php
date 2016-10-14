@@ -3,9 +3,9 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * 
+ * Library used to call a method of a model or a library
  */
-class PCRMLib
+class CallerLib
 {
 	const RESOURCE_PARAMETER = 'resource';
 	const FUNCTION_PARAMETER = 'function';
@@ -17,10 +17,11 @@ class PCRMLib
 	
 	// Black list of resources that are no allowed to be used
 	private static $RESOURCES_BLACK_LIST = array(
-		'PCRMLib', // disabled self loading
+		'CallerLib', // disabled self loading
 		'LogLib', // hardly usefull and virtually dangerous
 		'MigrationLib', // virtually dangerous, DB manipulation
-		'FilesystemLib' // virtually dangerous, direct access to file system
+		'FilesystemLib', // virtually dangerous, direct access to file system
+		'PermissionLib' // usefull?
 	);
 	
 	/**
@@ -34,13 +35,30 @@ class PCRMLib
 		// Loads helper message to manage returning messages
 		$this->ci->load->helper('message');
 		
+		// Loads permission library
 		$this->ci->load->library('PermissionLib');
+	}
+	
+	/**
+	 * Wrapper method for _call
+	 */
+	public function callLibrary($callParameters, $permissionType)
+	{
+		return $this->_call($callParameters, $permissionType);
+	}
+	
+	/**
+	 * Wrapper method for _call
+	 */
+	public function callModel($callParameters, $permissionType)
+	{
+		return $this->_call($callParameters, $permissionType);
 	}
 	
 	/**
 	 * Everything starts here...
 	 */
-	public function start($callParameters, $permissionType)
+	private function _call($callParameters, $permissionType)
 	{
 		$result = null;
 		$parameters = $this->_getParameters($callParameters);
@@ -51,7 +69,7 @@ class PCRMLib
 		{
 			$loaded = null;
 			// If the given resource is a model
-			if (strpos($parameters->resourceName, PCRMLib::MODEL_PREFIX) !== false)
+			if (strpos($parameters->resourceName, CallerLib::MODEL_PREFIX) !== false)
 			{
 				// Try to load the model
 				$result = $this->_loadModel($parameters->resourcePath, $parameters->resourceName);
@@ -61,7 +79,7 @@ class PCRMLib
 				}
 			}
 			// If the given resource is a library
-			else if (strpos($parameters->resourceName, PCRMLib::LIB_PREFIX) !== false)
+			else if (strpos($parameters->resourceName, CallerLib::LIB_PREFIX) !== false)
 			{
 				// Check if the resource is already loaded, it works only with libraries and drivers
 				$isLoaded = $this->ci->load->is_loaded($parameters->resourceName);
@@ -121,7 +139,15 @@ class PCRMLib
 	}
 	
 	/**
-	 * Gets the parameters from the call
+	 * Gets the parameters from the http call
+	 * Search for parameters <RESOURCE_PARAMETER> and <FUNCTION_PARAMETER>
+	 * <RESOURCE_PARAMETER> is the name of the model or of the library
+	 * <FUNCTION_PARAMETER> is the name of the method present in the model/library
+	 * All the others parameters will be given to the method in the same order that
+	 * they are present in the HTTP call
+	 * EX:
+	 * URL: ../system/CallerLibrary/Call?resource=<resource>&function=<method>&<par1>=<val1>&<par2>=<val2>&<par3>=<val3>
+	 * will call <resource>.<method>(par1, par2, par3)
 	 */
 	private function _getParameters($parametersArray)
 	{
@@ -132,15 +158,15 @@ class PCRMLib
 		foreach ($parametersArray as $parameterName => $parameterValue)
 		{
 			// The name of the resource, path included
-			if ($parameterName == PCRMLib::RESOURCE_PARAMETER)
+			if ($parameterName == CallerLib::RESOURCE_PARAMETER)
 			{
 				// Separates the resource path from the resource name
-				$splittedResource = preg_split(PCRMLib::REG_SPLIT_EXPR, $parameterValue);
+				$splittedResource = preg_split(CallerLib::REG_SPLIT_EXPR, $parameterValue);
 				$parameters->resourceName = $splittedResource[count($splittedResource) - 1];
 				$parameters->resourcePath = str_replace($parameters->resourceName, '', $parameterValue);
 			}
 			// The name of the function
-			else if ($parameterName == PCRMLib::FUNCTION_PARAMETER)
+			else if ($parameterName == CallerLib::FUNCTION_PARAMETER)
 			{
 				$parameters->function = $parameterValue;
 			}
@@ -181,7 +207,7 @@ class PCRMLib
 		{
 			return error('Parameters are not specified');
 		}
-		if (in_array($parameters->resourceName, PCRMLib::$RESOURCES_BLACK_LIST))
+		if (in_array($parameters->resourceName, CallerLib::$RESOURCES_BLACK_LIST))
 		{
 			return error('You are trying to access to unauthorized resources');
 		}
@@ -217,6 +243,10 @@ class PCRMLib
 		return $result;
 	}
 	
+	/**
+	 * Search for a valid permission for this library that should be present with this format:
+	 * '<library path>.<library name>.<library method name>' => '<permission>'
+	 */
 	private function checkLibraryPermission($resourcePath, $resourceName, $function, $permissionType)
 	{
 		$result = null;
@@ -265,8 +295,8 @@ class PCRMLib
 			$found = null;
 			for ($i = 0; $i < count($packagePaths) && is_null($found); $i++)
 			{
-				$file = $packagePaths[$i] . PCRMLib::LIBS_PATH . DIRECTORY_SEPARATOR .
-						$resourcePath . $resourceName . PCRMLib::LIB_FILE_EXTENSION;
+				$file = $packagePaths[$i] . CallerLib::LIBS_PATH . DIRECTORY_SEPARATOR .
+						$resourcePath . $resourceName . CallerLib::LIB_FILE_EXTENSION;
 				if (file_exists($file))
 				{
 					$found = $file;
