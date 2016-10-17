@@ -37,9 +37,6 @@ class Dokument extends APIv1_Controller
 		{
 			$result = $this->DokumentModel->load($dokument_kurzbz);
 			
-			// Workaround
-			$result = $this->escapeArrays($result, array('bezeichnung_mehrsprachig', 'dokumentbeschreibung_mehrsprachig'));
-			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else

@@ -2,6 +2,13 @@
 
 class DB_Model extends FHC_Model
 {
+	const PGSQL_ARRAY_TYPE = '_';
+	const PGSQL_BOOLEAN_TYPE = 'bool';
+	const PGSQL_BOOLEAN_ARRAY_TYPE = '_bool';
+	const PGSQL_BOOLEAN_TRUE = 't';
+	const PGSQL_BOOLEAN_FALSE = 'f';
+	const MODEL_POSTFIX = '_model';
+	
 	protected $dbTable;  	// Name of the DB-Table for CI-Insert, -Update, ...
 	protected $pk;  		// Name of the PrimaryKey for DB-Update, Load, ...
 	protected $hasSequence;	// False if this table has a composite primary key that is not using a sequence
@@ -15,7 +22,7 @@ class DB_Model extends FHC_Model
 		$this->hasSequence = $hasSequence;
 		$this->load->database();
 	}
-
+	
 	/** ---------------------------------------------------------------
 	 * Insert Data into DB-Table
 	 *
@@ -27,11 +34,10 @@ class DB_Model extends FHC_Model
 		// Check Class-Attributes
 		if (is_null($this->dbTable))
 			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
-
-		// Check rights
-		if (($chkRights = $this->isEntitled($this->dbTable, PermissionLib::INSERT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
-
+		
+		// Checks rights
+		if ($chkRights = $this->chkRights(PermissionLib::INSERT_RIGHT)) return $chkRights;
+		
 		// DB-INSERT
 		if ($this->db->insert($this->dbTable, $data))
 		{
@@ -73,9 +79,8 @@ class DB_Model extends FHC_Model
 		if (is_null($this->dbTable))
 			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
-		// Check rights
-		if (($chkRights = $this->isEntitled($this->dbTable, PermissionLib::REPLACE_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
+		// Checks rights
+		if ($chkRights = $this->chkRights(PermissionLib::REPLACE_RIGHT)) return $chkRights;
 
 		// DB-REPLACE
 		if ($this->db->replace($this->dbTable, $data))
@@ -99,9 +104,8 @@ class DB_Model extends FHC_Model
 		if (is_null($this->pk))
 			return error(FHC_MODEL_ERROR, FHC_NOPK);
 		
-		// Check rights
-		if (($chkRights = $this->isEntitled($this->dbTable, PermissionLib::UPDATE_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
+		// Checks rights
+		if ($chkRights = $this->chkRights(PermissionLib::UPDATE_RIGHT)) return $chkRights;
 
 		// DB-UPDATE
 		// Check for composite Primary Key
@@ -115,6 +119,40 @@ class DB_Model extends FHC_Model
 		else
 			$this->db->where($this->pk, $id);
 		if ($this->db->update($this->dbTable, $data))
+			return success($id);
+		else
+			return error($this->db->error(), FHC_DB_ERROR);
+	}
+	
+	/** ---------------------------------------------------------------
+	 * Delete data from DB-Table
+	 *
+	 * @param   string $id  Primary Key for DELETE
+	 * @return  array
+	 */
+	public function delete($id)
+	{
+		// Check Class-Attributes
+		if (is_null($this->dbTable))
+			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
+		if (is_null($this->pk))
+			return error(FHC_MODEL_ERROR, FHC_NOPK);
+		
+		// Checks rights
+		if ($chkRights = $this->chkRights(PermissionLib::DELETE_RIGHT)) return $chkRights;
+
+		// DB-DELETE
+		// Check for composite Primary Key
+		if (is_array($id))
+		{
+			if (isset($id[0]))
+				$result = $this->db->delete($this->dbTable, $this->_arrayMergeIndex($this->pk, $id));
+			else
+				$result = $this->db->delete($this->dbTable, $id);
+		}
+		else
+			$result = $this->db->delete($this->dbTable, array($this->pk => $id));
+		if ($result)
 			return success($id);
 		else
 			return error($this->db->error(), FHC_DB_ERROR);
@@ -134,10 +172,8 @@ class DB_Model extends FHC_Model
 		if (is_null($this->pk))
 			return error(FHC_MODEL_ERROR, FHC_NOPK);
 		
-		// Check rights only if this method is called from a model
-		if (substr(get_called_class(), -6) == '_model')
-			if (($chkRights = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-				return $chkRights;
+		// Checks rights
+		if ($chkRights = $this->chkRights(PermissionLib::SELECT_RIGHT)) return $chkRights;
 		
 		// DB-SELECT
 		// Check for composite Primary Key
@@ -154,7 +190,7 @@ class DB_Model extends FHC_Model
 			$result = $this->db->get_where($this->dbTable, array($this->pk => $id));
 		
 		if ($result)
-			return success($result->result());
+			return success($this->toPhp($result));
 		else
 			return error($this->db->error(), FHC_DB_ERROR);
 	}
@@ -170,17 +206,14 @@ class DB_Model extends FHC_Model
 		if (is_null($this->dbTable))
 			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
-		// Check rights
-		// Check rights only if this method is called from a model
-		if (substr(get_called_class(), -6) == '_model')
-			if (($chkRights = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-				return $chkRights;
-
+		// Checks rights
+		if ($chkRights = $this->chkRights(PermissionLib::SELECT_RIGHT)) return $chkRights;
+		
 		// Execute query
 		$result = $this->db->get_where($this->dbTable, $where);
 		
 		if ($result)
-			return success($result->result());
+			return success($this->toPhp($result));
 		else
 			return error($this->db->error(), FHC_DB_ERROR);
 	}
@@ -191,7 +224,7 @@ class DB_Model extends FHC_Model
 	 *
 	 * TODO:
 	 * - Adding support for composed primary key
-	 * - Adding support for cascading side tables (?)
+	 * - Adding support for cascading side tables (useful?)
 	 *
 	 * @return  array
 	 */
@@ -201,11 +234,8 @@ class DB_Model extends FHC_Model
 		if (is_null($this->dbTable))
 			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
-		// Check rights
-		// Check rights only if this method is called from a model
-		if (substr(get_called_class(), -6) == '_model')
-			if (($chkRights = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-				return $chkRights;
+		// Checks rights
+		if ($chkRights = $this->chkRights(PermissionLib::SELECT_RIGHT)) return $chkRights;
 		
 		// List of tables on which it will work
 		$tables = array_merge(array($mainTable), $sideTables);
@@ -241,7 +271,8 @@ class DB_Model extends FHC_Model
 		if ($resultDB)
 		{
 			// Converts the object that contains data, from the returned CI's object to an array
-			$resultArray = $resultDB->result();
+			// with the postgresql array and boolean types converterd
+			$resultArray = $this->toPhp($resultDB);
 			// Array that will contain all the mainTable records, and to each record the linked data
 			// of a side table
 			$returnArray = array();
@@ -306,22 +337,6 @@ class DB_Model extends FHC_Model
 		return $result;
 	}
 	
-	/**
-	 * Used in loadTree
-	 */
-	private function findMainTable($mainTableObj, $mainTableArray)
-	{
-		for ($i = 0; $i < count($mainTableArray); $i++)
-		{
-			if ($mainTableObj->{$this->pk} == $mainTableArray[$i]->{$this->pk})
-			{
-				return $i;
-			}
-		}
-		
-		return false;
-	}
-
 	/** ---------------------------------------------------------------
 	 * Add a table to join with
 	 *
@@ -402,42 +417,6 @@ class DB_Model extends FHC_Model
 		
 		return success(true);
 	}
-
-	/** ---------------------------------------------------------------
-	 * Delete data from DB-Table
-	 *
-	 * @param   string $id  Primary Key for DELETE
-	 * @return  array
-	 */
-	public function delete($id)
-	{
-		// Check Class-Attributes
-		if (is_null($this->dbTable))
-			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
-		if (is_null($this->pk))
-			return error(FHC_MODEL_ERROR, FHC_NOPK);
-		
-		// Check rights only if this method is called from a model
-		if (substr(get_called_class(), -6) == '_model')
-			if (($chkRights = $this->isEntitled($this->dbTable, PermissionLib::DELETE_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-				return $chkRights;
-
-		// DB-DELETE
-		// Check for composite Primary Key
-		if (is_array($id))
-		{
-			if (isset($id[0]))
-				$result = $this->db->delete($this->dbTable, $this->_arrayMergeIndex($this->pk, $id));
-			else
-				$result = $this->db->delete($this->dbTable, $id);
-		}
-		else
-			$result = $this->db->delete($this->dbTable, array($this->pk => $id));
-		if ($result)
-			return success($id);
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
-	}
 	
 	/** ---------------------------------------------------------------
 	 * Reset the query builder state
@@ -467,14 +446,21 @@ class DB_Model extends FHC_Model
 	 * @param   char	$b	PG-Char to convert
 	 * @return  bool
 	 */
-	public function pgBoolPhp($b)
+	public function pgBoolPhp($val)
 	{
-		if (is_null($b))
-			return null;
-		elseif ($b === 't')
+		// If true
+		if ($val == DB_Model::PGSQL_BOOLEAN_TRUE)
+		{
 			return true;
-		else
+		}
+		// If false
+		else if ($val == DB_Model::PGSQL_BOOLEAN_FALSE)
+		{
 			return false;
+		}
+		
+		// If it is null, let it be null
+		return $val;
 	}
 
 	/** ---------------------------------------------------------------
@@ -530,7 +516,43 @@ class DB_Model extends FHC_Model
 		}
 		return $return;
 	}
-
+	
+	/**
+	* Converts from PostgreSQL array to php array
+	* It also takes care about array of booleans
+	*/
+	public function pgsqlArrayToPhpArray($string, $booleans = false)
+	{
+		// At least returns an empty array
+		$result = array();
+		
+		// String that represents the pgsql array, better if not empty
+		if (!empty($string))
+		{
+			// Magic convertion
+			preg_match_all(
+				'/(?<=^\{|,)(([^,"{]*)|\s*"((?:[^"\\\\]|\\\\(?:.|[0-9]+|x[0-9a-f]+))*)"\s*)(,|(?<!^\{)(?=\}$))/i',
+				$string,
+				$matches,
+				PREG_SET_ORDER
+			);
+			foreach ($matches as $match)
+			{
+				// Single element of the array
+				$tmp = $match[3] != '' ? stripcslashes($match[3]) : (strtolower($match[2]) == 'null' ? null : $match[2]);
+				// If it is an array of booleans, then converts the single element
+				if ($booleans === true)
+				{
+					$tmp = $this->pgBoolPhp($tmp);
+				}
+				// Adds it to the result array
+				$result[] = $tmp;
+			}
+		}
+		
+		return $result;
+	}
+	
 	/** ---------------------------------------------------------------
 	 * Invalid ID
 	 *
@@ -545,5 +567,153 @@ class DB_Model extends FHC_Model
 		for ($j=0; $j < count($i); $j++)
 			$a[$i[$j]] = $v[$j];
 		return $a;
+	}
+	
+	/**
+	 * Executes a query and converts array and boolean data types from PgSql to php
+	 * @return: boolean false on failure
+	 *			boolean if the query is of the write type (INSERT, UPDATE, DELETE...)
+	 *			array that represents DB data
+	 */
+	protected function execQuery($query, $parametersArray = null)
+	{
+		$result = null;
+		
+		// If the query is empty don't lose time
+		if (!empty($query))
+		{
+			// If there are parameters to bind to the query
+			if (is_array($parametersArray) && count($parametersArray) > 0)
+			{
+				$resultDB = $this->db->query($query, $parametersArray);
+			}
+			else
+			{
+				$resultDB = $this->db->query($query);
+			}
+			
+			// If no errors occurred
+			if ($resultDB)
+			{
+				$result = success($this->toPhp($resultDB));
+			}
+			else
+			{
+				$result = error($this->db->error(), FHC_DB_ERROR);
+			}
+		}
+		
+		return $result;
+	}
+	
+	/**
+	 * Checks if the caller is entitled to perform this operation with this right
+	 */
+	protected function chkRights($permission)
+	{
+		// If the caller is _not_ a model _and_ tries to read data, then avoids to check permissions
+		// Otherwise checks always the permissions
+		if (($permission == PermissionLib::SELECT_RIGHT &&
+			substr(get_called_class(), -6) == DB_Model::MODEL_POSTFIX) ||
+			$permission != PermissionLib::SELECT_RIGHT)
+		{
+			if (($chkRights = $this->isEntitled($this->dbTable, $permission, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			{
+				return $chkRights;
+			}
+		}
+	}
+	
+	/**
+	 * Converts array and boolean data types from PgSql to php
+	 * NOTE: PostgreSQL php drivers returns:
+	 * - A boolean value if the query is of the write type (INSERT, UPDATE, DELETE...)
+	 * - A FALSE value on failure
+	 * - Otherwise an object filled with data on success
+	 */
+	private function toPhp($result)
+	{
+		$toPhp = $result; // if there is nothing to convert then return the result from DB
+		
+		// If it's an object its fields will be parsed to find booleans and arrays types
+		if (is_object($result))
+		{
+			$toBeConverterdArray = array(); // Fields to be converted
+			$metaDataArray = $result->field_data(); // Fields information
+			for($i = 0; $i < count($metaDataArray); $i++) // Looking for booleans and arrays
+			{
+				// If array type or boolean type
+				if (strpos($metaDataArray[$i]->type, DB_Model::PGSQL_ARRAY_TYPE) !== false ||
+					$metaDataArray[$i]->type == DB_Model::PGSQL_BOOLEAN_TYPE)
+				{
+					// Name and type of the field to be converted
+					$toBeConverted = new stdClass();
+					// Set the type of the field to be converted
+					$toBeConverted->type = $metaDataArray[$i]->type;
+					// Set the name of the field to be converted
+					$toBeConverted->name = $metaDataArray[$i]->name;
+					// Add the field to be converted to $toBeConverterdArray
+					array_push($toBeConverterdArray, $toBeConverted);
+				}
+			}
+			
+			// If there is something to convert, otherwhise don't lose time
+			if (count($toBeConverterdArray) > 0)
+			{
+				// Returns the array of objects, each of them represents a DB record
+				$resultsArray = $result->result();
+				// Looping on results
+				for($i = 0; $i < count($resultsArray); $i++)
+				{
+					// Single element
+					$tmpResult = $resultsArray[$i];
+					// Looping on fields to be converted
+					for($j = 0; $j < count($toBeConverterdArray); $j++)
+					{
+						// Single element
+						$toBeConverted = $toBeConverterdArray[$j];
+						
+						// Array type
+						if (strpos($toBeConverted->type, DB_Model::PGSQL_ARRAY_TYPE) !== false)
+						{
+							$tmpResult->{$toBeConverted->name} = $this->pgsqlArrayToPhpArray(
+								$tmpResult->{$toBeConverted->name},
+								$toBeConverted->type == DB_Model::PGSQL_BOOLEAN_ARRAY_TYPE
+							);
+						}
+						// Boolean type
+						else if ($toBeConverted->type == DB_Model::PGSQL_BOOLEAN_TYPE)
+						{
+							$tmpResult->{$toBeConverted->name} = $this->pgBoolPhp($tmpResult->{$toBeConverted->name});
+						}
+					}
+				}
+				// Returns DB data as an array
+				$toPhp = $resultsArray;
+			}
+			// And returns DB data as an array
+			else
+			{
+				$toPhp = $result->result();
+			}
+		}
+		
+		return $toPhp;
+	}
+	
+	/**
+	 * Used in loadTree to find the main tables
+	 */
+	private function findMainTable($mainTableObj, $mainTableArray)
+	{
+		for ($i = 0; $i < count($mainTableArray); $i++)
+		{
+			if ($mainTableObj->{$this->pk} == $mainTableArray[$i]->{$this->pk})
+			{
+				return $i;
+			}
+		}
+		
+		return false;
 	}
 }

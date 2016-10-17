@@ -35,13 +35,10 @@ class Dokumentprestudent_model extends DB_Model
 						AND ds.studiengang_kz = ?
 					)';
 			
-			$result = $this->db->query($query, array($prestudent_id, $studiengang_kz));
+			$result = $this->execQuery($query, array($prestudent_id, $studiengang_kz));
 		}
 		
-		if ($result)
-			return success($result);
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $result;
 	}
 	
 	public function setAcceptedDocuments($prestudent_id, $dokument_kurzbz)
@@ -66,12 +63,9 @@ class Dokumentprestudent_model extends DB_Model
 							)
 					)';
 			
-			$result = $this->db->query($query, array($prestudent_id, $dokument_kurzbz, $prestudent_id));
+			$result = $this->execQuery($query, array($prestudent_id, $dokument_kurzbz, $prestudent_id));
 		}
 		
-		if ($result)
-			return success($result);
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $result;
 	}
 }

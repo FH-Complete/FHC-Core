@@ -49,11 +49,6 @@ class Prestudentstatus_model extends DB_Model
 		
 		$query .= ' ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1';
 		
-		$result = $this->db->query($query, $parametersArray);
-		
-		if (is_object($result))
-			return success($result->result());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $this->execQuery($query, $parametersArray);
 	}
 }

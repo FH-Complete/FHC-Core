@@ -96,9 +96,7 @@ class Studiengang_model extends DB_Model
 									AND t1.aktiv IS TRUE
 							   ORDER BY typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC';
 		
-		$result = $this->db->query($allForBewerbungQuery);
-		
-		return success($result->result());
+		return $this->execQuery($allForBewerbungQuery);
 	}
 
 	/**

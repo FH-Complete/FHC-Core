@@ -38,9 +38,6 @@ class Dokumentstudiengang extends APIv1_Controller
 		{
 			$result = $this->DokumentstudiengangModel->load(array($studiengang_kz, $dokument_kurzbz));
 			
-			// Workaround
-			$result = $this->escapeArrays($result, array('beschreibung_mehrsprachig'));
-			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -61,9 +58,6 @@ class Dokumentstudiengang extends APIv1_Controller
 		if (isset($studiengang_kz))
 		{
 			$result = $this->DokumentstudiengangModel->getDokumentstudiengangByStudiengang_kz($studiengang_kz, $onlinebewerbung, $pflicht);
-			
-			// Workaround
-			$result = $this->escapeArrays($result, array('bezeichnung_mehrsprachig', 'dokumentbeschreibung_mehrsprachig'));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

@@ -35,12 +35,8 @@ class Organisationseinheit_model extends DB_Model
 		if (!empty($typ))
 			$qry .= 'WHERE organisationseinheittyp_kurzbz IN ('.$typ.') ';
 		$qry .= 'ORDER BY path;';
-
 		
-		if ($res = $this->db->query($qry))
-			return success($res);
-		else
-			return error($this->db->error());
+		return $this->execQuery($query);
 	}
 	
 	/**
@@ -79,13 +75,6 @@ class Organisationseinheit_model extends DB_Model
 		
 		$query = sprintf($query, $table, $fields, $schema, $table, $where, $orderby);
 		
-		if ($result = $this->db->query($query, array($oe_kurzbz)))
-		{
-			return success($result->result());
-		}
-		else
-		{
-			return error($this->db->error());
-		}
+		return $this->execQuery($query, array($oe_kurzbz));
 	}
 }

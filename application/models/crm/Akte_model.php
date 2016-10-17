@@ -75,12 +75,7 @@ class Akte_model extends DB_Model
 		
 		$query .= ' ORDER BY erstelltam';
 		
-		$result = $this->db->query($query, $parametersArray);
-		
-		if (is_object($result))
-			return success($result->result());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $this->execQuery($query, $parametersArray);
 	}
 	
 	/**
@@ -131,11 +126,6 @@ class Akte_model extends DB_Model
 		
 		$query .= ' GROUP BY a.akte_id ORDER BY a.erstelltam';
 		
-		$result = $this->db->query($query, $parametersArray);
-		
-		if (is_object($result))
-			return success($result->result());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $this->execQuery($query, $parametersArray);
 	}
 }

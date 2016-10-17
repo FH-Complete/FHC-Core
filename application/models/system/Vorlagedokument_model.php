@@ -17,11 +17,8 @@ class Vorlagedokument_model extends DB_Model
 	 */
 	public function loadDokumenteFromVorlagestudiengang($vorlagestudiengang_id)
 	{
-		// Checks if the operation is permitted by the API caller
-		if (($chkRights = $this->isEntitled('public.tbl_vorlagedokument', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
-		
-		$result = null;
+		// Checks rights
+		if ($chkRights = $this->chkRights(PermissionLib::SELECT_RIGHT)) return $chkRights;
 		
 		$qry = 'SELECT vorlagedokument_id,
 						sort,
@@ -33,11 +30,6 @@ class Vorlagedokument_model extends DB_Model
 				 WHERE vorlagestudiengang_id = ?
 			  ORDER BY sort ASC';
 		
-		$result = $this->db->query($qry, array($vorlagestudiengang_id));
-		
-		if (is_object($result))
-			return success($result->result());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $this->execQuery($qry, array($vorlagestudiengang_id));
 	}
 }

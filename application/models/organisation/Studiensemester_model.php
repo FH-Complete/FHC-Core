@@ -14,9 +14,8 @@ class Studiensemester_model extends DB_Model
 	
 	public function getLastOrAktSemester($days = 60)
 	{
-		// Checks if the operation is permitted by the API caller
-		if (($chkRights = $this->isEntitled('public.tbl_studiensemester', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
+		// Checks rights
+		if ($chkRights = $this->chkRights(PermissionLib::SELECT_RIGHT)) return $chkRights;
 		
 		if (!is_numeric($days))
 		{
@@ -29,19 +28,13 @@ class Studiensemester_model extends DB_Model
 				ORDER BY start DESC
 				   LIMIT 1';
 		
-		$result = $this->db->query($query);
-		
-		if (is_object($result))
-			return success($result->result());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $this->execQuery($query);
 	}
 	
 	public function getNextFrom($studiensemester_kurzbz)
 	{
-		// Checks if the operation is permitted by the API caller
-		if (($chkRights = $this->isEntitled('public.tbl_studiensemester', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
+		// Checks rights
+		if ($chkRights = $this->chkRights(PermissionLib::SELECT_RIGHT)) return $chkRights;
 		
 		$query = 'SELECT studiensemester_kurzbz,
 						 start,
@@ -55,12 +48,7 @@ class Studiensemester_model extends DB_Model
 				ORDER BY start
 				   LIMIT 1';
 		
-		$result = $this->db->query($query, array($studiensemester_kurzbz));
-		
-		if (is_object($result))
-			return success($result->result());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $this->execQuery($query, array($studiensemester_kurzbz));
 	}
 	
 	/**
@@ -93,11 +81,6 @@ class Studiensemester_model extends DB_Model
 		
 		$query .= ' ORDER BY delta LIMIT 1';
 		
-		$result = $this->db->query($query);
-		
-		if (is_object($result))
-			return success($result->result());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $this->execQuery($query);
 	}
 }

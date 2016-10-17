@@ -1,7 +1,7 @@
 <?php
+
 class Vorlage_model extends DB_Model
 {
-
 	/**
 	 * Constructor
 	 */
@@ -14,12 +14,11 @@ class Vorlage_model extends DB_Model
 
 	public function getMimeTypes()
 	{
-		$qry = 'SELECT DISTINCT mimetype FROM public.tbl_vorlage ORDER BY mimetype;';
-
+		// Checks rights
+		if ($chkRights = $this->chkRights(PermissionLib::SELECT_RIGHT)) return $chkRights;
 		
-		if ($res = $this->db->query($qry))
-			return success($res);
-		else
-			return error($this->db->error());
+		$query = 'SELECT DISTINCT mimetype FROM public.tbl_vorlage ORDER BY mimetype';
+		
+		return $this->execQuery($query);
 	}
 }

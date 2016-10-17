@@ -64,10 +64,6 @@ class Message_model extends DB_Model
 			$sql = sprintf($sql, 'WHERE status >= 3');
 		}
 		
-		$result = $this->db->query($sql, $parametersArray);
-		if (is_object($result))
-			return success($result->result());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $this->execQuery($sql, $parametersArray);
 	}
 }

@@ -57,12 +57,7 @@ class Phrase_model extends DB_Model
 			$parametersArray['orgform_kurzbz'] = $orgform_kurzbz;
 			$query .= ' AND orgform_kurzbz = ?';
 		}
-
-		$result = $this->db->query($query, $parametersArray);
 		
-		if (is_object($result))
-			return success($result->result());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $this->execQuery($query, $parametersArray);
 	}
 }

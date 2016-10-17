@@ -47,11 +47,7 @@ class Recipient_model extends DB_Model
 		$parametersArray = array($message_id, $person_id);
 		
 		// Get data of the messages to sent
-		$result = $this->db->query($query, $parametersArray);
-		if (is_object($result))
-			return success($result->result());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $this->execQuery($query, $parametersArray);
 	}
 	
 	/**
@@ -85,11 +81,7 @@ class Recipient_model extends DB_Model
 				 WHERE r.token = ?
 				 LIMIT 1';
 		
-		$result = $this->db->query($sql, array(MSG_STATUS_DELETED, $token));
-		if (is_object($result))
-			return success($result->result());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $this->execQuery($sql, array(MSG_STATUS_DELETED, $token));
 	}
 	
 	/**
@@ -147,11 +139,7 @@ class Recipient_model extends DB_Model
 			$sql = sprintf($sql, 'WHERE person_id = ? AND message_id NOT IN (SELECT message_id FROM public.tbl_msg_status WHERE status >= 3 AND person_id = ?)');
 		}
 		
-		$result = $this->db->query($sql, $parametersArray);
-		if (is_object($result))
-			return success($result->result());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $this->execQuery($sql, $parametersArray);
 	}
 	
 	/**
@@ -204,11 +192,7 @@ class Recipient_model extends DB_Model
 		if (! $all)
 			$sql .= ' AND (status < 3 OR status IS NULL)';
 		
-		$result = $this->db->query($sql, array($uid));
-		if (is_object($result))
-			return success($result->result());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $this->execQuery($sql, array($uid));
 	}
 	
 	/**
@@ -273,11 +257,6 @@ class Recipient_model extends DB_Model
 			array_push($parametersArray, $limit);
 		}
 		
-		// Get data of the messages to sent
-		$result = $this->db->query($query, $parametersArray);
-		if (is_object($result))
-			return success($result->result());
-		else
-			return error($this->db->error(), FHC_DB_ERROR);
+		return $this->execQuery($query, $parametersArray);
 	}
 }
