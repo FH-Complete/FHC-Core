@@ -152,7 +152,7 @@ class Studiengang_model extends DB_Model
 			'LEFT'
 		);
 		// Ordering by studiengang_kz and studienplan_id
-		$this->addOrder('public.tbl_studiengang.studiengang_kz');
+		$this->addOrder('public.tbl_studiengang.bezeichnung');
 		$this->addOrder('lehre.tbl_studienplan.studienplan_id');
 		
 		$result = $this->loadTree(
