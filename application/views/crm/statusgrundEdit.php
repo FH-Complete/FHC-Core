@@ -12,36 +12,24 @@
 						<tr>
 							<td colspan="2">
 								Bezeichnung mehrsprachig:<br/><br/>
-								
 								<?php
-									if (isset($sg->bezeichnung_mehrsprachig))
-									{
-										$val = str_replace("{", "", $sg->bezeichnung_mehrsprachig);
-										$val = str_replace("}", "", $val);
-										$val = str_replace("\"", "", $val);
-										$val = explode(",", $val);
-									}
-									else
-									{
-										$val = array();
-									}
-									
 									$i = 0;
+									$val = "";
 								?>
-								
 								<?php foreach ($sprache as $s): ?>
 									<?php echo $s->sprache; ?>:<br/>
 									<?php
-										if (!isset($val[$i]))
+										if (!isset($sg->bezeichnung_mehrsprachig[$i]))
 										{
-											$val[$i] = "";
+											$val = "";
 										}
 										else
 										{
-											$val = str_replace("|", ",", $val);
+											$val = $sg->bezeichnung_mehrsprachig[$i];
 										}
+										$i++;
 									?>
-									<input type="text" name="bezeichnung_mehrsprachig[]" value="<?php echo $val[$i++]; ?>" /><br/>
+									<input type="text" name="bezeichnung_mehrsprachig[]" value="<?php echo $val; ?>" /><br/>
 								<?php endforeach ?>
 								
 							</td>
@@ -54,36 +42,24 @@
 						<tr>
 							<td colspan="2">
 								Beschreibung:<br/><br/>
-								
 								<?php
-									if (isset($sg->beschreibung))
-									{
-										$val = str_replace("{", "", $sg->beschreibung);
-										$val = str_replace("}", "", $val);
-										$val = str_replace("\"", "", $val);
-										$val = explode(",", $val);
-									}
-									else
-									{
-										$val = array();
-									}
-									
 									$i = 0;
+									$val = "";
 								?>
-								
 								<?php foreach ($sprache as $s): ?>
 									<?php echo $s->sprache; ?>:<br/>
 									<?php
-										if (!isset($val[$i]))
+										if (!isset($sg->beschreibung[$i]))
 										{
-											$val[$i] = "";
+											$val = "";
 										}
 										else
 										{
-											$val = str_replace("|", ",", $val);
+											$val = $sg->beschreibung[$i];
 										}
+										$i++;
 									?>
-									<textarea name="beschreibung[]"><?php echo $val[$i++]; ?></textarea><br/>
+									<textarea name="beschreibung[]"><?php echo $val; ?></textarea><br/>
 								<?php endforeach ?>
 							</td>
 						</tr>
@@ -97,7 +73,7 @@
 								Aktiv: 
 							</td>
 							<td>
-								<input type="checkbox" name="aktiv" <?php echo isset($sg->aktiv) && $sg->aktiv == "t" ? "checked" : ""; ?> />
+								<input type="checkbox" name="aktiv" <?php echo isset($sg->aktiv) && $sg->aktiv === true ? "checked" : ""; ?> />
 							</td>
 						</tr>
 						<tr>

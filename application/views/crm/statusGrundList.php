@@ -22,9 +22,9 @@
 						<?php foreach ($statusGrund as $s): ?>
 							<tr>
 								<td><a href="../editGrund/<?php echo $s->statusgrund_kurzbz; ?>" target="StatusgrundBottom"><?php echo $s->status_kurzbz; ?></a></td>
-								<td><?php echo $s->aktiv; ?></td>
-								<td><?php echo $s->bezeichnung_mehrsprachig; ?></td>
-								<td><?php echo $s->beschreibung; ?></td>
+								<td><?php echo json_encode($s->aktiv); ?></td>
+								<td><?php echo json_encode($s->bezeichnung_mehrsprachig); ?></td>
+								<td><?php echo json_encode($s->beschreibung); ?></td>
 								<td><a href="../editGrund/<?php echo $s->statusgrund_kurzbz; ?>" target="StatusgrundBottom">Edit</a></td>
 							</tr>
 						<?php endforeach ?>

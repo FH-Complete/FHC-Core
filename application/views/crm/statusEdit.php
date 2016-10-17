@@ -36,34 +36,24 @@
 								Bezeichnung mehrsprachig:<br/><br/>
 								
 								<?php
-									if (isset($s->bezeichnung_mehrsprachig))
-									{
-										$val = str_replace("{", "", $s->bezeichnung_mehrsprachig);
-										$val = str_replace("}", "", $val);
-										$val = str_replace("\"", "", $val);
-										$val = explode(",", $val);
-									}
-									else
-									{
-										$val = array();
-									}
-									
+									$val = '';
 									$i = 0;
 								?>
 								
 								<?php foreach ($sprache as $sp): ?>
 									<?php echo $sp->sprache; ?>:<br/>
 									<?php
-										if (!isset($val[$i]))
+										if (!isset($s->bezeichnung_mehrsprachig[$i]))
 										{
-											$val[$i] = "";
+											$val = '';
 										}
 										else
 										{
-											$val = str_replace("|", ",", $val);
+											$val = $s->bezeichnung_mehrsprachig[$i];
 										}
+										$i++;
 									?>
-									<input type="text" name="bezeichnung_mehrsprachig[]" value="<?php echo $val[$i++]; ?>" /><br/>
+									<input type="text" name="bezeichnung_mehrsprachig[]" value="<?php echo $val; ?>" /><br/>
 								<?php endforeach ?>
 								
 							</td>
