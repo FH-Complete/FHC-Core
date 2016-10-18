@@ -224,7 +224,7 @@ class Person extends APIv1_Controller
 		{
 			return error("Anzahl der Kinder ist ungueltig");
 		}
-		if (!isset($person["aktiv"]) || (isset($person["aktiv"]) && $person["aktiv"] != "t" && $person["aktiv"] != "f"))
+		if (!isset($person["aktiv"]) || (isset($person["aktiv"]) && $person["aktiv"] !== true && $person["aktiv"] !== false))
 		{
 			return error("Aktiv ist ungueltig");
 		}
