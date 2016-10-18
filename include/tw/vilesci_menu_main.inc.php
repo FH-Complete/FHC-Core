@@ -160,6 +160,7 @@ $menu=array
 		'Ort'=>array('name'=>'Ort (Raum)', 'link'=>'stammdaten/raum_frameset.html', 'target'=>'main','permissions'=>array('basis/ort')),
 		'Firmen'=>array('name'=>'Firmen', 'link'=>'stammdaten/firma_frameset.html', 'target'=>'main','permissions'=>array('basis/firma')),
 		'Organisationseinheiten'=>array('name'=>'Organisationseinheiten', 'link'=>'stammdaten/organisationseinheiten.php', 'target'=>'main','permissions'=>array('basis/organisationseinheit')),
+		'Status'=>array('name'=>'Status', 'link'=>'../index.ci.php/crm/statusgrund', 'target'=>'main','permissions'=>array('admin')),
 		'Statistik'=>array('name'=>'Statistik', 'link'=>'stammdaten/statistik_frameset.html', 'target'=>'main','permissions'=>array('basis/statistik')),
 		'Ampel'=>array('name'=>'Ampel', 'link'=>'stammdaten/ampel_frameset.html', 'target'=>'main','permissions'=>array('basis/ampel')),
 		'Infoscreen'=>array('name'=>'Infoscreen', 'link'=>'stammdaten/infoscreen_frameset.html', 'target'=>'main','permissions'=>array('basis/infoscreen')),
