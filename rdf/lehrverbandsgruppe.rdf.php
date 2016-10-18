@@ -43,12 +43,12 @@ if(!isset($_SERVER['REMOTE_USER']))
 	{
 		die('Wenn keine Authentifizierung stattfindet, muss eine studiengang_kz uebergeben werden');
 	}
-	else 
+	else
 	{
 		$berechtigt_studiengang=array($_GET['studiengang_kz']);
 	}
 }
-else 
+else
 {
 	$uid=get_uid();
 	$berechtigung->getBerechtigungen($uid);
@@ -63,8 +63,8 @@ $orgform_sequence=array();
 
 if(isset($_GET['prestudent']) && $_GET['prestudent']=='false')
 	$berechtigt_studiengang = array_merge($berechtigt_studiengang, $berechtigung->getStgKz('lv-plan'));
-else 
-	$berechtigt_studiengang = array_merge($berechtigt_studiengang, $berechtigung->getStgKz('assistenz'));	
+else
+	$berechtigt_studiengang = array_merge($berechtigt_studiengang, $berechtigung->getStgKz('assistenz'));
 
 //var_dump($berechtigung);
 array_unique($berechtigt_studiengang);
@@ -78,14 +78,14 @@ if (count($berechtigt_studiengang)>0)
 
 	if (isset($_GET['studiengang_kz']))
 		$stg_kz_query='AND tbl_lehrverband.studiengang_kz='.$dbo->db_add_param($_GET['studiengang_kz'], FHC_INTEGER);
-	
+
 	$sql_query="SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz,kurzbzlang, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
 				FROM (public.tbl_studiengang JOIN public.tbl_lehrverband USING (studiengang_kz))
 					LEFT OUTER JOIN public.tbl_gruppe  ON (tbl_lehrverband.studiengang_kz=tbl_gruppe.studiengang_kz AND tbl_lehrverband.semester=tbl_gruppe.semester AND (tbl_lehrverband.verband='') AND tbl_gruppe.lehre AND tbl_gruppe.aktiv)
 				WHERE tbl_lehrverband.aktiv $stg_kz_query
 				ORDER BY erhalter_kz,typ, kurzbz, semester,verband,gruppe, gruppe_kurzbz;";
 }
-else 
+else
 {
 	die('Keine Berechtigung');
 }
@@ -104,13 +104,13 @@ function draw_orgformpart($stg_kz)
 {
 	global $orgform_sequence;
 	$stg_obj = new studiengang($stg_kz);
-	
+
 	//Zusatzfilterung nur bei Mischformen anzeigen
 	if(!$stg_obj->mischform)
 		return true;
-	
+
 	$orgform_sequence[$stg_kz]='';
-	
+
 	$qry = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz not in('VBB','ZGS')";
 	if($stg_obj->db_query($qry))
 	{
@@ -124,10 +124,10 @@ function draw_orgformpart($stg_kz)
 function draw_orgformsubmenu($stg_kz, $orgform)
 {
 	global $stsem_obj, $rdf_url, $orgform_sequence;
-	
+
 	$stg_obj = new studiengang($stg_kz);
 	$stg_kurzbz = $stg_obj->kuerzel;
-	
+
 	echo '
 	<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'" >
 		<VERBAND:name>'.$orgform.'</VERBAND:name>
@@ -137,7 +137,7 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 		<VERBAND:orgform>'.$orgform.'</VERBAND:orgform>
 	</RDF:Description>
 		';
-	
+
 	$orgform_sequence[$stg_kz].='
 	<RDF:li>
 		<RDF:Seq RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'">
@@ -185,7 +185,7 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 						<VERBAND:typ>bewerbungnichtabgeschickt</VERBAND:typ>
 						<VERBAND:orgform>'.$orgform.'</VERBAND:orgform>
 					</RDF:Description>
-								
+
 					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/interessenten/bewerbungabgeschickt" >
 						<VERBAND:name>Bewerbung abgeschickt, Status unbestätigt</VERBAND:name>
 						<VERBAND:stg>'.$stg_kurzbz.'</VERBAND:stg>
@@ -194,7 +194,7 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 						<VERBAND:typ>bewerbungabgeschickt</VERBAND:typ>
 						<VERBAND:orgform>'.$orgform.'</VERBAND:orgform>
 					</RDF:Description>
-								
+
 					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/interessenten/statusbestaetigt" >
 						<VERBAND:name>Status bestätigt</VERBAND:name>
 						<VERBAND:stg>'.$stg_kurzbz.'</VERBAND:stg>
@@ -203,7 +203,7 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 						<VERBAND:typ>statusbestaetigt</VERBAND:typ>
 						<VERBAND:orgform>'.$orgform.'</VERBAND:orgform>
 					</RDF:Description>
-								
+
 					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/interessenten/zgv" >
 						<VERBAND:name>ZGV erfüllt</VERBAND:name>
 						<VERBAND:stg>'.$stg_kurzbz.'</VERBAND:stg>
@@ -266,7 +266,7 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 						<VERBAND:typ>absage</VERBAND:typ>
 						<VERBAND:orgform>'.$orgform.'</VERBAND:orgform>
 					</RDF:Description>
-					
+
 					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$stsem->studiensemester_kurzbz.'/incoming" >
 						<VERBAND:name>Incoming</VERBAND:name>
 						<VERBAND:stg>'.$stg_kurzbz.'</VERBAND:stg>
@@ -277,7 +277,7 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 					</RDF:Description>
 					';
 			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li>\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz\">\n";
-	
+
 			$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li>";
 			$orgform_sequence[$stg_kz].= "\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten\">\n";
 			$orgform_sequence[$stg_kz].= "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$stsem->studiensemester_kurzbz/interessenten/bewerbungnichtabgeschickt\" />\n";
@@ -302,7 +302,7 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 		</RDF:li>
 		';
 	}
-	
+
 	$data = array();
 	$qry = "SELECT semester, verband, gruppe,'' as gruppe_kurzbz, bezeichnung, null as sort FROM public.tbl_lehrverband WHERE orgform_kurzbz=".$stg_obj->db_add_param($orgform)." AND studiengang_kz=".$stg_obj->db_add_param($stg_kz)." AND aktiv
 			UNION
@@ -336,9 +336,9 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 					</RDF:li>
 					';
 		   		}
-		   		
+
 		   		$sem=$row->semester;
-		   		
+
 		   		$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li>";
 				$orgform_sequence[$stg_kz].= "\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$orgform/$sem\">\n";
 				$qry_bez = "SELECT bezeichnung FROM public.tbl_lehrverband WHERE studiengang_kz=".$stg_obj->db_add_param($stg_kz)." AND semester=".$stg_obj->db_add_param($sem)." AND trim(verband)='' AND trim(gruppe)=''";
@@ -346,8 +346,8 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 				if($result_bez = $stg_obj->db_query($qry_bez))
 					if($row_bez = $stg_obj->db_fetch_object($result_bez))
 						$bezeichnung = ($row_bez->bezeichnung!=''?'('.$row_bez->bezeichnung.')':'');
-				
-				echo '		
+
+				echo '
 					<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$sem.'">
 						<VERBAND:name>'.$stg_kurzbz.'-'.$sem.' '.$bezeichnung.'</VERBAND:name>
 						<VERBAND:stg>'.$stg_kurzbz.'</VERBAND:stg>
@@ -357,7 +357,7 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 					</RDF:Description>
 					';
 			}
-		
+
 			if($row->gruppe_kurzbz!='')
 			{
 				$orgform_sequence[$stg_kz].= "\t\t\t\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$row->semester/$row->gruppe_kurzbz\" />\n";
@@ -370,9 +370,9 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 						<VERBAND:gruppe>'.$row->gruppe_kurzbz.'</VERBAND:gruppe>
 						<VERBAND:orgform>'.$orgform.'</VERBAND:orgform>
 					</RDF:Description>
-					';		
+					';
 			}
-			else 
+			else
 			{
 				//Wenn dieser Eintrag noch nicht geschrieben wurde
 				if($row->verband!='' && $row->verband!=' ' && trim($row->gruppe)=='')
@@ -386,11 +386,11 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 						';
 					}
 					$ver=$row->verband;
-					
+
 					$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li>";
 					$orgform_sequence[$stg_kz].= "\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$orgform/$row->semester/$row->verband\">\n";
 
-					echo '				
+					echo '
 						<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$row->semester.'/'.$row->verband.'">
 							<VERBAND:name>'.$stg_kurzbz.'-'.$row->semester.$row->verband.($row->bezeichnung!=''?'  ('.$row->bezeichnung.')':'').'</VERBAND:name>
 							<VERBAND:stg>'.$stg_kurzbz.'</VERBAND:stg>
@@ -404,7 +404,7 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 				else if  ($row->gruppe!='' && $row->gruppe!=' ')
 				{
 					$orgform_sequence[$stg_kz].= "\t\t\t\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$orgform/$row->semester/$row->verband/$row->gruppe\" />\n";
-					echo '			
+					echo '
 							<RDF:Description RDF:about="'.$rdf_url.$stg_kurzbz.'/'.$orgform.'/'.$row->semester.'/'.$row->verband.'/'.$row->gruppe.'">
 								<VERBAND:name>'.$stg_kurzbz.'-'.$row->semester.$row->verband.$row->gruppe.($row->bezeichnung!=''?'  ('.$row->bezeichnung.')':'').'</VERBAND:name>
 								<VERBAND:stg>'.$stg_kurzbz.'</VERBAND:stg>
@@ -443,9 +443,9 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 }
 ?>
 
-<RDF:RDF	
+<RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:VERBAND="<?php echo $rdf_url; ?>rdf#" 
+	xmlns:VERBAND="<?php echo $rdf_url; ?>rdf#"
 	xmlns:NC="http://home.netscape.com/NC-rdf#">
 
 <?php
@@ -466,7 +466,7 @@ while ($row=$dbo->db_fetch_object())
 			<VERBAND:stg_kz NC:parseType="Integer"><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
 		</RDF:Description>
 
-		<?php 
+		<?php
 		if(!(isset($_GET['prestudent']) && $_GET['prestudent']=='false'))
 		{
 			?>
@@ -487,7 +487,7 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 				<VERBAND:typ>prestudent</VERBAND:typ>
 			</RDF:Description>
-	
+
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten'; ?>" >
 				<VERBAND:name>Interessenten</VERBAND:name>
 				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -495,7 +495,7 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 				<VERBAND:typ>interessenten</VERBAND:typ>
 			</RDF:Description>
-			
+
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/bewerbungnichtabgeschickt'; ?>" >
 				<VERBAND:name>Bewerbung nicht abgeschickt</VERBAND:name>
 				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -503,7 +503,7 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 				<VERBAND:typ>bewerbungnichtabgeschickt</VERBAND:typ>
 			</RDF:Description>
-			
+
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/bewerbungabgeschickt'; ?>" >
 				<VERBAND:name>Bewerbung abgeschickt, Status unbestätigt</VERBAND:name>
 				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -511,7 +511,7 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 				<VERBAND:typ>bewerbungabgeschickt</VERBAND:typ>
 			</RDF:Description>
-			
+
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/statusbestaetigt'; ?>" >
 				<VERBAND:name>Status bestätigt</VERBAND:name>
 				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -519,7 +519,7 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 				<VERBAND:typ>statusbestaetigt</VERBAND:typ>
 			</RDF:Description>
-			
+
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/zgv'; ?>" >
 				<VERBAND:name>ZGV erfüllt</VERBAND:name>
 				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -527,7 +527,7 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 				<VERBAND:typ>zgv</VERBAND:typ>
 			</RDF:Description>
-	
+
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/reihungstestangemeldet'; ?>" >
 				<VERBAND:name>Reihungstest angemeldet</VERBAND:name>
 				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -535,7 +535,7 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 				<VERBAND:typ>reihungstestangemeldet</VERBAND:typ>
 			</RDF:Description>
-	
+
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/interessenten/reihungstestnichtangemeldet'; ?>" >
 				<VERBAND:name>Nicht zum Reihungstest angemeldet</VERBAND:name>
 				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -543,7 +543,7 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 				<VERBAND:typ>reihungstestnichtangemeldet</VERBAND:typ>
 			</RDF:Description>
-	
+
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/bewerber'; ?>" >
 				<VERBAND:name>Bewerber</VERBAND:name>
 				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -551,7 +551,7 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 				<VERBAND:typ>bewerber</VERBAND:typ>
 			</RDF:Description>
-	
+
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/aufgenommen'; ?>" >
 				<VERBAND:name>Aufgenommen</VERBAND:name>
 				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -559,7 +559,7 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 				<VERBAND:typ>aufgenommen</VERBAND:typ>
 			</RDF:Description>
-	
+
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/warteliste'; ?>" >
 				<VERBAND:name>Warteliste</VERBAND:name>
 				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -567,7 +567,7 @@ while ($row=$dbo->db_fetch_object())
 				<VERBAND:stsem><?php echo $stsem->studiensemester_kurzbz; ?></VERBAND:stsem>
 				<VERBAND:typ>warteliste</VERBAND:typ>
 			</RDF:Description>
-	
+
 			<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz.'/'.$stsem->studiensemester_kurzbz.'/absage'; ?>" >
 				<VERBAND:name>Absage</VERBAND:name>
 				<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
@@ -586,7 +586,7 @@ while ($row=$dbo->db_fetch_object())
 			}
 		}
    	}
-   	
+
    	if ($sem!=$row->semester && ($row->verband!='' || $row->verband!=' '))
    	{
    		$sem=$row->semester;
@@ -687,6 +687,16 @@ if($show_inout_block)
 		<VERBAND:orgform></VERBAND:orgform>
 		<VERBAND:typ>outgoing</VERBAND:typ>
 	</RDF:Description>
+	<RDF:Description RDF:about="'.$rdf_url.'inout/gemeinsamestudien">
+		<VERBAND:name>Gemeinsame Studien</VERBAND:name>
+		<VERBAND:stg></VERBAND:stg>
+		<VERBAND:stg_kz></VERBAND:stg_kz>
+		<VERBAND:sem></VERBAND:sem>
+		<VERBAND:ver></VERBAND:ver>
+		<VERBAND:grp></VERBAND:grp>
+		<VERBAND:orgform></VERBAND:orgform>
+		<VERBAND:typ>gemeinsamestudien</VERBAND:typ>
+	</RDF:Description>
 	';
 }
 
@@ -725,7 +735,7 @@ draw_orgformpart($stg_kz);
 			$stg_kurzbz=strtoupper($row->typ.$row->kurzbz);
 			//echo "\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz\" />\n";
 			echo "\t<RDF:li>\n\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz\">\n";
-			
+
 			if(!(isset($_GET['prestudent']) && $_GET['prestudent']=='false'))
 			{
 				//Prestudent
@@ -734,7 +744,7 @@ draw_orgformpart($stg_kz);
 				foreach ($stsem_obj->studiensemester as $stsem)
 				{
 					echo "\t\t\t<RDF:li>\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz\">\n";
-	
+
 					echo "\t\t\t<RDF:li>";
 					echo "\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten\">\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/bewerbungnichtabgeschickt\" />\n";
@@ -745,13 +755,13 @@ draw_orgformpart($stg_kz);
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/interessenten/reihungstestnichtangemeldet\" />\n";
 					echo "\t\t\t\t</RDF:Seq>";
 					echo "\n\t\t\t</RDF:li>\n";
-	
+
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/bewerber\" />\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/aufgenommen\" />\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/warteliste\" />\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/absage\" />\n";
 					echo "\t\t\t\t<RDF:li RDF:resource=\"$rdf_url$stg_kurzbz/$stsem->studiensemester_kurzbz/incoming\" />\n";
-	
+
 					echo "\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
 				}
 				echo "\t\t\t</RDF:Seq>\n\t\t\t</RDF:li>\n";
@@ -817,6 +827,7 @@ draw_orgformpart($stg_kz);
 			<RDF:Seq RDF:about="http://www.technikum-wien.at/lehrverbandsgruppe/inout">
 				<RDF:li RDF:resource="http://www.technikum-wien.at/lehrverbandsgruppe/inout/incoming"/>
 				<RDF:li RDF:resource="http://www.technikum-wien.at/lehrverbandsgruppe/inout/outgoing"/>
+				<RDF:li RDF:resource="http://www.technikum-wien.at/lehrverbandsgruppe/inout/gemeinsamestudien"/>
 			</RDF:Seq>
 		</RDF:li>';
 	}

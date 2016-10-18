@@ -40,8 +40,19 @@ echo '
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:MOB="'.$rdf_url.'/rdf#"
 >
-   <RDF:Seq about="'.$rdf_url.'/liste">';
+	<RDF:Seq about="'.$rdf_url.'/liste">';
 
+if(isset($_GET['optional']))
+{
+	echo '
+		<RDF:li>
+			<RDF:Description  id=""  about="'.$rdf_url.'/" >
+				<MOB:mobilitaetsprogramm_code><![CDATA[]]></MOB:mobilitaetsprogramm_code>
+				<MOB:kurzbz><![CDATA[]]></MOB:kurzbz>
+				<MOB:beschreibung><![CDATA[-- keine Auswahl --]]></MOB:beschreibung>
+			</RDF:Description>
+		</RDF:li>';
+}
 $qry = 'SELECT * FROM bis.tbl_mobilitaetsprogramm ORDER BY kurzbz';
 $db = new basis_db();
 
@@ -49,14 +60,14 @@ if($db->db_query($qry))
 {
 	while($row = $db->db_fetch_object())
 	{
-		echo '	
-      		<RDF:li>
-         		<RDF:Description  id="'.$row->mobilitaetsprogramm_code.'"  about="'.$rdf_url.'/'.$row->mobilitaetsprogramm_code.'" >
-            		<MOB:mobilitaetsprogramm_code><![CDATA['.$row->mobilitaetsprogramm_code.']]></MOB:mobilitaetsprogramm_code>
-            		<MOB:kurzbz><![CDATA['.$row->kurzbz.']]></MOB:kurzbz>
-            		<MOB:beschreibung><![CDATA['.$row->beschreibung.']]></MOB:beschreibung>
-         		</RDF:Description>
-      		</RDF:li>';
+		echo '
+			<RDF:li>
+				<RDF:Description  id="'.$row->mobilitaetsprogramm_code.'"  about="'.$rdf_url.'/'.$row->mobilitaetsprogramm_code.'" >
+					<MOB:mobilitaetsprogramm_code><![CDATA['.$row->mobilitaetsprogramm_code.']]></MOB:mobilitaetsprogramm_code>
+					<MOB:kurzbz><![CDATA['.$row->kurzbz.']]></MOB:kurzbz>
+					<MOB:beschreibung><![CDATA['.$row->beschreibung.']]></MOB:beschreibung>
+				</RDF:Description>
+			</RDF:li>';
 	}
 }
 ?>
