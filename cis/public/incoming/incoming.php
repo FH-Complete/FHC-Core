@@ -507,7 +507,6 @@ else if($method=="lehrveranstaltungen")
 				else if ($studiengang->typ == 'm')
 					$typ = 'MA';
 				echo '<tr>';
-				//echo '<td style="display:none">'.$lehrveranstaltung->lehrveranstaltung_id.'</td>';
 				echo '<td> <a href="incoming.php?method=lehrveranstaltungen&mode=delete&id='.$lv.'&view=own&'.$filter_url.'">'.$p->t('global/löschen').'</a></td>';
 				echo '<td>',$studiengang_language,'</td>';
 				echo '<td>',$typ,'</td>';
@@ -521,6 +520,7 @@ else if($method=="lehrveranstaltungen")
 					<a href="#Deutsch" class="Item" onclick="javascript:window.open(\'lvinfo.php?lv='.$lehrveranstaltung->lehrveranstaltung_id.'&amp;language=de\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">'.$p->t("global/deutsch").'&nbsp;</a>
 					<a href="#Englisch" class="Item" onclick="javascript:window.open(\'lvinfo.php?lv='.$lehrveranstaltung->lehrveranstaltung_id.'&amp;language=en\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">'.$p->t("global/englisch").'</a>
 					</td>';
+				echo '<td style="display:none">'.$lehrveranstaltung->lehrveranstaltung_id.'</td>';//Necessary for LV-Info-ADDON to get the ID for the course
 				echo '</tr>';
 			}
 			echo '</tbody></table>';
@@ -740,14 +740,16 @@ else if($method=="lehrveranstaltungen")
 		
 		//Uebersicht LVs
 		/* Erklaerung der Datumszeitraeume ab Zeile 663:
-		 *		|=============== Studiensemester ===============|
-		 *	|--------------| 											Incoming beginnt vor SS-Beginn und endet VOR SS-Ende jedoch ueberwiegend innerhalb SS
-		 *											|--------------| 	Incoming beginnt VOR SS-Ende und endet NACH SS-Ende, jedoch ueberwiegend innerhalb SS 
-		 * 				|------------------------------| 				Incoming ist innerhalb oder GENAU SS da
-		 *	|------------------------------------------------------|	Incoming ist VOR SS-Anfang und NACH SS-Ende da, jedoch ueberwiegend ueberlappend mit SS 
-		 * ---------------------------------------------------------	Von und Bis ist NULL
-		 * -------------------|											Von ist NULL und bis innerhalb SS
-		 *									|-----------------------	Bis ist NULL und von innerhalb SS 
+		 *			|=============== Studiensemester ===============|
+		 *		|--------------| 											Incoming beginnt vor SS-Beginn und endet VOR SS-Ende jedoch ueberwiegend innerhalb SS
+		 *												|--------------| 	Incoming beginnt VOR SS-Ende und endet NACH SS-Ende, jedoch ueberwiegend innerhalb SS 
+		 *	|----------| 													Incoming beginnt vor SS-Beginn und endet VOR SS-Ende jedoch ueberwiegend außerhalb SS
+		 *														|---------|	Incoming beginnt VOR SS-Ende und endet NACH SS-Ende, jedoch ueberwiegend außerhalb SS 
+		 * 					|------------------------------| 				Incoming ist innerhalb oder GENAU SS da
+		 *		|------------------------------------------------------|	Incoming ist VOR SS-Anfang und NACH SS-Ende da, jedoch ueberwiegend ueberlappend mit SS 
+		 *	------------------------------------------------------------	Von und Bis ist NULL
+		 *	-------------------|											Von ist NULL und bis innerhalb SS
+		 *									|---------------------------	Bis ist NULL und von innerhalb SS 
 		 */
 		
 		$studiensemester_array = array();
@@ -795,6 +797,8 @@ else if($method=="lehrveranstaltungen")
 							(
 								(bis - '$stsem->start' > '$stsem->start' - von) OR
 								('$stsem->start' <= von AND bis >= '$stsem->ende' AND '$stsem->ende' - von > bis - '$stsem->ende') OR
+								(bis <= '$stsem->ende' AND bis >= '$stsem->start' AND von < '$stsem->start') OR
+								('$stsem->start' <= von AND von < '$stsem->ende' AND bis > '$stsem->ende') OR
 								(von >= '$stsem->start' AND bis <= '$stsem->ende') OR
 								(von <= '$stsem->start' AND bis >= '$stsem->ende') OR
 								(von IS NULL AND bis IS NULL) OR
@@ -872,7 +876,7 @@ else if($method=="lehrveranstaltungen")
 							else
 								$typ = '-';
 							echo '<tr>';
-							//echo '<td style="display:none">'.$row->lehrveranstaltung_id.'</td>';If not commented, tablesorter is not working correct
+							
 							if(!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id) && $freieplaetze>0)
 								echo '<td><a href="incoming.php?method=lehrveranstaltungen&mode=add&id='.$row->lehrveranstaltung_id.'&'.$filter_url.'">'.$p->t('global/anmelden').'</a></td>';
 							elseif (!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id) && $freieplaetze==0)
@@ -892,6 +896,7 @@ else if($method=="lehrveranstaltungen")
 									<a href="#Englisch" class="Item" onclick="javascript:window.open(\'lvinfo.php?lv='.$row->lehrveranstaltung_id.'&amp;language=en\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">'.$p->t("global/englisch").'</a>
 								  </td>';
 							echo '<td '.$style.'>',($freieplaetze<$row->incoming?'<strong>'.$freieplaetze.' ('.$p->t('incoming/von').' '.$row->incoming.')</strong>':$freieplaetze.' ('.$p->t('incoming/von').' '.$row->incoming.')').'</td>';
+							echo '<td style="display:none">'.$row->lehrveranstaltung_id.'</td>';//Necessary for LV-Info-ADDON to get the ID for the course
 							echo '</tr>';
 						//}
 					}
