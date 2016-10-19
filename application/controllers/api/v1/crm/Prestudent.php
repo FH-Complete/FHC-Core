@@ -140,9 +140,9 @@ class Prestudent extends APIv1_Controller
 	 */
 	public function postPrestudent()
 	{
-		$prestudent = $this->_parseData($this->post());
+		$prestudent = $this->post();
 		
-		if ($this->_validate($prestudent))
+		if ($this->_validate($this->post()))
 		{
 			if (isset($prestudent['prestudent_id']))
 			{
@@ -183,7 +183,7 @@ class Prestudent extends APIv1_Controller
 	 */
 	public function postAddReihungstest()
 	{
-		$ddReihungstest = $this->_parseData($this->post());
+		$ddReihungstest = $this->post();
 		
 		if ($this->_validateReihungstest($ddReihungstest))
 		{
@@ -212,7 +212,7 @@ class Prestudent extends APIv1_Controller
 	 */
 	public function postDelReihungstest()
 	{
-		$ddReihungstest = $this->_parseData($this->post());
+		$ddReihungstest = $this->post();
 		
 		if (isset($ddReihungstest['rt_person_id']))
 		{

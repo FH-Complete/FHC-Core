@@ -47,17 +47,17 @@ class Adresse extends APIv1_Controller
     
     public function postAdresse()
     {
-		$post = $this->_parseData($this->post());
+		$adresse = $this->post();
 		
-		if (is_array($post))
+		if (is_array($adresse))
 		{
-			if (isset($post['adresse_id']))
+			if (isset($adresse['adresse_id']))
 			{
-				$result = $this->AdresseModel->update($post['adresse_id'], $post);
+				$result = $this->AdresseModel->update($adresse['adresse_id'], $adresse);
 			}
 			else
 			{
-				$result = $this->AdresseModel->insert($post);
+				$result = $this->AdresseModel->insert($adresse);
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);

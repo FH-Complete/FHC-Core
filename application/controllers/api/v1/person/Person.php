@@ -90,8 +90,8 @@ class Person extends APIv1_Controller
 	 */
 	public function postPerson()
 	{
-		$person = $this->_parseData($this->post());
-		$validation = $this->_validate($this->post());
+		$person = $this->post();
+		$validation = $this->_validate($person);
 		
 		if (isSuccess($validation))
 		{

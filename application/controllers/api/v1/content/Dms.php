@@ -51,7 +51,7 @@ class Dms extends APIv1_Controller
 	 */
 	public function postDms()
 	{
-		$dms = $this->_parseData($this->post());
+		$dms = $this->post();
 		
 		if ($this->_validatePost($dms))
 		{
@@ -70,9 +70,9 @@ class Dms extends APIv1_Controller
 	 */
 	public function postDelDms()
 	{
-		$dms = $this->_parseData($this->post());
+		$dms = $this->post();
 		
-		if ($this->_validateDelete($dms))
+		if ($this->_validateDelete($this->post()))
 		{
 			$result = $this->dmslib->delete($dms["person_id"], $dms["dms_id"]);
 			

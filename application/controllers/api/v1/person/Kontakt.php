@@ -13,7 +13,7 @@
  */
 // ------------------------------------------------------------------------
 
-if (! defined("BASEPATH")) exit("No direct script access allowed");
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Kontakt extends APIv1_Controller
 {
@@ -23,13 +23,14 @@ class Kontakt extends APIv1_Controller
     public function __construct()
     {
 		parent::__construct();
+		
 		// Load model PersonModel
-		$this->load->model("person/kontakt_model", "KontaktModel");
+		$this->load->model('person/kontakt_model', 'KontaktModel');
     }
 
 	public function getKontakt()
     {
-		$kontakt_id = $this->get("kontakt_id");
+		$kontakt_id = $this->get('kontakt_id');
 		
 		if (isset($kontakt_id))
 		{
@@ -45,7 +46,7 @@ class Kontakt extends APIv1_Controller
 	
 	public function getOnlyKontakt()
     {
-		$kontakt_id = $this->get("kontakt_id");
+		$kontakt_id = $this->get('kontakt_id');
 		
 		if (isset($kontakt_id))
 		{
@@ -61,7 +62,7 @@ class Kontakt extends APIv1_Controller
 	
 	public function getKontaktByPersonID()
     {
-		$person_id = $this->get("person_id");
+		$person_id = $this->get('person_id');
 		
 		if (isset($person_id))
 		{
@@ -77,11 +78,11 @@ class Kontakt extends APIv1_Controller
 	
 	public function getOnlyKontaktByPersonID()
     {
-		$person_id = $this->get("person_id");
+		$person_id = $this->get('person_id');
 		
 		if (isset($person_id))
 		{
-			$result = $this->KontaktModel->loadWhere(array("person_id" => $person_id));
+			$result = $this->KontaktModel->loadWhere(array('person_id' => $person_id));
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -93,8 +94,8 @@ class Kontakt extends APIv1_Controller
 	
 	public function getKontaktByPersonIDKontaktTyp()
     {
-		$person_id = $this->get("person_id");
-		$kontakttyp = $this->get("kontakttyp");
+		$person_id = $this->get('person_id');
+		$kontakttyp = $this->get('kontakttyp');
 		
 		if (isset($person_id) && isset($kontakttyp))
 		{
@@ -110,17 +111,17 @@ class Kontakt extends APIv1_Controller
     
     public function postKontakt()
     {
-		$post = $this->_parseData($this->post());
+		$kontakt = $this->post();
 		
-		if (is_array($post))
+		if (is_array($kontakt))
 		{
-			if (isset($post["kontakt_id"]))
+			if (isset($kontakt['kontakt_id']))
 			{
-				$result = $this->KontaktModel->update($post["kontakt_id"], $post);
+				$result = $this->KontaktModel->update($kontakt['kontakt_id'], $kontakt);
 			}
 			else
 			{
-				$result = $this->KontaktModel->insert($post);
+				$result = $this->KontaktModel->insert($kontakt);
 			}
 			
 			$this->response($result, REST_Controller::HTTP_OK);

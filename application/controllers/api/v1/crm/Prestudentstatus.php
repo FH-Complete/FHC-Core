@@ -74,7 +74,7 @@ class Prestudentstatus extends APIv1_Controller
 	 */
 	public function postPrestudentstatus()
 	{
-		$prestudentstatus = $this->_parseData($this->post());
+		$prestudentstatus = $this->post();
 		
 		if ($this->_validate($prestudentstatus))
 		{
@@ -109,7 +109,7 @@ class Prestudentstatus extends APIv1_Controller
 	 */
 	public function deletePrestudentstatus()
 	{
-		$prestudentstatus = $this->_parseData($this->delete());
+		$prestudentstatus = $this->delete();
 		
 		if ($this->_validate($prestudentstatus))
 		{
