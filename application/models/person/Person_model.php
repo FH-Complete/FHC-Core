@@ -24,16 +24,16 @@ class Person_model extends DB_Model
 	 */
 	public function checkBewerbung($email, $studiensemester_kurzbz = null)
 	{
-		if (($chkRights = $this->isEntitled('public.tbl_person', 's', FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
-		if (($chkRights = $this->isEntitled('public.tbl_kontakt', 's', FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
-		if (($chkRights = $this->isEntitled('public.tbl_benutzer', 's', FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
-		if (($chkRights = $this->isEntitled('public.tbl_prestudent', 's', FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
-		if (($chkRights = $this->isEntitled('public.tbl_prestudentstatus', 's', FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
+		if (($isEntitled = $this->isEntitled('public.tbl_person', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('public.tbl_kontakt', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('public.tbl_benutzer', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
 		
 		$checkBewerbungQuery = '';
 		$parametersArray = array($email, $email, $email);

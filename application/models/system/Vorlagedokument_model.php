@@ -18,7 +18,8 @@ class Vorlagedokument_model extends DB_Model
 	public function loadDokumenteFromVorlagestudiengang($vorlagestudiengang_id)
 	{
 		// Checks rights
-		if ($chkRights = $this->chkRights(PermissionLib::SELECT_RIGHT)) return $chkRights;
+		if (($isEntitled = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
 		
 		$qry = 'SELECT vorlagedokument_id,
 						sort,

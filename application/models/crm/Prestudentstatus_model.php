@@ -19,12 +19,12 @@ class Prestudentstatus_model extends DB_Model
 	public function getLastStatus($prestudent_id, $studiensemester_kurzbz = '', $status_kurzbz = '')
 	{
 		// Checks if the operation is permitted by the API caller
-		if (($chkRights = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
-		if (($chkRights = $this->isEntitled('lehre.tbl_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
-		if (($chkRights = $this->isEntitled('public.tbl_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
+		if (($isEntitled = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('lehre.tbl_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('public.tbl_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
 		
 		$query = 'SELECT tbl_prestudentstatus.*,
 						 bezeichnung AS studienplan_bezeichnung,

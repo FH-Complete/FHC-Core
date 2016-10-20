@@ -36,7 +36,7 @@ class DB_Model extends FHC_Model
 			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
 		// Checks rights
-		if ($chkRights = $this->chkRights(PermissionLib::INSERT_RIGHT)) return $chkRights;
+		if ($isEntitled = $this->_isEntitled(PermissionLib::INSERT_RIGHT)) return $isEntitled;
 		
 		// DB-INSERT
 		if ($this->db->insert($this->dbTable, $data))
@@ -80,7 +80,7 @@ class DB_Model extends FHC_Model
 			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
 		// Checks rights
-		if ($chkRights = $this->chkRights(PermissionLib::REPLACE_RIGHT)) return $chkRights;
+		if ($isEntitled = $this->_isEntitled(PermissionLib::REPLACE_RIGHT)) return $isEntitled;
 
 		// DB-REPLACE
 		if ($this->db->replace($this->dbTable, $data))
@@ -105,7 +105,7 @@ class DB_Model extends FHC_Model
 			return error(FHC_MODEL_ERROR, FHC_NOPK);
 		
 		// Checks rights
-		if ($chkRights = $this->chkRights(PermissionLib::UPDATE_RIGHT)) return $chkRights;
+		if ($isEntitled = $this->_isEntitled(PermissionLib::UPDATE_RIGHT)) return $isEntitled;
 
 		// DB-UPDATE
 		// Check for composite Primary Key
@@ -139,7 +139,7 @@ class DB_Model extends FHC_Model
 			return error(FHC_MODEL_ERROR, FHC_NOPK);
 		
 		// Checks rights
-		if ($chkRights = $this->chkRights(PermissionLib::DELETE_RIGHT)) return $chkRights;
+		if ($isEntitled = $this->_isEntitled(PermissionLib::DELETE_RIGHT)) return $isEntitled;
 
 		// DB-DELETE
 		// Check for composite Primary Key
@@ -173,7 +173,7 @@ class DB_Model extends FHC_Model
 			return error(FHC_MODEL_ERROR, FHC_NOPK);
 		
 		// Checks rights
-		if ($chkRights = $this->chkRights(PermissionLib::SELECT_RIGHT)) return $chkRights;
+		if ($isEntitled = $this->_isEntitled(PermissionLib::SELECT_RIGHT)) return $isEntitled;
 		
 		// DB-SELECT
 		// Check for composite Primary Key
@@ -207,7 +207,7 @@ class DB_Model extends FHC_Model
 			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
 		// Checks rights
-		if ($chkRights = $this->chkRights(PermissionLib::SELECT_RIGHT)) return $chkRights;
+		if ($isEntitled = $this->_isEntitled(PermissionLib::SELECT_RIGHT)) return $isEntitled;
 		
 		// Execute query
 		$result = $this->db->get_where($this->dbTable, $where);
@@ -235,7 +235,7 @@ class DB_Model extends FHC_Model
 			return error(FHC_MODEL_ERROR, FHC_NODBTABLE);
 		
 		// Checks rights
-		if ($chkRights = $this->chkRights(PermissionLib::SELECT_RIGHT)) return $chkRights;
+		if ($isEntitled = $this->_isEntitled(PermissionLib::SELECT_RIGHT)) return $isEntitled;
 		
 		// List of tables on which it will work
 		$tables = array_merge(array($mainTable), $sideTables);
@@ -609,7 +609,7 @@ class DB_Model extends FHC_Model
 	/**
 	 * Checks if the caller is entitled to perform this operation with this right
 	 */
-	protected function chkRights($permission)
+	private function _isEntitled($permission)
 	{
 		// If the caller is _not_ a model _and_ tries to read data, then avoids to check permissions
 		// Otherwise checks always the permissions
@@ -617,9 +617,9 @@ class DB_Model extends FHC_Model
 			substr(get_called_class(), -6) == DB_Model::MODEL_POSTFIX) ||
 			$permission != PermissionLib::SELECT_RIGHT)
 		{
-			if (($chkRights = $this->isEntitled($this->dbTable, $permission, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			if (($isEntitled = $this->isEntitled($this->dbTable, $permission, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			{
-				return $chkRights;
+				return $isEntitled;
 			}
 		}
 	}

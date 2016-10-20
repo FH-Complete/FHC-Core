@@ -238,7 +238,9 @@ $config['fhc_acl'] = array
 	
 	DMS_PATH => 'fs/dms',
 	
-	'public.tbl_sprache' => 'admin'
+	'public.tbl_sprache' => 'admin',
+	
+	'PhrasesLib.getPhrase' => 'system/PhrasesLib'
 );
 
 $config['addons_aufnahme_url'] = 'http://debian.dev/build/addons/aufnahme/cis/index.php';

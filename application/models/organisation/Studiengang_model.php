@@ -18,10 +18,10 @@ class Studiengang_model extends DB_Model
 	public function getAllForBewerbung()
 	{
 		// Checks if the operation is permitted by the API caller
-		if (($chkRights = $this->isEntitled('lehre.vw_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
-		if (($chkRights = $this->isEntitled('bis.tbl_lgartcode', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $chkRights;
+		if (($isEntitled = $this->isEntitled('lehre.vw_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('bis.tbl_lgartcode', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
 		
 		$allForBewerbungQuery = 'SELECT DISTINCT studiengang_kz,
 										typ,

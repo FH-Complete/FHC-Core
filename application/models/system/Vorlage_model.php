@@ -15,7 +15,8 @@ class Vorlage_model extends DB_Model
 	public function getMimeTypes()
 	{
 		// Checks rights
-		if ($chkRights = $this->chkRights(PermissionLib::SELECT_RIGHT)) return $chkRights;
+		if (($isEntitled = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
 		
 		$query = 'SELECT DISTINCT mimetype FROM public.tbl_vorlage ORDER BY mimetype';
 		

@@ -425,7 +425,8 @@ DELETE FROM system.tbl_rolleberechtigung WHERE berechtigung_kurzbz IN (
 	'system/phrase',
 	'system/vorlagestudiengang',
 	'system/vorlage',
-	'system/appdaten'
+	'system/appdaten',
+	'system/PhrasesLib'
 );
 
 -- DELETE FROM system.tbl_berechtigung
@@ -656,7 +657,8 @@ DELETE FROM system.tbl_berechtigung WHERE berechtigung_kurzbz IN (
 	'system/phrase',
 	'system/vorlagestudiengang',
 	'system/vorlage',
-	'system/appdaten'
+	'system/appdaten',
+	'system/PhrasesLib'
 );
 
 -- INSERT Permissions
@@ -887,6 +889,7 @@ INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('system/vorlagestudiengang', '');
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('system/vorlage', '');
 INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('system/appdaten', '');
+INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES('system/PhrasesLib', '');
 
 -- INSERT link between user admin and permissions
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/archiv', 'admin', 'suid');
@@ -1116,6 +1119,7 @@ INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('system/vorlagestudiengang', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('system/vorlage', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('system/appdaten', 'admin', 'suid');
+INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('system/PhrasesLib', 'admin', 'suid');
 
 -- EMPTY public.tbl_statistik
 DELETE FROM public.tbl_statistik;

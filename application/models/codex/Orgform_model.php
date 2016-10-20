@@ -15,7 +15,8 @@ class Orgform_model extends DB_Model
 	public function getOrgformLV()
 	{
 		// Checks rights
-		if ($chkRights = $this->chkRights(PermissionLib::SELECT_RIGHT)) return $chkRights;
+		if (($isEntitled = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
 		
 		$query = "SELECT *
 					FROM bis.tbl_orgform
