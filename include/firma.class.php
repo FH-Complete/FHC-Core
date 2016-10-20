@@ -16,9 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and.
- *          Gerald Simane-Sequens < gerald.simane-sequens@technikum-wien.at>.
+ *			Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *			Rudolf Hangl <rudolf.hangl@technikum-wien.at> and.
+ *			Gerald Simane-Sequens < gerald.simane-sequens@technikum-wien.at>.
  */
 /**
  * Klasse firma
@@ -29,14 +29,14 @@ require_once(dirname(__FILE__).'/organisationseinheit.class.php');
 
 class firma extends basis_db
 {
-	public $new;       			// boolean
+	public $new;				// boolean
 	public $result = array(); 	// adresse Objekt
 
 	//Tabellenspalten
 	public $firma_id;		// integer
 	public $name;			// string
 	public $anmerkung;		// string
-    public $lieferbedingungen;	// string
+	public $lieferbedingungen;	// string
 	public $ext_id;			// integer
 	public $insertamum;		// timestamp
 	public $insertvon;		// bigint
@@ -97,7 +97,7 @@ class firma extends basis_db
 				$this->firma_id = $row->firma_id;
 				$this->name = $row->name;
 				$this->anmerkung = $row->anmerkung;
-                $this->lieferbedingungen = $row->lieferbedingungen;
+				$this->lieferbedingungen = $row->lieferbedingungen;
 				$this->firmentyp_kurzbz = $row->firmentyp_kurzbz;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
@@ -151,7 +151,7 @@ class firma extends basis_db
 			$this->errormsg = 'Anmerkung darf nicht länger als 256 Zeichen sein';
 			return false;
 		}
-                if(mb_strlen($this->lieferbedingungen)>256)
+			if(mb_strlen($this->lieferbedingungen)>256)
 		{
 			$this->errormsg = 'Lieferbedingungen darf nicht länger als 256 Zeichen sein';
 			return false;
@@ -177,21 +177,21 @@ class firma extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='INSERT INTO public.tbl_firma (name,  anmerkung, lieferbedingungen,
 					firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon, schule,steuernummer,
-					gesperrt,aktiv,finanzamt,partner_code) VALUES('.
-			     $this->db_add_param($this->name).', '.
-			     $this->db_add_param($this->anmerkung).', '.
-                 $this->db_add_param($this->lieferbedingungen).', '.
-			     $this->db_add_param($this->firmentyp_kurzbz).', '.
-			     $this->db_add_param($this->updateamum).', '.
-			     $this->db_add_param($this->updatevon).', '.
-			     $this->db_add_param($this->insertamum).', '.
-			     $this->db_add_param($this->insertvon).', '.
-			     $this->db_add_param($this->schule, FHC_BOOLEAN).','.
-			     $this->db_add_param($this->steuernummer).', '.
-			     $this->db_add_param($this->gesperrt, FHC_BOOLEAN).','.
-			     $this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
-			     $this->db_add_param($this->finanzamt, FHC_INTEGER).','.
-			     $this->db_add_param($this->partner_code).'); ';
+					gesperrt,aktiv,finanzamt) VALUES('.
+				$this->db_add_param($this->name).', '.
+				$this->db_add_param($this->anmerkung).', '.
+				$this->db_add_param($this->lieferbedingungen).', '.
+				$this->db_add_param($this->firmentyp_kurzbz).', '.
+				$this->db_add_param($this->updateamum).', '.
+				$this->db_add_param($this->updatevon).', '.
+				$this->db_add_param($this->insertamum).', '.
+				$this->db_add_param($this->insertvon).', '.
+				$this->db_add_param($this->schule, FHC_BOOLEAN).','.
+				$this->db_add_param($this->steuernummer).', '.
+				$this->db_add_param($this->gesperrt, FHC_BOOLEAN).','.
+				$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
+				$this->db_add_param($this->finanzamt, FHC_INTEGER).','.
+				$this->db_add_param($this->partner_code).'); ';
 		}
 		else
 		{
@@ -207,15 +207,15 @@ class firma extends basis_db
 				'firma_id='.$this->db_add_param($this->firma_id).', '.
 				'name='.$this->db_add_param($this->name).', '.
 				'anmerkung='.$this->db_add_param($this->anmerkung).', '.
-                'lieferbedingungen='.$this->db_add_param($this->lieferbedingungen).', '.
+				'lieferbedingungen='.$this->db_add_param($this->lieferbedingungen).', '.
 				'updateamum= now(), '.
-		     	'updatevon='.$this->db_add_param($this->updatevon).', '.
-		     	'firmentyp_kurzbz='.$this->db_add_param($this->firmentyp_kurzbz).', '.
-		     	'schule='.$this->db_add_param($this->schule, FHC_BOOLEAN).', '.
-		     	'steuernummer='.$this->db_add_param($this->steuernummer).', '.
-		     	'gesperrt='.$this->db_add_param($this->gesperrt, FHC_BOOLEAN).', '.
-		     	'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
-		     	'finanzamt='.$this->db_add_param($this->finanzamt, FHC_INTEGER).', '.
+				'updatevon='.$this->db_add_param($this->updatevon).', '.
+				'firmentyp_kurzbz='.$this->db_add_param($this->firmentyp_kurzbz).', '.
+				'schule='.$this->db_add_param($this->schule, FHC_BOOLEAN).', '.
+				'steuernummer='.$this->db_add_param($this->steuernummer).', '.
+				'gesperrt='.$this->db_add_param($this->gesperrt, FHC_BOOLEAN).', '.
+				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				'finanzamt='.$this->db_add_param($this->finanzamt, FHC_INTEGER).', '.
 				'partner_code='.$this->db_add_param($this->partner_code).' '.
 				'WHERE firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).';';
 		}
@@ -654,15 +654,21 @@ class firma extends basis_db
 	}
 
 	/**
-	 * Laedt alle Firmen Standorte, und Adressen nach Suchstring und/oder eines bestimmen Firmentyps
+	 * Laedt alle Firmen Standorte, und Adressen nach Suchstring und/oder eines bestimmen Firmentyps, und/oder einer bestimmten Organisationseinheit
+	 * @param string $filter Optional. Searchstring.
+	 * @param string $firmentyp_kurzbz Optional. Firmentyp
+	 * @param boolean $standorte Default false. Wenn false, findet ein distinct on auf die firma_id statt
+	 * @param string $oefilter Oe_kurzbz. Optional. Filtert die Firmen auf die uebergebene oe_kurzbz.
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function searchFirma($filter='',$firmentyp_kurzbz='', $standorte=false)
+	public function searchFirma($filter='',$firmentyp_kurzbz='', $standorte=false, $oefilter='')
 	{
 		$this->result = array();
 		$this->errormsg = '';
-
-		$qry ="SELECT * FROM (SElECT ";
+		$oes = '';
+		if ($oefilter!='')
+			$oes = implode("','",$oefilter);
+		$qry ="SELECT * FROM (SELECT ";
 		if(!$standorte)
 			$qry.=" distinct on(firma_id)";
 		$qry.=" tbl_firma.firma_id,tbl_firma.* ,tbl_standort.kurzbz,tbl_standort.adresse_id,tbl_standort.standort_id,tbl_standort.bezeichnung  ";
@@ -670,6 +676,8 @@ class firma extends basis_db
 		$qry.=" FROM public.tbl_firma";
 		$qry.=" LEFT JOIN public.tbl_standort USING(firma_id) ";
 		$qry.=" LEFT JOIN public.tbl_adresse  on ( tbl_adresse.adresse_id=tbl_standort.adresse_id ) ";
+		if ($oes!='')
+			$qry.=" LEFT JOIN public.tbl_firma_organisationseinheit ON (tbl_firma.firma_id=tbl_firma_organisationseinheit.firma_id) ";
 		$qry.=" WHERE 1=1";
 
 		if($filter!='')
@@ -681,7 +689,7 @@ class firma extends basis_db
 					OR lower(ort) like lower('%".$this->db_escape($filter)."%')
 					OR lower(strasse) like lower('%".$this->db_escape($filter)."%')
 
-					OR lower(bezeichnung) like lower('%".$this->db_escape($filter)."%')
+					OR lower(tbl_standort.bezeichnung) like lower('%".$this->db_escape($filter)."%')
 					OR lower(anmerkung) like lower('%".$this->db_escape($filter)."%')
 					".(is_numeric($filter)?" OR tbl_firma.firma_id='".$this->db_escape($filter)."'":'')."
 					OR tbl_firma.firma_id IN (SELECT firma_id FROM public.tbl_firmatag
@@ -690,6 +698,9 @@ class firma extends basis_db
 
 		if($firmentyp_kurzbz!='')
 			$qry.=" and firmentyp_kurzbz=".$this->db_add_param($firmentyp_kurzbz);
+		
+		if($oes!='')
+			$qry.=" and oe_kurzbz IN ('".$oes."') ";
 
 		//if($filter=='' && $firmentyp_kurzbz=='')
 		//	$qry.=" limit 500 ";
@@ -704,7 +715,7 @@ class firma extends basis_db
 				$fa->firma_id = $row->firma_id;
 				$fa->name = $row->name;
 				$fa->anmerkung = $row->anmerkung;
-				$fa->lieferbedingungen = $row->lieferbedingungen;
+				//$fa->lieferbedingungen = $row->lieferbedingungen;
 				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
 				$fa->updateamum = $row->updateamum;
 				$fa->updatevon = $row->updatevon;
@@ -782,11 +793,12 @@ class firma extends basis_db
 
 	/**
 	 * Laedt alle Firmen -  Organisationseinheiten nach Firmen ID und/oder OE Kurzbz
-	 * @param $firma_id ID die gelesen werden soll
-	 * @param $oe_kurzbz Organisationskurzbezeichnung
+	 * @param integer $firma_id ID die gelesen werden soll
+	 * @param string $oe_kurzbz Organisationskurzbezeichnung
+	 * @param string $firmentyp_kurzbz Optional. Firmentyp, der geliefert werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function get_firmaorganisationseinheit($firma_id='',$oe_kurzbz='')
+	public function get_firmaorganisationseinheit($firma_id='', $oe_kurzbz='', $firmentyp_kurzbz='')
 	{
 		$this->result = array();
 		$this->errormsg = '';
@@ -806,9 +818,11 @@ class firma extends basis_db
 		$qry.=" WHERE true ";
 
 		if($firma_id!='')
-			$qry.=" and tbl_firma_organisationseinheit.firma_id=".$this->db_add_param($firma_id, FHC_INTEGER);
+			$qry.=" AND tbl_firma_organisationseinheit.firma_id=".$this->db_add_param($firma_id, FHC_INTEGER);
 		if($oe_kurzbz!='')
-			$qry.=" and tbl_firma_organisationseinheit.oe_kurzbz=".$this->db_add_param($oe_kurzbz);
+			$qry.=" AND tbl_firma_organisationseinheit.oe_kurzbz=".$this->db_add_param($oe_kurzbz);
+		if($firmentyp_kurzbz!='')
+			$qry.=" AND firmentyp_kurzbz=".$this->db_add_param($firmentyp_kurzbz);
 
 		$qry.=" ORDER BY tbl_firma.name, tbl_firma_organisationseinheit.oe_kurzbz;";
 		if($this->db_query($qry))
@@ -930,14 +944,14 @@ class firma extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='INSERT INTO public.tbl_firma_organisationseinheit (firma_id,oe_kurzbz,
 					bezeichnung,kundennummer, updateamum, updatevon, insertamum, insertvon) VALUES('.
-			     $this->db_add_param($this->firma_id, FHC_INTEGER).', '.
-			     $this->db_add_param($this->oe_kurzbz).', '.
-			     $this->db_add_param($this->bezeichnung).', '.
-			     $this->db_add_param($this->kundennummer).', '.
-			     $this->db_add_param($this->updateamum).', '.
-			     $this->db_add_param($this->updatevon).', '.
-			     $this->db_add_param($this->insertamum).', '.
-			     $this->db_add_param($this->insertvon).' ); ';
+				$this->db_add_param($this->firma_id, FHC_INTEGER).', '.
+				$this->db_add_param($this->oe_kurzbz).', '.
+				$this->db_add_param($this->bezeichnung).', '.
+				$this->db_add_param($this->kundennummer).', '.
+				$this->db_add_param($this->updateamum).', '.
+				$this->db_add_param($this->updatevon).', '.
+				$this->db_add_param($this->insertamum).', '.
+				$this->db_add_param($this->insertvon).' ); ';
 		}
 		else
 		{
@@ -955,7 +969,7 @@ class firma extends basis_db
 				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
 				'kundennummer='.$this->db_add_param($this->kundennummer).', '.
 				'updateamum= now(), '.
-		     	'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'updatevon='.$this->db_add_param($this->updatevon).' '.
 				'WHERE firma_organisationseinheit_id='.$this->db_add_param($this->firma_organisationseinheit_id, FHC_INTEGER).';';
 		}
 		if($this->db_query($qry))
@@ -1069,25 +1083,25 @@ class firma extends basis_db
 		}
 	}
 
-    /**
-     * Lädt Alle firmen die zu einem bestimmten mobilitaetsprogramm zugeordnet sind
-     * @param $mobilitaetsprogramm_code
-     * @return boolean
-     */
-    function getFirmenMobilitaetsprogramm($mobilitaetsprogramm_code)
-    {
-        $qry = 'SELECT * FROM public.tbl_firma JOIN public.tbl_firma_mobilitaetsprogramm USING(firma_id) WHERE mobilitaetsprogramm_code ='.$this->db_add_param($mobilitaetsprogramm_code, FHC_INTEGER).';';
+	/**
+	* Lädt Alle firmen die zu einem bestimmten mobilitaetsprogramm zugeordnet sind
+	* @param $mobilitaetsprogramm_code
+	* @return boolean
+	*/
+	function getFirmenMobilitaetsprogramm($mobilitaetsprogramm_code)
+	{
+		$qry = 'SELECT * FROM public.tbl_firma JOIN public.tbl_firma_mobilitaetsprogramm USING(firma_id) WHERE mobilitaetsprogramm_code ='.$this->db_add_param($mobilitaetsprogramm_code, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
-                $fi = new firma();
+				$fi = new firma();
 
 				$fi->firma_id = $row->firma_id;
 				$fi->name = $row->name;
 				$fi->anmerkung = $row->anmerkung;
-                $fi->lieferbedingungen = $row->lieferbedingungen;
+				$fi->lieferbedingungen = $row->lieferbedingungen;
 				$fi->firmentyp_kurzbz = $row->firmentyp_kurzbz;
 				$fi->updateamum = $row->updateamum;
 				$fi->updatevon = $row->updatevon;
