@@ -919,11 +919,12 @@ function StudentAuswahl()
 			StudentKontoDisableFields(false);
 			StudentAkteDisableFields(false);
 			StudentIODisableFields(false);
+			StudentMobilitaetDisableFields(false);
 			StudentNoteDisableFields(false);
 			document.getElementById('student-detail-button-save').disabled=false;
 			StudentPruefungDisableFileds(false);
 			if(document.getElementById('student-tab-anrechnungen'))
-                StudentAnrechnungenDisableFields(false);
+				StudentAnrechnungenDisableFields(false);
 		}
 		else
 		{
@@ -944,9 +945,9 @@ function StudentAuswahl()
 	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?prestudent_id='+prestudent_id+'&studiensemester_kurzbz='+stsem+'&'+gettimestamp();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
-                   getService(Components.interfaces.nsIRDFService);
+			getService(Components.interfaces.nsIRDFService);
 
-    var dsource = rdfService.GetDataSourceBlocking(url);
+	var dsource = rdfService.GetDataSourceBlocking(url);
 
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/student/" + prestudent_id);
 
@@ -1057,6 +1058,7 @@ function StudentAuswahl()
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkungpre" ));
 	mentor = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mentor" ));
 	dual = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dual" ));
+	gsstudientyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gsstudientyp_kurzbz" ));
 
 	document.getElementById('student-prestudent-menulist-aufmerksamdurch').value=aufmerksamdurch_kurzbz;
 	document.getElementById('student-prestudent-menulist-berufstaetigkeit').value=berufstaetigkeit_code;
@@ -1102,6 +1104,7 @@ function StudentAuswahl()
 
 	document.getElementById('student-prestudent-textbox-anmerkung').value=anmerkung;
 	document.getElementById('student-prestudent-textbox-mentor').value=mentor;
+	document.getElementById('student-detail-menulist-gsstudientyp').value=gsstudientyp_kurzbz;
 
 	document.getElementById('student-detail-groupbox-caption').label='Zugangsvoraussetzung für '+nachname+' '+vorname;
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
@@ -1368,6 +1371,12 @@ function StudentAuswahl()
 
 	if(uid!='')
 	{
+		// *** Gemeinsame Studien / Mobilitaet ***
+		StudentMobilitaetLoad(prestudent_id);
+	}
+
+	if(uid!='')
+	{
 		// *** ZeugnisNoten ***
 		notentree = document.getElementById('student-noten-tree');
 
@@ -1474,40 +1483,40 @@ function StudentAuswahl()
 	}
 
 	if(document.getElementById('student-tab-anrechnungen'))
-    {
-        // ****** Anrechnungen ****** //
-        StudentAnrechnungDetailDisableFields(true);
-        StudentAnrechnungResetNotizLabel();
+	{
+		// ****** Anrechnungen ****** //
+		StudentAnrechnungDetailDisableFields(true);
+		StudentAnrechnungResetNotizLabel();
 
-        anrechnungtree = document.getElementById('student-anrechnungen-tree');
+		anrechnungtree = document.getElementById('student-anrechnungen-tree');
 
-        url='<?php echo APP_ROOT;?>rdf/anrechnung.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
+		url='<?php echo APP_ROOT;?>rdf/anrechnung.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
 
-        try
-        {
-            StudentAnrechnungTreeDatasource.removeXMLSinkObserver(StudentAnrechnungTreeSinkObserver);
-            anrechnungtree.builder.removeListener(StudentAnrechnungTreeListener);
-        }
-        catch(e)
-        {}
+		try
+		{
+			StudentAnrechnungTreeDatasource.removeXMLSinkObserver(StudentAnrechnungTreeSinkObserver);
+			anrechnungtree.builder.removeListener(StudentAnrechnungTreeListener);
+		}
+		catch(e)
+		{}
 
-        //Alte DS entfernen
-        var oldDatasources = anrechnungtree.database.GetDataSources();
-        while(oldDatasources.hasMoreElements())
-        {
-            anrechnungtree.database.RemoveDataSource(oldDatasources.getNext());
-        }
-        //Refresh damit die entfernten DS auch wirklich entfernt werden
-        anrechnungtree.builder.rebuild();
+		//Alte DS entfernen
+		var oldDatasources = anrechnungtree.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			anrechnungtree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		anrechnungtree.builder.rebuild();
 
-        var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-        StudentAnrechnungTreeDatasource = rdfService.GetDataSource(url);
-        StudentAnrechnungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-        StudentAnrechnungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-        anrechnungtree.database.AddDataSource(StudentAnrechnungTreeDatasource);
-        StudentAnrechnungTreeDatasource.addXMLSinkObserver(StudentAnrechnungTreeSinkObserver);
-        anrechnungtree.builder.addListener(StudentAnrechnungTreeListener);
-    }
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		StudentAnrechnungTreeDatasource = rdfService.GetDataSource(url);
+		StudentAnrechnungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		StudentAnrechnungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		anrechnungtree.database.AddDataSource(StudentAnrechnungTreeDatasource);
+		StudentAnrechnungTreeDatasource.addXMLSinkObserver(StudentAnrechnungTreeSinkObserver);
+		anrechnungtree.builder.addListener(StudentAnrechnungTreeListener);
+	}
 
 	if(uid!='')
 	{
@@ -1602,6 +1611,7 @@ function StudentPrestudentDisableFields(val)
 	//document.getElementById('student-prestudent-menulist-studiengang_kz').disabled=val;
 	document.getElementById('student-prestudent-textbox-anmerkung').disabled=val;
 	document.getElementById('student-prestudent-textbox-mentor').disabled=val;
+	document.getElementById('student-detail-menulist-gsstudientyp').disabled=val;
 
 	//Status Tree leeren
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
@@ -1656,6 +1666,7 @@ function StudentPrestudentSave()
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	anmerkung = document.getElementById('student-prestudent-textbox-anmerkung').value;
 	mentor = document.getElementById('student-prestudent-textbox-mentor').value;
+	gsstudientyp = document.getElementById('student-detail-menulist-gsstudientyp').value;
 
 	if(zgvdatum!='' && !CheckDatum(zgvdatum))
 	{
@@ -1711,6 +1722,7 @@ function StudentPrestudentSave()
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('anmerkung', anmerkung);
 	req.add('mentor', mentor);
+	req.add('gsstudientyp_kurzbz', gsstudientyp);
 
 	var response = req.executePOST();
 

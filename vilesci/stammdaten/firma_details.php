@@ -46,16 +46,16 @@ $firma_id = (isset($_REQUEST['firma_id'])?$_REQUEST['firma_id']:'');
 $adresse_id = (isset($_REQUEST['adresse_id'])?$_REQUEST['adresse_id']:'');
 $standort_id = (isset($_REQUEST['standort_id'])?$_REQUEST['standort_id']:'');
 $oe_kurzbz = (isset($_REQUEST['oe_kurzbz'])?$_REQUEST['oe_kurzbz']:'');
-$firma_organisationseinheit_id = (isset($_REQUEST['firma_organisationseinheit_id'])?$_REQUEST['firma_organisationseinheit_id']:'');	
+$firma_organisationseinheit_id = (isset($_REQUEST['firma_organisationseinheit_id'])?$_REQUEST['firma_organisationseinheit_id']:'');
 $tag = (isset($_REQUEST['tag'])?$_REQUEST['tag']:'');
 $mobilitaetsprogramm_code = (isset($_REQUEST['mobilitaetsprogramm_code'])?$_REQUEST['mobilitaetsprogramm_code']:'');
-$save = (isset($_REQUEST['save'])?$_REQUEST['save']:null);	
-$work = (isset($_REQUEST['work'])?$_REQUEST['work']:(isset($_REQUEST['save'])?$_REQUEST['save']:null));	
-$ajax = (isset($_REQUEST['ajax'])?$_REQUEST['ajax']:null);	
+$save = (isset($_REQUEST['save'])?$_REQUEST['save']:null);
+$work = (isset($_REQUEST['work'])?$_REQUEST['work']:(isset($_REQUEST['save'])?$_REQUEST['save']:null));
+$ajax = (isset($_REQUEST['ajax'])?$_REQUEST['ajax']:null);
 
 $neu = (isset($_REQUEST['neu'])?$_REQUEST['neu']:null);
 
-// Defaultwerte 
+// Defaultwerte
 $adresstyp_arr = array('h'=>'Hauptwohnsitz','n'=>'Nebenwohnsitz','f'=>'Firma',''=>'');
 $errorstr='';
 
@@ -146,18 +146,18 @@ if(isset($_GET['deletetag']))
 <html>
 <head>
 	<title>Firma - Details</title>
-	
+
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/styles/jquery.css" type="text/css">
 <!--	<link rel="stylesheet" href="../../skin/styles/jquery-ui.css" type="text/css"> -->
-	
+
 	<script src="../../include/js/mailcheck.js" type="text/javascript"></script>
 	<script src="../../include/js/datecheck.js" type="text/javascript"></script>
 <!--	<script src="../../include/js/jquery.js" type="text/javascript"></script> -->
 <!--	<script src="../../include/js/jquery-ui.js" type="text/javascript"></script> -->
 <!--	<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script> -->
-	
+
 	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
         <link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 
@@ -167,7 +167,7 @@ if(isset($_GET['deletetag']))
 			if(confirm("Diesen Datensatz wirklich loeschen?"))
 				return true;
 			return false;
-		}	
+		}
 	</script>
 
 </head>
@@ -184,7 +184,7 @@ switch ($work)
 	case 'organisationliste':
 		echo getOrganisationsliste($firma_id,$adresstyp_arr,$user);
 		break;
-		
+
 	case 'mobilitaetsprogramm':
 		echo getMobilitaetsprogrammliste($firma_id,$user);
 		break;
@@ -192,7 +192,7 @@ switch ($work)
 		saveMobilitaetsprogramm($firma_id, $mobilitaetsprogramm_code);
 		echo getFirmadetail($firma_id,$adresstyp_arr,$user,$neu);
 		$tabselect=2;
-		break;	
+		break;
 	case 'anmerkungsfeld':
 		echo getAnmerkungen($firma_id,$user);
 		break;
@@ -202,9 +202,9 @@ switch ($work)
 		echo $status;
 		$tabselect=3;
 		break;
-	
+
 	case 'saveFirma':
-		$status=saveFirma($user,$rechte); // Postdaten werden in der Funktion verarbeitet			
+		$status=saveFirma($user,$rechte); // Postdaten werden in der Funktion verarbeitet
 		if (is_numeric($status))
 			$firma_id=$status;
 		if (!$ajax)
@@ -231,12 +231,12 @@ $(document).ready(function() {
 
 </body>
 </html>
-<?php	
+<?php
 /**
- * Firmenliste - lt. Suchekriterien 
+ * Firmenliste - lt. Suchekriterien
  */
-function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)	
-{	
+function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
+{
 	global $rechte;
 	if($firma_id!='' || $neu=='true')
 	{
@@ -244,14 +244,14 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
 			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 		// Init
 		$htmlstr='';
-		// Datenlesen zur Firma	
+		// Datenlesen zur Firma
 		$firma = new firma();
 		if($firma_id!='' && is_numeric($firma_id))
 		{
 			if (!$firma->load($firma_id))
 				return '<br>Firma mit der ID <b>'.$firma_id.'</b> existiert nicht';
 		}
-		else 
+		else
 		{
 			//Bei neuen Firmen wird standardmaessig Partnerfirma ausgewaehlt
 			$firma->firmentyp_kurzbz='Partnerfirma';
@@ -259,16 +259,16 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
 			$firma->gesperrt=false;
 			$firma->schule=false;
 		}
-		
+
 		$htmlstr.="<form id='addFirma' name='addFirma' action='firma_details.php' method='POST'>\n";
-		$htmlstr.="<input type='hidden' name='work' value='saveFirma'>\n";	
+		$htmlstr.="<input type='hidden' name='work' value='saveFirma'>\n";
 		$htmlstr.="<input type='hidden' name='firma_id' value='".$firma->firma_id."'>\n";
 		// Firma Detailanzeige
 		$htmlstr.="<table class='detail' style='padding-top:10px;'>\n";
 		$htmlstr.="<tr><td><table width='100%'><tr>\n";
-		$htmlstr.="<td>Typ: </td>";		
+		$htmlstr.="<td>Typ: </td>";
 		$htmlstr.="<td><select name='typ'>\n";
-	
+
 		$qry = "SELECT firmentyp_kurzbz FROM public.tbl_firmentyp ORDER BY firmentyp_kurzbz";
 		if($result = $db->db_query($qry))
 		{
@@ -278,7 +278,7 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
 			}
 		}
 		$htmlstr.="</select></td>";
-		$htmlstr.="<td>&nbsp;</td>";	
+		$htmlstr.="<td>&nbsp;</td>";
 		$htmlstr.="<td>Name: </td>";
 		$htmlstr.="<td><input type='text' name='name' value='".$firma->name."' size='80' maxlength='128' /></td>\n";
 
@@ -286,45 +286,45 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
 		$htmlstr.="</tr></table></td>";
 
 		$htmlstr.="</tr>\n";
-		$htmlstr.="<tr><td><table><tr>\n";	
+		$htmlstr.="<tr><td><table><tr>\n";
 		$htmlstr.="<td>Steuernummer: </td>";
 		$htmlstr.="<td><input size='32' maxlength='32' type='text' name='steuernummer' value='".$firma->steuernummer."'></td>\n";
-		$htmlstr.="<td>&nbsp;</td>";	
+		$htmlstr.="<td>&nbsp;</td>";
 		$htmlstr.="<td>Finanzamt: </td>";
 		// Finanzamt anzeige und suche
 		$firma_finanzamt = new firma();
 		$firmentyp_finanzamt='Finanzamt';
-		$firma_finanzamt->searchFirma('',$firmentyp_finanzamt, true);	
-		
+		$firma_finanzamt->searchFirma('',$firmentyp_finanzamt, true);
+
 		$htmlstr.="<td><select name='finanzamt'>";
 		$htmlstr.="<option value=''>-- keine Auswahl --</option>";
 		foreach ($firma_finanzamt->result as $row_finanzamt)
 		{
 			if($firma->finanzamt==$row_finanzamt->standort_id)
 				$selected='selected="true"';
-			else 
+			else
 				$selected='';
 			$htmlstr.="	<option value='".$row_finanzamt->standort_id ."' ".$selected.">".$row_finanzamt->name.' - '.$row_finanzamt->bezeichnung." </option>";
 		}
 		$htmlstr.="</select></td>\n";
-	
+
 		$htmlstr.="<td>Aktiv: </td>";
 		$htmlstr.="<td><input ".($firma->aktiv?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')." type='checkbox' name='aktiv' ".($firma->aktiv?'checked':'')."></td>\n";
 		$htmlstr.="<td>&nbsp;</td>\n";
-	
+
 		$htmlstr.="<td>Gesperrt: </td>";
-		
+
 		$disabled='disabled=true';
 		//Gesperrt Hackerl darf nur gesetzt werden wenn die Berechtigung vorhanden ist
 		if($rechte->isBerechtigt('basis/firma',null, 'suid'))
 		{
 			$disabled='';
 		}
-		
+
 		$htmlstr.="<td><input type='checkbox' name='gesperrt' ".($firma->gesperrt?'checked':'')." $disabled></td>\n";
-		
+
 		$htmlstr.="<td>&nbsp;</td>\n";
-	
+
 		$htmlstr.="<td>Schule:</td>";
 		$htmlstr.="<td><input ".($firma->schule?' style="background-color: #E3FDEE;" ':' style="background-color: #FFF4F4;" ')."  type='checkbox' name='schule' ".($firma->schule?'checked':'')."> </td>";
 		$htmlstr.="<td>&nbsp;</td>";
@@ -333,7 +333,7 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
 		$htmlstr.="<tr>";
 		$htmlstr.="<td title='Trennung mehrerer Tags durch ;'>Tags:</td><td><input type='text' id='tags' name='tags' size='32'>";
 		/* $htmlstr.="<script type='text/javascript' language='JavaScript1.2'>
-					$('#tags').autocomplete('stammdaten_autocomplete.php', 
+					$('#tags').autocomplete('stammdaten_autocomplete.php',
 					{
 						minChars:1,
 						matchSubset:1,matchContains:1,
@@ -347,7 +347,7 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
                             $(document).ready(function()
                             {
                                 $('#tags').autocomplete({
-                                    source: 'stammdaten_autocomplete.php?work=tags', 
+                                    source: 'stammdaten_autocomplete.php?work=tags',
                                     minLength:1,
                                     response: function(event, ui)
                                     {
@@ -365,22 +365,24 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
                             });
                            </script>";
 		$htmlstr.="</td>";
-		$htmlstr.="<td>&nbsp;</td>";	
-		$htmlstr.="<td colspan='9'>";
-		
+		$htmlstr.='<td>&nbsp;</td>';
+		$htmlstr.='<td>Partner Code:</td>';
+		$htmlstr.='<td><input type="text" name="partner_code" value="'.$db->convert_html_chars($firma->partner_code).'" maxlength="10" size="6" /></td>';
+		$htmlstr.="<td colspan='7'>";
+
 		foreach($firma->tags as $tag)
 		{
 			$htmlstr.= '&nbsp;'.$tag.'<a href="firma_details.php?firma_id='.$firma->firma_id.'&deletetag=true&tag='.urlencode($tag).'" title="entfernen"> <img src="../../skin/images/DeleteIcon.png" /></a>';
 		}
-		$htmlstr.="</td></tr></table></td>";	
+		$htmlstr.="</td></tr></table></td>";
 		$htmlstr.="</tr>\n";
 		$htmlstr.="	</table>\n";
 		$htmlstr.="</form>\n";
-	
+
 		$htmlstr.='<div id="addFirmaInfo"></div>';
 
 		$htmlstr.='
-			<!-- Tabs --> 
+			<!-- Tabs -->
 			<div id="tabs" style="font-size:80%;">
 				<ul class="css-tabs">
 				     <li><a href="#standort">Standorte</a></li>
@@ -401,7 +403,7 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
 				'.getAnmerkungen($firma_id, $user).'
 				</div>
 			</div>
-			
+
 			<div id="detailstandort">	</div>
 			';
 
@@ -427,10 +429,10 @@ function saveFirma($user,$rechte)
 	{
 		if(!$firma->load($firma_id))
 			return 'Firma '.$firma_id.' wurde nicht gefunden';
-		else 
+		else
 			$firma->new = false;
 	}
-	else 
+	else
 	{
 		$firma->insertamum = date('Y-m-d H:i:s');
 		$firma->insertvon = $user;
@@ -444,9 +446,10 @@ function saveFirma($user,$rechte)
 	$firma->steuernummer = (isset($_POST['steuernummer'])?$_POST['steuernummer']:'');
 	$firma->gesperrt = (isset($_POST['gesperrt'])?true:false);
 	$firma->aktiv = (isset($_POST['aktiv'])?true:false);
-	$firma->finanzamt = (isset($_POST['finanzamt'])?$_POST['finanzamt']:'');			
+	$firma->finanzamt = (isset($_POST['finanzamt'])?$_POST['finanzamt']:'');
+	$firma->partner_code = (isset($_POST['partner_code'])?$_POST['partner_code']:'');
 	$tags = (isset($_POST['tags'])?$_POST['tags']:'');
-	
+
 	if($firma->save())
 	{
 		if ($firma->new)
@@ -475,7 +478,7 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 {
 	// Init
 	$htmlstr='';
-		
+
 	// Plausib
 	if (empty($firma_id) || !is_numeric($firma_id) )
 		return 'Firma fehlt.';
@@ -486,12 +489,12 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 	if (!$standort_obj->load_firma($firma_id))
 		return $standort_obj->errormsg;
 
-	// Es gibt noch keinen Standort zur Firma - Neuanlage		
+	// Es gibt noch keinen Standort zur Firma - Neuanlage
 	if ($firma_id && !$standort_obj->result)
 	{
 		$firma_obj = new firma();
 		$firma_obj->load($firma_id);
-		
+
 		$standort_obj->new=true;
 		$standort_obj->standort_id=null;
 		$standort_obj->adresse_id=null;
@@ -506,7 +509,7 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 		$standort_obj = new standort();
 		$standort_obj->load_firma($firma_id);
 	}
-	
+
 	$htmlstr.= '<table class="liste">
 				<tr>
 					<th>Kurzbz</th>
@@ -517,14 +520,14 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 					<th>Strasse</th>
 					<th>Typ</th>
 					<th><font size="0">Zustelladr.</font></th>
-					
+
 					<td align="center" valign="top" colspan="2"><a target="detail_workfirma" href="firma_detailwork.php?showmenue=1&firma_id='.$firma_id.'"><input type="Button" value="Neuanlage" name="work"></a></td>
 			</tr>';
 
 	$i=1;
 	foreach ($standort_obj->result as $row)
 	{
-		
+
 		if ($firma_id  && $row->standort_id && !$row->adresse_id)
 		{
 			$adresse_obj = new adresse();
@@ -545,7 +548,7 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 			$adresse_obj->updatvon = $user;
 			if(!$adresse_obj->save())
 				return 'Fehler Adresse '.$adresse_obj->errormsg;
-				
+
 			$standort_obj = new standort($row->standort_id);
 			$standort_obj->updatevon=$user;
 			$standort_obj->adresse_id=$adresse_obj->adresse_id;
@@ -576,7 +579,7 @@ function getStandortliste($firma_id,$adresstyp_arr,$user)
 		else
 		{
 			$htmlstr.= '<td><a target="detail_workfirma" href="firma_detailwork.php?showmenue=1&firma_id='.$firma_id.'&standort_id='.$row->standort_id.'&adresse_id='.$row->adresse_id.'">'.$row->kurzbz.'</a></td>';
-			$htmlstr.= '<td colspan="10">'.$adresse_obj->errormsg.'</td>';					
+			$htmlstr.= '<td colspan="10">'.$adresse_obj->errormsg.'</td>';
 		}
 		$htmlstr.= '</tr>';
 	}
@@ -594,18 +597,18 @@ function getOrganisationsliste($firma_id,$adresstyp_arr,$user)
 	// Plausib
 	if (empty($firma_id) || !is_numeric($firma_id) )
 		return 'Firma fehlt.';
- 
+
 	$htmlstr.= '<table class="liste">
 				<tr>
 					<th width="30%">Organisationseinheit</th>
 					<th width="25%">Bezeichnung</th>
 					<th width="15%">Kundennummer</th>
-					<td width="15%" align="center" valign="top" colspan="2"><a target="detail_workfirma" 
+					<td width="15%" align="center" valign="top" colspan="2"><a target="detail_workfirma"
 						href="firma_detailwork.php?work=eingabeOrganisationseinheit&firma_organisationseinheit_id=&oe_kurzbz=&firma_id='.$firma_id.'">
 						<input type="Button" value="Neuanlage" name="work"></a></td>
 			</tr>
 			';
-	// Datenlesen zur Firma	
+	// Datenlesen zur Firma
 	$firma = new firma();
 	if (!$firma->get_firmaorganisationseinheit($firma_id))
 		return $htmlstr.'</table>';
@@ -621,7 +624,7 @@ function getOrganisationsliste($firma_id,$adresstyp_arr,$user)
 		$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deleteorganisationseinheit=true&firma_organisationseinheit_id=".$row->firma_organisationseinheit_id."&oe_kurzbz=".$row->oe_kurzbz."&firma_id=".$firma_id."' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
 		$htmlstr.= '</tr>';
 	}
-	
+
 	$htmlstr.= '</table>';
 	return $htmlstr;
 }
@@ -636,31 +639,31 @@ function getMobilitaetsprogrammliste($firma_id,$user)
 	// Plausib
 	if (empty($firma_id) || !is_numeric($firma_id) )
 		return 'Firma fehlt.';
- 
+
 	$htmlstr.= '<table class="liste">
 			<tr>
 				<th width="45%">Mobilitätsprogramm</th>
 				<th width="5%"></th>
 				<td width="15%" align="center" valign="top" colspan="2">
-				
+
 				<form action="'.$_SERVER['PHP_SELF'].'?firma_id='.$firma_id.'&work=saveMobilitaetsprogramm" METHOD="POST">
 					<SELECT name="mobilitaetsprogramm_code">';
 	$mob = new mobilitaetsprogramm();
 	$mob->getAll();
-	
+
 	foreach($mob->result as $row)
 	{
 		$htmlstr.= '<OPTION value="'.$mob->convert_html_chars($row->mobilitaetsprogramm_code).'">'.$mob->convert_html_chars($row->kurzbz).'</OPTION>';
 	}
-	$htmlstr.='				
+	$htmlstr.='
 					</SELECT>
 					<input type="submit" value="Hinzufügen">
 				</form>
-				</td>	
+				</td>
 			</tr>
 			';
-	
-	// Datenlesen zur Firma	
+
+	// Datenlesen zur Firma
 	$mob = new mobilitaetsprogramm();
 	if (!$mob->getFirmaMobilitaetsprogramm($firma_id))
 		return $htmlstr.'</table>';
@@ -673,7 +676,7 @@ function getMobilitaetsprogrammliste($firma_id,$user)
 		$htmlstr.= '</tr>';
 		$i++;
 	}
-	
+
 	$htmlstr.= '</table>';
 	return $htmlstr;
 }
@@ -695,28 +698,28 @@ function getAnmerkungen($firma_id,$user)
 	// Plausib
 	if (empty($firma_id) || !is_numeric($firma_id) )
 		return 'Firma fehlt.';
- 
- 	// Datenlesen zur Firma	
+
+ 	// Datenlesen zur Firma
 	$firma = new firma();
 	if($firma_id!='' && is_numeric($firma_id) )
 	{
 		if (!$firma->load($firma_id))
 			return '<br>Firma mit der ID <b>'.$firma_id.'</b> existiert nicht';
 	}
-	else 
+	else
 	{
 		return false;
 	}
 	$htmlstr.="<form id='addAnmerkungen' name='addAnmerkung' action='firma_details.php' method='POST'>\n";
-	$htmlstr.="<input type='hidden' name='work' value='saveAnmerkungen'>\n";	
+	$htmlstr.="<input type='hidden' name='work' value='saveAnmerkungen'>\n";
 	$htmlstr.="<input type='hidden' name='firma_id' value='".$firma->firma_id."'>\n";
 
 	$htmlstr.= "<table class='liste'>";
 	$htmlstr.= "<tr>";
 	$htmlstr.= "<td>Anmerkungen:</td>";
-	
+
 	$htmlstr.="<td align='center' width='20%'><input type='submit' name='save' value='speichern'></td>\n";
-	
+
 	$htmlstr.= "</tr><tr><td colspan='2'><textarea cols='40' rows='6' style='width:100%' name='anmerkung'>".$firma->anmerkung."</textarea></td></tr>";
 	$htmlstr.="</table></form>\n";
 	return $htmlstr;
@@ -728,20 +731,20 @@ function saveAnmerkungen($firma_id,$user, $rechte)
 {
 	if(!$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
 		return 'Sie haben keine Berechtigung';
-	
+
 	$firma_obj = new firma();
 	if(!$firma_obj->load($firma_id))
 		return 'Firma konnte nicht geladen werden';
-	
+
 	if(!isset($_REQUEST['anmerkung']))
 		return 'Anmerkung muss uebergeben werden';
-	
+
 	$firma_obj->anmerkung = $_REQUEST['anmerkung'];
-	
+
 	if(!$firma_obj->save())
-		return 'Fehler beim Speichern:'.$firma_obj->errormsg;	
-	else 
+		return 'Fehler beim Speichern:'.$firma_obj->errormsg;
+	else
 		return 'Anmerkung gespeichert!';
-	
+
 }
 ?>

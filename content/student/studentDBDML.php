@@ -70,6 +70,7 @@ require_once('../../include/benutzerfunktion.class.php');
 require_once('../../include/note.class.php');
 require_once('../../include/standort.class.php');
 require_once('../../include/adresse.class.php');
+require_once('../../include/mobilitaet.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -589,6 +590,7 @@ if(!$error)
 				$prestudent->dual = ($_POST['dual']=='true'?true:false);
 				$prestudent->anmerkung = $_POST['anmerkung'];
 				$prestudent->mentor = $_POST['mentor'];
+				$prestudent->gsstudientyp_kurzbz = $_POST['gsstudientyp_kurzbz'];
 				//$prestudent->insertamum = date('Y-m-d H:i:s');
 				//$prestudent->insertvon = $user;
 				$prestudent->updateamum = date('Y-m-d H:i:s');
@@ -3838,6 +3840,133 @@ if(!$error)
 		{
 			$return = false;
 			$errormsg  = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='savemobilitaet')
+	{
+		// Speichert Mobilitaet/Gemeinsames Studium
+		$prestudent_id = $_POST['prestudent_id'];
+		$prestudent_obj = new prestudent();
+		$prestudent_obj->load($prestudent_id);
+
+		if(!$rechte->isBerechtigt('student/stammdaten', $prestudent_obj->studiengang_kz, 'suid'))
+		{
+			$return = false;
+			$error = true;
+			$errormsg = 'Sie haben keine Berechtigung';
+		}
+		else
+		{
+			$mob = new mobilitaet();
+
+			$error = false;
+			if(isset($_POST['mobilitaet_id']))
+			{
+				$mobilitaet_id = $_POST['mobilitaet_id'];
+				if(!$mob->load($mobilitaet_id))
+				{
+					$error=true;
+					$errormsg = $mob->errormsg;
+				}
+			}
+			else
+			{
+				$mob->new = true;
+				$mob->inservon = $user;
+			}
+
+			if(isset($_POST['studiensemester_kurzbz'])
+			&& isset($_POST['mobilitaetsprogramm_code'])
+			&& isset($_POST['gsprogramm_id'])
+			&& isset($_POST['mobilitaetstyp_kurzbz'])
+			&& isset($_POST['firma_id'])
+			&& isset($_POST['status_kurzbz'])
+			&& isset($_POST['ausbildungssemester']))
+			{
+				$studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+				$mobilitaetsprogramm_code = $_POST['mobilitaetsprogramm_code'];
+				$gsprogramm_id = $_POST['gsprogramm_id'];
+				$mobilitaetstyp_kurzbz = $_POST['mobilitaetstyp_kurzbz'];
+				$firma_id = $_POST['firma_id'];
+				$status_kurzbz = $_POST['status_kurzbz'];
+				$ausbildungssemester = $_POST['ausbildungssemester'];
+			}
+			else
+			{
+				$error = true;
+				$errormsg = 'Fehlerhafte Parameteruebergabe';
+				$return = false;
+			}
+
+			if(!$error)
+			{
+				$mob->prestudent_id = $prestudent_id;
+				$mob->studiensemester_kurzbz = $studiensemester_kurzbz;
+				$mob->mobilitaetsprogramm_code = $mobilitaetsprogramm_code;
+				$mob->gsprogramm_id = $gsprogramm_id;
+				$mob->mobilitaetstyp_kurzbz = $mobilitaetstyp_kurzbz;
+				$mob->firma_id = $firma_id;
+				$mob->status_kurzbz = $status_kurzbz;
+				$mob->ausbildungssemester = $ausbildungssemester;
+				$mob->updatevon = $user;
+
+				if($mob->save())
+				{
+					$return = true;
+					$data = $mob->mobilitaet_id;
+				}
+				else
+				{
+					$return = false;
+					$error = true;
+					$errormsg = $mob->errormsg;
+				}
+			}
+			else
+			{
+				$return = false;
+			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deletemobilitaet')
+	{
+		$mobilitaet_id = $_POST['mobilitaet_id'];
+		$mob = new mobilitaet();
+		if($mob->load($mobilitaet_id))
+		{
+			$prestudent = new prestudent();
+			if($prestudent->load($mob->prestudent_id))
+			{
+				if(!$rechte->isBerechtigt('student/stammdaten',$prestudent->studiengang_kz,'suid'))
+				{
+					$error = true;
+					$return = false;
+					$errormsg = 'Sie haben keine Berechtigung';
+				}
+				else
+				{
+					if($mob->delete($mobilitaet_id))
+					{
+						$return = true;
+					}
+					else
+					{
+						$errormsg = $mob->errormsg;
+						$return = false;
+					}
+				}
+			}
+			else
+			{
+				$error = true;
+				$return = false;
+				$errormsg = $prestudent->errormsg;
+			}
+		}
+		else
+		{
+			$return = false;
+			$errormsg  = $mob->errormsg;
 		}
 	}
 	else

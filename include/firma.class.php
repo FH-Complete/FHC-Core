@@ -48,6 +48,7 @@ class firma extends basis_db
 	public $gesperrt; 		// boolean
 	public $aktiv; 			// boolean
 	public $finanzamt; 		// string
+	public $partner_code;	// varchar(20)
 
 	// firma_organisationseinheit
 	public $oe_kurzbz; 		// string
@@ -108,6 +109,7 @@ class firma extends basis_db
 				$this->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$this->aktiv = $this->db_parse_bool($row->aktiv);
 				$this->finanzamt = $row->finanzamt;
+				$this->partner_code = $row->partner_code;
 
 				$qry = "SELECT tag FROM public.tbl_firmatag WHERE firma_id=".$this->db_add_param($firma_id,FHC_INTEGER).';';
 				if($resulttag = $this->db_query($qry))
@@ -188,7 +190,8 @@ class firma extends basis_db
 				$this->db_add_param($this->steuernummer).', '.
 				$this->db_add_param($this->gesperrt, FHC_BOOLEAN).','.
 				$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
-				$this->db_add_param($this->finanzamt, FHC_INTEGER).' ); ';
+				$this->db_add_param($this->finanzamt, FHC_INTEGER).','.
+				$this->db_add_param($this->partner_code).'); ';
 		}
 		else
 		{
@@ -212,7 +215,8 @@ class firma extends basis_db
 				'steuernummer='.$this->db_add_param($this->steuernummer).', '.
 				'gesperrt='.$this->db_add_param($this->gesperrt, FHC_BOOLEAN).', '.
 				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
-				'finanzamt='.$this->db_add_param($this->finanzamt, FHC_INTEGER).' '.
+				'finanzamt='.$this->db_add_param($this->finanzamt, FHC_INTEGER).', '.
+				'partner_code='.$this->db_add_param($this->partner_code).' '.
 				'WHERE firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).';';
 		}
 
@@ -377,7 +381,7 @@ class firma extends basis_db
 
 				SELECT
 					firma_id, name, anmerkung, lieferbedingungen, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon,
-					ext_id, schule, steuernummer, gesperrt, aktiv, finanzamt, '1' as sort
+					ext_id, schule, steuernummer, gesperrt, aktiv, finanzamt, '1' as sort, partner_code
 				FROM public.tbl_firma
 				WHERE
 				UPPER(trim(public.tbl_firma.name)) like '".$this->db_escape($matchcode)."%'
@@ -418,6 +422,7 @@ class firma extends basis_db
 				$fa->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$fa->aktiv = $this->db_parse_bool($row->aktiv);
 				$fa->finanzamt = $row->finanzamt;
+				$fa->partner_code = $row->partner_code;
 
 				$this->result[] = $fa;
 			}
@@ -495,6 +500,7 @@ class firma extends basis_db
 				$fa->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$fa->aktiv = $this->db_parse_bool($row->aktiv);
 				$fa->finanzamt = $row->finanzamt;
+				$fa->partner_code = $row->partner_code;
 
 				$this->result[] = $fa;
 			}
@@ -511,7 +517,7 @@ class firma extends basis_db
 		$this->result = array();
 		$this->errormsg = '';
 
-		$qry ="SELECT * FROM (SElECT ";		
+		$qry ="SELECT * FROM (SElECT ";
 		$qry.=" distinct on(firma_id)";
 		$qry.=" tbl_firma.firma_id,tbl_firma.* ,tbl_standort.kurzbz,tbl_standort.adresse_id,tbl_standort.standort_id,tbl_standort.bezeichnung  ";
 		$qry.=" ,person_id,	tbl_adresse.name as adress_name, strasse, plz, ort, gemeinde,nation,typ,heimatadresse,zustelladresse  ";
@@ -542,6 +548,7 @@ class firma extends basis_db
 				$fa->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$fa->aktiv = $this->db_parse_bool($row->aktiv);
 				$fa->finanzamt = $row->finanzamt;
+				$fa->partner_code = $row->partner_code;
 				$fa->kurzbz = $row->kurzbz;
 				$fa->adresse_id = $row->adresse_id;
 				$fa->standort_id = $row->standort_id;
@@ -571,15 +578,15 @@ class firma extends basis_db
 
 
 	/**
-	 * Suche nur nach Firmennamen für die abgespeckte Firmenverwaltung 
+	 * Suche nur nach Firmennamen für die abgespeckte Firmenverwaltung
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function searchByName($filter) 
+	public function searchByName($filter)
 	{
 		$this->result = array();
 		$this->errormsg = '';
 
-		$qry ="SELECT * FROM (SElECT ";		
+		$qry ="SELECT * FROM (SElECT ";
 		$qry.=" distinct on(firma_id)";
 		$qry.=" tbl_firma.firma_id,tbl_firma.* ,tbl_standort.kurzbz,tbl_standort.adresse_id,tbl_standort.standort_id,tbl_standort.bezeichnung  ";
 		$qry.=" ,person_id,	tbl_adresse.name as adress_name, strasse, plz, ort, gemeinde,nation,typ,heimatadresse,zustelladresse  ";
@@ -590,9 +597,9 @@ class firma extends basis_db
 
 		if($filter!='')
 			$qry.= " and ( lower(tbl_firma.name) like lower('%".$this->db_escape($filter)."%')
-					
+
 				   ) ";
-		
+
 		//if($filter=='' && $firmentyp_kurzbz=='')
 		//	$qry.=" limit 500 ";
 		$qry.=") as a ORDER BY name;";
@@ -618,6 +625,7 @@ class firma extends basis_db
 				$fa->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$fa->aktiv = $this->db_parse_bool($row->aktiv);
 				$fa->finanzamt = $row->finanzamt;
+				$fa->partner_code = $row->partner_code;
 				$fa->kurzbz = $row->kurzbz;
 				$fa->adresse_id = $row->adresse_id;
 				$fa->standort_id = $row->standort_id;
@@ -719,6 +727,7 @@ class firma extends basis_db
 				$fa->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$fa->aktiv = $this->db_parse_bool($row->aktiv);
 				$fa->finanzamt = $row->finanzamt;
+				$fa->partner_code = $row->partner_code;
 				$fa->kurzbz = $row->kurzbz;
 				$fa->adresse_id = $row->adresse_id;
 				$fa->standort_id = $row->standort_id;
@@ -837,6 +846,7 @@ class firma extends basis_db
 				$fa->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$fa->aktiv = $this->db_parse_bool($row->aktiv);
 				$fa->finanzamt = $row->finanzamt;
+				$fa->partner_code = $row->partner_code;
 				$fa->oe_kurzbz = $row->oe_kurzbz;
 				$fa->firma_organisationseinheit_id = $row->firma_organisationseinheit_id;
 				$fa->oe_parent_kurzbz = $row->oe_parent_kurzbz;
@@ -1103,6 +1113,7 @@ class firma extends basis_db
 				$fi->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$fi->aktiv = $this->db_parse_bool($row->aktiv);
 				$fi->finanzamt = $row->finanzamt;
+				$fi->partner_code = $row->partner_code;
 
 				$this->result[] = $fi;
 			}
@@ -1114,6 +1125,49 @@ class firma extends basis_db
 			return false;
 		}
 
+	}
+
+	/**
+	 * Laedt Firmen die eine PartnerCode haben
+	 * @param  $firma_id ID der zu ladenden Funktion
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getFirmaPartner()
+	{
+		$qry = "SELECT * FROM public.tbl_firma WHERE partner_code is not null;";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new stdClass();
+
+				$obj->firma_id = $row->firma_id;
+				$obj->name = $row->name;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->lieferbedingungen = $row->lieferbedingungen;
+				$obj->firmentyp_kurzbz = $row->firmentyp_kurzbz;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->ext_id = $row->ext_id;
+				$obj->schule = $this->db_parse_bool($row->schule);
+				$obj->steuernummer = $row->steuernummer;
+				$obj->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->finanzamt = $row->finanzamt;
+				$obj->partner_code = $row->partner_code;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
 	}
 }
 ?>
