@@ -223,4 +223,7 @@ define('BEWERBERTOOL_GTM', '');
 
 // Array mit Usern die nicht Kollidieren
 define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
+
+//Wenn auf 'true' gesetzt, dann wird im FAS beim Konto das Feld fuer die CreditPoints angezeigt
+define('FAS_KONTO_SHOW_CREDIT_POINTS','false');
 ?>
