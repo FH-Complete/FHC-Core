@@ -602,7 +602,33 @@ class lvregel extends basis_db
 					}
 				}
 				$ausbildungssemester = $this->cache[$uid][$studiensemester_kurzbz];
+				
+				$qry = "SELECT 
+							tbl_lehrveranstaltung.ects
+						FROM 
+							lehre.tbl_lehrveranstaltung
+							JOIN lehre.tbl_studienplan_lehrveranstaltung sl USING(lehrveranstaltung_id)
+						WHERE 
+							studienplan_lehrveranstaltung_id=".$this->db_add_param($regel->studienplan_lehrveranstaltung_id);
 
+				if($result = $this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object($result))
+					{
+						$ects = $row->ects;
+					}
+					else
+					{
+						$ects = 0;
+					}
+				}
+				else
+				{
+					$this->debug('Fehler bei Abfrage',1);
+					$this->errormsg = 'Fehler bei Abfrage';	
+					$retval = false;
+				}
+				
 				// Vergleichen des Ausbildungssemesters mit dem RegelParameter
 				if($ausbildungssemester>=$regel->parameter)
 				{
