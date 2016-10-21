@@ -1337,6 +1337,17 @@ if(!$result = @$db->db_query("SELECT 1 FROM bis.tbl_mobilitaet LIMIT 1"))
 	else
 		echo '<br>Neue Tabelle fuer Gemeinsame Studien/Mobilitaet hinzugefügt<br>';
 }
+
+// Anmerkung bei Konto
+if(!$result = @$db->db_query("SELECT anmerkung FROM public.tbl_konto LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_konto ADD COLUMN anmerkung text";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_konto '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_konto: Spalte Anmerkung hinzugefuegt!<br>';
+}
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -1523,7 +1534,7 @@ $tabellen=array(
 	"public.tbl_kontakt"  => array("kontakt_id","person_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id"),
 	"public.tbl_kontaktmedium"  => array("kontaktmedium_kurzbz","beschreibung"),
 	"public.tbl_kontakttyp"  => array("kontakttyp","beschreibung"),
-	"public.tbl_konto"  => array("buchungsnr","person_id","studiengang_kz","studiensemester_kurzbz","buchungstyp_kurzbz","buchungsnr_verweis","betrag","buchungsdatum","buchungstext","mahnspanne","updateamum","updatevon","insertamum","insertvon","ext_id","credit_points", "zahlungsreferenz"),
+	"public.tbl_konto"  => array("buchungsnr","person_id","studiengang_kz","studiensemester_kurzbz","buchungstyp_kurzbz","buchungsnr_verweis","betrag","buchungsdatum","buchungstext","mahnspanne","updateamum","updatevon","insertamum","insertvon","ext_id","credit_points", "zahlungsreferenz", "anmerkung"),
 	"public.tbl_lehrverband"  => array("studiengang_kz","semester","verband","gruppe","aktiv","bezeichnung","ext_id","orgform_kurzbz","gid"),
 	"public.tbl_log"  => array("log_id","executetime","mitarbeiter_uid","beschreibung","sql","sqlundo"),
 	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_id","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","kleriker"),

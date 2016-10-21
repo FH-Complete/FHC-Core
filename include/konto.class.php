@@ -60,6 +60,7 @@ class konto extends basis_db
 	public $aktiv;
 	public $credit_points;
 	public $zahlungsreferenz;
+	public $anmerkung;
 
 	/**
 	 * Konstruktor
@@ -116,6 +117,7 @@ class konto extends basis_db
 				$this->vornamen = $row->vornamen;
 				$this->credit_points = $row->credit_points;
 				$this->zahlungsreferenz = $row->zahlungsreferenz;
+				$this->anmerkung = $row->anmerkung;
 				return true;
 			}
 			else
@@ -191,7 +193,7 @@ class konto extends basis_db
 		{
 
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO public.tbl_konto (person_id, studiengang_kz, studiensemester_kurzbz, buchungsnr_verweis, betrag, buchungsdatum, buchungstext, mahnspanne, buchungstyp_kurzbz, updateamum, updatevon, insertamum, insertvon, credit_points) VALUES('.
+			$qry='BEGIN;INSERT INTO public.tbl_konto (person_id, studiengang_kz, studiensemester_kurzbz, buchungsnr_verweis, betrag, buchungsdatum, buchungstext, mahnspanne, buchungstyp_kurzbz, updateamum, updatevon, insertamum, insertvon, credit_points, zahlungsreferenz, anmerkung) VALUES('.
 			     $this->db_add_param($this->person_id, FHC_INTEGER).', '.
 			     $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 			     $this->db_add_param($this->studiensemester_kurzbz).', '.
@@ -205,7 +207,9 @@ class konto extends basis_db
 			     $this->db_add_param($this->updatevon).', '.
 			     $this->db_add_param($this->insertamum).', '.
 			     $this->db_add_param($this->insertvon).', '.
-				 $this->db_add_param($this->credit_points).');';
+			     $this->db_add_param($this->credit_points).', '.
+			     $this->db_add_param($this->zahlungsreferenz).', '.
+				 $this->db_add_param($this->anmerkung).');';
 		}
 		else
 		{
@@ -224,7 +228,9 @@ class konto extends basis_db
 				   ' updatevon='.$this->db_add_param($this->updatevon).','.
 				   ' insertamum='.$this->db_add_param($this->insertamum).','.
 				   ' insertvon='.$this->db_add_param($this->insertvon).','.
-				   ' credit_points='.$this->db_add_param($this->credit_points).
+				   ' credit_points='.$this->db_add_param($this->credit_points).','.
+				   ' zahlungsreferenz='.$this->db_add_param($this->zahlungsreferenz).','.
+				   ' anmerkung='.$this->db_add_param($this->anmerkung).
 				   " WHERE buchungsnr='".$this->db_add_param($this->buchungsnr, FHC_INTEGER)."';";
 
 		}
@@ -385,6 +391,9 @@ class konto extends basis_db
 				$buchung->nachname = $row->nachname;
 				$buchung->vorname = $row->vorname;
 				$buchung->vornamen = $row->vornamen;
+				$buchung->credit_points = $row->credit_points;
+				$buchung->zahlungsreferenz = $row->zahlungsreferenz;
+				$buchung->anmerkung = $row->anmerkung;
 
 				if($buchung->buchungsnr_verweis!='')
 				{
@@ -899,6 +908,7 @@ class konto extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->credit_points = $row->credit_points;
 				$this->zahlungsreferenz = $row->zahlungsreferenz;
+				$this->anmerkung = $row->anmerkung;
 				return true;
 			}
 			else

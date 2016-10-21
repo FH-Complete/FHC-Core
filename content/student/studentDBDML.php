@@ -1866,6 +1866,7 @@ if(!$error)
 					$buchung->new = false;
 					$buchung->updateamum = date('Y-m-d H:i:s');
 					$buchung->updatevon = $user;
+					$buchung->anmerkung = $_POST['anmerkung'];
 
 					if($buchung->save())
 					{
@@ -1936,6 +1937,7 @@ if(!$error)
 								$buchung->new = true;
 								$buchung->insertamum = date('Y-m-d H:i:s');
 								$buchung->insertvon = $user;
+								$buchung->anmerkung = '';
 
 								if($buchung->save())
 								{
@@ -2051,6 +2053,7 @@ if(!$error)
 					$buchung->credit_points = $_POST["credit_points"];
 					$buchung->insertamum = date('Y-m-d H:i:s');
 					$buchung->insertvon = $user;
+					$buchung->anmerkung = $_POST['anmerkung'];
 					$buchung->new = true;
 
 					if($buchung->save())

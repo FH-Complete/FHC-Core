@@ -27,6 +27,7 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
 include('../../config/vilesci.config.inc.php');
+include('../../config/global.config.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
@@ -65,7 +66,12 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 					        		      label="rdf:http://www.technikum-wien.at/buchungstyp/rdf#beschreibung"
 					        		      standardbetrag="rdf:http://www.technikum-wien.at/buchungstyp/rdf#standardbetrag"
 					        		      standardtext="rdf:http://www.technikum-wien.at/buchungstyp/rdf#standardtext"
-										  credit_points="rdf:http://www.technikum-wien.at/buchungstyp/rdf#credit_points"
+					        		      <?php 
+											// Credit Points werden nur angezeigt, wenn diese im Config aktiviert wurden
+												if(defined('FAS_KONTO_SHOW_CREDIT_POINTS') && FAS_KONTO_SHOW_CREDIT_POINTS=='true')
+													echo 'credit_points="rdf:http://www.technikum-wien.at/buchungstyp/rdf#credit_points"';
+											?>
+										  anmerkung="rdf:http://www.technikum-wien.at/buchungstyp/rdf#anmerkung"
 								  		  uri="rdf:*"/>
 								</menupopup>
 							</rule>
@@ -111,12 +117,24 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 						</template>
 					</menulist>
 				</row>
+				<?php 
+					// Credit Points werden nur angezeigt, wenn diese im Config aktiviert wurden
+					if(defined('FAS_KONTO_SHOW_CREDIT_POINTS') && FAS_KONTO_SHOW_CREDIT_POINTS=='true')
+						$hidden='';
+					else
+						$hidden='hidden="true"';
+					
+					echo '	<row '.$hidden.'>
+								<label value="Credit Points" control="student-konto-neu-textbox-credit_points" '.$hidden.'/>
+								<hbox '.$hidden.'>
+									<textbox id="student-konto-neu-textbox-credit_points" maxlength="9" size="9" value="0.00" '.$hidden.'/>
+									<spacer flex="1" />			
+								</hbox>
+							</row>';
+				?>
 				<row>
-					<label value="Credit Points" control="student-konto-neu-textbox-credit_points"/>
-					<hbox>
-						<textbox id="student-konto-neu-textbox-credit_points" maxlength="9" size="9" value='0.00'/>
-						<spacer flex="1" />			
-      				</hbox>
+					<label value="Anmerkung" control="student-konto-neu-textbox-anmerkung"/>
+						<textbox id="student-konto-neu-textbox-anmerkung" multiline="true"/>		
 				</row>
 			</rows>
 	</grid>
