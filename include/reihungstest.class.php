@@ -428,7 +428,8 @@ class reihungstest extends basis_db
 			return false;
 	}
 
-	public function getTeilnehmerAnzahl($reihungstest_id) {
+	public function getTeilnehmerAnzahl($reihungstest_id)
+	{
 
 		$qry = 'SELECT count(*) AS anzahl '
 				. 'FROM public.tbl_prestudent '
@@ -908,6 +909,63 @@ class reihungstest extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Reihungstests';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt Reihungstests die den Suchkriterien entsprechen
+	 * @param $datum Datum
+	 * @param $studiensemester_kurzbz Studiensemester optional
+	 * @param $stufe Stufe optional
+	 * @return boolean true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function findReihungstest($datum, $studiensemester_kurzbz = null, $stufe = null)
+	{
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_reihungstest
+				WHERE
+					datum=".$this->db_add_param($datum);
+
+		if(!is_null($studiensemester_kurzbz))
+			$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+		if(!is_null($stufe))
+			$qry.=" AND stufe=".$this->db_add_param($stufe);
+		$qry .=" ORDER BY reihungstest_id";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new reihungstest();
+
+				$obj->reihungstest_id = $row->reihungstest_id;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->datum = $row->datum;
+				$obj->uhrzeit = $row->uhrzeit;
+				$obj->ext_id = $row->ext_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->max_teilnehmer = $row->max_teilnehmer;
+				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
+				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
+				$obj->studiensemester_kurzbz =$row->studiensemester_kurzbz;
+				$obj->stufe = $row->stufe;
+				$obj->anmeldefrist = $row->anmeldefrist;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}

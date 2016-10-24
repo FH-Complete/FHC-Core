@@ -132,6 +132,14 @@ echo ']>
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#rt_person_id" />
 							<splitter class="tree-splitter"/>
+							<treecol id="aufnahmetermine-tree-studienplan_bezeichnung" label="Studienplan" flex="2" hidden="false"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studienplan_bezeichnung" />
+							<splitter class="tree-splitter"/>
+							<treecol id="aufnahmetermine-tree-studienplan_id" label="StudienplanID" flex="2" hidden="true"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studienplan_id" />
+							<splitter class="tree-splitter"/>
 						</treecols>
 
 						<template>
@@ -148,6 +156,8 @@ echo ']>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#rt_id"/>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#person_id"/>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#rt_person_id"/>
+										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studienplan_bezeichnung"/>
+										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studienplan_id"/>
 									</treerow>
 								</treeitem>
 							</treechildren>

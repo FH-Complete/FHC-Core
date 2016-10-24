@@ -26,6 +26,7 @@ require_once('../include/datum.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/reihungstest.class.php');
+require_once('../include/studienplan.class.php');
 
 $user = get_uid();
 
@@ -74,6 +75,9 @@ function drawrow($row)
 	$reihungstest_obj = new reihungstest();
 	$reihungstest_obj->load($row->rt_id);
 
+	$studienplan = new studienplan();
+	$studienplan->loadStudienplan($row->studienplan_id);
+
 	$i=$oRdf->newObjekt($row->rt_person_id);
 	$oRdf->obj[$i]->setAttribut('rt_person_id',$row->rt_person_id,true);
 	$oRdf->obj[$i]->setAttribut('rt_id',$row->rt_id,true);
@@ -86,6 +90,7 @@ function drawrow($row)
 	$oRdf->obj[$i]->setAttribut('reihungstest',$reihungstest_obj->datum.' '.$reihungstest_obj->anmerkung,true);
 	$oRdf->obj[$i]->setAttribut('stufe',$reihungstest_obj->stufe,true);
 	$oRdf->obj[$i]->setAttribut('studienplan_id',$row->studienplan_id,true);
+	$oRdf->obj[$i]->setAttribut('studienplan_bezeichnung',$studienplan->bezeichnung,true);
 
 	$oRdf->addSequence($row->rt_person_id);
 }
