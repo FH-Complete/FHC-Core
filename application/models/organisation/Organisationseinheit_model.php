@@ -13,7 +13,7 @@ class Organisationseinheit_model extends DB_Model
 
 	public function getRecursiveList($typ)
 	{
-		$qry = "WITH RECURSIVE tree (oe_kurzbz, bezeichnung, path, organisationseinheittyp_kurzbz) AS 
+		$qry = "WITH RECURSIVE tree (oe_kurzbz, bezeichnung, path, organisationseinheittyp_kurzbz) AS
 				(
 					SELECT
 						oe_kurzbz,
@@ -28,23 +28,23 @@ class Organisationseinheit_model extends DB_Model
 						oe.bezeichnung||' ('||oe.organisationseinheittyp_kurzbz||')' AS bezeichnung,
 						tree.path ||oe.oe_kurzbz||'|' AS path,
 						oe.organisationseinheittyp_kurzbz
-					FROM tree 
+					FROM tree
 					JOIN tbl_organisationseinheit oe ON (tree.oe_kurzbz=oe.oe_parent_kurzbz)
 				)
 				SELECT oe_kurzbz AS value, substring(regexp_replace(path, '[A-z]+\|', '-','g')||bezeichnung,2) AS name, path FROM tree ";
 		if (!empty($typ))
 			$qry .= 'WHERE organisationseinheittyp_kurzbz IN ('.$typ.') ';
 		$qry .= 'ORDER BY path;';
-		
-		return $this->execQuery($query);
+
+		return $this->execQuery($qry);
 	}
-	
+
 	/**
      * getOneLevel
      *
 	 * This method get one level of the organisation tree, using the given parameters.
 	 * It returns even the data from another table linked by the oe_kurzbz
-	 * 
+	 *
      * @param	string	$schema		REQUIRED
      * @param	string	$table		REQUIRED
 	 * @param	mixed	$fields		REQUIRED
@@ -72,9 +72,9 @@ class Organisationseinheit_model extends DB_Model
 					) _joined_table ON (orgs._pk = _joined_table._pk)
 					WHERE orgs._pk = ?
 					ORDER BY %s";
-		
+
 		$query = sprintf($query, $table, $fields, $schema, $table, $where, $orderby);
-		
+
 		return $this->execQuery($query, array($oe_kurzbz));
 	}
 }

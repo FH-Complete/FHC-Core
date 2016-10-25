@@ -3,26 +3,26 @@
 /*
  * OE widget
  */
-class organisationseinheit_widget extends Widget 
+class organisationseinheit_widget extends Widget
 {
 
 	protected $_htmltagname = 'oe_kurzbz';
-	
-    public function display($data) 
+
+    public function display($data)
 	{
 		$this->load->model('organisation/Organisationseinheit_model');
 		if (isset($data['typ']))
 			$typ = $data['typ'];
-		else 
+		else
 			$typ = null;
 		$res = $this->Organisationseinheit_model->getRecursiveList($typ);
 
 		// *** set data ***
 		if (isset($data['htmltagname']))
 			$this->_htmltagname = $data['htmltagname'];
-		
+
 		// items from db
-		foreach ($res->retval->result() as $obj)
+		foreach ($res->retval as $obj)
 		{
 			$item = array
 			(
@@ -39,5 +39,5 @@ class organisationseinheit_widget extends Widget
 
         $this->view('widgets/organisationseinheit', $data);
     }
-    
+
 }
