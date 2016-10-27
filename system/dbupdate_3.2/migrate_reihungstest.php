@@ -55,7 +55,7 @@ $uid = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('admin', null, 'suid'))
+if (!$rechte->isBerechtigt('admin', null, 'suid'))
 	die($rechte->errormsg);
 
 echo '<doctype html>
@@ -69,7 +69,7 @@ echo '<doctype html>
 <body>
 <h1>Reihungstest Migration</h1>
 ';
-if(!isset($_POST['run']))
+if (!isset($_POST['run']))
 {
 	echo '
 	Dieses Script migriert die Reihungstestanmeldungen und Punkte von der
@@ -103,9 +103,9 @@ else
 	$count_neue_reihungsests = 0;
 	$count_zuordnung_vorhanden = 0;
 
-	if($result = $db->db_query($qry))
+	if ($result = $db->db_query($qry))
 	{
-		while($row = $db->db_fetch_object($result))
+		while ($row = $db->db_fetch_object($result))
 		{
 			$error = false;
 			$errormsg = '';
@@ -115,16 +115,16 @@ else
 			$ausbildungssemester = 1;
 			$studiensemester_kurzbz = '';
 
-			if($row->reihungstest_id == '')
+			if ($row->reihungstest_id == '')
 			{
 				// Reihungstesttermin nicht eingetragen -> erstellen
 				$prestudent_obj = new prestudent();
-				if($prestudent_obj->getLastStatus($row->prestudent_id, '','Interessent'))
+				if ($prestudent_obj->getLastStatus($row->prestudent_id, '', 'Interessent'))
 				{
 					$ausbildungssemester = $prestudent_obj->ausbildungssemester;
 
 					$stsem_obj = new studiensemester();
-					if($stsem_obj->load($prestudent_obj->studiensemester_kurzbz))
+					if ($stsem_obj->load($prestudent_obj->studiensemester_kurzbz))
 					{
 						$datum = $stsem_obj->start;
 						$studiensemester_kurzbz = $prestudent_obj->studiensemester_kurzbz;
@@ -142,7 +142,7 @@ else
 					$error = true;
 				}
 
-				if(!$error)
+				if (!$error)
 				{
 					$reihungstest_id = getReihungstest($datum, $studiensemester_kurzbz, $stufe, $row->studiengang_kz);
 				}
@@ -150,13 +150,13 @@ else
 			else
 				$reihungstest_id = $row->reihungstest_id;
 
-			if($studienplan_id=='')
+			if ($studienplan_id == '')
 			{
 				// Wenn kein Studienplan eingetragen ist, dann wird geraten
 				$studienplanObj = new studienplan();
 				$studienplanObj->getStudienplaeneFromSem($row->studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester);
 
-				if(isset($studienplanObj->result[0]))
+				if (isset($studienplanObj->result[0]))
 					$studienplan_id = $studienplanObj->result[0]->studienplan_id;
 				else
 				{
@@ -165,22 +165,22 @@ else
 				}
 			}
 
-			if($reihungstest_id == '')
+			if ($reihungstest_id == '')
 			{
 				$error = true;
 				$errormsg .= 'Reihungstest kann nicht ermittelt werden';
 			}
 
-			if(!$error)
+			if (!$error)
 			{
 				//echo "<br>AddReihungstestPerson1 $reihungstest_id, $row->rt_punkte1, $studienplan_id";
-				if(addReihungstestPerson($row, $reihungstest_id, $row->rt_punkte1, $studienplan_id)===false)
+				if (addReihungstestPerson($row, $reihungstest_id, $row->rt_punkte1, $studienplan_id) === false)
 					$error = true;
 			}
 
-			if(!$error)
+			if (!$error)
 			{
-				if($row->rt_punkte2 != '')
+				if ($row->rt_punkte2 != '')
 				{
 					$stufe = 2;
 					$rt = new reihungstest();
@@ -188,10 +188,10 @@ else
 
 					$reihungstest_id = getReihungstest($rt->datum, $rt->studiensemester_kurzbz, $stufe, $row->studiengang_kz);
 					//echo "<br>AddReihungstestPerson2 $reihungstest_id, $row->rt_punkte2, $studienplan_id";
-					if(addReihungstestPerson($row, $reihungstest_id, $row->rt_punkte2, $studienplan_id)===false)
+					if (addReihungstestPerson($row, $reihungstest_id, $row->rt_punkte2, $studienplan_id) === false)
 						$error = true;
 				}
-				if($row->rt_punkte3 != '' && $row->rt_punkte3 != '0.0000')
+				if ($row->rt_punkte3 != '' && $row->rt_punkte3 != '0.0000')
 				{
 					$stufe = 3;
 					$rt = new reihungstest();
@@ -199,12 +199,12 @@ else
 
 					$reihungstest_id = getReihungstest($rt->datum, $rt->studiensemester_kurzbz, $stufe, $row->studiengang_kz);
 					//echo "<br>AddReihungstestPerson3 $reihungstest_id, $row->rt_punkte3, $studienplan_id";
-					if(addReihungstestPerson($row, $reihungstest_id, $row->rt_punkte3, $studienplan_id)===false)
+					if (addReihungstestPerson($row, $reihungstest_id, $row->rt_punkte3, $studienplan_id) === false)
 						$error = true;
 				}
 			}
 
-			if($error)
+			if ($error)
 				echo $errormsg.'<br>';
 		}
 	}
@@ -221,6 +221,11 @@ echo '</body>
 
 /**
  * Erstellt die Zuordnung einer Person zu einem Reihungstest
+ * @param object $row DB Result mit Personen.
+ * @param int $reihungstest_id ID des Reihungstests.
+ * @param float $punkte Punkte des Reihungstests.
+ * @param int $studienplan_id ID des Studienplans.
+ * @return errormsg oder true wenn ok
  */
 function addReihungstestPerson($row, $reihungstest_id, $punkte, $studienplan_id)
 {
@@ -228,7 +233,7 @@ function addReihungstestPerson($row, $reihungstest_id, $punkte, $studienplan_id)
 
 	// Suchen ob bereits ein Eintrag vorhanden ist in rt_person
 	$rt_obj = new reihungstest();
-	if(!$rt_obj->getPersonReihungstest($row->person_id, $reihungstest_id))
+	if (!$rt_obj->getPersonReihungstest($row->person_id, $reihungstest_id))
 	{
 		// Zuordnung noch nicht vorhanden
 		// Neue Zuordnung erstellen
@@ -236,10 +241,10 @@ function addReihungstestPerson($row, $reihungstest_id, $punkte, $studienplan_id)
 		$rt_obj->rt_id = $reihungstest_id;
 		$rt_obj->studienplan_id = $studienplan_id;
 		$rt_obj->anmeldedatum = $row->anmeldungreihungstest;
-		$rt_obj->teilgenommen = ($row->reihungstestangetreten=='t'?true:false);
+		$rt_obj->teilgenommen = ($row->reihungstestangetreten == 't'?true:false);
 		$rt_obj->punkte = $punkte;
 		$rt_obj->new = true;
-		if(!$rt_obj->savePersonReihungstest())
+		if (!$rt_obj->savePersonReihungstest())
 		{
 			return 'Fehler beim Eintragen der RT-Zuordnung'.$rt_obj->errormsg;
 		}
@@ -251,17 +256,17 @@ function addReihungstestPerson($row, $reihungstest_id, $punkte, $studienplan_id)
 			$rt_obj = new reihungstest();
 			$rt_obj->getStudienplaeneReihungstest($reihungstest_id);
 			$found = false;
-			foreach($rt_obj->result as $row)
+			foreach ($rt_obj->result as $row)
 			{
-				if($row->studienplan_id==$studienplan_id)
+				if ($row->studienplan_id == $studienplan_id)
 				{
 					$found = true;
 					break;
 				}
 			}
-			if(!$found)
+			if (!$found)
 			{
-				$rt_obj->new=true;
+				$rt_obj->new = true;
 				$rt_obj->rt_id = $reihungstest_id;
 				$rt_obj->studienplan_id = $studienplan_id;
 				$rt_obj->saveStudienplanReihungstest();
@@ -281,6 +286,11 @@ function addReihungstestPerson($row, $reihungstest_id, $punkte, $studienplan_id)
 /**
  * Liefert eine ReihungstestID die den Kriterien entspricht
  * Wenn es keine passenden Termin gibt, dann wird einer erstellt
+ * @param date $datum Datum des Reihungstests.
+ * @param varchar $studiensemester_kurzbz Kurzbz des Studiensemesters in dem der RT stattfindet.
+ * @param int $stufe Stufe des Reihungstests.
+ * @param int $studiengang_kz Kennzahl des Studiengangs in dem der RT abgehalten wird.
+ * @return ID des Reihungstests oder false im Fehlerfall.
  */
 function getReihungstest($datum, $studiensemester_kurzbz, $stufe, $studiengang_kz)
 {
@@ -289,7 +299,7 @@ function getReihungstest($datum, $studiensemester_kurzbz, $stufe, $studiengang_k
 	// Pruefen ob bereits ein passender Reihungstesttermin vorhanden ist
 	$reihungstest_obj = new reihungstest();
 	$reihungstest_obj->findReihungstest($datum, $studiensemester_kurzbz, $stufe);
-	if(!isset($reihungstest_obj->result[0]))
+	if (!isset($reihungstest_obj->result[0]))
 	{
 		// Wenn kein Termin gefunden wurde, dann einen neuen Anlegen
 		$reihungstest_obj = new reihungstest();
@@ -301,7 +311,7 @@ function getReihungstest($datum, $studiensemester_kurzbz, $stufe, $studiengang_k
 		$reihungstest_obj->studiensemester_kurzbz = $studiensemester_kurzbz;
 		$reihungstest_obj->studiengang_kz = $studiengang_kz;
 
-		if($reihungstest_obj->save())
+		if ($reihungstest_obj->save())
 		{
 			$reihungstest_id = $reihungstest_obj->reihungstest_id;
 			$count_neue_reihungsests++;
@@ -319,4 +329,3 @@ function getReihungstest($datum, $studiensemester_kurzbz, $stufe, $studiengang_k
 	}
 	return $reihungstest_id;
 }
-?>
