@@ -112,6 +112,7 @@ function draw_row($mitarbeiter)
 		<MITARBEITER:vorname><![CDATA['.$mitarbeiter->vorname.']]></MITARBEITER:vorname>
 		<MITARBEITER:nachname><![CDATA['.$mitarbeiter->nachname.']]></MITARBEITER:nachname>
 		<MITARBEITER:kurzbz><![CDATA['.$mitarbeiter->kurzbz.']]></MITARBEITER:kurzbz>
+		<MITARBEITER:aktiv><![CDATA['.($mitarbeiter->aktiv == true?'aktiv':'inaktiv').']]></MITARBEITER:aktiv>
 		<MITARBEITER:studiengang_kz></MITARBEITER:studiengang_kz>
   	</RDF:Description>
   	';

@@ -1126,8 +1126,12 @@ function LeMitarbeiterLektorChange()
 	{
 		stundensatz = val.dbdml_data;
 	}
-
+	if (stundensatz != '')
+		default_stundensatz = 'Stundensatz (Default '+stundensatz+'):';
+	else
+		default_stundensatz = 'Stundensatz:';
 	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').value=stundensatz;
+	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-stundensatz').value=default_stundensatz;
 }
 
 // ****
@@ -1212,6 +1216,33 @@ function LeMitarbeiterAuswahl()
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/lehreinheitmitarbeiter/" + lehreinheit_id + "/"+ mitarbeiter_uid);
    	var predicateNS = "http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf";
 
+	//Standardstundensatz fuer die Anzeige laden
+	var url_stundensatz = '<?php echo APP_ROOT ?>content/lvplanung/lehrveranstaltungDBDML.php';
+	var req_stundensatz = new phpRequest(url_stundensatz,'','');
+
+	req_stundensatz.add('type', 'getstundensatz');
+	req_stundensatz.add('mitarbeiter_uid', mitarbeiter_uid);
+
+	var response_stundensatz = req_stundensatz.executePOST();
+
+	var val_stundensatz =  new ParseReturnValue(response_stundensatz);
+
+	if (!val_stundensatz.dbdml_return)
+	{
+		if(val_stundensatz.dbdml_errormsg=='')
+			alert(response_stundensatz);
+		else
+			alert(val_stundensatz.dbdml_errormsg);
+	}
+	else
+	{
+		default_stundensatz = val_stundensatz.dbdml_data;
+	}
+	if (default_stundensatz != '')
+		default_stundensatz_text = 'Stundensatz (Default '+default_stundensatz+'):';
+	else
+		default_stundensatz_text = 'Stundensatz:';
+
 	//Daten in Variablen speichern
 	lehrfunktion_kurzbz = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#lehrfunktion_kurzbz" ));
 	semesterstunden = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#semesterstunden" ));
@@ -1233,6 +1264,7 @@ function LeMitarbeiterAuswahl()
 	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung').value=anmerkung;
 	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-lehreinheit_id').value=lehreinheit_id;
 	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-mitarbeiter_uid').value=mitarbeiter_uid;
+	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-stundensatz').value=default_stundensatz_text;
 
 	if(bismelden=='Ja')
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked=true;
