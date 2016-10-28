@@ -368,7 +368,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<vbox>
 		<hbox>
 		<groupbox>
-			<caption label="Lektorendaten" />
+			<caption label="LektorInnendaten" />
 			<vbox flex="1">
 			<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-lehreinheit_id" hidden="true"/>
 			<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-mitarbeiter_uid" hidden="true"/>
@@ -395,7 +395,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					            </menupopup>
 					         </template>
 				   		 </menulist>
-				   		 <label align="end" control="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" value="Lektor:"/>
+				   		 <label align="end" control="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" value="LektorIn:"/>
 						 <menulist id="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" disabled="true" oncommand="LeMitarbeiterLektorChange(); LeMitarbeiterValueChanged();"
 	    		                   datasources="<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php"
 			                       ref="http://www.technikum-wien.at/mitarbeiter/_alle" flex="1">
