@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: 
+ * Authors:
  */
 
 // Requirements here and there
@@ -78,7 +78,7 @@ $L_LN_NOT_AVAILABLE = "N/A";
 function lChkStudiengang($studiengang, $postStudiengang, $rowStudiengang, $studentStudiengang)
 {
 	$chkStudiengang = false;
-	
+
 	foreach($studiengang->result as $val)
 	{
 		if ($val->studiengang_kz == $postStudiengang && $val->kurzbzlang == $rowStudiengang)
@@ -87,7 +87,7 @@ function lChkStudiengang($studiengang, $postStudiengang, $rowStudiengang, $stude
 			break;
 		}
 	}
-	
+
 	return $chkStudiengang && $studentStudiengang == $postStudiengang;
 }
 
@@ -96,6 +96,7 @@ function lChkStudiengang($studiengang, $postStudiengang, $rowStudiengang, $stude
  */
 function lCredit($student, $postStudiensemester, $rowAmount, $rowDate)
 {
+	$user = get_uid();
 	// To format a date
 	$datum = new datum();
 	// To work on table tbl_konto
@@ -108,7 +109,10 @@ function lCredit($student, $postStudiensemester, $rowAmount, $rowDate)
 	$konto->buchungstyp_kurzbz = "Leistungsstipendium";
 	$konto->mahnspanne = 0;
 	$konto->buchungsdatum = $datum->formatDatum($rowDate);
-	
+	$konto->buchungstext = "Leistungsstipendium STG ".$postStudiensemester;
+	$konto->insertamum = date('Y-m-d H:i:s');
+	$konto->insertvon = $user;
+
 	return $konto;
 }
 
@@ -133,25 +137,34 @@ function lDebit(&$konto)
 function lAddToLogArray($code, $lineNumber, $msg)
 {
 	global $logArray, $errorOccurred, $L_ERROR;
-	
+
 	if ($code == $L_ERROR)
 	{
 		$errorOccurred = true;
 	}
-	
+
 	$log = new stdClass();
 	$log->code = $code;
 	$log->lineNumber = $lineNumber;
 	$log->msg = $msg;
-	
+
 	array_push($logArray, $log);
+}
+
+function checkStipExists($uid, $stsem)
+{
+	$checkkonto = new konto();
+	if ($checkkonto->checkLeistungsstipendium($uid, $stsem))
+		return true;
+	else
+		return false;
 }
 
 // If data has been posted
 if (isset($_POST["submit"]))
 {
 	$dataPosted = true;
-	
+
 	// If studiensemester and/or studiengang have not been posted
 	if (!$errorOccurred && (empty($_POST["studiensemester"]) || !is_numeric($_POST["studiengang"])))
 	{
@@ -204,7 +217,7 @@ if (!$errorOccurred && $dataPosted)
 	$student = new student(); // Object that represents a student
 	$fileRow = false; // Contains a single file row
 	$lineNumber = 0; // lines number counter
-	
+
 	// Loops on file rows
 	do
 	{
@@ -226,12 +239,12 @@ if (!$errorOccurred && $dataPosted)
 					$rowStudiengang = $fileRow[3];
 					$rowAmount = $fileRow[4];
 					$rowDate = $fileRow[5];
-					
+
 					// If this row is not the header
 					if (strtolower($rowName) != "nachname")
 					{
 						// If $rowCode is a matrikelnr gets the uid
-						if ($uid = $student->getUidFromMatrikelnummer($rowCode) === false)
+						if (($uid = $student->getUidFromMatrikelnummer($rowCode)) === false)
 						{
 							// Otherwise $rowCode is already a uid
 							$uid = $rowCode;
@@ -245,19 +258,38 @@ if (!$errorOccurred && $dataPosted)
 							// the same which was choose in the interface
 							if (lChkStudiengang($studiengang, $postStudiengang, $rowStudiengang, $student->studiengang_kz) === true)
 							{
-								// Create an object of type konto and fill it with data
-								$konto = lCredit($student, $postStudiensemester, $rowAmount, $rowDate);
-								// Inserting positive amount
-								if ($konto->save(true) === true)
+								if (checkStipExists($uid, $postStudiensemester))
 								{
-									lDebit($konto); // Negative amount
-									if ($konto->save(true) === true) // Inserting negative amount
+									lAddToLogArray(
+										$L_WARNING,
+										$lineNumber,
+										"This file row has been discarted because an entry exists in DB"
+									);
+								}
+								else
+								{
+									// Create an object of type konto and fill it with data
+									$konto = lCredit($student, $postStudiensemester, $rowAmount, $rowDate);
+									// Inserting positive amount
+									if ($konto->save(true) === true)
 									{
-										lAddToLogArray(
-											$L_INFO,
-											$lineNumber,
-											"Added!!!"
-										);
+										lDebit($konto); // Negative amount
+										if ($konto->save(true) === true) // Inserting negative amount
+										{
+											lAddToLogArray(
+												$L_INFO,
+												$lineNumber,
+												"Added!!!"
+											);
+										}
+										else
+										{
+											lAddToLogArray(
+												$L_WARNING,
+												$lineNumber,
+												"This file row has been discarted because an error has occurred while inserting in DB"
+											);
+										}
 									}
 									else
 									{
@@ -268,14 +300,7 @@ if (!$errorOccurred && $dataPosted)
 										);
 									}
 								}
-								else
-								{
-									lAddToLogArray(
-										$L_WARNING,
-										$lineNumber,
-										"This file row has been discarted because an error has occurred while inserting in DB"
-									);
-								}
+
 							}
 							else
 							{
@@ -324,7 +349,7 @@ if (!$errorOccurred && $dataPosted)
 		}
 	}
 	while($fileRow);
-	
+
 	// Close the file handler
 	fclose($fileHandle);
 }
@@ -338,7 +363,7 @@ if (!$errorOccurred && $dataPosted)
 		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
-		
+
 		<form name="saveLeistungsstipendium" method="post" enctype="multipart/form-data" action="">
 			<table border=0>
 				<tr>
@@ -382,7 +407,7 @@ if (!$errorOccurred && $dataPosted)
 				</tr>
 				<tr>
 					<td>
-						CSV file: 
+						CSV file:
 					</td>
 					<td>&nbsp;</td>
 					<td>
@@ -399,10 +424,10 @@ if (!$errorOccurred && $dataPosted)
 				</tr>
 			</table>
 		</form>
-		
+
 		<br/>
 		<br/>
-		
+
 		<table border=0>
 			<tr>
 				<th width="25%" align="left">Status</th>
@@ -423,7 +448,7 @@ if (!$errorOccurred && $dataPosted)
 							%s
 						</td>
 					</tr>";
-				
+
 				foreach($logArray as $log)
 				{
 					$color = "green"; // great expectations
@@ -435,11 +460,11 @@ if (!$errorOccurred && $dataPosted)
 					{
 						$color = "orange";
 					}
-					
+
 					echo sprintf($tableRow, $color, $log->code, $log->lineNumber, $log->msg);
 				}
 			?>
 		</table>
-		
+
 	</body>
 </html>

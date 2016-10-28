@@ -60,7 +60,6 @@ class konto extends basis_db
 	public $aktiv;
 	public $credit_points;
 	public $zahlungsreferenz;
-	public $anmerkung;
 
 	/**
 	 * Konstruktor
@@ -117,7 +116,6 @@ class konto extends basis_db
 				$this->vornamen = $row->vornamen;
 				$this->credit_points = $row->credit_points;
 				$this->zahlungsreferenz = $row->zahlungsreferenz;
-				$this->anmerkung = $row->anmerkung;
 				return true;
 			}
 			else
@@ -193,7 +191,7 @@ class konto extends basis_db
 		{
 
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO public.tbl_konto (person_id, studiengang_kz, studiensemester_kurzbz, buchungsnr_verweis, betrag, buchungsdatum, buchungstext, mahnspanne, buchungstyp_kurzbz, updateamum, updatevon, insertamum, insertvon, credit_points, zahlungsreferenz, anmerkung) VALUES('.
+			$qry='BEGIN;INSERT INTO public.tbl_konto (person_id, studiengang_kz, studiensemester_kurzbz, buchungsnr_verweis, betrag, buchungsdatum, buchungstext, mahnspanne, buchungstyp_kurzbz, updateamum, updatevon, insertamum, insertvon, credit_points) VALUES('.
 			     $this->db_add_param($this->person_id, FHC_INTEGER).', '.
 			     $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 			     $this->db_add_param($this->studiensemester_kurzbz).', '.
@@ -207,9 +205,7 @@ class konto extends basis_db
 			     $this->db_add_param($this->updatevon).', '.
 			     $this->db_add_param($this->insertamum).', '.
 			     $this->db_add_param($this->insertvon).', '.
-			     $this->db_add_param($this->credit_points).', '.
-			     $this->db_add_param($this->zahlungsreferenz).', '.
-				 $this->db_add_param($this->anmerkung).');';
+				 $this->db_add_param($this->credit_points).');';
 		}
 		else
 		{
@@ -228,9 +224,7 @@ class konto extends basis_db
 				   ' updatevon='.$this->db_add_param($this->updatevon).','.
 				   ' insertamum='.$this->db_add_param($this->insertamum).','.
 				   ' insertvon='.$this->db_add_param($this->insertvon).','.
-				   ' credit_points='.$this->db_add_param($this->credit_points).','.
-				   ' zahlungsreferenz='.$this->db_add_param($this->zahlungsreferenz).','.
-				   ' anmerkung='.$this->db_add_param($this->anmerkung).
+				   ' credit_points='.$this->db_add_param($this->credit_points).
 				   " WHERE buchungsnr='".$this->db_add_param($this->buchungsnr, FHC_INTEGER)."';";
 
 		}
@@ -391,9 +385,6 @@ class konto extends basis_db
 				$buchung->nachname = $row->nachname;
 				$buchung->vorname = $row->vorname;
 				$buchung->vornamen = $row->vornamen;
-				$buchung->credit_points = $row->credit_points;
-				$buchung->zahlungsreferenz = $row->zahlungsreferenz;
-				$buchung->anmerkung = $row->anmerkung;
 
 				if($buchung->buchungsnr_verweis!='')
 				{
@@ -462,11 +453,11 @@ class konto extends basis_db
 	 */
 	public function getDifferenz($buchungsnr)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					sum(betrag) as differenz FROM public.tbl_konto
-				WHERE 
+				WHERE
 					(buchungsnr=".$this->db_add_param($buchungsnr, FHC_INTEGER)." OR buchungsnr_verweis=".$this->db_add_param($buchungsnr, FHC_INTEGER).")
-				OR 
+				OR
 					(buchungsnr=(SELECT buchungsnr_verweis FROM public.tbl_konto WHERE buchungsnr=".$this->db_add_param($buchungsnr, FHC_INTEGER).") OR buchungsnr_verweis=(SELECT buchungsnr_verweis FROM public.tbl_konto WHERE buchungsnr=".$this->db_add_param($buchungsnr, FHC_INTEGER)."))";
 
 		if($this->db_query($qry))
@@ -656,7 +647,7 @@ class konto extends basis_db
 						AND tbl_konto.buchungstyp_kurzbz in(".$this->db_implode4SQL($buchungstyp_kurzbz_array).")";
 		if(!is_null($studiensemester_kurzbz))
 			$subqry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
-			
+
 		$subqry.="
 					ORDER BY tbl_studiensemester.start DESC";
 
@@ -809,7 +800,7 @@ class konto extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert die CreditPoints die ein Studierender für ein Studiensemester zur Verfügung hat
 	 * falls dieser einschraenkungen eingetragen hat. Wenn keine Einschraenkung vorhanden ist,
@@ -908,7 +899,6 @@ class konto extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->credit_points = $row->credit_points;
 				$this->zahlungsreferenz = $row->zahlungsreferenz;
-				$this->anmerkung = $row->anmerkung;
 				return true;
 			}
 			else
@@ -924,5 +914,39 @@ class konto extends basis_db
 		}
 	}
 
+	/**
+	 * ueberprueft, ob leistungsstipendium gebucht ist fuer
+	 * student_uid und studiensemester
+	 * @param string $uid UserID
+	 * @param string $stsem Studiensemester
+	 * @return boolean
+	 */
+	public function checkLeistungsstipendium($uid, $stsem)
+	{
+		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum FROM public.tbl_konto, public.tbl_benutzer, public.tbl_student
+					WHERE
+						tbl_konto.studiensemester_kurzbz = ".$this->db_add_param($stsem)."
+						AND tbl_benutzer.uid = ".$this->db_add_param($uid)."
+						AND tbl_benutzer.uid = tbl_student.student_uid
+						AND tbl_benutzer.person_id = tbl_konto.person_id
+						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
+						AND tbl_konto.buchungstyp_kurzbz = 'Leistungsstipendium' ORDER BY buchungsnr";
+
+		if($this->db_query($subqry))
+		{
+			if ($this->db_num_rows()==0)
+				return false;
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei einer Abfrage';
+			return false;
+		}
+	}
 }
+
 ?>
