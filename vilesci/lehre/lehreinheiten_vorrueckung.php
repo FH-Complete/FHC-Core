@@ -19,8 +19,10 @@
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Manfred Kindl 	< manfred.kindl@technikum-wien.at >
  */
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studiensemester.class.php');
@@ -28,6 +30,7 @@ require_once('../../include/lehreinheit.class.php');
 require_once('../../include/lehreinheitmitarbeiter.class.php');
 require_once('../../include/lehreinheitgruppe.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/mitarbeiter.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -37,7 +40,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('lehre/vorrueckung', null, 'suid'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+	die($rechte->errormsg);
 
 $stg_obj = new studiengang();
 $stg_obj->loadArray($rechte->getStgKz('lehre/vorrueckung'),'typ, kurzbz');
@@ -141,7 +144,14 @@ foreach ($stsem_obj->studiensemester as $stsem)
 
 echo '</SELECT>';
 
-echo '&nbsp;&nbsp;<input type="submit" value="Vorrücken">';
+echo '&nbsp;&nbsp;<input type="submit" value="Vorrücken"><br>';
+
+if (defined('VILESCI_STUNDENSATZ_VORRUECKUNG') && VILESCI_STUNDENSATZ_VORRUECKUNG != '' && is_numeric(VILESCI_STUNDENSATZ_VORRUECKUNG))
+	echo '<br><span style="color: blue">Alle Lehraufträge werden mit dem Stundensatz "'.VILESCI_STUNDENSATZ_VORRUECKUNG.'" vorgerückt</span>';
+elseif (defined('VILESCI_STUNDENSATZ_VORRUECKUNG') && VILESCI_STUNDENSATZ_VORRUECKUNG != '' && VILESCI_STUNDENSATZ_VORRUECKUNG == 'default')
+	echo '<br><span style="color: blue">Alle Lehraufträge werden mit dem aktuell hinterlegten Standard-Stundensatz der/des Lehrenden vorgerückt</span>';
+else
+	echo '<br><span style="color: blue">Alle Lehraufträge werden mit dem Stundensatz des Vorjahres vorgerückt</span>';
 
 echo '</form>';
 
@@ -152,10 +162,10 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 		die('Studiengang kann nicht geladen werden');
 	
 	if(!$rechte->isBerechtigt('lehre/vorrueckung', $stg_obj->oe_kurzbz, 'suid'))
-		die('Sie haben keine Berechtigung fuer diesen Studiengang');
+		die($rechte->errormsg);
 
-	echo '<br><br>Starte Vorrückung '.$stg_arr[$studiengang_kz]." $semester von $stsem_von nach $stsem_nach ...";
-	
+	echo '<br>Starte Vorrückung '.$stg_arr[$studiengang_kz]." $semester von $stsem_von nach $stsem_nach ...";
+
 	$qry = "SELECT tbl_lehreinheit.lehreinheit_id
 			FROM 
 				lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
@@ -221,12 +231,13 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 							if($lem_obj->load($row->lehreinheit_id, $row_lem->mitarbeiter_uid))
 							{
 								// Pruefen ob der Lektor ueber die im Config festgelegte Stundengrenze kommt und Meldung ausgeben
-								$qry_stundengrenze="SELECT mitarbeiter_uid,fixangestellt,SUM(semesterstunden) AS summe FROM lehre.tbl_lehreinheitmitarbeiter 
+								$qry_stundengrenze="SELECT mitarbeiter_uid,fixangestellt,SUM(semesterstunden) AS summe, aktiv FROM lehre.tbl_lehreinheitmitarbeiter 
 													JOIN lehre.tbl_lehreinheit USING (lehreinheit_id) 
-													JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid) 
+													JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid)
+													JOIN public.tbl_benutzer ON (uid=mitarbeiter_uid)
 													WHERE mitarbeiter_uid='$row_lem->mitarbeiter_uid' 
 													AND studiensemester_kurzbz='$stsem_von' 
-													GROUP BY mitarbeiter_uid,fixangestellt";
+													GROUP BY mitarbeiter_uid,fixangestellt,aktiv";
 								//echo '<br>UNION<br>'.$qry_stundengrenze;
 								if($result_stundengrenze = $db->db_query($qry_stundengrenze))
 								{
@@ -240,10 +251,28 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 										{
 											$text.=" <span style='color:red'>Stundengrenze ".WARN_SEMESTERSTD_FIX." Stunden ueberschritten von $row_lem->mitarbeiter_uid</span>";
 										}
+										
+										// Meldung, wenn Benutzer inaktiv
+										if ($row_stundengrenze->aktiv == 'f')
+										{
+											$text.="; <span style='color:orange'>Achtung! MitarbeiterIn <b>$row_lem->mitarbeiter_uid</b> ist nicht aktiv</span>";
+										}
 									}
 								}
 								$lem_obj->lehreinheit_id=$le_obj->lehreinheit_id;
 								$lem_obj->new = true;
+								// Wenn VILESCI_STUNDENSATZ_VORRUECKUNG definiert ist, wird nicht der Stundensatz des Vorjahres verwendet
+								// Wenn VILESCI_STUNDENSATZ_VORRUECKUNG numerisch ist, wird dieser Wert fuer den Stundensatz verwendet
+								if (defined('VILESCI_STUNDENSATZ_VORRUECKUNG') && VILESCI_STUNDENSATZ_VORRUECKUNG != '' && is_numeric(VILESCI_STUNDENSATZ_VORRUECKUNG))
+								{
+									$lem_obj->stundensatz = VILESCI_STUNDENSATZ_VORRUECKUNG;
+								}
+								// Wenn VILESCI_STUNDENSATZ_VORRUECKUNG default ist, wird der Standard-Stundensatz des jeweiligen Lektors geladen und gespeichert
+								elseif (defined('VILESCI_STUNDENSATZ_VORRUECKUNG') && VILESCI_STUNDENSATZ_VORRUECKUNG != '' && VILESCI_STUNDENSATZ_VORRUECKUNG == 'default')
+								{
+									$stundensatz = new mitarbeiter($row_lem->mitarbeiter_uid);
+									$lem_obj->stundensatz = $stundensatz->stundensatz;
+								}
 								$lem_obj->insertamum = date('Y-m-d H:i:s');
 								$lem_obj->insertvon = 'Vorrueckung_'.$user;
 								$lem_obj->ext_id = '';

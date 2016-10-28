@@ -226,4 +226,11 @@ define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
 
 //Wenn auf 'true' gesetzt, dann wird im FAS beim Konto das Feld fuer die CreditPoints angezeigt
 define('FAS_KONTO_SHOW_CREDIT_POINTS','false');
+
+// Wenn definiert, wird bei der Vorrückung der Lehreinheiten nicht der Stundensatz des Vorjahres eingetragen.
+// Erlaubt sind numerische Werte oder der Wert "default".
+// Bei "default" wird der Standard-Stundensatz des Lektors (aus tbl_mitarbeiter) ermittelt, und dieser eingetragen.
+// Wenn numerisch, wird dieser Wert bei allen LektorInnen eingetragen.
+// Wenn nicht definiert, wird der Stundensatz des Vorjahres übernommen.
+define('VILESCI_STUNDENSATZ_VORRUECKUNG', '');
 ?>
