@@ -1188,7 +1188,8 @@ class lehrveranstaltung extends basis_db
 		JOIN lehre.tbl_studienplan_lehrveranstaltung
 		USING(lehrveranstaltung_id)
 		WHERE tbl_studienplan_lehrveranstaltung.studienplan_id=" . $this->db_add_param($studienplan_id, FHC_INTEGER);
-
+		if (defined("CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN") && ("CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN" === true))
+			$qry .= " AND tbl_lehrveranstaltung.lehrtyp_kurzbz != 'modul'";
 		if (!is_null($semester))
 		{
 			$qry.=" AND tbl_studienplan_lehrveranstaltung.semester=" . $this->db_add_param($semester, FHC_INTEGER);
@@ -1286,7 +1287,9 @@ class lehrveranstaltung extends basis_db
 		$tree = array();
 		foreach ($this->lehrveranstaltungen as $row)
 		{
-			if ($row->studienplan_lehrveranstaltung_id_parent == '')
+			if ($row->studienplan_lehrveranstaltung_id_parent == '' 
+				|| (defined("CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN") 
+					&& "CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN" === true))
 			{
 				$tree[$row->studienplan_lehrveranstaltung_id] = $row;
 				$tree[$row->studienplan_lehrveranstaltung_id]->childs = $this->getLehrveranstaltungTreeChilds($row->studienplan_lehrveranstaltung_id);
