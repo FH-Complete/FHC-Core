@@ -200,7 +200,7 @@ foreach ($anmeldungen as $row)
 				</td>
 			</tr>
 			<tr>
-				<td>Anmeldungen:</td>
+				<td><?php echo $p->t('pruefung/pruefungsbewertungAnmeldungen'); ?>:</td>
 				<td><?php echo $uids; ?></td>
 			</tr>
 			<tr>
