@@ -143,4 +143,15 @@ $this->phrasen['pruefung/emailLektorAm'] = 'del';
 $this->phrasen['pruefung/emailLektorVon'] = 'dalle';
 $this->phrasen['pruefung/emailLektorUhrBis'] = 'alle';
 $this->phrasen['pruefung/emailLektorUhrAngemeldet'] = '.';
+$this->phrasen['pruefung/emailVerschiebung'] = 'Gentile Studente,
+
+Con la presente comunichiamo che l’appello per l’esame %1$s ha
+subito delle variazioni.
+L’appello si terrà il giorno %2$s alle ore %3$s.
+
+Ci scusiamo per eventuali disagi.
+Grazie per l’attenzione.';
+$this->phrasen['pruefung/emailVerschiebungSubject'] = 'Variazione appello d’esame';
+
+
 ?>

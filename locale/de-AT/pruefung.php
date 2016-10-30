@@ -143,6 +143,11 @@ $this->phrasen['pruefung/emailLektorAm'] = 'am';
 $this->phrasen['pruefung/emailLektorVon'] = 'von';
 $this->phrasen['pruefung/emailLektorUhrBis'] = 'Uhr bis';
 $this->phrasen['pruefung/emailLektorUhrAngemeldet'] = 'Uhr angemeldet.';
+$this->phrasen['pruefung/emailVerschiebung'] = 'Sehr geehrte Studierende,
+
+Die Prüfung zur LV %1$s wurde verschoben.
+Der neue Termin für die Prüfung ist am  %2$s um %3$s Uhr.';
+$this->phrasen['pruefung/emailVerschiebungSubject'] = 'Verschiebung einer Prüfung';
 
 
 ?>
