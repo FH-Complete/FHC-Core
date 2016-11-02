@@ -46,6 +46,12 @@ if ($studiensemester->getAll("desc") === false)
 	die("Error: " . $studiensemester->errormsg);
 }
 
+// Gets current studiensemester
+if (($currentStudiensemester = $studiensemester->getakt()) === false)
+{
+	die("Error: " . $studiensemester->errormsg);
+}
+
 // Gets all activ studiengang
 $studiengang = new studiengang();
 if ($studiengang->getAll("kurzbzlang", true) === false)
@@ -217,6 +223,12 @@ if (!$errorOccurred && $dataPosted)
 	$student = new student(); // Object that represents a student
 	$fileRow = false; // Contains a single file row
 	$lineNumber = 0; // lines number counter
+	
+	// Gets the previous studiensemester to the posted one
+	if (($previousStudiensemester = $studiensemester->getPreviousFrom($postStudiensemester)) === false)
+	{
+		die("Error: " . $studiensemester->errormsg);
+	}
 
 	// Loops on file rows
 	do
@@ -250,8 +262,10 @@ if (!$errorOccurred && $dataPosted)
 							$uid = $rowCode;
 							$student->errormsg = ""; // Clean errors messages
 						}
-						// Looking for a person by uid that is valid for that studiensemester
-						if ($student->load($uid, $postStudiensemester) === true)
+						// Looking for a person by uid that is valid for the posted studiensemester
+						// or for the previous one
+						if ($student->load($uid, $postStudiensemester) === true
+						 || $student->load($uid, $previousStudiensemester) === true)
 						{
 							// If the student is valid for that studiengang
 							// and checks if the studiengang present in the file is
@@ -379,10 +393,21 @@ if (!$errorOccurred && $dataPosted)
 					<td>
 						<select name="studiensemester">
 						<?php
+							$selected = "";
 							// Fills the select element with all the loaded studiensemester
 							foreach($studiensemester->studiensemester as $val)
 							{
-								echo sprintf("<option value=\"%s\">%s</option>", $val->studiensemester_kurzbz, $val->studiensemester_kurzbz);
+								// If it is the current studiensemester then selects it
+								if ($val->studiensemester_kurzbz == $currentStudiensemester)
+								{
+									$selected = "selected";
+								}
+								else
+								{
+									$selected = "";
+								}
+								
+								echo sprintf("<option value=\"%s\" %s>%s</option>", $val->studiensemester_kurzbz, $selected, $val->studiensemester_kurzbz);
 							}
 						?>
 						</select>
