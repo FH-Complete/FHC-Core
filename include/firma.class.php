@@ -177,7 +177,7 @@ class firma extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='INSERT INTO public.tbl_firma (name,  anmerkung, lieferbedingungen,
 					firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon, schule,steuernummer,
-					gesperrt,aktiv,finanzamt) VALUES('.
+					gesperrt,aktiv,finanzamt, partner_code) VALUES('.
 				$this->db_add_param($this->name).', '.
 				$this->db_add_param($this->anmerkung).', '.
 				$this->db_add_param($this->lieferbedingungen).', '.
@@ -388,7 +388,7 @@ class firma extends basis_db
 				UNION
 				SELECT
 					firma_id, name, anmerkung, lieferbedingungen, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon,
-					ext_id, schule, steuernummer, gesperrt, aktiv, finanzamt, '2' as sort
+					ext_id, schule, steuernummer, gesperrt, aktiv, finanzamt, '2' as sort, partner_code
 				FROM public.tbl_firma
 				WHERE
 				UPPER(trim(public.tbl_firma.name)) like '%".$this->db_escape($matchcode)."%'
@@ -698,7 +698,7 @@ class firma extends basis_db
 
 		if($firmentyp_kurzbz!='')
 			$qry.=" and firmentyp_kurzbz=".$this->db_add_param($firmentyp_kurzbz);
-		
+
 		if($oes!='')
 			$qry.=" and oe_kurzbz IN ('".$oes."') ";
 
