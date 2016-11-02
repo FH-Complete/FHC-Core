@@ -350,10 +350,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<treechildren>
 								<treeitem uri="rdf:*">
 									<treerow>
-										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#nachname"   />
-										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#vorname"   />
-										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#mitarbeiter_uid"   />
-										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#lehreinheit_id"   />
+										<treecell properties="Lektor_rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#nachname"   />
+										<treecell properties="Lektor_rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#vorname"   />
+										<treecell properties="Lektor_rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#mitarbeiter_uid"   />
+										<treecell properties="Lektor_rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#lehreinheit_id"   />
 										<treecell src="../skin/images/verplant_rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#verplant^.png"   />
 					 				</treerow>
 					 			</treeitem>
