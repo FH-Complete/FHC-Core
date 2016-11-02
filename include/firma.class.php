@@ -177,7 +177,7 @@ class firma extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='INSERT INTO public.tbl_firma (name,  anmerkung, lieferbedingungen,
 					firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon, schule,steuernummer,
-					gesperrt,aktiv,finanzamt) VALUES('.
+					gesperrt,aktiv,finanzamt, partner_code) VALUES('.
 				$this->db_add_param($this->name).', '.
 				$this->db_add_param($this->anmerkung).', '.
 				$this->db_add_param($this->lieferbedingungen).', '.
