@@ -155,7 +155,7 @@ if(isset($_GET['excel']))
 				studiengang_kz,
 				gebdatum,
 				geschlecht,
-				punkte,
+				punkte
 				,(
 					SELECT kontakt
 					FROM tbl_kontakt
