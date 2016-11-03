@@ -806,7 +806,7 @@ else
 				}
 			}
 
-			if($studienplan_id!='')
+			if(isset($studienplan_id) && $studienplan_id!='')
 			{
 				$stpl = new studienplan();
 				$stpl->loadStudienplan($studienplan_id);
