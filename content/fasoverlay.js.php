@@ -1779,6 +1779,8 @@ function PrintStudienblatt(event)
 		if(stsem == ss)
 		{
 		    studienplan_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-studienplan_id', v);
+			if(studienplan_id!='')
+				break;
 		}
 	    }
 	}
