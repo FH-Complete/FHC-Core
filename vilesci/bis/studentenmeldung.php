@@ -908,7 +908,6 @@ function GenerateXMLStudentBlock($row)
 				$studstatuscode = $kodex_studstatuscode_array[$rowgs->status_kurzbz];
 				$gsblock.="
 				<GS>
-					<PersKz>".$row->matrikelnr."</PersKz>
 					<MobilitaetsProgrammCode>".$rowgs->mobilitaetsprogramm_code."</MobilitaetsProgrammCode>
 					<ProgrammNr>".$rowgs->programm_code."</ProgrammNr>
 					<StudTyp>".$studtyp."</StudTyp>
