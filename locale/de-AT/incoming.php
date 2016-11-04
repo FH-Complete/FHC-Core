@@ -132,5 +132,6 @@ $this->phrasen['incoming/tabelleSortierinformation']='Sie können die Spalten du
 $this->phrasen['incoming/waehlenSieAusDenOptionen']='Bitte wählen Sie die gewünschen Optionen aus dem DropDown und klicken Sie auf "Filter"';
 $this->phrasen['incoming/lvInfo']='LV-Info';
 $this->phrasen['incoming/erfolgreichAbgeschickt']='Ihre Bewerbung wurde erfolgreich abgeschickt. Die zuständige Assistenz wird sich in Kürze mit Ihnen in Verbindung setzen';
-$this->phrasen['incoming/fehlerBeimSenden']='An error occured while sending the application. Please contact <a href="mailto:'.MAIL_INTERNATIONAL.'">'.MAIL_INTERNATIONAL.'</a>';
+$this->phrasen['incoming/fehlerBeimSenden']='Fehler beim senden der Bewerbung. Bitte kontaktieren Sie <a href="mailto:'.MAIL_INTERNATIONAL.'">'.MAIL_INTERNATIONAL.'</a>';
+$this->phrasen['incoming/jahreStudiertMussGanzeZahlSein']='Das Feld "Jahre studiert" muss eine ganze Zahl sein</a>';
 ?>

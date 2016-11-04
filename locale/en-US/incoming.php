@@ -23,7 +23,7 @@ $this->phrasen['incoming/personimernstfall']='Person to contact in Case of Emerg
 $this->phrasen['incoming/bachelorstudiengang']='Bachelor´s Degree Program';
 $this->phrasen['incoming/masterstudiengang']='Master\'s Degree Program';
 $this->phrasen['incoming/studienrichtung']='Name of Study Program';
-$this->phrasen['incoming/jahrestudiert']='Years completetd when starting at UAS TW';
+$this->phrasen['incoming/jahrestudiert']='Years completed when starting at UAS TW';
 $this->phrasen['incoming/uploadLearningAgreement']= 'Upload Learning Agreement';
 $this->phrasen['incoming/uploadCv']='Upload CV';
 $this->phrasen['incoming/dokument']='Document';
@@ -133,5 +133,6 @@ $this->phrasen['incoming/tabelleSortierinformation']='You may sort the columns b
 $this->phrasen['incoming/waehlenSieAusDenOptionen']='Please choose your options from the DropDown-Fields and click "Filter"';
 $this->phrasen['incoming/lvInfo']='Course-Info';
 $this->phrasen['incoming/erfolgreichAbgeschickt']='Admission sent successfully. The administrative assistant responsible will contact you soon';
-$this->phrasen['incoming/fehlerBeimSenden']='Fehler beim senden der Bewerbung. Bitte kontaktieren Sie <a href="mailto:'.MAIL_INTERNATIONAL.'">'.MAIL_INTERNATIONAL.'</a>';
+$this->phrasen['incoming/fehlerBeimSenden']='An error occured while sending the application. Please contact <a href="mailto:'.MAIL_INTERNATIONAL.'">'.MAIL_INTERNATIONAL.'</a>';
+$this->phrasen['incoming/jahreStudiertMussGanzeZahlSein']='"Years completed" must be a positive integer</a>';
 ?>

@@ -944,7 +944,12 @@ else if ($method == "university")
 		}
 
 			$preincoming->program_name = $_REQUEST['name_of_program'];
-			$preincoming->jahre = $_REQUEST['jahre'];
+
+			//Pruefen, ob Jahre studiert eine ganze Zahl ist oder leer 
+			if(ctype_digit($_REQUEST['jahre']) || $_REQUEST['jahre'] == '')
+				$preincoming->jahre = $_REQUEST['jahre'];
+			else 
+				echo '<span class="error">'.$p->t('incoming/jahreStudiertMussGanzeZahlSein').'</span><br>';
 			if(isset($_REQUEST['bachelor']))
 				$preincoming->bachelor = true;
 			else
