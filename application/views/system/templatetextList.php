@@ -33,7 +33,7 @@
 				<td><?php echo $v->version; ?></td>
 				<td><?php echo $v->oe_kurzbz; ?></td>
 				<td></td>
-				<td><?php echo $v->berechtigung; ?></td>
+				<td><?php echo implode(',', $v->berechtigung); ?></td>
 				<td><?php echo $v->anmerkung_vorlagestudiengang; ?></td>
 				<td><?php echo $v->aktiv; ?></td>
 				<td><a href="../editText/<?php echo $v->vorlagestudiengang_id; ?>" target="TemplatesBottom">Edit Text</a></td>
