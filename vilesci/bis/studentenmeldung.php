@@ -1060,7 +1060,7 @@ function GenerateXMLStudentBlock($row)
 		$qryio="SELECT * FROM bis.tbl_bisio WHERE student_uid=".$db->db_add_param($row->student_uid)."
 					AND (von>".$db->db_add_param($bisprevious)." OR bis IS NULL OR bis>".$db->db_add_param($bisprevious).")
 					AND von<=".$db->db_add_param($bisdatum).";";
-		$is_a_outgoing=false;
+		$outgoing_count=0;
 		if($resultio = $db->db_query($qryio))
 		{
 			while($rowio = $db->db_fetch_object($resultio))
@@ -1091,7 +1091,7 @@ function GenerateXMLStudentBlock($row)
 						$iosem[$storgform][$sem]=0;
 					}
 					$iosem[$storgform][$sem]++;
-					$is_a_outgoing=true;
+					$outgoing_count++;
 				}
 				else
 				{
@@ -1148,8 +1148,13 @@ function GenerateXMLStudentBlock($row)
 		$status = $gsstatus;
 	else
 		$status = $aktstatus;
-	if($is_a_outgoing)
-		$status .= ' (Outgoing)';
+	if($outgoing_count>0)
+	{
+		$status .= ' ( Outgoing ';
+		if($outgoing_count>1)
+			$status.= $outgoing_count.'x';
+		$status .= ')';
+	}
 
 	//Studentenliste
 	$stlist.="
