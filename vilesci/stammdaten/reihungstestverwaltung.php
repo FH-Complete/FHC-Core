@@ -234,186 +234,209 @@ if(isset($_GET['excel']))
 		if($result = $db->db_query($qry))
 		{
 			$ort_kurzbz = '0';
-			while($row = $db->db_fetch_object($result))
+			// Wenn Daten vorhanden
+			if ($db->db_num_rows($result) > 0)
 			{
-				if ($ort_kurzbz == '0' || $ort_kurzbz != $row->ort_kurzbz)
+				while($row = $db->db_fetch_object($result))
 				{
-					// Creating a worksheet
-					if ($row->ort_kurzbz=='')
-						$worksheet =& $workbook->addWorksheet("Ohne Raumzuteilung");
-					else
-						$worksheet =& $workbook->addWorksheet("Raum ".$row->ort_kurzbz);
-					$worksheet->setInputEncoding('utf-8');
-					//$worksheet->setZoom (85);
-					$worksheet->hideScreenGridlines();
-					$worksheet->hideGridlines();
-					$worksheet->setLandscape();
-					$worksheet->centerHorizontally(1);
-					$worksheet->fitToPages ( 1, 1);
-					$worksheet->setMargins_LR (0.4);
-					$worksheet->setMarginTop (0.79);
-					$worksheet->setMarginBottom (0.59);
-
-					// Titelzeilen
-					$worksheet->write(0,0,'Anwesenheitsliste Aufnahmetermin vom '.$datum_obj->convertISODate($reihungstest->datum).' '.$reihungstest->uhrzeit.' Uhr, '.$reihungstest->anmerkung.', erstellt am '.date('d.m.Y'), $format_bold);
-					if ($row->ort_kurzbz=='')
-						$worksheet->write(1,0,'Ohne Raumzuteilung', $format_bold);
-					else
-						$worksheet->write(1,0,'Raum '.$row->ort_kurzbz, $format_bold);
-					$worksheet->write(2,0,'Studienpläne: '.implode(', ', $studienplaene_arr));
-					$worksheet->write(3,0,'Stufe: '.$reihungstest->stufe);
-					$worksheet->write(4,0,'Testmodule: '.implode(', ', $gebietbezeichnungen));
-
-					//Ueberschriften
-					$zeile=6;
+					if ($ort_kurzbz == '0' || $ort_kurzbz != $row->ort_kurzbz)
+					{
+						// Creating a worksheet
+						if ($row->ort_kurzbz=='')
+							$worksheet =& $workbook->addWorksheet("Ohne Raumzuteilung");
+						else
+							$worksheet =& $workbook->addWorksheet("Raum ".$row->ort_kurzbz);
+						$worksheet->setInputEncoding('utf-8');
+						//$worksheet->setZoom (85);
+						$worksheet->hideScreenGridlines();
+						$worksheet->hideGridlines();
+						$worksheet->setLandscape();
+						$worksheet->centerHorizontally(1);
+						$worksheet->fitToPages ( 1, 1);
+						$worksheet->setMargins_LR (0.4);
+						$worksheet->setMarginTop (0.79);
+						$worksheet->setMarginBottom (0.59);
+	
+						// Titelzeilen
+						$worksheet->write(0,0,'Anwesenheitsliste Aufnahmetermin vom '.$datum_obj->convertISODate($reihungstest->datum).' '.$reihungstest->uhrzeit.' Uhr, '.$reihungstest->anmerkung.', erstellt am '.date('d.m.Y'), $format_bold);
+						if ($row->ort_kurzbz=='')
+							$worksheet->write(1,0,'Ohne Raumzuteilung', $format_bold);
+						else
+							$worksheet->write(1,0,'Raum '.$row->ort_kurzbz, $format_bold);
+						$worksheet->write(2,0,'Studienpläne: '.implode(', ', $studienplaene_arr));
+						$worksheet->write(3,0,'Stufe: '.$reihungstest->stufe);
+						$worksheet->write(4,0,'Testmodule: '.implode(', ', $gebietbezeichnungen));
+	
+						//Ueberschriften
+						$zeile=6;
+						$col=0;
+						$worksheet->write($zeile,$col,"Vorname", $format_bold);
+						$maxlength[$col] = 7;
+						$worksheet->write($zeile,++$col,"Nachname", $format_bold);
+						$maxlength[$col] = 8;
+						$worksheet->write($zeile,++$col,"G", $format_bold);
+						$maxlength[$col] = 2;
+						$worksheet->write($zeile,++$col,"Geburtsdatum", $format_bold);
+						$maxlength[$col] = 12;
+						$worksheet->write($zeile,++$col,"Studiengang", $format_bold);
+						$maxlength[$col] = 11;
+						$worksheet->write($zeile,++$col,"S", $format_bold);
+						$maxlength[$col] = 2;
+						$worksheet->write($zeile,++$col,"Bereits absolvierte RTs", $format_bold);
+						$maxlength[$col] = 20;
+						$worksheet->write($zeile,++$col,"Sonstige Termine", $format_bold);
+						$maxlength[$col] = 20;
+						$worksheet->write($zeile,++$col,"EMail", $format_bold);
+						$maxlength[$col] = 5;
+						$worksheet->write($zeile,++$col,"Strasse", $format_bold);
+						$maxlength[$col] = 6;
+						$worksheet->write($zeile,++$col,"PLZ", $format_bold);
+						$maxlength[$col] = 3;
+						$worksheet->write($zeile,++$col,"Ort", $format_bold);
+						$maxlength[$col] = 3;
+						$worksheet->write($zeile,++$col,"Unterschrift", $format_bold);
+						$maxlength[$col] = 30;
+	
+						$ort_kurzbz = $row->ort_kurzbz;
+						$zeile++;
+					}
+	
+					$pruefling = new pruefling();
+	
+					$prestudent = new prestudent();
+					$prestudent->getPrestudenten($row->person_id);
+					$rt_in_anderen_stg='';
+					$erg = '';
+					if(defined('REIHUNGSTEST_ERGEBNISSE_BERECHNEN') && REIHUNGSTEST_ERGEBNISSE_BERECHNEN)
+					{
+						foreach($prestudent->result as $item)
+						{
+							if($item->prestudent_id!=$row->prestudent_id)
+							{
+								if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
+									$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id, true);
+								else
+									$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id);
+								if($erg!=0)
+								{
+									$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz]."; ";
+								}
+							}
+						}
+					}
+					$weitere_zuteilungen = array();
+					$qry_zuteilungen = "SELECT DISTINCT	tbl_studienplan.bezeichnung,tbl_reihungstest.datum,tbl_rt_person.studienplan_id
+									FROM public.tbl_rt_person JOIN public.tbl_reihungstest ON (rt_id = reihungstest_id)
+									JOIN lehre.tbl_studienplan USING (studienplan_id)
+									JOIN testtool.tbl_ablauf USING (studienplan_id)
+									WHERE person_id=".$db->db_add_param($row->person_id)."
+									AND studiensemester_kurzbz=".$db->db_add_param($reihungstest->studiensemester_kurzbz)."
+									ORDER BY bezeichnung";
+	
+					if($result_zuteilungen = $db->db_query($qry_zuteilungen))
+					{
+						while($row_zuteilungen = $db->db_fetch_object($result_zuteilungen))
+						{
+							$testmodule = array();
+							$qry_gebiete = "SELECT gebiet_id, bezeichnung, reihung FROM testtool.tbl_ablauf JOIN testtool.tbl_gebiet USING (gebiet_id) WHERE studienplan_id = ".$db->db_add_param($row_zuteilungen->studienplan_id)." ORDER BY reihung";
+							if($result_gebiete = $db->db_query($qry_gebiete))
+							{
+								while($row_gebiete = $db->db_fetch_object($result_gebiete))
+								{
+									$testmodule[$row_gebiete->gebiet_id] = $row_gebiete->bezeichnung;
+								}
+							}
+							$weitere_zuteilungen[] = $row_zuteilungen->bezeichnung.' am '.$datum_obj->formatDatum($row_zuteilungen->datum, 'd.m.Y').' ('.implode(', ', $testmodule).')';
+						}
+					}
+	
 					$col=0;
-					$worksheet->write($zeile,$col,"Vorname", $format_bold);
-					$maxlength[$col] = 7;
-					$worksheet->write($zeile,++$col,"Nachname", $format_bold);
-					$maxlength[$col] = 8;
-					$worksheet->write($zeile,++$col,"G", $format_bold);
-					$maxlength[$col] = 2;
-					$worksheet->write($zeile,++$col,"Geburtsdatum", $format_bold);
-					$maxlength[$col] = 12;
-					$worksheet->write($zeile,++$col,"Studiengang", $format_bold);
-					$maxlength[$col] = 11;
-					$worksheet->write($zeile,++$col,"S", $format_bold);
-					$maxlength[$col] = 2;
-					$worksheet->write($zeile,++$col,"Bereits absolvierte RTs", $format_bold);
-					$maxlength[$col] = 20;
-					$worksheet->write($zeile,++$col,"Sonstige Termine", $format_bold);
-					$maxlength[$col] = 20;
-					$worksheet->write($zeile,++$col,"EMail", $format_bold);
-					$maxlength[$col] = 5;
-					$worksheet->write($zeile,++$col,"Strasse", $format_bold);
-					$maxlength[$col] = 6;
-					$worksheet->write($zeile,++$col,"PLZ", $format_bold);
-					$maxlength[$col] = 3;
-					$worksheet->write($zeile,++$col,"Ort", $format_bold);
-					$maxlength[$col] = 3;
-					$worksheet->write($zeile,++$col,"Unterschrift", $format_bold);
-					$maxlength[$col] = 30;
-
-					$ort_kurzbz = $row->ort_kurzbz;
+					$worksheet->write($zeile,$col, $row->vorname, $format_border);
+					if(strlen($row->vorname)>$maxlength[$col])
+						$maxlength[$col] = strlen($row->vorname);
+	
+					$worksheet->write($zeile,++$col,$row->nachname, $format_border);
+					if(strlen($row->nachname)>$maxlength[$col])
+						$maxlength[$col] = strlen($row->nachname);
+	
+					$worksheet->write($zeile,++$col, $row->geschlecht, $format_border_center);
+					if(strlen($row->geschlecht)>$maxlength[$col])
+						$maxlength[$col] = strlen($row->geschlecht);
+	
+					$worksheet->write($zeile,++$col,$datum_obj->convertISODate($row->gebdatum), $format_border);
+					if(strlen($row->gebdatum)>$maxlength[$col])
+						$maxlength[$col] = strlen($row->gebdatum);
+	
+					$worksheet->write($zeile,++$col,$studiengang->kuerzel_arr[$row->studiengang_kz], $format_border);
+					if(strlen($studiengang->kuerzel_arr[$row->studiengang_kz])>$maxlength[$col])
+						$maxlength[$col] = strlen($studiengang->kuerzel_arr[$row->studiengang_kz]);
+	
+					$worksheet->write($zeile,++$col,$row->ausbildungssemester, $format_border_center);
+					if(strlen($row->ausbildungssemester)>$maxlength[$col])
+						$maxlength[$col] = strlen($row->ausbildungssemester);
+	
+					$worksheet->write($zeile,++$col,$rt_in_anderen_stg, $format_border);
+					if(strlen($rt_in_anderen_stg)>$maxlength[$col])
+						$maxlength[$col] = strlen($rt_in_anderen_stg);
+	
+					$worksheet->write($zeile,++$col,implode("\n", $weitere_zuteilungen), $format_border);
+					foreach ($weitere_zuteilungen as $items)
+					{
+						if (strlen($items)>$maxlength[$col])
+							$maxlength[$col] = strlen($items);
+					}
+	
+					$worksheet->write($zeile,++$col,$row->email, $format_border);
+					if(strlen($row->email)>$maxlength[$col])
+						$maxlength[$col] = strlen($row->email);
+	
+	 				$adresse = new adresse();
+					$adresse->loadZustellAdresse($row->person_id);
+	
+					$worksheet->write($zeile,++$col,$adresse->strasse, $format_border);
+					if(strlen($adresse->strasse)>$maxlength[$col])
+						$maxlength[$col] = strlen($adresse->strasse);
+	
+					$worksheet->write($zeile,++$col,$adresse->plz, $format_border_left);
+					if(strlen($adresse->plz)>$maxlength[$col])
+						$maxlength[$col] = strlen($adresse->plz);
+	
+					$worksheet->write($zeile,++$col,$adresse->ort, $format_border);
+					if(strlen($adresse->ort)>$maxlength[$col])
+						$maxlength[$col] = strlen($adresse->ort);
+	
+					$worksheet->write($zeile,++$col,'', $format_border);
+	
+					if(count($weitere_zuteilungen)>2)
+						$worksheet->setRow($zeile, count($weitere_zuteilungen)*14);
+					else
+						$worksheet->setRow($zeile, 35);
+	
 					$zeile++;
+	
+					//Die Breite der Spalten setzen
+					foreach($maxlength as $col=>$breite)
+						$worksheet->setColumn($col, $col, $breite+2);
 				}
+			}
+			else 
+			{
+				// Creating a worksheet
+				$worksheet =& $workbook->addWorksheet("Keine Daten");
+				$worksheet->setInputEncoding('utf-8');
+				$worksheet->hideScreenGridlines();
+				$worksheet->hideGridlines();
+				$worksheet->setLandscape();
+				$worksheet->centerHorizontally(1);
+				$worksheet->fitToPages ( 1, 1);
+				$worksheet->setMargins_LR (0.4);
+				$worksheet->setMarginTop (0.79);
+				$worksheet->setMarginBottom (0.59);
+		
+				// Titelzeilen
+				$worksheet->write(0,0,'Anwesenheitsliste Aufnahmetermin vom '.$datum_obj->convertISODate($reihungstest->datum).' '.$reihungstest->uhrzeit.' Uhr, '.$reihungstest->anmerkung.', erstellt am '.date('d.m.Y'), $format_bold);
 
-				$pruefling = new pruefling();
-
-				$prestudent = new prestudent();
-				$prestudent->getPrestudenten($row->person_id);
-				$rt_in_anderen_stg='';
-				$erg = '';
-				if(defined('REIHUNGSTEST_ERGEBNISSE_BERECHNEN') && REIHUNGSTEST_ERGEBNISSE_BERECHNEN)
-				{
-					foreach($prestudent->result as $item)
-					{
-						if($item->prestudent_id!=$row->prestudent_id)
-						{
-							if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-								$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id, true);
-							else
-								$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id);
-							if($erg!=0)
-							{
-								$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz]."; ";
-							}
-						}
-					}
-				}
-				$weitere_zuteilungen = array();
-				$qry_zuteilungen = "SELECT DISTINCT	tbl_studienplan.bezeichnung,tbl_reihungstest.datum,tbl_rt_person.studienplan_id
-								FROM public.tbl_rt_person JOIN public.tbl_reihungstest ON (rt_id = reihungstest_id)
-								JOIN lehre.tbl_studienplan USING (studienplan_id)
-								JOIN testtool.tbl_ablauf USING (studienplan_id)
-								WHERE person_id=".$db->db_add_param($row->person_id)."
-								AND studiensemester_kurzbz=".$db->db_add_param($reihungstest->studiensemester_kurzbz)."
-								ORDER BY bezeichnung";
-
-				if($result_zuteilungen = $db->db_query($qry_zuteilungen))
-				{
-					while($row_zuteilungen = $db->db_fetch_object($result_zuteilungen))
-					{
-						$testmodule = array();
-						$qry_gebiete = "SELECT gebiet_id, bezeichnung, reihung FROM testtool.tbl_ablauf JOIN testtool.tbl_gebiet USING (gebiet_id) WHERE studienplan_id = ".$db->db_add_param($row_zuteilungen->studienplan_id)." ORDER BY reihung";
-						if($result_gebiete = $db->db_query($qry_gebiete))
-						{
-							while($row_gebiete = $db->db_fetch_object($result_gebiete))
-							{
-								$testmodule[$row_gebiete->gebiet_id] = $row_gebiete->bezeichnung;
-							}
-						}
-						$weitere_zuteilungen[] = $row_zuteilungen->bezeichnung.' am '.$datum_obj->formatDatum($row_zuteilungen->datum, 'd.m.Y').' ('.implode(', ', $testmodule).')';
-					}
-				}
-
-				$col=0;
-				$worksheet->write($zeile,$col, $row->vorname, $format_border);
-				if(strlen($row->vorname)>$maxlength[$col])
-					$maxlength[$col] = strlen($row->vorname);
-
-				$worksheet->write($zeile,++$col,$row->nachname, $format_border);
-				if(strlen($row->nachname)>$maxlength[$col])
-					$maxlength[$col] = strlen($row->nachname);
-
-				$worksheet->write($zeile,++$col, $row->geschlecht, $format_border_center);
-				if(strlen($row->geschlecht)>$maxlength[$col])
-					$maxlength[$col] = strlen($row->geschlecht);
-
-				$worksheet->write($zeile,++$col,$datum_obj->convertISODate($row->gebdatum), $format_border);
-				if(strlen($row->gebdatum)>$maxlength[$col])
-					$maxlength[$col] = strlen($row->gebdatum);
-
-				$worksheet->write($zeile,++$col,$studiengang->kuerzel_arr[$row->studiengang_kz], $format_border);
-				if(strlen($studiengang->kuerzel_arr[$row->studiengang_kz])>$maxlength[$col])
-					$maxlength[$col] = strlen($studiengang->kuerzel_arr[$row->studiengang_kz]);
-
-				$worksheet->write($zeile,++$col,$row->ausbildungssemester, $format_border_center);
-				if(strlen($row->ausbildungssemester)>$maxlength[$col])
-					$maxlength[$col] = strlen($row->ausbildungssemester);
-
-				$worksheet->write($zeile,++$col,$rt_in_anderen_stg, $format_border);
-				if(strlen($rt_in_anderen_stg)>$maxlength[$col])
-					$maxlength[$col] = strlen($rt_in_anderen_stg);
-
-				$worksheet->write($zeile,++$col,implode("\n", $weitere_zuteilungen), $format_border);
-				foreach ($weitere_zuteilungen as $items)
-				{
-					if (strlen($items)>$maxlength[$col])
-						$maxlength[$col] = strlen($items);
-				}
-
-				$worksheet->write($zeile,++$col,$row->email, $format_border);
-				if(strlen($row->email)>$maxlength[$col])
-					$maxlength[$col] = strlen($row->email);
-
- 				$adresse = new adresse();
-				$adresse->loadZustellAdresse($row->person_id);
-
-				$worksheet->write($zeile,++$col,$adresse->strasse, $format_border);
-				if(strlen($adresse->strasse)>$maxlength[$col])
-					$maxlength[$col] = strlen($adresse->strasse);
-
-				$worksheet->write($zeile,++$col,$adresse->plz, $format_border_left);
-				if(strlen($adresse->plz)>$maxlength[$col])
-					$maxlength[$col] = strlen($adresse->plz);
-
-				$worksheet->write($zeile,++$col,$adresse->ort, $format_border);
-				if(strlen($adresse->ort)>$maxlength[$col])
-					$maxlength[$col] = strlen($adresse->ort);
-
-				$worksheet->write($zeile,++$col,'', $format_border);
-
-				if(count($weitere_zuteilungen)>2)
-					$worksheet->setRow($zeile, count($weitere_zuteilungen)*14);
-				else
-					$worksheet->setRow($zeile, 35);
-
-				$zeile++;
-
-				//Die Breite der Spalten setzen
-				foreach($maxlength as $col=>$breite)
-					$worksheet->setColumn($col, $col, $breite+2);
+				$worksheet->write(3,0,'Keine BewerberInnen zugeteilt', $format_bold);
 			}
 		}
 		$workbook->close();
