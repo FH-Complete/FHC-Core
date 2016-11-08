@@ -909,7 +909,7 @@ function GenerateXMLStudentBlock($row)
 				$gsblock.="
 				<GS>
 					<MobilitaetsProgrammCode>".$rowgs->mobilitaetsprogramm_code."</MobilitaetsProgrammCode>
-					<ProgrammNr>".$rowgs->programm_code."</ProgrammNr>
+					<ProgrammNr>".sprintf('%04s',$rowgs->programm_code)."</ProgrammNr>
 					<StudTyp>".$studtyp."</StudTyp>
 					<PartnerCode>".$rowgs->partner_code."</PartnerCode>
 					<Ausbildungssemester>".$rowgs->ausbildungssemester."</Ausbildungssemester>
@@ -1060,6 +1060,7 @@ function GenerateXMLStudentBlock($row)
 		$qryio="SELECT * FROM bis.tbl_bisio WHERE student_uid=".$db->db_add_param($row->student_uid)."
 					AND (von>".$db->db_add_param($bisprevious)." OR bis IS NULL OR bis>".$db->db_add_param($bisprevious).")
 					AND von<=".$db->db_add_param($bisdatum).";";
+		$is_a_outgoing=false;
 		if($resultio = $db->db_query($qryio))
 		{
 			while($rowio = $db->db_fetch_object($resultio))
@@ -1090,6 +1091,7 @@ function GenerateXMLStudentBlock($row)
 						$iosem[$storgform][$sem]=0;
 					}
 					$iosem[$storgform][$sem]++;
+					$is_a_outgoing=true;
 				}
 				else
 				{
@@ -1141,6 +1143,14 @@ function GenerateXMLStudentBlock($row)
 	if(!in_array($storgform, $verwendete_orgformen))
 		$verwendete_orgformen[]=$storgform;
 
+	$status = '';
+	if($gsstatus!='')
+		$status = $gsstatus;
+	else
+		$status = $aktstatus;
+	if($is_a_outgoing)
+		$status .= ' (Outgoing)';
+
 	//Studentenliste
 	$stlist.="
 	<tr>
@@ -1148,7 +1158,7 @@ function GenerateXMLStudentBlock($row)
 		<td align=center>".trim($row->matrikelnr)."</td>
 		<td>".trim($row->nachname)."</td>
 		<td>".trim($row->vorname)."</td>
-		<td>".($gsstatus!=''?$gsstatus:trim($aktstatus))."</td>
+		<td>".$status."</td>
 		<td align=center>".trim($sem)."</td>
 		<td align=center>".trim($storgform)."</td>
 	</tr>";
