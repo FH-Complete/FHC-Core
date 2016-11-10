@@ -108,6 +108,7 @@ function StudentMobilitaetAuswahl()
 function StudentMobilitaetLoad(prestudent_id)
 {
 	StudentMobilitaetResetFileds();
+	StudentMobilitaetDisableFields(true);
 	document.getElementById('student-mobilitaet-detail-textbox-prestudent_id').value=prestudent_id;
 	document.getElementById('student-mobilitaet-button-neu').disabled=false;
 	document.getElementById('student-mobilitaet-button-loeschen').disabled=false;
@@ -162,9 +163,10 @@ function StudentMobilitaetNeu()
 
 function StudentMobilitaetResetFileds()
 {
+	var stsem = getStudiensemester();
 	document.getElementById('student-mobilitaet-detail-checkbox-neu').checked=true;
 	document.getElementById('student-mobilitaet-detail-textbox-mobilitaet_id').value='';
-	document.getElementById('student-mobilitaet-menulist-studiensemester').value='';
+	document.getElementById('student-mobilitaet-menulist-studiensemester').value=stsem;
 	document.getElementById('student-mobilitaet-menulist-mobilitaetsprogramm').value='';
 	document.getElementById('student-mobilitaet-menulist-gsprogramm').value='';
 	document.getElementById('student-mobilitaet-menulist-mobilitaetstyp').value='GS';
