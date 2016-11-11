@@ -1345,9 +1345,81 @@ if(!$result = @$db->db_query("SELECT anmerkung FROM public.tbl_konto LIMIT 1"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_konto '.$db->db_last_error().'</strong><br>';
-		else
-			echo 'public.tbl_konto: Spalte Anmerkung hinzugefuegt!<br>';
+	else
+		echo 'public.tbl_konto: Spalte Anmerkung hinzugefuegt!<br>';
 }
+
+// Studienplan_id zu testtool.tbl_ablauf
+if(!$result = @$db->db_query("SELECT studienplan_id FROM testtool.tbl_ablauf LIMIT 1"))
+{
+	$qry = "ALTER TABLE testtool.tbl_ablauf ADD COLUMN studienplan_id integer;
+			ALTER TABLE testtool.tbl_ablauf ADD CONSTRAINT fk_studienplan_id FOREIGN KEY (studienplan_id) REFERENCES lehre.tbl_studienplan (studienplan_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.tbl_ablauf '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'testtool.tbl_ablauf: Spalte studienplan_id hinzugefuegt!<br>';
+}
+
+// Aktiv-Attribut zu testtool.tbl_frage
+if(!$result = @$db->db_query("SELECT aktiv FROM testtool.tbl_frage LIMIT 1"))
+{
+	$qry = "ALTER TABLE testtool.tbl_frage ADD COLUMN aktiv boolean DEFAULT TRUE;
+			UPDATE testtool.tbl_frage SET aktiv=TRUE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.tbl_frage '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'testtool.tbl_frage: Spalte aktiv hinzugefuegt und auf TRUE gesetzt!<br>';
+}
+
+// Aktiv-Attribut zu testtool.tbl_vorschlag
+if(!$result = @$db->db_query("SELECT aktiv FROM testtool.tbl_vorschlag LIMIT 1"))
+{
+	$qry = "ALTER TABLE testtool.tbl_vorschlag ADD COLUMN aktiv boolean DEFAULT TRUE;
+			UPDATE testtool.tbl_vorschlag SET aktiv=TRUE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.tbl_vorschlag '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'testtool.tbl_vorschlag: Spalte aktiv hinzugefuegt!<br>';
+}
+
+// Bezeichnung_mehrsprachig in testtool.tbl_gebiet
+if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM testtool.tbl_gebiet LIMIT 1"))
+{
+	$qry = "ALTER TABLE testtool.tbl_gebiet ADD COLUMN bezeichnung_mehrsprachig varchar(255)[];";
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.tbl_gebiet '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'testtool.tbl_gebiet: Spalte bezeichnung_mehrsprachig hinzugefuegt!<br>';
+	
+	// Bezeichnung_mehrsprachig aus existierender Bezeichnung vorausfuellen. Ein Eintrag fuer jede Sprache mit Content aktiv.
+	$qry_help = "SELECT count(*) FROM public.tbl_sprache WHERE content=TRUE;";
+	if(!$result = $db->db_query($qry_help))
+		echo '<strong>tbl_gebiet bezeichnung_mehrsprachig: Fehler beim ermitteln der Sprachen: '.$db->db_last_error().'</strong>';
+	else
+	{
+		$row = $db->db_fetch_row($result);
+		// In integer umwandeln
+		$row = intval($row[0]);
+		$bezeichnungen = '';
+		for ($i = 1; $i <= $row; $i++)
+		{
+			$bezeichnungen .= "\"'||bezeichnung||'\",";
+		}
+		//Komma am Ende entfernen
+		$bezeichnungen = mb_substr($bezeichnungen,0,-1);
+		$qry = "UPDATE testtool.tbl_gebiet set bezeichnung_mehrsprachig = cast('{".$bezeichnungen."}' as varchar[]);";
+		
+		if(!$db->db_query($qry))
+			echo '<strong>Setzen der bezeichnung_mehrsprachig fehlgeschlagen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'testtool.tbl_gebiet: bezeichnung_mehrprachig automatisch aus existierender Bezeichnung uebernommen und fuer '.$row.' Sprachen gesetzt<br>';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -1577,15 +1649,15 @@ $tabellen=array(
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype"),
 	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz","style","berechtigung","anmerkung_vorlagestudiengang","aktiv"),
-	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon","ablauf_vorgaben_id"),
+	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon","ablauf_vorgaben_id","studienplan_id"),
 	"testtool.tbl_ablauf_vorgaben"  => array("ablauf_vorgaben_id","studiengang_kz","sprache","sprachwahl","content_id","insertamum","insertvon","updateamum", "updatevon"),
 	"testtool.tbl_antwort"  => array("antwort_id","pruefling_id","vorschlag_id"),
-	"testtool.tbl_frage"  => array("frage_id","kategorie_kurzbz","gebiet_id","level","nummer","demo","insertamum","insertvon","updateamum","updatevon"),
-	"testtool.tbl_gebiet"  => array("gebiet_id","kurzbz","bezeichnung","beschreibung","zeit","multipleresponse","kategorien","maxfragen","zufallfrage","zufallvorschlag","levelgleichverteilung","maxpunkte","insertamum", "insertvon", "updateamum", "updatevon", "level_start","level_sprung_auf","level_sprung_ab","antwortenprozeile"),
+	"testtool.tbl_frage"  => array("frage_id","kategorie_kurzbz","gebiet_id","level","nummer","demo","insertamum","insertvon","updateamum","updatevon","aktiv"),
+	"testtool.tbl_gebiet"  => array("gebiet_id","kurzbz","bezeichnung","beschreibung","zeit","multipleresponse","kategorien","maxfragen","zufallfrage","zufallvorschlag","levelgleichverteilung","maxpunkte","insertamum", "insertvon", "updateamum", "updatevon", "level_start","level_sprung_auf","level_sprung_ab","antwortenprozeile","bezeichnung_mehrsprachig"),
 	"testtool.tbl_kategorie"  => array("kategorie_kurzbz","gebiet_id"),
 	"testtool.tbl_kriterien"  => array("gebiet_id","kategorie_kurzbz","punkte","typ"),
 	"testtool.tbl_pruefling"  => array("pruefling_id","prestudent_id","studiengang_kz","idnachweis","registriert","semester"),
-	"testtool.tbl_vorschlag"  => array("vorschlag_id","frage_id","nummer","punkte","insertamum","insertvon","updateamum","updatevon"),
+	"testtool.tbl_vorschlag"  => array("vorschlag_id","frage_id","nummer","punkte","insertamum","insertvon","updateamum","updatevon","aktiv"),
 	"testtool.tbl_pruefling_frage"  => array("prueflingfrage_id","pruefling_id","frage_id","nummer","begintime","endtime"),
 	"testtool.tbl_frage_sprache"  => array("frage_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
 	"testtool.tbl_vorschlag_sprache"  => array("vorschlag_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),

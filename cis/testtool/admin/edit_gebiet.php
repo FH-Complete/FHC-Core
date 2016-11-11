@@ -29,12 +29,20 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/gebiet.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/studiengang.class.php');
+require_once('../../../include/sprache.class.php');
 
-if (!$user=get_uid())
+if (!$user = get_uid())
 	die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
+
+$db = new basis_db();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
+
+$sprache = new sprache();
+$sprache->getAll(true, 'index');
+
+$sprache_user = getSprache();
 
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -56,7 +64,7 @@ echo '
 
 	function deleteZuordnung(ablauf_id)
 	{
-		if(confirm("Wollen Sie dieses Zuordnung wirklich entfernen?"))
+		if (confirm("Wollen Sie dieses Zuordnung wirklich entfernen?"))
         {
             $("#data").html(\'<form action="edit_gebiet.php" name="sendform" id="sendform" method="POST"><input type="hidden" name="action" value="deleteZuordnung" /><input type="hidden" name="ablauf_id" value="\'+ablauf_id+\'" /></form>\');
 			document.sendform.submit();
@@ -70,22 +78,22 @@ echo '
 <div id="data"></div>
 ';
 
-if(isset($_GET['gebiet_id']))
-	$gebiet_id=$_GET['gebiet_id'];
+if (isset($_GET['gebiet_id']))
+	$gebiet_id = $_GET['gebiet_id'];
 else
-	$gebiet_id='';
+	$gebiet_id = '';
 
 $stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'-1');
 
 echo '<h1>&nbsp;Gebiet bearbeiten</h1>';
 
-if(!$rechte->isBerechtigt('basis/testtool'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+if (!$rechte->isBerechtigt('basis/testtool'))
+	die($rechte->errormsg);
 
 $gebiet = new gebiet();
 $gebiet->getAll();
 
-echo '<a href="index.php?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'" class="Item">Zurück zur Admin Seite</a><br /><br />';
+echo '<a href="index.php?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'" class="Item">Zur&uuml;ck zur Admin Seite</a><br /><br />';
 
 //Liste der Gebiete anzeigen
 echo '<form id="gebiet_form" action="'.$_SERVER['PHP_SELF'].'" method="GET">';
@@ -93,13 +101,13 @@ echo 'Gebiet: <SELECT name="gebiet_id" onchange="document.getElementById(\'gebie
 
 foreach ($gebiet->result as $row)
 {
-	if($gebiet_id=='')
-		$gebiet_id=$row->gebiet_id;
+	if ($gebiet_id == '')
+		$gebiet_id = $row->gebiet_id;
 
-	if($gebiet_id==$row->gebiet_id)
-		$selected='selected';
+	if ($gebiet_id == $row->gebiet_id)
+		$selected = 'selected';
 	else
-		$selected='';
+		$selected = '';
 
 	echo '<OPTION value="'.$row->gebiet_id.'" '.$selected.'>'.$row->bezeichnung.' - '.$row->kurzbz.' - '.$row->zeit.'</OPTION>';
 }
@@ -110,22 +118,21 @@ echo '</SELECT>
 echo '<br /><br />';
 
 // Ablaufzuordnung entfernen
-if(isset($_POST['action']) && $_POST['action']=='deleteZuordnung')
+if (isset($_POST['action']) && $_POST['action'] == 'deleteZuordnung')
 {
-	if(!isset($_POST['ablauf_id']) || !is_numeric($_POST['ablauf_id']))
+	if (!isset($_POST['ablauf_id']) || !is_numeric($_POST['ablauf_id']))
 		die('ungueltige Parameteruebergabe');
 
 	$ablauf_id = $_POST['ablauf_id'];
 
 	$ablauf = new gebiet();
-	if($ablauf->deleteAblaufZuordnung($ablauf_id))
+	if ($ablauf->deleteAblaufZuordnung($ablauf_id))
 		echo '<span class="ok">Ablauf wurde entfernt</span>';
 	else
 		echo '<span class="error">Fehler beim Entfernen:'.$ablauf->errormsg.'</span>';
-
 }
 // Ablaufzuordnung hinzufügen
-if(isset($_POST['action']) && $_POST['action']=='saveAblauf')
+if (isset($_POST['action']) && $_POST['action'] == 'saveAblauf')
 {
 	$ablauf_vorgaben_id = $_POST['ablauf_vorgaben_id'];
 	$studiengang_kz = $_POST['studiengang_kz'];
@@ -143,22 +150,28 @@ if(isset($_POST['action']) && $_POST['action']=='saveAblauf')
 	$ablauf->new = true;
 	$ablauf->gebiet_id = $gebiet_id;
 
-	if($ablauf->saveAblauf())
+	if ($ablauf->saveAblauf())
 		echo '<span class="ok">Ablauf gespeichert</span>';
 	else
 		echo '<span class="error">Fehler beim Speichern:'.$ablauf->errormsg.'</span>';
-
 }
 
 //Speichern der Daten
-if(isset($_POST['speichern']))
+if (isset($_POST['speichern']))
 {
-	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
-		die('Sie haben keine Berechtigung fuer diese Aktion');
+	if (!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
+		die($rechte->errormsg);
 
 	$gebiet = new gebiet();
-	if($gebiet->load($gebiet_id))
+	if ($gebiet->load($gebiet_id))
 	{
+		$bezeichnung_mehrsprachig = array();
+		foreach ($sprache->result as $row_sprache)
+		{
+			$bezeichnung_mehrsprachig[$row_sprache->sprache] = $_POST['bezeichnung_mehrsprachig_'.$row_sprache->sprache];
+		}
+		$gebiet->bezeichnung_mehrsprachig = $bezeichnung_mehrsprachig;
+		
 		$gebiet->kurzbz = $_POST['kurzbz'];
 		$gebiet->bezeichnung = $_POST['bezeichnung'];
 		$gebiet->beschreibung = $_POST['beschreibung'];
@@ -177,7 +190,7 @@ if(isset($_POST['speichern']))
 		$gebiet->updatevon = $user;
 		$gebiet->antwortenprozeile = $_POST['antwortenprozeile'];
 
-		if($gebiet->save(false))
+		if ($gebiet->save(false))
 		{
 			echo 'Daten erfolgreich gespeichert';
 		}
@@ -192,7 +205,7 @@ if(isset($_POST['speichern']))
 	}
 }
 
-if($gebiet_id!='')
+if ($gebiet_id != '')
 {
 	$gebiet = new gebiet($gebiet_id);
 
@@ -202,16 +215,22 @@ if($gebiet_id!='')
 
 	echo '<tr>';
 	//ID
-	echo '<td>ID</td><td>'.$gebiet_id.'</td>';
+	echo '<td>ID</td><td><input type="text" disabled value="'.$gebiet_id.'" size="10" /></td>';
 	echo '</tr><tr>';
 	//Kurzbz
-	echo '<td>Kurzbz</td><td><input type="text" maxlength="10" size="10" name="kurzbz" value="'.$gebiet->kurzbz.'"></td>';
+	echo '<td>Kurzbz</td><td><input type="text" size="10" name="" value="'.$gebiet->kurzbz.'" disabled /><input type="hidden" name="kurzbz" value="'.$gebiet->kurzbz.'"/></td>';
 	echo '</tr><tr>';
 	//Bezeichnung
-	echo '<td>Bezeichnung</td><td><input type="text" maxlength="50" name="bezeichnung" value="'.$gebiet->bezeichnung.'"></td>';
+	echo '<td>Bezeichnung (intern)</td><td><input type="text" maxlength="50" name="bezeichnung" value="'.$gebiet->bezeichnung.'" /></td>';
 	echo '</tr><tr>';
+	foreach ($sprache->result as $s)
+	{
+		echo '<td>Bezeichnung '.$s->bezeichnung_arr[$sprache_user].'</td>';
+		echo '<td><input type="text" maxlength="255" name="bezeichnung_mehrsprachig_'.$s->sprache.'" value="'.(isset($gebiet->bezeichnung_mehrsprachig[$s->sprache])?$db->convert_html_chars($gebiet->bezeichnung_mehrsprachig[$s->sprache]):'').'" /></td>';
+		echo '</tr><tr>';
+	}
 	//Beschreibung
-	echo '<td>Beschreibung</td><td><textarea name="beschreibung">'.$gebiet->beschreibung.'</textarea></td>';
+	echo '<td>Beschreibung (intern)</td><td><textarea name="beschreibung" style="font-size: 9pt">'.$gebiet->beschreibung.'</textarea></td>';
 	echo '</tr><tr>';
 	//Zeit
 	echo '<td>Zeit</td><td><input type="text" name="zeit" size="8" maxlength="8" value="'.$gebiet->zeit.'"> hh:mm:ss</td>';
@@ -228,15 +247,15 @@ if($gebiet_id!='')
 	echo '</tr><tr>';
 	// empfohlene maximalpunkte berechnen und anzeigen
 	$maximalpunkte = $gebiet->berechneMaximalpunkte($gebiet_id);
-	if($gebiet->maxpunkte!=$maximalpunkte)
-		$hinweis = '<span class="error">empfohlene Maximalpunkteanzahl: '.$maximalpunkte.'</span>';
+	if ($gebiet->maxpunkte != $maximalpunkte)
+		$hinweis = ' <span class="error">empfohlene Maximalpunkteanzahl: '.round($maximalpunkte).(round($maximalpunkte) != $maximalpunkte?' ('.$maximalpunkte.' gerundet)':'').'</span>';
 	else
-		$hinweis ='';
+		$hinweis = '';
 	echo '<td>Maximale Punkteanzahl</td><td><input type="text" size="5" maxlength="5" name="maxpunkte" value="'.$gebiet->maxpunkte.'">'.$hinweis.'</td>';
 	echo '</tr><tr>';
 	echo '<td>Maximale Fragenanzahl</td><td><input type="text" size="5" maxlength="5" name="maxfragen" value="'.$gebiet->maxfragen.'"></td>';
 	echo '</tr><tr>';
-	echo '<td>Antworten pro Zeile</td><td><input type="text" size="5" maxlength="5" name="antwortenprozeile" value="'.$gebiet->antwortenprozeile.'"></td>';
+	echo '<td>Antworten pro Zeile</td><td><input type="text" size="5" maxlength="2" name="antwortenprozeile" value="'.$gebiet->antwortenprozeile.'" required></td>';
 	echo '</tr><tr>';
 	echo '<td>Start Level</td><td><input type="text" size="5" maxlength="5" name="level_start" value="'.$gebiet->level_start.'"></td>';
 	echo '</tr><tr>';
@@ -256,9 +275,8 @@ if($gebiet_id!='')
 	$gebiet->loadAblaufGebiet($gebiet_id);
 
 	$studiengang = new studiengang();
-	$studiengang->getAll('typ, kurzbz',false);
+	$studiengang->getAll('typ, kurzbz', false);
 
-	echo '<form action="edit_gebiet.php" method="POST">';
 	echo '<table id="t1" class="tablesorter">
 	<thead>
 	<tr>
@@ -271,7 +289,7 @@ if($gebiet_id!='')
 	</tr>
 	</thead>
 	<tbody>';
-	foreach($gebiet->result as $row)
+	foreach ($gebiet->result as $row)
 	{
 		echo '<tr>
 		<td>'.$studiengang->kuerzel_arr[$row->studiengang_kz].'</td>
@@ -286,7 +304,7 @@ if($gebiet_id!='')
 	echo '<tfoot>
 	<tr>
 	<td><select name="studiengang_kz">';
-	foreach($studiengang->kuerzel_arr as $stg_kz=>$row_stg)
+	foreach ($studiengang->kuerzel_arr as $stg_kz => $row_stg)
 	{
 		echo '<option value="'.$stg_kz.'">'.$row_stg.'</option>';
 	}
@@ -301,7 +319,7 @@ if($gebiet_id!='')
 	$ablauf_vorgabe = new gebiet();
 	$ablauf_vorgabe->getAblaufVorgaben();
 
-	foreach($ablauf_vorgabe->result as $vorgabe)
+	foreach ($ablauf_vorgabe->result as $vorgabe)
 	{
 		echo '<option value="'.$vorgabe->ablauf_vorgaben_id.'">'.$studiengang->kuerzel_arr[$vorgabe->studiengang_kz].' - Sprache: '.$vorgabe->sprache.' Sprachwahl: '.($vorgabe->sprachwahl?'Ja':'Nein').' Content:'.$vorgabe->content_id.'</option>';
 	}
