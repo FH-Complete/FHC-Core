@@ -27,6 +27,7 @@
 ### Updateinfo
 - **[FAS]** Für Lehraufträge muss eine Unoconv-Vorlage erstellt werden, da der für xsl-fo notwendige Seitenumbruch-Tag aus dem RDF entfernt wurde.
 - **[FAS]** Mehrsprachigkeitsspalte tbl_status.bezeichnung_mehrsprachig wird durch das Updatescript automatisch in den ersten beiden Sprachen mit der status_kurzbz vorbefüllt. Übersetzungen sind anzupassen.
+- **[MOODLE]** Neue Webservicefunktion core_user_update_users wird benötigt
 
 ## [3.1.0] - 2015-11-12
 ### Added

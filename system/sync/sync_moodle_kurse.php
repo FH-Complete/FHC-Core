@@ -24,6 +24,7 @@
  * Aber nur wenn die Lehrform der Lehreinheit=Lehrform der LV
  */
 require_once(dirname(__FILE__).'/../../config/cis.config.inc.php');
+require_once(dirname(__FILE__).'/../../config/global.config.inc.php');
 require_once(dirname(__FILE__).'/../../include/studiensemester.class.php');
 require_once(dirname(__FILE__).'/../../include/moodle.class.php');
 require_once(dirname(__FILE__).'/../../include/moodle24_course.class.php');
@@ -43,31 +44,37 @@ if(php_sapi_name() != 'cli')
 		die('Sie haben keine Berechtigung fuer diese Seite');
 }
 
+set_time_limit(10000);
+
 $db = new basis_db();
 
 $stsem_obj = new studiensemester();
 $stsem = $stsem_obj->getAktOrNext();
+$neue_kurse = 0;
+$vorhandene_kurse = 0;
+$anzahl_fehler = 0;
 
 $qry = "SELECT
-                        distinct lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.kurzbz,
-                        tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.orgform_kurzbz, tbl_lehrveranstaltung.semester,
-                        tbl_lehreinheit.lehreinheit_id, trim(string_agg(vorname||nachname,'_')) AS lektoren
-                FROM
-                        lehre.tbl_lehreinheit
-                        JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
-JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid)
-JOIN public.tbl_benutzer ON (uid=mitarbeiter_uid)
-JOIN public.tbl_person USING (person_id)
-                WHERE
-                        studiensemester_kurzbz=".$db->db_add_param($stsem)."
-                        AND semester is not null
-                        AND semester!=0
-                        AND tbl_lehreinheit.lehrform_kurzbz=tbl_lehrveranstaltung.lehrform_kurzbz
-						AND uid not like '_Dummy%'
-GROUP BY lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.kurzbz,
-                        tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.orgform_kurzbz, tbl_lehrveranstaltung.semester,
-                        tbl_lehreinheit.lehreinheit_id;";
+			distinct lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.kurzbz,
+			tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.orgform_kurzbz, tbl_lehrveranstaltung.semester,
+			tbl_lehreinheit.lehreinheit_id, trim(string_agg(vorname||nachname,'_')) AS lektoren
+		FROM
+			lehre.tbl_lehreinheit
+			JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+			JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
+			JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid)
+			JOIN public.tbl_benutzer ON (uid=mitarbeiter_uid)
+			JOIN public.tbl_person USING (person_id)
+		WHERE
+			studiensemester_kurzbz=".$db->db_add_param($stsem)."
+			AND semester is not null
+			AND semester!=0
+			AND tbl_lehreinheit.lehrform_kurzbz=tbl_lehrveranstaltung.lehrform_kurzbz
+			AND uid not like '_Dummy%'
+		GROUP BY lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.kurzbz,
+			tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.orgform_kurzbz, tbl_lehrveranstaltung.semester,
+			tbl_lehreinheit.lehreinheit_id
+		";
 
 if($result = $db->db_query($qry))
 {
@@ -84,6 +91,10 @@ if($result = $db->db_query($qry))
 			$shortname = $studiengang->kuerzel.($row->orgform_kurzbz!=''?'-'.$row->orgform_kurzbz:'').($row->semester!=''?'-'.$row->semester:'').'-'.$stsem.'-'.$row->kurzbz.'-'.$row->lehreinheit_id.'-'.$row->lektoren;
 			$bezeichnung = $studiengang->kuerzel.($row->orgform_kurzbz!=''?'-'.$row->orgform_kurzbz:'').($row->semester!=''?'-'.$row->semester:'').'-'.$stsem.'-'.$row->bezeichnung.'-'.$row->lehreinheit_id.'-'.$row->lektoren;
 
+			// Bezeichnung kuerzen wenn zu lange
+			$shortname = mb_substr($shortname,0,254);
+			$bezeichnung = mb_substr($bezeichnung,0,254);
+
 			//$mdl_course->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 			$mdl_course->studiensemester_kurzbz = $stsem;
 			$mdl_course->lehreinheit_id = $row->lehreinheit_id;
@@ -93,33 +104,55 @@ if($result = $db->db_query($qry))
 			$mdl_course->insertvon = 'auto';
 			$mdl_course->gruppen = true;
 
-			echo "\nCreate Course: $bezeichnung";
+			echo "\n<br>Create Course: $bezeichnung";
 
 			//Moodlekurs anlegen
 			if($mdl_course->create_moodle())
 			{
+				$neue_kurse++;
 				//Eintrag in der Vilesci DB
 				$mdl_course->create_vilesci();
 
 				$mdl_user = new moodle24_user();
 				//Lektoren Synchronisieren
 				if(!$mdl_user->sync_lektoren($mdl_course->mdl_course_id))
-					echo $mdl_user->errormsg;
+				{
+					$anzahl_fehler++;
+					echo "\n<br>Lektor Sync Failed:".$mdl_user->errormsg;
+				}
 
-				$mdl_user = new moodle24_user();
-				//Fachbereichsleitung Synchronisieren
-				if(!$mdl_user->sync_fachbereichsleitung($mdl_course->mdl_course_id))
-					echo $mdl_user->errormsg;
+				if(MOODLE_SYNC_FACHBEREICHSLEITUNG)
+				{
+					$mdl_user = new moodle24_user();
+					//Fachbereichsleitung Synchronisieren
+					if(!$mdl_user->sync_fachbereichsleitung($mdl_course->mdl_course_id))
+					{
+						$anzahl_fehler++;
+						echo "\n<br>FBL Sync Failed:".$mdl_user->errormsg;
+					}
+				}
 
 				$mdl_user = new moodle24_user();
 				//Studenten Synchronisieren
 				if(!$mdl_user->sync_studenten($mdl_course->mdl_course_id))
-					echo $mdl_user->errormsg;
+				{
+					$anzahl_fehler++;
+					echo "\n<br>Student Sync Failed:".$mdl_user->errormsg;
+				}
 			}
 			else
 			{
-				echo $mdl_course->errormsg;
+				$anzahl_fehler++;
+				echo "\nFailed:".$mdl_course->errormsg;
 			}
+		}
+		else
+		{
+			$vorhandene_kurse++;
 		}
 	}
 }
+echo "\n<hr>Fertig";
+echo "\n<br>Neue Kurse:".$neue_kurse;
+echo "\n<br>Vorhandene Kurse:".$vorhandene_kurse;
+echo "\n<br>Anzahl Fehler:".$anzahl_fehler;
