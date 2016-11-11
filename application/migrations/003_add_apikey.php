@@ -1,56 +1,60 @@
 <?php
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (! defined("BASEPATH")) exit("No direct script access allowed");
 
-class Migration_Add_apikey extends CI_Migration {
+require_once APPPATH . "/libraries/MigrationLib.php";
 
-        public function up()
-        {
-            //$this->load->database('system');
-			$this->dbforge->add_field(array(
-                    'apikey_id' => array(
-                            'type' => 'INT',
-                            'constraint' => 5,
-                            'unsigned' => TRUE,
-                            'auto_increment' => TRUE
-                    ),
-                    'key' => array(
-                            'type' => 'VARCHAR',
-                            'constraint' => '100',
-                    ),
-                    'level' => array(
-                            'type' => 'INT',
-                            'null' => TRUE,
-                    ),
-                    'ignore_limits' => array(
-                            'type' => 'INT',
-                            'null' => TRUE,
-                    ),
-                    'date_created' => array(
-                            'type' => 'DATE',
-                            'null' => TRUE,
-							'default' => 'now()'
-                    )
-            ));
-            $this->dbforge->add_key('apikey_id', TRUE);
-            if (!$this->db->table_exists('ci_apikey'))
-			{
-            	$this->dbforge->create_table('ci_apikey');
-    		}
+class Migration_Add_apikey extends MigrationLib
+{
+	public function __construct()
+	{
+		parent::__construct();
+	}
+	
+	public function up()
+	{
+		$this->startUP();
+		
+		// Create table public.ci_apikey
+		$fields = array(
+			"apikey_id" => array(
+				"type" => "serial"
+			),
+			"key" => array(
+				"type" => "varchar(100)",
+				"null" => false
+			),
+			"level" => array(
+				"type" => "integer",
+				"null" => true
+			),
+			"ignore_limits" => array(
+				"type" => "integer",
+				"null" => true
+			),
+			"date_created" => array(
+				"type" => "date DEFAULT NOW()",
+				"null" => true
+			)
+		);
+		$this->createTable("public", "ci_apikey", $fields);
+		$this->addPrimaryKey(
+			"public",
+			"ci_apikey",
+			"pk_ci_apikey",
+			array("apikey_id")
+		);
+		$this->grantTable(array("SELECT"), "public", "ci_apikey", "vilesci");
+		
+		$this->endUP();
+	}
 
-			if (!$this->db->simple_query('GRANT SELECT ON public.ci_apikey TO vilesci;'))
-			{
-					echo 'Error GRANT to vilesci!';
-			}
-
-			if (!$this->db->simple_query("INSERT INTO ci_apikey (key) VALUES ('testapikey@fhcomplete.org'); INSERT INTO ci_apikey (key) VALUES ('aufnahme@fhcomplete.org');"))
-			{
-					echo 'Error DB-Insert!';
-			}
-        }
-
-        public function down()
-        {
-                $this->dbforge->drop_table('ci_apikey');
-        }
+	public function down()
+	{
+		$this->startDown();
+		
+		$this->dropTable("public", "ci_apikey");
+		
+		$this->endDown();
+	}
 }
