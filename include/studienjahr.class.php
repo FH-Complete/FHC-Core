@@ -163,5 +163,58 @@ class studienjahr extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Springt von Studienjahr $studienjahr_kurzbz um $wert Studienjahre vor/zurueck
+	 *
+	 * @param string $studienjahr_kurzbz.
+	 * @param int $wert.
+	 * @return string studienjahr_kurzbz
+	 */
+	public function jump($studienjahr_kurzbz, $wert)
+	{
+		if($wert>0)
+		{
+			$op='>=';
+			$sort='ASC';
+		}
+		elseif($wert<0)
+		{
+			$op='<=';
+			$sort='DESC';
+		}
+		else
+		{
+			$op='=';
+			$sort='';
+		}
+
+		$qry = "select distinct(studienjahr_kurzbz)
+				FROM tbl_studiensemester
+				Where start $op
+					(
+					SELECT start
+					FROM tbl_studiensemester
+					WHERE studienjahr_kurzbz = ".$this->db_add_param($studienjahr_kurzbz)."
+					ORDER BY start LIMIT 1
+					)
+				ORDER BY studienjahr_kurzbz $sort
+				offset ".abs($wert)."  LIMIT 1";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->studienjahr_kurzbz;
+			}
+			else
+				return $studienjahr_kurzbz;
+		}
+		else
+		{
+			$this->errormsg='Fehler bei einer Abfrage';
+			return false;
+		}
+	}
 }
 ?>

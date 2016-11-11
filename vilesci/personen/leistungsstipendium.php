@@ -26,6 +26,7 @@ require_once("../../include/datum.class.php");
 
 require_once("../../include/studiengang.class.php");
 require_once("../../include/studiensemester.class.php");
+require_once("../../include/studienjahr.class.php");
 require_once("../../include/student.class.php");
 require_once("../../include/konto.class.php");
 
@@ -100,7 +101,7 @@ function lChkStudiengang($studiengang, $postStudiengang, $rowStudiengang, $stude
 /**
  * Create an object of type konto and fill it with data
  */
-function lCredit($student, $postStudiensemester, $rowAmount, $rowDate)
+function lCredit($student, $postStudiensemester, $rowAmount, $rowDate, $Studienjahr)
 {
 	$user = get_uid();
 	// To format a date
@@ -115,7 +116,7 @@ function lCredit($student, $postStudiensemester, $rowAmount, $rowDate)
 	$konto->buchungstyp_kurzbz = "Leistungsstipendium";
 	$konto->mahnspanne = 0;
 	$konto->buchungsdatum = $datum->formatDatum($rowDate);
-	$konto->buchungstext = "Leistungsstipendium STG ".$postStudiensemester;
+	$konto->buchungstext = "Leistungsstipendium für Studienjahr ".$Studienjahr;
 	$konto->insertamum = date('Y-m-d H:i:s');
 	$konto->insertvon = $user;
 
@@ -223,7 +224,7 @@ if (!$errorOccurred && $dataPosted)
 	$student = new student(); // Object that represents a student
 	$fileRow = false; // Contains a single file row
 	$lineNumber = 0; // lines number counter
-	
+
 	// Gets the previous studiensemester to the posted one
 	if (($previousStudiensemester = $studiensemester->getPreviousFrom($postStudiensemester)) === false)
 	{
@@ -282,8 +283,13 @@ if (!$errorOccurred && $dataPosted)
 								}
 								else
 								{
+									$stsem = new studiensemester($postStudiensemester);
+									$stjahr = new studienjahr();
+									if (!$vorjahr = $stjahr->jump($stsem->studienjahr_kurzbz, -1))
+										$vorjahr = 'Vorjahr';
+
 									// Create an object of type konto and fill it with data
-									$konto = lCredit($student, $postStudiensemester, $rowAmount, $rowDate);
+									$konto = lCredit($student, $postStudiensemester, $rowAmount, $rowDate, $vorjahr);
 									// Inserting positive amount
 									if ($konto->save(true) === true)
 									{
@@ -406,7 +412,7 @@ if (!$errorOccurred && $dataPosted)
 								{
 									$selected = "";
 								}
-								
+
 								echo sprintf("<option value=\"%s\" %s>%s</option>", $val->studiensemester_kurzbz, $selected, $val->studiensemester_kurzbz);
 							}
 						?>

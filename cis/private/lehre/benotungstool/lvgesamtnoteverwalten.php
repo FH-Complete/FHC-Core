@@ -846,8 +846,8 @@ echo "
                         {
                             echo "<th>".($grade_from_moodle?''.$p->t('benotungstool/moodleNote').'':''.$p->t('benotungstool/leNoten').' (LE-ID)')."</th>";
                         }
-                                
-                                
+
+
                     echo "<th>".$p->t('benotungstool/punkte').' / '.$p->t('benotungstool/note')."</th>
 			<th rowspan=2>".$p->t('benotungstool/lvNote')."<br>
 				<input type='button' onclick='GradeImport()' value='".$p->t('benotungstool/importieren')."'>
@@ -874,7 +874,7 @@ echo "
                             echo "<th colspan='2'>".$p->t('benotungstool/kommissionellePruefung')."</th>";
                         }
 			echo "
-			
+
 		</tr>
 			<tr>
 				<th colspan='9'>&nbsp;</th>";
@@ -890,7 +890,7 @@ echo "
                                                 </table>
                                         </th>";
                                 }
-                                
+
 				if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
 				{
 					echo "<th colspan='2'>
@@ -903,7 +903,7 @@ echo "
 						</table>
 					</th>";
 				}
-                                
+
                                 if(defined('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF') && CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF)
                                 {
                                     echo "
@@ -1434,26 +1434,29 @@ echo "
 	<tr style='font-weight:bold;' align='center'>
 		<th style='font-weight:bold;'>&Sigma;</th>
 		<th style='font-weight:bold;' title='".$p->t('benotungstool/anzahlDerStudenten')."'>$summe_stud</th>";
-                if(defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && (!CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE))
-                {
-                    echo "<th colspan='5'></td>";
-                }
-                else
-                {
-                    echo "<th colspan='6'></td>";
-                }
+		if(defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && (!CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE))
+		{
+			echo "<th colspan='5'></td>";
+		}
+		else
+		{
+			echo "<th colspan='6'></td>";
+		}
 		echo "<th style='color:red; font-weight:bold;' title='".$p->t('benotungstool/anzahlNegativerBeurteilungen')."'>$summe_ng</th>";
-		
-                if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2): ?>
-                    <th style='font-weight:bold;' colspan='2' title='"<?php echo $p->t('benotungstool/anzahlNachpruefungen'); ?>"'>$summe_t2</th>;
-                <?php endif;
-                if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3): ?>
-                    <th style='font-weight:bold;' colspan='2' title='"<?php echo $p->t('benotungstool/anzahlNachpruefungen'); ?>"'>$summe_t3</th>";
-                <?php endif;
-		if(defined('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF') && CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF): ?>
-                    <th style='font-weight:bold;' colspan='2' title='"<?php echo $p->t('benotungstool/anzahlKommisionellePruefungen'); ?>"'>$summe_komm</th>
-                <?php endif; 
-        echo "
+
+		if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2)
+		{
+			echo "<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlNachpruefungen')."'>".$summe_t2."</th>";
+		}
+		if(defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3)
+		{
+			echo "<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlNachpruefungen')."'>".$summe_t3."</th>";
+		}
+		if(defined('CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF') && CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF)
+		{
+			echo "<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlKommisionellePruefungen')."'>".$summe_komm."</th>";
+		}
+		echo "
 	</tr>
 </table>
 </td></tr>

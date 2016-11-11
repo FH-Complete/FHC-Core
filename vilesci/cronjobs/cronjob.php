@@ -22,7 +22,7 @@
  */
 /**
  * Cronjob.php
- * 
+ *
  * Dieses Script muss in der Crontab eingetragen werden. Von hier aus werden dann
  * die entsprechenden anderen Scripte aufgerufen.
  */
@@ -43,11 +43,12 @@ foreach ($cj->result as $cronjob)
 		//Starten des Jobs
 		if($cronjob->execute())
 		{
-			echo date('d.m.Y H:i:s').' '.$cronjob->titel.'('.$cronjob->cronjob_id.') executed<br>'."\n";
+			echo "\n".date('d.m.Y H:i:s').' '.$cronjob->titel.'('.$cronjob->cronjob_id.') executed<br>'."\n";
+			echo implode($cronjob->output,"\n");
 		}
-		else 
+		else
 		{
-			echo date('d.m.Y H:i:s').' '.$cronjob->titel.'('.$cronjob->cronjob_id.') <b>failed</b><br>'."\n";
+			echo "\n".date('d.m.Y H:i:s').' '.$cronjob->titel.'('.$cronjob->cronjob_id.') <b>failed</b><br>'."\n";
 		}
 	}
 }
