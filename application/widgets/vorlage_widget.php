@@ -6,7 +6,7 @@ class Vorlage_widget extends Widget
 	{
 		$this->load->model("system/Vorlage_model", "VorlageModel");
 		$this->VorlageModel->addOrder("vorlage_kurzbz");
-		$result = $this->VorlageModel->load();
+		$result = $this->VorlageModel->loadWhere(array("mimetype" => "text/html"));
 		
 		if (is_object($result) && $result->error == EXIT_SUCCESS)
 		{
