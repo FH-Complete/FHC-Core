@@ -177,7 +177,7 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 	
 	if($result = $db->db_query($qry))
 	{
-		$anzahl_von = $db->db_affected_rows($result);
+		$anzahl_von = $db->db_num_rows($result);
 	}
 	//Pruefen, ob schon eine Vorrueckung stattgefunden hat
 	$qry_nach = "SELECT tbl_lehreinheit.lehreinheit_id
@@ -191,7 +191,7 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 		
 	if($result = $db->db_query($qry_nach))
 	{
-		$anzahl_nach = $db->db_affected_rows($result);
+		$anzahl_nach = $db->db_num_rows($result);
 		$baseurl = basename($_SERVER['REQUEST_URI']);
 		if ($anzahl_nach >= $anzahl_von && !isset($_GET['continue']))
 		{
