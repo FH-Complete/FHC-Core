@@ -1,22 +1,36 @@
 <?php
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (! defined("BASEPATH")) exit("No direct script access allowed");
 
-class Migration_Pk_migrations extends CI_Migration {
+require_once APPPATH . "/libraries/MigrationLib.php";
 
-        public function up()
-        {
-          
-            //$this->load->database('system');
-			if ($this->db->table_exists('ci_migrations'))
-			{
-				$this->db->query('ALTER TABLE ci_migrations ADD CONSTRAINT pk_migrations PRIMARY KEY(version);');
-    		}
-		}
+class Migration_Pk_migrations extends MigrationLib
+{
+	public function __construct()
+	{
+		parent::__construct();
+	}
+	
+	public function up()
+	{
+		$this->startUP();
+		
+		$this->addPrimaryKey(
+			"public",
+			"ci_migrations",
+			"pk_migrations",
+			array("version")
+		);
+		
+		$this->endUP();
+	}
 
-        public function down()
-        {
-                $this->db->query('ALTER TABLE ci_migrations DROP CONSTRAINT pk_migrations;');
-        }
+	public function down()
+	{
+		$this->startDown();
+		
+		$this->execQuery('ALTER TABLE ci_migrations DROP CONSTRAINT pk_migrations');
+		
+		$this->endDown();
+	}
 }
-
