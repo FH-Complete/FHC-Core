@@ -36,6 +36,16 @@ function loadTermine(lehreinheit_id, lehrveranstaltung_id, mitarbeiter_uid, stud
 	TermineMitarbeiterUID=mitarbeiter_uid;
 	TermineStudentUID=student_uid;
 
+	if(student_uid=='')
+		document.getElementById('termine-tree-popup-toggle-anwesenheit').hidden=true;
+	else
+		document.getElementById('termine-tree-popup-toggle-anwesenheit').hidden=false;
+
+	if(mitarbeiter_uid=='')
+		document.getElementById('termine-tree-popup-delete-anwesenheit').hidden=true;
+	else
+		document.getElementById('termine-tree-popup-delete-anwesenheit').hidden=false;
+
 	// Stundenplan Tabelle aus Variablen holen
 	TermineStundenplanTable = getvariable('termin_export_db_stpl_table');
 	TermineSetSTPLTable(TermineStundenplanTable);
@@ -126,7 +136,7 @@ function TermineToggleAnwesenheit()
 		alert('Anwesenheit kann nur in der Studierendenansicht geaendert werden');
 		return;
 	}
-	
+
 	if(TermineStundenplanTable!='stundenplan')
 	{
 		alert('Bitte wechseln Sie auf die Stundenplan Tabelle. Anhand der StundenplanDEV duerfen keine Anwesenheiten geaendert werden.');
@@ -149,6 +159,58 @@ function TermineToggleAnwesenheit()
 	req.add('datum', datum);
 	req.add('lehreinheit_id', lehreinheit_id);
 	req.add('student_uid', TermineStudentUID);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		TermineLoadTree();
+		SetStatusBarText('Daten wurden gespeichert');
+	}
+}
+
+function TermineDeleteAnwesenheit()
+{
+	if(TermineMitarbeiterUID=='')
+	{
+		alert('Anwesenheit kann nur bei Mitarbeiter gelöscht werden');
+		return;
+	}
+
+	if(TermineStundenplanTable!='stundenplan')
+	{
+		alert('Bitte wechseln Sie auf die Stundenplan Tabelle. Anhand der StundenplanDEV duerfen keine Anwesenheiten geaendert werden.');
+		return;
+	}
+
+	if(!confirm('Achtung, beim Löschen der Anwesenheit des Lektors werden auch die Anwesenheiten der Studierenden entfernt. Wollen Sie die Anwesenheit wirklich entfernen?'))
+		return;
+
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('termine-tree');
+
+	if (tree.currentIndex==-1) return;
+
+	//Ausgewaehlte Nr holen
+	var datum = getTreeCellText(tree, 'termine-treecol-datum_iso', tree.currentIndex);
+	var lehreinheit_id = getTreeCellText(tree, 'termine-treecol-lehreinheit_id', tree.currentIndex);
+
+	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'anwesenheitdelete');
+
+	req.add('datum', datum);
+	req.add('lehreinheit_id', lehreinheit_id);
 
 	var response = req.executePOST();
 

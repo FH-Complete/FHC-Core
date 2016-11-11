@@ -689,6 +689,49 @@ if(!$error)
 			}
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='anwesenheitdelete')
+	{
+		if(!$rechte->isBerechtigt('student/anwesenheit'))
+		{
+			$return = false;
+			$errormsg = 'Sie haben keine Berechtigung fuer diese Aktion';
+			$data = '';
+			$error = true;
+		}
+		else
+		{
+			if(isset($_POST['lehreinheit_id']) && isset($_POST['datum']))
+			{
+				$lehreinheit_id = $_POST['lehreinheit_id'];
+				$datum = $_POST['datum'];
+				$anwesenheit = new anwesenheit();
+				if($anwesenheit->getAnwesenheitLehreinheit($lehreinheit_id, $datum))
+				{
+					$return = true;
+					$errormsg = "";
+					foreach($anwesenheit->result as $row)
+					{
+						$aw = new anwesenheit();
+						if(!$aw->delete($row->anwesenheit_id))
+						{
+							$errormsg.=$aw->errormsg;
+							$return = false;
+						}
+					}
+				}
+				else
+				{
+					$return = false;
+					$errormsg = $anwesenheit->errormsg;
+				}
+			}
+			else
+			{
+				$return = false;
+				$errormsg = 'Fehlerhafte Parameteruebergabe';
+			}
+		}
+	}
 	else
 	{
 		$return = false;
