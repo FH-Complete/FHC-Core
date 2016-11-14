@@ -137,18 +137,26 @@ class menu_addon_meinelv extends menu_addon
 								distinct
 								tbl_studiengang.typ,
 								tbl_studiengang.kurzbz,
+								tbl_studiengang.bezeichnung AS studiengang_bezeichnung,
+								tbl_studiengangstyp.bezeichnung AS studiengangstyp_bezeichnung,
 								tbl_lehrveranstaltung.bezeichnung,
 								tbl_lehrveranstaltung.studiengang_kz,
 								tbl_lehrveranstaltung.semester,
 								tbl_lehrveranstaltung.lehreverzeichnis,
 								tbl_lehrveranstaltung.lehrveranstaltung_id,
 								tbl_lehrveranstaltung.orgform_kurzbz,
-								tbl_lehreinheit.studiensemester_kurzbz
+								tbl_lehreinheit.studiensemester_kurzbz,
+								tbl_orgform.bezeichnung AS orgform_bezeichnung
 							FROM
-								lehre.tbl_lehrveranstaltung,
+								lehre.tbl_lehrveranstaltung
+							LEFT JOIN
+								bis.tbl_orgform ON (tbl_lehrveranstaltung.orgform_kurzbz=tbl_orgform.orgform_kurzbz),
 								lehre.tbl_lehreinheit,
 								lehre.tbl_lehreinheitmitarbeiter,
 								public.tbl_studiengang
+							LEFT JOIN
+								public.tbl_studiengangstyp ON (tbl_studiengang.typ=tbl_studiengangstyp.typ)
+							
 							WHERE
 								tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 								tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND
@@ -186,8 +194,9 @@ class menu_addon_meinelv extends menu_addon
 								else
 								{
 									$kurzbz = strtoupper($row->typ.$row->kurzbz).'-'.$row->semester.' '.$row->orgform_kurzbz;
+									$titel = $row->studiengangstyp_bezeichnung.' '.$row->studiengang_bezeichnung.' '.$row->semester.'.Semester '.$row->orgform_bezeichnung.' '.$lv_obj->bezeichnung_arr[$sprache];
 
-									$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
+									$this->items[] = array('title'=>$titel,
 									 'target'=>'content',
 									 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$row->studiensemester_kurzbz,
 									 'name'=>$kurzbz.' '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
