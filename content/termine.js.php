@@ -42,9 +42,9 @@ function loadTermine(lehreinheit_id, lehrveranstaltung_id, mitarbeiter_uid, stud
 		document.getElementById('termine-tree-popup-toggle-anwesenheit').hidden=false;
 
 	if(mitarbeiter_uid=='')
-		document.getElementById('termine-tree-popup-delete-anwesenheit').hidden=true;
+		document.getElementById('termine-tree-popup-togglemitarbeiter-anwesenheit').hidden=true;
 	else
-		document.getElementById('termine-tree-popup-delete-anwesenheit').hidden=false;
+		document.getElementById('termine-tree-popup-togglemitarbeiter-anwesenheit').hidden=false;
 
 	// Stundenplan Tabelle aus Variablen holen
 	TermineStundenplanTable = getvariable('termin_export_db_stpl_table');
@@ -178,7 +178,7 @@ function TermineToggleAnwesenheit()
 	}
 }
 
-function TermineDeleteAnwesenheit()
+function TermineToggleAnwesenheitMitarbeiter()
 {
 	if(TermineMitarbeiterUID=='')
 	{
@@ -192,9 +192,6 @@ function TermineDeleteAnwesenheit()
 		return;
 	}
 
-	if(!confirm('Achtung, beim Löschen der Anwesenheit des Lektors werden auch die Anwesenheiten der Studierenden entfernt. Wollen Sie die Anwesenheit wirklich entfernen?'))
-		return;
-
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('termine-tree');
 
@@ -203,14 +200,32 @@ function TermineDeleteAnwesenheit()
 	//Ausgewaehlte Nr holen
 	var datum = getTreeCellText(tree, 'termine-treecol-datum_iso', tree.currentIndex);
 	var lehreinheit_id = getTreeCellText(tree, 'termine-treecol-lehreinheit_id', tree.currentIndex);
+	var anwesend = getTreeCellText(tree, 'termine-treecol-anwesend', tree.currentIndex);
+
+	if(anwesend=='Ja')
+		setanwesend=false;
+	else if(anwesend=='Nein')
+		setanwesend=true;
+	else
+	{
+		alert('Abbruch -> Anwesenheit ist unbestimmt');
+		return;
+	}
+
+	if(setanwesend == false)
+	{
+		if(!confirm('Achtung, beim Löschen der Anwesenheit des Lektors werden auch die Anwesenheiten der Studierenden entfernt. Wollen Sie die Anwesenheit wirklich entfernen?'))
+		return;
+	}
 
 	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 	var req = new phpRequest(url,'','');
 
-	req.add('type', 'anwesenheitdelete');
+	req.add('type', 'anwesenheittogglemitarbeiter');
 
 	req.add('datum', datum);
 	req.add('lehreinheit_id', lehreinheit_id);
+	req.add('setanwesend', setanwesend);
 
 	var response = req.executePOST();
 

@@ -689,7 +689,7 @@ if(!$error)
 			}
 		}
 	}
-	elseif(isset($_POST['type']) && $_POST['type']=='anwesenheitdelete')
+	elseif(isset($_POST['type']) && $_POST['type']=='anwesenheittogglemitarbeiter')
 	{
 		if(!$rechte->isBerechtigt('student/anwesenheit'))
 		{
@@ -704,25 +704,84 @@ if(!$error)
 			{
 				$lehreinheit_id = $_POST['lehreinheit_id'];
 				$datum = $_POST['datum'];
-				$anwesenheit = new anwesenheit();
-				if($anwesenheit->getAnwesenheitLehreinheit($lehreinheit_id, $datum))
+
+				if($_POST['setanwesend']=='false')
 				{
-					$return = true;
-					$errormsg = "";
-					foreach($anwesenheit->result as $row)
+					// Anwesenheit loeschen
+					$anwesenheit = new anwesenheit();
+					if($anwesenheit->getAnwesenheitLehreinheit($lehreinheit_id, $datum))
 					{
-						$aw = new anwesenheit();
-						if(!$aw->delete($row->anwesenheit_id))
+						$return = true;
+						$errormsg = "";
+						foreach($anwesenheit->result as $row)
 						{
-							$errormsg.=$aw->errormsg;
-							$return = false;
+							$aw = new anwesenheit();
+							if(!$aw->delete($row->anwesenheit_id))
+							{
+								$errormsg.=$aw->errormsg;
+								$return = false;
+							}
 						}
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $anwesenheit->errormsg;
 					}
 				}
 				else
 				{
-					$return = false;
-					$errormsg = $anwesenheit->errormsg;
+					$error = false;
+					// Anwesenheit bei allen zugeteilten Studierenden setzen
+					// Teilnehmer ermitteln
+					$einheiten = 0;
+					// Anzahl der Einheiten ermitteln
+					$qry = "SELECT distinct stunde
+							FROM
+								lehre.tbl_stundenplan
+							WHERE
+								lehreinheit_id=".$db->db_add_param($lehreinheit_id)."
+								AND datum=".$db->db_add_param($datum).";";
+					if($result = $db->db_query($qry))
+					{
+						$einheiten = $db->db_num_rows($result);
+					}
+					else
+					{
+						$return = false;
+						$error = true;
+						$errormsg = 'Fehler beim Ermitteln der Einheiten';
+					}
+
+					if(!$error)
+					{
+						$qry = "SELECT distinct uid, vorname, nachname, person_id
+								FROM
+									campus.vw_student_lehrveranstaltung
+									JOIN public.tbl_benutzer USING(uid)
+									JOIN public.tbl_person USING(person_id) WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id);
+
+						if($result = $db->db_query($qry))
+						{
+							while($row = $db->db_fetch_object($result))
+							{
+								$anwesenheit = new anwesenheit();
+								$anwesenheit->uid = $row->uid;
+								$anwesenheit->einheiten = $einheiten;
+								$anwesenheit->lehreinheit_id = $lehreinheit_id;
+								$anwesenheit->datum = $datum;
+								$anwesenheit->anwesend = true;
+								$anwesenheit->anmerkung;
+								$anwesenheit->save();
+							}
+							$return = true;
+						}
+						else
+						{
+							$return = false;
+							$erorrmsg = 'Fehler beim Ermitteln der Studierenden';
+						}
+					}
 				}
 			}
 			else
