@@ -597,12 +597,12 @@ class anwesenheit extends basis_db
 			// Anwesenheitsliste wurde noch nicht erfasst. Eintrag neu anlegen
 
 			// Einheiten ermitteln
-			$qry = "SELECT 
-						distinct stunde 
-					FROM 
-						lehre.tbl_stundenplan 
-					WHERE 
-						lehreinheit_id=".$this->db_add_param($lehreinheit_id)." 
+			$qry = "SELECT
+						distinct stunde
+					FROM
+						lehre.tbl_stundenplan
+					WHERE
+						lehreinheit_id=".$this->db_add_param($lehreinheit_id)."
 						AND datum=".$this->db_add_param($datum);
 
 			if($result = $this->db_query($qry))
@@ -636,4 +636,23 @@ class anwesenheit extends basis_db
 		}
 	}
 
+	/**
+	 * Loescht eine Anwesenheit
+	 * @param anwesenheit_id integer ID der Anwesenheit.
+	 * @return boolean true wenn ok , false im fehlerfall
+	 */
+	public function delete($anwesenheit_id)
+	{
+		$qry = "DELETE FROM campus.tbl_anwesenheit WHERE anwesenheit_id=".$this->db_add_param($anwesenheit_id, FHC_INTEGER).";";
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Anwesenheit';
+			return false;
+		}
+	}
 }

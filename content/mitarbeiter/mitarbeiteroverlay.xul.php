@@ -261,6 +261,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 
 				?>
 				<tab id="mitarbeiter-tab-termine" label="Termine" onclick="MitarbeiterTermineIFrameLoad()" />
+				<tab id="mitarbeiter-tab-notizen" label="Notizen"/>
 			</tabs>
 			<tabpanels id="mitarbeiter-tabpanels-main" flex="1">
 				<vbox id="mitarbeiter-detail-stammdaten"  style="margin-top:10px;" />
@@ -275,6 +276,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 					echo '<vbox id="mitarbeiter-vertrag" style="margin-top:10px;" />';
 				?>
 				<iframe id="mitarbeiter-termine" src="" style="margin-top:10px;" />
+				<vbox id="mitarbeiter-box-notiz">
+					<box class="Notiz" flex="1" id="mitarbeiter-box-notizen"/>
+				</vbox>
 			</tabpanels>
 		</tabbox>
 	</vbox>
