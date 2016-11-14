@@ -977,4 +977,42 @@ class studiengang extends basis_db
 			return false;
 		}
 	}
+	
+
+	/**
+	 * Laedt einen Lehrgangstyp anhand des lgartcodes
+	 * @param integer $lgartcode
+	 * @return boolean true wenn ok sonst false
+	 */
+	public function loadLehrgangstyp($lgartcode)
+	{
+		if(!is_numeric($lgartcode))
+		{
+			$this->errormsg = 'Lgartcode muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM bis.tbl_lgartcode WHERE lgartcode=".$this->db_add_param($lgartcode);
+		
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+			return false;
+		}
+
+		if($row = $this->db_fetch_object())
+		{
+			$this->lgartcode = $row->lgartcode;
+			$this->kurzbz = $row->kurzbz;
+			$this->bezeichnung = $row->bezeichnung;
+			$this->beantragung = $this->db_parse_bool($row->beantragung);
+			$this->lgart_biscode = $row->lgart_biscode;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+		return true;
+	}
 }

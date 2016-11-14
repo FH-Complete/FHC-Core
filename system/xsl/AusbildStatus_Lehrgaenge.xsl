@@ -719,7 +719,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <style:footnote-sep style:width="0.018cm" style:distance-before-sep="0.101cm" style:distance-after-sep="0.101cm" style:line-style="solid" style:adjustment="left" style:rel-width="25%" style:color="#000000"/>
       </style:page-layout-properties>
       <style:header-style>
-        <style:header-footer-properties fo:min-height="3.48cm" fo:margin-bottom="3.381cm" style:dynamic-spacing="true"/>
+        <style:header-footer-properties fo:min-height="3cm" fo:margin-bottom="3cm" style:dynamic-spacing="true"/>
       </style:header-style>
       <style:footer-style>
         <style:header-footer-properties fo:min-height="0.771cm" fo:margin-top="0.672cm" style:dynamic-spacing="true"/>
