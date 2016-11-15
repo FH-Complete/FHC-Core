@@ -23,7 +23,7 @@ class Uebung extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model UebungModel
-		$this->load->model('Education/uebung_model', 'UebungModel');
+		$this->load->model('education/uebung_model', 'UebungModel');
 	}
 
 	/**
