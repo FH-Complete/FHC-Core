@@ -400,6 +400,7 @@ foreach ($semester_arr as $semester)
 			$abbrecher.=' / ';
 			$absolventen.=' / ';
 			$outgoing.=' / ';
+			$gemeinsamestudien .=' / ';
 		}
 
 		$aktiv .= (isset($stsem[$orgform][$semester])?$stsem[$orgform][$semester]:'');
@@ -407,7 +408,7 @@ foreach ($semester_arr as $semester)
 		$abbrecher .= (isset($asem[$orgform][$semester])?$asem[$orgform][$semester]:'');
 		$absolventen .= (isset($absem[$orgform][$semester])?$absem[$orgform][$semester]:'');
 		$outgoing .= (isset($iosem[$orgform][$semester])?$iosem[$orgform][$semester]:'');
-		$gemeinsamestudien .= (isset($gssem[$semester])?$gssem[$semester]:'');
+		$gemeinsamestudien .= (isset($gssem[$orgform][$semester])?$gssem[$orgform][$semester]:'');
 		$i++;
 	}
 	$aktiv.='</td>';
@@ -905,7 +906,7 @@ function GenerateXMLStudentBlock($row)
 				$gsstatus = 'GS '.$rowgs->status_kurzbz.' '.$row->gsstudientyp_kurzbz;
 				$gemeinsamestudien=True;
 				$studtyp = $kodex_studientyp_array[$row->gsstudientyp_kurzbz];
-				$studstatuscode = $kodex_studstatuscode_array[$rowgs->status_kurzbz];
+				$studstatuscode = (isset($kodex_studstatuscode_array[$rowgs->status_kurzbz])?$kodex_studstatuscode_array[$rowgs->status_kurzbz]:'');
 				$gsblock.="
 				<GS>
 					<MobilitaetsProgrammCode>".$rowgs->mobilitaetsprogramm_code."</MobilitaetsProgrammCode>
@@ -915,11 +916,11 @@ function GenerateXMLStudentBlock($row)
 					<Ausbildungssemester>".$rowgs->ausbildungssemester."</Ausbildungssemester>
 					<StudStatusCode>".$studstatuscode."</StudStatusCode>
 				</GS>";
-				if(!isset($gssem[$rowgs->ausbildungssemester]))
+				if(!isset($gssem[$storgform][$rowgs->ausbildungssemester]))
 				{
-					$gssem[$rowgs->ausbildungssemester]=0;
+					$gssem[$storgform][$rowgs->ausbildungssemester]=0;
 				}
-				$gssem[$rowgs->ausbildungssemester]++;
+				$gssem[$storgform][$rowgs->ausbildungssemester]++;
 			}
 		}
 
