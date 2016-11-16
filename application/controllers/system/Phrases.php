@@ -92,8 +92,8 @@ class Phrases extends FHC_Controller
 
 	public function save()
 	{
-		$phrase_id = $this->input->post('phrase_id', TRUE);
-		$data['phrase'] = $this->input->post('phrase', TRUE);
+		$phrase_id = $this->input->post('phrase_id');
+		$data['phrase'] = $this->input->post('phrase');
 		$phrase = $this->phraseslib->savePhrase($phrase_id, $data);
 		if ($phrase->error)
 			show_error($phrase->retval);
@@ -104,7 +104,7 @@ class Phrases extends FHC_Controller
 
 	public function newText()
 	{
-		$phrase_id = $this->input->post('phrase_id', TRUE);
+		$phrase_id = $this->input->post('phrase_id');
 		$data = array
 		(
 			'phrase_id' => $phrase_id,
@@ -133,12 +133,12 @@ class Phrases extends FHC_Controller
 
 	public function saveText()
 	{
-		$phrase_inhalt_id = $this->input->post('phrase_inhalt_id', TRUE);
-		$data['orgeinheit_kurzbz'] = $this->input->post('oe_kurzbz', TRUE);
-		$data['orgform_kurzbz'] = $this->input->post('orgform_kurzbz', TRUE);
-		$data['text'] = $this->input->post('text', TRUE);
-		$data['description'] = $this->input->post('description', TRUE);
-		$data['sprache'] = $this->input->post('sprache', TRUE);
+		$phrase_inhalt_id = $this->input->post('phrase_inhalt_id');
+		$data['orgeinheit_kurzbz'] = $this->input->post('oe_kurzbz');
+		$data['orgform_kurzbz'] = $this->input->post('orgform_kurzbz');
+		$data['text'] = $this->input->post('text');
+		$data['description'] = $this->input->post('description');
+		$data['sprache'] = $this->input->post('sprache');
 		$phrase_inhalt = $this->phraseslib->updatePhraseInhalt($phrase_inhalt_id, $data);
 		if ($phrase_inhalt->error)
 			show_error($phrase_inhalt->retval);
