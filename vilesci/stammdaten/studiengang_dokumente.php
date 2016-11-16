@@ -32,6 +32,7 @@ $stg_kz = isset($_REQUEST['stg_kz']) ? $_REQUEST['stg_kz'] : '0';
 $dokument_kurzbz = isset($_REQUEST['dokument_kurzbz']) ? $_REQUEST['dokument_kurzbz'] : '';
 $onlinebewerbung = isset($_REQUEST['onlinebewerbung']);
 $pflicht = isset($_POST['pflicht']);
+$nachreichbar = isset($_POST['nachreichbar']);
 
 $sprache = new sprache();
 $sprache->getAll(true);
@@ -58,6 +59,7 @@ if($action=='add')
 		$dokument->studiengang_kz = $stg_kz;
 		$dokument->onlinebewerbung = $onlinebewerbung;
         $dokument->pflicht = $pflicht;
+        $dokument->nachreichbar = $nachreichbar;
 
 		$beschreibung_mehrsprachig=array();
 		foreach($sprache->result as $row_sprache)
@@ -104,6 +106,21 @@ if($action === 'togglepflicht') {
         if($dokument->loadDokumentStudiengang($dokument_kurzbz, $stg_kz))
         {
             $dokument->pflicht = !$dokument->pflicht;
+            if(!$dokument->saveDokumentStudiengang())
+                echo $dokument->errormsg;
+        }
+        else
+            echo 'Zuordnung ist nicht vorhanden';
+    }
+}
+
+if($action === 'togglenachreichbar') {
+    if($dokument_kurzbz != '' && $stg_kz != '')
+    {
+        $dokument=new dokument();
+        if($dokument->loadDokumentStudiengang($dokument_kurzbz, $stg_kz))
+        {
+            $dokument->nachreichbar = !$dokument->nachreichbar;
             if(!$dokument->saveDokumentStudiengang())
                 echo $dokument->errormsg;
         }
@@ -351,6 +368,7 @@ else
 			<th>Dokumentname</th>
 			<th>Online-Bewerbung</th>
 			<th>Pflicht</th>
+			<th>Nachreichbar</th>
 			<th></th>
 		</tr>
 		</thead>
@@ -363,10 +381,12 @@ else
 			$zugewieseneDokumente[]=$dok->dokument_kurzbz;
             $checked_onlinebewerbung = $dok->onlinebewerbung ? 'true' : 'false';
             $checked_pflicht = $dok->pflicht ? 'true' : 'false';
+            $checked_nachreichbar = $dok->nachreichbar ? 'true' : 'false';
 			echo '<tr>
 				<td>'.$dok->bezeichnung.'</td>
 				<td><a href="'.$_SERVER['PHP_SELF'].'?action=toggleonline&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked_onlinebewerbung.'.png" /></a></td>
 				<td><a href="'.$_SERVER['PHP_SELF'].'?action=togglepflicht&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked_pflicht.'.png" /></a></td>
+				<td><a href="'.$_SERVER['PHP_SELF'].'?action=togglenachreichbar&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked_nachreichbar.'.png" /></a></td>
 				<td>
 					<a href="'.$_SERVER['PHP_SELF'].'?action=edit&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/edit.png" title="Zuordnung bearbeiten" size="17px" /></a>
 					<a href="'.$_SERVER['PHP_SELF'].'?action=delete&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'" onclick="return confdel()"><img src="../../skin/images/delete.png" title="Zuordnung löschen" height="17px"/></a>
@@ -409,6 +429,9 @@ else
 					<input type="checkbox" name="onlinebewerbung" '.($dok->onlinebewerbung?'checked="checked"':'').'></td>
 				<td valign="top">
 				    <input type="checkbox" name="pflicht" '.($dok->pflicht?'checked="checked"':'').'>
+				</td>
+				<td valign="top">
+				    <input type="checkbox" name="nachreichbar" '.($dok->nachreichbar?'checked="checked"':'').'>
 				</td>
 				<td valign="top"><input type="submit" name="add" value="Hinzufügen"></td>
 			</tr>

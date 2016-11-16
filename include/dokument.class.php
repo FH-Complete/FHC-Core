@@ -32,6 +32,7 @@ class dokument extends basis_db
 	public $bezeichnung;
 	public $studiengang_kz;
 	public $pflicht;
+	public $nachreichbar;
 	public $bezeichnung_mehrsprachig;
 	public $dokumentbeschreibung_mehrsprachig;
 
@@ -403,6 +404,7 @@ class dokument extends basis_db
 				$dok->dokument_kurzbz = $row->dokument_kurzbz;
 				$dok->bezeichnung = $row->bezeichnung;
 				$dok->pflicht = $this->db_parse_bool($row->pflicht);
+				$dok->nachreichbar = $this->db_parse_bool($row->nachreichbar);
 				$dok->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
 				$this->result[] = $dok;
 			}
@@ -435,6 +437,7 @@ class dokument extends basis_db
 				$dok->dokument_kurzbz = $row->dokument_kurzbz;
 				$dok->bezeichnung = $row->bezeichnung;
 				$dok->pflicht = $this->db_parse_bool($row->pflicht);
+				$dok->nachreichbar = $this->db_parse_bool($row->nachreichbar);
 				$dok->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
 
 				$this->result[] = $dok;
@@ -511,6 +514,7 @@ class dokument extends basis_db
 				$this->studiengang_kz = $row->studiengang_kz;
 				$this->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
 				$this->pflicht = $this->db_parse_bool($row->pflicht);
+				$this->nachreichbar = $this->db_parse_bool($row->nachreichbar);
 				$this->beschreibung_mehrsprachig = $sprache->parseSprachResult('beschreibung_mehrsprachig',$row);
 				return true;
 			}
@@ -572,7 +576,7 @@ class dokument extends basis_db
 				$qry.=" beschreibung_mehrsprachig[$idx],";
 			}
 
-			$qry.=' pflicht, onlinebewerbung)
+			$qry.=' pflicht, nachreichbar, onlinebewerbung)
 				VALUES ('.
 					$this->db_add_param($this->dokument_kurzbz).','.
 					$this->db_add_param($this->studiengang_kz,FHC_INTEGER).',';
@@ -581,6 +585,7 @@ class dokument extends basis_db
 				$qry.=$this->db_add_param($value).',';
 
 			$qry.=	$this->db_add_param($this->pflicht,FHC_BOOLEAN).','.
+					$this->db_add_param($this->nachreichbar,FHC_BOOLEAN).','.
 					$this->db_add_param($this->onlinebewerbung,FHC_BOOLEAN).')';
 		}
 		else
@@ -593,12 +598,13 @@ class dokument extends basis_db
 				$idx = sprache::$index_arr[$key];
 				$qry.=" beschreibung_mehrsprachig[$idx]=".$this->db_add_param($value).",";
 			}
-			$qry.='		pflicht='.$this->db_add_param($this->pflicht, FHC_BOOLEAN).'
+			$qry.='		pflicht='.$this->db_add_param($this->pflicht, FHC_BOOLEAN).',
+						nachreichbar='.$this->db_add_param($this->nachreichbar, FHC_BOOLEAN).'
 					WHERE
 						dokument_kurzbz='.$this->db_add_param($this->dokument_kurzbz).'
 						AND studiengang_kz='.$this->db_add_param($this->studiengang_kz);
 		}
-
+		
 		if($this->db_query($qry))
 		{
 			return true;
@@ -652,7 +658,7 @@ class dokument extends basis_db
 		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
 		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
 		$beschreibung_mehrsprachig = $sprache->getSprachQuery('beschreibung_mehrsprachig');
-		$qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht,
+		$qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht, nachreichbar
 			$bezeichnung_mehrsprachig, $dokumentbeschreibung_mehrsprachig, $beschreibung_mehrsprachig
 			FROM public.tbl_dokumentstudiengang
 			JOIN public.tbl_prestudent using (studiengang_kz)
@@ -673,6 +679,7 @@ class dokument extends basis_db
 				$dok->dokument_kurzbz = $row->dokument_kurzbz;
 				$dok->bezeichnung = $row->bezeichnung;
 				$dok->pflicht= $this->db_parse_bool($row->pflicht);
+				$dok->nachreichbar= $this->db_parse_bool($row->nachreichbar);
 				$dok->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
 				$dok->dokumentbeschreibung_mehrsprachig = $sprache->parseSprachResult('dokumentbeschreibung_mehrsprachig', $row);
 				$dok->beschreibung_mehrsprachig = $sprache->parseSprachResult('beschreibung_mehrsprachig', $row);
