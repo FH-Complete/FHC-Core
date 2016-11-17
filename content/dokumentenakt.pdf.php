@@ -103,7 +103,7 @@ foreach($prestudent_ids as $pid)
 		 */
 		$query= '
 			SELECT
-				titel, dms_id, inhalt, mimetype, dokument_kurzbz, tbl_dokument.bezeichnung, sort, akte_id
+				tbl_akte.bezeichnung as dateiname, titel, dms_id, inhalt, mimetype, dokument_kurzbz, tbl_dokument.bezeichnung, sort, akte_id
 			FROM
 				public.tbl_vorlagedokument
 				JOIN public.tbl_dokument USING(dokument_kurzbz)
@@ -153,7 +153,7 @@ foreach($prestudent_ids as $pid)
 				 * and convert, if nessecary
 				 */
 				 $fullFilename = "";
-				$explodedTitle = explode(".", $row->titel);
+				$explodedTitle = explode(".", $row->dateiname);
 				$type = $explodedTitle[count($explodedTitle)-1];
 
 				if(
