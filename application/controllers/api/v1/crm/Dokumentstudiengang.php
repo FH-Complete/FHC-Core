@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if (!defined("BASEPATH")) exit("No direct script access allowed");
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Dokumentstudiengang extends APIv1_Controller
 {
@@ -23,7 +23,7 @@ class Dokumentstudiengang extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model DokumentstudiengangModel
-		$this->load->model("crm/Dokumentstudiengang_model", "DokumentstudiengangModel");
+		$this->load->model('crm/Dokumentstudiengang_model', 'DokumentstudiengangModel');
 	}
 
 	/**
@@ -31,8 +31,8 @@ class Dokumentstudiengang extends APIv1_Controller
 	 */
 	public function getDokumentstudiengang()
 	{
-		$studiengang_kz = $this->get("studiengang_kz");
-		$dokument_kurzbz = $this->get("dokument_kurzbz");
+		$studiengang_kz = $this->get('studiengang_kz');
+		$dokument_kurzbz = $this->get('dokument_kurzbz');
 		
 		if (isset($studiengang_kz) && isset($dokument_kurzbz))
 		{
@@ -51,13 +51,19 @@ class Dokumentstudiengang extends APIv1_Controller
 	 */
 	public function getDokumentstudiengangByStudiengang_kz()
 	{
-		$studiengang_kz = $this->get("studiengang_kz");
-		$onlinebewerbung = $this->get("onlinebewerbung");
-		$pflicht = $this->get("pflicht");
+		$studiengang_kz = $this->get('studiengang_kz');
+		$onlinebewerbung = $this->get('onlinebewerbung');
+		$pflicht = $this->get('pflicht');
+		$nachreichbar = $this->get('nachreichbar');
 		
 		if (isset($studiengang_kz))
 		{
-			$result = $this->DokumentstudiengangModel->getDokumentstudiengangByStudiengang_kz($studiengang_kz, $onlinebewerbung, $pflicht);
+			$result = $this->DokumentstudiengangModel->getDokumentstudiengangByStudiengang_kz(
+				$studiengang_kz,
+				$onlinebewerbung,
+				$pflicht,
+				$nachreichbar
+			);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -74,9 +80,13 @@ class Dokumentstudiengang extends APIv1_Controller
 	{
 		if ($this->_validate($this->post()))
 		{
-			if (isset($this->post()["studiengang_kz"]) && isset($this->post()["dokument_kurzbz"]))
+			if (isset($this->post()['studiengang_kz']) && isset($this->post()['dokument_kurzbz']))
 			{
-				$result = $this->DokumentstudiengangModel->update(array($this->post()["studiengang_kz"], $this->post()["dokument_kurzbz"]), $this->post());
+				$result = $this->DokumentstudiengangModel->update(
+					array($this->post()['studiengang_kz'],
+					$this->post()['dokument_kurzbz']),
+					$this->post()
+				);
 			}
 			else
 			{
