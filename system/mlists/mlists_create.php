@@ -34,7 +34,7 @@
 		die($db->db_last_error());
 	$num_rows=$db->db_num_rows($result_stg);
 	$ss=new studiensemester();
-	$ss_nearest=$ss->getNearest();
+	$ss_nearest=$ss->getaktorNearest();
 	$ss_nearest_to_akt=$ss->getNearestFrom($ss_nearest);
 
 ?>
@@ -90,17 +90,22 @@
 			// File Operations
 			$name=$mg_kurzbz.'.txt';
 			$name=mb_strtolower($name);
-			$fp=fopen('../../../mlists/'.$name,"w");
-			//$fp=fopen('../../../../mlists/'.$name,"w");
-
-			$nr_person=$db->db_num_rows($result_person);
-			for  ($p=0; $p<$nr_person; $p++)
+			if($fp=fopen('../../../mlists/'.$name,"w"))
 			{
-				$row = $db->db_fetch_object($result_person, $p);
-				fwrite($fp, '#'.$row->nachname.' '.$row->vorname.$crlf.$row->uid.$crlf);
+			
+				$nr_person=$db->db_num_rows($result_person);
+				for  ($p=0; $p<$nr_person; $p++)
+				{
+					$row = $db->db_fetch_object($result_person, $p);
+					fwrite($fp, '#'.$row->nachname.' '.$row->vorname.$crlf.$row->uid.$crlf);
+				}
+				fclose($fp);
+				echo $name.' created<br>';
 			}
-			fclose($fp);
-			echo $name.' created<br>';
+			else
+			{
+				echo "Failed to Create $name";
+			}
 			flush();
 		}
 	}
