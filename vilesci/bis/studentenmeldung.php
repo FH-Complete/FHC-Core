@@ -904,18 +904,35 @@ function GenerateXMLStudentBlock($row)
 			while($rowgs = $db->db_fetch_object($resultgs))
 			{
 				$gsstatus = 'GS '.$rowgs->status_kurzbz.' '.$row->gsstudientyp_kurzbz;
-				$gemeinsamestudien=True;
+				$gemeinsamestudien=true;
 				$studtyp = $kodex_studientyp_array[$row->gsstudientyp_kurzbz];
 				$studstatuscode = (isset($kodex_studstatuscode_array[$rowgs->status_kurzbz])?$kodex_studstatuscode_array[$rowgs->status_kurzbz]:'');
+
+				$gserror='';
+				if($studstatuscode=='')
+					$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Status ist nicht gesetzt\n";
+				if($studtyp=='')
+					$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Studientyp ist nicht gesetzt\n";
+				if($rowgs->partner_code=='')
+					$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Partner Code ist leer\n";
+				if($rowgs->programm_code=='')
+					$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Programm ist leer\n";
+
+				if($gserror!='')
+				{
+					$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->status_kurzbz): </u>\n";
+					$v.=$gserror."\n";
+					return '';
+				}
 				$gsblock.="
-				<GS>
-					<MobilitaetsProgrammCode>".$rowgs->mobilitaetsprogramm_code."</MobilitaetsProgrammCode>
-					<ProgrammNr>".sprintf('%04s',$rowgs->programm_code)."</ProgrammNr>
-					<StudTyp>".$studtyp."</StudTyp>
-					<PartnerCode>".$rowgs->partner_code."</PartnerCode>
-					<Ausbildungssemester>".$rowgs->ausbildungssemester."</Ausbildungssemester>
-					<StudStatusCode>".$studstatuscode."</StudStatusCode>
-				</GS>";
+			<GS>
+				<MobilitaetsProgrammCode>".$rowgs->mobilitaetsprogramm_code."</MobilitaetsProgrammCode>
+				<ProgrammNr>".sprintf('%04s',$rowgs->programm_code)."</ProgrammNr>
+				<StudTyp>".$studtyp."</StudTyp>
+				<PartnerCode>".$rowgs->partner_code."</PartnerCode>
+				<Ausbildungssemester>".$rowgs->ausbildungssemester."</Ausbildungssemester>
+				<StudStatusCode>".$studstatuscode."</StudStatusCode>
+			</GS>";
 				if(!isset($gssem[$storgform][$rowgs->ausbildungssemester]))
 				{
 					$gssem[$storgform][$rowgs->ausbildungssemester]=0;
@@ -971,9 +988,9 @@ function GenerateXMLStudentBlock($row)
 		if(!$ausserordentlich)
 		{
 			$datei.="
-				<ZugangCode>".$row->zgv_code."</ZugangCode>";
+			<ZugangCode>".$row->zgv_code."</ZugangCode>";
 			$datei.="
-				<ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
+			<ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
 		}
 
 		if($stgart==2) // Master-Studiengang
@@ -996,7 +1013,7 @@ function GenerateXMLStudentBlock($row)
 			if($ausstellungsstaat!='' && ($datumobj->mktime_fromdate($beginndatum) > $datumobj->mktime_fromdate('2011-04-15')))
 			{
 				$datei.='
-				<Ausstellungsstaat>'.$ausstellungsstaat.'</Ausstellungsstaat>';
+			<Ausstellungsstaat>'.$ausstellungsstaat.'</Ausstellungsstaat>';
 			}
 		}
 
@@ -1015,18 +1032,15 @@ function GenerateXMLStudentBlock($row)
 		/* Ausbildungssemester nicht anzeigen wenn
 			Incoming
 			Ausserordentlich Studierender
-			oder Externer Studierender eines gemeinsamen Studienprogramms
 		*/
-		if($aktstatus!='Incoming' && !$ausserordentlich && !($gemeinsamestudien && $kodex_studientyp_array[$row->gsstudientyp_kurzbz]=='E'))
+		if($aktstatus!='Incoming' && !$ausserordentlich)
 		{
 			$datei.="
 			<Ausbildungssemester>".$sem."</Ausbildungssemester>";
 		}
 
-		// StudStatusCode nicht anzeigen wenn externer Studierender eines gemeinsamen Studienprogramms
-		if(!($gemeinsamestudien && $kodex_studientyp_array[$row->gsstudientyp_kurzbz]=='E'))
-			$datei.="
-				<StudStatusCode>".$status."</StudStatusCode>";
+		$datei.="
+			<StudStatusCode>".$status."</StudStatusCode>";
 
 		if($orgform_code_array[$storgform]!=1 && !$ausserordentlich) // Wenn nicht Vollzeit und nicht Ausserordentlich
 		{
@@ -1037,7 +1051,7 @@ function GenerateXMLStudentBlock($row)
 		if(!$ausserordentlich)
 		{
 			$datei.="
-					<StandortCode>".$standortcode."</StandortCode>";
+			<StandortCode>".$standortcode."</StandortCode>";
 		}
 		/*
 		 * BMWFFoerderrung derzeit fuer alle Studierende auf Ja gesetzt
@@ -1055,7 +1069,7 @@ function GenerateXMLStudentBlock($row)
 			$bmwf='J';
 
 		$datei.="
-				<BMWFWfoerderrelevant>".$bmwf."</BMWFWfoerderrelevant>";
+			<BMWFWfoerderrelevant>".$bmwf."</BMWFWfoerderrelevant>";
 
 		// **** IO Container ****/
 		$qryio="SELECT * FROM bis.tbl_bisio WHERE student_uid=".$db->db_add_param($row->student_uid)."
@@ -1073,7 +1087,7 @@ function GenerateXMLStudentBlock($row)
 				$zweck=$rowio->zweck_code;
 
 				$datei.="
-				<IO>
+			<IO>
 				<MobilitaetsProgrammCode>".$mob."</MobilitaetsProgrammCode>
 				<GastlandCode>".$gast."</GastlandCode>
 				<AufenthaltVon>".$avon."</AufenthaltVon>";
@@ -1084,7 +1098,7 @@ function GenerateXMLStudentBlock($row)
 				}
 				$datei.="
 				<AufenthaltZweckCode>".$zweck."</AufenthaltZweckCode>
-				</IO>";
+			</IO>";
 				if($aktstatus!='Incoming')
 				{
 					if(!isset($iosem[$storgform][$sem]))
@@ -1270,19 +1284,19 @@ function GenerateXMLBewerberBlock($orgformcode=null)
 			if(!isset($bewerberM[$key]))
 				$bewerberM[$key]=0;
 			$datei.="
-			<BewerberInnen>
+		<BewerberInnen>
 			<OrgFormCode>".$orgform_code_array[$bworgform]."</OrgFormCode>";
 			if($stgart==2)
 				$datei.='
-				<ZugangMaStgCode>'.$key.'</ZugangMaStgCode>';
+			<ZugangMaStgCode>'.$key.'</ZugangMaStgCode>';
 			else
 				$datei.='
-				<ZugangCode>'.$key.'</ZugangCode>';
+			<ZugangCode>'.$key.'</ZugangCode>';
 
 			$datei.='
-				<AnzBewerberM>'.$bewerberM[$key].'</AnzBewerberM>
-				<AnzBewerberW>'.$bewerberW[$key].'</AnzBewerberW>
-			</BewerberInnen>';
+			<AnzBewerberM>'.$bewerberM[$key].'</AnzBewerberM>
+			<AnzBewerberW>'.$bewerberW[$key].'</AnzBewerberW>
+		</BewerberInnen>';
 		}
 	}
 	return $datei;
