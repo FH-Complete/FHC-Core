@@ -233,4 +233,7 @@ define('FAS_KONTO_SHOW_CREDIT_POINTS','false');
 // Wenn numerisch, wird dieser Wert bei allen LektorInnen eingetragen.
 // Wenn nicht definiert, wird der Stundensatz des Vorjahres übernommen.
 define('VILESCI_STUNDENSATZ_VORRUECKUNG', '');
+
+// Wenn true, werden die Content-Aufrufe des CIS in der tbl_webservicelog mitgeloggt. Zuvor manuell einen neuen Webservicetyp "content" anlegen!
+define('LOG_CONTENT', false);
 ?>
