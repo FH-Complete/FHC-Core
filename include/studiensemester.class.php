@@ -244,6 +244,21 @@ class studiensemester extends basis_db
 	}
 
 	/**
+	 * Liefert das Aktuelle Studiensemester oder das darauffolgende
+	 *
+	 * @param $semester wenn das semester uebergeben wird, dann werden nur die studiensemester
+	 *                  geliefert die in dieses semester fallen (Bei geradem semester nur SS sonst WS)
+	 * @return Studiensemester oder false wenn es keines gibt
+	 */
+	public function getaktorNearest()
+	{
+		if($stsem=$this->getakt())
+			return $stsem;
+		else
+			return $this->getNearest();
+	}
+
+	/**
 	 * Liefert das naechstgelegenste Studiensemester
 	 *
 	 * @param semester  wenn das semester uebergeben wird, dann werden nur die studiensemester
