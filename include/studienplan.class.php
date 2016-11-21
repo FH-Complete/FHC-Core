@@ -75,12 +75,12 @@ class studienplan extends basis_db
 	{
 		$this->$name=$value;
 	}
-	
+
 	public function __get($name)
 	{
 		return $this->$name;
 	}
-	
+
 	/**
 	 * Laedt Studienplan mit der ID $studienplan_id
 	 * @param  $studienplan_id ID des zu ladenden Studienplanes
@@ -1139,7 +1139,7 @@ class studienplan extends basis_db
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Sucht nach Studienordnungen, die den Kriterien entsprechen
 	 * @param string $searchItems Array aus Suchstrings
@@ -1147,21 +1147,21 @@ class studienplan extends basis_db
 	public function searchStudienplaene($searchItems)
 	{
 		$qry= "
-				SELECT DISTINCT 
+				SELECT DISTINCT
 					studienplan_id, tbl_studienplan.bezeichnung
-				FROM 
+				FROM
 					lehre.tbl_studienplan
-				JOIN 
+				JOIN
 					lehre.tbl_studienordnung USING (studienordnung_id)
-				JOIN 
+				JOIN
 					lehre.tbl_studienplan_semester USING (studienplan_id)
-				JOIN 
+				JOIN
 					public.tbl_studiengang USING (studiengang_kz)
 				WHERE
 					tbl_studienplan.aktiv=true
 				AND
 					tbl_studienordnung.status_kurzbz IN ('approved')";
-				
+
 			foreach($searchItems as $value)
 			$qry.=" AND
 					(
@@ -1182,11 +1182,11 @@ class studienplan extends basis_db
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new studienplan();
-	
+
 				$obj->studienplan_id = $row->studienplan_id;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->new=false;
-	
+
 				$this->result[] = $obj;
 			}
 			return true;
