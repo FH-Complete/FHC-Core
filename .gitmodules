@@ -4,6 +4,3 @@
 [submodule "submodules/pivottable"]
 	path = submodules/pivottable
 	url = https://github.com/nicolaskruchten/pivottable.git
-[submodule "submodules/angular-tablesort"]
-	path = vendor/FHC-vendor/angular-tablesort
-	url = https://github.com/mattiash/angular-tablesort.git
