@@ -24,6 +24,8 @@ require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/firma.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/organisationseinheit.class.php');
+require_once('../../include/studiengang.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -41,6 +43,7 @@ if(!$rechte->isBerechtigt($berechtigung_kurzbz))
 $suchen = (isset($_GET['suchen'])?$_GET['suchen']:null);
 $filter = (isset($_GET['filter'])?$_GET['filter']:'');
 $firmentypfilter = (isset($_GET['firmentypfilter'])?$_GET['firmentypfilter']:'');
+$oe_kurzbz = (isset($_GET['oe_kurzbz'])?$_GET['oe_kurzbz']:'');
 ?>
 <html>
 <head>
@@ -70,29 +73,52 @@ echo '<table width="100%" border="0" cellpadding="0" cellspacing="0"><tr>';
 		echo "<option value='$row->firmentyp_kurzbz' $selected>$row->firmentyp_kurzbz</option>";
 	}
 	echo '</SELECT>';
+	echo '&nbsp;Organisationseinheit: <SELECT name="oe_kurzbz">
+			<option value="">-- Alle --</option>';
+	$oe = new organisationseinheit();
+	$oe->getAll(true,null,'organisationseinheittyp_kurzbz, bezeichnung');
+	
+
+	foreach ($oe->result as $row)
+	{
+		$stg = new studiengang();
+		$stg->getStudiengaengeFromOe($row->oe_kurzbz,null);
+		$stg_bezeichnung = '';
+		if ($row->organisationseinheittyp_kurzbz=='Studiengang' && isset($stg->result[0]))
+			$stg_bezeichnung = '('.$stg->result[0]->bezeichnung.')';
+		if($row->oe_kurzbz==$oe_kurzbz)
+			$selected='selected';
+		else
+			$selected='';
+		echo '<option value="'.$row->oe_kurzbz.'" '.$selected.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung.' '.$stg_bezeichnung).'</option>';
+	}
+	echo '</SELECT>';
 	echo '&nbsp;<input type="submit" name="suchen" value="Suchen">';
 	echo '</td></form>';
 	
 	echo "<td align='right'><input type='button' onclick='parent.detail_firma.location=\"firma_details.php?neu=true\"' value='Neue Firma anlegen'/></td>";
 	echo '</tr></table>';
-	echo creatList($suchen,$filter,$firmentypfilter);
+	echo creatList($suchen,$filter,$firmentypfilter,$oe_kurzbz);
 	
 ?>
 </body>
 </html>
 <?php
 
-function creatList($suchen,$filter,$firmentypfilter)
+function creatList($suchen,$filter,$firmentypfilter,$oe_kurzbz)
 {
 	// Initialisieren HTML Listenausgabe
 	$htmlstr = "";
 	$firma_finanzamt = new firma();
 	$firmentyp_finanzamt='Finanzamt';
 	$firma_finanzamt->errormsg='';
-	$firma_finanzamt->result=array();	
+	$firma_finanzamt->result=array();
+	$oes='';
+	$oes = new organisationseinheit();
+	$oes = $oes->getChilds($oe_kurzbz);
 	//echo "Filter: ".$filter." Firmentypfilter: ".$firmentypfilter."<br>";
 	if (!is_null($suchen)) // Nur wenn Suchknopf gedrueckt wurde
-		$firma_finanzamt->searchFirma($filter,$firmentypfilter);	
+		$firma_finanzamt->searchFirma($filter,$firmentypfilter,false,$oes);	
 		
     if($firma_finanzamt->errormsg)
 		return 'Fehler beim Laden der Firma<br>';
@@ -144,6 +170,10 @@ function creatList($suchen,$filter,$firmentypfilter)
 	        $i++;
 	    }
 	    $htmlstr .= "</tbody></table>\n";
+	}
+	else 
+	{
+		$htmlstr .= "<br>Keine Einträge gefunden";
 	}
 	return $htmlstr;
 }

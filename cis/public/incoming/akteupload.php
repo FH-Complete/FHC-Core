@@ -55,15 +55,11 @@ echo "<html>
 		<head><title>File-Upload</title></head>
 		<body>";
 
-//Bei Upload des Bildes
+//Bei Upload einer Datei
 if(isset($_POST['submitbild']))
 {
 	if(isset($_FILES['bild']['tmp_name']))
-	{
-		//Extension herausfiltern
-    	$ext = explode('.',$_FILES['bild']['name']);
-        $ext = mb_strtolower($ext[count($ext)-1]);
-		
+	{		
 		$filename = $_FILES['bild']['tmp_name'];
 		
 		$fp = fopen($filename,'r');
@@ -91,21 +87,24 @@ if(isset($_POST['submitbild']))
 		$dokument = new dokument(); 
 		$dokument->loadDokumenttyp($_REQUEST['dokumenttyp']);
 
-		$extension = end(explode(".",strtolower($_FILES['bild']['name'])));
+		$tmp = explode(".",strtolower($_FILES['bild']['name']));
+		$extension = end($tmp);
 		$titel = '';
 		
 		// da nur 32 zeichen gespeichert werden dürfen, muss anhand vom typ gekürzt werden
-		if($_REQUEST['dokumenttyp']=='Lebenslf')
+		/*if($_REQUEST['dokumenttyp']=='Lebenslf')
 			$titel = $p->t('incoming/lebenslauf').".".$extension;
 		if($_REQUEST['dokumenttyp']=='LearnAgr')
 			$titel = $p->t('incoming/learningAgreement').".".$extension;
 		if($_REQUEST['dokumenttyp']=='Motivat')
 			$titel = $p->t('incoming/motivationsschreiben').".".$extension;
 		if($_REQUEST['dokumenttyp']=='Zeugnis')
-			$titel = $p->t('incoming/zeugnis').".".$extension;			
+			$titel = $p->t('incoming/zeugnis').".".$extension;
 		if($_REQUEST['dokumenttyp']=='Lichtbil')
-			$titel = $p->t('incoming/lichtbild').".".$extension;					
-			
+			$titel = $p->t('incoming/lichtbild').".".$extension;*/
+		
+		$titel = StringCut($dokument->bezeichnung,25,false,'');
+		$titel = $titel.'.'.$extension;
 			
 		$akte->dokument_kurzbz = $_REQUEST['dokumenttyp'];
 		$akte->person_id = $_GET['person_id'];
@@ -116,9 +115,9 @@ if(isset($_POST['submitbild']))
 		$akte->titel = $titel; 
 		//$akte->bezeichnung = $dokument->bezeichnung;
 		$akte->updateamum = date('Y-m-d H:i:s');
-	//	$akte->updatevon = $user;
+		$akte->updatevon = 'Incoming-Online';
 		$akte->insertamum = date('Y-m-d H:i:s');
-	//	$akte->insertvon = $user;
+		$akte->insertvon = 'Incoming-Online';
 		$akte->uid = '';
 		$akte->new = true; 
 		
@@ -150,7 +149,7 @@ if(isset($_POST['submitbild']))
 if(isset($_GET['person_id']))
 {
 	$dokument = new dokument(); 
-	$dokument->getAllDokumente(); 
+	$dokument->getDokumente('10006'); 
 	echo "	<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?person_id=".$_GET['person_id']."'>
 			<table>
 				<tr>
@@ -165,13 +164,10 @@ if(isset($_GET['person_id']))
 					 <SELECT name='dokumenttyp'>";
 				foreach ($dokument->result as $dok)
 				{
-					if($dok->dokument_kurzbz == 'Lebenslf' || $dok->dokument_kurzbz == 'Motivat' || $dok->dokument_kurzbz == 'Maturaze' || $dok->dokument_kurzbz == 'LearnAgr')
-					{
-						$selected =""; 
-						if($dok->dokument_kurzbz == $dokumenttyp)
-							$selected = "selected";
-						echo '<option '.$selected.' value="'.$dok->dokument_kurzbz.'" >'.$dok->bezeichnung_mehrsprachig[$sprache]."</option>\n";
-					}
+					$selected =""; 
+					if($dok->dokument_kurzbz == $dokumenttyp)
+						$selected = "selected";
+					echo '<option '.$selected.' value="'.$dok->dokument_kurzbz.'" >'.$dok->bezeichnung_mehrsprachig[$sprache]."</option>\n";
 				}
 echo "				</select>
 					</td>

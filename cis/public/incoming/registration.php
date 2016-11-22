@@ -58,10 +58,15 @@ $date = new datum();
 	<body>
 <?php
 
-	echo '		<table width="100%" border="0">
+	echo '		<table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0">
 				<tr>
-					<td align="left"><a href="index.php">Login</a> &gt; Registration </td>
-					<td align ="right">
+				<td class="rand"></td>
+				<td style="vertical-align: top" class="boxshadow">
+				<table width="100%" border="0">
+				<tr>
+					<td style="padding: 20px; text-align: left; width: 33%"><a href="index.php">Login</a> &gt; Registration </td>
+					<td style="padding: 20px; text-align: center; width: 33%"></td>
+					<td style="padding: 20px; text-align: right; width: 33%">
 					'.$p->t("global/sprache").'
 					<a href="'.$_SERVER['PHP_SELF'].'?lang=English">'.$p->t("global/englisch").'</a> |
 					<a href="'.$_SERVER['PHP_SELF'].'?lang=German">'.$p->t("global/deutsch").'</a><br> </td>
@@ -172,6 +177,11 @@ echo '	<form action="registration.php" method="POST" name="RegistrationForm">
 				</tr>
 			</table>
 		</form>
+	</td>
+	<td class="rand">
+	</td>
+	</tr>
+	</table>
 
 	<script type="text/javascript">
 		function checkRegistration()

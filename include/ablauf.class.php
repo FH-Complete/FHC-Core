@@ -15,7 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Simon Schwebler <simon.schwebler@technikum-wien.at>,
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *          Andreas Moik <moik@technikum-wien.at>,
+ *			Simon Schwebler <simon.schwebler@technikum-wien.at>,
  *          Manfred Kindl <manfred.kindl@technikum-wien.at>
  */
 /**

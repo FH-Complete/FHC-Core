@@ -108,6 +108,7 @@ $this->phrasen['pruefung/keineLehreinheitenVorhanden'] = 'Keine Lehreinheiten vo
 $this->phrasen['pruefung/keineAnmeldungenVorhanden'] = 'Keine Anmeldungen vorhanden.';
 $this->phrasen['pruefung/derLektor'] = 'Lektor';
 $this->phrasen['pruefung/dieKommission'] = 'Kommission';
+$this->phrasen['pruefung/matrikelnummer'] = 'Personenkennzeichen';
 
 // anmeldungen Verwalten
 $this->phrasen['pruefung/anmeldungenVerwaltenTitle'] = 'Prüfungsanmeldung Verwaltung';
@@ -142,6 +143,11 @@ $this->phrasen['pruefung/emailLektorAm'] = 'am';
 $this->phrasen['pruefung/emailLektorVon'] = 'von';
 $this->phrasen['pruefung/emailLektorUhrBis'] = 'Uhr bis';
 $this->phrasen['pruefung/emailLektorUhrAngemeldet'] = 'Uhr angemeldet.';
+$this->phrasen['pruefung/emailVerschiebung'] = 'Sehr geehrte Studierende,
+
+Die Prüfung zur LV %1$s wurde verschoben.
+Der neue Termin für die Prüfung ist am  %2$s um %3$s Uhr.';
+$this->phrasen['pruefung/emailVerschiebungSubject'] = 'Verschiebung einer Prüfung';
 
 
 ?>

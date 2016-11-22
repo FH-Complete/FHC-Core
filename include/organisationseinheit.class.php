@@ -572,7 +572,7 @@ class organisationseinheit extends basis_db
 	    		foreach($searchItem as $value)
 				{
 					$qry.=' OR (LOWER(oe_kurzbz)=LOWER('.$this->db_add_param($value).'))
-							OR (LOWER(bezeichnung) LIKE LOWER(\'%'.$value.'%\'))'; 
+							OR (LOWER(bezeichnung) LIKE LOWER(\'%'.$this->db_escape($value).'%\'))'; 
 				}
 	    $qry.=	' ORDER BY organisationseinheittyp_kurzbz, bezeichnung;';
 	    

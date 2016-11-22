@@ -28,6 +28,7 @@ $this->phrasen['incoming/uploadLearningAgreement']= 'Upload Learning Agreement';
 $this->phrasen['incoming/uploadCv']='Upload CV';
 $this->phrasen['incoming/dokument']='Dokument';
 $this->phrasen['incoming/zugangsvoraussetzungFussnote']='Bitte geben Sie hier an, wann und wo Sie Ihre Abschlussprüfungen gemacht haben, um an einer Universität studieren zu können (=Matura, Abitur).';
+$this->phrasen['incoming/zugangsvoraussetzungMasterFussnote']='Bitte geben Sie hier an, wann und wo Sie Ihre Bachelor-Abschlussprüfungen (oder gleichwertige) gemacht haben, um ein Master-Studium besuchen zu können.';
 $this->phrasen['incoming/lebenslauf']='Lebenslauf';
 $this->phrasen['incoming/learningAgreement']='Learning Agreement';
 $this->phrasen['incoming/motivationsschreiben']='Motivationsschreiben';
@@ -122,5 +123,15 @@ $this->phrasen['incoming/captcha']='Geben Sie bitte hier die Zeichen aus der Gra
 $this->phrasen['incoming/andereGrafik']='Andere Grafik';
 $this->phrasen['incoming/noVacancies']='LV voll belegt';
 $this->phrasen['incoming/alleStudiengaenge']='Alle Studiengänge';
-$this->phrasen['incoming/downloadLearningAgreement']='Download Learning Agreement';
+$this->phrasen['incoming/downloadLearningAgreement']='Vorlage für Learning Agreement (<b>nicht</b> Erasmus) herunterladen';
+$this->phrasen['incoming/downloadLearningAgreementErasmus']='Vorlage für Learning Agreement (Erasmus) herunterladen';
+$this->phrasen['incoming/dankeFuerIhreAnmeldung']='Wenn Sie alle erforderlichen Daten eingegeben haben, klicken Sie bitte auf "Abschicken"';
+$this->phrasen['incoming/von']='von';
+$this->phrasen['incoming/derzeitKeineLehrveranstaltungen']='Für diese Auswahl sind derzeit keine Lehrveranstaltungen vorhanden';
+$this->phrasen['incoming/tabelleSortierinformation']='Sie können die Spalten durch klicken auf die Überschrift sortieren (Mehrfachsortierung mit gedrückter Umschalt-Taste)';
+$this->phrasen['incoming/waehlenSieAusDenOptionen']='Bitte wählen Sie die gewünschen Optionen aus dem DropDown und klicken Sie auf "Filter"';
+$this->phrasen['incoming/lvInfo']='LV-Info';
+$this->phrasen['incoming/erfolgreichAbgeschickt']='Ihre Bewerbung wurde erfolgreich abgeschickt. Die zuständige Assistenz wird sich in Kürze mit Ihnen in Verbindung setzen';
+$this->phrasen['incoming/fehlerBeimSenden']='Fehler beim senden der Bewerbung. Bitte kontaktieren Sie <a href="mailto:'.MAIL_INTERNATIONAL.'">'.MAIL_INTERNATIONAL.'</a>';
+$this->phrasen['incoming/jahreStudiertMussGanzeZahlSein']='Das Feld "Jahre studiert" muss eine ganze Zahl sein</a>';
 ?>

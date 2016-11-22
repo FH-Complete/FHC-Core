@@ -81,7 +81,7 @@ class frage extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM testtool.tbl_frage WHERE frage_id=".$this->db_add_param($frage_id, FHC_INTEGER);
+		$qry = "SELECT * FROM testtool.tbl_frage LEFT OUTER JOIN testtool.tbl_frage_sprache USING (frage_id) WHERE frage_id=".$this->db_add_param($frage_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -98,6 +98,7 @@ class frage extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->level = $row->level;
 				$this->aktiv = $row->aktiv;
+				$this->bild = $row->bild;
 
 				return true;
 			}
@@ -226,12 +227,12 @@ class frage extends basis_db
 		else
 		{
 			$qry = 'UPDATE testtool.tbl_frage_sprache SET'.
-			       ' text='.$this->db_add_param($this->text).','.
-			       ' bild='.$this->db_add_param($this->bild).','.
-			       ' audio='.$this->db_add_param($this->audio).','.
-			       ' updateamum='.$this->db_add_param($this->updateamum).','.
-			       ' updatevon='.$this->db_add_param($this->updatevon).
-			       " WHERE frage_id=".$this->db_add_param($this->frage_id, FHC_INTEGER, false)." AND sprache=".$this->db_add_param($this->sprache).";";
+					' text='.$this->db_add_param($this->text).','.
+					' bild='.$this->db_add_param($this->bild).','.
+					' audio='.$this->db_add_param($this->audio).','.
+					' updateamum='.$this->db_add_param($this->updateamum).','.
+					' updatevon='.$this->db_add_param($this->updatevon).
+					" WHERE frage_id=".$this->db_add_param($this->frage_id, FHC_INTEGER, false)." AND sprache=".$this->db_add_param($this->sprache).";";
 		}
 
 		if($this->db_query($qry))
@@ -286,7 +287,7 @@ class frage extends basis_db
 	/**
 	 * Liefert die Fragen eines Gebietes
 	 *
-	 * @param $gebiet_id
+	 * @param integer $gebiet_id
 	 * @return true wenn ok, sonst false
 	 */
 	public function getFragenGebiet($gebiet_id)
@@ -401,6 +402,7 @@ class frage extends basis_db
 				$this->level = $row->level;
 				$this->demo = $this->db_parse_bool($row->demo);
 				$this->nummer = $row->nummer;
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
 
 				return true;
 			}
@@ -545,6 +547,7 @@ class frage extends basis_db
 						tbl_frage.gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND
 						tbl_pruefling_frage.pruefling_id=".$this->db_add_param($pruefling_id, FHC_INTEGER)."
 					ORDER BY nummer DESC LIMIT 1;";
+
 			if($this->db_query($qry))
 			{
 				if($row = $this->db_fetch_object())
@@ -859,6 +862,32 @@ class frage extends basis_db
 			}
 			return $erg;
 		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Gibt die letzte (hoechste) Nummer eines Gebiets zurueck
+	 *
+	 * @param integer $gebiet_id Gebiet der Fragen
+	 * @return integer $number Nummer der letzten Frage des Gebiets, wenn gefunden, sonst false
+	 */
+	public function getMaxNummer($gebiet_id)
+	{
+		$number = '';
+		$qry = "SELECT nummer FROM testtool.tbl_frage
+				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." ORDER BY nummer DESC LIMIT 1";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$number = $row->nummer;
+			}
+			return $number;
+		}
+		else 
+		{
 			return false;
 		}
 	}

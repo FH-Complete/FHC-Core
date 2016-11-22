@@ -180,3 +180,17 @@ treechildren::-moz-tree-row(makeItyellow)
 {
 	background-color: #ffe6b5;
 }
+treechildren::-moz-tree-cell-text(Aktiv_Nein)
+{
+  color: grey;
+}
+treechildren::-moz-tree-cell(Lektor_inaktiv)
+{
+  color: grey;
+  cursor: not-allowed;
+}
+treechildren::-moz-tree-cell-text(Lektor_inaktiv)
+{
+  color: grey;
+  cursor: not-allowed;
+}

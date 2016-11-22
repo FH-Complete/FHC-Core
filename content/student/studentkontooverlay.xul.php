@@ -26,6 +26,7 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 ?>
@@ -126,7 +127,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						>
 						<!-- onselect="StudentKontoAuswahl()" - wird jetzt per JS gesetzt -->						
 							<treecols>
-								<treecol id="student-konto-tree-buchungsdatum" label="Buchungsdatum" flex="2" hidden="false" primary="true"
+								<treecol id="student-konto-tree-buchungsdatum" label="Buchungsdatum" flex="1" hidden="false" primary="true"
 									class="sortDirectionIndicator"
 									sortActive="true"
 									sortDirection="ascending"
@@ -164,6 +165,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									class="sortDirectionIndicator"
 									sort="rdf:http://www.technikum-wien.at/konto/rdf#studiengang_kuerzel" />
 								<splitter class="tree-splitter"/>
+								<treecol id="student-konto-tree-anmerkung" label="Anmerkung" flex="2" hidden="false"
+									class="sortDirectionIndicator"
+									sort="rdf:http://www.technikum-wien.at/konto/rdf#anmerkung" />
+								<splitter class="tree-splitter"/>
 							</treecols>
 						
 							<template>
@@ -179,6 +184,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#insertvon"/>
 											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#insertamum"/>
 											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#studiengang_kuerzel"/>
+											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#anmerkung"/>
 										</treerow>
 									</treeitem>
 								</treechildren>
@@ -296,19 +302,30 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											</template>
 										</menulist>
 									</row>
-									<row>
-										<label value="Credit Points" control="student-konto-textbox-credit_points"/>
-										<hbox>
-					      					<textbox id="student-konto-textbox-credit_points" disabled="true" maxlength="9" size="9"/>
-					      					<spacer flex="1" />			
-					      				</hbox>
-									</row>
+									<?php 
+									// Credit Points werden nur angezeigt, wenn diese im Config aktiviert wurden
+									if(defined('FAS_KONTO_SHOW_CREDIT_POINTS') && FAS_KONTO_SHOW_CREDIT_POINTS=='true')
+										$hidden='';
+									else
+										$hidden='hidden="true"';
+									echo '	<row '.$hidden.'>
+												<label value="Credit Points" control="student-konto-textbox-credit_points" '.$hidden.'/>
+												<hbox '.$hidden.'>
+													<textbox id="student-konto-textbox-credit_points" disabled="true" maxlength="9" size="9" '.$hidden.'/>
+													<spacer flex="1" />			
+												</hbox>
+											</row>';
+									?>
 									<row>
 										<label value="Zahlungsreferenz" control="student-konto-textbox-zahlungsreferenz"/>
 										<hbox>
 					      					<textbox id="student-konto-textbox-zahlungsreferenz" disabled="true" maxlength="20" size="20"/>
 					      					<spacer flex="1" />			
 					      				</hbox>
+									</row>
+									<row>
+										<label value="Anmerkung" control="student-konto-textbox-anmerkung"/>
+										<textbox id="student-konto-textbox-anmerkung" multiline="true"/>			
 									</row>
 								</rows>
 							</grid>

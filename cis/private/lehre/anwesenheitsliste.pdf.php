@@ -27,6 +27,7 @@ require_once('../../../include/lehreinheitmitarbeiter.class.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/erhalter.class.php');
+require_once('../../../include/datum.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -156,6 +157,8 @@ $erhalter->getAll();
 
 $a_o_kz = '9'.sprintf("%03s", $erhalter->result[0]->erhalter_kz); //Stg_Kz AO-Studierende auslesen (9005 fuer FHTW)
 $anzahl_studierende = 0;
+$datum = new datum();
+$zusatz = '';
 
 if($result = $db->db_query($qry))
 {	
@@ -171,7 +174,7 @@ if($result = $db->db_query($qry))
 				$zusatz='';
 			
 			if($row->bisio_id!='' && $row->status!='Incoming' && ($row->bis > $stsemdatumvon || $row->bis=='') && $row->von < $stsemdatumbis) //Outgoing
-				$zusatz.='(o)';
+				$zusatz.='(o)(ab '.$datum->formatDatum($row->von,'d.m.Y').')';
 				
 			if($row->note==6) //angerechnet
 				$zusatz.='(ar)';

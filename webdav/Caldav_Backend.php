@@ -2,17 +2,18 @@
 require_once(dirname(__FILE__).'/../include/wochenplan.class.php');
 require_once(dirname(__FILE__).'/../include/functions.inc.php');
 require_once(dirname(__FILE__).'/../include/mitarbeiter.class.php');
+require_once(dirname(__FILE__).'/../include/datum.class.php');
 /**
  * CalDAV backend
  */
-class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend 
+class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
 {
     /**
-     * Creates the backend 
-     * 
+     * Creates the backend
+     *
      * @param AuthBackend $auth
      */
-    public function __construct($auth) 
+    public function __construct($auth)
 	{
 		$this->auth = $auth;
     }
@@ -31,18 +32,18 @@ class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
      * Every project is an array with the following keys:
      *  * id, a unique id that will be used by other functions to modify the
      *    calendar. This can be the same as the uri or a database key.
-     *  * uri, which the basename of the uri with which the calendar is 
+     *  * uri, which the basename of the uri with which the calendar is
      *    accessed.
      *  * principalUri. The owner of the calendar. Almost always the same as
      *    principalUri passed to this method.
      *
      * Furthermore it can contain webdav properties in clark notation. A very
-     * common one is '{DAV:}displayname'. 
+     * common one is '{DAV:}displayname'.
      *
-     * @param string $principalUri 
-     * @return array 
+     * @param string $principalUri
+     * @return array
      */
-    public function getCalendarsForUser($principalUri) 
+    public function getCalendarsForUser($principalUri)
 	{
 		//error_log("Caldav_Backend.php/getCalendarsForUser($principalUri)");
 		//$user = $this->getUser();
@@ -75,7 +76,7 @@ class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
      * @param string $calendarUri
      * @param array $properties
      */
-    public function createCalendar($principalUri,$calendarUri, array $properties) 
+    public function createCalendar($principalUri,$calendarUri, array $properties)
 	{
 		throw new \Sabre\DAV\Exception('Not Implemented');
     }
@@ -108,43 +109,44 @@ class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
      *   )
      * )
      *
-     * In this example it was forbidden to update {DAV:}displayname. 
+     * In this example it was forbidden to update {DAV:}displayname.
      * (403 Forbidden), which in turn also caused {DAV:}owner to fail
      * (424 Failed Dependency) because the request needs to be atomic.
      *
      * @param string $calendarId
-     * @param array $mutations 
-     * @return bool|array 
+     * @param array $mutations
+     * @return bool|array
      */
-    public function updateCalendar($calendarId, array $mutations) 
+    public function updateCalendar($calendarId, array $mutations)
 	{
         return false;
     }
 
     /**
-     * Delete a calendar and all it's objects 
-     * 
-     * @param string $calendarId 
+     * Delete a calendar and all it's objects
+     *
+     * @param string $calendarId
      * @return void
      */
-    public function deleteCalendar($calendarId) 
+    public function deleteCalendar($calendarId)
 	{
 		throw new \Sabre\DAV\Exception('Not Implemented');
     }
 
-	
+
 	public function getCalendarData($user, $objectUri=null)
 	{
+		$datum_obj = new datum();
 		$starttime = microtime(true);
 		$bn = new benutzer();
 		if(!$bn->load($user))
 			die('User invalid');
-	
+
 		if(check_lektor($user))
 			$type='lektor';
 		else
 			$type='student';
-	
+
 		// Stundenplanobjekt erzeugen
 		$stdplan = new wochenplan($type);
 		$stdplan->crlf="\n";
@@ -156,7 +158,7 @@ class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
 		}
 		if(!is_null($objectUri))
 		{
-			$unr = mb_substr($objectUri, mb_strpos($objectUri,'-')+1);
+			$unr = mb_substr($objectUri, (mb_strpos($objectUri,'-')+1), mb_strpos($objectUri,'@')-(mb_strpos($objectUri,'-')+1));
 			$dtstart = mb_substr($objectUri,0,mb_strpos($objectUri,'-'));
 
 			if(mb_strlen($dtstart)==15)
@@ -170,14 +172,14 @@ class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
 				$sekunde = mb_substr($dtstart,13,2);
 				$begin = mktime($stunde, $minute, $sekunde, $monat, $tag-1, $jahr);
 				$ende = mktime($stunde, $minute, $sekunde, $monat, $tag+1, $jahr);
-				//error_log("getCalendarData unr: $unr dtstart: $dtstart");
+				//error_log("getCalendarData unr: $unr dtstart: $dtstart size:".(mb_strlen($objectUri)-mb_strpos($objectUri,'@')));
 				//error_log($begin.'/'.$ende);
 			}
 			else
 			{
 				//error_log("dtstart laenge abnormal: $dtstart");
 				$begin = mktime(0,0,0,date('m'),date('d')-14,date('Y'));
-				$ende = mktime(0,0,0,date('m')+6,date('d'),date('Y'));	
+				$ende = mktime(0,0,0,date('m')+6,date('d'),date('Y'));
 			}
 		}
 		else
@@ -195,10 +197,10 @@ class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
 			$i++;
 			if(!date("w",$begin))
 				$begin=jump_day($begin,1);
-	
+
 			$stdplan->init_stdplan();
 			$datum=$begin;
-			$begin+=604800;	// eine Woche
+			$begin = $datum_obj->jump_week($begin,1);
 
 			// Stundenplan einer Woche laden
 			if(!$stdplan->load_week($datum,$db_stpl_table))
@@ -224,7 +226,7 @@ class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
 		//error_log("\n\nDATA".print_r($data,true));
 		//error_log("getCalendarData time:".($endtime-$starttime));
 		//$data.="\nEND:VCALENDAR";
-		return $data;	
+		return $data;
 	}
 	public function makeCal($event)
 	{
@@ -250,28 +252,28 @@ END:STANDARD
 END:VTIMEZONE\n".$event."\nEND:VCALENDAR";
 	}
     /**
-     * Returns all calendar objects within a calendar. 
+     * Returns all calendar objects within a calendar.
      *
      * Every item contains an array with the following keys:
      *   * id - unique identifier which will be used for subsequent updates
      *   * calendardata - The iCalendar-compatible calnedar data
      *   * uri - a unique key which will be used to construct the uri. This can be any arbitrary string.
      *   * lastmodified - a timestamp of the last modification time
-     *   * etag - An arbitrary string, surrounded by double-quotes. (e.g.: 
+     *   * etag - An arbitrary string, surrounded by double-quotes. (e.g.:
      *   '  "abcdef"')
      *   * calendarid - The calendarid as it was passed to this function.
      *
-     * Note that the etag is optional, but it's highly encouraged to return for 
+     * Note that the etag is optional, but it's highly encouraged to return for
      * speed reasons.
      *
-     * The calendardata is also optional. If it's not returned 
-     * 'getCalendarObject' will be called later, which *is* expected to return 
+     * The calendardata is also optional. If it's not returned
+     * 'getCalendarObject' will be called later, which *is* expected to return
      * calendardata.
-     * 
-     * @param string $calendarId 
-     * @return array 
+     *
+     * @param string $calendarId
+     * @return array
      */
-    public function getCalendarObjects($calendarId) 
+    public function getCalendarObjects($calendarId)
 	{
 		//$user = $this->getUser();
 		$user = $calendarId;
@@ -290,7 +292,7 @@ END:VTIMEZONE\n".$event."\nEND:VCALENDAR";
 
 			$return[] = array("id"=>$row['UID'],
 			"calendardata"=>$this->makeCal($row['data']),
-			"uri"=>$uri,
+			"uri"=>$uri.'@'.md5($row['UID']),
 			"lastmodified"=>$row['updateamum'],
 			"etag"=>'"'.$row['UID'].'"',
 			"calendarid"=>$calendarId);
@@ -303,15 +305,15 @@ END:VTIMEZONE\n".$event."\nEND:VCALENDAR";
      * Returns information from a single calendar object, based on it's object
      * uri.
      *
-     * The returned array must have the same keys as getCalendarObjects. The 
-     * 'calendardata' object is required here though, while it's not required 
+     * The returned array must have the same keys as getCalendarObjects. The
+     * 'calendardata' object is required here though, while it's not required
      * for getCalendarObjects.
-     * 
-     * @param string $calendarId 
-     * @param string $objectUri 
-     * @return array 
+     *
+     * @param string $calendarId
+     * @param string $objectUri
+     * @return array
      */
-    public function getCalendarObject($calendarId,$objectUri) 
+    public function getCalendarObject($calendarId,$objectUri)
 	{
 		//error_log("Caldav_Backend.php/getCalendarObject($calendarId, $objectUri)");
 		//$user = $this->getUser();
@@ -330,7 +332,7 @@ END:VTIMEZONE\n".$event."\nEND:VCALENDAR";
 		{
 			$ret = array("id"=>$data['UID'],
 			"calendardata"=>$this->makeCal($data['data']),
-			"uri"=>'principals/'.$user.'/LVPlan/'.$data['dtstart'].'-'.$data['unr'][0],
+			"uri"=>'principals/'.$user.'/LVPlan/'.$data['dtstart'].'-'.$data['unr'][0].'@'.md5($data['UID']),
 			"lastmodified"=>$data['updateamum'],
 			"etag"=>'"'.$data['UID'].'"',
 			"calendarid"=>$calendarId);
@@ -339,39 +341,39 @@ END:VTIMEZONE\n".$event."\nEND:VCALENDAR";
     }
 
     /**
-     * Creates a new calendar object. 
-     * 
-     * @param string $calendarId 
-     * @param string $objectUri 
-     * @param string $calendarData 
+     * Creates a new calendar object.
+     *
+     * @param string $calendarId
+     * @param string $objectUri
+     * @param string $calendarData
      * @return void
      */
-    public function createCalendarObject($calendarId,$objectUri,$calendarData) 
+    public function createCalendarObject($calendarId,$objectUri,$calendarData)
 	{
 		throw new \Sabre\DAV\Exception('Not Implemented');
     }
 
     /**
-     * Updates an existing calendarobject, based on it's uri. 
-     * 
-     * @param string $calendarId 
-     * @param string $objectUri 
-     * @param string $calendarData 
+     * Updates an existing calendarobject, based on it's uri.
+     *
+     * @param string $calendarId
+     * @param string $objectUri
+     * @param string $calendarData
      * @return void
      */
-    public function updateCalendarObject($calendarId,$objectUri,$calendarData) 
+    public function updateCalendarObject($calendarId,$objectUri,$calendarData)
 	{
 		throw new \Sabre\DAV\Exception('Not Implemented');
     }
 
     /**
-     * Deletes an existing calendar object. 
-     * 
-     * @param string $calendarId 
-     * @param string $objectUri 
+     * Deletes an existing calendar object.
+     *
+     * @param string $calendarId
+     * @param string $objectUri
      * @return void
      */
-    public function deleteCalendarObject($calendarId,$objectUri) 
+    public function deleteCalendarObject($calendarId,$objectUri)
 	{
 		throw new Sabre\DAV\Exception('Not Implemented');
     }

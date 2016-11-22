@@ -159,7 +159,7 @@ function loadampel()
 <tr>
 <td class="rand"></td>
 <td class="boxshadow">
-	<table cellspacing="0" cellpadding="0" class="header">
+	<table cellspacing="0" cellpadding="0" class="header" style="position: relative">
 		<tr>
 		<td valign="top" align="left" style="background-image: url(<?php echo APP_ROOT.'skin/styles/'.DEFAULT_STYLE.'/header.png'; ?>); background-position: top; background-repeat: repeat-x;">
 		<a href="index.php"><img class="header_logo" src="<?php echo APP_ROOT.'skin/styles/'.DEFAULT_STYLE.'/logo_250x130.png'; ?>" alt="logo"></a>
@@ -192,12 +192,14 @@ function loadampel()
 	   	</tr>
 	   	<tr>
 			<td valign="top" align="left">
-			<iframe id="menue" src="<?php echo $db->convert_html_chars($menu); ?>" name="menu" frameborder="0">
-				No iFrames
-			</iframe>
-			<iframe id="content" src="<?php echo $db->convert_html_chars($content); ?>" name="content" frameborder="0">
-				No iFrames
-			</iframe>
+			
+				<iframe id="menue" src="<?php echo $db->convert_html_chars($menu); ?>" name="menu" frameborder="0">
+					No iFrames
+				</iframe>
+				<iframe id="content" src="<?php echo $db->convert_html_chars($content); ?>" name="content" frameborder="0">
+					No iFrames
+				</iframe>
+				<div id="ampel_div"></div>
 			</td>
 		</tr>
 	</table>

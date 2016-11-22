@@ -152,7 +152,7 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 		    $konto->load($bnr);
 		    if($konto->person_id!=$user_obj->person_id)
 			die('Sie haben keine Berechtigung fuer diese Buchung');
-		    if($konto->getDifferenz($bnr)!=0)
+		    if($konto->getDifferenz($bnr)>0)
 			die('Diese Zahlung wurde noch nicht beglichen');
 		}
 	    }

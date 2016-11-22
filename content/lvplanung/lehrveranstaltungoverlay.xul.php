@@ -250,7 +250,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 			<tabbox id="lehrveranstaltung-tabbox" flex="3" orient="vertical">
 				<tabs orient="horizontal" id="lehrveranstaltung-tabs">
 					<tab id="lehrveranstaltung-tab-detail" label="Details" />
-					<tab id="lehrveranstaltung-tab-lektor" label="Lektorenzuteilung" />
+					<tab id="lehrveranstaltung-tab-lektor" label="LektorInnenzuteilung" />
 					<tab id="lehrveranstaltung-tab-noten" label="Noten" />
 					<tab id="lehrveranstaltung-tab-notizen" label="Notizen" />
 					<tab id="lehrveranstaltung-tab-lvangebot" label="LV-Angebot" />

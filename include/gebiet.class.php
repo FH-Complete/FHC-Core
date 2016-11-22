@@ -72,7 +72,9 @@ class gebiet extends basis_db
 	 */
 	public function load($gebiet_id)
 	{
-		$qry = "SELECT * FROM testtool.tbl_gebiet WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER);
+		$sprache = new sprache();
+		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
+		$qry = "SELECT *,$bezeichnung_mehrsprachig FROM testtool.tbl_gebiet WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -81,6 +83,7 @@ class gebiet extends basis_db
 				$this->gebiet_id = $row->gebiet_id;
 				$this->kurzbz = $row->kurzbz;
 				$this->bezeichnung = $row->bezeichnung;
+				$this->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
 				$this->beschreibung = $row->beschreibung;
 				$this->zeit = $row->zeit;
 				$this->multipleresponse = $this->db_parse_bool($row->multipleresponse);
@@ -193,47 +196,65 @@ class gebiet extends basis_db
 		{
 			$qry = 'BEGIN;INSERT INTO testtool.tbl_gebiet (kurzbz, bezeichnung, beschreibung, zeit, multipleresponse,
 					kategorien, maxfragen, zufallfrage, zufallvorschlag, level_start, level_sprung_auf, level_sprung_ab,
-					levelgleichverteilung, maxpunkte, antwortenprozeile, insertamum, insertvon , updateamum, updatevon) VALUES('.
-			       $this->db_add_param($this->kurzbz).','.
-			       $this->db_add_param($this->bezeichnung).','.
-			       $this->db_add_param($this->beschreibung).','.
-			       $this->db_add_param($this->zeit).','.
-			       $this->db_add_param($this->multipleresponse, FHC_BOOLEAN).','.
-			       $this->db_add_param($this->kategorien, FHC_BOOLEAN).','.
-			       $this->db_add_param($this->maxfragen).','.
-			       $this->db_add_param($this->zufallfrage, FHC_BOOLEAN).','.
-			       $this->db_add_param($this->zufallvorschlag, FHC_BOOLEAN).','.
-			       $this->db_add_param($this->level_start).','.
-			       $this->db_add_param($this->level_sprung_auf).','.
-			       $this->db_add_param($this->level_sprung_ab).','.
-			       $this->db_add_param($this->levelgleichverteilung, FHC_BOOLEAN).','.
-			       $this->db_add_param($this->maxpunkte).','.
-			       $this->db_add_param($this->antwortenprozeile).','.
-			       $this->db_add_param($this->insertamum).','.
-			       $this->db_add_param($this->insertvon).
-			       ',null, null);';
+					levelgleichverteilung, maxpunkte, antwortenprozeile, ';
+					
+					foreach($this->bezeichnung_mehrsprachig as $key=>$value)
+					{
+						$idx = sprache::$index_arr[$key];
+						$qry.=" bezeichnung_mehrsprachig[$idx],";
+					}
+					
+					$qry.='insertamum, insertvon , updateamum, updatevon) VALUES('.
+
+					$this->db_add_param($this->kurzbz).','.
+					$this->db_add_param($this->bezeichnung).','.
+					$this->db_add_param($this->beschreibung).','.
+					$this->db_add_param($this->zeit).','.
+					$this->db_add_param($this->multipleresponse, FHC_BOOLEAN).','.
+					$this->db_add_param($this->kategorien, FHC_BOOLEAN).','.
+					$this->db_add_param($this->maxfragen).','.
+					$this->db_add_param($this->zufallfrage, FHC_BOOLEAN).','.
+					$this->db_add_param($this->zufallvorschlag, FHC_BOOLEAN).','.
+					$this->db_add_param($this->level_start).','.
+					$this->db_add_param($this->level_sprung_auf).','.
+					$this->db_add_param($this->level_sprung_ab).','.
+					$this->db_add_param($this->levelgleichverteilung, FHC_BOOLEAN).','.
+					$this->db_add_param($this->maxpunkte).','.
+					$this->db_add_param($this->antwortenprozeile).',';
+					foreach($this->bezeichnung_mehrsprachig as $key=>$value)
+						$qry.=$this->db_add_param($value).',';
+					
+					$qry .= $this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).
+					',null, null);';
 		}
 		else
 		{
 			$qry = 'UPDATE testtool.tbl_gebiet SET'.
-			       ' kurzbz='.$this->db_add_param($this->kurzbz).','.
-			       ' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
-			       ' beschreibung='.$this->db_add_param($this->beschreibung).','.
-			       ' zeit='.$this->db_add_param($this->zeit).','.
-			       ' multipleresponse='.$this->db_add_param($this->multipleresponse, FHC_BOOLEAN).','.
-			       ' kategorien='.$this->db_add_param($this->kategorien, FHC_BOOLEAN).','.
-			       ' maxfragen='.$this->db_add_param($this->maxfragen).','.
-			       ' zufallfrage='.$this->db_add_param($this->zufallfrage, FHC_BOOLEAN).','.
-			       ' zufallvorschlag='.$this->db_add_param($this->zufallvorschlag, FHC_BOOLEAN).','.
-			       ' level_start='.$this->db_add_param($this->level_start).','.
-			       ' level_sprung_auf='.$this->db_add_param($this->level_sprung_auf).','.
-			       ' level_sprung_ab='.$this->db_add_param($this->level_sprung_ab).','.
-			       ' levelgleichverteilung='.$this->db_add_param($this->levelgleichverteilung, FHC_BOOLEAN).','.
-			       ' maxpunkte='.$this->db_add_param($this->maxpunkte).','.
-			       ' antwortenprozeile='.$this->db_add_param($this->antwortenprozeile).','.
-			       ' updateamum='.$this->db_add_param($this->updateamum).','.
-			       ' updatevon='.$this->db_add_param($this->updatevon).
-			       " WHERE gebiet_id=".$this->db_add_param($this->gebiet_id, FHC_INTEGER, false).";";
+					' kurzbz='.$this->db_add_param($this->kurzbz).','.
+					' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
+					' beschreibung='.$this->db_add_param($this->beschreibung).','.
+					' zeit='.$this->db_add_param($this->zeit).','.
+					' multipleresponse='.$this->db_add_param($this->multipleresponse, FHC_BOOLEAN).','.
+					' kategorien='.$this->db_add_param($this->kategorien, FHC_BOOLEAN).','.
+					' maxfragen='.$this->db_add_param($this->maxfragen).','.
+					' zufallfrage='.$this->db_add_param($this->zufallfrage, FHC_BOOLEAN).','.
+					' zufallvorschlag='.$this->db_add_param($this->zufallvorschlag, FHC_BOOLEAN).','.
+					' level_start='.$this->db_add_param($this->level_start).','.
+					' level_sprung_auf='.$this->db_add_param($this->level_sprung_auf).','.
+					' level_sprung_ab='.$this->db_add_param($this->level_sprung_ab).','.
+					' levelgleichverteilung='.$this->db_add_param($this->levelgleichverteilung, FHC_BOOLEAN).','.
+					' maxpunkte='.$this->db_add_param($this->maxpunkte).','.
+					' antwortenprozeile='.$this->db_add_param($this->antwortenprozeile).','.
+					' updateamum='.$this->db_add_param($this->updateamum).','.
+					' updatevon='.$this->db_add_param($this->updatevon).',';
+					foreach($this->bezeichnung_mehrsprachig as $key=>$value)
+					{
+						$idx = sprache::$index_arr[$key];
+						$qry .= " bezeichnung_mehrsprachig[$idx]=".$this->db_add_param($value).",";
+					}
+					$qry = mb_substr($qry,0,-1);
+					$qry .=	' WHERE gebiet_id='.$this->db_add_param($this->gebiet_id, FHC_INTEGER, false).';';
 		}
 
 		if($this->db_query($qry))
@@ -241,7 +262,7 @@ class gebiet extends basis_db
 			//aktuelle ID aus der Sequence holen
 			if($new)
 			{
-				$qry='SELECT currval("testtool.tbl_gebiet_gebiet_id_seq") as id;';
+				$qry="SELECT currval('testtool.tbl_gebiet_gebiet_id_seq') as id;";
 				if($this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object())

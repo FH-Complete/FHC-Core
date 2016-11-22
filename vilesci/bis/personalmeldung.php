@@ -214,6 +214,7 @@ if($result = $db->db_query($qry))
 								AND funktion_kurzbz='Leitung' 
 								AND (datum_von<".$db->db_add_param($bisdatum)." OR datum_von is null) 
 								AND (datum_bis>".$db->db_add_param($bisprevious)." OR datum_bis is NULL)
+								AND studiengang_kz>0
 								AND studiengang_kz<10000;";
 					if($resultslt=$db->db_query($qryslt))
 					{

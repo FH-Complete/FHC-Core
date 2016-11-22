@@ -164,12 +164,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 		<treechildren>
 	       	<treeitem uri="rdf:*">
 	         	<treerow>
-	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#kurzbz"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"/>
-	           		<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#studiengang_kz"/>
+	           		<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#kurzbz"/>
+	           		<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname"/>
+	           		<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname"/>
+	           		<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre"/>
+	           		<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"/>
+	           		<treecell properties="Lektor_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#studiengang_kz"/>
 	         	</treerow>
 	    	</treeitem>
 	    </treechildren>
@@ -320,12 +320,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 		<?php
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz'))
 			{
-				echo '<tab id="tab-studenten" label="Studenten" onclick="ChangeTabsToVerband()"/>';
+				echo '<tab id="tab-studenten" label="Studierende" onclick="ChangeTabsToVerband()"/>';
 				echo '<tab id="tab-lfvt" label="Lehrveranstaltungen" onclick="ChangeTabsToVerband()"/>';
 			}
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter'))
 			{
-				echo '<tab id="tab-mitarbeiter" label="Mitarbeiter" onclick="document.getElementById(\'menu-content-tabs\').selectedItem=document.getElementById(\'tab-menu-mitarbeiter\');" />';
+				echo '<tab id="tab-mitarbeiter" label="MitarbeiterInnen" onclick="document.getElementById(\'menu-content-tabs\').selectedItem=document.getElementById(\'tab-menu-mitarbeiter\');" />';
 			}
 		?>
 			<tab id="tab-notizen" label="Meine Notizen" />

@@ -295,7 +295,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 			<tab id="tab-verband" label="Verband" />
 			<tab id="tab-ort" label="Ort" />
 			<tab id="tab-fachbereich" label="Institut" onclick="ChangeTabsToLehrveranstaltung()"/>
-			<tab id="tab-lektor" label="Lektor" />
+			<tab id="tab-lektor" label="Lehrende" />
 		</tabs>
 		<tabpanels id="tabpanels-left" flex="1">
 			<tree id="tree-verband" />

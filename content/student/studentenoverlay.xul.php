@@ -40,6 +40,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.p
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentzeugnisoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentkontooverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentiooverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentmobilitaetoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentnotenoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentpruefungoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentanrechnungenoverlay.xul.php"?>';
@@ -387,6 +388,7 @@ else
 							<tab id="student-tab-konto" label="Konto" />
 							<tab id="student-tab-betriebsmittel" label="Betriebsmittel" />
 							<tab id="student-tab-io" label="In/Out" />
+							<tab id="student-tab-mobilitaet" label="GS" />
 							<tab id="student-tab-noten" label="Noten" />
 							<tab id="student-tab-zeugnis" label="Archiv" />
 							<tab id="student-tab-pruefung" label="Prüfung" />
@@ -416,6 +418,7 @@ else
 							<vbox id="student-konto"  style="margin-top:10px;" />
 							<iframe id="student-betriebsmittel" src="" style="margin-top:10px;" />
 							<vbox id="student-io"  style="margin-top:10px;" />
+							<vbox id="student-mobilitaet"  style="margin-top:10px;" />
 							<vbox id="student-noten"  style="margin-top:10px;" />
 							<vbox id="student-zeugnis"  style="margin-top:10px;" />
 							<vbox id="student-pruefung"  style="margin-top:10px;" />

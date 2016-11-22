@@ -350,10 +350,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<treechildren>
 								<treeitem uri="rdf:*">
 									<treerow>
-										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#nachname"   />
-										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#vorname"   />
-										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#mitarbeiter_uid"   />
-										<treecell label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#lehreinheit_id"   />
+										<treecell properties="Lektor_rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#nachname"   />
+										<treecell properties="Lektor_rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#vorname"   />
+										<treecell properties="Lektor_rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#mitarbeiter_uid"   />
+										<treecell properties="Lektor_rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#lehreinheit_id"   />
 										<treecell src="../skin/images/verplant_rdf:http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf#verplant^.png"   />
 					 				</treerow>
 					 			</treeitem>
@@ -368,7 +368,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<vbox>
 		<hbox>
 		<groupbox>
-			<caption label="Lektorendaten" />
+			<caption label="LektorInnendaten" />
 			<vbox flex="1">
 			<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-lehreinheit_id" hidden="true"/>
 			<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-mitarbeiter_uid" hidden="true"/>
@@ -395,7 +395,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					            </menupopup>
 					         </template>
 				   		 </menulist>
-				   		 <label align="end" control="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" value="Lektor:"/>
+				   		 <label align="end" control="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" value="LektorIn:"/>
 						 <menulist id="lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor" disabled="true" oncommand="LeMitarbeiterLektorChange(); LeMitarbeiterValueChanged();"
 	    		                   datasources="<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php"
 			                       ref="http://www.technikum-wien.at/mitarbeiter/_alle" flex="1">
