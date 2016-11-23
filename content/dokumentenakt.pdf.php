@@ -1,4 +1,6 @@
 <?php
+use Sabre\DAV\Exception\NotImplemented;
+
 /* Copyright (C) 2016 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,6 +27,11 @@ require_once(dirname(__FILE__).'/../include/dokument_export.class.php');
 require_once(dirname(__FILE__).'/../include/phrasen.class.php');
 require_once(dirname(__FILE__).'/../include/prestudent.class.php');
 require_once(dirname(__FILE__).'/../include/dms.class.php');
+require_once(dirname(__FILE__).'/../include/adresse.class.php');
+require_once(dirname(__FILE__).'/../include/nation.class.php');
+require_once(dirname(__FILE__).'/../include/kontakt.class.php');
+require_once(dirname(__FILE__).'/../include/studiengang.class.php');
+require_once(dirname(__FILE__).'/../include/notiz.class.php');
 
 $sprache = getSprache();
 $p=new phrasen($sprache);
@@ -103,7 +110,18 @@ foreach($prestudent_ids as $pid)
 		 */
 		$query= '
 			SELECT
-				tbl_akte.bezeichnung as dateiname, titel, dms_id, inhalt, mimetype, dokument_kurzbz, tbl_dokument.bezeichnung, sort, akte_id
+				tbl_akte.bezeichnung as dateiname,
+				titel,
+				dms_id,
+				inhalt,
+				mimetype,
+				dokument_kurzbz,
+				tbl_dokument.bezeichnung,
+				tbl_akte.bezeichnung as aktbezeichnung,
+				sort,
+				akte_id,
+				nachgereicht,
+				tbl_akte.anmerkung
 			FROM
 				public.tbl_vorlagedokument
 				JOIN public.tbl_dokument USING(dokument_kurzbz)
@@ -132,6 +150,11 @@ foreach($prestudent_ids as $pid)
 				$dms = new dms();
 				$dms->load($row->dms_id);
 
+				if ($dms->mimetype != $row->mimetype)
+				{
+					$preErrors[] = "Mimetype von Akte und DMS der DMS-ID ".$row->dms_id." stimmen nicht ueberein. Bitte kontaktieren Sie einen Administrator";
+				}
+					
 				$filename = DMS_PATH . $dms->filename;
 
 				if(!file_exists($filename))
@@ -186,7 +209,7 @@ foreach($prestudent_ids as $pid)
 					if(!$docExp->convert($filename, $fullFilename, "pdf"))
 					{
 						$convertSuccess = false;
-						$preErrors[] ="'$row->titel': Konvertierung fehlgeschlagen(".$row->mimetype.")";
+						$preErrors[] = ($row->titel != ''? $row->titel:$row->bezeichnung)." (Akte_ID ".$row->akte_id."): Konvertierung fehlgeschlagen(".$row->mimetype.")";
 					}
 				}
 				else if(
@@ -204,9 +227,35 @@ foreach($prestudent_ids as $pid)
 					{
 						$preDocs[] = $fullFilename;
 						if(isset($row->bezeichnung) && $row->bezeichnung && $row->bezeichnung != "")
-							$dokumente[] = array("name" => $row->bezeichnung);
+						{
+							if ($row->titel != '')
+								$dokumente[]['dokument'] = array(
+															"name" => $row->bezeichnung,
+															"filename" => $row->titel,
+															"nachgereicht" => ($row->nachgereicht == 't'?'true':'false'),
+															"anmerkung" => $row->anmerkung);
+							else 
+								$dokumente[]['dokument'] = array(
+															"name" => $row->bezeichnung,
+															"filename" => $row->aktbezeichnung,
+															"nachgereicht" => ($row->nachgereicht == 't'?'true':'false'),
+															"anmerkung" => $row->anmerkung);
+						}
 						else
-							$dokumente[] = array("name" => $row->dokument_kurzbz);
+						{
+							if ($row->titel != '')
+								$dokumente[]['dokument'] = array(
+															"name" => $row->dokument_kurzbz,
+															"filename" => $row->titel,
+															"nachgereicht" => ($row->nachgereicht == 't'?'true':'false'),
+															"anmerkung" => $row->anmerkung);
+							else
+								$dokumente[]['dokument'] = array(
+															"name" => $row->dokument_kurzbz,
+															"filename" => $row->aktbezeichnung,
+															"nachgereicht" => ($row->nachgereicht == 't'?'true':'false'),
+															"anmerkung" => $row->anmerkung);
+						}
 					}
 					else
 					{
@@ -227,10 +276,152 @@ foreach($prestudent_ids as $pid)
 		/*
 		 * Deckblatt
 		 */
+		$adresse = new adresse();
+		$adresse->load_pers($prestudent->person_id);
+		$strasse = '';
+		$plz = '';
+		$bundesland = '';
+	
+		$nation = new nation($prestudent->geburtsnation);
+		$geburtsnation = $nation->kurztext;
+		$nation->load($prestudent->staatsbuergerschaft);
+		$staatsbuergerschaft = $nation->kurztext;
+		$nation->load($prestudent->zgvnation);
+		$zgvnation = $nation->kurztext;
+		
+		$svnr = ($prestudent->svnr == '')?($prestudent->ersatzkennzeichen != ''?'Ersatzkennzeichen: '.$prestudent->ersatzkennzeichen:''):$prestudent->svnr;
+		
+		foreach($adresse->result as $row_adresse)
+		{
+			if($row_adresse->heimatadresse)
+			{
+				$heimatStrasse = $row_adresse->strasse;
+				$heimatPlz = $row_adresse->plz;
+				$heimatOrt = $row_adresse->ort;
+				// Bundesland ermitteln
+				$qry= '
+					SELECT
+						tbl_bundesland.bezeichnung AS bundesland
+					FROM
+						bis.tbl_gemeinde
+					JOIN
+						bis.tbl_bundesland ON (tbl_gemeinde.bulacode = tbl_bundesland.bundesland_code)
+					WHERE
+						tbl_gemeinde.name='.$db->db_add_param($row_adresse->gemeinde).'
+					LIMIT 1;
+				';
+				if(!$res = $db->db_query($qry))
+					die("Es ist ein Fehler bei der Ermittlung des Bundeslandes aufgetreten");
+			
+				if(!$row = $db->db_fetch_object($res))
+					die("Es ist ein Fehler bei der Ermittlung des Bundeslandes aufgetreten");
+			
+				$heimatBundesland = $row->bundesland;
+			}
+			if($row_adresse->zustelladresse)
+			{
+				$zustellStrasse = $row_adresse->strasse;
+				$zustellPlz = $row_adresse->plz;
+				$zustellOrt = $row_adresse->ort;
+				// Bundesland ermitteln
+				$qry= '
+					SELECT
+						tbl_bundesland.bezeichnung AS bundesland
+					FROM
+						bis.tbl_gemeinde
+					JOIN
+						bis.tbl_bundesland ON (tbl_gemeinde.bulacode = tbl_bundesland.bundesland_code)
+					WHERE
+						tbl_gemeinde.name='.$db->db_add_param($row_adresse->gemeinde).'
+					LIMIT 1;
+				';
+				if(!$res = $db->db_query($qry))
+					die("Es ist ein Fehler bei der Ermittlung des Bundeslandes aufgetreten");
+				
+				if(!$row = $db->db_fetch_object($res))
+					die("Es ist ein Fehler bei der Ermittlung des Bundeslandes aufgetreten");
+				
+				$zustellBundesland = $row->bundesland;
+				//break;
+			}
+		}
+		$kontakt = new kontakt();
+		$kontakt->load_pers($prestudent->person_id);
+		$telefonnummer = '';
+		foreach($kontakt->result as $row)
+		{
+			if ($row->zustellung)
+			{
+				if ($row->kontakttyp == 'mobil')
+				{
+					$telefonnummer = $row->kontakt;
+				}
+				elseif ($row->kontakttyp == 'telefon' && $telefonnummer == '')
+				{
+					$telefonnummer = $row->kontakt;
+				}
+				
+				if ($row->kontakttyp == 'email')
+				{
+					$mailadresse = $row->kontakt;
+				}
+			}
+			
+		}
+		// Studiengang der Bewerbung
+		$studiengang = new studiengang();
+		$studiengang->load($prestudent->studiengang_kz);
+		
+		// Datum Bewerbungabgschickt
+		$prestudentstatus = new prestudent();
+		$prestudentstatus->getLastStatus($pid, '', 'Interessent');
+		
+		// Spezielle Notizen auslesen und aufbereiten
+		$notiz = new notiz();
+		$notiz->getNotiz('','','','','','',$pid,'','','','','','aufnahme/spezialisierung');
+
+		$notiz_text_array = array();
+		foreach ($notiz->result as $notiz_row)
+		{
+			// Entfernt alle HTML und PHP-Tags aus der Notiz und splittet sie als array auf
+			$array_help = explode(';', strip_tags($notiz_row->text));
+			foreach ($array_help as $key => $value)
+				$notiz_text_array[]['aufnahme_notiz'] = $value;
+		}
+
 		$filename = $tmpDir . "/".uniqid();
 		$doc = new dokument_export($vorlage_kurzbz, $oe_kurzbz);
-		$doc->addDataArray(array('vorname' => $prestudent->vorname, 'nachname' => $prestudent->nachname, array('dokumente'=> $dokumente)),"dokumentenakt");
-
+		$doc->addDataArray(array(
+				'studiengang_kuerzel' => strtoupper($studiengang->typ.$studiengang->kurzbz),
+				'orgform_kurzbz' => $prestudent->orgform_kurzbz,
+				'bewerbung_abgeschicktamum' => date('d.m.Y H:i',strtotime($prestudentstatus->bewerbung_abgeschicktamum)),
+				'vorname' => $prestudent->vorname,
+				'nachname' => $prestudent->nachname,
+				'geb_datum' => date('d.m.Y',strtotime($prestudent->gebdatum)),
+				'gebort' => $prestudent->gebort,
+				'heimat_strasse' => $heimatStrasse,
+				'heimat_plz' => $heimatPlz,
+				'heimat_ort' => $heimatOrt,
+				'heimat_bundesland' => $heimatBundesland,
+				'zustell_strasse' => $zustellStrasse,
+				'zustell_plz' => $zustellPlz,
+				'zustell_ort' => $zustellOrt,
+				'zustell_bundesland' => $zustellBundesland,
+				'geburtsnation' => $geburtsnation,
+				'svnr' => $svnr,
+				'staatsbuergerschaft' => $staatsbuergerschaft,
+				'geschlecht' => $prestudent->geschlecht,
+				'telefonnummer' => $telefonnummer,
+				'email' => $mailadresse,
+				'zgvort' => $prestudent->zgvort,
+				'zgvdatum' => $prestudent->zgvdatum,
+				'zgvnation' => $zgvnation,
+				array('dokumente'=> $dokumente),
+				array('aufnahme_notizen'=> $notiz_text_array)
+				
+		),"dokumentenakt"
+				);
+		//echo $doc->getXML();exit;
 		if(!$doc->create('pdf'))
 			die($doc->errormsg);
 
@@ -255,6 +446,7 @@ foreach($prestudent_ids as $pid)
 if(count($errors) == 0 || $force)
 {
 	$finishedPdf = $tmpDir . "/Dokumentenakt.pdf";
+	//$finishedPdf = "/Dokumentenakt.pdf";
 	if(!$pdf->merge($allDocs, $finishedPdf))
 		cleanUpAndDie($pdf->errormsg, $tmpDir);
 	$fsize = filesize($finishedPdf);
@@ -263,7 +455,7 @@ if(count($errors) == 0 || $force)
 		die('load failed');
 
 	header('Content-type: application/pdf');
-	header('Content-Disposition: attachment; filename="'.$finishedPdf);
+	header('Content-Disposition: attachment; filename="Dokumentenakt.pdf"');
 	header('Content-Length: '.$fsize);
 
 	while (!feof($handle))
@@ -271,6 +463,7 @@ if(count($errors) == 0 || $force)
 		echo fread($handle, 8192);
 	}
 	fclose($handle);
+	
 }
 else
 {

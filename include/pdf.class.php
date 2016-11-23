@@ -76,24 +76,39 @@ class Pdf
 		}
 
 		$s = getimagesize($image);
+		
+		$margin_left_right = 18;
+		$margin_bottom = 18;
 
 		/*
 		 * längere Seite ermitteln
-		 * Hochformat wenn die Seiten gleich lang sind.
+		 * Hochformat wenn die Seiten gleich lang sind oder das Bild schmäler ist als die Seitenbreite
 		 */
-		if($s[0] > $s[1])
+		if($s[0] > $s[1] && $s[0] > 595)
 		{
-			$height = 595;
-			$width = 842;
+			$page_height = 595;
+			$page_width = 842;
+			//Wenn Bild kleiner oder gleich Seitenbreite, dann margin erhoehen
+			if ($s[0] <= $page_width)
+			{
+				$margin_left_right = ($page_width - $s[0]) / 2;
+				$margin_bottom = ($page_height - $s[1]);
+			}
 		}
 		else
 		{
-			$height = 842;
-			$width = 595;
+			$page_height = 842;
+			$page_width = 595;
+			//Wenn Bild kleiner oder gleich Seitenbreite, dann margin erhoehen
+			if ($s[0] <= $page_width)
+			{
+				$margin_left_right = ($page_width - $s[0]) / 2;
+				$margin_bottom = ($page_height - $s[1]);
+			}
 		}
 
 		// -r300 = 300 ppi
-		$cmd = 'gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -r100 -o '.$outFile.' viewjpeg.ps -c "('.$image.') << /PageSize [' . $width . ' ' . $height .'] /.HWMargins [18 18 18 13.5] /countspaces {  [ exch { dup 32 ne { pop } if  } forall ] length } bind def  >>  setpagedevice viewJPEG"';
+		$cmd = 'gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -r100 -o '.$outFile.' viewjpeg.ps -c "('.$image.') << /PageSize [' . $page_width . ' ' . $page_height .'] /.HWMargins ['.$margin_left_right.' '.$margin_bottom.' '.$margin_left_right.' 18] /countspaces {  [ exch { dup 32 ne { pop } if  } forall ] length } bind def  >>  setpagedevice viewJPEG"';
 
 		exec($cmd, $out, $ret);
 		if($ret!=0)

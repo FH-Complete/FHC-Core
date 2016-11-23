@@ -305,7 +305,20 @@ class notiz extends basis_db
 	 * @param $anrechnung_id
 	 * @return boolean
 	 */
-	public function getNotiz($erledigt=null, $projekt_kurzbz=null, $projektphase_id=null, $projekttask_id=null, $uid=null, $person_id=null, $prestudent_id=null, $bestellung_id=null, $user=null, $lehreinheit_id=null, $stundenplandev_id=null, $anrechnung_id=null)
+	public function getNotiz(
+			$erledigt=null,
+			$projekt_kurzbz=null,
+			$projektphase_id=null,
+			$projekttask_id=null,
+			$uid=null,
+			$person_id=null,
+			$prestudent_id=null,
+			$bestellung_id=null,
+			$user=null,
+			$lehreinheit_id=null,
+			$stundenplandev_id=null,
+			$anrechnung_id=null,
+			$titel=null)
 	{
 		$qry = "SELECT 
 					* 
@@ -341,6 +354,8 @@ class notiz extends basis_db
 			$qry.=" AND lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
 		if($anrechnung_id!='')
 			$qry.=" AND anrechnung_id=".$this->db_add_param($anrechnung_id, FHC_INTEGER);
+		if($titel!='')
+			$qry.=" AND titel=".$this->db_add_param($titel);
 
 		$qry.=' ORDER BY start, ende, titel';
 		
