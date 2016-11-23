@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
@@ -28,12 +28,12 @@
 require_once('../../../../config/cis.config.inc.php');
 require_once('../../../../include/functions.inc.php');
 
-$user = get_uid(); 
+$user = get_uid();
 
 if(!check_lektor($user))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
-//Gueltigkeit der Parameter pruefen		
+//Gueltigkeit der Parameter pruefen
 if(!isset($_GET['uebung_id']) || !is_numeric($_GET['uebung_id']))
 {
 	die('Fehler bei der Parameteruebergabe');
@@ -62,24 +62,30 @@ if(mb_strstr($downloadname,'..'))
 //Pfade bauen
 $pfad = BENOTUNGSTOOL_PATH.'abgabe/';
 $filename = 'download_'.$user.'_'.$downloadname.'.zip';
+$filename_tmp = 'download_'.$user.'_'.$uebung_id.'.zip';
 
-if(!check_filename($filename))
+if(!check_filename($filename) || !check_filename($filename_tmp))
 	die('Ungueltiger Parameter gefunden');
 
 //Pfad wechseln
-chdir($pfad);
+if(chdir($pfad))
+{
+	//File loeschen falls es existiert
+	//if(file_exists("download_".$user."*"))
+	exec('rm download_'.$user.'*');
 
-//File loeschen falls es existiert
-//if(file_exists("download_".$user."*"))
-exec('rm download_'.$user.'*');
-	
-//Zip File erstellen
-exec("zip -r ".escapeshellarg($filename).' *_[WS]S[0-9][0-9][0-9][0-9]_'.$uebung_id.'_*');
+	//Zip File erstellen
+	exec("zip -r ".escapeshellarg($filename_tmp).' *_[WS]S[0-9][0-9][0-9][0-9]_'.$uebung_id.'_*');
 
-//Auf Zip File Verweisen
-//header("Location: $pfad$filename");
-header('Content-Type: application/octet-stream');
-header('Content-disposition: attachment; filename="'.$filename.'"');
-readfile($filename);
-unlink($filename);
+	//Auf Zip File Verweisen
+	//header("Location: $pfad$filename");
+	header('Content-Type: application/octet-stream');
+	header('Content-disposition: attachment; filename="'.$filename.'"');
+	readfile($filename_tmp);
+	unlink($filename_tmp);
+}
+else
+{
+	die('Path change failed');
+}
 ?>
