@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="100mm"
+   height="100mm"
+   viewBox="0 0 100 100"
+   version="1.1"
+   id="svg4517"
+   inkscape:version="0.92pre2 r"
+   sodipodi:docname="Chart.svg">
+  <defs
+     id="defs4511">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient5781">
+      <stop
+         style="stop-color:#bb8a8a;stop-opacity:1"
+         offset="0"
+         id="stop5777" />
+      <stop
+         style="stop-color:#121212;stop-opacity:1"
+         offset="1"
+         id="stop5779" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient5414-8"
+       inkscape:collect="always">
+      <stop
+         id="stop5515"
+         offset="0"
+         style="stop-color:#ce2121;stop-opacity:1" />
+      <stop
+         id="stop5517"
+         offset="1"
+         style="stop-color:#d7a98e;stop-opacity:0" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5414-8"
+       id="linearGradient5416"
+       x1="15.893733"
+       y1="291.10629"
+       x2="84.106262"
+       y2="202.89375"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5781"
+       id="linearGradient5783"
+       x1="77.190254"
+       y1="208.05676"
+       x2="22.4"
+       y2="277"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="-619.33207"
+     inkscape:cy="89.602917"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="2497"
+     inkscape:window-height="1016"
+     inkscape:window-x="63"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     showguides="false" />
+  <metadata
+     id="metadata4514">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-197)">
+    <rect
+       style="fill:url(#linearGradient5416);fill-opacity:1;fill-rule:nonzero;stroke:#474747;stroke-width:1.78746629;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.97089945;opacity:1"
+       id="rect5081"
+       width="68.212532"
+       height="88.21254"
+       x="15.893733"
+       y="202.89375" />
+    <g
+       id="g5775"
+       style="fill-opacity:1;fill:url(#linearGradient5783)">
+      <rect
+         y="227"
+         x="22.4"
+         height="50"
+         width="5"
+         id="rect5693"
+         style="opacity:1;fill:url(#linearGradient5783);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.43855953;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.97089945" />
+      <rect
+         y="207"
+         x="32.399998"
+         height="70"
+         width="5"
+         id="rect5693-8"
+         style="opacity:1;fill:url(#linearGradient5783);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:4.06855869;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.97089945" />
+      <rect
+         y="217"
+         x="42.399998"
+         height="60"
+         width="5"
+         id="rect5693-8-5"
+         style="opacity:1;fill:url(#linearGradient5783);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.76675367;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.97089945" />
+      <rect
+         y="227"
+         x="52.399998"
+         height="50"
+         width="5"
+         id="rect5693-8-5-2"
+         style="opacity:1;fill:url(#linearGradient5783);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.43856001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.97089945" />
+      <rect
+         y="237"
+         x="62.399998"
+         height="40"
+         width="5"
+         id="rect5693-8-5-1"
+         style="opacity:1;fill:url(#linearGradient5783);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.0755415;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.97089945" />
+      <rect
+         y="227"
+         x="72.399963"
+         height="50"
+         width="5"
+         id="rect5693-8-5-9"
+         style="opacity:1;fill:url(#linearGradient5783);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.43856001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.97089945" />
+    </g>
+    <g
+       aria-label="C"
+       transform="matrix(0.26458333,0,0,0.26458333,-58.26189,200.08014)"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:25px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="flowRoot5418">
+      <path
+         d="m 531.46827,321.41028 -6.144,-13.248 c -8.064,5.184 -19.584,8.64 -31.68,8.64 -30.72,0 -48.576,-23.424 -48.576,-54.336 0,-30.912 17.856,-55.104 48.576,-55.104 12.096,0 24.576,3.84 31.68,8.64 l 6.144,-13.248 c -8.448,-5.184 -22.08,-9.408 -37.824,-9.408 -38.4,0 -64.512,30.72 -64.512,69.12 0,38.4 26.112,68.352 64.512,68.352 12.864,0 26.688,-3.072 37.824,-9.408 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;font-family:Cantarell;-inkscape-font-specification:Cantarell;fill:#000000;fill-opacity:1"
+         id="path4485" />
+    </g>
+  </g>
+</svg>
