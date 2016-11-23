@@ -50,6 +50,7 @@ $student_uid = filter_input(INPUT_GET,'student_uid');
 <popupset>
 	<menupopup id="termine-tree-popup">
 		<menuitem label="Anwesenheit umschalten" oncommand="TermineToggleAnwesenheit();" id="termine-tree-popup-toggle-anwesenheit" hidden="false"/>
+		<menuitem label="Anwesenheit umschalten" oncommand="TermineToggleAnwesenheitMitarbeiter();" id="termine-tree-popup-togglemitarbeiter-anwesenheit" hidden="false"/>
 	</menupopup>
 </popupset>
 	<groupbox id="termine-groupbox-termine" flex="1">

@@ -202,35 +202,35 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 					<treechildren>
 						<treeitem uri="rdf:*">
  						<treerow>
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#anrede" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vornamen" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpost" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#anrede" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpre" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vornamen" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpost" />
    							<?php
 							if($rechte->isBerechtigt('mitarbeiter/persoenlich'))
 							echo '
-	   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#geburtsdatum" />
-	   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#geburtsdatum_iso" />
-	   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#svnr" />
-	   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#ersatzkennzeichen" />';
+	   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#geburtsdatum" />
+	   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#geburtsdatum_iso" />
+	   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#svnr" />
+	   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#ersatzkennzeichen" />';
 							?>
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#personalnummer" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#kurzbz" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#lektor" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#fixangestellt" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#telefonklappe" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#ort_kurzbz" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#person_id" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#insertamum" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#insertvon" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#insertamum_iso" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#updateamum" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#updatevon" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#updateamum_iso" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#personalnummer" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#kurzbz" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#lektor" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#fixangestellt" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#telefonklappe" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#ort_kurzbz" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#person_id" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#insertamum" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#insertvon" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#insertamum_iso" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#updateamum" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#updatevon" />
+   							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#updateamum_iso" />
  						</treerow>
 						</treeitem>
 					</treechildren>
@@ -261,6 +261,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 
 				?>
 				<tab id="mitarbeiter-tab-termine" label="Termine" onclick="MitarbeiterTermineIFrameLoad()" />
+				<tab id="mitarbeiter-tab-notizen" label="Notizen"/>
 			</tabs>
 			<tabpanels id="mitarbeiter-tabpanels-main" flex="1">
 				<vbox id="mitarbeiter-detail-stammdaten"  style="margin-top:10px;" />
@@ -275,6 +276,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 					echo '<vbox id="mitarbeiter-vertrag" style="margin-top:10px;" />';
 				?>
 				<iframe id="mitarbeiter-termine" src="" style="margin-top:10px;" />
+				<vbox id="mitarbeiter-box-notiz">
+					<box class="Notiz" flex="1" id="mitarbeiter-box-notizen"/>
+				</vbox>
 			</tabpanels>
 		</tabbox>
 	</vbox>

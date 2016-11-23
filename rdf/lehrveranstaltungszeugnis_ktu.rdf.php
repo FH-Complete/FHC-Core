@@ -371,10 +371,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		{
 		    $studienplan->loadStudienplanLehrveranstaltung($studienplan_lehrveranstaltung_id);
 		    $lv = new lehrveranstaltung();
-		    while($lv->lehrtyp_kurzbz != "modul")
+		    while(($lv->lehrtyp_kurzbz != "modul") && ($studienplan->lehrveranstaltung_id != $studienplan_lehrveranstaltung_id))
 		    {
-			$lv->load($studienplan->lehrveranstaltung_id);
-			$studienplan->loadStudienplanLehrveranstaltung($studienplan->studienplan_lehrveranstaltung_id_parent);
+				$lv->load($studienplan->lehrveranstaltung_id);
+				$studienplan_lehrveranstaltung_id = $studienplan->lehrveranstaltung_id;
+				$studienplan->loadStudienplanLehrveranstaltung($studienplan->studienplan_lehrveranstaltung_id_parent);
 		    }
 		    $lehrveranstaltung->lehrveranstaltungen = array(0 => $lv);
 		}

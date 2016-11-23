@@ -16,6 +16,7 @@ tests/codeception/codeception.yml
 tests/codeception/tests/api.suite.yml
 tests/codeception/tests/functional.suite.yml
 tests/codeception/tests/acceptance.suite.yml
+tests/codeception/tests/unit.suite.yml
 /submodules/d3
 composer.lock
 bin

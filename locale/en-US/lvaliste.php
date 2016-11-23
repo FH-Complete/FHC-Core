@@ -31,3 +31,4 @@ $this->phrasen['lvaliste/betreuungen']='Supervisor';
 $this->phrasen['lvaliste/koordination']='Coordination';
 $this->phrasen['lvaliste/anzahl']='Number';
 $this->phrasen['lvaliste/summe']='Total';
+$this->phrasen['lvaliste/id']='ID';

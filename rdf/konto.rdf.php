@@ -142,6 +142,7 @@ function drawrow($row)
 			<KONTO:buchungstyp_kurzbz><![CDATA[".$row->buchungstyp_kurzbz."]]></KONTO:buchungstyp_kurzbz>
 			<KONTO:credit_points><![CDATA[".$row->credit_points."]]></KONTO:credit_points>
 			<KONTO:zahlungsreferenz><![CDATA[".$row->zahlungsreferenz."]]></KONTO:zahlungsreferenz>
+			<KONTO:anmerkung><![CDATA[".$row->anmerkung."]]></KONTO:anmerkung>
 			<KONTO:updateamum><![CDATA[".$row->updateamum."]]></KONTO:updateamum>
 			<KONTO:updatevon><![CDATA[".$row->updatevon."]]></KONTO:updatevon>
 			<KONTO:insertamum><![CDATA[".$row->insertamum."]]></KONTO:insertamum>
@@ -243,6 +244,9 @@ elseif ($xmlformat=='xml')
 			<updateamum><![CDATA[".$row->updateamum."]]></updateamum>
 			<updatevon><![CDATA[".$row->updatevon."]]></updatevon>
 			<insertamum><![CDATA[".$row->insertamum."]]></insertamum>
+			<credit_points><![CDATA[".$row->credit_points."]]></credit_points>
+			<zahlungsreferenz><![CDATA[".$row->zahlungsreferenz."]]></zahlungsreferenz>
+			<anmerkung><![CDATA[".$row->anmerkung."]]></anmerkung>
 		</buchung>";
 	}
 	function drawperson_xml($row)

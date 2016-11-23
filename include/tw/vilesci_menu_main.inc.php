@@ -77,9 +77,9 @@ $menu=array
 		(
 			'name'=>'Moodle', 'permissions'=>array('basis/moodle'),
 			'Account'=>array('name'=>'Accountverwaltung', 'link'=>'moodle/account_verwaltung24.php', 'target'=>'main'),
-            'Kursverwaltung'=>array('name'=>'Kurs entfernen', 'link'=>'moodle/kurs_verwaltung24.php', 'target'=>'main'),
-            'Rollenzuteilung'=>array('name'=>'Rollenzuteilung', 'link'=>'moodle/rollenzuteilung24.php', 'target'=>'main'),
-            'UserSync'=>array('name'=>'User Sync', 'link'=>'moodle/user_sync24.php', 'target'=>'main'),
+			'Kursverwaltung'=>array('name'=>'Kurs entfernen', 'link'=>'moodle/kurs_verwaltung24.php', 'target'=>'main'),
+			'Rollenzuteilung'=>array('name'=>'Rollenzuteilung', 'link'=>'moodle/rollenzuteilung24.php', 'target'=>'main'),
+			'UserSync'=>array('name'=>'User Sync', 'link'=>'moodle/user_sync24.php', 'target'=>'main'),
 			'UserMassCreate'=>array('name'=>'User Massenanlage', 'link'=>'moodle/account_masscreate24.php', 'target'=>'main'),
 		),
 		'Freifach'=>array
@@ -134,7 +134,7 @@ $menu=array
 		'AnwesenheitslistenBarcode'=>array('name'=>'Anwesenheitslisten mit Barcodes', 'link'=>'personen/anwesenheitslisten_barcode.php', 'target'=>'main','permissions'=>array('basis/person')),
 		'Preinteressenten'=>array('name'=>'Preinteressenten', 'link'=>'personen/preinteressent_frameset.html', 'target'=>'_blank','permissions'=>array('admin','preinteressent')),
 		'Incoming'=>array('name'=>'Incoming', 'link'=>'personen/incoming_frameset.php', 'target'=>'_blank','permissions'=>array('inout/incoming')),
-        'Outgoing'=>array('name'=>'Outgoing', 'link'=>'personen/outgoing_frameset.php', 'target'=>'_blank','permissions'=>array('inout/outgoing'))
+		'Outgoing'=>array('name'=>'Outgoing', 'link'=>'personen/outgoing_frameset.php', 'target'=>'_blank','permissions'=>array('inout/outgoing'))
 	),
 	'Stammdaten'=>	array
 	(
@@ -167,6 +167,7 @@ $menu=array
 		'Ferien'=>array('name'=>'Ferien', 'link'=>'lehre/ferienverwaltung.php', 'target'=>'main','permissions'=>array('admin')),
 		'Service'=>array('name'=>'Service', 'link'=>'stammdaten/service_frameset.html', 'target'=>'main','permissions'=>array('basis/service')),
 		'Dokumentvorlagen'=>array('name'=>'Dokumentvorlagen', 'link'=>'stammdaten/dokumentvorlagen_verwaltung.php', 'target'=>'main','permissions'=>array('basis/dokumente')),
+		'GSProgramm'=>array('name'=>'GSProgramm', 'link'=>'stammdaten/gsprogramm.php', 'target'=>'main','permissions'=>array('inout/uebersicht')),
 		'FH Ausweis'=>array
 		(
 			'name'=>'FH Ausweis','permissions'=>array('basis/fhausweis'),
@@ -196,6 +197,7 @@ $menu=array
 		'checkStudenten'=>array('name'=>'CheckStudenten', 'link'=>'../system/checkStudenten.php', 'target'=>'main'),
 		'StudienplanZuteilung'=>array('name'=>'Studienplan Zuteilung', 'link'=>'lehre/studienplan_zuteilung.php', 'target'=>'main','permissions'=>array('assistenz')),
 		'lv_merge'=>array('name'=>'LVs zusammenlegen', 'link'=>'lehre/lv_merge.php', 'target'=>'main','permissions'=>array('admin','lv-plan')),
+		'akteupdate'=>array('name'=>'Akten überschreiben', 'link'=>'personen/akteupdate.php', 'target'=>'main','permissions'=>array('admin')),
 	),
 	'Auswertung'=>	array
 	(

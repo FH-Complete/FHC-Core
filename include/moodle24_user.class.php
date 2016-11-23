@@ -54,7 +54,7 @@ class moodle24_user extends basis_db
 	 * Laedt einen Moodle User
 	 *
 	 * @param $uid
-	 * @return boolean
+	 * @return boolean oder -1 bei SOAP Fehler
 	 */
 	public function loaduser($uid)
 	{
@@ -87,7 +87,7 @@ class moodle24_user extends basis_db
 		catch (SoapFault $E)
 		{
 			$this->errormsg.="SOAP Fehler beim Laden des Users: ".$E->faultstring;
-			return false;
+			return -1;
 		}
 	}
 
@@ -195,7 +195,6 @@ class moodle24_user extends basis_db
 		{
 			while($row_ma = $this->db_fetch_object($result_ma))
 			{
-
 				$user_zugeteilt=false;
 				foreach($enrolled_users as $user)
 				{
@@ -208,9 +207,9 @@ class moodle24_user extends basis_db
 
 				if(!$user_zugeteilt)
 				{
-
+					$retval = $this->loaduser($row_ma->mitarbeiter_uid);
 					//MoodleID des Users holen bzw ggf neu anlegen
-					if(!$this->loaduser($row_ma->mitarbeiter_uid))
+					if($retval===false)
 					{
 						//User anlegen
 						if(!$this->createUser($row_ma->mitarbeiter_uid))
@@ -222,29 +221,32 @@ class moodle24_user extends basis_db
 							$this->errormsg = '';
 					}
 
-					if($mitarbeiter!='')
-						$mitarbeiter.=',';
-					$mitarbeiter.=$this->mdl_user_id;
-
-					//Mitarbeiter ist noch nicht zugeteilt.
-					$data = new stdClass();
-					$data->roleid=3; // 3=Lektor
-					$data->userid=$this->mdl_user_id;
-					$data->courseid=$mdl_course_id;
-
-					try
+					if($retval!==-1)
 					{
-						$client = new SoapClient($this->serverurl);
-						$client->enrol_manual_enrol_users(array($data));
+						if($mitarbeiter!='')
+							$mitarbeiter.=',';
+						$mitarbeiter.=$this->mdl_user_id;
 
-						$this->log.="\nLektorIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
-						$this->log_public.="\nLektorIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
-						$this->sync_create++;
-					}
-					catch (SoapFault $E)
-					{
-						$this->errormsg.="SOAP Fehler beim zuteilen der Teilnehmer des Kurses: ".$E->faultstring;
-						return false;
+						//Mitarbeiter ist noch nicht zugeteilt.
+						$data = new stdClass();
+						$data->roleid=3; // 3=Lektor
+						$data->userid=$this->mdl_user_id;
+						$data->courseid=$mdl_course_id;
+
+						try
+						{
+							$client = new SoapClient($this->serverurl);
+							$client->enrol_manual_enrol_users(array($data));
+
+							$this->log.="\nLektorIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+							$this->log_public.="\nLektorIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+							$this->sync_create++;
+						}
+						catch (SoapFault $E)
+						{
+							$this->errormsg.="SOAP Fehler beim zuteilen der Teilnehmer des Kurses: ".$E->faultstring;
+							return false;
+						}
 					}
 				}
 			}
@@ -312,14 +314,16 @@ class moodle24_user extends basis_db
 				$gruppensync = $this->db_parse_bool($row_std->gruppen);
 
 				//Studenten dieser Gruppe holen
-
 				if($row_std->gruppe_kurzbz=='') //LVB Gruppe
 				{
 					$qry = "SELECT
-								distinct student_uid
+								distinct student_uid, tbl_person.vorname, tbl_person.nachname
 							FROM
 								public.tbl_studentlehrverband
+								JOIN public.tbl_benutzer ON(student_uid=uid)
+								JOIN public.tbl_person USING(person_id)
 							WHERE
+								tbl_benutzer.aktiv AND
 								studiensemester_kurzbz=".$this->db_add_param($row_std->studiensemester_kurzbz)." AND
 								studiengang_kz = ".$this->db_add_param($row_std->studiengang_kz)." AND
 								semester = ".$this->db_add_param($row_std->semester);
@@ -339,10 +343,13 @@ class moodle24_user extends basis_db
 				else //Spezialgruppe
 				{
 					$qry = "SELECT
-								distinct uid as student_uid
+								distinct uid as student_uid, tbl_person.vorname, tbl_person.nachname
 							FROM
 								public.tbl_benutzergruppe
+								JOIN public.tbl_benutzer USING(uid)
+								JOIN public.tbl_person USING(person_id)
 							WHERE
+								tbl_benutzer.aktiv AND
 								gruppe_kurzbz=".$this->db_add_param($row_std->gruppe_kurzbz)." AND
 								studiensemester_kurzbz=".$this->db_add_param($row_std->studiensemester_kurzbz);
 					$gruppenbezeichnung = $row_std->gruppe_kurzbz;
@@ -352,9 +359,7 @@ class moodle24_user extends basis_db
 				{
 					while($row_user = $this->db_fetch_object($result_user))
 					{
-
 						//Nachschauen ob dieser Student bereits zugeteilt ist
-
 						$user_zugeteilt=false;
 						foreach($enrolled_users as $user)
 						{
@@ -368,9 +373,9 @@ class moodle24_user extends basis_db
 
 						if(!$user_zugeteilt)
 						{
-
+							$retval = $this->loaduser($row_user->student_uid);
 							//MoodleID des Users holen bzw ggf neu anlegen
-							if(!$this->loaduser($row_user->student_uid))
+							if($retval===false)
 							{
 								//User anlegen
 								if(!$this->createUser($row_user->student_uid))
@@ -382,23 +387,25 @@ class moodle24_user extends basis_db
 									$this->errormsg = '';
 							}
 
-							if($studenten!='')
-								$studenten.=',';
-							$studenten.=$this->mdl_user_id;
+							if($retval!==-1)
+							{
+								if($studenten!='')
+									$studenten.=',';
+								$studenten.=$this->mdl_user_id;
 
+								//Student ist noch nicht zugeteilt.
 
-							//Student ist noch nicht zugeteilt.
+								$data = new stdClass();
+								$data->roleid=5; // 5=Teilnehmer/Student
+								$data->userid=$this->mdl_user_id;
+								$data->courseid=$mdl_course_id;
 
-							$data = new stdClass();
-							$data->roleid=5; // 5=Teilnehmer/Student
-							$data->userid=$this->mdl_user_id;
-							$data->courseid=$mdl_course_id;
+								$userstoenroll[]=$data;
 
-							$userstoenroll[]=$data;
-
-							$this->log.="\nStudentIn $row_user->student_uid wurde zum Kurs hinzugefügt";
-							$this->log_public.="\nStudentIn $row_user->student_uid wurde zum Kurs hinzugefügt";
-							$this->sync_create++;
+								$this->log.="\nStudentIn ".$this->mdl_user_firstname." ".$this->mdl_user_lastname." ($row_user->student_uid) wurde zum Kurs hinzugefügt";
+								$this->log_public.="\nStudentIn ".$this->mdl_user_firstname." ".$this->mdl_user_lastname." ($row_user->student_uid) wurde zum Kurs hinzugefügt";
+								$this->sync_create++;
+							}
 						}
 
 						//Gruppenzuteilung
@@ -407,7 +414,11 @@ class moodle24_user extends basis_db
 							if(!isset($vorhandenegruppen[$gruppenbezeichnung]))
 							{
 								//Schauen ob die Gruppe vorhanden ist
-								if(!$groupid = $this->getGroup($mdl_course_id, $gruppenbezeichnung))
+								$groupid = $this->getGroup($mdl_course_id, $gruppenbezeichnung);
+								if ($groupid === false)
+									return false;
+
+								if($groupid === -1)
 								{
 									//wenn nicht dann anlegen
 									if(!$groupid = $this->createGroup($mdl_course_id, $gruppenbezeichnung))
@@ -427,14 +438,18 @@ class moodle24_user extends basis_db
 							//if($this->mdl_user_id=='')
 							//	$this->loaduser($row_user->student_uid);
 							//Schauen ob eine Zuteilung zu dieser Gruppe vorhanden ist
-							if(!$this->getGroupMember($groupid, $this->mdl_user_id))
+							$groupmember = $this->getGroupMember($groupid, $this->mdl_user_id);
+							if($groupmember === false)
+								continue;
+
+							if($groupmember === -1)
 							{
 								//wenn nicht dann zuteilen
 								$groupmembertoadd[] = array('groupid'=>$groupid,'userid'=>$this->mdl_user_id);
 								//$this->createGroupMember($groupid, $this->mdl_user_id);
 								$this->group_update++;
-								$this->log.="\nStudentIn $row_user->student_uid wurde der Gruppe $gruppenbezeichnung ($groupid) zugeordnet";
-								$this->log_public.="\nStudentIn $row_user->student_uid wurde der Gruppe $gruppenbezeichnung zugeordnet";
+								$this->log.="\nStudentIn $row_user->vorname $row_user->nachname ($row_user->student_uid) wurde der Gruppe $gruppenbezeichnung ($groupid) zugeordnet";
+								$this->log_public.="\nStudentIn $row_user->vorname $row_user->nachname ($row_user->student_uid) wurde der Gruppe $gruppenbezeichnung zugeordnet";
 							}
 						}
 					}
@@ -448,9 +463,11 @@ class moodle24_user extends basis_db
 					$client = new SoapClient($this->serverurl);
 					$client->enrol_manual_enrol_users($userstoenroll);
 					// Wenn User zum Kurs hinzugefuegt werden, muss eine kleine Pause eingelegt werden
-					// damit sich Moodle wieder beruhigt, sonst werden die Gruppenzuordnungen nicht korrekt gesetzt
-					// die Pause ist abgaengig von der Anzahl der User die neu angelegt werden
-					usleep(count($userstoenroll)*1000);
+					// Die User werden nicht gleich zugeordnet, diese werden nach
+					// abschluss des SOAP Requests von Moodle noch weiterverarbeitet und
+					// erst zeitversetzt zugeordnet.
+					// Die Pause ist abgaengig von der Anzahl der User die hinzugefuegt werden
+					usleep(count($userstoenroll)*150000);
 				}
 				catch (SoapFault $E)
 				{
@@ -461,11 +478,17 @@ class moodle24_user extends basis_db
 
 			if(count($groupmembertoadd)>0)
 			{
-				$client = new SoapClient($this->serverurl);
-				$groupresult = $client->core_group_add_group_members($groupmembertoadd);
-				//$this->log.="\n\n".print_r($groupmembertoadd,true)."\n".print_r($groupresult,true);
+				try
+				{
+					$client = new SoapClient($this->serverurl);
+					$groupresult = $client->core_group_add_group_members($groupmembertoadd);
+				}
+				catch (SoapFault $E)
+				{
+					$this->errormsg.="SOAP Fehler beim Zuteilen der Teilnehmer zu Gruppen";
+					return false;
+				}
 			}
-
 			return true;
 		}
 		else
@@ -480,7 +503,7 @@ class moodle24_user extends basis_db
 	 * existiert
 	 * @param grouid ID der Gruppe
 	 *        userid MoodleID des Users
-	 * @return true wenn zugeteilt sonst false
+	 * @return true wenn zugeteilt, -1 wenn nicht, false im Fehlerfall
 	 */
 	public function getGroupMember($groupid, $userid)
 	{
@@ -506,11 +529,13 @@ class moodle24_user extends basis_db
 
 		foreach($this->gruppenzuordnungen[$groupid] as $id)
 		{
-			if($id==$userid)
+			if ($id == $userid)
+			{
 				return true;
+			}
 		}
 
-		return false;
+		return -1;
 	}
 
 	/**
@@ -542,7 +567,7 @@ class moodle24_user extends basis_db
 	 * Holt die ID einer MoodleGruppe
 	 * @param $mdl_course_id ID des Kurses
 	 *        $gruppenbezeichnung Name der Gruppe
-	 * @return GruppenID wenn ok, false im Fehlerfall
+	 * @return GruppenID wenn ok, -1 wenn nicht gefunden, false im Fehlerfall
 	 */
 	public function getGroup($mdl_course_id, $gruppenbezeichnung)
 	{
@@ -555,15 +580,15 @@ class moodle24_user extends basis_db
 				if($row['name']==$gruppenbezeichnung)
 					return $row['id'];
 			}
+
+			$this->errormsg = "Gruppe wurde nicht gefunden $gruppenbezeichnung";
+			return -1;
 		}
 		catch (SoapFault $E)
 		{
-    		$this->log.="Fehler beim Laden der Gruppe $mdl_course_id, $gruppenbezeichnung: ".$E->faultstring;
-    		return false;
+			$this->log.="Fehler beim Laden der Gruppe $mdl_course_id, $gruppenbezeichnung: ".$E->faultstring;
+			return false;
 		}
-
-		$this->errormsg = "Gruppe wurde nicht gefunden $gruppenbezeichnung";
-		return false;
 	}
 
 	/**
@@ -628,12 +653,19 @@ class moodle24_user extends basis_db
 				 Dieses wird beim Login nicht verwendet da ueber ldap authentifiziert wird.
 				 Prefix ist noetig damit es nicht zu Problemen kommt wenn
 				 im Moodle die Passwort Policy aktiviert ist
+
+				 Wenn das Passwort uebergeben wird, dann versucht Moodle das auch
+				 im LDAP zu setzen. Das fuehrt dazu dass der Account nicht mehr funktioniert.
+				 Anlegen eines Users ohne Passwortuebergabe ist jedoch nicht moeglich-
+				 Deshalb wird die Authentifizierungsmethode beim Anlegen auf manual
+				 gesetzt und nach dem anlegen auf ldap geändert
 				*/
 				$user->password = "FHCv!A2".hash('sha512', rand());
 				$user->firstname = $vorname;
 				$user->lastname = $nachname;
 				$user->email = $username.'@'.DOMAIN;
-				$user->auth = 'ldap';
+				//$user->auth = 'ldap';
+				$user->auth = 'manual';
 				$user->idnumber = $username;
 				$user->lang = 'en';
 
@@ -646,6 +678,14 @@ class moodle24_user extends basis_db
 					if(isset($response[0]))
 					{
 						$this->mdl_user_id = $response[0]['id'];
+
+						// User nach dem anlegen auf LDAP Auth umstellen
+						$user = new stdClass();
+						$user->id = $this->mdl_user_id;
+						$user->auth = 'ldap';
+						$client = new SoapClient($this->serverurl);
+						$response = $client->core_user_update_users(array($user));
+
 						return true;
 					}
 					else
@@ -685,8 +725,9 @@ class moodle24_user extends basis_db
 
 		foreach ($users as $row_user)
 		{
+			$retval = $this->loaduser($row_user);
 			//MoodleID des Users holen
-			if(!$this->loaduser($row_user))
+			if($retval!==true)
 			{
 				$this->errormsg = "Fehler beim Laden des Users $row_user: $this->errormsg";
 				return false;
@@ -765,14 +806,16 @@ class moodle24_user extends basis_db
 	{
 		//Leitung laden die zu diesem Kurs zugeteilt sind
 		$qry = "SELECT
-					distinct uid as mitarbeiter_uid
+					distinct tbl_benutzer.uid as mitarbeiter_uid
 				FROM
 					public.tbl_organisationseinheit
 					JOIN public.tbl_benutzerfunktion USING (oe_kurzbz)
 					JOIN lehre.tbl_lehrveranstaltung USING(oe_kurzbz)
 					JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
+					JOIN public.tbl_benutzer ON(tbl_benutzerfunktion.uid=tbl_benutzer.uid)
 				WHERE
-					organisationseinheittyp_kurzbz in('Institut','Fachbereich')
+					tbl_benutzer.aktiv
+					AND organisationseinheittyp_kurzbz in('Institut','Fachbereich')
 					AND funktion_kurzbz='Leitung'
 					AND (tbl_benutzerfunktion.datum_von<=now() OR tbl_benutzerfunktion.datum_von is null)
 					AND (tbl_benutzerfunktion.datum_bis>=now() OR tbl_benutzerfunktion.datum_bis is null)
@@ -812,7 +855,6 @@ class moodle24_user extends basis_db
 		{
 			while($row_ma = $this->db_fetch_object($result_ma))
 			{
-
 				$user_zugeteilt=false;
 				foreach($enrolled_users as $user)
 				{
@@ -825,9 +867,9 @@ class moodle24_user extends basis_db
 
 				if(!$user_zugeteilt)
 				{
-
+					$retval = $this->loaduser($row_ma->mitarbeiter_uid);
 					//MoodleID des Users holen bzw ggf neu anlegen
-					if(!$this->loaduser($row_ma->mitarbeiter_uid))
+					if($retval===false)
 					{
 						//User anlegen
 						if(!$this->createUser($row_ma->mitarbeiter_uid))
@@ -839,29 +881,32 @@ class moodle24_user extends basis_db
 							$this->errormsg = '';
 					}
 
-					if($mitarbeiter!='')
-						$mitarbeiter.=',';
-					$mitarbeiter.=$this->mdl_user_id;
-
-					//Mitarbeiter ist noch nicht zugeteilt.
-					$data = new stdClass();
-					$data->roleid=11; // 11=Fachbereichsleiter (selbst definierte rolle)
-					$data->userid=$this->mdl_user_id;
-					$data->courseid=$mdl_course_id;
-
-					try
+					if($retval!==-1)
 					{
+						if($mitarbeiter!='')
+							$mitarbeiter.=',';
+						$mitarbeiter.=$this->mdl_user_id;
 
-						$client = new SoapClient($this->serverurl);
-						$client->enrol_manual_enrol_users(array($data));
+						//Mitarbeiter ist noch nicht zugeteilt.
+						$data = new stdClass();
+						$data->roleid=11; // 11=Fachbereichsleiter (selbst definierte rolle)
+						$data->userid=$this->mdl_user_id;
+						$data->courseid=$mdl_course_id;
 
-						$this->log.="\nFachbereitsleiterIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
-						$this->log_public.="\nFachbereichsleiterIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
-						$this->sync_create++;
-					}
-					catch (SoapFault $E)
-					{
-						$this->log.="Fehler beim hinzufügen von FBL: ".$E->faultstring;
+						try
+						{
+
+							$client = new SoapClient($this->serverurl);
+							$client->enrol_manual_enrol_users(array($data));
+
+							$this->log.="\nFachbereitsleiterIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+							$this->log_public.="\nFachbereichsleiterIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+							$this->sync_create++;
+						}
+						catch (SoapFault $E)
+						{
+							$this->log.="Fehler beim hinzufügen von FBL: ".$E->faultstring;
+						}
 					}
 				}
 			}

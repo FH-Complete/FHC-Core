@@ -293,12 +293,15 @@ if($resultall = $db->db_query($qryall))
 $i=0;
 $qryall="SELECT DISTINCT lehre.tbl_lehreinheitmitarbeiter.mitarbeiter_uid, nachname, vorname
 	FROM lehre.tbl_lehreinheitmitarbeiter join lehre.tbl_lehreinheit USING (lehreinheit_id)
-	JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-        	JOIN campus.vw_mitarbeiter ON (tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid)
-	WHERE (lehre.tbl_lehreinheit.studiensemester_kurzbz='$lastss' OR lehre.tbl_lehreinheit.studiensemester_kurzbz='$lastws')
-        	AND NOT EXISTS (SELECT * FROM bis.tbl_bisverwendung
-       	WHERE ((beginn<'".$ende[$lastss]."') AND (ende>'".$beginn[$lastws]."') OR ende is null) AND mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid)
-        	ORDER BY nachname,vorname;";
+	JOIN 
+		lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+       	JOIN campus.vw_mitarbeiter ON (tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid)
+	WHERE 
+		(lehre.tbl_lehreinheit.studiensemester_kurzbz='$lastss' OR lehre.tbl_lehreinheit.studiensemester_kurzbz='$lastws')
+		AND tbl_lehreinheitmitarbeiter.stundensatz!=0 AND tbl_lehreinheitmitarbeiter.semesterstunden!=0
+       	AND NOT EXISTS (SELECT * FROM bis.tbl_bisverwendung
+       			WHERE ((beginn<'".$ende[$lastss]."') AND (ende>'".$beginn[$lastws]."') OR ende is null) AND mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid)
+        		ORDER BY nachname,vorname;";
 
 if($resultall = $db->db_query($qryall))
 {

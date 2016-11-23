@@ -687,6 +687,16 @@ if($show_inout_block)
 		<VERBAND:orgform></VERBAND:orgform>
 		<VERBAND:typ>outgoing</VERBAND:typ>
 	</RDF:Description>
+	<RDF:Description RDF:about="'.$rdf_url.'inout/gemeinsamestudien">
+		<VERBAND:name>Gemeinsame Studien</VERBAND:name>
+		<VERBAND:stg></VERBAND:stg>
+		<VERBAND:stg_kz></VERBAND:stg_kz>
+		<VERBAND:sem></VERBAND:sem>
+		<VERBAND:ver></VERBAND:ver>
+		<VERBAND:grp></VERBAND:grp>
+		<VERBAND:orgform></VERBAND:orgform>
+		<VERBAND:typ>gemeinsamestudien</VERBAND:typ>
+	</RDF:Description>
 	';
 }
 
@@ -817,6 +827,7 @@ draw_orgformpart($stg_kz);
 			<RDF:Seq RDF:about="http://www.technikum-wien.at/lehrverbandsgruppe/inout">
 				<RDF:li RDF:resource="http://www.technikum-wien.at/lehrverbandsgruppe/inout/incoming"/>
 				<RDF:li RDF:resource="http://www.technikum-wien.at/lehrverbandsgruppe/inout/outgoing"/>
+				<RDF:li RDF:resource="http://www.technikum-wien.at/lehrverbandsgruppe/inout/gemeinsamestudien"/>
 			</RDF:Seq>
 		</RDF:li>';
 	}

@@ -38,6 +38,8 @@ class ampel extends basis_db
 	public $vorlaufzeit;	// smallint
 	public $verfallszeit;	// smallint
 	public $email;			// boolean
+	public $verpflichtend;	// boolean
+	public $buttontext;		// varchar(64)[]
 	public $insertamum;		// timestamp
 	public $insertvon;		// varchar(32)
 	public $updateamum;		// timestamp
@@ -74,8 +76,9 @@ class ampel extends basis_db
 		
 		$sprache = new sprache();
 		$beschreibung = $sprache->getSprachQuery('beschreibung');
+		$buttontext = $sprache->getSprachQuery('buttontext');
 		
-		$qry = "SELECT *,".$beschreibung." FROM public.tbl_ampel WHERE ampel_id=".$this->db_add_param($ampel_id, FHC_INTEGER);
+		$qry = "SELECT *,".$beschreibung.", ".$buttontext." FROM public.tbl_ampel WHERE ampel_id=".$this->db_add_param($ampel_id, FHC_INTEGER);
 
 		if($result = $this->db_query($qry))
 		{
@@ -89,6 +92,8 @@ class ampel extends basis_db
 				$this->vorlaufzeit = $row->vorlaufzeit;
 				$this->verfallszeit = $row->verfallszeit;
 				$this->email = $row->email;
+				$this->verpflichtend = $row->verpflichtend;
+				$this->buttontext = $sprache->parseSprachResult('buttontext', $row);
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
@@ -117,8 +122,9 @@ class ampel extends basis_db
 	{
 		$sprache = new sprache();
 		$beschreibung = $sprache->getSprachQuery('beschreibung');
+		$buttontext = $sprache->getSprachQuery('buttontext');
 		
-		$qry = "SELECT *,".$beschreibung." FROM public.tbl_ampel";
+		$qry = "SELECT *,".$beschreibung.", ".$buttontext." FROM public.tbl_ampel";
 		if($aktiv)
 		{
 			$qry .= " WHERE (NOW()>(deadline-(vorlaufzeit || ' days')::interval)::date)";
@@ -140,6 +146,8 @@ class ampel extends basis_db
 				$obj->vorlaufzeit = $row->vorlaufzeit;
 				$obj->verfallszeit = $row->verfallszeit;
 				$obj->email = $this->db_parse_bool($row->email);
+				$obj->verpflichtend = $this->db_parse_bool($row->verpflichtend);
+				$obj->buttontext = $sprache->parseSprachResult('buttontext', $row);
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 					
@@ -212,20 +220,21 @@ class ampel extends basis_db
 	
 	/**
 	 * Laedt alle aktuellen Ampeln eines Users
-	 * @param $user
-	 * @param $zukuenftige_anzeigen
+	 * @param string $user User, dessen Ampeln geladen werden sollen
+	 * @param boolean $zukuenftige_anzeigen Default false
 	 * 				wenn true, werden alle zukuenftigen Ampeln geladen 
 	 * 				wenn false, werden nur die Ampeln geladen die innerhalb der vorlaufzeit liegen
-	 * @param $bestaetigt
+	 * @param boolean $bestaetigt Default false
 	 * 				wenn true, werden alle Ampeln geladen 
-	 * 				wenn false, werden nur die Ampeln geladen die noch nicht bestaetigt wurden
+	 * 				wenn false, werden nur die Ampeln geladen die noch NICHT bestaetigt wurden
 	 */
 	public function loadUserAmpel($user, $zukuenftige_anzeigen=false, $bestaetigt=false)
 	{
 		$sprache = new sprache();
 		$beschreibung = $sprache->getSprachQuery('beschreibung');
+		$buttontext = $sprache->getSprachQuery('buttontext');
 		
-		$qry = "SELECT *,".$beschreibung." FROM public.tbl_ampel WHERE deadline+verfallszeit>now()";
+		$qry = "SELECT *,".$beschreibung.", ".$buttontext." FROM public.tbl_ampel WHERE deadline+verfallszeit>now()";
 		
 		if(!$zukuenftige_anzeigen)
 			$qry.=" AND deadline-vorlaufzeit<now()";
@@ -237,7 +246,7 @@ class ampel extends basis_db
 						 FROM public.tbl_ampel_benutzer_bestaetigt 
 						 WHERE uid=".$this->db_add_param($user)." AND ampel_id=tbl_ampel.ampel_id)";
 		}
-			
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -254,6 +263,8 @@ class ampel extends basis_db
 					$obj->vorlaufzeit = $row->vorlaufzeit;
 					$obj->verfallszeit = $row->verfallszeit;
 					$obj->email = $row->email;
+					$obj->verpflichtend = $row->verpflichtend;
+					$obj->buttontext = $sprache->parseSprachResult('buttontext', $row);
 					$obj->insertamum = $row->insertamum;
 					$obj->insertvon = $row->insertvon;
 					
@@ -315,12 +326,20 @@ class ampel extends basis_db
 				$idx = sprache::$index_arr[$key];
 				$qry.=" beschreibung[$idx],";
 			}
+			foreach($this->buttontext as $key=>$value)
+			{
+				$idx = sprache::$index_arr[$key];
+				$qry.=" buttontext[$idx],";
+			}
 			
 			$qry.=" benutzer_select, deadline, 
-					vorlaufzeit, verfallszeit, email, insertamum, insertvon , updateamum, updatevon) VALUES(".
+					vorlaufzeit, verfallszeit, email, verpflichtend, insertamum, insertvon , updateamum, updatevon) VALUES(".
 					$this->db_add_param($this->kurzbz).',';
 			reset($this->beschreibung);
 			foreach($this->beschreibung as $key=>$value)
+				$qry.=$this->db_add_param($value).',';
+			reset($this->buttontext);
+			foreach($this->buttontext as $key=>$value)
 				$qry.=$this->db_add_param($value).',';
 								
 			$qry .= $this->db_add_param($this->benutzer_select).','.
@@ -328,6 +347,7 @@ class ampel extends basis_db
 					$this->db_add_param($this->vorlaufzeit).','.
 					$this->db_add_param($this->verfallszeit).','.
 					$this->db_add_param($this->email, FHC_BOOLEAN).','.
+					$this->db_add_param($this->verpflichtend, FHC_BOOLEAN).','.
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->updateamum).','.
@@ -343,12 +363,19 @@ class ampel extends basis_db
 				$idx = sprache::$index_arr[$key];
 				$qry.=' beschreibung['.$idx.'] = '.$this->db_add_param($value).',';
 			}
+			reset($this->buttontext);
+			foreach($this->buttontext as $key=>$value)
+			{
+				$idx = sprache::$index_arr[$key];
+				$qry.=' buttontext['.$idx.'] = '.$this->db_add_param($value).',';
+			}
 			
 			$qry.=  ' benutzer_select = '.$this->db_add_param($this->benutzer_select).','.
 					' deadline = '.$this->db_add_param($this->deadline).','.
 					' vorlaufzeit = '.$this->db_add_param($this->vorlaufzeit).','.
 					' verfallszeit = '.$this->db_add_param($this->verfallszeit).','.
 					' email = '.$this->db_add_param($this->email, FHC_BOOLEAN).','.
+					' verpflichtend = '.$this->db_add_param($this->verpflichtend, FHC_BOOLEAN).','.
 					' updateamum ='.$this->db_add_param($this->updateamum).','.
 					' updatevon ='.$this->db_add_param($this->updatevon).
 					' WHERE ampel_id='.$this->db_add_param($this->ampel_id, FHC_INTEGER).';';					
@@ -415,6 +442,29 @@ class ampel extends basis_db
 	}
 	
 	/**
+	 * Loescht eine Bestaetigung einer Ampel
+	
+	 * @param $ampel_id
+	 */
+	public function deleteAmpelBenutzer($ampel_benutzer_bestaetigt_id)
+	{
+		if(!is_numeric($ampel_benutzer_bestaetigt_id))
+		{
+			$this->errormsg='ID ist ungueltig';
+			return false;
+		}
+		$qry = "DELETE FROM public.tbl_ampel_benutzer_bestaetigt WHERE ampel_benutzer_bestaetigt_id=".$this->db_add_param($ampel_benutzer_bestaetigt_id);
+	
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			$this->errormsg = 'Fehler beim Loeschen der Bestaetigung';
+			return false;
+		}
+	}
+	
+	/**
 	 * Bestaetigt die Ampel eines Users
 	 * @param $user
 	 * @param $ampel_id
@@ -446,6 +496,7 @@ class ampel extends basis_db
 	{
 		$sprache = new sprache();
 		$beschreibung = $sprache->getSprachQuery('beschreibung');
+		$buttontext = $sprache->getSprachQuery('buttontext');
 		
 		if(!is_numeric($ampel_id) && $ampel_id!='')
 		{
@@ -454,7 +505,7 @@ class ampel extends basis_db
 		}
 		
 		// Ampeln holen
-		$qry = "SELECT *,".$beschreibung." FROM public.tbl_ampel";
+		$qry = "SELECT *,".$beschreibung.", ".$buttontext." FROM public.tbl_ampel";
 		if($ampel_id!='')
 			$qry.=" WHERE ampel_id=".$this->db_add_param($ampel_id, FHC_INTEGER);
 			
@@ -500,6 +551,8 @@ class ampel extends basis_db
 						$obj->vorlaufzeit = $row->vorlaufzeit;
 						$obj->verfallszeit = $row->verfallszeit;
 						$obj->email = $row->email;
+						$obj->verpflichtend = $row->verpflichtend;
+						$obj->buttontext = $sprache->parseSprachResult('buttontext', $row);
 						$obj->insertamum = $row->insertamum;
 						$obj->insertvon = $row->insertvon;
 						

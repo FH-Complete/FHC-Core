@@ -24,10 +24,12 @@
  * zeigt diese an.
  */
 require_once('../config/cis.config.inc.php');
+require_once('../config/global.config.inc.php');
 require_once('../include/content.class.php');
 require_once('../include/template.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/phrasen.class.php');
+require_once('../include/webservicelog.class.php');
 
 if(isset($_GET['content_id']))
 	$content_id = $_GET['content_id'];
@@ -64,6 +66,27 @@ if($content->islocked($content_id))
 if(!$content->getContent($content_id, $sprache, $version, $sichtbar, true))
 	die($content->errormsg);
 
+// Legt einen Logeintrag für die Klickstatistik an
+if (defined('LOG_CONTENT') && LOG_CONTENT==true)
+{
+	// Nur eingeloggte User werden geloggt, das sonst auch alle Infoscreenaufrufe und dgl. mitgeloggt werden
+	if (is_user_logged_in())
+	{
+		$uid = get_uid();
+
+		$requestdata = $_SERVER['QUERY_STRING'].'&sprache='.$sprache;
+		$log = new webservicelog();
+		
+		$log->webservicetyp_kurzbz = 'content';
+		$log->request_id = $content_id;
+		$log->beschreibung = 'content';
+		$log->request_data = $requestdata;
+		$log->execute_user = $uid;
+		
+		$log->save(true);
+	}
+}
+	
 $XML = new DOMDocument();
 $XML->loadXML($content->content);
 

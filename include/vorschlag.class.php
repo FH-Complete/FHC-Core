@@ -76,7 +76,7 @@ class vorschlag extends basis_db
 				$this->frage_id = $row->frage_id;
 				$this->punkte = $row->punkte;
 				$this->nummer = $row->nummer;
-				$this->aktiv = $row->aktiv;
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
 				$this->loadVorschlagSprache($vorschlag_id, $sprache);
 				return true;
 			}
@@ -279,10 +279,9 @@ class vorschlag extends basis_db
 	/**
 	 * Laedt die Vorschlaege zu einer Frage
 	 * 
-	 * @param $frage_id
-	 * @param $sprache
-	 * @param $random  Wenn true, dann werden die Vorschlaege in zufaelliger 
-	 *                  Reihenfolge geladen, sonst nach nummer sortiert
+	 * @param integer $frage_id
+	 * @param string $sprache
+	 * @param boolean $random Wenn true, dann werden die Vorschlaege in zufaelliger Reihenfolge geladen, sonst nach nummer sortiert
 	 */
 	public function getVorschlag($frage_id, $sprache, $random)
 	{
@@ -291,7 +290,6 @@ class vorschlag extends basis_db
 			$qry.=" ORDER BY random()";
 		else 
 			$qry.=" ORDER BY nummer";
-
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))

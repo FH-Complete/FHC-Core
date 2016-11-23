@@ -179,6 +179,7 @@ function draw_content_liste($row)
 			<STUDENT:status_bestaetigung><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'d.m.Y'):'-').']]></STUDENT:status_bestaetigung>
 			<STUDENT:status_datum_iso><![CDATA['.$datum_obj->formatDatum($prestudent->datum,'Y-m-d').']]></STUDENT:status_datum_iso>
 			<STUDENT:status_bestaetigung_iso><![CDATA['.($prestudent->bestaetigtam!=''?$datum_obj->formatDatum($prestudent->bestaetigtam,'Y-m-d'):'-').']]></STUDENT:status_bestaetigung_iso>
+
 			<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
 			<STUDENT:anmerkungpre>'.($row->anmerkung==''?'&#xA0;':'<![CDATA['.$row->anmerkung.']]>').'</STUDENT:anmerkungpre>
 			<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
@@ -197,6 +198,7 @@ function draw_content_liste($row)
 			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual=='t'?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
 			<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
 			<STUDENT:mentor><![CDATA['.$row->mentor.']]></STUDENT:mentor>
+			<STUDENT:gsstudientyp_kurzbz><![CDATA['.($row->gsstudientyp_kurzbz).']]></STUDENT:gsstudientyp_kurzbz>
 			<STUDENT:aktiv><![CDATA['.((isset($row->bnaktiv) && $row->bnaktiv=='t')?'true':'false').']]></STUDENT:aktiv>
 		</RDF:Description>
 	</RDF:li>';
@@ -349,8 +351,9 @@ function draw_prestudent($row)
 			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
 			<STUDENT:anmerkungpre><![CDATA['.$row->anmerkung.']]></STUDENT:anmerkungpre>
 			<STUDENT:mentor><![CDATA['.$row->mentor.']]></STUDENT:mentor>
-		</RDF:Description>
-	</RDF:li>';
+			<STUDENT:gsstudientyp_kurzbz><![CDATA['.$row->gsstudientyp_kurzbz.']]></STUDENT:gsstudientyp_kurzbz>
+      	</RDF:Description>
+      </RDF:li>';
 	}
 }
 
@@ -470,7 +473,7 @@ if($xmlformat=='rdf')
 						(SELECT rt_punkte1 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte1,
 						(SELECT rt_punkte2 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte2,
 						(SELECT rt_punkte3 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte3,
-						 tbl_prestudent.dual as dual, tbl_prestudent.reihungstest_id, tbl_prestudent.anmeldungreihungstest, p.matr_nr
+						 tbl_prestudent.dual as dual, tbl_prestudent.reihungstest_id, tbl_prestudent.anmeldungreihungstest, p.matr_nr, tbl_prestudent.gsstudientyp_kurzbz
 						FROM public.tbl_student
 							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id)  JOIN public.tbl_prestudent USING(prestudent_id) ";
 		if($gruppe_kurzbz!=null)
@@ -514,6 +517,44 @@ if($xmlformat=='rdf')
 						AND NOT EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Incoming' AND prestudent_id=tbl_student.prestudent_id)
 					";
 		}
+		if($db->db_query($qry))
+		{
+			while($row = $db->db_fetch_object())
+			{
+				$student=new student();
+				if($uid = $student->getUid($row->prestudent_id))
+				{
+					//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
+					//nochmal laden aber ohne studiensemester
+					if(!$student->load($uid, $studiensemester_kurzbz))
+						$student->load($uid);
+				}
+				$prestd = new prestudent();
+				$prestd->load($row->prestudent_id);
+				if($uid!='')
+				{
+					draw_content($student);
+					draw_prestudent($prestd);
+				}
+				else
+				{
+					draw_content($prestd);
+					draw_prestudent($prestd);
+				}
+			}
+		}
+	}
+	elseif($typ=='gemeinsamestudien')
+	{
+		if($studiensemester_kurzbz=='')
+			$studiensemester_kurzbz=$semester_aktuell;
+
+		$qry = "SELECT prestudent_id
+					FROM
+						bis.tbl_mobilitaet
+					WHERE
+						studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
+
 		if($db->db_query($qry))
 		{
 			while($row = $db->db_fetch_object())
@@ -768,7 +809,7 @@ else
 				}
 			}
 
-			if($studienplan_id!='')
+			if(isset($studienplan_id) && $studienplan_id!='')
 			{
 				$stpl = new studienplan();
 				$stpl->loadStudienplan($studienplan_id);

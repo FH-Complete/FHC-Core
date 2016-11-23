@@ -31,3 +31,4 @@ $this->phrasen['lvaliste/gesamtnote']='Noten eintragen';
 $this->phrasen['lvaliste/anzahl']='Anzahl';
 $this->phrasen['lvaliste/summe']='Summe';
 $this->phrasen['lvaliste/lvinfo']='LV-Info';
+$this->phrasen['lvaliste/id']='ID';

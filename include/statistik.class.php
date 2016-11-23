@@ -108,7 +108,7 @@ class statistik extends basis_db
 			}
 			else
 			{
-				$this->errormsg = 'Dieser Eintrag wurde nicht gefunden';
+				$this->errormsg = 'Dieser Eintrag wurde nicht gefunden: ' . $statistik_kurzbz;
 				return false;
 			}
 		}

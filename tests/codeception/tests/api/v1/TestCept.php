@@ -1,12 +1,11 @@
 <?php
 
 $I = new ApiTester($scenario);
-$I->wantTo("Test API call v1/Test/test");
+$I->wantTo("Test API call v1/Test/: Test");
 $I->amHttpAuthenticated("admin", "1q2w3");
 $I->haveHttpHeader("FHC-API-KEY", "testapikey@fhcomplete.org");
-
-$I->sendGET("v1/Test/test");
+$I->sendGET("v1/Test/Test", array());
 $I->seeResponseCodeIs(200);
 $I->seeResponseIsJson();
-$I->seeResponseContainsJson(["success" => true]);
+$I->seeResponseContainsJson(["error" => 0]);
 $I->wait();

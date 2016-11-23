@@ -485,6 +485,19 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								</template>
 							</menulist>
 
+							<label value="Studientyp" control="student-detail-menulist-gsstudientyp"/>
+							<menulist id="student-detail-menulist-gsstudientyp" disabled="true"
+									datasources="<?php echo APP_ROOT ?>rdf/gsstudientyp.rdf.php" flex="1"
+									ref="http://www.technikum-wien.at/gsstudientyp" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/gsstudientyp/rdf#gsstudientyp_kurzbz"
+												label="rdf:http://www.technikum-wien.at/gsstudientyp/rdf#bezeichnung"
+												uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+
 							<label value="Facheinschlaegig berufstaetig" control="student-prestudent-checkbox-facheinschlberuf" hidden="true"/>
 							<checkbox id="student-prestudent-checkbox-facheinschlberuf" checked="true" disabled="true" hidden="true"/>
 

@@ -917,11 +917,12 @@ function StudentAuswahl()
 			StudentKontoDisableFields(false);
 			StudentAkteDisableFields(false);
 			StudentIODisableFields(false);
+			StudentMobilitaetDisableFields(false);
 			StudentNoteDisableFields(false);
 			document.getElementById('student-detail-button-save').disabled=false;
 			StudentPruefungDisableFileds(false);
 			if(document.getElementById('student-tab-anrechnungen'))
-                StudentAnrechnungenDisableFields(false);
+				StudentAnrechnungenDisableFields(false);
 		}
 		else
 		{
@@ -942,9 +943,9 @@ function StudentAuswahl()
 	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?prestudent_id='+prestudent_id+'&studiensemester_kurzbz='+stsem+'&'+gettimestamp();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
-                   getService(Components.interfaces.nsIRDFService);
+			getService(Components.interfaces.nsIRDFService);
 
-    var dsource = rdfService.GetDataSourceBlocking(url);
+	var dsource = rdfService.GetDataSourceBlocking(url);
 
 	var subject = rdfService.GetResource("http://www.technikum-wien.at/student/" + prestudent_id);
 
@@ -1048,6 +1049,7 @@ function StudentAuswahl()
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkungpre" ));
 	mentor = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mentor" ));
 	dual = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dual" ));
+	gsstudientyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gsstudientyp_kurzbz" ));
 
 	document.getElementById('student-prestudent-menulist-aufmerksamdurch').value=aufmerksamdurch_kurzbz;
 	document.getElementById('student-prestudent-menulist-berufstaetigkeit').value=berufstaetigkeit_code;
@@ -1083,6 +1085,7 @@ function StudentAuswahl()
 
 	document.getElementById('student-prestudent-textbox-anmerkung').value=anmerkung;
 	document.getElementById('student-prestudent-textbox-mentor').value=mentor;
+	document.getElementById('student-detail-menulist-gsstudientyp').value=gsstudientyp_kurzbz;
 
 	document.getElementById('student-detail-groupbox-caption').label='Zugangsvoraussetzung für '+nachname+' '+vorname;
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
@@ -1330,6 +1333,12 @@ function StudentAuswahl()
 
 	if(uid!='')
 	{
+		// *** Gemeinsame Studien / Mobilitaet ***
+		StudentMobilitaetLoad(prestudent_id);
+	}
+
+	if(uid!='')
+	{
 		// *** ZeugnisNoten ***
 		notentree = document.getElementById('student-noten-tree');
 
@@ -1566,6 +1575,7 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-button-save').disabled=val;
 	document.getElementById('student-prestudent-textbox-anmerkung').disabled=val;
 	document.getElementById('student-prestudent-textbox-mentor').disabled=val;
+	document.getElementById('student-detail-menulist-gsstudientyp').disabled=val;
 
 	//Status Tree leeren
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
@@ -1613,6 +1623,7 @@ function StudentPrestudentSave()
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	anmerkung = document.getElementById('student-prestudent-textbox-anmerkung').value;
 	mentor = document.getElementById('student-prestudent-textbox-mentor').value;
+	gsstudientyp = document.getElementById('student-detail-menulist-gsstudientyp').value;
 
 	if(zgvdatum!='' && !CheckDatum(zgvdatum))
 	{
@@ -1656,6 +1667,7 @@ function StudentPrestudentSave()
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('anmerkung', anmerkung);
 	req.add('mentor', mentor);
+	req.add('gsstudientyp_kurzbz', gsstudientyp);
 
 	var response = req.executePOST();
 
@@ -2229,6 +2241,7 @@ function StudentKontoAuswahl()
 	buchungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchungstyp_kurzbz" ));
 	credit_points = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#credit_points" ));
 	zahlungsreferenz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zahlungsreferenz" ));
+	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 
 	document.getElementById('student-konto-textbox-betrag').value=betrag;
 	document.getElementById('student-konto-textbox-buchungsdatum').value=buchungsdatum;
@@ -2240,6 +2253,7 @@ function StudentKontoAuswahl()
 	document.getElementById('student-konto-menulist-studiengang_kz').value=studiengang_kz;
 	document.getElementById('student-konto-textbox-credit_points').value=credit_points;
 	document.getElementById('student-konto-textbox-zahlungsreferenz').value=zahlungsreferenz;
+	document.getElementById('student-konto-textbox-anmerkung').value=anmerkung;
 }
 
 // ****
@@ -2455,6 +2469,7 @@ function StudentKontoDetailDisableFields(val)
 	document.getElementById('student-konto-menulist-buchungstyp').disabled=val;
 	document.getElementById('student-konto-menulist-studiensemester').disabled=val;
 	document.getElementById('student-konto-menulist-studiengang_kz').disabled=val;
+	document.getElementById('student-konto-textbox-anmerkung').disabled=val;
 	document.getElementById('student-konto-button-speichern').disabled=val;
 }
 
@@ -2474,6 +2489,7 @@ function StudentKontoDetailSpeichern()
 	studiensemester_kurzbz = document.getElementById('student-konto-menulist-studiensemester').value;
 	studiengang_kz = document.getElementById('student-konto-menulist-studiengang_kz').value;
 	credit_points = document.getElementById('student-konto-textbox-credit_points').value;
+	anmerkung = document.getElementById('student-konto-textbox-anmerkung').value;
 
 	if(buchungsdatum!='' && !CheckDatum(buchungsdatum))
 	{
@@ -2494,6 +2510,7 @@ function StudentKontoDetailSpeichern()
 	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('credit_points', credit_points);
+	req.add('anmerkung', anmerkung);
 
 	var response = req.executePOST();
 
@@ -2644,6 +2661,7 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 	buchungstyp_kurzbz = dialog.getElementById('student-konto-neu-menulist-buchungstyp').value;
 	studiensemester_kurzbz = dialog.getElementById('student-konto-neu-menulist-studiensemester').value;
 	credit_points = dialog.getElementById('student-konto-neu-textbox-credit_points').value;
+	anmerkung = dialog.getElementById('student-konto-neu-textbox-anmerkung').value;
 
 	if(buchungsdatum!='' && !CheckDatum(buchungsdatum))
 	{
@@ -2662,6 +2680,7 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);
 	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 	req.add('credit_points', credit_points);
+	req.add('anmerkung', anmerkung);
 
 	var response = req.executePOST();
 

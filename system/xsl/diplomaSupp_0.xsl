@@ -1190,6 +1190,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <style:text-properties fo:font-size="9pt" fo:language="en" fo:country="US" style:font-size-asian="9pt" style:font-size-complex="9pt" fo:font-style="italic" style:font-style-asian="italic" style:font-style-complex="italic"/>
 	  <style:paragraph-properties fo:text-align="end"/>
     </style:style>
+    <style:style style:name="Warning" style:family="paragraph" style:parent-style-name="Standard">
+		<style:paragraph-properties fo:line-height="122%" fo:text-align="center" style:justify-single-word="false"/>
+		<style:text-properties style:font-name="Arial" fo:color="#ff3333" fo:font-weight="bold" fo:font-size="16pt" style:font-size-asian="16pt" style:font-size-complex="16pt"/>
+	</style:style>
     <style:style style:name="T1" style:family="text">
       <style:text-properties fo:language="en" fo:country="US"/>
     </style:style>
@@ -1291,32 +1295,14 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <text:span text:style-name="T10"><xsl:value-of select="studiengang_bezeichnung_englisch"/></text:span>
         </text:span>
       </text:p>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
-      <text:p text:style-name="P8"/>
+      <!-- Ueberprueft ob benoetigte Datenfelder leer sind -->
+		<xsl:if test="titel_de = '' or titel_en = ''"><text:p text:style-name="Warning">Verliehener Titel ist nicht gesetzt</text:p></xsl:if>
+		<xsl:if test="semester = '' or jahre = ''"><text:p text:style-name="Warning">Regelstudiendauer wurde nicht gefunden</text:p></xsl:if>
+		<xsl:if test="ects = ''"><text:p text:style-name="Warning">ECTS wurden nicht gefunden</text:p></xsl:if>
+		<xsl:if test="sponsion_datum = ''"><text:p text:style-name="Warning">Kein Sponsionsdatum gesetzt</text:p></xsl:if>
+		<xsl:if test="stgl = ''"><text:p text:style-name="Warning">Keine Studiengangsleitung eingetragen</text:p></xsl:if>
+		<xsl:if test="abschlusspruefungsdatum = ''"><text:p text:style-name="Warning">Datum der Abschlussprüfung ist nicht gesetzt</text:p></xsl:if>
+		<xsl:if test="abschlussbeurteilung = ''"><text:p text:style-name="Warning">Abschlussbeurteilung ist nicht gesetzt</text:p></xsl:if>
       <text:p text:style-name="P8"/>
       <text:p text:style-name="P8"/>
       <text:p text:style-name="P8"/>

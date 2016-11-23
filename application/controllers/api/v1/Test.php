@@ -25,7 +25,8 @@ class Test extends APIv1_Controller
     {
 		$payload = [
 			'success' => TRUE,
-			'message' => 'API HTTP GET call test succeed'
+			'message' => 'API HTTP GET call test succeed',
+			'error' => 0
 		];
 		$httpstatus = REST_Controller::HTTP_OK;
 		$this->response($payload, $httpstatus);
@@ -42,7 +43,8 @@ class Test extends APIv1_Controller
     {
 		$payload = [
 			'success' => TRUE,
-			'message' => 'API HTTP POST call test succeed'
+			'message' => 'API HTTP POST call test succeed',
+			'error' => 0
 		];
 		$httpstatus = REST_Controller::HTTP_OK;
 		$this->response($payload, $httpstatus);

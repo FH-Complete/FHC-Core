@@ -40,7 +40,7 @@ $lektoren=array();
 
 //ini_set('soap.wsdl_cache_enabled',0);
 //ini_set('soap.wsdl_cache_ttl',0);
-
+set_time_limit(1000);
 echo "-- Start ".date('Y-m-d H:i:s')."--";
 
 //nur Synchronisieren wenn ein aktuelles Studiensemester existiert damit keine
@@ -152,7 +152,7 @@ if($stsem_kurzbz=$stsem->getakt())
 			//Mail an die Lektoren
 			foreach ($lektoren as $uid=>$message_lkt)
 			{
-				if($message_lkt!='')
+				if($message_lkt!='' && $uid!='_DummyLektor')
 				{
 					$header = "Dies ist eine automatische Mail!\n";
 					$header.= "Es wurden folgende Aktualisierungen an Ihren Moodle-Kursen durchgeführt:\n\n";

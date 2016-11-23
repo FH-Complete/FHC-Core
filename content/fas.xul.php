@@ -923,11 +923,11 @@ foreach($addon_obj->result as $addon)
 				echo '<tab id="tab-verband" label="Verband" onclick="ChangeTabVerband();"/>';
 				//echo '<tab id="tab-fachbereich" label="Institut" onclick="ChangeTabsToLehrveranstaltung()"/>';
 				echo '<tab id="tab-organisationseinheit" label="Org.einheit" tooltiptext="Organisationseinheit" onclick="ChangeTabsToLehrveranstaltung()"/>';
-				echo '<tab id="tab-lektor" label="Lektor" onclick="ChangeTabsToLehrveranstaltung()"/>';
+				echo '<tab id="tab-lektor" label="Lehrende" onclick="ChangeTabsToLehrveranstaltung()"/>';
 			}
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter'))
 			{
-				echo '<tab id="tab-menu-mitarbeiter" label="Mitarbeiter" onclick="document.getElementById(\'main-content-tabs\').selectedItem=document.getElementById(\'tab-mitarbeiter\');"/>';
+				echo '<tab id="tab-menu-mitarbeiter" label="Mitarbeitende" onclick="document.getElementById(\'main-content-tabs\').selectedItem=document.getElementById(\'tab-mitarbeiter\');"/>';
 			}
 		?>
 		</tabs>

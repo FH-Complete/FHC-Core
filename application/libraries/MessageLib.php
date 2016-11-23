@@ -837,7 +837,6 @@ class MessageLib
 		{
 			$this->ci->db->trans_rollback();
 			$result = $this->_error($result->msg, EXIT_ERROR);
-			break;
 		}
 		else
 		{
