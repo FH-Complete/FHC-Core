@@ -4,7 +4,7 @@ modules:
         - Db
         - REST:
             # API URL
-            url: http://demo.fhcomplete.org/index.ci.php/api/
+            url: 'http://admin:1q2w3@demo.fhcomplete.org/index.ci.php/api/'
             # Can also be a framework module name
             depends: PhpBrowser
             # Limits PhpBrowser to JSON or XML
