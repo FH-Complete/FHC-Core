@@ -1152,10 +1152,58 @@ function casDeletePerson($db, $person_id, $trans=true)
 	if(!$error)
 	{
 		$qry = '
+			DELETE FROM public.tbl_msg_recipient
+				WHERE message_id IN (SELECT message_id FROM tbl_msg_message WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER) . ')';
+		if(!$db->db_query($qry))
+			$error = true;
+	}
+
+	if(!$error)
+	{
+		$qry = '
+			DELETE FROM public.tbl_msg_status
+				WHERE message_id IN (SELECT message_id FROM tbl_msg_message WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER) . ')';
+		if(!$db->db_query($qry))
+			$error = true;
+	}
+
+	if(!$error)
+	{
+		$qry = '
+			DELETE FROM public.tbl_msg_message
+				WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER);
+		if(!$db->db_query($qry))
+			$error = true;
+	}
+
+	if(!$error)
+	{
+		$qry = '
 			DELETE FROM public.tbl_akte
 				WHERE uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).')';
 		if(!$db->db_query($qry))
 			$error = true;
+	}
+
+	if(!$error)
+	{
+		$tqry = "SELECT 1
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE table_type='BASE TABLE'
+				AND table_schema='addon'
+				AND table_name='tbl_lvinfostatus_zuordnung';";
+
+		if(!$result = $db->db_query($tqry))
+			$error = true;
+
+		if($db->db_num_rows($result))
+		{
+			$qry = '
+				DELETE FROM addon.tbl_lvinfostatus_zuordnung
+					WHERE uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id='.$db->db_add_param($person_id, FHC_INTEGER).')';
+			if(!$db->db_query($qry))
+				$error = true;
+		}
 	}
 
 	if(!$error)
