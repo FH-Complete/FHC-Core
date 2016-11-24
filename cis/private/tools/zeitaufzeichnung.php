@@ -86,7 +86,8 @@ $activities_str = "'".implode("','", $activities)."'";
 $gesperrt_bis = '2015-08-31';
 $sperrdatum = date('c', strtotime($gesperrt_bis));
 
-$zeitaufzeichnung_id = (isset($_GET['zeitaufzeichnung_id'])?$_GET['zeitaufzeichnung_id']:'');
+// Uses urlencode to avoid XSS issues
+$zeitaufzeichnung_id = urlencode(isset($_GET['zeitaufzeichnung_id'])?$_GET['zeitaufzeichnung_id']:'');
 $projekt_kurzbz = (isset($_POST['projekt'])?$_POST['projekt']:'');
 $oe_kurzbz_1 = (isset($_POST['oe_kurzbz_1'])?$_POST['oe_kurzbz_1']:'');
 $oe_kurzbz_2 = (isset($_POST['oe_kurzbz_2'])?$_POST['oe_kurzbz_2']:'');
