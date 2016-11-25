@@ -141,6 +141,8 @@ class Studiengang_model extends DB_Model
 	{
 		// Join table public.tbl_studiengang with table lehre.tbl_studienordnung on column studiengang_kz
 		$this->addJoin('lehre.tbl_studienordnung', 'studiengang_kz');
+		// Join table lehre.tbl_studienordnung with table lehre.tbl_akadgrad on column akadgrad_id
+		$this->addJoin('lehre.tbl_akadgrad', 'akadgrad_id', 'LEFT');
 		// Then join with table lehre.tbl_studienplan on column studienordnung_id
 		$this->addJoin('lehre.tbl_studienplan', 'studienordnung_id');
 		// Then join with table lehre.tbl_studienplan_semester on column studienplan_id
@@ -158,7 +160,8 @@ class Studiengang_model extends DB_Model
 		$result = $this->loadTree(
 			'tbl_studiengang',
 			array(
-				'tbl_studienplan'
+				'tbl_studienplan',
+				'tbl_akadgrad'
 			),
 			'public.tbl_studiengang.aktiv = TRUE
 			AND public.tbl_studiengang.onlinebewerbung = TRUE
@@ -168,7 +171,8 @@ class Studiengang_model extends DB_Model
 			AND lehre.tbl_studienplan.aktiv = TRUE'
 			,
 			array(
-				'studienplaene'
+				'studienplaene',
+				'akadgrad'
 			)
 		);
 		
