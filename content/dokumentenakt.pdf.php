@@ -137,6 +137,7 @@ foreach($prestudent_ids as $pid)
 		$result = $db->db_query($query);
 		while($row = $db->db_fetch_object($result))
 		{
+			$docErrors = array();
 			$convertSuccess = true;
 			$filename = "";
 			if($row->inhalt != null)
@@ -152,24 +153,24 @@ foreach($prestudent_ids as $pid)
 
 				if ($dms->mimetype != $row->mimetype)
 				{
-					$preErrors[] = "Mimetype von Akte und DMS der DMS-ID ".$row->dms_id." stimmen nicht ueberein. Bitte kontaktieren Sie einen Administrator";
+					$docErrors[] = "Mimetype von Akte und DMS der DMS-ID ".$row->dms_id." stimmen nicht ueberein. Bitte kontaktieren Sie einen Administrator";
 				}
-					
+
 				$filename = DMS_PATH . $dms->filename;
 
 				if(!file_exists($filename))
 				{
-					$preErrors[] = "'" . $filename . "': Datei nicht gefunden";
+					$docErrors[] = "'" . $filename . "': Datei nicht gefunden";
 				}
 			}
 
 			// this should never happen
 			if($filename == "")
 			{
-				$preErrors[] = "'" . $row->akte_id . "': Diese Akte hat keinen Inhalt und keine dms_id";
+				$docErrors[] = "'" . $row->akte_id . "': Diese Akte hat keinen Inhalt und keine dms_id";
 			}
 
-			if(empty($preErrors))
+			if(empty($docErrors))
 			{
 				/*
 				 * Determine the filetype
@@ -205,11 +206,12 @@ foreach($prestudent_ids as $pid)
 				)
 				{
 					$fullFilename = $tmpDir . "/".uniqid() . ".pdf";
+					$convert = $docExp->convert($filename, $fullFilename, "pdf");
 
-					if(!$docExp->convert($filename, $fullFilename, "pdf"))
+					if(!$convert)
 					{
 						$convertSuccess = false;
-						$preErrors[] = ($row->titel != ''? $row->titel:$row->bezeichnung)." (Akte_ID ".$row->akte_id."): Konvertierung fehlgeschlagen(".$row->mimetype.")";
+						$docErrors[] = ($row->titel != ''? $row->titel:$row->bezeichnung)." (Akte_ID ".$row->akte_id."): Konvertierung fehlgeschlagen(".$row->mimetype.")";
 					}
 				}
 				else if(
@@ -265,11 +267,11 @@ foreach($prestudent_ids as $pid)
 						else
 							$addString = "(DB)";
 						if($convertSuccess)
-							$preErrors[] = '"' . $row->titel . '":' . $addString . ' Dokument nicht gefunden';
+							$docErrors[] = '"' . $row->titel . '":' . $addString . ' Dokument nicht gefunden';
 					}
 				}
 				else
-					$preErrors[] ="'$row->titel' hat einen nicht unterstützten mimetype: $row->mimetype";
+					$docErrors[] ="'$row->titel' hat einen nicht unterstützten mimetype: $row->mimetype";
 			}
 		}
 
@@ -418,7 +420,7 @@ foreach($prestudent_ids as $pid)
 				'zgvnation' => $zgvnation,
 				array('dokumente'=> $dokumente),
 				array('aufnahme_notizen'=> $notiz_text_array)
-				
+
 		),"dokumentenakt"
 				);
 		//echo $doc->getXML();exit;
@@ -433,9 +435,10 @@ foreach($prestudent_ids as $pid)
 		unset($doc);
 	}
 
-	if(!empty($preErrors))
+	if(!empty($docErrors) || !empty($preErrors))
 	{
 		$errors[$pid] = $preErrors;
+		$errors[$pid] = array_merge($errors[$pid], $docErrors);
 	}
 }
 

@@ -34,6 +34,7 @@ class dokument_export
 	private $temp_filename;
 	private $temp_folder;
 	private $images=array();
+	private $sourceDir;
 	public $errormsg;
 
 	/**
@@ -171,6 +172,7 @@ class dokument_export
 
 		$this->temp_folder = sys_get_temp_dir().'/fhcunoconv-'.uniqid();
 		mkdir($this->temp_folder);
+		$this->sourceDir = getcwd();
 		chdir($this->temp_folder);
 		file_put_contents($this->temp_folder . '/content.xml', $contentbuffer);
 
@@ -256,18 +258,14 @@ class dokument_export
 		switch($this->outputformat)
 		{
 			case 'pdf':
-				$this->temp_filename = $this->temp_folder . '/out.pdf';
-				exec("unoconv -e IsSkipEmptyPages=false --stdout -f pdf $tempname_zip > ".$this->temp_filename, $out, $ret);
-
-				if($ret!=0)
-				{
-					$this->errormsg = 'Dokumentenkonvertierung ist derzeit nicht möglich. Bitte informieren Sie den Administrator';
-					return false;
-				}
-				break;
 			case 'doc':
-				$this->temp_filename='out.doc';
-				exec("unoconv -e IsSkipEmptyPages=false --stdout -f doc $tempname_zip > ".$this->temp_filename, $out, $ret);
+				$this->temp_filename = $this->temp_folder . '/out.' . $this->outputformat;
+
+				$command = 'unoconv -e IsSkipEmptyPages=false -f ' . $this->outputformat . ' --output %s %s 2>&1';
+				$command = sprintf($command, $this->temp_filename, $tempname_zip);
+
+				exec($command, $out, $ret);
+
 				if($ret!=0)
 				{
 					$this->errormsg = 'Dokumentenkonvertierung ist derzeit nicht möglich. Bitte informieren Sie den Administrator';
@@ -365,6 +363,7 @@ class dokument_export
 
 
 		rmdir($this->temp_folder);
+		chdir($this->sourceDir);
 
 		return true;
 	}
@@ -412,10 +411,11 @@ class dokument_export
 	*/
 	public function convert($inFile, $outFile, $format = "pdf")
 	{
-		$command = 'unoconv --format %s --output %s %s';
+		$command = 'unoconv -f %s --output %s %s 2>&1';
 		$command = sprintf($command, $format, $outFile, $inFile);
 
 		exec($command, $out, $ret);
+
 		if($ret!=0)
 		{
 			$this->errormsg = 'Dokumentenkonvertierung ist derzeit nicht möglich. Bitte informieren Sie den Administrator';
