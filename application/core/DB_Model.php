@@ -266,13 +266,12 @@ class DB_Model extends FHC_Model
 		
 		// Execute the query
 		$resultDB = $this->db->get_where($this->dbTable, $where);
-		
 		// If everything went ok...
 		if ($resultDB)
 		{
 			// Converts the object that contains data, from the returned CI's object to an array
 			// with the postgresql array and boolean types converterd
-			$resultArray = $this->toPhp($resultDB);
+			$resultArray = $this->toPhp($resultDB);//var_dump($resultArray);
 			// Array that will contain all the mainTable records, and to each record the linked data
 			// of a side table
 			$returnArray = array();
@@ -286,15 +285,18 @@ class DB_Model extends FHC_Model
 				// Temporary array that will contain a representation of every records returned from DB
 				// every element is an associative array that contains all the data of each table
 				$objTmpArray = array();
-				
+				$tableColumnsCountArrayOffset = 0; // Columns offset
 				// Gets all the data of a single table from the returned record, and creates an object filled with these data
 				for ($f = 0; $f < count($tableColumnsCountArray); $f++)
 				{
 					$objTmpArray[$f] = new stdClass(); // Object that will represent a data set of a table
-					foreach (array_slice($objectVars, $f == 0 ? 0 : $tableColumnsCountArray[$f - 1], $tableColumnsCountArray[$f]) as $key => $value)
+					
+					foreach (array_slice($objectVars, $tableColumnsCountArrayOffset, $tableColumnsCountArray[$f]) as $key => $value)
 					{
 						$objTmpArray[$f]->{str_replace($tables[$f] . '_', '', $key)} = $value;
 					}
+					
+					$tableColumnsCountArrayOffset += $tableColumnsCountArray[$f]; // Increasing the offset
 				}
 				
 				// Object that represents data of the main table
@@ -304,23 +306,30 @@ class DB_Model extends FHC_Model
 				{
 					// Object that represents data of the side table
 					$sideTableObj = $objTmpArray[$t];
-					
 					$sideTableProperty = $tables[$t];
 					if (is_array($sideTablesAliases))
 					{
-						$sideTableProperty = $sideTablesAliases[$t -1];
+						$sideTableProperty = $sideTablesAliases[$t - 1];
 					}
 					
-					if (($k = $this->findMainTable($mainTableObj, $returnArray)) === false)
+					// If the side table has data. If it was used a left join all the properties could be null
+					if (!empty(array_filter(get_object_vars($sideTableObj))))
 					{
-						$mainTableObj->{$sideTableProperty} = array($sideTableObj);
-						$returnArray[$returnArrayCounter++] = $mainTableObj;
-					}
-					else
-					{
-						if (array_search($sideTableObj, $returnArray[$k]->{$sideTableProperty}) === false)
+						if (($k = $this->findMainTable($mainTableObj, $returnArray)) === false)
 						{
-							array_push($returnArray[$k]->{$sideTableProperty}, $sideTableObj);
+							$mainTableObj->{$sideTableProperty} = array($sideTableObj);
+							$returnArray[$returnArrayCounter++] = $mainTableObj;
+						}
+						else
+						{
+							if (!isset($returnArray[$k]->{$sideTableProperty}))
+							{
+								$returnArray[$k]->{$sideTableProperty} = array($sideTableObj);
+							}
+							else if (array_search($sideTableObj, $returnArray[$k]->{$sideTableProperty}) === false)
+							{
+								array_push($returnArray[$k]->{$sideTableProperty}, $sideTableObj);
+							}
 						}
 					}
 				}

@@ -54,9 +54,9 @@ $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
 // Class name conflicts
-$route['api/v1/organisation/studiengang/(:any)'] = 'api/v1/organisation/studiengang2/$1';
-$route['api/v1/ressource/betriebsmittelperson/(:any)'] = 'api/v1/ressource/betriebsmittelperson2/$1';
-$route['api/v1/organisation/fachbereich/(:any)'] = 'api/v1/organisation/fachbereich2/$1';
-$route['api/v1/organisation/geschaeftsjahr/(:any)'] = 'api/v1/organisation/geschaeftsjahr2/$1';
-$route['api/v1/organisation/organisationseinheit/(:any)'] = 'api/v1/organisation/organisationseinheit2/$1';
-$route['api/v1/system/sprache/(:any)'] = 'api/v1/system/sprache2/$1';
+$route['api/v1/organisation/[S|s]tudiengang/(:any)'] = 'api/v1/organisation/studiengang2/$1';
+$route['api/v1/organisation/[F|f]achbereich/(:any)'] = 'api/v1/organisation/fachbereich2/$1';
+$route['api/v1/organisation/[G|g]eschaeftsjahr/(:any)'] = 'api/v1/organisation/geschaeftsjahr2/$1';
+$route['api/v1/organisation/[O|o]rganisationseinheit/(:any)'] = 'api/v1/organisation/organisationseinheit2/$1';
+$route['api/v1/ressource/[B|b]etriebsmittelperson/(:any)'] = 'api/v1/ressource/betriebsmittelperson2/$1';
+$route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
