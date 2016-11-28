@@ -927,7 +927,7 @@ function GenerateXMLStudentBlock($row)
 				$gsblock.="
 			<GS>
 				<MobilitaetsProgrammCode>".$rowgs->mobilitaetsprogramm_code."</MobilitaetsProgrammCode>
-				<ProgrammNr>".sprintf('%04s',$rowgs->programm_code)."</ProgrammNr>
+				<ProgrammNr>".$rowgs->programm_code."</ProgrammNr>
 				<StudTyp>".$studtyp."</StudTyp>
 				<PartnerCode>".$rowgs->partner_code."</PartnerCode>
 				<Ausbildungssemester>".$rowgs->ausbildungssemester."</Ausbildungssemester>
