@@ -447,14 +447,14 @@ function drawTree($tree, $depth)
 				if($note_pruef_arr[$note]->positiv)
 					$positiv=true;
 			}
-
+			
 			if(!$positiv)
 			{
 				echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
 			}
 			elseif($lvregelExists)
 			{
-				if($abgeschlossen && $positiv)
+				if($abgeschlossen || $positiv)
 				{
 					echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
 				}
