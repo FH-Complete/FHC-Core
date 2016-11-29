@@ -931,38 +931,38 @@ INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('system/appdaten', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('system/PhrasesLib', 'admin', 'suid');
 
+-- UPDATE tbl_studiengang
+UPDATE public.tbl_studiengang SET onlinebewerbung = TRUE;
+
+-- EMPTY public.tbl_preinteressent
+DELETE FROM public.tbl_preinteressent;
+-- EMPTY public.tbl_prestudentstatus
+DELETE FROM public.tbl_prestudentstatus;
+-- EMPTY public.tbl_prestudent
+DELETE FROM public.tbl_prestudent;
+-- EMPTY lehre.tbl_studienplan
+DELETE FROM lehre.tbl_studienplan_semester;
+-- EMPTY lehre.tbl_studienplan
+DELETE FROM lehre.tbl_studienplan;
+-- EMPTY lehre.tbl_studienordnung_semester
+DELETE FROM lehre.tbl_studienordnung_semester;
+-- EMPTY lehre.tbl_studienordnung
+DELETE FROM lehre.tbl_studienordnung;
+-- EMPTY public.tbl_studienjahr
+DELETE FROM public.tbl_studienjahr;
+-- EMPTY public.tbl_ort
+DELETE FROM public.tbl_ort;
+-- EMPTY public.tbl_kontakt
+DELETE FROM public.tbl_kontakt WHERE person_id > 2;
+-- EMPTY public.tbl_benutzer
+DELETE FROM public.tbl_benutzer WHERE person_id > 2;
+-- EMPTY public.tbl_preinteressent
+DELETE FROM public.tbl_preinteressent WHERE person_id > 2;
+-- EMPTY public.tbl_person
+DELETE FROM public.tbl_person WHERE person_id > 2;
+
 -- INSERT Persons (public.tbl_person)
 INSERT INTO public.tbl_person VALUES (3, NULL, NULL, NULL, NULL, NULL, NULL, 'McKenzie', 'Vicenta', 'Abraham', '2002-12-30', 'Brooksburgh', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'm', NULL, true, '2016-03-27 22:23:20.624239', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '01234567A', false);
-
--- UPDATE tbl_studiengang
--- UPDATE public.tbl_studiengang SET onlinebewerbung = TRUE;
-
--- EMPTY public.tbl_preinteressent
--- DELETE FROM public.tbl_preinteressent;
--- EMPTY public.tbl_prestudentstatus
--- DELETE FROM public.tbl_prestudentstatus;
--- EMPTY public.tbl_prestudent
--- DELETE FROM public.tbl_prestudent;
--- EMPTY lehre.tbl_studienplan
--- DELETE FROM lehre.tbl_studienplan_semester;
--- EMPTY lehre.tbl_studienplan
--- DELETE FROM lehre.tbl_studienplan;
--- EMPTY lehre.tbl_studienordnung_semester
--- DELETE FROM lehre.tbl_studienordnung_semester;
--- EMPTY lehre.tbl_studienordnung
--- DELETE FROM lehre.tbl_studienordnung;
--- EMPTY public.tbl_studienjahr
--- DELETE FROM public.tbl_studienjahr;
--- EMPTY public.tbl_ort
--- DELETE FROM public.tbl_ort;
--- EMPTY public.tbl_kontakt
--- DELETE FROM public.tbl_kontakt WHERE person_id > 2;
--- EMPTY public.tbl_benutzer
--- DELETE FROM public.tbl_benutzer WHERE person_id > 2;
--- EMPTY public.tbl_preinteressent
--- DELETE FROM public.tbl_preinteressent WHERE person_id > 2;
--- EMPTY public.tbl_person
--- DELETE FROM public.tbl_person WHERE person_id > 2;
 
 -- INSERT INTO public.tbl_person VALUES (4, NULL, NULL, NULL, NULL, NULL, NULL, 'Wilderman', 'Rocio', 'Jayson', '2002-09-03', 'Hermannshire', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'm', NULL, true, '2016-03-27 22:23:20.632551', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '01234567B', false);
 -- INSERT INTO public.tbl_person VALUES (5, NULL, NULL, NULL, NULL, NULL, NULL, 'Harvey', 'Joshuah', 'Halie', '1930-01-18', 'Mitchellville', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'm', NULL, true, '2016-03-27 22:23:20.634179', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '01234567C', false);
