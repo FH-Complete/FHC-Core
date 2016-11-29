@@ -29,7 +29,7 @@ test:
     lint:
         directories:
             - "application/"
-            recursive: true
+        recursive: true
     codeception:
         config: "tests/codeception/"
         path: "tests/codeception/_output/"
