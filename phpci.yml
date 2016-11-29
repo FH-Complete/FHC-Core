@@ -21,8 +21,8 @@ setup:
         - "CREATE DATABASE fhctest OWNER fhcomplete;" # Creates database
     shell:
         - "mkdir -p /var/www/html/build" # Create the build directory if it doesn't exist
-        - "rm -f /var/www/html/build/fhcomplete.ci" # Remove the previous soft link, if exists, to the build directory
-        - "ln -s %BUILD_PATH% /var/www/html/build/fhcomplete.ci" # Create a new soft link to the actual build directory
+        - "rm -f /var/www/html/build/build" # Remove the previous soft link, if exists, to the build directory
+        - "ln -s %BUILD_PATH% /var/www/html/build/build" # Create a new soft link to the actual build directory
         # Rename configuration files
         - "cd %BUILD_PATH% && cp ./config/global.config-default.inc.php ./config/global.config.inc.php"
         - "cd %BUILD_PATH% && cp ./config/cis.config-default.inc.php ./config/cis.config.inc.php"
@@ -55,4 +55,4 @@ complete:
         - "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = 'fhctest';" # Close previous connections to database
         - "DROP DATABASE IF EXISTS fhctest;" # Drops database
     shell:
-        - "rm -f /var/www/html/build/fhcomplete.ci" # Remove the previous soft link, if exists, to the build directory
+        - "rm -f /var/www/html/build/build" # Remove the previous soft link, if exists, to the build directory
