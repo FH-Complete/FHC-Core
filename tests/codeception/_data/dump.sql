@@ -5,7 +5,7 @@ GRANT SELECT ON TABLE fue.tbl_scrumsprint TO vilesci;
 GRANT SELECT ON TABLE fue.tbl_scrumteam TO vilesci;
 
 -- INSERT INTO ci_apikey
-INSERT INTO public.ci_apikey (apikey_id, key, level, ignore_limits, date_created) VALUES (1, 'testapikey@fhcomplete.org', NULL, NULL, NOW());
+INSERT INTO public.ci_apikey (key, level, ignore_limits, date_created) VALUES ('testapikey@fhcomplete.org', NULL, NULL, NOW());
 
 -- DELETE FROM system.tbl_rolleberechtigung
 DELETE FROM system.tbl_rolleberechtigung WHERE berechtigung_kurzbz IN (
