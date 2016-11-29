@@ -931,7 +931,8 @@ INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('system/appdaten', 'admin', 'suid');
 INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art) VALUES('system/PhrasesLib', 'admin', 'suid');
 
-
+-- INSERT Persons (public.tbl_person)
+INSERT INTO public.tbl_person VALUES (3, NULL, NULL, NULL, NULL, NULL, NULL, 'McKenzie', 'Vicenta', 'Abraham', '2002-12-30', 'Brooksburgh', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'm', NULL, true, '2016-03-27 22:23:20.624239', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '01234567A', false);
 
 -- UPDATE tbl_studiengang
 -- UPDATE public.tbl_studiengang SET onlinebewerbung = TRUE;
@@ -963,8 +964,6 @@ INSERT INTO system.tbl_rolleberechtigung (berechtigung_kurzbz, rolle_kurzbz, art
 -- EMPTY public.tbl_person
 -- DELETE FROM public.tbl_person WHERE person_id > 2;
 
--- INSERT Persons (public.tbl_person)
--- INSERT INTO public.tbl_person VALUES (3, NULL, NULL, NULL, NULL, NULL, NULL, 'McKenzie', 'Vicenta', 'Abraham', '2002-12-30', 'Brooksburgh', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'm', NULL, true, '2016-03-27 22:23:20.624239', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '01234567A', false);
 -- INSERT INTO public.tbl_person VALUES (4, NULL, NULL, NULL, NULL, NULL, NULL, 'Wilderman', 'Rocio', 'Jayson', '2002-09-03', 'Hermannshire', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'm', NULL, true, '2016-03-27 22:23:20.632551', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '01234567B', false);
 -- INSERT INTO public.tbl_person VALUES (5, NULL, NULL, NULL, NULL, NULL, NULL, 'Harvey', 'Joshuah', 'Halie', '1930-01-18', 'Mitchellville', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'm', NULL, true, '2016-03-27 22:23:20.634179', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '01234567C', false);
 -- INSERT INTO public.tbl_person VALUES (6, NULL, NULL, NULL, NULL, NULL, NULL, 'Kessler', 'Neil', 'Dashawn', '1948-06-10', 'Anitafort', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'm', NULL, true, '2016-03-27 22:23:20.63728', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '01234567D', false);
