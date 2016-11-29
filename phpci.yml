@@ -15,15 +15,19 @@ setup:
         prefer_dist: true
         no_dev: true
     pgsql:
-        - "UPDATE pg_database SET datallowconn = 'false' WHERE datname = 'fhctest';"
-        - "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = 'fhctest';"
-        - "DROP DATABASE IF EXISTS fhctest;"
-        - "CREATE DATABASE fhctest OWNER fhcomplete;"
+        - "UPDATE pg_database SET datallowconn = 'false' WHERE datname = 'fhctest';" # Stops connections to database
+        - "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = 'fhctest';" # Close previous connections to database
+        - "DROP DATABASE IF EXISTS fhctest;" # Drops database
+        - "CREATE DATABASE fhctest OWNER fhcomplete;" # Creates database
     shell:
-        #- "cd %BUILD_PATH% && chmod u+x install.sh && ./install.sh fhctest" # Install Database
+        - "rm -f /var/www/phpci/PHPCI/build/fhcomplete.ci" # Remove the previous soft link, if exists, to the build directory
+        - "ln -s %BUILD_PATH% /var/www/phpci/PHPCI/build/fhcomplete.ci" # Create a new soft link to the actual build directory
         - "cd %BUILD_PATH% && php index.ci.php DBTools migrate" # Install Database
-        - "rm -f /var/www/phpci/PHPCI/build/fhcomplete.ci" # SymLink löschen falls vorhanden
-        - "ln -s %BUILD_PATH% /var/www/phpci/PHPCI/build/fhcomplete.ci" # SymLink to the actual build
+        # Rename configuration files
+        - "cd %BUILD_PATH% && cp ./config/global.config-default.inc.php ./config/global.config.inc.php"
+        - "cd %BUILD_PATH% && cp ./config/cis.config-default.inc.php ./config/cis.config.inc.php"
+        - "cd %BUILD_PATH% && cp ./config/vilesci.config-default.inc.php ./config/vilesci.config.inc.php"
+        - "cd %BUILD_PATH% && cp ./config/system.config-default.inc.php ./config/system.config.inc.php"
 
 test:
     lint:
@@ -47,6 +51,8 @@ test:
 
 complete:
     pgsql:
-        - "UPDATE pg_database SET datallowconn = 'false' WHERE datname = 'fhctest';"
-        - "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = 'fhctest';"
-        - "DROP DATABASE IF EXISTS fhctest;"
+        - "UPDATE pg_database SET datallowconn = 'false' WHERE datname = 'fhctest';" # Stops connections to database
+        - "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = 'fhctest';" # Close previous connections to database
+        - "DROP DATABASE IF EXISTS fhctest;" # Drops database
+    shell:
+        - "rm -f /var/www/phpci/PHPCI/build/fhcomplete.ci" # Remove the previous soft link, if exists, to the build directory
