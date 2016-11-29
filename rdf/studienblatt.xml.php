@@ -94,7 +94,7 @@ foreach($uid_arr as $uid)
 			$datum_aktuell = date('d.m.Y');
 			$gebdatum = date('d.m.Y',strtotime($student->gebdatum));
 			$prestudent = new prestudent($student->prestudent_id);
-			$prestudent->getLastStatus($student->prestudent_id,$studiensemester,'Student');
+			$prestudent->getLastStatus($student->prestudent_id,$studiensemester);
 			$studienordnung = new studienordnung();
 			$studienordnung->getStudienordnungFromStudienplan($prestudent->studienplan_id);
 			$studiengang = new studiengang();
@@ -180,7 +180,7 @@ foreach($uid_arr as $uid)
             echo "\t\t<studiensemester_beginn>".$studiensemester_beginn->bezeichnung."</studiensemester_beginn>";
             echo "\t\t<studiensemester_beginndatum>".date('d.m.Y',strtotime($studiensemester_beginn->start))."</studiensemester_beginndatum>";
 	
-            $prestudent->getLastStatus($student->prestudent_id,$studiensemester,'Student');
+            $prestudent->getLastStatus($student->prestudent_id,$studiensemester);
             $studiensemester_abschluss = new studiensemester();
             $abschluss = $studiensemester_abschluss->jump($prestudent->studiensemester_kurzbz, $studienplan->regelstudiendauer-$prestudent->ausbildungssemester);
             $studiensemester_abschluss->load($abschluss);
@@ -306,7 +306,7 @@ foreach($uid_arr as $uid)
 				}
 			}
 			$prestudent = new prestudent();
-			$prestudent->getLastStatus($student->prestudent_id, null, 'Student');
+			$prestudent->getLastStatus($student->prestudent_id, null);
 			
 			if($prestudent->orgform_kurzbz!='')
 				$orgform = $prestudent->orgform_kurzbz;
