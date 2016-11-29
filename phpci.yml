@@ -22,13 +22,12 @@ setup:
     shell:
         - "rm -f /var/www/phpci/PHPCI/build/fhcomplete.ci" # Remove the previous soft link, if exists, to the build directory
         - "ln -s %BUILD_PATH% /var/www/phpci/PHPCI/build/fhcomplete.ci" # Create a new soft link to the actual build directory
-        - "cd %BUILD_PATH% && php index.ci.php DBTools migrate" # Install Database
         # Rename configuration files
         - "cd %BUILD_PATH% && cp ./config/global.config-default.inc.php ./config/global.config.inc.php"
         - "cd %BUILD_PATH% && cp ./config/cis.config-default.inc.php ./config/cis.config.inc.php"
         - "cd %BUILD_PATH% && cp ./config/vilesci.config-default.inc.php ./config/vilesci.config.inc.php"
         - "cd %BUILD_PATH% && cp ./config/system.config-default.inc.php ./config/system.config.inc.php"
-
+        - "cd %BUILD_PATH% && php index.ci.php DBTools migrate" # Install Database
 test:
     lint:
         directories:
