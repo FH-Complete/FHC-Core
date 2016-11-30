@@ -11,31 +11,28 @@ build_settings:
 
 setup:
     composer:
-#        directory: ""
         action: "install"
         prefer_dist: true
         no_dev: true
     pgsql:
-        - "UPDATE pg_database SET datallowconn='false' WHERE datname='fhctest';"
-        - "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='fhctest';"
-        - "DROP DATABASE IF EXISTS fhctest;"
+        - "UPDATE pg_database SET datallowconn = 'false' WHERE datname = 'fhctest';" # Stops connections to database
+        - "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = 'fhctest';" # Close previous connections to database
+        - "DROP DATABASE IF EXISTS fhctest;" # Drops database
+        - "CREATE DATABASE fhctest OWNER fhcomplete;" # Creates database
     shell:
-#        - "pkill -f fhctest &"
-#        - "sudo -u postgres psql fhctest -c 'DROP DATABASE IF EXISTS fhctest;'"
-        - "cd %BUILD_PATH% && chmod u+x install.sh && ./install.sh fhctest" # Install Database
-        - "rm -f /var/www/html/build/fhcomplete" # SymLink löschen falls vorhanden
-        - "ln -s %BUILD_PATH% /var/www/html/build/fhcomplete" # SymLink to the actual build
-#        - "php index.ci.php DBTools migrate" # DB-Migration
-
+        - "rm -f /var/www/html/build" # Remove the previous soft link, if exists, to the build directory
+        - "ln -s %BUILD_PATH% /var/www/html/build" # Create a new soft link to the actual build directory
+        # Copies configuration files
+        - "cp /home/phpci/config/* %BUILD_PATH%/config/"
+        - "cd %BUILD_PATH% && php index.ci.php DBTools migrate" # Install Database
 test:
     lint:
         directories:
-        - "application/"
+            - "application/"
         recursive: true
     codeception:
         config: "tests/codeception/"
         path: "tests/codeception/_output/"
-#    php_loc:
 #    php_docblock_checker:
 #        path: "application/controllers/"
 #        allowed_warnings: 100
@@ -49,28 +46,9 @@ test:
 #        directory: "tests/phpunit/"
 
 complete:
-    clean_build:
-        remove:
-            - index.php
-            - config/global.config.inc.php
-            - config/cis.config.inc.php
-            - config/vilesci.config.inc.php
-            - config/system.config.inc.php
-#    xmpp:
-#        username: "fhcomplete"
-#        password: "fhcomplete1q2w3blah.im"
-#        recipients:
-#            - "fhcomplete@darkness.su"
-#            - "nk@jabber.at" 
-#            - "tschux@jabber.org"
-#            - "tschux@jabber.at"      
-#        server: "jabber.blah.im"
-#        tls: 1
-#        alias: "jabber.blah.im"
-#        date_format: "%d.%m.%Y"
-
-success:
-#    shell:
-#        - "cd %BUILD_PATH% && chmod u+x copyBuild.sh && ./copyBuild.sh" # Copy Build
-#        - "curl 'http://localhost/backend/Migrate/'" # DB-Installation
-#        - "cd /var/www/html/ && sudo -u wsp doxygen Doxyfile" # Doxygen
+    pgsql:
+        - "UPDATE pg_database SET datallowconn = 'false' WHERE datname = 'fhctest';" # Stops connections to database
+        - "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = 'fhctest';" # Close previous connections to database
+        - "DROP DATABASE IF EXISTS fhctest;" # Drops database
+    shell:
+        - "rm -f /var/www/html/build" # Remove the previous soft link, if exists, to the build directory
