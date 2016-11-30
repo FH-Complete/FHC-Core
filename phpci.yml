@@ -24,7 +24,15 @@ setup:
         - "ln -s %BUILD_PATH% /var/www/html/build" # Create a new soft link to the actual build directory
         # Copies configuration files
         - "cp /home/phpci/config/* %BUILD_PATH%/config/"
-        - "wget -qO - 'http://admin:1q2w3@test.fhcomplete.org/build/system/checksystem.php'" # Install Database
+         # Install Database
+        - "psql -h localhost -U fhcomplete -p 5432 -d fhctest -a -f %BUILD_PATH%/system/fhcomplete3.0.sql"
+        - "cp /home/phpci/config/version_3.0.php %BUILD_PATH%/config/version.php"
+        - "wget -qO - 'http://admin:1q2w3@test.fhcomplete.org/build/system/checksystem.php'"
+        - "cp /home/phpci/config/version_3.1.php %BUILD_PATH%/config/version.php"
+        - "wget -qO - 'http://admin:1q2w3@test.fhcomplete.org/build/system/checksystem.php'"
+        - "cp /home/phpci/config/version_3.2.php %BUILD_PATH%/config/version.php"
+        - "wget -qO - 'http://admin:1q2w3@test.fhcomplete.org/build/system/checksystem.php'"
+
 test:
 #    lint:
 #        directories:
