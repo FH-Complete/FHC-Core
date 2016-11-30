@@ -20,7 +20,7 @@ date_default_timezone_set('Europe/Vienna');
 define("DB_SYSTEM","pgsql");
 define("DB_HOST","localhost");
 define("DB_PORT","5432");
-define("DB_NAME","fhctest");
+define("DB_NAME","fhcomplete");
 define("DB_USER","vilesci");
 define("DB_PASSWORD","vilesci");
 define("DB_CONNECT_PERSISTENT",TRUE);

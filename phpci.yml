@@ -22,11 +22,8 @@ setup:
     shell:
         - "rm -f /var/www/html/build" # Remove the previous soft link, if exists, to the build directory
         - "ln -s %BUILD_PATH% /var/www/html/build" # Create a new soft link to the actual build directory
-        # Rename configuration files
-        - "cd %BUILD_PATH% && cp ./config/global.config-default.inc.php ./config/global.config.inc.php"
-        - "cd %BUILD_PATH% && cp ./config/cis.config-default.inc.php ./config/cis.config.inc.php"
-        - "cd %BUILD_PATH% && cp ./config/vilesci.config-default.inc.php ./config/vilesci.config.inc.php"
-        - "cd %BUILD_PATH% && cp ./config/system.config-default.inc.php ./config/system.config.inc.php"
+        # Copies configuration files
+        - "cp /home/phpci/config/* %BUILD_PATH%/config/"
         - "cd %BUILD_PATH% && php index.ci.php DBTools migrate" # Install Database
 test:
     lint:

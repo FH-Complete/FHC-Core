@@ -21,8 +21,8 @@ define("DB_SYSTEM","pgsql");
 define("DB_HOST","localhost");
 define("DB_PORT","5432");
 define("DB_NAME","fhcomplete");
-define("DB_USER","user");
-define("DB_PASSWORD","password");
+define("DB_USER","wawi");
+define("DB_PASSWORD","wawi");
 define("DB_CONNECT_PERSISTENT",TRUE);
 define('CONN_CLIENT_ENCODING','UTF-8' );
 	
