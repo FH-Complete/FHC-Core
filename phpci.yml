@@ -25,7 +25,7 @@ setup:
         # Copies configuration files
         - "cp /home/phpci/config/* %BUILD_PATH%/config/"
          # Install Database
-        - "psql -h localhost -U fhcomplete -p 5432 -d fhctest -a -f %BUILD_PATH%/system/fhcomplete3.0.sql"
+        - "psql -q -w -P pager=off -h localhost -U fhcomplete -p 5432 -d fhctest -f %BUILD_PATH%/system/fhcomplete3.0.sql >/dev/null"
         - "cp /home/phpci/config/version_3.0.php %BUILD_PATH%/config/version.php"
         - "wget -qO - 'http://admin:1q2w3@test.fhcomplete.org/build/system/checksystem.php'"
         - "cp /home/phpci/config/version_3.1.php %BUILD_PATH%/config/version.php"
