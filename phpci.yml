@@ -24,6 +24,8 @@ setup:
         - "ln -s %BUILD_PATH% /var/www/html/build" # Create a new soft link to the actual build directory
         # Copies configuration files
         - "cp /home/phpci/config/* %BUILD_PATH%/config/"
+        # Change database name
+        - "sed -i.bak 's/DATABASE fhcomplete/DATABASE fhctest/g' %BUILD_PATH%/system/fhcomplete3.0.sql"
          # Install Database
         - "psql -q -w -P pager=off -h localhost -U fhcomplete -p 5432 -d fhctest -f %BUILD_PATH%/system/fhcomplete3.0.sql >/dev/null"
         - "cp /home/phpci/config/version_3.0.php %BUILD_PATH%/config/version.php"
