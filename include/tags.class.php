@@ -55,9 +55,16 @@ class tags extends basis_db
 	 * 
 	 * Gibt alle Tags zurück
 	 */
-	public function getAll()
+	public function getAll($tag_search = null)
 	{
-		$qry = "SELECT * FROM public.tbl_tag; ";
+		$matchcode=mb_strtoupper(str_replace(array('<','>',' ',';','*','_','-',',',"'",'"'),"%",$tag_search));
+		$qry = "SELECT * FROM public.tbl_tag ";
+
+		if (!empty($tag_search))
+		{
+			$qry.="WHERE UPPER(trim(public.tbl_tag.tag)) like '%".$this->db_escape($matchcode)."%' ";
+		}
+		$qry.="ORDER BY UPPER(trim(public.tbl_tag.tag)) ";
 
 		if($this->db_query($qry))
 		{
