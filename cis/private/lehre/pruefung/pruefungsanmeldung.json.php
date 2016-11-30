@@ -539,11 +539,20 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 
 				$konto = new konto();
 				$creditPoints = $konto->getCreditPointsOfStudiensemester($uid, $pruefungsfenster->studiensemester_kurzbz);
-				if(($creditPoints != false) && ($lehrveranstaltung->ects > ($creditPoints - $ects_verwendet)))
+				if(($creditPoints != false))
+				{
+					$cpVerbleibend = $creditPoints - $ects_verwendet;
+					if(($lehrveranstaltung->ects > $cpVerbleibend))
+					{
+						$data['error'] = 'true';
+						$data['errormsg'] = $p->t('pruefung/zuWenigeCreditPoints');
+						return $data;
+					}
+				}
+				else
 				{
 					$data['error'] = 'true';
-					$data['errormsg'] = $p->t('pruefung/zuWenigeCreditPoints');
-					return $data;
+					$data['errormsg'] = 'Fehler beim Laden der Credit Points.';
 				}
 
 				if(isset($data['error']) && $data['error'] = 'true')
