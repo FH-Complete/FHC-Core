@@ -135,6 +135,7 @@ foreach($prestudent_ids as $pid)
 
 		$preDocs = array();
 		$result = $db->db_query($query);
+		
 		while($row = $db->db_fetch_object($result))
 		{
 			$docErrors = array();
@@ -153,21 +154,21 @@ foreach($prestudent_ids as $pid)
 
 				if ($dms->mimetype != $row->mimetype)
 				{
-					$docErrors[] = "Mimetype von Akte und DMS der DMS-ID ".$row->dms_id." stimmen nicht ueberein. Bitte kontaktieren Sie einen Administrator";
+					$docErrors[] = "Mimetype von Akte-ID ".$row->akte_id." \"".$row->mimetype."\" und DMS-ID ".$row->dms_id." \"".$dms->mimetype."\" stimmen nicht ueberein. Bitte kontaktieren Sie einen Administrator";
 				}
 
 				$filename = DMS_PATH . $dms->filename;
 
 				if(!file_exists($filename))
 				{
-					$docErrors[] = "'" . $filename . "': Datei nicht gefunden";
+					$docErrors[] = "".$row->dokument_kurzbz." '".$filename."': Datei nicht gefunden (DMS-ID ".$row->dms_id."; Akte-ID ".$row->akte_id.")";
 				}
 			}
 
 			// this should never happen
-			if($filename == "")
+			if($filename == "" && $row->nachgereicht == 'f')
 			{
-				$docErrors[] = "'" . $row->akte_id . "': Diese Akte hat keinen Inhalt und keine dms_id";
+				$docErrors[] = "".$row->dokument_kurzbz." '".$row->akte_id."': Diese Akte hat keinen Inhalt und keine dms_id";
 			}
 
 			if(empty($docErrors))
@@ -186,7 +187,7 @@ foreach($prestudent_ids as $pid)
 				|| $row->mimetype == "image/jpeg"
 				|| $row->mimetype == "image/jpg"
 				|| $row->mimetype == "image/pjpeg"
-			)
+				)
 				{
 					$fullFilename = $tmpDir . "/".uniqid() . ".pdf";
 					if(!$pdf->jpegToPdf($filename, $fullFilename))
@@ -267,11 +268,26 @@ foreach($prestudent_ids as $pid)
 						else
 							$addString = "(DB)";
 						if($convertSuccess)
-							$docErrors[] = '"' . $row->titel . '":' . $addString . ' Dokument nicht gefunden';
+							$docErrors[] = '"$row->dokument_kurzbz: Akte-ID '.$row->akte_id.' '.$row->titel.'":' . $addString . ' Dokument nicht gefunden';
 					}
 				}
 				else
-					$docErrors[] ="'$row->titel' hat einen nicht unterstützten mimetype: $row->mimetype";
+				{
+					$docErrors[] ="$row->dokument_kurzbz: Akte-ID $row->akte_id $row->titel hat einen nicht unterstützten mimetype: $row->mimetype";
+					$dokumente[]['dokument'] = array(
+							"name" => $row->bezeichnung,
+							"filename" => $row->aktbezeichnung,
+							"nachgereicht" => ($row->nachgereicht == 't'?'true':'false'),
+							"anmerkung" => $row->anmerkung,
+							"errormsg" => 'Dieses Dateiformat kann nicht in diesem PDF ausgegeben werden.');
+				}
+			}
+			if(!empty($docErrors))
+			{
+				if(!isset($errors[$pid]))
+					$errors[$pid] = array();
+				
+				$errors[$pid] = array_merge($errors[$pid], $docErrors);
 			}
 		}
 
@@ -283,6 +299,8 @@ foreach($prestudent_ids as $pid)
 		$strasse = '';
 		$plz = '';
 		$bundesland = '';
+		$heimatBundesland = '';
+		$zustellBundesland = '';
 	
 		$nation = new nation($prestudent->geburtsnation);
 		$geburtsnation = $nation->kurztext;
@@ -292,7 +310,7 @@ foreach($prestudent_ids as $pid)
 		$zgvnation = $nation->kurztext;
 		
 		$svnr = ($prestudent->svnr == '')?($prestudent->ersatzkennzeichen != ''?'Ersatzkennzeichen: '.$prestudent->ersatzkennzeichen:''):$prestudent->svnr;
-		
+
 		foreach($adresse->result as $row_adresse)
 		{
 			if($row_adresse->heimatadresse)
@@ -301,24 +319,31 @@ foreach($prestudent_ids as $pid)
 				$heimatPlz = $row_adresse->plz;
 				$heimatOrt = $row_adresse->ort;
 				// Bundesland ermitteln
-				$qry= '
-					SELECT
-						tbl_bundesland.bezeichnung AS bundesland
-					FROM
-						bis.tbl_gemeinde
-					JOIN
-						bis.tbl_bundesland ON (tbl_gemeinde.bulacode = tbl_bundesland.bundesland_code)
-					WHERE
-						tbl_gemeinde.name='.$db->db_add_param($row_adresse->gemeinde).'
-					LIMIT 1;
-				';
-				if(!$res = $db->db_query($qry))
-					die("Es ist ein Fehler bei der Ermittlung des Bundeslandes aufgetreten");
-			
-				if(!$row = $db->db_fetch_object($res))
-					die("Es ist ein Fehler bei der Ermittlung des Bundeslandes aufgetreten");
-			
-				$heimatBundesland = $row->bundesland;
+				if ($row_adresse->gemeinde != '')
+				{
+					$qry= '
+						SELECT
+							tbl_bundesland.bezeichnung AS bundesland
+						FROM
+							bis.tbl_gemeinde
+						JOIN
+							bis.tbl_bundesland ON (tbl_gemeinde.bulacode = tbl_bundesland.bundesland_code)
+						WHERE
+							tbl_gemeinde.name='.$db->db_add_param($row_adresse->gemeinde).'
+						LIMIT 1;
+					';
+					if ($res = $db->db_query($qry))
+					{
+						if ($row = $db->db_fetch_object($res))
+							$heimatBundesland = $row->bundesland;
+						else
+							$errors[$pid][] = "Es ist ein Fehler bei der Ermittlung des Bundeslandes der Heimatadresse aufgetreten";
+					}
+					else
+						$errors[$pid][] = "Es ist ein Fehler bei der Ermittlung des Bundeslandes der Heimatadresse aufgetreten";
+				}
+				else 
+					$errors[$pid][] = "Heimat-Bundesland kann nicht ermittelt werden, da keine Gemeinde eingetragen ist";
 			}
 			if($row_adresse->zustelladresse)
 			{
@@ -326,24 +351,31 @@ foreach($prestudent_ids as $pid)
 				$zustellPlz = $row_adresse->plz;
 				$zustellOrt = $row_adresse->ort;
 				// Bundesland ermitteln
-				$qry= '
-					SELECT
-						tbl_bundesland.bezeichnung AS bundesland
-					FROM
-						bis.tbl_gemeinde
-					JOIN
-						bis.tbl_bundesland ON (tbl_gemeinde.bulacode = tbl_bundesland.bundesland_code)
-					WHERE
-						tbl_gemeinde.name='.$db->db_add_param($row_adresse->gemeinde).'
-					LIMIT 1;
-				';
-				if(!$res = $db->db_query($qry))
-					die("Es ist ein Fehler bei der Ermittlung des Bundeslandes aufgetreten");
-				
-				if(!$row = $db->db_fetch_object($res))
-					die("Es ist ein Fehler bei der Ermittlung des Bundeslandes aufgetreten");
-				
-				$zustellBundesland = $row->bundesland;
+				if ($row_adresse->gemeinde != '')
+				{
+					$qry= '
+						SELECT
+							tbl_bundesland.bezeichnung AS bundesland
+						FROM
+							bis.tbl_gemeinde
+						JOIN
+							bis.tbl_bundesland ON (tbl_gemeinde.bulacode = tbl_bundesland.bundesland_code)
+						WHERE
+							tbl_gemeinde.name='.$db->db_add_param($row_adresse->gemeinde).'
+						LIMIT 1;
+					';
+					if ($res = $db->db_query($qry))
+					{
+						if ($row = $db->db_fetch_object($res))
+							$zustellBundesland = $row->bundesland;
+						else
+							$errors[$pid][] = "Es ist ein Fehler bei der Ermittlung des Bundeslandes der Heimatadresse aufgetreten";
+					}
+					else
+						$errors[$pid][] = "Es ist ein Fehler bei der Ermittlung des Bundeslandes der Heimatadresse aufgetreten";
+				}
+				else
+					$errors[$pid][] = "Zustelladresse-Bundesland kann nicht ermittelt werden, da keine Gemeinde eingetragen ist";
 				//break;
 			}
 		}
@@ -391,7 +423,6 @@ foreach($prestudent_ids as $pid)
 				$notiz_text_array[]['aufnahme_notiz'] = $value;
 		}
 
-		$filename = $tmpDir . "/".uniqid();
 		$doc = new dokument_export($vorlage_kurzbz, $oe_kurzbz);
 		$doc->addDataArray(array(
 				'studiengang_kuerzel' => strtoupper($studiengang->typ.$studiengang->kurzbz),
@@ -434,14 +465,7 @@ foreach($prestudent_ids as $pid)
 		$allDocs = array_merge($allDocs, $preDocs);
 		unset($doc);
 	}
-
-	if(!empty($docErrors) || !empty($preErrors))
-	{
-		$errors[$pid] = $preErrors;
-		$errors[$pid] = array_merge($errors[$pid], $docErrors);
-	}
 }
-
 
 /*
  * generate the merged PDF

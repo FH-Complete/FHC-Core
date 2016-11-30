@@ -393,6 +393,12 @@
 			<style:paragraph-properties fo:text-align="center" style:justify-single-word="false" fo:background-color="#dddddd"/>
 			<style:text-properties style:font-name="Arial" fo:font-size="10pt" fo:font-weight="bold" officeooo:rsid="001d0b51" officeooo:paragraph-rsid="001d0b51" style:font-size-asian="10pt" style:font-weight-asian="bold" style:font-size-complex="10pt" style:font-weight-complex="bold"/>
 		</style:style>
+		<style:style style:name="P17" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+			<style:text-properties style:font-name="Arial" fo:font-size="8pt" officeooo:rsid="0020372f" officeooo:paragraph-rsid="0020372f" style:font-size-asian="8pt" style:font-size-complex="8pt"/>
+		</style:style>
+		<style:style style:name="P18" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+			<style:text-properties fo:color="#ff0000" style:font-name="Arial" fo:font-size="8pt" officeooo:rsid="0020372f" officeooo:paragraph-rsid="0020372f" style:font-size-asian="8pt" style:font-size-complex="8pt"/>
+		</style:style>
 		<style:style style:name="T1" style:family="text">
 			<style:text-properties style:text-underline-style="solid" style:text-underline-width="auto" style:text-underline-color="font-color"/>
 		</style:style>
@@ -902,10 +908,16 @@
 			<xsl:choose>
 				<xsl:when test="nachgereicht='true' and filename=''">
 					<text:p text:style-name="P10">Das Dokument wird nachgereicht</text:p>
-					<text:p text:style-name="P4"><xsl:value-of select="anmerkung"/></text:p>
+					<text:p text:style-name="P17"><xsl:value-of select="anmerkung"/></text:p>
+					<xsl:if test="errormsg != ''">
+						<text:p text:style-name="P18"><xsl:value-of select="errormsg"/></text:p>
+					</xsl:if>
 				</xsl:when>
 				<xsl:otherwise>
 					<text:p text:style-name="P4"><xsl:value-of select="filename"/></text:p>
+					<xsl:if test="errormsg != ''">
+						<text:p text:style-name="P18"><xsl:value-of select="errormsg"/></text:p>
+					</xsl:if>
 				</xsl:otherwise>
 			</xsl:choose>				
 		</table:table-cell>
