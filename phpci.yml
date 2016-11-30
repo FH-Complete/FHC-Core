@@ -30,12 +30,16 @@ setup:
         - "sed -i.bak 's/CREATE PROCEDURAL LANGUAGE plpgsql;//g' %BUILD_PATH%/system/fhcomplete3.0.sql"
          # Install Database
         - "psql -q -P pager=off -h localhost -U fhcomplete -p 5432 -d fhctest -f %BUILD_PATH%/system/fhcomplete3.0.sql >/dev/null"
-        - "cp /home/phpci/config/version_3.0.php %BUILD_PATH%/version.php"
-        - "wget -qO - 'http://admin:1q2w3@test.fhcomplete.org/build/system/checksystem.php'"
-        - "cp /home/phpci/config/version_3.1.php %BUILD_PATH%/version.php"
-        - "wget -qO - 'http://admin:1q2w3@test.fhcomplete.org/build/system/checksystem.php'"
-        - "cp /home/phpci/config/version_3.2.php %BUILD_PATH%/version.php"
-        - "wget -qO - 'http://admin:1q2w3@test.fhcomplete.org/build/system/checksystem.php'"
+#   TODO: This part is not working because of the tbl_benutzerrolle.anmerkung field
+#        - "cp /home/phpci/config/version_3.0.php %BUILD_PATH%/version.php"
+#        - "wget -qO - 'http://admin:1q2w3@test.fhcomplete.org/build/system/checksystem.php'"
+#        - "cp /home/phpci/config/version_3.1.php %BUILD_PATH%/version.php"
+#        - "wget -qO - 'http://admin:1q2w3@test.fhcomplete.org/build/system/checksystem.php'"
+#        - "cp /home/phpci/config/version_3.2.php %BUILD_PATH%/version.php"
+#        - "wget -qO - 'http://admin:1q2w3@test.fhcomplete.org/build/system/checksystem.php'"
+        - "cd %BUILD_PATH%/system/ && php dbupdate_3.0.php"
+        - "cd %BUILD_PATH%/system/ && php dbupdate_3.1.php"
+        - "cd %BUILD_PATH%/system/ && php dbupdate_3.2.php"
 
 test:
 #    lint:
