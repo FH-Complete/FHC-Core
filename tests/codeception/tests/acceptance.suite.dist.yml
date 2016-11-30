@@ -1,0 +1,21 @@
+# Codeception Test Suite Configuration
+
+# suite for acceptance tests.
+# perform tests in browser using the WebDriver or PhpBrowser.
+# If you need both WebDriver and PHPBrowser tests - create a separate suite.
+
+class_name: AcceptanceTester
+modules:
+    enabled:
+        - Db
+        - PhpBrowser:
+            url: 'http://admin:1q2w3@test.fhcomplete.org/build/'
+    config:
+        Db:
+            dsn: 'pgsql:host=localhost;port=5432;dbname=fhctest'
+            user: 'fhcomplete'
+            password: 'fhcomplete'
+            dump: _data/dump.sql
+            populate: true
+            cleanup: false
+            reconnect: false

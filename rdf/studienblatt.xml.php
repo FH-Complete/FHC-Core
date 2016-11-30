@@ -94,7 +94,7 @@ foreach($uid_arr as $uid)
 			$datum_aktuell = date('d.m.Y');
 			$gebdatum = date('d.m.Y',strtotime($student->gebdatum));
 			$prestudent = new prestudent($student->prestudent_id);
-			$prestudent->getLastStatus($student->prestudent_id,$studiensemester,'Student');
+			$prestudent->getLastStatus($student->prestudent_id,$studiensemester);
 			$studienordnung = new studienordnung();
 			$studienordnung->getStudienordnungFromStudienplan($prestudent->studienplan_id);
 			$studiengang = new studiengang();
@@ -146,6 +146,7 @@ foreach($uid_arr as $uid)
 			echo "\t\t<gebort>".$student->gebort."</gebort>\n";
 			echo "\t\t<staatsbuergerschaft>".$staatsbuergerschaft->langtext."</staatsbuergerschaft>\n";
 			echo "\t\t<svnr>".$svnr."</svnr>\n";
+			echo "\t\t<matr_nr>".trim($student->matr_nr)."</matr_nr>\n";
 			echo "\t\t<matrikelnr>".trim($student->matrikelnr)."</matrikelnr>\n";
 			echo "\t\t<studiengang>".$studienordnung->studiengangbezeichnung."</studiengang>\n";
 			echo "\t\t<studiengang_englisch>".$studienordnung->studiengangbezeichnung_englisch."</studiengang_englisch>\n";
@@ -179,7 +180,7 @@ foreach($uid_arr as $uid)
             echo "\t\t<studiensemester_beginn>".$studiensemester_beginn->bezeichnung."</studiensemester_beginn>";
             echo "\t\t<studiensemester_beginndatum>".date('d.m.Y',strtotime($studiensemester_beginn->start))."</studiensemester_beginndatum>";
 	
-            $prestudent->getLastStatus($student->prestudent_id,$studiensemester,'Student');
+            $prestudent->getLastStatus($student->prestudent_id,$studiensemester);
             $studiensemester_abschluss = new studiensemester();
             $abschluss = $studiensemester_abschluss->jump($prestudent->studiensemester_kurzbz, $studienplan->regelstudiendauer-$prestudent->ausbildungssemester);
             $studiensemester_abschluss->load($abschluss);
@@ -305,7 +306,7 @@ foreach($uid_arr as $uid)
 				}
 			}
 			$prestudent = new prestudent();
-			$prestudent->getLastStatus($student->prestudent_id, null, 'Student');
+			$prestudent->getLastStatus($student->prestudent_id, null);
 			
 			if($prestudent->orgform_kurzbz!='')
 				$orgform = $prestudent->orgform_kurzbz;

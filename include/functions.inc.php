@@ -784,11 +784,12 @@ function getSprache()
 	{
 		if(isset($_COOKIE['sprache']))
 		{
-			$sprache=$_COOKIE['sprache'];
+			// Uses urlencode to avoid XSS issues
+			$sprache = urlencode($_COOKIE['sprache']);
 		}
 		else
 		{
-			$sprache=DEFAULT_LANGUAGE;
+			$sprache = DEFAULT_LANGUAGE;
 		}
 		setSprache($sprache);
 	}

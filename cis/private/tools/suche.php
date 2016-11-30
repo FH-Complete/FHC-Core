@@ -61,7 +61,10 @@ echo '<h1>',$p->t('tools/suche'),'</h1>';
 
 $search = (isset($_REQUEST['search'])?$_REQUEST['search']:'');
 
-echo '<form action="',$_SERVER['PHP_SELF'],'" name="searchform" method="GET">
+// Uses htmlspecialchars to avoid XSS issues
+$self = htmlspecialchars($_SERVER["PHP_SELF"], ENT_QUOTES, "utf-8");
+
+echo '<form action="',$self,'" name="searchform" method="GET">
 	<input type="search" placeholder="'.$p->t('tools/suchbegriff').' ..." size="40" name="search" value="',$db->convert_html_chars($search),'" />
 	<img src="../../../skin/images/search.png" onclick="document.searchform.submit()" height="15px" class="suchicon"/>
 	</form><br>';
@@ -454,16 +457,22 @@ function searchContent($searchItems)
 					echo '<h3>',$row->sprache,'</h3>';
 					echo '<ul>';
 				}
-				$berechtigt = new content();
-				$berechtigt = $berechtigt->berechtigt($row->content_id, $uid);
-				if ($berechtigt)
+				// Nur die hoechste Version des Contents anzeigen
+				$version = new content();
+				$maxversion = $version->getMaxVersion($row->content_id, $row->sprache);
+				if ($row->version == $maxversion)
 				{
-					echo '<li><div class="suchergebnis">';
-					echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
-					$preview = findAndMark($row->content, $searchItems);
-					
-					echo $preview;
-					echo '<br /><br /></div></li>';
+					$berechtigt = new content();
+					$berechtigt = $berechtigt->berechtigt($row->content_id, $uid);
+					if ($berechtigt)
+					{
+						echo '<li><div class="suchergebnis">';
+						echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
+						$preview = findAndMark($row->content, $searchItems);
+						
+						echo $preview;
+						echo '<br /><br /></div></li>';
+					}
 				}
 			}
 		}

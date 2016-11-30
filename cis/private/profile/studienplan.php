@@ -19,6 +19,7 @@
  *
  *
  * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
+ *			Stefan Puraner <stefan.puraner@technikum-wien.at>
  *
  * Zeigt den Studienplan eines Studierenden an
  * und bietet die Möglichkeit zur Anmeldung zu Lehrveranstaltungen.
@@ -101,14 +102,7 @@ if(isset($_GET['getAnmeldung']))
 				if(!$bngruppe->load($uid, $lvangebot->result[0]->gruppe_kurzbz, $stsem))
 				{
 					// User ist noch nicht angemeldet
-					//Pruefen ob genug Credit Points zur Verfuegung stehen zur Anmeldung
-
-					$konto = new konto();
-					$cp = $konto->getCreditPoints($uid, $stsem);
-					if($cp===false || $cp>=$lv->ects)
-						echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung.' (Anmeldung bis '.$datum->formatDatum($angebot->anmeldefenster_ende,"d.m.Y").')';
-					else
-						echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span style="color:gray;">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$p->t('studienplan/zuWenigCP').'" />';
+					echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung.' (Anmeldung bis '.$datum->formatDatum($angebot->anmeldefenster_ende,"d.m.Y").')';
 				}
 				else
 				{
@@ -200,25 +194,16 @@ if(isset($_POST['action']) && $_POST['action']=='anmeldung')
 
 			if(!$bngruppe->load($uid, $lvangebot->result[0]->gruppe_kurzbz, $stsem))
 			{
-
-				// Pruefen ob genug CP zur Verfuegung stehen falls diese reduziert sind
-				$konto = new konto();
-				$cp = $konto->getCreditPoints($uid, $stsem);
-				if($cp===false || $cp>=$lv->ects)
+				$bngruppe->uid = $uid;
+				$bngruppe->gruppe_kurzbz = $lvangebot->result[0]->gruppe_kurzbz;
+				$bngruppe->studiensemester_kurzbz = $stsem;
+				$bngruppe->new=true;
+				if($bngruppe->save())
 				{
-					$bngruppe->uid = $uid;
-					$bngruppe->gruppe_kurzbz = $lvangebot->result[0]->gruppe_kurzbz;
-					$bngruppe->studiensemester_kurzbz = $stsem;
-					$bngruppe->new=true;
-					if($bngruppe->save())
-					{
-						echo '<span class="ok">'.$p->t('studienplan/einschreibungErfolgreich').'</span>';
-						// Menue neu Laden damit die LV unter Meine LV gleich angezeigt wird
-						echo '<script>window.parent.menu.location.reload();</script>';
-					}
+					echo '<span class="ok">'.$p->t('studienplan/einschreibungErfolgreich').'</span>';
+					// Menue neu Laden damit die LV unter Meine LV gleich angezeigt wird
+					echo '<script>window.parent.menu.location.reload();</script>';
 				}
-				else
-					echo '<span class="error">'.$p->t('studienplan/zuWenigCP').'</span>';
 			}
 			else
 			{
@@ -306,9 +291,9 @@ if($zeugnisnote->getZeugnisnoten('',$uid,''))
 	foreach($zeugnisnote->result as $row_note)
 	{
 		if($row_note->note!='')
-                {
+		{
 			$noten_arr[$row_note->lehrveranstaltung_id][$row_note->studiensemester_kurzbz]=$row_note->note;
-                }
+		}
 	}
 }
 
@@ -366,7 +351,7 @@ drawTree($tree,0);
 
 function drawTree($tree, $depth)
 {
-	global $uid, $stsem_arr, $noten_arr, $lvangebot_arr;
+	global $uid, $stsem_arr, $noten_arr, $lvangebot_arr, $aktornext;
 	global $datum_obj, $db, $lv_arr, $p, $note_pruef_arr, $student;
         
 	foreach($tree as $row_tree)
@@ -411,7 +396,8 @@ function drawTree($tree, $depth)
 
 		$abgeschlossen=false;
 		$lvregel = new lvregel();
-		if($lvregel->exists($row_tree->studienplan_lehrveranstaltung_id))
+		$lvregelExists = $lvregel->exists($row_tree->studienplan_lehrveranstaltung_id);
+		if($lvregelExists)
 		{
 			if($lvregel->isAbgeschlossen($uid, $row_tree->studienplan_lehrveranstaltung_id))
 				$abgeschlossen=true;
@@ -451,7 +437,7 @@ function drawTree($tree, $depth)
 		
 		$lv_kompatibel = new lehrveranstaltung();
 		$kompatibleLVs = $lv_kompatibel->loadLVkompatibel($row_tree->lehrveranstaltung_id);
-                
+		
 		if(isset($noten_arr[$row_tree->lehrveranstaltung_id]))
 		{
 			// Positive Note fuer diese LV vorhanden?
@@ -461,78 +447,54 @@ function drawTree($tree, $depth)
 				if($note_pruef_arr[$note]->positiv)
 					$positiv=true;
 			}
-
-			if($positiv)
+			
+			if(!$positiv)
+			{
+				//echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
+				if(count($kompatibleLVs) > 0)
+				{
+					checkKompatibleLvs($kompatibleLVs, $student, $row_tree, $noten_arr, $note_pruef_arr, $p, $uid, true);
+				}
+				else
+				{
+					echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
+				}
+			}
+			elseif($lvregelExists)
+			{
+				if($abgeschlossen || $positiv)
+				{
+					echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
+				}
+				else
+				{
+					echo '<span>'.$p->t('studienplan/offen').'</span>';
+				}
+			}
+			elseif($positiv)
+			{
 				echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
+			}
 			else
-				echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
+			{
+				echo '<span>'.$p->t('studienplan/offen').'</span>';
+			}	
 		}
 		//check if compatible course has grade
 		elseif(count($kompatibleLVs) > 0)
 		{
-                    $positiv = false;                 
-                    $found = false;
-                    $i = 0;
-                    while(!$found && $i < count($kompatibleLVs))
-                    {   
-                        foreach($kompatibleLVs as $komp)
-                        {
-                            
-                            $anrechnung = new anrechnung();
-                            $anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);    
-                            
-                            if(count($anrechnung->result) == 1)
-                            {
-                                $lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
-                                if(isset($noten_arr[$lv]))
-                                {
-                                    $positiv=false;
-                                    foreach($noten_arr[$lv] as $note)
-                                    {
-                                        if($note_pruef_arr[$note]->positiv)
-                                            $positiv=true;
-                                    }
-
-                                    $found = true;
-                                }
-                                else
-                                {
-                                    /* wenn zu mehreren kompatiblen lvs eine Anrechnung existiert
-                                     * darf found nicht auf false gesetzt werden wenn es zuvor bereits auf true gesetzt wurde
-                                     */
-                                    if(!$found)
-                                        $found = false;
-                                }
-                            }
-                            $i++;
-                        }
-                    }
-                    
-                    if($found)
-                    {
-                        if($positiv)
-                        echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
-                        else
-                            echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
-                    }
-                    elseif(!$found)
-                    {
-                        if($abgeschlossen)
-                            echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
-			elseif(!$row_tree->stpllv_pflicht)
-                            echo '<span>'.$p->t('studienplan/optional').'</span>';
-			else
-                            echo '<span>'.$p->t('studienplan/offen').'</span>';
-                    }
+			checkKompatibleLvs($kompatibleLVs, $student, $row_tree, $noten_arr, $note_pruef_arr, $p, $uid);
 		}
 		else
 		{
-			if($abgeschlossen)
-				echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
-			elseif(!$row_tree->stpllv_pflicht)
+			if(!$row_tree->stpllv_pflicht)
+			{
 				echo '<span>'.$p->t('studienplan/optional').'</span>';
+			}
 			else
+			{
 				echo '<span>'.$p->t('studienplan/offen').'</span>';
+			}
 		}
 		echo '</td>';
 
@@ -551,6 +513,7 @@ function drawTree($tree, $depth)
 //			}
 
 			$tdinhalt='';
+			$found = false;
 
 			// Ist bereits eine Note für diese LV in diesem Stsem vorhanden?
 			if(isset($noten_arr[$row_tree->lehrveranstaltung_id][$stsem]))
@@ -559,40 +522,37 @@ function drawTree($tree, $depth)
 					$tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$row_tree->lehrveranstaltung_id][$stsem]]->anmerkung.'</span>';
 				else
 					$tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$row_tree->lehrveranstaltung_id][$stsem]]->anmerkung.'</span>';
+				$found=true;
 			}
 			elseif(count($kompatibleLVs) > 0)
 			{
-                            $found = false;
-                            $i = 0;
-                            while(!$found && $i < count($kompatibleLVs))
-                            {   
-                                foreach($kompatibleLVs as $komp)
-                                {
-                                    $anrechnung = new anrechnung();
-                                    $anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);
-                                    
-                                    if(count($anrechnung->result) == 1)
-                                    {
-                                        $lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
-                                        if(isset($noten_arr[$lv][$stsem]))
-                                        {
-                                            $found = true;
-                                            if($note_pruef_arr[$noten_arr[$lv][$stsem]]->positiv)
-                                                    $tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
-                                            else
-                                                    $tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
-                                        }
-                                    }
-                                    $i++;
-                                }
-
-                                if(!$found)
-                                {
-                                    $tdinhalt.= '-';
-                                }   
+                            
+                $i = 0;
+                while(!$found && $i < count($kompatibleLVs))
+                {   
+                    foreach($kompatibleLVs as $komp)
+                    {
+                        $anrechnung = new anrechnung();
+                        $anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);
+                        
+                        if(count($anrechnung->result) == 1)
+                        {
+                            $lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
+                            if(isset($noten_arr[$lv][$stsem]))
+                            {
+                                $found = true;
+                                if($note_pruef_arr[$noten_arr[$lv][$stsem]]->positiv)
+                                        $tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
+                                else
+                                        $tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
                             }
+                        }
+                        $i++;
+                    }
+                }
 			}
-			else
+
+			if(!$found)
 			{
 				// Angebot der LV und der Kompatiblen pruefen
 				$anmeldungmoeglich=false;
@@ -612,12 +572,16 @@ function drawTree($tree, $depth)
 				}
 				else
 				{
-					if(!$lvregel->isZugangsberechtigt($uid, $row_tree->studienplan_lehrveranstaltung_id, $stsem))
+					//check if rules are fulfilled just for actual or next studiensemester
+					if($stsem === $aktornext)
 					{
-						$regelerfuellt=false;
+						if($lvregel->isZugangsberechtigt($uid, $row_tree->studienplan_lehrveranstaltung_id, $stsem) !== true)
+						{
+							$regelerfuellt=false;
+						}
 					}
 				}
-
+				
 				foreach($lvkompatibel_arr as $row_lvid)
 				{
 					// Angebot der LV pruefen
@@ -671,7 +635,7 @@ function drawTree($tree, $depth)
 								$tdinhalt.= '<span title="'.$anmeldeinformation.'">-</a>';
 
 							if(!$regelerfuellt)
-								$tdinhalt.= '<span title="'.$p->t('studienplan/regelnichterfuellt').'">X</span>';
+								$tdinhalt= '<span title="'.$p->t('studienplan/regelnichterfuellt').'">X</span>';
 						}
 					}
 					else
@@ -693,6 +657,79 @@ function drawTree($tree, $depth)
 			drawTree($row_tree->childs, $depth+1);
 	}
 }
+
+function checkKompatibleLvs($kompatibleLVs, $student, $row_tree, $noten_arr, $note_pruef_arr, $p, $uid, $negativeNote= null)
+{
+	$positiv = false;                 
+	$found = false;
+	$i = 0;
+	while(!$found && $i < count($kompatibleLVs))
+	{   
+		foreach($kompatibleLVs as $komp)
+		{
+
+			$anrechnung = new anrechnung();
+			$anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);    
+
+			if(count($anrechnung->result) == 1)
+			{
+				$lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
+				if(isset($noten_arr[$lv]))
+				{
+					$positiv=false;
+					foreach($noten_arr[$lv] as $note)
+					{
+						if($note_pruef_arr[$note]->positiv)
+							$positiv=true;
+					}
+
+					$found = true;
+				}
+				else
+				{
+					/* wenn zu mehreren kompatiblen lvs eine Anrechnung existiert
+					 * darf found nicht auf false gesetzt werden wenn es zuvor bereits auf true gesetzt wurde
+					 */
+					if(!$found)
+						$found = false;
+				}
+			}
+			$i++;
+		}
+	}
+
+	if($found)
+	{
+		if($positiv)
+		{
+			echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
+		}
+		else
+		{
+			echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
+		}
+	}
+	elseif(!$found)
+	{
+		if(!$row_tree->stpllv_pflicht)
+		{
+			echo '<span>'.$p->t('studienplan/optional').'</span>';
+		}
+		else
+		{
+			if(($negativeNote!= null) && ($negativeNote == true))
+			{
+				echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
+			}
+			else
+			{
+				echo '<span>'.$p->t('studienplan/offen').'</span>';
+			}
+		}
+	}
+}
+
+
 echo '</table>';
 echo '<br><br>'.$p->t('studienplan/legende').':<br>
 <table>

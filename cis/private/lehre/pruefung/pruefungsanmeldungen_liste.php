@@ -227,7 +227,7 @@ $rechte->getBerechtigungen($uid);
 			<th>#</th>
 			<th><?php echo $p->t('global/vorname'); ?></th>
 			<th><?php echo $p->t('global/nachname'); ?></th>
-			<th><?php echo $p->t('global/matrikelnummer'); ?></th>
+			<th><?php echo $p->t('pruefung/matrikelnummer'); ?></th>
 			<th><?php echo $p->t('global/datum'); ?></th>
 			<th><?php echo $p->t('benotungstool/note'); ?></th>
 			<th><?php echo $p->t('global/anmerkung'); ?></th>
@@ -247,7 +247,7 @@ $rechte->getBerechtigungen($uid);
 				$date = $datum->formatDatum($prfTermin->von, "Y-m-d H:i:s");
 				$date = strtotime($date);
 				$date = $date+(60*$pruefungsintervall*($count));
-				$date = $datum->formatDatum($prfTermin->von,"d.m.Y").' - '.date("h:i",$date);
+				$date = $datum->formatDatum($prfTermin->von,"d.m.Y").' - '.date("H:i",$date);
 				$count++;
 			    }
 			    else

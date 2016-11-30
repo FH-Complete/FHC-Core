@@ -23,6 +23,7 @@
  */
 
 require_once('../config/cis.config.inc.php');
+require_once('../config/global.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../cms/menu.inc.php');
 require_once('../include/phrasen.class.php');
@@ -102,12 +103,14 @@ ob_start();
 
 		if(isset($_GET['content_id']) && $_GET['content_id'] != '')
 		{
-			$content_id = $_GET['content_id'];
+			// Uses urlencode to avoid XSS issues
+			$content_id = urlencode($_GET['content_id']);
 		}
 		else
 		{
 			$content_id = CIS_MENU_ENTRY_CONTENT;
-		} ?>
+		}
+	?>
 
 		<ul id="menu">
 			<?php if($content_id != CIS_MENU_ENTRY_CONTENT): ?>

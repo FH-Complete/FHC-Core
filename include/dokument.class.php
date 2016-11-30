@@ -422,7 +422,10 @@ class dokument extends basis_db
 	 */
 	public function getDokumente($studiengang_kz)
 	{
-		$qry = "SELECT * FROM public.tbl_dokumentstudiengang JOIN public.tbl_dokument USING(dokument_kurzbz)
+		$sprache = new sprache();
+		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
+		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
+		$qry = "SELECT *,$bezeichnung_mehrsprachig, $dokumentbeschreibung_mehrsprachig FROM public.tbl_dokumentstudiengang JOIN public.tbl_dokument USING(dokument_kurzbz)
 				WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)."
 				ORDER BY dokument_kurzbz;";
 
@@ -434,6 +437,8 @@ class dokument extends basis_db
 
 				$dok->dokument_kurzbz = $row->dokument_kurzbz;
 				$dok->bezeichnung = $row->bezeichnung;
+				$dok->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
+				$dok->dokumentbeschreibung_mehrsprachig = $sprache->parseSprachResult('dokumentbeschreibung_mehrsprachig', $row);
 				$dok->pflicht = $this->db_parse_bool($row->pflicht);
 				$dok->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
 

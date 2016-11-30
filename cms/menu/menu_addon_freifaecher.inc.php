@@ -25,6 +25,7 @@
 require_once(dirname(__FILE__).'/menu_addon.class.php');
 require_once(dirname(__FILE__).'/../../include/functions.inc.php');
 require_once(dirname(__FILE__).'/../../include/lehrveranstaltung.class.php');
+require_once(dirname(__FILE__).'/../../include/studiensemester.class.php');
 
 class menu_addon_freifaecher extends menu_addon
 {
@@ -35,6 +36,8 @@ class menu_addon_freifaecher extends menu_addon
 		$this->link=false;
 		
 		$sprache = getSprache();
+		$stsem = new studiensemester();
+		$stsem = $stsem->getAktOrNext();
 
 		$lv_obj = new lehrveranstaltung();
 		if(!$lv_obj->load_lva('0',null, null,true,false,'bezeichnung'))
@@ -44,7 +47,7 @@ class menu_addon_freifaecher extends menu_addon
 		{
 			$this->items[] = array('title'=>$row->bezeichnung_arr[$sprache],
 						 'target'=>'content',
-						 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id,
+						 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$stsem,
 						 'name'=>'<span '.(!$row->aktiv?' style="" ':' style=""').'>'.(!$row->aktiv?' <img src="../skin/images/ampel_rot.png" height="8px" height="8px"> ':' <img src="../skin/images/ampel_gruen.png" height="8px"> ').' '.$this->CutString($row->bezeichnung_arr[$sprache], 21).'</span>'
 						);
 		}

@@ -1485,6 +1485,7 @@ function loadPruefungsDetails(prfId)
 									$("#termin"+j+"sammelklausur").text("false");
 								}
 								$("#termin"+j+"Id").closest("tr").append("<td><a href='#' onclick='terminLoeschen(\""+d.pruefung.pruefung_id+"\", \""+t.pruefungstermin_id+"\");'><?php echo $p->t('global/löschen'); ?></a></td>");
+								$("#termin"+j+"Id").closest("tr").append("<td><a href='#' onclick='window.open(\"pruefungstermin_aendern.php?termin_id="+t.pruefungstermin_id+"\",\"edit\",\"height=600,width=500,toolbar=no,titlebar=no,status=no,menubar=no\");'><?php echo $p->t('global/editieren'); ?></a></td>");
 								terminHinzufuegen("span");
 							}
 						});

@@ -21,7 +21,7 @@
  */
 
 require_once('../../../../config/cis.config.inc.php');
-require_once('../../../../include/basis_db.class.php');		
+require_once('../../../../include/basis_db.class.php');
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -34,9 +34,9 @@ require_once('../../../../include/studentnote.class.php');
 require_once('../../../../include/datum.class.php');
 require_once('functions.inc.php');
 require_once('../../../../include/phrasen.class.php');
-		
-$sprache = getSprache(); 
-$p = new phrasen($sprache); 
+
+$sprache = getSprache();
+$p = new phrasen($sprache);
 if (!$db = new basis_db())
 		die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 $user = get_uid();
@@ -102,9 +102,9 @@ if (isset($_GET["handbuch"])){
 
 if (isset($_FILES["abgabedatei"]))
 {
-	//echo $_FILES["abgabedatei"];	
+	//echo $_FILES["abgabedatei"];
 	$abgabedatei_up = $_FILES["abgabedatei"]["tmp_name"];
-					
+
 	if ($abgabedatei_up)
 	{
 		$student_uid = $uid;
@@ -112,13 +112,14 @@ if (isset($_FILES["abgabedatei"]))
 		$datumstr = ereg_replace(" ","_",$datum);
 		$name_up = pathinfo($_FILES["abgabedatei"]["name"]);
 		$name_neu = makeUploadName($db, $which='abgabe', $lehreinheit_id=$lehreinheit_id, $uebung_id=$uebung_id, $ss=$stsem,$uid=$student_uid, $date=$datumstr);
+		$name_neu = preg_replace('/[^A-Za-z0-9\-_]/', '',$name_neu);
 		$abgabedatei = $name_neu.".".$name_up["extension"];
-		$abgabepfad = BENOTUNGSTOOL_PATH."abgabe/".$abgabedatei;	
-			
+		$abgabepfad = BENOTUNGSTOOL_PATH."abgabe/".$abgabedatei;
+
 		$uebung_obj = new uebung();
 		$uebung_obj->load_studentuebung($student_uid, $uebung_id);
-	
-			
+
+
 		if ($uebung_obj->errormsg != "")
 		{
 			$uebung_obj->student_uid = $student_uid;
@@ -137,12 +138,12 @@ if (isset($_FILES["abgabedatei"]))
 			$uebung_obj->new = true;
 			$uebung_obj->studentuebung_save($new=true);
 			echo $uebung_obj->errormsg;
-			
+
 		}
 		if ($uebung_obj->abgabe_id != null)
-		{			
-			$uebung_obj->load_abgabe($uebung_obj->abgabe_id);			
-			unlink(BENOTUNGSTOOL_PATH."abgabe/".$uebung_obj->abgabedatei);			
+		{
+			$uebung_obj->load_abgabe($uebung_obj->abgabe_id);
+			unlink(BENOTUNGSTOOL_PATH."abgabe/".$uebung_obj->abgabedatei);
 			$uebung_obj->abgabedatei = $abgabedatei;
 			$uebung_obj->abgabezeit = 	$datum;
 			$uebung_obj->abgabe_anmerkung = "";
@@ -156,7 +157,7 @@ if (isset($_FILES["abgabedatei"]))
 			$uebung_obj->abgabe_save(true);
 		}
 		$uebung_obj->studentuebung_save(false);
-		//Abgabedatei ablegen				
+		//Abgabedatei ablegen
 		move_uploaded_file($_FILES['abgabedatei']['tmp_name'], $abgabepfad);
 	}
 }
@@ -217,11 +218,11 @@ $stsem_content.= "</SELECT>\n";
 //Lehreinheiten laden
 if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
 {
-	$qry = "SELECT 
-				distinct lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz 
-			FROM 
+	$qry = "SELECT
+				distinct lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz
+			FROM
 				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehreinheitmitarbeiter
-			WHERE 
+			WHERE
 				tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
 				tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
@@ -229,11 +230,11 @@ if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->st
 }
 else
 {
-	$qry = "SELECT 
-				distinct lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz 
-			FROM 
+	$qry = "SELECT
+				distinct lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz
+			FROM
 				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehreinheitmitarbeiter
-			WHERE 
+			WHERE
 				tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
 				tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
@@ -440,14 +441,14 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		die($p->t('benotungstool/studentWurdeNichtGefunden'));
 
 	//echo "<b>$row_stud->vorname $row_stud->nachname</b><br>\n";
-	
 
-	
+
+
 	$uid_arr = Array();
 	$vorname_arr = Array();
 	$nachname_arr = Array();
 
-			// studentenquery					
+			// studentenquery
 			$qry_stud_dd = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = ".$db->db_add_param($stsem)." and lehreinheit_id = ".$db->db_add_param($lehreinheit_id, FHC_INTEGER)."  ORDER BY nachname, vorname";
             if($result_stud_dd = $db->db_query($qry_stud_dd))
 			{
@@ -456,7 +457,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 				{
 					$uid_arr[] = $row_stud_dd->uid;
 					$vorname_arr[] = $row_stud_dd->vorname;
-					$nachname_arr[] = $row_stud_dd->nachname;				
+					$nachname_arr[] = $row_stud_dd->nachname;
 
 				}
 			}
@@ -467,22 +468,22 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 	$prev = $key-1;
 	$next = $key+1;
 	if ($key > 0)
-		echo "<a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid_arr[$prev]&stsem=$stsem'> &lt;&lt; </a>";	
-	echo "<SELECT name='stud_dd' onChange=\"MM_jumpMenu('self',this,0)\">\n";	
+		echo "<a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid_arr[$prev]&stsem=$stsem'> &lt;&lt; </a>";
+	echo "<SELECT name='stud_dd' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 	for ($j = 0; $j < count($uid_arr); $j++)
-	{						
+	{
 			if ($uid_arr[$j] == $uid)
 				$selected = " selected";
 			else
 				$selected = "";
-		
+
 			echo "<option value='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid_arr[$j]&stsem=$stsem'$selected>$vorname_arr[$j] $nachname_arr[$j]</option>";
 	}
 	echo "</select>";
 	if ($key < count($uid_arr)-1)
-		echo "<a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid_arr[$next]&stsem=$stsem'> &gt;&gt; </a>";	
-	
-	
+		echo "<a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid_arr[$next]&stsem=$stsem'> &gt;&gt; </a>";
+
+
 	$uebung_obj = new uebung();
 	$uebung_obj->load_uebung($lehreinheit_id,1);
 	if(count($uebung_obj->uebungen)>0)
@@ -492,15 +493,15 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		echo "<option value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=&uid=$uid' selected></option>";
 		foreach ($uebung_obj->uebungen as $row)
 		{
-			
+
 			if($uebung_id == $row->uebung_id)
 				$selected = 'selected';
 			else
-				$selected = '';		
-					
+				$selected = '';
+
 			if($uebung_id=='')
 				$uebung_id=$row->uebung_id;
-			
+
 			$subuebung_obj = new uebung();
 			$subuebung_obj->load_uebung($lehreinheit_id,2,$row->uebung_id);
 			if(count($subuebung_obj->uebungen)>0)
@@ -510,46 +511,46 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 				}
 			else
 				$disabled = '';
-			
+
 			echo "<OPTION style='background-color:#cccccc;' value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id&uid=$uid' $selected $disabled>";
-			
-			
+
+
 			echo $row->bezeichnung;
 			echo '</OPTION>';
-			
+
 			if(count($subuebung_obj->uebungen)>0)
 			{
 				foreach ($subuebung_obj->uebungen as $subrow)
 				{
 					if($uebung_id=='')
 						$uebung_id=$subrow->uebung_id;
-		
+
 					if($uebung_id == $subrow->uebung_id)
 						$selected = 'selected';
 					else
 						$selected = '';
-					
+
 					echo "<OPTION value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$subrow->uebung_id&uid=$uid' $selected>";
 
-					
+
 					//Freigegeben = +
 					//Nicht Freigegeben = -
 					if($datum_obj->mktime_fromtimestamp($subrow->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($subrow->freigabebis)>time())
 						echo ' + ';
 					else
 						echo ' - ';
-					
+
 					echo $subrow->bezeichnung;
 					echo '</OPTION>';
-					
+
 				}
 			}
 		}
-		
+
 		echo '</SELECT>';
-		
+
 		echo '</td>';
-		
+
 		echo "<td>
 			<table>
 			<tr>
@@ -581,7 +582,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		$mitarbeit = 0;
 		$note = '';
 	}
-	
+
 	if ($ueb_obj->beispiele && is_numeric($_GET['uebung_id']))
 	{
 		echo "
@@ -598,10 +599,10 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		    <td class='ContentHeader2'>".$p->t('benotungstool/probleme')."</td>
 		    <td class='ContentHeader2'>".$p->t('benotungstool/punkte')."</td>
 		</tr>";
-	
+
 		$bsp_obj = new beispiel();
 		$bsp_obj->load_beispiel($uebung_id);
-	
+
 		foreach ($bsp_obj->beispiele as $row)
 		{
 			$stud_bsp_obj = new beispiel();
@@ -623,14 +624,14 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 					<td align='center'>$row->punkte</td>
 				</tr>";
 		}
-	
+
 		echo "</table>";
-		
-		
-		
+
+
+
 		$ueb_obj->load_studentuebung($uid, $uebung_id);
-		if ($ueb_obj->abgabe_id)	
-		{	
+		if ($ueb_obj->abgabe_id)
+		{
 			$ueb_obj->load_abgabe($ueb_obj->abgabe_id);
 			$filename = $ueb_obj->abgabedatei;
 		}
@@ -639,27 +640,27 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 
 		if ($filename != '')
 			echo "<br>".$p->t('benotungstool/abgabedatei').": <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$uid&download_abgabe=$filename'>".$filename."</a><br><br>";
-		
 
-		
+
+
 		echo "
 		</td><td valign='top' algin='right'>";
-	
+
 		//Gesamtpunkte diese Kreuzerlliste
 		$qry = "SELECT sum(punkte) as punktegesamt FROM campus.tbl_beispiel WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER);
 		$punkte_gesamt=0;
 		if($result=$db->db_query($qry))
 			if($row = $db->db_fetch_object($result))
 				$punkte_gesamt = $row->punktegesamt;
-	
+
 		//Eingetragen diese Kreuzerlliste
 		$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($uid)." AND vorbereitet=true";
 		$punkte_eingetragen=0;
 		if($result=$db->db_query($qry))
 			if($row = $db->db_fetch_object($result))
 				$punkte_eingetragen = ($row->punkteeingetragen!=''?$row->punkteeingetragen:0);
-	
-		
+
+
 		//Gesamtpunkte alle Kreuzerllisten in dieser Übung
 		$ueb_help = new uebung($uebung_id);
 		$liste_id = $ueb_help->liste_id;
@@ -670,19 +671,19 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		if($result=$db->db_query($qry))
 			if($row = $db->db_fetch_object($result))
 				$punkte_gesamt_alle = $row->punktegesamt_alle;
-	
+
 		//Eingetragen alle Kreuzerllisten
 		$qry = "SELECT sum(tbl_beispiel.punkte) as punkteeingetragen_alle FROM campus.tbl_beispiel, campus.tbl_studentbeispiel, campus.tbl_uebung
 				WHERE tbl_beispiel.beispiel_id = tbl_studentbeispiel.beispiel_id AND
 				tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
 				tbl_uebung.lehreinheit_id=".$db->db_add_param($lehreinheit_id)." AND
-				tbl_uebung.liste_id = ".$db->db_add_param($liste_id)." AND 
+				tbl_uebung.liste_id = ".$db->db_add_param($liste_id)." AND
 				tbl_studentbeispiel.student_uid=".$db->db_add_param($uid)." AND vorbereitet=true";
 		$punkte_eingetragen_alle=0;
 		if($result=$db->db_query($qry))
 			if($row = $db->db_fetch_object($result))
 				$punkte_eingetragen_alle = ($row->punkteeingetragen_alle!=''?$row->punkteeingetragen_alle:0);
-	
+
 		//Mitarbeitspunkte
 		$qry = "SELECT sum(mitarbeitspunkte) as mitarbeitspunkte FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id)
 				WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($uid)." and liste_id=".$db->db_add_param($liste_id);
@@ -690,7 +691,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		if($result=$db->db_query($qry))
 			if($row = $db->db_fetch_object($result))
 				$mitarbeit_alle = ($row->mitarbeitspunkte!=''?$row->mitarbeitspunkte:0);
-	
+
 		//Mitarbeitspunkte
 		$qry = "SELECT mitarbeitspunkte FROM campus.tbl_studentuebung
 				WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($uid);
@@ -742,8 +743,8 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 			</tr>
 			</table>
 			";
-	
-	
+
+
 		echo "
 		</td></tr>
 		<tr>
@@ -752,18 +753,18 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 				<input type='button' value='".$p->t('global/zurueck')."' onclick='history.back();'>
 				<input type='submit' value='".$p->t('global/speichern')."' name='submit'>
 			</td>
-	
+
 		</tr>
 		</table>
-	
+
 		</form>
 		";
 	}
 	else if (is_numeric($_GET['uebung_id']))
 	{
 		$ueb_obj->load_studentuebung($uid, $uebung_id);
-		if ($ueb_obj->abgabe_id)	
-		{	
+		if ($ueb_obj->abgabe_id)
+		{
 			$ueb_obj->load_abgabe($ueb_obj->abgabe_id);
 			$filename = $ueb_obj->abgabedatei;
 		}
@@ -790,28 +791,28 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 		<tr>
 			<td colspan='2'>
 				<input type='button' value='".$p->t('global/zurueck')."' onclick='history.back();'>
-				<input type='submit' value='".$p->t('global/speichern')."' name='submit'>	
+				<input type='submit' value='".$p->t('global/speichern')."' name='submit'>
 			</td>
-	
+
 		</tr>
 		</table>
 		</form>";
 
 	}
-	echo "</td></tr></table>";	
-	echo "<table>\n";		
+	echo "</td></tr></table>";
+	echo "<table>\n";
 	echo "	<tr>\n";
 	echo "	<form accept-charset='UTF-8' method='POST' action='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&uid=$uid' enctype='multipart/form-data'>\n";
 	echo "		<td>\n";
 	echo "			<b>".$p->t('benotungstool/studentenabgabedatei').":</b><br><input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='".$p->t('benotungstool/abgeben')."'>";
-	echo "		</td>\n";	
+	echo "		</td>\n";
 	echo "	</form>\n";
 	echo "</tr>\n";
 	echo "</table>";
 }
 else
 {
-	
+
 	//Übungen benoten
 	$uebung_obj = new uebung();
 	$uebung_obj->load_uebung($lehreinheit_id,1);
@@ -822,15 +823,15 @@ else
 		echo "<option value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=&uid=$uid' selected></option>";
 		foreach ($uebung_obj->uebungen as $row)
 		{
-			
+
 			if($uebung_id == $row->uebung_id)
 				$selected = 'selected';
 			else
-				$selected = '';		
-					
+				$selected = '';
+
 			if($uebung_id=='')
 				$uebung_id=$row->uebung_id;
-			
+
 			$subuebung_obj = new uebung();
 			$subuebung_obj->load_uebung($lehreinheit_id,2,$row->uebung_id);
 			if(count($subuebung_obj->uebungen)>0)
@@ -840,61 +841,62 @@ else
 				}
 			else
 				$disabled = '';
-			
+
 			echo "<OPTION style='background-color:#cccccc;' value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$row->uebung_id&uid=$uid' $selected $disabled>";
-			
-			
+
+
 			echo $row->bezeichnung;
 			echo '</OPTION>';
-			
+
 			if(count($subuebung_obj->uebungen)>0)
 			{
 				foreach ($subuebung_obj->uebungen as $subrow)
 				{
 					if($uebung_id=='')
 						$uebung_id=$subrow->uebung_id;
-		
+
 					if($uebung_id == $subrow->uebung_id)
 						$selected = 'selected';
 					else
 						$selected = '';
-					
+
 					echo "<OPTION value='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$subrow->uebung_id&uid=$uid' $selected>";
 
-					
+
 					//Freigegeben = +
 					//Nicht Freigegeben = -
 					if($datum_obj->mktime_fromtimestamp($subrow->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($subrow->freigabebis)>time())
 						echo ' + ';
 					else
 						echo ' - ';
-					
+
 					echo $subrow->bezeichnung;
 					echo '</OPTION>';
-					
+
 				}
 			}
 		}
-		
+
 		echo '</SELECT>';
 		echo "<a href='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id&stsem=$stsem' target='_blank'> [".$p->t('benotungstool/benoten')."]</a>";
 		$abgabe_obj = new uebung($uebung_id);
 		if ($abgabe_obj->abgabe && glob(BENOTUNGSTOOL_PATH."abgabe/*_[WS]S[0-9][0-9][0-9][0-9]_".$uebung_id."_*"))
 		{
-		   $date = date('Y-m-d_H:i:s');
+			$date = date('Y-m-d_H:i:s');
 			$downloadname = makeUploadName($db, $which="zip", $lehreinheit_id, $uebung_id, $stsem, $uid=null, $date);
-			$downloadname = mb_ereg_replace($uebung_id, ereg_replace(" ","_",$abgabe_obj->bezeichnung), $downloadname);
+			$downloadname = str_replace($uebung_id, str_replace(" ","_",$abgabe_obj->bezeichnung), $downloadname);
+			$downloadname = preg_replace('/[^A-Za-z0-9\-_]/', '',$downloadname);
 			echo "<a href='zipdownload_benotungstool.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&downloadname=$downloadname'> [".$p->t('benotungstool/abgabenDownloaden')."]</a>";
 		}
 		else
 			echo "[".$p->t('benotungstool/keineAbgabenVerfuegbar')."]";
-		
+
 		echo '</td></tr></table>';
 	}
-	
-	
-	
-	
+
+
+
+
 	echo "<br><hr><br>";
 	//Studentenliste
 	echo $p->t('benotungstool/bitteWaehlenSieDenStudentenAus')."<br>";
@@ -907,14 +909,14 @@ else
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
-					
+
 				</tr>
 				<tr>
 					<td class='ContentHeader2'>".$p->t('global/uid')."</td>
 					<td class='ContentHeader2'>".$p->t('global/nachname')."</td>
 					<td class='ContentHeader2'>".$p->t('global/vorname')."</td>
 					<td class='ContentHeader2'>".$p->t('benotungstool/studentenansicht')."</td>
-					
+
 				</tr>
 				<tr>
 					<td>&nbsp;</td>
@@ -922,7 +924,7 @@ else
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
 				</tr>";
-			/*			
+			/*
 			if($row_grp->gruppe_kurzbz!='')
 			{
 					echo "
@@ -945,16 +947,16 @@ else
 					            " ORDER BY nachname, vorname";
 			}
 			*/
-			// studentenquery		
+			// studentenquery
 			$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehreinheit_id = '".$lehreinheit_id."' ORDER BY nachname, vorname";
             if($result_stud = $db->db_query($qry_stud))
 			{
 				$i=1;
 				while($row_stud = $db->db_fetch_object($result_stud))
 				{
-        			
 
-					
+
+
 					echo "
 					<tr class='liste".($i%2)."'>
 						<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->uid</a></td>

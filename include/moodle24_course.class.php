@@ -98,8 +98,16 @@ class moodle24_course extends basis_db
 			return false;
 		}
 
-		$client = new SoapClient($this->serverurl);
-		$response = $client->core_course_get_courses(array('ids'=>array($this->mdl_course_id)));
+		try
+		{
+			$client = new SoapClient($this->serverurl);
+			$response = $client->core_course_get_courses(array('ids'=>array($this->mdl_course_id)));
+		}
+		catch (SoapFault $E)
+		{
+			$this->errormsg.="SOAP Fehler beim Anlegen des Kurses: ".$E->faultstring;
+			return false;
+		}
 
 		if($response)
 		{
@@ -186,7 +194,7 @@ class moodle24_course extends basis_db
 	{
 		//CourseCategorie ermitteln
 
-		//lehrveranstalung ID holen falls die nur die lehreinheit_id angegeben wurde
+		//lehrveranstalung ID holen falls nur die lehreinheit_id angegeben wurde
 		if($this->lehrveranstaltung_id=='')
 		{
 			$qry = "SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit
@@ -239,11 +247,12 @@ class moodle24_course extends basis_db
 			return false;
 		}
 
-		// Kategoriebau Aufbauen
+		// Kategoriebaum Aufbauen
 		if(defined('MOODLE_COURSE_SCHEMA') && MOODLE_COURSE_SCHEMA=='DEP-STG-JG-STSEM')
 		{
 
-			// Struktur: Department -> STG -> Jahrgang -> StSem (Informationstechnologie und Informationsmanagement -> BIMK -> Jahrgang 2014 -> WS2014)
+			// Struktur: Department -> STG -> Jahrgang -> StSem
+			// (Informationstechnologie und Informationsmanagement -> BIMK -> Jahrgang 2014 -> WS2014)
 
 			// Studiengang der Lehrveranstaltung holen
 			// Uebergeordnetes Department ermitteln
@@ -267,17 +276,29 @@ class moodle24_course extends basis_db
 				}
 			}
 			// Department
-			if(!$id_department = $this->getCategorie($department, '0'))
+			$id_department = $this->getCategorie($department, '0');
+			if ($id_department === false)
+				return false;
+			if ($id_department === -1)
 			{
 				if(!$id_department = $this->createCategorie($department, '0'))
+				{
 					echo "<br>$this->errormsg";
+					return false;
+				}
 			}
 
 			// Studiengang
-			if(!$id_stg = $this->getCategorie($stg, $id_department))
+			$id_stg = $this->getCategorie($stg, $id_department);
+			if ($id_stg === false)
+				return false;
+			if ($id_stg === -1)
 			{
 				if(!$id_stg = $this->createCategorie($stg, $id_department))
+				{
 					echo "<br>$this->errormsg";
+					return false;
+				}
 			}
 
 			// Jahrgang - 1. Studiensemester ermitteln (Stsem um Ausbsem -1 zurückspringen) und das Jahr ermitteln
@@ -296,17 +317,29 @@ class moodle24_course extends basis_db
 			$datum = new Datum();
 			$jahr = $datum->formatDatum($studiensemester->start, 'Y');
 
-			if(!$id_jahrgang = $this->getCategorie('Jahrgang '.$jahr, $id_stg))
+			$id_jahrgang = $this->getCategorie('Jahrgang '.$jahr, $id_stg);
+			if ($id_jahrgang === false)
+				return false;
+			if ($id_jahrgang === -1)
 			{
 				if(!$id_jahrgang = $this->createCategorie('Jahrgang '.$jahr, $id_stg))
+				{
 					echo "<br>$this->errormsg";
+					return false;
+				}
 			}
 
 			// Studiensemester
-			if(!$id_stsem = $this->getCategorie($this->studiensemester_kurzbz, $id_jahrgang))
+			$id_stsem = $this->getCategorie($this->studiensemester_kurzbz, $id_jahrgang);
+			if ($id_stsem === false)
+				return false;
+			if ($id_stsem === -1)
 			{
 				if(!$id_stsem = $this->createCategorie($this->studiensemester_kurzbz, $id_jahrgang))
+				{
 					echo "<br>Fehler beim Anlegen des Studiensemesters";
+					return false;
+				}
 			}
 
 			$categoryid=$id_stsem;
@@ -316,22 +349,40 @@ class moodle24_course extends basis_db
 			// Struktur: STSEM -> STG -> Ausbsemester (WS2014 -> BEL -> 1)
 
 			//Studiensemester Categorie holen
-			if(!$id_stsem = $this->getCategorie($this->studiensemester_kurzbz, '0'))
+			$id_stsem = $this->getCategorie($this->studiensemester_kurzbz, '0');
+			if ($id_stsem === false)
+				return false;
+			if ($id_stsem === -1)
 			{
 				if(!$id_stsem = $this->createCategorie($this->studiensemester_kurzbz, '0'))
+				{
 					echo "<br>Fehler beim Anlegen des Studiensemesters";
+					return false;
+				}
 			}
 			//Studiengang Categorie holen
-			if(!$id_stg = $this->getCategorie($stg, $id_stsem))
+			$id_stg = $this->getCategorie($stg, $id_stsem);
+			if ($id_stg === false)
+				return false;
+			if ($id_stg === -1)
 			{
 				if(!$id_stg = $this->createCategorie($stg, $id_stsem))
+				{
 					echo "<br>$this->errormsg";
+					return false;
+				}
 			}
 			//Semester Categorie holen
-			if(!$id_sem = $this->getCategorie($semester, $id_stg))
+			$id_sem = $this->getCategorie($semester, $id_stg);
+			if ($id_sem === false)
+				return false;
+			if ($id_sem === -1)
 			{
-				if(!$id_sem = $this->createCategorie($semester, $id_stg))
+				if (!$id_sem = $this->createCategorie($semester, $id_stg))
+				{
 					echo "<br>$this->errormsg";
+					return false;
+				}
 			}
 			$categoryid=$id_sem;
 		}
@@ -377,7 +428,7 @@ class moodle24_course extends basis_db
 	 * @param bezeichnung Bezeichnung der Kategorie
 	 * @param parent ID der uebergeordneten Kurskategorie
 	 *
-	 * @return id der Kategorie oder false im Fehlerfall
+	 * @return id der Kategorie, -1 wenn Kategorie nicht existiert, false im Fehlerfall
 	 */
 	public function getCategorie($bezeichnung, $parent)
 	{
@@ -404,7 +455,7 @@ class moodle24_course extends basis_db
 			else
 			{
 				$this->errormsg = 'Fehler beim Laden der Kurskategorie';
-				return false;
+				return -1;
 			}
 		}
 		catch (SoapFault $E)
@@ -412,13 +463,12 @@ class moodle24_course extends basis_db
 			$this->errormsg.="SOAP Fehler beim Laden der Kurskategorie: ".$E->faultstring;
 			return false;
 		}
-
 	}
 
 	/**
 	 * Erzeugt eine Kurskategorie anhand der Bezeichnung und der ParentID
 	 * @param bezeichnung Bezeichnung der Kategorie
-	 * @param parent ID der uebergeordneten Kategorie
+	 * @param parent ID der uebergeordneten Kategorie, false im Fehlerfall
 	 */
 	public function createCategorie($bezeichnung, $parent)
 	{
@@ -451,6 +501,7 @@ class moodle24_course extends basis_db
 		catch (SoapFault $E)
 		{
 			$this->errormsg.="SOAP Fehler beim Anlegen der Kategorie: ".$E->faultstring;
+			return false;
 		}
 	}
 
@@ -524,7 +575,10 @@ class moodle24_course extends basis_db
 		}
 
 		//Testkurs Categorie holen
-		if(!$id_testkurs = $this->getCategorie('Testkurse', '0'))
+		$id_testkurs = $this->getCategorie('Testkurse', '0');
+		if ($id_testkurs === false)
+			return false;
+		if ($id_testkurs === -1)
 		{
 			if(!$id_testkurs = $this->createCategorie('Testkurse', '0'))
 			{
@@ -533,7 +587,10 @@ class moodle24_course extends basis_db
 			}
 		}
 		//StSem Categorie holen
-		if(!$id_stsem = $this->getCategorie($studiensemester_kurzbz, $id_testkurs))
+		$id_stsem = $this->getCategorie($studiensemester_kurzbz, $id_testkurs);
+		if ($id_stsem === false)
+			return false;
+		if ($id_stsem === -1)
 		{
 			if(!$id_stsem = $this->createCategorie($studiensemester_kurzbz, $id_testkurs))
 			{
@@ -598,14 +655,20 @@ class moodle24_course extends basis_db
 		}
 
 		//Testkurs Categorie holen
-		if(!$id_testkurs = $this->getCategorie('Testkurse', '0'))
+		$id_testkurs = $this->getCategorie('Testkurse', '0');
+		if ($id_testkurs === false)
+			return false;
+		if ($id_testkurs === -1)
 		{
 			$this->errormsg = 'Categorie nicht gefunden';
 			return false;
 		}
 
 		//StSem Categorie holen
-		if(!$id_stsem = $this->getCategorie($studiensemester_kurzbz, $id_testkurs))
+		$id_stsem = $this->getCategorie($studiensemester_kurzbz, $id_testkurs);
+		if($id_stsem === false)
+			return false;
+		if ($id_stsem === -1)
 		{
 			$this->errormsg = 'Categorie nicht gefunden';
 			return false;
@@ -734,6 +797,15 @@ class moodle24_course extends basis_db
 		$data = array($mdl_course_id);
 
 		$response = $client->core_course_delete_courses(array($mdl_course_id));
+
+		if(is_object($response))
+		{
+			$response_obj = $response;
+			unset($response);
+			if(isset($response_obj->warnings) && isset($response_obj->warnings->message))
+				$response[0] = $response_obj->warnings->message;
+		}
+
 		if(isset($response[0]))
 		{
             $this->errormsg = $response[0];
@@ -749,7 +821,7 @@ class moodle24_course extends basis_db
 	 */
 	public function getLeFromCourse($moodle_course_id)
 	{
-		$qry = "SELECT lehreinheit_id FROM lehre.tbl_moodle WHERE moodle_version='2.4' AND mdl_course_id =".$this->db_add_param($moodle_course_id, FHC_INTEGER).';'; 
+		$qry = "SELECT lehreinheit_id FROM lehre.tbl_moodle WHERE moodle_version='2.4' AND mdl_course_id =".$this->db_add_param($moodle_course_id, FHC_INTEGER).';';
 		$le = array();
 		if($result = $this->db_query($qry))
 		{

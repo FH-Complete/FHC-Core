@@ -40,7 +40,7 @@ require_once('../../../include/addon.class.php');
 
 	if (!$db = new basis_db())
       die('Fehler beim Oeffnen der Datenbankverbindung');
-  
+
 	$adress=MAIL_ADMIN;
 
 	$user=get_uid();
@@ -50,12 +50,12 @@ require_once('../../../include/addon.class.php');
 		$uid=$_GET['uid'];
 	else
 		$uid = $user;
-		
+
 	if (isset($_GET['stdsem']))
 		$stdsem=$_GET['stdsem'];
 	else
 		$stdsem=$studiensemester->getaktorNext();
-	
+
 	$datum = new datum();
 
 	$addon = new addon();
@@ -86,8 +86,8 @@ require_once('../../../include/addon.class.php');
 */
 	//Lehrveranstaltungen abfragen.
 	$sql_query="
-		SELECT 
-			*, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kurzbz, 
+		SELECT
+			*, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kurzbz,
 			tbl_lehrveranstaltung.semester as lv_semester,
 			lehrfach.kurzbz as lehrfach,
 			lehrfach.bezeichnung as lehrfach_bez,
@@ -97,8 +97,8 @@ require_once('../../../include/addon.class.php');
 			tbl_lehreinheit.lehrform_kurzbz as le_lehrform_kurzbz,
 			(SELECT kurzbz FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as lektor,
 			tbl_lehrveranstaltung.lehrveranstaltung_id
-		FROM 
-		lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
+		FROM
+		lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
 		JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 		JOIN public.tbl_studiengang USING(studiengang_kz)
 		JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
@@ -122,23 +122,23 @@ require_once('../../../include/addon.class.php');
 		{
 			alert("'.$p->t('lvaliste/hilfeText').'");
 		}
-		$(document).ready(function() 
-		{ 
+		$(document).ready(function()
+		{
 			$("#t1").tablesorter(
 			{
-				sortList: [[4,0],[5,0],[2,0]],
+				sortList: [[5,0],[6,0],[3,0]],
 				widgets: ["zebra"]
-			}); 
+			});
 			$("#t2").tablesorter(
 			{
 				sortList: [[0,0],[1,0],[3,0]],
 				widgets: ["zebra"]
-			}); 
+			});
 			$("#t3").tablesorter(
 			{
 				sortList: [[0,0],[1,0],[3,0]],
 				widgets: ["zebra"]
-			}); 
+			});
 		});
 		-->
 		</script>
@@ -159,7 +159,7 @@ require_once('../../../include/addon.class.php');
 	echo '</td></tr></table><br>';
 	if ($num_rows>0)
 	{
-		
+
 		echo '<h3>'.$p->t('lvaliste/lehrveranstaltungen').'</h3>';
 		echo $p->t('lvaliste/anzahl').': '.$num_rows;
 		echo '
@@ -174,9 +174,10 @@ require_once('../../../include/addon.class.php');
 			echo '<th>'.$p->t('lvaliste/lvinfo').'</th>';
 
 		echo '
+				<th>'.$p->t('lvaliste/id').'</th>
 				<th>'.$p->t('lvaliste/lehrfach').'</th>
 				<th>'.$p->t('lvaliste/lehrform').'</th>
-				<th>'.$p->t('lvaliste/lvBezeichnung').'</th>				
+				<th>'.$p->t('lvaliste/lvBezeichnung').'</th>
 				<th>'.$p->t('lvaliste/lektor').'</th>
 				<th>'.$p->t('lvaliste/studiengang').'</th>
 				<th>'.$p->t('lvaliste/semester').'</th>
@@ -196,7 +197,7 @@ require_once('../../../include/addon.class.php');
 		$stg_obj = new studiengang();
 		$stg_obj->getAll(null,null);
 		$summe_std=0;
-		
+
 		for ($i=0; $i<$num_rows; $i++)
 		{
 			$row=$db->db_fetch_object($result);
@@ -208,16 +209,17 @@ require_once('../../../include/addon.class.php');
 			if($lvinfo)
 				echo '<td><a href="../../../addons/lvinfo/cis/lvinfo.php?lv_id='.$row->lehrveranstaltung_id.'&studiensemester_kurzbz='.$stdsem.'" target="_blank">'.$p->t('lvaliste/lvinfo').'</a></td>';
 
+			echo '<td>'.$row->lehreinheit_id.'</td>';
 			echo '<td>'.$row->lehrfach.'</td>';
-			echo '<td>'.$row->le_lehrform_kurzbz.'</td>';	
-			if ($row->lehrfach_bez!=$row->lv_bezeichnung)			
+			echo '<td>'.$row->le_lehrform_kurzbz.'</td>';
+			if ($row->lehrfach_bez!=$row->lv_bezeichnung)
 				echo '<td>'.$row->lv_bezeichnung.' ('.$p->t('lvaliste/lehrfach').': '.$row->lehrfach_bez.')</td>';
-			else 
+			else
 				echo '<td>'.$row->lv_bezeichnung.'</td>';
 			echo '<td>'.$row->lektor.'</td>';
 			echo '<td><a href="mailto:'.$row->email.'">'.$row->stg_kurzbz.'</a></td>';
 			echo '<td>'.$row->semester.'</td>';
-			
+
 			$qry ="SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='".addslashes($row->lehreinheit_id)."'";
 			$gruppe='';
 			if($result_grp = $db->db_query($qry))
@@ -226,7 +228,7 @@ require_once('../../../include/addon.class.php');
 				{
 					if($row_grp->gruppe_kurzbz!='')
 						$gruppe.= $row_grp->gruppe_kurzbz.'<br>';
-					else 
+					else
 						$gruppe.= $stg_obj->kuerzel_arr[$row->studiengang_kz].'-'.$row_grp->semester.$row_grp->verband.$row_grp->gruppe.'<br>';
 				}
 			}
@@ -237,7 +239,7 @@ require_once('../../../include/addon.class.php');
 			echo '<td>'.$row->wochenrythmus.'</td>';
 			echo '<td>'.$row->semesterstunden.'</td>';
 			echo '<td>'.$row->start_kw.'</td>';
-			
+
 			$lvangebot->getAllFromLvId($row->lehrveranstaltung_id, $row->studiensemester_kurzbz);
 			if(!empty($lvangebot->result))
 			{
@@ -282,18 +284,18 @@ require_once('../../../include/addon.class.php');
 	}
 	else
 		echo $p->t('lvaliste/keineDatensaetze').'<BR>';
-		
+
 	//Betreuungen
 
 	$mitarbeiter = new benutzer();
 	$mitarbeiter->load($uid);
-	
-	$qry = "SELECT 
-				tbl_lehrveranstaltung.bezeichnung, tbl_projektarbeit.titel, 
-				(SELECT nachname || ' ' || vorname FROM public.tbl_benutzer JOIN public.tbl_person USING(person_id) 
+
+	$qry = "SELECT
+				tbl_lehrveranstaltung.bezeichnung, tbl_projektarbeit.titel,
+				(SELECT nachname || ' ' || vorname FROM public.tbl_benutzer JOIN public.tbl_person USING(person_id)
 				 WHERE uid=student_uid) as student, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester,
 				 tbl_studiengang.email
-			FROM 
+			FROM
 				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektarbeit, lehre.tbl_projektbetreuer, public.tbl_studiengang
 			WHERE
 				tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
@@ -302,10 +304,10 @@ require_once('../../../include/addon.class.php');
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND
 				tbl_projektbetreuer.person_id=".$db->db_add_param($mitarbeiter->person_id, FHC_INTEGER);
-	
+
 	$stg_obj = new studiengang();
 	$stg_obj->getAll(null,null);
-	
+
 	if($result = $db->db_query($qry))
 	{
 		if($db->db_num_rows($result)>0)
@@ -322,29 +324,29 @@ require_once('../../../include/addon.class.php');
 			echo '</tr></thead><tbody>';
 			while($row = $db->db_fetch_object($result))
 			{
-				echo '<tr>';				
+				echo '<tr>';
 				echo '<td><a href="mailto:'.$row->email.'">'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</a></td>';
 				echo '<td>'.$row->semester.'</td>';
 				echo '<td>'.$row->bezeichnung.'</td>';
 				echo '<td>'.$row->student.'</td>';
 				echo '<td>'.$row->titel.'</td>';
-				
+
 				echo '</tr>';
 			}
 			echo '</tbody></table>';
 		}
 	}
-	
-	
+
+
 	//Koordination
-	
-	$qry = "SELECT 
+
+	$qry = "SELECT
 				distinct
-				tbl_lehrveranstaltung.studiengang_kz, tbl_fachbereich.fachbereich_kurzbz, tbl_lehrveranstaltung.bezeichnung, 
+				tbl_lehrveranstaltung.studiengang_kz, tbl_fachbereich.fachbereich_kurzbz, tbl_lehrveranstaltung.bezeichnung,
 				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.semester,tbl_lehrveranstaltung.koordinator,
 				tbl_studiengang.email
-			FROM 
-				lehre.tbl_lehrveranstaltung, 
+			FROM
+				lehre.tbl_lehrveranstaltung,
 				lehre.tbl_lehreinheit,
 				lehre.tbl_lehrveranstaltung as lehrfach,
 				public.tbl_studiengang,
@@ -355,18 +357,18 @@ require_once('../../../include/addon.class.php');
 				tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz AND
 				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stdsem)." AND
 				(tbl_lehrveranstaltung.koordinator=".$db->db_add_param($uid)."
-				OR 
-				 ( tbl_lehrveranstaltung.koordinator is null and (tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz) IN (SELECT studiengang_kz, fachbereich_kurzbz 
+				OR
+				 ( tbl_lehrveranstaltung.koordinator is null and (tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz) IN (SELECT studiengang_kz, fachbereich_kurzbz
 				 																FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz)
-									 										  WHERE funktion_kurzbz='fbk' AND uid=".$db->db_add_param($uid)." 
+									 										  WHERE funktion_kurzbz='fbk' AND uid=".$db->db_add_param($uid)."
 														  					and ( tbl_benutzerfunktion.datum_bis is null or now() between tbl_benutzerfunktion.datum_von and tbl_benutzerfunktion.datum_bis )
 																			))
 				 ) AND
 				 tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz
 				 order by tbl_lehrveranstaltung.studiengang_kz,tbl_lehrveranstaltung.semester ,tbl_lehrveranstaltung.bezeichnung
 				 ";
-				 
-				 
+
+
 	if($result = $db->db_query($qry))
 	{
 		if($db->db_num_rows($result)>0)
@@ -386,12 +388,12 @@ require_once('../../../include/addon.class.php');
 				//Fachbereichskoordinatoren holen
 				$qry = "SELECT distinct
 							uid,titelpre, titelpost, vorname, nachname
-						FROM 
+						FROM
 							lehre.tbl_lehreinheitmitarbeiter,
 							public.tbl_benutzer,
 							public.tbl_person,
 							lehre.tbl_lehreinheit
-						WHERE 
+						WHERE
 							tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 							tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($row->lehrveranstaltung_id, FHC_INTEGER)." AND
 							tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND
@@ -407,7 +409,7 @@ require_once('../../../include/addon.class.php');
 						$lektoren.=trim($row_lkt->titelpre.' '.$row_lkt->vorname.' '.$row_lkt->nachname.' '.$row_lkt->titelpost);
 					}
 				}
-					
+
 				echo '<tr>';
 					echo '<td><a href="mailto:'.$row->email.'">'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</a></td>';
 					echo '<td>'.$row->semester.'</td>';

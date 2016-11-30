@@ -709,7 +709,7 @@
 				<text:p text:style-name="P9"/>
 				<text:p text:style-name="P20">This contract governs the legal relationship between </text:p>
 				<text:p text:style-name="P20">
-					<text:span text:style-name="T5">the University of Applied Sciences Technikum Wien Association,</text:span> 1060 Vienna, Mariahilferstraße 37-39 (referred to as &quot;operator&quot;) on the one hand <text:span text:style-name="T5">and</text:span>
+					<text:span text:style-name="T5">the University of Applied Sciences Technikum Wien Association,</text:span> 1060 Vienna, Mariahilfer Straße 37-39 (referred to as &quot;operator&quot;) on the one hand <text:span text:style-name="T5">and</text:span>
 				</text:p>
 				<text:p text:style-name="P26"/>
 				<text:p text:style-name="P20"/>
@@ -808,6 +808,9 @@
 						<xsl:when test="orgform = 'VZ'" >
 							Vollzeitstudiums.
 						</xsl:when>
+						<xsl:when test="orgform = 'PT'" >
+							berufsbegleitenden Studiums.
+						</xsl:when>
 						<xsl:otherwise>
 							Fernstudiums.
 						</xsl:otherwise>
@@ -837,7 +840,7 @@
 					<text:span text:style-name="T18">1. Ausbildungsort</text:span>
 				</text:p>
 				<text:p text:style-name="P19"/>
-				<text:p text:style-name="P20">Studienort sind die Räumlichkeiten der FH Technikum Wien, 1200 Wien, Höchstädtplatz und 1210 Wien, Giefinggasse. Bei Bedarf kann der Erhalter einen anderen Studienort in Wien festlegen, außerhochschulische Aktivitäten (zB Exkursionen) können auch außerhalb von Wien stattfinden. </text:p>
+				<text:p text:style-name="P20">Studienort sind die Räumlichkeiten der FH Technikum Wien, 1200 Wien, Höchstädtplatz und 1210 Wien, Giefinggasse. Bei Bedarf kann der Erhalter einen anderen Studienort in Wien festlegen, außerhochschulische Aktivitäten (z.B. Exkursionen) können auch außerhalb von Wien stattfinden. </text:p>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="Standard">
 					<text:span text:style-name="T18">2. Vertragsgrundlage</text:span>
@@ -1103,7 +1106,7 @@
 				<text:p text:style-name="P20">Diese Dokumente sind öffentlich zugänglich unter www.technikum-wien.at.</text:p>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P48">6.2.2 Studienbeitrag </text:p>
-				<text:p text:style-name="P48">Die Studentin bzw. der Student ist verpflichtet, zwei Wochen vor Beginn jedes Semesters (StudienanfängerInnen: bis 20. August vor Studienbeginn) einen Studienbeitrag gemäß Fachhochschul-Studiengesetz in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Dies gilt auch in Semestern mit DiplomandInnenenstatus o.ä. Im Falle einer Erhöhung des gesetzlichen Studienbeitrags-satzes erhöht sich der angeführte Betrag entsprechend. Die vollständige Bezahlung des Studienbeitrags ist Voraussetzung für die Aufnahme bzw. die Fortsetzung des Studiums. Bei Nichtantritt des Studiums oder Abbruch zu Beginn oder während des Semesters verfällt der Studienbeitrag. </text:p>
+				<text:p text:style-name="P48">Die Studentin bzw. der Student ist verpflichtet, zwei Wochen vor Beginn jedes Semesters (StudienanfängerInnen: bis 20. August vor Studienbeginn) einen Studienbeitrag gemäß Fachhochschul-Studiengesetz idgF in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Dies gilt auch in Semestern mit DiplomandInnenenstatus o.ä. Im Falle einer Erhöhung des gesetzlichen Studienbeitrags-satzes erhöht sich der angeführte Betrag entsprechend. Die vollständige Bezahlung des Studienbeitrags ist Voraussetzung für die Aufnahme bzw. die Fortsetzung des Studiums. Bei Nichtantritt des Studiums oder Abbruch zu Beginn oder während des Semesters verfällt der Studienbeitrag. </text:p>
 				<text:p text:style-name="P69">
 					<text:span text:style-name="T8">6.2 Duties</text:span>
 				</text:p>
@@ -1131,10 +1134,10 @@
 				<text:p text:style-name="P20">These documents are publically available at www.technikum-wien.at.</text:p>
 				<text:p text:style-name="P48"/>
 				<text:p text:style-name="P48">6.2.2 Tuition Fees</text:p>
-				<text:p text:style-name="P48">Two weeks before the beginning of each semester (new students: up to August 20 before taking up studies) the student undertakes to pay tuition fees according to the University of Applied Sciences Studies Act currently to the sum of € 363.36 net payable per semester. This also applies in semesters with graduand status etc. In the event of an increase in the legal tuition fees rate, the amount quoted will increase accordingly. Full payment of the tuition fees is a prerequisite both for enrolling on the course and continuing with the degree program. For non-commencement or termination of the study at the beginning or during the semester, the tuition fee is forfeited. </text:p>
+				<text:p text:style-name="P48">Two weeks before the beginning of each semester (new students: up to August 20 before taking up studies) the student undertakes to pay tuition fees according to the University of Applied Sciences Studies Act as amended currently to the sum of € 363.36 net payable per semester. This also applies in semesters with graduand status etc. In the event of an increase in the legal tuition fees rate, the amount quoted will increase accordingly. Full payment of the tuition fees is a prerequisite both for enrolling on the course and continuing with the degree program. For non-commencement or termination of the study at the beginning or during the semester, the tuition fee is forfeited. </text:p>
 				<text:p text:style-name="P67">
 					<text:soft-page-break/>6.2.3 ÖH-Beitrag</text:p>
-				<text:p text:style-name="P20">Gemäß § 4 Abs 10 FHStG sind Studierende an Fachhochschulen Mitglieder der Österreichischen HochschülerInnenschaft (ÖH). Der/Die Studierende hat semesterweise einen ÖH-Beitrag an den Erhalter zu entrichten, der diesen an die ÖH abführt. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum Studium bzw. für dessen Fortsetzung.</text:p>
+				<text:p text:style-name="P20">Gemäß § 4 Abs. 10 FHStG sind Studierende an Fachhochschulen Mitglieder der Österreichischen HochschülerInnenschaft (ÖH). Der/Die Studierende hat semesterweise einen ÖH-Beitrag an den Erhalter zu entrichten, der diesen an die ÖH abführt. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum Studium bzw. für dessen Fortsetzung.</text:p>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20">6.2.4 Kaution </text:p>
 				<text:p text:style-name="P20">Im Zuge der Einschreibung ist der Nachweis über die einbezahlte Kaution zu erbringen. </text:p>
@@ -1203,7 +1206,7 @@
 				<text:p text:style-name="P48"/>
 				<text:p text:style-name="P48"/>
 				<text:p text:style-name="P48">6.2.7 Providing Personal Data</text:p>
-				<text:p text:style-name="P51">The student is obliged to produce personal data which must be registered because of a law, regulation or a decision by the operator, or is essential fort he fulfilling of the training contract or fort he program of studies.</text:p>
+				<text:p text:style-name="P51">The student is obliged to produce personal data which must be registered because of a law, regulation or a decision by the operator, or is essential for the fulfilling of the training contract or for the program of studies.</text:p>
 				<text:p text:style-name="P51"/>
 				<text:p text:style-name="P51"/>
 				<text:p text:style-name="P51"/>
@@ -1220,8 +1223,8 @@
 				<text:p text:style-name="P39">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der Studentin oder dem Studenten getroffen wurden, ist die Studentin oder der Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen auf dessen schriftliche Anfrage hin anzubieten.</text:p>
 				<text:p text:style-name="P39"/>
 				<text:p text:style-name="P41">6.2.10 Aufzeichnungen und Mitschnitte</text:p>
-				<text:p text:style-name="P39">Es ist der/dem Studierenden ausdrücklich untersagt, Lehrveranstaltungen als Ganzes oder nur Teile davon aufzuzeichnen und/oder mitzuschneiden (z.B. durch Film- und/oder Tonaufnahmen oder sonstige hierfür geeignete audiovisuelle Mittel). Darüber hinaus ist jede Form der öffentlichen Zurverfügungstellung (drahtlos oder drahtgebunden) der vorgenannten Aufnahmen z.B. in sozialen Netzwerken wie Facebook, StudiVZ etc, aber auch auf Youtube usw. oder durch sonstige für diese Zwecke geeignete Kommunikations-mittel untersagt. Diese Regelungen gelten sinngemäß auch für Skripten, sonstige Lernbehelfe und Prüfungsangaben. </text:p>
-				<text:p text:style-name="P39">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und zum privaten Gebrauch, sofern hierfür der Vortragende vorab ausdrücklich seine schriftliche Zustimmung erteilt hat. </text:p>
+				<text:p text:style-name="P39">Es ist der/dem Studierenden ausdrücklich untersagt, Lehrveranstaltungen als Ganzes oder nur Teile davon aufzuzeichnen und/oder mitzuschneiden (z.B. durch Film- und/oder Tonaufnahmen oder sonstige hierfür geeignete audiovisuelle Mittel). Darüber hinaus ist jede Form der öffentlichen Zurverfügungstellung (drahtlos oder drahtgebunden) der vorgenannten Aufnahmen z.B. in sozialen Netzwerken wie Facebook, StudiVZ etc., aber auch auf Youtube usw. oder durch sonstige für diese Zwecke geeignete Kommunikations-mittel untersagt. Diese Regelungen gelten sinngemäß auch für Skripten, sonstige Lernbehelfe und Prüfungsangaben. </text:p>
+				<text:p text:style-name="P39">Ausgenommen hiervon ist eine Aufzeichnung zu ausschließlichen Lern-, Studien- und Forschungszwecken und zum privaten Gebrauch, sofern hierfür der / die Vortragende vorab ausdrücklich seine / ihre schriftliche Zustimmung erteilt hat. </text:p>
 				<text:p text:style-name="P39"/>
 				<text:p text:style-name="P39">
 					<text:span text:style-name="T37">6.2.11 Geheimhaltungspflicht</text:span>
@@ -1235,7 +1238,7 @@
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20">6.2.10 Recordings </text:p>
-				<text:p text:style-name="P20">It is expressly forbidden for the student to record lectures in part or in total (e.g. by using film and / or sound recordings or other audio-visual means suitable for this purpose). In addition, any form of making the aforementioned recordings publically available (wired or wireless) for example in social networks such as Facebook, StudiVZ etc, but also on Youtube, etc., or by other means of communication designed for these purposes is strictly prohibited. These regulations shall apply correspondingly to scripts, other learning aids and examination data. </text:p>
+				<text:p text:style-name="P20">It is expressly forbidden for the student to record lectures in part or in total (e.g. by using film and / or sound recordings or other audio-visual means suitable for this purpose). In addition, any form of making the aforementioned recordings publically available (wired or wireless) for example in social networks such as Facebook, StudiVZ etc., but also on Youtube, etc., or by other means of communication designed for these purposes is strictly prohibited. These regulations shall apply correspondingly to scripts, other learning aids and examination data. </text:p>
 				<text:p text:style-name="P20">The only exception is a recording exclusively for the purpose of learning, study and research and for personal use, provided that the lecturer has expressly granted his / her prior written consent.</text:p>
 				<text:p text:style-name="P20"/>
 				<text:p text:style-name="P20"/>

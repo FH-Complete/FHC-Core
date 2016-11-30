@@ -75,8 +75,26 @@ $count_err=0;
 $error_log=array();
 // Mails an die Lektoren und Verbaende
 $message=array();
-// Nachrichten fuer die Stundenplanstelle
-$message_stpl='';
+// Nachrichten fuer die LV-Planung
+$message_stpl='
+<style>
+th,td
+{
+	text-align:left;
+}
+.marked
+{
+	color:red;
+}
+.unmarked
+{
+}
+span.engl
+{
+	color:gray;
+	size:small;
+}
+</style>';
 // error_log
 $message_sync='';
 
@@ -85,10 +103,12 @@ $message_sync='';
 $headers= "MIME-Version: 1.0\r\n";
 $headers.="Content-Type: text/html; charset=UTF-8\r\n";
 
-$ss=new studiensemester();
-$ss->getNearestTillNext();
+$stsem = new studiensemester();
+$studiensemester = $stsem->getaktorNearest();
+$ss=new studiensemester($studiensemester);
 $datum_begin=$ss->start;
 $datum_ende=$ss->ende;
+
 //$datum_begin='2012-08-03';
 //$datum_ende='2013-02-02'; // $ss->ende
 if(defined('LVPLAN_SYNC_ENDE') && LVPLAN_SYNC_ENDE!='')
@@ -107,6 +127,7 @@ if(isset($_GET['custom']))
 	$datum_begin = $datum->formatDatum($_GET['von'],'Y-m-d');
 	$datum_ende = $datum->formatDatum($_GET['bis'],'Y-m-d');
 }
+$message_summary = '';
 
 // Beginnzeiten holen
 $qry = "SELECT stunde,to_char(beginn, 'HH24:MI') AS beginn FROM lehre.tbl_stunde";
@@ -450,7 +471,7 @@ else
 						$message[$student]->message_begin=$message_begin.'<BR>';
 						if(!isset($message[$student]->message))
 							$message[$student]->message='';
-						$message[$student]->message.='<font style="color:#FFA100"><strong>'.$p_de->t('lvplan/gloeschteStunden').' / '.$p_en->t('lvplan/geloeschteStunden').'</strong></font><BR>
+						$message[$student]->message.='<font style="color:#FFA100"><strong>'.$p_de->t('lvplan/geloeschteStunden').' / '.$p_en->t('lvplan/geloeschteStunden').'</strong></font><BR>
 								<TABLE>
 								<TR>
 									<TH>'.$p_de->t('lvplan/raum').'<br><span class="engl">'.$p_en->t('lvplan/raum').'</span></TH>
@@ -759,16 +780,23 @@ else
 /**************************************************
  * Mails an Lektoren und Studenten schicken
  */
+$message_help = '';
 if ($sendmail)
 {
 	foreach ($message as $msg)
 	{
-		$mail = new mail($msg->mailadress,MAIL_LVPLAN,'LV-Plan update','Sie muessen diese Mail als HTML-Mail anzeigen um die LV-Plan Änderungen anzuzeigen');
+		$mail = new mail($msg->mailadress,MAIL_LVPLAN,'LV-Plan Update','Sie muessen diese Mail als HTML-Mail anzeigen um die LV-Plan Änderungen anzuzeigen');
 		$mail->setHTMLContent($msg->message_begin.$msg->message);
 		if ($mail->send())
 		{
 			echo 'Mail an '.$msg->mailadress.' wurde verschickt!<BR>';
 			$message_stpl.='Mail an '.$msg->mailadress.' wurde verschickt!<BR>';
+			if ($message_help != $msg->message)
+			{
+				$message_summary .= $msg->message;
+				$message_summary .= '<br/><hr><br/>';
+				$message_help = $msg->message;
+			}
 		}
 		else
 		{
@@ -836,12 +864,15 @@ $message_tmp=$count_upd.' Datens&auml;tze wurden ge&auml;ndert.<BR>
 			'.$count_err.' Fehler sind dabei aufgetreten!<BR><BR>';
 echo '<BR>'.$message_tmp;
 
-$message_sync='<HTML><BODY>'.$message_tmp.$message_sync.$message_stpl.'</BODY></HTML>';
-$mail = new mail(MAIL_ADMIN,MAIL_LVPLAN,'LV-Plan update','Sie muessen diese Mail als HTML-Mail anzeigen um die LV-Plan Änderungen anzuzeigen');
+//Bricht den Code um, da es sonst zu Anzeigefehlern im Mail kommen kann
+$message_stpl = wordwrap($message_stpl, 70);
+$message_summary = wordwrap($message_summary, 70);
+$message_sync='<HTML><BODY>'.$message_tmp.$message_sync.$message_stpl.'<br/><br/><h3>Details</h3>'.$message_summary.'</BODY></HTML>';
+$mail = new mail(MAIL_ADMIN,MAIL_LVPLAN,'LV-Plan Update Zusammenfassung','Sie muessen diese Mail als HTML-Mail anzeigen um die LV-Plan Änderungen anzuzeigen');
 $mail->setHTMLContent($message_sync);
 $mail->send();
-$message_stpl='<HTML><BODY>'.$message_tmp.$message_stpl.'</BODY></HTML>';
-$mail = new mail(MAIL_LVPLAN, MAIL_LVPLAN, 'LV-Plan update', 'Sie muessen diese Mail als HTML-Mail anzeigen um die LV-Plan Änderungen anzuzeigen');
+$message_stpl='<HTML><BODY>'.$message_tmp.$message_stpl.'<br/><br/><h3>Details</h3>'.$message_summary.'</BODY></HTML>';
+$mail = new mail(MAIL_LVPLAN, MAIL_LVPLAN, 'LV-Plan Update Zusammenfassung', 'Sie muessen diese Mail als HTML-Mail anzeigen um die LV-Plan Änderungen anzuzeigen');
 $mail->setHTMLContent($message_stpl);
 $mail->send();
 ?>

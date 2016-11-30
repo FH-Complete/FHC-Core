@@ -36,6 +36,7 @@ class frage extends basis_db
 	public $demo;
 	public $level;
 	public $kategorie_kurzbz;
+	public $aktiv;
 
 	public $sprache;
 	public $audio;
@@ -80,7 +81,7 @@ class frage extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM testtool.tbl_frage WHERE frage_id=".$this->db_add_param($frage_id, FHC_INTEGER);
+		$qry = "SELECT * FROM testtool.tbl_frage LEFT OUTER JOIN testtool.tbl_frage_sprache USING (frage_id) WHERE frage_id=".$this->db_add_param($frage_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -96,6 +97,8 @@ class frage extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->level = $row->level;
+				$this->aktiv = $row->aktiv;
+				$this->bild = $row->bild;
 
 				return true;
 			}
@@ -137,7 +140,7 @@ class frage extends basis_db
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
 			$qry = 'BEGIN;INSERT INTO testtool.tbl_frage (kategorie_kurzbz, gebiet_id, level, nummer, demo,
-													insertamum, insertvon, updateamum, updatevon) VALUES('.
+													insertamum, insertvon, aktiv, updateamum, updatevon) VALUES('.
 			       $this->db_add_param($this->kategorie_kurzbz).','.
 			       $this->db_add_param($this->gebiet_id, FHC_INTEGER).','.
 			       $this->db_add_param($this->level).','.
@@ -145,6 +148,7 @@ class frage extends basis_db
 			       $this->db_add_param($this->demo, FHC_BOOLEAN).','.
 			       $this->db_add_param($this->insertamum).','.
 			       $this->db_add_param($this->insertvon).','.
+			       $this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
 			       'null,null);';
 		}
 		else
@@ -156,7 +160,8 @@ class frage extends basis_db
 			       ' nummer='.$this->db_add_param($this->nummer).','.
 			       ' demo='.$this->db_add_param($this->demo, FHC_BOOLEAN).','.
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
-			       ' updatevon='.$this->db_add_param($this->updatevon).
+			       ' updatevon='.$this->db_add_param($this->updatevon).','.
+			       ' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).
 			       " WHERE frage_id=".$this->db_add_param($this->frage_id, FHC_INTEGER, false).";";
 		}
 
@@ -222,12 +227,12 @@ class frage extends basis_db
 		else
 		{
 			$qry = 'UPDATE testtool.tbl_frage_sprache SET'.
-			       ' text='.$this->db_add_param($this->text).','.
-			       ' bild='.$this->db_add_param($this->bild).','.
-			       ' audio='.$this->db_add_param($this->audio).','.
-			       ' updateamum='.$this->db_add_param($this->updateamum).','.
-			       ' updatevon='.$this->db_add_param($this->updatevon).
-			       " WHERE frage_id=".$this->db_add_param($this->frage_id, FHC_INTEGER, false)." AND sprache=".$this->db_add_param($this->sprache).";";
+					' text='.$this->db_add_param($this->text).','.
+					' bild='.$this->db_add_param($this->bild).','.
+					' audio='.$this->db_add_param($this->audio).','.
+					' updateamum='.$this->db_add_param($this->updateamum).','.
+					' updatevon='.$this->db_add_param($this->updatevon).
+					" WHERE frage_id=".$this->db_add_param($this->frage_id, FHC_INTEGER, false)." AND sprache=".$this->db_add_param($this->sprache).";";
 		}
 
 		if($this->db_query($qry))
@@ -265,6 +270,7 @@ class frage extends basis_db
 				$obj->level = $row->level;
 				$obj->nummer = $row->nummer;
 				$obj->demo = $this->db_parse_bool($row->demo);
+				$obj->aktiv = $this->db_parse_bool($row->aktiv); //TODO
 
 				$this->result[] = $obj;
 			}
@@ -281,7 +287,7 @@ class frage extends basis_db
 	/**
 	 * Liefert die Fragen eines Gebietes
 	 *
-	 * @param $gebiet_id
+	 * @param integer $gebiet_id
 	 * @return true wenn ok, sonst false
 	 */
 	public function getFragenGebiet($gebiet_id)
@@ -301,6 +307,7 @@ class frage extends basis_db
 				$obj->level = $row->level;
 				$obj->nummer = $row->nummer;
 				$obj->demo = $this->db_parse_bool($row->demo);
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 
 				$this->result[] = $obj;
 			}
@@ -346,7 +353,7 @@ class frage extends basis_db
 			if(!is_null($frage_id))
 				$qry.="	AND tbl_pruefling_frage.nummer>(SELECT nummer FROM testtool.tbl_pruefling_frage WHERE pruefling_id=".$this->db_add_param($pruefling_id, FHC_INTEGER)." AND frage_id=".$this->db_add_param($frage_id, FHC_INTEGER)." LIMIT 1)";
 			elseif(is_null($frage_id) && $levelgebiet)
-				$qry.=" AND tbl_pruefling_frage.endtime is null ";
+				$qry.=" AND tbl_pruefling_frage.endtime is null";
 
 			$qry.="ORDER BY tbl_pruefling_frage.nummer ASC LIMIT 1";
 		}
@@ -391,6 +398,7 @@ class frage extends basis_db
 				$this->level = $row->level;
 				$this->demo = $this->db_parse_bool($row->demo);
 				$this->nummer = $row->nummer;
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
 
 				return true;
 			}
@@ -535,6 +543,7 @@ class frage extends basis_db
 						tbl_frage.gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND
 						tbl_pruefling_frage.pruefling_id=".$this->db_add_param($pruefling_id, FHC_INTEGER)."
 					ORDER BY nummer DESC LIMIT 1;";
+
 			if($this->db_query($qry))
 			{
 				if($row = $this->db_fetch_object())
@@ -816,6 +825,65 @@ class frage extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim loeschen der Frage';
+			return false;
+		}
+	}
+	
+	/**
+	 * Gibt die Nummer der naechsten Frage zurueck (nicht fuer den test sondern fuer die testtool-administrationsseite)
+	 * 
+	 * @param $frage_nummer Nummer der aktuellen Frage
+	 * @param $gebiet_id Gebiet der Fragen
+	 * @param $aktiv true wenn nur aktiv, false wenn nur inaktiv, null wenn beides
+	 */
+	public function getNextFrageNummer($frage_nummer, $gebiet_id, $aktiv=null)
+	{
+		$erg = '';
+		$qry = "SELECT nummer FROM testtool.tbl_frage
+				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)."
+				 AND nummer>".$this->db_add_param($frage_nummer, FHC_INTEGER);
+		
+		if (!is_null($aktiv) && $aktiv)
+			$qry .= " AND aktiv";
+		if (!is_null($aktiv) && !$aktiv)
+			$qry .= " AND NOT aktiv";
+		
+		$qry .=	" ORDER BY nummer ASC LIMIT 1"; //Es wird immer nur ein Maximum geben, deswegen kein max()
+			
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$erg .= $row->nummer;
+			}
+			return $erg;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Gibt die letzte (hoechste) Nummer eines Gebiets zurueck
+	 *
+	 * @param integer $gebiet_id Gebiet der Fragen
+	 * @return integer $number Nummer der letzten Frage des Gebiets, wenn gefunden, sonst false
+	 */
+	public function getMaxNummer($gebiet_id)
+	{
+		$number = '';
+		$qry = "SELECT nummer FROM testtool.tbl_frage
+				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." ORDER BY nummer DESC LIMIT 1";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$number = $row->nummer;
+			}
+			return $number;
+		}
+		else 
+		{
 			return false;
 		}
 	}

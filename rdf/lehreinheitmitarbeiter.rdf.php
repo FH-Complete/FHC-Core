@@ -61,14 +61,16 @@ foreach ($DAO_obj->lehreinheitmitarbeiter as $row)
 {
 	$vorname='unbekannt';
 	$nachname='unbekannt';
+	$aktiv=true;
 	$db = new basis_db();
-	$qry = "SELECT vorname, nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid='".addslashes($row->mitarbeiter_uid)."'";
+	$qry = "SELECT vorname, nachname, tbl_benutzer.aktiv FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid='".addslashes($row->mitarbeiter_uid)."'";
 	if($db->db_query($qry))
 	{
 		if($row_lkt = $db->db_fetch_object())
 		{
 			$vorname = $row_lkt->vorname;
 			$nachname = $row_lkt->nachname;
+			$aktiv = $db->db_parse_bool($row_lkt->aktiv);
 		}
 	}
 
@@ -97,6 +99,7 @@ foreach ($DAO_obj->lehreinheitmitarbeiter as $row)
             <LEHREINHEITMITARBEITER:anmerkung><![CDATA[<?php echo $row->anmerkung ?>]]></LEHREINHEITMITARBEITER:anmerkung>
             <LEHREINHEITMITARBEITER:bismelden><![CDATA[<?php echo ($row->bismelden?'Ja':'Nein') ?>]]></LEHREINHEITMITARBEITER:bismelden>
 			<LEHREINHEITMITARBEITER:verplant><![CDATA[<?php echo ($verplant?'true':'false'); ?>]]></LEHREINHEITMITARBEITER:verplant>
+			<LEHREINHEITMITARBEITER:aktiv><![CDATA[<?php echo ($aktiv?'aktiv':'inaktiv'); ?>]]></LEHREINHEITMITARBEITER:aktiv>
          </RDF:Description>
       </RDF:li>
 <?php

@@ -78,7 +78,7 @@ if(isset($_GET['stg_kz']))
 	{
 		$stg_kz=$_GET['stg_kz'];
 	}
-	else 
+	else
 	{
 		echo "<H2>Es wurde kein Lehrgang ausgew&auml;hlt!</H2>";
 	}
@@ -166,12 +166,12 @@ if($result = $db->db_query($qry))
 	<ErhKz>".$erhalter."</ErhKz>
 	<MeldeDatum>".date("dmY", $datumobj->mktime_fromdate($bisdatum))."</MeldeDatum>
 	<LehrgangMeldung>
-  		<Lehrgang>
+		<Lehrgang>
 			<LehrgangNr>".$lehrgangsnummer."</LehrgangNr>";
-	
+
 	while($row = $db->db_fetch_object($result))
-  	{
-      	//Plausichecks
+	{
+		//Plausichecks
 		$qryadr="SELECT * FROM public.tbl_adresse WHERE heimatadresse IS TRUE AND person_id=".$db->db_add_param($row->pers_id).";";
 		$results=$db->db_query($qryadr);
 
@@ -195,107 +195,106 @@ if($result = $db->db_query($qry))
 		}
 		if($row->gebdatum<'1920-01-01' OR $row->gebdatum==null OR $row->gebdatum=='')
 		{
-				$error_log.=(!empty($error_log)?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
+			$error_log.=(!empty($error_log)?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
 		}
 		if($row->geschlecht!='m' && $row->geschlecht!='w')
 		{
-				$error_log.=(!empty($error_log)?', ':'')."Geschlecht ('".$row->geschlecht."')";
+			$error_log.=(!empty($error_log)?', ':'')."Geschlecht ('".$row->geschlecht."')";
 		}
 		if($row->vorname=='' || $row->vorname==null)
 		{
-				$error_log.=(!empty($error_log)?', ':'')."Vorname ('".$row->vorname."')";
+			$error_log.=(!empty($error_log)?', ':'')."Vorname ('".$row->vorname."')";
 		}
 		if($row->nachname=='' || $row->nachname==null)
 		{
-				$error_log.=(!empty($error_log)?', ':'')."Nachname ('".$row->nachname."')";
+			$error_log.=(!empty($error_log)?', ':'')."Nachname ('".$row->nachname."')";
 		}
 		//SVNR muß¸ 10-stellig sein
 		if($row->svnr!='' && $row->svnr!=null && mb_strlen(trim($row->svnr))!=10)
 		{
-				$error_log.=(!empty($error_log)?', ':'')."SVNR ('".trim($row->svnr)."') ist nicht 10 Zeichen lang";
+			$error_log.=(!empty($error_log)?', ':'')."SVNR ('".trim($row->svnr)."') ist nicht 10 Zeichen lang";
 		}
 		//Ersatzkennzeichen muß 10-stellig sein
 		if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && mb_strlen(trim($row->ersatzkennzeichen))!=10)
 		{
-				$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".trim($row->ersatzkennzeichen)."') ist nicht 10 Zeichen lang";
+			$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".trim($row->ersatzkennzeichen)."') ist nicht 10 Zeichen lang";
 		}
 		//Vergleich der letzten 6 Stellen der SVNR mit Geburtsdatum - ausser bei 01.01. und 01.07.
 		if($row->svnr!='' && $row->svnr!=null && substr($row->svnr,4,6)!=$row->vdat && substr($row->vdat,0,4)!='0101' && substr($row->vdat,0,4)!='0107')
 		{
-				$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$row->gebdatum.") nicht";
+			$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$row->gebdatum.") nicht";
 		}
 		//Vergleich der letzten 6 Stellen des Ersatzkennzeichen mit Geburtsdatum
 		if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && substr($row->ersatzkennzeichen,4,6)!=$row->vdat)
 		{
-				$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".$row->ersatzkennzeichen."') enth&auml;lt Geburtsdatum (".$row->gebdatum.") nicht";
+			$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".$row->ersatzkennzeichen."') enth&auml;lt Geburtsdatum (".$row->gebdatum.") nicht";
 		}
 		if(($row->svnr=='' || $row->svnr==null)&&($row->ersatzkennzeichen=='' || $row->ersatzkennzeichen==null))
 		{
-				$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') bzw. ErsKz ('".$row->ersatzkennzeichen."') fehlt";
+			$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') bzw. ErsKz ('".$row->ersatzkennzeichen."') fehlt";
 		}
 		if($row->staatsbuergerschaft=='' || $row->staatsbuergerschaft==null)
 		{
-				$error_log.=(!empty($error_log)?', ':'')."Staatsb&uuml;rgerschaft ('".$row->staatsbuergerschaft."')";
+			$error_log.=(!empty($error_log)?', ':'')."Staatsb&uuml;rgerschaft ('".$row->staatsbuergerschaft."')";
 		}
 		if($plz=='' || $plz==null)
 		{
-				$error_log.=(!empty($error_log)?', ':'')."Heimat-PLZ ('".$plz."')";
+			$error_log.=(!empty($error_log)?', ':'')."Heimat-PLZ ('".$plz."')";
 		}
 		if($gemeinde=='' || $gemeinde==null)
 		{
-				$error_log.=(!empty($error_log)?', ':'')."Heimat-Gemeinde ('".$gemeinde."')";
+			$error_log.=(!empty($error_log)?', ':'')."Heimat-Gemeinde ('".$gemeinde."')";
 		}
 		if($strasse=='' || $strasse==null)
 		{
-				$error_log.=(!empty($error_log)?', ':'')."Heimat-Strasse ('".$strasse."')";
+			$error_log.=(!empty($error_log)?', ':'')."Heimat-Strasse ('".$strasse."')";
 		}
 		if($nation=='' || $nation==null)
 		{
-
-				$error_log.=(!empty($error_log)?', ':'')."Heimat-Nation ('".$nation."')";
+			$error_log.=(!empty($error_log)?', ':'')."Heimat-Nation ('".$nation."')";
 		}
 		if($row->zgv_code=='' || $row->zgv_code==null)
 		{
-				$error_log.=(!empty($error_log)?', ':'')."ZugangCode ('".$row->zgv_code."')";
+			$error_log.=(!empty($error_log)?', ':'')."ZugangCode ('".$row->zgv_code."')";
 		}
 		if($row->zgvdatum=='' || $row->zgvdatum==null)
 		{
-				$error_log.=(!empty($error_log)?', ':'')."ZugangDatum ('".$row->zgvdatum."')";
+			$error_log.=(!empty($error_log)?', ':'')."ZugangDatum ('".$row->zgvdatum."')";
 		}
 		else
 		{
 			if($row->zgvdatum>date('Y-m-d'))
 			{
-					$error_log.=(!empty($error_log)?', ':'')."ZugangDatum liegt in der Zukunft ('".$row->zgvdatum."')";
+				$error_log.=(!empty($error_log)?', ':'')."ZugangDatum liegt in der Zukunft ('".$row->zgvdatum."')";
 			}
 			if($row->zgvdatum<$row->gebdatum)
 			{
-					$error_log.=(!empty($error_log)?', ':'')."ZugangDatum ('".$row->zgvdatum."') kleiner als Geburtsdatum ('".$row->gebdatum."')";
+				$error_log.=(!empty($error_log)?', ':'')."ZugangDatum ('".$row->zgvdatum."') kleiner als Geburtsdatum ('".$row->gebdatum."')";
 			}
 		}
 		if($lgartcode==1)
 		{
 			if($row->zgvmas_code=='' || $row->zgvmas_code==null)
 			{
-					$error_log.=(!empty($error_log)?', ':'')."ZugangMagStgCode ('".$row->zgvmas_code."')";
+				$error_log.=(!empty($error_log)?', ':'')."ZugangMagStgCode ('".$row->zgvmas_code."')";
 			}
 			if($row->zgvmadatum=='' || $row->zgvmadatum==null)
 			{
-					$error_log.=(!empty($error_log)?', ':'')."ZugangMagStgDatum ('".$row->zgvmadatum."')";
+				$error_log.=(!empty($error_log)?', ':'')."ZugangMagStgDatum ('".$row->zgvmadatum."')";
 			}
 			else
 			{
 				if($row->zgvmadatum>date("Y-m-d"))
 				{
-						$error_log.=(!empty($error_log)?', ':'')."ZugangMagStgDatum liegt in der Zukunft ('".$row->zgvmadatum."')";
+					$error_log.=(!empty($error_log)?', ':'')."ZugangMagStgDatum liegt in der Zukunft ('".$row->zgvmadatum."')";
 				}
 				if($row->zgvmadatum<$row->zgvdatum)
 				{
-						$error_log.=(!empty($error_log)?', ':'')."ZugangMagStgDatum ('".$row->zgvmadatum."') kleiner als Zugangdatum ('".$row->zgvdatum."')";
+					$error_log.=(!empty($error_log)?', ':'')."ZugangMagStgDatum ('".$row->zgvmadatum."') kleiner als Zugangdatum ('".$row->zgvdatum."')";
 				}
 				if($row->zgvmadatum<$row->gebdatum)
 				{
-						$error_log.=(!empty($error_log)?', ':'')."ZugangMagStgDatum ('".$row->zgvmadatum."') kleiner als Geburtsdatum ('".$row->gebdatum."')";
+					$error_log.=(!empty($error_log)?', ':'')."ZugangMagStgDatum ('".$row->zgvmadatum."') kleiner als Geburtsdatum ('".$row->gebdatum."')";
 				}
 			}
 		}
@@ -411,28 +410,40 @@ if($result = $db->db_query($qry))
 		if($aktstatus=='Absolvent')
 		{
 			$qry_ap="SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid=".$db->db_add_param($row->student_uid)." AND abschlussbeurteilung_kurzbz!='nicht' AND abschlussbeurteilung_kurzbz IS NOT NULL";
-	      		if($result_ap = $db->db_query($qry_ap))
+			if($result_ap = $db->db_query($qry_ap))
 			{
 				$ap=0;
 				while($row_ap = $db->db_fetch_object($result_ap))
 				{
 					if($row_ap->datum=='' || $row_ap->datum==null)
 					{
-							$error_log.=(!empty($error_log)?', ':'')."Datum der Abschlusspr&uuml;fung ('".$row_ap->datum."')";
+						$error_log.=(!empty($error_log)?', ':'')."Datum der Abschlusspr&uuml;fung ('".$row_ap->datum."')";
 					}
 					if($row_ap->sponsion=='' || $row_ap->sponsion==null)
 					{
-							$error_log.=(!empty($error_log)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."')";
+						$error_log.=(!empty($error_log)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."')";
 					}
 					$ap++;
 					$sponsion=$row_ap->sponsion;
 				}
 				if($ap!=1)
 				{
-						$error_log.=(!empty($error_log)?', ':'').$ap." bestandene Abschlusspr&uuml;fungen";
+					$error_log.=(!empty($error_log)?', ':'').$ap." bestandene Abschlusspr&uuml;fungen";
 				}
 			}
 		}
+
+		if($row->zgvmanation!='' && $lgartcode==1) // Master Lehrgang
+			$ausstellungsstaat = $row->zgvmanation;
+		elseif($row->zgvnation!='')
+			$ausstellungsstaat = $row->zgvnation;
+		else
+			$ausstellungsstaat = $row->ausstellungsstaat;
+		if($ausstellungsstaat == '')
+		{
+			$error_log.=(!empty($error_log)?', ':'')." Ausstellungsstaat fehlt";
+		}
+
 		if($error_log!='' OR $error_log1!='')
 		{
 			//Ausgabe der fehlenden Daten
@@ -452,108 +463,95 @@ if($result = $db->db_query($qry))
 			continue;
 		}
 		else
-		{	
+		{
 			$anzahl_gemeldet++;
 			$tabelle.='<tr><td>'.$row->student_uid.'</td><td>'.$row->nachname.'</td><td>'.$row->vorname.'</td><td>'.$row->matrikelnr.'</td></tr>';
 
 			//Erstellung der XML-Datei
-				$datei.="
+			$datei.="
 			<StudentIn>
-            	  <PersKz>".trim($row->matrikelnr)."</PersKz>
-            	  <GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
-            	  <Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
+				<PersKz>".trim($row->matrikelnr)."</PersKz>
+				<GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
+				<Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
 				if(($row->svnr!='')&&($row->ersatzkennzeichen!=''))
 				{
-					//$datei.="
-		          //<Vorname>".$row->vorname."</Vorname>
-		          //<Familienname>".$row->nachname."</Familienname>";
 					$datei.="
-		          <SVNR>".$row->svnr."</SVNR>";
+				<SVNR>".$row->svnr."</SVNR>";
 					$datei.="
-		          <ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
+				<ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
 				}
 				else
 				{
 					if($row->svnr!='')
 					{
 						$datei.="
-                  <SVNR>".$row->svnr."</SVNR>";
+				<SVNR>".$row->svnr."</SVNR>";
 					}
 					if($row->ersatzkennzeichen!='')
 					{
-						//$datei.="
-                  //<Vorname>".$row->vorname."</Vorname>
-                  //<Familienname>".$row->nachname."</Familienname>";
 						$datei.="
-                  <ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
+				<ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
 					}
 				}
-				//<HeimatStrasse><![CDATA[".$strasse."]]></HeimatStrasse>
 
-				if($row->zgvmanation!='' && $lgartcode==1) // Master Lehrgang
-					$ausstellungsstaat = $row->zgvmanation;
-				elseif($row->zgvnation!='')
-					$ausstellungsstaat = $row->zgvnation;
-				else
-					$ausstellungsstaat = $row->ausstellungsstaat;
 				$datei.="
-	          <StaatsangehoerigkeitCode>".$row->staatsbuergerschaft."</StaatsangehoerigkeitCode>
-	          <HeimatPLZ>".$plz."</HeimatPLZ>
-	          <HeimatGemeinde>".$gemeinde."</HeimatGemeinde>
-	          <HeimatNation>".$nation."</HeimatNation>
-	          <ZugangCode>".$row->zgv_code."</ZugangCode>
-	          <ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
-				
+				<StaatsangehoerigkeitCode>".$row->staatsbuergerschaft."</StaatsangehoerigkeitCode>
+				<HeimatPLZ>".$plz."</HeimatPLZ>
+				<HeimatGemeinde>".$gemeinde."</HeimatGemeinde>
+				<HeimatNation>".$nation."</HeimatNation>
+				<ZugangCode>".$row->zgv_code."</ZugangCode>
+				<ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
+
 				if($lgartcode==1)
 				{
 					$datei.="
-	          <ZugangMasterCode>".$row->zgvmas_code."</ZugangMasterCode>
-	          <ZugangMasterDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvmadatum))."</ZugangMasterDatum>";
+				<ZugangMasterCode>".$row->zgvmas_code."</ZugangMasterCode>
+				<ZugangMasterDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvmadatum))."</ZugangMasterDatum>";
 				}
 
 				$datei.="
-			  <Ausstellungsstaat>".$ausstellungsstaat."</Ausstellungsstaat>";
-				
-				$qryad="SELECT 
-							* 
-						FROM 
-							public.tbl_prestudentstatus 
-						WHERE 
+				<Ausstellungsstaat>".$ausstellungsstaat."</Ausstellungsstaat>";
+
+				$qryad="SELECT
+							*
+						FROM
+							public.tbl_prestudentstatus
+						WHERE
 							prestudent_id=".$db->db_add_param($row->prestudent_id, FHC_INTEGER)."
-							AND (status_kurzbz='Student'  OR status_kurzbz='Unterbrecher')  
+							AND (status_kurzbz='Student'  OR status_kurzbz='Unterbrecher')
 							AND (tbl_prestudentstatus.datum<".$db->db_add_param($bisdatum).") ORDER BY datum asc;";
-				
+
 				if($resultad = $db->db_query($qryad))
 				{
 					if($rowad = $db->db_fetch_object($resultad))
 					{
-	          			$datei.="
-	          <BeginnDatum>".date("dmY", $datumobj->mktime_fromdate($rowad->datum))."</BeginnDatum>";
+						$datei.="
+				<BeginnDatum>".date("dmY", $datumobj->mktime_fromdate($rowad->datum))."</BeginnDatum>";
 					}
 				}
-				
+
 				if($aktstatus=='Absolvent')
 				{
 					$datei.="
-	          <BeendigungsDatum>".date("dmY", $datumobj->mktime_fromdate($aktstatus_datum))."</BeendigungsDatum>";
+				<BeendigungsDatum>".date("dmY", $datumobj->mktime_fromdate($aktstatus_datum))."</BeendigungsDatum>";
 				}
 				if($aktstatus=='Abbrecher')
 				{
 					$datei.="
-	          <BeendigungsDatum>".date("dmY", $datumobj->mktime_fromdate($aktstatus_datum))."</BeendigungsDatum>";
+				<BeendigungsDatum>".date("dmY", $datumobj->mktime_fromdate($aktstatus_datum))."</BeendigungsDatum>";
 				}
 				$datei.="
-	          <StudStatusCode>".$status."</StudStatusCode>
-	 </StudentIn>";
+				<StudStatusCode>".$status."</StudStatusCode>
+			</StudentIn>";
 		}
 	}
 	$tabelle.='</table>';
 
 	$datei.="
-     </Lehrgang>
-  </LehrgangMeldung>
+		</Lehrgang>
+	</LehrgangMeldung>
 </Erhalter>";
-		
+
 	echo '
 	<html>
 		<head>
@@ -562,20 +560,20 @@ if($result = $db->db_query($qry))
 		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 		</head>
 	<body>';
-	
+
 	echo "<H1>BIS - Studentendaten werden &uuml;berpr&uuml;ft! Lehrgang: ".$lehrgangsname.' ('.$lehrgangsnummer.")</H1>\n";
-	
+
 	if(strlen(trim($v))>0)
 	{
 		echo "<H2>Nicht plausible BIS-Daten (f&uuml;r Meldung ".$ssem."): </H2><br>";
-		echo nl2br($v."\n\n");	
+		echo nl2br($v."\n\n");
 	}
-	
+
 	$ddd='bisdaten/bismeldung_'.$ssem.'_Lehrgang'.$lehrgangsnummer.'.xml';
 	$dateiausgabe=fopen($ddd,'w');
 	fwrite($dateiausgabe,$datei);
 	fclose($dateiausgabe);
-	
+
 	if(file_exists($ddd))
 	{
 		echo "<a href=$ddd>XML-Datei f&uuml;r BIS-Meldung Lehrgang ".$lehrgangsname.' ('.$lehrgangsnummer.")</a><br>";

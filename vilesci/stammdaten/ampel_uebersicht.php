@@ -93,6 +93,7 @@ echo '<table class="tablesorter" id="myTable">
 			<th>Deadline</th>
 			<th>Vorlaufzeit</th>
 			<th>Verfallszeit</th>
+			<th>Verpflichtend</th>
 			<th colspan="3">Aktion</th>
 		</tr>
 	</thead>
@@ -106,6 +107,7 @@ foreach($ampel->result as $row)
 	echo '<td>',$datum_obj->formatDatum($row->deadline,'d.m.Y'),'</td>';
 	echo '<td>',$row->vorlaufzeit,'</td>';
 	echo '<td>',$row->verfallszeit,'</td>';
+	echo '<td>',($row->verpflichtend=='t'?'Ja':'Nein'),'</td>';
 	echo '<td><a href="ampel_details.php?action=update&ampel_id=',$row->ampel_id,' " target="detail_ampel">bearbeiten</a></td>';
 	echo '<td><a href="ampel_details.php?action=copy&ampel_id=',$row->ampel_id,' " target="detail_ampel">kopieren</a></td>';
 	echo '<td><a href="ampel_uebersicht.php?action=delete&ampel_id=',$row->ampel_id,' " onclick="return confdel()">entfernen</a></td>';

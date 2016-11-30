@@ -96,6 +96,8 @@ if(isset($_POST['sync']))
 		if($moodle->sync_studenten($mdl_course_id))
 		{
 			echo $moodle->log;
+			echo '<hr>';
+			echo $moodle->errormsg;
 		}
 		else
 			echo 'Fehler bei der Zuteilung:'.$moodle->errormsg;

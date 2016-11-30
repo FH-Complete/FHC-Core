@@ -25,10 +25,13 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/benutzerfunktion.class.php');
 require_once('../../../include/organisationseinheit.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/studiensemester.class.php');
 
 $user = get_uid();
 $sprache = getSprache();
 $p = new phrasen($sprache);
+
+$show = (isset($_GET['show'])?$_GET['show']:'aktuell');
 
 //Leiter OEs holen
 $benutzerfunktion = new benutzerfunktion();
@@ -54,6 +57,8 @@ if($rechte->isBerechtigt('basis/ampeluebersicht'))
 
 array_unique($oes);
 
+$studiensemester = new studiensemester();
+$ss_akt = $studiensemester->getakt();
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
@@ -73,7 +78,8 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 	    $("#myTable").tablesorter(
 		{
 			sortList: [[0,1],[3,0]],
-			widgets: [\'zebra\']
+			widgets: [\'zebra\'],
+			headers: {1:{sorter:false}}
 		}); 
 	});
 	</script>
@@ -86,6 +92,10 @@ if(count($oes)!=0)
 	
 echo '<p>'.$p->t('tools/dasAmpelsystemIstEinErinnerungsystem').'</p>';
 
+if ($show == 'aktuell')
+	echo '<p><a href="ampelverwaltung.php?show=alle">'.$p->t('tools/ampelAlleAnzeigen').'</a></p>';
+else
+	echo '<p><a href="ampelverwaltung.php?show=aktuell">'.$p->t('tools/ampelNurAktuellesStudiensemester').'</a></p>';
 
 $datum_obj = new datum();
 
@@ -126,78 +136,135 @@ if($type=='bestaetigen' && is_numeric($ampel_id))
 echo $message;
 
 $ampel = new ampel();
-$ampel->loadUserAmpel($user, true, true);
+$ampel->loadUserAmpel($user, false, true);
 
 echo '
 <table id="myTable" class="tablesorter">
 	<thead>
 		<tr>
 			<th></th>
-			<th>'.$p->t('tools/ampelErledigt').'</th>
+			<th></th>
 			<th>'.$p->t('tools/ampelBeschreibung').'</th>
 			<th>'.$p->t('tools/ampelDeadline').'</th>			
 		</tr>
 	</thead>
 	<tbody>
 ';
+$beginn = new studiensemester($ss_akt);
 
 foreach($ampel->result as $row)
 {
-	$ts_deadline = $datum_obj->mktime_fromdate($row->deadline);
-	$vlz = "-".$row->vorlaufzeit." day";
-	$ts_vorlaufzeit = strtotime($vlz, $ts_deadline);
-	$ts_now = $datum_obj->mktime_fromdate(date('Y-m-d'));
-	
-	if($ts_vorlaufzeit<=$ts_now && $ts_now<=$ts_deadline)
-		$ampelstatus='gelb';
-	elseif($ts_now>$ts_deadline)
-		$ampelstatus='rot';
-	elseif($ts_now<$ts_deadline && $ts_vorlaufzeit>=$ts_now)
-		$ampelstatus='gruen';
-	
-	if($bestaetigt = $ampel->isBestaetigt($user,$row->ampel_id))
-		$ampelstatus='';
-	
-	echo '<tr>';
-	echo '<td align="center">';
-	switch($ampelstatus)
+	//Nur Ampeln laden, die im aktuellen Studiensemester liegen
+	if ($show == 'aktuell' && $row->deadline>=$beginn->start)
 	{
-		case 'rot':
-			$status= '<img name="C" src="../../../skin/images/ampel_rot.png" >';
-			break;
-		case 'gelb':
-			$status= '<img name="B" src="../../../skin/images/ampel_gelb.png" >';
-			break;
-		case 'gruen':
-			$status= '<img name="A" src="../../../skin/images/ampel_gruen.png" >';
-			break;
-		default:
-			$status= '<img name="A" src="../../../skin/images/ampel_gruen.png" >';
-			break;
+		$ts_deadline = $datum_obj->mktime_fromdate($row->deadline);
+		$vlz = "-".$row->vorlaufzeit." day";
+		$ts_vorlaufzeit = strtotime($vlz, $ts_deadline);
+		$ts_now = $datum_obj->mktime_fromdate(date('Y-m-d'));
+
+		if($ts_vorlaufzeit<=$ts_now && $ts_now<=$ts_deadline)
+			$ampelstatus='gelb';
+		elseif($ts_now>$ts_deadline)
+			$ampelstatus='rot';
+		elseif($ts_now<$ts_deadline && $ts_vorlaufzeit>=$ts_now)
+			$ampelstatus='gruen';
+
+		if($bestaetigt = $ampel->isBestaetigt($user,$row->ampel_id))
+			$ampelstatus='';
+
+		echo '<tr>';
+		echo '<td style="text-align: center; vertical-align: middle">';
+		switch($ampelstatus)
+		{
+			case 'rot':
+				$status= '<img name="C" src="../../../skin/images/ampel_rot.png" >';
+				break;
+			case 'gelb':
+				$status= '<img name="B" src="../../../skin/images/ampel_gelb.png" >';
+				break;
+			case 'gruen':
+				$status= '<img name="A" src="../../../skin/images/ampel_gruen.png" >';
+				break;
+			default:
+				$status= '<img name="A" src="../../../skin/images/ampel_gruen.png" >';
+				break;
+		}
+		echo $status;
+		
+		echo '<td align="center">';
+		if(!$bestaetigt)
+			echo '<form method="POST" action="'.$_SERVER['PHP_SELF'].'?ampel_id='.$row->ampel_id.'&type=bestaetigen"><button name="type" type="submit">'.($row->buttontext[$sprache]!=''?$row->buttontext[$sprache]:$p->t('tools/ampelErledigt')).'</button></form>';
+		else
+			echo '<button disabled="disabled" name="type" type="submit">'.($row->buttontext[$sprache]!=''?$row->buttontext[$sprache]:$p->t('tools/ampelErledigt')).'</button>';
+		echo '</td>';
+		
+		echo '</td>';
+		$beschreibung = $row->beschreibung[$sprache];
+		if($beschreibung=='' && isset($row->beschreibung[DEFAULT_LANGUAGE]))
+			$beschreibung = $row->beschreibung[DEFAULT_LANGUAGE];
+		echo '<td '.(!$bestaetigt && $row->verpflichtend=='t'?'style="background-color: #EF8A88"':'').'>'.$beschreibung.'</td>';
+		echo '<td>'.$datum_obj->formatDatum($row->deadline,'d.m.Y').'</td>';
+		
+	//	echo "<td>".date('d.m.Y',$ts_now)."</td>";
+	//	echo "<td align=\"center\">".date('d.m.Y',$ts_vorlaufzeit)."</td>";
+	//	echo "<td>".date('d.m.Y',$ts_deadline)."</td>";
+		echo '</tr>';
 	}
-	echo $status;
+	elseif ($show == 'alle')
+	{
+		$ts_deadline = $datum_obj->mktime_fromdate($row->deadline);
+		$vlz = "-".$row->vorlaufzeit." day";
+		$ts_vorlaufzeit = strtotime($vlz, $ts_deadline);
+		$ts_now = $datum_obj->mktime_fromdate(date('Y-m-d'));
 	
-	echo '<td align="center">';
-	if(!$bestaetigt)
-		//echo '<a href="'.$_SERVER['PHP_SELF'].'?ampel_id='.$row->ampel_id.'&type=bestaetigen">'.$p->t('tools/ampelBestaetigen').'</a>';
-		echo '<a href="'.$_SERVER['PHP_SELF'].'?ampel_id='.$row->ampel_id.'&type=bestaetigen" style="text-decoration: none"><input type="button" value="'.$p->t('tools/ampelErledigt').'"></a>';
-	else
-		//echo $p->t('tools/ampelBestaetigt');
-		//echo '<img src="../../../skin/images/true.png" height="15px">';
-		echo '';
-	echo '</td>';
+		if($ts_vorlaufzeit<=$ts_now && $ts_now<=$ts_deadline)
+			$ampelstatus='gelb';
+		elseif($ts_now>$ts_deadline)
+			$ampelstatus='rot';
+		elseif($ts_now<$ts_deadline && $ts_vorlaufzeit>=$ts_now)
+			$ampelstatus='gruen';
+
+		if($bestaetigt = $ampel->isBestaetigt($user,$row->ampel_id))
+			$ampelstatus='';
+
+		echo '<tr>';
+		echo '<td style="text-align: center; vertical-align: middle">';
+		switch($ampelstatus)
+		{
+			case 'rot':
+				$status= '<img name="C" src="../../../skin/images/ampel_rot.png" >';
+				break;
+			case 'gelb':
+				$status= '<img name="B" src="../../../skin/images/ampel_gelb.png" >';
+				break;
+			case 'gruen':
+				$status= '<img name="A" src="../../../skin/images/ampel_gruen.png" >';
+				break;
+			default:
+				$status= '<img name="A" src="../../../skin/images/ampel_gruen.png" >';
+				break;
+		}
+		echo $status;
+
+		echo '<td align="center">';
+		if(!$bestaetigt)
+			echo '<form method="POST" action="'.$_SERVER['PHP_SELF'].'?ampel_id='.$row->ampel_id.'&type=bestaetigen"><button name="type" type="submit">'.($row->buttontext[$sprache]!=''?$row->buttontext[$sprache]:$p->t('tools/ampelErledigt')).'</button></form>';
+		else
+			echo '<button disabled="disabled" name="type" type="submit">'.($row->buttontext[$sprache]!=''?$row->buttontext[$sprache]:$p->t('tools/ampelErledigt')).'</button>';
+		echo '</td>';
+
+		echo '</td>';
+		$beschreibung = $row->beschreibung[$sprache];
+		if($beschreibung=='' && isset($row->beschreibung[DEFAULT_LANGUAGE]))
+			$beschreibung = $row->beschreibung[DEFAULT_LANGUAGE];
+		echo '<td '.(!$bestaetigt && $row->verpflichtend=='t'?'style="background-color: #EF8A88"':'').'>'.$beschreibung.'</td>';
+		echo '<td>'.$datum_obj->formatDatum($row->deadline,'d.m.Y').'</td>';
 	
-	echo '</td>';
-	$beschreibung = $row->beschreibung[$sprache];
-	if($beschreibung=='' && isset($row->beschreibung[DEFAULT_LANGUAGE]))
-		$beschreibung = $row->beschreibung[DEFAULT_LANGUAGE];
-	echo '<td>'.$beschreibung.'</td>';
-	echo '<td>'.$datum_obj->formatDatum($row->deadline,'d.m.Y').'</td>';
-	
-//	echo "<td>".date('d.m.Y',$ts_now)."</td>";
-//	echo "<td align=\"center\">".date('d.m.Y',$ts_vorlaufzeit)."</td>";
-//	echo "<td>".date('d.m.Y',$ts_deadline)."</td>";
-	echo '</tr>';
+		//	echo "<td>".date('d.m.Y',$ts_now)."</td>";
+		//	echo "<td align=\"center\">".date('d.m.Y',$ts_vorlaufzeit)."</td>";
+		//	echo "<td>".date('d.m.Y',$ts_deadline)."</td>";
+		echo '</tr>';
+	}
 }
 echo '</tbody></table>';
 

@@ -1,22 +1,57 @@
 build_settings:
     verbose: false
     prefer_symlink: false
+    ignore:
+        - "vendor"
+        - "tests"
+    pgsql:
+        host: 'localhost;dbname=template1'
+        user: 'fhcomplete'
+        pass: 'fhcomplete'
 
 setup:
-
+    composer:
+        action: "install"
+        prefer_dist: true
+        no_dev: true
+    pgsql:
+        - "UPDATE pg_database SET datallowconn = 'false' WHERE datname = 'fhctest';" # Stops connections to database
+        - "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = 'fhctest';" # Close previous connections to database
+        - "DROP DATABASE IF EXISTS fhctest;" # Drops database
+        - "CREATE DATABASE fhctest OWNER fhcomplete;" # Creates database
+    shell:
+        - "rm -f /var/www/html/build" # Remove the previous soft link, if exists, to the build directory
+        - "ln -s %BUILD_PATH% /var/www/html/build" # Create a new soft link to the actual build directory
+        # Rename configuration files
+        - "cd %BUILD_PATH% && cp ./config/global.config-default.inc.php ./config/global.config.inc.php"
+        - "cd %BUILD_PATH% && cp ./config/cis.config-default.inc.php ./config/cis.config.inc.php"
+        - "cd %BUILD_PATH% && cp ./config/vilesci.config-default.inc.php ./config/vilesci.config.inc.php"
+        - "cd %BUILD_PATH% && cp ./config/system.config-default.inc.php ./config/system.config.inc.php"
+        - "wget -qO - 'http://admin:1q2w3@test.fhcomplete.org/build/system/checksystem.php'" # Install Database
 test:
-    codeception:
-        config: "tests"
     lint:
-    php_loc:
-    php_docblock_checker:
-       allowed_warnings: -1
-#    phing:
-#        build_file: 'build.xml'
-#        targets:
-#         - "deploy"
+        directories:
+            - "application/"
+        recursive: true
+    codeception:
+        config: "tests/codeception/"
+        path: "tests/codeception/_output/"
+#    php_docblock_checker:
+#        path: "application/controllers/"
+#        allowed_warnings: 100
+#        skip_classes: false
+#    php_code_sniffer:
+#        path: "application/controllers/"
+#        standard: "tests/codesniffer/FHComplete"
+#        allowed_errors: 200
+#        allowed_warnings: 200
 #    php_unit:
 #        directory: "tests/phpunit/"
-#        args: "--bootstrap 'test/phpunit/bootstrap.php' --configuration 'tests/phpunit/phpunit.xml'"
 
 complete:
+    pgsql:
+        - "UPDATE pg_database SET datallowconn = 'false' WHERE datname = 'fhctest';" # Stops connections to database
+        - "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE pid <> pg_backend_pid() AND datname = 'fhctest';" # Close previous connections to database
+        - "DROP DATABASE IF EXISTS fhctest;" # Drops database
+    shell:
+        - "rm -f /var/www/html/build" # Remove the previous soft link, if exists, to the build directory

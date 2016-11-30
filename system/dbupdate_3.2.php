@@ -1181,6 +1181,256 @@ if($result = $db->db_query("SELECT * FROM information_schema.table_constraints W
 	}
 }
 
+// Neue Spalte studienplan_id in public.tbl_bewerbungstermine
+if(!$result = @$db->db_query("SELECT studienplan_id FROM public.tbl_bewerbungstermine LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_bewerbungstermine ADD COLUMN studienplan_id integer;
+	ALTER TABLE public.tbl_bewerbungstermine ADD CONSTRAINT fk_bewerbungstermine_studienplan_id FOREIGN KEY (studienplan_id) REFERENCES lehre.tbl_studienplan(studienplan_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_bewerbungstermine '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte studienplan_id in Tabelle public.tbl_bewerbungstermine hinzugefügt<br>';
+}
+
+
+// Attribute verpflichtend und buttontext in public.tbl_ampel
+if(!$result = @$db->db_query("SELECT verpflichtend FROM public.tbl_ampel LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_ampel ADD COLUMN verpflichtend boolean NOT NULL DEFAULT FALSE;
+			ALTER TABLE public.tbl_ampel ADD COLUMN buttontext varchar(64)[];";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_ampel '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalten "verpflichtend" und "buttontext" in Tabelle public.tbl_ampel hinzugefügt<br>';
+}
+
+// Neue Spalte lieferbedingungen in public.tbl_firma
+if(!$result = @$db->db_query("SELECT lieferbedingungen FROM public.tbl_firma LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_firma ADD COLUMN lieferbedingungen varchar(256);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_firma '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Spalte lieferbedingungen in Tabelle public.tbl_firma hinzugefügt<br>';
+
+}
+
+// 10.16 neuer webservicetyp reports
+$result = $db->db_query("SELECT 1 FROM system.tbl_webservicetyp WHERE webservicetyp_kurzbz='reports'");
+if($db->db_num_rows($result) < 1)
+{
+	$qry = "INSERT INTO system.tbl_webservicetyp (webservicetyp_kurzbz, beschreibung) VALUES('reports', 'Logtyp fuer reports');";
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_webservicetyp '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neuen Eintrag "reports" in Tabelle system.tbl_webservicetyp eingefuegt<br>';
+}
+
+// Gemeinsame Studien
+if(!$result = @$db->db_query("SELECT 1 FROM bis.tbl_mobilitaet LIMIT 1"))
+{
+	$qry = "
+	CREATE TABLE bis.tbl_mobilitaetstyp
+	(
+		mobilitaetstyp_kurzbz varchar(32) NOT NULL,
+		bezeichnung varchar(255),
+		aktiv boolean NOT NULL DEFAULT true
+	);
+	ALTER TABLE bis.tbl_mobilitaetstyp ADD CONSTRAINT pk_mobilitaetstyp PRIMARY KEY (mobilitaetstyp_kurzbz);
+	GRANT SELECT, INSERT, UPDATE, DELETE ON bis.tbl_mobilitaetstyp TO vilesci;
+
+	CREATE TABLE bis.tbl_gsstudientyp
+	(
+		gsstudientyp_kurzbz varchar(32) NOT NULL,
+		bezeichnung varchar(255),
+		studientyp_code varchar(64)
+	);
+	ALTER TABLE bis.tbl_gsstudientyp ADD CONSTRAINT pk_gsstudientyp PRIMARY KEY (gsstudientyp_kurzbz);
+	GRANT SELECT, INSERT, UPDATE, DELETE ON bis.tbl_gsstudientyp TO vilesci;
+
+	INSERT INTO bis.tbl_gsstudientyp(gsstudientyp_kurzbz, bezeichnung, studientyp_code) VALUES('Intern','Interner Studierender','I');
+	INSERT INTO bis.tbl_gsstudientyp(gsstudientyp_kurzbz, bezeichnung, studientyp_code) VALUES('Extern','Externer Studierender','E');
+
+	ALTER TABLE public.tbl_prestudent ADD COLUMN gsstudientyp_kurzbz varchar(32) DEFAULT 'Intern';
+	ALTER TABLE public.tbl_prestudent ADD CONSTRAINT fk_prestudent_gsstudientyp FOREIGN KEY (gsstudientyp_kurzbz) REFERENCES bis.tbl_gsstudientyp (gsstudientyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	CREATE TABLE bis.tbl_gsprogrammtyp
+	(
+		gsprogrammtyp_kurzbz varchar(32) NOT NULL,
+		bezeichnung varchar(255),
+		programmtyp_code varchar(64)
+	);
+	ALTER TABLE bis.tbl_gsprogrammtyp ADD CONSTRAINT pk_gsprogrammtyp PRIMARY KEY (gsprogrammtyp_kurzbz);
+	GRANT SELECT, INSERT, UPDATE, DELETE ON bis.tbl_gsprogrammtyp TO vilesci;
+
+	CREATE TABLE bis.tbl_gsprogramm
+	(
+		gsprogramm_id integer NOT NULL,
+		bezeichnung varchar(255),
+		programm_code bigint,
+		gsprogrammtyp_kurzbz varchar(32)
+	);
+	ALTER TABLE bis.tbl_gsprogramm ADD CONSTRAINT pk_gsprogramm PRIMARY KEY (gsprogramm_id);
+	GRANT SELECT, INSERT, UPDATE, DELETE ON bis.tbl_gsprogramm TO vilesci;
+	ALTER TABLE bis.tbl_gsprogramm ADD CONSTRAINT fk_gsprogrammtyp_gsprogramm FOREIGN KEY (gsprogrammtyp_kurzbz) REFERENCES bis.tbl_gsprogrammtyp (gsprogrammtyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	CREATE SEQUENCE bis.tbl_gsprogramm_gsprogramm_id_seq
+	 INCREMENT BY 1
+	 NO MAXVALUE
+	 NO MINVALUE
+	 CACHE 1;
+
+	ALTER TABLE bis.tbl_gsprogramm ALTER COLUMN gsprogramm_id SET DEFAULT nextval('bis.tbl_gsprogramm_gsprogramm_id_seq');
+	GRANT SELECT, UPDATE ON bis.tbl_gsprogramm_gsprogramm_id_seq TO vilesci;
+
+	ALTER TABLE public.tbl_firma ADD COLUMN partner_code varchar(20);
+
+	CREATE TABLE bis.tbl_mobilitaet
+	(
+		mobilitaet_id integer NOT NULL,
+		mobilitaetstyp_kurzbz varchar(32) NOT NULL,
+		prestudent_id integer NOT NULL,
+		studiensemester_kurzbz varchar(16) NOT NULL,
+		mobilitaetsprogramm_code integer,
+		gsprogramm_id integer,
+		firma_id integer,
+		status_kurzbz varchar(20),
+		ausbildungssemester smallint,
+		insertvon varchar(32),
+		insertamum timestamp,
+		updateamum  timestamp,
+		updatevon varchar(32)
+	);
+	ALTER TABLE bis.tbl_mobilitaet ADD CONSTRAINT pk_mobilitaet PRIMARY KEY (mobilitaet_id);
+	GRANT SELECT, INSERT, UPDATE, DELETE ON bis.tbl_mobilitaet TO vilesci;
+
+	ALTER TABLE bis.tbl_mobilitaet ADD CONSTRAINT fk_prestudent_mobilitaet FOREIGN KEY (prestudent_id) REFERENCES public.tbl_prestudent (prestudent_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE bis.tbl_mobilitaet ADD CONSTRAINT fk_studiensemester_mobilitaet FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester (studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE bis.tbl_mobilitaet ADD CONSTRAINT fk_mobilitaetsprogrammcode_mobilitaet FOREIGN KEY (mobilitaetsprogramm_code) REFERENCES bis.tbl_mobilitaetsprogramm (mobilitaetsprogramm_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE bis.tbl_mobilitaet ADD CONSTRAINT fk_gsprogramm_mobilitaet FOREIGN KEY (gsprogramm_id) REFERENCES bis.tbl_gsprogramm (gsprogramm_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE bis.tbl_mobilitaet ADD CONSTRAINT fk_firma_mobilitaet FOREIGN KEY (firma_id) REFERENCES public.tbl_firma (firma_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE bis.tbl_mobilitaet ADD CONSTRAINT fk_status_mobilitaet FOREIGN KEY (status_kurzbz) REFERENCES public.tbl_status (status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE bis.tbl_mobilitaet ADD CONSTRAINT fk_moblitaetstyp_mobilitaet FOREIGN KEY (mobilitaetstyp_kurzbz) REFERENCES bis.tbl_mobilitaetstyp (mobilitaetstyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	CREATE SEQUENCE bis.tbl_mobilitaet_mobilitaet_id_seq
+	 INCREMENT BY 1
+	 NO MAXVALUE
+	 NO MINVALUE
+	 CACHE 1;
+
+	ALTER TABLE bis.tbl_mobilitaet ALTER COLUMN mobilitaet_id SET DEFAULT nextval('bis.tbl_mobilitaet_mobilitaet_id_seq');
+	GRANT SELECT, UPDATE ON bis.tbl_mobilitaet_mobilitaet_id_seq TO vilesci;
+
+	INSERT INTO bis.tbl_gsprogrammtyp(gsprogrammtyp_kurzbz, bezeichnung, programmtyp_code) VALUES('Joint', 'Joint Degree','Joint');
+	INSERT INTO bis.tbl_gsprogrammtyp(gsprogrammtyp_kurzbz, bezeichnung, programmtyp_code) VALUES('Double', 'Double Degree','Double');
+	INSERT INTO bis.tbl_gsprogrammtyp(gsprogrammtyp_kurzbz, bezeichnung, programmtyp_code) VALUES('Multiple', 'Multiple Degree','Multiple');
+
+	INSERT INTO bis.tbl_mobilitaetstyp(mobilitaetstyp_kurzbz, bezeichnung, aktiv) VALUES('GS', 'Gemeinsame Studien',true);
+	INSERT INTO bis.tbl_mobilitaetstyp(mobilitaetstyp_kurzbz, bezeichnung, aktiv) VALUES('Incoming', 'Incoming',false);
+	INSERT INTO bis.tbl_mobilitaetstyp(mobilitaetstyp_kurzbz, bezeichnung, aktiv) VALUES('Outgoing', 'Outgoing',false);
+	";
+	if(!$db->db_query($qry))
+		echo '<strong>Gemeinsame Studien '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Neue Tabelle fuer Gemeinsame Studien/Mobilitaet hinzugefügt<br>';
+}
+
+// Anmerkung bei Konto
+if(!$result = @$db->db_query("SELECT anmerkung FROM public.tbl_konto LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_konto ADD COLUMN anmerkung text";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_konto '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_konto: Spalte Anmerkung hinzugefuegt!<br>';
+}
+
+// Studienplan_id zu testtool.tbl_ablauf
+if(!$result = @$db->db_query("SELECT studienplan_id FROM testtool.tbl_ablauf LIMIT 1"))
+{
+	$qry = "ALTER TABLE testtool.tbl_ablauf ADD COLUMN studienplan_id integer;
+			ALTER TABLE testtool.tbl_ablauf ADD CONSTRAINT fk_studienplan_id FOREIGN KEY (studienplan_id) REFERENCES lehre.tbl_studienplan (studienplan_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.tbl_ablauf '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'testtool.tbl_ablauf: Spalte studienplan_id hinzugefuegt!<br>';
+}
+
+// Aktiv-Attribut zu testtool.tbl_frage
+if(!$result = @$db->db_query("SELECT aktiv FROM testtool.tbl_frage LIMIT 1"))
+{
+	$qry = "ALTER TABLE testtool.tbl_frage ADD COLUMN aktiv boolean DEFAULT TRUE;
+			UPDATE testtool.tbl_frage SET aktiv=TRUE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.tbl_frage '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'testtool.tbl_frage: Spalte aktiv hinzugefuegt und auf TRUE gesetzt!<br>';
+}
+
+// Aktiv-Attribut zu testtool.tbl_vorschlag
+if(!$result = @$db->db_query("SELECT aktiv FROM testtool.tbl_vorschlag LIMIT 1"))
+{
+	$qry = "ALTER TABLE testtool.tbl_vorschlag ADD COLUMN aktiv boolean DEFAULT TRUE;
+			UPDATE testtool.tbl_vorschlag SET aktiv=TRUE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.tbl_vorschlag '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'testtool.tbl_vorschlag: Spalte aktiv hinzugefuegt!<br>';
+}
+
+// Bezeichnung_mehrsprachig in testtool.tbl_gebiet
+if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM testtool.tbl_gebiet LIMIT 1"))
+{
+	$qry = "ALTER TABLE testtool.tbl_gebiet ADD COLUMN bezeichnung_mehrsprachig varchar(255)[];";
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.tbl_gebiet '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'testtool.tbl_gebiet: Spalte bezeichnung_mehrsprachig hinzugefuegt!<br>';
+	
+	// Bezeichnung_mehrsprachig aus existierender Bezeichnung vorausfuellen. Ein Eintrag fuer jede Sprache mit Content aktiv.
+	$qry_help = "SELECT count(*) FROM public.tbl_sprache WHERE content=TRUE;";
+	if(!$result = $db->db_query($qry_help))
+		echo '<strong>tbl_gebiet bezeichnung_mehrsprachig: Fehler beim ermitteln der Sprachen: '.$db->db_last_error().'</strong>';
+	else
+	{
+		$row = $db->db_fetch_row($result);
+		// In integer umwandeln
+		$row = intval($row[0]);
+		$bezeichnungen = '';
+		for ($i = 1; $i <= $row; $i++)
+		{
+			$bezeichnungen .= "\"'||bezeichnung||'\",";
+		}
+		//Komma am Ende entfernen
+		$bezeichnungen = mb_substr($bezeichnungen,0,-1);
+		$qry = "UPDATE testtool.tbl_gebiet set bezeichnung_mehrsprachig = cast('{".$bezeichnungen."}' as varchar[]);";
+		
+		if(!$db->db_query($qry))
+			echo '<strong>Setzen der bezeichnung_mehrsprachig fehlgeschlagen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'testtool.tbl_gebiet: bezeichnung_mehrprachig automatisch aus existierender Bezeichnung uebernommen und fuer '.$row.' Sprachen gesetzt<br>';
+	}
+}
+
+// Removing schema kommune
+if($result = @$db->db_query("SELECT 1 FROM kommune.tbl_match"))
+{
+	$qry = "DROP SCHEMA kommune CASCADE";
+
+	if(!$db->db_query($qry))
+		echo '<strong>kommune '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'kommune schema is dropped<br>';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -1201,8 +1451,13 @@ $tabellen=array(
 	"bis.tbl_bundesland"  => array("bundesland_code","kurzbz","bezeichnung"),
 	"bis.tbl_entwicklungsteam"  => array("mitarbeiter_uid","studiengang_kz","besqualcode","beginn","ende","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
+	"bis.tbl_gsstudientyp" => array("gsstudientyp_kurzbz","bezeichnung","studientyp_code"),
+	"bis.tbl_gsprogrammtyp" => array("gsprogrammtyp_kurzbz","bezeichnung","programmtyp_code"),
+	"bis.tbl_gsprogramm" => array("gsprogramm_id","programm_code","bezeichnung","gsprogrammtyp_kurzbz"),
 	"bis.tbl_hauptberuf"  => array("hauptberufcode","bezeichnung"),
 	"bis.tbl_lgartcode"  => array("lgartcode","kurzbz","bezeichnung","beantragung","lgart_biscode"),
+	"bis.tbl_mobilitaet" => array("mobilitaet_id","prestudent_id","mobilitaetstyp_kurzbz","studiensemester_kurzbz","mobilitaetsprogramm_code","gsprogramm_id","firma_id","status_kurzbz","ausbildungssemester","insertvon","insertamum","updatevon","updateamum"),
+	"bis.tbl_mobilitaetstyp" => array("mobilitaetstyp_kurzbz","bezeichnung","aktiv"),
 	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung","sichtbar","sichtbar_outgoing"),
 	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre"),
 	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle","bisorgform_kurzbz"),
@@ -1275,12 +1530,6 @@ $tabellen=array(
 	"fue.tbl_ressource"  => array("ressource_id","student_uid","mitarbeiter_uid","betriebsmittel_id","firma_id","bezeichnung","beschreibung","insertamum","insertvon","updateamum","updatevon"),
 	"fue.tbl_scrumteam" => array("scrumteam_kurzbz","bezeichnung","punkteprosprint","tasksprosprint","gruppe_kurzbz"),
 	"fue.tbl_scrumsprint" => array("scrumsprint_id","scrumteam_kurzbz","sprint_kurzbz","sprintstart","sprintende","insertamum","insertvon","updateamum","updatevon"),
-	"kommune.tbl_match"  => array("match_id","team_sieger","wettbewerb_kurzbz","team_gefordert","team_forderer","gefordertvon","gefordertamum","matchdatumzeit","matchort","matchbestaetigtvon","matchbestaetigtamum","ergebniss","bestaetigtvon","bestaetigtamum"),
-	"kommune.tbl_team"  => array("team_kurzbz","bezeichnung","beschreibung","logo"),
-	"kommune.tbl_teambenutzer"  => array("uid","team_kurzbz"),
-	"kommune.tbl_wettbewerb"  => array("wettbewerb_kurzbz","regeln","forderungstage","teamgroesse","wbtyp_kurzbz","uid","icon"),
-	"kommune.tbl_wettbewerbteam"  => array("team_kurzbz","wettbewerb_kurzbz","rang","punkte"),
-	"kommune.tbl_wettbewerbtyp"  => array("wbtyp_kurzbz","bezeichnung","farbe"),
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
@@ -1332,7 +1581,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern"),
-	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email"),
+	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email","verpflichtend","buttontext"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id","bezeichnung", "aktiv"),
 	"public.tbl_aufnahmeschluessel"  => array("aufnahmeschluessel"),
@@ -1342,7 +1591,7 @@ $tabellen=array(
 	"public.tbl_benutzer"  => array("uid","person_id","aktiv","alias","insertamum","insertvon","updateamum","updatevon","ext_id","updateaktivvon","updateaktivam","aktivierungscode"),
 	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung","wochenstunden"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_bewerbungstermine" => array("bewerbungstermin_id","studiengang_kz","studiensemester_kurzbz","beginn","ende","nachfrist","nachfrist_ende","anmerkung", "insertamum", "insertvon", "updateamum", "updatevon"),
+	"public.tbl_bewerbungstermine" => array("bewerbungstermin_id","studiengang_kz","studiensemester_kurzbz","beginn","ende","nachfrist","nachfrist_ende","anmerkung", "insertamum", "insertvon", "updateamum", "updatevon","studienplan_id"),
 	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext","aktiv","credit_points"),
 	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id","bezeichnung_mehrsprachig","dokumentbeschreibung_mehrsprachig"),
 	"public.tbl_dokumentprestudent"  => array("dokument_kurzbz","prestudent_id","mitarbeiter_uid","datum","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -1350,7 +1599,7 @@ $tabellen=array(
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
 	"public.tbl_fachbereich"  => array("fachbereich_kurzbz","bezeichnung","farbe","studiengang_kz","aktiv","ext_id","oe_kurzbz"),
 	"public.tbl_filter" => array("filter_id","kurzbz","sql","valuename","showvalue","insertamum","insertvon","updateamum","updatevon","type","htmlattr"),
-	"public.tbl_firma"  => array("firma_id","name","anmerkung","firmentyp_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id","schule","finanzamt","steuernummer","gesperrt","aktiv"),
+	"public.tbl_firma"  => array("firma_id","name","anmerkung","firmentyp_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id","schule","finanzamt","steuernummer","gesperrt","aktiv","lieferbedingungen","partner_code"),
 	"public.tbl_firma_mobilitaetsprogramm" => array("firma_id","mobilitaetsprogramm_code","ext_id"),
 	"public.tbl_firma_organisationseinheit"  => array("firma_organisationseinheit_id","firma_id","oe_kurzbz","bezeichnung","kundennummer","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_firmentyp"  => array("firmentyp_kurzbz","beschreibung"),
@@ -1362,7 +1611,7 @@ $tabellen=array(
 	"public.tbl_kontakt"  => array("kontakt_id","person_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id"),
 	"public.tbl_kontaktmedium"  => array("kontaktmedium_kurzbz","beschreibung"),
 	"public.tbl_kontakttyp"  => array("kontakttyp","beschreibung"),
-	"public.tbl_konto"  => array("buchungsnr","person_id","studiengang_kz","studiensemester_kurzbz","buchungstyp_kurzbz","buchungsnr_verweis","betrag","buchungsdatum","buchungstext","mahnspanne","updateamum","updatevon","insertamum","insertvon","ext_id","credit_points", "zahlungsreferenz"),
+	"public.tbl_konto"  => array("buchungsnr","person_id","studiengang_kz","studiensemester_kurzbz","buchungstyp_kurzbz","buchungsnr_verweis","betrag","buchungsdatum","buchungstext","mahnspanne","updateamum","updatevon","insertamum","insertvon","ext_id","credit_points", "zahlungsreferenz", "anmerkung"),
 	"public.tbl_lehrverband"  => array("studiengang_kz","semester","verband","gruppe","aktiv","bezeichnung","ext_id","orgform_kurzbz","gid"),
 	"public.tbl_log"  => array("log_id","executetime","mitarbeiter_uid","beschreibung","sql","sqlundo"),
 	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_id","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","kleriker"),
@@ -1385,7 +1634,7 @@ $tabellen=array(
 	"public.tbl_preoutgoing_lehrveranstaltung" => array("preoutgoing_lehrveranstaltung_id","preoutgoing_id","bezeichnung","ects","endversion","insertamum","insertvon","updateamum","updatevon","wochenstunden","unitcode"),
 	"public.tbl_preoutgoing_preoutgoing_status" => array("status_id","preoutgoing_status_kurzbz","preoutgoing_id","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
-	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor","zgvnation","zgvmanation","zgvdoktornation"),
+	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor","zgvnation","zgvmanation","zgvdoktornation","gsstudientyp_kurzbz"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv", "anmerkung","bewerbung_abgeschicktamum"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz"),
@@ -1405,15 +1654,15 @@ $tabellen=array(
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype"),
 	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz","style","berechtigung","anmerkung_vorlagestudiengang","aktiv"),
-	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon","ablauf_vorgaben_id"),
+	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon","ablauf_vorgaben_id","studienplan_id"),
 	"testtool.tbl_ablauf_vorgaben"  => array("ablauf_vorgaben_id","studiengang_kz","sprache","sprachwahl","content_id","insertamum","insertvon","updateamum", "updatevon"),
 	"testtool.tbl_antwort"  => array("antwort_id","pruefling_id","vorschlag_id"),
-	"testtool.tbl_frage"  => array("frage_id","kategorie_kurzbz","gebiet_id","level","nummer","demo","insertamum","insertvon","updateamum","updatevon"),
-	"testtool.tbl_gebiet"  => array("gebiet_id","kurzbz","bezeichnung","beschreibung","zeit","multipleresponse","kategorien","maxfragen","zufallfrage","zufallvorschlag","levelgleichverteilung","maxpunkte","insertamum", "insertvon", "updateamum", "updatevon", "level_start","level_sprung_auf","level_sprung_ab","antwortenprozeile"),
+	"testtool.tbl_frage"  => array("frage_id","kategorie_kurzbz","gebiet_id","level","nummer","demo","insertamum","insertvon","updateamum","updatevon","aktiv"),
+	"testtool.tbl_gebiet"  => array("gebiet_id","kurzbz","bezeichnung","beschreibung","zeit","multipleresponse","kategorien","maxfragen","zufallfrage","zufallvorschlag","levelgleichverteilung","maxpunkte","insertamum", "insertvon", "updateamum", "updatevon", "level_start","level_sprung_auf","level_sprung_ab","antwortenprozeile","bezeichnung_mehrsprachig"),
 	"testtool.tbl_kategorie"  => array("kategorie_kurzbz","gebiet_id"),
 	"testtool.tbl_kriterien"  => array("gebiet_id","kategorie_kurzbz","punkte","typ"),
 	"testtool.tbl_pruefling"  => array("pruefling_id","prestudent_id","studiengang_kz","idnachweis","registriert","semester"),
-	"testtool.tbl_vorschlag"  => array("vorschlag_id","frage_id","nummer","punkte","insertamum","insertvon","updateamum","updatevon"),
+	"testtool.tbl_vorschlag"  => array("vorschlag_id","frage_id","nummer","punkte","insertamum","insertvon","updateamum","updatevon","aktiv"),
 	"testtool.tbl_pruefling_frage"  => array("prueflingfrage_id","pruefling_id","frage_id","nummer","begintime","endtime"),
 	"testtool.tbl_frage_sprache"  => array("frage_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),
 	"testtool.tbl_vorschlag_sprache"  => array("vorschlag_id","sprache","text","bild","audio","insertamum","insertvon","updateamum","updatevon"),

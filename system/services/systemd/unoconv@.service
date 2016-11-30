@@ -1,0 +1,13 @@
+[Unit]
+Description=The unoconv listener running on User %I
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/unoconv -l
+KillMode=mixed
+Restart=on-failure on-abort
+User=%i
+Group=%i
+
+[Install]
+WantedBy=multi-user.target

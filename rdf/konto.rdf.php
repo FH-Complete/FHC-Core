@@ -36,6 +36,9 @@ require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/student.class.php');
 require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/prestudent.class.php');
+require_once('../include/studienordnung.class.php');
+require_once('../include/studienplan.class.php');
 
 if(isset($_SERVER['REMOTE_USER']))
 {
@@ -86,7 +89,7 @@ else
 	$buchungsnummern = '';
 
 $studiengang_kz = (isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:'');
-	
+
 $datum = new datum();
 $konto = new konto();
 
@@ -111,7 +114,7 @@ elseif($buchungsnr!='')
 $rdf_url='http://www.technikum-wien.at/konto';
 if ($xmlformat=='rdf')
 {
-	
+
 echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -121,7 +124,7 @@ echo '
 function drawrow($row)
 {
 	global $rdf_url, $datum;
-	
+
 	$stg = new studiengang($row->studiengang_kz);
 	echo "
   		<RDF:Description  id=\"".$row->buchungsnr."\"  about=\"".$rdf_url.'/'.$row->buchungsnr."\" >
@@ -139,6 +142,7 @@ function drawrow($row)
 			<KONTO:buchungstyp_kurzbz><![CDATA[".$row->buchungstyp_kurzbz."]]></KONTO:buchungstyp_kurzbz>
 			<KONTO:credit_points><![CDATA[".$row->credit_points."]]></KONTO:credit_points>
 			<KONTO:zahlungsreferenz><![CDATA[".$row->zahlungsreferenz."]]></KONTO:zahlungsreferenz>
+			<KONTO:anmerkung><![CDATA[".$row->anmerkung."]]></KONTO:anmerkung>
 			<KONTO:updateamum><![CDATA[".$row->updateamum."]]></KONTO:updateamum>
 			<KONTO:updatevon><![CDATA[".$row->updatevon."]]></KONTO:updatevon>
 			<KONTO:insertamum><![CDATA[".$row->insertamum."]]></KONTO:insertamum>
@@ -155,11 +159,11 @@ if($person_id!='')
 			$buchung = $buchung['parent'];
 			//1. Ebene
 			drawrow($buchung);
-	
+
 			$hier.="
 	      	<RDF:li>
 	      		<RDF:Seq about=\"".$rdf_url.'/'.$buchung->buchungsnr."\" >";
-	
+
 			if(isset($konto->result[$buchung->buchungsnr]['childs']))
 			{
 				//2. Ebene
@@ -168,13 +172,13 @@ if($person_id!='')
 					if(is_object($row))
 					{
 						drawrow($row);
-	
+
 						$hier.="
 						<RDF:li resource=\"".$rdf_url.'/'.$row->buchungsnr.'" />';
 					}
 				}
 			}
-	
+
 			$hier.="
 	      		</RDF:Seq>
 	      	</RDF:li>";
@@ -191,7 +195,7 @@ $hier="
   	</RDF:Seq>";
 
 echo $hier;
-	
+
 echo '
 </RDF:RDF>
 ';
@@ -223,13 +227,13 @@ elseif ($xmlformat=='xml')
 			if($parent->betrag>0)
 				$rueckerstattung=true;
 		}
-		else 
+		else
 		{
 			if($row->betrag>0)
 				$rueckerstattung=true;
 		}
-		
-		if($rueckerstattung)			
+
+		if($rueckerstattung)
 				echo "<rueckerstattung><![CDATA[true]]></rueckerstattung>";
 		echo "
 			<buchungsdatum><![CDATA[".$datum->convertISODate($row->buchungsdatum)."]]></buchungsdatum>
@@ -240,19 +244,38 @@ elseif ($xmlformat=='xml')
 			<updateamum><![CDATA[".$row->updateamum."]]></updateamum>
 			<updatevon><![CDATA[".$row->updatevon."]]></updatevon>
 			<insertamum><![CDATA[".$row->insertamum."]]></insertamum>
+			<credit_points><![CDATA[".$row->credit_points."]]></credit_points>
+			<zahlungsreferenz><![CDATA[".$row->zahlungsreferenz."]]></zahlungsreferenz>
+			<anmerkung><![CDATA[".$row->anmerkung."]]></anmerkung>
 		</buchung>";
 	}
 	function drawperson_xml($row)
 	{
 		global $conn, $datum;
 		$pers = new person();
-		
+
 		$pers->load($row->person_id);
-		
+
 		$stg = new studiengang($row->studiengang_kz);
 		$student_obj = new student();
 		$student_obj->load_person($row->person_id, $row->studiengang_kz);
-		
+
+		$prestudent = new prestudent();
+		$prestudent->getLastStatus($student_obj->prestudent_id, $row->studiensemester_kurzbz);
+
+		$studiengang_bezeichnung_sto='';
+		$studiengang_bezeichnung_sto_englisch='';
+		$stpl = new studienplan();
+		if($stpl->loadStudienplan($prestudent->studienplan_id))
+		{
+			$sto = new studienordnung();
+			if($sto->loadStudienordnung($stpl->studienordnung_id))
+			{
+				$studiengang_bezeichnung_sto = $sto->studiengangbezeichnung;
+				$studiengang_bezeichnung_sto_englisch = $sto->studiengangbezeichnung_englisch;
+			}
+		}
+
 		switch($stg->typ)
 		{
 			case 'b':
@@ -267,7 +290,7 @@ elseif ($xmlformat=='xml')
 			default:
 				$studTyp ='';
 		}
-		
+
 		echo "
   		<person>
 			<person_id><![CDATA[".$pers->person_id."]]></person_id>
@@ -288,6 +311,8 @@ elseif ($xmlformat=='xml')
 			<tagesdatum><![CDATA[".date('d.m.Y')."]]></tagesdatum>
 			<logopath>".DOC_ROOT."skin/images/</logopath>
 			<studiengang><![CDATA[".$stg->bezeichnung."]]></studiengang>
+			<studiengang_bezeichnung_sto><![CDATA[".$studiengang_bezeichnung_sto."]]></studiengang_bezeichnung_sto>
+			<studiengang_bezeichnung_sto_englisch><![CDATA[".$studiengang_bezeichnung_sto_englisch."]]></studiengang_bezeichnung_sto_englisch>
 			<studiengang_typ><![CDATA[".$studTyp."]]></studiengang_typ>
 		</person>";
 	}
@@ -295,10 +320,10 @@ elseif ($xmlformat=='xml')
 	$buchungstyp = new konto();
 	$buchungstyp->getBuchungstyp();
 	$btyp = array();
-	
+
 	foreach ($buchungstyp->result as $row)
-		$btyp[$row->buchungstyp_kurzbz]=$row->beschreibung;	
-	
+		$btyp[$row->buchungstyp_kurzbz]=$row->beschreibung;
+
 	if($person_id!='')
 		foreach ($konto->result as $buchung)
 			drawrow_xml($buchung);
@@ -315,7 +340,7 @@ elseif ($xmlformat=='xml')
 				{
 					drawperson_xml($konto);
 					$drawperson=false;
-				}				
+				}
 				drawrow_xml($konto);
 			}
 		}

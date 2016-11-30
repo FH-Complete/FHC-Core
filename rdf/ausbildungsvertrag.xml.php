@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
- *          Karl Burkhart <burkhart@technikum-wien.at>
- *          Manfred Kindl <manfred.kindl@technikum-wien.at>
+ *		  Karl Burkhart <burkhart@technikum-wien.at>
+ *		  Manfred Kindl <manfred.kindl@technikum-wien.at>
  */
 header("Content-type: application/xhtml+xml");
 require_once('../config/vilesci.config.inc.php');
@@ -50,28 +50,28 @@ $student_help = new student();
 // an 2ter stelle da im Aufruf vom FAS ;<uid>; der erste immer '' ist
 if($student_help->load($uid))
 {
-    $studiengang = new studiengang();
-    $studiengang->load($student_help->studiengang_kz);
+	$studiengang = new studiengang();
+	$studiengang->load($student_help->studiengang_kz);
 	switch($studiengang->typ)
-    {
-        case 'b':
-            $studTyp = 'Bachelor'; 
-            $titel_kurzbz = 'BSc'; 
-            break; 
-        case 'm': 
-            $studTyp = 'Master'; 
-            $titel_kurzbz ='MSc'; 
-            break; 
-        case 'd':
-            $studTyp = 'Diplom'; 
-            break; 
-        default: 
-            $studTyp =''; 
-            $titel_kurzbz = ''; 
-    }
-    echo "\t<studiengang_typ>".$studTyp."</studiengang_typ>\n";
-    echo "\t<studiengang>".$studiengang->bezeichnung."</studiengang>\n";
-    echo "\t<studiengang_englisch>".$studiengang->english."</studiengang_englisch>\n";
+	{
+		case 'b':
+			$studTyp = 'Bachelor'; 
+			$titel_kurzbz = 'BSc'; 
+			break; 
+		case 'm': 
+			$studTyp = 'Master'; 
+			$titel_kurzbz ='MSc'; 
+			break; 
+		case 'd':
+			$studTyp = 'Diplom'; 
+			break; 
+		default: 
+			$studTyp =''; 
+			$titel_kurzbz = ''; 
+	}
+	echo "\t<studiengang_typ>".$studTyp."</studiengang_typ>\n";
+	echo "\t<studiengang>".$studiengang->bezeichnung."</studiengang>\n";
+	echo "\t<studiengang_englisch>".$studiengang->english."</studiengang_englisch>\n";
 }
 
 foreach($uid_arr as $uid)
@@ -90,20 +90,22 @@ foreach($uid_arr as $uid)
 			$studiengang->load($student->studiengang_kz);
 			$staatsbuergerschaft = new nation();
 			$staatsbuergerschaft->load($student->staatsbuergerschaft);
+			$lehrgangstyp = new studiengang();
+			$lehrgangstyp->loadLehrgangstyp($studiengang->lgartcode);
 			
-            $svnr = ($student->svnr == '')?'Ersatzkennzeichen: '.$student->ersatzkennzeichen:$student->svnr; 
-            
-            //Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
-            if ($studiengang->studiengang_kz<0)
-            {
-            	$stg = new studiengang();
-            	$stg->load($studiengang->studiengang_kz);
-            		
-            	$studiengang_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($studiengang->studiengang_kz));
-            }
-            else
-            	$studiengang_kz = sprintf("%04s", abs($studiengang->studiengang_kz));
-            
+			$svnr = ($student->svnr == '')?'Ersatzkennzeichen: '.$student->ersatzkennzeichen:$student->svnr; 
+			
+			//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
+			if ($studiengang->studiengang_kz<0)
+			{
+				$stg = new studiengang();
+				$stg->load($studiengang->studiengang_kz);
+					
+				$studiengang_kz = sprintf("%03s", $stg->erhalter_kz).sprintf("%04s", abs($studiengang->studiengang_kz));
+			}
+			else
+				$studiengang_kz = sprintf("%04s", abs($studiengang->studiengang_kz));
+			
 			echo "\t\t<quote>1</quote>\n"; 
 			echo "\t\t<anrede>".$student->anrede."</anrede>\n";
 			echo "\t\t<vorname>".$student->vorname." ".$student->vornamen."</vorname>\n";
@@ -118,47 +120,49 @@ foreach($uid_arr as $uid)
 			echo "\t\t<matrikelnr>".trim($student->matrikelnr)."</matrikelnr>\n";
 			echo "\t\t<studiengang>".$studiengang->bezeichnung."</studiengang>\n";
 			echo "\t\t<studiengang_englisch>".$studiengang->english."</studiengang_englisch>\n";
-            echo "\t\t<studiengang_kurzbz>".$studiengang->kurzbzlang."</studiengang_kurzbz>\n";
+			echo "\t\t<studiengang_kurzbz>".$studiengang->kurzbzlang."</studiengang_kurzbz>\n";
 			echo "\t\t<studiengang_kz>".$studiengang_kz."</studiengang_kz>\n";
-            echo "\t\t<studiengangSprache>".$studiengang->sprache."</studiengangSprache>"; 
-            
-            echo "\t\t<aktuellesJahr>".date('Y')."</aktuellesJahr>"; 
-            
-            // check ob Quereinsteiger
-            $prestudent = new prestudent(); 
-            $ausbildungssemester = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->ausbildungssemester:'1';           
-            echo "\t\t<semesterStudent>".$ausbildungssemester."</semesterStudent>";
-            
-            $studiensemester_beginn = new studiensemester();
-            $studienbeginn = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->studiensemester_kurzbz:'';
-            $studiensemester_beginn->load($studienbeginn);
-            
-            echo "\t\t<studiensemester_beginn>".$studiensemester_beginn->bezeichnung."</studiensemester_beginn>";
-            
-            $studiensemester_endedatum = new studiensemester();
-            $studiensemester_endedatum->load($studiensemester_endedatum->getaktorNext(1));
-            
-            echo "\t\t<studiensemester_endedatum>".date('d.m.Y',strtotime($studiensemester_endedatum->ende))."</studiensemester_endedatum>";
-            
-            switch($studiengang->typ)
-            {
-                case 'b':
-                    $studTyp = 'Bachelor'; 
-                    $titel_kurzbz = 'BSc'; 
-                    break;
-                case 'm': 
-                    $studTyp = 'Master'; 
-                    $titel_kurzbz ='MSc'; 
-                    break; 
-                case 'd':
-                    $studTyp = 'Diplom'; 
-                    break; 
-                default: 
-                    $studTyp =''; 
-                    $titel_kurzbz = ''; 
-            }
-            
-            echo "\t\t<titel_kurzbz>".$titel_kurzbz."</titel_kurzbz>\n"; 
+			echo "\t\t<studiengangSprache>".$studiengang->sprache."</studiengangSprache>";
+			echo "\t\t<lgartcode>".$lehrgangstyp->lgartcode."</lgartcode>";
+			echo "\t\t<lgartBezeichnung>".$lehrgangstyp->bezeichnung."</lgartBezeichnung>";
+			
+			echo "\t\t<aktuellesJahr>".date('Y')."</aktuellesJahr>"; 
+			
+			// check ob Quereinsteiger
+			$prestudent = new prestudent(); 
+			$ausbildungssemester = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->ausbildungssemester:'1';		   
+			echo "\t\t<semesterStudent>".$ausbildungssemester."</semesterStudent>";
+			
+			$studiensemester_beginn = new studiensemester();
+			$studienbeginn = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->studiensemester_kurzbz:'';
+			$studiensemester_beginn->load($studienbeginn);
+			
+			echo "\t\t<studiensemester_beginn>".$studiensemester_beginn->bezeichnung."</studiensemester_beginn>";
+			
+			$studiensemester_endedatum = new studiensemester();
+			$studiensemester_endedatum->load($studiensemester_endedatum->getaktorNext(1));
+			
+			echo "\t\t<studiensemester_endedatum>".date('d.m.Y',strtotime($studiensemester_endedatum->ende))."</studiensemester_endedatum>";
+			
+			switch($studiengang->typ)
+			{
+				case 'b':
+					$studTyp = 'Bachelor'; 
+					$titel_kurzbz = 'BSc'; 
+					break;
+				case 'm': 
+					$studTyp = 'Master'; 
+					$titel_kurzbz ='MSc'; 
+					break; 
+				case 'd':
+					$studTyp = 'Diplom'; 
+					break; 
+				default: 
+					$studTyp =''; 
+					$titel_kurzbz = ''; 
+			}
+			
+			echo "\t\t<titel_kurzbz>".$titel_kurzbz."</titel_kurzbz>\n"; 
 			echo "\t\t<studiengang_typ>".$studTyp."</studiengang_typ>\n";
 			echo "\t\t<studiengang_sprache>".$studiengang->sprache."</studiengang_sprache>\n";
 			echo "\t\t<studiengang_maxsemester>".$studiengang->max_semester."</studiengang_maxsemester>\n";
@@ -189,7 +193,7 @@ foreach($uid_arr as $uid)
 				$lv_studiengang=new studiengang();
 				$lv_studiengang->load($lv_studiengang_kz);
 				$lv_studiengang_bezeichnung=$lv_studiengang->bezeichnung;
-	            $stg_typ->getStudiengangTyp($lv_studiengang->typ); 
+				$stg_typ->getStudiengangTyp($lv_studiengang->typ); 
 				$lv_studiengang_typ=$stg_typ->bezeichnung;
 			}
 			
@@ -276,6 +280,8 @@ foreach($prestudent_arr as $prest_id)
 				$studiengang->load($prestudent->studiengang_kz);
 				$staatsbuergerschaft = new nation();
 				$staatsbuergerschaft->load($person->staatsbuergerschaft);
+				$lehrgangstyp = new studiengang();
+				$lehrgangstyp->loadLehrgangstyp($studiengang->lgartcode);
 					
 				$svnr = ($person->svnr == '')?($person->ersatzkennzeichen != ''?'Ersatzkennzeichen: '.$person->ersatzkennzeichen:''):$person->svnr;
 	
@@ -306,6 +312,8 @@ foreach($prestudent_arr as $prest_id)
 					echo "\t\t<studiengang_kurzbz>".$studiengang->kurzbzlang."</studiengang_kurzbz>\n";
 					echo "\t\t<studiengang_kz>".$studiengang_kz."</studiengang_kz>\n";
 					echo "\t\t<studiengangSprache>".$studiengang->sprache."</studiengangSprache>";
+					echo "\t\t<lgartcode>".$lehrgangstyp->lgartcode."</lgartcode>";
+					echo "\t\t<lgartBezeichnung>".$lehrgangstyp->bezeichnung."</lgartBezeichnung>";
 	
 					echo "\t\t<aktuellesJahr>".date('Y')."</aktuellesJahr>";
 					

@@ -166,9 +166,9 @@ class anrechnung extends basis_db
 				. 'genehmigt_von = ' . $this->db_add_param($this->genehmigt_von) . ', '
 				. 'updateamum = NOW(), '
 				. 'updatevon = ' . $this->db_add_param($this->updatevon) . ' '
-				. 'WHERE anrechnung_id = ' . $this->db_add_param($this->anrechnung_id);
+				. 'WHERE anrechnung_id = ' . $this->db_add_param($this->anrechnung_id). ' RETURNING anrechnung_id;';
 		}
-
+		
 		if ($this->db_query($qry))
 		{
 			$this->anrechnung_id = $this->db_fetch_object()->anrechnung_id;

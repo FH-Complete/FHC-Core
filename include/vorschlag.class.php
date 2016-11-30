@@ -32,6 +32,7 @@ class vorschlag extends basis_db
 	public $frage_id;
 	public $nummer;
 	public $punkte;
+	public $aktiv;
 	
 	public $text;
 	public $bild;
@@ -75,6 +76,7 @@ class vorschlag extends basis_db
 				$this->frage_id = $row->frage_id;
 				$this->punkte = $row->punkte;
 				$this->nummer = $row->nummer;
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
 				$this->loadVorschlagSprache($vorschlag_id, $sprache);
 				return true;
 			}
@@ -142,14 +144,15 @@ class vorschlag extends basis_db
 
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'BEGIN;INSERT INTO testtool.tbl_vorschlag (frage_id, nummer, punkte, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			$qry = 'BEGIN;INSERT INTO testtool.tbl_vorschlag (frage_id, nummer, punkte, insertamum, insertvon, updateamum, updatevon, aktiv) VALUES('.
 			       $this->db_add_param($this->frage_id, FHC_INTEGER).','.
 			       $this->db_add_param($this->nummer).','.
 				   $this->db_add_param($this->punkte).','.
 				   $this->db_add_param($this->insertamum).','.
 				   $this->db_add_param($this->insertvon).','.
 				   $this->db_add_param($this->updateamum).','.
-				   $this->db_add_param($this->updatevon).');';
+				   $this->db_add_param($this->updatevon).','.
+				   $this->db_add_param($this->aktiv, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -158,7 +161,8 @@ class vorschlag extends basis_db
 			       ' nummer='.$this->db_add_param($this->nummer).','.
 			       ' punkte='.$this->db_add_param($this->punkte).','.
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
-			       ' updatevon='.$this->db_add_param($this->updatevon).
+			       ' updatevon='.$this->db_add_param($this->updatevon).','.
+			       ' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).
 					" WHERE vorschlag_id=".$this->db_add_param($this->vorschlag_id, FHC_INTEGER, false).";";
 		}
 
@@ -275,10 +279,9 @@ class vorschlag extends basis_db
 	/**
 	 * Laedt die Vorschlaege zu einer Frage
 	 * 
-	 * @param $frage_id
-	 * @param $sprache
-	 * @param $random  Wenn true, dann werden die Vorschlaege in zufaelliger 
-	 *                  Reihenfolge geladen, sonst nach nummer sortiert
+	 * @param integer $frage_id
+	 * @param string $sprache
+	 * @param boolean $random Wenn true, dann werden die Vorschlaege in zufaelliger Reihenfolge geladen, sonst nach nummer sortiert
 	 */
 	public function getVorschlag($frage_id, $sprache, $random)
 	{
@@ -287,7 +290,6 @@ class vorschlag extends basis_db
 			$qry.=" ORDER BY random()";
 		else 
 			$qry.=" ORDER BY nummer";
-
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))

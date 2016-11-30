@@ -717,6 +717,10 @@ function MitarbeiterAuswahl()
 	if(document.getElementById('mitarbeiter-tab-vertrag'))
 		MitarbeiterVertragLoad(person_id)
 
+	// Notizen laden
+	var mitarbeiternotiz = document.getElementById('mitarbeiter-box-notizen');
+	mitarbeiternotiz.LoadNotizTree('','','','',person_id,'','','','');
+
 	// Selektierungsfunktion der Addons aufrufen
 	for(i in addon)
 	{

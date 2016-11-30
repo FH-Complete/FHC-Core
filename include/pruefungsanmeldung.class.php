@@ -114,7 +114,7 @@ class pruefungsanmeldung extends basis_db {
 		    . 'wuensche='.$this->db_add_param($this->wuensche).', '
 		    . 'reihung='.$this->db_add_param($this->reihung).', '
 		    . 'kommentar='.$this->db_add_param($this->kommentar).', '
-		    . 'anrechnung_id='.$this->db_add_param($this->anrechnung_id)
+		    . 'anrechnung_id='.$this->db_add_param($this->anrechnung_id).', '
 		    . 'pruefungstyp_kurzbz='.$this->db_add_param($this->pruefungstyp_kurzbz)
 		    . ' WHERE pruefungsanmeldung_id='.$this->db_add_param($this->pruefungsanmeldung_id).';';
         }
@@ -174,16 +174,23 @@ class pruefungsanmeldung extends basis_db {
     /**
      * Lädt alle Prüfungsanmeldungen eines Studenten
      * @param type $uid UID eines Studenten
-     * @param type $studiensemester_kurbz Filter nach Studiensemester (zB 'WS2013')
+     * @param type $studiensemester_kurzbz Filter nach Studiensemester (zB 'WS2013')
      * @param type $status_kurzbz Filter nach Status (zB 'angemeldet')
      * @return boolean|array false, bei Fehler; Array mit Anmeldungen
      */
-    public function getAnmeldungenByStudent($uid, $studiensemester_kurbz=null, $status_kurzbz=null)
+    public function getAnmeldungenByStudent($uid, $studiensemester_kurzbz=null, $status_kurzbz=null)
     {
         $qry = 'SELECT * FROM campus.tbl_pruefungsanmeldung pa '
                 . 'JOIN campus.tbl_pruefungstermin pt ON pa.pruefungstermin_id=pt.pruefungstermin_id '
                 . 'JOIN campus.tbl_pruefung p ON p.pruefung_id=pt.pruefung_id '
-                . 'WHERE uid='.$this->db_add_param($uid).';';
+                . 'WHERE uid='.$this->db_add_param($uid);
+		
+		if($studiensemester_kurzbz != null)
+		{
+			$qry .= ' AND studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz);
+		}
+		
+		$qry .= ';';
         
         if(!$this->db_query($qry))
         {
@@ -204,13 +211,13 @@ class pruefungsanmeldung extends basis_db {
                 $anmeldung->pruefung_id = $row->pruefung_id;
                 $anmeldung->von = $row->von;
                 $anmeldung->bis = $row->bis;
-		$anmeldung->reihung = $row->reihung;
-		$anmeldung->wuensche = $row->wuensche;
-		$anmeldung->kommentar = $row->kommentar;
-		$anmeldung->statusupdateamum = $row->statusupdateamum;
-		$anmeldung->statusupdatevon = $row->statusupdatevon;
-		$anmeldung->anrechnung_id = $row->anrechnung_id;
-		$anmeldung->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
+				$anmeldung->reihung = $row->reihung;
+				$anmeldung->wuensche = $row->wuensche;
+				$anmeldung->kommentar = $row->kommentar;
+				$anmeldung->statusupdateamum = $row->statusupdateamum;
+				$anmeldung->statusupdatevon = $row->statusupdatevon;
+				$anmeldung->anrechnung_id = $row->anrechnung_id;
+				$anmeldung->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
                 array_push($anmeldungen, $anmeldung);
             }
             return $anmeldungen;

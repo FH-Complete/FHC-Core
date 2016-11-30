@@ -701,7 +701,7 @@ class studienplan extends basis_db
 	 * @param $ausbuldungssemester
 	 * @param $orgform_kurzbz
 	 */
-	function getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester="", $orgform_kurzbz = "")
+	function getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz="", $ausbildungssemester="", $orgform_kurzbz = "")
 	{
 		$qry = "SELECT
 					studienplan_id,
@@ -746,8 +746,9 @@ class studienplan extends basis_db
 					JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
 				WHERE
 					tbl_studienplan.aktiv
-					AND tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)."
-					AND tbl_studienplan_semester.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz);
+					AND tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+		if($studiensemester_kurzbz!='')
+			$qry.="	AND tbl_studienplan_semester.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz);
 
 		if($ausbildungssemester!='')
 			$qry.=" AND tbl_studienplan_semester.semester=".$this->db_add_param($ausbildungssemester);
@@ -862,7 +863,7 @@ class studienplan extends basis_db
 			tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
 			AND EXISTS (
 			SELECT 1 FROM lehre.tbl_studienplan_semester
-			WHERE studienordnung_id=tbl_studienplan.studienordnung_id
+			WHERE studienplan_id=tbl_studienplan.studienplan_id
 			AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 			AND semester = tbl_studienplan_lehrveranstaltung.semester)
 			ORDER BY bezeichnung";

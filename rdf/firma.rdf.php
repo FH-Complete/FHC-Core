@@ -35,18 +35,23 @@ require_once('../include/datum.class.php');
 
 if(isset($_GET['firma_id']))
 	$firma_id = $_GET['firma_id'];
-else 
+else
 	$firma_id = '';
 
 if(isset($_GET['filter']))
 	$filter = $_GET['filter'];
-else 
+else
 	$filter = '';
 
 if(isset($_GET['firmentyp_kurzbz']))
 	$firmentyp_kurzbz = $_GET['firmentyp_kurzbz'];
-else 
+else
 	$firmentyp_kurzbz='';
+
+if(isset($_GET['partner']))
+	$partner = true;
+else
+	$partner = false;
 
 $datum = new datum();
 
@@ -88,6 +93,12 @@ elseif($firmentyp_kurzbz!='' || $filter!='')
 	foreach ($firma->result as $row)
 		draw_rdf($row);
 }
+elseif($partner)
+{
+	$firma->getFirmaPartner();
+	foreach ($firma->result as $row)
+		draw_rdf($row);
+}
 else
 {
 	//$firma->getAll($firma_id);
@@ -98,7 +109,7 @@ else
 function draw_rdf($row)
 {
 	global $rdf_url;
-	
+
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->firma_id.'"  about="'.$rdf_url.'/'.$row->firma_id.'" >

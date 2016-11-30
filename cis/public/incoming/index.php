@@ -64,52 +64,61 @@ if (isset($_POST['userid']))
 		<link href="../../../include/js/tablesort/table.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
-	<table width="100%" border="0">
-			<tr>
-				<td align="left"></td>
-				<td align ="right"><?php
-				echo $p->t("global/sprache")." ";
-				echo '<a href="'.$_SERVER['PHP_SELF'].'?lang=English">'.$p->t("global/englisch").'</a> |
-				<a href="'.$_SERVER['PHP_SELF'].'?lang=German">'.$p->t("global/deutsch").'</a><br>';?></td>
-			</tr>
-		</table>
-		<form action ="index.php" method="POST">
-		<table border ="0" width ="100%" height="40%">
-			<tr height="50%">
-				<td align ="center" valign="center"><h3><?php echo $p->t('incoming/welcomeToUAS',array(CAMPUS_NAME));?></h3><span style="font-size:1.2em"></span></td>
-			</tr>
-			<tr >
-				<td align="center" valign="bottom"> <img src="../../../skin/styles/<?php echo DEFAULT_STYLE ?>/logo.png"></td>
-			</tr>
-		</table>
-		<table border ="0" width ="100%">
-			<tr>
-				<td>&nbsp;</td>
-			</tr>
-			<tr>
-				<td align="center"><a href="registration.php"><?php echo $p->t('incoming/registration');?></a></td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-			</tr>
-			<tr>
-				<td align="center"><input type="text" size="30" value="UserID" name ="userid" onfocus="this.value='';"></td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-			</tr>
-			<tr>
-				<td align="center"><input type="submit" value="Login" name="submit"></td>
-			</tr>
-			<tr>
-				<td>&nbsp;</td>
-			</tr>
-			<tr>
-				<td align="center"><?php if(isset($errormsg))
-							echo $errormsg; ?>
-			</tr>
-		</table>
-		</form>
+	<table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0">
+		<tr>
+		<td class="rand"></td>
+		<td style="vertical-align: top" class="boxshadow">
+			<table width="100%" border="0">
+				<tr>
+					<td style="padding: 20px; text-align: left; width: 33%"></td>
+					<td style="padding: 20px; text-align: center; width: 33%"></td>
+					<td style="padding: 20px; text-align: right; width: 33%"><?php
+					echo $p->t("global/sprache")." ";
+					echo '<a href="'.$_SERVER['PHP_SELF'].'?lang=English&'.$_SERVER['QUERY_STRING'].'">'.$p->t("global/englisch").'</a> |
+					<a href="'.$_SERVER['PHP_SELF'].'?lang=German&'.$_SERVER['QUERY_STRING'].'">'.$p->t("global/deutsch").'</a><br>';?></td>
+				</tr>
+			</table>
+			
+			<table style="padding: 50px" border="0" width ="100%">
+				<tr height="50%">
+					<td align ="center" valign="center"><h3><?php echo $p->t('incoming/welcomeToUAS',array(CAMPUS_NAME));?></h3><br><br>
+					 <img src="../../../skin/styles/<?php echo DEFAULT_STYLE ?>/logo.png"></td>
+				</tr>
+			</table>
+			<table border ="0" width ="100%">
+				<form action ="index.php" method="POST">
+				<tr>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td align="center"><a href="registration.php"><?php echo $p->t('incoming/registration');?></a></td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td align="center"><input type="text" size="30" value="UserID" name ="userid" onfocus="this.value='';"></td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td align="center"><input type="submit" value="Login" name="submit"></td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td align="center"><?php if(isset($errormsg))
+								echo $errormsg; ?>
+				</tr>
+				</form>
+			</table>
+		</td>
+	<td class="rand">
+	</td>
+	</tr>
+	</table>
 
 	</body>
 

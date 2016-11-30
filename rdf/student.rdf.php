@@ -47,6 +47,8 @@ require_once('../include/mitarbeiter.class.php');
 require_once('../include/organisationsform.class.php');
 require_once('../include/konto.class.php');
 require_once('../include/reihungstest.class.php');
+require_once('../include/studienordnung.class.php');
+require_once('../include/studienplan.class.php');
 
 // *********** Funktionen *************************
 function convdate($date)
@@ -194,9 +196,10 @@ function draw_content_liste($row)
 		<STUDENT:dual_bezeichnung><![CDATA['.($row->dual=='t'?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
 		<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
 		<STUDENT:mentor><![CDATA['.$row->mentor.']]></STUDENT:mentor>
+		<STUDENT:gsstudientyp_kurzbz><![CDATA['.($row->gsstudientyp_kurzbz).']]></STUDENT:gsstudientyp_kurzbz>
 		<STUDENT:aktiv><![CDATA['.((isset($row->bnaktiv) && $row->bnaktiv=='t')?'true':'false').']]></STUDENT:aktiv>
-      	</RDF:Description>
-      </RDF:li>';
+	</RDF:Description>
+	</RDF:li>';
 }
 
 function draw_content($row)
@@ -345,6 +348,7 @@ function draw_prestudent($row)
 			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
 			<STUDENT:anmerkungpre><![CDATA['.$row->anmerkung.']]></STUDENT:anmerkungpre>
 			<STUDENT:mentor><![CDATA['.$row->mentor.']]></STUDENT:mentor>
+			<STUDENT:gsstudientyp_kurzbz><![CDATA['.$row->gsstudientyp_kurzbz.']]></STUDENT:gsstudientyp_kurzbz>
       	</RDF:Description>
       </RDF:li>';
 	}
@@ -466,7 +470,7 @@ if($xmlformat=='rdf')
 						(SELECT rt_punkte1 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte1,
 						(SELECT rt_punkte2 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte2,
 						(SELECT rt_punkte3 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte3,
-						 tbl_prestudent.dual as dual, tbl_prestudent.reihungstest_id, tbl_prestudent.anmeldungreihungstest, p.matr_nr
+						 tbl_prestudent.dual as dual, tbl_prestudent.reihungstest_id, tbl_prestudent.anmeldungreihungstest, p.matr_nr, tbl_prestudent.gsstudientyp_kurzbz
 						FROM public.tbl_student
 							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id)  JOIN public.tbl_prestudent USING(prestudent_id) ";
 		if($gruppe_kurzbz!=null)
@@ -510,6 +514,44 @@ if($xmlformat=='rdf')
 						AND NOT EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Incoming' AND prestudent_id=tbl_student.prestudent_id)
 					";
 		}
+		if($db->db_query($qry))
+		{
+			while($row = $db->db_fetch_object())
+			{
+				$student=new student();
+				if($uid = $student->getUid($row->prestudent_id))
+				{
+					//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
+					//nochmal laden aber ohne studiensemester
+					if(!$student->load($uid, $studiensemester_kurzbz))
+						$student->load($uid);
+				}
+				$prestd = new prestudent();
+				$prestd->load($row->prestudent_id);
+				if($uid!='')
+				{
+					draw_content($student);
+					draw_prestudent($prestd);
+				}
+				else
+				{
+					draw_content($prestd);
+					draw_prestudent($prestd);
+				}
+			}
+		}
+	}
+	elseif($typ=='gemeinsamestudien')
+	{
+		if($studiensemester_kurzbz=='')
+			$studiensemester_kurzbz=$semester_aktuell;
+
+		$qry = "SELECT prestudent_id
+					FROM
+						bis.tbl_mobilitaet
+					WHERE
+						studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
+
 		if($db->db_query($qry))
 		{
 			while($row = $db->db_fetch_object())
@@ -760,7 +802,25 @@ else
 				if($row = $db->db_fetch_object())
 				{
 					$semester = $row->ausbildungssemester;
+					$studienplan_id = $row->studienplan_id;
 				}
+			}
+
+			if(isset($studienplan_id) && $studienplan_id!='')
+			{
+				$stpl = new studienplan();
+				$stpl->loadStudienplan($studienplan_id);
+
+				$sto = new studienordnung();
+				$sto->loadStudienordnung($stpl->studienordnung_id);
+
+				$sto_studiengang_bezeichnung = $sto->studiengangbezeichnung;
+				$sto_studiengang_bezeichnung_englisch = $sto->studiengangbezeichnung_englisch;
+			}
+			else
+			{
+				$sto_studiengang_bezeichnung='';
+				$sto_studiengang_bezeichnung_englisch='';
 			}
 
 			//für ao. Studierende wird der Studiengang der Lehrveranstaltungen benötigt, die sie besuchen
@@ -801,7 +861,7 @@ else
 								break;
 				}
 			}
-			$prestudent = new prestudent();
+			$prestudent = new prestudent($student->prestudent_id);
 			$prestudent->getLastStatus($student->prestudent_id);
 
 			$orgform_bezeichnung = new organisationsform();
@@ -863,6 +923,8 @@ else
                 <studiengang_orgform_kurzbz><![CDATA['.$studiengang->orgform_kurzbz.']]></studiengang_orgform_kurzbz>
                 <studiengang_orgform_bezeichnung><![CDATA['.$orgform_bezeichnung->bezeichnung.']]></studiengang_orgform_bezeichnung>
                 <studiengang_studiengangsleitung><![CDATA['.$stgl.']]></studiengang_studiengangsleitung>
+				<studiengang_bezeichnung_sto><![CDATA['.$sto_studiengang_bezeichnung.']]></studiengang_bezeichnung_sto>
+				<studiengang_bezeichnung_sto_englisch><![CDATA['.$sto_studiengang_bezeichnung_englisch.']]></studiengang_bezeichnung_sto_englisch>
 				<lv_studiengang_kz><![CDATA['.$lv_studiengang_kz.']]></lv_studiengang_kz>
 				<lv_studiengang_bezeichnung><![CDATA['.$lv_studiengang_bezeichnung.']]></lv_studiengang_bezeichnung>
                 <lv_studiengang_typ><![CDATA['.$lv_studiengang_typ.']]></lv_studiengang_typ>

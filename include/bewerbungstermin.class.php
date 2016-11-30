@@ -42,6 +42,7 @@ class bewerbungstermin extends basis_db
 	public $insertvon;		//  bigint
 	public $updateamum;		//  timestamp
 	public $updatevon;		//  bigint
+	public $studienplan_id;	// integer
 
 	/**
 	 * Konstruktor
@@ -86,6 +87,7 @@ class bewerbungstermin extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->studienplan_id = $row->studienplan_id;
 				return true;
 			}
 			else
@@ -109,13 +111,13 @@ class bewerbungstermin extends basis_db
 		$qry = "SELECT * FROM public.tbl_bewerbungstermine WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 		if($studiensemester_kurzbz!=null)
 			$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
-		
+
 		if($sort != null)
 		{
 		    $qry.=" ORDER BY ".$sort;
 		}
 		$qry.=";";
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -134,6 +136,7 @@ class bewerbungstermin extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->studienplan_id = $row->studienplan_id;
 
 				$this->result[] = $obj;
 			}
@@ -170,7 +173,7 @@ class bewerbungstermin extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN; INSERT INTO public.tbl_bewerbungstermine(studiensemester_kurzbz, studiengang_kz, beginn, ende, nachfrist, nachfrist_ende, anmerkung, insertamum, insertvon) VALUES('.
+			$qry='BEGIN; INSERT INTO public.tbl_bewerbungstermine(studiensemester_kurzbz, studiengang_kz, beginn, ende, nachfrist, nachfrist_ende, anmerkung, insertamum, insertvon, studienplan_id) VALUES('.
 			     $this->db_add_param($this->studiensemester_kurzbz).', '.
 			     $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 			     $this->db_add_param($this->beginn).', '.
@@ -178,7 +181,8 @@ class bewerbungstermin extends basis_db
 			     $this->db_add_param($this->nachfrist, FHC_BOOLEAN).', '.
 			     $this->db_add_param($this->nachfrist_ende).', '.
 			     $this->db_add_param($this->anmerkung).', now(),'.
-			     $this->db_add_param($this->insertvon).');';
+			     $this->db_add_param($this->insertvon).','.
+			     $this->db_add_param($this->studienplan_id, FHC_INTEGER).');';
 		}
 		else
 		{
@@ -191,7 +195,8 @@ class bewerbungstermin extends basis_db
 				'nachfrist_ende='.$this->db_add_param($this->nachfrist_ende).', '.
 				'anmerkung='.$this->db_add_param($this->anmerkung).', '.
 				'updateamum= now(), '.
-				'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'updatevon='.$this->db_add_param($this->updatevon).', '.
+				'studienplan_id='.$this->db_add_param($this->studienplan_id, FHC_INTEGER).' '.
 				'WHERE bewerbungstermin_id='.$this->db_add_param($this->bewerbungstermin_id, FHC_INTEGER, false).';';
 		}
 		if($this->db_query($qry))
@@ -229,17 +234,17 @@ class bewerbungstermin extends basis_db
 			return false;
 		}
 	}
-	
+
 	public function delete($bewerbungstermin_id)
 	{
 	    $qry = "DELETE from public.tbl_bewerbungstermine WHERE bewerbungstermin_id=".$this->db_add_param($bewerbungstermin_id);
-	    
+
 	    if(!$this->db_query($qry))
 	    {
 		$this->errormsg = 'Fehler beim Löschen der Daten';
 		return false;
 	    }
-	    
+
 	    return true;
 	}
 }
