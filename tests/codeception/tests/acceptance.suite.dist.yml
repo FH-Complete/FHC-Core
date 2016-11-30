@@ -9,7 +9,7 @@ modules:
     enabled:
         - Db
         - PhpBrowser:
-            url: 'http://admin:1q2w3@demo.fhcomplete.org/'
+            url: 'http://admin:1q2w3@test.fhcomplete.org/build/'
     config:
         Db:
             dsn: 'pgsql:host=localhost;port=5432;dbname=fhctest'
