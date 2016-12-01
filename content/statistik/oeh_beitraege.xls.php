@@ -143,7 +143,7 @@ if($studiensemester_kurzbz!='')
 	$worksheet->write($zeile,++$spalte,'Status',$format_bold);
 	$maxlength[$spalte]=20;
 		
-	// Daten holen - Alle Personen mit akt. Status Student, Diplomand oder Praktikant
+	// Daten holen - Alle Personen mit akt. Status Student, Diplomand oder Praktikant plus Incoming
 	$qry="SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzahl, tbl_student.studiengang_kz, geschlecht, vorname, nachname, gebdatum AS geburtsdatum, 
 		geburtsnation AS nation, titelpre, uid || '@".DOMAIN."' AS email, 
 		(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=public.tbl_person.person_id and (kontakttyp='mobil' OR kontakttyp='telefon') LIMIT 1) AS telefon, 
@@ -163,7 +163,7 @@ if($studiensemester_kurzbz!='')
 		JOIN public.tbl_prestudent using(prestudent_id)
 		JOIN public.tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
 		WHERE tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." 
-		AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand','Praktikant')
+		AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand','Praktikant','Incoming')
 		AND tbl_student.studiengang_kz<999 AND tbl_prestudent.bismelden=true";
 	// AND tbl_benutzer.aktiv=true
 
@@ -339,7 +339,7 @@ if($studiensemester_kurzbz!='')
 	JOIN public.tbl_prestudent using(prestudent_id)
 	JOIN public.tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
 	WHERE tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." 
-	AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand','Praktikant')
+	AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand','Praktikant','Incoming')
 	AND tbl_student.studiengang_kz<999 AND
 	ka.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND ka.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=ka.studiengang_kz 
 	AND kb.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND kb.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=kb.studiengang_kz 
