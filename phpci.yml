@@ -29,7 +29,7 @@ setup:
         # Removing the creation of procedural language plpgsql
         - "sed -i.bak 's/CREATE PROCEDURAL LANGUAGE plpgsql;//g' %BUILD_PATH%/system/fhcomplete3.0.sql"
          # Install Database
-        - "psql -q -P pager=off -h localhost -U fhcomplete -p 5432 -d fhctest -f %BUILD_PATH%/system/fhcomplete3.0.sql >/dev/null"
+        - "psql -w -q -P pager=off -h localhost -U fhcomplete -p 5432 -d fhctest -f %BUILD_PATH%/system/fhcomplete3.0.sql >/dev/null"
         - "cp /home/phpci/config/version_3.0.php %BUILD_PATH%/version.php"
         - "cd %BUILD_PATH%/system/ && php checksystem.php"
         - "cp /home/phpci/config/version_3.1.php %BUILD_PATH%/version.php"
