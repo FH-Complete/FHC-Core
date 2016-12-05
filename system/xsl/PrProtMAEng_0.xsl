@@ -359,7 +359,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.1">
           <table:table-cell table:style-name="Tabelle1.A2" table:number-columns-spanned="2" office:value-type="string">
-            <text:p text:style-name="P4">Topic and Assessment of Master's thesis</text:p>
+            <text:p text:style-name="P4">Topic and Assessment of Master's Thesis</text:p>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:table-cell table:style-name="Tabelle1.B5" table:number-columns-spanned="6" office:value-type="string">
@@ -381,7 +381,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </table:table-cell>
           <table:covered-table-cell/>
           <table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="7" office:value-type="string">
-            <text:p text:style-name="P4">Examination interview on the Master’s thesis and its links to subjects of the curriculum as well as examination interview on a curricular theme</text:p>
+            <text:p text:style-name="P4">Examination interview on the Master’s Thesis and its links to subjects of the curriculum as well as examination interview on a curricular theme</text:p>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
@@ -396,8 +396,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </table:table-cell>
           <table:covered-table-cell/>
           <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="7" office:value-type="string">
-            <text:p text:style-name="P14"><draw:custom-shape text:anchor-type="char" draw:z-index="6" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.336cm" svg:height="0.359cm" svg:x="10.964cm" svg:y="0.153cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>Presentation of the Master's thesis</text:p>
-            <text:p text:style-name="P14">Examination interview on the Master's thesis <text:span text:style-name="T1">and its links</text:span></text:p>
+            <text:p text:style-name="P14"><draw:custom-shape text:anchor-type="char" draw:z-index="6" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.336cm" svg:height="0.359cm" svg:x="10.964cm" svg:y="0.153cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>Presentation of the Master's Thesis</text:p>
+            <text:p text:style-name="P14">Examination interview on the Master's Thesis <text:span text:style-name="T1">and its links</text:span></text:p>
             <text:p text:style-name="P4"><draw:custom-shape text:anchor-type="char" draw:z-index="4" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.336cm" svg:height="0.359cm" svg:x="10.982cm" svg:y="-0.046cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>to subjects of the curriculum</text:p>
             <text:p text:style-name="P14"><draw:custom-shape text:anchor-type="char" draw:z-index="5" draw:name="Rechteck 1" draw:style-name="gr1" draw:text-style-name="P21" svg:width="0.336cm" svg:height="0.359cm" svg:x="10.986cm" svg:y="-0.019cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>Examination interview on other subjects relevant to the curriculum</text:p>
           </table:table-cell>
@@ -410,7 +410,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.1">
           <table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="9" office:value-type="string">
-            <text:p text:style-name="P4">Notes on the presentation of the Master's thesis</text:p>
+            <text:p text:style-name="P4">Notes on the presentation of the Master's Thesis</text:p>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
@@ -538,10 +538,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:covered-table-cell/>
           <table:table-cell table:style-name="Tabelle1.D2" table:number-columns-spanned="5" office:value-type="string">         
             <text:p text:style-name="P4">                        	
-            	 (+++) Passed with highest distinction
+            	 (+++) Passed with distinction
            	</text:p>
             <text:p text:style-name="P4">
-            	(++) Passt with distinction
+            	(++) Passed with merit
             </text:p>
             <text:p text:style-name="P4">
             	(+) Passed
