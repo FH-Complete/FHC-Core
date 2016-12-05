@@ -52,6 +52,12 @@ $stsem->getNextStudiensemester();
 $stg = new studiengang();
 $stg->getAll();
 
+$message = '';
+
+$filter_url = '';
+if (isset($_GET['filter']) || isset($_GET['unterrichtssprache']) || isset($_GET['studiengang']))
+	$filter_url = 'filter='.$_GET['filter'].'&unterrichtssprache='.$_GET['unterrichtssprache'].'&studiengang='.$_GET['studiengang'].'&go=Filter&';
+
 ?>
 <html>
 	<head>
@@ -66,14 +72,20 @@ $stg->getAll();
 			$(document).ready(function()
 			{
 				$("#t1").tablesorter(
-						{
-							sortList: [[0,0],[2,0],[3,0],[4,0]],
-							widgets: ["zebra"]
-						});
+				{
+					sortList: [[1,0],[3,0],[4,0],[5,0]],
+					widgets: ["zebra"],
+					headers: {10: {sorter: false}, 11: {sorter: false}}
+				});
+				$("#t2").tablesorter(
+				{
+					sortList: [[0,0],[1,0]],
+					widgets: ["zebra"]
+				});
 			});
 			function conf(val1)
 			{
-				return confirm("Incomingplätze von '"+val1+"' auf 0 setzen?");
+				return confirm("Incomingplätze der LV '"+val1+"' auf 0 setzen?");
 			}
 		</script>
 	
@@ -96,88 +108,101 @@ if($method=="lehrveranstaltungen")
 		$lehrveranstaltung->incoming = 0;
 		
 		if($lehrveranstaltung->save())
-			echo $p->t('global/erfolgreichgespeichert');  
+			$message = $p->t('global/erfolgreichgespeichert');  
 		else
-			echo $p->t('global/fehleraufgetreten');  
+			$message = $p->t('global/fehleraufgetreten');  
 	}
 	
 	// Übersicht aller LVs
 	echo '<h2>Lehrveranstaltungs-Verwaltung</h2>';
 	echo '
-	<form name="filterSemester">
-	<table border="0">
-		<tr>
-			<td>'.$p->t('incoming/filter').':
-				<SELECT name="filterLv" onchange=selectChange()>					
-				<option value="allSemester">'.$p->t('incoming/alleSemester').'</option>';
-				
-				// Vorauswahl der Übergebenen Filter
-				$WSemesterSelected = '';
-				$SSemesterSelected = '';
-				
-				if(isset($_GET['filter']))
-					if($_GET['filter'] == 'WSemester')
-						$WSemesterSelected ='selected';
-					elseif($_GET['filter']=='SSemester')
-						$SSemesterSelected='selected';
 	
-				echo '<option value="WSemester" '.$WSemesterSelected.'>'.$p->t('incoming/wintersemester').'</option>';
+		<form name="filterSemester" action="'.$_SERVER['PHP_SELF'].'" method="GET">
+		<table width="90%" border="0" align="center">
+			<tr>
+				<td>'.$p->t('incoming/studentenImWS').'</td>
+			</tr>
+			<tr>
+				<td>'.$p->t('incoming/studentenImSS').'</td>
+			</tr>
+			<tr>
+				<td>'.$p->t('incoming/filter').':
+					<SELECT name="filter">
+					<option value="allSemester">'.$p->t('incoming/alleSemester').'</option>';
 
-				echo '<option value="SSemester" '.$SSemesterSelected.'>'.$p->t('incoming/sommersemester').'</option>';
+					// Vorauswahl der Übergebenen Filter
+					$WSemesterSelected = '';
+					$SSemesterSelected = '';
 
-		echo'</SELECT><br>';
-		echo $p->t('courseInformation/unterrichtssprache').':<SELECT name="filterUnterrichtssprache" onchange=selectChange()>
-		<option value="">'.$p->t('incoming/alleSprachen').'</option>';
-		
-				// Vorauswahl der Übergebenen Filter
-				$GermanSelected = '';
-				$EnglishSelected = '';
-		
-				if(isset($_GET['unterrichtssprache']))
-					if($_GET['unterrichtssprache'] == 'German')
-						$GermanSelected ='selected';
-					elseif($_GET['unterrichtssprache']=='English')
-						$EnglishSelected='selected';
-		
-				echo '<option value="German" '.$GermanSelected.'>German</option>';
-		
-				echo '<option value="English" '.$EnglishSelected.'>English</option>';
-		
-		echo'</SELECT><br>';
-		echo $p->t('global/studiengang').':<SELECT name="filterStudiengang" onchange=selectChange()>
-		<option value="">Alle Studiengänge</option>';
-		
-				// Vorauswahl der Übergebenen Filter
-				
-				$studiengang = new studiengang();
-				$studiengang->getAll('typ,kurzbz', true);
-				
-				foreach ($studiengang->result as $row)
+					if(isset($_GET['filter']))
+						if($_GET['filter'] == 'WSemester')
+							$WSemesterSelected ='selected';
+						elseif($_GET['filter']=='SSemester')
+							$SSemesterSelected='selected';
+
+					echo '<option value="WSemester" '.$WSemesterSelected.'>'.$p->t('incoming/wintersemester').'</option>';
+
+					echo '<option value="SSemester" '.$SSemesterSelected.'>'.$p->t('incoming/sommersemester').'</option>';
+
+			echo'</SELECT><br>';
+			echo $p->t('courseInformation/unterrichtssprache').':<SELECT name="unterrichtssprache">
+			<option value="">'.$p->t('incoming/alleSprachen').'</option>';
+
+					// Vorauswahl der Übergebenen Filter
+					$GermanSelected = '';
+					$EnglishSelected = '';
+
+					if(isset($_GET['unterrichtssprache']))
+						if($_GET['unterrichtssprache'] == 'German')
+							$GermanSelected ='selected';
+						elseif($_GET['unterrichtssprache']=='English')
+							$EnglishSelected='selected';
+
+					echo '<option value="German" '.$GermanSelected.'>'.$p->t("global/deutsch").'</option>';
+
+					echo '<option value="English" '.$EnglishSelected.'>'.$p->t("global/englisch").'</option>';
+
+			echo'</SELECT><br>';
+			echo $p->t('global/studiengang').':<SELECT name="studiengang">
+			<option value="">'.$p->t('incoming/alleStudiengaenge').'</option>';
+
+			// Vorauswahl der Übergebenen Filter
+
+			$studiengang = new studiengang();
+			$studiengang->getAll('typ,kurzbz', true);
+			$type = array('b' => 'Bachelor', 'm' => 'Master', 'e' => 'Other');
+			$typ = '';
+
+			foreach ($studiengang->result as $row)
+			{
+				//Nur Bachelor, Master und CIR-Studiengang
+				if ($row->typ == 'b' || $row->typ == 'm' || $row->studiengang_kz == '10006')
 				{
 					$selected = '';
+					
+					if ($typ != $row->typ || $typ=='')
+					{
+						if ($typ!='')
+							echo '</optgroup>';
+							echo '<optgroup label="'.$type[$row->typ].'">';
+					}
+					
 					if(isset($_GET['studiengang']) && $_GET['studiengang'] == $row->studiengang_kz)
 						$selected='selected';
-					
-					echo '<option value="'.$row->studiengang_kz.'" '.$selected.'>'.strtoupper($row->typ.$row->kurzbz).' - '.$row->bezeichnung.'</option>';
+
+					$studiengang_language = ($sprache == 'German') ? $row->bezeichnung : $row->english;
+					echo '<option value="'.$row->studiengang_kz.'" '.$selected.'>'.strtoupper($row->typ.$row->kurzbz).' - '.$studiengang_language.'</option>';
+					$typ = $row->typ;
 				}
-		
-		echo'</SELECT>';
-		echo '</td>
-		</tr>
-	</table>
-		
-<script language="JavaScript">
-	function selectChange() 
-	{
-		filter = document.filterSemester.filterLv.options[document.filterSemester.filterLv.selectedIndex].value;
-		filterSprache = document.filterSemester.filterUnterrichtssprache.options[document.filterSemester.filterUnterrichtssprache.selectedIndex].value;
-		filterStudiengang = document.filterSemester.filterStudiengang.options[document.filterSemester.filterStudiengang.selectedIndex].value;
-		url = [location.protocol, "//", location.host, location.pathname].join("");
-		url = url+"?method=lehrveranstaltungen&filter="+filter+"&unterrichtssprache="+filterSprache+"&studiengang="+filterStudiengang;
-		document.location=url;
-	}
-</script>	
-		
+			}
+
+			echo'</SELECT><br><br>';
+			echo '<input type="hidden" name="method" value="lehrveranstaltungen">';
+			//echo '<input type="hidden" >';
+			echo '<input type="submit" name="go" value="Filter">';
+			echo '</td>
+			</tr>
+		</table>
 		</form>';
 			
 		// Filter für Semester setzen
@@ -192,114 +217,344 @@ if($method=="lehrveranstaltungen")
 		if(isset($_GET['unterrichtssprache']) && $_GET['unterrichtssprache']!='')
 			$filterqry .= " AND tbl_lehrveranstaltung.sprache='".$_GET['unterrichtssprache']."'";
 
-		
 		//Uebersicht LVs
-		$qry = "SELECT 
-					tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.ects, 
-					tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache,
-					tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.incoming, tbl_lehrveranstaltung.orgform_kurzbz,
-					(
-					Select count(*) 
-					FROM (
-						SELECT
-							person_id
-						FROM 
-							campus.vw_student_lehrveranstaltung 
-						JOIN public.tbl_benutzer using(uid)
-						JOIN public.tbl_student ON(uid=student_uid) 
-						JOIN public.tbl_prestudentstatus USING(prestudent_id)
+		/* Erklaerung der Datumszeitraeume ab Zeile 857:
+		 *			|=============== Studiensemester ===============|
+		 *		|--------------| 											Incoming beginnt vor SS-Beginn und endet VOR SS-Ende jedoch ueberwiegend innerhalb SS
+		 *												|--------------| 	Incoming beginnt VOR SS-Ende und endet NACH SS-Ende, jedoch ueberwiegend innerhalb SS
+		 *	|----------| 													Incoming beginnt vor SS-Beginn und endet VOR SS-Ende jedoch ueberwiegend außerhalb SS
+		 *														|---------|	Incoming beginnt VOR SS-Ende und endet NACH SS-Ende, jedoch ueberwiegend außerhalb SS
+		 * 					|------------------------------| 				Incoming ist innerhalb oder GENAU SS da
+		 *		|------------------------------------------------------|	Incoming ist VOR SS-Anfang und NACH SS-Ende da, jedoch ueberwiegend ueberlappend mit SS
+		 *	------------------------------------------------------------	Von und Bis ist NULL
+		 *	-------------------|											Von ist NULL und bis innerhalb SS
+		 *									|---------------------------	Bis ist NULL und von innerhalb SS
+		 */
+		
+		$studiensemester_array = array();
+		$studiensemester = new studiensemester();
+		$studiensemester_array[] = $studiensemester->getakt();
+		
+		$studiensemester->getFutureStudiensemester('',2);
+		foreach ($studiensemester->studiensemester AS $row)
+			$studiensemester_array[] = $row->studiensemester_kurzbz;
+		
+		if(isset($_GET['go']))
+		{
+			// QUERY liefert LVs aus den gültigen Studienordnungen UND jene mit Anmeldungen, auch wenn Incomingplätze 0 sind oder die LV in keinem gültigen Studienplan liegt
+			$qry = "SELECT
+						tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.ects,
+						tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache,
+						tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.incoming, tbl_lehrveranstaltung.orgform_kurzbz,
+						(
+						Select count(*)
+						FROM (
+							SELECT
+								person_id
+							FROM
+								campus.vw_student_lehrveranstaltung
+							JOIN public.tbl_benutzer using(uid)
+							JOIN public.tbl_student ON(uid=student_uid)
+							JOIN public.tbl_prestudentstatus USING(prestudent_id)
+							WHERE
+								lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
+								AND
+								lehreinheit_id in (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
+							WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
+								AND
+								tbl_lehreinheit.studiensemester_kurzbz='$stsem->studiensemester_kurzbz')
+								AND
+								tbl_prestudentstatus.status_kurzbz='Incoming'
+								AND tbl_prestudentstatus.studiensemester_kurzbz='$stsem->studiensemester_kurzbz'
+							UNION
+							SELECT
+								person_id
+							FROM
+								public.tbl_preincoming_lehrveranstaltung
+							JOIN public.tbl_preincoming using(preincoming_id)
+							WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
+							AND
+							(
+								(bis - '$stsem->start' > '$stsem->start' - von) OR
+								('$stsem->start' <= von AND bis >= '$stsem->ende' AND '$stsem->ende' - von > bis - '$stsem->ende') OR
+								(bis <= '$stsem->ende' AND bis >= '$stsem->start' AND von < '$stsem->start') OR
+								('$stsem->start' <= von AND von < '$stsem->ende' AND bis > '$stsem->ende') OR
+								(von >= '$stsem->start' AND bis <= '$stsem->ende') OR
+								(von <= '$stsem->start' AND bis >= '$stsem->ende') OR
+								(von IS NULL AND bis IS NULL) OR
+								(von IS NULL AND bis <= '$stsem->ende' AND bis > '$stsem->start') OR
+								(bis IS NULL AND von < '$stsem->ende' AND von >= '$stsem->start')
+							)
+							AND aktiv = true
+							)a ) as anzahl 
+						FROM
+							lehre.tbl_lehrveranstaltung
+						JOIN 
+							public.tbl_studiengang USING(studiengang_kz) 
 						WHERE
-							lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id 
-							AND
-							lehreinheit_id in (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
-						WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id						
-							AND 
-							tbl_lehreinheit.studiensemester_kurzbz='$stsem->studiensemester_kurzbz')
-							AND
-							tbl_prestudentstatus.status_kurzbz='Incoming'
-							AND tbl_prestudentstatus.studiensemester_kurzbz='$stsem->studiensemester_kurzbz'
+							tbl_lehrveranstaltung.incoming>0 AND 
+							tbl_lehrveranstaltung.aktiv AND 
+							tbl_lehrveranstaltung.lehre AND 
+							tbl_lehrveranstaltung.lehrveranstaltung_id IN 
+							(
+								SELECT lehrveranstaltung_id FROM lehre.tbl_studienplan_lehrveranstaltung 
+								JOIN lehre.tbl_studienplan USING (studienplan_id) 
+								JOIN lehre.tbl_studienordnung USING (studienordnung_id) 
+								JOIN lehre.tbl_studienplan_semester USING (studienplan_id)
+								WHERE tbl_studienordnung.status_kurzbz='approved' 
+								AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id
+								AND tbl_studienplan_semester.studiensemester_kurzbz IN ('".implode("','", $studiensemester_array)."')
+								AND tbl_studienplan_semester.semester=tbl_lehrveranstaltung.semester
+							) 
+							AND ((tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000) OR tbl_lehrveranstaltung.studiengang_kz=10006)";
+							
+						if (isset($_GET['studiengang']) && $_GET['studiengang'] !='')
+							$qry .= " AND tbl_lehrveranstaltung.studiengang_kz=".$_GET['studiengang'];
+			
+							$qry .= " AND tbl_studiengang.aktiv ".$filterqry;
+						
+						$qry .= " 
 						UNION
-						SELECT 
-							person_id 
-						FROM 
-							public.tbl_preincoming_lehrveranstaltung 
-						JOIN public.tbl_preincoming using(preincoming_id) 
-						WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id 
-						AND 
-						(von is null OR von <= '$stsem->start') 
-						AND 
-						(bis is null OR bis >= (DATE '$stsem->ende')) 
-						AND aktiv = true				
-						)a ) as anzahl
-					FROM 
-						lehre.tbl_lehrveranstaltung JOIN public.tbl_studiengang USING(studiengang_kz)
-					WHERE 
-						/*tbl_lehrveranstaltung.incoming>0 AND*/
-						tbl_lehrveranstaltung.aktiv AND 
-						tbl_lehrveranstaltung.lehre
-						AND tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000";
-					
-					if (isset($_GET['studiengang']) && $_GET['studiengang'] !='')
-						$qry .= "AND tbl_lehrveranstaltung.studiengang_kz=".$_GET['studiengang'];
-				
-					$qry .= "AND tbl_studiengang.aktiv ".$filterqry." order by studiengang_kz
-					";
 
-		echo '<table class="tablesorter" id="t1" width="90%" border="0" align="center">
+						SELECT
+						tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.ects,
+						tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache,
+						tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.incoming, tbl_lehrveranstaltung.orgform_kurzbz,
+						(
+						Select count(*)
+						FROM (
+							SELECT
+								person_id
+							FROM
+								campus.vw_student_lehrveranstaltung
+							JOIN public.tbl_benutzer using(uid)
+							JOIN public.tbl_student ON(uid=student_uid)
+							JOIN public.tbl_prestudentstatus USING(prestudent_id)
+							WHERE
+								lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
+								AND
+								lehreinheit_id in (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
+							WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
+								AND
+								tbl_lehreinheit.studiensemester_kurzbz='$stsem->studiensemester_kurzbz')
+								AND
+								tbl_prestudentstatus.status_kurzbz='Incoming'
+								AND tbl_prestudentstatus.studiensemester_kurzbz='$stsem->studiensemester_kurzbz'
+							UNION
+							SELECT
+								person_id
+							FROM
+								public.tbl_preincoming_lehrveranstaltung
+							JOIN public.tbl_preincoming using(preincoming_id)
+							WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
+							AND
+							(
+								(bis - '$stsem->start' > '$stsem->start' - von) OR
+								('$stsem->start' <= von AND bis >= '$stsem->ende' AND '$stsem->ende' - von > bis - '$stsem->ende') OR
+								(bis <= '$stsem->ende' AND bis >= '$stsem->start' AND von < '$stsem->start') OR
+								('$stsem->start' <= von AND von < '$stsem->ende' AND bis > '$stsem->ende') OR
+								(von >= '$stsem->start' AND bis <= '$stsem->ende') OR
+								(von <= '$stsem->start' AND bis >= '$stsem->ende') OR
+								(von IS NULL AND bis IS NULL) OR
+								(von IS NULL AND bis <= '$stsem->ende' AND bis > '$stsem->start') OR
+								(bis IS NULL AND von < '$stsem->ende' AND von >= '$stsem->start')
+							)
+							AND aktiv = true
+							)a ) as anzahl 
+						FROM
+							public.tbl_preincoming_lehrveranstaltung
+						JOIN public.tbl_preincoming using(preincoming_id)
+						JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+						JOIN public.tbl_studiengang USING(studiengang_kz)
+						WHERE 
+						(
+							(bis - '$stsem->start' > '$stsem->start' - von) OR
+							('$stsem->start' <= von AND bis >= '$stsem->ende' AND '$stsem->ende' - von > bis - '$stsem->ende') OR
+							(bis <= '$stsem->ende' AND bis >= '$stsem->start' AND von < '$stsem->start') OR
+							('$stsem->start' <= von AND von < '$stsem->ende' AND bis > '$stsem->ende') OR
+							(von >= '$stsem->start' AND bis <= '$stsem->ende') OR
+							(von <= '$stsem->start' AND bis >= '$stsem->ende') OR
+							(von IS NULL AND bis IS NULL) OR
+							(von IS NULL AND bis <= '$stsem->ende' AND bis > '$stsem->start') OR
+							(bis IS NULL AND von < '$stsem->ende' AND von >= '$stsem->start')
+						)
+						AND tbl_preincoming.aktiv = true
+							";
+	
+			if (isset($_GET['studiengang']) && $_GET['studiengang'] !='')
+				$qry .= " AND tbl_lehrveranstaltung.studiengang_kz=".$_GET['studiengang'];
+
+			$qry .= " AND tbl_studiengang.aktiv ".$filterqry." order by studiengang_kz";
+
+			if($result = $db->db_query($qry))
+			{
+				if ($db->db_num_rows($result)>0)
+				{
+					echo '<center>'.$message.'</center>';
+					echo '<p style="padding-left: 10px; padding-right: 10px;">'.$p->t('incoming/tabelleSortierinformation').'</p>';
+					echo '<table class="tablesorter" id="t1" width="90%" style="padding-left: 10px; padding-right: 10px;" border="0" align="center">
+						<thead align="center">
+						<tr>
+							<th>LV-ID</th>
+							<th>'.$p->t('global/studiengang').'</th>
+							<th>'.$p->t('abgabetool/typ').'</th>
+							<th>'.$p->t('incoming/orgform').'</th>
+							<th>'.$p->t('global/semester').'</th>
+							<th>'.$p->t('global/lehrveranstaltung').'</th>
+							<th>'.$p->t('global/lehrveranstaltung').' '.$p->t('global/englisch').'</th>
+							<th>'.$p->t('incoming/ects').'</th>
+							<th>'.$p->t('courseInformation/unterrichtssprache').'</th>
+							<th>'.$p->t('incoming/lvInfo').'</th>
+							<th>'.$p->t('incoming/freieplätze').'</th>
+							<th></th>
+							<th></th>
+						</tr>
+						</thead>
+						<tbody>';
+					while($row = $db->db_fetch_object($result))
+					{
+						$freieplaetze = $row->incoming - $row->anzahl;
+						$style = '';
+	
+						$studiengang = new studiengang();
+						$studiengang->load($row->studiengang_kz);
+						$studiengang_language = ($sprache == 'German') ? $studiengang->bezeichnung : $studiengang->english;
+						$typ = $studiengang->typ;
+						if ($studiengang->typ == 'b')
+							$typ = 'Bachelor';
+						else if ($studiengang->typ == 'm')
+							$typ = 'Master';
+						else
+							$typ = '-';
+						echo '<tr>';
+						
+						if ($freieplaetze<=0)
+							$style = 'style="background-color: #FF8888"';
+						
+						echo '<td '.$style.'>',$row->lehrveranstaltung_id,'</td>';
+						echo '<td '.$style.'>',$studiengang_language,'</td>';
+						echo '<td '.$style.'>',$typ,'</td>';
+						echo '<td '.$style.'>',$row->orgform_kurzbz,'</td>';
+						echo '<td '.$style.'>',$row->semester,'</td>';
+						echo '<td '.$style.'>',$row->bezeichnung,'</td>';
+						echo '<td '.$style.'>',$row->bezeichnung_english,'</td>';
+						echo '<td '.$style.'>',$row->ects,'</td>';
+						echo '<td '.$style.'>',($row->sprache=='German'?$p->t("global/deutsch"):$p->t("global/englisch")),'</td>';
+						echo '<td '.$style.'>
+								<a href="#Deutsch" class="Item" onclick="javascript:window.open(\'../../addons/lvinfo/cis/view.php?lehrveranstaltung_id='.$row->lehrveranstaltung_id.'&amp;sprache=German\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">'.$p->t("global/deutsch").'&nbsp;</a>
+								<a href="#Englisch" class="Item" onclick="javascript:window.open(\'../../addons/lvinfo/cis/view.php?lehrveranstaltung_id='.$row->lehrveranstaltung_id.'&amp;sprache=English\',\'Courseinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">'.$p->t("global/englisch").'</a>
+							  </td>';
+						echo '<td '.$style.'>',($freieplaetze<$row->incoming?'<strong>'.$freieplaetze.' ('.$p->t('incoming/von').' '.$row->incoming.')</strong>':$freieplaetze.' ('.$p->t('incoming/von').' '.$row->incoming.')').'</td>';
+						echo '<td '.$style.'><a href="#Teilnehmer" class="Item" onclick="javascript:window.open(\'incoming_lehrveranstaltungen.php?method=anmeldungen&amp;id='.$row->lehrveranstaltung_id.'&amp;'.$filter_url.'\',\'Anmeldungen\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Anmeldungen</a></td>';
+						echo '<td '.$style.'><a href="incoming_lehrveranstaltungen.php?method=lehrveranstaltungen&mode=setZero&id='.$row->lehrveranstaltung_id.'&'.$filter_url.'" onclick="return conf(\''.$row->bezeichnung.'\')">Incomingplätze auf 0</a></td>';
+						echo '</tr>';
+
+					}
+					echo '</tbody></table>';
+				}
+				else
+					echo '<center><b>'.$p->t('incoming/derzeitKeineLehrveranstaltungen').'</b></center>';
+			}
+		}
+		else
+			echo '<center><b>'.$p->t('incoming/waehlenSieAusDenOptionen').'</b></center>';
+		echo '</tbody></table>';
+}
+elseif($method=="anmeldungen")
+{
+	// Übersicht aller LVs
+	echo '<h2>Übersicht Anmeldungen</h2>';
+
+	// Filter für Semester setzen
+	
+
+	//Uebersicht LVs
+	/* Erklaerung der Datumszeitraeume
+	*			|=============== Studiensemester ===============|
+	*		|--------------| 											Incoming beginnt vor SS-Beginn und endet VOR SS-Ende jedoch ueberwiegend innerhalb SS
+	*												|--------------| 	Incoming beginnt VOR SS-Ende und endet NACH SS-Ende, jedoch ueberwiegend innerhalb SS
+	*	|----------| 													Incoming beginnt vor SS-Beginn und endet VOR SS-Ende jedoch ueberwiegend außerhalb SS
+	*														|---------|	Incoming beginnt VOR SS-Ende und endet NACH SS-Ende, jedoch ueberwiegend außerhalb SS
+	* 					|------------------------------| 				Incoming ist innerhalb oder GENAU SS da
+	*		|------------------------------------------------------|	Incoming ist VOR SS-Anfang und NACH SS-Ende da, jedoch ueberwiegend ueberlappend mit SS
+	*	------------------------------------------------------------	Von und Bis ist NULL
+	*	-------------------|											Von ist NULL und bis innerhalb SS
+	*									|---------------------------	Bis ist NULL und von innerhalb SS
+	*/
+	if (isset($_GET['id']))
+	{
+		$id = $db->db_add_param($_GET['id'], FHC_INTEGER, false);
+		$qry = "	SELECT
+						nachname, vorname
+					FROM
+						campus.vw_student_lehrveranstaltung
+					JOIN public.tbl_benutzer using(uid)
+					JOIN public.tbl_student ON(uid=student_uid)
+					JOIN public.tbl_prestudentstatus USING(prestudent_id)
+					JOIN public.tbl_person USING(person_id)
+					WHERE
+						lehrveranstaltung_id=".$id."
+						AND
+						lehreinheit_id in (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
+					WHERE lehrveranstaltung_id=".$id."
+						AND
+						tbl_lehreinheit.studiensemester_kurzbz='$stsem->studiensemester_kurzbz')
+						AND
+						tbl_prestudentstatus.status_kurzbz='Incoming'
+						AND tbl_prestudentstatus.studiensemester_kurzbz='$stsem->studiensemester_kurzbz'
+					UNION
+					SELECT
+						nachname, vorname
+					FROM
+						public.tbl_preincoming_lehrveranstaltung
+					JOIN public.tbl_preincoming using(preincoming_id)
+					JOIN public.tbl_person USING(person_id)
+					WHERE lehrveranstaltung_id=".$id."
+					AND
+					(
+						(bis - '$stsem->start' > '$stsem->start' - von) OR
+						('$stsem->start' <= von AND bis >= '$stsem->ende' AND '$stsem->ende' - von > bis - '$stsem->ende') OR
+						(bis <= '$stsem->ende' AND bis >= '$stsem->start' AND von < '$stsem->start') OR
+						('$stsem->start' <= von AND von < '$stsem->ende' AND bis > '$stsem->ende') OR
+						(von >= '$stsem->start' AND bis <= '$stsem->ende') OR
+						(von <= '$stsem->start' AND bis >= '$stsem->ende') OR
+						(von IS NULL AND bis IS NULL) OR
+						(von IS NULL AND bis <= '$stsem->ende' AND bis > '$stsem->start') OR
+						(bis IS NULL AND von < '$stsem->ende' AND von >= '$stsem->start')
+					)
+					AND tbl_preincoming.aktiv = true";
+	
+	
+		if($result = $db->db_query($qry))
+		{
+			if ($db->db_num_rows($result)>0)
+			{
+				echo '<table class="tablesorter" id="t2" width="90%" style="padding-left: 10px; padding-right: 10px;" border="0" align="center">
 				<thead align="center">
 				<tr>
-					<th>'.$p->t('global/studiengang').'</th>
-					<th>'.$p->t('abgabetool/typ').'</th>
-					<th>'.$p->t('incoming/orgform').'</th>
-					<th>'.$p->t('global/semester').'</th>
-					<th>'.$p->t('global/lehrveranstaltung').'</th>
-					<th>'.$p->t('global/lehrveranstaltung').' '.$p->t('global/englisch').'</th>
-					<th>'.$p->t('incoming/ects').'</th>
-					<th>'.$p->t('courseInformation/unterrichtssprache').'</th>
-					<th>Info</th>
-					<th>'.$p->t('incoming/freieplätze').'</th>
-	   				<th></th>
+					<th>'.$p->t('global/nachname').'</th>
+					<th>'.$p->t('global/vorname').'</th>
 				</tr>
 				</thead>
 				<tbody>';
-		if($result = $db->db_query($qry))
-		{
-			while($row = $db->db_fetch_object($result))
-			{
-				$freieplaetze = $row->incoming - $row->anzahl;
-				
-				$studiengang = new studiengang(); 
-				$studiengang->load($row->studiengang_kz);
-				$studiengang_language = ($sprache == 'German') ? $studiengang->bezeichnung : $studiengang->english;  
-				$typ = $studiengang->typ; 
-				$style='';
-				if ($row->incoming=='0')
-					$style = 'style="color:grey"';
-				if ($studiengang->typ == 'b')
-					$typ = 'BA';
-				else if ($studiengang->typ == 'm')
-					$typ = 'MA';  
-				echo '<tr>';
-				echo '<td '.$style.'>',$studiengang_language,'</td>';
-				echo '<td '.$style.'>',$typ,'</td>';
-				echo '<td '.$style.'>',$row->orgform_kurzbz,'</td>';
-				echo '<td '.$style.'>',$row->semester,'</td>';
-				echo '<td '.$style.'>',$row->bezeichnung,'</td>';
-				echo '<td '.$style.'>',$row->bezeichnung_english,'</td>';
-				echo '<td '.$style.'>',$row->ects,'</td>';
-				echo '<td '.$style.'>',$row->sprache,'</td>';
-				echo '<td '.$style.'>
-						<a href="#Deutsch" class="Item" onclick="javascript:window.open(\'../../cis/private/lehre/ects/preview.php?lv='.$row->lehrveranstaltung_id.'&amp;language=de\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Deutsch&nbsp;</a>
-						<a href="#Englisch" class="Item" onclick="javascript:window.open(\'../../cis/private/lehre/ects/preview.php?lv='.$row->lehrveranstaltung_id.'&amp;language=en\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Englisch</a>
-					  </td>';
-				echo '<td '.$style.'>',($freieplaetze<$row->incoming?'<strong>'.$freieplaetze.'/'.$row->incoming.'</strong>':$freieplaetze.'/'.$row->incoming),'</td>';
-				echo '<td><a href="incoming_lehrveranstaltungen.php?method=lehrveranstaltungen&mode=setZero&id='.$row->lehrveranstaltung_id.'" onclick="return conf(\''.$row->bezeichnung.'\')">Plätze auf 0 setzen</a></td>';
-				echo '</tr>';
-
+				while($row = $db->db_fetch_object($result))
+				{
+					
+					echo '<tr>';
+					echo '<td>',$row->nachname,'</td>';
+					echo '<td>',$row->vorname,'</td>';
+					echo '</tr>';
+	
+				}
+				echo '</tbody></table>';
 			}
+			else
+				echo '<center><b>Keine Anmeldungen gefunden</b></center>';
 		}
-		echo '</tbody></table>';
 	}
+	else
+		'<center><b>Es wurde keine Lehrveranstaltungs-ID übergeben</b></center>';
+}
 ?>
 	</body>
 </html>

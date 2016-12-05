@@ -406,7 +406,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </table:table-cell>
           <table:covered-table-cell/>
           <table:table-cell table:style-name="Tabelle1.C2" table:number-columns-spanned="5" office:value-type="string">
-            <text:p text:style-name="P5">Presentation and Examination interview on the Bachelor paper and its links to subjects of the curriculum</text:p>
+            <text:p text:style-name="P5">Presentation and Examination interview on the Bachelor Paper and its links to subjects of the curriculum</text:p>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
@@ -434,7 +434,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:table-cell table:style-name="Tabelle1.C2" table:number-columns-spanned="5" office:value-type="string">
-            <text:p text:style-name="P4">Examination interview on the Bachelor paper and its links to </text:p>
+            <text:p text:style-name="P4">Examination interview on the Bachelor Paper and its links to </text:p>
             <text:p text:style-name="P5">
 				<draw:custom-shape text:anchor-type="char" draw:z-index="5" draw:name="Rechteck 10" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.4cm" svg:height="0.4cm" svg:x="10.9cm" svg:y="-0.2cm">
 					<text:p/>
@@ -554,7 +554,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <table:table-row table:style-name="Tabelle1.1">
           <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
             <text:p text:style-name="P10">Assessment of the examination interview based on technical accuracy, completeness, structure and linguistic quality.</text:p>
-            <text:p text:style-name="P10">Passed with highest distinction, Passed with distinction, Passed, Failed</text:p>
+            <text:p text:style-name="P10">Passed with distinction, Passed with merit, Passed, Failed</text:p>
           </table:table-cell>
         </table:table-row>
         <table:table-row table:style-name="Tabelle1.1">

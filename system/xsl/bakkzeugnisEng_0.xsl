@@ -369,7 +369,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P9"/>
 			<text:p text:style-name="P9"/>
 			<text:p text:style-name="P10"/>
-			<text:p text:style-name="P10">Final assessment: Passed with highest distinction, Passed with distinction, Passed</text:p>
+			<text:p text:style-name="P10">Final assessment: Passed with distinction, Passed with merit, Passed</text:p>
 			<text:p text:style-name="P10">Pursuant to section 6 subsection 1 of the University of Applied Sciences Studies Act (FHStG), BGBI. Nr. <xsl:value-of select="bescheidbgbl1" /> idgF</text:p>
 			<text:p text:style-name="P18"/>
 			<text:p text:style-name="P18"/>
