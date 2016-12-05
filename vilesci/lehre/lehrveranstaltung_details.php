@@ -475,6 +475,22 @@
 					$htmlstr.= $row->studiensemester_kurzbz.'; ';
 				}
 			}
+
+			$htmlstr.='<br><b>Verwendung in folgenden Studienplänen</b>: ';
+			$qry ="SELECT distinct tbl_studienplan.bezeichnung
+					FROM
+						lehre.tbl_studienplan_lehrveranstaltung
+						JOIN lehre.tbl_studienplan USING(studienplan_id)
+					WHERE lehrveranstaltung_id=".$db->db_add_param($lv->lehrveranstaltung_id).'
+					ORDER BY tbl_studienplan.bezeichnung desc';
+			if($result = $db->db_query($qry))
+			{
+				while($row = $db->db_fetch_object($result))
+				{
+					$htmlstr.= $row->bezeichnung.'; ';
+				}
+			}
+
 			$htmlstr.='</span>';
 			// Details Ende
 	}
