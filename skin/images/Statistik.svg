@@ -10,9 +10,9 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="100mm"
+   width="75mm"
    height="100mm"
-   viewBox="0 0 100 100"
+   viewBox="0 0 75 100"
    version="1.1"
    id="svg4517"
    inkscape:version="0.92pre3 r"
@@ -72,7 +72,8 @@
        y1="291.10629"
        x2="84.106262"
        y2="202.89375"
-       gradientUnits="userSpaceOnUse" />
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0709151,0,0,1.111518,-16.045751,-27.544968)" />
     <linearGradient
        inkscape:collect="always"
        xlink:href="#linearGradient912"
@@ -324,11 +325,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="44.8"
-     inkscape:cx="307.61418"
-     inkscape:cy="31.988821"
+     inkscape:zoom="0.7"
+     inkscape:cx="-56.976954"
+     inkscape:cy="42.697031"
      inkscape:document-units="mm"
-     inkscape:current-layer="flowRoot5418"
+     inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="2497"
      inkscape:window-height="1016"
@@ -344,7 +345,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -354,15 +355,15 @@
      id="layer1"
      transform="translate(0,-197)">
     <rect
-       style="fill:url(#linearGradient5416);fill-opacity:1;fill-rule:nonzero;stroke:#474747;stroke-width:1.78746629;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.97089945"
+       style="fill:url(#linearGradient5416);fill-opacity:1;fill-rule:nonzero;stroke:#474747;stroke-width:1.95017505;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.97089945"
        id="rect5081"
-       width="68.212532"
-       height="88.21254"
-       x="15.893733"
-       y="202.89375" />
+       width="73.04982"
+       height="98.049828"
+       x="0.97508752"
+       y="197.97508" />
     <g
        id="g5359"
-       transform="matrix(0.60187871,0,0,0.77835028,19.992816,48.488095)"
+       transform="matrix(0.64456095,0,0,0.86515033,5.3648571,26.350421)"
        style="fill:url(#linearGradient5367);fill-opacity:1">
       <g
          id="g906"
@@ -554,7 +555,7 @@
     </g>
     <g
        aria-label="P"
-       transform="matrix(0.26458333,0,0,0.26458333,-54.77314,200.08014)"
+       transform="matrix(0.28334626,0,0,0.29408913,-74.703128,194.8477)"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:25px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        id="flowRoot5418">
       <text
