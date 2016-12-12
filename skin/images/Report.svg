@@ -15,7 +15,7 @@
    viewBox="0 0 100 100"
    version="1.1"
    id="svg4517"
-   inkscape:version="0.92pre2 r"
+   inkscape:version="0.92pre3 r"
    sodipodi:docname="Report.svg">
   <defs
      id="defs4511">
@@ -69,9 +69,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="36.830519"
-     inkscape:cy="159.96607"
+     inkscape:zoom="15.839192"
+     inkscape:cx="331.16915"
+     inkscape:cy="38.642793"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -461,20 +461,16 @@
            y="227" />
       </g>
     </g>
-    <g
-       aria-label="P"
-       transform="matrix(0.26458333,0,0,0.26458333,-56.852009,201.21407)"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:25px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       id="flowRoot5418">
-      <g
-         aria-label="R"
-         style="font-style:normal;font-weight:normal;font-size:40px;line-height:25px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         id="text4505">
-        <path
-           d="m 507.0968,325.40009 h 18.432 l -37.824,-56.64 c 18.24,-4.992 30.528,-19.968 30.528,-37.44 0,-22.848 -13.248,-38.784 -39.552,-38.784 h -48.768 v 132.864 h 15.936 v -54.72 h 25.344 z m -33.984,-68.736 h -27.264 v -50.112 h 27.264 c 17.28,0 29.184,3.648 29.184,24.768 0,19.968 -13.44,25.344 -29.184,25.344 z"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;font-family:cantarell;-inkscape-font-specification:cantarell;fill:#000000;fill-opacity:1"
-           id="path4905" />
-      </g>
-    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:6.61458349px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="53.591858"
+       y="290.21683"
+       id="text4505"><tspan
+         sodipodi:role="line"
+         id="tspan4503"
+         x="53.591858"
+         y="290.21683"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:50.79999924px;font-family:cantarell;-inkscape-font-specification:cantarell;fill:#000000;fill-opacity:1;stroke-width:0.26458332px">R</tspan></text>
   </g>
 </svg>

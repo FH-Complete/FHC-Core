@@ -15,7 +15,7 @@
    viewBox="0 0 100 100"
    version="1.1"
    id="svg4517"
-   inkscape:version="0.92pre2 r"
+   inkscape:version="0.92pre3 r"
    sodipodi:docname="Statistik.svg">
   <defs
      id="defs4511">
@@ -324,11 +324,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="-160.90502"
-     inkscape:cy="173.2425"
+     inkscape:zoom="44.8"
+     inkscape:cx="307.61418"
+     inkscape:cy="31.988821"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="flowRoot5418"
      showgrid="false"
      inkscape:window-width="2497"
      inkscape:window-height="1016"
@@ -557,15 +557,17 @@
        transform="matrix(0.26458333,0,0,0.26458333,-54.77314,200.08014)"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:25px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        id="flowRoot5418">
-      <g
-         aria-label="S"
+      <text
+         xml:space="preserve"
          style="font-style:normal;font-weight:normal;font-size:40px;line-height:25px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         id="text4505">
-        <path
-           d="m 466.5848,327.32009 c 28.032,0 48.96,-14.976 48.96,-36.096 0,-43.008 -73.344,-35.904 -73.344,-65.28 0,-13.824 11.712,-22.08 30.528,-22.08 10.752,0 24.96,3.456 32.064,8.64 l 6.144,-13.248 c -10.368,-5.952 -22.656,-9.408 -38.592,-9.408 -24.768,0 -46.08,10.56 -46.08,36.096 0,43.008 73.344,35.904 73.344,65.28 0,11.136 -12.48,22.08 -32.64,22.08 -15.168,0 -30.144,-5.76 -37.632,-10.56 l -6.144,13.248 c 10.368,5.76 23.04,11.328 43.392,11.328 z"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;font-family:cantarell;-inkscape-font-specification:cantarell;fill:#000000;fill-opacity:1"
-           id="path4504" />
-      </g>
+         x="419.58417"
+         y="338.6937"
+         id="text4505"><tspan
+           sodipodi:role="line"
+           id="tspan4503"
+           x="419.58417"
+           y="338.6937"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;font-family:cantarell;-inkscape-font-specification:cantarell;fill:#000000;fill-opacity:1">S</tspan></text>
     </g>
   </g>
 </svg>

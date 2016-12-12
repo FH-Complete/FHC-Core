@@ -15,7 +15,7 @@
    viewBox="0 0 100 100"
    version="1.1"
    id="svg4517"
-   inkscape:version="0.92pre2 r"
+   inkscape:version="0.92pre3 r"
    sodipodi:docname="Chart.svg">
   <defs
      id="defs4511">
@@ -69,9 +69,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="-619.33207"
-     inkscape:cy="89.602917"
+     inkscape:zoom="44.8"
+     inkscape:cx="311.14603"
+     inkscape:cy="23.343605"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -151,15 +151,16 @@
          id="rect5693-8-5-9"
          style="opacity:1;fill:url(#linearGradient5783);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.43856001;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.97089945" />
     </g>
-    <g
-       aria-label="C"
-       transform="matrix(0.26458333,0,0,0.26458333,-58.26189,200.08014)"
-       style="font-style:normal;font-weight:normal;font-size:40px;line-height:25px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       id="flowRoot5418">
-      <path
-         d="m 531.46827,321.41028 -6.144,-13.248 c -8.064,5.184 -19.584,8.64 -31.68,8.64 -30.72,0 -48.576,-23.424 -48.576,-54.336 0,-30.912 17.856,-55.104 48.576,-55.104 12.096,0 24.576,3.84 31.68,8.64 l 6.144,-13.248 c -8.448,-5.184 -22.08,-9.408 -37.824,-9.408 -38.4,0 -64.512,30.72 -64.512,69.12 0,38.4 26.112,68.352 64.512,68.352 12.864,0 26.688,-3.072 37.824,-9.408 z"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:192px;font-family:Cantarell;-inkscape-font-specification:Cantarell;fill:#000000;fill-opacity:1"
-         id="path4485" />
-    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:6.61458349px;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="53.336128"
+       y="289.70715"
+       id="text4505"><tspan
+         sodipodi:role="line"
+         id="tspan4503"
+         x="53.336128"
+         y="289.70715"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:50.79999924px;font-family:cantarell;-inkscape-font-specification:cantarell;fill:#000000;fill-opacity:1;stroke-width:0.26458332px">C</tspan></text>
   </g>
 </svg>
