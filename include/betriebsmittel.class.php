@@ -1115,11 +1115,11 @@ class betriebsmittel extends basis_db
 			$jahr_monat=mb_strtoupper(trim(str_replace(array('-','.','/','*','%',"'",'"'),'',trim($jahr_monat))));
 			$jm='';
 			if (!empty($jahr_monat) && is_numeric($jahr_monat) && strlen($jahr_monat)>6)
-				$jm=" and to_char(tbl_betriebsmittel_betriebsmittelstatus.datum, 'YYYYMMDD') = ".$this->db_add_param($jahr_monat)." ";
+				$jm=" and to_char(tbl_betriebsmittel.insertamum, 'YYYYMMDD') = ".$this->db_add_param($jahr_monat)." ";
 			elseif (!empty($jahr_monat) && is_numeric($jahr_monat) && strlen($jahr_monat)>4)
-				$jm=" and to_char(tbl_betriebsmittel_betriebsmittelstatus.datum, 'YYYYMM') = ".$this->db_add_param($jahr_monat)." ";
+				$jm=" and to_char(tbl_betriebsmittel.insertamum, 'YYYYMM') = ".$this->db_add_param($jahr_monat)." ";
 			elseif (!is_null($jahr_monat) && !empty($jahr_monat))
-				$jm=" and to_char(tbl_betriebsmittel_betriebsmittelstatus.datum, 'YYYY') = ".$this->db_add_param($jahr_monat)." ";
+				$jm=" and to_char(tbl_betriebsmittel.insertamum, 'YYYY') = ".$this->db_add_param($jahr_monat)." ";
 			$where.=$jm;
 			$where.=" and tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id in ( select max(betriebsmittelbetriebsmittelstatus_id) from wawi.tbl_betriebsmittel_betriebsmittelstatus where not betriebsmittelbetriebsmittelstatus_id is null ". $jm ."  group by betriebsmittel_id) ";
 		}

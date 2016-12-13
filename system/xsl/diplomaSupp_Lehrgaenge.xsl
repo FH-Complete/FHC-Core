@@ -2814,7 +2814,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 	         </table:table-row>
 	      </table:table>
 	      <text:p text:style-name="P15"/>
-     	 <text:p text:style-name="P23">Grading Scheme: Passed with highest distinction, Passed with distinction, Passed</text:p>
+     	 <text:p text:style-name="P23">Grading Scheme: Passed with distinction, Passed with merit, Passed</text:p>
      	 <text:p text:style-name="P22"/>
       </xsl:if>
       <text:p text:style-name="P22">
