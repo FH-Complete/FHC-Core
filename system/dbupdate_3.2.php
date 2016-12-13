@@ -1431,6 +1431,33 @@ if($result = @$db->db_query("SELECT 1 FROM kommune.tbl_match"))
 		echo 'kommune schema is dropped<br>';
 }
 
+
+
+// Removing column "r" from tbl_statistik
+if ($result = @$db->db_query("SELECT r FROM public.tbl_statistik LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_statistik DROP COLUMN r;";
+
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_statistik: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' public.tbl_statistik: Spalte r entfernt.<br>';
+}
+
+
+// Removing column "php" from tbl_statistik
+if ($result = @$db->db_query("SELECT php FROM public.tbl_statistik LIMIT 1;"))
+{s
+	$qry = "ALTER TABLE public.tbl_statistik DROP COLUMN php;";
+
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_statistik: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' public.tbl_statistik: Spalte php entfernt.<br>';
+}
+
+
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -1643,7 +1670,7 @@ $tabellen=array(
 	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id"),
 	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content","bezeichnung"),
 	"public.tbl_standort"  => array("standort_id","adresse_id","kurzbz","bezeichnung","insertvon","insertamum","updatevon","updateamum","ext_id", "firma_id","code"),
-	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","r","gruppe","sql","php","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz","publish","preferences"),
+	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","gruppe","sql","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz","publish","preferences"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung"),

@@ -71,8 +71,6 @@ if(!$rechte->isBerechtigt('basis/statistik'))
 			$sql = (isset($_POST['sql']) ? $_POST['sql'] : die('SQL fehlt'));
 			$gruppe = (isset($_POST['gruppe']) ? $_POST['gruppe'] : die('Gruppe fehlt'));
 			$content_id = (isset($_POST['content_id']) ? $_POST['content_id'] : die('ContentID fehlt'));
-			$php = (isset($_POST['php']) ? $_POST['php'] : die('PHP fehlt'));
-			$r = (isset($_POST['r']) ? $_POST['r'] : die('R fehlt'));
 			$publish = (isset($_POST['publish']) ? true : false);
 			$berechtigung_kurzbz = (isset($_POST['berechtigung_kurzbz']) ? $_POST['berechtigung_kurzbz'] : die('Berechtigungkurzbz fehlt'));
 			$preferences = (isset($_POST['preferences']) ? $_POST['preferences'] : die('preferences fehlt'));
@@ -91,8 +89,6 @@ if(!$rechte->isBerechtigt('basis/statistik'))
 			$statistik->sql = $sql;
 			$statistik->gruppe = $gruppe;
 			$statistik->content_id = $content_id;
-			$statistik->php = $php;
-			$statistik->r = $r;
 			$statistik->publish = $publish;
 			$statistik->updateamum = date('Y-m-d H:i:s');
 			$statistik->updatevon = $user;
@@ -177,14 +173,6 @@ EOT;
 						<td rowspan="3">SQL</td>
 						<td rowspan="3"><textarea name="sql" cols="60" rows="5"><?php echo $statistik->sql ?></textarea></td>
 						<td></td>
-						<td>R</td>
-						<td><input type="text" name="r" value="<?php echo $statistik->r ?>"></td>
-					</tr>
-					<tr valign="top">
-						<td></td>
-						<td>PHP</td>
-						<td><input type="text" name="php" value="<?php echo $statistik->php ?>"></td>
-					</tr>
 					<tr valign="top">
 						<td></td>
 						<td>Publish</td>
@@ -192,11 +180,19 @@ EOT;
 					</tr>
 
 					<tr valign="top">
+						<td></td>
 						<td>Preferences</td>
 						<td><textarea name="preferences" cols="60" rows="5"><?php echo $statistik->preferences ?></textarea></td>
 						<td></td>
 						<td></td>
-						<td><input type="submit" value="Speichern" name="save"></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td align="right"><input type="submit" value="Speichern" name="save"></td>
 					</tr>
 				</table>
 			</fieldset>
