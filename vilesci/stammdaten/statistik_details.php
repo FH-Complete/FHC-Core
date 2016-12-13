@@ -187,15 +187,11 @@ EOT;
 						<td></td>
 						<td></td>
 					</tr>
-					<tr>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td align="right"><input type="submit" value="Speichern" name="save"></td>
-					</tr>
 				</table>
 			</fieldset>
+				<div align="right" id="sub">
+					<input type="submit" value="Speichern" name="save">
+				</div>
 		</form>
 	</body>
 </html>
