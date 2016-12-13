@@ -51,41 +51,37 @@
 	$filter->htmlattr		= '';
 	$filter->insertvon		= $user;
 	$filter->updatevon		= $user;
-	
-	if(isset($_POST["action"]) && isset($_REQUEST["filter_id"]))
+
+	if(isset($_POST["save"]) && isset($_REQUEST["filter_id"]))
 	{
 		if(!$rechte->isBerechtigt('basis/statistik', null, 'suid'))
 			die('Sie haben keine Berechtigung fuer diese Aktion');
-	
-		if ($_POST["action"]=='save')
+
+		if ($_REQUEST["filter_id"]!='')
 		{
-			if ($_REQUEST["filter_id"]!='')
+			if($filter->load($_REQUEST["filter_id"]))
 			{
-				if($filter->load($_REQUEST["filter_id"]))
-				{
-					$filter->updatevon=$user;					
-				}
-				else
-					die('Fehlgeschlagen:'.$filter->errormsg);
+				$filter->updatevon=$user;
 			}
-
-			$filter->kurzbz = $_POST["kurzbz"];
-			$filter->valuename = $_POST["valuename"];
-			$filter->sql = $_POST["sql"];
-			$filter->showvalue = isset($_POST["showvalue"]);
-			$filter->type = $_POST["type"];
-			$filter->htmlattr = $_POST["htmlattr"];
-
-			if(!$filter->save())
-			{
-				$errorstr .= $filter->errormsg;
-			}
-		
-			$reloadstr .= "<script type='text/javascript'>\n";
-			$reloadstr .= "	parent.frame_filter_overview.location.href='filter_overview.php';";
-			$reloadstr .= "</script>\n";
-			//echo '<pre>'.var_dump($filter).'</pre>';
+			else
+				die('Fehlgeschlagen:'.$filter->errormsg);
 		}
+
+		$filter->kurzbz = $_POST["kurzbz"];
+		$filter->valuename = $_POST["valuename"];
+		$filter->sql = $_POST["sql"];
+		$filter->showvalue = isset($_POST["showvalue"]);
+		$filter->type = $_POST["type"];
+		$filter->htmlattr = $_POST["htmlattr"];
+
+		if(!$filter->save())
+		{
+			$errorstr .= $filter->errormsg;
+		}
+
+		$reloadstr .= "<script type='text/javascript'>\n";
+		$reloadstr .= "	parent.frame_filter_overview.location.href='filter_overview.php';";
+		$reloadstr .= "</script>\n";
 	}
 
 	if ((isset($_REQUEST['filter_id'])) && ((!isset($_REQUEST['neu'])) || ($_REQUEST['neu']!= "true")) && is_numeric($_REQUEST['filter_id']))
@@ -95,12 +91,12 @@
 			die($filter->errormsg);
 	}
 
-    if($filter->filter_id > 0)
-        $htmlstr .= "<br><div class='kopf'>Filter <b>".$filter->filter_id."</b></div>\n";
-    else
-        $htmlstr .="<br><div class='kopf'>Neuer Filter</div>\n";
-        
-    if($filter->showvalue)
+	if($filter->filter_id > 0)
+		$htmlstr .= "<br><div class='kopf'>Filter <b>".$filter->filter_id."</b></div>\n";
+	else
+		$htmlstr .="<br><div class='kopf'>Neuer Filter</div>\n";
+
+	if($filter->showvalue)
 		$chk = "checked";
 	else
 		$chk = '';
@@ -127,7 +123,7 @@
 	$htmlstr .= "<div align='right' id='sub'>\n";
 	$htmlstr .= "	<span id='submsg' style='color:red; visibility:hidden;'>Datensatz ge&auml;ndert!&nbsp;&nbsp;</span>\n";
 	$htmlstr .= "	<input type='hidden' name='filter_id' value='".$filter->filter_id."'>";
-	$htmlstr .= "	<input type='submit' value='save' name='action'>\n";
+	$htmlstr .= "	<input type='submit' value='Speichern' name='save'>\n";
 	$htmlstr .= "</div>";
 	$htmlstr .= "</form>";
 	$htmlstr .= "<div class='inserterror'>".$errorstr."</div>"
