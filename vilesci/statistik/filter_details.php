@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
+ * Authors: Christian Paminger < christian.paminger@technikum-wien.at > and
+ *          Andreas Moik < moik@technikum-wien.at >.
  */
 	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/globals.inc.php');
@@ -127,7 +128,6 @@
 	$htmlstr .= "	<span id='submsg' style='color:red; visibility:hidden;'>Datensatz ge&auml;ndert!&nbsp;&nbsp;</span>\n";
 	$htmlstr .= "	<input type='hidden' name='filter_id' value='".$filter->filter_id."'>";
 	$htmlstr .= "	<input type='submit' value='save' name='action'>\n";
-	$htmlstr .= "	<input type='button' value='Reset' onclick='unchanged()'>\n";
 	$htmlstr .= "</div>";
 	$htmlstr .= "</form>";
 	$htmlstr .= "<div class='inserterror'>".$errorstr."</div>"
@@ -139,13 +139,6 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<script type="text/javascript">
-	function unchanged()
-	{
-			document.filterform.reset();
-			document.filterform.schick.disabled = true;
-			document.getElementById("submsg").style.visibility="hidden";
-			checkrequired(document.filterform.filter_id);
-	}
 
 	function checkrequired(feld)
 	{
