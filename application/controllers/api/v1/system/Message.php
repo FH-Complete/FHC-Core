@@ -148,7 +148,8 @@ class Message extends APIv1_Controller
 				isset($this->post()['oe_kurzbz']) ? $this->post()['oe_kurzbz'] : null,
 				$this->post()['data'],
 				isset($this->post()['relationmessage_id']) ? $this->post()['relationmessage_id'] : null,
-				isset($this->post()['orgform_kurzbz']) ? $this->post()['orgform_kurzbz'] : null
+				isset($this->post()['orgform_kurzbz']) ? $this->post()['orgform_kurzbz'] : null,
+				isset($this->post()['multiPartMime']) ? $this->post()['multiPartMime'] : true
 			);
 			
 			$this->response($result, REST_Controller::HTTP_OK);

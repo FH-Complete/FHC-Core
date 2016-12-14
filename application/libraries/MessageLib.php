@@ -287,7 +287,7 @@ class MessageLib
      * @param   integer  $priority
      * @return  array
      */
-    public function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $relationmessage_id = null, $orgform_kurzbz = null)
+    public function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $relationmessage_id = null, $orgform_kurzbz = null, $multiPartMime = true)
     {
         if (!is_numeric($sender_id))
         {
@@ -347,7 +347,7 @@ class MessageLib
 								if ($this->ci->config->item('send_immediately') === true)
 								{
 									// Send message by email!
-									$resultSendEmail = $this->sendOne($result->retval, $subject, $parsedText);
+									$resultSendEmail = $this->sendOne($result->retval, $subject, $parsedText, $multiPartMime);
 								}
 							}
 						}
@@ -545,7 +545,7 @@ class MessageLib
 	/**
 	 * Gets one message from DB and sends it via email
 	 */
-	public function sendOne($message_id, $subject = null, $body = null)
+	public function sendOne($message_id, $subject = null, $body = null, $multiPartMime = true)
 	{
 		$sent = true; // optimistic expectation
 		
@@ -565,15 +565,15 @@ class MessageLib
 				// If the person has an email account
 				if (!is_null($result->retval[0]->receiver) && $result->retval[0]->receiver != '')
 				{
-					// Using a template as email body if it is not given as method parameter
-					if (is_null($body))
+					// If it is required use a multi-part message in MIME format
+					if ($multiPartMime === true)
 					{
 						// Using a template for the html email body
-						$href = APP_ROOT . $this->ci->config->item('redirect_view_message_url') . $result->retval[$i]->token;
+						$href = APP_ROOT . $this->ci->config->item('redirect_view_message_url') . $result->retval[0]->token;
 						$bodyMsg = $this->ci->parser->parse(
 							'templates/mailHTML',
 							array(
-								'src' => APP_ROOT . $this->ci->config->item('message_html_view_url') . $result->retval[$i]->token,
+								'src' => APP_ROOT . $this->ci->config->item('message_html_view_url') . $result->retval[0]->token,
 								'href' => $href
 							),
 							true
