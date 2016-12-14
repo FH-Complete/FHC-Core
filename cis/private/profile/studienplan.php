@@ -452,6 +452,10 @@ function drawTree($tree, $depth)
 			{
 				echo '<span class="error">'.$p->t('studienplan/negativ').'</span>';
 			}
+            elseif($positiv)
+            {
+                echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
+            }
 			elseif($lvregelExists)
 			{
 				if($abgeschlossen && $positiv)
@@ -462,10 +466,6 @@ function drawTree($tree, $depth)
 				{
 					echo '<span>'.$p->t('studienplan/offen').'</span>';
 				}
-			}
-			elseif($positiv)
-			{
-				echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
 			}
 			else
 			{
@@ -626,7 +626,8 @@ function drawTree($tree, $depth)
 					//check if rules are fulfilled just for actual or next studiensemester
 					if($stsem === $aktornext)
 					{
-						if($lvregel->isZugangsberechtigt($uid, $row_tree->studienplan_lehrveranstaltung_id, $stsem) !== true)
+						$result = $lvregel->isZugangsberechtigt($uid, $row_tree->studienplan_lehrveranstaltung_id, $stsem);
+						if((is_array($result)) && ($result[0] !== true))
 						{
 							$regelerfuellt=false;
 						}
