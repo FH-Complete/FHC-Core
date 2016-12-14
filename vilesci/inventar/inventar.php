@@ -72,6 +72,7 @@ if (!$uid = get_uid())
 	$jahr_monat=trim(isset($_REQUEST['jahr_monat']) ? $_REQUEST['jahr_monat']:'');
   	$afa=trim(isset($_REQUEST['afa']) ? $_REQUEST['afa']:'');
   	$inventur_jahr=trim(isset($_REQUEST['inventur_jahr']) ? $_REQUEST['inventur_jahr']:'');
+	$anlage_jahr_monat=trim(isset($_REQUEST['anlage_jahr_monat']) ? $_REQUEST['anlage_jahr_monat']:'');
 
   	$person_id=trim(isset($_REQUEST['person_id']) ? $_REQUEST['person_id']:'');
 	if (!empty($person_id) && !is_numeric($person_id))
@@ -503,6 +504,28 @@ if (!$uid = get_uid())
 							<option <?php echo ($jahr_monat_select=='-' || empty($jahr_monat_select)  ?'  selected="selected" ':''); ?>   value="">&nbsp;-&nbsp;</option>
 						</select>&nbsp;
 				</td>
+				<td><label for="anlage_jahr_monat">Anlagedatum</label>&nbsp;
+					<select id="anlage_jahr_monat" name="anlage_jahr_monat">
+							<?php
+							$anlage_jahr_monat_select=trim((!isset($_REQUEST['anlage_jahr_monat'])? '-':$anlage_jahr_monat));
+							$tmpJahr=(int)date("Y",mktime(0, 0, 0, 1, 1, date("Y")-12));
+							for ($i=0;$i<12;$i++)
+							{
+								$tmpJahr=$tmpJahr + 1;
+								$jjjjmm=$tmpJahr.'-00';
+								echo '<option '.($anlage_jahr_monat_select==$tmpJahr?'  selected="selected" ':'').' value="'.$tmpJahr.'">&nbsp;--'.$tmpJahr.'--&nbsp;</option>';
+								for ($ii=1;$ii<=12;$ii++)
+								{
+									$jjjjmm=$tmpJahr.'-'.($ii<10?'0'."$ii":$ii);
+									echo '<option '.($anlage_jahr_monat_select==$jjjjmm?' selected="selected" ':'').' value="'.$jjjjmm.'">&nbsp;'.$jjjjmm.'&nbsp;</option>';
+									if ($tmpJahr==date("Y") && $ii==date("m"))
+										break;
+								}
+							}
+							?>
+							<option <?php echo ($anlage_jahr_monat_select=='-' || empty($anlage_jahr_monat_select)  ?'  selected="selected" ':''); ?>   value="">&nbsp;-&nbsp;</option>
+						</select>&nbsp;
+				</td>
 				<td style="background-color: #FFFFDD;">&nbsp;<a href="javascript:document.sendform.submit();"><img border="0" src="../../skin/images/application_go.png" alt="suchen">&nbsp;suchen</a>&nbsp;<input style="display:none;" name="debug" value="<?php echo $debug;?>"></td>
 			</tr>
 		</table>
@@ -824,12 +847,12 @@ if (!$uid = get_uid())
 	if (empty($bestellung_id) && empty($bestellnr)  )
 		$bestelldetail_id='';
 	
- 	$check=$inventarnummer.$ort_kurzbz.$betriebsmittelstatus_kurzbz.$betriebsmitteltyp.$bestellung_id.$bestelldetail_id.$bestellnr.$hersteller.$afa.$jahr_monat.$firma_id.$inventur_jahr.$beschreibung.$oe_kurzbz.$seriennummer.$person_id.$betriebsmittel_id;
+ 	$check=$inventarnummer.$ort_kurzbz.$betriebsmittelstatus_kurzbz.$betriebsmitteltyp.$bestellung_id.$bestelldetail_id.$bestellnr.$hersteller.$afa.$jahr_monat.$firma_id.$inventur_jahr.$beschreibung.$oe_kurzbz.$seriennummer.$person_id.$betriebsmittel_id.$anlage_jahr_monat;
 	$order=null; // Sortierung
 
 	$oBetriebsmittel->result=array();
 	$oBetriebsmittel->errormsg='';
-	if ($check!='' && !$oBetriebsmittel->betriebsmittel_inventar($order,$inventarnummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz,$seriennummer,$person_id,$betriebsmittel_id))
+	if ($check!='' && !$oBetriebsmittel->betriebsmittel_inventar($order,$inventarnummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz,$seriennummer,$person_id,$betriebsmittel_id, $anlage_jahr_monat))
 		$errormsg[]=$oBetriebsmittel->errormsg;
 
 	echo '<form action="inventarliste.php" method="POST" target="_blank">
@@ -851,6 +874,7 @@ if (!$uid = get_uid())
 		<input type="hidden" name="seriennummer" value="'.$seriennummer.'">
 		<input type="hidden" name="person_id" value="'.$person_id.'">
 		<input type="hidden" name="betriebsmittel_id" value="'.$betriebsmittel_id.'">
+		<input type="hidden" name="anlage_jahr_monat" value="'.$anlage_jahr_monat.'">
 		<input type="submit" value="Excel Export" />
 		</form>
 		';

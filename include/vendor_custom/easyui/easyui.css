@@ -6,12 +6,17 @@
 .panel-body-noheader {
   border-top-width: 1px;
 }
-.panel-header,
-.panel-body {
+
+.panel {
+  background-color: #EEE;
+  color: #333;
   border-color: #888;
+  border: 1px solid #888;
 }
+
 .panel-body {
   background-color: #EEE;
   color: #333;
   font-size: 12px;
+  border: none;
 }
