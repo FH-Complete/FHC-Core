@@ -40,6 +40,17 @@ $p = new phrasen($sprache);
 //TODO
 $uid = get_uid();
 
+if(isset($_GET['uid']))
+{
+    // Administratoren duerfen die UID als Parameter uebergeben um den Studienplan
+    // von anderen Personen anzuzeigen
+
+    $rechte = new benutzerberechtigung();
+    $rechte->getBerechtigungen($uid);
+    if($rechte->isBerechtigt('admin'))
+        $uid=$_GET['uid'];
+}
+
 $db = new basis_db();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
@@ -302,6 +313,9 @@ $studiensemester->getAll();
 			</td>
 		    </tr>
             <?php endif; ?>
+            <tr id="studiengang">
+
+            </tr>
 		    <tr>
 			<td style="vertical-align: top; font-weight: bold;"><?php echo $p->t('global/anmerkung'); ?>: </td>
 			<td>

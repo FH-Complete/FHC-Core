@@ -149,5 +149,7 @@ Die Prüfung zur LV %1$s wurde verschoben.
 Der neue Termin für die Prüfung ist am  %2$s um %3$s Uhr.';
 $this->phrasen['pruefung/emailVerschiebungSubject'] = 'Verschiebung einer Prüfung';
 
+$this->phrasen['pruefung/AnrechnungInStudiengang'] = 'Studiengang für Anrechnung';
+
 
 ?>

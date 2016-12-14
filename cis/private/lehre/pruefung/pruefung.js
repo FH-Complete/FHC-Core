@@ -446,6 +446,34 @@ function openDialog(lehrveranstaltung_id, termin_id, lvBezeichnung, terminVon, t
 		});
 		$("#studienverpflichtung").html(html);
 	});
+
+    $.ajax({
+        dataType: 'json',
+        url: "./pruefungsanmeldung.json.php",
+        type: "POST",
+        data: {
+            method: "getPrestudenten"
+        },
+        error: loadError
+    }).success(function(data)
+    {
+        if(data.error !== false)
+        {
+            var html = "<select id='prestudent_studiengang' name='studiengang'>";
+            //show if more than 1 active prestudent exists
+            if(data.result.length > 1)
+            {
+                data.result.forEach(function(v,i){
+                    html += "<option value='"+v.studiengang_kz+"'>"+v.kuerzel+"</option>";
+                });
+            }
+            html += "</select>";
+
+            console.log(html);
+
+            $("#studiengang").html("<td style='vertical-align: top; font-weight: bold;'><?php echo $p->t('pruefung/AnrechnungInStudiengang'); ?>:</td><td>"+html+"</td>");
+        }
+    });
 	
 	var start = terminVon;
 	var ende = terminBis;
@@ -487,6 +515,10 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 	var studienverpflichtung_id = null;
     if($("#studienverpflichtung").length)
         studienverpflichtung_id = $("#studienverpflichtung option:selected").val();
+
+    var studiengang_kz = null;
+    if($('#prestudent_studiengang').length)
+        studiengang_kz =   $('#prestudent_studiengang option:selected').val();
 	
 	$.ajax({
 		dataType: 'json',
@@ -498,7 +530,8 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 			lehrveranstaltung_id: lehrveranstaltung_id,
 			bemerkung: bemerkungen,
 			uid: uid,
-			studienverpflichtung_id: studienverpflichtung_id
+			studienverpflichtung_id: studienverpflichtung_id,
+            studiengang_kz: studiengang_kz
 		},
 		error: loadError
 	}).success(function(data){

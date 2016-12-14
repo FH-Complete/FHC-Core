@@ -41,6 +41,7 @@ $lang->load($sprache);
 $p = new phrasen($sprache);
 
 $uid = get_uid();
+$uid = "p20110133";
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
@@ -120,6 +121,9 @@ switch($method)
 	    $lvid = filter_input(INPUT_POST, "lehrveranstaltung_id");
 	    $data = getLvKompatibel($lvid);
 	    break;
+    case 'getPrestudenten':
+        $data = getPrestudenten($uid, $aktStudiensemester);
+        break;
 	default:
 	    break;
 }
@@ -376,6 +380,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
     $stdsem = $studiensemester->getLastOrAktSemester(0);
     $lv_besucht = false;
     $studienverpflichtung_id = filter_input(INPUT_POST, "studienverpflichtung_id");
+    $studiengang_kz = filter_input(INPUT_POST, "studiengang_kz");
 
     //Defaulteinstellung für Anzahlprüfungsversuche (wird durch Addon "ktu" überschrieben)
     $maxAnzahlVersuche = 0;
@@ -583,6 +588,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 
     $anrechnung = new anrechnung();
     $lv_komp = new lehrveranstaltung($studienverpflichtung_id);
+    $lehrveranstaltung = new lehrveranstaltung($_REQUEST["lehrveranstaltung_id"]);
     $person = new person();
     $person->getPersonFromBenutzer($uid);
     $prestudent = new prestudent();
@@ -592,39 +598,92 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	if ($aktStudiensemester)
 		$stdsem = $aktStudiensemester;
 
-    if(count($prestudent->result) > 0)
+	$prestudenten = array();
+
+    foreach ($prestudent->result as $ps)
     {
-		$prestudent_id = "";
-		foreach($prestudent->result as $ps)
-		{
-			if($ps->getLaststatus($ps->prestudent_id, $stdsem))
-			{
-				if(($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
-				{
-					$prestudent_id = $ps->prestudent_id;
-				}
-				else
-				{
-					if($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
-					{
-						if(($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
-						{
-							$prestudent_id = $ps->prestudent_id;
-						}
-					}
-				}
-			}
-			else
-			{
-				if($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
-				{
-					if(($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
-					{
-						$prestudent_id = $ps->prestudent_id;
-					}
-				}
-			}
-		}
+        if ($ps->getLaststatus($ps->prestudent_id, $stdsem))
+        {
+            if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+            {
+                array_push($prestudenten, $ps);
+            }
+        }
+    }
+
+    if (count($prestudenten) > 0)
+    {
+        $prestudent_id = "";
+        if (count($prestudenten) != 1)
+        {
+            foreach ($prestudenten as $ps)
+            {
+                if($ps->studiengang_kz === $studiengang_kz)
+                {
+                    if ($ps->getLaststatus($ps->prestudent_id, $stdsem))
+                    {
+                        if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+                        {
+                            $prestudent_id = $ps->prestudent_id;
+                        }
+                        else
+                        {
+                            if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
+                            {
+                                if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+                                {
+                                    $prestudent_id = $ps->prestudent_id;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
+                        {
+                            if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+                            {
+                                $prestudent_id = $ps->prestudent_id;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            foreach ($prestudenten as $ps)
+            {
+                if ($ps->getLaststatus($ps->prestudent_id, $stdsem))
+                {
+                    if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+                    {
+                        $prestudent_id = $ps->prestudent_id;
+                    }
+                    else
+                    {
+                        if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
+                        {
+                            if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+                            {
+                                $prestudent_id = $ps->prestudent_id;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
+                    {
+                        if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+                        {
+                            $prestudent_id = $ps->prestudent_id;
+                        }
+                    }
+                }
+            }
+        }
+
 		if($prestudent_id != "")
 		{
 				$anrechungSaveResult = false;
@@ -1165,18 +1224,54 @@ function saveRaum($terminId, $ort_kurzbz, $uid)
 function getLvKompatibel($lvid)
 {
     $lv = new lehrveranstaltung();
-    if($lv->getLVkompatibel($lvid))
+    if($lv->getLVkompatibelTo($lvid))
     {
-	$data['result']=$lv->lehrveranstaltungen;
-	$data['error']='false';
-	$data['errormsg']='';
+        $data['result']=$lv->lehrveranstaltungen;
+        $data['error']='false';
+        $data['errormsg']='';
     }
     else
     {
-	$data['result']="";
-	$data['error']='true';
-	$data['errormsg']=$lv->errormsg;
+        $data['result']="";
+        $data['error']='true';
+        $data['errormsg']=$lv->errormsg;
     }
+    return $data;
+}
+
+function getPrestudenten($uid, $aktStudiensemester)
+{
+    $person = new person();
+    $person->getPersonFromBenutzer($uid);
+    $prestudent = new prestudent();
+    $prestudent->getPrestudenten($person->person_id);
+    $result = array();
+
+    if (count($prestudent->result) > 0)
+    {
+        foreach ($prestudent->result as $key=>$ps)
+        {
+            if ($ps->getLaststatus($ps->prestudent_id))
+            {
+                if(($ps->status_kurzbz === 'Student') || ($ps->status_kurzbz == 'Unterbrecher'))
+                {
+                    $studiengang = new studiengang($ps->studiengang_kz);
+                    array_push($result, $studiengang);
+                }
+            }
+        }
+
+        $data['result']=$result;
+        $data['error']='false';
+        $data['errormsg']='';
+    }
+    else
+    {
+        $data['result']="";
+        $data['error']='true';
+        $data['errormsg']=$lv->errormsg;
+    }
+
     return $data;
 }
 ?>
