@@ -22,12 +22,15 @@ class ViewMessage extends CI_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->library('MessageLib');
+		
+		// Load model MessageToken_model
+		$this->load->model('system/MessageToken_model', 'MessageTokenModel');
 	}
 	
 	public function toHTML($token)
 	{
-		$msg = $this->messagelib->getMessageByToken($token);
+		$msg = $this->MessageTokenModel->getMessageByToken($token);
+		
 		if ($msg->error)
 		{
 			show_error($msg->retval);
