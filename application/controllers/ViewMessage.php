@@ -23,6 +23,9 @@ class ViewMessage extends CI_Controller
 	{
 		parent::__construct();
 		
+		// Loading config file message
+		$this->config->load('message');
+		
 		// Load model MessageToken_model
 		$this->load->model('system/MessageToken_model', 'MessageTokenModel');
 	}
@@ -39,7 +42,8 @@ class ViewMessage extends CI_Controller
 		if (is_array($msg->retval) && count($msg->retval) > 0)
 		{
 			$data = array (
-				'message' => $msg->retval[0]
+				'message' => $msg->retval[0],
+				'href' => $this->ci->config->item('message_html_view_url')
 			);
 			
 			$this->load->view('system/messageHTML.php', $data);

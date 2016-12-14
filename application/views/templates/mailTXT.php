@@ -1,1 +1,3 @@
-Click here!!!! >>>> {href} <<<<<
+Follow the following link to read the message.
+
+{href}

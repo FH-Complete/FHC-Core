@@ -287,7 +287,7 @@ class MessageLib
      * @param   integer  $priority
      * @return  array
      */
-    public function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $relationmessage_id = null, $orgform_kurzbz = null, $multiPartMime = true)
+    public function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $relationmessage_id = null, $orgform_kurzbz = null)
     {
         if (!is_numeric($sender_id))
         {
@@ -437,13 +437,14 @@ class MessageLib
 					// If the person has an email account
 					if (!is_null($result->retval[$i]->receiver) && $result->retval[$i]->receiver != '')
 					{
-						$href = APP_ROOT . $this->ci->config->item('redirect_view_message_url') . $result->retval[$i]->token;
+						$href = APP_ROOT . $this->ci->config->item('message_html_view_url') . $result->retval[0]->token;
 						// Using a template for the html email body
 						$body = $this->ci->parser->parse(
 							'templates/mailHTML',
 							array(
-								'src' => APP_ROOT . $this->ci->config->item('message_html_view_url') . $result->retval[$i]->token,
-								'href' => $href
+								'href' => $href,
+								'subject' => $result->retval[0]->subject,
+								'body' => $result->retval[0]->body
 							),
 							true
 						);
@@ -456,7 +457,9 @@ class MessageLib
 						$altBody = $this->ci->parser->parse(
 							'templates/mailTXT',
 							array(
-								'href' => $href
+								'href' => $href,
+								'subject' => $result->retval[0]->subject,
+								'body' => $result->retval[0]->body
 							),
 							true
 						);
@@ -569,12 +572,13 @@ class MessageLib
 					if ($multiPartMime === true)
 					{
 						// Using a template for the html email body
-						$href = APP_ROOT . $this->ci->config->item('redirect_view_message_url') . $result->retval[0]->token;
+						$href = APP_ROOT . $this->ci->config->item('message_html_view_url') . $result->retval[0]->token;
 						$bodyMsg = $this->ci->parser->parse(
 							'templates/mailHTML',
 							array(
-								'src' => APP_ROOT . $this->ci->config->item('message_html_view_url') . $result->retval[0]->token,
-								'href' => $href
+								'href' => $href,
+								'subject' => $result->retval[0]->subject,
+								'body' => $result->retval[0]->body
 							),
 							true
 						);
@@ -588,7 +592,9 @@ class MessageLib
 						$altBody = $this->ci->parser->parse(
 							'templates/mailTXT',
 							array(
-								'href' => $href
+								'href' => $href,
+								'subject' => $result->retval[0]->subject,
+								'body' => $result->retval[0]->body
 							),
 							true
 						);
