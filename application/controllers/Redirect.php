@@ -23,7 +23,7 @@ class Redirect extends FHC_Controller
 	{
 		parent::__construct();
 		
-		// The second parameter is used to avoiding name collisions in the config array
+		// Loads config file fhcomplete
 		$this->config->load('fhcomplete');
 	}
 	
@@ -32,10 +32,6 @@ class Redirect extends FHC_Controller
 		if (isset($token))
 		{
 			redirect($this->config->item('addons_aufnahme_url') . '?token=' . $token);
-		}
-		else
-		{
-			$this->response();
 		}
 	}
 }
