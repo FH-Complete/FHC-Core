@@ -818,7 +818,7 @@ class betriebsmittel extends basis_db
 
 	 * @return Daten Objekt wenn ok, false im Fehlerfall
 	 */
-	function betriebsmittel_inventar($order=null,$inventarnummer=null,$ort_kurzbz=null,$betriebsmittelstatus_kurzbz=null,$betriebsmitteltyp=null,$bestellung_id=null,$bestelldetail_id=null,$bestellnr=null,$hersteller=null,$afa=null,$jahr_monat=null,$firma_id=null,$inventur_jahr=null,$beschreibung=null,$oe_kurzbz=null,$seriennummer=null,$person_id=null,$betriebsmittel_id=null)
+	function betriebsmittel_inventar($order=null,$inventarnummer=null,$ort_kurzbz=null,$betriebsmittelstatus_kurzbz=null,$betriebsmitteltyp=null,$bestellung_id=null,$bestelldetail_id=null,$bestellnr=null,$hersteller=null,$afa=null,$jahr_monat=null,$firma_id=null,$inventur_jahr=null,$beschreibung=null,$oe_kurzbz=null,$seriennummer=null,$person_id=null,$betriebsmittel_id=null,$anlage_jahr_monat=null)
 	{
 		// Init
 		$this->errormsg='';
@@ -853,7 +853,7 @@ class betriebsmittel extends basis_db
 				LEFT JOIN public.tbl_firma ON(tbl_firma.firma_id=tbl_bestellung.firma_id )';
 
 		$qry.=" WHERE not tbl_betriebsmittel.betriebsmittel_id is null ";
-		$where=$this->betriebsmittel_inventar_get_where($inventarnummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz,$seriennummer,$person_id,$betriebsmittel_id);
+		$where=$this->betriebsmittel_inventar_get_where($inventarnummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz,$seriennummer,$person_id,$betriebsmittel_id,$anlage_jahr_monat);
 		if ($where!='' && !$where)
 			return $this->result;
 
@@ -957,7 +957,7 @@ class betriebsmittel extends basis_db
 	 * @param $betriebsmittel_id
 	 * @return unknown
 	 */
-	public function betriebsmittel_inventar_get_where($inventarnummer=null,$ort_kurzbz=null,$betriebsmittelstatus_kurzbz=null,$betriebsmitteltyp=null,$bestellung_id=null,$bestelldetail_id=null,$bestellnr=null,$hersteller=null,$afa=null,$jahr_monat=null,$firma_id=null,$inventur_jahr=null,$beschreibung=null,$oe_kurzbz=null,$seriennummer=null,$person_id=null,$betriebsmittel_id=null)
+	public function betriebsmittel_inventar_get_where($inventarnummer=null,$ort_kurzbz=null,$betriebsmittelstatus_kurzbz=null,$betriebsmitteltyp=null,$bestellung_id=null,$bestelldetail_id=null,$bestellnr=null,$hersteller=null,$afa=null,$jahr_monat=null,$firma_id=null,$inventur_jahr=null,$beschreibung=null,$oe_kurzbz=null,$seriennummer=null,$person_id=null,$betriebsmittel_id=null,$anlage_jahr_monat=null)
 	{
 		$where='';
 		// Inventarnummer oder Betriebsmittelnummer
@@ -1115,11 +1115,24 @@ class betriebsmittel extends basis_db
 			$jahr_monat=mb_strtoupper(trim(str_replace(array('-','.','/','*','%',"'",'"'),'',trim($jahr_monat))));
 			$jm='';
 			if (!empty($jahr_monat) && is_numeric($jahr_monat) && strlen($jahr_monat)>6)
-				$jm=" and to_char(tbl_betriebsmittel.insertamum, 'YYYYMMDD') = ".$this->db_add_param($jahr_monat)." ";
+				$jm=" and to_char(tbl_betriebsmittel_betriebsmittelstatus.datum, 'YYYYMMDD') = ".$this->db_add_param($jahr_monat)." ";
 			elseif (!empty($jahr_monat) && is_numeric($jahr_monat) && strlen($jahr_monat)>4)
-				$jm=" and to_char(tbl_betriebsmittel.insertamum, 'YYYYMM') = ".$this->db_add_param($jahr_monat)." ";
+				$jm=" and to_char(tbl_betriebsmittel_betriebsmittelstatus.datum, 'YYYYMM') = ".$this->db_add_param($jahr_monat)." ";
 			elseif (!is_null($jahr_monat) && !empty($jahr_monat))
-				$jm=" and to_char(tbl_betriebsmittel.insertamum, 'YYYY') = ".$this->db_add_param($jahr_monat)." ";
+				$jm=" and to_char(tbl_betriebsmittel_betriebsmittelstatus.datum, 'YYYY') = ".$this->db_add_param($jahr_monat)." ";
+			$where.=$jm;
+			$where.=" and tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id in ( select max(betriebsmittelbetriebsmittelstatus_id) from wawi.tbl_betriebsmittel_betriebsmittelstatus where not betriebsmittelbetriebsmittelstatus_id is null ". $jm ."  group by betriebsmittel_id) ";
+		}
+		elseif (!is_null($anlage_jahr_monat) && $anlage_jahr_monat!='')
+		{
+			$anlage_jahr_monat=mb_strtoupper(trim(str_replace(array('-','.','/','*','%',"'",'"'),'',trim($anlage_jahr_monat))));
+			$jm='';
+			if (!empty($anlage_jahr_monat) && is_numeric($anlage_jahr_monat) && strlen($anlage_jahr_monat)>6)
+				$jm=" and to_char(tbl_betriebsmittel.insertamum, 'YYYYMMDD') = ".$this->db_add_param($anlage_jahr_monat)." ";
+			elseif (!empty($anlage_jahr_monat) && is_numeric($anlage_jahr_monat) && strlen($anlage_jahr_monat)>4)
+				$jm=" and to_char(tbl_betriebsmittel.insertamum, 'YYYYMM') = ".$this->db_add_param($anlage_jahr_monat)." ";
+			elseif (!is_null($anlage_jahr_monat) && !empty($anlage_jahr_monat))
+				$jm=" and to_char(tbl_betriebsmittel.insertamum, 'YYYY') = ".$this->db_add_param($anlage_jahr_monat)." ";
 			$where.=$jm;
 			$where.=" and tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelbetriebsmittelstatus_id in ( select max(betriebsmittelbetriebsmittelstatus_id) from wawi.tbl_betriebsmittel_betriebsmittelstatus where not betriebsmittelbetriebsmittelstatus_id is null ". $jm ."  group by betriebsmittel_id) ";
 		}
