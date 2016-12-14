@@ -5,5 +5,5 @@
 	B: <?php echo $message->body; ?>
 </div>
 <div>
-	<a href="<?php echo $href.$message->token; ?>">Reply</a>
+	<a href="<?php echo $href; ?>">Reply</a>
 </div>

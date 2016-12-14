@@ -43,7 +43,7 @@ class ViewMessage extends CI_Controller
 		{
 			$data = array (
 				'message' => $msg->retval[0],
-				'href' => $this->ci->config->item('message_html_view_url')
+				'href' => APP_ROOT . $this->config->item('redirect_view_message_url') . $token
 			);
 			
 			$this->load->view('system/messageHTML.php', $data);

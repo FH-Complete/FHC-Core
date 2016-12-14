@@ -29,6 +29,8 @@ class Redirect extends FHC_Controller
 	
 	public function redirectByToken($token)
 	{
+		var_dump($token);
+		
 		if (isset($token))
 		{
 			redirect($this->config->item('addons_aufnahme_url') . '?token=' . $token);
