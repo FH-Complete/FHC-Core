@@ -1447,7 +1447,7 @@ if ($result = @$db->db_query("SELECT r FROM public.tbl_statistik LIMIT 1;"))
 
 // Removing column "php" from tbl_statistik
 if ($result = @$db->db_query("SELECT php FROM public.tbl_statistik LIMIT 1;"))
-{s
+{
 	$qry = "ALTER TABLE public.tbl_statistik DROP COLUMN php;";
 
 	if (!$db->db_query($qry))
