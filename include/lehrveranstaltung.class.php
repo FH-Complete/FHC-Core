@@ -1596,7 +1596,7 @@ class lehrveranstaltung extends basis_db
      * Lädt alle Lehrveranstaltungen zu denen die übergebene LV ID kompatibel ist
      * @param $lehrveranstaltung_id ID der Lehrveranstaltung
      */
-    public function getLVkompatibelTo($lehrveranstaltung_id)
+    public function getLVkompatibelTo($lehrveranstaltung_id, $studienplan_ids=array())
     {
         if (!is_numeric($lehrveranstaltung_id))
         {
@@ -1604,10 +1604,26 @@ class lehrveranstaltung extends basis_db
             return false;
         }
 
-        $qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id IN (
-			SELECT lehrveranstaltung_id
-			FROM lehre.tbl_lehrveranstaltung_kompatibel
-			WHERE lehrveranstaltung_id_kompatibel=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).");";
+        if((!is_array($studienplan_ids)) && (count($studienplan_ids) < 1))
+		{
+            $this->errormsg = 'Es muss ein Array von Studienplan_IDs mit mindestens einem Element übergeben werden.';
+			return false;
+		}
+
+        $studienplaene = "";
+        foreach($studienplan_ids as $stplId)
+		{
+			$studienplaene .= $stplId.",";
+		}
+        $studienplaene = rtrim($studienplaene, ",");
+
+        $qry = "SELECT * FROM lehre.tbl_lehrveranstaltung
+					JOIN lehre.tbl_studienplan_lehrveranstaltung USING (lehrveranstaltung_id)
+ 					WHERE lehrveranstaltung_id IN (
+						SELECT lehrveranstaltung_id
+						FROM lehre.tbl_lehrveranstaltung_kompatibel
+							WHERE lehrveranstaltung_id_kompatibel=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).")
+							AND studienplan_id IN(".$studienplaene.");";
 
         if($this->db_query($qry))
         {

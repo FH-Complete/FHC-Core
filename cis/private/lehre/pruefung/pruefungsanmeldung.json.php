@@ -41,7 +41,6 @@ $lang->load($sprache);
 $p = new phrasen($sprache);
 
 $uid = get_uid();
-$uid = "p20110133";
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
@@ -119,7 +118,7 @@ switch($method)
 	    break;
 	case 'getLvKompatibel':
 	    $lvid = filter_input(INPUT_POST, "lehrveranstaltung_id");
-	    $data = getLvKompatibel($lvid);
+	    $data = getLvKompatibel($lvid, $uid);
 	    break;
     case 'getPrestudenten':
         $data = getPrestudenten($uid, $aktStudiensemester);
@@ -1221,10 +1220,28 @@ function saveRaum($terminId, $ort_kurzbz, $uid)
     return $data;
 }
 
-function getLvKompatibel($lvid)
+function getLvKompatibel($lvid, $uid)
 {
+    $person = new person();
+    $person->getPersonFromBenutzer($uid);
+    $prestudent = new prestudent();
+    $prestudent->getPrestudenten($person->person_id);
+
+    $stplIds = array();
+
+    foreach ($prestudent->result as $ps)
+    {
+        if ($ps->getLaststatus($ps->prestudent_id))
+        {
+            if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+            {
+                array_push($stplIds, $ps->studienplan_id);
+            }
+        }
+    }
+
     $lv = new lehrveranstaltung();
-    if($lv->getLVkompatibelTo($lvid))
+    if($lv->getLVkompatibelTo($lvid, $stplIds))
     {
         $data['result']=$lv->lehrveranstaltungen;
         $data['error']='false';
