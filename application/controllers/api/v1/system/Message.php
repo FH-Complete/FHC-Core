@@ -121,7 +121,8 @@ class Message extends APIv1_Controller
 				$this->post()['body'],
 				PRIORITY_NORMAL,
 				isset($this->post()['relationmessage_id']) ? $this->post()['relationmessage_id'] : null,
-				isset($this->post()['oe_kurzbz']) ? $this->post()['oe_kurzbz'] : null
+				isset($this->post()['oe_kurzbz']) ? $this->post()['oe_kurzbz'] : null,
+				isset($this->post()['multiPartMime']) ? $this->post()['multiPartMime'] : true
 			);
 			
 			$this->response($result, REST_Controller::HTTP_OK);

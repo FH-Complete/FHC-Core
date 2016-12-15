@@ -205,7 +205,7 @@ class MessageLib
      * sendMessage() - sends new internal message. This function will create a new thread
      *
      */
-    public function sendMessage($sender_id, $receiver_id, $subject, $body, $priority = PRIORITY_NORMAL, $relationmessage_id = null, $oe_kurzbz = null)
+    public function sendMessage($sender_id, $receiver_id, $subject, $body, $priority = PRIORITY_NORMAL, $relationmessage_id = null, $oe_kurzbz = null, $multiPartMime = true)
     {
         if (!is_numeric($sender_id))
         {
@@ -243,7 +243,7 @@ class MessageLib
 							if ($this->ci->config->item('send_immediately') === true)
 							{
 								// Send message by email!
-								$resultSendEmail = $this->sendOne($result->retval, $subject, $body);
+								$resultSendEmail = $this->sendOne($result->retval, $subject, $body, $multiPartMime);
 							}
 						}
 					}
@@ -287,7 +287,7 @@ class MessageLib
      * @param   integer  $priority
      * @return  array
      */
-    public function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $relationmessage_id = null, $orgform_kurzbz = null)
+    public function sendMessageVorlage($sender_id, $receiver_id, $vorlage_kurzbz, $oe_kurzbz, $data, $relationmessage_id = null, $orgform_kurzbz = null, $multiPartMime = true)
     {
         if (!is_numeric($sender_id))
         {
