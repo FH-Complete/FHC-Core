@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011 FH Technikum-Wien
+/* Copyright (C) 2011 FH Technikum Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,188 +15,110 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Karl Burkhart		< burkhart@technikum-wien.at >
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Karl Burkhart <karl.burkhart@technikum-wien.at>
+ *          Robert Hofer <robert.hofer@technikum-wien.at>
  */
 /**
- * Seite zur Wartung der Statistiken
+ * Statistik Uebersichtsseite
+ * - zeigt die Beschreibung einer Statistik ein
+ * - Link zum Starten der Statistik
+ * - Eventuelle Parametereingabe für die Statistik 
  */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/statistik.class.php');
-require_once('../../include/benutzerberechtigung.class.php');
-require_once('../../include/berechtigung.class.php');
+require_once('../../include/filter.class.php');
+require_once('../../include/functions.inc.php');
 
-if(!$db = new basis_db())
+$statistik_kurzbz = filter_input(INPUT_GET, 'statistik_kurzbz');
+
+$statistik = new statistik();
+
+if(!$statistik->load($statistik_kurzbz))
 {
-	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+	die($statistik->errormsg);
 }
-
-$user = get_uid();
-
-$rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen($user);
-
-if(!$rechte->isBerechtigt('basis/statistik'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
-?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+?>
+<!DOCTYPE html>
 <html>
 	<head>
+		<title>Statistik</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>Statistik - Details</title>
-		<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
-		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css"/>
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css"/>
+		<link rel="stylesheet" href="../../include/css/jquery-ui.1.11.2.min.css" />
+		<script type="text/javascript" src="../../include/js/jquery.min.1.11.1.js"></script>
+		<script type="text/javascript" src="../../include/js/jquery-ui.1.11.2.min.js"></script>
+		<script>
+			$(function() {
+				$.datepicker.setDefaults({dateFormat: "yy-mm-dd"});
+			});
+		</script>
 	</head>
 	<body>
 
+		<h2>Report - <?php echo $statistik->bezeichnung ?></h2>
 		<?php
-		$statistik_kurzbz = filter_input(INPUT_GET, 'statistik_kurzbz');
-		$statistik = new statistik();
-
-		if($statistik_kurzbz)
-		{
-			$exists = $statistik->load($statistik_kurzbz);
-		}
-		else
-		{
-			$statistik_kurzbz = filter_input(INPUT_POST, 'statistik_kurzbz');
-			$exists = false;
-		}
-
-		if(isset($_POST['save']))
-		{
-			$statistik_kurzbz_orig = (isset($_POST['statistik_kurzbz_orig']) ? $_POST['statistik_kurzbz_orig'] : die('Statistik_kurzbz_orig fehlt'));
-			$bezeichnung = (isset($_POST['bezeichnung']) ? $_POST['bezeichnung'] : die('Bezeichnung fehlt'));
-			$url = (isset($_POST['url']) ? $_POST['url'] : die('URL fehlt'));
-			$sql = (isset($_POST['sql']) ? $_POST['sql'] : die('SQL fehlt'));
-			$gruppe = (isset($_POST['gruppe']) ? $_POST['gruppe'] : die('Gruppe fehlt'));
-			$content_id = (isset($_POST['content_id']) ? $_POST['content_id'] : die('ContentID fehlt'));
-			$publish = (isset($_POST['publish']) ? true : false);
-			$berechtigung_kurzbz = (isset($_POST['berechtigung_kurzbz']) ? $_POST['berechtigung_kurzbz'] : die('Berechtigungkurzbz fehlt'));
-			$preferences = (isset($_POST['preferences']) ? $_POST['preferences'] : die('preferences fehlt'));
-
-			if(!$exists)
-			{
-				$statistik->insertamum = date('Y-m-d H:i:s');
-				$statistik->insertvon = $user;
-				$statistik->new = true;
-			}
-
-			$statistik->statistik_kurzbz = $statistik_kurzbz;
-			$statistik->statistik_kurzbz_orig = $statistik_kurzbz_orig;
-			$statistik->bezeichnung = $bezeichnung;
-			$statistik->url = $url;
-			$statistik->sql = $sql;
-			$statistik->gruppe = $gruppe;
-			$statistik->content_id = $content_id;
-			$statistik->publish = $publish;
-			$statistik->updateamum = date('Y-m-d H:i:s');
-			$statistik->updatevon = $user;
-			$statistik->berechtigung_kurzbz = $berechtigung_kurzbz;
-			$statistik->preferences = $preferences;
-
-			$success = $statistik->save();
-
-			if($success):
-				?>
-				<span class="ok">Daten erfolgreich gespeichert</span>
-				<script type='text/javascript'>
-					parent.uebersicht_statistik.location.href = 'statistik_uebersicht.php';
-				</script>
-			<?php else: ?>
-				<span class="error"><?php echo $statistik->errormsg ?></span>
-			<?php
-			endif;
-		}
-
-		$preferences = trim($statistik->preferences);
-
-		if(empty($preferences))
-		{
-			$statistik->preferences = <<<EOT
-// Folgendes Objekt wird als "options"-Parameter an den Pivottable übergeben:
+		//Beschreibung zu der Statistik anzeigen
+		if($statistik->content_id): ?>
+			<a href="#" onclick="window.open('../../cms/content.php?content_id=<?php echo $statistik->content_id ?>', 'Beschreibung', 'width=600,height=600, scrollbars=yes');">
+				Beschreibung anzeigen
+			</a><br><br>
+		<?php endif;
+$variablenstring='';
+$action='';
+if($statistik->url)
 {
-	rows: [],
-	cols: [],
-	rendererName: "Table",
-	aggregatorName: "Count",
-	vals: []
+	$action = $statistik->url;
+	$variablenstring = $statistik->url;
 }
-EOT;
-		}
-		?>
-		<form method="POST">
-			<fieldset>
-				<?php if($statistik->new === false): ?>
-					<legend>Bearbeiten - <?php echo $statistik_kurzbz ?></legend>
-				<?php else: ?>
-					<legend>Neu</legend>
-				<?php endif; ?>
-				<input type="hidden" name="statistik_kurzbz_orig" value="<?php echo $statistik->statistik_kurzbz ?>">
-				<table>
-					<tr>
-						<td>Kurzbz</td>
-						<td><input type="text" name="statistik_kurzbz" size="50" maxlength="64" value="<?php echo $statistik->statistik_kurzbz ?>"></td>
-						<td></td>
-						<td>Gruppe</td>
-						<td><input type="text" name="gruppe" value="<?php echo $statistik->gruppe ?>"></td>
-					</tr>
-					<tr>
-						<td>Bezeichnung</td>
-						<td><input type="text" name="bezeichnung" size="80" maxlength="256" value="<?php echo $statistik->bezeichnung ?>"></td>
-						<td></td>
-						<td>ContentID</td>
-						<td><input type="text" name="content_id" value="<?php echo $statistik->content_id ?>"></td>
-					</tr>
-					<tr>
-						<td>URL</td>
-						<td><input type="text" name="url" size="80" maxlength="512" value="<?php echo $statistik->url ?>"></td>
-						<td></td>
-						<td>Berechtigung</td>
-						<td>
-							<?php
-							$berechtigung = new berechtigung();
-							$berechtigung->getBerechtigungen();
-							?>
-							<select name="berechtigung_kurzbz">
-								<option value="">-- keine Auswahl --</option>
-								<?php foreach($berechtigung->result as $row): ?>
-									<option value="<?php echo $row->berechtigung_kurzbz ?>"
-											<?php echo ($row->berechtigung_kurzbz == $statistik->berechtigung_kurzbz ? 'selected' : '') ?>>
-												<?php echo $row->berechtigung_kurzbz ?>
-									</option>
-								<?php endforeach; ?>
-							</select>
-						</td>
-					</tr>
-					<tr valign="top">
-						<td rowspan="3">SQL</td>
-						<td rowspan="3"><textarea name="sql" cols="60" rows="5"><?php echo $statistik->sql ?></textarea></td>
-						<td></td>
-					</tr>
-					<tr valign="top">
-						<td></td>
-						<td>Publish</td>
-						<td><input type="checkbox" name="publish" <?php echo $statistik->publish ? 'checked="checked"' : '' ?>></td>
-					</tr>
+elseif($statistik->sql!='')
+{
+	$action = 'statistik_sql.php?statistik_kurzbz='.$statistik_kurzbz;
+	$variablenstring = $statistik->sql;
+}
 
-					<tr valign="top">
-						<td>Preferences</td>
-						<td><textarea name="preferences" cols="60" rows="5"><?php echo $statistik->preferences ?></textarea></td>
-						<td></td>
-						<td></td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td><input type="submit" value="Speichern" name="save"></td>
-					</tr>
-				</table>
-			</fieldset>
+$vars = $statistik->parseVars($variablenstring); ?>
+		<script type="text/javascript">
+			function doit()
+			{
+				<?php if($statistik->url): ?>
+					var action='<?php echo $action ?>';
+
+					<?php foreach ($vars as $var): ?>
+						action = action.replace('$<?php echo $var ?>', document.getElementById('<?php echo $var ?>').value);
+					<?php endforeach; ?>
+					parent.detail_statistik.location.href=action;
+					return false;
+				<?php else: ?>
+					return true;
+				<?php endif; ?>
+			}
+		</script>
+		<form action="<?php echo $action ?>" method="POST" target="detail_statistik" onsubmit="return doit();">
+			<table>
+
+			<?php
+			// Filter parsen
+			$fltr=new filter();
+			$fltr->loadAll(); ?>
+
+				<tr>
+					<?php foreach($vars as $var):
+						if ($fltr->isFilter($var)): ?>
+							<td><?php echo $var ?></td><td><?php echo $fltr->getHtmlWidget($var) ?></td>
+						<?php else: ?>
+							<td><?php echo $var ?></td><td><input type="text" id="<?php echo $var ?>" name="<?php echo $var ?>" value=""></td>
+						<?php endif;
+					endforeach; ?>
+				</tr>
+				<tr>
+					<td></td>
+					<td><input type="submit" value="Anzeigen"></td>
+				</tr>
+			</table>
 		</form>
 	</body>
 </html>
+
