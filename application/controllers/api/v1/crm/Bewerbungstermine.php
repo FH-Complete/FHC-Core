@@ -77,7 +77,7 @@ class Bewerbungstermine extends APIv1_Controller
 	{
 		$studienplan_id = $this->get('studienplan_id');
 
-		if (isset($studienplan_id) && isset($studienplan_id))
+		if (isset($studienplan_id))
 		{
 			$result = $this->BewerbungstermineModel->loadWhere(array(
 				'studienplan_id' => $studienplan_id
