@@ -57,7 +57,7 @@ function getGemeindeDropDown($postleitzahl)
 	if(is_numeric($postleitzahl) && $postleitzahl<10000)
 	{
 		$qry = "SELECT distinct name FROM bis.tbl_gemeinde WHERE plz='".addslashes($postleitzahl)."'";
-		
+
 		if($db->db_query($qry))
 		{
 			while($row = $db->db_fetch_object())
@@ -66,7 +66,7 @@ function getGemeindeDropDown($postleitzahl)
 					$firstentry=$row->name;
 				if($gemeinde_x=='')
 					$gemeinde_x=$row->name;
-				
+
 				if($row->name==$gemeinde_x)
 				{
 					$selected='selected';
@@ -78,7 +78,7 @@ function getGemeindeDropDown($postleitzahl)
 			}
 		}
 	}
-		
+
 	echo '</SELECT>';
 	if(!$found && (isset($importort) && $importort!=''))
 	{
@@ -99,13 +99,13 @@ function getOrtDropDown($postleitzahl, $gemeindename)
 {
 	global $_REQUEST;
 	$db = new basis_db();
-	
+
 	echo '<SELECT id="ort" name="ort">';
-	
+
 	if(is_numeric($postleitzahl) && $postleitzahl<10000)
 	{
 		$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
-		$qry = "SELECT distinct ortschaftsname FROM bis.tbl_gemeinde 
+		$qry = "SELECT distinct ortschaftsname FROM bis.tbl_gemeinde
 				WHERE plz='".addslashes($postleitzahl)."' AND name='".addslashes($gemeindename)."'";
 		if($db->db_query($qry))
 		{
@@ -113,45 +113,46 @@ function getOrtDropDown($postleitzahl, $gemeindename)
 			{
 				if($row->ortschaftsname==$ort)
 					$selected='selected';
-				else 
+				else
 					$selected='';
 				echo "<option value='$row->ortschaftsname' $selected>$row->ortschaftsname</option>";
 			}
 		}
-	}	
+	}
 	echo '</SELECT>';
 }
 if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz']) && isset($_GET['gemeinde']))
 {
 	header('Content-Type: text/html; charset=UTF-8');
-	
+
 	echo getOrtDropDown($_GET['plz'], $_GET['gemeinde']);
 	exit;
 }
 
-function getStudienplanDropDown($studiengang_kz, $orgform_kurzbz='', $studienplan_id='')
+function getStudienplanDropDown($studiengang_kz, $orgform_kurzbz='', $studienplan_id='', $studiensemester_kurzbz='', $ausbildungssemester='')
 {
 	$db = new basis_db();
 
 	$content= '<SELECT id="studienplan_id" name="studienplan_id">
 	<OPTION value="">-- keine Auswahl --</OPTION>';
 	$studienplan = new studienplan();
-	$studienplan->getStudienplaene($studiengang_kz);
-	
+	//$studienplan->getStudienplaene($studiengang_kz);
+	$studienplan->getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester, $orgform_kurzbz);
+
 	foreach($studienplan->result as $row)
 	{
 		if($studienplan_id=='')
 			$studienplan_id=$row->studienplan_id;
-		
+
 		if($studienplan_id==$row->studienplan_id)
 			$selected='selected';
 		else
 			$selected='';
-		
+
 		if($row->aktiv)
 		{
-			if($orgform_kurzbz=='' || $row->orgform_kurzbz=='' || $row->orgform_kurzbz==$orgform_kurzbz)			
-				$content.="<option value='$row->studienplan_id' $selected>$row->bezeichnung</option>";
+			if($orgform_kurzbz=='' || $row->orgform_kurzbz=='' || $row->orgform_kurzbz==$orgform_kurzbz)
+				$content.="<option value='$row->studienplan_id' $selected>$row->bezeichnung_studienplan</option>";
 		}
 	}
 
@@ -163,7 +164,7 @@ if(isset($_GET['type']) && $_GET['type']=='getstudienplancontent' && isset($_GET
 {
 	header('Content-Type: text/html; charset=UTF-8');
 
-	echo getStudienplanDropDown($_GET['studiengang_kz'], $_GET['orgform_kurzbz']);
+	echo getStudienplanDropDown($_GET['studiengang_kz'], $_GET['orgform_kurzbz'], '', $_GET['studiensemester'],$_GET['ausbildungssemester']);
 	exit;
 }
 ?><!DOCTYPE HTML>
@@ -175,15 +176,15 @@ if(isset($_GET['type']) && $_GET['type']=='getstudienplancontent' && isset($_GET
 <link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css">
 <script type="text/Javascript">
 
-$(document).ready(function() 
-{ 
+$(document).ready(function()
+{
 	$('#t1').tablesorter(
 	{
 		sortList: [[1,0],[2,0],[4,0]],
 		widgets: ['zebra'],
-		headers: {0: {sorter: false},8: {sorter: false},9: {sorter: false}} 
-	}); 
-}); 
+		headers: {0: {sorter: false},8: {sorter: false},9: {sorter: false}}
+	});
+});
 
 function disablefields(obj)
 {
@@ -229,7 +230,7 @@ function disablefields2(val)
 function AnredeChange()
 {
 	anrede = document.getElementById('anrede').value;
-	
+
 	if(anrede=='Herr')
 		document.getElementById('geschlecht').value='m';
 	if(anrede=='Frau')
@@ -244,7 +245,7 @@ function cmdIncoming()
 function checkVorschlag()
 {
 	var elems = document.getElementsByName('person_id');
-	
+
 	for(i=0;i<=elems.length;i++)
 	{
 		try
@@ -256,7 +257,7 @@ function checkVorschlag()
 		catch(e)
 		{}
 	}
-	
+
 	alert('Bitte wählen Sie einen der Vorschläge aus');
 	return false;
 }
@@ -311,7 +312,7 @@ function loadGemeindeData()
 	{
 		anfrage=null;
 		//Request erzeugen und die Note speichern
-		erzeugeAnfrage(); 
+		erzeugeAnfrage();
 	    var jetzt = new Date();
 		var ts = jetzt.getTime();
 		var plz = document.getElementById('plz').value;
@@ -336,13 +337,13 @@ function setGemeindeData()
 {
 	if (anfrage.readyState == 4)
 	{
-		if (anfrage.status == 200) 
+		if (anfrage.status == 200)
 		{
 			var resp = anfrage.responseText;
             var gemeindediv = document.getElementById('gemeindediv');
 			gemeindediv.innerHTML = resp;
 			loadOrtData();
-        } 
+        }
         else alert("Request status:" + anfrage.status);
     }
 }
@@ -353,7 +354,7 @@ function loadOrtData()
 	{
 		anfrage=null;
 		//Request erzeugen und die Note speichern
-		erzeugeAnfrage(); 
+		erzeugeAnfrage();
 	    var jetzt = new Date();
 		var ts = jetzt.getTime();
 		var plz = document.getElementById('plz').value;
@@ -371,26 +372,29 @@ function setOrtData()
 {
 	if (anfrage.readyState == 4)
 	{
-		if (anfrage.status == 200) 
+		if (anfrage.status == 200)
 		{
 			var resp = anfrage.responseText;
             var ortdiv = document.getElementById('ortdiv');
 			ortdiv.innerHTML = resp;
-        } 
+        }
         else alert("Request status:" + anfrage.status);
     }
-}	
+}
 function loadStudienplanData()
 {
 	anfrage=null;
 	//Request erzeugen und die Note speichern
-	erzeugeAnfrage(); 
+	erzeugeAnfrage();
     var jetzt = new Date();
 	var ts = jetzt.getTime();
 	var studiengang_kz = document.getElementById('studiengang_kz').value;
 	var orgform_kurzbz = document.getElementById('orgform_kurzbz').value;
+	var ausbildungssemester = document.getElementById('ausbildungssemester').value;
+	var studiensemester = document.getElementById('studiensemester_kurzbz').value;
     var url= '<?php echo $_SERVER['PHP_SELF']."?type=getstudienplancontent"?>';
     url += '&studiengang_kz='+encodeURIComponent(studiengang_kz)+"&orgform_kurzbz="+encodeURIComponent(orgform_kurzbz)+"&"+ts;
+	url += '&ausbildungssemester='+encodeURIComponent(ausbildungssemester)+"&studiensemester="+encodeURIComponent(studiensemester);
     anfrage.open("GET", url, true);
     anfrage.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
     anfrage.onreadystatechange = setStudienplanData;
@@ -401,12 +405,12 @@ function setStudienplanData()
 {
 	if (anfrage.readyState == 4)
 	{
-		if (anfrage.status == 200) 
+		if (anfrage.status == 200)
 		{
 			var resp = anfrage.responseText;
             var ortdiv = document.getElementById('studienplandiv');
 			ortdiv.innerHTML = resp;
-        } 
+        }
         else alert("Request status:" + anfrage.status);
     }
 }
@@ -438,13 +442,13 @@ $adresse = (isset($_REQUEST['adresse'])?$_REQUEST['adresse']:'');
 $adresse_nation = (isset($_REQUEST['adresse_nation'])?$_REQUEST['adresse_nation']:'A');
 $plz = (isset($_REQUEST['plz'])?$_REQUEST['plz']:'');
 
-//Wenn die Daten aus dem Mail Importiert werden, sind diese LATIN9 konvertiert 
+//Wenn die Daten aus dem Mail Importiert werden, sind diese LATIN9 konvertiert
 //und muessen zuerst nach UTF8 konvertiert werden
 function utf8($string)
 {
 	if(!check_utf8($string))
 		return utf8_encode($string);
-	else 
+	else
 		return $string;
 }
 
@@ -465,7 +469,7 @@ if($adresse_nation=='A')
 	$ort = (isset($_REQUEST['ort'])?$_REQUEST['ort']:'');
 	$gemeinde = (isset($_REQUEST['gemeinde'])?$_REQUEST['gemeinde']:'');
 }
-else 
+else
 {
 	$ort = (isset($_REQUEST['ort_txt'])?$_REQUEST['ort_txt']:'');
 	$gemeinde = (isset($_REQUEST['gemeinde_txt'])?$_REQUEST['gemeinde_txt']:'');
@@ -515,32 +519,32 @@ $anmerkungen = utf8($anmerkungen);
 // * 001 = Laufende Nummer
 // ****
 function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
-{ 
+{
 	$db = new basis_db();
-	
-	$jahr = mb_substr($studiensemester_kurzbz, 4);	
+
+	$jahr = mb_substr($studiensemester_kurzbz, 4);
 	$sem = mb_substr($studiensemester_kurzbz, 0, 2);
 	if($sem=='SS')
 		$jahr = $jahr-1;
 	$art =0;
-	
+
 	$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
-	
+
 	$qry = "SELECT matrikelnr FROM public.tbl_student WHERE matrikelnr LIKE '$matrikelnummer%' ORDER BY matrikelnr DESC LIMIT 1";
-	
+
 	if($db->db_query($qry))
 	{
 		if($row = $db->db_fetch_object())
 		{
 			$max = mb_substr($row->matrikelnr,7);
 		}
-		else 
+		else
 			$max = 0;
-		
+
 		$max += 1;
 		return $matrikelnummer.sprintf("%03d",$max);
 	}
-	else 
+	else
 	{
 		return false;
 	}
@@ -564,8 +568,8 @@ if($studiensemester_kurzbz == '')
 	{
 		$studiensemester_kurzbz = $stsem->getNextOrAktSemester(VILESCI_PERSON_NEU_STUDIENSEMESTER_UEBERGANGSFRIST);
 
-		if(defined('VILESCI_PERSON_NEU_STUDIENSEMESTER_WINTERONLY') 
-		   && VILESCI_PERSON_NEU_STUDIENSEMESTER_WINTERONLY 
+		if(defined('VILESCI_PERSON_NEU_STUDIENSEMESTER_WINTERONLY')
+		   && VILESCI_PERSON_NEU_STUDIENSEMESTER_WINTERONLY
 		   && mb_substr($studiensemester_kurzbz,0,2)=='SS')
 		{
 			$studiensemester_kurzbz = $stsem->getNextFrom($studiensemester_kurzbz);
@@ -587,9 +591,9 @@ if(isset($_POST['save']))
 	//		anmerkungen: $anmerkungen | studiengang_kz: $studiengang_kz | person_id: $person_id<br><br>";
 	$person = new person();
 	$prestudent = new prestudent();
-	
+
 	$prestudent_vorhanden=false;
-	
+
 	$db->db_query('BEGIN');
 	//Wenn die person_id=0 dann wird eine neue Person angelegt
 	//Ansosnsten wird es an die Person mit $person_id angehaengt
@@ -623,7 +627,7 @@ if(isset($_POST['save']))
 						$error=true;
 						$errormsg = 'Der Interessent konnte nicht angelegt werden, da dieser Student bereits mehr als einen Prestudenten in diesem Studiengang hat.';
 					}
-					else 
+					else
 					{
 						$row = $db->db_fetch_object($result);
 						$prestudent_id=$row->prestudent_id;
@@ -638,20 +642,20 @@ if(isset($_POST['save']))
 								$error=true;
 								$errormsg = 'Der Interessent konnte nicht angelegt werden, da diese Person bereits als Student in diesem Studiengang angelegt ist.';
 							}
-							else 
+							else
 							{
 								$prestudent_vorhanden=true;
 								$prestudent->load($prestudent_id);
 							}
 						}
-						else 
+						else
 						{
 							$error=true;
 							$errormsg = 'Fehler beim Ermitteln der Prestudentrollen!';
 						}
 					}
 				}
-				else 
+				else
 				{
 					$error = true;
 					$errormsg = 'Fehler beim Suchen der PrestudentID';
@@ -828,7 +832,7 @@ if(isset($_POST['save']))
 		$prestudent->anmerkung = $anmerkungen .($ausbildungsart!=''?' Ausbildungsart:'.$ausbildungsart:'');
 		$prestudent->reihungstestangetreten = false;
 		$prestudent->bismelden = true;
-		
+
 		//Wenn die Person schon im System erfasst ist, dann die ZGV des Datensatzes uebernehmen
 		$qry_zgv = "SELECT * FROM public.tbl_prestudent WHERE person_id='$person->person_id' AND zgv_code is not null ORDER BY zgvmas_code, zgv_code DESC LIMIT 1";
 		if($result_zgv = $db->db_query($qry_zgv))
@@ -840,7 +844,7 @@ if(isset($_POST['save']))
 					$prestudent->zgv_code = $row_zgv->zgv_code;
 					$prestudent->zgvort = $row_zgv->zgvort;
 					$prestudent->zgvdatum = $row_zgv->zgvdatum;
-					
+
 					$prestudent->zgvmas_code = $row_zgv->zgvmas_code;
 					$prestudent->zgvmaort = $row_zgv->zgvmaort;
 					$prestudent->zgvmadatum = $row_zgv->zgvmadatum;
@@ -854,10 +858,10 @@ if(isset($_POST['save']))
 			$errormsg = $prestudent->errormsg;
 		}
 	}
-	
+
 	if(!$error)
 	{
-		//Prestudent Rolle Anlegen			
+		//Prestudent Rolle Anlegen
 		$rolle = new prestudent();
 
 		$rolle->prestudent_id = $prestudent->prestudent_id;
@@ -888,42 +892,42 @@ if(isset($_POST['save']))
 	{
 		//Matrikelnummer und UID generieren
 		$matrikelnr = generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz);
-				
+
 		$jahr = mb_substr($matrikelnr,0, 2);
 		$stg = mb_substr($matrikelnr, 3, 4);
-		
+
 		$stg_obj = new studiengang();
 		$stg_obj->load(ltrim($stg,'0'));
-		
+
 		$uid = generateUID($stg_obj->kurzbz,$jahr, $stg_obj->typ, $matrikelnr);
-						
+
 		//Benutzerdatensatz anlegen
 		$benutzer = new benutzer();
 		$benutzer->uid = $uid;
 		$benutzer->person_id = $person->person_id;
 		$benutzer->aktiv = true;
 		$benutzer->aktivierungscode = generateActivationKey();
-		
+
 		$nachname_clean = mb_strtolower(convertProblemChars($person->nachname));
 		$vorname_clean = mb_strtolower(convertProblemChars($person->vorname));
 		$nachname_clean = str_replace(' ','_', $nachname_clean);
 		$vorname_clean = str_replace(' ','_', $vorname_clean);
-		
+
 		if(!defined('GENERATE_ALIAS_STUDENT') || GENERATE_ALIAS_STUDENT===true)
 		{
 			$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER('".$vorname_clean.".".$nachname_clean."')";
 			$result_alias = $db->db_query($qry_alias);
-			if($db->db_num_rows($result_alias)==0)								
+			if($db->db_num_rows($result_alias)==0)
 				$benutzer->alias =$vorname_clean.'.'.$nachname_clean;
-			else 
+			else
 				$benutzer->alias = '';
 		}
 		else
 			$benutzer->alias='';
-									
+
 		$benutzer->insertamum = date('Y-m-d H:i:s');
 		$benutzer->insertvon = $user;
-						
+
 		if($benutzer->save(true, false))
 		{
 			//Studentendatensatz anlegen
@@ -947,10 +951,10 @@ if(isset($_POST['save']))
 				$lvb->gruppe = $student->gruppe;
 				$lvb->bezeichnung = 'Incoming';
 				$lvb->aktiv = true;
-				
+
 				$lvb->save(true);
 			}
-			
+
 			if($student->save(true, false))
 			{
 				//StudentLehrverband anlegen
@@ -963,26 +967,26 @@ if(isset($_POST['save']))
 				$studentlehrverband->gruppe = ' ';
 				$studentlehrverband->insertamum = date('Y-m-d H:i:s');
 				$studentlehrverband->insertvon = $user;
-					
+
 				if(!$studentlehrverband->save_studentlehrverband(true))
 				{
 					$error = true;
 					$errormsg = 'StudentLehrverband konnte nicht angelegt werden';
 				}
 			}
-			else 
+			else
 			{
 				$error = true;
 				$errormsg = 'Student konnte nicht angelegt werden: '.$student->errormsg;
 			}
 		}
-		else 
+		else
 		{
 			$error = true;
 			$errormsg = 'Benutzer konnte nicht angelegt werden:'.$benutzer->errormsg;
 		}
 	}
-	
+
 	if(!$error)
 	{
 		$db->db_query('COMMIT');
@@ -1011,18 +1015,18 @@ if($geburtsdatum!='')
 			$geburtsdatum_error=true;
 		}
 	}
-	else 
+	else
 	{
 		if(!mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$geburtsdatum))
 			$geburtsdatum_error=true;
 	}
-	
+
 	if($geburtsdatum_error)
 		echo "Format des Geburtsdatums ist ungueltig!";
 }
 if(($geburtsdatum=='' && $vorname=='' && $nachname=='') || $geburtsdatum_error)
 	echo "<form method='POST' onsubmit='return checkInput1();'>";
-else 
+else
 	echo "<form method='POST'>";
 ?>
 <table width="100%">
@@ -1049,7 +1053,7 @@ echo '<tr><td colspan="2"><fieldset><legend>Adresse</legend><table>';
 
 if(isset($adresse_nation) && $adresse_nation=='A' && isset($plz) && $plz>10000)
 	$nationstyle='style="border: 1px solid red"';
-else 
+else
 	$nationstyle='';
 echo '<tr><td>Nation</td><td><SELECT name="adresse_nation" id="adresse_nation" onchange="loadGemeindeData()" '.$nationstyle.'>';
 $nation =  new nation();
@@ -1058,7 +1062,7 @@ foreach ($nation->nation as $row)
 {
 	if($row->code==$adresse_nation)
 		$selected='selected';
-	else 
+	else
 		$selected='';
 	echo "<option value='$row->code' $selected>$row->langtext</option>";
 }
@@ -1072,10 +1076,10 @@ if($adresse_nation=='A' && $plz!='')
 {
 	echo getGemeindeDropDown($plz);
 }
-else 
+else
 {
 	echo '<font color="gray">Bitte zuerst eine Postleitzahl eintragen</font>';
-}	
+}
 
 //wenn der Ort per EMail-Import von der www kommt und der Ort in der Gemeindetabelle
 //nicht gefunden wird, dann wird der Ort in Klammer neben dem DropDown angezeigt
@@ -1124,14 +1128,14 @@ foreach ($stg_obj->result as $row)
 }
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>Studiensemester *</td><td><SELECT id="studiensemester_kurzbz" name="studiensemester_kurzbz">';
+echo '<tr><td>Studiensemester *</td><td><SELECT id="studiensemester_kurzbz" name="studiensemester_kurzbz" onchange="loadStudienplanData()">';
 $stsem = new studiensemester();
 $stsem->getAll();
 foreach ($stsem->studiensemester as $row)
 	echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.($row->studiensemester_kurzbz==$studiensemester_kurzbz?'selected':'').'>'.$row->studiensemester_kurzbz.'</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>Ausbildungssemester *</td><td><SELECT id="ausbildungssemester" name="ausbildungssemester" '.($incoming?'disabled':'').'>';
+echo '<tr><td>Ausbildungssemester *</td><td><SELECT id="ausbildungssemester" name="ausbildungssemester" onchange="loadStudienplanData()" '.($incoming?'disabled':'').'>';
 for ($i=1;$i<9;$i++)
 	echo '<OPTION value="'.$i.'" '.($i==$ausbildungssemester?'selected':'').'>'.$i.'. Semester</OPTION>';
 echo '</SELECT>';
@@ -1151,7 +1155,7 @@ echo '</td></tr>';
 echo "\n";
 echo '<tr><td>Studienplan</td><td><div id="studienplandiv">';
 if($studiengang_kz!='')
-	echo getStudienplanDropDown($studiengang_kz, $orgform_kurzbz, $studienplan_id);
+	echo getStudienplanDropDown($studiengang_kz, $orgform_kurzbz, $studienplan_id, $studiensemester_kurzbz, $ausbildungssemester);
 else
 	echo '<font color="gray">Bitte zuerst einen Studiengang waehlen</font>';
 echo '</div></td>
@@ -1178,7 +1182,7 @@ Felder die mit einem * gekennzeichnet sind müssen ausgefüllt werden!
 <?php
 //Vorschlaege laden
 if($geburtsdatum!='')
-{		
+{
 	if(mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$geburtsdatum))
 	{
 		$where = " gebdatum='".$geburtsdatum."'";
@@ -1222,7 +1226,7 @@ if($where!='')
 				}
 			}
 			$status = mb_substr($status, 0, mb_strlen($status)-2);
-			
+
 			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->vornamen</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id'";
 			if($result_adr = $db->db_query($qry_adr))
