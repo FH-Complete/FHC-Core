@@ -259,4 +259,26 @@ class Recipient_model extends DB_Model
 		
 		return $this->execQuery($query, $parametersArray);
 	}
+	
+	/**
+	 * Get all unread messages for a person identified by person_id
+	 */
+	public function getCountUnreadMessages($person_id)
+	{
+		// Checks if the operation is permitted by the API caller
+		if (($isEntitled = $this->isEntitled('public.tbl_msg_recipient', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('public.tbl_msg_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		
+		$sql = 'SELECT COUNT(r.message_id) AS unreadMessages
+				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_status s
+					ON (r.message_id = s.message_id AND r.person_id = s.person_id)
+				 WHERE r.person_id = ?
+				   AND s.status = ?';
+		
+		$parametersArray = array($person_id, MSG_STATUS_UNREAD);
+		
+		return $this->execQuery($sql, $parametersArray);
+	}
 }

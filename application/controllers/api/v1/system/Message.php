@@ -108,6 +108,25 @@ class Message extends APIv1_Controller
 	/**
 	 * @return void
 	 */
+	public function getCountUnreadMessages()
+	{
+		$person_id = $this->get('person_id');
+		
+		if (isset($person_id))
+		{
+			$result = $this->messagelib->getCountUnreadMessages($person_id);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	/**
+	 * @return void
+	 */
 	public function postMessage()
 	{
 		$validation = $this->_validatePostMessage($this->post());

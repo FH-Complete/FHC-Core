@@ -153,6 +153,22 @@ class MessageLib
 		
         return $result;
     }
+    
+    /**
+     * getCountUnreadMessages
+     *
+     * @param   bigint  $person_id   REQUIRED
+     * @return  array
+     */
+    public function getCountUnreadMessages($person_id)
+    {
+        if (!is_numeric($person_id))
+        	return $this->_error('', MSG_ERR_INVALID_RECIPIENTS);
+		
+		$msg = $this->ci->RecipientModel->getCountUnreadMessages($person_id);
+		
+        return $msg;
+    }
 	
     /**
      * updateMessageStatus() - will change status on message for particular user
