@@ -73,14 +73,14 @@ function drawrow($row)
 	global $oRdf, $datum_obj;
 
 	$reihungstest_obj = new reihungstest();
-	$reihungstest_obj->load($row->rt_id);
+	$reihungstest_obj->load($row->reihungstest_id);
 
 	$studienplan = new studienplan();
 	$studienplan->loadStudienplan($row->studienplan_id);
 
 	$i=$oRdf->newObjekt($row->rt_person_id);
 	$oRdf->obj[$i]->setAttribut('rt_person_id',$row->rt_person_id,true);
-	$oRdf->obj[$i]->setAttribut('rt_id',$row->rt_id,true);
+	$oRdf->obj[$i]->setAttribut('rt_id',$row->reihungstest_id,true);
 	$oRdf->obj[$i]->setAttribut('person_id',$row->person_id,true);
 	$oRdf->obj[$i]->setAttribut('anmeldedatum',$datum_obj->formatDatum($row->anmeldedatum, 'd.m.Y'),true);
 	$oRdf->obj[$i]->setAttribut('anmeldedatum_iso',$row->anmeldedatum,true);

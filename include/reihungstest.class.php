@@ -28,7 +28,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class reihungstest extends basis_db
 {
-	public $new;			//  boolean
+	public $new=true;			//  boolean
 	public $done = false;	//  boolean
 	public $result = array();
 
@@ -476,7 +476,7 @@ class reihungstest extends basis_db
 				FROM
 					public.tbl_rt_person
 				WHERE
-					reihungstest_id = '.$this->db_add_param($reihungstest_id, FHC_INTEGER);
+					rt_id = '.$this->db_add_param($reihungstest_id, FHC_INTEGER);
 
 		if ($result = $this->db_query($qry))
 		{
@@ -541,7 +541,7 @@ class reihungstest extends basis_db
 			if ($row = $this->db_fetch_object($result))
 			{
 				$this->rt_person_id = $row->rt_person_id;
-				$this->rt_id = $row->rt_id;
+				$this->reihungstest_id = $row->rt_id;
 				$this->person_id = $row->person_id;
 				$this->studienplan_id = $row->studienplan_id;
 				$this->anmeldedatum = $row->anmeldedatum;
@@ -584,7 +584,7 @@ class reihungstest extends basis_db
 				$obj = new stdClass();
 
 				$obj->rt_person_id = $row->rt_person_id;
-				$obj->rt_id = $row->rt_id;
+				$obj->reihungstest_id = $row->rt_id;
 				$obj->person_id = $row->person_id;
 				$obj->studienplan_id = $row->studienplan_id;
 				$obj->anmeldedatum = $row->anmeldedatum;
@@ -606,10 +606,10 @@ class reihungstest extends basis_db
 	/**
 	 * Liefert die Zuordnung einer Person zu einem Reihungstest
 	 * @param int $person_id ID der Person.
-	 * @param int $rt_id ID des Reihungstests.
+	 * @param int $reihungstest_id ID des Reihungstests.
 	 * @return boolean true wenn erfolgreich, false im Fehlerfall
 	 */
-	public function getPersonReihungstest($person_id, $rt_id)
+	public function getPersonReihungstest($person_id, $reihungstest_id)
 	{
 		$qry = "SELECT
 					*
@@ -617,13 +617,13 @@ class reihungstest extends basis_db
 					public.tbl_rt_person
 				WHERE
 					tbl_rt_person.person_id=".$this->db_add_param($person_id)."
-					AND rt_id=".$this->db_add_param($rt_id);
+					AND rt_id=".$this->db_add_param($reihungstest_id);
 		if ($result = $this->db_query($qry))
 		{
 			if ($row = $this->db_fetch_object($result))
 			{
 				$this->rt_person_id = $row->rt_person_id;
-				$this->rt_id = $row->rt_id;
+				$this->reihungstest_id = $row->rt_id;
 				$this->person_id = $row->person_id;
 				$this->studienplan_id = $row->studienplan_id;
 				$this->anmeldedatum = $row->anmeldedatum;
@@ -647,18 +647,18 @@ class reihungstest extends basis_db
 
 	/**
 	 * Liefert die Personen, die einem Ort des Reihungstests zugeteilt sind
-	 * @param int $rt_id ID des Reihungstests.
-	 * @param string $ort_kurzbz Ort des Reihungstests mit der ID $rt_id.
+	 * @param int $reihungstest_id ID des Reihungstests.
+	 * @param string $ort_kurzbz Ort des Reihungstests mit der ID $reihungstest_id.
 	 * @return true wenn ok, sonst false
 	 */
-	public function getPersonReihungstestOrt($rt_id, $ort_kurzbz)
+	public function getPersonReihungstestOrt($reihungstest_id, $ort_kurzbz)
 	{
 		$qry = "SELECT
 					*
 				FROM
 					public.tbl_rt_person
 				WHERE
-					tbl_rt_person.rt_id=".$this->db_add_param($rt_id)."
+					tbl_rt_person.rt_id=".$this->db_add_param($reihungstest_id)."
 					AND tbl_rt_person.ort_kurzbz=".$this->db_add_param($ort_kurzbz);
 		if ($result = $this->db_query($qry))
 		{
@@ -667,7 +667,7 @@ class reihungstest extends basis_db
 				$obj = new stdClass();
 
 				$obj->rt_person_id = $row->rt_person_id;
-				$obj->rt_id = $row->rt_id;
+				$obj->reihungstest_id = $row->rt_id;
 				$obj->person_id = $row->person_id;
 				$obj->studienplan_id = $row->studienplan_id;
 				$obj->anmeldedatum = $row->anmeldedatum;
@@ -697,7 +697,7 @@ class reihungstest extends basis_db
 			$qry = "BEGIN;INSERT INTO public.tbl_rt_person(person_id, rt_id, studienplan_id, anmeldedatum,
 				teilgenommen, ort_kurzbz, punkte) VALUES(".
 				$this->db_add_param($this->person_id, FHC_INTEGER).','.
-				$this->db_add_param($this->rt_id, FHC_INTEGER).','.
+				$this->db_add_param($this->reihungstest_id, FHC_INTEGER).','.
 				$this->db_add_param($this->studienplan_id, FHC_INTEGER).','.
 				$this->db_add_param($this->anmeldedatum).','.
 				$this->db_add_param($this->teilgenommen, FHC_BOOLEAN).','.
@@ -707,7 +707,7 @@ class reihungstest extends basis_db
 		else
 		{
 			$qry = "UPDATE public.tbl_rt_person SET ".
-			' rt_id = '.$this->db_add_param($this->rt_id).','.
+			' rt_id = '.$this->db_add_param($this->reihungstest_id).','.
 			' studienplan_id = '.$this->db_add_param($this->studienplan_id).','.
 			' anmeldedatum='.$this->db_add_param($this->anmeldedatum).','.
 			' teilgenommen='.$this->db_add_param($this->teilgenommen, FHC_BOOLEAN).','.
@@ -788,13 +788,14 @@ class reihungstest extends basis_db
 					tbl_rt_ort.rt_id=".$this->db_add_param($reihungstest_id)."
 				ORDER BY
 					ort_kurzbz";
+
 		if ($result = $this->db_query($qry))
 		{
 			while ($row = $this->db_fetch_object($result))
 			{
 				$obj = new stdClass();
 
-				$obj->rt_id = $row->rt_id;
+				$obj->reihungstest_id = $row->rt_id;
 				$obj->ort_kurzbz = $row->ort_kurzbz;
 				$obj->uid = $row->uid;
 
@@ -820,7 +821,7 @@ class reihungstest extends basis_db
 		if ($this->new)
 		{
 			$qry = "INSERT INTO public.tbl_rt_ort(rt_id, ort_kurzbz, uid) VALUES(".
-					$this->db_add_param($this->rt_id, FHC_INTEGER).','.
+					$this->db_add_param($this->reihungstest_id, FHC_INTEGER).','.
 					$this->db_add_param($this->ort_kurzbz).','.
 					$this->db_add_param($this->uid).');';
 		}
@@ -829,7 +830,7 @@ class reihungstest extends basis_db
 			$qry = "UPDATE public.tbl_rt_ort SET ".
 				' ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).','.
 				' uid='.$this->db_add_param($this->uid).' '.
-				' WHERE rt_id='.$this->db_add_param($this->rt_id, FHC_INTEGER).' AND '.
+				' WHERE rt_id='.$this->db_add_param($this->reihungstest_id, FHC_INTEGER).' AND '.
 				' ort_kurzbz='.$this->db_add_param($this->ort_kurzbz);
 		}
 
@@ -878,14 +879,14 @@ class reihungstest extends basis_db
 		if ($this->new)
 		{
 			$qry = "INSERT INTO public.tbl_rt_studienplan(reihungstest_id, studienplan_id) VALUES(".
-					$this->db_add_param($this->rt_id, FHC_INTEGER).','.
+					$this->db_add_param($this->reihungstest_id, FHC_INTEGER).','.
 					$this->db_add_param($this->studienplan_id).');';
 		}
 		else
 		{
 			$qry = "UPDATE public.tbl_rt_studienplan SET ".
 					' studienplan_id='.$this->db_add_param($this->studienplan_id).' '.
-					' WHERE reihungstest_id='.$this->db_add_param($this->rt_id, FHC_INTEGER).' AND '.
+					' WHERE reihungstest_id='.$this->db_add_param($this->reihungstest_id, FHC_INTEGER).' AND '.
 					' studienplan_id='.$this->db_add_param($this->studienplan_id);
 		}
 
@@ -966,11 +967,16 @@ class reihungstest extends basis_db
 	public function getReihungstestStudienplan($studienplan_arr)
 	{
 		$qry = "SELECT
-					distinct tbl_reihungstest.*
+					distinct a.*,
+					(
+						SELECT count(*) FROM public.tbl_rt_person
+						WHERE rt_id=a.reihungstest_id
+					) as angemeldete_teilnehmer
 				FROM
-					public.tbl_reihungstest
+					public.tbl_reihungstest a
 					JOIN public.tbl_rt_studienplan USING(reihungstest_id)
-				WHERE studienplan_id IN(".$this->db_implode4Sql($studienplan_arr).")";
+				WHERE studienplan_id IN(".$this->db_implode4Sql($studienplan_arr).")
+				ORDER BY a.datum DESC";
 
 		if ($this->db_query($qry))
 		{
@@ -995,6 +1001,7 @@ class reihungstest extends basis_db
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->stufe = $row->stufe;
 				$obj->anmeldefrist = $row->anmeldefrist;
+				$obj->angemeldete_teilnehmer = $row->angemeldete_teilnehmer;
 
 				$this->result[] = $obj;
 			}
@@ -1060,6 +1067,85 @@ class reihungstest extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt die Reihungstest-Zuordnungen eines Prestudenten zu einem Datum
+	 * @param int $prestudent_id ID des Prestudenten.
+	 * @param date $datum Datum an dem der Reihugnstest stattfindet.
+	 * @return boolean true wenn erfolgreich geladen, false im Fehlerfall
+	 */
+	public function getReihungstestPersonDatum($prestudent_id, $datum)
+	{
+		$qry = "SELECT
+					tbl_rt_person.*
+				FROM
+					public.tbl_rt_person
+					JOIN public.tbl_prestudent USING(person_id)
+					JOIN public.tbl_reihungstest ON(tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id)
+				WHERE
+					tbl_prestudent.prestudent_id = ".$this->db_add_param($prestudent_id)."
+					AND tbl_reihungstest.datum=".$this->db_add_param($datum);
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+
+				$obj->rt_person_id = $row->rt_person_id;
+				$obj->reihungstest_id = $row->rt_id;
+				$obj->person_id = $row->person_id;
+				$obj->studienplan_id = $row->studienplan_id;
+				$obj->anmeldedatum = $row->anmeldedatum;
+				$obj->teilgenommen = $this->db_parse_bool($row->teilgenommen);
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->punkte = $row->punkte;
+
+				$this->result[] = $obj;
+
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Ermittelt die Anzahl der maximalen Platzanzahl aufgrund der Raumzuordnung
+	 * @param int $reihungstest_id ID des Reihungstests.
+	 * @return Anzahl der Plaetze
+	 */
+	public function getPlatzAnzahlRaum($reihungstest_id)
+	{
+		$qry = "
+			SELECT
+				sum(tbl_ort.arbeitsplaetze) as anzahl
+			FROM
+				public.tbl_rt_ort
+				JOIN public.tbl_ort USING(ort_kurzbz)
+			WHERE
+				tbl_rt_ort.rt_id = ".$this->db_add_param($reihungstest_id, FHC_INTEGER);
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->anzahl;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Arbeitsplaetze';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Arbeitsplaetze';
 			return false;
 		}
 	}

@@ -256,7 +256,7 @@ if(isset($_GET['excel']))
 						$worksheet->setMargins_LR (0.4);
 						$worksheet->setMarginTop (0.79);
 						$worksheet->setMarginBottom (0.59);
-	
+
 						// Titelzeilen
 						$worksheet->write(0,0,'Anwesenheitsliste Aufnahmetermin vom '.$datum_obj->convertISODate($reihungstest->datum).' '.$reihungstest->uhrzeit.' Uhr, '.$reihungstest->anmerkung.', erstellt am '.date('d.m.Y'), $format_bold);
 						if ($row->ort_kurzbz=='')
@@ -266,7 +266,7 @@ if(isset($_GET['excel']))
 						$worksheet->write(2,0,'Studienpläne: '.implode(', ', $studienplaene_arr));
 						$worksheet->write(3,0,'Stufe: '.$reihungstest->stufe);
 						$worksheet->write(4,0,'Testmodule: '.implode(', ', $gebietbezeichnungen));
-	
+
 						//Ueberschriften
 						$zeile=6;
 						$col=0;
@@ -296,13 +296,13 @@ if(isset($_GET['excel']))
 						$maxlength[$col] = 3;
 						$worksheet->write($zeile,++$col,"Unterschrift", $format_bold);
 						$maxlength[$col] = 30;
-	
+
 						$ort_kurzbz = $row->ort_kurzbz;
 						$zeile++;
 					}
-	
+
 					$pruefling = new pruefling();
-	
+
 					$prestudent = new prestudent();
 					$prestudent->getPrestudenten($row->person_id);
 					$rt_in_anderen_stg='';
@@ -314,9 +314,9 @@ if(isset($_GET['excel']))
 							if($item->prestudent_id!=$row->prestudent_id)
 							{
 								if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-									$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id, true);
+									$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, true);
 								else
-									$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id);
+									$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id);
 								if($erg!=0)
 								{
 									$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz]."; ";
@@ -332,7 +332,7 @@ if(isset($_GET['excel']))
 									WHERE person_id=".$db->db_add_param($row->person_id)."
 									AND studiensemester_kurzbz=".$db->db_add_param($reihungstest->studiensemester_kurzbz)."
 									ORDER BY bezeichnung";
-	
+
 					if($result_zuteilungen = $db->db_query($qry_zuteilungen))
 					{
 						while($row_zuteilungen = $db->db_fetch_object($result_zuteilungen))
@@ -349,77 +349,77 @@ if(isset($_GET['excel']))
 							$weitere_zuteilungen[] = $row_zuteilungen->bezeichnung.' am '.$datum_obj->formatDatum($row_zuteilungen->datum, 'd.m.Y').' ('.implode(', ', $testmodule).')';
 						}
 					}
-	
+
 					$col=0;
 					$worksheet->write($zeile,$col, $row->vorname, $format_border);
 					if(strlen($row->vorname)>$maxlength[$col])
 						$maxlength[$col] = strlen($row->vorname);
-	
+
 					$worksheet->write($zeile,++$col,$row->nachname, $format_border);
 					if(strlen($row->nachname)>$maxlength[$col])
 						$maxlength[$col] = strlen($row->nachname);
-	
+
 					$worksheet->write($zeile,++$col, $row->geschlecht, $format_border_center);
 					if(strlen($row->geschlecht)>$maxlength[$col])
 						$maxlength[$col] = strlen($row->geschlecht);
-	
+
 					$worksheet->write($zeile,++$col,$datum_obj->convertISODate($row->gebdatum), $format_border);
 					if(strlen($row->gebdatum)>$maxlength[$col])
 						$maxlength[$col] = strlen($row->gebdatum);
-	
+
 					$worksheet->write($zeile,++$col,$studiengang->kuerzel_arr[$row->studiengang_kz], $format_border);
 					if(strlen($studiengang->kuerzel_arr[$row->studiengang_kz])>$maxlength[$col])
 						$maxlength[$col] = strlen($studiengang->kuerzel_arr[$row->studiengang_kz]);
-	
+
 					$worksheet->write($zeile,++$col,$row->ausbildungssemester, $format_border_center);
 					if(strlen($row->ausbildungssemester)>$maxlength[$col])
 						$maxlength[$col] = strlen($row->ausbildungssemester);
-	
+
 					$worksheet->write($zeile,++$col,$rt_in_anderen_stg, $format_border);
 					if(strlen($rt_in_anderen_stg)>$maxlength[$col])
 						$maxlength[$col] = strlen($rt_in_anderen_stg);
-	
+
 					$worksheet->write($zeile,++$col,implode("\n", $weitere_zuteilungen), $format_border);
 					foreach ($weitere_zuteilungen as $items)
 					{
 						if (strlen($items)>$maxlength[$col])
 							$maxlength[$col] = strlen($items);
 					}
-	
+
 					$worksheet->write($zeile,++$col,$row->email, $format_border);
 					if(strlen($row->email)>$maxlength[$col])
 						$maxlength[$col] = strlen($row->email);
-	
+
 	 				$adresse = new adresse();
 					$adresse->loadZustellAdresse($row->person_id);
-	
+
 					$worksheet->write($zeile,++$col,$adresse->strasse, $format_border);
 					if(strlen($adresse->strasse)>$maxlength[$col])
 						$maxlength[$col] = strlen($adresse->strasse);
-	
+
 					$worksheet->write($zeile,++$col,$adresse->plz, $format_border_left);
 					if(strlen($adresse->plz)>$maxlength[$col])
 						$maxlength[$col] = strlen($adresse->plz);
-	
+
 					$worksheet->write($zeile,++$col,$adresse->ort, $format_border);
 					if(strlen($adresse->ort)>$maxlength[$col])
 						$maxlength[$col] = strlen($adresse->ort);
-	
+
 					$worksheet->write($zeile,++$col,'', $format_border);
-	
+
 					if(count($weitere_zuteilungen)>2)
 						$worksheet->setRow($zeile, count($weitere_zuteilungen)*14);
 					else
 						$worksheet->setRow($zeile, 35);
-	
+
 					$zeile++;
-	
+
 					//Die Breite der Spalten setzen
 					foreach($maxlength as $col=>$breite)
 						$worksheet->setColumn($col, $col, $breite+2);
 				}
 			}
-			else 
+			else
 			{
 				// Creating a worksheet
 				$worksheet =& $workbook->addWorksheet("Keine Daten");
@@ -432,7 +432,7 @@ if(isset($_GET['excel']))
 				$worksheet->setMargins_LR (0.4);
 				$worksheet->setMarginTop (0.79);
 				$worksheet->setMarginBottom (0.59);
-		
+
 				// Titelzeilen
 				$worksheet->write(0,0,'Anwesenheitsliste Aufnahmetermin vom '.$datum_obj->convertISODate($reihungstest->datum).' '.$reihungstest->uhrzeit.' Uhr, '.$reihungstest->anmerkung.', erstellt am '.date('d.m.Y'), $format_bold);
 
@@ -821,7 +821,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 						{
 							$add_ort = new reihungstest();
 							$add_ort->new = true;
-							$add_ort->rt_id = $reihungstest->reihungstest_id;
+							$add_ort->reihungstest_id = $reihungstest->reihungstest_id;
 							$add_ort->ort_kurzbz = $_POST['ort_kurzbz'];
 							$add_ort->uid = null;
 
@@ -843,7 +843,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			{
 				$rt_stpl = new reihungstest();
 				$rt_stpl->new = true;
-				$rt_stpl->rt_id = $reihungstest->reihungstest_id;
+				$rt_stpl->reihungstest_id = $reihungstest->reihungstest_id;
 				$rt_stpl->studienplan_id = $_POST['studienplan_id'];
 
 				if ($rt_stpl->saveStudienplanReihungstest())
@@ -925,8 +925,7 @@ if(isset($_POST['raumzuteilung_speichern']))
 					$raumzuteilung->punkte = $load_person->punkte;
 					$raumzuteilung->studienplan_id = $load_person->studienplan_id;
 
-					$raumzuteilung->rt_id = $load_person->rt_id;
-					$raumzuteilung->rt_id_old = $load_person->rt_id;
+					$raumzuteilung->reihungstest_id = $load_person->reihungstest_id;
 					$raumzuteilung->person_id = $key;
 					$raumzuteilung->ort_kurzbz = $_POST['raumzuteilung'];
 				}
@@ -995,9 +994,9 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 				{
 					$pruefling = new pruefling();
 					if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-						$rtpunkte = $pruefling->getReihungstestErgebnis($row->prestudent_id,true);
+						$rtpunkte = $pruefling->getReihungstestErgebnisPerson($row->person_id, true, $reihungstest->reihungstest_id);
 					else
-						$rtpunkte = $pruefling->getReihungstestErgebnis($row->prestudent_id);
+						$rtpunkte = $pruefling->getReihungstestErgebnisPerson($row->person_id, false, $reihungstest->reihungstest_id);
 					$reihungstest->punkte = $rtpunkte;
 					$reihungstest->reihungstestangetreten=true;
 					$reihungstest->save(false);
@@ -1080,8 +1079,7 @@ if(isset($_GET['type']) && $_GET['type']=='verteilen')
 							$raumzuteilung->punkte = $load_person->punkte;
 							$raumzuteilung->studienplan_id = $load_person->studienplan_id;
 
-							$raumzuteilung->rt_id = $load_person->rt_id;
-							$raumzuteilung->rt_id_old = $load_person->rt_id;
+							$raumzuteilung->reihungstest_id = $load_person->reihungstest_id;
 							$raumzuteilung->person_id = $row->person_id;
 							$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
 						}
@@ -1165,8 +1163,7 @@ if(isset($_GET['type']) && $_GET['type']=='auffuellen')
 						$raumzuteilung->punkte = $load_person->punkte;
 						$raumzuteilung->studienplan_id = $load_person->studienplan_id;
 
-						$raumzuteilung->rt_id = $load_person->rt_id;
-						$raumzuteilung->rt_id_old = $load_person->rt_id;
+						$raumzuteilung->reihungstest_id = $load_person->reihungstest_id;
 						$raumzuteilung->person_id = $row->person_id;
 						$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
 					}
@@ -1221,7 +1218,7 @@ if(isset($_POST['aufsicht']) && $_POST['aufsicht']!='' && !isset($_POST['kopiere
 			else
 			{
 				$save_aufsicht->new = false;
-				$save_aufsicht->rt_id = $_POST['reihungstest_id'];
+				$save_aufsicht->reihungstest_id = $_POST['reihungstest_id'];
 				$save_aufsicht->ort_kurzbz = $key;
 				$save_aufsicht->uid = $uid;
 				if (!$save_aufsicht->saveOrtReihungstest())
@@ -1824,9 +1821,9 @@ if($result = $db->db_query($qry))
 			if(defined('REIHUNGSTEST_ERGEBNISSE_BERECHNEN') && REIHUNGSTEST_ERGEBNISSE_BERECHNEN)
 			{
 				if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-					$rtergebnis = $pruefling->getReihungstestErgebnis($row->prestudent_id,true);
+					$rtergebnis = $pruefling->getReihungstestErgebnisPerson($row->person_id,true, $reihungstest->reihungstest_id);
 				else
-					$rtergebnis = $pruefling->getReihungstestErgebnis($row->prestudent_id);
+					$rtergebnis = $pruefling->getReihungstestErgebnisPerson($row->person_id, false, $reihungstest->reihungstest_id);
 				$prestudent = new prestudent();
 				$prestudent->getPrestudenten($row->person_id);
 				$rt_in_anderen_stg='';
@@ -1835,14 +1832,13 @@ if($result = $db->db_query($qry))
 					if($item->prestudent_id!=$row->prestudent_id)
 					{
 						if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-							$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id, true);
+							$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, true);
 						else
-							$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id);
+							$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id);
 						if($erg!=0)
 						{
 							$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz].'<br>';
 						}
-
 					}
 				}
 			}
@@ -1937,9 +1933,9 @@ if($result = $db->db_query($qry))
 				if(defined('REIHUNGSTEST_ERGEBNISSE_BERECHNEN') && REIHUNGSTEST_ERGEBNISSE_BERECHNEN)
 				{
 					if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-						$rtergebnis = $pruefling->getReihungstestErgebnis($row->prestudent_id,true);
+						$rtergebnis = $pruefling->getReihungstestErgebnisPerson($row->person_id,true, $reihungstest->reihungstest_id);
 					else
-						$rtergebnis = $pruefling->getReihungstestErgebnis($row->prestudent_id);
+						$rtergebnis = $pruefling->getReihungstestErgebnisPerson($row->person_id, false, $reihungstest->reihungstest_id);
 					$prestudent = new prestudent();
 					$prestudent->getPrestudenten($row->person_id);
 					$rt_in_anderen_stg='';
@@ -1948,14 +1944,13 @@ if($result = $db->db_query($qry))
 						if($item->prestudent_id!=$row->prestudent_id)
 						{
 							if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-								$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id, true);
+								$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, true);
 							else
-								$erg = $pruefling->getReihungstestErgebnis($item->prestudent_id);
+								$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id);
 							if($erg!=0)
 							{
 								$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz].'<br>';
 							}
-
 						}
 					}
 				}

@@ -38,7 +38,7 @@ if (!$db = new basis_db())
 //if(isset($_GET['lang']))
 //	setSprache($_GET['lang']);
 
-$date = new datum(); 
+$date = new datum();
 
 function getSpracheUser()
 {
@@ -78,7 +78,7 @@ if(isset($_GET['sprache_user']))
 		setSpracheUser(DEFAULT_LANGUAGE);
 }
 
-$sprache_user = getSpracheUser(); 
+$sprache_user = getSpracheUser();
 $p = new phrasen($sprache_user);
 
 $gebdatum='';
@@ -101,7 +101,7 @@ if (isset($_GET['logout']))
 
 if(isset($_POST['gebdatum']) && $_POST['gebdatum']!='')
 {
-	$gebdatum = $date->formatDatum($_POST['gebdatum'],'Y-m-d');	
+	$gebdatum = $date->formatDatum($_POST['gebdatum'],'Y-m-d');
 }
 else
 	$gebdatum='';
@@ -109,22 +109,39 @@ else
 if (isset($_POST['prestudent']) && isset($gebdatum))
 {
 	$ps=new prestudent($_POST['prestudent']);
+
 	//Geburtsdatum Pruefen
 	if ($gebdatum==$ps->gebdatum)
 	{
+		$reihungstest_id='';
 		//Freischaltung fuer zugeteilten Reihungstest pruefen
 		$rt = new reihungstest();
-		if($rt->load($ps->reihungstest_id))
+		if($rt->getReihungstestPersonDatum($ps->prestudent_id, date('Y-m-d')))
+		{
+			// TODO Was ist wenn da mehrere Zurueckkommen?!
+			if(isset($rt->result[0]))
+				$reihungstest_id = $rt->result[0]->reihungstest_id;
+			else
+			{
+				echo '<span class="error">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</span>';
+			}
+		}
+		else
+		{
+			echo 'Failed:'.$rt->errormsg;
+		}
+		//echo "Reihungstest $reihungstest_id";
+		if($reihungstest_id != '' && $rt->load($reihungstest_id))
 		{
 			if($rt->freigeschaltet)
-			{		
+			{
 				$pruefling = new pruefling();
 				if($pruefling->getPruefling($ps->prestudent_id))
 				{
 					$studiengang = $pruefling->studiengang_kz;
 					$semester = $pruefling->semester;
 				}
-				else 
+				else
 				{
 					$studiengang = $ps->studiengang_kz;
 					$ps->getLastStatus($ps->prestudent_id);
@@ -132,7 +149,7 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 				}
 				if($semester=='')
 					$semester=1;
-				
+
 				$_SESSION['prestudent_id']=$_POST['prestudent'];
 				$_SESSION['studiengang_kz']=$studiengang;
 				$_SESSION['nachname']=$ps->nachname;
@@ -140,7 +157,7 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 				$_SESSION['gebdatum']=$ps->gebdatum;
 				$stg_obj = new studiengang($studiengang);
 				$_SESSION['sprache']=$stg_obj->sprache;
-						
+
 				$_SESSION['semester']=$semester;
 			}
 			else
@@ -153,12 +170,12 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 			echo '<span class="error">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</span>';
 		}
 	}
-	else 
+	else
 	{
 		echo '<span class="error">'.$p->t('testtool/geburtsdatumStimmtNichtUeberein').'</span>';
 	}
 }
-	
+
 if (isset($_SESSION['prestudent_id']))
 	$prestudent_id=$_SESSION['prestudent_id'];
 else
@@ -166,9 +183,7 @@ else
 	//$prestudent_id=null;
 	$ps=new prestudent();
 	$datum=date('Y-m-d');
-	$ps->getPrestudentRT($datum,true);
-	if ($ps->num_rows==0)
-		$ps->getPrestudentRT($datum);
+	$ps->getPrestudentRT($datum);
 }
 
 if(isset($_GET['type']) && $_GET['type']=='sprachechange' && isset($_GET['sprache']))
@@ -179,14 +194,14 @@ if(isset($_GET['type']) && $_GET['type']=='sprachechange' && isset($_GET['sprach
 if(isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']))
 {
 	$pruefling = new pruefling();
-	
+
 	if(!$pruefling->getPruefling($_SESSION['prestudent_id']))
 	{
 		$pruefling->new = true;
-					
+
 		$pruefling->studiengang_kz = $_SESSION['studiengang_kz'];
 		$pruefling->semester = $_SESSION['semester'];
-		
+
 		$pruefling->idnachweis = '';
 		$pruefling->registriert = date('Y-m-d H:i:s');
 		$pruefling->prestudent_id = $_SESSION['prestudent_id'];
@@ -204,11 +219,11 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	if($_POST['pruefling_id']!='')
 		if(!$pruefling->load($_POST['pruefling_id']))
 			die('Pruefling wurde nicht gefunden');
-		else 
+		else
 			$pruefling->new=false;
-	else 
+	else
 		$pruefling->new=true;
-			
+
 	$pruefling->studiengang_kz = $_SESSION['studiengang_kz'];
 	$pruefling->idnachweis = isset($_POST['idnachweis'])?$_POST['idnachweis']:'';
 	$pruefling->registriert = date('Y-m-d H:i:s');
@@ -227,64 +242,64 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
-	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>	
+	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 	<script type="text/javascript">
-	$(document).ready(function() 
-	{		
+	$(document).ready(function()
+	{
 		$.datepicker.setDefaults( $.datepicker.regional[ "" ] );
-		<?php //Wenn Deutsch ausgewaehlt, dann Datepicker auch in Deutsch 
+		<?php //Wenn Deutsch ausgewaehlt, dann Datepicker auch in Deutsch
 		if ($sprache_user=="German")
 			echo '$.datepicker.setDefaults( $.datepicker.regional[ "de" ] );
-			$( "#datepicker" ).datepicker(	
+			$( "#datepicker" ).datepicker(
 				{
 					changeMonth: true,
 					changeYear: true,
 					defaultDate: "-6570",
 					maxDate: -5110,
 					yearRange: "-60:+00",
-				}					
+				}
 				);';
-		else 
+		else
 			echo '$( "#datepicker" ).datepicker({
 				dateFormat: "dd.mm.yy",
 				changeMonth: true,
 				changeYear: true,
 				defaultDate: "-6570",
 				maxDate: -5110,
-				yearRange: "-60:+00",	 
+				yearRange: "-60:+00",
 				});';
 		?>
-		
+
 	});
 	</script>
-<?php 
+<?php
 	if($reload_parent)
 		echo '<script language="Javascript">parent.menu.location.reload()</script>';
 	if($reload)
 		echo "<script language=\"Javascript\">parent.location.reload();</script>";
-?>		
+?>
 </head>
 
 <body>
 <?php	echo '<h1>'.$p->t('testtool/startseite').'</h1>';
 
 	if (isset($prestudent_id))
-	{	
-		
+	{
+
 		$prestudent = new prestudent($prestudent_id);
 		$stg_obj = new studiengang($prestudent->studiengang_kz);
 		$pruefling = new pruefling();
 		$typ = new studiengang($prestudent->studiengang_kz);
-		$typ->getStudiengangTyp($stg_obj->typ);	
-		
+		$typ->getStudiengangTyp($stg_obj->typ);
+
 		//Sprachwahl des Studiengangs
 		$qry = "SELECT sprachwahl FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz=".$db->db_add_param($prestudent->studiengang_kz)." LIMIT 1";
 		$result = $db->db_query($qry);
 		$sprachwahl = $db->db_fetch_object($result);
 		$sprachwahl = $db->db_parse_bool($sprachwahl->sprachwahl);
-		
-		echo '<form method="GET">';	
+
+		echo '<form method="GET">';
 		echo '<br>'.$p->t('testtool/begruessungstext').' <br/><br/>';
 		echo '<b>'.$p->t('zeitaufzeichnung/id').'</b>: '.$_SESSION['prestudent_id'].'<br/>';
 		echo '<b>'.$p->t('global/name').'</b>: '.$_SESSION['vorname'].' '.$_SESSION['nachname'].'<br/>';
@@ -293,10 +308,10 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		echo '<INPUT type="submit" value="Logout" name="logout" />';
 		echo '</form>';
 		echo '<br><br>';
-		
+
 		if($pruefling->getPruefling($prestudent_id))
 		{
-		
+
 			echo '<FORM accept-charset="UTF-8"   action="'. $_SERVER['PHP_SELF'].'"  method="post" enctype="multipart/form-data">';
 			echo '<input type="hidden" name="pruefling_id" value="'.$pruefling->pruefling_id.'">';
 			echo '<table>';
@@ -305,17 +320,17 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 			//echo '<tr><td></td><td><input type="submit" name="save" value="Semester ändern"></td>';
 			echo '</table>';
 			echo '</FORM>';
-			
+
 			//Wenn die Sprachwahl fuer diesen Studiengang aktiviert ist, dann die Sprachen anzeigen
 			if($sprachwahl==true)
 			{
 				//Liste der Sprachen, die in den Gebieten vorkommen koennen
-				$qry = "SELECT distinct sprache 
-						FROM 
-							testtool.tbl_pruefling 
+				$qry = "SELECT distinct sprache
+						FROM
+							testtool.tbl_pruefling
 							JOIN testtool.tbl_ablauf USING(studiengang_kz)
 							JOIN testtool.tbl_frage USING(gebiet_id)
-							JOIN testtool.tbl_frage_sprache USING(frage_id)						
+							JOIN testtool.tbl_frage_sprache USING(frage_id)
 						WHERE
 							tbl_pruefling.pruefling_id=".$db->db_add_param($pruefling->pruefling_id)."
 						ORDER BY sprache DESC";
@@ -326,7 +341,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 					{
 						if($_SESSION['sprache']==$row->sprache)
 							$selected='style="border:1px solid black;"';
-						else 
+						else
 							$selected='';
 						echo " <a href='".$_SERVER['PHP_SELF']."?type=sprachechange&sprache=$row->sprache' class='Item' $selected><img src='bild.php?src=flag&amp;sprache=$row->sprache' alt='$row->sprache' title='$row->sprache'/></a>";
 					}
@@ -339,7 +354,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 				echo '<script language="Javascript">parent.menu.location.reload()</script>';
 			}
 		}
-		else 
+		else
 		{
 			echo '<span class="error">'.$p->t('testtool/keinPrueflingseintragVorhanden').'</span>';
 		}
@@ -347,7 +362,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	else
 	{
 		$prestudent_id_dummy_student = (defined('PRESTUDENT_ID_DUMMY_STUDENT')?PRESTUDENT_ID_DUMMY_STUDENT:'');
-			
+
 		echo '<form method="post">
 				<SELECT name="prestudent">';
 		echo '<OPTION value="'.$prestudent_id_dummy_student.'">'.$p->t('testtool/nameAuswaehlen').'</OPTION>\n';
@@ -356,7 +371,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 			$stg = new studiengang();
 			$stg->load($prestd->studiengang_kz);
 			if(isset($_POST['prestudent']) && $prestd->prestudent_id==$_POST['prestudent'])
-				$selected = 'selected';	
+				$selected = 'selected';
 			else
 				$selected='';
 			echo '<OPTION value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.' ('.(strtoupper($stg->typ.$stg->kurzbz)).')</OPTION>\n';
@@ -366,7 +381,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		echo '<input type="text" id="datepicker" size="12" name="gebdatum" value="'.$date->formatDatum($gebdatum,'d.m.Y').'">';
 		echo '&nbsp; <INPUT type="submit" value="'.$p->t('testtool/login').'" />';
 		echo '</form>';
-		
+
 		echo '<br /><br /><br />
 		<center>
 		<span style="font-size: 1.2em; font-style: italic;">'.$p->t('testtool/willkommenstext').'</span>
