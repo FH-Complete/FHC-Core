@@ -85,7 +85,7 @@ FROM public.tbl_person
 	JOIN public.tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
 WHERE
 	tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
-	AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand','Incoming')
+	AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand','Incoming','Absolvent')
 	AND tbl_student.studiengang_kz<10000
 	AND tbl_student.studiengang_kz>0
 	AND tbl_student.studiengang_kz!='9".$erhalter_row->erhalter_kz."'
