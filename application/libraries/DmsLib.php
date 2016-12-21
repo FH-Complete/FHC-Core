@@ -60,9 +60,34 @@ class DmsLib
 			{
 				$result = $resultFS;
 			}
-
 		}
-
+		
+		return $result;
+	}
+	
+	/**
+	 *
+	 */
+	public function getAktenAcceptedDms($person_id, $dokument_kurzbz = null)
+	{
+		$result = $this->ci->AkteModel->getAktenAcceptedDms($person_id, $dokument_kurzbz);
+		
+		if (hasData($result))
+		{
+			for ($i = 0; $i < count($result->retval); $i++)
+			{
+				$resultFS = $this->ci->DmsFSModel->read($result->retval[$i]->filename);
+				if (isSuccess($resultFS))
+				{
+					$result->retval[$i]->{DmsLib::FILE_CONTENT_PROPERTY} = $resultFS->retval;
+				}
+				else
+				{
+					$result = $resultFS;
+				}
+			}
+		}
+		
 		return $result;
 	}
 
@@ -191,7 +216,7 @@ class DmsLib
 		
 		return $result;
 	}
-
+	
 	/**
 	 *
 	 */

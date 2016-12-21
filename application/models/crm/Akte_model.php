@@ -128,4 +128,69 @@ class Akte_model extends DB_Model
 		
 		return $this->execQuery($query, $parametersArray);
 	}
+	
+	/**
+	 * 
+	 */
+	public function getAktenAcceptedDms($person_id, $dokument_kurzbz = null)
+	{
+		// Checks if the operation is permitted by the API caller
+		if (($isEntitled = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('public.tbl_dokumentprestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('campus.tbl_dms', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('campus.tbl_dms_version', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		
+		$query = 'SELECT a.akte_id,
+						 a.person_id,
+						 a.dokument_kurzbz,
+						 a.mimetype,
+						 a.erstelltam,
+						 a.gedruckt,
+						 a.titel_intern,
+						 a.anmerkung_intern,
+						 a.titel,
+						 a.bezeichnung,
+						 a.updateamum,
+						 a.insertamum,
+						 a.updatevon,
+						 a.insertvon,
+						 a.uid,
+						 a.dms_id,
+						 a.anmerkung,
+						 a.nachgereicht,
+						 a.nachgereicht_am,
+						 CASE WHEN MAX(dp.dokument_kurzbz) IS NOT NULL THEN TRUE ELSE FALSE END AS accepted,
+						 d.oe_kurzbz,
+						 d.kategorie_kurzbz,
+						 dv.version,
+						 dv.filename,
+						 dv.mimetype,
+						 dv.name,
+						 dv.beschreibung
+					FROM public.tbl_akte a
+			  INNER JOIN public.tbl_prestudent p USING(person_id)
+			   LEFT JOIN public.tbl_dokumentprestudent dp ON(p.prestudent_id = dp.prestudent_id AND a.dokument_kurzbz = dp.dokument_kurzbz)
+			  INNER JOIN campus.tbl_dms d ON (a.dms_id = d.dms_id AND a.dokument_kurzbz = d.dokument_kurzbz)
+			  INNER JOIN (SELECT dms_id, MAX(version) AS version FROM campus.tbl_dms_version GROUP BY dms_id) dvv ON (d.dms_id = dvv.dms_id)
+			  INNER JOIN campus.tbl_dms_version dv ON (dv.dms_id = dvv.dms_id AND dv.version = dvv.version)
+				   WHERE a.person_id = ?';
+		
+		$parametersArray = array($person_id);
+		
+		if (!empty($dokument_kurzbz))
+		{
+			$query .= ' AND a.dokument_kurzbz = ?';
+			array_push($parametersArray, $dokument_kurzbz);
+		}
+		
+		$query .= ' GROUP BY a.akte_id, d.dms_id, dv.dms_id, dv.version ORDER BY a.erstelltam';
+		
+		return $this->execQuery($query, $parametersArray);
+	}
 }

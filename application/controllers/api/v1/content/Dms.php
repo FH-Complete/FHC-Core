@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if (!defined("BASEPATH")) exit("No direct script access allowed");
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Dms extends APIv1_Controller
 {
@@ -23,7 +23,7 @@ class Dms extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load library DmsLib
-		$this->load->library("DmsLib");
+		$this->load->library('DmsLib');
 	}
 	
 	/**
@@ -31,12 +31,32 @@ class Dms extends APIv1_Controller
 	 */
 	public function getDms()
 	{
-		$dms_id = $this->get("dms_id");
-		$version = $this->get("version");
+		$dms_id = $this->get('dms_id');
+		$version = $this->get('version');
 		
 		if (isset($dms_id))
 		{
 			$result = $this->dmslib->read($dms_id, $version);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public function getAktenAcceptedDms()
+	{
+		$person_id = $this->get('person_id');
+		$dokument_kurzbz = $this->get('dokument_kurzbz');
+		
+		if (isset($person_id))
+		{
+			$result = $this->dmslib->getAktenAcceptedDms($person_id, $dokument_kurzbz);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -74,7 +94,7 @@ class Dms extends APIv1_Controller
 		
 		if ($this->_validateDelete($this->post()))
 		{
-			$result = $this->dmslib->delete($dms["person_id"], $dms["dms_id"]);
+			$result = $this->dmslib->delete($dms['person_id'], $dms['dms_id']);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
@@ -90,11 +110,11 @@ class Dms extends APIv1_Controller
 		{
 			return false;
 		}
-		if (!isset($dms["file_content"]) || (isset($dms["file_content"]) && $dms["file_content"] == ""))
+		if (!isset($dms['file_content']) || (isset($dms['file_content']) && $dms['file_content'] == ''))
 		{
 			return false;
 		}
-		if (!isset($dms["name"]) || (isset($dms["name"]) && $dms["name"] == ""))
+		if (!isset($dms['name']) || (isset($dms['name']) && $dms['name'] == ''))
 		{
 			return false;
 		}
@@ -108,11 +128,11 @@ class Dms extends APIv1_Controller
 		{
 			return false;
 		}
-		if (!isset($dms["person_id"]) || !is_numeric($dms["person_id"]))
+		if (!isset($dms['person_id']) || !is_numeric($dms['person_id']))
 		{
 			return false;
 		}
-		if (!isset($dms["dms_id"]) || !is_numeric($dms["dms_id"]))
+		if (!isset($dms['dms_id']) || !is_numeric($dms['dms_id']))
 		{
 			return false;
 		}
