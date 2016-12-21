@@ -307,15 +307,20 @@ class pruefling extends basis_db
 	}
 
 	/**
-	 * Berechnet das Reihungstestergebnis fuer einen Prestudenten
+	 * Berechnet das Reihungstestergebnis fuer eine Person und ggf Reihungstest
 	 *
-	 * @param $prestudent_id
+	 * @param $person_id ID der Person.
+	 * @param $punkte Wenn true werden Punkte geliefert, sonst Prozentsumme.
+	 * @param $reihungstest_id ID des Reihungstests.
 	 * @return Endpunkte des Reihungstests
 	 */
-	public function getReihungstestErgebnis($prestudent_id, $punkte=false)
+	public function getReihungstestErgebnisPerson($person_id, $punkte=false, $reihungstest_id=null)
 	{
 		$qry = "SELECT * FROM testtool.vw_auswertung
-				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
+				WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
+
+		if(!is_null($reihungstest_id))
+			$qry.=" AND reihungstest_id=".$this->db_add_param($reihungstest_id, FHC_INTEGER);
 
 		$ergebnis=0;
 
@@ -335,7 +340,52 @@ class pruefling extends basis_db
 				if($punkte)
 					$ergebnis +=$row->punkte;
 				else
-					$ergebnis+=$prozent*$row->gewicht;		
+					$ergebnis+=$prozent*$row->gewicht;
+			}
+			return $ergebnis;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei einer Abfrage';
+			return false;
+		}
+	}
+
+	/**
+	 * Berechnet das Reihungstestergebnis fuer einen Prestudenten und ggf Reihungstest
+	 *
+	 * @param $prestudent_id ID des Prestudenten
+	 * @param $punkte Wenn true werden Punkte geliefert, sonst Prozentsumme.
+	 * @param $reihungstest_id ID des Reihungstests.
+	 * @return Endpunkte des Reihungstests
+	 */
+	public function getReihungstestErgebnisPrestudent($prestudent_id, $punkte=false, $reihungstest_id=null)
+	{
+		$qry = "SELECT * FROM testtool.vw_auswertung
+				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
+
+		if(!is_null($reihungstest_id))
+			$qry.=" AND reihungstest_id=".$this->db_add_param($reihungstest_id, FHC_INTEGER);
+
+		$ergebnis=0;
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				//wenn maxpunkte ueberschritten wurde -> 100%
+				if($row->punkte>=$row->maxpunkte)
+				{
+					$prozent=100;
+					$row->punkte = $row->maxpunkte;
+				}
+				else
+					$prozent = ($row->punkte/$row->maxpunkte)*100;
+
+				if($punkte)
+					$ergebnis +=$row->punkte;
+				else
+					$ergebnis+=$prozent*$row->gewicht;
 			}
 			return $ergebnis;
 		}

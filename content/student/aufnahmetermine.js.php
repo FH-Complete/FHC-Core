@@ -272,13 +272,16 @@ function AufnahmeTermineDelete()
 
 function AufnahemTermineReihungstestPunkteTransmit()
 {
+	var reihungstest_id = document.getElementById('aufnahmetermine-menulist-reihungstest').value;
+	var person_id = document.getElementById('aufnahmetermine-textbox-person_id').value;
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'getReihungstestPunkte');
 
-	req.add('prestudent_id', AufnahmeTerminePrestudentID);
-
+	req.add('person_id', person_id);
+	req.add('reihungstest_id', reihungstest_id);
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
@@ -337,6 +340,11 @@ function AufnahmeTermineSpeichern()
 			alert(response)
 		else
 			alert(val.dbdml_errormsg)
+
+		document.getElementById('aufnahmetermine-textbox-rt_person_id').value=val.dbdml_data;
+		document.getElementById('aufnahmetermine-checkbox-neu').checked=false;
+		AufnahmeTermineLoadTree();
+
 		return false;
 	}
 	else

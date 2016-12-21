@@ -3765,13 +3765,13 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='getReihungstestPunkte')
 	{
 		//Liefert die Reihungstestpunkte eines Prestudenten
-		if(isset($_POST['prestudent_id']))
+		if(isset($_POST['person_id']) && isset($_POST['reihungstest_id']))
 		{
 			$pruefling = new pruefling();
 			if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
-				$data = $pruefling->getReihungstestErgebnis($_POST['prestudent_id'], true);
+				$data = $pruefling->getReihungstestErgebnisPerson($_POST['person_id'], true, $_POST['reihungstest_id']);
 			else
-				$data = $pruefling->getReihungstestErgebnis($_POST['prestudent_id']);
+				$data = $pruefling->getReihungstestErgebnisPerson($_POST['person_id'], false, $_POST['reihungstest_id']);
 			$return = true;
 		}
 		else
@@ -3906,7 +3906,25 @@ if(!$error)
 						$reihungstest->new=true;
 					}
 
-					$reihungstest->rt_id = $rt_id;
+					$warnung_zu_viele_teilnehmer = false;
+					if($reihungstest->reihungstest_id != $rt_id)
+					{
+						// Wenn ein neuer Reihungstesttermin ausgewählt wird, dann wird geprueft ob
+						// noch genuegend Platz vorhanden ist.
+						$rt_help = new reihungstest();
+						$aktuelle_anzahl = $rt_help->getTeilnehmerAnzahl($rt_id);
+						$rt_help->load($rt_id);
+						$max_teilnehmer = $rt_help->max_teilnehmer;
+						if($max_teilnehmer == '')
+						{
+							// Wenn keine Teilnehmer eingetragen sind, dann schauen welche Raeume zugeteilt
+							// sind und wie viel Platz dort ist
+							$max_teilnehmer = $rt_help->getPlatzAnzahlRaum($rt_id);
+						}
+						if($max_teilnehmer!='' && $aktuelle_anzahl >= $max_teilnehmer)
+							$warnung_zu_viele_teilnehmer = true;
+					}
+					$reihungstest->reihungstest_id = $rt_id;
 					$reihungstest->person_id = $person_id;
 					$reihungstest->punkte = $punkte;
 					$reihungstest->teilgenommen = $teilgenommen;
@@ -3920,6 +3938,13 @@ if(!$error)
 						$error = false;
 						$errormsg = 'Erfolgreich gespeichert';
 						$data = $reihungstest->rt_person_id;
+						if($warnung_zu_viele_teilnehmer)
+						{
+							$return = false;
+							$error = true;
+							$errormsg = 'Achtung - die Maximalanzahl der Teilnehmer wurde überschritten;'.
+							' Prüfen Sie ob genug Platz zur Verfügung steht - Zuteilung wurde erfolgreich gespeichert';
+						}
 					}
 					else
 					{

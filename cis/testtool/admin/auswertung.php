@@ -16,9 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *          Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>.
+ *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *		  Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>.
  */
 /**
  * Auswertung fuer den Reihungstest
@@ -39,18 +39,18 @@ $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('lehre/reihungstest'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
-	
+
 if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='prestudent')
 {
 	$search=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 	if (is_null($search) ||$search=='')
-		exit();	
-	$qry = "SELECT 
-				nachname, vorname, prestudent_id, student_uid, 
-				UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg, 
+		exit();
+	$qry = "SELECT
+				nachname, vorname, prestudent_id, student_uid,
+				UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg,
 				get_rolle_prestudent(prestudent_id, null) as status
-			FROM 
-				public.tbl_person 
+			FROM
+				public.tbl_person
 				JOIN public.tbl_prestudent USING(person_id)
 				JOIN public.tbl_studiengang USING(studiengang_kz)
 				LEFT JOIN public.tbl_student USING (prestudent_id)
@@ -61,7 +61,7 @@ if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='prestudent')
 				lower(vorname || ' ' || nachname) like '%".$db->db_escape(mb_strtolower($search))."%' OR
 				prestudent_id::text like '%".$db->db_escape(mb_strtolower($search))."%' OR
 				student_uid::text like '%".$db->db_escape(mb_strtolower($search))."%'
-				ORDER BY nachname,vorname,stg 
+				ORDER BY nachname,vorname,stg
 				LIMIT 10
 			";
 	if($result = $db->db_query($qry))
@@ -85,40 +85,40 @@ if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='prestudent')
 function sortByField($multArray,$sortField,$desc=true)
 {
 	$tmpKey='';
-    $ResArray=array();
+	$ResArray=array();
 
-    if(!is_array($multArray))
-    	return array();
-    
-    $maIndex=array_keys($multArray);
-    $maSize=count($multArray)-1;
+	if(!is_array($multArray))
+		return array();
 
-    for($i=0; $i < $maSize ; $i++)
-    {
-    	$minElement=$i;
-    	$tempMin=$multArray[$maIndex[$i]]->$sortField;
-    	$tmpKey=$maIndex[$i];
-    	for($j=$i+1; $j <= $maSize; $j++)
-    	{
-    		if($multArray[$maIndex[$j]]->$sortField < $tempMin )
-    		{
-   				$minElement=$j;
-    		    $tmpKey=$maIndex[$j];
-    		    $tempMin=$multArray[$maIndex[$j]]->$sortField;
-    		}
-    	}
-    	$maIndex[$minElement]=$maIndex[$i];
-    	$maIndex[$i]=$tmpKey;
-    }
+	$maIndex=array_keys($multArray);
+	$maSize=count($multArray)-1;
 
-    if($desc)
-    	for($j=0;$j<=$maSize;$j++)
-    		$ResArray[$maIndex[$j]]=$multArray[$maIndex[$j]];
-    else
-        for($j=$maSize;$j>=0;$j--)
-            $ResArray[$maIndex[$j]]=$multArray[$maIndex[$j]];
+	for($i=0; $i < $maSize ; $i++)
+	{
+		$minElement=$i;
+		$tempMin=$multArray[$maIndex[$i]]->$sortField;
+		$tmpKey=$maIndex[$i];
+		for($j=$i+1; $j <= $maSize; $j++)
+		{
+			if($multArray[$maIndex[$j]]->$sortField < $tempMin )
+			{
+				$minElement=$j;
+				$tmpKey=$maIndex[$j];
+				$tempMin=$multArray[$maIndex[$j]]->$sortField;
+			}
+		}
+		$maIndex[$minElement]=$maIndex[$i];
+		$maIndex[$i]=$tmpKey;
+	}
 
-    return $ResArray;
+	if($desc)
+		for($j=0;$j<=$maSize;$j++)
+			$ResArray[$maIndex[$j]]=$multArray[$maIndex[$j]];
+	else
+		for($j=$maSize;$j>=0;$j--)
+			$ResArray[$maIndex[$j]]=$multArray[$maIndex[$j]];
+
+	return $ResArray;
 }
 
 $ergebnis='';
@@ -158,18 +158,18 @@ $qry = "SELECT * FROM bis.tbl_zgv";
 if($result = $db->db_query($qry))
 	while($row = $db->db_fetch_object($result))
 		$zgv_arr[$row->zgv_code]=$row->zgv_kurzbz;
-		
+
 $zgvma_arr['']='';
 $qry = "SELECT * FROM bis.tbl_zgvmaster";
 if($result = $db->db_query($qry))
 	while($row = $db->db_fetch_object($result))
 		$zgvma_arr[$row->zgvmas_code]=$row->zgvmas_kurzbz;
-		
+
 // Reihungstests laden
 $sql_query="SELECT * FROM public.tbl_reihungstest WHERE date_part('year',datum)=date_part('year',now()) ORDER BY datum,uhrzeit";
 
 if(!($result=$db->db_query($sql_query)))
-    die($db->db_last_error());
+	die($db->db_last_error());
 
 while ($row=$db->db_fetch_object($result))
 {
@@ -187,32 +187,31 @@ if (isset($_REQUEST['reihungstest']))
 {
 	// Vorkommende Gebiete laden
 	$sql_query="
-		SELECT DISTINCT gebiet_id, gebiet, vw_auswertung_ablauf.reihung 
-		FROM 
-			testtool.vw_auswertung_ablauf 
-			JOIN public.tbl_prestudent USING(prestudent_id) 
+		SELECT DISTINCT gebiet_id, gebiet, vw_auswertung_ablauf.reihung
+		FROM
+			testtool.vw_auswertung_ablauf
+			JOIN public.tbl_prestudent USING(prestudent_id)
+			JOIN public.tbl_rt_person USING(person_id)
 			JOIN public.tbl_reihungstest ON(vw_auswertung_ablauf.reihungstest_id=tbl_reihungstest.reihungstest_id)
 			JOIN testtool.tbl_ablauf USING(gebiet_id)
 		WHERE 1=1";
 	if($reihungstest!='')
-		$sql_query.=" AND vw_auswertung_ablauf.reihungstest_id='".addslashes($reihungstest)."'";
+		$sql_query.=" AND vw_auswertung_ablauf.reihungstest_id=".$db->db_add_param($reihungstest, FHC_INTEGER);
 	if($datum_von!='')
-		$sql_query.=" AND tbl_reihungstest.datum>='$datum_von'";
+		$sql_query.=" AND tbl_reihungstest.datum>=".$db->db_add_param($datum_von);
 	if($datum_bis!='')
-		$sql_query.=" AND tbl_reihungstest.datum<='$datum_bis'";
+		$sql_query.=" AND tbl_reihungstest.datum<=".$db->db_add_param($datum_bis);
 	if($studiengang!='')
-		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($studiengang)."'";
+		$sql_query.=" AND tbl_prestudent.studiengang_kz=".$db->db_add_param($studiengang, FHC_INTEGER);
 	if($semester!='')
-		$sql_query.=" AND tbl_ablauf.semester='".addslashes($semester)."' AND tbl_ablauf.studiengang_kz=tbl_prestudent.studiengang_kz";
+		$sql_query.=" AND tbl_ablauf.semester=".$db->db_add_param($semester, FHC_INTEGER)." AND tbl_ablauf.studiengang_kz=tbl_prestudent.studiengang_kz";
 	if($prestudent_id!='')
-		$sql_query.=" AND prestudent_id='".addslashes($prestudent_id)."'";
-	
+		$sql_query.=" AND prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER);
+
 	$sql_query.=" ORDER BY vw_auswertung_ablauf.reihung, gebiet_id";
-	
-	//echo $sql_query;
-	
+
 	if(!($result=$db->db_query($sql_query)))
-	     die($db->db_last_error());
+		 die($db->db_last_error());
 	while ($row=$db->db_fetch_object($result))
 	{
 		if(!isset($gebiet[$row->gebiet_id]))
@@ -220,33 +219,33 @@ if (isset($_REQUEST['reihungstest']))
 		$gebiet[$row->gebiet_id]->name=$row->gebiet;
 		$gebiet[$row->gebiet_id]->gebiet_id=$row->gebiet_id;
 	}
-	
+
 	// Alle Personen und deren Ergebnisse laden
 	$sql_query="SELECT DISTINCT ON (pruefling_id,vw_auswertung_ablauf.gebiet_id)
 					*
 				FROM
-					testtool.vw_auswertung_ablauf 
+					testtool.vw_auswertung_ablauf
 					JOIN public.tbl_prestudent USING(prestudent_id)
 					JOIN public.tbl_reihungstest ON(vw_auswertung_ablauf.reihungstest_id=tbl_reihungstest.reihungstest_id)
 					JOIN testtool.tbl_ablauf ON(tbl_ablauf.gebiet_id=vw_auswertung_ablauf.gebiet_id)
 				WHERE 1=1 AND tbl_ablauf.studiengang_kz=tbl_prestudent.studiengang_kz";
 	if($reihungstest!='')
-		$sql_query.=" AND vw_auswertung_ablauf.reihungstest_id='".addslashes($reihungstest)."'";
+		$sql_query.=" AND vw_auswertung_ablauf.reihungstest_id=".$db->db_add_param($reihungstest, FHC_INTEGER);
 	if($datum_von!='')
-		$sql_query.=" AND tbl_reihungstest.datum>='$datum_von'";
+		$sql_query.=" AND tbl_reihungstest.datum>=".$db->db_add_param($datum_von);
 	if($datum_bis!='')
-		$sql_query.=" AND tbl_reihungstest.datum<='$datum_bis'";
+		$sql_query.=" AND tbl_reihungstest.datum<=".$db->db_add_param($datum_bis);
 	if($studiengang!='')
-		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($studiengang)."'";
+		$sql_query.=" AND tbl_prestudent.studiengang_kz=".$db->db_add_param($studiengang, FHC_INTEGER);
 	if($semester!='')
-		$sql_query.=" AND tbl_ablauf.semester='".addslashes($semester)."'";
+		$sql_query.=" AND tbl_ablauf.semester=".$db->db_add_param($semester, FHC_INTEGER);
 	if($prestudent_id!='')
-		$sql_query.=" AND prestudent_id='".addslashes($prestudent_id)."'";
-		
-	
+		$sql_query.=" AND prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER);
+
+
 	if(!($result=$db->db_query($sql_query)))
-	    die($db->db_last_error());
-	
+		die($db->db_last_error());
+
 	while ($row=$db->db_fetch_object($result))
 	{
 		if(!isset($ergebnis[$row->pruefling_id]))
@@ -276,54 +275,53 @@ if (isset($_REQUEST['reihungstest']))
 			$prozent=100;
 		else
 			$prozent = ($row->punkte/$row->maxpunkte)*100;
-			
+
 		if($row->punkte>=$row->maxpunkte)
 			$punkte=$row->maxpunkte;
 		else
-			$punkte=$row->punkte;			
-		
+			$punkte=$row->punkte;
+
 		$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->prozent=$prozent;
 		$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]->punkte=$punkte;
-		
+
 		if (isset($ergebnis[$row->pruefling_id]->gesamt))
 			$ergebnis[$row->pruefling_id]->gesamt+=$prozent*$row->gewicht;
 		else
 			$ergebnis[$row->pruefling_id]->gesamt=$prozent*$row->gewicht;
-			
+
 		if (isset($ergebnis[$row->pruefling_id]->gesamtpunkte))
 			$ergebnis[$row->pruefling_id]->gesamtpunkte+=$punkte;
 		else
 			$ergebnis[$row->pruefling_id]->gesamtpunkte=$punkte;
 	}
-	
+
 	$ergb=sortByField($ergebnis,'gesamt');
-	
+
 	// Vorkommende Kategorien laden
-	$sql_query="SELECT 
-					DISTINCT kategorie_kurzbz, 
-					(SELECT sum(punkte) FROM testtool.tbl_vorschlag JOIN testtool.tbl_frage USING(frage_id) 
-					 WHERE tbl_frage.kategorie_kurzbz=vw_auswertung_kategorie_semester.kategorie_kurzbz) as gesamtpunkte 
-				 FROM 
-				 	testtool.vw_auswertung_kategorie_semester 
+	$sql_query="SELECT
+					DISTINCT kategorie_kurzbz,
+					(SELECT sum(punkte) FROM testtool.tbl_vorschlag JOIN testtool.tbl_frage USING(frage_id)
+					 WHERE tbl_frage.kategorie_kurzbz=vw_auswertung_kategorie_semester.kategorie_kurzbz) as gesamtpunkte
+				 FROM
+				 	testtool.vw_auswertung_kategorie_semester
 				 	JOIN public.tbl_prestudent USING(prestudent_id)
 					JOIN public.tbl_reihungstest ON(vw_auswertung_kategorie_semester.reihungstest_id=tbl_reihungstest.reihungstest_id)
 				WHERE 1=1";
 	if($reihungstest!='')
-		$sql_query.=" AND vw_auswertung_kategorie_semester.reihungstest_id='".addslashes($reihungstest)."'";
+		$sql_query.=" AND vw_auswertung_kategorie_semester.reihungstest_id=".$db->db_add_param($reihungstest, FHC_INTEGER);
 	if($datum_von!='')
-		$sql_query.=" AND tbl_reihungstest.datum>='$datum_von'";
+		$sql_query.=" AND tbl_reihungstest.datum>=".$db->db_add_param($datum_von);
 	if($datum_bis!='')
-		$sql_query.=" AND tbl_reihungstest.datum<='$datum_bis'";
+		$sql_query.=" AND tbl_reihungstest.datum<=".$db->db_add_param($datum_bis);
 	if($studiengang!='')
-		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($studiengang)."'";
+		$sql_query.=" AND tbl_prestudent.studiengang_kz=".$db->db_add_param($studiengang, FHC_INTEGER);
 	if($prestudent_id!='')
-		$sql_query.=" AND vw_auswertung_kategorie_semester.prestudent_id='".addslashes($prestudent_id)."'";
+		$sql_query.=" AND vw_auswertung_kategorie_semester.prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER);
 
-		
 	if(!($result=$db->db_query($sql_query)))
-	    die($db->db_last_error());
+		die($db->db_last_error());
 	$gesamtpunkte=array();
-	
+
 	while ($row=$db->db_fetch_object($result))
 	{
 		if(!isset($kategorie[$row->kategorie_kurzbz]))
@@ -331,38 +329,38 @@ if (isset($_REQUEST['reihungstest']))
 		$gesamtpunkte[$row->kategorie_kurzbz]=$row->gesamtpunkte;
 		$kategorie[$row->kategorie_kurzbz]->name=$row->kategorie_kurzbz;
 	}
-	
+
 	// Ergebnisse laden
 	$sql_query="
-		SELECT 
-			vw_auswertung_kategorie_semester.*, 
-			(SELECT typ FROM testtool.tbl_kriterien 
-			 WHERE gebiet_id=vw_auswertung_kategorie_semester.gebiet_id AND punkte=vw_auswertung_kategorie_semester.punkte 
+		SELECT
+			vw_auswertung_kategorie_semester.*,
+			(SELECT typ FROM testtool.tbl_kriterien
+			 WHERE gebiet_id=vw_auswertung_kategorie_semester.gebiet_id AND punkte=vw_auswertung_kategorie_semester.punkte
 			 AND kategorie_kurzbz=vw_auswertung_kategorie_semester.kategorie_kurzbz) as typ,
 			tbl_prestudent.zgv_code, tbl_prestudent.zgvmas_code
-		FROM 
-			testtool.vw_auswertung_kategorie_semester 
+		FROM
+			testtool.vw_auswertung_kategorie_semester
 			JOIN public.tbl_prestudent USING(prestudent_id)
 			JOIN public.tbl_reihungstest ON(vw_auswertung_kategorie_semester.reihungstest_id=tbl_reihungstest.reihungstest_id)
 		WHERE 1=1";
 	if($reihungstest!='')
-		$sql_query.=" AND vw_auswertung_kategorie_semester.reihungstest_id='".addslashes($reihungstest)."'";
+		$sql_query.=" AND vw_auswertung_kategorie_semester.reihungstest_id=".$db->db_add_param($reihungstest, FHC_INTEGER);
 	if($datum_von!='')
-		$sql_query.=" AND tbl_reihungstest.datum>='$datum_von'";
+		$sql_query.=" AND tbl_reihungstest.datum>=".$db->db_add_param($datum_von);
 	if($datum_bis!='')
-		$sql_query.=" AND tbl_reihungstest.datum<='$datum_bis'";
+		$sql_query.=" AND tbl_reihungstest.datum<=".$db->db_add_param($datum_bis);
 	if($studiengang!='')
-		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($studiengang)."'";
+		$sql_query.=" AND tbl_prestudent.studiengang_kz=".$db->db_add_param($studiengang, FHC_INTEGER);
 	//if($semester!='')
-	//	$sql_query.=" AND vw_auswertung_kategorie_semester.semester='".addslashes($semester)."'"; Auskommentiert, damit bei der Persönlichkeitsauswertung kein Kandidat verloren geht 
+	//	$sql_query.=" AND vw_auswertung_kategorie_semester.semester='".addslashes($semester)."'"; Auskommentiert, damit bei der Persönlichkeitsauswertung kein Kandidat verloren geht
 	if($prestudent_id!='')
-		$sql_query.=" AND prestudent_id='".addslashes($prestudent_id)."'";
-	
+		$sql_query.=" AND prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER);
+
 	$sql_query.=" ORDER BY nachname, vorname";
-	
+
 	if(!($result=$db->db_query($sql_query)))
-	     die($db->db_last_error());
-	
+		 die($db->db_last_error());
+
 	while ($row=$db->db_fetch_object($result))
 	{
 		if(!isset($erg_kat[$row->pruefling_id]))
@@ -411,7 +409,7 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 	// Creating a worksheet
 	$titel_studiengang = (isset ($_REQUEST['studiengang']) && $_REQUEST['studiengang']!='');
 	$titel_semester = (isset ($_REQUEST['semester']) && $_REQUEST['semester']!='');
-	
+
 	$worksheet =& $workbook->addWorksheet("Technischer Teil "	.($titel_studiengang?$stg_arr[$_REQUEST['studiengang']]:'').($titel_semester?' '.$semester.'.Semester':''));
 	$worksheet->setInputEncoding('utf-8');
 	$worksheet->setZoom (85);
@@ -421,37 +419,37 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 	$format_bold->setAlign("center");
 	$format_bold->setFgColor(15);
 	$format_bold->setVAlign('vcenter');
-	
+
 	$format_bold_border =& $workbook->addFormat();
 	$format_bold_border->setBold();
 	$format_bold_border->setAlign("center");
 	$format_bold_border->setFgColor(15);
 	$format_bold_border->setBorder(1);
 	$format_bold_border->setBorderColor('white');
-	
+
 	$format_date =& $workbook->addFormat();
 	$format_date->setNumFormat('YYYY-MM-DD');
-	
+
 	$format_registriert =& $workbook->addFormat();
 	$format_registriert->setNumFormat('YYYY-MM-DD hh:mm:ss');
-	
+
 	$format_punkte =& $workbook->addFormat();
 	$format_punkte->setNumFormat('0.00');
-	
+
 	$format_punkte_rot =& $workbook->addFormat();
 	$format_punkte_rot->setNumFormat('0.00');
 	$format_punkte_rot->setColor ('22');
-	
+
 	$format_prozent =& $workbook->addFormat();
 	$format_prozent->setNumFormat('0.00%');
-	
+
 	$format_prozent_rot =& $workbook->addFormat();
 	$format_prozent_rot->setNumFormat('0.00%');
 	$format_prozent_rot->setColor ('22');
-	
+
 	$format_male =& $workbook->addFormat();
 	$format_male->setColor ('blue');
-	
+
 	$format_female =& $workbook->addFormat();
 	$format_female->setColor ('magenta');
 
@@ -491,39 +489,39 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 	$worksheet->write(0,++$spalte,'ZGV MA', $format_bold);
 	$worksheet->mergeCells(0,10,1,10);
 	$maxlength[10]=20;
-	
+
 	$spalte=9;
 	$zeile=0;
-	
+
 	foreach ($gebiet AS $gbt)
-	{		
+	{
 		++$spalte;
-		$worksheet->write($zeile,++$spalte,strip_tags($gbt->name), $format_bold_border);		
+		$worksheet->write($zeile,++$spalte,strip_tags($gbt->name), $format_bold_border);
 		$worksheet->mergeCells($zeile,$spalte,0,$spalte+1);
 		$maxlength[$spalte]=10;
 	}
 	$worksheet->write($zeile,++$spalte+1,'Gesamt', $format_bold_border);
 	$worksheet->mergeCells($zeile,++$spalte,0,$spalte+1);
 	$maxlength[$spalte]=12;
-	
+
 	$spalte=10;
 	$zeile=0;
-	
+
 	foreach ($gebiet AS $gbt)
-	{		
+	{
 		$worksheet->write($zeile+1,++$spalte,'Punkte', $format_bold_border);
-		$worksheet->write($zeile+1,++$spalte,'Prozent', $format_bold_border);		
+		$worksheet->write($zeile+1,++$spalte,'Prozent', $format_bold_border);
 		$maxlength[$spalte]=10;
 	}
 	$worksheet->write($zeile+1,++$spalte,'Punkte', $format_bold_border);
-	$worksheet->write($zeile+1,++$spalte,'Prozent', $format_bold_border);		
+	$worksheet->write($zeile+1,++$spalte,'Prozent', $format_bold_border);
 	$maxlength[$spalte]=10;
-	
+
 	$maxspalten=$spalte;
 
 	$zeile=1;
 	$spalte=0;
-	
+
 	if(isset($ergb))
 	{
 		foreach ($ergb AS $erg)
@@ -535,7 +533,7 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 			$worksheet->write($zeile,++$spalte,$erg->vorname);
 			$worksheet->write($zeile,++$spalte,$erg->gebdatum, $format_date);
 			if($erg->geschlecht=='m')
-				$worksheet->write($zeile,++$spalte,$erg->geschlecht, $format_male); 
+				$worksheet->write($zeile,++$spalte,$erg->geschlecht, $format_male);
 			else
 				$worksheet->write($zeile,++$spalte,$erg->geschlecht, $format_female);
 			$worksheet->write($zeile,++$spalte,$erg->registriert, $format_registriert);
@@ -556,27 +554,27 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 					else
 					$worksheet->writeNumber($zeile,++$spalte,$erg->gebiet[$gbt->gebiet_id]->prozent/100,$format_prozent_rot);
 				}
-				else 
+				else
 				{
 					$worksheet->write($zeile,++$spalte,'');
 					$worksheet->write($zeile,++$spalte,'');
-				}			
+				}
 			$worksheet->writeNumber($zeile,++$spalte,$erg->gesamtpunkte, $format_punkte);
 			$worksheet->writeNumber($zeile,++$spalte,$erg->gesamt, $format_punkte);
 		}
 	}
-						
+
 	//Die Breite der Spalten setzen
 	foreach($maxlength as $i=>$breite)
 		$worksheet->setColumn($i, $i, $breite);
-	
+
 	if(isset($erg_kat) && count($erg_kat)>0)
 	{
 	// Creating second worksheet
 	$worksheet2 =& $workbook->addWorksheet("Persoenlichkeit");
 	$worksheet2->setInputEncoding('utf-8');
 	$worksheet2->setZoom (85);
-	
+
 	$spalte=0;
 	$zeile=0;
 
@@ -614,33 +612,32 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 	$worksheet2->mergeCells(0,10,1,10);
 	$maxlength[10]=20;
 
-	
 	$spalte=9;
 	$zeile=0;
-	
+
 	foreach ($kategorie AS $gbt)
-	{		
+	{
 		++$spalte;
-		$worksheet2->write($zeile,++$spalte,$gbt->name, $format_bold_border);		
+		$worksheet2->write($zeile,++$spalte,$gbt->name, $format_bold_border);
 		$worksheet2->mergeCells($zeile,$spalte,0,$spalte+1);
 		$maxlength[$spalte]=10;
 	}
-	
+
 	$spalte=10;
 	$zeile=0;
-	
+
 	foreach ($kategorie AS $gbt)
-	{		
+	{
 		$worksheet2->write($zeile+1,++$spalte,'Punkte', $format_bold_border);
-		$worksheet2->write($zeile+1,++$spalte,'Typ', $format_bold_border);		
+		$worksheet2->write($zeile+1,++$spalte,'Typ', $format_bold_border);
 		$maxlength[$spalte]=10;
 	}
-	
+
 	$maxspalten=$spalte;
 
 	$zeile=1;
 	$spalte=0;
-	
+
 	foreach ($erg_kat AS $erg)
 	{
 		$zeile++;
@@ -650,7 +647,7 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 		$worksheet2->write($zeile,++$spalte,$erg->vorname);
 		$worksheet2->write($zeile,++$spalte,$erg->gebdatum, $format_date);
 		if($erg->geschlecht=='m')
-				$worksheet2->write($zeile,++$spalte,$erg->geschlecht, $format_male); 
+				$worksheet2->write($zeile,++$spalte,$erg->geschlecht, $format_male);
 			else
 				$worksheet2->write($zeile,++$spalte,$erg->geschlecht, $format_female);
 		$worksheet2->write($zeile,++$spalte,$erg->registriert, $format_registriert);
@@ -660,12 +657,12 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 		$worksheet2->write($zeile,++$spalte,$zgv_arr[$erg->zgv]);
 		$worksheet2->write($zeile,++$spalte,$zgvma_arr[$erg->zgvma]);
 		foreach ($kategorie AS $gbt)
-		{		
+		{
 			$worksheet2->write($zeile,++$spalte,$erg->kategorie[$gbt->name]->punkte);
 			$worksheet2->write($zeile,++$spalte,$erg->kategorie[$gbt->name]->typ);
 		}
 	}
-	
+
 	//Die Breite der Spalten setzen
 	foreach($maxlength as $i=>$breite)
 		$worksheet2->setColumn($i, $i, $breite);
@@ -676,23 +673,23 @@ else
 {
 	echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 	<html>
-	
+
 	<head>
 	<title>Testtool - Auswertung</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link type="text/css" rel="stylesheet" href="../../../skin/style.css.php">
 	<link href="../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-	<script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script> 	
+	<script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script>
 	<script type="text/javascript">
-	$(document).ready(function() 
-		{ 
-		    $( ".datepicker_datum" ).datepicker({
+	$(document).ready(function()
+		{
+			$( ".datepicker_datum" ).datepicker({
 					 changeMonth: true,
-					 changeYear: true, 
+					 changeYear: true,
 					 dateFormat: "dd.mm.yy",
 					 });
-	
-		    $("#prestudent").autocomplete({
+
+			$("#prestudent").autocomplete({
 				source: "auswertung.php?autocomplete=prestudent",
 				minLength:2,
 				response: function(event, ui)
@@ -713,14 +710,14 @@ else
 		});
 	</script>
 	</head>
-	
+
 	<body>
-	
+
 	<h1>Auswertung Reihungstest</h1>
 	<table width="100%">
 		<tr>
 			<form method="POST">
-			<td style="white-space:nowrap; padding: 10px; background-color: #EEE">				
+			<td style="white-space:nowrap; padding: 10px; background-color: #EEE">
 				Reihungstest w&auml;hlen:&nbsp;
 					<SELECT id="reihungstest" name="reihungstest">
 					<OPTION value="">-- keine Auswahl --</OPTION>';
@@ -738,12 +735,12 @@ else
 								$selected = 'selected';
 								$select = true;
 							}
-							else 
+							else
 								$selected = '';
-								
+
 							echo '<OPTION value="'.$rt->reihungstest_id.'" '.$selected.'>'.$rt->datum.' '.(isset($stg_arr[$rt->studiengang_kz])?$stg_arr[$rt->studiengang_kz]:'').' '.$rt->ort_kurzbz.' '.$rt->anmerkung."</OPTION>\n";
 						}
-						
+
 					echo '</SELECT>
 					<br /><hr style="color: #B3B3B3; background-color: #B3B3B3; border:none;">
 				Studiengang:
@@ -753,24 +750,24 @@ else
 						{
 							if(isset($_REQUEST['studiengang']) && $_REQUEST['studiengang']==$kz && $_REQUEST['studiengang']!='')
 								$selected='selected';
-							else 
+							else
 								$selected='';
-							
+
 							echo '<OPTION value="'.$kz.'" '.$selected.'>'.$kurzbz.'</OPTION>';
 						}
 						echo '</SELECT>
 				Semester:
 					<SELECT name="semester">
-						<OPTION value="">Alle</OPTION>';			
+						<OPTION value="">Alle</OPTION>';
 						for ($i=1;$i<9;$i++)
 						{
 							if (isset($semester) && $semester==$i)
 								echo "<option value=\"$i\" selected>$i</option>";
 							else
 								echo "<option value=\"$i\">$i</option>";
-						}				
+						}
 						echo '</SELECT>';
-					
+
 						echo ' von Datum: <INPUT class="datepicker_datum" type="text" name="datum_von" maxlength="10" size="10" value="'.$datum_obj->formatDatum($datum_von, 'd.m.Y').'" />&nbsp;';
 						echo 'bis Datum: <INPUT class="datepicker_datum" type="text" name="datum_bis" maxlength="10" size="10" value="'.$datum_obj->formatDatum($datum_bis, 'd.m.Y').'" /><br />';
 						echo '<hr style="color: #B3B3B3; background-color: #B3B3B3; border:none;">';
@@ -797,93 +794,93 @@ else
 			echo ' bis '.$datum_obj->formatDatum($datum_bis, 'd.m.Y');
 		if ($prestudent_id!='')
 			echo ' PrestudentID: '.$prestudent_id;
-			
+
 		echo '</strong>';
 		echo '</td>
 		<td style="padding: 5px; background-color: #EEE";">
 		<a href="auswertung.php?studiengang='.$studiengang.'&semester='.$semester.'&datum_von='.$datum_von.'&datum_bis='.$datum_bis.'&prestudent_id='.$prestudent_id.'&reihungstest='.$reihungstest.'&format=xls"><img src="../../../skin/images/xls_icon.png" alt="Excel Icon"> Export</a>
 		</td></tr>
 	</table><br />';
-	
+
 	if (isset($_REQUEST['reihungstest']))
 	{
-	
+
 		echo '<h1>Technischer Teil</h1>
-		
+
 		<table id="zeitsperren">
-		  <tr>
+			<tr>
 				<th rowspan="2">PrestudentIn_ID</th><th rowspan="2">Nachname</th><th rowspan="2">Vornamen</th>
 				<th rowspan="2">GebDatum</th><th rowspan="2">G</th>
 				<th rowspan="2">ZGV</th>
 				<th rowspan="2">ZGV MA</th>
 				<th rowspan="2">Registriert</th><th rowspan="2">STG</th><th rowspan="2">Studiengang</th><th title="Semester" rowspan="2">S</th>';
-		
+
 				foreach ($gebiet AS $gbt)
 					echo '<th colspan="2">'.$gbt->name.'</th>';
-		
+
 				echo '<th colspan="2">Gesamt</th>
-		  </tr>
-		   <tr>';
-		
+			</tr>
+			<tr>';
+
 				foreach ($gebiet AS $gbt)
 					echo "<th><small>Punkte</small></th><th><small>Prozent</small></th>";
-		
+
 				echo '<th><small>Punkte</small></th><th><small>Prozent</small></th>
-		  </tr>';
-		
-		  if(isset($ergb))
-		  {
-		  	foreach ($ergb AS $erg)
-		  	{
-		  		echo "<tr><td>$erg->prestudent_id [<a href=auswertung_detail_prestudent.php?prestudent_id=$erg->prestudent_id target='blank'>Detail</a>]</td><td>$erg->nachname</td><td>$erg->vorname</td><td>$erg->gebdatum</td><td>$erg->geschlecht</td>
-		  				<td>".$zgv_arr[$erg->zgv]."</td><td>".$zgvma_arr[$erg->zgvma]."</td><td>$erg->registriert</td><td>$erg->stg_kurzbz</td><td>$erg->stg_bez</td><td>$erg->semester</td>";
-		  		//<td>$erg->idnachweis</td>
-		  		foreach ($gebiet AS $gbt)
-		  			if (isset($erg->gebiet[$gbt->gebiet_id]))
+		</tr>';
+
+		if(isset($ergb))
+		{
+			foreach ($ergb AS $erg)
+			{
+				echo "<tr><td>$erg->prestudent_id [<a href=auswertung_detail_prestudent.php?prestudent_id=$erg->prestudent_id target='blank'>Detail</a>]</td><td>$erg->nachname</td><td>$erg->vorname</td><td>$erg->gebdatum</td><td>$erg->geschlecht</td>
+						<td>".$zgv_arr[$erg->zgv]."</td><td>".$zgvma_arr[$erg->zgvma]."</td><td>$erg->registriert</td><td>$erg->stg_kurzbz</td><td>$erg->stg_bez</td><td>$erg->semester</td>";
+				//<td>$erg->idnachweis</td>
+				foreach ($gebiet AS $gbt)
+					if (isset($erg->gebiet[$gbt->gebiet_id]))
 						if ($erg->gebiet[$gbt->gebiet_id]->punkte!='' && $erg->gebiet[$gbt->gebiet_id]->punkte!='0')
-		  					echo '<td>'.number_format($erg->gebiet[$gbt->gebiet_id]->punkte,2,',',' ').'</td><td nowrap>'.number_format($erg->gebiet[$gbt->gebiet_id]->prozent,2,',',' ').' %</td>';
-		  				else 
-		  					echo '<td style="color:#C10000">'.number_format($erg->gebiet[$gbt->gebiet_id]->punkte,2,',',' ').'</td><td style="color:#C10000" nowrap>'.number_format($erg->gebiet[$gbt->gebiet_id]->prozent,2,',',' ').' %</td>';
+							echo '<td>'.number_format($erg->gebiet[$gbt->gebiet_id]->punkte,2,',',' ').'</td><td nowrap>'.number_format($erg->gebiet[$gbt->gebiet_id]->prozent,2,',',' ').' %</td>';
+						else
+							echo '<td style="color:#C10000">'.number_format($erg->gebiet[$gbt->gebiet_id]->punkte,2,',',' ').'</td><td style="color:#C10000" nowrap>'.number_format($erg->gebiet[$gbt->gebiet_id]->prozent,2,',',' ').' %</td>';
 					else
 						echo '<td></td><td></td>';
 				echo '<td>'.number_format($erg->gesamtpunkte,2,',',' ').'</td>';
 				echo '<td>'.number_format($erg->gesamt,2,',',' ').'</td>';
-		  		echo '</tr>';
-		  	}
-		  }
-		
+				echo '</tr>';
+			}
+		}
+
 		echo '</table>
-		
+
 		<h1>Persönlichkeit</h1>
-		
+
 		<table id="zeitsperren">
-		  <tr>
+			<tr>
 				<th rowspan="2">PrestudentID</th><th rowspan="2">Nachname</th><th rowspan="2">Vornamen</th>
 				<th rowspan="2">GebDatum</th><th rowspan="2">G</th>
 				<th rowspan="2">ZGV</th>
 				<th rowspan="2">ZGV MA</th>
 				<th rowspan="2">Registriert</th><th rowspan="2">STG</th><th rowspan="2">Studiengang</th><th rowspan="2">S</th>';
-		
+
 				foreach ($kategorie AS $gbt)
 					echo '<th colspan="2">'.$gbt->name.'</th>';
-		
+
 			echo '</tr><tr>';
-		
+
 				foreach ($kategorie AS $gbt)
 					echo '<th><small>Punkte</small></th><th><small>Typ</small>';
-					
+
 			echo '</th></tr>';
-		
-		   	foreach ($erg_kat AS $erg)
-		  	{
-		  		echo "<tr><td>$erg->prestudent_id</td><td>$erg->nachname</td><td>$erg->vorname</td><td>$erg->gebdatum</td><td>$erg->geschlecht</td>
-		  					<td>".$zgv_arr[$erg->zgv]."</td><td>".$zgvma_arr[$erg->zgvma]."</td><td>$erg->registriert</td><td>$erg->stg_kurzbz</td><td>$erg->stg_bez</td><td>$erg->semester</td>";
-		  		//<td>$erg->idnachweis</td>
-		  		foreach ($kategorie AS $gbt)
+
+			foreach ($erg_kat AS $erg)
+			{
+				echo "<tr><td>$erg->prestudent_id</td><td>$erg->nachname</td><td>$erg->vorname</td><td>$erg->gebdatum</td><td>$erg->geschlecht</td>
+							<td>".$zgv_arr[$erg->zgv]."</td><td>".$zgvma_arr[$erg->zgvma]."</td><td>$erg->registriert</td><td>$erg->stg_kurzbz</td><td>$erg->stg_bez</td><td>$erg->semester</td>";
+				//<td>$erg->idnachweis</td>
+				foreach ($kategorie AS $gbt)
 					echo '<td>'.$erg->kategorie[$gbt->name]->punkte.'</td><td>'.$erg->kategorie[$gbt->name]->typ.'</td>';
-		  		echo '</tr>';
-		  	}
-		
+				echo '</tr>';
+			}
+
 		echo '</table>';
 	}
 }

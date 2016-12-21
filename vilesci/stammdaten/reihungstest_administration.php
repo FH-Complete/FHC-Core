@@ -15,13 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
+ *			Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *			Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
+ *			Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 require_once('../../config/vilesci.config.inc.php');
-require_once('../../config/global.config.inc.php');			
+require_once('../../config/global.config.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/functions.inc.php');
@@ -32,8 +32,8 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/reihungstest.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/log.class.php');
-	
-//	Studiengang lesen 
+
+//	Studiengang lesen
 $s=new studiengang();
 $s->getAll('typ, kurzbz', false);
 $studiengang=$s->result;
@@ -47,13 +47,13 @@ if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='prestudent')
 {
 	$search=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 	if (is_null($search) ||$search=='')
-		exit();	
-	$qry = "SELECT 
+		exit();
+	$qry = "SELECT
 				nachname, vorname, prestudent_id,
-				UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg, 
+				UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg,
 				get_rolle_prestudent(prestudent_id, null) as status
-			FROM 
-				public.tbl_person 
+			FROM
+				public.tbl_person
 				JOIN public.tbl_prestudent USING(person_id)
 				JOIN public.tbl_studiengang USING(studiengang_kz)
 			WHERE
@@ -78,7 +78,7 @@ if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='prestudent')
 	}
 	exit;
 }
-	
+
 $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
@@ -95,50 +95,50 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www
 		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 		<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
 		<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 				$("#t1").tablesorter(
 					{
 						sortList: [[1,0],[3,0]],
 						widgets: ["zebra"]
-					}); 
+					});
 				$("#t2").tablesorter(
 					{
 						sortList: [[6,0],[5,0]],
 						widgets: ["zebra"]
-					}); 
+					});
 				$("#t3").tablesorter(
 					{
 						sortList: [[0,0],[1,0],[3,0]],
 						widgets: ["zebra"]
-					}); 
+					});
 				$("#t4").tablesorter(
 					{
 						sortList: [[2,0],[3,0]],
 						widgets: ["zebra"],
 						headers: {5:{sorter:false}}
-					}); 
-		
+					});
+
 				$(".prestudent_option").click(function ()
 				{
 					var elementExists = document.getElementById("input_prestudent");
 					var e = document.getElementById("pruefling_select");
 					var strUser = e.options[e.selectedIndex].value;
-					if (elementExists != null) 
+					if (elementExists != null)
 					{
 						elementExists.value=strUser;
 					}
 					$(this).closest("form").submit();
 				});
-				
+
 				$("#prestudent_input").click(function ()
 				{
 					$(this).closest("form").submit();
 				});
-				
+
 			});
 		</script>
-		
+
 	</head>
 	<body class="Background_main">
 	<h2>Reihungstest - Administration</h2>';
@@ -150,24 +150,48 @@ if(isset($_POST['personzuteilen']))
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'sui'))
 		die('<span class="error">Sie haben keine Berechtigung für diese Aktion. <a href="reihungstest_administration.php">Seite neu laden</a></span>');
-	
+
 	$prestudent = new prestudent();
 	if($prestudent->load($_POST['prestudent_id']))
 	{
-		$prestudent->reihungstest_id=$_POST['reihungstest_id'];
-		$prestudent->new=false;
-		if($prestudent->save())
-			echo '<span class="ok">Zuteilung gespeichert</span>';
+		$rt_obj = new reihungstest();
+		if($rt_obj->getPersonReihungstest($prestudent->person_id, $_POST['reihungstest_id'])===false)
+		{
+			$rt_obj = new reihungstest();
+
+			$prestudent->getLastStatus($prestudent->prestudent_id, '', 'Interessent');
+
+			if($prestudent->studienplan_id!='')
+			{
+				$rt_obj->person_id=$prestudent->person_id;
+				$rt_obj->reihungstest_id=$_POST['reihungstest_id'];
+				$rt_obj->studienplan_id=$prestudent->studienplan_id;
+				$rt_obj->anmeldedatum = date('Y-m-d');
+				$rt_obj->teilgenommen = false;
+				$rt_obj->ort_kurzbz = null;
+				$rt_obj->punkte = null;
+
+				if($rt_obj->savePersonReihungstest())
+					echo '<span class="ok">Zuteilung gespeichert</span>';
+				else
+					echo '<span class="error">Fehler beim Speichern der Zuteilung</span>';
+			}
+			else
+			{
+				echo '<span class="error">Interessent ist keinen Studienplan zugeordnet</span>';
+			}
+		}
 		else
-			echo '<span class="error">Fehler beim Speichern der Zuteilung</span>';
+			echo '<span class="error">Person ist bereits zugeteilt</span>';
+
 	}
 	else
 	{
 		echo '<span class="error">Fehler beim Laden des Prestudenten</span>';
-	}	
+	}
 }
 //Links
-echo '<br><a href="'.CIS_ROOT.'cis/testtool/admin/auswertung.php" target="blank">Auswertung</a> | 
+echo '<br><a href="'.CIS_ROOT.'cis/testtool/admin/auswertung.php" target="blank">Auswertung</a> |
 	<a href="'.CIS_ROOT.'cis/testtool/admin/index.php" target="blank">Fragenadministration</a> |
 	<a href="'.CIS_ROOT.'cis/testtool/admin/uebersichtFragen.php" target="blank">Fragenkatalog</a><br>
 	<hr>';
@@ -176,11 +200,20 @@ echo '<br><a href="'.$_SERVER['PHP_SELF'].'?action=showreihungstests">Anzeigen d
 
 if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 {
-	$qry = "SELECT kurzbzlang,datum,ort_kurzbz,anmerkung,uhrzeit,max_teilnehmer,insertvon,reihungstest_id, 
-			(SELECT count(*) FROM public.tbl_prestudent WHERE reihungstest_id=tbl_reihungstest.reihungstest_id) as anzahl_teilnehmer
+	$qry = "SELECT
+				kurzbzlang,
+				datum,
+				anmerkung,
+				uhrzeit,
+				max_teilnehmer,
+				insertvon,
+				reihungstest_id,
+				array_to_string(ARRAY(SELECT ort_kurzbz FROM public.tbl_rt_ort WHERE rt_id=tbl_reihungstest.reihungstest_id),',') as orte,
+				(SELECT count(*) FROM public.tbl_rt_person
+				WHERE rt_id=tbl_reihungstest.reihungstest_id) as anzahl_teilnehmer
 			FROM public.tbl_reihungstest JOIN public.tbl_studiengang USING (studiengang_kz)
 			WHERE datum>=CURRENT_DATE ORDER BY datum";
-	
+
 	if($result = $db->db_query($qry))
 	{
 		echo '<table id="t1" class="tablesorter">
@@ -188,7 +221,7 @@ if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 					<tr>
 						<th>Kurzbz</th>
 						<th>Datum</th>
-						<th>Ort</th>
+						<th>Orte</th>
 						<th>Uhrzeit</th>
 						<th>Teilnehmer</th>
 						<th>Max-Teilnehmer</th>
@@ -203,7 +236,7 @@ if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 			echo '<tr>';
 			echo "<td>$row->kurzbzlang</td>";
 			echo "<td>".$datum_obj->formatDatum($row->datum,'d.m.Y')."</td>";
-			echo "<td>$row->ort_kurzbz</td>";
+			echo "<td>$row->orte</td>";
 			echo "<td>$row->uhrzeit</td>";
 			echo "<td>$row->anzahl_teilnehmer</td>";
 			echo "<td ".($row->anzahl_teilnehmer>$row->max_teilnehmer?"style='color: red; font-weight: bold'":"").">$row->max_teilnehmer</td>";
@@ -219,14 +252,12 @@ if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 // Antworten eines Gebietes einer Person löschen und einen Logfile-Eintrag mit Undo-Befehl erstellen
 if(isset($_POST['prestudent']) && is_numeric($_POST['prestudent']))
 	$prestudent_id = $_POST['prestudent'];
-else 
+else
 	$prestudent_id = '';
 
 $ps=new prestudent();
 $datum=date('Y-m-d');
-$ps->getPrestudentRT($datum,true);
-if ($ps->num_rows==0)
-	$ps->getPrestudentRT($datum);
+$ps->getPrestudentRT($datum);
 
 $prestudent_arr = array();
 //Array mit Dropdownwerten befüllen
@@ -261,7 +292,7 @@ if($prestudent_id!='' && !in_array($prestudent_id, $prestudent_arr))
 
 if ($prestudent_id!='' && $prestudent_id!='-1')
 {
-	$qry = "SELECT DISTINCT(tbl_gebiet.gebiet_id),tbl_gebiet.bezeichnung,tbl_gebiet.kurzbz FROM testtool.tbl_gebiet 
+	$qry = "SELECT DISTINCT(tbl_gebiet.gebiet_id),tbl_gebiet.bezeichnung,tbl_gebiet.kurzbz FROM testtool.tbl_gebiet
 			JOIN testtool.tbl_ablauf USING (gebiet_id)
 			JOIN public.tbl_prestudent USING (studiengang_kz)
 			WHERE tbl_prestudent.prestudent_id = ".$prestudent_id."
@@ -283,7 +314,7 @@ if($result = $db->db_query($qry))
 			$selected='selected';
 		else
 			$selected='';
-			
+
 		echo "<OPTION  value='$row->gebiet_id' $selected>$row->bezeichnung ($row->kurzbz)</OPTION>";
 	}
 	echo '</SELECT>';
@@ -294,8 +325,8 @@ if(isset($_POST['deleteteilgebiet']))
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
 		die('<span class="error">Sie haben keine Berechtigung für diese Aktion. <a href="reihungstest_administration.php">Seite neu laden</a></span>');
-	
-	if(isset($_POST['prestudent']) && isset($_POST['gebiet']) && 
+
+	if(isset($_POST['prestudent']) && isset($_POST['gebiet']) &&
 	   is_numeric($_POST['prestudent']) && is_numeric($_POST['gebiet']))
 	{
 		$pruefling = new pruefling();
@@ -306,11 +337,11 @@ if(isset($_POST['deleteteilgebiet']))
 		//UNDO Befehl zusammenbauen und Log schreiben
 		$undo='';
 		$db->db_query('BEGIN;');
-		
+
 		$qry = "SELECT * FROM testtool.tbl_pruefling_frage WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id, FHC_INTEGER)." AND
 				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($_POST['gebiet']).");
 				";
-		
+
 		if($db->db_query($qry))
 		{
 			while($row = $db->db_fetch_object())
@@ -324,19 +355,19 @@ if(isset($_POST['deleteteilgebiet']))
 						$db->db_add_param($row->endtime).');';
 			}
 		}
-		else 
+		else
 		{
 			$db->errormsg = 'Fehler beim Erstellen des UNDO Befehls fuer testtool.tbl_pruefling_frage';
 			$db->db_query('ROLLBACK');
 			return false;
 		}
-		
-		$qry = "SELECT * FROM testtool.tbl_antwort 
-				WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id)." AND 
-				vorschlag_id IN (SELECT vorschlag_id FROM testtool.tbl_vorschlag WHERE frage_id IN 
+
+		$qry = "SELECT * FROM testtool.tbl_antwort
+				WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id)." AND
+				vorschlag_id IN (SELECT vorschlag_id FROM testtool.tbl_vorschlag WHERE frage_id IN
 				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($_POST['gebiet'])."));
 				";
-		
+
 		if($db->db_query($qry))
 		{
 			while($row = $db->db_fetch_object())
@@ -347,7 +378,7 @@ if(isset($_POST['deleteteilgebiet']))
 						$db->db_add_param($row->vorschlag_id, FHC_INTEGER).');';
 			}
 		}
-		else 
+		else
 		{
 			$db->errormsg = 'Fehler beim Erstellen des UNDO Befehls fuer testtool.tbl_antwort';
 			$db->db_query('ROLLBACK');
@@ -356,17 +387,17 @@ if(isset($_POST['deleteteilgebiet']))
 		//Gebiet loeschen
 		$qry = "DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=".$db->db_add_param($pruefling->pruefling_id, FHC_INTEGER)." AND
 				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($_POST['gebiet']).");
-				
-				DELETE FROM testtool.tbl_antwort 
-				WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id)." AND 
-				vorschlag_id IN (SELECT vorschlag_id FROM testtool.tbl_vorschlag WHERE frage_id IN 
+
+				DELETE FROM testtool.tbl_antwort
+				WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id)." AND
+				vorschlag_id IN (SELECT vorschlag_id FROM testtool.tbl_vorschlag WHERE frage_id IN
 				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($_POST['gebiet'])."));";
-		
+
 		if($result = $db->db_query($qry))
 		{
 			//Log schreiben
 			$log = new log();
-			
+
 			$log->new = true;
 			$log->sql = $qry;
 			$log->sqlundo = $undo;
@@ -380,17 +411,17 @@ if(isset($_POST['deleteteilgebiet']))
 				$db->db_query('ROLLBACK');
 				return false;
 			}
-			
+
 			$db->db_query('COMMIT;');
 			echo '<b>'.$db->db_affected_rows($result).' Antworten wurden gelöscht</b>';
 		}
-		else 
+		else
 		{
 			$db->errormsg = 'Fehler beim Loeschen der Daten';
 			$db->db_query('ROLLBACK');
 		}
 	}
-	else 
+	else
 		echo '<span class="error">Wählen Sie bitte ein Gebiet, dessen Antworten Sie löschen wollen</span>';
 }
 
@@ -399,21 +430,21 @@ echo '<input type="submit" value="! Alle Teilgebiete l&ouml;schen !" name="delet
 // Alle Antworten aller Gebiete einer Person löschen und einen Logfile-Eintrag mit Undo-Befehl erstellen
 if(isset($_POST['delete_all']))
 {
-	if(isset($_POST['prestudent']) && isset($_POST['gebiet']) && 
+	if(isset($_POST['prestudent']) && isset($_POST['gebiet']) &&
 	   is_numeric($_POST['prestudent']) && ($_POST['gebiet'])=='alle')
 	{
 		$pruefling = new pruefling();
 		$pruefling->getPruefling($_POST['prestudent']);
 		if($pruefling->pruefling_id=='')
 			die('Pruefling wurde nicht gefunden');
-	
+
 		//UNDO Befehl zusammenbauen und Log schreiben
 		$undo='';
 		$db->db_query('BEGIN;');
-		
+
 		$qry = "SELECT * FROM testtool.tbl_pruefling_frage where pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";
 				";
-		
+
 		if($db->db_query($qry))
 		{
 			while($row = $db->db_fetch_object())
@@ -427,16 +458,16 @@ if(isset($_POST['delete_all']))
 						$db->db_add_param($row->endtime).');';
 			}
 		}
-		else 
+		else
 		{
 			$db->errormsg = 'Fehler beim Erstellen des UNDO Befehls fuer testtool.tbl_pruefling_frage';
 			$db->db_query('ROLLBACK');
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM testtool.tbl_antwort WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";
 				";
-		
+
 		if($db->db_query($qry))
 		{
 			while($row = $db->db_fetch_object())
@@ -447,7 +478,7 @@ if(isset($_POST['delete_all']))
 						$db->db_add_param($row->vorschlag_id, FHC_INTEGER).');';
 			}
 		}
-		else 
+		else
 		{
 			$db->errormsg = 'Fehler beim Erstellen des UNDO Befehls fuer testtool.tbl_antwort';
 			$db->db_query('ROLLBACK');
@@ -456,12 +487,12 @@ if(isset($_POST['delete_all']))
 		//Gebiet loeschen
 		$qry = "DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";
 				DELETE FROM testtool.tbl_antwort WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";";
-		
+
 		if($result = $db->db_query($qry))
 		{
 			//Log schreiben
 			$log = new log();
-			
+
 			$log->new = true;
 			$log->sql = $qry;
 			$log->sqlundo = $undo;
@@ -475,17 +506,17 @@ if(isset($_POST['delete_all']))
 				$db->db_query('ROLLBACK');
 				return false;
 			}
-			
+
 			$db->db_query('COMMIT;');
 			echo '<b> Alle '.$db->db_affected_rows($result).' Antworten wurden gelöscht</b>';
 		}
-		else 
+		else
 		{
 			$db->errormsg = 'Fehler beim Loeschen der Daten';
 			$db->db_query('ROLLBACK');
 		}
 	}
-	else 
+	else
 		echo '<span class="error">Um alle Antworten eines Prüflings zu löschen, wählen Sie im DropDown bitte "Alle Gebiete" aus</span>';
 }
 
@@ -552,12 +583,12 @@ if(isset($_GET['action']) && $_GET['action']=='deletedummyanswers')
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
 		die('<span class="error">Sie haben keine Berechtigung für diese Aktion. <a href="reihungstest_administration.php">Seite neu laden</a></span>');
-		
+
 	$qry = "DELETE FROM testtool.tbl_antwort WHERE pruefling_id=(SELECT pruefling_id FROM testtool.tbl_pruefling WHERE prestudent_id=".$db->db_add_param(PRESTUDENT_ID_DUMMY_STUDENT).");
 			DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=(SELECT pruefling_id FROM testtool.tbl_pruefling WHERE prestudent_id=".$db->db_add_param(PRESTUDENT_ID_DUMMY_STUDENT).");";
 	if($db->db_query($qry))
 		echo ' <b>Antworten wurden gelöscht</b>';
-	else 
+	else
 		echo ' <b>Fehler beim Löschen der Antworten</b>';
 }
 
@@ -567,12 +598,12 @@ if(isset($_POST['savedummystg']) && isset($_POST['stg']))
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'su'))
 		die('<span class="error">Sie haben keine Berechtigung für diese Aktion. <a href="reihungstest_administration.php">Seite neu laden</a></span>');
-		
+
 	$qry = "UPDATE public.tbl_prestudent SET studiengang_kz=".$db->db_add_param($_POST['stg'])." WHERE prestudent_id=".$db->db_add_param(PRESTUDENT_ID_DUMMY_STUDENT).";
-	UPDATE testtool.tbl_pruefling SET studiengang_kz=".$db->db_add_param($_POST['stg'])." WHERE prestudent_id=".$db->db_add_param(PRESTUDENT_ID_DUMMY_STUDENT).";";	
+	UPDATE testtool.tbl_pruefling SET studiengang_kz=".$db->db_add_param($_POST['stg'])." WHERE prestudent_id=".$db->db_add_param(PRESTUDENT_ID_DUMMY_STUDENT).";";
 	if($db->db_query($qry))
 		echo '<b>Studiengang geändert!</b><br>';
-	else 
+	else
 		echo '<b>Fehler beim Ändern des Studienganges!</b><br>';
 }
 $name='';
@@ -586,7 +617,7 @@ if($result = $db->db_query($qry))
 		$dummystg=$row->studiengang_kz;
 	}
 }
-echo '<form action="'.$_SERVER['PHP_SELF'].'" METHOD="POST">Studiengang von '.$name.' 
+echo '<form action="'.$_SERVER['PHP_SELF'].'" METHOD="POST">Studiengang von '.$name.'
 	<SELECT name="stg">';
 $stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz');
@@ -625,28 +656,28 @@ echo '</SELECT>
 <input type="submit" value="zuteilen" name="personzuteilen">
 </form>';
 echo "<script type='text/javascript'>
-function formatItem(row) 
-{
-    return row[0] + ' ' + row[1] + ' ' + row[2] + ' ' + row[3];
-}	
-$('#prestudent_name').autocomplete({
-			source: 'reihungstest_administration.php?autocomplete=prestudent',
-			minLength:2,
-			response: function(event, ui)
+	function formatItem(row)
+	{
+		return row[0] + ' ' + row[1] + ' ' + row[2] + ' ' + row[3];
+	}
+	$('#prestudent_name').autocomplete({
+		source: 'reihungstest_administration.php?autocomplete=prestudent',
+		minLength:2,
+		response: function(event, ui)
+		{
+			//Value und Label fuer die Anzeige setzen
+			for(i in ui.content)
 			{
-				//Value und Label fuer die Anzeige setzen
-				for(i in ui.content)
-				{
-					ui.content[i].value=ui.content[i].vorname+' '+ui.content[i].nachname+' '+ui.content[i].stg+' '+ui.content[i].status+' '+ui.content[i].prestudent_id;
-					ui.content[i].label=ui.content[i].vorname+' '+ui.content[i].nachname+' '+ui.content[i].stg+' '+ui.content[i].status+' '+ui.content[i].prestudent_id;
-				}
-			},
-			select: function(event, ui)
-			{
-				//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
-				$('#prestudent_id').val(ui.item.prestudent_id);
+				ui.content[i].value=ui.content[i].vorname+' '+ui.content[i].nachname+' '+ui.content[i].stg+' '+ui.content[i].status+' '+ui.content[i].prestudent_id;
+				ui.content[i].label=ui.content[i].vorname+' '+ui.content[i].nachname+' '+ui.content[i].stg+' '+ui.content[i].status+' '+ui.content[i].prestudent_id;
 			}
-			});
+		},
+		select: function(event, ui)
+		{
+			//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
+			$('#prestudent_id').val(ui.item.prestudent_id);
+		}
+	});
 </script>";
 
 
@@ -680,11 +711,11 @@ for ($i=0;$i<9;$i++)
 		echo "<option value=\"$i\" selected>$i</option>";
 	else
 		echo "<option value=\"$i\">$i</option>";
-}		
+}
 echo '</SELECT>';
 echo '&nbsp;&nbsp;<input type="submit" name="show" value="OK"></form><br>';
 
-$qry="SELECT 
+$qry="SELECT
 		UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg,
 		semester,
 		studiengang_kz,
@@ -701,22 +732,22 @@ $qry="SELECT
 		level_sprung_ab,
 		levelgleichverteilung,
 		maxpunkte,
-		antwortenprozeile, 
+		antwortenprozeile,
 		(SELECT SUM (zeit) AS sum FROM testtool.tbl_gebiet JOIN testtool.tbl_ablauf USING (gebiet_id) WHERE studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
-		if ($semester!='') 
-			$qry.=" AND semester=".$db->db_add_param($semester, FHC_INTEGER);				
+		if ($semester!='')
+			$qry.=" AND semester=".$db->db_add_param($semester, FHC_INTEGER);
 		$qry.="	) AS gesamtzeit,
 		(SELECT SUM (zeit) AS sum FROM testtool.tbl_gebiet JOIN testtool.tbl_ablauf USING (gebiet_id) WHERE studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
-		if ($semester!='') 
-			$qry.=" AND semester=".$db->db_add_param($semester, FHC_INTEGER);				
+		if ($semester!='')
+			$qry.=" AND semester=".$db->db_add_param($semester, FHC_INTEGER);
 		$qry.="	)-'00:40:00'::time without time zone AS gesamtzeit_persoenlichkeit
-		FROM testtool.tbl_ablauf 
-		JOIN testtool.tbl_gebiet USING (gebiet_id) 
+		FROM testtool.tbl_ablauf
+		JOIN testtool.tbl_gebiet USING (gebiet_id)
 		JOIN public.tbl_studiengang USING (studiengang_kz)
 		WHERE studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
-		if ($semester!='') 
+		if ($semester!='')
 			$qry.=" AND semester=".$db->db_add_param($semester, FHC_INTEGER);
-		
+
 		$qry.=" ORDER BY stg,semester,reihung";
 
 //echo $qry;
@@ -724,11 +755,11 @@ $row=$db->db_fetch_object($db->db_query($qry));
 $num_rows=$db->db_num_rows($db->db_query($qry));
 if ($studiengang_kz!=1 && $num_rows!=0)
 {
-	$gesamtzeit = $row->gesamtzeit;	
+	$gesamtzeit = $row->gesamtzeit;
 	if($result = $db->db_query($qry))
 	{
 		$num_rows=$db->db_num_rows($result);
-		echo "<table id='t3' class='tablesorter'><thead><tr>";		
+		echo "<table id='t3' class='tablesorter'><thead><tr>";
 		echo "	<th>STG</th>
 				<th>SEM</th>
 				<th>KZ</th>
@@ -750,35 +781,35 @@ if ($studiengang_kz!=1 && $num_rows!=0)
 		echo "<tbody>";
 		for($i=0;$i<$num_rows;$i++)
 		{
-		   $row=$db->db_fetch_object($result);
-		   echo "<tr>";
-		   echo "<td>$row->stg</td>
-		   <td>$row->semester</td>
-		   <td>$row->studiengang_kz</td>
-		   <td>$row->reihung</td>
-		   <td>$row->gebiet_id</td>
-		   <td>$row->bezeichnung</td>";
-		   if ($row->gebiet_id==7)
-		   {
-		   		echo "<td>00:20:00*</td>";
-		   		$gesamtzeit = $row->gesamtzeit_persoenlichkeit; //Das Gebiet Persönlichkeit wird mit 20 Min. angezeigt und berechnet, läuft im System aber 60 Min.
-		   		$persoenlichkeit = true;
-		   }
-		   else 
-		   {
-		   		echo "<td>$row->zeit</td>";
-		   }	   	
-		   echo "<td align='center'><img src='../../skin/images/".($row->multipleresponse=='t'?'true.png':'false.png')."' height='20'></td>
-		   <td align='center'>$row->maxfragen</td>
-		   <td align='center'><img src='../../skin/images/".($row->zufallfrage=='t'?'true.png':'false.png')."' height='20'></td>
-		   <td align='center'><img src='../../skin/images/".($row->zufallvorschlag=='t'?'true.png':'false.png')."' height='20'></td>
-		   <td align='center'>$row->level_start</td>
-		   <td align='center'>$row->level_sprung_auf</td>
-		   <td align='center'>$row->level_sprung_ab</td>
-		   <td align='center'><img src='../../skin/images/".($row->levelgleichverteilung=='t'?'true.png':'false.png')."' height='20'></td>
-		   <td align='center'>$row->maxpunkte</td>
-		   <td align='center'>$row->antwortenprozeile</td>";
-		   echo "</tr>\n";
+			$row=$db->db_fetch_object($result);
+			echo "<tr>";
+			echo "<td>$row->stg</td>
+			<td>$row->semester</td>
+			<td>$row->studiengang_kz</td>
+			<td>$row->reihung</td>
+			<td>$row->gebiet_id</td>
+			<td>$row->bezeichnung</td>";
+			if ($row->gebiet_id==7)
+			{
+					echo "<td>00:20:00*</td>";
+					$gesamtzeit = $row->gesamtzeit_persoenlichkeit; //Das Gebiet Persönlichkeit wird mit 20 Min. angezeigt und berechnet, läuft im System aber 60 Min.
+					$persoenlichkeit = true;
+			}
+			else
+			{
+					echo "<td>$row->zeit</td>";
+			}
+			echo "<td align='center'><img src='../../skin/images/".($row->multipleresponse=='t'?'true.png':'false.png')."' height='20'></td>
+			<td align='center'>$row->maxfragen</td>
+			<td align='center'><img src='../../skin/images/".($row->zufallfrage=='t'?'true.png':'false.png')."' height='20'></td>
+			<td align='center'><img src='../../skin/images/".($row->zufallvorschlag=='t'?'true.png':'false.png')."' height='20'></td>
+			<td align='center'>$row->level_start</td>
+			<td align='center'>$row->level_sprung_auf</td>
+			<td align='center'>$row->level_sprung_ab</td>
+			<td align='center'><img src='../../skin/images/".($row->levelgleichverteilung=='t'?'true.png':'false.png')."' height='20'></td>
+			<td align='center'>$row->maxpunkte</td>
+			<td align='center'>$row->antwortenprozeile</td>";
+			echo "</tr>\n";
 		}
 		echo "</tbody>";
 		echo "<tfooter>";
@@ -805,10 +836,10 @@ if ($studiengang_kz!=1 && $num_rows!=0)
 	}
 	else
 		echo "Kein Eintrag gefunden!";
-		
+
 	if ($persoenlichkeit)
 		echo "<div style='font-size:smaller'>*Das Gebiet Persönlichkeit ist mit 60 Minuten eingestellt, kann aber in der Regel in 15-20 Minuten bearbeitet werden.</div>";
-	
+
 	echo "<br>";
 }
 
@@ -820,7 +851,7 @@ if(isset($_GET['action']) && $_GET['action']=='sperren')
 {
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'su'))
 		die('<span class="error">Sie haben keine Berechtigung für diese Aktion. <a href="reihungstest_administration.php">Seite neu laden</a></span>');
-		
+
 	$rt = new reihungstest();
 	if($rt->load($_GET['reihungstest_id']))
 	{
@@ -835,7 +866,7 @@ if(isset($_GET['action']) && $_GET['action']=='sperren')
 	}
 }
 
-$qry = "SELECT tbl_reihungstest.*,UPPER(tbl_studiengang.typ||tbl_studiengang.kurzbz)AS studiengang FROM public.tbl_reihungstest 
+$qry = "SELECT tbl_reihungstest.*,UPPER(tbl_studiengang.typ||tbl_studiengang.kurzbz)AS studiengang FROM public.tbl_reihungstest
 		JOIN public.tbl_studiengang USING(studiengang_kz) WHERE freigeschaltet ORDER BY datum";
 
 if($result = $db->db_query($qry))
@@ -863,7 +894,7 @@ if($result = $db->db_query($qry))
 	echo '</tbody></table>';
 }
 
-	
+
 echo '</body>
 </html>';
 ?>

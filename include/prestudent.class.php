@@ -357,23 +357,28 @@ class prestudent extends person
 
 	/**
 	 * Laden aller Prestudenten, die an $datum zum Reihungstest geladen sind.
-	 * Wenn $equal auf true gesetzt ist wird genau dieses Datum verwendet,
-	 * ansonsten werden auch alle mit späterem Datum geladen. ---> von kindlm am 30.03.2012 geändert
 	 * da zukünftige Teilnehmer nicht mehr angezeigt werden sollen.
+	 * @param date $datum Datum an dem der Reihungstest stattfindet
 	 * @return true wenn erfolgreich, false im Fehlerfall
 	 */
-	public function getPrestudentRT($datum, $equal=false)
+	public function getPrestudentRT($datum)
 	{
-		$sql_query='SELECT DISTINCT * FROM public.vw_prestudent WHERE rt_datum';
-		if ($equal)
-			$sql_query.='=';
-		else
-			$sql_query.='=';
-		$sql_query.="'$datum' ORDER BY nachname,vorname";
+		$sql_query='SELECT
+						DISTINCT tbl_prestudent.prestudent_id,
+						tbl_person.vorname, tbl_person.nachname, tbl_person.person_id, tbl_person.titelpre,
+						tbl_person.titelpost, tbl_person.gebdatum,tbl_prestudent.studiengang_kz,
+						tbl_reihungstest.*
+					FROM
+						public.tbl_prestudent
+						JOIN public.tbl_person USING(person_id)
+						JOIN public.tbl_rt_person USING(person_id)
+						JOIN public.tbl_reihungstest ON(tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id)
+					WHERE tbl_reihungstest.datum='.$this->db_add_param($datum).'
+					ORDER BY nachname,vorname';
 
 		if(!$this->db_query($sql_query))
 		{
-			$this->errormsg = 'Fehler beim Speichern des Benutzer-Datensatzes:'.$sql_query;
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 
@@ -385,56 +390,12 @@ class prestudent extends person
 			$ps->prestudent_id = $row->prestudent_id;
 			$ps->person_id = $row->person_id;
 			$ps->reihungstest_id = $row->reihungstest_id;
-			$ps->staatsbuergerschaft = $row->staatsbuergerschaft;
-			$ps->geburtsnation = $row->geburtsnation;
-			$ps->sprache = $row->sprache;
-			$ps->anrede = $row->anrede;
 			$ps->titelpost = $row->titelpost;
 			$ps->titelpre = $row->titelpre;
 			$ps->nachname = $row->nachname;
 			$ps->vorname = $row->vorname;
-			$ps->vornamen = $row->vornamen;
 			$ps->gebdatum = $row->gebdatum;
-			$ps->gebort = $row->gebort;
-			$ps->gebzeit = $row->gebzeit;
-			// $ps->foto = $row->foto;
-			$ps->anmerkungen = $row->anmerkungen;
-			$ps->homepage = $row->homepage;
-			$ps->svnr = $row->svnr;
-			$ps->ersatzkennzeichen = $row->ersatzkennzeichen;
-			$ps->familienstand = $row->familienstand;
-			$ps->geschlecht = $row->geschlecht;
-			$ps->anzahlkinder = $row->anzahlkinder;
-			$ps->aktiv = $this->db_parse_bool($row->aktiv);
-			$ps->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;
 			$ps->studiengang_kz = $row->studiengang_kz;
-			$ps->berufstaetigkeit_code = $row->berufstaetigkeit_code;
-			$ps->ausbildungcode = $row->ausbildungcode;
-			$ps->zgv_code = $row->zgv_code;
-			$ps->zgvort = $row->zgvort;
-			$ps->zgvdatum = $row->zgvdatum;
-			//$ps->zgvnation = $row->zgvnation;
-			$ps->zgvmas_code = $row->zgvmas_code;
-			$ps->zgvmaort = $row->zgvmaort;
-			$ps->zgvmadatum = $row->zgvmadatum;
-			//$ps->zgvmanation = $row->zgvmanation;
-			$ps->aufnahmeschluessel = $row->aufnahmeschluessel;
-			$ps->facheinschlberuf = $this->db_parse_bool($row->facheinschlberuf);
-			$ps->anmeldungreihungstest = $row->anmeldungreihungstest;
-			$ps->reihungstestangetreten = $this->db_parse_bool($row->reihungstestangetreten);
-			$ps->punkte = $row->punkte;
-			$ps->rt_punkte1 = $row->rt_punkte1;
-			$ps->rt_punkte2 = $row->rt_punkte2;
-			$ps->bismelden = $this->db_parse_bool($row->bismelden);
-			$ps->rt_studiengang_kz = $row->rt_studiengang_kz;
-			$ps->rt_ort = $row->rt_ort;
-			$ps->rt_datum = $row->rt_datum;
-			$ps->rt_uhrzeit = $row->rt_uhrzeit;
-			$ps->updateamum = $row->updateamum;
-			$ps->updatevon = $row->updatevon;
-			$ps->insertamum = $row->insertamum;
-			$ps->insertvon = $row->insertvon;
-			//$ps->ext_id_prestudent = $row->ext_id_prestudent;
 			$this->result[]=$ps;
 			$this->num_rows++;
 		}

@@ -42,14 +42,14 @@ $rdf_url='http://www.technikum-wien.at/reihungstest';
 	xmlns:RT="<?php echo $rdf_url; ?>/rdf#"
 >
 
-  <RDF:Seq about="<?php echo $rdf_url ?>/alle">
+<RDF:Seq about="<?php echo $rdf_url ?>/alle">
 
 <?php
 if(isset($_GET['optional']) && $_GET['optional']=='true')
 {
 	echo '
-	  <RDF:li>
-      	<RDF:Description  id=""  about="'.$rdf_url.'/" >
+	<RDF:li>
+		<RDF:Description  id=""  about="'.$rdf_url.'/" >
 			<RT:reihungstest_id></RT:reihungstest_id>
 			<RT:studiengang_kz></RT:studiengang_kz>
 			<RT:ort_kurzbz></RT:ort_kurzbz>
@@ -57,8 +57,8 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
 			<RT:datum></RT:datum>
 			<RT:uhrzeit></RT:uhrzeit>
 			<RT:bezeichnung>-- keine Auswahl --</RT:bezeichnung>
-      	</RDF:Description>
-      </RDF:li>
+		</RDF:Description>
+	</RDF:li>
 
 ';
 }
@@ -87,6 +87,17 @@ elseif(isset($_GET['prestudent_id']))
 		$studienplan_arr[] = $row->studienplan_id;
 	}
 
+	// Zusaetzlich auch die Studienplaene holen bei denen die
+	// Person schon zu Reihungstests zugeordnet ist
+	$prestudent = new prestudent();
+	$prestudent->load($_GET['prestudent_id']);
+	$rt_help = new reihungstest();
+	$rt_help->getReihungstestPerson($prestudent->person_id);
+	foreach($rt_help->result as $row)
+	{
+		$studienplan_arr[] = $row->studienplan_id;
+	}
+
 	$rt->getReihungstestStudienplan($studienplan_arr);
 }
 else
@@ -103,8 +114,8 @@ foreach ($rt->result as $row)
 
 	$bezeichnung = (array_key_exists($row->studiengang_kz, $stg)?$stg[$row->studiengang_kz].' ':'').$row->datum.' '.$row->uhrzeit.' '.$row->ort_kurzbz.' '.$row->anmerkung.$freieplaetze;
 ?>
-	  <RDF:li>
-      	<RDF:Description  id="<?php echo $row->reihungstest_id; ?>"  about="<?php echo $rdf_url.'/'.$row->reihungstest_id; ?>" >
+	<RDF:li>
+		<RDF:Description  id="<?php echo $row->reihungstest_id; ?>"  about="<?php echo $rdf_url.'/'.$row->reihungstest_id; ?>" >
 			<RT:reihungstest_id><![CDATA[<?php echo $row->reihungstest_id;  ?>]]></RT:reihungstest_id>
 			<RT:studiengang_kz><![CDATA[<?php echo $row->studiengang_kz;  ?>]]></RT:studiengang_kz>
 			<RT:ort_kurzbz><![CDATA[<?php echo $row->ort_kurzbz;  ?>]]></RT:ort_kurzbz>
@@ -112,10 +123,10 @@ foreach ($rt->result as $row)
 			<RT:datum><![CDATA[<?php echo $row->datum;  ?>]]></RT:datum>
 			<RT:uhrzeit><![CDATA[<?php echo $row->uhrzeit;  ?>]]></RT:uhrzeit>
 			<RT:bezeichnung><![CDATA[<?php echo $bezeichnung;  ?>]]></RT:bezeichnung>
-      	</RDF:Description>
-      </RDF:li>
+		</RDF:Description>
+	</RDF:li>
 <?php
 }
 ?>
-  </RDF:Seq>
+	</RDF:Seq>
 </RDF:RDF>
