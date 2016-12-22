@@ -4,8 +4,9 @@
 	</head>
 	<body>
 		<div class="container">
+			<h2>Neue Nachricht vorhanden</h2>
 			<div class="body">
-				<a href="{href}">Click here to see the message</a>
+				<a href="{href}">Klicken Sie hier, um die Nachricht anzuzeigen</a>
 			</div>
 		</div>
 	</body>
