@@ -127,7 +127,7 @@ if(!$person->load($uid))
 			{
 				if(elem[i].name.match("^wunsch"))
 				{
-					if(!elem[i].value.match("[12]"))
+					if(!elem[i].value.match("^\-?[1-2]\d{0,0}$"))
 						error=true;
 				}
 			}

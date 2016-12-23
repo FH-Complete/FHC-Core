@@ -118,8 +118,11 @@ switch($method)
 	    break;
 	case 'getLvKompatibel':
 	    $lvid = filter_input(INPUT_POST, "lehrveranstaltung_id");
-	    $data = getLvKompatibel($lvid);
+	    $data = getLvKompatibel($lvid, $uid);
 	    break;
+    case 'getPrestudenten':
+        $data = getPrestudenten($uid, $aktStudiensemester);
+        break;
 	default:
 	    break;
 }
@@ -376,6 +379,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
     $stdsem = $studiensemester->getLastOrAktSemester(0);
     $lv_besucht = false;
     $studienverpflichtung_id = filter_input(INPUT_POST, "studienverpflichtung_id");
+    $studiengang_kz = filter_input(INPUT_POST, "studiengang_kz");
 
     //Defaulteinstellung für Anzahlprüfungsversuche (wird durch Addon "ktu" überschrieben)
     $maxAnzahlVersuche = 0;
@@ -539,7 +543,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 
 				$konto = new konto();
 				$creditPoints = $konto->getCreditPointsOfStudiensemester($uid, $pruefungsfenster->studiensemester_kurzbz);
-				if(($creditPoints != false))
+				if(($creditPoints !== false))
 				{
 					$cpVerbleibend = $creditPoints - $ects_verwendet;
 					if(($lehrveranstaltung->ects > $cpVerbleibend))
@@ -549,7 +553,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 						return $data;
 					}
 				}
-				else
+				elseif($konto->errormsg !== null)
 				{
 					$data['error'] = 'true';
 					$data['errormsg'] = 'Fehler beim Laden der Credit Points.';
@@ -583,6 +587,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 
     $anrechnung = new anrechnung();
     $lv_komp = new lehrveranstaltung($studienverpflichtung_id);
+    $lehrveranstaltung = new lehrveranstaltung($_REQUEST["lehrveranstaltung_id"]);
     $person = new person();
     $person->getPersonFromBenutzer($uid);
     $prestudent = new prestudent();
@@ -592,39 +597,92 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	if ($aktStudiensemester)
 		$stdsem = $aktStudiensemester;
 
-    if(count($prestudent->result) > 0)
+	$prestudenten = array();
+
+    foreach ($prestudent->result as $ps)
     {
-		$prestudent_id = "";
-		foreach($prestudent->result as $ps)
-		{
-			if($ps->getLaststatus($ps->prestudent_id, $stdsem))
-			{
-				if(($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
-				{
-					$prestudent_id = $ps->prestudent_id;
-				}
-				else
-				{
-					if($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
-					{
-						if(($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
-						{
-							$prestudent_id = $ps->prestudent_id;
-						}
-					}
-				}
-			}
-			else
-			{
-				if($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
-				{
-					if(($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
-					{
-						$prestudent_id = $ps->prestudent_id;
-					}
-				}
-			}
-		}
+        if ($ps->getLaststatus($ps->prestudent_id, $stdsem))
+        {
+            if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+            {
+                array_push($prestudenten, $ps);
+            }
+        }
+    }
+
+    if (count($prestudenten) > 0)
+    {
+        $prestudent_id = "";
+        if (count($prestudenten) != 1)
+        {
+            foreach ($prestudenten as $ps)
+            {
+                if($ps->studiengang_kz === $studiengang_kz)
+                {
+                    if ($ps->getLaststatus($ps->prestudent_id, $stdsem))
+                    {
+                        if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+                        {
+                            $prestudent_id = $ps->prestudent_id;
+                        }
+                        else
+                        {
+                            if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
+                            {
+                                if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+                                {
+                                    $prestudent_id = $ps->prestudent_id;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
+                        {
+                            if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+                            {
+                                $prestudent_id = $ps->prestudent_id;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            foreach ($prestudenten as $ps)
+            {
+                if ($ps->getLaststatus($ps->prestudent_id, $stdsem))
+                {
+                    if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+                    {
+                        $prestudent_id = $ps->prestudent_id;
+                    }
+                    else
+                    {
+                        if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
+                        {
+                            if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+                            {
+                                $prestudent_id = $ps->prestudent_id;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
+                    {
+                        if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+                        {
+                            $prestudent_id = $ps->prestudent_id;
+                        }
+                    }
+                }
+            }
+        }
+
 		if($prestudent_id != "")
 		{
 				$anrechungSaveResult = false;
@@ -1162,21 +1220,75 @@ function saveRaum($terminId, $ort_kurzbz, $uid)
     return $data;
 }
 
-function getLvKompatibel($lvid)
+function getLvKompatibel($lvid, $uid)
 {
-    $lv = new lehrveranstaltung();
-    if($lv->getLVkompatibel($lvid))
+    $person = new person();
+    $person->getPersonFromBenutzer($uid);
+    $prestudent = new prestudent();
+    $prestudent->getPrestudenten($person->person_id);
+
+    $stplIds = array();
+
+    foreach ($prestudent->result as $ps)
     {
-	$data['result']=$lv->lehrveranstaltungen;
-	$data['error']='false';
-	$data['errormsg']='';
+        if ($ps->getLaststatus($ps->prestudent_id))
+        {
+            if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
+            {
+                array_push($stplIds, $ps->studienplan_id);
+            }
+        }
+    }
+
+    $lv = new lehrveranstaltung();
+    if($lv->getLVkompatibelTo($lvid, $stplIds))
+    {
+        $data['result']=$lv->lehrveranstaltungen;
+        $data['error']='false';
+        $data['errormsg']='';
     }
     else
     {
-	$data['result']="";
-	$data['error']='true';
-	$data['errormsg']=$lv->errormsg;
+        $data['result']="";
+        $data['error']='true';
+        $data['errormsg']=$lv->errormsg;
     }
+    return $data;
+}
+
+function getPrestudenten($uid, $aktStudiensemester)
+{
+    $person = new person();
+    $person->getPersonFromBenutzer($uid);
+    $prestudent = new prestudent();
+    $prestudent->getPrestudenten($person->person_id);
+    $result = array();
+
+    if (count($prestudent->result) > 0)
+    {
+        foreach ($prestudent->result as $key=>$ps)
+        {
+            if ($ps->getLaststatus($ps->prestudent_id))
+            {
+                if(($ps->status_kurzbz === 'Student') || ($ps->status_kurzbz == 'Unterbrecher'))
+                {
+                    $studiengang = new studiengang($ps->studiengang_kz);
+                    array_push($result, $studiengang);
+                }
+            }
+        }
+
+        $data['result']=$result;
+        $data['error']='false';
+        $data['errormsg']='';
+    }
+    else
+    {
+        $data['result']="";
+        $data['error']='true';
+        $data['errormsg']=$lv->errormsg;
+    }
+
     return $data;
 }
 ?>

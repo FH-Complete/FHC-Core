@@ -57,6 +57,7 @@ $afa=trim(isset($_REQUEST['afa']) ? $_REQUEST['afa']:'');
 $inventur_jahr=trim(isset($_REQUEST['inventur_jahr']) ? $_REQUEST['inventur_jahr']:'');
 $order = trim(isset($_REQUEST['order']) ? $_REQUEST['order']:'');
 $person_id = trim(isset($_REQUEST['person_id']) ? $_REQUEST['person_id']:'');
+$anlage_jahr_monat=trim(isset($_REQUEST['anlage_jahr_monat']) ? $_REQUEST['anlage_jahr_monat']:'');
 
 $debug = false;
 $schreib_recht_administration=false;
@@ -70,7 +71,7 @@ $oBetriebsmittelstatus->result=array();
 $resultBetriebsmittelstatus=$oBetriebsmittelstatus->result;
 
 $oBetriebsmittel = new betriebsmittel();
-if (!$oBetriebsmittel->betriebsmittel_inventar($order,$inventarnummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz,$seriennummer,$person_id,$betriebsmittel_id))
+if (!$oBetriebsmittel->betriebsmittel_inventar($order,$inventarnummer,$ort_kurzbz,$betriebsmittelstatus_kurzbz,$betriebsmitteltyp,$bestellung_id,$bestelldetail_id,$bestellnr,$hersteller,$afa,$jahr_monat,$firma_id,$inventur_jahr,$beschreibung,$oe_kurzbz,$seriennummer,$person_id,$betriebsmittel_id,$anlage_jahr_monat))
 		$errormsg[]=$oBetriebsmittel->errormsg;
 
 $resultBetriebsmittel = $oBetriebsmittel->result;

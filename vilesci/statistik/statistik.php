@@ -121,3 +121,4 @@ $vars = $statistik->parseVars($variablenstring); ?>
 		</form>
 	</body>
 </html>
+
