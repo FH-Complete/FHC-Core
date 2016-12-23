@@ -110,7 +110,7 @@ loadVariables($user);
 	$worksheet->write($zeile,++$i,"ORT", $format_bold);
 	$maxlength[$i]=3;
 	$worksheet->write($zeile,++$i,"GEMEINDE", $format_bold);
-	$maxlength[$i]=3;
+	$maxlength[$i]=9;
 	$worksheet->write($zeile,++$i,"NATION", $format_bold);
 	$maxlength[$i]=6;
 	$worksheet->write($zeile,++$i,"GEBURTSDATUM", $format_bold);
