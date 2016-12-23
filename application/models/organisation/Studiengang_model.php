@@ -178,4 +178,51 @@ class Studiengang_model extends DB_Model
 		
 		return $result;
 	}
+	
+	/**
+	 * TODO
+	 */
+	public function getAppliedStudiengang($person_id, $studiensemester_kurzbz, $titel, $status_kurzbz)
+	{
+		// Then join with table 
+		$this->addJoin('public.tbl_prestudent', 'studiengang_kz');
+		// Join table 
+		$this->addJoin('public.tbl_prestudentstatus', 'prestudent_id');
+		// Then join with table 
+		$this->addJoin('lehre.tbl_studienplan', 'studienplan_id');
+		// Then join with table 
+		$this->addJoin(
+			'(
+				SELECT *
+				  FROM public.tbl_notizzuordnung INNER JOIN public.tbl_notiz n USING(notiz_id)
+				 WHERE n.titel = \''.$titel.'\') tbl_nn',
+			'prestudent_id',
+			'LEFT'
+		);
+		
+		// Ordering by studiengang_kz and studienplan_id
+		$this->addOrder('public.tbl_studiengang.bezeichnung');
+		
+		$result = $this->loadTree(
+			'tbl_studiengang',
+			array(
+				'tbl_prestudent',
+				'tbl_prestudentstatus',
+				'tbl_studienplan',
+				'tbl_nn'
+			),
+			'public.tbl_prestudent.person_id = '.$person_id.
+			' AND public.tbl_prestudentstatus.studiensemester_kurzbz = \''.$studiensemester_kurzbz.'\''.
+			' AND (public.tbl_prestudentstatus.status_kurzbz = \'Interessent\' OR public.tbl_prestudentstatus.status_kurzbz = \'Bewerber\')'
+			,
+			array(
+				'prestudenten',
+				'prestudentstatus',
+				'studienplaene',
+				'notizen'
+			)
+		);
+		
+		return $result;
+	}
 }
