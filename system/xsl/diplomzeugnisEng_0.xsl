@@ -352,7 +352,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
 						<text:p text:style-name="P20">
-							<text:span text:style-name="T2"><xsl:value-of select="abschlussbeurteilung_kurzbz" /></text:span>
+							<text:span text:style-name="T2"><xsl:value-of select="abschlussbeurteilung_kurzbzEng" /></text:span>
 						</text:p>
 					</table:table-cell>
 				</table:table-row>
