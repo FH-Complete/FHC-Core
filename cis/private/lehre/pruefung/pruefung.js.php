@@ -831,6 +831,8 @@ function writeAnmeldungen(data)
 	}
 	else
 	{
+		$("#anmeldung_hinzufuegen").empty();
+		$("#lvdaten").empty();
 		$("#anmeldeDaten").empty();
 		$("#reihungSpeichernButton").empty();
 		$("#kommentar").empty();
@@ -838,6 +840,11 @@ function writeAnmeldungen(data)
 		$("#raumLink").empty();
 		$("#listeDrucken").empty();
 		messageBox("message", data.errormsg, "red", "highlight", 1000);
+		if (data.lv_bezeichnung)
+		{
+			$("#lvdaten").html(data.lv_bezeichnung+" ("+data.termin_datum+")");
+			$("#anmeldung_hinzufuegen").html("<input id='anmeldung_hinzufuegen_uid' type='text' placeholder='StudentIn-UID' /><input type='button' value='<?php echo $p->t('global/hinzufuegen'); ?>' onclick='saveAnmeldung(\""+data.lv_id+"\",\""+data.termin_id+"\");'/>");
+		}
 	}
 }
 

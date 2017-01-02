@@ -424,7 +424,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 				$stdsem_lv_besuch = $stdsem;
 			}
 		}
-		
+
 		$stdsem = $studiensemester->getPreviousFrom($stdsem);
 		$lehrveranstaltung->lehrveranstaltungen = array();
 		$i++;
@@ -445,7 +445,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	// Defaulteinstellung für Prüfungstypen - schauen, ob bereits aus KTU-Addon geladen
 	if(!isset($pruefungstyp_kurzbzArray))
 		$pruefungstyp_kurzbzArray = array("Termin1","Termin2","kommPruef");
-	
+
     if(isset($pruefungstyp_kurzbzArray))
     {
 		if($anzahlPruefungen < count($pruefungstyp_kurzbzArray))
@@ -523,7 +523,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 			$pf = new pruefungCis($pruefungstermin->pruefung_id);
 			$pruefungsfenster = new pruefungsfenster($pf->pruefungsfenster_id);
 			$anmeldungen = $anmeldung->getAnmeldungenByStudent($uid, $pruefungsfenster->studiensemester_kurzbz);
-			
+
 			if($anmeldungen !== false)
 			{
 				$ects_verwendet = 0;
@@ -876,34 +876,38 @@ function getAnmeldungenTermin()
 	$pruefungstermin->lv_lehrtyp = $lv->lehrtyp_kurzbz;
 	$datum = new DateTime($pruefungstermin->von);
 	$pruefungstermin->datum = $datum->format('d.m.Y');
-    foreach($pruefungstermin->anmeldungen as $a)
-    {
-	$student = new student($a->uid);
-	$temp = new stdClass();
-	$temp->vorname = $student->vorname;
-	$temp->nachname = $student->nachname;
-	$temp->uid = $student->uid;
-	$a->student = $temp;
-    }
-    if(!empty($pruefungstermin->anmeldungen))
-    {
-	$data['result']=$pruefungstermin;
-	$data['error']='false';
-	$data['errormsg']='';
-    }
-    else
-    {
-	$data['error']='true';
-	if($pruefungsanmeldung->errormsg !== null)
+	foreach($pruefungstermin->anmeldungen as $a)
 	{
-	    $data['errormsg']=$pruefungsanmeldung->errormsg;
+		$student = new student($a->uid);
+		$temp = new stdClass();
+		$temp->vorname = $student->vorname;
+		$temp->nachname = $student->nachname;
+		$temp->uid = $student->uid;
+		$a->student = $temp;
+	}
+	if(!empty($pruefungstermin->anmeldungen))
+	{
+		$data['result']=$pruefungstermin;
+		$data['error']='false';
+		$data['errormsg']='';
 	}
 	else
 	{
-	    $data['errormsg']= $p->t('pruefung/keineAnmeldungenVorhanden');
+		$data['error']='true';
+		if($pruefungsanmeldung->errormsg !== null)
+		{
+			$data['errormsg']=$pruefungsanmeldung->errormsg;
+		}
+		else
+		{
+			$data['errormsg']= $p->t('pruefung/keineAnmeldungenVorhanden');
+			$data['lv_id'] = $lehrveranstaltung_id;
+			$data['termin_id'] = $pruefungstermin_id;
+			$data['termin_datum'] = $pruefungstermin->datum;
+			$data['lv_bezeichnung'] = $pruefungstermin->lv_bezeichnung;
+		}
 	}
-    }
-    return $data;
+	return $data;
 }
 
 /**
