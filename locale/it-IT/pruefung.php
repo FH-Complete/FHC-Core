@@ -75,6 +75,7 @@ $this->phrasen['pruefung/terminGeloescht'] = 'Appello eliminato';
 $this->phrasen['pruefung/unbegrenzt'] = '';
 $this->phrasen['pruefung/bewertungenZu'] = 'Studenti iscritti all’appello di';
 $this->phrasen['pruefung/keineAuswahl'] = 'Nessuna selezione';
+$this->phrasen['pruefung/alleBestaetigen'] = 'Confermare tutti';
 
 // pruefungsbewertung
 $this->phrasen['pruefung/pruefungsbewertungTitle'] = 'Voti d’esame';

@@ -809,7 +809,7 @@ function writeAnmeldungen(data)
 		});
 		liste += "</ul>";
 		$("#anmeldung_hinzufuegen").html("<input id='anmeldung_hinzufuegen_uid' type='text' placeholder='StudentIn-UID' /><input type='button' value='<?php echo $p->t('global/hinzufuegen'); ?>' onclick='saveAnmeldung(\""+lehrveranstaltung_id+"\",\""+terminId+"\");'/>");
-		$("#reihungSpeichernButton").html("<input type='button' value='<?php echo $p->t('pruefung/reihungSpeichern'); ?>' onclick='saveReihung(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'>");
+		$("#reihungSpeichernButton").html("<input type='button' value='<?php echo $p->t('pruefung/reihungSpeichern'); ?>' onclick='saveReihung(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'><input type='button' value='<?php echo $p->t('pruefung/alleBestaetigen'); ?>' onclick='alleBestaetigen(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'>");
 		$("#lvdaten").html(lv_bezeichnung+" ("+prf_termin+")");
 		$("#anmeldeDaten").html(liste);
 		$("#listeDrucken").html("<a href='./pruefungsanmeldungen_liste.php?termin_id="+terminId+"&lehrveranstaltung_id="+lehrveranstaltung_id+"&studiensemester="+studiensemester+"' target='_blank'><?php echo $p->t('pruefung/listeDrucken'); ?></a>");
@@ -912,6 +912,39 @@ function anmeldungBestaetigen(pruefungsanmeldung_id, termin_id, lehrveranstaltun
 		data: {
 			method: "anmeldungBestaetigen",
 			pruefungsanmeldung_id: pruefungsanmeldung_id
+		},
+		error: loadError
+	}).success(function(data){
+		if(data.error === 'false' && data.result === true)
+		{
+			if(termin_id !== 'undefined' && lehrveranstaltung_id !== 'undefined')
+			{
+				showAnmeldungen(termin_id, lehrveranstaltung_id);
+			}
+		}
+		else
+		{
+			messageBox("message", data.errormsg, "red", "highlight", 1000);
+		}
+	});
+}
+
+/**
+ * Ändert den Status aller Anmeldungen eines Termins auf "bestätigt"
+ * @param {type} termin_id ID des Prüfungstermines
+ * @param {type} lehrveranstaltung_id ID der Lehrveranstaltung
+ * @returns {undefined}
+ */
+function alleBestaetigen(termin_id, lehrveranstaltung_id)
+{
+	$.ajax({
+		dataType: 'json',
+		url: "./pruefungsanmeldung.json.php",
+		type: "POST",
+		data: {
+			method: "alleBestaetigen",
+			termin_id: termin_id,
+			lehrveranstaltung_id: lehrveranstaltung_id
 		},
 		error: loadError
 	}).success(function(data){

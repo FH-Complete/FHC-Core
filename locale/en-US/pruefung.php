@@ -75,6 +75,7 @@ $this->phrasen['pruefung/terminGeloescht'] = 'Termin gelöscht';
 $this->phrasen['pruefung/unbegrenzt'] = 'unlimited';
 $this->phrasen['pruefung/bewertungenZu'] = 'Bewertungen zu';
 $this->phrasen['pruefung/keineAuswahl'] = 'Keine Auswahl';
+$this->phrasen['pruefung/alleBestaetigen'] = 'Confirm all';
 
 // pruefungsbewertung
 $this->phrasen['pruefung/pruefungsbewertungTitle'] = 'Prüfungsbewertung';

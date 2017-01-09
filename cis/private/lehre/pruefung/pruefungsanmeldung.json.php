@@ -97,6 +97,9 @@ switch($method)
 	case 'anmeldungBestaetigen':
 	    $data = anmeldungBestaetigen($uid);
 	    break;
+	case 'alleBestaetigen':
+	    $data = alleBestaetigen($uid);
+	    break;
 	case 'getStudiengaenge':
 	    $data = getStudiengaenge();
 	    break;
@@ -930,6 +933,28 @@ function saveReihung()
 	$data['errormsg']=$anmeldung->errormsg;
     }
     return $data;
+}
+
+/**
+ * Ändert den Status aller Prüfungsanmeldungen eines Termins/LV auf "bestaetigt"
+ * @return Array
+ */
+function alleBestaetigen($uid)
+{
+	$lehrveranstaltung_id = $_REQUEST["lehrveranstaltung_id"];
+    $pruefungstermin_id = $_REQUEST["termin_id"];
+    $pruefungstermin = new pruefungstermin($pruefungstermin_id);
+    $pruefungsanmeldung = new pruefungsanmeldung();
+    $pranmeldungen = $pruefungsanmeldung->getAnmeldungenByTermin($pruefungstermin_id, $lehrveranstaltung_id);
+	foreach($pranmeldungen as $a)
+	{
+		$anmeldung = new pruefungsanmeldung();
+		$anmeldung->changeState($a->pruefungsanmeldung_id, 'bestaetigt', $uid);
+	}
+	$data['result']=true;
+	$data['error']='false';
+	$data['errormsg']='';
+	return $data;
 }
 
 /**
