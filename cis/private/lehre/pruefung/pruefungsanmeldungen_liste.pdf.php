@@ -141,7 +141,9 @@ if(!empty($anmeldungen))
 								'vorname' => $student->vorname,
 								'nachname' => $student->nachname,
 								'matr_nr' => $student->matr_nr,
-								'datum' => $date
+								'datum' => $date,
+								'wuensche' => $anmeldung->wuensche,
+								'kommentar' => $anmeldung->kommentar
 		));
 
 	}
