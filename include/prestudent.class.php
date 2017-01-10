@@ -522,8 +522,13 @@ class prestudent extends person
 
 	/**
 	 * Laedt die Interessenten und Bewerber fuer ein bestimmtes Studiensemester
-	 * @param $studiensemester_kurzbz Studiensemester fuer das die Int. und Bewerber
-	 *                                geladen werden sollen
+	 *
+	 * @param $studiensemester_kurzbz Studiensemester fuer das die Int. und Bewerber geladen werden sollen.
+	 * @param $studiengang_kz Kennzahl des Studiengangs.
+	 * @param $semester Ausbildungssemester.
+	 * @param $typ Filter fuer Typ von Interessenten/Bewerber
+	 * @param $orgform Organisationsform.
+	 * @return boolean true wenn erfolgreich, false im Fehlerfall
 	 */
 	public function loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=null, $typ=null, $orgform=null)
 	{
@@ -577,10 +582,27 @@ class prestudent extends person
 					$qry.=" AND a.rolle='Interessent' AND a.zgv_code is not null";
 				break;
 			case "reihungstestangemeldet":
-				$qry.=" AND a.rolle='Interessent' AND a.anmeldungreihungstest is not null";
+				$qry.="
+					AND a.rolle='Interessent'
+					AND EXISTS(SELECT 1 FROM public.tbl_rt_person
+						WHERE
+							person_id=a.person_id
+							AND studienplan_id IN(
+								SELECT studienplan_id FROM lehre.tbl_studienplan
+								JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+								WHERE tbl_studienordnung.studiengang_kz=a.studiengang_kz)
+						)";
 				break;
 			case "reihungstestnichtangemeldet":
-				$qry.=" AND a.rolle='Interessent' AND a.anmeldungreihungstest is null";
+				$qry.=" AND a.rolle='Interessent'
+					AND NOT EXISTS(SELECT 1 FROM public.tbl_rt_person
+					WHERE
+						person_id=a.person_id
+						AND studienplan_id IN(
+							SELECT studienplan_id FROM lehre.tbl_studienplan
+							JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+							WHERE tbl_studienordnung.studiengang_kz=a.studiengang_kz)
+					)";
 				break;
 			case "bewerber":
 				$qry.=" AND a.rolle='Bewerber'";

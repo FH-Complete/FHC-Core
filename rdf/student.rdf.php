@@ -67,8 +67,8 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 		// Alle Personen die noch nicht alle Dokumente gebracht haben
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_dokumentstudiengang WHERE
 				dokument_kurzbz NOT IN(
-					SELECT dokument_kurzbz FROM tbl_dokumentprestudent WHERE prestudent_id='$row->prestudent_id')
-				AND studiengang_kz='$row->studiengang_kz'";
+					SELECT dokument_kurzbz FROM tbl_dokumentprestudent WHERE prestudent_id=".$db->db_add_param($row->prestudent_id).")
+				AND studiengang_kz=".$db->db_add_param($row->studiengang_kz);
 		if($db->db_query($qry))
 			if($row_filter = $db->db_fetch_object())
 				if($row_filter->anzahl==0)
@@ -77,11 +77,11 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 	elseif($filter2=='konto')
 	{
 		// Alle Personen die offene Buchungen haben
-		$qry = "SELECT sum(betrag) as summe FROM tbl_konto WHERE person_id='$row->person_id'";
+		$qry = "SELECT sum(betrag) as summe FROM tbl_konto WHERE person_id=".$db->db_add_param($row->person_id, FHC_INTEGER);
 		if($kontofilterstg=='true')
-			$qry.=" AND studiengang_kz='$row->studiengang_kz'";
+			$qry.=" AND studiengang_kz=".$db->db_add_param($row->studiengang_kz);
 		if($buchungstyp != null && $buchungstyp != "alle")
-			$qry.=" AND buchungstyp_kurzbz='$buchungstyp'";
+			$qry.=" AND buchungstyp_kurzbz=".$db->db_add_param($buchungstyp);
 
 		if($db->db_query($qry))
 			if($row_filter = $db->db_fetch_object())
@@ -96,8 +96,8 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 		$prestudent->getLastStatus($row->prestudent_id);
 
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE
-					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
-					person_id='".addslashes($row->person_id)."' AND
+					studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
+					person_id=".$db->db_add_param($row->person_id, FHC_INTEGER)." AND
 					buchungstyp_kurzbz='Studiengebuehr'";
 		if($db->db_query($qry))
 			if($row_filter = $db->db_fetch_object())
@@ -113,9 +113,9 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 		$prestudent->getLastStatus($row->prestudent_id);
 
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE
-					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
-					person_id='".addslashes($row->person_id)."' AND
-					buchungstyp_kurzbz='$buchungstyp'";
+					studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
+					person_id=".$db->db_add_param($row->person_id, FHC_INTEGER)." AND
+					buchungstyp_kurzbz=".$db->db_add_param($buchungstyp);
 		if($db->db_query($qry))
 			if($row_filter = $db->db_fetch_object())
 				if($row_filter->anzahl>0 || $prestudent->status_kurzbz=='Incoming')
@@ -124,14 +124,15 @@ function checkfilter($row, $filter2, $buchungstyp = null)
 	elseif($filter2=='zgvohnedatum')
 	{
 		//Alle Personen die den ZGV Typ eingetragen haben aber noch kein Datum
-		$qry = "SELECT zgv_code, zgvdatum, zgvmas_code, zgvmadatum FROM public.tbl_prestudent WHERE prestudent_id='$row->prestudent_id'";
+		$qry = "SELECT zgv_code, zgvdatum, zgvmas_code, zgvmadatum
+			FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($row->prestudent_id);
 		if($db->db_query($qry))
 		{
 			if($row_filter = $db->db_fetch_object())
 			{
-				if(($row_filter->zgv_code!='' && $row_filter->zgvdatum=='') ||
-				   ($row_filter->zgvmas_code!='' && $row_filter->zgvmadatum==''))
-				   	return true;
+				if(($row_filter->zgv_code!='' && $row_filter->zgvdatum=='')
+				|| ($row_filter->zgvmas_code!='' && $row_filter->zgvmadatum==''))
+					return true;
 				else
 					return false;
 			}
@@ -150,8 +151,6 @@ function draw_content_liste($row)
 	$status = $prestudent->status_kurzbz;
 	$orgform = $prestudent->orgform_kurzbz;
 	$studienplan_bezeichnung=$prestudent->studienplan_bezeichnung;
-	$reihungstest = new reihungstest($row->reihungstest_id);
-	$rt_datum = $reihungstest->datum;
 	echo '
 	<RDF:li>
 		<RDF:Description  id="'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'" >
@@ -189,11 +188,6 @@ function draw_content_liste($row)
 			<STUDENT:studienplan_id><![CDATA['.$prestudent->studienplan_id.']]></STUDENT:studienplan_id>
 			<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
 			<STUDENT:punkte><![CDATA['.$row->punkte.']]></STUDENT:punkte>
-			<STUDENT:punkte1><![CDATA['.$row->rt_punkte1.']]></STUDENT:punkte1>
-			<STUDENT:punkte2><![CDATA['.$row->rt_punkte2.']]></STUDENT:punkte2>
-			<STUDENT:punkte3><![CDATA['.$row->rt_punkte3.']]></STUDENT:punkte3>
-			<STUDENT:rt_datum><![CDATA['.$rt_datum.']]></STUDENT:rt_datum>
-			<STUDENT:rt_anmeldung><![CDATA['.$row->anmeldungreihungstest.']]></STUDENT:rt_anmeldung>
 			<STUDENT:dual><![CDATA['.($row->dual=='t'?'true':'false').']]></STUDENT:dual>
 			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual=='t'?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
 			<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
@@ -211,7 +205,7 @@ function draw_content($row)
 	$status='';
 
 	$mail_privat = '';
-	$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$row->person_id' AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
+	$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id=".$db->db_add_param($row->person_id)." AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
 	if($db->db_query($qry_mail))
 	{
 		if($row_mail = $db->db_fetch_object())
@@ -223,17 +217,17 @@ function draw_content($row)
 	$aktiv = "-";
 	if(isset($row->bnaktiv))
 	{
-	    switch($row->bnaktiv)
-	    {
-		case "t":
-		    $aktiv = "true";
-		    break;
-		case "f":
-		    $aktiv = "false";
-		    break;
-		default:
-		    $aktiv = "-";
-	    }
+		switch($row->bnaktiv)
+		{
+			case "t":
+				$aktiv = "true";
+				break;
+			case "f":
+				$aktiv = "false";
+				break;
+			default:
+				$aktiv = "-";
+		}
 	}
 
 	$studiengang = new studiengang();
@@ -341,19 +335,14 @@ function draw_prestudent($row)
 			<STUDENT:anmeldungreihungstest_iso><![CDATA['.$row->anmeldungreihungstest.']]></STUDENT:anmeldungreihungstest_iso>
 			<STUDENT:reihungstestangetreten><![CDATA['.($row->reihungstestangetreten?'true':'false').']]></STUDENT:reihungstestangetreten>
 			<STUDENT:punkte><![CDATA['.$row->punkte.']]></STUDENT:punkte>
-			<STUDENT:punkte1><![CDATA['.$row->rt_punkte1.']]></STUDENT:punkte1>
-			<STUDENT:punkte2><![CDATA['.$row->rt_punkte2.']]></STUDENT:punkte2>
-			<STUDENT:punkte3><![CDATA['.$row->rt_punkte3.']]></STUDENT:punkte3>
-			<STUDENT:rt_datum><![CDATA['.$rt_datum.']]></STUDENT:rt_datum>
-			<STUDENT:rt_anmeldung><![CDATA['.$row->anmeldungreihungstest.']]></STUDENT:rt_anmeldung>
 			<STUDENT:bismelden><![CDATA['.($row->bismelden?'true':'false').']]></STUDENT:bismelden>
 			<STUDENT:dual><![CDATA['.($row->dual?'true':'false').']]></STUDENT:dual>
 			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
 			<STUDENT:anmerkungpre><![CDATA['.$row->anmerkung.']]></STUDENT:anmerkungpre>
 			<STUDENT:mentor><![CDATA['.$row->mentor.']]></STUDENT:mentor>
 			<STUDENT:gsstudientyp_kurzbz><![CDATA['.$row->gsstudientyp_kurzbz.']]></STUDENT:gsstudientyp_kurzbz>
-      	</RDF:Description>
-      </RDF:li>';
+		</RDF:Description>
+	</RDF:li>';
 	}
 }
 
@@ -431,19 +420,19 @@ if($xmlformat=='rdf')
 		$where = '';
 		if ($gruppe_kurzbz!=null)
 		{
-			$where=" gruppe_kurzbz='".$gruppe_kurzbz."' ";
+			$where=" gruppe_kurzbz=".$db->db_add_param($gruppe_kurzbz)." ";
 			if($studiensemester_kurzbz!=null)
-				$where.=" AND tbl_benutzergruppe.studiensemester_kurzbz='$studiensemester_kurzbz'";
+				$where.=" AND tbl_benutzergruppe.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
 		}
 		else
 		{
-			$where.=" tbl_studentlehrverband.studiengang_kz=$studiengang_kz";
+			$where.=" tbl_studentlehrverband.studiengang_kz=".$db->db_add_param($studiengang_kz);
 			if ($semester!=null)
-				$where.=" AND tbl_studentlehrverband.semester=$semester";
+				$where.=" AND tbl_studentlehrverband.semester=".$db->db_add_param($semester);
 			if ($verband!=null)
-				$where.=" AND tbl_studentlehrverband.verband='".$verband."'";
+				$where.=" AND tbl_studentlehrverband.verband=".$db->db_add_param($verband);
 			if ($gruppe!=null)
-				$where.=" AND tbl_studentlehrverband.gruppe='".$gruppe."'";
+				$where.=" AND tbl_studentlehrverband.gruppe=".$db->db_add_param($gruppe);
 
 			//Wenn eine Orgform uebergeben wird nur das Semester ausgewaehlt ist, dann
 			//nach der Orgform filtern. Bei Verbaenden, Gruppen und Spezialgruppen wird auf
@@ -452,35 +441,36 @@ if($xmlformat=='rdf')
 			{
 				$where.=" AND '$orgform' = (SELECT orgform_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id";
 				if($studiensemester_kurzbz!=null)
-					$where.=" AND studiensemester_kurzbz='$studiensemester_kurzbz'";
+					$where.=" AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
 				$where.=" ORDER BY datum desc, insertamum desc, ext_id desc LIMIT 1)";
 			}
 		}
 
 		//$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz'";
 
-		$sql_query="SELECT p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,	vorname, vornamen, geschlecht,
-						nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
-						tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-						tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, mentor, public.tbl_benutzer.aktiv AS bnaktiv,
-						(	SELECT kontakt
-							FROM public.tbl_kontakt
-							WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung
-							LIMIT 1
-						)
-						AS email_privat,
-						(SELECT rt_gesamtpunkte as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as punkte,
-						(SELECT rt_punkte1 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte1,
-						(SELECT rt_punkte2 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte2,
-						(SELECT rt_punkte3 as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as rt_punkte3,
-						 tbl_prestudent.dual as dual, tbl_prestudent.reihungstest_id, tbl_prestudent.anmeldungreihungstest, p.matr_nr, tbl_prestudent.gsstudientyp_kurzbz
-						FROM public.tbl_student
-							JOIN public.tbl_benutzer ON (student_uid=uid) JOIN public.tbl_person p USING (person_id)  JOIN public.tbl_prestudent USING(prestudent_id) ";
+		$sql_query="
+		SELECT
+			p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,vorname, vornamen, geschlecht,
+			nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
+			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
+			tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, mentor, public.tbl_benutzer.aktiv AS bnaktiv,
+			(	SELECT kontakt
+				FROM public.tbl_kontakt
+				WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung
+				LIMIT 1
+			)
+			AS email_privat,
+			(SELECT rt_gesamtpunkte as punkte FROM public.tbl_prestudent WHERE prestudent_id=tbl_student.prestudent_id) as punkte,
+			 tbl_prestudent.dual as dual, tbl_prestudent.reihungstest_id, tbl_prestudent.anmeldungreihungstest, p.matr_nr, tbl_prestudent.gsstudientyp_kurzbz
+		FROM
+			public.tbl_student
+			JOIN public.tbl_benutzer ON (student_uid=uid)
+			JOIN public.tbl_person p USING (person_id)
+			JOIN public.tbl_prestudent USING(prestudent_id) ";
 		if($gruppe_kurzbz!=null)
 			$sql_query.= "JOIN public.tbl_benutzergruppe USING (uid) ";
-		$sql_query.="LEFT JOIN public.tbl_studentlehrverband ON (tbl_studentlehrverband.student_uid=tbl_student.student_uid AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz')";
+		$sql_query.="LEFT JOIN public.tbl_studentlehrverband ON (tbl_studentlehrverband.student_uid=tbl_student.student_uid AND tbl_studentlehrverband.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz).")";
 		$sql_query.="WHERE ".$where.' ORDER BY nachname, vorname';
-
 
 		if($db->db_query($sql_query))
 		{
@@ -497,7 +487,7 @@ if($xmlformat=='rdf')
 			$studiensemester_kurzbz=$semester_aktuell;
 		if($typ=='incoming')
 		{
-			$qry = "SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE status_kurzbz='Incoming' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+			$qry = "SELECT prestudent_id FROM public.tbl_prestudentstatus WHERE status_kurzbz='Incoming' AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
 		}
 		else
 		{
@@ -508,11 +498,11 @@ if($xmlformat=='rdf')
 						bis.tbl_bisio JOIN public.tbl_student USING(student_uid)
 					WHERE
 						(
-						(tbl_bisio.von>='".$stsem_obj->start."' AND tbl_bisio.von<='".$stsem_obj->ende."')
+						(tbl_bisio.von>=".$db->db_add_param($stsem_obj->start)." AND tbl_bisio.von<=".$db->db_add_param($stsem_obj->ende).")
 						OR
-						(tbl_bisio.bis>='".$stsem_obj->start."' AND tbl_bisio.bis<='".$stsem_obj->ende."')
+						(tbl_bisio.bis>=".$db->db_add_param($stsem_obj->start)." AND tbl_bisio.bis<=".$db->db_add_param($stsem_obj->ende).")
 						OR
-						(tbl_bisio.von<='".$stsem_obj->start."' AND tbl_bisio.bis>='".$stsem_obj->ende."')
+						(tbl_bisio.von<=".$db->db_add_param($stsem_obj->start)." AND tbl_bisio.bis>=".$db->db_add_param($stsem_obj->ende).")
 						)
 						AND NOT EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Incoming' AND prestudent_id=tbl_student.prestudent_id)
 					";
@@ -582,9 +572,9 @@ if($xmlformat=='rdf')
 			}
 		}
 	}
-	elseif(in_array($typ, array('prestudent', 'interessenten','bewerber','aufgenommen',
-	                      'warteliste','absage','zgv','reihungstestangemeldet',
-	                      'reihungstestnichtangemeldet','absolvent','diplomand','bewerbungnichtabgeschickt','bewerbungabgeschickt','statusbestaetigt')))
+	elseif(in_array($typ, array('prestudent', 'interessenten', 'bewerber', 'aufgenommen',
+		'warteliste', 'absage', 'zgv', 'reihungstestangemeldet', 'reihungstestnichtangemeldet', 'absolvent',
+		'diplomand', 'bewerbungnichtabgeschickt', 'bewerbungabgeschickt', 'statusbestaetigt')))
 	{
 		$prestd = new prestudent();
 
@@ -629,77 +619,76 @@ if($xmlformat=='rdf')
 	{
 		if($filter!='')
 		{
-		    if(substr_compare($filter, "#ref", 0, 4,true)==0)
-		    {
-			$zahlungsreferenz = explode(" ", $filter);
-			unset($zahlungsreferenz[0]);
-
-			foreach($zahlungsreferenz as $ref)
+			if(substr_compare($filter, "#ref", 0, 4,true)==0)
 			{
-			    $konto = new konto();
-			    $konto->loadFromZahlungsreferenz($ref);
-			    $prestudent=new prestudent();
-			    $prestudent->getPrestudenten($konto->person_id);
-			    if(!empty($prestudent->result))
-			    {
-				$prestudent_temp = new prestudent($prestudent->result[0]->prestudent_id);
-				$student = new student();
-				$uid = $student->getUid($prestudent_temp->prestudent_id);
+				$zahlungsreferenz = explode(" ", $filter);
+				unset($zahlungsreferenz[0]);
 
-				if($uid!='' && $uid != false)
+				foreach($zahlungsreferenz as $ref)
 				{
-				    if(!$student->load($uid, $studiensemester_kurzbz))
-					$student->load($uid);
-				    draw_content($student);
-				    draw_prestudent($prestudent_temp);
+					$konto = new konto();
+					$konto->loadFromZahlungsreferenz($ref);
+					$prestudent=new prestudent();
+					$prestudent->getPrestudenten($konto->person_id);
+					if(!empty($prestudent->result))
+					{
+						$prestudent_temp = new prestudent($prestudent->result[0]->prestudent_id);
+						$student = new student();
+						$uid = $student->getUid($prestudent_temp->prestudent_id);
+
+						if($uid!='' && $uid != false)
+						{
+							if(!$student->load($uid, $studiensemester_kurzbz))
+							$student->load($uid);
+							draw_content($student);
+							draw_prestudent($prestudent_temp);
+						}
+						else
+						{
+							draw_content($prestudent_temp);
+							draw_prestudent($prestudent_temp);
+						}
+					}
 				}
-				else
-				{
-				    draw_content($prestudent_temp);
-				    draw_prestudent($prestudent_temp);
-				}
-			    }
 			}
-		    }
-		    else
-		    {
-			//$filter = utf8_decode($filter);
-			$qry = "SELECT prestudent_id
-				FROM
-				    public.tbl_person JOIN tbl_prestudent USING (person_id) LEFT JOIN tbl_student using(prestudent_id)
-				WHERE
-				    COALESCE(nachname,'')||' '||COALESCE(vorname,'') ~* '".addslashes($filter)."' OR
-				    COALESCE(vorname,'')||' '||COALESCE(nachname,'') ~* '".addslashes($filter)."' OR
-				    student_uid ~* '".addslashes($filter)."' OR
-				    matrikelnr = '".addslashes($filter)."' OR
-				    svnr = '".addslashes($filter)."';";
-			if($db->db_query($qry))
+			else
 			{
-			    while($row = $db->db_fetch_object())
-			    {
-				$student=new student();
-				if($uid = $student->getUid($row->prestudent_id))
+				$qry = "SELECT prestudent_id
+					FROM
+						public.tbl_person JOIN tbl_prestudent USING (person_id) LEFT JOIN tbl_student using(prestudent_id)
+					WHERE
+						COALESCE(nachname,'')||' '||COALESCE(vorname,'') ~* ".$db->db_add_param($filter)." OR
+						COALESCE(vorname,'')||' '||COALESCE(nachname,'') ~* ".$db->db_add_param($filter)." OR
+						student_uid ~* ".$db->db_add_param($filter)." OR
+						matrikelnr = ".$db->db_add_param($filter)." OR
+						svnr = ".$db->db_add_param($filter).";";
+				if($db->db_query($qry))
 				{
-				    //Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
-				    //nochmal laden aber ohne studiensemester
-				    if(!$student->load($uid, $studiensemester_kurzbz))
-					$student->load($uid);
+					while($row = $db->db_fetch_object())
+					{
+						$student=new student();
+						if($uid = $student->getUid($row->prestudent_id))
+						{
+							//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
+							//nochmal laden aber ohne studiensemester
+							if(!$student->load($uid, $studiensemester_kurzbz))
+							$student->load($uid);
+						}
+						$prestd = new prestudent();
+						$prestd->load($row->prestudent_id);
+						if($uid!='')
+						{
+							draw_content($student);
+							draw_prestudent($prestd);
+						}
+						else
+						{
+							draw_content($prestd);
+							draw_prestudent($prestd);
+						}
+					}
 				}
-				$prestd = new prestudent();
-				$prestd->load($row->prestudent_id);
-				if($uid!='')
-				{
-				    draw_content($student);
-				    draw_prestudent($prestd);
-				}
-				else
-				{
-				    draw_content($prestd);
-				    draw_prestudent($prestd);
-				}
-			    }
 			}
-		    }
 		}
 		elseif(isset($prestudent_id))
 		{
@@ -852,8 +841,7 @@ else
 				$lv_studiengang->load($lv_studiengang_kz);
 				$lv_studiengang_bezeichnung=$lv_studiengang->bezeichnung;
 				$lv_studiengang_typ=$lv_studiengang->typ;
-//	            $stg_typ->getStudiengangTyp($lv_studiengang->typ);
-//				$lv_studiengang_art=$stg_typ->bezeichnung;
+
 				switch($lv_studiengang->typ)
 				{
 					case 'd':	$lv_studiengang_art = 'Diplom';
@@ -918,19 +906,19 @@ else
 				<gruppe><![CDATA['.$student->gruppe.']]></gruppe>
 				<studienjahr><![CDATA['.$studienjahr.']]></studienjahr>
 				<student_orgform_kurzbz><![CDATA['.$prestudent->orgform_kurzbz.']]></student_orgform_kurzbz>
-                <student_orgform_bezeichnung><![CDATA['.$orgform_student_bezeichnung->bezeichnung.']]></student_orgform_bezeichnung>
+				<student_orgform_bezeichnung><![CDATA['.$orgform_student_bezeichnung->bezeichnung.']]></student_orgform_bezeichnung>
 				<studiengang_kz><![CDATA['.$stg_kz.']]></studiengang_kz>
 				<studiengang_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></studiengang_bezeichnung>
 				<studiengang_art><![CDATA['.$typ.']]></studiengang_art>
-                <studiengang_typ><![CDATA['.$studiengang->typ.']]></studiengang_typ>
-                <studiengang_orgform_kurzbz><![CDATA['.$studiengang->orgform_kurzbz.']]></studiengang_orgform_kurzbz>
-                <studiengang_orgform_bezeichnung><![CDATA['.$orgform_bezeichnung->bezeichnung.']]></studiengang_orgform_bezeichnung>
-                <studiengang_studiengangsleitung><![CDATA['.$stgl.']]></studiengang_studiengangsleitung>
+				<studiengang_typ><![CDATA['.$studiengang->typ.']]></studiengang_typ>
+				<studiengang_orgform_kurzbz><![CDATA['.$studiengang->orgform_kurzbz.']]></studiengang_orgform_kurzbz>
+				<studiengang_orgform_bezeichnung><![CDATA['.$orgform_bezeichnung->bezeichnung.']]></studiengang_orgform_bezeichnung>
+				<studiengang_studiengangsleitung><![CDATA['.$stgl.']]></studiengang_studiengangsleitung>
 				<studiengang_bezeichnung_sto><![CDATA['.$sto_studiengang_bezeichnung.']]></studiengang_bezeichnung_sto>
 				<studiengang_bezeichnung_sto_englisch><![CDATA['.$sto_studiengang_bezeichnung_englisch.']]></studiengang_bezeichnung_sto_englisch>
 				<lv_studiengang_kz><![CDATA['.$lv_studiengang_kz.']]></lv_studiengang_kz>
 				<lv_studiengang_bezeichnung><![CDATA['.$lv_studiengang_bezeichnung.']]></lv_studiengang_bezeichnung>
-                <lv_studiengang_typ><![CDATA['.$lv_studiengang_typ.']]></lv_studiengang_typ>
+				<lv_studiengang_typ><![CDATA['.$lv_studiengang_typ.']]></lv_studiengang_typ>
 				<lv_studiengang_art><![CDATA['.$lv_studiengang_art.']]></lv_studiengang_art>
 				<anrede><![CDATA['.$student->anrede.']]></anrede>
 				<geschlecht><![CDATA['.$student->geschlecht.']]></geschlecht>
@@ -948,7 +936,7 @@ else
 				<max_semester><![CDATA['.$studiengang->max_semester.']]></max_semester>
 				<anmerkungpre><![CDATA['.$prestudent->anmerkung.']]></anmerkungpre>
 				<aktiv><![CDATA['.$student->aktiv.']]></aktiv>
-	    	</student>';
+			</student>';
 		}
 	}
 	echo '</studenten>';
