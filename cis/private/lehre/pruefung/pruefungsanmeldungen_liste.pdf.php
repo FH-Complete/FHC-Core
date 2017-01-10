@@ -109,7 +109,7 @@ if(!empty($anmeldungen))
 		'studiengang'=>$studiengang_bezeichnung,
 		'studiengang_kz'=>$lv->studiengang_kz,
 		'typ'=>$stg->studiengang_typ_arr[$stg->typ],
-		'studiensemester'=>$studiensemester,
+		'studiensemester'=>$stdsem->bezeichnung,
 		'semester'=>$lv->semester,
 		'orgform'=>$lv->orgform_kurzbz,
 		'dozent'=>$dozent,
