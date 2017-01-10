@@ -812,7 +812,7 @@ function writeAnmeldungen(data)
 		$("#reihungSpeichernButton").html("<input type='button' value='<?php echo $p->t('pruefung/reihungSpeichern'); ?>' onclick='saveReihung(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'><input type='button' value='<?php echo $p->t('pruefung/alleBestaetigen'); ?>' onclick='alleBestaetigen(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'>");
 		$("#lvdaten").html(lv_bezeichnung+" ("+prf_termin+")");
 		$("#anmeldeDaten").html(liste);
-		$("#listeDrucken").html("<a href='./pruefungsanmeldungen_liste.php?termin_id="+terminId+"&lehrveranstaltung_id="+lehrveranstaltung_id+"&studiensemester="+studiensemester+"' target='_blank'><?php echo $p->t('pruefung/listeDrucken'); ?></a>");
+		$("#listeDrucken").html("<a href='./pruefungsanmeldungen_liste.pdf.php?termin_id="+terminId+"&lehrveranstaltung_id="+lehrveranstaltung_id+"&studiensemester="+studiensemester+"' target='_blank'><?php echo $p->t('pruefung/listeDrucken'); ?></a>");
 		if(ort_kurzbz !== null)
 		{
 			$("#raumLink").html("<span><?php echo $p->t('pruefung/pruefungsraum'); ?></span>"+ort_kurzbz);

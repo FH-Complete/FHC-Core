@@ -31,6 +31,7 @@ require_once('../../../../include/datum.class.php');
 require_once('../../../../include/phrasen.class.php');
 require_once('../../../../include/globals.inc.php');
 require_once('../../../../include/sprache.class.php');
+require_once('../../../../include/vorlage.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -59,6 +60,10 @@ if(isset($_GET['termin_id']) && is_numeric($_GET['termin_id']))
 		$termin_id = $_GET['termin_id'];
 else
 	die('Eine Termin-ID muss uebergeben werden');
+
+$vorlagecheck = new vorlage();
+if (!$vorlagecheck->loadVorlage('Pruefungslist'))
+	header('Location: pruefungsanmeldungen_liste.php?termin_id='.$termin_id.'&lehrveranstaltung_id='.$lvid.'&studiensemester='.$studiensemester);
 
 if(!$berechtigung->isBerechtigt('admin') && !$berechtigung->isBerechtigt('assistenz') && !check_lektor_lehrveranstaltung($user,$lvid,$studiensemester))
 	die('Sie muessen LektorIn der LV oder Admin sein, um diese Seite aufrufen zu koennen');
