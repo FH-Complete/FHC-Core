@@ -1394,7 +1394,7 @@ if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM testtool.tbl_
 		echo '<strong>testtool.tbl_gebiet '.$db->db_last_error().'</strong><br>';
 	else
 		echo 'testtool.tbl_gebiet: Spalte bezeichnung_mehrsprachig hinzugefuegt!<br>';
-	
+
 	// Bezeichnung_mehrsprachig aus existierender Bezeichnung vorausfuellen. Ein Eintrag fuer jede Sprache mit Content aktiv.
 	$qry_help = "SELECT count(*) FROM public.tbl_sprache WHERE content=TRUE;";
 	if(!$result = $db->db_query($qry_help))
@@ -1412,7 +1412,7 @@ if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM testtool.tbl_
 		//Komma am Ende entfernen
 		$bezeichnungen = mb_substr($bezeichnungen,0,-1);
 		$qry = "UPDATE testtool.tbl_gebiet set bezeichnung_mehrsprachig = cast('{".$bezeichnungen."}' as varchar[]);";
-		
+
 		if(!$db->db_query($qry))
 			echo '<strong>Setzen der bezeichnung_mehrsprachig fehlgeschlagen: '.$db->db_last_error().'</strong><br>';
 		else
@@ -1456,7 +1456,23 @@ if ($result = @$db->db_query("SELECT php FROM public.tbl_statistik LIMIT 1;"))
 		echo ' public.tbl_statistik: Spalte php entfernt.<br>';
 }
 
-
+// vorlage_kurzbz von 16 auf 32 Zeichen
+if($result = $db->db_query("SELECT character_maximum_length FROM information_schema.columns WHERE column_name='vorlage_kurzbz' AND table_name='tbl_vorlage' AND table_schema='public';"))
+{
+	if($row = $db->db_fetch_object($result))
+	{
+		if($row->character_maximum_length==16)
+		{
+			$qry = "ALTER TABLE public.tbl_vorlage ALTER COLUMN vorlage_kurzbz TYPE varchar(32);
+			ALTER TABLE public.tbl_vorlagestudiengang ALTER COLUMN vorlage_kurzbz TYPE varchar(32);
+			";
+			if(!$db->db_query($qry))
+				echo '<strong>public.tbl_vorlage: '.$db->db_last_error().'</strong><br>';
+			else
+				echo 'public.tbl_vorlage: Spalte vorlage_kurzbz auf 32 Zeichen verlaengert<br>';
+		}
+	}
+}
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
