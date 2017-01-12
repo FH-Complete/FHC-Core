@@ -1287,8 +1287,8 @@ class lehrveranstaltung extends basis_db
 		$tree = array();
 		foreach ($this->lehrveranstaltungen as $row)
 		{
-			if ($row->studienplan_lehrveranstaltung_id_parent == '' 
-				|| (defined("CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN") 
+			if ($row->studienplan_lehrveranstaltung_id_parent == ''
+				|| (defined("CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN")
 					&& CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN))
 			{
 				$tree[$row->studienplan_lehrveranstaltung_id] = $row;
@@ -2563,6 +2563,51 @@ class lehrveranstaltung extends basis_db
 			else
 			{
 				$this->errormsg='Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Prueft ob eine Lehrveranstaltung im gewaehlten Studiensemester angeboten wird.
+	 * Dazu wird geprueft ob die LV einem aktuellen Studienplan zugeordnet ist, und ob ein Lehrauftrag vorhanden ist.
+	 *
+	 * @param $lehrveranstaltung_id ID der Lehrveranstaltung.
+	 * @param $studiensemester_kurzbz Kurzbz des Studiensemesters.
+	 * @return boolean true wenn angeboten, false wenn nicht angeboten
+	 */
+	public function isOffered($lehrveranstaltung_id, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT
+					*
+				FROM
+					lehre.tbl_lehreinheit
+				WHERE lehrveranstaltung_id = ".$this->db_add_param($lehrveranstaltung_id)."
+				AND studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
+				AND EXISTS (
+					SELECT
+						*
+					FROM
+						lehre.tbl_studienplan_lehrveranstaltung
+						JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
+					WHERE
+						lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id)."
+						AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					)";
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_num_rows($result)>0)
+			{
+				return true;
+			}
+			else
+			{
 				return false;
 			}
 		}
