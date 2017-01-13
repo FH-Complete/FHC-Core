@@ -92,6 +92,33 @@ class Prestudent extends APIv1_Controller
 	/**
 	 * @return void
 	 */
+	public function getLastStatuses()
+	{
+		$person_id = $this->get('person_id');
+		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
+		$studiengang_kz = $this->get('studiengang_kz');
+		$status_kurzbz = $this->get('status_kurzbz');
+		
+		if (isset($person_id))
+		{
+			$result = $this->PrestudentModel->getLastStatuses(
+				$person_id,
+				$studiensemester_kurzbz,
+				$studiengang_kz,
+				$status_kurzbz
+			);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+	
+	/**
+	 * @return void
+	 */
 	public function postRmSpecialization()
 	{
 		$notiz_id = $this->post()['notiz_id'];
