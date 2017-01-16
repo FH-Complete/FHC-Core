@@ -47,6 +47,7 @@ class gruppe extends basis_db
 	public $orgform_kurzbz;
 	public $gesperrt=false;		// boolean
 	public $zutrittssystem=false;	// boolean
+	public $aufnahmegruppe=false; // boolean
 
 	/**
 	 * Konstruktor - Laedt optional eine Gruppe
@@ -55,7 +56,7 @@ class gruppe extends basis_db
 	public function __construct($gruppe_kurzbz=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($gruppe_kurzbz))
 			$this->load($gruppe_kurzbz);
 	}
@@ -68,7 +69,7 @@ class gruppe extends basis_db
 	public function delete($gruppe_kurzbz)
 	{
 		$qry ="DELETE FROM public.tbl_gruppe WHERE gruppe_kurzbz=".$this->db_add_param($gruppe_kurzbz);
-		
+
 		if($this->db_query($qry))
 			return true;
 		else
@@ -102,7 +103,7 @@ class gruppe extends basis_db
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler bei einer Abfrage';
 			return false;
@@ -116,7 +117,7 @@ class gruppe extends basis_db
 	public function load($gruppe_kurzbz)
 	{
 		$qry = "SELECT * FROM public.tbl_gruppe WHERE gruppe_kurzbz=".$this->db_add_param($gruppe_kurzbz);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -140,6 +141,7 @@ class gruppe extends basis_db
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				$this->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$this->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
+				$this->aufnahmegruppe = $this->db_parse_bool($row->aufnahmegruppe);
 				return true;
 			}
 			else
@@ -169,7 +171,7 @@ class gruppe extends basis_db
 			while($row = $this->db_fetch_object())
 			{
 				$grp_obj = new gruppe();
-				
+
 				$grp_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
 				$grp_obj->studiengang_kz = $row->studiengang_kz;
 				$grp_obj->bezeichnung = $row->bezeichnung;
@@ -189,6 +191,7 @@ class gruppe extends basis_db
 				$grp_obj->orgform_kurzbz = $row->orgform_kurzbz;
 				$grp_obj->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$grp_obj->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
+				$grp_obj->aufnahmegruppe = $this->db_parse_bool($row->aufnahmegruppe);
 
 				$this->result[] = $grp_obj;
 			}
@@ -209,9 +212,9 @@ class gruppe extends basis_db
 	 */
 	public function countStudenten($gruppe_kurzbz)
 	{
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzergruppe 
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzergruppe
 				WHERE gruppe_kurzbz=".$this->db_add_param($gruppe_kurzbz);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -265,7 +268,7 @@ class gruppe extends basis_db
 			while($row = $this->db_fetch_object())
 			{
 				$grp_obj = new gruppe();
-				
+
 				$grp_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
 				$grp_obj->studiengang_kz = $row->studiengang_kz;
 				$grp_obj->bezeichnung = $row->bezeichnung;
@@ -285,6 +288,7 @@ class gruppe extends basis_db
 				$grp_obj->orgform_kurzbz = $row->orgform_kurzbz;
 				$grp_obj->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$grp_obj->zutrittsssystem = $this->db_parse_bool($row->zutrittssystem);
+				$grp_obj->aufnahmegruppe = $this->db_parse_bool($row->aufnahmegruppe);
 
 				$this->result[] = $grp_obj;
 			}
@@ -367,7 +371,7 @@ class gruppe extends basis_db
 
 		return true;
 	}
-	
+
 	/**
 	 * Speichert Gruppe in die Datenbank
 	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
@@ -385,15 +389,16 @@ class gruppe extends basis_db
 
 		if($new)
 		{
-			if ($upper)			
+			if ($upper)
 				$kurzbz = mb_strtoupper($this->gruppe_kurzbz);
 			else
 				$kurzbz = $this->gruppe_kurzbz;
-			
+
 			$qry = 'INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, sort,
-			                                mailgrp, beschreibung, sichtbar, generiert, aktiv, lehre, content_visible,
-			                                updateamum, updatevon, insertamum, insertvon, orgform_kurzbz, gesperrt,zutrittssystem)
-			        VALUES('.$this->db_add_param($kurzbz).','.
+											mailgrp, beschreibung, sichtbar, generiert, aktiv, lehre, content_visible,
+											updateamum, updatevon, insertamum, insertvon, orgform_kurzbz, gesperrt,
+											zutrittssystem, aufnahmegruppe)
+					VALUES('.$this->db_add_param($kurzbz).','.
 					$this->db_add_param($this->studiengang_kz).','.
 					$this->db_add_param($this->bezeichnung).','.
 					$this->db_add_param($this->semester).','.
@@ -411,31 +416,34 @@ class gruppe extends basis_db
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->orgform_kurzbz).','.
 					$this->db_add_param($this->gesperrt, FHC_BOOLEAN).','.
-					$this->db_add_param($this->zutrittssystem, FHC_BOOLEAN).');';
+					$this->db_add_param($this->zutrittssystem, FHC_BOOLEAN).','.
+					$this->db_add_param($this->aufnahmegruppe, FHC_BOOLEAN).');';
 		}
 		else
 		{
 			$qry = 'UPDATE public.tbl_gruppe SET'.
-			       ' studiengang_kz='.$this->db_add_param($this->studiengang_kz).','.
-			       ' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
-			       ' semester='.$this->db_add_param($this->semester).','.
-			       ' sort='.$this->db_add_param($this->sort).','.
-			       ' mailgrp='.$this->db_add_param($this->mailgrp, FHC_BOOLEAN).','.
-			       ' beschreibung='.$this->db_add_param($this->beschreibung).','.
-			       ' sichtbar='.$this->db_add_param($this->sichtbar, FHC_BOOLEAN).','.
-			       ' generiert='.$this->db_add_param($this->generiert, FHC_BOOLEAN).','.
-			       ' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
-			       ' lehre='.$this->db_add_param($this->lehre, FHC_BOOLEAN).','.
-				   ' content_visible='.$this->db_add_param($this->content_visible, FHC_BOOLEAN).','.
-			       ' updateamum='.$this->db_add_param($this->updateamum).','.
-			       ' updatevon='.$this->db_add_param($this->updatevon).','.
-			       ' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).', '.
-				   ' gesperrt='.$this->db_add_param($this->gesperrt, FHC_BOOLEAN).', '.
-				   ' zutrittssystem='.$this->db_add_param($this->zutrittssystem, FHC_BOOLEAN).' ';
-					if($this->gruppe_kurbzNeu != null) {
-						$qry.=', gruppe_kurzbz='.$this->db_add_param($this->gruppe_kurbzNeu).' ';
-					}
-			       $qry.=" WHERE gruppe_kurzbz=".$this->db_add_param($this->gruppe_kurzbz).";";
+				' studiengang_kz='.$this->db_add_param($this->studiengang_kz).','.
+				' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
+				' semester='.$this->db_add_param($this->semester).','.
+				' sort='.$this->db_add_param($this->sort).','.
+				' mailgrp='.$this->db_add_param($this->mailgrp, FHC_BOOLEAN).','.
+				' beschreibung='.$this->db_add_param($this->beschreibung).','.
+				' sichtbar='.$this->db_add_param($this->sichtbar, FHC_BOOLEAN).','.
+				' generiert='.$this->db_add_param($this->generiert, FHC_BOOLEAN).','.
+				' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
+				' lehre='.$this->db_add_param($this->lehre, FHC_BOOLEAN).','.
+				' content_visible='.$this->db_add_param($this->content_visible, FHC_BOOLEAN).','.
+				' updateamum='.$this->db_add_param($this->updateamum).','.
+				' updatevon='.$this->db_add_param($this->updatevon).','.
+				' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).', '.
+				' gesperrt='.$this->db_add_param($this->gesperrt, FHC_BOOLEAN).', '.
+				' zutrittssystem='.$this->db_add_param($this->zutrittssystem, FHC_BOOLEAN).', '.
+				' aufnahmegruppe='.$this->db_add_param($this->aufnahmegruppe, FHC_BOOLEAN).' ';
+			if($this->gruppe_kurbzNeu != null)
+			{
+				$qry.=', gruppe_kurzbz='.$this->db_add_param($this->gruppe_kurbzNeu).' ';
+			}
+			$qry.=" WHERE gruppe_kurzbz=".$this->db_add_param($this->gruppe_kurzbz).";";
 		}
 
 		if($this->db_query($qry))
@@ -449,34 +457,34 @@ class gruppe extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt die User dieser Gruppe
-	 * 
+	 *
 	 * @param $gruppe_kurzbz
 	 */
 	public function loadUser($gruppe_kurzbz)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					tbl_benutzer.uid, tbl_person.vorname, tbl_person.nachname
-				FROM 
-					public.tbl_benutzergruppe 
-					JOIN public.tbl_benutzer USING(uid) 
-					JOIN public.tbl_person USING(person_id) 
+				FROM
+					public.tbl_benutzergruppe
+					JOIN public.tbl_benutzer USING(uid)
+					JOIN public.tbl_person USING(person_id)
 				WHERE
 					tbl_benutzergruppe.gruppe_kurzbz=".$this->db_add_param($gruppe_kurzbz)."
-	       		ORDER BY nachname, vorname";
-		
+				ORDER BY nachname, vorname";
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new gruppe();
-				
+
 				$obj->uid = $row->uid;
 				$obj->vorname = $row->vorname;
 				$obj->nachname = $row->nachname;
-				
+
 				$this->result[]=$obj;
 			}
 			return true;
@@ -485,9 +493,9 @@ class gruppe extends basis_db
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
-		}		
+		}
 	}
-	
+
 	/**
 	 * Laedt alle Zutrittsgruppen in denen sich der Benutzer befindet
 	 *
@@ -495,21 +503,21 @@ class gruppe extends basis_db
 	 */
 	public function loadZutrittsgruppen($user)
 	{
-		$qry = "SELECT 
-					* 
-				FROM 
-					public.tbl_benutzergruppe 
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_benutzergruppe
 					JOIN public.tbl_gruppe USING(gruppe_kurzbz)
 				WHERE
 					tbl_gruppe.zutrittssystem=true
 					AND tbl_benutzergruppe.uid=".$this->db_add_param($user);
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$grp_obj = new gruppe();
-				
+
 				$grp_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
 				$grp_obj->studiengang_kz = $row->studiengang_kz;
 				$grp_obj->bezeichnung = $row->bezeichnung;
@@ -529,6 +537,7 @@ class gruppe extends basis_db
 				$grp_obj->orgform_kurzbz = $row->orgform_kurzbz;
 				$grp_obj->gesperrt = $this->db_parse_bool($row->gesperrt);
 				$grp_obj->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
+				$grp_obj->aufnahmegruppe = $this->db_parse_bool($row->aufnahmegruppe);
 
 				$this->result[] = $grp_obj;
 			}
@@ -540,7 +549,7 @@ class gruppe extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Prüft ob die Gruppenbezeichnung bereits vorhanden ist
 	 * und gibt bei Bedarf die Bezeichnung inkl. Nummerierung zurück
@@ -550,7 +559,7 @@ class gruppe extends basis_db
 	public function getNummerierteGruppenbez($gruppe_kurzbz)
 	{
 		$gruppe_kurzbz_regex = $gruppe_kurzbz . '-[0-9]+$';
-		
+
 		$qry = 'SELECT COUNT(gruppe_kurzbz) AS anzahl
 				FROM public.tbl_gruppe
 				WHERE gruppe_kurzbz = ' . $this->db_add_param($gruppe_kurzbz) . '
@@ -564,8 +573,55 @@ class gruppe extends basis_db
 					$gruppe_kurzbz = $gruppe_kurzbz . "-" . $row->anzahl;
 			}
 		}
-		
+
 		return $gruppe_kurzbz;
+	}
+
+	/**
+	 * Laedt alle Aufnahmegruppen
+	 *
+	 * @return boolean true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function getAufnahmegruppen()
+	{
+		$qry = "SELECT * FROM public.tbl_gruppe WHERE aufnahmegruppe=true ORDER BY bezeichnung";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$grp_obj = new gruppe();
+
+				$grp_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$grp_obj->studiengang_kz = $row->studiengang_kz;
+				$grp_obj->bezeichnung = $row->bezeichnung;
+				$grp_obj->semester = $row->semester;
+				$grp_obj->sort = $row->sort;
+				$grp_obj->mailgrp = $this->db_parse_bool($row->mailgrp);
+				$grp_obj->lehre = $this->db_parse_bool($row->lehre);
+				$grp_obj->beschreibung = $row->beschreibung;
+				$grp_obj->sichtbar = $this->db_parse_bool($row->sichtbar);
+				$grp_obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$grp_obj->content_visible = $this->db_parse_bool($row->content_visible);
+				$grp_obj->generiert = $this->db_parse_bool($row->generiert);
+				$grp_obj->updateamum = $row->updateamum;
+				$grp_obj->updatevon = $row->updatevon;
+				$grp_obj->insertamum = $row->insertamum;
+				$grp_obj->insertvon = $row->insertvon;
+				$grp_obj->orgform_kurzbz = $row->orgform_kurzbz;
+				$grp_obj->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$grp_obj->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
+				$grp_obj->aufnahmegruppe = $this->db_parse_bool($row->aufnahmegruppe);
+
+				$this->result[] = $grp_obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 }
 ?>

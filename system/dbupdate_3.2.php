@@ -1338,7 +1338,7 @@ if($result = $db->db_query("SELECT * FROM public.tbl_vorlage WHERE vorlage_kurzb
 
 			$testQuery = "SELECT setval('seq_vorlagestudiengang_vorlagestudiengang_id', max(vorlagestudiengang_id)) FROM tbl_vorlagestudiengang;";
 			$testResult = $db->db_query($testQuery);
-			
+
 			$text = file_get_contents(DOC_ROOT . '/system/xsl/Bewerberakt.xsl');
 
 			while($row = $db->db_fetch_object($result))
@@ -1618,7 +1618,7 @@ if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM testtool.tbl_
 		echo '<strong>testtool.tbl_gebiet '.$db->db_last_error().'</strong><br>';
 	else
 		echo 'testtool.tbl_gebiet: Spalte bezeichnung_mehrsprachig hinzugefuegt!<br>';
-	
+
 	// Bezeichnung_mehrsprachig aus existierender Bezeichnung vorausfuellen. Ein Eintrag fuer jede Sprache mit Content aktiv.
 	$qry_help = "SELECT count(*) FROM public.tbl_sprache WHERE content=TRUE;";
 	if(!$result = $db->db_query($qry_help))
@@ -1636,7 +1636,7 @@ if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM testtool.tbl_
 		//Komma am Ende entfernen
 		$bezeichnungen = mb_substr($bezeichnungen,0,-1);
 		$qry = "UPDATE testtool.tbl_gebiet set bezeichnung_mehrsprachig = cast('{".$bezeichnungen."}' as varchar[]);";
-		
+
 		if(!$db->db_query($qry))
 			echo '<strong>Setzen der bezeichnung_mehrsprachig fehlgeschlagen: '.$db->db_last_error().'</strong><br>';
 		else
@@ -1653,6 +1653,21 @@ if($result = @$db->db_query("SELECT 1 FROM kommune.tbl_match"))
 		echo '<strong>kommune '.$db->db_last_error().'</strong><br>';
 	else
 		echo 'kommune schema is dropped<br>';
+}
+
+// Aufnahmegruppe boolean tbl_gruppe, FK prestudent und reihungstest zu gruppe
+if(!$result = @$db->db_query("SELECT aufnahmegruppe FROM public.tbl_gruppe"))
+{
+	$qry = "ALTER TABLE public.tbl_gruppe ADD COLUMN aufnahmegruppe boolean DEFAULT false NOT NULL;
+	ALTER TABLE public.tbl_prestudent ADD COLUMN aufnahmegruppe_kurzbz varchar(32);
+	ALTER TABLE public.tbl_prestudent ADD CONSTRAINT fk_prestudent_aufnahmegruppe FOREIGN KEY (aufnahmegruppe_kurzbz) REFERENCES public.tbl_gruppe (gruppe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE public.tbl_reihungstest ADD COLUMN aufnahmegruppe_kurzbz varchar(32);
+	ALTER TABLE public.tbl_reihungstest ADD CONSTRAINT fk_reihungstest_aufnahmegruppe FOREIGN KEY (aufnahmegruppe_kurzbz) REFERENCES public.tbl_gruppe (gruppe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>aufnahmegruppe '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'Boolean aufnahmegruppe zu Gruppen hinzugefuegt. aufnahmegruppe_kurzbz zu tbl_prestudent und tbl_reihungstest hinzugefuegt<br>';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen

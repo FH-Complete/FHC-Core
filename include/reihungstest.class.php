@@ -50,6 +50,7 @@ class reihungstest extends basis_db
 	public $studiensemester_kurzbz; //string
 	public $stufe; 			//smallint
 	public $anmeldefrist; 	//date
+	public $aufnahmegruppe_kurzbz; // varchar(32)
 
 	/**
 	 * Konstruktor
@@ -100,6 +101,8 @@ class reihungstest extends basis_db
 				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$this->stufe = $row->stufe;
 				$this->anmeldefrist = $row->anmeldefrist;
+				$this->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
+
 				return true;
 			}
 			else
@@ -152,6 +155,7 @@ class reihungstest extends basis_db
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->stufe = $row->stufe;
 				$obj->anmeldefrist = $row->anmeldefrist;
+				$this->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -209,7 +213,7 @@ class reihungstest extends basis_db
 
 			$qry = 'BEGIN; INSERT INTO public.tbl_reihungstest (studiengang_kz, ort_kurzbz, anmerkung, datum, uhrzeit,
 				insertamum, insertvon, updateamum, updatevon, max_teilnehmer, oeffentlich, freigeschaltet,
-				studiensemester_kurzbz, stufe, anmeldefrist) VALUES('.
+				studiensemester_kurzbz, stufe, anmeldefrist, aufnahmegruppe_kurzbz) VALUES('.
 				$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 				$this->db_add_param($this->ort_kurzbz).', '.
 				$this->db_add_param($this->anmerkung).', '.
@@ -222,7 +226,8 @@ class reihungstest extends basis_db
 				$this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).','.
 				$this->db_add_param($this->studiensemester_kurzbz).','.
 				$this->db_add_param($this->stufe, FHC_INTEGER).','.
-				$this->db_add_param($this->anmeldefrist).');';
+				$this->db_add_param($this->anmeldefrist).','.
+				$this->db_add_param($this->aufnahmegruppe_kurzbz).');';
 		}
 		else
 		{
@@ -239,7 +244,8 @@ class reihungstest extends basis_db
 				'freigeschaltet='.$this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).', '.
 				'studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).', '.
 				'stufe='.$this->db_add_param($this->stufe, FHC_INTEGER).', '.
-				'anmeldefrist='.$this->db_add_param($this->anmeldefrist).' '.
+				'anmeldefrist='.$this->db_add_param($this->anmeldefrist).', '.
+				'aufnahmegruppe_kurzbz='.$this->db_add_param($this->aufnahmegruppe_kurzbz).' '.
 				'WHERE reihungstest_id='.$this->db_add_param($this->reihungstest_id, FHC_INTEGER, false).';';
 		}
 
@@ -324,6 +330,7 @@ class reihungstest extends basis_db
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->stufe = $row->stufe;
 				$obj->anmeldefrist = $row->anmeldefrist;
+				$obj->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -407,6 +414,7 @@ class reihungstest extends basis_db
 				$obj->angemeldete_teilnehmer = $row->angemeldete_teilnehmer;
 				$obj->stufe = $row->stufe;
 				$obj->anmeldefrist = $row->anmeldefrist;
+				$obj->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -455,6 +463,7 @@ class reihungstest extends basis_db
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->stufe = $row->stufe;
 				$obj->anmeldefrist = $row->anmeldefrist;
+				$obj->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -1001,6 +1010,7 @@ class reihungstest extends basis_db
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->stufe = $row->stufe;
 				$obj->anmeldefrist = $row->anmeldefrist;
+				$obj->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 				$obj->angemeldete_teilnehmer = $row->angemeldete_teilnehmer;
 
 				$this->result[] = $obj;
@@ -1059,6 +1069,7 @@ class reihungstest extends basis_db
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->stufe = $row->stufe;
 				$obj->anmeldefrist = $row->anmeldefrist;
+				$obj->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 
 				$this->result[] = $obj;
 			}

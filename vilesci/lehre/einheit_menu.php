@@ -35,10 +35,10 @@ if (!$db = new basis_db())
 if (isset($_GET['studiengang_kz']))
 	$studiengang_kz=$_GET['studiengang_kz'];
 else if(isset($_POST['studiengang_kz']))
-	$studiengang_kz = $_POST['studiengang_kz'];	
+	$studiengang_kz = $_POST['studiengang_kz'];
 else
 	$studiengang_kz='';
-	
+
 if (isset($_GET['sem']))
 
 	$sem=$_GET['sem'];
@@ -50,14 +50,14 @@ if (isset($_GET['ss']))
 	$ss=$_GET['ss'];
 else
 	$ss=null;
-	
+
 $uid = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 if(!$rechte->isBerechtigt('lehre/gruppe'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
-	
+
 ?>
 <html>
 	<head>
@@ -71,14 +71,14 @@ if(!$rechte->isBerechtigt('lehre/gruppe'))
 		{
 			return confirm('Diese Gruppe wirklich löschen?');
 		}
-		$(document).ready(function() 
-		{ 
+		$(document).ready(function()
+		{
 			$("#t1").tablesorter(
 			{
 				sortList: [[0,0]],
 				widgets: ["zebra"]
-			}); 
-		}); 
+			});
+		});
 		</script>
 	</head>
 <body>
@@ -115,34 +115,33 @@ else
 
 function printDropDown()
 {
-	global $rechte, $studiengang_kz;		
+	global $rechte, $studiengang_kz;
 	//Studiengang Drop Down anzeigen
 	$stud = new studiengang();
 	if(!$stud->getAll('typ, kurzbz'))
 		echo 'Fehler beim Laden der Studiengaenge:'.$stud->errormsg;
-	
+
 	// Studiengang AuswahlFilter
 	echo '<form accept-charset="UTF-8" name="frm_studiengang" action="'.$_SERVER['PHP_SELF'].'" method="GET">';
-	echo 'Studiengang: <SELECT name="studiengang_kz"  onchange="document.frm_studiengang.submit()">';
-	
+	echo 'Studiengang: <SELECT name="studiengang_kz" onchange="document.frm_studiengang.submit()">';
+
 	foreach($stud->result as $row)
 	{
 		if($rechte->isBerechtigt('lehre/gruppe', $row->oe_kurzbz, 'suid'))
 		{
 			if($studiengang_kz=='')
 				$studiengang_kz=$row->studiengang_kz;
-			
+
 			echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.' - '.$row->bezeichnung.'</OPTION>';
 		}
 	}
-	
+
 	echo '</SELECT><input type="submit" value="Anzeigen" />';
 	echo '</form>';
 }
 function doSave()
 {
-
-	$e=new gruppe();
+	$e = new gruppe();
 
 	if ($_POST['new']=='true')
 	{
@@ -169,9 +168,10 @@ function doSave()
 	$e->aktiv=isset($_POST['aktiv']);
 	$e->gesperrt = isset($_POST['gesperrt']);
 	$e->zutrittssystem = isset($_POST['zutrittssystem']);
+	$e->aufnahmegruppe = isset($_POST['aufnahmegruppe']);
 	$e->sort=$_POST['sort'];
 	$e->content_visible=isset($_POST['content_visible']);
-	
+
 	if(!$e->save())
 		echo $e->errormsg;
 }
@@ -180,37 +180,37 @@ function doSave()
 
 function doEdit($kurzbz,$new=false)
 {
-    if (!$new)
+	if (!$new)
 		$e=new gruppe($kurzbz);
 	else
 		$e = new gruppe();
 	?>
 	<form name="gruppe" method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
-  		<p><b>Gruppe <?php echo ($new?'hinzufügen':'bearbeiten'); ?></b>:
-  			<table border="0">
-  			<tr>
-  				<td><i>Kurzbezeichnung</i></td>
-      			<td>
-      				<input type="text" name="kurzbz" size="16" maxlength="32" value="<?php echo $e->gruppe_kurzbz; ?>">
+			<p><b>Gruppe <?php echo ($new?'hinzufügen':'bearbeiten'); ?></b>:
+				<table border="0">
+				<tr>
+					<td><i>Kurzbezeichnung</i></td>
+					<td>
+						<input type="text" name="kurzbz" size="16" maxlength="32" value="<?php echo $e->gruppe_kurzbz; ?>">
 				</td>
 			</tr>
-  			<tr>
-  				<td><i>Bezeichnung</i></td>
-  				<td>
-    				<input type="text" name="bezeichnung" size="20" maxlength="32" value="<?php echo $e->bezeichnung; ?>">
-    			</td>
-    		</tr>
-    		<tr>
-  				<td><i>Beschreibung</i></td>
-  				<td>
-    				<input type="text" name="beschreibung" size="20" maxlength="128" value="<?php echo $e->beschreibung; ?>">
-    			</td>
-    		</tr>
+				<tr>
+					<td><i>Bezeichnung</i></td>
+					<td>
+					<input type="text" name="bezeichnung" size="20" maxlength="32" value="<?php echo $e->bezeichnung; ?>">
+				</td>
+			</tr>
+			<tr>
+					<td><i>Beschreibung</i></td>
+					<td>
+					<input type="text" name="beschreibung" size="20" maxlength="128" value="<?php echo $e->beschreibung; ?>">
+				</td>
+			</tr>
 			<tr>
 				<td><i>Studiengang</i></td>
 				<td>
 					<SELECT name="studiengang_kz">
-      					<option value="-1">- auswählen -</option>
+							<option value="-1">- auswählen -</option>
 						<?php
 							// Auswahl des Studiengangs
 							$stg=new studiengang();
@@ -223,7 +223,7 @@ function doEdit($kurzbz,$new=false)
 								echo " >$studiengang->kuerzel ($studiengang->bezeichnung)</option>\n";
 							}
 						?>
-		    		</SELECT>
+					</SELECT>
 				</td>
 			</tr>
 			<tr><td><i>Semester</i></td><td><input type="text" name="semester" size="2" maxlength="1" value="<?php echo $e->semester ?>"></td></tr>
@@ -234,6 +234,7 @@ function doEdit($kurzbz,$new=false)
 			<tr><td><i>ContentVisible</i></td><td><input type='checkbox' name='content_visible' <?php echo ($e->content_visible?'checked':'');?>>
 			<tr><td><i>Gesperrt</i></td><td><input type='checkbox' name='gesperrt' <?php echo ($e->gesperrt?'checked':'');?>>
 			<tr><td><i>Zutrittssystem</i></td><td><input type='checkbox' name='zutrittssystem' <?php echo ($e->zutrittssystem?'checked':'');?>>
+			<tr><td><i>Aufnahmegruppe</i></td><td><input type='checkbox' name='aufnahmegruppe' <?php echo ($e->aufnahmegruppe?'checked':'');?>>
 			<tr>
 				<td><i>Sort</i></td><td><input type='text' name='sort' maxlength="4" value="<?php echo $e->sort;?>">
 				</td>
@@ -241,10 +242,10 @@ function doEdit($kurzbz,$new=false)
 		</table>
 		<input type="hidden" name="pk" value="<?php echo $e->gruppe_kurzbz ?>" />
 		<input type="hidden" name="new" value="<?php echo ($new?'true':'false') ?>" />
-    	<input type="hidden" name="type" value="save">
-    	<input type="submit" name="save" value="Speichern">
-  	</p>
-  	<hr>
+		<input type="hidden" name="type" value="save">
+		<input type="submit" name="save" value="Speichern">
+		</p>
+		<hr>
 </form>
 <?php
 }
@@ -254,11 +255,11 @@ function getUebersicht()
 	global $studiengang_kz,$semester;
 	if (!$db = new basis_db())
 			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
+
 	$gruppe=new gruppe();
 	// Array mit allen Einheiten holen
 	$gruppeen=$gruppe->getgruppe($studiengang_kz,$semester);
-	
+
 	echo '<h3>&Uuml;bersicht</h3>';
 
 	echo "<table id='t1' class='tablesorter'>";
@@ -279,6 +280,7 @@ function getUebersicht()
 				<th>ContentVisible</th>
 				<th>Gesperrt</th>
 				<th>Zutrittssystem</th>
+				<th>Aufnahmegruppe</th>
 				<th colspan=\"3\">Aktion</th>
 			</tr>
 			</thead><tbody>";
@@ -286,7 +288,7 @@ function getUebersicht()
 	$i=0;
 	$stg = new studiengang();
 	$stg->getAll(null, false);
-	
+
 	foreach ($gruppe->result as $e)
 	{
 		$i++;
@@ -306,14 +308,15 @@ function getUebersicht()
 		echo "<td><img height='16px' src='../../skin/images/".($e->content_visible?"true.png":"false.png")."' alt='".($e->content_visible?"true.png":"false.png")."'></td>";
 		echo "<td><img height='16px' src='../../skin/images/".($e->gesperrt?"true.png":"false.png")."' alt='".($e->gesperrt?"true.png":"false.png")."'></td>";
 		echo "<td><img height='16px' src='../../skin/images/".($e->zutrittssystem?"true.png":"false.png")."' alt='".($e->zutrittssystem?"true.png":"false.png")."'></td>";
+		echo "<td><img height='16px' src='../../skin/images/".($e->aufnahmegruppe?"true.png":"false.png")."' alt='".($e->aufnahmegruppe?"true.png":"false.png")."'></td>";
 		// src="../../skin/images/'.($row->projektarbeit=='t'?'true.png':'false.png').'"
 		//echo "<td>".$gruppe->countStudenten($e->gruppe_kurzbz)."</td>"; Auskommentiert, da sonst die Ladezeit der Seite zu lange ist
 		echo "<td><a href='einheit_det.php?kurzbz=$e->gruppe_kurzbz'>Details</a></td>";
 		echo "<td><a href=\"einheit_menu.php?edit=1&kurzbz=$e->gruppe_kurzbz\">Edit</a></td>";
-	   	echo "<td><a href=\"einheit_menu.php?einheit_id=$e->gruppe_kurzbz&studiengang_kz=$e->studiengang_kz&type=delete\" onclick='return conf_del()'>Delete</a></td>";
-	   	echo "</tr>\n";
+		 	echo "<td><a href=\"einheit_menu.php?einheit_id=$e->gruppe_kurzbz&studiengang_kz=$e->studiengang_kz&type=delete\" onclick='return conf_del()'>Delete</a></td>";
+		 	echo "</tr>\n";
 	}
-	
+
 	echo '</tbody></table>';
 }
 

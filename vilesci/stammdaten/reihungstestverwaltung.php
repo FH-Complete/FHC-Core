@@ -49,6 +49,7 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/studienplan.class.php');
 require_once('../../include/sprache.class.php');
 require_once('../../include/organisationsform.class.php');
+require_once('../../include/gruppe.class.php');
 
 // @todo Allgemein: Beim kopieren auch die Studienplanzuordnungen übernehmen
 //					"Teilgenommen" und "Punkte" werden immer mit false bzw. 0 gespeichert
@@ -772,6 +773,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			$reihungstest->max_teilnehmer = '';
 			$reihungstest->oeffentlich = false;
 			$reihungstest->stufe = filter_input(INPUT_POST, 'stufe', FILTER_VALIDATE_INT);
+			$reihungstest->aufnahmegruppe_kurzbz = filter_input(INPUT_POST, 'aufnahmegruppe');
 			$reihungstest->anmeldefrist = $datum_obj->formatDatum($_POST['anmeldefrist']);
 			$reihungstest->updateamum = date('Y-m-d H:i:s');
 			$reihungstest->updatevon = $user;
@@ -782,6 +784,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			$reihungstest->max_teilnehmer = filter_input(INPUT_POST, 'max_teilnehmer', FILTER_VALIDATE_INT);
 			$reihungstest->oeffentlich = filter_input(INPUT_POST, 'oeffentlich', FILTER_VALIDATE_BOOLEAN);
 			$reihungstest->stufe = filter_input(INPUT_POST, 'stufe', FILTER_VALIDATE_INT);
+			$reihungstest->aufnahmegruppe_kurzbz = filter_input(INPUT_POST, 'aufnahmegruppe');
 			$reihungstest->anmeldefrist = $datum_obj->formatDatum($_POST['anmeldefrist']);
 			$reihungstest->updateamum = date('Y-m-d H:i:s');
 			$reihungstest->updatevon = $user;
@@ -1468,6 +1471,26 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 							echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.$selected.'>'.$db->convert_html_chars($row->studiensemester_kurzbz).'</OPTION>'.'\n';
 						}
 					?>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="feldtitel">Gruppe</td>
+			<td>
+				<select name='aufnahmegruppe'>
+				<option value=''>-- keine Auswahl --</option>
+					<?php
+					$gruppen_obj = new gruppe();
+					$gruppen_obj->getAufnahmegruppen();
+					foreach($gruppen_obj->result as $row)
+					{
+						if($reihungstest->aufnahmegruppe_kurzbz==$row->gruppe_kurzbz)
+							$selected = 'selected="selected"';
+						else
+							$selected = ''; ?>
+
+						<option value="<?php echo $row->gruppe_kurzbz ?>" <?php echo $selected ?>><?php echo $row->bezeichnung ?></option>
+					<?php } ?>
 				</select>
 			</td>
 		</tr>
