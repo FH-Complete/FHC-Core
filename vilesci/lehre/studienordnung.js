@@ -1407,16 +1407,18 @@ function writeEctsSum(parent)
 	}
 	if($(parent).attr("rel") === "semester")
 	{
-		var cells = $(parent).find(".jstree-grid-col-1");
+		var cells = $(parent).children("ul").children();
+
 		var sum = 0;
-		for(var j=1; j<cells.length; j++)
+		for(var j=0; j<cells.length; j++)
 		{
-			if(!isNaN(parseFloat(cells[j].childNodes[0].innerHTML)))
+			if(!isNaN(parseFloat(cells[j].childNodes[2].childNodes[0].innerHTML)))
 			{
-				sum+=parseFloat(cells[j].childNodes[0].innerHTML);
+				sum+=parseFloat(cells[j].childNodes[2].childNodes[0].innerHTML);
 			}
 		}
-		cells[0].childNodes[0].innerHTML = "<b>"+sum+"</b>";
+
+		$(parent).children()[2].innerHTML = "<b>"+sum+"</b>";
 	}
 }
 
@@ -1427,14 +1429,14 @@ function writeOverallSum(root)
 {
 	if(!$('#stplDetails').length)
 		$("#treeData").append('<div id="stplDetails" style="padding-top: 1.0em"></div>');
-	var cells = $(root).find(".jstree-grid-col-1");
+	var cells = $(root).children("ul").children();
 	var sum = 0;
 
 	for(var i=0; i<cells.length; i++)
 	{
-		if(!isNaN(parseFloat(cells[i].childNodes[0].innerHTML)))
+		if(!isNaN(parseFloat(cells[i].childNodes[2].childNodes[0].innerHTML)))
 		{
-			sum+=parseFloat(cells[i].childNodes[0].innerHTML);
+			sum+=parseFloat(cells[i].childNodes[2].childNodes[0].innerHTML);
 		}
 	}
 	$("#stplDetails").html("ECTS-Summe: <b>"+sum+"</b>");
