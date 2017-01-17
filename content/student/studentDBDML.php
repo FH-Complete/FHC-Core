@@ -4053,6 +4053,7 @@ if(!$error)
 					$reihungstestangetreten = ($_POST['reihungstestangetreten']=='true'?true:false);
 					$prestudent->punkte = $punkte;
 					$prestudent->reihungstestangetreten = $reihungstestangetreten;
+					$prestudent->aufnahmegruppe_kurzbz = $_POST['aufnahmegruppe_kurzbz'];
 					$prestudent->new=false;
 
 					if($prestudent->save())

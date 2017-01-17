@@ -273,7 +273,7 @@ else
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#punkte" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="student-treecol-rt_punkte1" label="Punkte1" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    				<!--<treecol id="student-treecol-rt_punkte1" label="Punkte1" flex="1" hidden="true" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#punkte1" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
@@ -284,6 +284,10 @@ else
 	    				<treecol id="student-treecol-rt_punkte3" label="Punkte3" flex="1" hidden="true" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#punkte3" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>-->
+						<treecol id="student-treecol-aufnahmegruppe" label="Aufnahmegruppe" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#aufnahmegruppe_kurzbz" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 						<treecol id="student-treecol-rt_datum" label="RT Datum" flex="1" hidden="true" persist="hidden, width, ordinal"
 							class="sortDirectionIndicator"
@@ -350,9 +354,12 @@ else
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#orgform" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#aufmerksamdurch_kurzbz" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#punkte" />
+										<!--
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#punkte1" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#punkte2" />
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#punkte3" />
+									-->
+									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#aufnahmegruppe_kurzbz" />
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#rt_datum" />
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#rt_anmeldung" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#dual_bezeichnung" />

@@ -36,6 +36,25 @@ function loadAufnahmeTermine(prestudent_id)
 	document.getElementById('aufnahmetermine-button-savegesamtpunkte').disabled=false;
 	document.getElementById('aufnahmetermine-button-calculatetotal').disabled=false;
 
+
+	// Gruppen DropDown laden
+	var aufnahmegruppemenulist = document.getElementById('aufnahmetermine-menulist-aufnahmegruppe');
+	var url="<?php echo APP_ROOT ?>rdf/gruppen.rdf.php?aufnahmegruppe=true&optional=true";
+
+	//Alte DS entfernen
+	var oldDatasources = aufnahmegruppemenulist.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		aufnahmegruppemenulist.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	aufnahmegruppemenulist.builder.rebuild();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var myDatasource = rdfService.GetDataSourceBlocking(url);
+	aufnahmegruppemenulist.database.AddDataSource(myDatasource);
+	aufnahmegruppemenulist.builder.rebuild();
+
 	// Gesamtpunkte laden und anzeigen
 
 	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?prestudent_id='+prestudent_id+'&'+gettimestamp();
@@ -51,11 +70,13 @@ function loadAufnahmeTermine(prestudent_id)
 
 	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 	reihungstestangetreten = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#reihungstestangetreten" ));
+	var aufnahmegruppe_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufnahmegruppe_kurzbz" ));
 	document.getElementById('aufnahmetermine-textbox-gesamtpunkte').value=punkte;
 	if(reihungstestangetreten=='true')
 		document.getElementById('aufnahmetermine-checkbox-reihungstestangetreten').checked=true;
 	else
 		document.getElementById('aufnahmetermine-checkbox-reihungstestangetreten').checked=false;
+	document.getElementById('aufnahmetermine-menulist-aufnahmegruppe').value = aufnahmegruppe_kurzbz;
 	AufnahmeTermineStudienplanID = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studienplan_id" ));
 
 	// ReihungstestDropDown laden
@@ -84,7 +105,7 @@ function loadAufnahmeTermine(prestudent_id)
 	var oldDatasources = ortmenulist.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
 	{
-		ort.database.RemoveDataSource(oldDatasources.getNext());
+		ortmenulist.database.RemoveDataSource(oldDatasources.getNext());
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	ortmenulist.builder.rebuild();
@@ -126,6 +147,7 @@ function AufnahmeTermineLoadTree()
 function AufnahmeTermineSaveGesamtpunkte()
 {
 	var punkte = document.getElementById('aufnahmetermine-textbox-gesamtpunkte').value;
+	var aufnahmegruppe_kurzbz = document.getElementById('aufnahmetermine-menulist-aufnahmegruppe').value;
 	var reihungstestangetreten = document.getElementById('aufnahmetermine-checkbox-reihungstestangetreten').checked;
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
@@ -135,6 +157,7 @@ function AufnahmeTermineSaveGesamtpunkte()
 	req.add('prestudent_id', AufnahmeTerminePrestudentID);
 	req.add('punkte', punkte);
 	req.add('reihungstestangetreten',reihungstestangetreten);
+	req.add('aufnahmegruppe_kurzbz',aufnahmegruppe_kurzbz);
 
 	var response = req.executePOST();
 	var val = new ParseReturnValue(response);

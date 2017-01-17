@@ -68,6 +68,7 @@ class prestudent extends person
 	public $zgvdoktordatum;
 	public $zgvdoktornation;
 	public $gsstudientyp_kurzbz='Intern';
+	public $aufnahmegruppe_kurzbz;
 
 	public $status_kurzbz;
 	public $studiensemester_kurzbz;
@@ -157,6 +158,7 @@ class prestudent extends person
                 $this->zgvdoktordatum = $row->zgvdoktordatum;
                 $this->zgvdoktornation = $row->zgvdoktornation;
 				$this->gsstudientyp_kurzbz = $row->gsstudientyp_kurzbz;
+				$this->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 
                 if(!person::load($row->person_id))
 					return false;
@@ -232,7 +234,8 @@ class prestudent extends person
 					zgvmas_code, zgvmaort, zgvmadatum, zgvmanation, aufnahmeschluessel, facheinschlberuf,
 					reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte,
 					rt_punkte1, rt_punkte2, rt_punkte3, bismelden, insertamum, insertvon,
-					updateamum, updatevon, anmerkung, dual, ausstellungsstaat, mentor, gsstudientyp_kurzbz) VALUES('.
+					updateamum, updatevon, anmerkung, dual, ausstellungsstaat, mentor,
+					gsstudientyp_kurzbz, aufnahmegruppe_kurzbz) VALUES('.
 			       $this->db_add_param($this->aufmerksamdurch_kurzbz).",".
 			       $this->db_add_param($this->person_id).",".
 			       $this->db_add_param($this->studiengang_kz).",".
@@ -264,7 +267,8 @@ class prestudent extends person
 			       $this->db_add_param($this->dual, FHC_BOOLEAN).",".
 			       $this->db_add_param($this->ausstellungsstaat).",".
 			       $this->db_add_param($this->mentor).",".
-				   $this->db_add_param($this->gsstudientyp_kurzbz).");";
+				   $this->db_add_param($this->gsstudientyp_kurzbz).",".
+				   $this->db_add_param($this->aufnahmegruppe_kurzbz).");";
 		}
 		else
 		{
@@ -298,7 +302,8 @@ class prestudent extends person
 			       ' mentor='.$this->db_add_param($this->mentor).",".
 				   ' gsstudientyp_kurzbz='.$this->db_add_param($this->gsstudientyp_kurzbz).",".
 			       ' dual='.$this->db_add_param($this->dual, FHC_BOOLEAN).",".
-				   ' ausstellungsstaat='.$this->db_add_param($this->ausstellungsstaat).
+				   ' ausstellungsstaat='.$this->db_add_param($this->ausstellungsstaat).",".
+				   ' aufnahmegruppe_kurzbz='.$this->db_add_param($this->aufnahmegruppe_kurzbz).' '.
 			       " WHERE prestudent_id=".$this->db_add_param($this->prestudent_id).";";
 		}
 
@@ -688,6 +693,7 @@ class prestudent extends person
 				$ps->anmerkung = $row->anmerkung;
 				$ps->dual = $this->db_parse_bool($row->dual);
 				$ps->gsstudientyp_kurzbz = $row->gsstudientyp_kurzbz;
+				$ps->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 
 				$ps->status_kurzbz = $row->status_kurzbz;
 				$ps->studiensemester_kurzbz = $row->studiensemester_kurzbz;

@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -34,15 +34,21 @@ require_once('../include/datum.class.php');
 require_once('../include/basis_db.class.php');
 
 $filter = null;
+$aufnahmegruppe = null;
+
 if(isset($_GET['filter']))
 {
 	$filter = strtolower($_GET['filter']);
+}
+elseif(isset($_GET['aufnahmegruppe']))
+{
+	$aufnahmegruppe = true;
 }
 else
 {
 	if(isset($_GET['uid']))
 		$uid = $_GET['uid'];
-	else 
+	else
 		die('uid muss uebergeben werden');
 
 	if(isset($_GET['studiensemester_kurzbz']))
@@ -53,7 +59,7 @@ else
 
 $datum = new datum();
 
-	
+
 $rdf_url='http://www.technikum-wien.at/gruppen';
 
 echo '
@@ -61,30 +67,47 @@ echo '
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:GRP="'.$rdf_url.'/rdf#"
 >
-
-   <RDF:Seq about="'.$rdf_url.'/liste">
+	<RDF:Seq about="'.$rdf_url.'/liste">
 ';
-
-if($filter)
-	$qry = "SELECT * FROM tbl_gruppe WHERE LOWER(gruppe_kurzbz) LIKE '%" . $filter . "%'";
-else
-	$qry = "SELECT * FROM public.tbl_benutzergruppe JOIN tbl_gruppe using(gruppe_kurzbz) WHERE uid='".addslashes($uid)."' AND (studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' OR studiensemester_kurzbz is null)";
 
 $db = new basis_db();
 
+if($filter)
+{
+	$qry = "SELECT * FROM tbl_gruppe WHERE LOWER(gruppe_kurzbz) LIKE '%" . $db->db_escape($filter) . "%'";
+}
+elseif($aufnahmegruppe)
+{
+	$qry = "SELECT * FROM tbl_gruppe WHERE aufnahmegruppe=true";
+}
+else
+	$qry = "SELECT * FROM public.tbl_benutzergruppe JOIN tbl_gruppe using(gruppe_kurzbz) WHERE uid=".$db->db_add_param($uid)." AND (studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." OR studiensemester_kurzbz is null)";
+
+if(isset($_GET['optional']))
+{
+	echo '
+		<RDF:li>
+			<RDF:Description  id=""  about="'.$rdf_url.'/" >
+				<GRP:gruppe_kurzbz><![CDATA[]]></GRP:gruppe_kurzbz>
+				<GRP:bezeichnung><![CDATA[-- keine Auswahl --]]></GRP:bezeichnung>
+				<GRP:generiert><![CDATA[]]></GRP:generiert>
+			</RDF:Description>
+		</RDF:li>
+		';
+}
 if($db->db_query($qry))
 {
 	while($row = $db->db_fetch_object())
 	{
-		if($filter)
+		if($filter || $aufnahmegruppe)
 		{
 			echo '
 				<RDF:li>
-				   <RDF:Description  id="'.$row->gruppe_kurzbz.'"  about="'.$rdf_url.'/'.$row->gruppe_kurzbz.'" >
-					  <GRP:gruppe_kurzbz><![CDATA['.$row->gruppe_kurzbz.']]></GRP:gruppe_kurzbz>
-					  <GRP:bezeichnung><![CDATA['.$row->bezeichnung.']]></GRP:bezeichnung>
-					  <GRP:generiert><![CDATA['.($row->generiert=='t'?'Ja':'Nein').']]></GRP:generiert>
-				   </RDF:Description>
+					<RDF:Description  id="'.$row->gruppe_kurzbz.'"  about="'.$rdf_url.'/'.$row->gruppe_kurzbz.'" >
+						<GRP:gruppe_kurzbz><![CDATA['.$row->gruppe_kurzbz.']]></GRP:gruppe_kurzbz>
+						<GRP:bezeichnung><![CDATA['.$row->bezeichnung.']]></GRP:bezeichnung>
+						<GRP:generiert><![CDATA['.($row->generiert=='t'?'Ja':'Nein').']]></GRP:generiert>
+					</RDF:Description>
 				</RDF:li>
 				';
 		}
@@ -92,18 +115,18 @@ if($db->db_query($qry))
 		{
 			echo '
 				<RDF:li>
-				   <RDF:Description  id="'.$row->uid.'/'.$row->gruppe_kurzbz.'"  about="'.$rdf_url.'/'.$row->uid.'/'.$row->gruppe_kurzbz.'" >
-					  <GRP:gruppe_kurzbz><![CDATA['.$row->gruppe_kurzbz.']]></GRP:gruppe_kurzbz>
-					  <GRP:bezeichnung><![CDATA['.$row->bezeichnung.']]></GRP:bezeichnung>
-					  <GRP:generiert><![CDATA['.($row->generiert=='t'?'Ja':'Nein').']]></GRP:generiert>
-					  <GRP:uid><![CDATA['.$row->uid.']]></GRP:uid>
-					  <GRP:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></GRP:studiensemester_kurzbz>
-				   </RDF:Description>
+					<RDF:Description  id="'.$row->uid.'/'.$row->gruppe_kurzbz.'"  about="'.$rdf_url.'/'.$row->uid.'/'.$row->gruppe_kurzbz.'" >
+						<GRP:gruppe_kurzbz><![CDATA['.$row->gruppe_kurzbz.']]></GRP:gruppe_kurzbz>
+						<GRP:bezeichnung><![CDATA['.$row->bezeichnung.']]></GRP:bezeichnung>
+						<GRP:generiert><![CDATA['.($row->generiert=='t'?'Ja':'Nein').']]></GRP:generiert>
+						<GRP:uid><![CDATA['.$row->uid.']]></GRP:uid>
+						<GRP:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></GRP:studiensemester_kurzbz>
+					</RDF:Description>
 				</RDF:li>
 				';
 		}
 	}
 }
 ?>
-   </RDF:Seq>
+	</RDF:Seq>
 </RDF:RDF>

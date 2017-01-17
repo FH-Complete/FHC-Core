@@ -66,6 +66,18 @@ echo ']>
 	</menupopup>
 </popupset>
 <hbox style="padding-top: 10px">
+	<label value="Gruppe" control="aufnahmetermine-menulist-aufnahmegruppe"/>
+	<menulist id="aufnahmetermine-menulist-aufnahmegruppe" disabled="false"
+			datasources="rdf:null"
+			ref="http://www.technikum-wien.at/gruppen/liste">
+		<template>
+			<menupopup>
+				<menuitem value="rdf:http://www.technikum-wien.at/gruppen/rdf#gruppe_kurzbz"
+					label="rdf:http://www.technikum-wien.at/gruppen/rdf#bezeichnung"
+					uri="rdf:*"/>
+			</menupopup>
+		</template>
+	</menulist>
 	<label value="&aufnahmetermine-reihungstest.absolviert;" control="aufnahmetermine-checkbox-reihungstestangetreten"/>
 	<checkbox id="aufnahmetermine-checkbox-reihungstestangetreten" checked="true"/>
 	<label value="Gesamtpunkte" control="aufnahmetermine-textbox-gesamtpunkte"/>
