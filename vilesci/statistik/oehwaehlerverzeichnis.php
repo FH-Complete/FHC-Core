@@ -57,10 +57,10 @@ header( 'Content-Type: text/csv' );
 header( 'Content-Disposition: attachment;filename='.$filename);
 
 
-// Daten holen - Alle Personen mit akt. Status Student, Diplomand die bezahlt haben
+// Daten holen - Alle Personen mit akt. Status Student, Diplomand und Incoming die bezahlt haben
 $qry="
 SELECT * FROM (
-SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzeichen, 
+SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzeichen,
 	tbl_person.svnr,
 	tbl_person.ersatzkennzeichen,
 	tbl_person.gebdatum,
@@ -69,28 +69,28 @@ SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzeichen,
 	tbl_person.geschlecht,
 	tbl_student.studiengang_kz,
 	tbl_student.student_uid,
-	(SELECT plz FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY zustelladresse desc  LIMIT 1) AS zustell_plz, 
-	(SELECT gemeinde FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY zustelladresse desc  LIMIT 1) AS zustell_ort, 
-	(SELECT strasse FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY zustelladresse desc  LIMIT 1) AS zustell_strasse, 
-	(SELECT plz FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS heimat_plz, 
-	(SELECT gemeinde FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS heimat_ort, 
+	(SELECT plz FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY zustelladresse desc  LIMIT 1) AS zustell_plz,
+	(SELECT gemeinde FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY zustelladresse desc  LIMIT 1) AS zustell_ort,
+	(SELECT strasse FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY zustelladresse desc  LIMIT 1) AS zustell_strasse,
+	(SELECT plz FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS heimat_plz,
+	(SELECT gemeinde FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS heimat_ort,
 	(SELECT strasse FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS heimat_strasse,
 	tbl_person.person_id
-FROM public.tbl_person 
-	JOIN public.tbl_konto as ka using(person_id) 
-	JOIN public.tbl_konto as kb using(person_id) 
-	JOIN public.tbl_benutzer using(person_id) 
+FROM public.tbl_person
+	JOIN public.tbl_konto as ka using(person_id)
+	JOIN public.tbl_konto as kb using(person_id)
+	JOIN public.tbl_benutzer using(person_id)
 	JOIN public.tbl_student on(uid=student_uid)
 	JOIN public.tbl_prestudent using(prestudent_id)
 	JOIN public.tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
-WHERE 
-	tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." 
-	AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand')
+WHERE
+	tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+	AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand','Incoming','Absolvent')
 	AND tbl_student.studiengang_kz<10000
 	AND tbl_student.studiengang_kz>0
 	AND tbl_student.studiengang_kz!='9".$erhalter_row->erhalter_kz."'
-	AND ka.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND ka.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=ka.studiengang_kz 
-	AND kb.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND kb.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=kb.studiengang_kz 
+	AND ka.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND ka.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=ka.studiengang_kz
+	AND kb.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND kb.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=kb.studiengang_kz
 	AND kb.buchungsnr_verweis=ka.buchungsnr AND bismelden
 ) a
 ORDER BY person_id";
@@ -111,7 +111,7 @@ if($result = $db->db_query($qry))
 			$data_row[2]=implode(';',$personenkennzeichen);
 			$data_row[8]=implode(';',$studiengang_kz);
 
-			echo implode('|',$data_row)."\r\n";
+			echo implode('|',$data_row)."|\r\n";
 			$data_row = array();
 			$personenkennzeichen = array();
 			$studiengang_kz = array();
@@ -124,7 +124,7 @@ if($result = $db->db_query($qry))
 
 		$data_row = array(
 			sprintf('%1$03d',$erhalter_row->erhalter_kz),
-			$erhalter_row->bezeichnung, 
+			$erhalter_row->bezeichnung,
 			null,
 			($row->svnr!=''?$row->svnr:$row->ersatzkennzeichen),
 			$datum_obj->formatDatum($row->gebdatum,'Ymd'),
@@ -140,7 +140,11 @@ if($result = $db->db_query($qry))
 			$row->heimat_strasse,
 			$row->student_uid.'@'.DOMAIN
 			);
-		
+
 	}
+	$data_row[2]=implode(';',$personenkennzeichen);
+	$data_row[8]=implode(';',$studiengang_kz);
+
+	echo implode('|',$data_row)."|\r\n";
 }
 

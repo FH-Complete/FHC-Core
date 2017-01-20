@@ -23,6 +23,7 @@
  * Zeigt eine Liste mit den LVs zu denen der Lektor oder Student zugeordnet ist.
  */
 require_once(dirname(__FILE__).'/menu_addon.class.php');
+require_once(dirname(__FILE__).'/../../config/cis.config.inc.php');
 require_once(dirname(__FILE__).'/../../include/functions.inc.php');
 require_once(dirname(__FILE__).'/../../include/phrasen.class.php');
 require_once(dirname(__FILE__).'/../../include/studiensemester.class.php');
@@ -41,7 +42,10 @@ class menu_addon_meinelv extends menu_addon
 		$is_lector=check_lektor($user);
 
 		$p = new phrasen($sprache);
-		$cutlength=21;
+		if (defined("CIS_LVMENUE_CUTLENGTH"))
+			$cutlength = CIS_LVMENUE_CUTLENGTH;
+		else
+			$cutlength = 21;
 
 		//Meine LVs Student
 		if(!$is_lector)
@@ -156,7 +160,7 @@ class menu_addon_meinelv extends menu_addon
 								public.tbl_studiengang
 							LEFT JOIN
 								public.tbl_studiengangstyp ON (tbl_studiengang.typ=tbl_studiengangstyp.typ)
-							
+
 							WHERE
 								tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 								tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND

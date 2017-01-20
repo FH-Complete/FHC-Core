@@ -36,11 +36,11 @@ require_once('functions.inc.php');
 require_once('../../../../include/phrasen.class.php');
 
 $sprache = getSprache();
-$p = new phrasen($sprache); 
+$p = new phrasen($sprache);
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
-		
+
 function microtime_float()
 {
     list($usec, $sec) = explode(" ", microtime());
@@ -64,7 +64,7 @@ if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehr
 	$lehreinheit_id = $_GET['lehreinheit_id'];
 else
 	$lehreinheit_id = '';
-	
+
 //Angabedatei ausliefern
 if (isset($_GET["download"])){
 	$file=$_GET["download"];
@@ -100,7 +100,7 @@ if (isset($_GET["download"])){
 	{
 		return confirm('<?php echo $p->t('gesamtnote/wollenSieWirklichLoeschen');?>');
 	}
-	
+
 	function set_notenschluessel_prozent()
 	{
 		document.ns.schluessel_punkte_1.value=89;
@@ -156,7 +156,7 @@ if (isset($_FILES["angabedatei"]))
 	$angabedatei_up = $_FILES["angabedatei"]["tmp_name"];
 else
 	$angabedatei_up = null;
-	
+
 $beispiel_id = (isset($_GET['beispiel_id'])?$_GET['beispiel_id']:'');
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 
@@ -223,11 +223,11 @@ $stsem_content.= "</SELECT>\n";
 //Lehreinheiten laden
 if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
 {
-	$qry = "SELECT 
-				distinct lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz 
-			FROM 
+	$qry = "SELECT
+				distinct lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz
+			FROM
 				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehreinheitmitarbeiter
-			WHERE 
+			WHERE
 				tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
 				tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
@@ -235,11 +235,11 @@ if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->st
 }
 else
 {
-	$qry = "SELECT 
-				distinct lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz 
-			FROM 
+	$qry = "SELECT
+				distinct lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz
+			FROM
 				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehreinheitmitarbeiter
-			WHERE 
+			WHERE
 				tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
 				tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
@@ -384,7 +384,7 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 				$error_anzahlderbeispiele = "<span class='error'>".$p->t('benotungstool/anzahlDerBeispieleKleiner100')."</span>";
 				$error=true;
 			}
-	
+
 			if ($maxstd != '')
 			{
 				if(!is_numeric($maxstd))
@@ -405,7 +405,7 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 			}
 			else
 				$maxstd = null;
-			
+
 			if ($maxbsp != '')
 			{
 				if(!is_numeric($maxbsp))
@@ -427,7 +427,7 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 			else
 				$maxbsp = null;
 		}
-		
+
 		$freigabevon_sav = $datum_obj->mktime_datumundzeit($freigabevon);
 		$freigabebis_sav = $datum_obj->mktime_datumundzeit($freigabebis);
 
@@ -462,7 +462,7 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 			$uebung_obj->freigabebis = date('Y-m-d H:i',$freigabebis_sav);
 			if (isset($_POST["uebung_neu"]))
 			{
-				if (isset($_POST["kl_abgabe"]))				
+				if (isset($_POST["kl_abgabe"]))
 					$uebung_obj->abgabe=true;
 				else
 					$uebung_obj->abgabe=false;
@@ -487,12 +487,12 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 			$uebung_obj->maxbsp = $maxbsp;
 			$uebung_obj->gewicht = $gewicht;
 			$uebung_obj->get_next_nummer();
-			$uebung_obj->nummer = $uebung_obj->next_nummer;	
+			$uebung_obj->nummer = $uebung_obj->next_nummer;
 
 			if($uebung_obj->save(true))
 			{
 				$uebung_id = $uebung_obj->uebung_id;
-				
+
 				//Angabedatei ablegen
 				if ($angabedatei_up)
 				{
@@ -503,12 +503,12 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 					//Find occurence of extensions ending with ".tar."
 					if (in_array(substr($_FILES["angabedatei"]["name"], strripos($_FILES["angabedatei"]["name"], '.tar.')), $ext_array))
 						$extension = substr($_FILES["angabedatei"]["name"], strripos($_FILES["angabedatei"]["name"]+1, '.tar.'));
-					else 
+					else
 						$extension = $name_up["extension"];
 
 					$name_neu = makeUploadName($db, $which='angabe', $lehreinheit_id=$lehreinheit_id, $uebung_id=$uebung_id, $ss=$stsem);
 					$angabedatei = $name_neu.".".$extension;
-					
+
 					$angabepfad = BENOTUNGSTOOL_PATH."angabe/".$angabedatei;
 					//$angabepfad = BENOTUNGSTOOL_PATH.$angabedatei;
 					//unlink($angabepfad);
@@ -518,7 +518,7 @@ if(isset($_POST['uebung_neu']) || isset($_POST['abgabe_neu']))
 					$uebung_obj->save(false);
 				}
 				//Beispiele anlegen
-				
+
 				$error_msg='';
 				for($i=0;$i<$anzahlderbeispiele;$i++)
 				{
@@ -625,7 +625,7 @@ if(isset($_POST['uebung_edit']))
 		}
 		else
 			$maxstd = null;
-		
+
 		if ($maxbsp != '')
 		{
 			if(!is_numeric($maxbsp))
@@ -646,7 +646,7 @@ if(isset($_POST['uebung_edit']))
 		}
 		else
 			$maxbsp = null;
-	
+
 	if($freigabevon_sav>$freigabebis_sav)
 	{
 		echo "<span class='error'>".$p->t('benotungstool/vonDatumNichtGroesserAlsBisDatum')."</span>";
@@ -680,7 +680,7 @@ if(isset($_POST['uebung_edit']))
 				$extension = $name_up["extension"];
 			$name_neu = makeUploadName($db, $which='angabe', $lehreinheit_id=$lehreinheit_id, $uebung_id=$uebung_id, $ss=$stsem);
 			$angabedatei_neu = $name_neu.".".$extension;
-			
+
 			$angabepfad = BENOTUNGSTOOL_PATH."angabe/".$angabedatei_neu;
 			//$angabepfad = BENOTUNGSTOOL_PATH.$angabedatei;
 			//unlink($angabepfad);
@@ -690,7 +690,7 @@ if(isset($_POST['uebung_edit']))
 			move_uploaded_file($_FILES['angabedatei']['tmp_name'], $angabepfad);
 		}
 		else
-		{	
+		{
 			$uebung_akt = new uebung();
 			$uebung_akt->load($uebung_id);
 			$angabedatei_neu = $uebung_akt->angabedatei;
@@ -702,7 +702,7 @@ if(isset($_POST['uebung_edit']))
 		$uebung_obj->angabedatei=$angabedatei_neu;
 		$uebung_obj->freigabevon = date('Y-m-d H:i',$freigabevon_sav);
 		$uebung_obj->freigabebis = date('Y-m-d H:i',$freigabebis_sav);
-		if ($uebung_obj->beispiele)		
+		if ($uebung_obj->beispiele)
 			$uebung_obj->abgabe = (isset($_POST['kl_abgabe'])?true:false);
 		//$uebung_obj->beispiele=true;
 		$uebung_obj->bezeichnung=$thema;
@@ -749,11 +749,11 @@ if(isset($_POST['liste_edit']))
 		echo "<span class='error'>".$p->t('benotungstool/gewichtMussEineZahlSein')."</span>";
 		$error = true;
 	}
-	
+
 
 	if(!$error)
 	{
-		
+
 		$uebung_obj = new uebung();
 		$uebung_obj->load($_GET['liste_id']);
 		$uebung_obj->gewicht=$gewicht;
@@ -804,7 +804,7 @@ if(isset($_POST['beispiel_neu']) || isset($_POST['beispiel_edit']))
 					$beispiel_obj = new beispiel();
 					if(isset($_POST['beispiel_edit']))
 					{
-						$beispiel_obj->load($beispiel_id);					
+						$beispiel_obj->load($beispiel_id);
 						$beispiel_obj->beispiel_id= $beispiel_id;
 						$beispiel_obj->new=false;
 					}
@@ -845,7 +845,7 @@ if(isset($_POST['beispiel_neu']) || isset($_POST['beispiel_edit']))
 //Uebersichtstabelle
 if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 {
-	
+
 	echo "<table><tr><td valign='top'>";
 	//Bearbeiten der ausgewaehlten Uebung
 	echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&liste_id=$liste_id' method=POST enctype='multipart/form-data'>\n";
@@ -857,23 +857,24 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 	//$downloadname = mb_ereg_replace($uebung_id,ereg_replace(' ','_',$uebung_obj->bezeichnung), $uebung_obj->angabedatei);
 	$downloadname = mb_str_replace(' ', '_', $uebung_obj->bezeichnung);
 	$downloadname = mb_str_replace($uebung_id, $downloadname, $uebung_obj->angabedatei);
+	$downloadname = preg_replace('/[^A-Za-z0-9\-_.]/', '',$downloadname);
 	echo "
 	<tr><td>".$p->t('benotungstool/thema')."</td><td align='right'><input type='text' name='thema'  maxlength='32' value='".htmlentities($uebung_obj->bezeichnung,ENT_QUOTES,'UTF-8')."'></td><td>$error_thema</td></tr>
 	<tr><td>".$p->t('benotungstool/freigabe')."</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))."'></td></tr>
 	<tr><td>".$p->t('benotungstool/format')."</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis))."'></td></tr>";
-	
+
 	if ($uebung_obj->beispiele){
 		echo "<tr><td>".$p->t('benotungstool/maxStudentenBeispiel')."</td><td align='right'><input type='text' name='maxstd' value='$uebung_obj->maxstd'></td><td>$error_maxstd</td></tr>
 	<tr><td>".$p->t('benotungstool/maxBeispieleStudent')."</td><td align='right'><input type='text' name='maxbsp' value='$uebung_obj->maxbsp'></td><td>$error_maxbsp</td></tr>";
 		echo"<tr><td>".$p->t('benotungstool/abgabe')." </td><td><input type='checkbox' name='kl_abgabe' ".($uebung_obj->abgabe?'checked':'')."></td></tr>";
 		echo "<input type='hidden' size='16' name='gewicht' value='0'>";
-	}	
+	}
 	else if ($uebung_obj->abgabe)
 	{
 		echo "<tr><td>".$p->t('benotungstool/gewicht')."</td><td align='right'><input type='text' size='16' name='gewicht' value='$uebung_obj->gewicht'></td><td>$error_gewicht</td></tr>";
 		echo "<tr><td>".$p->t('benotungstool/positiv')." </td><td><input type='checkbox' name='positiv' ".($uebung_obj->positiv?'checked':'')."></td></tr>";
 	}
-	if ($uebung_obj->beispiele)	
+	if ($uebung_obj->beispiele)
 		echo"<tr><td>".$p->t('benotungstool/statistikFuerStudentenAnzeigen')." </td><td><input type='checkbox' name='statistik' ".($uebung_obj->statistik?'checked':'')."></td></tr>";
 	echo "<tr>";
 	echo "<td>".$p->t('benotungstool/angabeidatei')."</td>";
@@ -900,25 +901,25 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 		echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&liste_id=$liste_id' method=POST>\n";
 		echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>".$p->t('benotungstool/neuesBeispielAnlegen')."</td></tr>\n";
 		echo "<tr><td>&nbsp;</td><td></td></tr>\n\n";
-	
+
 		echo "<tr><td>".$p->t('global/bezeichnung')." <input type='text' name='bezeichnung' maxlength='32' value='".$p->t('benotungstool/beispiel')." ".($anzahl<9?'0'.($anzahl+1):($anzahl+1))."'>";
 		echo "&nbsp;".$p->t('benotungstool/punkte')." <input type='text' size='2' name='punkte' value='1'></td></tr>";
 		echo "<tr><td align='right'><input type='submit' name='beispiel_neu' value='".$p->t('benotungstool/anlegen')."'></td></tr>";
-	
+
 		echo "</table>
 		</form>";
 	}
-	
+
 	echo "</td></tr><tr><td valign='top'>";
-	
-	
+
+
 	//Uebersicht der Beispiele
 	if ($uebung_obj->beispiele)
 	{
 		echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&liste_id=$liste_id' method=POST>\n";
 		echo "<table width='340'><tr><td colspan='3' class='ContentHeader3'>".$p->t('benotungstool/vorhandeneBeispiele')."</td></tr>\n";
 		echo "<tr><td>&nbsp;</td><td></td><td></td></tr>\n\n";
-	
+
 		if($anzahl>0)
 		{
 			echo "<tr><th>".$p->t('benotungstool/beispiel')."</th><th>".$p->t('benotungstool/punkte')."</th><th>".$p->t('benotungstool/auswahl')."</th></tr>\n";
@@ -932,7 +933,7 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 		}
 		else
 			echo "<tr><td colspan='3'>".$p->t('benotungstool/keineBeispieleAngelegt')."</td><td></td></tr>";
-	
+
 		echo "</table></form>";
 	}
 	echo "</td><td valign='top'>";
@@ -969,10 +970,10 @@ else
 		echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST>\n";
 		echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>".$p->t('benotungstool/uebungBearbeiten')."</td><td>&nbsp;</td></tr>\n";
 		echo "<tr><td>&nbsp;</td><td></td></tr>";
-	
+
 		$liste_obj = new uebung();
 		$liste_obj->load($liste_id);
-	
+
 		echo "
 		<tr><td>".$p->t('benotungstool/thema')."</td><td align='right'><input type='text' name='thema'  maxlength='32' value='".htmlentities($liste_obj->bezeichnung,ENT_QUOTES,'UTF-8')."'></td><td>$error_thema</td></tr><tr><td>".$p->t('benotungstool/gewicht')."</td><td align='right'><input type='text' size='16' name='gewicht' value='$liste_obj->gewicht'></td><td>$error_gewicht</td></tr>
 		<tr><td>".$p->t('benotungstool/positiv')." </td><td><input type='checkbox' name='positiv' ".($liste_obj->positiv?'checked':'')."></td></tr>
@@ -980,13 +981,13 @@ else
 		</table>
 		</form>";
 	}
-	
+
 	//Gesamtuebersicht ueber alle Listen innerhalb der Uebung
 	echo "<table><tr><td valign='top'>";
 	echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST>";
 	echo "<table width='440'>";
 	$studentuebung = new uebung();
-	if (!$studentuebung->check_studentuebung($liste_id))	
+	if (!$studentuebung->check_studentuebung($liste_id))
 		echo "<tr><td colspan='3' class='ContentHeader3'>".$p->t('benotungstool/vorhandeneAufgabeBearbeiten')."</td></tr>";
 
 	$uebung_obj = new uebung();
@@ -1138,10 +1139,10 @@ else
 		$maxstudentenprobeispiel = '';
 		$maxbeispieleprostudent = '';
 		$gewicht = 1;
-		
+
 	}
 	echo "</td><td valign='top'>";
-	
+
 	if ($anzeigen != 'abgabe' && $anzeigen != 'nada')
 	{
 		echo "
@@ -1181,27 +1182,27 @@ else
 				}
 			}
 		}
-		
+
 		if ($anzeigen != "beide")
-		{	
+		{
 			if ($liste_obj->prozent == 't')
 			{
 				$einheit = " %";
 				$einheit_link = $p->t('benotungstool/notenschluesselInProzent')." / <a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id&notenschluessel=punkte'>".$p->t('benotungstool/punkten')."</a>";
-			}			
+			}
 			else
 			{
 				$einheit=" ".$p->t('benotungstool/punkte');
 				$einheit_link = $p->t('benotungstool/notenschluesselIn')." <a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id&notenschluessel=prozent'>".$p->t('benotungstool/prozentPunkten');
 			}
-			
+
 			echo "<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method='POST' name='ns'>\n";
 			echo "<table><tr><td colspan='3' class='ContentHeader3'>".$p->t('benotungstool/notenschluesselDefinieren')."</td></tr>\n";
 			echo "<tr>";
 			echo "<td colspan='3'>";
 			echo $einheit_link;
-			echo "</td>";			
-			echo "</tr>";			
+			echo "</td>";
+			echo "</tr>";
 			echo "<tr><td colspan='3'>&nbsp;</td></tr>\n";
 			echo "<tr><td>".$p->t('benotungstool/note')."</td><td>".$p->t('benotungstool/minimum')."</td></tr>";
 			echo "<tr><td><input type='text' name='schluessel_note_1' maxlength='2' size='2' value='1' readonly></td><td><input type='text' size='4' name='schluessel_punkte_1' value='$notenschluessel[1]'>$einheit</td></tr>";
@@ -1215,14 +1216,14 @@ else
 				echo "<input type='button' onclick='set_notenschluessel_prozent();' value='".$p->t('benotungstool/standardwerteSetzen')."'><br>";
 			echo "<input type='submit' name='schluessel' value='".$p->t('global/speichern')."'></td>";
 			echo "</tr>";
-		
+
 			echo "</table>
 			</form>";
 		}
 	}
 	if(!isset($_POST['uebung_neu']))
 		$thema = "Abgabe ".($anzahl<9?'0'.($anzahl+1):($anzahl+1));
-	
+
 	if ($anzeigen != 'beispiele' && $anzeigen != 'nada')
 	{
 		echo "

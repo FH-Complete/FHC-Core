@@ -1,12 +1,12 @@
 .icon-fhc-chart{
-	background:url('../../../skin/images/Graphs_clip_art.svg') no-repeat center center;
-  background-size: 16px 16px;
+	background:url('../../../skin/images/Chart.svg') no-repeat center center;
+  background-size: 11px 16px;
 }
 .icon-fhc-report{
-	background:url('../../../skin/images/x-office-presentation.svg') no-repeat center center;
-  background-size: 16px 16px;
+	background:url('../../../skin/images/Report.svg') no-repeat center center;
+  background-size: 11px 16px;
 }
 .icon-fhc-statistik{
-	background:url('../../../skin/images/x-office-spreadsheet.svg') no-repeat center center;
-  background-size: 16px 16px;
+	background:url('../../../skin/images/Statistik.svg') no-repeat center center;
+  background-size: 11px 16px;
 }

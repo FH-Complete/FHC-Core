@@ -30,6 +30,7 @@
  * - studiengang_kurzbz_hi 3-stelliges Studiengangskuerzel grossgeschrieben
  */
 require_once(dirname(__FILE__).'/menu_addon.class.php');
+require_once(dirname(__FILE__).'/../../config/cis.config.inc.php');
 require_once(dirname(__FILE__).'/../../include/studiengang.class.php');
 require_once(dirname(__FILE__).'/../../include/lehrveranstaltung.class.php');
 require_once(dirname(__FILE__).'/../../include/organisationsform.class.php');
@@ -58,6 +59,10 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 
 		$p = new phrasen($sprache);
 
+		if (defined("CIS_LVMENUE_CUTLENGTH"))
+			$cutlength = CIS_LVMENUE_CUTLENGTH;
+		else
+			$cutlength = 21;
 
 		$this->block.='
 			<script language="JavaScript" type="text/javascript">
@@ -213,7 +218,7 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 				}
 				else
 				{
-					// Wenn es in diesem Studiengang keine genehmigte Studienordnung gibt dann 
+					// Wenn es in diesem Studiengang keine genehmigte Studienordnung gibt dann
 					// alle LVs anzeigen und nur die Module herausfiltern
 					if($row->lehrtyp_kurzbz!='lv')
 						continue;
@@ -230,7 +235,7 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 				}
 				$this->block.= '<tr>';
 				$this->block.= '	<td class="tdwrap"><ul style="margin: 0px; padding: 0px; ">';
-				$this->block.= "<li style='padding: 0px;'><a title=\"".$row->bezeichnung_arr[$sprache]."\" href=\"private/lehre/lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$this->CutString($row->bezeichnung_arr[$sprache], 21).' '.$row->lehrform_kurzbz."</a></li>";
+				$this->block.= "<li style='padding: 0px;'><a title=\"".$row->bezeichnung_arr[$sprache]."\" href=\"private/lehre/lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$this->CutString($row->bezeichnung_arr[$sprache], $cutlength).' '.$row->lehrform_kurzbz."</a></li>";
 				$this->block.= '	</ul></td>';
 				$this->block.= '</tr>';
 			}

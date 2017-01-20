@@ -216,7 +216,7 @@ define('CIS_PRUEFUNGSANMELDUNG_USER','p.pruefungsanmeldung');
 define('CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG', true);
 
 //Gibt an, ob der Bereich zur Anmeldung zu Pruefungen des gesamten Studiengangs angezeigt werden soll
-define('CIS_PRUEFUNGSANMELDUNG_LEHRVERANSTALTUNGEN_AUS_STUDIENGANG', true); 
+define('CIS_PRUEFUNGSANMELDUNG_LEHRVERANSTALTUNGEN_AUS_STUDIENGANG', true);
 
 //Gibt an, wie viele Semester aus der Vergangenheit unter Meine LV angezeigt werden
 define('CIS_MEINELV_ANZAHL_SEMESTER_PAST', 3);
@@ -224,4 +224,6 @@ define('CIS_MEINELV_ANZAHL_SEMESTER_PAST', 3);
 //Gibt an, welche Buchungstypen bei der Überprüfung auf Einzahlung berücksichtigt werden
 define('CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN', serialize(array("Studiengebuehr")));
 
+//Gibt an bei welcher Länge die LV-Bezeichnungen im Menü abgeschnitten werden. Default: 21  
+define('CIS_LVMENUE_CUTLENGTH', 21);
 ?>

@@ -381,7 +381,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </table:table-cell>
           <table:covered-table-cell/>
           <table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="7" office:value-type="string">
-            <text:p text:style-name="P4">Prüfungsgespräch über Masterarbeit und Querverbindungen zu Fächern des Studienplans sowie Prüfungsgespräch über Stoffgebiet</text:p>
+            <text:p text:style-name="P4">Prüfungsgespräch über die Masterarbeit und deren Querverbindungen zu Fächern des Studienplans sowie Prüfungsgespräch über das Stoffgebiet</text:p>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>

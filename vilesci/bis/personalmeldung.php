@@ -26,6 +26,7 @@ require_once('../../include/studiensemester.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/functions.inc.php');
+require_once('../../include/studiengang.class.php');
 
 $uid = get_uid();
 
@@ -86,23 +87,50 @@ if($result = $db->db_query($qry))
 	}
 }
 
+$ba1_arr = array();
+$qry = "SELECT * FROM bis.tbl_beschaeftigungsart1";
+if($result = $db->db_query($qry))
+	while($row = $db->db_fetch_object($result))
+		$ba1_arr[$row->ba1code]=$row->ba1kurzbz;
+
+$ba2_arr = array();
+$qry = "SELECT * FROM bis.tbl_beschaeftigungsart2";
+if($result = $db->db_query($qry))
+	while($row = $db->db_fetch_object($result))
+		$ba2_arr[$row->ba2code]=$row->ba2bez;
+
+$verwendung_arr = array();
+$qry = "SELECT * FROM bis.tbl_verwendung";
+if($result = $db->db_query($qry))
+	while($row = $db->db_fetch_object($result))
+		$verwendung_arr[$row->verwendung_code]=$row->verwendungbez;
+
+$ausmass_arr = array();
+$qry = "SELECT * FROM bis.tbl_beschaeftigungsausmass";
+if($result = $db->db_query($qry))
+	while($row = $db->db_fetch_object($result))
+		$ausmass_arr[$row->beschausmasscode]=$row->beschausmassbez;
+
+$stg_obj = new studiengang();
+$stg_obj->getAll(null,false);
+
 $qry="
-	SELECT DISTINCT ON (UID) * 
-	FROM 
-		public.tbl_mitarbeiter 
+	SELECT DISTINCT ON (UID) *
+	FROM
+		public.tbl_mitarbeiter
 		JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
 		JOIN public.tbl_person USING(person_id)
 		JOIN bis.tbl_bisverwendung USING(mitarbeiter_uid)
-	WHERE 
-		bismelden 
-		AND personalnummer>0 
+	WHERE
+		bismelden
+		AND personalnummer>0
 		AND (tbl_bisverwendung.ende is NULL OR tbl_bisverwendung.ende>".$db->db_add_param($bisprevious).")
 	ORDER BY uid, nachname,vorname
 	";
 
 if($result = $db->db_query($qry))
 {
-	
+
 	$datei.="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <Erhalter>
    <ErhKz>".$erhalter."</ErhKz>
@@ -111,7 +139,7 @@ if($result = $db->db_query($qry))
 	while($row = $db->db_fetch_object($result))
 	{
 		$mitarbeiter_data=array();
-		
+
 		$error_person = false;
 		$person_content='';
 		$qryet="SELECT * FROM bis.tbl_entwicklungsteam WHERE mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid).";";
@@ -123,7 +151,7 @@ if($result = $db->db_query($qry))
 			}
 		}
 		$error_log='';
-		
+
 		if($row->gebdatum=='' || $row->gebdatum==NULL)
 		{
 				$error_log.=($error_log!=''?', ':'')."Geburtsdatum ('".$row->gebdatum."')";
@@ -140,7 +168,9 @@ if($result = $db->db_query($qry))
 		$mitarbeiter_data['personalnummer']=sprintf("%015s",$row->personalnummer);
 		$mitarbeiter_data['vorname']=$row->vorname;
 		$mitarbeiter_data['nachname']=$row->nachname;
-		
+		$mitarbeiter_data['fixangestellt']=($row->fixangestellt=='t'?true:false);
+		$mitarbeiter_data['lektor']=($row->lektor=='t'?true:false);
+
 		$person_content.="
      <Person>
       <PersonalNummer>".sprintf("%015s",$row->personalnummer)."</PersonalNummer>
@@ -202,17 +232,17 @@ if($result = $db->db_query($qry))
 					$verwendung_data[$key]['ba2code']=$rowvw->ba2code;
 					$verwendung_data[$key]['beschausmasscode']=$rowvw->beschausmasscode;
 					$verwendung_data[$key]['verwendung_code']=$rowvw->verwendung_code;
-					
-					
-					
+
+
+
 					//Studiengangsleiter
-					$qryslt="SELECT 
-								tbl_benutzerfunktion.*, tbl_studiengang.studiengang_kz 
-							FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz) 
-							WHERE 
-								uid=".$db->db_add_param($row->mitarbeiter_uid)." 
-								AND funktion_kurzbz='Leitung' 
-								AND (datum_von<".$db->db_add_param($bisdatum)." OR datum_von is null) 
+					$qryslt="SELECT
+								tbl_benutzerfunktion.*, tbl_studiengang.studiengang_kz
+							FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz)
+							WHERE
+								uid=".$db->db_add_param($row->mitarbeiter_uid)."
+								AND funktion_kurzbz='Leitung'
+								AND (datum_von<".$db->db_add_param($bisdatum)." OR datum_von is null)
 								AND (datum_bis>".$db->db_add_param($bisprevious)." OR datum_bis is NULL)
 								AND studiengang_kz>0
 								AND studiengang_kz<10000;";
@@ -259,7 +289,7 @@ if($result = $db->db_query($qry))
 										$error_log.=($error_log!=''?', ':'')."BesondereQualifikationCode ('".$eteam[$rowfkt->studiengang_kz]."')";
 								}
 							}
-							
+
 							$verwfkt_found=false;
 
 							// Wenn mehrere Verwendungen vorhanden sind fuer und funktionen fuer die gleichen Studiengaenge
@@ -287,7 +317,7 @@ if($result = $db->db_query($qry))
 						}
 					}
 				}
-				
+				$mitarbeiter_data['verwendung']=$verwendung_data;
 				//Verwendungen ausgeben
 				foreach($verwendung_data as $row_verwendung)
 				{
@@ -297,7 +327,7 @@ if($result = $db->db_query($qry))
               <BeschaeftigungsArt2>".$row_verwendung['ba2code']."</BeschaeftigungsArt2>
               <BeschaeftigungsAusmass>".$row_verwendung['beschausmasscode']."</BeschaeftigungsAusmass>
               <VerwendungsCode>".$row_verwendung['verwendung_code']."</VerwendungsCode>";
-					
+
 					if(isset($row_verwendung['stgltg']))
 					{
 						foreach($row_verwendung['stgltg'] as $row_stgl)
@@ -340,14 +370,14 @@ if($result = $db->db_query($qry))
 								}
 							$person_content.="
 		                    </Funktion>";
-						}	
+						}
 					}
 						$person_content.="
        </Verwendung>";
 				}
-				
+
 			}
-			else 
+			else
 			{
 				$qry_count="SELECT 1 FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid);
 				if($result_count=$db->db_query($qry_count))
@@ -384,7 +414,7 @@ if($result = $db->db_query($qry))
 			if($error_person)
 				$v.='</span>';
 		}
-		else 
+		else
 		{
 			if(!$error_person)
 			{
@@ -400,7 +430,10 @@ if($result = $db->db_query($qry))
 
 echo '	<html><head><title>BIS - Meldung Mitarbeiter</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
+	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">';
+	include('../../include/meta/jquery.php');
+	include('../../include/meta/jquery-tablesorter.php');
+echo '
 	</head><body>';
 echo "<H1>BIS - Mitarbeiterdaten werden &uuml;berpr&uuml;ft (f&uuml;r Meldung ".$stsem." / $bisprevious - $bisdatum)</H1><br>";
 echo "Anzahl Mitarbeiter: Gesamt: ".$mitarbeiterzahl." / echter Dienstvertrag: ".$echt." / freier Dienstvertrag: ".$frei."<br><br>";
@@ -416,13 +449,30 @@ fclose($dateiausgabe);
 
 echo '<h2>Folgende Personen werden gemeldet</h2>
 Anzahl:'.count($mitarbeiter_gesamt).'
-<table>
+<script type="text/javascript">
+	$(document).ready(function()
+		{
+			$("#t1").tablesorter(
+			{
+				sortList: [[2,0]],
+				widgets: ["zebra"]
+			});
+		});
+</script>
+<table class="tablesorter" id="t1">
 <thead>
 	<tr>
 		<th>UID</th>
 		<th>Vorname</th>
 		<th>Nachname</th>
 		<th>Personalnummer</th>
+		<th>Fixangestellt</th>
+		<th>Lektor</th>
+		<th>BeschaeftigungsArt1</th>
+		<th>BeschaeftigungsArt2</th>
+		<th>Ausmass</th>
+		<th>Verwendung</th>
+		<th>Details (Funktion/Lehre)</th>
 	</tr>
 </thead>
 <tbody>';
@@ -434,6 +484,57 @@ foreach($mitarbeiter_gesamt as $row)
 	echo '<td>'.$row['vorname'].'</td>';
 	echo '<td>'.$row['nachname'].'</td>';
 	echo '<td>'.$row['personalnummer'].'</td>';
+	echo '<td>'.($row['fixangestellt']?'Ja':'Nein').'</td>';
+	echo '<td>'.($row['lektor']?'Ja':'Nein').'</td>';
+	foreach($row['verwendung'] as $row_verwendung)
+	{
+		// Ba1Code
+		if(isset($ba1_arr[$row_verwendung['ba1code']]))
+			echo '<td>'.$ba1_arr[$row_verwendung['ba1code']].'</td>';
+		else
+			echo '<td>'.$row_verwendung['ba1code'].'</td>';
+
+		// Ba2Code
+		if(isset($ba2_arr[$row_verwendung['ba2code']]))
+			echo '<td>'.$ba2_arr[$row_verwendung['ba2code']].'</td>';
+		else
+			echo '<td>'.$row_verwendung['ba2code'].'</td>';
+
+		// Ausmass
+		if(isset($ausmass_arr[$row_verwendung['beschausmasscode']]))
+			echo '<td>'.$ausmass_arr[$row_verwendung['beschausmasscode']].'</td>';
+		else
+			echo '<td>'.$row_verwendung['beschausmasscode'].'</td>';
+
+		// Verwendung
+		if(isset($verwendung_arr[$row_verwendung['verwendung_code']]))
+			echo '<td nowrap>'.$verwendung_arr[$row_verwendung['verwendung_code']].'</td>';
+		else
+			echo '<td nowrap>'.$row_verwendung['verwendung_code'].'</td>';
+
+		echo '<td nowrap>';
+		// Details
+		if(isset($row_verwendung['stgltg']))
+		{
+
+			foreach($row_verwendung['stgltg'] as $row_stgl)
+			{
+				echo 'Leitung:'.$stg_obj->kuerzel_arr[$row_stgl];
+				echo '<br>';
+			}
+		}
+
+		if(isset($row_verwendung['fkt']))
+		{
+			foreach($row_verwendung['fkt'] as $row_fkt)
+			{
+				echo $stg_obj->kuerzel_arr[$row_fkt['stgkz']].': '.$row_fkt['sws'].' SWS';
+				echo '<br>';
+			}
+		}
+
+		echo '</td>';
+	}
 	echo '</tr>';
 }
 echo '</tbody></table><br>';

@@ -1793,13 +1793,13 @@ function PrintStudienblatt(event)
 	    var studienplan_id = "";
 	    for (var v=0; v < items; v++)
 	    {
-		var stsem = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', v);
-		if(stsem == ss)
-		{
-		    studienplan_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-studienplan_id', v);
-			if(studienplan_id!='')
-				break;
-		}
+			var stsem = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', v);
+			if(stsem == ss)
+			{
+				studienplan_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-studienplan_id', v);
+				if(studienplan_id!='')
+					break;
+			}
 	    }
 	}
 	catch(e)
@@ -1869,7 +1869,7 @@ function PrintStudienblatt(event)
 	{
 		if(error>0)
 			alert(error+' der ausgewaehlten Personen haben keinen Account');
-		action = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&output='+output+'&&uid='+data+"&ss="+ss;
+		action = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&output='+output+'&uid='+data+"&ss="+ss;
 		window.open(action,'Studienblatt','height=520,width=500,left=350,top=350,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	}
 	else
@@ -1884,6 +1884,7 @@ function PrintStudienblatt(event)
 function PrintStudienblattEnglisch(event)
 {
 	var tree = document.getElementById('student-prestudent-tree-rolle');
+	var ss = document.getElementById('statusbarpanel-semester').label;
 	var items = tree.view.rowCount;
 
 	try
@@ -1891,12 +1892,14 @@ function PrintStudienblattEnglisch(event)
 	    var studienplan_id = "";
 	    for (var v=0; v < items; v++)
 	    {
-		var stsem = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', v);
-		if(stsem == ss)
-		{
-		    studienplan_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-studienplan_id', v);
+			var stsem = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', v);
+			if(stsem == ss)
+			{
+				studienplan_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-studienplan_id', v);
+				if(studienplan_id!='')
+					break;
+			}
 		}
-	    }
 	}
 	catch(e)
 	{
@@ -1965,7 +1968,7 @@ function PrintStudienblattEnglisch(event)
 	{
 		if(error>0)
 			alert(error+' der ausgewaehlten Personen haben keinen Account');
-		action = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=StudienblattEng&xml=studienblatt.xml.php&output='+output+'&&uid='+data;
+		action = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=StudienblattEng&xml=studienblatt.xml.php&output='+output+'&uid='+data+'&ss='+ss;
 		window.open(action,'StudienblattEng','height=520,width=500,left=350,top=350,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	}
 	else

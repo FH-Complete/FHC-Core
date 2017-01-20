@@ -61,7 +61,10 @@ echo '<h1>',$p->t('tools/suche'),'</h1>';
 
 $search = (isset($_REQUEST['search'])?$_REQUEST['search']:'');
 
-echo '<form action="',$_SERVER['PHP_SELF'],'" name="searchform" method="GET">
+// Uses htmlspecialchars to avoid XSS issues
+$self = htmlspecialchars($_SERVER["PHP_SELF"], ENT_QUOTES, "utf-8");
+
+echo '<form action="',$self,'" name="searchform" method="GET">
 	<input type="search" placeholder="'.$p->t('tools/suchbegriff').' ..." size="40" name="search" value="',$db->convert_html_chars($search),'" />
 	<img src="../../../skin/images/search.png" onclick="document.searchform.submit()" height="15px" class="suchicon"/>
 	</form><br>';

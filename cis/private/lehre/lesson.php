@@ -64,7 +64,8 @@ $lv_obj->load($lvid);
 $lv=$lv_obj;
 
 if(isset($_GET['studiensemester_kurzbz']))
-	$studiensemester_kurzbz=$_GET['studiensemester_kurzbz'];
+	// Uses urlencode to avoid XSS issues
+	$studiensemester_kurzbz = urlencode($_GET['studiensemester_kurzbz']);
 else
 	$studiensemester_kurzbz='';
 

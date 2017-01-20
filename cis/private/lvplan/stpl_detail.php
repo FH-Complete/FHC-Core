@@ -235,7 +235,7 @@ if ($num_rows_stpl>0)
 	    echo '
 	    <tr class="liste'.($i%2).'">
 	        <td>'.$db->convert_html_chars($unr).'</td>
-	        <td><A class="Item" href="mailto:'.$pers_email.'">'.$db->convert_html_chars($titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost).'</A></td>
+	        <td><A class="Item" href="../profile/index.php?uid='.$row->uid.'" target="_self" onClick="window.resizeTo(1200,880)">'.$db->convert_html_chars($titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost).'</A></td>
 	        <td  title="'.$db->convert_html_chars($ort->bezeichnung).'">'.(!empty($ortkurzbz)?($ort->content_id!=''?'<a href="../../../cms/content.php?content_id='.$ort->content_id.'" target="_self" onClick="window.resizeTo(1200,880)">'.$db->convert_html_chars($ortkurzbz).'</a>':$db->convert_html_chars($ortkurzbz)):$db->convert_html_chars($ortkurzbz)).'</td>
 	        <td>'.$db->convert_html_chars($lehrfachkurzbz).'</td>
 	        <td>'.$db->convert_html_chars($bezeichnung).'</td>

@@ -131,9 +131,15 @@ class benutzerfunktion extends basis_db
 	 */
 	public function getBenutzerFunktion($uid, $funktion_kurzbz, $oe_kurzbz)
 	{
-		$qry = "SELECT * FROM public.tbl_benutzerfunktion
-				WHERE uid=".$this->db_add_param($uid)." AND funktion_kurzbz=".$this->db_add_param($funktion_kurzbz)."
-				AND oe_kurzbz=".$this->db_add_param($oe_kurzbz);
+		$qry = "SELECT 
+					bfunk.*, stg.studiengang_kz
+				FROM 
+					public.tbl_benutzerfunktion AS bfunk
+					INNER JOIN public.tbl_studiengang AS stg ON(stg.oe_kurzbz = bfunk.oe_kurzbz)
+				WHERE 
+					bfunk.uid=".$this->db_add_param($uid)." 
+					AND bfunk.funktion_kurzbz=".$this->db_add_param($funktion_kurzbz)."
+					AND bfunk.oe_kurzbz=".$this->db_add_param($oe_kurzbz);
 
 		if($result = $this->db_query($qry))
 		{

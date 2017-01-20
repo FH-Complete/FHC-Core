@@ -17,13 +17,13 @@ function makeUploadName($db, $which, $lehreinheit_id=null, $uebung_id=null, $ss=
 	{
 		$query = "SELECT nachname, vorname from tbl_person, tbl_benutzer where tbl_benutzer.person_id = tbl_person.person_id and tbl_benutzer.uid = ".$db->db_add_param($uid);
 		$result = $db->db_query($query);
-		$row = $db->db_fetch_object($result);		
+		$row = $db->db_fetch_object($result);
 		$name .= "_".$uebung_id."_".$row->nachname."_".$row->vorname."_".$uid."_".$date;
 	}
 	else if ($which == "zip")
 	{
-		
-		$name .= "_".$uebung_id."_".$date;	
+
+		$name .= "_".$uebung_id."_".$date;
 	}
 	$name = str_replace(":","-",$name);
 	return $name;

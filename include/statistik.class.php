@@ -32,8 +32,6 @@ class statistik extends basis_db
 	public $bezeichnung;
 	public $url;
 	public $sql;
-	public $php;
-	public $r;
 	public $gruppe;
 	public $publish;
 	public $insertamum;
@@ -92,8 +90,6 @@ class statistik extends basis_db
 				$this->bezeichnung = $row->bezeichnung;
 				$this->url = $row->url;
 				$this->sql = $row->sql;
-				$this->php = $row->php;
-				$this->r = $row->r;
 				$this->gruppe = $row->gruppe;
 				$this->publish = $this->db_parse_bool($row->publish);
 				$this->insertamum = $row->insertamum;
@@ -141,8 +137,6 @@ class statistik extends basis_db
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->url = $row->url;
 				$obj->sql = $row->sql;
-				$obj->php = $row->php;
-				$obj->r = $row->r;
 				$obj->gruppe = $row->gruppe;
 				$obj->publish = $this->db_parse_bool($row->publish);
 				$obj->insertamum = $row->insertamum;
@@ -187,8 +181,6 @@ class statistik extends basis_db
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->url = $row->url;
 				$obj->sql = $row->sql;
-				$obj->php = $row->php;
-				$obj->r = $row->r;
 				$obj->gruppe = $row->gruppe;
 				$obj->publish = $this->db_parse_bool($row->publish);
 				$obj->insertamum = $row->insertamum;
@@ -267,14 +259,12 @@ class statistik extends basis_db
 		if($new)
 		{
 			$qry = 'INSERT INTO public.tbl_statistik(statistik_kurzbz, content_id, bezeichnung, url, sql, 
-					php, r, gruppe, publish, insertamum, insertvon, updateamum, updatevon, preferences, berechtigung_kurzbz) VALUES('.
+					gruppe, publish, insertamum, insertvon, updateamum, updatevon, preferences, berechtigung_kurzbz) VALUES('.
 					$this->db_add_param($this->statistik_kurzbz).','.
 					$this->db_add_param($this->content_id,FHC_INTEGER).','.
 					$this->db_add_param($this->bezeichnung).','.
 					$this->db_add_param($this->url).','.
 					$this->db_add_param($this->sql).','.
-					$this->db_add_param($this->php).','.
-					$this->db_add_param($this->r).','.
 					$this->db_add_param($this->gruppe).','.
 					$this->db_add_param($this->publish, FHC_BOOLEAN).','.
 					$this->db_add_param($this->insertamum).','.
@@ -294,8 +284,6 @@ class statistik extends basis_db
 				' statistik_kurzbz='.$this->db_add_param($this->statistik_kurzbz).','.
 				' url='.$this->db_add_param($this->url).','.
 				' sql='.$this->db_add_param($this->sql).','.
-				' php='.$this->db_add_param($this->php).','.
-				' r='.$this->db_add_param($this->r).','.
 				' gruppe='.$this->db_add_param($this->gruppe).','.
 				' publish='.$this->db_add_param($this->publish, FHC_BOOLEAN).','.
 				' insertamum='.$this->db_add_param($this->insertamum).','.

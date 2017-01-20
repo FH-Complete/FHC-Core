@@ -75,6 +75,7 @@ $this->phrasen['pruefung/terminGeloescht'] = 'Termin gelöscht';
 $this->phrasen['pruefung/unbegrenzt'] = 'unbegrenzt';
 $this->phrasen['pruefung/bewertungenZu'] = 'Bewertungen zu';
 $this->phrasen['pruefung/keineAuswahl'] = 'Keine Auswahl';
+$this->phrasen['pruefung/alleBestaetigen'] = 'Alle bestätigen';
 
 // pruefungsbewertung
 $this->phrasen['pruefung/pruefungsbewertungTitle'] = 'Prüfungsbewertung';
@@ -148,6 +149,8 @@ $this->phrasen['pruefung/emailVerschiebung'] = 'Sehr geehrte Studierende,
 Die Prüfung zur LV %1$s wurde verschoben.
 Der neue Termin für die Prüfung ist am  %2$s um %3$s Uhr.';
 $this->phrasen['pruefung/emailVerschiebungSubject'] = 'Verschiebung einer Prüfung';
+
+$this->phrasen['pruefung/AnrechnungInStudiengang'] = 'Studiengang für Anrechnung';
 
 
 ?>

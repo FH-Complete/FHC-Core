@@ -117,7 +117,7 @@ if (!$filter->loadAll())
 								<?php echo $filter->filter_id ?>
 							</a>
 							<a href="filter_vorschau.php?filter_id=<?php echo $filter->filter_id ?>" target="_blank">
-								<img src="../../skin/images/x-office-presentation.png" class="mini-icon" />
+								<img src="../../skin/images/Filter.svg" class="mini-icon" />
 							</a>
 						</td>
 						<td>

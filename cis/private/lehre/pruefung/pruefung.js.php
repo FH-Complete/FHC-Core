@@ -491,6 +491,32 @@ function openDialog(lehrveranstaltung_id, termin_id, lvBezeichnung, terminVon, t
 		$("#studienverpflichtung").html(html);
 	});
 
+    $.ajax({
+        dataType: 'json',
+        url: "./pruefungsanmeldung.json.php",
+        type: "POST",
+        data: {
+            method: "getPrestudenten"
+        },
+        error: loadError
+    }).success(function(data)
+    {
+        if(data.error !== false)
+        {
+            //show if more than 1 active prestudent exists
+            if(data.result.length > 1)
+            {
+                var html = "<select id='prestudent_studiengang' name='studiengang'>";
+                data.result.forEach(function(v,i){
+                    html += "<option value='"+v.studiengang_kz+"'>"+v.kuerzel+"</option>";
+                });
+                html += "</select>";
+
+                $("#studiengang").html("<td style='vertical-align: top; font-weight: bold;'><?php echo $p->t('pruefung/AnrechnungInStudiengang'); ?>:</td><td>"+html+"</td>");
+            }
+        }
+    });
+
 	var start = terminVon;
 	var ende = terminBis;
 	start = start.split(' ');
@@ -532,6 +558,10 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
     if($("#studienverpflichtung").length)
         studienverpflichtung_id = $("#studienverpflichtung option:selected").val();
 
+    var studiengang_kz = null;
+    if($('#prestudent_studiengang').length)
+        studiengang_kz =   $('#prestudent_studiengang option:selected').val();
+
 	$.ajax({
 		dataType: 'json',
 		url: "./pruefungsanmeldung.json.php",
@@ -542,7 +572,8 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 			lehrveranstaltung_id: lehrveranstaltung_id,
 			bemerkung: bemerkungen,
 			uid: uid,
-			studienverpflichtung_id: studienverpflichtung_id
+			studienverpflichtung_id: studienverpflichtung_id,
+            studiengang_kz: studiengang_kz
 		},
 		error: loadError
 	}).success(function(data){
@@ -778,10 +809,10 @@ function writeAnmeldungen(data)
 		});
 		liste += "</ul>";
 		$("#anmeldung_hinzufuegen").html("<input id='anmeldung_hinzufuegen_uid' type='text' placeholder='StudentIn-UID' /><input type='button' value='<?php echo $p->t('global/hinzufuegen'); ?>' onclick='saveAnmeldung(\""+lehrveranstaltung_id+"\",\""+terminId+"\");'/>");
-		$("#reihungSpeichernButton").html("<input type='button' value='<?php echo $p->t('pruefung/reihungSpeichern'); ?>' onclick='saveReihung(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'>");
+		$("#reihungSpeichernButton").html("<input type='button' value='<?php echo $p->t('pruefung/reihungSpeichern'); ?>' onclick='saveReihung(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'><input type='button' value='<?php echo $p->t('pruefung/alleBestaetigen'); ?>' onclick='alleBestaetigen(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'>");
 		$("#lvdaten").html(lv_bezeichnung+" ("+prf_termin+")");
 		$("#anmeldeDaten").html(liste);
-		$("#listeDrucken").html("<a href='./pruefungsanmeldungen_liste.php?termin_id="+terminId+"&lehrveranstaltung_id="+lehrveranstaltung_id+"&studiensemester="+studiensemester+"' target='_blank'><?php echo $p->t('pruefung/listeDrucken'); ?></a>");
+		$("#listeDrucken").html("<a href='./pruefungsanmeldungen_liste.pdf.php?termin_id="+terminId+"&lehrveranstaltung_id="+lehrveranstaltung_id+"&studiensemester="+studiensemester+"' target='_blank'><?php echo $p->t('pruefung/listeDrucken'); ?></a>");
 		if(ort_kurzbz !== null)
 		{
 			$("#raumLink").html("<span><?php echo $p->t('pruefung/pruefungsraum'); ?></span>"+ort_kurzbz);
@@ -800,6 +831,8 @@ function writeAnmeldungen(data)
 	}
 	else
 	{
+		$("#anmeldung_hinzufuegen").empty();
+		$("#lvdaten").empty();
 		$("#anmeldeDaten").empty();
 		$("#reihungSpeichernButton").empty();
 		$("#kommentar").empty();
@@ -807,6 +840,11 @@ function writeAnmeldungen(data)
 		$("#raumLink").empty();
 		$("#listeDrucken").empty();
 		messageBox("message", data.errormsg, "red", "highlight", 1000);
+		if (data.lv_bezeichnung)
+		{
+			$("#lvdaten").html(data.lv_bezeichnung+" ("+data.termin_datum+")");
+			$("#anmeldung_hinzufuegen").html("<input id='anmeldung_hinzufuegen_uid' type='text' placeholder='StudentIn-UID' /><input type='button' value='<?php echo $p->t('global/hinzufuegen'); ?>' onclick='saveAnmeldung(\""+data.lv_id+"\",\""+data.termin_id+"\");'/>");
+		}
 	}
 }
 
@@ -874,6 +912,39 @@ function anmeldungBestaetigen(pruefungsanmeldung_id, termin_id, lehrveranstaltun
 		data: {
 			method: "anmeldungBestaetigen",
 			pruefungsanmeldung_id: pruefungsanmeldung_id
+		},
+		error: loadError
+	}).success(function(data){
+		if(data.error === 'false' && data.result === true)
+		{
+			if(termin_id !== 'undefined' && lehrveranstaltung_id !== 'undefined')
+			{
+				showAnmeldungen(termin_id, lehrveranstaltung_id);
+			}
+		}
+		else
+		{
+			messageBox("message", data.errormsg, "red", "highlight", 1000);
+		}
+	});
+}
+
+/**
+ * Ändert den Status aller Anmeldungen eines Termins auf "bestätigt"
+ * @param {type} termin_id ID des Prüfungstermines
+ * @param {type} lehrveranstaltung_id ID der Lehrveranstaltung
+ * @returns {undefined}
+ */
+function alleBestaetigen(termin_id, lehrveranstaltung_id)
+{
+	$.ajax({
+		dataType: 'json',
+		url: "./pruefungsanmeldung.json.php",
+		type: "POST",
+		data: {
+			method: "alleBestaetigen",
+			termin_id: termin_id,
+			lehrveranstaltung_id: lehrveranstaltung_id
 		},
 		error: loadError
 	}).success(function(data){

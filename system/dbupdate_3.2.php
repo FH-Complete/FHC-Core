@@ -1670,6 +1670,47 @@ if(!$result = @$db->db_query("SELECT aufnahmegruppe FROM public.tbl_gruppe"))
 		echo 'Boolean aufnahmegruppe zu Gruppen hinzugefuegt. aufnahmegruppe_kurzbz zu tbl_prestudent und tbl_reihungstest hinzugefuegt<br>';
 }
 
+// Removing column "r" from tbl_statistik
+if ($result = @$db->db_query("SELECT r FROM public.tbl_statistik LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_statistik DROP COLUMN r;";
+
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_statistik: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' public.tbl_statistik: Spalte r entfernt.<br>';
+}
+
+
+// Removing column "php" from tbl_statistik
+if ($result = @$db->db_query("SELECT php FROM public.tbl_statistik LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_statistik DROP COLUMN php;";
+
+	if (!$db->db_query($qry))
+		echo '<strong>public.tbl_statistik: ' . $db->db_last_error() . '</strong><br>';
+	else
+		echo ' public.tbl_statistik: Spalte php entfernt.<br>';
+}
+
+// vorlage_kurzbz von 16 auf 32 Zeichen
+if($result = $db->db_query("SELECT character_maximum_length FROM information_schema.columns WHERE column_name='vorlage_kurzbz' AND table_name='tbl_vorlage' AND table_schema='public';"))
+{
+	if($row = $db->db_fetch_object($result))
+	{
+		if($row->character_maximum_length==16)
+		{
+			$qry = "ALTER TABLE public.tbl_vorlage ALTER COLUMN vorlage_kurzbz TYPE varchar(32);
+			ALTER TABLE public.tbl_vorlagestudiengang ALTER COLUMN vorlage_kurzbz TYPE varchar(32);
+			";
+			if(!$db->db_query($qry))
+				echo '<strong>public.tbl_vorlage: '.$db->db_last_error().'</strong><br>';
+			else
+				echo 'public.tbl_vorlage: Spalte vorlage_kurzbz auf 32 Zeichen verlaengert<br>';
+		}
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -1882,7 +1923,7 @@ $tabellen=array(
 	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id"),
 	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content","bezeichnung"),
 	"public.tbl_standort"  => array("standort_id","adresse_id","kurzbz","bezeichnung","insertvon","insertamum","updatevon","updateamum","ext_id", "firma_id","code"),
-	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","r","gruppe","sql","php","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz","publish","preferences"),
+	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","gruppe","sql","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz","publish","preferences"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung"),

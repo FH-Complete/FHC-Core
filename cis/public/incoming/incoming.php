@@ -187,6 +187,11 @@ $( document ).ready(function()
         }
     }
 });
+function setBisdatum(datum)
+{
+	if(document.getElementById("bis_datum").value=="")
+		document.getElementById("bis_datum").value=datum;
+}
 </script>
 ';
 ?>
@@ -269,20 +274,51 @@ if($method =="austauschprogram")
 	// Speichert Austauschprogram in preincoming tabelle
 	if(isset($_POST['submit_program']))
 	{
-		$preincoming->von = $date->formatDatum($_REQUEST['von'],'Y-m-d');
-		$preincoming->bis = $date->formatDatum($_REQUEST['bis'],'Y-m-d');
-		if (isset($_REQUEST['code']))
-			$preincoming->code = $_REQUEST['code'];
-		if($_REQUEST['austausch_kz']== "austausch_auswahl")
-			$preincoming->mobilitaetsprogramm_code = '';
+		$von_datum = $_REQUEST['von'];
+		$bis_datum = $_REQUEST['bis'];
+		
+		//Datum auf Gueltigkeit pruefen
+		if (($von_datum != '' && !$date->formatDatum($von_datum,'Y-m-d')) || ($bis_datum != '' && !$date->formatDatum($bis_datum,'Y-m-d')))
+		{
+			echo '<span style="color: red"><b>'.($p->t('incoming/bitteGueltigesDatumEingeben')).'</b></span>';
+		}
 		else
-			$preincoming->mobilitaetsprogramm_code = $_REQUEST['austausch_kz'];
-		$preincoming->updateamum = date('Y-m-d H:i:s');
+		{
+			$von_datum = $date->formatDatum($von_datum,'Y-m-d');
+			$bis_datum = $date->formatDatum($bis_datum,'Y-m-d');
+		
+			$dtstart = new DateTime($von_datum);
+			$dtende = new DateTime($bis_datum);
+			$jetzt = new DateTime();
 
-		if(!$preincoming->save())
-			echo $preincoming->errormsg;
-		else
-			echo $p->t('global/erfolgreichgespeichert');
+			if ($dtstart < $jetzt)
+			{
+				echo '<span style="color: red"><b>'.$p->t('incoming/beginnNichtInVergangenheit').'</b></span>';
+				$_REQUEST['von'] = '';
+			}
+			elseif ($von_datum != '' && $bis_datum != '' && $dtende < $dtstart)
+			{
+				echo '<span style="color: red"><b>'.$p->t('incoming/endeGroesserStart').'</b></span>';
+				$_REQUEST['bis'] = '';
+			}
+			else 
+			{
+				$preincoming->von = $date->formatDatum($_REQUEST['von'],'Y-m-d');
+				$preincoming->bis = $date->formatDatum($_REQUEST['bis'],'Y-m-d');
+				if (isset($_REQUEST['code']))
+					$preincoming->code = $_REQUEST['code'];
+				if($_REQUEST['austausch_kz']== "austausch_auswahl")
+					$preincoming->mobilitaetsprogramm_code = '';
+				else
+					$preincoming->mobilitaetsprogramm_code = $_REQUEST['austausch_kz'];
+					$preincoming->updateamum = date('Y-m-d H:i:s');
+		
+				if(!$preincoming->save())
+					echo $preincoming->errormsg;
+				else
+					echo $p->t('global/erfolgreichgespeichert');
+			}
+		}
 	}
 	// Ausgabe Austauschprogram Formular
 	echo '	<form method="POST" action="incoming.php?method=austauschprogram" name="AustauschForm">
@@ -317,11 +353,11 @@ if($method =="austauschprogram")
 						</tr>
 						<tr>
 							<td>'.$p->t('incoming/studiertvon').' </td>
-							<td><input type="text" name="von" class="datepicker_exchange" size="10"  value="'.$date->formatDatum($preincoming->von,'d.m.Y').'"> (dd.mm.yyyy)</td>
+							<td><input type="text" id="von_datum" name="von" class="datepicker_exchange" size="10"  value="'.($preincoming->von != ''?$date->formatDatum($preincoming->von,'d.m.Y'):$_REQUEST['von']).'" onchange="setBisdatum(this.value)"> (dd.mm.yyyy)</td>
 						</tr>
 						<tr>
 							<td>'.$p->t('incoming/studiertbis').' </td>
-							<td><input type="text" name="bis" class="datepicker_exchange" size="10"  value="'.$date->formatDatum($preincoming->bis,'d.m.Y').'"> (dd.mm.yyyy)</td>
+							<td><input type="text" id="bis_datum" name="bis" class="datepicker_exchange" size="10"  value="'.($preincoming->bis != ''?$date->formatDatum($preincoming->bis,'d.m.Y'):$_REQUEST['bis']).'"> (dd.mm.yyyy)</td>
 						</tr>
 							<td>&nbsp;</td>
 							<td>&nbsp;</td>
@@ -345,12 +381,71 @@ else if($method=="lehrveranstaltungen")
 	{	// speichern der LV-ID
 		if($_GET['mode']=="add")
 		{
-			$id= $_GET['id'];
-
-			if($preincoming->addLehrveranstaltung($preincoming->preincoming_id, $_GET['id'], date('Y-m-d H:i:s')))
-				$message = '<span style="color: green"><b>'.($p->t('global/erfolgreichgespeichert')).'</b></span>';
-			else
-				$message = '<span style="color: red"><b>'.($p->t('global/fehleraufgetreten')).'</b></span>';
+			$id = $db->db_add_param($_GET['id'], FHC_INTEGER, false);
+			$freieplaetze = 0;
+			// Freie Plaetze ermitteln
+			$qry = "	SELECT tbl_lehrveranstaltung.incoming, (
+						SELECT count(*)
+						FROM (
+							SELECT person_id
+							FROM campus.vw_student_lehrveranstaltung
+							JOIN PUBLIC.tbl_benutzer using (uid)
+							JOIN PUBLIC.tbl_student ON (uid = student_uid)
+							JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+							WHERE lehrveranstaltung_id = ".$id."
+								AND lehreinheit_id IN (
+									SELECT lehreinheit_id
+									FROM lehre.tbl_lehreinheit
+									WHERE lehrveranstaltung_id = ".$id."
+										AND tbl_lehreinheit.studiensemester_kurzbz = '$stsem->studiensemester_kurzbz'
+									)
+								AND tbl_prestudentstatus.status_kurzbz = 'Incoming'
+								AND tbl_prestudentstatus.studiensemester_kurzbz = '$stsem->studiensemester_kurzbz'
+							
+							UNION
+							
+							SELECT person_id
+							FROM PUBLIC.tbl_preincoming_lehrveranstaltung
+							JOIN PUBLIC.tbl_preincoming using (preincoming_id)
+							WHERE lehrveranstaltung_id = ".$id."
+							AND
+							(
+								(bis - '$stsem->start' > '$stsem->start' - von) OR
+								('$stsem->start' <= von AND bis >= '$stsem->ende' AND '$stsem->ende' - von > bis - '$stsem->ende') OR
+								(bis <= '$stsem->ende' AND bis >= '$stsem->start' AND von < '$stsem->start') OR
+								('$stsem->start' <= von AND von < '$stsem->ende' AND bis > '$stsem->ende') OR
+								(von >= '$stsem->start' AND bis <= '$stsem->ende') OR
+								(von <= '$stsem->start' AND bis >= '$stsem->ende') OR
+								(von IS NULL AND bis IS NULL) OR
+								(von IS NULL AND bis <= '$stsem->ende' AND bis > '$stsem->start') OR
+								(bis IS NULL AND von < '$stsem->ende' AND von >= '$stsem->start')
+							)
+							AND aktiv = true
+							) a
+						) AS anzahl
+						FROM lehre.tbl_lehrveranstaltung
+						WHERE tbl_lehrveranstaltung.lehrveranstaltung_id = ".$id;
+			
+			if($result = $db->db_query($qry))
+			{
+				if ($db->db_num_rows($result)>0)
+				{
+					if ($row = $db->db_fetch_object($result))
+					{
+						$freieplaetze = $row->incoming - $row->anzahl;
+					}
+				}
+			}
+			
+			if(!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id,  $_GET['id']) && $freieplaetze>0)
+			{
+				if($preincoming->addLehrveranstaltung($preincoming->preincoming_id, $_GET['id'], date('Y-m-d H:i:s')))
+					$message = '<span style="color: green"><b>'.($p->t('global/erfolgreichgespeichert')).'</b></span>';
+				else
+					$message = '<span style="color: red"><b>'.($p->t('global/fehleraufgetreten')).'</b></span>';
+			}
+			else 
+				$message = '<span style="color: red"><b>'.$p->t('incoming/lvVollBelegt').'</b></span>';
 		}
 		// löschen der LV-ID
 		if($_GET['mode'] == "delete")
@@ -709,19 +804,6 @@ else if($method=="lehrveranstaltungen")
 			echo '</td>
 			</tr>
 		</table>
-
-<script language="JavaScript">
-	function selectChange()
-	{
-		filter = document.filterSemester.filterLv.options[document.filterSemester.filterLv.selectedIndex].value;
-		filterSprache = document.filterSemester.filterUnterrichtssprache.options[document.filterSemester.filterUnterrichtssprache.selectedIndex].value;
-		filterStudiengang = document.filterSemester.filterStudiengang.options[document.filterSemester.filterStudiengang.selectedIndex].value;
-		url = [location.protocol, "//", location.host, location.pathname].join("");
-		url = url+"?method=lehrveranstaltungen&filter="+filter+"&unterrichtssprache="+filterSprache+"&studiengang="+filterStudiengang;
-		document.location=url;
-	}
-</script>
-
 		</form>
 		<br><br>';
 
@@ -739,7 +821,7 @@ else if($method=="lehrveranstaltungen")
 
 		
 		//Uebersicht LVs
-		/* Erklaerung der Datumszeitraeume ab Zeile 663:
+		/* Erklaerung der Datumszeitraeume ab Zeile 857:
 		 *			|=============== Studiensemester ===============|
 		 *		|--------------| 											Incoming beginnt vor SS-Beginn und endet VOR SS-Ende jedoch ueberwiegend innerhalb SS
 		 *												|--------------| 	Incoming beginnt VOR SS-Ende und endet NACH SS-Ende, jedoch ueberwiegend innerhalb SS 
@@ -861,7 +943,7 @@ else if($method=="lehrveranstaltungen")
 						
 						if ($preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id))
 							$style = 'style="background-color: #88DD88"';
-						elseif ($freieplaetze==0)
+						elseif ($freieplaetze<=0)
 							$style = 'style="background-color: #FF8888"';
 						//if($freieplaetze>0)
 						//{
@@ -879,7 +961,7 @@ else if($method=="lehrveranstaltungen")
 							
 							if(!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id) && $freieplaetze>0)
 								echo '<td><a href="incoming.php?method=lehrveranstaltungen&mode=add&id='.$row->lehrveranstaltung_id.'&'.$filter_url.'">'.$p->t('global/anmelden').'</a></td>';
-							elseif (!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id) && $freieplaetze==0)
+							elseif (!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id) && $freieplaetze<=0)
 								echo '<td '.$style.'>'.$p->t('incoming/noVacancies').'</td>';
 							else
 								echo '<td '.$style.'>'.$p->t('global/angemeldet').'</td>';

@@ -2784,7 +2784,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
          </table:table-row>
       </table:table>
       <text:p text:style-name="P15"/>
-      <text:p text:style-name="P23">Grading Scheme: Passed with highest distinction, Passed with distinction, Passed</text:p>
+      <text:p text:style-name="P23">Grading Scheme: Passed with distinction, Passed with merit, Passed</text:p>
       <text:p text:style-name="P22"/>
       <text:p text:style-name="P22">
 		<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr4" draw:name="graphics5" text:anchor-type="char" svg:x="4.50cm" svg:y="0.1cm" svg:width="3.5cm" svg:height="3.5cm" draw:z-index="16" >

@@ -352,7 +352,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle1.B1" office:value-type="string">
 						<text:p text:style-name="P20">
-							<text:span text:style-name="T2"><xsl:value-of select="abschlussbeurteilung_kurzbz" /></text:span>
+							<text:span text:style-name="T2"><xsl:value-of select="abschlussbeurteilung_kurzbzEng" /></text:span>
 						</text:p>
 					</table:table-cell>
 				</table:table-row>
@@ -393,7 +393,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P9"/>
 			<text:p text:style-name="P9"/>
 			<text:p text:style-name="P10"/>
-			<text:p text:style-name="P10">Final assessment: Passed with highest distinction, Passed with distinction, Passed</text:p>
+			<text:p text:style-name="P10">Final assessment: Passed with distinction, Passed with merit, Passed</text:p>
 			<text:p text:style-name="P10">Pursuant to section 6 subsection 1 of the University of Applied Sciences Studies Act (FHStG), BGBI. Nr. <xsl:value-of select="bescheidbgbl1" /> idgF</text:p>
 			<text:p text:style-name="P18"/>
 			<text:p text:style-name="P18"/>

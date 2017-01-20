@@ -21,7 +21,7 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/authentication.class.php');
-require_once(dirname(__FILE__).'/betriebsmittelperson.class.php'); 
+require_once(dirname(__FILE__).'/betriebsmittelperson.class.php');
 
 // Auth: Benutzer des Webportals
 /**
@@ -78,13 +78,13 @@ function check_uid($uid)
 {
 	if(ctype_alnum($uid) && mb_strlen($uid)<=32)
 		return true;
-	else 
+	else
 		return false;
 }
 
 function check_stsem($stsem)
 {
-	return preg_match('/^[WS][S][0-9]{4}$/', $stsem);	
+	return preg_match('/^[WS][S][0-9]{4}$/', $stsem);
 }
 
 /**
@@ -93,7 +93,7 @@ function check_stsem($stsem)
  */
 function check_ort($ort_kurzbz)
 {
-	if(preg_match('/^[A-Za-z0-9_.\-]{0,16}$/', $ort_kurzbz)) 
+	if(preg_match('/^[A-Za-z0-9_.\-]{0,16}$/', $ort_kurzbz))
 		return true;
 	else
 		return false;
@@ -102,7 +102,7 @@ function check_ort($ort_kurzbz)
 function check_lektor($uid)
 {
 	$db = new basis_db();
-	
+
 	// uid von View 'Lektor' holen
 	$sql_query="SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=".$db->db_add_param($uid);
 	//echo $sql_query;
@@ -118,20 +118,20 @@ function check_lektor($uid)
 		else
 			return 0;
 	}
-	else 
+	else
 		return 0;
 }
 
 function check_lektor_lehrveranstaltung($uid, $lehrveranstaltung_id, $studiensemester_kurzbz)
 {
 	$db = new basis_db();
-	
+
 	// uid von View 'Lektor' holen
 	$sql_query="SELECT mitarbeiter_uid FROM campus.vw_lehreinheit
-				WHERE mitarbeiter_uid=".$db->db_add_param($uid)." AND 
-				lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." AND 
+				WHERE mitarbeiter_uid=".$db->db_add_param($uid)." AND
+				lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." AND
 				studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
-	
+
 	//echo $sql_query;
 	if($db->db_query($sql_query))
 	{
@@ -145,14 +145,14 @@ function check_lektor_lehrveranstaltung($uid, $lehrveranstaltung_id, $studiensem
 		else
 			return 0;
 	}
-	else 
+	else
 		return 0;
 }
 
 function check_student($uid)
 {
 	$db = new basis_db();
-	
+
 	// uid von Tabelle 'Student' holen
 	$sql_query="SELECT student_uid FROM public.tbl_student WHERE student_uid=".$db->db_add_param($uid);
 	//echo $sql_query;
@@ -168,7 +168,7 @@ function check_student($uid)
 		else
 			return 0;
 	}
-	else 
+	else
 		return 0;
 }
 
@@ -200,7 +200,7 @@ function montag($datum)
 	}
 	else
 	{
-	
+
 		if($wt!=1)
 			$datum-=86400*($wt-1);
 	}
@@ -247,7 +247,7 @@ function jump_week($datum, $wochen)
 function loadVariables($user)
 {
 	$db = new basis_db();
-	
+
 	$error_msg='';
 	$num_rows=0;
 	$sql_query="SELECT * FROM public.tbl_variable WHERE uid=".$db->db_add_param($user);
@@ -261,7 +261,7 @@ function loadVariables($user)
 		global ${$row->name};
 		${$row->name}=$row->wert;
 	}
-	
+
 	if (!isset($semester_aktuell))
 		if(!$db->db_query('SELECT * FROM public.tbl_studiensemester WHERE ende>now() ORDER BY start LIMIT 1'))
 			$error_msg.=$db->db_last_error().'<BR>'.$sql_query;
@@ -292,19 +292,19 @@ function loadVariables($user)
 		global $ignore_kollision;
 		$ignore_kollision='false';
 	}
-	
+
 	if (!isset($kollision_student))
 	{
 		global $kollision_student;
 		$kollision_student='false';
 	}
-	
+
 	if (!isset($max_kollision))
 	{
 		global $max_kollision;
 		$max_kollision='0';
 	}
-	
+
 	if (!isset($ignore_zeitsperre))
 	{
 		global $ignore_zeitsperre;
@@ -322,7 +322,7 @@ function loadVariables($user)
 		global $emailadressentrennzeichen;
 		$emailadressentrennzeichen=',';
 	}
-	
+
 	if(!isset($alle_unr_mitladen))
 	{
 		global $alle_unr_mitladen;
@@ -398,17 +398,17 @@ function checkalias($alias)
 }
 
 /**
- * 
- * Gibt UID zur passenden Kartennummer zurück, false im Fehlerfall 
+ *
+ * Gibt UID zur passenden Kartennummer zurück, false im Fehlerfall
  * @param $number
  */
 function getUidFromCardNumber($number)
 {
-    $betriebsmittel = new betriebsmittelperson(); 
+    $betriebsmittel = new betriebsmittelperson();
     if($betriebsmittel->getKartenzuordnung($number))
-        return $betriebsmittel->uid; 
+        return $betriebsmittel->uid;
     else
-        return false; 
+        return false;
 
 }
 
@@ -434,20 +434,20 @@ function intersect($str1, $str2)
 	    $size = mb_strlen($str1);
 	else
 	    $size = mb_strlen($str2);
-	
+
 	$intersect = null;
-	
-	for ($i=0; $i<$size; $i++) 
+
+	for ($i=0; $i<$size; $i++)
 	{
 	    if (mb_substr($str1, $i, 1) == mb_substr($str2, $i, 1))
-	        $intersect.= mb_substr($str1, $i, 1);	
+	        $intersect.= mb_substr($str1, $i, 1);
 	}
-	
+
 	return $intersect;
 }
 
 /**
- * Konvertiert Problematische Sonderzeichen in Strings fuer 
+ * Konvertiert Problematische Sonderzeichen in Strings fuer
  * Accountnamen und EMail-Aliase
  *
  * @param $str
@@ -456,7 +456,7 @@ function intersect($str1, $str2)
 function convertProblemChars($str)
 {
 	$enc = 'UTF-8';
-	
+
 	$acentos = array(
    'A' => '/&Agrave;|&Aacute;|&Acirc;|&Atilde;|&Aring;/',
    'Ae' => '/&Auml;/',
@@ -485,7 +485,7 @@ function convertProblemChars($str)
    'ss' => '/&szlig;/'
 	);
 
-	return preg_replace($acentos, array_keys($acentos), htmlentities($str,ENT_NOQUOTES, $enc));     
+	return preg_replace($acentos, array_keys($acentos), htmlentities($str,ENT_NOQUOTES, $enc));
 }
 
 //Ersetzt alle Problemzeichen in einem String bevor dieser als xml oder rdf ausgegeben wird
@@ -505,7 +505,7 @@ function xmlclean($string)
 		chr(014), //NP form feed, new page
 		chr(016), //shift out
 		chr(017), //shift in
-		
+
 		chr(020), //data link escape
 		chr(021), //device control 1
 		chr(022), //device control 2
@@ -531,66 +531,66 @@ function xmlclean($string)
  * @param String der die Zeichenkette enthaelt die verkuertzt werden soll
  * @param Laenge des Strings der geliefert werden soll (inkl. der Laenge des Fortsetzungszeichen)
  * @return Daten Objekt wenn ok, false im Fehlerfall
- */ 
+ */
 function StringCut($str='',$len=0,$checkWortumbruch=false,$fortsetzungszeichen='...')
 {
 	// Plausib
 	if (!is_numeric($len))
 		return $str;
-		
+
 	$len=intval($len);
 	if ($len  <1 )
 		return $str;
-		
+
 	if (is_null($checkWortumbruch) || empty($checkWortumbruch))
 		$checkWortumbruch=false;
-		
-	if (is_null($fortsetzungszeichen) || empty($fortsetzungszeichen) || $checkWortumbruch) 
+
+	if (is_null($fortsetzungszeichen) || empty($fortsetzungszeichen) || $checkWortumbruch)
 		$fortsetzungszeichen='';
-	// null oder Leerzeichen beim Fortsetzungszeichen entfernen	
+	// null oder Leerzeichen beim Fortsetzungszeichen entfernen
 	$fortsetzungszeichen=trim($fortsetzungszeichen);
 
 	// Pruefen auf UTF-8 und Bearbeitungsfunktionen
 	$utf8=check_utf8($str);
-	if (!function_exists('mb_strlen')) 
+	if (!function_exists('mb_strlen'))
 		$utf8=false;
-	if (!function_exists('mb_substr')) 
+	if (!function_exists('mb_substr'))
 		$utf8=false;
 
-	// ist der String nicht laenger als die gewuenschte Lange kann hier beendet werden	
+	// ist der String nicht laenger als die gewuenschte Lange kann hier beendet werden
 	if ($utf8)
 		$vLen=mb_strlen($str);
-	else	
-		$vLen=strlen($str);		
+	else
+		$vLen=strlen($str);
 
-	// String ist nicht laenger als die gewuenschte leange - kpl.String retour senden	
+	// String ist nicht laenger als die gewuenschte leange - kpl.String retour senden
 	if ($len>=$vLen)
 		return $str;
-		
+
 	if (!$checkWortumbruch)
 	{
 		if ($utf8)
 			$vLen=$len-mb_strlen($fortsetzungszeichen,'utf-8');
-		else	
-			$vLen=$len- strlen($fortsetzungszeichen);			
+		else
+			$vLen=$len- strlen($fortsetzungszeichen);
 		// die Laenge vom Fortsetzungszeichen mit berucksichtigen
 		if ($utf8) // Teilstring ermitteln, und Ergebnis zuruck geben
 			return mb_substr($str,0,$vLen,'utf-8').$fortsetzungszeichen;
 		else // Teilstring ermitteln, und Ergebnis zuruck geben
 			return substr($str,0,$vLen).$fortsetzungszeichen;
-	}		
-	
-	
+	}
+
+
 	if ($utf8) // Teilstring ermitteln, und Ergebnis zuruck geben
 		$vStr=mb_substr($str,0,$len,'utf-8');
 	else	// Teilstring ermitteln, und Ergebnis zuruck geben
 		$vStr=substr($str,0,$len);
-		
+
 	if ($utf8)
 		$vLen=mb_strlen($vStr);
-	else	
-		$vLen=strlen($vStr);		
-	
+	else
+		$vLen=strlen($vStr);
+
 	// Suchen letztes Leerzeichen im String
 	for ($i=$vLen;$i>0;$i--)
 	{
@@ -603,7 +603,7 @@ function StringCut($str='',$len=0,$checkWortumbruch=false,$fortsetzungszeichen='
 		{
 			if (substr($vStr,$i,1)==' ' && $i>0)
 				return $vStr=trim(substr($str,0,$i));
-		}	
+		}
 	}
 	return $vStr;
 }
@@ -631,7 +631,7 @@ function check_utf8($str="")
        | [\xF1-\xF3][\x80-\xBF]{3}          # planes 4-15
        |  \xF4[\x80-\x8F][\x80-\xBF]{2}     # plane 16
       )*$/x",$cStr);
-  
+
 	  return $stati;
 }
 
@@ -646,29 +646,29 @@ function array_to_xml($rows,$root='root')
 {
 	if (!count($rows))
 		return '<'.$root.' />'."\r\n";
-		
+
 	$xml_string='';
 	$xml_string.='<'.$root.'>'."\r\n";
 	reset($rows);
 
   	for ($i=0;$i<count($rows);$i++)
-	{	
+	{
 		$xml_string.='<row>'."\r\n";
 		$row=$rows[$i];
 		@reset($row);
-		while (@list( $tmp_key, $tmp_value ) = each($row) ) 
+		while (@list( $tmp_key, $tmp_value ) = each($row) )
 		{
 			if (!is_numeric($tmp_key))
 			{
 				$xml_string.='<'.$tmp_key.'><![CDATA['.trim($tmp_value).']]></'.$tmp_key.'>'."\r\n";
-			}	
+			}
 			elseif (is_numeric($tmp_key))
 			{
 				$xml_string.='<row'.$tmp_key.'><![CDATA['.trim($tmp_value).']]></row'.$tmp_key.'>'."\r\n";
-			}	
-		}							
+			}
+		}
 		$xml_string.='</row>'."\r\n";
-	}	
+	}
 	$xml_string.='</'.$root.'>'."\r\n";
 	return $xml_string;
 }
@@ -692,13 +692,13 @@ function array_to_rdf($rows,$root='root',$rdf_uri='rdf')
 
 	reset($rows);
 	for ($i=0;$i<count($rows);$i++)
-	{           
+	{
 		$rdf_string.='<'.strtoupper($rdf_uri).':li>'."\r\n";
 		$rdf_string.='<'.strtoupper($rdf_uri).':Description id="'.$i.'" about="http://'.$rdf_server.'/liste'.$i.'">'."\r\n";
 
 		$row=$rows[$i];
 		reset($row);
-		while (list( $tmp_key, $tmp_value ) = each($row) ) 
+		while (list( $tmp_key, $tmp_value ) = each($row) )
 		{
 			if (!is_numeric($tmp_key))
 			{
@@ -731,11 +731,11 @@ function isint( $mixed )
  * @param $haystack
  * @return string
  */
-function mb_str_replace( $needle, $replacement, $haystack ) 
+function mb_str_replace( $needle, $replacement, $haystack )
 {
 	$needle_len = mb_strlen($needle);
 	$pos = mb_strpos( $haystack, $needle);
-	while (!($pos ===false)) 
+	while (!($pos ===false))
 	{
 		$front = mb_substr( $haystack, 0, $pos );
 		$back  = mb_substr( $haystack, $pos + $needle_len);
@@ -746,10 +746,10 @@ function mb_str_replace( $needle, $replacement, $haystack )
 }
 
 /**
- * 
+ *
  * Prueft ob es sich um einen gueltigen Filenamen handelt
  * Filenamen mit HTML-Tags oder sonstigem Schadcode sind nicht gueltig
- * 
+ *
  * @param string $filename
  * @return boolean true wenn gueltig, sonst false
  */
@@ -784,11 +784,12 @@ function getSprache()
 	{
 		if(isset($_COOKIE['sprache']))
 		{
-			$sprache=$_COOKIE['sprache'];
+			// Uses urlencode to avoid XSS issues
+			$sprache = urlencode($_COOKIE['sprache']);
 		}
 		else
 		{
-			$sprache=DEFAULT_LANGUAGE;
+			$sprache = DEFAULT_LANGUAGE;
 		}
 		setSprache($sprache);
 	}
@@ -824,7 +825,7 @@ function check_user($username, $passwort)
 	}
 }
 
-function safe_b64encode($string) 
+function safe_b64encode($string)
 {
 	$data = base64_encode($string);
 	$data = str_replace(array('+','/','='),array('-','_',''),$data);
@@ -835,7 +836,7 @@ function safe_b64decode($string)
 {
 	$data = str_replace(array('-','_'),array('+','/'),$string);
 	$mod4 = strlen($data) % 4;
-	if ($mod4) 
+	if ($mod4)
 	{
 		$data .= substr('====', $mod4);
 	}
@@ -874,7 +875,7 @@ function clearHtmlTags($text)
 {
 	$newline='
 		';
-	
+
 	$text=mb_str_replace('<br>','\n',$text);
 	$text=mb_str_replace('<br/>','\n',$text);
 	$text=mb_str_replace('<br />','\n',$text);
@@ -885,10 +886,10 @@ function clearHtmlTags($text)
 	$text=mb_str_replace('</ul>','',$text);
 	$text=mb_str_replace('<li>',$newline.' - ',$text);
 	$text=mb_str_replace('</li>','',$text);
-	
+
 	$text=mb_str_replace('</lI>','',$text);
 	$text=mb_str_replace('</li','',$text);
-	
+
 	return $text;
 }
 
@@ -897,8 +898,8 @@ function clearHtmlTags($text)
  * @param string $semester z.B. SS2014
  * @return string nächstes semester
  */
-function incSemester($semester) 
-{	
+function incSemester($semester)
+{
 	$result = null;
 	$jahr = intval(substr($semester,2,4));
 	if (substr($semester,0,2) === 'SS') {
@@ -946,9 +947,9 @@ function generateActivationKey()
 function check_infrastruktur($uid)
 {
 	$db = new basis_db();
-	
+
 	// checken, ob der user eine oezuordnung der infrastruktur hat
-	$sql_query="SELECT 1 FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz = 'oezuordnung' and oe_kurzbz in ('Infrastruktur', 'Systementwicklung', 'ServiceDesk', 'Empfang', 'Haustechnik', 'ITService', 'LVPlanung') and (datum_bis > now() or datum_bis is NULL) and uid=".$db->db_add_param($uid);
+	$sql_query="SELECT 1 FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz = 'oezuordnung' and oe_kurzbz in ('Infrastruktur', 'Systementwicklung', 'ServiceDesk', 'Empfang', 'Haustechnik', 'ITService', 'LVPlanung','ITBereich') and (datum_bis > now() or datum_bis is NULL) and uid=".$db->db_add_param($uid);
 	//echo $sql_query;
 	if($db->db_query($sql_query))
 	{
@@ -961,7 +962,7 @@ function check_infrastruktur($uid)
 		else
 			return 0;
 	}
-	else 
+	else
 		return 0;
 }
 ?>

@@ -81,15 +81,18 @@ if(!$generateuid_addon_found)
 		// Das File aliases enthaelt die Mailverteiler haendisch gewarteten Mailverteiler die nicht
 		// in der FHC Datenbank vorhanden sind.
 		// Diese duerfen nicht als UID verwendet werden, da es sonst zu Konflikten kommt
-		$aliases = file_get_contents(DOC_ROOT.'../system/aliases');
-		$aliases = explode("\n",$aliases);
-		foreach($aliases as $alias)
+		if(file_exists(DOC_ROOT.'../system/aliases'))
 		{
-			if(!strstr($alias,'#'))
+			$aliases = file_get_contents(DOC_ROOT.'../system/aliases');
+			$aliases = explode("\n",$aliases);
+			foreach($aliases as $alias)
 			{
-			 $entry = preg_split("/[\s:]+/", $alias);
-			 if($entry[0]!='')
-			 	$reserviert[]=$entry[0];
+				if(!strstr($alias,'#'))
+				{
+				 $entry = preg_split("/[\s:]+/", $alias);
+				 if($entry[0]!='')
+				 	$reserviert[]=$entry[0];
+				}
 			}
 		}
 

@@ -57,7 +57,7 @@ If your account has been deactivated by mistake, please contact the administrati
 
 
 $this->phrasen['profil/nurJPGBilder']='Currently it is only possible to upload JPEG images';
-$this->phrasen['profil/BilduploadInfotext']='Currently it is only possible to upload JPG images with a maximum size of 15MB!<br><br><b>Please follow the <a href="../../cms/content.php?content_id=%s">guidelines for uploading images</a></b>';
+$this->phrasen['profil/BilduploadInfotext']='Currently it is only possible to upload JPG images with a maximum size of 15MB!<br><br><b>Please follow the <a href="'.APP_ROOT.'cms/content.php?content_id=%s">guidelines for uploading images</a></b>';
 $this->phrasen['profil/Bild']='Picture';
 $this->phrasen['profil/Bildupload']='Upload Picture';
 $this->phrasen['profil/fotofreigeben']='Unlock your profile photo';

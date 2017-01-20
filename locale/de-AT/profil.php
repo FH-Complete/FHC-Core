@@ -60,7 +60,7 @@ Sollte innerhalb der nächsten Tagen keine neuerliche Aktivierung Ihres Benutzer
 sich umgehend mit Ihrer Studiengangsassistenz in Verbindung zu setzen.<br>';
 
 $this->phrasen['profil/nurJPGBilder']='Derzeit können nur Bilder im JPG Format hochgeladen werden';
-$this->phrasen['profil/BilduploadInfotext']='Derzeit können nur Bilder im JPG Format mit einer Maximalgröße von 15MB hochgeladen werden!<br><br><b>Bitte beachten Sie die <a href="../../cms/content.php?content_id=%s">Richtlinien für den Bildupload</a></b>';
+$this->phrasen['profil/BilduploadInfotext']='Derzeit können nur Bilder im JPG Format mit einer Maximalgröße von 15MB hochgeladen werden!<br><br><b>Bitte beachten Sie die <a href="'.APP_ROOT.'cms/content.php?content_id=%s">Richtlinien für den Bildupload</a></b>';
 $this->phrasen['profil/Bild']='Profilfoto';
 $this->phrasen['profil/Bildupload']='Bildupload';
 $this->phrasen['profil/fotofreigeben']='Sperre des Profilfotos aufheben';

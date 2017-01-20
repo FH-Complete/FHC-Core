@@ -55,10 +55,11 @@ if (isset($_GET['datum']))
 if (isset($_POST['datum']))
 	$datum=$_POST['datum'];
 
+// Uses urlencode to avoid XSS issues
 if (isset($_GET['ort_kurzbz']))
-	$ort_kurzbz=$_GET['ort_kurzbz'];
+	$ort_kurzbz = urlencode($_GET['ort_kurzbz']);
 else if (isset($_POST['ort_kurzbz']))
-	$ort_kurzbz=$_POST['ort_kurzbz'];
+	$ort_kurzbz = urlencode($_POST['ort_kurzbz']);
 else
 	$ort_kurzbz=null;
 

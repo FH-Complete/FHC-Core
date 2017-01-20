@@ -37,12 +37,17 @@ echo '<html>
 </head>
 <body>';
 
-$uid = get_uid();
-$rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen($uid);
+if (php_sapi_name() != 'cli')
+{
+	$uid = get_uid();
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($uid);
 
-if(! $rechte->isBerechtigt('admin'))
-	exit('Sie ('.$uid.') haben keine Berechtigung');
+	if(!$rechte->isBerechtigt('admin'))
+	{
+		exit('Sie haben keine Berechtigung');
+	}
+}
 
 echo '<H1>Systemcheck!</H1>';
 echo '<H2>DB-Updates!</H2>';

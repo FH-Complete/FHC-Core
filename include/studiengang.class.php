@@ -226,6 +226,7 @@ class studiengang extends basis_db
 		return true;
 	}
 
+	// DEPRECATED! SIEHE NAECHSTE FUNKTION
 	/**
 	 * Gibt alle Studiengaenge zurueck, fuer die man sich online bewerben kann
 	 * 
@@ -255,6 +256,47 @@ class studiengang extends basis_db
 
 		return true;
 	}
+	
+	// DIESE FUNKTION WARE BESSER GEEIGNET, DA DIE ALTE NOCH AUF DIE vw_studienplan ZUGREIFT
+	// IN DER DIE GUELTIGEN SEMESTER NOCH VON DEN STUDIENORDNUNGEN ERMITTELT WERDEN ANSTATT VON DEN STUDIENPLAENEN
+	// IN DIESER WERDEN AUCH DIE STUDIENSEMESTER ABGEFRAGT
+	/**
+	 * Gibt alle Studiengaenge zurueck, fuer die man sich online bewerben kann
+	 *
+	 * @param string $order Default: typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC. Spalten, nach denen Sortiert werden soll.
+	 * @param array $studiensemester_kurzbz Array von Studiensemestern, in deren Gueltigkeit die Studienplaene liegen
+	 * @return boolean
+	 */
+	/*public function getAllForBewerbung($order = 'typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC', $studiensemester_kurzbz = '')
+	{	
+		$qry = "SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch, lgartcode, tbl_lgartcode.bezeichnung "
+				. "FROM lehre.tbl_studienplan "
+				. "JOIN lehre.tbl_studienordnung USING (studienordnung_id) "
+				. "JOIN public.tbl_studiengang USING (studiengang_kz) "
+				. "JOIN public.tbl_organisationseinheit USING (oe_kurzbz) "
+				. "JOIN public.tbl_organisationseinheittyp USING (organisationseinheittyp_kurzbz) "
+				. "LEFT JOIN lehre.tbl_studienplan_semester USING (studienplan_id) "
+				. "LEFT JOIN bis.tbl_lgartcode USING (lgartcode) "
+				. "WHERE onlinebewerbung IS TRUE "
+				. "AND tbl_studienplan.aktiv IS TRUE "
+				. "AND tbl_studienplan_semester.semester=1 "
+				. "AND tbl_studienplan_semester.studiensemester_kurzbz IN (".$this->implode4SQL($studiensemester_kurzbz).") ";
+
+				$qry .= " ORDER BY ".$order;
+
+				if(!$result = $this->db_query($qry))
+				{
+					$this->errormsg = 'Datensatz konnte nicht geladen werden';
+					return false;
+				}
+
+				while($row = $this->db_fetch_object($result))
+				{
+					$this->result[] = $row;
+				}
+
+				return true;
+	}*/
 
 	/**
 	 * Laedt alle Studientypen in das Attribut studiengang_typ_array
