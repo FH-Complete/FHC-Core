@@ -126,8 +126,8 @@ $this->phrasen['pruefung/anmeldungErfolgreichGeloescht'] = 'Iscrizione cancellat
 
 // Mailtexte
 $this->phrasen['pruefung/emailSubjectAnmeldungBestaetigung'] = 'Conferma d’iscrizione all’appello d’esame';
-$this->phrasen['pruefung/emailBody1'] = 'La sua iscrizione all’appello d’esame è stata';
-$this->phrasen['pruefung/emailBody2'] = 'confermata.';
+$this->phrasen['pruefung/emailBody1'] = 'La sua iscrizione all’appello d’esame è stata confermata da';
+$this->phrasen['pruefung/emailBody2'] = '.';
 $this->phrasen['pruefung/emailBodyPruefung'] = 'Appello d’esame:';
 $this->phrasen['pruefung/emailBodyTermin'] = 'Data:';
 $this->phrasen['pruefung/emailBodyDauer'] = 'Durata:';
