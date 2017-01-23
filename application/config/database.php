@@ -103,6 +103,7 @@ $db['system'] = array(
 	'username' => 'fhcomplete',
 	'password' => 'fhcomplete',
 	'database' => DB_NAME,
+	'port'     => DB_PORT,
 	'dbschema' => 'public',
 	'dbdriver' => 'postgre',
 	'dbprefix' => '',
