@@ -255,7 +255,7 @@ function addReihungstestPerson($row, $reihungstest_id, $punkte, $studienplan_id)
 		// Zuordnung noch nicht vorhanden
 		// Neue Zuordnung erstellen
 		$rt_obj->person_id = $row->person_id;
-		$rt_obj->rt_id = $reihungstest_id;
+		$rt_obj->reihungstest_id = $reihungstest_id;
 		$rt_obj->studienplan_id = $studienplan_id;
 		$rt_obj->anmeldedatum = $row->anmeldungreihungstest;
 		$rt_obj->teilgenommen = ($row->reihungstestangetreten == 't'?true:false);
@@ -284,7 +284,7 @@ function addReihungstestPerson($row, $reihungstest_id, $punkte, $studienplan_id)
 			if (!$found)
 			{
 				$rt_obj->new = true;
-				$rt_obj->rt_id = $reihungstest_id;
+				$rt_obj->reihungstest_id = $reihungstest_id;
 				$rt_obj->studienplan_id = $studienplan_id;
 				$rt_obj->saveStudienplanReihungstest();
 			}
