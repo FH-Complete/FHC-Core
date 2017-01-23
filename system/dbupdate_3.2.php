@@ -1396,27 +1396,19 @@ if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM testtool.tbl_
 		echo 'testtool.tbl_gebiet: Spalte bezeichnung_mehrsprachig hinzugefuegt!<br>';
 
 	// Bezeichnung_mehrsprachig aus existierender Bezeichnung vorausfuellen. Ein Eintrag fuer jede Sprache mit Content aktiv.
-	$qry_help = "SELECT count(*) FROM public.tbl_sprache WHERE content=TRUE;";
+	$qry_help = "SELECT index FROM public.tbl_sprache WHERE content=TRUE;";
 	if(!$result = $db->db_query($qry_help))
 		echo '<strong>tbl_gebiet bezeichnung_mehrsprachig: Fehler beim ermitteln der Sprachen: '.$db->db_last_error().'</strong>';
 	else
 	{
-		$row = $db->db_fetch_row($result);
-		// In integer umwandeln
-		$row = intval($row[0]);
-		$bezeichnungen = '';
-		for ($i = 1; $i <= $row; $i++)
-		{
-			$bezeichnungen .= "\"'||bezeichnung||'\",";
-		}
-		//Komma am Ende entfernen
-		$bezeichnungen = mb_substr($bezeichnungen,0,-1);
-		$qry = "UPDATE testtool.tbl_gebiet set bezeichnung_mehrsprachig = cast('{".$bezeichnungen."}' as varchar[]);";
+		$qry='';
+		while($row = $db->db_fetch_object($result))
+			$qry.= "UPDATE testtool.tbl_gebiet set bezeichnung_mehrsprachig[".$row->index."] = bezeichnung;";
 
 		if(!$db->db_query($qry))
 			echo '<strong>Setzen der bezeichnung_mehrsprachig fehlgeschlagen: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'testtool.tbl_gebiet: bezeichnung_mehrprachig automatisch aus existierender Bezeichnung uebernommen und fuer '.$row.' Sprachen gesetzt<br>';
+			echo 'testtool.tbl_gebiet: bezeichnung_mehrprachig automatisch aus existierender Bezeichnung uebernommen<br>';
 	}
 }
 
