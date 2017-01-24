@@ -101,31 +101,7 @@ class VorlageLib
 	{
         if (empty($vorlage_kurzbz))
         	return error($this->ci->lang->line('fhc_'.FHC_INVALIDID, false));
-
-		// Builds where clause
-		$where = "vorlage_kurzbz=".$this->ci->VorlageModel->escape($vorlage_kurzbz);
-		if (is_null($orgform_kurzbz))
-		{
-			$where .= "AND orgform_kurzbz IS NULL";
-		}
-		else
-		{
-			$where .= "AND orgform_kurzbz = " . $this->ci->VorlageModel->escape($orgform_kurzbz);
-		}
-
-		$where .= " AND ";
-
-		if (is_null($sprache))
-		{
-			$where .= "sprache IS NULL";
-		}
-		else
-		{
-			$where .= "sprache = " . $this->ci->VorlageModel->escape($sprache);
-		}
 		
-		$where .= " AND aktiv = true";
-
 		// Try to search the template with the given vorlage_kurzbz and other parameters if present
 		$queryParameters = array("vorlage_kurzbz" => $vorlage_kurzbz, "aktiv" => true);
 
@@ -146,6 +122,9 @@ class VorlageLib
 		// If the searched template was not found
 		if (!hasData($vorlage))
 		{
+			// Builds where clause
+			$where = $this->_where($vorlage_kurzbz, $orgform_kurzbz, $sprache);
+		
 			$vorlage = $this->ci->organisationseinheitlib->treeSearch(
 					'public',
 					'tbl_vorlagestudiengang',
@@ -159,6 +138,33 @@ class VorlageLib
 		}
 
         return $vorlage;
+    }
+    
+    private function _where($vorlage_kurzbz, $orgform_kurzbz, $sprache)
+    {
+		// Builds where clause
+		$where = "vorlage_kurzbz = ".$this->ci->VorlageModel->escape($vorlage_kurzbz);
+// 		if (is_null($orgform_kurzbz))
+// 		{
+// 			$where .= " AND orgform_kurzbz IS NULL";
+// 		}
+// 		else
+// 		{
+// 			$where .= " AND orgform_kurzbz = " . $this->ci->VorlageModel->escape($orgform_kurzbz);
+// 		}
+
+		if (is_null($sprache))
+		{
+			$where .= " AND sprache IS NULL";
+		}
+		else
+		{
+			$where .= " AND sprache = " . $this->ci->VorlageModel->escape($sprache);
+		}
+		
+		$where .= " AND aktiv = true";
+		
+		return $where;
     }
 
 	/**
