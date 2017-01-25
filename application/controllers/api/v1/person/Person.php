@@ -12,7 +12,7 @@
  */
 // ------------------------------------------------------------------------
 
-if (!defined("BASEPATH")) exit("No direct script access allowed");
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Person extends APIv1_Controller
 {
@@ -23,7 +23,7 @@ class Person extends APIv1_Controller
 	{
 		parent::__construct();
 		// Load model PersonModel
-		$this->load->model("person/person_model", "PersonModel");
+		$this->load->model('person/person_model', 'PersonModel');
 	}
 
 	/**
@@ -31,9 +31,9 @@ class Person extends APIv1_Controller
 	 */
 	public function getPerson()
 	{
-		$person_id = $this->get("person_id");
-		$code = $this->get("code");
-		$email = $this->get("email");
+		$person_id = $this->get('person_id');
+		$code = $this->get('code');
+		$email = $this->get('email');
 		
 		if (isset($code) || isset($email) || isset($person_id))
 		{
@@ -47,11 +47,11 @@ class Person extends APIv1_Controller
 				
 				if (isset($code))
 				{
-					$parametersArray["zugangscode"] = $code;
+					$parametersArray['zugangscode'] = $code;
 				}
 				else
 				{
-					$parametersArray["person_id"] = $person_id;
+					$parametersArray['person_id'] = $person_id;
 				}
 				
 				$result = $this->PersonModel->loadWhere($parametersArray);
@@ -70,8 +70,8 @@ class Person extends APIv1_Controller
 	 */
 	public function getCheckBewerbung()
 	{
-		$email = $this->get("email");
-		$studiensemester_kurzbz = $this->get("studiensemester_kurzbz");
+		$email = $this->get('email');
+		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
 		
 		if (isset($email))
 		{
@@ -95,7 +95,7 @@ class Person extends APIv1_Controller
 		
 		if (isSuccess($validation))
 		{
-			if(isset($person["person_id"]) && !(is_null($person["person_id"])) && ($person["person_id"] != ""))
+			if(isset($person['person_id']) && !(is_null($person['person_id'])) && ($person['person_id'] != ''))
 			{
 				$result = $this->PersonModel->updatePerson($person);
 			}
@@ -112,168 +112,153 @@ class Person extends APIv1_Controller
 		}
 	}
 	
-	private function _validate($person = NULL)
+	private function _validate($person)
 	{
-		if (!isset($person))
+		// If $person is consistent
+		if (!isset($person) || (isset($person) && !is_array($person)))
 		{
-			return error("Parameter is null");
+			return error('Any parameters posted');
 		}
 		
-		if (isset($person["nachname"]))
-			$person["nachname"] = trim($person["nachname"]);
-		if (isset($person["vorname"]))
-			$person["vorname"] = trim($person["vorname"]);
-		if (isset($person["vornamen"]))
-			$person["vornamen"] = trim($person["vornamen"]);
-		if (isset($person["anrede"]))
-			$person["anrede"] = trim($person["anrede"]);
-		if (isset($person["titelpost"]))
-			$person["titelpost"] = trim($person["titelpost"]);
-		if (isset($person["titelpre"]))
-			$person["titelpre"] = trim($person["titelpre"]);
+		// Trim all the values
+		foreach($person as $key => $value)
+		{
+			$person[$key] = trim($value);
+		}
 		
-		if (isset($person["sprache"]) && mb_strlen($person["sprache"]) > 16)
+		if (isset($person['sprache']) && mb_strlen($person['sprache']) > 16)
 		{
-			return error("Sprache darf nicht laenger als 16 Zeichen sein");
+			return error('Sprache darf nicht laenger als 16 Zeichen sein');
 		}
-		if (isset($person["anrede"]) && mb_strlen($person["anrede"]) > 16)
+		if (isset($person['anrede']) && mb_strlen($person['anrede']) > 16)
 		{
-			return error("Anrede darf nicht laenger als 16 Zeichen sein");
+			return error('Anrede darf nicht laenger als 16 Zeichen sein');
 		}
-		if (isset($person["titelpost"]) && mb_strlen($person["titelpost"]) > 32)
+		if (isset($person['titelpost']) && mb_strlen($person['titelpost']) > 32)
 		{
-			return error("Titelpost darf nicht laenger als 32 Zeichen sein");
+			return error('Titelpost darf nicht laenger als 32 Zeichen sein');
 		}
-		if (isset($person["titelpre"]) && mb_strlen($person["titelpre"]) > 64)
+		if (isset($person['titelpre']) && mb_strlen($person['titelpre']) > 64)
 		{
-			return error("Titelpre darf nicht laenger als 64 Zeichen sein");
+			return error('Titelpre darf nicht laenger als 64 Zeichen sein');
 		}
-		if (isset($person["nachname"]) && mb_strlen($person["nachname"]) > 64)
+		if (isset($person['nachname']) && mb_strlen($person['nachname']) > 64)
 		{
-			return error("Nachname darf nicht laenger als 64 Zeichen sein");
+			return error('Nachname darf nicht laenger als 64 Zeichen sein');
 		}
-		if (isset($person["nachname"]) && ($person["nachname"] == "" || is_null($person["nachname"])))
+		if (isset($person['nachname']) && ($person['nachname'] == '' || is_null($person['nachname'])))
 		{
-			return error("Nachname muss eingegeben werden");
+			return error('Nachname muss eingegeben werden');
 		}
-
-		if (isset($person["vorname"]) && mb_strlen($person["vorname"]) > 32)
+		if (isset($person['vorname']) && mb_strlen($person['vorname']) > 32)
 		{
-			return error("Vorname darf nicht laenger als 32 Zeichen sein");
+			return error('Vorname darf nicht laenger als 32 Zeichen sein');
 		}
-		if (isset($person["vornamen"]) && mb_strlen($person["vornamen"]) > 128)
+		if (isset($person['vornamen']) && mb_strlen($person['vornamen']) > 128)
 		{
-			return error("Vornamen darf nicht laenger als 128 Zeichen sein");
+			return error('Vornamen darf nicht laenger als 128 Zeichen sein');
 		}
-		if (isset($person["gebort"]) && mb_strlen($person["gebort"]) > 128)
+		if (isset($person['gebort']) && mb_strlen($person['gebort']) > 128)
 		{
-			return error("Geburtsort darf nicht laenger als 128 Zeichen sein");
+			return error('Geburtsort darf nicht laenger als 128 Zeichen sein');
 		}
-		if (isset($person["homepage"]) && mb_strlen($person["homepage"]) > 256)
+		if (isset($person['homepage']) && mb_strlen($person['homepage']) > 256)
 		{
-			return error("Homepage darf nicht laenger als 256 Zeichen sein");
+			return error('Homepage darf nicht laenger als 256 Zeichen sein');
 		}
-		if (isset($person["matr_nr"]) && mb_strlen($person["matr_nr"]) > 32)
+		if (isset($person['matr_nr']) && mb_strlen($person['matr_nr']) > 32)
 		{
-			return error("Matrikelnummer darf nicht laenger als 32 Zeichen sein");
-			return false;
+			return error('Matrikelnummer darf nicht laenger als 32 Zeichen sein');
 		}
-		if (isset($person["svnr"]) && $person["svnr"] != "" && mb_strlen($person["svnr"]) != 16 &&
-			mb_strlen($person["svnr"]) != 12 && mb_strlen($person["svnr"]) != 10)
+		if (isset($person['ersatzkennzeichen']) && mb_strlen($person['ersatzkennzeichen']) > 10)
 		{
-			return error("SVNR muss 10, 12 oder 16 Zeichen lang sein");
+			return error('Ersatzkennzeichen darf nicht laenger als 10 Zeichen sein');
 		}
-		if (isset($person["svnr"]) && (mb_strlen($person["svnr"]) == 10 || mb_strlen($person["svnr"]) == 12))
+		if (isset($person['familienstand']) && mb_strlen($person['familienstand']) > 1)
 		{
-			//SVNR mit Pruefziffer pruefen
-			//Die 4. Stelle in der SVNR ist die Pruefziffer
-			//(Summe von (gewichtung[i]*svnr[i])) modulo 11 ergibt diese Pruefziffer
-			//Falls nicht, ist die SVNR ungueltig
-			$gewichtung = array(3, 7, 9, 0, 5, 8, 4, 2, 1, 6);
-			$erg = 0;
-			$tmpSvnr = substr($person["svnr"], 0, 10);
-			//Quersumme bilden
-			for ($i = 0; $i < 10; $i++)
+			return error('Familienstand ist ungueltig');
+		}
+		if (isset($person['anzahlkinder']) && $person['anzahlkinder'] != '' && !is_numeric($person['anzahlkinder']))
+		{
+			return error('Anzahl der Kinder ist ungueltig');
+		}
+		if (!isset($person['aktiv']) || (isset($person['aktiv']) && $person['aktiv'] !== 'true' && $person['aktiv'] !== 'false'))
+		{
+			return error('Aktiv ist ungueltig');
+		}
+		if (!isset($person['person_id']) && isset($person['insertvon']) && mb_strlen($person['insertvon']) > 32)
+		{
+			return error('Insertvon darf nicht laenger als 32 Zeichen sein');
+		}
+		if (isset($person['updatevon']) && mb_strlen($person['updatevon']) > 32)
+		{
+			return error('Updatevon darf nicht laenger als 32 Zeichen sein');
+		}
+		if (isset($person['geburtsnation']) && mb_strlen($person['geburtsnation']) > 3)
+		{
+			return error('Geburtsnation darf nicht laenger als 3 Zeichen sein');
+		}
+		if (isset($person['staatsbuergerschaft']) && mb_strlen($person['staatsbuergerschaft']) > 3)
+		{
+			return error('Staatsbuergerschaft darf nicht laenger als 3 Zeichen sein');
+		}
+		if (!isset($person['geschlecht']) || (isset($person['geschlecht']) && mb_strlen($person['geschlecht']) > 1))
+		{
+			return error('Geschlecht darf nicht laenger als 1 Zeichen sein');
+		}
+		if (isset($person['geschlecht']) && $person['geschlecht'] != 'm' && $person['geschlecht'] != 'w' && $person['geschlecht'] != 'u')
+		{
+			return error('Geschlecht muss w, m oder u sein!');
+		}
+		
+		if (isset($person['svnr']))
+		{
+			if ($person['svnr'] != '' && mb_strlen($person['svnr']) != 16
+				&& mb_strlen($person['svnr']) != 12 && mb_strlen($person['svnr']) != 10)
 			{
-				$erg += $gewichtung[$i] * $tmpSvnr{$i};
+				return error('SVNR muss 10, 12 oder 16 Zeichen lang sein');
 			}
-
-			if ($tmpSvnr{3} != ($erg % 11)) //Vergleichen der Pruefziffer mit Quersumme Modulo 11
+			if (mb_strlen($person['svnr']) == 10 || mb_strlen($person['svnr']) == 12)
 			{
-				return error("SVNR ist ungueltig");
+				//SVNR mit Pruefziffer pruefen
+				//Die 4. Stelle in der SVNR ist die Pruefziffer
+				//(Summe von (gewichtung[i]*svnr[i])) modulo 11 ergibt diese Pruefziffer
+				//Falls nicht, ist die SVNR ungueltig
+				$gewichtung = array(3, 7, 9, 0, 5, 8, 4, 2, 1, 6);
+				$erg = 0;
+				$tmpSvnr = substr($person['svnr'], 0, 10);
+				//Quersumme bilden
+				for ($i = 0; $i < 10; $i++)
+				{
+					$erg += $gewichtung[$i] * $tmpSvnr{$i};
+				}
+
+				if ($tmpSvnr{3} != ($erg % 11)) //Vergleichen der Pruefziffer mit Quersumme Modulo 11
+				{
+					return error('SVNR ist ungueltig');
+				}
+				
+				if (mb_strlen($person['svnr']) == 12)
+				{
+					$last = substr($person['svnr'], 10, 12);
+					if ($last{0} != 'v' || !is_numeric($last{1}))
+					{
+						return error('SVNR ist ungueltig');
+					}
+				}
 			}
 			
-			if (mb_strlen($person["svnr"]) == 12)
+			//Pruefen ob das Geburtsdatum mit der SVNR uebereinstimmt.
+			if (isset($person['gebdatum']) && $person['svnr'] != '' && $person['gebdatum'] != '')
 			{
-				$last = substr($person["svnr"], 10, 12);
-				if ($last{0} != "v" || !is_numeric($last{1}))
+				if (!mb_ereg('([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})', $person['gebdatum'])
+					&& !mb_ereg('([0-9]{4})-([0-9]{2})-([0-9]{2})', $person['gebdatum']))
 				{
-					return error("SVNR ist ungueltig");
+					return error('Format des Geburtsdatums ist ungueltig');
 				}
 			}
 		}
-		if (isset($person["ersatzkennzeichen"]) && mb_strlen($person["ersatzkennzeichen"]) > 10)
-		{
-			return error("Ersatzkennzeichen darf nicht laenger als 10 Zeichen sein");
-		}
-		if (isset($person["familienstand"]) && mb_strlen($person["familienstand"]) > 1)
-		{
-			return error("Familienstand ist ungueltig");
-		}
-		if (isset($person["anzahlkinder"]) && $person["anzahlkinder"] != "" && !is_numeric($person["anzahlkinder"]))
-		{
-			return error("Anzahl der Kinder ist ungueltig");
-		}
-		if (!isset($person["aktiv"]) || (isset($person["aktiv"]) && $person["aktiv"] !== true && $person["aktiv"] !== false))
-		{
-			return error("Aktiv ist ungueltig");
-		}
-		if (!isset($person["person_id"]) && isset($person["insertvon"]) && mb_strlen($person["insertvon"]) > 32)
-		{
-			return error("Insertvon darf nicht laenger als 32 Zeichen sein");
-		}
-		if (isset($person["updatevon"]) && mb_strlen($person["updatevon"]) > 32)
-		{
-			return error("Updatevon darf nicht laenger als 32 Zeichen sein");
-		}
-		if (!isset($person["geschlecht"]) || (isset($person["geschlecht"]) && mb_strlen($person["geschlecht"]) > 1))
-		{
-			return error("Geschlecht darf nicht laenger als 1 Zeichen sein");
-		}
-		if (isset($person["geburtsnation"]) && mb_strlen($person["geburtsnation"]) > 3)
-		{
-			return error("Geburtsnation darf nicht laenger als 3 Zeichen sein");
-		}
-		if (isset($person["staatsbuergerschaft"]) && mb_strlen($person["staatsbuergerschaft"]) > 3)
-		{
-			return error("Staatsbuergerschaft darf nicht laenger als 3 Zeichen sein");
-		}
-		if (isset($person["geschlecht"]) && $person["geschlecht"] != "m" && $person["geschlecht"] != "w" && $person["geschlecht"] != "u")
-		{
-			return error("Geschlecht muss w, m oder u sein!");
-		}
-
-		//Pruefen ob das Geburtsdatum mit der SVNR uebereinstimmt.
-		if (isset($person["svnr"]) && isset($person["gebdatum"]) && $person["svnr"] != "" && $person["gebdatum"] != "")
-		{
-			if (mb_ereg("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})", $person["gebdatum"], $regs))
-			{
-				//$day = sprintf("%02s",$regs[1]);
-				//$month = sprintf("%02s",$regs[2]);
-				//$year = mb_substr($regs[3],2,2);
-			}
-			elseif (mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})", $person["gebdatum"], $regs))
-			{
-				//$day = sprintf("%02s",$regs[3]);
-				//$month = sprintf("%02s",$regs[2]);
-				//$year = mb_substr($regs[1],2,2);
-			}
-			else
-			{
-				return error("Format des Geburtsdatums ist ungueltig");
-			}
-		}
-
-		return success("Input data are valid");
+		
+		return success('Input data are valid');
 	}
 }
