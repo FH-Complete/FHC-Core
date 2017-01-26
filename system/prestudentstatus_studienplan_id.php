@@ -26,6 +26,7 @@ require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/student.class.php');
+require_once('../include/studiensemester.class.php');
 
 // Datenbank Verbindung
 $db = new basis_db();
@@ -95,7 +96,7 @@ if(isset($_POST["start"]) && $_POST["start"] == "start")
 		SELECT prestudent_id, orgform_kurzbz, studiengang_kz, studiensemester_kurzbz, ausbildungssemester, status_kurzbz
 		FROM public.tbl_prestudentstatus
 			JOIN public.tbl_prestudent USING(prestudent_id)
-		WHERE studienplan_id IS NULL;"))
+		WHERE studienplan_id IS NULL order by 3,4,5"))
 	{
 		$all_count = $db->db_num_rows($result);
 		$entries_not_unique = 0;
@@ -146,100 +147,68 @@ if(isset($_POST["start"]) && $_POST["start"] == "start")
 			$ct = $db->db_num_rows($result_search);
 			if($ct < 1)
 			{
-				$entries_not_found++;
+				// Es wurde kein genau passender Studienplan gefunden
 
-				/* load informations about the student */
-				$ps = new prestudent();
-				$ps->load($row->prestudent_id);
-				$stud = new student();
-				$uid = $stud->getUid($row->prestudent_id);
+				if(in_array($row->status_kurzbz,array('Abbrecher','Unterbrecher','Diplomand','Absolvent')))
+				{
+					// Schauen ob fuer das vorherige Studiensemester ein eindeutiger Eintrag vorhanden ist
+					// Da bei diesen Statuseintraegen Studiensemster und Ausbildungssemester meist versetzt sind
+					// (zB Wintersemester 2. Semester)
 
+					$stsem_obj = new studiensemester();
+					$stsem_prev = $stsem_obj->getPreviousFrom($row->studiensemester_kurzbz);
 
-				$qry_analyze1="
-					SELECT
-						studienplan_id
-					FROM
-						lehre.tbl_studienplan
-						JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-					WHERE lehre.tbl_studienplan.orgform_kurzbz=
-					(
-						SELECT COALESCE
-						(
-							".$db->db_add_param($row->orgform_kurzbz).",
+					$qry_search="
+						SELECT
+							studienplan_id
+						FROM
+							lehre.tbl_studienplan
+							JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+						WHERE tbl_studienordnung.studiengang_kz=".$db->db_add_param($row->studiengang_kz)."
+							AND lehre.tbl_studienplan.orgform_kurzbz=
 							(
-								SELECT orgform_kurzbz FROM public.tbl_studiengang
+								SELECT COALESCE
+								(
+									".$db->db_add_param($row->orgform_kurzbz).",
+									(
+										SELECT orgform_kurzbz FROM public.tbl_studiengang
+										WHERE
+											studiengang_kz=(SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($row->prestudent_id,FHC_INTEGER).")
+					 				)
+								)
+							)
+							AND EXISTS
+							(
+								SELECT 1 FROM lehre.tbl_studienplan_semester
 								WHERE
-									studiengang_kz=(SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($row->prestudent_id,FHC_INTEGER).")
-			 				)
-						)
-					);
-				";
-				$result_analyze1 = $db->db_query($qry_analyze1);
-				if($db->db_num_rows($result_analyze1) == 0)
-				{
-					$orgform = $row->orgform_kurzbz;
+									studienplan_id=tbl_studienplan.studienplan_id
+								AND studiensemester_kurzbz=".$db->db_add_param($stsem_prev)."
+								AND semester=".$db->db_add_param($row->ausbildungssemester,FHC_INTEGER)."
+								LIMIT 1
+							);
+					";
 
-					if($orgform == null)
+					if($result_search_alternativ = $db->db_query($qry_search))
 					{
-						$qry_analyze1_2="
-							SELECT orgform_kurzbz FROM public.tbl_studiengang
-							WHERE
-								studiengang_kz=(SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($row->prestudent_id,FHC_INTEGER).")";
-
-						$result_analyze1_2 = $db->db_query($qry_analyze1_2);
-						if($row3 = $db->db_fetch_object($result_analyze1_2))
-							$orgform = $row3->orgform_kurzbz;
-					}
-
-
-
-
-					if($orgform == null)
-					{
-
-						if(!isset($array_no_orgform[$row->prestudent_id]))
+						if($db->db_num_rows($result_search_alternativ)==1)
 						{
-							$info = array("uid" => $uid, "vorname" => $ps->vorname, "nachname" => $ps->nachname, "stg_kz" => $row->studiengang_kz, "count" => 0);
-							$array_no_orgform[$row->prestudent_id] = $info;
+							// Es wurde ein eindeutiger Eintrag gefunden
+							// dieser wird gesetzt
+							$sp = $db->db_fetch_object($result_search_alternativ);
+							if(!$db->db_query("UPDATE public.tbl_prestudentstatus SET studienplan_id=".$db->db_add_param($sp->studienplan_id, FHC_INTEGER).
+								" WHERE prestudent_id=".$db->db_add_param($row->prestudent_id, FHC_INTEGER).
+								" AND status_kurzbz=".$db->db_add_param($row->status_kurzbz).
+								" AND studiensemester_kurzbz=".$db->db_add_param($row->studiensemester_kurzbz).
+								" AND ausbildungssemester=".$db->db_add_param($row->ausbildungssemester, FHC_INTEGER)
+								))
+								$entries_with_error ++;
+							continue;
 						}
-						$array_no_orgform[$row->prestudent_id]["count"] ++;
-					}
-					else
-					{
-						$key = $orgform;
-						if(!isset($array_orgform[$key]))
-						{
-							$info = array("orgform_kurzbz" => $orgform, "count" => 0);
-							$array_orgform[$key] = $info;
-						}
-						$array_orgform[$key]["count"] ++;
 					}
 				}
 
-
-
-
-
-				$qry_analyze2="
-					SELECT
-						studienplan_id
-					FROM
-						lehre.tbl_studienplan
-						JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-					WHERE tbl_studienordnung.studiengang_kz=".$db->db_add_param($row->studiengang_kz);
-
-				$result_analyze2 = $db->db_query($qry_analyze2);
-				if($db->db_num_rows($result_analyze2) == 0)
-				{
-					$key = $row->studiengang_kz;
-					if(!isset($array_stg_without_studienplan[$key]))
-					{
-						$info = array("stg_kz" => $row->studiengang_kz, "count" => 0);
-						$array_stg_without_studienplan[$key] = $info;
-					}
-					$array_stg_without_studienplan[$key]["count"] ++;
-				}
-
+				// Pruefen ob der Studiengang in diesem Semester Studienplaene hat
+				// unabhaengig der orgform
 				$qry_analyze3="
 				SELECT
 					studienplan_id
@@ -263,22 +232,138 @@ if(isset($_POST["start"]) && $_POST["start"] == "start")
 				);";
 
 				$result_analyze3 = $db->db_query($qry_analyze3);
-				if($db->db_num_rows($result_analyze3) == 0)
+				$cnt = $db->db_num_rows($result_analyze3);
+				if($cnt == 0)
 				{
-					$key = $row->studiengang_kz." ".$row->status_kurzbz;
+					$key = $row->studiengang_kz." ".$row->ausbildungssemester." ".$row->studiensemester_kurzbz." ".$row->status_kurzbz;
 					if(!isset($array_studienplan_semester[$key]))
 					{
 						$info = array("stg_kz" => $row->studiengang_kz, "ausbildungssemester" => $row->ausbildungssemester, "studiensemester_kurzbz" => $row->studiensemester_kurzbz, "status_kurzbz" => $row->status_kurzbz, "count" => 0);
 						$array_studienplan_semester[$key] = $info;
 					}
 					$array_studienplan_semester[$key]["count"] ++;
+					$analyse_gefunden=true;
+				}
+				elseif($cnt == 1)
+				{
+					// Wenn es in dem Studiengang genau einen passenden Studienplan gibt
+					// dieser jedoch die falsche orgform hat, dann wird dieser trotzdem gesetzt
+					// da dies bei alten Studiengaengen nicht immer so genau angelegt wurde
+					$sp = $db->db_fetch_object($result_analyze3);
+					if(!$db->db_query("UPDATE public.tbl_prestudentstatus SET studienplan_id=".$db->db_add_param($sp->studienplan_id, FHC_INTEGER).
+						" WHERE prestudent_id=".$db->db_add_param($row->prestudent_id, FHC_INTEGER).
+						" AND status_kurzbz=".$db->db_add_param($row->status_kurzbz).
+						" AND studiensemester_kurzbz=".$db->db_add_param($row->studiensemester_kurzbz).
+						" AND ausbildungssemester=".$db->db_add_param($row->ausbildungssemester, FHC_INTEGER)
+						))
+						$entries_with_error ++;
+					continue;
 				}
 
+				$entries_not_found++;
+				$analyse_gefunden=false;
 
+				/* load informations about the student */
+				$ps = new prestudent();
+				$ps->load($row->prestudent_id);
+				$stud = new student();
+				$uid = $stud->getUid($row->prestudent_id);
 
+				// Pruefen ob die Orgform generell existiert in einem Studienplan
+				$qry_analyze1="
+					SELECT
+						studienplan_id
+					FROM
+						lehre.tbl_studienplan
+						JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					WHERE lehre.tbl_studienplan.orgform_kurzbz=
+					(
+						SELECT COALESCE
+						(
+							".$db->db_add_param($row->orgform_kurzbz).",
+							(
+								SELECT orgform_kurzbz FROM public.tbl_studiengang
+								WHERE
+									studiengang_kz=(SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($row->prestudent_id,FHC_INTEGER).")
+			 				)
+						)
+					)
+				";
+				$result_analyze1 = $db->db_query($qry_analyze1);
+				if($db->db_num_rows($result_analyze1) == 0)
+				{
+					$orgform = $row->orgform_kurzbz;
+
+					if($orgform == null)
+					{
+						$qry_analyze1_2="
+							SELECT orgform_kurzbz FROM public.tbl_studiengang
+							WHERE
+								studiengang_kz=(SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($row->prestudent_id,FHC_INTEGER).")";
+
+						$result_analyze1_2 = $db->db_query($qry_analyze1_2);
+						if($row3 = $db->db_fetch_object($result_analyze1_2))
+							$orgform = $row3->orgform_kurzbz;
+					}
+
+					if($orgform == null)
+					{
+						if(!isset($array_no_orgform[$row->prestudent_id]))
+						{
+							$info = array("uid" => $uid, "vorname" => $ps->vorname, "nachname" => $ps->nachname, "stg_kz" => $row->studiengang_kz, "count" => 0);
+							$array_no_orgform[$row->prestudent_id] = $info;
+						}
+						$array_no_orgform[$row->prestudent_id]["count"] ++;
+					}
+					else
+					{
+						$key = $orgform;
+						if(!isset($array_orgform[$key]))
+						{
+							$info = array("orgform_kurzbz" => $orgform, "count" => 0);
+							$array_orgform[$key] = $info;
+						}
+						$array_orgform[$key]["count"] ++;
+					}
+					$analyse_gefunden=true;
+				}
+
+				// Pruefen ob der Studiengang Studienplaene hat
+				$qry_analyze2="
+					SELECT
+						studienplan_id
+					FROM
+						lehre.tbl_studienplan
+						JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					WHERE tbl_studienordnung.studiengang_kz=".$db->db_add_param($row->studiengang_kz);
+
+				$result_analyze2 = $db->db_query($qry_analyze2);
+				if($db->db_num_rows($result_analyze2) == 0)
+				{
+					$key = $row->studiengang_kz;
+					if(!isset($array_stg_without_studienplan[$key]))
+					{
+						$info = array("stg_kz" => $row->studiengang_kz, "count" => 0);
+						$array_stg_without_studienplan[$key] = $info;
+					}
+					$array_stg_without_studienplan[$key]["count"] ++;
+					$analyse_gefunden=true;
+				}
+
+				/*if(!$analyse_gefunden)
+					var_dump($row);
+				*/
 			}
 			else if($ct > 1)
 			{
+				// Es wurden mehrere passende Studienplaene gefunden
+				// Eindeutige zuordnung nicht moeglich
+
+				$ps = new prestudent();
+				$ps->load($row->prestudent_id);
+				$stud = new student();
+				$uid = $stud->getUid($row->prestudent_id);
+
 				if(!isset($array_not_unique[$row->prestudent_id]))
 				{
 					$info = array("prestudent_id" => $row->prestudent_id, "uid" => $uid, "vorname" => $ps->vorname, "nachname" => $ps->nachname, "stg_kz" => $row->studiengang_kz, "count" => 0);
@@ -289,6 +374,8 @@ if(isset($_POST["start"]) && $_POST["start"] == "start")
 			}
 			else
 			{
+				// Es wurde ein eindeutiger Eintrag gefunden
+				// dieser wird gesetzt
 				$sp = $db->db_fetch_object($result_search);
 				if(!$db->db_query("UPDATE public.tbl_prestudentstatus SET studienplan_id=".$db->db_add_param($sp->studienplan_id, FHC_INTEGER).
 					" WHERE prestudent_id=".$db->db_add_param($row->prestudent_id, FHC_INTEGER).
@@ -315,12 +402,7 @@ if(isset($_POST["start"]) && $_POST["start"] == "start")
 		echo $entries_not_unique." sind nicht eindeutig<br>";
 		echo $entries_with_error." konnten aufgrund eines Fehlers nicht eingetragen werden<br>";
 		echo "Es wurde eine quote von <span style='color:$color;'>" . round($quote,2) . "%</span> erreicht<br>";
-
-
 		echo "<h2 style='margin-top:20px;'>Details</h2>";
-
-
-
 
 		$ct = countIntArray($array_no_orgform);
 		if($ct)
@@ -336,9 +418,6 @@ if(isset($_POST["start"]) && $_POST["start"] == "start")
 			}
 			echo "</table>";
 		}
-
-
-
 
 		$ct = countIntArray($array_stg_without_studienplan);
 		if($ct)
@@ -368,7 +447,6 @@ if(isset($_POST["start"]) && $_POST["start"] == "start")
 			echo "</table>";
 		}
 
-
 		$ct = countIntArray($array_studienplan_semester);
 		if($ct)
 		{
@@ -386,7 +464,6 @@ if(isset($_POST["start"]) && $_POST["start"] == "start")
 			echo "</table>";
 			echo "</div>";
 		}
-
 
 		$ct = countIntArray($array_not_unique);
 		if($ct)
@@ -414,6 +491,7 @@ else
 	<p>Es werden nur Einträge mit studienplan_id IS NULL geändert</p>
 	<p>Hinweis:</p>
 	<p style="color:orange;">Vor diesem Skript sollte <a style="color:red;text-decoration: underline;" href="checksystem.php">Checksystem</a> ausgef&uuml;hrt werden!</p>
+	<p style="color:orange;">Wenn die Studienordnungen nicht vollständig eingepflegt sind, kann <a style="color:red;text-decoration: underline;" href="generate_missing_sto.php">dieses Script</a> ausgef&uuml;hrt werden um Dummy Studienpläne aufgrund von Statuseinträgen zu generieren!</p>
 
 <?php
 }
