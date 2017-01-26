@@ -123,7 +123,10 @@ class Person extends APIv1_Controller
 		// Trim all the values
 		foreach($person as $key => $value)
 		{
-			$person[$key] = trim($value);
+			if (gettype($value) == 'string')
+			{
+				$person[$key] = trim($value);
+			}
 		}
 		
 		if (isset($person['sprache']) && mb_strlen($person['sprache']) > 16)
@@ -182,7 +185,7 @@ class Person extends APIv1_Controller
 		{
 			return error('Anzahl der Kinder ist ungueltig');
 		}
-		if (!isset($person['aktiv']) || (isset($person['aktiv']) && $person['aktiv'] !== 'true' && $person['aktiv'] !== 'false'))
+		if (!isset($person['aktiv']) || (isset($person['aktiv']) && $person['aktiv'] !== true && $person['aktiv'] !== false))
 		{
 			return error('Aktiv ist ungueltig');
 		}
