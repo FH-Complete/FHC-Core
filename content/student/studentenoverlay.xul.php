@@ -27,6 +27,7 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
@@ -414,7 +415,10 @@ else
 								echo '<tab id="student-tab-anwesenheit" label="Anwesenheit" onclick="StudentAnwesenheitIFrameLoad();"/>';
                             ?>
 							<tab id="student-tab-aufnahmetermine" label="Aufnahme-Termine" onclick="StudentAufnahmeTermineIFrameLoad();"/>
-							<tab id="student-tab-messages" label="Messages" onclick="StudentMessagesIFrameLoad();"/>
+							<?php
+							if(!defined('FAS_MESSAGES') || FAS_MESSAGES==true)
+								echo '<tab id="student-tab-messages" label="Messages" onclick="StudentMessagesIFrameLoad();"/>';
+							?>
 
 						</tabs>
 						<tabpanels id="student-tabpanels-main" flex="1">
@@ -446,7 +450,10 @@ else
 								echo '<iframe id="student-anwesenheit" src="" style="margin-top:10px;" />';
                             ?>
 							<iframe id="student-aufnahmetermine" style="margin: 0px;" src="" />
-							<iframe id="student-messages" style="margin: 0px;" src="" />
+							<?php
+							if(!defined('FAS_MESSAGES') || FAS_MESSAGES==false)
+								echo '<iframe id="student-messages" style="margin: 0px;" src="" />';
+							?>
 						</tabpanels>
 					</tabbox>
 				</vbox>
