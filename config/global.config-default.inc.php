@@ -95,6 +95,9 @@ define('FAS_REIHUNGSTEST_PUNKTE', false);
 // Legt fest ob Messages im FAS angezeigt werden true|false
 define('FAS_MESSAGES',false);
 
+// Legt fest ob Aufnahmegruppen bei Reihungstests verwaltet werden true|false
+define('FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN',false);
+
 // Anzeigeoptionen für LV-Plan Menü
 define('CIS_LVPLAN_EXPORT_ANZEIGEN',true);
 define('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN',true);
