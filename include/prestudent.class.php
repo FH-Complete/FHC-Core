@@ -371,14 +371,16 @@ class prestudent extends person
 		$sql_query='SELECT
 						DISTINCT tbl_prestudent.prestudent_id,
 						tbl_person.vorname, tbl_person.nachname, tbl_person.person_id, tbl_person.titelpre,
-						tbl_person.titelpost, tbl_person.gebdatum,tbl_prestudent.studiengang_kz,
-						tbl_reihungstest.*
+						tbl_person.titelpost, tbl_person.gebdatum,
+						tbl_reihungstest.*,
+						tbl_prestudent.studiengang_kz as studiengang_kz
 					FROM
 						public.tbl_prestudent
 						JOIN public.tbl_person USING(person_id)
 						JOIN public.tbl_rt_person USING(person_id)
 						JOIN public.tbl_reihungstest ON(tbl_reihungstest.reihungstest_id=tbl_rt_person.rt_id)
 					WHERE tbl_reihungstest.datum='.$this->db_add_param($datum).'
+					AND tbl_rt_person.studienplan_id IN (SELECT studienplan_id FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id)
 					ORDER BY nachname,vorname';
 
 		if(!$this->db_query($sql_query))
