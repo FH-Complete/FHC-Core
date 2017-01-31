@@ -66,7 +66,7 @@ class authentication extends auth
 			|| $username=='lektor1'
 			|| $username=='lektor2'
 			|| $username=='lektor3'
-			|| $username == 'aufname'))
+			|| $username == 'aufnahme'))
 			return true;
 		else
 			return false;
