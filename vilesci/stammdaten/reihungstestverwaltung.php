@@ -1474,12 +1474,16 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				</select>
 			</td>
 		</tr>
-		<tr>
-			<td class="feldtitel">Gruppe</td>
-			<td>
-				<select name='aufnahmegruppe'>
-				<option value=''>-- keine Auswahl --</option>
-					<?php
+		<?php
+		if(!defined('FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN') || FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN==true)
+		{
+			echo '
+			<tr>
+				<td class="feldtitel">Gruppe</td>
+				<td>
+					<select name="aufnahmegruppe">
+					<option value="">-- keine Auswahl --</option>
+					';
 					$gruppen_obj = new gruppe();
 					$gruppen_obj->getAufnahmegruppen();
 					foreach($gruppen_obj->result as $row)
@@ -1487,14 +1491,18 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 						if($reihungstest->aufnahmegruppe_kurzbz==$row->gruppe_kurzbz)
 							$selected = 'selected="selected"';
 						else
-							$selected = ''; ?>
+							$selected = '';
 
-						<option value="<?php echo $row->gruppe_kurzbz ?>" <?php echo $selected ?>><?php echo $row->bezeichnung ?></option>
-					<?php } ?>
-				</select>
-			</td>
-		</tr>
-		<?php
+						echo '<option value="'.$db->convert_html_chars($row->gruppe_kurzbz).'" '.$selected.'>'.
+								$db->convert_html_chars($row->bezeichnung).
+							'</option>';
+					}
+				echo '
+						</select>
+					</td>
+				</tr>';
+		}
+
 		if($neu)
 		{
 			echo '<tr>';

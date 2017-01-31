@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once('../config/vilesci.config.inc.php');
+require_once('../config/global.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/studiensemester.class.php');
@@ -751,17 +752,24 @@ foreach($addon_obj->result as $addon)
                accesskey = "&menu-cis-notenliste.accesskey;"/>
           </menupopup>
     </menu>
-	<!-- ***** CIS ***** -->
-    <menu id="menu-messages" label="&menu-messages.label;" accesskey="&menu-messages.accesskey;">
-          <menupopup id="menu-messages-popup">
-            <menuitem
-               id        =  "menu-messages-new"
-               key       =  "menu-messages-new:key"
-               label     = "&menu-messages-new.label;"
-               command   =  "menu-messages-new:command"
-               accesskey = "&menu-messages-new.accesskey;"/>
-          </menupopup>
-    </menu>
+	<?php
+	if(!defined('FAS_MESSAGES') || FAS_MESSAGES==true)
+	{
+		?>
+		<!-- ***** Messages ***** -->
+	    <menu id="menu-messages" label="&menu-messages.label;" accesskey="&menu-messages.accesskey;">
+	          <menupopup id="menu-messages-popup">
+	            <menuitem
+	               id        =  "menu-messages-new"
+	               key       =  "menu-messages-new:key"
+	               label     = "&menu-messages-new.label;"
+	               command   =  "menu-messages-new:command"
+	               accesskey = "&menu-messages-new.accesskey;"/>
+	          </menupopup>
+	    </menu>
+		<?php
+	}
+	?>
     <!-- ***** Zusatzmenues inkludieren ***** -->
     <?php
     include('../include/'.EXT_FKT_PATH.'/fas_zusatzmenues.inc.php');

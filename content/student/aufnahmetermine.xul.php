@@ -24,6 +24,7 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/variable.class.php');
 require_once('../../include/prestudent.class.php');
@@ -65,7 +66,17 @@ echo ']>
 		<menuitem label="Entfernen" oncommand="aufnahmetermineDelete();" id="aufnahmetermine-tree-popup-delete" hidden="false"/>
 	</menupopup>
 </popupset>
+<groupbox>
+<caption label="Studiengang" />
 <hbox style="padding-top: 10px">
+	<?php
+	if(!defined('FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN') || FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN==true)
+		$aufnahmegruppe_visibility='';
+	else
+		$aufnahmegruppe_visibility='hidden="true"';
+
+	echo '<hbox '.$aufnahmegruppe_visibility.'>';
+	?>
 	<label value="Gruppe" control="aufnahmetermine-menulist-aufnahmegruppe"/>
 	<menulist id="aufnahmetermine-menulist-aufnahmegruppe" disabled="false"
 			datasources="rdf:null"
@@ -78,6 +89,7 @@ echo ']>
 			</menupopup>
 		</template>
 	</menulist>
+	</hbox>
 	<label value="&aufnahmetermine-reihungstest.absolviert;" control="aufnahmetermine-checkbox-reihungstestangetreten"/>
 	<checkbox id="aufnahmetermine-checkbox-reihungstestangetreten" checked="true"/>
 	<label value="Gesamtpunkte" control="aufnahmetermine-textbox-gesamtpunkte"/>
@@ -85,7 +97,9 @@ echo ']>
 	<button id="aufnahmetermine-button-savegesamtpunkte" disabled="true" label="Speichern" oncommand="AufnahmeTermineSaveGesamtpunkte();"/>
 	<button id="aufnahmetermine-button-calculatetotal" disabled="true" label="Gesamtpunkte berechnen" oncommand="AufnahmeTermineCalculateTotal();"/>
 </hbox>
-
+</groupbox>
+<groupbox>
+<caption label="Allgemein" />
 <hbox flex="1">
 <grid id="aufnahmetermine-grid-detail" style="overflow:auto;margin:4px;" flex="1">
 			<columns  >
@@ -265,6 +279,7 @@ echo ']>
 </grid>
 
 </hbox>
+</groupbox>
 <spacer flex="1" />
 </vbox>
 </window>

@@ -39,22 +39,24 @@ function loadAufnahmeTermine(prestudent_id)
 
 	// Gruppen DropDown laden
 	var aufnahmegruppemenulist = document.getElementById('aufnahmetermine-menulist-aufnahmegruppe');
-	var url="<?php echo APP_ROOT ?>rdf/gruppen.rdf.php?aufnahmegruppe=true&optional=true";
-
-	//Alte DS entfernen
-	var oldDatasources = aufnahmegruppemenulist.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
+	if(aufnahmegruppemenulist)
 	{
-		aufnahmegruppemenulist.database.RemoveDataSource(oldDatasources.getNext());
+		var url="<?php echo APP_ROOT ?>rdf/gruppen.rdf.php?aufnahmegruppe=true&optional=true";
+
+		//Alte DS entfernen
+		var oldDatasources = aufnahmegruppemenulist.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			aufnahmegruppemenulist.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		aufnahmegruppemenulist.builder.rebuild();
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		var myDatasource = rdfService.GetDataSourceBlocking(url);
+		aufnahmegruppemenulist.database.AddDataSource(myDatasource);
+		aufnahmegruppemenulist.builder.rebuild();
 	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	aufnahmegruppemenulist.builder.rebuild();
-
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	var myDatasource = rdfService.GetDataSourceBlocking(url);
-	aufnahmegruppemenulist.database.AddDataSource(myDatasource);
-	aufnahmegruppemenulist.builder.rebuild();
-
 	// Gesamtpunkte laden und anzeigen
 
 	var url = '<?php echo APP_ROOT ?>rdf/student.rdf.php?prestudent_id='+prestudent_id+'&'+gettimestamp();
