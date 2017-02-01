@@ -1148,7 +1148,7 @@ class studienplan extends basis_db
 	{
 		$qry= "
 				SELECT DISTINCT
-					studienplan_id, tbl_studienplan.bezeichnung
+					studienplan_id, tbl_studienplan.bezeichnung, tbl_studiensemester.start
 				FROM
 					lehre.tbl_studienplan
 				JOIN
@@ -1157,6 +1157,8 @@ class studienplan extends basis_db
 					lehre.tbl_studienplan_semester USING (studienplan_id)
 				JOIN
 					public.tbl_studiengang USING (studiengang_kz)
+				JOIN
+					public.tbl_studiensemester ON (tbl_studienordnung.gueltigvon = tbl_studiensemester.studiensemester_kurzbz)
 				WHERE
 					tbl_studienplan.aktiv=true
 				AND
@@ -1175,7 +1177,7 @@ class studienplan extends basis_db
 						OR
 						tbl_studienplan.studienplan_id::text = '".$this->db_escape($value)."'
 					)";
-			$qry.=" ORDER BY studienplan_id DESC";
+			$qry.=" ORDER BY start DESC, studienplan_id DESC";
 
 		if($result = $this->db_query($qry))
 		{

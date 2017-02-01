@@ -50,12 +50,12 @@ require_once('../../include/studienplan.class.php');
 require_once('../../include/sprache.class.php');
 require_once('../../include/organisationsform.class.php');
 require_once('../../include/gruppe.class.php');
+require_once('../../include/variable.class.php');
 
 // @todo Allgemein: Beim kopieren auch die Studienplanzuordnungen übernehmen
 //					"Teilgenommen" und "Punkte" werden immer mit false bzw. 0 gespeichert
 
 define('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND', '5');
-define('REIHUNGSTEST_ERGEBNISSE_BERECHNEN', true);
 
 if (!$db = new basis_db())
 {
@@ -126,6 +126,35 @@ $orgform_obj->getAll();
 $orgform_arr=array();
 foreach($orgform_obj->result as $row)
 	$orgform_arr[$row->orgform_kurzbz]=$row->bezeichnung;
+
+// Pruefen ob Variable fuer Punkteberechnung gesetzt ist, wenn nicht, einen neuen Eintrag anlegen
+$variable = new variable();
+if ($variable->load($user, 'reihungstestverwaltung_punkteberechnung'))
+{
+	if (isset($_GET['punkteberechnung']) && $_GET['punkteberechnung'] != $variable->wert)
+	{
+		$variable->new = false;
+		$variable->uid = $user;
+		$variable->name = 'reihungstestverwaltung_punkteberechnung';
+		$variable->wert = $_GET['punkteberechnung'];
+		$variable->save();
+
+		$punkteberechnung = $_GET['punkteberechnung'];
+	}
+	else 
+		$punkteberechnung = $variable->wert;
+		
+}
+else 
+{
+	$variable->new = true;
+	$variable->uid = $user;
+	$variable->name = 'reihungstestverwaltung_punkteberechnung';
+	$variable->wert = 'true';
+	$variable->save();
+	
+	$punkteberechnung = 'true';
+}
 
 //Studierende als Excel Exportieren
 if(isset($_GET['excel']))
@@ -271,10 +300,10 @@ if(isset($_GET['excel']))
 						//Ueberschriften
 						$zeile=6;
 						$col=0;
-						$worksheet->write($zeile,$col,"Vorname", $format_bold);
-						$maxlength[$col] = 7;
-						$worksheet->write($zeile,++$col,"Nachname", $format_bold);
+						$worksheet->write($zeile,$col,"Nachname", $format_bold);
 						$maxlength[$col] = 8;
+						$worksheet->write($zeile,++$col,"Vorname", $format_bold);
+						$maxlength[$col] = 7;
 						$worksheet->write($zeile,++$col,"G", $format_bold);
 						$maxlength[$col] = 2;
 						$worksheet->write($zeile,++$col,"Geburtsdatum", $format_bold);
@@ -308,7 +337,7 @@ if(isset($_GET['excel']))
 					$prestudent->getPrestudenten($row->person_id);
 					$rt_in_anderen_stg='';
 					$erg = '';
-					if(defined('REIHUNGSTEST_ERGEBNISSE_BERECHNEN') && REIHUNGSTEST_ERGEBNISSE_BERECHNEN)
+					//if($punkteberechnung == 'true') Punktebrechnung im Excel wird immer ausgefuehrt
 					{
 						foreach($prestudent->result as $item)
 						{
@@ -352,13 +381,14 @@ if(isset($_GET['excel']))
 					}
 
 					$col=0;
-					$worksheet->write($zeile,$col, $row->vorname, $format_border);
-					if(strlen($row->vorname)>$maxlength[$col])
-						$maxlength[$col] = strlen($row->vorname);
 
-					$worksheet->write($zeile,++$col,$row->nachname, $format_border);
+					$worksheet->write($zeile,$col,$row->nachname, $format_border);
 					if(strlen($row->nachname)>$maxlength[$col])
 						$maxlength[$col] = strlen($row->nachname);
+					
+					$worksheet->write($zeile,++$col, $row->vorname, $format_border);
+					if(strlen($row->vorname)>$maxlength[$col])
+						$maxlength[$col] = strlen($row->vorname);
 
 					$worksheet->write($zeile,++$col, $row->geschlecht, $format_border_center);
 					if(strlen($row->geschlecht)>$maxlength[$col])
@@ -534,6 +564,15 @@ if(isset($_GET['excel']))
 					}
 				});
 
+				// Wenn die Spalten "Absolvierte Tests" oder "Ergebnis" angezeigt werden, wird die Punkteberechnung aktiviert
+				$('#clm_absolviert, #clm_ergebnis').on('click', function()
+				{
+					if (<?php echo json_encode($punkteberechnung);?> == 'false' && (document.getElementById('clm_absolviert').className == 'inactive' || document.getElementById('clm_ergebnis').className == 'inactive'))
+						window.location.href = "<?php echo $_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&punkteberechnung=true';?>";
+					else if (<?php echo json_encode($punkteberechnung);?> == 'true' && document.getElementById('clm_absolviert').className == 'inactive' && document.getElementById('clm_ergebnis').className == 'inactive')
+						window.location.href = "<?php echo $_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&punkteberechnung=false';?>";
+				});
+
 				if (typeof(Storage) !== 'undefined')
 				{
 					let arr = ['clm_prestudent_id','clm_person_id','clm_geschlecht','clm_studiengang','clm_studienplan','clm_orgform','clm_einstiegssemester','clm_geburtsdatum','clm_email','clm_absolviert','clm_ergebnis','clm_fas'];
@@ -559,7 +598,7 @@ if(isset($_GET['excel']))
 					$("#"+v.id).tablesorter(
 					{
 						widgets: ["zebra"],
-						sortList: [[2,0],[3,0]],
+						sortList: [[3,0],[4,0]],
 						headers: {0: { sorter: false}}
 					});
 
@@ -1815,9 +1854,9 @@ if($result = $db->db_query($qry))
 	{
 		echo '<td style="vertical-align: top">';
 		echo '<div style="text-align: center; padding: 0 0 5px 0"><b>Ohne Raumzuteilung ('.$orte_zuteilung_array['ohne'].')</b></div>';
-		echo '<div align="center"><a class="buttonorange" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&type=verteilen" onclick="return confirm(\'BewerberInnen gleichmaeßig auf alle Raeume verteilen?\');">Gleichmäßig verteilen</a>';
-		echo '<a class="buttonorange" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&type=auffuellen" onclick="return confirm(\'Die Räume werden ansteigend mit BewerbeInnen aufgefuellt\');">Auffüllen</a></div>';
-		echo '<form id="raumzuteilung_form[ohne]" method="POST" action="'.$_SERVER['PHP_SELF'].'">';
+		echo '<div align="center"><a class="buttonorange" href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&type=verteilen" onclick="return confirm(\'BewerberInnen gleichmaeßig auf alle Raeume verteilen?\');">Gleichmäßig verteilen</a>';
+		echo '<a class="buttonorange" href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&type=auffuellen" onclick="return confirm(\'Die Räume werden ansteigend mit BewerbeInnen aufgefuellt\');">Auffüllen</a></div>';
+		echo '<form id="raumzuteilung_form[ohne]" method="POST" action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest->reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'"">';
 		echo '<input type="hidden" value="'.$reihungstest->reihungstest_id.'" name="reihungstest_id">';
 		echo '<table class="tablesorter" id="t'.$cnt.'">
 				<thead>
@@ -1849,7 +1888,7 @@ if($result = $db->db_query($qry))
 		{
 			$rt_in_anderen_stg='';
 			$rtergebnis = '';
-			if(defined('REIHUNGSTEST_ERGEBNISSE_BERECHNEN') && REIHUNGSTEST_ERGEBNISSE_BERECHNEN)
+			if($punkteberechnung == 'true')
 			{
 				if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
 					$rtergebnis = $pruefling->getReihungstestErgebnisPerson($row->person_id,true, $reihungstest->reihungstest_id);
@@ -1928,7 +1967,7 @@ if($result = $db->db_query($qry))
 
 		if ($orte_zuteilung_array[$ort->ort_kurzbz]>0)
 		{
-			echo '<form id="raumzuteilung_form['.$ort->ort_kurzbz.']" method="POST" action="'.$_SERVER['PHP_SELF'].'">';
+			echo '<form id="raumzuteilung_form['.$ort->ort_kurzbz.']" method="POST" action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest->reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'">';
 			echo '<input type="hidden" value="'.$reihungstest->reihungstest_id.'" name="reihungstest_id">';
 			echo '<table class="tablesorter" id="t'.$cnt.'">
 					<thead>
@@ -1961,7 +2000,7 @@ if($result = $db->db_query($qry))
 			{
 				$rt_in_anderen_stg='';
 				$rtergebnis = '';
-				if(defined('REIHUNGSTEST_ERGEBNISSE_BERECHNEN') && REIHUNGSTEST_ERGEBNISSE_BERECHNEN)
+				if($punkteberechnung == 'true')
 				{
 					if(defined('FAS_REIHUNGSTEST_PUNKTE') && FAS_REIHUNGSTEST_PUNKTE)
 						$rtergebnis = $pruefling->getReihungstestErgebnisPerson($row->person_id,true, $reihungstest->reihungstest_id);
