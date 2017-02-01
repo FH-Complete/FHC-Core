@@ -1,6 +1,6 @@
 <?php
 
-if (! defined("BASEPATH")) exit("No direct script access allowed");
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * 
@@ -14,8 +14,8 @@ class ReihungstestLib
 	{
 		$this->ci =& get_instance();
 		
-		$this->ci->load->model("crm/RtPerson_model", "RtPersonModel");
-		$this->ci->load->model("crm/Reihungstest_model", "ReihungstestModel");
+		$this->ci->load->model('crm/RtPerson_model', 'RtPersonModel');
+		$this->ci->load->model('crm/Reihungstest_model', 'ReihungstestModel');
 	}
 	
 	/**
@@ -31,7 +31,7 @@ class ReihungstestLib
 	 */
 	public function updatePersonReihungstest($ddReihungstest)
 	{
-		$pksArray = array($ddReihungstest["person_id"], $ddReihungstest["rt_id"]);
+		$pksArray = array($ddReihungstest['person_id'], $ddReihungstest['rt_id']);
 		
 		return $this->ci->RtPersonModel->update($pksArray, $ddReihungstest);
 	}
@@ -41,7 +41,7 @@ class ReihungstestLib
 	 */
 	public function deletePersonReihungstest($ddReihungstest)
 	{
-		return $this->ci->RtPersonModel->delete($ddReihungstest["rt_person_id"], $ddReihungstest);
+		return $this->ci->RtPersonModel->delete($ddReihungstest['rt_person_id'], $ddReihungstest);
 	}
 	
 	/**
@@ -49,15 +49,15 @@ class ReihungstestLib
 	 */
 	public function getReihungstestByPersonID($person_id, $available = null)
 	{
-		$this->ci->ReihungstestModel->addJoin("public.tbl_rt_person", "reihungstest_id = rt_id");
-		$this->ci->ReihungstestModel->addJoin("public.tbl_person", "person_id");
-		$this->ci->ReihungstestModel->addJoin("public.tbl_ort", "tbl_ort.ort_kurzbz = tbl_rt_person.ort_kurzbz", "LEFT");
+		$this->ci->ReihungstestModel->addJoin('public.tbl_rt_person', 'reihungstest_id = rt_id');
+		$this->ci->ReihungstestModel->addJoin('public.tbl_person', 'person_id');
+		$this->ci->ReihungstestModel->addJoin('public.tbl_ort', 'tbl_ort.ort_kurzbz = tbl_rt_person.ort_kurzbz', 'LEFT');
 		
-		$parametersArray = array("person_id" => $person_id);
+		$parametersArray = array('person_id' => $person_id);
 		
 		if (isset($available))
 		{
-			$parametersArray["anmeldefrist >="] = "NOW()";
+			$parametersArray['anmeldefrist >='] = 'NOW()';
 		}
 		
 		return $this->ci->ReihungstestModel->loadWhere($parametersArray);

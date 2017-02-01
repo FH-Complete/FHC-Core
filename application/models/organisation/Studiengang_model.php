@@ -225,4 +225,61 @@ class Studiengang_model extends DB_Model
 		
 		return $result;
 	}
+	
+	/**
+	 * 
+	 */
+	public function getAvailableReihungstestByPersonId($person_id)
+	{
+		if (($isEntitled = $this->isEntitled('lehre.tbl_studienordnung', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('lehre.tbl_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		/*if (($isEntitled = $this->isEntitled('public.tbl_rt_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;*/
+		if (($isEntitled = $this->isEntitled('public.tbl_reihungstest', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		
+		$this->addJoin('lehre.tbl_studienordnung', 'studiengang_kz');
+		
+		$this->addJoin('lehre.tbl_studienplan', 'studienordnung_id');
+		
+		$this->addJoin('public.tbl_rt_studienplan', 'studienplan_id');
+		
+		$this->addJoin('public.tbl_reihungstest', 'reihungstest_id');
+		
+		$this->addJoin('public.tbl_prestudentstatus', 'studienplan_id');
+		
+		$this->addJoin('public.tbl_prestudent', 'prestudent_id');
+		
+		$this->addOrder('tbl_studiengang.studiengang_kz, tbl_reihungstest.stufe');
+		
+		return $this->loadTree(
+			'tbl_studiengang',
+			array('tbl_reihungstest'),
+			'tbl_prestudentstatus.status_kurzbz = \'Interessent\'
+			AND (tbl_prestudentstatus.rt_stufe = tbl_reihungstest.stufe OR tbl_reihungstest.stufe IS NULL)
+			AND tbl_reihungstest.oeffentlich = TRUE
+			AND tbl_reihungstest.datum > NOW()
+			AND tbl_reihungstest.anmeldefrist >= NOW()
+			AND COALESCE (
+					tbl_reihungstest.max_teilnehmer,
+					(
+						SELECT SUM(arbeitsplaetze)
+						FROM public.tbl_ort JOIN public.tbl_rt_ort USING(ort_kurzbz)
+						WHERE rt_id = tbl_reihungstest.reihungstest_id
+					)
+				) - (
+					SELECT COUNT(*)
+					FROM public.tbl_rt_person
+					WHERE rt_id = tbl_reihungstest.reihungstest_id
+				) > 0
+			AND person_id = ' . $person_id,
+			array('reihungstest')
+		);
+	}
 }
