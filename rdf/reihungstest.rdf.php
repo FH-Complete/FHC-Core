@@ -96,9 +96,10 @@ elseif(isset($_GET['prestudent_id']))
 	foreach($rt_help->result as $row)
 	{
 		$studienplan_arr[] = $row->studienplan_id;
+		$include_ids[] = $row->reihungstest_id;
 	}
 
-	$rt->getReihungstestStudienplan($studienplan_arr);
+	$rt->getReihungstestStudienplan($studienplan_arr, $include_ids);
 }
 else
 	$rt->getAll();

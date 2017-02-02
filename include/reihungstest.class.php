@@ -971,9 +971,10 @@ class reihungstest extends basis_db
 	 * Liefert alle Reihungstests zu den uebergebenen StudienplanIDs
 	 *
 	 * @param array $studienplan_arr Array mit StudienplanIDs zu denen die RT geladen werden sollen.
+	 * @param array $include_ids Array mit ReihungstestIDs die zusaetzlich geladen werden sollen.
 	 * @return boolean true wenn erfolgreich, false im Fehlerfall.
 	 */
-	public function getReihungstestStudienplan($studienplan_arr)
+	public function getReihungstestStudienplan($studienplan_arr, $include_ids=null)
 	{
 		$qry = "SELECT
 					distinct a.*,
@@ -984,8 +985,13 @@ class reihungstest extends basis_db
 				FROM
 					public.tbl_reihungstest a
 					JOIN public.tbl_rt_studienplan USING(reihungstest_id)
-				WHERE studienplan_id IN(".$this->db_implode4Sql($studienplan_arr).")
-				ORDER BY a.datum DESC";
+				WHERE studienplan_id IN(".$this->db_implode4Sql($studienplan_arr).")";
+
+		if(!is_null($include_ids) && is_array($include_ids) && count($include_ids)>0)
+		{
+			$qry .=" OR reihungstest_id in(".$this->db_implode4SQL($include_ids).")";
+		}
+		$qry.="	ORDER BY a.datum DESC";
 
 		if ($this->db_query($qry))
 		{

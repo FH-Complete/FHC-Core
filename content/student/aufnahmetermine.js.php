@@ -37,7 +37,6 @@ function loadAufnahmeTermine(prestudent_id)
 	document.getElementById('aufnahmetermine-button-savegesamtpunkte').disabled=false;
 	document.getElementById('aufnahmetermine-button-calculatetotal').disabled=false;
 
-
 	// Gruppen DropDown laden
 	var aufnahmegruppemenulist = document.getElementById('aufnahmetermine-menulist-aufnahmegruppe');
 	if(aufnahmegruppemenulist)
