@@ -87,7 +87,7 @@ class Reihungstest extends APIv1_Controller
 		
 		if (isset($person_id))
 		{
-			$result = $this->ReihungstestLib->getReihungstestByPersonID($person_id, $available);
+			$result = $this->reihungstestlib->getReihungstestByPersonID($person_id, $available);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

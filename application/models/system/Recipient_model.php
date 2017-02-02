@@ -275,9 +275,16 @@ class Recipient_model extends DB_Model
 				  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_status s
 					ON (r.message_id = s.message_id AND r.person_id = s.person_id)
 				 WHERE r.person_id = ?
-				   AND s.status = ?';
+				   AND s.status = ?
+				   AND r.message_id NOT IN (
+							SELECT r.message_id
+							  FROM public.tbl_msg_recipient r JOIN public.tbl_msg_status s
+								ON (r.message_id = s.message_id AND r.person_id = s.person_id)
+							 WHERE r.person_id = ?
+							   AND s.status > ?
+						)';
 		
-		$parametersArray = array($person_id, MSG_STATUS_UNREAD);
+		$parametersArray = array($person_id, MSG_STATUS_UNREAD, $person_id, MSG_STATUS_UNREAD);
 		
 		return $this->execQuery($sql, $parametersArray);
 	}
