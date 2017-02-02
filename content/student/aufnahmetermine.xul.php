@@ -199,8 +199,6 @@ echo ']>
 							<textbox id="aufnahmetermine-textbox-person_id" disabled="true"/>
 							<label value="Neu" control="aufnahmetermine-checkbox-neu"/>
 							<checkbox id="aufnahmetermine-checkbox-neu" disabled="true" checked="false"/>
-							<label value="studienplan_id" control="aufnahmetermine-textbox-studienplan_id"/>
-							<textbox id="aufnahmetermine-textbox-studienplan_id" disabled="true"/>
 							<label value="rt_person_id" control="aufnahmetermine-textbox-rt_person_id"/>
 							<textbox id="aufnahmetermine-textbox-rt_person_id" disabled="true"/>
 						</vbox>
@@ -227,6 +225,7 @@ echo ']>
 											</template>
 										</menulist>
 										<toolbarbutton id="aufnahmetermine-button-reihungstest-refresh" image="../../skin/images/refresh.png" tooltiptext="Liste neu laden" onclick="AufnahmeTermineReihungstestDropDownRefresh()"/>
+										<toolbarbutton id="aufnahmetermine-button-reihungstest-open" image="../../skin/images/edit.png" tooltiptext="Zum Reihungstest" onclick="AufnahmeTermineReihungstestEdit()"/>
 										<spacer flex="1"/>
 										</hbox>
 									</row>
@@ -242,15 +241,15 @@ echo ']>
 										<checkbox id="aufnahmetermine-checkbox-teilgenommen" checked="true" disabled="true"/>
 									</row>
 									<row>
-										<label value="Reihungstest Ort" control="aufnahmetermine-menulist-ort"/>
+										<label value="Reihungstest Studienplan" control="aufnahmetermine-menulist-studienplan"/>
 										<hbox>
-										<menulist id="aufnahmetermine-menulist-ort" disabled="true"
+										<menulist id="aufnahmetermine-menulist-studienplan" disabled="true"
 												datasources="rdf:null" flex="1"
-												ref="http://www.technikum-wien.at/ort/liste">
+												ref="http://www.technikum-wien.at/studienplan">
 											<template>
 												<menupopup>
-													<menuitem value="rdf:http://www.technikum-wien.at/ort/rdf#ort_kurzbz"
-														label="rdf:http://www.technikum-wien.at/ort/rdf#anzeigename"
+													<menuitem value="rdf:http://www.technikum-wien.at/studienplan/rdf#studienplan_id"
+														label="rdf:http://www.technikum-wien.at/studienplan/rdf#bezeichnung"
 														uri="rdf:*"/>
 												</menupopup>
 											</template>

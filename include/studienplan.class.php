@@ -1194,5 +1194,50 @@ class studienplan extends basis_db
 			return true;
 		}
 	}
+
+	/**
+	 * Laedt die Studienplaene zu denen eine Lehrveranstaltung zugeordnet ist
+	 */
+	public function getStudienplaenePerson($person_id)
+	{
+		$qry= "
+			SELECT
+			distinct tbl_studienplan.*
+			FROM
+				lehre.tbl_studienplan
+				JOIN public.tbl_prestudentstatus USING(studienplan_id)
+				JOIN public.tbl_prestudent USING(prestudent_id)
+			WHERE
+				person_id=".$this->db_add_param($person_id)."
+			ORDER BY bezeichnung";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new studienplan();
+
+				$obj->studienplan_id = $row->studienplan_id;
+				$obj->studienordnung_id = $row->studienordnung_id;
+				$obj->orgform_kurzbz = $row->orgform_kurzbz;
+				$obj->version = $row->version;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->regelstudiendauer = $row->regelstudiendauer;
+				$obj->sprache = $row->sprache;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->semesterwochen = $row->semesterwochen;
+				$obj->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->new=false;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+	}
+
 }
 ?>

@@ -3891,7 +3891,6 @@ if(!$error)
 					if($person_id=='')
 						$person_id=$prestudent->person_id;
 					$punkte = $_POST['punkte'];
-					$ort_kurzbz = $_POST['ort_kurzbz'];
 					$teilgenommen = ($_POST['teilgenommen']=='true'?true:false);
 					$anmeldedatum = $_POST['anmeldedatum'];
 					$studienplan_id = $_POST['studienplan_id'];
@@ -3929,7 +3928,6 @@ if(!$error)
 					$reihungstest->punkte = $punkte;
 					$reihungstest->teilgenommen = $teilgenommen;
 					$reihungstest->anmeldedatum = $anmeldedatum;
-					$reihungstest->ort_kurzbz = $ort_kurzbz;
 					$reihungstest->studienplan_id = $studienplan_id;
 
 					if($reihungstest->savePersonReihungstest())
