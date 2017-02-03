@@ -26,6 +26,12 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+$uid = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 ?>
@@ -39,6 +45,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <popupset>
 	<menupopup id="student-zeugnis-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentAkteDel();" id="student-zeugnis-tree-popup-aktedel" hidden="false"/>
+		<?php
+		if($rechte->isBerechtigt('admin'))
+		{
+			echo '<menuitem label="Datei überschreiben" oncommand="StudentAkteUpload();" id="student-zeugnis-tree-popup-akteupload" hidden="false"/>';
+		}
+		?>
 	</menupopup>
 </popupset>
 <hbox>
@@ -51,7 +63,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		context="student-zeugnis-tree-popup"
 		flags="dont-build-content"
 	>
-	
+
 		<treecols>
 			<treecol id="student-zeugnis-tree-titel" label="Titel" flex="2" hidden="false" primary="true"
 				class="sortDirectionIndicator"
@@ -67,14 +79,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<splitter class="tree-splitter"/>
 			<treecol id="student-zeugnis-tree-gedruckt" label="Gedruckt" flex="2" hidden="false"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/akte/rdf#gedruckt" />									
+				sort="rdf:http://www.technikum-wien.at/akte/rdf#gedruckt" />
 			<splitter class="tree-splitter"/>
 			<treecol id="student-zeugnis-tree-akte_id" label="akte_id" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/akte/rdf#akte_id" />									
+				sort="rdf:http://www.technikum-wien.at/akte/rdf#akte_id" />
 			<splitter class="tree-splitter"/>
 		</treecols>
-	
+
 		<template>
 			<treechildren flex="1" >
 					<treeitem uri="rdf:*">

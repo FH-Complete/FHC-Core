@@ -65,7 +65,11 @@ if(isset($_POST['submitdatei']))
 	}
 }
 
-echo '	
+if(isset($_GET['akte_id']) && is_numeric($_GET['akte_id']))
+	$akte_id = $_GET['akte_id'];
+else
+	$akte_id = '';
+echo '
 <br>
 Hier können bestehnde Akten die bereits im FAS archiviert mit neuen Dokumenten überschrieben werden.<br>
 Dies ist hilfreich wenn zB Zeugnisse manuell korrigiert wurden.
@@ -73,7 +77,7 @@ Dies ist hilfreich wenn zB Zeugnisse manuell korrigiert wurden.
 	<form method="POST" enctype="multipart/form-data" action="'.$_SERVER['PHP_SELF'].'">
 	<table>
 	<tr><td>Datei:</td><td><input type="file" name="datei" /></td></tr>
-	<tr><td>AkteID:</td><td><input type="text" name="akte_id" /></td></tr>
+	<tr><td>AkteID:</td><td><input type="text" name="akte_id" value="'.$akte_id.'"/></td></tr>
 	<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
 	<tr><td></td><td><input type="submit" name="submitdatei" value="Upload" /></td></tr>
 

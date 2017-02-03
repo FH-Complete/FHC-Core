@@ -2948,6 +2948,7 @@ function StudentZeugnisAnzeigen()
 	}
 }
 
+
 // ****
 // * Loescht ein Dokument aus dem Archiv
 // ****
@@ -2958,7 +2959,7 @@ function StudentAkteDel()
 	var tree = document.getElementById('student-zeugnis-tree');
 
 	if (tree.currentIndex==-1)
-		return;
+	return;
 
 	try
 	{
@@ -2987,18 +2988,43 @@ function StudentAkteDel()
 		var val =  new ParseReturnValue(response)
 
 		if(!val.dbdml_return)
-			alert(val.dbdml_errormsg)
+		alert(val.dbdml_errormsg)
 
 		StudentTreeRefresh();
 	}
 }
-
 // ****
 // * Deaktiviert die Felder
 // ****
 function StudentAkteDisableFields(val)
 {
 	document.getElementById('student-zeugnis-button-archivieren').disabled=val;
+}
+
+// ****
+// * Offent eine Seite zum Upload einer neuen Datei zu einer archivierten Akte
+// ****
+function StudentAkteUpload()
+{
+
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-zeugnis-tree');
+
+	if (tree.currentIndex==-1)
+		return;
+
+	try
+	{
+		//Ausgewaehlte Akte holen
+		var akte_id = getTreeCellText(tree, 'student-zeugnis-tree-akte_id', tree.currentIndex);
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+
+	window.open('../vilesci/personen/akteupdate.php?akte_id='+akte_id);
 }
 
 // ****
