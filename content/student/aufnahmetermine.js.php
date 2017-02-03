@@ -22,6 +22,7 @@ require_once('../../config/vilesci.config.inc.php');
 // ********** FUNKTIONEN ********** //
 var AufnahmeterminePrestudentID='';
 var AufnahmeTermineStudienplanID='';
+var AufnahmeTermineStudiengang='';
 
 // ****
 // * Laedt die Trees
@@ -35,7 +36,6 @@ function loadAufnahmeTermine(prestudent_id)
 	document.getElementById('aufnahmetermine-textbox-gesamtpunkte').disabled=false;
 	document.getElementById('aufnahmetermine-button-savegesamtpunkte').disabled=false;
 	document.getElementById('aufnahmetermine-button-calculatetotal').disabled=false;
-
 
 	// Gruppen DropDown laden
 	var aufnahmegruppemenulist = document.getElementById('aufnahmetermine-menulist-aufnahmegruppe');
@@ -71,6 +71,8 @@ function loadAufnahmeTermine(prestudent_id)
 	var predicateNS = "http://www.technikum-wien.at/student/rdf";
 
 	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
+	var person_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_id" ));
+	AufnahmeTermineStudiengang = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiengang_kz" ));
 	reihungstestangetreten = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#reihungstestangetreten" ));
 	var aufnahmegruppe_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufnahmegruppe_kurzbz" ));
 	document.getElementById('aufnahmetermine-textbox-gesamtpunkte').value=punkte;
@@ -99,23 +101,23 @@ function loadAufnahmeTermine(prestudent_id)
 	reihungstestmenulist.database.AddDataSource(myDatasource);
 	reihungstestmenulist.builder.rebuild();
 
-	// OrtDropDown laden
-	var ortmenulist = document.getElementById('aufnahmetermine-menulist-ort');
-	var url="<?php echo APP_ROOT ?>rdf/orte.rdf.php?optional=true";
+	// Studienplan DropDown laden
+	var studienplanmenulist = document.getElementById('aufnahmetermine-menulist-studienplan');
+	var url="<?php echo APP_ROOT ?>rdf/studienplan.rdf.php?person_id="+person_id;
 
 	//Alte DS entfernen
-	var oldDatasources = ortmenulist.database.GetDataSources();
+	var oldDatasources = studienplanmenulist.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
 	{
-		ortmenulist.database.RemoveDataSource(oldDatasources.getNext());
+		studienplanmenulist.database.RemoveDataSource(oldDatasources.getNext());
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	ortmenulist.builder.rebuild();
+	studienplanmenulist.builder.rebuild();
 
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var myDatasource = rdfService.GetDataSourceBlocking(url);
-	ortmenulist.database.AddDataSource(myDatasource);
-	ortmenulist.builder.rebuild();
+	studienplanmenulist.database.AddDataSource(myDatasource);
+	studienplanmenulist.builder.rebuild();
 }
 
 /**
@@ -238,7 +240,6 @@ function AufnahmeTermineAuswahl()
 	var anmeldedatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmeldedatum" ));
 	var teilgenommen = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#teilgenommen" ));
 	var punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
-	var ort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ort_kurzbz" ));
 	var studienplan_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studienplan_id" ));
 
 	document.getElementById('aufnahmetermine-textbox-rt_person_id').value=rt_person_id;
@@ -246,13 +247,13 @@ function AufnahmeTermineAuswahl()
 	document.getElementById('aufnahmetermine-checkbox-neu').checked=false;
 	document.getElementById('aufnahmetermine-textbox-anmeldungreihungstest').value=anmeldedatum;
 	MenulistSelectItemOnValue('aufnahmetermine-menulist-reihungstest', rt_id);
-	MenulistSelectItemOnValue('aufnahmetermine-menulist-ort', ort);
+
 	if(teilgenommen=='Ja')
 		document.getElementById('aufnahmetermine-checkbox-teilgenommen').checked=true;
 	else
 		document.getElementById('aufnahmetermine-checkbox-teilgenommen').checked=false;
 	document.getElementById('aufnahmetermine-textbox-punkte').value=punkte;
-	document.getElementById('aufnahmetermine-textbox-studienplan_id').value=studienplan_id;
+	document.getElementById('aufnahmetermine-menulist-studienplan').value=studienplan_id;
 }
 
 function AufnahmeTermineNeu()
@@ -337,8 +338,7 @@ function AufnahmeTermineSpeichern()
 	var rt_id_new = document.getElementById('aufnahmetermine-menulist-reihungstest').value;
 	var teilgenommen = document.getElementById('aufnahmetermine-checkbox-teilgenommen').checked;
 	var punkte = document.getElementById('aufnahmetermine-textbox-punkte').value;
-	var ort = document.getElementById('aufnahmetermine-menulist-ort').value;
-	var studienplan_id = document.getElementById('aufnahmetermine-textbox-studienplan_id').value;
+	var studienplan_id = document.getElementById('aufnahmetermine-menulist-studienplan').value;
 
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
@@ -353,7 +353,6 @@ function AufnahmeTermineSpeichern()
 	req.add('anmeldedatum', anmeldedatum);
 	req.add('teilgenommen', teilgenommen);
 	req.add('punkte', punkte);
-	req.add('ort_kurzbz', ort);
 	req.add('studienplan_id', studienplan_id);
 
 	var response = req.executePOST();
@@ -392,8 +391,8 @@ function AufnahmeTermineDisableFields(val)
 	document.getElementById('aufnahmetermine-checkbox-teilgenommen').disabled=val;
 	document.getElementById('aufnahmetermine-textbox-anmeldungreihungstest').disabled=val;
 	document.getElementById('aufnahmetermine-menulist-reihungstest').disabled=val;
-	document.getElementById('aufnahmetermine-menulist-ort').disabled=val;
 	document.getElementById('aufnahmetermine-button-anmeldungreihungstest-heute').disabled=val;
+	document.getElementById('aufnahmetermine-menulist-studienplan').disabled=val;
 }
 
 /**
@@ -405,11 +404,10 @@ function AufnahmeTermineResetFields()
 	document.getElementById('aufnahmetermine-checkbox-teilgenommen').checked=false;
 	document.getElementById('aufnahmetermine-textbox-anmeldungreihungstest').value='';
 	document.getElementById('aufnahmetermine-menulist-reihungstest').value='';
-	document.getElementById('aufnahmetermine-menulist-ort').value='';
 	document.getElementById('aufnahmetermine-textbox-person_id').value='';
 	document.getElementById('aufnahmetermine-checkbox-neu').checked=true;
 	document.getElementById('aufnahmetermine-textbox-rt_person_id').value='';
-	document.getElementById('aufnahmetermine-textbox-studienplan_id').value=AufnahmeTermineStudienplanID;
+	document.getElementById('aufnahmetermine-menulist-studienplan').value=AufnahmeTermineStudienplanID;
 }
 
 
@@ -436,7 +434,8 @@ function AufnahmeTermineReihungstestDropDownRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('aufnahmetermine-menulist-reihungstest');
-	var url="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true&prestudent_id="+AufnahmeTerminePrestudentID+"&"+gettimestamp();
+	//var url="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true&prestudent_id="+AufnahmeTerminePrestudentID+"&"+gettimestamp();
+	var url="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?include_id=&studiengang_kz="+AufnahmeTermineStudiengang+"&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = tree.database.GetDataSources();
@@ -450,4 +449,11 @@ function AufnahmeTermineReihungstestDropDownRefresh()
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var myDatasource = rdfService.GetDataSource(url);
 	tree.database.AddDataSource(myDatasource);
+}
+
+function AufnahmeTermineReihungstestEdit()
+{
+	var rt_id = document.getElementById('aufnahmetermine-menulist-reihungstest').value;
+	var url="<?php echo APP_ROOT ?>vilesci/stammdaten/reihungstestverwaltung.php?reihungstest_id="+rt_id;
+	window.open(url);
 }

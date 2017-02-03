@@ -1703,6 +1703,42 @@ if($result = $db->db_query("SELECT character_maximum_length FROM information_sch
 	}
 }
 
+// Nummer in campus.tbl_beispiel von smallint auf integer aendern
+if($result = $db->db_query("SELECT data_type FROM information_schema.columns WHERE column_name='nummer' AND table_name='tbl_beispiel' AND table_schema='campus';"))
+{
+	if($row = $db->db_fetch_object($result))
+	{
+		if($row->data_type=='smallint')
+		{
+			$qry = "ALTER TABLE campus.tbl_beispiel ALTER COLUMN nummer TYPE integer;";
+
+			if(!$db->db_query($qry))
+				echo '<strong>campus.tbl_beispiel: '.$db->db_last_error().'</strong><br>';
+			else
+				echo 'campus.tbl_beispiel: Spalte nummer von smallint auf integer geändert<br>';
+		}
+	}
+}
+
+// Index fuer prestudent und prestudentstatus
+if($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_prestudent_person'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "
+		CREATE INDEX idx_prestudent_person ON public.tbl_prestudent USING btree (person_id);
+		CREATE INDEX idx_prestudentstatus_prestudent ON public.tbl_prestudentstatus USING btree (prestudent_id);
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Indizes: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Diverse Indizes fuer Prestudent und Prestudentstatus hinzugefuegt';
+	}
+}
+
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 

@@ -124,6 +124,7 @@ $berechtigungen = array(
 	array('lehre/pruefungsterminAdmin','Recht für jeden Lektor eine Prüfung anzulegen'),
 	array('lehre/pruefungsfenster','Erlaubt dem Benutzer Prüfungsfenster anzulegen.'),
 	array('lehre/reihungstest','Reihungstestverwaltung'),
+	array('lehre/reihungstestOrt','Erlaubt die Zuteilung von Raeumen zu Reihungstests'),
 	array('lehre/reservierung','erweiterte Reservierung inkl. Lektorauswahl, Stg, Sem und Gruppe'),
 	array('lehre/reservierung:begrenzt','normale Raumreservierung im CIS'),
 	array('lehre/studienordnung','Studienordnung'),

@@ -141,18 +141,18 @@ if ($variable->load($user, 'reihungstestverwaltung_punkteberechnung'))
 
 		$punkteberechnung = $_GET['punkteberechnung'];
 	}
-	else 
+	else
 		$punkteberechnung = $variable->wert;
-		
+
 }
-else 
+else
 {
 	$variable->new = true;
 	$variable->uid = $user;
 	$variable->name = 'reihungstestverwaltung_punkteberechnung';
 	$variable->wert = 'true';
 	$variable->save();
-	
+
 	$punkteberechnung = 'true';
 }
 
@@ -174,55 +174,63 @@ if(isset($_GET['excel']))
 
 		$studienplaene_list = implode(',', array_keys($studienplaene_arr));
 		$qry = "
+		SELECT
+			rt_id,
+			prestudent_id,
+			tbl_rt_person.person_id,
+			vorname,
+			nachname,
+			ort_kurzbz,
+			studienplan_id,
+			studiengang_kz,
+			gebdatum,
+			geschlecht,
+			punkte
+			,(
 				SELECT
-				rt_id,
-				prestudent_id,
-				tbl_rt_person.person_id,
-				vorname,
-				nachname,
-				ort_kurzbz,
-				studienplan_id,
-				studiengang_kz,
-				gebdatum,
-				geschlecht,
-				punkte
-				,(
-					SELECT kontakt
-					FROM tbl_kontakt
-					WHERE kontakttyp = 'email'
-						AND person_id = tbl_rt_person.person_id
-						AND zustellung = true LIMIT 1
-					) AS email
-				,(
-					SELECT ausbildungssemester
-					FROM public.tbl_prestudentstatus
-					WHERE prestudent_id = tbl_prestudent.prestudent_id
-						AND datum = (
+					kontakt
+				FROM
+					public.tbl_kontakt
+				WHERE
+					kontakttyp = 'email'
+					AND person_id = tbl_rt_person.person_id
+					AND zustellung = true LIMIT 1
+			) AS email
+			,(
+				SELECT
+					ausbildungssemester
+				FROM
+					public.tbl_prestudentstatus
+				WHERE
+					prestudent_id = tbl_prestudent.prestudent_id
+					AND datum = (
 							SELECT MAX(datum)
 							FROM public.tbl_prestudentstatus
 							WHERE prestudent_id = tbl_prestudent.prestudent_id
 								AND status_kurzbz = 'Interessent'
 							) LIMIT 1
-					) AS ausbildungssemester
-				,(
-					SELECT orgform_kurzbz
-					FROM public.tbl_prestudentstatus
-					WHERE prestudent_id = tbl_prestudent.prestudent_id
-						AND datum = (
-							SELECT MAX(datum)
-							FROM public.tbl_prestudentstatus
-							WHERE prestudent_id = tbl_prestudent.prestudent_id
-								AND status_kurzbz = 'Interessent'
-							) LIMIT 1
-					) AS orgform_kurzbz
-				FROM public.tbl_rt_person
+			) AS ausbildungssemester
+			,(
+				SELECT orgform_kurzbz
+				FROM public.tbl_prestudentstatus
+				WHERE prestudent_id = tbl_prestudent.prestudent_id
+					AND datum = (
+						SELECT MAX(datum)
+						FROM public.tbl_prestudentstatus
+						WHERE prestudent_id = tbl_prestudent.prestudent_id
+							AND status_kurzbz = 'Interessent'
+						) LIMIT 1
+			) AS orgform_kurzbz
+			FROM
+				public.tbl_rt_person
 				JOIN public.tbl_person USING (person_id)
 				JOIN public.tbl_prestudent ON (tbl_rt_person.person_id=tbl_prestudent.person_id)
-				WHERE rt_id = ".$db->db_add_param($reihungstest->reihungstest_id, FHC_INTEGER)."
-				AND tbl_rt_person.studienplan_id IN (".$studienplaene_list.")
+			WHERE
+				rt_id = ".$db->db_add_param($reihungstest->reihungstest_id, FHC_INTEGER)."
 				AND tbl_rt_person.studienplan_id IN(SELECT studienplan_id FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id)
-				ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname
-				";
+			ORDER BY
+				ort_kurzbz NULLS FIRST,nachname,vorname
+			";
 
 		$gebietbezeichnungen = array();
 		$qry_gebiete = "SELECT gebiet_id, reihung, bezeichnung FROM testtool.tbl_ablauf JOIN testtool.tbl_gebiet USING (gebiet_id) WHERE studienplan_id = ".$db->db_add_param($row->studienplan_id)." ORDER BY reihung";
@@ -355,13 +363,17 @@ if(isset($_GET['excel']))
 						}
 					}
 					$weitere_zuteilungen = array();
-					$qry_zuteilungen = "SELECT DISTINCT	tbl_studienplan.bezeichnung,tbl_reihungstest.datum,tbl_rt_person.studienplan_id
-									FROM public.tbl_rt_person JOIN public.tbl_reihungstest ON (rt_id = reihungstest_id)
-									JOIN lehre.tbl_studienplan USING (studienplan_id)
-									JOIN testtool.tbl_ablauf USING (studienplan_id)
-									WHERE person_id=".$db->db_add_param($row->person_id)."
-									AND studiensemester_kurzbz=".$db->db_add_param($reihungstest->studiensemester_kurzbz)."
-									ORDER BY bezeichnung";
+					$qry_zuteilungen = "
+						SELECT
+							DISTINCT tbl_studienplan.bezeichnung, tbl_reihungstest.datum, tbl_rt_person.studienplan_id
+						FROM
+							public.tbl_rt_person JOIN public.tbl_reihungstest ON (rt_id = reihungstest_id)
+							JOIN lehre.tbl_studienplan USING (studienplan_id)
+							JOIN testtool.tbl_ablauf USING (studienplan_id)
+						WHERE
+							person_id=".$db->db_add_param($row->person_id)."
+							AND studiensemester_kurzbz=".$db->db_add_param($reihungstest->studiensemester_kurzbz)."
+						ORDER BY bezeichnung";
 
 					if($result_zuteilungen = $db->db_query($qry_zuteilungen))
 					{
@@ -385,7 +397,7 @@ if(isset($_GET['excel']))
 					$worksheet->write($zeile,$col,$row->nachname, $format_border);
 					if(strlen($row->nachname)>$maxlength[$col])
 						$maxlength[$col] = strlen($row->nachname);
-					
+
 					$worksheet->write($zeile,++$col, $row->vorname, $format_border);
 					if(strlen($row->vorname)>$maxlength[$col])
 						$maxlength[$col] = strlen($row->vorname);
@@ -1013,7 +1025,8 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 {
 	$errormsg='';
 	$qry = "SELECT
-				prestudent_id, tbl_prestudent.studiengang_kz, nachname, vorname, tbl_studiengang.oe_kurzbz, rt_person_id
+				prestudent_id, tbl_prestudent.studiengang_kz, nachname, vorname,
+				tbl_studiengang.oe_kurzbz, rt_person_id, tbl_person.person_id
 			FROM
 				public.tbl_prestudent
 				JOIN public.tbl_person USING(person_id)
@@ -1092,55 +1105,62 @@ if(isset($_GET['type']) && $_GET['type']=='verteilen')
 		{
 			$anz_personen = $db->db_num_rows($result);
 
-			$multiplikator = $anz_personen/$arbeitsplaetze_gesamt;
-			foreach ($orte->result AS $ort)
+			if($arbeitsplaetze_gesamt!=0)
 			{
-				$counter = 0;
-
-				$anz_zugeteilte = new Reihungstest();
-				$anz_zugeteilte->getPersonReihungstestOrt($reihungstest_id, $ort->ort_kurzbz);
-				$anz_zugeteilte = count($anz_zugeteilte->result);
-
-				$anteil = round(($orte_array[$ort->ort_kurzbz] * $multiplikator))-$anz_zugeteilte;
-
-				if ($orte_array[$ort->ort_kurzbz] == 0 || ($anteil - $anz_zugeteilte)<=0)
-					continue;
-
-				while($row = $db->db_fetch_object($result))
+				$multiplikator = $anz_personen/$arbeitsplaetze_gesamt;
+				foreach ($orte->result AS $ort)
 				{
-					//Nur Personen ohne Raumzuteilung verteilen
-					if ($row->ort_kurzbz == '')
+					$counter = 0;
+
+					$anz_zugeteilte = new Reihungstest();
+					$anz_zugeteilte->getPersonReihungstestOrt($reihungstest_id, $ort->ort_kurzbz);
+					$anz_zugeteilte = count($anz_zugeteilte->result);
+
+					$anteil = round(($orte_array[$ort->ort_kurzbz] * $multiplikator))-$anz_zugeteilte;
+
+					if ($orte_array[$ort->ort_kurzbz] == 0 || ($anteil - $anz_zugeteilte)<=0)
+						continue;
+
+					while($row = $db->db_fetch_object($result))
 					{
-						$load_person = new reihungstest();
-						if ($load_person->getPersonReihungstest($row->person_id, $reihungstest_id))
+						//Nur Personen ohne Raumzuteilung verteilen
+						if ($row->ort_kurzbz == '')
 						{
-							$raumzuteilung->new = false;
-							$raumzuteilung->rt_person_id = $load_person->rt_person_id;
-							$raumzuteilung->anmeldedatum = $load_person->anmeldedatum;
-							$raumzuteilung->teilgenommen = $load_person->teilgenommen;
-							$raumzuteilung->punkte = $load_person->punkte;
-							$raumzuteilung->studienplan_id = $load_person->studienplan_id;
+							$load_person = new reihungstest();
+							if ($load_person->getPersonReihungstest($row->person_id, $reihungstest_id))
+							{
+								$raumzuteilung->new = false;
+								$raumzuteilung->rt_person_id = $load_person->rt_person_id;
+								$raumzuteilung->anmeldedatum = $load_person->anmeldedatum;
+								$raumzuteilung->teilgenommen = $load_person->teilgenommen;
+								$raumzuteilung->punkte = $load_person->punkte;
+								$raumzuteilung->studienplan_id = $load_person->studienplan_id;
 
-							$raumzuteilung->reihungstest_id = $load_person->reihungstest_id;
-							$raumzuteilung->person_id = $row->person_id;
-							$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
-						}
-						else
-						{
-							die('Person zuteilung nicht gefunden');
-						}
+								$raumzuteilung->reihungstest_id = $load_person->reihungstest_id;
+								$raumzuteilung->person_id = $row->person_id;
+								$raumzuteilung->ort_kurzbz = $ort->ort_kurzbz;
+							}
+							else
+							{
+								die('Person zuteilung nicht gefunden');
+							}
 
-						if (!$raumzuteilung->savePersonReihungstest())
-						{
-							echo '<span class="input_error">Fehler beim Speichern der Daten: '.$db->convert_html_chars($raumzuteilung->errormsg).'</span>';
-						}
-						$counter++;
+							if (!$raumzuteilung->savePersonReihungstest())
+							{
+								echo '<span class="input_error">Fehler beim Speichern der Daten: '.$db->convert_html_chars($raumzuteilung->errormsg).'</span>';
+							}
+							$counter++;
 
-						//Wenn 0 Arbeitsplaetze vorhanden sind oder die max. Arbeitsplatzanzahl erreicht ist
-						if ($orte_array[$ort->ort_kurzbz] == 0 || ($anteil - $counter)<=0)
-							break;
+							//Wenn 0 Arbeitsplaetze vorhanden sind oder die max. Arbeitsplatzanzahl erreicht ist
+							if ($orte_array[$ort->ort_kurzbz] == 0 || ($anteil - $counter)<=0)
+								break;
+						}
 					}
 				}
+			}
+			else
+			{
+				echo '<span class="error">Nicht genug Raumkapazität vorhanden</span>';
 			}
 		}
 
@@ -1748,82 +1768,82 @@ echo '</td></tr>';
 echo '</td></tr></table>';
 if($reihungstest_id!='')
 {
-//Liste der Interessenten die zum Reihungstest angemeldet sind
+	//Liste der Interessenten die zum Reihungstest angemeldet sind
 	$qry = "
-SELECT
-rt_person_id,
-rt_id,
-prestudent_id,
-tbl_rt_person.person_id,
-vorname,
-nachname,
-ort_kurzbz,
-studienplan_id,
-studiengang_kz,
-gebdatum,
-geschlecht,
-punkte
-,(
-	SELECT kontakt
-	FROM tbl_kontakt
-	WHERE kontakttyp = 'email'
-		AND person_id = tbl_rt_person.person_id
-		AND zustellung = true LIMIT 1
-	) AS email
-,(
-	SELECT ausbildungssemester
-	FROM public.tbl_prestudentstatus
-	WHERE prestudent_id = tbl_prestudent.prestudent_id
-		AND datum = (
-			SELECT MAX(datum)
+	SELECT
+		rt_person_id,
+		rt_id,
+		prestudent_id,
+		tbl_rt_person.person_id,
+		vorname,
+		nachname,
+		ort_kurzbz,
+		studienplan_id,
+		studiengang_kz,
+		gebdatum,
+		geschlecht,
+		punkte
+		,(
+			SELECT kontakt
+			FROM tbl_kontakt
+			WHERE kontakttyp = 'email'
+				AND person_id = tbl_rt_person.person_id
+				AND zustellung = true LIMIT 1
+			) AS email
+		,(
+			SELECT ausbildungssemester
 			FROM public.tbl_prestudentstatus
 			WHERE prestudent_id = tbl_prestudent.prestudent_id
-				AND status_kurzbz = 'Interessent'
-			) LIMIT 1
-	) AS ausbildungssemester
-,(
-	SELECT orgform_kurzbz
-	FROM public.tbl_prestudentstatus
-	WHERE prestudent_id = tbl_prestudent.prestudent_id
-		AND datum = (
-			SELECT MAX(datum)
-			FROM public.tbl_prestudentstatus
-			WHERE prestudent_id = tbl_prestudent.prestudent_id
-				AND status_kurzbz = 'Interessent'
-			) LIMIT 1
-	) AS orgform_kurzbz
-FROM public.tbl_rt_person
-JOIN public.tbl_person USING (person_id)
-JOIN public.tbl_prestudent ON (tbl_rt_person.person_id=tbl_prestudent.person_id)
-WHERE rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER);
-if ($studienplaene_list != '')
-$qry .= "AND tbl_rt_person.studienplan_id IN (".$studienplaene_list.")";
+				AND datum = (
+					SELECT MAX(datum)
+					FROM public.tbl_prestudentstatus
+					WHERE prestudent_id = tbl_prestudent.prestudent_id
+						AND status_kurzbz = 'Interessent'
+					) LIMIT 1
+			) AS ausbildungssemester
+		,(
+		SELECT orgform_kurzbz
+		FROM public.tbl_prestudentstatus
+		WHERE prestudent_id = tbl_prestudent.prestudent_id
+			AND datum = (
+				SELECT MAX(datum)
+				FROM public.tbl_prestudentstatus
+				WHERE prestudent_id = tbl_prestudent.prestudent_id
+					AND status_kurzbz = 'Interessent'
+				) LIMIT 1
+		) AS orgform_kurzbz
+	FROM
+		public.tbl_rt_person
+		JOIN public.tbl_person USING (person_id)
+		JOIN public.tbl_prestudent ON (tbl_rt_person.person_id=tbl_prestudent.person_id)
+	WHERE
+		rt_id = ".$db->db_add_param($reihungstest_id, FHC_INTEGER);
 
-$qry .= " AND tbl_rt_person.studienplan_id IN(SELECT studienplan_id FROM public.tbl_prestudentstatus where prestudent_id=tbl_prestudent.prestudent_id)
-ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname";
+	$qry .= " AND tbl_rt_person.studienplan_id IN(SELECT studienplan_id FROM public.tbl_prestudentstatus where prestudent_id=tbl_prestudent.prestudent_id)
+	ORDER BY ort_kurzbz NULLS FIRST,nachname,vorname";
 
-$mailto = '';
-$result_arr = array();
+	$mailto = '';
+	$result_arr = array();
 
-$orte = new Reihungstest();
-$orte->getOrteReihungstest($reihungstest_id);
-$orte_zuteilung_array = array();
-$orte_zuteilung_array['ohne'] = 0;
-foreach ($orte->result AS $row)
-	$orte_zuteilung_array[$row->ort_kurzbz] = 0;
+	$orte = new Reihungstest();
+	$orte->getOrteReihungstest($reihungstest_id);
+	$orte_zuteilung_array = array();
+	$orte_zuteilung_array['ohne'] = 0;
+	foreach ($orte->result AS $row)
+		$orte_zuteilung_array[$row->ort_kurzbz] = 0;
 
-if($result = $db->db_query($qry))
-{
-	while($row = $db->db_fetch_object($result))
+	if($result = $db->db_query($qry))
 	{
-		$result_arr[] = $row;
+		while($row = $db->db_fetch_object($result))
+		{
+			$result_arr[] = $row;
 
-		if (is_null($row->ort_kurzbz))
-			$orte_zuteilung_array['ohne']++;
-		else
-			$orte_zuteilung_array[$row->ort_kurzbz]++;
+			if (is_null($row->ort_kurzbz))
+				$orte_zuteilung_array['ohne']++;
+			else
+				$orte_zuteilung_array[$row->ort_kurzbz]++;
+		}
 	}
-}
 
 	echo '<table width="100%"><tr><td>';
 	echo '<tr><td>';
@@ -1914,6 +1934,15 @@ if($result = $db->db_query($qry))
 			}
 			if ($row->ort_kurzbz == '')
 			{
+				if(isset($studienplaene_arr[$row->studienplan_id]))
+					$studienplan_bezeichnung = $studienplaene_arr[$row->studienplan_id];
+				else
+				{
+					$studienplan_obj = new studienplan();
+					$studienplan_obj->loadStudienplan($row->studienplan_id);
+					$studienplan_bezeichnung = $studienplan_obj->bezeichnung;
+					$studienplaene_arr[$row->studienplan_id]=$studienplan_obj->bezeichnung;
+				}
 				echo '
 					<tr>
 						<td style="text-align: center"><input type="checkbox" class="chkbox" id="checkbox_'.$row->person_id.'" name="checkbox['.$row->person_id.']"></td>
@@ -1924,7 +1953,7 @@ if($result = $db->db_query($qry))
 						<td style="display: table-cell" class="clm_geschlecht">'.$db->convert_html_chars($row->geschlecht).'</td>
 						<td style="display: table-cell" class="clm_studiengang">'.$db->convert_html_chars($stg_arr[$row->studiengang_kz]).'</td>
 						<td style="display: table-cell" class="clm_orgform">'.$db->convert_html_chars($row->orgform_kurzbz!=''?$row->orgform_kurzbz:' ').'</td>
-						<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplaene_arr[$row->studienplan_id]).' ('.$row->studienplan_id.')</td>
+						<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplan_bezeichnung).' ('.$row->studienplan_id.')</td>
 						<td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
 						<td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
 						<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
@@ -2026,6 +2055,17 @@ if($result = $db->db_query($qry))
 				}
 				if ($row->ort_kurzbz == $ort->ort_kurzbz)
 				{
+
+					if(isset($studienplaene_arr[$row->studienplan_id]))
+						$studienplan_bezeichnung = $studienplaene_arr[$row->studienplan_id];
+					else
+					{
+						$studienplan_obj = new studienplan();
+						$studienplan_obj->loadStudienplan($row->studienplan_id);
+						$studienplan_bezeichnung = $studienplan_obj->bezeichnung;
+						$studienplaene_arr[$row->studienplan_id]=$studienplan_obj->bezeichnung;
+					}
+
 					$cnt_personen++;
 					echo '
 						<tr>
@@ -2037,7 +2077,7 @@ if($result = $db->db_query($qry))
 							<td style="display: table-cell" class="clm_geschlecht">'.$db->convert_html_chars($row->geschlecht).'</td>
 							<td style="display: table-cell" class="clm_studiengang">'.$db->convert_html_chars($stg_arr[$row->studiengang_kz]).'</td>
 							<td style="display: table-cell" class="clm_orgform">'.$db->convert_html_chars($row->orgform_kurzbz!=''?$row->orgform_kurzbz:' ').'</td>
-							<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplaene_arr[$row->studienplan_id]).' ('.$row->studienplan_id.')</td>
+							<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplan_bezeichnung).' ('.$row->studienplan_id.')</td>
 							<td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
 							<td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
 							<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
