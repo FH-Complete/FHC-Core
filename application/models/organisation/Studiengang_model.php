@@ -256,7 +256,7 @@ class Studiengang_model extends DB_Model
 		
 		$this->addJoin('public.tbl_prestudent', 'prestudent_id');
 		
-		$this->addOrder('tbl_studiengang.studiengang_kz, tbl_reihungstest.stufe');
+		$this->addOrder('tbl_studiengang.bezeichnung, tbl_reihungstest.stufe, tbl_reihungstest.datum');
 		
 		return $this->loadTree(
 			'tbl_studiengang',
