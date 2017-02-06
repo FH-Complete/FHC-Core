@@ -79,6 +79,7 @@ if(isset($_GET['include_id']) && isset($_GET['studiengang_kz']))
 }
 elseif(isset($_GET['prestudent_id']))
 {
+	$include_ids=array();
 	$prestudent = new prestudent();
 	$prestudent->getPrestudentRolle($_GET['prestudent_id'], 'Interessent');
 	$studienplan_arr = array();
