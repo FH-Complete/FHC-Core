@@ -9,6 +9,6 @@ class Statusgrund_model extends DB_Model
 	{
 		parent::__construct();
 		$this->dbTable = "public.tbl_status_grund";
-		$this->pk = "statusgrund_kurzbz";
+		$this->pk = "statusgrund_id";
 	}
 }

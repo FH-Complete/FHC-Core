@@ -1,12 +1,12 @@
 <?php
 	$this->load->view('templates/header', array('title' => 'StatusgrundEdit'));
-	
+
 	$sg = $statusgrund;
 ?>
 
 		<div class="row">
 			<div class="span4">
-				<h2>Status grund: <?php echo $sg->status_kurzbz; ?></h2>
+				<h2>Statusgrund: <?php echo $sg->status_kurzbz; ?></h2>
 				<form method="post" action="<?php echo APP_ROOT . "index.ci.php/crm/Statusgrund/saveGrund";?>">
 					<table>
 						<tr>
@@ -31,7 +31,7 @@
 									?>
 									<input type="text" name="bezeichnung_mehrsprachig[]" value="<?php echo $val; ?>" /><br/>
 								<?php endforeach ?>
-								
+
 							</td>
 						</tr>
 						<tr>
@@ -70,7 +70,7 @@
 						</tr>
 						<tr>
 							<td>
-								Aktiv: 
+								Aktiv:
 							</td>
 							<td>
 								<input type="checkbox" name="aktiv" <?php echo isset($sg->aktiv) && $sg->aktiv === true ? "checked" : ""; ?> />
@@ -87,12 +87,12 @@
 							</td>
 						</tr>
 					</table>
-					<input type="hidden" name="statusgrund_kurzbz" value="<?php echo isset($sg->statusgrund_kurzbz) ? $sg->statusgrund_kurzbz : ""; ?>" />
+					<input type="hidden" name="statusgrund_id" value="<?php echo isset($sg->statusgrund_id) ? $sg->statusgrund_id : ""; ?>" />
 				</form>
 			</div>
 		</div>
 	</body>
-	
+
 	<?php
 		if (!is_null($update))
 		{
@@ -103,5 +103,5 @@
 	<?php
 		}
 	?>
-	
+
 </html>
