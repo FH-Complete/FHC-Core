@@ -609,7 +609,7 @@ class dokument extends basis_db
 						dokument_kurzbz='.$this->db_add_param($this->dokument_kurzbz).'
 						AND studiengang_kz='.$this->db_add_param($this->studiengang_kz);
 		}
-		
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -663,7 +663,7 @@ class dokument extends basis_db
 		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
 		$dokumentbeschreibung_mehrsprachig = $sprache->getSprachQuery('dokumentbeschreibung_mehrsprachig');
 		$beschreibung_mehrsprachig = $sprache->getSprachQuery('beschreibung_mehrsprachig');
-		$qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht, nachreichbar
+		$qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht, nachreichbar,
 			$bezeichnung_mehrsprachig, $dokumentbeschreibung_mehrsprachig, $beschreibung_mehrsprachig
 			FROM public.tbl_dokumentstudiengang
 			JOIN public.tbl_prestudent using (studiengang_kz)
