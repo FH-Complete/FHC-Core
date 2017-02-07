@@ -315,7 +315,7 @@ class wochenplan extends basis_db
 			$obj->ort_ausstattung = $row->ausstattung;
 			$obj->ort_max_person = $row->max_person;
 			$obj->ort_content_id = $row->content_id;
-			$obj->link.='&ort_kurzbz='.$this->ort_kurzbz;	//Link erweitern
+			//$obj->link.='&ort_kurzbz='.$this->ort_kurzbz;	//Link erweitern
 			array_push($this->raeume, $obj);
 		    }
 		}
