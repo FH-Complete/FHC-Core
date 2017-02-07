@@ -48,7 +48,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum,
 				tbl_studiensemester.bezeichnung as sembezeichnung,
 				tbl_studiengang.english as bezeichnung_englisch,
-				tbl_studiengang.orgform_kurzbz, tbl_studiengang.typ
+				tbl_studiengang.typ, tbl_studiengang.orgform_kurzbz, tbl_person.matr_nr
 			FROM
 				public.tbl_person, public.tbl_student, public.tbl_studiengang, public.tbl_benutzer,
 				public.tbl_studentlehrverband, public.tbl_studiensemester
@@ -189,6 +189,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 	$xml .= "		<gebdatum>".$gebdatum."</gebdatum>";
 	$xml .= "		<matrikelnr>".$row->matrikelnr."</matrikelnr>";
+	$xml .= "		<matr_nr>".$row->matr_nr."</matr_nr>";
 	$xml .= "		<studiensemester_kurzbz>".(($stdsem->beschreibung != NULL) ? $stdsem->beschreibung : $studiensemester_kurzbz)."</studiensemester_kurzbz>";
 	$datum_aktuell = date('d.m.Y');
 	$xml .= "		<datum>".$datum_aktuell."</datum>";

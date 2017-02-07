@@ -88,7 +88,7 @@ class vertrag extends basis_db
 	 * @param $person_id
 	 * @return boolean true wenn ok ,false im Fehlerfall
 	 */
-	public function loadVertrag($person_id, $abgerechnet=null)
+	public function loadVertrag($person_id, $abgerechnet=null, $datum=null)
 	{
 		$qry = "SELECT
 					*,
@@ -105,6 +105,23 @@ class vertrag extends basis_db
 			$qry.=" AND EXISTS (SELECT 1 FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=tbl_vertrag.vertrag_id AND vertragsstatus_kurzbz='abgerechnet')";
 		if($abgerechnet===false)
 			$qry.=" AND NOT EXISTS (SELECT 1 FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=tbl_vertrag.vertrag_id AND vertragsstatus_kurzbz='abgerechnet')";
+
+		if(!is_null($datum))
+		{
+			$qry.=" AND NOT
+						(
+							vertragstyp_kurzbz='Lehrauftrag'
+							AND EXISTS(SELECT
+											1
+										FROM
+											lehre.tbl_lehreinheitmitarbeiter
+											JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+										WHERE
+											vertrag_id=tbl_vertrag.vertrag_id
+											AND studiensemester_kurzbz in (SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start>=".$this->db_add_param($datum).")
+								)
+						)";
+		}
 
 		if($result = $this->db_query($qry))
 		{

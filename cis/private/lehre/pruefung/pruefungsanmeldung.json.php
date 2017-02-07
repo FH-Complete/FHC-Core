@@ -604,7 +604,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 
     foreach ($prestudent->result as $ps)
     {
-        if ($ps->getLaststatus($ps->prestudent_id, $stdsem))
+        if ($ps->getLaststatus($ps->prestudent_id, $stdsem_lv_besuch))
         {
             if (($ps->status_kurzbz == "Student") || ($ps->status_kurzbz == "Unterbrecher"))
             {

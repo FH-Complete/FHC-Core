@@ -36,7 +36,7 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/lvangebot.class.php');
 require_once('../../../include/addon.class.php');
-
+require_once('../../../include/benutzerberechtigung.class.php');
 
 	if (!$db = new basis_db())
       die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -55,6 +55,11 @@ require_once('../../../include/addon.class.php');
 		$stdsem=$_GET['stdsem'];
 	else
 		$stdsem=$studiensemester->getaktorNext();
+
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+	if(!$rechte->isBerechtigt('admin') && $uid!=$user)
+		die('Sie haben keine Berechtigung für diesen Vorgang');
 
 	$datum = new datum();
 

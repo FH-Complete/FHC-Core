@@ -2428,6 +2428,10 @@ class wochenplan extends basis_db
 										$end_time=$row->ende;
 										break;
 									}
+									else
+									{
+										break;
+									}
 								}
 							}
 						}
