@@ -93,7 +93,7 @@ h1 {
 			<math xmlns="http://www.w3.org/1998/Math/MathML">
 			<mrow>
 			  <munderover>
-			     <mo movablelimits="false">â</mo>
+			     <mo movablelimits="false">&sum;</mo>
 			     <mn><mi>k</mi>=1</mn>
 			     <mn>5</mn>
 			  </munderover>
@@ -129,17 +129,15 @@ h1 {
     <?php
     //Sound einbinden
 	echo '	<tr>
-	    		<td align="center" colspan="3"><hr><br/>Audio-Testfile<br/><br/>
-					<script language="JavaScript" src="audio-player/audio-player.js"></script>
-					<object type="application/x-shockwave-flash" data="audio-player/player.swf" id="audioplayer1" height="24" width="290">
-					<param name="movie" value="audio_player/player.swf" />
-					<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=audio_testfile.mp3" />
-					<param name="quality" value="high" />
-					<param name="menu" value="false" />
-					<param name="wmode" value="transparent" />
-					</object>
-				</td>
-	    	</tr>';
+		 		<td align="center" colspan="3"><hr><br/>Audio-Testfile<br/><br/>
+				<!--<audio src="sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$_SESSION['sprache'].'" controls="controls" type="audio/mpeg">-->
+				<audio src="audio_testfile.ogg" controls="controls" type="audio/ogg">
+				<div>
+					<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
+				</div>
+			</audio>
+ 		</td>
+		</tr>';
 	?>
   </tbody>
 </table>
