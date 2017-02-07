@@ -381,7 +381,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P25"><text:tab/>angerechnet (ar), nicht beurteilt (nb), bestanden (b), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</text:p>
 			<text:p text:style-name="P20"/>
 			<text:p text:style-name="P21"/>
-			<text:p text:style-name="P22">Inhalte der Lehrveranstaltung:</text:p>
+			<text:p text:style-name="P22">Nach erfolgreichem Abschluss sind die Studierenden in der Lage, ...</text:p>
 			<text:p text:style-name="P22"/>
 			<text:p text:style-name="P22"/>
 			<text:p text:style-name="P22">
