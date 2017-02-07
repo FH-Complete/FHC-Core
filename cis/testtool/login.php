@@ -88,7 +88,6 @@ $reload=false;
 $reload_parent=false;
 
 $sg_var = new studiengang();
-$studiengang_typ_arr = $sg_var->studiengang_typ_arr;
 
 if (isset($_GET['logout']))
 {

@@ -61,9 +61,7 @@ class studiengang extends basis_db
 	public $mischform;	// boolean
 	public $projektarbeit_note_anzeige; // boolean
 	public $bezeichnung_arr = array();
-
-    public $beschreibung;
-	
+	public $beschreibung;
 	public $studiengang_typ_arr = array(); 	// Array mit den Studiengangstypen
 
 	/**
@@ -78,19 +76,6 @@ class studiengang extends basis_db
 			$this->load($studiengang_kz);
 	}
 
-	public function __get($value)
-	{
-		switch($value)
-		{
-			case 'studiengang_typ_arr':
-				if(count($this->studiengang_typ_arr)==0)
-				{
-					$this->getAllTypes();
-				}
-		}
-		return $this->$value;
-	}
-
 	/**
 	 * Laedt einen Studiengang
 	 * @param studiengang_kz KZ des Studienganges der zu Laden ist
@@ -103,7 +88,7 @@ class studiengang extends basis_db
 			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM public.tbl_studiengang WHERE studiengang_kz = " . $this->db_add_param($studiengang_kz);
 
 		if($this->db_query($qry))
@@ -229,7 +214,7 @@ class studiengang extends basis_db
 	// DEPRECATED! SIEHE NAECHSTE FUNKTION
 	/**
 	 * Gibt alle Studiengaenge zurueck, fuer die man sich online bewerben kann
-	 * 
+	 *
 	 * @param string $order Default: typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC. Spalten, nach denen Sortiert werden soll.
 	 * @return boolean
 	 */
@@ -256,7 +241,7 @@ class studiengang extends basis_db
 
 		return true;
 	}
-	
+
 	// DIESE FUNKTION WARE BESSER GEEIGNET, DA DIE ALTE NOCH AUF DIE vw_studienplan ZUGREIFT
 	// IN DER DIE GUELTIGEN SEMESTER NOCH VON DEN STUDIENORDNUNGEN ERMITTELT WERDEN ANSTATT VON DEN STUDIENPLAENEN
 	// IN DIESER WERDEN AUCH DIE STUDIENSEMESTER ABGEFRAGT
@@ -268,7 +253,7 @@ class studiengang extends basis_db
 	 * @return boolean
 	 */
 	/*public function getAllForBewerbung($order = 'typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC', $studiensemester_kurzbz = '')
-	{	
+	{
 		$qry = "SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch, lgartcode, tbl_lgartcode.bezeichnung "
 				. "FROM lehre.tbl_studienplan "
 				. "JOIN lehre.tbl_studienordnung USING (studienordnung_id) "
@@ -1020,7 +1005,7 @@ class studiengang extends basis_db
 			return false;
 		}
 	}
-	
+
 
 	/**
 	 * Laedt einen Lehrgangstyp anhand des lgartcodes
@@ -1034,9 +1019,9 @@ class studiengang extends basis_db
 			$this->errormsg = 'Lgartcode muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM bis.tbl_lgartcode WHERE lgartcode=".$this->db_add_param($lgartcode);
-		
+
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
