@@ -544,11 +544,12 @@ if($frage->frage_id!='')
 	//Bild und Text der Frage anzeigen
 	if($frage->bild!='')
 		echo "<img class='testtoolfrage' src='bild.php?src=frage&amp;frage_id=$frage->frage_id&amp;sprache=".$_SESSION['sprache']."' /><br/><br/>\n";
-		
+	
+	$timestamp = time();
 	//Sound einbinden
 	if($frage->audio!='')
 	{
-		echo '	<audio src="sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$_SESSION['sprache'].'" controls="controls">
+		echo '	<audio src="sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$_SESSION['sprache'].'&amp;'.$timestamp.'" controls="controls" type="audio/ogg">
 					<div>
 						<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
 					</div>

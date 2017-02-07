@@ -48,7 +48,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum,
 				tbl_studiensemester.bezeichnung as sembezeichnung,
 				tbl_studiengang.english as bezeichnung_englisch,
-				tbl_studiengang.orgform_kurzbz, tbl_person.matr_nr
+				tbl_studiengang.typ, tbl_studiengang.orgform_kurzbz, tbl_person.matr_nr
 			FROM
 				public.tbl_person, public.tbl_student, public.tbl_studiengang, public.tbl_benutzer,
 				public.tbl_studentlehrverband, public.tbl_studiensemester
@@ -68,6 +68,27 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	}
 	else
 		return false;
+
+	switch($row->typ)
+	{
+		case 'b':
+			$studTyp = 'Bachelor';
+			break;
+		case 'm':
+			$studTyp = 'Master';
+			break;
+		case 'd':
+			$studTyp = 'Diplom';
+			break;
+		case 'l':
+			$studTyp = 'Lehrgang';
+			break;
+		case 'k':
+			$studTyp = 'Kurzstudium';
+			break;
+		default:
+			$studTyp ='';
+	}
 
 	$studiensemester = new studiensemester();
 	$studiensemester_aktuell = $studiensemester->getNearest();
@@ -122,7 +143,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 		}
 	}
 
-	// Wenn der Studiernede keine Orgform eingetragen hat, wird die Orgform des Studiengang genommen
+	// Wenn der Studierende keine Orgform eingetragen hat, wird die Orgform des Studiengangs genommen
 	if($orgform=='')
 		$orgform = $row->orgform_kurzbz;
 
@@ -159,6 +180,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$xml .= "		<studiengang_englisch>".$row->bezeichnung_englisch."</studiengang_englisch>";
 	$xml .= "		<studiengang_bezeichnung_sto>".$studiengang_bezeichnung_sto."</studiengang_bezeichnung_sto>";
 	$xml .= "		<studiengang_bezeichnung_sto_englisch>".$studiengang_bezeichnung_sto_englisch."</studiengang_bezeichnung_sto_englisch>";
+	$xml .= "		<studiengang_typ>".$studTyp."</studiengang_typ>";
 	$xml .= "		<studiengang_kz>".$studiengang_kz."</studiengang_kz>";
 	$xml .= "		<titelpre>".$row->titelpre."</titelpre>";
 	$xml .= "		<titelpost>".$row->titelpost."</titelpost>";

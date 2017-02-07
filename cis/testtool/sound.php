@@ -44,7 +44,11 @@ else
 if($qry!='')
 {
 	//Header fuer Sound schicken
-	header("Content-type: audio/mp3");
+	header("Content-type: audio/ogg");
+	//Caching unterbinden
+	header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1.
+	header("Pragma: no-cache"); // HTTP 1.0.
+	header("Expires: 43200"); // Proxies.
 	//base64 Werte in Zeichen
 	$result = $db->db_query($qry);
 	$row = $db->db_fetch_object($result);

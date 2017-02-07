@@ -38,7 +38,7 @@
 	$rechte->getBerechtigungen($uid);
 	
 	if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 's') || !$rechte->isBerechtigt('admin'))
-		die('<span class="error">Sie haben keine Berechtigung für diese Seite</span>');
+		die($rechte->errormsg);
 	unset($rechte);
 
    	header('Content-Type: text/html;charset=UTF-8');
@@ -160,6 +160,7 @@
 
 	// Variablen uebernehmen
 	$datum=(isset($_GET['datum'])?$_GET['datum']:(isset($_POST['datum'])?$_POST['datum']:time()));
+	$stpl_table=(isset($_GET['stpl_table'])?$_GET['stpl_table']:'stundenplan');
 	$montag=montag($datum);
 	$letzterTag=mktime(0,0,0,date('m',$montag),date('d',$montag) + TAGE_PRO_WOCHE,date('Y',$montag));
 	$letzterTagAnzeige=mktime(0,0,0,date('m',$montag),date('d',$montag) + ( TAGE_PRO_WOCHE - 1),date('Y',$montag));
@@ -207,10 +208,10 @@
 	$stg=array();
 	echo '<H2><table class="tabcontent"><tr><td>
 				&nbsp;Lehrveranstaltungsplan  &gt;&gt; <a class="Item" href="index.php">Wochenplan</a> - Anzahl Studenten 
-				&nbsp;&nbsp;&nbsp;<a class="Item" href="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'&amp;datum='.$kwRet.'">&lt;&lt;</a> 
-				Wochenplan  &nbsp;<a class="Item" href="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'&amp;datum='.$datum.'">Kw '.$kw.'</a>
-				&nbsp;<a class="Item" href="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'&amp;datum='.$kwVor.'">&gt;&gt;</a>
-				&nbsp;&nbsp;&nbsp;<a class="Item" href="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'&amp;datum='.time().'">Heute</a>
+				&nbsp;&nbsp;&nbsp;<a class="Item" href="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'&amp;datum='.$kwRet.'&amp;stpl_table='.$stpl_table.'">&lt;&lt;</a> 
+				Wochenplan  &nbsp;<a class="Item" href="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'&amp;datum='.$datum.'&amp;stpl_table='.$stpl_table.'">Kw '.$kw.'</a>
+				&nbsp;<a class="Item" href="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'&amp;datum='.$kwVor.'&amp;stpl_table='.$stpl_table.'">&gt;&gt;</a>
+				&nbsp;&nbsp;&nbsp;<a class="Item" href="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'&amp;datum='.time().'&amp;stpl_table='.$stpl_table.'">Heute</a>
 		</td></tr></table></H2>';
 
 		// Stundentafel abfragen
@@ -256,15 +257,15 @@
 						
 					echo '<td style="border-bottom: 1px solid Black;'.($aktiv?'background-color:#009e84;color:#FFF;':'').'" valign="top"  '.($k % 2==0?'':' class="MarkLine" ').' >';
 					
-					$sql_query=' select distinct  vw_stundenplan.stg_bezeichnung as bezeichnung,vw_stundenplan.stg_kurzbzlang as kurzbzlang,vw_stundenplan.stg_kurzbz as kurzbz, vw_stundenplan.stundenplan_id,vw_stundenplan.lehrform, vw_stundenplan.gruppe, vw_stundenplan.gruppe_kurzbz, vw_stundenplan.unr,vw_stundenplan.verband,vw_stundenplan.ort_kurzbz,vw_stundenplan.lehreinheit_id,vw_stundenplan.studiengang_kz,vw_stundenplan.semester,tbl_ort.max_person,tbl_standort.adresse_id,tbl_adresse.plz,tbl_adresse.name  ';
-					$sql_query.=' from lehre.vw_stundenplan, public.tbl_ort,public.tbl_standort, public.tbl_adresse ';
-					$sql_query.=" where vw_stundenplan.datum=".$db->db_add_param(date('Y-m-d',mktime(0,0,0,date('m',$montag),date('d',$montag) + $i,date('Y',$montag))))." ";
-					$sql_query.=" and vw_stundenplan.stunde=".$db->db_add_param($row->stunde, FHC_INTEGER)." ";
-					$sql_query.=" and tbl_ort.ort_kurzbz=vw_stundenplan.ort_kurzbz ";
+					$sql_query=' select distinct  vw_'.$stpl_table.'.stg_bezeichnung as bezeichnung,vw_'.$stpl_table.'.stg_kurzbzlang as kurzbzlang,vw_'.$stpl_table.'.stg_kurzbz as kurzbz, vw_'.$stpl_table.'.'.$stpl_table.'_id,vw_'.$stpl_table.'.lehrform, vw_'.$stpl_table.'.gruppe, vw_'.$stpl_table.'.gruppe_kurzbz, vw_'.$stpl_table.'.unr,vw_'.$stpl_table.'.verband,vw_'.$stpl_table.'.ort_kurzbz,vw_'.$stpl_table.'.lehreinheit_id,vw_'.$stpl_table.'.studiengang_kz,vw_'.$stpl_table.'.semester,tbl_ort.max_person,tbl_standort.adresse_id,tbl_adresse.plz,tbl_adresse.name  ';
+					$sql_query.=' from lehre.vw_'.$stpl_table.', public.tbl_ort,public.tbl_standort, public.tbl_adresse ';
+					$sql_query.=" where vw_".$stpl_table.".datum=".$db->db_add_param(date('Y-m-d',mktime(0,0,0,date('m',$montag),date('d',$montag) + $i,date('Y',$montag))))." ";
+					$sql_query.=" and vw_".$stpl_table.".stunde=".$db->db_add_param($row->stunde, FHC_INTEGER)." ";
+					$sql_query.=" and tbl_ort.ort_kurzbz=vw_".$stpl_table.".ort_kurzbz ";
 					$sql_query.=" and tbl_standort.standort_id=tbl_ort.standort_id ";	
 					$sql_query.=" and tbl_adresse.adresse_id=tbl_standort.adresse_id ";	
 					$sql_query.=" and tbl_adresse.adresse_id=".$db->db_add_param($adresse_id, FHC_INTEGER)." ";
-					$sql_query.=" order by tbl_adresse.plz,vw_stundenplan.ort_kurzbz ";
+					$sql_query.=" order by tbl_adresse.plz,vw_".$stpl_table.".ort_kurzbz ";
 
 					// Gibt es fuer das Datum und Stunde einen Stundenplaneintrag
 					if(!$results_anzahl=$db->db_query($sql_query))
@@ -310,7 +311,7 @@
 							$tooltip.='</tr><tr>';
 						else
 							$tooltip.='<tr><th colspan=\'4\'>'.  date('d M Y',mktime(0,0,0,date('m',$montag),date('d',$montag) + $i,date('Y',$montag))).'  '.$row->show_beginn.' - '.$row->show_ende.'</th><th>Anzahl</th></tr>'; 				
-						$tooltip.='<td title=\'Stundenplan ID '.$row_anz->stundenplan_id.'\'><b>'.trim($row_anz->ort_kurzbz).'</b>&nbsp;</td><td><a href=\'stpl_detail.php?type=ort&datum='.date('Y-m-d',mktime(0,0,0,date('m',$montag),date('d',$montag) + $i,date('Y',$montag))).'&stunde='.$row->stunde.'&pers_uid='.$uid.'&stg_kz=&sem=&ver=&grp=&ort_kurzbz='.trim($row_anz->ort_kurzbz).'\' target=\'_blank\' titel=\'Studiengang Kz '.$row_anz->studiengang_kz.'\'>'.$lvb.'</a>&nbsp;</td><td>'.$row_anz->gruppe_kurzbz.'&nbsp;</td><td>'.(!$row_anz->anz?'<font color=\'Maroon\'>':'').$row_anz->bezeichnung.(!$row_anz->anz?'</font>':'').'&nbsp;</td><td>'.$row_anz->anz.'</td>'; 				
+						$tooltip.='<td title=\'Stundenplan ID '.($stpl_table=='stundenplan'?$row_anz->stundenplan_id:$row_anz->stundenplandev_id).'\'><b>'.trim($row_anz->ort_kurzbz).'</b>&nbsp;</td><td><a href=\'stpl_detail.php?type=ort&datum='.date('Y-m-d',mktime(0,0,0,date('m',$montag),date('d',$montag) + $i,date('Y',$montag))).'&stunde='.$row->stunde.'&pers_uid='.$uid.'&stg_kz=&sem=&ver=&grp=&ort_kurzbz='.trim($row_anz->ort_kurzbz).'\' target=\'_blank\' titel=\'Studiengang Kz '.$row_anz->studiengang_kz.'\'>'.$lvb.'</a>&nbsp;</td><td>'.$row_anz->gruppe_kurzbz.'&nbsp;</td><td>'.(!$row_anz->anz?'<font color=\'Maroon\'>':'').$row_anz->bezeichnung.(!$row_anz->anz?'</font>':'').'&nbsp;</td><td>'.$row_anz->anz.'</td>'; 				
 						$gefunden_anz+=$row_anz->anz;
 					}
 					

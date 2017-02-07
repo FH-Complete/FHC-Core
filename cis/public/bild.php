@@ -27,20 +27,39 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/basis_db.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/dms.class.php');
+require_once('../../include/person.class.php');
 
 session_start();
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
 
+$person_id = '';
 //Wenn das Bild direkt aufgerufen wird, ist eine Authentifizierung erforderlich
 //Wenn es vom Server selbst aufgerufen wird, ist keine Auth. notwendig
 //(z.B. fuer die Erstellung von PDFs)
 if($_SERVER['REMOTE_ADDR']!=$_SERVER['SERVER_ADDR'])
 {
-    // wenn session gesetzt ist von Prestudententool -> keine Abfrage da diese Studenten noch keine uid haben
-    if(!isset($_SESSION['prestudent/user']) && !isset($_SESSION['incoming/user']))
-       $uid = get_uid();
+	// wenn session gesetzt ist von Prestudententool, Incomingtool oder Bewerbungstool -> keine Abfrage da diese Personen noch keine uid haben
+	if(!isset($_SESSION['prestudent/user']) && !isset($_SESSION['incoming/user']) && !isset($_SESSION['bewerbung/personId']))
+		$uid = get_uid();
+	else 
+	{
+		if (isset($_SESSION['incoming/user']))
+		{
+			$person = new person();
+			$person_id = $person->checkZugangscode($_SESSION['incoming/user']);
+		}
+		elseif (isset($_SESSION['prestudent/user']))
+		{
+			$person = new person();
+			$person_id = $person->checkZugangscode($_SESSION['prestudent/user']);
+		}
+		elseif (isset($_SESSION['bewerbung/personId']))
+		{
+			$person_id = $_SESSION['bewerbung/personId'];
+		}
+	}
 }
 
 //default bild (ein weisser pixel)
@@ -48,14 +67,14 @@ $cTmpHEX='/9j/4AAQSkZJRgABAQEASABIAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD//gAXQ3JlYX
 //Hex Dump aus der DB holen
 if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id'])  && is_numeric($_GET['person_id']))
 {
-	$qry = "SELECT tbl_akte.inhalt as foto, tbl_person.foto_sperre, tbl_akte.dms_id FROM public.tbl_akte JOIN public.tbl_person USING(person_id) WHERE tbl_akte.person_id=".$db->db_add_param($_GET['person_id'], FHC_INTEGER)." AND dokument_kurzbz='Lichtbil'";
+	$qry = "SELECT tbl_akte.inhalt as foto, tbl_person.foto_sperre, tbl_akte.dms_id, tbl_person.person_id FROM public.tbl_akte JOIN public.tbl_person USING(person_id) WHERE tbl_akte.person_id=".$db->db_add_param($_GET['person_id'], FHC_INTEGER)." AND dokument_kurzbz='Lichtbil'";
 	if($result = $db->db_query($qry))
 	{
 		if($row = $db->db_fetch_object($result))
 		{
 			$gesperrt=false;
 
-			//Schauen ob eine Foto Sperre existiert
+			//Schauen ob eine Foto Sperre existiert, wenn nicht, schauen, ob der User auch die selbe Person ist
 			if($db->db_parse_bool($row->foto_sperre))
 			{
 				$gesperrt=true;
@@ -68,6 +87,10 @@ if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id'])  &
 						$gesperrt=false;
 
 				}
+			}
+			elseif(!isset($uid) && $person_id != $row->person_id)
+			{
+				$gesperrt=true;
 			}
 
 			if($row->foto=='' && $row->dms_id!='')
@@ -100,7 +123,7 @@ if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id'])  &
 
 			if($row->foto!='' && !$gesperrt)
 			{
-		  		if($row->dms_id=='')
+				if($row->dms_id=='')
 					$cTmpHEX=$row->foto;
 				else
 					$cTmpHEX=$row->foto;

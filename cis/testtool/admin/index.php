@@ -821,9 +821,10 @@ if ($frage_id != '')
 		if ($frage->audio == '')
 			echo "Kein Bild vorhanden\n";
 	}
+	$timestamp = time();
 	if ($frage->audio != '')
 	{
-		echo '	<audio src="../sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$sprache.'" controls="controls">
+		echo '	<audio src="../sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$sprache.'&amp;'.$timestamp.'" controls="controls">
 					<div>
 						<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
 					</div>
@@ -995,7 +996,7 @@ if ($frage_id != '')
 			$a[] = $vs->punkte;
 			if ($vs->audio != '')
 			{
-				echo '	<audio src="../sound.php?src=vorschlag&amp;vorschlag_id='.$vs->vorschlag_id.'&amp;sprache='.$sprache.'" controls="controls">
+				echo '	<audio src="../sound.php?src=vorschlag&amp;vorschlag_id='.$vs->vorschlag_id.'&amp;sprache='.$sprache.'&amp;'.$timestamp.'" controls="controls">
 							<div>
 								<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
 							</div>

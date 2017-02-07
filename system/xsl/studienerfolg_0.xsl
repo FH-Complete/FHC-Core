@@ -493,7 +493,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<table:table-row table:style-name="Tabelle1.2">
 					<table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="2" office:value-type="string">
 						<text:p text:style-name="P8">Studiengang</text:p>
-						<text:p text:style-name="P7">
+						<text:p text:style-name="P7"><xsl:value-of select="studiengang_typ" /><xsl:text> </xsl:text>
 						<xsl:choose>
 							<xsl:when test="studiengang_bezeichnung_sto=''">
 								<xsl:value-of select="studiengang" />
