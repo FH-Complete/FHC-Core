@@ -199,28 +199,6 @@ define('STIP_USER_NAME','stipendienstelle');
 // Passwort fuer STIP Schnittstelle
 define('STIP_USER_PASSWORD','password');
 
-// Optionen für das Bewerbertool
-define('BEWERBERTOOL_STUDIENAUSWAHL_ANZEIGEN', true);
-define('BEWERBERTOOL_STANDORTAUSWAHL_ANZEIGEN', false);
-
-define('BEWERBERTOOL_REIHUNGSTEST_ANZEIGEN', true);
-define('BEWERBERTOOL_ZAHLUNGEN_ANZEIGEN', true);
-define('BEWERBERTOOL_DOKUMENTE_ANZEIGEN', true);
-define('BEWERBERTOOL_ZGV_ANZEIGEN', true);
-define('BEWERBERTOOL_BERUFSTAETIGKEIT_ANZEIGEN', true);
-// Wenn hier eine Mailadresse angegeben ist, werden die Bewerbungen aus der Onlinebwerbung an diese Adresse gesendet.
-// Wenn leer dann wird an BEWERBERTOOL_BEWERBUNG_EMPFAENGER geschickt, sonst an die Studiengangsadresse.
-define('BEWERBERTOOL_MAILEMPFANG', '');
-// Wenn true dann koennen Dokumente nachgereicht werden, wenn false dann nicht
-define('BEWERBERTOOL_DOKUMENTE_NACHREICHEN', true);
-//Wer soll beim nachtraeglichen Upload von Dokumenten im Bewerbertool benachrichtigt werden. Kommagetrenntes Array in der Form: "Stg-Kz" => "empfaenger@domain.at". zB: "227" => "info.bbe@technikum-wien.at",
-define('BEWERBERTOOL_UPLOAD_EMPFAENGER', serialize(array()));
-//Array von Empfaengern fuer das Abschicken von Bewerbungen aus dem Bewerbungstool. Kommagetrenntes Array in der Form: "Stg-Kz" => "empfaenger@domain.at". zB: "227" => "info.bbe@technikum-wien.at",
-define('BEWERBERTOOL_BEWERBUNG_EMPFAENGER', serialize(array()));
-
-// Google Tag Manager HTML/JS Snippet für Bewerbertool Tracking
-define('BEWERBERTOOL_GTM', '');
-
 // Array mit Usern die nicht Kollidieren
 define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
 
