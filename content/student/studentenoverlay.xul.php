@@ -451,7 +451,7 @@ else
                             ?>
 							<iframe id="student-aufnahmetermine" style="margin: 0px;" src="" />
 							<?php
-							if(!defined('FAS_MESSAGES') || FAS_MESSAGES==false)
+							if(!defined('FAS_MESSAGES') || FAS_MESSAGES==true)
 								echo '<iframe id="student-messages" style="margin: 0px;" src="" />';
 							?>
 						</tabpanels>
