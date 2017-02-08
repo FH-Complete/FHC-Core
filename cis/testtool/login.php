@@ -115,9 +115,12 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 		$reihungstest_id='';
 		//Freischaltung fuer zugeteilten Reihungstest pruefen
 		$rt = new reihungstest();
-		if($rt->getReihungstestPersonDatum($ps->prestudent_id, date('Y-m-d')))
+
+		// Wenns der Dummy ist dann extra laden
+		$prestudent_id_dummy_student = (defined('PRESTUDENT_ID_DUMMY_STUDENT')?PRESTUDENT_ID_DUMMY_STUDENT:'');
+		if($prestudent_id_dummy_student==$ps->prestudent_id)
 		{
-			// TODO Was ist wenn da mehrere Zurueckkommen?!
+			$rt->getReihungstestPerson($ps->person_id);
 			if(isset($rt->result[0]))
 				$reihungstest_id = $rt->result[0]->reihungstest_id;
 			else
@@ -127,7 +130,20 @@ if (isset($_POST['prestudent']) && isset($gebdatum))
 		}
 		else
 		{
-			echo 'Failed:'.$rt->errormsg;
+			if($rt->getReihungstestPersonDatum($ps->prestudent_id, date('Y-m-d')))
+			{
+				// TODO Was ist wenn da mehrere Zurueckkommen?!
+				if(isset($rt->result[0]))
+					$reihungstest_id = $rt->result[0]->reihungstest_id;
+				else
+				{
+					echo '<span class="error">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</span>';
+				}
+			}
+			else
+			{
+				echo 'Failed:'.$rt->errormsg;
+			}
 		}
 		//echo "Reihungstest $reihungstest_id";
 		if($reihungstest_id != '' && $rt->load($reihungstest_id))
