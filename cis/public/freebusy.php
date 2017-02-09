@@ -19,7 +19,7 @@
  */
 /**
  * Dieses Script liefert die FreeBusy Informationen
- * 
+ *
  * Aufruf: http://www.example.com/cis/public/freebusy.php/[uid]
  * zB
  * http://www.example.com/cis/public/freebusy.php/oesi
@@ -31,7 +31,7 @@ require_once('../../include/ical.class.php');
 
 if(!isset($_SERVER['PATH_INFO']))
 	die('Username fehlt. Aufruf ueber '.APP_ROOT.'cis/public/freebusy.php/username/');
-	
+
 $uid = mb_substr($_SERVER['PATH_INFO'],1);
 
 $bn = new benutzer();
@@ -46,7 +46,7 @@ if(!$bn->load($uid))
 	else
 		die('User invalid');
 }
-	
+
 $freebusy = new freebusy();
 $freebusy->getFreeBusy($uid);
 header("Content-Type: text/calendar; charset=UTF-8");
@@ -68,42 +68,42 @@ foreach($freebusy->result as $row)
 	if($row->aktiv)
 	{
 		$fp = fopen($row->url,'r');
-		if (!$fp) 
+		if (!$fp)
 		{
-		    echo "$errstr ($errno)<br />\n";
+			echo "URL kann nicht geoeffent werden<br />\n";
 		}
-		else 
+		else
 		{
 			$doc = '';
-		    while (!feof($fp)) 
-		    {
-		        $line = fgets($fp);
-		        $doc.=$line;
-		    }
-		    fclose($fp);
-		    
-		    $ical->importFreeBusy($doc, $row->freebusytyp_kurzbz);
+			while (!feof($fp))
+			{
+				$line = fgets($fp);
+				$doc.=$line;
+			}
+			fclose($fp);
+
+			$ical->importFreeBusy($doc, $row->freebusytyp_kurzbz);
 		}
 	}
 }
 
 //Pers. LVplan
 $fp = fopen(APP_ROOT.'cis/public/freebusy_lvplan.php/'.$uid,'r');
-if (!$fp) 
+if (!$fp)
 {
-    echo "$errstr ($errno)<br />\n";
+	echo "URL kann nicht geoeffnet werden<br />\n";
 }
-else 
+else
 {
 	$doc = '';
-    while (!feof($fp)) 
-    {
-        $line = fgets($fp);
-        $doc.=$line;
-    }
-    fclose($fp);
-    
-    $ical->importFreeBusy($doc, 'LVPLAN');
+	while (!feof($fp))
+	{
+		$line = fgets($fp);
+		$doc.=$line;
+	}
+	fclose($fp);
+
+	$ical->importFreeBusy($doc, 'LVPLAN');
 }
 echo $ical->getFreeBusy();
 echo "\nEND:VCALENDAR";
