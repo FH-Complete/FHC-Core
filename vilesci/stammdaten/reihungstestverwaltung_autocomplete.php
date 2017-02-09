@@ -155,6 +155,7 @@ if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='ort_aktiv')
 			$item['ort_kurzbz']=html_entity_decode($row->ort_kurzbz);
 			$item['planbezeichnung']=html_entity_decode($row->planbezeichnung);
 			$item['bezeichnung']=html_entity_decode($row->bezeichnung);
+			$item['arbeitsplaetze']=html_entity_decode($row->arbeitsplaetze);
 			$result_obj[]=$item;
 		}
 		echo json_encode($result_obj);

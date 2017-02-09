@@ -55,21 +55,36 @@ require_once('../../include/variable.class.php');
 // @todo Allgemein: Beim kopieren auch die Studienplanzuordnungen übernehmen
 //					"Teilgenommen" und "Punkte" werden immer mit false bzw. 0 gespeichert
 
-define('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND', '5');
+define('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND', 5);
 
 if (!$db = new basis_db())
 {
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 }
 
-$stsem_akt = new studiensemester();
-$stsem_akt = $stsem_akt->getaktorNext();
+//Richtiges Studiensemester zum anzeigen ermitteln
+	//Mit getAktOrNext das aktuelle oder kommende WINTERsemester auslesen
+	$stsem_aktorNext = new studiensemester();
+	$stsem_aktorNext = $stsem_aktorNext->getaktorNext(1);
+	//Ergebnis aus $stsem_aktorNext laden und den Timestamp der Semestermitte bestimmen.
+	$stsem_berechnet = new studiensemester();
+	$stsem_berechnet->load($stsem_aktorNext);
+	$mitte = (strtotime($stsem_berechnet->ende) - strtotime($stsem_berechnet->start)) / 2;
+	// Wenn die Haelfte des Wintersemesters vorbei ist, das naechste Wintersemester ermitteln, sonst das Aktuelle nehmen
+	if (strtotime($stsem_berechnet->ende) - $mitte <= time())
+	{
+		$stsem_dropdown = new studiensemester();
+		$stsem_dropdown->getNextStudiensemester('WS');
+		$stsem_dropdown = $stsem_dropdown->studiensemester_kurzbz;
+	}
+	else
+		$stsem_dropdown = $stsem_aktorNext;
 
 $user = get_uid();
 $datum_obj = new datum();
 $stg_kz = (isset($_GET['stg_kz']) ? $_GET['stg_kz'] : '');
 $reihungstest_id = (isset($_GET['reihungstest_id']) ? $_GET['reihungstest_id'] : '');
-$studiensemester_kurzbz = (isset($_GET['studiensemester_kurzbz']) ? $_GET['studiensemester_kurzbz'] : $stsem_akt);
+$studiensemester_kurzbz = (isset($_GET['studiensemester_kurzbz']) ? $_GET['studiensemester_kurzbz'] : $stsem_dropdown);
 $studienplan_id = (isset($_GET['studienplan_id']) ? $_GET['studienplan_id'] : '');
 $prestudent_id = (isset($_GET['prestudent_id']) ? $_GET['prestudent_id'] : '');
 $rtpunkte = (isset($_GET['rtpunkte']) ? $_GET['rtpunkte'] : '');
@@ -107,7 +122,7 @@ $studiengang = new studiengang();
 $studiengang->getAll('typ, kurzbz', false);
 
 $studiensemester = new Studiensemester();
-$studiensemester->getAll('DESC');
+$studiensemester->getAll('desc');
 
 $sprachen_obj = new sprache();
 $sprachen_obj->getAll();
@@ -527,7 +542,10 @@ if(isset($_GET['excel']))
 						for(i in ui.content)
 						{
 							ui.content[i].value=ui.content[i].ort_kurzbz;
-							ui.content[i].label=ui.content[i].ort_kurzbz+" "+ui.content[i].bezeichnung;
+							if (ui.content[i].arbeitsplaetze != '')
+								ui.content[i].label=ui.content[i].ort_kurzbz+" "+ui.content[i].bezeichnung+" ("+ui.content[i].arbeitsplaetze+" Arbeitsplätze)";
+							else
+								ui.content[i].label=ui.content[i].ort_kurzbz+" "+ui.content[i].bezeichnung;
 						}
 					},
 					select: function(event, ui)
@@ -587,8 +605,8 @@ if(isset($_GET['excel']))
 
 				if (typeof(Storage) !== 'undefined')
 				{
-					let arr = ['clm_prestudent_id','clm_person_id','clm_geschlecht','clm_studiengang','clm_studienplan','clm_orgform','clm_einstiegssemester','clm_geburtsdatum','clm_email','clm_absolviert','clm_ergebnis','clm_fas'];
-					for (let i of arr)
+					var arr = ['clm_prestudent_id','clm_person_id','clm_geschlecht','clm_studiengang','clm_studienplan','clm_orgform','clm_einstiegssemester','clm_geburtsdatum','clm_email','clm_absolviert','clm_ergebnis','clm_fas'];
+					for (var i of arr)
 					{
 						if (localStorage.getItem(i) != null)
 						{
@@ -617,14 +635,30 @@ if(isset($_GET['excel']))
 					$("#toggle_"+v.id).on('click', function(e) {
 						$("#"+v.id).checkboxes('toggle');
 						e.preventDefault();
+						if ($("input.chkbox:checked").size() > 0)
+							$("#mailSendButton").html('Mail an markierte Personen senden');
+						else
+							$("#mailSendButton").html('Mail an alle senden');
 					});
 
 					$("#uncheck_"+v.id).on('click', function(e) {
 						$("#"+v.id).checkboxes('uncheck');
 						e.preventDefault();
+						if ($("input.chkbox:checked").size() > 0)
+							$("#mailSendButton").html('Mail an markierte Personen senden');
+						else
+							$("#mailSendButton").html('Mail an alle senden');
 					});
 
 					$("#"+v.id).checkboxes('range', true);
+				});
+
+				$('.chkbox').change(function()
+				{
+					if ($("input.chkbox:checked").size() > 0)
+						$("#mailSendButton").html('Mail an markierte Personen senden');
+					else
+						$("#mailSendButton").html('Mail an alle senden');
 				});
 			});
 
@@ -682,6 +716,26 @@ if(isset($_GET['excel']))
 						alert("Fehler beim Laden der Daten: "+data);
 					}
 				});
+			}
+
+			function SendMail()
+			{
+				// Wenn Checkboxen markiert sind, an diese senden, sonst an alle
+				if ($("input.chkbox:checked").size() > 0)
+					var elements = $("input.chkbox:checked");
+				else
+					var elements = $("input.chkbox");
+				var mailadressen = '';
+				var adresse = '';
+
+				// Schleife ueber die einzelnen Elemente
+				$.each(elements, function(index, item)
+				{
+					adresse = $(this).closest('tr').find('td.clm_email a:first').attr('href');
+					adresse = adresse.replace(/^mailto?:/, '') + ';';
+					mailadressen += adresse;
+				});
+				window.location.href = "mailto:?bcc="+mailadressen;
 			}
 		</script>
 		<style type="text/css">
@@ -931,14 +985,14 @@ if ($reihungstest_id != '' || isset($_POST['reihungstest_id']))
 		$raum->load($row->ort_kurzbz);
 		if ($raum->arbeitsplaetze != '')
 		{
-			if(defined('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND') || REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND > 0)
+			if(defined('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND') && REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND > 0)
 				$orte_array[$row->ort_kurzbz] = $raum->arbeitsplaetze - ceil(($raum->arbeitsplaetze/100)*REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND);
 			else
 				$orte_array[$row->ort_kurzbz] = $raum->arbeitsplaetze;
 		}
 		else
 		{
-			if(defined('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND') || REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND > 0)
+			if(defined('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND') && REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND > 0)
 				$orte_array[$row->ort_kurzbz] = $raum->max_person - ceil(($raum->max_person/100)*REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND);
 			else
 				$orte_array[$row->ort_kurzbz] = $raum->max_person;
@@ -1404,7 +1458,12 @@ foreach ($studiensemester->studiensemester as $row)
 	else
 		$selected='';
 
-	echo '<OPTION value="'.$_SERVER['PHP_SELF'].'?studiensemester_kurzbz='.$row->studiensemester_kurzbz.'&stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest_id.'" '.$selected.'>'.$db->convert_html_chars($row->studiensemester_kurzbz).'</OPTION>'.'\n';
+	if ($row->ende < date('Y-m-d'))
+		$style = 'style="color: grey"';
+	else
+		$style = '';
+
+	echo '<OPTION value="'.$_SERVER['PHP_SELF'].'?studiensemester_kurzbz='.$row->studiensemester_kurzbz.'&stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest_id.'" '.$selected.' '.$style.'>'.$db->convert_html_chars($row->studiensemester_kurzbz).'</OPTION>'.'\n';
 }
 echo "</SELECT>";
 
@@ -1520,7 +1579,9 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				<select id='studiensemester_dropdown' name='studiensemester_kurzbz'>
 				<option value=''>-- keine Auswahl --</option>
 					<?php
-						foreach ($studiensemester->studiensemester as $row)
+						$stsem_zukuenftig = new Studiensemester();
+						$stsem_zukuenftig->getPlusMinus(5,1);
+						foreach ($stsem_zukuenftig->studiensemester as $row)
 						{
 							if($row->studiensemester_kurzbz == $studiensemester_kurzbz)
 								$selected='selected';
@@ -1666,13 +1727,18 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 					$anzeigename = '';
 
 				echo '<tr><td>&nbsp;</td>';
-				echo '<td class="listitem">'.$row->ort_kurzbz.' ('.$orte_array[$row->ort_kurzbz].' Personen)';
+				echo '<td class="listitem">'.$row->ort_kurzbz.' ('.$orte_array[$row->ort_kurzbz].' Arbeitsplätze';
+				if(defined('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND') && REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND > 0)
+					echo '*';
+				echo ')';
 				echo ' <input type="text" id="aufsicht_'.$row->ort_kurzbz.'" class="aufsicht_uid" name="aufsicht['.$row->ort_kurzbz.']" value="'.$anzeigename.'" placeholder="Aufsichtsperson" size="32">';
 				if ($rechte->isBerechtigt('lehre/reihungstestOrt', null, 'suid'))
 					echo '</td><td><button type="submit" name="delete_ort" value="'.$row->ort_kurzbz.'"><img src="../../skin/images/delete_x.png" alt="Ort hinzufügen" height="13px"></button>';
 				echo '</td></tr>';
 				$arbeitsplaetze_sum = $arbeitsplaetze_sum + $orte_array[$row->ort_kurzbz];
 			}
+			if(defined('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND') && REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND > 0)
+				echo '<tr><td>&nbsp;</td><td>* Inklusive '.REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND.'% Schwund</td></tr>';
 			//echo '</table></td>';
 		}
 		else
@@ -1705,7 +1771,13 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			<td class="feldtitel">Max TeilnehmerInnen</td>
 			<td>
 				<input type="number" name="max_teilnehmer" id="max_teilnehmer" value="<?php echo ($reihungstest->max_teilnehmer!=''?$reihungstest->max_teilnehmer:'') ?>">
-				(optional; <?php echo $arbeitsplaetze_sum; ?> laut Raumkapazität)
+				(optional; <?php echo $arbeitsplaetze_sum; ?> laut Raumkapazität
+				<?php
+					if(defined('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND') && REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND > 0)
+						echo ' inklusive '.REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND.'% Schwund)';
+					else
+						echo ')';
+				?>
 			</td>
 		</tr>
 		<tr>
@@ -1757,6 +1829,7 @@ if($reihungstest_id!='')
 {
 	echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&excel=true">Excel Export</a>';
 	echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&type=saveallrtpunkte">Punkte ins FAS &uuml;bertragen</a>';
+	echo '<a class="buttongreen" href="#" onclick="SendMail()" id="mailSendButton">Mail an alle senden</a>';
 }
 echo '<a class="buttongreen" href="../../cis/testtool/admin/auswertung.php?'.($reihungstest_id!=''?"reihungstest=$reihungstest_id":'').'" target="_blank">Auswertung</a>';
 echo '<a class="buttonorange" href="reihungstest_zusammenlegung.php">Anmeldungen zusammenlegen</a>';
@@ -1847,7 +1920,12 @@ if($reihungstest_id!='')
 
 	echo '<table width="100%"><tr><td>';
 	echo '<tr><td>';
-	echo '<span style="font-size: 9pt">Anzahl: '.$db->db_num_rows($result).'/'.($reihungstest->max_teilnehmer!=''?$reihungstest->max_teilnehmer:$arbeitsplaetze_sum).'</span>';
+	echo '<span style="font-size: 9pt">Anzahl: '.$db->db_num_rows($result).' ('.($reihungstest->max_teilnehmer!=''?$reihungstest->max_teilnehmer:$arbeitsplaetze_sum).' Plätze verfügbar)</span>';
+	if (	($reihungstest->max_teilnehmer!='' && $db->db_num_rows($result) > $reihungstest->max_teilnehmer)
+			|| ($reihungstest->max_teilnehmer=='' && $db->db_num_rows($result) > $arbeitsplaetze_sum)
+			&& !empty($orte_array)
+		)
+		echo '<br><span style="color: red"><b>Achtung!</b> Anzahl Arbeitsplätze überschritten</span>';
 	echo '</td></tr>';
 	echo '<tr><td>';
 	echo '<div id="clm_prestudent_id" class="active" onclick="hideColumn(\'clm_prestudent_id\')">Prestudent ID</div>';
@@ -2113,7 +2191,6 @@ if($reihungstest_id!='')
 	}
 
 	echo '</tr></table>';
-	//echo "<span style='font-size: 9pt'><a href='mailto:?bcc=$mailto'>Mail an alle senden</a></span>"; //@todo: Braucht man das noch oder eventuell gleich raumweise?
 } ?>
 
 	</body>
