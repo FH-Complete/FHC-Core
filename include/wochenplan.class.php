@@ -1067,18 +1067,21 @@ class wochenplan extends basis_db
 
 				//Spezialgruppen aus den Studiengaengen mit erweiterten Reservierungsberechtigung holen
 				$stgs = $rechte->getStgKz('lehre/reservierung');
-				$in='';
-				foreach($stgs as $stg)
+				if(count($stgs)>0)
 				{
-					$in .= $this->db_add_param($stg).",";
-				}
-				$in = substr($in, 0, -1);
-				$qry = "SELECT * FROM public.tbl_gruppe WHERE studiengang_kz in($in) AND lehre=true AND sichtbar=true ORDER BY gruppe_kurzbz";
-				if($result = $this->db_query($qry))
-				{
-					while($row = $this->db_fetch_object($result))
+					$in='';
+					foreach($stgs as $stg)
 					{
-						echo '<OPTION value="'.$row->gruppe_kurzbz.'">'.$row->gruppe_kurzbz.'</OPTION>'.$this->crlf;
+						$in .= $this->db_add_param($stg).",";
+					}
+					$in = substr($in, 0, -1);
+					$qry = "SELECT * FROM public.tbl_gruppe WHERE studiengang_kz in($in) AND lehre=true AND sichtbar=true ORDER BY gruppe_kurzbz";
+					if($result = $this->db_query($qry))
+					{
+						while($row = $this->db_fetch_object($result))
+						{
+							echo '<OPTION value="'.$row->gruppe_kurzbz.'">'.$row->gruppe_kurzbz.'</OPTION>'.$this->crlf;
+						}
 					}
 				}
 				echo '</SELECT></td>'.$this->crlf;
