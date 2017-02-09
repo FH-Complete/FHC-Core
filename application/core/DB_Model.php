@@ -313,7 +313,9 @@ class DB_Model extends FHC_Model
 					}
 					
 					// If the side table has data. If it was used a left join all the properties could be null
-					if (!empty(array_filter(get_object_vars($sideTableObj))))
+					// NOTE: Keep this way to be compatible with a php version older than 5.5
+					$tmpFilteredArray = array_filter(get_object_vars($sideTableObj));
+					if (isset($tmpFilteredArray) && count($tmpFilteredArray) > 0)
 					{
 						if (($k = $this->findMainTable($mainTableObj, $returnArray)) === false)
 						{
