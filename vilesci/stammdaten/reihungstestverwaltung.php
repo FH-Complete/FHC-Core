@@ -66,7 +66,7 @@ if (!$db = new basis_db())
 	//Mit getAktOrNext das aktuelle oder kommende WINTERsemester auslesen
 	$stsem_aktorNext = new studiensemester();
 	$stsem_aktorNext = $stsem_aktorNext->getaktorNext(1);
-	//Ergebnis aus $stsem_aktorNext laden und den Timestamp der Semestermitte bestimmen. 
+	//Ergebnis aus $stsem_aktorNext laden und den Timestamp der Semestermitte bestimmen.
 	$stsem_berechnet = new studiensemester();
 	$stsem_berechnet->load($stsem_aktorNext);
 	$mitte = (strtotime($stsem_berechnet->ende) - strtotime($stsem_berechnet->start)) / 2;
@@ -77,7 +77,7 @@ if (!$db = new basis_db())
 		$stsem_dropdown->getNextStudiensemester('WS');
 		$stsem_dropdown = $stsem_dropdown->studiensemester_kurzbz;
 	}
-	else 
+	else
 		$stsem_dropdown = $stsem_aktorNext;
 
 $user = get_uid();
@@ -605,8 +605,8 @@ if(isset($_GET['excel']))
 
 				if (typeof(Storage) !== 'undefined')
 				{
-					let arr = ['clm_prestudent_id','clm_person_id','clm_geschlecht','clm_studiengang','clm_studienplan','clm_orgform','clm_einstiegssemester','clm_geburtsdatum','clm_email','clm_absolviert','clm_ergebnis','clm_fas'];
-					for (let i of arr)
+					var arr = ['clm_prestudent_id','clm_person_id','clm_geschlecht','clm_studiengang','clm_studienplan','clm_orgform','clm_einstiegssemester','clm_geburtsdatum','clm_email','clm_absolviert','clm_ergebnis','clm_fas'];
+					for (var i of arr)
 					{
 						if (localStorage.getItem(i) != null)
 						{
@@ -653,7 +653,7 @@ if(isset($_GET['excel']))
 					$("#"+v.id).checkboxes('range', true);
 				});
 
-				$('.chkbox').change(function() 
+				$('.chkbox').change(function()
 				{
 					if ($("input.chkbox:checked").size() > 0)
 						$("#mailSendButton").html('Mail an markierte Personen senden');
@@ -729,7 +729,7 @@ if(isset($_GET['excel']))
 				var adresse = '';
 
 				// Schleife ueber die einzelnen Elemente
-				$.each(elements, function(index, item) 
+				$.each(elements, function(index, item)
 				{
 					adresse = $(this).closest('tr').find('td.clm_email a:first').attr('href');
 					adresse = adresse.replace(/^mailto?:/, '') + ';';
@@ -1460,7 +1460,7 @@ foreach ($studiensemester->studiensemester as $row)
 
 	if ($row->ende < date('Y-m-d'))
 		$style = 'style="color: grey"';
-	else 
+	else
 		$style = '';
 
 	echo '<OPTION value="'.$_SERVER['PHP_SELF'].'?studiensemester_kurzbz='.$row->studiensemester_kurzbz.'&stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest_id.'" '.$selected.' '.$style.'>'.$db->convert_html_chars($row->studiensemester_kurzbz).'</OPTION>'.'\n';
@@ -1772,7 +1772,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			<td>
 				<input type="number" name="max_teilnehmer" id="max_teilnehmer" value="<?php echo ($reihungstest->max_teilnehmer!=''?$reihungstest->max_teilnehmer:'') ?>">
 				(optional; <?php echo $arbeitsplaetze_sum; ?> laut Raumkapazität
-				<?php 
+				<?php
 					if(defined('REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND') && REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND > 0)
 						echo ' inklusive '.REIHUNGSTEST_ARBEITSPLAETZE_SCHWUND.'% Schwund)';
 					else
@@ -1921,7 +1921,7 @@ if($reihungstest_id!='')
 	echo '<table width="100%"><tr><td>';
 	echo '<tr><td>';
 	echo '<span style="font-size: 9pt">Anzahl: '.$db->db_num_rows($result).' ('.($reihungstest->max_teilnehmer!=''?$reihungstest->max_teilnehmer:$arbeitsplaetze_sum).' Plätze verfügbar)</span>';
-	if (	($reihungstest->max_teilnehmer!='' && $db->db_num_rows($result) > $reihungstest->max_teilnehmer) 
+	if (	($reihungstest->max_teilnehmer!='' && $db->db_num_rows($result) > $reihungstest->max_teilnehmer)
 			|| ($reihungstest->max_teilnehmer=='' && $db->db_num_rows($result) > $arbeitsplaetze_sum)
 			&& !empty($orte_array)
 		)
