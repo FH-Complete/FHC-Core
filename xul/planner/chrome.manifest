@@ -1,9 +1,0 @@
-content planner	chrome/content/
-skin	planner	classic/1.0	chrome/skin/
-overlay   chrome://browser/content/browser.xul   chrome://planner/content/browser-overlay.xul
-style   chrome://browser/content/browser.xul chrome://planner/skin/planner.css
-overlay   chrome://navigator/content/navigator.xul   chrome://planner/content/browser-overlay.xul
-
-locale    planner   en-US         chrome/locale/en-US/
-locale    planner   de-AT         chrome/locale/de-AT/
-

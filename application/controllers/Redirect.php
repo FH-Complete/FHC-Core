@@ -22,15 +22,13 @@ class Redirect extends FHC_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		// Loads config file fhcomplete
 		$this->config->load('fhcomplete');
 	}
-	
+
 	public function redirectByToken($token)
 	{
-		var_dump($token);
-		
 		if (isset($token))
 		{
 			redirect($this->config->item('addons_aufnahme_url') . '?token=' . $token);
