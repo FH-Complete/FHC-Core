@@ -1425,7 +1425,7 @@ foreach($studienplan_obj->result as $row_sto)
 	$studienplan_arr[$row_sto->studienordnung_id][$row_sto->studienplan_id]['bezeichnung']=$row_sto->bezeichnung_studienplan;
 
 	$studienplan_arr[$row_sto->studienordnung_id][$row_sto->studienplan_id]['orgform_kurzbz']=$row_sto->orgform_kurzbz;
-	$studienplan_arr[$row_sto->studienordnung_id][$row_sto->studienplan_id]['sprache']=$sprachen_arr[$row_sto->sprache];
+	$studienplan_arr[$row_sto->studienordnung_id][$row_sto->studienplan_id]['sprache']=(isset($sprachen_arr[$row_sto->sprache])?$sprachen_arr[$row_sto->sprache]:'');
 	$studienplaene_verwendet[$row_sto->studienplan_id] = $row_sto->bezeichnung_studienplan;
 }
 
