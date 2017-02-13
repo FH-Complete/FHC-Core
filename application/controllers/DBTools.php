@@ -1,8 +1,8 @@
 <?php
- 
+
 if (! defined('BASEPATH'))
 	exit('No direct script access allowed');
- 
+
 /**
  * Database Class
  *
@@ -30,46 +30,40 @@ class DBTools extends FHC_Controller
 	 *
 	 * @return	void
 	 */
-    public function __construct()
-    {
-        parent::__construct();
- 		
+	public function __construct()
+	{
+		parent::__construct();
+
 		$this->seed_path = APPPATH.'seeds/';
-		
+
 		if ($this->input->is_cli_request())
 		{
 			$cli = true;
+
+			$this->load->database('system'); //Use the system-Connection for DB-Manipulation
+			$this->config->load('migration');
+			$this->load->library('migration');
+
+			// If not set, set it
+			$this->seed_path !== '' OR $this->seed_path = APPPATH.'seeds/';
+			// Add trailing slash if not set
+			$this->seed_path = rtrim($this->seed_path, '/').'/';
+
+			// Load seed language
+			$this->lang->load('seed');
+
+			// initiate faker
+			$this->faker = \Faker\Factory::create();
+
 		}
 		else
 		{
-			//$this->output->set_status_header(403, 'Migrations must be run from the CLI');
-			//exit;
+			$this->output->set_status_header(403, 'Migrations must be run from the CLI');
+			echo "Migrations must be run from the CLI";
+			exit;
 		}
-		
-        // can only be run in the development environment
-        if (ENVIRONMENT == 'production')
-            exit('Wowsers! You don\'t want to do that!');
- 		$this->load->database('system'); //Use the system-Connection for DB-Manipulation
-		$this->config->load('migration');
-		$this->load->library('migration');
- 
-		// If not set, set it
-		$this->seed_path !== '' OR $this->seed_path = APPPATH.'seeds/';
-		// Add trailing slash if not set
-		$this->seed_path = rtrim($this->seed_path, '/').'/';
+	}
 
-		// Load seed language
-		$this->lang->load('seed');
-
-        // initiate faker
-        $this->faker = \Faker\Factory::create();
- 
-        // load any required models
-        //$this->load->model('person/Person_model');
-		
-		log_message('info', 'DB-Tools Controller Initialized');
-    }
- 
 	/**
 	 * Main function index as help
 	 *
@@ -92,23 +86,23 @@ class DBTools extends FHC_Controller
 	 * @return	void
 	 */
 	public function migrate($version = 'latest')
-    {
+	{
 		echo 'DB-Migration';
-	    if ($version != 'latest' && $version != 'current')
+		if ($version != 'latest' && $version != 'current')
 		{
 			$this->__failed('Migration version must be either latest or current');
 		}
 		elseif ($this->cli && !$this->migration->$version())
-	    {
-	        show_error($this->migration->error_string());
-	    }
+		{
+			show_error($this->migration->error_string());
+		}
 		elseif (!$this->migration->$version())
 		{
 			$this->__failed();
 		}
 
 		$this->__succeeded();
-    }
+	}
 
 
 	/**
@@ -165,7 +159,7 @@ class DBTools extends FHC_Controller
 		$this->rollback(0);
 	}
 
-    /**
+	/**
 	 * Seeds DB with Testdata
 	 *
 	 * @param	string	$name Name of the seed file.
@@ -184,7 +178,7 @@ class DBTools extends FHC_Controller
 		$method = 'seed';
 		$pending = array();
 
-		
+
 		foreach ($seeds as $number => $file)
 		{
 			include_once($file);
@@ -207,28 +201,28 @@ class DBTools extends FHC_Controller
 
 			$pending[$number] = array($class, $method);
 		}
-		
+
 		// Now just run the necessary seeds
 		foreach ($pending as $number => $seed)
 		{
 			if (is_null($name))
 			{
 				log_message('debug', 'Seeding '.$method);
-			
+
 				$seed[0] = new $seed[0];
 				call_user_func($seed);
 			}
 			elseif ($seed[0] == 'Seed_'.$name)
 			{
 				log_message('debug', 'Seeding '.$method);
-			
+
 				$seed[0] = new $seed[0];
 				call_user_func($seed);
 			}
 		}
 	}
- 
-    /**
+
+	/**
 	 * Retrieves list of available seed files
 	 *
 	 * @return	array	list of seed file paths sorted by version
@@ -281,7 +275,7 @@ class DBTools extends FHC_Controller
 		$method = 'truncate';
 		$pending = array();
 
-		
+
 		foreach ($seeds as $number => $file)
 		{
 			include_once($file);
@@ -304,21 +298,21 @@ class DBTools extends FHC_Controller
 
 			$pending[$number] = array($class, $method);
 		}
-		
+
 		// Now just run the necessary seeds
 		foreach ($pending as $number => $seed)
 		{
 			if (is_null($name))
 			{
 				log_message('debug', 'Seeding '.$method);
-			
+
 				$seed[0] = new $seed[0];
 				call_user_func($seed);
 			}
 			elseif ($seed[0] == 'Seed_'.$name)
 			{
 				log_message('debug', 'Seeding '.$method);
-			
+
 				$seed[0] = new $seed[0];
 				call_user_func($seed);
 			}
@@ -433,7 +427,7 @@ class DBTools extends FHC_Controller
 					foreach ($role['berechtigung'] as $b)
 					{
 						$qry = "SELECT * FROM system.tbl_rolleberechtigung
-								WHERE rolle_kurzbz='".$role['rolle_kurzbz']."' 
+								WHERE rolle_kurzbz='".$role['rolle_kurzbz']."'
 								AND berechtigung_kurzbz='".$b."';";
 
 						if($result = $this->db->query($qry))
@@ -462,7 +456,7 @@ class DBTools extends FHC_Controller
 		}
 
 		exit('Succesfully checked!');
-    }
+	}
 
 	/**
 	 * Create User in DB
@@ -471,9 +465,9 @@ class DBTools extends FHC_Controller
 	 * @return	void
 	 */
 	public function createadminuser($uid, $person_id = 1)
-    {
+	{
 		echo 'Create User!';
-	    $qry = "SELECT * FROM public.tbl_benutzer
+		$qry = "SELECT * FROM public.tbl_benutzer
 							WHERE uid='".$uid."';";
 		if ($result = $this->db->query($qry))
 		{
@@ -495,7 +489,7 @@ class DBTools extends FHC_Controller
 		}
 
 		exit('Succesfully created User!');
-    }
+	}
 }
 
 /* Check also this permissions:
