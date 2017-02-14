@@ -591,29 +591,12 @@ if(!$error)
 					// kann in Config abgestellt werden
 					if(REIHUNGSTEST_CHECK)
 					{
-						$rt = new reihungstest();
-						$rt->getReihungstestPerson($prestd->person_id);
-						// Pruefen ob Person an zumindest einem RT-Termin teilgenommen hat
-						$reihungstestangetreten=false;
-						foreach($rt->result as $row_rt)
-						{
-							if($row_rt->teilgenommen)
-							{
-								$reihungstestangetreten=true;
-								break;
-							}
-						}
-						if($_POST['status_kurzbz']=='Bewerber' && count($rt->result)==0)
-						{
-							$error = true;
-							$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss ein Reihungstest zugeteilt sein.";
-							$anzahl_fehler++;
-						}
+						$reihungstestangetreten = $prestd->reihungstestangetreten;
 
 						if($_POST['status_kurzbz']=='Bewerber' && !$reihungstestangetreten)
 						{
 							$error = true;
-							$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Person an einem Reihungstest teilgenommen haben";
+							$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss die Person das Reihungstestverfahren abgeschlossen haben";
 							$anzahl_fehler++;
 						}
 					}
