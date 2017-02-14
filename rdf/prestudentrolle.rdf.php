@@ -49,24 +49,24 @@ echo '
 
 if(isset($_GET['prestudent_id']) && is_numeric($_GET['prestudent_id']))
 	$prestudent_id = $_GET['prestudent_id'];
-else 
+else
 	die('Prestudent_id muss angegeben werden');
-	
+
 if(isset($_GET['status_kurzbz']))
 	$status_kurzbz = $_GET['status_kurzbz'];
-else 
+else
 	$status_kurzbz=null;
-	
+
 if(isset($_GET['studiensemester_kurzbz']))
 	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
-else 
+else
 	$studiensemester_kurzbz=null;
 
 if(isset($_GET['ausbildungssemester']))
 	$ausbildungssemester=$_GET['ausbildungssemester'];
-else 
+else
 	$ausbildungssemester=null;
-	
+
 $ps = new prestudent();
 $ps->getPrestudentRolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, 'datum desc, insertamum desc', $ausbildungssemester);
 
@@ -88,6 +88,8 @@ foreach($ps->result as $row)
         	<ROLLE:bestaetigt_von><![CDATA['.$row->bestaetigtvon.']]></ROLLE:bestaetigt_von>
         	<ROLLE:bestaetigt_am><![CDATA['.$datum->convertISODate($row->bestaetigtam).']]></ROLLE:bestaetigt_am>
         	<ROLLE:anmerkung><![CDATA['.$row->anmerkung_status.']]></ROLLE:anmerkung>
+			<ROLLE:rt_stufe><![CDATA['.$row->rt_stufe.']]></ROLLE:rt_stufe>
+			<ROLLE:statusgrund_id><![CDATA['.$row->statusgrund_id.']]></ROLLE:statusgrund_id>
       	</RDF:Description>
       </RDF:li>
 	';

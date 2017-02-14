@@ -84,6 +84,8 @@ class prestudent extends person
 	public $bestaetigtam;
 	public $bestaetigtvon;
 	public $bewerbung_abgeschicktamum;
+	public $statusgrund_id;
+	public $rt_stufe;
 
     public $studiensemester_old = '';
     public $ausbildungssemester_old = '';
@@ -458,6 +460,8 @@ class prestudent extends person
 				$rolle->bestaetigtvon = $row->bestaetigtvon;
 				$rolle->anmerkung_status = $row->anmerkung;
 				$rolle->bewerbung_abgeschicktamum = $row->bewerbung_abgeschicktamum;
+				$rolle->rt_stufe = $row->rt_stufe;
+				$rolle->statusgrund_id = $row->statusgrund_id;
 				$this->result[] = $rolle;
 			}
 			return true;
@@ -511,6 +515,8 @@ class prestudent extends person
 				$this->bestaetigtvon = $row->bestaetigtvon;
 				$this->anmerkung_status = $row->anmerkung;
 				$this->bewerbung_abgeschicktamum = $row->bewerbung_abgeschicktamum;
+				$this->statusgrund_id = $row->statusgrund_id;
+				$this->rt_stufe = $row->rt_stufe;
 
 				return true;
 			}
@@ -789,7 +795,7 @@ class prestudent extends person
 			$qry = 'INSERT INTO public.tbl_prestudentstatus (prestudent_id, status_kurzbz,
 					studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon,
 					updateamum, updatevon, ext_id, orgform_kurzbz, bestaetigtam, bestaetigtvon, anmerkung,
-					bewerbung_abgeschicktamum, studienplan_id) VALUES('.
+					bewerbung_abgeschicktamum, studienplan_id, rt_stufe, statusgrund_id) VALUES('.
 			       $this->db_add_param($this->prestudent_id).",".
 			       $this->db_add_param($this->status_kurzbz).",".
 			       $this->db_add_param($this->studiensemester_kurzbz).",".
@@ -805,7 +811,9 @@ class prestudent extends person
 			       $this->db_add_param($this->bestaetigtvon).",".
 			       $this->db_add_param($this->anmerkung_status).",".
 			       $this->db_add_param($this->bewerbung_abgeschicktamum).",".
-				   $this->db_add_param($this->studienplan_id,FHC_INTEGER).");";
+				   $this->db_add_param($this->studienplan_id,FHC_INTEGER).",".
+				   $this->db_add_param($this->rt_stufe,FHC_INTEGER).",".
+					$this->db_add_param($this->statusgrund_id, FHC_INTEGER).");";
 		}
 		else
 		{
@@ -835,7 +843,9 @@ class prestudent extends person
 			       ' bewerbung_abgeschicktamum='.$this->db_add_param($this->bewerbung_abgeschicktamum).",".
 				   ' studienplan_id='.$this->db_add_param($this->studienplan_id, FHC_INTEGER).",".
 				   ' anmerkung='.$this->db_add_param($this->anmerkung_status).",".
-			       ' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).
+			       ' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).",".
+				   ' rt_stufe='.$this->db_add_param($this->rt_stufe).",".
+				   ' statusgrund_id='.$this->db_add_param($this->statusgrund_id, FHC_INTEGER)." ".
 			       " WHERE
 						prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER, false)."
 						AND status_kurzbz=".$this->db_add_param($this->status_kurzbz, FHC_STRING, false)."
@@ -890,7 +900,8 @@ class prestudent extends person
 			$log->sql = $qry;
 			$log->sqlundo = 'INSERT INTO public.tbl_prestudentstatus(prestudent_id, status_kurzbz, studiensemester_kurzbz,'
 							. ' ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz,'
-							. ' bestaetigtam, bestaetigtvon, anmerkung, bewerbung_abgeschicktamum, studienplan_id) VALUES('.
+							. ' bestaetigtam, bestaetigtvon, anmerkung, bewerbung_abgeschicktamum, studienplan_id, '
+							. ' rt_stufe, statusgrund_id) VALUES('.
 							$this->db_add_param($this->prestudent_id).','.
 							$this->db_add_param($this->status_kurzbz).','.
 							$this->db_add_param($this->studiensemester_kurzbz).','.
@@ -906,7 +917,9 @@ class prestudent extends person
 							$this->db_add_param($this->bestaetigtvon).','.
 							$this->db_add_param($this->anmerkung_status).','.
 							$this->db_add_param($this->bewerbung_abgeschicktamum).','.
-							$this->db_add_param($this->studienplan_id, FHC_INTEGER).');';
+							$this->db_add_param($this->studienplan_id, FHC_INTEGER).','.
+							$this->db_add_param($this->rt_stufe, FHC_INTEGER).','.
+							$this->db_add_param($this->statusgrund_id, FHC_INTEGER).');';
 			if($log->save(true))
 			{
 
@@ -1013,6 +1026,8 @@ class prestudent extends person
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				$this->studienplan_id = $row->studienplan_id;
 				$this->studienplan_bezeichnung = $row->studienplan_bezeichnung;
+				$this->rt_stufe = $row->rt_stufe;
+				$this->statusgrund_id = $row->statusgrund_id;
 				return true;
 			}
 			else
@@ -1065,6 +1080,8 @@ class prestudent extends person
 				$this->bewerbung_abgeschicktamum = $row->bewerbung_abgeschicktamum;
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				$this->studienplan_id = $row->studienplan_id;
+				$this->rt_stufe = $row->rt_stufe;
+				$this->statusgrund_id = $row->statusgrund_id;
 				return true;
 			}
 			else

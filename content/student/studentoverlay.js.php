@@ -1807,7 +1807,7 @@ function StudentRolleBearbeiten()
 	var prestudent_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-prestudent_id', tree.currentIndex);
 	var ausbildungssemester = getTreeCellText(tree, 'student-prestudent-tree-rolle-ausbildungssemester', tree.currentIndex);
 
-	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id+'&status_kurzbz='+status_kurzbz+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&ausbildungssemester='+ausbildungssemester,"Status","status=no, width=500, height=350, centerscreen, resizable");
+	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id+'&status_kurzbz='+status_kurzbz+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&ausbildungssemester='+ausbildungssemester,"Status","status=no, width=500, height=450, centerscreen, resizable");
 }
 
 // ****
@@ -1828,6 +1828,8 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	orgform_kurzbz = dialog.getElementById('student-rolle-menulist-orgform_kurzbz').value;
 	studienplan_id = dialog.getElementById('student-rolle-menulist-studienplan').value;
 	anmerkung = dialog.getElementById('student-rolle-textbox-anmerkung').value;
+	rt_stufe = dialog.getElementById('student-rolle-menulist-stufe').value;
+	statusgrund_id = dialog.getElementById('student-rolle-menulist-statusgrund').value;
 
 	if(!CheckDatum(datum))
 	{
@@ -1856,6 +1858,8 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	req.add('orgform_kurzbz', orgform_kurzbz);
 	req.add('studienplan_id', studienplan_id);
 	req.add('anmerkung', anmerkung);
+	req.add('rt_stufe', rt_stufe);
+	req.add('statusgrund_id', statusgrund_id);
 
 	var response = req.executePOST();
 
@@ -1922,7 +1926,7 @@ function StudentUnterbrecherZuStudent()
 function StudentRolleAdd()
 {
 	var prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
-	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id,"Status","chrome, status=no, width=500, height=300, centerscreen, resizable");
+	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id,"Status","chrome, status=no, width=500, height=450, centerscreen, resizable");
 }
 
 // ****

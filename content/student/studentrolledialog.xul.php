@@ -39,22 +39,22 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 
 if(isset($_GET['prestudent_id']))
 	$prestudent_id=$_GET['prestudent_id'];
-else 
+else
 	$prestudent_id='';
-	
+
 if(isset($_GET['status_kurzbz']))
 	$status_kurzbz=$_GET['status_kurzbz'];
-else 
+else
 	$status_kurzbz='';
-	
+
 if(isset($_GET['studiensemester_kurzbz']))
 	$studiensemester_kurzbz=$_GET['studiensemester_kurzbz'];
-else 
+else
 	$studiensemester_kurzbz='';
-	
+
 if(isset($_GET['ausbildungssemester']))
 	$ausbildungssemester=$_GET['ausbildungssemester'];
-else 
+else
 	$ausbildungssemester='';
 
 $vorname = '';
@@ -63,7 +63,7 @@ if($prestudent_id!='')
 {
 	$prestudent = new prestudent();
 	$prestudent->load($prestudent_id);
-	
+
 	$vorname = $prestudent->vorname;
 	$nachname = $prestudent->nachname;
 }
@@ -108,24 +108,24 @@ $db = new basis_db();
 				</row>
 				<row>
 					<label value="Studiensemester" control="student-rolle-menulist-studiensemester"/>
-					<menulist id="student-rolle-menulist-studiensemester" 
+					<menulist id="student-rolle-menulist-studiensemester"
 					          datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php?order=desc" flex="1"
 					          ref="http://www.technikum-wien.at/studiensemester/liste" >
 						<template>
 							<menupopup>
 								<menuitem value="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
-					        		      label="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
-								  		  uri="rdf:*"/>
+								          label="rdf:http://www.technikum-wien.at/studiensemester/rdf#kurzbz"
+								          uri="rdf:*"/>
 								</menupopup>
 						</template>
 					</menulist>
-      			</row>
-      			<row>
-      				<label value="Ausbildungssemester" control="student-rolle-menulist-ausbildungssemester"/>
+	  			</row>
+	  			<row>
+	  				<label value="Ausbildungssemester" control="student-rolle-menulist-ausbildungssemester"/>
 					<menulist id="student-rolle-menulist-ausbildungssemester" >
 						<menupopup>
 						<?php
-						
+
 							if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false)
 							{
 								$maxsem=100;
@@ -142,7 +142,7 @@ $db = new basis_db();
 									}
 								}
 							}
-														
+
 							for($i=0;$i<=$maxsem;$i++)
 							{
 								echo '<menuitem value="'.$i.'" label="'.$i.'"/>';
@@ -150,17 +150,17 @@ $db = new basis_db();
 						?>
 						</menupopup>
 					</menulist>
-      			</row>
-      			<?php
-      				$hidden='true';
-      				$qry = "SELECT mischform FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE prestudent_id='$prestudent_id'";
-      				if($result = $db->db_query($qry))
-      					if($row = $db->db_fetch_object($result))
-      						if($row->mischform=='t')
-      							$hidden='false';
-      			?>
-      			<row hidden="<?php echo $hidden; ?>">		
-      				<label value="Organisationsform" control="student-rolle-menulist-orgform_kurzbz"/>
+				</row>
+				<?php
+					$hidden = 'true';
+					$qry = "SELECT mischform FROM public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) WHERE prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER);
+					if($result = $db->db_query($qry))
+						if($row = $db->db_fetch_object($result))
+							if($row->mischform=='t')
+								$hidden='false';
+				?>
+				<row hidden="<?php echo $hidden; ?>">
+					<label value="Organisationsform" control="student-rolle-menulist-orgform_kurzbz"/>
 					<menulist id="student-rolle-menulist-orgform_kurzbz" >
 						<menupopup>
 						<menuitem value="" label="-- keine Auswahl --"/>
@@ -176,7 +176,7 @@ $db = new basis_db();
 						?>
 						</menupopup>
 					</menulist>
-      			</row>
+				</row>
 				<row>
 					<label value="Datum" control="student-rolle-datum-datum"/>
 					<box class='Datum' id="student-rolle-datum-datum" />
@@ -205,6 +205,31 @@ $db = new basis_db();
 				<row>
 					<label value="Anmerkung"/>
 					<textbox id="student-rolle-textbox-anmerkung" multiline="true" />
+				</row>
+				<row>
+					<label value="Aufnahmestufe"/>
+					<menulist id="student-rolle-menulist-stufe" disabled="false">
+						<menupopup>
+							<menuitem value="" label="-- keine Auswahl --"/>
+							<menuitem value="1" label="1"/>
+							<menuitem value="2" label="2"/>
+							<menuitem value="3" label="3"/>
+						</menupopup>
+					</menulist>
+				</row>
+				<row>
+					<label value="Grund"/>
+					<menulist id="student-rolle-menulist-statusgrund"
+					          datasources="rdf:null" flex="1"
+					          ref="http://www.technikum-wien.at/statusgrund" >
+						<template>
+							<menupopup>
+								<menuitem value="rdf:http://www.technikum-wien.at/statusgrund/rdf#statusgrund_id"
+								          label="rdf:http://www.technikum-wien.at/statusgrund/rdf#bezeichnung_mehrsprachig"
+								          uri="rdf:*"/>
+								</menupopup>
+						</template>
+					</menulist>
 				</row>
 			</rows>
 	</grid>
