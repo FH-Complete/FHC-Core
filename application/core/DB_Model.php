@@ -430,6 +430,29 @@ class DB_Model extends FHC_Model
 	}
 	
 	/** ---------------------------------------------------------------
+	 * Add a table in the from clause
+	 *
+	 * @return  void
+	 */
+	public function addFrom($table, $alias = null)
+	{
+		$tmpTable = trim($table);
+		
+		// Check parameters
+		if (empty($tmpTable))
+			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
+		
+		if (!empty($alias))
+		{
+			$tmpTable .= ' AS ' . $alias;
+		}
+		
+		$this->db->from($tmpTable);
+		
+		return success(true);
+	}
+	
+	/** ---------------------------------------------------------------
 	 * Reset the query builder state
 	 *
 	 * @return  void
