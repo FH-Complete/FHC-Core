@@ -127,6 +127,8 @@ switch($method)
         $data = getPrestudenten($uid, $aktStudiensemester);
         break;
 	default:
+        $data['error']='true';
+        $data['errormsg']="unknown method: ".$method;
 	    break;
 }
 
