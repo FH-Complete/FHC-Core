@@ -33,7 +33,6 @@ var StudentRolleStatusgrundDatasource;
 function StudentRolleInit(prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	StudentRolleLoadStatusgrund(status_kurzbz)
 	if(status_kurzbz!='')
 	{
 		document.getElementById('student-rolle-grid-row-textbox').hidden=false;
@@ -63,6 +62,7 @@ function StudentRolleInit(prestudent_id, status_kurzbz, studiensemester_kurzbz, 
 		var statusgrund_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#statusgrund_id" ));
 		var rt_stufe = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#rt_stufe" ));
 		var neu = false;
+		StudentRolleLoadStatusgrund(status_kurzbz);
 	}
 	else
 	{
@@ -83,6 +83,7 @@ function StudentRolleInit(prestudent_id, status_kurzbz, studiensemester_kurzbz, 
 		var anmerkung = '';
 		var statusgrund_id = '';
 		var rt_stufe = '';
+		StudentRolleLoadStatusgrund(status_kurzbz);
 	}
 
 	document.getElementById('student-rolle-textbox-prestudent_id').value=prestudent_id;
@@ -138,4 +139,14 @@ function StudentRolleLoadStatusgrund(status_kurzbz)
 	StudentRolleStatusgrundDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	menulistgrund.database.AddDataSource(StudentRolleStatusgrundDatasource);
 	menulistgrund.builder.rebuild();
+}
+
+/**
+ * Wenn das Dropdown fuer den Status geaendert wird, dann
+ * werden die Statusgruende zu diesem Status geladen
+ */
+function StudentRolleChangeStatus()
+{
+	var status = document.getElementById('student-rolle-menulist-status_kurzbz').value;
+	StudentRolleLoadStatusgrund(status);
 }

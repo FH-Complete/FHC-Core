@@ -94,7 +94,7 @@ $db = new basis_db();
 				</row>
 				<row id="student-rolle-grid-row-menulist" hidden="true">
 					<label value="Rolle"/>
-					<menulist id="student-rolle-menulist-status_kurzbz" disabled="false">
+					<menulist id="student-rolle-menulist-status_kurzbz" disabled="false" oncommand="StudentRolleChangeStatus()">
 						<menupopup>
 							<menuitem value="Interessent" label="Interessent"/>
 							<menuitem value="Bewerber" label="Bewerber"/>
