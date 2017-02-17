@@ -1900,7 +1900,7 @@ function StudentAnmeldungreihungstestHeute()
 // ****
 // * Einen Ab-/Unterbrecher wieder zum Studenten machen
 // ****
-function StudentUnterbrecherZuStudent()
+function StudentUnterbrecherZuStudent(statusgrund_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-tree');
@@ -1911,7 +1911,7 @@ function StudentUnterbrecherZuStudent()
 	{
 		if(!isNaN(sem))
 		{
-			StudentAddRolle('Student', sem)
+			StudentAddRolle('Student', sem, undefined, statusgrund_id);
 		}
 		else
 		{
@@ -1932,7 +1932,7 @@ function StudentRolleAdd()
 // ****
 // * Fuegt eine Rolle zu einem Studenten hinzu
 // ****
-function StudentAddRolle(rolle, semester, studiensemester)
+function StudentAddRolle(rolle, semester, studiensemester, statusgrund_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-tree');
@@ -1975,8 +1975,10 @@ function StudentAddRolle(rolle, semester, studiensemester)
 		req.add('prestudent_id', paramList);
 		req.add('status_kurzbz', rolle);
 		req.add('semester', semester);
-		if(typeof(studiensemester)!='unknown')
+		if(typeof(studiensemester)!='undefined')
 			req.add('studiensemester_kurzbz', studiensemester);
+		if(typeof(statusgrund_id)!='undefined')
+			req.add('statusgrund_id', statusgrund_id);
 
 		var response = req.executePOST();
 

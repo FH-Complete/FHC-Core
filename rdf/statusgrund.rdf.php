@@ -43,8 +43,17 @@ $oRdf->obj[$i]->setAttribut('beschreibung','-- keine Auswahl --',true);
 $oRdf->obj[$i]->setAttribut('bezeichnung_mehrsprachig','-- keine Auswahl --',true);
 $oRdf->addSequence('');
 
+$include_id_found=false;
+$include_id = '';
+if(isset($_GET['include_id']))
+{
+	$include_id = $_GET['include_id'];
+}
 foreach($statusgrund->result as $row)
 {
+	if($include_id==$row->statusgrund_id)
+		$include_id_found=true;
+
 	$i=$oRdf->newObjekt($row->statusgrund_id);
 	$oRdf->obj[$i]->setAttribut('statusgrund_id',$row->statusgrund_id,true);
 	$oRdf->obj[$i]->setAttribut('status_kurzbz',$row->status_kurzbz,true);
@@ -52,6 +61,19 @@ foreach($statusgrund->result as $row)
 	$oRdf->obj[$i]->setAttribut('bezeichnung_mehrsprachig',$row->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE],true);
 
 	$oRdf->addSequence($row->statusgrund_id);
+}
+
+if(!$include_id_found && $include_id!='')
+{
+	$statusgrund->load($include_id);
+
+	$i=$oRdf->newObjekt($statusgrund->statusgrund_id);
+	$oRdf->obj[$i]->setAttribut('statusgrund_id',$statusgrund->statusgrund_id,true);
+	$oRdf->obj[$i]->setAttribut('status_kurzbz',$statusgrund->status_kurzbz,true);
+	$oRdf->obj[$i]->setAttribut('beschreibung',$statusgrund->beschreibung[DEFAULT_LANGUAGE],true);
+	$oRdf->obj[$i]->setAttribut('bezeichnung_mehrsprachig',$statusgrund->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE],true);
+
+	$oRdf->addSequence($statusgrund->statusgrund_id);
 }
 
 $oRdf->sendRdfText();

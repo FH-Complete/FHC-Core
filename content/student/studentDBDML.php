@@ -679,6 +679,8 @@ if(!$error)
 									$prestd_neu->insertvon = $user;
 									$prestd_neu->bestaetigtam = date('Y-m-d');
 									$prestd_neu->bestaetigtvon = $user;
+									if(isset($_POST['statusgrund_id']))
+										$prestd_neu->statusgrund_id = $_POST['statusgrund_id'];
 									$prestd_neu->new = true;
 
 									if($prestd_neu->save_rolle())
@@ -1462,6 +1464,8 @@ if(!$error)
 																	$rolle->insertvon = $user;
 																	$rolle->bestaetigtam = date('Y-m-d');
 																	$rolle->bestaetigtvon = $user;
+																	if(isset($_POST['statusgrund_id']))
+																		$rolle->statusgrund_id = $_POST['statusgrund_id'];
 																	$rolle->new = true;
 
 																	if($rolle->save_rolle())

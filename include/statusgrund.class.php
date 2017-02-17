@@ -91,6 +91,7 @@ class statusgrund extends basis_db
 	 * Laedt die Gruende fuer einen Status
 	 *
 	 * @param $status_kurzbz Status zu dem die Gruende geladen werden sollen
+	 * @param boolean $aktiv Gibt an ob nur aktive Eintraege geladen werden sollen
 	 */
 	public function getFromStatus($status_kurzbz, $aktiv=null)
 	{
@@ -107,6 +108,52 @@ class statusgrund extends basis_db
 		if(!is_null($aktiv))
 			$qry.=" AND aktiv=".($aktiv?'true':'false');
 		$qry.=" ORDER BY bezeichnung_mehrsprachig[0]";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new statusgrund();
+
+				$obj->statusgrund_id = $row->statusgrund_id;
+				$obj->status_kurzbz = $row->status_kurzbz;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
+				$obj->beschreibung = $sprache->parseSprachResult('beschreibung', $row);
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Laedt die Statusgruende
+	 *
+	 * @param boolean $aktiv Wenn true werden nur aktive geladen.
+	 */
+	public function getAll($aktiv=null)
+	{
+		$sprache = new sprache();
+		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
+		$beschreibung = $sprache->getSprachQuery('beschreibung');
+		$qry = "
+			SELECT
+				*,".$bezeichnung_mehrsprachig.",".$beschreibung."
+			FROM
+				public.tbl_status_grund
+			";
+
+		if(!is_null($aktiv))
+			$qry.="WHERE aktiv=".($aktiv?'true':'false');
+		$qry.=" ORDER BY status_kurzbz, bezeichnung_mehrsprachig[0]";
 
 		if($this->db_query($qry))
 		{

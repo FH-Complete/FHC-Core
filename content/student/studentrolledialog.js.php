@@ -62,7 +62,7 @@ function StudentRolleInit(prestudent_id, status_kurzbz, studiensemester_kurzbz, 
 		var statusgrund_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#statusgrund_id" ));
 		var rt_stufe = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#rt_stufe" ));
 		var neu = false;
-		StudentRolleLoadStatusgrund(status_kurzbz);
+		StudentRolleLoadStatusgrund(status_kurzbz, statusgrund_id);
 	}
 	else
 	{
@@ -111,11 +111,11 @@ function StudentRolleSpeichern()
 		window.close();
 }
 
-function StudentRolleLoadStatusgrund(status_kurzbz)
+function StudentRolleLoadStatusgrund(status_kurzbz, statusgrund_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var menulistgrund = document.getElementById('student-rolle-menulist-statusgrund');
-	url='<?php echo APP_ROOT;?>rdf/statusgrund.rdf.php?status_kurzbz='+status_kurzbz+'&ts'+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/statusgrund.rdf.php?status_kurzbz='+status_kurzbz+'&include_id='+statusgrund_id+'&ts'+gettimestamp();
 
 	try
 	{
