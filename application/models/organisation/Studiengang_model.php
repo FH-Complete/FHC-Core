@@ -244,13 +244,14 @@ class Studiengang_model extends DB_Model
 		if (($isEntitled = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $isEntitled;
 		
+		$this->addFrom(
+			'(SELECT * FROM public.tbl_reihungstest LEFT JOIN public.tbl_rt_studienplan USING(reihungstest_id))',
+			'tbl_reihungstest'
+		);
+		
 		$this->addJoin('lehre.tbl_studienordnung', 'studiengang_kz');
 		
 		$this->addJoin('lehre.tbl_studienplan', 'studienordnung_id');
-		
-		$this->addJoin('public.tbl_rt_studienplan', 'studienplan_id');
-		
-		$this->addJoin('public.tbl_reihungstest', 'reihungstest_id');
 		
 		$this->addJoin('public.tbl_prestudentstatus', 'studienplan_id');
 		
@@ -263,6 +264,8 @@ class Studiengang_model extends DB_Model
 			array('tbl_reihungstest'),
 			'tbl_prestudentstatus.status_kurzbz = \'Interessent\'
 			AND (tbl_prestudentstatus.rt_stufe = tbl_reihungstest.stufe OR tbl_reihungstest.stufe IS NULL)
+			AND (tbl_prestudent.aufnahmegruppe_kurzbz = tbl_reihungstest.aufnahmegruppe_kurzbz OR tbl_reihungstest.aufnahmegruppe_kurzbz IS NULL)
+			AND (tbl_prestudentstatus.studienplan_id = tbl_reihungstest.studienplan_id OR tbl_reihungstest.studienplan_id IS NULL)
 			AND tbl_reihungstest.oeffentlich = TRUE
 			AND tbl_reihungstest.datum > NOW()
 			AND tbl_reihungstest.anmeldefrist >= NOW()
