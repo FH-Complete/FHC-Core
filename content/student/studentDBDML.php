@@ -1113,38 +1113,38 @@ if(!$error)
 
 					if(!$error)
 					{
-
 						// Bei Studenten wird der Studentlehrverband Eintrag angelegt/korrigiert
 						$student = new student();
 						if($temp_uid = $student->getUid($rolle->prestudent_id))
 						{
-							if($student->load($temp_uid))
+							if(in_array($rolle->status_kurzbz,array('Student','Diplomand','Absovlent','Incoming','Abbrecher','Unterbrecher')))
 							{
-								$stdsem_new = filter_input(INPUT_POST, "studiensemester_kurzbz");
-								$semester = filter_input(INPUT_POST, "ausbildungssemester");
-
-								$prestudent_temp = new prestudent();
-								$prestudent_temp->getLastStatus($rolle->prestudent_id, "", "Student");
-								if($student->load_studentlehrverband($temp_uid, $prestudent_temp->studiensemester_kurzbz))
-									$student->new=false;
-								else
-									$student->new=true;
-
-								$lehrverband = new lehrverband();
-								if(!$lehrverband->exists($student->studiengang_kz, $semester, $student->verband, $student->gruppe))
+								if($student->load($temp_uid))
 								{
-									$student->studiensemester_kurzbz = $stdsem_new;
-									$return = false;
-									$errormsg = $student->errormsg;
-								}
-								else
-								{
-									$student->studiensemester_kurzbz = $stdsem_new;
-									$student->semester = $semester;
-									$student->updatevon = $user;
-								}
+									$stdsem_new = filter_input(INPUT_POST, "studiensemester_kurzbz");
+									$semester = filter_input(INPUT_POST, "ausbildungssemester");
 
-								$student->save_studentlehrverband();
+									if($student->load_studentlehrverband($temp_uid, $stdsem_new))
+										$student->new=false;
+									else
+										$student->new=true;
+
+									$lehrverband = new lehrverband();
+									if(!$lehrverband->exists($student->studiengang_kz, $semester, $student->verband, $student->gruppe))
+									{
+										$student->studiensemester_kurzbz = $stdsem_new;
+										$return = false;
+										$errormsg = $student->errormsg;
+									}
+									else
+									{
+										$student->studiensemester_kurzbz = $stdsem_new;
+										$student->semester = $semester;
+										$student->updatevon = $user;
+									}
+
+									$student->save_studentlehrverband();
+								}
 							}
 						}
 
