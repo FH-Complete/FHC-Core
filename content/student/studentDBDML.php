@@ -1353,7 +1353,7 @@ if(!$error)
 												{
 													//pruefen ob schon eine Studentenrolle Existiert
 													$hlp1 = new prestudent();
-													$hlp1->getPrestudentRolle($prestudent_id, 'Student', $hlp->result[0]->studiensemester_kurzbz);
+													$hlp1->getPrestudentRolle($prestudent_id, 'Student', $aufgenommener->result[0]->studiensemester_kurzbz);
 													if(count($hlp1->result)>0)
 													{
 														$return = false;
@@ -1365,7 +1365,7 @@ if(!$error)
 														$db->db_query('BEGIN;');
 
 														//Matrikelnummer und UID generieren
-														$matrikelnr = generateMatrikelnummer($prestd->studiengang_kz, $hlp->result[0]->studiensemester_kurzbz);
+														$matrikelnr = generateMatrikelnummer($prestd->studiengang_kz, $aufgenommener->result[0]->studiensemester_kurzbz);
 														$jahr = substr($matrikelnr,0, 2);
 														$stg = $prestd->studiengang_kz;
 														$stg_obj = new studiengang();
@@ -1424,7 +1424,7 @@ if(!$error)
 															$student->matrikelnr = $matrikelnr;
 															$student->prestudent_id = $prestd->prestudent_id;
 															$student->studiengang_kz = $prestd->studiengang_kz;
-															$student->semester = $hlp->result[0]->ausbildungssemester;
+															$student->semester = $aufgenommener->result[0]->ausbildungssemester;
 															$student->verband = ' ';
 															$student->gruppe = ' ';
 															$student->insertamum = date('Y-m-d H:i:s');
@@ -1455,10 +1455,10 @@ if(!$error)
 																	$rolle = new prestudent();
 																	$rolle->prestudent_id = $prestd->prestudent_id;
 																	$rolle->status_kurzbz = 'Student';
-																	$rolle->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
-																	$rolle->ausbildungssemester = $hlp->result[0]->ausbildungssemester;
-																	$rolle->orgform_kurzbz = $hlp->result[0]->orgform_kurzbz;
-																	$rolle->studienplan_id = $hlp->result[0]->studienplan_id;
+																	$rolle->studiensemester_kurzbz = $aufgenommener->result[0]->studiensemester_kurzbz;
+																	$rolle->ausbildungssemester = $aufgenommener->result[0]->ausbildungssemester;
+																	$rolle->orgform_kurzbz = $aufgenommener->result[0]->orgform_kurzbz;
+																	$rolle->studienplan_id = $aufgenommener->result[0]->studienplan_id;
 																	$rolle->datum = date('Y-m-d');
 																	$rolle->insertamum = date('Y-m-d H:i:s');
 																	$rolle->insertvon = $user;
@@ -1473,9 +1473,9 @@ if(!$error)
 																		//StudentLehrverband anlegen
 																		$studentlehrverband = new student();
 																		$studentlehrverband->uid = $uid;
-																		$studentlehrverband->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
+																		$studentlehrverband->studiensemester_kurzbz = $aufgenommener->result[0]->studiensemester_kurzbz;
 																		$studentlehrverband->studiengang_kz = $prestd->studiengang_kz;
-																		$studentlehrverband->semester = $hlp->result[0]->ausbildungssemester;
+																		$studentlehrverband->semester = $aufgenommener->result[0]->ausbildungssemester;
 																		$studentlehrverband->verband = ' ';
 																		$studentlehrverband->gruppe = ' ';
 																		$studentlehrverband->insertamum = date('Y-m-d H:i:s');
