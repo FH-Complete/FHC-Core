@@ -902,14 +902,19 @@ if(!$error)
 							if($rolle->delete_rolle($_POST['prestudent_id'],$_POST['status_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
 							{
 								$return = true;
-								if($return)
+								// Wenn in diesem Semester kein Status mehr vorhanden ist,
+								// dann wird auch der Studentlehrverband eintrag entfernt
+								if($rolle->getLastStatus($_POST['prestudent_id'],$_POST['studiensemester_kurzbz'])===false)
 								{
-									$student = new student();
-									$temp_uid = $student->getUid($rolle->prestudent_id);
-									if(!$student->delete_studentLehrverband($temp_uid, $_POST['studiengang_kz'], $rolle->studiensemester_kurzbz, $rolle->ausbildungssemester))
+									if($return)
 									{
-									$return = false;
-									$errormsg = "Fehler beim Löschen der Lehrverbandszuordnung.";
+										$student = new student();
+										$temp_uid = $student->getUid($rolle->prestudent_id);
+										if(!$student->delete_studentLehrverband($temp_uid, $_POST['studiengang_kz'], $rolle->studiensemester_kurzbz, $rolle->ausbildungssemester))
+										{
+											$return = false;
+											$errormsg = "Fehler beim Löschen der Lehrverbandszuordnung.";
+										}
 									}
 								}
 							}
