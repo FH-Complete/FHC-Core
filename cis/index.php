@@ -22,12 +22,48 @@
  *
  */
 require_once('../config/cis.config.inc.php');
+require_once('../config/global.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/sprache.class.php');
 require_once('../include/phrasen.class.php');
 require_once('../include/mail.class.php');
 require_once('../include/student.class.php');
 
+$redirectPasswordChange=false;
+if(defined('CIS_CHECK_PASSWORD_CHANGE') && CIS_CHECK_PASSWORD_CHANGE==true)
+{
+	require_once('../addons/ldap/vilesci/ldap.class.php');
+	$user = get_uid();
+	$password = $_SERVER['PHP_AUTH_PW'];
+	$ldap = new ldap();
+	$ldap->connect();
+	$userdn = $ldap->GetUserDN($user);
+	$ldap = new ldap();
+	if($ldap->connect(LDAP_SERVER, LDAP_PORT, $userdn, $password))
+	{
+		$lastchange = $ldap->getEntry($user,'shadowLastChange');
+		if(isset($lastchange[0])
+		&& isset($lastchange[0]['shadowlastchange'])
+		&& isset($lastchange[0]['shadowlastchange'][0]))
+		{
+			$shadowlastchange = $lastchange[0]['shadowlastchange'][0];
+		}
+		else
+			$shadowlastchange = 0;
+
+		// get unix timestamp 1 year ago
+		$dt = new DateTime();
+		$dt1year = $dt->sub(new DateInterval('P12M'));
+		$ux1year = $dt1year->format('U');
+
+		if($shadowlastchange <= $ux1year)
+			$redirectPasswordChange = true;
+		else
+			$redirectPasswordChange = false;
+	}
+	else
+		die('Bind Failed'.$ldap->errormsg);
+}
 /**
  * Prueft die URL damit keine boesen URLS uebergeben werden koennen
  * @param $param
@@ -46,9 +82,9 @@ function validURLCheck($param)
 			$text.="\nFolgende URL wurde versucht aufzurufen: \n".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
 			$text.="\n\nIP des Aufrufers: ".$_SERVER['REMOTE_ADDR'];
 			$text.="\n\nUserAgent: ".$_SERVER['HTTP_USER_AGENT'];
-			
+
 			$text.="\n\nAuffälliger Value: $param";
-			
+
 			$mail = new mail(MAIL_ADMIN, 'no-reply@'.DOMAIN, 'Versuchte XSS Attacke', $text);
 			$mail->send();
 			die('Invalid URL detected');
@@ -74,7 +110,7 @@ if(isset($_GET['content_id']))
 }
 else
 	$id = '';
-	
+
 if(isset($_GET['menu']))
 {
 	$menu = $_GET['menu'];
@@ -82,7 +118,7 @@ if(isset($_GET['menu']))
 }
 else
 	$menu = 'menu.php?content_id='.$id;
-	
+
 $user = get_uid();
 $student = new student();
 if($student->load($user))
@@ -113,14 +149,17 @@ else
 		else
 			$content = '../cms/news.php?studiengang_kz='.$studiengang_kz.'&semester='.$semester.'';
 }
-	
+
+if($redirectPasswordChange)
+	$content = '../cis/private/profile/change_password.php?requiredtochange=true';
+
 $sprache = getSprache();
 $p = new phrasen($sprache);
 $db = new basis_db();
 ?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-	<meta http-equiv="X-UA-Compatible" content="IE=9"/> 
+	<meta http-equiv="X-UA-Compatible" content="IE=9"/>
 	<title>CIS - <?php echo CAMPUS_NAME; ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link rel="stylesheet" href="../skin/jquery.css" type="text/css">
@@ -137,7 +176,7 @@ function changeSprache(sprache)
 	content = document.getElementById('content').contentWindow.location.href;
 	menu = escape(menu);
 	content = escape(content);
-	
+
 	window.location.href="index.php?sprache="+sprache+"&content_id=<?php echo $db->convert_html_chars($id);?>&menu="+menu+"&content="+content;
 }
 function gettimestamp()
@@ -163,20 +202,20 @@ function loadampel()
 		<tr>
 		<td valign="top" align="left" style="background-image: url(<?php echo APP_ROOT.'skin/styles/'.DEFAULT_STYLE.'/header.png'; ?>); background-position: top; background-repeat: repeat-x;">
 		<a href="index.php"><img class="header_logo" src="<?php echo APP_ROOT.'skin/styles/'.DEFAULT_STYLE.'/logo_250x130.png'; ?>" alt="logo"></a>
-		<!--<img class="header" src="<?php echo APP_ROOT.'skin/styles/'.DEFAULT_STYLE.'/header.png'; ?>" alt="header">-->  	 	
+		<!--<img class="header" src="<?php echo APP_ROOT.'skin/styles/'.DEFAULT_STYLE.'/header.png'; ?>" alt="header">-->
 	   	 	<table class="header_content" cellpadding="0">
 		   	  <tr>
 		   	    <td width="20%" align="center">&nbsp;
 		        </td>
 		         <td valign="middle" align="center">
-					<form name="searchform" action="private/tools/suche.php" method="GET" target="content" style="display:inline">				
+					<form name="searchform" action="private/tools/suche.php" method="GET" target="content" style="display:inline">
 		        	<input id="globalsearch" type="search" size="55" name="search" placeholder=" <?php echo $p->t('menu/suchePersonOrtDokumentInhalt');?> ..." title="<?php echo $p->t('menu/suchePersonOrtDokumentInhaltLang');?>"/>
 		        	<img src="../skin/images/search.png" onclick="document.searchform.submit()" class="suchicon"/>
 		        	</form>
 		        </td>
 		         <td align="right" valign="top" style="width: 20%; padding-right: 10px; padding-top: 10px;">
 			          <nobr><span style="vertical-align:top;" id="ampel"></span><a href="private/lvplan/stpl_week.php?pers_uid=<?php echo $user; ?>" target="_blank"><?php echo $p->t('lvplan/lvPlan'); ?></a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>
-						<?php	  
+						<?php
 							$sprache = new sprache();
 							$sprache->getAll(true);
 							foreach($sprache->result as $row)
@@ -187,12 +226,12 @@ function loadampel()
 		        </td>
 		   	  </tr>
 	   	    </table>
-	   	    
+
 	   	</td>
 	   	</tr>
 	   	<tr>
 			<td valign="top" align="left">
-			
+
 				<iframe id="menue" src="<?php echo $db->convert_html_chars($menu); ?>" name="menu" frameborder="0">
 					No iFrames
 				</iframe>
@@ -231,8 +270,8 @@ function loadampel()
 					<td><img src="../skin/images/aufklappen.png" /></td>
 					</td>
 					</tr>
-				
-				</table>				
+
+				</table>
 			</div>
 		</div>
 	</div>-->';*/

@@ -31,7 +31,7 @@ $passwort_addons = new addon();
 foreach($passwort_addons->aktive_addons as $addon)
 {
 	$passwort_addon_filename = dirname(__FILE__).'/../../addons/'.$addon.'/vilesci/passwort.inc.php';
-	
+
 	if(file_exists($passwort_addon_filename))
 	{
 		include($passwort_addon_filename);
@@ -42,7 +42,7 @@ foreach($passwort_addons->aktive_addons as $addon)
 
 if(!$passwort_addon_found)
 {
-	
+
 	/**
 	 * Prueft die Passwort Policy
 	 * Das Passwort muss zumindest 8 Zeichen enthalten, davon mindestens 1 Großbuchstabe,
@@ -52,9 +52,10 @@ if(!$passwort_addon_found)
 	 *
 	 * @param $passwort_neu das neue Passwort
 	 * @param $p Phrasen Objekt - Wenn nicht uebergeben werden die Fehler in der Default Langauge angezeigt
+	 * @param $passwort_alt Altes Passwort bei Passwortaenderung
 	 * @return errormsg wenn Policy nicht erfuellt ist oder true wenn ok
 	 */
-	function check_policy($passwort_neu, $p=null)
+	function check_policy($passwort_neu, $p=null, $passwort_alt=null)
 	{
 		if(is_null($p))
 			$p = new phrase(DEFAULT_LANGUAGE);
@@ -69,6 +70,15 @@ if(!$passwort_addon_found)
 			$errormsg .= $p->t('passwort/MinLaenge');
 		}
 
+		// Altes Passwort darf nicht gleich dem neuen sein
+		if(!is_null($passwort_alt) && $passwort_alt!='')
+		{
+			if($passwort_neu == $passwort_alt)
+			{
+				$error=true;
+				$errormsg .= $p->t('passwort/nichtGleich');
+			}
+		}
 		// Mindestens 1 Großbuchstabe
 		if(!preg_match('/[A-Z]/', $passwort_neu))
 		{
@@ -115,7 +125,7 @@ if(!$passwort_addon_found)
 		else
 			return true;
 	}
-	
+
 	/**
 	 * Aendert das Passwort im LDAP
 	 * @param $passwort_alt Altes (aktuelles) Passwort
@@ -145,7 +155,7 @@ if(!$passwort_addon_found)
 					$encrypted = base64_encode(pack('H*',hash('sha1',$passwort_neu.$salt)).$salt);
 					$ssha_password = '{SSHA}'.$encrypted;
 
-					// LM und NT 
+					// LM und NT
 					//$hash = new Crypt_CHAP_MSv2();
 					//$hash->password = $passwort_neu;
 					// $lm_password = strtoupper(bin2hex($hash->lmPasswordHash()));

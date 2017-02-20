@@ -47,6 +47,10 @@ define('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN',true);
 // Anzeige des LV-Plan Links bei globaler Suche
 define('CIS_SUCHE_LVPLAN_ANZEIGEN',true);
 
+// Soll geprueft werden ob das Passwort innerhalb des letzten Jahres geaendert wurde true|false
+// Wenn dies nicht geaendert wurde wird nach dem Login auf die Passwort aendern Seite umgeleitet
+define('CIS_CHECK_PASSWORD_CHANGE',false);
+
 // Link zu den Excel Notenlisten im CIS Anzeigen
 define('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN',true);
 
