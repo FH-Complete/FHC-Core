@@ -133,7 +133,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'save')
 			isset($_POST['reihung']) && $_POST['reihung'] != '' &&
 			isset($_POST['gewicht']) && $_POST['gewicht'] != '' &&
 			isset($_POST['semester']) && $_POST['semester'] != '' &&
-			isset($_POST['studienplan']) && $_POST['studienplan'] != '')
+			isset($_POST['studienplan']))
 	{
 		$ablauf = new ablauf();
 		$ablauf->studiengang_kz = $_POST['stg_kz'];
@@ -179,10 +179,10 @@ if (isset($_GET['action']) && $_GET['action'] == 'edit')
 		$ablauf_id = $ablauf->result[0];
 		$ablauf = new ablauf($ablauf_id);
 		$ablauf = $ablauf->result[0];
-		
+
 		$gebiet = new gebiet($_POST['gebiet_id']);
 		$studiengang = new studiengang($stg_kz);
-		
+
 		echo '<table><form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&action=editsave" method="POST">
 				<tr><td>Studiengang_kz: </td><td><input type="text" name="stg_kz" value="'.strtoupper($studiengang->typ.$studiengang->kurzbz).' ('.$studiengang->bezeichnung.')'.'" style="width:98.5%" disabled /></td></tr>
 				<tr><td>Gebiet: </td><td><input type="text" value="'.$gebiet->kurzbz.' ('.$gebiet->bezeichnung.')" style="width:98.5%" disabled /><input type="hidden" name="gebiet_id" value="'.$ablauf->gebiet_id.'"/></td></tr>
@@ -215,7 +215,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'editsave')
 		$ablauf->semester = $_POST['semester'];
 		if (isset($_POST['studienplan_id'])) // && $_POST['studienplan_id'] != ''
 			$ablauf->studienplan_id = $_POST['studienplan_id'];
-		
+
 		if (!$ablauf->save(false))
 			echo $ablauf->errormsg;
 	}
@@ -263,7 +263,7 @@ if ($stg_kz != -1)
                   <input type="hidden" name="gebiet_id" value="'.$gebiet->gebiet_id.'" />
 				</form></td></tr>';
 	}
-	
+
 	$gebiet->getAll();
 	echo '</tbody><tfoot><tr><form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&action=save" method="POST"><input type="hidden" name="stg_kz" value="'.$stg_kz.'" /><td><SELECT name="gebiet_id">';
 	foreach ($gebiet->result as $row)
@@ -347,7 +347,7 @@ if (isset($_POST['speichern']))
 				$bezeichnung_mehrsprachig[$row_sprache->sprache] = $_POST['bezeichnung_mehrsprachig_'.$row_sprache->sprache];
 		}
 		$gebiet->bezeichnung_mehrsprachig = $bezeichnung_mehrsprachig;
-		
+
 		$gebiet->kurzbz = $_POST['kurzbz'];
 		$gebiet->bezeichnung = $_POST['bezeichnung_mehrsprachig_German'];
 		$gebiet->beschreibung = $_POST['beschreibung'];
@@ -421,22 +421,22 @@ function drawStudienplanDropdown($stg_kz, $db, $name = '', $autosubmitform = nul
 	$orgform_arr = array();
 	foreach ($orgform_obj->result as $row)
 		$orgform_arr[$row->orgform_kurzbz] = $row->bezeichnung;
-	
+
 	foreach ($studienplan_obj->result as $row_sto)
 	{
 		$studienordnung_arr[$row_sto->studienordnung_id]['bezeichnung'] = $row_sto->bezeichnung_studienordnung;
 		$studienplan_arr[$row_sto->studienordnung_id][$row_sto->studienplan_id]['bezeichnung'] = $row_sto->bezeichnung_studienplan;
-	
+
 		$studienplan_arr[$row_sto->studienordnung_id][$row_sto->studienplan_id]['orgform_kurzbz'] = $row_sto->orgform_kurzbz;
 		$studienplan_arr[$row_sto->studienordnung_id][$row_sto->studienplan_id]['sprache'] = $sprachen_arr[$row_sto->sprache];
 		$studienplaene_verwendet[$row_sto->studienplan_id] = $row_sto->bezeichnung_studienplan;
 	}
-	
+
 	$selected = isset($_GET['stp_id'])?'':'selected';
 	echo "<SELECT id='studienplan_dropdown' name='".$name."' ";
 	if (isset($autosubmitform) && $autosubmitform != '')
 		echo 'onchange="document.getElementById(\''.$autosubmitform.'\').submit();"';
-	
+
 	echo " style='".$style."'>";
 	echo "<OPTION value='' ".$selected.">Studienplan auswaehlen</OPTION>";
 	// Pruefen ob uebergebene StudienplanID in Auswahl enthalten
@@ -460,9 +460,9 @@ function drawStudienplanDropdown($stg_kz, $db, $name = '', $autosubmitform = nul
 	foreach ($studienordnung_arr as $stoid => $row_sto)
 	{
 		$selected = '';
-	
+
 		echo '<option value="" disabled>Studienordnung: '.$db->convert_html_chars($row_sto['bezeichnung']).'</option>';
-	
+
 		foreach ($studienplan_arr[$stoid] as $stpid => $row_stp)
 		{
 			if (isset($_GET['stp_id']) && $_GET['stp_id'] == $stpid)
