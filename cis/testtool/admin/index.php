@@ -295,6 +295,8 @@ if (isset($_POST['submitdata']))
 			{
 				$frage->new = false;
 			}
+			else
+				$frage->new = true;
 
 			if (isset($_POST['text']))
 				$frage->text = $_POST['text'];
