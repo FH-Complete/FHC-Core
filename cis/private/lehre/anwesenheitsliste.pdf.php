@@ -39,12 +39,12 @@ $berechtigung->getBerechtigungen($user);
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 	$lvid = $_GET['lvid'];
-else 
+else
 	die('Eine gueltige LvID muss uebergeben werden');
 
 if(isset($_GET['stsem']))
 	$studiensemester = $_GET['stsem'];
-else 
+else
 	die('Eine Studiensemester muss uebergeben werden');
 
 if(!$berechtigung->isBerechtigt('admin') && !$berechtigung->isBerechtigt('assistenz') && !check_lektor_lehrveranstaltung($user,$lvid,$studiensemester))
@@ -56,7 +56,6 @@ if(isset($_GET['output']) && ($output='odt' || $output='doc'))
 	$output=$_GET['output'];
 
 isset($_GET['stg_kz']) ? $studiengang = $_GET['stg_kz'] : $studiengang = NULL;
-isset($_GET['semester']) ? $semester = $_GET['semester'] : $semester = NULL;
 isset($_GET['lehreinheit_id']) ? $lehreinheit = $_GET['lehreinheit_id'] : $lehreinheit = NULL;
 
 $lv = new lehrveranstaltung();
@@ -65,17 +64,17 @@ $lv->load($lvid);
 $doc = new dokument_export('Anwesenheitslist');
 
 // Teilnehmende Gruppen laden
-$qry = "SELECT DISTINCT ON(kuerzel, semester, verband, gruppe, gruppe_kurzbz) 
-			UPPER(stg_typ::varchar(1) || stg_kurzbz) as kuerzel, 
-			semester, 
-			verband, 
-			gruppe, 
-			gruppe_kurzbz 
-		FROM campus.vw_lehreinheit 
-		WHERE lehrveranstaltung_id='".addslashes($lvid)."' 
-		AND studiensemester_kurzbz='".addslashes($studiensemester)."'";
+$qry = "SELECT DISTINCT ON(kuerzel, semester, verband, gruppe, gruppe_kurzbz)
+			UPPER(stg_typ::varchar(1) || stg_kurzbz) as kuerzel,
+			semester,
+			verband,
+			gruppe,
+			gruppe_kurzbz
+		FROM campus.vw_lehreinheit
+		WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)."
+		AND studiensemester_kurzbz=".$db->db_add_param($studiensemester);
 if($lehreinheit!='')
-	$qry.=" AND lehreinheit_id='".addslashes($lehreinheit)."'";
+	$qry.=" AND lehreinheit_id=".$db->db_add_param($lehreinheit, FHC_INTEGER);
 
 $gruppen_string = '';
 if($result = $db->db_query($qry))
@@ -115,36 +114,39 @@ $data = array(
 //Lehrende der LV laden und in ein Array schreiben
 $lehrende = new lehreinheitmitarbeiter();
 $lehrende->getMitarbeiterLV($lvid, $studiensemester, $lehreinheit);
-
+$arr_lehrende = array();
 if (isset($lehrende->result))
 {
 	foreach($lehrende->result AS $row)
+	{
 		$data[]=array('lehrende'=>array('uid'=>$row->uid,'name'=>$row->vorname.' '.$row->nachname));
+		$arr_lehrende[]=mb_strtoupper($row->uid);
+	}
 }
 
 
 //Studierende der LV laden und in ein Array schreiben
 
-$qry = "SELECT 
-			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, 
+$qry = 'SELECT
+			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 			tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis, tbl_student.studiengang_kz AS stg_kz_student,
 			tbl_zeugnisnote.note, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr
-		FROM 
-			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid) 
-			JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student ON(uid=student_uid) 
-			LEFT JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) 
+		FROM
+			campus.vw_student_lehrveranstaltung JOIN public.tbl_benutzer USING(uid)
+			JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student ON(uid=student_uid)
+			LEFT JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
 			LEFT JOIN public.tbl_studentlehrverband USING(student_uid,studiensemester_kurzbz)
 			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
 			LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
-		WHERE 
-			vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND 
-			vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($studiensemester)."'";
+		WHERE
+			vw_student_lehrveranstaltung.lehrveranstaltung_id='.$db->db_add_param($lvid, FHC_INTEGER).' AND
+			vw_student_lehrveranstaltung.studiensemester_kurzbz='.$db->db_add_param($studiensemester);
 
 if($lehreinheit!='')
-	$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id='".addslashes($lehreinheit)."'";
-	
+	$qry.=' AND vw_student_lehrveranstaltung.lehreinheit_id='.$db->db_add_param($lehreinheit, FHC_INTEGER);
+
 $qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
 
 $stsem_obj = new studiensemester();
@@ -161,30 +163,30 @@ $datum = new datum();
 $zusatz = '';
 
 if($result = $db->db_query($qry))
-{	
+{
 	while($row = $db->db_fetch_object($result))
 	{
 		if($row->status!='Abbrecher' && $row->status!='Unterbrecher')
 		{
 			$anzahl_studierende++;
-			
+
 			if($row->status=='Incoming') //Incoming
 				$zusatz='(i)';
-			else 
+			else
 				$zusatz='';
-			
+
 			if($row->bisio_id!='' && $row->status!='Incoming' && ($row->bis > $stsemdatumvon || $row->bis=='') && $row->von < $stsemdatumbis) //Outgoing
 				$zusatz.='(o)(ab '.$datum->formatDatum($row->von,'d.m.Y').')';
-				
+
 			if($row->note==6) //angerechnet
 				$zusatz.='(ar)';
-			
+
 			if($row->mitarbeiter_uid!='') //mitarbeiter
 				$zusatz.='(ma)';
-			
+
 			if($row->stg_kz_student==$a_o_kz) //Außerordentliche Studierende
 				$zusatz.='(a.o.)';
-			
+
 			$data[]=array('student'=>array(
 							'vorname'=>$row->vorname,
 							'nachname'=>$row->nachname,
@@ -202,38 +204,18 @@ if($result = $db->db_query($qry))
 	$data['anzahl_studierende'] = $anzahl_studierende;
 	$data = array_reverse($data, true);
 }
-//var_dump($data);
-//$files=array();
-/*
-foreach($codes_obj->result as $code)
-{
-	$filename='/tmp/fhc_lveval_code'.$code->lvevaluierung_code_id.'.png';
-	$files[]=$filename;
-
-	// QRCode ertellen und speichern
-	QRcode::png($url_detail.'?code='.$code->code, $filename);
-
-	// QRCode zu Dokument hinzufuegen
-	$doc->addImage($filename, $code->lvevaluierung_code_id.'.png', 'image/png');
-	$data[]=array('code'=>array('lvevaluierung_code_id'=>$code->lvevaluierung_code_id,'code'=>$code->code));
-
-
-}*/
 
 $doc->addDataArray($data,'anwesenheitsliste');
+if($lehreinheit!='')
+{
+	$lehrende = '_'.implode('_',array_unique($arr_lehrende));
+}
+else
+	$lehrende = '';
 
-//header("Content-type: application/xhtml+xml");
-//echo $doc->ConvertArrayToXML($data,'anwesenheitsliste');
-//exit;
-
+$doc->setFilename('Anwesenheitsliste_'.$studiensemester.'_'.$stg->kuerzel.'_'.$lv->semester.'_'.$lv->kurzbz.$lehrende);
 if(!$doc->create($output))
 	die($doc->errormsg);
 $doc->output();
 $doc->close();
-/*
-// QR Codes aus Temp Ordner entfernen
-foreach($files as $file)
-	unlink($file);
-*/
-
 ?>
