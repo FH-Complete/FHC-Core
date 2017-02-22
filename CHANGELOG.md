@@ -1,10 +1,10 @@
 # Change Log
 
-## [Unreleased]]
+## [Unreleased]
 
 ### Added
 - **[FAS]** Verwaltung von Rechnungsadressen
-- **[CIS]** Mitarbeiter und Studienrende können nach dem Login im CIS zur Passwortänderung umgeleitet werden wenn dieses seit über einem Jahr nicht geändert wurde
+- **[CIS]** Mitarbeiter und Studierende können nach dem Login im CIS zur Passwortänderung umgeleitet werden wenn dieses seit über einem Jahr nicht geändert wurde
 - **[FAS]** Bei Statuswechsel von Studierenden können Gründe für den Statuswechsel angegeben werden
 
 ## [3.2]
