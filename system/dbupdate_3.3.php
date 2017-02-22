@@ -33,6 +33,23 @@ if(!$result = @$db->db_query("SELECT statusgrund_id FROM public.tbl_prestudentst
 		echo 'public.tbl_prestudentstatus: Spalte statusgrund_id hinzugefuegt';
 }
 
+// Berechtigungen fuer web User erteilen um Gebiete anlegen zu duerfen
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_gebiet' AND table_schema='testtool' AND grantee='web' AND privilege_type='INSERT'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "GRANT SELECT, INSERT, UPDATE, DELETE ON testtool.tbl_gebiet TO web;
+			GRANT SELECT, UPDATE ON testtool.tbl_gebiet_gebiet_id_seq TO web;
+			";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Testtool Berechtigungen: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Web User fuer testtool.tbl_gebiet berechtigt';
+	}
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
