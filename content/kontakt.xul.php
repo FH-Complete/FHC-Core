@@ -37,10 +37,10 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>
 
 if(isset($_GET['person_id']) && is_numeric($_GET['person_id']))
 	$person_id = $_GET['person_id'];
-else 
+else
 	die('Parameter person_id muss uebergeben werden');
 
-$uid = get_uid(); 
+$uid = get_uid();
 ?>
 
 <window id="kontakt-window" title="Kontakt"
@@ -111,7 +111,7 @@ $uid = get_uid();
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#person_id" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-adressen-treecol-name" label="Anmerkung" flex="1" hidden="true"
+					<treecol id="kontakt-adressen-treecol-name" label="Name" flex="1" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#name" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
@@ -123,8 +123,16 @@ $uid = get_uid();
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/adresse/rdf#firma_name" onclick="KontaktAdresseTreeSort()"/>
 					<splitter class="tree-splitter"/>
+					<treecol id="kontakt-adressen-treecol-rechnungsadresse" label="Rechnungsadresse" flex="1" hidden="true"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#rechnungsadresse" onclick="KontaktAdresseTreeSort()"/>
+					<splitter class="tree-splitter"/>
+					<treecol id="kontakt-adressen-treecol-anmerkung" label="Anmerkung" flex="1" hidden="true"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/adresse/rdf#anmerkung" onclick="KontaktAdresseTreeSort()"/>
+					<splitter class="tree-splitter"/>
 				</treecols>
-			
+
 				<template>
 					<rule>
 						<treechildren>
@@ -144,6 +152,8 @@ $uid = get_uid();
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#name" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#updateamum" />
 									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#firma_name" />
+									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#rechnungsadresse" />
+									<treecell label="rdf:http://www.technikum-wien.at/adresse/rdf#anmerkung" />
 								</treerow>
 							</treeitem>
 						</treechildren>
@@ -207,7 +217,7 @@ $uid = get_uid();
 						sort="rdf:http://www.technikum-wien.at/kontakt/rdf#updateamum" onclick="KontaktKontaktTreeSort()"/>
 					<splitter class="tree-splitter"/>
 				</treecols>
-			
+
 				<template>
 					<rule>
 						<treechildren>
@@ -235,8 +245,8 @@ $uid = get_uid();
 			</vbox>
 		</hbox>
 	</groupbox>
-<?php 
-$recht = new benutzerberechtigung(); 
+<?php
+$recht = new benutzerberechtigung();
 $recht->getBerechtigungen($uid);
 if($recht->isberechtigt('mitarbeiter/bankdaten') || $recht->isberechtigt('student/bankdaten'))
 echo '
@@ -293,7 +303,7 @@ echo '
 						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#bankverbindung_id" onclick="KontaktBankverbindungTreeSort()"/>
 					<splitter class="tree-splitter"/>
 				</treecols>
-			
+
 				<template>
 					<rule>
 						<treechildren>
@@ -309,7 +319,7 @@ echo '
 									<treecell label="rdf:http://www.technikum-wien.at/bankverbindung/rdf#verrechnung" />
 									<treecell label="rdf:http://www.technikum-wien.at/bankverbindung/rdf#person_id" />
 									<treecell label="rdf:http://www.technikum-wien.at/bankverbindung/rdf#bankverbindung_id" />
-									
+
 								</treerow>
 							</treeitem>
 						</treechildren>

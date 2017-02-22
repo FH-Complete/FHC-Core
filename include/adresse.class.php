@@ -49,6 +49,8 @@ class adresse extends basis_db
 	public $insertamum;      	//  timestamp
 	public $insertvon;      	//  string
 	public $ext_id;				//  integer
+	public $rechnungsadresse=false;	//  boolean
+	public $anmerkung;			//  string
 
 	/**
 	 * Konstruktor
@@ -103,6 +105,8 @@ class adresse extends basis_db
 			$this->insertamum		= $row->insertamum;
 			$this->insertvon		= $row->insertvon;
 			$this->firma_id			= $row->firma_id;
+			$this->rechnungsadresse = $this->db_parse_bool($row->rechnungsadresse);
+			$this->anmerkung 		= $row->anmerkung;
 		}
 		else
 		{
@@ -157,6 +161,8 @@ class adresse extends basis_db
 			$adr_obj->insertamum      = $row->insertamum;
 			$adr_obj->insertvon       = $row->insertvon;
 			$adr_obj->zustelladresse  = $this->db_parse_bool($row->zustelladresse);
+			$adr_obj->rechnungsadresse 	= $this->db_parse_bool($row->rechnungsadresse);
+			$adr_obj->anmerkung 	  = $row->anmerkung;
 
 			$this->result[] = $adr_obj;
 		}
@@ -211,6 +217,8 @@ class adresse extends basis_db
 			$adr_obj->insertamum      = $row->insertamum;
 			$adr_obj->insertvon       = $row->insertvon;
 			$adr_obj->zustelladresse  = $this->db_parse_bool($row->zustelladresse);
+			$adr_obj->rechnungsadresse = $this->db_parse_bool($row->rechnungsadresse);
+			$adr_obj->anmerkung 	  = $row->anmerkung;
 
 			$this->result[] = $adr_obj;
 		}
@@ -281,7 +289,7 @@ class adresse extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO public.tbl_adresse (person_id, name, strasse, plz, typ, ort, nation, insertamum, insertvon,
-				gemeinde, heimatadresse, zustelladresse, firma_id, updateamum, updatevon) VALUES('.
+				gemeinde, heimatadresse, zustelladresse, firma_id, updateamum, updatevon, rechnungsadresse, anmerkung) VALUES('.
 				$this->db_add_param($this->person_id, FHC_INTEGER).', '.
 				$this->db_add_param($this->name).', '.
 				$this->db_add_param($this->strasse).', '.
@@ -294,7 +302,9 @@ class adresse extends basis_db
 				$this->db_add_param($this->heimatadresse,FHC_BOOLEAN, false).', '.
 				$this->db_add_param($this->zustelladresse,FHC_BOOLEAN, false).', '.
 				$this->db_add_param($this->firma_id, FHC_INTEGER).', now(), '.
-				$this->db_add_param($this->updatevon).');';
+				$this->db_add_param($this->updatevon).','.
+				$this->db_add_param($this->rechnungsadresse, FHC_BOOLEAN, false).','.
+				$this->db_add_param($this->anmerkung).');';
 		}
 		else
 		{
@@ -317,7 +327,9 @@ class adresse extends basis_db
 				' updateamum= now(), '.
 				' updatevon='.$this->db_add_param($this->updatevon).', '.
 				' heimatadresse='.$this->db_add_param($this->heimatadresse, FHC_BOOLEAN, false).', '.
-				' zustelladresse='.$this->db_add_param($this->zustelladresse, FHC_BOOLEAN, false).' '.
+				' zustelladresse='.$this->db_add_param($this->zustelladresse, FHC_BOOLEAN, false).', '.
+				' rechnungsadresse='.$this->db_add_param($this->rechnungsadresse, FHC_BOOLEAN, false).','.
+				' anmerkung='.$this->db_add_param($this->anmerkung).' '.
 				'WHERE adresse_id='.$this->db_add_param($this->adresse_id, FHC_INTEGER, false).';';
 		}
 
@@ -428,6 +440,8 @@ class adresse extends basis_db
 			$this->insertamum		= $row->insertamum;
 			$this->insertvon		= $row->insertvon;
 			$this->firma_id			= $row->firma_id;
+			$this->rechnungsadresse = $this->db_parse_bool($row->rechnungsadresse);
+			$this->anmerkung        = $row->anmerkung;
 		}
 		else
 		{

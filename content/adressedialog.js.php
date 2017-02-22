@@ -33,23 +33,23 @@ loadVariables($user);
 function AdresseInit(adresse_id, person_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	if(adresse_id!='')
 	{
 		//Daten holen
 		var url = '<?php echo APP_ROOT ?>rdf/adresse.rdf.php?adresse_id='+adresse_id+'&'+gettimestamp();
-			
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
 	                   getService(Components.interfaces.nsIRDFService);
-	    
+
 	    var dsource = rdfService.GetDataSourceBlocking(url);
-	    
+
 		var subject = rdfService.GetResource("http://www.technikum-wien.at/adresse/" + adresse_id);
-	
+
 		var predicateNS = "http://www.technikum-wien.at/adresse/rdf";
-	
+
 		//RDF parsen
-	
+
 		person_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_id" ));
 		name = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#name" ));
 		strasse = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#strasse" ));
@@ -61,6 +61,8 @@ function AdresseInit(adresse_id, person_id)
 		heimatadresse = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#heimatadresse" ));
 		zustelladresse = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zustelladresse" ));
 		firma_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#firma_id" ));
+		rechnungsadresse = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#rechnungsadresse" ));
+		anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 		neu = false;
 	}
 	else
@@ -77,8 +79,10 @@ function AdresseInit(adresse_id, person_id)
 		heimatadresse='Ja';
 		zustelladresse='Ja';
 		firma_id='';
-	}		
-	
+		rechnungsadresse='Nein';
+		anmerkung='';
+	}
+
 	document.getElementById('adresse-checkbox-neu').checked=neu;
 	document.getElementById('adresse-textbox-person_id').value=person_id;
 	document.getElementById('adresse-textbox-adresse_id').value=adresse_id;
@@ -95,12 +99,17 @@ function AdresseInit(adresse_id, person_id)
 		document.getElementById('adresse-checkbox-heimatadresse').checked=true;
 	else
 		document.getElementById('adresse-checkbox-heimatadresse').checked=false;
-		
+
 	if(zustelladresse=='Ja')
 		document.getElementById('adresse-checkbox-zustelladresse').checked=true;
 	else
 		document.getElementById('adresse-checkbox-zustelladresse').checked=false;
 	document.getElementById('adresse-menulist-firma').value=firma_id;
+	document.getElementById('adresse-textbox-anmerkung').value=anmerkung;
+	if(rechnungsadresse=='Ja')
+		document.getElementById('adresse-checkbox-rechnungsadresse').checked=true;
+	else
+		document.getElementById('adresse-checkbox-rechnungsadresse').checked=false;
 }
 
 // ****
@@ -120,7 +129,7 @@ function AdresseSpeichern()
 function AdresseLoadGemeinde(blocking)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	menulist_gemeinde = document.getElementById('adresse-textbox-gemeinde');
 	if(document.getElementById('adresse-menulist-nation').value=='A')
 	{
@@ -128,11 +137,11 @@ function AdresseLoadGemeinde(blocking)
 		document.getElementById('adresse-textbox-ort').value='';
 	}
 	plz = document.getElementById('adresse-textbox-plz').value;
-	
+
 	if(plz.length>3)
 	{
 		var url = '<?php echo APP_ROOT; ?>rdf/gemeinde.rdf.php?plz='+plz+'&'+gettimestamp();
-		
+
 		var oldDatasources = menulist_gemeinde.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
 		{
@@ -149,7 +158,7 @@ function AdresseLoadGemeinde(blocking)
 		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 		menulist_gemeinde.database.AddDataSource(datasource);
-		
+
 		menulist_gemeinde.builder.rebuild();
 	}
 }
@@ -168,11 +177,11 @@ function AdresseLoadOrtschaft(blocking)
 		menulist_ort.value='';
 	}
 	plz = document.getElementById('adresse-textbox-plz').value;
-	
+
 	if(plz.length>3 && gemeinde!='')
 	{
 		var url = '<?php echo APP_ROOT; ?>rdf/gemeinde.rdf.php?plz='+plz+'&gemeinde='+encodeURIComponent(gemeinde)+'&'+gettimestamp();
-		
+
 		var oldDatasources = menulist_ort.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
 		{
@@ -180,7 +189,7 @@ function AdresseLoadOrtschaft(blocking)
 		}
 		//Refresh damit die entfernten DS auch wirklich entfernt werden
 		menulist_ort.builder.rebuild();
-	
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		if(blocking)
 			var datasource1 = rdfService.GetDataSourceBlocking(url);
@@ -189,7 +198,7 @@ function AdresseLoadOrtschaft(blocking)
 		datasource1.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 		datasource1.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 		menulist_ort.database.AddDataSource(datasource1);
-		
+
 		menulist_ort.builder.rebuild();
 	}
 }
