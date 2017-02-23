@@ -514,6 +514,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_Am" />
 							<splitter class="tree-splitter"/>
+							<treecol id="student-prestudent-tree-rolle-statusgrund" label="Statusgrund" flex="1" hidden="false" persist="hidden, width, ordinal"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#statusgrund" />
+							<splitter class="tree-splitter"/>
 						</treecols>
 
 						<template>
@@ -532,6 +536,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#anmerkung"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_von"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_am"/>
+											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#statusgrund"/>
 										</treerow>
 									</treeitem>
 								</treechildren>

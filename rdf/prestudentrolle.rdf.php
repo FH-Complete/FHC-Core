@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -33,6 +33,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/person.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/statusgrund.class.php');
 
 $rdf_url='http://www.technikum-wien.at/prestudentrolle';
 $datum = new datum();
@@ -42,7 +43,6 @@ echo '
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:ROLLE="'.$rdf_url.'/rdf#"
 >
-
 
   <RDF:Seq about="'.$rdf_url.'/liste">
 ';
@@ -70,6 +70,12 @@ else
 $ps = new prestudent();
 $ps->getPrestudentRolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, 'datum desc, insertamum desc', $ausbildungssemester);
 
+$statusgrund = new statusgrund();
+$statusgrund->getAll();
+$statusgrund_arr = array();
+foreach($statusgrund->result as $row)
+	$statusgrund_arr[$row->statusgrund_id]=$row->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE];
+
 foreach($ps->result as $row)
 {
 
@@ -90,6 +96,7 @@ foreach($ps->result as $row)
         	<ROLLE:anmerkung><![CDATA['.$row->anmerkung_status.']]></ROLLE:anmerkung>
 			<ROLLE:rt_stufe><![CDATA['.$row->rt_stufe.']]></ROLLE:rt_stufe>
 			<ROLLE:statusgrund_id><![CDATA['.$row->statusgrund_id.']]></ROLLE:statusgrund_id>
+			<ROLLE:statusgrund><![CDATA['.(isset($statusgrund_arr[$row->statusgrund_id])?$statusgrund_arr[$row->statusgrund_id]:'').']]></ROLLE:statusgrund>
       	</RDF:Description>
       </RDF:li>
 	';
