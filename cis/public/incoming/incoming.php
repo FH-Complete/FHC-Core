@@ -89,8 +89,24 @@ $kontakt->load_pers($preincoming->person_id);
 
 $db = new basis_db();
 
+$stsemAktOrNext = new studiensemester();
+if(isset($_GET['filter']))
+{
+	if($_GET['filter'] == 'WSemester')
+		$stsemAktOrNext = $stsemAktOrNext->getaktorNext(1);
+	elseif($_GET['filter']=='SSemester')
+		$stsemAktOrNext = $stsemAktOrNext->getaktorNext(2);
+	else 
+		$stsemAktOrNext = $stsemAktOrNext->getaktorNext();
+}
+else 
+{
+	$stsemAktOrNext = $stsemAktOrNext->getaktorNext();
+}
+
 $stsem = new studiensemester();
-$stsem->getNextStudiensemester();
+$stsem->load($stsemAktOrNext);
+
 
 $stg = new studiengang();
 $stg->getAll();
@@ -841,7 +857,7 @@ else if($method=="lehrveranstaltungen")
 		$studiensemester->getFutureStudiensemester('',2);
 		foreach ($studiensemester->studiensemester AS $row)
 			$studiensemester_array[] = $row->studiensemester_kurzbz;
-		
+
 		if(isset($_GET['go']))
 		{
 			$qry = "SELECT
@@ -904,7 +920,8 @@ else if($method=="lehrveranstaltungen")
 								JOIN lehre.tbl_studienplan_semester USING (studienplan_id)
 								WHERE tbl_studienordnung.status_kurzbz='approved' 
 								AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id
-								AND tbl_studienplan_semester.studiensemester_kurzbz IN ('".implode("','", $studiensemester_array)."')) 
+								AND tbl_studienplan_semester.studiensemester_kurzbz IN ('".$stsem->studiensemester_kurzbz."')
+								AND tbl_lehrveranstaltung.semester=tbl_studienplan_semester.semester) 
 								AND ((tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000) OR tbl_lehrveranstaltung.studiengang_kz=10006)";
 	
 						if (isset($_GET['studiengang']) && $_GET['studiengang'] !='')
@@ -912,12 +929,13 @@ else if($method=="lehrveranstaltungen")
 	
 						$qry .= " AND tbl_studiengang.aktiv ".$filterqry." order by studiengang_kz
 						";
-		
+
 			if($result = $db->db_query($qry))
 			{
 				if ($db->db_affected_rows($result)>0)
 				{
 					echo '<center>'.$message.'</center>';
+					echo '<center><h3>'.$stsem->studiensemester_kurzbz.'</h3></center>';
 					echo '<p style="padding-left: 10px; padding-right: 10px;">'.$p->t('incoming/tabelleSortierinformation').'</p>';
 					echo '<table class="tablesorter" id="t3" style="padding-left: 10px; padding-right: 10px;" border="0" align="center">
 						<thead align="center">
