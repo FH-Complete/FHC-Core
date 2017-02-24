@@ -37,12 +37,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <style:table-row-properties style:min-row-height="0.75cm"/>
         </style:style>
         <style:style style:name="Tabelle1.A1" style:family="table-cell">
-            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#afb8bc" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000">
+            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#999999" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000">
                 <style:background-image/>
             </style:table-cell-properties>
         </style:style>
         <style:style style:name="Tabelle1.D1" style:family="table-cell">
-            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#afb8bc" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border="0.05pt solid #000000">
+            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#999999" fo:padding-left="0.101cm" fo:padding-right="0.101cm" fo:padding-top="0.079cm" fo:padding-bottom="0.079cm" fo:border="0.05pt solid #000000">
                 <style:background-image/>
             </style:table-cell-properties>
         </style:style>
@@ -143,7 +143,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <style:table-row-properties style:min-row-height="0.75cm"/>
         </style:style>
         <style:style style:name="Tabelle2.A1" style:family="table-cell">
-            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#afb8bc" fo:padding="0.097cm" fo:border="0.05pt solid #000000">
+            <style:table-cell-properties style:vertical-align="middle" fo:background-color="#999999" fo:padding="0.097cm" fo:border="0.05pt solid #000000">
                 <style:background-image/>
             </style:table-cell-properties>
         </style:style>
@@ -248,7 +248,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <style:text-properties fo:font-size="9pt" officeooo:rsid="0013c612" officeooo:paragraph-rsid="0013c612" style:font-size-complex="9pt"/>
         </style:style>
         <style:style style:name="P18" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-            <style:paragraph-properties fo:background-color="#afb8bc">
+            <style:paragraph-properties fo:background-color="#999999">
                 <style:background-image/>
             </style:paragraph-properties>
             <style:text-properties fo:font-size="9pt" fo:font-weight="bold" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="9pt" style:font-weight-asian="bold" style:font-size-complex="9pt" style:font-weight-complex="bold"/>
@@ -290,6 +290,14 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <style:style style:name="P27" style:family="paragraph" style:parent-style-name="Standard">
             <style:text-properties fo:font-size="5pt" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="1.75pt" style:font-size-complex="2pt"/>
         </style:style>
+        <style:style style:name="P28" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+            <style:paragraph-properties fo:text-align="start" style:justify-single-word="false"/>
+            <style:text-properties fo:font-size="9pt" fo:color="#ffffff" fo:font-weight="bold" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="9pt" style:font-weight-asian="bold" style:font-size-complex="9pt" style:font-weight-complex="bold"/>
+        </style:style>
+        <style:style style:name="P29" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+            <style:paragraph-properties fo:text-align="center" style:justify-single-word="false"/>
+            <style:text-properties fo:font-size="9pt" fo:color="#ffffff" fo:font-weight="bold" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="9pt" style:font-weight-asian="bold" style:font-size-complex="9pt" style:font-weight-complex="bold"/>
+        </style:style>
         <style:style style:name="Seitenumbruch" style:family="paragraph" style:parent-style-name="Standard">
             <style:paragraph-properties fo:break-before="page"/>
             <style:text-properties fo:font-size="16pt" fo:font-weight="bold" officeooo:rsid="000de2a1" officeooo:paragraph-rsid="000de2a1" style:font-size-asian="16pt" style:font-weight-asian="bold" style:font-size-complex="16pt" style:font-weight-complex="bold"/>
@@ -330,10 +338,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 <text:sequence-decl text:display-outline-level="0" text:name="Text"/>
                 <text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
             </text:sequence-decls>
-            <!-- Wichtig für Mehrfachdruck (mehrere Studenten ausgewählt): Wenn ein Element (in diesem Fall Stempel und Unterschriftenblock) relativ zur SEITE ausgerichtet werden soll, 
+			<!-- Wichtig für Mehrfachdruck (mehrere Studenten ausgewählt): Wenn ein Element (in diesem Fall Stempel und Unterschriftenblock) relativ zur SEITE ausgerichtet werden soll, 
 			muss für jedes Dokument (jeder neue Durchlauf der Schleife) ein draw:frame-Tag definiert werden. Diese müssen ALLE VOR den ersten text:p-Elementen stehen.
 			Deshalb wirde erst die Schleife für die draw:frames aufgerufen, dann folg tder Inhalt -->
-            <xsl:if test="position()=1">
+			<xsl:if test="position()=1">
 				<xsl:for-each select="../zeugnis">
 					<xsl:variable select="position()" name="number"/><!-- Variable number definieren, die nach jedem Dokument um eines erhöht wird (position) -->
 						<draw:frame draw:style-name="fr1" draw:name="Rahmen{$number}" text:anchor-type="page" text:anchor-page-number="{$number}" svg:y="21.001cm" draw:z-index="0">
@@ -415,15 +423,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</xsl:otherwise>
 			</xsl:choose> Degree Program
 			</text:p>
-            <text:p text:style-name="P1">
-                <draw:frame draw:style-name="fr2" draw:name="Rahmen2" text:anchor-type="paragraph" svg:width="7.999cm" draw:z-index="2">
-                    <draw:text-box fo:min-height="0.499cm">
-                        <text:p text:style-name="P6"><xsl:value-of select="studiengang_englisch"/></text:p>
-                    </draw:text-box>
-                </draw:frame>
-            </text:p>
-            <text:p text:style-name="P1"/>
-            <text:p text:style-name="P1"/>
+            <text:p text:style-name="P6"><xsl:value-of select="studiengang_englisch"/></text:p>
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P1"/>
@@ -432,8 +432,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <text:p text:style-name="P2"/>
             <text:p text:style-name="P3"/>
             <text:p text:style-name="P3"/>
-            <text:p text:style-name="P3"/>
-            <text:p text:style-name="P27"/>
             <text:p text:style-name="P4">First Name/Last Name:<text:tab/>
                 <text:span text:style-name="T1"><xsl:value-of select="name"/></text:span>
             </text:p>
@@ -448,13 +446,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                         <text:p text:style-name="P14">Course</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-                        <text:p text:style-name="P15">Grade<text:span text:style-name="T4">1</text:span></text:p>
+                        <text:p text:style-name="P15">SP/W<text:span text:style-name="T4">1</text:span></text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-                        <text:p text:style-name="P15">SP/W<text:span text:style-name="T4">2</text:span></text:p>
+                        <text:p text:style-name="P15">ECTS</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.D1" office:value-type="string">
-                        <text:p text:style-name="P15">ECTS</text:p>
+                        <text:p text:style-name="P15">Grade<text:span text:style-name="T4">2</text:span></text:p>
                     </table:table-cell>
                 </table:table-row>
                 <xsl:apply-templates select="unterrichtsfach"/>
@@ -466,19 +464,19 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                         <text:p text:style-name="P13">-</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.C7" office:value-type="string">
-                        <text:p text:style-name="P13">-</text:p>
+                        <text:p text:style-name="P13"><xsl:value-of select="ects_gesamt"/></text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.D7" office:value-type="string">
-                        <text:p text:style-name="P9"><xsl:value-of select="ects_gesamt"/></text:p>
+                        <text:p text:style-name="P9">-</text:p>
                     </table:table-cell>
                 </table:table-row>            
                 <xsl:apply-templates select="fussnote"/> 
             </table:table>
             <text:p text:style-name="P26"/>
-            <text:p text:style-name="P22">¹ Grades:<text:tab/>excellent (1), very good (2), good (3), satisfactory (4), fail (5), not graded (nb), Credit based on previous experience/work (ar),</text:p>
+            <text:p text:style-name="P22">¹ 1 Semester period per week = 45 minutes</text:p>
+            <text:p text:style-name="P22">² Grades:<text:tab/>excellent (1), very good (2), good (3), satisfactory (4), fail (5), not graded (nb), Credit based on previous experience/work (ar),</text:p>
             <text:p text:style-name="P22">
                 <text:tab/>Participated with success (met), passed (b), successfully completed (ea), not successfully completed (nea), did not participate (nt), participated(tg)</text:p>
-            <text:p text:style-name="P22">² 1 Semester period per week = 45 minutes</text:p>
             <text:p text:style-name="P7"/>
             <xsl:if test="abschlusspruefung_typ">
 	            <table:table table:name="Tabelle2" table:style-name="Tabelle2">
@@ -506,7 +504,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 	                </table:table-row>
 	            </table:table>
 	            <text:p text:style-name="P26"/>
-	            <text:p text:style-name="P23">Grades:<text:tab/>Passed with highest distinction, Passed with distinction, Passed</text:p>
+	            <text:p text:style-name="P23">Grades:<text:tab/>Passed with distinction, Passed with merit, Passed</text:p>
 	            <text:p text:style-name="P19"/>
             </xsl:if>
         </office:text>
@@ -517,7 +515,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     	<xsl:choose>
 			<xsl:when test="bisio_von">
                         <text:p text:style-name="P12">International Semester Abroad: <xsl:value-of select="bisio_von"/>-<xsl:value-of select="bisio_bis"/>, at <xsl:value-of select="bisio_ort"/>, <xsl:value-of select="bisio_universitaet"/></text:p>
-                        <text:p text:style-name="P12">All credits earned during the International Semester Abroad (ISA) are fully credited for the
+                        <text:p text:style-name="P12">All credits earned during the International Semester Abroad (ISA) are fully credited for the 
                         <xsl:value-of select="../semester"/>
 							<xsl:choose>
 								<xsl:when test="../semester=1">
@@ -551,21 +549,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     </table:table-cell>
     <table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
         <text:p text:style-name="P9">
-        <xsl:if test="note=''">
+        <xsl:if test="sws=''">
 			<xsl:text>-</xsl:text>
 		</xsl:if>
-		<xsl:value-of select="note"/>
+		<xsl:value-of select="sws"/>
         </text:p>
     </table:table-cell>
     <table:table-cell table:style-name="Tabelle1.C2" office:value-type="string">
-        <text:p text:style-name="P9">
-	        <xsl:if test="sws=''">
-				<xsl:text>-</xsl:text>
-			</xsl:if>
-			<xsl:value-of select="sws"/>
-		</text:p>
-    </table:table-cell>
-    <table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
         <text:p text:style-name="P9">
 	        <xsl:if test="ects=''">
 				<xsl:text>-</xsl:text>
@@ -573,12 +563,20 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<xsl:value-of select="ects"/>
 		</text:p>
     </table:table-cell>
+    <table:table-cell table:style-name="Tabelle1.D2" office:value-type="string">
+        <text:p text:style-name="P9">
+	        <xsl:if test="note=''">
+				<xsl:text>-</xsl:text>
+			</xsl:if>
+			<xsl:value-of select="note"/>
+		</text:p>
+    </table:table-cell>
 </table:table-row>
 </xsl:template>
 <xsl:template match="fussnote">
 <table:table-row>
     <table:table-cell table:style-name="Tabelle1.A8" office:value-type="string">
-        <xsl:choose>
+    	<xsl:choose>
 			<xsl:when test="themenbereich!=''">
 		        <text:p text:style-name="P10"><xsl:value-of select="fussnotenzeichen"/>
 			        <xsl:text> </xsl:text>
@@ -647,23 +645,23 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</xsl:choose>
 				</text:p>
         	</xsl:otherwise>
-		</xsl:choose>	 
+		</xsl:choose>
     </table:table-cell>
     <table:table-cell table:style-name="Tabelle1.B8" office:value-type="string">
         <text:p text:style-name="P13">
-        	<xsl:if test="../projektarbeit_note_anzeige='true'">
-				<xsl:value-of select="note"/>
-			</xsl:if>
+        	<xsl:value-of select="sws"/>
 		</text:p>
     </table:table-cell>
     <table:table-cell table:style-name="Tabelle1.C8" office:value-type="string">
         <text:p text:style-name="P13">
-        	<xsl:value-of select="sws"/>
+        	<xsl:value-of select="ects"/>
         </text:p>
     </table:table-cell>
     <table:table-cell table:style-name="Tabelle1.D8" office:value-type="string">
         <text:p text:style-name="P13">
-        	<xsl:value-of select="ects"/>
+        	<xsl:if test="../projektarbeit_note_anzeige='true'">
+				<xsl:value-of select="note"/>
+			</xsl:if>
         </text:p>
     </table:table-cell>
 </table:table-row>
