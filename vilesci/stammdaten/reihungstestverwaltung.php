@@ -1579,16 +1579,23 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				<select id='studiensemester_dropdown' name='studiensemester_kurzbz'>
 				<option value=''>-- keine Auswahl --</option>
 					<?php
+
 						$stsem_zukuenftig = new Studiensemester();
-						$stsem_zukuenftig->getPlusMinus(5,1);
+						if($neu)
+							$stsem_zukuenftig->getPlusMinus(5,1);
+						else
+							$stsem_zukuenftig->getAll();
+
 						foreach ($stsem_zukuenftig->studiensemester as $row)
 						{
-							if($row->studiensemester_kurzbz == $studiensemester_kurzbz)
-								$selected='selected';
+							if((!$neu && $row->studiensemester_kurzbz == $reihungstest->studiensemester_kurzbz)
+							   ||
+							   ($neu && $row->studiensemester_kurzbz == $studiensemester_kurzbz))
+								$selected='selected="selected"';
 							else
 								$selected='';
 
-							echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.$selected.'>'.$db->convert_html_chars($row->studiensemester_kurzbz).'</OPTION>'.'\n';
+							echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.$selected.'>'.$db->convert_html_chars($row->studiensemester_kurzbz).'</OPTION>'."\n";
 						}
 					?>
 				</select>
