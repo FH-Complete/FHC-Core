@@ -602,25 +602,28 @@ if(isset($_GET['excel']))
 					else if (<?php echo json_encode($punkteberechnung);?> == 'true' && document.getElementById('clm_absolviert').className == 'inactive' && document.getElementById('clm_ergebnis').className == 'inactive')
 						window.location.href = "<?php echo $_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&punkteberechnung=false';?>";
 				});
-
-				if (typeof(Storage) !== 'undefined')
+				if (window.localStorage && window.localStorage !== 'undefined') 
 				{
-					var arr = ['clm_prestudent_id','clm_person_id','clm_geschlecht','clm_studiengang','clm_studienplan','clm_orgform','clm_einstiegssemester','clm_geburtsdatum','clm_email','clm_absolviert','clm_ergebnis','clm_fas'];
-					for (var i of arr)
+					if (typeof(Storage) !== 'undefined')
 					{
-						if (localStorage.getItem(i) != null)
+						var arr = ['clm_prestudent_id','clm_person_id','clm_geschlecht','clm_studiengang','clm_studienplan','clm_orgform','clm_einstiegssemester','clm_geburtsdatum','clm_email','clm_absolviert','clm_ergebnis','clm_fas'];
+						for (var i in arr)
 						{
-							$('.'+i).css('display', localStorage.getItem(i));
-							if (localStorage.getItem(i) == 'none')
-								document.getElementById(i).className = 'inactive';
-							else
-								document.getElementById(i).className = 'active';
+							i = arr[i];
+							if (localStorage.getItem(i) != null)
+							{
+								$('.'+i).css('display', localStorage.getItem(i));
+								if (localStorage.getItem(i) == 'none')
+									document.getElementById(i).className = 'inactive';
+								else
+									document.getElementById(i).className = 'active';
+							}
 						}
 					}
-				}
-				else
-				{
-					alert('Local Storage nicht unterstuetzt');
+					else
+					{
+						alert('Local Storage nicht unterstuetzt');
+					}
 				}
 
 				$(".tablesorter").each(function(i,v)
@@ -664,23 +667,26 @@ if(isset($_GET['excel']))
 
 			function hideColumn(column)
 			{
-				if ($('.'+column).css('display') == 'table-cell')
+				if (window.localStorage) 
 				{
-					$('.'+column).css('display', 'none');
-					localStorage.setItem(column, 'none');
-					if (localStorage.getItem(column) == 'none')
-						document.getElementById(column).className = 'inactive';
+					if ($('.'+column).css('display') == 'table-cell')
+					{
+						$('.'+column).css('display', 'none');
+						localStorage.setItem(column, 'none');
+						if (localStorage.getItem(column) == 'none')
+							document.getElementById(column).className = 'inactive';
+						else
+							document.getElementById(column).className = 'active';
+					}
 					else
-						document.getElementById(column).className = 'active';
-				}
-				else
-				{
-					$('.'+column).css('display', 'table-cell');
-					localStorage.setItem(column, 'table-cell');
-					if (localStorage.getItem(column) == 'none')
-						document.getElementById(column).className = 'inactive';
-					else
-						document.getElementById(column).className = 'active';
+					{
+						$('.'+column).css('display', 'table-cell');
+						localStorage.setItem(column, 'table-cell');
+						if (localStorage.getItem(column) == 'none')
+							document.getElementById(column).className = 'inactive';
+						else
+							document.getElementById(column).className = 'active';
+					}
 				}
 			}
 
