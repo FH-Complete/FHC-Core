@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -35,18 +35,18 @@ require_once('../include/datum.class.php');
 
 if(isset($_GET['person_id']))
 	$person_id = $_GET['person_id'];
-else 
+else
 	$person_id = '';
 
 if(isset($_GET['adresse_id']))
 	$adresse_id = $_GET['adresse_id'];
-else 
+else
 	$adresse_id = '';
-	
+
 $datum = new datum();
 
 $adresse = new adresse();
-	
+
 $rdf_url='http://www.technikum-wien.at/adresse';
 
 echo '
@@ -75,15 +75,16 @@ function draw_rdf($row)
 {
 	global $rdf_url;
 	$db = new basis_db();
-	
+
 	$typ='';
 	switch ($row->typ)
 	{
 		case 'h': $typ='Hauptwohnsitz'; break;
 		case 'n': $typ='Nebenwohnsitz'; break;
 		case 'f': $typ='Firma'; break;
+		case 'r': $typ='Rechnungsadresse'; break;
 	}
-	
+
 	$firma_name='';
 	if($row->firma_id!='')
 	{
@@ -114,6 +115,8 @@ function draw_rdf($row)
             <ADRESSE:firma_id><![CDATA['.$row->firma_id.']]></ADRESSE:firma_id>
             <ADRESSE:firma_name><![CDATA['.$firma_name.']]></ADRESSE:firma_name>
             <ADRESSE:updateamum><![CDATA['.date('d.m.Y H:i:s',strtotime($row->updateamum)).']]></ADRESSE:updateamum>
+			<ADRESSE:rechnungsadresse><![CDATA['.($row->rechnungsadresse?'Ja':'Nein').']]></ADRESSE:rechnungsadresse>
+			<ADRESSE:anmerkung><![CDATA['.$row->anmerkung.']]></ADRESSE:anmerkung>
          </RDF:Description>
       </RDF:li>
       ';

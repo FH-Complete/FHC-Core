@@ -25,7 +25,7 @@ class statistik extends basis_db
 {
 	public $new;
 	public $statistik_obj=array();
-	public $result;
+	public $result=array();
 
 	public $statistik_kurzbz;
 	public $content_id;
@@ -40,32 +40,32 @@ class statistik extends basis_db
 	public $udpatevon;
 	public $berechtigung_kurzbz;
 	public $preferences;
-				
+
 	public $studiengang_kz;		// integer
 	public $prestudent_id;		// integer
 	public $geschlecht;			// char(1)
 	public $studiensemester_kurzbz;// varchar(16)
 	public $ausbildungssemester;// smallint
-	
+
 	public $anzahl; //Hilfsvariable fuer Group BY Abfragen
-	
+
 	// Daten der Statistik
 	public $data; // DB ressource
 	public $html;
 	public $csv;
 	public $json;
-	
+
 	/**
 	 * Konstruktor
 	 */
 	public function __construct($statistik_kurzbz=null)
 	{
-		parent::__construct();	
-		
+		parent::__construct();
+
 		if(!is_null($statistik_kurzbz))
 			$this->load($statistik_kurzbz);
 		else
-			$this->new=true;	
+			$this->new=true;
 	}
 
 	/**
@@ -74,13 +74,13 @@ class statistik extends basis_db
 	 */
 	public function load($statistik_kurzbz)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					*
 				FROM
 					public.tbl_statistik
 				WHERE
 					statistik_kurzbz = " . $this->db_add_param($statistik_kurzbz);
-		
+
 		if($result = $this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object($result))
@@ -99,7 +99,7 @@ class statistik extends basis_db
 				$this->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				$this->preferences = $row->preferences;
 				$this->new = false;
-				
+
 				return true;
 			}
 			else
@@ -114,7 +114,7 @@ class statistik extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt alle Statistiken
 	 * @return true wenn ok, sonst false
@@ -123,15 +123,15 @@ class statistik extends basis_db
 	{
 		$qry = 'SELECT * FROM public.tbl_statistik';
 
-		if($order) 
+		if($order)
 			$qry .= ' ORDER BY ' . $order;
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new statistik();
-				
+
 				$obj->statistik_kurzbz = $row->statistik_kurzbz;
 				$obj->content_id = $row->content_id;
 				$obj->bezeichnung = $row->bezeichnung;
@@ -145,10 +145,10 @@ class statistik extends basis_db
 				$obj->udpatevon = $row->updatevon;
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				$obj->preferences = $row->preferences;
-				
+
 				$this->result[] = $obj;
 			}
-			
+
 			return true;
 		}
 		else
@@ -169,13 +169,13 @@ class statistik extends basis_db
 		elseif ($publish==false)
 			$qry.=' AND NOT publish ';
 		$qry.=' ORDER BY bezeichnung;';
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new statistik();
-				
+
 				$obj->statistik_kurzbz = $row->statistik_kurzbz;
 				$obj->content_id = $row->content_id;
 				$obj->bezeichnung = $row->bezeichnung;
@@ -189,17 +189,17 @@ class statistik extends basis_db
 				$obj->udpatevon = $row->updatevon;
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				$obj->preferences = $row->preferences;
-				
+
 				$this->result[] = $obj;
 			}
-			
+
 			return true;
 		}
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
-		}			
+		}
 	}
 	/**
 	 * Laedt alle Statistik Gruppen, Parameter publish zum Filtern.
@@ -225,20 +225,20 @@ class statistik extends basis_db
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new statistik();
-				
+
 				$obj->gruppe = $row->gruppe;
 				$obj->anzahl = $row->anzahl;
-				
+
 				$this->result[] = $obj;
 			}
-			
+
 			return true;
 		}
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
-		}		
+		}
 	}
 	/**
 	 * Speichert einen Statistik Datensatz
@@ -255,10 +255,10 @@ class statistik extends basis_db
 		 * integer umgestellt ist)
 		 */
 		$this->statistik_kurzbz = preg_replace('/\W/', '', $this->statistik_kurzbz);
-			
+
 		if($new)
 		{
-			$qry = 'INSERT INTO public.tbl_statistik(statistik_kurzbz, content_id, bezeichnung, url, sql, 
+			$qry = 'INSERT INTO public.tbl_statistik(statistik_kurzbz, content_id, bezeichnung, url, sql,
 					gruppe, publish, insertamum, insertvon, updateamum, updatevon, preferences, berechtigung_kurzbz) VALUES('.
 					$this->db_add_param($this->statistik_kurzbz).','.
 					$this->db_add_param($this->content_id,FHC_INTEGER).','.
@@ -305,23 +305,23 @@ class statistik extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert ein Array mit den Menueeintraegen der Statistiken
 	 * Mit dem Returnwert dieser Funktion wird die entsprechende Stelle im
-	 * Menue ueberschrieben  
+	 * Menue ueberschrieben
 	 * @return Array fuer Menue
 	 */
 	public function getMenueArray()
 	{
 		$arr = array();
-				
-		$qry = "SELECT 
+
+		$qry = "SELECT
 					*
 				FROM
 					public.tbl_statistik
 				ORDER BY gruppe, bezeichnung, statistik_kurzbz";
-			
+
 		if($result = $this->db_query($qry))
 		{
 			$lastgruppe='';
@@ -342,13 +342,13 @@ class statistik extends basis_db
 				{
 					$arr[$row->statistik_kurzbz]=array('name'=>$row->bezeichnung, 'link'=>APP_ROOT.'vilesci/statistik/statistik_frameset.php?statistik_kurzbz='.$row->statistik_kurzbz, 'target'=>'main');
 					if($row->berechtigung_kurzbz!='')
-						$arr[$row->statistik_kurzbz]['permissions']=array($row->berechtigung_kurzbz);					
+						$arr[$row->statistik_kurzbz]['permissions']=array($row->berechtigung_kurzbz);
 				}
 			}
 		}
 		return $arr;
 	}
-	
+
 	/**
 	 * Loescht einen Eintrag
 	 *
@@ -358,7 +358,7 @@ class statistik extends basis_db
 	public function delete($statistik_kurzbz)
 	{
 		$qry = "DELETE FROM public.tbl_statistik WHERE statistik_kurzbz=".$this->db_add_param($statistik_kurzbz).";";
-		
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -369,9 +369,9 @@ class statistik extends basis_db
 			return false;
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Laedt bestimmte PreStudenten
 	 * @param studiengang_kz KZ des Studienganges der zu Laden ist
@@ -393,22 +393,22 @@ class statistik extends basis_db
 			$this->errormsg = 'Ausbildungssemester muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		// Neue Studenten ermitteln
 		$qry="
-			SELECT 
+			SELECT
 				DISTINCT prestudent_id, geschlecht, studiengang_kz, ausbildungssemester, studiensemester_kurzbz
-			FROM 
-				public.tbl_prestudent 
-				JOIN public.tbl_prestudentstatus status USING (prestudent_id) 
-				JOIN public.tbl_person USING (person_id) 
-			WHERE 
+			FROM
+				public.tbl_prestudent
+				JOIN public.tbl_prestudentstatus status USING (prestudent_id)
+				JOIN public.tbl_person USING (person_id)
+			WHERE
 				status_kurzbz='Student'
-				AND NOT EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Student' AND datum<status.datum AND prestudent_id=status.prestudent_id) 
+				AND NOT EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Student' AND datum<status.datum AND prestudent_id=status.prestudent_id)
 				AND studiengang_kz=".$this->db_add_param($studiengang_kz);
 		if($ausbildungssemester!='')
 			$qry.="	AND ausbildungssemester=".$this->db_add_param($ausbildungssemester);
-		
+
 		$qry.="	AND ((studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		if (!is_null($datum_stichtag))
 			$qry.="	AND datum <=".$this->db_add_param($datum_stichtag);
@@ -418,7 +418,7 @@ class statistik extends basis_db
 			$qry.="	AND datum <=".$this->db_add_param($datum_stichtag);
 		$qry.="))";
 		$qry.=" ORDER BY prestudent_id;";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -440,9 +440,9 @@ class statistik extends basis_db
 
 		return true;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * Liefert die DropOut Rate
 	 * @param unknown_type $studiengang_kz
 	 * @param unknown_type $studiensemester_kurzbz
@@ -452,7 +452,7 @@ class statistik extends basis_db
 	public function get_DropOut($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester=null, $datum_stichtag=null)
 	{
 		$this->statistik_obj=array();
-		
+
 		if(!is_numeric($studiengang_kz))
 		{
 			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
@@ -464,21 +464,21 @@ class statistik extends basis_db
 			$this->errormsg = 'Ausbildungssemester muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		// Neue Studenten ermitteln
 		$qry="SELECT DISTINCT prestudent_id, geschlecht, studiengang_kz, ausbildungssemester, studiensemester_kurzbz
-			FROM tbl_prestudent JOIN tbl_prestudentstatus USING (prestudent_id) JOIN tbl_person USING (person_id) 
-			WHERE (status_kurzbz='Abbrecher') 
+			FROM tbl_prestudent JOIN tbl_prestudentstatus USING (prestudent_id) JOIN tbl_person USING (person_id)
+			WHERE (status_kurzbz='Abbrecher')
 			AND studiengang_kz=".$this->db_add_param($studiengang_kz);
 		if($ausbildungssemester!='')
 			$qry.="	AND ausbildungssemester=".$this->db_add_param($ausbildungssemester);
-		
+
 		$qry.="	AND (studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		if (!is_null($datum_stichtag))
 			$qry.="	AND datum <=".$this->db_add_param($datum_stichtag);
 		$qry.=') ';
 		$qry.=" ORDER BY prestudent_id;";
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -497,10 +497,10 @@ class statistik extends basis_db
 			$this->errormsg = 'Datensatz konnte nicht geladen werden';
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Laedt die Daten einer Statistik (derzeit nur SQL)
 	 * @param $statistik_kurzbz
@@ -510,7 +510,7 @@ class statistik extends basis_db
 		$this->html='';
 		$this->csv='';
 		$this->json=array();
-		
+
 		if($this->sql!='')
 		{
 			$sql = $this->sql;
@@ -524,7 +524,7 @@ class statistik extends basis_db
 				else
 					$sql = str_replace('$'.$name,$this->db_add_param($value),$sql);
 			}
-			
+
 			if($this->data = $this->db_query($sql))
 			{
 				$this->html.= '<thead><tr>';
@@ -562,22 +562,22 @@ class statistik extends basis_db
 			return false;
 		}
 	}
-	
+
 	function getHtmlTable($id, $class='')
 	{
-				
+
 		return '<table class="'.$class.'" id="'.$id.'">'.$this->html.'</table>';
 	}
-	
+
 	function getCSV()
 	{
 		return $this->csv;
 	}
-	
+
 	function writeCSV($filename, $delimiter=',', $enclosure='"')
 	{
 		$fh=fopen($filename,'w');
-		
+
 		$fieldnames=array();
 		for ($i=0; $i < $this->db_num_fields($this->data); $i++)
 			$fieldnames[]=$this->db_field_name($this->data,$i);
@@ -588,24 +588,24 @@ class statistik extends basis_db
 		fclose($fh);
 		return true;
 	}
-	
+
 	function getJSON()
 	{
 		return json_encode($this->json);
 	}
-	
+
 	function getArray()
 	{
 		return $this->json;
 	}
 
 	/**
-	 * 
+	 *
 	 * Parst Variablen aus einem String und liefert diese als Array zurueck
 	 * @param $value String mit Variablen
 	 * z.B.: "Select * from tbl_person where person_id<'$person_id'"
 	 * oder "../content/statistik/bewerberstatistik.php?stsem=$StSem&stg_kz=$stg_kz"
-	 * 
+	 *
 	 * @return Array mit den Variablennamen
 	 */
 	function parseVars($value)
@@ -615,7 +615,7 @@ class statistik extends basis_db
 		$check = '/\$[0-9A-z]+/';
 		preg_match_all($check, $value, $result);
 		$result = $result[0];
-	
+
 		for($i=0;$i<count($result);$i++)
 		{
 			$result[$i] = mb_str_replace('$','',$result[$i]);

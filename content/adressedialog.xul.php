@@ -31,15 +31,15 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>';
-	
+
 if(isset($_GET['adresse_id']) && is_numeric($_GET['adresse_id']))
 	$adresse_id=$_GET['adresse_id'];
-else 
+else
 	$adresse_id='';
-	
+
 if(isset($_GET['person_id']) && is_numeric($_GET['person_id']))
 	$person_id=$_GET['person_id'];
-else 
+else
 	$person_id='';
 ?>
 
@@ -69,12 +69,13 @@ else
 			<rows>
 				<row>
 					<label value="Typ" control="adresse-menulist-typ"/>
-					<menulist id="adresse-menulist-typ" 
+					<menulist id="adresse-menulist-typ"
 					          flex="1">
 							<menupopup>
 								<menuitem value="h" label="Hauptwohnsitz"/>
 								<menuitem value="n" label="Nebenwohnsitz"/>
 								<menuitem value="f" label="Firma"/>
+								<menuitem value="r" label="Rechnungsadresse"/>
 							</menupopup>
 					</menulist>
 				</row>
@@ -82,12 +83,12 @@ else
 					<label value="Strasse" control="adresse-textbox-strasse"/>
 					<hbox>
 						<textbox id="adresse-textbox-strasse" maxlength="256" size="30"/>
-      					<spacer flex="1" />			
+      					<spacer flex="1" />
       				</hbox>
       			</row>
       			<row>
 					<label value="Nation" control="adresse-menulist-nation"/>
-					<menulist id="adresse-menulist-nation" 
+					<menulist id="adresse-menulist-nation"
 					          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php" flex="1"
 					          ref="http://www.technikum-wien.at/nation/liste" >
 						<template>
@@ -108,14 +109,14 @@ else
 				</row>
 				<row>
 					<label value="Gemeinde" />
-					<!--<hbox>						
+					<!--<hbox>
 						<textbox id="adresse-textbox-gemeinde" maxlength="256" size="30" />
-						<spacer flex="1" />			
+						<spacer flex="1" />
       				</hbox>-->
       				<menulist id="adresse-textbox-gemeinde"
-						  editable="true" 
+						  editable="true"
 				          datasources="rdf:null" flex="1"
-				          ref="http://www.technikum-wien.at/gemeinde/liste" 
+				          ref="http://www.technikum-wien.at/gemeinde/liste"
 				          oncommand="AdresseLoadOrtschaft(false)"
 					>
 						<template>
@@ -131,12 +132,12 @@ else
 					<label value="Ortschaft" control="adresse-textbox-ort"/>
 					<!--<hbox>
 						<textbox id="adresse-textbox-ort" maxlength="256" size="30"/>
-						<spacer flex="1" />			
+						<spacer flex="1" />
       				</hbox>-->
       				<menulist id="adresse-textbox-ort"
 						  editable="true"
 				          datasources="rdf:null" flex="1"
-				          ref="http://www.technikum-wien.at/gemeinde/liste" 
+				          ref="http://www.technikum-wien.at/gemeinde/liste"
 					>
 						<template>
 							<menupopup>
@@ -156,9 +157,13 @@ else
   					<checkbox id="adresse-checkbox-zustelladresse" checked="true"/>
 				</row>
 				<row>
+   					<label value="Rechnungsadresse" control="adresse-checkbox-rechnungsadresse"/>
+  					<checkbox id="adresse-checkbox-rechnungsadresse" checked="true"/>
+				</row>
+				<row>
 					<label value="Firma" control="adresse-menulist-firma"/>
 					<!--
-					<menulist id="adresse-menulist-firma" 
+					<menulist id="adresse-menulist-firma"
 					          datasources="<?php echo APP_ROOT ?>rdf/firma.rdf.php?optional=true" flex="1"
 					          ref="http://www.technikum-wien.at/firma/liste" >
 						<template>
@@ -173,11 +178,15 @@ else
 					<box class="Firma" id="adresse-menulist-firma" />
 				</row>
 				<row>
-					<label value="Anmerkung" control="adresse-textbox-name"/>
+					<label value="Name" control="adresse-textbox-name"/>
 					<hbox>
       					<textbox id="adresse-textbox-name" maxlength="256" size="30"/>
-      					<spacer flex="1" />			
+      					<spacer flex="1" />
       				</hbox>
+				</row>
+				<row>
+					<label value="Anmerkung" control="adresse-textbox-anmerkung"/>
+      				<textbox id="adresse-textbox-anmerkung" multiline="true"/>
 				</row>
 			</rows>
 	</grid>

@@ -117,18 +117,29 @@ echo ']>
 					>
 
 						<treecols>
-							<treecol id="aufnahmetermine-tree-reihungstest" label="Reihungstest" flex="2" hidden="false" primary="true"
-							class="sortDirectionIndicator"
-							sortActive="true"
-							sortDirection="ascending"
-							sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#reihungstest"/>
+							<treecol id="aufnahmetermine-tree-datum" label="Datum" flex="3" hidden="false" primary="true"
+								class="sortDirectionIndicator"
+								sortActive="true"
+								sortDirection="ascending"
+								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#datum_iso"/>
+							<splitter class="tree-splitter"/>
+							<treecol id="aufnahmetermine-tree-stufe" label="Stufe" flex="2" hidden="false"
+								class="sortDirectionIndicator"
+								sortActive="true"
+   								sortDirection="ascending"
+								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#stufe"/>
+							<splitter class="tree-splitter"/>
+							<treecol id="aufnahmetermine-tree-studiensemester" label="Studiensemester" flex="2" hidden="false"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studiensemester"/>
+							<splitter class="tree-splitter"/>
+							<treecol id="aufnahmetermine-tree-anmerkung" label="Anmerkung" flex="2" hidden="true"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#anmerkung"/>
+							<splitter class="tree-splitter"/>
 							<treecol id="aufnahmetermine-tree-anmeldedatum" label="Anmeldedatum" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#anmeldedatum"/>
-							<splitter class="tree-splitter"/>
-							<treecol id="aufnahmetermine-tree-stufe" label="Stufe" flex="5" hidden="true"
-							   class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#stufe"/>
 							<splitter class="tree-splitter"/>
 							<treecol id="aufnahmetermine-tree-ort" label="Ort" flex="2" hidden="true"
 								class="sortDirectionIndicator"
@@ -138,7 +149,7 @@ echo ']>
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#punkte" />
 							<splitter class="tree-splitter"/>
-							<treecol id="aufnahmetermine-tree-teilgenommen" label="Teilgenommen" flex="2" hidden="false"
+							<treecol id="aufnahmetermine-tree-teilgenommen" label="Teilgenommen" flex="1" hidden="false"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#teilgenommen" />
 							<splitter class="tree-splitter"/>
@@ -158,7 +169,7 @@ echo ']>
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#rt_person_id" />
 							<splitter class="tree-splitter"/>
-							<treecol id="aufnahmetermine-tree-studienplan_bezeichnung" label="Studienplan" flex="2" hidden="false"
+							<treecol id="aufnahmetermine-tree-studienplan_bezeichnung" label="Studienplan" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studienplan_bezeichnung" />
 							<splitter class="tree-splitter"/>
@@ -172,9 +183,11 @@ echo ']>
 							<treechildren flex="1" >
 									<treeitem uri="rdf:*">
 									<treerow>
-										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#reihungstest"/>
-										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#anmeldedatum"/>
+										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#datum"/>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#stufe"/>
+										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studiensemester"/>
+										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#anmerkung"/>
+										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#anmeldedatum"/>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#ort_kurzbz"/>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#punkte"/>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#teilgenommen"/>
@@ -211,7 +224,7 @@ echo ']>
 								</columns>
 								<rows>
 									<row>
-										<label value="Reihungstest" control="aufnahmetermine-menulist-reihungstest"/>
+										<label value="Reihungstest / Interview" control="aufnahmetermine-menulist-reihungstest"/>
 										<hbox>
 										<menulist id="aufnahmetermine-menulist-reihungstest" disabled="true"
 												datasources="rdf:null" flex="1"
@@ -224,8 +237,8 @@ echo ']>
 												</menupopup>
 											</template>
 										</menulist>
-										<toolbarbutton id="aufnahmetermine-button-reihungstest-refresh" image="../../skin/images/refresh.png" tooltiptext="Liste neu laden" onclick="AufnahmeTermineReihungstestDropDownRefresh()"/>
-										<toolbarbutton id="aufnahmetermine-button-reihungstest-open" image="../../skin/images/edit.png" tooltiptext="Zum Reihungstest" onclick="AufnahmeTermineReihungstestEdit()"/>
+										<toolbarbutton id="aufnahmetermine-button-reihungstest-refresh" image="../../skin/images/refresh.png" tooltiptext="Alle zukünftigen Reihungstests des Studiengangs laden" onclick="AufnahmeTermineReihungstestDropDownRefresh()"/>
+										<toolbarbutton id="aufnahmetermine-button-reihungstest-open" image="../../skin/images/edit.png" tooltiptext="Zur Reihungstestverwaltung" onclick="AufnahmeTermineReihungstestEdit()"/>
 										<spacer flex="1"/>
 										</hbox>
 									</row>

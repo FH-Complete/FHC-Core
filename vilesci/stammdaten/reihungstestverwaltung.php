@@ -1067,7 +1067,7 @@ if(isset($_GET['type']) && $_GET['type']=='savertpunkte')
 	{
 		$rtperson = new reihungstest();
 		$rtperson->loadReihungstestPerson($_GET['rt_person_id']);
-		$rtperson->punkte = $rtpunkte;
+		$rtperson->punkte = str_replace(',','.',$rtpunkte);
 		$rtperson->new=false;
 		if(!$rtperson->savePersonReihungstest())
 		{
@@ -1112,7 +1112,7 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 						$rtpunkte = $pruefling->getReihungstestErgebnisPerson($row->person_id, true, $reihungstest->reihungstest_id);
 					else
 						$rtpunkte = $pruefling->getReihungstestErgebnisPerson($row->person_id, false, $reihungstest->reihungstest_id);
-					$reihungstest->punkte = $rtpunkte;
+					$reihungstest->punkte = str_replace(',','.',$rtpunkte);
 					$reihungstest->reihungstestangetreten=true;
 					$reihungstest->save(false);
 					$reihungstest->new=false;
@@ -1585,16 +1585,23 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				<select id='studiensemester_dropdown' name='studiensemester_kurzbz'>
 				<option value=''>-- keine Auswahl --</option>
 					<?php
+
 						$stsem_zukuenftig = new Studiensemester();
-						$stsem_zukuenftig->getPlusMinus(5,1);
+						if($neu)
+							$stsem_zukuenftig->getPlusMinus(5,1);
+						else
+							$stsem_zukuenftig->getAll();
+
 						foreach ($stsem_zukuenftig->studiensemester as $row)
 						{
-							if($row->studiensemester_kurzbz == $studiensemester_kurzbz)
-								$selected='selected';
+							if((!$neu && $row->studiensemester_kurzbz == $reihungstest->studiensemester_kurzbz)
+							   ||
+							   ($neu && $row->studiensemester_kurzbz == $studiensemester_kurzbz))
+								$selected='selected="selected"';
 							else
 								$selected='';
 
-							echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.$selected.'>'.$db->convert_html_chars($row->studiensemester_kurzbz).'</OPTION>'.'\n';
+							echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.$selected.'>'.$db->convert_html_chars($row->studiensemester_kurzbz).'</OPTION>'."\n";
 						}
 					?>
 				</select>

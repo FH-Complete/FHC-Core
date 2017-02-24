@@ -114,7 +114,7 @@ foreach ($rt->result as $row)
 			$freieplaetze = ' ('.$row->angemeldete_teilnehmer.'/'.$row->max_teilnehmer.')';
 	}
 
-	$bezeichnung = (array_key_exists($row->studiengang_kz, $stg)?$stg[$row->studiengang_kz].' ':'').$row->datum.' '.$row->uhrzeit.' '.$row->ort_kurzbz.' '.$row->anmerkung.$freieplaetze;
+	$bezeichnung = $row->studiensemester_kurzbz.' St.'.$row->stufe.' '.(array_key_exists($row->studiengang_kz, $stg)?$stg[$row->studiengang_kz].' ':'').$row->datum.' '.$row->uhrzeit.' '.$row->ort_kurzbz.' '.$row->anmerkung.$freieplaetze;
 ?>
 	<RDF:li>
 		<RDF:Description  id="<?php echo $row->reihungstest_id; ?>"  about="<?php echo $rdf_url.'/'.$row->reihungstest_id; ?>" >

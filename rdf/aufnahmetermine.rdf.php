@@ -87,10 +87,13 @@ function drawrow($row)
 	$oRdf->obj[$i]->setAttribut('teilgenommen',($row->teilgenommen?'Ja':'Nein'),true);
 	$oRdf->obj[$i]->setAttribut('punkte',$row->punkte,true);
 	$oRdf->obj[$i]->setAttribut('ort_kurzbz',$row->ort_kurzbz,true);
-	$oRdf->obj[$i]->setAttribut('reihungstest',$reihungstest_obj->datum.' '.$reihungstest_obj->anmerkung,true);
+	$oRdf->obj[$i]->setAttribut('anmerkung',$reihungstest_obj->anmerkung,true);
 	$oRdf->obj[$i]->setAttribut('stufe',$reihungstest_obj->stufe,true);
 	$oRdf->obj[$i]->setAttribut('studienplan_id',$row->studienplan_id,true);
 	$oRdf->obj[$i]->setAttribut('studienplan_bezeichnung',$studienplan->bezeichnung,true);
+	$oRdf->obj[$i]->setAttribut('studiensemester',$reihungstest_obj->studiensemester_kurzbz,true);
+	$oRdf->obj[$i]->setAttribut('datum',$datum_obj->formatDatum($reihungstest_obj->datum,'d.m.Y'),true);
+	$oRdf->obj[$i]->setAttribut('datum_iso',$reihungstest_obj->datum,true);
 
 	$oRdf->addSequence($row->rt_person_id);
 }

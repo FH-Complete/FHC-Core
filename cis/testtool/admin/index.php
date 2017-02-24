@@ -37,7 +37,7 @@ if (!$db = new basis_db())
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
 session_cache_limiter('none');
-//session_start();
+session_start();
 
 $user = get_uid();
 $rechte = new benutzerberechtigung();
@@ -168,10 +168,10 @@ font-size: 10pt;
 <h1>
 	<div style="float:left">Testtool - Administrationsseite</div>
 	<div style="text-align:right; padding-right: 5px;">
-		<a href="gebieteAnheangen.php?stg_kz=<?php echo $stg_kz?>">Ablauf</a> | 
-		<a href="uebersichtGebiete.php" class="Item" target="blank">Gebietübersicht</a> | 
-		<a href="uebersichtFragen.php" class="Item" target="blank">Fragenübersicht</a> | 
-		<a href="auswertung.php" class="Item">Auswertung</a> | 
+		<a href="gebieteAnheangen.php?stg_kz=<?php echo $stg_kz?>">Ablauf</a> |
+		<a href="uebersichtGebiete.php" class="Item" target="blank">Gebietübersicht</a> |
+		<a href="uebersichtFragen.php" class="Item" target="blank">Fragenübersicht</a> |
+		<a href="auswertung.php" class="Item">Auswertung</a> |
 		<a href="Testtool.pdf" class="Item" target="_blank">Hilfe</a>
 	</div>
 </h1>
@@ -295,6 +295,8 @@ if (isset($_POST['submitdata']))
 			{
 				$frage->new = false;
 			}
+			else
+				$frage->new = true;
 
 			if (isset($_POST['text']))
 				$frage->text = $_POST['text'];
@@ -563,7 +565,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'vorschlaegeaktiv')
 			$checkedVorschlaege = $_POST['vorschlagaktiv'];
 			$allevorschlaege = array();
 			$allevorschlaege = explode(",", rtrim($_POST['allevorschlaege'], ","));
-			
+
 			foreach ($allevorschlaege as $vorschlag)
 			{
 				$vs->load($vorschlag, $sprache);
@@ -583,7 +585,7 @@ if (isset($_GET['type']) && $_GET['type'] == 'vorschlaegeaktiv')
 		{
 			$allevorschlaege = array();
 			$allevorschlaege = explode(",", rtrim($_POST['allevorschlaege'], ","));
-			
+
 			foreach ($allevorschlaege as $vorschlag)
 			{
 				$vs->load($vorschlag, $sprache);
@@ -697,7 +699,7 @@ if (($anzahl !== 0) || ($stg_kz == '-1') && ($stg_kz !== ''))
 		{
 			$link = "";
 			echo '<a href="'.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$nummer.'&amp;filter=inaktiv">
-					<input type="checkbox" name="aktiv" '.$aktivchecked.' onclick="window.location.assign(\''.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$nummer.'&amp;filter=inaktiv\');"/>aktiv</a> 
+					<input type="checkbox" name="aktiv" '.$aktivchecked.' onclick="window.location.assign(\''.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$nummer.'&amp;filter=inaktiv\');"/>aktiv</a>
 					<a href="'.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$nummer.'&amp;filter=">
 					<input type="checkbox" name="inaktiv" '.$inaktivchecked.' onclick="window.location.assign(\''.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$nummer.'&amp;filter=\');"/>inaktiv</a>';
 		}
@@ -720,7 +722,7 @@ if (($anzahl !== 0) || ($stg_kz == '-1') && ($stg_kz !== ''))
 		{
 			if ($nummer == '')
 				$nummer = $row->nummer;
-			
+
 			$style = '';
 			if ($db->db_parse_bool($row->aktiv) == false)
 				$style = 'style="color: lightgrey"';
@@ -901,8 +903,13 @@ if ($frage_id != '')
 		{
 			$fragef1 = new frage();
 			$fragef1->getFragen($_GET['gebiet_id'], $_GET['nummer']);
-			$vorschlag->getVorschlag($fragef1->result[0]->frage_id, $sprache, false, false);
-			echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size='3' id='nummer' value='".(count($vorschlag->result) + 1)."' />"; //@Todo: Count ($vorschlag->result) liefert die naechste Nummer nur dann richtig, falls keine Zahl dazwischen fehlt (1,3,4,..). Hier sollte die letzte Nummer ermittelt werden.
+			if(isset($fragef1->result[0]))
+			{
+				$vorschlag->getVorschlag($fragef1->result[0]->frage_id, $sprache, false, false);
+				echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size='3' id='nummer' value='".(count($vorschlag->result) + 1)."' />"; //@Todo: Count ($vorschlag->result) liefert die naechste Nummer nur dann richtig, falls keine Zahl dazwischen fehlt (1,3,4,..). Hier sollte die letzte Nummer ermittelt werden.
+			}
+			else
+				echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size='3' id='nummer' />";
 		}
 		else
 		{
@@ -1009,7 +1016,7 @@ if ($frage_id != '')
 			$vss = new vorschlag();
 			$vss->load($vs->vorschlag_id);
 			if ($vss->aktiv == true) echo "checked='checked'";
-			
+
 			echo "/></td></tr>";
 			$allevorschlaege .= $vs->vorschlag_id.",";
 		}

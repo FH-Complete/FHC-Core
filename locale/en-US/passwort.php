@@ -30,5 +30,7 @@ $this->phrasen['passwort/CodeOderUsernameFalsch']='Code or Username wrong';
 $this->phrasen['passwort/CaptchaCodeFalsch']='Captcha Code wrong';
 $this->phrasen['passwort/AccountErfolgreichAktiviert']='Account has been activated successfully';
 $this->phrasen['passwort/WeiterZumLogin']='Proceed to Login';
-
+$this->phrasen['passwort/RequiredToChangeInfo']='You have not changed your password for over a year.
+Please change your password immediately';
+$this->phrasen['passwort/nichtGleich']='The new password must be different from the old password.';
 ?>

@@ -149,6 +149,11 @@ class zeugnisnote extends basis_db
 			$this->errormsg = 'Note ist ungueltig';
 			return false;
 		}
+		if($this->punkte!='' && !is_numeric($this->punkte))
+		{
+			$this->errormsg = 'Punkte sind ungueltig';
+			return false;
+		}
 		if($this->uebernahmedatum!='' && !mb_ereg("([0-9]{4})-([0-9]{2})-([0-9]{2})",$this->uebernahmedatum))
 		{
 			$this->errormsg = 'Uebernahmedatum ist ungueltig';

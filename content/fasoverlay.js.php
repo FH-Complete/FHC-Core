@@ -1787,24 +1787,31 @@ function PrintStudienblatt(event)
 	var ss = document.getElementById('statusbarpanel-semester').label;
 
 	var items = tree.view.rowCount;
-
+	var statusstsemfound=false;
 	try
 	{
-	    var studienplan_id = "";
-	    for (var v=0; v < items; v++)
-	    {
+		var studienplan_id = "";
+		for (var v=0; v < items; v++)
+		{
 			var stsem = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', v);
 			if(stsem == ss)
 			{
+				statusstsemfound=true;
 				studienplan_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-studienplan_id', v);
 				if(studienplan_id!='')
 					break;
 			}
-	    }
+		}
 	}
 	catch(e)
 	{
 		check = confirm('Achtung: Beim letzten (aktuellen) PreStudent-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
+		if (check == false)
+			return false;
+	}
+	if(!statusstsemfound)
+	{
+		check = confirm('Achtung: Die Person hat im '+ss+' keinen Status\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
 		if (check == false)
 			return false;
 	}
@@ -1887,14 +1894,17 @@ function PrintStudienblattEnglisch(event)
 	var ss = document.getElementById('statusbarpanel-semester').label;
 	var items = tree.view.rowCount;
 
+	var statusstsemfound = false;
+
 	try
 	{
-	    var studienplan_id = "";
-	    for (var v=0; v < items; v++)
-	    {
+		var studienplan_id = "";
+		for (var v=0; v < items; v++)
+		{
 			var stsem = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', v);
 			if(stsem == ss)
 			{
+				statusstsemfound=true;
 				studienplan_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-studienplan_id', v);
 				if(studienplan_id!='')
 					break;
@@ -1904,6 +1914,13 @@ function PrintStudienblattEnglisch(event)
 	catch(e)
 	{
 		check = confirm('Achtung: Beim letzten (aktuellen) PreStudent-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
+		if (check == false)
+			return false;
+	}
+
+	if(!statusstsemfound)
+	{
+		check = confirm('Achtung: Die Person hat im '+ss+' keinen Status\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
 		if (check == false)
 			return false;
 	}

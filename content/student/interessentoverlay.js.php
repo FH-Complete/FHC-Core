@@ -38,7 +38,7 @@ function InteressentNeu()
 	}
 	catch(e)
 	{}
-	
+
 	window.open('<?php echo APP_ROOT; ?>vilesci/personen/import/interessentenimport.php?studiengang_kz='+stg_kz,'Interessent anlegen', 'height=768,width=1024,resizable=yes,status=yes,scrollbars=yes,toolbar=yes,location=yes,menubar=yes');
 }
 
@@ -49,7 +49,7 @@ function InteressentNeu()
 // *	- Hakerl "zum Reihungstest angetreten" muss angekreuzt sein
 // * Wenn die Voraussetzungen erfuellt sind wird die Rolle Bewerber hinzugefuegt
 // ****
-function InteressentzuBewerber()
+function InteressentzuBewerber(statusgrund_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-tree');
@@ -84,6 +84,8 @@ function InteressentzuBewerber()
 
 	req.add('prestudent_id', paramList);
 	req.add('status_kurzbz', 'Bewerber');
+	if(typeof(statusgrund_id)!='undefined')
+		req.add('statusgrund_id', statusgrund_id);
 
 	var response = req.executePOST();
 
@@ -114,7 +116,7 @@ function InteressentzuBewerber()
 // * Wenn die Voraussetzungen erfuellt sind, dann wird die Matrikelnr
 // * und UID generiert und der Studentendatensatz angelegt.
 // ****
-function InteressentzuStudent()
+function InteressentzuStudent(statusgrund_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-tree');
@@ -139,13 +141,15 @@ function InteressentzuStudent()
 			anzahl = anzahl+1;
 		}
 	}
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'BewerberZuStudent');
 
 	req.add('prestudent_id', paramList);
+	if(typeof(statusgrund_id)!='undefined')
+		req.add('statusgrund_id', statusgrund_id);
 
 	var response = req.executePOST();
 
@@ -170,13 +174,13 @@ function InteressentzuStudent()
 // ****
 // * Fuegt eine Rolle zu einem Interessenten hinzu
 // ****
-function InteressentAddRolle(rolle)
+function InteressentAddRolle(rolle, statusgrund_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-tree');
 
 	if (tree.currentIndex==-1) return;
-	
+
 	//Alle markierten Personen holen
 	var start = new Object();
 	var end = new Object();
@@ -199,7 +203,7 @@ function InteressentAddRolle(rolle)
 		conf = 'Diese '+anzahl+' Studenten';
 	else
 		conf = 'Diesen Studenten';
-	
+
 	if(confirm(conf+' zum '+rolle+' machen?'))
 	{
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
@@ -209,6 +213,8 @@ function InteressentAddRolle(rolle)
 
 		req.add('prestudent_id', paramList);
 		req.add('status_kurzbz', rolle);
+		if(typeof(statusgrund_id)!='undefined')
+			req.add('statusgrund_id', statusgrund_id);
 
 		var response = req.executePOST();
 
@@ -223,7 +229,7 @@ function InteressentAddRolle(rolle)
 			StudentTreeRefresh();
 		}
 		else
-		{			
+		{
 			StudentTreeRefresh();
 			SetStatusBarText('Rolle hinzugefuegt');
 		}

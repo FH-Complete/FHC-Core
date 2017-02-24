@@ -1,5 +1,12 @@
 # Change Log
 
+## [Unreleased]
+
+### Added
+- **[FAS]** Verwaltung von Rechnungsadressen
+- **[CIS]** Mitarbeiter und Studierende können nach dem Login im CIS zur Passwortänderung umgeleitet werden wenn dieses seit über einem Jahr nicht geändert wurde
+- **[FAS]** Bei Statuswechsel von Studierenden können Gründe für den Statuswechsel angegeben werden
+
 ## [3.2]
 
 ### Added
@@ -26,7 +33,7 @@
 - **[FAS]** Es ist möglich bei Statusänderungen im FAS automatisierte Nachrichten an die Studierenden zu senden
 - **[FAS]** Bewerberakt - Erstellung eines Akts mit allen hochgeladenen Dokumenten einer Person
 - **[FAS]** Bewerbungsfristen für einzelen Studienpläne
-- **[FAS]** Beim Statuswechsel kann ein Statusgrund hinterlegt werden. 
+- **[FAS]** Beim Statuswechsel kann ein Statusgrund hinterlegt werden.
 - **[FAS]** Es kann pro Studiengang hinterlegt werden ob ein Dokument nachreichbar ist oder nicht
 - **[FAS]** Arbeitsplätze bei Räumen (zB für EDV Säle mit 50 Plätzen aber nur 25 PCs)
 - **[FAS]** Zuteilung von Prestudenten zu Aufnahmegruppen
@@ -56,7 +63,7 @@
 - **[FAS]** Mehrsprachigkeitsspalte tbl_status.bezeichnung_mehrsprachig wird durch das Updatescript automatisch in den ersten beiden Sprachen mit der status_kurzbz vorbefüllt. Übersetzungen sind anzupassen.
 - **[MOODLE]** Neue Webservicefunktion core_user_update_users wird benötigt
 - **[CORE]** Kommune wurde aus Core entfernt
-- **[DEPRECATED]]** WaWi wurde in ein Addon (FHC-ADDON-WAWI) ausgelagert. Die Funktionalität im Core wird demnächst entfernt. 
+- **[DEPRECATED]]** WaWi wurde in ein Addon (FHC-ADDON-WAWI) ausgelagert. Die Funktionalität im Core wird demnächst entfernt.
 - **[DEPRECATED]]** LV-Informationen (FHC-ADDON-LVINFO) wurde in ein Addon ausgelagert. Die Funktionalität im Core wird demnächst entfernt
 - **[DEPRECATED]]** Punkte1, Punkte2 und Punkte3 in tbl_prestudent werden nicht mehr verwendet und in zukünftigen Versionen entfernt. Diese werden jetzt in tbl_rt_person gespeichert
 - **[DEPRECATED]]** anmeldungreihungstest in tbl_prestudent wird nicht mehr verwendet und in zukünftigen Versionen entfernt

@@ -30,6 +30,7 @@ require_once('../../config/vilesci.config.inc.php');
 require_once('../../config/global.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/statusgrund.class.php');
 
 $user = get_uid();
 $rechte = new benutzerberechtigung();
@@ -93,20 +94,74 @@ else
 							<toolbarbutton id="student-toolbar-buchung" label="Neue Buchung" oncommand="StudentKontoNeu()" disabled="false" tooltiptext="neue Buchung anlegen"/>
 
 							<toolbarbutton label="Status ändern " id="student-toolbar-status" type="menu">
-						      <menupopup id="student-status-menu-popup" >
-								    <menuitem id="student-toolbar-abbrecher" label="-> Abbrecher" oncommand="StudentAddRolle('Abbrecher','0')" disabled="false" tooltiptext="Student zum Abbrecher machen" hidden="true"/>
-									<menuitem id="student-toolbar-unterbrecher" label="-> Unterbrecher" oncommand="StudentAddRolle('Unterbrecher','0')" disabled="false" tooltiptext="Student zum Unterbrecher machen" hidden="true"/>
-									<menuitem id="student-toolbar-student" label="-> Student" oncommand="StudentUnterbrecherZuStudent()" disabled="false" tooltiptext="Ab/Unterbrecher wieder zum Studenten machen" hidden="true"/>
-									<menuitem id="student-toolbar-diplomand" label="-> Diplomand" oncommand="StudentAddRolle('Diplomand')" disabled="false" tooltiptext="Studenten zum Diplomanden machen" hidden="true"/>
-									<menuitem id="student-toolbar-absolvent" label="-> Absolvent" oncommand="StudentAddRolle('Absolvent')" disabled="false" tooltiptext="Studenten zum Absolventen machen" hidden="true"/>
+								<menupopup id="student-status-menu-popup" >
+								<?php
 
-									<menuitem id="interessent-toolbar-zubewerber" label="-> Bewerber" oncommand="InteressentzuBewerber()" disabled="false" tooltiptext="Interessent zum Bewerber machen" hidden="true"/>
-									<menuitem id="interessent-toolbar-aufgenommener" label="-> Aufgenommener" oncommand="InteressentAddRolle('Aufgenommener')" disabled="false" tooltiptext="Interessent zum Aufgenommenen machen" hidden="true"/>
-									<menuitem id="interessent-toolbar-zustudent" label="-> Student" oncommand="InteressentzuStudent()" disabled="false" tooltiptext="Bewerber zu Studenten machen" hidden="true"/>
-									<menuitem id="interessent-toolbar-warteliste" label="-> Warteliste" oncommand="InteressentAddRolle('Wartender')" disabled="false" tooltiptext="Interessent zum Wartenden machen" hidden="true"/>
-									<menuitem id="interessent-toolbar-absage" label="-> Absage" oncommand="InteressentAddRolle('Abgewiesener')" disabled="false" tooltiptext="Interessent zum Absager machen" hidden="true"/>
-						      </menupopup>
-						    </toolbarbutton>
+								/**
+								 * Erstellt den Menuepunkt fuer den Statuswechsel
+								 * Wenn ein Statusgrund vorhanden ist wird ein Submenue angezeigt fuer die Auswahl
+								 * des Statusgrund. Wenn keine Statusgruende vorhanden sind wird nur ein normaler
+								 * Menuepuntk angezeigt
+								 *
+								 * @param $gruende Array mit Statusgruenden
+								 * @param $status_kurzbz Status
+								 * @param $id HTML id des Menueeintrags
+								 * @param $label HTML Label des Menueeintrages
+								 * @param $command JS Funktion die aufgerufen werden soll
+								 */
+								function printStatuswechselMenuitem($gruende, $status_kurzbz, $id, $label, $command)
+								{
+									if(isset($gruende[$status_kurzbz]) && count($gruende[$status_kurzbz])>0)
+									{
+
+										echo '
+										<menu id="'.$id.'" label="'.$label.'">
+											<menupopup>';
+										foreach($gruende[$status_kurzbz] as $row)
+										{
+											$commandWithID = str_replace('STATUSGRUNDID',$row['statusgrund_id'],$command);
+											echo '<menuitem label="'.$row['bezeichnung'].'" oncommand="'.$commandWithID.'" disabled="false" tooltiptext="'.$row['beschreibung'].'"/>';
+										}
+										echo '
+											</menupopup>
+										</menu>
+										';
+									}
+									else
+									{
+										$command = str_replace('STATUSGRUNDID','',$command);
+										echo '<menuitem id="'.$id.'" label="'.$label.'" oncommand="'.$command.'" disabled="false" tooltiptext="Status ändern auf '.$status_kurzbz.'" hidden="true"/>';
+									}
+								}
+								// Statusgruende laden
+								$statusgrund = new statusgrund();
+								$statusgrund->getAll(true);
+								$gruende=array();
+								foreach($statusgrund->result as $row)
+								{
+									$gruende[$row->status_kurzbz][] = array(
+										'statusgrund_id'=>$row->statusgrund_id,
+										'bezeichnung'=>$row->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE],
+										'beschreibung'=>$row->beschreibung[DEFAULT_LANGUAGE]
+									);
+								}
+
+								printStatuswechselMenuitem($gruende, 'Abbrecher', 'student-toolbar-abbrecher', 'Abbrecher', "StudentAddRolle('Abbrecher','0',undefined,'STATUSGRUNDID')");
+								printStatuswechselMenuitem($gruende, 'Unterbrecher', 'student-toolbar-unterbrecher', 'Unterbrecher', "StudentAddRolle('Unterbrecher','0',undefined,'STATUSGRUNDID')");
+								printStatuswechselMenuitem($gruende, 'Student', 'student-toolbar-student', 'Student', "StudentUnterbrecherZuStudent('STATUSGRUNDID')");
+								printStatuswechselMenuitem($gruende, 'Diplomand', 'student-toolbar-diplomand', 'Diplomand', "StudentAddRolle('Diplomand',undefined,undefined,'STATUSGRUNDID')");
+								printStatuswechselMenuitem($gruende, 'Absovlent', 'student-toolbar-absolvent', 'Absolvent', "StudentAddRolle('Absolvent',undefined,undefined,'STATUSGRUNDID')");
+
+								printStatuswechselMenuitem($gruende, 'Bewerber', 'interessent-toolbar-zubewerber', 'Bewerber', "InteressentzuBewerber('STATUSGRUNDID')");
+								printStatuswechselMenuitem($gruende, 'Aufgenommener', 'interessent-toolbar-aufgenommener', 'Aufgenommener', "InteressentAddRolle('Aufgenommener','STATUSGRUNDID')");
+								printStatuswechselMenuitem($gruende, 'Student', 'interessent-toolbar-zustudent', 'Student', "InteressentzuStudent('STATUSGRUNDID')");
+								printStatuswechselMenuitem($gruende, 'Warteliste', 'interessent-toolbar-warteliste', 'Wartender', "InteressentAddRolle('Wartender','STATUSGRUNDID')");
+								printStatuswechselMenuitem($gruende, 'Absage', 'interessent-toolbar-absage', 'Abgewiesener', "InteressentAddRolle('Abgewiesener','STATUSGRUNDID')");
+
+								?>
+								</menupopup>
+
+							</toolbarbutton>
 
 							<toolbarbutton id="student-toolbar-export" label="Export" oncommand="StudentExport()" disabled="false" image="../skin/images/ExcelIcon.png" tooltiptext="Daten ins Excel Exportieren"/>
 						<?php

@@ -107,6 +107,8 @@ if(!$error)
 			$adresse->firma_id = $_POST['firma_id'];
 			$adresse->updateamum = date('Y-m-d H:i:s');
 			$adresse->updatevon = $user;
+			$adresse->rechnungsadresse = ($_POST['rechnungsadresse']=='true'?true:false);
+			$adresse->anmerkung = $_POST['anmerkung'];
 
 			//Wenn die Nation Oesterreich ist, dann muss die Gemeinde in der Tabelle Gemeinde vorkommen
 			if($_POST['nation']=='A')

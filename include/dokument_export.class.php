@@ -302,21 +302,21 @@ class dokument_export
 			switch($this->outputformat)
 			{
 				case 'pdf':
-		            header('Content-type: application/pdf');
-		            header('Content-Disposition: attachment; filename="'.$this->filename.'.pdf"');
-		            header('Content-Length: '.$fsize);
+					header('Content-type: application/pdf');
+					header('Content-Disposition: attachment; filename="'.$this->filename.'.pdf"');
+					header('Content-Length: '.$fsize);
 					break;
 
 				case 'doc':
-		            header('Content-type: application/vnd.ms-word');
-		            header('Content-Disposition: attachment; filename="'.$this->filename.'.doc"');
-		            header('Content-Length: '.$fsize);
+					header('Content-type: application/vnd.ms-word');
+					header('Content-Disposition: attachment; filename="'.$this->filename.'.doc"');
+					header('Content-Length: '.$fsize);
 					break;
 
 				case 'odt':
-		            header('Content-type: application/vnd.oasis.opendocument.text');
-		            header('Content-Disposition: attachment; filename="'.$this->filename.'.odt"');
-		            header('Content-Length: '.$fsize);
+					header('Content-type: application/vnd.oasis.opendocument.text');
+					header('Content-Disposition: attachment; filename="'.$this->filename.'.odt"');
+					header('Content-Length: '.$fsize);
 					break;
 				default:
 					exit('Outputformat is not defined');
@@ -383,21 +383,21 @@ class dokument_export
 
 		foreach( $data as $key => $value )
 		{
-		    if( is_array($value) )
+			if( is_array($value) )
 			{
-		        if( is_numeric($key) )
+				if( is_numeric($key) )
 				{
-		            $key = 'item'.$key; //dealing with <0/>..<n/> issues
-			        $this->ConvertArrayToXML($value, null, $_xml_data);
-		        }
+					$key = 'item'.$key; //dealing with <0/>..<n/> issues
+					$this->ConvertArrayToXML($value, null, $_xml_data);
+				}
 				else
 				{
-		        	$subnode = $_xml_data->addChild($key);
-			        $this->ConvertArrayToXML($value, null, $subnode);
+					$subnode = $_xml_data->addChild($key);
+					$this->ConvertArrayToXML($value, null, $subnode);
 				}
-		    }
+			}
 			else
-		        $_xml_data->addChild("$key",htmlspecialchars("$value"));
+				$_xml_data->addChild("$key",htmlspecialchars("$value"));
 		}
 		return $_xml_data->asXML();
 	}
@@ -423,6 +423,16 @@ class dokument_export
 		}
 
 		return true;
+	}
+
+	/**
+	 * Set the Filename
+	 * @param string $filename Filename without Extension.
+	 * @return void
+	 */
+	public function setFilename($filename)
+	{
+		$this->filename = $filename;
 	}
 }
 ?>

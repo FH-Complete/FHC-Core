@@ -147,13 +147,13 @@ var KontaktBankverbindungTreeListener =
 function loadKontakte(person_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	KontaktPerson_id=person_id;
-	
+
 	//Adressen laden
-	url = "<?php echo APP_ROOT; ?>rdf/adresse.rdf.php?person_id="+person_id+"&"+gettimestamp();	
+	url = "<?php echo APP_ROOT; ?>rdf/adresse.rdf.php?person_id="+person_id+"&"+gettimestamp();
 	var treeAdressen=document.getElementById('kontakt-adressen-tree');
-	
+
 	try
 	{
 		AdressenTreeDatasource.removeXMLSinkObserver(KontaktAdressenTreeSinkObserver);
@@ -161,14 +161,14 @@ function loadKontakte(person_id)
 	}
 	catch(e)
 	{}
-	
+
 	//Alte DS entfernen
 	var oldDatasources = treeAdressen.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
 	{
 		treeAdressen.database.RemoveDataSource(oldDatasources.getNext());
 	}
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	AdressenTreeDatasource = rdfService.GetDataSource(url);
 	AdressenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -176,11 +176,11 @@ function loadKontakte(person_id)
 	treeAdressen.database.AddDataSource(AdressenTreeDatasource);
 	AdressenTreeDatasource.addXMLSinkObserver(KontaktAdressenTreeSinkObserver);
 	treeAdressen.builder.addListener(KontaktAdressenTreeListener);
-		
+
 	//Kontakte laden
-	url = "<?php echo APP_ROOT; ?>rdf/kontakt.rdf.php?person_id="+person_id+"&"+gettimestamp();	
+	url = "<?php echo APP_ROOT; ?>rdf/kontakt.rdf.php?person_id="+person_id+"&"+gettimestamp();
 	var treeKontakt=document.getElementById('kontakt-kontakt-tree');
-	
+
 	try
 	{
 		KontaktTreeDatasource.removeXMLSinkObserver(KontaktKontaktTreeSinkObserver);
@@ -188,14 +188,14 @@ function loadKontakte(person_id)
 	}
 	catch(e)
 	{}
-	
+
 	//Alte DS entfernen
 	var oldDatasources = treeKontakt.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
 	{
 		treeKontakt.database.RemoveDataSource(oldDatasources.getNext());
 	}
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	KontaktTreeDatasource = rdfService.GetDataSource(url);
 	KontaktTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
@@ -203,9 +203,9 @@ function loadKontakte(person_id)
 	treeKontakt.database.AddDataSource(KontaktTreeDatasource);
 	KontaktTreeDatasource.addXMLSinkObserver(KontaktKontaktTreeSinkObserver);
 	treeKontakt.builder.addListener(KontaktKontaktTreeListener);
-	
+
 	//Bankverbindungen laden
-	url = "<?php echo APP_ROOT; ?>rdf/bankverbindung.rdf.php?person_id="+person_id+"&"+gettimestamp();	
+	url = "<?php echo APP_ROOT; ?>rdf/bankverbindung.rdf.php?person_id="+person_id+"&"+gettimestamp();
 	var treeBankverbindung=document.getElementById('kontakt-bankverbindung-tree');
 	if(treeBankverbindung != null)
     {
@@ -247,13 +247,13 @@ function KontaktAdressenTreeSelectID()
 
 	//In der globalen Variable ist die zu selektierende Adresse gespeichert
 	if(KontaktAdresseSelectID!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ID der row holen
 			col = tree.columns ? tree.columns["kontakt-adressen-treecol-adresse_id"] : "kontakt_adressen-treecol-adresse_id";
 			id=tree.view.getCellText(i,col);
-						
+
 			if(id == KontaktAdresseSelectID)
 			{
 				//Zeile markieren
@@ -264,7 +264,7 @@ function KontaktAdressenTreeSelectID()
 			}
 	   	}
 	   	KontaktAdresseSelectID=null;
-	}	
+	}
 }
 
 // ****
@@ -285,16 +285,18 @@ function KontaktAdresseSpeichern(dialog)
 	heimatadresse = dialog.getElementById('adresse-checkbox-heimatadresse').checked;
 	zustelladresse = dialog.getElementById('adresse-checkbox-zustelladresse').checked;
 	firma_id = dialog.getElementById('adresse-menulist-firma').value;
-	
+	rechnungsadresse = dialog.getElementById('adresse-checkbox-rechnungsadresse').checked;
+	anmerkung = dialog.getElementById('adresse-textbox-anmerkung').value;
+
 	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
-		studiengang_kz='';	
+		studiengang_kz='';
 	else
 		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
-	
+
 	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'adressesave');
 
 	req.add('neu', neu);
@@ -311,11 +313,13 @@ function KontaktAdresseSpeichern(dialog)
 	req.add('zustelladresse', zustelladresse);
 	req.add('firma_id', firma_id);
 	req.add('studiengang_kz', studiengang_kz);
+	req.add('rechnungsadresse', rechnungsadresse);
+	req.add('anmerkung', anmerkung);
 
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -338,7 +342,7 @@ function KontaktAdresseSpeichern(dialog)
 // ****
 function KontaktAdresseNeu()
 {
-	window.open("<?php echo APP_ROOT; ?>content/adressedialog.xul.php?person_id="+KontaktPerson_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+	window.open("<?php echo APP_ROOT; ?>content/adressedialog.xul.php?person_id="+KontaktPerson_id,"","chrome, status=no, width=500, height=450, centerscreen, resizable");
 }
 
 // ****
@@ -347,14 +351,14 @@ function KontaktAdresseNeu()
 function KontaktAdresseBearbeiten()
 {
 	tree = document.getElementById('kontakt-adressen-tree');
-	
+
 	if (tree.currentIndex==-1) return;
-	
+
 	//Ausgewaehlte ID holen
     var col = tree.columns ? tree.columns["kontakt-adressen-treecol-adresse_id"] : "kontakt-adressen-treecol-adresse_id";
 	var adresse_id=tree.view.getCellText(tree.currentIndex,col);
-	
-	window.open("<?php echo APP_ROOT; ?>content/adressedialog.xul.php?adresse_id="+adresse_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+
+	window.open("<?php echo APP_ROOT; ?>content/adressedialog.xul.php?adresse_id="+adresse_id,"","chrome, status=no, width=500, height=450, centerscreen, resizable");
 }
 
 // ****
@@ -363,16 +367,16 @@ function KontaktAdresseBearbeiten()
 function KontaktAdresseDelete()
 {
 	tree = document.getElementById('kontakt-adressen-tree');
-	
+
 	if (tree.currentIndex==-1) return;
-	
+
 	//Ausgewaehlte ID holen
     var col = tree.columns ? tree.columns["kontakt-adressen-treecol-adresse_id"] : "kontakt-adressen-treecol-adresse_id";
 	var adresse_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
-		studiengang_kz='';	
+		studiengang_kz='';
 	else
 		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 
@@ -380,16 +384,16 @@ function KontaktAdresseDelete()
 	{
 		var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'adressedelete');
-		
+
 		req.add('adresse_id', adresse_id);
 		req.add('studiengang_kz', studiengang_kz);
-	
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -409,7 +413,7 @@ function KontaktAdresseDelete()
 
 // ****
 // * Beim Sortieren des Trees wird der markierte Eintrag gespeichert und nach dem sortieren
-// * wieder markiert. 
+// * wieder markiert.
 // ****
 function KontaktAdresseTreeSort()
 {
@@ -438,13 +442,13 @@ function KontaktKontaktTreeSelectID()
 
 	//In der globalen Variable ist die zu selektierende Bankverbindung gespeichert
 	if(KontaktKontaktSelectID!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ID der row holen
 			col = tree.columns ? tree.columns["kontakt-kontakt-treecol-kontakt_id"] : "kontakt_kontakt-treecol-kontakt_id";
 			id=tree.view.getCellText(i,col);
-						
+
 			if(id == KontaktKontaktSelectID)
 			{
 				//Zeile markieren
@@ -470,19 +474,19 @@ function KontaktKontaktSpeichern(dialog)
 	zustellung = dialog.getElementById('kontakt-checkbox-zustellung').checked;
 	typ = dialog.getElementById('kontakt-menulist-typ').value;
 	standort_id = dialog.getElementById('kontakt-menulist-firma').value;
-		
+
 	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
-		studiengang_kz='';	
+		studiengang_kz='';
 	else
 		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 
-	
+
 	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'kontaktsave');
-	
+
 	req.add('neu', neu);
 	req.add('person_id', person_id);
 	req.add('kontakt_id', kontakt_id);
@@ -496,7 +500,7 @@ function KontaktKontaktSpeichern(dialog)
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -528,13 +532,13 @@ function KontaktKontaktNeu()
 function KontaktKontaktBearbeiten()
 {
 	tree = document.getElementById('kontakt-kontakt-tree');
-	
+
 	if (tree.currentIndex==-1) return;
-	
+
 	//Ausgewaehlte ID holen
     var col = tree.columns ? tree.columns["kontakt-kontakt-treecol-kontakt_id"] : "kontakt-kontakt-treecol-kontakt_id";
 	var kontakt_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	window.open("<?php echo APP_ROOT; ?>content/kontaktdialog.xul.php?kontakt_id="+kontakt_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
 }
 
@@ -544,16 +548,16 @@ function KontaktKontaktBearbeiten()
 function KontaktKontaktDelete()
 {
 	tree = document.getElementById('kontakt-kontakt-tree');
-	
+
 	if (tree.currentIndex==-1) return;
-	
+
 	//Ausgewaehlte ID holen
     var col = tree.columns ? tree.columns["kontakt-kontakt-treecol-kontakt_id"] : "kontakt-kontakt-treecol-kontakt_id";
 	var kontakt_id=tree.view.getCellText(tree.currentIndex,col);
 
 	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
-		studiengang_kz='';	
+		studiengang_kz='';
 	else
 		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 
@@ -561,16 +565,16 @@ function KontaktKontaktDelete()
 	{
 		var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'kontaktdelete');
-		
+
 		req.add('kontakt_id', kontakt_id);
 		req.add('studiengang_kz', studiengang_kz);
-	
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -590,7 +594,7 @@ function KontaktKontaktDelete()
 
 // ****
 // * Beim Sortieren des Trees wird der markierte Eintrag gespeichert und nach dem sortieren
-// * wieder markiert. 
+// * wieder markiert.
 // ****
 function KontaktKontaktTreeSort()
 {
@@ -618,13 +622,13 @@ function KontaktBankverbindungTreeSelectID()
 
 	//In der globalen Variable ist die zu selektierende Bankverbindung gespeichert
 	if(KontaktBankverbindungSelectID!=null)
-	{		
+	{
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//ID der row holen
 			col = tree.columns ? tree.columns["kontakt-bankverbindung-treecol-bankverbindung_id"] : "kontakt_bankverbindung-treecol-bankverbindung_id";
 			id=tree.view.getCellText(i,col);
-						
+
 			if(id == KontaktBankverbindungSelectID)
 			{
 				//Zeile markieren
@@ -654,18 +658,18 @@ function KontaktBankverbindungSpeichern(dialog)
 	kontonr = dialog.getElementById('bankverbindung-textbox-kontonr').value;
 	typ = dialog.getElementById('bankverbindung-menulist-typ').value;
 	verrechnung = dialog.getElementById('bankverbindung-checkbox-verrechnung').checked;
-		
+
 	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
-		studiengang_kz='';	
+		studiengang_kz='';
 	else
 		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 
 	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 	var req = new phpRequest(url,'','');
-	
+
 	req.add('type', 'bankverbindungsave');
-	
+
 	req.add('neu', neu);
 	req.add('person_id', person_id);
 	req.add('bankverbindung_id', bankverbindung_id);
@@ -682,7 +686,7 @@ function KontaktBankverbindungSpeichern(dialog)
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
-	
+
 	if (!val.dbdml_return)
 	{
 		if(val.dbdml_errormsg=='')
@@ -714,13 +718,13 @@ function KontaktBankverbindungNeu()
 function KontaktBankverbindungBearbeiten()
 {
 	tree = document.getElementById('kontakt-bankverbindung-tree');
-	
+
 	if (tree.currentIndex==-1) return;
-	
+
 	//Ausgewaehlte ID holen
     var col = tree.columns ? tree.columns["kontakt-bankverbindung-treecol-bankverbindung_id"] : "kontakt-bankverbindung-treecol-bankverbindung_id";
 	var bankverbindung_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	window.open("<?php echo APP_ROOT; ?>content/bankverbindungdialog.xul.php?bankverbindung_id="+bankverbindung_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
 }
 
@@ -730,16 +734,16 @@ function KontaktBankverbindungBearbeiten()
 function KontaktBankverbindungDelete()
 {
 	tree = document.getElementById('kontakt-bankverbindung-tree');
-	
+
 	if (tree.currentIndex==-1) return;
-	
+
 	//Ausgewaehlte ID holen
     var col = tree.columns ? tree.columns["kontakt-bankverbindung-treecol-bankverbindung_id"] : "kontakt-bankverbindung-treecol-bankverbindung_id";
 	var bankverbindung_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
-		studiengang_kz='';	
+		studiengang_kz='';
 	else
 		studiengang_kz = window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 
@@ -747,16 +751,16 @@ function KontaktBankverbindungDelete()
 	{
 		var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
 		var req = new phpRequest(url,'','');
-		
+
 		req.add('type', 'bankverbindungdelete');
-		
+
 		req.add('bankverbindung_id', bankverbindung_id);
 		req.add('studiengang_kz', studiengang_kz);
-	
+
 		var response = req.executePOST();
-	
+
 		var val =  new ParseReturnValue(response)
-		
+
 		if (!val.dbdml_return)
 		{
 			if(val.dbdml_errormsg=='')
@@ -777,7 +781,7 @@ function KontaktBankverbindungDelete()
 
 // ****
 // * Beim Sortieren des Trees wird der markierte Eintrag gespeichert und nach dem sortieren
-// * wieder markiert. 
+// * wieder markiert.
 // ****
 function KontaktBankverbindungTreeSort()
 {
