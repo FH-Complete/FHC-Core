@@ -1166,4 +1166,71 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Liefert die Raeume mit den Aufsichtspersonen (uid aus tbl_rt_ort), die den Kriterien $uid entsprechen
+	 * @param string|array $uid Optional. Default NULL. UID oder array von UIDs deren Aufsichtszuteilungen geladen werden sollen
+	 * @param integer $studiengang_kz Optional. Default NULL. Kennzahl des Studiengangs, auf den gefiltert werden soll
+	 * @return true
+	 */
+	public function getOrteByUid($uid = null, $studiengang_kz = null)
+	{
+		if ($uid != null && is_array($uid))
+			$uid = $this->db_implode4SQL($include_ids);
+		elseif ($uid != null)
+			$uid = $this->db_add_param($uid);
+		
+		$qry = "
+			SELECT
+				tbl_rt_ort.ort_kurzbz AS ort, *
+			FROM
+				public.tbl_rt_ort
+			JOIN
+				public.tbl_reihungstest ON (rt_id = tbl_reihungstest.reihungstest_id)
+			WHERE
+				datum>=now()";
+		if ($uid != null)
+			$qry .= " AND uid IN (".$uid.")";
+			
+		
+		if ($studiengang_kz != null)
+			$qry .= " AND studiengang_kz = ".$this->db_add_param($studiengang_kz);
+	
+		if ($result = $this->db_query($qry))
+		{
+			while ($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+		
+				$obj->reihungstest_id = $row->rt_id;
+				$obj->ort_kurzbz = $row->ort;
+				$obj->uid = $row->uid;
+
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->datum = $row->datum;
+				$obj->uhrzeit = $row->uhrzeit;
+				$obj->ext_id = $row->ext_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->max_teilnehmer = $row->max_teilnehmer;
+				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
+				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$obj->stufe = $row->stufe;
+				$obj->anmeldefrist = $row->anmeldefrist;
+				$obj->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
+		
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
