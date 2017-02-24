@@ -2614,23 +2614,31 @@ if(!$error)
 		}
 		else
 		{
-
 			$punkte=$_POST['punkte'];
-			$lehrveranstaltung_id=$_POST['lehrveranstaltung_id'];
-			$studiensemester_kurzbz=$semester_aktuell;
-
-			$notenschluessel = new notenschluessel();
-			if(($note = $notenschluessel->getNote($punkte, $lehrveranstaltung_id, $studiensemester_kurzbz))!==false)
+			if(is_numeric($punkte))
 			{
-				$return = true;
-				$error = false;
-				$data = $note;
+				$lehrveranstaltung_id=$_POST['lehrveranstaltung_id'];
+				$studiensemester_kurzbz=$semester_aktuell;
+
+				$notenschluessel = new notenschluessel();
+				if(($note = $notenschluessel->getNote($punkte, $lehrveranstaltung_id, $studiensemester_kurzbz))!==false)
+				{
+					$return = true;
+					$error = false;
+					$data = $note;
+				}
+				else
+				{
+					$return = false;
+					$error = true;
+					$errormsg=$notenschluessel->errormsg;
+				}
 			}
 			else
 			{
-				$return = false;
-				$error = true;
-				$errormsg=$notenschluessel->errormsg;
+				$return = true;
+				$error = false;
+				$data = '';
 			}
 		}
 	}
@@ -2717,7 +2725,7 @@ if(!$error)
 					$noten->benotungsdatum = date('Y-m-d H:i:s');
 					$noten->note = $_POST['note'];
 					if(isset($_POST['punkte']))
-						$noten->punkte=$_POST['punkte'];
+						$noten->punkte=str_replace(',','.',$_POST['punkte']);
 
 					if($noten->save())
 					{
