@@ -217,6 +217,7 @@ function AufnahmeTermineAuswahl()
 	if (tree.currentIndex==-1) return;
 
 	AufnahmeTermineDisableFields(false);
+	AufnahmeTermineReihungstestDropDownRefresh(true);
 
 	//Ausgewaehlten Eintrag holen
 	var rt_person_id = getTreeCellText(tree, 'aufnahmetermine-tree-rt_person_id', tree.currentIndex);
@@ -260,6 +261,7 @@ function AufnahmeTermineNeu()
 {
 	AufnahmeTermineDisableFields(false);
 	AufnahmeTermineResetFields();
+	AufnahmeTermineReihungstestDropDownRefresh(true);
 }
 
 /**
@@ -430,12 +432,15 @@ function AufnahmeTermineAnmeldungreihungstestHeute()
 /**
  * Refresht das DropDown mit den Reihungstestterminen
  */
-function AufnahmeTermineReihungstestDropDownRefresh()
+function AufnahmeTermineReihungstestDropDownRefresh(prestudent)
 {
+
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var menulist = document.getElementById('aufnahmetermine-menulist-reihungstest');
-	//var url="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true&prestudent_id="+AufnahmeTerminePrestudentID+"&"+gettimestamp();
-	var url="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?include_id=&studiengang_kz="+AufnahmeTermineStudiengang+"&"+gettimestamp();
+	if(typeof(prestudent)=='undefined')
+		var url="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?include_id=&studiengang_kz="+AufnahmeTermineStudiengang+"&"+gettimestamp();
+	else
+		var url="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true&prestudent_id="+AufnahmeTerminePrestudentID+"&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = menulist.database.GetDataSources();
