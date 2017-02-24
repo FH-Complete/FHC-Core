@@ -237,8 +237,8 @@ echo ']>
 												</menupopup>
 											</template>
 										</menulist>
-										<toolbarbutton id="aufnahmetermine-button-reihungstest-refresh" image="../../skin/images/refresh.png" tooltiptext="Liste neu laden" onclick="AufnahmeTermineReihungstestDropDownRefresh()"/>
-										<toolbarbutton id="aufnahmetermine-button-reihungstest-open" image="../../skin/images/edit.png" tooltiptext="Zum Reihungstest" onclick="AufnahmeTermineReihungstestEdit()"/>
+										<toolbarbutton id="aufnahmetermine-button-reihungstest-refresh" image="../../skin/images/refresh.png" tooltiptext="Alle zukünftigen Reihungstests des Studiengangs laden" onclick="AufnahmeTermineReihungstestDropDownRefresh()"/>
+										<toolbarbutton id="aufnahmetermine-button-reihungstest-open" image="../../skin/images/edit.png" tooltiptext="Zur Reihungstestverwaltung" onclick="AufnahmeTermineReihungstestEdit()"/>
 										<spacer flex="1"/>
 										</hbox>
 									</row>

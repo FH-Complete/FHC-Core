@@ -433,22 +433,25 @@ function AufnahmeTermineAnmeldungreihungstestHeute()
 function AufnahmeTermineReihungstestDropDownRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var tree = document.getElementById('aufnahmetermine-menulist-reihungstest');
+	var menulist = document.getElementById('aufnahmetermine-menulist-reihungstest');
 	//var url="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true&prestudent_id="+AufnahmeTerminePrestudentID+"&"+gettimestamp();
 	var url="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?include_id=&studiengang_kz="+AufnahmeTermineStudiengang+"&"+gettimestamp();
 
 	//Alte DS entfernen
-	var oldDatasources = tree.database.GetDataSources();
+	var oldDatasources = menulist.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
 	{
-		tree.database.RemoveDataSource(oldDatasources.getNext());
+		menulist.database.RemoveDataSource(oldDatasources.getNext());
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	tree.builder.rebuild();
-
+	menulist.builder.rebuild();
+	btn = document.getElementById('aufnahmetermine-button-reihungstest-refresh');
+	btn.setAttribute('image','../../skin/images/spinner.gif');
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	var myDatasource = rdfService.GetDataSource(url);
-	tree.database.AddDataSource(myDatasource);
+	var myDatasource = rdfService.GetDataSourceBlocking(url);
+	menulist.database.AddDataSource(myDatasource);
+	menulist.builder.rebuild();
+	btn.setAttribute('image','../../skin/images/refresh.png');
 }
 
 function AufnahmeTermineReihungstestEdit()
