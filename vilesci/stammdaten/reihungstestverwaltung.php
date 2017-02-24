@@ -1061,7 +1061,7 @@ if(isset($_GET['type']) && $_GET['type']=='savertpunkte')
 	{
 		$rtperson = new reihungstest();
 		$rtperson->loadReihungstestPerson($_GET['rt_person_id']);
-		$rtperson->punkte = $rtpunkte;
+		$rtperson->punkte = str_replace(',','.',$rtpunkte);
 		$rtperson->new=false;
 		if(!$rtperson->savePersonReihungstest())
 		{
@@ -1106,7 +1106,7 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 						$rtpunkte = $pruefling->getReihungstestErgebnisPerson($row->person_id, true, $reihungstest->reihungstest_id);
 					else
 						$rtpunkte = $pruefling->getReihungstestErgebnisPerson($row->person_id, false, $reihungstest->reihungstest_id);
-					$reihungstest->punkte = $rtpunkte;
+					$reihungstest->punkte = str_replace(',','.',$rtpunkte);
 					$reihungstest->reihungstestangetreten=true;
 					$reihungstest->save(false);
 					$reihungstest->new=false;
