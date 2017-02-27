@@ -3254,7 +3254,7 @@ if(!$error)
 				$pruefung->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 				$pruefung->note = $_POST['note'];
 				if(isset($_POST['punkte']))
-					$pruefung->punkte = $_POST['punkte'];
+					$pruefung->punkte = str_replace(',','.',$_POST['punkte']);
 				$pruefung->pruefungstyp_kurzbz = $_POST['pruefungstyp_kurzbz'];
 				$pruefung->datum = $_POST['datum'];
 				$pruefung->anmerkung = $_POST['anmerkung'];
@@ -3331,7 +3331,7 @@ if(!$error)
 							$zeugnisnote->studiensemester_kurzbz = $studiensemester_kurzbz;
 							$zeugnisnote->note = $_POST['note'];
 							if(isset($_POST['punkte']))
-								$zeugnisnote->punkte = $_POST['punkte'];
+								$zeugnisnote->punkte = str_replace(',','.',$_POST['punkte']);
 							else
 								$zeugnisnote->punkte='';
 							$zeugnisnote->uebernahmedatum = date('Y-m-d H:i:s');
@@ -3774,6 +3774,9 @@ if(!$error)
 				$data = $pruefling->getReihungstestErgebnisPerson($_POST['person_id'], true, $_POST['reihungstest_id']);
 			else
 				$data = $pruefling->getReihungstestErgebnisPerson($_POST['person_id'], false, $_POST['reihungstest_id']);
+
+			// Runden auf 2 Nachkommastellen
+			$data = number_format($data, 2, '.','');
 			$return = true;
 		}
 		else
@@ -3892,7 +3895,7 @@ if(!$error)
 					$person_id = $_POST['person_id'];
 					if($person_id=='')
 						$person_id=$prestudent->person_id;
-					$punkte = $_POST['punkte'];
+					$punkte = str_replace(',','.',$_POST['punkte']);
 					$teilgenommen = ($_POST['teilgenommen']=='true'?true:false);
 					$anmeldedatum = $_POST['anmeldedatum'];
 					$studienplan_id = $_POST['studienplan_id'];
@@ -4049,7 +4052,7 @@ if(!$error)
 				}
 				else
 				{
-					$punkte = $_POST['punkte'];
+					$punkte = str_replace(',','.',$_POST['punkte']);
 					$reihungstestangetreten = ($_POST['reihungstestangetreten']=='true'?true:false);
 					$prestudent->punkte = $punkte;
 					$prestudent->reihungstestangetreten = $reihungstestangetreten;
