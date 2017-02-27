@@ -45,7 +45,7 @@ $uid = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('basis/addon'))
+if(!$rechte->isBerechtigt('basis/addon', null, 'suid'))
 {
 	exit('Sie haben keine Berechtigung für die Verwaltung von Addons');
 }
@@ -66,7 +66,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM addon.tbl_template_items"))
 
 	if(!$db->db_query($qry))
 		echo '<strong>addon.tbl_template_items: '.$db->db_last_error().'</strong><br>';
-	else 
+	else
 		echo ' addon.tbl_template_items: Tabelle addon.template_items hinzugefuegt!<br>';
 
 }
