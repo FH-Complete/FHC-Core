@@ -39,7 +39,8 @@ define("anzahlSemester","10");
 $buchstabenArray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','Ä','Ö','Ü');
 
 $studiengang = new studiengang(); 
-$studiengang->getAll('oe_kurzbz', true);
+$studiengang->getAll('typ, bezeichnung', true);
+$studiengang_array = array();
 
 $fotostatus = new fotostatus(); 
 $fotostatus->getAllStatusKurzbz();
@@ -114,14 +115,24 @@ echo '<body>
 				<td>Studiengang:</td>
 				<td><select name="select_studiengang">
 				<option value="">Alle (keine Incoming)</option>
-				<option value="incoming">Incoming</option>
+				<option value="incoming" '.($studiengang_kz=="incoming"?'selected':'').'>Incoming</option>
+ 				<option value="bama" '.($studiengang_kz=="bama"?'selected':'').'>Bachelor und Master</option>
+				<option value="special" '.($studiengang_kz=="special"?'selected':'').'>Spezialfälle</option>
 				';
-				
+				$typ = '';
 				foreach($studiengang->result as $stud)
 				{
 					// 10007 -> EVU Studiengang
-					if($stud->studiengang_kz < '10000' || $stud->studiengang_kz == '10007' || $stud->studiengang_kz=='10004')
-						echo '<option value='.$stud->studiengang_kz.' '.($studiengang_kz==$stud->studiengang_kz?'selected':'').'>'.mb_strtoupper($stud->oe_kurzbz).' | '.mb_strtoupper($stud->kurzbzlang).'</option>';
+					//if($stud->studiengang_kz < '10000' || $stud->studiengang_kz == '10007' || $stud->studiengang_kz=='10004')
+					$studiengang_array[$stud->studiengang_kz] = mb_strtoupper($stud->typ.$stud->kurzbz);
+					if ($typ != $stud->typ || $typ=='')
+					{
+						if ($typ!='')
+							echo '</optgroup>';
+						echo '<optgroup label="'.$stud->typ.'">';
+					}
+					echo '<option value='.$stud->studiengang_kz.' '.($studiengang_kz==$stud->studiengang_kz?'selected':'').'>'.mb_strtoupper($stud->typ.$stud->kurzbz).' - '.$stud->bezeichnung.'</option>';
+					$typ = $stud->typ;
 				}
 echo'			</select></td>
 				<td>Semester:</td>
@@ -203,15 +214,35 @@ if(isset($_REQUEST['btn_submitStudent']))
 	if($semester == 'alle')
 		$semester = null;
 	
-	$studenten = new student(); 
+	$studenten = new student();
+	$studentenArray = array();
 
 	if($studiengang_kz=='incoming')
+	{
 		$studenten->getIncoming();
+	}
+	elseif ($studiengang_kz=='special')
+	{
+		foreach($studiengang->result as $stud)
+		{
+			if($stud->studiengang_kz >= '10000' || $stud->studiengang_kz < '0')
+				$studenten->getStudentsStudiengang($stud->studiengang_kz, $semester);
+		}
+	}
+	elseif ($studiengang_kz=='bama')
+	{
+		foreach($studiengang->result as $stud)
+		{
+			if($stud->typ == 'b' || $stud->typ == 'm')
+				$studenten->getStudentsStudiengang($stud->studiengang_kz, $semester);
+		}
+	}
 	else
+	{
 		$studenten->getStudentsStudiengang($studiengang_kz, $semester);
+	}
 	$studentenArray = $studenten->result; 
 	
-	// $studentenArray = $studenten->getStudents($studiengang_kz,$semester,null,null,null,'WS2011');
 	echo '
 		<form method="POST" name="form_studentenkarten" action="kartezuweisen.php">
 		<table id="myTableFiles" class="tablesorter">
@@ -221,78 +252,82 @@ if(isset($_REQUEST['btn_submitStudent']))
 				<th>Geburtsdatum</th>
 				<th>Matrikelnummer</th>
 				<th>UID</th>
+				<th>Studiengang</th>
 				<th>person_id</th>
 			</tr>
 		</thead>
 		<tbody>';
 	
-	foreach($studentenArray as $stud)
+	if (count($studentenArray) > 0)
 	{
-		if($stud->studiengang_kz>10000  && $stud->studiengang_kz !='10007'  && $stud->studiengang_kz!='10004')
-			continue;
-
-		// Wenn letzter Status nich Student ist -> nicht anzeigen
-		$prestudent = new prestudent(); 
-		$prestudent->getLastStatus($stud->prestudent_id);
-		if($prestudent->status_kurzbz == 'Student' || ($studiengang_kz=='incoming' && $prestudent->status_kurzbz='Incoming'))
+		foreach($studentenArray as $stud)
 		{
-			if($statusStudent=='gedrucktNichtAusgegeben')
+			//if($stud->studiengang_kz>10000  && $stud->studiengang_kz !='10007'  && $stud->studiengang_kz!='10004')
+				//continue;
+	
+			// Wenn letzter Status nicht Student ist -> nicht anzeigen
+			$prestudent = new prestudent(); 
+			$prestudent->getLastStatus($stud->prestudent_id);
+			if(($prestudent->status_kurzbz == 'Student' || ($studiengang_kz=='incoming' && $prestudent->status_kurzbz='Incoming')) && array_key_exists($stud->studiengang_kz, $studiengang_array))
 			{
-				// gedruckt aber noch nicht ausgegeben
-				$fotostatus = new fotostatus();
-				$fotostatus->getLastFotoStatus($stud->person_id); 
-				$betriebsmittel = new betriebsmittel(); 
-
-				// status akzeptiert und noch nicht gedruckt
-				if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == true && $betriebsmittel->zutrittskarteAusgegeben($stud->uid) == false)
+				if($statusStudent=='gedrucktNichtAusgegeben')
 				{
-					echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
-					$uids.=';'.$stud->uid;
-					$mails[]=$stud->uid.'@'.DOMAIN;
+					// gedruckt aber noch nicht ausgegeben
+					$fotostatus = new fotostatus();
+					$fotostatus->getLastFotoStatus($stud->person_id); 
+					$betriebsmittel = new betriebsmittel(); 
+	
+					// status akzeptiert und noch nicht gedruckt
+					if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == true && $betriebsmittel->zutrittskarteAusgegeben($stud->uid) == false)
+					{
+						echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$studiengang_array[$stud->studiengang_kz].'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
+						$uids.=';'.$stud->uid;
+						$mails[]=$stud->uid.'@'.DOMAIN;
+					}
 				}
-			}
-			else if($statusStudent == 'nichtGedrucktAkzept')
-			{
-				// akzeptiert und nicht gedruckt
-				$fotostatus = new fotostatus();
-				$fotostatus->getLastFotoStatus($stud->person_id); 
-				$betriebsmittel = new betriebsmittel(); 
-
-				// status akzeptiert und noch nicht gedruckt
-				if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == false)
+				else if($statusStudent == 'nichtGedrucktAkzept')
 				{
-					echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
-					$uids.=';'.$stud->uid;
-					$mails[]=$stud->uid.'@'.DOMAIN;
+					// akzeptiert und nicht gedruckt
+					$fotostatus = new fotostatus();
+					$fotostatus->getLastFotoStatus($stud->person_id); 
+					$betriebsmittel = new betriebsmittel(); 
+	
+					// status akzeptiert und noch nicht gedruckt
+					if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == false)
+					{
+						echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$studiengang_array[$stud->studiengang_kz].'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
+						$uids.=';'.$stud->uid;
+						$mails[]=$stud->uid.'@'.DOMAIN;
+					}
 				}
-			}
-			else if($statusStudent == 'nichtGedruckt')
-			{
-				// akzeptiert und nicht gedruckt
-				$fotostatus = new fotostatus();
-				$fotostatus->getLastFotoStatus($stud->person_id); 
-				$betriebsmittel = new betriebsmittel(); 
-
-				// noch nicht gedruckt
-				if($betriebsmittel->zutrittskartePrinted($stud->uid) == false)
+				else if($statusStudent == 'nichtGedruckt')
 				{
-					echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.' ('.$fotostatus->fotostatus_kurzbz.')</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
-					$uids.=';'.$stud->uid;
-					$mails[]=$stud->uid.'@'.DOMAIN;
+					// akzeptiert und nicht gedruckt
+					$fotostatus = new fotostatus();
+					$fotostatus->getLastFotoStatus($stud->person_id); 
+					$betriebsmittel = new betriebsmittel(); 
+	
+					// noch nicht gedruckt
+					if($betriebsmittel->zutrittskartePrinted($stud->uid) == false)
+					{
+						echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.' ('.$fotostatus->fotostatus_kurzbz.')</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$studiengang_array[$stud->studiengang_kz].'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
+						$uids.=';'.$stud->uid;
+						$mails[]=$stud->uid.'@'.DOMAIN;
+					}
 				}
-			}
-			else
-			{
-				// letzten Status anzeigen
-				$fotostatus = new fotostatus();
-				$fotostatus->getLastFotoStatus($stud->person_id); 
-
-				// überprüfen ob letzer Status der gesuchte ist
-				if($fotostatus->fotostatus_kurzbz == $statusStudent)
+				else
 				{
-					echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
-					$uids.=';'.$stud->uid;
-					$mails[]=$stud->uid.'@'.DOMAIN;
+					// letzten Status anzeigen
+					$fotostatus = new fotostatus();
+					$fotostatus->getLastFotoStatus($stud->person_id); 
+	
+					// überprüfen ob letzer Status der gesuchte ist
+					if($fotostatus->fotostatus_kurzbz == $statusStudent)
+					{
+						echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$studiengang_array[$stud->studiengang_kz].'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
+						$uids.=';'.$stud->uid;
+						$mails[]=$stud->uid.'@'.DOMAIN;
+					}
 				}
 			}
 		}
