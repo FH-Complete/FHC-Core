@@ -131,12 +131,16 @@ if ($firma->result)
 
 	foreach($firma->result as $row)
 	{
-		echo '<tr>';
-		echo '<td>',$row->name,'</td>';
-		/*echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'">'.$row->bezeichnung.'</a>':$row->bezeichnung).'</td>';
-		 echo '<td>',$row->beschreibung,'</td>';
-		 echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'">Details</a>':'').'</td>';*/
-		echo '</tr>';
+		// Nur aktive Partnerunis anzeigen
+		if ($row->aktiv)
+		{
+			echo '<tr>';
+			echo '<td>',$row->name,'</td>';
+			/*echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'">'.$row->bezeichnung.'</a>':$row->bezeichnung).'</td>';
+			 echo '<td>',$row->beschreibung,'</td>';
+			 echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'">Details</a>':'').'</td>';*/
+			echo '</tr>';
+		}
 	}
 }
 else

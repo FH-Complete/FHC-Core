@@ -49,7 +49,7 @@ class notiz extends basis_db
     public $bestellung_id;
     public $lehreinheit_id;
     public $anrechnung_id;
-	
+
 	/**
 	 * Konstruktor
 	 * @param $notiz_id
@@ -94,7 +94,7 @@ class notiz extends basis_db
 				$this->updateamum=$row->updateamum;
 				$this->updatevon=$row->updatevon;
                 $this->getDokumente($row->notiz_id);
-				
+
 				return true;
 			}
 			else
@@ -109,7 +109,7 @@ class notiz extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Löscht eine Notiz
 	 * @param  $notiz_id
@@ -122,13 +122,13 @@ class notiz extends basis_db
 			$this->errormsg = 'NotizID ist ungueltig';
 			return false;
 		}
-        
+
         // Dokumente der Notiz löschen
         $this->getDokumente($notiz_id);
         if(!empty($this->dokumente))
         {
             $dms = new dms();
-            
+
             foreach($this->dokumente as $dms_id)
             {
                 $dms->deleteDms($dms_id);
@@ -142,8 +142,8 @@ class notiz extends basis_db
 			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
 		}
-		return true; 
-	}	
+		return true;
+	}
 
 	/**
 	 * Prueft die Daten vor dem Speichern
@@ -152,7 +152,7 @@ class notiz extends basis_db
 	public function validate()
 	{
 		return true;
-	}	
+	}
 
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
@@ -239,11 +239,11 @@ class notiz extends basis_db
 
 	/**
 	 * Speichert die Zuordnung einer Notiz
-	 * 
+	 *
 	 */
 	public function saveZuordnung()
 	{
-		$qry = "INSERT INTO public.tbl_notizzuordnung(notiz_id, projekt_kurzbz, projektphase_id, projekttask_id, 
+		$qry = "INSERT INTO public.tbl_notizzuordnung(notiz_id, projekt_kurzbz, projektphase_id, projekttask_id,
 						uid, person_id, prestudent_id, bestellung_id, lehreinheit_id, anrechnung_id) VALUES(".
 				$this->db_add_param($this->notiz_id, FHC_INTEGER).','.
 				$this->db_add_param($this->projekt_kurzbz).','.
@@ -255,7 +255,7 @@ class notiz extends basis_db
 				$this->db_add_param($this->bestellung_id, FHC_INTEGER).','.
 				$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
 				$this->db_add_param($this->anrechnung_id, FHC_INTEGER).');';
-				
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -266,18 +266,18 @@ class notiz extends basis_db
 			return false;
 		}
 	}
-    
+
     /**
      * Speichert ein Dokument zur Notiz
      * @param int $dms_id
      * @return boolean
      */
-    public function saveDokument($dms_id) 
+    public function saveDokument($dms_id)
     {
         $qry = "INSERT INTO public.tbl_notiz_dokument(notiz_id, dms_id) VALUES(".
 				$this->db_add_param($this->notiz_id, FHC_INTEGER).','.
 				$this->db_add_param($dms_id, FHC_INTEGER).');';
-				
+
 		if($this->db_query($qry))
 		{
 			return true;
@@ -290,7 +290,7 @@ class notiz extends basis_db
     }
 
 	/**
-	 * 
+	 *
 	 * Laedt die Notizen
 	 * @param $erledigt
 	 * @param $projekt_kurzbz
@@ -320,13 +320,13 @@ class notiz extends basis_db
 			$anrechnung_id=null,
 			$titel=null)
 	{
-		$qry = "SELECT 
-					* 
-				FROM 
-					public.tbl_notiz 
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_notiz
 					LEFT JOIN public.tbl_notizzuordnung USING(notiz_id)
 				WHERE 1=1";
-		
+
 		if(!is_null($erledigt))
 		{
 			if($erledigt)
@@ -358,13 +358,13 @@ class notiz extends basis_db
 			$qry.=" AND titel=".$this->db_add_param($titel);
 
 		$qry.=' ORDER BY start, ende, titel';
-		
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new notiz();
-				
+
 				$obj->notiz_id=$row->notiz_id;
 				$obj->titel=$row->titel;
 				$obj->text=$row->text;
@@ -378,7 +378,7 @@ class notiz extends basis_db
 				$obj->updateamum=$row->updateamum;
 				$obj->updatevon=$row->updatevon;
                 $obj->getDokumente($row->notiz_id);
-	
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -405,7 +405,7 @@ class notiz extends basis_db
 					LEFT JOIN public.tbl_notizzuordnung USING(notiz_id)
 				WHERE person_id = ' . $this->db_add_param($person_id, FHC_INTEGER) .
                 ' AND (insertvon = ' . $this->db_add_param('online') .' OR insertvon = ' . $this->db_add_param('online_notiz').')
-                
+
                 ORDER BY notiz_id';
 
 		if($result = $this->db_query($qry))
@@ -438,9 +438,63 @@ class notiz extends basis_db
 		}
 	}
 
+
+	/**
+	 * TEMPORARY: kurzfristig wird für das Onlinebewerbungstool die Ausbildung
+	 * (Name und Adresse der besuchten Schule) in eine Notiz mit
+	 * insertvon = online_ausbildung gespeichert.
+	 * Wird auf UDF umgebaut!
+	 * 
+	 * Laedt die Notizen zur Ausbilund vom Bewerbungstool
+	 * @param $person_id int
+	 * @return boolean
+	 */
+	public function getBewerbungstoolNotizenAusbildung($person_id)
+	{
+		$qry = 'SELECT
+					*
+				FROM
+					public.tbl_notiz
+					LEFT JOIN public.tbl_notizzuordnung USING(notiz_id)
+				WHERE person_id = ' . $this->db_add_param($person_id, FHC_INTEGER) .
+                ' AND insertvon = ' . $this->db_add_param('online_ausbildung') .
+                ' ORDER BY notiz_id';
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new notiz();
+
+				$obj->notiz_id=$row->notiz_id;
+				$obj->titel=$row->titel;
+				$obj->text=$row->text;
+				$obj->verfasser_uid=$row->verfasser_uid;
+				$obj->bearbeiter_uid=$row->bearbeiter_uid;
+				$obj->start=$row->start;
+				$obj->ende=$row->ende;
+				$obj->erledigt=$this->db_parse_bool($row->erledigt);
+				$obj->insertamum=$row->insertamum;
+				$obj->insertvon=$row->insertvon;
+				$obj->updateamum=$row->updateamum;
+				$obj->updatevon=$row->updatevon;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+
+
 	/**
 
-	 * 
+	 *
 
 	 * Laedt die Notizen
 	 * @param $erledigt
@@ -458,13 +512,13 @@ class notiz extends basis_db
 	 */
 	public function getAnzahlNotizen($erledigt=null, $projekt_kurzbz=null, $projektphase_id=null, $projekttask_id=null, $uid=null, $person_id=null, $prestudent_id=null, $bestellung_id=null, $user=null, $lehreinheit_id=null, $anrechnung_id=null)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					count(*) as anzahl
-				FROM 
-					public.tbl_notiz 
+				FROM
+					public.tbl_notiz
 					LEFT JOIN public.tbl_notizzuordnung USING(notiz_id)
 				WHERE 1=1";
-		
+
 		if(!is_null($erledigt))
 		{
 			if($erledigt)
@@ -492,7 +546,7 @@ class notiz extends basis_db
 			$qry.=" AND lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
 		if($anrechnung_id!='')
 			$qry.=" AND anrechnung_id=".$this->db_add_param($anrechnung_id, FHC_INTEGER);
-		
+
 		if($result = $this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object($result))
@@ -509,12 +563,12 @@ class notiz extends basis_db
 			return false;
 		}
 	}
-    
+
     /**
      * Laedt die Dokumente der Notiz
      * @return boolean
      */
-    public function getDokumente($notiz_id) 
+    public function getDokumente($notiz_id)
     {
         $qry = "SELECT dms_id FROM public.tbl_notiz_dokument WHERE notiz_id=".$this->db_add_param($notiz_id, FHC_INTEGER);
 
@@ -524,7 +578,7 @@ class notiz extends basis_db
 			{
 				$this->dokumente[] = $row->dms_id;
 			}
-            
+
             return true;
 		}
 		else

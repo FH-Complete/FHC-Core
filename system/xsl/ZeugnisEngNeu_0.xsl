@@ -504,7 +504,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 	                </table:table-row>
 	            </table:table>
 	            <text:p text:style-name="P26"/>
-	            <text:p text:style-name="P23">Grades:<text:tab/>Passed with highest distinction, Passed with distinction, Passed</text:p>
+	            <text:p text:style-name="P23">Grades:<text:tab/>Passed with distinction, Passed with merit, Passed</text:p>
 	            <text:p text:style-name="P19"/>
             </xsl:if>
         </office:text>

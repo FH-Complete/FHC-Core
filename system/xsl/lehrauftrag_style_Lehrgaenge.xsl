@@ -548,7 +548,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 		<style:master-page style:name="Standard" style:page-layout-name="Mpm1">
 			<style:header>
 				<text:p text:style-name="MP1">Technikum Wien GmbH <draw:frame draw:style-name="Mfr1" draw:name="Bild 1" text:anchor-type="char" svg:x="13.259cm" svg:y="-0.24cm" svg:width="4.106cm" svg:height="2.17cm" draw:z-index="0">
-						<draw:image xlink:href="Pictures/tw_academy_logo.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+						<draw:image xlink:href="Pictures/Logo_TW_Academy.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 					</draw:frame>
 				</text:p>
 				<text:p text:style-name="MP1">Höchstädtplatz 6</text:p>

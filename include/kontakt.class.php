@@ -270,7 +270,7 @@ class kontakt extends basis_db
      * @param kontakttyp
 	 * @return boolean
 	 */
-	public function load_persKontakttyp($person_id, $kontakttyp)
+	public function load_persKontakttyp($person_id, $kontakttyp, $order = null)
 	{
 		if(!is_numeric($person_id))
 		{
@@ -280,7 +280,10 @@ class kontakt extends basis_db
 
 		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name, tbl_firma.firma_id
 				FROM public.tbl_kontakt LEFT JOIN public.tbl_standort USING(standort_id) LEFT JOIN public.tbl_firma USING(firma_id) WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
-                AND kontakttyp =".$this->db_add_param($kontakttyp, FHC_STRING);
+				AND kontakttyp =".$this->db_add_param($kontakttyp, FHC_STRING);
+		
+		if ($order != null)
+			$qry .= " ORDER BY ".$order;
 
 		if($this->db_query($qry))
 		{
