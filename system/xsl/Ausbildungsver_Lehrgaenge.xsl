@@ -319,6 +319,10 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<style:paragraph-properties fo:line-height="130%" fo:text-align="start"/>
 			<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-pitch="variable" fo:font-size="9pt" style:font-size-asian="9pt" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold"/>
 	</style:style>
+	<style:style style:name="P46" style:family="paragraph">
+		<style:paragraph-properties fo:line-height="130%"/>
+		<style:text-properties fo:color="#ff3333" fo:font-size="16pt" style:font-size-asian="16pt" style:font-name-complex="Arial" style:font-size-complex="16pt"/>
+	</style:style>
 	<style:style style:name="P140" style:family="paragraph">
 			<style:paragraph-properties fo:text-align="start"/>
 			<style:text-properties style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Helvetica" fo:font-size="10pt" fo:font-style="normal" style:text-underline-style="none" fo:font-weight="bold"/>
@@ -407,6 +411,11 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 		<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 		</text:sequence-decls>
 		<text:h text:style-name="P22" text:outline-level="1" text:is-list-header="true">Ausbildungsvertrag</text:h>
+				<!-- Ueberprueft ob benoetigte Datenfelder leer sind -->
+				<xsl:if test="student_maxsemester = ''"><text:p text:style-name="P46">Ausbildungsdauer konnte nicht berechnet werden</text:p></xsl:if>
+				<xsl:if test="lgartcode='1' and akadgrad = ''"><text:p text:style-name="P46">Kein Akademischer Grad für diesen Lehrgang hinterlegt</text:p></xsl:if>
+				<xsl:if test="lgartcode='2' and akadgrad = ''"><text:p text:style-name="P46">Kein Akademischer Grad für diesen Lehrgang hinterlegt</text:p></xsl:if>
+				
 		<text:p text:style-name="P2"/>
 		<text:p text:style-name="P4">Dieser Vertrag regelt das Rechtsverhältnis zwischen dem </text:p>
 		<text:p text:style-name="P4"><text:span text:style-name="T1">Verein Fachhochschule Technikum Wien,</text:span> 1060 Wien, Mariahilfer Straße 37-39 (kurz „Erhalter“ genannt) einerseits <text:span text:style-name="T1">und</text:span></text:p>
