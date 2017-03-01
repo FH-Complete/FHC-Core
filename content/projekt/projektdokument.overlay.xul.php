@@ -20,7 +20,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -76,7 +76,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<treecol id="treecol-projektdokument-projektphase_id" label="ProjektphaseID" flex="2" hidden="true"  persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dms/rdf#projektphaseID"/>
-				<splitter class="tree-splitter"/>				
+				<splitter class="tree-splitter"/>
 				<treecol id="treecol-projektdokument-insertamum" label="Angelegt am" flex="5" hidden="true" persist="hidden, width, ordinal"
 				   class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dms/rdf#insertamum"/>
@@ -106,7 +106,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<treerow >
 								<treecell label="rdf:http://www.technikum-wien.at/dms/rdf#name"/>
 								<treecell label="rdf:http://www.technikum-wien.at/dms/rdf#projekt_kurzbz"/>
-								<treecell label="rdf:http://www.technikum-wien.at/dms/rdf#projektphase_id"/>								
+								<treecell label="rdf:http://www.technikum-wien.at/dms/rdf#projektphase_id"/>
 								<treecell label="rdf:http://www.technikum-wien.at/dms/rdf#insertamum"/>
 								<treecell label="rdf:http://www.technikum-wien.at/dms/rdf#updateamum"/>
 								<treecell label="rdf:http://www.technikum-wien.at/dms/rdf#insertvon"/>

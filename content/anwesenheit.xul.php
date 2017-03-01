@@ -19,7 +19,7 @@
  */
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -32,7 +32,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>
 
 $student_uid = filter_input(INPUT_GET,'student_uid');
 $lehrveranstaltung_id= filter_input(INPUT_GET,'lehrveranstaltung_id');
-        
+
 ?>
 
 <window id="anwesenheit-window" title="anwesenheit"
@@ -81,13 +81,13 @@ $lehrveranstaltung_id= filter_input(INPUT_GET,'lehrveranstaltung_id');
 						sort="rdf:http://www.technikum-wien.at/anwesenheit/rdf#uid" onclick="anwesenheitTreeSort()"/>
 					<splitter class="tree-splitter"/>
 				</treecols>
-			
+
 				<template>
 					<rule>
 						<treechildren>
 							<treeitem uri="rdf:*">
 								<treerow properties="rdf:http://www.technikum-wien.at/anwesenheit/rdf#ampel">
-									<treecell label="rdf:http://www.technikum-wien.at/anwesenheit/rdf#lehrveranstaltung_bezeichnung" />								
+									<treecell label="rdf:http://www.technikum-wien.at/anwesenheit/rdf#lehrveranstaltung_bezeichnung" />
 									<treecell label="rdf:http://www.technikum-wien.at/anwesenheit/rdf#nachname" />
 									<treecell label="rdf:http://www.technikum-wien.at/anwesenheit/rdf#vorname" />
 									<treecell label="rdf:http://www.technikum-wien.at/anwesenheit/rdf#prozent" />

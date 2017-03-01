@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -37,17 +37,17 @@ require_once('../include/betriebsmitteltyp.class.php');
 
 if(isset($_GET['person_id']))
 	$person_id = $_GET['person_id'];
-else 
+else
 	$person_id = '';
 
 if(isset($_GET['betriebsmitteltyp']))
 	$betriebsmitteltyp = $_GET['betriebsmitteltyp'];
-else 
+else
 	$betriebsmitteltyp = null;
-	
+
 if(isset($_GET['betriebsmittelperson_id']))
 	$betriebsmittelperson_id = $_GET['betriebsmittelperson_id'];
-else 
+else
 	$betriebsmittelperson_id = null;
 
 if(isset($_GET['id']))
@@ -62,32 +62,32 @@ $datum = new datum();
 if($xmlformat!='xml')
 {
 	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-	
+
 	$rdf_url='http://www.technikum-wien.at/betriebsmittel';
-	
+
 	echo '
 	<RDF:RDF
 		xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 		xmlns:BTM="'.$rdf_url.'/rdf#"
 	>
-	
+
 	   <RDF:Seq about="'.$rdf_url.'/liste">';
-	
-	
+
+
 	$betriebsmittel = new betriebsmittelperson();
 	if($betriebsmittelperson_id=='' && $person_id!='')
 	{
 		if($betriebsmittel->getBetriebsmittelPerson($person_id, $betriebsmitteltyp))
 			foreach ($betriebsmittel->result as $row)
 				draw_content($row);
-		else 
+		else
 			die($betriebsmittel->errormsg);
 	}
-	else 
+	else
 	{
 		if($betriebsmittel->load($betriebsmittelperson_id))
 			draw_content($betriebsmittel);
-		else 
+		else
 			die($betriebsmittel->errormsg);
 	}
 	echo '</RDF:Seq>
@@ -102,10 +102,10 @@ else
 	$oe = new organisationseinheit();
 	$oe->load($bmp->oe_kurzbz);
 	$organisationseinheit = $oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung;
-	
+
 	$person = new person();
 	$person->load($bmp->person_id);
-	
+
 	$bmt = new betriebsmitteltyp();
 	$bmt->load($bmp->betriebsmitteltyp);
 	$typ = $bmt->result[0]->beschreibung;
@@ -133,12 +133,12 @@ else
 		<datum><![CDATA['.date("d.m.Y").']]></datum>
 	</betriebsmittelperson>
 	';
-		
+
 }
 function draw_content($row)
 {
 	global $rdf_url, $datum;
-	
+
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->betriebsmittelperson_id.'"  about="'.$rdf_url.'/'.$row->betriebsmittelperson_id.'" >
@@ -150,7 +150,7 @@ function draw_content($row)
             <BTM:nummer2><![CDATA['.$row->nummer2.']]></BTM:nummer2>
             <BTM:inventarnummer><![CDATA['.$row->inventarnummer.']]></BTM:inventarnummer>
             <BTM:reservieren><![CDATA['.($row->reservieren?'Ja':'Nein').']]></BTM:reservieren>
-            <BTM:ort_kurzbz><![CDATA['.$row->ort_kurzbz.']]></BTM:ort_kurzbz>            
+            <BTM:ort_kurzbz><![CDATA['.$row->ort_kurzbz.']]></BTM:ort_kurzbz>
             <BTM:person_id><![CDATA['.$row->person_id.']]></BTM:person_id>
             <BTM:anmerkung><![CDATA['.$row->anmerkung.']]></BTM:anmerkung>
             <BTM:kaution><![CDATA['.$row->kaution.']]></BTM:kaution>
@@ -165,4 +165,4 @@ function draw_content($row)
 }
 
 ?>
-   
+

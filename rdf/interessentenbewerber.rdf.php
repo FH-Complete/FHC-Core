@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 //header("Content-type: application/vnd.mozilla.xul+xml");
@@ -53,28 +53,28 @@ if(isset($_GET['studiensemester_kurzbz']))
 	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
 else
 	$studiensemester_kurzbz = null;
-	
+
 if($studiensemester_kurzbz=='aktuelles')
 	$studiensemester_kurzbz = $semester_aktuell;
 
 if(isset($_GET['studiengang_kz']) && is_numeric($_GET['studiengang_kz']))
 	$studiengang_kz = $_GET['studiengang_kz'];
-else 
+else
 	$studiengang_kz = null;
 
 if(isset($_GET['semester']) && is_numeric($_GET['semester']))
 	$semester = $_GET['semester'];
-else 
+else
 	$semester = null;
-	
+
 if(isset($_GET['prestudent_id']) && is_numeric($_GET['prestudent_id']))
 	$prestudent_id=$_GET['prestudent_id'];
-else 
+else
 	$prestudent_id=null;
 
 if(isset($_GET['typ']))
 	$typ=$_GET['typ'];
-else 
+else
 	$typ=null;
 
 $prestd = new prestudent();
@@ -93,10 +93,10 @@ elseif($prestudent_id!=null)
 {
 	if($prestd->load($prestudent_id))
 		DrawInteressent($prestd);
-	else 
-		echo $prestd->errormsg;	
+	else
+		echo $prestd->errormsg;
 }
-else 
+else
 {
 	echo 'Falsche Parameteruebergabe';
 }
@@ -127,7 +127,7 @@ function DrawInteressent($row)
 	    		<PRESTD:aktiv><![CDATA['.($row->aktiv?'true':'false').']]></PRESTD:aktiv>
 	    		<PRESTD:gebort><![CDATA['.$row->gebort.']]></PRESTD:gebort>
 	    		<PRESTD:gebzeit><![CDATA['.$row->gebzeit.']]></PRESTD:gebzeit>
-	    		
+
 	    		<PRESTD:anmerkungen><![CDATA['.$row->anmerkungen.']]></PRESTD:anmerkungen>
 	    		<PRESTD:svnr><![CDATA['.$row->svnr.']]></PRESTD:svnr>
 	    		<PRESTD:ersatzkennzeichen><![CDATA['.$row->ersatzkennzeichen.']]></PRESTD:ersatzkennzeichen>
@@ -135,7 +135,7 @@ function DrawInteressent($row)
 	    		<PRESTD:anzahlkinder><![CDATA['.$row->anzahlkinder.']]></PRESTD:anzahlkinder>
 	    		<PRESTD:updateamum><![CDATA['.$row->updateamum.']]></PRESTD:updateamum>
 	    		<PRESTD:updatevon><![CDATA['.$row->updatevon.']]></PRESTD:updatevon>
-	    		
+
 				<PRESTD:prestudent_id><![CDATA['.$row->prestudent_id.']]></PRESTD:prestudent_id>
 				<PRESTD:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></PRESTD:aufmerksamdurch_kurzbz>
 				<PRESTD:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></PRESTD:studiengang_kz>

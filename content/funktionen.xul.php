@@ -22,7 +22,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -35,7 +35,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 
 if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
-else 
+else
 	die('Parameter uid muss uebergeben werden');
 
 ?>
@@ -110,7 +110,7 @@ else
 				sort="rdf:http://www.technikum-wien.at/bnfunktion/rdf#wochenstunden" onclick="FunktionTreeSort()"/>
 			<splitter class="tree-splitter"/>
 		</treecols>
-	
+
 		<template>
 			<rule>
 				<treechildren>
@@ -265,8 +265,8 @@ else
 			<spacer flex="1" />
 			<button id="funktion-button-speichern" oncommand="FunktionDetailSpeichern()" label="Speichern" disabled="true"/>
 		</hbox>
-		</groupbox>	
-		<spacer/>	
-	</vbox>	
+		</groupbox>
+		<spacer/>
+	</vbox>
 </hbox>
 </window>

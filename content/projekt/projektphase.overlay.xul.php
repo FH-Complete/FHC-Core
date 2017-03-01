@@ -20,7 +20,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -116,7 +116,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay
 				<treecol id="treecol-projektphase-endeiso" label="EndeISO" flex="2" hidden="true" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#ende_iso" />
-				
+
 			</treecols>
 
 			<template>

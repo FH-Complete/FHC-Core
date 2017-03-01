@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -35,18 +35,18 @@ require_once('../include/datum.class.php');
 
 if(isset($_GET['person_id']))
 	$person_id = $_GET['person_id'];
-else 
+else
 	$person_id = '';
 
 if(isset($_GET['kontakt_id']))
 	$kontakt_id = $_GET['kontakt_id'];
-else 
+else
 	$kontakt_id = '';
-	
+
 $datum = new datum();
 
 $kontakt = new kontakt();
-	
+
 $rdf_url='http://www.technikum-wien.at/kontakt';
 
 echo '
@@ -73,7 +73,7 @@ else
 function draw_rdf($row)
 {
 	global $rdf_url;
-	
+
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->kontakt_id.'"  about="'.$rdf_url.'/'.$row->kontakt_id.'" >

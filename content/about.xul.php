@@ -22,7 +22,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -67,7 +67,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 	You should have received a copy of the GNU General Public License
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-			 
+
 	Authors: Christian Paminger &lt;christian.paminger@technikum-wien.at&gt;,
 			 Andreas Oesterreicher &lt;andreas.oesterreicher@technikum-wien.at&gt;,
 			 Rudolf Hangl &lt;rudolf.hangl@technikum-wien.at&gt;,

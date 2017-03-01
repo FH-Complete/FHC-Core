@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -33,7 +33,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/kontakt.class.php');
 
 $kontakt = new kontakt();
-	
+
 $rdf_url='http://www.technikum-wien.at/kontakttyp';
 
 echo '
@@ -46,9 +46,9 @@ echo '
 ';
 
 if($kontakt->getKontakttyp())
-{	
+{
 	foreach ($kontakt->result as $row)
-	{	
+	{
 		echo '
 	      <RDF:li>
 	         <RDF:Description  id="'.$row->kontakttyp.'"  about="'.$rdf_url.'/'.$row->kontakttyp.'" >
@@ -59,7 +59,7 @@ if($kontakt->getKontakttyp())
 	      ';
 	}
 }
-else 
+else
 {
 	echo $kontakt->errormsg;
 }

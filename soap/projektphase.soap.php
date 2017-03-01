@@ -21,10 +21,10 @@
  */
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 
-require_once('../config/vilesci.config.inc.php'); 
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/projektphase.class.php');
 require_once('../include/datum.class.php');
@@ -40,23 +40,23 @@ $SOAPServer->handle();
 ini_set("soap.wsdl_cache_enabled", "0");
 
 /**
- * 
+ *
  * Speichert die vom Webservice übergebene Phase in die DB
  * @param $username
  * @param $passwort
  * @param $phase
  */
 function saveProjektphase($username, $passwort, $phase)
-{ 
+{
 	if(!$user = check_user($username, $passwort))
-		return new SoapFault("Server", "Invalid Credentials");	
-	
+		return new SoapFault("Server", "Invalid Credentials");
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-		
+
 	if(!$rechte->isBerechtigt('planner', null, 'sui'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Phasen.");
-	
+
 	$projektphase = new projektphase();
 	if($phase->projektphase_id!='')
 	{
@@ -81,20 +81,20 @@ function saveProjektphase($username, $passwort, $phase)
     $projektphase->farbe = $phase->farbe;
 	$projektphase->updatevon = $user;
 	$projektphase->updateamum = date('Y-m-d H:i:s');
-	
+
 	if($phase->neu=='true')
 		$projektphase->new = true;
 	else
-		$projektphase->new = false; 
-	
+		$projektphase->new = false;
+
 	if($projektphase->save())
-		return $projektphase->projektphase_id; 
+		return $projektphase->projektphase_id;
 	else
 		return new SoapFault("Server", $projektphase->errormsg);
 }
 
 /**
- * 
+ *
  * Loescht die übergebene Projektphase
  * @param $username
  * @param $passwort
@@ -103,18 +103,18 @@ function saveProjektphase($username, $passwort, $phase)
 function deleteProjektphase($username, $passwort, $projektphase_id)
 {
 	if(!$user = check_user($username, $passwort))
-		return new SoapFault("Server", "Invalid Credentials");	
-	
+		return new SoapFault("Server", "Invalid Credentials");
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-		
+
 	if(!$rechte->isBerechtigt('planner', null, 'suid'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Loeschen von Phasen");
-		
+
 	$phase = new projektphase();
 	if($phase->delete($projektphase_id))
 		return "OK";
 	else
-		return new SoapFault("Server", $phase->errormsg); 
+		return new SoapFault("Server", $phase->errormsg);
 }
 ?>

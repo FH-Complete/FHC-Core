@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -54,8 +54,8 @@ if(isset($_GET['lehrveranstaltung_id']) && is_numeric($_GET['lehrveranstaltung_i
 	$lvid = $_GET['lehrveranstaltung_id'];
 
 	$qry = "SELECT studiengang_kz, semester FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($lvid);
-	
-	
+
+
 	if($db->db_query($qry))
 	{
 		if($row = $db->db_fetch_object())
@@ -66,7 +66,7 @@ if(isset($_GET['lehrveranstaltung_id']) && is_numeric($_GET['lehrveranstaltung_i
 		else
 			die('Fehler beim Laden der Daten');
 	}
-	else 
+	else
 		die('Fehler beim Laden der Daten');
 }
 
@@ -86,23 +86,23 @@ if(isset($_GET['lehrfach_id']) && is_numeric($_GET['lehrfach_id']))
 	$lehrfach_id = $_GET['lehrfach_id'];
 	$where =" OR lehrveranstaltung_id=".$db->db_add_param($lehrfach_id);
 }
-else 
+else
 	$where = '';
-	
-//Alle Lehrfaecher mit Entsprechendem Studiengang und Semester holen bei 
+
+//Alle Lehrfaecher mit Entsprechendem Studiengang und Semester holen bei
 //denen sowohl das Lehrfach als auch der Fachbereich aktiv ist und
 //zusaetzlich das Lehrfach das uebergeben wurde
-$qry = "SELECT 
+$qry = "SELECT
 			tbl_lehrveranstaltung.*, tbl_fachbereich.fachbereich_kurzbz
-		FROM 
-			lehre.tbl_lehrveranstaltung 
-			JOIN public.tbl_fachbereich USING(oe_kurzbz) 
+		FROM
+			lehre.tbl_lehrveranstaltung
+			JOIN public.tbl_fachbereich USING(oe_kurzbz)
 		WHERE tbl_lehrveranstaltung.aktiv AND tbl_fachbereich.aktiv";
 if($stg!='')
 	$qry.=" AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($stg);
 if($sem!='')
 	$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($sem);
-	
+
 $qry.=$where;
 $qry.=" ORDER BY bezeichnung";
 if($db->db_query($qry))

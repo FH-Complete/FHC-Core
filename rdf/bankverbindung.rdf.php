@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -34,26 +34,26 @@ require_once('../include/bankverbindung.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 
-$uid = get_uid(); 
-$recht = new benutzerberechtigung(); 
+$uid = get_uid();
+$recht = new benutzerberechtigung();
 $recht->getBerechtigungen($uid);
 if(!$recht->isberechtigt('mitarbeiter/bankdaten') && !$recht->isBerechtigt('student/bankdaten'))
     die('Sie haben keine Berechtigung');
 
 if(isset($_GET['person_id']))
 	$person_id = $_GET['person_id'];
-else 
+else
 	$person_id = '';
 
 if(isset($_GET['bankverbindung_id']))
 	$bankverbindung_id = $_GET['bankverbindung_id'];
-else 
+else
 	$bankverbindung_id = '';
-	
+
 $datum = new datum();
 
 $bankverbindung = new bankverbindung();
-	
+
 $rdf_url='http://www.technikum-wien.at/bankverbindung';
 
 echo '
@@ -80,14 +80,14 @@ else
 function draw_rdf($row)
 {
 	global $rdf_url;
-	
+
 	switch($row->typ)
 	{
 		case 'p': $typ_bezeichnung = 'Privatkonto'; break;
 		case 'f': $typ_bezeichnung = 'Firmenkonto'; break;
 		default: $typ_bezeichnung = ''; break;
 	}
-	
+
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->bankverbindung_id.'"  about="'.$rdf_url.'/'.$row->bankverbindung_id.'" >

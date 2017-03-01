@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -36,7 +36,7 @@ if(isset($_GET['plz']))
 {
 	$plz = $_GET['plz'];
 }
-else 
+else
 	die('Plz muss uebergeben werden');
 
 $gemeinde = isset($_GET['gemeinde'])?$_GET['gemeinde']:'';
@@ -59,7 +59,7 @@ if($gemeinde=='')
 		$qry = "SELECT distinct on (name) * FROM bis.tbl_gemeinde WHERE plz='".addslashes($plz)."' ORDER BY name";
 	}
 }
-else 
+else
 {
 	$qry = "SELECT * FROM bis.tbl_gemeinde WHERE ";
 	if(is_numeric($plz) && $plz<32000) //smallint
@@ -75,7 +75,7 @@ if($qry!='' && $result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
-		
+
 		echo '
 	      <RDF:li>
 	         <RDF:Description  id="'.$row->gemeinde_id.'"  about="'.$rdf_url.'/'.$row->gemeinde_id.'" >

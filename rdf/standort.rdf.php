@@ -23,7 +23,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -31,27 +31,27 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-	
+
 $rdf_url='http://www.technikum-wien.at/standort';
 
 if(isset($_GET['firma_id']) && is_numeric($_GET['firma_id']))
 	$firma_id = $_GET['firma_id'];
-else 
+else
 	unset($firma_id);
-	
+
 if(isset($_GET['standort_id']) && is_numeric($_GET['standort_id']))
 	$standort_id = $_GET['standort_id'];
-else 
+else
 	unset($standort_id);
 
 if(isset($_GET['standort_id_all']) && is_numeric($_GET['standort_id_all']))
 	$standort_id_all = $_GET['standort_id_all'];
-else 
+else
 	unset($standort_id_all);
-	
+
 if(isset($_GET['firmentyp_kurzbz']))
 	$firmentyp_kurzbz = $_GET['firmentyp_kurzbz'];
-else 
+else
 	unset($firmentyp_kurzbz);
 
 
@@ -62,7 +62,7 @@ echo '
 >
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
-   
+
 if(isset($_GET['optional']) && $_GET['optional']=='true')
 {
 	echo '
@@ -87,7 +87,7 @@ elseif(isset($standort_id_all))
 	$qry.=" WHERE firma_id=(SELECT firma_id FROM public.tbl_standort WHERE standort_id='".addslashes($standort_id_all)."')";
 elseif(isset($firmentyp_kurzbz))
 	$qry.=" JOIN public.tbl_firma USING(firma_id) WHERE firmentyp_kurzbz='".addslashes($firmentyp_kurzbz)."'";
-else 
+else
 	die('Fehlerhafte Parameteruebergabe');
 $qry.=" ORDER BY kurzbz";
 
@@ -97,9 +97,9 @@ if($db->db_query($qry))
 		draw_content($row);
 
 function draw_content($row)
-{		
+{
 	global $rdf_url, $datum;
-	
+
 	echo '
 		  <RDF:li>
 	         <RDF:Description  id="'.$row->standort_id.'"  about="'.$rdf_url.'/'.$row->standort_id.'" >

@@ -23,7 +23,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -54,22 +54,22 @@ $stg_arr = array();
 $stg_obj = new studiengang();
 $stg_obj->getAll(null, false);
 
-foreach ($stg_obj->result as $stg) 
+foreach ($stg_obj->result as $stg)
 	$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;
 
 if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
-else 
+else
 	$uid = null;
-	
+
 if(isset($_GET['lehrveranstaltung_id']))
 	$lehrveranstaltung_id = $_GET['lehrveranstaltung_id'];
-else 
+else
 	$lehrveranstaltung_id = null;
 
 if(isset($_GET['studiensemester_kurzbz']))
 	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
-else 
+else
 	$studiensemester_kurzbz = $semester_aktuell;
 
 $rdf_url='http://www.technikum-wien.at/zeugnisnote';
@@ -81,24 +81,24 @@ echo '
 >
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
-   
+
 //Daten holen
 $obj = new zeugnisnote();
 
 $obj->getZeugnisnoten($lehrveranstaltung_id, $uid, $studiensemester_kurzbz);
 $benutzer = new student();
 
-foreach ($obj->result as $row)	
+foreach ($obj->result as $row)
 {
 	$benutzer->load($row->student_uid);
 	$lv_obj = new lehrveranstaltung();
 	$lv_obj->load($row->lehrveranstaltung_id);
-	
+
 	if ($lv_obj->zeugnis==false)
 		$zeugnis=APP_ROOT.'skin/images/invisible.png';
-	else 
+	else
 		$zeugnis='';
-		
+
 	echo '
 		  <RDF:li>
 	         <RDF:Description  id="'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'"  about="'.$rdf_url.'/'.$row->lehrveranstaltung_id.'/'.$row->student_uid.'/'.$row->studiensemester_kurzbz.'" >

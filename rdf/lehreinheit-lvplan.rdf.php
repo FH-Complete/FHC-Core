@@ -25,7 +25,7 @@
 // header fuer no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -94,16 +94,16 @@ if(isset($_GET['order']))
 {
 	switch($_GET['order'])
 	{
-		case 'lektorDESC': 
+		case 'lektorDESC':
 			$order='lektor DESC, offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz';
 			break;
-		case 'lektorASC': 
+		case 'lektorASC':
 			$order='lektor ASC, offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz';
 			break;
-		case 'lfDESC': 
+		case 'lfDESC':
 			$order='lehrfach DESC, offenestunden DESC, lehrform, semester, verband, gruppe, gruppe_kurzbz';
 			break;
-		case 'lfASC': 
+		case 'lfASC':
 			$order='lehrfach ASC, offenestunden DESC, lehrform, semester, verband, gruppe, gruppe_kurzbz';
 			break;
 		case 'stundenDESC':
@@ -117,7 +117,7 @@ if(isset($_GET['order']))
 			break;
 	}
 }
-else 
+else
 	$order=null;
 
 // LVA holen
@@ -223,7 +223,7 @@ if ($anz>0)
 			$semesterstunden.=$lf.' ';
 		if (count($l->semesterstunden)>1)
 			$semesterstunden.=' ?';
-	
+
 		// Planstunden
 		$planstunden='';
 		$l->planstunden=array_unique($l->planstunden);
@@ -232,7 +232,7 @@ if ($anz>0)
 			$planstunden.=$lf.' ';
 		if (count($l->planstunden)>1)
 			$planstunden.=' ?';
-	
+
 		// Verplant
 		$verplant='';
 		$l->verplant=array_unique($l->verplant);
@@ -249,13 +249,13 @@ if ($anz>0)
 			$offenestunden.=$os.' ';
 		if (count($l->offenestunden)>1)
 			$offenestunden.=' ?';
-	
+
 		if($filter!='')
 		{
 			$filter = mb_strtolower($filter);
-			if(!mb_strstr(mb_strtolower($lektor), $filter) && 
+			if(!mb_strstr(mb_strtolower($lektor), $filter) &&
 			   !mb_strstr(mb_strtolower($lehrfach), $filter) &&
-			   !mb_strstr(mb_strtolower($l->lehrfach_bez[0]), $filter) && 
+			   !mb_strstr(mb_strtolower($l->lehrfach_bez[0]), $filter) &&
 			   !mb_strstr(mb_strtolower(implode('',$l->stg)), $filter))
 			{
 				continue;

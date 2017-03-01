@@ -22,7 +22,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
@@ -31,12 +31,12 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/planner.css" type="text/css"?>';
 if(isset($_GET['projekt_kurzbz']))
 	$projekt_kurzbz=$_GET['projekt_kurzbz'];
-else 
+else
 	$projekt_kurzbz='';
 //echo $oe;
 if(isset($_GET['projektphase_id']))
 	$projektphase_id=$_GET['projektphase_id'];
-else 
+else
 	$projektphase_id='';
 ?>
 
@@ -65,7 +65,7 @@ else
 				    <menulist id="projektdokument-menulist-dokument"
 							editable="true"
 							datasources="rdf:null" flex="1"
-							ref="http://www.technikum-wien.at/dms/liste" 
+							ref="http://www.technikum-wien.at/dms/liste"
 							oninput="ProjektdokumentMenulistDokumentLoad(this);"
 							oncommand=""
 							>

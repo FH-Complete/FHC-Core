@@ -22,7 +22,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../config/vilesci.config.inc.php');
@@ -31,15 +31,15 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>';
-	
+
 if(isset($_GET['bankverbindung_id']) && is_numeric($_GET['bankverbindung_id']))
 	$bankverbindung_id=$_GET['bankverbindung_id'];
-else 
+else
 	$bankverbindung_id='';
-	
+
 if(isset($_GET['person_id']) && is_numeric($_GET['person_id']))
 	$person_id=$_GET['person_id'];
-else 
+else
 	$person_id='';
 ?>
 
@@ -84,11 +84,11 @@ else
 				<row>
 					<label value="Kontonummer" control="bankverbindung-textbox-kontonr"/>
    					<textbox id="bankverbindung-textbox-kontonr" checked="true"/>
-      			</row>				
+      			</row>
       			<row>
 					<label value="BLZ" control="bankverbindung-textbox-blz"/>
    					<textbox id="bankverbindung-textbox-blz" checked="true"/>
-      			</row>				
+      			</row>
       			<row>
 					<label value="Typ" control="bankverbindung-textbox-typ"/>
    					<menulist id="bankverbindung-menulist-typ" flex="1">

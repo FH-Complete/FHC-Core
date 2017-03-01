@@ -21,7 +21,7 @@
  */
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -46,7 +46,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <textbox id="mitarbeiter-detail-textbox-person_id" hidden="true" />
 		<groupbox id='groupbox-personendaten'>
 		<!--PersonenDaten-->
-			<caption label="Personendaten" />			
+			<caption label="Personendaten" />
 		<grid align="end" flex="1"
 				 flags="dont-build-content"
 				enableColumnDrag="true"
@@ -186,9 +186,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			</grid>
 
 		</groupbox>
-		
+
 		<!-- MITARBEITER DATEN -->
-		
+
 	<hbox>
 		<groupbox flex="8">
 			<caption label="Mitarbeiterdaten" />
@@ -225,10 +225,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	    				<textbox id="mitarbeiter-detail-textbox-telefonklappe" size="10" maxlength="10" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
 	    				<spacer />
 	    			</hbox>
-					<checkbox label="Fixangestellt" id="mitarbeiter-detail-checkbox-fixangestellt" checked="false" disabled="true" onchange="MitarbeiterDetailValueChange()"/>		   			
+					<checkbox label="Fixangestellt" id="mitarbeiter-detail-checkbox-fixangestellt" checked="false" disabled="true" onchange="MitarbeiterDetailValueChange()"/>
 					<spacer />
 		    	</row>
-		    	<row>	    		
+		    	<row>
 				    <label align="end" control="mitarbeiter-detail-menulist-ort_kurzbz" value="Buero"/>
 				    <vbox>
 					 	<menulist id="mitarbeiter-detail-menulist-ort_kurzbz" disabled="true"
@@ -288,16 +288,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</menulist>
 					<textbox id="mitarbeiter-detail-textbox-resturlaubstage" disabled="true" oninput="MitarbeiterDetailValueChange()" />
 				</vbox>
-		    	</row>	
+		    	</row>
 		  	</rows>
 		 </grid>
 		 <hbox class="style-groupbox">
-		 	
+
 		 </hbox>
 		</groupbox>
 	</hbox>
 	<hbox>
-		
+
 		<spacer flex="1"/>
 		<button id="mitarbeiter-detail-button-speichern" disabled="true" label="Speichern" oncommand="MitarbeiterSave();"/>
 	</hbox>

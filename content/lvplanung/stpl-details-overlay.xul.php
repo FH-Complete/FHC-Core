@@ -21,7 +21,7 @@
  */
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -61,91 +61,91 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<treecols>
 			<treecol id="lehreinheit_id" label="LE_ID" flex="2" primary="false"
 				class="sortDirectionIndicator" sortActive="true" sortDirection="ascending"
-				persist="hidden, width, ordinal" 
+				persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehreinheit_id"  />
 			<splitter class="tree-splitter"/>
 			<treecol id="stplLektor" label="Lektor" flex="2" hidden="false"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lektor" />
 			<splitter class="tree-splitter"/>
 			<treecol id="stplLehrfachKurzbz" label="Fach" flex="1" hidden="false"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehrfach" />
 			<splitter class="tree-splitter"/>
 			<treecol id="stplLehrform" label="Form" flex="1" hidden="false"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehrform" />
 			<splitter class="tree-splitter"/>
 			<treecol id="stplLehrfachBezeichnung" label="Lehrfach" flex="20" hidden="false"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#lehrfach_bez" />
 			<splitter class="tree-splitter"/>
 			<treecol id="stpl_studiengang" label="Studiengang" flex="1" hidden="false"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#studiengang" />
 			<splitter class="tree-splitter"/>
 			<treecol id="stplSemester" label="S" flex="1" hidden="false"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#sem" />
 			<splitter class="tree-splitter"/>
 			<treecol id="stplVerband" label="V" flex="1" hidden="false"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#ver" />
 			<splitter class="tree-splitter"/>
 			<treecol id="gruppe" label="G" flex="1" hidden="false"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#grp" />
 			<splitter class="tree-splitter"/>
 			<treecol id="stpl_einheit" label="SpzGrp" flex="3" hidden="false"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#gruppe" />
 			<splitter class="tree-splitter"/>
 			<treecol id="stplOrt" label="Ort" flex="2" hidden="true"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#ort_kurzbz" />
 			<splitter class="tree-splitter"/>
 			<treecol id="stpl_datum" label="Datum" flex="2" hidden="true"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#datum" />
 			<splitter class="tree-splitter"/>
 			<treecol id="stpl_stunde" label="Std" flex="1" hidden="true"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#stunde" />
 			<splitter class="tree-splitter"/>
 			<treecol id="stplUNR" label="UNR" flex="2" hidden="true"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#unr"  />
 			<splitter class="tree-splitter"/>
 			<treecol id="stundenplan_id" label="StundenplanID" flex="2" hidden="true"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#id"  />
 			<splitter class="tree-splitter"/>
 			<treecol id="anzahlstudenten" label="AnzahlStudenten" flex="2" hidden="false"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#anzahlstudenten"  />
 			<splitter class="tree-splitter"/>
 			<treecol id="stpl-details-overlay-lehrstunde-anmerkung" label="Anmerkung" flex="2" hidden="false"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#anmerkung"  />
 			<splitter class="tree-splitter"/>
 			<treecol id="stpl-details-overlay-lehrstunde-anmerkung_lehreinheit" label="AnmerkungLE" flex="2" hidden="false"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#anmerkung_lehreinheit"  />
 			<splitter class="tree-splitter"/>
 			<treecol id="stpl-details-overlay-lehrstunde-titel" label="Titel" flex="2" hidden="false"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#titel"  />
 			<splitter class="tree-splitter"/>
 			<treecol id="stpl-details-overlay-lehrstunde-gruppe_bezeichnung" label="Gruppe Bezeichnung" flex="2" hidden="true"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#gruppe_bezeichnung"  />
 			<splitter class="tree-splitter"/>
 			<treecol id="stpl-details-overlay-lehrstunde-gruppe_beschreibung" label="Gruppe Beschreibung" flex="2" hidden="true"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#gruppe_beschreibung"  />
 			<splitter class="tree-splitter"/>
 			<treecol id="stpl-details-overlay-lehrstunde-reservierung" label="Reservierung" flex="2" hidden="true"
-				class="sortDirectionIndicator" persist="hidden, width, ordinal" 
+				class="sortDirectionIndicator" persist="hidden, width, ordinal"
 				sort="rdf:http://www.technikum-wien.at/lehrstunde/rdf#reservierung"  />
 			<splitter class="tree-splitter"/>
 		</treecols>

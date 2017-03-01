@@ -20,7 +20,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -55,7 +55,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 				<toolbarbutton id="projekttask-toolbar-neu" label="Neuer Task" oncommand="TaskNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neuen Task anlegen" />
 				<toolbarbutton id="projekttask-toolbar-del" label="Loeschen" oncommand="TaskDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Task löschen"/>
 				<toolbarbutton id="projekttask-toolbar-refresh" label="Aktualisieren" oncommand="TaskTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
-				<toolbarbutton anonid="toolbarbutton-notiz-filter" label="Filter " type="menu">							
+				<toolbarbutton anonid="toolbarbutton-notiz-filter" label="Filter " type="menu">
 					<menupopup>
                         <menuitem label="Erledigte Tasks" type="radio" name="sort" oncommand="LoadTasks(currentProjektPhaseID,'erledigt')" tooltiptext="Erledigte Tasks anzeigen"/>
 						<menuitem label="Offene Tasks" type="radio" name="sort" oncommand="LoadTasks(currentProjektPhaseID,'offen')" tooltiptext="Offene Tasks anzeigen"/>
@@ -71,7 +71,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 		<!-- Bem.: style="visibility:collapse" versteckt eine Spalte -->
 		<tree id="projekttask-tree" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="rdf:null" ref="http://www.technikum-wien.at/projekttask"
-				style="margin:0px;height:500px" enableColumnDrag="true" 
+				style="margin:0px;height:500px" enableColumnDrag="true"
 				ondraggesture="nsDragAndDrop.startDrag(event,taskDDObserver);"
 
 				onselect="onselectProjekttask(this);"
@@ -135,7 +135,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#mantis_id"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#scrumsprint_id"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#ende"/>
-							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#ressource_bezeichnung"/>							
+							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#ressource_bezeichnung"/>
 							<treecell label="erledigt" value="rdf:http://www.technikum-wien.at/projekttask/rdf#erledigt"/>
 						</treerow>
 					</treeitem>

@@ -20,7 +20,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
@@ -46,7 +46,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<column flex="4"/>
 				<column flex="1"/>
 			</columns>
-			<rows>				
+			<rows>
 				<row flex="1">
 					<vbox flex="1">
 						<tree id="mitarbeiter-buchung-tree" seltype="multi" hidecolumnpicker="false" flex="1"
@@ -103,7 +103,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									sort="rdf:http://www.technikum-wien.at/wawi_buchung/rdf#buchungsdatum_iso" />
 								<splitter class="tree-splitter"/>
 							</treecols>
-						
+
 							<template>
 								<treechildren flex="1" >
 										<treeitem uri="rdf:*">
@@ -146,14 +146,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<label value="Betrag" control="mitarbeiter-buchung-textbox-betrag"/>
 										<hbox>
 					      					<textbox id="mitarbeiter-buchung-textbox-betrag" disabled="true" maxlength="9" size="9"/>
-					      					<spacer flex="1" />			
+					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
 									<row>
 										<label value="Buchungsdatum" control="mitarbeiter-buchung-textbox-buchungsdatum"/>
 										<hbox>
 											<box class="Datum" id="mitarbeiter-buchung-textbox-buchungsdatum" disabled="true"/>
-					      					<spacer flex="1" />			
+					      					<spacer flex="1" />
 					      				</hbox>
 					      			</row>
 					      			<row>

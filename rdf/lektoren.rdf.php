@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // DAO
 require_once('../config/vilesci.config.inc.php');
@@ -30,13 +30,13 @@ require_once('../include/studiengang.class.php');
 require_once('../include/fachbereich.class.php');
 
 if (isset($_GET['studiengang_kz']))
-{ 
+{
     if (isset($_GET['institut']))
         die('Only one parameter please.');
 }
 elseif (!isset($_GET['institut']))
     die('No Parameters!');
-    
+
 if(isset($_GET['studiengang_kz']))
 {
 	$stg = $_GET['studiengang_kz'];
@@ -79,8 +79,8 @@ $qry = "SELECT
 			JOIN public.tbl_person USING(person_id)
 			JOIN public.tbl_benutzerfunktion USING (uid)
 		WHERE
-			funktion_kurzbz='oezuordnung' 
-			AND tbl_benutzer.aktiv 
+			funktion_kurzbz='oezuordnung'
+			AND tbl_benutzer.aktiv
 			AND oe_kurzbz='$obj->oe_kurzbz'
 			AND (datum_bis >= now() OR datum_bis IS NULL)
 			AND (datum_von <= now() OR datum_von IS NULL)
@@ -103,7 +103,7 @@ if($db->db_query($qry))
             <LEKTOREN:titelpost><![CDATA['.$lektoren->titelpost.']]></LEKTOREN:titelpost>
             <LEKTOREN:email><![CDATA['
             .($lektoren->alias=='' ? $lektoren->uid : $lektoren->alias).'@'.DOMAIN.
-            ']]></LEKTOREN:email> 
+            ']]></LEKTOREN:email>
             <LEKTOREN:fixangestellt>'
             .(strtolower($lektoren->fixangestellt)=='t' ? 'TRUE' : 'FALSE').
             '</LEKTOREN:fixangestellt>

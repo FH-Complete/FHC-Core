@@ -21,10 +21,10 @@
  */
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 
-require_once('../config/vilesci.config.inc.php'); 
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/projekttask.class.php');
 require_once('../include/benutzer.class.php');
@@ -38,32 +38,32 @@ $SOAPServer->addFunction("saveProjekttask");
 $SOAPServer->addFunction("deleteProjekttask");
 $SOAPServer->addFunction("saveMantis");
 $SOAPServer->addFunction("setErledigt");
-$SOAPServer->addFunction("changeProjektPhase"); 
-$SOAPServer->addFunction("saveTagsForIssue"); 
+$SOAPServer->addFunction("changeProjektPhase");
+$SOAPServer->addFunction("saveTagsForIssue");
 $SOAPServer->handle();
 
 // WSDL Chache auf aus
 ini_set("soap.wsdl_cache_enabled", "0");
 
 /**
- * 
+ *
  * Speichert die vom Webservice übergebenen Parameter in die DB
  * @param $username
  * @param $passwort
  * @param $task Task-Objekt
  */
 function saveProjekttask($username, $passwort, $task)
-{ 	
+{
 
 	if(!$user = check_user($username, $passwort))
-		return new SoapFault("Server", "Invalid Credentials");	
-	
+		return new SoapFault("Server", "Invalid Credentials");
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-		
+
 	if(!$rechte->isBerechtigt('planner', null, 'sui'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Tasks");
-	
+
 	$projekttask = new projekttask();
 	// wenn projekttaskt_id == leer -> neuer task anlegen ohne laden
 	if($task->projekttask_id != '')
@@ -73,7 +73,7 @@ function saveProjekttask($username, $passwort, $task)
 			$projekttask->new = false;
 		}
 		else
-			return new SoapFault("Server", "Fehler beim Laden"); 
+			return new SoapFault("Server", "Fehler beim Laden");
 	}
 	else
 	{
@@ -89,13 +89,13 @@ function saveProjekttask($username, $passwort, $task)
 	$projekttask->mantis_id = $task->mantis_id;
 	$projekttask->scrumsprint_id = $task->scrumsprint_id;
 	$projekttask->updatevon = $task->user;
-	$projekttask->ende = $task->ende; 
-	$projekttask->ressource_id = $task->ressource_id; 
-	
+	$projekttask->ende = $task->ende;
+	$projekttask->ressource_id = $task->ressource_id;
+
 	if($projekttask->save())
 	{
 		return $projekttask->projekttask_id;
-	} 
+	}
 	else
 		return new SoapFault("Server", $projekttask->errormsg);
 }
@@ -107,27 +107,27 @@ function saveProjekttask($username, $passwort, $task)
 function changeProjektPhase($username, $passwort, $projekttask_id, $projektphase_id)
 {
 	if(!$user = check_user($username, $passwort))
-		return new SoapFault("Server", "Invalid Credentials");	
-		
+		return new SoapFault("Server", "Invalid Credentials");
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-		
+
 	if(!$rechte->isBerechtigt('planner', null, 'sui'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Umhängen von Tasks");
-		
-	$projekttask = new projekttask(); 
+
+	$projekttask = new projekttask();
 	$projekttask->load($projekttask_id);
-	$projekttask->new = false; 
-	$projekttask->projektphase_id = $projektphase_id; 
-	
+	$projekttask->new = false;
+	$projekttask->projektphase_id = $projektphase_id;
+
 	if($projekttask->changePhase($projekttask_id, $projektphase_id))
-		return true; 
+		return true;
 	else
 		return new SoapFault("Server", $projekttask->errormsg);
 }
 /**
- * 
- * Löscht den Task mit der vom Webservice übergebenen ID 
+ *
+ * Löscht den Task mit der vom Webservice übergebenen ID
  * @param $username
  * @param $passwort
  * @param $projekttask_id
@@ -135,14 +135,14 @@ function changeProjektPhase($username, $passwort, $projekttask_id, $projektphase
 function deleteProjekttask($username, $passwort, $projekttask_id)
 {
 	if(!$user = check_user($username, $passwort))
-		return new SoapFault("Server", "Invalid Credentials");	
-	
+		return new SoapFault("Server", "Invalid Credentials");
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-		
+
 	if(!$rechte->isBerechtigt('planner', null, 'suid'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Loeschen von Tasks");
-	
+
 	$projekttask = new projekttask();
 	if($projekttask->delete($projekttask_id))
 		return "OK";
@@ -154,7 +154,7 @@ function saveMantis($projekttask_id, $mantis_id, $issue_summary, $issue_descript
 {
 	get_uid();
 	$mantis = new mantis();
-	
+
 	if($mantis_id!='')
 	{
 		//Update
@@ -169,11 +169,11 @@ function saveMantis($projekttask_id, $mantis_id, $issue_summary, $issue_descript
 		$mantis->issue_additional_information = $issue_additional_information;
 		$mantis->issue_reporter_name=$issue_reporter_name;
 		$mantis->issue_reporter_id=$issue_reporter_id;
-		
+
 		if($mantis->updateIssue())
 			return 'ok';
 		else
-			return new SoapFault("Server", 'Fehler:'.$mantis->errormsg);	
+			return new SoapFault("Server", 'Fehler:'.$mantis->errormsg);
 	}
 	else
 	{
@@ -186,11 +186,11 @@ function saveMantis($projekttask_id, $mantis_id, $issue_summary, $issue_descript
 		$mantis->issue_category = $issue_category;
 		$mantis->issue_status->id = $issue_status_id;
 		$mantis->issue_priority->id = $issue_priority_id;
-		
+
 		if($id = $mantis->insertIssue())
 		{
 			$projekttask = new projekttask();
-			//Mantis ID zu Projekttask speichern 
+			//Mantis ID zu Projekttask speichern
 			if($projekttask->load($projekttask_id))
 			{
 				$projekttask->new=false;
@@ -198,7 +198,7 @@ function saveMantis($projekttask_id, $mantis_id, $issue_summary, $issue_descript
 				if($projekttask->save())
 					return 'ok';
 				else
-					return new SoapFault("Server", 'Fehler:'.$projekttask->errormsg);		
+					return new SoapFault("Server", 'Fehler:'.$projekttask->errormsg);
 			}
 		}
 		else
@@ -218,7 +218,7 @@ function saveTagsForIssue($mantis_id, $issue_tags)
 	$mantis = new mantis();
 
 	$mantis->issue_id = $mantis_id;
-		
+
 	if($mantis->setTags($issue_tags))
 		return 'ok';
 	else
@@ -227,7 +227,7 @@ function saveTagsForIssue($mantis_id, $issue_tags)
 
 
 /**
- * 
+ *
  * Setzt den Erledigt Status
  * @param $username
  * @param $passwort
@@ -235,32 +235,32 @@ function saveTagsForIssue($mantis_id, $issue_tags)
  * @param $erledigt
  */
 function setErledigt($username, $passwort, $projekttask_id, $erledigt)
-{ 	
+{
 	if(!$user = check_user($username, $passwort))
-		return new SoapFault("Server", "Invalid Credentials");	
-	
+		return new SoapFault("Server", "Invalid Credentials");
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-		
+
 	if(!$rechte->isBerechtigt('planner', null, 'sui'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung.");
-	
+
 	$projekttask = new projekttask();
-	
+
 	if($projekttask->load($projekttask_id))
 	{
 		$projekttask->new = false;
 		$projekttask->erledigt=$erledigt;
-		
+
 		if($projekttask->save())
 		{
 			return $projekttask->projekttask_id;
-		} 
+		}
 		else
 			return new SoapFault("Server", $projekttask->errormsg);
 	}
 	else
-		return new SoapFault("Server", "Fehler beim Laden"); 
+		return new SoapFault("Server", "Fehler beim Laden");
 }
 
 ?>

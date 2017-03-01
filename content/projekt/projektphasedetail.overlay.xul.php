@@ -21,7 +21,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -51,7 +51,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<column flex="5"/>
 				</columns>
 				<rows>
-					
+
 					<row>
 						<label value="Projekt Kurzbz" control="textbox-projektphase-detail-projekt_kurzbz"/>
 						<hbox>
@@ -63,7 +63,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="Parent Projektphase" control="menulist-projektphase-detail-projektphase_fk"/>
 				      		<menulist id="menulist-projektphase-detail-projektphase_fk"
 					          datasources="rdf:null"
-					          ref="http://www.technikum-wien.at/projektphase" 
+					          ref="http://www.technikum-wien.at/projektphase"
 					          disabled="true"
 					         >
 								<template>
@@ -72,7 +72,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							        			      label="rdf:http://www.technikum-wien.at/projektphase/rdf#bezeichnung"
 										  			  uri="rdf:*"/>
 										</menupopup>
-	
+
 								</template>
 							</menulist>
 						</hbox>
@@ -84,18 +84,18 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	   						<spacer />
 	   						<label value="Typ" control="textbox-projektphase-detail-typ"/>
 							<hbox>
-								<menulist id="textbox-projektphase-detail-typ" disabled="true">										
+								<menulist id="textbox-projektphase-detail-typ" disabled="true">
 										<menupopup>
-											<menuitem value="Arbeitspaket" label="Arbeitspaket"/>											
+											<menuitem value="Arbeitspaket" label="Arbeitspaket"/>
 											<menuitem value="Projektphase" label="Projektphase"/>
 											<menuitem value="Milestone" label="Milestone"/>
-										</menupopup>					
-								</menulist>						
-								
+										</menupopup>
+								</menulist>
+
 								<spacer />
 							</hbox>
 	   					</hbox>
-	   					
+
 					</row>
 					<row>
 						<label value="Beschreibung" control="menulist-projektphase-detail-ressource"/>
@@ -107,11 +107,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				      		<menulist id="menulist-projektphase-detail-ressource"
 					          datasources="rdf:null"
 					          xmlns:RESSOURCE="http://www.technikum-wien.at/ressource/rdf#"
-					          ref="http://www.technikum-wien.at/ressource/alle" 
+					          ref="http://www.technikum-wien.at/ressource/alle"
 					          disabled="true"
 					         >
 								<template>
-	
+
 										<menupopup>
 											<menuitem value="rdf:http://www.technikum-wien.at/ressource/rdf#ressource_id"
 							        			      label="rdf:http://www.technikum-wien.at/ressource/rdf#bezeichnung ( rdf:http://www.technikum-wien.at/ressource/rdf#typ )"

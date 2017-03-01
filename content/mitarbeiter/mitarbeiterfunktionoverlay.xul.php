@@ -21,7 +21,7 @@
  */
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -138,7 +138,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					sort="rdf:http://www.technikum-wien.at/bisverwendung/rdf#insertvon"  onclick="MitarbeiterTreeVerwendungSort()"/>
 				<splitter class="tree-splitter"/>
 			</treecols>
-	
+
 			<template>
 				<rule>
 					<treechildren>
@@ -149,7 +149,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#ausmass" />
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#verwendung" />
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#hauptberuf" />
-								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#hauptberuflich" />   							
+								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#hauptberuflich" />
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#habilitation" />
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#vertragsstunden" />
 								<treecell label="rdf:http://www.technikum-wien.at/bisverwendung/rdf#beginn" />
@@ -188,7 +188,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					flags="dont-build-content"
 					enableColumnDrag="true"
 					style="margin:5px;"
-					persist="hidden, height"						
+					persist="hidden, height"
 			>
 				<treecols>
 					<treecol id="mitarbeiter-funktion-treecol-studiengang" label="Studiengang" flex="1" persist="hidden, width" hidden="false"
@@ -208,7 +208,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						sort="rdf:http://www.technikum-wien.at/bisfunktion/rdf#studiengang_kz"  onclick="MitarbeiterTreeFunktionSort()"/>
 					<splitter class="tree-splitter"/>
 				</treecols>
-		
+
 				<template>
 					<rule>
 						<treechildren>
@@ -264,7 +264,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								</row>
 							</rows>
 						</grid>
-					</groupbox>									
+					</groupbox>
 				</vbox>
 			</hbox>
 		</hbox>
@@ -279,7 +279,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				flags="dont-build-content"
 				enableColumnDrag="true"
 				style="margin:5px;"
-				persist="hidden, height"						
+				persist="hidden, height"
 		>
 			<treecols>
 				<treecol id="mitarbeiter-entwicklungsteam-treecol-studiengang" label="Studiengang" flex="1" persist="hidden, width" hidden="false"
@@ -311,7 +311,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					sort="rdf:http://www.technikum-wien.at/entwicklungsteam/rdf#besqualcode"  onclick="MitarbeiterTreeEntwicklungsteamSort()"/>
 				<splitter class="tree-splitter"/>
 			</treecols>
-	
+
 			<template>
 				<rule>
 					<treechildren>

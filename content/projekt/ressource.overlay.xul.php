@@ -20,7 +20,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -37,7 +37,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 <overlay id="overlay-ressource"
 	xmlns:html="http://www.w3.org/1999/xhtml"
-	xmlns:svg="http://www.w3.org/2000/svg" 
+	xmlns:svg="http://www.w3.org/2000/svg"
 	xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 >
@@ -73,7 +73,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<toolbarbutton id="toolbarbutton-ressource-projektphase-drucken" label="Drucken" oncommand="RessourcePrintPhasen()" image="../skin/images/drucken.png" tooltiptext="Drucken"/>
 						</toolbar>
 					</toolbox>
-				
+
 					<iframe id="iframe-ressource-projektphase" flex="5" src="about:blank" />
 				</vbox>
 				<vbox>
@@ -83,7 +83,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<toolbarbutton id="toolbarbutton-ressource-projektask-drucken" label="Drucken" oncommand="RessourcePrintTask()" image="../skin/images/drucken.png" tooltiptext="Drucken"/>
 						</toolbar>
 					</toolbox>
-				
+
 					<iframe id="iframe-ressource-projekttask" flex="5" src="about:blank" />
 				</vbox>
 			</tabpanels>

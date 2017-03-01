@@ -22,7 +22,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -31,15 +31,15 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>';
-	
+
 if(isset($_GET['kontakt_id']) && is_numeric($_GET['kontakt_id']))
 	$kontakt_id=$_GET['kontakt_id'];
-else 
+else
 	$kontakt_id='';
-	
+
 if(isset($_GET['person_id']) && is_numeric($_GET['person_id']))
 	$person_id=$_GET['person_id'];
-else 
+else
 	$person_id='';
 ?>
 
@@ -67,7 +67,7 @@ else
 			<rows>
 				<row>
 					<label value="Typ" control="kontakt-menulist-typ"/>
-					<menulist id="kontakt-menulist-typ" 
+					<menulist id="kontakt-menulist-typ"
 					          datasources="<?php echo APP_ROOT ?>rdf/kontakttyp.rdf.php" flex="1"
 					          ref="http://www.technikum-wien.at/kontakttyp/liste" >
 						<template>
@@ -86,15 +86,15 @@ else
 				<row>
 					<label value="Anmerkung" control="kontakt-textbox-anmerkung"/>
    					<textbox id="kontakt-textbox-anmerkung" maxlength="64"/>
-				</row>				
+				</row>
       			<row>
 					<label value="Zustellung" control="kontakt-checkbox-zustellung"/>
    					<checkbox id="kontakt-checkbox-zustellung" checked="true"/>
       			</row>
-				
+
 				<row>
 					<label value="Firma / Standort" control="kontakt-menulist-firma"/>
-					<!--<menulist id="kontakt-menulist-firma" 
+					<!--<menulist id="kontakt-menulist-firma"
 					          datasources="<?php echo APP_ROOT ?>rdf/firma.rdf.php?optional=true" flex="1"
 					          ref="http://www.technikum-wien.at/firma/liste" >
 						<template>

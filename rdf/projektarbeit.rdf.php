@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -33,7 +33,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/projektarbeit.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/lehreinheit.class.php');
-	
+
 $rdf_url='http://www.technikum-wien.at/projektarbeit';
 
 echo '
@@ -51,7 +51,7 @@ $projektarbeit = new projektarbeit();
 if(isset($_GET['student_uid']))
 {
 	$projektarbeit->getProjektarbeit($_GET['student_uid']);
-	
+
 	foreach ($projektarbeit->result as $row)
 		draw_content($row);
 }
@@ -59,13 +59,13 @@ elseif(isset($_GET['projektarbeit_id']) && is_numeric($_GET['projektarbeit_id'])
 {
 	if($projektarbeit->load($_GET['projektarbeit_id']))
 		draw_content($projektarbeit);
-	else 
+	else
 		die('Eintrag wurde nicht gefunden');
 }
-else 
+else
 	die('Student_uid oder Projektarbeit_id muss uebergeben werden');
-	
-	
+
+
 function draw_content($row)
 {
 	global $rdf_url, $datum_obj;

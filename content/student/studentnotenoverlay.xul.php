@@ -22,7 +22,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
@@ -58,7 +58,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		style="margin-bottom:5px;" height="100%" enableColumnDrag="true"
 		context="student-noten-tree-popup"
 		flags="dont-build-content"
-	>	
+	>
 		<treecols>
 			<treecol id="student-noten-tree-zeugnis" label="Zeugnis" hidden="false" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator" tooltiptext="Zeugnisoption deaktiviert"
@@ -135,7 +135,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#punkte" />
 			<splitter class="tree-splitter"/>
 		</treecols>
-	
+
 		<template>
 			<treechildren flex="1" >
 					<treeitem uri="rdf:*">
@@ -169,7 +169,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		<button id="student-note-copy" label="&lt;=" style="font-weight: bold;" oncommand="StudentNotenMove();"/>
 		<spacer flex="1"/>
 	</vbox>
-	
+
 	<vbox flex="1">
 	<label value='Lektor' />
 	<tree id="student-lvgesamtnoten-tree" seltype="multi" hidecolumnpicker="false" flex="1"
@@ -177,7 +177,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		style="margin-bottom:5px;" height="100%" enableColumnDrag="true"
 		flags="dont-build-content"
 	>
-	
+
 		<treecols>
 			<treecol id="student-lvgesamtnoten-tree-lehrveranstaltung_bezeichnung" label="Lehrveranstaltung" flex="2" hidden="false" primary="true"
 				class="sortDirectionIndicator"
@@ -226,7 +226,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#punkte" />
 			<splitter class="tree-splitter"/>
 		</treecols>
-	
+
 		<template>
 			<treechildren flex="1" >
 					<treeitem uri="rdf:*">
@@ -248,12 +248,12 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		</template>
 	</tree>
 	</vbox>
-</hbox>		
-<hbox>		
+</hbox>
+<hbox>
 	<label value="Note" control="student-noten-menulist-note"/>
 	<menulist id="student-noten-menulist-note" disabled="true"
 	          datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php" flex="1"
-	          ref="http://www.technikum-wien.at/note/liste" 
+	          ref="http://www.technikum-wien.at/note/liste"
 	          oncommand="StudentNoteSpeichern()">
 		<template>
 			<menupopup>
@@ -265,9 +265,9 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	</menulist>
 	<label value="Punkte" control="student-noten-textbox-punkte" hidden="<?php echo $punktehidden; ?>"/>
 	<textbox id="student-noten-textbox-punkte" oninput="StudentNotenPunkteChange()" disabled="true" hidden="<?php echo $punktehidden; ?>"/>
-	
+
 	<button id="student-noten-button-speichern" oncommand="StudentNoteSpeichern()" label="Speichern" disabled="true" hidden="<?php echo $punktehidden; ?>"/>
-	
+
 	<spacer flex="1" />
 </hbox>
 </vbox>

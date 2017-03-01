@@ -21,10 +21,10 @@
  */
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 
-require_once('../config/vilesci.config.inc.php'); 
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/ressource.class.php');
 require_once('../include/datum.class.php');
@@ -40,23 +40,23 @@ $SOAPServer->handle();
 ini_set("soap.wsdl_cache_enabled", "0");
 
 /**
- * 
+ *
  * Speichert in der Zwischentabelle Ressource - Projekt
  * @param $username
  * @param $passwort
  * @param $projektRessource
  */
 function saveProjektRessource($username, $passwort, $projektRessource)
-{ 	
+{
 	if(!$user = check_user($username, $passwort))
-		return new SoapFault("Server", "Invalid Credentials");	
-	
+		return new SoapFault("Server", "Invalid Credentials");
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-		
+
 	if(!$rechte->isBerechtigt('planner', null, 'sui'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Projekten.");
-	
+
 	$ressource = new ressource();
 	if($projektRessource->projekt_ressource_id!='')
 	{
@@ -65,7 +65,7 @@ function saveProjektRessource($username, $passwort, $projektRessource)
 	}
 	else
 	{
-		$ressource->new = true; 
+		$ressource->new = true;
 	}
 	$ressource->projekt_ressource_id=$projektRessource->projekt_ressource_id;
 	$ressource->projektphase_id=$projektRessource->projektphase_id;
@@ -75,9 +75,9 @@ function saveProjektRessource($username, $passwort, $projektRessource)
 	$ressource->beschreibung = $projektRessource->beschreibung;
 	$ressource->aufwand = $projektRessource->aufwand;
 
-	
+
 	if($ressource->saveProjektRessource())
-		return $ressource->projekt_ressource_id; 
+		return $ressource->projekt_ressource_id;
 	else
 		return new SoapFault("Server", $ressource->errormsg);
 }
@@ -87,38 +87,38 @@ function saveProjektRessource($username, $passwort, $projektRessource)
  * @param type $username
  * @param type $passwort
  * @param type $projektRessource
- * @return \SoapFault 
+ * @return \SoapFault
  */
 function deleteProjektRessource($username, $passwort, $projektRessource)
-{  
+{
     if(!$user = check_user($username, $passwort))
-        return new SoapFault ("Server", "Invalid Credentials"); 
-    
-    $recht = new benutzerberechtigung(); 
-    $recht->getBerechtigungen($user); 
-        
+        return new SoapFault ("Server", "Invalid Credentials");
+
+    $recht = new benutzerberechtigung();
+    $recht->getBerechtigungen($user);
+
    // if(!$rechte->isBerechtigt('planner', null, 'sui'))
 	//	return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Projekten.");
-    
-    $ressource = new ressource(); 
-        
+
+    $ressource = new ressource();
+
     if($projektRessource->projektphase_id != '')
     {
         // von Projektphase löschen
         if($ressource->deleteFromPhase($projektRessource->ressource_id, $projektRessource->projektphase_id))
-            return "Erfolg"; 
+            return "Erfolg";
         else
-            return "Fehler beim Löschen"; 
-        
+            return "Fehler beim Löschen";
+
     }
     else
     {
         // von Projekt löschen
         if($ressource->deleteFromProjekt($projektRessource->ressource_id, $projektRessource->projekt_kurzbz))
-            return "Erfolg"; 
+            return "Erfolg";
         else
-            return "Fehler beim Löschen"; 
-            
+            return "Fehler beim Löschen";
+
     }
 }
 

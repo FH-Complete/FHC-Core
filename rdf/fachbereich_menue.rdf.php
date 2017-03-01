@@ -15,14 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 // header fuer no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -66,7 +66,7 @@ echo '
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:FACHBEREICH="'.$rdf_url.'/rdf#"
 >
- 
+
 ';
 
 $hier = '';
@@ -78,7 +78,7 @@ if($result = $db->db_query($qry))
 {
 	while ($row = $db->db_fetch_object($result))
 	{
-		echo ' 
+		echo '
 	      	<RDF:Description  id="'.$row->fachbereich_kurzbz.'"  about="'.$rdf_url.'/'.$row->fachbereich_kurzbz.'" >
 	    		<FACHBEREICH:kurzbz>'.$row->fachbereich_kurzbz.'</FACHBEREICH:kurzbz>
 	    		<FACHBEREICH:bezeichnung><![CDATA['.$row->bezeichnung.']]></FACHBEREICH:bezeichnung>
@@ -89,13 +89,13 @@ if($result = $db->db_query($qry))
 	      	';
 	  $hier .= "\n<RDF:li>";
 	  $hier .= "\n".'   <RDF:Seq about="'.$rdf_url.'/'.$row->fachbereich_kurzbz.'">'."\n";
-	  
-	  $qry = "SELECT 
-				distinct mitarbeiter_uid as uid, tbl_mitarbeiter.kurzbz, vorname, nachname, titelpre, titelpost 
-			FROM 
-				campus.vw_lehreinheit JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) 
+
+	  $qry = "SELECT
+				distinct mitarbeiter_uid as uid, tbl_mitarbeiter.kurzbz, vorname, nachname, titelpre, titelpost
+			FROM
+				campus.vw_lehreinheit JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
 				JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) JOIN public.tbl_person USING(person_id)
-			WHERE 
+			WHERE
 				fachbereich_kurzbz='".addslashes($row->fachbereich_kurzbz)."' AND
 				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 	  //echo $qry;
@@ -124,8 +124,8 @@ if($result = $db->db_query($qry))
 
 echo $lektoren;
 echo '<RDF:Seq about="'.$rdf_url.'/liste">';
-echo $hier;   
+echo $hier;
 echo '</RDF:Seq>';
 ?>
-  
+
 </RDF:RDF>
