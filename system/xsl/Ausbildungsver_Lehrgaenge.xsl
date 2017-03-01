@@ -513,10 +513,10 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 		</text:list>
 		<xsl:choose>
 			<xsl:when test="lgartcode='1'">
-				<text:p text:style-name="P5">Nach Abschluss aller vorgeschriebenen Prüfungen wird der akademische Grad &quot;Master of &quot; verliehen.</text:p>
+				<text:p text:style-name="P5">Nach Abschluss aller vorgeschriebenen Prüfungen wird der akademische Grad &quot;<xsl:value-of select="akadgrad"/>&quot; verliehen.</text:p>
 			</xsl:when>
 			<xsl:when test="lgartcode='2'">
-				<text:p text:style-name="P5">Nach Abschluss aller vorgeschriebenen Prüfungen wird der Titel &quot;Akademische/r &quot; verliehen.</text:p>
+				<text:p text:style-name="P5">Nach Abschluss aller vorgeschriebenen Prüfungen wird der Titel &quot;<xsl:value-of select="akadgrad"/>&quot; verliehen.</text:p>
 			</xsl:when>
 			<xsl:otherwise>
 				<text:p text:style-name="P5">Nach Abschluss aller vorgeschriebenen Prüfungen wird ein Zertifizierungsdiplom der Technikum Wien Academy verliehen.</text:p>
