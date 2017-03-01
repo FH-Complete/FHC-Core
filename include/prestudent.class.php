@@ -543,7 +543,7 @@ class prestudent extends person
 	 * @param $orgform Organisationsform.
 	 * @return boolean true wenn erfolgreich, false im Fehlerfall
 	 */
-	public function loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=null, $typ=null, $orgform=null)
+	public function loadInteressentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=null, $typ=null, $orgform=null)
 	{
 		$stsemqry='';
 		if(!is_null($studiensemester_kurzbz) && $studiensemester_kurzbz!='')

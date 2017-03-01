@@ -583,7 +583,7 @@ if($xmlformat=='rdf')
 
 		if($studiengang_kz!=null)
 		{
-			if($prestd->loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester, $typ, $orgform))
+			if($prestd->loadInteressentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester, $typ, $orgform))
 			{
 				foreach ($prestd->result as $row)
 				{
