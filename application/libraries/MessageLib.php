@@ -265,12 +265,12 @@ class MessageLib
 					}
 					else
 					{
-						if (!empty($subject))
+						if (empty($subject))
 						{
 							$result = $this->_error('', MSG_ERR_SUBJECT_EMPTY);
 							break;
 						}
-						else if (!empty($body))
+						else if (empty($body))
 						{
 							$result = $this->_error('', MSG_ERR_BODY_EMPTY);
 							break;
@@ -884,4 +884,12 @@ class MessageLib
     {
 		return success($retval, $code, MessageLib::MSG_INDX_PREFIX);
     }
+    
+    /**
+     * 
+     */
+	public function parseMessageText($text, $data = array())
+	{
+		return $this->ci->parser->parse_string($text, $data, true);
+	}
 }
