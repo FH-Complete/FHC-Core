@@ -35,6 +35,7 @@ if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
 
 $person_id = '';
+$serverzugriff=false;
 //Wenn das Bild direkt aufgerufen wird, ist eine Authentifizierung erforderlich
 //Wenn es vom Server selbst aufgerufen wird, ist keine Auth. notwendig
 //(z.B. fuer die Erstellung von PDFs)
@@ -43,7 +44,7 @@ if($_SERVER['REMOTE_ADDR']!=$_SERVER['SERVER_ADDR'])
 	// wenn session gesetzt ist von Prestudententool, Incomingtool oder Bewerbungstool -> keine Abfrage da diese Personen noch keine uid haben
 	if(!isset($_SESSION['prestudent/user']) && !isset($_SESSION['incoming/user']) && !isset($_SESSION['bewerbung/personId']))
 		$uid = get_uid();
-	else 
+	else
 	{
 		if (isset($_SESSION['incoming/user']))
 		{
@@ -61,6 +62,8 @@ if($_SERVER['REMOTE_ADDR']!=$_SERVER['SERVER_ADDR'])
 		}
 	}
 }
+else
+	$serverzugriff=true;
 
 //default bild (ein weisser pixel)
 $cTmpHEX='/9j/4AAQSkZJRgABAQEASABIAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD//gAXQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q/9sAQwAFAwQEBAMFBAQEBQUFBgcMCAcHBwcPCwsJDBEPEhIRDxERExYcFxMUGhURERghGBodHR8fHxMXIiQiHiQcHh8e/9sAQwEFBQUHBgcOCAgOHhQRFB4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4e/8AAEQgAAQABAwEiAAIRAQMRAf/EABUAAQEAAAAAAAAAAAAAAAAAAAAI/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCywAf/2Q==';
@@ -88,7 +91,7 @@ if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id'])  &
 
 				}
 			}
-			elseif(!isset($uid) && $person_id != $row->person_id)
+			elseif(!isset($uid) && $person_id != $row->person_id && !$serverzugriff)
 			{
 				$gesperrt=true;
 			}
