@@ -35,6 +35,8 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/vorlage.class.php');
 require_once('../../include/addon.class.php');
 require_once('../../include/studiengang.class.php');
+require_once('../../include/student.class.php');
+require_once('../../include/prestudent.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -54,10 +56,49 @@ if(isset($_GET['xsl']))
 	$xsl=$_GET['xsl'];
 else
 	die('Fehlerhafte Parameteruebergabe');
+
+// Studiengang ermitteln dessen Vorlage verwendet werden soll
+$xsl_stg_kz=0;
+// Direkte uebergabe des Studienganges dessen Vorlage verwendet werden soll
 if(isset($_GET['xsl_stg_kz']))
 	$xsl_stg_kz=$_GET['xsl_stg_kz'];
 else
-	$xsl_stg_kz=0;
+{
+	// Wenn eine Studiengangskennzahl uebergeben wird, wird die Vorlage dieses Studiengangs verwendet
+	if(isset($_GET['stg_kz']))
+		$xsl_stg_kz=$_GET['stg_kz'];
+	else
+	{
+		// Werden UIDs oder Prestudent_IDs uebergeben, wird die Vorlage des Studiengangs genommen
+		// in dem der 1. Studierende in der Liste ist
+		if(isset($_GET['uid']) && $_GET['uid']!='')
+		{
+			if(strstr($_GET['uid'],';'))
+				$uids = explode(';',$_GET['uid']);
+			else
+				$uids[1] = $_GET['uid'];
+
+			$student_obj = new student();
+			if($student_obj->load($uids[1]))
+			{
+				$xsl_stg_kz=$student_obj->studiengang_kz;
+			}
+		}
+		elseif(isset($_GET['prestudent_id']) && $_GET['prestudent_id']!='')
+		{
+			if(strstr($_GET['prestudent_id'],';'))
+				$prestudent_ids = explode(';',$_GET['prestudent_id']);
+			else
+				$prestudent_ids[1] = $_GET['prestudent_id'];
+
+			$prestudent_obj = new prestudent();
+			if($prestudent_obj->load($prestudent_ids[1]))
+			{
+				$xsl_stg_kz=$prestudent_obj->studiengang_kz;
+			}
+		}
+	}
+}
 
 if(isset($_GET['version']) && is_numeric($_GET['version']))
 	$version = $_GET['version'];
@@ -214,14 +255,24 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 
 		// Wenn ein Style XSL uebergeben wurde wird ein zweites XML File erstellt mit den
 		// Styleanweisungen und ebenfalls zum Zip hinzugefuegt
-		if(isset($_GET['style_xsl']))
+		if(isset($_GET['style_xsl']) || $vorlage->style!='')
 		{
-		    $style_xsl=$_GET['style_xsl'];
-		    $style_vorlage = new vorlage();
-		    $style_vorlage->getAktuelleVorlage($xsl_stg_kz, $style_xsl, $version);
-		    $style_xsl_doc = new DOMDocument;
-		    if(!$style_xsl_doc->loadXML($style_vorlage->text))
-			    die('unable to load xsl');
+			//Wenn die Spalte style in der DB befuellt ist, wird dieses verwendet
+			if($vorlage->style!='')
+			{
+				$style_xsl_doc = new DOMDocument;
+				if(!$style_xsl_doc->loadXML($vorlage->style))
+					die('unable to load xsl from tbl_vorlagestudiengang');
+			}
+			else
+			{
+				$style_xsl=$_GET['style_xsl'];
+				$style_vorlage = new vorlage();
+				$style_vorlage->getAktuelleVorlage($xsl_stg_kz, $style_xsl, $version);
+				$style_xsl_doc = new DOMDocument;
+				if(!$style_xsl_doc->loadXML($style_vorlage->text))
+					die('unable to load xsl');
+			}
 
 		    // Configure the transformer
 		    $style_proc = new XSLTProcessor;
@@ -237,7 +288,7 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 
 		foreach($addons->aktive_addons as $addon)
 		{
-		    $zipfile = DOC_ROOT.'/addons/'.$addon.'/system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
+		    $zipfile = DOC_ROOT.'addons/'.$addon.'/system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
 
 		    if(file_exists($zipfile))
 		    {
@@ -246,14 +297,14 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 		    }
 		}
 		if(!$vorlage_found)
-		    $zipfile = DOC_ROOT.'/system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
+		    $zipfile = DOC_ROOT.'system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
 
 
 		$tempname_zip = 'out.zip';
 		if(copy($zipfile, $tempname_zip))
 		{
 		    exec("zip $tempname_zip content.xml");
-		    if(isset($_GET['style_xsl']))
+		    if(isset($_GET['style_xsl']) || $vorlage->style!='')
 			    exec("zip $tempname_zip styles.xml");
 
 		    clearstatcache();
