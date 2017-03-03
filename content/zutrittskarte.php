@@ -60,10 +60,15 @@ $output = isset($_REQUEST['output'])?$_REQUEST['output']:'pdf';
 if($uid=='' && $users=='')
 	die('Parameter data is missing');
 	
+$uid_arr = array();
 if($users!='')
-	$uid_arr=$users;
+	$uid_arr = $users;
 else
 	$uid_arr = explode(';',$uid);
+
+// Wenn Array mehrere Elemente hat und erstes Element im Array leer ist -> entfernen
+if (isset($uid_arr[1]) && $uid_arr[0] == '')
+	array_shift($uid_arr);
 
 // Tempordner fuer das erstellen des ODT anlegen
 $tempfolder = '/tmp/'.uniqid();
@@ -73,9 +78,37 @@ chdir($tempfolder);
 // Unterordner fuer die Bilder erstellen
 mkdir('Pictures');
 
+// Studiengang ermitteln dessen Vorlage verwendet werden soll
+$xsl_stg_kz=0;
+// Direkte uebergabe des Studienganges dessen Vorlage verwendet werden soll
+if(isset($_GET['xsl_stg_kz']))
+	$xsl_stg_kz=$_GET['xsl_stg_kz'];
+else
+{
+	// Wenn eine Studiengangskennzahl uebergeben wird, wird die Vorlage dieses Studiengangs verwendet
+	if(isset($_GET['stg_kz']))
+		$xsl_stg_kz=$_GET['stg_kz'];
+	else
+	{
+		// Vorlage des Studiengangs aus $uid_arr ermitteln (1. Studierender im Array)
+		if($uid_arr[0] != '')
+		{
+			$student_obj = new student();
+			if($student_obj->load($uid_arr[0]))
+			{
+				$xsl_stg_kz = $student_obj->studiengang_kz;
+			}
+		}
+	}
+}
+	
 // Vorlage der Zutrittskarte laden
+
+if($xsl_stg_kz=='')
+	$xsl_stg_kz='0';
+
 $vorlage = new vorlage();
-if(!$vorlage->getAktuelleVorlage('0', 'Zutrittskarte'))
+if(!$vorlage->getAktuelleVorlage($xsl_stg_kz, 'Zutrittskarte'))
 	die($vorlage->errormsg);
 $xsl_content = $vorlage->text;
 
