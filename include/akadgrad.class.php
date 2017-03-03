@@ -131,7 +131,7 @@ class akadgrad extends basis_db
 								JOIN public.tbl_person USING (person_id) 
 								WHERE student_uid=".$this->db_add_param($student_uid).") 
 					OR geschlecht IS NULL)
-				LIMIT 1";
+				ORDER BY geschlecht NULLS LAST LIMIT 1";
 		
 		if($this->db_query($qry))
 		{
