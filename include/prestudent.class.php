@@ -543,7 +543,7 @@ class prestudent extends person
 	 * @param $orgform Organisationsform.
 	 * @return boolean true wenn erfolgreich, false im Fehlerfall
 	 */
-	public function loadIntessentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=null, $typ=null, $orgform=null)
+	public function loadInteressentenUndBewerber($studiensemester_kurzbz, $studiengang_kz, $semester=null, $typ=null, $orgform=null)
 	{
 		$stsemqry='';
 		if(!is_null($studiensemester_kurzbz) && $studiensemester_kurzbz!='')
@@ -597,13 +597,19 @@ class prestudent extends person
 			case "reihungstestangemeldet":
 				$qry.="
 					AND a.rolle='Interessent'
-					AND EXISTS(SELECT 1 FROM public.tbl_rt_person
+					AND EXISTS(
+						SELECT
+							1
+						FROM
+							public.tbl_rt_person
+							JOIN public.tbl_reihungstest ON(rt_id = reihungstest_id)
 						WHERE
 							person_id=a.person_id
 							AND studienplan_id IN(
 								SELECT studienplan_id FROM lehre.tbl_studienplan
 								JOIN lehre.tbl_studienordnung USING(studienordnung_id)
 								WHERE tbl_studienordnung.studiengang_kz=a.studiengang_kz)
+							AND tbl_reihungstest.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 						)";
 				break;
 			case "reihungstestnichtangemeldet":

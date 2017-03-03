@@ -20,7 +20,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -66,7 +66,7 @@ foreach($addon_obj->result as $addon)
 		<textbox id="mitarbeiter-vertrag-neu-textbox-vertrag_id" value=""/>
 	</hbox>
 	<description>Die folgenden Lehraufträge sind noch keinem Vertrag zugeordnet.
-	Markieren Sie die Lehraufträge um diese dem Vertrag zuzuordnen:</description>	
+	Markieren Sie die Lehraufträge um diese dem Vertrag zuzuordnen:</description>
 	<tree id="mitarbeiter-vertrag-tree-nichtzugeordnet" seltype="multi" hidecolumnpicker="false" flex="1"
 	datasources="rdf:null" ref="http://www.technikum-wien.at/vertragdetails"
 		enableColumnDrag="true"
@@ -91,27 +91,27 @@ foreach($addon_obj->result as $addon)
 			<splitter class="tree-splitter"/>
 			<treecol id="mitarbeiter-vertrag-tree-nichtzugeordnet-studiensemester_kurzbz" label="Studiensemester" flex="2" hidden="false"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#studiensemester_kurzbz" />							
+				sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#studiensemester_kurzbz" />
 			<splitter class="tree-splitter"/>
 			<treecol id="mitarbeiter-vertrag-tree-nichtzugeordnet-pruefung_id" label="PruefungID" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#pruefung_id" />							
+				sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#pruefung_id" />
 			<splitter class="tree-splitter"/>
 			<treecol id="mitarbeiter-vertrag-tree-nichtzugeordnet-mitarbeiter_uid" label="mitarbeiter_uid" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#mitarbeiter_uid" />							
+				sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#mitarbeiter_uid" />
 			<splitter class="tree-splitter"/>
 			<treecol id="mitarbeiter-vertrag-tree-nichtzugeordnet-projektarbeit_id" label="ProjektarbeitID" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#projektarbeit_id" />							
+				sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#projektarbeit_id" />
 			<splitter class="tree-splitter"/>
 			<treecol id="mitarbeiter-vertrag-tree-nichtzugeordnet-lehreinheit_id" label="LehreinheitID" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#lehreinheit_id" />							
+				sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#lehreinheit_id" />
 			<splitter class="tree-splitter"/>
 			<treecol id="mitarbeiter-vertrag-tree-nichtzugeordnet-betreuerart_kurzbz" label="BetreuerartKurzbz" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#betreuerart_kurzbz" />							
+				sort="rdf:http://www.technikum-wien.at/vertragdetails/rdf#betreuerart_kurzbz" />
 		</treecols>
 
 		<template>
@@ -138,21 +138,21 @@ foreach($addon_obj->result as $addon)
 				<column flex="1"/>
 				<column flex="8"/>
 			</columns>
-			<rows id="mitarbeiter-buchung-grid-detail-rows">			
+			<rows id="mitarbeiter-buchung-grid-detail-rows">
 				<row>
 					<label value="Vertragsdatum" control="mitarbeiter-vertrag-neu-box-vertragsdatum" />
 					<hbox>
 						<box class="Datum" id="mitarbeiter-vertrag-neu-box-vertragsdatum"/>
 						<spacer />
 					</hbox>
-				</row>	
+				</row>
 				<row>
 					<label value="Bezeichnung" control="mitarbeiter-vertrag-neu-textbox-bezeichnung" />
 					<hbox>
 						<textbox id="mitarbeiter-vertrag-neu-textbox-bezeichnung" value=""/>
 						<spacer />
 					</hbox>
-				</row>	
+				</row>
 				<row>
 					<label value="Typ" control="mitarbeiter-vertrag-neu-menulist-vertragstyp"/>
 					<menulist id="mitarbeiter-vertrag-neu-menulist-vertragstyp" disabled="false"
@@ -187,7 +187,7 @@ foreach($addon_obj->result as $addon)
 				</row>
 			</rows>
 		</grid>
-	</hbox>	
+	</hbox>
 	<button id="mitarbeiter-vertrag-neu-button-speichern" label="Vertrag erstellen" oncommand="MitarbeiterVertragNeuGenerateVertrag()" />
 </vbox>
 </window>

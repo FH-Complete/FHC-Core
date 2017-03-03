@@ -20,7 +20,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -37,12 +37,12 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 
 if(isset($_GET['prestudent_id']))
 	$prestudent_id=$_GET['prestudent_id'];
-else 
+else
 	$prestudent_id='';
-	
+
 if(isset($_GET['akte_id']))
 	$akte_id=$_GET['akte_id'];
-else 
+else
 	$akte_id='';
 
 $vorname = '';
@@ -51,7 +51,7 @@ if($prestudent_id!='')
 {
 	$prestudent = new prestudent();
 	$prestudent->load($prestudent_id);
-	
+
 	$vorname = $prestudent->vorname;
 	$nachname = $prestudent->nachname;
 }
@@ -80,7 +80,7 @@ $db = new basis_db();
 					<label value="Dokumenttyp" />
 					<menulist id="interessent-dokumente-dialog-menulist-dokument_kurzbz"
 						      datasources="<?php echo APP_ROOT; ?>rdf/dokumenttyp.rdf.php?ohne_dok=Zeugnis" flex="1"
-						      ref="http://www.technikum-wien.at/dokumenttyp" 
+						      ref="http://www.technikum-wien.at/dokumenttyp"
 					>
 						<template>
 							<menupopup>
@@ -100,7 +100,7 @@ $db = new basis_db();
 					<textbox multiline="true" rows="10" id="interessent-dokumente-dialog-textbox-anmerkung" />
 				</row>
 				<row id="interessent-dokumente-dialog-row-anmerkung" hidden="false">
-					<spacer />			
+					<spacer />
 					<hbox>
 						<spacer flex="1" />
 						<button id="interessent-dokumente-dialog-button-speichern" oncommand="InteressentDokumenteDialogSpeichern()" label="Speichern" />

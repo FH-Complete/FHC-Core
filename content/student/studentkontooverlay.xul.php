@@ -22,7 +22,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
@@ -49,7 +49,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<column flex="1"/>
 			</columns>
 			<rows>
-				<row>	
+				<row>
 					<hbox>
 						<spacer flex="1" />
 						<button id="student-konto-button-filter" value="alle" oncommand="StudentKontoFilter()" label="offene anzeigen" disabled="true"/>
@@ -83,7 +83,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<spacer flex="1" />
 						</vbox>
 						<button id="student-konto-button-filterbuchungstyp" oncommand="StudentKontoFilterBuchungstyp()" label="filtern"/>
-						
+
 					</hbox>
 				</row>
 				<row>
@@ -112,10 +112,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<spacer flex="1" />
 						</vbox>
 						<button id="student-konto-button-filterbuchungstypoffen" oncommand="StudentKontoFilterStudenten('konto')" label="filtern"/>
-						
+
 					</hbox>
 				</row>
-				
+
 				<row flex="1">
 					<vbox flex="1">
 						<label id="student-konto-label-filter" value="alle Buchungen:"/>
@@ -125,7 +125,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							context="student-konto-tree-popup"
 							flags="dont-build-content"
 						>
-						<!-- onselect="StudentKontoAuswahl()" - wird jetzt per JS gesetzt -->						
+						<!-- onselect="StudentKontoAuswahl()" - wird jetzt per JS gesetzt -->
 							<treecols>
 								<treecol id="student-konto-tree-buchungsdatum" label="Buchungsdatum" flex="1" hidden="false" primary="true"
 									class="sortDirectionIndicator"
@@ -170,7 +170,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									sort="rdf:http://www.technikum-wien.at/konto/rdf#anmerkung" />
 								<splitter class="tree-splitter"/>
 							</treecols>
-						
+
 							<template>
 								<treechildren flex="1" >
 										<treeitem uri="rdf:*">
@@ -216,7 +216,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<label value="Betrag" control="student-konto-textbox-betrag"/>
 										<hbox>
 					      					<textbox id="student-konto-textbox-betrag" disabled="true" maxlength="9" size="9"/>
-					      					<spacer flex="1" />			
+					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
 									<row>
@@ -224,7 +224,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<hbox>
 											<box class="Datum" id="student-konto-textbox-buchungsdatum" disabled="true"/>
 					      					<!--<textbox id="student-konto-textbox-buchungsdatum" disabled="true" maxlength="10" size="10"/>-->
-					      					<spacer flex="1" />			
+					      					<spacer flex="1" />
 					      				</hbox>
 					      			</row>
 					      			<row>
@@ -235,7 +235,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<label value="Mahnspanne" control="student-konto-textbox-mahnspanne"/>
 										<hbox>
 											<textbox id="student-konto-textbox-mahnspanne" disabled="true" maxlength="4" size="4"/>
-											<spacer flex="1" />			
+											<spacer flex="1" />
 					      				</hbox>
 									</row>
 									<row>
@@ -259,7 +259,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 													  		  uri="rdf:*"/>
 													</menupopup>
 												</rule>
-												
+
 											</template>
 										</menulist>
 									</row>
@@ -298,11 +298,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 													  		  uri="rdf:*"/>
 													</menupopup>
 												</rule>
-												
+
 											</template>
 										</menulist>
 									</row>
-									<?php 
+									<?php
 									// Credit Points werden nur angezeigt, wenn diese im Config aktiviert wurden
 									if(defined('FAS_KONTO_SHOW_CREDIT_POINTS') && FAS_KONTO_SHOW_CREDIT_POINTS=='true')
 										$hidden='';
@@ -312,7 +312,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 												<label value="Credit Points" control="student-konto-textbox-credit_points" '.$hidden.'/>
 												<hbox '.$hidden.'>
 													<textbox id="student-konto-textbox-credit_points" disabled="true" maxlength="9" size="9" '.$hidden.'/>
-													<spacer flex="1" />			
+													<spacer flex="1" />
 												</hbox>
 											</row>';
 									?>
@@ -320,12 +320,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<label value="Zahlungsreferenz" control="student-konto-textbox-zahlungsreferenz"/>
 										<hbox>
 					      					<textbox id="student-konto-textbox-zahlungsreferenz" disabled="true" maxlength="20" size="20"/>
-					      					<spacer flex="1" />			
+					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
 									<row>
 										<label value="Anmerkung" control="student-konto-textbox-anmerkung"/>
-										<textbox id="student-konto-textbox-anmerkung" multiline="true"/>			
+										<textbox id="student-konto-textbox-anmerkung" multiline="true"/>
 									</row>
 								</rows>
 							</grid>

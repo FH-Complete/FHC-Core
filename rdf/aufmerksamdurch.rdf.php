@@ -15,14 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 //header("Content-type: application/vnd.mozilla.xul+xml");
@@ -48,7 +48,7 @@ $rdf_url='http://www.technikum-wien.at/aufmerksamdurch';
   <RDF:Seq about="<?php echo $rdf_url ?>/alle">
 
 <?php
-foreach ($ad->result as $row) 
+foreach ($ad->result as $row)
 {
 ?>
 	  <RDF:li>

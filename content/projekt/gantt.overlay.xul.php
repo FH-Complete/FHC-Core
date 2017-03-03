@@ -20,7 +20,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -30,16 +30,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 /*echo '<?xml-stylesheet href="gantt.css" type="text/css"?>';*/
 ?>
 <!DOCTYPE overlay >
-<overlay id="gant" 
+<overlay id="gant"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         >
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/projekt/gantt.overlay.js.php" />
 
-        	        
+
 	<vbox id="box-ganttx" flex="1">
 		<toolbox>
 			<toolbar id="toolbar-bestellung-main">
-				<toolbarbutton id="toolbarbutton-notiz-filter" label="Ansicht " type="menu">							
+				<toolbarbutton id="toolbarbutton-notiz-filter" label="Ansicht " type="menu">
 					<menupopup>
 						<menuitem id="toolbarbutton-menuitem-gantt-studienjahr" label="Studienjahr" type="radio" name="sort" oncommand="drawGantt()" tooltiptext="Anzeige Studienjahr" checked="true"/>
 						<menuitem id="toolbarbutton-menuitem-gantt-kalenderjahr" label="Kalenderjahr" type="radio" name="sort" oncommand="drawGantt()" tooltiptext="Anzeige Kalenderjahr"/>
@@ -52,10 +52,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
                 <label value="Beginn:" control="toolbarbutton-gantt-label-beginn"/>
                 <box class="Datum" id="toolbarbutton-gantt-beginn"  disabled="false"/>
                 <label value="Ende:" control="toolbarbutton-gantt-label-ende"/>
-                <box class="Datum" id="toolbarbutton-gantt-ende"  disabled="false"/>      
+                <box class="Datum" id="toolbarbutton-gantt-ende"  disabled="false"/>
                 <toolbarbutton id="toolbarbutton-gantt-anzeigen" label="anzeigen" oncommand="showZeitraum(document.getElementById('toolbarbutton-gantt-beginn').value, document.getElementById('toolbarbutton-gantt-ende').value)" disabled="false" tooltiptext="Zeite Zeitraum"/>
             </toolbar>
 		</toolbox>
         <iframe id="iframe-gant-projekt" flex="5" src="" />
-	</vbox> 
+	</vbox>
 </overlay>

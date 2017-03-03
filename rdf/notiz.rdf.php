@@ -20,7 +20,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -36,7 +36,7 @@ $rdf_url='http://www.technikum-wien.at/notiz';
 echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:NOTIZ="'.$rdf_url.'/rdf#" 
+	xmlns:NOTIZ="'.$rdf_url.'/rdf#"
 >
 
    <RDF:Seq about="'.$rdf_url.'/liste">
@@ -78,7 +78,7 @@ else
 }
 
 foreach($notiz->result as $row)
-{	
+{
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->notiz_id.'"  about="'.$rdf_url.'/'.$row->notiz_id.'" >
@@ -97,7 +97,7 @@ foreach($notiz->result as $row)
 			<NOTIZ:insertamum><![CDATA['.$row->insertamum.']]></NOTIZ:insertamum>
 			<NOTIZ:insertvon><![CDATA['.$row->insertvon.']]></NOTIZ:insertvon>
 			<NOTIZ:updateamum><![CDATA['.$datum_obj->formatDatum($row->updateamum,'d.m.Y H:i:s').']]></NOTIZ:updateamum>
-			<NOTIZ:updatevon><![CDATA['.$row->updatevon.']]></NOTIZ:updatevon>	
+			<NOTIZ:updatevon><![CDATA['.$row->updatevon.']]></NOTIZ:updatevon>
          </RDF:Description>
       </RDF:li>
       ';

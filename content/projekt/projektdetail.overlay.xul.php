@@ -20,7 +20,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -126,14 +126,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</row>
 					<row style="background-color:#eeeeee">
 						<label value="Anzahl MA" control="textbox-projekt-anzahl_ma"/>
-							<hbox>	   					
+							<hbox>
 	   					<textbox id="textbox-projekt-anzahl_ma"  size="7" maxlength="7" disabled="true" onchange="makeProjektAnalyse()"/>
 	   					</hbox>
 	   					<spacer />
 	   			</row>
 					<row style="background-color:#eeeeee">
 						<label value="Aufwand PT" control="textbox-projekt-aufwand_pt" />
-							<hbox>	   					
+							<hbox>
 	   					<textbox id="textbox-projekt-aufwand_pt"  size="7" maxlength="7" disabled="true" onchange="makeProjektAnalyse()"/>
 	   					</hbox>
 	   					<spacer />

@@ -22,7 +22,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
@@ -52,7 +52,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			context="student-projektarbeit-tree-popup"
 			flags="dont-build-content"
 		>
-		
+
 			<treecols>
 				<treecol id="student-projektarbeit-tree-projekttyp_kurzbz" label="Typ" flex="2" hidden="false"
 					class="sortDirectionIndicator"
@@ -113,7 +113,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#firma_id" />
 				<splitter class="tree-splitter"/>
 			</treecols>
-		
+
 			<template>
 				<treechildren flex="1" >
 						<treeitem uri="rdf:*">
@@ -142,7 +142,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<button id="student-projektarbeit-button-loeschen" label="Loeschen" oncommand="StudentProjektarbeitLoeschen();" disabled="true"/>
 		</vbox>
 	</hbox>
-	<hbox>						
+	<hbox>
 		<vbox hidden="true">
 			<label value="Neu"/>
 			<checkbox id="student-projektarbeit-checkbox-neu" checked="true" />
@@ -207,7 +207,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="Lehrveranstaltung" control="student-projektarbeit-menulist-lehrveranstaltung"/>
 							<menulist id="student-projektarbeit-menulist-lehrveranstaltung" disabled="true"
 							          datasources="rdf:null" flex="1"
-							          ref="http://www.technikum-wien.at/lehrveranstaltung/liste" 
+							          ref="http://www.technikum-wien.at/lehrveranstaltung/liste"
 							          oncommand="StudentProjektarbeitLVAChange()"
 							          >
 								<template>
@@ -298,7 +298,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<hbox>
 						<textbox id="student-projektarbeit-textbox-faktor" disabled="true" maxlength="3" size="3"/>
 					</hbox>
-				
+
 					<label value="Gesamtstunden" control="student-projektarbeit-textbox-gesamtstunden"/>
 					<hbox>
 						<textbox id="student-projektarbeit-textbox-gesamtstunden" disabled="true" maxlength="8" size="8"/>
@@ -313,7 +313,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						  style="margin-left:10px;margin-right:10px;margin-bottom:5px;margin-top: 10px;" height="100px" enableColumnDrag="true"
 						  context="student-projektbetreuer-tree-popup"
 						  flags="dont-build-content"
-					>		
+					>
 					<!--onselect="StudentProjektbetreuerAuswahl()" - wird jetzt per JS gesetzt-->
 							<treecols>
 								<treecol id="student-projektbetreuer-tree-nachname" label="Nachname" flex="2" hidden="false"
@@ -362,7 +362,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									sort="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#projektarbeit_id" />
 								<splitter class="tree-splitter"/>
 							</treecols>
-						
+
 							<template>
 								<treechildren flex="1" >
 										<treeitem uri="rdf:*">
@@ -406,7 +406,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				    			<menulist id="student-projektbetreuer-menulist-person"
 										  editable="true" disabled="true"
 								          datasources="rdf:null" flex="1"
-								          ref="http://www.technikum-wien.at/person/liste" 
+								          ref="http://www.technikum-wien.at/person/liste"
 								          oninput="StudentProjektbetreuerMenulistPersonLoad(this)"
 								          oncommand="StudentProjektbetreuerLoadMitarbeiterDaten()">
 									<template>
@@ -476,7 +476,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</rows>
 					</grid>
 			</groupbox>
-	</hbox>		
+	</hbox>
 
 <spacer flex="1" />
 </vbox>

@@ -103,42 +103,80 @@ class Messages extends VileSci_Controller
 		redirect('/system/Messages/view/' . $msg->retval . '/' . $originMsg->retval[0]->person_id);
 	}
 	
-	public function write($sender_id, $receiver_id)
+	public function write($sender_id)
 	{
-		$person = $this->PersonModel->load($receiver_id);
-		if ($person->error)
+		$prestudent_id = $this->input->post('prestudent_id');
+		
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$prestudent = $this->MessageModel->getMsgVarsData($prestudent_id);
+		if ($prestudent->error)
 		{
-			show_error($person->retval);
+			show_error($prestudent->retval);
 		}
+		
+		$this->load->model('system/Message_model', 'MessageModel');
+		if (!hasData($variables = $this->MessageModel->getMessageVars()))
+		{
+			unset($variables);
+		}
+		else
+		{
+			$variablesArray = array();
+			// Skip person_id and prestudent_id
+			for($i = 2; $i < count($variables->retval); $i++)
+			{
+				$variablesArray['{'.str_replace(" ", "_", strtolower($variables->retval[$i])).'}'] = $variables->retval[$i];
+			}
+		}
+		
+		array_shift($variables->retval); // Remove person_id
+		array_shift($variables->retval); // Remove prestudent_id
 		
 		$data = array (
 			'sender_id' => $sender_id,
-			'receiver_id' => $receiver_id,
-			'receiver' => $person->retval[0]
+			'receivers' => $prestudent->retval,
+			'variables' => $variablesArray
 		);
 		
 		$v = $this->load->view('system/messageWrite', $data);
 	}
 	
-	public function send($sender_id, $receiver_id)
+	public function send($sender_id)
 	{
+		$error = false;
+		
 		$subject = $this->input->post('subject');
 		$body = $this->input->post('body');
-		
-		$this->load->model('system/Message_model', 'MessageModel');
-		$originMsg = $this->MessageModel->load($msg_id);
-		if ($originMsg->error)
+		$prestudents = $this->input->post('prestudents');
+		$data = $this->MessageModel->getMsgVarsData($prestudents);
+		if (hasData($data))
 		{
-			show_error($originMsg->retval);
+			for ($i = 0; $i < count($data->retval); $i++)
+			{
+				$parsedText = "";
+				$dataArray = (array)$data->retval[$i];
+				foreach($dataArray as $key => $val)
+				{
+					$newKey = str_replace(" ", "_", strtolower($key));
+					$dataArray[$newKey] = $dataArray[$key];
+				}
+				
+				$parsedText = $this->messagelib->parseMessageText($body, $dataArray);
+				
+				$msg = $this->messagelib->sendMessage($sender_id, $dataArray['person_id'], $subject, $parsedText, PRIORITY_NORMAL);
+				if ($msg->error)
+				{
+					show_error($msg->retval);
+					$error = true;
+					break;
+				}
+			}
 		}
 		
-		$msg = $this->messagelib->sendMessage($sender_id, $receiver_id, $subject, $body, PRIORITY_NORMAL);
-		if ($msg->error)
+		if (!$error)
 		{
-			show_error($msg->retval);
+			echo "Messages sent successfully";
 		}
-		
-		redirect('/system/Messages/view/' . $msg->retval . '/' . $receiver_id);
 	}
 	
 	private function getPersonId()
@@ -174,6 +212,34 @@ class Messages extends VileSci_Controller
 			$this->output
 				->set_content_type('application/json')
 				->set_output(json_encode($result));
+		}
+	}
+	
+	public function parseMessageText()
+	{
+		$prestudent_id = $this->input->get('prestudent_id');
+		$text = $this->input->get('text');
+		
+		if (isset($prestudent_id))
+		{
+			$data = $this->MessageModel->getMsgVarsData($prestudent_id);
+			
+			$parsedText = "";
+			if (hasData($data))
+			{
+				$dataArray = (array)$data->retval[0];
+				foreach($dataArray as $key => $val)
+				{
+					$newKey = str_replace(" ", "_", strtolower($key));
+					$dataArray[$newKey] = $dataArray[$key];
+				}
+				
+				$parsedText = $this->messagelib->parseMessageText($text, $dataArray);
+			}
+			
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($parsedText));
 		}
 	}
 }

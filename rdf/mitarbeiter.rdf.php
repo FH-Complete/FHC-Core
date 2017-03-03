@@ -22,7 +22,7 @@
 // header for no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -39,7 +39,7 @@ if (isset($_GET['lektor']))
 {
 	if($_GET['lektor']=='true')
 		$lektor=true;
-	else 
+	else
 		$lektor=false;
 }
 else
@@ -64,15 +64,15 @@ if (isset($_GET['user']))
 	$user=$_GET['user'];
 else
 	$user=false;
-	
+
 if(isset($_GET['filter']))
 	$filter = $_GET['filter'];
-else 
+else
 	$filter=null;
-	
+
 if(isset($_GET['mitarbeiter_uid']))
 	$mitarbeiter_uid=$_GET['mitarbeiter_uid'];
-else 
+else
 	$mitarbeiter_uid=null;
 
 if(isset($_GET['lehrveranstaltung_id']) && is_numeric($_GET['lehrveranstaltung_id']))
@@ -81,7 +81,7 @@ if(isset($_GET['lehrveranstaltung_id']) && is_numeric($_GET['lehrveranstaltung_i
 	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	$mitarbeiter=new mitarbeiter();
 }
-else 	
+else
 {
 	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	$lehrveranstaltung_id=null;
@@ -102,7 +102,7 @@ echo '
 function draw_row($mitarbeiter)
 {
 	global $rdf_url;
-	
+
 	echo '
 	<RDF:Description about="'.$rdf_url.$mitarbeiter->uid.'" >
     	<MITARBEITER:uid><![CDATA['.$mitarbeiter->uid.']]></MITARBEITER:uid>
@@ -121,12 +121,12 @@ function draw_row($mitarbeiter)
 if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 {
 	$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz);
-	
+
 	$stg_obj = new studiengang();
 	$stg_obj->getAll('typ, kurzbz', false);
 	foreach ($stg_obj->result as $stg)
 		$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;
-	
+
 	$alle='';
 	foreach ($ma as $mitarbeiter)
 	{
@@ -145,7 +145,7 @@ if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 				<MITARBEITER:studiengang_kz></MITARBEITER:studiengang_kz>
 			</RDF:Description>
 	';
-	
+
 	$seq= "
 	<RDF:Seq about=\"".$rdf_url."liste\" >
 		<RDF:li>
@@ -153,7 +153,7 @@ if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 			</RDF:Seq>
 		</RDF:li>
 		";
-	
+
 	if ($user)
 	{
 		$bb=new benutzerberechtigung();
@@ -183,9 +183,9 @@ if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 								"\n\t\t\t<MITARBEITER:kurzbz>".$stg_arr[$mitarbeiter->studiengang_kz]."</MITARBEITER:kurzbz>".
 								"\n\t\t\t<MITARBEITER:studiengang_kz>$mitarbeiter->studiengang_kz</MITARBEITER:studiengang_kz>".
 								"\n\t\t</RDF:Description>\n";
-	
+
 						$seq.="\n\t<RDF:li>\n\t\t<RDF:Seq about=\"".$rdf_url.$mitarbeiter->studiengang_kz."\" >";
-	
+
 						$laststg = $mitarbeiter->studiengang_kz;
 					}
 					$seq.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$mitarbeiter->uid."\" />";
@@ -197,7 +197,7 @@ if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 	echo $desc;
 	echo $seq;
 }
-else 
+else
 {
 	$filter = $filter;
 	echo "<RDF:Seq about=\"".$rdf_url."liste\" >";
@@ -218,11 +218,11 @@ else
 	  	</RDF:li>
 	  	';
 	}
-	
+
 	if($mitarbeiter_uid!=null)
 	{
 		$mitarbeiter->load($mitarbeiter_uid);
-		echo " 
+		echo "
 		<RDF:li>
 			<RDF:Seq about=\"".$rdf_url."_alle\" >
       			<RDF:li>";
@@ -232,17 +232,17 @@ else
 			</RDF:Seq>
 		</RDF:li>";
 	}
-	else 
+	else
 	{
 		if($filter==null)
 		{
 			$mitarbeiter->getMitarbeiterFromLehrveranstaltung($lehrveranstaltung_id);
 		}
-		else 
+		else
 		{
 			$mitarbeiter->getMitarbeiterFilter($filter);
 		}
-		
+
 		foreach ($mitarbeiter->result as $row)
 		{
 			echo '<RDF:li>';

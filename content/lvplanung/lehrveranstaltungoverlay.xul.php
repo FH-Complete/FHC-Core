@@ -22,7 +22,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -64,7 +64,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 			<toolbarbutton id="lehrveranstaltung-toolbar-refresh" label="Aktualisieren" oncommand="LvTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 			<toolbarbutton id="lehrveranstaltung-toolbar-lehrauftrag" label="Lehrauftrag" oncommand="LvCreateLehrauftrag()" disabled="false" image="../skin/images/person.gif" tooltiptext="Lehrauftrag ausdrucken" hidden="true"/>
 
-			<toolbarbutton label="Ausbildungssemester " id="lehrveranstaltung-toolbar-filter-ausbildungssemester" type="menu" hidden="true">	
+			<toolbarbutton label="Ausbildungssemester " id="lehrveranstaltung-toolbar-filter-ausbildungssemester" type="menu" hidden="true">
 				<menupopup id="lehrveranstaltung-toolbar-popup-filter-ausbildungssemester" >
 					<menuitem id="lehrveranstaltung-toolbar-filter-ausbildungssemester-alle" type="radio" checked="true" label="Alle Semester" oncommand="FilterLehrveranstaltungAusbsem('')" disabled="false" tooltiptext="Alle Semester anzeigen"/>
 					<menuitem id="lehrveranstaltung-toolbar-filter-ausbildungssemester-1" type="radio" label="1. Semester" oncommand="FilterLehrveranstaltungAusbsem('1')" disabled="false"/>
@@ -255,9 +255,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 					<tab id="lehrveranstaltung-tab-notizen" label="Notizen" />
 					<tab id="lehrveranstaltung-tab-lvangebot" label="LV-Angebot" />
 					<tab id="lehrveranstaltung-tab-termine" label="Termine" onclick="LehrveranstaltungTermineIFrameLoad()"/>
-					<?php 
+					<?php
                     if($rechte->isBerechtigt('student/anwesenheit'))
-						echo '<tab id="lehrveranstaltung-tab-anwesenheit" label="Anwesenheit" onclick="LehrveranstaltungAnwesenheitIFrameLoad();"/>';						
+						echo '<tab id="lehrveranstaltung-tab-anwesenheit" label="Anwesenheit" onclick="LehrveranstaltungAnwesenheitIFrameLoad();"/>';
 					?>
 
 				</tabs>
@@ -270,7 +270,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 					</vbox>
 					<vbox id="lehrveranstaltung-lvangebot" />
 					<iframe id="lehrveranstaltung-termine" src="" style="margin-top:10px;" />
-					<?php 
+					<?php
                        if($rechte->isBerechtigt('student/anwesenheit'))
 							echo '<iframe id="lehrveranstaltung-anwesenheit" src="" style="margin-top:10px;" />';
                      ?>

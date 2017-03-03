@@ -20,7 +20,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -30,55 +30,55 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>';
-	
+
 if(isset($_GET['projekt_kurzbz']))
 	$projekt_kurzbz=$_GET['projekt_kurzbz'];
-else 
+else
 	$projekt_kurzbz='';
 
 if(isset($_GET['projektphase_id']) && is_numeric($_GET['projektphase_id']))
 	$projektphase_id=$_GET['projektphase_id'];
-else 
+else
 	$projektphase_id='';
 
 if(isset($_GET['projekttask_id']) && is_numeric($_GET['projekttask_id']))
 	$projekttask_id=$_GET['projekttask_id'];
-else 
+else
 	$projekttask_id='';
 
 if(isset($_GET['uid']))
 	$uid=$_GET['uid'];
-else 
-	$uid='';	
+else
+	$uid='';
 
 if(isset($_GET['person_id']) && is_numeric($_GET['person_id']))
 	$person_id=$_GET['person_id'];
-else 
+else
 	$person_id='';
 
 if(isset($_GET['prestudent_id']) && is_numeric($_GET['prestudent_id']))
 	$prestudent_id=$_GET['prestudent_id'];
-else 
+else
 	$prestudent_id='';
 
 if(isset($_GET['bestellung_id']) && is_numeric($_GET['bestellung_id']))
 	$bestellung_id=$_GET['bestellung_id'];
-else 
+else
 	$bestellung_id='';
 
 if(isset($_GET['user']) && is_numeric($_GET['user']))
 	$user=$_GET['user'];
-else 
+else
 	$user='';
 
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id']))
 	$lehreinheit_id=$_GET['lehreinheit_id'];
-else 
+else
 	$lehreinheit_id='';
 
 if(isset($_GET['anrechnung_id']) && is_numeric($_GET['anrechnung_id']))
 	$anrechnung_id=$_GET['anrechnung_id'];
-else 
+else
 	$anrechnung_id='';
 
 ?>

@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -32,30 +32,30 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/dokument.class.php');
 require_once('../include/datum.class.php');
-require_once('../include/akte.class.php'); 
+require_once('../include/akte.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/mitarbeiter.class.php');
 
 $rdf_url='http://www.technikum-wien.at/dokumentprestudent';
-	
+
 $date = new datum();
 
 if(isset($_GET['prestudent_id']))
 	if(is_numeric($_GET['prestudent_id']))
 		$prestudent_id=$_GET['prestudent_id'];
-	else 
+	else
 		die('Prestudent_id ist ungueltig');
-else 
+else
 	die('Fehlerhafte Parameteruebergabe');
-	
+
 $dok = new dokument();
 if(!$dok->getPrestudentDokumente($prestudent_id))
 	die($dok->errormsg);
 
-$prestudent = new prestudent(); 
+$prestudent = new prestudent();
 if(!$prestudent->load($prestudent_id))
-	die($prestudent->errormsg); 
-	
+	die($prestudent->errormsg);
+
 echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -67,20 +67,20 @@ echo '
 
 foreach ($dok->result as $row)
 {
-	
-	$akte = new akte(); 
-	$akte->getAkten($prestudent->person_id, $row->dokument_kurzbz); 
+
+	$akte = new akte();
+	$akte->getAkten($prestudent->person_id, $row->dokument_kurzbz);
 	$datum=(isset($row->datum))?$date->formatDatum($row->datum, 'd.m.Y'):'';
 	$mitarbeiter = new mitarbeiter($row->mitarbeiter_uid);
-	
+
 	if(count($akte->result) != 0)
 	{
 		foreach($akte->result as $a)
 		{
-			$datumhochgeladen=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):'';  
-			$nachgereicht = (isset($a->nachgereicht) && $a->nachgereicht)?'ja':''; 
-			$info = (isset($a->anmerkung))?$a->anmerkung:''; 
-			$vorhanden = (isset($a->dms_id) || $a->inhalt_vorhanden)?'ja':'nein'; 
+			$datumhochgeladen=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):'';
+			$nachgereicht = (isset($a->nachgereicht) && $a->nachgereicht)?'ja':'';
+			$info = (isset($a->anmerkung))?$a->anmerkung:'';
+			$vorhanden = (isset($a->dms_id) || $a->inhalt_vorhanden)?'ja':'nein';
 
 				echo 	'
 				  <RDF:li>

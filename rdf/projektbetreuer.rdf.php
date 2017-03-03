@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -33,7 +33,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/projektbetreuer.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/person.class.php');
-	
+
 $rdf_url='http://www.technikum-wien.at/projektbetreuer';
 
 echo '
@@ -51,7 +51,7 @@ $projektbetreuer = new projektbetreuer();
 if(isset($_GET['projektarbeit_id']) && !isset($_GET['person_id']))
 {
 	$projektbetreuer->getProjektbetreuer($_GET['projektarbeit_id']);
-	
+
 	foreach ($projektbetreuer->result as $row)
 		draw_content($row);
 }
@@ -59,12 +59,12 @@ elseif(isset($_GET['person_id']) && is_numeric($_GET['person_id']) && isset($_GE
 {
 	if($projektbetreuer->load($_GET['person_id'], $_GET['projektarbeit_id'], $_GET['betreuerart_kurzbz']))
 		draw_content($projektbetreuer);
-	else 
+	else
 		die('Eintrag wurde nicht gefunden');
 }
-else 
+else
 	die('Projektarbeit_id muss uebergeben werden');
-	
+
 function draw_content($row)
 {
 	global $rdf_url, $datum_obj;

@@ -27,7 +27,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -36,34 +36,34 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/dokument.class.php');
-require_once('../include/akte.class.php'); 
-require_once('../include/prestudent.class.php'); 
-require_once('../include/datum.class.php'); 
+require_once('../include/akte.class.php');
+require_once('../include/prestudent.class.php');
+require_once('../include/datum.class.php');
 
 $rdf_url='http://www.technikum-wien.at/dokument';
 
 if(isset($_GET['studiengang_kz']) && is_numeric($_GET['studiengang_kz']))
 	$studiengang_kz=$_GET['studiengang_kz'];
-else 
+else
 	die('Fehlerhafte Parameteruebergabe');
-	
+
 if(isset($_GET['prestudent_id']))
 	if(is_numeric($_GET['prestudent_id']))
 		$prestudent_id=$_GET['prestudent_id'];
-	else 
+	else
 		die('Prestudent_id ist ungueltig');
-else 
+else
 	$prestudent_id = null;
-	
+
 $dok = new dokument();
 if(!$dok->getFehlendeDokumente($studiengang_kz, $prestudent_id))
 	die($dok->errormsg);
 
-$prestudent = new prestudent(); 
+$prestudent = new prestudent();
 if(!$prestudent->load($prestudent_id))
-	die($prestudent->errormsg); 
+	die($prestudent->errormsg);
 
-$date = new datum(); 
+$date = new datum();
 ?>
 
 <RDF:RDF
@@ -78,23 +78,23 @@ $date = new datum();
 // Alle dokumenttypen die der Student abzugeben hat vom Studiengang
 foreach ($dok->result as $row)
 {
-	$akte = new akte(); 
-	$akte->getAkten($prestudent->person_id, $row->dokument_kurzbz); 
+	$akte = new akte();
+	$akte->getAkten($prestudent->person_id, $row->dokument_kurzbz);
 	// Schleife für alle Akten -> wenn akte draufhängt id in rdf -> akte_id anhängen
-	
-	$onlinebewerbung = ($row->onlinebewerbung)?'ja':'nein'; 
+
+	$onlinebewerbung = ($row->onlinebewerbung)?'ja':'nein';
 	$pflicht = ($row->pflicht)?'ja':'nein';
 	// Wenn Akten vorhanden anzeigen
 	if(count($akte->result) != 0)
 	{
-	
+
 		foreach($akte->result as $a)
 		{
 			$datum='';
-			$datumhochgeladen=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):''; 
-			$nachgereicht = (isset($a->nachgereicht) && $a->nachgereicht)?'ja':''; 
-			$info = (isset($a->anmerkung))?$akte->result[0]->anmerkung:''; 
-			$vorhanden = (isset($a->dms_id) || $a->inhalt_vorhanden)?'ja':((isset($a->nachgereicht) && $a->nachgereicht)?'nachgereicht':'nein'); 
+			$datumhochgeladen=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):'';
+			$nachgereicht = (isset($a->nachgereicht) && $a->nachgereicht)?'ja':'';
+			$info = (isset($a->anmerkung))?$akte->result[0]->anmerkung:'';
+			$vorhanden = (isset($a->dms_id) || $a->inhalt_vorhanden)?'ja':((isset($a->nachgereicht) && $a->nachgereicht)?'nachgereicht':'nein');
 
 			echo 	'
 			  <RDF:li>
@@ -140,21 +140,21 @@ foreach ($dok->result as $row)
 }
 
 // Alle Akten/Dokumente holen die Upgeloaded wurden ohne die vom Studiengang und Zeugnisse
-$akte = new akte(); 
+$akte = new akte();
 if(!$akte->getAkten($prestudent->person_id, null, $prestudent->studiengang_kz, $prestudent->prestudent_id))
-	die('fehler'); 
+	die('fehler');
 
 foreach($akte->result as $a)
 {
 
 	$datum='';
-	$datumhochgeladen=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):'';  
-	$nachgereicht = (isset($a->nachgereicht) && $a->nachgereicht)?'ja':''; 
-	$info = (isset($a->anmerkung))?$akte->result[0]->anmerkung:''; 
-	$vorhanden = (isset($a->dms_id) || $a->inhalt_vorhanden)?'ja':'nein'; 
-	$dokument_kurzbz = $a->dokument_kurzbz; 
-	$dokument = new dokument(); 
-	$dokument->loadDokumenttyp($dokument_kurzbz); 
+	$datumhochgeladen=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):'';
+	$nachgereicht = (isset($a->nachgereicht) && $a->nachgereicht)?'ja':'';
+	$info = (isset($a->anmerkung))?$akte->result[0]->anmerkung:'';
+	$vorhanden = (isset($a->dms_id) || $a->inhalt_vorhanden)?'ja':'nein';
+	$dokument_kurzbz = $a->dokument_kurzbz;
+	$dokument = new dokument();
+	$dokument->loadDokumenttyp($dokument_kurzbz);
 
 	echo 	'
 	  <RDF:li>

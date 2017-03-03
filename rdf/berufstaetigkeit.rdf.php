@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -45,7 +45,7 @@ $rdf_url='http://www.technikum-wien.at/berufstaetigkeit';
 <?php
 if(isset($_GET['optional']) && $_GET['optional']=='true')
 {
-echo '	
+echo '
 	  <RDF:li>
       	<RDF:Description  id=""  about="'.$rdf_url.'/'.'" >
         	<BT:code></BT:code>

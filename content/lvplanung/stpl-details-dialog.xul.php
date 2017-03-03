@@ -22,7 +22,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -40,9 +40,9 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 
 if(isset($_GET['id']) && is_numeric($_GET['id']))
 	$id=$_GET['id'];
-else 
+else
 	$id='';
-	
+
 $datum_obj = new datum();
 $db = new basis_db();
 
@@ -92,7 +92,7 @@ $studiengang->load($stundenplan->studiengang_kz);
 				<row>
 					<spacer />
 					<spacer />
-				</row>	
+				</row>
 				<row>
 					<label value="Studiengang"/>
 					<label value="<?php echo $studiengang->kuerzel; ?>" id="stpl-details-dialog-label-studiengang"/>
@@ -117,19 +117,19 @@ $studiengang->load($stundenplan->studiengang_kz);
       			</row>
       			<row>
       				<label value="Spezialgruppe" control="stpl-details-dialog-menulist-gruppe_kurzbz"/>
-					<menulist id="stpl-details-dialog-menulist-gruppe_kurzbz" 
+					<menulist id="stpl-details-dialog-menulist-gruppe_kurzbz"
 					          flex="1">
 							<menupopup>
 							<?php
 								echo "<menuitem value='' label='-- keine Auswahl --'/>\n";
-								$qry = "SELECT gruppe_kurzbz 
-										FROM public.tbl_gruppe 
+								$qry = "SELECT gruppe_kurzbz
+										FROM public.tbl_gruppe
 										WHERE studiengang_kz='$stundenplan->studiengang_kz' AND semester='$stundenplan->semester'
 										UNION
 										SELECT gruppe_kurzbz
 										FROM lehre.tbl_lehreinheitgruppe
 										WHERE lehreinheit_id='$stundenplan->lehreinheit_id'";
-								
+
 								if($db->db_query($qry))
 								{
 									while($row = $db->db_fetch_object())
@@ -138,9 +138,9 @@ $studiengang->load($stundenplan->studiengang_kz);
 										{
 											if($row->gruppe_kurzbz==$stundenplan->gruppe_kurzbz)
 												$selected="selected='true'";
-											else 
+											else
 												$selected='';
-												
+
 											echo "<menuitem value='$row->gruppe_kurzbz' label='$row->gruppe_kurzbz' $selected/>\n";
 										}
 									}
@@ -153,19 +153,19 @@ $studiengang->load($stundenplan->studiengang_kz);
 					<label value="UNr" />
 					<textbox id="stpl-details-dialog-textbox-unr" value="<?php echo $stundenplan->unr; ?>"/>
       			</row>
-      			
+
       			<row>
 					<label value="Fix" />
 					<checkbox id="stpl-details-dialog-checkbox-fix" checked="<?php echo ($stundenplan->fix?'true':'false'); ?>"/>
       			</row>
       			<row>
       				<label value="Ort" control="stpl-details-dialog-menulist-ort_kurzbz"/>
-					<menulist id="stpl-details-dialog-menulist-ort_kurzbz" 
+					<menulist id="stpl-details-dialog-menulist-ort_kurzbz"
 					          flex="1">
 							<menupopup>
 							<?php
 								$qry = "SELECT ort_kurzbz FROM public.tbl_ort WHERE aktiv=true ORDER BY ort_kurzbz";
-								
+
 								if($db->db_query($qry))
 								{
 									while($row = $db->db_fetch_object())
@@ -174,9 +174,9 @@ $studiengang->load($stundenplan->studiengang_kz);
 										{
 											if($row->ort_kurzbz==$stundenplan->ort_kurzbz)
 												$selected="selected='true'";
-											else 
+											else
 												$selected='';
-												
+
 											echo "<menuitem value='$row->ort_kurzbz' label='$row->ort_kurzbz' $selected/>\n";
 										}
 									}
@@ -187,12 +187,12 @@ $studiengang->load($stundenplan->studiengang_kz);
       			</row>
       				<row>
       				<label value="Stunde" control="stpl-details-dialog-menulist-stunde"/>
-					<menulist id="stpl-details-dialog-menulist-stunde" 
+					<menulist id="stpl-details-dialog-menulist-stunde"
 					          flex="1">
 							<menupopup>
 							<?php
 								$qry = "SELECT stunde FROM lehre.tbl_stunde ORDER BY stunde";
-								
+
 								if($db->db_query($qry))
 								{
 									while($row = $db->db_fetch_object())
@@ -201,9 +201,9 @@ $studiengang->load($stundenplan->studiengang_kz);
 										{
 											if($row->stunde==$stundenplan->stunde)
 												$selected="selected='true'";
-											else 
+											else
 												$selected='';
-												
+
 											echo "<menuitem value='$row->stunde' label='$row->stunde' $selected/>\n";
 										}
 									}
@@ -239,5 +239,5 @@ $studiengang->load($stundenplan->studiengang_kz);
 		<button id="stpl-details-dialog-button-speichern" command="stpl-details-dialog-command-save" label="speichern" accesskey="s"/>
 	</hbox>
 </groupbox>
-</vbox>		
+</vbox>
 </window>

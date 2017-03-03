@@ -66,4 +66,31 @@ class Message_model extends DB_Model
 		
 		return $this->execQuery($sql, $parametersArray);
 	}
+	
+	/**
+	 * 
+	 */
+	public function getMessageVars()
+	{
+		$result = $this->db->query('SELECT * FROM public.vw_msg_vars WHERE 0 = 1');
+		
+		if ($result)
+		{
+			return success($result->list_fields());
+		}
+		else
+		{
+			return error($this->db->error(), FHC_DB_ERROR);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public function getMsgVarsData($prestudent_id)
+	{
+		$query = 'SELECT * FROM public.vw_msg_vars WHERE prestudent_id %s ?';
+		
+		return $this->execQuery(sprintf($query, is_array($prestudent_id) ? 'IN' : '='), array($prestudent_id));
+	}
 }

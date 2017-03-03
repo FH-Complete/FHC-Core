@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -35,22 +35,22 @@ require_once('../include/datum.class.php');
 
 if(isset($_GET['betriebsmittel_id']))
 	$betriebsmittel_id = $_GET['betriebsmittel_id'];
-else 
+else
 	$betriebsmittel_id = '';
 
 if(isset($_GET['filter']))
 	$filter = $_GET['filter'];
-else 
+else
 	$filter = '';
 
 if(isset($_GET['datum']))
 	$datum = $_GET['datum'];
-else 
+else
 	$datum = '';
 
 if(isset($_GET['stunde']))
 	$stunde = $_GET['stunde'];
-else 
+else
 	$stunde = '';
 
 $betriebsmittel = new betriebsmittel();
@@ -88,11 +88,11 @@ if($betriebsmittel_id!='')
 elseif($filter!='')
 {
 	$betriebsmittel->searchBetriebsmittel($filter);
-	
+
 	foreach ($betriebsmittel->result as $row)
 		draw_rdf($row);
-	
-		
+
+
 }
 elseif($datum!='')
 {
@@ -109,7 +109,7 @@ elseif($datum!='')
 function draw_rdf($row)
 {
 	global $rdf_url;
-	
+
 	echo '
       <RDF:li>
          <RDF:Description  id="'.$row->betriebsmittel_id.'"  about="'.$rdf_url.'/'.$row->betriebsmittel_id.'" >

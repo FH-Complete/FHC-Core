@@ -22,13 +22,13 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
 
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';	
+echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 ?>
 
 <window id="window-ressource-neu" title="Neue Ressource anlegen"
@@ -57,7 +57,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 				    <menulist id="ressource-menulist-mitarbeiter"
 										  editable="true"
 								          datasources="rdf:null" flex="1"
-								          ref="http://www.technikum-wien.at/mitarbeiter/liste" 
+								          ref="http://www.technikum-wien.at/mitarbeiter/liste"
 								          oninput="RessourceMenulistMitarbeiterLoad(this);"
 								          oncommand=""
 								         >
@@ -75,7 +75,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 				    <menulist id="ressource-menulist-student"
 										  editable="true"
 								          datasources="rdf:null" flex="1"
-								          ref="http://www.technikum-wien.at/student/alle" 
+								          ref="http://www.technikum-wien.at/student/alle"
 								          oninput="RessourceMenulistStudentLoad(this);"
 								          oncommand=""
 								         >
@@ -93,7 +93,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 				    <menulist id="ressource-menulist-betriebsmittel"
 										  editable="true"
 								          datasources="rdf:null" flex="1"
-								          ref="http://www.technikum-wien.at/betriebsmittel/liste" 
+								          ref="http://www.technikum-wien.at/betriebsmittel/liste"
 								          oninput="RessourceMenulistBetriebsmittelLoad(this)"
 								          oncommand=""
 								         >
@@ -111,7 +111,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 				    <menulist id="ressource-menulist-firma"
 										  editable="true"
 								          datasources="rdf:null" flex="1"
-								          ref="http://www.technikum-wien.at/firma/liste" 
+								          ref="http://www.technikum-wien.at/firma/liste"
 								          oninput="RessourceMenulistFirmaLoad(this)"
 								          oncommand=""
 								         >

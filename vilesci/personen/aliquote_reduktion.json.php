@@ -354,7 +354,21 @@ function getAllStudentenFromStudienplanAndStudsem($studienplan_id, $studiensemes
 		$qry = "SELECT DISTINCT prestudent_id, vorname, nachname, gebdatum, rt_gesamtpunkte, tbl_prestudent.studiengang_kz, bis.tbl_zgvgruppe.bezeichnung, get_rolle_prestudent(prestudent_id, null) as laststatus,
 				(SELECT studienplan_id FROM tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)." ORDER BY datum desc LIMIT 1) as studienplan_id,
 				(SELECT anmerkung FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)."
-					AND status_kurzbz='Bewerber') as anmerkung, rt_punkte1, rt_punkte2,
+					AND status_kurzbz='Bewerber') as anmerkung,
+				(SELECT punkte FROM public.tbl_rt_person JOIN public.tbl_reihungstest ON(rt_id=reihungstest_id)
+				 WHERE
+				 	person_id=tbl_person.person_id
+				 	AND stufe=1
+					AND tbl_reihungstest.studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)."
+					AND studienplan_id = (SELECT studienplan_id FROM tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)." ORDER BY datum desc LIMIT 1)
+				ORDER BY tbl_reihungstest.datum desc LIMIT 1) as rt_punkte1,
+				(SELECT punkte FROM public.tbl_rt_person JOIN public.tbl_reihungstest ON(rt_id=reihungstest_id)
+				 WHERE
+				 	person_id=tbl_person.person_id
+				 	AND stufe=2
+					AND tbl_reihungstest.studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)."
+					AND studienplan_id = (SELECT studienplan_id FROM tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)." ORDER BY datum desc LIMIT 1)
+				ORDER BY tbl_reihungstest.datum desc LIMIT 1) as rt_punkte2,
 				(SELECT kontakt FROM public.tbl_kontakt where kontakttyp='email' AND zustellung AND person_id=tbl_person.person_id limit 1) as email_privat
 		FROM
 			public.tbl_prestudent
@@ -384,7 +398,21 @@ function getAllStudentenFromStudienplanAndStudsem($studienplan_id, $studiensemes
 		$qry = "SELECT DISTINCT prestudent_id, vorname, nachname, gebdatum, rt_gesamtpunkte, tbl_prestudent.studiengang_kz, bis.tbl_zgvgruppe.bezeichnung, get_rolle_prestudent(prestudent_id, null) as laststatus,
 				(SELECT studienplan_id FROM tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)." ORDER BY datum desc LIMIT 1) as studienplan_id,
 			(SELECT anmerkung FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)."
-					AND status_kurzbz='Bewerber') as anmerkung, rt_punkte1, rt_punkte2,
+					AND status_kurzbz='Bewerber') as anmerkung,
+			(SELECT punkte FROM public.tbl_rt_person JOIN public.tbl_reihungstest ON(rt_id=reihungstest_id)
+			 WHERE
+			 	person_id=tbl_person.person_id
+			 	AND stufe=1
+				AND tbl_reihungstest.studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)."
+				AND studienplan_id = (SELECT studienplan_id FROM tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)." ORDER BY datum desc LIMIT 1)
+			ORDER BY tbl_reihungstest.datum desc LIMIT 1) as rt_punkte1,
+			(SELECT punkte FROM public.tbl_rt_person JOIN public.tbl_reihungstest ON(rt_id=reihungstest_id)
+			 WHERE
+			 	person_id=tbl_person.person_id
+			 	AND stufe=2
+				AND tbl_reihungstest.studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)."
+				AND studienplan_id = (SELECT studienplan_id FROM tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND studiensemester_kurzbz=". $db->db_add_param($studiensemester_kurzbz)." ORDER BY datum desc LIMIT 1)
+				ORDER BY tbl_reihungstest.datum desc LIMIT 1) as rt_punkte2,
 			(SELECT kontakt FROM public.tbl_kontakt where kontakttyp='email' AND zustellung AND person_id=tbl_person.person_id limit 1) as email_privat
 		FROM
 			public.tbl_prestudent

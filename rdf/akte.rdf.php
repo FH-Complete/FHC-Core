@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -36,14 +36,14 @@ require_once('../include/datum.class.php');
 
 if(isset($_GET['person_id']))
 	$person_id = $_GET['person_id'];
-else 
+else
 	$person_id = '';
 
 if(isset($_GET['dokument_kurzbz']))
 	$dokument_kurzbz = $_GET['dokument_kurzbz'];
-else 
+else
 	$dokument_kurzbz = '';
-	
+
 if(isset($_GET['akte_id']))
 {
 	$akte_id=$_GET['akte_id'];
@@ -95,7 +95,7 @@ foreach ($akten->result as $row)
 			<AKTE:updatevon><![CDATA['.$row->updatevon.']]></AKTE:updatevon>
 			<AKTE:insertamum><![CDATA['.$row->insertamum.']]></AKTE:insertamum>
 			<AKTE:insertvon><![CDATA['.$row->insertvon.']]></AKTE:insertvon>
-			<AKTE:uid><![CDATA['.$row->uid.']]></AKTE:uid>			
+			<AKTE:uid><![CDATA['.$row->uid.']]></AKTE:uid>
 			<AKTE:anmerkung_intern><![CDATA['.$row->anmerkung_intern.']]></AKTE:anmerkung_intern>
 			<AKTE:titel_intern><![CDATA['.$row->titel_intern.']]></AKTE:titel_intern>
 			<AKTE:anmerkung><![CDATA['.$row->anmerkung.']]></AKTE:anmerkung>

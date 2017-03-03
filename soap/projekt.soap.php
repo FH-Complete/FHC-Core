@@ -21,10 +21,10 @@
  */
  header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 
-require_once('../config/vilesci.config.inc.php'); 
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/projekt.class.php');
 require_once('../include/datum.class.php');
@@ -41,23 +41,23 @@ $SOAPServer->handle();
 ini_set("soap.wsdl_cache_enabled", "0");
 
 /**
- * 
+ *
  * Speichert das vom Webservice übergebene Projekt in die DB
  * @param $username
  * @param $passwort
  * @param $projekt
  */
 function saveProjekt($username, $passwort, $projekt)
-{ 	
+{
 	if(!$user = check_user($username, $passwort))
-		return new SoapFault("Server", "Invalid Credentials");	
-	
+		return new SoapFault("Server", "Invalid Credentials");
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-		
+
 	if(!$rechte->isBerechtigt('planner', null, 'sui'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Projekten.");
-	
+
 	$projektNew = new projekt();
 	$projektNew->projekt_kurzbz=$projekt->projekt_kurzbz;
 	$projektNew->nummer = $projekt->nummer;
@@ -71,12 +71,12 @@ function saveProjekt($username, $passwort, $projekt)
 	$projektNew->aufwandstyp_kurzbz = $projekt->aufwandstyp_kurzbz;
 	$projektNew->anzahl_ma = $projekt->anzahl_ma;
 	$projektNew->aufwand_pt = $projekt->aufwand_pt;
-	
+
 	if($projekt->neu=='true')
-		$projektNew->new = true; 
+		$projektNew->new = true;
 	else
 		$projektNew->new = false;
-	
+
 	if($projektNew->save())
 		return $projektNew->projekt_kurzbz;
 	else
@@ -84,7 +84,7 @@ function saveProjekt($username, $passwort, $projekt)
 }
 
 /**
- * 
+ *
  * Speichert die Zuordnung eines Dokuments zu einem Projekt oder einer Phase
  * @param $username
  * @param $passwort
@@ -95,16 +95,16 @@ function saveProjekt($username, $passwort, $projekt)
 function saveProjektdokumentZuordnung($username, $passwort, $projekt_kurzbz, $projektphase_id, $dms_id)
 {
 	if(!$user = check_user($username, $passwort))
-		return new SoapFault("Server", "Invalid Credentials");	
-	
+		return new SoapFault("Server", "Invalid Credentials");
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-		
+
 	if(!$rechte->isBerechtigt('planner', null, 'sui'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Zuordnen von Dokumenten.");
-	
+
 	$dms = new dms();
-	
+
 	if($dms->saveProjektzuordnung($dms_id, $projekt_kurzbz, $projektphase_id))
 		return true;
 	else

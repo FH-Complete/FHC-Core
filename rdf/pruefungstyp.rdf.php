@@ -23,7 +23,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -32,12 +32,12 @@ require_once('../include/functions.inc.php');
 require_once('../include/basis_db.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-	
+
 if(isset($_GET['abschluss']))
 {
 	if($_GET['abschluss']!='true' && $_GET['abschluss']!='false')
 		die('Parameter abschluss darf nur true oder false sein');
-	else 
+	else
 		$abschlusspruefung = $_GET['abschluss'];
 }
 
@@ -50,7 +50,7 @@ echo '
 >
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
-   
+
 //Daten holen
 $qry = 'SELECT * FROM lehre.tbl_pruefungstyp ';
 if(isset($abschlusspruefung))

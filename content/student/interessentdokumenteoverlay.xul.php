@@ -22,7 +22,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
@@ -42,14 +42,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<menupopup id="interessent-dokumente-tree-nichtabgegeben-popup" onpopupshowing="InteressentDokumenteTreeNichtAbgegebenPopupShowing()">
 		<menuitem label="Upload" oncommand="InteressentDokumenteNichtabgegebenUpload();" id="interessent-dokumente-tree-nichtabgegeben-popup-upload" hidden="false"/>
 		<menuitem label="Bearbeiten" oncommand="InteressentDokumenteNichtabgegebenBearbeiten();" id="interessent-dokumente-tree-nichtabgegeben-popup-edit" hidden="false"/>
-		<menuitem label="Dokument löschen" oncommand="InteressentDokumenteNichtabgegebenEntfernen();" id="interessent-dokumente-tree-nichtabgegeben-popup-remove" hidden="false"/>		
+		<menuitem label="Dokument löschen" oncommand="InteressentDokumenteNichtabgegebenEntfernen();" id="interessent-dokumente-tree-nichtabgegeben-popup-remove" hidden="false"/>
 	</menupopup>
 </popupset>
 <popupset>
 	<menupopup id="interessent-dokumente-tree-abgegeben-popup"  onpopupshowing="InteressentDokumenteTreeAbgegebenPopupShowing()">
 		<menuitem label="Upload" oncommand="InteressentDokumenteAbgegebenUpload();" id="interessent-dokumente-tree-abgegeben-popup-upload" hidden="false"/>
 		<menuitem label="Bearbeiten" oncommand="InteressentDokumenteAbgegebenBearbeiten();" id="interessent-dokumente-tree-abgegeben-popup-edit" hidden="false"/>
-		<menuitem label="Dokument löschen" oncommand="InteressentDokumenteAbgegebenEntfernen();" id="interessent-dokumente-tree-abgegeben-popup-remove" hidden="false"/>		
+		<menuitem label="Dokument löschen" oncommand="InteressentDokumenteAbgegebenEntfernen();" id="interessent-dokumente-tree-abgegeben-popup-remove" hidden="false"/>
 	</menupopup>
 </popupset>
 <hbox flex="1">
@@ -113,7 +113,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					sort="rdf:http://www.technikum-wien.at/dokument/rdf#pflicht" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
 			</treecols>
-		
+
 			<template>
 				<rule>
 					<treechildren>
@@ -138,7 +138,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			</template>
 		</tree>
 	</groupbox>
-	
+
 	<vbox>
 		<spacer flex="1" />
 		<button id="interessent-dokumente-filter" oncommand="InteressentDokumenteFilter()" label="Filter" tooltiptext="Liste aller Studenten mit fehlenden Dokumenten" />
@@ -150,7 +150,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<button id="interessent-dokumente-remove" oncommand="InteressentDokumenteRemove()" label="&lt;="  style="font-weight: bold;"/>
 		<spaver flex="4" />
 	</vbox>
-	
+
 	<groupbox flex="3">
 		<caption label="Akzeptiert"/>
 		<tree id="interessent-dokumente-tree-abgegeben" seltype="multi" hidecolumnpicker="false" flex="1"
@@ -211,7 +211,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					sort="rdf:http://www.technikum-wien.at/dokument/rdf#anmerkung_intern" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
 			</treecols>
-		
+
 			<template>
 				<rule>
 					<treechildren>

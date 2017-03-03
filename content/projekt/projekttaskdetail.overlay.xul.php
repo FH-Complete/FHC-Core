@@ -21,7 +21,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -67,7 +67,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</row>
 					<row>
 						<box orient="vertical">
-							<button label=" Beschreibung" image="../skin/images/markdown_button.png" id="button-projekttask-beschreibung-parsedown" oncommand="showProjekttaskParsedown()" control="textbox-projekttask-detail-beschreibung"/>	
+							<button label=" Beschreibung" image="../skin/images/markdown_button.png" id="button-projekttask-beschreibung-parsedown" oncommand="showProjekttaskParsedown()" control="textbox-projekttask-detail-beschreibung"/>
 							<spacer />
 						</box>
 	   					<textbox id="textbox-projekttask-detail-beschreibung" multiline="true" disabled="true" rows="10"/>
@@ -98,11 +98,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				      		<menulist id="textbox-projekttask-detail-ressource"
 					          datasources="rdf:null"
 					          xmlns:RESSOURCE="http://www.technikum-wien.at/ressource/rdf#"
-					          ref="http://www.technikum-wien.at/ressource/alle" 
+					          ref="http://www.technikum-wien.at/ressource/alle"
 					          disabled="true"
 					         >
 								<template>
-	
+
 										<menupopup>
 											<menuitem value="rdf:http://www.technikum-wien.at/ressource/rdf#ressource_id"
 							        			      label="rdf:http://www.technikum-wien.at/ressource/rdf#bezeichnung ( rdf:http://www.technikum-wien.at/ressource/rdf#typ )"

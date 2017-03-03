@@ -21,11 +21,11 @@
  */
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 
 
-require_once('../config/vilesci.config.inc.php'); 
+require_once('../config/vilesci.config.inc.php');
 
 $SOAPServer = new SoapServer(APP_ROOT."soap/test.wsdl.php?".microtime());
 $SOAPServer->addFunction("myTest");
@@ -36,7 +36,7 @@ ini_set("soap.wsdl_cache_enabled", "0");
 
 
 function myTest($foo)
-{ 	
+{
 	if($foo=='foo')
 		return 'OK';
 	else

@@ -23,7 +23,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -38,16 +38,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
 if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
-else 
+else
 	$uid = null;
-	
+
 if(isset($_GET['bisio_id']))
 	$bisio_id = $_GET['bisio_id'];
-else 
+else
 	$bisio_id = null;
 
 $datum = new datum();
-	
+
 $rdf_url='http://www.technikum-wien.at/bisio';
 
 echo '
@@ -57,7 +57,7 @@ echo '
 >
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
-   
+
 //Daten holen
 $ioobj = new bisio();
 
@@ -70,7 +70,7 @@ if($uid)
 		foreach ($ioobj->result as $row)
 			draw_content($row);
 	}
-	else 
+	else
 		die($ioobj->errormsg);
 }
 elseif($bisio_id)
@@ -79,18 +79,18 @@ elseif($bisio_id)
 	//dieser eine Datensatz geladen
 	if($ioobj->load($bisio_id))
 		draw_content($ioobj);
-	else 
+	else
 		die($ioobj->errormsg);
 }
-else 
+else
 	die('Falsche Parameteruebergabe');
 
 function draw_content($row)
-{		
+{
 	global $rdf_url, $datum, $db;
 	$lehrveranstaltung_id='';
 	$studiensemester_kurzbz = '';
-	
+
 	if($row->lehreinheit_id!='')
 	{
 		$qry = "SELECT lehrveranstaltung_id, studiensemester_kurzbz FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$row->lehreinheit_id'";
@@ -103,7 +103,7 @@ function draw_content($row)
 			}
 		}
 	}
-	
+
 	echo '
 		  <RDF:li>
 	         <RDF:Description  id="'.$row->bisio_id.'"  about="'.$rdf_url.'/'.$row->bisio_id.'" >

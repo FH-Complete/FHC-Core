@@ -22,7 +22,7 @@
 // header for no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -39,7 +39,7 @@ loadVariables($user);
 
 if(isset($_GET['filter']))
 	$filter = $_GET['filter'];
-else 
+else
 	die('Filter muss uebergeben werden');
 
 $rdf_url='http://www.technikum-wien.at/person';
@@ -55,9 +55,9 @@ echo '
   <RDF:Seq RDF:about="'.$rdf_url.'/liste">
 ';
 //$filter = utf8_encode($filter);
-$qry = "SELECT 
+$qry = "SELECT
 			distinct person_id, vorname, nachname, titelpre, titelpost,
-			CASE 
+			CASE
 				WHEN (SELECT count(*) FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE person_id=tbl_person.person_id)>0 THEN 'Mitarbeiter'
 				WHEN (SELECT count(*) FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE person_id=tbl_person.person_id)>0 THEN 'Student'
 				ELSE 'Person'

@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -36,14 +36,14 @@ require_once('../include/studiengang.class.php');
 
 if(isset($_GET['bisverwendung_id']))
 	$bisverwendung_id = $_GET['bisverwendung_id'];
-else 
+else
 	$bisverwendung_id = '';
 
 if(isset($_GET['studiengang_kz']))
 	$studiengang_kz = $_GET['studiengang_kz'];
-else 
+else
 	$studiengang_kz = '';
-	
+
 $datum = new datum();
 $stg = new studiengang();
 $stg->getAll(null, false);

@@ -20,11 +20,11 @@
  */
 /**
  * RDF Klasse
- * 
- * Hilfsfunktionen für die Generierung von RDF-Dateien 
+ *
+ * Hilfsfunktionen für die Generierung von RDF-Dateien
  *
  */
-class rdf 
+class rdf
 {
 	// Header Variablen
 	public $content_type='Content-type: application/xhtml+xml';	// string
@@ -39,10 +39,10 @@ class rdf
 	protected $counter=0;
 	public $obj_id;
 	public $obj = array();
-	public $attr = array();	
+	public $attr = array();
 	protected $childs = array();
 	protected $sequence = array();
-	
+
 	/**
 	 * Konstruktor - Uebergibt die Connection und laedt optional eine Reservierung
 	 * @param $reservierung_id
@@ -52,10 +52,10 @@ class rdf
 		$this->xml_ns = $xml_ns;
 		$this->rdf_url = $rdf_url;
 	}
-	
+
 	/**
 	 * Erstellt ein neues RDF Description Objekt
-	 * 
+	 *
 	 * @return index des neuen Objekts
 	 */
 	public function newObjekt($id)
@@ -66,8 +66,8 @@ class rdf
 	}
 
 	/**
-	 * Setzt die ID eines Objektes 
-	 * 
+	 * Setzt die ID eines Objektes
+	 *
 	 * @param $id
 	 */
 	public function setObjID($id)
@@ -75,7 +75,7 @@ class rdf
 		$this->obj_id=$id;
 		return true;
 	}
-	
+
 	/**
 	 * Sendet die HTTP-Header der RDF Datei
 	 * @param $cache
@@ -90,7 +90,7 @@ class rdf
 		{
 			header("Cache-Control: no-cache");
 			header("Cache-Control: post-check=0, pre-check=0",false);
-			header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+			header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 			header("Pragma: no-cache");
 		}
 		header($this->content_type);
@@ -126,14 +126,14 @@ class rdf
 		$this->rdf_text="\n".'<RDF:RDF'."\n\t"
 			.'xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"'."\n\t".'xmlns:nc="http://home.netscape.com/NC-rdf#"'."\n\t".'xmlns:'.$this->xml_ns.'="'.$this->rdf_url.'/rdf#"'."\n".'>'."\n\t";
 	}
-	
+
 	/**
 	 * Erzeugt die Descriptions aus den bestehenden Daten
 	 */
 	public function createRdfData()
 	{
 		foreach ($this->obj as $obj)
-		{		
+		{
 			$this->rdf_text.="\n\t\t".'<RDF:Description id="'.$obj->obj_id.'"  about="'.$this->rdf_url.'/'.$obj->obj_id.'" >';
 			foreach ($obj->attr as $attr)
 			{
@@ -151,7 +151,7 @@ class rdf
 	 * Fuegt ein Objekt zur Sequence hinzu
 	 * Wenn eine Parent_id uebergeben wird, wird das Objekt unterhalb dieses Eintrags
 	 * angehängt
-	 * 
+	 *
 	 * @param $id
 	 * @param $parent_id
 	 */
@@ -163,14 +163,14 @@ class rdf
 		}
 		else
 		{
-			$this->sequence[]=$id;	
+			$this->sequence[]=$id;
 		}
 	}
-	
+
 	/**
 	 * Erzeugt die Sequenz
 	 * Wenn eine ID uebergeben wird, wird nur die Sequenz unterhalb dieser ID erzeugt
-	 * 
+	 *
 	 * @param $id
 	 */
 	function createRDFSequence($id=null)
@@ -199,7 +199,7 @@ class rdf
 			$this->rdf_text.='</RDF:li>';
 		}
 	}
-	
+
 	/**
 	 * Generiert den RDF Footer
 	 */

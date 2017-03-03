@@ -20,7 +20,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
@@ -53,17 +53,17 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						context="student-anrechnungen-tree-popup"
 						flags="dont-build-content"
 					>
-										
+
 						<treecols>
-							<treecol id="student-anrechnungen-tree-anrechnung_id" label="Anrechnung ID" flex="2" hidden="true" 
+							<treecol id="student-anrechnungen-tree-anrechnung_id" label="Anrechnung ID" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/anrechnung/rdf#anrechnung_id"/>
 							<splitter class="tree-splitter"/>
-							<treecol id="student-anrechnungen-tree-lehrveranstaltung_id" label="Lehrveranstaltung ID" flex="2" hidden="true" 
+							<treecol id="student-anrechnungen-tree-lehrveranstaltung_id" label="Lehrveranstaltung ID" flex="2" hidden="true"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/anrechnung/rdf#lehrveranstaltung_id"/>
 							<splitter class="tree-splitter"/>
-							<treecol id="student-anrechnungen-tree-lehrveranstaltung_bezeichnung" label="Lehrveranstaltung" flex="2" hidden="false" 
+							<treecol id="student-anrechnungen-tree-lehrveranstaltung_bezeichnung" label="Lehrveranstaltung" flex="2" hidden="false"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/anrechnung/rdf#lehrveranstaltung_bez"/>
 							<splitter class="tree-splitter"/>
@@ -88,7 +88,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								sort="rdf:http://www.technikum-wien.at/anrechnung/rdf#insertamum" />
 							<splitter class="tree-splitter"/>
 						</treecols>
-					
+
 						<template>
 							<treechildren flex="1" >
 									<treeitem uri="rdf:*">

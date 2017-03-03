@@ -22,7 +22,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../config/vilesci.config.inc.php');
@@ -179,7 +179,7 @@ else
 								<rows>
 									<row>
 										<label value="Typ" control="betriebsmittel-menulist-betriebsmitteltyp"/>
-										<menulist id="betriebsmittel-menulist-betriebsmitteltyp" 
+										<menulist id="betriebsmittel-menulist-betriebsmitteltyp"
 											disabled="true" flex="1"
 											datasources="<?php echo APP_ROOT ?>rdf/betriebsmitteltyp.rdf.php"
 											ref="http://www.technikum-wien.at/betriebsmitteltyp/liste"
@@ -217,7 +217,7 @@ else
 				      					<menulist id="betriebsmittel-menulist-inventarnummer"
 										  editable="true" disabled="true"
 								          datasources="rdf:null" flex="1"
-								          ref="http://www.technikum-wien.at/betriebsmittel/liste" 
+								          ref="http://www.technikum-wien.at/betriebsmittel/liste"
 								          oninput="BetriebsmittelMenulistInventarLoad(this)"
 								          >
 											<template>

@@ -21,11 +21,11 @@
  */
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 session_start();
 
-require_once('../config/vilesci.config.inc.php'); 
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/notiz.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
@@ -43,25 +43,25 @@ $SOAPServer->handle();
 ini_set("soap.wsdl_cache_enabled", "0");
 
 /**
- * 
+ *
  * Speichert Notizen in die Datenbank
- * 
+ *
  * @param string $username
  * @param string $passwort
  * @param complextype $notiz
  */
 function saveNotiz($username, $passwort, $notiz)
-{ 	
-	
+{
+
 	if(!$user = check_user($username, $passwort))
-		return new SoapFault("Server", "Invalid Credentials");	
-	
+		return new SoapFault("Server", "Invalid Credentials");
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 
 	if(!$rechte->isBerechtigt('basis/notiz', null, 'sui'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Notizen");
-	
+
 	$notiz_obj = new notiz();
 	if($notiz->notiz_id != '')
 	{
@@ -70,7 +70,7 @@ function saveNotiz($username, $passwort, $notiz)
 			$notiz_obj->new = false;
 		}
 		else
-			return new SoapFault("Server", "Fehler beim Laden"); 
+			return new SoapFault("Server", "Fehler beim Laden");
 	}
 	else
 	{
@@ -102,32 +102,32 @@ function saveNotiz($username, $passwort, $notiz)
 			$notiz_obj->bestellung_id = $notiz->bestellung_id;
 			$notiz_obj->lehreinheit_id = $notiz->lehreinheit_id;
 			$notiz_obj->anrechnung_id = $notiz->anrechnung_id;
-			
+
 			if(!$notiz_obj->saveZuordnung())
 				return new SoapFault("Server", $notiz_obj->errormsg);
-		}		
+		}
 		return $notiz_obj->notiz_id;
-	} 
+	}
 	else
 		return new SoapFault("Server", $notiz_obj->errormsg);
 }
 
 /**
- * 
- * Löscht die Notiz mit der vom Webservice übergebenen ID 
+ *
+ * Löscht die Notiz mit der vom Webservice übergebenen ID
  * @param $notiz_id
  */
 function deleteNotiz($username, $passwort, $notiz_id)
 {
 	if(!$user = check_user($username, $passwort))
 		return new SoapFault("Server", "Invalid Credentials");
-	
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-		
+
 	if(!$rechte->isBerechtigt('basis/notiz', null, 'suid'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Loeschen von Notizen");
-	
+
 	$notiz = new notiz();
 	if($notiz->delete($notiz_id))
 		return "OK";
@@ -136,21 +136,21 @@ function deleteNotiz($username, $passwort, $notiz_id)
 }
 
 /**
- * 
- * Löscht das Dokument mit der vom Webservice übergebenen DMS-ID 
+ *
+ * Löscht das Dokument mit der vom Webservice übergebenen DMS-ID
  * @param $dms_id
  */
 function deleteDokument($username, $passwort, $dms_id)
 {
 	if(!$user = check_user($username, $passwort))
 		return new SoapFault("Server", "Invalid Credentials");
-	
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-		
+
 	if(!$rechte->isBerechtigt('basis/notiz', null, 'suid'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Loeschen von Dokumenten");
-	
+
     $dms = new dms();
     if($dms->deleteDms($dms_id))
         return "OK";
@@ -159,35 +159,35 @@ function deleteDokument($username, $passwort, $dms_id)
 }
 
 /**
- * 
+ *
  * Setzt den erledigt Status
  * @param $notiz_id
  * @param $erledigt
  */
 function setErledigt($notiz_id, $erledigt)
-{ 	
+{
 	$user = get_uid();
-		
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-		
+
 	if(!$rechte->isBerechtigt('basis/notiz', null, 'su'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Notizen");
-	
+
 	$notiz = new notiz();
 	if($notiz->load($notiz_id))
 	{
 		$notiz->erledigt=$erledigt;
-		
+
 		if($notiz->save())
 		{
 			return true;
-		} 
+		}
 		else
 			return new SoapFault("Server", $notiz->errormsg);
 	}
 	else
-		return new SoapFault("Server", "Fehler beim Laden"); 	
+		return new SoapFault("Server", "Fehler beim Laden");
 }
 ?>
 

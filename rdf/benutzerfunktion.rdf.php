@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -53,7 +53,7 @@ $datum_obj = new datum();
 $fkt = new funktion();
 $fkt->getAll();
 
-foreach ($fkt->result as $row) 
+foreach ($fkt->result as $row)
 	$fkt_arr[$row->funktion_kurzbz] = $row->beschreibung;
 
 $db = new basis_db();
@@ -62,13 +62,13 @@ if($uid!='')
 {
 	$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE uid=".$db->db_add_param($uid)." ORDER BY funktion_kurzbz";
 }
-else 
+else
 {
 	$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id=".$db->db_add_param($benutzerfunktion_id);
 }
 
 if($db->db_query($qry))
-{	
+{
 	while($row = $db->db_fetch_object())
 	{
 		$oe = new organisationseinheit($row->oe_kurzbz);

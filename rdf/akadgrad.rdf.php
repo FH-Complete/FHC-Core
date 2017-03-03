@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -31,7 +31,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
-	
+
 $rdf_url='http://www.technikum-wien.at/akadgrad';
 
 echo '
@@ -44,7 +44,7 @@ echo '
 ';
 if(isset($_GET['studiengang_kz']) && is_numeric($_GET['studiengang_kz']))
 	$studiengang_kz = $_GET['studiengang_kz'];
-else 
+else
 	die('Studiengang_kz muss uebergeben werden');
 
 if(!is_numeric($studiengang_kz))
@@ -69,7 +69,7 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
 
 $db = new basis_db();
 if($db->db_query($qry))
-{	
+{
 	while($row = $db->db_fetch_object())
 	{
 		echo '

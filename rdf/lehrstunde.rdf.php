@@ -26,7 +26,7 @@
 // header fuer no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -141,12 +141,12 @@ $db = new basis_db();
 function getAnzahl($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz, $studiensemester_kurzbz)
 {
 	global $db;
-	
+
 	if($semester=='')
 		return 0;
 	if($gruppe_kurzbz=='')
 	{
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_studentlehrverband 
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_studentlehrverband
 				WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
 				AND studiengang_kz='".addslashes($studiengang_kz)."' AND
 				semester='".addslashes($semester)."'";
@@ -154,15 +154,15 @@ function getAnzahl($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz
 			$qry.=" AND trim(verband)=trim('".addslashes($verband)."')";
 		if(trim($gruppe)!='')
 			$qry.=" AND trim(gruppe)=trim('".addslashes($gruppe)."')";
-		
+
 	}
-	else 
+	else
 	{
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzergruppe 
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzergruppe
 				WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
 				AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
 	}
-	
+
 	if($res_anz = $db->db_query($qry))
 	{
 		if($row_anz = $db->db_fetch_object($res_anz))
@@ -183,7 +183,7 @@ if (is_array($lehrstunden->lehrstunden))
 			$anzahl = getAnzahl($ls->studiengang_kz, $ls->sem, $ls->ver, $ls->grp, $ls->gruppe_kurzbz, $stsem);
 			$gruppenbezeichnung = '';
 			$gruppenbeschreibung = '';
-			
+
 			if($ls->gruppe_kurzbz!='')
 			{
 				$obj = new gruppe();
@@ -192,7 +192,7 @@ if (is_array($lehrstunden->lehrstunden))
 				$gruppenbezeichnung = $obj->bezeichnung;
 				$gruppenbeschreibung = $obj->beschreibung;
 			}
-			else 
+			else
 			{
 				$obj = new lehrverband();
 				if($obj->load($ls->studiengang_kz, $ls->sem, $ls->ver, $ls->grp))

@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 // DAO
@@ -38,38 +38,38 @@ require_once('../include/adresse.class.php');
 require_once('../include/firma.class.php');
 require_once('../include/standort.class.php');
 require_once('../include/kontakt.class.php');
-require_once('../include/wawi_aufteilung.class.php'); 
-require_once('../include/studiengang.class.php'); 
+require_once('../include/wawi_aufteilung.class.php');
+require_once('../include/studiengang.class.php');
 
 if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 {
-	
+
 	$bestellung = new wawi_bestellung();
 	if(isset($_GET['id']))
 	{
 		if(!$bestellung->load($_GET['id']))
 			die('Bestellung wurde nicht gefunden');
-			
+
 		$besteller = new benutzer();
 		if(!$besteller->load($bestellung->besteller_uid))
 			die('Besteller konnte nicht geladen werden');
-		
+
 		$konto = new wawi_konto();
 		$konto->load($bestellung->konto_id);
-		
+
 		$kostenstelle = new wawi_kostenstelle();
 		$kostenstelle->load($bestellung->kostenstelle_id);
-		
+
 		$rechnungsadresse = new adresse();
 		$rechnungsadresse->load($bestellung->rechnungsadresse);
-		
+
 		$lieferadresse = new adresse();
 		$lieferadresse->load($bestellung->lieferadresse);
-		
-		$aufteilung = new wawi_aufteilung(); 
-		$aufteilung->getAufteilungFromBestellung($bestellung->bestellung_id); 
-		
-		$studiengang = new studiengang(); 
+
+		$aufteilung = new wawi_aufteilung();
+		$aufteilung->getAufteilungFromBestellung($bestellung->bestellung_id);
+
+		$studiengang = new studiengang();
 
 		$firma = new firma();
 		$standort = new standort();
@@ -78,11 +78,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		{
 			$firma->load($bestellung->firma_id);
 			$kundennummer = $firma->get_kundennummer($bestellung->firma_id, $kostenstelle->oe_kurzbz);
-			
+
 			$standort->load_firma($firma->firma_id);
 			if(isset($standort->result[0]))
 				$standort = $standort->result[0];
-					
+
 			$empfaengeradresse->load($standort->adresse_id);
 			$kontakt = new kontakt();
 			$kontakt->loadFirmaKontakttyp($standort->standort_id, 'telefon');
@@ -98,10 +98,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$kundennummer='';
 		}
 		$datum_obj = new datum();
-		
+
 		header("Content-type: application/xhtml+xml");
 		echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-		
+
 		echo "\n<bestellungen><bestellung>\n";
 		echo "	<bestell_nr><![CDATA[$bestellung->bestell_nr]]></bestell_nr>\n";
 		echo "	<titel><![CDATA[$bestellung->titel]]></titel>\n";
@@ -134,15 +134,15 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo "		<plz><![CDATA[$empfaengeradresse->plz]]></plz>\n";
 		echo "		<ort><![CDATA[$empfaengeradresse->ort]]></ort>\n";
 		echo "		<telefon><![CDATA[$telefon]]></telefon>\n";
-		echo "		<fax><![CDATA[$fax]]></fax>\n";		
+		echo "		<fax><![CDATA[$fax]]></fax>\n";
 		echo "	</empfaenger>\n";
-				
+
 		$details = new wawi_bestelldetail();
 		$details->getAllDetailsFromBestellung($bestellung->bestellung_id);
 		$summe_netto=0;
 		$summe_brutto=0;
 		$summe_mwst=0;
-		
+
 		$i=0;
 		$pagebreakposition=30;
 		$pagebreak=false;
@@ -155,7 +155,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				//echo "reduce";
 				$pagebreakposition--;
 			}
-				
+
 			//echo "pos:".$pagebreakposition;
 			//echo "i:".$i;
 			if(!$pagebreak && $i>$pagebreakposition)
@@ -188,10 +188,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo "	</details_1>\n";
 		else
 			echo "	</details>\n";
-			
+
 		echo "	<aufteilungen_1>\n";
-		$anzAufteilungen = sizeof($aufteilung->result); 	
-		$i = 0;	
+		$anzAufteilungen = sizeof($aufteilung->result);
+		$i = 0;
 		$aufteilbreak=false;
 		foreach($aufteilung->result as $aufteilung_row)
 		{
@@ -201,18 +201,18 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				echo '</aufteilungen_1>';
 				echo '<aufteilungen_2>';
 			}
-			
+
 			// Aufteilung nur auf Studiengaenge
 			if($studiengang->getStudiengangFromOe($aufteilung_row->oe_kurzbz))
-			{ 
+			{
 				// Diplomstudiengänge nicht laden, Dummy Studiengaenge (stgkz>10000) nicht laden, Studiengang EAS (Ausserordentliche) nicht laden
 				if($studiengang->typ !='d' && $studiengang->studiengang_kz>0 && $studiengang->studiengang_kz<10000 && $aufteilung_row->oe_kurzbz!='eas')
 				{
 					echo "		<aufteilung>\n";
-					echo "			<oe><![CDATA[".strtoupper($aufteilung_row->oe_kurzbz)."]]></oe>\n"; 
-					echo "			<prozent><![CDATA[$aufteilung_row->anteil]]></prozent>\n"; 
-					echo "		</aufteilung>\n"; 
-					$i++; 
+					echo "			<oe><![CDATA[".strtoupper($aufteilung_row->oe_kurzbz)."]]></oe>\n";
+					echo "			<prozent><![CDATA[$aufteilung_row->anteil]]></prozent>\n";
+					echo "		</aufteilung>\n";
+					$i++;
 				}
 			}
 		}

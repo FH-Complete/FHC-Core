@@ -22,7 +22,7 @@
 // header für no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -47,39 +47,39 @@ if(isset($_GET['stg_kz']) && is_numeric($_GET['stg_kz']))
 		$stg_kz=$_GET['stg_kz'];
 		$request=true;
 	}
-else 
+else
 	unset($stg_kz);
-	
+
 if(isset($_GET['mitarbeiter_uid']))
 	{
 		$mitarbeiter_uid=$_GET['mitarbeiter_uid'];
 		$request=true;
 	}
-else 
+else
 	unset($mitarbeiter_uid);
 
 if(isset($_GET['semester']))
 	if(is_numeric($_GET['semester']))
 		$sem = $_GET['semester'];
-	else 
+	else
 		die('Semester muss eine gueltige Zahl sein');
-else 
+else
 	unset($sem);
-	
+
 if(isset($_GET['studiensemester_kurzbz']))
 	$studiensemester_kurzbz=$_GET['studiensemester_kurzbz'];
-else 
+else
 	unset($studiensemester_kurzbz);
 $db = new basis_db();
 $qry = "
 SELECT DISTINCT
-tbl_lehrveranstaltung.lehrveranstaltung_id as lv_lehrveranstaltung_id, 
-tbl_lehrveranstaltung.kurzbz as lv_kurzbz, 
-tbl_lehrveranstaltung.lehreverzeichnis as lv_lehrevz, 
-tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung, 
-tbl_lehrveranstaltung.bezeichnung_english as lv_bezeichnung_english, 
-tbl_lehrveranstaltung.studiengang_kz as lv_studiengang_kz, 
-tbl_lehrveranstaltung.semester as lv_semester, 
+tbl_lehrveranstaltung.lehrveranstaltung_id as lv_lehrveranstaltung_id,
+tbl_lehrveranstaltung.kurzbz as lv_kurzbz,
+tbl_lehrveranstaltung.lehreverzeichnis as lv_lehrevz,
+tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
+tbl_lehrveranstaltung.bezeichnung_english as lv_bezeichnung_english,
+tbl_lehrveranstaltung.studiengang_kz as lv_studiengang_kz,
+tbl_lehrveranstaltung.semester as lv_semester,
 tbl_lehrveranstaltung.sprache as unterrichtssprache,
 tbl_lehrveranstaltung.ects as ects,
 tbl_lehrveranstaltung.semesterstunden as lv_semesterstunden,
@@ -87,13 +87,13 @@ tbl_lehrveranstaltung.orgform_kurzbz as orgform_kurzbz,
 tbl_lehrveranstaltung.incoming as incoming,
 lower(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kuerzel,
 tbl_lvinfo.*
-FROM (lehre.tbl_lehrveranstaltung JOIN campus.tbl_lvinfo USING (lehrveranstaltung_id)) 
+FROM (lehre.tbl_lehrveranstaltung JOIN campus.tbl_lvinfo USING (lehrveranstaltung_id))
 JOIN public.tbl_studiengang USING (studiengang_kz)";
 if(isset($mitarbeiter_uid) || isset($studiensemester_kurzbz))
 	$qry.= " JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id) ";
 if(isset($mitarbeiter_uid))
 	$qry.= " JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id) ";
-$qry.="WHERE 
+$qry.="WHERE
 tbl_lehrveranstaltung.aktiv=true AND
 tbl_lehrveranstaltung.lehre=true AND
 tbl_lvinfo.aktiv=true AND
@@ -101,13 +101,13 @@ tbl_lvinfo.genehmigt=true ";
 
 if(isset($stg_kz))
 	$qry.= " AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($stg_kz);
-	
+
 if(isset($mitarbeiter_uid))
 	$qry.= " AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$db->db_add_param($mitarbeiter_uid);
-	
+
 if(isset($studiensemester_kurzbz))
 	$qry.= " AND tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
-	
+
 if(isset($sem))
 	$qry .= " AND tbl_lehrveranstaltung.semester=".$db->db_add_param($sem);
 
@@ -152,17 +152,17 @@ if($db->db_query($qry))
 		$arr[$row->lv_studiengang_kz][$row->lv_semester][$row->lv_lehrveranstaltung_id][$row->sprache]=$row->lv_lehrveranstaltung_id.'/'.$row->sprache;
 	}
 	//Hierarchie hinausschreiben
-	echo '<RDF:Seq about="'.$rdf_url.'/liste"> '."\n";  
+	echo '<RDF:Seq about="'.$rdf_url.'/liste"> '."\n";
 	foreach ($arr as $stg=>$stgitem)
 	{
-		echo '<RDF:li>'."\n\t".'<RDF:Seq about="'.$stg.'">'."\n";      	
+		echo '<RDF:li>'."\n\t".'<RDF:Seq about="'.$stg.'">'."\n";
 		foreach ($stgitem as $sem=>$semitem)
 		{
 			echo "\t".'<RDF:li>'."\n\t\t".'<RDF:Seq about="'.$stg.'/'.$sem.'">'."\n";
 			foreach ($semitem as $lvid=>$lvitem)
 			{
 				echo "\t\t<RDF:li>\n\t\t\t".'<RDF:Seq about="'.$rdf_url.'/'.$lvid.'" >'."\n";
-				foreach ($lvitem as $sprache=>$spracheitem) 
+				foreach ($lvitem as $sprache=>$spracheitem)
 				{
 					echo "\t\t\t\t".'<RDF:li resource="'.$rdf_url.'/'.$lvid.'/'.$sprache.'" />'."\n";
 				}

@@ -22,7 +22,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
@@ -41,7 +41,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <vbox id="student-gruppen" style="overflow:auto; margin:0px;" flex="1">
 <popupset>
 	<menupopup id="student-gruppe-tree-popup">
-		<menuitem label="Entfernen" oncommand="StudentGruppeDelete();" id="student-gruppe-tree-popup-delete" hidden="false"/>		
+		<menuitem label="Entfernen" oncommand="StudentGruppeDelete();" id="student-gruppe-tree-popup-delete" hidden="false"/>
 	</menupopup>
 </popupset>
 <hbox flex="1">
@@ -76,7 +76,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					sort="rdf:http://www.technikum-wien.at/gruppen/rdf#uid" />
 				<splitter class="tree-splitter"/>
 			</treecols>
-		
+
 			<template>
 				<rule>
 					<treechildren>

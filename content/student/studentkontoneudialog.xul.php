@@ -22,7 +22,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -55,7 +55,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 			<rows>
 				<row>
 					<label value="Typ" control="student-konto-neu-menulist-buchungstyp"/>
-					<menulist id="student-konto-neu-menulist-buchungstyp" 
+					<menulist id="student-konto-neu-menulist-buchungstyp"
 					          datasources="<?php echo APP_ROOT ?>rdf/buchungstyp.rdf.php?aktiv=true" flex="1"
 					          ref="http://www.technikum-wien.at/buchungstyp/liste"
 					          oncommand="StudentKontoNeuDefaultBetrag()" >
@@ -66,7 +66,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 					        		      label="rdf:http://www.technikum-wien.at/buchungstyp/rdf#beschreibung"
 					        		      standardbetrag="rdf:http://www.technikum-wien.at/buchungstyp/rdf#standardbetrag"
 					        		      standardtext="rdf:http://www.technikum-wien.at/buchungstyp/rdf#standardtext"
-					        		      <?php 
+					        		      <?php
 											// Credit Points werden nur angezeigt, wenn diese im Config aktiviert wurden
 												if(defined('FAS_KONTO_SHOW_CREDIT_POINTS') && FAS_KONTO_SHOW_CREDIT_POINTS=='true')
 													echo 'credit_points="rdf:http://www.technikum-wien.at/buchungstyp/rdf#credit_points"';
@@ -82,12 +82,12 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 					<label value="Betrag" control="student-konto-neu-textbox-betrag"/>
 					<hbox>
       					<textbox id="student-konto-neu-textbox-betrag" value="-0.00" maxlength="9" size="9"/>
-      					<spacer flex="1" />			
+      					<spacer flex="1" />
       				</hbox>
 				</row>
 				<row>
 					<label value="Buchungsdatum" control="student-konto-neu-textbox-buchungsdatum"/>
-					<hbox>      					
+					<hbox>
       					<box class='Datum' id="student-konto-neu-textbox-buchungsdatum"/>
       					<spacer flex="1" />
       				</hbox>
@@ -100,12 +100,12 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 					<label value="Mahnspanne" control="student-konto-neu-textbox-mahnspanne"/>
 					<hbox>
 						<textbox id="student-konto-neu-textbox-mahnspanne" value="30" maxlength="4" size="4"/>
-						<spacer flex="1" />			
+						<spacer flex="1" />
       				</hbox>
 				</row>
 				<row>
 					<label value="Studiensemester" control="student-konto-neu-menulist-studiensemester"/>
-					<menulist id="student-konto-neu-menulist-studiensemester" 
+					<menulist id="student-konto-neu-menulist-studiensemester"
 					          datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php" flex="1"
 					          ref="http://www.technikum-wien.at/studiensemester/liste" >
 						<template>
@@ -117,24 +117,24 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 						</template>
 					</menulist>
 				</row>
-				<?php 
+				<?php
 					// Credit Points werden nur angezeigt, wenn diese im Config aktiviert wurden
 					if(defined('FAS_KONTO_SHOW_CREDIT_POINTS') && FAS_KONTO_SHOW_CREDIT_POINTS=='true')
 						$hidden='';
 					else
 						$hidden='hidden="true"';
-					
+
 					echo '	<row '.$hidden.'>
 								<label value="Credit Points" control="student-konto-neu-textbox-credit_points" '.$hidden.'/>
 								<hbox '.$hidden.'>
 									<textbox id="student-konto-neu-textbox-credit_points" maxlength="9" size="9" value="0.00" '.$hidden.'/>
-									<spacer flex="1" />			
+									<spacer flex="1" />
 								</hbox>
 							</row>';
 				?>
 				<row>
 					<label value="Anmerkung" control="student-konto-neu-textbox-anmerkung"/>
-						<textbox id="student-konto-neu-textbox-anmerkung" multiline="true"/>		
+						<textbox id="student-konto-neu-textbox-anmerkung" multiline="true"/>
 				</row>
 			</rows>
 	</grid>

@@ -22,14 +22,14 @@ $projekt_kurzbz=(isset($_GET['projekt_kurzbz'])?$_GET['projekt_kurzbz']:null);
 $projekt_phase=(isset($_GET['projekt_phase'])?$_GET['projekt_phase']:null);
 
 if($projekt_phase != null && (is_numeric($projekt_phase) == false ))
-	die('Ungültige ProjektphasenID'); 
+	die('Ungültige ProjektphasenID');
 
 
 
 // header for no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
@@ -50,14 +50,14 @@ echo '
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:RESSOURCE="'.$rdf_url.'rdf#"
 >
-';	
+';
 
 $optional = '';
 $optional_description = '';
 if(isset($_GET['optional']))
 {
 	$optional.="\n\t\t\t<RDF:li resource=\"".$rdf_url."opt"."\" />";
-	
+
 	$optional_description = '
 	<RDF:Description about="'.$rdf_url.'opt" >
     	<RESSOURCE:ressource_id></RESSOURCE:ressource_id>
@@ -76,15 +76,15 @@ if(isset($_GET['optional']))
   	</RDF:Description>';
 }
 
-$ressource = new ressource(); 
+$ressource = new ressource();
 
 if($projekt_kurzbz!=null)
 	$ressource->getProjectRessourcen($projekt_kurzbz);
 else if($projekt_phase!= null)
 	$ressource->getPhaseRessourcen($projekt_phase);
 
-else 
-	$ressource->getAllRessourcen(); 
+else
+	$ressource->getAllRessourcen();
 
 foreach ($ressource->result as $res)
 {
@@ -120,13 +120,13 @@ draw_caption('mitarbeiter');
 draw_caption('studenten');
 draw_caption('betriebsmittel');
 draw_caption('firma');
-echo $optional_description; 
-echo $seq; 
+echo $optional_description;
+echo $seq;
 
 function draw_caption($name)
 {
 	global $rdf_url;
-	
+
 		echo '
 	<RDF:Description about="'.$rdf_url.$name.'" >
     	<RESSOURCE:ressource_id></RESSOURCE:ressource_id>
@@ -151,12 +151,12 @@ function draw_caption($name)
 function draw_ressource($ressource)
 {
 	global $rdf_url;
-	global $mitarbeiter, $student, $betriebsmittel, $firma; 
-	
-	$db = new basis_db(); 
+	global $mitarbeiter, $student, $betriebsmittel, $firma;
+
+	$db = new basis_db();
 	$RdfDescription ='';
 	$typ = '';
-	
+
 	// Ressource ist ein Mitarbeiter
 	if($ressource->mitarbeiter_uid != '')
 	{
@@ -168,9 +168,9 @@ function draw_ressource($ressource)
 			else
 				die('Fehler beim Laden der Mitarbeiter-daten');
 		}
-		else 
+		else
 			die('Fehler beim Laden der Mitarbeiter-daten');
-			
+
 		$mitarbeiter.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id."\" />";
 		$typ ='Mitarbeiter';
 	}
@@ -185,13 +185,13 @@ function draw_ressource($ressource)
 			else
 				die('Fehler beim Laden der Studenten-daten');
 		}
-		else 
+		else
 			die('Fehler beim Laden der Studenten-daten');
-			
+
 		$student.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id."\" />";
 		$typ ='Student';
 	}
-	
+
 	// Ressource ist ein Betriebsmittel
 	if($ressource->betriebsmittel_id != '')
 	{
@@ -203,13 +203,13 @@ function draw_ressource($ressource)
 			else
 				die('Fehler beim Laden der Betriebsmittel-daten');
 		}
-		else 
+		else
 			die('Fehler beim Laden der Betriebsmittel-daten');
-			
+
 		$betriebsmittel.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id."\" />";
 		$typ = 'Betriebsmittel';
 	}
-	
+
 	// Ressource ist eine Firma
 	if($ressource->firma_id != '')
 	{
@@ -221,13 +221,13 @@ function draw_ressource($ressource)
 			else
 				die('Fehler beim Laden der Firmen-daten');
 		}
-		else 
+		else
 			die('Fehler beim Laden der Firmen-daten');
-			
+
 		$firma.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id."\" />";
 		$typ = 'Firma';
 	}
-	
+
 	echo '
 	<RDF:Description about="'.$rdf_url.$ressource->ressource_id.'" >
     	<RESSOURCE:ressource_id><![CDATA['.$ressource->ressource_id.']]></RESSOURCE:ressource_id>

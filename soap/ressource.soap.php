@@ -21,15 +21,15 @@
  */
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 
-require_once('../config/vilesci.config.inc.php'); 
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/ressource.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/benutzerberechtigung.class.php');
-require_once('../include/functions.inc.php'); 
+require_once('../include/functions.inc.php');
 
 $SOAPServer = new SoapServer(APP_ROOT."/soap/ressource.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveRessource");
@@ -39,23 +39,23 @@ $SOAPServer->handle();
 ini_set("soap.wsdl_cache_enabled", "0");
 
 /**
- * 
+ *
  * Speichert die Ressource
  * @param $username
  * @param $passwort
  * @param $ressource
  */
 function saveRessource($username, $passwort, $ressource)
-{ 	
+{
 	if(!$user = check_user($username, $passwort))
-		return new SoapFault("Server", "Invalid Credentials");	
-	
+		return new SoapFault("Server", "Invalid Credentials");
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-		
+
 	if(!$rechte->isBerechtigt('planner', null, 'sui'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Ressourcen.");
-	
+
 	$ressourceNew = new ressource();
 	if($ressource_id!='')
 	{
@@ -64,7 +64,7 @@ function saveRessource($username, $passwort, $ressource)
 	}
 	else
 	{
-		$ressourceNew->new = true; 
+		$ressourceNew->new = true;
 		$ressourceNew->insertvon = $user;
 	}
 	$ressourceNew->ressource_id=$ressource->ressource_id;
@@ -75,9 +75,9 @@ function saveRessource($username, $passwort, $ressource)
 	$ressourceNew->betriebsmittel_id = $ressource->betriebsmittel_id;
 	$ressourceNew->firma_id = $ressource->firma_id;
 	$ressourceNew->updatevon = $user;
-	
+
 	if($ressourceNew->save())
-		return $ressourceNew->ressource_id; 
+		return $ressourceNew->ressource_id;
 	else
 		return new SoapFault("Server", $ressourceNew->errormsg);
 }

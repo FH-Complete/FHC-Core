@@ -20,7 +20,7 @@
 
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
-header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
@@ -86,11 +86,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								</menupopup>
 
 						</template>
-					</menulist>		
+					</menulist>
 				</row>
 				<row>
 					<label value="Zusammenfassung" control="textbox-projekttask-mantis-issue_summary"/>
-					<textbox id="textbox-projekttask-mantis-issue_summary"/>	
+					<textbox id="textbox-projekttask-mantis-issue_summary"/>
 					<label value="Reporter_real_name" control="textbox-projekttask-mantis-issue_reporter_real_name"/>
    					<textbox id="textbox-projekttask-mantis-issue_reporter_real_name" disabled="true"/>
 				</row>
@@ -152,15 +152,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
    						<textbox id="textbox-projekttask-mantis-issue_status_name" disabled="true"/>
    						<spacer />
    					</vbox>
-					
-				</row> 		
+
+				</row>
 				<row>
 					<label value="View_state_id" control="textbox-projekttask-mantis-issue_view_state_id"/>
    					<textbox id="textbox-projekttask-mantis-issue_view_state_id" disabled="true"/>
 					<label value="Due_date" control="textbox-projekttask-mantis-issue_due_date"/>
    					<textbox id="textbox-projekttask-mantis-issue_due_date" disabled="true"/>
 				</row>
-				
+
 				<row>
 					<label value="Severity_id" control="textbox-projekttask-mantis-issue_severity_id"/>
    					<textbox id="textbox-projekttask-mantis-issue_severity_id" disabled="true"/>
@@ -182,7 +182,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
    					<textbox id="textbox-projekttask-mantis-issue_reproducibility_id" disabled="true"/>
 					<label value="Reproducibility_name" control="textbox-projekttask-mantis-issue_reproducibility_name"/>
    					<textbox id="textbox-projekttask-mantis-issue_reproducibility_name" disabled="true"/>
-				</row> 
+				</row>
 				<row>
 					<label value="Date_submitted" control="textbox-projekttask-mantis-issue_date_submitted"/>
    					<textbox id="textbox-projekttask-mantis-issue_date_submitted" disabled="true"/>
@@ -206,7 +206,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
    					<textbox id="textbox-projekttask-mantis-issue_resolution_id" disabled="true"/>
 					<label value="Resolution_name" control="textbox-projekttask-mantis-issue_resolution_name"/>
    					<textbox id="textbox-projekttask-mantis-issue_resolution_name" disabled="true"/>
-				</row> 
+				</row>
 			</rows>
 		</grid>
 		<hbox>
