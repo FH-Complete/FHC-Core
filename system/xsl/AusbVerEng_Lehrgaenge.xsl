@@ -614,6 +614,10 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 		<style:style style:name="P119" style:family="paragraph" style:parent-style-name="Heading_20_1" style:list-style-name="">
 			<style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:text-indent="0cm" style:auto-text-indent="false"/>
 		</style:style>
+		<style:style style:name="P120" style:family="paragraph">
+		<style:paragraph-properties fo:line-height="130%"/>
+		<style:text-properties fo:color="#ff3333" fo:font-size="16pt" style:font-size-asian="16pt" style:font-name-complex="Arial" style:font-size-complex="16pt"/>
+		</style:style>
 		<style:style style:name="T1" style:family="text">
 			<style:text-properties fo:font-size="8pt" style:font-size-asian="8pt" style:font-size-complex="8pt"/>
 		</style:style>
@@ -861,6 +865,11 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
 				<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 			</text:sequence-decls>
+				<!-- Ueberprueft ob benoetigte Datenfelder leer sind -->
+				<xsl:if test="student_maxsemester = ''"><text:p text:style-name="P120">Ausbildungsdauer konnte nicht berechnet werden</text:p></xsl:if>
+				<xsl:if test="lgartcode='1' and akadgrad = ''"><text:p text:style-name="P120">Kein Akademischer Grad für diesen Lehrgang hinterlegt</text:p></xsl:if>
+				<xsl:if test="lgartcode='2' and akadgrad = ''"><text:p text:style-name="P120">Kein Akademischer Grad für diesen Lehrgang hinterlegt</text:p></xsl:if>
+				
 			<text:section text:style-name="Sect1" text:name="Bereich1">
 				<text:h text:style-name="P118" text:outline-level="1">Ausbildungsvertrag</text:h>
 				<text:p text:style-name="P81"/>
@@ -1083,10 +1092,10 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P13"/>
 				<xsl:choose>
 					<xsl:when test="lgartcode='1'">
-						<text:p text:style-name="P13">Nach Abschluss aller vorgeschriebenen Prüfungen wird der akademische Grad &quot;Master of &quot; verliehen.</text:p>
+						<text:p text:style-name="P13">Nach Abschluss aller vorgeschriebenen Prüfungen wird der akademische Grad &quot;<xsl:value-of select="akadgrad"/>&quot; verliehen.</text:p>
 					</xsl:when>
 					<xsl:when test="lgartcode='2'">
-						<text:p text:style-name="P13">Nach Abschluss aller vorgeschriebenen Prüfungen wird der Titel &quot;Akademische/r &quot; verliehen.</text:p>
+						<text:p text:style-name="P13">Nach Abschluss aller vorgeschriebenen Prüfungen wird der Titel &quot;<xsl:value-of select="akadgrad"/>&quot; verliehen.</text:p>
 					</xsl:when>
 					<xsl:otherwise>
 						<text:p text:style-name="P13">Nach Abschluss aller vorgeschriebenen Prüfungen wird ein Zertifizierungsdiplom der Technikum Wien Academy verliehen.</text:p>
@@ -1141,10 +1150,10 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 				<text:p text:style-name="P14"/>
 				<xsl:choose>
 					<xsl:when test="lgartcode='1'">
-						<text:p text:style-name="P13">When all the required examinations have been completed the academic degree &quot;Master of &quot; will be awarded.</text:p>
+						<text:p text:style-name="P13">When all the required examinations have been completed the academic degree &quot;<xsl:value-of select="akadgrad"/>&quot; will be awarded.</text:p>
 					</xsl:when>
 					<xsl:when test="lgartcode='2'">
-						<text:p text:style-name="P13">When all the required examinations have been completed the title &quot;Academic &quot; will be awarded.</text:p>
+						<text:p text:style-name="P13">When all the required examinations have been completed the title &quot;<xsl:value-of select="akadgrad"/>&quot; will be awarded.</text:p>
 					</xsl:when>
 					<xsl:otherwise>
 						<text:p text:style-name="P13">>When all the required examinations have been completed a Technikum Wien Academy diploma certificate will be awarded.</text:p>

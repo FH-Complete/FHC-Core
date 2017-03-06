@@ -22,6 +22,8 @@
 
 //PDF fuer die Anwesenheitsliste auf CIS
 
+$db = new basis_db();
+
 //PDF erzeugen
 $pdf = new PDF('P','pt');
 $pdf->Open();
@@ -33,7 +35,7 @@ $pdf->SetXY(30,40);
 $stgobj=new studiengang();
 $stgobj->load($stg);
 //Logo
-$pdf->Image("../../../skin/images/logo.jpg","430","45","","45","jpg","");
+$pdf->Image("../../../skin/styles/tw/logo.jpg","470","45","","50","jpg","");
 //$pdf->Image("../../../skin/images/tw_logo_02.jpg","400","30","116","43","jpg","");
 
 $bezeichnung='';
@@ -56,9 +58,21 @@ $pdf->SetXY(30,60);
 //$stsem_obj = new studiensemester($conn);
 //$stsem = $stsem_obj->getaktorNext();
 
-$qry = "SELECT distinct on(kuerzel, semester, verband, gruppe, gruppe_kurzbz) UPPER(stg_typ::varchar(1) || stg_kurzbz) as kuerzel, semester, verband, gruppe, gruppe_kurzbz from campus.vw_lehreinheit WHERE lehrveranstaltung_id='".addslashes($lvid)."' AND studiensemester_kurzbz='".addslashes($stsem)."'";
+$qry = "SELECT DISTINCT ON 
+			(kuerzel, semester, verband, gruppe, gruppe_kurzbz) 
+			UPPER(stg_typ::varchar(1) || stg_kurzbz) as kuerzel, 
+			semester, 
+			verband, 
+			gruppe, 
+			gruppe_kurzbz 
+		FROM 
+			campus.vw_lehreinheit 
+		WHERE 
+			lehrveranstaltung_id=".$db->db_add_param($lvid)." 
+		AND 
+			studiensemester_kurzbz=".$db->db_add_param($stsem);
 if($lehreinheit_id!='')
-	$qry.=" AND lehreinheit_id='".addslashes($lehreinheit_id)."'";
+	$qry.=" AND lehreinheit_id=".$db->db_add_param($lehreinheit_id);
 
 $gruppen='';
 if($result = $db->db_query($qry))
@@ -77,7 +91,7 @@ $gruppen=mb_convert_encoding($gruppen,'ISO-8859-15','UTF-8');
 
 $pdf->MultiCell(0,20,'Gruppe: '.$gruppen);
 $semester = new studiensemester($stsem);
-$pdf->MultiCell(0,20,'Studiensemester: '.(($semester->beschreibung != NULL) ? $semester->beschreibung : $stsem));
+$pdf->MultiCell(0,20,'Studiensemester: '.(($semester->beschreibung != '') ? $semester->beschreibung : $stsem));
 
 $maxY=$pdf->GetY();
 $maxY=getmax($maxY,$pdf->GetY());
@@ -111,7 +125,7 @@ $pdf->SetFont('Arial','',8);
 		$maxX +=20;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->SetFont('Arial','B',8);
-		$pdf->MultiCell(130,$lineheight,mb_convert_encoding('Hörer/Name','ISO-8859-15','UTF-8'),1,'L',0);
+		$pdf->MultiCell(130,$lineheight,mb_convert_encoding('HörerIn/Name','ISO-8859-15','UTF-8'),1,'L',0);
 		$maxX +=130;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(65,$lineheight,'Kennzeichen',1,'C',0);
@@ -138,11 +152,11 @@ $qry = "SELECT
 			LEFT JOIN lehre.tbl_zeugnisnote on(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=tbl_student.student_uid AND tbl_zeugnisnote.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz)
 			LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
 		WHERE
-			vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND
-			vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($stsem)."'";
+			vw_student_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid)." AND
+			vw_student_lehrveranstaltung.studiensemester_kurzbz=".$db->db_add_param($stsem);
 
 if($lehreinheit_id!='')
-	$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id='".addslashes($lehreinheit_id)."'";
+	$qry.=" AND vw_student_lehrveranstaltung.lehreinheit_id=".$db->db_add_param($lehreinheit_id);
 $qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis DESC';
 
 $lineheight=80;
@@ -210,18 +224,11 @@ if($result = $db->db_query($qry))
 //			$pdf->MultiCell(80,$lineheight,'',0,'L',1);
 			if($elem->foto_sperre=='f')
 			{
-				$image_link = APP_ROOT."cis/public/bild.php?src=person&person_id=".$elem->person_id;
-				$type = exif_imagetype($image_link);
-
-				if($type==IMAGETYPE_JPEG)
-				{
-					$file_type='jpg';
-					$pdf->Image($image_link,$maxX+1,$maxY+1,0,"78",$file_type,"");
-				}
+				$pdf->Image(APP_ROOT."cis/public/bild.php?src=person&person_id=".$elem->person_id,$maxX+1,$maxY+1,0,"78","jpg","");
 			}
-		   	$inhalt[]=array($i,$name,$matrikelnr,$sem_verb_grup,'');
+			$inhalt[]=array($i,$name,$matrikelnr,$sem_verb_grup,'');
 		}
-   }
+	}
 }
 
 $lineheight=10;

@@ -209,32 +209,33 @@ a:hover /*link ohne Item-Definition*/
 a.ItemTesttool
 {
 	color: #000;
-	line-height: 25px;
+	/*line-height: 25px;*/
 	display:block;
-	padding: 0 10px 0 10px;
+	padding: 5px 10px 5px 10px;
 }
 a.ItemTesttoolAktiv
 {
 	color: #000;
-	line-height: 25px;
+	/*line-height: 25px;*/
 	display:block;
-	padding: 0 10px 0 10px;
+	padding: 5px 10px 5px 10px;
+	text-decoration: none;
 }
 a.ItemTesttoolBeendet
 {
 	color: #C7C8C9;
-	line-height: 25px;
+	/*line-height: 25px;*/
 	display:block;
-	padding: 0 10px 0 10px;
+	padding: 5px 10px 5px 10px;
 	cursor: default;
 	text-decoration: none;
 }
 a:hover.ItemTesttool
 {
-	color: #0086CC;
-	line-height: 25px;
+	color: #000;
+	/*line-height: 25px;*/
 	text-decoration: none;
-	padding: 0 10px 0 10px;
+	padding: 5px 10px 5px 10px;
 }
 a.HyperItem /* ? */
 {
@@ -421,6 +422,15 @@ td.MarkLine
 {
 	background-color: #F2F2F2; /*wie EEEEEE; also grau fast weiss */
 }
+td.HeaderTesttool /*fuer die Button-Optik beim Testtool*/
+{
+	color: #FFFFFF;
+	background-color: #00639C;
+	white-space:nowrap;
+	line-height: 25px;
+	box-shadow: inset 0 0 2px #FFFFFF;
+	padding: 0 10px 0 10px;
+}
 td.Inaktiv  /*fuer Inaktive Items bei der Raumbeschreibung */
 {
   background-color: #F2F2F2; /*wie EEEEEE; also grau fast weiss */
@@ -430,34 +440,48 @@ td.Inaktiv  /*fuer Inaktive Items bei der Raumbeschreibung */
 td.ItemTesttool /*fuer die Button-Optik beim Testtool*/
 {
 	color: #000;
-	background-color: #DEE1E2;
-	white-space:nowrap;
-	box-shadow: inset 0 0 5px #888;
+	white-space: initial;
+	box-shadow: inset 0 0 2px #00639C;
+	width: 170px;
+	display: inline-block;
+}
+td:hover.ItemTesttool
+{
+	color: #000;
+	white-space: initial;
+	box-shadow: inset 0px 0px 2px 2px #00639C;
+	width: 170px;
+	display: inline-block;
 }
 td.ItemTesttoolAktiv /*fuer die Button-Optik beim Testtool*/
 {
 	color: #000;
-	background-color: #DEE1E2;
-	padding: 0 10px 0 10px;
-	white-space:nowrap;
-	box-shadow: 0px 0px 5px 5px #888888;
+	white-space: initial;
+	box-shadow: 0px 0px 2px 2px #00639C;
 }
 td.ItemTesttoolBeendet /*fuer die Button-Optik beim Testtool*/
 {
-	background-color: #EAECED;
-	white-space:nowrap;
-}
-td:hover.ItemTesttool
-{
-	color: white;
-	background-color: #fff;
-	box-shadow: 0px 0px 5px 5px #888888;
+	background-color: #FFFFFF;
+	white-space: initial;
+	box-shadow: inset 0px 0px 2px 2px #EAECED;
 }
 td:hover.ItemTesttoolBeendet
 {
-	color: #C7C8C9;
-	background-color: #EAECED;
-	white-space:nowrap;
+	color: #EAECED;
+	background-color: #FFFFFF;
+	white-space: initial;
+	box-shadow: inset 0px 0px 2px 2px #EAECED;
+}
+div.TesttoolTitle /* Ueberschrift auf den Titelfolien */
+{
+	font-size: 400%; 
+	font-family: Helvetica, Arial, sans-serif; 
+	text-transform: uppercase; 
+	color: #FFFFFF;
+	display: table;
+	white-space: nowrap;
+	text-shadow: -1px 0 #00639C, 0 1px #00639C, 1px 0 #00639C, 0 -1px #00639C;
+	margin: 0 0 20px 0;
 }
 td.tdwidth10
 {

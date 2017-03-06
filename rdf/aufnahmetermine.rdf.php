@@ -27,6 +27,8 @@ require_once('../include/benutzer.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/reihungstest.class.php');
 require_once('../include/studienplan.class.php');
+require_once('../include/studienordnung.class.php');
+require_once('../include/studiengang.class.php');
 
 $user = get_uid();
 
@@ -78,6 +80,12 @@ function drawrow($row)
 	$studienplan = new studienplan();
 	$studienplan->loadStudienplan($row->studienplan_id);
 
+	$studienordnung = new studienordnung();
+	$studienordnung->loadStudienordnung($studienplan->studienordnung_id);
+
+	$stpl_stg = new studiengang();
+	$stpl_stg->load($studienordnung->studiengang_kz);
+
 	$i=$oRdf->newObjekt($row->rt_person_id);
 	$oRdf->obj[$i]->setAttribut('rt_person_id',$row->rt_person_id,true);
 	$oRdf->obj[$i]->setAttribut('rt_id',$row->reihungstest_id,true);
@@ -91,6 +99,7 @@ function drawrow($row)
 	$oRdf->obj[$i]->setAttribut('stufe',$reihungstest_obj->stufe,true);
 	$oRdf->obj[$i]->setAttribut('studienplan_id',$row->studienplan_id,true);
 	$oRdf->obj[$i]->setAttribut('studienplan_bezeichnung',$studienplan->bezeichnung,true);
+	$oRdf->obj[$i]->setAttribut('studienplan_studiengang',$stpl_stg->kuerzel,true);
 	$oRdf->obj[$i]->setAttribut('studiensemester',$reihungstest_obj->studiensemester_kurzbz,true);
 	$oRdf->obj[$i]->setAttribut('datum',$datum_obj->formatDatum($reihungstest_obj->datum,'d.m.Y'),true);
 	$oRdf->obj[$i]->setAttribut('datum_iso',$reihungstest_obj->datum,true);
