@@ -2,13 +2,14 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+require_once(dirname(__FILE__).'/../../include/basis_db.class.php');
+
 class Migration_fhc30 extends CI_Migration
 {
 	public function up()
 	{
 		echo '<br/><h1>Update to FHC 3.0</h1><br/>';
 		$this->db=$this->load->database('system', true); 	
-		$this->load->helper('fhcdb');
 		$db = new basis_db($this);
 		require_once('./system/dbupdate_3.0.php');
 	}

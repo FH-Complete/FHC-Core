@@ -4,14 +4,14 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 require_once(dirname(__FILE__).'/../../include/basis_db.class.php');
 
-class Migration_fhc32 extends CI_Migration
+class Migration_fhc33 extends CI_Migration
 {
 	public function up()
 	{
-		echo '<br/><h1>Update to FHC 3.2</h1><br/>';
+		echo '<br/><h1>Update to FHC 3.3</h1><br/>';
 		$this->db=$this->load->database('system', true); 	
 		$db = new basis_db($this);
-		require_once('./system/dbupdate_3.2.php');
+		require_once('./system/dbupdate_3.3.php');
 	}
 
 	public function down()
