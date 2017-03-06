@@ -50,6 +50,73 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
+// CREATE VIEW public.vw_msg_vars and grants privileges
+if (!@$db->db_query("SELECT * FROM public.vw_msg_vars WHERE 0 = 1"))
+{
+	$qry = '
+		CREATE VIEW public.vw_msg_vars AS (
+		SELECT DISTINCT ON(p.person_id, pr.prestudent_id) p.person_id,
+			   pr.prestudent_id AS prestudent_id,
+			   p.nachname AS "Nachname",
+			   p.vorname AS "Vorname",
+			   p.geschlecht AS "Anrede",
+			   a.strasse AS "Strasse",
+			   a.ort AS "Ort",
+			   a.plz AS "PLZ",
+			   a.gemeinde AS "Gemeinde",
+			   a.langtext AS "Nation",
+			   ke.kontakt AS "Email",
+			   kt.kontakt AS "Telefon",
+			   s.bezeichnung AS "Studiengang DE",
+			   s.english AS "Studiengang EN"
+		FROM public.tbl_person p
+   LEFT JOIN (
+					SELECT person_id,
+						   kontakt
+					  FROM public.tbl_kontakt
+					 WHERE zustellung = TRUE
+					   AND kontakttyp = \'email\'
+				  ORDER BY kontakt_id DESC
+			) ke USING(person_id)
+   LEFT JOIN (
+					SELECT person_id,
+						   kontakt
+					  FROM public.tbl_kontakt
+					 WHERE zustellung = TRUE
+					   AND kontakttyp IN (\'telefon\', \'mobil\')
+				  ORDER BY kontakt_id DESC
+			) kt USING(person_id)
+   LEFT JOIN (
+					SELECT person_id,
+						   strasse,
+						   ort,
+						   plz,
+						   gemeinde,
+						   langtext
+					  FROM public.tbl_adresse
+				 LEFT JOIN bis.tbl_nation ON(bis.tbl_nation.nation_code = public.tbl_adresse.nation)
+					 WHERE public.tbl_adresse.heimatadresse = TRUE
+				  ORDER BY adresse_id DESC
+			) a USING(person_id)
+   LEFT JOIN public.tbl_prestudent pr USING(person_id)
+  INNER JOIN public.tbl_studiengang s USING(studiengang_kz)
+	   WHERE p.aktiv = TRUE
+	ORDER BY p.person_id ASC, pr.prestudent_id ASC
+);';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.vw_msg_vars view created';
+	
+	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars TO web;';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'granted privileges to web on public.vw_msg_vars';
+}
+
 //Spalte anmerkung und rechnungsadresse in tbl_adresse
 if(!$result = @$db->db_query("SELECT rechnungsadresse FROM public.tbl_adresse LIMIT 1"))
 {
