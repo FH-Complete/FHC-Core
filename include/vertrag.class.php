@@ -952,9 +952,22 @@ class vertrag extends basis_db
 											lehre.tbl_projektbetreuer
 										WHERE
 											vertrag_id=tbl_vertrag.vertrag_id)
-					))
+					)
+					)
 					AND vertragsdatum<=".$this->db_add_param($datum)."
-					AND vertragsdatum>=".$this->db_add_param($prevstsemende)."
+					AND
+						(
+							vertragsdatum>=".$this->db_add_param($prevstsemende)."
+							OR
+							EXISTS (SELECT
+										1
+									FROM
+										lehre.tbl_lehreinheitmitarbeiter
+										JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+									WHERE
+										vertrag_id=tbl_vertrag.vertrag_id
+										AND studiensemester_kurzbz=".$this->db_add_param($stsem).")
+						)
 					AND tbl_benutzer.uid=".$this->db_add_param($mitarbeiter_uid);
 
 		if($result = $this->db_query($qry))
