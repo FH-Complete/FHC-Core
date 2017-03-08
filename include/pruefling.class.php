@@ -312,7 +312,7 @@ class pruefling extends basis_db
 	 * @param $person_id ID der Person.
 	 * @param $punkte Wenn true werden Punkte geliefert, sonst Prozentsumme.
 	 * @param $reihungstest_id ID des Reihungstests.
-	 * @return Endpunkte des Reihungstests
+	 * @return Endpunkte des Reihungstests oder False wenn keine Punkte vorhanden
 	 */
 	public function getReihungstestErgebnisPerson($person_id, $punkte=false, $reihungstest_id=null)
 	{
@@ -324,9 +324,13 @@ class pruefling extends basis_db
 
 		$ergebnis=0;
 
-		if($this->db_query($qry))
+		if($result = $this->db_query($qry))
 		{
-			while($row = $this->db_fetch_object())
+			// Wenn keine Eintraege vorhanden dann false
+			if($this->db_num_rows($result)==0)
+				return false;
+
+			while($row = $this->db_fetch_object($result))
 			{
 				//wenn maxpunkte ueberschritten wurde -> 100%
 				if($row->punkte>=$row->maxpunkte)
@@ -357,7 +361,7 @@ class pruefling extends basis_db
 	 * @param $prestudent_id ID des Prestudenten
 	 * @param $punkte Wenn true werden Punkte geliefert, sonst Prozentsumme.
 	 * @param $reihungstest_id ID des Reihungstests.
-	 * @return Endpunkte des Reihungstests
+	 * @return Endpunkte des Reihungstests oder false wenn keine Punkte vorhanden
 	 */
 	public function getReihungstestErgebnisPrestudent($prestudent_id, $punkte=false, $reihungstest_id=null)
 	{
@@ -369,8 +373,11 @@ class pruefling extends basis_db
 
 		$ergebnis=0;
 
-		if($this->db_query($qry))
+		if($result = $this->db_query($qry))
 		{
+			if($this->db_num_rows($result)==0)
+				return false;
+
 			while($row = $this->db_fetch_object())
 			{
 				//wenn maxpunkte ueberschritten wurde -> 100%
