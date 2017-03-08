@@ -73,6 +73,7 @@ require_once('../../include/adresse.class.php');
 require_once('../../include/reihungstest.class.php');
 require_once('../../include/studienplan.class.php');
 require_once('../../include/mobilitaet.class.php');
+require_once('../../include/studienordnung.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -4101,17 +4102,57 @@ if(!$error)
 				}
 				else
 				{
-					$gesamtpunkte=0;
+					$gesamtpunkte_arr = array();
 					$reihungstest = new reihungstest();
 					if($reihungstest->getReihungstestPerson($prestudent->person_id))
 					{
 						foreach($reihungstest->result as $row)
-							$gesamtpunkte += $row->punkte;
+						{
+							$studienplan = new studienplan();
+							if($studienplan->loadStudienplan($row->studienplan_id))
+							{
+								$studienordnung = new studienordnung();
+								if($studienordnung->loadStudienordnung($studienplan->studienordnung_id))
+								{
+									if($studienordnung->studiengang_kz == $prestudent->studiengang_kz)
+									{
+										$rt_obj = new reihungstest();
+										$rt_obj->load($row->reihungstest_id);
+										if(!isset($gesamtpunkte_arr[$rt_obj->studiensemester_kurzbz]))
+											$gesamtpunkte_arr[$rt_obj->studiensemester_kurzbz]=0;
+										$gesamtpunkte_arr[$rt_obj->studiensemester_kurzbz] += $row->punkte;
+									}
+								}
+								else
+								{
+									$return = false;
+									$errormsg = $studienordnung->errormsg;
+									$error = true;
+								}
+							}
+							else
+							{
+								$return = false;
+								$errormsg = $studienplan->errormsg;
+								$error = true;
+							}
+						}
 
-						$return = true;
-						$error = false;
-						$data = $gesamtpunkte;
-						$errormsg = 'Erfolgreich gespeichert';
+						if(!$error)
+						{
+							if(count(array_keys($gesamtpunkte_arr))>0)
+							{
+								$studiensemester = new studiensemester();
+								$stsem = $studiensemester->getYoungestFromArray(array_keys($gesamtpunkte_arr));
+								$gesamtpunkte = $gesamtpunkte_arr[$stsem];
+							}
+							else
+								$gesamtpunkte = '0';
+							$return = true;
+							$error = false;
+							$data = $gesamtpunkte;
+							$errormsg = 'Erfolgreich gespeichert';
+						}
 					}
 					else
 					{

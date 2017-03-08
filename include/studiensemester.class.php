@@ -662,7 +662,7 @@ class studiensemester extends basis_db
 	public function getFinished($limit = null)
 	{
 		$qry = "SELECT * FROM public.tbl_studiensemester WHERE start <= NOW() ORDER BY ende DESC";
-		
+
 		if(!is_null($limit) && is_numeric($limit))
 			$qry.=' LIMIT '.$limit;
 
@@ -768,22 +768,22 @@ class studiensemester extends basis_db
 			{
 				if (!isset($this->begin))
 					$this->begin = new stdclass();
-				
+
 				$this->begin->start = mktime(0, 0, 0,
 					mb_substr($row->start, 5, 2),
 					mb_substr($row->start, 8, 2),
 					mb_substr($row->start, 0, 4)
 				);
-				
+
 				if (!isset($this->end))
 					$this->ende = new stdclass();
-				
+
 				$this->ende->ende = mktime(0, 0, 0,
 					mb_substr($row->ende, 5, 2),
 					mb_substr($row->ende, 8, 2),
 					mb_substr($row->ende, 0, 4)
 				);
-				
+
 				return true;
 			}
 			else
@@ -973,6 +973,45 @@ class studiensemester extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Ermitteln des folgenden Studiensemesters';
+			return false;
+		}
+	}
+
+	/**
+	 * Liefert aus einer Liste von Studiensemester das neueste Studiensemester zurueck
+	 * @param $studiensemester_arr Array mit Studiensemester_kurzbz
+	 * @return Studiensemester aus dem Array das zuletzt startet
+	 */
+	public function getYoungestFromArray($studiensemester_arr)
+	{
+		$qry = "SELECT
+					*
+				FROM
+					public.tbl_studiensemester
+				WHERE
+					studiensemester_kurzbz IN(".$this->db_implode4SQL($studiensemester_arr).")
+				ORDER BY
+					start desc
+				LIMIT 1";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->start = $row->start;
+				$this->ende = $row->ende;
+				return $row->studiensemester_kurzbz;
+			}
+			else
+			{
+				$this->errormsg = 'Es wurde kein Studiensemester gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Ermitteln des Studiensemesters';
 			return false;
 		}
 	}
