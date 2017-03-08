@@ -98,20 +98,39 @@ class Templates extends FHC_Controller
 
 	public function newText()
 	{
-		$vorlage_kurzbz = $this->input->post('vorlage_kurzbz', TRUE);
-		$data = array
-		(
-			'vorlage_kurzbz' => $vorlage_kurzbz,
-			'studiengang_kz' => 0,
-			'version' => 1,
-			'oe_kurzbz' => 'etw'
-		);
-		$vorlagetext = $this->vorlagelib->insertVorlagetext($data);
-		if ($vorlagetext->error)
-			show_error($vorlagetext->retval);
-		$vorlagestudiengang_id = $vorlagetext->retval;
-
-		redirect('/system/Templates/editText/'.$vorlagestudiengang_id);
+		$vorlage_kurzbz = $this->input->post('vorlage_kurzbz', true);
+		
+		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+		$this->OrganisationseinheitModel->addLimit(1);
+		$this->OrganisationseinheitModel->addOrder('oe_kurzbz');
+		$resultOE = $this->OrganisationseinheitModel->loadWhere(array('aktiv' => true, 'oe_parent_kurzbz' => null));
+		
+		if ($resultOE->error)
+			show_error($resultOE->retval);
+		
+		if (hasData($resultOE))
+		{
+			$orgeinheit_kurzbz = $resultOE->retval[0]->oe_kurzbz;
+			
+			$data = array (
+				'vorlage_kurzbz' => $vorlage_kurzbz,
+				'studiengang_kz' => 0,
+				'version' => 1,
+				'oe_kurzbz' => $orgeinheit_kurzbz
+			);
+			
+			$vorlagetext = $this->vorlagelib->insertVorlagetext($data);
+			if ($vorlagetext->error)
+				show_error($vorlagetext->retval);
+			
+			$vorlagestudiengang_id = $vorlagetext->retval;
+			
+			redirect('/system/Templates/editText/'.$vorlagestudiengang_id);
+		}
+		else
+		{
+			show_error('No valid organisation unit found');
+		}
 	}
 
 	public function editText($vorlagestudiengang_id)
