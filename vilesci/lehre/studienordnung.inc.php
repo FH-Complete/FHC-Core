@@ -139,7 +139,7 @@ switch($method)
 				$selected=' selected';
 			else
 				$selected='';
-			echo '<option value="'.$row->akadgrad_id.'"'.$selected.'>'.$row->akadgrad_kurzbz.'</option>';
+			echo '<option value="'.$row->akadgrad_id.'"'.$selected.'>'.$row->akadgrad_kurzbz.' - '.$row->titel.'</option>';
 		}
 		echo '
 					</select>
