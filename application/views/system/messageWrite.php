@@ -22,7 +22,7 @@
 						}
 					?>
 					<br>
-					Subject: <input type="text" value="" name="subject" size="70"><br/>
+					Subject: <input id="subject" type="text" value="" name="subject" size="70"><br/>
 					<textarea id="bodyTextArea" name="body"></textarea>
 				<?php
 					if (isset($variables))
@@ -48,7 +48,7 @@
 			
 			<div class="row">
 				<div class="span4">
-					<button type="submit">Send</button>
+					<button id="sendButton" type="button">Send</button>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					<?php echo $this->templatelib->widget("Vorlage_widget", array("title" => "Vorlage")); ?>
 				</div>
@@ -128,6 +128,20 @@
 			if ($("#refresh"))
 			{
 				$("#refresh").click(tinymcePreviewSetContent);
+			}
+			
+			if ($("#sendButton") && $("#sendForm"))
+			{
+				$("#sendButton").click(function() {
+					if ($("#subject") && $("#subject").val() != '' && tinyMCE.get("bodyTextArea").getContent() != '')
+					{
+						$("#sendForm").submit();
+					}
+					else
+					{
+						alert("Subject and text are required fields!");
+					}
+				});
 			}
 		});
 		
