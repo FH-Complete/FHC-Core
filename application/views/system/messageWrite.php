@@ -3,7 +3,6 @@
 	<body>
 		<?php
 			$href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER["REQUEST_URI"]);
-			$href = substr($href, 0, strrpos($href, '?'));
 		?>
 		<form id="sendForm" method="post" action="<?php echo $href; ?>">
 			
@@ -163,6 +162,25 @@
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					alert(textStatus + " - " + errorThrown + " - " + jqXHR.responseText);
+				}
+			});
+		}
+		
+		function getVorlageText(vorlage_kurzbz)
+		{
+			<?php
+				$url = str_replace("/system/Messages/write", "/system/Messages/getVorlage", $_SERVER["REQUEST_URI"]);
+			?>
+			
+			$.ajax({
+				dataType: "json",
+				url: "<?php echo $url; ?>",
+				data: {"vorlage_kurzbz": vorlage_kurzbz},
+				success: function(data, textStatus, jqXHR) {
+					tinyMCE.get("bodyTextArea").setContent(data.retval[0].text);
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					alert(textStatus + " - " + errorThrown);
 				}
 			});
 		}
