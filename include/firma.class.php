@@ -682,15 +682,15 @@ class firma extends basis_db
 
 		if($filter!='')
 			$qry.= " and ( lower(tbl_firma.name) like lower('%".$this->db_escape($filter)."%')
-					OR lower(kurzbz) like lower('%".$this->db_escape($filter)."%')
+					OR lower(tbl_standort.kurzbz) like lower('%".$this->db_escape($filter)."%')
 
 					OR lower(tbl_adresse.name) like lower('%".$this->db_escape($filter)."%')
-					OR lower(plz) like lower('%".$this->db_escape($filter)."%')
-					OR lower(ort) like lower('%".$this->db_escape($filter)."%')
-					OR lower(strasse) like lower('%".$this->db_escape($filter)."%')
+					OR lower(tbl_adresse.plz) like lower('%".$this->db_escape($filter)."%')
+					OR lower(tbl_adresse.ort) like lower('%".$this->db_escape($filter)."%')
+					OR lower(tbl_adresse.strasse) like lower('%".$this->db_escape($filter)."%')
 
 					OR lower(tbl_standort.bezeichnung) like lower('%".$this->db_escape($filter)."%')
-					OR lower(anmerkung) like lower('%".$this->db_escape($filter)."%')
+					OR lower(tbl_firma.anmerkung) like lower('%".$this->db_escape($filter)."%')
 					".(is_numeric($filter)?" OR tbl_firma.firma_id='".$this->db_escape($filter)."'":'')."
 					OR tbl_firma.firma_id IN (SELECT firma_id FROM public.tbl_firmatag
 											  WHERE firma_id=tbl_firma.firma_id AND lower(tag) like lower('%".$this->db_escape($filter)."%'))
