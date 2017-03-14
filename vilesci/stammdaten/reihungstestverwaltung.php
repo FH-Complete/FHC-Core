@@ -1093,8 +1093,11 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 				JOIN public.tbl_person USING(person_id)
 				JOIN public.tbl_studiengang USING(studiengang_kz)
 				JOIN public.tbl_rt_person USING(person_id)
+				JOIN lehre.tbl_studienplan ON(tbl_rt_person.studienplan_id=tbl_studienplan.studienplan_id)
+				JOIN lehre.tbl_studienordnung ON(tbl_studienplan.studienordnung_id=tbl_studienordnung.studienordnung_id)
 			WHERE
-				tbl_rt_person.rt_id=".$db->db_add_param($reihungstest_id, FHC_INTEGER);
+				tbl_studienordnung.studiengang_kz=tbl_prestudent.studiengang_kz
+				AND tbl_rt_person.rt_id=".$db->db_add_param($reihungstest_id, FHC_INTEGER);
 
 	if($result = $db->db_query($qry))
 	{
