@@ -22,12 +22,12 @@
  */
 /*******************************************************************************************************
  *				abgabe_lektor
- * 		abgabe_lektor ist die Lektorenseite des Abgabesystems 
+ * 		abgabe_lektor ist die Lektorenseite des Abgabesystems
  * 			fuer Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
 require_once('../../../config/cis.config.inc.php');
-require_once('../../../include/basis_db.class.php');			
+require_once('../../../include/basis_db.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/datum.class.php');
@@ -40,7 +40,7 @@ $p = new phrasen($sprache);
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
-	
+
 $i=0;
 $irgendwas='';
 foreach($_POST as $key=>$value)
@@ -50,7 +50,7 @@ foreach($_POST as $key=>$value)
 		$irgendwas.=substr($key, 3).";";
 		//echo $irgendwas."<br>";
 		$i++;
-	}	
+	}
 }
 $irgendwas = (isset($_POST['irgendwas'])?$_POST['irgendwas']:$irgendwas);
 $projektarbeit_id = (isset($_POST['projektarbeit_id'])?$_POST['projektarbeit_id']:'-1');
@@ -83,23 +83,21 @@ if($irgendwas=='')
 
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre/abgabetool'))
 {
-	echo "foo";
 	// Pruefen ob der Lektor zu diesen Projektarbeiten zugeteilt ist
 	$ids = explode(";",$irgendwas);
 	foreach($ids as $id)
 	{
 		if($id!='')
 		{
-			$qry = "SELECT 
+			$qry = "SELECT
 					projektarbeit_id
-				FROM 
+				FROM
 					lehre.tbl_projektbetreuer
 					JOIN public.tbl_benutzer USING(person_id)
-				 WHERE projektarbeit_id=".$db->db_add_param($id)." 
+				 WHERE projektarbeit_id=".$db->db_add_param($id)."
 				AND uid=".$db->db_add_param($user);
 			if($result = $db->db_query($qry))
 			{
-				echo "bar".$id;
 				if($db->db_num_rows($result)==0)
 				{
 					die('Sie sind nicht zu dieser Projektarbeit zugeteilt');
@@ -116,10 +114,10 @@ if(isset($_POST["schick"]))
 	//var_dump($termine);
 	for($j=0;$j<count($termine)-1;$j++)
 	{
-		$qrychk="SELECT * FROM campus.tbl_paabgabe 
+		$qrychk="SELECT * FROM campus.tbl_paabgabe
 			WHERE projektarbeit_id=".$db->db_add_param($termine[$j])."
 			AND paabgabetyp_kurzbz=".$db->db_add_param($paabgabetyp_kurzbz)."
-			AND fixtermin=".($fixtermin==1?'true':'false')." 
+			AND fixtermin=".($fixtermin==1?'true':'false')."
 			AND datum=".$db->db_add_param($datum)."
 			AND kurzbz=".$db->db_add_param($kurzbz);
 
@@ -130,13 +128,13 @@ if(isset($_POST["schick"]))
 			{
 				echo $p->t('abgabetool/terminVorhanden');
 			}
-			else 
+			else
 			{
 				//pruefen, ob user zweitbetreuer
-				$qry2="SELECT * FROM lehre.tbl_projektbetreuer WHERE 
+				$qry2="SELECT * FROM lehre.tbl_projektbetreuer WHERE
 					projektarbeit_id=".$db->db_add_param($termine[$j])."
 					AND betreuerart_kurzbz='Zweitbegutachter'
-					AND person_id=(SELECT person_id FROM campus.vw_mitarbeiter 
+					AND person_id=(SELECT person_id FROM campus.vw_mitarbeiter
 						WHERE uid=".$db->db_add_param($user).")";
 
 				$result2=$db->db_query($qry2);
@@ -144,8 +142,8 @@ if(isset($_POST["schick"]))
 				if($db->db_num_rows($result2)==0)
 				{
 					//echo "neuer Termin";
-					$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, 
-						fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
+					$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz,
+						fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum)
 						VALUES (".$db->db_add_param($termine[$j]).", ".
 						$db->db_add_param($paabgabetyp_kurzbz).", ".
 						($fixtermin==1?'true':'false').", ".
@@ -155,9 +153,9 @@ if(isset($_POST["schick"]))
 					//echo $qry;
 					if(!$result=$db->db_query($qry))
 					{
-						echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerTerminEintragen')."</font><br>&nbsp;";	
+						echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerTerminEintragen')."</font><br>&nbsp;";
 					}
-					else 
+					else
 					{
 						$row=$db->db_fetch_object($result);
 						$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz=".$db->db_add_param($paabgabetyp_kurzbz);
@@ -165,7 +163,7 @@ if(isset($_POST["schick"]))
 						{
 							$row_typ=$db->db_fetch_object($result_typ);
 						}
-						else 
+						else
 						{
 							$row_typ->bezeichnung='';
 						}
@@ -178,23 +176,23 @@ if(isset($_POST["schick"]))
 							"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Masterarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Masterarbeitsabgabe\n--------------------------------------------------------------------------");
 							if(!$mail->send())
 							{
-								echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailStudent')." ($row_std->uid)</font><br>&nbsp;";	
+								echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailStudent')." ($row_std->uid)</font><br>&nbsp;";
 							}
-							else 
+							else
 							{
 								echo $p->t('abgabetool/mailVerschicktAn').": ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
 							}
 						}
 					}
 				}
-				else 
+				else
 				{
-					echo $p->t('abgabetool/zweitbetreuerBei')." ".$termine[$j]." <br>";	
+					echo $p->t('abgabetool/zweitbetreuerBei')." ".$termine[$j]." <br>";
 				}
 				$command='';
 			}
 		}
-		else 
+		else
 		{
 			echo $p->t('global/fehlerBeimLesenAusDatenbank');
 		}
@@ -235,10 +233,10 @@ while ($row_typ=@$db->db_fetch_object($result_typ))
 	{
 		$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."'>$row_typ->bezeichnung</option>";
 	}
-}		
+}
 $htmlstr .= "		</select></td>\n";
-$htmlstr .= "		<td><input  type='text' name='kurzbz' size='60' maxlength='256'></td>\n";		
-$htmlstr .= "		<td>&nbsp;</td>\n";		
+$htmlstr .= "		<td><input  type='text' name='kurzbz' size='60' maxlength='256'></td>\n";
+$htmlstr .= "		<td>&nbsp;</td>\n";
 $htmlstr .= "		<td><input type='submit' name='schick' value='".$p->t('global/speichern')."'></td>";
 
 $htmlstr .= "</tr>\n";
