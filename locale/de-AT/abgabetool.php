@@ -8,7 +8,7 @@ $this->phrasen['abgabetool/plagiatspruefung']='zur Plagiatsprüfung';
 $this->phrasen['abgabetool/studentenansicht']='Studierendenansicht';
 $this->phrasen['abgabetool/abgabetermine']='Abgabetermine';
 $this->phrasen['abgabetool/benoten']='benoten';
-$this->phrasen['abgabetool/fix']='fix'; // Fixtermin 
+$this->phrasen['abgabetool/fix']='fix'; // Fixtermin
 $this->phrasen['abgabetool/datum']='Datum'; // Datum für Terminabgabe
 $this->phrasen['abgabetool/abgabetyp']='Abgabetyp';
 $this->phrasen['abgabetool/details']='Details';
@@ -65,12 +65,13 @@ $this->phrasen['abgabetool/fehlerMailBegutachter']='Fehler beim Versenden des Ma
 $this->phrasen['abgabetool/fehlerBetreuerNichtGefundenKeinMail']='Betreuer nicht gefunden. Kein Mail verschickt!';
 $this->phrasen['abgabetool/keinPDF']='Upload ist keine pdf-Datei! Bitte wiederholen Sie den Fileupload.';
 $this->phrasen['abgabetool/dateiZuGross']='Die Datei ist zu groß! Maximale Dateigröße 15 MB';
+$this->phrasen['abgabetool/fehlerTerminVorbei']='Die Abgabefrist für diesen Termin ist bereits abgelaufen.';
 
-$this->phrasen['abgabetool/eidesstattlicheErklaerung']='Ich erkläre hiermit an Eides statt, dass ich die vorliegende Arbeit selbständig angefertigt habe. 
-Die aus fremden Quellen direkt oder indirekt übernommenen Gedanken sind als solche kenntlich gemacht. 
+$this->phrasen['abgabetool/eidesstattlicheErklaerung']='Ich erkläre hiermit an Eides statt, dass ich die vorliegende Arbeit selbständig angefertigt habe.
+Die aus fremden Quellen direkt oder indirekt übernommenen Gedanken sind als solche kenntlich gemacht.
 Die Arbeit wurde bisher weder in gleicher noch in ähnlicher Form einer anderen Prüfungsbehörde vorgelegt und auch noch nicht veröffentlicht.<br>
-Ich räume der Fachhochschule Technikum Wien das Recht ein, das/die übermittelte/n Dokument/e elektronisch zu speichern und in Datennetzen öffentlich zugänglich zu machen. 
-Ich räume der Fachhochschule Technikum Wien ferner das Recht zur Konvertierung zum Zwecke der Langzeitarchivierung unter Beachtung der Bewahrung des Inhalts ein. 
+Ich räume der Fachhochschule Technikum Wien das Recht ein, das/die übermittelte/n Dokument/e elektronisch zu speichern und in Datennetzen öffentlich zugänglich zu machen.
+Ich räume der Fachhochschule Technikum Wien ferner das Recht zur Konvertierung zum Zwecke der Langzeitarchivierung unter Beachtung der Bewahrung des Inhalts ein.
 Ich erkläre außerdem, dass von mir die urheber- und lizenzrechtliche Seite (Copyright) geklärt wurde und Rechte Dritter der Publikation nicht entgegenstehen.';
 $this->phrasen['abgabetool/gelesenUndAkzeptiert']='Gelesen und akzeptiert';
 $this->phrasen['abgabetool/erklaerungNichtAkzeptiert']='Erklärung nicht akzeptiert';
