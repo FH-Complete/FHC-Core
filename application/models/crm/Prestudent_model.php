@@ -58,4 +58,20 @@ class Prestudent_model extends DB_Model
 		
 		return $this->execQuery($query, $parametersArray);
 	}
+	
+	/**
+	 * 
+	 */
+	public function updateAufnahmegruppe($prestudentIdArray, $aufnahmegruppe)
+	{	
+		return $this->execQuery(
+			'UPDATE public.tbl_prestudent
+				SET aufnahmegruppe_kurzbz = ?
+			  WHERE prestudent_id IN ?',
+			array(
+				$aufnahmegruppe,
+				$prestudentIdArray
+			)
+        );
+	}
 }
