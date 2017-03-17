@@ -156,10 +156,10 @@ if($redirectPasswordChange)
 $sprache = getSprache();
 $p = new phrasen($sprache);
 $db = new basis_db();
-?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+?><!DOCTYPE HTML>
 <html>
 <head>
-	<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
 	<title>CIS - <?php echo CAMPUS_NAME; ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link rel="stylesheet" href="../skin/jquery.css" type="text/css">
