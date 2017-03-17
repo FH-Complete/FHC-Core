@@ -36,16 +36,23 @@ class Users extends VileSci_Controller
 			$users = $returnUsers->retval;
 		}
 		
-		$viewData = array(
-			'studiengang' => $studiengang,
-			'studiensemester' => $studiensemester,
-			'gruppe' => $gruppe,
-			'reihungstest' => $reihungstest,
-			'stufe' => $stufe,
-			'users' => $users
-		);
-		
-		$this->load->view('system/users', $viewData);
+		if ($returnUsers == null || isSuccess($returnUsers))
+		{
+			$viewData = array(
+				'studiengang' => $studiengang,
+				'studiensemester' => $studiensemester,
+				'gruppe' => $gruppe,
+				'reihungstest' => $reihungstest,
+				'stufe' => $stufe,
+				'users' => $users
+			);
+			
+			$this->load->view('system/users', $viewData);
+		}
+		else if (isError($returnUsers))
+		{
+			show_error($returnUsers->retval);
+		}
 	}
 	
 	public function linkToStufe()

@@ -27,7 +27,6 @@ class Usersfilters_widget extends Widget
 
 		// Studiengaenge
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
-		$this->StudiengangModel->resetQuery();
 		$this->StudiengangModel->addOrder('kurzbzlang');
 		$studiengaenge = $this->StudiengangModel->loadWhere(array('aktiv' => true));
 		if (hasData($studiengaenge))
