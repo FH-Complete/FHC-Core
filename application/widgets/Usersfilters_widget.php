@@ -8,25 +8,26 @@ class Usersfilters_widget extends Widget
 	private $gruppe;
 	private $reihungstest;
 	private $stufe;
-	
+
 	public function __construct($name, $args)
 	{
 		// Calling daddy
 		parent::__construct($name, $args);
-		
+
 		// Loads helper message to manage returning messages
 		$this->load->helper('message');
-		
+
 		// Initialising properties
 		$this->_setProperties($args);
 	}
-	
+
     public function display($widgetData)
 	{
 		$errors = array(); // Array containing possible errors
-		
+
 		// Studiengaenge
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->StudiengangModel->resetQuery();
 		$this->StudiengangModel->addOrder('kurzbzlang');
 		$studiengaenge = $this->StudiengangModel->loadWhere(array('aktiv' => true));
 		if (hasData($studiengaenge))
@@ -42,7 +43,7 @@ class Usersfilters_widget extends Widget
 		{
 			$errors[] = $studiengaenge; // Adding the error to the array of errors
 		}
-		
+
 		// Studiensemester
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		$this->StudiengangModel->addSelect('studiensemester_kurzbz, studiensemester_kurzbz AS beschreibung');
@@ -60,7 +61,7 @@ class Usersfilters_widget extends Widget
 		{
 			$errors[] = $studiensemester; // Adding the error to the array of errors
 		}
-		
+
 		// Gruppen
 		$this->load->model('organisation/Gruppe_model', 'GruppeModel');
 		$this->GruppeModel->addOrder('beschreibung');
@@ -77,7 +78,7 @@ class Usersfilters_widget extends Widget
 		{
 			$errors[] = $gruppen; // Adding the error to the array of errors
 		}
-		
+
 		// Stufe
 		$this->load->model('crm/Reihungstest_model', 'ReihungstestModel');
 		$this->ReihungstestModel->addSelect('DISTINCT ON(stufe) stufe, stufe AS beschreibung');
@@ -95,7 +96,7 @@ class Usersfilters_widget extends Widget
 		{
 			$errors[] = $stufen; // Adding the error to the array of errors
 		}
-		
+
 		// Reihungstest
 		$reihungstest = success(array()); // default value empty array
 		// If the parameters studiengang or studiensemester are given and are not empty
@@ -105,7 +106,7 @@ class Usersfilters_widget extends Widget
 			$this->ReihungstestModel->resetQuery(); // cleans any previous setting
 			$this->ReihungstestModel->addSelect('reihungstest_id, concat(datum, \' \',  uhrzeit, \' \', anmerkung) AS beschreibung');
 			$this->ReihungstestModel->addOrder('datum', 'DESC');
-			
+
 			$parametersArray = array();
 			if ($this->studiengang != null)
 			{
@@ -115,14 +116,14 @@ class Usersfilters_widget extends Widget
 			{
 				$parametersArray['studiensemester_kurzbz'] = $this->studiensemester;
 			}
-			
+
 			$reihungstest = $this->ReihungstestModel->loadWhere($parametersArray);
 			if (isError($reihungstest))
 			{
 				$errors[] = $reihungstest; // Adding the error to the array of errors
 			}
 		}
-		
+
 		if (!isError($reihungstest))
 		{
 			// Adding an empty element at the beginning
@@ -131,7 +132,7 @@ class Usersfilters_widget extends Widget
 			$emptyElement->beschreibung = 'Select a reihungstest...';
 			array_unshift($reihungstest->retval, $emptyElement);
 		}
-		
+
 		// Data to be used in the widget view
 		$viewData = array(
 			'studiengaenge' => $studiengaenge->retval,
@@ -146,11 +147,11 @@ class Usersfilters_widget extends Widget
 			'selectedReihungstest' => $this->reihungstest,
 			'selectedStufe' => $this->stufe
 		);
-		
+
 		// Loads widget view
 		$this->view('widgets/usersfilters', $viewData);
     }
-    
+
     /**
      * Initialising properties
      */
