@@ -249,12 +249,19 @@ class lehrveranstaltung extends basis_db
 	}
 
 	/**
-	 * Liefert alle Lehrveranstaltungen zu einem Studiengang/Semester
-	 * @param $studiengang_kz
-	 * @param $semester
+	 * Liefert alle Lehrveranstaltungen die den gefilterten Attributen entsprechen
+	 * @param $studiengang_kz integer Kennzahl des Studiengangs.
+	 * @param $semester integer Ausbildungssemester.
+	 * @param $lehreverzeichnis string LehreVZ
+	 * @param $lehre boolean Lehre
+	 * @param $aktiv boolean
+	 * @param $sort smallint Sortierung
+	 * @param $oe_kurzbz string Organisationseinheit
+	 * @param $lehrtyp string lehrtyp_kurzbz
+	 * @param $orgform string Organisationsform
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_lva($studiengang_kz, $semester = null, $lehreverzeichnis = null, $lehre = null, $aktiv = null, $sort = null, $oe_kurzbz=null, $lehrtyp=null, $orgform=null)
+	public function load_lva($studiengang_kz=null, $semester = null, $lehreverzeichnis = null, $lehre = null, $aktiv = null, $sort = null, $oe_kurzbz=null, $lehrtyp=null, $orgform=null)
 	{
 		//Variablen pruefen
 		if($semester == "null")
@@ -263,7 +270,7 @@ class lehrveranstaltung extends basis_db
 		if($lehreverzeichnis == "null")
 			$lehreverzeichnis = null;
 
-		if (!is_numeric($studiengang_kz) || $studiengang_kz == '')
+		if (!is_null($studiengang_kz) && (!is_numeric($studiengang_kz) && $studiengang_kz != ''))
 		{
 			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
 			return false;
@@ -284,7 +291,10 @@ class lehrveranstaltung extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung where studiengang_kz=" . $this->db_add_param($studiengang_kz, FHC_INTEGER);
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE 1=1";
+
+		if (!is_null($studiengang_kz))
+			$qry.=" AND studiengang_kz=" . $this->db_add_param($studiengang_kz, FHC_INTEGER);
 
 		//Select Befehl zusammenbauen
 		if (!is_null($lehreverzeichnis))
