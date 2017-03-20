@@ -21,8 +21,8 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 /*******************************************************************************************************
- *		Autocomplete 
- * 		projektabgabe ermöglicht den Download aller Abgaben eines Stg. 
+ *		Autocomplete
+ * 		projektabgabe ermöglicht den Download aller Abgaben eines Stg.
  * 			fuer Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 	header( 'Expires:  -1' );
@@ -35,20 +35,20 @@
 	require_once('../../config/vilesci.config.inc.php');
   	require_once('../../include/functions.inc.php');
 	include_once('../../include/basis_db.class.php');
-	require_once('../../include/benutzerberechtigung.class.php');	
+	require_once('../../include/benutzerberechtigung.class.php');
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung
 // ------------------------------------------------------------------------------------------
 
 	if (!$db = new basis_db())
 		die('Datenbank kann nicht geoeffnet werden.  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-		
+
 	if (!$uid = get_uid())
 		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 	$rechte =  new benutzerberechtigung();
-	$rechte->getBerechtigungen($uid);	
-		
+	$rechte->getBerechtigungen($uid);
+
 // ------------------------------------------------------------------------------------------
 // Initialisierung
 // ------------------------------------------------------------------------------------------
@@ -58,13 +58,13 @@
 // Parameter Aufruf uebernehmen
 // ------------------------------------------------------------------------------------------
   	$oe_kurzbz=trim((isset($_REQUEST['oe_kurzbz']) ? $_REQUEST['oe_kurzbz']:''));
-  	$funktion_kurzbz=trim((isset($_REQUEST['funktion_kurzbz']) ? $_REQUEST['funktion_kurzbz']:''));	
-  	$nation=trim((isset($_REQUEST['nation']) ? $_REQUEST['nation']:''));	
-  	$plz=trim((isset($_REQUEST['plz']) ? $_REQUEST['plz']:''));	
-	
+  	$funktion_kurzbz=trim((isset($_REQUEST['funktion_kurzbz']) ? $_REQUEST['funktion_kurzbz']:''));
+  	$nation=trim((isset($_REQUEST['nation']) ? $_REQUEST['nation']:''));
+  	$plz=trim((isset($_REQUEST['plz']) ? $_REQUEST['plz']:''));
+
   	$work=trim(isset($_REQUEST['work'])?$_REQUEST['work']:(isset($_REQUEST['ajax'])?$_REQUEST['ajax']:false));
 	$work=strtolower($work);
-	
+
 // ------------------------------------------------------------------------------------------
 //	Datenlesen
 // ------------------------------------------------------------------------------------------
@@ -83,7 +83,7 @@ cellSeparator (default value: "|")
 				exit();
 			if (is_null($gemeinde) || $gemeinde=='')
 				exit();
-				
+
 			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($gemeinde))));
 			$pWhere=" upper(gemeinde) like '%".addslashes($matchcode)."%' ";
 			$pSql="SELECT distinct gemeinde
@@ -92,14 +92,14 @@ cellSeparator (default value: "|")
 					ORDER BY nation,gemeinde ";
 
 				$pArt='';
-				$pDistinct=true; 
+				$pDistinct=true;
 				$pFields='';
 				$pTable='';
 				$matchcode='';
 				$pWhere='';
 				$pOrder='';
 				$pLimit='';
-				
+
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 			{
 				exit(' |'.$db->errormsg."\n");
@@ -107,7 +107,7 @@ cellSeparator (default value: "|")
 			for ($i=0;$i<count($oRresult);$i++)
 				echo html_entity_decode($oRresult[$i]->gemeinde).'|'.html_entity_decode($nation)."\n";
 			break;
-	
+
 		case 'plz':
 		 	$plz=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 		 	$nation=trim((isset($_REQUEST['nation']) ? $_REQUEST['nation']:''));
@@ -115,7 +115,7 @@ cellSeparator (default value: "|")
 				exit();
 			if (is_null($plz) || $plz=='')
 				exit();
-				
+
 			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($plz))));
 			$pWhere=" to_char(plz,'999999') like '%".addslashes($matchcode)."%' ";
 			$pSql="SELECT distinct plz
@@ -124,7 +124,7 @@ cellSeparator (default value: "|")
 					ORDER BY plz ";
 
 				$pArt='';
-				$pDistinct=true; 
+				$pDistinct=true;
 				$pFields='';
 				$pTable='';
 				$matchcode='';
@@ -146,7 +146,7 @@ cellSeparator (default value: "|")
 				exit();
 			if (is_null($ort) || $ort=='')
 				exit();
-				
+
 			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($ort))));
 			$pWhere=" upper(ort) like '%".addslashes($matchcode)."%' ".($nation?" and nation='".addslashes($nation)."'":'');
 			$pSql="SELECT distinct plz,ort
@@ -155,7 +155,7 @@ cellSeparator (default value: "|")
 					ORDER BY plz,ort ";
 
 				$pArt='';
-				$pDistinct=true; 
+				$pDistinct=true;
 				$pFields='';
 				$pTable='';
 				$matchcode='';
@@ -170,20 +170,20 @@ cellSeparator (default value: "|")
 				echo html_entity_decode($oRresult[$i]->ort).'|'.html_entity_decode($oRresult[$i]->plz)."\n";
 			break;
 
-			
+
 
 		case 'position':
 		 	$position=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-				
+
 			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($position))));
 			$pWhere=" upper(position) like '%".addslashes($matchcode)."%' ".($funktion_kurzbz?" and funktion_kurzbz='".addslashes($funktion_kurzbz)."'":'');
-			$pSql="SELECT distinct funktion_kurzbz,position 
+			$pSql="SELECT distinct funktion_kurzbz,position
 					FROM public.tbl_personfunktionstandort
 					where ". $pWhere ."
 					ORDER BY funktion_kurzbz,position ";
 
 				$pArt='';
-				$pDistinct=true; 
+				$pDistinct=true;
 				$pFields='';
 				$pTable='';
 				$matchcode='';
@@ -197,8 +197,8 @@ cellSeparator (default value: "|")
 					exit;
 
 				$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($position))));
-				$pWhere=" upper(position) like '%".addslashes($matchcode)."%'";				
-				$pSql="SELECT distinct funktion_kurzbz,position 
+				$pWhere=" upper(position) like '%".addslashes($matchcode)."%'";
+				$pSql="SELECT distinct funktion_kurzbz,position
 						FROM public.tbl_personfunktionstandort
 						where ". $pWhere ."
 						ORDER BY funktion_kurzbz,position ";
@@ -211,7 +211,7 @@ cellSeparator (default value: "|")
 			break;
 
 		case 'work_firmen_search':
-			$json=array();	
+			$json=array();
 			$berechtigung_kurzbz = 'basis/firma:begrenzt';
 			if(!$rechte->isBerechtigt($berechtigung_kurzbz))
 				exit(json_encode(array_push($json, array ('oFirma_id' => '','oName' =>'keine Berechtigung'))));
@@ -223,17 +223,17 @@ cellSeparator (default value: "|")
 			$qry.=" FROM public.tbl_firma,  public.tbl_standort  ";
 			$qry.=" left outer join public.tbl_adresse  on ( tbl_adresse.adresse_id=tbl_standort.adresse_id ) ";
 			$qry.=" WHERE tbl_standort.firma_id=tbl_firma.firma_id ";
-	
+
 			if($filter!='')
-				$qry.= " and ( lower(tbl_firma.name) like lower('%$filter%') 
-						OR lower(kurzbz) like lower('%$filter%') 			
-						OR lower(tbl_adresse.strasse) like lower('%$filter%') 
-						OR lower(bezeichnung) like lower('%$filter%') 
-						OR lower(anmerkung) like lower('%$filter%')
+				$qry.= " and ( lower(tbl_firma.name) like lower('%$filter%')
+						OR lower(kurzbz) like lower('%$filter%')
+						OR lower(tbl_adresse.strasse) like lower('%$filter%')
+						OR lower(bezeichnung) like lower('%$filter%')
+						OR lower(tbl_firma.anmerkung) like lower('%$filter%')
 						".(is_numeric($filter)?" OR tbl_firma.firma_id='$filter'":'')."
 						 ) ";
 
-			
+
 			if($firmentyp_kurzbz!='')
 				$qry.=" and firmentyp_kurzbz='".addslashes($firmentyp_kurzbz)."'";
 			$qry.=" ORDER BY tbl_firma.name ";
@@ -242,7 +242,7 @@ cellSeparator (default value: "|")
 				$qry.=" limit 350 ";
 
 			$pArt='';
-			$pDistinct=false; 
+			$pDistinct=false;
 			$pFields='';
 			$pTable='';
 			$matchcode='';
@@ -253,10 +253,10 @@ cellSeparator (default value: "|")
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 			{
 				array_push($json, array ('oFirma_id' => '','oName' => $db->errormsg ));
-			}	
+			}
 			else if ($oRresult)
 			{
-				for ($i=0;$i<count($oRresult);$i++) 
+				for ($i=0;$i<count($oRresult);$i++)
 				{
 					array_push($json, array ('oFirma_id' => $oRresult[$i]->firma_id,'oName' => $oRresult[$i]->name ));
 				}
@@ -264,17 +264,17 @@ cellSeparator (default value: "|")
 			else
 			{
 				array_push($json, array ('oFirma_id' => '','oName' => 'keine Daten gefunden!' ));
-			}	
+			}
 			echo json_encode($json);
 			break;
 
 		case 'tags':
 			$tag=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
-			
+
 		 	$pWhere=" upper(tag) like upper('%".addslashes($tag)."%')";
-			
+
 			$pArt='select';
-			$pDistinct=false; 
+			$pDistinct=false;
 			$pFields='tag';
 			$pTable='public.tbl_tag';
 			$matchcode='';
@@ -283,7 +283,7 @@ cellSeparator (default value: "|")
 			$pSql='';
 			if (!$result=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 				exit(' |'.$db->errormsg."\n");
-			
+
 			if(is_array($result))
 			{
                             $json=array();
@@ -296,13 +296,13 @@ cellSeparator (default value: "|")
                             echo json_encode($json);
 			}
 			break;
-			
+
 		// Person - FH Technikum suche
 		case 'person':
 		 	$person_id=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($person_id) || $person_id=='')
 				exit('person_id wurde nicht übergeben!');
-			
+
 			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($person_id))));
 			$pWhere=" aktiv ";
 			if ($person_id)
@@ -313,20 +313,20 @@ cellSeparator (default value: "|")
 				$pWhere.="	or	UPPER(trim(vorname)) like '%".addslashes($matchcode)."%'  ";
 				$pWhere.="	or	UPPER(trim(nachname || ' ' || vorname)) like '%".addslashes($matchcode)."%'  ";
 				$pWhere.="	or	UPPER(trim(vorname || ' ' || nachname)) like '%".addslashes($matchcode)."%' ) ";
-			}		
+			}
 			if (!empty($oe_kurzbz))
-			{	
-				$pSql="SELECT vw_benutzer.uid,vw_benutzer.person_id,vw_benutzer.aktiv,uid,person_id,titelpre,anrede,vorname,nachname,vornamen,titelpost,funktion_kurzbz 
-					FROM public.tbl_benutzerfunktion JOIN campus.vw_benutzer USING(uid) 
+			{
+				$pSql="SELECT vw_benutzer.uid,vw_benutzer.person_id,vw_benutzer.aktiv,uid,person_id,titelpre,anrede,vorname,nachname,vornamen,titelpost,funktion_kurzbz
+					FROM public.tbl_benutzerfunktion JOIN campus.vw_benutzer USING(uid)
 					where ". $pWhere ."
-					and (funktion_kurzbz='oezuordnung') 
+					and (funktion_kurzbz='oezuordnung')
 					and	oe_kurzbz IN(
-						WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
+						WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
 						(
-							SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+							SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit
 							WHERE upper(trim(oe_kurzbz))=upper(trim('".addslashes($oe_kurzbz)."'))
 							UNION ALL
-							SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+							SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes
 							WHERE o.oe_parent_kurzbz=oes.oe_kurzbz
 						)
 						SELECT oe_kurzbz
@@ -335,7 +335,7 @@ cellSeparator (default value: "|")
 					ORDER BY nachname, vorname, funktion_kurzbz ";
 
 				$pArt='';
-				$pDistinct=true; 
+				$pDistinct=true;
 				$pFields='';
 				$pTable='';
 				$matchcode='';
@@ -347,7 +347,7 @@ cellSeparator (default value: "|")
 			else
 			{
 				$pArt='select';
-				$pDistinct=true; 
+				$pDistinct=true;
 				$pFields='uid,person_id,titelpre,anrede,vorname,nachname,vornamen,aktiv,\'\' as funktion_kurzbz';
 				$pTable=' campus.vw_benutzer ';
 				$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($person_id))));
@@ -372,19 +372,19 @@ cellSeparator (default value: "|")
                             $json[]=$item;
 /*				echo html_entity_decode($oRresult[$i]->person_id).'|'
 									.trim($oRresult[$i]->anrede).'&nbsp;'.($oRresult[$i]->titelpre?html_entity_decode($oRresult[$i]->titelpre).'&nbsp;':'')
-									.html_entity_decode($oRresult[$i]->vorname).' '.html_entity_decode($oRresult[$i]->nachname).($oRresult[$i]->funktion_kurzbz?html_entity_decode($oRresult[$i]->funktion_kurzbz).'&nbsp;':'') 
+									.html_entity_decode($oRresult[$i]->vorname).' '.html_entity_decode($oRresult[$i]->nachname).($oRresult[$i]->funktion_kurzbz?html_entity_decode($oRresult[$i]->funktion_kurzbz).'&nbsp;':'')
 									.($oRresult[$i]->aktiv==true || $oRresult[$i]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
 					."\n"; */
 			}
                         echo json_encode($json);
 			break;
-			
+
 		// Lektor,Student - FHTW Suche im LV-Plan
 		case 'lektor_student':
 		 	$person_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
 			if (is_null($person_id) || $person_id=='')
 				exit('person_id wurde nicht übergeben!');
-			
+
 			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($person_id))));
 			$pWhere=" aktiv ";
 			if ($person_id)
@@ -395,20 +395,20 @@ cellSeparator (default value: "|")
 				$pWhere.="	or	UPPER(trim(vorname)) like '%".addslashes($matchcode)."%'  ";
 				$pWhere.="	or	UPPER(trim(nachname || ' ' || vorname)) like '%".addslashes($matchcode)."%'  ";
 				$pWhere.="	or	UPPER(trim(vorname || ' ' || nachname)) like '%".addslashes($matchcode)."%' ) ";
-			}		
+			}
 			/*if (!empty($oe_kurzbz))
-			{	
-				$pSql="SELECT vw_benutzer.uid,vw_benutzer.person_id,vw_benutzer.aktiv,uid,person_id,titelpre,anrede,vorname,nachname,vornamen,titelpost,funktion_kurzbz 
-					FROM public.tbl_benutzerfunktion JOIN campus.vw_benutzer USING(uid) 
+			{
+				$pSql="SELECT vw_benutzer.uid,vw_benutzer.person_id,vw_benutzer.aktiv,uid,person_id,titelpre,anrede,vorname,nachname,vornamen,titelpost,funktion_kurzbz
+					FROM public.tbl_benutzerfunktion JOIN campus.vw_benutzer USING(uid)
 					where ". $pWhere ."
-					and (funktion_kurzbz='oezuordnung') 
+					and (funktion_kurzbz='oezuordnung')
 					and	oe_kurzbz IN(
-						WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
+						WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
 						(
-							SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+							SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit
 							WHERE upper(trim(oe_kurzbz))=upper(trim('".addslashes($oe_kurzbz)."'))
 							UNION ALL
-							SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+							SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes
 							WHERE o.oe_parent_kurzbz=oes.oe_kurzbz
 						)
 						SELECT oe_kurzbz
@@ -417,7 +417,7 @@ cellSeparator (default value: "|")
 					ORDER BY nachname, vorname, funktion_kurzbz ";
 
 				$pArt='';
-				$pDistinct=true; 
+				$pDistinct=true;
 				$pFields='';
 				$pTable='';
 				$matchcode='';
@@ -429,18 +429,18 @@ cellSeparator (default value: "|")
 			else
 			{*/
 				$pArt='select';
-				$pDistinct=true; 
+				$pDistinct=true;
 				$pFields='uid,vorname,nachname,tbl_mitarbeiter.lektor,aktiv';
 				$pTable=' campus.vw_benutzer LEFT JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid)';
 				$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($person_id))));
 				$pOrder='lektor,nachname';
 				$pLimit='100';
 				$pSql='';
-			
+
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 				exit(' |'.$db->errormsg."\n");
 
-				
+
 			for ($i=0;$i<count($oRresult);$i++)
 			{
 				echo html_entity_decode($oRresult[$i]->uid).'|'
@@ -450,7 +450,7 @@ cellSeparator (default value: "|")
 					."\n";
 			}
 			break;
-			
+
 	    default:
    	   		echo " Funktion $work fehlt! ";
 			break;
