@@ -93,7 +93,20 @@ function loadMessages(person_id, fas_person_id)
 // ****
 function MessagesNewMessage()
 {
-	window.open('<?php echo APP_ROOT ?>index.ci.php/system/Messages/write/'+MessageSenderPersonID+'/'+MessagePersonID,'Message','');
+	var tree = parent.document.getElementById('student-tree');
+
+	if (tree.currentIndex == -1)
+	{
+		alert("Bitte markieren Sie zuerst eine Person");
+	}
+	else
+	{
+		var prestudentIdArray = getMultipleTreeCellText(tree, 'student-treecol-prestudent_id');
+		
+		var action = '<?php echo APP_ROOT ?>index.ci.php/system/Messages/write/' + MessageSenderPersonID;
+		
+		openWindowPostArray(action, 'prestudent_id', prestudentIdArray);
+	}
 }
 
 /**

@@ -30,7 +30,7 @@ if(!$result = @$db->db_query("SELECT statusgrund_id FROM public.tbl_prestudentst
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_prestudentstatus: '.$db->db_last_error().'</strong><br>';
 	else
-		echo 'public.tbl_prestudentstatus: Spalte statusgrund_id hinzugefuegt';
+		echo '<br>public.tbl_prestudentstatus: Spalte statusgrund_id hinzugefuegt';
 }
 
 // Berechtigungen fuer web User erteilen um Gebiete anlegen zu duerfen
@@ -46,10 +46,86 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 		if(!$db->db_query($qry))
 			echo '<strong>Testtool Berechtigungen: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'Web User fuer testtool.tbl_gebiet berechtigt';
+			echo '<br>Web User fuer testtool.tbl_gebiet berechtigt';
 	}
 }
 
+if(!$result = @$db->db_query("SELECT 1 FROM public.vw_msg_vars LIMIT 1"))
+{
+	// CREATE OR REPLACE VIEW public.vw_msg_vars and grants privileges
+	$qry = '
+		CREATE OR REPLACE VIEW public.vw_msg_vars AS (
+			SELECT DISTINCT ON(p.person_id, pr.prestudent_id) p.person_id,
+				   pr.prestudent_id AS prestudent_id,
+				   p.nachname AS "Nachname",
+				   p.vorname AS "Vorname",
+				   p.anrede AS "Anrede",
+				   a.strasse AS "Strasse",
+				   a.ort AS "Ort",
+				   a.plz AS "PLZ",
+				   a.gemeinde AS "Gemeinde",
+				   a.langtext AS "Nation",
+				   ke.kontakt AS "Email",
+				   kt.kontakt AS "Telefon",
+				   s.bezeichnung AS "Studiengang DE",
+				   s.english AS "Studiengang EN",
+				   st.bezeichnung AS "Typ",
+				   orgform_kurzbz AS "Orgform"
+			  FROM public.tbl_person p
+		 LEFT JOIN (
+						SELECT person_id,
+							   kontakt
+						  FROM public.tbl_kontakt
+						 WHERE zustellung = TRUE
+						   AND kontakttyp = \'email\'
+					  ORDER BY kontakt_id DESC
+				) ke USING(person_id)
+		 LEFT JOIN (
+						SELECT person_id,
+							   kontakt
+						  FROM public.tbl_kontakt
+						 WHERE zustellung = TRUE
+						   AND kontakttyp IN (\'telefon\', \'mobil\')
+					  ORDER BY kontakt_id DESC
+				) kt USING(person_id)
+		 LEFT JOIN (
+						SELECT person_id,
+							   strasse,
+							   ort,
+							   plz,
+							   gemeinde,
+							   langtext
+						  FROM public.tbl_adresse
+					 LEFT JOIN bis.tbl_nation ON(bis.tbl_nation.nation_code = public.tbl_adresse.nation)
+						 WHERE public.tbl_adresse.heimatadresse = TRUE
+					  ORDER BY adresse_id DESC
+				) a USING(person_id)
+		 LEFT JOIN public.tbl_prestudent pr USING(person_id)
+		INNER JOIN public.tbl_studiengang s USING(studiengang_kz)
+		INNER JOIN public.tbl_studiengangstyp st USING(typ)
+			 WHERE p.aktiv = TRUE
+		  ORDER BY p.person_id ASC, pr.prestudent_id ASC
+		);';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.vw_msg_vars view created';
+
+	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars TO web;';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on public.vw_msg_vars';
+
+	$qry = 'GRANT SELECT ON TABLE public.vw_msg_vars TO vilesci;';
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.vw_msg_vars: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on public.vw_msg_vars';
+}
 //Spalte anmerkung und rechnungsadresse in tbl_adresse
 if(!$result = @$db->db_query("SELECT rechnungsadresse FROM public.tbl_adresse LIMIT 1"))
 {
@@ -60,7 +136,19 @@ if(!$result = @$db->db_query("SELECT rechnungsadresse FROM public.tbl_adresse LI
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_adresse: '.$db->db_last_error().'</strong><br>';
 	else
-		echo 'public.tbl_adresse: Spalte rechnungsadresse und anmerkung hinzugefuegt';
+		echo '<br>public.tbl_adresse: Spalte rechnungsadresse und anmerkung hinzugefuegt';
+}
+
+//Spalte final tbl_projektarbeit zum Markieren der letztgueltigen Projektarbeit
+if(!$result = @$db->db_query("SELECT final FROM lehre.tbl_projektarbeit LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_projektarbeit ADD COLUMN final boolean NOT NULL DEFAULT true;
+		COMMENT ON COLUMN lehre.tbl_projektarbeit.final IS 'Markiert letztgültige Version der Projektarbeit';";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_projektarbeit: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_projektarbeit: Spalte final hinzugefuegt';
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -188,7 +276,7 @@ $tabellen=array(
 	"lehre.tbl_notenschluesselaufteilung" => array("notenschluesselaufteilung_id","notenschluessel_kurzbz","note","punkte"),
 	"lehre.tbl_notenschluesselzuordnung" => array("notenschluesselzuordnung_id","notenschluessel_kurzbz","lehrveranstaltung_id","studienplan_id","oe_kurzbz","studiensemester_kurzbz"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv","notenwert","aktiv","lehre"),
-	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache"),
+	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache","final"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id","vertrag_id", "punkte"),

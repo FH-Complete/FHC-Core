@@ -97,6 +97,9 @@ function draw_content($row)
             <PROJEKTARBEIT:gesamtstunden><![CDATA['.$row->gesamtstunden.']]></PROJEKTARBEIT:gesamtstunden>
             <PROJEKTARBEIT:themenbereich><![CDATA['.$row->themenbereich.']]></PROJEKTARBEIT:themenbereich>
             <PROJEKTARBEIT:anmerkung><![CDATA['.$row->anmerkung.']]></PROJEKTARBEIT:anmerkung>
+			<PROJEKTARBEIT:final><![CDATA['.($row->final?'Ja':'Nein').']]></PROJEKTARBEIT:final>
+			<PROJEKTARBEIT:abgabedatum><![CDATA['.$datum_obj->convertISODate($row->abgabedatum).']]></PROJEKTARBEIT:abgabedatum>
+            <PROJEKTARBEIT:abgabedatum_iso><![CDATA['.$row->abgabedatum.']]></PROJEKTARBEIT:abgabedatum_iso>
          </RDF:Description>
       </RDF:li>
       ';

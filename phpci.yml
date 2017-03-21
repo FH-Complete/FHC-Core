@@ -23,7 +23,8 @@ setup:
         - "rm -f /var/www/html/build" # Remove the previous soft link, if exists, to the build directory
         - "ln -s %BUILD_PATH% /var/www/html/build" # Create a new soft link to the actual build directory
         # Copies configuration files
-        - "cp /home/phpci/config/* %BUILD_PATH%/config/"
+        - "cp /home/phpci/config/*.inc.php %BUILD_PATH%/config/"
+        - "cp /home/phpci/config/*.php %BUILD_PATH%/application/config/"
         - "cd %BUILD_PATH% && php index.ci.php DBTools migrate" # Install Database
 test:
     lint:

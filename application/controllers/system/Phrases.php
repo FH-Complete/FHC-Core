@@ -8,6 +8,9 @@ class Phrases extends FHC_Controller
     {
         parent::__construct();
         $this->load->library('PhrasesLib');
+        
+        // Loads helper message to manage returning messages
+		$this->load->helper('message');
     }
 
 	public function index()
@@ -105,20 +108,39 @@ class Phrases extends FHC_Controller
 	public function newText()
 	{
 		$phrase_id = $this->input->post('phrase_id');
-		$data = array
-		(
-			'phrase_id' => $phrase_id,
-			'sprache' => 'German',
-			'text' => '',
-			'description' => '',
-			'orgeinheit_kurzbz' => 'etw'
-		);
-		$phrase_inhalt = $this->phraseslib->insertPhraseinhalt($data);
-		if ($phrase_inhalt->error)
-			show_error($phrase_inhalt->retval);
-		$phrase_inhalt_id = $phrase_inhalt->retval;
-
-		redirect('/system/Phrases/editText/'.$phrase_inhalt_id);
+		
+		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+		$this->OrganisationseinheitModel->addLimit(1);
+		$this->OrganisationseinheitModel->addOrder('oe_kurzbz');
+		$resultOE = $this->OrganisationseinheitModel->loadWhere(array('aktiv' => true, 'oe_parent_kurzbz' => null));
+		
+		if ($resultOE->error)
+			show_error($resultOE->retval);
+		
+		if (hasData($resultOE))
+		{
+			$orgeinheit_kurzbz = $resultOE->retval[0]->oe_kurzbz;
+			
+			$data = array (
+				'phrase_id' => $phrase_id,
+				'sprache' => 'German',
+				'text' => '',
+				'description' => '',
+				'orgeinheit_kurzbz' => $orgeinheit_kurzbz
+			);
+			
+			$phrase_inhalt = $this->phraseslib->insertPhraseinhalt($data);
+			if ($phrase_inhalt->error)
+				show_error($phrase_inhalt->retval);
+			
+			$phrase_inhalt_id = $phrase_inhalt->retval;
+			
+			redirect('/system/Phrases/editText/'.$phrase_inhalt_id);
+		}
+		else
+		{
+			show_error('No valid organisation unit found');
+		}
 	}
 
 	public function editText($phrasentext_id)

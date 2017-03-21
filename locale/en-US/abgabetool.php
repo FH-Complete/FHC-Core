@@ -8,7 +8,7 @@ $this->phrasen['abgabetool/plagiatspruefung']='to Plagiarism check';
 $this->phrasen['abgabetool/studentenansicht']='Student view';
 $this->phrasen['abgabetool/abgabetermine']='Deadlines';
 $this->phrasen['abgabetool/benoten']='grade';
-$this->phrasen['abgabetool/fix']='fix'; // Fixtermin 
+$this->phrasen['abgabetool/fix']='fix'; // Fixtermin
 $this->phrasen['abgabetool/datum']='Date'; // Datum für Terminabgabe
 $this->phrasen['abgabetool/abgabetyp']='Type of document submitted';
 $this->phrasen['abgabetool/details']='Details';
@@ -64,13 +64,14 @@ $this->phrasen['abgabetool/fehlerMailBegutachter']='Error sending E-Mail to Asse
 $this->phrasen['abgabetool/fehlerBetreuerNichtGefundenKeinMail']='Assessor not found. No E-Mail sent!';
 $this->phrasen['abgabetool/keinPDF']='Upload-File ist not a PDF! Please retry the Fileupload.';
 $this->phrasen['abgabetool/dateiZuGross']='The File is too big! Maximum File size: 15 MB';
+$this->phrasen['abgabetool/fehlerTerminVorbei']='The deadline for this upload has already expired.';
 
-$this->phrasen['abgabetool/eidesstattlicheErklaerung']='I confirm that this paper is entirely my own work. 
-All sources and quotations have been fully acknowledged in the appropriate places with adequate footnotes and citations. 
-Quotations have been properly acknowledged and marked with appropriate punctuation. The works consulted are listed in the bibliography. 
+$this->phrasen['abgabetool/eidesstattlicheErklaerung']='I confirm that this paper is entirely my own work.
+All sources and quotations have been fully acknowledged in the appropriate places with adequate footnotes and citations.
+Quotations have been properly acknowledged and marked with appropriate punctuation. The works consulted are listed in the bibliography.
 This paper has not been submitted to another examination panel in the same or a similar form, and has not been published.<br>
-I grant the University Of Applied Sciences Technikum Wien the right to store the uploaded file(s) in electronic form and to make them publicly available in data networks. 
-I further grant the University of Applied Sciences Technikum Wien the right to convert the file(s) for long term preservation purposes. 
+I grant the University Of Applied Sciences Technikum Wien the right to store the uploaded file(s) in electronic form and to make them publicly available in data networks.
+I further grant the University of Applied Sciences Technikum Wien the right to convert the file(s) for long term preservation purposes.
 I declare that copyright and licensing issues related to my work have been resolved and that therefore no rights on the part of any third parties impede the publication.';
 $this->phrasen['abgabetool/gelesenUndAkzeptiert']='Read and accepted';
 $this->phrasen['abgabetool/erklaerungNichtAkzeptiert']='Declaration not accepted';

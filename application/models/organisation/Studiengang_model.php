@@ -263,7 +263,7 @@ class Studiengang_model extends DB_Model
 			'tbl_studiengang',
 			array('tbl_reihungstest'),
 			'tbl_prestudentstatus.status_kurzbz = \'Interessent\'
-			AND (tbl_prestudentstatus.rt_stufe = tbl_reihungstest.stufe OR tbl_reihungstest.stufe IS NULL)
+			AND (tbl_prestudentstatus.rt_stufe >= tbl_reihungstest.stufe OR tbl_reihungstest.stufe IS NULL)
 			AND (tbl_prestudent.aufnahmegruppe_kurzbz = tbl_reihungstest.aufnahmegruppe_kurzbz OR tbl_reihungstest.aufnahmegruppe_kurzbz IS NULL)
 			AND (tbl_prestudentstatus.studienplan_id = tbl_reihungstest.studienplan_id OR tbl_reihungstest.studienplan_id IS NULL)
 			AND tbl_reihungstest.oeffentlich = TRUE

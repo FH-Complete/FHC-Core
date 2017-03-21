@@ -15,22 +15,19 @@ isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
 if ($tablesort)
 	$jquery = true;
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE HTML>
 <html>
 <head>
 	<title><?php echo $title; ?></title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<link rel="shortcut icon" href="<?php echo base_url('skin/images/Vilesci.ico'); ?>" type="image/x-icon">
-	<link rel="stylesheet" href="<?php echo base_url('skin/vilesci.css'); ?>" type="text/css" />
-
+	<meta charset="UTF-8">
+	<link rel="shortcut icon" type="image/x-icon" href="<?php echo base_url('skin/images/Vilesci.ico'); ?>" />
+	<link rel="stylesheet"    type="text/css"     href="<?php echo base_url('skin/vilesci.css'); ?>" />
 <?php if($tablesort) : ?>
-	<link href="<?php echo base_url('skin/tablesort.css'); ?>" rel="stylesheet" type="text/css"/>
+	<link rel="stylesheet"    type="text/css"     href="<?php echo base_url('skin/tablesort.css'); ?>" />
 <?php endif ?>
-
 <?php if($jquery) : ?>
-	<script src="<?php echo base_url('include/js/jquery1.9.min.js'); ?>" type="text/javascript"></script>
+	<script type="text/javascript" src="<?php echo base_url('include/js/jquery1.9.min.js'); ?>"></script>
 <?php endif ?>
-
 <?php if($tablesort && !empty($tableid)) : ?>
 	<script language="Javascript" type="text/javascript">
 		$(document).ready(function()
@@ -44,23 +41,18 @@ if ($tablesort)
 		});
 	</script>
 <?php endif ?>
-
 <?php if($tinymce) : ?>
 	<script type="text/javascript" src="<?php echo base_url('vendor/tinymce/tinymce/tinymce.min.js');?>"></script>
 <?php endif ?>
-
 <?php if($textile) : ?>
 	<script type="text/javascript" src="<?php echo base_url('include/js/textile.min.js');?>"></script>
 <?php endif ?>
-
 <?php if($jsoneditor) : ?>
-	<link href="<?php echo base_url('vendor/jsoneditor/dist/jsoneditor.css');?>" rel="stylesheet" type="text/css">
-  <script src="<?php echo base_url('vendor/jsoneditor/dist/jsoneditor.js');?>"></script>
+	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/jsoneditor/dist/jsoneditor.css');?>" />
+	<script type="text/javascript" src="<?php echo base_url('vendor/jsoneditor/dist/jsoneditor.js');?>"></script>
 <?php endif ?>
-
 <?php if($jsonforms) : ?>
-	<link rel="stylesheet" href="<?php echo base_url('vendor/json-forms/dist/css/brutusin-json-forms.min.css'); ?>"/>
-	<script src="<?php echo base_url('vendor/json-forms/dist/js/brutusin-json-forms.min.js'); ?>"></script>
+	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/json-forms/dist/css/brutusin-json-forms.min.css'); ?>" />
+	<script type="text/javascript" src="<?php echo base_url('vendor/json-forms/dist/js/brutusin-json-forms.min.js'); ?>"></script>
 <?php endif ?>
-
 </head>

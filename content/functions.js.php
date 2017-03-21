@@ -261,6 +261,55 @@ function getTreeCellText(tree, col, idx)
 	return tree.view.getCellText(idx, col);
 }
 
+/**
+ * Like getTreeCellText, but returns all the selected values (= cooler!)
+ * @param: tree
+ * @param: col
+ */
+function getMultipleTreeCellText(tree, col)
+{
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var returnArray = new Array();
+
+	for (var t = 0; t < numRanges; t++)
+	{
+		tree.view.selection.getRangeAt(t, start, end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			returnArray.push(getTreeCellText(tree, col, v));
+		}
+	}
+	
+	return returnArray;
+}
+
+/**
+ * Create a window with a form inside and a hidden input for each element of the given array
+ * @param: action
+ * @param: dataName
+ * @param: data
+ */
+function openWindowPostArray(action, dataName, data)
+{
+	var FORM_HEAD = "<form id='postform-form' name='postfrm' action='' method='POST'>\n";
+	var FORM_FOOT = "</form>";
+	
+	var inputsHidden = "";
+	
+	for (var i = 0; i < data.length; i++)
+	{
+		inputsHidden += "	<input type='hidden' name='" + dataName + "[]' value='" + data[i] + "' />\n";
+	}
+	
+	var newwindow = window.open("", "FAS");
+	newwindow.document.getElementsByTagName('body')[0].innerHTML = FORM_HEAD + inputsHidden + FORM_FOOT;
+	newwindow.document.getElementById('postform-form').action = action;
+	
+	newwindow.document.postfrm.submit();
+}
+
 // ****
 // * Trim Member Function fuer Strings
 // ****

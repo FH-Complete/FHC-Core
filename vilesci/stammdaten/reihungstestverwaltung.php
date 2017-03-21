@@ -372,7 +372,7 @@ if(isset($_GET['excel']))
 									$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, true);
 								else
 									$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id);
-								if($erg!=0)
+								if($erg!==false)
 								{
 									$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz]."; ";
 								}
@@ -608,7 +608,7 @@ if(isset($_GET['excel']))
 					else if (<?php echo json_encode($punkteberechnung);?> == 'true' && document.getElementById('clm_absolviert').className == 'inactive' && document.getElementById('clm_ergebnis').className == 'inactive')
 						window.location.href = "<?php echo $_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&punkteberechnung=false';?>";
 				});
-				if (window.localStorage && window.localStorage !== 'undefined') 
+				if (window.localStorage && window.localStorage !== 'undefined')
 				{
 					if (typeof(Storage) !== 'undefined')
 					{
@@ -673,7 +673,7 @@ if(isset($_GET['excel']))
 
 			function hideColumn(column)
 			{
-				if (window.localStorage) 
+				if (window.localStorage)
 				{
 					if ($('.'+column).css('display') == 'table-cell')
 					{
@@ -1075,6 +1075,7 @@ if(isset($_GET['type']) && $_GET['type']=='savertpunkte')
 		$rtperson->loadReihungstestPerson($_GET['rt_person_id']);
 		$rtperson->punkte = str_replace(',','.',$rtpunkte);
 		$rtperson->new = false;
+		$rtperson->teilgenommen = true;
 		if(!$rtperson->savePersonReihungstest())
 		{
 			echo '<span class="error">Fehler:'.$rtperson->errormsg.'</span>';
@@ -1098,8 +1099,11 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 				JOIN public.tbl_person USING(person_id)
 				JOIN public.tbl_studiengang USING(studiengang_kz)
 				JOIN public.tbl_rt_person USING(person_id)
+				JOIN lehre.tbl_studienplan ON(tbl_rt_person.studienplan_id=tbl_studienplan.studienplan_id)
+				JOIN lehre.tbl_studienordnung ON(tbl_studienplan.studienordnung_id=tbl_studienordnung.studienordnung_id)
 			WHERE
-				tbl_rt_person.rt_id=".$db->db_add_param($reihungstest_id, FHC_INTEGER);
+				tbl_studienordnung.studiengang_kz=tbl_prestudent.studiengang_kz
+				AND tbl_rt_person.rt_id=".$db->db_add_param($reihungstest_id, FHC_INTEGER);
 
 	if($result = $db->db_query($qry))
 	{
@@ -1118,14 +1122,23 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 						$rtpunkte = $pruefling->getReihungstestErgebnisPerson($row->person_id, true, $reihungstest->reihungstest_id);
 					else
 						$rtpunkte = $pruefling->getReihungstestErgebnisPerson($row->person_id, false, $reihungstest->reihungstest_id);
+
 					$reihungstest->punkte = str_replace(',','.',$rtpunkte);
 					$reihungstest->reihungstestangetreten = true;
 					$reihungstest->save(false);
 					$reihungstest->new = false;
 
-					if(!$reihungstest->savePersonReihungstest())
+					if($rtpunkte!==false)
 					{
-						$errormsg .='<br>Fehler:'.$reihungstest->errorsmg;
+						$reihungstest->punkte = str_replace(',','.',$rtpunkte);
+						$reihungstest->teilgenommen = true;
+						$reihungstest->save(false);
+						$reihungstest->new = false;
+
+						if(!$reihungstest->savePersonReihungstest())
+						{
+							$errormsg .='<br>Fehler:'.$reihungstest->errorsmg;
+						}
 					}
 				}
 			}
@@ -2050,7 +2063,7 @@ if($reihungstest_id!='')
 							$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, true);
 						else
 							$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id);
-						if($erg!=0)
+						if($erg!==false)
 						{
 							$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz].'<br>';
 						}
@@ -2083,8 +2096,16 @@ if($reihungstest_id!='')
 						<td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
 						<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
 						<td style="display: table-cell" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
-						<td style="display: table-cell; align: right" class="clm_ergebnis"">'.($rtergebnis==0?'-':number_format($rtergebnis,2,'.','')).'</td>
-						<td style="display: table-cell; align: right" class="clm_fas">'.($rtergebnis!=0 && $row->punkte==''?'<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&rt_person_id='.$row->rt_person_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>':$row->punkte).'</td>
+						<td style="display: table-cell; align: right" class="clm_ergebnis"">'.($rtergebnis===false?'-':number_format($rtergebnis,2,'.','')).'</td>
+						<td style="display: table-cell; align: right" class="clm_fas">';
+						if($rtergebnis!==false && $row->punkte=='')
+							echo '<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&rt_person_id='.$row->rt_person_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>';
+						else
+						{
+							if($row->punkte!='')
+								echo number_format($row->punkte,2,'.','');
+						}
+						echo '</td>
 					</tr>';
 
 				$mailto.= ($mailto!=''?',':'').$row->email;
@@ -2171,7 +2192,7 @@ if($reihungstest_id!='')
 								$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id, true);
 							else
 								$erg = $pruefling->getReihungstestErgebnisPrestudent($item->prestudent_id);
-							if($erg!=0)
+							if($erg!==false)
 							{
 								$rt_in_anderen_stg.=number_format($erg,2).' Punkte im Studiengang '.$studiengang->kuerzel_arr[$item->studiengang_kz].'<br>';
 							}

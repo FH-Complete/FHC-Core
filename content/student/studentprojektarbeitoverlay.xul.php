@@ -112,6 +112,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#firma_id" />
 				<splitter class="tree-splitter"/>
+				<treecol id="student-projektarbeit-tree-final" label="Final" flex="2" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#final" />
+				<splitter class="tree-splitter"/>
+				<treecol id="student-projektarbeit-tree-abgabedatum" label="Abgabe Endupload" flex="2" hidden="false"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#abgabedatum" />
+				<splitter class="tree-splitter"/>
 			</treecols>
 
 			<template>
@@ -132,6 +140,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#lehreinheit_id"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#student_uid"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#firma_id"/>
+							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#final"/>
+							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#abgabedatum"/>
 						</treerow>
 					</treeitem>
 				</treechildren>
@@ -238,7 +248,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<grid style="margin:4px;" flex="1">
 				  	<columns  >
 						<column flex="1"/>
-						<column flex="5"/>
+						<column flex="1"/>
 						<column flex="1"/>
 						<column flex="5"/>
 					</columns>
@@ -278,6 +288,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<row>
 							<label value="Anmerkung" control="student-projektarbeit-textbox-anmerkung"/>
 							<textbox id="student-projektarbeit-textbox-anmerkung" disabled="true" maxlength="256"/>
+							<label value="Final / Zeugnis" control="student-projektarbeit-checkbox-final"/>
+							<checkbox id="student-projektarbeit-checkbox-final" disabled="true" />
 						</row>
 						<row>
 							<spacer />

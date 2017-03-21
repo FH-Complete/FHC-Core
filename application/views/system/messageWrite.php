@@ -3,7 +3,6 @@
 	<body>
 		<?php
 			$href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER["REQUEST_URI"]);
-			$href = substr($href, 0, strrpos($href, '?'));
 		?>
 		<form id="sendForm" method="post" action="<?php echo $href; ?>">
 			
@@ -23,7 +22,7 @@
 						}
 					?>
 					<br>
-					Subject: <input type="text" value="" name="subject" size="70"><br/>
+					Subject: <input id="subject" type="text" value="" name="subject" size="70"><br/>
 					<textarea id="bodyTextArea" name="body"></textarea>
 				<?php
 					if (isset($variables))
@@ -49,7 +48,7 @@
 			
 			<div class="row">
 				<div class="span4">
-					<button type="submit">Send</button>
+					<button id="sendButton" type="button">Send</button>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					<?php echo $this->templatelib->widget("Vorlage_widget", array("title" => "Vorlage")); ?>
 				</div>
@@ -130,6 +129,20 @@
 			{
 				$("#refresh").click(tinymcePreviewSetContent);
 			}
+			
+			if ($("#sendButton") && $("#sendForm"))
+			{
+				$("#sendButton").click(function() {
+					if ($("#subject") && $("#subject").val() != '' && tinyMCE.get("bodyTextArea").getContent() != '')
+					{
+						$("#sendForm").submit();
+					}
+					else
+					{
+						alert("Subject and text are required fields!");
+					}
+				});
+			}
 		});
 		
 		function tinymcePreviewSetContent()
@@ -163,6 +176,25 @@
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					alert(textStatus + " - " + errorThrown + " - " + jqXHR.responseText);
+				}
+			});
+		}
+		
+		function getVorlageText(vorlage_kurzbz)
+		{
+			<?php
+				$url = str_replace("/system/Messages/write", "/system/Messages/getVorlage", $_SERVER["REQUEST_URI"]);
+			?>
+			
+			$.ajax({
+				dataType: "json",
+				url: "<?php echo $url; ?>",
+				data: {"vorlage_kurzbz": vorlage_kurzbz},
+				success: function(data, textStatus, jqXHR) {
+					tinyMCE.get("bodyTextArea").setContent(data.retval[0].text);
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					alert(textStatus + " - " + errorThrown);
 				}
 			});
 		}

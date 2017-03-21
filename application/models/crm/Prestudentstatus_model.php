@@ -51,4 +51,21 @@ class Prestudentstatus_model extends DB_Model
 		
 		return $this->execQuery($query, $parametersArray);
 	}
+	
+	/**
+	 * 
+	 */
+	public function updateStufe($prestudentIdArray, $stufe)
+	{	
+		return $this->execQuery(
+			'UPDATE public.tbl_prestudentstatus
+				SET rt_stufe = ?
+			  WHERE status_kurzbz = \'Interessent\'
+			    AND prestudent_id IN ?',
+			array(
+				$stufe,
+				$prestudentIdArray
+			)
+        );
+	}
 }

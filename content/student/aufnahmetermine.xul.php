@@ -149,7 +149,7 @@ echo ']>
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#punkte" />
 							<splitter class="tree-splitter"/>
-							<treecol id="aufnahmetermine-tree-teilgenommen" label="Teilgenommen" flex="1" hidden="false"
+							<treecol id="aufnahmetermine-tree-teilgenommen" label="Teilgen." flex="1" hidden="false"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#teilgenommen" />
 							<splitter class="tree-splitter"/>
@@ -177,6 +177,10 @@ echo ']>
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studienplan_id" />
 							<splitter class="tree-splitter"/>
+							<treecol id="aufnahmetermine-tree-studienplan_studiengang" label="Stg" flex="2" hidden="false"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studienplan_studiengang" />
+							<splitter class="tree-splitter"/>
 						</treecols>
 
 						<template>
@@ -197,6 +201,7 @@ echo ']>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#rt_person_id"/>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studienplan_bezeichnung"/>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studienplan_id"/>
+										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studienplan_studiengang"/>
 									</treerow>
 								</treeitem>
 							</treechildren>
@@ -227,12 +232,13 @@ echo ']>
 										<label value="Reihungstest / Interview" control="aufnahmetermine-menulist-reihungstest"/>
 										<hbox>
 										<menulist id="aufnahmetermine-menulist-reihungstest" disabled="true"
-												datasources="rdf:null" flex="1"
+												datasources="rdf:null" flex="1" style="width:200px"
 												ref="http://www.technikum-wien.at/reihungstest/alle">
 											<template>
 												<menupopup>
 													<menuitem value="rdf:http://www.technikum-wien.at/reihungstest/rdf#reihungstest_id"
 												 		label="rdf:http://www.technikum-wien.at/reihungstest/rdf#bezeichnung"
+														tooltiptext="rdf:http://www.technikum-wien.at/reihungstest/rdf#bezeichnung"
 														uri="rdf:*"/>
 												</menupopup>
 											</template>

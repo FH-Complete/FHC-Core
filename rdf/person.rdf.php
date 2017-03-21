@@ -54,21 +54,29 @@ echo '
 
   <RDF:Seq RDF:about="'.$rdf_url.'/liste">
 ';
+$db = new basis_db();
 //$filter = utf8_encode($filter);
 $qry = "SELECT
 			distinct person_id, vorname, nachname, titelpre, titelpost,
 			CASE
-				WHEN (SELECT count(*) FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE person_id=tbl_person.person_id)>0 THEN 'Mitarbeiter'
-				WHEN (SELECT count(*) FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE person_id=tbl_person.person_id)>0 THEN 'Student'
+				WHEN EXISTS (SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE person_id=tbl_person.person_id) THEN 'Mitarbeiter'
+				WHEN EXISTS (SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE person_id=tbl_person.person_id) THEN 'Student'
 				ELSE 'Person'
 			END as status
-		FROM public.tbl_person WHERE nachname ~* '".addslashes($filter).".*' ORDER BY nachname, vorname, titelpre, titelpost";
+		FROM
+			public.tbl_person
+		WHERE
+			lower(nachname) like '%".$db->db_escape(mb_strtolower($filter))."%'
+			OR
+			lower(nachname || ' ' || vorname) like '%".$db->db_escape(mb_strtolower($filter))."%'
+			OR
+			lower(vorname || ' ' || nachname) like '%".$db->db_escape(mb_strtolower($filter))."%' 
+		ORDER BY nachname, vorname, titelpre, titelpost";
 
 if(isset($_GET['nurmittitel']))
 {
 	$qry.=" AND (titelpre<>'' OR titelpost<>'')";
 }
-$db = new basis_db();
 
 if($result = $db->db_query($qry))
 {

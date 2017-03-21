@@ -23,10 +23,15 @@
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/variable.class.php');
+require_once('../include/benutzer.class.php');
+
+$user = get_uid();
 
 $variable = new variable();
-$variable->loadVariables(get_uid());
-if(false): ?> <script type="text/javascript"> <?php endif;
+$variable->loadVariables($user);
+
+$benutzer = new benutzer();
+$benutzer->load($user);
 ?>
 
 var currentAuswahl=new auswahlValues();
@@ -1191,14 +1196,17 @@ function MessageNew()
 {
 	var tree = document.getElementById('student-tree');
 
-	if(tree.currentIndex==-1)
+	if (tree.currentIndex == -1)
 	{
 		alert("Bitte markieren Sie zuerst eine Person");
 	}
 	else
 	{
-		var person_id = getTreeCellText(tree, 'student-treecol-person_id', tree.currentIndex);
-		window.open('<?php echo APP_ROOT ?>/index.ci.php/system/Messages/outbox/'+person_id,'Outbox','');
+		var prestudentIdArray = getMultipleTreeCellText(tree, 'student-treecol-prestudent_id');
+		
+		var action = '<?php echo APP_ROOT ?>index.ci.php/system/Messages/write/' + <?php echo $benutzer->person_id; ?>;
+		
+		openWindowPostArray(action, 'prestudent_id', prestudentIdArray);
 	}
 }
 

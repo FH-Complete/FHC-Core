@@ -25,6 +25,12 @@ require_once('../include/functions.inc.php');
 
 if(isset($_GET['login']))
 {
+	if((!isset($_SERVER['HTTPS']) || (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='off'))
+		&& strstr(APP_ROOT,'https')!==false)
+	{
+		header('Location: '.APP_ROOT.'cis/index_login.php?login=1');
+		exit;
+	}
 	$uid = get_uid();
 
 	if($uid!='')
@@ -37,24 +43,38 @@ if(isset($_GET['login']))
 <html>
 <head>
 <title>CIS</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="../skin/jquery.css" type="text/css">
+	<link href="../skin/style.css.php" rel="stylesheet" type="text/css">
+	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
 </head>
 <body>
 <table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0">
 	<tr>
 		<td class="rand"></td>
 		<td class="boxshadow">
-		<br><br><br><br><br>
-		<center>
-		<img src="../skin/images/logo.jpg" width="400px" />
-		<br><br><br>
-		Herzlich Willkommen am Campus Informationssystem der Fachhochschule Technikum Wien
-		<br>
-		<br>
-		<form action="index_login.php?login=1" method="POST">
-		<input type="submit" value="Login">
-		</form>
-		</center>
+		<table cellspacing="0" cellpadding="0" class="header">
+			<tr>
+				<td align="center" valign="middle" style="background-image: url(../skin/styles/default/header.png); background-position: top; background-repeat: repeat-x;">
+					<img class="header_logo" src="../skin/styles/default/logo_250x130.png" alt="logo">
+					<center>
+					<img src="../skin/styles/default/cis_logo_text_400x78.png" width="400px" />
+					<br><br><br>
+					<br>
+					<br>
+					<form action="index_login.php?login=1" method="POST">
+					<input class="cis_login" type="submit" value="Login">
+					</form>
+					</center>
+					</td>
+				</tr>
+				<tr style="height:10%;" >
+					<td align="center" valign="bottom">
+						<div style="color:grey">Powered by <a href="http://www.fhcomplete.org" target="blank">FH Complete</a></div>
+						<br><br>
+					</td>
+				</tr>
+			</table>
 		</td>
 		<td class="rand"></td>
 	</tr>
