@@ -333,6 +333,8 @@ if(isset($_GET['excel']))
 						$maxlength[$col] = 12;
 						$worksheet->write($zeile,++$col,"Studiengang", $format_bold);
 						$maxlength[$col] = 11;
+						$worksheet->write($zeile,++$col,"OrgForm", $format_bold);
+						$maxlength[$col] = 7;
 						$worksheet->write($zeile,++$col,"S", $format_bold);
 						$maxlength[$col] = 2;
 						$worksheet->write($zeile,++$col,"Bereits absolvierte RTs", $format_bold);
@@ -428,6 +430,10 @@ if(isset($_GET['excel']))
 					$worksheet->write($zeile,++$col,$studiengang->kuerzel_arr[$row->studiengang_kz], $format_border);
 					if(strlen($studiengang->kuerzel_arr[$row->studiengang_kz])>$maxlength[$col])
 						$maxlength[$col] = strlen($studiengang->kuerzel_arr[$row->studiengang_kz]);
+
+					$worksheet->write($zeile,++$col,$row->orgform_kurzbz, $format_border);
+					if(strlen($row->orgform_kurzbz)>$maxlength[$col])
+						$maxlength[$col] = strlen($row->orgform_kurzbz);
 
 					$worksheet->write($zeile,++$col,$row->ausbildungssemester, $format_border_center);
 					if(strlen($row->ausbildungssemester)>$maxlength[$col])
@@ -1063,12 +1069,12 @@ if(isset($_GET['type']) && $_GET['type']=='savertpunkte')
 	$prestudent = new prestudent();
 	$prestudent->load($prestudent_id);
 
-	if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz', $prestudent->studiengang_kz, 'suid'))
+	if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz', $prestudent->studiengang_kz, 'sui'))
 	{
 		$rtperson = new reihungstest();
 		$rtperson->loadReihungstestPerson($_GET['rt_person_id']);
 		$rtperson->punkte = str_replace(',','.',$rtpunkte);
-		$rtperson->new=false;
+		$rtperson->new = false;
 		if(!$rtperson->savePersonReihungstest())
 		{
 			echo '<span class="error">Fehler:'.$rtperson->errormsg.'</span>';
@@ -1099,7 +1105,7 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 	{
 		while($row = $db->db_fetch_object($result))
 		{
-			if($rechte->isBerechtigt('student/stammdaten', $row->oe_kurzbz,'suid'))
+			if($rechte->isBerechtigt('student/stammdaten', $row->oe_kurzbz,'sui'))
 			{
 				$prestudent = new prestudent();
 				$prestudent->load($row->prestudent_id);
@@ -1113,9 +1119,9 @@ if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 					else
 						$rtpunkte = $pruefling->getReihungstestErgebnisPerson($row->person_id, false, $reihungstest->reihungstest_id);
 					$reihungstest->punkte = str_replace(',','.',$rtpunkte);
-					$reihungstest->reihungstestangetreten=true;
+					$reihungstest->reihungstestangetreten = true;
 					$reihungstest->save(false);
-					$reihungstest->new=false;
+					$reihungstest->new = false;
 
 					if(!$reihungstest->savePersonReihungstest())
 					{
@@ -1394,6 +1400,21 @@ if(isset($_POST['delete_studienplan'])) //@todo: Check, ob Zuordnungen zu diesem
 		$studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 	}
 	$neu=false;
+}
+
+if(isset($_POST['deleteReihungstest'])) //@todo: Check, ob Zuordnungen zu diesem Studienplan vorhanden sind. Wenn ja, nicht loeschen!
+{
+	if(isset($_POST['reihungstest_id']) && $_POST['reihungstest_id']!='')
+	{
+		$deleteReihungstest = new reihungstest();
+
+		if (!$deleteReihungstest->delete($_POST['reihungstest_id']))
+			echo '<span class="input_error">Fehler beim löschen des Reihungstests: '.$db->convert_html_chars($deleteReihungstest->errormsg).'</span>';
+
+		$reihungstest_id = '';
+		$studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+	}
+	$neu = true;
 }
 
 echo '<table width="100%"><tr><td>';
@@ -1825,8 +1846,21 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			<td></td>
 			<td>
 				<button type="submit" name="speichern"><?php echo $val ?></button>
-				<?php if(!$neu)
-					echo '<button type="submit" name="kopieren" onclick="return confirm (\'Eine Kopie dieses Tests (ohne Raumzuordnung) erstellen?\')">Kopie erstellen</button>'; ?>
+				<?php 
+					if(!$neu)
+						echo '<button type="submit" name="kopieren" onclick="return confirm (\'Eine Kopie dieses Tests (ohne Raumzuordnung) erstellen?\')">Kopie erstellen</button>';
+					
+					if($rechte->isBerechtigt('lehre/reihungstest', null, 'suid'))
+					{
+						$anzahl_teilnehmer = new reihungstest();
+						$anzahl_teilnehmer = $anzahl_teilnehmer->getTeilnehmerAnzahl($reihungstest_id);
+
+						if (isset($orte) && count($orte->result) == 0 && isset($studienplaene) && count($studienplaene->result) == 0 && $anzahl_teilnehmer == 0 && $reihungstest_id != '')
+							echo '<button type="submit" name="deleteReihungstest" onclick="return confirm (\'Diesen Reihungstesttermin löschen?\')">Termin löschen</button>';
+						else 
+							echo '<button type="submit" name="" disabled="disabled" title="Entfernen Sie zuerst alle Raumzuteilungen, Studienpläne und TeilnehmerInnen">Termin löschen</button>';
+					} 
+				?>
 			</td>
 		</tr>
 		</table>
