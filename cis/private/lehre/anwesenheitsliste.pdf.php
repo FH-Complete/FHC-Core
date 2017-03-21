@@ -42,13 +42,19 @@ if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 else
 	die('Eine gueltige LvID muss uebergeben werden');
 
+$lv = new lehrveranstaltung();
+$lv->load($lvid);
+	
 if(isset($_GET['stsem']))
 	$studiensemester = $_GET['stsem'];
 else
 	die('Eine Studiensemester muss uebergeben werden');
 
-if(!$berechtigung->isBerechtigt('admin') && !$berechtigung->isBerechtigt('assistenz') && !check_lektor_lehrveranstaltung($user,$lvid,$studiensemester))
-	die('Sie muessen LektorIn der LV oder Admin sein, um diese Seite aufrufen zu koennen');
+if(	!$berechtigung->isBerechtigt('admin') 
+	&& !$berechtigung->isBerechtigt('assistenz') 
+	&& !$berechtigung->isBerechtigt('lehre', $lv->oe_kurzbz, 's') 
+	&& !check_lektor_lehrveranstaltung($user,$lvid,$studiensemester))
+	die('Sie muessen LektorIn der LV sein oder das Recht "ADMIN", "ASSISTENZ" oder "LEHRE" haben, um diese Seite aufrufen zu koennen');
 
 $output='pdf';
 
@@ -58,8 +64,7 @@ if(isset($_GET['output']) && ($output='odt' || $output='doc'))
 isset($_GET['stg_kz']) ? $studiengang = $_GET['stg_kz'] : $studiengang = NULL;
 isset($_GET['lehreinheit_id']) ? $lehreinheit = $_GET['lehreinheit_id'] : $lehreinheit = NULL;
 
-$lv = new lehrveranstaltung();
-$lv->load($lvid);
+
 
 $doc = new dokument_export('Anwesenheitslist');
 
