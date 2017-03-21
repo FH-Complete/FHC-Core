@@ -76,10 +76,16 @@ class ablauf extends basis_db
 
 		//laden des Datensatzes
 		$qry = "SELECT
-					*
+					tbl_ablauf.*, 
+					tbl_ablauf_vorgaben.sprache, 
+					tbl_ablauf_vorgaben.sprachwahl, 
+					tbl_ablauf_vorgaben.content_id
 				FROM
 					testtool.tbl_ablauf
-				WHERE ablauf_id=".$this->db_add_param($ablauf_id, FHC_INTEGER, false).";";
+				LEFT JOIN 
+					testtool.tbl_ablauf_vorgaben USING (ablauf_vorgaben_id)
+				WHERE 
+					ablauf_id=".$this->db_add_param($ablauf_id, FHC_INTEGER, false).";";
 
 		if($this->db_query($qry))
 		{
@@ -99,6 +105,9 @@ class ablauf extends basis_db
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
+				$obj->sprache = $row->sprache;
+				$obj->sprachwahl = $this->db_parse_bool($row->sprachwahl);
+				$obj->content_id = $row->content_id;
 				
 				$this->result[] = $obj;
 				return true;
@@ -140,6 +149,34 @@ class ablauf extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Loeschen';
+			return false;
+		}
+	}
+	
+	/**
+	 * Loescht einen Ablauf-Vorgabe Datensatz
+	 * @param $ablauf_vorgabe_id ID des zu loeschenden Datensatzes
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function deleteAblaufVorgabe($ablauf_vorgabe_id)
+	{
+		//$ablauf_vorgabe_id auf Gueltigkeit pruefen
+		if(!is_numeric($ablauf_vorgabe_id))
+		{
+			$this->errormsg = 'ablauf_vorgabe_id muss eine gueltige Zahl sein';
+			return false;
+		}
+	
+		$qry = "DELETE FROM testtool.tbl_ablauf_vorgaben
+				WHERE ablauf_vorgaben_id=".$this->db_add_param($ablauf_vorgabe_id, FHC_INTEGER).";";
+	
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Loeschen der Ablauf-Vorgabe mit der ID '.$ablauf_vorgabe_id;
 			return false;
 		}
 	}
@@ -273,24 +310,38 @@ class ablauf extends basis_db
 	 */
 	public function getAblaufGebiete($studiengang_kz, $studienplan_id=null, $semester=null) 
 	{
-		$qry = "SELECT * FROM testtool.tbl_ablauf WHERE studiengang_kz=".$studiengang_kz;
+		$qry = "SELECT 
+					tbl_ablauf.*, 
+					tbl_ablauf_vorgaben.sprache, 
+					tbl_ablauf_vorgaben.sprachwahl, 
+					tbl_ablauf_vorgaben.content_id 
+				FROM 
+					testtool.tbl_ablauf 
+				LEFT JOIN 
+					testtool.tbl_ablauf_vorgaben USING (ablauf_vorgaben_id)
+				WHERE 
+					tbl_ablauf.studiengang_kz=".$studiengang_kz;
 		if (!is_null($studienplan_id))
 			$qry .= " AND studienplan_id=".$studienplan_id;
 		if (!is_null($semester))
 			$qry .= " AND semester=".$semester;
-	
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new stdClass();
 	
+				$obj->ablauf_id = $row->ablauf_id;
 				$obj->gebiet_id = $row->gebiet_id;
 				$obj->reihung = $row->reihung;
 				$obj->gewicht = $row->gewicht;
 				$obj->semester = $row->semester;
 				$obj->studienplan_id = $row->studienplan_id;
 				$obj->ablauf_vorgaben_id = $row->ablauf_vorgaben_id;
+				$obj->sprache = $row->sprache;
+				$obj->sprachwahl = $this->db_parse_bool($row->sprachwahl);
+				$obj->content_id = $row->content_id;
 	
 				$this->result[]= $obj;
 			}
@@ -341,7 +392,7 @@ class ablauf extends basis_db
 		//id auf Gueltigkeit pruefen
 		if(!is_numeric($ablauf_vorgaben_id))
 		{
-			$this->errormsg = '$ablauf_vorgaben_id muss eine gueltige Zahl sein';
+			$this->errormsg = 'ablauf_vorgaben_id muss eine gueltige Zahl sein';
 			return false;
 		}
 	
@@ -473,7 +524,7 @@ class ablauf extends basis_db
 				$obj->ablauf_vorgaben_id = $row->ablauf_vorgaben_id;
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->sprache = $row->sprache;
-				$obj->sprachwahl = $row->sprachwahl;
+				$obj->sprachwahl = $this->db_parse_bool($row->sprachwahl);
 				$obj->content_id = $row->content_id;
 	
 				$this->result[]= $obj;
@@ -497,7 +548,7 @@ class ablauf extends basis_db
 		//id auf Gueltigkeit pruefen
 		if(!is_numeric($studiengang_kz))
 		{
-			$this->errormsg = '$studiengang_kz muss eine gueltige Zahl sein';
+			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
 		
@@ -522,6 +573,83 @@ class ablauf extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Zaehlt, wie of die ablauf_vorgabe_id noch in tbl_ablauf verwendet wird
+	 * @param integer $ablauf_vorgaben_id Ablauf-Vorlage-ID
+	 * @return boolean true wenn ok sonst false
+	 */
+	public function countAblaufVorgabe($ablauf_vorgaben_id)
+	{
+		//id auf Gueltigkeit pruefen
+		if(!is_numeric($ablauf_vorgaben_id))
+		{
+			$this->errormsg = 'ablauf_vorgaben_id muss eine gueltige Zahl sein';
+			return false;
+		}
+	
+		$qry = "SELECT count(*) FROM testtool.tbl_ablauf WHERE ablauf_vorgaben_id=".$this->db_add_param($ablauf_vorgaben_id, FHC_INTEGER);
+	
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->count;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler bei der Datenbankabfrage';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Berechnet die Dauer eines Tests
+	 * @param integer $studiengang_kz Kennzahl des Studiengangs
+	 * @param integer $studienplan_id Optional. Default NULL. ID des Studienplans
+	 * @param integer $semester Optional. Default NULL.
+	 * @return boolean true wenn ok sonst false
+	 */
+	public function getDauer($studiengang_kz, $studienplan_id=null, $semester=null)
+	{
+		$qry = "SELECT 
+					SUM (zeit) as dauer
+				FROM 
+					testtool.tbl_ablauf 
+				JOIN 
+					testtool.tbl_gebiet USING (gebiet_id)
+				WHERE 
+					studiengang_kz=".$studiengang_kz;
+		if (!is_null($studienplan_id))
+			$qry .= " AND studienplan_id=".$studienplan_id;
+		if (!is_null($semester))
+			$qry .= " AND semester=".$semester;
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+					
+				return $row->dauer;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler bei der Datenbankabfrage';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
 			return false;
 		}
 	}

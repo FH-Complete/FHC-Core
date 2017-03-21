@@ -244,38 +244,6 @@ function loadampel()
 	</table>
 </td>
 <td class="rand">
-	<?php /*echo'
-	<!--  Menubox-Effekt am Seitenrand. Nettes Feature aber dzt. nicht sinnvoll einsetzbar
-	<div class="hoverbox">
-		<div class="preview">
-			<img src="../skin/images/aufklappen.png" />
-			<div class="hoverbox_inhalt">
-				<table class="hoverbox">
-					<tr>
-					<td><table style="text-align:right;" width="150px">
-						<tr>
-						<td><a href="http://www.hofer.at" target="blank">Impressum</a></td>
-						</tr>
-						<tr>
-						<td><a href="mailto:kindlm@technikum-wien.at">Kontakt</a></td>
-						</tr>
-						<tr>
-						<td>&nbsp;</td>
-						</tr>
-						<tr>
-						<td>Powered by <a href="http://fhcomplete.technikum-wien.at" target="blank">FH Complete 2.0</i></a></td>
-						</tr>
-						</table>
-					</td>
-					<td><img src="../skin/images/aufklappen.png" /></td>
-					</td>
-					</tr>
-
-				</table>
-			</div>
-		</div>
-	</div>-->';*/
-	?>
 </td>
 </tr>
 </table>

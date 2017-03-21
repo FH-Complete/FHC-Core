@@ -16,9 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
- *          Manfred Kindl <manfred.kindl@technikum-wien.at>
+ *			Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *			Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *			Manfred Kindl <manfred.kindl@technikum-wien.at>
  */
 
 require_once('../../config/cis.config.inc.php');
@@ -27,9 +27,9 @@ require_once('../../include/basis_db.class.php');
 require_once('../../include/sprache.class.php');
 require_once '../../include/phrasen.class.php';
 
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-  
+if (!$db = new basis_db())
+	die('Fehler beim Oeffnen der Datenbankverbindung');
+
 require_once('../../include/gebiet.class.php');
 
 function getSpracheUser()
@@ -91,7 +91,7 @@ if (isset($_SESSION['pruefling_id']))
 	$qry = "SELECT content_id FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz=".$db->db_add_param($_SESSION['studiengang_kz'])." LIMIT 1";
 	$result = $db->db_query($qry);
 	
-	echo '<table width="100%"  border="0" cellspacing="0" cellpadding="0" style="border-right-width:1px;border-right-color:#BCBCBC;">';
+	echo '<table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-right-width:1px;border-right-color:#BCBCBC;">';
 	echo '<tr><td style="padding-left: 20px;" nowrap>
 			<a href="login.php" target="content">'.$p->t('testtool/startseite').'</a>
 		</td></tr>';
@@ -100,9 +100,11 @@ if (isset($_SESSION['pruefling_id']))
 			echo '<tr><td style="padding-left: 20px;"><a href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a></td></tr>';	
 	echo '<tr><td>&nbsp;</td></tr>';
 	echo '<tr><td style="padding-left: 20px;" nowrap>';
-	  	
-	$qry = "SELECT * FROM testtool.vw_ablauf WHERE studiengang_kz=".$db->db_add_param($_SESSION['studiengang_kz'])." ORDER BY semester,reihung";
 	
+	$sprache_mehrsprachig = new sprache();
+	$bezeichnung_mehrsprachig = $sprache_mehrsprachig->getSprachQuery('bezeichnung_mehrsprachig');
+	$qry = "SELECT vw_ablauf.*, ".$bezeichnung_mehrsprachig." FROM testtool.vw_ablauf JOIN testtool.tbl_gebiet USING (gebiet_id) WHERE studiengang_kz=".$db->db_add_param($_SESSION['studiengang_kz'])." ORDER BY semester,reihung";
+
 	$result = $db->db_query($qry);
 	$lastsemester = '';
 	
@@ -119,7 +121,7 @@ if (isset($_SESSION['pruefling_id']))
 			$lastsemester = $row->semester;
 			
 			echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 6px;">';
-			echo '<tr><td style="color: #000; background-color: #8DBDD8; white-space:nowrap; padding: 0 10px 0 10px; line-height: 20px">'.$row->semester.'. '.$p->t('testtool/semester').' '.($row->semester!='1'?$p->t('testtool/quereinstieg'):'').'</td></tr>';
+			echo '<tr><td class="HeaderTesttool">'.$row->semester.'. '.$p->t('testtool/semester').' '.($row->semester!='1'?$p->t('testtool/quereinstieg'):'').'</td></tr>';
 		}
 		$gebiet = new gebiet();
 		if($gebiet->check_gebiet($row->gebiet_id))
@@ -167,22 +169,22 @@ if (isset($_SESSION['pruefling_id']))
 				$style='';
 				$class='ItemTesttool';
 			}
-			
+
 			echo '<tr>
-						<!--<td width="10" class="ItemTesttoolLeft" nowrap>&nbsp;</td>-->
-				   		<td class="'.$class.'">
-				   			<a class="'.$class.'" href="frage.php?gebiet_id='.$row->gebiet_id.'" onclick="document.location.reload()" target="content" style="'.$style.'">'.$row->gebiet_bez.'</a>
-				   		</td>
-						<!--<td width="10" class="ItemTesttoolRight" nowrap>&nbsp;</td>-->
-				   	</tr>';
+					<!--<td width="10" class="ItemTesttoolLeft" nowrap>&nbsp;</td>-->
+						<td class="'.$class.'">
+							<a class="'.$class.'" href="frage.php?gebiet_id='.$row->gebiet_id.'" onclick="document.location.reload()" target="content" style="'.$style.'">'.$sprache_mehrsprachig->parseSprachResult("bezeichnung_mehrsprachig", $row)[$sprache_user].'</a>
+						</td>
+					<!--<td width="10" class="ItemTesttoolRight" nowrap>&nbsp;</td>-->
+					</tr>';
 		}
 		else 
 		{
 			echo '<tr>
-				   		<td nowrap>
-				   			<span class="error">&nbsp;'.$row->gebiet_bez.' (invalid)</span>
-				   		</td>
-				   	</tr>';
+						<td nowrap>
+							<span class="error">&nbsp;'.$row->gebiet_bez.' (invalid)</span>
+						</td>
+					</tr>';
 		}
 	}
 	echo '</table>';

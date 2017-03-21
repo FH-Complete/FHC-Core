@@ -273,6 +273,41 @@ if (isset($_POST['submitaudio']))
 			echo "<b>Es duerfen nur mp3 Dateien hochgeladen werden</b><br />";
 	}
 }
+//Loeschen eines Bildes
+if (isset($_POST['deletePicture']) || isset($_POST['deleteAudio']))
+{
+	if (!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
+		die($rechte->errormsg);
+		
+	$frage = new frage();
+	if ($frage->load($_GET['frage_id']))
+	{
+		$frage->new = false;
+
+		if ($frage->getFrageSprache($frage->frage_id, $sprache))
+		{
+			$frage->new = false;
+		}
+		else
+			$frage->new = true;
+
+		if (isset($_POST['deletePicture']))
+			$frage->bild = '';
+		elseif (isset($_POST['deleteAudio']))
+			$frage->audio = '';
+
+		if ($frage->save_fragesprache())
+		{
+			echo "<b>File erfolgreich gelöscht</b><br />";
+			$nummer = $frage->nummer;
+		}
+		else
+			echo '<b>Fehler:'.$frage->errormsg.'</b><br />';
+
+	}
+	else
+		echo '<b>'.$frage->errormsg.'</b><br />';
+}
 
 //Speichern der Frage-Daten
 if (isset($_POST['submitdata']))
@@ -816,6 +851,9 @@ if ($frage_id != '')
 	if ($frage->bild != '')
 	{
 		echo "\n<tr><td width='400' height='300'><img src='../bild.php?src=frage&amp;frage_id=$frage->frage_id&amp;sprache=$sprache' width='400' />";
+		echo "\n<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage->frage_id&amp;filter=$filter'>";
+		echo "\n<center><input type='submit' name='deletePicture' value='Delete Picture' onclick='return confirm(\"Bild löschen?\")'/></center>";
+		echo "\n</form>";
 	}
 	else
 	{
@@ -831,6 +869,9 @@ if ($frage_id != '')
 						<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
 					</div>
 				</audio>';
+		echo "\n<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage->frage_id&amp;filter=$filter'>";
+		echo "\n<center><input type='submit' name='deleteAudio' value='Delete Audio' onclick='return confirm(\"Audiodatei löschen?\")'/></center>";
+		echo "\n</form>";
 	}
 	echo '</td>';
 	//Zusaetzliche EingabeFelder anzeigen

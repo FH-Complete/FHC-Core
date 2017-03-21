@@ -34,6 +34,7 @@ require_once('../../../include/studienplan.class.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/organisationsform.class.php');
 require_once('../../../include/ablauf.class.php');
+require_once('../../../include/content.class.php');
 
 if (!$user = get_uid())
 	die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -47,7 +48,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 $sprache = new sprache();
-$sprache->getAll(true);
+$sprache->getAll(true, 'index');
 
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -58,26 +59,15 @@ echo '
 	<link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css">
 	<script type="text/javascript" src="../../../include/js/jquery1.9.min.js" ></script>
 	<script type="text/javascript">
-    $(document).ready(function()
-    {
-        $("#t1").tablesorter(
-        {
-            sortList: [[3,0],[1,0]],
-            widgets: ["zebra"]
-        });
-    });
-
-	function deleteZuordnung(ablauf_id)
+	$(document).ready(function()
 	{
-		if (confirm("Wollen Sie dieses Zuordnung wirklich entfernen?"))
-        {
-            $("#data").html(\'<form action="edit_gebiet.php" name="sendform" id="sendform" method="POST"><input type="hidden" name="action" value="deleteZuordnung" /><input type="hidden" name="ablauf_id" value="\'+ablauf_id+\'" /></form>\');
-			document.sendform.submit();
-        }
-        return false;
-	}
-
-    </script>
+		$("#t1").tablesorter(
+		{
+			sortList: [[3,0],[1,0]],
+			widgets: ["zebra"]
+		});
+	});
+	</script>
 </head>
 <body>
 <div id="data"></div>
@@ -90,7 +80,7 @@ else
 
 $stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'-1');
 
-echo '<h1>&nbsp;Gebiete an Studieng&auml;nge anh&auml;ngen</h1>';
+echo '<h1>Ablauf der Gebiete verwalten</h1>';
 
 if (!$rechte->isBerechtigt('basis/testtool'))
 	die($rechte->errormsg);
@@ -102,6 +92,7 @@ $gebiet->getAll();
 $ablauf_vorgabe = new gebiet();
 $ablauf_vorgabe->getAblaufVorgaben();
 
+$errormsg = '';
 
 echo '<a href="index.php?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'" class="Item">Zurück zur Admin Seite</a><br /><br />';
 echo '<table><tr><td>';
@@ -135,6 +126,44 @@ if (isset($_GET['action']) && $_GET['action'] == 'save')
 			isset($_POST['semester']) && $_POST['semester'] != '' &&
 			isset($_POST['studienplan']))
 	{
+		// Ablauf-Vorgaben-Daten werden nur beim ersten Gebietseintrag gesendet.
+		// In diesem Fall wird vorher ein neuer Ablauf-Vorgaben-Eintrag erstellt.
+		$vorgaben_id = '';
+		if (isset($_POST['sprache']) && $_POST['sprache'] != '')
+		{
+			// Prüfen, ob Content ID schon existiert
+			foreach ($sprache->result as $row)
+			{
+				$content = new content();
+				if ($content->getContent($_POST['content_id'], $row->sprache))
+				{
+					$content_id = $_POST['content_id'];
+					break;
+				}
+				else
+				{
+					$content_id = '';
+					$errormsg = '<span class="error">Content_ID '.$_POST['content_id'].' ist nicht vorhanden und wurde nicht gespeichert</span>';
+				}
+			}
+			echo $errormsg;
+			$ablauf_vorgaben = new ablauf();
+			$ablauf_vorgaben->studiengang_kz = $stg_kz;
+			$ablauf_vorgaben->sprache = $_POST['sprache'];
+			$ablauf_vorgaben->sprachwahl = isset($_POST['sprachwahl'])?true:false;
+			$ablauf_vorgaben->content_id = $content_id;
+			$ablauf_vorgaben->insertamum = date('Y-m-d H:i:s');
+			$ablauf_vorgaben->insertvon = $user;
+			if ($ablauf_vorgaben->saveAblaufVorgabe(true))
+			{
+				$vorgaben_id = $ablauf_vorgaben->ablauf_vorgaben_id;
+			}
+			else 
+				echo $ablauf_vorgaben->errormsg;
+		}
+		elseif (isset($_POST['ablauf_vorgaben_id']) && $_POST['ablauf_vorgaben_id'] != '')
+			$vorgaben_id = $_POST['ablauf_vorgaben_id'];
+
 		$ablauf = new ablauf();
 		$ablauf->studiengang_kz = $_POST['stg_kz'];
 		$ablauf->gebiet_id = $_POST['gebiet_id'];
@@ -144,6 +173,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'save')
 		$ablauf->insertvon = $user;
 		$ablauf->insertamum = date('Y-m-d H:i:s');
 		$ablauf->studienplan_id = $_POST['studienplan'];
+		$ablauf->ablauf_vorgaben_id = $vorgaben_id;
 
 		if (!$ablauf->save(true))
 			echo $ablauf->errormsg;
@@ -156,42 +186,58 @@ if (isset($_GET['action']) && $_GET['action'] == 'save')
 // Gebiet entfernen
 if (isset($_GET['action']) && $_GET['action'] == 'delete')
 {
-	if (isset($_POST['gebiet_id']) && $_POST['gebiet_id'] != '')
+	if (isset($_POST['ablauf_id']) && $_POST['ablauf_id'] != '')
 	{
-		$ablauf = new ablauf();
-		$ablauf->getAblaufId($stg_kz, $_POST['gebiet_id']);
-		$ablauf_id = $ablauf->result[0];
-		if ($ablauf->delete($ablauf_id))
+		$ablauf = new ablauf($_POST['ablauf_id']);
+		if ($ablauf->delete($_POST['ablauf_id']))
 			echo $ablauf->errormsg;
-	}
-	else
-	{
-		//echo '<span class="error">Bitte f&uuml;llen Sie alle Felder aus</span>';
+		
+		// Wenn der Ablauf-Eintrag der letzte war, und die Ablauf-Vorgaben-ID nicht woanders verwendet wird, dann auch diesen löschen
+		if (isset($_POST['ablauf_vorgaben_id']) && $_POST['ablauf_vorgaben_id'] != '')
+		{
+			$abl_vorgabe = new ablauf();
+			$vorlage_count = $abl_vorgabe->countAblaufVorgabe($_POST['ablauf_vorgaben_id']);
+
+			if ($vorlage_count == 0)
+			{
+				if (!$abl_vorgabe->deleteAblaufVorgabe($_POST['ablauf_vorgaben_id']))
+					echo $abl_vorgabe->errormsg;
+			}
+		}	
 	}
 }
 // Gebiet bearbeiten
 if (isset($_GET['action']) && $_GET['action'] == 'edit')
 {
-	if (isset($_POST['gebiet_id']) && $_POST['gebiet_id'] != '')
+	if (isset($_POST['ablauf_id']) && $_POST['ablauf_id'] != '')
 	{
-		$ablauf = new ablauf();
-		$ablauf->getAblaufId($stg_kz, $_POST['gebiet_id']);
-		$ablauf_id = $ablauf->result[0];
-		$ablauf = new ablauf($ablauf_id);
-		$ablauf = $ablauf->result[0];
+		$ablauf = new ablauf($_POST['ablauf_id']);
 
-		$gebiet = new gebiet($_POST['gebiet_id']);
+		$gebiet = new gebiet($ablauf->result[0]->gebiet_id);
 		$studiengang = new studiengang($stg_kz);
 
 		echo '<table><form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&action=editsave" method="POST">
 				<tr><td>Studiengang_kz: </td><td><input type="text" name="stg_kz" value="'.strtoupper($studiengang->typ.$studiengang->kurzbz).' ('.$studiengang->bezeichnung.')'.'" style="width:98.5%" disabled /></td></tr>
-				<tr><td>Gebiet: </td><td><input type="text" value="'.$gebiet->kurzbz.' ('.$gebiet->bezeichnung.')" style="width:98.5%" disabled /><input type="hidden" name="gebiet_id" value="'.$ablauf->gebiet_id.'"/></td></tr>
-				<tr><td>Reihung: </td><td><input type="text" name="reihung" value="'.$ablauf->reihung.'" style="width:98.5%" /></td></tr>
-				<tr><td>Gewichtung: </td><td><input type="text" name="gewicht" value="'.$ablauf->gewicht.'" style="width:98.5%" /></td></tr>
-				<tr><td>Semester: </td><td><input type="text" name="semester" value="'.$ablauf->semester.'" style="width:98.5%" /></td></tr>
+				<tr><td>Gebiet: </td><td><input type="text" value="'.$gebiet->kurzbz.' ('.$gebiet->bezeichnung.')" style="width:98.5%" disabled /><input type="hidden" name="gebiet_id" value="'.$ablauf->result[0]->gebiet_id.'"/></td></tr>
+				<tr><td>Reihung: </td><td><input type="text" name="reihung" value="'.$ablauf->result[0]->reihung.'" style="width:98.5%" /></td></tr>
+				<tr><td>Gewichtung: </td><td><input type="text" name="gewicht" value="'.$ablauf->result[0]->gewicht.'" style="width:98.5%" /></td></tr>
+				<tr><td>Semester: </td><td><input type="text" name="semester" value="'.$ablauf->result[0]->semester.'" style="width:98.5%" /></td></tr>
 				<tr><td>Studienplan: </td><td>';
-				drawStudienplanDropdown($stg_kz, $db, $name = 'studienplan_id', null, 'width:100%', $ablauf->studienplan_id);
+				drawStudienplanDropdown($stg_kz, $db, $name = 'studienplan_id', null, 'width:100%', $ablauf->result[0]->studienplan_id);
 				echo '</td></tr>
+				<tr><td>Sprache*: </td><td><select name="sprache">';	
+				foreach ($sprache->result as $row)
+				{
+					if ($ablauf->result[0]->sprache == $row->sprache)
+						$selected = 'selected';
+					else
+						$selected = '';
+					echo '<OPTION value="'.$row->sprache.'" '.$selected.'>'.$row->sprache.'</OPTION>';
+				}
+				echo '</SELECT></td></tr>
+				<tr><td>Sprachwahl*: </td><td><input type="checkbox" name="sprachwahl" '.($ablauf->result[0]->sprachwahl?'checked':'').' /></td></tr>
+				<tr><td>Content ID*: </td><td><input type="text" name="content_id" value="'.$ablauf->result[0]->content_id.'"/></td></tr>
+				<tr><td colspan="2">* Wirken sich auf alle Gebiete gleich aus</td></tr>
 				<tr><td></td><td><input type="submit" value="Speichern" style="width:50%"/><a href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'"><input type="button" value="Abbrechen" style="width:50%"></a></td></tr>
 			  </form></table>';
 	}
@@ -213,10 +259,44 @@ if (isset($_GET['action']) && $_GET['action'] == 'editsave')
 		$ablauf->reihung = $_POST['reihung'];
 		$ablauf->gewicht = $_POST['gewicht'];
 		$ablauf->semester = $_POST['semester'];
+		
 		if (isset($_POST['studienplan_id'])) // && $_POST['studienplan_id'] != ''
 			$ablauf->studienplan_id = $_POST['studienplan_id'];
 
-		if (!$ablauf->save(false))
+		if ($ablauf->save(false))
+		{
+			// Prüfen, ob Content ID schon existiert
+			foreach ($sprache->result as $row)
+			{
+				$content = new content();
+				if ($content->getContent($_POST['content_id'], $row->sprache))
+				{
+					$content_id = $_POST['content_id'];
+					break;
+				}
+				else
+				{
+					$content_id = '';
+					$errormsg = '<span class="error">Content_ID '.$_POST['content_id'].' ist nicht vorhanden und wurde nicht gespeichert</span>';
+				}
+			}
+			echo $errormsg;
+			$ablauf_vorgaben = new ablauf();
+			$ablauf_vorgaben->ablauf_vorgaben_id = $ablauf->ablauf_vorgaben_id;
+			$ablauf_vorgaben->studiengang_kz = $stg_kz;
+			$ablauf_vorgaben->sprache = $_POST['sprache'];
+			$ablauf_vorgaben->sprachwahl = isset($_POST['sprachwahl'])?true:false;
+			$ablauf_vorgaben->content_id = $content_id;
+			$ablauf_vorgaben->updateamum = date('Y-m-d H:i:s');
+			$ablauf_vorgaben->updatevon = $user;
+			
+			if (!$ablauf_vorgaben->saveAblaufVorgabe(false))
+			{
+				echo $ablauf_vorgaben->errormsg;
+			}
+			
+		}
+		else
 			echo $ablauf->errormsg;
 	}
 	else
@@ -237,47 +317,68 @@ else
 }
 $gebieteangehaengt = array();
 $studienplan = new studienplan();
+$ablauf_vorgaben_id = '';
 
 if ($stg_kz != -1)
 {
 	echo '
 			<table id="t1" class="tablesorter">
-			 <thead><tr>
-			  <th>Gebiet</th>
-			  <th>Reihung</th>
-			  <th>Gewichtung</th>
-			  <th>Semester</th>
-			  <th>Studienplan</th>
-			  <th></th>
-			 </tr></thead><tbody>';
+				<thead><tr>
+					<th>Gebiet</th>
+					<th>Reihung</th>
+					<th>Gewichtung</th>
+					<th>Semester</th>
+					<th>Studienplan</th>
+					<th>Sprache</th>
+					<th>Sprachwahl</th>
+					<th>Content ID</th>
+					<th></th>
+			</tr></thead><tbody>';
 	foreach ($ablauf->result as $row)
 	{
 		$studienplan->loadStudienplan($row->studienplan_id);
 		$gebiet = new gebiet($row->gebiet_id);
 		array_push($gebieteangehaengt, $gebiet->gebiet_id);
-		echo '<tr><td>'.$gebiet->kurzbz.' ('.$gebiet->bezeichnung.')</td><td>'.$row->reihung.'</td><td>'.$row->gewicht.'</td><td>'.$row->semester.'</td><td>'.$studienplan->bezeichnung.'</td><td>
-				<form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&action=edit"   method="POST" style="float:left" id="fe'.$gebiet->gebiet_id.'"><a onclick="document.getElementById(\'fe'.$gebiet->gebiet_id.'\').submit();">edit</a>
-				  <input type="hidden" name="gebiet_id" value="'.$gebiet->gebiet_id.'" />
-				</form>
-				<form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&action=delete" method="POST" style="float:left; margin-left:5px;" id="fd'.$gebiet->gebiet_id.'"><a onclick="document.getElementById(\'fd'.$gebiet->gebiet_id.'\').submit();">delete</a>
-                  <input type="hidden" name="gebiet_id" value="'.$gebiet->gebiet_id.'" />
-				</form></td></tr>';
+		
+		if ($ablauf_vorgaben_id == '' && $row->ablauf_vorgaben_id != '')
+			$ablauf_vorgaben_id = $row->ablauf_vorgaben_id;
+		echo '<tr>
+				<td>'.$gebiet->bezeichnung.' ('.$gebiet->kurzbz.')</td>
+				<td>'.$row->reihung.'</td>
+				<td>'.$row->gewicht.'</td>
+				<td>'.$row->semester.'</td>
+				<td>'.$studienplan->bezeichnung.'</td>
+				<td>'.$row->sprache.'</td>
+				<td>'.($row->sprachwahl != ''?($row->sprachwahl?'Ja':'Nein'):'-').'</td>
+				<td><a href="'.APP_ROOT.'cms/admin.php?content_id='.$row->content_id.'&action=content&filter='.$row->content_id.'" target="_blank">'.$row->content_id.'</a></td>
+				<td>
+					<form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&action=edit"   method="POST" style="float:left" id="fe'.$row->ablauf_id.'"><a onclick="document.getElementById(\'fe'.$row->ablauf_id.'\').submit();">edit</a>
+						<input type="hidden" name="ablauf_id" value="'.$row->ablauf_id.'" />
+					</form>
+					<form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&action=delete" method="POST" style="float:left; margin-left:5px;" id="fd'.$row->ablauf_id.'"><a onclick="if (confirm(\'Gebietszuteilung entfernen?\')) document.getElementById(\'fd'.$row->ablauf_id.'\').submit();">delete</a>
+						<input type="hidden" name="ablauf_id" value="'.$row->ablauf_id.'" />
+						<input type="hidden" name="ablauf_vorgaben_id" value="'.$ablauf_vorgaben_id.'" />
+					</form>
+				</td>
+			</tr>';
 	}
 
-	$gebiet->getAll();
-	echo '</tbody><tfoot><tr><form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&action=save" method="POST"><input type="hidden" name="stg_kz" value="'.$stg_kz.'" /><td><SELECT name="gebiet_id">';
-	foreach ($gebiet->result as $row)
+	$gebiet_dropdown = new gebiet();
+	$gebiet_dropdown->getAll();
+	echo '</tbody><tfoot><tr>
+			<form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&action=save" method="POST">
+			<input type="hidden" name="stg_kz" value="'.$stg_kz.'" />
+			<td>
+				<SELECT name="gebiet_id">';
+	foreach ($gebiet_dropdown->result as $row)
 	{
-		if (!in_array($row->gebiet_id, $gebieteangehaengt))
-		{
-			if ($gebiet_id == '')
-				$gebiet_id = $row->gebiet_id;
-			if ($gebiet_id == $row->gebiet_id)
-				$selected = 'selected';
-			else
-				$selected = '';
-			echo '<OPTION value="'.$row->gebiet_id.'" '.$selected.'>'.$row->kurzbz.' ('.$row->bezeichnung.')</OPTION>';
-		}
+		if ($gebiet_id == '')
+			$gebiet_id = $row->gebiet_id;
+		if ($gebiet_id == $row->gebiet_id)
+			$selected = 'selected';
+		else
+			$selected = '';
+		echo '<OPTION value="'.$row->gebiet_id.'" '.$selected.'>'.$row->bezeichnung.' ('.$row->kurzbz.')</OPTION>';
 	}
 	echo '</SELECT></td>';
 	echo '<td><input type="text" name="reihung" /></td>';
@@ -286,26 +387,24 @@ if ($stg_kz != -1)
 	echo '<td>';
 	drawStudienplanDropdown($stg_kz, $db, "studienplan");
 	echo '</td>';
+	// Ablauf-Vorgaben können nur beim ersten Eintrag gespeichert werden. Ansonsten werden sie über EDIT geändert.
+	if (count($gebieteangehaengt) == 0)
+	{
+		echo '<td><select name="sprache">';	
+		foreach ($sprache->result as $row)
+		{
+			echo '<OPTION value="'.$row->sprache.'" '.$selected.'>'.$row->sprache.'</OPTION>';
+		}
+		echo '</SELECT></td>';
+		echo '<td><input type="checkbox" name="sprachwahl" /></td>';
+		echo '<td><input type="text" name="content_id" /></td>';
+	}
+	else 
+		echo '<td></td><td></td><td></td>';
+	echo '<input type="hidden" name="ablauf_vorgaben_id" value="'.$ablauf_vorgaben_id.'" />';
 	echo '<td><input type="submit" value="Speichern"/></td></form></tr></tfoot></table>';
 }
 
-
-
-
-// Ablaufzuordnung entfernen
-if (isset($_POST['action']) && $_POST['action'] == 'deleteZuordnung')
-{
-	if (!isset($_POST['ablauf_id']) || !is_numeric($_POST['ablauf_id']))
-		die('ungueltige Parameteruebergabe');
-
-	$ablauf_id = $_POST['ablauf_id'];
-
-	$ablauf = new gebiet();
-	if ($ablauf->deleteAblaufZuordnung($ablauf_id))
-		echo '<span class="ok">Ablauf wurde entfernt</span>';
-	else
-		echo '<span class="error">Fehler beim Entfernen:'.$ablauf->errormsg.'</span>';
-}
 // Ablaufzuordnung hinzufügen
 if (isset($_POST['action']) && $_POST['action'] == 'saveAblauf')
 {
