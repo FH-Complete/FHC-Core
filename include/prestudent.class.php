@@ -872,11 +872,11 @@ class prestudent extends person
 	}
 
 	/**
-	 * Loescht einen Prestudentstatus
-	 * @param $prestudent_id
-	 *        $status_kurzbz
-	 *        $studiensemester_kurzbz
-	 *		  $ausbildungssemester
+	 * Loescht einen Prestudentstatus und legt einen Log-Eintrag dafuer an
+	 * @param integer $prestudent_id
+	 * @param string $status_kurzbz
+	 * @param string $studiensemester_kurzbz
+	 * @param integer $ausbildungssemester
 	 * @return true wenn ok, false wenn Fehler
 	 */
 	public function delete_rolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
@@ -928,10 +928,10 @@ class prestudent extends person
 							$this->db_add_param($this->statusgrund_id, FHC_INTEGER).');';
 			if($log->save(true))
 			{
-
 				if($this->db_query($qry))
 				{
 					$this->db_query('COMMIT');
+					$this->log_id = $log->log_id;
 					return true;
 				}
 				else
@@ -1742,6 +1742,103 @@ class prestudent extends person
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Loescht einen Prestudenten und legt einen Log-Eintrag dafuer an
+	 * @param integer $prestudent_id
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function deletePrestudent($prestudent_id)
+	{
+		if(!is_numeric($prestudent_id))
+		{
+			$this->errormsg = 'Prestudent_id ist ungueltig';
+			return false;
+		}
+	
+		$qry = "DELETE FROM public.tbl_prestudent
+				WHERE
+					prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
+	
+		if($this->load($prestudent_id))
+		{
+			$this->db_query('BEGIN;');
+
+			$log = new log();
+
+			$log->executetime = date('Y-m-d H:i:s');
+			$log->beschreibung = 'Loeschen der Prestudent ID '.$prestudent_id;
+			$log->mitarbeiter_uid = get_uid();
+			$log->sql = $qry;
+			$log->sqlundo = 'INSERT INTO public.tbl_prestudent(
+				prestudent_id, aufmerksamdurch_kurzbz, studiengang_kz, berufstaetigkeit_code, ausbildungcode,
+				zgv_code, zgvort, zgvdatum, zgvnation, zgvmas_code, zgvmaort, zgvmadatum, zgvmanation,
+				aufnahmeschluessel, facheinschlberuf, anmeldungreihungstest, reihungstestangetreten, reihungstest_id,
+				punkte, rt_punkte1, rt_punkte2, rt_punkte3, bismelden, person_id, anmerkung, mentor, ext_id_prestudent,
+				dual, ausstellungsstaat, zgvdoktor_code, zgvdoktorort, zgvdoktordatum, zgvdoktornation,
+				gsstudientyp_kurzbz, aufnahmegruppe_kurzbz) VALUES('.
+				$this->db_add_param($this->prestudent_id).','.
+				$this->db_add_param($this->aufmerksamdurch_kurzbz).','.
+				$this->db_add_param($this->studiengang_kz).','.
+				$this->db_add_param($this->berufstaetigkeit_code).','.
+				$this->db_add_param($this->ausbildungcode).','.
+				$this->db_add_param($this->zgv_code).','.
+				$this->db_add_param($this->zgvort).','.
+				$this->db_add_param($this->zgvdatum).','.
+				$this->db_add_param($this->zgvnation).','.
+				$this->db_add_param($this->zgvmas_code).','.
+				$this->db_add_param($this->zgvmaort).','.
+				$this->db_add_param($this->zgvmadatum).','.
+				$this->db_add_param($this->zgvmanation).','.
+				$this->db_add_param($this->aufnahmeschluessel).','.
+				$this->db_add_param($this->facheinschlberuf, FHC_BOOLEAN).','.
+				$this->db_add_param($this->anmeldungreihungstest).','.
+				$this->db_add_param($this->reihungstestangetreten, FHC_BOOLEAN).','.
+				$this->db_add_param($this->reihungstest_id).','.
+				$this->db_add_param($this->punkte).','.
+				$this->db_add_param($this->rt_punkte1).','.
+				$this->db_add_param($this->rt_punkte2).','.
+				$this->db_add_param($this->rt_punkte3).','.
+				$this->db_add_param($this->bismelden, FHC_BOOLEAN).','.
+				$this->db_add_param($this->person_id).','.
+				$this->db_add_param($this->anmerkung).','.
+				$this->db_add_param($this->mentor).','.
+				$this->db_add_param($this->ext_id_prestudent).','.
+				$this->db_add_param($this->dual, FHC_BOOLEAN).','.
+				$this->db_add_param($this->ausstellungsstaat).','.
+				$this->db_add_param($this->zgvdoktor_code).','.
+				$this->db_add_param($this->zgvdoktorort).','.
+				$this->db_add_param($this->zgvdoktordatum).','.
+				$this->db_add_param($this->zgvdoktornation).','.
+				$this->db_add_param($this->gsstudientyp_kurzbz).','.
+				$this->db_add_param($this->aufnahmegruppe_kurzbz).');';
+					
+			if($log->save(true))
+			{
+				if($this->db_query($qry))
+				{
+					$this->db_query('COMMIT');
+					return true;
+				}
+				else
+				{
+					$this->db_query('ROLLBACK');
+					$this->errormsg = 'Fehler beim Loeschen der Daten';
+					return false;
+				}
+			}
+			else
+			{
+				$this->db_query('ROLLBACK');
+				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
+				return false;
+			}
+		}
+		else
+		{
 			return false;
 		}
 	}

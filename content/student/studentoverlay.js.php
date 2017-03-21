@@ -1712,32 +1712,78 @@ function StudentPrestudentRolleDelete()
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	if(confirm('Diese Rolle wirklich loeschen?'))
 	{
+		
 		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 		var req = new phpRequest(url,'','');
 
-		req.add('type', 'deleterolle');
-
-		req.add('status_kurzbz', status_kurzbz);
+		req.add('type', 'returnDeletePrestudent');
 		req.add('prestudent_id', prestudent_id);
-		req.add('studiensemester_kurzbz', studiensemester_kurzbz);
-		req.add('ausbildungssemester', ausbildungssemester);
-		req.add('studiengang_kz', studiengang_kz);
 
 		var response = req.executePOST();
-
 		var val =  new ParseReturnValue(response)
-
-		if (!val.dbdml_return)
+		
+		if (val.dbdml_data == 1)
 		{
-			if(val.dbdml_errormsg=='')
-				alert(response)
-			else
-				alert(val.dbdml_errormsg)
+			if(confirm('Das Loeschen der letzten Rolle loescht auch den gesamten Prestudent-Datensatz!\nMoechten Sie Fortfahren?'))
+			{
+				var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+				var req = new phpRequest(url,'','');
+
+				req.add('type', 'deleterolle');
+
+				req.add('status_kurzbz', status_kurzbz);
+				req.add('prestudent_id', prestudent_id);
+				req.add('studiensemester_kurzbz', studiensemester_kurzbz);
+				req.add('ausbildungssemester', ausbildungssemester);
+				req.add('studiengang_kz', studiengang_kz);
+
+				var response = req.executePOST();
+
+				var val =  new ParseReturnValue(response)
+
+				if (!val.dbdml_return)
+				{
+					if(val.dbdml_errormsg=='')
+						alert(response)
+					else
+						alert(val.dbdml_errormsg)
+				}
+				else
+				{
+					StudentDetailRolleTreeDatasource.Refresh(false);
+					SetStatusBarText('Daten wurden geloescht');
+				}
+			}
 		}
 		else
 		{
-			StudentDetailRolleTreeDatasource.Refresh(false);
-			SetStatusBarText('Daten wurden geloescht');
+			var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+			var req = new phpRequest(url,'','');
+	
+			req.add('type', 'deleterolle');
+	
+			req.add('status_kurzbz', status_kurzbz);
+			req.add('prestudent_id', prestudent_id);
+			req.add('studiensemester_kurzbz', studiensemester_kurzbz);
+			req.add('ausbildungssemester', ausbildungssemester);
+			req.add('studiengang_kz', studiengang_kz);
+	
+			var response = req.executePOST();
+	
+			var val =  new ParseReturnValue(response)
+	
+			if (!val.dbdml_return)
+			{
+				if(val.dbdml_errormsg=='')
+					alert(response)
+				else
+					alert(val.dbdml_errormsg)
+			}
+			else
+			{
+				StudentDetailRolleTreeDatasource.Refresh(false);
+				SetStatusBarText('Daten wurden geloescht');
+			}
 		}
 	}
 }

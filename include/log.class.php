@@ -164,7 +164,30 @@ class log extends basis_db
 
 		if($this->db_query($qry))
 		{
-				return true;
+			if($new)
+			{
+				//Sequence Auslesen
+				$qry = "SELECT currval('public.tbl_log_log_id_seq') as id";
+				if($result = $this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object($result))
+					{
+						$this->log_id = $row->id;
+						$this->db_query('COMMIT;');
+					}
+					else
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						$this->db_query('ROLLBACK');
+					}
+				}
+				else
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					$this->db_query('ROLLBACK');
+				}
+			}
+			return true;
 		}
 		else
 		{

@@ -6,10 +6,16 @@ $this->phrasen['global/semester']='Semester';
 $this->phrasen['global/studiensemester']='Semester';
 $this->phrasen['global/studienzentrum']='Study Center';
 $this->phrasen['global/studiengangsleitung']='Program Director';
+$this->phrasen['global/leitung']='Head';
+$this->phrasen['global/koordination']='Coordination';
 $this->phrasen['global/lehrveranstaltung']='Subject';
 $this->phrasen['global/lehreinheit']='Teaching unit';
 $this->phrasen['global/organisationseinheit']='Organisation Unit';
 $this->phrasen['global/organisationseinheiten']='Organisation Units';
+$this->phrasen['global/organisationsform']='Organisational form';
+
+$this->phrasen['global/ects']='ECTS';
+$this->phrasen['global/semesterstunden']='Units per semester';
 
 $this->phrasen['global/studiengangsmanagement']='Study Management';
 $this->phrasen['global/geschaeftsfuehrendeltg']='business Leadership';
@@ -85,6 +91,7 @@ $this->phrasen['global/bezeichnung']='Description';
 $this->phrasen['global/datum']='Date';
 $this->phrasen['global/stunde']='Hour';
 $this->phrasen['global/minute']='Minute';
+$this->phrasen['global/uhrzeit']='Time';
 $this->phrasen['global/person']='Person';
 $this->phrasen['global/personenkz']='StudentID';
 $this->phrasen['global/personen']='Number of Persons';

@@ -854,6 +854,7 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='deleterolle')
 	{
 		//Loescht eine Prestudentrolle
+		$deletePrestudent = false;
 
 		if(isset($_POST['studiensemester_kurzbz']) && isset($_POST['status_kurzbz']) &&
 		   isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']) &&
@@ -871,11 +872,16 @@ if(!$error)
 				{
 					if($row = $db->db_fetch_object($result))
 					{
-						if($row->anzahl<=1 && !$rechte->isBerechtigt('admin', null, 'suid'))
+						// Die letzte Rolle darf nur durch einen Administrator geloescht werden. Danach wird auch der PreStudent-Eintrag geloescht
+						if($row->anzahl<=1)
 						{
-							$return = false;
-							$errormsg = 'Die letzte Rolle kann nur durch den Administrator geloescht werden';
-							$error = true;
+							$deletePrestudent = true;
+							if (!$rechte->isBerechtigt('admin', null, 'suid'))
+							{
+								$return = false;
+								$errormsg = 'Die letzte Rolle kann nur durch den Administrator geloescht werden';
+								$error = true;
+							}
 						}
 					}
 					else
@@ -901,6 +907,7 @@ if(!$error)
 						{
 							if($rolle->delete_rolle($_POST['prestudent_id'],$_POST['status_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
 							{
+								$log_id = $rolle->log_id;
 								$return = true;
 								// Wenn in diesem Semester kein Status mehr vorhanden ist,
 								// dann wird auch der Studentlehrverband eintrag entfernt
@@ -915,6 +922,18 @@ if(!$error)
 											$return = false;
 											$errormsg = "Fehler beim Löschen der Lehrverbandszuordnung.";
 										}
+									}
+								}
+								// Wenn kein Prestudent-Eintrag mehr vorhanden ist, wird der ganze Prestudent-Datensatz geloescht
+								if ($deletePrestudent == true)
+								{
+									$prestudent = new prestudent();
+									if(!$prestudent->deletePrestudent($_POST['prestudent_id']))
+									{
+										$return = false;
+										$errormsg = "Fehler beim Löschen des Prestudenten.";
+										$log = new log();
+										$log->undo($log_id);
 									}
 								}
 							}
@@ -936,6 +955,40 @@ if(!$error)
 						$errormsg = $rolle->errormsg;
 					}
 				}
+			}
+		}
+		else
+		{
+			$return = false;
+			$errormsg = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='returnDeletePrestudent')
+	{
+		//Prueft, wie viele Prestudentrolle-Eintraege noch vorhanden sind und gibt diese Anzahl als Wert zurueck
+	
+		if(isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']))
+		{
+			$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudentstatus WHERE prestudent_id=".$db->db_add_param($_POST['prestudent_id'], FHC_INTEGER);
+			if($result = $db->db_query($qry))
+			{
+				if($row = $db->db_fetch_object($result))
+				{
+					$return = true;
+					$data = $row->anzahl;
+				}
+				else
+				{
+					$return = false;
+					$errormsg = 'Fehler beim Zaehlen der Rollen';
+					$error = true;
+				}
+			}
+			else
+			{
+				$return = false;
+				$error = true;
+				$errormsg = 'Fehler beim Zaehlen der Rollen';
 			}
 		}
 		else
