@@ -19,13 +19,49 @@
 		</div>
 
 		<form id="linkUsersForm" action="" method="post">
-			<div>
-				Stufe: <input type="text" name="stufe" value=""> <button type="button" id="linkToStufe">To step</button>
-			</div>
-			<div>
-				Gruppe: <input type="text" name="aufnahmegruppe" value=""> <button type="button" id="linkToGruppe">To group</button>
-			</div>
-
+			
+			<br>
+			<br>
+			<br>
+			
+			<?php
+				if ($users != null)
+				{
+			?>
+				<div>
+					Assign to:<br>
+					<select id="linkToGruppe" name="aufnahmegruppe">
+						<?php foreach($gruppen as $v): ?>
+							<?php
+								$selected = '';
+								if ($v->gruppe_kurzbz == $selectedGruppe)
+								{
+									$selected = 'selected';
+								}
+							?>
+							<option value="<?php echo $v->gruppe_kurzbz; ?>" <?php echo $selected; ?>>
+								<?php echo $v->beschreibung; ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
+					<select id="linkToStufe" name="stufe">
+						<?php foreach($stufen as $v): ?>
+							<?php
+								$selected = '';
+								if ($v->stufe == $selectedStufe)
+								{
+									$selected = 'selected';
+								}
+							?>
+							<option value="<?php echo $v->stufe; ?>" <?php echo $selected; ?>>
+								<?php echo $v->beschreibung; ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
+				</div>
+			<?php
+				}
+			?>
 			<br>
 			<br>
 
@@ -33,20 +69,100 @@
 				<?php
 					if ($users != null)
 					{
+				?>
+						<table>
+							<thead>
+								<tr>
+									<th>&nbsp;</th>
+									<th>Prestudent ID</th>
+									<th>Person ID</th>
+									<th>Vorname</th>
+									<th>Nachname</th>
+									<th>Geschlecht</th>
+									<th>Studiengang</th>
+									<th>OrgForm</th>
+									<th>Studienplan</th>
+									<th>Geburtsdatum</th>
+									<th>Email</th>
+									<th>Stufe</th>
+									<th>Gruppe</th>
+									<th>Punkte</th>
+								</tr>
+							</thead>
+							<tbody>
+				<?php
 						for ($i = 0; $i < count($users); $i++)
 						{
 							$user = $users[$i];
-
-							echo '<input type="checkbox" name="prestudent_id[]" value="' . $user->prestudent_id . '"> - ';
-							echo $user->prestudent_id . ' - ';
-							echo $user->vorname . ' - ';
+							
+							echo "<tr>";
+							
+							echo "<td>";
+							echo '<input type="checkbox" name="prestudent_id[]" value="' . $user->prestudent_id . '">';
+							echo "</td>";
+							
+							echo "<td>";
+							echo $user->prestudent_id;
+							echo "</td>";
+							
+							echo "<td>";
+							echo $user->person_id;
+							echo "</td>";
+							
+							echo "<td>";
+							echo $user->vorname;
+							echo "</td>";
+							
+							echo "<td>";
 							echo $user->nachname;
-							echo '<br>';
+							echo "</td>";
+							
+							echo "<td>";
+							echo $user->geschlecht;
+							echo "</td>";
+							
+							echo "<td>";
+							echo $user->kurzbzlang;
+							echo "</td>";
+							
+							echo "<td>";
+							echo $user->orgform_kurzbz;
+							echo "</td>";
+							
+							echo "<td>";
+							echo $user->studienplan;
+							echo "</td>";
+							
+							echo "<td>";
+							echo $user->gebdatum;
+							echo "</td>";
+							
+							echo "<td>";
+							echo $user->email;
+							echo "</td>";
+							
+							echo "<td>";
+							echo $user->rt_stufe;
+							echo "</td>";
+							
+							echo "<td>";
+							echo $user->aufnahmegruppe_kurzbz;
+							echo "</td>";
+							
+							echo "<td>";
+							echo $user->punkte;
+							echo "</td>";
+							
+							echo "</tr>";
 						}
+				?>
+							</tbody>
+						</table>
+				<?php
 					}
 					else
 					{
-						echo 'No data found!!!';
+						echo 'No users found.';
 					}
 				?>
 			</div>
@@ -62,7 +178,7 @@
 		$(document).ready(function() {
 			if ($("#linkToStufe"))
 			{
-				$("#linkToStufe").click(function() {
+				$("#linkToStufe").change(function() {
 					if ($("#linkUsersForm"))
 					{
 						$("#linkUsersForm").attr("action", "<?php echo $hrefLinkToStufe; ?>");
@@ -73,7 +189,7 @@
 
 			if ($("#linkToGruppe"))
 			{
-				$("#linkToGruppe").click(function() {
+				$("#linkToGruppe").change(function() {
 					if ($("#linkUsersForm"))
 					{
 						$("#linkUsersForm").attr("action", "<?php echo $hrefLinkToAufnahmegruppe; ?>");
