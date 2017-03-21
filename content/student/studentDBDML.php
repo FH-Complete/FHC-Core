@@ -3524,6 +3524,7 @@ if(!$error)
 			$projektarbeit->anmerkung = $_POST['anmerkung'];
 			$projektarbeit->updateamum = date('Y-m-d H:i:s');
 			$projektarbeit->updatevon = $user;
+			$projektarbeit->final = ($_POST['final']=='true'?true:false);
 
 			if(!$error)
 			{

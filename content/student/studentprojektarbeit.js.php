@@ -39,7 +39,7 @@ var StudentProjektbetreuerSelectBetreuerartKurzbz=null;
 // ****
 var StudentProjektarbeitTreeSinkObserver =
 {
-	onBeginLoad : function(pSink) 
+	onBeginLoad : function(pSink)
 	{
 		//Eventlistener waehrend des Ladevorganges deaktivieren da es sonst
 		//zu Problemen kommt
@@ -81,8 +81,8 @@ var StudentProjektarbeitTreeListener =
 // ****
 var StudentProjektbetreuerTreeSinkObserver =
 {
-	onBeginLoad : function(pSink) 
-	{ 
+	onBeginLoad : function(pSink)
+	{
 		//Eventlistener waehrend des Ladevorganges deaktivieren da es sonst
 		//zu Problemen kommt
 		tree = document.getElementById('student-projektbetreuer-tree');
@@ -133,7 +133,7 @@ function StudentProjektarbeitTreeLoad(uid)
 	}
 	catch(e)
 	{}
-	
+
 	//Alte DS entfernen
 	var oldDatasources = tree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -150,7 +150,7 @@ function StudentProjektarbeitTreeLoad(uid)
 	tree.database.AddDataSource(StudentProjektarbeitTreeDatasource);
 	StudentProjektarbeitTreeDatasource.addXMLSinkObserver(StudentProjektarbeitTreeSinkObserver);
 	tree.builder.addListener(StudentProjektarbeitTreeListener);
-	
+
 	StudentProjektarbeitDisableFields(false);
 }
 
@@ -161,7 +161,7 @@ function StudentProjektarbeitDisableAll()
 {
 	//Tree Leeren
 	var tree = document.getElementById('student-projektarbeit-tree');
-	
+
 	//Alte DS entfernen
 	var oldDatasources = tree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -170,7 +170,7 @@ function StudentProjektarbeitDisableAll()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	tree.builder.rebuild();
-	
+
 	StudentProjektarbeitDisableFields(true);
 }
 
@@ -181,7 +181,7 @@ function StudentProjektarbeitDisableFields(val)
 {
 	document.getElementById('student-projektarbeit-button-neu').disabled=val;
 	document.getElementById('student-projektarbeit-button-loeschen').disabled=val;
-	
+
 	if(val)
 	{
 		StudentProjektarbeitDetailDisableFields(val);
@@ -211,7 +211,8 @@ function StudentProjektarbeitDetailDisableFields(val)
 	document.getElementById('student-projektarbeit-textbox-gesamtstunden').disabled=val;
 	document.getElementById('student-projektarbeit-textbox-themenbereich').disabled=val;
 	document.getElementById('student-projektarbeit-textbox-anmerkung').disabled=val;
-	
+	document.getElementById('student-projektarbeit-checkbox-final').disabled=val;
+
 	if(val)
 		StudentProjektarbeitResetFields();
 }
@@ -246,6 +247,7 @@ function StudentProjektarbeitResetFields()
 	document.getElementById('student-projektarbeit-menulist-firma').value='';
 	document.getElementById('student-projektarbeit-menulist-note').value='';
 	document.getElementById('student-projektarbeit-menulist-projekttyp').value='Bachelor';
+	document.getElementById('student-projektarbeit-checkbox-final').checked=true;
 }
 
 // *****
@@ -294,7 +296,7 @@ function StudentProjektarbeitAuswahl()
 
 	StudentProjektarbeitDetailDisableFields(false);
 	StudentProjektbetreuerDetailDisableFields(true);
-	
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-projektarbeit-tree-projektarbeit_id"] : "student-projektarbeit-treecol-projektarbeit_id";
 	var projektarbeit_id=tree.view.getCellText(tree.currentIndex,col);
@@ -332,12 +334,13 @@ function StudentProjektarbeitAuswahl()
 	themenbereich = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#themenbereich" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	gesamtstunden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gesamtstunden" ));
-		
+	final = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#final" ));
+
 	//var verband_tree=document.getElementById('tree-verband');
 	//var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
 	//var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
 	var stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
-	
+
 	//Lehrveranstaltung DropDown laden
 	var LvDropDown = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung');
 	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&projektarbeit=true&withlv="+lehrveranstaltung_id+"&"+gettimestamp();
@@ -356,13 +359,13 @@ function StudentProjektarbeitAuswahl()
 	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	LvDropDown.database.AddDataSource(datasource);
-	
+
 	LvDropDown.builder.rebuild();
 
 	// Lehreinheit Drop Down laden
 	var LeDropDown = document.getElementById('student-projektarbeit-menulist-lehreinheit');
 	url='<?php echo APP_ROOT;?>rdf/lehreinheit.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&studiensemester_kurzbz="+lehreinheit_stsem+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = LeDropDown.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -377,9 +380,9 @@ function StudentProjektarbeitAuswahl()
 	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	LeDropDown.database.AddDataSource(datasource);
-	
+
 	LeDropDown.builder.rebuild();
-	
+
 	//Werte setzen
 	document.getElementById('student-projektarbeit-textbox-projektarbeit_id').value=projektarbeit_id;
 	document.getElementById('student-projektarbeit-menulist-projekttyp').value=projekttyp_kurzbz;
@@ -403,11 +406,15 @@ function StudentProjektarbeitAuswahl()
 	document.getElementById('student-projektarbeit-textbox-themenbereich').value=themenbereich;
 	document.getElementById('student-projektarbeit-textbox-anmerkung').value=anmerkung;
 	document.getElementById('student-projektarbeit-checkbox-neu').checked=false;
-	
+	if(final=='Ja')
+		document.getElementById('student-projektarbeit-checkbox-final').checked=true;
+	else
+		document.getElementById('student-projektarbeit-checkbox-final').checked=false;
+
 	// **** BETREUER **** //
 	var tree = document.getElementById('student-projektbetreuer-tree');
 	var url='<?php echo APP_ROOT;?>rdf/projektbetreuer.rdf.php?projektarbeit_id='+projektarbeit_id+"&"+gettimestamp();
-	
+
 	try
 	{
 		StudentProjektbetreuerTreeDatasource.removeXMLSinkObserver(StudentProjektbetreuerTreeSinkObserver);
@@ -415,7 +422,7 @@ function StudentProjektarbeitAuswahl()
 	}
 	catch(e)
 	{}
-	
+
 	//Alte DS entfernen
 	var oldDatasources = tree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -433,7 +440,7 @@ function StudentProjektarbeitAuswahl()
 	StudentProjektbetreuerTreeDatasource.addXMLSinkObserver(StudentProjektbetreuerTreeSinkObserver);
 	tree.builder.addListener(StudentProjektbetreuerTreeListener);
 	StudentProjektbetreuerDisableFields(false);
-		
+
 }
 
 // ****
@@ -444,7 +451,7 @@ function StudentProjektarbeitFirmaRefresh()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-projektarbeit-menulist-firma');
 	var url="<?php echo APP_ROOT ?>rdf/firma.rdf.php?optional=true&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = tree.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -453,7 +460,7 @@ function StudentProjektarbeitFirmaRefresh()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	tree.builder.rebuild();
-	
+
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var myDatasource = rdfService.GetDataSource(url);
 	tree.database.AddDataSource(myDatasource);
@@ -485,16 +492,17 @@ function StudentProjektarbeitSpeichern()
 	themenbereich = document.getElementById('student-projektarbeit-textbox-themenbereich').value;
 	anmerkung = document.getElementById('student-projektarbeit-textbox-anmerkung').value;
 	neu = document.getElementById('student-projektarbeit-checkbox-neu').checked;
+	final = document.getElementById('student-projektarbeit-checkbox-final').checked;
 
 	student_uid =document.getElementById('student-detail-textbox-uid').value;
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
-	
+
 	if(student_uid=='')
 	{
 		alert('UID dieser Person konnte nicht ermittelt werden');
 		return false;
 	}
-	
+
 	//Datum pruefen
 	if(beginn!='' && !CheckDatum(beginn))
 	{
@@ -507,7 +515,7 @@ function StudentProjektarbeitSpeichern()
 		alert('Ende ist ungueltig');
 		return false;
 	}
-	
+
 	if(gesperrtbis!='' && !CheckDatum(gesperrtbis))
 	{
 		alert('gesperrtbis ist ungueltig');
@@ -519,15 +527,15 @@ function StudentProjektarbeitSpeichern()
 		alert('Bitte eine Lehreinheit Auswaehlen');
 		return false;
 	}
-	
+
 	if(isNaN(gesamtstunden))
 		gesamtstunden=0;
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'saveprojektarbeit');
-	
+
 	req.add('projektarbeit_id', projektarbeit_id);
 	req.add('projekttyp_kurzbz', projekttyp_kurzbz );
 	req.add('titel', titel);
@@ -548,6 +556,7 @@ function StudentProjektarbeitSpeichern()
 	req.add('anmerkung', anmerkung);
 	req.add('neu', neu);
 	req.add('studiengang_kz', studiengang_kz);
+	req.add('final', final);
 
 	var response = req.executePOST();
 
@@ -576,7 +585,7 @@ function StudentProjektarbeitSpeichern()
 function StudentProjektarbeitNeu()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	document.getElementById('student-projektarbeit-checkbox-neu').checked=true;
 	document.getElementById('student-projektarbeit-textbox-projektarbeit_id').value='';
 	StudentProjektarbeitResetFields();
@@ -586,7 +595,7 @@ function StudentProjektarbeitNeu()
 	//var col = verband_tree.columns ? verband_tree.columns["stg_kz"] : "stg_kz";
 	//var stg_kz=verband_tree.view.getCellText(verband_tree.currentIndex,col);
 	var stg_kz = studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
-	
+
 	//Lehrveranstaltung DropDown laden
 	var LvDropDown = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung');
 	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?stg_kz='+stg_kz+"&projektarbeit=true&"+gettimestamp();
@@ -605,7 +614,7 @@ function StudentProjektarbeitNeu()
 	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	LvDropDown.database.AddDataSource(datasource);
-	
+
 	LvDropDown.builder.rebuild();
 }
 
@@ -618,8 +627,8 @@ function StudentProjektarbeitLoeschen()
 	var tree = document.getElementById('student-projektarbeit-tree');
 
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
-	
-	if (tree.currentIndex==-1) 
+
+	if (tree.currentIndex==-1)
 	{
 		alert('Bitte zuerst einen Eintrag markieren');
 		return false;
@@ -629,14 +638,14 @@ function StudentProjektarbeitLoeschen()
     var col = tree.columns ? tree.columns["student-projektarbeit-tree-projektarbeit_id"] : "student-projektarbeit-tree-projektarbeit_id";
 	var projektarbeit_id=tree.view.getCellText(tree.currentIndex,col);
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
-	
+
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'deleteprojektarbeit');
-		
+
 	req.add('projektarbeit_id', projektarbeit_id);
 	req.add('studiengang_kz', studiengang_kz);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
@@ -658,20 +667,20 @@ function StudentProjektarbeitLoeschen()
 }
 
 // ****
-// * Wenn die Lehrveranstaltung geaendert wird, dann 
+// * Wenn die Lehrveranstaltung geaendert wird, dann
 // * muss das LehreinheitenDropDown neu geladen werden
 // ****
 function StudentProjektarbeitLVAChange()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	lehrveranstaltung_id = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung').value;
 	studiensemester_kurzbz = getStudiensemester();
-	
+
 	// Lehreinheit Drop Down laden
 	var LeDropDown = document.getElementById('student-projektarbeit-menulist-lehreinheit');
 	url='<?php echo APP_ROOT;?>rdf/lehreinheit.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&studiensemester_kurzbz="+studiensemester_kurzbz+"&"+gettimestamp();
-	
+
 	//Alte DS entfernen
 	var oldDatasources = LeDropDown.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -686,9 +695,9 @@ function StudentProjektarbeitLVAChange()
 	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	LeDropDown.database.AddDataSource(datasource);
-	
+
 	LeDropDown.selectedIndex=-1;
-	
+
 	LeDropDown.builder.rebuild();
 }
 
@@ -705,7 +714,7 @@ function StudentProjektbetreuerTreeSelectID()
 	else
 		return false;
 
-	
+
 	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
 	if(StudentProjektbetreuerSelectPersonID!=null)
 	{
@@ -744,7 +753,7 @@ function StudentProjektbetreuerAuswahl()
 	if (tree.currentIndex==-1) return;
 
 	StudentProjektbetreuerDetailDisableFields(false);
-	
+
 	//Ausgewaehlte Nr holen
     var col = tree.columns ? tree.columns["student-projektbetreuer-tree-projektarbeit_id"] : "student-projektbetreuer-treecol-projektarbeit_id";
 	var projektarbeit_id=tree.view.getCellText(tree.currentIndex,col);
@@ -758,7 +767,7 @@ function StudentProjektbetreuerAuswahl()
 		debug('StudentProjektbetreuerAuswahl: Fehler beim Laden');
 		return false;
 	}
-	
+
 	//Daten holen
 	var url = '<?php echo APP_ROOT ?>rdf/projektbetreuer.rdf.php?projektarbeit_id='+projektarbeit_id+'&person_id='+person_id+'&betreuerart_kurzbz='+betreuerart_kurzbz+'&'+gettimestamp();
 
@@ -781,9 +790,9 @@ function StudentProjektbetreuerAuswahl()
 	stundensatz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#stundensatz" ));
 	betreuerart_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betreuerart_kurzbz" ));
 	person_nachname = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_nachname" ));
-	
+
 	StudentProjektbetreuerMenulistPersonLoad(document.getElementById('student-projektbetreuer-menulist-person'), person_nachname);
-	
+
 	//Werte setzen
 	MenulistSelectItemOnValue('student-projektbetreuer-menulist-person', person_id);
 	document.getElementById('student-projektbetreuer-menulist-note').value=note;
@@ -795,7 +804,7 @@ function StudentProjektbetreuerAuswahl()
 	document.getElementById('student-projektbetreuer-menulist-betreuerart').value=betreuerart_kurzbz;
 	document.getElementById('student-projektbetreuer-textbox-betreuerart_kurzbz_old').value=betreuerart_kurzbz;
 	document.getElementById('student-projektbetreuer-textbox-person_id').value=person_id;
-	document.getElementById('student-projektbetreuer-checkbox-neu').checked=false;	
+	document.getElementById('student-projektbetreuer-checkbox-neu').checked=false;
 }
 
 // *****
@@ -805,7 +814,7 @@ function StudentProjektbetreuerDisableFields(val)
 {
 	document.getElementById('student-projektbetreuer-button-neu').disabled=val;
 	document.getElementById('student-projektbetreuer-button-loeschen').disabled=val;
-	
+
 	if(val)
 	{
 		tree = document.getElementById('student-projektbetreuer-tree');
@@ -815,7 +824,7 @@ function StudentProjektbetreuerDisableFields(val)
 			tree.database.RemoveDataSource(oldDatasources.getNext());
 		}
 		tree.builder.rebuild();
-		
+
 		StudentProjektbetreuerDetailDisableFields(val);
 	}
 }
@@ -878,7 +887,7 @@ function StudentProjektbetreuerMenulistPersonLoad(menulist, filter)
 		v = filter;
 
 	if(v.length>2)
-	{		
+	{
 		var url = '<?php echo APP_ROOT; ?>rdf/person.rdf.php?filter='+encodeURIComponent(v)+'&'+gettimestamp();
 		//nurmittitel=&
 		var oldDatasources = menulist.database.GetDataSources();
@@ -888,7 +897,7 @@ function StudentProjektbetreuerMenulistPersonLoad(menulist, filter)
 		}
 		//Refresh damit die entfernten DS auch wirklich entfernt werden
 		menulist.builder.rebuild();
-	
+
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		if(typeof(filter)=='undefined')
 			var datasource = rdfService.GetDataSource(url);
@@ -908,7 +917,7 @@ function StudentProjektbetreuerMenulistPersonLoad(menulist, filter)
 function StudentProjektbetreuerSpeichern()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
+
 	person_id = MenulistGetSelectedValue('student-projektbetreuer-menulist-person');
 	note = document.getElementById('student-projektbetreuer-menulist-note').value;
 	faktor = document.getElementById('student-projektbetreuer-textbox-faktor').value;
@@ -920,9 +929,9 @@ function StudentProjektbetreuerSpeichern()
 	betreuerart_kurzbz_old = document.getElementById('student-projektbetreuer-textbox-betreuerart_kurzbz_old').value;
 	person_id_old = document.getElementById('student-projektbetreuer-textbox-person_id').value;
 	neu = document.getElementById('student-projektbetreuer-checkbox-neu').checked;
-	
+
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
-	
+
 	var tree = document.getElementById('student-projektarbeit-tree');
 
 	if(person_id=='')
@@ -930,7 +939,7 @@ function StudentProjektbetreuerSpeichern()
 		alert('Bitte zuerst einen Betreuer auswaehlen');
 		return false;
 	}
-	
+
 	if (tree.currentIndex==-1)
 	{
 		alert('Projektarbeit muss ausgewaehlt sein');
@@ -938,12 +947,12 @@ function StudentProjektbetreuerSpeichern()
 	}
     var col = tree.columns ? tree.columns["student-projektarbeit-tree-projektarbeit_id"] : "student-projektarbeit-tree-projektarbeit_id";
 	var projektarbeit_id=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'saveprojektbetreuer');
-	
+
 	req.add('person_id', person_id);
 	req.add('note', note);
 	req.add('faktor', faktor);
@@ -977,7 +986,7 @@ function StudentProjektbetreuerSpeichern()
 		StudentProjektbetreuerDetailDisableFields(true);
 		StudentProjektbetreuerTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
-		
+
 	}
 }
 
@@ -997,7 +1006,7 @@ function StudentProjektbetreuerNeu()
 function StudentProjektbetreuerLoeschen()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		
+
 	var tree = document.getElementById('student-projektbetreuer-tree');
 
 	if (tree.currentIndex==-1)
@@ -1011,14 +1020,14 @@ function StudentProjektbetreuerLoeschen()
 	var person_id=tree.view.getCellText(tree.currentIndex,col);
 	var col = tree.columns ? tree.columns["student-projektbetreuer-tree-betreuerart_kurzbz"] : "student-projektbetreuer-tree-betreuerart_kurzbz";
 	var betreuerart_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-	
+
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'deleteprojektbetreuer');
-	
+
 	req.add('person_id', person_id);
 	req.add('projektarbeit_id', projektarbeit_id);
 	req.add('betreuerart_kurzbz', betreuerart_kurzbz);
@@ -1049,13 +1058,13 @@ function StudentProjektbetreuerLoeschen()
 function StudentProjektbetreuerLoadMitarbeiterDaten()
 {
 	person_id = MenulistGetSelectedValue('student-projektbetreuer-menulist-person');
-	
+
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
 	var req = new phpRequest(url,'','');
 
 	req.add('type', 'getstundensatz');
 	req.add('person_id', person_id);
-	
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
@@ -1071,7 +1080,7 @@ function StudentProjektbetreuerLoadMitarbeiterDaten()
 	{
 		stundensatz = val.dbdml_data
 	}
-	
+
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').value=stundensatz;
 }
 

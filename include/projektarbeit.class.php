@@ -55,6 +55,9 @@ class projektarbeit extends basis_db
 	public $insertvon;			// bigint
 	public $updateamum;			// timestamp
 	public $updatevon;			// bigint
+	public $final;				// boolean
+
+	public $abgabedatum;
 
 
 	/**
@@ -114,6 +117,9 @@ class projektarbeit extends basis_db
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->projekttyp_bezeichnung = $row->bezeichnung;
+				$this->final = $this->db_parse_bool($row->final);
+				$this->abgabedatum = $row->abgabedatum;
+
 				return true;
 			}
 			else
@@ -226,7 +232,7 @@ class projektarbeit extends basis_db
 
 			$qry='BEGIN; INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid, firma_id, note, punkte,
 				beginn, ende, faktor, freigegeben, gesperrtbis, stundensatz, gesamtstunden, themenbereich, anmerkung,
-				insertamum, insertvon, updateamum, updatevon, titel_english) VALUES('.
+				insertamum, insertvon, updateamum, updatevon, titel_english, final) VALUES('.
 			     $this->db_add_param($this->projekttyp_kurzbz).', '.
 			     $this->db_add_param($this->titel).', '.
 			     $this->db_add_param($this->lehreinheit_id, FHC_INTEGER).', '.
@@ -245,7 +251,8 @@ class projektarbeit extends basis_db
 			     $this->db_add_param($this->anmerkung).', now(), '.
 			     $this->db_add_param($this->insertvon).', now(), '.
 			     $this->db_add_param($this->updatevon).','.
-			     $this->db_add_param($this->titel_english).');';
+			     $this->db_add_param($this->titel_english).','.
+				 $this->db_add_param($this->final, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -277,7 +284,8 @@ class projektarbeit extends basis_db
 				'themenbereich='.$this->db_add_param($this->themenbereich).', '.
 				'anmerkung='.$this->db_add_param($this->anmerkung).', '.
 				'updateamum= now(), '.
-				'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'updatevon='.$this->db_add_param($this->updatevon).', '.
+				'final='.$this->db_add_param($this->final, FHC_BOOLEAN).' '.
 				'WHERE projektarbeit_id='.$this->db_add_param($this->projektarbeit_id, FHC_INTEGER).';';
 		}
 
@@ -385,6 +393,8 @@ class projektarbeit extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->final = $this->db_parse_bool($row->final);
+				$obj->abgabedatum = $row->abgabedatum;
 
 				$this->result[] = $obj;
 			}
@@ -447,6 +457,7 @@ class projektarbeit extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->final = $this->db_parse_bool($row->final);
 
 				$this->result[] = $obj;
 			}
