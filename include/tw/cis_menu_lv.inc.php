@@ -457,14 +457,28 @@ function checkZeilenUmbruch()
 	//Gesamtnote
 	if($is_lector && ((!defined('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN) && $angemeldet))
 	{
-		$menu[]=array
-		(
-			'id'=>'core_menu_gesamtnote',
-			'position'=>'80',
-			'name'=>$p->t('lehre/gesamtnote'),
-			'icon'=>'../../../skin/images/button_endnote.png',
-			'link'=>'benotungstool/lvgesamtnoteverwalten.php?lvid='.urlencode($lvid).'&stsem='.urlencode($angezeigtes_stsem)
-		);
+		if($lv_obj->benotung)
+		{
+			$menu[]=array
+			(
+				'id'=>'core_menu_gesamtnote',
+				'position'=>'80',
+				'name'=>$p->t('lehre/gesamtnote'),
+				'icon'=>'../../../skin/images/button_endnote.png',
+				'link'=>'benotungstool/lvgesamtnoteverwalten.php?lvid='.urlencode($lvid).'&stsem='.urlencode($angezeigtes_stsem)
+			);
+		}
+		else
+		{
+			$menu[]=array
+			(
+				'id'=>'core_menu_gesamtnote',
+				'position'=>'80',
+				'name'=>$p->t('lehre/gesamtnote'),
+				'icon'=>'../../../skin/images/button_endnote.png',
+				'text'=>$p->t('lehre/noteneingabedeaktiviert')
+			);
+		}
 	}
 
 	// Studentenupload
