@@ -198,22 +198,38 @@
 			if ($("#linkToStufe"))
 			{
 				$("#linkToStufe").click(function() {
-					if ($("#linkUsersForm"))
-					{
-						$("#linkUsersForm").attr("action", "<?php echo $hrefLinkToStufe; ?>");
-						$("#linkUsersForm").submit();
-					}
+					$.ajax({
+						type: "POST",
+						dataType: "json",
+						url: "<?php echo $hrefLinkToStufe; ?>",
+						data: $("#linkUsersForm").serialize(),
+						success: function(data, textStatus, jqXHR) {
+							alert(data.msg);
+							$("#usersFiltersForm").submit();
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							alert(textStatus + " - " + errorThrown + " - " + jqXHR.responseText);
+						}
+					});
 				});
 			}
 
 			if ($("#linkToGruppe"))
 			{
 				$("#linkToGruppe").click(function() {
-					if ($("#linkUsersForm"))
-					{
-						$("#linkUsersForm").attr("action", "<?php echo $hrefLinkToAufnahmegruppe; ?>");
-						$("#linkUsersForm").submit();
-					}
+					$.ajax({
+						type: "POST",
+						dataType: "json",
+						url: "<?php echo $hrefLinkToAufnahmegruppe; ?>",
+						data: $("#linkUsersForm").serialize(),
+						success: function(data, textStatus, jqXHR) {
+							alert(data.msg);
+							$("#usersFiltersForm").submit();
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							alert(textStatus + " - " + errorThrown + " - " + jqXHR.responseText);
+						}
+					});
 				});
 			}
 			

@@ -100,16 +100,22 @@ class Users extends VileSci_Controller
 		// Load model PrestudentstatusModel
         $this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
         
-        $result = $this->PrestudentstatusModel->updateStufe($prestudentIdArray, $stufe);
+        $result = error("No valid parameters");
+        if (isset($stufe) && isset($prestudentIdArray) && is_array($prestudentIdArray) && count($prestudentIdArray) >0)
+        {
+			$result = $this->PrestudentstatusModel->updateStufe($prestudentIdArray, $stufe);
+		}
+        
+        $this->output->set_header('Content-Type: application/json; charset=utf-8');
         
         if (isSuccess($result))
         {
 			$href = str_replace("/system/Users/linkToStufe", "/system/Users", $_SERVER["REQUEST_URI"]);
-			echo "<div>Data correctly saved - <a href=\"" . $href . "\">Back</a></div>";
+			echo '{"msg": "Data correctly saved"}';
         }
         else
         {
-			echo "<div>Error occurred while saving data, please contact the administrator.</div>";
+			echo '{"msg": "Error occurred while saving data, please contact the administrator"}';
         }
 	}
 	
@@ -121,16 +127,20 @@ class Users extends VileSci_Controller
 		// Load model PrestudentstatusModel
         $this->load->model('crm/Prestudent_model', 'PrestudentModel');
         
-        $result = $this->PrestudentModel->updateAufnahmegruppe($prestudentIdArray, $aufnahmegruppe);
+        $result = error("No valid parameters");
+        if (isset($aufnahmegruppe) && isset($prestudentIdArray) && is_array($prestudentIdArray) && count($prestudentIdArray) >0)
+        {
+			$result = $this->PrestudentModel->updateAufnahmegruppe($prestudentIdArray, $aufnahmegruppe);
+		}
         
         if (isSuccess($result))
         {
 			$href = str_replace("/system/Users/linkToAufnahmegruppe", "/system/Users", $_SERVER["REQUEST_URI"]);
-			echo "<div>Data correctly saved - <a href=\"" . $href . "\">Back</a></div>";
+			echo '{"msg": "Data correctly saved"}';
         }
         else
         {
-			echo "<div>Error occurred while saving data, please contact the administrator.</div>";
+			echo '{"msg": "Error occurred while saving data, please contact the administrator"}';
         }
 	}
 	
