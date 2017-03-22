@@ -2,6 +2,7 @@
 $this->phrasen['lehre/keineLektorenZugeordnet']='Currently there are no lecturers assigned for this subject';
 
 $this->phrasen['lehre/lehrveranstaltungsinformation']='Course Information';
+$this->phrasen['lehre/lehrbeauftragter']='Lecturer(s)';
 $this->phrasen['lehre/lvInfoBearbeiten']='Edit';
 
 $this->phrasen['lehre/semesterplan']='Semesterplan';
@@ -34,5 +35,14 @@ $this->phrasen['lehre/mail']='E-Mail to students';
 $this->phrasen['lehre/keinMailverteiler']='There is no e-mail distribution list for the group(s) %s! The students in these groups will not receive an e-mail.';
 
 $this->phrasen['lehre/pinboard']='Pinboard';
+$this->phrasen['lehre/abmelden']='Abmelden';
+$this->phrasen['lehre/abmeldung']='Abmeldung';
+$this->phrasen['lehre/AbmeldungErfolgreich']='Sie wurden erfolgreich von der Lehrveranstaltung abgemeldet';
+$this->phrasen['lehre/AbmeldungAusGruppeNichtMoeglich']='Sie können sich nicht von dieser Lehrveranstaltung abmelden';
+$this->phrasen['lehre/confirmAbmeldung']='Wollen Sie sich wirklich von der Lehrveranstaltung "%s" abmelden?';
+$this->phrasen['lehre/nichtzugeteilt']='Sie sind nicht zu dieser Lehrveranstaltung zugeteilt';
+
+$this->phrasen['lehre/studienordnung']='Studienordnung';
+$this->phrasen['lehre/studienplan']='Studienplan';
 
 ?>
