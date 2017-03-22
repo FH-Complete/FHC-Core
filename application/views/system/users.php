@@ -29,8 +29,10 @@
 				{
 			?>
 				<div>
-					Assign to:<br>
-					<select id="linkToGruppe" name="aufnahmegruppe">
+					Assign to:
+				</div>
+				<div>
+					<select name="aufnahmegruppe">
 						<?php foreach($gruppen as $v): ?>
 							<?php
 								$selected = '';
@@ -44,7 +46,11 @@
 							</option>
 						<?php endforeach; ?>
 					</select>
-					<select id="linkToStufe" name="stufe">
+					&nbsp;&nbsp;&nbsp;
+					<input type="button" id="linkToGruppe" value="Assign to this group">
+				</div>
+				<div>
+					<select name="stufe">
 						<?php foreach($stufen as $v): ?>
 							<?php
 								$selected = '';
@@ -58,6 +64,8 @@
 							</option>
 						<?php endforeach; ?>
 					</select>
+					&nbsp;&nbsp;&nbsp;
+					<input type="button" id="linkToStufe" value="Assign this stufe">
 				</div>
 			<?php
 				}
@@ -178,7 +186,7 @@
 		$(document).ready(function() {
 			if ($("#linkToStufe"))
 			{
-				$("#linkToStufe").change(function() {
+				$("#linkToStufe").click(function() {
 					if ($("#linkUsersForm"))
 					{
 						$("#linkUsersForm").attr("action", "<?php echo $hrefLinkToStufe; ?>");
@@ -189,7 +197,7 @@
 
 			if ($("#linkToGruppe"))
 			{
-				$("#linkToGruppe").change(function() {
+				$("#linkToGruppe").click(function() {
 					if ($("#linkUsersForm"))
 					{
 						$("#linkUsersForm").attr("action", "<?php echo $hrefLinkToAufnahmegruppe; ?>");

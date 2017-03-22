@@ -35,7 +35,6 @@
 				</option>
 			<?php endforeach; ?>
 		</select>
-		AND
 		<select id="studiensemester" name="studiensemester">
 			<?php foreach($studiensemester as $v): ?>
 				<?php
@@ -50,7 +49,6 @@
 				</option>
 			<?php endforeach; ?>
 		</select>
-		->
 		<select id="reihungstest" name="reihungstest">
 			<?php foreach($reihungstest as $v): ?>
 				<?php
@@ -67,9 +65,6 @@
 		</select>
 	</div>
 	<div>
-		AND
-	</div>
-	<div>
 		<select id="gruppe" name="gruppe">
 			<?php foreach($gruppen as $v): ?>
 				<?php
@@ -84,7 +79,6 @@
 				</option>
 			<?php endforeach; ?>
 		</select>
-		AND
 		<select id="stufe" name="stufe">
 			<?php foreach($stufen as $v): ?>
 				<?php
