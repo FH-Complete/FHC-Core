@@ -5,81 +5,124 @@
 			$href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER["REQUEST_URI"]);
 		?>
 		<form id="sendForm" method="post" action="<?php echo $href; ?>">
-			
-			<div class="row">
-				<div class="span4">
-					To:
-					<?php
-						for($i = 0; $i < count($receivers); $i++)
-						{
-							$receiver = $receivers[$i];
-							// Every 10 recipients a new line
-							if ($i > 1 && $i % 10 == 0)
-							{
-								echo '<br>';
-							}
-							echo $receiver->Vorname . " " . $receiver->Nachname . "; ";
-						}
-					?>
-					<br>
-					Subject: <input id="subject" type="text" value="" name="subject" size="70"><br/>
-					<textarea id="bodyTextArea" name="body"></textarea>
-				<?php
-					if (isset($variables))
-					{
-				?>
-						Variables:<br>
-						<select id="variables" size="12" style="min-width:200px;">
+			<table>
+				<tr>
+					<td>
+						<strong>To:</strong>
+					</td>
+					<td>
 						<?php
-							foreach($variables as $key => $val)
+							for ($i = 0; $i < count($receivers); $i++)
 							{
-						?>
-								<option value="<?php echo $key; ?>"><?php echo $val; ?></option>
-						<?php
+								$receiver = $receivers[$i];
+								// Every 10 recipients a new line
+								if ($i > 1 && $i % 10 == 0)
+								{
+									echo '<br>';
+								}
+								echo $receiver->Vorname . " " . $receiver->Nachname . "; ";
 							}
 						?>
-						</select>
-				<?php
-					}
-				?>
-				
-				</div>
-			</div>
+					</td>
+				</tr>
+				<tr>
+					<td height="3px"></td>
+				</tr>
+				<tr>
+					<td>
+						<strong>Subject:</strong>&nbsp;
+					</td>
+					<td>
+						<input id="subject" type="text" value="" name="subject" size="70">
+					</td>
+				</tr>
+			</table>
+			<table width="100%">
+				<tr>
+					<td width="80%">
+						<strong>Message:</strong><br>
+						<textarea id="bodyTextArea" name="body"></textarea>
+					</td>
+					<td width="3%">&nbsp;</td>
+					<td width="17%">
+						<?php
+							if (isset($variables))
+							{
+						?>
+							<div>
+								<strong>Variables:</strong><br>
+								<select id="variables" size="14" style="min-width:200px;">
+								<?php
+									foreach($variables as $key => $val)
+									{
+								?>
+										<option value="<?php echo $key; ?>"><?php echo $val; ?></option>
+								<?php
+									}
+								?>
+								</select>
+							</div>
+						<?php
+							}
+						?>
+					</td>
+				</tr>
+			</table>
 			
-			<div class="row">
-				<div class="span4">
-					<button id="sendButton" type="button">Send</button>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					<?php echo $this->templatelib->widget("Vorlage_widget", array("title" => "Vorlage")); ?>
-				</div>
-			</div>
+			<table>
+				<tr>
+					<td>
+						<?php echo $this->templatelib->widget("Vorlage_widget", array("title" => "Vorlage")); ?>
+					</td>
+					<td>
+						&nbsp;
+					</td>
+					<td>
+						<button id="sendButton" type="button">Send</button>
+					</td>
+				</tr>
+			</table>
+			
+			<br>
 			
 			<?php
 				if (isset($receivers) && count($receivers) > 0)
 				{
 			?>
-				<div class="row">
-					<div class="span4">
-						Recipients:<br>
-						<select id="recipients">
-							<option value="-1">Select...</option>
-						<?php
-							foreach($receivers as $receiver)
-							{
-						?>
-							<option value="<?php echo $receiver->prestudent_id; ?>"><?php echo $receiver->Nachname . " " . $receiver->Vorname; ?></option>
-						<?php
-							}
-						?>	
-						</select>
-						<a href="#" id="refresh">Refresh</a>
-					</div>
+				<div>
+					Preview:
 				</div>
-				
-				<div class="row">
-					<div class="span4">
-						<textarea id="tinymcePreview"></textarea>
-					</div>
+				<div style="border: 1px; border-style: solid;">
+					<table width="100%" style="margin: 3px;">
+						<tr>
+							<td>
+								<strong>Recipient:</strong>
+								<select id="recipients">
+									<option value="-1">Select...</option>
+								<?php
+									foreach($receivers as $receiver)
+									{
+								?>
+									<option value="<?php echo $receiver->prestudent_id; ?>"><?php echo $receiver->Nachname . " " . $receiver->Vorname; ?></option>
+								<?php
+									}
+								?>	
+								</select>
+								&nbsp;
+								<strong><a href="#" id="refresh">Refresh</a></strong>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								&nbsp;
+							</td>
+						</tr>
+						<tr>
+							<td width="100%">
+								<textarea id="tinymcePreview"></textarea>
+							</td>
+						</tr>
+					</table>
 				</div>
 			<?php
 				}
