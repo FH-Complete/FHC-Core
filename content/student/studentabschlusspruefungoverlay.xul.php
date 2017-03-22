@@ -60,7 +60,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				datasources="rdf:null" ref="http://www.technikum-wien.at/abschlusspruefung/liste"
 				flags="dont-build-content"
 				enableColumnDrag="true"
-				style="margin:0px;"
+				style="margin:0px;min-height:100px;"
 				persist="hidden, height"
 				context="student-abschlusspruefung-tree-popup"
 		>

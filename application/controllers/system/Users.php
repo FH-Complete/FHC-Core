@@ -36,6 +36,41 @@ class Users extends VileSci_Controller
 			$users = $returnUsers->retval;
 		}
 		
+		// Gruppen
+		$this->load->model('organisation/Gruppe_model', 'GruppeModel');
+		$this->GruppeModel->addOrder('beschreibung');
+		$gruppen = $this->GruppeModel->loadWhere(array('aktiv' => true, 'aufnahmegruppe' => true));
+		if (hasData($gruppen))
+		{
+			// Adding an empty element at the beginning
+			$emptyElement = new stdClass();
+			$emptyElement->gruppe_kurzbz = '-1';
+			$emptyElement->beschreibung = 'Select a group...';
+			array_unshift($gruppen->retval, $emptyElement);
+		}
+		else
+		{
+			show_error($gruppen->retval);
+		}
+		
+		// Stufe
+		$this->load->model('crm/Reihungstest_model', 'ReihungstestModel');
+		$this->ReihungstestModel->addSelect('DISTINCT ON(stufe) stufe, stufe AS beschreibung');
+		$this->ReihungstestModel->addOrder('stufe');
+		$stufen = $this->ReihungstestModel->loadWhere('stufe IS NOT NULL');
+		if (hasData($stufen))
+		{
+			// Adding an empty element at the beginning
+			$emptyElement = new stdClass();
+			$emptyElement->stufe = '-1';
+			$emptyElement->beschreibung = 'Select a stufe...';
+			array_unshift($stufen->retval, $emptyElement);
+		}
+		else
+		{
+			show_error($stufen->retval);
+		}
+		
 		if ($returnUsers == null || isSuccess($returnUsers))
 		{
 			$viewData = array(
@@ -44,7 +79,9 @@ class Users extends VileSci_Controller
 				'gruppe' => $gruppe,
 				'reihungstest' => $reihungstest,
 				'stufe' => $stufe,
-				'users' => $users
+				'users' => $users,
+				'gruppen' => $gruppen->retval,
+				'stufen' => $stufen->retval
 			);
 			
 			$this->load->view('system/users', $viewData);
@@ -67,11 +104,12 @@ class Users extends VileSci_Controller
         
         if (isSuccess($result))
         {
-			echo "Tutto ok!";
+			$href = str_replace("/system/Users/linkToStufe", "/system/Users", $_SERVER["REQUEST_URI"]);
+			echo "<div>Data correctly saved - <a href=\"" . $href . "\">Back</a></div>";
         }
         else
         {
-			echo "Kaputt!";
+			echo "<div>Error occurred while saving data, please contact the administrator.</div>";
         }
 	}
 	
@@ -87,11 +125,12 @@ class Users extends VileSci_Controller
         
         if (isSuccess($result))
         {
-			echo "Tutto ok!";
+			$href = str_replace("/system/Users/linkToAufnahmegruppe", "/system/Users", $_SERVER["REQUEST_URI"]);
+			echo "<div>Data correctly saved - <a href=\"" . $href . "\">Back</a></div>";
         }
         else
         {
-			echo "Kaputt!";
+			echo "<div>Error occurred while saving data, please contact the administrator.</div>";
         }
 	}
 	
@@ -112,7 +151,9 @@ class Users extends VileSci_Controller
 			sg.bezeichnung,
 			sg.orgform_kurzbz,
 			sgt.bezeichnung AS typ,
+			s.bezeichnung AS studienplan,
 			ps.rt_stufe,
+			aufnahmegruppe_kurzbz,
 			rtp.punkte'
 		);
 		

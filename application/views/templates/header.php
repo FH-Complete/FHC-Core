@@ -1,8 +1,10 @@
 <?php
-if (! defined('BASEPATH'))
-	exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
+
 isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
 !isset($jquery) ? $jquery = false : $jquery = $jquery;
+!isset($jquery_checkboxes) ? $jquery_checkboxes = false : $jquery_checkboxes = $jquery_checkboxes;
+!isset($jquery_custom) ? $jquery_custom = false : $jquery_custom = $jquery_custom;
 !isset($tablesort) ? $tablesort = false : $tablesort = $tablesort;
 !isset($sortList) ? $sortList = '0,0' : $sortList = $sortList;
 !isset($widgets) ? $widgets = 'zebra' : $widgets = $widgets;
@@ -12,7 +14,7 @@ isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
 !isset($jsonforms) ? $jsonforms = false : $jsonforms = $jsonforms;
 !isset($textile) ? $textile = false : $textile = $textile;
 
-if ($tablesort)
+if ($tablesort || $jquery_checkboxes || $jquery_custom)
 	$jquery = true;
 ?>
 <!DOCTYPE HTML>
@@ -25,9 +27,19 @@ if ($tablesort)
 <?php if($tablesort) : ?>
 	<link rel="stylesheet"    type="text/css"     href="<?php echo base_url('skin/tablesort.css'); ?>" />
 <?php endif ?>
+
 <?php if($jquery) : ?>
 	<script type="text/javascript" src="<?php echo base_url('include/js/jquery1.9.min.js'); ?>"></script>
 <?php endif ?>
+
+<?php if($jquery_checkboxes) : ?>
+	<script type="text/javascript" src="<?php echo base_url('include/js/jquery.checkboxes-1.0.7.min.js'); ?>"></script>
+<?php endif ?>
+
+<?php if($jquery_custom) : ?>
+	<link rel="stylesheet"    type="text/css"     href="<?php echo base_url('skin/jquery-ui-1.9.2.custom.min.css'); ?>" />
+<?php endif ?>
+
 <?php if($tablesort && !empty($tableid)) : ?>
 	<script language="Javascript" type="text/javascript">
 		$(document).ready(function()

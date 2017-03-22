@@ -653,6 +653,7 @@ class DB_Model extends FHC_Model
 		{
 			if (($isEntitled = $this->isEntitled($this->dbTable, $permission, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			{
+				// TODO: resetQuery
 				return $isEntitled;
 			}
 		}
