@@ -235,6 +235,7 @@
 				data: {"vorlage_kurzbz": vorlage_kurzbz},
 				success: function(data, textStatus, jqXHR) {
 					tinyMCE.get("bodyTextArea").setContent(data.retval[0].text);
+					$("#subject").val(data.retval[0].subject);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					alert(textStatus + " - " + errorThrown);
