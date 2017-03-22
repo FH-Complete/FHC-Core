@@ -604,7 +604,10 @@ if(isset($_GET['excel']))
 				$('#clm_absolviert, #clm_ergebnis').on('click', function()
 				{
 					if (<?php echo json_encode($punkteberechnung);?> == 'false' && (document.getElementById('clm_absolviert').className == 'inactive' || document.getElementById('clm_ergebnis').className == 'inactive'))
+					{
+						$('.wait').html('...wait...');
 						window.location.href = "<?php echo $_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&punkteberechnung=true';?>";
+					}
 					else if (<?php echo json_encode($punkteberechnung);?> == 'true' && document.getElementById('clm_absolviert').className == 'inactive' && document.getElementById('clm_ergebnis').className == 'inactive')
 						window.location.href = "<?php echo $_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&punkteberechnung=false';?>";
 				});
@@ -1997,8 +2000,8 @@ if($reihungstest_id!='')
 	echo '<div id="clm_einstiegssemester" class="active" onclick="hideColumn(\'clm_einstiegssemester\')">Einstiegssemester</div>';
 	echo '<div id="clm_geburtsdatum" class="active" onclick="hideColumn(\'clm_geburtsdatum\')">Geburtsdatum</div>';
 	echo '<div id="clm_email" class="active" onclick="hideColumn(\'clm_email\')">EMail</div>';
-	echo '<div id="clm_absolviert" class="active" onclick="hideColumn(\'clm_absolviert\')">Absolvierte Tests</div>';
-	echo '<div id="clm_ergebnis" class="active" onclick="hideColumn(\'clm_ergebnis\')">Ergebnis</div>';
+	echo '<div id="clm_absolviert" class="active" onclick="hideColumn(\'clm_absolviert\')">Absolvierte Tests <span class="wait"></span></div>';
+	echo '<div id="clm_ergebnis" class="active" onclick="hideColumn(\'clm_ergebnis\')">Ergebnis <span class="wait"></span></div>';
 	echo '<div id="clm_fas" class="active" onclick="hideColumn(\'clm_fas\')">FAS</div>';
 	echo '</td></tr></table>';
 	echo '<br>';
@@ -2096,9 +2099,9 @@ if($reihungstest_id!='')
 						<td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
 						<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
 						<td style="display: table-cell" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
-						<td style="display: table-cell; align: right" class="clm_ergebnis"">'.($rtergebnis===false?'-':number_format($rtergebnis,2,'.','')).'</td>
+						<td style="display: table-cell; align: right" class="clm_ergebnis"">'.($rtergebnis == '' || $rtergebnis===false?'-':number_format($rtergebnis,2,'.','')).'</td>
 						<td style="display: table-cell; align: right" class="clm_fas">';
-						if($rtergebnis!==false && $row->punkte=='')
+						if($rtergebnis!==false && $rtergebnis != '' && $row->punkte=='')
 							echo '<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&rt_person_id='.$row->rt_person_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>';
 						else
 						{
