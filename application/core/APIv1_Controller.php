@@ -9,6 +9,6 @@ class APIv1_Controller extends REST_Controller
         parent::__construct();
         
         // Loads return messages
-		$this->load->helper('Message');
+		$this->load->helper('message');
     }
 }

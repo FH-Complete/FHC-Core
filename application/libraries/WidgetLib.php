@@ -24,12 +24,10 @@
  * THE SOFTWARE.
  */
 
-if (!defined("BASEPATH"))
-    exit("No direct script access allowed");
+if (!defined("BASEPATH")) exit("No direct script access allowed");
 
-class TemplateLib
+class WidgetLib
 {
-    
     /* default values */
     private $_template = 'template';
     private $_parser = FALSE;
@@ -604,26 +602,29 @@ class Partial
 
 class Widget extends Partial
 {
-    
-    /* (non-PHPdoc)
-     * @see Partial::content()
-     */
-    public function content() {
-        if (!$this->_cached) {
-            if (method_exists($this, 'display')) {
-                // capture output
-                ob_start();
-                $this->display($this->_args);
-                $buffer = ob_get_clean();
-                
-                // if no content is produced but there was direct ouput we set 
-                // that output as content
-                if (!$this->_content && $buffer) {
-                    $this->set($buffer);
-                }
-            }
-        }
-        
-        return parent::content();
-    }
+	/* (non-PHPdoc)
+	* @see Partial::content()
+	*/
+	public function content()
+	{
+		if (!$this->_cached)
+		{
+			if (method_exists($this, 'display'))
+			{
+				// capture output
+				ob_start();
+				$this->display($this->_args);
+				$buffer = ob_get_clean();
+				
+				// if no content is produced but there was direct ouput we set 
+				// that output as content
+				if (!$this->_content && $buffer)
+				{
+					$this->set($buffer);
+				}
+			}
+		}
+		
+		return parent::content();
+	}
 }

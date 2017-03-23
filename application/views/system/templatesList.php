@@ -8,7 +8,7 @@
 MimeType 
 <?php 
     // This is an example to show that you can load stuff from inside the template file
-    echo $this->templatelib->widget("mimetype_widget", array('mimetype' => $mimetype));
+    echo $this->widgetlib->widget("mimetype_widget", array('mimetype' => $mimetype));
 ?>
  <button type="submit">Filter</button> 
 </form> 

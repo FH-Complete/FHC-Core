@@ -11,11 +11,11 @@
 	<table>
 	<tr>
 		<td>OE</td>
-		<td><?php echo $this->templatelib->widget("organisationseinheit_widget", array('oe_kurzbz' => $orgeinheit_kurzbz)); ?></td>
+		<td><?php echo $this->widgetlib->widget("organisationseinheit_widget", array('oe_kurzbz' => $orgeinheit_kurzbz)); ?></td>
 		<td>Preview</td>
 	</tr>
-	<tr><td>Orgform</td><td><?php echo $this->templatelib->widget("orgform_widget", array('orgform_kurzbz' => $orgform_kurzbz)); ?></td><td></td></tr>
-	<tr><td>Sprache</td><td><?php echo $this->templatelib->widget("sprache_widget", array('sprache' => $sprache)); ?></td><td></td></tr>
+	<tr><td>Orgform</td><td><?php echo $this->widgetlib->widget("orgform_widget", array('orgform_kurzbz' => $orgform_kurzbz)); ?></td><td></td></tr>
+	<tr><td>Sprache</td><td><?php echo $this->widgetlib->widget("sprache_widget", array('sprache' => $sprache)); ?></td><td></td></tr>
 	<tr><td>Text</td><td><textarea name="text" style="width:500px; height:300px;" id="markitup"><?php echo $text ?></textarea></td>
 		<td valign="top">
 			<div id="textile-preview" style="width:500px; height:300px; border: 1px solid gray; overflow: auto;"></div>
@@ -35,7 +35,7 @@
 	</td></tr>
  	<?php
 		// This is an example to show that you can load stuff from inside the template file
-		//echo $this->templatelib->widget("tinymce_widget", array('name' => 'text', 'text' => $text));
+		//echo $this->widgetlib->widget("tinymce_widget", array('name' => 'text', 'text' => $text));
 	?>
 	<tr><td colspan="2" align="right"><button type="submit">Save</button></td></tr>
 </table>

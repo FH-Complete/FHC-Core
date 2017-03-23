@@ -18,7 +18,7 @@
 				<div class="span4">
 					<button type="submit">Send</button>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					<?php echo $this->templatelib->widget("Vorlage_widget", array("title" => "Vorlage")); ?>
+					<?php echo $this->widgetlib->widget("Vorlage_widget", array("title" => "Vorlage")); ?>
 				</div>
 			</div>
 			

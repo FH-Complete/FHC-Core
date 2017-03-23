@@ -8,9 +8,9 @@
 	Bezeichnung: <input type="text" name="bezeichnung" value="<?php echo $vorlage->bezeichnung; ?>" />
 	Anmerkung: <input type="text" name="anmerkung" value="<?php echo $vorlage->anmerkung; ?>" /><br/>
 
-	MimeType:<?php echo $this->templatelib->widget("mimetype_widget", array('mimetype' => $vorlage->mimetype)); ?>
+	MimeType:<?php echo $this->widgetlib->widget("mimetype_widget", array('mimetype' => $vorlage->mimetype)); ?>
 
-	Attribute: <?php echo $this->templatelib->widget("jsoneditor_widget", array('json' => $vorlage->attribute)); ?>
+	Attribute: <?php echo $this->widgetlib->widget("jsoneditor_widget", array('json' => $vorlage->attribute)); ?>
 
 	<input type="hidden" name="attribute" id="attribute" value="<?=$vorlage->attribute?>" />
 	<input type="hidden" name="vorlage_kurzbz" value="<?php echo $vorlage->vorlage_kurzbz; ?>" />

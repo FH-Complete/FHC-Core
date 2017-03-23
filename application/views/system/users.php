@@ -4,7 +4,7 @@
 		<div>
 			<form id="usersFiltersForm" action="" method="post">
 				<?php
-					echo $this->templatelib->widget(
+					echo $this->widgetlib->widget(
 						'Usersfilters_widget',
 						array(
 							'studiengang' => $studiengang,

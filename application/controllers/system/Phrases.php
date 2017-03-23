@@ -7,7 +7,12 @@ class Phrases extends FHC_Controller
 	public function __construct()
     {
         parent::__construct();
+        
+        // Loads the phrases library
         $this->load->library('PhrasesLib');
+        
+        // Loads the widget library
+		$this->load->library('WidgetLib');
         
         // Loads helper message to manage returning messages
 		$this->load->helper('message');

@@ -7,22 +7,22 @@
 	  <h2>Vorlagetext: <?=$vorlagestudiengang_id?></h2>
 	<!--StudiengangKZ: <?=$studiengang_kz?>-->
 <form method="post" action="../saveText/<?=$vorlagestudiengang_id?>">
-	OE:<?php echo $this->templatelib->widget("organisationseinheit_widget", array('oe_kurzbz' => $oe_kurzbz, 'typ' => "'Erhalter','Studienzentrum','Studiengang','Lehrgang'")); ?>
-	Sprache:<?php echo $this->templatelib->widget("sprache_widget", array('sprache' => $sprache)); ?>
-	OrgForm:<?php echo $this->templatelib->widget("orgform_widget", array('orgform' => $orgform_kurzbz)); ?>
+	OE:<?php echo $this->widgetlib->widget("organisationseinheit_widget", array('oe_kurzbz' => $oe_kurzbz, 'typ' => "'Erhalter','Studienzentrum','Studiengang','Lehrgang'")); ?>
+	Sprache:<?php echo $this->widgetlib->widget("sprache_widget", array('sprache' => $sprache)); ?>
+	OrgForm:<?php echo $this->widgetlib->widget("orgform_widget", array('orgform' => $orgform_kurzbz)); ?>
 	Version: <input type="text" name="version" value="<?php echo $version; ?>" size="1" />
 	Aktiv: <input type="text" name="aktiv" value="<?php echo $aktiv; ?>" size="1" />
 	<input type="hidden" name="vorlagestudiengang_id" value="<?php echo $vorlagestudiengang_id; ?>" />
 	<input type="hidden" name="studiengang_kz" value="<?php echo $studiengang_kz; ?>" />
  	<?php
 		// This is an example to show that you can load stuff from inside the template file
-		echo $this->templatelib->widget("tinymce_widget", array('name' => 'text', 'text' => $text));
+		echo $this->widgetlib->widget("tinymce_widget", array('name' => 'text', 'text' => $text));
 	?>
 	<button type="submit">Save</button>
 </form>
 <hr/><h2>Preview-Data</h2>
 <form method="post" action="../preview/<?=$vorlagestudiengang_id?>" target="TemplatePreview">
-	<?php echo $this->templatelib->widget("jsonforms_widget", array('id' => 'dataform', 'schema' => $schema)); ?>
+	<?php echo $this->widgetlib->widget("jsonforms_widget", array('id' => 'dataform', 'schema' => $schema)); ?>
 	<input type="hidden" name="formdata" id="formdata" value="" />
 	<button type="submit" onclick="getFormdata(this.form);">Preview</button>
 </form>

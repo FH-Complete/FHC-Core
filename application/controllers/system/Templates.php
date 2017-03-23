@@ -7,7 +7,12 @@ class Templates extends FHC_Controller
 	public function __construct()
     {
         parent::__construct();
+        
+        // Loads the vorlage library
         $this->load->library('VorlageLib');
+        
+        // Loads the widget library
+		$this->load->library('WidgetLib');
     }
 
 	public function index()
