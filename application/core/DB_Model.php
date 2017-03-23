@@ -651,9 +651,13 @@ class DB_Model extends FHC_Model
 			substr(get_called_class(), -6) == DB_Model::MODEL_POSTFIX) ||
 			$permission != PermissionLib::SELECT_RIGHT)
 		{
+			// If true is not returned, then an error has occurred
 			if (($isEntitled = $this->isEntitled($this->dbTable, $permission, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			{
-				// TODO: resetQuery
+				// Before returning the object containing the error, reset the build query
+				// This is for preventing that other parts of the query will be built before of the next execution
+				$this->resetQuery();
+				
 				return $isEntitled;
 			}
 		}
