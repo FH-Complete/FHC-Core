@@ -74,4 +74,87 @@ class Prestudent_model extends DB_Model
 			)
         );
 	}
+	
+	/**
+	 * Returns a list of prestudent with additional information:
+	 *	- person_id
+	 *	- name, surname, gender and birthday
+	 *	- email
+	 *	- studiengang and orgform
+	 *	- studienplan
+	 *	- stufe and aufnahmegruppe
+	 *	- reihungstest score
+	 */
+	public function getPrestudentMultiAssign($studiengang = null, $studiensemester = null, $gruppe = null, $reihungstest = null, $stufe = null)
+	{
+		$this->addSelect(
+			'DISTINCT ON(p.person_id, prestudent_id) p.person_id,
+			prestudent_id,
+			p.nachname,
+			p.vorname,
+			p.geschlecht,
+			p.gebdatum,
+			k.kontakt AS email,
+			sg.kurzbzlang,
+			sg.bezeichnung,
+			sg.orgform_kurzbz,
+			sgt.bezeichnung AS typ,
+			s.bezeichnung AS studienplan,
+			ps.rt_stufe,
+			aufnahmegruppe_kurzbz,
+			rtp.punkte'
+		);
+		
+		$this->addJoin('public.tbl_rt_person rtp', 'person_id');
+		$this->addJoin('public.tbl_person p', 'person_id', 'LEFT');
+		$this->addJoin(
+			'(
+					SELECT person_id,
+						   kontakt
+					  FROM public.tbl_kontakt
+					 WHERE zustellung = TRUE
+					   AND kontakttyp = \'email\'
+				  ORDER BY kontakt_id DESC
+			) k',
+			'person_id',
+			'LEFT'
+		);
+		$this->addJoin('public.tbl_prestudentstatus ps', 'prestudent_id');
+		$this->addJoin('lehre.tbl_studienplan s', 's.studienplan_id = ps.studienplan_id');
+		$this->addJoin('lehre.tbl_studienordnung so', 'studienordnung_id');
+		$this->addJoin('public.tbl_studiengang sg', 'sg.studiengang_kz = so.studiengang_kz');
+		$this->addJoin('public.tbl_studiengangstyp sgt', 'typ');
+		
+		$this->addOrder('p.person_id', 'ASC');
+		$this->addOrder('prestudent_id', 'ASC');
+		
+		$parametersArray = array('p.aktiv' => true, 'ps.status_kurzbz' => 'Interessent');
+		
+		if ($studiengang != null)
+		{
+			$parametersArray['sg.studiengang_kz'] = $studiengang;
+		}
+		
+		if ($studiensemester != null)
+		{
+			$parametersArray['ps.studiensemester_kurzbz'] = $studiensemester;
+		}
+		
+		if ($gruppe != null)
+		{
+			$parametersArray['aufnahmegruppe_kurzbz'] = $gruppe;
+		}
+		
+		if ($reihungstest != null)
+		{
+			$parametersArray['rtp.rt_id'] = $reihungstest;
+		}
+		
+		if ($stufe != null)
+		{
+			$parametersArray['ps.rt_stufe'] = $stufe;
+		}
+		
+		return $this->loadWhere($parametersArray);
+	}
 }

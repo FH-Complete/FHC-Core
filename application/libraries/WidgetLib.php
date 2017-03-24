@@ -181,7 +181,8 @@ class WidgetLib
      * @param array $data
      * @return Widget
      */
-    public function widget($name, $data = array()) {
+    public function widget($name, $data = array(), $htmlArgs = array())
+    {
         $class = str_replace('.php', '', trim($name, '/'));
         
         // determine path and widget class name
@@ -208,7 +209,7 @@ class WidgetLib
             show_error("Widget '" . $class . "' was not found.");
         }
         
-        return new $class($class, $data);
+        return new $class($class, $data, $htmlArgs);
     }
     
     /**
@@ -333,6 +334,7 @@ class WidgetLib
 
 class Partial
 {
+    const HTML_DEFAULT_VALUE = ''; // Default value of the html element
     
     protected $_ci, $_content, $_name, $_cache_ttl = 0, $_cached = false, $_identifier, $_trigger;
     protected $_args = array();
@@ -341,10 +343,17 @@ class Partial
      * Construct with optional parameters
      * @param array $args
      */
-    public function __construct($name, $args = array()) {
+    public function __construct($name, $args = array(), $htmlArgs = array())
+    {
         $this->_ci = &get_instance();
         $this->_args = $args;
         $this->_name = $name;
+        
+        // Initialising properties
+		$this->_setHtmlProperties($htmlArgs);
+        
+        // Loads helper message to manage returning messages
+		$this->load->helper('message');
     }
     
     /**
@@ -598,6 +607,35 @@ class Partial
             $this->_trigger = FALSE;
         }
     }
+    
+    /**
+     * Initialising properties
+     */
+    private function _setHtmlProperties($htmlArgs)
+    {
+		if (isset($htmlArgs) && is_array($htmlArgs))
+		{
+			$this->_args['html'] = array();
+			
+			if (!isset($htmlArgs['id']) || (isset($htmlArgs['id']) && $htmlArgs['id'] == ''))
+			{
+				$this->_args['html']['id'] = '';
+			}
+			else
+			{
+				$this->_args['html']['id'] = $htmlArgs['id'];
+			}
+			
+			if (!isset($htmlArgs['name']) || (isset($htmlArgs['name']) && $htmlArgs['name'] == ''))
+			{
+				$this->_args['html']['name'] = '';
+			}
+			else
+			{
+				$this->_args['html']['name'] = $htmlArgs['name'];
+			}
+		}
+    }    
 }
 
 class Widget extends Partial
