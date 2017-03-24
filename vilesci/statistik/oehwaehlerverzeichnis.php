@@ -87,10 +87,8 @@ WHERE
 	tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
 	AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand','Incoming','Absolvent')
 	AND tbl_student.studiengang_kz<10000
-	AND tbl_student.studiengang_kz>0
-	AND tbl_student.studiengang_kz!='9".$erhalter_row->erhalter_kz."'
-	AND ka.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND ka.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=ka.studiengang_kz
-	AND kb.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND kb.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=kb.studiengang_kz
+	AND ka.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND ka.buchungstyp_kurzbz in('OEH','Lehrgangsgebuehr') AND tbl_student.studiengang_kz=ka.studiengang_kz
+	AND kb.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND kb.buchungstyp_kurzbz in('OEH','Lehrgangsgebuehr') AND tbl_student.studiengang_kz=kb.studiengang_kz
 	AND kb.buchungsnr_verweis=ka.buchungsnr AND bismelden
 ) a
 ORDER BY person_id";
@@ -120,7 +118,10 @@ if($result = $db->db_query($qry))
 		$last_person_id=$row->person_id;
 
 		$personenkennzeichen[]=trim($row->personenkennzeichen);
-		$studiengang_kz[] = sprintf('%1$04d',$row->studiengang_kz);
+		if($row->studiengang_kz<0)
+			$studiengang_kz[] = sprintf('%1$03d',$erhalter_row->erhalter_kz).sprintf('%1$04d',abs($row->studiengang_kz));
+		else
+			$studiengang_kz[] = sprintf('%1$04d',$row->studiengang_kz);
 
 		$data_row = array(
 			sprintf('%1$03d',$erhalter_row->erhalter_kz),
