@@ -23,9 +23,18 @@ class Studiengang_widget extends Widget
 			$emptyElement->bezeichnung = '';
 			array_unshift($studiengaenge->retval, $emptyElement);
 		}
-		else
+		else if (isError($studiengaenge))
 		{
 			show_error($studiengaenge);
+		}
+		else
+		{
+			// Adding an element to the array
+			$emptyElement = new stdClass();
+			$emptyElement->studiengang_kz = Partial::HTML_DEFAULT_VALUE;
+			$emptyElement->kurzbzlang = 'No studiengaenge found';
+			$emptyElement->bezeichnung = '';
+			array_unshift($studiengaenge->retval, $emptyElement);
 		}
 		
 		// Data to be used in the widget view

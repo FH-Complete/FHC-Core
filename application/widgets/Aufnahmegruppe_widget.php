@@ -22,9 +22,17 @@ class Aufnahmegruppe_widget extends Widget
 			$emptyElement->beschreibung = 'Select a group...';
 			array_unshift($gruppen->retval, $emptyElement);
 		}
-		else
+		else if (isError($gruppen))
 		{
 			show_error($gruppen);
+		}
+		else
+		{
+			// Adding an element to the array
+			$emptyElement = new stdClass();
+			$emptyElement->gruppe_kurzbz = Partial::HTML_DEFAULT_VALUE;
+			$emptyElement->beschreibung = 'No aufnahmegruppe found';
+			array_unshift($gruppen->retval, $emptyElement);
 		}
 		
 		// Data to be used in the widget view

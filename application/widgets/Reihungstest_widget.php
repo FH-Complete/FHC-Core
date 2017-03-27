@@ -40,11 +40,22 @@ class Reihungstest_widget extends Widget
 		
 		if (!isError($reihungstest))
 		{
-			// Adding an empty element at the beginning
-			$emptyElement = new stdClass();
-			$emptyElement->reihungstest_id = Partial::HTML_DEFAULT_VALUE;
-			$emptyElement->beschreibung = 'Select a reihungstest...';
-			array_unshift($reihungstest->retval, $emptyElement);
+			if (hasData($reihungstest))
+			{
+				// Adding an empty element at the beginning
+				$emptyElement = new stdClass();
+				$emptyElement->reihungstest_id = Partial::HTML_DEFAULT_VALUE;
+				$emptyElement->beschreibung = 'Select a reihungstest...';
+				array_unshift($reihungstest->retval, $emptyElement);
+			}
+			else
+			{
+				// Adding an element to the array
+				$emptyElement = new stdClass();
+				$emptyElement->reihungstest_id = Partial::HTML_DEFAULT_VALUE;
+				$emptyElement->beschreibung = 'No reihungstest found';
+				array_unshift($reihungstest->retval, $emptyElement);
+			}
 		}
 		
 		// Data to be used in the widget view

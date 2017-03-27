@@ -23,9 +23,17 @@ class Studiensemester_widget extends Widget
 			$emptyElement->beschreibung = 'Select a studiensemester...';
 			array_unshift($studiensemester->retval, $emptyElement);
 		}
-		else
+		else if (isError($studiensemester))
 		{
 			show_error($studiensemester);
+		}
+		else
+		{
+			// Adding an element to the array
+			$emptyElement = new stdClass();
+			$emptyElement->studiensemester_kurzbz = Partial::HTML_DEFAULT_VALUE;
+			$emptyElement->beschreibung = 'No studiensemester found';
+			array_unshift($studiensemester->retval, $emptyElement);
 		}
 		
 		// Data to be used in the widget view

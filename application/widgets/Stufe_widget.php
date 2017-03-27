@@ -23,9 +23,17 @@ class Stufe_widget extends Widget
 			$emptyElement->beschreibung = 'Select a stufe...';
 			array_unshift($stufen->retval, $emptyElement);
 		}
-		else
+		else if (isError($stufen))
 		{
 			show_error($stufen);
+		}
+		else
+		{
+			// Adding an element to the array
+			$emptyElement = new stdClass();
+			$emptyElement->stufe = Partial::HTML_DEFAULT_VALUE;
+			$emptyElement->beschreibung = 'No stufen found';
+			array_unshift($stufen->retval, $emptyElement);
 		}
 		
 		// Data to be used in the widget view
