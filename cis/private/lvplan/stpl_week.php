@@ -20,7 +20,9 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *          Gerald Simane-Sequens <gerald.simane@technikum-wien.at>.
  */
-
+/**
+ * Das Script dient zum Navigieren im Stundenplan und zur Reservierung von Raeumen
+ */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/wochenplan.class.php');
@@ -28,6 +30,7 @@ require_once('../../../include/reservierung.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/ort.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/stundenplan.class.php');
 
 $sprache = getSprache();
 $p=new phrasen($sprache);
@@ -36,14 +39,6 @@ if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
 $uid=get_uid();
-
-//$type='ort';
-//$ort_kurzbz='EDV6.08';
-//$datum=1102260015;
-
-// Deutsche Umgebung
-//$loc_de=setlocale(LC_ALL, 'de_AT@euro', 'de_AT','de_DE@euro', 'de_DE');
-//setlocale(LC_ALL, $loc_de);
 
 // Variablen uebernehmen
 if (isset($_GET['type']))
@@ -117,23 +112,24 @@ if (isset($_POST['beschreibung']))
 if (isset($_POST['titel']))
 	$titel=$_POST['titel'];
 
-?><!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+?><!DOCTYPE html>
 <HTML>
 <HEAD>
-	<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<META charset="UTF-8">
 	<TITLE><?php echo $p->t('lvplan/lehrveranstaltungsplan').' '.CAMPUS_NAME;?></TITLE>
-    <script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+	<?php include('../../../include/meta/jquery.php');?>
+
 	<script type="text/javascript">
 		<!--
 		function MM_jumpMenu(targ,selObj,restore)
-		{ //v3.0
-	  		eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
-	  		if (restore)
-	  			selObj.selectedIndex=0;
+		{
+			eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
+			if (restore)
+				selObj.selectedIndex=0;
 		}
 
-        function toggle_checkboxes(obj)
-        {
+		function toggle_checkboxes(obj)
+		{
 			var f = obj.form;
 			var regExp = /reserve[1-7]_[1-9][1-6]?/;
 			for (var i = 0; i < f.elements.length; i++)
@@ -144,85 +140,85 @@ if (isset($_POST['titel']))
 			}
 		}
 
-        $(document).ready(function() {
-            $("select[name='studiengang_kz']").change(function() {
-                var studiengang_kz = $("select[name='studiengang_kz']").val();
-                $.ajax({
-                    url: "lvplan_autocomplete.php",
-                    data: { 'autocomplete':'getSemester',
-                            'stg_kz':studiengang_kz
-                         },
-                    type: "POST",
-                    dataType: "json",
-                    success: function(data)
-                    {
-                        $("select[name='semester']").empty();
-                        $("select[name='semester']").append('<option value="">*</option>');
-                        $.each(data, function(i, data){
-                            $("select[name='semester']").append('<option value="'+data+'">'+data+'</option>');
-                        });
-                    },
-                    error: function(data)
-                    {
-                        alert("Fehler beim Laden der Daten");
-                    }
-                });
-            })
+		$(document).ready(function() {
+			$("select[name='studiengang_kz']").change(function() {
+				var studiengang_kz = $("select[name='studiengang_kz']").val();
+				$.ajax({
+					url: "lvplan_autocomplete.php",
+					data: { 'autocomplete':'getSemester',
+						'stg_kz':studiengang_kz
+					},
+					type: "POST",
+					dataType: "json",
+					success: function(data)
+					{
+						$("select[name='semester']").empty();
+						$("select[name='semester']").append('<option value="">*</option>');
+						$.each(data, function(i, data){
+							$("select[name='semester']").append('<option value="'+data+'">'+data+'</option>');
+						});
+					},
+					error: function(data)
+					{
+						alert("Fehler beim Laden der Daten");
+					}
+				});
+			})
 
-            $("select[name='semester']").change(function() {
-                var studiengang_kz = $("select[name='studiengang_kz']").val();
-                var semester = $("select[name='semester']").val();
-                $.ajax({
-                    url: "lvplan_autocomplete.php",
-                    data: { 'autocomplete':'getVerband',
-                            'stg_kz':studiengang_kz,
-                            'sem':semester
-                         },
-                    type: "POST",
-                    dataType: "json",
-                    success: function(data)
-                    {
-                        $("select[name='verband']").empty();
-                        $("select[name='verband']").append('<option value="">*</option>');
-                        $.each(data, function(i, data){
-                            $("select[name='verband']").append('<option value="'+data+'">'+data+'</option>');
-                        });
-                    },
-                    error: function(data)
-                    {
-                        alert("Fehler beim Laden der Daten");
-                    }
-                });
-            })
+			$("select[name='semester']").change(function() {
+				var studiengang_kz = $("select[name='studiengang_kz']").val();
+				var semester = $("select[name='semester']").val();
+				$.ajax({
+					url: "lvplan_autocomplete.php",
+					data: { 'autocomplete':'getVerband',
+						'stg_kz':studiengang_kz,
+						'sem':semester
+					},
+					type: "POST",
+					dataType: "json",
+					success: function(data)
+					{
+						$("select[name='verband']").empty();
+						$("select[name='verband']").append('<option value="">*</option>');
+						$.each(data, function(i, data){
+							$("select[name='verband']").append('<option value="'+data+'">'+data+'</option>');
+						});
+					},
+					error: function(data)
+					{
+						alert("Fehler beim Laden der Daten");
+					}
+				});
+			})
 
-            $("select[name='verband']").change(function() {
-                var studiengang_kz = $("select[name='studiengang_kz']").val();
-                var semester = $("select[name='semester']").val();
-                var verband = $("select[name='verband']").val();
-                $.ajax({
-                    url: "lvplan_autocomplete.php",
-                    data: { 'autocomplete':'getGruppe',
-                            'stg_kz':studiengang_kz,
-                            'sem':semester,
-                            'ver':verband
-                         },
-                    type: "POST",
-                    dataType: "json",
-                    success: function(data)
-                    {
-                        $("select[name='gruppe']").empty();
-                        $("select[name='gruppe']").append('<option value="">*</option>');
-                        $.each(data, function(i, data){
-                            $("select[name='gruppe']").append('<option value="'+data+'">'+data+'</option>');
-                        });
-                    },
-                    error: function(data)
-                    {
-                        alert("Fehler beim Laden der Daten");
-                    }
-                });
-            })
-        });
+			$("select[name='verband']").change(function() {
+				var studiengang_kz = $("select[name='studiengang_kz']").val();
+				var semester = $("select[name='semester']").val();
+				var verband = $("select[name='verband']").val();
+				$.ajax({
+					url: "lvplan_autocomplete.php",
+					data: { 'autocomplete':'getGruppe',
+						'stg_kz':studiengang_kz,
+						'sem':semester,
+						'ver':verband
+					},
+					type: "POST",
+					dataType: "json",
+					success: function(data)
+					{
+						$("select[name='gruppe']").empty();
+						$("select[name='gruppe']").append('<option value="">*</option>');
+						$.each(data, function(i, data){
+							$("select[name='gruppe']").append('<option value="'+data+'">'+data+'</option>');
+						});
+					},
+					error: function(data)
+					{
+						alert("Fehler beim Laden der Daten");
+					}
+				});
+			})
+		});
 		-->
 	</script>
 	<?php
@@ -234,11 +230,11 @@ if (isset($_POST['titel']))
 		if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
 			echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
 	}
-	
+
 	// Wenn Seite fertig geladen ist Addons aufrufen
 	echo '
 	<script>
-	$( document ).ready(function() 
+	$( document ).ready(function()
 	{
 		if(typeof addon  !== \'undefined\')
 		{
@@ -265,17 +261,6 @@ if (isset($_POST['titel']))
 </table>
 
 <?php
-/****************************************************************************
- * Script: 			stpl_week.php
- * Descr:  			Das Script dient zum Navigieren im Stundenplan.
- *					Ein Lektor kann auch einen Saal reservieren
- * Verzweigungen: 	nach stpl_detail.php
- *					von index.php
- * Author: 			Christian Paminger
- * Erstellt: 		21.8.2001
- * Update: 			15.11.2004 von Christian Paminger
- *****************************************************************************/
-
 //Parameter pruefen
 if($stg_kz!='' && !is_numeric($stg_kz))
 	die('Studiengang ist ungueltig');
@@ -305,11 +290,9 @@ elseif (check_lektor($uid))
 else
 {
 	die($p->t('global/userNichtGefunden'));
-	//GastAccountHack
-	//$user='student';
 }
 
-    // User bestimmen
+// User bestimmen
 if (!isset($type))
 	$type=$user;
 if (!isset($pers_uid))
@@ -344,47 +327,59 @@ if (isset($reserve) && $raumres)
 			{
 				$datum_res=$_REQUEST[$var];
 
-				$reservierung = new reservierung();
+				// Pruefen ob der Raum im Stundenplan und Stundenplandev frei ist
+				$stpl = new stundenplan('stundenplan');
+				$stpldev = new stundenplan('stundenplandev');
 
-				if(!$reservierung->isReserviert($ort_kurzbz, $datum_res, $stunde))
+				if(!$stpl->isBelegt($ort_kurzbz, $datum_res, $stunde)
+				&& !$stpldev->isBelegt($ort_kurzbz, $datum_res, $stunde))
 				{
-					if (empty($_REQUEST['titel']) && empty($_REQUEST['beschreibung']))
-						echo "<br>".$p->t('lvplan/titelUndBeschreibungFehlt')."! <br>";
-					else if (empty($_REQUEST['titel']) )
-						echo "<br>".$p->t('lvplan/titelFehlt')."! <br>";
-					else if ( empty($_REQUEST['beschreibung']))
-						echo "<br>".$p->t('lvplan/beschreibungFehlt')."! <br>";
+					$reservierung = new reservierung();
+
+					if(!$reservierung->isReserviert($ort_kurzbz, $datum_res, $stunde))
+					{
+						if (empty($_REQUEST['titel']) && empty($_REQUEST['beschreibung']))
+							echo "<br>".$p->t('lvplan/titelUndBeschreibungFehlt')."! <br>";
+						else if (empty($_REQUEST['titel']) )
+							echo "<br>".$p->t('lvplan/titelFehlt')."! <br>";
+						else if ( empty($_REQUEST['beschreibung']))
+							echo "<br>".$p->t('lvplan/beschreibungFehlt')."! <br>";
+						else
+						{
+							$reservierung = new reservierung();
+							$reservierung->datum = $datum_res;
+							$reservierung->ort_kurzbz = $ort_kurzbz;
+							$reservierung->stunde = $stunde;
+							$reservierung->beschreibung = $_REQUEST['beschreibung'];
+							$reservierung->titel = $_REQUEST['titel'];
+							$reservierung->insertamum=date('Y-m-d H:i:s');
+							$reservierung->insertvon=$uid;
+
+							if(isset($_REQUEST['studiengang_kz']))
+							{
+								$reservierung->studiengang_kz = $_REQUEST['studiengang_kz'];
+								$reservierung->semester = $_REQUEST['semester'];
+								$reservierung->verband = $_REQUEST['verband'];
+								$reservierung->gruppe = $_REQUEST['gruppe'];
+								$reservierung->gruppe_kurzbz = $_REQUEST['gruppe_kurzbz'];
+								$reservierung->uid = $_REQUEST['user_uid'];
+							}
+							else
+							{
+								$reservierung->studiengang_kz='0';
+								$reservierung->uid = $uid;
+							}
+
+							if(!$reservierung->save(true))
+								echo $reservierung->errormsg;
+							else
+								$count++;
+						}
+					}
 					else
 					{
-	  					$reservierung = new reservierung();
-		  				$reservierung->datum = $datum_res;
-				  		$reservierung->ort_kurzbz = $ort_kurzbz;
-					  	$reservierung->stunde = $stunde;
-	  					$reservierung->beschreibung = $_REQUEST['beschreibung'];
-		  				$reservierung->titel = $_REQUEST['titel'];
-		  				$reservierung->insertamum=date('Y-m-d H:i:s');
-		  				$reservierung->insertvon=$uid;
-
-		  				if(isset($_REQUEST['studiengang_kz']))
-		  				{
-		  					$reservierung->studiengang_kz = $_REQUEST['studiengang_kz'];
-		  					$reservierung->semester = $_REQUEST['semester'];
-		  					$reservierung->verband = $_REQUEST['verband'];
-		  					$reservierung->gruppe = $_REQUEST['gruppe'];
-		  					$reservierung->gruppe_kurzbz = $_REQUEST['gruppe_kurzbz'];
-		  					$reservierung->uid = $_REQUEST['user_uid'];
-		  				}
-		  				else
-		  				{
-			  				$reservierung->studiengang_kz='0';
-			  				$reservierung->uid = $uid;
-		  				}
-
-	  					if(!$reservierung->save(true))
-		  					echo $reservierung->errormsg;
-	            		else
-	         				$count++;
-            		}
+						echo "<br>$ort_kurzbz ".$p->t('lvplan/bereitsReserviert').": $datum_res - Stunde $stunde <br>";
+					}
 				}
 				else
 				{
@@ -411,7 +406,6 @@ if (! $stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gr
 	die($stdplan->errormsg);
 }
 
-//echo 'Datum:'.$datum.'<BR>';
 // Stundenplan einer Woche laden
 if (! $stdplan->load_week($datum))
 {
@@ -426,9 +420,9 @@ if (! $stdplan->draw_header())
 
 // Stundenplan der Woche drucken
 if($ort_kurzbz == 'all')
-    $stdplan->draw_week ($raumres, $uid, false);
+	$stdplan->draw_week ($raumres, $uid, false);
 else
-    $stdplan->draw_week($raumres,$uid);
+	$stdplan->draw_week($raumres,$uid);
 
 if (isset($count))
 	echo "Es wurde".($count!=1?'n':'')." $count Stunde".($count!=1?'n':'')." reserviert!<BR>";

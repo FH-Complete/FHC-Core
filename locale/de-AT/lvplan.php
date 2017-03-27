@@ -97,4 +97,5 @@ $this->phrasen['lvplan/vorher']='Vorher';
 $this->phrasen['lvplan/status']='Status';
 $this->phrasen['lvplan/automatischeMail']='Dies ist eine automatische Mail!';
 $this->phrasen['lvplan/folgendeAenderungen']='Es haben sich folgende Aenderungen in Ihrem LV-Plan ergeben:';
+$this->phrasen['lvplan/reserviertInDev']='reserviert<br>für<br>lehre';
 ?>

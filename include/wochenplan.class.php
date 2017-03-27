@@ -637,13 +637,29 @@ class wochenplan extends basis_db
 		$result_stunde = $this->db_result;
 		$num_rows_stunde = $this->db_num_rows($result_stunde);
 
+		$stundenplandev_belegt = array();
 		// Formularbeginn wenn Lektor
 		if ($raumres && $this->type=='ort')
 		{
 			$ort = new ort();
 			$ort->load($this->ort_kurzbz);
 			if ($ort->reservieren)
+			{
 				echo '<form name="reserve" method="post" action="stpl_week.php">'.$this->crlf;
+
+				// In tbl_stundenplandev schauen ob dort der Raum bereits belegt ist
+				$qry = "SELECT distinct datum, stunde FROM lehre.tbl_stundenplandev
+						WHERE datum>=".$this->db_add_param($this->datum_begin)."
+						AND datum<=".$this->db_add_param($this->datum_end)."
+						AND ort_kurzbz=".$this->db_add_param($this->ort_kurzbz);
+				if($result_devbelegt = $this->db_query($qry))
+				{
+					while($row_devbelegt = $this->db_fetch_object($result_devbelegt))
+					{
+						$stundenplandev_belegt[$row_devbelegt->datum][$row_devbelegt->stunde]=true;
+					}
+				}
+			}
 			else
 				$raumres=false;
 		}
@@ -671,6 +687,7 @@ class wochenplan extends basis_db
 		if (!date("w",$this->datum))
 			$this->datum=jump_day($this->datum,1);
 		$datum=$datum_mon=$this->datum;
+
 		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 		{
 			echo '<tr><td>'.$tagbez[$spracheLoad->index][$i].'<br>'.strftime("%e. %b %Y",$datum).'<br></td>'.$this->crlf;
@@ -929,7 +946,14 @@ class wochenplan extends basis_db
 					$datum_res_lektor_ende_m = date('Y-m-d', $datum_res_lektor_ende);
 					$datum_m = date('Y-m-d',$datum);
 					if ($raumres && $this->type=='ort' && ($datum_m>=$datum_res_lektor_start_m && $datum_m<=$datum_res_lektor_ende_m))
-						echo '<INPUT type="checkbox" name="reserve'.$i.'_'.$j.'" value="'.date("Y-m-d",$datum).'">'; //&& $datum>=$datum_now
+					{
+						// Wenn die Stunde bereits in der tbl_stundenplandev verplant ist
+						// darf die Stunde nicht reserviert werden
+						if(!isset($stundenplandev_belegt[$datum_m][$j]))
+							echo '<INPUT type="checkbox" name="reserve'.$i.'_'.$j.'" value="'.date("Y-m-d",$datum).'">';
+						else
+							echo $p->t('lvplan/reserviertInDev');
+					}
 					echo '</td>'.$this->crlf;
 				}
 			}
