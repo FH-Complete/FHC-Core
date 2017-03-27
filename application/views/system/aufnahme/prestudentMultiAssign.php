@@ -8,7 +8,7 @@
 						<?php
 							echo $this->widgetlib->widget(
 								'Studiengang_widget',
-								array('studiengang' => $studiengang),
+								array(DropdownWidget::SELECTED_ELEMENT => $studiengang),
 								array('name' => 'studiengang', 'id' => 'studiengangFilter')
 							);
 						?>
@@ -17,7 +17,7 @@
 						<?php
 							echo $this->widgetlib->widget(
 								'Studiensemester_widget',
-								array('studiensemester' => $studiensemester),
+								array(DropdownWidget::SELECTED_ELEMENT => $studiensemester),
 								array('name' => 'studiensemester', 'id' => 'studiensemesterFilter')
 							);
 						?>
@@ -26,7 +26,11 @@
 						<?php
 							echo $this->widgetlib->widget(
 								'Reihungstest_widget',
-								array('reihungstest' => $reihungstest, 'studiengang' => $studiengang, 'studiensemester' => $studiensemester),
+								array(
+									DropdownWidget::SELECTED_ELEMENT => $reihungstest,
+									'studiengang' => $studiengang,
+									'studiensemester' => $studiensemester
+								),
 								array('name' => 'reihungstest', 'id' => 'reihungstestFilter')
 							);
 						?>
@@ -35,7 +39,7 @@
 						<?php
 							echo $this->widgetlib->widget(
 								'Aufnahmegruppe_widget',
-								array('aufnahmegruppe' => $aufnahmegruppe),
+								array(DropdownWidget::SELECTED_ELEMENT => $aufnahmegruppe),
 								array('name' => 'aufnahmegruppe', 'id' => 'aufnahmegruppeFilter')
 							);
 						?>
@@ -44,7 +48,7 @@
 						<?php
 							echo $this->widgetlib->widget(
 								'Stufe_widget',
-								array('stufe' => $stufe),
+								array(DropdownWidget::SELECTED_ELEMENT => $stufe),
 								array('name' => 'stufe', 'id' => 'stufeFilter')
 							);
 						?>
@@ -134,66 +138,52 @@
 						for ($i = 0; $i < count($users); $i++)
 						{
 							$user = $users[$i];
-							
-							echo "<tr>";
-							
-							echo "<td>";
-							echo '<input type="checkbox" name="prestudent_id[]" value="' . $user->prestudent_id . '">';
-							echo "</td>";
-							
-							echo "<td>";
-							echo $user->prestudent_id;
-							echo "</td>";
-							
-							echo "<td>";
-							echo $user->person_id;
-							echo "</td>";
-							
-							echo "<td>";
-							echo $user->vorname;
-							echo "</td>";
-							
-							echo "<td>";
-							echo $user->nachname;
-							echo "</td>";
-							
-							echo "<td>";
-							echo $user->geschlecht;
-							echo "</td>";
-							
-							echo "<td>";
-							echo $user->kurzbzlang;
-							echo "</td>";
-							
-							echo "<td>";
-							echo $user->orgform_kurzbz;
-							echo "</td>";
-							
-							echo "<td>";
-							echo $user->studienplan;
-							echo "</td>";
-							
-							echo "<td>";
-							echo $user->gebdatum;
-							echo "</td>";
-							
-							echo "<td>";
-							echo $user->email;
-							echo "</td>";
-							
-							echo "<td>";
-							echo $user->rt_stufe;
-							echo "</td>";
-							
-							echo "<td>";
-							echo $user->aufnahmegruppe_kurzbz;
-							echo "</td>";
-							
-							echo "<td>";
-							echo $user->punkte;
-							echo "</td>";
-							
-							echo "</tr>";
+				?>
+							<tr>
+								<td>
+									<input type="checkbox" name="prestudent_id[]" value="<?php echo $user->prestudent_id ?>">
+								</td>
+								<td>
+									<?php echo $user->prestudent_id; ?>
+								</td>
+								<td>
+									<?php echo $user->person_id; ?>
+								</td>
+								<td>
+									<?php echo $user->vorname; ?>
+								</td>
+								<td>
+									<?php echo $user->nachname; ?>
+								</td>
+								<td>
+									<?php echo $user->geschlecht; ?>
+								</td>
+								<td>
+									<?php echo $user->kurzbzlang; ?>
+								</td>
+								<td>
+									<?php echo $user->orgform_kurzbz; ?>
+								</td>
+								<td>
+									<?php echo $user->studienplan; ?>
+								</td>
+								<td>
+									<?php echo $user->gebdatum; ?>
+								</td>
+								<td>
+									<?php echo $user->email; ?>
+								</td>
+								<td>
+									<?php echo $user->rt_stufe; ?>
+								</td>
+								<td>
+									<?php echo $user->aufnahmegruppe_kurzbz; ?>
+								</td>
+								<td>
+									<?php echo $user->punkte; ?>
+								</td>
+							</tr>
+				<?php
 						}
 				?>
 							</tbody>

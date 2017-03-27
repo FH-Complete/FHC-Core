@@ -179,6 +179,7 @@ class WidgetLib
      * Can be usefull to use straight from the template file
      * @param string $name
      * @param array $data
+     * @param array $htmlArgs
      * @return Widget
      */
     public function widget($name, $data = array(), $htmlArgs = array())
@@ -334,8 +335,6 @@ class WidgetLib
 
 class Partial
 {
-    const HTML_DEFAULT_VALUE = ''; // Default value of the html element
-    
     protected $_ci, $_content, $_name, $_cache_ttl = 0, $_cached = false, $_identifier, $_trigger;
     protected $_args = array();
     
@@ -343,17 +342,11 @@ class Partial
      * Construct with optional parameters
      * @param array $args
      */
-    public function __construct($name, $args = array(), $htmlArgs = array())
+    public function __construct($name, $args = array())
     {
         $this->_ci = &get_instance();
         $this->_args = $args;
         $this->_name = $name;
-        
-        // Initialising properties
-		$this->_setHtmlProperties($htmlArgs);
-        
-        // Loads helper message to manage returning messages
-		$this->load->helper('message');
     }
     
     /**
@@ -607,42 +600,38 @@ class Partial
             $this->_trigger = FALSE;
         }
     }
-    
-    /**
-     * Initialising properties
-     */
-    private function _setHtmlProperties($htmlArgs)
-    {
-		if (isset($htmlArgs) && is_array($htmlArgs))
-		{
-			$this->_args['html'] = array();
-			
-			if (!isset($htmlArgs['id']) || (isset($htmlArgs['id']) && $htmlArgs['id'] == ''))
-			{
-				$this->_args['html']['id'] = '';
-			}
-			else
-			{
-				$this->_args['html']['id'] = $htmlArgs['id'];
-			}
-			
-			if (!isset($htmlArgs['name']) || (isset($htmlArgs['name']) && $htmlArgs['name'] == ''))
-			{
-				$this->_args['html']['name'] = '';
-			}
-			else
-			{
-				$this->_args['html']['name'] = $htmlArgs['name'];
-			}
-		}
-    }    
 }
 
+/**
+ * The mother of all widgets
+ * it represent a generic HTML element
+ */
 class Widget extends Partial
 {
-	/* (non-PHPdoc)
-	* @see Partial::content()
-	*/
+	// The name of the array present in the data array given to the view that will render this widget
+    const HTML_ARG_NAME = 'HTML';
+	const HTML_DEFAULT_VALUE = ''; // Default value of the html element
+    const HTML_NAME = 'name'; // HTML name attribute
+    const HTML_ID = 'id'; // HTML id attribute
+    
+    /**
+     * It gets also the htmlArgs array as parameter, it will be used to set the HTML properties
+     */
+    public function __construct($name, $args, $htmlArgs = array())
+	{
+		parent::__construct($name, $args);
+		
+		// Initialising HTML properties
+		$this->_setHtmlProperties($htmlArgs);
+        
+        // Loads helper message to manage returning messages
+		$this->load->helper('message');
+	}
+	
+	/**
+	 * (non-PHPdoc)
+	 * @see Partial::content()
+	 */
 	public function content()
 	{
 		if (!$this->_cached)
@@ -664,5 +653,140 @@ class Widget extends Partial
 		}
 		
 		return parent::content();
+	}
+	
+    /**
+     * Initialising html properties, such as the id and name attributes of the HTML element
+     */
+    private function _setHtmlProperties($htmlArgs)
+    {
+		if (isset($htmlArgs) && is_array($htmlArgs))
+		{
+			$this->_args[Widget::HTML_ARG_NAME] = array();
+			
+			// Avoids that the elements of a same HTML page have the same name or id
+			$randomIdentifier = uniqid(rand(0, 1000));
+			
+			if (isset($htmlArgs[Widget::HTML_ID]) && trim($htmlArgs[Widget::HTML_ID]) != '')
+			{
+				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_ID] = $htmlArgs[Widget::HTML_ID];
+			}
+			else
+			{
+				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_ID] = $randomIdentifier;
+			}
+			
+			if (isset($htmlArgs[Widget::HTML_NAME]) && trim($htmlArgs[Widget::HTML_NAME]) != '')
+			{
+				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] = $htmlArgs[Widget::HTML_NAME];
+			}
+			else
+			{
+				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] = $randomIdentifier;
+			}
+		}
+    }
+}
+
+/**
+ * It exends the Widget class to represent an HTML dropdown
+ */
+class DropdownWidget extends Widget
+{
+	// The name of the element of the data array given to the view
+	// this element is an array of elements to be place inside the dropdown
+	const WIDGET_DATA_ELEMENTS_ARRAY_NAME = 'ELEMENTS_ARRAY';
+	// Name of the property that will be used to store the value attribute of the option tag
+	const ID_FIELD = 'id';
+	// Name of the property that will be used to store the value between the option tags
+	const DESCRIPTION_FIELD = 'description'; //
+	// The name of the element of the data array given to the view
+	// this element is used to tell what element of the dropdown is selected
+	const SELECTED_ELEMENT = 'selectedElement'; // 
+	
+	private $elementsArray; // Array of elements to be place inside the dropdown
+	
+	/**
+	 * Loads the dropdown view with all the elements to be displayed
+	 */
+	protected function loadDropDownView($widgetData)
+	{
+		$widgetData[DropdownWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME] = $this->elementsArray->retval;
+		
+		$this->view('widgets/dropdown', $widgetData);
+	}
+	
+	/**
+	 * Add the correct select to the model used to load a list of elemets for this dropdown
+	 * @param model $model the model used to load elements
+	 * @param string $idName the name of the field that will used to be the value of the option tag
+	 * @param string $descriptionName the name of the field that will used to be displayed in the dropdown
+	 */
+	protected function addSelectToModel($model, $idName, $descriptionName)
+	{
+		$model->addSelect(
+			sprintf(
+				'%s AS %s, %s AS %s',
+				$idName,
+				DropdownWidget::ID_FIELD,
+				$descriptionName,
+				DropdownWidget::DESCRIPTION_FIELD
+			)
+		);
+	}
+	
+	/**
+	 * Set the array used to populate the dropdown
+	 * @param array $elements list used to populate this dropdown
+	 * @param boolean $emptyElement if an empty element must be added at the beginning of the dropdown
+	 * @param string $stdDescription description of the empty element
+	 * @param string $noDataDescription description if no data are found
+	 * @param string $id value of the attribute value of the empty element
+	 */
+	protected function setElementsArray(
+		$elements, $emptyElement = false, $stdDescription = '' , $noDataDescription = '' , $id = Widget::HTML_DEFAULT_VALUE
+	)
+	{
+		if (isError($elements))
+		{
+			if (is_object($elements) && isset($elements->retval))
+			{
+				show_error($elements->retval);
+			}
+			else if (is_string($elements))
+			{
+				show_error($elements);
+			}
+			else
+			{
+				show_error('Generic error occurred');
+			}
+		}
+		else
+		{
+			$this->elementsArray = $elements;
+			
+			if ($emptyElement === true)
+			{
+				$this->addElementAtBeginning($stdDescription, $noDataDescription, $id);
+			}
+		}
+	}
+	
+	/**
+     * Adds an element to the beginning of the array
+     */
+	protected function addElementAtBeginning($stdDescription, $noDataDescription, $id)
+	{
+		$element = new stdClass();
+		$element->id = $id;
+		$element->description = $stdDescription;
+		
+		if (!hasData($this->elementsArray))
+		{
+			$element->description = $noDataDescription;
+		}
+		
+		array_unshift($this->elementsArray->retval, $element);
 	}
 }

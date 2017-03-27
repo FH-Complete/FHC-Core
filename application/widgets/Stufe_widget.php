@@ -1,45 +1,23 @@
 <?php
 
-class Stufe_widget extends Widget
+class Stufe_widget extends DropdownWidget
 {
-	public function __construct($name, $args, $htmlArgs = array())
-	{
-		// Calling daddy
-		parent::__construct($name, $args, $htmlArgs);
-	}
-	
     public function display($widgetData)
 	{
 		// Stufe
 		$this->load->model('crm/Reihungstest_model', 'ReihungstestModel');
-		$this->ReihungstestModel->addSelect('DISTINCT ON(stufe) stufe, stufe AS beschreibung');
+		$this->ReihungstestModel->addSelect('DISTINCT ON(stufe) stufe');
 		$this->ReihungstestModel->addOrder('stufe');
-		$stufen = $this->ReihungstestModel->loadWhere('stufe IS NOT NULL');
-		if (hasData($stufen))
-		{
-			// Adding an empty element at the beginning
-			$emptyElement = new stdClass();
-			$emptyElement->stufe = Partial::HTML_DEFAULT_VALUE;
-			$emptyElement->beschreibung = 'Select a stufe...';
-			array_unshift($stufen->retval, $emptyElement);
-		}
-		else if (isError($stufen))
-		{
-			show_error($stufen);
-		}
-		else
-		{
-			// Adding an element to the array
-			$emptyElement = new stdClass();
-			$emptyElement->stufe = Partial::HTML_DEFAULT_VALUE;
-			$emptyElement->beschreibung = 'No stufen found';
-			array_unshift($stufen->retval, $emptyElement);
-		}
 		
-		// Data to be used in the widget view
-		$widgetData['stufen'] = $stufen->retval;
+		$this->addSelectToModel($this->ReihungstestModel, 'stufe', 'stufe');
 		
-		// Loads widget view
-		$this->view('widgets/stufe', $widgetData);
+		$this->setElementsArray(
+			$this->ReihungstestModel->loadWhere('stufe IS NOT NULL'),
+			true,
+			'Select a stufe...',
+			'No stufen found'
+		);
+		
+		$this->loadDropDownView($widgetData);
     }
 }
