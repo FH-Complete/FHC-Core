@@ -47,9 +47,9 @@ $stg_obj->loadArray($rechte->getStgKz('lehre/vorrueckung'),'typ, kurzbz');
 
 $stg_arr = array();
 
-foreach ($stg_obj->result as $stg) 
+foreach ($stg_obj->result as $stg)
 {
-	$stg_arr[$stg->studiengang_kz] = $stg->kuerzel;	
+	$stg_arr[$stg->studiengang_kz] = $stg->kuerzel;
 }
 
 $studiengang_kz = (isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:'');
@@ -95,9 +95,9 @@ foreach($stg_obj->result as $stg)
 {
 	if($studiengang_kz==$stg->studiengang_kz)
 		$selected='selected';
-	else 
+	else
 		$selected='';
-	
+
 	echo '<OPTION value="'.$stg->studiengang_kz.'" '.$selected.'>'.$stg->kuerzel.' ('.$stg->kurzbzlang.')</OPTION>';
 }
 echo '</SELECT>';
@@ -108,9 +108,9 @@ for($i=1;$i<=8;$i++)
 {
 	if($semester==$i)
 		$selected='selected';
-	else 
+	else
 		$selected='';
-	
+
 	echo '<OPTION value="'.$i.'" '.$selected.'>'.$i.'</OPTION>';
 }
 echo '</SELECT>';
@@ -123,9 +123,9 @@ foreach ($stsem_obj->studiensemester as $stsem)
 {
 	if($stsem_von == $stsem->studiensemester_kurzbz)
 		$selected = 'selected';
-	else 
+	else
 		$selected = '';
-	
+
 	echo '<OPTION value="'.$stsem->studiensemester_kurzbz.'" '.$selected.'>'.$stsem->studiensemester_kurzbz.'</OPTION>';
 }
 echo '</SELECT>';
@@ -136,9 +136,9 @@ foreach ($stsem_obj->studiensemester as $stsem)
 {
 	if($stsem_nach == $stsem->studiensemester_kurzbz)
 		$selected = 'selected';
-	else 
+	else
 		$selected = '';
-	
+
 	echo '<OPTION value="'.$stsem->studiensemester_kurzbz.'" '.$selected.'>'.$stsem->studiensemester_kurzbz.'</OPTION>';
 }
 
@@ -160,35 +160,35 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 	$stg_obj = new studiengang();
 	if(!$stg_obj->load($studiengang_kz))
 		die('Studiengang kann nicht geladen werden');
-	
+
 	if(!$rechte->isBerechtigt('lehre/vorrueckung', $stg_obj->oe_kurzbz, 'suid'))
 		die($rechte->errormsg);
 
 	echo '<br>Starte Vorrückung '.$stg_arr[$studiengang_kz]." $semester von $stsem_von nach $stsem_nach ...";
 
 	$qry = "SELECT tbl_lehreinheit.lehreinheit_id
-			FROM 
-				lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+			FROM
+				lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 			WHERE
-				tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz' AND
-				tbl_lehreinheit.studiensemester_kurzbz='$stsem_von'";
+				tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz)." AND
+				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem_von);
 	if($semester!='')
-		$qry .= " AND tbl_lehrveranstaltung.semester='$semester'";
-	
+		$qry .= " AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester);
+
 	if($result = $db->db_query($qry))
 	{
 		$anzahl_von = $db->db_num_rows($result);
 	}
 	//Pruefen, ob schon eine Vorrueckung stattgefunden hat
 	$qry_nach = "SELECT tbl_lehreinheit.lehreinheit_id
-			FROM 
-				lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+			FROM
+				lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 			WHERE
-				tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz' AND
-				tbl_lehreinheit.studiensemester_kurzbz='$stsem_nach'";
+				tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz)." AND
+				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem_nach);
 	if($semester!='')
-		$qry_nach .= " AND tbl_lehrveranstaltung.semester='$semester'";
-		
+		$qry_nach .= " AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester);
+
 	if($result = $db->db_query($qry_nach))
 	{
 		$anzahl_nach = $db->db_num_rows($result);
@@ -196,11 +196,11 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 		if ($anzahl_nach >= $anzahl_von && !isset($_GET['continue']))
 		{
 			echo '<br><br><span style="color:red">Es sind schon Lehreinheiten fuer das '.$stsem_nach.' in '.$stg_arr[$studiengang_kz].' '.$semester.' vorhanden. Trotzdem fortsetzen?</span><br><br>
-					<form action="'.$baseurl.'&continue" method="POST"><input type="submit" value="Fortsetzen"></form>'; 
+					<form action="'.$baseurl.'&continue" method="POST"><input type="submit" value="Fortsetzen"></form>';
 			die ();
 		}
 	}
-	
+
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
@@ -216,13 +216,14 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 				$le_obj->insertvon='Vorrueckung_'.$user;
 				$le_obj->ext_id='';
 				$le_obj->unr='';
-				
+
 				if($le_obj->save())
 				{
 					$anzahl_lehreinheiten++;
-					
+
 					//LehreinheitMitarbeiter Eintrag neu Anlengen
-					$qry_lem="SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$row->lehreinheit_id'";
+					$qry_lem="SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter
+						WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id);
 					if($result_lem = $db->db_query($qry_lem))
 					{
 						while($row_lem = $db->db_fetch_object($result_lem))
@@ -230,13 +231,15 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 							$lem_obj = new lehreinheitmitarbeiter();
 							if($lem_obj->load($row->lehreinheit_id, $row_lem->mitarbeiter_uid))
 							{
-								// Pruefen ob der Lektor ueber die im Config festgelegte Stundengrenze kommt und Meldung ausgeben
-								$qry_stundengrenze="SELECT mitarbeiter_uid,fixangestellt,SUM(semesterstunden) AS summe, aktiv FROM lehre.tbl_lehreinheitmitarbeiter 
-													JOIN lehre.tbl_lehreinheit USING (lehreinheit_id) 
+								// Pruefen ob der Lektor ueber die im Config festgelegte Stundengrenze
+								// kommt und Meldung ausgeben
+								$qry_stundengrenze="SELECT mitarbeiter_uid,fixangestellt,SUM(semesterstunden) AS summe,
+													aktiv FROM lehre.tbl_lehreinheitmitarbeiter
+													JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
 													JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid)
 													JOIN public.tbl_benutzer ON (uid=mitarbeiter_uid)
-													WHERE mitarbeiter_uid='$row_lem->mitarbeiter_uid' 
-													AND studiensemester_kurzbz='$stsem_von' 
+													WHERE mitarbeiter_uid=".$db->db_add_param($row_lem->mitarbeiter_uid)."
+													AND studiensemester_kurzbz=".$db->db_add_param($stsem_von)."
 													GROUP BY mitarbeiter_uid,fixangestellt,aktiv";
 								//echo '<br>UNION<br>'.$qry_stundengrenze;
 								if($result_stundengrenze = $db->db_query($qry_stundengrenze))
@@ -251,7 +254,7 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 										{
 											$text.=" <span style='color:red'>Stundengrenze ".WARN_SEMESTERSTD_FIX." Stunden ueberschritten von $row_lem->mitarbeiter_uid</span>";
 										}
-										
+
 										// Meldung, wenn Benutzer inaktiv
 										if ($row_stundengrenze->aktiv == 'f')
 										{
@@ -277,30 +280,32 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 								$lem_obj->insertvon = 'Vorrueckung_'.$user;
 								$lem_obj->ext_id = '';
 								$lem_obj->vertrag_id='';
-								
+
 								if(!$lem_obj->save())
 								{
 									$error_lehreinheitmitarbeiter++;
 									$text.='Fehler beim Anlegen des Lehreinheitmitarbeiter Eintrages: '.$lem_obj->errormsg;
 								}
-								else 
+								else
 									$anzahl_lehreinheitmitarbeiter++;
 							}
-							else 
+							else
 							{
 								$text.='Fehler beim Laden der Mitarbeiter';
 								$error_lehreinheitmitarbeiter++;
 							}
 						}
 					}
-					else 
+					else
 					{
 						$text.='Fehler beim Laden der Mitarbeiter '.$db->db_last_error();
 						$error_lehreinheitmitarbeiter++;
 					}
-					
+
 					//LehreinheitGruppe Eintrag neu Anlegen
-					$qry_leg="SELECT lehreinheitgruppe_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id' AND NOT (tbl_lehreinheitgruppe.semester='0' AND tbl_lehreinheitgruppe.verband='I')";
+					$qry_leg="SELECT lehreinheitgruppe_id FROM lehre.tbl_lehreinheitgruppe
+						WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id)."
+						AND NOT (tbl_lehreinheitgruppe.semester='0' AND tbl_lehreinheitgruppe.verband='I')";
 					if($result_leg = $db->db_query($qry_leg))
 					{
 						while($row_leg = $db->db_fetch_object($result_leg))
@@ -313,47 +318,47 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 								$leg_obj->insertamum = date('Y-m-d H:i:s');
 								$leg_obj->insertvon = 'Vorrueckung_'.$user;
 								$leg_obj->ext_id = '';
-								
+
 								if(!$leg_obj->save())
 								{
 									$error_lehreinheitgruppe++;
 									$text.='Fehler beim Anlegen des Lehreinheitgruppe Eintrages: '.$leg_obj->errormsg;
 								}
-								else 
+								else
 									$anzahl_lehreinheitgruppe++;
 							}
-							else 
+							else
 							{
 								$text.='Fehler beim Laden der Gruppe '.$leg_obj->errormsg.' '.$db->db_last_error();
 								$error_lehreinheitgruppe++;
 							}
 						}
 					}
-					else 
+					else
 					{
 						$text.='Fehler beim Auslesen der Gruppen';
 						$error_lehreinheitgruppe++;
 					}
 				}
-				else 
+				else
 				{
 					$error_lehreinheit++;
 					$text.='Fehler beim Speichern der Lehreinheit '.$le_obj->errormsg;
 				}
 			}
-			else 
+			else
 			{
 				$error_lehreinheit++;
 				$text.='Fehler beim Laden der Lehreinheit '.$le_obj->errormsg;
 			}
 		}
 	}
-	else 
+	else
 	{
 		$text.='Fehler beim Laden der Lehreinheiten '.$db->db_last_error();
 		$error_lehreinheit++;
 	}
-	
+
 	echo "<br><br>";
 	echo "Vorgerueckte Lehreinheiten: $anzahl_lehreinheiten<br>";
 	echo "Vorgerueckte LEMitarbeiter: $anzahl_lehreinheitmitarbeiter<br>";
@@ -361,7 +366,7 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 	echo "Fehler bei Lehreinheiten: $error_lehreinheit<br>";
 	echo "Fehler bei LEMitarbeiter: $error_lehreinheitmitarbeiter<br>";
 	echo "Fehler bei LEGruppen: $error_lehreinheitmitarbeiter<br>";
-	
+
 	echo '<br><br><hr>';
 	echo $text;
 	echo '<br><br><br><br><br><br><br><br>';

@@ -17,39 +17,37 @@
  *
  * Authors: Martin Tatzber < tatzberm@technikum-wien.at >
  */
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/gruppe.class.php');
 
-	require_once('../../config/vilesci.config.inc.php');
-//	require_once('../../include/functions.inc.php');
-//	require_once('../../include/benutzerberechtigung.class.php');
-	require_once('../../include/gruppe.class.php');
+	if (!$uid = get_uid())
+	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
-/* 	if (!$uid = get_uid())
-		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+$rechte = new benutzerberechtigung();
+if(!$rechte->getBerechtigungen($uid))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
-	$rechte = new benutzerberechtigung();
-	if(!$rechte->getBerechtigungen($uid))
-		die('Sie haben keine Berechtigung fuer diese Seite');
-		
-	if(!$rechte->isBerechtigt('...', null, 's'))
-		die('Sie haben keine Berechtigung fuer diese Seite'); */
+if(!$rechte->isBerechtigt('lehre/lehrveranstaltung', null, 's'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
-  	if (!$db = new basis_db())
-		die('Datenbank kann nicht geoeffnet werden.  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+if (!$db = new basis_db())
+	die('Datenbank kann nicht geoeffnet werden.  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
-	$gruppe_kurzbz=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
-	$json=array();
-	
-	$qry="SELECT gruppe_kurzbz FROM public.tbl_gruppe
-		WHERE lower(gruppe_kurzbz) LIKE lower('%$gruppe_kurzbz%')
-		AND aktiv=true";
-	if($result=$db->db_query($qry))
+$gruppe_kurzbz=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
+$json=array();
+
+$qry="SELECT gruppe_kurzbz FROM public.tbl_gruppe
+	WHERE lower(gruppe_kurzbz) LIKE lower('%".$db->db_escape($gruppe_kurzbz)."%')
+	AND aktiv=true";
+if($result=$db->db_query($qry))
+{
+	while($row=$db->db_fetch_object($result))
 	{
-		while($row=$db->db_fetch_object($result))
-		{
-			$item['gruppe_kurzbz']=html_entity_decode($row->gruppe_kurzbz);
-			$json[]=$item;			
-		}
+		$item['gruppe_kurzbz']=html_entity_decode($row->gruppe_kurzbz);
+		$json[]=$item;
 	}
-	echo json_encode($json);
-//	exit();
+}
+echo json_encode($json);
 ?>

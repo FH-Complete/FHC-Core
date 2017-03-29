@@ -33,7 +33,7 @@ if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 if (!$user = get_uid())
-	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');		
+	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
@@ -59,22 +59,22 @@ else
 <link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
 <script type="text/javascript" src="../../include/js/jquery.js"></script>
 <script  type="text/javascript">
-$(document).ready(function() 
-{ 
+$(document).ready(function()
+{
 	$("#t1").tablesorter(
 	{
 		sortList: [[0,0],[2,0]],
 		widgets: ["zebra"]
-	}); 
-}); 
+	});
+});
 function selectAll()
 {
 	var a = document.getElementById("anmeldungen");
 	var checkboxen = a.getElementsByTagName("input");
-	
-	for (var i = 0; i < checkboxen.length; i++)	
+
+	for (var i = 0; i < checkboxen.length; i++)
 	{
-		if (document.auswahl.toggle.checked == true)		
+		if (document.auswahl.toggle.checked == true)
 			checkboxen[i].checked = true;
 		else
 			checkboxen[i].checked = false;
@@ -85,15 +85,15 @@ function selectAll()
 </head>
 <body class="Background_main">
 <?php
-	
+
 	echo "<H2>Freif&auml;cher LektorInnen-Verwaltung</H2>";
 	echo "<form name='auswahl' method='POST' action='freifach_lektoren.php'>";
 	echo "<table>";
 
-	echo "<tr><td>";	
-	
+	echo "<tr><td>";
+
 	echo "<select name='stsem' onchange='document.auswahl.submit();'>";;
-	$stsem_obj->getAll();	
+	$stsem_obj->getAll();
 
 	foreach($stsem_obj->studiensemester AS $strow)
 	{
@@ -111,7 +111,7 @@ function selectAll()
 	echo "<br>";
 	echo "<table style='width:10%' id='t1' class='tablesorter'>";
 	echo "<thead>";
-	echo "<tr>";				
+	echo "<tr>";
 	echo "<th>UID</th>";
 	echo "<th>LV-ID</th>";
 	echo "<th>Bezeichnung</th>";
@@ -123,29 +123,28 @@ function selectAll()
 	$emailstr = "";
 	$emailarr = array();
 
-	$qry = "SELECT 
-				tbl_lehreinheitmitarbeiter.mitarbeiter_uid,  tbl_lehrveranstaltung.lehrveranstaltung_id, 
-				tbl_lehrveranstaltung.bezeichnung, tbl_lehreinheitmitarbeiter.stundensatz, 
+	$qry = "SELECT
+				tbl_lehreinheitmitarbeiter.mitarbeiter_uid,  tbl_lehrveranstaltung.lehrveranstaltung_id,
+				tbl_lehrveranstaltung.bezeichnung, tbl_lehreinheitmitarbeiter.stundensatz,
 				tbl_lehreinheitmitarbeiter.semesterstunden, tbl_lehreinheitmitarbeiter.planstunden
 			FROM
-				lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung 
-			WHERE 
-				tbl_lehreinheitmitarbeiter.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND 
-				tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND 
-				tbl_lehrveranstaltung.studiengang_kz = 0 AND 
-				tbl_lehrveranstaltung.lehre = TRUE AND 
-				((tbl_lehreinheitmitarbeiter.stundensatz > 0 AND 
-				tbl_lehreinheitmitarbeiter.semesterstunden > 0) OR 
+				lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
+			WHERE
+				tbl_lehreinheitmitarbeiter.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
+				tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+				tbl_lehrveranstaltung.studiengang_kz = 0 AND
+				tbl_lehrveranstaltung.lehre = TRUE AND
+				((tbl_lehreinheitmitarbeiter.stundensatz > 0 AND
+				tbl_lehreinheitmitarbeiter.semesterstunden > 0) OR
 				tbl_lehreinheitmitarbeiter.planstunden > 0) AND
-				tbl_lehreinheit.studiensemester_kurzbz = '".$stsem."' 
+				tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($stsem)."
 			ORDER BY mitarbeiter_uid, lehrveranstaltung_id;";
 
-	//$qry = "select tbl_lehreinheitmitarbeiter.mitarbeiter_uid,  tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.semesterstunden from lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung where tbl_lehreinheitmitarbeiter.lehreinheit_id = tbl_lehreinheit.lehreinheit_id and tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id and tbl_lehrveranstaltung.studiengang_kz = 0 and tbl_lehrveranstaltung.lehre = TRUE and tbl_lehreinheit.studiensemester_kurzbz = '".$stsem."' order by mitarbeiter_uid, lehrveranstaltung_id;";
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
 		{
-			echo "<tr>";				
+			echo "<tr>";
 			echo "<td><b>".$row->mitarbeiter_uid."</b></td>";
 			echo "<td>".$row->lehrveranstaltung_id."</td>";
 			echo "<td><nobr>".$row->bezeichnung."</nobr></td>";
@@ -158,13 +157,13 @@ function selectAll()
 			if (!in_array($row->mitarbeiter_uid, $emailarr))
 				$emailarr[] = $row->mitarbeiter_uid;
 		}
-	}	
+	}
 
 	echo "</tbody></table>";
 	echo "<br><br>";
 	foreach ($emailarr as $mail)
 		$emailstr .= $mail.'@'.DOMAIN.', ';
-	
+
 	echo "<a href='mailto:".$emailstr."'>Mail an alle LektorInnen</a><br>(".$emailstr.")";
 	echo "</form>";
 ?>
