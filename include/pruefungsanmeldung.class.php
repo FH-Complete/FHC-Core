@@ -2,22 +2,22 @@
 
 /*
  * Copyright 2014 fhcomplete.org
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
- * 
+ *
  *
  * Authors: Stefan Puraner	<puraner@technikum-wien.at>
  */
@@ -27,7 +27,7 @@ require_once(dirname(__FILE__) . '/basis_db.class.php');
 class pruefungsanmeldung extends basis_db {
     public $new;
     public $result = array();
-    
+
     public $pruefungsanmeldung_id;      //bigint
     public $uid;                        //varchar(32)
     public $pruefungstermin_id;         //bigint
@@ -40,12 +40,13 @@ class pruefungsanmeldung extends basis_db {
     public $statusupdateamum;		//timestamp
     public $anrechnung_id;		//integer
     public $pruefungstyp_kurzbz;		//varchar(32)
-    
+    public $insertamum; // timestamp
+
     /**
      * Konstruktor
      * @param pruefung_id ID der zu ladenden Prüfung
      */
-    public function __construct($pruefungsanmeldung_id = null) 
+    public function __construct($pruefungsanmeldung_id = null)
     {
         parent::__construct();
 
@@ -80,7 +81,7 @@ class pruefungsanmeldung extends basis_db {
     {
         return $this->$name;
     }
-    
+
     /**
      * speichert eine Prüfungsanmeldung
      * @param type $new
@@ -90,7 +91,7 @@ class pruefungsanmeldung extends basis_db {
     {
         if ($new == null)
             $new = $this->new;
-        
+
         if($new)
         {
             $qry = 'INSERT INTO campus.tbl_pruefungsanmeldung (uid, pruefungstermin_id, lehrveranstaltung_id, status_kurzbz, wuensche, reihung, kommentar, anrechnung_id, pruefungstyp_kurzbz) VALUES ('
@@ -118,7 +119,7 @@ class pruefungsanmeldung extends basis_db {
 		    . 'pruefungstyp_kurzbz='.$this->db_add_param($this->pruefungstyp_kurzbz)
 		    . ' WHERE pruefungsanmeldung_id='.$this->db_add_param($this->pruefungsanmeldung_id).';';
         }
-        
+
         if ($this->db_query($qry))
         {
             return true;
@@ -129,7 +130,7 @@ class pruefungsanmeldung extends basis_db {
             return false;
         }
     }
-    
+
     /**
      * Lädt eine Prüfungsanmeldung
      * @param type $pruefungsanmeldung_id
@@ -142,9 +143,9 @@ class pruefungsanmeldung extends basis_db {
             $this->errormsg = "Anmeldung ID muss eine gültige Zahl sein";
             return false;
         }
-        
+
         $qry = 'SELECT * FROM campus.tbl_pruefungsanmeldung WHERE pruefungsanmeldung_id='.$this->db_add_param($pruefungsanmeldung_id).';';
-        
+
         if(!$this->db_query($qry))
         {
             $this->errormsg = 'Anmeldungsdaten konnten nicht geladen werden.';
@@ -166,11 +167,12 @@ class pruefungsanmeldung extends basis_db {
 		$this->statusupdatevon = $row->statusupdatevon;
 		$this->anrechnung_id = $row->anrechnung_id;
 		$this->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
+        $this->insertamum = $row->insertamum;
             }
             return true;
         }
     }
-    
+
     /**
      * Lädt alle Prüfungsanmeldungen eines Studenten
      * @param type $uid UID eines Studenten
@@ -184,14 +186,14 @@ class pruefungsanmeldung extends basis_db {
                 . 'JOIN campus.tbl_pruefungstermin pt ON pa.pruefungstermin_id=pt.pruefungstermin_id '
                 . 'JOIN campus.tbl_pruefung p ON p.pruefung_id=pt.pruefung_id '
                 . 'WHERE uid='.$this->db_add_param($uid);
-		
+
 		if($studiensemester_kurzbz != null)
 		{
 			$qry .= ' AND studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz);
 		}
-		
+
 		$qry .= ';';
-        
+
         if(!$this->db_query($qry))
         {
             $this->errormsg = 'Anmeldungen konnten nicht geladen werden.';
@@ -223,9 +225,9 @@ class pruefungsanmeldung extends basis_db {
             return $anmeldungen;
         }
     }
-    
+
     /**
-     * Lädt alle Anmeldungen eines Prüfungstermins 
+     * Lädt alle Anmeldungen eines Prüfungstermins
      * @param type $pruefungstermin_id ID des Prüfungstermins
      * @param type $lehrveranstaltung_id Filter nach Lehrveranstaltung
      * @param type $studiensemester_kurbz Filter nach Studiensemester (zB 'WS2013')
@@ -234,23 +236,23 @@ class pruefungsanmeldung extends basis_db {
      */
     public function getAnmeldungenByTermin($pruefungstermin_id, $lehrveranstaltung_id=null, $studiensemester_kurbz=null, $status_kurzbz=null)
     {
-        $qry = 'SELECT * FROM campus.tbl_pruefungsanmeldung pa '
+        $qry = 'SELECT *, pa.insertamum as datum_anmeldung FROM campus.tbl_pruefungsanmeldung pa '
                 . 'JOIN campus.tbl_pruefungstermin pt ON pa.pruefungstermin_id=pt.pruefungstermin_id '
                 . 'JOIN campus.tbl_pruefung p ON p.pruefung_id=pt.pruefung_id '
                 . 'WHERE pa.pruefungstermin_id='.$this->db_add_param($pruefungstermin_id);
-        
+
 	if($lehrveranstaltung_id !== null)
 	{
 	    $qry .= ' AND lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id);
 	}
-	
+
 	if($status_kurzbz !== null)
 	{
 	    $qry .= ' AND status_kurzbz='.$this->db_add_param($status_kurzbz);
 	}
 	$qry .=' ORDER BY reihung';
 	$qry .=';';
-	
+
         if(!$this->db_query($qry))
         {
             $this->errormsg = "Anmeldungen konnten nicht geladen werden.";
@@ -277,12 +279,13 @@ class pruefungsanmeldung extends basis_db {
 		$anmeldung->statusupdatevon = $row->statusupdatevon;
 		$anmeldung->anrechnung_id = $row->anrechnung_id;
 		$anmeldung->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
+        $anmeldung->datum_anmeldung = $row->datum_anmeldung;
                 array_push($anmeldungen, $anmeldung);
             }
             return $anmeldungen;
         }
     }
-    
+
     /**
      * Löscht eine Prüfungsanmeldung
      * @param type $pruefungsanmeldung_id ID der Prüfungsanmeldung
@@ -292,14 +295,14 @@ class pruefungsanmeldung extends basis_db {
     public function delete($pruefungsanmeldung_id, $uid=null)
     {
         $qry = 'DELETE FROM campus.tbl_pruefungsanmeldung WHERE pruefungsanmeldung_id='.$this->db_add_param($pruefungsanmeldung_id);
-	
+
 	if(!is_null($uid))
 	{
 	    $qry .= ' AND uid='.$this->db_add_param($uid);
 	}
-	
+
 	$qry .= ' ;';
-	
+
 	if($this->db_query($qry))
 	{
 	    return true;
@@ -310,7 +313,7 @@ class pruefungsanmeldung extends basis_db {
 	    return false;
 	}
     }
-    
+
     /**
      * speichert die Reihung eines Anmeldungstermins
      * WICHTIG: Auf den Aufbau des übergebenen arrays muss geachtet werden
@@ -348,8 +351,8 @@ class pruefungsanmeldung extends basis_db {
 	$this->errormsg = "No Array";
 	return false;
     }
-    
-    
+
+
     /**
      * Ändert den Status einer Prüfungsanmeldung
      * @param type $pruefungsanmeldung_id ID der Prüfungsanmeldung
@@ -363,7 +366,7 @@ class pruefungsanmeldung extends basis_db {
 		. 'statusupdatevon='.$this->db_add_param($user).', '
 		. 'statusupdateamum=NOW() '
 		. ' WHERE pruefungsanmeldung_id='.$this->db_add_param($pruefungsanmeldung_id).';';
-	
+
 	if(!$this->db_query($qry))
 	{
 	    $this->errormsg = 'Status konnte nicht geändert werden.';

@@ -151,6 +151,19 @@ if(!$result = @$db->db_query("SELECT final FROM lehre.tbl_projektarbeit LIMIT 1"
 		echo '<br>lehre.tbl_projektarbeit: Spalte final hinzugefuegt';
 }
 
+//Spalte insertamum tbl_pruefungsanmeldung zur Ausgabe des Anmeldedatums auf Anmeldelisten
+if(!$result = @$db->db_query("SELECT insertamum FROM campus.tbl_pruefungsanmeldung LIMIT 1"))
+{
+	$qry = "ALTER TABLE campus.tbl_pruefungsanmeldung ADD COLUMN insertamum timestamp DEFAULT now();";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_pruefungsanmeldung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>campus.tbl_pruefungsanmeldung: Spalte insertamum hinzugefuegt';
+}
+
+
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
