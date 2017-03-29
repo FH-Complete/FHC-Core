@@ -1,5 +1,5 @@
 <?php
-	$this->load->view('templates/header', array('title' => 'TemplateEdit', 'tinymce' => true, 'jsonforms' => true));
+	$this->load->view('templates/header', array('title' => 'VorlageEdit', 'tinymce' => true, 'jsonforms' => true));
 ?>
 
 <div class="row">
@@ -7,9 +7,31 @@
 	  <h2>Vorlagetext: <?=$vorlagestudiengang_id?></h2>
 	<!--StudiengangKZ: <?=$studiengang_kz?>-->
 <form method="post" action="../saveText/<?=$vorlagestudiengang_id?>">
-	OE:<?php echo $this->widgetlib->widget("organisationseinheit_widget", array('oe_kurzbz' => $oe_kurzbz, 'typ' => "'Erhalter','Studienzentrum','Studiengang','Lehrgang'")); ?>
-	Sprache:<?php echo $this->widgetlib->widget("sprache_widget", array('sprache' => $sprache)); ?>
-	OrgForm:<?php echo $this->widgetlib->widget("orgform_widget", array('orgform' => $orgform_kurzbz)); ?>
+
+	OE:	<?php
+			echo $this->widgetlib->widget(
+				'Organisationseinheit_widget',
+				array(
+					DropdownWidget::SELECTED_ELEMENT => $oe_kurzbz,
+					'typ' => array('Erhalter', 'Studienzentrum', 'Studiengang', 'Lehrgang')
+				),
+				array('name' => 'organisationseinheit', 'id' => 'organisationseinheitDnD')
+			);
+		?>
+	Sprache:	<?php
+					echo $this->widgetlib->widget(
+						'Sprache_widget',
+						array(DropdownWidget::SELECTED_ELEMENT => $sprache),
+						array('name' => 'sprache', 'id' => 'spracheDnD')
+					);
+				?>
+	OrgForm:	<?php
+					echo $this->widgetlib->widget(
+						'Orgform_widget',
+						array(DropdownWidget::SELECTED_ELEMENT => $orgform_kurzbz),
+						array('name' => 'orgform', 'id' => 'orgformDnD')
+					);
+				?>
 	Version: <input type="text" name="version" value="<?php echo $version; ?>" size="1" />
 	Aktiv: <input type="text" name="aktiv" value="<?php echo $aktiv; ?>" size="1" />
 	<input type="hidden" name="vorlagestudiengang_id" value="<?php echo $vorlagestudiengang_id; ?>" />
@@ -21,7 +43,7 @@
 	<button type="submit">Save</button>
 </form>
 <hr/><h2>Preview-Data</h2>
-<form method="post" action="../preview/<?=$vorlagestudiengang_id?>" target="TemplatePreview">
+<form method="post" action="../preview/<?=$vorlagestudiengang_id?>" target="VorlagePreview">
 	<?php echo $this->widgetlib->widget("jsonforms_widget", array('id' => 'dataform', 'schema' => $schema)); ?>
 	<input type="hidden" name="formdata" id="formdata" value="" />
 	<button type="submit" onclick="getFormdata(this.form);">Preview</button>
@@ -38,6 +60,6 @@
     }
 </script>
 
-<iframe name="TemplatePreview" width="100%" src=""/>
+<iframe name="VorlagePreview" width="100%" src=""/>
 </body>
 </html>

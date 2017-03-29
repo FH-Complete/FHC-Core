@@ -1,23 +1,21 @@
 <?php
 
-class Vorlage_widget extends Widget
+class Vorlage_widget extends DropdownWidget
 {
-    public function display($data)
+    public function display($widgetData)
 	{
-		$this->load->model("system/Vorlage_model", "VorlageModel");
-		$this->VorlageModel->addOrder("vorlage_kurzbz");
-		$result = $this->VorlageModel->loadWhere(array("mimetype" => "text/html"));
+		$this->load->model('system/Vorlage_model', 'VorlageModel');
+		$this->VorlageModel->addOrder('vorlage_kurzbz');
 		
-		if (is_object($result) && $result->error == EXIT_SUCCESS)
-		{
-			// Adding an empty element
-			$emptyVorlage = new stdClass();
-			$emptyVorlage->vorlage_kurzbz = '-1';
-			$emptyVorlage->bezeichnung = 'Select a template...';
-			array_unshift($result->retval, $emptyVorlage);
-			
-			$data = array("vorlage" => $result->retval);
-			$this->view("widgets/vorlage", $data);
-		}
+		$this->addSelectToModel($this->VorlageModel, 'vorlage_kurzbz', 'bezeichnung');
+		
+		$this->setElementsArray(
+			$this->VorlageModel->loadWhere(array('mimetype' => 'text/html')),
+			true,
+			'Select a vorlage...',
+			'No vorlage found'
+		);
+		
+		$this->loadDropDownView($widgetData);
     }
 }

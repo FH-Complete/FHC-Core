@@ -713,6 +713,11 @@ class DropdownWidget extends Widget
 	{
 		$widgetData[DropdownWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME] = $this->elementsArray->retval;
 		
+		if (!isset($widgetData[DropdownWidget::SELECTED_ELEMENT]))
+		{
+			$widgetData[DropdownWidget::SELECTED_ELEMENT] = Widget::HTML_DEFAULT_VALUE;
+		}
+		
 		$this->view('widgets/dropdown', $widgetData);
 	}
 	

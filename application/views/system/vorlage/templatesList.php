@@ -1,5 +1,5 @@
 <?php
-	$this->load->view('templates/header', array('title' => 'TemplatesList', 'tablesort' => true, 'tableid' => 't1', 'headers' => '4:{sorter:false}'));
+	$this->load->view('templates/header', array('title' => 'VorlageList', 'tablesort' => true, 'tableid' => 't1', 'headers' => '4:{sorter:false}'));
 ?>
 <div class="row">
 	<div class="span4">
@@ -23,7 +23,7 @@ MimeType
 	</thead>
 	<tbody>
 	<?php foreach ($vorlage as $v): ?>
-		<tr><td><a href="edit/<?php echo $v->vorlage_kurzbz; ?>" target="TemplatesBottom"><?php echo $v->vorlage_kurzbz; ?></a></td>
+		<tr><td><a href="edit/<?php echo $v->vorlage_kurzbz; ?>" target="VorlageBottom"><?php echo $v->vorlage_kurzbz; ?></a></td>
 			<td><?php echo $v->bezeichnung; ?></td>
 			<td><?php echo $v->anmerkung; ?></td>
 			<td><?php echo $v->mimetype; ?></td>

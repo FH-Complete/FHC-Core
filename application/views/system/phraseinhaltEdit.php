@@ -11,11 +11,43 @@
 	<table>
 	<tr>
 		<td>OE</td>
-		<td><?php echo $this->widgetlib->widget("organisationseinheit_widget", array('oe_kurzbz' => $orgeinheit_kurzbz)); ?></td>
+		<td>
+			<?php
+				echo $this->widgetlib->widget(
+					'Organisationseinheit_widget',
+					array(DropdownWidget::SELECTED_ELEMENT => $orgeinheit_kurzbz),
+					array('name' => 'organisationseinheit', 'id' => 'organisationseinheitDnD')
+				);
+			?>
+		</td>
 		<td>Preview</td>
 	</tr>
-	<tr><td>Orgform</td><td><?php echo $this->widgetlib->widget("orgform_widget", array('orgform_kurzbz' => $orgform_kurzbz)); ?></td><td></td></tr>
-	<tr><td>Sprache</td><td><?php echo $this->widgetlib->widget("sprache_widget", array('sprache' => $sprache)); ?></td><td></td></tr>
+	<tr>
+		<td>Orgform</td>
+		<td>
+			<?php
+				echo $this->widgetlib->widget(
+					'Orgform_widget',
+					array(DropdownWidget::SELECTED_ELEMENT => $orgform_kurzbz),
+					array('name' => 'orgform', 'id' => 'orgformDnD')
+				);
+			?>
+		</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>Sprache</td>
+		<td>
+			<?php
+				echo $this->widgetlib->widget(
+					'Sprache_widget',
+					array(DropdownWidget::SELECTED_ELEMENT => $sprache),
+					array('name' => 'sprache', 'id' => 'spracheDnD')
+				);
+			?>
+		</td>
+		<td></td>
+	</tr>
 	<tr><td>Text</td><td><textarea name="text" style="width:500px; height:300px;" id="markitup"><?php echo $text ?></textarea></td>
 		<td valign="top">
 			<div id="textile-preview" style="width:500px; height:300px; border: 1px solid gray; overflow: auto;"></div>

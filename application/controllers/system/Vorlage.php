@@ -1,9 +1,9 @@
 <?php
+
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Templates extends FHC_Controller 
+class Vorlage extends VileSci_Controller 
 {
-
 	public function __construct()
     {
         parent::__construct();
@@ -14,100 +14,109 @@ class Templates extends FHC_Controller
         // Loads the widget library
 		$this->load->library('WidgetLib');
     }
-
+	
 	public function index()
 	{
-		$this->load->view('system/templates.php');
+		$this->load->view('system/vorlage/templates.php');
 	}
-
+	
 	public function table()
 	{
-		$mimetype = $this->input->post('mimetype', TRUE);
+		$mimetype = $this->input->post('mimetype');
+		
 		if (is_null($mimetype))
 			$mimetype = 'text/html';
 		if ($mimetype == '')
 			$mimetype = null;
+		
 		$vorlage = $this->vorlagelib->getVorlageByMimetype($mimetype);
+		
 		if ($vorlage->error)
 			show_error($vorlage->retval);
-		//var_dump($vorlage);
 		
-		$data = array
-		(
+		$data = array (
 			'mimetype' => $mimetype,
 			'vorlage' => $vorlage->retval
 		);
-		$v = $this->load->view('system/templatesList.php', $data);
+		
+		$v = $this->load->view('system/vorlage/templatesList.php', $data);
 	}
-
+	
 	public function view($vorlage_kurzbz = null)
 	{
-		if (empty($vorlage_kurzbz))
-			exit;
+		if (empty($vorlage_kurzbz)) exit;
+		
 		$vorlagentext = $this->vorlagelib->getVorlagetextByVorlage($vorlage_kurzbz);
+		
 		if ($vorlagentext->error)
 			show_error($vorlagentext->retval);
-		//var_dump($vorlagentext);
 		
-		$data = array
-		(
+		$data = array (
 			'vorlage_kurzbz' => $vorlage_kurzbz,
 			'vorlagentext' => $vorlagentext->retval
 		);
-		$v = $this->load->view('system/templatetextList.php', $data);
+		
+		$v = $this->load->view('system/vorlage/templatetextList.php', $data);
 	}
-
+	
 	public function edit($vorlage_kurzbz = null)
 	{
-		if (empty($vorlage_kurzbz))
-			exit;
+		if (empty($vorlage_kurzbz)) exit;
+		
 		$vorlage = $this->vorlagelib->getVorlage($vorlage_kurzbz);
-		//var_dump($vorlage);
+		
 		if ($vorlage->error)
 			show_error($vorlage->retval);
+		
 		if (count($vorlage->retval) != 1)
 			show_error('Nachricht nicht vorhanden! ID: '.$vorlage_kurzbz);
-
-		$data = array
-		(
+		
+		$data = array (
 			'vorlage' => $vorlage->retval[0]
 		);
-		//var_dump($data['message']);
-		$v = $this->load->view('system/templatesEdit', $data);
+		
+		$v = $this->load->view('system/vorlage/templatesEdit', $data);
 	}
 
 	public function write($vorlage_kurzbz = null)
 	{
-		$data = array
-		(
+		$data = array (
 			'subject' => 'TestSubject',
 			'body' => 'TestDevelopmentBodyText'
-		);		
-		$v = $this->load->view('system/messageWrite', $data);
+		);
+		
+		$v = $this->load->view('system/vorlage/messageWrite', $data);
 	}
 	
 	public function save()
 	{
-		$vorlage_kurzbz = $this->input->post('vorlage_kurzbz', TRUE);
-		$data['bezeichnung'] = $this->input->post('bezeichnung', TRUE);
-		$data['anmerkung'] = $this->input->post('anmerkung', TRUE);
-		$data['mimetype'] = $this->input->post('mimetype', TRUE);
-		$data['attribute'] = $this->input->post('attribute', TRUE);
+		$vorlage_kurzbz = $this->input->post('vorlage_kurzbz');
+		
+		$data = array(
+			'bezeichnung' => $this->input->post('bezeichnung'),
+			'anmerkung' => $this->input->post('anmerkung'),
+			'mimetype' => $this->input->post('mimetype'),
+			'attribute' => $this->input->post('attribute')
+		);
+		
 		$vorlage = $this->vorlagelib->saveVorlage($vorlage_kurzbz, $data);
+		
 		if ($vorlage->error)
 			show_error($vorlage->retval);
+		
 		$vorlage_kurzbz = $vorlage->retval;
-
-		redirect('/system/Templates/edit/'.$vorlage_kurzbz);
+		
+		redirect('/system/vorlage/edit/'.$vorlage_kurzbz);
 	}
-
+	
 	public function newText()
 	{
-		$vorlage_kurzbz = $this->input->post('vorlage_kurzbz', true);
+		$vorlage_kurzbz = $this->input->post('vorlage_kurzbz');
 		
 		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 		$this->OrganisationseinheitModel->addLimit(1);
 		$this->OrganisationseinheitModel->addOrder('oe_kurzbz');
+		
 		$resultOE = $this->OrganisationseinheitModel->loadWhere(array('aktiv' => true, 'oe_parent_kurzbz' => null));
 		
 		if ($resultOE->error)
@@ -125,105 +134,127 @@ class Templates extends FHC_Controller
 			);
 			
 			$vorlagetext = $this->vorlagelib->insertVorlagetext($data);
+			
 			if ($vorlagetext->error)
 				show_error($vorlagetext->retval);
 			
 			$vorlagestudiengang_id = $vorlagetext->retval;
 			
-			redirect('/system/Templates/editText/'.$vorlagestudiengang_id);
+			redirect('/system/vorlage/editText/'.$vorlagestudiengang_id);
 		}
 		else
 		{
 			show_error('No valid organisation unit found');
 		}
 	}
-
+	
 	public function editText($vorlagestudiengang_id)
 	{
 		$vorlagetext = $this->vorlagelib->getVorlagetextById($vorlagestudiengang_id);
+		
 		if ($vorlagetext->error)
 			show_error($vorlagetext->retval);
+		
 		$data = $vorlagetext->retval[0];
-
+		
 		// Preview-Data
 		$schema = $this->vorlagelib->getVorlage($data->vorlage_kurzbz);
+		
 		$data->schema = $schema->retval[0]->attribute;
-
-		$this->load->view('system/templatetextEdit', $data);
+		
+		$this->load->view('system/vorlage/templatetextEdit', $data);
 	}
-
+	
 	public function linkDocuments($vorlagestudiengang_id)
 	{
-		$this->load->model('system/vorlagedokument_model');
-		$return = $this->vorlagedokument_model->loadDokumenteFromVorlagestudiengang($vorlagestudiengang_id);
+		$data = array();
+		
+		$this->load->model('system/Vorlagedokument_model', 'VorlagedokumentModel');
+		
+		$return = $this->VorlagedokumentModel->loadDokumenteFromVorlagestudiengang($vorlagestudiengang_id);
+		
 		$data['documents'] = $return->retval;
-
-		$this->load->model('system/dokument_model');
-		$this->dokument_model->addOrder("bezeichnung");
-		$return = $this->dokument_model->load();
+		
+		$this->load->model('system/Dokument_model', 'DokumentModel');
+		$this->DokumentModel->addOrder('bezeichnung');
+		
+		$return = $this->DokumentModel->load();
+		
 		$data['allDocuments'] = $return->retval;
-
 		$data['vorlagestudiengang_id'] = $vorlagestudiengang_id;
-
-		$this->load->view('system/templateLinkDocuments', $data);
+		
+		$this->load->view('system/vorlage/templateLinkDocuments', $data);
 	}
-
+	
 	public function saveDocuments($vorlagestudiengang_id, $dokument_kurzbz, $sort)
 	{
-		$this->load->model('system/vorlagedokument_model');
+		$insert = array();
+		
 		$insert['vorlagestudiengang_id'] = $vorlagestudiengang_id;
 		$insert['dokument_kurzbz'] = $dokument_kurzbz;
-		$insert['sort']      = $sort;
-		$this->vorlagedokument_model->insert($insert);
+		$insert['sort'] = $sort;
+		
+		$this->load->model('system/Vorlagedokument_model', 'VorlagedokumentModel');
+		
+		$this->VorlagedokumentModel->insert($insert);
 	}
-
+	
 	public function deleteDocumentLink($vorlagestudiengang_id)
 	{
-		$this->load->model('system/vorlagedokument_model');
-		$this->vorlagedokument_model->delete($vorlagestudiengang_id);
+		$this->load->model('system/Vorlagedokument_model', 'VorlagedokumentModel');
+		
+		$this->VorlagedokumentModel->delete($vorlagestudiengang_id);
 	}
-
+	
 	public function changeSort($vorlagestudiengang_id, $sort)
 	{
-		$this->load->model('system/vorlagedokument_model');
-		$this->vorlagedokument_model->update($vorlagestudiengang_id, array("sort"=>$sort));
+		$this->load->model('system/Vorlagedokument_model', 'VorlagedokumentModel');
+		
+		$this->VorlagedokumentModel->update($vorlagestudiengang_id, array('sort' => $sort));
 	}
-
+	
 	public function saveText()
 	{
-		$vorlagestudiengang_id = $this->input->post('vorlagestudiengang_id', TRUE);
-		$data['studiengang_kz'] = $this->input->post('studiengang_kz', TRUE);
-		$data['version'] = $this->input->post('version', TRUE);
-		$data['oe_kurzbz'] = $this->input->post('oe_kurzbz', TRUE);
+		$data = array(
+			'studiengang_kz' => $this->input->post('studiengang_kz'),
+			'version' => $this->input->post('version'),
+			'oe_kurzbz' => $this->input->post('oe_kurzbz'),
+			'aktiv' => $this->input->post('aktiv'),
+			'text' => $this->input->post('text'),
+			'vorlagestudiengang_id' => $this->input->post('vorlagestudiengang_id')
+		);
+		
 		if ($this->input->post('sprache') == '')
 			$data['sprache'] = null;
 		else
-			$data['sprache'] = $this->input->post('sprache', TRUE);
+			$data['sprache'] = $this->input->post('sprache');
+		
 		if ($this->input->post('orgform_kurzbz') == '')
 			$data['orgform_kurzbz'] = null;
 		else
-			$data['orgform_kurzbz'] = $this->input->post('orgform_kurzbz', TRUE);
-		$data['text'] = $this->input->post('text', TRUE);
-		$data['aktiv'] = $this->input->post('aktiv', TRUE);
-		$vorlagetext = $this->vorlagelib->updateVorlagetext($vorlagestudiengang_id, $data);
+			$data['orgform_kurzbz'] = $this->input->post('orgform_kurzbz');
+		
+		$vorlagetext = $this->vorlagelib->updateVorlagetext($data['vorlagestudiengang_id'], $data);
+		
 		if ($vorlagetext->error)
 			show_error($vorlagetext->retval);
-		$data['vorlagestudiengang_id'] = $vorlagestudiengang_id;
-		redirect('/system/Templates/editText/'.$vorlagestudiengang_id);
-		//$this->load->view('system/templatetextEdit', $data);
+		
+		redirect('/system/vorlage/editText/'.$data['vorlagestudiengang_id']);
 	}
-
+	
 	public function preview($vorlagestudiengang_id)
 	{
-		$formdata = $this->input->post('formdata', FALSE);
-		$daten = json_decode($formdata, TRUE);
+		$jsonDecodedForm = json_decode($this->input->post('formdata'), true);
+		
 		$vorlagetext = $this->vorlagelib->getVorlagetextById($vorlagestudiengang_id);
+		
 		if ($vorlagetext->error)
 			show_error($vorlagetext->retval);
-		$data = array
-		(
-			'text' => $this->vorlagelib->parseVorlagetext($vorlagetext->retval[0]->text, $daten)
+		
+		$data = array(
+			'text' => $this->vorlagelib->parseVorlagetext($vorlagetext->retval[0]->text, $jsonDecodedForm)
 		);
-		$this->load->view('system/templatetextPreview', $data);
+		
+		$this->load->view('system/vorlage/templatetextPreview', $data);
 	}
 }

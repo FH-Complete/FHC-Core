@@ -1,5 +1,5 @@
 <?php
-	$this->load->view('templates/header', array('title' => 'TemplateEdit', 'jsoneditor' => true));
+	$this->load->view('templates/header', array('title' => 'VorlageEdit', 'jsoneditor' => true));
 ?>
 <div class="row">
 	<div class="span4">
