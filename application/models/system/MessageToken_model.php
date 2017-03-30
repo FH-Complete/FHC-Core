@@ -153,16 +153,56 @@ class MessageToken_model extends CI_Model
 					   p.anrede,
 					   p.titelpost,
 					   p.titelpre,
-					   p.vornamen
+					   p.vornamen,
+					   m.mitarbeiter_uid
 				  FROM public.tbl_person p
+			 LEFT JOIN public.tbl_benutzer b USING(person_id)
+			 LEFT JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
 				 WHERE p.person_id = ?';
-
+		
 		$result = $this->db->query($sql, array($person_id));
 		
 		// If no errors occurred
 		if ($result)
 		{
 			return success($result->result());
+		}
+		else
+		{
+			return error($this->db->error());
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public function isEmployee($person_id)
+	{
+		$sql = 'SELECT m.mitarbeiter_uid
+				  FROM public.tbl_person p
+			 LEFT JOIN public.tbl_benutzer b USING(person_id)
+			 LEFT JOIN public.tbl_mitarbeiter m ON(b.uid = m.mitarbeiter_uid)
+				 WHERE p.person_id = ?
+				   AND b.aktiv = TRUE';
+		
+		$result = $this->db->query($sql, array($person_id));
+		
+		// If no errors occurred
+		if ($result)
+		{
+			// If data are present
+			if (is_array($result->result()) && count($result->result()) > 0)
+			{
+				$person = $result->result()[0];
+				
+				// If it is an employee
+				if ($person->mitarbeiter_uid != null)
+				{
+					return true;
+				}
+			}
+			
+			return false;
 		}
 		else
 		{

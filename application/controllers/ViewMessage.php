@@ -57,12 +57,21 @@ class ViewMessage extends CI_Controller
 			}
 			
 			$sender_id = $msg->retval[0]->sender_id;
+			$receiver_id = $msg->retval[0]->receiver_id;
 			$sender = $this->MessageTokenModel->getSenderData($sender_id);
+			
+			// To decide how to change the redirection
+			$isEmployee = $this->MessageTokenModel->isEmployee($receiver_id);
+			if (!is_bool($isEmployee) && isError($isEmployee))
+			{
+				show_error($isEmployee);
+			}
 			
 			$data = array (
 				'sender_id' => $sender_id,
 				'sender' => $sender->retval[0],
 				'message' => $msg->retval[0],
+				'isEmployee' => $isEmployee,
 				'href' => APP_ROOT . $this->config->item('redirect_view_message_url') . $token
 			);
 			

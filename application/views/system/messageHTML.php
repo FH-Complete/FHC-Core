@@ -37,11 +37,18 @@
 					<?php echo $message->body; ?>
 				</td>
 			</tr>
-			<tr>
-				<td colspan="3" align="center" style="background-color:#dddddd; padding:5px;">
-					<a href="<?php echo $href; ?>">Reply</a>
-				</td>
-			</tr>
+			<?php
+				if ($isEmployee === false)
+				{
+			?>
+					<tr>
+						<td colspan="3" align="center" style="background-color:#dddddd; padding:5px;">
+							<a href="<?php echo $href; ?>">Reply</a>
+						</td>
+					</tr>
+			<?php
+				}
+			?>	
 		</table>
 	</center>
 
