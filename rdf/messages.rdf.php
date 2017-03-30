@@ -41,12 +41,16 @@ else
 $db = new basis_db();
 $qry = "
 SELECT
-	m.*,
+	m.message_id AS message_id,
+	m.subject AS subject,
+	m.body AS body,
+	m.insertamum AS insertamum,
+	m.relationmessage_id AS relationmessage_id,
 	(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=m.person_id) as sender,
 	(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id=r.person_id) as recipient,
 	m.person_id as sender_id,
 	r.person_id as recipient_id,
-	s.status as status
+	MAX(s.status) as status
 FROM
 	public.tbl_msg_message m
 	JOIN public.tbl_msg_recipient r USING(message_id)
@@ -55,6 +59,7 @@ WHERE
  	r.person_id=".$db->db_add_param($person_id, FHC_INTEGER)."
 	OR m.person_id=".$db->db_add_param($person_id, FHC_INTEGER)."
 	AND s.person_id=".$db->db_add_param($person_id, FHC_INTEGER)."
+GROUP BY m.message_id, m.subject, m.body, m.insertamum, m.relationmessage_id, sender, recipient, sender_id, recipient_id
 ORDER BY
 	message_id, status";
 
