@@ -30,6 +30,10 @@ class ViewMessage extends CI_Controller
 		$this->load->model('system/MessageToken_model', 'MessageTokenModel');
 	}
 	
+	/**
+	 * Using the MessageTokenModel instead of MessageLib to allow
+	 * viewing the message without prompting the login
+	 */
 	public function toHTML($token)
 	{
 		$msg = $this->MessageTokenModel->getMessageByToken($token);
@@ -41,6 +45,13 @@ class ViewMessage extends CI_Controller
 		
 		if (is_array($msg->retval) && count($msg->retval) > 0)
 		{
+			$setReadMessageStatusByToken = $this->MessageTokenModel->setReadMessageStatusByToken($token);
+			
+			if (isError($setReadMessageStatusByToken))
+			{
+				show_error($msg->$setReadMessageStatusByToken);
+			}
+			
 			$data = array (
 				'message' => $msg->retval[0],
 				'href' => APP_ROOT . $this->config->item('redirect_view_message_url') . $token
