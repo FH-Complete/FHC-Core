@@ -8,17 +8,17 @@ class MessageToken_model extends CI_Model
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		// Loads config file message
 		$this->config->load('message');
-		
+
 		// Load return message helper
 		$this->load->helper('message');
-		
+
 		// Loads the database object
 		$this->load->database();
 	}
-	
+
 	/**
 	 * Get a received message identified by token
 	 */
@@ -41,9 +41,9 @@ class MessageToken_model extends CI_Model
 						) s ON (r.message_id = s.message_id AND r.person_id = s.person_id)
 				 WHERE r.token = ?
 				 LIMIT 1';
-		
+
 		$result = $this->db->query($sql, array(MSG_STATUS_DELETED, $token));
-		
+
 		return success($result->result());
 	}
 }
