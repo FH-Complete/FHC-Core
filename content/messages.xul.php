@@ -118,7 +118,7 @@ echo ']>
 			class="sortDirectionIndicator"
 			sort="rdf:http://www.technikum-wien.at/messages/rdf#recipient_id"/>
 		<splitter class="tree-splitter"/>
-		<treecol id="messages-tree-status" label="Status" flex="2" hidden="true"
+		<treecol id="messages-tree-status" label="Status" flex="2" hidden="false"
 			class="sortDirectionIndicator"
 			sort="rdf:http://www.technikum-wien.at/messages/rdf#status"/>
 		<splitter class="tree-splitter"/>
