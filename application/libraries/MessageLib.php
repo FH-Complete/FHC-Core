@@ -505,7 +505,7 @@ class MessageLib
 						if (!$sent)
 						{
 							$this->ci->loglib->logError('Error while sending an email');
-							// Writing errors in tbl_message_status
+							// Writing errors in tbl_message_recipient
 							$sme = $this->setMessageError(
 								$result->retval[$i]->message_id,
 								$result->retval[$i]->receiver_id,
@@ -531,7 +531,7 @@ class MessageLib
 					else
 					{
 						$this->ci->loglib->logError('This person does not have an email account');
-						// Writing errors in tbl_message_status
+						// Writing errors in tbl_message_recipient
 						$sme = $this->setMessageError(
 								$result->retval[$i]->message_id,
 								$result->retval[$i]->receiver_id,
