@@ -50,10 +50,10 @@ class benutzerberechtigung extends basis_db
 	public $insertvon;
 	public $kostenstelle_id;
 	public $anmerkung;					// varchar(256)
-	
+
 	public $starttimestamp;
 	public $endetimestamp;
-	
+
 	//Attribute des Mitarbeiters
 	public $fix;
 	public $lektor;
@@ -65,7 +65,7 @@ class benutzerberechtigung extends basis_db
 	public function __construct($benutzerberechtigung_id=null)
 	{
 		parent::__construct();
-		
+
 		if($benutzerberechtigung_id!=null)
 			$this->load($benutzerberechtigung_id);
 	}
@@ -81,9 +81,9 @@ class benutzerberechtigung extends basis_db
 			$this->errormsg = 'benutzerberechtigung_id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM system.tbl_benutzerrolle WHERE benutzerberechtigung_id=".$this->db_add_param($benutzerberechtigung_id, FHC_INTEGER);
-		
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -105,16 +105,16 @@ class benutzerberechtigung extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->kostenstelle_id = $row->kostenstelle_id;
 				$this->anmerkung = $row->anmerkung;
-				
+
 				return true;
 			}
-			else 
+			else
 			{
 				$this->errormsg = 'Es wurde kein Eintrag mit dieser ID gefunden';
 				return false;
 			}
 		}
-		else 
+		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Berechtigung';
 			return false;
@@ -144,64 +144,64 @@ class benutzerberechtigung extends basis_db
 			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
-		
+
 		if($this->rolle_kurzbz=='' && $this->berechtigung_kurzbz=='')
 		{
 			$this->errormsg = 'Es muss entweder eine Rolle oder eine Berechtigung angegeben werden';
 			return false;
 		}
-		
+
 		if($this->rolle_kurzbz!='' && $this->berechtigung_kurzbz!='')
 		{
 			$this->errormsg = 'Rolle und Berechtigung kann nicht gleichzeitig angegeben werden';
 			return false;
 		}
-		
+
 		if($this->uid=='' && $this->funktion_kurzbz=='')
 		{
 			$this->errormsg = 'Ess muss entweder eine UID oder eine Funktion_kurzbz angegeben werden';
 			return false;
 		}
-		
+
 		if($this->uid!='' && $this->funktion_kurzbz!='')
 		{
 			$this->errormsg = 'UID und Funktion_kurzbz kann nicht gleichzeitig angegeben werden';
 			return false;
 		}
-		
+
 		if($this->funktion_kurzbz!='' && $this->oe_kurzbz!='')
 		{
 			$this->errormsg = 'Wenn eine Funktion_kurzbz angegeben wird, darf keine Organisationseinheit eingetragen sein';
 			return false;
 		}
-		
+
 		if($this->art=='')
 		{
 			$this->errormsg = 'Art darf nicht leer sein';
 			return false;
 		}
-		
+
 		if($this->kostenstelle_id!='' && !is_numeric($this->kostenstelle_id))
 		{
 			$this->errormsg = 'Kostenstelle_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		if($this->kostenstelle_id!='' && $this->oe_kurzbz!='')
 		{
 			$this->errormsg = 'Wenn eine Kostenstelle angegeben wird, darf keine Organisationseinheit eingetragen sein';
 			return false;
 		}
-		
+
 		if(mb_strlen($this->anmerkung)>256)
 		{
 			$this->errormsg = 'Anmerkung darf nicht laenger als 256 Zeichen sein';
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Speichert Benutzerberechtigung in die Datenbank
 	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
@@ -216,8 +216,8 @@ class benutzerberechtigung extends basis_db
 
 		if($this->new)
 		{
-			$qry = 'INSERT INTO system.tbl_benutzerrolle (rolle_kurzbz, berechtigung_kurzbz, uid, funktion_kurzbz, 
-						oe_kurzbz, art, studiensemester_kurzbz, start, ende, negativ, updateamum, updatevon, 
+			$qry = 'INSERT INTO system.tbl_benutzerrolle (rolle_kurzbz, berechtigung_kurzbz, uid, funktion_kurzbz,
+						oe_kurzbz, art, studiensemester_kurzbz, start, ende, negativ, updateamum, updatevon,
 						insertamum, insertvon, kostenstelle_id, anmerkung)
 			        VALUES('.$this->db_add_param($this->rolle_kurzbz).','.
 					$this->db_add_param($this->berechtigung_kurzbz).','.
@@ -279,7 +279,7 @@ class benutzerberechtigung extends basis_db
 			$this->errormsg = 'benutzerberechtigung_id ist ungültig';
 			return false;
 		}
-		
+
 		// Berechtigungen loeschen
 		$sql_query="DELETE FROM system.tbl_benutzerrolle where benutzerberechtigung_id=".$this->db_add_param($benutzerberechtigung_id, FHC_INTEGER);
 
@@ -299,12 +299,12 @@ class benutzerberechtigung extends basis_db
 	public function loadBenutzerRollen($uid=null, $funktion_kurzbz=null)
 	{
 		$qry = 'SELECT * FROM system.tbl_benutzerrolle WHERE ';
-		
+
 		if(!is_null($uid))
 			$qry.= " uid=".$this->db_add_param($uid);
 		elseif(!is_null($funktion_kurzbz))
 			$qry.= " funktion_kurzbz=".$this->db_add_param($funktion_kurzbz);
-		else 
+		else
 		{
 			$this->errormsg = 'Entweder UID oder funktion_kurzbz muss uebergeben werden';
 			return false;
@@ -315,7 +315,7 @@ class benutzerberechtigung extends basis_db
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new benutzerberechtigung();
-				
+
 				$obj->benutzerberechtigung_id = $row->benutzerberechtigung_id;
 				$obj->rolle_kurzbz = $row->rolle_kurzbz;
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
@@ -333,13 +333,13 @@ class benutzerberechtigung extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->kostenstelle_id = $row->kostenstelle_id;
 				$obj->anmerkung = $row->anmerkung;
-				
+
 				$this->berechtigungen[] = $obj;
 			}
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Laedt die Berechtigungen eines Users
 	 * @param $uid
@@ -348,6 +348,27 @@ class benutzerberechtigung extends basis_db
 	 */
 	public function getBerechtigungen($uid,$all=false)
 	{
+		// Pruefen ob die Person aktiv ist
+		$qry = "SELECT aktiv FROM public.tbl_benutzer WHERE uid=".$this->db_add_param($uid);
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				// Wenn die Person nicht aktiv ist dann hat diese auch keine Rechte
+				if($this->db_parse_bool($row->aktiv) == false)
+					return false;
+			}
+			else
+			{
+				// Wenn die Person nicht gefunden wurde dann hat diese auch keine Rechte
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 		// Berechtigungen holen
 		/*
 		Direkte Berechtigungszuordnung
@@ -357,77 +378,77 @@ class benutzerberechtigung extends basis_db
 		Berechtigung ueber Funktion
 		UNION
 		Berechtigung ueber Funktion Mitarbeiter
-		UNION 
+		UNION
 		Berechtigung ueber Funktion Student
 		*/
-		$qry = "SELECT 
+		$qry = "SELECT
 					benutzerberechtigung_id, tbl_benutzerrolle.uid, tbl_benutzerrolle.funktion_kurzbz,
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
-				FROM 
-					system.tbl_benutzerrolle JOIN system.tbl_berechtigung USING(berechtigung_kurzbz) 
+				FROM
+					system.tbl_benutzerrolle JOIN system.tbl_berechtigung USING(berechtigung_kurzbz)
 				WHERE uid=".$this->db_add_param($uid)."
-				
+
 				UNION
-				
-				SELECT 
+
+				SELECT
 					benutzerberechtigung_id, tbl_benutzerrolle.uid, tbl_benutzerrolle.funktion_kurzbz,
 					tbl_benutzerrolle.rolle_kurzbz, tbl_berechtigung.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_rolleberechtigung.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
-				FROM 
-					system.tbl_benutzerrolle JOIN system.tbl_rolle USING(rolle_kurzbz) 
-					JOIN system.tbl_rolleberechtigung USING(rolle_kurzbz) 
+				FROM
+					system.tbl_benutzerrolle JOIN system.tbl_rolle USING(rolle_kurzbz)
+					JOIN system.tbl_rolleberechtigung USING(rolle_kurzbz)
 					JOIN system.tbl_berechtigung ON(tbl_rolleberechtigung.berechtigung_kurzbz=tbl_berechtigung.berechtigung_kurzbz)
 				WHERE uid=".$this->db_add_param($uid)."
-				
+
 				UNION
-				
-				SELECT 
+
+				SELECT
 					benutzerberechtigung_id, tbl_benutzerfunktion.uid, tbl_benutzerrolle.funktion_kurzbz,
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerfunktion.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
-				FROM 
+				FROM
 					system.tbl_benutzerrolle JOIN public.tbl_benutzerfunktion USING(funktion_kurzbz)
 				WHERE tbl_benutzerfunktion.uid=".$this->db_add_param($uid)."
 					AND (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now())
 					AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
-				
+
 				UNION
-				
-				SELECT 
+
+				SELECT
 					benutzerberechtigung_id, '', tbl_benutzerrolle.funktion_kurzbz,
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
-				FROM 
+				FROM
 					system.tbl_benutzerrolle
-				WHERE 
-					tbl_benutzerrolle.funktion_kurzbz='Mitarbeiter' AND 
+				WHERE
+					tbl_benutzerrolle.funktion_kurzbz='Mitarbeiter' AND
 					EXISTS (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=".$this->db_add_param($uid).")
-					
+
 				UNION
-				
-				SELECT 
+
+				SELECT
 					benutzerberechtigung_id, '', tbl_benutzerrolle.funktion_kurzbz,
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
 					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
-				FROM 
+				FROM
 					system.tbl_benutzerrolle
-				WHERE 
-					tbl_benutzerrolle.funktion_kurzbz='Student' AND 
+				WHERE
+					tbl_benutzerrolle.funktion_kurzbz='Student' AND
 					EXISTS (SELECT student_uid FROM public.tbl_student WHERE student_uid=".$this->db_add_param($uid).")
-								
+
 				ORDER BY negativ DESC";
-		
+
 		if(!$result = $this->db_query($qry))
 		{
 			$this->errormsg='Fehler beim Laden der Berechtigungen';
@@ -461,10 +482,10 @@ class benutzerberechtigung extends basis_db
 			$b->insertvon = $row->insertvon;
 			$b->kostenstelle_id = $row->kostenstelle_id;
 			$b->anmerkung = $row->anmerkung;
-			
+
 			$this->berechtigungen[]=$b;
 		}
-		
+
 		unset($result);
 		// Attribute des Mitarbeiters holen
 		$sql_query="SELECT fixangestellt, lektor FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=".$this->db_add_param($uid);
@@ -493,8 +514,8 @@ class benutzerberechtigung extends basis_db
 	 * Funktion getBerechtigungen aufgerufen werden.
 	 *
 	 * @param $berechtigung
-	 * @param $oe_kurzbz 		
-	 * 		derzeit kann hier noch die Studiengangskennzahl uebergeben werden, 
+	 * @param $oe_kurzbz
+	 * 		derzeit kann hier noch die Studiengangskennzahl uebergeben werden,
 	 * 		dies wird in Zukunft aber nicht mehr moeglich sein
 	 * @param $art			suid (select|update|insert|delete)
 	 * @param $kostenstelle_id	ID der Kostenstelle
@@ -503,7 +524,7 @@ class benutzerberechtigung extends basis_db
 	public function isBerechtigt($berechtigung_kurzbz, $oe_kurzbz=null, $art=null, $kostenstelle_id=null)
 	{
 		$timestamp=time();
-		
+
 		//Studiengang
 		if(is_numeric($oe_kurzbz))
 		{
@@ -511,59 +532,59 @@ class benutzerberechtigung extends basis_db
 			$stg = new studiengang($oe_kurzbz);
 			$oe_kurzbz = $stg->oe_kurzbz;
 		}
-		
+
 		if($kostenstelle_id!='' && !is_numeric($kostenstelle_id))
 		{
 			$this->errormsg = 'Kostenstelle_id "'.$kostenstelle_id.'" is invalid';
 			return false;
 		}
-		
+
 		$oe = new organisationseinheit();
-		
+
 		foreach ($this->berechtigungen as $b)
 		{
 			//Pruefen ob eine negativ-Berechtigung vorhanden ist
-			if($b->berechtigung_kurzbz==$berechtigung_kurzbz 
-				&& $b->negativ 
+			if($b->berechtigung_kurzbz==$berechtigung_kurzbz
+				&& $b->negativ
 				&& (is_null($oe_kurzbz) || ($b->kostenstelle_id=='' && ($b->oe_kurzbz=='' || $oe_kurzbz==$b->oe_kurzbz || $oe->isChild($b->oe_kurzbz, $oe_kurzbz))))
 				&& (is_null($kostenstelle_id) || $kostenstelle_id==$b->kostenstelle_id))
 			{
-				if (($timestamp>$b->starttimestamp || $b->starttimestamp==null) 
+				if (($timestamp>$b->starttimestamp || $b->starttimestamp==null)
 				 && ($timestamp<$b->endetimestamp || $b->endetimestamp==null))
 				{
 					$this->errormsg='Access denied! You need permission '.strtoupper($berechtigung_kurzbz).' '.($oe_kurzbz!=null?'in '.strtoupper($oe_kurzbz):'').' '.($art!=null?'with '.strtoupper($art):'');
 					return false;
 				}
 			}
-		
+
 			if($b->berechtigung_kurzbz==$berechtigung_kurzbz
 			   && (is_null($art) || mb_strstr($b->art, $art))
 			   && (is_null($oe_kurzbz) || ($b->kostenstelle_id=='' && ($b->oe_kurzbz=='' || $oe_kurzbz==$b->oe_kurzbz || $oe->isChild($b->oe_kurzbz, $oe_kurzbz))))
 			   && (is_null($kostenstelle_id) || $kostenstelle_id==$b->kostenstelle_id))
 			{
-				if (($timestamp>$b->starttimestamp || $b->starttimestamp==null) 
+				if (($timestamp>$b->starttimestamp || $b->starttimestamp==null)
 				 && ($timestamp<$b->endetimestamp || $b->endetimestamp==null))
 				{
 						return true;
 				}
-			}			
+			}
 		}
-		
+
 		//Kostenstellenrecht ueber Organisationseinheit
 		if($kostenstelle_id!='')
 		{
-			//Kostenstelle laden und schauen, ob auf die Organisationseinheit der Kostenstelle 
+			//Kostenstelle laden und schauen, ob auf die Organisationseinheit der Kostenstelle
 			//die Berechtigung vorhanden ist
 			$kostenstelle = new wawi_kostenstelle();
 			if($kostenstelle->load($kostenstelle_id))
 			{
 				return $this->isBerechtigt($berechtigung_kurzbz, $kostenstelle->oe_kurzbz, $art);
-			}		
+			}
 			else
 			{
 				$this->errormsg='Cost center (ID '.$kostenstelle_id.') does not exist';
 				return false;
-			}		
+			}
 		}
 
 		//wenn ein Doppelpunkt vorkommt, pruefen ob das Uebergeordnete vorhanden ist
@@ -572,34 +593,34 @@ class benutzerberechtigung extends basis_db
 			$this->errormsg='Access denied! You need permission '.strtoupper($berechtigung_kurzbz).' '.($oe_kurzbz!=null?'in '.strtoupper($oe_kurzbz):'').' '.($art!=null?'with '.strtoupper($art):'');
 			return false;
 		}
-		else 
+		else
 		{
 			return $this->isBerechtigt(substr($berechtigung_kurzbz,0,$pos-1), $oe_kurzbz, $art, $kostenstelle_id);
 		}
 	}
-    
-    /**
-     * Prueft ob die Berechtigung zumindest fuer eine der angegebenen OE vorhanden ist.
-     * @param $berechtigung_kurzbz
-     * @param $oe_kurzbz
-     * @param $art
-     * @param $kostenstelle_id
-     * @return boolean
-     */
-    public function isBerechtigtMultipleOe($berechtigung_kurzbz, $oe_kurzbz, $art=null, $kostenstelle_id=null) 
-    {
-        $results = array();
-        
-        foreach($oe_kurzbz as $value)
-        {
-            $results[] = $this->isBerechtigt($berechtigung_kurzbz, $value, $art, $kostenstelle_id);
-        }
-        
-        if(!in_array(true, $results))
-            return false;
-        else
-            return true;
-    }
+
+	/**
+	 * Prueft ob die Berechtigung zumindest fuer eine der angegebenen OE vorhanden ist.
+	 * @param $berechtigung_kurzbz
+	 * @param $oe_kurzbz
+	 * @param $art
+	 * @param $kostenstelle_id
+	 * @return boolean
+	 */
+	public function isBerechtigtMultipleOe($berechtigung_kurzbz, $oe_kurzbz, $art=null, $kostenstelle_id=null)
+	{
+		$results = array();
+
+		foreach($oe_kurzbz as $value)
+		{
+			$results[] = $this->isBerechtigt($berechtigung_kurzbz, $value, $art, $kostenstelle_id);
+		}
+
+		if(!in_array(true, $results))
+			return false;
+		else
+			return true;
+	}
 
 	/**
 	 * Prueft ob die Person Fixangestellt ist
@@ -626,7 +647,7 @@ class benutzerberechtigung extends basis_db
 		$not='';
 		$all=false;
 		$oe = new organisationseinheit();
-	
+
 		foreach ($this->berechtigungen as $b)
 		{
 			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null || mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz)
@@ -641,18 +662,18 @@ class benutzerberechtigung extends basis_db
 						foreach($childoes as $row)
 							$not .="'".$this->db_escape($row)."',";
 					}
-					else 
+					else
 						return array();
 				}
-				else 
+				else
 				{
 					if(!is_null($b->oe_kurzbz))
 					{
 						$childoes = $oe->getChilds($b->oe_kurzbz);
 						foreach($childoes as $row)
-							$in .= "'".$this->db_escape($row)."',"; 
+							$in .= "'".$this->db_escape($row)."',";
 					}
-					else 
+					else
 					{
 						//Wenn NULL dann berechtigung auf alles
 						$all = true;
@@ -661,7 +682,7 @@ class benutzerberechtigung extends basis_db
 				}
 			}
 		}
-			
+
 		if(!$all)
 		{
 			if($in=='')
@@ -669,24 +690,24 @@ class benutzerberechtigung extends basis_db
 			else
 				$in = ' AND oe_kurzbz IN('.mb_substr($in,0, mb_strlen($in)-1).')';
 		}
-		else 
+		else
 		{
 			$in='';
 			$not='';
 		}
-		
+
 		if($not!='')
 			$not = ' AND oe_kurzbz NOT IN('.mb_substr($not,0, mb_strlen($not)-1).')';
-		
+
 		$qry = "SELECT studiengang_kz FROM public.tbl_studiengang WHERE 1=1 $in $not";
-		
+
 		if($this->db_query($qry))
 			while($row = $this->db_fetch_object())
-				$studiengang_kz[]=$row->studiengang_kz;	
-		
+				$studiengang_kz[]=$row->studiengang_kz;
+
 		$studiengang_kz=array_unique($studiengang_kz);
 		sort($studiengang_kz);
-		
+
 		return $studiengang_kz;
 	}
 
@@ -704,7 +725,7 @@ class benutzerberechtigung extends basis_db
 		$not='';
 		$all=false;
 		$oe = new organisationseinheit();
-		
+
 		foreach ($this->berechtigungen as $b)
 		{
 			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null  || mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz)
@@ -719,18 +740,18 @@ class benutzerberechtigung extends basis_db
 						foreach($childoes as $row)
 							$not .="'".$this->db_escape($row)."',";
 					}
-					else 
+					else
 						return array();
 				}
-				else 
+				else
 				{
 					if(!is_null($b->oe_kurzbz))
 					{
 						$childoes = $oe->getChilds($b->oe_kurzbz);
 						foreach($childoes as $row)
-							$in .= "'".$this->db_escape($row)."',"; 
+							$in .= "'".$this->db_escape($row)."',";
 					}
-					else 
+					else
 					{
 						//Wenn NULL dann berechtigung auf alles
 						$all = true;
@@ -739,7 +760,7 @@ class benutzerberechtigung extends basis_db
 				}
 			}
 		}
-			
+
 		if(!$all)
 		{
 			if($in=='')
@@ -747,25 +768,25 @@ class benutzerberechtigung extends basis_db
 			else
 				$in = ' AND oe_kurzbz IN('.mb_substr($in,0, mb_strlen($in)-1).')';
 		}
-		else 
+		else
 		{
 			$in='';
 		}
-		
+
 		if($not!='')
 			$not = ' AND oe_kurzbz NOT IN('.mb_substr($not,0, mb_strlen($not)-1).')';
-		
+
 		$qry = "SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE 1=1 $in $not";
-		
+
 		if($this->db_query($qry))
 			while($row = $this->db_fetch_object())
-				$fachbereich_kurzbz[]=$row->fachbereich_kurzbz;	
-					
+				$fachbereich_kurzbz[]=$row->fachbereich_kurzbz;
+
 		$fachbereich_kurzbz=array_unique($fachbereich_kurzbz);
 		sort($fachbereich_kurzbz);
 		return $fachbereich_kurzbz;
 	}
-	
+
 	/**
 	 * Gibt Array mit den Organisationseinheiten zurueck fuer welche die
 	 * Person eine Berechtigung besitzt.
@@ -792,16 +813,16 @@ class benutzerberechtigung extends basis_db
 						foreach($childoes as $row)
 							$not[] = $row;
 					}
-					else 
+					else
 						return array();
 				}
-				else 
+				else
 				{
 					if($b->kostenstelle_id != '')
 					{
-						$kst = new wawi_kostenstelle(); 
+						$kst = new wawi_kostenstelle();
 						$kst->load($b->kostenstelle_id);
-						$oe_kurzbz[] = $kst->oe_kurzbz; 
+						$oe_kurzbz[] = $kst->oe_kurzbz;
 					}
 					else
 					{
@@ -811,7 +832,7 @@ class benutzerberechtigung extends basis_db
 						foreach($childoes as $row)
 							$oe_kurzbz[] = $row;
 						}
-						else 
+						else
 						{
 							$all=true;
 							break;
@@ -820,7 +841,7 @@ class benutzerberechtigung extends basis_db
 				}
 			}
 		}
-		
+
 		if($all)
 		{
 			$oe->loadParentsArray();
@@ -831,7 +852,7 @@ class benutzerberechtigung extends basis_db
 		sort($oe_kurzbz);
 		return $oe_kurzbz;
 	}
-	
+
 	/**
 	 * Gibt Array mit den Kostenstellen zurueck fuer welche die
 	 * Person eine Berechtigung besitzt.
@@ -852,7 +873,7 @@ class benutzerberechtigung extends basis_db
 		{
 			if(!mb_strstr($b->berechtigung_kurzbz,'wawi/'))
 				continue;
-			
+
 			if	(($berechtigung_kurzbz==$b->berechtigung_kurzbz || $berechtigung_kurzbz==null  || mb_substr($berechtigung_kurzbz,0,mb_strpos($berechtigung_kurzbz,':'))==$b->berechtigung_kurzbz)
 				&& (($timestamp>$b->starttimestamp || $b->starttimestamp==null) && ($timestamp<$b->endetimestamp || $b->endetimestamp==null)))
 			{
@@ -869,10 +890,10 @@ class benutzerberechtigung extends basis_db
 					{
 						$not_id[] = $b->kostenstelle_id;
 					}
-					else 
+					else
 						return array();
 				}
-				else 
+				else
 				{
 					if($b->oe_kurzbz!='')
 					{
@@ -891,9 +912,9 @@ class benutzerberechtigung extends basis_db
 					}
 				}
 			}
-			
+
 		}
-		
+
 		$qry = "SELECT distinct kostenstelle_id FROM wawi.tbl_kostenstelle";
 
 		if(!$all)
@@ -901,7 +922,7 @@ class benutzerberechtigung extends basis_db
 			if(count($kst_id)==0 && count($oe_kurzbz)==0)
 				return array();
 			$qry.="
-				WHERE 
+				WHERE
 					(";
 			if(count($kst_id)>0)
 				$qry.=" kostenstelle_id IN(".$this->db_implode4SQL($kst_id).")";
@@ -933,7 +954,7 @@ class benutzerberechtigung extends basis_db
 	 * Organisationseinheit sind.
 	 * Es werden nur die Benutzer zurückgeliefert die genau auf diese Organisationseinheit das Freigaberecht haben
 	 * Uebergeordnete Benutzer werden nicht geliefert
-	 *  
+	 *
 	 * @param $kostenstelle_id
 	 * @param $oe_kurzbz
 	 */
@@ -944,52 +965,52 @@ class benutzerberechtigung extends basis_db
 			$this->errormsg = 'Kostenstelle und Organisationseinheit darf nicht gleichzeitig leer sein';
 			return false;
 		}
-		
+
 		if($kostenstelle_id!='' && $oe_kurzbz!='')
 		{
 			$this->errormsg = 'Kostenstelle und Organisationseinheit darf nicht gleichzeitig gesetzt sein';
 			return false;
 		}
-		
+
 		$where = '';
 		if($kostenstelle_id!='')
 			$where.=" kostenstelle_id=".$this->db_add_param($kostenstelle_id, FHC_INTEGER);
 		elseif($oe_kurzbz!='')
 			$where.=" oe_kurzbz=".$this->db_add_param($oe_kurzbz);
 		$where .=" AND berechtigung_kurzbz='wawi/freigabe'";
-		$where .=" AND (start<=now() OR start is null) AND (ende>=now() OR ende is null)"; 
+		$where .=" AND (start<=now() OR start is null) AND (ende>=now() OR ende is null)";
 
-		
-		$qry = "SELECT uid, negativ FROM system.tbl_benutzerrolle WHERE ".$where;			
-		$qry .= " UNION 
-			SELECT uid, negativ 
-			FROM 
+
+		$qry = "SELECT uid, negativ FROM system.tbl_benutzerrolle WHERE ".$where;
+		$qry .= " UNION
+			SELECT uid, negativ
+			FROM
 				system.tbl_benutzerrolle
 				JOIN system.tbl_rolle USING(rolle_kurzbz)
 				JOIN system.tbl_rolleberechtigung USING(berechtigung_kurzbz)
 			WHERE ".$where;
-		
+
 		$freigabebenutzer=array();
 		$not = array();
- 
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				if($this->db_parse_bool($row->negativ)==true)
-					$not[]=$row->uid;	
+					$not[]=$row->uid;
 				$freigabebenutzer[]=$row->uid;
 			}
-			
+
 			return array_diff($freigabebenutzer,$not);
 		}
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der FreigabeBenutzer';
 			return false;
-		}	 
+		}
 	}
-	
+
 	/**
 	 * Liefert alle User mit deren Rechte fuer eine Kostenstelle
 	 * @param $kostenstelle_id ID der Kostenstelle
@@ -997,42 +1018,43 @@ class benutzerberechtigung extends basis_db
 	 */
 	public function getKostenstelleUser($kostenstelle_id)
 	{
-		$qry = "SELECT 
-					distinct uid, a.art, 
-					CASE WHEN a.berechtigung_kurzbz is null 
-						THEN tbl_rolleberechtigung.berechtigung_kurzbz 
+		$qry = "SELECT
+					distinct uid, a.art,
+					CASE WHEN a.berechtigung_kurzbz is null
+						THEN tbl_rolleberechtigung.berechtigung_kurzbz
 						ELSE a.berechtigung_kurzbz END as berechtigung_kurzbz
 				FROM
 				(
 				SELECT * FROM system.tbl_benutzerrolle WHERE kostenstelle_id=".$this->db_add_param($kostenstelle_id, FHC_INTEGER)."
-				UNION 
+				UNION
 				SELECT * FROM system.tbl_benutzerrolle WHERE
-				oe_kurzbz = (SELECT oe_kurzbz FROM wawi.tbl_kostenstelle WHERE kostenstelle_id=".$this->db_add_param($kostenstelle_id, FHC_INTEGER).")  
+				oe_kurzbz = (SELECT oe_kurzbz FROM wawi.tbl_kostenstelle WHERE kostenstelle_id=".$this->db_add_param($kostenstelle_id, FHC_INTEGER).")
 				OR oe_kurzbz IN(
-				WITH RECURSIVE oes(oe_parent_kurzbz) as 
+				WITH RECURSIVE oes(oe_parent_kurzbz) as
 				(
-					SELECT oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+					SELECT oe_parent_kurzbz FROM public.tbl_organisationseinheit
 					WHERE oe_kurzbz=(SELECT oe_kurzbz FROM wawi.tbl_kostenstelle WHERE kostenstelle_id=".$this->db_add_param($kostenstelle_id, FHC_INTEGER).")
 					UNION ALL
-					SELECT o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+					SELECT o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes
 					WHERE o.oe_kurzbz=oes.oe_parent_kurzbz
 				)
 				SELECT oe_parent_kurzbz
 				FROM oes)
 				) as a
 				LEFT JOIN system.tbl_rolleberechtigung USING(rolle_kurzbz)
-				WHERE (start is null OR start<=now()) AND (ende is null OR ende>=now()) AND negativ=false";
-		
+				JOIN public.tbl_benutzer USING(uid)
+				WHERE tbl_benutzer.aktiv AND (start is null OR start<=now()) AND (ende is null OR ende>=now()) AND negativ=false";
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
 			{
 				$obj = new benutzerberechtigung();
-								
+
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
 				$obj->uid = $row->uid;
 				$obj->art = $row->art;
-				
+
 				$this->berechtigungen[] = $obj;
 			}
 		}

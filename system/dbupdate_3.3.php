@@ -162,7 +162,111 @@ if(!$result = @$db->db_query("SELECT insertamum FROM campus.tbl_pruefungsanmeldu
 		echo '<br>campus.tbl_pruefungsanmeldung: Spalte insertamum hinzugefuegt';
 }
 
+// Berechtigungs View liefert nur noch aktive Benutzer
+if($result = $db->db_query("SELECT view_definition FROM information_schema.views WHERE table_schema='system' AND table_name='vw_berechtigung_nichtrekursiv'"))
+{
+	if($row = $db->db_fetch_object($result))
+	{
+		if(!mb_stristr($row->view_definition, 'tbl_benutzer.aktiv = true'))
+		{
+			$qry = "
+			CREATE OR REPLACE VIEW system.vw_berechtigung_nichtrekursiv AS
+			SELECT
+				uid, berechtigung_kurzbz,
+				-- art zusammenfassung und nur die nehmen die gleich sind
+				CASE WHEN length(art)>length(art1) THEN art1 ELSE art END as art,
+				oe_kurzbz, kostenstelle_id
+			FROM
+				(
+				-- Normal
+				SELECT
+					benutzerberechtigung_id, tbl_benutzerrolle.uid, tbl_benutzerrolle.funktion_kurzbz,
+					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
+					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
+					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
+				FROM
+					system.tbl_benutzerrolle JOIN system.tbl_berechtigung USING(berechtigung_kurzbz)
 
+				-- Rollen
+				UNION
+				SELECT
+					benutzerberechtigung_id, tbl_benutzerrolle.uid, tbl_benutzerrolle.funktion_kurzbz,
+					tbl_benutzerrolle.rolle_kurzbz, tbl_berechtigung.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_rolleberechtigung.art art1,
+					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
+					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
+				FROM
+					system.tbl_benutzerrolle JOIN system.tbl_rolle USING(rolle_kurzbz)
+					JOIN system.tbl_rolleberechtigung USING(rolle_kurzbz)
+					JOIN system.tbl_berechtigung ON(tbl_rolleberechtigung.berechtigung_kurzbz=tbl_berechtigung.berechtigung_kurzbz)
+
+				-- Funktionen
+				UNION
+				SELECT
+					benutzerberechtigung_id, tbl_benutzerfunktion.uid, tbl_benutzerrolle.funktion_kurzbz,
+					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
+					tbl_benutzerfunktion.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
+					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
+				FROM
+					system.tbl_benutzerrolle JOIN public.tbl_benutzerfunktion USING(funktion_kurzbz)
+				WHERE
+					(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now())
+					AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
+
+				-- Funktion Mitarbeiter
+				UNION
+				SELECT
+					benutzerberechtigung_id, vw_mitarbeiter.uid, tbl_benutzerrolle.funktion_kurzbz,
+					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
+					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
+					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
+				FROM
+					system.tbl_benutzerrolle, campus.vw_mitarbeiter
+				WHERE
+					tbl_benutzerrolle.funktion_kurzbz='Mitarbeiter' and vw_mitarbeiter.aktiv
+
+
+				-- Funktion Student
+				UNION
+				SELECT
+					benutzerberechtigung_id, vw_student.uid, tbl_benutzerrolle.funktion_kurzbz,
+					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
+					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
+					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
+				FROM
+					system.tbl_benutzerrolle, campus.vw_student
+				WHERE
+					tbl_benutzerrolle.funktion_kurzbz='Student' and vw_student.aktiv
+			) as a
+			JOIN public.tbl_benutzer USING(uid)
+			WHERE
+				-- Datumsgrenzen beruecksichtigen
+				tbl_benutzer.aktiv = true
+				AND (a.start<=now() OR a.start is null)
+				AND (a.ende>=now() OR a.ende is null)
+
+				-- Neagtiv Rechte entfernen
+				AND not negativ
+				AND NOT EXISTS(SELECT
+					1
+				FROM
+					system.tbl_benutzerrolle JOIN system.tbl_berechtigung USING(berechtigung_kurzbz) WHERE uid=a.uid AND berechtigung_kurzbz=a.berechtigung_kurzbz AND negativ);
+
+			GRANT SELECT ON system.vw_berechtigung_nichtrekursiv TO web;
+			GRANT SELECT ON system.vw_berechtigung_nichtrekursiv TO vilesci;
+			";
+
+			if(!$db->db_query($qry))
+				echo '<strong>system.vw_berechtigung_nichtrekursiv:'.$db->db_last_error().'</strong><br>';
+			else
+				echo '<br>system.vw_berechtigung_nichtrekursiv angepasst damit nur aktive Benutzer beruecksichtigt werden';
+		}
+	}
+}
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
