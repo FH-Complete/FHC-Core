@@ -112,6 +112,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dokument/rdf#pflicht" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="interessent-dokumente-tree-nichtabgegeben-nachgereicht_am" label="Nachreichung Am" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/dokument/rdf#nachgereicht_am" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
+				<splitter class="tree-splitter"/>
 			</treecols>
 
 			<template>
@@ -131,6 +135,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#anmerkung_intern" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#onlinebewerbung" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#pflicht" />
+								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#nachgereicht_am" />
 							</treerow>
 						</treeitem>
 					</treechildren>
@@ -210,6 +215,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dokument/rdf#anmerkung_intern" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="interessent-dokumente-tree-abgegeben-nachgereicht_am" label="Nachreichung am" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/dokument/rdf#nachgereicht_am" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
+				<splitter class="tree-splitter"/>
 			</treecols>
 
 			<template>
@@ -229,6 +238,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#akte_id" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#titel_intern" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#anmerkung_intern" />
+								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#nachgereicht_am" />
 							</treerow>
 						</treeitem>
 					</treechildren>

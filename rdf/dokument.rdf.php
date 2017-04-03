@@ -111,6 +111,7 @@ foreach ($dok->result as $row)
 						<DOKUMENT:anmerkung_intern><![CDATA['.$a->anmerkung_intern.']]></DOKUMENT:anmerkung_intern>
 						<DOKUMENT:onlinebewerbung><![CDATA['.$onlinebewerbung.']]></DOKUMENT:onlinebewerbung>
 						<DOKUMENT:pflicht><![CDATA['.$pflicht.']]></DOKUMENT:pflicht>
+						<DOKUMENT:nachgereicht_am><![CDATA['.$a->nachgereicht_am.']]></DOKUMENT:nachgereicht_am>
 					</RDF:Description>
 			  </RDF:li>
 				  ';
@@ -170,6 +171,7 @@ foreach($akte->result as $a)
 				<DOKUMENT:titel_intern><![CDATA['.$a->titel_intern.']]></DOKUMENT:titel_intern>
 				<DOKUMENT:anmerkung_intern><![CDATA['.$a->anmerkung_intern.']]></DOKUMENT:anmerkung_intern>
 				<DOKUMENT:onlinebewerbung><![CDATA[nein]]></DOKUMENT:onlinebewerbung>
+				<DOKUMENT:nachgereicht_am><![CDATA['.$a->nachgereicht_am.']]></DOKUMENT:nachgereicht_am>
 			</RDF:Description>
 	  </RDF:li>
 		  ';
