@@ -88,17 +88,15 @@ class Studiengang2 extends APIv1_Controller
 	{
 		$person_id = $this->get('person_id');
 		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
-		$titel = $this->get('titel');
 		$status_kurzbz = $this->get('status_kurzbz');
 		
-		if (isset($person_id) && isset($studiensemester_kurzbz) && isset($titel) && isset($status_kurzbz))
+		if (isset($person_id) && isset($studiensemester_kurzbz) && isset($status_kurzbz))
 		{
 			$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 			
 			$result = $this->StudiengangModel->getAppliedStudiengang(
 				$person_id,
 				$studiensemester_kurzbz,
-				$titel,
 				$status_kurzbz
 			);
 			

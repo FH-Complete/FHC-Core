@@ -8,6 +8,7 @@ class DB_Model extends FHC_Model
 	const PGSQL_BOOLEAN_TRUE = 't';
 	const PGSQL_BOOLEAN_FALSE = 'f';
 	const MODEL_POSTFIX = '_model';
+	const DEFAULT_SCHEMA = 'public';
 	
 	protected $dbTable;  	// Name of the DB-Table for CI-Insert, -Update, ...
 	protected $pk;  		// Name of the PrimaryKey for DB-Update, Load, ...
@@ -226,6 +227,8 @@ class DB_Model extends FHC_Model
 	 * - Adding support for composed primary key
 	 * - Adding support for cascading side tables (useful?)
 	 *
+	 * NOTE: sub queries are not supported in the from clause
+	 *
 	 * @return  array
 	 */
 	public function loadTree($mainTable, $sideTables, $where = null, $sideTablesAliases = null)
@@ -246,13 +249,26 @@ class DB_Model extends FHC_Model
 		$select = '';
 		for ($t = 0; $t < count($tables); $t++)
 		{
-			$fields = $this->db->list_fields($tables[$t]); // list of the columns of the current table
+			// Get the schema if it is specified
+			$schemaAndTable = $this->getSchemaAndTable($tables[$t]);
+			// Discard the schema, not needed in the next steps
+			$tables[$t] = $schemaAndTable->table;
+			
+			// List of the columns of the current table
+			// NOTE: $this->db->list_fields($tables[$t]) doesn't work if there are two tables with
+			// the same name in two different schemas, use this workaround
+			$fields = array();
+			if (isSuccess($lstColumns = $this->_list_columns($schemaAndTable->schema, $schemaAndTable->table)))
+			{
+				$fields = $lstColumns->retval;
+			}
+			
 			for ($f = 0; $f < count($fields); $f++)
 			{
 				// To avoid overwriting of the properties within the object returned by CI
 				// will be given an alias to every column, that will be composed with the following schema
 				// <table name>.<column name> AS <table_name>_<column name>
-				$select .= $tables[$t] . '.' . $fields[$f] . ' AS ' . $tables[$t] . '_' . $fields[$f];
+				$select .= $tables[$t] . '.' . $fields[$f]->column_name . ' AS ' . $tables[$t] . '_' . $fields[$f]->column_name;
 				if ($f < count($fields) - 1) $select .= ', ';
 			}
 			
@@ -641,6 +657,32 @@ class DB_Model extends FHC_Model
 	}
 	
 	/**
+	 * Get schema and table name from the parameter
+	 * If no schema are specified it will returns the parameter as table name,
+	 * and the default schema as schema
+	 * Ex:
+	 * If the parameters is 'lehre.tbl_studienplan' it will returns the following object:
+	 * obj
+	 *  |--->schema: lehre
+	 *  |--->table: tbl_studienplan
+	 */
+	protected function getSchemaAndTable($schemaAndTable)
+	{
+		$result = new stdClass();
+		$result->schema = DB_Model::DEFAULT_SCHEMA;
+		$result->table = $schemaAndTable;
+		
+		// If a schema is specified
+		if (($pos = strpos($schemaAndTable, '.')) !==  false)
+		{
+			$result->schema = substr($schemaAndTable, 0, $pos);
+			$result->table = substr($schemaAndTable, $pos + 1);
+		}
+		
+		return $result;
+	}
+	
+	/**
 	 * Checks if the caller is entitled to perform this operation with this right
 	 */
 	private function _isEntitled($permission)
@@ -754,5 +796,20 @@ class DB_Model extends FHC_Model
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Workaround of CI_DB_driver->_list_columns
+	 * CI_DB_driver->list_fields($tableName), that calls CI_DB_postgre_driver->_list_columns,
+	 * doesn't work if there are two tables with the same name in two different schemas
+	 */
+	private function _list_columns($schema, $table)
+	{
+		$query = 'SELECT column_name
+					FROM information_schema.columns
+				   WHERE LOWER(table_schema) = ?
+					 AND LOWER(table_name) = ?';
+		
+		return $this->execQuery($query, array(strtolower($schema), strtolower($table)));
 	}
 }
