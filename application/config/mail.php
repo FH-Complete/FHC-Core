@@ -8,6 +8,7 @@ $config['email_number_to_sent'] = 1000; // Number of emails to sent each time se
 $config['email_number_per_time_range'] = 1; // Number of emails to sent before pause
 $config['email_time_range'] = 1; // Length of the pause in seconds
 $config['email_from_system'] = 'no-reply@technikum-wien.at';
+$config['alias_from_system'] = 'No Reply';
 
 // Smtp: if the CI email library has to connect to a smtp server
 // Mail: if the system is setup to send emails with the standard php mail function
