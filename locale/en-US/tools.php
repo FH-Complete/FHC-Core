@@ -78,5 +78,5 @@ $this->phrasen['tools/esWurdenKeineErgebnisseGefunden']='Your search did not ret
 //Partnerhochschulen
 $this->phrasen['tools/partnerhochschulenUebersicht']='Partner Universities';
 $this->phrasen['tools/partnerhochschulenKeinEintrag']='No entry found';
-$this->phrasen['tools/partnerhochschulenEinleitung']='In case you would like to study at a partner university that isn´t listed - please contact the <a href="../../../cms/content.php?content_id=6952">Center for International Relations (CIR)</a>.';
+$this->phrasen['tools/partnerhochschulenEinleitung']='Please kindly note that the possibility of an exchange semester at a partner university depends on whether you can find a sufficient amount of creditable courses at the partner university as well as the inter-institutional framework. For your study program some partner universities may be only an option for exchange within specific programs. Please check the partner university´s website in advance and discuss with the CIR and your study program director whether the courses at the chosen partner university are appropriate for your exchange semester. In case you would like to study at a partner university which isn´t listed - please contact the <a href="../../../cms/content.php?content_id=6952">Center for International Relations (CIR)</a>.';
 ?>
