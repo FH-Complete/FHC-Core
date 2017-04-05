@@ -88,7 +88,7 @@ class Prestudent_model extends DB_Model
 	public function getPrestudentMultiAssign($studiengang = null, $studiensemester = null, $gruppe = null, $reihungstest = null, $stufe = null)
 	{
 		$this->addSelect(
-			'DISTINCT ON(p.person_id, prestudent_id) p.person_id,
+			'p.person_id,
 			prestudent_id,
 			p.nachname,
 			p.vorname,
@@ -102,19 +102,18 @@ class Prestudent_model extends DB_Model
 			s.bezeichnung AS studienplan,
 			ps.rt_stufe,
 			aufnahmegruppe_kurzbz,
-			rtp.punkte'
+			SUM(rtp.punkte) AS punkte'
 		);
 		
-		$this->addJoin('public.tbl_rt_person rtp', 'person_id');
 		$this->addJoin('public.tbl_person p', 'person_id', 'LEFT');
 		$this->addJoin(
 			'(
-					SELECT person_id,
+					SELECT DISTINCT ON(person_id) person_id,
 						   kontakt
 					  FROM public.tbl_kontakt
 					 WHERE zustellung = TRUE
 					   AND kontakttyp = \'email\'
-				  ORDER BY kontakt_id DESC
+				  ORDER BY person_id, kontakt_id DESC
 			) k',
 			'person_id',
 			'LEFT'
@@ -125,6 +124,8 @@ class Prestudent_model extends DB_Model
 		$this->addJoin('public.tbl_studiengang sg', 'sg.studiengang_kz = so.studiengang_kz');
 		$this->addJoin('public.tbl_studiengangstyp sgt', 'typ');
 		
+		$this->addJoin('public.tbl_rt_person rtp', 'rtp.person_id = p.person_id AND rtp.studienplan_id = s.studienplan_id', 'LEFT');
+		
 		$this->addOrder('p.person_id', 'ASC');
 		$this->addOrder('prestudent_id', 'ASC');
 		
@@ -132,7 +133,7 @@ class Prestudent_model extends DB_Model
 		
 		if ($studiengang != null)
 		{
-			$parametersArray['sg.studiengang_kz'] = $studiengang;
+			$parametersArray['public.tbl_prestudent.studiengang_kz'] = $studiengang;
 		}
 		
 		if ($studiensemester != null)
@@ -154,6 +155,25 @@ class Prestudent_model extends DB_Model
 		{
 			$parametersArray['ps.rt_stufe'] = $stufe;
 		}
+		
+		$this->addGroupBy(
+			array(
+				'p.person_id',
+				'prestudent_id',
+				'p.nachname',
+				'p.vorname',
+				'p.geschlecht',
+				'p.gebdatum',
+				'k.kontakt',
+				'sg.kurzbzlang',
+				'sg.bezeichnung',
+				'sg.orgform_kurzbz',
+				'sgt.bezeichnung',
+				's.bezeichnung',
+				'ps.rt_stufe',
+				'aufnahmegruppe_kurzbz'
+			)
+		);
 		
 		return $this->loadWhere($parametersArray);
 	}

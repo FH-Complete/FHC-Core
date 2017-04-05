@@ -469,6 +469,26 @@ class DB_Model extends FHC_Model
 	}
 	
 	/** ---------------------------------------------------------------
+	 * Add one or more fields in the group by clause
+	 *
+	 * @return  void
+	 */
+	public function addGroupBy($fields)
+	{
+		if (!isset($fields)
+			|| (!is_array($fields) && !is_string($fields))
+			|| (is_array($fields) && count($fields) == 0)
+			|| (is_string($fields) && $fields == ''))
+		{
+			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
+		}
+		
+		$this->db->group_by($fields);
+		
+		return success(true);
+	}
+	
+	/** ---------------------------------------------------------------
 	 * Reset the query builder state
 	 *
 	 * @return  void
