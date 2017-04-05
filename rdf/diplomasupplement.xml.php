@@ -620,7 +620,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				tbl_lehrveranstaltung.bezeichnung, COALESCE(tbl_lehrveranstaltung.bezeichnung_english,
 				tbl_lehrveranstaltung.bezeichnung) as bezeichnung_english, tbl_lehrveranstaltung.semester,
 				tbl_lehrveranstaltung.semesterstunden, tbl_lehrveranstaltung.ects, zeugnis.studiensemester_kurzbz,
-				zeugnis.note, note.bezeichnung note_bezeichnung, note.anmerkung, sort
+				zeugnis.note, note.bezeichnung note_bezeichnung, note.anmerkung, sort, tbl_lehrveranstaltung.sws
 			FROM
 				lehre.tbl_zeugnisnote zeugnis
 				JOIN lehre.tbl_note note USING(note)
@@ -650,6 +650,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['semester'] = $row_stud->semester;
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['semesterstunden'] = $row_stud->semesterstunden;
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['ects'] = $row_stud->ects;
+						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sws_lv'] = $row_stud->sws;
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['studiensemester_kurzbz'] = $row_stud->studiensemester_kurzbz;
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note'] = $row_stud->anmerkung;
 						$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sort'] = $row_stud->sort;
@@ -672,6 +673,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['semester'] = $row_stud->semester;
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['semesterstunden'] = $row_stud->semesterstunden;
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['ects'] = $row_stud->ects;
+							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sws_lv'] = $row_stud->sws;
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['studiensemester_kurzbz'] = $row_stud->studiensemester_kurzbz;
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note'] = $row_stud->anmerkung;
 							$arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sort'] = $row_stud->sort;
@@ -804,14 +806,18 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				foreach($arrayLvAusbildungssemester as $lv_test)
 				{
 					$sws = number_format(sprintf('%.1F',$lv_test['sws']),2);
+					$sws_lv = number_format(sprintf('%.1F',$lv_test['sws_lv']),2);
 
 					if($sws == '0.0')
 						$sws = '';
+					if($sws_lv == '0.0')
+						$sws_lv = '';
 
 					echo '<lv>
 							<lehrform_kurzbz>'.$lv_test['lehrform_kurzbz'].'</lehrform_kurzbz>
 							<benotungsdatum>'.$lv_test['benotungsdatum'].'</benotungsdatum>
 							<sws>'.$sws.'</sws>
+							<sws_lv>'.$sws_lv.'</sws_lv>
 							<semester>'.$lv_test['semester'].'</semester>
 							<kurzbz>'.$lv_test['kurzbz'].'</kurzbz>
 							<stsem>'.$lv_test['studiensemester_kurzbz'].'</stsem>
@@ -828,7 +834,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$qry_outgoing = "
 					SELECT
 						studiensemester_kurzbz, ort, ects, semesterstunden, von, bis,
-						universitaet, lehrveranstaltung_id
+						universitaet, lehrveranstaltung_id, tbl_lehrveranstaltung.sws
 					FROM
 						bis.tbl_bisio
 						JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
@@ -876,6 +882,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							$sws = number_format(sprintf('%.1F',($row_outgoing->semesterstunden/$wochen)),2);
 							if($sws == '0.0')
 								$sws = '';
+
+							$sws_lv = number_format(sprintf('%.1F',($row_outgoing->sws)),2);
+							if($sws_lv == '0.0')
+								$sws_lv = '';
+
 							switch ($start)
 							{
 								case '1':
@@ -896,6 +907,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 								<lehrform_kurzbz></lehrform_kurzbz>
 								<benotungsdatum>'.$benotungsdatum_outgoing.'</benotungsdatum>
 								<sws>'.$sws.'</sws>
+								<sws_lv>'.$sws_lv.'</sws_lv>
 								<semester></semester>
 								<kurzbz>'.$lehrform_kurzbz_outgoing.'</kurzbz>
 								<stsem></stsem>

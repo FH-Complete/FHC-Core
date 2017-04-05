@@ -285,7 +285,8 @@ class zeugnisnote extends basis_db
 					   vw_student_lehrveranstaltung.sort,
 					   vw_student_lehrveranstaltung.zeugnis,
 					   vw_student_lehrveranstaltung.studiengang_kz,
-					   vw_student_lehrveranstaltung.lv_lehrform_kurzbz
+					   vw_student_lehrveranstaltung.lv_lehrform_kurzbz,
+					   tbl_lehrveranstaltung.sws
 				FROM
 				(
 					campus.vw_student_lehrveranstaltung LEFT JOIN lehre.tbl_zeugnisnote
@@ -294,13 +295,14 @@ class zeugnisnote extends basis_db
 						   AND vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
 						  )
 				) LEFT JOIN lehre.tbl_note USING(note)
+				JOIN lehre.tbl_lehrveranstaltung ON(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)
 				WHERE true $where
 				UNION
 				SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,student_uid AS uid,studiensemester_kurzbz, note, punkte,
 					uebernahmedatum, benotungsdatum,lehre.tbl_lehrveranstaltung.ects,lehre.tbl_lehrveranstaltung.semesterstunden, tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
 					tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id, lehre.tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, lehre.tbl_lehrveranstaltung.bezeichnung_english as lehrveranstaltung_bezeichnung_english,
 					tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung as bemerkung, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.studiengang_kz,
-					tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz
+					tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz, tbl_lehrveranstaltung.sws
 				FROM
 					lehre.tbl_zeugnisnote
 					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
@@ -336,6 +338,7 @@ class zeugnisnote extends basis_db
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->zeugnis = $this->db_parse_bool($row->zeugnis);
 				$obj->lv_lehrform_kurzbz = $row->lv_lehrform_kurzbz;
+				$obj->sws = $row->sws;
 
 				$this->result[] = $obj;
 			}

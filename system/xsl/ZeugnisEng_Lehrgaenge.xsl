@@ -370,7 +370,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		                            </table:table-cell>
 		                            <table:table-cell table:style-name="Tabelle3.C2" office:value-type="string">
 		                                <text:p text:style-name="P17"><xsl:value-of select="studiengangsleiter" /></text:p>
-		                                <text:p text:style-name="P17">Program Director</text:p>
+		                                <text:p text:style-name="P17">Director of Certificate Program</text:p>
 		                            </table:table-cell>
 		                        </table:table-row>
 		                    </table:table>
@@ -410,19 +410,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</xsl:choose>
             </text:p>
             <text:p text:style-name="P5"/>
-            <text:p text:style-name="P5">
-			<xsl:choose>
-				<xsl:when test="studiengang_art='Bachelor'">
-					<xsl:text>Bachelor's</xsl:text>
-				</xsl:when>
-				<xsl:when test="studiengang_art='Master'">
-					<xsl:text>Master's</xsl:text>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="studiengang_art"/>
-				</xsl:otherwise>
-			</xsl:choose> Degree Program
-			</text:p>
+            <text:p text:style-name="P5">Certificate Program for Further Education subjected to § 9 FHStG</text:p>
             <text:p text:style-name="P6"><xsl:value-of select="studiengang_englisch"/></text:p>
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P1"/>

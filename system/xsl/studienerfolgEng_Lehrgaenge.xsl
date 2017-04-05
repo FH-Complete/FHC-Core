@@ -565,7 +565,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 						<text:p text:style-name="P25"/>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-						<text:p text:style-name="P23"><xsl:value-of select="gesamtstunden" /></text:p>
+						<text:p text:style-name="P23"><xsl:value-of select="gesamtstunden_lv" /></text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
 						<text:p text:style-name="P23"><xsl:value-of select="gesamtects" /></text:p>
@@ -624,7 +624,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P27"><xsl:value-of select="../semester" /></text:p>
 		</table:table-cell>
 		<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
-			<text:p text:style-name="P27"><xsl:value-of select="sws" /></text:p>
+			<text:p text:style-name="P27"><xsl:value-of select="sws_lv" /></text:p>
 		</table:table-cell>
 		<table:table-cell table:style-name="Tabelle3.A2" office:value-type="string">
 			<text:p text:style-name="P27"><xsl:value-of select="ects" /></text:p>

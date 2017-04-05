@@ -209,6 +209,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 
 
 	$gesamtstunden=0;
+	$gesamtstunden_lv=0;
 	$gesamtects=0;
 	$notensumme=0;
 	$anzahl=0;
@@ -243,6 +244,8 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				$xml .= "				<note_idx>".$row->note."</note_idx>";
 				$sws = sprintf('%.1F',$row->semesterstunden/$wochen);
 				$xml .= "				<sws>".$sws."</sws>";
+				$sws_lv = sprintf('%.1F',$row->sws);
+				$xml .= "				<sws_lv>".$sws_lv."</sws_lv>";
 				$xml .= "				<ects>".$row->ects."</ects>";
 				$xml .= "				<lehrform><![CDATA[".$row->lv_lehrform_kurzbz."]]></lehrform>";
 				if($row->benotungsdatum!='')
@@ -250,6 +253,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				$xml .= "			</unterrichtsfach>";
 
 				$gesamtstunden +=$sws;
+				$gesamtstunden_lv +=$sws_lv;
 				$gesamtects += $row->ects;
 				if($note_wert[$row->note]!='')
 				{
@@ -268,6 +272,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	else
 		$schnitt = 0;
 	$xml .= "		<gesamtstunden>".$gesamtstunden."</gesamtstunden>";
+	$xml .= "		<gesamtstunden_lv>".$gesamtstunden_lv."</gesamtstunden_lv>";
 	$xml .= "		<gesamtects>$gesamtects</gesamtects>";
 	$xml .= "		<schnitt>".sprintf('%.2f',$schnitt)."</schnitt>";
 	$xml .= "	</studienerfolg>";

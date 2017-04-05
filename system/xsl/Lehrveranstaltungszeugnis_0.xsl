@@ -212,6 +212,58 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<style:style style:name="fr3" style:family="graphic" style:parent-style-name="Graphics">
             <style:graphic-properties style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="bottom" style:vertical-rel="page-content" style:horizontal-pos="from-left" style:horizontal-rel="page-content" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
         </style:style>
+		<text:list-style style:name="L1">
+			<text:list-level-style-bullet text:level="1" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">
+				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="0.4cm" fo:text-indent="-0.4cm" fo:margin-left="0.4cm"/>
+				</style:list-level-properties>
+			</text:list-level-style-bullet>
+			<text:list-level-style-bullet text:level="2" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">
+				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.905cm" fo:text-indent="-0.635cm" fo:margin-left="1.905cm"/>
+				</style:list-level-properties>
+			</text:list-level-style-bullet>
+			<text:list-level-style-bullet text:level="3" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">
+				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="2.54cm" fo:text-indent="-0.635cm" fo:margin-left="2.54cm"/>
+				</style:list-level-properties>
+			</text:list-level-style-bullet>
+			<text:list-level-style-bullet text:level="4" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="3.175cm" fo:text-indent="-0.635cm" fo:margin-left="3.175cm"/>
+				</style:list-level-properties>
+			</text:list-level-style-bullet>
+			<text:list-level-style-bullet text:level="5" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">
+				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="3.81cm" fo:text-indent="-0.635cm" fo:margin-left="3.81cm"/>
+				</style:list-level-properties>
+			</text:list-level-style-bullet>
+			<text:list-level-style-bullet text:level="6" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">
+				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="4.445cm" fo:text-indent="-0.635cm" fo:margin-left="4.445cm"/>
+				</style:list-level-properties>
+			</text:list-level-style-bullet>
+			<text:list-level-style-bullet text:level="7" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="5.08cm" fo:text-indent="-0.635cm" fo:margin-left="5.08cm"/>
+				</style:list-level-properties>
+			</text:list-level-style-bullet>
+			<text:list-level-style-bullet text:level="8" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">
+				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="5.715cm" fo:text-indent="-0.635cm" fo:margin-left="5.715cm"/>
+				</style:list-level-properties>
+			</text:list-level-style-bullet>
+			<text:list-level-style-bullet text:level="9" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">
+				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="6.35cm" fo:text-indent="-0.635cm" fo:margin-left="6.35cm"/>
+				</style:list-level-properties>
+			</text:list-level-style-bullet>
+			<text:list-level-style-bullet text:level="10" text:style-name="Bullet_20_Symbols" text:bullet-char="•">
+				<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
+					<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="6.985cm" fo:text-indent="-0.635cm" fo:margin-left="6.985cm"/>
+				</style:list-level-properties>
+			</text:list-level-style-bullet>
+		</text:list-style>
 	</office:automatic-styles>
 	<office:body>
 		<xsl:apply-templates select="zertifikat"/>
@@ -300,11 +352,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			    <table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
 			        <text:p text:style-name="P9">
 					<xsl:choose>
-						<xsl:when test="sws=''">
+						<xsl:when test="sws_lv=''">
 							<xsl:text>-</xsl:text>
 						</xsl:when>
 						<xsl:otherwise>
-							<xsl:value-of select="sws"/>
+							<xsl:value-of select="sws_lv"/>
 						</xsl:otherwise>
 					</xsl:choose>
 			        </text:p>
@@ -341,16 +393,15 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			<text:p text:style-name="P25"><text:tab/>angerechnet (ar), nicht beurteilt (nb), bestanden (b), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</text:p>
 			<text:p text:style-name="P20"/>
 			<text:p text:style-name="P21"/>
-			<text:p text:style-name="P22">Inhalte der Lehrveranstaltung:</text:p>
+			<text:p text:style-name="P22">Nach erfolgreichem Abschluss sind die Studierenden in der Lage, ...</text:p>
 			<text:p text:style-name="P22"/>
 			<text:p text:style-name="P22"/>
-			<text:p text:style-name="P22">
 
-			<xsl:call-template name="replace">
-				<xsl:with-param name="string" select="lehrziele"/>
-			</xsl:call-template>
+			<text:list xml:id="list4694811147287548861" text:style-name="L1">
+				<xsl:apply-templates select="lehrziele_arr"/>
+			</text:list>
 			
-			</text:p>
+
 			<text:p text:style-name="P22"/>
 			<text:p text:style-name="P22"/>
 			<text:p text:style-name="P22"/>
@@ -400,20 +451,16 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</text:p>
 		</office:text>
 </xsl:template>
-<xsl:template name="replace">
-    <xsl:param name="string"/>
-    <xsl:choose>
-        <xsl:when test="contains($string,'\n')">
-            <xsl:value-of select="substring-before($string,'\n')"/>
-            <text:line-break/>
-            <xsl:call-template name="replace">
-                <xsl:with-param name="string" select="substring-after($string,'\n')"/>
-            </xsl:call-template>
-        </xsl:when>
-        <xsl:otherwise>
-            <xsl:value-of select="$string"/>
-        </xsl:otherwise>
-    </xsl:choose>
+
+<xsl:template match="lehrziele_arr">
+	<xsl:apply-templates select="lehrziel"/>
+</xsl:template>
+
+<xsl:template match="lehrziel">
+	<text:list-item>
+		<text:p text:style-name="P21"><xsl:value-of select="."/></text:p>
+	</text:list-item>
 </xsl:template>
 
 </xsl:stylesheet>
+

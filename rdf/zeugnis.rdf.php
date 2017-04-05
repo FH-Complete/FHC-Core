@@ -325,6 +325,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							//$nl = str_repeat('\n',($anzahl_nl));
 							$xml_fussnote .='      <note>'.(isset($note_arr[$note])?$note_arr[$note]:$note).$nl.'</note>';
 							$xml_fussnote .='      <sws>'.$nl.'</sws>';
+							$xml_fussnote .='      <sws_lv>'.$nl.'</sws_lv>';
 							$xml_fussnote .='      <ects>'.$nl.'</ects>';
 							$xml_fussnote .='      <lv_lehrform_kurzbz>'.$nl.'</lv_lehrform_kurzbz>';
 
@@ -379,6 +380,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						$xml .= "				<bezeichnung_englisch><![CDATA[".$bezeichnung_englisch."]]></bezeichnung_englisch>";
 						$xml .= "				<note>".$note2."</note>";
 						$xml .= "				<sws>".($row->semesterstunden==0?'':number_format(sprintf('%.1F',$row->semesterstunden/$wochen),1))."</sws>";
+						$xml .= "				<sws_lv>".($row->sws==0?'':number_format(sprintf('%.1F',$row->sws),1))."</sws_lv>";
 						$ectspunkte='';
 
 						$anrechnung = new anrechnung();
