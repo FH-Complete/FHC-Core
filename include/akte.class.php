@@ -48,6 +48,7 @@ class akte extends basis_db
 	public $anmerkung;
 	public $titel_intern;
 	public $anmerkung_intern;
+	public $nachgereicht_am;
 
 	/**
 	 * Konstruktor
@@ -100,6 +101,7 @@ class akte extends basis_db
 				$this->nachgereicht = $this->db_parse_bool($row->nachgereicht);
 				$this->titel_intern = $row->titel_intern;
 				$this->anmerkung_intern = $row->anmerkung_intern;
+				$this->nachgereicht_am = $row->nachgereicht_am;
 				return true;
 			}
 			else
@@ -182,7 +184,8 @@ class akte extends basis_db
 		{
 			//Neuen Datensatz anlegen
 			$qry = "BEGIN;INSERT INTO public.tbl_akte (person_id, dokument_kurzbz, inhalt, mimetype, erstelltam, gedruckt, titel,
-					bezeichnung, updateamum, updatevon, insertamum, insertvon, uid, dms_id, nachgereicht, anmerkung, titel_intern, anmerkung_intern ) VALUES (".
+					bezeichnung, updateamum, updatevon, insertamum, insertvon, uid, dms_id, nachgereicht, anmerkung,
+					titel_intern, anmerkung_intern, nachgereicht_am) VALUES (".
 						$this->db_add_param($this->person_id, FHC_INTEGER).', '.
 						$this->db_add_param($this->dokument_kurzbz).', '.
 						$this->db_add_param($this->inhalt).', '.
@@ -200,7 +203,8 @@ class akte extends basis_db
 						$this->db_add_param($this->nachgereicht, FHC_BOOLEAN).','.
 						$this->db_add_param($this->anmerkung).','.
 						$this->db_add_param($this->titel_intern).','.
-						$this->db_add_param($this->anmerkung_intern).');';
+						$this->db_add_param($this->anmerkung_intern).','.
+						$this->db_add_param($this->nachgereicht_am).');';
 		}
 		else
 		{
@@ -221,7 +225,8 @@ class akte extends basis_db
 				" nachgereicht=".$this->db_add_param($this->nachgereicht, FHC_BOOLEAN).",".
 				" anmerkung=".$this->db_add_param($this->anmerkung).",".
 				" titel_intern=".$this->db_add_param($this->titel_intern).",".
-				" anmerkung_intern=".$this->db_add_param($this->anmerkung_intern).
+				" anmerkung_intern=".$this->db_add_param($this->anmerkung_intern).",".
+				" nachgereicht_am=".$this->db_add_param($this->nachgereicht_am).
 				" WHERE akte_id=".$this->db_add_param($this->akte_id, FHC_INTEGER);
 		}
 
@@ -277,7 +282,8 @@ class akte extends basis_db
 		$qry = "SELECT
 					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt, titel_intern, anmerkung_intern,
 					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid, dms_id, anmerkung, nachgereicht,
-					CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden
+					CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden,
+					nachgereicht_am
 				FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		if($dokument_kurzbz!=null)
 			$qry.=" AND dokument_kurzbz=".$this->db_add_param($dokument_kurzbz);
@@ -317,6 +323,7 @@ class akte extends basis_db
 				$akten->anmerkung = $row->anmerkung;
 				$akten->titel_intern = $row->titel_intern;
 				$akten->anmerkung_intern = $row->anmerkung_intern;
+				$akten->nachgereicht_am = $row->nachgereicht_am;
 
 				$this->result[] = $akten;
 			}
@@ -341,7 +348,7 @@ class akte extends basis_db
 		$qry = "SELECT
 			akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt,
 			titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid,
-			dms_id,nachgereicht,anmerkung,titel_intern,anmerkung_intern
+			dms_id,nachgereicht,anmerkung,titel_intern,anmerkung_intern, nachgereicht_am
 			FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 
 		$qry.=" AND dokument_kurzbz IN ('Lebenslf','Motivat','LearnAgr')";
@@ -372,6 +379,7 @@ class akte extends basis_db
 				$akten->anmerkung = $row->anmerkung;
 				$akten->titel_intern = $row->titel_intern;
 				$akten->anmerkung_intern = $row->anmerkung_intern;
+				$akten->nachgereicht_am = $row->nachgereicht_am;
 
 				$this->result[] = $akten;
 			}
@@ -383,7 +391,7 @@ class akte extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Liefert die Akten anhand der dms_id
 	 *
@@ -395,16 +403,16 @@ class akte extends basis_db
 		$qry = "SELECT
 					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt,
 					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid,
-					dms_id,nachgereicht,anmerkung,titel_intern,anmerkung_intern
-				FROM public.tbl_akte WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER)." 
+					dms_id,nachgereicht,anmerkung,titel_intern,anmerkung_intern, nachgereicht_am
+				FROM public.tbl_akte WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER)."
 				ORDER BY erstelltam";
-	
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$akten = new akte();
-	
+
 				$akten->akte_id = $row->akte_id;
 				$akten->person_id = $row->person_id;
 				$akten->dokument_kurzbz = $row->dokument_kurzbz;
@@ -424,7 +432,8 @@ class akte extends basis_db
 				$akten->anmerkung = $row->anmerkung;
 				$akten->titel_intern = $row->titel_intern;
 				$akten->anmerkung_intern = $row->anmerkung_intern;
-	
+				$akten->nachgereicht_am = $row->nachgereicht_am;
+
 				$this->result[] = $akten;
 			}
 			return true;

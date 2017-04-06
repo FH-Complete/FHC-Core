@@ -131,7 +131,7 @@ class wochenplan extends basis_db
 		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 			for ($j=0; $j<20; $j++)
 			{
-				if(!isset($this->std_plan[$i][$j][0]))
+				if (!isset($this->std_plan[$i][$j][0]))
 					$this->std_plan[$i][$j][0]=new stdClass();
 				$this->std_plan[$i][$j][0]->anz=0;
 				$this->std_plan[$i][$j][0]->unr=0;
@@ -174,8 +174,6 @@ class wochenplan extends basis_db
 		// Ort
 		if ($type=='ort' && $ort_kurzbz==NULL)
 		{
-			//$this->errormsg='Fehler: Kurzbezeichnung des Orts ist nicht gesetzt';
-			//return false;
 			$this->ort_kurzbz = "all";
 		}
 		elseif ($type=='ort')
@@ -189,7 +187,7 @@ class wochenplan extends basis_db
 			$this->errormsg='Fehler: Kennzahl des Studiengangs ist nicht gesetzt';
 			return false;
 		}
-		elseif($type=='verband')
+		elseif ($type=='verband')
 		{
 			$this->stg_kz=$studiengang_kz;
 			$this->sem=$sem;
@@ -207,24 +205,23 @@ class wochenplan extends basis_db
 			$this->gruppe_kurzbz=$gruppe;
 
 
-		if($type=='fachbereich')
+		if ($type=='fachbereich')
 		{
-			if(is_null($fachbereich_kurzbz))
+			if (is_null($fachbereich_kurzbz))
 			{
 				$this->errormsg = 'Fachbereich nicht gesetzt';
 				return false;
 			}
 			$this->fachbereich_kurzbz=$fachbereich_kurzbz;
-
 		}
 
 		// LVA
-		if($type=='lva' && $lva==NULL)
+		if ($type=='lva' && $lva==NULL)
 		{
 			$this->errormsg='Fehler: LVA-ID ist nicht gesetzt';
 			return false;
 		}
-		elseif($type=='lva')
+		elseif ($type=='lva')
 		{
 			$this->lva=$lva;
 		}
@@ -238,13 +235,13 @@ class wochenplan extends basis_db
 				$sql_query="SELECT uid, titelpre, titelpost, nachname, vorname, vornamen, studiengang_kz, semester, verband, gruppe FROM campus.vw_student WHERE uid=".$this->db_add_param($this->pers_uid);
 			else
 				$sql_query="SELECT uid, titelpre, titelpost, nachname, vorname, vornamen FROM campus.vw_mitarbeiter WHERE uid=".$this->db_add_param($this->pers_uid);
-			//echo $sql_query;
+
 			if (!$this->db_query($sql_query))
 			{
 				$this->errormsg=$this->db_last_error();
 				return false;
 			}
-			if($row = $this->db_fetch_object())
+			if ($row = $this->db_fetch_object())
 			{
 				$this->pers_uid = $row->uid;
 				$this->pers_titelpre = $row->titelpre;
@@ -271,15 +268,16 @@ class wochenplan extends basis_db
 		//ortdaten ermitteln
 		if ($this->type=='ort' && $this->ort_kurzbz != 'all')
 		{
-			$sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung, ausstattung, max_person, content_id FROM public.tbl_ort WHERE ort_kurzbz=".$this->db_add_param($this->ort_kurzbz);
-			//echo $sql_query;
+			$sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung, ausstattung, max_person, content_id
+						FROM public.tbl_ort WHERE ort_kurzbz=".$this->db_add_param($this->ort_kurzbz);
+
 			if (!$this->db_query($sql_query))
 			{
 				$this->errormsg=$this->db_last_error();
 				return false;
 			}
 
-			if($row = $this->db_fetch_object())
+			if ($row = $this->db_fetch_object())
 			{
 				$this->ort_bezeichnung = $row->bezeichnung;
 				$this->ort_kurzbz = $row->ort_kurzbz;
@@ -298,36 +296,38 @@ class wochenplan extends basis_db
 
 		if ($this->type=='ort' && $this->ort_kurzbz == 'all')
 		{
-		    $sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung, ausstattung, max_person, content_id FROM public.tbl_ort WHERE lehre AND ort_kurzbz != 'Dummy'";
-		    //echo $sql_query;
-		    if (!$this->db_query($sql_query))
-		    {
-			    $this->errormsg=$this->db_last_error();
-			    return false;
-		    }
+			$sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung, ausstattung, max_person, content_id
+					FROM public.tbl_ort WHERE lehre AND ort_kurzbz != 'Dummy'";
 
-		    while($row = $this->db_fetch_object())
-		    {
-			$obj = new stdClass();
-			$obj->ort_bezeichnung = $row->bezeichnung;
-			$obj->ort_kurzbz = $row->ort_kurzbz;
-			$obj->ort_planbezeichnung = $row->planbezeichnung;
-			$obj->ort_ausstattung = $row->ausstattung;
-			$obj->ort_max_person = $row->max_person;
-			$obj->ort_content_id = $row->content_id;
-			//$obj->link.='&ort_kurzbz='.$this->ort_kurzbz;	//Link erweitern
-			array_push($this->raeume, $obj);
-		    }
+			if (!$this->db_query($sql_query))
+			{
+				$this->errormsg=$this->db_last_error();
+				return false;
+			}
+
+			while ($row = $this->db_fetch_object())
+			{
+				$obj = new stdClass();
+				$obj->ort_bezeichnung = $row->bezeichnung;
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->ort_planbezeichnung = $row->planbezeichnung;
+				$obj->ort_ausstattung = $row->ausstattung;
+				$obj->ort_max_person = $row->max_person;
+				$obj->ort_content_id = $row->content_id;
+
+				array_push($this->raeume, $obj);
+			}
 		}
 
 		// Studiengangsdaten ermitteln
 		if ($this->type=='student' || $this->type=='verband' || $this->type=='lva')
 		{
-			$sql_query="SELECT bezeichnung, kurzbz, kurzbzlang, typ, UPPER(typ||kurzbz) AS kuerzel, english FROM public.tbl_studiengang WHERE studiengang_kz=".$this->db_add_param($this->stg_kz);
-			//echo $sql_query;
-			if(!($this->db_query($sql_query)))
+			$sql_query="SELECT bezeichnung, kurzbz, kurzbzlang, typ, UPPER(typ||kurzbz) AS kuerzel, english
+						FROM public.tbl_studiengang WHERE studiengang_kz=".$this->db_add_param($this->stg_kz);
+
+			if (!($this->db_query($sql_query)))
 				die($this->db_last_error());
-			if($row = $this->db_fetch_object())
+			if ($row = $this->db_fetch_object())
 			{
 				$this->stg_bez = $row->bezeichnung;
 				$this->stg_kurzbz = $row->typ.$row->kurzbz;
@@ -339,27 +339,27 @@ class wochenplan extends basis_db
 
 		// Stundentafel abfragen
 		$sql_query="SELECT stunde, beginn, ende FROM lehre.tbl_stunde ORDER BY stunde";
-		if(!$this->db_query($sql_query))
+		if (!$this->db_query($sql_query))
 			die($this->db_last_error());
 		$this->stunde = $this->db_result;
 
 		// Studiensemesterdaten ermitteln
 		$sql_query="SELECT * FROM public.tbl_studiensemester WHERE now()<ende ORDER BY start LIMIT 2";
-		if(!$this->db_query($sql_query))
+		if (!$this->db_query($sql_query))
 			die($this->db_last_error());
 		else
 		{
-			if($row = $this->db_fetch_object())
+			if ($row = $this->db_fetch_object())
 			{
-				if(!isset($this->studiensemester_now))
+				if (!isset($this->studiensemester_now))
 					$this->studiensemester_now = new stdClass();
 				$this->studiensemester_now->name=$row->studiensemester_kurzbz;
 				$this->studiensemester_now->start=mktime(0,0,0,mb_substr($row->start,5,2),mb_substr($row->start,8,2),mb_substr($row->start,0,4));
 				$this->studiensemester_now->ende=mktime(0,0,0,mb_substr($row->ende,5,2),mb_substr($row->ende,8,2),mb_substr($row->ende,0,4));#
 			}
-			if($row = $this->db_fetch_object())
+			if ($row = $this->db_fetch_object())
 			{
-				if(!isset($this->studiensemester_next))
+				if (!isset($this->studiensemester_next))
 					$this->studiensemester_next = new stdClass();
 				$this->studiensemester_next->name=$row->studiensemester_kurzbz;
 				$this->studiensemester_next->start=mktime(0,0,0,mb_substr($row->start,5,2),mb_substr($row->start,8,2),mb_substr($row->start,0,4));
@@ -407,7 +407,7 @@ class wochenplan extends basis_db
 		}
 
 		// Stundenplandaten aufbereiten
-		for($i=0;$i<$anz;$i++)
+		for ($i=0;$i<$anz;$i++)
 		{
 			$idx=0;
 			$mtag=mb_substr($this->wochenplan->lehrstunden[$i]->datum, 8,2);
@@ -416,13 +416,13 @@ class wochenplan extends basis_db
 			$tag=date("w",mktime(12,0,0,$month,$mtag,$jahr));
 			if ($tag==0)
 				$tag=7; //Sonntag
-			//echo $tag.':'.$this->wochenplan->lehrstunden[$i]->datum.'<BR>';
+
 			$stunde=$this->wochenplan->lehrstunden[$i]->stunde;
 			// naechste freie Stelle im Array suchen
 			while (isset($this->std_plan[$tag][$stunde][$idx]->lektor_uid))
 				$idx++;
-			//echo $idx.'<BR>';
-			if(!isset($this->std_plan[$tag][$stunde][$idx]))
+
+			if (!isset($this->std_plan[$tag][$stunde][$idx]))
 				$this->std_plan[$tag][$stunde][$idx]=new stdClass();
 			$this->std_plan[$tag][$stunde][$idx]->unr=$this->wochenplan->lehrstunden[$i]->unr;
 			$this->std_plan[$tag][$stunde][$idx]->reservierung=$this->wochenplan->lehrstunden[$i]->reservierung;
@@ -450,7 +450,6 @@ class wochenplan extends basis_db
 			$this->std_plan[$tag][$stunde][$idx]->anmerkung=$this->wochenplan->lehrstunden[$i]->anmerkung;
 			$this->std_plan[$tag][$stunde][$idx]->updateamum=$this->wochenplan->lehrstunden[$i]->updateamum;
 			$this->std_plan[$tag][$stunde][$idx]->updatevon=$this->wochenplan->lehrstunden[$i]->updatevon;
-			//echo $tag.' '.$stunde.' '.$this->std_plan[$tag][$stunde][$idx]->lektor_uid.'<br>';
 		}
 		unset($this->wochenplan);
 		return true;
@@ -494,18 +493,14 @@ class wochenplan extends basis_db
 			$this->link.='&lva='.$this->lva;
 		echo '</P>'.$this->crlf;
 		echo '			<table class="stdplan" style="width: auto; margin: auto;" valign="bottom" align="center">';
-		//echo '			<tr><td colspan="2" class="stdplan" style="padding:3px;" align="center">'.$p->t('lvplan/semesterplaene').'</td></tr>';
 		echo '			<tr><td  style="padding:3px 15px 0px 15px; margin: 0,0,20px,0;" align="center">'.$this->crlf;
 
 		//Kalender
 		$this->kal_link.='&pers_uid='.$this->pers_uid.'&ort_kurzbz='.$this->ort_kurzbz.'&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp.'&gruppe_kurzbz='.$this->gruppe_kurzbz.'&lva='.$this->lva;
-		//global $kalender_begin_ws, $kalender_ende_ws, $kalender_begin_ss, $kalender_ende_ss;
 		$kal_link_ws=$this->kal_link.'&begin='.$this->studiensemester_now->start.'&ende='.$this->studiensemester_now->ende;
 		$kal_link_ss=$this->kal_link.'&begin='.$this->studiensemester_next->start.'&ende='.$this->studiensemester_next->ende;
 
-		//echo '				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>'.$p->t('global/kalender').':&nbsp;&nbsp;&nbsp;</strong>'.$this->crlf;
 		echo 				$this->crlf;
-		//echo '				'.$p->t('lvplan/uebersicht').':&nbsp;<A href="'.$kal_link_ws.'&format=html" target="_blank" title="HTML">'.$this->studiensemester_now->name.'</A>&nbsp;'.$this->crlf;
 		echo				$this->studiensemester_now->name.'<br>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ws.'&format=html" target="_blank" title="HTML"><IMG src="../../../skin/images/html.png" height="30" alt="HTML" border="0"></A>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ws.'&format=excel" title="excel"><IMG src="../../../skin/images/xls.png" height="30" alt="Excel" border="0"></A>'.$this->crlf;
@@ -514,7 +509,6 @@ class wochenplan extends basis_db
 		echo '				<A href="'.$kal_link_ws.'&format=ical&version=1&target=ical" title="iCal Version 1.0"><IMG src="../../../skin/images/ical1.0.png" height="30" alt="vCal Version 1.0" border="0"></A>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ws.'&format=ical&version=2&target=ical" title="iCal Version 2.0"><IMG src="../../../skin/images/ical2.0.png" height="30" alt="vCal Version 2.0" border="0"></A>'.$this->crlf;
 		echo '				</td><td class="stdplan" style="padding:8px;" align="center">'.$p->t('lvplan/semesterplaene').'</td><td style="padding:3px 15px 0px 15px;" align="center">';
-		//echo '				&nbsp;&nbsp;&nbsp;&nbsp;'.$p->t('lvplan/uebersicht').':&nbsp;<A href="'.$kal_link_ss.'&format=html" target="_blank" title="HTML">'.$this->studiensemester_next->name.'</A>&nbsp;'.$this->crlf;
 		echo '				<span style="color:#999">'.$this->studiensemester_next->name.'</span><br>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ss.'&format=html" target="_blank" title="HTML"><IMG src="../../../skin/images/html_light.png" height="30" alt="HTML" border="0"></A>'.$this->crlf;
 		echo '				<A href="'.$kal_link_ss.'&format=excel" title="excel"><IMG src="../../../skin/images/xls_light.png" height="30" alt="Excel" border="0"></A>'.$this->crlf;
@@ -525,10 +519,7 @@ class wochenplan extends basis_db
 		echo '			</td></tr></table>'.$this->crlf;
 		echo '		</TD>'.$this->crlf;
 
-    	// Kalenderjump
-		//echo '		<TD align="right" valign="top">'.$this->crlf;
-		//jahreskalenderjump($this->link);
-		//echo '		</TD>'.$this->crlf;
+		// Kalenderjump
 		echo '	</TR>'.$this->crlf;
 		echo '</TABLE>'.$this->crlf.$this->crlf;
 
@@ -545,7 +536,7 @@ class wochenplan extends basis_db
 		{
 			// Orte abfragen
 			$sql_query="SELECT * FROM public.tbl_ort WHERE aktiv AND lehre ORDER BY ort_kurzbz";
-			if(!$this->db_query($sql_query))
+			if (!$this->db_query($sql_query))
 				die($this->db_last_error());
 			$num_rows_ort=$this->db_num_rows();
 
@@ -568,7 +559,7 @@ class wochenplan extends basis_db
 			// Ort Jump
 			echo '<FORM align="center" name="AuswahlOrt" action="stpl_week.php">'.$this->crlf;
 			echo '	<p align="center">'.$this->crlf;
-			//$datum=mktime($this->datum[hours], $this->datum[minutes], $this->datum[seconds], $this->datum[mon], $this->datum[mday], $this->datum[year]);
+
 			if (isset($prev_ort))
 			{
 				echo '		<a style="text-decoration:none" href="stpl_week.php?type='.$this->type.'&datum='.$this->datum.'&ort_kurzbz='.$prev_ort->ort_kurzbz.'">'.$this->crlf;
@@ -621,10 +612,10 @@ class wochenplan extends basis_db
 		echo $link_parameter;
 		echo '&datum='.$this->datum_next4week;
 		echo '"><img class="lvplanbutton" src="../../../skin/images/moreright_lvplan.png" title="'.$p->t('lvplan/vierWochenVor').'"></a>';
-        echo '</p>';
-        //Kalenderjump mit Hoverbox
-        $this->jahreskalenderjump_hoverbox($this->link);
-        return true;
+		echo '</p>';
+		//Kalenderjump mit Hoverbox
+		$this->jahreskalenderjump_hoverbox($this->link);
+		return true;
 	}
 
 	/**
@@ -641,18 +632,34 @@ class wochenplan extends basis_db
 		$o_datum=new datum();
 		// Stundentafel abfragen
 		$sql_query="SELECT stunde, beginn, ende FROM lehre.tbl_stunde ORDER BY stunde";
-		if(!$this->db_query($sql_query))
+		if (!$this->db_query($sql_query))
 			die($this->db_last_error());
 		$result_stunde = $this->db_result;
 		$num_rows_stunde = $this->db_num_rows($result_stunde);
 
+		$stundenplandev_belegt = array();
 		// Formularbeginn wenn Lektor
 		if ($raumres && $this->type=='ort')
 		{
 			$ort = new ort();
 			$ort->load($this->ort_kurzbz);
-			if($ort->reservieren)
+			if ($ort->reservieren)
+			{
 				echo '<form name="reserve" method="post" action="stpl_week.php">'.$this->crlf;
+
+				// In tbl_stundenplandev schauen ob dort der Raum bereits belegt ist
+				$qry = "SELECT distinct datum, stunde FROM lehre.tbl_stundenplandev
+						WHERE datum>=".$this->db_add_param($this->datum_begin)."
+						AND datum<=".$this->db_add_param($this->datum_end)."
+						AND ort_kurzbz=".$this->db_add_param($this->ort_kurzbz);
+				if($result_devbelegt = $this->db_query($qry))
+				{
+					while($row_devbelegt = $this->db_fetch_object($result_devbelegt))
+					{
+						$stundenplandev_belegt[$row_devbelegt->datum][$row_devbelegt->stunde]=true;
+					}
+				}
+			}
 			else
 				$raumres=false;
 		}
@@ -660,7 +667,7 @@ class wochenplan extends basis_db
 		//Tabelle zeichnen
 		echo '	<table class="stdplan" width="100%" border="0" cellpadding="1" cellspacing="1" name="Stundenplantabelle" align="center">'.$this->crlf;
 		// Kopfzeile darstellen
-	  	echo '<thead><tr>'.$this->crlf;
+		echo '<thead><tr>'.$this->crlf;
 		echo '			<th align="right">'.$p->t('global/stunde').'&nbsp;<br>'.$p->t('global/beginn').'&nbsp;<br>'.$p->t('global/ende').'&nbsp;</th>'.$this->crlf;
 		for ($i=0;$i<$num_rows_stunde; $i++)
 		{
@@ -676,17 +683,16 @@ class wochenplan extends basis_db
 		// Von Montag bis Samstag
 		$datum_now=time();
 		$datum_res_lektor_start=jump_day($datum_now,(RES_TAGE_LEKTOR_MIN)-1);
-		$datum_res_lektor_ende=$o_datum->mktime_fromdate(RES_TAGE_LEKTOR_BIS); //jump_day($datum_now,RES_TAGE_LEKTOR_MAX);
+		$datum_res_lektor_ende=$o_datum->mktime_fromdate(RES_TAGE_LEKTOR_BIS);
 		if (!date("w",$this->datum))
 			$this->datum=jump_day($this->datum,1);
 		$datum=$datum_mon=$this->datum;
+
 		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 		{
-	  		//echo '<tr><td>'.strftime("%A",$datum).'<br>'.strftime("%e. %b %Y",$datum).'<br></td>'.$this->crlf; //.strftime("%A %d %B %Y",$this->datum)
-	  		echo '<tr><td>'.$tagbez[$spracheLoad->index][$i].'<br>'.strftime("%e. %b %Y",$datum).'<br></td>'.$this->crlf; //.strftime("%A %d %B %Y",$this->datum)
-	  		for ($k=0; $k<$num_rows_stunde; $k++)
+			echo '<tr><td>'.$tagbez[$spracheLoad->index][$i].'<br>'.strftime("%e. %b %Y",$datum).'<br></td>'.$this->crlf;
+			for ($k=0; $k<$num_rows_stunde; $k++)
 			{
-
 				$row = $this->db_fetch_object($result_stunde, $k);
 				$j = $row->stunde;
 				// Stunde aufbereiten
@@ -702,20 +708,19 @@ class wochenplan extends basis_db
 						unset($lehrverband);
 					if (isset($lehrfach))
 						unset($lehrfach);
-					if(isset($anmerkung))
+					if (isset($anmerkung))
 						unset($anmerkung);
-					if(isset($titel_arr))
+					if (isset($titel_arr))
 						unset($titel_arr);
 					$reservierung=false;
 					foreach ($this->std_plan[$i][$j] as $lehrstunde)
 					{
-
 						$unr[]=$lehrstunde->unr;
 						// Lektoren
 						$lektor[]=$lehrstunde->lektor;
 						// Lehrverband
 						$typ='';
-						if($lehrstunde->reservierung)
+						if ($lehrstunde->reservierung)
 						{
 							$studiengang = new studiengang();
 							$studiengang->load($lehrstunde->stg_kz);
@@ -745,7 +750,7 @@ class wochenplan extends basis_db
 							$reservierung=$lehrstunde->reservierung;
 					}
 
-					if($gruppieren)
+					if ($gruppieren)
 					{
 						// Unterrichtsnummer (Kollision?)
 						$unr=array_unique($unr);
@@ -762,7 +767,6 @@ class wochenplan extends basis_db
 						}
 						else
 							$lkt='<BR />'.$lektor[0];
-						//echo $lkt;
 
 						// Lehrverband
 						if ($this->type!='verband')
@@ -788,7 +792,7 @@ class wochenplan extends basis_db
 						else
 							$lf=$lehrfach[0].'<BR />';
 
-						if(LVPLAN_ANMERKUNG_ANZEIGEN)
+						if (LVPLAN_ANMERKUNG_ANZEIGEN)
 						{
 							$anmerkung=array_unique($anmerkung);
 							sort($anmerkung);
@@ -826,20 +830,19 @@ class wochenplan extends basis_db
 						echo '&sem='.$this->sem;
 						echo '&ver='.$this->ver;
 						echo '&grp='.$this->grp;
-						echo '&ort_kurzbz='.$this->std_plan[$i][$j][0]->ort;		//.'">'
+						echo '&ort_kurzbz='.$this->std_plan[$i][$j][0]->ort;
 						echo "','Details', 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');return false;";
 						echo '" title="'.$this->convert_html_chars($titel).'" ';
 						echo ' href="#">';
 
 						// Ausgabe
-						//echo $lf;
 						echo mb_substr($lf, 0,-strlen('<BR />'));
 
-						if($titel!='' && !$reservierung)
+						if ($titel!='' && !$reservierung)
 						{
 							echo '<img src="../../../skin/images/sticky.png" tooltip="'.$this->convert_html_chars($titel).'"/>';
 						}
-						//echo '<BR />';
+
 						if ($this->type=='ort' || $this->type=='lektor' || $this->type=='verband')
 							echo $lvb;
 						if ($this->type!='lektor')
@@ -849,11 +852,6 @@ class wochenplan extends basis_db
 						if (LVPLAN_ANMERKUNG_ANZEIGEN)
 						{
 							echo $anm;
-/*							$anmerkung=array_unique($anmerkung);
-							foreach($anmerkung as $anm)
-								if($anm!='')
-									echo '<BR />'.$anm;
-							echo '<BR />anm'; */
 						}
 						echo '</A></DIV>'.$blink_aus.'</td>'.$this->crlf;
 					}
@@ -861,19 +859,11 @@ class wochenplan extends basis_db
 					{
 						// mehrere Einheiten innerhalb einer Stunde sollen getrennt aufgelistet werden
 						$uEinheiten=array();
-						for($n=0;$n<count($unr);$n++)
+						for ($n=0;$n<count($unr);$n++)
 						{
 							$unrIndex=$this->searchForId($unr[$n], $uEinheiten);
-							if($unrIndex===FALSE)
+							if ($unrIndex===false)
 							{
-								/*
-								if($unr[$n]=='51561')
-								{
-									echo "<br><br>N=$n";
-									echo "unr:".$unr[$n];
-									echo "Data:".print_r($uEinheiten,true);
-									echo "<br><br>";
-								}*/
 								$unrIndex=count($uEinheiten);
 								$uEinheiten[$unrIndex]['unr']=$unr[$n];
 								$uEinheiten[$unrIndex]['lehrfach']=$lehrfach[$n];
@@ -889,7 +879,7 @@ class wochenplan extends basis_db
 
 						// Ausgabe einer Stunde im Raster (HTML)
 						echo '				<td nowrap valign="top">';
-//						for($n=0;$n<count($uEinheiten);$n++)
+
 						foreach($uEinheiten as $key=>$uEinheit)
 						{
 							echo '<DIV align="center" ';
@@ -906,16 +896,15 @@ class wochenplan extends basis_db
 							echo '&sem='.$this->sem;
 							echo '&ver='.$this->ver;
 							echo '&grp='.$this->grp;
-							echo '&ort_kurzbz='.$uEinheit['ort'][0];		//.'">'
+							echo '&ort_kurzbz='.$uEinheit['ort'][0];
 							echo "','Details', 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');return false;";
 							echo '" title="'.$this->convert_html_chars($uEinheit['titel'][0]).'" ';
 							echo ' href="#">';
 
 							// Ausgabe
-							//echo $lf;
 							echo $uEinheit['lehrfach'];
 
-							if($uEinheit['titel'][0]!='' && !$reservierung)
+							if ($uEinheit['titel'][0]!='' && !$reservierung)
 							{
 								echo '<img src="../../../skin/images/sticky.png" tooltip="'.$this->convert_html_chars($uEinheit['titel'][0]).'"/>';
 							}
@@ -938,7 +927,7 @@ class wochenplan extends basis_db
 								foreach($uEinheit['ort'] as $ueOrt)
 									echo $ueOrt."<BR />";
 							}
-							if(LVPLAN_ANMERKUNG_ANZEIGEN)
+							if (LVPLAN_ANMERKUNG_ANZEIGEN)
 							{
 								$uEinheit['anmerkung']=array_unique($uEinheit['anmerkung']);
 								foreach($uEinheit['anmerkung'] as $ueAnmerkung)
@@ -957,7 +946,14 @@ class wochenplan extends basis_db
 					$datum_res_lektor_ende_m = date('Y-m-d', $datum_res_lektor_ende);
 					$datum_m = date('Y-m-d',$datum);
 					if ($raumres && $this->type=='ort' && ($datum_m>=$datum_res_lektor_start_m && $datum_m<=$datum_res_lektor_ende_m))
-						echo '<INPUT type="checkbox" name="reserve'.$i.'_'.$j.'" value="'.date("Y-m-d",$datum).'">'; //&& $datum>=$datum_now
+					{
+						// Wenn die Stunde bereits in der tbl_stundenplandev verplant ist
+						// darf die Stunde nicht reserviert werden
+						if(!isset($stundenplandev_belegt[$datum_m][$j]))
+							echo '<INPUT type="checkbox" name="reserve'.$i.'_'.$j.'" value="'.date("Y-m-d",$datum).'">';
+						else
+							echo $p->t('lvplan/reserviertInDev');
+					}
 					echo '</td>'.$this->crlf;
 				}
 			}
@@ -969,7 +965,7 @@ class wochenplan extends basis_db
 		{
 			$check_all_checkbox='';
 
-			echo '<table><tr><br>';
+			echo '<br><table><tr>';
 			echo '	<td>'.$p->t('global/titel').':</td><td><input onchange="if (this.value.length>0 && document.getElementById(\'beschreibung\').value.length<1) {document.getElementById(\'beschreibung\').value=document.getElementById(\'titel\').value;document.getElementById(\'beschreibung\').focus();};" type="text" id="titel"  name="titel" size="10" maxlength="10" value="" /></td> '.$this->crlf;
 			echo '	<td>'.$p->t('global/beschreibung').':</td><td colspan="6"> <input onchange="if (this.value.length<1 && document.getElementById(\'titel\').value.length>0) {alert(\'Achtung! Speichern nur mit Beschreibung moeglich!\');this.focus();};" type="text" id="beschreibung" name="beschreibung" size="20" maxlength="32" value=""  /> </td>'.$this->crlf;
 
@@ -977,7 +973,7 @@ class wochenplan extends basis_db
 			$rechte->getBerechtigungen($user_uid);
 
 			//Pruefen ob die erweiterte Reservierungsrechte vorhanden sind
-			if($rechte->isBerechtigt('lehre/reservierung', null, 'sui'))
+			if ($rechte->isBerechtigt('lehre/reservierung', null, 'sui'))
 			{
 				$check_all_checkbox='';
 				//Lektor
@@ -988,11 +984,11 @@ class wochenplan extends basis_db
 						WHERE aktiv=true
 						ORDER BY nachname, uid";
 
-				if($result = $this->db_query($qry))
+				if ($result = $this->db_query($qry))
 				{
-					while($row = $this->db_fetch_object($result))
+					while ($row = $this->db_fetch_object($result))
 					{
-						if($row->uid==$user_uid)
+						if ($row->uid==$user_uid)
 							$selected='selected="selected"';
 						else
 							$selected='';
@@ -1067,7 +1063,7 @@ class wochenplan extends basis_db
 
 				//Spezialgruppen aus den Studiengaengen mit erweiterten Reservierungsberechtigung holen
 				$stgs = $rechte->getStgKz('lehre/reservierung');
-				if(count($stgs)>0)
+				if (count($stgs)>0)
 				{
 					$in='';
 					foreach($stgs as $stg)
@@ -1076,9 +1072,9 @@ class wochenplan extends basis_db
 					}
 					$in = substr($in, 0, -1);
 					$qry = "SELECT * FROM public.tbl_gruppe WHERE studiengang_kz in($in) AND lehre=true AND sichtbar=true ORDER BY gruppe_kurzbz";
-					if($result = $this->db_query($qry))
+					if ($result = $this->db_query($qry))
 					{
-						while($row = $this->db_fetch_object($result))
+						while ($row = $this->db_fetch_object($result))
 						{
 							echo '<OPTION value="'.$row->gruppe_kurzbz.'">'.$row->gruppe_kurzbz.'</OPTION>'.$this->crlf;
 						}
@@ -1106,7 +1102,7 @@ class wochenplan extends basis_db
 		}
 		else
 		{
-			if($this->type=='ort')
+			if ($this->type=='ort')
 			{
 				echo '<table><tr><td><br>';
 				echo '<span style="color: orange">'.$p->t('lvplan/raumreservierungAufZeitraumEingeschraenkt',array(date("d.m.Y",$datum_res_lektor_start),date("d.m.Y",$datum_res_lektor_ende))).'</span>';
@@ -1123,25 +1119,24 @@ class wochenplan extends basis_db
 	 */
 	public function draw_week_xul($semesterplan, $uid, $wunsch=null, $ignore_kollision=false, $kollision_student=false, $max_kollision=0)
 	{
-		//echo $wunsch;
 		global $cfgStdBgcolor;
 		$count=0;
 		$berechtigung=new benutzerberechtigung();
 		$berechtigung->getBerechtigungen($uid);
 		// Stundentafel abfragen
 		$sql_query="SELECT * FROM lehre.tbl_stunde ORDER BY stunde";
-		if(!$this->db_query($sql_query))
+		if (!$this->db_query($sql_query))
 			$this->errormsg=$this->db_last_error();
 		$result_stunde = $this->db_result;
 		$num_rows_stunde=$this->db_num_rows($result_stunde);
 
 		// Kontext Menue
 		echo '<popupset>
-  				<menupopup id="stplPopupMenue">
-    				<menuitem label="Ressourcen zuordnen" oncommand="TimeTableWeekMarkiere(document.popupNode);BetriebsmittelZuordnen(document.popupNode);" />
+				<menupopup id="stplPopupMenue">
+					<menuitem label="Ressourcen zuordnen" oncommand="TimeTableWeekMarkiere(document.popupNode);BetriebsmittelZuordnen(document.popupNode);" />
 					<menuitem label="Raumvorschlag" oncommand="StplSearchRoom(document.popupNode);" />
-    				<menuitem label="Entfernen" oncommand="TimeTableWeekMarkiere(document.popupNode);TimetableDeleteEntries()" />
-  				</menupopup>
+					<menuitem label="Entfernen" oncommand="TimeTableWeekMarkiere(document.popupNode);TimetableDeleteEntries()" />
+				</menupopup>
 			</popupset>';
 
 		//Tabelle zeichnen
@@ -1169,7 +1164,7 @@ class wochenplan extends basis_db
 				pers_uid="'.$this->pers_uid.'"
 				kw="'.$this->kalenderwoche.'"
 				align="left">KW:'.$this->kalenderwoche.'</label>
-			</vbox>'.$this->crlf; //<html:br />Beginn<html:br />Ende
+			</vbox>'.$this->crlf;
 		$stunden_arr=array();
 		for ($i=0;$i<$num_rows_stunde; $i++)
 		{
@@ -1211,14 +1206,14 @@ class wochenplan extends basis_db
 				if (isset($wunsch[$i][$j]))
 				{
 					$index=$wunsch[$i][$j];
-					if($index==-3)
+					if ($index==-3)
 					{
 						//Wenn eine Zeitsperre eingetragen ist, dann diese im Tooltiptext anzeigen
 						$zeitsperre = new zeitsperre();
 						$zeitsperre->getSperreByDate($this->pers_uid, date('Y-m-d',$datum), $j);
 						foreach($zeitsperre->result as $sperren)
 						{
-							if($tooltip!='')
+							if ($tooltip!='')
 								$tooltip.=', ';
 							$tooltip.=$sperren->zeitsperretyp_kurzbz.' - '.$sperren->bezeichnung;
 						}
@@ -1231,7 +1226,7 @@ class wochenplan extends basis_db
 				$bgcolor=$cfgStdBgcolor[$index+3];
 
 				// Sonntag wie Ferien markieren
-				if($i==7)
+				if ($i==7)
 					$bgcolor='#FFFF55';
 
 				if ($isferien)
@@ -1241,22 +1236,22 @@ class wochenplan extends basis_db
 					//Wenn Ferien eingetragen sind, dann die Bezeichnung im Tooltiptext anzeigen
 					foreach($ferien->getFerien($datum) as $bezeichnung)
 					{
-						if($tooltip!='')
+						if ($tooltip!='')
 							$tooltip.=', ';
 						$tooltip .= $bezeichnung;
 					}
 				}
 				echo '<vbox class="stplweek_vbox" style="border:1px solid black; background-color:'.$bgcolor.'"';
-				if($tooltip!='')
+				if ($tooltip!='')
 				{
 					echo ' tooltiptext="'.$this->convert_html_chars($tooltip).'"';
 				}
 				echo '
 					ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
 					ondragover="nsDragAndDrop.dragOver(event,boardObserver)"
-		  			ondragenter="nsDragAndDrop.dragEnter(event,boardObserver)"
+					ondragenter="nsDragAndDrop.dragEnter(event,boardObserver)"
 					ondragexit="nsDragAndDrop.dragExit(event,boardObserver)"
-		  			datum="'.date("Y-m-d",$datum).'" stunde="'.$j.'"
+					datum="'.date("Y-m-d",$datum).'" stunde="'.$j.'"
 					stg_kz="'.$this->stg_kz.'" sem="'.$this->sem.'" ver="'.$this->ver.'"
 					grp="'.$this->grp.'" gruppe="'.$this->gruppe_kurzbz.'"
 					pers_uid="'.$this->pers_uid.'" stpltype="'.$this->type.'">';
@@ -1266,7 +1261,7 @@ class wochenplan extends basis_db
 					// Daten aufbereiten
 					if (isset($lvb))
 						unset($lvb);
-					//$lvb=array();
+
 					$kollision=-1;
 					unset($kollisionsmeldungen);
 					if (isset($a_unr))
@@ -1283,7 +1278,7 @@ class wochenplan extends basis_db
 					$a_unr=array_unique($a_unr);
 					$kollision+=count($a_unr);
 					//Kollisionspruefung Studentenebene
-					if($kollision_student=='true')
+					if ($kollision_student=='true')
 					{
 						$kollision=0;
 						$studiensemester = getStudiensemesterFromDatum(date('Y-m-d',$datum));
@@ -1309,7 +1304,7 @@ class wochenplan extends basis_db
 								GROUP BY datum, stunde, student_uid
 								HAVING count(student_uid)>1 ";
 
-								if(count($a_unr)>0)
+								if (count($a_unr)>0)
 								{
 									// Nur die Eintraege als kollision anzeigen, die auch aktuell im Tempus sichtbar sind
 									// Dazu werden die UNRs der betroffenen Studierenden zuerst ein ein Array gruppiert und danach
@@ -1321,9 +1316,9 @@ class wochenplan extends basis_db
 								}
 								$qry.="ORDER BY datum, stunde, student_uid LIMIT 1;";
 
-						if($stud_result = $this->db_query($qry))
+						if ($stud_result = $this->db_query($qry))
 						{
-							if($this->db_num_rows($stud_result)>0)
+							if ($this->db_num_rows($stud_result)>0)
 							{
 								$kollision++;
 								$stud_row = $this->db_fetch_object($stud_result);
@@ -1397,10 +1392,10 @@ class wochenplan extends basis_db
 						$stundenplan_ids=array();
 						$titel='';
 
-						if(isset($raumcheck))
+						if (isset($raumcheck))
 							unset($raumcheck);
 
-						if(isset($lktcheck))
+						if (isset($lktcheck))
 							unset($lktcheck);
 
 						foreach ($this->std_plan[$i][$j] as $lehrstunde)
@@ -1436,20 +1431,20 @@ class wochenplan extends basis_db
 								}
 								else
 								{
-									if(!in_array($lehrstunde->stundenplan_id, $stundenplan_ids))
+									if (!in_array($lehrstunde->stundenplan_id, $stundenplan_ids))
 									{
 										$paramList.='&amp;stundenplan_id'.$z++.'='.$lehrstunde->stundenplan_id;
 										$stundenplan_ids[]=$lehrstunde->stundenplan_id;
 									}
 								}
-								if(isset($lehrstunde->farbe) && $farbe=='')
+								if (isset($lehrstunde->farbe) && $farbe=='')
 									$farbe=$lehrstunde->farbe;
 								$titel.=htmlspecialchars($lehrstunde->titel);
 								$anmerkung=htmlspecialchars($lehrstunde->anmerkung);
 								$tooltip_anmerkung[]=$titel.' '.$anmerkung;
 							}
 
-							if(isset($raumcheck[$lehrstunde->ort]) && $raumcheck[$lehrstunde->ort]!=$lehrstunde->unr)
+							if (isset($raumcheck[$lehrstunde->ort]) && $raumcheck[$lehrstunde->ort]!=$lehrstunde->unr)
 							{
 								$kollision++;
 								$kollisionsmeldungen[$lehrstunde->unr][]=" Ort ".$lehrstunde->ort;
@@ -1458,9 +1453,9 @@ class wochenplan extends basis_db
 							else
 								$raumcheck[$lehrstunde->ort]=$lehrstunde->unr;
 
-							if(isset($lktcheck[$lehrstunde->lektor]) && $lktcheck[$lehrstunde->lektor]!=$lehrstunde->unr)
+							if (isset($lktcheck[$lehrstunde->lektor]) && $lktcheck[$lehrstunde->lektor]!=$lehrstunde->unr)
 							{
-								if(!in_array($lehrstunde->lektor_uid, unserialize(KOLLISIONSFREIE_USER)))
+								if (!in_array($lehrstunde->lektor_uid, unserialize(KOLLISIONSFREIE_USER)))
 								{
 									$kollision++;
 									$kollisionsmeldungen[$lehrstunde->unr][]=" LektorIn ".$lehrstunde->lektor; //." ".$lehrstunde->unr."!=".$lktcheck[$lehrstunde->lektor];
@@ -1471,7 +1466,6 @@ class wochenplan extends basis_db
 								$lktcheck[$lehrstunde->lektor]=$lehrstunde->unr;
 						}
 						// Lektoren
-						//if ($this->type!='lektor')
 						$lektor=array_unique($lektor);
 						sort($lektor);
 						$lkt='';
@@ -1479,7 +1473,6 @@ class wochenplan extends basis_db
 							$lkt.=$l.'<html:br />';
 
 						// Lehrverband
-						//if ($this->type!='verband')
 						$lehrverband=array_unique($lehrverband);
 						sort($lehrverband);
 						$lvb='';
@@ -1487,7 +1480,6 @@ class wochenplan extends basis_db
 							$lvb.=$l.'<html:br />';
 
 						// Lehrfach
-						//if ($this->type=='verband')
 						$lehrfach=array_unique($lehrfach);
 						sort($lehrfach);
 						$lf='';
@@ -1495,8 +1487,6 @@ class wochenplan extends basis_db
 							$lf.=$l.'<html:br />';
 
 						// Ort
-						//if ($this->type=='verband')
-
 						$ort=array_unique($ort);
 						sort($ort);
 						$orte='';
@@ -1519,9 +1509,9 @@ class wochenplan extends basis_db
 
 						// Blinken oder nicht ?
 						if (isset($kollisionsmeldungen[$unr])
-					    || (isset($kollisionsmeldung) && count($kollisionsmeldungen, COUNT_RECURSIVE)==0 && $kollision>0))
+						|| (isset($kollisionsmeldung) && count($kollisionsmeldungen, COUNT_RECURSIVE)==0 && $kollision>0))
 						{
-							$blink_ein='<html:blink>';// .$kollision;
+							$blink_ein='<html:blink>';
 							$blink_aus='</html:blink>';
 						}
 						else
@@ -1535,7 +1525,7 @@ class wochenplan extends basis_db
 						$tooltip_anmerkung = array_unique($tooltip_anmerkung);
 						$tooltip_gesamt = '('.$updatevonam.') '.implode(',',$tooltip_anmerkung);
 
-						if(isset($kollisionsmeldungen[$unr]))
+						if (isset($kollisionsmeldungen[$unr]))
 							$tooltip_gesamt .= ' Kollision wegen:'.implode(',',array_unique($kollisionsmeldungen[$unr]));
 
 						// Ausgabe
@@ -1547,9 +1537,9 @@ class wochenplan extends basis_db
 							echo ' context="stplPopupMenue" ';
 						if ($berechtigung->isBerechtigt('lehre/lvplan',$stg_obj->oe_kurzbz,'u'))
 							echo 'ondraggesture="nsDragAndDrop.startDrag(event,listObserver)" ';
-						//onclick="return onStplSearchRoom(event, event.target);"
+
 						$button_orte = $this->ort_kurzbz;
-						if($button_orte=='')
+						if ($button_orte=='')
 							$button_orte=$ort[0];
 						echo 'ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
 							ondragover="nsDragAndDrop.dragOver(event,boardObserver)"
@@ -1567,18 +1557,18 @@ class wochenplan extends basis_db
 
 						echo '<label align="center">'.$blink_ein;
 						$count++;
-						//echo $lf;
+
 						echo mb_substr($lf, 0,-strlen('<html:br />'));
-						if($titel!='' && !$reservierung)
+						if ($titel!='' && !$reservierung)
 						{
 							echo '<image src="../../skin/images/sticky.png" tooltip="'.$titel.'"/>';
 						}
 
 						// Zugeteilte Ressourcen Anzeigen
 						$betriebsmittel = new betriebsmittel();
-						if($betriebsmittel->getBetriebsmittelStundenplan($stundenplan_ids))
+						if ($betriebsmittel->getBetriebsmittelStundenplan($stundenplan_ids))
 						{
-							if(count($betriebsmittel->result)>0)
+							if (count($betriebsmittel->result)>0)
 							{
 								$ressourceinfo='';
 								foreach($betriebsmittel->result as $row)
@@ -1594,7 +1584,7 @@ class wochenplan extends basis_db
 						if ($this->type!='ort')
 							echo $orte;
 
-						if(LVPLAN_ANMERKUNG_ANZEIGEN)
+						if (LVPLAN_ANMERKUNG_ANZEIGEN)
 							echo $anmerkung;
 
 						echo $blink_aus;
@@ -1617,13 +1607,13 @@ class wochenplan extends basis_db
 
 					foreach ($this->std_plan[$i][$j][0]->frei_orte as $f_ort=>$anzahl)
 					{
-						if($anzahl<=$max_kollision)
+						if ($anzahl<=$max_kollision)
 						{
 							echo '<label value="'.$f_ort.($anzahl>0?' ('.$anzahl.')':'').'"
 								styleOrig=""
 								ondragenter="nsDragAndDrop.dragEnter(event,boardObserver)"
 								ondragexit="nsDragAndDrop.dragExit(event,boardObserver)"
-			  					ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
+								ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
 								datum="'.date("Y-m-d",$datum).'" stunde="'.$j.'"
 								stg_kz="'.$this->stg_kz.'" sem="'.$this->sem.'" ver="'.$this->ver.'"
 								grp="'.$this->grp.'" gruppe="'.$this->gruppe_kurzbz.'"
@@ -1634,7 +1624,7 @@ class wochenplan extends basis_db
 					}
 				}
 
-				if(defined('TEMPUS_TAGESINFO_FORMAT'))
+				if (defined('TEMPUS_TAGESINFO_FORMAT'))
 					$tagesinfo = TEMPUS_TAGESINFO_FORMAT;
 				else
 					$tagesinfo = '%t %s';
@@ -1656,7 +1646,7 @@ class wochenplan extends basis_db
 			echo '<vbox>
 				<label align="center">Stunde</label>
 				<label align="left" class="kalenderwoche">KW:'.$this->kalenderwoche.'</label>
-				</vbox>'.$this->crlf; //<html:br />Beginn<html:br />Ende
+				</vbox>'.$this->crlf;
 			for ($i=0;$i<$num_rows_stunde; $i++)
 			{
 				$row=$this->db_fetch_object($result_stunde,$i);
@@ -1673,8 +1663,6 @@ class wochenplan extends basis_db
 		echo '</rows>';
 		echo '</grid>';
 	}
-
-
 
 	/**
 	 * Funktion load_stpl_search sucht Vorschlag fuer Stundenverschiebung
@@ -1699,8 +1687,8 @@ class wochenplan extends basis_db
 		$this->datum_begin=date("Y-m-d",$this->datum_begin);
 		$this->datum_end=date("Y-m-d",$this->datum_end);
 		// Stundentafel abfragen
-		$sql_query='SELECT min(stunde),max(stunde)FROM lehre.tbl_stunde';
-		if(!$this->db_query($sql_query))
+		$sql_query='SELECT min(stunde),max(stunde) FROM lehre.tbl_stunde';
+		if (!$this->db_query($sql_query))
 			die($this->db_last_error());
 		$row = $this->db_fetch_object();
 		$min_stunde=$row->min;
@@ -1712,8 +1700,8 @@ class wochenplan extends basis_db
 			$stplids.=" OR $stpl_view_id=$id";
 		$stplids=mb_substr($stplids,3);
 		$sql_query.=$stplids;
-		//echo $sql_query;
-		if(!$this->db_query($sql_query))
+
+		if (!$this->db_query($sql_query))
 			die($this->db_last_error());
 		$num_rows_stpl=$this->db_num_rows();
 		// Daten aufbereiten
@@ -1721,14 +1709,11 @@ class wochenplan extends basis_db
 		for ($i=0;$i<$num_rows_stpl;$i++)
 		{
 			$row=$this->db_fetch_object(null,$i);
-			//$block=$row->stundenblockung;
-			//$raumtyp[$i]=$row->raumtyp;
-			//$raumtypalt[$i]=$row->raumtypalternativ;
 			if ($row->gruppe_kurzbz!=null)
 				$gruppe[]=$row->gruppe_kurzbz;
 			else
 				$gruppe[]='';
-			if(!isset($lehrverband[$i]))
+			if (!isset($lehrverband[$i]))
 				$lehrverband[$i]= new stdClass();
 			$lehrverband[$i]->stg_kz=$row->studiengang_kz;
 			$lehrverband[$i]->sem=$row->semester;
@@ -1738,13 +1723,13 @@ class wochenplan extends basis_db
 			$lektor[$i]=$row->uid;
 			$unr=$row->unr;
 		}
-		if($leids!='')
+		if ($leids!='')
 		{
 			// Raumtypen
 			$leids = mb_substr($leids, 0, mb_strlen($leids)-1);
 			$qry = "SELECT raumtyp, raumtypalternativ FROM lehre.tbl_lehreinheit WHERE lehreinheit_id IN ($leids)";
-			if($this->db_query($qry)){
-				while($row = $this->db_fetch_object())
+			if ($this->db_query($qry)){
+				while ($row = $this->db_fetch_object())
 				{
 					$raumtyp[]=$row->raumtyp;
 					$raumtyp[]=$row->raumtypalternativ;
@@ -1768,9 +1753,6 @@ class wochenplan extends basis_db
 		foreach ($gruppe as $g)
 			if ($g!='')
 				$gruppen.=" OR gruppe_kurzbz=".$this->db_add_param($g);
-		//$gruppen=mb_substr($gruppen,3);
-		//Lehrverband
-		//$lehrverband=array_unique($lehrverband);
 		$lvb='';
 		foreach ($lehrverband as $l)
 		{
@@ -1781,20 +1763,16 @@ class wochenplan extends basis_db
 				if ($l->grp!='' && $l->grp!=' ' && $l->grp!=null)
 					$lvb.=" AND (gruppe=".$this->db_add_param($l->grp)." OR gruppe IS NULL OR gruppe='')";
 			}
-			//if ($gruppen!='')
-			//	$lvb.=' AND gruppe_kurzbz IS NULL';
 			$lvb.=')';
 		}
 		$lvb=mb_substr($lvb,3);
-		//if($rtype=='')
-		//	$rtype='1=1';
 		// Raeume die in Frage kommen, aufgrund der Raumtypen
 		$sql_query="SELECT DISTINCT ort_kurzbz, hierarchie FROM public.tbl_ort
 			JOIN public.tbl_ortraumtyp USING (ort_kurzbz) WHERE ($rtype) AND aktiv AND ort_kurzbz NOT LIKE '\\\\_%' ORDER BY hierarchie,ort_kurzbz";
 
-		if(!$this->db_query($sql_query))
+		if (!$this->db_query($sql_query))
 			die($this->db_last_error());
-		while($row = $this->db_fetch_object())
+		while ($row = $this->db_fetch_object())
 			$orte[]=$row->ort_kurzbz;
 
 		// Raster vorbereiten
@@ -1810,10 +1788,10 @@ class wochenplan extends basis_db
 		$sql_query="SELECT DISTINCT datum, stunde FROM $stpl_view
 			WHERE datum>=".$this->db_add_param($this->datum_begin)." AND datum<".$this->db_add_param($this->datum_end)." AND
 			($lkt $gruppen OR ($lvb) ) AND unr!=".$this->db_add_param($unr);
-		//echo $sql_query;
-		if(!$this->db_query($sql_query))
+
+		if (!$this->db_query($sql_query))
 			die($this->db_last_error());
-		while($row = $this->db_fetch_object())
+		while ($row = $this->db_fetch_object())
 		{
 			$mtag=mb_substr($row->datum, 8,2);
 			$month=mb_substr($row->datum, 5,2);
@@ -1825,16 +1803,15 @@ class wochenplan extends basis_db
 		// Stundenplanabfrage bauen (Wo ist besetzt?)
 		$sql_query="SELECT DISTINCT datum, stunde, ort_kurzbz FROM $stpl_view
 			WHERE datum>=".$this->db_add_param($this->datum_begin)." AND datum<".$this->db_add_param($this->datum_end)." AND unr!=".$this->db_add_param($unr);
-		//echo $sql_query; NATURAL JOIN tbl_ortraumtyp AND ($rtype) "
 
 		// Reservierungen beruecksichtigen
 		$sql_query.=" UNION SELECT DISTINCT datum, stunde, ort_kurzbz FROM campus.tbl_reservierung
 			WHERE datum>=".$this->db_add_param($this->datum_begin)." AND datum<".$this->db_add_param($this->datum_end)." ";
 
-		if(!$this->db_query($sql_query))
+		if (!$this->db_query($sql_query))
 			die($this->db_last_error());
 
-		while($row = $this->db_fetch_object())
+		while ($row = $this->db_fetch_object())
 		{
 			$mtag=mb_substr($row->datum, 8,2);
 			$month=mb_substr($row->datum, 5,2);
@@ -1859,12 +1836,12 @@ class wochenplan extends basis_db
 					// Besetzte Raueme eintragen
 					foreach($raster[$t][$s]->ort as $ort)
 					{
-						if(in_array($ort, $orte))
+						if (in_array($ort, $orte))
 							$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
 					}
 
 					// Gruppenkollision eintragen
-					if($raster[$t][$s]->kollision)
+					if ($raster[$t][$s]->kollision)
 					{
 						foreach($this->std_plan[$t][$s][0]->frei_orte as $ort=>$value)
 						{
@@ -1875,12 +1852,12 @@ class wochenplan extends basis_db
 					// Blockung beruecksichtigen
 					for ($b=1;$b<$block && ($s+$block)<=($max_stunde+1);$b++)
 					{
-						if(!$raster[$t][$s+$b]->kollision)
+						if (!$raster[$t][$s+$b]->kollision)
 						{
 							//Wenn keine Gruppenkollision vorhanden ist, nur die Raumkollision eintragen
 							foreach($raster[$t][$s+$b]->ort as $ort)
 							{
-								if(in_array($ort, $orte))
+								if (in_array($ort, $orte))
 									$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
 							}
 						}
@@ -1929,7 +1906,7 @@ class wochenplan extends basis_db
 		$this->datum_end=date("Y-m-d",$this->datum_end);
 		// Stundentafel abfragen
 		$sql_query='SELECT min(stunde),max(stunde) FROM lehre.tbl_stunde';
-		if(!$this->db_query($sql_query))
+		if (!$this->db_query($sql_query))
 			die($this->db_last_error());
 		$row = $this->db_fetch_object();
 		$min_stunde=$row->min;
@@ -1942,13 +1919,11 @@ class wochenplan extends basis_db
 			$lvas.=" OR lehreinheit_id=".$this->db_add_param($id);
 		$lvas=mb_substr($lvas,3);
 		$sql_query.=$lvas;
-		//$this->errormsg.=$sql_query;
-		//return false;
-		if(!$this->db_query($sql_query))
+
+		if (!$this->db_query($sql_query))
 			die($this->db_last_error());
 		$num_rows_lva=$this->db_num_rows();
-		// Arrays setzen
-		//$wochenrythmus=array();
+
 		$verplant=array();
 		$block=array();
 		$semesterstunden=array();
@@ -1975,42 +1950,19 @@ class wochenplan extends basis_db
 			$block[$i]=$row->stundenblockung;
 			$wochenrythmus[$i]=$row->wochenrythmus;
 			$semesterstunden[$i]=(integer)$row->semesterstunden;
-			//$this->errormsg.='SS:'.$semesterstunden[$i];
 		}
-		/*// verplante Stunden eindeutig?
-		$verpl=$verplant[0];
-		$verplant=array_unique($verplant);
-		if (count($verplant)==1)
-			$verplant=$verpl; //verplant[0];
-		else
-		{
-			$this->errormsg.='Verplante Stunden sind nicht eindeutig!';
-			return false;
-		}
-		//$this->errormsg.='Verplant:'.$verplant;
-		// Semesterstunden eindeutig?
-		$semstd=$semesterstunden[0];
-		$semesterstunden=array_unique($semesterstunden);
-		//$this->errormsg.='SS:'.$semesterstunden[0];
-		if (count($semesterstunden)==1)
-			$semesterstunden=$semstd;//semesterstunden[0];
-		else
-		{
-			$this->errormsg.='Semesterstunden sind nicht eindeutig!';
-			return false;
-		}
-		//$this->errormsg.='SS:'.$semesterstunden;*/
+
 		// Blockung eindeutig?
 		$blck=$block[0];
 		$block=array_unique($block);
 		if (count($block)==1)
-			$block=$blck; //block[0];
+			$block=$blck;
 		else
 		{
 			$this->errormsg.='Blockung ist nicht eindeutig!';
 			return false;
 		}
-		//$this->errormsg.='Block:'.$block;
+
 		// Offene Stunden eindeutig?
 		$os=$offenestunden[0];
 		$offenestunden=array_unique($offenestunden);
@@ -2023,6 +1975,7 @@ class wochenplan extends basis_db
 			$this->errormsg.='Offene Stunden sind nicht eindeutig!';
 			return false;
 		}
+
 		// Wochenrythmus eindeutig?
 		$wr=$wochenrythmus[0];
 		$wochenrythmus=array_unique($wochenrythmus);
@@ -2050,6 +2003,7 @@ class wochenplan extends basis_db
 		$lkt=mb_substr($lkt,3);
 		//Dummy Lektor kollidiert nicht
 		$lkt='(('.$lkt.') AND mitarbeiter_uid not in ('.$this->db_implode4SQL(unserialize(KOLLISIONSFREIE_USER)).'))';
+
 		// Gruppen
 		$gruppen='';
 		if (isset($gruppe))
@@ -2057,10 +2011,9 @@ class wochenplan extends basis_db
 			$gruppe=array_unique($gruppe);
 			foreach ($gruppe as $g)
 				$gruppen.=" OR gruppe_kurzbz=".$this->db_add_param($g);
-			//$gruppen=mb_substr($gruppen,3);
 		}
+
 		//Lehrverband
-		//$lehrverband=array_unique($lehrverband);
 		$lvb='';
 		foreach ($lehrverband as $l)
 		{
@@ -2079,8 +2032,8 @@ class wochenplan extends basis_db
 		// Raeume die in Frage kommen aufgrund der Raumtypen
 		$sql_query="SELECT DISTINCT ort_kurzbz, hierarchie FROM public.tbl_ort
 			JOIN public.tbl_ortraumtyp USING (ort_kurzbz) WHERE ($rtype) AND aktiv AND ort_kurzbz NOT LIKE '\\\\_%' ORDER BY hierarchie,ort_kurzbz"; //
-		//die($sql_query);
-		if(!$this->db_query($sql_query))
+
+		if (!$this->db_query($sql_query))
 		{
 			$this->errormsg=$this->db_last_error();
 			return false;
@@ -2132,20 +2085,20 @@ class wochenplan extends basis_db
 			if (is_numeric($unr))
 				$sql_query.=" AND unr!=".$this->db_add_param($unr);
 
-			if(!$this->db_query($sql_query))
+			if (!$this->db_query($sql_query))
 			{
 				$this->errormsg = $this->db_last_error().$sql_query;
 				return false;
 			}
 
 			// Kollisionen ins Raster eintragen
-			while($row = $this->db_fetch_object())
+			while ($row = $this->db_fetch_object())
 			{
 				$mtag=mb_substr($row->datum, 8,2);
 				$month=mb_substr($row->datum, 5,2);
 				$jahr=mb_substr($row->datum, 0,4);
 				$tag=date("w",mktime(12,0,0,$month,$mtag,$jahr));
-				if(!isset($raster[$tag][$row->stunde]))
+				if (!isset($raster[$tag][$row->stunde]))
 					$raster[$tag][$row->stunde]=new stdClass();
 				$raster[$tag][$row->stunde]->kollision=true;
 			}
@@ -2162,13 +2115,13 @@ class wochenplan extends basis_db
 			$sql_query.=" UNION SELECT distinct datum, stunde, ort_kurzbz FROM campus.tbl_reservierung
 						WHERE datum>=".$this->db_add_param($datum_begin)." AND datum<".$this->db_add_param($datum_end);
 
-			if(!$this->db_query($sql_query))
+			if (!$this->db_query($sql_query))
 			{
 				$this->errormsg = $this->db_last_error().$sql_query;
 				return false;
 			}
 
-			while($row = $this->db_fetch_object())
+			while ($row = $this->db_fetch_object())
 			{
 				$mtag=mb_substr($row->datum, 8,2);
 				$month=mb_substr($row->datum, 5,2);
@@ -2188,7 +2141,7 @@ class wochenplan extends basis_db
 					//Blockung passt in die Maximalstundenanzahl
 					if (($s+$blck)<=($max_stunde+1))
 					{
-						if($count==0)
+						if ($count==0)
 						{
 							// Freie Orte beim 1. Durchlauf zuteilen
 							foreach($orte as $ort)
@@ -2198,18 +2151,18 @@ class wochenplan extends basis_db
 						// Besetzte Orte eintragen
 						foreach ($raster[$t][$s]->ort as $ort)
 						{
-							if(in_array($ort, $orte))
+							if (in_array($ort, $orte))
 								$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
 						}
 
 						//Kollision mit Gruppe
-						if($raster[$t][$s]->kollision)
+						if ($raster[$t][$s]->kollision)
 						{
-							if(isset($this->std_plan[$t][$s][0]->frei_orte))
+							if (isset($this->std_plan[$t][$s][0]->frei_orte))
 							{
 								foreach ($this->std_plan[$t][$s][0]->frei_orte as $ort=>$value)
 								{
-									if(in_array($ort, $orte))
+									if (in_array($ort, $orte))
 										$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
 								}
 							}
@@ -2223,13 +2176,13 @@ class wochenplan extends basis_db
 								// Wenn keine Gruppenkollision vorhanden ist, dann die kollidierenden Raeume eintragen
 								foreach ($raster[$t][$s+$b]->ort as $ort)
 								{
-									if(in_array($ort, $orte))
+									if (in_array($ort, $orte))
 										$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
 								}
 							}
 							else
 							{
-								if(isset($this->std_plan[$t][$s][0]->frei_orte))
+								if (isset($this->std_plan[$t][$s][0]->frei_orte))
 								{
 									// Bei Gruppenkollision den Wert bei allen Raumen erhoehen
 									foreach ($this->std_plan[$t][$s][0]->frei_orte as $ort=>$value)
@@ -2256,7 +2209,7 @@ class wochenplan extends basis_db
 			$datum_begin=date("Y-m-d",$datum_begin);
 			$datum_end=date("Y-m-d",$datum_end);
 			$count++;
-		} while($type=='lva_multi_search' && $rest>0);
+		} while ($type=='lva_multi_search' && $rest>0);
 		return true;
 	}
 
@@ -2278,7 +2231,7 @@ class wochenplan extends basis_db
 			$blocked=array();
 			$gruppiert=array();
 
-  			for ($k=0; $k<$num_rows_stunde; $k++)
+			for ($k=0; $k<$num_rows_stunde; $k++)
 			{
 				$row = $this->db_fetch_object($this->stunde, $k);
 				$j=$row->stunde;  // get id of hour
@@ -2319,7 +2272,7 @@ class wochenplan extends basis_db
 						$lehrverband[]=$lvb;
 						// Lehrfach
 						$lf=$lehrstunde->lehrfach;
-						//echo "\n!!!!Lehrfach $lf\n";
+
 						if (isset($lehrstunde->lehrform))
 							$lf.='-'.$lehrstunde->lehrform;
 						$lehrfach[]=$lf;
@@ -2329,7 +2282,7 @@ class wochenplan extends basis_db
 
 					// Unterrichtsnummer (Kollision?)
 					$unr=array_unique($unr);
-					if(!isset($kollision))
+					if (!isset($kollision))
 						$kollision=0;
 					$kollision+=count($unr);
 
@@ -2344,13 +2297,10 @@ class wochenplan extends basis_db
 					}
 					else
 						$lkt=$lektor[0];
-					//echo $lkt;
 
 					// Lehrverband
 					if ($this->type!='verband')
 					{
-//						$lehrverband=array_unique($lehrverband);
-//						sort($lehrverband);
 						$lvb='';
 						foreach ($lehrverband as $l)
 							$lvb.=$l.' ';
@@ -2361,9 +2311,9 @@ class wochenplan extends basis_db
 					$row = $this->db_fetch_object($this->stunde, $k);
 					$start_time=$row->beginn;
 
-					for($idx=0;$idx<count($this->std_plan[$i][$j]);$idx++)
+					for ($idx=0;$idx<count($this->std_plan[$i][$j]);$idx++)
 					{
-						if(!isset($this->std_plan[$i][$j][$idx]))
+						if (!isset($this->std_plan[$i][$j][$idx]))
 						{
 							continue;
 						}
@@ -2379,7 +2329,7 @@ class wochenplan extends basis_db
 						 * Es wird nur der erste Eintrag ausgegeben. Die restlichen werden uebersprungen da
 						 * die Lektoren, Gruppen und Raeume bereits zum Ersten Eintrag hinzugefuegt wurden.
 						 */
-						if(isset($gruppiert[$this->std_plan[$i][$j][$idx]->unr]) && $gruppiert[$this->std_plan[$i][$j][$idx]->unr]>0)
+						if (isset($gruppiert[$this->std_plan[$i][$j][$idx]->unr]) && $gruppiert[$this->std_plan[$i][$j][$idx]->unr]>0)
 						{
 							$gruppiert[$this->std_plan[$i][$j][$idx]->unr]--;
 							continue;
@@ -2394,18 +2344,18 @@ class wochenplan extends basis_db
 						 * ermittelt und dann ebenfalls uebersprungen
 						 */
 						$blockcontinue=false;
-						if(isset($blocked[$this->std_plan[$i][$j][$idx]->unr]) && $blocked[$this->std_plan[$i][$j][$idx]->unr]>0)
+						if (isset($blocked[$this->std_plan[$i][$j][$idx]->unr]) && $blocked[$this->std_plan[$i][$j][$idx]->unr]>0)
 						{
 							$blocked[$this->std_plan[$i][$j][$idx]->unr]--;
 							$blockcontinue=true;
 						}
 
-						if(!$blockcontinue)
+						if (!$blockcontinue)
 						{
 							// Blockungen ueber mehrere Stunden erkennen
 
 							$blockflag=false;
-							for($blockstunden=1;$blockstunden<=$num_rows_stunde;$blockstunden++)
+							for ($blockstunden=1;$blockstunden<=$num_rows_stunde;$blockstunden++)
 							{
 								if (isset($this->std_plan[$i][$j+$blockstunden][$idx]) && isset($this->std_plan[$i][$j+$blockstunden][$idx]->stundenplan_id)
 									&& ($this->std_plan[$i][$j][$idx]->unr == $this->std_plan[$i][$j+$blockstunden][$idx]->unr)
@@ -2413,7 +2363,7 @@ class wochenplan extends basis_db
 									&& !($this->std_plan[$i][$j][$idx]->reservierung && $this->std_plan[$i][$j][$idx]->lektor!=$this->std_plan[$i][$j+$blockstunden][$idx]->lektor))
 								{
 
-									if(isset($blocked[$this->std_plan[$i][$j][$idx]->unr]))
+									if (isset($blocked[$this->std_plan[$i][$j][$idx]->unr]))
 										$blocked[$this->std_plan[$i][$j][$idx]->unr]++;
 									else
 										$blocked[$this->std_plan[$i][$j][$idx]->unr]=1;
@@ -2424,7 +2374,7 @@ class wochenplan extends basis_db
 								}
 								else
 								{
-									if(!$blockflag)
+									if (!$blockflag)
 									{
 										$row = $this->db_fetch_object($this->stunde, $k);
 										$stunden_arr[]=$row->stunde;
@@ -2441,13 +2391,13 @@ class wochenplan extends basis_db
 
 						//Wenn im selben Raum mehrere Lektoren sind bzw mehrere Gruppen
 						//dann werden diese zusammengruppiert und als ein Eintrag angezeigt
-						for($idx1=0;$idx1<count($this->std_plan[$i][$j]);$idx1++)
+						for ($idx1=0;$idx1<count($this->std_plan[$i][$j]);$idx1++)
 						{
-							if($idx!=$idx1)
+							if ($idx!=$idx1)
 							{
-								if($this->kannGruppieren($i,$j,$idx,$idx1))
+								if ($this->kannGruppieren($i,$j,$idx,$idx1))
 								{
-									if(isset($gruppiert[$this->std_plan[$i][$j][$idx]->unr]))
+									if (isset($gruppiert[$this->std_plan[$i][$j][$idx]->unr]))
 										$gruppiert[$this->std_plan[$i][$j][$idx]->unr]++;
 									else
 										$gruppiert[$this->std_plan[$i][$j][$idx]->unr]=1;
@@ -2455,21 +2405,21 @@ class wochenplan extends basis_db
 									//Bezeichnungen zusammenfuehren
 
 									//Lektoren
-									if(!mb_strstr($this->std_plan[$i][$j][$idx1]->lektor,$this->std_plan[$i][$j][$idx]->lektor))
+									if (!mb_strstr($this->std_plan[$i][$j][$idx1]->lektor,$this->std_plan[$i][$j][$idx]->lektor))
 									{
 										$this->std_plan[$i][$j][$idx]->lektor.=' / '.$this->std_plan[$i][$j][$idx1]->lektor;
 									}
 
 									//Ort
-									if(!mb_strstr($this->std_plan[$i][$j][$idx1]->ort,$this->std_plan[$i][$j][$idx]->ort))
+									if (!mb_strstr($this->std_plan[$i][$j][$idx1]->ort,$this->std_plan[$i][$j][$idx]->ort))
 									{
 										$this->std_plan[$i][$j][$idx]->ort.=' / '.$this->std_plan[$i][$j][$idx1]->ort;
 									}
 
 									//Gruppen
-									if(isset($lehrverband[$idx]) && isset($lehrverband[$idx1]))
+									if (isset($lehrverband[$idx]) && isset($lehrverband[$idx1]))
 									{
-										if(!mb_strstr($lehrverband[$idx], $lehrverband[$idx1]))
+										if (!mb_strstr($lehrverband[$idx], $lehrverband[$idx1]))
 											$lehrverband[$idx].=' / '.$lehrverband[$idx1];
 									}
 								}
@@ -2477,14 +2427,14 @@ class wochenplan extends basis_db
 						}
 
 						//Geblockte Eintraege werden uebersprungen nachdem die Gruppierung ermittelt wurde
-						if($blockcontinue)
+						if ($blockcontinue)
 						{
 							continue;
 						}
 
 						$start_date=date("d.m.Y",$this->datum);
 						$end_date=$start_date;
-						if(isset($lehrverband[$idx]))
+						if (isset($lehrverband[$idx]))
 							$lvb = $lehrverband[$idx];
 						if ($target=='outlook')
 						{
@@ -2596,7 +2546,7 @@ class wochenplan extends basis_db
 			}
 			$this->datum=jump_day($this->datum, 1);
 		}
-		if($target=='return')
+		if ($target=='return')
 			return $return;
 		else
 			return true;
@@ -2614,8 +2564,8 @@ class wochenplan extends basis_db
 	 */
 	protected function kannGruppieren($tag, $stunde, $idx, $idx1)
 	{
-		if(isset($this->std_plan[$tag][$stunde][$idx]) &&
-		   isset($this->std_plan[$tag][$stunde][$idx1]))
+		if (isset($this->std_plan[$tag][$stunde][$idx]) &&
+			isset($this->std_plan[$tag][$stunde][$idx1]))
 		{
 			$unr1 = $this->std_plan[$tag][$stunde][$idx]->unr;
 			$unr2 = $this->std_plan[$tag][$stunde][$idx1]->unr;
@@ -2624,7 +2574,7 @@ class wochenplan extends basis_db
 			$lektor1 = $this->std_plan[$tag][$stunde][$idx]->lektor;
 			$lektor2 = $this->std_plan[$tag][$stunde][$idx1]->lektor;
 
-			if($unr1==$unr2 && ($ort1==$ort2 || $lektor1==$lektor2)
+			if ($unr1==$unr2 && ($ort1==$ort2 || $lektor1==$lektor2)
 				&& !$this->std_plan[$tag][$stunde][$idx]->reservierung && !$this->std_plan[$tag][$stunde][$idx1]->reservierung)
 				return true;
 			else
@@ -2636,14 +2586,14 @@ class wochenplan extends basis_db
 
 	protected function searchForId($id, $array)
 	{
-	   foreach ($array as $key => $val)
-	   {
-		   if ($val['unr'] == $id)
-		   {
-		       return $key;
-		   }
-	   }
-	   return false;
+		foreach ($array as $key => $val)
+		{
+			if ($val['unr'] == $id)
+			{
+				return $key;
+			}
+		}
+		return false;
 	}
 
 	/**

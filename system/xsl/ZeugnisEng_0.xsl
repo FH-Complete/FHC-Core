@@ -549,10 +549,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     </table:table-cell>
     <table:table-cell table:style-name="Tabelle1.B2" office:value-type="string">
         <text:p text:style-name="P9">
-        <xsl:if test="sws=''">
+        <xsl:if test="sws_lv=''">
 			<xsl:text>-</xsl:text>
 		</xsl:if>
-		<xsl:value-of select="sws"/>
+		<xsl:value-of select="sws_lv"/>
         </text:p>
     </table:table-cell>
     <table:table-cell table:style-name="Tabelle1.C2" office:value-type="string">
@@ -649,7 +649,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     </table:table-cell>
     <table:table-cell table:style-name="Tabelle1.B8" office:value-type="string">
         <text:p text:style-name="P13">
-        	<xsl:value-of select="sws"/>
+        	<xsl:value-of select="sws_lv"/>
 		</text:p>
     </table:table-cell>
     <table:table-cell table:style-name="Tabelle1.C8" office:value-type="string">

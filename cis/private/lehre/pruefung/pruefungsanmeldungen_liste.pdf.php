@@ -135,7 +135,12 @@ if(!empty($anmeldungen))
 			$date =  $datum->formatDatum($prfTermin->von,"d.m.Y - H:i");
 			$count++;
 		}
-		$date = $datum->formatDatum($prfTermin->von,"d.m.Y");
+		// Es soll das Datum der Anmeldung angezeigt werden
+        if ($anmeldung->datum_anmeldung)
+            $date = $datum->formatDatum($anmeldung->datum_anmeldung, "d.m.Y");
+        else
+            $date = '';
+
 		$data[] = array('student'=>array(
 								'count' => $count,
 								'vorname' => $student->vorname,

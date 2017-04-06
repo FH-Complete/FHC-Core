@@ -2916,7 +2916,7 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
       </table:table-cell>
       <table:table-cell table:style-name="Table12.D5" office:value-type="string">
         <text:p text:style-name="P65">
-          <xsl:value-of select="sws"/>
+          <xsl:value-of select="sws_lv"/>
         </text:p>
       </table:table-cell>
       <table:table-cell table:style-name="Table12.E5" office:value-type="string">
@@ -2933,3 +2933,4 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
   </xsl:template>
 
 </xsl:stylesheet>
+

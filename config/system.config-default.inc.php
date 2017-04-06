@@ -2,39 +2,42 @@
 	ini_set('display_errors','1');
 	error_reporting(E_ALL);
 
-	mb_internal_encoding("UTF-8");
-	mb_regex_encoding("UTF-8");
+	mb_internal_encoding('UTF-8');
+	mb_regex_encoding('UTF-8');
 	setlocale (LC_ALL, 'de_DE.UTF8','de_DE@euro', 'de_DE', 'de','DE', 'ge','German');
 	date_default_timezone_set('Europe/Vienna');
-	
+
 	// Connection Strings zur Datenbank
-	define("DB_SYSTEM","pgsql");
-	define("DB_HOST","localhost");
-	define("DB_PORT","5432");
-	define("DB_NAME","fhcomplete");
-	define("DB_USER","fhcomplete");
-	define("DB_PASSWORD","fhcomplete");
-	define("DB_CONNECT_PERSISTENT",FALSE);
+	define('DB_SYSTEM','pgsql');
+	define('DB_HOST','localhost');
+	define('DB_PORT','5432');
+	define('DB_NAME','fhcomplete');
+	define('DB_USER','fhcomplete');
+	define('DB_PASSWORD','fhcomplete');
+	define('DB_CONNECT_PERSISTENT',FALSE);
 	define('CONN_CLIENT_ENCODING','UTF-8' );
-	
+
 	// Dokumentenmanagement
 	define('DMS_PATH','/var/fhcomplete/documents/dms/');
-	
+
 	// Pfad zu Document Root
 	define('DOC_ROOT','/var/www/html/build/');
 
 	// Fuer Mails etc
 	define('DOMAIN','technikum-wien.at');
-	
+
+	// Default Sprache
+	define('DEFAULT_LANGUAGE','German' );
+
 	// Authentifizierungsmethode
 	// Moegliche Werte:
 	// auth_mixed    - htaccess mit LDAP (Default)
-// auth_demo     - Demo Modus (.htaccess)
+	// auth_demo     - Demo Modus (.htaccess)
 	// auth_session  - Sessions mit LDAP (Testbetrieb)
-	define("AUTH_SYSTEM", "auth_demo"); 
+	define('AUTH_SYSTEM', 'auth_demo');
 	// Gibt den Namen fuer die htaccess Authentifizierung an (muss mit dem Attribut AuthName im htaccess uebereinstimmen)
-	define("AUTH_NAME","FH-Complete");
-	
+	define('AUTH_NAME','FH-Complete');
+
 	// DatenbankRollen fuer Grants
 	define('DB_CIS_USER_GROUP','web');
 	define('DB_FAS_USER_GROUP','admin');

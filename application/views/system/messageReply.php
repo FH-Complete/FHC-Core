@@ -18,7 +18,13 @@
 				<div class="span4">
 					<button type="submit">Send</button>
 					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					<?php echo $this->templatelib->widget("Vorlage_widget", array("title" => "Vorlage")); ?>
+					<?php
+						echo $this->widgetlib->widget(
+							'Vorlage_widget',
+							null,
+							array('name' => 'vorlage', 'id' => 'vorlageDnD')
+						);
+					?>
 				</div>
 			</div>
 			
@@ -34,19 +40,26 @@
 			$url = str_replace("/system/Messages/reply", "/system/Messages/getVorlage", $_SERVER["REQUEST_URI"]);
 		?>
 		
-		function getVorlageText(vorlage_kurzbz)
-		{
-			$.ajax({
-				dataType: "json",
-				url: "<?php echo $url; ?>",
-				data: {"vorlage_kurzbz": vorlage_kurzbz},
-				success: function(data, textStatus, jqXHR) {
-					tinyMCE.activeEditor.setContent(data.retval[0].text + "<?php echo $message->body; ?>");
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					alert(textStatus + " - " + errorThrown);
-				}
-			});
-		}
+		$(document).ready(function() {
+			if ($("#vorlageDnD"))
+			{
+				$("#vorlageDnD").change(function() {
+					if (this.value != '')
+					{
+						$.ajax({
+							dataType: "json",
+							url: "<?php echo $url; ?>",
+							data: {"vorlage_kurzbz": this.value},
+							success: function(data, textStatus, jqXHR) {
+								tinyMCE.activeEditor.setContent(data.retval[0].text + "<?php echo $message->body; ?>");
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								alert(textStatus + " - " + errorThrown);
+							}
+						});
+					}
+				});
+			}
+		});
 	</script>
 </html>

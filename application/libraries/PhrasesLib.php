@@ -126,12 +126,24 @@ class PhrasesLib
 				for ($i = 0; $i < count($result->retval); $i++)
 				{
 					// If no <p> tags required
-					if ($blockTags == "no")
+					if ($blockTags == 'no')
 					{
-						// Removes tags <p> and </p> from the beginning and from the end of the string
-						$tmpText = $parser->textileThis($result->retval[$i]->text);
-						$tmpText = substr($tmpText, 3, strlen($tmpText));
-						$tmpText = substr($tmpText, 0, strlen($tmpText) - 4);
+						$tmpText = $parser->textileThis($result->retval[$i]->text); // Parse
+						
+						// Removes tags <p> and </p> from the beginning and from the end of the string if they are present
+						// NOTE: Those tags are usually, but not always, added by the textile parser
+						if (strlen($tmpText) >= 7)
+						{
+							if (substr($tmpText, 0, 3) == '<p>')
+							{
+								$tmpText = substr($tmpText, 3, strlen($tmpText));
+							}
+							if (substr($tmpText, -4, strlen($tmpText)) == '</p>')
+							{
+								$tmpText = substr($tmpText, 0, strlen($tmpText) - 4);
+							}
+						}
+						
 						$result->retval[$i]->text = $tmpText;
 					}
 					else

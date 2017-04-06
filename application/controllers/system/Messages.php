@@ -7,7 +7,13 @@ class Messages extends VileSci_Controller
 	public function __construct()
     {
         parent::__construct();
+        
+        // Loads the message library
         $this->load->library('MessageLib');
+        
+        // Loads the widget library
+		$this->load->library('WidgetLib');
+		
 		$this->load->model('person/Person_model', 'PersonModel');
     }
 

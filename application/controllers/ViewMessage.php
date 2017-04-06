@@ -14,6 +14,10 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
+/**
+ * NOTE: in this controller is not possible to include/call everything
+ * that automatically call the authentication system, like the most of models or libraries
+ */
 class ViewMessage extends CI_Controller
 {
 	/**
@@ -22,27 +26,52 @@ class ViewMessage extends CI_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		// Loading config file message
 		$this->config->load('message');
-		
-		// Load model MessageToken_model
+
+		// Load model MessageToken_model, not calling the authentication system
 		$this->load->model('system/MessageToken_model', 'MessageTokenModel');
 	}
 	
+	/**
+	 * Using the MessageTokenModel instead of MessageLib to allow
+	 * viewing the message without prompting the login
+	 */
 	public function toHTML($token)
 	{
 		$msg = $this->MessageTokenModel->getMessageByToken($token);
-		
+
 		if ($msg->error)
 		{
 			show_error($msg->retval);
 		}
-		
+
 		if (is_array($msg->retval) && count($msg->retval) > 0)
 		{
+			$setReadMessageStatusByToken = $this->MessageTokenModel->setReadMessageStatusByToken($token);
+			
+			if (isError($setReadMessageStatusByToken))
+			{
+				show_error($msg->$setReadMessageStatusByToken);
+			}
+			
+			$sender_id = $msg->retval[0]->sender_id;
+			$receiver_id = $msg->retval[0]->receiver_id;
+			$sender = $this->MessageTokenModel->getSenderData($sender_id);
+			
+			// To decide how to change the redirection
+			$isEmployee = $this->MessageTokenModel->isEmployee($receiver_id);
+			if (!is_bool($isEmployee) && isError($isEmployee))
+			{
+				show_error($isEmployee);
+			}
+			
 			$data = array (
+				'sender_id' => $sender_id,
+				'sender' => $sender->retval[0],
 				'message' => $msg->retval[0],
+				'isEmployee' => $isEmployee,
 				'href' => APP_ROOT . $this->config->item('redirect_view_message_url') . $token
 			);
 			

@@ -3,9 +3,14 @@
 ## [Unreleased]
 
 ### Added
+- **[CIS]** Reservierungen im Stundenplan prüft nun die Verfügbarkeit des Raums im Stundenplandev
+- **[FAS]** Projektarbeiten können als Final markiert werden
 - **[FAS]** Verwaltung von Rechnungsadressen
 - **[CIS]** Mitarbeiter und Studierende können nach dem Login im CIS zur Passwortänderung umgeleitet werden wenn dieses seit über einem Jahr nicht geändert wurde
 - **[FAS]** Bei Statuswechsel von Studierenden können Gründe für den Statuswechsel angegeben werden
+
+### CHANGED
+- **[CORE]** Berechtigungsprüfung wurde angepasst damit deaktiverte Benutzer keine Berechtigungen mehr haben
 
 ## [3.2]
 

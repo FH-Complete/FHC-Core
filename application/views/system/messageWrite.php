@@ -72,7 +72,13 @@
 			<table>
 				<tr>
 					<td>
-						<?php echo $this->templatelib->widget("Vorlage_widget", array("title" => "Vorlage")); ?>
+						<?php
+							echo $this->widgetlib->widget(
+								'Vorlage_widget',
+								null,
+								array('name' => 'vorlage', 'id' => 'vorlageDnD')
+							);
+						?>
 					</td>
 					<td>
 						&nbsp;
@@ -186,6 +192,31 @@
 					}
 				});
 			}
+			
+			if ($("#vorlageDnD"))
+			{
+				$("#vorlageDnD").change(function() {
+					if (this.value != '')
+					{
+						<?php
+							$url = str_replace("/system/Messages/write", "/system/Messages/getVorlage", $_SERVER["REQUEST_URI"]);
+						?>
+						
+						$.ajax({
+							dataType: "json",
+							url: "<?php echo $url; ?>",
+							data: {"vorlage_kurzbz": this.value},
+							success: function(data, textStatus, jqXHR) {
+								tinyMCE.get("bodyTextArea").setContent(data.retval[0].text);
+								$("#subject").val(data.retval[0].subject);
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								alert(textStatus + " - " + errorThrown);
+							}
+						});
+					}
+				});
+			}
 		});
 		
 		function tinymcePreviewSetContent()
@@ -219,26 +250,6 @@
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					alert(textStatus + " - " + errorThrown + " - " + jqXHR.responseText);
-				}
-			});
-		}
-		
-		function getVorlageText(vorlage_kurzbz)
-		{
-			<?php
-				$url = str_replace("/system/Messages/write", "/system/Messages/getVorlage", $_SERVER["REQUEST_URI"]);
-			?>
-			
-			$.ajax({
-				dataType: "json",
-				url: "<?php echo $url; ?>",
-				data: {"vorlage_kurzbz": vorlage_kurzbz},
-				success: function(data, textStatus, jqXHR) {
-					tinyMCE.get("bodyTextArea").setContent(data.retval[0].text);
-					$("#subject").val(data.retval[0].subject);
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					alert(textStatus + " - " + errorThrown);
 				}
 			});
 		}

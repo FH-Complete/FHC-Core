@@ -17,8 +17,22 @@
  *
  * Authors: Andreas Moik <moik@technikum-wien.at>
  */
-//require_once(dirname(__FILE__).'/config/vilesci.config.inc.php'); Muss vor dieser Datei eingebunden werden!
-
+/*
+Meta Include für JQuery Tablesorter
+require_once(dirname(__FILE__).'/config/vilesci.config.inc.php'); Muss vor dieser Datei eingebunden werden!
+Usage:
+	<script language="Javascript">
+	$(document).ready(function()
+	{
+		$("#t1").tablesorter(
+		{
+			sortList: [[0,0]],
+			widgets: ["zebra"],
+			headers: {1:{sorter: false}}
+		});
+	});
+	</script>
+*/
 $dr = DOC_ROOT;
 $dr = str_replace($_SERVER["DOCUMENT_ROOT"], "", $dr);
 if($dr=='')
@@ -26,9 +40,7 @@ if($dr=='')
 
 //Originaldateien des Herstellers
 echo '<link rel="stylesheet" type="text/css" href="'.$dr.'vendor/FHC-vendor/jquery-tablesorter/css/theme.default.css">';
-
 echo '<script src="'.$dr.'vendor/FHC-vendor/jquery-tablesorter/js/jquery.tablesorter.js"></script>';
-
 
 //Anpassungen
 echo '<link rel="stylesheet" type="text/css" href="'.$dr.'include/vendor_custom/jquery-tablesorter/tablesort.css">';

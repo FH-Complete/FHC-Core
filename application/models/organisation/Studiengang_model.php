@@ -116,9 +116,9 @@ class Studiengang_model extends DB_Model
 		$this->addOrder('lehre.tbl_studienplan.studienplan_id');
 		
 		$result = $this->loadTree(
-			'tbl_studiengang',
+			'public.tbl_studiengang',
 			array(
-				'tbl_studienplan'
+				'lehre.tbl_studienplan'
 			),
 			array(
 				'lehre.tbl_studienplan_semester.studiensemester_kurzbz' => $studiensemester_kurzbz,
@@ -158,10 +158,10 @@ class Studiengang_model extends DB_Model
 		$this->addOrder('lehre.tbl_studienplan.studienplan_id');
 		
 		$result = $this->loadTree(
-			'tbl_studiengang',
+			'public.tbl_studiengang',
 			array(
-				'tbl_studienplan',
-				'tbl_akadgrad'
+				'lehre.tbl_studienplan',
+				'lehre.tbl_akadgrad'
 			),
 			'public.tbl_studiengang.aktiv = TRUE
 			AND public.tbl_studiengang.onlinebewerbung = TRUE
@@ -180,22 +180,23 @@ class Studiengang_model extends DB_Model
 	}
 	
 	/**
-	 * TODO
+	 * 
 	 */
-	public function getAppliedStudiengang($person_id, $studiensemester_kurzbz, $titel, $status_kurzbz)
+	public function getAppliedStudiengang($person_id, $studiensemester_kurzbz, $titel)
 	{
-		// Then join with table 
+		// Then join with table public.tbl_prestudent
 		$this->addJoin('public.tbl_prestudent', 'studiengang_kz');
-		// Join table 
+		// Join table public.tbl_prestudentstatus
 		$this->addJoin('public.tbl_prestudentstatus', 'prestudent_id');
-		// Then join with table 
+		// Then join with table lehre.tbl_studienplan
 		$this->addJoin('lehre.tbl_studienplan', 'studienplan_id');
-		// Then join with table 
+		// Then join with table public.tbl_notizzuordnung + public.tbl_notiz
 		$this->addJoin(
 			'(
-				SELECT *
-				  FROM public.tbl_notizzuordnung INNER JOIN public.tbl_notiz n USING(notiz_id)
-				 WHERE n.titel = \''.$titel.'\') tbl_nn',
+				SELECT public.tbl_notiz.*, public.tbl_notizzuordnung.prestudent_id
+				  FROM public.tbl_notiz JOIN public.tbl_notizzuordnung USING(notiz_id)
+				 WHERE titel = '.$this->escape($titel).
+			') tbl_notiz',
 			'prestudent_id',
 			'LEFT'
 		);
@@ -204,17 +205,16 @@ class Studiengang_model extends DB_Model
 		$this->addOrder('public.tbl_studiengang.bezeichnung');
 		
 		$result = $this->loadTree(
-			'tbl_studiengang',
+			'public.tbl_studiengang',
 			array(
-				'tbl_prestudent',
-				'tbl_prestudentstatus',
-				'tbl_studienplan',
-				'tbl_nn'
+				'public.tbl_prestudent',
+				'public.tbl_prestudentstatus',
+				'lehre.tbl_studienplan',
+				'public.tbl_notiz'
 			),
-			'public.tbl_prestudent.person_id = '.$person_id.
-			' AND public.tbl_prestudentstatus.studiensemester_kurzbz = \''.$studiensemester_kurzbz.'\''.
-			' AND (public.tbl_prestudentstatus.status_kurzbz = \'Interessent\' OR public.tbl_prestudentstatus.status_kurzbz = \'Bewerber\')'
-			,
+			'public.tbl_prestudent.person_id = '.$this->escape($person_id).
+			' AND public.tbl_prestudentstatus.studiensemester_kurzbz = '.$this->escape($studiensemester_kurzbz).
+			' AND (public.tbl_prestudentstatus.status_kurzbz = \'Interessent\' OR public.tbl_prestudentstatus.status_kurzbz = \'Bewerber\')',
 			array(
 				'prestudenten',
 				'prestudentstatus',
@@ -235,19 +235,12 @@ class Studiengang_model extends DB_Model
 			return $isEntitled;
 		if (($isEntitled = $this->isEntitled('lehre.tbl_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $isEntitled;
-		/*if (($isEntitled = $this->isEntitled('public.tbl_rt_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;*/
 		if (($isEntitled = $this->isEntitled('public.tbl_reihungstest', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $isEntitled;
 		if (($isEntitled = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $isEntitled;
 		if (($isEntitled = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $isEntitled;
-		
-		$this->addFrom(
-			'(SELECT * FROM public.tbl_reihungstest LEFT JOIN public.tbl_rt_studienplan USING(reihungstest_id))',
-			'tbl_reihungstest'
-		);
 		
 		$this->addJoin('lehre.tbl_studienordnung', 'studiengang_kz');
 		
@@ -257,11 +250,16 @@ class Studiengang_model extends DB_Model
 		
 		$this->addJoin('public.tbl_prestudent', 'prestudent_id');
 		
+		$this->addFrom(
+			'(SELECT * FROM public.tbl_reihungstest LEFT JOIN public.tbl_rt_studienplan USING(reihungstest_id))',
+			'tbl_reihungstest'
+		);
+		
 		$this->addOrder('tbl_studiengang.bezeichnung, tbl_reihungstest.stufe, tbl_reihungstest.datum');
 		
 		return $this->loadTree(
-			'tbl_studiengang',
-			array('tbl_reihungstest'),
+			'public.tbl_studiengang',
+			array('public.tbl_reihungstest'),
 			'tbl_prestudentstatus.status_kurzbz = \'Interessent\'
 			AND (tbl_prestudentstatus.rt_stufe >= tbl_reihungstest.stufe OR tbl_reihungstest.stufe IS NULL)
 			AND (tbl_prestudent.aufnahmegruppe_kurzbz = tbl_reihungstest.aufnahmegruppe_kurzbz OR tbl_reihungstest.aufnahmegruppe_kurzbz IS NULL)
@@ -273,15 +271,15 @@ class Studiengang_model extends DB_Model
 					tbl_reihungstest.max_teilnehmer,
 					(
 						SELECT SUM(arbeitsplaetze)
-						FROM public.tbl_ort JOIN public.tbl_rt_ort USING(ort_kurzbz)
-						WHERE rt_id = tbl_reihungstest.reihungstest_id
+						  FROM public.tbl_ort JOIN public.tbl_rt_ort USING(ort_kurzbz)
+						 WHERE rt_id = tbl_reihungstest.reihungstest_id
 					)
 				) - (
 					SELECT COUNT(*)
-					FROM public.tbl_rt_person
-					WHERE rt_id = tbl_reihungstest.reihungstest_id
+					  FROM public.tbl_rt_person
+					 WHERE rt_id = tbl_reihungstest.reihungstest_id
 				) > 0
-			AND person_id = ' . $person_id,
+			AND person_id = ' . $this->escape($person_id),
 			array('reihungstest')
 		);
 	}
