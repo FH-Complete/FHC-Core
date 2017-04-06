@@ -182,7 +182,7 @@ class Studiengang_model extends DB_Model
 	/**
 	 * 
 	 */
-	public function getAppliedStudiengang($person_id, $studiensemester_kurzbz, $status_kurzbz)
+	public function getAppliedStudiengang($person_id, $studiensemester_kurzbz, $titel)
 	{
 		// Then join with table public.tbl_prestudent
 		$this->addJoin('public.tbl_prestudent', 'studiengang_kz');
@@ -190,10 +190,16 @@ class Studiengang_model extends DB_Model
 		$this->addJoin('public.tbl_prestudentstatus', 'prestudent_id');
 		// Then join with table lehre.tbl_studienplan
 		$this->addJoin('lehre.tbl_studienplan', 'studienplan_id');
-		// Then join with table public.tbl_notizzuordnung
-		$this->addJoin('public.tbl_notizzuordnung', 'prestudent_id', 'LEFT');
-		// Then join with table public.tbl_notiz
-		$this->addJoin('public.tbl_notiz', 'notiz_id', 'LEFT');
+		// Then join with table public.tbl_notizzuordnung + public.tbl_notiz
+		$this->addJoin(
+			'(
+				SELECT public.tbl_notiz.*, public.tbl_notizzuordnung.prestudent_id
+				  FROM public.tbl_notiz JOIN public.tbl_notizzuordnung USING(notiz_id)
+				 WHERE titel = '.$this->escape($titel).
+			') tbl_notiz',
+			'prestudent_id',
+			'LEFT'
+		);
 		
 		// Ordering by studiengang_kz and studienplan_id
 		$this->addOrder('public.tbl_studiengang.bezeichnung');
@@ -206,8 +212,8 @@ class Studiengang_model extends DB_Model
 				'lehre.tbl_studienplan',
 				'public.tbl_notiz'
 			),
-			'public.tbl_prestudent.person_id = '.$person_id.
-			' AND public.tbl_prestudentstatus.studiensemester_kurzbz = \''.$studiensemester_kurzbz.'\''.
+			'public.tbl_prestudent.person_id = '.$this->escape($person_id).
+			' AND public.tbl_prestudentstatus.studiensemester_kurzbz = '.$this->escape($studiensemester_kurzbz).
 			' AND (public.tbl_prestudentstatus.status_kurzbz = \'Interessent\' OR public.tbl_prestudentstatus.status_kurzbz = \'Bewerber\')',
 			array(
 				'prestudenten',
@@ -229,19 +235,12 @@ class Studiengang_model extends DB_Model
 			return $isEntitled;
 		if (($isEntitled = $this->isEntitled('lehre.tbl_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $isEntitled;
-		/*if (($isEntitled = $this->isEntitled('public.tbl_rt_studienplan', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;*/
 		if (($isEntitled = $this->isEntitled('public.tbl_reihungstest', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $isEntitled;
 		if (($isEntitled = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $isEntitled;
 		if (($isEntitled = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $isEntitled;
-		
-		$this->addFrom(
-			'(SELECT * FROM public.tbl_reihungstest LEFT JOIN public.tbl_rt_studienplan USING(reihungstest_id))',
-			'tbl_reihungstest'
-		);
 		
 		$this->addJoin('lehre.tbl_studienordnung', 'studiengang_kz');
 		
@@ -250,6 +249,11 @@ class Studiengang_model extends DB_Model
 		$this->addJoin('public.tbl_prestudentstatus', 'studienplan_id');
 		
 		$this->addJoin('public.tbl_prestudent', 'prestudent_id');
+		
+		$this->addFrom(
+			'(SELECT * FROM public.tbl_reihungstest LEFT JOIN public.tbl_rt_studienplan USING(reihungstest_id))',
+			'tbl_reihungstest'
+		);
 		
 		$this->addOrder('tbl_studiengang.bezeichnung, tbl_reihungstest.stufe, tbl_reihungstest.datum');
 		
@@ -267,15 +271,15 @@ class Studiengang_model extends DB_Model
 					tbl_reihungstest.max_teilnehmer,
 					(
 						SELECT SUM(arbeitsplaetze)
-						FROM public.tbl_ort JOIN public.tbl_rt_ort USING(ort_kurzbz)
-						WHERE rt_id = tbl_reihungstest.reihungstest_id
+						  FROM public.tbl_ort JOIN public.tbl_rt_ort USING(ort_kurzbz)
+						 WHERE rt_id = tbl_reihungstest.reihungstest_id
 					)
 				) - (
 					SELECT COUNT(*)
-					FROM public.tbl_rt_person
-					WHERE rt_id = tbl_reihungstest.reihungstest_id
+					  FROM public.tbl_rt_person
+					 WHERE rt_id = tbl_reihungstest.reihungstest_id
 				) > 0
-			AND person_id = ' . $person_id,
+			AND person_id = ' . $this->escape($person_id),
 			array('reihungstest')
 		);
 	}
