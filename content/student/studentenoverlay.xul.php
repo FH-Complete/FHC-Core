@@ -168,20 +168,30 @@ else
 						}
 						?>
 							<toolbarbutton id="student-toolbar-refresh" label="Aktualisieren" oncommand="StudentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
-							<textbox id="student-toolbar-textbox-suche" control="student-toolbar-button-search" onkeypress="StudentSearchFieldKeyPress(event)" />
+							<toolbarbutton label="Suchkriterien " id="student-toolbar-suchkriterien" type="menu">
+								<menupopup id="student-suchkriterien-menu-popup" >
+									<menuitem id="student-toolbar-suchkriterien-email" label="E-Mail #email" oncommand="StudentSuchkriterien('#email')" disabled="false" tooltiptext="Suche nach E-Mail Adresse"/>
+									<menuitem id="student-toolbar-suchkriterien-genau" label="Name #name" oncommand="StudentSuchkriterien('#name')" disabled="false" tooltiptext="Suche nach einer exakten Namensübereinstimmung (Geeignet für kurze Namen wie 'Wu')"/>
+									<menuitem id="student-toolbar-suchkriterien-person_id" label="Person ID #pid" oncommand="StudentSuchkriterien('#pid')" disabled="false" tooltiptext="Suche nach Person ID" />
+									<menuitem id="student-toolbar-suchkriterien-prestudent_id" label="Prestudent ID #preid" oncommand="StudentSuchkriterien('#preid')" disabled="false" tooltiptext="Suche nach Prestudent ID" />
+									<menuitem id="student-toolbar-suchkriterien-telefon" label="Telefonnummer #tel" oncommand="StudentSuchkriterien('#tel')" disabled="false" tooltiptext="Suche nach Telefonnummer"/>
+									<menuitem id="student-toolbar-suchkriterien-ref" label="Zahlungsreferenz #ref" oncommand="StudentSuchkriterien('#ref')" disabled="false" tooltiptext="Suche nach Zahlungsreferenz (Kontobuchung)"/>
+								</menupopup>
+							</toolbarbutton>
+							<textbox id="student-toolbar-textbox-suche" control="student-toolbar-button-search" onkeypress="StudentSearchFieldKeyPress(event)" onfocus="this.value = this.value;" style="width: 300px" />
 							<button id="student-toolbar-button-search" oncommand="StudentSuche()" label="Suchen"/>
 						<?php
 						if($xulapp!='tempus')
 						{
 						?>
 							<toolbarbutton label="Filter " id="student-toolbar-filter" type="menu">
-						      <menupopup id="student-filter-menu-popup" >
-								    <menuitem id="student-toolbar-filter-dokumente" label="fehlende Dokumente" oncommand="InteressentDokumenteFilter()" disabled="false" tooltiptext="Liste aller Studenten mit Fehlenden Dokumenten"/>
+								<menupopup id="student-filter-menu-popup" >
+									<menuitem id="student-toolbar-filter-dokumente" label="fehlende Dokumente" oncommand="InteressentDokumenteFilter()" disabled="false" tooltiptext="Liste aller Studenten mit Fehlenden Dokumenten"/>
 									<menuitem id="student-toolbar-filter-offenebuchungen" label="offene Buchungen" oncommand="StudentKontoFilterStudenten('konto')" disabled="false" tooltiptext="Liste aller Studenten mit offenen Buchungen"/>
 									<menuitem id="student-toolbar-filter-studiengebuehr" label="nicht gebuchte Studiengebuehr" oncommand="StudentKontoFilterStudenten('studiengebuehr')" disabled="false" tooltiptext="Liste aller Studenten die noch nicht mit Studienbebuehr belastet wurden" />
 									<menuitem id="student-toolbar-filter-zgvohnedatum" label="ZGV eingetragen ohne Datum" oncommand="StudentKontoFilterStudenten('zgvohnedatum')" disabled="false" tooltiptext="Liste aller Studenten die ZGV eingetragen haben bei denen aber kein ZGV Datum gesetzt ist" />
-						      </menupopup>
-						    </toolbarbutton>
+								</menupopup>
+							</toolbarbutton>
 						<?php
 						}
 						?>

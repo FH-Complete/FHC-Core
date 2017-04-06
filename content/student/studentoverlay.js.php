@@ -5579,3 +5579,22 @@ function StudentCisNotenliste(event)
 
 	window.open('<?php echo CIS_ROOT; ?>cis/private/lehre/notenliste.php?stsem=alle&uid='+uid);
 }
+
+//****
+//* Fuegt Suchkriterien in das Textfeld der Personensuche ein
+//****
+function StudentSuchkriterien(suchkriterium)
+{
+	filter = document.getElementById('student-toolbar-textbox-suche').value;
+	if (filter.substr(0, 1) == '#')
+	{
+		position = filter.search(" ") + 1;
+		filter = filter.substr(position);
+	} 
+
+	newval = suchkriterium+' '+filter;
+
+	document.getElementById('student-toolbar-textbox-suche').value = newval;
+	document.getElementById('student-toolbar-textbox-suche').focus();
+	//document.getElementById('student-toolbar-textbox-suche').select();
+}

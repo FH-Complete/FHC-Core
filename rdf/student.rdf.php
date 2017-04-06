@@ -49,6 +49,7 @@ require_once('../include/konto.class.php');
 require_once('../include/reihungstest.class.php');
 require_once('../include/studienordnung.class.php');
 require_once('../include/studienplan.class.php');
+require_once('../include/kontakt.class.php');
 
 // *********** Funktionen *************************
 function convdate($date)
@@ -620,14 +621,23 @@ if($xmlformat=='rdf')
 	}
 	else
 	{
-		if($filter!='')
+		// String aufsplitten und Sonderzeichen entfernen
+		$searchItems = explode(' ',TRIM(str_replace(',', '', $filter),' 	!.?'));
+		$kriterienliste = array("#email","#name","#pid","#preid","#tel", "#ref");
+		$suchkriterium = '';
+		
+		// Wenn der erste Array-Eintrag einem kriterium der $kriterienliste entspricht -> in $suchkriterium speichern und aus Array entfernen
+		if (isset($searchItems[0]) && in_array($searchItems[0], $kriterienliste))
 		{
-			if(substr_compare($filter, "#ref", 0, 4,true)==0)
+			$suchkriterium = $searchItems[0];
+			array_shift($searchItems);
+		}
+		// Wenn nach dem TRIM Zeichen uebrig bleiben, dann fortfahren
+		if(implode(',', $searchItems) != '')
+		{
+			if($suchkriterium == '#ref')
 			{
-				$zahlungsreferenz = explode(" ", $filter);
-				unset($zahlungsreferenz[0]);
-
-				foreach($zahlungsreferenz as $ref)
+				foreach($searchItems as $ref)
 				{
 					$konto = new konto();
 					$konto->loadFromZahlungsreferenz($ref);
@@ -654,17 +664,57 @@ if($xmlformat=='rdf')
 					}
 				}
 			}
-			else
+			if($suchkriterium == '#tel' || $suchkriterium == '#email')
 			{
+				$searchItems_string_orig = implode(' ', $searchItems);
+				$kontakt = new kontakt();
+				if ($suchkriterium == '#tel')
+					$kontakt->searchKontakt($searchItems_string_orig, 'nummer');
+				elseif ($suchkriterium == '#email')
+					$kontakt->searchKontakt($searchItems_string_orig, 'email');
+				else
+					$kontakt->searchKontakt($searchItems_string_orig);
+
+				foreach ($kontakt->result AS $row)
+				{
+					$prestudent=new prestudent();
+					$prestudent->getPrestudenten($row->person_id);
+					if(!empty($prestudent->result))
+					{
+						$prestudent_temp = new prestudent($prestudent->result[0]->prestudent_id);
+						$student = new student();
+						$uid = $student->getUid($prestudent_temp->prestudent_id);
+			
+						if($uid!='' && $uid != false)
+						{
+							if(!$student->load($uid, $studiensemester_kurzbz))
+								$student->load($uid);
+								draw_content($student);
+								draw_prestudent($prestudent_temp);
+						}
+						else
+						{
+							draw_content($prestudent_temp);
+							draw_prestudent($prestudent_temp);
+						}
+					}
+				}
+			}
+			elseif($suchkriterium == '#name')
+			{
+				// String imploden und trimmen, um preg_split(Zeichenweise trennung) durchfuehren zu koennen
+				$searchItems_string_orig = implode(' ', $searchItems);
+				$searchItems_string_orig = mb_strtolower(TRIM($searchItems_string_orig));
+
 				$qry = "SELECT prestudent_id
 					FROM
-						public.tbl_person JOIN tbl_prestudent USING (person_id) LEFT JOIN tbl_student using(prestudent_id)
-					WHERE
-						COALESCE(nachname,'')||' '||COALESCE(vorname,'') ~* ".$db->db_add_param($filter)." OR
-						COALESCE(vorname,'')||' '||COALESCE(nachname,'') ~* ".$db->db_add_param($filter)." OR
-						student_uid ~* ".$db->db_add_param($filter)." OR
-						matrikelnr = ".$db->db_add_param($filter)." OR
-						svnr = ".$db->db_add_param($filter).";";
+						public.tbl_person JOIN public.tbl_prestudent USING (person_id) LEFT JOIN public.tbl_student USING (prestudent_id)
+					WHERE 
+						UPPER(nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
+						UPPER(vorname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
+						UPPER(vorname || ' ' || nachname) = UPPER(".$db->db_add_param($searchItems_string_orig).") OR
+						UPPER(nachname || ' ' || vorname) = UPPER(".$db->db_add_param($searchItems_string_orig).");";
+
 				if($db->db_query($qry))
 				{
 					while($row = $db->db_fetch_object())
@@ -675,7 +725,110 @@ if($xmlformat=='rdf')
 							//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
 							//nochmal laden aber ohne studiensemester
 							if(!$student->load($uid, $studiensemester_kurzbz))
-							$student->load($uid);
+								$student->load($uid);
+						}
+						$prestd = new prestudent();
+						$prestd->load($row->prestudent_id);
+						if($uid!='')
+						{
+							draw_content($student);
+							draw_prestudent($prestd);
+						}
+						else
+						{
+							draw_content($prestd);
+							draw_prestudent($prestd);
+						}
+					}
+				}
+			}
+			else
+			{
+				// String imploden und trimmen, um preg_split(Zeichenweise trennung) durchfuehren zu koennen
+				$searchItems_string_orig = implode(' ', $searchItems);
+				$searchItems_string_orig = mb_strtolower(TRIM($searchItems_string_orig));
+				
+				// Wenn String numerisch ist, keine Namenssuche durchführen
+				if (!is_numeric($searchItems_string_orig))
+				{	
+					$character_set_klein = array(
+							'aáăắặằẳẵǎâấậầẩẫäạàảāąåǻãæǽɑɐɒ',
+							'bḅɓß',
+							'cćčçĉɕċ',
+							'dďḓḍɗḏđɖʤǳʣʥǆð',
+							'eéĕěêếệềểễëėẹèẻēęẽʒǯʓɘɜɝəɚ',
+							'fƒſʩﬁﬂʃʆʅɟʄ',
+							'gǵğǧģĝġɠḡɡɣ',
+							'hḫĥḥɦẖħɧɥʮʯų',
+							'iíĭǐîïịìỉīįɨĩɩı',
+							'jĳɟjǰĵʝȷɟʄ',
+							'kķḳƙḵĸʞ',
+							'lĺƚɬľļḽḷḹḻŀɫɭłƛɮǉʪʫ',
+							'mḿṁṃɱɯɰ',
+							'nŉńňņṋṅṇǹɲṉɳñǌŋŊ',
+							'oóŏǒôốộồổỗöọőòỏơớợờởỡōǫøǿõɛɔɵʘœ',
+							'pɸþ',
+							'rŕřŗṙṛṝɾṟɼɽɿɹɻɺ',
+							'sśšşŝșṡṣʂſʃʆßʅ',
+							'tťţṱțẗṭṯʈŧʨʧþðʦʇ',
+							'uʉúŭǔûüǘǚǜǖụűùủưứựừửữūųůũʊ',
+							'wẃŵẅẁʍ',
+							'yýŷÿẏỵỳƴỷȳỹʎ',
+							'zźžʑżẓẕʐƶ'
+					);
+
+					// String zeichenweise aufsplitten zum Vergleich mit den Sonderzeichen
+					$searchItems_string_splitted = preg_split('//u', $searchItems_string_orig, -1, PREG_SPLIT_NO_EMPTY);
+					
+					// Jedes Zeichen mit jedem Zeichenset vergleichen und dann damit ersetzen
+					foreach ($searchItems_string_splitted AS $key => $item)
+					{
+						foreach ($character_set_klein AS $set)
+						{
+							if (strpos($set, $item) !== false)
+								$searchItems_string_splitted[$key] = '['.$set.']';
+								elseif ($item == ' ')
+								$searchItems_string_splitted[$key] = '.*';
+						}
+					}
+					
+					// Array wieder zu String zusammenfuehren
+					$searchItems_string = implode('', $searchItems_string_splitted);
+				}
+
+				$qry = "SELECT prestudent_id
+					FROM
+						public.tbl_person JOIN public.tbl_prestudent USING (person_id) LEFT JOIN public.tbl_student USING (prestudent_id)
+					WHERE 1=1 AND";
+				
+				// Wenn der urspruengliche Suchbegriff NICHT numerisch ist, Namenssuche durchführen
+				if (!is_numeric($searchItems_string_orig))
+				{
+					$qry .= "	UPPER(vorname || ' ' || nachname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
+								UPPER(nachname || ' ' || vorname) ~* UPPER(".$db->db_add_param($searchItems_string).") OR
+								student_uid ~* LOWER(".$db->db_add_param($searchItems_string).")";
+				}
+				else
+				{
+					if ($suchkriterium == '#pid')
+						$qry .= "	person_id = ".$db->db_add_param($searchItems_string_orig).";";
+					elseif ($suchkriterium == '#preid')
+						$qry .= "	prestudent_id = ".$db->db_add_param($searchItems_string_orig).";";
+					else 
+						$qry .= "	matrikelnr = ".$db->db_add_param($searchItems_string_orig)." OR
+									svnr = ".$db->db_add_param($searchItems_string_orig).";";
+				}
+				if($db->db_query($qry))
+				{
+					while($row = $db->db_fetch_object())
+					{
+						$student=new student();
+						if($uid = $student->getUid($row->prestudent_id))
+						{
+							//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
+							//nochmal laden aber ohne studiensemester
+							if(!$student->load($uid, $studiensemester_kurzbz))
+								$student->load($uid);
 						}
 						$prestd = new prestudent();
 						$prestd->load($row->prestudent_id);
@@ -716,10 +869,7 @@ if($xmlformat=='rdf')
 				draw_prestudent($prestd);
 			}
 		}
-
-
 	}
-
 
 	echo "</RDF:Seq>\n</RDF:RDF>";
 }

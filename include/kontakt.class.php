@@ -512,5 +512,72 @@ class kontakt extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Sucht nach Kontaktdaten, die den Suchkriterien entsprechen
+	 * @param string $searchstring 	String, nach dem gesucht werden soll. 
+	 * 								Wenn $typ = nummer ist, werden eventuelle nicht-numerische Zeichen mit preg_replace entfernt,
+	 * 								und es wird nach den Typen "telefon","mobil","so.tel","firmenhandy" und "notfallkontakt" gesucht
+	 * @param string $typ Optional. Kontakttyp. Möglich sind <b>"nummer"</b>,"telefon","mobil","so.tel","firmenhandy","firmenhandy","email","fax" und "homepage".
+	 * 								Wenn $typ = nummer ist, werden eventuelle nicht-numerische Zeichen mit preg_replace entfernt,
+	 * 								und es wird nach den Typen "telefon","mobil","so.tel","firmenhandy" und "notfallkontakt" gesucht 
+	 * @return boolean
+	 */
+	public function searchKontakt ($searchstring, $typ = '')
+	{
+		if ($typ == 'nummer')
+		{
+			$searchstring = preg_replace('/[^0-9]/','',$searchstring);
+			if(!is_numeric($searchstring))
+			{
+				$this->errormsg='Der Suchbegriff ist keine gültige Telefonnummer';
+				return false;
+			}
+		}
+		$qry = "SELECT 
+					*
+				FROM 
+					public.tbl_kontakt
+				WHERE 
+					1=1";
+		
+		if ($typ == 'nummer')
+			$qry .= " AND regexp_replace(kontakt , '[^0-9]', '', 'g') LIKE ('%".$this->db_escape($searchstring)."%')";
+		else
+			$qry .= " AND LOWER (kontakt) LIKE LOWER ('%".$this->db_escape($searchstring)."%')";
+		
+		if ($typ != '' && $typ != 'nummer')
+			$qry .= " AND kontakttyp=".$this->db_add_param($typ);
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new kontakt();
+	
+				$obj->kontakt_id = $row->kontakt_id;
+				$obj->person_id = $row->person_id;
+				$obj->standort_id = $row->standort_id;
+				$obj->kontakttyp = $row->kontakttyp;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->kontakt = $row->kontakt;
+				$obj->zustellung = $this->db_parse_bool($row->zustellung);
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->ext_id = $row->ext_id;
+	
+				$this->result[] = $obj;
+			}
+	
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
