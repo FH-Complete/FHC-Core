@@ -605,7 +605,7 @@ if(isset($_GET['excel']))
 				{
 					if (<?php echo json_encode($punkteberechnung);?> == 'false' && (document.getElementById('clm_absolviert').className == 'inactive' || document.getElementById('clm_ergebnis').className == 'inactive'))
 					{
-						$('.wait').html('...wait...');
+						$('.wait').html('...loading...');
 						window.location.href = "<?php echo $_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$reihungstest_id.'&studiensemester_kurzbz='.$studiensemester_kurzbz.'&punkteberechnung=true';?>";
 					}
 					else if (<?php echo json_encode($punkteberechnung);?> == 'true' && document.getElementById('clm_absolviert').className == 'inactive' && document.getElementById('clm_ergebnis').className == 'inactive')
