@@ -695,9 +695,9 @@ class studienplan extends basis_db
 
 	/**
 	 * Holt die aktiven Studienplaene eines Studiensemester / Ausbildungssemesters
-	 * @param studiensemester_kurzbz
-	 * @param $ausbuldungssemester
-	 * @param $orgform_kurzbz
+	 * @param string $studiensemester_kurzbz Optional. Studiensemester in dem der Studienplan liegen soll
+	 * @param integer $ausbildungssemester Optional. Ausbildungssemester in dem der Studienplan liegen soll
+	 * @param string $orgform_kurzbz. Optional. Organisationsform des Studienplans
 	 */
 	function getStudienplaeneFromSem($studiengang_kz, $studiensemester_kurzbz="", $ausbildungssemester="", $orgform_kurzbz = "")
 	{
