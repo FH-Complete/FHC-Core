@@ -114,16 +114,22 @@ function MessagesNewMessage()
  */
 function MessagesSendAnswer()
 {
-	var tree=document.getElementById('messages-tree');
-	if(tree.currentIndex==-1)
+	var messagesTree = document.getElementById('messages-tree');
+	var studentsTree = parent.document.getElementById('student-tree');
+	
+	if (messagesTree.currentIndex == -1)
 	{
 		alert("Bitte markieren Sie zuerst eine Nachricht");
 	}
 	else
 	{
-		var MessageId = getTreeCellText(tree, 'messages-tree-message_id', tree.currentIndex);
-		var RecipientID = getTreeCellText(tree, 'messages-tree-recipient_id', tree.currentIndex);
-		window.open('<?php echo APP_ROOT ?>index.ci.php/system/Messages/reply/'+MessageId+'/'+RecipientID,'Reply','');
+		var MessageId = getTreeCellText(messagesTree, 'messages-tree-message_id', messagesTree.currentIndex);
+		var RecipientID = getTreeCellText(messagesTree, 'messages-tree-recipient_id', messagesTree.currentIndex);
+		var prestudentIdArray = new Array(getTreeCellText(studentsTree, 'student-treecol-prestudent_id', studentsTree.currentIndex));
+		
+		var action = '<?php echo APP_ROOT ?>index.ci.php/system/Messages/write/' + MessageSenderPersonID + '/' + MessageId + '/' + RecipientID;
+		
+		openWindowPostArray(action, 'prestudent_id', prestudentIdArray);
 	}
 }
 
