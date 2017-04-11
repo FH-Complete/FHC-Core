@@ -160,6 +160,15 @@
 				}
 			?>
 			
+			<?php
+				if (isset($message))
+				{
+			?>
+					<input type="hidden" name="relationmessage_id" value="<?php echo $message->message_id; ?>">
+			<?php
+				}
+			?>
+			
 		</form>
 	
 	<script>

@@ -107,7 +107,7 @@ class Messages extends VileSci_Controller
 				
 				$parsedText = $this->messagelib->parseMessageText($body, $dataArray);
 				
-				$msg = $this->messagelib->sendMessage($sender_id, $dataArray['person_id'], $subject, $parsedText, PRIORITY_NORMAL);
+				$msg = $this->messagelib->sendMessage($sender_id, $dataArray['person_id'], $subject, $parsedText, PRIORITY_NORMAL, $relationmessage_id);
 				if ($msg->error)
 				{
 					show_error($msg->retval);
