@@ -665,6 +665,7 @@ function GenerateXMLStudentBlock($row)
 		}
 	}
 
+	$aktstatus_stsem = $ssem;
 	//StudStatusCode und Semester ermitteln
 	$qrystatus="SELECT * FROM public.tbl_prestudentstatus
 		WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." AND studiensemester_kurzbz=".$db->db_add_param($ssem)." AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
@@ -721,6 +722,7 @@ function GenerateXMLStudentBlock($row)
 				$aktstatus=$rowstatus->status_kurzbz;
 				$aktstatus_datum=$rowstatus->datum;
 				$storgform=$rowstatus->orgform_kurzbz;
+				$aktstatus_stsem = $rowstatus->studiensemester_kurzbz;
 			}
 		}
 		else
@@ -775,6 +777,7 @@ function GenerateXMLStudentBlock($row)
 					$aktstatus=$rowstatus->status_kurzbz;
 					$aktstatus_datum=$rowstatus->datum;
 					$storgform=$rowstatus->orgform_kurzbz;
+					$aktstatus_stsem = $rowstatus->studiensemester_kurzbz;
 				}
 			}
 		}
@@ -797,7 +800,9 @@ function GenerateXMLStudentBlock($row)
 				LEFT JOIN public.tbl_firma USING(firma_id)
 			WHERE
 				prestudent_id=".$db->db_add_param($row->prestudent_id)."
-				AND studiensemester_kurzbz=".$db->db_add_param($ssem).";";
+				AND studiensemester_kurzbz=".$db->db_add_param($aktstatus_stsem)."
+			ORDER BY tbl_mobilitaet.insertamum DESC limit 1;";
+
 	if($resultgs = $db->db_query($qrygs))
 	{
 		while($rowgs = $db->db_fetch_object($resultgs))
