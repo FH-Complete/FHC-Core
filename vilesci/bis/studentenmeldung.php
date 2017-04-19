@@ -783,8 +783,65 @@ function GenerateXMLStudentBlock($row)
 	if($storgform=='')
 		$storgform=$orgform_kurzbz;
 
+	// **** GS Container ****/
+	$gsstatus='';
+	$gsblock='';
+	$gemeinsamestudien=false;
+	$qrygs="SELECT
+				tbl_mobilitaet.*,
+				tbl_gsprogramm.programm_code,
+				tbl_firma.partner_code
+			FROM
+				bis.tbl_mobilitaet
+				LEFT JOIN bis.tbl_gsprogramm USING(gsprogramm_id)
+				LEFT JOIN public.tbl_firma USING(firma_id)
+			WHERE
+				prestudent_id=".$db->db_add_param($row->prestudent_id)."
+				AND studiensemester_kurzbz=".$db->db_add_param($ssem).";";
+	if($resultgs = $db->db_query($qrygs))
+	{
+		while($rowgs = $db->db_fetch_object($resultgs))
+		{
+			$gsstatus = 'GS '.$rowgs->status_kurzbz.' '.$row->gsstudientyp_kurzbz;
+			$gemeinsamestudien=true;
+			$studtyp = $kodex_studientyp_array[$row->gsstudientyp_kurzbz];
+			$studstatuscode = (isset($kodex_studstatuscode_array[$rowgs->status_kurzbz])?$kodex_studstatuscode_array[$rowgs->status_kurzbz]:'');
+
+			$gserror='';
+			if($studstatuscode=='')
+				$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Status ist nicht gesetzt\n";
+			if($studtyp=='')
+				$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Studientyp ist nicht gesetzt\n";
+			if($rowgs->partner_code=='')
+				$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Partner Code ist leer\n";
+			if($rowgs->programm_code=='')
+				$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Programm ist leer\n";
+
+			if($gserror!='')
+			{
+				$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->status_kurzbz): </u>\n";
+				$v.=$gserror."\n";
+				return '';
+			}
+			$gsblock.="
+		<GS>
+			<MobilitaetsProgrammCode>".$rowgs->mobilitaetsprogramm_code."</MobilitaetsProgrammCode>
+			<ProgrammNr>".$rowgs->programm_code."</ProgrammNr>
+			<StudTyp>".$studtyp."</StudTyp>
+			<PartnerCode>".$rowgs->partner_code."</PartnerCode>
+			<Ausbildungssemester>".$rowgs->ausbildungssemester."</Ausbildungssemester>
+			<StudStatusCode>".$studstatuscode."</StudStatusCode>
+		</GS>";
+			if(!isset($gssem[$storgform][$rowgs->ausbildungssemester]))
+			{
+				$gssem[$storgform][$rowgs->ausbildungssemester]=0;
+			}
+			$gssem[$storgform][$rowgs->ausbildungssemester]++;
+		}
+	}
+
 	//bei Absolventen das Beendigungsdatum (Sponsion oder Abschlussprüfung) überprüfen
-	if($aktstatus=='Absolvent')
+	if($aktstatus=='Absolvent' && !$gemeinsamestudien)
 	{
 		$qry_ap="SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid=".$db->db_add_param($row->student_uid)." AND abschlussbeurteilung_kurzbz!='nicht' AND abschlussbeurteilung_kurzbz IS NOT NULL";
 		if($result_ap = $db->db_query($qry_ap))
@@ -883,64 +940,6 @@ function GenerateXMLStudentBlock($row)
 	}
 	else
 	{
-
-		// **** GS Container ****/
-		$gsstatus='';
-		$gsblock='';
-		$gemeinsamestudien=false;
-		$qrygs="SELECT
-					tbl_mobilitaet.*,
-					tbl_gsprogramm.programm_code,
-					tbl_firma.partner_code
-				FROM
-					bis.tbl_mobilitaet
-					LEFT JOIN bis.tbl_gsprogramm USING(gsprogramm_id)
-					LEFT JOIN public.tbl_firma USING(firma_id)
-				WHERE
-					prestudent_id=".$db->db_add_param($row->prestudent_id)."
-					AND studiensemester_kurzbz=".$db->db_add_param($ssem).";";
-		if($resultgs = $db->db_query($qrygs))
-		{
-			while($rowgs = $db->db_fetch_object($resultgs))
-			{
-				$gsstatus = 'GS '.$rowgs->status_kurzbz.' '.$row->gsstudientyp_kurzbz;
-				$gemeinsamestudien=true;
-				$studtyp = $kodex_studientyp_array[$row->gsstudientyp_kurzbz];
-				$studstatuscode = (isset($kodex_studstatuscode_array[$rowgs->status_kurzbz])?$kodex_studstatuscode_array[$rowgs->status_kurzbz]:'');
-
-				$gserror='';
-				if($studstatuscode=='')
-					$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Status ist nicht gesetzt\n";
-				if($studtyp=='')
-					$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Studientyp ist nicht gesetzt\n";
-				if($rowgs->partner_code=='')
-					$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Partner Code ist leer\n";
-				if($rowgs->programm_code=='')
-					$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Programm ist leer\n";
-
-				if($gserror!='')
-				{
-					$v.="<u>Bei Student (UID, Vorname, Nachname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($row->status_kurzbz): </u>\n";
-					$v.=$gserror."\n";
-					return '';
-				}
-				$gsblock.="
-			<GS>
-				<MobilitaetsProgrammCode>".$rowgs->mobilitaetsprogramm_code."</MobilitaetsProgrammCode>
-				<ProgrammNr>".$rowgs->programm_code."</ProgrammNr>
-				<StudTyp>".$studtyp."</StudTyp>
-				<PartnerCode>".$rowgs->partner_code."</PartnerCode>
-				<Ausbildungssemester>".$rowgs->ausbildungssemester."</Ausbildungssemester>
-				<StudStatusCode>".$studstatuscode."</StudStatusCode>
-			</GS>";
-				if(!isset($gssem[$storgform][$rowgs->ausbildungssemester]))
-				{
-					$gssem[$storgform][$rowgs->ausbildungssemester]=0;
-				}
-				$gssem[$storgform][$rowgs->ausbildungssemester]++;
-			}
-		}
-
 		$datei.="
 		<StudentIn>
 			<PersKz>".trim($row->matrikelnr)."</PersKz>";
