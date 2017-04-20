@@ -214,6 +214,38 @@ class WidgetLib
     }
     
     /**
+     * 
+     */
+    public function UDFWidget($args, $htmlArgs = array())
+    {
+		if (!empty($args[UDF_widget_tpl::SCHEMA_ARG_NAME])
+			&& !empty($args[UDF_widget_tpl::TABLE_ARG_NAME])
+			&& !empty($args[UDF_widget_tpl::FIELD_ARG_NAME]))
+		{
+			return $this->widget(
+				UDF_widget_tpl::WIDGET_NAME,
+				$args,
+				$htmlArgs
+			);
+		}
+		else
+		{
+			if (empty($args[UDF_widget_tpl::SCHEMA_ARG_NAME]))
+			{
+				show_error(UDF_widget_tpl::SCHEMA_ARG_NAME.' parameter is missing!');
+			}
+			if (empty($args[UDF_widget_tpl::TABLE_ARG_NAME]))
+			{
+				show_error(UDF_widget_tpl::TABLE_ARG_NAME.' parameter is missing!');
+			}
+			if (empty($args[UDF_widget_tpl::FIELD_ARG_NAME]))
+			{
+				show_error(UDF_widget_tpl::FIELD_ARG_NAME.' parameter is missing!');
+			}
+		}
+    }
+    
+    /**
      * Enable cache for all partials with TTL, default TTL is 60
      * @param int $ttl
      * @param mixed $identifier
@@ -794,4 +826,15 @@ class DropdownWidget extends Widget
 		
 		array_unshift($this->elementsArray->retval, $element);
 	}
+}
+
+/**
+ * 
+ */
+abstract class UDF_widget_tpl extends Widget
+{
+	const WIDGET_NAME = 'UDF_widget';
+	const SCHEMA_ARG_NAME = 'schema';
+	const TABLE_ARG_NAME = 'table';
+	const FIELD_ARG_NAME = 'field';
 }
