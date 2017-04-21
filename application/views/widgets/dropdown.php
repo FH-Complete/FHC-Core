@@ -2,7 +2,7 @@
 	<?php foreach(${DropdownWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME} as $element): ?>
 		<?php
 			$selected = '';
-			if ($element->{DropdownWidget::ID_FIELD} == ${DropdownWidget::SELECTED_ELEMENT})
+			if ($element->{DropdownWidget::ID_FIELD} === ${DropdownWidget::SELECTED_ELEMENT})
 			{
 				$selected = 'selected';
 			}

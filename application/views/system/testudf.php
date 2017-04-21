@@ -14,7 +14,7 @@
 						UDF_widget_tpl::TABLE_ARG_NAME => $table,
 						UDF_widget_tpl::FIELD_ARG_NAME => $field
 					),
-					array('name' => 'schuhgroesse', 'id' => 'schuhgroesseUDF')
+					array('id' => 'schuhgroesseID', 'name' => 'schuhgroesseName')
 				);
 			?>
 		</div>

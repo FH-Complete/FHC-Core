@@ -739,6 +739,36 @@ class DropdownWidget extends Widget
 	private $elementsArray; // Array of elements to be place inside the dropdown
 	
 	/**
+	 * 
+	 */
+	public function displayElements($elements, $widgetData)
+	{
+		$this->setElementsArray(success($this->convert($elements)), true);
+		$this->loadDropDownView($widgetData);
+		
+		echo $this->content();
+    }
+    
+    /**
+	 * 
+	 */
+	public static function convert($elements)
+	{
+		$returnArray = array();
+		
+		foreach($elements as $key => $val)
+		{
+			$element = new stdClass();
+			$element->id = $key;
+			$element->description = $val;
+			
+			array_push($returnArray, $element);
+		}
+		
+		return $returnArray;
+    }
+	
+	/**
 	 * Loads the dropdown view with all the elements to be displayed
 	 */
 	protected function loadDropDownView($widgetData)

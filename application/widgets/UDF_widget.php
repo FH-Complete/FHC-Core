@@ -50,7 +50,7 @@ class UDF_widget extends UDF_widget_tpl
 				{
 					if (isset($jsonSchema->type))
 					{
-						var_dump($jsonSchema);
+// 						var_dump($jsonSchema);
 						
 						if ($jsonSchema->type == 'checkbox')
 						{
@@ -70,7 +70,8 @@ class UDF_widget extends UDF_widget_tpl
 						}
 						else if ($jsonSchema->type == 'dropdown')
 						{
-							$dropdownWidget = new DropdownWidget();
+							$dropdownWidget = new DropdownWidget($this->_name, $this->_args);
+							$dropdownWidget->displayElements($jsonSchema->listValues->enum, $this->_args);
 						}
 						else if ($jsonSchema->type == 'multipledropdown')
 						{
