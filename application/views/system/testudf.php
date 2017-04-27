@@ -10,11 +10,12 @@
 			<?php
 				echo $this->widgetlib->UDFWidget(
 					array(
-						UDF_widget_tpl::SCHEMA_ARG_NAME => $schema,
-						UDF_widget_tpl::TABLE_ARG_NAME => $table,
-						UDF_widget_tpl::FIELD_ARG_NAME => $field
+						UDFWidgetTpl::SCHEMA_ARG_NAME => $schema,
+						UDFWidgetTpl::TABLE_ARG_NAME => $table,
+						UDFWidgetTpl::FIELD_ARG_NAME => $field,
+						DropdownWidget::SELECTED_ELEMENT => $selected
 					),
-					array('id' => 'schuhgroesseID', 'name' => 'schuhgroesseName')
+					array('id' => 'schuhgroesseID', 'name' => 'schuhgroesseName', 'size' => '6')
 				);
 			?>
 		</div>

@@ -218,29 +218,29 @@ class WidgetLib
      */
     public function UDFWidget($args, $htmlArgs = array())
     {
-		if (!empty($args[UDF_widget_tpl::SCHEMA_ARG_NAME])
-			&& !empty($args[UDF_widget_tpl::TABLE_ARG_NAME])
-			&& !empty($args[UDF_widget_tpl::FIELD_ARG_NAME]))
+		if (!empty($args[UDFWidgetTpl::SCHEMA_ARG_NAME])
+			&& !empty($args[UDFWidgetTpl::TABLE_ARG_NAME])
+			&& !empty($args[UDFWidgetTpl::FIELD_ARG_NAME]))
 		{
 			return $this->widget(
-				UDF_widget_tpl::WIDGET_NAME,
+				UDFWidgetTpl::WIDGET_NAME,
 				$args,
 				$htmlArgs
 			);
 		}
 		else
 		{
-			if (empty($args[UDF_widget_tpl::SCHEMA_ARG_NAME]))
+			if (empty($args[UDFWidgetTpl::SCHEMA_ARG_NAME]))
 			{
-				show_error(UDF_widget_tpl::SCHEMA_ARG_NAME.' parameter is missing!');
+				show_error(UDFWidgetTpl::SCHEMA_ARG_NAME.' parameter is missing!');
 			}
-			if (empty($args[UDF_widget_tpl::TABLE_ARG_NAME]))
+			if (empty($args[UDFWidgetTpl::TABLE_ARG_NAME]))
 			{
-				show_error(UDF_widget_tpl::TABLE_ARG_NAME.' parameter is missing!');
+				show_error(UDFWidgetTpl::TABLE_ARG_NAME.' parameter is missing!');
 			}
-			if (empty($args[UDF_widget_tpl::FIELD_ARG_NAME]))
+			if (empty($args[UDFWidgetTpl::FIELD_ARG_NAME]))
 			{
-				show_error(UDF_widget_tpl::FIELD_ARG_NAME.' parameter is missing!');
+				show_error(UDFWidgetTpl::FIELD_ARG_NAME.' parameter is missing!');
 			}
 		}
     }
@@ -692,38 +692,64 @@ class Widget extends Partial
      */
     private function _setHtmlProperties($htmlArgs)
     {
-		if (isset($htmlArgs) && is_array($htmlArgs))
+		// If $htmlArgs wasn't already stored in $this->_args
+		if (!isset($this->_args[Widget::HTML_ARG_NAME]))
 		{
 			$this->_args[Widget::HTML_ARG_NAME] = array();
 			
-			// Avoids that the elements of a same HTML page have the same name or id
+			// Avoids that elements in a HTML page have the same name or id
 			$randomIdentifier = uniqid(rand(0, 1000));
+			$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_ID] = $randomIdentifier;
+			$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] = $randomIdentifier;
 			
-			if (isset($htmlArgs[Widget::HTML_ID]) && trim($htmlArgs[Widget::HTML_ID]) != '')
+			foreach($htmlArgs as $argName => $argValue)
 			{
-				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_ID] = $htmlArgs[Widget::HTML_ID];
-			}
-			else
-			{
-				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_ID] = $randomIdentifier;
-			}
-			
-			if (isset($htmlArgs[Widget::HTML_NAME]) && trim($htmlArgs[Widget::HTML_NAME]) != '')
-			{
-				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] = $htmlArgs[Widget::HTML_NAME];
-			}
-			else
-			{
-				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] = $randomIdentifier;
+				$this->_args[Widget::HTML_ARG_NAME][$argName] = $argValue;
 			}
 		}
     }
+    
+    /**
+	 * 
+	 */
+	public static function printAttribute($htmlArgs, $attribute, $isValuePresent = true)
+	{
+		if ($attribute != null)
+		{
+			if (isset($htmlArgs[$attribute]))
+			{
+				if ($isValuePresent === true)
+				{
+					$value = $htmlArgs[$attribute];
+					
+					if (is_bool($value))
+					{
+						$value = $value ? 'true' : 'false';
+					}
+					
+					echo sprintf('%s="%s"', $attribute, $value);
+				}
+				else
+				{
+					echo $attribute;
+				}
+			}
+		}
+	}
+}
+
+/**
+ * 
+ */
+abstract class WidgetTpl extends Widget
+{
+	abstract public function render($parameters);
 }
 
 /**
  * It exends the Widget class to represent an HTML dropdown
  */
-class DropdownWidget extends Widget
+class DropdownWidget extends WidgetTpl
 {
 	// The name of the element of the data array given to the view
 	// this element is an array of elements to be place inside the dropdown
@@ -731,59 +757,58 @@ class DropdownWidget extends Widget
 	// Name of the property that will be used to store the value attribute of the option tag
 	const ID_FIELD = 'id';
 	// Name of the property that will be used to store the value between the option tags
-	const DESCRIPTION_FIELD = 'description'; //
+	const DESCRIPTION_FIELD = 'description';
 	// The name of the element of the data array given to the view
 	// this element is used to tell what element of the dropdown is selected
-	const SELECTED_ELEMENT = 'selectedElement'; // 
+	const SELECTED_ELEMENT = 'selectedElement';
 	
-	private $elementsArray; // Array of elements to be place inside the dropdown
+	const SIZE = 'size'; // 
+	const MULTIPLE = 'multiple'; // 
 	
 	/**
 	 * 
 	 */
-	public function displayElements($elements, $widgetData)
+	public function __construct($name, $args, $htmlArgs = array())
 	{
-		$this->setElementsArray(success($this->convert($elements)), true);
-		$this->loadDropDownView($widgetData);
+		parent::__construct($name, $args, $htmlArgs);
 		
-		echo $this->content();
-    }
-    
-    /**
+		// 
+		if (!isset($this->_args[DropdownWidget::SELECTED_ELEMENT]))
+		{
+			$this->_args[DropdownWidget::SELECTED_ELEMENT] = Widget::HTML_DEFAULT_VALUE;
+		}
+	}
+	
+	/**
 	 * 
 	 */
-	public static function convert($elements)
+	public function render($parameters)
 	{
-		$returnArray = array();
+		$tmpElements = array();
 		
-		foreach($elements as $key => $val)
+		// 
+		foreach($parameters['elements'] as $key => $val)
 		{
 			$element = new stdClass();
 			$element->id = $key;
 			$element->description = $val;
 			
-			array_push($returnArray, $element);
+			array_push($tmpElements, $element);
 		}
 		
-		return $returnArray;
+		$this->setElementsArray(
+			success($tmpElements),
+			true,
+			'Select a value...',
+			'No data found for this UDF'
+		);
+		
+		$this->loadDropDownView();
+		
+		echo $this->content();
     }
-	
-	/**
-	 * Loads the dropdown view with all the elements to be displayed
-	 */
-	protected function loadDropDownView($widgetData)
-	{
-		$widgetData[DropdownWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME] = $this->elementsArray->retval;
-		
-		if (!isset($widgetData[DropdownWidget::SELECTED_ELEMENT]))
-		{
-			$widgetData[DropdownWidget::SELECTED_ELEMENT] = Widget::HTML_DEFAULT_VALUE;
-		}
-		
-		$this->view('widgets/dropdown', $widgetData);
-	}
-	
-	/**
+    
+    /**
 	 * Add the correct select to the model used to load a list of elemets for this dropdown
 	 * @param model $model the model used to load elements
 	 * @param string $idName the name of the field that will used to be the value of the option tag
@@ -801,7 +826,7 @@ class DropdownWidget extends Widget
 			)
 		);
 	}
-	
+    
 	/**
 	 * Set the array used to populate the dropdown
 	 * @param array $elements list used to populate this dropdown
@@ -811,9 +836,11 @@ class DropdownWidget extends Widget
 	 * @param string $id value of the attribute value of the empty element
 	 */
 	protected function setElementsArray(
-		$elements, $emptyElement = false, $stdDescription = '' , $noDataDescription = '' , $id = Widget::HTML_DEFAULT_VALUE
+		$elements, $emptyElement = false, $stdDescription = '' , $noDataDescription = 'No data found' , $id = Widget::HTML_DEFAULT_VALUE
 	)
 	{
+		$tmpElements = array();
+		
 		if (isError($elements))
 		{
 			if (is_object($elements) && isset($elements->retval))
@@ -831,40 +858,85 @@ class DropdownWidget extends Widget
 		}
 		else
 		{
-			$this->elementsArray = $elements;
-			
 			if ($emptyElement === true)
 			{
-				$this->addElementAtBeginning($stdDescription, $noDataDescription, $id);
+				$tmpElements = $this->addElementAtBeginning(
+					$elements,
+					$stdDescription,
+					$noDataDescription,
+					$id
+				);
 			}
+			else
+			{
+				$tmpElements = $elements->retval;
+			}
+			
+			$this->_args[DropdownWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME] = $tmpElements;
 		}
 	}
 	
 	/**
      * Adds an element to the beginning of the array
      */
-	protected function addElementAtBeginning($stdDescription, $noDataDescription, $id)
+	protected function addElementAtBeginning($elements, $stdDescription, $noDataDescription, $id)
 	{
 		$element = new stdClass();
 		$element->id = $id;
 		$element->description = $stdDescription;
 		
-		if (!hasData($this->elementsArray))
+		if (!hasData($elements))
 		{
 			$element->description = $noDataDescription;
 		}
 		
-		array_unshift($this->elementsArray->retval, $element);
+		array_unshift($elements->retval, $element);
+		
+		return $elements->retval;
+	}
+	
+	/**
+	 * Loads the dropdown view with all the elements to be displayed
+	 */
+	protected function loadDropDownView()
+	{
+		$this->view('widgets/dropdown', $this->_args);
 	}
 }
 
 /**
  * 
  */
-abstract class UDF_widget_tpl extends Widget
+class MultipleDropdownWidget extends DropdownWidget
 {
-	const WIDGET_NAME = 'UDF_widget';
+	/**
+	 * 
+	 */
+	public function __construct($name, $args, $htmlArgs = array())
+	{
+		parent::__construct($name, $args, $htmlArgs);
+		
+		// 
+		$this->_args[Widget::HTML_ARG_NAME][DropdownWidget::MULTIPLE] = 'multiple';
+	}
+}
+
+/**
+ * 
+ */
+abstract class UDFWidgetTpl extends Widget
+{
+	const WIDGET_NAME = 'UDFWidget';
 	const SCHEMA_ARG_NAME = 'schema';
 	const TABLE_ARG_NAME = 'table';
 	const FIELD_ARG_NAME = 'field';
+	
+	const TITLE = 'title';
+	const DESCRIPTION = 'description';
+	const PLACEHOLDER = 'placeholder';
+	const DEFAULT_VALUE = 'defaultValue';
+	const REGEX = 'regex';
+	const REQUIRED = 'required';
+	const MAX_VALUE = 'max_value';
+	const MIN_VALUE = 'min_value';
 }
