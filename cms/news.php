@@ -331,6 +331,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 			$xml.='<ass>';
 			
 			$xml.='<name><![CDATA['.$ma->titelpre.' '.$ma->vorname.' '.$ma->nachname.' '.$ma->titelpost.']]></name>';
+			$xml.='<bezeichnung><![CDATA['.$row->bezeichnung.']]></bezeichnung>';
 			$alias = new benutzer();
 			$alias->load($ma->uid);
 			if($alias->alias!='')

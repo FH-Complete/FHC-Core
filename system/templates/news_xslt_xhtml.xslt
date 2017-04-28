@@ -138,7 +138,11 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	</xsl:template>
 	<xsl:template match="ass">
 			<xsl:variable name="uid" select="uid"></xsl:variable>
-			<p><a href="../cis/private/profile/index.php?uid={$uid}"><xsl:value-of select="name" /></a><br />			
+			<p>
+			<xsl:if test="bezeichnung != 'Assistenz'" >
+				<b><xsl:value-of select="bezeichnung" /></b><br />
+			</xsl:if>
+			<a href="../cis/private/profile/index.php?uid={$uid}"><xsl:value-of select="name" /></a><br />			
 			T: <xsl:value-of select="telefon" /><br />
 			R: <xsl:value-of select="ort" /><br />
 			E: <xsl:variable name="mail" select="email"></xsl:variable>
