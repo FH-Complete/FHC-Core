@@ -83,17 +83,41 @@ class UDFWidget extends UDFWidgetTpl
 			
 			if (isset($jsonSchema->title))
 			{
-				$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::TITLE] = $this->_ci->phraseslib->getPhrases('core', 'German', $jsonSchema->title);
+				$tmpResult = $this->_ci->phraseslib->getPhrases('core', 'German', $jsonSchema->title, null, null, 'no');
+				if (hasData($tmpResult))
+				{
+					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::LABEL] = $tmpResult->retval[0]->text;
+				}
+				else
+				{
+					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::LABEL] = null;
+				}
 			}
 			
 			if (isset($jsonSchema->description))
 			{
-				$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::DESCRIPTION] = $this->_ci->phraseslib->getPhrases('core', 'German', $jsonSchema->description);
+				$tmpResult = $this->_ci->phraseslib->getPhrases('core', 'German', $jsonSchema->description, null, null, 'no');
+				if (hasData($tmpResult))
+				{
+					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::TITLE] = $tmpResult->retval[0]->text;
+				}
+				else
+				{
+					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::TITLE] = null;
+				}
 			}
 			
 			if (isset($jsonSchema->placeholder))
 			{
-				$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::PLACEHOLDER] = $this->_ci->phraseslib->getPhrases('core', 'German', $jsonSchema->placeholder);
+				$tmpResult = $this->_ci->phraseslib->getPhrases('core', 'German', $jsonSchema->placeholder, null, null, 'no');
+				if (hasData($tmpResult))
+				{
+					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::PLACEHOLDER] = $tmpResult->retval[0]->text;
+				}
+				else
+				{
+					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::PLACEHOLDER] = null;
+				}
 			}
 		}
 		

@@ -799,7 +799,7 @@ class DropdownWidget extends WidgetTpl
 		$this->setElementsArray(
 			success($tmpElements),
 			true,
-			'Select a value...',
+			$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::PLACEHOLDER],
 			'No data found for this UDF'
 		);
 		
@@ -932,7 +932,7 @@ abstract class UDFWidgetTpl extends Widget
 	const FIELD_ARG_NAME = 'field';
 	
 	const TITLE = 'title';
-	const DESCRIPTION = 'description';
+	const LABEL = 'description';
 	const PLACEHOLDER = 'placeholder';
 	const DEFAULT_VALUE = 'defaultValue';
 	const REGEX = 'regex';

@@ -1,10 +1,6 @@
 <?php $this->load->view("templates/header", array("title" => "UDF")); ?>
 
 	<body>
-	
-		<div>
-			UDFWidget: 
-		</div>
 		
 		<div>
 			<?php
@@ -19,7 +15,7 @@
 				);
 			?>
 		</div>
-	
+		
 	</body>
 	
 <?php $this->load->view("templates/footer"); ?>
