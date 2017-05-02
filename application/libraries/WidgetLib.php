@@ -739,17 +739,9 @@ class Widget extends Partial
 }
 
 /**
- * 
- */
-abstract class WidgetTpl extends Widget
-{
-	abstract public function render($parameters);
-}
-
-/**
  * It exends the Widget class to represent an HTML dropdown
  */
-class DropdownWidget extends WidgetTpl
+class DropdownWidget extends Widget
 {
 	// The name of the element of the data array given to the view
 	// this element is an array of elements to be place inside the dropdown
@@ -779,33 +771,12 @@ class DropdownWidget extends WidgetTpl
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	public function render($parameters)
-	{
-		$tmpElements = array();
-		
-		// 
-		foreach($parameters['elements'] as $key => $val)
-		{
-			$element = new stdClass();
-			$element->id = $key;
-			$element->description = $val;
-			
-			array_push($tmpElements, $element);
-		}
-		
-		$this->setElementsArray(
-			success($tmpElements),
-			true,
-			$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::PLACEHOLDER],
-			'No data found for this UDF'
-		);
-		
-		$this->loadDropDownView();
-		
-		echo $this->content();
+    /**
+     * 
+     */
+    public function setMultiple()
+    {
+		$this->_args[Widget::HTML_ARG_NAME][DropdownWidget::MULTIPLE] = 'multiple';
     }
     
     /**
@@ -904,21 +875,36 @@ class DropdownWidget extends WidgetTpl
 	}
 }
 
-/**
- * 
- */
-class MultipleDropdownWidget extends DropdownWidget
+class DropdownWidgetUDF extends DropdownWidget
 {
 	/**
 	 * 
 	 */
-	public function __construct($name, $args, $htmlArgs = array())
+	public function render($parameters)
 	{
-		parent::__construct($name, $args, $htmlArgs);
+		$tmpElements = array();
 		
 		// 
-		$this->_args[Widget::HTML_ARG_NAME][DropdownWidget::MULTIPLE] = 'multiple';
-	}
+		foreach($parameters as $key => $val)
+		{
+			$element = new stdClass();
+			$element->id = $key;
+			$element->description = $val;
+			
+			array_push($tmpElements, $element);
+		}
+		
+		$this->setElementsArray(
+			success($tmpElements),
+			true,
+			$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::PLACEHOLDER],
+			'No data found for this UDF'
+		);
+		
+		$this->loadDropDownView();
+		
+		echo $this->content();
+    }
 }
 
 /**
@@ -931,12 +917,12 @@ abstract class UDFWidgetTpl extends Widget
 	const TABLE_ARG_NAME = 'table';
 	const FIELD_ARG_NAME = 'field';
 	
-	const TITLE = 'title';
-	const LABEL = 'description';
+	const TITLE = 'description';
+	const LABEL = 'title';
 	const PLACEHOLDER = 'placeholder';
 	const DEFAULT_VALUE = 'defaultValue';
 	const REGEX = 'regex';
 	const REQUIRED = 'required';
-	const MAX_VALUE = 'max_value';
-	const MIN_VALUE = 'min_value';
+	const MAX_VALUE = 'max-value';
+	const MIN_VALUE = 'min-value';
 }
