@@ -875,6 +875,9 @@ class DropdownWidget extends Widget
 	}
 }
 
+/**
+ * 
+ */
 class DropdownWidgetUDF extends DropdownWidget
 {
 	/**
@@ -902,6 +905,50 @@ class DropdownWidgetUDF extends DropdownWidget
 		);
 		
 		$this->loadDropDownView();
+		
+		echo $this->content();
+    }
+}
+
+/**
+ * It exends the Widget class to represent an HTML textarea
+ */
+class TextareaWidget extends Widget
+{
+	const TEXT = 'text'; // 
+	const ROWS = 'rows'; // 
+	const COLS = 'cols'; // 
+	
+	/**
+	 * 
+	 */
+	protected function setText($text)
+	{
+		$this->_args[DropdownWidget::TEXT] = $text;
+	}
+	
+	/**
+	 * 
+	 */
+	protected function loadTextareaView()
+	{
+		$this->view('widgets/textarea', $this->_args);
+	}
+}
+
+/**
+ * 
+ */
+class TextareaWidgetUDF extends TextareaWidget
+{
+	/**
+	 * 
+	 */
+	public function render($parameters)
+	{
+		$this->setText($parameters);
+		
+		$this->loadTextareaView();
 		
 		echo $this->content();
     }

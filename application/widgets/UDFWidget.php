@@ -133,7 +133,7 @@ class UDFWidget extends UDFWidgetTpl
 		}
 		else if ($jsonSchema->type == 'textarea')
 		{
-			
+			$this->_renderTextarea($jsonSchema);
 		}
 		else if ($jsonSchema->type == 'date')
 		{
@@ -156,15 +156,15 @@ class UDFWidget extends UDFWidgetTpl
 	{
 		$dropdownWidgetUDF = new DropdownWidgetUDF($this->_name, $this->_args);
 			
-		$paramters = array();
+		$parameters = array();
 		
 		if (isset($jsonSchema->listValues->enum))
 		{
-			$paramters = $jsonSchema->listValues->enum;
+			$parameters = $jsonSchema->listValues->enum;
 		}
 		else if (isset($jsonSchema->listValues->sql))
 		{
-			$paramters = $jsonSchema->listValues->sql;
+			$parameters = $jsonSchema->listValues->sql;
 		}
 		
 		if ($multiple)
@@ -172,7 +172,23 @@ class UDFWidget extends UDFWidgetTpl
 			$dropdownWidgetUDF->setMultiple();
 		}
 		
-		$dropdownWidgetUDF->render($paramters);
+		$dropdownWidgetUDF->render($parameters);
+	}
+	
+	/**
+     * 
+     */
+	private function _renderTextarea($jsonSchema)
+	{
+		$textareaUDF = new TextareaUDF($this->_name, $this->_args);
+			
+		$text = '';
+		if (isset($jsonSchema->defaultValue))
+		{
+			$text = $jsonSchema->defaultValue;
+		}
+		
+		$textareaUDF->render($text);
 	}
     
     /**
