@@ -853,12 +853,12 @@ class DropdownWidget extends Widget
 	protected function addElementAtBeginning($elements, $stdDescription, $noDataDescription, $id)
 	{
 		$element = new stdClass();
-		$element->id = $id;
-		$element->description = $stdDescription;
+		$element->{DropdownWidget::ID_FIELD} = $id;
+		$element->{DropdownWidget::DESCRIPTION_FIELD} = $stdDescription;
 		
 		if (!hasData($elements))
 		{
-			$element->description = $noDataDescription;
+			$element->{DropdownWidget::DESCRIPTION_FIELD} = $noDataDescription;
 		}
 		
 		array_unshift($elements->retval, $element);
@@ -888,13 +888,35 @@ class DropdownWidgetUDF extends DropdownWidget
 		$tmpElements = array();
 		
 		// 
-		foreach($parameters as $key => $val)
+		foreach($parameters as $parameter)
 		{
-			$element = new stdClass();
-			$element->id = $key;
-			$element->description = $val;
-			
-			array_push($tmpElements, $element);
+			// 
+			if ((is_array($parameter) && count($parameter) == 2)
+				|| (is_string($parameter) || is_numeric($parameter))
+				|| (is_object($parameter) && isset($parameter->{PARENT::ID_FIELD}) && isset($parameter->{PARENT::DESCRIPTION_FIELD})))
+			{
+				$element = new stdClass(); // 
+				// 
+				if (is_array($parameter) && count($parameter) == 2)
+				{
+					$element->{PARENT::ID_FIELD} = $parameter[0]; // 
+					$element->{PARENT::DESCRIPTION_FIELD} = $parameter[1]; // 
+				}
+				// 
+				else if (is_string($parameter) || is_numeric($parameter))
+				{
+					$element->{PARENT::ID_FIELD} = $parameter; // 
+					$element->{PARENT::DESCRIPTION_FIELD} = $parameter; // 
+				}
+				// 
+				else if (is_object($parameter) && isset($parameter->{PARENT::ID_FIELD}) && isset($parameter->{PARENT::DESCRIPTION_FIELD}))
+				{
+					$element->{PARENT::ID_FIELD} = $parameter->{PARENT::ID_FIELD}; // 
+					$element->{PARENT::DESCRIPTION_FIELD} = $parameter->{PARENT::DESCRIPTION_FIELD}; // 
+				}
+				
+				array_push($tmpElements, $element); // 
+			}
 		}
 		
 		$this->setElementsArray(
@@ -924,7 +946,7 @@ class TextareaWidget extends Widget
 	 */
 	protected function setText($text)
 	{
-		$this->_args[DropdownWidget::TEXT] = $text;
+		$this->_args[TextareaWidget::TEXT] = $text;
 	}
 	
 	/**
@@ -946,9 +968,157 @@ class TextareaWidgetUDF extends TextareaWidget
 	 */
 	public function render($parameters)
 	{
-		$this->setText($parameters);
+		if ($parameters != null)
+		{
+			$this->setText($parameters);
+		}
+		else
+		{
+			$this->setText('');
+		}
 		
 		$this->loadTextareaView();
+		
+		echo $this->content();
+    }
+}
+
+/**
+ * It exends the Widget class to represent an HTML textarea
+ */
+class TextfieldWidget extends Widget
+{
+	const VALUE = 'text'; // 
+	const SIZE = 'size'; // 
+	
+	/**
+	 * 
+	 */
+	protected function setValue($value)
+	{
+		$this->_args[TextfieldWidget::VALUE] = $value;
+	}
+	
+	/**
+	 * 
+	 */
+	protected function loadTextfieldView()
+	{
+		$this->view('widgets/textfield', $this->_args);
+	}
+}
+
+/**
+ * 
+ */
+class TextfieldWidgetUDF extends TextfieldWidget
+{
+	/**
+	 * 
+	 */
+	public function render($parameters)
+	{
+		if ($parameters != null)
+		{
+			$this->setValue($parameters);
+		}
+		else
+		{
+			$this->setValue('');
+		}
+		
+		$this->loadTextfieldView();
+		
+		echo $this->content();
+    }
+}
+
+/**
+ * It exends the Widget class to represent an HTML dropdown
+ */
+class CheckboxWidget extends Widget
+{
+	// The name of the element of the data array given to the view
+	// this element is an array of elements to be place inside the dropdown
+	const WIDGET_DATA_VALUES_ARRAY_NAME = 'VALUES_ARRAY';
+	// The name of the element of the data array given to the view
+	// this element is used to tell what element of the dropdown is selected
+	const CHECKED_VALUE = 'checkedValue';
+	
+	/**
+	 * 
+	 */
+	public function __construct($name, $args, $htmlArgs = array())
+	{
+		parent::__construct($name, $args, $htmlArgs);
+		
+		// 
+		if (!isset($this->_args[CheckboxWidget::CHECKED_VALUE]))
+		{
+			$this->_args[CheckboxWidget::CHECKED_VALUE] = Widget::HTML_DEFAULT_VALUE;
+		}
+	}
+
+	/**
+	 * 
+	 */
+	protected function setValuesArray($values)
+	{
+		if (isError($values))
+		{
+			if (is_object($values) && isset($values->retval))
+			{
+				show_error($values->retval);
+			}
+			else if (is_string($values))
+			{
+				show_error($values);
+			}
+			else
+			{
+				show_error('Generic error occurred');
+			}
+		}
+		else
+		{
+			$this->_args[CheckboxWidget::WIDGET_DATA_VALUES_ARRAY_NAME] = $values->retval;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected function loadCheckboxView()
+	{
+		$this->view('widgets/checkbox', $this->_args);
+	}
+}
+
+/**
+ * 
+ */
+class CheckboxWidgetUDF extends CheckboxWidget
+{
+	/**
+	 * 
+	 */
+	public function render($parameters)
+	{
+		$tmpValues = array();
+		
+		// 
+		foreach($parameters as $parameter)
+		{
+			// 
+			if (is_string($parameter) || is_numeric($parameter))
+			{
+				array_push($tmpValues, $parameter); // 
+			}
+		}
+		
+		$this->setValuesArray(success($tmpValues));
+		
+		$this->loadCheckboxView();
 		
 		echo $this->content();
     }

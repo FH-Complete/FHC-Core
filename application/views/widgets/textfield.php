@@ -8,15 +8,14 @@
 <?php
 	}
 ?>
-<textarea
+<input
+	type="text"
 	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, Widget::HTML_ID); ?>
 	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, Widget::HTML_NAME); ?>
-	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, TextareaWidget::ROWS); ?>
-	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, TextareaWidget::COLS); ?>
+	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, TextfieldWidget::SIZE); ?>
 	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidgetTpl::REQUIRED); ?>
 	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidgetTpl::PLACEHOLDER); ?>
 	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidgetTpl::REGEX); ?>
 	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidgetTpl::TITLE); ?>
+	value="<?php echo ${TextfieldWidget::VALUE}; ?>"
 >
-<?php echo ${TextareaWidget::TEXT}; ?>
-</textarea>

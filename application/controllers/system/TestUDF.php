@@ -17,12 +17,7 @@ class TestUDF extends VileSci_Controller
 	 */
 	public function index()
 	{
-		$data = array (
-			'schema' => 'public',
-			'table' => 'tbl_person',
-			'field' => 'schuhgroesse',
-			'selected' => array(1, 2)
-		);
+		$data = array();
 		
 		$this->load->view('system/testudf', $data);
 	}

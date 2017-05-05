@@ -125,11 +125,11 @@ class UDFWidget extends UDFWidgetTpl
 		// Type
 		if ($jsonSchema->type == 'checkbox')
 		{
-			
+			$this->_renderCheckbox($jsonSchema);
 		}
 		else if ($jsonSchema->type == 'textfield')
 		{
-			
+			$this->_renderTextfield($jsonSchema);
 		}
 		else if ($jsonSchema->type == 'textarea')
 		{
@@ -155,16 +155,21 @@ class UDFWidget extends UDFWidgetTpl
 	private function _renderDropdown($jsonSchema, $multiple = false)
 	{
 		$dropdownWidgetUDF = new DropdownWidgetUDF($this->_name, $this->_args);
-			
 		$parameters = array();
 		
+		// 
 		if (isset($jsonSchema->listValues->enum))
 		{
 			$parameters = $jsonSchema->listValues->enum;
 		}
+		// 
 		else if (isset($jsonSchema->listValues->sql))
 		{
-			$parameters = $jsonSchema->listValues->sql;
+			$queryResult = $this->UDFModel->execQuery($jsonSchema->listValues->sql);
+			if (hasData($queryResult))
+			{	
+				$parameters = $queryResult->retval;
+			}
 		}
 		
 		if ($multiple)
@@ -180,15 +185,45 @@ class UDFWidget extends UDFWidgetTpl
      */
 	private function _renderTextarea($jsonSchema)
 	{
-		$textareaUDF = new TextareaUDF($this->_name, $this->_args);
+		$textareaUDF = new TextareaWidgetUDF($this->_name, $this->_args);
 			
-		$text = '';
-		if (isset($jsonSchema->defaultValue))
+		$textareaUDF->render(null);
+	}
+	
+	/**
+     * 
+     */
+	private function _renderTextfield($jsonSchema)
+	{
+		$textareaUDF = new TextfieldWidgetUDF($this->_name, $this->_args);
+			
+		$textareaUDF->render(null);
+	}
+	
+	/**
+     * 
+     */
+	private function _renderCheckbox($jsonSchema)
+	{
+		$checkboxWidgetUDF = new CheckboxWidgetUDF($this->_name, $this->_args);
+		$parameters = array();
+		
+		// 
+		if (isset($jsonSchema->listValues->enum))
 		{
-			$text = $jsonSchema->defaultValue;
+			$parameters = $jsonSchema->listValues->enum;
+		}
+		// 
+		else if (isset($jsonSchema->listValues->sql))
+		{
+			$queryResult = $this->UDFModel->execQuery($jsonSchema->listValues->sql);
+			if (hasData($queryResult))
+			{	
+				$parameters = $queryResult->retval;
+			}
 		}
 		
-		$textareaUDF->render($text);
+		$checkboxWidgetUDF->render($parameters);
 	}
     
     /**
