@@ -23,7 +23,14 @@ class ReihungstestLib
 	 */
 	public function insertPersonReihungstest($ddReihungstest)
 	{
-		return $this->ci->RtPersonModel->insert($ddReihungstest);
+		if (isset($ddReihungstest['rt_id']) && $this->checkAvailability($ddReihungstest['rt_id']))
+		{
+  			return $this->ci->RtPersonModel->insert($ddReihungstest);
+		}
+		else
+		{
+			return error('This test is not more available');
+		}
 	}
 	
 	/**
@@ -61,5 +68,20 @@ class ReihungstestLib
 		}
 		
 		return $this->ci->ReihungstestModel->loadWhere($parametersArray);
+	}
+	
+	/**
+	 * It checks if the test is available
+	 */
+	public function checkAvailability($reihungstest_id)
+	{
+		$result = $this->ci->ReihungstestModel->checkAvailability($reihungstest_id);
+		
+		if (hasData($result))
+		{
+			return true;
+		}
+		
+		return false;
 	}
 }
