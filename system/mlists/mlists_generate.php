@@ -963,6 +963,68 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 
 
+	// ***************************
+	// TW_BAMA abgleichen
+	// Alle ordentlichen Bachelor- und Master-Studierenden 
+	flush();
+	setGeneriert('TW_BAMA');
+	echo 'TW_BAMA wird abgeglichen!<br>';
+	
+	//Abbrecher bleiben noch 3 Wochen im Verteiler
+	//andere inaktive noch fuer 20 Wochen
+	$sql_query="DELETE FROM public.tbl_benutzergruppe
+			WHERE UPPER(gruppe_kurzbz)='TW_BAMA'
+			AND uid NOT IN
+			(
+				SELECT 
+					uid 
+				FROM 
+					campus.vw_student 
+				WHERE aktiv 
+				AND studiengang_kz IN 
+						(SELECT studiengang_kz FROM public.tbl_studiengang WHERE typ IN ('b','m'))
+				
+				UNION
+				
+				SELECT 
+					uid 
+				FROM 
+					campus.vw_student 
+				WHERE aktiv=false 
+				AND studiengang_kz IN 
+						(SELECT studiengang_kz FROM public.tbl_studiengang WHERE typ IN ('b','m')) 
+				AND get_rolle_prestudent(vw_student.prestudent_id, null)='Absolvent' 
+				AND updateaktivam>now()-'20 weeks'::interval
+			)";
+	if($result = $db->db_query($sql_query))
+	{
+		echo $db->db_affected_rows($result).' Eintraege entfernt<br>';
+	}
+	else
+	{
+		$error_msg.=$db->db_last_error();
+	}
+	
+	// Studenten holen die nicht im Verteiler sind
+	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon)
+			SELECT uid,'TW_BAMA',now(),'mlists_generate'
+			FROM campus.vw_student
+			WHERE (aktiv
+					OR
+					(aktiv=false AND get_rolle_prestudent(vw_student.prestudent_id, null)='Absolvent' AND updateaktivam>now()-'20 weeks'::interval))
+			AND studiengang_kz IN 
+					(SELECT studiengang_kz FROM public.tbl_studiengang WHERE typ IN ('b','m'))
+			AND uid NOT in(SELECT uid FROM public.tbl_benutzergruppe
+				WHERE UPPER(gruppe_kurzbz)='TW_BAMA')";
+	
+	if($result = $db->db_query($sql_query))
+	{
+		echo $db->db_affected_rows($result).' Eintraege hinzugefuegt<br>';
+	}
+	else
+		$error_msg.=$db->db_last_error();
+	
+		
    	// **************************************************************
 	// Moodle - LektorenVerteiler abgleichen
 	$mlist_name='moodle_lkt';
