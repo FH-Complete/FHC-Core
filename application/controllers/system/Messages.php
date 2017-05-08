@@ -16,105 +16,32 @@ class Messages extends VileSci_Controller
 		
 		$this->load->model('person/Person_model', 'PersonModel');
     }
-
-	public function index()
-	{
-		$this->load->view('system/messages.php', array('person_id' => $this->getPersonId()));
-	}
-
-	public function inbox($person_id)
-	{
-		$msg = $this->messagelib->getMessagesByPerson($person_id);
-		if ($msg->error)
-		{
-			show_error($msg->retval);
-		}
-		
-		$person = $this->PersonModel->load($person_id);
-		if ($person->error)
-		{
-			show_error($person->retval);
-		}
-		
-		$data = array (
-			'messages' => $msg->retval,
-			'person' => $person->retval[0]
-		);
-			
-		$this->load->view('system/messagesInbox.php', $data);
-	}
-
-	public function outbox($person_id)
-	{
-		$msg = $this->messagelib->getSentMessagesByPerson($person_id);
-		if ($msg->error)
-		{
-			show_error($msg->retval);
-		}
-		
-		$person = $this->PersonModel->load($person_id);
-		if ($person->error)
-		{
-			show_error($person->retval);
-		}
-		
-		$data = array (
-			'messages' => $msg->retval,
-			'person' => $person->retval[0]
-		);
-		
-		$this->load->view('system/messagesOutbox.php', $data);
-	}
 	
-	public function view($msg_id, $person_id)
-	{
-		$msg = $this->messagelib->getMessage($msg_id, $person_id);
-		if ($msg->error)
-		{
-			show_error($msg->retval);
-		}
-		
-		$v = $this->load->view('system/messageView', array('message' => $msg->retval[0]));
-	}
-
-	public function reply($msg_id, $person_id)
-	{
-		$msg = $this->messagelib->getMessage($msg_id, $person_id);
-		if ($msg->error)
-		{
-			show_error($msg->retval);
-		}
-		
-		$v = $this->load->view('system/messageReply', array('message' => $msg->retval[0]));
-	}
-	
-	public function sendReply($msg_id, $person_id)
-	{
-		$subject = $this->input->post('subject');
-		$body = $this->input->post('body');
-		
-		$this->load->model('system/Message_model', 'MessageModel');
-		$originMsg = $this->MessageModel->load($msg_id);
-		if ($originMsg->error)
-		{
-			show_error($originMsg->retval);
-		}
-		
-		$msg = $this->messagelib->sendMessage($person_id, $originMsg->retval[0]->person_id, $subject, $body, PRIORITY_NORMAL, $msg_id);
-		if ($msg->error)
-		{
-			show_error($msg->retval);
-		}
-		
-		redirect('/system/Messages/view/' . $msg->retval . '/' . $originMsg->retval[0]->person_id);
-	}
-	
-	public function write($sender_id)
+	/**
+	 * 
+	 */
+	public function write($sender_id, $msg_id = null, $receiver_id = null)
 	{
 		$prestudent_id = $this->input->post('prestudent_id');
+		$msg = null;
 		
+		// Get message data if possible
+		if (is_numeric($msg_id) && is_numeric($receiver_id))
+		{
+			$msg = $this->messagelib->getMessage($msg_id, $receiver_id);
+			if ($msg->error)
+			{
+				show_error($msg->retval);
+			}
+			else
+			{
+				$msg = $msg->retval[0];
+			}
+		}
+		
+		// Get variables
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-		$prestudent = $this->MessageModel->getMsgVarsData($prestudent_id);
+		$prestudent = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
 		if ($prestudent->error)
 		{
 			show_error($prestudent->retval);
@@ -141,12 +68,16 @@ class Messages extends VileSci_Controller
 		$data = array (
 			'sender_id' => $sender_id,
 			'receivers' => $prestudent->retval,
+			'message' => $msg,
 			'variables' => $variablesArray
 		);
 		
 		$v = $this->load->view('system/messageWrite', $data);
 	}
 	
+	/**
+	 * 
+	 */
 	public function send($sender_id)
 	{
 		$error = false;
@@ -154,7 +85,14 @@ class Messages extends VileSci_Controller
 		$subject = $this->input->post('subject');
 		$body = $this->input->post('body');
 		$prestudents = $this->input->post('prestudents');
-		$data = $this->MessageModel->getMsgVarsData($prestudents);
+		$relationmessage_id = $this->input->post('relationmessage_id');
+		
+		if (!isset($relationmessage_id) || $relationmessage_id == '')
+		{
+			$relationmessage_id = null;
+		}
+		
+		$data = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudents);
 		if (hasData($data))
 		{
 			for ($i = 0; $i < count($data->retval); $i++)
@@ -169,7 +107,7 @@ class Messages extends VileSci_Controller
 				
 				$parsedText = $this->messagelib->parseMessageText($body, $dataArray);
 				
-				$msg = $this->messagelib->sendMessage($sender_id, $dataArray['person_id'], $subject, $parsedText, PRIORITY_NORMAL);
+				$msg = $this->messagelib->sendMessage($sender_id, $dataArray['person_id'], $subject, $parsedText, PRIORITY_NORMAL, $relationmessage_id);
 				if ($msg->error)
 				{
 					show_error($msg->retval);
@@ -185,6 +123,9 @@ class Messages extends VileSci_Controller
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	private function getPersonId()
 	{
 		$person_id = null;
@@ -206,6 +147,9 @@ class Messages extends VileSci_Controller
 		return $person_id;
 	}
 	
+	/**
+	 * 
+	 */
 	public function getVorlage()
 	{
 		$vorlage_kurzbz = $this->input->get('vorlage_kurzbz');
@@ -221,6 +165,9 @@ class Messages extends VileSci_Controller
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	public function parseMessageText()
 	{
 		$prestudent_id = $this->input->get('prestudent_id');
@@ -228,7 +175,7 @@ class Messages extends VileSci_Controller
 		
 		if (isset($prestudent_id))
 		{
-			$data = $this->MessageModel->getMsgVarsData($prestudent_id);
+			$data = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
 			
 			$parsedText = "";
 			if (hasData($data))

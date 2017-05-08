@@ -24,6 +24,7 @@ var MessagePersonID=null;
 var MessagesTreeDatasource=''; // Datasource des Adressen Trees
 var MessagesSelectID='';
 var MessageSenderPersonID='';
+var MessageIFrameIsInitialized=false;
 
 var MessagesTreeSinkObserver =
 {
@@ -102,9 +103,9 @@ function MessagesNewMessage()
 	else
 	{
 		var prestudentIdArray = getMultipleTreeCellText(tree, 'student-treecol-prestudent_id');
-		
+
 		var action = '<?php echo APP_ROOT ?>index.ci.php/system/Messages/write/' + MessageSenderPersonID;
-		
+
 		openWindowPostArray(action, 'prestudent_id', prestudentIdArray);
 	}
 }
@@ -114,16 +115,22 @@ function MessagesNewMessage()
  */
 function MessagesSendAnswer()
 {
-	var tree=document.getElementById('messages-tree');
-	if(tree.currentIndex==-1)
+	var messagesTree = document.getElementById('messages-tree');
+	var studentsTree = parent.document.getElementById('student-tree');
+
+	if (messagesTree.currentIndex == -1)
 	{
 		alert("Bitte markieren Sie zuerst eine Nachricht");
 	}
 	else
 	{
-		var MessageId = getTreeCellText(tree, 'messages-tree-message_id', tree.currentIndex);
-		var RecipientID = getTreeCellText(tree, 'messages-tree-recipient_id', tree.currentIndex);
-		window.open('<?php echo APP_ROOT ?>index.ci.php/system/Messages/reply/'+MessageId+'/'+RecipientID,'Reply','');
+		var MessageId = getTreeCellText(messagesTree, 'messages-tree-message_id', messagesTree.currentIndex);
+		var RecipientID = getTreeCellText(messagesTree, 'messages-tree-recipient_id', messagesTree.currentIndex);
+		var prestudentIdArray = new Array(getTreeCellText(studentsTree, 'student-treecol-prestudent_id', studentsTree.currentIndex));
+
+		var action = '<?php echo APP_ROOT ?>index.ci.php/system/Messages/write/' + MessageSenderPersonID + '/' + MessageId + '/' + RecipientID;
+
+		openWindowPostArray(action, 'prestudent_id', prestudentIdArray);
 	}
 }
 
@@ -150,5 +157,35 @@ function MessageAuswahl()
 			document.getElementById('messages-button-answer').disabled=false;
 		}
 	}
-	document.getElementById('message-wysiwyg').value=text;
+
+	MessagesIFrameSetHTML(text);
+}
+
+function MessagesIFrameSetHTML(val)
+{
+	MessageIFrameInit();
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	editor = document.getElementById('message-wysiwyg');
+
+	if(editor.contentWindow.document.body.innerHTML!='')
+	{
+		//Inhalt leeren
+		editor.contentDocument.execCommand("selectall", false, null);
+		editor.contentDocument.execCommand("delete", false, null);
+	}
+	//Value setzen
+	if(val!='')
+		editor.contentDocument.execCommand("inserthtml", false, val);
+}
+
+function MessageIFrameInit()
+{
+	if(!MessageIFrameIsInitialized)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		editor = document.getElementById('message-wysiwyg');
+		editor.contentDocument.designMode = 'on';
+		editor.style.backgroundColor="#FFFFFF";
+		MessageIFrameIsInitialized=true;
+	}
 }

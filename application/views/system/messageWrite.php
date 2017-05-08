@@ -1,10 +1,13 @@
 <?php $this->load->view("templates/header", array("title" => "MessageReply", "jquery" => true, "tinymce" => true)); ?>
 
 	<body>
+	
 		<?php
 			$href = str_replace("/system/Messages/write", "/system/Messages/send", $_SERVER["REQUEST_URI"]);
 		?>
+		
 		<form id="sendForm" method="post" action="<?php echo $href; ?>">
+		
 			<table>
 				<tr>
 					<td>
@@ -33,15 +36,30 @@
 						<strong>Subject:</strong>&nbsp;
 					</td>
 					<td>
-						<input id="subject" type="text" value="" name="subject" size="70">
+						<?php
+							$subject = '';
+							if (isset($message))
+							{
+								$subject = 'Re: '.$message->subject;
+							}
+						?>
+						<input id="subject" type="text" value="<?php echo $subject; ?>" name="subject" size="70">
 					</td>
 				</tr>
 			</table>
+			
 			<table width="100%">
 				<tr>
 					<td width="80%">
 						<strong>Message:</strong><br>
-						<textarea id="bodyTextArea" name="body"></textarea>
+						<?php
+							$body = '';
+							if (isset($message))
+							{
+								$body = $message->body;
+							}
+						?>
+						<textarea id="bodyTextArea" name="body"><?php echo $body; ?></textarea>
 					</td>
 					<td width="3%">&nbsp;</td>
 					<td width="17%">
@@ -142,8 +160,16 @@
 				}
 			?>
 			
+			<?php
+				if (isset($message))
+				{
+			?>
+					<input type="hidden" name="relationmessage_id" value="<?php echo $message->message_id; ?>">
+			<?php
+				}
+			?>
+			
 		</form>
-	</body>
 	
 	<script>
 		tinymce.init({
@@ -254,4 +280,7 @@
 			});
 		}
 	</script>
-</html>
+	
+	</body>
+	
+<?php $this->load->view("templates/footer"); ?>

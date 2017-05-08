@@ -87,7 +87,7 @@ class Message_model extends DB_Model
 	/**
 	 * 
 	 */
-	public function getMsgVarsData($prestudent_id)
+	public function getMsgVarsDataByPrestudentId($prestudent_id)
 	{
 		$query = 'SELECT * FROM public.vw_msg_vars WHERE prestudent_id %s ?';
 		

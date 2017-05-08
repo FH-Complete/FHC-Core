@@ -73,7 +73,7 @@ echo ']>
 	<button oncommand="MessagesSendAnswer()" id="messages-button-answer" label="Antworten"/>
 </hbox>
 
-<hbox>
+<hbox flex="1">
 
 <tree id="messages-tree" seltype="single" hidecolumnpicker="false" flex="1"
 	datasources="rdf:null" ref="http://www.technikum-wien.at/messages"
@@ -142,8 +142,11 @@ echo ']>
 		</treechildren>
 	</template>
 </tree>
+<splitter collapse="after" persist="state">
+	<grippy />
+</splitter>
+<iframe id="message-wysiwyg" editortype="html" src="about:blank" flex="1" type="content-primary" style="min-width: 100px; min-height: 100px; border: 1px solid gray; margin: 10px;"/>
 </hbox>
-<box class="WYSIWYG" id="message-wysiwyg" flex="1"/>
-<spacer flex="1" />
+
 </vbox>
 </window>

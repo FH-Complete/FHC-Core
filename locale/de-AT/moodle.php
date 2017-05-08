@@ -35,4 +35,6 @@ Bitte wählen Sie die Moodle Version die Sie für Ihre Lehrveranstaltung verwend
 Moodle befindet sich derzeit im Dualbetrieb.<br>
 Ab dem <b>Wintersemester 2014</b> wird Moodle nur noch in der <b>Version 2.4</b> angeboten.
 </center>';
+$this->phrasen['moodle/meineKurse']='Meine Kurse';
+$this->phrasen['moodle/vorhandeneKurse']='Vorhandene Kurse';
 ?>
