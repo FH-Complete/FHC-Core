@@ -882,25 +882,31 @@ class studiensemester extends basis_db
 	/**
 	 * Liefert ausgehend von heutigen Datum $plus studiensemester in die Zukunft und $minus Studiensemester in die Vergangenheit
 	 *
-	 * @param integer $plus Wieviele Studiensemester in die Zukunft sollen ausgegeben werden.
-	 * @param integer $minus Wieviele Studiensemester in die Vergangenheit sollen ausgegeben werden.
+	 * @param integer $plus Optional. Wieviele Studiensemester in die Zukunft sollen ausgegeben werden. Wenn NULL werden alle zukuenftigen geliefert.
+	 * @param integer $minus Optional. Wieviele Studiensemester in die Vergangenheit sollen ausgegeben werden. Wenn NULL werden alle vergangenen geliefert.
+	 * @param string $order Optional. Sortierreihenfolge. Default "ende DESC".
 	 *
 	 * @return true wenn ok, sonst false
 	 */
-	public function getPlusMinus($plus=null, $minus=null)
+	public function getPlusMinus($plus = null, $minus = null, $order = "ende DESC")
 	{
-		if((is_null($plus) || !is_numeric($plus)) || (is_null($minus) || !is_numeric($minus)))
+		if(($plus != '' && !is_numeric($plus)) || ($minus != '' && !is_numeric($minus)))
 			return false;
 
 		$qry = "SELECT DISTINCT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz IN
 				(
 					(SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start >= now()
-						ORDER BY ende ASC LIMIT $plus)
-					UNION
+						ORDER BY ende ASC";
+					if ($plus != '')
+						$qry .= " LIMIT ".$this->db_add_param($plus, FHC_INTEGER);
+				
+				$qry .= ") UNION
 					(SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start <= now()
-						ORDER BY start DESC LIMIT $minus)
-				)
-				ORDER BY ende DESC";
+						ORDER BY start DESC ";
+					if ($minus != '')
+						$qry .= " LIMIT ".$this->db_add_param($minus, FHC_INTEGER);
+				
+				$qry .= ")) ORDER BY ".$order;
 
 		if($this->db_query($qry))
 		{

@@ -27,6 +27,7 @@ require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/variable.class.php');
 
 $rdf_url='http://www.technikum-wien.at/lehrverbandsgruppe/';
 
@@ -35,6 +36,7 @@ $uid='';
 $berechtigung=new benutzerberechtigung();
 $dbo = new basis_db();
 $show_inout_block=false;
+$number_displayed_past_studiensemester = '';
 
 // Berechtigungen ermitteln
 if(!isset($_SERVER['REMOTE_USER']))
@@ -58,6 +60,23 @@ else
 
 	if(isset($_GET['studiengang_kz']))
 		$berechtigt_studiengang=array_merge($berechtigt_studiengang,array($_GET['studiengang_kz']));
+	
+	// Pruefen ob Variable fuer number_displayed_studiensemester gesetzt ist, wenn nicht, einen neuen Eintrag anlegen
+	$variable = new variable();
+	if ($variable->load($uid, 'number_displayed_past_studiensemester'))
+	{
+			$number_displayed_past_studiensemester = $variable->wert;	
+	}
+	else
+	{
+		$variable->new = true;
+		$variable->uid = $uid;
+		$variable->name = 'number_displayed_past_studiensemester';
+		$variable->wert = '';
+		$variable->save();
+	
+		$number_displayed_past_studiensemester = '';
+	}
 }
 $orgform_sequence=array();
 
@@ -96,7 +115,7 @@ else
 	$num_rows=$dbo->db_num_rows();
 
 $stsem_obj = new studiensemester();
-$stsem_obj->getAll();
+$stsem_obj->getPlusMinus(NULL, $number_displayed_past_studiensemester, 'ende ASC');
 
 //Bei Mischformen werden die Organisationsformen
 //getrennt aufgelistet

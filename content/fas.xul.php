@@ -95,6 +95,7 @@ foreach($addon_obj->result as $addon)
   <command id="menu-prefs-stpltable-stundenplan:command" oncommand="stpltableChange('stundenplan');"/>
   <command id="menu-prefs-stpltable-stundenplandev:command" oncommand="stpltableChange('stundenplandev');"/>
   <command id="menu-prefs-kontofilterstg:command" oncommand="EinstellungenKontoFilterStgChange();"/>
+  <command id="menu-prefs-number_displayed_past_studiensemester:command" oncommand="variableChangeValue('number_displayed_past_studiensemester');"/>
   <command id="menu-statistic-koordinatorstunden:command" oncommand="StatistikPrintKoordinatorstunden();"/>
   <command id="menu-statistic-lehrauftraege:command" oncommand="StatistikPrintLehrauftraege();"/>
   <command id="menu-statistic-lvplanung:command" oncommand="StatistikPrintLVPlanung();"/>
@@ -266,6 +267,14 @@ foreach($addon_obj->result as $addon)
    			 checkbox   ="true"
    			 checked   ="<?php echo $variable->variable->kontofilterstg;?>"
    			 />
+   		<menuitem
+			 id        	="menu-prefs-number_displayed_past_studiensemester"
+ 			 key       	="menu-prefs-number_displayed_past_studiensemester:key"
+			 label     	="&menu-prefs-number_displayed_past_studiensemester.label;"
+			 command   	="menu-prefs-number_displayed_past_studiensemester:command"
+			 accesskey 	="&menu-prefs-number_displayed_past_studiensemester.accesskey;" 			
+			 value    	="<?php echo (isset($variable->variable->number_displayed_past_studiensemester)?$variable->variable->number_displayed_past_studiensemester:'');?>"
+			 />
 	    </menupopup>
     </menu>
     <!-- ********** BERICHTE ********** -->
