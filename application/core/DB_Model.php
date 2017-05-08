@@ -9,6 +9,8 @@ class DB_Model extends FHC_Model
 	const PGSQL_BOOLEAN_FALSE = 'f';
 	const MODEL_POSTFIX = '_model';
 	const DEFAULT_SCHEMA = 'public';
+	const UDF_FIELD_NAME = 'udf_values';
+	const UDF_FIELD_TYPE = 'jsonb';
 	
 	protected $dbTable;  	// Name of the DB-Table for CI-Insert, -Update, ...
 	protected $pk;  		// Name of the PrimaryKey for DB-Update, Load, ...
@@ -744,8 +746,9 @@ class DB_Model extends FHC_Model
 			for($i = 0; $i < count($metaDataArray); $i++) // Looking for booleans and arrays
 			{
 				// If array type or boolean type
-				if (strpos($metaDataArray[$i]->type, DB_Model::PGSQL_ARRAY_TYPE) !== false ||
-					$metaDataArray[$i]->type == DB_Model::PGSQL_BOOLEAN_TYPE)
+				if (strpos($metaDataArray[$i]->type, DB_Model::PGSQL_ARRAY_TYPE) !== false
+					|| $metaDataArray[$i]->type == DB_Model::PGSQL_BOOLEAN_TYPE
+					|| $metaDataArray[$i]->name == DB_Model::UDF_FIELD_NAME)
 				{
 					// Name and type of the field to be converted
 					$toBeConverted = new stdClass();
@@ -786,6 +789,19 @@ class DB_Model extends FHC_Model
 						else if ($toBeConverted->type == DB_Model::PGSQL_BOOLEAN_TYPE)
 						{
 							$tmpResult->{$toBeConverted->name} = $this->pgBoolPhp($tmpResult->{$toBeConverted->name});
+						}
+						// UDF
+						else if ($toBeConverted->type == DB_Model::UDF_FIELD_TYPE)
+						{
+							$jsonValues = json_decode($tmpResult->{$toBeConverted->name});
+							if ($jsonValues != null)
+							{
+								foreach($jsonValues as $key => $value)
+								{
+									$tmpResult->{$key} = $value;
+								}
+							}
+							unset($tmpResult->{$toBeConverted->name});
 						}
 					}
 				}
