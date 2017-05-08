@@ -91,6 +91,36 @@
 			?>
 		</div>
 		
+		<br/>
+		
+		<div>
+			<?php
+				echo $this->widgetlib->UDFWidget(
+					array(
+						UDFWidgetTpl::SCHEMA_ARG_NAME => 'public',
+						UDFWidgetTpl::TABLE_ARG_NAME => 'tbl_person',
+						UDFWidgetTpl::FIELD_ARG_NAME => 'disagree'
+					),
+					array('id' => 'disagreeID', 'name' => 'disagreeName')
+				);
+			?>
+		</div>
+		
+		<br/>
+		
+		<div>
+			<?php
+				echo $this->widgetlib->UDFWidget(
+					array(
+						UDFWidgetTpl::SCHEMA_ARG_NAME => 'public',
+						UDFWidgetTpl::TABLE_ARG_NAME => 'tbl_person',
+						UDFWidgetTpl::FIELD_ARG_NAME => 'dunno'
+					),
+					array('id' => 'dunnoID', 'name' => 'dunnoName')
+				);
+			?>
+		</div>
+		
 	</body>
 	
 <?php $this->load->view("templates/footer"); ?>

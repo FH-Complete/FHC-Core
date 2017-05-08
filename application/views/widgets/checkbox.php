@@ -15,14 +15,14 @@
 	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidgetTpl::TITLE); ?>
 >
 	<?php
-		$values = ${CheckboxWidget::WIDGET_DATA_VALUES_ARRAY_NAME};
-		$checkedValue = ${CheckboxWidget::CHECKED_VALUE};
+		$elements = ${CheckboxWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME};
+		$checkedElement = ${CheckboxWidget::CHECKED_ELEMENT};
 		
-		foreach($values as $value)
+		foreach($elements as $element)
 		{
 			$checked = '';
 			
-			if ($value == $checkedValue)
+			if ($element->{CheckboxWidget::VALUE_FIELD} == $checkedElement)
 			{
 				$checked = 'checked';
 			}
@@ -30,10 +30,10 @@
 		<input
 			type="checkbox"
 			<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, Widget::HTML_NAME); ?>
-			value="<?php echo $value; ?>"
+			value="<?php echo $element->{CheckboxWidget::VALUE_FIELD}; ?>"
 			<?php echo $checked; ?>
 		>
-		
+		<?php echo $element->{CheckboxWidget::DESCRIPTION_FIELD}; ?>
 	<?php
 		}
 	?>

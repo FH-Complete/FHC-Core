@@ -1040,10 +1040,14 @@ class CheckboxWidget extends Widget
 {
 	// The name of the element of the data array given to the view
 	// this element is an array of elements to be place inside the dropdown
-	const WIDGET_DATA_VALUES_ARRAY_NAME = 'VALUES_ARRAY';
+	const WIDGET_DATA_ELEMENTS_ARRAY_NAME = 'ELEMENTS_ARRAY';
+	// Name of the property that will be used to store the value attribute of the option tag
+	const VALUE_FIELD = 'value';
+	// Name of the property that will be used to store the value between the option tags
+	const DESCRIPTION_FIELD = 'description';
 	// The name of the element of the data array given to the view
 	// this element is used to tell what element of the dropdown is selected
-	const CHECKED_VALUE = 'checkedValue';
+	const CHECKED_ELEMENT = 'checkedElement';
 	
 	/**
 	 * 
@@ -1053,9 +1057,9 @@ class CheckboxWidget extends Widget
 		parent::__construct($name, $args, $htmlArgs);
 		
 		// 
-		if (!isset($this->_args[CheckboxWidget::CHECKED_VALUE]))
+		if (!isset($this->_args[CheckboxWidget::CHECKED_ELEMENT]))
 		{
-			$this->_args[CheckboxWidget::CHECKED_VALUE] = Widget::HTML_DEFAULT_VALUE;
+			$this->_args[CheckboxWidget::CHECKED_ELEMENT] = Widget::HTML_DEFAULT_VALUE;
 		}
 	}
 
@@ -1081,7 +1085,7 @@ class CheckboxWidget extends Widget
 		}
 		else
 		{
-			$this->_args[CheckboxWidget::WIDGET_DATA_VALUES_ARRAY_NAME] = $values->retval;
+			$this->_args[CheckboxWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME] = $values->retval;
 		}
 	}
 	
@@ -1104,19 +1108,41 @@ class CheckboxWidgetUDF extends CheckboxWidget
 	 */
 	public function render($parameters)
 	{
-		$tmpValues = array();
+		$tmpElements = array();
 		
 		// 
 		foreach($parameters as $parameter)
 		{
 			// 
-			if (is_string($parameter) || is_numeric($parameter))
+			if ((is_array($parameter) && count($parameter) == 2)
+				|| (is_string($parameter) || is_numeric($parameter))
+				|| (is_object($parameter) && isset($parameter->{PARENT::VALUE_FIELD}) && isset($parameter->{PARENT::DESCRIPTION_FIELD})))
 			{
-				array_push($tmpValues, $parameter); // 
+				$element = new stdClass(); // 
+				// 
+				if (is_array($parameter) && count($parameter) == 2)
+				{
+					$element->{PARENT::VALUE_FIELD} = $parameter[0]; // 
+					$element->{PARENT::DESCRIPTION_FIELD} = $parameter[1]; // 
+				}
+				// 
+				else if (is_string($parameter) || is_numeric($parameter))
+				{
+					$element->{PARENT::VALUE_FIELD} = $parameter; // 
+					$element->{PARENT::DESCRIPTION_FIELD} = $parameter; // 
+				}
+				// 
+				else if (is_object($parameter) && isset($parameter->{PARENT::VALUE_FIELD}) && isset($parameter->{PARENT::DESCRIPTION_FIELD}))
+				{
+					$element->{PARENT::VALUE_FIELD} = $parameter->{PARENT::VALUE_FIELD}; // 
+					$element->{PARENT::DESCRIPTION_FIELD} = $parameter->{PARENT::DESCRIPTION_FIELD}; // 
+				}
+				
+				array_push($tmpElements, $element); // 
 			}
 		}
 		
-		$this->setValuesArray(success($tmpValues));
+		$this->setValuesArray(success($tmpElements));
 		
 		$this->loadCheckboxView();
 		
