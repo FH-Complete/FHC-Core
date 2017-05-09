@@ -1,3 +1,4 @@
+<?php Widget::printStartBlock(${Widget::HTML_ARG_NAME}); ?>
 <?php
 	if (isset(${Widget::HTML_ARG_NAME}[UDFWidgetTpl::LABEL]))
 	{
@@ -19,3 +20,4 @@
 	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidgetTpl::TITLE); ?>
 	value="<?php echo ${TextfieldWidget::VALUE}; ?>"
 >
+<?php Widget::printEndBlock(${Widget::HTML_ARG_NAME}); ?>

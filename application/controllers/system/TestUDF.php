@@ -10,6 +10,9 @@ class TestUDF extends VileSci_Controller
         
         // Loads the widget library
 		$this->load->library('WidgetLib');
+		
+		// 
+		$this->load->model('person/Person_model', 'PersonModel');
     }
 	
 	/**
@@ -17,7 +20,11 @@ class TestUDF extends VileSci_Controller
 	 */
 	public function index()
 	{
-		$data = array();
+		$person = $this->PersonModel->load(1);
+		
+		$data = array(
+			'udfs' => $this->PersonModel->getUDFs()
+		);
 		
 		$this->load->view('system/testudf', $data);
 	}

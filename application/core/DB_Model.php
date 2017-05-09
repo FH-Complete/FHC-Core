@@ -17,6 +17,8 @@ class DB_Model extends FHC_Model
 	protected $hasSequence;	// False if this table has a composite primary key that is not using a sequence
 							// True if this table has a primary key that uses a sequence
 	
+	protected $UDFs; // 
+	
 	function __construct($dbTable = null, $pk = null, $hasSequence = true)
 	{
 		parent::__construct();
@@ -24,6 +26,7 @@ class DB_Model extends FHC_Model
 		$this->pk = $pk;
 		$this->hasSequence = $hasSequence;
 		$this->load->database();
+		$this->UDFs = array();
 	}
 	
 	/** ---------------------------------------------------------------
@@ -705,6 +708,27 @@ class DB_Model extends FHC_Model
 	}
 	
 	/**
+	 * 
+	 */
+	public function getUDFs()
+	{
+		return $this->UDFs;
+	}
+	
+	/**
+	 * 
+	 */
+	public function getUDF($udf)
+	{
+		if (isset($this->UDFs[$udf]))
+		{
+			return $this->UDFs[$udf];
+		}
+		
+		return null;
+	}
+	
+	/**
 	 * Checks if the caller is entitled to perform this operation with this right
 	 */
 	private function _isEntitled($permission)
@@ -799,6 +823,7 @@ class DB_Model extends FHC_Model
 								foreach($jsonValues as $key => $value)
 								{
 									$tmpResult->{$key} = $value;
+									$this->UDFs[$key] = $value; // 
 								}
 							}
 							unset($tmpResult->{$toBeConverted->name});

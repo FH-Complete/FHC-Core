@@ -218,10 +218,14 @@ class WidgetLib
      */
     public function UDFWidget($args, $htmlArgs = array())
     {
-		if (!empty($args[UDFWidgetTpl::SCHEMA_ARG_NAME])
-			&& !empty($args[UDFWidgetTpl::TABLE_ARG_NAME])
-			&& !empty($args[UDFWidgetTpl::FIELD_ARG_NAME]))
+		if (!empty($args[UDFWidgetTpl::SCHEMA_ARG_NAME]) && !empty($args[UDFWidgetTpl::TABLE_ARG_NAME]))
 		{
+			// 
+			if (empty($args[UDFWidgetTpl::FIELD_ARG_NAME]) && !isset($htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK]))
+			{
+				$htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK] = true;
+			}
+			
 			return $this->widget(
 				UDFWidgetTpl::WIDGET_NAME,
 				$args,
@@ -237,10 +241,6 @@ class WidgetLib
 			if (empty($args[UDFWidgetTpl::TABLE_ARG_NAME]))
 			{
 				show_error(UDFWidgetTpl::TABLE_ARG_NAME.' parameter is missing!');
-			}
-			if (empty($args[UDFWidgetTpl::FIELD_ARG_NAME]))
-			{
-				show_error(UDFWidgetTpl::FIELD_ARG_NAME.' parameter is missing!');
 			}
 		}
     }
@@ -646,6 +646,8 @@ class Widget extends Partial
     const HTML_NAME = 'name'; // HTML name attribute
     const HTML_ID = 'id'; // HTML id attribute
     
+    const EXTERNAL_BLOCK = 'externalBlock'; // 
+    
     /**
      * It gets also the htmlArgs array as parameter, it will be used to set the HTML properties
      */
@@ -734,6 +736,30 @@ class Widget extends Partial
 					echo $attribute;
 				}
 			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static function printStartBlock($htmlArgs)
+	{
+		if (isset($htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK])
+			&& $htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK] === true)
+		{
+			echo '<div>';
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static function printEndBlock($htmlArgs)
+	{
+		if (isset($htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK])
+			&& $htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK] === true)
+		{
+			echo '</div>';
 		}
 	}
 }
@@ -1159,6 +1185,7 @@ abstract class UDFWidgetTpl extends Widget
 	const SCHEMA_ARG_NAME = 'schema';
 	const TABLE_ARG_NAME = 'table';
 	const FIELD_ARG_NAME = 'field';
+	const UDFS_ARG_NAME = 'udfs';
 	
 	const TITLE = 'description';
 	const LABEL = 'title';

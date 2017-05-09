@@ -11,9 +11,13 @@ class UDFWidget extends UDFWidgetTpl
 	{
 		$schema = $widgetData[UDFWidgetTpl::SCHEMA_ARG_NAME];
 		$table = $widgetData[UDFWidgetTpl::TABLE_ARG_NAME];
-		$field = $widgetData[UDFWidgetTpl::FIELD_ARG_NAME];
 		
-		$udfResults = $this->_loadUDF($schema, $table, $field);
+		if (isset($widgetData[UDFWidgetTpl::FIELD_ARG_NAME]))
+		{
+			$field = $widgetData[UDFWidgetTpl::FIELD_ARG_NAME];
+		}
+		
+		$udfResults = $this->_loadUDF($schema, $table);
 		if (hasData($udfResults))
 		{
 			$udf = $udfResults->retval[0];
@@ -22,6 +26,7 @@ class UDFWidget extends UDFWidgetTpl
 				$jsonSchemas = json_decode($udf->jsons);
 				if (is_object($jsonSchemas) || is_array($jsonSchemas))
 				{
+					// 
 					if (is_object($jsonSchemas))
 					{
 						$jsonSchemasArray = array($jsonSchemas);
@@ -31,38 +36,45 @@ class UDFWidget extends UDFWidgetTpl
 						$jsonSchemasArray = $jsonSchemas;
 					}
 					
-					$found = false;
+					$found = false; // 
 					
+					$this->_sortJsonSchemas($jsonSchemasArray); // 
+					
+					//
 					foreach($jsonSchemasArray as $jsonSchema)
 					{
-						if (isset($jsonSchema->name) && $field === $jsonSchema->name)
+						// 
+						if (!isset($jsonSchema->type))
 						{
-							if (isset($jsonSchema->type))
-							{
-								$this->_setAttributesWithPhrases($jsonSchema);
-								
-								$this->_setValidationAttributes($jsonSchema);
-								
-								$this->_render($jsonSchema);
-							}
-							else
-							{
-								show_error(sprintf('%s.%s: Attribute "type" not present in the json schema', $schema, $table));
-							}
-							
-							$found = true;
+							show_error(sprintf('%s.%s: Attribute "type" not present in the json schema', $schema, $table));
 							break;
 						}
-						else
+						if (!isset($jsonSchema->name))
 						{
-							if (!isset($jsonSchema->name))
+							show_error(sprintf('%s.%s: Attribute "name" not present in the json schema', $schema, $table));
+							break;
+						}
+						
+						// 
+						if ((isset($field) && $field == $jsonSchema->name) || !isset($field))
+						{
+							$this->_setAttributesWithPhrases($jsonSchema);
+							
+							$this->_setValidationAttributes($jsonSchema);
+							
+							$this->_render($jsonSchema);
+							
+							// 
+							if (isset($field) && $field == $jsonSchema->name)
 							{
-								show_error(sprintf('%s.%s: Attribute "name" not present in the json schema', $schema, $table));
+								$found = true;
+								break;
 							}
 						}
 					}
 					
-					if (!$found)
+					// 
+					if (isset($field) && !$found)
 					{
 						show_error(sprintf('%s.%s: No schema present for field: %s', $schema, $table, $field));
 					}
@@ -82,7 +94,33 @@ class UDFWidget extends UDFWidgetTpl
     /**
      * 
      */
-    private function _loadUDF($schema, $table, $field)
+    private function _sortJsonSchemas(&$jsonSchemasArray)
+    {
+		// 
+		usort($jsonSchemasArray, function ($a, $b) {
+			// 
+			if (!isset($a->sort))
+			{
+				$a->sort = 9999;
+			}
+			if (!isset($b->sort))
+			{
+				$b->sort = 9999;
+			}
+			
+			if ($a->sort == $b->sort)
+			{
+				return 0;
+			}
+			
+			return ($a->sort < $b->sort) ? -1 : 1;
+		});
+    }
+    
+    /**
+     * 
+     */
+    private function _loadUDF($schema, $table)
     {
 		// Loads UDF model
 		$this->_ci->load->model('system/UDF_model', 'UDFModel');
@@ -154,6 +192,13 @@ class UDFWidget extends UDFWidgetTpl
      */
 	private function _renderDropdown($jsonSchema, $multiple = false)
 	{
+		
+		if (isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME])
+			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name]))
+		{
+			$this->_args[DropdownWidget::SELECTED_ELEMENT] = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name];
+		}
+		
 		$dropdownWidgetUDF = new DropdownWidgetUDF($this->_name, $this->_args);
 		$parameters = array();
 		
@@ -186,8 +231,15 @@ class UDFWidget extends UDFWidgetTpl
 	private function _renderTextarea($jsonSchema)
 	{
 		$textareaUDF = new TextareaWidgetUDF($this->_name, $this->_args);
-			
-		$textareaUDF->render(null);
+		$text = null;
+		
+		if (isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME])
+			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name]))
+		{
+			$text = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name];
+		}
+		
+		$textareaUDF->render($text);
 	}
 	
 	/**
@@ -196,8 +248,15 @@ class UDFWidget extends UDFWidgetTpl
 	private function _renderTextfield($jsonSchema)
 	{
 		$textareaUDF = new TextfieldWidgetUDF($this->_name, $this->_args);
-			
-		$textareaUDF->render(null);
+		$text = null;
+		
+		if (isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME])
+			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name]))
+		{
+			$text = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name];
+		}
+		
+		$textareaUDF->render($text);
 	}
 	
 	/**
@@ -205,6 +264,12 @@ class UDFWidget extends UDFWidgetTpl
      */
 	private function _renderCheckbox($jsonSchema)
 	{
+		if (isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME])
+			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name]))
+		{
+			$this->_args[CheckboxWidget::CHECKED_ELEMENT] = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name];
+		}
+		
 		// 
 		if (!isset($this->_args[CheckboxWidget::CHECKED_ELEMENT]))
 		{
