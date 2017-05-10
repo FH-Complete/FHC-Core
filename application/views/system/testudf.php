@@ -2,6 +2,19 @@
 
 	<body>
 		
+		<div>
+			<?php
+				echo $this->widgetlib->UDFWidget(
+					array(
+						UDFWidgetTpl::SCHEMA_ARG_NAME => 'public',
+						UDFWidgetTpl::TABLE_ARG_NAME => 'tbl_person',
+						UDFWidgetTpl::FIELD_ARG_NAME => 'schuhgroesse',
+						DropdownWidget::SELECTED_ELEMENT => $udfs['schuhgroesse']
+					),
+					array('name' => 'schuhgroesseName', 'id' => 'schuhgroesseId')
+				);
+			?>
+		</div>
 		
 		<br/>
 		<br/>

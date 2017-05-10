@@ -20,7 +20,9 @@ class TestUDF extends VileSci_Controller
 	 */
 	public function index()
 	{
-		$person = $this->PersonModel->load(1);
+		$person_id = $this->input->get('person_id');
+		
+		$person = $this->PersonModel->load($person_id);
 		
 		$data = array(
 			'udfs' => $this->PersonModel->getUDFs()

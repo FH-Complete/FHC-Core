@@ -647,6 +647,8 @@ class Widget extends Partial
     const HTML_ID = 'id'; // HTML id attribute
     
     const EXTERNAL_BLOCK = 'externalBlock'; // 
+    const EXTERNAL_START_BLOCK_HTML_TAG = '<div>'; //
+    const EXTERNAL_END_BLOCK_HTML_TAG = '</div>'; // 
     
     /**
      * It gets also the htmlArgs array as parameter, it will be used to set the HTML properties
@@ -747,7 +749,7 @@ class Widget extends Partial
 		if (isset($htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK])
 			&& $htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK] === true)
 		{
-			echo '<div>';
+			echo Widget::EXTERNAL_START_BLOCK_HTML_TAG;
 		}
 	}
 	
@@ -759,7 +761,7 @@ class Widget extends Partial
 		if (isset($htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK])
 			&& $htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK] === true)
 		{
-			echo '</div>';
+			echo Widget::EXTERNAL_END_BLOCK_HTML_TAG;
 		}
 	}
 }

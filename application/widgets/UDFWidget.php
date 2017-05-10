@@ -62,6 +62,8 @@ class UDFWidget extends UDFWidgetTpl
 							
 							$this->_setValidationAttributes($jsonSchema);
 							
+							$this->_setNameAndId($jsonSchema);
+							
 							$this->_render($jsonSchema);
 							
 							// 
@@ -89,6 +91,15 @@ class UDFWidget extends UDFWidgetTpl
 				show_error(sprintf('%s.%s: Does not contain "jsons" field', $schema, $table));
 			}
 		}
+    }
+    
+    /**
+     * 
+     */
+    private function _setNameAndId($jsonSchema)
+    {
+		$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_ID] = $jsonSchema->name;
+		$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] = $jsonSchema->name;
     }
     
     /**
