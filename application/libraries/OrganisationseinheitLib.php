@@ -59,7 +59,56 @@ class OrganisationseinheitLib
 				return $this->treeSearch($schema, $table, $select, $where, $orderby, $result->retval[0]->_ppk);
 			}
 		}
+		
+		return $result;
+	}
+	
+	public function treeSearchEntire($table, $alias, $fields, $where, $orderby, $oe_kurzbz, $entireTree = false)
+	{
+		$select = "";
+		if (is_array($fields))
+		{
+			for ($i = 0; $i < count($fields); $i++)
+			{
+				$select .= $fields[$i];
+				if ($i != count($fields) - 1)
+				{
+					$select .= ", ";
+				}
+			}
+		}
+		else
+		{
+			$select = $fields;
+		}
 
+		$result = $this->ci->OrganisationseinheitModel->getOneLevel2($table, $alias, $select, $where, $orderby, $oe_kurzbz);
+		
+		if (hasData($result))
+		{
+			if ($result->retval[0]->_pk != null && $result->retval[0]->_ppk != null)
+			{
+				$tmpResult = error();
+				
+				if (($entireTree == false && $result->retval[0]->oe_kurzbz == null) || $entireTree === true)
+				{
+					$tmpResult = $this->treeSearchEntire($table, $alias, $select, $where, $orderby, $result->retval[0]->_ppk, $entireTree);
+				}
+				
+				if ($entireTree === true)
+				{
+					if (hasData($tmpResult))
+					{
+						$result->retval = array_merge($result->retval, $tmpResult->retval);
+					}
+				}
+			}
+			else if ($result->retval[0]->_pk == null && $result->retval[0]->_ppk != null)
+			{
+				$result = $this->treeSearchEntire($table, $alias, $select, $where, $orderby, $result->retval[0]->_ppk, $entireTree);
+			}
+		}
+		
 		return $result;
 	}
 }

@@ -78,9 +78,34 @@ class Organisationseinheit_model extends DB_Model
 					) _joined_table ON (orgs._pk = _joined_table._pk)
 					WHERE orgs._pk = ?
 					ORDER BY %s";
-
+		
 		$query = sprintf($query, $table, $fields, $schema, $table, $where, $orderby);
-
+		
+		return $this->execQuery($query, array($oe_kurzbz));
+	}
+	
+	public function getOneLevel2($table, $alias, $fields, $where, $orderby, $oe_kurzbz)
+	{
+		$query = "WITH RECURSIVE organizations(_pk, _ppk) AS
+					(
+						SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+						  FROM public.tbl_organisationseinheit o
+						  WHERE o.oe_parent_kurzbz IS NULL
+					  UNION ALL
+						SELECT o.oe_kurzbz, o.oe_parent_kurzbz
+						  FROM public.tbl_organisationseinheit o INNER JOIN organizations orgs ON (o.oe_parent_kurzbz = orgs._pk)
+					)
+					SELECT orgs._pk, orgs._ppk, _joined_table.*
+					FROM organizations orgs LEFT JOIN (
+						SELECT %s.oe_kurzbz as _pk, %s
+						  FROM %s
+						 WHERE %s
+					) _joined_table ON (orgs._pk = _joined_table._pk)
+					WHERE orgs._pk = ?
+					ORDER BY %s";
+		
+		$query = sprintf($query, $alias, $fields, $table, $where, $orderby);
+		
 		return $this->execQuery($query, array($oe_kurzbz));
 	}
 }
