@@ -19,11 +19,8 @@ class Vorlage_widget extends DropdownWidget
 			AND templates.text IS NOT NULL
 			AND templates.mimetype = \'text/html\'',
 			"description ASC",
-			'eas',
-			true
+			$widgetData['oe_kurzbz']
 		);
-		
-		array_pop($vorlage->retval);
 		
 		$this->setElementsArray(
 			$vorlage,
