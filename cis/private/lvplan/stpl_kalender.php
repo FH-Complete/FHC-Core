@@ -289,12 +289,14 @@ $i=0;
 while($begin<$ende)
 {
 	$i++;
-	if(!date("w",$begin))
-		$begin=jump_day($begin,1);
+	$begin = montag($begin);
 
 	$stdplan->init_stdplan();
 	$datum=$begin;
-	$begin+=604800;	// eine Woche
+
+	// eine Woche weiterspringen
+	$datum_tmp = new datum();
+	$begin = $datum_tmp->jump_week($begin,1);
 
 	// Stundenplan einer Woche laden
 	if(!$stdplan->load_week($datum,$db_stpl_table))

@@ -65,11 +65,21 @@ class Messages extends VileSci_Controller
 		array_shift($variables->retval); // Remove person_id
 		array_shift($variables->retval); // Remove prestudent_id
 		
+		// 
+		$oe_kurzbz = null;
+		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+		$benutzerResult = $this->BenutzerfunktionModel->getByPersonId($sender_id);
+		if (hasData($benutzerResult))
+		{
+			$oe_kurzbz = $benutzerResult->retval[0]->oe_kurzbz;
+		}
+		
 		$data = array (
 			'sender_id' => $sender_id,
 			'receivers' => $prestudent->retval,
 			'message' => $msg,
-			'variables' => $variablesArray
+			'variables' => $variablesArray,
+			'oe_kurzbz' => $oe_kurzbz
 		);
 		
 		$v = $this->load->view('system/messageWrite', $data);

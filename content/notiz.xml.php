@@ -45,7 +45,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					<xul:toolbarbutton anonid="toolbarbutton-notiz-neu" label="Neue Notiz" oncommand="document.getBindingParent(this).NeueNotiz()" image="<?php echo APP_ROOT;?>skin/images/NeuDokument.png" tooltiptext="Neue Notiz anlegen" />
 					<xul:toolbarbutton anonid="toolbarbutton-notiz-del" label="Loeschen" oncommand="document.getBindingParent(this).Loeschen()" image="<?php echo APP_ROOT;?>skin/images/DeleteIcon.png" disabled="true" tooltiptext="Notiz löschen"/>
 					<xul:toolbarbutton anonid="toolbarbutton-notiz-aktualisieren" label="Aktualisieren" oncommand="document.getBindingParent(this).RefreshNotiz()" image="<?php echo APP_ROOT;?>skin/images/refresh.png" tooltiptext="Liste neu laden"/>
-					<xul:toolbarbutton anonid="toolbarbutton-notiz-filter" label="Filter" type="menu">							
+					<xul:toolbarbutton anonid="toolbarbutton-notiz-filter" label="Filter" type="menu">
 				      <xul:menupopup>
 						    <xul:menuitem label="Alle Notizen anzeigen" oncommand="document.getBindingParent(this).LoadNotizTree(document.getBindingParent(this).getAttribute('projekt_kurzbz'),document.getBindingParent(this).getAttribute('projektphase_id'),document.getBindingParent(this).getAttribute('projekttask_id'),document.getBindingParent(this).getAttribute('uid'),document.getBindingParent(this).getAttribute('person_id'),document.getBindingParent(this).getAttribute('prestudent_id'),document.getBindingParent(this).getAttribute('bestellung_id'), document.getBindingParent(this).getAttribute('user'), document.getBindingParent(this).getAttribute('lehreinheit_id'), null, document.getBindingParent(this).getAttribute('anrechnung_id'));" tooltiptext="Alle Notizen anzeigen"/>
 							<xul:menuitem label="nur offene Notizen anzeigen" oncommand="document.getBindingParent(this).LoadNotizTree(document.getBindingParent(this).getAttribute('projekt_kurzbz'),document.getBindingParent(this).getAttribute('projektphase_id'),document.getBindingParent(this).getAttribute('projekttask_id'),document.getBindingParent(this).getAttribute('uid'),document.getBindingParent(this).getAttribute('person_id'),document.getBindingParent(this).getAttribute('prestudent_id'),document.getBindingParent(this).getAttribute('bestellung_id'), document.getBindingParent(this).getAttribute('user'), document.getBindingParent(this).getAttribute('lehreinheit_id'), false, document.getBindingParent(this).getAttribute('anrechnung_id'));" tooltiptext="nur offene Notizen anzeigen"/>
@@ -60,34 +60,34 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			onselect="document.getBindingParent(this).edit(event);"
 			flags="dont-build-content" style="min-height: 60px"
 			>
-			
+
 			<xul:treecols>
 			    <xul:treecol anonid="treecol-notiz-titel" label="Titel" flex="5" primary="true" persist="hidden width ordinal"
-					class="sortDirectionIndicator" sortActive="true"
+					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#titel"  />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-text" label="Text" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator"  
+					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#text" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-verfasser" label="Verfasser" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator" 
+					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#verfasser_uid" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-bearbeiter" label="Bearbeiter" flex="2" hidden="true" persist="hidden width ordinal"
-					class="sortDirectionIndicator" 
+					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#bearbeiter_uid" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-start" label="Start" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator" 
+					class="sortDirectionIndicator" sortActive="true" sortDirection="descending"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#startISO" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-ende" label="Ende" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator" 
+					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#endeISO" />
 			    <xul:splitter class="tree-splitter"/>
                 <xul:treecol anonid="treecol-notiz-dokumente" label="Dokumente" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator" 
+					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#dokumente" />
 			    <xul:splitter class="tree-splitter"/>
 				<xul:treecol anonid="treecol-notiz-erledigt" label="Erledigt" flex="2" hidden="false" persist="hidden width ordinal"
@@ -106,7 +106,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#endeISO" />
 			</xul:treecols>
-		
+
 			<xul:template>
 			    <xul:rule>
 			      <xul:treechildren>
@@ -138,7 +138,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			</xul:splitter>
 		    <xul:vbox flex="1">
 		    	<xul:textbox anonid="textbox-notiz-notiz_id" hidden="true"/>
-				
+
 				<xul:groupbox flex="1">
 					<xul:caption anonid="caption-notiz-detail" label="Neue Notiz"/>
 						<xul:grid anonid="grid-notiz-detail" style="overflow:auto;margin:4px;" flex="1">
@@ -188,7 +188,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 								      		<xul:menulist anonid="menulist-notiz-bearbeiter"
 													editable="true" flex="1"
 													datasources="rdf:null"
-													ref="http://www.technikum-wien.at/mitarbeiter/liste" 
+													ref="http://www.technikum-wien.at/mitarbeiter/liste"
 													oninput="document.getBindingParent(this).BearbeiterLoad(this);"
 													oncommand=""
 											>
@@ -201,7 +201,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 												</xul:template>
 											</xul:menulist>
 										</xul:hbox>
-										
+
 							      	</xul:hbox>
 								</xul:row>
 								<xul:row>
@@ -247,7 +247,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<![CDATA[
 			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 			tree = document.getAnonymousElementByAttribute(this ,'anonid', 'tree-notiz');
-					
+
 			 var direction = treecol.getAttribute("sortDirection");
 		       var current = treecol.parentNode.firstChild;
 		       while (current) {
@@ -262,7 +262,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 		       } else {
 		          direction = "ascending";
 		          treecol.setAttribute("sortDirection",direction);
-		       } 
+		       }
 			var sortService = Components.classes["@mozilla.org/xul/xul-sort-service;1"].
 			                    getService(Components.interfaces.nsIXULSortService);
 			sortService.sort(tree, treecol.getAttribute('sort'), direction);
@@ -326,9 +326,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				var start = document.getAnonymousElementByAttribute(this ,'anonid', 'box-notiz-start').iso;
 				var ende = document.getAnonymousElementByAttribute(this ,'anonid', 'box-notiz-ende').iso;
 				var verfasser_uid = document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-verfasser').value;
-								
+
 				menulist = document.getAnonymousElementByAttribute(this ,'anonid', 'menulist-notiz-bearbeiter');
-	
+
 				//Es kann sein, dass im Eingabefeld nichts steht und
 				//trotzdem ein Eintrag auf selected gesetzt ist.
 				//In diesem Fall soll aber kein Wert zurueckgegeben werden
@@ -337,7 +337,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					bearbeiter_uid='';
 				}
 				else
-				{				
+				{
 					//Wenn es Selektierte Eintraege gibt, dann den value zurueckliefern
 					var children = menulist.getElementsByAttribute('selected','true');
 					if(children.length>0)
@@ -345,9 +345,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					else
 						bearbeiter_uid = '';
 				}
-					
+
 				var erledigt = document.getAnonymousElementByAttribute(this ,'anonid', 'checkbox-notiz-erledigt').checked;
-				
+
 				var projekt_kurzbz = this.getAttribute('projekt_kurzbz');
 				var projektphase_id = this.getAttribute('projektphase_id');
 				var projekttask_id = this.getAttribute('projekttask_id');
@@ -357,11 +357,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				var bestellung_id = this.getAttribute('bestellung_id');
 				var lehreinheit_id = this.getAttribute('lehreinheit_id');
 				var anrechnung_id = this.getAttribute('anrechnung_id');
-				
+
 				var soapBody = new SOAPObject("saveNotiz");
 				//soapBody.appendChild(new SOAPObject("username")).val('joe');
 				//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
-				
+
 				var notiz = new SOAPObject("notiz");
 				notiz.appendChild(new SOAPObject("notiz_id")).val(notiz_id);
 				notiz.appendChild(new SOAPObject("titel")).cdataval(titel);
@@ -371,7 +371,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				notiz.appendChild(new SOAPObject("start")).val(start);
 				notiz.appendChild(new SOAPObject("ende")).val(ende);
 				notiz.appendChild(new SOAPObject("erledigt")).val(erledigt);
-			
+
 				notiz.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
 				notiz.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
 				notiz.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
@@ -382,11 +382,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				notiz.appendChild(new SOAPObject("lehreinheit_id")).val(lehreinheit_id);
 				notiz.appendChild(new SOAPObject("anrechnung_id")).val(anrechnung_id);
 				soapBody.appendChild(notiz);
-								
+
 				var sr = new SOAPRequest("saveNotiz",soapBody);
-			
+
 				SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/notiz.soap.php?"+gettimestamp();
-				
+
 				 function mycallb(obj) {
 				  var me=obj;
 				  this.invoke=function (respObj) {
@@ -412,11 +412,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					me.RefreshNotiz();
 				  }
 				}
-					 
+
 				var cb=new mycallb(this);
-					
+
 				SOAPClient.SendRequest(sr, cb.invoke);
-			
+
 			]]>
 			</body>
 		</method>
@@ -451,9 +451,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 		<method name="Loeschen">
 			<body>
 			<![CDATA[
-			
+
 				var notiz_id = document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-notiz_id').value;
-				
+
 				// falls nichts markiert ist
 				if(notiz_id =='')
 					alert('Keine Notiz ausgewählt')
@@ -465,11 +465,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
                         document.getAnonymousElementByAttribute(this ,'anonid', 'button-notiz-upload-dokument').disabled=true;
 						var soapBody = new SOAPObject("deleteNotiz");
 						soapBody.appendChild(new SOAPObject("notiz_id")).val(notiz_id);
-						
+
 						var sr = new SOAPRequest("deleteNotiz",soapBody);
-					
+
 						SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/notiz.soap.php?"+gettimestamp();
-						
+
 						function mycallb(obj) {
 						  var me=obj;
 						  this.invoke=function (respObj) {
@@ -494,16 +494,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 							me.RefreshNotiz();
 						  }
 						}
-						
+
 						var cb=new mycallb(this);
-						
+
 						SOAPClient.SendRequest(sr, cb.invoke);
 					}
 				}
 			]]>
 			</body>
 		</method>
-		
+
 		<method name="updateErledigt">
 			<parameter name="event"/>
 			<body>
@@ -512,13 +512,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			    var col = new Object();
 			    var childElt = new Object();
 			    //Tree holen
-			    var tree = event.currentTarget; 
+			    var tree = event.currentTarget;
 			    //Treecol ermitteln in die geklickt wurde
 			    tree.treeBoxObject.getCellAt(event.clientX, event.clientY, row, col, childElt);
 			    //abbrechen wenn auf Header oder Scrollbar geklickt wurde
 			    if(!col.value)
 			    	return 0;
-			    
+
 				var val = tree.view.getCellValue(row.value, col.value);
 				var text = tree.view.getCellText(row.value, col.value);
 				var newval='false';
@@ -526,11 +526,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					newval='false';
 				else
 					newval='true';
-				
+
 				var col_id = tree.columns.getColumnFor(document.getAnonymousElementByAttribute(this ,'anonid', 'treecol-notiz-notiz_id'));
 				var id = tree.view.getCellText(row.value, col_id);
-				document.getAnonymousElementByAttribute(this ,'anonid', 'toolbarbutton-notiz-del').disabled=false; 
-				
+				document.getAnonymousElementByAttribute(this ,'anonid', 'toolbarbutton-notiz-del').disabled=false;
+
 				if(text=='erledigt')
 				{
 					var soapBody = new SOAPObject("setErledigt");
@@ -539,7 +539,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
 				    var sr = new SOAPRequest("setErledigt",soapBody);
 				    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/notiz.soap.php?"+gettimestamp();
-				    
+
 				    function mycallb(obj) {
 					  var me=obj;
 					  this.invoke=function (respObj) {
@@ -556,9 +556,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 						me.RefreshNotiz();
 					  }
 					}
-					
+
 					var cb=new mycallb(this);
-				
+
 				    SOAPClient.SendRequest(sr,cb.invoke);
 				}
 			]]>
@@ -569,7 +569,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<body>
 			<![CDATA[
 			    var id = this.value;
-                
+
 			    if(id!='')
 			    {
 			    	var notizdoks = document.getAnonymousElementByAttribute(this ,'anonid', 'hbox-notiz-dokumente');
@@ -577,22 +577,22 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
                     {
                       notizdoks.removeChild(notizdoks.firstChild);
                     }
-                    
+
                     this.DisableDetails(false);
                     document.getAnonymousElementByAttribute(this ,'anonid', 'button-notiz-upload-dokument').disabled=false;
 			    	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 			    	//Daten holen
 					var url = '<?php echo APP_ROOT ?>rdf/notiz.rdf.php?notiz_id='+id+'&'+gettimestamp();
-						
+
 					var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
 				                   getService(Components.interfaces.nsIRDFService);
-				    
+
 				    var dsource = rdfService.GetDataSourceBlocking(url);
-				    
+
 					var subject = rdfService.GetResource("http://www.technikum-wien.at/notiz/" + id);
-				
+
 					var predicateNS = "http://www.technikum-wien.at/notiz/rdf";
-				
+
 					//RDF parsen
                     titel = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titel" ));
 					text = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#text" ));
@@ -602,12 +602,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					bearbeiter = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bearbeiter_uid" ));
 					updateamum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#updateamum" ));
 					erledigt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#erledigt" ));
-					
+
 					if(erledigt=='true')
 						erledigt=true;
 					else
 						erledigt=false;
-						
+
 					document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-notiz_id').value=id;
 					document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-titel').value=titel;
 					document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-text').value=text;
@@ -621,43 +621,43 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					{
 						menulist = document.getAnonymousElementByAttribute(this ,'anonid', 'menulist-notiz-bearbeiter');
 						this.BearbeiterLoad(menulist, bearbeiter);
-						
+
 						var children = menulist.getElementsByAttribute('value',bearbeiter);
-						menulist.selectedItem=children[0];	
+						menulist.selectedItem=children[0];
 					}
 					else
 					{
 						menulist = document.getAnonymousElementByAttribute(this ,'anonid', 'menulist-notiz-bearbeiter');
 						this.BearbeiterLoad(menulist, bearbeiter);
-						
+
 						var children = menulist.getElementsByAttribute('value',bearbeiter);
 						menulist.selectedItem=null;
 					}
 					document.getAnonymousElementByAttribute(this ,'anonid', 'caption-notiz-detail').label="Bearbeiten";
-                    
+
                     // Dokumente auslesen
                     var url = '<?php echo APP_ROOT ?>rdf/dms.rdf.php?notiz_id='+id+'&'+gettimestamp();
-                    	
+
                     var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                                    getService(Components.interfaces.nsIRDFService);
 
                     dsource = rdfService.GetDataSourceBlocking(url);
 
                     // Alle Elemente aus dem RDF holen
-                    var dsResources = dsource.GetAllResources(); 
-                    var thisResource = null; 
+                    var dsResources = dsource.GetAllResources();
+                    var thisResource = null;
 
                     // Durchlaufen der Elemente
                     while(dsResources.hasMoreElements())
-                    { 
-                        thisResource = dsResources.getNext().QueryInterface( Components.interfaces.nsIRDFResource); 
+                    {
+                        thisResource = dsResources.getNext().QueryInterface( Components.interfaces.nsIRDFResource);
 
                         var predicateNS = "http://www.technikum-wien.at/dms/rdf";
 
                         //Spalten holen
                         name = getTargetHelper(dsource,thisResource,rdfService.GetResource( predicateNS + "#name" ));
                         dms_id = getTargetHelper(dsource,thisResource,rdfService.GetResource( predicateNS + "#dms_id" ));
-                        
+
                         if(dms_id!='')
                         {
                             // Download-Link für Dokument einfügen
@@ -667,7 +667,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
                             dokbtn.setAttribute("onclick", "window.open('"+dokurl+"')");
                             dokbtn.setAttribute("style", "margin-right: -5px;");
                             document.getAnonymousElementByAttribute(this ,'anonid', 'hbox-notiz-dokumente').appendChild(dokbtn);
-                            
+
                             // Link zum Löschen des Dokuments
                             var delbtn = document.createElement("button");
                             delbtn.setAttribute("image", "<?php echo APP_ROOT;?>skin/images/delete_x.png");
@@ -686,16 +686,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<body>
 			<![CDATA[
 				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		
+
 				if(typeof(filter)=='undefined')
 					v = menulist.value;
 				else
 					v = filter;
-			
+
 				if(v.length>2)
-				{		
+				{
 					var url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?filter='+encodeURIComponent(v)+'&'+gettimestamp();
-					
+
 					var oldDatasources = menulist.database.GetDataSources();
 					while(oldDatasources.hasMoreElements())
 					{
@@ -703,7 +703,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					}
 					//Refresh damit die entfernten DS auch wirklich entfernt werden
 					menulist.builder.rebuild();
-				
+
 					var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 					if(typeof(filter)=='undefined')
 						var datasource = rdfService.GetDataSource(url);
@@ -734,7 +734,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<![CDATA[
 				//debug('LoadNotizTree');
 				 netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-				
+
 				try
 				{
 					this.initialsiert=false;
@@ -744,8 +744,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					this.DisableControls(false);
 					this.DisableDetails(true);
 					this.ResetDetails();
-									
-					
+
+
 					this.setAttribute('projekt_kurzbz',projekt_kurzbz);
 					this.setAttribute('projektphase_id',projektphase_id);
 					this.setAttribute('projekttask_id',projekttask_id);
@@ -755,18 +755,18 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					this.setAttribute('bestellung_id',bestellung_id);
 					this.setAttribute('user',user);
 					this.setAttribute('lehreinheit_id',lehreinheit_id);
-										
-					//Wenn kein Erledigt Parameter uebergeben wird, dann wird die zuletzt 
+
+					//Wenn kein Erledigt Parameter uebergeben wird, dann wird die zuletzt
 					//verwendete Einstellung verwendet
 					if(typeof erledigt=="undefined")
 						erledigt = this.getAttribute('erledigt');
 
 					if(typeof erledigt!="undefined")
 						this.setAttribute('erledigt',erledigt);
-						
+
 					if(typeof anrechnung_id=="undefined")
 						anrechnung_id = '';
-						
+
 					if(typeof anrechnung_id!="undefined")
 						this.setAttribute('anrechnung_id',anrechnung_id);
 
@@ -786,9 +786,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 						datasource = datasource+"&erledigt=true";
 					else if((typeof erledigt=="boolean" && erledigt==false)	|| (typeof erledigt=="string" && erledigt=='false'))
 						datasource = datasource+"&erledigt=false";
-						
+
 					datasource = datasource+"&anrechnung_id="+encodeURIComponent(anrechnung_id);
-					
+
 					//debug('Source:'+datasource);
 	                var tree = document.getAnonymousElementByAttribute(this ,'anonid', 'tree-notiz');
 
@@ -798,34 +798,34 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	                {
 	                    tree.database.RemoveDataSource(oldDatasources.getNext());
 	                }
-		               	                 
+
 	                var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	                this.TreeNotizDatasource = rdfService.GetDataSource(datasource);
 	                this.TreeNotizDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	                this.TreeNotizDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	                tree.database.AddDataSource(this.TreeNotizDatasource);
-	                
+
 	                this.TreeNotizDatasource.addXMLSinkObserver({
 	                  notiz: this,
 					  onBeginLoad: function(aSink)
 					    {},
-					
+
 					  onInterrupt: function(aSink)
 					    {},
-					
+
 					  onResume: function(aSink)
 					    {},
-					
+
 					  onEndLoad: function(aSink)
-					    { 
+					    {
 					     	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-					    
+
 					      //aSink.removeXMLSinkObserver(this);
 					      //debug('onEndLoad start Rebuild');
 					      var tree = document.getAnonymousElementByAttribute(this.notiz ,'anonid', 'tree-notiz');
 						  tree.builder.rebuild();
 					    },
-					
+
 					  onError: function(aSink, aStatus, aErrorMsg)
 					    { alert("error! " + aErrorMsg); }
 					});
@@ -843,7 +843,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 							notiz.selectItem();
 						}
 					});
-					
+
 				}
 				catch(e)
 				{
@@ -859,7 +859,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				if(tree.view)
 				{
 					var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
-				
+
 					//In der globalen Variable ist die zu selektierende ID gespeichert
 					if(this.selectID!=null)
 					{
@@ -868,7 +868,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					   		//id der row holen
 							var col = tree.columns.getColumnFor(document.getAnonymousElementByAttribute(this ,'anonid', 'treecol-notiz-notiz_id'));
 							id = tree.view.getCellText(i, col);
-						
+
 							//wenn dies die zu selektierende Zeile
 							if(this.selectID==id)
 							{
@@ -877,21 +877,21 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 								//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
 								tree.treeBoxObject.ensureRowIsVisible(i);
 								this.selectID=null;
-								
+
 								return true;
 							}
 					   	}
 					}
-				}				
+				}
 			]]>
 			</body>
 		</method>
-        
+
         <method name="UploadDokument">
             <body>
 			<![CDATA[
                 notiz_id = document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-notiz_id').value;
-                                
+
                 if(notiz_id != '')
                 {
 					NotizDokumentUploadScope = this;
@@ -903,13 +903,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
             ]]>
 			</body>
         </method>
-        
+
         <method name="LoeschenDokument">
 			<parameter name="dms_id"/>
             <parameter name="dateiname"/>
 			<body>
 			<![CDATA[
-								
+
 				//Abfrage ob wirklich geloescht werden soll
                 if (confirm('Wollen Sie die Datei '+dateiname+' wirklich loeschen?'))
                 {
@@ -948,39 +948,39 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
                     var cb=new mycallb(this);
 
                     SOAPClient.SendRequest(sr, cb.invoke);
-                    
+
                     // Alle Download-Buttons der Dokumente entfernen
                     var notizdoks = document.getAnonymousElementByAttribute(this ,'anonid', 'hbox-notiz-dokumente');
                     while(notizdoks.hasChildNodes())
                     {
                       notizdoks.removeChild(notizdoks.firstChild);
                     }
-                    
+
                     // Dokumente auslesen
                     netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
                     var id = document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-notiz_id').value;
                     var url = '<?php echo APP_ROOT ?>rdf/dms.rdf.php?notiz_id='+id+'&'+gettimestamp();
-                    	
+
                     var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                                    getService(Components.interfaces.nsIRDFService);
 
                     dsource = rdfService.GetDataSourceBlocking(url);
 
                     // Alle Elemente aus dem RDF holen
-                    var dsResources = dsource.GetAllResources(); 
-                    var thisResource = null; 
+                    var dsResources = dsource.GetAllResources();
+                    var thisResource = null;
 
                     // Durchlaufen der Elemente
                     while(dsResources.hasMoreElements())
-                    { 
-                        thisResource = dsResources.getNext().QueryInterface( Components.interfaces.nsIRDFResource); 
+                    {
+                        thisResource = dsResources.getNext().QueryInterface( Components.interfaces.nsIRDFResource);
 
                         var predicateNS = "http://www.technikum-wien.at/dms/rdf";
 
                         //Spalten holen
                         name = getTargetHelper(dsource,thisResource,rdfService.GetResource( predicateNS + "#name" ));
                         dms_id = getTargetHelper(dsource,thisResource,rdfService.GetResource( predicateNS + "#dms_id" ));
-                        
+
                         if(dms_id!='')
                         {
                             // Download-Link für Dokument einfügen
@@ -990,7 +990,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
                             dokbtn.setAttribute("onclick", "window.open('"+dokurl+"')");
                             dokbtn.setAttribute("style", "margin-right: -5px;");
                             document.getAnonymousElementByAttribute(this ,'anonid', 'hbox-notiz-dokumente').appendChild(dokbtn);
-                            
+
                             // Link zum Löschen des Dokuments
                             var delbtn = document.createElement("button");
                             delbtn.setAttribute("image", "<?php echo APP_ROOT;?>skin/images/delete_x.png");
@@ -1000,11 +1000,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
                         }
                     }
                 }
-				
+
 			]]>
 			</body>
 		</method>
-		
+
 		<constructor>
 			//debug('load notiz:'+this.getAttribute('id'));
 			this.DisableControls(true);
@@ -1019,8 +1019,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			var user = this.getAttribute('user');
 			var lehreinheit_id = this.getAttribute('lehreinheit_id');
 			var anrechnung_id = this.getAttribute('anrechnung_id');
-			
-			if(projekt_kurzbz!='' || projektphase_id!='' || projekttask_id!='' 
+
+			if(projekt_kurzbz!='' || projektphase_id!='' || projekttask_id!=''
 			   || uid!='' || person_id!='' || prestudent_id!='' || bestellung_id!='' || user!='' || lehreinheit_id!='' || anrechnung_id!='')
 			{
 				this.LoadNotizTree(projekt_kurzbz,projektphase_id,projekttask_id,uid,person_id,prestudent_id,bestellung_id, user, lehreinheit_id, null, anrechnung_id);
@@ -1031,6 +1031,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			//debug('Notiz Binding Stop');
 		</destructor>
 	</implementation>
-	
+
   </binding>
 </bindings>
