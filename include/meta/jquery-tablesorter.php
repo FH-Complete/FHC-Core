@@ -41,6 +41,7 @@ if($dr=='')
 //Originaldateien des Herstellers
 echo '<link rel="stylesheet" type="text/css" href="'.$dr.'vendor/FHC-vendor/jquery-tablesorter/css/theme.default.css">';
 echo '<script src="'.$dr.'vendor/FHC-vendor/jquery-tablesorter/js/jquery.tablesorter.js"></script>';
+echo '<script src="'.$dr.'vendor/FHC-vendor/jquery-tablesorter/js/jquery.tablesorter.widgets.js"></script>';
 
 //Anpassungen
 echo '<link rel="stylesheet" type="text/css" href="'.$dr.'include/vendor_custom/jquery-tablesorter/tablesort.css">';
