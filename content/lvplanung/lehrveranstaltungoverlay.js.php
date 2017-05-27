@@ -733,6 +733,17 @@ function LeAuswahl()
 	lehrveranstaltungGesamtNotenTreeloaded=false;
 
 	if (tree.currentIndex==-1) return;
+
+	// Wenn Honorareingabe aktiviert ist dann das Vertragsdatum auf heutigen Tag setzen
+	var pruefung_vertragsdatum = document.getElementById('lehrveranstaltung-noten-pruefung-box-datum')
+	if(pruefung_vertragsdatum)
+	{
+		var heute = new Date();
+		var datum = '';
+		datum = heute.getDate()+'.'+(heute.getMonth()+1)+'.'+heute.getFullYear();
+		pruefung_vertragsdatum.value=datum;
+	}
+
 	try
 	{
 		//Ausgewaehlte Lehreinheit holen
@@ -979,7 +990,6 @@ function LeAuswahl()
 	// Notizen Laden
 	var lehreinheitnotiz = document.getElementById('lehrveranstaltung-box-notizen');
 	lehreinheitnotiz.LoadNotizTree('','','','','','','','',lehreinheit_id);
-
 }
 
 //******** LehreinheitMitarbeiter **********//
@@ -2575,6 +2585,8 @@ function LehrveranstaltungNotenPruefungSave()
 	var anzahl = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anzahl').value;
 	var vertragstyp_kurzbz = document.getElementById('lehrveranstaltung-noten-pruefung-menulist-vertragstyp').value;
 	var anmerkung = document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anmerkung').value;
+	var vertragsdatum = document.getElementById('lehrveranstaltung-noten-pruefung-box-datum').iso;
+
 	satz = satz.replace(',','.');
 
     if(mitarbeiter_uid == '' || satz == '' || anzahl == '' || vertragstyp_kurzbz=='')
@@ -2604,16 +2616,13 @@ function LehrveranstaltungNotenPruefungSave()
 
 	var req = new phpRequest('mitarbeiter/mitarbeiterDBDML.php','','');
 
-	var heute = new Date();
-	var datum = '';
-	datum = heute.getFullYear()+'-'+(heute.getMonth()+1)+'-'+heute.getDate();
 	req.add('type', 'vertraggenerate');
 	req.add('mitarbeiter_uid', mitarbeiter_uid);
 	req.add('vertragstyp_kurzbz', vertragstyp_kurzbz);
 	req.add('betrag', gesamt);
 	req.add('bezeichnung', 'Pruefungshonorar '+lv_studiengang+' '+lv_semester+' '+lv_bezeichnung+' '+lehrveranstaltung_id);
 	req.add('anmerkung', anmerkung);
-	req.add('vertragsdatum', datum);
+	req.add('vertragsdatum', vertragsdatum);
 	req.add('lehrveranstaltung_id',lehrveranstaltung_id);
 
 	var response = req.executePOST();

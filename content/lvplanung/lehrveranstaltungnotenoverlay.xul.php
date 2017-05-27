@@ -311,6 +311,8 @@ if(defined('FAS_GESAMTNOTE_PRUEFUNGSHONORAR') && FAS_GESAMTNOTE_PRUEFUNGSHONORAR
 		<hbox>
 			<label value="Anmerkung" control="lehrveranstaltung-noten-pruefung-textbox-anmerkung"/>
 			<textbox id="lehrveranstaltung-noten-pruefung-textbox-anmerkung" size="60"/>
+			<label value="Vertragsdatum" control="lehrveranstaltung-noten-pruefung-box-datum"/>
+			<box class="Datum" id="lehrveranstaltung-noten-pruefung-box-datum"/>
 			<button id="lehrveranstaltung-noten-pruefung-button-save" label="Speichern" oncommand="LehrveranstaltungNotenPruefungSave();" />
 		</hbox>
 	</vbox>
