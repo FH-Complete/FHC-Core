@@ -201,6 +201,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrtyp_kurzbz"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="lehrveranstaltung-treecol-studiensemester_kurzbz" label="Studiensemester" flex="1" hidden="true" persist="hidden, width, ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#studiensemester_kurzbz"/>
+				<splitter class="tree-splitter"/>
 			</treecols>
 
 			<template>
@@ -233,6 +237,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#studienplan_id"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#studienplan_bezeichnung"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrtyp_kurzbz"/>
+							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#studiensemester_kurzbz"/>
 						</treerow>
 					</treeitem>
 				</treechildren>
