@@ -2645,3 +2645,14 @@ function LehrveranstaltungNotenPruefungSave()
 		document.getElementById('lehrveranstaltung-noten-pruefung-textbox-anmerkung').value='';
 	}
 }
+
+function LehrveranstaltungLVGesamtNotenTreeSort()
+{
+	// Nach dem Sortieren der Noten die Unterschiede erneut markieren
+	// da sonst nach dem sortieren falsche Eintraege markiert sind
+	window.setTimeout(LehrveranstaltungGesamtNotenTreeSelectDifferent,20);
+}
+
+function LehrveranstaltungNotenTreeSort()
+{
+}
