@@ -183,47 +183,48 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sortActive="true"
 				sortDirection="ascending"
-				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#lehrveranstaltung_bezeichnung"/>
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#lehrveranstaltung_bezeichnung"
+				onclick="StudentLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="student-lvgesamtnoten-tree-note_bezeichnung" label="Note" flex="5" hidden="false"
 			   class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#note_bezeichnung"/>
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#note_bezeichnung" onclick="StudentLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="student-lvgesamtnoten-tree-mitarbeiter_uid" label="MitarbeiterUID" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#mitarbeiter_uid" />
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#mitarbeiter_uid"  onclick="StudentLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="student-lvgesamtnoten-tree-benotungsdatum" label="Benotungsdatum" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#benotungsdatum_iso" />
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#benotungsdatum_iso"  onclick="StudentLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="student-lvgesamtnoten-tree-benotungsdatum-iso" label="BenotungsdatumISO" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#benotungsdatum_iso" />
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#benotungsdatum_iso"  onclick="StudentLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="student-lvgesamtnoten-tree-freigabedatum" label="Freigabedatum" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#freigabedatum_iso" />
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#freigabedatum_iso"  onclick="StudentLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="student-lvgesamtnoten-tree-studiensemester_kurzbz" label="Studiensemester" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#studiensemester_kurzbz" />
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#studiensemester_kurzbz"  onclick="StudentLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="student-lvgesamtnoten-tree-note" label="Note" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#note" />
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#note"  onclick="StudentLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="student-lvgesamtnoten-tree-student_uid" label="StudentUID" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#student_uid" />
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#student_uid"  onclick="StudentLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="student-lvgesamtnoten-tree-lehrveranstaltung_id" label="LehrveranstaltungID" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#lehrveranstaltung_id" />
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#lehrveranstaltung_id"  onclick="StudentLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
 			<treecol id="student-lvgesamtnoten-tree-punkte" label="Punkte" flex="2" hidden="true"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#punkte" />
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#punkte"  onclick="StudentLVGesamtNotenTreeSort()"/>
 			<splitter class="tree-splitter"/>
 		</treecols>
 

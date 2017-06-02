@@ -39,13 +39,13 @@ $db = new basis_db();
 foreach($studiengang->result as $rowstg)
 {
 /*
-	$qry = "SELECT 
-				studiensemester_kurzbz 
-			FROM 
-				lehre.tbl_lehrveranstaltung 
-				JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
-				JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
-			WHERE 
+	$qry = "SELECT
+				studiensemester_kurzbz
+			FROM
+				lehre.tbl_lehrveranstaltung
+				JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
+				JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+			WHERE
 				tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($rowstg->studiengang_kz, FHC_INTEGER)."
 			ORDER BY tbl_studiensemester.start LIMIT 1";
 */
@@ -79,11 +79,11 @@ foreach($studiengang->result as $rowstg)
 	}
 	else
 		$studienordnung_id = $studienordnung->studienordnung_id;
-	
+
 	// Studienplan anlegen
 	if($rowstg->mischform)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					distinct orgform_kurzbz
 				FROM
 					lehre.tbl_lehrveranstaltung
@@ -158,19 +158,19 @@ function createStudienplan($orgform, $studienordnung_id, $rowstg, $studienordnun
 			$wochen = $row->wochen;
 		}
 	}
-	
+
 	$studienplan->semesterwochen = $wochen;
 	$studienplan->testtool_sprachwahl = true;//$db->db_parse_bool($rowstg->testtool_sprachwahl);
 	$studienplan->insertvon = 'generate';
 	if(!$studienplan->save())
 	{
 		echo 'Studienplan failed for '.$rowstg->studiengang_kz.$studienplan->errormsg;
-		continue;
+		return false;
 	}
 	else
 		$studienplan_id = $studienplan->studienplan_id;
 
-	$qry = "SELECT 
+	$qry = "SELECT
 				distinct lehrveranstaltung_id, semester, koordinator
 			FROM
 				lehre.tbl_lehrveranstaltung
