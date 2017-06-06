@@ -93,7 +93,7 @@
 						<?php
 							echo $this->widgetlib->widget(
 								'Vorlage_widget',
-								array('oe_kurzbz' => $oe_kurzbz),
+								array('oe_kurzbz' => $oe_kurzbz, 'isAdmin' => $isAdmin),
 								array('name' => 'vorlage', 'id' => 'vorlageDnD')
 							);
 						?>
