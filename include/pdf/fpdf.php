@@ -6,7 +6,7 @@
 * Date:    2008-08-03                                                          *
 * Author:  Olivier PLATHEY                                                     *
 *******************************************************************************/
-if (!defined('FPDF_VERSION'))   
+if (!defined('FPDF_VERSION'))
 	define('FPDF_VERSION','1.6');
 
 class FPDF
@@ -72,7 +72,7 @@ var $PDFVersion;         //PDF version number
 *                               Public methods                                 *
 *                                                                              *
 *******************************************************************************/
-function FPDF($orientation='P', $unit='mm', $format='A4')
+function __construct($orientation='P', $unit='mm', $format='A4')
 {
 	//Some checks
 	$this->_dochecks();

@@ -27,10 +27,10 @@ class PDF extends FPDF
 	 *                      letter
 	 *                      legal
 	 */
-	function PDF($orientation='P',$unit='mm',$format='A4')
+	function __construct($orientation='P',$unit='mm',$format='A4')
 	{
 	    //Call parent constructor
-	    $this->FPDF($orientation,$unit,$format);
+	    parent::__construct($orientation,$unit,$format);
 		//Initialization
 	    $this->B=0;
 	    $this->I=0;
