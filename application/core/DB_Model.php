@@ -11,14 +11,18 @@ class DB_Model extends FHC_Model
 	const DEFAULT_SCHEMA = 'public';
 	const UDF_FIELD_NAME = 'udf_values';
 	const UDF_FIELD_TYPE = 'jsonb';
+	const UDF_FIELD_PREFIX = 'udf_';
 	
 	protected $dbTable;  	// Name of the DB-Table for CI-Insert, -Update, ...
 	protected $pk;  		// Name of the PrimaryKey for DB-Update, Load, ...
 	protected $hasSequence;	// False if this table has a composite primary key that is not using a sequence
 							// True if this table has a primary key that uses a sequence
 	
-	protected $UDFs; // 
+	protected $UDFs; // Contains the udfs
 	
+	/**
+	 * Constructor
+	 */
 	function __construct($dbTable = null, $pk = null, $hasSequence = true)
 	{
 		parent::__construct();
@@ -29,7 +33,7 @@ class DB_Model extends FHC_Model
 		$this->UDFs = array();
 	}
 	
-	/** ---------------------------------------------------------------
+	/**
 	 * Insert Data into DB-Table
 	 *
 	 * @param   array $data  DataArray for Insert
@@ -43,6 +47,9 @@ class DB_Model extends FHC_Model
 		
 		// Checks rights
 		if ($isEntitled = $this->_isEntitled(PermissionLib::INSERT_RIGHT)) return $isEntitled;
+		
+		// UDFs
+		$this->_manageUDFInsert($data);
 		
 		// DB-INSERT
 		if ($this->db->insert($this->dbTable, $data))
@@ -73,11 +80,14 @@ class DB_Model extends FHC_Model
 			return error($this->db->error(), FHC_DB_ERROR);
 	}
 
-	/** ---------------------------------------------------------------
+	/**
 	 * Replace Data in DB-Table
 	 *
 	 * @param   array $data  DataArray for Replacement
 	 * @return  array
+	 *
+	 * DEPRECATED: to be updated, not maintained
+	 *
 	 */
 	public function replace($data)
 	{
@@ -94,8 +104,53 @@ class DB_Model extends FHC_Model
 		else
 			return error($this->db->error(), FHC_DB_ERROR);
 	}
-
-	/** ---------------------------------------------------------------
+	
+	/**
+	 * Manage UDFs on update
+	 */
+	private function _manageUDFUpdate($id, &$data)
+	{
+		// Checks if this table has udf
+		if ($this->_hasUDF())
+		{
+			$dbVersionArray = explode('.', $this->db->version());
+			if ($dbVersionArray[0] == 9 && $dbVersionArray[1] <= 5)
+			{
+				$this->addSelect(DB_Model::UDF_FIELD_NAME);
+				$result = $this->load($id);
+				if (hasData($result))
+				{
+					// Get udf values from $data & clean udf values from $data
+					// Must be performed here because the load method populates UDFs too
+					$this->_popUDF($data);
+					
+					$jsonb = (array)$result->retval[0];
+					if (count($jsonb) > 0)
+					{
+						foreach($this->UDFs as $key => $val)
+						{
+							if (isset($jsonb[$key]))
+							{
+								$jsonb[$key] = $val;
+							}
+						}
+						
+						$jsonEncodedUDFs = json_encode($jsonb);
+						if ($jsonEncodedUDFs !== false)
+						{
+							$data[DB_Model::UDF_FIELD_NAME] = $jsonEncodedUDFs;
+						}
+					}
+				}
+			}
+			else if ($dbVersionArray[0] == 9 && $dbVersionArray[1] > 5)
+			{
+				// TODO
+			}
+		}
+	}
+	
+	/**
 	 * Update Data in DB-Table
 	 *
 	 * @param   string $id  PK for DB-Table
@@ -112,7 +167,15 @@ class DB_Model extends FHC_Model
 		
 		// Checks rights
 		if ($isEntitled = $this->_isEntitled(PermissionLib::UPDATE_RIGHT)) return $isEntitled;
-
+		
+		// UDFs
+		$this->_manageUDFUpdate($id, $data);
+		
+ 		var_dump($this->UDFs);
+ 		var_dump($data);
+		
+		exit;
+		
 		// DB-UPDATE
 		// Check for composite Primary Key
 		if (is_array($id))
@@ -130,7 +193,7 @@ class DB_Model extends FHC_Model
 			return error($this->db->error(), FHC_DB_ERROR);
 	}
 	
-	/** ---------------------------------------------------------------
+	/**
 	 * Delete data from DB-Table
 	 *
 	 * @param   string $id  Primary Key for DELETE
@@ -164,7 +227,7 @@ class DB_Model extends FHC_Model
 			return error($this->db->error(), FHC_DB_ERROR);
 	}
 
-	/** ---------------------------------------------------------------
+	/**
 	 * Load single data from DB-Table
 	 *
 	 * @param   string $id  ID (Primary Key) for SELECT ... WHERE
@@ -201,7 +264,7 @@ class DB_Model extends FHC_Model
 			return error($this->db->error(), FHC_DB_ERROR);
 	}
 
-	/** ---------------------------------------------------------------
+	/**
 	 * Load data from DB-Table with a where clause
 	 *
 	 * @return  array
@@ -224,7 +287,7 @@ class DB_Model extends FHC_Model
 			return error($this->db->error(), FHC_DB_ERROR);
 	}
 	
-	/** ---------------------------------------------------------------
+	/**
 	 * Load data and convert a record into a list of data from the main table,
 	 * and linked to every element, the data from the side tables
 	 *
@@ -292,7 +355,7 @@ class DB_Model extends FHC_Model
 		{
 			// Converts the object that contains data, from the returned CI's object to an array
 			// with the postgresql array and boolean types converterd
-			$resultArray = $this->toPhp($resultDB);//var_dump($resultArray);
+			$resultArray = $this->toPhp($resultDB);
 			// Array that will contain all the mainTable records, and to each record the linked data
 			// of a side table
 			$returnArray = array();
@@ -369,7 +432,7 @@ class DB_Model extends FHC_Model
 		return $result;
 	}
 	
-	/** ---------------------------------------------------------------
+	/**
 	 * Add a table to join with
 	 *
 	 * @return  void
@@ -385,7 +448,7 @@ class DB_Model extends FHC_Model
 		return success(true);
 	}
 	
-	/** ---------------------------------------------------------------
+	/**
 	 * Add order clause
 	 *
 	 * @return  void
@@ -401,7 +464,7 @@ class DB_Model extends FHC_Model
 		return success(true);
 	}
 	
-	/** ---------------------------------------------------------------
+	/**
 	 * Add select clause
 	 *
 	 * @return  void
@@ -417,7 +480,7 @@ class DB_Model extends FHC_Model
 		return success(true);
 	}
 	
-	/** ---------------------------------------------------------------
+	/**
 	 * Add distinct clause
 	 *
 	 * @return  void
@@ -427,7 +490,7 @@ class DB_Model extends FHC_Model
 		$this->db->distinct();
 	}
 	
-	/** ---------------------------------------------------------------
+	/**
 	 * Add limit clause
 	 *
 	 * @return  void
@@ -450,7 +513,7 @@ class DB_Model extends FHC_Model
 		return success(true);
 	}
 	
-	/** ---------------------------------------------------------------
+	/**
 	 * Add a table in the from clause
 	 *
 	 * @return  void
@@ -473,7 +536,7 @@ class DB_Model extends FHC_Model
 		return success(true);
 	}
 	
-	/** ---------------------------------------------------------------
+	/**
 	 * Add one or more fields in the group by clause
 	 *
 	 * @return  void
@@ -493,7 +556,7 @@ class DB_Model extends FHC_Model
 		return success(true);
 	}
 	
-	/** ---------------------------------------------------------------
+	/**
 	 * Reset the query builder state
 	 *
 	 * @return  void
@@ -503,7 +566,7 @@ class DB_Model extends FHC_Model
 		$this->db->reset_query();
 	}
 	
-	/** ---------------------------------------------------------------
+	/**
 	 * This method call the method escape from class CI_DB_driver, therefore:
 	 * this method determines the data type so that it can escape only string data.
 	 * It also automatically adds single quotes around the data so you don’t have to
@@ -515,7 +578,7 @@ class DB_Model extends FHC_Model
 		return $this->db->escape($value);
 	}
 
-	/** ---------------------------------------------------------------
+	/**
 	 * Convert PG-Boolean to PHP-Boolean
 	 *
 	 * @param   char	$b	PG-Char to convert
@@ -538,7 +601,7 @@ class DB_Model extends FHC_Model
 		return $val;
 	}
 
-	/** ---------------------------------------------------------------
+	/**
 	 * Convert PG-Array to PHP-Array
 	 *
 	 * @param   string	$s		PG-String to convert
@@ -628,7 +691,30 @@ class DB_Model extends FHC_Model
 		return $result;
 	}
 	
-	/** ---------------------------------------------------------------
+	/**
+	 * Return UDFs
+	 */
+	public function getUDFs()
+	{
+		return $this->UDFs;
+	}
+	
+	/**
+	 * Return one selected element of UDFs
+	 */
+	public function getUDF($udf)
+	{
+		if (isset($this->UDFs[$udf]))
+		{
+			return $this->UDFs[$udf];
+		}
+		
+		return null;
+	}
+	
+	// ----------------------------------------------------------------------------
+	
+	/**
 	 * Invalid ID
 	 *
 	 * @param   array $i	Array with indexes.
@@ -707,25 +793,75 @@ class DB_Model extends FHC_Model
 		return $result;
 	}
 	
+	// ----------------------------------------------------------------------------
+	
 	/**
-	 * 
+	 * Checks if for $dbTable are present UDFs
 	 */
-	public function getUDFs()
+	private function _hasUDF()
 	{
-		return $this->UDFs;
+		$hasUDF = false;
+		
+		$this->load->model('system/UDF_model', 'UDFModel');
+		
+		$schema = DB_Model::DEFAULT_SCHEMA;
+		$table = $this->dbTable;
+		$dotPos = strpos($table, '.');
+		
+		if (is_numeric($dotPos) && $dotPos > 0)
+		{
+			$tmpArray = explode('.', $table);
+			$schema = $tmpArray[0];
+			$table = $tmpArray[1];
+		}
+		
+		$udfResults = $this->UDFModel->loadWhere(
+			array(
+				'schema' => $schema,
+				'table' => $table
+			)
+		);
+		
+		if (hasData($udfResults))
+		{
+			$hasUDF = true;
+		}
+		
+		return $hasUDF;
 	}
 	
 	/**
-	 * 
+	 * Move UDFs from $data to $UDFs
 	 */
-	public function getUDF($udf)
+	private function _popUDF(&$data)
 	{
-		if (isset($this->UDFs[$udf]))
+		foreach($data as $key => $val)
 		{
-			return $this->UDFs[$udf];
+			if (substr($key, 0, 4) == DB_Model::UDF_FIELD_PREFIX)
+			{
+				$this->UDFs[$key] = $val;
+				unset($data[$key]); // remove from data
+			}
 		}
-		
-		return null;
+	}
+	
+	/**
+	 * Manage UDFs on insert
+	 */
+	private function _manageUDFInsert(&$data)
+	{
+		// Checks if this table has udf
+		if ($this->_hasUDF())
+		{
+			// Get udf values from $data & clean udf values from $data
+			$this->_popUDF($data);
+			// Encode UDFs to json and store them into $data
+			$jsonEncodedUDFs = json_encode($this->UDFs);
+			if ($jsonEncodedUDFs !== false)
+			{
+				$data[DB_Model::UDF_FIELD_NAME] = $jsonEncodedUDFs;
+			}
+		}
 	}
 	
 	/**
@@ -823,7 +959,7 @@ class DB_Model extends FHC_Model
 								foreach($jsonValues as $key => $value)
 								{
 									$tmpResult->{$key} = $value;
-									$this->UDFs[$key] = $value; // 
+									$this->UDFs[$key] = $value; // Stores the udfs in UDFs
 								}
 							}
 							unset($tmpResult->{$toBeConverted->name});
