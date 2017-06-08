@@ -276,11 +276,11 @@ switch($method)
 			</tr>
 			<tr>
 				<td>Aktiv:</td>';
-		if($studienplan->aktiv)
-			$checked=' checked="checked"';
-		else
-			$checked='';
-		echo '
+				if($studienplan->aktiv)
+					$checked=' checked="checked"';
+				else
+					$checked='';
+				echo '
 				<td><input type="checkbox" id="aktiv"'.($new?' checked="checked"':$checked).'/></td>
 			</tr>
 			<tr>
@@ -294,6 +294,15 @@ switch($method)
 			<tr>
 				<td>Pflicht LVS</td>
 				<td><input type="text"  size="3" id="pflicht_lvs" value="'.$studienplan->pflicht_lvs.'" /></td>
+			</tr>
+			<tr>
+				<td>Onlinebewerbung:</td>';
+				if($studienplan->onlinebewerbung_studienplan)
+					$checked=' checked="checked"';
+				else
+					$checked='';
+				echo '
+				<td><input type="checkbox" id="onlinebewerbung_studienplan"'.($new?' checked="checked"':$checked).'/></td>
 			</tr>
 			<tr>
 				<td><span id="submsg" style="color:green; visibility:hidden;">Daten gespeichert</span></td>

@@ -284,7 +284,7 @@ if(!$result = @$db->db_query("SELECT mailversand FROM campus.tbl_coodle LIMIT 1;
 // Spalte onlinebewerbung_studienplan in lehre.tbl_studienplan
 if(!$result = @$db->db_query("SELECT onlinebewerbung_studienplan FROM lehre.tbl_studienplan LIMIT 1;"))
 {
-	$qry = "ALTER TABLE lehre.tbl_studienplan ADD COLUMN onlinebewerbung_studienplan boolean;";
+	$qry = "ALTER TABLE lehre.tbl_studienplan ADD COLUMN onlinebewerbung_studienplan boolean NOT NULL DEFAULT true;";
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_studienplan: '.$db->db_last_error().'</strong><br>';
