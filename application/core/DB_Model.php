@@ -97,57 +97,12 @@ class DB_Model extends FHC_Model
 		
 		// Checks rights
 		if ($isEntitled = $this->_isEntitled(PermissionLib::REPLACE_RIGHT)) return $isEntitled;
-
+		
 		// DB-REPLACE
 		if ($this->db->replace($this->dbTable, $data))
 			return success($this->db->insert_id());
 		else
 			return error($this->db->error(), FHC_DB_ERROR);
-	}
-	
-	/**
-	 * Manage UDFs on update
-	 */
-	private function _manageUDFUpdate($id, &$data)
-	{
-		// Checks if this table has udf
-		if ($this->_hasUDF())
-		{
-			$dbVersionArray = explode('.', $this->db->version());
-			if ($dbVersionArray[0] == 9 && $dbVersionArray[1] <= 5)
-			{
-				$this->addSelect(DB_Model::UDF_FIELD_NAME);
-				$result = $this->load($id);
-				if (hasData($result))
-				{
-					// Get udf values from $data & clean udf values from $data
-					// Must be performed here because the load method populates UDFs too
-					$this->_popUDF($data);
-					
-					$jsonb = (array)$result->retval[0];
-					if (count($jsonb) > 0)
-					{
-						foreach($this->UDFs as $key => $val)
-						{
-							if (isset($jsonb[$key]))
-							{
-								$jsonb[$key] = $val;
-							}
-						}
-						
-						$jsonEncodedUDFs = json_encode($jsonb);
-						if ($jsonEncodedUDFs !== false)
-						{
-							$data[DB_Model::UDF_FIELD_NAME] = $jsonEncodedUDFs;
-						}
-					}
-				}
-			}
-			else if ($dbVersionArray[0] == 9 && $dbVersionArray[1] > 5)
-			{
-				// TODO
-			}
-		}
 	}
 	
 	/**
@@ -170,11 +125,6 @@ class DB_Model extends FHC_Model
 		
 		// UDFs
 		$this->_manageUDFUpdate($id, $data);
-		
- 		var_dump($this->UDFs);
- 		var_dump($data);
-		
-		exit;
 		
 		// DB-UPDATE
 		// Check for composite Primary Key
@@ -860,6 +810,51 @@ class DB_Model extends FHC_Model
 			if ($jsonEncodedUDFs !== false)
 			{
 				$data[DB_Model::UDF_FIELD_NAME] = $jsonEncodedUDFs;
+			}
+		}
+	}
+	
+	/**
+	 * Manage UDFs on update
+	 */
+	private function _manageUDFUpdate($id, &$data)
+	{
+		// Checks if this table has udf
+		if ($this->_hasUDF())
+		{
+			$dbVersionArray = explode('.', $this->db->version());
+			if ($dbVersionArray[0] == 9 && $dbVersionArray[1] <= 4) // If postgresql version is <= 9.4
+			{
+				$this->addSelect(DB_Model::UDF_FIELD_NAME);
+				$result = $this->load($id);
+				if (hasData($result))
+				{
+					// Get udf values from $data & clean udf values from $data
+					// Must be performed here because the load method populates UDFs too
+					$this->_popUDF($data);
+					
+					$jsonb = (array)$result->retval[0]; // convert the result to an array
+					if (count($jsonb) > 0) // if UDFs are present
+					{
+						foreach($this->UDFs as $key => $val)
+						{
+							if (isset($jsonb[$key]))
+							{
+								$jsonb[$key] = $val;
+							}
+						}
+						
+						$jsonEncodedUDFs = json_encode($jsonb); // encode to json
+						if ($jsonEncodedUDFs !== false)
+						{
+							$data[DB_Model::UDF_FIELD_NAME] = $jsonEncodedUDFs;
+						}
+					}
+				}
+			}
+			else if ($dbVersionArray[0] == 9 && $dbVersionArray[1] > 4) // If postgresql version is > 9.4
+			{
+				// TODO: use jsonb_set
 			}
 		}
 	}
