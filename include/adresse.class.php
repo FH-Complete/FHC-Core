@@ -248,9 +248,9 @@ class adresse extends basis_db
 			$this->errormsg = 'Strasse darf nicht länger als 255 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->plz)>10)
+		if(mb_strlen($this->plz)>16)
 		{
-			$this->errormsg = 'Plz darf nicht länger als 10 Zeichen sein';
+			$this->errormsg = 'Plz darf nicht länger als 16 Zeichen sein';
 			return false;
 		}
 		if(mb_strlen($this->ort)>255)
