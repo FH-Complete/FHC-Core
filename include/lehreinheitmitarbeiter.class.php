@@ -473,11 +473,15 @@ class lehreinheitmitarbeiter extends basis_db
 	 */
 	public function getLehreinheiten($mitarbeiter_uid, $studiensemester_kurzbz)
 	{
-		$qry = 'SELECT DISTINCT lehreinheit_id, lv_bezeichnung, lv_kurzbz, unr, lv_lehrform_kurzbz, stg_kurzbzlang, lv_semester '
-				. 'FROM campus.vw_lehreinheit '
-				. 'WHERE mitarbeiter_uid = ' . $this->db_add_param($mitarbeiter_uid)
-				. ' AND studiensemester_kurzbz = ' . $this->db_add_param($studiensemester_kurzbz)
-				. ' ORDER BY lv_bezeichnung, unr ';
+		$qry = 'SELECT
+					DISTINCT lehreinheit_id, lv_bezeichnung, lv_kurzbz, unr, lv_lehrform_kurzbz, stg_kurzbzlang,
+					lv_semester, lehrform_kurzbz
+				FROM
+					campus.vw_lehreinheit
+				WHERE
+					mitarbeiter_uid = '.$this->db_add_param($mitarbeiter_uid).'
+					AND studiensemester_kurzbz = '.$this->db_add_param($studiensemester_kurzbz).'
+					ORDER BY lv_bezeichnung, unr ';
 
 		$result = $this->db_query($qry);
 		$ret = array();
@@ -494,7 +498,7 @@ class lehreinheitmitarbeiter extends basis_db
 	 * Laedt die Lektoren einer Lehrveranstaltung in einem Studiensemester
 	 * @param lehrveranstaltung_id
 	 * @param studiensemester_kurzbz
-	 * @param integer lehreinheit_id Optional Lehreinheit_id 
+	 * @param integer lehreinheit_id Optional Lehreinheit_id
 	 * @return array + true wenn ok / false im Fehlerfall
 	 */
 	public function getMitarbeiterLV($lehrveranstaltung_id, $studiensemester_kurzbz, $lehreinheit_id=null)
@@ -514,7 +518,7 @@ class lehreinheitmitarbeiter extends basis_db
 				WHERE
 					lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
 					AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
-		
+
 		if(!is_null($lehreinheit_id))
 			$qry .=" AND tbl_lehreinheit.lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
 		$qry .=" ORDER BY nachname, vorname;";
