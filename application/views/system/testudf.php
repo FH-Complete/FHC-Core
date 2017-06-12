@@ -8,8 +8,8 @@
 					array(
 						UDFWidgetTpl::SCHEMA_ARG_NAME => 'public',
 						UDFWidgetTpl::TABLE_ARG_NAME => 'tbl_person',
-						UDFWidgetTpl::FIELD_ARG_NAME => 'schuhgroesse',
-						DropdownWidget::SELECTED_ELEMENT => $udfs['schuhgroesse']
+						UDFWidgetTpl::FIELD_ARG_NAME => 'udf_schuhgroesse',
+						DropdownWidget::SELECTED_ELEMENT => $udfs['udf_schuhgroesse']
 					),
 					array('name' => 'schuhgroesseName', 'id' => 'schuhgroesseId')
 				);
