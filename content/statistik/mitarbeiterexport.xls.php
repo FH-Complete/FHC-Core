@@ -93,7 +93,7 @@ $mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschie
 //sondern richtig mitsortiert
 $vorname=array();
 $nachname=array();
-	
+
 $umlaute = array('ö','Ö','ü','Ü','ä','Ä');
 $umlauterep = array('o','O','u','U','a','A');
 foreach ($mitarbeiterDAO->result as $key=>$foo)
@@ -102,7 +102,7 @@ foreach ($mitarbeiterDAO->result as $key=>$foo)
 	$nachname[$key]=str_replace($umlaute, $umlauterep, $foo->nachname);
 }
 array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result);
-	
+
 	// Creating a workbook
 	$workbook = new Spreadsheet_Excel_Writer();
 	$workbook->setVersion(8);
@@ -112,7 +112,7 @@ array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result
 	// Creating a worksheet
 	$worksheet =& $workbook->addWorksheet("Mitarbeiter");
 	$worksheet->setInputEncoding('utf-8');
-	
+
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
 
@@ -145,20 +145,20 @@ array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result
 		//Spalten ausgeben
 		for ($i=0;$i<$anzSpalten;$i++)
 		{
-			if(is_bool($mitarbeiter->$spalte[$i]))
-				$mitarbeiter->$spalte[$i] = ($mitarbeiter->$spalte[$i]?'Ja':'Nein');
-			
-			if(mb_strlen($mitarbeiter->$spalte[$i])>$maxlength[$i])
-				$maxlength[$i] = mb_strlen($mitarbeiter->$spalte[$i]);
-			$worksheet->write($j,$i, $mitarbeiter->$spalte[$i]);
+			if(is_bool($mitarbeiter->{$spalte[$i]}))
+				$mitarbeiter->{$spalte[$i]} = ($mitarbeiter->{$spalte[$i]}?'Ja':'Nein');
+
+			if(mb_strlen($mitarbeiter->{$spalte[$i]})>$maxlength[$i])
+				$maxlength[$i] = mb_strlen($mitarbeiter->{$spalte[$i]});
+			$worksheet->write($j,$i, $mitarbeiter->{$spalte[$i]});
 		}
-		
+
 		//Zustelladresse aus der Datenbank holen und dazuhaengen
 		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$mitarbeiter->person_id' AND zustelladresse=true LIMIT 1";
 		if($result = $db->db_query($qry))
 		{
 			if($row = $db->db_fetch_object($result))
-			{	
+			{
 				if(mb_strlen($row->strasse)>$maxlength[$i])
 					$maxlength[$i]=mb_strlen($row->strasse);
 				$worksheet->write($j,$i, $row->strasse);
@@ -168,7 +168,7 @@ array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result
 				if(mb_strlen($row->ort)>$maxlength[$i+2])
 					$maxlength[$i+2]=mb_strlen($row->ort);
 				$worksheet->write($j,$i+2, $row->ort);
-				
+
 				if($row->firma_id!='')
 				{
 					$qry = "SELECT * FROM public.tbl_firma WHERE firma_id='$row->firma_id'";
@@ -184,7 +184,7 @@ array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result
 				}
 			}
 		}
-		
+
 		$j++;
 	}
 

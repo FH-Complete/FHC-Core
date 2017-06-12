@@ -73,6 +73,7 @@ if(!$semester || !array_key_exists($semester, $alle_semester))
 
 $lehreinheiten = $lema->getLehreinheiten($uid, $semester);
 
+
 if(!array_key_exists($lehreinheit_id, $lehreinheiten))
 {
 	$lehreinheit_id = null;
@@ -125,8 +126,19 @@ if($lehreinheit_id)
 
 			foreach($lehreinheiten as $le)
 			{
+				$lvdropdown_bezeichnung = $le->stg_kurzbzlang.' '.$le->lv_semester.' '.$le->lv_bezeichnung;
+				$lvdropdown_bezeichnung .= ' (';
+				if($le->lv_lehrform_kurzbz!='')
+				{
+					$lvdropdown_bezeichnung .= $le->lv_lehrform_kurzbz;
+					if($le->lehrform_kurzbz!='')
+						$lvdropdown_bezeichnung .= ' - '.$le->lehrform_kurzbz;
+					$lvdropdown_bezeichnung .= ', ';
+				}
+				$lvdropdown_bezeichnung .= $le->lehreinheit_id.')';
+
 				echo '<option value="'.$le->lehreinheit_id.'" '.($le->lehreinheit_id === $lehreinheit_id ? 'selected' : '').'>
-							'.$le->stg_kurzbzlang.' '.$le->lv_semester.' '.$le->lv_bezeichnung.' ('.($le->lv_lehrform_kurzbz ? $le->lv_lehrform_kurzbz . ', '  : '') . $le->lehreinheit_id.')
+							'.$lvdropdown_bezeichnung.'
 						</option>';
 			}
 			echo '
@@ -153,7 +165,7 @@ if($lehreinheit_id)
 					$fehlstunden = $anwesenheit->getAnwesenheit($student->uid, $lehreinheit_id);
 					$le_erledigt = $fehlstunden + $anwesenheit->getAnwesenheit($student->uid, $lehreinheit_id, true);
 					$anwesenheit_relativ = ($stunden_gesamt - $fehlstunden) / $stunden_gesamt * 100;
-				
+
 					echo '
 					<div class="lv">
 						<div>

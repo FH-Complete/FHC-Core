@@ -248,7 +248,7 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
     * @param integer $index the XF index for the format.
     * @param array   $properties array with properties to be set on initialization.
     */
-    function Spreadsheet_Excel_Writer_Format($BIFF_version, $index = 0, $properties =  array())
+    function __construct($BIFF_version, $index = 0, $properties =  array())
     {
         $this->_xf_index       = $index;
         $this->_BIFF_version   = $BIFF_version;
@@ -431,12 +431,12 @@ class Spreadsheet_Excel_Writer_Format extends PEAR
             //$rotation      = 0x00;
             //oesi fix rotation mit utf8
             switch($this->_rotation)
-            { 
-            	case 0: $rotation = 0; break; 
-            	case 1: $rotation = 255; break; 
-            	case 2: $rotation = 90; break; 
-            	case 3: $rotation = 180; break; 
-            	default: $rotation = 0; break; 
+            {
+            	case 0: $rotation = 0; break;
+            	case 1: $rotation = 255; break;
+            	case 2: $rotation = 90; break;
+            	case 3: $rotation = 180; break;
+            	default: $rotation = 0; break;
            	}
             $biff8_options = 0x00;
             $data  = pack("vvvC", $ifnt, $ifmt, $style, $align);

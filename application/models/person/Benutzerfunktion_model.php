@@ -13,7 +13,7 @@ class Benutzerfunktion_model extends DB_Model
 	}
 	
 	/**
-	 * 
+	 * Get the Benutzerfunktion using the person_id
 	 */
 	public function getByPersonId($person_id)
 	{
