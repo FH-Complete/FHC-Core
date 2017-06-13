@@ -11,6 +11,6 @@ class APIv1_Controller extends REST_Controller
         // Loads return messages
 		$this->load->helper('message');
 		
-		log_message('debug', 'Called API: '.$_SERVER['PHP_SELF']);
+		log_message('debug', 'Called API: '.$_SERVER['PHP_SELF'].$_SERVER['QUERY_STRING']);
     }
 }
