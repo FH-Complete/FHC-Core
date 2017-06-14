@@ -838,10 +838,7 @@ class DB_Model extends FHC_Model
 					{
 						foreach($this->UDFs as $key => $val)
 						{
-							if (isset($jsonb[$key]))
-							{
-								$jsonb[$key] = $val;
-							}
+							$jsonb[$key] = $val;
 						}
 						
 						$jsonEncodedUDFs = json_encode($jsonb); // encode to json
