@@ -752,6 +752,19 @@ class DB_Model extends FHC_Model
 	{
 		$hasUDF = false;
 		
+		if (hasData($this->_getUDF()))
+		{
+			$hasUDF = true;
+		}
+		
+		return $hasUDF;
+	}
+	
+	/**
+	 * Returns all the UDF for this table
+	 */
+	private function _getUDF()
+	{
 		$this->load->model('system/UDF_model', 'UDFModel');
 		
 		$schema = DB_Model::DEFAULT_SCHEMA;
@@ -765,6 +778,7 @@ class DB_Model extends FHC_Model
 			$table = $tmpArray[1];
 		}
 		
+		$this->UDFModel->addSelect('jsons');
 		$udfResults = $this->UDFModel->loadWhere(
 			array(
 				'schema' => $schema,
@@ -772,12 +786,7 @@ class DB_Model extends FHC_Model
 			)
 		);
 		
-		if (hasData($udfResults))
-		{
-			$hasUDF = true;
-		}
-		
-		return $hasUDF;
+		return $udfResults;
 	}
 	
 	/**
@@ -796,17 +805,35 @@ class DB_Model extends FHC_Model
 	}
 	
 	/**
-	 * Manage UDFs on insert
+	 * Manage UDFs
 	 */
-	private function _manageUDFInsert(&$data)
+	private function _manageUDF(&$data)
 	{
-		// Checks if this table has udf
-		if ($this->_hasUDF())
+		$udfs = $this->_getUDF();
+		if (hasData($udfs))
 		{
 			// Get udf values from $data & clean udf values from $data
+			// Must be performed here because the load method populates UDFs too
 			$this->_popUDF($data);
-			// Encode UDFs to json and store them into $data
-			$jsonEncodedUDFs = json_encode($this->UDFs);
+			
+			$jsonb = array();
+			
+			$udfsDecoded = json_decode($udfs->retval[0]->jsons);
+			
+			for($i = 0; $i < count($udfsDecoded); $i++)
+			{
+				$udfDescription = $udfsDecoded[$i];
+				
+				foreach($this->UDFs as $key => $val)
+				{
+					if ($udfDescription->name == $key)
+					{
+						$jsonb[$key] = $val;
+					}
+				}
+			}
+			
+			$jsonEncodedUDFs = json_encode($jsonb); // encode to json
 			if ($jsonEncodedUDFs !== false)
 			{
 				$data[DB_Model::UDF_FIELD_NAME] = $jsonEncodedUDFs;
@@ -815,44 +842,31 @@ class DB_Model extends FHC_Model
 	}
 	
 	/**
+	 * Manage UDFs on insert
+	 */
+	private function _manageUDFInsert(&$data)
+	{
+		$this->_manageUDF($data);
+	}
+	
+	/**
 	 * Manage UDFs on update
 	 */
 	private function _manageUDFUpdate($id, &$data)
 	{
-		// Checks if this table has udf
-		if ($this->_hasUDF())
+		$dbVersionArray = explode('.', $this->db->version());
+		if ($dbVersionArray[0] == 9 && $dbVersionArray[1] <= 4) // If postgresql version is <= 9.4
 		{
-			$dbVersionArray = explode('.', $this->db->version());
-			if ($dbVersionArray[0] == 9 && $dbVersionArray[1] <= 4) // If postgresql version is <= 9.4
+			$this->addSelect(DB_Model::UDF_FIELD_NAME);
+			$result = $this->load($id);
+			if (hasData($result)) // if UDFs are present
 			{
-				$this->addSelect(DB_Model::UDF_FIELD_NAME);
-				$result = $this->load($id);
-				if (hasData($result))
-				{
-					// Get udf values from $data & clean udf values from $data
-					// Must be performed here because the load method populates UDFs too
-					$this->_popUDF($data);
-					
-					$jsonb = (array)$result->retval[0]; // convert the result to an array
-					if (count($jsonb) > 0) // if UDFs are present
-					{
-						foreach($this->UDFs as $key => $val)
-						{
-							$jsonb[$key] = $val;
-						}
-						
-						$jsonEncodedUDFs = json_encode($jsonb); // encode to json
-						if ($jsonEncodedUDFs !== false)
-						{
-							$data[DB_Model::UDF_FIELD_NAME] = $jsonEncodedUDFs;
-						}
-					}
-				}
+				$this->_manageUDF($data);
 			}
-			else if ($dbVersionArray[0] == 9 && $dbVersionArray[1] > 4) // If postgresql version is > 9.4
-			{
-				// TODO: use jsonb_set
-			}
+		}
+		else if ($dbVersionArray[0] == 9 && $dbVersionArray[1] > 4) // If postgresql version is > 9.4
+		{
+			// TODO: use jsonb_set
 		}
 	}
 	
