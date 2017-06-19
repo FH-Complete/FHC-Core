@@ -61,7 +61,7 @@ class UDF extends APIv1_Controller
 	}
 	
 	/**
-	 * 
+	 * Decode to json the column jsons for every result set
 	 */
 	private function _jsonDecodeResult(&$result)
 	{

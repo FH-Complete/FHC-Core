@@ -12,7 +12,7 @@ class DB_Model extends FHC_Model
 	const UDF_FIELD_NAME = 'udf_values';
 	const UDF_FIELD_TYPE = 'jsonb';
 	const UDF_FIELD_PREFIX = 'udf_';
-	const UDF_QUERY_CHECK = 'SELECT * FROM %s WHERE 0 = 1';
+	const QUERY_LIST_FIELDS = 'SELECT * FROM %s WHERE 0 = 1';
 	
 	protected $dbTable;  	// Name of the DB-Table for CI-Insert, -Update, ...
 	protected $pk;  		// Name of the PrimaryKey for DB-Update, Load, ...
@@ -664,21 +664,45 @@ class DB_Model extends FHC_Model
 	}
 	
 	/**
-	 * Checks if this tables has the field udf_values
+	 * Checks if this table has the field udf_values
 	 */
 	public function hasUDF()
 	{
-		$hasUDF = true;
+		return $this->fieldExists(DB_Model::UDF_FIELD_NAME);
+	}
+	
+	/**
+	 * Returns an array that contains a list of columns names of this table
+	 */
+	public function listFields()
+	{
+		$listFields = array();
 		
 		// Workaround to get metadata from this table
-		$result = $this->db->query(sprintf(DB_Model::UDF_QUERY_CHECK, $this->dbTable));
-		// If udf_values is not found in the list of filds of this table
-		if (array_search(DB_Model::UDF_FIELD_NAME, $result->list_fields()) === false)
+		$result = $this->db->query(sprintf(DB_Model::QUERY_LIST_FIELDS, $this->dbTable));
+		
+		if (is_object($result))
 		{
-			$hasUDF = false;
+			$listFields = $result->list_fields();
 		}
 		
-		return $hasUDF;
+		return $listFields;
+	}
+	
+	/**
+	 * Checks if this table has a field == $field
+	 */
+	public function fieldExists($field)
+	{
+		$exists = true;
+		
+		// If $field is not found in the list of fields of this table
+		if (array_search($field, $this->listFields()) === false)
+		{
+			$exists = false;
+		}
+		
+		return $exists;
 	}
 	
 	// ----------------------------------------------------------------------------
