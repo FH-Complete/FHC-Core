@@ -32,8 +32,11 @@ class UDF extends APIv1_Controller
 	 */
 	public function getUDF()
 	{
+		$decode = $this->get('decode');
 		$schema = $this->get('schema');
 		$table = $this->get('table');
+		
+		$result = error();
 		
 		if (isset($schema) || isset($table))
 		{
@@ -43,14 +46,32 @@ class UDF extends APIv1_Controller
 					'table' => $table
 				)
 			);
-			
-			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
 		{
 			$result = $this->UDFModel->load();
-			
-			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		
+		if ($decode)
+		{
+			$this->_jsonDecodeResult($result);
+		}
+		
+		$this->response($result, REST_Controller::HTTP_OK);
+	}
+	
+	/**
+	 * 
+	 */
+	private function _jsonDecodeResult(&$result)
+	{
+		if (hasData($result))
+		{
+			for($i = 0; $i < count($result->retval); $i++)
+			{
+				$obj = $result->retval[$i];
+				$obj->jsons = json_decode($obj->jsons);
+			}
 		}
 	}
 }
