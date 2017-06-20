@@ -40,6 +40,15 @@ else
 	$anmeldefrist = 3;
 }
 
+if (defined('CIS_PRUEFUNGSTERMIN_FRIST'))
+{
+	$terminfrist = CIS_PRUEFUNGSTERMIN_FRIST;
+}
+else
+{
+	$terminfrist = 14;
+}
+
 ?>
 
 /* Copyright (C) 2013 fhcomplete.org
@@ -368,7 +377,7 @@ function writePruefungsTable(e, data, anmeldung)
 			else
 			{
 				//button = "<p><span style='display: inline-block; width: 155px;'>Anmelden (bis "+frist+"): </span><input style='width: 90px;' type='button' value='"+termin+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung+"\", \""+d.von+"\", \""+d.bis+"\");'></p>";
-				button = "<p><a href='#' title='<?php echo $p->t('pruefung/anmeldenMoeglichBis'); ?> "+frist+"';><input style='width: 140px; background-color: green;' type='button' value='"+termin+" "+time+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung.replace("'", "&apos;")+"\", \""+d.von+"\", \""+d.bis+"\");'></a></p>";
+				button = "<p><a href='#' title='<?php echo $p->t('pruefung/anmeldenMoeglichBis'); ?> "+frist+"';><input style='width: 140px; background-color: green;' type='button' value='"+termin+" "+time+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung+"\", \""+d.von+"\", \""+d.bis+"\");'></a></p>";
 			}
 		}
 		else
@@ -1983,7 +1992,7 @@ function loadAllPruefungen()
 function checkTermin(termin)
 {
 	var heute = new Date();
-	var aktTime = new Date(heute.getTime() + (14*24*60*60*1000));
+	var aktTime = new Date(heute.getTime() + (<?php echo $terminfrist ?>*24*60*60*1000));
 	var vonTime = stringToDate(termin.datum, termin.beginn);
 	var bisTime = stringToDate(termin.datum, termin.ende);
 
