@@ -28,6 +28,10 @@ $this->phrasen['dms_link/lvplanSyncFAQ']='7188'; //Link zur Anleitung zur Kalend
 $this->phrasen['dms_link/profilhilfe']=''; //Hilfe-Link aus dem Profil
 $this->phrasen['dms_link/anleitungMailverteiler']='7578'; //Anleitung für die Benutzung der Mailverteiler und der Berechtigungsschlüssel
 
+// LV-Evaluierung
+$this->phrasen['dms_link/lvevaluierungStudierendeninformation']=''; //Beschreibung des Ablaufs der LVEvaluierung für Studierende
+$this->phrasen['dms_link/lvevaluierungProzessbeschreibung']=''; //Beschreibung des Prozesses der LVEvaluierung
+
 //Links auf externe Seiten
 $this->phrasen['dms_link/dokuwikiGesamtnote']='http://fhcomplete.technikum-wien.at/dokuwiki/doku.php?id=cis:gesamtnote'; //Link ins Dokuwiki zur Anleitung Gesamtnote
 ?>

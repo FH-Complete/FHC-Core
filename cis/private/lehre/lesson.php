@@ -353,7 +353,11 @@ $( document ).ready(function()
 					$user_is_allowed_to_upload=true;
 			}
 		}
-		?></td>
+
+		// DIV zur Plazierung von Zusatzinformationen durch Addons
+		echo '<div id="lesson_infobox_lektor"></div>';
+		?>
+		</td>
 	</tr>
 	<tr>
 		<td >&nbsp;</td>
