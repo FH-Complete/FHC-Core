@@ -268,6 +268,72 @@ if($result = $db->db_query("SELECT view_definition FROM information_schema.views
 	}
 }
 
+// Creates table system.tbl_udf if it doesn't exist and grants privileges
+if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_udf LIMIT 1"))
+{
+	$qry = '
+		CREATE TABLE system.tbl_udf (
+			"schema"	VARCHAR(32) NOT NULL,
+			"table"		VARCHAR(128) NOT NULL,
+			"jsons"		JSONB NOT NULL,
+			CONSTRAINT tbl_udf_pkey PRIMARY KEY("schema", "table")
+		);';
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_udf: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>system.tbl_udf table created';
+	
+	$qry = 'COMMENT ON COLUMN system.tbl_udf.schema IS \'Schema of the table\';';
+	if(!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_udf.schema: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_udf.schema';
+	
+	$qry = 'COMMENT ON COLUMN system.tbl_udf.table IS \'Table name\';';
+	if(!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_udf.table: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_udf.table';
+	
+	$qry = 'COMMENT ON COLUMN system.tbl_udf.jsons IS \'JSON schema\';';
+	if(!$db->db_query($qry))
+		echo '<strong>Adding comment to system.tbl_udf.jsons: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added comment to system.tbl_udf.jsons';
+	
+	$qry = 'GRANT SELECT ON TABLE system.tbl_udf TO web;';
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_udf: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on system.tbl_udf';
+
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE system.tbl_udf TO vilesci;';
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_udf: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on system.tbl_udf';
+}
+
+// Add column udf_values to public.tbl_person
+if(!$result = @$db->db_query("SELECT udf_values FROM public.tbl_person LIMIT 1"))
+{
+	$qry = 'ALTER TABLE public.tbl_person ADD COLUMN udf_values JSONB;';
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_person: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added column udf_values to table public.tbl_person';
+}
+
+// Add column udf_values to public.tbl_prestudent
+if(!$result = @$db->db_query("SELECT udf_values FROM public.tbl_prestudent LIMIT 1"))
+{
+	$qry = 'ALTER TABLE public.tbl_prestudent ADD COLUMN udf_values JSONB;';
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Added column udf_values to table public.tbl_prestudent';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -526,6 +592,7 @@ $tabellen=array(
 	"system.tbl_webservicerecht" => array("webservicerecht_id","berechtigung_kurzbz","methode","attribut","insertamum","insertvon","updateamum","updatevon","klasse"),
 	"system.tbl_webservicetyp"  => array("webservicetyp_kurzbz","beschreibung"),
 	"system.tbl_server"  => array("server_kurzbz","beschreibung"),
+	"system.tbl_udf"  => array("schema", "table", "jsons"),
 	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id","uid"),
 	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis","inventuramum","inventurvon","anschaffungsdatum","anschaffungswert","hoehe","breite","tiefe","nummer2","verplanen"),
 	"wawi.tbl_betriebsmittel_betriebsmittelstatus"  => array("betriebsmittelbetriebsmittelstatus_id","betriebsmittel_id","betriebsmittelstatus_kurzbz", "datum", "updateamum", "updatevon", "insertamum", "insertvon","anmerkung"),
@@ -607,5 +674,4 @@ if (!$result=@$db->db_query($sql_query))
 		}
 if($error==false)
 	echo '<br>Gegenpruefung fehlerfrei';
-
 ?>
