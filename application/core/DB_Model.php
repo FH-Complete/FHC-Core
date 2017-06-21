@@ -19,19 +19,24 @@ class DB_Model extends FHC_Model
 	protected $hasSequence;	// False if this table has a composite primary key that is not using a sequence
 							// True if this table has a primary key that uses a sequence
 	
-	protected $UDFs; // Contains the udfs
+	protected $UDFs; // Contains the UDFs
 	
 	/**
 	 * Constructor
 	 */
 	function __construct($dbTable = null, $pk = null, $hasSequence = true)
 	{
+		// Call parent constructor
 		parent::__construct();
+		
+		// Set properties
 		$this->dbTable = $dbTable;
 		$this->pk = $pk;
 		$this->hasSequence = $hasSequence;
-		$this->load->database();
 		$this->UDFs = array();
+		
+		// Loads DB conns and confs
+		$this->load->database();
 	}
 	
 	/**
@@ -50,7 +55,7 @@ class DB_Model extends FHC_Model
 		if ($isEntitled = $this->_isEntitled(PermissionLib::INSERT_RIGHT)) return $isEntitled;
 		
 		// UDFs
-		$this->_manageUDF($data);
+		if (isError($validate = $this->_manageUDFs($data))) return $validate;
 		
 		// DB-INSERT
 		if ($this->db->insert($this->dbTable, $data))
@@ -125,7 +130,7 @@ class DB_Model extends FHC_Model
 		if ($isEntitled = $this->_isEntitled(PermissionLib::UPDATE_RIGHT)) return $isEntitled;
 		
 		// UDFs
-		$this->_manageUDF($data);
+		if (isError($validate = $this->_manageUDFs($data))) return $validate;
 		
 		// DB-UPDATE
 		// Check for composite Primary Key
@@ -643,7 +648,7 @@ class DB_Model extends FHC_Model
 	}
 	
 	/**
-	 * Return UDFs
+	 * Return $this->UDFs
 	 */
 	public function getUDFs()
 	{
@@ -791,7 +796,7 @@ class DB_Model extends FHC_Model
 	/**
 	 * Returns all the UDF for this table
 	 */
-	private function _getUDFParamters()
+	private function _getUDFs()
 	{
 		$this->load->model('system/UDF_model', 'UDFModel');
 		
@@ -833,13 +838,83 @@ class DB_Model extends FHC_Model
 	}
 	
 	/**
+	 * Validates UDF value
+	 */
+	private function _validateUDFs($udfDescription, $udfValue)
+	{
+		$isValid = true;
+		
+		$tmpUdfValues = $udfValue;
+		if (!is_array($udfValue))
+		{
+			$tmpUdfValues = array($udfValue);
+		}
+		
+		// 
+		$validation = null;
+		if (isset($udfDescription->validation))
+		{
+			$validation = $udfDescription->validation;
+		}
+		
+		// 
+		if ($validation != null)
+		{
+			foreach($tmpUdfValues as $udfValIndx => $udfVal)
+			{
+				// 
+				if (isset($validation->{'max-value'}) && $udfVal > $validation->{'max-value'})
+				{
+					$isValid = false;
+					break;
+				}
+				
+				// 
+				if (isset($validation->{'min-value'}) && $udfVal < $validation->{'min-value'})
+				{
+					$isValid = false;
+					break;
+				}
+				
+				// 
+				if (isset($validation->regex) && is_array($validation->regex))
+				{
+					foreach($validation->regex as $regexIndx => $regex)
+					{
+						if ($regex->language == 'php')
+						{
+							if (preg_match($regex->expression, $udfVal) != 1)
+							{
+								$isValid = false;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		// 
+		if ($isValid === true)
+		{
+			return success(true);
+		}
+		else
+		{
+			return error($udfDescription->name, EXIT_VALIDATION_UDF);
+		}
+	}
+	
+	/**
 	 * Manage UDFs
 	 */
-	private function _manageUDF(&$data)
+	private function _manageUDFs(&$data)
 	{
+		$validate = error('manageUDFs', EXIT_DATABASE);
+		
 		if ($this->hasUDF()) // Checks if this table has UDFs
 		{
-			$udfs = $this->_getUDFParamters();
+			$udfs = $this->_getUDFs();
 			if (hasData($udfs))
 			{
 				// Get udf values from $data & clean udf values from $data
@@ -858,18 +933,35 @@ class DB_Model extends FHC_Model
 					{
 						if ($udfDescription->name == $key)
 						{
-							$jsonb[$key] = $val;
+							// Validation of UDF parameter value
+							$validate = $this->_validateUDFs($udfDescription, $val);
+							
+							// If validation is ok copy the value
+							if (isSuccess($validate))
+							{
+								$jsonb[$key] = $val;
+							}
+							else // otherwise stop the elaboration
+							{
+								break;
+							}
 						}
 					}
 				}
 				
-				$jsonEncodedUDFs = json_encode($jsonb); // encode to json
-				if ($jsonEncodedUDFs !== false)
+				// If validation was ok
+				if (isSuccess($validate))
 				{
-					$data[DB_Model::UDF_FIELD_NAME] = $jsonEncodedUDFs;
+					$jsonEncodedUDFs = json_encode($jsonb); // encode to json
+					if ($jsonEncodedUDFs !== false)
+					{
+						$data[DB_Model::UDF_FIELD_NAME] = $jsonEncodedUDFs;
+					}
 				}
 			}
 		}
+		
+		return $validate;
 	}
 	
 	/**
@@ -967,7 +1059,7 @@ class DB_Model extends FHC_Model
 								foreach($jsonValues as $key => $value)
 								{
 									$tmpResult->{$key} = $value;
-									$this->UDFs[$key] = $value; // Stores the udfs in UDFs
+									$this->UDFs[$key] = $value; // Stores the UDFs in $this->UDFs
 								}
 							}
 							unset($tmpResult->{$toBeConverted->name});
