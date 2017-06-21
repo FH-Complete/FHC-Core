@@ -11,7 +11,7 @@
  * @filesource
  */
 
-if (! defined('FHCPATH')) exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 require_once(FHCPATH.'include/basis_db.class.php');
 require_once(FHCPATH.'include/organisationseinheit.class.php');
@@ -30,11 +30,12 @@ class PermissionLib
 	const DELETE_RIGHT = 'd';
 	const REPLACE_RIGHT = 'ui';
 
-	private $bb; // benutzerberechtigung
 	private $acl; // conversion array from a source to a permission
+	private static $bb; // benutzerberechtigung
 
 	/**
-	 *
+	 * PermissionLib's constructor
+	 * Here is initialized the static property bb with all the rights of the user (API caller)
 	 */
 	function __construct()
 	{
@@ -49,9 +50,10 @@ class PermissionLib
 
 		// Loads the array of resources
 		$this->acl = $this->ci->config->item('fhc_acl');
-
-		//
-		$this->bb = new benutzerberechtigung();
+		
+		// API Caller rights initialization
+		self::$bb = new benutzerberechtigung();
+		self::$bb->getBerechtigungen(getAuthUID());
 	}
 
 	/**
@@ -66,7 +68,7 @@ class PermissionLib
 		if (isset($this->acl[$sourceName]))
 		{
 			// Checks permission
-			return $this->isBerechtigt($this->acl[$sourceName], $permissionType);
+			return $this->_isBerechtigt($this->acl[$sourceName], $permissionType);
 		}
 		// if the resource does not exist, do not lose useful clock cycles
 		else
@@ -91,27 +93,20 @@ class PermissionLib
 	}
 
 	/**
-	 *
+	 * Checks user's (API caller) rights
 	 */
-	private function isBerechtigt($berechtigung_kurzbz, $art = null,  $oe_kurzbz = null,  $kostenstelle_id = null)
+	private function _isBerechtigt($berechtigung_kurzbz, $art = null,  $oe_kurzbz = null,  $kostenstelle_id = null)
 	{
+		$isBerechtigt = false;
+		
 		if (!is_null($berechtigung_kurzbz))
 		{
-			$this->bb->getBerechtigungen(getAuthUID());
-			if($this->bb->isBerechtigt($berechtigung_kurzbz, $oe_kurzbz, $art, $kostenstelle_id))
+			if(self::$bb->isBerechtigt($berechtigung_kurzbz, $oe_kurzbz, $art, $kostenstelle_id))
 			{
-				log_message('debug','Permission '.$berechtigung_kurzbz.' granted');
-				return true;
-			}
-			else
-			{
-				log_message('debug','Permission '.$berechtigung_kurzbz.' failed');
-				return false;
+				$isBerechtigt = true;
 			}
 		}
-		else
-		{
-			return false;
-		}
+		
+		return $isBerechtigt;
 	}
 }
