@@ -11,15 +11,15 @@
  * @filesource
  */
 
-if (! defined('FCPATH')) exit('No direct script access allowed');
+if (! defined('FHCPATH')) exit('No direct script access allowed');
 
-require_once(FCPATH.'include/basis_db.class.php');
-require_once(FCPATH.'include/organisationseinheit.class.php');
-require_once(FCPATH.'include/studiengang.class.php');
-require_once(FCPATH.'include/fachbereich.class.php');
-require_once(FCPATH.'include/functions.inc.php');
-require_once(FCPATH.'include/wawi_kostenstelle.class.php');
-require_once(FCPATH.'include/benutzerberechtigung.class.php');
+require_once(FHCPATH.'include/basis_db.class.php');
+require_once(FHCPATH.'include/organisationseinheit.class.php');
+require_once(FHCPATH.'include/studiengang.class.php');
+require_once(FHCPATH.'include/fachbereich.class.php');
+require_once(FHCPATH.'include/functions.inc.php');
+require_once(FHCPATH.'include/wawi_kostenstelle.class.php');
+require_once(FHCPATH.'include/benutzerberechtigung.class.php');
 
 class PermissionLib
 {
