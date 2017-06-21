@@ -1162,7 +1162,7 @@ class studienplan extends basis_db
 	{
 		$qry= "
 				SELECT DISTINCT
-					studienplan_id, tbl_studienplan.bezeichnung, tbl_studiensemester.start
+					studienplan_id, tbl_studienplan.bezeichnung, tbl_studiensemester.start, tbl_studienordnung.status_kurzbz
 				FROM
 					lehre.tbl_studienplan
 				JOIN
@@ -1174,9 +1174,7 @@ class studienplan extends basis_db
 				JOIN
 					public.tbl_studiensemester ON (tbl_studienordnung.gueltigvon = tbl_studiensemester.studiensemester_kurzbz)
 				WHERE
-					tbl_studienplan.aktiv=true
-				AND
-					tbl_studienordnung.status_kurzbz IN ('approved')";
+					tbl_studienplan.aktiv=true";
 
 			foreach($searchItems as $value)
 			$qry.=" AND
@@ -1201,6 +1199,7 @@ class studienplan extends basis_db
 
 				$obj->studienplan_id = $row->studienplan_id;
 				$obj->bezeichnung = $row->bezeichnung;
+				$obj->status_kurzbz = $row->status_kurzbz;
 				$obj->new=false;
 
 				$this->result[] = $obj;
