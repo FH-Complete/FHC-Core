@@ -214,7 +214,7 @@ class Studiengang_model extends DB_Model
 			),
 			'public.tbl_prestudent.person_id = '.$this->escape($person_id).
 			' AND public.tbl_prestudentstatus.studiensemester_kurzbz = '.$this->escape($studiensemester_kurzbz).
-			' AND (public.tbl_prestudentstatus.status_kurzbz = \'Interessent\' OR public.tbl_prestudentstatus.status_kurzbz = \'Bewerber\')',
+			' AND (public.tbl_prestudentstatus.status_kurzbz = \'Interessent\')',
 			array(
 				'prestudenten',
 				'prestudentstatus',
