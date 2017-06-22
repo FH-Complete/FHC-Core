@@ -960,6 +960,10 @@ class DB_Model extends FHC_Model
 				}
 			}
 		}
+		else
+        {
+            return success(true);
+        }
 		
 		return $validate;
 	}
