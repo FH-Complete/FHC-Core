@@ -50,7 +50,7 @@ $error_msg='';
 	if (!$db = new basis_db())
  		die('Fehler beim Oeffnen der Datenbankverbindung');
 
-   	// aktuelles Studiensemester ermitteln
+	// aktuelles Studiensemester ermitteln
 	$sql_query="SELECT studiensemester_kurzbz FROM public.vw_studiensemester ORDER BY delta LIMIT 1";
 	if(!($result = $db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error();
@@ -76,7 +76,7 @@ $error_msg='';
 		$db->db_query($qry);
 	}
 
-   	// **************************************************************
+	// **************************************************************
 	// MitarbeiterInnenVerteiler abgleichen
 	$mlist_name='tw_ma';
 	setGeneriert($mlist_name);
@@ -90,7 +90,7 @@ $error_msg='';
 
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -103,7 +103,7 @@ $error_msg='';
 		$error_msg.= $db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
+		$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -124,7 +124,7 @@ $error_msg='';
 
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER(".$db->db_add_param($mlist_name).") AND uid=".$db->db_add_param($row->uid);
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER(".$db->db_add_param($mlist_name).") AND uid=".$db->db_add_param($row->uid);
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -137,7 +137,7 @@ $error_msg='';
 		$error_msg.= $db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES (".$db->db_add_param($row->uid).",".$db->db_add_param(strtoupper($mlist_name)).", now(), 'mlists_generate')";
+		$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES (".$db->db_add_param($row->uid).",".$db->db_add_param(strtoupper($mlist_name)).", now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -158,7 +158,7 @@ $error_msg='';
 
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -171,7 +171,7 @@ $error_msg='';
 		$error_msg.= $db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
+		$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -199,7 +199,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -224,7 +224,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row=$db->db_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, studiensemester_kurzbz, updateamum, updatevon, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."',null, null, null, now(), 'mlists_generate')";
+		$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, studiensemester_kurzbz, updateamum, updatevon, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."',null, null, null, now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -256,7 +256,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row=$db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -281,7 +281,75 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row=$db->db_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, studiensemester_kurzbz, updateamum, updatevon, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."',null, null, null, now(), 'mlists_generate')";
+		$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, studiensemester_kurzbz, updateamum, updatevon, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."',null, null, null, now(), 'mlists_generate')";
+		if(!$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error().$sql_query;
+		echo '-';
+		flush();
+	}
+
+	// **************************************************************
+	// Studiengangsleiter-Verteiler abgleichen
+	// Es werden auch StellvertreterInnen hinzugefügt
+	$mlist_name='tw_stgl_bama';
+	setGeneriert($mlist_name);
+	// Personen holen die nicht mehr in den Verteiler gehoeren
+	echo $mlist_name.' wird abgeglichen!<BR>';
+	flush();
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe
+				WHERE
+					UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND
+					uid NOT IN (SELECT mitarbeiter_uid
+								FROM
+									public.tbl_mitarbeiter
+									JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid)
+									JOIN public.tbl_benutzerfunktion USING(uid)
+									JOIN public.tbl_studiengang USING(oe_kurzbz)
+								WHERE tbl_benutzer.aktiv AND (funktion_kurzbz='Leitung' OR funktion_kurzbz='gLtg' OR funktion_kurzbz='stvLtg') AND
+								(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+								(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
+								AND tbl_studiengang.aktiv=true
+								AND tbl_studiengang.typ in('b','m')
+								AND tbl_studiengang.studiengang_kz>0
+								AND tbl_studiengang.studiengang_kz<10000
+								)";
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error();
+	while($row=$db->db_fetch_object($result))
+	{
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid=".$db->db_add_param($row->uid);
+		if(!$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error().$sql_query;
+		echo '-';
+		flush();
+	}
+	// Personen holen die nicht im Verteiler sind
+	echo '<BR>';
+	$sql_query="SELECT DISTINCT mitarbeiter_uid AS uid
+				FROM
+					public.tbl_mitarbeiter
+					JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid)
+					JOIN public.tbl_benutzerfunktion USING(uid)
+					JOIN public.tbl_studiengang USING(oe_kurzbz)
+				WHERE
+					tbl_benutzer.aktiv AND
+					(tbl_benutzerfunktion.funktion_kurzbz='Leitung' OR funktion_kurzbz='gLtg' OR funktion_kurzbz='stvLtg') AND
+					(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+					(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
+					mitarbeiter_uid NOT LIKE '\\\\_%' AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))
+					AND tbl_studiengang.aktiv=true
+					AND tbl_studiengang.typ in('b','m')
+					AND tbl_studiengang.studiengang_kz>0
+					AND tbl_studiengang.studiengang_kz<10000";
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error();
+	while($row=$db->db_fetch_object($result))
+	{
+		$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, studiensemester_kurzbz,
+					updateamum, updatevon, insertamum, insertvon) VALUES (".
+					$db->db_add_param($row->uid).",".
+					$db->db_add_param(strtoupper($mlist_name)).
+					",null, null, null, now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -300,7 +368,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row=$db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -313,7 +381,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row=$db->db_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
+		$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -332,7 +400,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row=$db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -345,7 +413,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
+		$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -364,7 +432,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row=$db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -377,13 +445,12 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
+		$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
 		flush();
 	}
-
 
 	// **************************************************************
 	// Lektoren-Verteiler innerhalb der Studiengaenge abgleichen
@@ -401,12 +468,12 @@ $error_msg='';
 			tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND
 			(studiensemester_kurzbz='$studiensemester' OR
 			 studiensemester_kurzbz='$stsem2') AND mitarbeiter_uid NOT LIKE '\\\\_%')";
-	//echo $sql_query;
+
 	if(!($result=$db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error().$sql_query;
 	while($row=$db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$row->gruppe_kurzbz') AND uid='$row->uid'";
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$row->gruppe_kurzbz') AND uid='$row->uid'";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -450,7 +517,7 @@ $error_msg='';
 			echo "<br>Fehler:$sql_query";
 
 		setGeneriert($row->mlist_name);
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->mitarbeiter_uid','".strtoupper($row->mlist_name)."', now(), 'mlists_generate')";
+		$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->mitarbeiter_uid','".strtoupper($row->mlist_name)."', now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -494,7 +561,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$row->gruppe_kurzbz') AND uid='$row->uid'";
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$row->gruppe_kurzbz') AND uid='$row->uid'";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -523,7 +590,7 @@ $error_msg='';
 		if($row->uid!='')
 		{
 			setGeneriert('TW_HSV');
-	     	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES (".$db->db_add_param($row->uid).",'TW_HSV', now(), 'mlists_generate')";
+			$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES (".$db->db_add_param($row->uid).",'TW_HSV', now(), 'mlists_generate')";
 			if(!$db->db_query($sql_query))
 				$error_msg.=$db->db_last_error().$sql_query;
 			echo '-';
@@ -579,7 +646,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$row->gruppe_kurzbz') AND uid='$row->uid'";
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$row->gruppe_kurzbz') AND uid='$row->uid'";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -610,7 +677,7 @@ $error_msg='';
 		if($row->gruppe_kurzbz!='')
 		{
 			setGeneriert($row->gruppe_kurzbz);
-	     	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".mb_strtoupper($row->gruppe_kurzbz)."', now(), 'mlists_generate')";
+			$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".mb_strtoupper($row->gruppe_kurzbz)."', now(), 'mlists_generate')";
 			if(!$db->db_query($sql_query))
 				$error_msg.=$db->db_last_error().$sql_query;
 			echo '-';
@@ -637,9 +704,9 @@ $error_msg='';
 	else
 		echo "<br>Fehler:$sql_query";
 
-    flush();
+	flush();
 	ob_flush();
-    setGeneriert('TW_STDV');
+	setGeneriert('TW_STDV');
 	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe
 				WHERE gruppe_kurzbz='TW_STDV'
 				AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion JOIN public.tbl_benutzer USING(uid)
@@ -651,7 +718,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('tw_stdv') AND uid='$row->uid'";
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('tw_stdv') AND uid='$row->uid'";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -670,7 +737,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-	   	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','TW_STDV', now(), 'mlists_generate')";
+		$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','TW_STDV', now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -725,7 +792,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$row->gruppe_kurzbz') AND uid='$row->uid'";
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$row->gruppe_kurzbz') AND uid='$row->uid'";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -756,7 +823,7 @@ $error_msg='';
 		if($row->gruppe_kurzbz!='')
 		{
 			setGeneriert($row->gruppe_kurzbz);
-	     	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".mb_strtoupper($row->gruppe_kurzbz)."', now(), 'mlists_generate')";
+			$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".mb_strtoupper($row->gruppe_kurzbz)."', now(), 'mlists_generate')";
 			if(!$db->db_query($sql_query))
 				$error_msg.=$db->db_last_error().$sql_query;
 			echo '-';
@@ -783,9 +850,9 @@ $error_msg='';
 	else
 		echo "<br>Fehler:$sql_query";
 	// Studierende holen, die nicht mehr in den Verteiler gehoeren
-    flush();
+	flush();
 	ob_flush();
-    setGeneriert('TW_JGV');
+	setGeneriert('TW_JGV');
 	$sql_query="SELECT gruppe_kurzbz, uid FROM public.tbl_benutzergruppe
 				WHERE gruppe_kurzbz='TW_JGV'
 				AND uid not in (SELECT uid FROM public.tbl_benutzerfunktion JOIN public.tbl_benutzer USING(uid)
@@ -797,7 +864,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('tw_jgv') AND uid='$row->uid'";
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('tw_jgv') AND uid='$row->uid'";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -825,13 +892,13 @@ $error_msg='';
 
 	// ***************************
 	// TW_STD abgleichen
-    flush();
-    setGeneriert('TW_STD');
-    echo 'TW_STD wird abgeglichen!<br>';
+	flush();
+	setGeneriert('TW_STD');
+	echo 'TW_STD wird abgeglichen!<br>';
 
-    //Abbrecher bleiben noch 3 Wochen im Verteiler
-    //andere inaktive noch fuer 20 Wochen
-    //damit im CIS die Menuepunkte fuer Studierende richtig angezeigt werden
+	//Abbrecher bleiben noch 3 Wochen im Verteiler
+	//andere inaktive noch fuer 20 Wochen
+	//damit im CIS die Menuepunkte fuer Studierende richtig angezeigt werden
 	$sql_query="DELETE FROM public.tbl_benutzergruppe
 				WHERE UPPER(gruppe_kurzbz)='TW_STD'
 				AND uid not in
@@ -871,14 +938,14 @@ $error_msg='';
 
 	// ***************************
 	// TW_STD_M abgleichen. Alle maennlichen Studenten
-    flush();
+	flush();
 	ob_flush();
-    setGeneriert('TW_STD_M');
-    echo 'TW_STD_M wird abgeglichen!<br>';
+	setGeneriert('TW_STD_M');
+	echo 'TW_STD_M wird abgeglichen!<br>';
 
-    //Abbrecher bleiben noch 3 Wochen im Verteiler
-    //andere inaktive noch fuer 20 Wochen
-    //damit im CIS die Menuepunkte fuer Studierende richtig angezeigt werden
+	//Abbrecher bleiben noch 3 Wochen im Verteiler
+	//andere inaktive noch fuer 20 Wochen
+	//damit im CIS die Menuepunkte fuer Studierende richtig angezeigt werden
 	$sql_query="DELETE FROM public.tbl_benutzergruppe
 				WHERE UPPER(gruppe_kurzbz)='TW_STD_M'
 				AND uid not in
@@ -918,14 +985,14 @@ $error_msg='';
 
 	// ***************************
 	// TW_STD_W abgleichen. Alle weiblichen Studentinnen
-    flush();
+	flush();
 	ob_flush();
-    setGeneriert('TW_STD_W');
-    echo 'TW_STD_W wird abgeglichen!<br>';
+	setGeneriert('TW_STD_W');
+	echo 'TW_STD_W wird abgeglichen!<br>';
 
-    //Abbrecher bleiben noch 3 Wochen im Verteiler
-    //andere inaktive noch fuer 20 Wochen
-    //damit im CIS die Menuepunkte fuer Studierende richtig angezeigt werden
+	//Abbrecher bleiben noch 3 Wochen im Verteiler
+	//andere inaktive noch fuer 20 Wochen
+	//damit im CIS die Menuepunkte fuer Studierende richtig angezeigt werden
 	$sql_query="DELETE FROM public.tbl_benutzergruppe
 				WHERE UPPER(gruppe_kurzbz)='TW_STD_W'
 				AND uid not in
@@ -965,35 +1032,36 @@ $error_msg='';
 
 	// ***************************
 	// TW_BAMA abgleichen
-	// Alle ordentlichen Bachelor- und Master-Studierenden 
+	// Alle ordentlichen Bachelor- und Master-Studierenden
 	flush();
+	ob_flush();
 	setGeneriert('TW_BAMA');
 	echo 'TW_BAMA wird abgeglichen!<br>';
-	
+
 	//Abbrecher bleiben noch 3 Wochen im Verteiler
 	//andere inaktive noch fuer 20 Wochen
 	$sql_query="DELETE FROM public.tbl_benutzergruppe
 			WHERE UPPER(gruppe_kurzbz)='TW_BAMA'
 			AND uid NOT IN
 			(
-				SELECT 
-					uid 
-				FROM 
-					campus.vw_student 
-				WHERE aktiv 
-				AND studiengang_kz IN 
+				SELECT
+					uid
+				FROM
+					campus.vw_student
+				WHERE aktiv
+				AND studiengang_kz IN
 						(SELECT studiengang_kz FROM public.tbl_studiengang WHERE typ IN ('b','m'))
-				
+
 				UNION
-				
-				SELECT 
-					uid 
-				FROM 
-					campus.vw_student 
-				WHERE aktiv=false 
-				AND studiengang_kz IN 
-						(SELECT studiengang_kz FROM public.tbl_studiengang WHERE typ IN ('b','m')) 
-				AND get_rolle_prestudent(vw_student.prestudent_id, null)='Absolvent' 
+
+				SELECT
+					uid
+				FROM
+					campus.vw_student
+				WHERE aktiv=false
+				AND studiengang_kz IN
+						(SELECT studiengang_kz FROM public.tbl_studiengang WHERE typ IN ('b','m'))
+				AND get_rolle_prestudent(vw_student.prestudent_id, null)='Absolvent'
 				AND updateaktivam>now()-'20 weeks'::interval
 			)";
 	if($result = $db->db_query($sql_query))
@@ -1004,7 +1072,7 @@ $error_msg='';
 	{
 		$error_msg.=$db->db_last_error();
 	}
-	
+
 	// Studenten holen die nicht im Verteiler sind
 	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon)
 			SELECT uid,'TW_BAMA',now(),'mlists_generate'
@@ -1012,20 +1080,20 @@ $error_msg='';
 			WHERE (aktiv
 					OR
 					(aktiv=false AND get_rolle_prestudent(vw_student.prestudent_id, null)='Absolvent' AND updateaktivam>now()-'20 weeks'::interval))
-			AND studiengang_kz IN 
+			AND studiengang_kz IN
 					(SELECT studiengang_kz FROM public.tbl_studiengang WHERE typ IN ('b','m'))
 			AND uid NOT in(SELECT uid FROM public.tbl_benutzergruppe
 				WHERE UPPER(gruppe_kurzbz)='TW_BAMA')";
-	
+
 	if($result = $db->db_query($sql_query))
 	{
 		echo $db->db_affected_rows($result).' Eintraege hinzugefuegt<br>';
 	}
 	else
 		$error_msg.=$db->db_last_error();
-	
-		
-   	// **************************************************************
+
+
+	// **************************************************************
 	// Moodle - LektorenVerteiler abgleichen
 	$mlist_name='moodle_lkt';
 	setGeneriert($mlist_name);
@@ -1059,7 +1127,7 @@ $error_msg='';
 	echo '<BR>';
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
+		$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 		{
 			$error_msg.=$db->db_last_error().$sql_query;
@@ -1141,7 +1209,7 @@ $error_msg='';
 			echo '<BR>';
 			while($row_oe = $db->db_fetch_object($result_oe))
 			{
-		     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
+				$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
 				if(!$db->db_query($sql_query))
 				{
 					$error_msg.=$db->db_last_error().$sql_query;
@@ -1228,7 +1296,7 @@ $error_msg='';
 
 			while($row_oe = $db->db_fetch_object($result_oe))
 			{
-		     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
+				$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
 				if(!$db->db_query($sql_query))
 				{
 					$error_msg.=$db->db_last_error().$sql_query;
@@ -1308,7 +1376,7 @@ $error_msg='';
 			// Lektoren holen die nicht im Verteiler sind
 			while($row_oe = $db->db_fetch_object($result_oe))
 			{
-		     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
+				$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
 				if(!$db->db_query($sql_query))
 				{
 					$error_msg.=$db->db_last_error().$sql_query;
@@ -1347,10 +1415,10 @@ $error_msg='';
 
 		while($row = $db->db_fetch_object($result))
 		{
-	     	$mlist_name=strtoupper($row->typ.$row->kurzbz.'_'.$row->orgform_kurzbz);
-	     	echo $mlist_name.'<br>';
+			$mlist_name=strtoupper($row->typ.$row->kurzbz.'_'.$row->orgform_kurzbz);
+			echo $mlist_name.'<br>';
 
-	     	//Gruppe anlegen falls noch nicht vorhanden
+			//Gruppe anlegen falls noch nicht vorhanden
 			$grp = new gruppe();
 			if(!$grp->exists($mlist_name))
 			{
@@ -1407,7 +1475,7 @@ $error_msg='';
 
 			while($row_oe = $db->db_fetch_object($result_oe))
 			{
-		     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->student_uid','".$mlist_name."', now(), 'mlists_generate')";
+				$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->student_uid','".$mlist_name."', now(), 'mlists_generate')";
 				if(!$db->db_query($sql_query))
 				{
 					$error_msg.=$db->db_last_error().$sql_query;
@@ -1468,7 +1536,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row=$db->db_fetch_object($result))
 	{
-     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
+		$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -1491,7 +1559,7 @@ $error_msg='';
 		$error_msg.=$db->db_last_error();
 	while($row=$db->db_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, studiensemester_kurzbz, updateamum, updatevon, insertamum, insertvon) VALUES ('$row->mitarbeiter_uid','".strtoupper($mlist_name)."',null, null, null, now(), 'mlists_generate')";
+		$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, studiensemester_kurzbz, updateamum, updatevon, insertamum, insertvon) VALUES ('$row->mitarbeiter_uid','".strtoupper($mlist_name)."',null, null, null, now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -1615,7 +1683,7 @@ $error_msg='';
 	// Lektoren holen die nicht im Verteiler sind
 	while($row_oe = $db->db_fetch_object($result_oe))
 	{
-	   	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
+		$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 		{
 			$error_msg.=$db->db_last_error().$sql_query;
@@ -1773,7 +1841,7 @@ $error_msg='';
 	// Personen holen die nicht im Verteiler sind
 	while($row_oe = $db->db_fetch_object($result_oe))
 	{
-	   	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
+		$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 		{
 			$error_msg.=$db->db_last_error().$sql_query;
