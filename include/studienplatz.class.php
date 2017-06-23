@@ -400,7 +400,7 @@ class studienplatz extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO lehre.tbl_studienplatz ('.
 				'studiengang_kz, orgform_kurzbz, studiensemester_kurzbz, '.
-				'ausbildungssemester, gpz, npz, apz, studienplan_id insertamum, insertvon, '.
+				'ausbildungssemester, gpz, npz, apz, studienplan_id, insertamum, insertvon, '.
 				'updateamum, updatevon) VALUES('.
 				$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 				$this->db_add_param($this->orgform_kurzbz).', '.
