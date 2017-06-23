@@ -56,13 +56,13 @@ else
 if (isset($_GET['semester']) || isset($_POST['semester']))
 	$semester=(isset($_GET['semester'])?$_GET['semester']:$_POST['semester']);
 else
-	$semester=0;
+	$semester = -1;
 
 if(!is_numeric($stg_kz) && $stg_kz!='')
 	$stg_kz='';
 
 if(!is_numeric($semester))
-	$semester=0;
+	$semester = -1;
 
 $oe_fachbereich='';
 if(isset($_REQUEST['fachbereich_kurzbz']))
@@ -93,6 +93,13 @@ if (isset($_REQUEST['orgform']))
 else
 	$orgform_kurzbz='';
 
+if (isset($_REQUEST['lehrveranstaltung_id']))
+{
+	$lehrveranstaltung_id = $_REQUEST['lehrveranstaltung_id'];
+}
+else
+	$lehrveranstaltung_id = '';
+
 //Wenn kein Fachbereich und kein Studiengang gewaehlt wurde
 //dann wird der Studiengang auf 0 gesetzt da sonst die zu ladende liste zu lang wird
 
@@ -121,7 +128,7 @@ if($rechte->isBerechtigt('lehre/lehrveranstaltung:begrenzt', $oe_studiengang, 's
 	$write_low=true;
 
 if(!$rechte->isBerechtigt('lehre/lehrveranstaltung:begrenzt'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+	die($rechte->errormsg);
 
 if (isset($_GET['isaktiv']) || isset($_POST['isaktiv']))
 	$isaktiv=(isset($_GET['isaktiv'])?$_GET['isaktiv']:$_POST['isaktiv']);
@@ -488,6 +495,9 @@ if($orgform_kurzbz != -1)
 		$sql_query.=" AND (tbl_lehrveranstaltung.orgform_kurzbz IS NULL OR tbl_lehrveranstaltung.orgform_kurzbz='')";
 	else
 		$sql_query.=" AND tbl_lehrveranstaltung.orgform_kurzbz=".$db->db_add_param($orgform_kurzbz, FHC_STRING);
+	
+if($lehrveranstaltung_id != '')
+	$sql_query.= " AND tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 
 $sql_query.=" $aktiv ORDER BY tbl_lehrveranstaltung.bezeichnung";
 
@@ -511,7 +521,7 @@ foreach ($studiengang as $stg)
 {
 	if(in_array($stg->studiengang_kz, $stg_berechtigt))
 	{
-		$outp.="<OPTION value='$stg->studiengang_kz' ".($stg->studiengang_kz==$stg_kz?'selected':'').">".$db->convert_html_chars($stg->kuerzel.' - '.$stg->kurzbzlang)."</OPTION>";
+		$outp.="<OPTION value='$stg->studiengang_kz' ".($stg->studiengang_kz==$stg_kz?'selected':'').">".$db->convert_html_chars(strtoupper($stg->typ.$stg->kurzbz).' - '.$stg->bezeichnung)."</OPTION>";
 	}
 	if(!isset($s[$stg->studiengang_kz]))
 		$s[$stg->studiengang_kz]=new stdClass();
@@ -592,6 +602,9 @@ $outp.= '</SELECT>';
 		$outp.= '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</option>';
 	}
 	$outp.= '</select>';
+	
+	//Lehrveranstaltung ID Input
+	$outp.= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 100px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
 
 	$outp.= ' <input type="submit" value="Anzeigen">';
 	$outp.= '</form>';
@@ -602,10 +615,11 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<title>Lehrveranstaltung Verwaltung</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
-	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
-	<script type="text/javascript" src="../../include/js/jquery.js"></script>
-	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">';
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">';
+
+	include('../../include/meta/jquery.php');
+	include('../../include/meta/jquery-tablesorter.php');
+
 
 	// ADDONS laden
 	$addon_obj = new addon();
@@ -640,7 +654,46 @@ echo '
 				$("#t1").tablesorter(
 				{
 					sortList: [[2,0]],
-					widgets: ["zebra"]
+					widgets: ["saveSort", "zebra", "filter", "stickyHeaders"],
+					headers: {	4: {sorter: false, filter: false},
+								5: {sorter: false, filter: false},
+								11: {sorter: false, filter: false},
+								13: {sorter: false, filter: false},
+								14: {sorter: false, filter: false},
+								17: {sorter: false, filter: false},
+								18: {sorter: false, filter: false},
+								19: {sorter: false, filter: false},
+								20: {sorter: false, filter: false},
+								21: {sorter: false, filter: false}},
+					widgetOptions : {filter_saveFilters : true,
+									filter_functions : {
+										// Add select menu to this column
+										10 : {
+										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
+										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
+										},
+										12 : {
+										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
+										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
+										},
+										15 : {
+										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
+										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
+										},
+										16 : {
+										"True" : function(e, n, f, i, $r, c, data) { return /t/.test(e); },
+										"False" : function(e, n, f, i, $r, c, data) { return /f/.test(e); }
+										}
+									}
+		
+}
+				}); 
+		
+				$(\'.resetsaved\').click(function()
+				{
+					$("#t1").trigger("filterReset");
+					location.reload();
+					return false;
 				});
 			});
 
@@ -649,9 +702,10 @@ echo '
 			{
 				if(document.getElementById("select_stg_kz").value==\'\'
 					&& document.getElementById("select_fachbereich_kurzbz").value==\'\'
-					&& document.getElementById("select_oe_kurzbz").value==\'\')
+					&& document.getElementById("select_oe_kurzbz").value==\'\'
+					&& document.getElementById("lehrveranstaltung_id").value==\'\')
 				{
-					alert("Die Felder Studiengang, Institut und Organisationseinheit dürfen nicht gleichzeitig auf \'Alle\' gesetzt sein");
+					alert("Die Felder Studiengang, Institut, Organisationseinheit und ID dürfen nicht gleichzeitig auf \'Alle\' gesetzt sein");
 					return false;
 				}
 				else
@@ -850,6 +904,20 @@ echo '
 			}
 
 		</script>
+		<style>
+		.tablesorter-default input.tablesorter-filter
+		{
+			padding: 0 4px;
+		}
+		table.tablesorter tbody td 
+		{
+			padding: 0 4px;
+		}
+		.tablesorter-default select.tablesorter-filter
+		{
+			padding: 0 4px;
+		}
+		</style>
 	</head>
 	<body class="Background_main">
 	';
@@ -894,12 +962,14 @@ if ($result_lv!=0)
 
 	$num_rows=$db->db_num_rows($result_lv);
 	echo '<h3>&Uuml;bersicht - '.$num_rows.' LVAs</h3>
+	<button type="button" class="resetsaved" title="Reset Filter">Reset Filter</button>
 	<table class="tablesorter" id="t1">
 	<thead>
 	<tr>';
 	echo "<th>ID</th>
 		  <th>Kurzbz</th>
 		  <th>Bezeichnung</th>
+		  <th>Bezeichnung English</th>
 		  <th>Lehrform</th>
 		  <th>Lehrtyp</th>
 		  <th>Stg</th>\n
@@ -944,6 +1014,11 @@ if ($result_lv!=0)
 			echo '<a href="lehrveranstaltung_details.php?lv_id='.$db->convert_html_chars($row->lehrveranstaltung_id).'" target="lv_detail">'.$db->convert_html_chars($row->bezeichnung).'</a>';
 		else
 			echo $db->convert_html_chars($row->bezeichnung);
+		echo '</td>';
+		
+		//Bezeichnung Englisch
+		echo '<td>';
+		echo $db->convert_html_chars($row->bezeichnung_english);
 		echo '</td>';
 
 		//Lehrform
@@ -997,7 +1072,7 @@ if ($result_lv!=0)
 		echo '<td  style="white-space:nowrap;">';
 		if($write_admin)
 		{
-			echo '<input type="text" id="lehrevz'.$row->lehrveranstaltung_id.'" onkeyup="checkInput(this);" value="'.$db->convert_html_chars($row->lehreverzeichnis).'" size="4" name="lehrevz">
+			echo '<input type="text" id="lehrevz'.$row->lehrveranstaltung_id.'" onkeyup="checkInput(this);" value="'.$db->convert_html_chars($row->lehreverzeichnis).'" size="4" name="lehrevz_'.$db->convert_html_chars($row->lehreverzeichnis).'">
 			<input type="button" id="lehrevzok'.$row->lehrveranstaltung_id.'" value="ok" onclick="changelehrevz(\''.$row->lehrveranstaltung_id.'\',document.getElementById(\'lehrevz'.$row->lehrveranstaltung_id.'\').value);">';
 		}
 		else
