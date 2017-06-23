@@ -516,6 +516,8 @@ class person extends basis_db
 	 */
 	public function getTab($filter, $order = 'person_id')
 	{
+		//Filterstring trimmen und Umwandlung mittels generateSpecialCharacterString um auch Namen mit Sonderzeichen zu erhalten
+		$filter = generateSpecialCharacterString(trim($filter));
 		$sqlQuery = "
 			SELECT
 				distinct on (person_id) *
@@ -526,16 +528,16 @@ class person extends basis_db
 
 		if ($filter != '')
 		{
-			$sqlQuery .= " AND 	nachname ~* '".$this->db_escape($filter)."' OR
-								vorname ~* '".$this->db_escape($filter)."' OR
-								(nachname || ' ' || vorname) ~* '".$this->db_escape($filter)."' OR
-								(vorname || ' ' || nachname) ~* '".$this->db_escape($filter)."' OR
+			$sqlQuery .= " AND 	UPPER(nachname) ~* UPPER(".$this->db_add_param($filter).") OR
+								UPPER (vorname) ~* UPPER(".$this->db_add_param($filter).") OR
+								UPPER (nachname || ' ' || vorname) ~* UPPER(".$this->db_add_param($filter).") OR
+								UPPER (vorname || ' ' || nachname) ~* UPPER(".$this->db_add_param($filter).") OR
 								uid=".$this->db_add_param($filter);
 		}
 
 		$sqlQuery .= " ORDER BY $order";
 		if ($filter == '')
-		   $sqlQuery .= " LIMIT 30";
+			$sqlQuery .= " LIMIT 30";
 
 		if ($this->db_query($sqlQuery))
 		{
