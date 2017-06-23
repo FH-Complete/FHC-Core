@@ -2,17 +2,36 @@
 
 class DB_Model extends FHC_Model
 {
+	// Default schema used by the models
+	const DEFAULT_SCHEMA = 'public';
+	
+	// Default model class name postfix
+	const MODEL_POSTFIX = '_model';
+	
+	// Query used to get the list of columns from a table
+	const QUERY_LIST_FIELDS = 'SELECT * FROM %s WHERE 0 = 1';
+	
+	// Constants used to convert postgresql arrays and booleans to the php equivalent
 	const PGSQL_ARRAY_TYPE = '_';
 	const PGSQL_BOOLEAN_TYPE = 'bool';
 	const PGSQL_BOOLEAN_ARRAY_TYPE = '_bool';
 	const PGSQL_BOOLEAN_TRUE = 't';
 	const PGSQL_BOOLEAN_FALSE = 'f';
-	const MODEL_POSTFIX = '_model';
-	const DEFAULT_SCHEMA = 'public';
+	
+	// UDF constants
 	const UDF_FIELD_NAME = 'udf_values';
 	const UDF_FIELD_TYPE = 'jsonb';
 	const UDF_FIELD_PREFIX = 'udf_';
-	const QUERY_LIST_FIELDS = 'SELECT * FROM %s WHERE 0 = 1';
+	const UDF_ATTRIBUTE_NAME = 'name';
+	
+	// UDF validation attributes
+	const UDF_REGEX = 'regex';
+	const UDF_REGEX_LANG = 'php';
+	const UDF_REQUIRED = 'required';
+	const UDF_MAX_VALUE = 'max-value';
+	const UDF_MIN_VALUE = 'min-value';
+	const UDF_MAX_LENGTH = 'max-length';
+	const UDF_MIN_LENGTH = 'min-length';
 	
 	protected $dbTable;  	// Name of the DB-Table for CI-Insert, -Update, ...
 	protected $pk;  		// Name of the PrimaryKey for DB-Update, Load, ...
@@ -843,6 +862,7 @@ class DB_Model extends FHC_Model
 	private function _validateUDFs($udfDescription, $udfValue)
 	{
 		$isValid = true;
+		$valid = success(true);
 		
 		$tmpUdfValues = $udfValue;
 		if (!is_array($udfValue))
@@ -863,29 +883,43 @@ class DB_Model extends FHC_Model
 			foreach($tmpUdfValues as $udfValIndx => $udfVal)
 			{
 				// 
-				if (isset($validation->{'max-value'}) && $udfVal > $validation->{'max-value'})
+				if (isset($validation->{DB_Model::UDF_MAX_VALUE}) && $udfVal > $validation->{DB_Model::UDF_MAX_VALUE})
 				{
-					$isValid = false;
+					$valid = error($udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}, EXIT_VALIDATION_UDF_MAX_VALUE);
 					break;
 				}
 				
 				// 
-				if (isset($validation->{'min-value'}) && $udfVal < $validation->{'min-value'})
+				if (isset($validation->{DB_Model::UDF_MIN_VALUE}) && $udfVal < $validation->{DB_Model::UDF_MIN_VALUE})
 				{
-					$isValid = false;
+					$valid = error($udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}, EXIT_VALIDATION_UDF_MIN_VALUE);
 					break;
 				}
 				
 				// 
-				if (isset($validation->regex) && is_array($validation->regex))
+				if (isset($validation->{DB_Model::UDF_MAX_LENGTH}) && $udfVal > $validation->{DB_Model::UDF_MAX_LENGTH})
 				{
-					foreach($validation->regex as $regexIndx => $regex)
+					$valid = error($udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}, EXIT_VALIDATION_UDF_MAX_LENGTH);
+					break;
+				}
+				
+				// 
+				if (isset($validation->{DB_Model::UDF_MIN_LENGTH}) && $udfVal < $validation->{DB_Model::UDF_MIN_LENGTH})
+				{
+					$valid = error($udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}, EXIT_VALIDATION_UDF_MIN_LENGTH);
+					break;
+				}
+				
+				// 
+				if (isset($validation->{DB_Model::UDF_REGEX}) && is_array($validation->{DB_Model::UDF_REGEX}))
+				{
+					foreach($validation->{DB_Model::UDF_REGEX} as $regexIndx => $regex)
 					{
-						if ($regex->language == 'php')
+						if ($regex->language == DB_Model::UDF_REGEX_LANG)
 						{
 							if (preg_match($regex->expression, $udfVal) != 1)
 							{
-								$isValid = false;
+								$valid = error($udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}, EXIT_VALIDATION_UDF_REGEX);
 								break;
 							}
 						}
@@ -894,15 +928,7 @@ class DB_Model extends FHC_Model
 			}
 		}
 		
-		// 
-		if ($isValid === true)
-		{
-			return success(true);
-		}
-		else
-		{
-			return error($udfDescription->name, EXIT_VALIDATION_UDF);
-		}
+		return $valid;
 	}
 	
 	/**
@@ -910,7 +936,8 @@ class DB_Model extends FHC_Model
 	 */
 	private function _manageUDFs(&$data)
 	{
-		$validate = error('manageUDFs', EXIT_DATABASE);
+		$validate = success(true);
+		$notValidUDFsArray = array();
 		
 		if ($this->hasUDF()) // Checks if this table has UDFs
 		{
@@ -931,10 +958,10 @@ class DB_Model extends FHC_Model
 					
 					foreach($this->UDFs as $key => $val)
 					{
-						if ($udfDescription->name == $key)
+						if ($udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME} == $key)
 						{
 							// Validation of UDF parameter value
-							$validate = $this->_validateUDFs($udfDescription, $val);
+							// $validate = $this->_validateUDFs($udfDescription, $val);
 							
 							// If validation is ok copy the value
 							if (isSuccess($validate))
@@ -943,14 +970,14 @@ class DB_Model extends FHC_Model
 							}
 							else // otherwise stop the elaboration
 							{
-								break;
+								$notValidUDFsArray[] = $validate;
 							}
 						}
 					}
 				}
 				
 				// If validation was ok
-				if (isSuccess($validate))
+				if (count($notValidUDFsArray) == 0)
 				{
 					$jsonEncodedUDFs = json_encode($jsonb); // encode to json
 					if ($jsonEncodedUDFs !== false)
@@ -958,12 +985,12 @@ class DB_Model extends FHC_Model
 						$data[DB_Model::UDF_FIELD_NAME] = $jsonEncodedUDFs;
 					}
 				}
+				else
+				{
+					$validate = error($notValidUDFsArray, EXIT_VALIDATION_UDF);
+				}
 			}
 		}
-		else
-        {
-            return success(true);
-        }
 		
 		return $validate;
 	}

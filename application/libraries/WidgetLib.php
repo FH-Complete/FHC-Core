@@ -1179,7 +1179,8 @@ class CheckboxWidgetUDF extends CheckboxWidget
 }
 
 /**
- * 
+ * Defined here because these constants can be used
+ * in the views also
  */
 abstract class UDFWidgetTpl extends Widget
 {
@@ -1189,12 +1190,17 @@ abstract class UDFWidgetTpl extends Widget
 	const FIELD_ARG_NAME = 'field';
 	const UDFS_ARG_NAME = 'udfs';
 	
+	// HTML components
 	const TITLE = 'description';
 	const LABEL = 'title';
 	const PLACEHOLDER = 'placeholder';
 	const DEFAULT_VALUE = 'defaultValue';
+	
+	// Validation attributes
 	const REGEX = 'regex';
 	const REQUIRED = 'required';
 	const MAX_VALUE = 'max-value';
 	const MIN_VALUE = 'min-value';
+	const MAX_LENGTH = 'max-length';
+	const MIN_LENGTH = 'min-length';
 }
