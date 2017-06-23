@@ -1285,10 +1285,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:sequence-decl text:display-outline-level="0" text:name="Text"/>
 		<text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
 		</text:sequence-decls>
-		<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr5" draw:name="Bild2" text:anchor-type="page" text:anchor-page-number="1" svg:y="8.82cm" svg:width="11.45cm" svg:height="12.61cm" draw:z-index="17">
-			<draw:image xlink:href="Pictures/bundesadler.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
-		</draw:frame>
-		<text:p text:style-name="P60"/>
+		<text:p text:style-name="P60">
+			<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr5" draw:name="Bild2" text:anchor-type="paragraph" svg:y="8.82cm" svg:width="11.45cm" svg:height="12.61cm" draw:z-index="20">
+				<draw:image xlink:href="Pictures/bundesadler.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+			</draw:frame>
+		</text:p>
 		<text:p text:style-name="P2"/>
 		<text:p text:style-name="P2"/>
 		<text:p text:style-name="P2"/>
