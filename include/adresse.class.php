@@ -450,5 +450,58 @@ class adresse extends basis_db
 		}
 		return true;
 	}
+
+
+	/**
+	 * Laedt die Rechnungsadresse zu der Person die uebergeben wird
+	 * @param $pers_id ID der Person zu der die Adressen geladen werden sollen
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load_rechnungsadresse($pers_id)
+	{
+		//Pruefen ob pers_id eine gueltige Zahl ist
+		if(!is_numeric($pers_id) || $pers_id == '')
+		{
+			$this->errormsg = 'person_id muss eine gültige Zahl sein';
+			return false;
+		}
+
+		//Lesen der Daten aus der Datenbank
+		$qry = "SELECT * FROM public.tbl_adresse WHERE rechnungsadresse and person_id=".$this->db_add_param($pers_id, FHC_INTEGER, false);
+		$qry.=" limit 1";
+
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+			return false;
+		}
+
+		while($row = $this->db_fetch_object())
+		{
+			$adr_obj = new adresse();
+
+			$adr_obj->adresse_id      = $row->adresse_id;
+			$adr_obj->heimatadresse   = $this->db_parse_bool($row->heimatadresse);
+			$adr_obj->gemeinde        = $row->gemeinde;
+			$adr_obj->name            = $row->name;
+			$adr_obj->nation          = $row->nation;
+			$adr_obj->ort             = $row->ort;
+			$adr_obj->person_id       = $row->person_id;
+			$adr_obj->plz             = $row->plz;
+			$adr_obj->strasse         = $row->strasse;
+			$adr_obj->typ             = $row->typ;
+			$adr_obj->firma_id		  = $row->firma_id;
+			$adr_obj->updateamum      = $row->updateamum;
+			$adr_obj->updatevon       = $row->updatevon;
+			$adr_obj->insertamum      = $row->insertamum;
+			$adr_obj->insertvon       = $row->insertvon;
+			$adr_obj->zustelladresse  = $this->db_parse_bool($row->zustelladresse);
+			$adr_obj->rechnungsadresse 	= $this->db_parse_bool($row->rechnungsadresse);
+			$adr_obj->anmerkung 	  = $row->anmerkung;
+
+			$this->result[] = $adr_obj;
+		}
+		return true;
+	}
 }
 ?>

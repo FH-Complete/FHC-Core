@@ -590,7 +590,7 @@ if(isset($_GET['excel']))
 						for(i in ui.content)
 						{
 							ui.content[i].value=ui.content[i].bezeichnung;
-							ui.content[i].label=ui.content[i].bezeichnung;
+							ui.content[i].label=ui.content[i].bezeichnung+' ('+ui.content[i].status+')';
 						}
 					},
 					select: function(event, ui)
@@ -1862,10 +1862,10 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			<td></td>
 			<td>
 				<button type="submit" name="speichern"><?php echo $val ?></button>
-				<?php 
+				<?php
 					if(!$neu)
 						echo '<button type="submit" name="kopieren" onclick="return confirm (\'Eine Kopie dieses Tests (ohne Raumzuordnung) erstellen?\')">Kopie erstellen</button>';
-					
+
 					if($rechte->isBerechtigt('lehre/reihungstest', null, 'suid'))
 					{
 						$anzahl_teilnehmer = new reihungstest();
@@ -1873,9 +1873,9 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 
 						if (isset($orte) && count($orte->result) == 0 && isset($studienplaene) && count($studienplaene->result) == 0 && $anzahl_teilnehmer == 0 && $reihungstest_id != '')
 							echo '<button type="submit" name="deleteReihungstest" onclick="return confirm (\'Diesen Reihungstesttermin löschen?\')">Termin löschen</button>';
-						else 
+						else
 							echo '<button type="submit" name="" disabled="disabled" title="Entfernen Sie zuerst alle Raumzuteilungen, Studienpläne und TeilnehmerInnen">Termin löschen</button>';
-					} 
+					}
 				?>
 			</td>
 		</tr>
