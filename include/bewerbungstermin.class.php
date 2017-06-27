@@ -113,11 +113,18 @@ class bewerbungstermin extends basis_db
 	 */
 	public function getBewerbungstermine($studiengang_kz, $studiensemester_kurzbz = null, $sort = null, $studienplan_id = null)
 	{
-		$qry = "SELECT * FROM public.tbl_bewerbungstermine WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
-		
+		$qry = "SELECT
+					tbl_bewerbungstermine.*,
+					tbl_studienplan.bezeichnung as stpl_bezeichnung
+				FROM
+					public.tbl_bewerbungstermine
+					LEFT JOIN lehre.tbl_studienplan USING(studienplan_id)
+				WHERE
+					studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+
 		if($studiensemester_kurzbz!=null)
 			$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
-		
+
 		if($studienplan_id!=null)
 			$qry.=" AND studienplan_id=".$this->db_add_param($studienplan_id);
 
@@ -146,6 +153,7 @@ class bewerbungstermin extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->studienplan_id = $row->studienplan_id;
+				$obj->stpl_bezeichnung = $row->stpl_bezeichnung;
 
 				$this->result[] = $obj;
 			}

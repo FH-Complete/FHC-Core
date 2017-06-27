@@ -53,10 +53,11 @@ class Dms extends APIv1_Controller
 	{
 		$person_id = $this->get('person_id');
 		$dokument_kurzbz = $this->get('dokument_kurzbz');
+		$no_file = $this->get('no_file');
 		
 		if (isset($person_id))
 		{
-			$result = $this->dmslib->getAktenAcceptedDms($person_id, $dokument_kurzbz);
+			$result = $this->dmslib->getAktenAcceptedDms($person_id, $dokument_kurzbz, $no_file);
 			
 			$this->response($result, REST_Controller::HTTP_OK);
 		}

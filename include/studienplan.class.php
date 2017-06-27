@@ -820,12 +820,14 @@ class studienplan extends basis_db
 	function getStudienplaene($studiengang_kz)
 	{
 		$qry = "SELECT
-		distinct tbl_studienplan.*
-		FROM
-		lehre.tbl_studienplan
-		JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-		WHERE
-		tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+					distinct tbl_studienplan.*, tbl_studiensemester.start as start_stsem
+				FROM
+					lehre.tbl_studienplan
+					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					LEFT JOIN public.tbl_studiensemester ON(studiensemester_kurzbz=tbl_studienordnung.gueltigvon)
+				WHERE
+					tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)."
+				ORDER BY tbl_studiensemester.start";
 
 		if($result = $this->db_query($qry))
 		{
