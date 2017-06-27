@@ -46,7 +46,7 @@ class MyPdf extends FPDF {
 	function __construct($orientation='P',$unit='mm',$format='A4')
 	{
 	    //Call parent constructor
-	    $this->FPDF($orientation,$unit,$format);
+	    parent::__construct($orientation,$unit,$format);
 	}
 
   /**
