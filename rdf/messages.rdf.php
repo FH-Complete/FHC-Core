@@ -28,7 +28,7 @@ require_once('../include/benutzerberechtigung.class.php');
 $uid = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
-if(!$rechte->isBerechtigt('basis/message','s'))
+if(!$rechte->isBerechtigt('basis/message', null, 's'))
 	die($rechte->errormsg);
 
 $oRdf = new rdf('MESSAGES','http://www.technikum-wien.at/messages');
@@ -97,7 +97,7 @@ if($db->db_query($qry))
 		{
 			$status = 'Deleted';
 		}
-		
+
 		$i=$oRdf->newObjekt($row->message_id);
 		$oRdf->obj[$i]->setAttribut('subject',$row->subject,true);
 		$oRdf->obj[$i]->setAttribut('body',$row->body,true);
