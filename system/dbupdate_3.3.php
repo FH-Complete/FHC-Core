@@ -268,7 +268,6 @@ if($result = $db->db_query("SELECT view_definition FROM information_schema.views
 	}
 }
 
-<<<<<<< HEAD
 // Creates table system.tbl_udf if it doesn't exist and grants privileges
 if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_udf LIMIT 1"))
 {
@@ -333,7 +332,8 @@ if(!$result = @$db->db_query("SELECT udf_values FROM public.tbl_prestudent LIMIT
 		echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Added column udf_values to table public.tbl_prestudent';
-=======
+}
+
 // Spalten mailversand,teilnehmer_anonym,termine_anonym in campus.tbl_coodle
 if(!$result = @$db->db_query("SELECT mailversand FROM campus.tbl_coodle LIMIT 1;"))
 {
@@ -356,7 +356,6 @@ if(!$result = @$db->db_query("SELECT onlinebewerbung_studienplan FROM lehre.tbl_
 		echo '<strong>lehre.tbl_studienplan: '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>lehre.tbl_studienplan: Spalte onlinebewerbung_studienplan hinzugefuegt!<br>';
->>>>>>> master
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -617,7 +616,7 @@ $tabellen=array(
 	"system.tbl_webservicerecht" => array("webservicerecht_id","berechtigung_kurzbz","methode","attribut","insertamum","insertvon","updateamum","updatevon","klasse"),
 	"system.tbl_webservicetyp"  => array("webservicetyp_kurzbz","beschreibung"),
 	"system.tbl_server"  => array("server_kurzbz","beschreibung"),
-	"system.tbl_udf"  => array("schema", "table", "jsons"),
+	"system.tbl_udf"  => array("schema", "tbl_udf.table", "jsons"),
 	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id","uid"),
 	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis","inventuramum","inventurvon","anschaffungsdatum","anschaffungswert","hoehe","breite","tiefe","nummer2","verplanen"),
 	"wawi.tbl_betriebsmittel_betriebsmittelstatus"  => array("betriebsmittelbetriebsmittelstatus_id","betriebsmittel_id","betriebsmittelstatus_kurzbz", "datum", "updateamum", "updatevon", "insertamum", "insertvon","anmerkung"),
