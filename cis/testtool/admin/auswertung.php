@@ -166,7 +166,13 @@ if($result = $db->db_query($qry))
 		$zgvma_arr[$row->zgvmas_code]=$row->zgvmas_kurzbz;
 
 // Reihungstests laden
-$sql_query="SELECT * FROM public.tbl_reihungstest WHERE date_part('year',datum)=date_part('year',now()) ORDER BY datum,uhrzeit";
+$sql_query = "SELECT * FROM public.tbl_reihungstest WHERE date_part('year',datum)=date_part('year',now()) ";
+
+// Wenn Reihungstest ID gesetzt ist, diesen Test zusaetzlich laden, um auch jene außerhalbs des Datumszeitraums zu erwischen
+if ($reihungstest != '')
+$sql_query .= "UNION SELECT * FROM public.tbl_reihungstest WHERE reihungstest_id=".$db->db_add_param($reihungstest, FHC_INTEGER);
+
+$sql_query .= " ORDER BY datum,uhrzeit";
 
 if(!($result=$db->db_query($sql_query)))
 	die($db->db_last_error());

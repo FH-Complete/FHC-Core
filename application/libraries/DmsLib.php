@@ -68,11 +68,11 @@ class DmsLib
 	/**
 	 *
 	 */
-	public function getAktenAcceptedDms($person_id, $dokument_kurzbz = null)
+	public function getAktenAcceptedDms($person_id, $dokument_kurzbz = null, $no_file = null)
 	{
 		$result = $this->ci->AkteModel->getAktenAcceptedDms($person_id, $dokument_kurzbz);
 		
-		if (hasData($result))
+		if (hasData($result) && $no_file == null)
 		{
 			for ($i = 0; $i < count($result->retval); $i++)
 			{

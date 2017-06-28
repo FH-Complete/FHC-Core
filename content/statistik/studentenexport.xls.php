@@ -177,7 +177,9 @@ loadVariables($user);
 	$maxlength[$i]=8;
 	$worksheet->write($zeile,++$i,"PRESTUDENTID", $format_bold);
 	$maxlength[$i]=12;
-
+	$worksheet->write($zeile,++$i,"MATR_NR", $format_bold);
+	$maxlength[$i]=12;
+	
 	$zeile++;
 
 	$ids = explode(';',$data);
@@ -564,6 +566,12 @@ loadVariables($user);
 		if(mb_strlen($row->prestudent_id)>$maxlength[$i])
 			$maxlength[$i] = mb_strlen($row->prestudent_id);
 		$worksheet->write($zeile,$i, $row->prestudent_id);
+		$i++;
+
+		//Matrikelnummer (tbl_person)
+		if(mb_strlen($row->matr_nr)>$maxlength[$i])
+			$maxlength[$i] = mb_strlen($row->matr_nr);
+		$worksheet->write($zeile,$i, $row->matr_nr);
 		$i++;
 	}
 

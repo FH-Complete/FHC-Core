@@ -106,7 +106,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 				<row>
 					<label value="Studiensemester" control="student-konto-neu-menulist-studiensemester"/>
 					<menulist id="student-konto-neu-menulist-studiensemester"
-					          datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php" flex="1"
+					          datasources="<?php echo APP_ROOT ?>rdf/studiensemester.rdf.php?order=desc" flex="1"
 					          ref="http://www.technikum-wien.at/studiensemester/liste" >
 						<template>
 							<menupopup>

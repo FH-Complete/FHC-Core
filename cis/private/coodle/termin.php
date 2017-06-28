@@ -55,7 +55,7 @@ if(!$coodle->load($coodle_id))
 }
 $event_titel = $coodle->titel;
 
-if($coodle->coodle_status_kurzbz == 'storniert' || $coodle->coodle_status_kurzbz == 'abgeschlossen' || $coodle->coodle_status_kurzbz=='laufend')
+if($coodle->coodle_status_kurzbz == 'storniert' || $coodle->coodle_status_kurzbz == 'abgeschlossen')
 {
 	die($p->t('coodle/umfrageNichtGueltig'));
 }
@@ -67,7 +67,7 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 	echo '<html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link rel="stylesheet"  href="../../../skin/fhcomplete.css" type="text/css">
+		<link rel="stylesheet" href="../../../skin/fhcomplete.css" type="text/css">
 		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	</head>
 	<body>
@@ -132,15 +132,22 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 				$html=$anrede.'!<br><br>
 					Sie wurden zu einer Terminumfrage zum Thema "'.$db->convert_html_chars($coodle->titel).'" eingeladen.
 					<br>
-					Bitte folgen Sie dem Link um Ihre Terminwünsche bekannt zu geben:
+					Bitte folgen Sie dem Link, um Ihre Terminwünsche bekannt zu geben:
 					<a href="'.$link.'">Link zur Terminumfrage</a>
-					<br><br>'.nl2br($sign);
+					<br><br>
+					Beschreibung:<br><br>
+					'.$coodle->beschreibung.'<br><br>
+					'.nl2br($sign);
 				
 				$text=$anrede."!\n\nSie wurden zu einer Terminumfrage zum Thema \"".$db->convert_html_chars($coodle->titel)."\" eingeladen.\n
-					Bitte folgen Sie dem Link um Ihre Terminwünsche bekannt zu geben:\n
-					$link\n\n$sign";
+					Bitte folgen Sie dem Link, um Ihre Terminwünsche bekannt zu geben:\n
+					$link\n\n
+					Beschreibung:\n\n
+					".strip_tags($coodle->beschreibung)."
+					\n\n
+					$sign";
 				
-				$mail = new mail($email, $von,'Termineinladung - '.$coodle->titel, $text);
+				$mail = new mail($email, $von,'Terminumfrage - '.$coodle->titel, $text);
 				$mail->setHTMLContent($html);
 				if($mail->send())
 				{
@@ -199,9 +206,11 @@ echo '<html>
 		}
 		
 	#external-events h4 {
-		font-size: 16px;
+		font-size: 17px;
 		margin-top: 0;
-		padding-top: 1em;
+		padding-top: 10px;
+		padding-bottom: 10px;
+		text-decoration: none;
 		}
 		
 	.external-event { /* try to mimick the look of a real event */
@@ -211,6 +220,8 @@ echo '<html>
 		color: #fff;
 		font-size: .85em;
 		cursor: pointer;
+		border-radius: 2px;
+		box-shadow: 3px 3px 3px #bbb;
 		}
 		
 	#external-events p {
@@ -239,9 +250,11 @@ echo '<html>
 		}
 		
 	#ressourcen h4 {
-		font-size: 16px;
+		font-size: 17px;
 		margin-top: 0;
-		padding-top: 1em;
+		padding-top: 10px;
+		padding-bottom: 10px;
+		text-decoration: none;
 		}
 		
 	.ressourcen {
@@ -285,9 +298,11 @@ echo '<html>
 		
 	#fertig h4 
 	{
-		font-size: 16px;
+		font-size: 17px;
 		margin-top: 0;
-		padding-top: 1em;
+		padding-top: 10px;
+		padding-bottom: 10px;
+		text-decoration: none;
 	}
 		
 	#fertig p 
@@ -296,7 +311,7 @@ echo '<html>
 		font-size: 11px;
 		color: #666;
 	}
-	
+		
 </style>
 <script type="text/javascript">
 
@@ -398,36 +413,45 @@ echo '<html>
 				else
 					uhrzeit = $.fullCalendar.formatDate(date, "HH:mm:ss");
 
-				// Pruefen ob die Reservierungsgrenze ueberschritten wurde und ggf Warnung anzeigen
-				if(datum>\''.RES_TAGE_LEKTOR_BIS.'\')
+				// Pruefen ob der Termin in der Vergangenheit liegt
+				if(datum+\' \'+uhrzeit<=\''.date('Y-m-d H:i:s').'\')
 				{
-					alert("'.$p->t('coodle/ReservierungNichtMoeglich', array($datum_obj->formatDatum(RES_TAGE_LEKTOR_BIS, 'd.m.Y'))).'");
+					alert("'.$p->t('coodle/TerminInDerVergangenheit').'");
+					return false;
 				}
+				else
+				{
+					// Pruefen ob die Reservierungsgrenze ueberschritten wurde und ggf Warnung anzeigen
+					if(datum>\''.RES_TAGE_LEKTOR_BIS.'\')
+					{
+						alert("'.$p->t('coodle/ReservierungNichtMoeglich', array($datum_obj->formatDatum(RES_TAGE_LEKTOR_BIS, 'd.m.Y'))).'");
+					}
 
-				// Termin Speichern
-				$.ajax({
-					type:"POST",
-					url:"coodle_worker.php", 
-					data:{ 
-							"work": "addTermin",
-							"datum": datum,
-							"uhrzeit": uhrzeit,
-							"coodle_id": "'.$coodle_id.'"
-						 },
-					success: function(data) 
-						{ 
-							if(isNaN(data))
-								alert("ERROR:"+data)
-							else
-							{
-								copiedEventObject.id=data;
-								// render the event on the calendar
-								// the last `true` argument determines if the event "sticks" (http://arshaw.com/fullcalendar/docs/event_rendering/renderEvent/)
-								$("#calendar").fullCalendar("renderEvent", copiedEventObject, true);
-							}
-						},
-					error: function() { alert("error"); }
-				});				
+					// Termin Speichern
+					$.ajax({
+						type:"POST",
+						url:"coodle_worker.php", 
+						data:{ 
+								"work": "addTermin",
+								"datum": datum,
+								"uhrzeit": uhrzeit,
+								"coodle_id": "'.$coodle_id.'"
+							 },
+						success: function(data) 
+							{ 
+								if(isNaN(data))
+									alert("ERROR:"+data)
+								else
+								{
+									copiedEventObject.id=data;
+									// render the event on the calendar
+									// the last `true` argument determines if the event "sticks" (http://arshaw.com/fullcalendar/docs/event_rendering/renderEvent/)
+									$("#calendar").fullCalendar("renderEvent", copiedEventObject, true);
+								}
+							},
+						error: function() { alert("error"); }
+					});
+				}
 			},
 			eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view)
 			{
@@ -445,31 +469,41 @@ echo '<html>
 					event.allDay=false;
 					$("#calendar").fullCalendar("renderEvent", event, true);
 				}
-				// Verschiebung Speichern
-				$.ajax({
-					type:"POST",
-					url:"coodle_worker.php", 
-					data:{ 
-							"work": "moveTermin",
-							"datum": datum,
-							"uhrzeit": uhrzeit,
-							"coodle_termin_id": event.id,
-							"coodle_id": "'.$coodle_id.'"
-						 },
-					success: function(data) 
-						{ 
-							if(data!="true")
-							{
-								alert("ERROR:"+data)
-								revertFunc();
-							}
-							else
-							{
-								// Verschiebung OK
-							}
-						},
-					error: function() { alert("error"); }
-				});				
+				
+				// Pruefen ob der Termin in der Vergangenheit liegt
+				if(datum+\' \'+uhrzeit<=\''.date('Y-m-d H:i:s').'\')
+				{
+					alert("'.$p->t('coodle/TerminInDerVergangenheit').'");
+					return false;
+				}
+				else
+				{
+					// Verschiebung Speichern
+					$.ajax({
+						type:"POST",
+						url:"coodle_worker.php", 
+						data:{ 
+								"work": "moveTermin",
+								"datum": datum,
+								"uhrzeit": uhrzeit,
+								"coodle_termin_id": event.id,
+								"coodle_id": "'.$coodle_id.'"
+							 },
+						success: function(data) 
+							{ 
+								if(data!="true")
+								{
+									alert("ERROR:"+data)
+									revertFunc();
+								}
+								else
+								{
+									// Verschiebung OK
+								}
+							},
+						error: function() { alert("error"); }
+					});
+				}
 			},
 			eventRender: function (event, element) 
 			{ 
@@ -578,7 +612,7 @@ echo '
 			select: function(event, ui)
 			{
 				//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
-				addRessource(ui.item.uid, ui.item.typ, ui.item.bezeichnung);
+				addRessource(ui.item.uid, ui.item.typ, ui.item.bezeichnung);	
 				ui.item.value="";
 				ui.item.label="";
 			}
@@ -608,14 +642,17 @@ echo '
 						else
 						{
 							// Speichern der Ressource OK
-							addRessourceToContent(id, typ, bezeichnung);
+							if(typ=="Gruppe")
+								location.reload(true);
+							else
+								addRessourceToContent(id, typ, bezeichnung);
 						}
 
 					},
 				error: function() { alert("error"); }
 			});
 	}
-	// Zeigt eine Ressoure mit deren Events an
+	// Zeigt eine Ressource mit deren Events an
 	function addRessourceToContent(id, typ, bezeichnung)
 	{
 		// HTML Tags aus der Bezeichnung Entfernen, sofern vorhanden
@@ -645,7 +682,7 @@ echo '
 				error: function() {
 					alert("Error fetching data for "+typ+" "+id);
 				},
-				color:"gray"
+				color:"lightgrey"
 				//textColor:"black"
 			});
 

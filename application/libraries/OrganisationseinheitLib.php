@@ -59,7 +59,48 @@ class OrganisationseinheitLib
 				return $this->treeSearch($schema, $table, $select, $where, $orderby, $result->retval[0]->_ppk);
 			}
 		}
+		
+		return $result;
+	}
+	
+	public function treeSearchEntire($table, $alias, $fields, $where, $orderby, $oe_kurzbz)
+	{
+		$select = "";
+		if (is_array($fields))
+		{
+			for ($i = 0; $i < count($fields); $i++)
+			{
+				$select .= $fields[$i];
+				if ($i != count($fields) - 1)
+				{
+					$select .= ", ";
+				}
+			}
+		}
+		else
+		{
+			$select = $fields;
+		}
 
+		$result = $this->ci->OrganisationseinheitModel->getOneLevelAlias($table, $alias, $select, $where, $orderby, $oe_kurzbz);
+		
+		if (hasData($result))
+		{
+			if ($result->retval[0]->_pk != null && $result->retval[0]->_ppk != null && $result->retval[0]->_jtpk != null)
+			{
+				$tmpResult = $this->treeSearchEntire($table, $alias, $select, $where, $orderby, $result->retval[0]->_ppk);
+				
+				if (hasData($tmpResult) && $tmpResult->retval[0]->_pk != null && $tmpResult->retval[0]->_ppk != null && $tmpResult->retval[0]->_jtpk != null)
+				{
+					$result->retval = array_merge($result->retval, $tmpResult->retval);
+				}
+			}
+			else if ($result->retval[0]->_ppk != null)
+			{
+				$result = $this->treeSearchEntire($table, $alias, $select, $where, $orderby, $result->retval[0]->_ppk);
+			}
+		}
+		
 		return $result;
 	}
 }

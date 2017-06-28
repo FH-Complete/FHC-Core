@@ -681,21 +681,24 @@ if($xmlformat=='rdf')
 					$prestudent->getPrestudenten($row->person_id);
 					if(!empty($prestudent->result))
 					{
-						$prestudent_temp = new prestudent($prestudent->result[0]->prestudent_id);
-						$student = new student();
-						$uid = $student->getUid($prestudent_temp->prestudent_id);
-			
-						if($uid!='' && $uid != false)
+						foreach ($prestudent->result AS $prest)
 						{
-							if(!$student->load($uid, $studiensemester_kurzbz))
-								$student->load($uid);
+							$prestudent_temp = new prestudent($prest->prestudent_id);
+							$student = new student();
+							$uid = $student->getUid($prestudent_temp->prestudent_id);
+				
+							if($uid!='' && $uid != false)
+							{
+								if(!$student->load($uid, $studiensemester_kurzbz))
+									$student->load($uid);
 								draw_content($student);
 								draw_prestudent($prestudent_temp);
-						}
-						else
-						{
-							draw_content($prestudent_temp);
-							draw_prestudent($prestudent_temp);
+							}
+							else
+							{
+								draw_content($prestudent_temp);
+								draw_prestudent($prestudent_temp);
+							}
 						}
 					}
 				}
@@ -746,60 +749,15 @@ if($xmlformat=='rdf')
 			{
 				// String imploden und trimmen, um preg_split(Zeichenweise trennung) durchfuehren zu koennen
 				$searchItems_string_orig = implode(' ', $searchItems);
-				$searchItems_string_orig = mb_strtolower(TRIM($searchItems_string_orig));
-				
-				// Wenn String numerisch ist, keine Namenssuche durchführen
-				if (!is_numeric($searchItems_string_orig))
-				{	
-					$character_set_klein = array(
-							'aáăắặằẳẵǎâấậầẩẫäạàảāąåǻãæǽɑɐɒ',
-							'bḅɓß',
-							'cćčçĉɕċ',
-							'dďḓḍɗḏđɖʤǳʣʥǆð',
-							'eéĕěêếệềểễëėẹèẻēęẽʒǯʓɘɜɝəɚ',
-							'fƒſʩﬁﬂʃʆʅɟʄ',
-							'gǵğǧģĝġɠḡɡɣ',
-							'hḫĥḥɦẖħɧɥʮʯų',
-							'iíĭǐîïịìỉīįɨĩɩı',
-							'jĳɟjǰĵʝȷɟʄ',
-							'kķḳƙḵĸʞ',
-							'lĺƚɬľļḽḷḹḻŀɫɭłƛɮǉʪʫ',
-							'mḿṁṃɱɯɰ',
-							'nŉńňņṋṅṇǹɲṉɳñǌŋŊ',
-							'oóŏǒôốộồổỗöọőòỏơớợờởỡōǫøǿõɛɔɵʘœ',
-							'pɸþ',
-							'rŕřŗṙṛṝɾṟɼɽɿɹɻɺ',
-							'sśšşŝșṡṣʂſʃʆßʅ',
-							'tťţṱțẗṭṯʈŧʨʧþðʦʇ',
-							'uʉúŭǔûüǘǚǜǖụűùủưứựừửữūųůũʊ',
-							'wẃŵẅẁʍ',
-							'yýŷÿẏỵỳƴỷȳỹʎ',
-							'zźžʑżẓẕʐƶ'
-					);
+				$searchItems_string = generateSpecialCharacterString($searchItems_string_orig);
 
-					// String zeichenweise aufsplitten zum Vergleich mit den Sonderzeichen
-					$searchItems_string_splitted = preg_split('//u', $searchItems_string_orig, -1, PREG_SPLIT_NO_EMPTY);
-					
-					// Jedes Zeichen mit jedem Zeichenset vergleichen und dann damit ersetzen
-					foreach ($searchItems_string_splitted AS $key => $item)
-					{
-						foreach ($character_set_klein AS $set)
-						{
-							if (strpos($set, $item) !== false)
-								$searchItems_string_splitted[$key] = '['.$set.']';
-								elseif ($item == ' ')
-								$searchItems_string_splitted[$key] = '.*';
-						}
-					}
-					
-					// Array wieder zu String zusammenfuehren
-					$searchItems_string = implode('', $searchItems_string_splitted);
-				}
-
-				$qry = "SELECT prestudent_id
-					FROM
-						public.tbl_person JOIN public.tbl_prestudent USING (person_id) LEFT JOIN public.tbl_student USING (prestudent_id)
-					WHERE 1=1 AND";
+				$qry = "SELECT 
+							prestudent_id
+						FROM
+							public.tbl_person JOIN public.tbl_prestudent USING (person_id) LEFT JOIN public.tbl_student USING (prestudent_id)
+						WHERE 
+							1=1 
+						AND";
 				
 				// Wenn der urspruengliche Suchbegriff NICHT numerisch ist, Namenssuche durchführen
 				if (!is_numeric($searchItems_string_orig))

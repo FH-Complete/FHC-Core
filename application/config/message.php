@@ -9,6 +9,7 @@ $config['msg_delivery'] = true; // Default true
 $config['system_person_id'] = 1; // Dummy sender, used for sending messages from the system
 $config['redirect_view_message_url'] = 'index.ci.php/Redirect/redirectByToken/'; // 
 $config['message_html_view_url'] = 'index.ci.php/ViewMessage/toHTML/';
+$config['message_server'] = 'http://www.fhcomplete.org/';
 $config['assistent_function'] = 'ass';
 
 define('EMAIL_KONTAKT_TYPE', 'email'); // Email kontakt type

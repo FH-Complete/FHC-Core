@@ -40,14 +40,13 @@ class Messages extends VileSci_Controller
 		}
 		
 		// Get variables
-		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-		$prestudent = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
-		if ($prestudent->error)
+		$this->load->model('system/Message_model', 'MessageModel');
+		$msgVarsDataByPrestudentId = $this->MessageModel->getMsgVarsDataByPrestudentId($prestudent_id);
+		if ($msgVarsDataByPrestudentId->error)
 		{
-			show_error($prestudent->retval);
+			show_error($msgVarsDataByPrestudentId->retval);
 		}
 		
-		$this->load->model('system/Message_model', 'MessageModel');
 		if (!hasData($variables = $this->MessageModel->getMessageVars()))
 		{
 			unset($variables);
@@ -65,11 +64,33 @@ class Messages extends VileSci_Controller
 		array_shift($variables->retval); // Remove person_id
 		array_shift($variables->retval); // Remove prestudent_id
 		
+		// Organisation units
+		$oe_kurzbz = array(); // A person can have more organisation units
+		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+		$benutzerResult = $this->BenutzerfunktionModel->getByPersonId($sender_id);
+		if (hasData($benutzerResult))
+		{
+			foreach($benutzerResult->retval as $val)
+			{
+				$oe_kurzbz[] = $val->oe_kurzbz;
+			}
+		}
+		
+		// Admin or commoner?
+		$this->load->model('system/Benutzerrolle_model', 'BenutzerrolleModel');
+		$isAdmin = $this->BenutzerrolleModel->isAdminByPersonId($sender_id);
+		if (isError($isAdmin))
+		{
+			show_error($isAdmin->retval);
+		}
+		
 		$data = array (
 			'sender_id' => $sender_id,
-			'receivers' => $prestudent->retval,
+			'receivers' => $msgVarsDataByPrestudentId->retval,
 			'message' => $msg,
-			'variables' => $variablesArray
+			'variables' => $variablesArray,
+			'oe_kurzbz' => $oe_kurzbz,
+			'isAdmin' => $isAdmin->retval
 		);
 		
 		$v = $this->load->view('system/messageWrite', $data);

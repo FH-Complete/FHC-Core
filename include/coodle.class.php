@@ -40,6 +40,9 @@ class coodle extends basis_db
 	public $updatevon;				// varchar(32)
 	public $insertamum;    		  	// timestamp
 	public $insertvon;     	 		// varchar(32)
+	public $mailversand;			// boolean
+	public $teilnehmer_anonym;		// boolean
+	public $termine_anonym;			// boolean
     
     // tbl_coodle_ressource
     public $coodle_ressource_id;    // integer
@@ -105,6 +108,9 @@ class coodle extends basis_db
 			$this->updatevon = $row->updatevon;
 			$this->insertamum = $row->insertamum;
 			$this->insertvon = $row->insertvon;
+			$this->mailversand = $this->db_parse_bool($row->mailversand);
+			$this->teilnehmer_anonym = $this->db_parse_bool($row->teilnehmer_anonym);
+			$this->termine_anonym = $this->db_parse_bool($row->termine_anonym);
 		}
 		else
 		{
@@ -156,7 +162,7 @@ class coodle extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO campus.tbl_coodle(ersteller_uid, coodle_status_kurzbz, titel, beschreibung,
-				dauer, endedatum, insertamum, insertvon, updateamum, updatevon) VALUES('.
+				dauer, endedatum, insertamum, insertvon, updateamum, updatevon, mailversand, teilnehmer_anonym, termine_anonym) VALUES('.
 			      $this->db_add_param($this->ersteller_uid).', '.
 			      $this->db_add_param($this->coodle_status_kurzbz).', '.
 			      $this->db_add_param($this->titel).', '.
@@ -166,7 +172,10 @@ class coodle extends basis_db
 			      $this->db_add_param($this->insertamum).', '.
 			      $this->db_add_param($this->insertvon).', '.
 			      $this->db_add_param($this->updateamum).', '.
-			      $this->db_add_param($this->updatevon).');';
+			      $this->db_add_param($this->updatevon).', '.
+			      $this->db_add_param($this->mailversand, FHC_BOOLEAN, true).', '.
+			      $this->db_add_param($this->teilnehmer_anonym, FHC_BOOLEAN, true).', '.
+			      $this->db_add_param($this->termine_anonym, FHC_BOOLEAN, true).');';
 		}
 		else
 		{
@@ -184,7 +193,10 @@ class coodle extends basis_db
 				' dauer='.$this->db_add_param($this->dauer).', '.
 		      	' endedatum='.$this->db_add_param($this->endedatum).', '.
 		      	' updateamum='.$this->db_add_param($this->updateamum).', '.
-		      	' updatevon='.$this->db_add_param($this->updatevon).' '.
+		      	' updatevon='.$this->db_add_param($this->updatevon).', '.
+				' mailversand='.$this->db_add_param($this->mailversand, FHC_BOOLEAN).', '.
+				' teilnehmer_anonym='.$this->db_add_param($this->teilnehmer_anonym, FHC_BOOLEAN).', '.
+				' termine_anonym='.$this->db_add_param($this->termine_anonym, FHC_BOOLEAN).' '.
 		      	'WHERE coodle_id='.$this->db_add_param($this->coodle_id, FHC_INTEGER, false).';';
 		}
 		
@@ -383,6 +395,9 @@ class coodle extends basis_db
             $coodle->updatevon = $row->updatevon; 
             $coodle->endedatum = $row->endedatum; 
             $coodle->ersteller_uid = $row->ersteller_uid; 
+            $coodle->mailversand = $row->mailversand; 
+            $coodle->teilnehmer_anonym = $row->teilnehmer_anonym; 
+            $coodle->termine_anonym = $row->termine_anonym; 
             
             $this->result[] = $coodle; 
         }
@@ -505,7 +520,7 @@ class coodle extends basis_db
 	}
     
     /**
-	 * Speichert die aktuelle Ressource in die Datenbank
+	 * Speichert die Terminwahl der Ressource in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	 * andernfalls wird der Datensatz mit der ID in $coodle_id aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
@@ -648,6 +663,70 @@ class coodle extends basis_db
         }
         
         return false; 
+    }
+    
+	/**
+     * Überprüft ob der übergebenen Termin schon von einer Ressource gewählt wurde
+     * @param Integer $termin_id
+     * @return boolean true, wenn schon ein Termin schon gewaehlt wurde, sonst false
+     */
+    public function checkTerminGewaehlt($termin_id)
+    {
+        if( $termin_id == '' || !is_numeric($termin_id))
+        {
+            $this->errormsg = 'Ungültige ID übergeben';
+            return false; 
+        }
+        
+        $qry="SELECT * FROM campus.tbl_coodle_ressource_termin 
+            WHERE coodle_termin_id=".$this->db_add_param($termin_id, FHC_INTEGER).';';
+         
+        if($result = $this->db_query($qry))
+        {
+            if($row = $this->db_fetch_row($result))
+            {
+                return true; 
+            }
+            return false; 
+        }
+        
+        return false; 
+    }
+    
+	/**
+     * Zählt, wie oft ein Termin gewählt wurde
+     * @param Integer $termin_id
+     * @param Integer $ressource_id
+     * @return boolean 
+     */
+    public function countTermin($termin_id)
+    {
+        if($termin_id == '' || !is_numeric($termin_id))
+        {
+            $this->errormsg = 'Ungültige ID übergeben';
+            return false; 
+        }
+        
+        $qry="SELECT count(*) AS anzahl FROM campus.tbl_coodle_ressource_termin 
+            WHERE coodle_termin_id=".$this->db_add_param($termin_id, FHC_INTEGER).';';
+         
+   		if($result = $this->db_query($qry))
+        {
+            if($row = $this->db_fetch_object($result))
+            {
+                $this->anzahl = $row->anzahl; 
+            }
+            else
+            {
+                return false; 
+            }
+            return true; 
+        }
+        else
+        {
+            $this->errormsg = "Fehler bei der Abfrage aufgetreten";
+            return false; 
+        }
     }
     
     /**
@@ -844,20 +923,28 @@ class coodle extends basis_db
 
 	/**
 	 * Laedt die Terminvorschlaege zu einer Umfrage
+	 * Das Datum 1900-01-01 wird an die letzte Stelle sortiert, da es fuer "Keine Auswahl" benoetigt wird
 	 * @param $coodle_id
 	 * @return boolean
 	 */
 	public function getTermine($coodle_id)
 	{
-        if($coodle_id == '' || !is_numeric($coodle_id))
-        {
-            $this->errormsg = "Ungültige Coodle_id"; 
-            return false; 
-        }
-        
-		$qry = "SELECT * FROM campus.tbl_coodle_termin
-                    WHERE coodle_id=".$this->db_add_param($coodle_id, FHC_INTEGER, false).' 
-                    ORDER BY datum, uhrzeit;';
+		if($coodle_id == '' || !is_numeric($coodle_id))
+		{
+			$this->errormsg = "Ungültige Coodle_id"; 
+			return false; 
+		}
+		
+		$qry = "(SELECT * FROM campus.tbl_coodle_termin
+					WHERE coodle_id=".$this->db_add_param($coodle_id, FHC_INTEGER, false)." 
+					AND datum != '1900-01-01'
+					ORDER BY datum, uhrzeit)
+							
+				UNION ALL 
+							
+				(SELECT * FROM campus.tbl_coodle_termin
+					WHERE coodle_id=".$this->db_add_param($coodle_id, FHC_INTEGER, false)."
+					AND datum = '1900-01-01');";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -910,6 +997,9 @@ class coodle extends basis_db
                 $coodle->insertvon = $row->insertvon;
                 $coodle->updateamum = $row->updateamum; 
                 $coodle->updatevon = $row->updatevon; 
+                $coodle->mailversand = $row->mailversand; 
+	            $coodle->teilnehmer_anonym = $row->teilnehmer_anonym; 
+	            $coodle->termine_anonym = $row->termine_anonym; 
                 
                 $this->result[] = $coodle; 
             }
@@ -1210,6 +1300,9 @@ class coodle extends basis_db
             $coodle->updatevon = $row->updatevon; 
             $coodle->endedatum = $row->endedatum; 
             $coodle->ersteller_uid = $row->ersteller_uid; 
+            $coodle->mailversand = $row->mailversand; 
+            $coodle->teilnehmer_anonym = $row->teilnehmer_anonym; 
+            $coodle->termine_anonym = $row->termine_anonym; 
             
             $this->result[] = $coodle; 
         }

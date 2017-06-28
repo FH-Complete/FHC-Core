@@ -370,8 +370,9 @@ class prestudent extends person
 	 */
 	public function getPrestudentRT($datum)
 	{
-		$sql_query='SELECT
-						DISTINCT tbl_prestudent.prestudent_id,
+		$sql_query='SELECT * FROM (
+					SELECT
+						DISTINCT on(tbl_prestudent.prestudent_id) tbl_prestudent.prestudent_id,
 						tbl_person.vorname, tbl_person.nachname, tbl_person.person_id, tbl_person.titelpre,
 						tbl_person.titelpost, tbl_person.gebdatum,
 						tbl_reihungstest.*,
@@ -386,6 +387,7 @@ class prestudent extends person
 						AND tbl_rt_person.studienplan_id IN (SELECT studienplan_id FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id)
 						AND EXISTS(SELECT * FROM public.tbl_prestudentstatus JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
 							WHERE prestudent_id=tbl_prestudent.prestudent_id AND tbl_studiensemester.start>'.$this->db_add_param($datum).')
+					) a
 					ORDER BY nachname,vorname';
 
 		if(!$this->db_query($sql_query))
@@ -1748,7 +1750,7 @@ class prestudent extends person
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Loescht einen Prestudenten und legt einen Log-Eintrag dafuer an
 	 * @param integer $prestudent_id
@@ -1761,11 +1763,11 @@ class prestudent extends person
 			$this->errormsg = 'Prestudent_id ist ungueltig';
 			return false;
 		}
-	
+
 		$qry = "DELETE FROM public.tbl_prestudent
 				WHERE
 					prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
-	
+
 		if($this->load($prestudent_id))
 		{
 			$this->db_query('BEGIN;');
@@ -1818,7 +1820,7 @@ class prestudent extends person
 				$this->db_add_param($this->zgvdoktornation).','.
 				$this->db_add_param($this->gsstudientyp_kurzbz).','.
 				$this->db_add_param($this->aufnahmegruppe_kurzbz).');';
-					
+
 			if($log->save(true))
 			{
 				if($this->db_query($qry))

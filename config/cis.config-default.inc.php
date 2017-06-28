@@ -212,6 +212,14 @@ define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN',true);
 //User, welcher für das Anlegen von Anrechnungen bei der Prüfungsanmeldung verwendet wird
 define('CIS_PRUEFUNGSANMELDUNG_USER','p.pruefungsanmeldung');
 
+// Anmeldefristen für Prüfungen in Tagen;
+// Wenn nicht definiert: 3
+//define('CIS_PRUEFUNGSANMELDUNG_FRIST',3);
+
+// Mindestvorlaufzeit beim Anlegen von Prüfungen in Tagen
+// Wenn nicht definiert: 14
+//define('CIS_PRUEFUNGSTERMIN_FRIST',14);
+
 // Soll für die Prüfungsanmeldungen eine Anrechnung erstellt werden
 define('CIS_PRUEFUNGSANMELDUNG_ANRECHNUNG', true);
 
@@ -224,6 +232,6 @@ define('CIS_MEINELV_ANZAHL_SEMESTER_PAST', 3);
 //Gibt an, welche Buchungstypen bei der Überprüfung auf Einzahlung berücksichtigt werden
 define('CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN', serialize(array("Studiengebuehr")));
 
-//Gibt an bei welcher Länge die LV-Bezeichnungen im Menü abgeschnitten werden. Default: 21  
+//Gibt an bei welcher Länge die LV-Bezeichnungen im Menü abgeschnitten werden. Default: 21
 define('CIS_LVMENUE_CUTLENGTH', 21);
 ?>

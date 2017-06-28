@@ -965,4 +965,82 @@ function check_infrastruktur($uid)
 	else
 		return 0;
 }
+
+/**
+ * The function is used to prepare a string for a regular expression search in an sql-query.
+ * It lowers and trims the $inputString, splits it by character, compares each character with the character set 
+ * and replaces (if exists) this character with the entire set surrounded with square brackets.
+ * E.g: "ösi" returns "[oóŏǒôốộồổỗöọőòỏơớợờởỡōǫøǿõɛɔɵʘœ][sśšşŝșṡṣʂſʃʆßʅ][iíĭǐîïịìỉīįɨĩɩı]"
+ * 
+ * @param string $inputString The string to convert
+ * @param boolean $punctuationMark Default false. If true, the set is expanded with punctuation marks.
+ * @return string A regular expression-formatted string
+ */
+function generateSpecialCharacterString($inputString, $punctuationMark = false)
+{
+	$character_set = array(
+		'aáăắặằẳẵǎâấậầẩẫäạàảāąåǻãæǽɑɐɒ',
+		'bḅɓß',
+		'cćčçĉɕċ',
+		'dďḓḍɗḏđɖʤǳʣʥǆð',
+		'eéĕěêếệềểễëėẹèẻēęẽʒǯʓɘɜɝəɚ',
+		'fƒſʩﬁﬂʃʆʅɟʄ',
+		'gǵğǧģĝġɠḡɡɣ',
+		'hḫĥḥɦẖħɧɥʮʯų',
+		'iíĭǐîïịìỉīįɨĩɩıİ',
+		'jĳɟjǰĵʝȷɟʄ',
+		'kķḳƙḵĸʞ',
+		'lĺƚɬľļḽḷḹḻŀɫɭłƛɮǉʪʫ',
+		'mḿṁṃɱɯɰ',
+		'nŉńňņṋṅṇǹɲṉɳñǌŋŊ',
+		'oóŏǒôốộồổỗöọőòỏơớợờởỡōǫøǿõɛɔɵʘœ',
+		'pɸþ',
+		'rŕřŗṙṛṝɾṟɼɽɿɹɻɺ',
+		'sśšşŝșṡṣʂſʃʆßʅ',
+		'tťţṱțẗṭṯʈŧʨʧþðʦʇ',
+		'uʉúŭǔûüǘǚǜǖụűùủưứựừửữūųůũʊ',
+		'wẃŵẅẁʍ',
+		'yýŷÿẏỵỳƴỷȳỹʎ',
+		'zźžʑżẓẕʐƶ'
+	);
+	
+	if ($punctuationMark == true)
+		array_push($character_set, '--‒–——–—-');
+	
+		
+	/* the backslash \, 
+	 * the caret ^, 
+	 * the dollar sign $, 
+	 * the period or dot ., 
+	 * the vertical bar or pipe symbol |, 
+	 * the question mark ?, 
+	 * the asterisk or star *, 
+	 * the plus sign +, 
+	 * the opening parenthesis (, 
+	 * the closing parenthesis ), 
+	 * the opening square bracket [, 
+	 * the opening curly brace { */
+
+	// Trim and lower $inputString
+	$inputString = mb_strtolower(TRIM($inputString));
+	// Split string by character to compare it with the character set
+	$inputStringSplitted = preg_split('//u', $inputString, -1, PREG_SPLIT_NO_EMPTY);
+	
+	// Compare every character with the set and replace it
+	foreach ($inputStringSplitted AS $key => $item)
+	{
+		foreach ($character_set AS $set)
+		{
+			if (strpos($set, $item) !== false)
+				$inputStringSplitted[$key] = '['.$set.']';
+			elseif ($item == ' ')
+				$inputStringSplitted[$key] = '.*';
+		}
+	}
+		
+	// Recombine array to string
+	$inputString = implode('', $inputStringSplitted);
+
+	return $inputString;
+}
 ?>

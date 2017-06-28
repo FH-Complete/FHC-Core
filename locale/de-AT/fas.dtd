@@ -38,6 +38,10 @@
 <!ENTITY menu-prefs-kontofilterstg.label    	"Buchungen auf Studiengang filtern">
 <!ENTITY menu-prefs-kontofilterstg.accesskey	"B">
 
+<!ENTITY menu-prefs-number_displayed_past_studiensemester.key      	"A">
+<!ENTITY menu-prefs-number_displayed_past_studiensemester.label    	"Anzahl angezeigter vergangener Studiensemester">
+<!ENTITY menu-prefs-number_displayed_past_studiensemester.accesskey	"A">
+
 <!-- Berichte -->
 <!ENTITY menu-statistic.label		"Berichte">
 <!ENTITY menu-statistic.accesskey	"R">

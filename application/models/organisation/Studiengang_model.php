@@ -22,7 +22,7 @@ class Studiengang_model extends DB_Model
 			return $isEntitled;
 		if (($isEntitled = $this->isEntitled('bis.tbl_lgartcode', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $isEntitled;
-		
+
 		$allForBewerbungQuery = 'SELECT DISTINCT studiengang_kz,
 										typ,
 										organisationseinheittyp_kurzbz,
@@ -95,7 +95,7 @@ class Studiengang_model extends DB_Model
 								  WHERE t1.onlinebewerbung IS TRUE
 									AND t1.aktiv IS TRUE
 							   ORDER BY typ, studiengangbezeichnung, tbl_lgartcode.bezeichnung ASC';
-		
+
 		return $this->execQuery($allForBewerbungQuery);
 	}
 
@@ -110,11 +110,11 @@ class Studiengang_model extends DB_Model
 		$this->addJoin('lehre.tbl_studienplan', 'studienordnung_id');
 		// Then join with table lehre.tbl_studienplan_semester on column studienplan_id
 		$this->addJoin('lehre.tbl_studienplan_semester', 'studienplan_id');
-		
+
 		// Ordering by studiengang_kz and studienplan_id
 		$this->addOrder('public.tbl_studiengang.studiengang_kz');
 		$this->addOrder('lehre.tbl_studienplan.studienplan_id');
-		
+
 		$result = $this->loadTree(
 			'public.tbl_studiengang',
 			array(
@@ -130,7 +130,7 @@ class Studiengang_model extends DB_Model
 				'studienplaene'
 			)
 		);
-		
+
 		return $result;
 	}
 
@@ -156,7 +156,7 @@ class Studiengang_model extends DB_Model
 		// Ordering by studiengang_kz and studienplan_id
 		$this->addOrder('public.tbl_studiengang.bezeichnung');
 		$this->addOrder('lehre.tbl_studienplan.studienplan_id');
-		
+
 		$result = $this->loadTree(
 			'public.tbl_studiengang',
 			array(
@@ -175,12 +175,12 @@ class Studiengang_model extends DB_Model
 				'akadgrad'
 			)
 		);
-		
+
 		return $result;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function getAppliedStudiengang($person_id, $studiensemester_kurzbz, $titel)
 	{
@@ -200,10 +200,10 @@ class Studiengang_model extends DB_Model
 			'prestudent_id',
 			'LEFT'
 		);
-		
+
 		// Ordering by studiengang_kz and studienplan_id
 		$this->addOrder('public.tbl_studiengang.bezeichnung');
-		
+
 		$result = $this->loadTree(
 			'public.tbl_studiengang',
 			array(
@@ -222,12 +222,12 @@ class Studiengang_model extends DB_Model
 				'notizen'
 			)
 		);
-		
+
 		return $result;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function getAvailableReihungstestByPersonId($person_id)
 	{
@@ -241,22 +241,22 @@ class Studiengang_model extends DB_Model
 			return $isEntitled;
 		if (($isEntitled = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $isEntitled;
-		
+
 		$this->addJoin('lehre.tbl_studienordnung', 'studiengang_kz');
-		
+
 		$this->addJoin('lehre.tbl_studienplan', 'studienordnung_id');
-		
+
 		$this->addJoin('public.tbl_prestudentstatus', 'studienplan_id');
-		
+
 		$this->addJoin('public.tbl_prestudent', 'prestudent_id');
-		
+
 		$this->addFrom(
 			'(SELECT * FROM public.tbl_reihungstest LEFT JOIN public.tbl_rt_studienplan USING(reihungstest_id))',
 			'tbl_reihungstest'
 		);
-		
+
 		$this->addOrder('tbl_studiengang.bezeichnung, tbl_reihungstest.stufe, tbl_reihungstest.datum');
-		
+
 		return $this->loadTree(
 			'public.tbl_studiengang',
 			array('public.tbl_reihungstest'),

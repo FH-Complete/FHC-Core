@@ -268,6 +268,7 @@ if($result = $db->db_query("SELECT view_definition FROM information_schema.views
 	}
 }
 
+<<<<<<< HEAD
 // Creates table system.tbl_udf if it doesn't exist and grants privileges
 if(!$result = @$db->db_query("SELECT 1 FROM system.tbl_udf LIMIT 1"))
 {
@@ -332,6 +333,30 @@ if(!$result = @$db->db_query("SELECT udf_values FROM public.tbl_prestudent LIMIT
 		echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Added column udf_values to table public.tbl_prestudent';
+=======
+// Spalten mailversand,teilnehmer_anonym,termine_anonym in campus.tbl_coodle
+if(!$result = @$db->db_query("SELECT mailversand FROM campus.tbl_coodle LIMIT 1;"))
+{
+	$qry = "ALTER TABLE campus.tbl_coodle ADD COLUMN mailversand boolean;
+			ALTER TABLE campus.tbl_coodle ADD COLUMN teilnehmer_anonym boolean;
+			ALTER TABLE campus.tbl_coodle ADD COLUMN termine_anonym boolean;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_coodle: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>campus.tbl_coodle: Spalten mailversand, teilnehmer_anonym und termine_anonym hinzugefuegt!<br>';
+}
+
+// Spalte onlinebewerbung_studienplan in lehre.tbl_studienplan
+if(!$result = @$db->db_query("SELECT onlinebewerbung_studienplan FROM lehre.tbl_studienplan LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_studienplan ADD COLUMN onlinebewerbung_studienplan boolean NOT NULL DEFAULT true;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienplan: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>lehre.tbl_studienplan: Spalte onlinebewerbung_studienplan hinzugefuegt!<br>';
+>>>>>>> master
 }
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
@@ -380,7 +405,7 @@ $tabellen=array(
 	"campus.tbl_contentgruppe"  => array("content_id","gruppe_kurzbz","insertamum","insertvon"),
 	"campus.tbl_contentlog"  => array("contentlog_id","contentsprache_id","uid","start","ende"),
 	"campus.tbl_contentsprache"  => array("contentsprache_id","content_id","sprache","version","sichtbar","content","reviewvon","reviewamum","updateamum","updatevon","insertamum","insertvon","titel","gesperrt_uid"),
-	"campus.tbl_coodle"  => array("coodle_id","titel","beschreibung","coodle_status_kurzbz","dauer","endedatum","insertamum","insertvon","updateamum","updatevon","ersteller_uid"),
+	"campus.tbl_coodle"  => array("coodle_id","titel","beschreibung","coodle_status_kurzbz","dauer","endedatum","insertamum","insertvon","updateamum","updatevon","ersteller_uid","mailversand","teilnehmer_anonym","termine_anonym"),
 	"campus.tbl_coodle_ressource"  => array("coodle_ressource_id","coodle_id","uid","ort_kurzbz","email","name","zugangscode","insertamum","insertvon","updateamum","updatevon"),
 	"campus.tbl_coodle_termin"  => array("coodle_termin_id","coodle_id","datum","uhrzeit","auswahl"),
 	"campus.tbl_coodle_ressource_termin"  => array("coodle_ressource_id","coodle_termin_id","insertamum","insertvon"),
@@ -409,7 +434,7 @@ $tabellen=array(
 	"campus.tbl_pruefungsfenster" => array("pruefungsfenster_id","studiensemester_kurzbz","oe_kurzbz","start","ende"),
 	"campus.tbl_pruefung" => array("pruefung_id","mitarbeiter_uid","studiensemester_kurzbz","pruefungsfenster_id","pruefungstyp_kurzbz","titel","beschreibung","methode","einzeln","storniert","insertvon","insertamum","updatevon","updateamum","pruefungsintervall"),
 	"campus.tbl_pruefungstermin" => array("pruefungstermin_id","pruefung_id","von","bis","teilnehmer_max","teilnehmer_min","anmeldung_von","anmeldung_bis","ort_kurzbz","sammelklausur"),
-	"campus.tbl_pruefungsanmeldung" => array("pruefungsanmeldung_id","uid","pruefungstermin_id","lehrveranstaltung_id","status_kurzbz","wuensche","reihung","kommentar","statusupdatevon","statusupdateamum","anrechnung_id","pruefungstyp_kurzbz"),
+	"campus.tbl_pruefungsanmeldung" => array("pruefungsanmeldung_id","uid","pruefungstermin_id","lehrveranstaltung_id","status_kurzbz","wuensche","reihung","kommentar","statusupdatevon","statusupdateamum","anrechnung_id","pruefungstyp_kurzbz","insertamum"),
 	"campus.tbl_pruefungsstatus" => array("status_kurzbz","bezeichnung"),
 	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz","veranstaltung_id","insertamum","insertvon"),
 	"campus.tbl_resturlaub"  => array("mitarbeiter_uid","resturlaubstage","mehrarbeitsstunden","updateamum","updatevon","insertamum","insertvon","urlaubstageprojahr"),
@@ -467,7 +492,7 @@ $tabellen=array(
 	"lehre.tbl_studienordnung"  => array("studienordnung_id","studiengang_kz","version","gueltigvon","gueltigbis","bezeichnung","ects","studiengangbezeichnung","studiengangbezeichnung_englisch","studiengangkurzbzlang","akadgrad_id","insertamum","insertvon","updateamum","updatevon","ext_id", "status_kurzbz", "standort_id"),
 	"lehre.tbl_studienordnungstatus" => array("status_kurzbz","bezeichnung","reihenfolge"),
 	"lehre.tbl_studienordnung_semester"  => array("studienordnung_semester_id","studienordnung_id","studiensemester_kurzbz","semester"),
-	"lehre.tbl_studienplan" => array("studienplan_id","studienordnung_id","orgform_kurzbz","version","regelstudiendauer","sprache","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon","semesterwochen","testtool_sprachwahl","ext_id", "ects_stpl", "pflicht_sws", "pflicht_lvs"),
+	"lehre.tbl_studienplan" => array("studienplan_id","studienordnung_id","orgform_kurzbz","version","regelstudiendauer","sprache","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon","semesterwochen","testtool_sprachwahl","ext_id", "ects_stpl", "pflicht_sws", "pflicht_lvs","onlinebewerbung_studienplan"),
 	"lehre.tbl_studienplan_lehrveranstaltung" => array("studienplan_lehrveranstaltung_id","studienplan_id","lehrveranstaltung_id","semester","studienplan_lehrveranstaltung_id_parent","pflicht","koordinator","insertamum","insertvon","updateamum","updatevon","sort","ext_id", "curriculum","export","genehmigung"),
 	"lehre.tbl_studienplan_semester" => array("studienplan_semester_id", "studienplan_id", "studiensemester_kurzbz", "semester"),
 	"lehre.tbl_studienplatz" => array("studienplatz_id","studiengang_kz","studiensemester_kurzbz","orgform_kurzbz","ausbildungssemester","gpz","npz","insertamum","insertvon","updateamum","updatevon","ext_id", "apz", "studienplan_id"),

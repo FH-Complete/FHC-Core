@@ -38,17 +38,39 @@ if(!check_lektor($user))
 
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-        "http://www.w3.org/TR/html4/strict.dtd">
+		"http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet"  href="../../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<link rel="stylesheet" href="../../../skin/styles/jquery.css" type="text/css">
-	<link rel="stylesheet" href="../../../skin/styles/jquery-ui1.9.2.custom.min.css" type="text/css">
+	<link rel="stylesheet" href="../../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
+	<link rel="stylesheet" href="../../../skin/jquery.ui.timepicker.css" type="text/css"/>
 	<script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script>
-	<script type="text/javascript" src="../../../include/tiny_mce/tiny_mce.js"></script>
-	
+	<script src="../../../include/tiny_mce/tiny_mce.js" type="text/javascript" ></script>
+	<script src="../../../include/js/jquery.ui.timepicker.js" type="text/javascript" ></script>
+	<script type="text/javascript">
+	$(document).ready(function() 
+	{ 
+		$.datepicker.setDefaults( $.datepicker.regional[ "de" ] );
+		$("#datepicker_datum").datepicker(	
+		{
+			changeMonth: true,
+			defaultDate: "+7",
+			minDate: "0",
+		});
+		$(".timepicker").timepicker(
+		{
+			showPeriodLabels: false,
+			showHours: false,
+			minuteText: "",
+			minutes: {starts: 30, ends: 150, interval: 30},
+			rows: 5,
+		});
+				
+	});
+	</script>
 	<script type="text/javascript">
 	tinyMCE.init
 	(
@@ -62,56 +84,147 @@ echo '
 			
 		// Theme options
 		theme_advanced_buttons1 : "bold,italic,underline,|,justifyleft,justifycenter,justifyright,justifyfull,|,link,unlink,|,bullist,pastetext", 
-    	theme_advanced_buttons2 : "", 
-    	theme_advanced_buttons3 : "",
-	    theme_advanced_toolbar_location : "top",
-        theme_advanced_toolbar_align : "center",
-        theme_advanced_statusbar_location : "bottom",
-        theme_advanced_resizing : true,
-        force_br_newlines : true,
-        force_p_newlines : false,
-        forced_root_block : "",
-        //Formatierungen beim Einfuegen entfernen
-        paste_auto_cleanup_on_paste : true,
-        paste_remove_styles: true,
-        paste_remove_styles_if_webkit: true,
-        paste_strip_class_attributes: true,
-        paste_retain_style_properties: "",
-        paste_text_sticky: true,
-        setup : function(ed) 
-        {    
-        	ed.onInit.add(function(ed)
-            {    ed.pasteAsPlainText = true;
-                ed.controlManager.setActive("pastetext", true);
-            });
-           }
+		theme_advanced_buttons2 : "", 
+		theme_advanced_buttons3 : "",
+		theme_advanced_toolbar_location : "top",
+		theme_advanced_toolbar_align : "center",
+		theme_advanced_statusbar_location : "bottom",
+		theme_advanced_resizing : true,
+		force_br_newlines : true,
+		force_p_newlines : false,
+		forced_root_block : "",
+		//Formatierungen beim Einfuegen entfernen
+		paste_auto_cleanup_on_paste : true,
+		paste_remove_styles: true,
+		paste_remove_styles_if_webkit: true,
+		paste_strip_class_attributes: true,
+		paste_retain_style_properties: "",
+		paste_text_sticky: true,
+		setup : function(ed) 
+		{	
+			ed.onInit.add(function(ed)
+			{	ed.pasteAsPlainText = true;
+				ed.controlManager.setActive("pastetext", true);
+			});
+		   }
 		
 		}
 	);
+	
+	function checkrequired()
+	{
+		var error = false;
+		if(document.getElementById("titel").value == "")
+		{
+			document.getElementById("titel").style.border = "solid red 2px";
+			error = true;
+		}
+		else
+		{
+			document.getElementById("titel").style.border = "";
+		}
+		if(document.getElementById("dauer").value == "")
+		{
+			document.getElementById("dauer").style.border = "solid red 2px";
+			error = true;
+		}
+		else
+		{
+			document.getElementById("dauer").style.border = "";
+		}
+		if(document.getElementById("datepicker_datum").value == "")
+		{
+			document.getElementById("datepicker_datum").style.border = "solid red 2px";
+			error = true;
+		}
+		else
+		{
+			document.getElementById("datepicker_datum").style.border = "";
+		}
+		
+		var datum = document.getElementById("datepicker_datum").value;
+		var Tag = datum.substring(0,2); 
+		var Monat = datum.substring(3,5);
+		Monat = Monat-1;
+		var Jahr = datum.substring(6,10);
+		//Neues Datumsobjekt erzeugen
+		var Enddatum = new Date(Jahr, Monat, Tag,23,59,59);
+		var Heute = new Date();
+		if (Enddatum < Heute)
+		{
+			alert("Das Umfrageende darf nicht in der Vergangenheit liegen");
+			document.getElementById("datepicker_datum").style.border = "solid red 2px";
+			error = true;
+		}
+		else
+		{
+			document.getElementById("datepicker_datum").style.border = "";
+		}
+		
+		if (error)
+			return false;
+		else
+			return true;
+	}
 	</script>
 	<style>
 	#wrapper 
 	{
-		width: 70%;
+		width: 80%;
 		padding: 0 10px 15px 10px;
 		border: 1px solid #ccc;
 		background: #eee;
 		text-align: left;
 	}
-
 	#wrapper h4 
 	{
-		font-size: 16px;
+		font-size: 17px;
 		margin-top: 0;
-		padding-top: 1em;
-	}
-		
+		padding-top: 10px;
+		padding-bottom: 10px;
+		text-decoration: none;
+	}	
 	#weiter
 	{
-		width: 70%;
-		text-align: right;
+		width: 80%;
+		text-align: center;
 		margin-top: 10px;
 		padding: 10px;
+		
+		padding: 10px 10px 10px 10px;
+		border: 1px solid #D6E9C6;
+		background: #DFF0D8;
+	}
+	#weiter:hover
+	{
+		width: 80%;
+		text-align: center;
+		margin-top: 10px;
+		padding: 10px;
+		
+		padding: 10px 10px 10px 10px;
+		border: 1px solid #ccc;
+		background: #ddd;
+	}
+	#laufend
+	{
+		width: 80%;
+		text-align: center;
+		margin-top: 10px;
+		padding: 10px;
+		
+		padding: 10px 10px 10px 10px;
+		border: 1px solid #ccc;
+		background: #EDCECE;
+	}
+	a:hover
+	{
+		text-decoration: none;
+	}
+	.ui-timepicker-table td a 
+	{
+		padding:0.2em 0.3em 0.2em 0.3em;
+		width: 1.8em;
 	}
 	</style>
 	<title>'.$p->t('coodle/coodle').'</title>
@@ -123,10 +236,24 @@ if(isset($_POST['save']))
 {
 	//Speichern
 	$titel = $_POST['titel'];
-	$beschreibung = $_POST['beschreibung'];
+	$beschreibung = ($_POST['beschreibung']==''?null:$_POST['beschreibung']);
 	$dauer = $_POST['dauer'];
 	$endedatum = $_POST['endedatum'];
 	$coodle_id = $_POST['coodle_id'];
+	if (isset($_POST['mailversand']))
+			$mailversand = true;
+		else 
+			$mailversand = false;
+			
+	if (isset($_POST['teilnehmer_anonym']))
+			$teilnehmer_anonym = true;
+		else 
+			$teilnehmer_anonym = false;
+	
+	if (isset($_POST['termin_anonym']))
+			$termin_anonym = true;
+		else 
+			$termin_anonym = false;
 	
 	$coodle = new coodle();
 	
@@ -139,15 +266,15 @@ if(isset($_POST['save']))
 		{
 			die($p->t('basis/keineBerechtigung'));
 		}
-		$coodle->new=false;
+		$coodle->new = false;
 	}
 	else
 	{
-		$coodle->new=true;
+		$coodle->new = true;
 		$coodle->ersteller_uid = $user;
 		$coodle->insertamum = date('Y-m-d H:i:s');
 		$coodle->insertvon = $user;
-		$coodle->coodle_status_kurzbz='neu';
+		$coodle->coodle_status_kurzbz = 'neu';
 	}
 		
 	$coodle->titel = $titel;
@@ -156,10 +283,25 @@ if(isset($_POST['save']))
 	$coodle->endedatum = $datum_obj->formatDatum($endedatum, 'Y-m-d');
 	$coodle->updateamum = date('Y-m-d H:i:s');
 	$coodle->updatevon = $user;
+	$coodle->mailversand = $mailversand;
+	$coodle->teilnehmer_anonym = $teilnehmer_anonym;
+	$coodle->termine_anonym = $termin_anonym;
 	
 	if($coodle->save())
 	{
 		$message.= '<span class="ok">'.$p->t('global/erfolgreichgespeichert').'</span>';
+		//Fuer alle neuen Umfragen wird ein Termine am 01.01.1900 00:00:01 als Option fuer "Keine Auswahl" angelegt
+		if ($coodle->new == true)
+		{
+			$coodletermin = new coodle();
+			
+			$coodletermin->datum = '1900-01-01';
+			$coodletermin->uhrzeit = '00:00:01';
+			$coodletermin->coodle_id = $coodle->coodle_id;
+			
+			if (!$coodletermin->saveTermin(true))
+				$message.= '<span class="error">'.$coodletermin->errormsg.'</span>';
+		}
 	}
 	else
 	{
@@ -175,9 +317,9 @@ elseif(isset($_GET['coodle_id']))
 		if($coodle->ersteller_uid!=$user)
 			die($p->t('global/keineBerechtigungFuerDieseSeite'));
 			
-		if($coodle->coodle_status_kurzbz!='neu')
+		if(($coodle->coodle_status_kurzbz!='neu') && ($coodle->coodle_status_kurzbz!='laufend'))
 		{
-			// Wenn bereits gestartet, abgeschlosse oder storniert, 
+			// Wenn bereits abgeschlosse oder storniert, 
 			// kann nicht mehr bearbeitet werden
 			die($p->t('coodle/umfrageNichtGueltig'));
 		}
@@ -193,6 +335,7 @@ else
 	$coodle = new coodle();
 	$coodle->endedatum=date('d.m.Y',strtotime("+7 day"));
 	$coodle->dauer=60;
+	$coodle->mailversand=true;
 }
 echo '
 <a href="uebersicht.php">&lt;&lt;&nbsp;'.$p->t('coodle/zurueckZurUebersicht').'</a><br>
@@ -202,6 +345,8 @@ echo '<div id="wrapper">
 <h4>';
 if($coodle->coodle_id=='')
 	echo $p->t('coodle/neuerEintrag');
+elseif($coodle->coodle_status_kurzbz=='laufend')
+	echo $p->t('coodle/laufendeUmfrageBearbeiten');
 else
 	echo $p->t('coodle/bearbeiten');
 echo '</h4>';
@@ -210,27 +355,49 @@ echo '
 <input type="hidden" name="coodle_id" value="'.$db->convert_html_chars($coodle->coodle_id).'" />
 <table>
 	<tr>
-		<td>'.$p->t('coodle/titel').'</td>
-		<td><input type="text" name="titel" value="'.$db->convert_html_chars($coodle->titel).'" maxlength="64" size="50"/></td>
+		<td valign="top">'.$p->t('coodle/titel').'</td>
+		<td valign="top">
+			<input type="hidden" name="titel" value="'.$db->convert_html_chars($coodle->titel).'" />
+			<input id="titel" placeholder="'.$p->t('coodle/titelEingeben').'" title="'.$p->t('coodle/titelInfotext').'" type="text" name="titel" value="'.$db->convert_html_chars($coodle->titel).'" maxlength="64" size="50" '.($coodle->coodle_status_kurzbz=='laufend'?'disabled':'').'/></td>
+		<td valign="top" style="color:grey">'.$p->t('coodle/titelInfotext').'</td>
 	</tr>
 	<tr>
 		<td valign="top">'.$p->t('coodle/beschreibung').'</td>
-		<td><textarea name="beschreibung" rows="6" cols="50">'.$db->convert_html_chars($coodle->beschreibung).'</textarea></td>
+		<td><textarea name="beschreibung" rows="6" cols="50" >'.$db->convert_html_chars($coodle->beschreibung).'</textarea></td>
+		<td valign="top" style="color:grey"><br><br>'.$p->t('coodle/beschreibungInfotext').'</td>
 	</tr>
 	<tr>
-		<td>'.$p->t('coodle/dauer').'</td>
-		<td>
-			<input type="text" name="dauer" value="'.$db->convert_html_chars($coodle->dauer).'" maxlength="5" size="2"/>
+		<td valign="top">'.$p->t('coodle/dauer').'</td>
+		<td valign="top">
+			<input type="hidden" name="dauer" value="'.$db->convert_html_chars($coodle->dauer).'" />
+			<input id="dauer" class="timepicker" type="text" name="dauer" value="'.$db->convert_html_chars($coodle->dauer).'" maxlength="5" size="2" '.($coodle->coodle_status_kurzbz=='laufend'?'disabled':'').'/>
 			'.$p->t('coodle/dauerminuten').'
 		</td>
+		<td valign="top" style="color:grey">'.$p->t('coodle/dauerInfotext').'</td>
 	</tr>
 	<tr>
-		<td>'.$p->t('coodle/endedatum').'</td>
-		<td><input type="text" name="endedatum" value="'.$db->convert_html_chars($datum_obj->formatDatum($coodle->endedatum,'d.m.Y')).'" maxlength="10" size="10"/></td>
+		<td valign="top">'.$p->t('coodle/endedatum').'</td>
+		<td valign="top"><input id="datepicker_datum" type="text" name="endedatum" value="'.$db->convert_html_chars($datum_obj->formatDatum($coodle->endedatum,'d.m.Y')).'" maxlength="10" size="10"/></td>
+		<td valign="top" style="color:grey">'.$p->t('coodle/endeInfotext').'</td>
+	</tr>
+	<tr>
+		<td valign="top">'.$p->t('coodle/mailversand').'</td>
+		<td valign="top"><input id="mailversand" type="checkbox" name="mailversand" '.($coodle->mailversand=='t'?'checked':'').'/></td>
+		<td valign="top" style="color:grey">'.$p->t('coodle/infotextMailversand').'</td>
+	</tr>
+	<tr>
+		<td valign="top">'.$p->t('coodle/teilnehmerAnonym').'</td>
+		<td valign="top"><input id="teilnehmer_anonym" type="checkbox" name="teilnehmer_anonym" '.($coodle->teilnehmer_anonym=='t'?'checked':'').'/></td>
+		<td valign="top" style="color:grey">'.$p->t('coodle/infotextTeilnehmerAnonym').'</td>
+	</tr>
+	<tr>
+		<td valign="top">'.$p->t('coodle/terminAnonym').'</td>
+		<td valign="top"><input id="termin_anonym" type="checkbox" name="termin_anonym" '.($coodle->termine_anonym=='t'?'checked':'').'/></td>
+		<td valign="top" style="color:grey">'.$p->t('coodle/infotextTerminAnonym').'</td>
 	</tr>
 	<tr>
 		<td></td>
-		<td><input type="submit" name="save" value="'.$p->t('global/speichern').'"/> '.$message.'</td>
+		<td><input type="submit" name="save" value="'.$p->t('global/speichern').'" onClick="return checkrequired();"/> '.$message.'</td>
 	</tr>
 </table>';
 
@@ -241,8 +408,10 @@ echo '
 
 if($coodle->coodle_id)
 {
-	echo '<div id="weiter"><a href="termin.php?coodle_id='.$db->convert_html_chars($coodle->coodle_id).'"> &gt;&gt; '.$p->t('coodle/weiterZurTerminauswahl').'</a></div>';
+	echo '<a href="termin.php?coodle_id='.$db->convert_html_chars($coodle->coodle_id).'"><div id="weiter">'.$p->t('coodle/weiterZurTerminauswahl').'</div></a>';
 }
+/*elseif ($coodle->coodle_status_kurzbz=='laufend')
+	echo '<div id="laufend">'.$p->t('coodle/umfrageLaeuftBereits').'</div>';*/
 
 echo '</body>
 </html>';

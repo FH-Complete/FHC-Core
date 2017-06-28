@@ -25,7 +25,7 @@ require_once("fpdf.php");
 
 
 class MyPdf extends FPDF {
-	
+
   /**
 	 * Konstruktor
 	 *
@@ -43,12 +43,12 @@ class MyPdf extends FPDF {
 	 *                      letter
 	 *                      legal
 	 */
-	function MyPdf($orientation='P',$unit='mm',$format='A4')
+	function __construct($orientation='P',$unit='mm',$format='A4')
 	{
 	    //Call parent constructor
-	    $this->FPDF($orientation,$unit,$format);
+	    parent::__construct($orientation,$unit,$format);
 	}
-	
+
   /**
    * Additional getter methods
    **/
@@ -79,14 +79,14 @@ class MyPdf extends FPDF {
   function GetPageWidth() {
     return $this->w-$this->rMargin-$this->lMargin;
   }
-       
+
   function GetLineWidth() {
     return $this->LineWidth;
   }
 
   function FontExists($family, $style='') {
     $fontkey=$family.$style;
-    return isset($this->fonts[$fontkey]) || 
+    return isset($this->fonts[$fontkey]) ||
       isset($this->CoreFonts[$fontkey]);
   }
 
@@ -94,7 +94,7 @@ class MyPdf extends FPDF {
    * Methods to capture output
    */
   function startCapture() {
-    if($this->state==2) {	 
+    if($this->state==2) {
       $buf = $this->pages[$this->page];
       $this->pages[$this->page] = "";
       return $buf;
@@ -103,11 +103,11 @@ class MyPdf extends FPDF {
       $buf = $this->buffer;
       $this->buffer = "";
       return $buf;
-    }	
+    }
   }
 
-  function endCapture($buffer) {	
-    if($this->state==2) {	 
+  function endCapture($buffer) {
+    if($this->state==2) {
       $buf = $this->pages[$this->page];
       $this->pages[$this->page] = $buffer;
       return $buf;
@@ -116,17 +116,17 @@ class MyPdf extends FPDF {
       $buf = $this->buffer;
       $this->buffer = $buffer;
       return $buf;
-    }	
+    }
   }
 
   function appendBuffer($buffer) {
-    if($this->state==2) {	 
+    if($this->state==2) {
       $this->pages[$this->page] .= $buffer;
     }
     else {
       $this->buffer .= $buffer;
     }
-	
+
   }
 
   /**
@@ -165,14 +165,14 @@ class MyPdf extends FPDF {
    * Write string regarding to \n as line breaks
    * Return an array containing number of line, width and height
    * of this textual block. The align paramtere accepts L, R and C
-   * get values using: 
+   * get values using:
    * list($width, $height, $no, $firstX, $firstY, $lastX, $lastYl) = $pdf->Text2();
    **/
   function Text2($x, $y, $text, $align="L", $lineHeight=NULL, $xNewLine=NULL, $width=NULL) {
     if (!$xNewLine) {
       $xNewLine = $x;
     }
-    
+
     $lines = explode('\n', $text);
     $height = ($lineHeight)?$lineHeight:$this->FontSize;
     //oesi - add parameter width for set the content-width of fo:block
@@ -187,29 +187,29 @@ class MyPdf extends FPDF {
     $maxWidth = 0;
     $sx = $x;
     $sy = $y;
-    foreach($lines as $line) 
-    {    	
-    	
-		$width = $this->GetStringWidth($line);	 
-		do 
+    foreach($lines as $line)
+    {
+
+		$width = $this->GetStringWidth($line);
+		do
       	{
-			//$w=$this->w-$this->rMargin-$x;	
+			//$w=$this->w-$this->rMargin-$x;
 			$w = $pw-$x; //oesi - changed
 			//echo "w:$w<br>";
 			//$wmax=($w-2*$this->cMargin)*1000/$this->FontSize;
 			$noc = $this->GetNumberOfChars($w, $line);
 			//echo "noc:$noc xNewLine: $xNewLine x:$x w:$w strlen:".strlen($line)." line:$line<br>";
-			if ($noc == -1) 
+			if ($noc == -1)
 			{
-				if ($x == $xNewLine) 
+				if ($x == $xNewLine)
 				{
 	    			//word has not enough space on one line, draw it beyond borders
 	    			$noc = strlen($line);
 	  			}
-	  			else 
+	  			else
 	  			{
 	  				//echo "NEWLINE";
-	    			if ($nb == 0) 
+	    			if ($nb == 0)
 	    			{
 	      				$sy += $height;
 	      				$sx = $xNewLine;
@@ -221,12 +221,12 @@ class MyPdf extends FPDF {
 	    			continue;
 	  			}
 			}
-	
+
 			$showLine = substr($line, 0, $noc);
 			$textWidth = $this->GetStringWidth($showLine);
 			//echo "showline: $showLine<br>";
 			//echo "nb:$nb x:$x w:$w textwidth:$textWidth showline:$showLine<br>";
-			switch ($align) 
+			switch ($align)
 			{
 				case "R":
 					$tx = $pw-$textWidth;
@@ -238,12 +238,12 @@ class MyPdf extends FPDF {
 				default:
 					$tx = $x;
 			}
-	
+
 			$this->Text($tx, $y+$height, $showLine);
 			$line = trim(substr($line, $noc));
 			$width = $this->GetStringWidth($line);
-			
-			if ($textWidth > $maxWidth) 
+
+			if ($textWidth > $maxWidth)
 			{
 			  $maxWidth = $textWidth;
 			}
@@ -263,7 +263,7 @@ class MyPdf extends FPDF {
 
     return array($maxWidth, $tot_height, $nb, $sx, $sy, $tx+$textWidth, $y-$height);
   }
-      
+
   /*
    This extension allows to set a dash pattern and draw dashed lines or rectangles.
    $pdf->SetDash(4,2); //4mm on, 2mm off
@@ -327,22 +327,22 @@ class MyPdf extends FPDF {
     $yc = $y+$r;
     $this->_out(sprintf('%.2f %.2f l', $xc*$k,($hp-$y)*$k ));
 
-    $this->_Arc($xc + $r*$MyArc, $yc - $r, $xc + $r, $yc - $r*$MyArc, 
+    $this->_Arc($xc + $r*$MyArc, $yc - $r, $xc + $r, $yc - $r*$MyArc,
 		$xc + $r, $yc);
     $xc = $x+$w-$r ;
     $yc = $y+$h-$r;
     $this->_out(sprintf('%.2f %.2f l',($x+$w)*$k,($hp-$yc)*$k));
-    $this->_Arc($xc + $r, $yc + $r*$MyArc, $xc + $r*$MyArc, $yc + $r, $xc, 
+    $this->_Arc($xc + $r, $yc + $r*$MyArc, $xc + $r*$MyArc, $yc + $r, $xc,
 		$yc + $r);
     $xc = $x+$r ;
     $yc = $y+$h-$r;
     $this->_out(sprintf('%.2f %.2f l',$xc*$k,($hp-($y+$h))*$k));
-    $this->_Arc($xc - $r*$MyArc, $yc + $r, $xc - $r, $yc + $r*$MyArc, 
+    $this->_Arc($xc - $r*$MyArc, $yc + $r, $xc - $r, $yc + $r*$MyArc,
 		$xc - $r, $yc);
     $xc = $x+$r ;
     $yc = $y+$r;
     $this->_out(sprintf('%.2f %.2f l',($x)*$k,($hp-$yc)*$k ));
-    $this->_Arc($xc - $r, $yc - $r*$MyArc, $xc - $r*$MyArc, $yc - $r, $xc, 
+    $this->_Arc($xc - $r, $yc - $r*$MyArc, $xc - $r*$MyArc, $yc - $r, $xc,
 		$yc - $r);
     $this->_out($op);
   }
@@ -352,7 +352,7 @@ class MyPdf extends FPDF {
    * $pdf->Rotate($angle,$x,$y);
    * $pdf->Text($x,$y,$txt);
    * $pdf->Rotate(0);
-   */ 
+   */
   function Rotate($angle,$x=-1,$y=-1) {
     if($x==-1)
       $x=$this->x;
@@ -420,7 +420,7 @@ class MyPdf extends FPDF {
 	$op = 'S';
 	break;
       }
-      
+
       if ($rx) {
       if (!$ry)
 	$ry = $rx;
@@ -443,7 +443,7 @@ class MyPdf extends FPDF {
 	$this->_out(sprintf('q %.2f %.2f %.2f %.2f %.2f %.2f cm', cos($a), -1 * sin($a), sin($a), cos($a), $x0*10, $y0*10));
 	$x0 = 0;
 	$y0 = 0;
-      }    
+      }
 
       $t1 = $astart;
       $a0 = $x0 + ($rx * cos($t1));
@@ -484,7 +484,7 @@ class MyPdf extends FPDF {
       $op='B';
     else
       $op='S';
-  
+
     $this->_out(sprintf('h %s', $op));
   }
 
@@ -495,7 +495,7 @@ class MyPdf extends FPDF {
       $op='B';
     else
       $op='S';
-  
+
     $this->_out(sprintf('%s', $op));
   }
 
@@ -520,7 +520,7 @@ class MyPdf extends FPDF {
   function _Point($x, $y) {
     $this->_out(sprintf('%.2f %.2f m', $x * $this->k, ($this->h - $y) * $this->k));
   }
-  
+
   // Draws a B�zier curve from last draw point
   // Parameters:
   // - x1, y1: Control point 1
@@ -528,9 +528,9 @@ class MyPdf extends FPDF {
   // - x3, y3: End point
   function _Curve($x1, $y1, $x2, $y2, $x3, $y3) {
     $this->_out(sprintf('%.2f %.2f %.2f %.2f %.2f %.2f c', $x1 * $this->k, ($this->h - $y1) * $this->k, $x2 * $this->k, ($this->h - $y2) * $this->k, $x3 * $this->k, ($this->h - $y3) * $this->k));
-  }  
+  }
 
-  
+
   // Draws a cubic B�zier curve from last draw point
   // Parameters:
   // - x2, y2: Control point 2
@@ -547,7 +547,7 @@ class MyPdf extends FPDF {
 
   function _CurveRef2($x1, $y1, $x3, $y3) {
     $this->_out(sprintf('%.2f %.2f %.2f %.2f y', $x1 * $this->k, ($this->h - $y1) * $this->k, $x3 * $this->k, ($this->h - $y3) * $this->k));
-  }  
+  }
 
   // Draws a line from last draw point
   // Parameters:
@@ -593,7 +593,7 @@ class MyPdf extends FPDF {
 	//echo "X2:$x0:$y0<br>";
 	//$x0 -=  cos($a);
 	//$y0 -= $ry * sin($a);
-      }    
+      }
 
       $t1 = $astart;
       $a0 = $x0 + ($rx * cos($t1));

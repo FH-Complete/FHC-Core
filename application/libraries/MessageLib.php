@@ -453,7 +453,7 @@ class MessageLib
 					// If the person has an email account
 					if (!is_null($result->retval[$i]->receiver) && $result->retval[$i]->receiver != '')
 					{
-						$href = APP_ROOT . $this->ci->config->item('message_html_view_url') . $result->retval[0]->token;
+						$href = $this->ci->config->item('message_server') . $this->ci->config->item('message_html_view_url') . $result->retval[0]->token;
 						// Using a template for the html email body
 						$body = $this->ci->parser->parse(
 							'templates/mailHTML',
@@ -588,7 +588,7 @@ class MessageLib
 					if ($multiPartMime === true)
 					{
 						// Using a template for the html email body
-						$href = APP_ROOT . $this->ci->config->item('message_html_view_url') . $result->retval[0]->token;
+						$href = $this->ci->config->item('message_server') . $this->ci->config->item('message_html_view_url') . $result->retval[0]->token;
 						$bodyMsg = $this->ci->parser->parse(
 							'templates/mailHTML',
 							array(

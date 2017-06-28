@@ -623,5 +623,76 @@ class gruppe extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Sucht nach Gruppen in gruppe_kurzbz, bezeichnung und beschreibung.
+	 *
+	 * @param array $searchItems Array mit Suchbegriffen, nach denen gesucht werden soll
+	 * @param boolean $aktiv (optional). Default true. Wenn false werden nur inaktive gruppen geladen, wenn null dann alle
+	 * @param integer $limit (optional). Limit an Ergebnissen
+	 * 
+	 * @return true, wenn erfolgreich, false im Fehlerfall
+	 */
+	public function searchGruppen($searchItems, $aktiv = true, $limit = null)
+	{
+		$qry = "SELECT 
+				* 
+				FROM
+					public.tbl_gruppe
+				WHERE";
+		if(is_null($aktiv))
+			$qry.=" (";
+		elseif($aktiv==true)
+			$qry.=" tbl_gruppe.aktiv=true AND (";
+		elseif($aktiv==false)
+			$qry.=" tbl_gruppe.aktiv=false AND (";
+
+		$qry.=" lower(gruppe_kurzbz) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
+		$qry.=" OR lower(bezeichnung) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
+		$qry.=" OR lower(beschreibung) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
+
+		$qry.=") ORDER BY gruppe_kurzbz";
+
+		if(!is_null($limit) && is_numeric($limit))
+			$qry.=" LIMIT ".$limit;
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$grp_obj = new gruppe();
+				
+				$grp_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$grp_obj->studiengang_kz = $row->studiengang_kz;
+				$grp_obj->bezeichnung = $row->bezeichnung;
+				$grp_obj->semester = $row->semester;
+				$grp_obj->sort = $row->sort;
+				$grp_obj->mailgrp = $this->db_parse_bool($row->mailgrp);
+				$grp_obj->lehre = $this->db_parse_bool($row->lehre);
+				$grp_obj->beschreibung = $row->beschreibung;
+				$grp_obj->sichtbar = $this->db_parse_bool($row->sichtbar);
+				$grp_obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$grp_obj->content_visible = $this->db_parse_bool($row->content_visible);
+				$grp_obj->generiert = $this->db_parse_bool($row->generiert);
+				$grp_obj->updateamum = $row->updateamum;
+				$grp_obj->updatevon = $row->updatevon;
+				$grp_obj->insertamum = $row->insertamum;
+				$grp_obj->insertvon = $row->insertvon;
+				$grp_obj->orgform_kurzbz = $row->orgform_kurzbz;
+				$grp_obj->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$grp_obj->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
+				$grp_obj->aufnahmegruppe = $this->db_parse_bool($row->aufnahmegruppe);
+				
+				$this->result[] = $grp_obj;
+			}
+			$this->errormsg = $qry;
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

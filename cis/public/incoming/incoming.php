@@ -455,7 +455,7 @@ else if($method=="lehrveranstaltungen")
 			
 			if(!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id,  $_GET['id']) && $freieplaetze>0)
 			{
-				if($preincoming->addLehrveranstaltung($preincoming->preincoming_id, $_GET['id'], date('Y-m-d H:i:s')))
+				if($preincoming->addLehrveranstaltung($preincoming->preincoming_id, $_GET['id'], date('Y-m-d H:i:s'), 'Incoming '.$preincoming->preincoming_id))
 					$message = '<span style="color: green"><b>'.($p->t('global/erfolgreichgespeichert')).'</b></span>';
 				else
 					$message = '<span style="color: red"><b>'.($p->t('global/fehleraufgetreten')).'</b></span>';

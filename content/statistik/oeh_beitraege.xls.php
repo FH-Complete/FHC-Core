@@ -157,14 +157,17 @@ if($studiensemester_kurzbz!='')
 		(SELECT strasse FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_strasse,
 		titelpost, get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") as status,
 		(SELECT ausbildungssemester FROM public.tbl_prestudentstatus WHERE prestudent_id=public.tbl_prestudent.prestudent_id AND tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' ORDER BY datum desc LIMIT 1) AS semester
-		FROM public.tbl_person
-		JOIN public.tbl_benutzer using(person_id)
-		JOIN public.tbl_student on(uid=student_uid)
-		JOIN public.tbl_prestudent using(prestudent_id)
-		JOIN public.tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
-		WHERE tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
-		AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand','Praktikant','Incoming')
-		AND tbl_student.studiengang_kz<999 AND tbl_prestudent.bismelden=true";
+		FROM 
+			public.tbl_person
+			JOIN public.tbl_benutzer using(person_id)
+			JOIN public.tbl_student on(uid=student_uid)
+			JOIN public.tbl_prestudent using(prestudent_id)
+			JOIN public.tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
+		WHERE 
+			tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+			AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand','Praktikant','Incoming')
+			AND tbl_student.studiengang_kz<10000 
+			AND tbl_prestudent.bismelden=true";
 	// AND tbl_benutzer.aktiv=true
 
 	if($result = $db->db_query($qry))
@@ -331,19 +334,21 @@ if($studiensemester_kurzbz!='')
 	(SELECT strasse FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_strasse,
 	titelpost, get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") as status,
 	(SELECT ausbildungssemester FROM public.tbl_prestudentstatus WHERE prestudent_id=public.tbl_prestudent.prestudent_id AND tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' ORDER BY datum desc LIMIT 1) AS semester
-	FROM public.tbl_person
-	JOIN public.tbl_konto as ka using(person_id)
-	JOIN public.tbl_konto as kb using(person_id)
-	JOIN public.tbl_benutzer using(person_id)
-	JOIN public.tbl_student on(uid=student_uid)
-	JOIN public.tbl_prestudent using(prestudent_id)
-	JOIN public.tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
-	WHERE tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
-	AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand','Praktikant','Incoming','Absolvent','Abbrecher')
-	AND tbl_student.studiengang_kz<999 AND
-	ka.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND ka.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=ka.studiengang_kz
-	AND kb.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND kb.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=kb.studiengang_kz
-	AND kb.buchungsnr_verweis=ka.buchungsnr";
+	FROM 
+		public.tbl_person
+		JOIN public.tbl_konto as ka using(person_id)
+		JOIN public.tbl_konto as kb using(person_id)
+		JOIN public.tbl_benutzer using(person_id)
+		JOIN public.tbl_student on(uid=student_uid)
+		JOIN public.tbl_prestudent using(prestudent_id)
+		JOIN public.tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
+	WHERE 
+		tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+		AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand','Praktikant','Incoming','Absolvent','Abbrecher')
+		AND tbl_student.studiengang_kz<10000 
+		AND ka.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND ka.buchungstyp_kurzbz in('OEH','Lehrgangsgebuehr') AND tbl_student.studiengang_kz=ka.studiengang_kz
+		AND kb.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND kb.buchungstyp_kurzbz in('OEH','Lehrgangsgebuehr') AND tbl_student.studiengang_kz=kb.studiengang_kz
+		AND kb.buchungsnr_verweis=ka.buchungsnr";
 	//AND tbl_benutzer.aktiv=true
 
 	if($result = $db->db_query($qry))

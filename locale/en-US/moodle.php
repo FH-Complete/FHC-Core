@@ -35,4 +35,6 @@ Please select the Moodle version you want to use for your course:
 Two versions of Moodle are currently offered.<br>
 Starting <b>Winter Semester 2014</b>, Moodle will only be available in <b>version 2.4</b>.
 </center>';
+$this->phrasen['moodle/meineKurse']='My Courses';
+$this->phrasen['moodle/vorhandeneKurse']='Available Courses';
 ?>

@@ -11,7 +11,8 @@
  * @filesource
  */
 if (! defined('BASEPATH')) exit('No direct script access allowed');
-require_once FCPATH.'include/authentication.class.php';
+
+require_once FHCPATH.'include/authentication.class.php';
 
 /**
  * FHC-Auth Helpers

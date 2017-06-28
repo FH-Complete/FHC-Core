@@ -204,24 +204,24 @@ if (is_array($lehrstunden->lehrstunden))
 			?>
   			<RDF:li>
   	    	<RDF:Description  id="<?php echo $ls->stundenplan_id; ?>"  about="<?php echo $rdf_url.'/'. $ls->stundenplan_id; ?>" >
-  		      	<LEHRSTUNDE:id><?php echo $ls->stundenplan_id  ?></LEHRSTUNDE:id>
-  		      	<LEHRSTUNDE:reservierung><?php echo ($ls->reservierung?'true':'false'); ?></LEHRSTUNDE:reservierung>
-				<LEHRSTUNDE:lehreinheit_id><?php echo $ls->lehreinheit_id  ?></LEHRSTUNDE:lehreinheit_id>
-				<LEHRSTUNDE:datum><?php echo $ls->datum  ?></LEHRSTUNDE:datum>
-				<LEHRSTUNDE:stunde><?php echo $ls->stunde  ?></LEHRSTUNDE:stunde>
-  		  		<LEHRSTUNDE:unr><?php echo $ls->unr  ?></LEHRSTUNDE:unr>
-				<LEHRSTUNDE:ort_kurzbz><?php echo $ls->ort_kurzbz  ?></LEHRSTUNDE:ort_kurzbz>
-				<LEHRSTUNDE:lehrfach><?php echo $ls->lehrfach  ?></LEHRSTUNDE:lehrfach>
+  		      	<LEHRSTUNDE:id><![CDATA[<?php echo $ls->stundenplan_id  ?>]]></LEHRSTUNDE:id>
+  		      	<LEHRSTUNDE:reservierung><![CDATA[<?php echo ($ls->reservierung?'true':'false'); ?>]]></LEHRSTUNDE:reservierung>
+				<LEHRSTUNDE:lehreinheit_id><![CDATA[<?php echo $ls->lehreinheit_id  ?>]]></LEHRSTUNDE:lehreinheit_id>
+				<LEHRSTUNDE:datum><![CDATA[<?php echo $ls->datum  ?>]]></LEHRSTUNDE:datum>
+				<LEHRSTUNDE:stunde><![CDATA[<?php echo $ls->stunde  ?>]]></LEHRSTUNDE:stunde>
+  		  		<LEHRSTUNDE:unr><![CDATA[<?php echo $ls->unr  ?>]]></LEHRSTUNDE:unr>
+				<LEHRSTUNDE:ort_kurzbz><![CDATA[<?php echo $ls->ort_kurzbz  ?>]]></LEHRSTUNDE:ort_kurzbz>
+				<LEHRSTUNDE:lehrfach><![CDATA[<?php echo $ls->lehrfach  ?>]]></LEHRSTUNDE:lehrfach>
 				<LEHRSTUNDE:lehrfach_bez><![CDATA[<?php echo $ls->lehrfach_bez  ?>]]></LEHRSTUNDE:lehrfach_bez>
-				<LEHRSTUNDE:lehrform><?php echo $ls->lehrform  ?></LEHRSTUNDE:lehrform>
-				<LEHRSTUNDE:lektor><?php echo $ls->lektor_kurzbz  ?></LEHRSTUNDE:lektor>
-				<LEHRSTUNDE:sem><?php echo $ls->sem  ?></LEHRSTUNDE:sem>
-				<LEHRSTUNDE:ver><?php echo $ls->ver  ?></LEHRSTUNDE:ver>
-				<LEHRSTUNDE:grp><?php echo $ls->grp  ?></LEHRSTUNDE:grp>
-				<LEHRSTUNDE:gruppe><?php echo $ls->gruppe_kurzbz  ?></LEHRSTUNDE:gruppe>
-				<LEHRSTUNDE:lehrform><?php echo $ls->lehrform  ?></LEHRSTUNDE:lehrform>
-				<LEHRSTUNDE:studiengang><?php echo $ls->studiengang  ?></LEHRSTUNDE:studiengang>
-				<LEHRSTUNDE:farbe><?php echo $ls->farbe  ?></LEHRSTUNDE:farbe>
+				<LEHRSTUNDE:lehrform><![CDATA[<?php echo $ls->lehrform  ?>]]></LEHRSTUNDE:lehrform>
+				<LEHRSTUNDE:lektor><![CDATA[<?php echo $ls->lektor_kurzbz  ?>]]></LEHRSTUNDE:lektor>
+				<LEHRSTUNDE:sem><![CDATA[<?php echo $ls->sem  ?>]]></LEHRSTUNDE:sem>
+				<LEHRSTUNDE:ver><![CDATA[<?php echo $ls->ver  ?>]]></LEHRSTUNDE:ver>
+				<LEHRSTUNDE:grp><![CDATA[<?php echo $ls->grp  ?>]]></LEHRSTUNDE:grp>
+				<LEHRSTUNDE:gruppe><![CDATA[<?php echo $ls->gruppe_kurzbz  ?>]]></LEHRSTUNDE:gruppe>
+				<LEHRSTUNDE:lehrform><![CDATA[<?php echo $ls->lehrform  ?>]]></LEHRSTUNDE:lehrform>
+				<LEHRSTUNDE:studiengang><![CDATA[<?php echo $ls->studiengang  ?>]]></LEHRSTUNDE:studiengang>
+				<LEHRSTUNDE:farbe><![CDATA[<?php echo $ls->farbe  ?>]]></LEHRSTUNDE:farbe>
 				<LEHRSTUNDE:anmerkung><![CDATA[<?php echo $ls->anmerkung;  ?>]]></LEHRSTUNDE:anmerkung>
 				<LEHRSTUNDE:anmerkung_lehreinheit><![CDATA[<?php echo $ls->anmerkung_lehreinheit;  ?>]]></LEHRSTUNDE:anmerkung_lehreinheit>
 				<LEHRSTUNDE:titel><![CDATA[<?php echo $ls->titel;  ?>]]></LEHRSTUNDE:titel>

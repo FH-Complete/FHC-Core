@@ -27,6 +27,7 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/ort.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/coodle.class.php');
+require_once('../../../include/gruppe.class.php');
 
 $user = get_uid();
 
@@ -65,6 +66,7 @@ switch($work)
 		$uid='';
 		$ort='';
 		$email='';
+		$gruppe_kurzbz='';
 		$name='';
 		switch($typ)
 		{
@@ -74,27 +76,61 @@ switch($work)
 				$email = $id; 
 				$name=$bezeichnung; 
 				break;
+			case 'Gruppe': $gruppe_kurzbz = $id; break;
 			default: die('Ungueltiger Typ:'.$typ); break;
-		}		
-
-		if($coodle->RessourceExists($coodle_id, $uid, $ort, $email))
-			die('Ressource ist bereits zugeteilt');
-
-		$coodle->coodle_id = $coodle_id;
-		$coodle->uid = $uid;
-		$coodle->ort_kurzbz = $ort;
-		$coodle->email = $email;
-		$coodle->name = $name;
-		$coodle->zugangscode = uniqid();
-		$coodle->insertamum = date('Y-m-d H:i:s');
-		$coodle->insertvon = $user;
-		$coodle->updateamum = date('Y-m-d H:i:s');
-		$coodle->updatevon = $user;
-
-		if($coodle->saveRessource(true))
+		}
+		
+		if($typ=='Gruppe')
+		{
+			$gruppe = new gruppe();
+			if(!$gruppe->loadUser($gruppe_kurzbz))
+				die('Fehler: '.$gruppe->errormsg);
+			
+			foreach($gruppe->result as $row)
+			{
+				$coodle->coodle_id = $coodle_id;
+				$coodle->uid = $row->uid;
+				$coodle->ort_kurzbz = $ort;
+				$coodle->email = $email;
+				$coodle->name = $name;
+				$coodle->zugangscode = uniqid();
+				$coodle->insertamum = date('Y-m-d H:i:s');
+				$coodle->insertvon = $user;
+				$coodle->updateamum = date('Y-m-d H:i:s');
+				$coodle->updatevon = $user;
+				
+				if(!$coodle->RessourceExists($coodle_id, $row->uid, $ort, $email))
+				{					
+					if(!$coodle->saveRessource(true))
+					{
+						echo 'Fehler beim Speichern:'.$coodle->errormsg;
+						continue;
+					}
+				}
+			}
 			echo 'true';
-		else
-			echo 'Fehler beim Speichern:'.$coodle->errormsg;
+		}
+		else 
+		{
+			if($coodle->RessourceExists($coodle_id, $uid, $ort, $email))
+				die('Ressource ist bereits zugeteilt');
+	
+			$coodle->coodle_id = $coodle_id;
+			$coodle->uid = $uid;
+			$coodle->ort_kurzbz = $ort;
+			$coodle->email = $email;
+			$coodle->name = $name;
+			$coodle->zugangscode = uniqid();
+			$coodle->insertamum = date('Y-m-d H:i:s');
+			$coodle->insertvon = $user;
+			$coodle->updateamum = date('Y-m-d H:i:s');
+			$coodle->updatevon = $user;
+	
+			if($coodle->saveRessource(true))
+				echo 'true';
+			else
+				echo 'Fehler beim Speichern:'.$coodle->errormsg;
+		}
 
 		break;
 	case 'removeressource':
@@ -122,20 +158,29 @@ switch($work)
 		$uid='';
 		$ort='';
 		$email='';
+		$gruppe='';
 		$name='';
 		switch($typ)
 		{
 			case 'Ort': $ort = $id; break;
 			case 'Person': $uid = $id; break;
 			case 'Extern': $email = $id; break;
+			case 'Gruppe': $gruppe = $id; break;
 			default: die('Ungueltiger Typ'); break;
 		}
 		if($coodle_ressource_id = $coodle->RessourceExists($coodle_id, $uid, $ort, $email))
 		{
-			if($coodle->deleteRessource($coodle_ressource_id))
-				echo 'true';
-			else
-				echo 'Fehler:'.$coodle->errormsg;
+			//Person darf nur entfernt werden, wenn noch kein Termin gewaelt wurde
+			$coodle->getRessourceTermin($coodle_id, $coodle_ressource_id);
+			if (count($coodle->result) == 0)
+			{
+				if($coodle->deleteRessource($coodle_ressource_id))
+					echo 'true';
+				else
+					echo 'Fehler:'.$coodle->errormsg;
+			}
+			else 
+				echo 'Die Person kann nicht entfern werden, da sie bereits eine Terminauswahl getroffen hat';
 		}
 		else
 		{
@@ -206,10 +251,13 @@ switch($work)
 	
 		if($coodle->ersteller_uid!=$user)
 			die('Diese Aktion ist nur durch den Ersteller der Umfrage möglich');
-
+			
 		$coodletermin = new coodle();
 		if(!$coodletermin->loadTermin($coodle_termin_id))
 			die('Fehler: '.$coodletermin->errormsg);
+			
+		if($coodletermin->checkTerminGewaehlt($coodle_termin_id))
+			die('Der Termin kann nicht verschoben werden, da er schon ausgewählt wurde');
 
 		$coodletermin->datum = $datum;
 		$coodletermin->uhrzeit = $uhrzeit;
@@ -248,6 +296,9 @@ switch($work)
 		{
 			die('Termin und Umfrage passen nicht zusammen!');
 		}
+		
+		if($coodletermin->checkTerminGewaehlt($coodle_termin_id))
+			die('Der Termin kann nicht gelöscht werden, da er schon ausgewählt wurde');
 		
 		if($coodletermin->deleteTermin($coodle_termin_id))
 			echo 'true';

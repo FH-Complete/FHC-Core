@@ -29,45 +29,46 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class studienplan extends basis_db
 {
-    public $new = true;			// boolean
-    public $result = array();		// Objekte
+	public $new = true;			// boolean
+	public $result = array();		// Objekte
 
-    //Tabellenspalten
-    public $studienplan_id;			// integer (PK)
-    public $studienordnung_id;		// integer FK Studienordnung
-    public $orgform_kurzbz; 			// varchar (3)
-    public $version;					// varchar (256)
-    public $bezeichnung;				// varchar (256)
-    public $regelstudiendauer;		// integer
-    public $sprache;					// varchar (16) FK Sprache
-    public $aktiv=false;				// boolean
-    public $semesterwochen;			// smallint
-    public $testtool_sprachwahl=true;// boolean
-    public $updateamum;				// timestamp
-    public $updatevon;				// varchar
-    public $insertamum;				// timestamp
-    public $insertvon;				// varchar
-    public $ects_stpl;
-    public $pflicht_sws;
-    public $pflicht_lvs;
+	//Tabellenspalten
+	public $studienplan_id;					// integer (PK)
+	public $studienordnung_id;				// integer FK Studienordnung
+	public $orgform_kurzbz; 				// varchar (3)
+	public $version;						// varchar (256)
+	public $bezeichnung;					// varchar (256)
+	public $regelstudiendauer;				// integer
+	public $sprache;						// varchar (16) FK Sprache
+	public $aktiv=false;					// boolean
+	public $semesterwochen;					// smallint
+	public $testtool_sprachwahl=true;		// boolean
+	public $updateamum;						// timestamp
+	public $updatevon;						// varchar
+	public $insertamum;						// timestamp
+	public $insertvon;						// varchar
+	public $ects_stpl;						//numeric(5,2)
+	public $pflicht_sws;					// integer
+	public $pflicht_lvs;					// integer
+	public $onlinebewerbung_studienplan;	//boolean
 
-    //Tabellenspalten für Zwischentabelle tbl_studienplan_lehrveranstaltung
-    public $studienplan_lehrveranstaltung_id;		//integer
-    public $lehrveranstaltung_id;					//integer
-    public $semester;								//smallint
-    public $studienplan_lehrveranstaltung_id_parent;	//integer
-    public $pflicht;									//boolean
-    public $koordinator;								//varchar(32)
-    public $sort;
+	//Tabellenspalten für Zwischentabelle tbl_studienplan_lehrveranstaltung
+	public $studienplan_lehrveranstaltung_id;		//integer
+	public $lehrveranstaltung_id;					//integer
+	public $semester;								//smallint
+	public $studienplan_lehrveranstaltung_id_parent;	//integer
+	public $pflicht;									//boolean
+	public $koordinator;								//varchar(32)
+	public $sort;
 	public $curriculum=true;
 	public $export=true;
 	public $genehmigung=true;
 
 	/**
-     * Konstruktor
-     */
-    public function __construct()
-    {
+	 * Konstruktor
+	 */
+	public function __construct()
+	{
 		parent::__construct();
 	}
 
@@ -119,6 +120,7 @@ class studienplan extends basis_db
 			$this->ects_stpl = $row->ects_stpl;
 			$this->pflicht_lvs = $row->pflicht_lvs;
 			$this->pflicht_sws = $row->pflicht_sws;
+			$this->onlinebewerbung_studienplan = $this->db_parse_bool($row->onlinebewerbung_studienplan);
 			$this->updateamum = $row->updateamum;
 			$this->updatevon = $row->updatevon;
 			$this->insertamum = $row->insertamum;
@@ -176,6 +178,7 @@ class studienplan extends basis_db
 				$obj->ects_stpl = $row->ects_stpl;
 				$obj->pflicht_lvs = $row->pflicht_lvs;
 				$obj->pflicht_sws = $row->pflicht_sws;
+				$obj->onlinebewerbung_studienplan = $this->db_parse_bool($row->onlinebewerbung_studienplan);
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
@@ -269,7 +272,7 @@ class studienplan extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO lehre.tbl_studienplan (studienordnung_id, orgform_kurzbz,version,
 				bezeichnung, regelstudiendauer, sprache, aktiv, semesterwochen, testtool_sprachwahl,
-				pflicht_sws, pflicht_lvs, ects_stpl, insertamum, insertvon) VALUES ('.
+				pflicht_sws, pflicht_lvs, ects_stpl, onlinebewerbung_studienplan, insertamum, insertvon) VALUES ('.
 			$this->db_add_param($this->studienordnung_id, FHC_INTEGER).', '.
 			$this->db_add_param($this->orgform_kurzbz).', '.
 			$this->db_add_param($this->version).', '.
@@ -282,6 +285,7 @@ class studienplan extends basis_db
 			$this->db_add_param($this->pflicht_sws) . ', ' .
 			$this->db_add_param($this->pflicht_lvs) . ', ' .
 			$this->db_add_param($this->ects_stpl) . ', ' .
+			$this->db_add_param($this->onlinebewerbung_studienplan, FHC_BOOLEAN) . ', ' .
 			'now(), '.
 			$this->db_add_param($this->insertvon).');';
 		}
@@ -298,17 +302,18 @@ class studienplan extends basis_db
 				' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).', '.
 				' version='.$this->db_add_param($this->version).', '.
 				' bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
-			' regelstudiendauer='.$this->db_add_param($this->regelstudiendauer, FHC_INTEGER).', '.
-			' sprache='.$this->db_add_param($this->sprache).', '.
-			' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
-			' semesterwochen='.$this->db_add_param($this->semesterwochen, FHC_INTEGER).', '.
-			' testtool_sprachwahl='.$this->db_add_param($this->testtool_sprachwahl, FHC_BOOLEAN).','.
-			' ects_stpl=' . $this->db_add_param($this->ects_stpl) . ',' .
-			' pflicht_sws=' . $this->db_add_param($this->pflicht_sws, FHC_INTEGER) . ',' .
-			' pflicht_lvs=' . $this->db_add_param($this->pflicht_lvs, FHC_INTEGER) . ',' .
-			' updateamum= now(), '.
-			' updatevon='.$this->db_add_param($this->updatevon).' '.
-			' WHERE studienplan_id='.$this->db_add_param($this->studienplan_id, FHC_INTEGER, false).';';
+				' regelstudiendauer='.$this->db_add_param($this->regelstudiendauer, FHC_INTEGER).', '.
+				' sprache='.$this->db_add_param($this->sprache).', '.
+				' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				' semesterwochen='.$this->db_add_param($this->semesterwochen, FHC_INTEGER).', '.
+				' testtool_sprachwahl='.$this->db_add_param($this->testtool_sprachwahl, FHC_BOOLEAN).','.
+				' ects_stpl=' . $this->db_add_param($this->ects_stpl) . ',' .
+				' pflicht_sws=' . $this->db_add_param($this->pflicht_sws, FHC_INTEGER) . ',' .
+				' pflicht_lvs=' . $this->db_add_param($this->pflicht_lvs, FHC_INTEGER) . ',' .
+				' onlinebewerbung_studienplan=' . $this->db_add_param($this->onlinebewerbung_studienplan, FHC_BOOLEAN) . ',' .
+				' updateamum= now(), '.
+				' updatevon='.$this->db_add_param($this->updatevon).' '.
+				' WHERE studienplan_id='.$this->db_add_param($this->studienplan_id, FHC_INTEGER, false).';';
 		}
 
 		if($this->db_query($qry))
@@ -719,6 +724,7 @@ class studienplan extends basis_db
 					ects_stpl,
 					pflicht_sws,
 					pflicht_lvs,
+					onlinebewerbung_studienplan,
 					studiengang_kz,
 					tbl_studienordnung.version AS version_studienordnung,
 					gueltigvon,
@@ -814,12 +820,14 @@ class studienplan extends basis_db
 	function getStudienplaene($studiengang_kz)
 	{
 		$qry = "SELECT
-		distinct tbl_studienplan.*
-		FROM
-		lehre.tbl_studienplan
-		JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-		WHERE
-		tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+					distinct tbl_studienplan.*, tbl_studiensemester.start as start_stsem
+				FROM
+					lehre.tbl_studienplan
+					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					LEFT JOIN public.tbl_studiensemester ON(studiensemester_kurzbz=tbl_studienordnung.gueltigvon)
+				WHERE
+					tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)."
+				ORDER BY tbl_studiensemester.start";
 
 		if($result = $this->db_query($qry))
 		{
@@ -837,6 +845,10 @@ class studienplan extends basis_db
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 				$obj->semesterwochen = $row->semesterwochen;
 				$obj->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
+				$obj->ects_stpl = $row->ects_stpl;
+				$obj->pflicht_lvs = $row->pflicht_lvs;
+				$obj->pflicht_sws = $row->pflicht_sws;
+				$obj->onlinebewerbung_studienplan = $this->db_parse_bool($row->onlinebewerbung_studienplan);
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
@@ -916,6 +928,10 @@ class studienplan extends basis_db
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 				$obj->semesterwochen = $row->semesterwochen;
 				$obj->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
+				$obj->ects_stpl = $row->ects_stpl;
+				$obj->pflicht_lvs = $row->pflicht_lvs;
+				$obj->pflicht_sws = $row->pflicht_sws;
+				$obj->onlinebewerbung_studienplan = $this->db_parse_bool($row->onlinebewerbung_studienplan);
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
@@ -1148,7 +1164,7 @@ class studienplan extends basis_db
 	{
 		$qry= "
 				SELECT DISTINCT
-					studienplan_id, tbl_studienplan.bezeichnung, tbl_studiensemester.start
+					studienplan_id, tbl_studienplan.bezeichnung, tbl_studiensemester.start, tbl_studienordnung.status_kurzbz
 				FROM
 					lehre.tbl_studienplan
 				JOIN
@@ -1160,9 +1176,7 @@ class studienplan extends basis_db
 				JOIN
 					public.tbl_studiensemester ON (tbl_studienordnung.gueltigvon = tbl_studiensemester.studiensemester_kurzbz)
 				WHERE
-					tbl_studienplan.aktiv=true
-				AND
-					tbl_studienordnung.status_kurzbz IN ('approved')";
+					tbl_studienplan.aktiv=true";
 
 			foreach($searchItems as $value)
 			$qry.=" AND
@@ -1187,6 +1201,7 @@ class studienplan extends basis_db
 
 				$obj->studienplan_id = $row->studienplan_id;
 				$obj->bezeichnung = $row->bezeichnung;
+				$obj->status_kurzbz = $row->status_kurzbz;
 				$obj->new=false;
 
 				$this->result[] = $obj;
@@ -1227,6 +1242,10 @@ class studienplan extends basis_db
 				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 				$obj->semesterwochen = $row->semesterwochen;
 				$obj->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
+				$obj->ects_stpl = $row->ects_stpl;
+				$obj->pflicht_lvs = $row->pflicht_lvs;
+				$obj->pflicht_sws = $row->pflicht_sws;
+				$obj->onlinebewerbung_studienplan = $this->db_parse_bool($row->onlinebewerbung_studienplan);
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;

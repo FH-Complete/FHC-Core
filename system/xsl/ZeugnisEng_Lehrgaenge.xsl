@@ -462,7 +462,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             </table:table>
             <text:p text:style-name="P26"/>
             <text:p text:style-name="P22">¹ 1 Semester period per week = 45 minutes</text:p>
-            <text:p text:style-name="P22">² Grades:<text:tab/>excellent (1), very good (2), good (3), satisfactory (4), fail (5), not graded (nb), Credit based on previous experience/work (ar),</text:p>
+            <text:p text:style-name="P22">² Grades:<text:tab/>excellent (1), good (2), satisfactory (3), sufficient (4), insufficient (5), not graded (nb), Credit based on previous experience/work (ar),</text:p>
             <text:p text:style-name="P22">
                 <text:tab/>Participated with success (met), passed (b), successfully completed (ea), not successfully completed (nea), did not participate (nt), participated(tg)</text:p>
             <text:p text:style-name="P7"/>

@@ -20,6 +20,7 @@
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/ort.class.php');
 require_once('../../../include/benutzer.class.php');
+require_once('../../../include/gruppe.class.php');
 
 if(!isset($_REQUEST['work']))
 	die('Parameter Work missing');
@@ -64,6 +65,23 @@ switch($work)
 				$item['bezeichnung']=$row->nachname.' '.$row->vorname;
 				$result[]=$item;
 			}
+			
+			$gruppe = new gruppe();
+			
+			if(!$gruppe->searchGruppen(array($q)))
+				die('Fehler beim Laden der Gruppe: '.$gruppe->errormsg);
+				
+			foreach($gruppe->result as $row)
+			{
+				if ($row->sichtbar)
+				{
+					$item['uid']=$row->gruppe_kurzbz;
+					$item['typ']='Gruppe';
+					$item['bezeichnung']='Gruppe';
+					$result[]=$item;
+				}
+			}
+			
 			echo json_encode($result);
 			break;
 	default:

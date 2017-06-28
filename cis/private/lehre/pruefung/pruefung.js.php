@@ -40,6 +40,15 @@ else
 	$anmeldefrist = 3;
 }
 
+if (defined('CIS_PRUEFUNGSTERMIN_FRIST'))
+{
+	$terminfrist = CIS_PRUEFUNGSTERMIN_FRIST;
+}
+else
+{
+	$terminfrist = 14;
+}
+
 ?>
 
 /* Copyright (C) 2013 fhcomplete.org
@@ -1983,7 +1992,7 @@ function loadAllPruefungen()
 function checkTermin(termin)
 {
 	var heute = new Date();
-	var aktTime = new Date(heute.getTime() + (14*24*60*60*1000));
+	var aktTime = new Date(heute.getTime() + (<?php echo $terminfrist ?>*24*60*60*1000));
 	var vonTime = stringToDate(termin.datum, termin.beginn);
 	var bisTime = stringToDate(termin.datum, termin.ende);
 

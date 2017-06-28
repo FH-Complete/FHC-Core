@@ -1336,6 +1336,7 @@ function saveStudienplan()
 	semesterwochen = $("#semesterwochen").val();
 	testtool_sprachwahl = $("#testtool_sprachwahl").prop("checked");
 	aktiv = $("#aktiv").prop("checked");
+	onlinebewerbung_studienplan = $("#onlinebewerbung_studienplan").prop("checked");
 	var studienplan_id = $("#studienplan_id").val();
 	var pflicht_sws = $("#pflicht_sws").val();
 	var pflicht_lvs = $("#pflicht_lvs").val();
@@ -1360,6 +1361,7 @@ function saveStudienplan()
 	"semesterwochen":semesterwochen,
 	"testtool_sprachwahl":testtool_sprachwahl,
 	"aktiv":aktiv,
+	"onlinebewerbung_studienplan":onlinebewerbung_studienplan,
 	"studienordnung_id":global_studienordnung_id,
 	"ects_stpl":ects_stpl,
 	"pflicht_sws":pflicht_sws,

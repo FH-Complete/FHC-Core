@@ -98,7 +98,7 @@ class person extends basis_db
 				$this->errormsg = "Fehler beim Lesen der Personendaten\n";
 				return false;
 			}
-			
+
 			if ($row = $this->db_fetch_object())
 			{
 				$this->person_id = $row->person_id;
@@ -279,7 +279,7 @@ class person extends basis_db
 				return false;
 			}
 		}
-		
+
 		if ($this->svnr != '')
 		{
 			//Pruefen ob bereits ein Eintrag mit dieser SVNR vorhanden ist
@@ -302,6 +302,24 @@ class person extends basis_db
 			$this->errormsg = 'Ersatzkennzeichen darf nicht laenger als 10 Zeichen sein';
 			return false;
 		}
+
+		if ($this->ersatzkennzeichen != '')
+		{
+			//Pruefen ob bereits ein Eintrag mit dieser SVNR vorhanden ist
+			$qry = "SELECT person_id FROM public.tbl_person WHERE ersatzkennzeichen=".$this->db_add_param($this->ersatzkennzeichen);
+			if ($this->db_query($qry))
+			{
+				if ($row = $this->db_fetch_object())
+				{
+					if ($row->person_id != $this->person_id)
+					{
+						$this->errormsg = 'Es existiert bereits eine Person mit diesem Ersatzkennzeichen! Daten wurden NICHT gepeichert.';
+						return false;
+					}
+				}
+			}
+		}
+
 		if (mb_strlen($this->familienstand) > 1)
 		{
 			$this->errormsg = 'Familienstand ist ungueltig';
@@ -516,6 +534,8 @@ class person extends basis_db
 	 */
 	public function getTab($filter, $order = 'person_id')
 	{
+		//Filterstring trimmen und Umwandlung mittels generateSpecialCharacterString um auch Namen mit Sonderzeichen zu erhalten
+		$filter = generateSpecialCharacterString(trim($filter));
 		$sqlQuery = "
 			SELECT
 				distinct on (person_id) *
@@ -526,16 +546,16 @@ class person extends basis_db
 
 		if ($filter != '')
 		{
-			$sqlQuery .= " AND 	nachname ~* '".$this->db_escape($filter)."' OR
-								vorname ~* '".$this->db_escape($filter)."' OR
-								(nachname || ' ' || vorname) ~* '".$this->db_escape($filter)."' OR
-								(vorname || ' ' || nachname) ~* '".$this->db_escape($filter)."' OR
+			$sqlQuery .= " AND 	UPPER(nachname) ~* UPPER(".$this->db_add_param($filter).") OR
+								UPPER (vorname) ~* UPPER(".$this->db_add_param($filter).") OR
+								UPPER (nachname || ' ' || vorname) ~* UPPER(".$this->db_add_param($filter).") OR
+								UPPER (vorname || ' ' || nachname) ~* UPPER(".$this->db_add_param($filter).") OR
 								uid=".$this->db_add_param($filter);
 		}
 
 		$sqlQuery .= " ORDER BY $order";
 		if ($filter == '')
-		   $sqlQuery .= " LIMIT 30";
+			$sqlQuery .= " LIMIT 30";
 
 		if ($this->db_query($sqlQuery))
 		{

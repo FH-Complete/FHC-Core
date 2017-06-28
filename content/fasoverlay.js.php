@@ -2047,3 +2047,71 @@ function OrganisationseinheitTreeRefresh()
 	oe_datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	tree.database.AddDataSource(oe_datasource);
 }
+
+// ****
+// * Oeffnet ein Fenster zum Aendern eines Variablenwertes
+// ****
+function variableChangeValue(variable)
+{
+	var variablevalue = getvariable(variable);
+	
+	if(variablevalue = prompt('Bitte geben Sie den neuen Wert fuer '+variable+' ein', variablevalue))
+	{	
+		variableChange(variable, '', variablevalue);
+	}
+}
+
+// ****
+// * Sendet einen Request zum Aendern einer Variable
+// ****
+function variableChange(variable, id, wert)
+{
+	if(id!=null)
+		item = document.getElementById(id);
+	
+	if(typeof(wert)==='undefined')
+	{
+		if(item.getAttribute('checked')=='true')
+			checked='true';
+		else
+			checked='false';
+	}
+	else
+		checked=wert;
+	
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	// Request absetzen
+	
+	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'variablechange');
+	req.add('name', variable);
+	req.add('wert', checked);
+	
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		if(variable=='ignore_kollision')
+			updateignorekollision();
+		if(variable=='db_stpl_table')
+		{
+			document.getElementById("statusbarpanel-db_table").label = wert;
+			updatedbstpltable();
+		}
+		//Statusbar setzen
+		document.getElementById("statusbarpanel-text").label = "Variable erfolgreich geaendert";
+	}
+}

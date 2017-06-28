@@ -16,9 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger 	< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *		  Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
+ *		  Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
+ *		  Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
@@ -50,28 +50,37 @@ require_once('../../include/benutzerberechtigung.class.php');
 			die('Sie haben keine Rechte fuer diese Aktion');
 	}
 	
-    $sg = new studiengang();
-    if (!$sg->loadArray($rechte->getStgKz('basis/studiengang'),'kurzbzlang',false))
-        die($sg->errormsg);
-    
-    //$htmlstr = "<table class='liste sortable'>\n";
+	$sg = new studiengang();
+	if (!$sg->loadArray($rechte->getStgKz('basis/studiengang'),'kurzbzlang',false))
+		die($sg->errormsg);
+	
+	//$htmlstr = "<table class='liste sortable'>\n";
 	$htmlstr = '';
 	$htmlstr .= '<input type="button" value="Neu" onClick="parent.detail_studiengang.location=\'studiengang_details.php\'">
+		<br><br><input type="button" value="Reset Filter" class="resetsaved">
 		<form name="formular"><input type="hidden" name="check" value=""></form><table class="tablesorter" id="t1">
 		<thead><tr>
-			<th onmouseup="document.formular.check.value=0">Kz</th><th>Kurzbz</th><th>KurzbzLang</th> <th>Typ</th><th>Bezeichnung</th><th>Aktiv</th><th>Email</th>
+			<th onmouseup="document.formular.check.value=0">Kz</th>
+			<th>Kurzbz</th>
+			<th>KurzbzLang</th>
+			<th>Typ</th>
+			<th>Bezeichnung</th>
+			<th>Englisch</th>
+			<th data-placeholder="t or f">Aktiv</th>
+			<th>Email</th>
 		</tr></thead><tbody>
 		';
-    $i = 0;
-    foreach ($sg->result as $stg)
-    {
-        //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
+	$i = 0;
+	foreach ($sg->result as $stg)
+	{
+		//$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 		$htmlstr .= "   <tr>\n";
-		$htmlstr .= "       <td><a href='studiengang_details.php?studiengang_kz=".$stg->studiengang_kz."' target='detail_studiengang'>".$stg->studiengang_kz."</a></td>\n";
-        $htmlstr .= "       <td>".$stg->kurzbz."</td>\n";
-        $htmlstr .= "       <td>".$stg->kurzbzlang."</td>\n";
-		$htmlstr .= "       <td>".$stg->typ."</td>\n";
-        $htmlstr .= "       <td><a href='studiengang_details.php?studiengang_kz=".$stg->studiengang_kz."' target='detail_studiengang'>".$stg->bezeichnung."</a></td>\n";
+		$htmlstr .= "	<td><a href='studiengang_details.php?studiengang_kz=".$stg->studiengang_kz."' target='detail_studiengang'>".$stg->studiengang_kz."</a></td>\n";
+		$htmlstr .= "	<td>".$stg->kurzbz."</td>\n";
+		$htmlstr .= "	<td>".$stg->kurzbzlang."</td>\n";
+		$htmlstr .= "	<td>".$stg->typ."</td>\n";
+		$htmlstr .= "	<td><a href='studiengang_details.php?studiengang_kz=".$stg->studiengang_kz."' target='detail_studiengang'>".$stg->bezeichnung."</a></td>\n";
+		$htmlstr .= "	<td>".$stg->english."</td>\n";
 		
 		if($stg->aktiv)
 			$aktivbild = "true.png";	
@@ -80,12 +89,12 @@ require_once('../../include/benutzerberechtigung.class.php');
 
 		$aktivlink = "?toggle=true&kz=".$stg->studiengang_kz;
 		
-		$htmlstr .= "		<td align='center'><a href='".$aktivlink."'><img src='../../skin/images/".$aktivbild."' height='20px'></a></td>\n";
-        $htmlstr .= "       <td><a href='mailto:".$stg->email."'>".$stg->email."</a></td>\n";
-        $htmlstr .= "   </tr>\n";
-        $i++;
-    }
-    $htmlstr .= "</tbody></table>\n";
+		$htmlstr .= "		<td align='center'><a href='".$aktivlink."'><img src='../../skin/images/".$aktivbild."' height='20px' alt='".$aktivbild."'></a></td>\n";
+		$htmlstr .= "	   <td><a href='mailto:".$stg->email."'>".$stg->email."</a></td>\n";
+		$htmlstr .= "   </tr>\n";
+		$i++;
+	}
+	$htmlstr .= "</tbody></table>\n";
 
 
 ?>
@@ -94,19 +103,34 @@ require_once('../../include/benutzerberechtigung.class.php');
 <title>Studieng&auml;nge Uebersicht</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
-<script type="text/javascript" src="../../include/js/jquery.js"></script>
-<script language="JavaScript" type="text/javascript">
+
+<?php 
+include('../../include/meta/jquery.php');
+include('../../include/meta/jquery-tablesorter.php');
+?>
+		
+<script>
+//Clear stored filters
+
 $(document).ready(function() 
 	{ 
-	    $("#t1").tablesorter(
+		$("#t1").tablesorter(
 		{
-			sortList: [[2,0]],
-			widgets: ["zebra"],
-			headers: {5:{sorter:false}}
+			sortList: [[3,0],[1,0]],
+			widgets: ["saveSort", "zebra", "filter", "stickyHeaders"],
+			headers: {6:{sorter:false}},
+			widgetOptions : {filter_saveFilters : true}
 		}); 
+
+		$('.resetsaved').click(function()
+		{
+			$("#t1").trigger("filterReset");
+			location.reload();
+			return false;
+		});
 	} 
 );
+
 
 function confdel()
 {
@@ -116,13 +140,18 @@ function confdel()
 }
 
 </script>
-
+<style>
+.tablesorter-default input.tablesorter-filter
+{
+	padding: 0 4px;
+}
+</style>
 </head>
 
 <body class="background_main">
 <h2>Studieng&auml;nge &Uuml;bersicht</h2>
 <?php 
-    echo $htmlstr;
+	echo $htmlstr;
 ?>
 </body>
 </html>

@@ -104,13 +104,29 @@ class bewerbungstermin extends basis_db
 	}
 
 	/**
-	 * Liefert alle Förderverträge
+	 * Liefert die Bewerbungstermine eines Studiengangs
+	 * @param integer $studiengang_kz. Kennzahl des Studiengangs, dessen Bewerbungstermine geladen werden sollen
+	 * @param string $studiensemester_kurzbz. Optional. Default NULL. Studiensemester, dessen Bewerbungstermine geladen werden sollen
+	 * @param $sort. Optional. Default NULL. Sortierung der Ergebnisse
+	 * @param $studienplan_id. Optional. Default NULL. Studienplan ID, dessen Bewerbungstermine geladen werden sollen
+	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getBewerbungstermine($studiengang_kz, $studiensemester_kurzbz=null, $sort=null)
+	public function getBewerbungstermine($studiengang_kz, $studiensemester_kurzbz = null, $sort = null, $studienplan_id = null)
 	{
-		$qry = "SELECT * FROM public.tbl_bewerbungstermine WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+		$qry = "SELECT
+					tbl_bewerbungstermine.*,
+					tbl_studienplan.bezeichnung as stpl_bezeichnung
+				FROM
+					public.tbl_bewerbungstermine
+					LEFT JOIN lehre.tbl_studienplan USING(studienplan_id)
+				WHERE
+					studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+
 		if($studiensemester_kurzbz!=null)
 			$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+
+		if($studienplan_id!=null)
+			$qry.=" AND studienplan_id=".$this->db_add_param($studienplan_id);
 
 		if($sort != null)
 		{
@@ -137,6 +153,7 @@ class bewerbungstermin extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->studienplan_id = $row->studienplan_id;
+				$obj->stpl_bezeichnung = $row->stpl_bezeichnung;
 
 				$this->result[] = $obj;
 			}
