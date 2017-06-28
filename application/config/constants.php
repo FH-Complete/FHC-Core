@@ -104,10 +104,10 @@ define('EXIT_DATABASE', 8); // database error
 define('EXIT_VALIDATION_UDF',				10); // UDF validation has been failed
 define('EXIT_VALIDATION_UDF_MIN_VALUE',		11); // UDF validation has been failed -> MIN VALUE
 define('EXIT_VALIDATION_UDF_MAX_VALUE',		12); // UDF validation has been failed -> MAX VALUE
-define('EXIT_VALIDATION_UDF_MIN_LENGTH',	11); // UDF validation has been failed -> MIN LENGTH
-define('EXIT_VALIDATION_UDF_MAX_LENGTH',	12); // UDF validation has been failed -> MAX LENGTH
-define('EXIT_VALIDATION_UDF_REGEX',			13); // UDF validation has been failed -> REGEX
-define('EXIT_VALIDATION_UDF_REQUIRED',		14); // UDF validation has been failed -> REQUIRED
+define('EXIT_VALIDATION_UDF_MIN_LENGTH',	13); // UDF validation has been failed -> MIN LENGTH
+define('EXIT_VALIDATION_UDF_MAX_LENGTH',	14); // UDF validation has been failed -> MAX LENGTH
+define('EXIT_VALIDATION_UDF_REGEX',			15); // UDF validation has been failed -> REGEX
+define('EXIT_VALIDATION_UDF_REQUIRED',		16); // UDF validation has been failed -> REQUIRED
 
 define('EXIT_AUTO_MIN', 1000); // lowest automatically-assigned error code
 define('EXIT_AUTO_MAX', 2000); // highest automatically-assigned error code

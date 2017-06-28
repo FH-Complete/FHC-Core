@@ -49,10 +49,10 @@ class DB_Model extends FHC_Model
 		parent::__construct();
 		
 		// Set properties
-		$this->dbTable = $dbTable;
 		$this->pk = $pk;
-		$this->hasSequence = $hasSequence;
 		$this->UDFs = array();
+		$this->dbTable = $dbTable;
+		$this->hasSequence = $hasSequence;
 		
 		// Loads DB conns and confs
 		$this->load->database();
@@ -859,11 +859,11 @@ class DB_Model extends FHC_Model
 	/**
 	 * Validates UDF value
 	 */
-	private function _validateUDFs($udfDescription, $udfValue)
+	private function _validateUDFs($validation, $udfName, $udfValue)
 	{
-		$isValid = true;
-		$valid = success(true);
+		$valid = array();
 		
+		// 
 		$tmpUdfValues = $udfValue;
 		if (!is_array($udfValue))
 		{
@@ -871,45 +871,45 @@ class DB_Model extends FHC_Model
 		}
 		
 		// 
-		$validation = null;
-		if (isset($udfDescription->validation))
+		foreach($tmpUdfValues as $udfValIndx => $udfVal)
 		{
-			$validation = $udfDescription->validation;
-		}
-		
-		// 
-		if ($validation != null)
-		{
-			foreach($tmpUdfValues as $udfValIndx => $udfVal)
+			// 
+			if (is_numeric($udfVal))
 			{
 				// 
 				if (isset($validation->{DB_Model::UDF_MAX_VALUE}) && $udfVal > $validation->{DB_Model::UDF_MAX_VALUE})
 				{
-					$valid = error($udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}, EXIT_VALIDATION_UDF_MAX_VALUE);
-					break;
+					$valid[] = error($udfName, EXIT_VALIDATION_UDF_MAX_VALUE);
 				}
 				
 				// 
 				if (isset($validation->{DB_Model::UDF_MIN_VALUE}) && $udfVal < $validation->{DB_Model::UDF_MIN_VALUE})
 				{
-					$valid = error($udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}, EXIT_VALIDATION_UDF_MIN_VALUE);
-					break;
+					$valid[] = error($udfName, EXIT_VALIDATION_UDF_MIN_VALUE);
+				}
+			}
+			
+			// 
+			if (!is_array($udfVal) && !is_object($udfVal))
+			{
+				$strUdfVal = strval($udfVal); // 
+				
+				// 
+				if (isset($validation->{DB_Model::UDF_MAX_LENGTH}) && isset($strUdfVal) && strlen($strUdfVal) > $validation->{DB_Model::UDF_MAX_LENGTH})
+				{
+					$valid[] = error($udfName, EXIT_VALIDATION_UDF_MAX_LENGTH);
 				}
 				
 				// 
-				if (isset($validation->{DB_Model::UDF_MAX_LENGTH}) && $udfVal > $validation->{DB_Model::UDF_MAX_LENGTH})
+				if (isset($validation->{DB_Model::UDF_MIN_LENGTH}) && isset($strUdfVal) && strlen($strUdfVal) < $validation->{DB_Model::UDF_MIN_LENGTH})
 				{
-					$valid = error($udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}, EXIT_VALIDATION_UDF_MAX_LENGTH);
-					break;
+					$valid[] = error($udfName, EXIT_VALIDATION_UDF_MIN_LENGTH);
 				}
-				
-				// 
-				if (isset($validation->{DB_Model::UDF_MIN_LENGTH}) && $udfVal < $validation->{DB_Model::UDF_MIN_LENGTH})
-				{
-					$valid = error($udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}, EXIT_VALIDATION_UDF_MIN_LENGTH);
-					break;
-				}
-				
+			}
+			
+			// 
+			if (is_string($udfVal))
+			{
 				// 
 				if (isset($validation->{DB_Model::UDF_REGEX}) && is_array($validation->{DB_Model::UDF_REGEX}))
 				{
@@ -919,13 +919,18 @@ class DB_Model extends FHC_Model
 						{
 							if (preg_match($regex->expression, $udfVal) != 1)
 							{
-								$valid = error($udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}, EXIT_VALIDATION_UDF_REGEX);
-								break;
+								$valid[] = error($udfName, EXIT_VALIDATION_UDF_REGEX);
 							}
 						}
 					}
 				}
 			}
+		}
+		
+		// 
+		if (count($valid) == 0)
+		{
+			$valid = success(true);
 		}
 		
 		return $valid;
@@ -952,28 +957,60 @@ class DB_Model extends FHC_Model
 				
 				$udfsDecoded = json_decode($udfs->retval[0]->jsons);
 				
+				$requiredArray = array(); // 
+				
+				// 
 				for($i = 0; $i < count($udfsDecoded); $i++)
 				{
-					$udfDescription = $udfsDecoded[$i];
+					$udfDescription = $udfsDecoded[$i]; // 
 					
+					if(isset($udfDescription->validation)
+						&& isset($udfDescription->validation->required)
+						&& $udfDescription->validation->required === true)
+					{
+						$requiredArray[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = error($udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}, EXIT_VALIDATION_UDF_REQUIRED);
+					}
+					
+					// 
 					foreach($this->UDFs as $key => $val)
 					{
+						// 
 						if ($udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME} == $key)
 						{
-							// Validation of UDF parameter value
-							// $validate = $this->_validateUDFs($udfDescription, $val);
+							// Validation of UDF parameter value, if validation rules are present
+							if (isset($udfDescription->validation))
+							{
+								$validate = $this->_validateUDFs(
+									$udfDescription->validation, // 
+									$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}, // 
+									$val // 
+								);
+								
+								if (isset($udfDescription->validation->required) && $udfDescription->validation->required === true)
+								{
+									if (isset($requiredArray[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}]))
+									{
+										unset($requiredArray[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}]);
+									}
+								}
+							}
 							
 							// If validation is ok copy the value
 							if (isSuccess($validate))
 							{
 								$jsonb[$key] = $val;
 							}
-							else // otherwise stop the elaboration
+							else // 
 							{
 								$notValidUDFsArray[] = $validate;
 							}
 						}
 					}
+				}
+				
+				foreach($requiredArray as $key => $val)
+				{
+					$notValidUDFsArray[] = array($val);
 				}
 				
 				// If validation was ok
