@@ -194,3 +194,7 @@ treechildren::-moz-tree-cell-text(Lektor_inaktiv)
   color: grey;
   cursor: not-allowed;
 }
+treechildren::-moz-tree-row(makeItMarked)
+{
+	background-color: #ceffb0;
+}
