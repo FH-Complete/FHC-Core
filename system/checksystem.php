@@ -155,6 +155,7 @@ $berechtigungen = array(
 	array('soap/studienordnung','Recht für Studienordnung Webservice'),
 	array('soap/benutzer','Berechtigung für Bentutzerabfrage Addon Kontoimport'),
 	array('soap/buchungen','Berechtigung für Buchungsabfrage Addon Kontoimport'),
+	array('student/alias','Berechtigung zum Aendern von Alias falls deaktiviert 	'),
 	array('student/bankdaten','Bankdaten des Studenten'),
 	array('student/anrechnung','Anrechnungen des Studenten'),
 	array('student/anwesenheit','Anwesenheiten im FAS'),
