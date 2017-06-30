@@ -13,3 +13,4 @@ $lang['fhc_'.EXIT_VALIDATION_UDF_MIN_LENGTH]	= 'UDF validation has been failed -
 $lang['fhc_'.EXIT_VALIDATION_UDF_MAX_LENGTH]	= 'UDF validation has been failed - MAX LENGTH';
 $lang['fhc_'.EXIT_VALIDATION_UDF_REGEX]			= 'UDF validation has been failed - REGEX';
 $lang['fhc_'.EXIT_VALIDATION_UDF_REQUIRED]		= 'UDF validation has been failed - REQUIRED';
+$lang['fhc_'.EXIT_VALIDATION_UDF_NOT_VALID_VAL]	= 'UDF validation has been failed - Not valid value, object or array given';

@@ -108,6 +108,7 @@ define('EXIT_VALIDATION_UDF_MIN_LENGTH',	13); // UDF validation has been failed 
 define('EXIT_VALIDATION_UDF_MAX_LENGTH',	14); // UDF validation has been failed -> MAX LENGTH
 define('EXIT_VALIDATION_UDF_REGEX',			15); // UDF validation has been failed -> REGEX
 define('EXIT_VALIDATION_UDF_REQUIRED',		16); // UDF validation has been failed -> REQUIRED
+define('EXIT_VALIDATION_UDF_NOT_VALID_VAL',	17); // UDF validation has been failed -> Not valid value, object or array
 
 define('EXIT_AUTO_MIN', 1000); // lowest automatically-assigned error code
 define('EXIT_AUTO_MAX', 2000); // highest automatically-assigned error code
