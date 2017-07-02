@@ -3,9 +3,8 @@
 use One;
 use Two;
 
-class Foo {
-
-    use LogTrait;
-    use FirstTrait;
-
+class Foo
+{
+	use LogTrait;
+	use FirstTrait;
 }

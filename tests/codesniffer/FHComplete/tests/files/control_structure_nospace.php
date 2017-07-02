@@ -1,4 +1,5 @@
 <?php
-if(isset($test)) {
+if(isset($test))
+{
 	echo 'hello';
 }

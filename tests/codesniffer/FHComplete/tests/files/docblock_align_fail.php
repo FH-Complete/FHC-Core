@@ -11,22 +11,23 @@ namespace App\Person\Patient;
  */
 class Foo extends Bar
 {
-    /**
-     * What are your thoughts?
-     *
-     * @var array $brain
-     */
-    public $brain = array();
+	/**
+	 * What are your thoughts?
+	 *
+	 * @var array $brain
+	 */
+	public $brain = array();
 
 /**
  * Tell me your thoughts.
  *
  * @return void
  */
-    public function dumpThoughts()
-    {
-        foreach ($thoughts as $thought) {
-            echo $thought;
-        }
-    }
+	public function dumpThoughts()
+	{
+		foreach ($thoughts as $thought)
+		{
+			echo $thought;
+		}
+	}
 }
