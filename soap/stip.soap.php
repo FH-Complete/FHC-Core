@@ -17,47 +17,47 @@
  *
  * Authors:		Karl Burkhart <burkhart@technikum-wien.at>.
  */
- 
+
 require_once('../config/vilesci.config.inc.php');
-require_once('../config/global.config.inc.php');  
+require_once('../config/global.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/prestudent.class.php');
-require_once('../include/student.class.php'); 
+require_once('../include/student.class.php');
 require_once('../include/konto.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/benutzer.class.php');
-require_once('../include/webservicelog.class.php'); 
+require_once('../include/webservicelog.class.php');
 require_once('../include/mail.class.php');
 require_once('../include/abschlusspruefung.class.php');
 require_once('../include/note.class.php');
-require_once('stip.class.php'); 
+require_once('stip.class.php');
 
 ini_set("soap.wsdl_cache_enabled", "0");
 
-$SOAPServer = new SoapServer(APP_ROOT."/soap/stip.wsdl.php?".microtime());
+$SOAPServer = new SoapServer(APP_ROOT."/soap/stip.wsdl.php?".microtime(true));
 $SOAPServer->addFunction("GetStipendienbezieherStip");
 $SOAPServer->addFunction("SendStipendienbezieherStipError");
 $SOAPServer->handle();
 
 /**
- * 
+ *
  * Funktion nimmt Anfragen entgegen und bearbeitet diese
  * @param $parameters -> XML SOAP File
  */
 function GetStipendienbezieherStip($parameters)
-{ 	
-	$anfrageDaten = $parameters->anfrageDaten; 
-	$Stipendiumsbezieher = $anfrageDaten->Stipendiumsbezieher; 
-	
-	$ErhalterKz = $anfrageDaten->ErhKz; 
-	$AnfrageDatenID = $anfrageDaten->AnfragedatenID; 
-		
+{
+	$anfrageDaten = $parameters->anfrageDaten;
+	$Stipendiumsbezieher = $anfrageDaten->Stipendiumsbezieher;
+
+	$ErhalterKz = $anfrageDaten->ErhKz;
+	$AnfrageDatenID = $anfrageDaten->AnfragedatenID;
+
 	// Eintrag in der LogTabelle anlegen
-	$log = new webservicelog(); 
-	$log->request_data = file_get_contents('php://input'); 
-	$log->webservicetyp_kurzbz = 'stip'; 
-	$log->request_id = $AnfrageDatenID; 
-	$log->beschreibung = "Anfrage von Stip"; 
+	$log = new webservicelog();
+	$log->request_data = file_get_contents('php://input');
+	$log->webservicetyp_kurzbz = 'stip';
+	$log->request_id = $AnfrageDatenID;
+	$log->beschreibung = "Anfrage von Stip";
 	$log->save(true);
 
 	$username = $parameters->userName;
@@ -66,17 +66,17 @@ function GetStipendienbezieherStip($parameters)
 	if(!($username==STIP_USER_NAME && $passwort==STIP_USER_PASSWORD))
 	{
 		// Eintrag in der LogTabelle anlegen
-		$log = new webservicelog(); 
+		$log = new webservicelog();
 		$log->request_data = 'SOAP FAULT - Invalid Credentials';
-		$log->webservicetyp_kurzbz = 'stip'; 
-		$log->request_id = $AnfrageDatenID; 
-		$log->beschreibung = "Antwort an Stip"; 
+		$log->webservicetyp_kurzbz = 'stip';
+		$log->request_id = $AnfrageDatenID;
+		$log->beschreibung = "Antwort an Stip";
 		$log->save(true);
 
-		return new SoapFault("Server", 'Invalid Credentials');	
+		return new SoapFault("Server", 'Invalid Credentials');
 	}
 
-	$StipBezieherAntwort = array(); 
+	$StipBezieherAntwort = array();
 
 	$i=0;
 	if(!is_array($Stipendiumsbezieher->StipendiumsbezieherAnfrage))
@@ -85,33 +85,33 @@ function GetStipendienbezieherStip($parameters)
 	// läuft alle Anfragedaten durch
 	foreach($Stipendiumsbezieher->StipendiumsbezieherAnfrage as $BezieherStip)
 	{
-		$prestudentID; 
-		$studentUID; 
-		$studSemester; 
+		$prestudentID;
+		$studentUID;
+		$studSemester;
 		$StipBezieher = new stip();
-		$datum_obj = new datum(); 
+		$datum_obj = new datum();
 
 		if($StipBezieher->validateStipDaten($anfrageDaten->ErhKz, $anfrageDaten->AnfragedatenID, $BezieherStip))
 		{
-			$StipBezieher->Semester = $BezieherStip->Semester; 
-			$StipBezieher->Studienjahr = $BezieherStip->Studienjahr; 
-			$StipBezieher->PersKz = $BezieherStip->PersKz; 
-			$StipBezieher->SVNR = $BezieherStip->SVNR; 	
-			$StipBezieher->Familienname = $BezieherStip->Familienname; 
-			$StipBezieher->Vorname = $BezieherStip->Vorname; 
-			$StipBezieher->Typ = $BezieherStip->Typ; 
-			
+			$StipBezieher->Semester = $BezieherStip->Semester;
+			$StipBezieher->Studienjahr = $BezieherStip->Studienjahr;
+			$StipBezieher->PersKz = $BezieherStip->PersKz;
+			$StipBezieher->SVNR = $BezieherStip->SVNR;
+			$StipBezieher->Familienname = $BezieherStip->Familienname;
+			$StipBezieher->Vorname = $BezieherStip->Vorname;
+			$StipBezieher->Typ = $BezieherStip->Typ;
+
 			// Studiensemester_kurzbz auslesen
 			if($BezieherStip->Semester == "WS" || $BezieherStip->Semester == "ws")
 			{
-				$year = mb_substr($BezieherStip->Studienjahr, 0,4); 
-				$studSemester = "WS".$year; 
+				$year = mb_substr($BezieherStip->Studienjahr, 0,4);
+				$studSemester = "WS".$year;
 			}elseif ($BezieherStip->Semester == "SS" || $BezieherStip->Semester == "ss")
 			{
-				$year = mb_substr($BezieherStip->Studienjahr, 0,2).mb_substr($BezieherStip->Studienjahr, 5,7); 
-				$studSemester = "SS".$year; 
+				$year = mb_substr($BezieherStip->Studienjahr, 0,2).mb_substr($BezieherStip->Studienjahr, 5,7);
+				$studSemester = "SS".$year;
 			}
-			
+
 			if(!$prestudentID = $StipBezieher->searchPersonKz($BezieherStip->PersKz))
 				if(!$prestudentID = $StipBezieher->searchSvnr($BezieherStip->SVNR))
 					$prestudentID = $StipBezieher->searchVorNachname($BezieherStip->Vorname, $BezieherStip->Familienname);
@@ -119,29 +119,29 @@ function GetStipendienbezieherStip($parameters)
 			// Student wurde gefunden
 			if($StipBezieher->AntwortStatusCode == 1)
 			{
-				$prestudent = new prestudent(); 
-				$prestudent->load($prestudentID); 
-				$prestudent->getLastStatus($prestudentID); 
+				$prestudent = new prestudent();
+				$prestudent->load($prestudentID);
+				$prestudent->getLastStatus($prestudentID);
 				$prestudentStatus = new prestudent();
 
-				$student = new student(); 
-				$studentUID = $student->getUID($prestudentID); 
+				$student = new student();
+				$studentUID = $student->getUID($prestudentID);
 
                 $abschlusspruefung = new abschlusspruefung();
                 $abschlusspruefung->getLastAbschlusspruefung($studentUID);
-                
-				$student->load($studentUID); 
-				$studiengang_kz = $student->studiengang_kz; 
-				
-				$konto = new konto(); 
+
+				$student->load($studentUID);
+				$studiengang_kz = $student->studiengang_kz;
+
+				$konto = new konto();
 				$studGebuehr = $konto->getStudiengebuehrGesamt($studentUID, $studSemester, $studiengang_kz);
 				// , als Dezimaltrennzeichen
-				$studGebuehr = str_replace('.', ',', $studGebuehr); 
-				
+				$studGebuehr = str_replace('.', ',', $studGebuehr);
+
 				// wenn nicht bezahlt
 				if($studGebuehr == "")
 					$studGebuehr = "0,00";
-			
+
 				if(!$prestudentStatus->getLastStatus($prestudentID,$studSemester))
 					$StipBezieher->Inskribiert = 'n';
 				else
@@ -150,61 +150,61 @@ function GetStipendienbezieherStip($parameters)
                     if($prestudentStatus->status_kurzbz == 'Interessent')
                         $StipBezieher->Inskribiert = 'n';
                     else
-                        $StipBezieher->Inskribiert = 'j';	
+                        $StipBezieher->Inskribiert = 'j';
                 }
-					
+
 				if($BezieherStip->Typ == "as" || $BezieherStip->Typ == "AS")
 				{
 					$StipBezieher->getOrgFormTeilCode($studentUID, $studSemester, $prestudentID);
-					$StipBezieher->Studienbeitrag = $studGebuehr; 
-                    
+					$StipBezieher->Studienbeitrag = $studGebuehr;
+
                     // Wenn letzter Status von Semester Interessent ist -> Semester = null
                     if($prestudentStatus->status_kurzbz != 'Interessent')
-                        $StipBezieher->Ausbildungssemester = $StipBezieher->getSemester($prestudentID, $studSemester);						
+                        $StipBezieher->Ausbildungssemester = $StipBezieher->getSemester($prestudentID, $studSemester);
 					else
-                       $StipBezieher->Ausbildungssemester = null; 
-                     
+                       $StipBezieher->Ausbildungssemester = null;
+
                     $StipBezieher->StudStatusCode = $StipBezieher->getStudStatusCode($prestudentID, $studSemester);
-                    
+
                     // Ausgeschieden ohne Abschluss
 					if($StipBezieher->StudStatusCode==4)
 						$StipBezieher->BeendigungsDatum = $datum_obj->formatDatum($prestudent->datum,'dmY');
 					else if($StipBezieher->StudStatusCode==3) // Absolvent -> letzte Prüfung nehmen
                         $StipBezieher->BeendigungsDatum = $datum_obj->formatDatum($abschlusspruefung->datum,'dmY');
                     else
-						$StipBezieher->BeendigungsDatum = null; 
-						
+						$StipBezieher->BeendigungsDatum = null;
+
 					$StipBezieher->Erfolg = $StipBezieher->getErfolg($prestudentID, $studSemester);
 				}
 				elseif($BezieherStip->Typ =="ag" || $BezieherStip->Typ == "AG")
 				{
 					$StipBezieher->Ausbildungssemester = null;
-					$StipBezieher->StudStatusCode = null; 
-					$StipBezieher->BeendigungsDatum = null; 
-					$StipBezieher->Studienbeitrag = null; 
-					$StipBezieher->OrgFormTeilCode = null; 
+					$StipBezieher->StudStatusCode = null;
+					$StipBezieher->BeendigungsDatum = null;
+					$StipBezieher->Studienbeitrag = null;
+					$StipBezieher->OrgFormTeilCode = null;
 				}
-				
-				$StipBezieherAntwort[$i] = $StipBezieher; 
+
+				$StipBezieherAntwort[$i] = $StipBezieher;
 				$i++;
 
 			}
 			else if($StipBezieher->AntwortStatusCode == 2)
 			{
 				// Student wurde nicht gefunden
-				$StipBezieher->PersKz_Antwort = null; 
-				$StipBezieher->SVNR_Antwort = null; 
-				$StipBezieher->Familienname_Antwort = null; 
-				$StipBezieher->Vorname_Antwort = null; 
-				$StipBezieher->Ausbildungssemester = null; 
-				$StipBezieher->StudStatusCode = null; 
-				$StipBezieher->BeendigungsDatum = null; 
-				$StipBezieher->VonNachPersKz = null; 
-				$StipBezieher->Studienbeitrag = null; 
-				$StipBezieher->Inskribiert = null; 
-				$StipBezieher->Erfolg = null; 
-				$StipBezieher->OrgFormTeilCode = null; 
-				$StipBezieherAntwort[$i] = $StipBezieher; 
+				$StipBezieher->PersKz_Antwort = null;
+				$StipBezieher->SVNR_Antwort = null;
+				$StipBezieher->Familienname_Antwort = null;
+				$StipBezieher->Vorname_Antwort = null;
+				$StipBezieher->Ausbildungssemester = null;
+				$StipBezieher->StudStatusCode = null;
+				$StipBezieher->BeendigungsDatum = null;
+				$StipBezieher->VonNachPersKz = null;
+				$StipBezieher->Studienbeitrag = null;
+				$StipBezieher->Inskribiert = null;
+				$StipBezieher->Erfolg = null;
+				$StipBezieher->OrgFormTeilCode = null;
+				$StipBezieherAntwort[$i] = $StipBezieher;
 				$i++;
 			}
 
@@ -212,46 +212,46 @@ function GetStipendienbezieherStip($parameters)
 		else
 		{
 			// Eintrag in der LogTabelle anlegen
-			$log = new webservicelog(); 
+			$log = new webservicelog();
 			$log->request_data = 'SOAP FAULT - ValidationError: '.$StipBezieher->errormsg;
-			$log->webservicetyp_kurzbz = 'stip'; 
-			$log->request_id = $AnfrageDatenID; 
-			$log->beschreibung = "Antwort an Stip"; 
+			$log->webservicetyp_kurzbz = 'stip';
+			$log->request_id = $AnfrageDatenID;
+			$log->beschreibung = "Antwort an Stip";
 			$log->save(true);
 
-			return new SoapFault("Server", $StipBezieher->errormsg);	
+			return new SoapFault("Server", $StipBezieher->errormsg);
 		}
 	}
 
 	$ret = array("GetStipendienbezieherStipResult" =>array("ErhKz"=>$ErhalterKz,"AnfragedatenID"=>$AnfrageDatenID, "Stipendiumsbezieher"=>$StipBezieherAntwort));
 
 	// Eintrag in der LogTabelle anlegen
-	$log = new webservicelog(); 
+	$log = new webservicelog();
 	$log->request_data = print_r($ret,true);
-	$log->webservicetyp_kurzbz = 'stip'; 
-	$log->request_id = $AnfrageDatenID; 
-	$log->beschreibung = "Antwort an Stip"; 
+	$log->webservicetyp_kurzbz = 'stip';
+	$log->request_id = $AnfrageDatenID;
+	$log->beschreibung = "Antwort an Stip";
 	$log->save(true);
 
-	return $ret; 
+	return $ret;
 }
 
 /**
- * 
+ *
  * Funktion nimmt Fehler entgegen und sendet sie an Admin
  * @param $parameters -> XML SOAP File
  */
 function SendStipendienbezieherStipError($parameters)
 {
-	$xmlData = file_get_contents('php://input'); 
-	
-	$log = new webservicelog(); 
-	$log->request_data = file_get_contents('php://input'); 
-	$log->webservicetyp_kurzbz = 'stip'; 
-	//$log->request_id = $AnfrageDatenID; 
-	$log->beschreibung = "Stip Error"; 
+	$xmlData = file_get_contents('php://input');
+
+	$log = new webservicelog();
+	$log->request_data = file_get_contents('php://input');
+	$log->webservicetyp_kurzbz = 'stip';
+	//$log->request_id = $AnfrageDatenID;
+	$log->beschreibung = "Stip Error";
 	$log->save(true);
-	
+
 	//1=successful; 2=incomplete xml document; 3=incomplete processing; 4=system-error
 	if($parameters->errorReport->ErrorStatusCode!=1)
 	{
