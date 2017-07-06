@@ -68,8 +68,6 @@ class UDF extends APIv1_Controller
 		$udfs = $this->post();
 		$validation = $this->_validate($udfs);
 		
-		var_dump($udfs);exit;
-		
 		if (isSuccess($validation))
 		{
 			$caller = null;
