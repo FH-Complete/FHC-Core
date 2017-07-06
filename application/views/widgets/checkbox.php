@@ -9,34 +9,22 @@
 <?php
 	}
 ?>
-<fieldset
+<input
+	type="checkbox"
 	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, Widget::HTML_ID); ?>
+	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, Widget::HTML_NAME); ?>
 	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidgetTpl::REQUIRED); ?>
 	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidgetTpl::REGEX); ?>
 	<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidgetTpl::TITLE); ?>
->
 	<?php
-		$elements = ${CheckboxWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME};
-		$checkedElement = ${CheckboxWidget::CHECKED_ELEMENT};
-		
-		foreach($elements as $element)
+		$checked = '';
+		if (${CheckboxWidget::VALUE_FIELD} == ${CheckboxWidget::CHECKED_ELEMENT})
 		{
-			$checked = '';
-			
-			if ($element->{CheckboxWidget::VALUE_FIELD} == $checkedElement)
-			{
-				$checked = 'checked';
-			}
-	?>
-		<input
-			type="checkbox"
-			<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, Widget::HTML_NAME); ?>
-			value="<?php echo $element->{CheckboxWidget::VALUE_FIELD}; ?>"
-			<?php echo $checked; ?>
-		>
-		<?php echo $element->{CheckboxWidget::DESCRIPTION_FIELD}; ?>
-	<?php
+			$checked = 'checked';
 		}
 	?>
-</fieldset>
+	<?php echo $checked; ?>
+	value="<?php echo ${CheckboxWidget::VALUE_FIELD}; ?>"
+>
+<?php echo ${CheckboxWidget::VALUE_FIELD}; ?>
 <?php Widget::printEndBlock(${Widget::HTML_ARG_NAME}); ?>

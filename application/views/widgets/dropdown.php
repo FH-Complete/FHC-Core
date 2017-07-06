@@ -32,7 +32,7 @@
 			{
 				foreach($selectedElements as $selectedElement)
 				{
-					if ($element->{DropdownWidget::ID_FIELD} === $selectedElement)
+					if ($element->{DropdownWidget::ID_FIELD} == $selectedElement)
 					{
 						$selected = 'selected';
 					}
@@ -40,7 +40,7 @@
 			}
 			else
 			{
-				if ($element->{DropdownWidget::ID_FIELD} === $selectedElements)
+				if ($element->{DropdownWidget::ID_FIELD} == $selectedElements)
 				{
 					$selected = 'selected';
 				}

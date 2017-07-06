@@ -61,6 +61,64 @@ class UDF extends APIv1_Controller
 	}
 	
 	/**
+	 * 
+	 */
+	public function postUDF()
+	{
+		$udfs = $this->post();
+		$validation = $this->_validate($udfs);
+		
+		var_dump($udfs);exit;
+		
+		if (isSuccess($validation))
+		{
+			$caller = null;
+			if (isset($udfs['caller']))
+			{
+				$caller = $udfs['caller'];
+				unset($udfs['caller']);
+			}
+			
+			$result = $this->UDFModel->saveUDFs($udfs);
+			
+			if ($caller != null)
+			{
+				$res = 'ERR';
+				if (isSuccess($result))
+				{
+					$res = 'OK';
+				}
+				
+				redirect($caller.'&res='.$res);
+			}
+			else
+			{
+				$this->response($result, REST_Controller::HTTP_OK);
+			}
+		}
+		else
+		{
+			$this->response($validation, REST_Controller::HTTP_OK);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private function _validate($udfs)
+	{
+		$validation = error('person_id or prestudent_id is missing');
+		
+		if((isset($udfs['person_id']) && !(is_null($udfs['person_id'])) && ($udfs['person_id'] != ''))
+			|| (isset($udfs['prestudent_id']) && !(is_null($udfs['prestudent_id'])) && ($udfs['prestudent_id'] != '')))
+		{
+			$validation = success(true);
+		}
+		
+		return $validation;
+	}
+	
+	/**
 	 * Decode to json the column jsons for every result set
 	 */
 	private function _jsonDecodeResult(&$result)

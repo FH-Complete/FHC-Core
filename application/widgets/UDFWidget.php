@@ -5,6 +5,9 @@
  */
 class UDFWidget extends UDFWidgetTpl
 {
+	const NAME = 'name';
+	const TYPE = 'type';
+	const LIST_VALUES = 'listValues';
 	const REGEX_LANGUAGE = 'js';
 	
     public function display($widgetData)
@@ -44,19 +47,19 @@ class UDFWidget extends UDFWidgetTpl
 					foreach($jsonSchemasArray as $jsonSchema)
 					{
 						// 
-						if (!isset($jsonSchema->type))
+						if (!isset($jsonSchema->{UDFWidget::TYPE}))
 						{
 							show_error(sprintf('%s.%s: Attribute "type" not present in the json schema', $schema, $table));
 							break;
 						}
-						if (!isset($jsonSchema->name))
+						if (!isset($jsonSchema->{UDFWidget::NAME}))
 						{
 							show_error(sprintf('%s.%s: Attribute "name" not present in the json schema', $schema, $table));
 							break;
 						}
 						
 						// 
-						if ((isset($field) && $field == $jsonSchema->name) || !isset($field))
+						if ((isset($field) && $field == $jsonSchema->{UDFWidget::NAME}) || !isset($field))
 						{
 							$this->_setAttributesWithPhrases($jsonSchema);
 							
@@ -67,7 +70,7 @@ class UDFWidget extends UDFWidgetTpl
 							$this->_render($jsonSchema);
 							
 							// 
-							if (isset($field) && $field == $jsonSchema->name)
+							if (isset($field) && $field == $jsonSchema->{UDFWidget::NAME})
 							{
 								$found = true;
 								break;
@@ -98,8 +101,8 @@ class UDFWidget extends UDFWidgetTpl
      */
     private function _setNameAndId($jsonSchema)
     {
-		$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_ID] = $jsonSchema->name;
-		$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] = $jsonSchema->name;
+		$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_ID] = $jsonSchema->{UDFWidget::NAME};
+		$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] = $jsonSchema->{UDFWidget::NAME};
     }
     
     /**
@@ -172,27 +175,27 @@ class UDFWidget extends UDFWidgetTpl
     private function _render($jsonSchema)
     {
 		// Type
-		if ($jsonSchema->type == 'checkbox')
+		if ($jsonSchema->{UDFWidget::TYPE} == 'checkbox')
 		{
 			$this->_renderCheckbox($jsonSchema);
 		}
-		else if ($jsonSchema->type == 'textfield')
+		else if ($jsonSchema->{UDFWidget::TYPE} == 'textfield')
 		{
 			$this->_renderTextfield($jsonSchema);
 		}
-		else if ($jsonSchema->type == 'textarea')
+		else if ($jsonSchema->{UDFWidget::TYPE} == 'textarea')
 		{
 			$this->_renderTextarea($jsonSchema);
 		}
-		else if ($jsonSchema->type == 'date')
+		else if ($jsonSchema->{UDFWidget::TYPE} == 'date')
 		{
 			
 		}
-		else if ($jsonSchema->type == 'dropdown')
+		else if ($jsonSchema->{UDFWidget::TYPE} == 'dropdown')
 		{
 			$this->_renderDropdown($jsonSchema);
 		}
-		else if ($jsonSchema->type == 'multipledropdown')
+		else if ($jsonSchema->{UDFWidget::TYPE} == 'multipledropdown')
 		{
 			$this->_renderDropdown($jsonSchema, true);
 		}
@@ -205,23 +208,23 @@ class UDFWidget extends UDFWidgetTpl
 	{
 		
 		if (isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME])
-			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name]))
+			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}]))
 		{
-			$this->_args[DropdownWidget::SELECTED_ELEMENT] = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name];
+			$this->_args[DropdownWidget::SELECTED_ELEMENT] = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
 		}
 		
 		$dropdownWidgetUDF = new DropdownWidgetUDF($this->_name, $this->_args);
 		$parameters = array();
 		
 		// 
-		if (isset($jsonSchema->listValues->enum))
+		if (isset($jsonSchema->{UDFWidget::LIST_VALUES}->enum))
 		{
-			$parameters = $jsonSchema->listValues->enum;
+			$parameters = $jsonSchema->{UDFWidget::LIST_VALUES}->enum;
 		}
 		// 
-		else if (isset($jsonSchema->listValues->sql))
+		else if (isset($jsonSchema->{UDFWidget::LIST_VALUES}->sql))
 		{
-			$queryResult = $this->UDFModel->execQuery($jsonSchema->listValues->sql);
+			$queryResult = $this->UDFModel->execQuery($jsonSchema->{UDFWidget::LIST_VALUES}->sql);
 			if (hasData($queryResult))
 			{	
 				$parameters = $queryResult->retval;
@@ -245,9 +248,9 @@ class UDFWidget extends UDFWidgetTpl
 		$text = null;
 		
 		if (isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME])
-			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name]))
+			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}]))
 		{
-			$text = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name];
+			$text = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
 		}
 		
 		$textareaUDF->render($text);
@@ -262,9 +265,9 @@ class UDFWidget extends UDFWidgetTpl
 		$text = null;
 		
 		if (isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME])
-			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name]))
+			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}]))
 		{
-			$text = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name];
+			$text = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
 		}
 		
 		$textareaUDF->render($text);
@@ -276,32 +279,33 @@ class UDFWidget extends UDFWidgetTpl
 	private function _renderCheckbox($jsonSchema)
 	{
 		if (isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME])
-			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name]))
+			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}]))
 		{
-			$this->_args[CheckboxWidget::CHECKED_ELEMENT] = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->name];
+			$this->_args[CheckboxWidget::CHECKED_ELEMENT] = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
 		}
 		
 		// 
 		if (!isset($this->_args[CheckboxWidget::CHECKED_ELEMENT]))
 		{
-			$this->_args[CheckboxWidget::CHECKED_ELEMENT] = $jsonSchema->defaultValue;
+			$this->_args[CheckboxWidget::CHECKED_ELEMENT] = $jsonSchema->{UDFWidgetTpl::DEFAULT_VALUE};
 		}
 		
 		$checkboxWidgetUDF = new CheckboxWidgetUDF($this->_name, $this->_args);
 		$parameters = array();
 		
 		// 
-		if (isset($jsonSchema->listValues->enum))
+		if (isset($jsonSchema->{UDFWidget::LIST_VALUES}->enum))
 		{
-			$parameters = $jsonSchema->listValues->enum;
+			$parameters = $jsonSchema->{UDFWidget::LIST_VALUES}->enum;
 		}
 		// 
-		else if (isset($jsonSchema->listValues->sql))
+		else if (isset($jsonSchema->{UDFWidget::LIST_VALUES}->sql))
 		{
-			$queryResult = $this->UDFModel->execQuery($jsonSchema->listValues->sql);
+			$queryResult = $this->UDFModel->execQuery($jsonSchema->{UDFWidget::LIST_VALUES}->sql);
 			if (hasData($queryResult))
-			{	
-				$parameters = $queryResult->retval;
+			{
+				$tmpResult = (array)$queryResult->retval[0];
+				$parameters = $tmpResult;
 			}
 		}
 		
