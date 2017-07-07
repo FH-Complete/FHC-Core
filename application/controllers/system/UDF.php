@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class TestUDF extends VileSci_Controller 
+class UDF extends VileSci_Controller 
 {
 	public function __construct()
     {
@@ -24,10 +24,16 @@ class TestUDF extends VileSci_Controller
 		
 		$person = $this->PersonModel->load($person_id);
 		
+		$udfs = $this->PersonModel->getUDFs();
+		
+		$udfs['person_id'] = 1;
+		$udfs['prestudent_id'] = 1;
+		$udfs['caller'] = 'system/UDF?person_id=1';
+		
 		$data = array(
-			'udfs' => $this->PersonModel->getUDFs()
+			'udfs' => $udfs
 		);
 		
-		$this->load->view('system/testudf', $data);
+		$this->load->view('system/udf', $data);
 	}
 }

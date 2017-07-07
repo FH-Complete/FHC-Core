@@ -99,6 +99,9 @@ define('FAS_REIHUNGSTEST_PUNKTE', false);
 // Legt fest ob Messages im FAS angezeigt werden true|false
 define('FAS_MESSAGES',false);
 
+// Enable (true) or disable (false) the UDF tab
+define('FAS_UDF', true);
+
 // Legt fest ob Aufnahmegruppen bei Reihungstests verwaltet werden true|false
 define('FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN',false);
 

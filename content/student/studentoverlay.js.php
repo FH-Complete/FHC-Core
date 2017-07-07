@@ -5433,6 +5433,27 @@ function StudentMessagesIFrameLoad()
 }
 
 // ****
+// * Load UDF IFrame
+// ****
+function StudentUDFIFrameLoad()
+{
+	var tree = document.getElementById('student-tree');
+
+	if (tree.currentIndex == -1) return;
+
+	try
+	{
+		//Ausgewaehlte person_id holen
+		var person_id = getTreeCellText(tree, 'student-treecol-person_id', tree.currentIndex);
+		var prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', tree.currentIndex);
+		
+		url = 'udf.xul.php?person_id='+person_id+'&prestudent_id='+prestudent_id;
+		document.getElementById('student-udf').setAttribute('src', url);
+	}
+	catch(e) {}
+}
+
+// ****
 // * Laedt den Anwesenheit IFrame
 // ****
 function StudentAnwesenheitIFrameLoad()

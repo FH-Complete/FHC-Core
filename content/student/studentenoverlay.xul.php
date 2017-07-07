@@ -484,6 +484,11 @@ else
 							if(!defined('FAS_MESSAGES') || FAS_MESSAGES==true)
 								echo '<tab id="student-tab-messages" label="Messages" onclick="StudentMessagesIFrameLoad();"/>';
 							?>
+							
+							<?php
+							if(!defined('FAS_UDF') || FAS_UDF==true)
+								echo '<tab id="student-tab-udf" label="UDF" onclick="StudentUDFIFrameLoad();"/>';
+							?>
 
 						</tabs>
 						<tabpanels id="student-tabpanels-main" flex="1">
@@ -516,9 +521,13 @@ else
                             ?>
 							<iframe id="student-aufnahmetermine" style="margin: 0px;" src="" />
 							<?php
-							if(!defined('FAS_MESSAGES') || FAS_MESSAGES==true)
-								echo '<iframe id="student-messages" style="margin: 0px;" src="" />';
+								if(!defined('FAS_MESSAGES') || FAS_MESSAGES==true)
+									echo '<iframe id="student-messages" style="margin: 0px;" src="" />';
+								
+								if(!defined('FAS_UDF') || FAS_UDF==true)
+									echo '<iframe id="student-udf" style="margin: 0px;" src="" />';
 							?>
+							
 						</tabpanels>
 					</tabbox>
 				</vbox>
