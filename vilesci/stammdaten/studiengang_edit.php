@@ -85,7 +85,7 @@ if(isset($_GET['action']) && $_GET['action']=='save')
 
 	}
 
-	if($studiengang_kz==334)
+	if(in_array($studiengang_kz,array(334,257)))
 	{
 		$benutzerfunktion = new benutzerfunktion();
 		$benutzerfunktion->getOeFunktionen($stg->oe_kurzbz, 'Leitung');
@@ -180,9 +180,9 @@ echo '
 	</td>
 </tr>';
 
-if($stg->studiengang_kz==334)
+if(in_array($stg->studiengang_kz, array(334,257)))
 {
-	// Studiengang MIT / MSC kann auch die Leitung aktivieren/deaktivieren
+	// Studiengang MIT / MSC und BIF kann auch die Leitung aktivieren/deaktivieren
 	echo '<tr>';
 	echo '<td valign="top">Leitung</td>';
 	echo '<td>';
