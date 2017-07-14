@@ -1,12 +1,12 @@
-<?php 
+<?php
 require_once('../config/vilesci.config.inc.php');
 header("Content-type: text/plain");
 echo "<?xml version='1.0' encoding='utf-8' ?>";
 ?>
-<wsdl:definitions 
-  xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" 
-  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+<wsdl:definitions
+  xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
 
 <wsdl:types>
@@ -66,7 +66,7 @@ echo "<?xml version='1.0' encoding='utf-8' ?>";
 
 <wsdl:service name="SemesterTicketService">
     <wsdl:port name="SemesterTicketServicePort" binding="SemesterTicketServicePortSoapBinding">
-        <wsdlsoap:address location="<?php echo APP_ROOT."soap/semesterticket.soap.php?".microtime();?>" />
+        <wsdlsoap:address location="<?php echo APP_ROOT."soap/semesterticket.soap.php?".microtime(true);?>" />
     </wsdl:port>
 </wsdl:service>
 </wsdl:definitions>

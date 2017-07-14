@@ -1,4 +1,5 @@
 <?php
-if ($value) {
+if ($value)
+{
 	$thing = 'test';
-	}
+}

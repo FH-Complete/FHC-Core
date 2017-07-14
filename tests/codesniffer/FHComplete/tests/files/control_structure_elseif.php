@@ -1,6 +1,9 @@
 <?php
-if (isset($a)) {
+if (isset($a))
+{
 	echo 'a isset';
-} else if (isset($b)) {
+}
+elseif (isset($b))
+{
 	echo 'b isset';
 }

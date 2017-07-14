@@ -27,7 +27,7 @@ header("Pragma: no-cache");
 
 require_once('../config/vilesci.config.inc.php');
 
-$SOAPServer = new SoapServer(APP_ROOT."soap/test.wsdl.php?".microtime());
+$SOAPServer = new SoapServer(APP_ROOT."soap/test.wsdl.php?".microtime(true));
 $SOAPServer->addFunction("myTest");
 $SOAPServer->handle();
 
@@ -44,5 +44,3 @@ function myTest($foo)
 }
 
 ?>
-
-

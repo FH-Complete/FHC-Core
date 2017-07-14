@@ -46,6 +46,12 @@ $prestudent_id = filter_input(INPUT_GET, 'prestudent_id');
 $rt_person_id = filter_input(INPUT_GET, 'rt_person_id');
 
 $oRdf->sendHeader();
+$reihungstest_obj_arr = array();
+$studienplan_obj_arr = array();
+$studienordnung_obj_arr = array();
+$stsem_arr = array();
+$youngest_rt_stsem = '';
+$zuordnung_fuer_selben_studiengang = array();
 
 if($prestudent_id!='')
 {
@@ -58,6 +64,43 @@ if($prestudent_id!='')
 
 	foreach($reihungstest->result as $row)
 	{
+		// Reihungstest laden
+		if(!isset($reihungstest_obj_arr[$row->reihungstest_id]))
+		{
+			$reihungstest_obj_arr[$row->reihungstest_id] = new reihungstest();
+			$reihungstest_obj_arr[$row->reihungstest_id]->load($row->reihungstest_id);
+		}
+
+		// Studienplan laden
+		if(!isset($studienplan_obj_arr[$row->studienplan_id]))
+		{
+			$studienplan_obj_arr[$row->studienplan_id] = new studienplan();
+			$studienplan_obj_arr[$row->studienplan_id]->loadStudienplan($row->studienplan_id);
+		}
+
+		// Studienordnung laden
+		$studienordnung_id = $studienplan_obj_arr[$row->studienplan_id]->studienordnung_id;
+		if(!isset($studienordnung_obj_arr[$studienordnung_id]))
+		{
+			$studienordnung_obj_arr[$studienordnung_id] = new studienordnung();
+			$studienordnung_obj_arr[$studienordnung_id]->loadStudienordnung($studienordnung_id);
+		}
+
+		// Pruefen ob das ein Reihungstest fuer den Studiengang des Prestudenten ist
+		if($studienordnung_obj_arr[$studienordnung_id]->studiengang_kz == $prestudent->studiengang_kz)
+		{
+			$zuordnung_fuer_selben_studiengang[] = $row->rt_person_id;
+			$stsem_arr[] = $reihungstest_obj_arr[$row->reihungstest_id]->studiensemester_kurzbz;
+		}
+	}
+	if(count($stsem_arr) > 0)
+	{
+		$studiensemester = new studiensemester();
+		$youngest_rt_stsem = $studiensemester->getYoungestFromArray($stsem_arr);
+	}
+
+	foreach($reihungstest->result as $row)
+	{
 		drawrow($row);
 	}
 }
@@ -65,23 +108,39 @@ elseif($rt_person_id!='')
 {
 	$reihungstest = new reihungstest();
 	if($reihungstest->loadReihungstestPerson($rt_person_id))
+	{
+		$reihungstest_obj_arr[$reihungstest->reihungstest_id] = new reihungstest();
+		$reihungstest_obj_arr[$reihungstest->reihungstest_id]->load($reihungstest->reihungstest_id);
 		drawrow($reihungstest);
+	}
 	else
 		die($reihungstest->errormsg);
 }
 
 function drawrow($row)
 {
-	global $oRdf, $datum_obj;
+	global $oRdf, $datum_obj, $reihungstest_obj_arr, $youngest_rt_stsem, $zuordnung_fuer_selben_studiengang;
+	global $studienplan_obj_arr, $studienordnung_obj_arr;
 
-	$reihungstest_obj = new reihungstest();
-	$reihungstest_obj->load($row->reihungstest_id);
+	$reihungstest_obj = $reihungstest_obj_arr[$row->reihungstest_id];
 
-	$studienplan = new studienplan();
-	$studienplan->loadStudienplan($row->studienplan_id);
+	if(!isset($studienplan_obj_arr[$row->studienplan_id]))
+	{
+		$studienplan = new studienplan();
+		$studienplan->loadStudienplan($row->studienplan_id);
+	}
+	else
+	{
+		$studienplan = $studienplan_obj_arr[$row->studienplan_id];
+	}
 
-	$studienordnung = new studienordnung();
-	$studienordnung->loadStudienordnung($studienplan->studienordnung_id);
+	if(!isset($studienordnung_obj_arr[$studienplan->studienordnung_id]))
+	{
+		$studienordnung = new studienordnung();
+		$studienordnung->loadStudienordnung($studienplan->studienordnung_id);
+	}
+	else
+		$studienordnung = $studienordnung_obj_arr[$studienplan->studienordnung_id];
 
 	$stpl_stg = new studiengang();
 	$stpl_stg->load($studienordnung->studiengang_kz);
@@ -103,6 +162,14 @@ function drawrow($row)
 	$oRdf->obj[$i]->setAttribut('studiensemester',$reihungstest_obj->studiensemester_kurzbz,true);
 	$oRdf->obj[$i]->setAttribut('datum',$datum_obj->formatDatum($reihungstest_obj->datum,'d.m.Y'),true);
 	$oRdf->obj[$i]->setAttribut('datum_iso',$reihungstest_obj->datum,true);
+
+	// Es wird der neueste Reihungstest im Studiengang des Prestudenten markiert damit im FAS erkennbar ist welches
+	// Eintraege zur Punkteberechnung verwendet werden
+	if($reihungstest_obj->studiensemester_kurzbz == $youngest_rt_stsem
+		&& in_array($row->rt_person_id,$zuordnung_fuer_selben_studiengang))
+		$oRdf->obj[$i]->setAttribut('properties','makeItMarked',true);
+	else
+		$oRdf->obj[$i]->setAttribut('properties','',true);
 
 	$oRdf->addSequence($row->rt_person_id);
 }

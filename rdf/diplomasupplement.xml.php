@@ -940,6 +940,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 // return true wenn neue note genommen werden soll
 function checkNote($note_alt, $note_neu)
 {
+	$priority_neu = 9999;
+	$priority_alt = 9999;
 	$arrayNotenPriority = array(
 		'0' => '1',
 		'1' => '2',

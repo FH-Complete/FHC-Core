@@ -19,7 +19,7 @@
  * Authors:		Karl Burkhart <burkhart@technikum-wien.at>.
  */
 
-require_once('../config/vilesci.config.inc.php'); 
+require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/webservicerecht.class.php');
@@ -31,52 +31,52 @@ require_once('../include/studiengang.class.php');
 
 ini_set("soap.wsdl_cache_enabled", "0");
 
-$SOAPServer = new SoapServer(APP_ROOT."/soap/lehrveranstaltung.wsdl.php?".microtime());
+$SOAPServer = new SoapServer(APP_ROOT."/soap/lehrveranstaltung.wsdl.php?".microtime(true));
 $SOAPServer->addFunction("getLehrveranstaltungFromId");
 $SOAPServer->addFunction("getLehrveranstaltungFromStudiengang");
 $SOAPServer->handle();
 
 /*
- * 
+ *
  * Funktion getLehrveranstaltungFromId liefert eine LV  zurück
  * @param lehrveranstaltung_id - Lehrveranstaltungs ID -> Pflichtfeld
  * @param semester - SemesterKurzbz -> Optional
- * @param authentifizierung - Array mit Username und Passwort -> Pflichtfeld 
- * 
+ * @param authentifizierung - Array mit Username und Passwort -> Pflichtfeld
+ *
  */
 function getLehrveranstaltungFromId($lehrveranstaltung_id, $semester, $authentifizierung)
 {
     if($lehrveranstaltung_id == '')
         return new SOAPFault("Server", "lehrveranstaltungs_id must be set");
-     
-    $user = $authentifizierung->username; 
+
+    $user = $authentifizierung->username;
     $passwort = $authentifizierung->passwort;
-    $lv_id = $lehrveranstaltung_id; 
+    $lv_id = $lehrveranstaltung_id;
 
     // User authentifizieren
     if(!check_user($user, $passwort))
-        return new SoapFault("Server", "Invalid Credentials");	
- 
+        return new SoapFault("Server", "Invalid Credentials");
+
     // darf user überhaupt was von Methode sehen
-    $recht = new webservicerecht(); 
+    $recht = new webservicerecht();
     if(!$recht->isUserAuthorized($user, 'getLehrveranstaltungFromId'))
         return new SoapFault("Server", "No permission");
-   
+
     // Daten für Lehrveranstaltung
-    $lv = new lehrveranstaltung(); 
+    $lv = new lehrveranstaltung();
     if(!$lv->load($lv_id))
-        return new SoapFault("Server", "Error loading Lv");	
-    
-    class foo{}; 
+        return new SoapFault("Server", "Error loading Lv");
+
+    class foo{};
     $mitarbeiterlehreinheit = array(); // uids aller mitarbeiter
     $gruppelehreinheit = array(); // objekte aller gruppen
     $moodleArray = array(); // ids aller moodle kurse
-       
+
     // wenn semester nicht übergeben wurde, gib nur bezeichnung und lehreverzeichnis aus
     if($semester != '')
     {
         // hole alle Lehreinheiten von Lehrveranstaltung
-        $lehreinheit = new lehreinheit(); 
+        $lehreinheit = new lehreinheit();
         if(!$lehreinheit->load_lehreinheiten($lv_id, $semester))
             return new SoapFault("Server", $lehreinheit->errormsg);
 
@@ -86,39 +86,39 @@ function getLehrveranstaltungFromId($lehrveranstaltung_id, $semester, $authentif
             $mitarbeiter = new lehreinheitmitarbeiter();
             $mitarbeiter->getLehreinheitmitarbeiter($l->lehreinheit_id);
             foreach($mitarbeiter->lehreinheitmitarbeiter as $m)
-                $mitarbeiterlehreinheit[]=$m->mitarbeiter_uid; 
+                $mitarbeiterlehreinheit[]=$m->mitarbeiter_uid;
 
             // alle gruppen einer lehreinheit
-            $gruppe = new lehreinheitgruppe(); 
+            $gruppe = new lehreinheitgruppe();
             $gruppe->getLehreinheitgruppe($l->lehreinheit_id);
             foreach($gruppe->lehreinheitgruppe as $g)
             {
-                $grp = new foo(); 
-                $grp->studiengang_kz = $g->studiengang_kz; 
-                $grp->semester=$g->semester; 
-                $grp->verband=$g->verband; 
-                $grp->gruppe=$g->gruppe; 
-                $grp->grupppe_kurzbz=$g->gruppe_kurzbz; 
-                $gruppelehreinheit[] = $grp; 
+                $grp = new foo();
+                $grp->studiengang_kz = $g->studiengang_kz;
+                $grp->semester=$g->semester;
+                $grp->verband=$g->verband;
+                $grp->gruppe=$g->gruppe;
+                $grp->grupppe_kurzbz=$g->gruppe_kurzbz;
+                $gruppelehreinheit[] = $grp;
             }
         }
-        
+
         // alle moodle kurse einer lv
         $moodleArray = $lv->getMoodleKurse($lehrveranstaltung_id, $semester);
 
     }
-    
-    $LvObject = new foo(); 
-    $LvObject->bezeichnung = $lv->bezeichnung; 
-    $LvObject->lehreverzeichnis = $lv->lehreverzeichnis; 
-    $LvObject->moodle_id = $moodleArray; 
-    $LvObject->lektoren = $mitarbeiterlehreinheit; 
-    $LvObject->gruppen= $gruppelehreinheit; 
-    
-    // lösche alle Attribute für die user keine Berechtigung hat 
+
+    $LvObject = new foo();
+    $LvObject->bezeichnung = $lv->bezeichnung;
+    $LvObject->lehreverzeichnis = $lv->lehreverzeichnis;
+    $LvObject->moodle_id = $moodleArray;
+    $LvObject->lektoren = $mitarbeiterlehreinheit;
+    $LvObject->gruppen= $gruppelehreinheit;
+
+    // lösche alle Attribute für die user keine Berechtigung hat
     $LvObject = $recht->clearResponse($user, 'getLehrveranstaltungFromId', $LvObject);
 
-    return $LvObject; 
+    return $LvObject;
 }
 
 /*
@@ -127,90 +127,90 @@ function getLehrveranstaltungFromId($lehrveranstaltung_id, $semester, $authentif
  * @param semester - Semester_kurzbz -> Pflichtfeld
  * @param ausbildungssemester - Ausbildungssemester -> Optional
  * @param authentifizierung - Array mit Username und Passwort -> Pflichtfeld
- * 
+ *
 */
 function getLehrveranstaltungFromStudiengang($studiengang, $semester, $ausbildungssemester, $authentifizierung)
 {
 
-    $user = $authentifizierung->username; 
+    $user = $authentifizierung->username;
     $passwort = $authentifizierung->passwort;
-    
+
     if($studiengang == '' || $semester == '')
         return new SOAPFault("Server", "studiengang | semester must be set");
-    
+
     // User authentifizieren
     if(!check_user($user, $passwort))
-        return new SoapFault("Server", "Invalid Credentials");	
-    
+        return new SoapFault("Server", "Invalid Credentials");
+
     // darf user überhaupt was von Methode sehen
-    $recht = new webservicerecht(); 
+    $recht = new webservicerecht();
     if(!$recht->isUserAuthorized($user, 'getLehrveranstaltungFromStudiengang'))
         return new SoapFault("Server", "No permission");
-    
+
     // Daten für Lehrveranstaltung
-    $lehrveranstaltung = new lehrveranstaltung(); 
-    $stud = new studiengang(); 
-    
+    $lehrveranstaltung = new lehrveranstaltung();
+    $stud = new studiengang();
+
     if(!$stud->load($studiengang))
         return new SoapFault ("Server", "Error loading Studiengang");
-    
+
     if(!$lehrveranstaltung->load_lva_le($stud->studiengang_kz, $semester, $ausbildungssemester))
-        return new SoapFault("Server", "Error loading Lv");	
-    
+        return new SoapFault("Server", "Error loading Lv");
+
     class bar{};
-    $lvFromStudiengang= array(); 
+    $lvFromStudiengang= array();
 
     foreach($lehrveranstaltung->lehrveranstaltungen as $lv)
     {
         $mitarbeiterlehreinheit = array(); // uids aller mitarbeiter der lehreinheit
         $gruppelehreinheit = array(); // ids aller grupper der lehreinheit
         $moodleArray = array();
-        
+
         // hole alle Lehreinheiten von Lehrveranstaltung
-        $lehreinheit = new lehreinheit(); 
+        $lehreinheit = new lehreinheit();
         if(!$lehreinheit->load_lehreinheiten($lv->lehrveranstaltung_id, $semester))
             return new SoapFault("Server", $lehreinheit->errormsg);
 
-       
-        
+
+
 
         foreach($lehreinheit->lehreinheiten as $l)
-        {    
+        {
             // alle mitarbeiter der lehreinheit
             $mitarbeiter = new lehreinheitmitarbeiter();
             $mitarbeiter->getLehreinheitmitarbeiter($l->lehreinheit_id);
             foreach($mitarbeiter->lehreinheitmitarbeiter as $m)
-                $mitarbeiterlehreinheit[]=$m->mitarbeiter_uid; 
+                $mitarbeiterlehreinheit[]=$m->mitarbeiter_uid;
 
             // alle gruppen der lehreinheit
-            $gruppe = new lehreinheitgruppe(); 
+            $gruppe = new lehreinheitgruppe();
             $gruppe->getLehreinheitgruppe($l->lehreinheit_id);
             foreach($gruppe->lehreinheitgruppe as $g)
             {
-                $grp = new bar(); 
-                $grp->studiengang_kz = $g->studiengang_kz; 
-                $grp->semester=$g->semester; 
-                $grp->verband=$g->verband; 
-                $grp->gruppe=$g->gruppe; 
-                $grp->grupppe_kurzbz=$g->gruppe_kurzbz; 
-                $gruppelehreinheit[] = $grp; 
+                $grp = new bar();
+                $grp->studiengang_kz = $g->studiengang_kz;
+                $grp->semester=$g->semester;
+                $grp->verband=$g->verband;
+                $grp->gruppe=$g->gruppe;
+                $grp->grupppe_kurzbz=$g->gruppe_kurzbz;
+                $gruppelehreinheit[] = $grp;
             }
         }
         // alle moodlekurse der lehrveranstaltung
         $moodleArray = $lv->getMoodleKurse($lv->lehrveranstaltung_id, $semester);
-        
+
         // LV Object für Rückgabe
-        $lehrveranstaltungen = new bar(); 
-        $lehrveranstaltungen->bezeichnung = $lv->bezeichnung; 
-        $lehrveranstaltungen->lehreverzeichnis = $lv->lehreverzeichnis; 
-        $lehrveranstaltungen->moodle_id = $moodleArray; 
+        $lehrveranstaltungen = new bar();
+        $lehrveranstaltungen->bezeichnung = $lv->bezeichnung;
+        $lehrveranstaltungen->lehreverzeichnis = $lv->lehreverzeichnis;
+        $lehrveranstaltungen->moodle_id = $moodleArray;
         $lehrveranstaltungen->lektoren = $mitarbeiterlehreinheit;
-        $lehrveranstaltungen->gruppen = $gruppelehreinheit; 
-        
+        $lehrveranstaltungen->gruppen = $gruppelehreinheit;
+
         $lehrveranstaltungen = $recht->clearResponse($user, 'getLehrveranstaltungFromStudiengang', $lehrveranstaltungen);
-        
-        $lvFromStudiengang[] = $lehrveranstaltungen; 
+
+        $lvFromStudiengang[] = $lehrveranstaltungen;
     }
-    return ($lvFromStudiengang); 
+    return ($lvFromStudiengang);
 }
 ?>

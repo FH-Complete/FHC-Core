@@ -31,7 +31,7 @@ require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 
-$SOAPServer = new SoapServer(APP_ROOT."/soap/projektphase.wsdl.php?".microtime());
+$SOAPServer = new SoapServer(APP_ROOT."/soap/projektphase.wsdl.php?".microtime(true));
 $SOAPServer->addFunction("saveProjektphase");
 $SOAPServer->addFunction("deleteProjektphase");
 $SOAPServer->handle();

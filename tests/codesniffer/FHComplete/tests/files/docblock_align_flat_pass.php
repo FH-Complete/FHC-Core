@@ -17,7 +17,8 @@ $anotherThing = 'what';
  * What happens with If's?
  *
  */
-if ($anotherThing !== 'notfun') {
+if ($anotherThing !== 'notfun')
+{
     $anotherThing = 'Oh no.';
 }
 
