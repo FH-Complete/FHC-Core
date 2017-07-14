@@ -225,7 +225,7 @@ if(isset($_REQUEST['btn_submitStudent']))
 	{
 		foreach($studiengang->result as $stud)
 		{
-			if($stud->studiengang_kz >= '10000' || $stud->studiengang_kz < '0')
+			if($stud->studiengang_kz >= '10000' || $stud->studiengang_kz < '0' || $stud->studiengang_kz == '9005')
 				$studenten->getStudentsStudiengang($stud->studiengang_kz, $semester);
 		}
 	}
