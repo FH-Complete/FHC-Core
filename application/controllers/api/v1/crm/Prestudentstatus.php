@@ -35,11 +35,11 @@ class Prestudentstatus extends APIv1_Controller
 		$studiensemester_kurzbz = $this->get('studiensemester_kurzbz');
 		$status_kurzbz = $this->get('status_kurzbz');
 		$prestudent_id = $this->get('prestudent_id');
-		
+
 		if (isset($ausbildungssemester) && isset($studiensemester_kurzbz) && isset($status_kurzbz) && isset($prestudent_id))
 		{
 			$result = $this->PrestudentstatusModel->load(array($ausbildungssemester, $studiensemester_kurzbz, $status_kurzbz, $prestudent_id));
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -47,7 +47,7 @@ class Prestudentstatus extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -56,11 +56,11 @@ class Prestudentstatus extends APIv1_Controller
 		$prestudent_id = $this->get("prestudent_id");
 		$studiensemester_kurzbz = $this->get("studiensemester_kurzbz");
 		$status_kurzbz = $this->get("status_kurzbz");
-		
+
 		if (isset($prestudent_id))
 		{
 			$result = $this->PrestudentstatusModel->getLastStatus($prestudent_id, $studiensemester_kurzbz, $status_kurzbz);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -75,14 +75,14 @@ class Prestudentstatus extends APIv1_Controller
 	public function postPrestudentstatus()
 	{
 		$prestudentstatus = $this->post();
-		
+
 		if ($this->_validate($prestudentstatus))
 		{
 			if(isset($prestudentstatus['new']) && $prestudentstatus['new'] == true)
 			{
 				// Remove new parameter to avoid DB insert errors
 				unset($prestudentstatus['new']);
-				
+
 				$result = $this->PrestudentstatusModel->insert($prestudentstatus);
 			}
 			else
@@ -95,7 +95,7 @@ class Prestudentstatus extends APIv1_Controller
 
 				$result = $this->PrestudentstatusModel->update($pksArray, $prestudentstatus);
 			}
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -103,14 +103,14 @@ class Prestudentstatus extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	/**
 	 * @return void
 	 */
 	public function deletePrestudentstatus()
 	{
 		$prestudentstatus = $this->delete();
-		
+
 		if ($this->_validate($prestudentstatus))
 		{
 			$pksArray = array($prestudentstatus['ausbildungssemester'],
@@ -120,7 +120,7 @@ class Prestudentstatus extends APIv1_Controller
 							);
 
 			$result = $this->PrestudentstatusModel->delete($pksArray);
-			
+
 			$this->response($result, REST_Controller::HTTP_OK);
 		}
 		else
@@ -128,9 +128,34 @@ class Prestudentstatus extends APIv1_Controller
 			$this->response();
 		}
 	}
-	
+
 	private function _validate($prestudentstatus = null)
 	{
 		return true;
 	}
+
+	/**
+	 * Get list of Status entries of a prestudent according to the filter
+	 *
+	 * @return void
+	 */
+	public function getStatusByFilter()
+	{
+		$prestudent_id = $this->get("prestudent_id");
+		$status_kurzbz = $this->get("status_kurzbz");
+		$ausbildungssemester = $this->get("ausbildungssemester");
+		$studiensemester_kurzbz = $this->get("studiensemester_kurzbz");
+
+		if (isset($prestudent_id))
+		{
+			$result = $this->PrestudentstatusModel->getStatusByFilter($prestudent_id, $status_kurzbz, $ausbildungssemester, $studiensemester_kurzbz);
+
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
+
 }
