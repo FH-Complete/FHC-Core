@@ -1077,20 +1077,6 @@ class CheckboxWidget extends Widget
 	/**
 	 * 
 	 */
-	public function __construct($name, $args, $htmlArgs = array())
-	{
-		parent::__construct($name, $args, $htmlArgs);
-		
-		// 
-		if (!isset($this->_args[CheckboxWidget::CHECKED_ELEMENT]))
-		{
-			$this->_args[CheckboxWidget::CHECKED_ELEMENT] = Widget::HTML_DEFAULT_VALUE;
-		}
-	}
-	
-	/**
-	 * 
-	 */
 	protected function setValue($value)
 	{
 		$tmpValue = $value;
@@ -1133,48 +1119,6 @@ class CheckboxWidgetUDF extends CheckboxWidget
 		$this->loadCheckboxView();
 		
 		echo $this->content();
-		
-// 		$tmpElements = array();
-		
-		// 
-// 		foreach($parameters as $parameter)
-// 		{
-// 			// 
-// 			if ((is_array($parameter) && count($parameter) == 2)
-// 				|| (is_string($parameter) || is_numeric($parameter))
-// 				|| (is_object($parameter) && isset($parameter->{PARENT::VALUE_FIELD})
-// 					&& isset($parameter->{PARENT::DESCRIPTION_FIELD})))
-// 			{
-// 				$element = new stdClass(); // 
-// 				// 
-// 				if (is_array($parameter) && count($parameter) == 2)
-// 				{
-// 					$element->{PARENT::VALUE_FIELD} = $parameter[0]; // 
-// 					$element->{PARENT::DESCRIPTION_FIELD} = $parameter[1]; // 
-// 				}
-// 				// 
-// 				else if (is_string($parameter) || is_numeric($parameter))
-// 				{
-// 					$element->{PARENT::VALUE_FIELD} = $parameter; // 
-// 					$element->{PARENT::DESCRIPTION_FIELD} = $parameter; // 
-// 				}
-// 				// 
-// 				else if (is_object($parameter) && isset($parameter->{PARENT::VALUE_FIELD})
-// 					&& isset($parameter->{PARENT::DESCRIPTION_FIELD}))
-// 				{
-// 					$element->{PARENT::VALUE_FIELD} = $parameter->{PARENT::VALUE_FIELD}; // 
-// 					$element->{PARENT::DESCRIPTION_FIELD} = $parameter->{PARENT::DESCRIPTION_FIELD}; // 
-// 				}
-// 				
-// 				array_push($tmpElements, $element); // 
-// 			}
-// 		}
-// 		
-// 		$this->setValuesArray(success($tmpElements));
-// 		
-// 		$this->loadCheckboxView();
-// 		
-// 		echo $this->content();
     }
 }
 

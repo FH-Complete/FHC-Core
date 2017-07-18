@@ -283,15 +283,9 @@ class UDFWidget extends UDFWidgetTpl
 		{
 			$this->_args[CheckboxWidget::CHECKED_ELEMENT] = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
 		}
-		
-		// 
-		if (!isset($this->_args[CheckboxWidget::CHECKED_ELEMENT]))
-		{
-			$this->_args[CheckboxWidget::CHECKED_ELEMENT] = $jsonSchema->{UDFWidgetTpl::DEFAULT_VALUE};
-		}
 		else
 		{
-			$this->_args[CheckboxWidget::CHECKED_ELEMENT] = Widget::HTML_DEFAULT_VALUE;
+			$this->_args[CheckboxWidget::CHECKED_ELEMENT] = $jsonSchema->{UDFWidgetTpl::DEFAULT_VALUE};
 		}
 		
 		$checkboxWidgetUDF = new CheckboxWidgetUDF($this->_name, $this->_args);
