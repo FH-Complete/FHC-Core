@@ -1539,6 +1539,12 @@ function StudentAuswahl()
 	{
 		document.getElementById('student-messages').setAttribute('src','messages.xul.php?person_id='+person_id);
 	}
+	
+	// ***** UDF *****
+	if (document.getElementById('student-content-tabs').selectedItem == document.getElementById('student-tab-udf'))
+	{
+		document.getElementById('student-udf').setAttribute('src', 'udf.xul.php?person_id='+person_id+'&prestudent_id='+prestudent_id);
+	}
 
 	// Notizen laden
 	var studentnotiz = document.getElementById('student-box-notizen');

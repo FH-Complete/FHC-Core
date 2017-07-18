@@ -20,34 +20,6 @@
 require_once('../config/vilesci.config.inc.php');
 ?>
 // ********** FUNKTIONEN ********** //
-var UDFPersonID = null;
-var UDFTreeDatasource = ''; // Datasource des Adressen Trees
-var UDFSelectID = '';
-var UDFIFrameIsInitialized = false;
-
-var UDFTreeSinkObserver =
-{
-	onBeginLoad : function(pSink) {},
-	onInterrupt : function(pSink) {},
-	onResume : function(pSink) {},
-	onError : function(pSink, pStatus, pError) {},
-	onEndLoad : function(pSink)
-	{
-		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	}
-};
-
-var UDFTreeListener =
-{
-  willRebuild : function(builder) {  },
-  didRebuild : function(builder)
-  {
-  	  //timeout nur bei Mozilla notwendig da sonst die rows
-  	  //noch keine values haben. Ab Seamonkey funktionierts auch
-  	  //ohne dem setTimeout
-      //window.setTimeout(KontaktAdressenTreeSelectID,10);
-  }
-};
 
 // ****
 // * Laedt die Trees
@@ -58,10 +30,8 @@ function loadUDF(person_id, prestudent_id)
 
 	var udfIFrame = document.getElementById('udfIFrame');
 	
-	alert(udfIFrame.src);
-	
-	if (udfIFrame != null)
+	if (udfIFrame != null && udfIFrame.getAttribute('src') == 'about:blank')
 	{
-		udfIFrame.src = '/core/index.ci.php/system/UDF?person_id=' + person_id + '&prestudent_id' + prestudent_id;
+		udfIFrame.setAttribute('src', '/core/index.ci.php/system/UDF?person_id='+person_id+'&prestudent_id='+prestudent_id);
 	}
 }

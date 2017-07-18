@@ -65,7 +65,7 @@ echo ']>
 
 <vbox flex="1">
 	<hbox flex="1">
-		<iframe id="udfIFrame" editortype="html" src="about:blank" flex="1" type="content-primary" style="min-width: 100px; min-height: 100px; border: 1px solid gray; margin: 10px;"/>
+		<iframe id="udfIFrame" editortype="html" src="about:blank" flex="1" type="content-primary" style="min-width: 100px; min-height: 100px; border: 0px; margin: 10px;"/>
 	</hbox>
 </vbox>
 

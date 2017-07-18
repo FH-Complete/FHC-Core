@@ -49,26 +49,26 @@ class UDF_model extends DB_Model
 		$resultPerson = success('person');
 		$resultPrestudent = success('prestudent');
 		
+		$person_id = $udfs['person_id'];
+		unset($udfs['person_id']);
+		
+		$prestudent_id = $udfs['prestudent_id'];
+		unset($udfs['prestudent_id']);
+		
 		// 
-		if (isset($udfs['person_id']))
+		if (isset($person_id))
 		{
 			// Load model Person_model
 			$this->load->model('person/Person_model', 'PersonModel');
-			
-			$person_id = $udfs['person_id'];
-			unset($udfs['person_id']);
 			
 			$resultPerson = $this->PersonModel->update($person_id, $udfs);
 		}
 		
 		// 
-		if (isset($udfs['prestudent_id']))
+		if (isset($prestudent_id))
 		{
 			// Load model Prestudent_model
 			$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-			
-			$prestudent_id = $udfs['prestudent_id'];
-			unset($udfs['prestudent_id']);
 			
 			$resultPrestudent = $this->PrestudentModel->update($prestudent_id, $udfs);
 		}
