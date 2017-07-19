@@ -15,6 +15,9 @@
 ### CHANGED
 - **[CORE]** Berechtigungsprüfung wurde angepasst damit deaktiverte Benutzer keine Berechtigungen mehr haben
 
+### Updateinfo
+- **[CORE]** Infoscreen wurde umbenannt (informationsbildschirm.php)
+
 ## [3.2]
 
 ### Added
