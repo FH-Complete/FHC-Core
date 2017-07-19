@@ -130,7 +130,7 @@ class Prestudent extends APIv1_Controller
 		$von = $this->get('von');
 		$bis = $this->get('bis');
 
-		if (isset($status_kurzbz))
+		if (isset($status_kurzbz) && isset($von) && isset($bis))
 		{
 			$result = $this->PersonModel->getPersonFromStatus(
 				$status_kurzbz,
