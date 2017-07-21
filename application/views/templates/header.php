@@ -13,6 +13,7 @@ isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
 !isset($jsoneditor) ? $jsoneditor = false : $jsoneditor = $jsoneditor;
 !isset($jsonforms) ? $jsonforms = false : $jsonforms = $jsonforms;
 !isset($textile) ? $textile = false : $textile = $textile;
+!isset($widgetsCSS) ? $widgetsCSS = false : $widgetsCSS = $widgetsCSS;
 
 if ($tablesort || $jquery_checkboxes || $jquery_custom)
 	$jquery = true;
@@ -66,5 +67,8 @@ if ($tablesort || $jquery_checkboxes || $jquery_custom)
 <?php if($jsonforms) : ?>
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/json-forms/dist/css/brutusin-json-forms.min.css'); ?>" />
 	<script type="text/javascript" src="<?php echo base_url('vendor/json-forms/dist/js/brutusin-json-forms.min.js'); ?>"></script>
+<?php endif ?>
+<?php if($widgetsCSS) : ?>
+	<link rel="stylesheet" type="text/css" href="<?php echo base_url('skin/widgets.css'); ?>" />
 <?php endif ?>
 </head>

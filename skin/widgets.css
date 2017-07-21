@@ -1,0 +1,20 @@
+.div-table {
+	display: table;
+}
+
+.div-row {
+	display: table-row;
+}
+
+.div-cell {
+	display: table-cell;
+}
+
+.align-middle {
+	vertical-align: middle;
+}
+
+.align-top {
+	vertical-align: top;
+	padding-top: 1px;
+}

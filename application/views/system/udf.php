@@ -1,7 +1,7 @@
-<?php $this->load->view("templates/header", array("title" => "UDF")); ?>
+<?php $this->load->view("templates/header", array("title" => "UDF", "widgetsCSS" => true)); ?>
 	
 	<body style="background-color: #eff0f1;">
-		
+	
 <?php
 	if ($result != null)
 	{
@@ -47,13 +47,13 @@
 		
 			<table>
 				<tr>
-					<td>
+					<td style="font-size: 20px; font-weight: bold;">
 						Person
 					</td>
 					<td width="30px">
 						&nbsp;
 					</td>
-					<td>
+					<td style="font-size: 20px; font-weight: bold;">
 						Prestudent
 					</td>
 				</tr>
@@ -63,7 +63,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td>
+					<td class="align-top">
 						<?php
 							echo $this->widgetlib->UDFWidget(
 								array(
@@ -77,7 +77,7 @@
 					<td width="30px">
 						&nbsp;
 					</td>
-					<td>
+					<td class="align-top">
 						<?php
 							echo $this->widgetlib->UDFWidget(
 								array(

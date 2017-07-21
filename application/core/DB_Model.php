@@ -27,10 +27,10 @@ class DB_Model extends FHC_Model
 	
 	// UDF validation attributes
 	const UDF_REGEX = 'regex';
-	const UDF_REGEX_LANG = 'php';
 	const UDF_REQUIRED = 'required';
 	const UDF_MAX_VALUE = 'max-value';
 	const UDF_MIN_VALUE = 'min-value';
+	const UDF_REGEX_LANG = 'php';
 	const UDF_MAX_LENGTH = 'max-length';
 	const UDF_MIN_LENGTH = 'min-length';
 	
@@ -991,8 +991,8 @@ class DB_Model extends FHC_Model
 					// If validation rules are present for this UDF description and the required attribute is === true
 					// then add this UDF into $requiredUDFsArray
 					if(isset($decodedUDFDefinition->validation)
-						&& isset($decodedUDFDefinition->validation->required)
-						&& $decodedUDFDefinition->validation->required === true)
+						&& isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED})
+						&& $decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED} === true)
 					{
 						$requiredUDFsArray[$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}] = error(
 							$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME},
@@ -1021,8 +1021,8 @@ class DB_Model extends FHC_Model
 								// then removes this UDF from the array $requiredUDFsArray
 								// because this UDF is present in the property UDFs (the list of UDFs that should be stored)
 								// therefore it was supplied
-								if (isset($decodedUDFDefinition->validation->required)
-									&& $decodedUDFDefinition->validation->required === true
+								if (isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED})
+									&& $decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED} === true
 									&& isset($requiredUDFsArray[$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}]))
 								{
 									unset($requiredUDFsArray[$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}]);

@@ -7,6 +7,8 @@ class UDFWidget extends UDFWidgetTpl
 {
 	const NAME = 'name';
 	const TYPE = 'type';
+	const REQUIRED = 'udf-required';
+	const VALIDATION = 'validation';
 	const LIST_VALUES = 'listValues';
 	const REGEX_LANGUAGE = 'js';
 	
@@ -369,16 +371,16 @@ class UDFWidget extends UDFWidgetTpl
     private function _setValidationAttributes($jsonSchema)
     {
 		// Validation
+		$this->_args[Widget::HTML_ARG_NAME][UDFWidget::REQUIRED] = null;
 		$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::REGEX] = null;
-		$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::REQUIRED] = null;
 		$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::MAX_VALUE] = null;
 		$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::MIN_VALUE] = null;
 		
 		if (isset($jsonSchema->validation))
 		{
-			if (isset($jsonSchema->validation->regex) && is_array($jsonSchema->validation->regex))
+			if (isset($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REGEX}) && is_array($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REGEX}))
 			{
-				foreach($jsonSchema->validation->regex as $regex)
+				foreach($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REGEX} as $regex)
 				{
 					if ($regex->language === UDFWidget::REGEX_LANGUAGE)
 					{
@@ -387,20 +389,20 @@ class UDFWidget extends UDFWidgetTpl
 				}
 			}
 			
-			if (isset($jsonSchema->validation->required))
+			if (isset($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REQUIRED}))
 			{
-				$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::REQUIRED] = $jsonSchema->validation->required;
+				$this->_args[Widget::HTML_ARG_NAME][UDFWidget::REQUIRED] = $jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REQUIRED};
 			}
 			
-			if (isset($jsonSchema->validation->{UDFWidgetTpl::MAX_VALUE}))
+			if (isset($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::MAX_VALUE}))
 			{
-				$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::MAX_VALUE] = $jsonSchema->validation->{UDFWidgetTpl::MAX_VALUE};
+				$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::MAX_VALUE] = $jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::MAX_VALUE};
 			}
 			
-			if (isset($jsonSchema->validation->{UDFWidgetTpl::MIN_VALUE}))
+			if (isset($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::MIN_VALUE}))
 			{
-				$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::MIN_VALUE] = $jsonSchema->validation->{UDFWidgetTpl::MIN_VALUE};
+				$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::MIN_VALUE] = $jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::MIN_VALUE};
 			}
 		}
-    }
+	}
 }
