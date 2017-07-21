@@ -3,7 +3,7 @@
 class Person_model extends DB_Model
 {
 	/**
-	 * 
+	 *
 	 */
 	public function __construct()
 	{
@@ -11,16 +11,16 @@ class Person_model extends DB_Model
 		$this->dbTable = 'public.tbl_person';
 		$this->pk = 'person_id';
 	}
-	
+
 	public function getPersonKontaktByZugangscode($zugangscode, $email)
 	{
 		$this->addJoin('public.tbl_kontakt', 'person_id');
-		
+
 		return $this->loadWhere(array('zugangscode' => $zugangscode, 'kontakt' => $email));
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public function checkBewerbung($email, $studiensemester_kurzbz = null)
 	{
@@ -34,10 +34,10 @@ class Person_model extends DB_Model
 			return $isEntitled;
 		if (($isEntitled = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $isEntitled;
-		
+
 		$checkBewerbungQuery = '';
 		$parametersArray = array($email, $email, $email);
-		
+
 		if (is_null($studiensemester_kurzbz))
 		{
 			$checkBewerbungQuery = 'SELECT DISTINCT p.person_id, p.zugangscode, p.insertamum
@@ -60,13 +60,13 @@ class Person_model extends DB_Model
 									   AND studiensemester_kurzbz = ?
 								  ORDER BY p.insertamum DESC
 									 LIMIT 1';
-			
+
 			array_push($parametersArray, $studiensemester_kurzbz);
 		}
-		
+
 		return $this->execQuery($checkBewerbungQuery, $parametersArray);
 	}
-	
+
 	public function updatePerson($person)
 	{
 		if (isset($person['svnr']) && $person['svnr'] != '')
@@ -88,7 +88,46 @@ class Person_model extends DB_Model
 				}
 			}
 		}
-		
+
 		return $this->PersonModel->update($person['person_id'], $person);
 	}
+
+	/**
+	 * @return void
+	 */
+	public function getPersonFromStatus($status_kurzbz, $von, $bis)
+	{
+		// Checks if the operation is permitted by the API caller
+		if (($isEntitled = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+		if (($isEntitled = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+
+		$this->addJoin('public.tbl_prestudent', 'person_id');
+
+		$result = $this->loadTree(
+			'public.tbl_person',
+			array(
+				'public.tbl_prestudent'
+			),
+			'EXISTS (
+				SELECT
+					1
+				FROM
+					public.tbl_prestudentstatus
+					JOIN public.tbl_prestudent USING(prestudent_id)
+				WHERE
+					person_id=tbl_person.person_id
+					AND status_kurzbz='.$this->escape($status_kurzbz).'
+					AND datum >= '.$this->escape($von).'
+					AND datum <= '.$this->escape($bis).'
+				)',
+			array(
+				'prestudenten'
+			)
+		);
+
+		return $result;
+	}
+
 }

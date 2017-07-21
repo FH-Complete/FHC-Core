@@ -25,10 +25,6 @@ menubar,menupopup,toolbar,tabpanels,tabbox,iframe,box,hbox,vbox,tree,label,descr
   	padding-left: 0px;
   	padding-right: 0px;
 }
-menubar
-{
-  	background-color: #ff8040;
-}
 menupopup
 {
 	border: 1px solid black;
@@ -193,4 +189,8 @@ treechildren::-moz-tree-cell-text(Lektor_inaktiv)
 {
   color: grey;
   cursor: not-allowed;
+}
+treechildren::-moz-tree-row(makeItMarked)
+{
+	background-color: #ceffb0;
 }

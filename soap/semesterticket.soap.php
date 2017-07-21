@@ -17,144 +17,144 @@
  *
  * Authors: Karl Burkhart <burkhart@technikum-wien.at>.
  */
- 
-require_once('../config/vilesci.config.inc.php'); 
-require_once('../include/student.class.php'); 
+
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/student.class.php');
 require_once('../include/benutzer.class.php');
-require_once('../include/adresse.class.php'); 
-require_once('../include/person.class.php'); 
-require_once('../include/webservicelog.class.php'); 
+require_once('../include/adresse.class.php');
+require_once('../include/person.class.php');
+require_once('../include/webservicelog.class.php');
 
 ini_set("soap.wsdl_cache_enabled", "0");
-	
-$SOAPServer = new SoapServer(APP_ROOT."/soap/semesterticket.wsdl.php?".microtime());
+
+$SOAPServer = new SoapServer(APP_ROOT."/soap/semesterticket.wsdl.php?".microtime(true));
 $SOAPServer->addFunction("verifyData");
 $SOAPServer->handle();
 
-$fehler = ''; 
+$fehler = '';
 
-		
+
 /**
- * 
- * Nimmt Anfrage entgegen und überprüft ob Student auch wirklich Student ist (anhand Matrikelnummer) 
+ *
+ * Nimmt Anfrage entgegen und überprüft ob Student auch wirklich Student ist (anhand Matrikelnummer)
  * @param $parameters
  */
 function verifyData($parameters)
-{ 	
-	global $fehler; 
+{
+	global $fehler;
 	class foo{};
-	
-	$obj = new foo(); 
-	
+
+	$obj = new foo();
+
 	if (!$db = new basis_db())
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-	
+
 	// Eintrag in der LogTabelle anlegen
-	$log = new webservicelog(); 
-	$log->request_data = file_get_contents('php://input'); 
-	$log->webservicetyp_kurzbz = 'wienerlinien'; 
-	$log->request_id = $parameters->token;  
-	$log->beschreibung = "Semesterticketanfrage"; 
+	$log = new webservicelog();
+	$log->request_data = file_get_contents('php://input');
+	$log->webservicetyp_kurzbz = 'wienerlinien';
+	$log->request_id = $parameters->token;
+	$log->beschreibung = "Semesterticketanfrage";
 	$log->save(true);
 
 	if(!validateRequest($parameters))
 	{
 		$obj->result = 'false';
-		$obj->fehler = $fehler; 
+		$obj->fehler = $fehler;
 	}
 	else
 	{
-		$student = new student(); 
-		$student_uid = $student->getUidFromMatrikelnummer($parameters->Matrikelnummer); 
-		
+		$student = new student();
+		$student_uid = $student->getUidFromMatrikelnummer($parameters->Matrikelnummer);
+
 		// überprüfe ob Benutzer aktiv ist
-		$benutzer = new benutzer(); 
-		$benutzer->load($student_uid); 
+		$benutzer = new benutzer();
+		$benutzer->load($student_uid);
 		if(!$benutzer->bnaktiv)
 		{
 			$obj->result = 'false';
 			$obj->fehler ='1';
-			return $obj; 
-		}	
-		
+			return $obj;
+		}
+
 		// überprüfe vorname
 		if($benutzer->vorname != $parameters->Vorname)
 		{
 			// es wurde keine übereinstimmung gefunden
 			$obj->result = 'false';
-			$obj->fehler = '6'; 
-			return $obj; 
+			$obj->fehler = '6';
+			return $obj;
 		}
-		
+
 		if($benutzer->nachname != $parameters->Name)
 		{
 			// es wurde keine übereinstimmung gefunden
 			$obj->result = 'false';
-			$obj->fehler = '7'; 
-			return $obj; 
+			$obj->fehler = '7';
+			return $obj;
 		}
-		
+
 		// Überprüfe PLZ
-		$adresse = new adresse(); 
-		$adresse->load_pers($benutzer->person_id); 
-		
-		$foundAdr = false; 
+		$adresse = new adresse();
+		$adresse->load_pers($benutzer->person_id);
+
+		$foundAdr = false;
 		foreach($adresse->result as $adr)
 		{
 			if($adr->plz == $parameters->Postleitzahl && $adr->typ == 'h')
-				$foundAdr = true; 
+				$foundAdr = true;
 		}
 		if($foundAdr == false)
 		{
 			// es wurde keine übereinstimmung gefunden
 			$obj->result = 'false';
-			$obj->fehler = '5'; 
-			return $obj; 
+			$obj->fehler = '5';
+			return $obj;
 		}
-		
+
 		// Überprüfe Geburtsdatum
-		$person = new person(); 
-		$person->load($benutzer->person_id); 
+		$person = new person();
+		$person->load($benutzer->person_id);
 		if($person->gebdatum != $parameters->Geburtsdatum)
 		{
-			$obj->result = 'false'; 
+			$obj->result = 'false';
 			$obj->fehler = '4';
-			return $obj; 
-		}	
-	
+			return $obj;
+		}
+
 		// hole prestudentID
-		$student->load($student_uid); 
+		$student->load($student_uid);
 		if($student->prestudent_id == '')
 		{
 			// es wurde kein student gefunden
 			$obj->result = 'false';
-			$obj->fehler = '3'; 
-			return $obj; 
+			$obj->fehler = '3';
+			return $obj;
 		}
-		
+
 		// Übergabe von studiensemester -> z.b 11W, 12S auf WS2011, SS2012
-		$year = mb_substr($parameters->Semesterkuerzel, 0,2); 
-		$semester = mb_substr($parameters->Semesterkuerzel,2,1); 
+		$year = mb_substr($parameters->Semesterkuerzel, 0,2);
+		$semester = mb_substr($parameters->Semesterkuerzel,2,1);
 		if($semester == 'S')
 		{
-			$semester = 'SS'; 
+			$semester = 'SS';
 		}
 		else if($semester == 'W')
 		{
-			$semester= 'WS'; 
+			$semester= 'WS';
 		}
 		else
 		{
 			// ungültiges Semester
 			$obj->result = 'false';
-			$obj->fehler = '8'; 
-			return $obj; 
+			$obj->fehler = '8';
+			return $obj;
 		}
-		$studiensemester = $semester.'20'.$year; 
-		
+		$studiensemester = $semester.'20'.$year;
+
 		// letzten Status holen
-		$qry = "Select public.get_rolle_prestudent ('".$student->prestudent_id."', '".$studiensemester."')"; 
-		
+		$qry = "Select public.get_rolle_prestudent ('".$student->prestudent_id."', '".$studiensemester."')";
+
 		if($db->db_query($qry))
 		{
 			if($row = $db->db_fetch_object())
@@ -165,20 +165,20 @@ function verifyData($parameters)
 		// Status Student und Diplomand gültig
 		if($status == 'Student' || $status == 'Diplomand')
 		{
-			$obj->result = 'true'; 
+			$obj->result = 'true';
 			$obj->fehler = '';
 		}
 		else
 		{
 			$obj->result = 'false';
 			$obj->fehler ='1';
-		}	
+		}
 	}
 	return $obj;
 }
 
 /**
- * 
+ *
  * Prüft die übergebenen Parameter auf Richtigkeit
  * @param $parameter
  */
@@ -196,34 +196,32 @@ function validateRequest($parameter)
 	 *	8: Fehler Semester
 	 *	9: Fehler Matrikelnummer
 	 */
-	
-	global $fehler; 
-	
+
+	global $fehler;
+
 	if(mb_strlen($parameter->Postleitzahl) > 10)
 	{
 		$fehler = '5';
-		return false; 
+		return false;
 	}
 	if(mb_strlen($parameter->Vorname) > 255)
 	{
 		$fehler = '6';
-		return false; 
+		return false;
 	}
 	if(mb_strlen($parameter->Name) > 255)
 	{
 		$fehler = '7';
-		return false; 
+		return false;
 	}
-	
+
 	if(mb_strlen($parameter->Matrikelnummer) >15  || $parameter->Matrikelnummer == '')
 	{
 		$fehler = '9';
-		return false; 
+		return false;
 	}
 
 	return true;
 }
 
 ?>
-
-

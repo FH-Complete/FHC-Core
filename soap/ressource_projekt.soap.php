@@ -31,7 +31,7 @@ require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 
-$SOAPServer = new SoapServer(APP_ROOT."/soap/ressource_projekt.wsdl.php?".microtime());
+$SOAPServer = new SoapServer(APP_ROOT."/soap/ressource_projekt.wsdl.php?".microtime(true));
 $SOAPServer->addFunction("saveProjektRessource");
 $SOAPServer->addFunction("deleteProjektRessource");
 $SOAPServer->handle();
@@ -123,5 +123,3 @@ function deleteProjektRessource($username, $passwort, $projektRessource)
 }
 
 ?>
-
-

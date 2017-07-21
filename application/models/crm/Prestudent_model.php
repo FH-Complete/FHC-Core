@@ -11,7 +11,7 @@ class Prestudent_model extends DB_Model
 		$this->dbTable = 'public.tbl_prestudent';
 		$this->pk = 'prestudent_id';
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -24,7 +24,7 @@ class Prestudent_model extends DB_Model
 			return $isEntitled;
 		if (($isEntitled = $this->isEntitled('public.tbl_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $isEntitled;
-		
+
 		$query = 'SELECT *
 					FROM public.tbl_prestudent p
 					JOIN (
@@ -37,33 +37,33 @@ class Prestudent_model extends DB_Model
 				   WHERE ps.ausbildungssemester = 1';
 
 		$parametersArray = array($person_id);
-		
+
 		if ($studiensemester_kurzbz != '')
 		{
 			array_push($parametersArray, $studiensemester_kurzbz);
 			$query .= ' AND ps.studiensemester_kurzbz = ?';
 		}
-		
+
 		if (isset($studiengang_kz))
 		{
 			array_push($parametersArray, $studiengang_kz);
 			$query .= ' AND p.studiengang_kz = ?';
 		}
-		
+
 		if ($status_kurzbz != '')
 		{
 			array_push($parametersArray, $status_kurzbz);
 			$query .= ' AND ps.status_kurzbz = ?';
 		}
-		
+
 		return $this->execQuery($query, $parametersArray);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function updateAufnahmegruppe($prestudentIdArray, $aufnahmegruppe)
-	{	
+	{
 		return $this->execQuery(
 			'UPDATE public.tbl_prestudent
 				SET aufnahmegruppe_kurzbz = ?
@@ -74,7 +74,7 @@ class Prestudent_model extends DB_Model
 			)
         );
 	}
-	
+
 	/**
 	 * Returns a list of prestudent with additional information:
 	 *	- person_id
@@ -104,7 +104,7 @@ class Prestudent_model extends DB_Model
 			aufnahmegruppe_kurzbz,
 			SUM(rtp.punkte) AS punkte'
 		);
-		
+
 		$this->addJoin('public.tbl_person p', 'person_id', 'LEFT');
 		$this->addJoin(
 			'(
@@ -123,39 +123,39 @@ class Prestudent_model extends DB_Model
 		$this->addJoin('lehre.tbl_studienordnung so', 'studienordnung_id');
 		$this->addJoin('public.tbl_studiengang sg', 'sg.studiengang_kz = so.studiengang_kz');
 		$this->addJoin('public.tbl_studiengangstyp sgt', 'typ');
-		
+
 		$this->addJoin('public.tbl_rt_person rtp', 'rtp.person_id = p.person_id AND rtp.studienplan_id = s.studienplan_id', 'LEFT');
-		
+
 		$this->addOrder('p.person_id', 'ASC');
 		$this->addOrder('prestudent_id', 'ASC');
-		
+
 		$parametersArray = array('p.aktiv' => true, 'ps.status_kurzbz' => 'Interessent');
-		
+
 		if ($studiengang != null)
 		{
 			$parametersArray['public.tbl_prestudent.studiengang_kz'] = $studiengang;
 		}
-		
+
 		if ($studiensemester != null)
 		{
 			$parametersArray['ps.studiensemester_kurzbz'] = $studiensemester;
 		}
-		
+
 		if ($gruppe != null)
 		{
 			$parametersArray['aufnahmegruppe_kurzbz'] = $gruppe;
 		}
-		
+
 		if ($reihungstest != null)
 		{
 			$parametersArray['rtp.rt_id'] = $reihungstest;
 		}
-		
+
 		if ($stufe != null)
 		{
 			$parametersArray['ps.rt_stufe'] = $stufe;
 		}
-		
+
 		$this->addGroupBy(
 			array(
 				'p.person_id',
@@ -174,7 +174,7 @@ class Prestudent_model extends DB_Model
 				'aufnahmegruppe_kurzbz'
 			)
 		);
-		
+
 		return $this->loadWhere($parametersArray);
 	}
 }

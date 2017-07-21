@@ -12,7 +12,7 @@ class Prestudentstatus_model extends DB_Model
 		$this->pk = array('ausbildungssemester', 'studiensemester_kurzbz', 'status_kurzbz', 'prestudent_id');
 		$this->hasSequence = false;
 	}
-	
+
 	/**
 	 * @return void
 	 */
@@ -25,7 +25,7 @@ class Prestudentstatus_model extends DB_Model
 			return $isEntitled;
 		if (($isEntitled = $this->isEntitled('public.tbl_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
 			return $isEntitled;
-		
+
 		$query = 'SELECT tbl_prestudentstatus.*,
 						 bezeichnung AS studienplan_bezeichnung,
 						 tbl_status.bezeichnung_mehrsprachig
@@ -35,7 +35,7 @@ class Prestudentstatus_model extends DB_Model
 					 AND prestudent_id = ?';
 
 		$parametersArray = array($prestudent_id);
-		
+
 		if ($studiensemester_kurzbz != '')
 		{
 			array_push($parametersArray, $studiensemester_kurzbz);
@@ -46,17 +46,17 @@ class Prestudentstatus_model extends DB_Model
 			array_push($parametersArray, $status_kurzbz);
 			$query .= ' AND status_kurzbz = ?';
 		}
-		
+
 		$query .= ' ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1';
-		
+
 		return $this->execQuery($query, $parametersArray);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function updateStufe($prestudentIdArray, $stufe)
-	{	
+	{
 		return $this->execQuery(
 			'UPDATE public.tbl_prestudentstatus
 				SET rt_stufe = ?
@@ -67,5 +67,52 @@ class Prestudentstatus_model extends DB_Model
 				$prestudentIdArray
 			)
         );
+	}
+
+	/**
+	 * Get all Prestudent status entries according to the given filter
+	 *
+	 * @param prestudent_id ID of the Prestudent.
+	 * @param $status_kurzbz kurzbz of the status.
+	 * @param $ausbildungssemester ausbildungssemester of the status.
+	 * @param $studiensemester_kurzbz studiensemster of the status.
+	 *
+	 * @return result object with all the status entries
+	 */
+	public function getStatusByFilter($prestudent_id, $status_kurzbz = '', $ausbildungssemester = '', $studiensemester_kurzbz = '')
+	{
+		// Checks if the operation is permitted by the API caller
+		if (($isEntitled = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
+			return $isEntitled;
+
+		$query = '
+			SELECT
+				tbl_prestudentstatus.*
+			FROM
+				public.tbl_prestudentstatus
+			WHERE
+				prestudent_id = ?';
+
+		$parametersArray = array($prestudent_id);
+
+		if ($studiensemester_kurzbz != '')
+		{
+			array_push($parametersArray, $studiensemester_kurzbz);
+			$query .= ' AND studiensemester_kurzbz = ?';
+		}
+		if ($status_kurzbz != '')
+		{
+			array_push($parametersArray, $status_kurzbz);
+			$query .= ' AND status_kurzbz = ?';
+		}
+		if ($ausbildungssemester != '')
+		{
+			array_push($parametersArray, $ausbildungssemester);
+			$query .= ' AND ausbildungssemester = ?';
+		}
+
+		$query .= ' ORDER BY datum DESC, insertamum DESC, ext_id DESC';
+
+		return $this->execQuery($query, $parametersArray);
 	}
 }

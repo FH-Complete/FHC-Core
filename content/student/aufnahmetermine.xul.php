@@ -186,7 +186,7 @@ echo ']>
 						<template>
 							<treechildren flex="1" >
 									<treeitem uri="rdf:*">
-									<treerow>
+									<treerow  properties="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#properties">
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#datum"/>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#stufe"/>
 										<treecell label="rdf:http://www.technikum-wien.at/aufnahmetermine/rdf#studiensemester"/>

@@ -31,7 +31,7 @@ require_once('../include/datum.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/functions.inc.php');
 
-$SOAPServer = new SoapServer(APP_ROOT."/soap/ressource.wsdl.php?".microtime());
+$SOAPServer = new SoapServer(APP_ROOT."/soap/ressource.wsdl.php?".microtime(true));
 $SOAPServer->addFunction("saveRessource");
 $SOAPServer->handle();
 
@@ -82,5 +82,3 @@ function saveRessource($username, $passwort, $ressource)
 		return new SoapFault("Server", $ressourceNew->errormsg);
 }
 ?>
-
-

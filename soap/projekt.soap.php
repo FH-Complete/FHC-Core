@@ -32,7 +32,7 @@ require_once('../include/dms.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 
-$SOAPServer = new SoapServer(APP_ROOT."/soap/projekt.wsdl.php?".microtime());
+$SOAPServer = new SoapServer(APP_ROOT."/soap/projekt.wsdl.php?".microtime(true));
 $SOAPServer->addFunction("saveProjekt");
 $SOAPServer->addFunction("saveProjektdokumentZuordnung");
 $SOAPServer->handle();
@@ -111,5 +111,3 @@ function saveProjektdokumentZuordnung($username, $passwort, $projekt_kurzbz, $pr
 		return new SoapFault("Server", $dms->errormsg);
 }
 ?>
-
-

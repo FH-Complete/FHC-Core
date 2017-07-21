@@ -41,4 +41,5 @@ $this->phrasen['zeitsperre/legendeGrund']='G...Grund';
 $this->phrasen['zeitsperre/legendeErreichbarkeit']='E...Erreichbarkeit (n=nicht erreichbar, t=telefonisch, e=eMail, et=eMail oder telefonisch)';
 $this->phrasen['zeitsperre/legendeVertretung']='V...Vertretung';
 $this->phrasen['zeitsperre/legendeDurchwahl']='(123)...Durchwahl';
+$this->phrasen['zeitsperre/vertretungNichtKorrekt']='Die angegebene Vertretung kann nicht gefunden werden. Bitte prüfen Sie die Vertretung und versuchen Sie es erneut.';
 ?>

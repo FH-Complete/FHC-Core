@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 ### Added
+- **[FAS]** Studierendensuche erweitert für leichteres auffinden von Personen mit Sonderzeichen;Suche nach EMail (#email),Telefon(#tel)
+- **[FAS]** Die Anzahl der angezeigten Studiensemester im Menübaum ist pro User konfigurierbar
+- **[CIS]** Im Coodle können nun auch Gruppen zu Umfragen hinzugefügt werden.
 - **[CIS]** Reservierungen im Stundenplan prüft nun die Verfügbarkeit des Raums im Stundenplandev
 - **[FAS]** Projektarbeiten können als Final markiert werden
 - **[FAS]** Verwaltung von Rechnungsadressen
@@ -11,6 +14,9 @@
 
 ### CHANGED
 - **[CORE]** Berechtigungsprüfung wurde angepasst damit deaktiverte Benutzer keine Berechtigungen mehr haben
+
+### Updateinfo
+- **[CORE]** Infoscreen wurde umbenannt (informationsbildschirm.php)
 
 ## [3.2]
 

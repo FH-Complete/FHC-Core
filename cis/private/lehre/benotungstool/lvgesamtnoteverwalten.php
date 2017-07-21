@@ -533,12 +533,41 @@ foreach($noten_obj->result as $row)
 		var rows = data.split("\n");
 		var i=0;
 		var params='';
+		alertMsg = '';
 
 		var gradedata = {};
+		var validGrades = '';
+		
+		<?php
+				// If CIS_GESAMTNOTE_PUNKTE is false, check for valid grades
+				// Fill Array $gradesArray with valid grades
+				if(CIS_GESAMTNOTE_PUNKTE == false)
+				{
+					$gradesArray = array();
+					foreach($noten_obj->result as $row_note)
+					{
+						if($row_note->lehre && $row_note->aktiv)
+							$gradesArray[] = '"'.$row_note->anmerkung.'"';
+					}
+					// Output JS variable with valid grades  
+					echo 'var validGrades = ['.implode(',', $gradesArray).'];';
+				}
+		?>
 
 		for(row in rows)
 		{
 			zeile = rows[row].split("	");
+			
+			<?php
+			// If CIS_GESAMTNOTE_PUNKTE is false, check for valid grades
+			if(CIS_GESAMTNOTE_PUNKTE == false)
+				echo '	// check for valid grades
+						if (validGrades.indexOf(zeile[1]) === -1 && typeof(zeile[1]) != "undefined" && zeile[1] != "")
+						{
+							alertMsg = alertMsg+"Die Note "+zeile[1]+" ist nicht zulaessig. Die Zeile wurde uebersprungen. \n";
+							continue;
+						}';
+			?>
 
 			if(zeile[0]!='' && zeile[1]!='')
 			{
@@ -553,7 +582,10 @@ foreach($noten_obj->result as $row)
 				i++;
 			}
 		}
-
+		
+		if (alertMsg != "")
+			alert(alertMsg);
+		
 		if(i>0)
 		{
 

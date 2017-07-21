@@ -48,10 +48,12 @@ function checkLength()
 		return false;
 	}
 	else
-		return true;	
+		return true;
 }
-$(document).ready(function() 
-	{ 
+$(document).ready(function()
+	{
+		$("#erweitertesuche").hide();
+
 		$("#t1").tablesorter(
 		{
 			sortList: [[0,0],[1,0],[2,0]],
@@ -100,13 +102,13 @@ $benutzerart = (isset($_GET['benutzerart'])?$_GET['benutzerart']:'');
 $benutzeraktiv = (isset($_GET['aktiv'])?$_GET['aktiv']:'aktiv');
 $berechtigung_kurzbz = (isset($_GET['berechtigung_kurzbz'])?$_GET['berechtigung_kurzbz']:'');
 $rolle_kurzbz = (isset($_GET['rolle_kurzbz'])?$_GET['rolle_kurzbz']:'');
-		
+
 $htmlstr='
 <table width="100%">
 <tr>
 	<td>
 		<form accept-charset="UTF-8" name="searchbenutzer" method="GET" onsubmit="return checkLength();">
-			BenutzerIn suchen: 
+			BenutzerIn suchen:
 			<input type="text" id="searchbox" name="searchstr" size="30" value="'.$searchstr.'" placeholder="Name oder UID eingeben">
 			<select id="benutzerart" name="benutzerart">
 				<option value="" '.($benutzerart == ''?'selected':'').'>Alle BenutzerInnen</option>
@@ -119,9 +121,13 @@ $htmlstr='
 				<option value="inaktiv" '.($benutzeraktiv == 'inaktiv'?'selected':'').'>Inaktiv</option>
 			</select>
 			<input type="submit" value="Suchen">
-		</form><hr>
+			&nbsp;&nbsp;
+			<span style="float:right"><a href="#" onclick="$(\'#erweitertesuche\').toggle();">Erweiterte Suchoptionen ein-/ausblenden</a></span>
+		</form>
+		<div id="erweitertesuche">
+		<hr>
 		<form accept-charset="UTF-8" name="searchrechte" method="GET">
-			Berechtigung:  
+			Berechtigung:
 			<select id="berechtigung_kurzbz" name="berechtigung_kurzbz">
 				<option value=""></option>';
 			$berechtigung = new berechtigung();
@@ -130,7 +136,7 @@ $htmlstr='
 			{
 				if ($berechtigung_kurzbz == $berechtigung->berechtigung_kurzbz)
 					$selected = 'selected="selected"';
-				else 
+				else
 					$selected = '';
 				$htmlstr .= '<option value="'.$berechtigung->berechtigung_kurzbz.'"  title="'.$berechtigung->beschreibung.'" '.$selected.'>'.$berechtigung->berechtigung_kurzbz.'</option>';
 			}
@@ -138,7 +144,7 @@ $htmlstr='
 			<input type="submit" value="Suchen">
 		</form><hr>
 		<form accept-charset="UTF-8" name="searchrollen" method="GET">
-			Rollen:  
+			Rollen:
 			<select id="rolle_kurzbz" name="rolle_kurzbz">
 				<option value=""></option>';
 			$rollen = new berechtigung();
@@ -147,13 +153,14 @@ $htmlstr='
 			{
 				if ($rolle_kurzbz == $rolle->rolle_kurzbz)
 					$selected = 'selected="selected"';
-				else 
+				else
 					$selected = '';
 				$htmlstr .= '<option value="'.$rolle->rolle_kurzbz.'"  title="'.$rolle->beschreibung.'" '.$selected.'>'.$rolle->rolle_kurzbz.'</option>';
 			}
 			$htmlstr .= '</select>
 			<input type="submit" value="Suchen">
 		</form><hr>
+		</div>
 	</td>
 </tr>
 </table>
@@ -161,8 +168,8 @@ $htmlstr='
 
 //Benutzer suchen und Tabelle anzeigen
 if(isset($_GET['searchstr']))
-{	
-	$benutzer = new benutzer(); 
+{
+	$benutzer = new benutzer();
 	$searchItems = explode(' ',$searchstr);
 	if ($benutzeraktiv == 'aktiv')
 		$benutzer->search($searchItems,"",true);
@@ -170,9 +177,9 @@ if(isset($_GET['searchstr']))
 		$benutzer->search($searchItems,"",false);
 	if ($benutzeraktiv == '')
 		$benutzer->search($searchItems,"",null);
-		
+
 	if(count($benutzer->result)!=0)
-	{	
+	{
 		$htmlstr .= "<table id='t1' class='tablesorter'><thead><tr>\n";
 		$htmlstr .= "<th>Nachname</th><th>Vorname</th><th>UID</th><th>Aktiv</th><th>Aktion</th>";
 		$htmlstr .= "</tr></thead><tbody>\n";
@@ -185,14 +192,14 @@ if(isset($_GET['searchstr']))
 				{
 					$benutzerrolle = new benutzerberechtigung();
 					$benutzerrolle->loadBenutzerRollen($row->uid);
-					$aktiv = new benutzer(); 
+					$aktiv = new benutzer();
 					$aktiv->load($row->uid);
-					
+
 					$htmlstr .= "	<tr>\n";
 					$htmlstr .= "		<td>".$row->nachname."</td>\n";
 					$htmlstr .= "		<td>".$row->vorname."</td>\n";
-					$htmlstr .= "		<td>".$row->uid."</td>\n";		
-					$htmlstr .= "		<td>".($aktiv->bnaktiv?"Ja":"Nein")."</td>\n";		 
+					$htmlstr .= "		<td>".$row->uid."</td>\n";
+					$htmlstr .= "		<td>".($aktiv->bnaktiv?"Ja":"Nein")."</td>\n";
 					$htmlstr .= "		<td><a href='benutzerberechtigung_details.php?uid=".$row->uid."' target='vilesci_detail'>".(count($benutzerrolle->berechtigungen)!=0?"Rechte bearbeiten":"Rechte vergeben")."</a></td>\n";
 					$htmlstr .= "	</tr>\n";
 				}
@@ -203,7 +210,7 @@ if(isset($_GET['searchstr']))
 				$benutzerrolle->loadBenutzerRollen($row->uid);
 				$aktiv = new benutzer();
 				$aktiv->load($row->uid);
-			
+
 				$htmlstr .= "	<tr>\n";
 				$htmlstr .= "		<td>".$row->nachname."</td>\n";
 				$htmlstr .= "		<td>".$row->vorname."</td>\n";
@@ -218,7 +225,7 @@ if(isset($_GET['searchstr']))
 				$benutzerrolle->loadBenutzerRollen($row->uid);
 				$aktiv = new benutzer();
 				$aktiv->load($row->uid);
-					
+
 				$htmlstr .= "	<tr>\n";
 				$htmlstr .= "		<td>".$row->nachname."</td>\n";
 				$htmlstr .= "		<td>".$row->vorname."</td>\n";
@@ -230,7 +237,7 @@ if(isset($_GET['searchstr']))
 		}
 		$htmlstr .= "</tbody></table>\n";
 	}
-	else 
+	else
 	{
 		$htmlstr .= "Es wurden keine Übereinstimmungen mit Ihrem Suchbegriff gefunden";
 	}
@@ -252,9 +259,9 @@ if($berechtigung_kurzbz != '')
 		{
 			$benutzer = new benutzer();
 			$benutzer->load($row->uid);
-			
+
 			$heute = strtotime(date('Y-m-d'));
-			
+
 			if ($row->ende!='' && strtotime($row->ende) < $heute)
 			{
 				$color1 = '#f79c9c';
@@ -282,7 +289,7 @@ if($berechtigung_kurzbz != '')
 						-webkit-border-radius: 10;
 						-moz-border-radius: 10;
 						border-radius: 10px;
-			
+
 						border: solid #999 1px;
 						text-decoration: none;
 						"></div>';
@@ -330,9 +337,9 @@ if($rolle_kurzbz != '')
 		{
 			$benutzer = new benutzer();
 			$benutzer->load($row->uid);
-			
+
 			$heute = strtotime(date('Y-m-d'));
-			
+
 			if ($row->ende!='' && strtotime($row->ende) < $heute)
 			{
 				$color1 = '#f79c9c';
@@ -360,7 +367,7 @@ if($rolle_kurzbz != '')
 						-webkit-border-radius: 10;
 						-moz-border-radius: 10;
 						border-radius: 10px;
-		
+
 						border: solid #999 1px;
 						text-decoration: none;
 						"></div>';

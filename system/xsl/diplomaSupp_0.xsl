@@ -1287,7 +1287,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		</text:sequence-decls>
 		<text:p text:style-name="P60">
 			<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr5" draw:name="Bild2" text:anchor-type="paragraph" svg:y="8.82cm" svg:width="11.45cm" svg:height="12.61cm" draw:z-index="20">
-				<draw:image xlink:href="Pictures/bundesadler.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+				<draw:image xlink:href="Pictures/bundesadler.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 			</draw:frame>
 		</text:p>
 		<text:p text:style-name="P2"/>
@@ -2836,12 +2836,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		<text:p text:style-name="P22"/>
 		<text:p text:style-name="P78">
 			<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr6" draw:name="Bild1" text:anchor-type="paragraph" svg:y="8.82cm" svg:width="11.45cm" svg:height="12.61cm" draw:z-index="20">
-				<draw:image xlink:href="Pictures/bundesadler.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+				<draw:image xlink:href="Pictures/bundesadler.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 			</draw:frame>
 		</text:p>
 		<text:p text:style-name="P78">
 			<draw:frame xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" draw:style-name="fr7" draw:name="Bild5" text:anchor-type="paragraph" svg:y="8.82cm" svg:width="11.45cm" svg:height="12.61cm" draw:z-index="21">
-				<draw:image xlink:href="Pictures/bundesadler.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
+				<draw:image xlink:href="Pictures/bundesadler.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
 			</draw:frame>
 		</text:p>
 

@@ -1,19 +1,19 @@
-<?php 
+<?php
 require_once('../config/vilesci.config.inc.php');
-require_once('../include/functions.inc.php'); 
+require_once('../include/functions.inc.php');
 require_once('../include/basis_db.class.php');
 
-$getuid = get_uid(); 
+$getuid = get_uid();
 if(!check_lektor($getuid))
-	die('Sie haben keine Berechtigung für diese Seite'); 
+	die('Sie haben keine Berechtigung für diese Seite');
 
 $db = new basis_db();
 ?>
 <html>
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<script type="text/javascript" src="../include/js/jqSOAPClient.js"></script> 
-		<script type="text/javascript" src="../include/js/jquery.js"></script> 
+	<script type="text/javascript" src="../include/js/jqSOAPClient.js"></script>
+		<script type="text/javascript" src="../include/js/jquery.js"></script>
 		<title>Semesterticket-Client</title>
 	</head>
 	<body>
@@ -61,16 +61,16 @@ $db = new basis_db();
 		</form>
 
 
-<?php 
+<?php
 
 if(isset($_REQUEST['submit']))
 {
-	$client = new SoapClient(APP_ROOT."/soap/semesterticket.wsdl.php?".microtime()); 
-	
+	$client = new SoapClient(APP_ROOT."/soap/semesterticket.wsdl.php?".microtime(true)); 
+
 	try
 	{
-		class foo {}; 
-		$obj = new foo(); 
+		class foo {};
+		$obj = new foo();
 		$obj->Token = $_REQUEST['token'];
 		$obj->Matrikelnummer = $_REQUEST['matrikelnummer'];
 		$obj->Name = $_REQUEST['name'];
@@ -78,16 +78,16 @@ if(isset($_REQUEST['submit']))
 		$obj->Geburtsdatum = $_REQUEST['geburtsdatum'];
 		$obj->Postleitzahl = $_REQUEST['postleitzahl'];
 		$obj->Semesterkuerzel = $_REQUEST['semesterkuerzel'];
-		
+
 		$response = $client->verifyData($obj);
 		//$response = $client->verifyData(array('token'=>$_REQUEST['token'], 'matrikelnummer'=>$_REQUEST['matrikelnummer'], 'name'=>$_REQUEST['name'], 'vorname'=>$_REQUEST['vorname'], 'geburtsdatum'=>$_REQUEST['geburtsdatum'], 'postleitzahl'=>$_REQUEST['postleitzahl'], 'semesterkuerzel'=>$_REQUEST['semesterkuerzel']));
 		var_dump($response);
 	}
-	catch(SoapFault $fault) 
+	catch(SoapFault $fault)
 	{
     	echo "SOAP Fault: (faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring})", E_USER_ERROR;
 	}
-	 
+
 }
 
 ?>

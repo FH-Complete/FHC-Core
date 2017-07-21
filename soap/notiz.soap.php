@@ -32,7 +32,7 @@ require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/dms.class.php');
 
-$SOAPServer = new SoapServer(APP_ROOT."/soap/notiz.wsdl.php?".microtime());
+$SOAPServer = new SoapServer(APP_ROOT."/soap/notiz.wsdl.php?".microtime(true));
 $SOAPServer->addFunction("saveNotiz");
 $SOAPServer->addFunction("deleteNotiz");
 $SOAPServer->addFunction("deleteDokument");
@@ -190,5 +190,3 @@ function setErledigt($notiz_id, $erledigt)
 		return new SoapFault("Server", "Fehler beim Laden");
 }
 ?>
-
-

@@ -1,4 +1,4 @@
-<?php 
+<?php
 /* Copyright (C) 2015 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/basis_db.class.php');
-require_once('stip.class.php'); 
+require_once('stip.class.php');
 $getuid=get_uid();
 if(!check_lektor($getuid))
 	die('Sie haben keine Berechtigung für diese Seite.');
@@ -32,7 +32,7 @@ $db = new basis_db();
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<script type="text/javascript" src="../include/js/jquery.js"></script> 
+		<script type="text/javascript" src="../include/js/jquery.js"></script>
 		<title>STIP-Client</title>
 	</head>
 	<body>
@@ -81,7 +81,7 @@ $db = new basis_db();
 		      <td align="right">JobID:</td>
 		      <td><input name="jobid" type="text" size="30" maxlength="30" value="<?php echo $db->convert_html_chars((isset($_REQUEST['jobid']) ? $_REQUEST['jobid'] : ""));?>"></td>
 		    </tr>
-		    <tr> 
+		    <tr>
 		      <td align="right"></td>
 		      <td>
 		        <input type="submit" value=" Absenden " name="submit">
@@ -91,31 +91,31 @@ $db = new basis_db();
 		</form>
 
 
-<?php 
+<?php
 
 if(isset($_REQUEST['submit']))
 {
-	$client = new SoapClient(APP_ROOT."/soap/stip.wsdl.php?".microtime());
-	
+	$client = new SoapClient(APP_ROOT."/soap/stip.wsdl.php?".microtime(true));
+
 	$username = $_REQUEST['username'];
 	$passwort = $_REQUEST['password'];
-	
+
 	$ErhKz = $_REQUEST['ErhKz'];
 	$statecode = $_REQUEST['statecode'];
-	$jobid = $_REQUEST['jobid']; 
+	$jobid = $_REQUEST['jobid'];
 	$statemessage = $_REQUEST['statemessage'];
 	$errorstatuscode = $_REQUEST['errorstatuscode'];
-	
+
 	try
-	{           
+	{
 		$response_stip = $client->SendStipendienbezieherStipError(array("userName"=>$username,"passWord"=>$passwort,"errorReport"=>array("ErhKz"=>$ErhKz, "StateCode"=>$statecode,"StateMessage"=>$statemessage,"ErrorStatusCode"=>$errorstatuscode,"JobID"=>$jobid)));
 		echo '<h2>Error Request Result sent</h2>';
 	}
-	catch(SoapFault $fault) 
+	catch(SoapFault $fault)
 	{
     	echo "SOAP Fault: (faultcode: ".$fault->faultcode.", faultstring: ".$fault->faultstring.")", E_USER_ERROR;
 	}
-	 
+
 }
 
 ?>

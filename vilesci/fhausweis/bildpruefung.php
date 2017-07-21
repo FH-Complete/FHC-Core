@@ -40,8 +40,34 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet"  href="../../skin/fhcomplete.css" type="text/css">
-	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<title>Profilfoto Check</title>
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">';
+
+	include('../../include/meta/jquery.php');
+
+echo'	<title>Profilfoto Check</title>
+	<script>
+	$(document).ready(function()
+	{
+		var img = document.getElementById("image");
+
+		img.onload = function()
+		{
+			var width = img.naturalWidth;
+			if (width < 240)
+				width = "<span style=\'color: red\'>"+width+"</span>";
+	
+			var height = img.naturalHeight;
+			if (height < 320)
+				height = "<span style=\'color: red\'>"+height+"</span>";
+			$("#imagesize").html(width+" x "+height);
+		}
+	});
+	function RefreshImage()
+	{
+		document.getElementById("image").src = document.getElementById("image").src+"&foo";
+		document.getElementById("imagepreview").src = document.getElementById("imagepreview").src+"&foo";
+	}
+	</script>
 	<style type="text/css">
 	.hoverbox
 	{
@@ -83,13 +109,17 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 		border-style: solid;
 		border-width: 2px;
 		border-color: #000;
-		height: 100px;
+		height: 200px;
 	}
 	
 	.hoverbox .image
 	{
-		width: 75px;
-		height: 100px;
+		width: 150px;
+		height: 200px;
+	}
+	input
+	{
+		padding: 2px 4px;
 	}
 	</style>
 	
@@ -116,13 +146,13 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 		border-style: solid;
 		border-width: 2px;
 		border-color: #000;
-		height: 100px;
+		height: 200px;
 	}
 	
 	.hoverbox .image
 	{
-		width: 75px;
-		height: 100px;
+		width: 150px;
+		height: 200px;
 	}
 	
 	.hoverbox a:hover .preview
@@ -154,7 +184,7 @@ if(!$rechte->isBerechtigt('basis/fhausweis','suid'))
 	die('Sie haben keine Berechtigung für diese Seite');
 }
 $error = false;
-$person_id='';
+
 if(isset($_POST['person_id']))
 {
 	$person_id=$_POST['person_id'];
@@ -312,10 +342,12 @@ $qry_anzahl_mitarbeiter = "
 	FROM
 		public.tbl_person
 		JOIN public.tbl_benutzer USING(person_id)
-		LEFT JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid)
+		JOIN public.tbl_akte USING (person_id)
+		LEFT JOIN public.tbl_mitarbeiter ON (tbl_benutzer.uid=mitarbeiter_uid)
 	WHERE
 		foto is not NULL
 		AND tbl_benutzer.aktiv
+		AND tbl_akte.dokument_kurzbz='Lichtbil'
 		AND 'akzeptiert' NOT IN(SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
 					WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
@@ -335,15 +367,17 @@ $qry_anzahl_studenten = "
 	FROM
 		public.tbl_person
 		JOIN public.tbl_benutzer USING(person_id)
-		LEFT JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid)
+		JOIN public.tbl_akte USING (person_id)
+		LEFT JOIN public.tbl_mitarbeiter ON (tbl_benutzer.uid=mitarbeiter_uid)
 	WHERE
 		foto is not NULL
 		AND tbl_benutzer.aktiv
+		AND tbl_akte.dokument_kurzbz='Lichtbil'
 		AND 'akzeptiert' NOT IN(SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
 					WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
 						WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
-		AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)
+		AND tbl_benutzer.uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter)
 	";
 $anzahl_std = '';
 if($result_anzahl = $db->db_query($qry_anzahl_studenten))
@@ -358,9 +392,11 @@ $qry_anzahl_gesamt = "
 	FROM
 		public.tbl_person
 		JOIN public.tbl_benutzer USING(person_id)
+		JOIN public.tbl_akte USING (person_id)
 	WHERE
 		foto is not NULL
 		AND tbl_benutzer.aktiv
+		AND tbl_akte.dokument_kurzbz='Lichtbil'
 		AND 'akzeptiert' NOT IN(SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
 					WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
@@ -434,10 +470,13 @@ if($result = $db->db_query($qry))
 		<table style="position: relative;">	
 			<tr>
 				<td class="hoverbox">
-				<a href="#"><p class="previewtext">Originalvorschau</p><img class="image" src="../../content/bild.php?src=akte&person_id='.$row->person_id.'"><img src="../../content/bild.php?src=akte&person_id='.$row->person_id.'" class="preview"></a>
+				<a href="#"><p class="previewtext">Originalvorschau</p><img id="image" class="image" src="../../content/bild.php?src=akte&person_id='.$row->person_id.'"><img id="imagepreview" src="../../content/bild.php?src=akte&person_id='.$row->person_id.'" class="preview"></a>
+				<br>
+				<div id="imagesize"></div>
 				</td>
 				<td>&nbsp;</td>
 				<td>
+				Person ID: '.$db->convert_html_chars($row->person_id).'<br>
 				Vorname: '.$db->convert_html_chars($row->vorname).'<br>
 				Nachname: '.$db->convert_html_chars($row->nachname).'<br>
 				'.($row->mitarbeiter=='1'?'MitarbeiterIn':'StudentIn').'
@@ -455,8 +494,11 @@ if($result = $db->db_query($qry))
 		echo '</form>';
 		echo '<br><br><br>';
 		echo '<a href="#FotoUpload" onclick="window.open(\'../../content/bildupload.php?person_id='.$row->person_id.'\',\'BildUpload\', \'height=50,width=600,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\'); return false;">Bild Upload</a>';
-		echo '<br><br>';
-		echo '<a href="#dms_download" onclick="window.open(\''.APP_ROOT.'cms/dms.php?id='.$row->dms_id.'\',\'DmsDownload\', \'height=800,width=900,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\'); return false;">DMS Download</a>';
+		if ($row->dms_id !='')
+		{
+			echo '<br><br>';
+			echo '<a href="#dms_download" onclick="window.open(\''.APP_ROOT.'cms/dms.php?id='.$row->dms_id.'\',\'DmsDownload\', \'height=800,width=900,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\'); return false;">DMS Download</a>';
+		}
 		echo '</center>';
 	}
 	else

@@ -47,7 +47,7 @@ $aktuellerContentIdx=0;
 //Cookie erhaelt zusaetzlich die IP im Namen damit bei der Preview keine Konflikte entstehen
 $cookie = 'infoscreenContent'.str_replace('-','',str_replace('.','',$ip));
 
-//zuletzt angezeigte Seite des Terminals ermitteln 
+//zuletzt angezeigte Seite des Terminals ermitteln
 if(isset($_COOKIE[$cookie]))
 {
 	$lastinfoscreencontent = $_COOKIE[$cookie];
@@ -57,7 +57,7 @@ else
 	$lastinfoscreencontent = -1;
 	$aktuellerContentIdx = 0;
 }
-	
+
 if($infoscreen->getInfoscreen($ip))
 {
 	$infoscreen_id = $infoscreen->infoscreen_id;
@@ -72,14 +72,14 @@ if($infoscreen->getInfoscreen($ip))
 		{
 			$aktuellerContentIdx=$i+1;
 		}
-		
+
 	}
 }
 if($aktuellerContentIdx>$i)
 	$aktuellerContentIdx=0;
 
 if(isset($refreshzeiten[$aktuellerContentIdx]) && $refreshzeiten[$aktuellerContentIdx]!='')
-	$refreshzeit = $refreshzeiten[$aktuellerContentIdx];	
+	$refreshzeit = $refreshzeiten[$aktuellerContentIdx];
 
 if(isset($infoscreen_content) && isset($infoscreen_content[$aktuellerContentIdx]))
 {
@@ -105,7 +105,7 @@ function initialize()
 	{
 	startit()
 	}
-	
+
 function scrollwindow()
 	{
 	if (document.all)
@@ -134,12 +134,12 @@ function scrollwindow()
 		window.scroll(0,currentpos)
 		}
 	}
-	
+
 function startit()
 	{
 	setInterval("scrollwindow()",40) <!--Zeit in ms bis zum naechsten Bildwechsel 1000=1sek-->
 	}
-	
+
 window.onload=initialize
 </script>';
 $scroll= "<script>
@@ -155,22 +155,22 @@ window.onload=scrolldown;
 //echo $scroll;
 
 echo '
-	<title>Infoscreen</title>
+	<title>Informationsbildschirm</title>
 </head>
 <body>';
-echo '<!-- Last content:'.$lastinfoscreencontent.' Infoscreen-ID:'.$infoscreen_id.' IP:'.$ip.'-->';
+echo '<!-- Last content:'.$lastinfoscreencontent.' ID:'.$infoscreen_id.' IP:'.$ip.'-->';
 if($infoscreen_id!='' && isset($content[$aktuellerContentIdx]))
 {
-	
+
 	echo '<center style="height: 100%"><iframe id="content" src="../../cms/content.php?content_id='.$content[$aktuellerContentIdx].'" ></iframe></center>';
 }
 else
 {
 	echo '<br><br><br>
 		<center>
-		<h1>Infoscreen - '.CAMPUS_NAME.'</h1>
+		<h1>Informationsbildschirm - '.CAMPUS_NAME.'</h1>
 		<br><br><br>
-		Dieser Infoscreen wurde noch nicht registriert
+		Dieser Informationsbildschirm wurde noch nicht registriert
 		<br><br>
 		IP-Adresse:'.$ip.'
 		</center>';

@@ -1,4 +1,4 @@
-<?php 
+<?php
 /* Copyright (C) 2012 FH Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/basis_db.class.php');
-require_once('stip.class.php'); 
+require_once('stip.class.php');
 $getuid=get_uid();
 if(!check_lektor($getuid))
 	die('Sie haben keine Berechtigung für diese Seite.');
@@ -29,7 +29,7 @@ $db = new basis_db();
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<script type="text/javascript" src="../include/js/jquery.js"></script> 
+		<script type="text/javascript" src="../include/js/jquery.js"></script>
 		<title>STIP-Client</title>
 	</head>
 	<body>
@@ -93,37 +93,37 @@ $db = new basis_db();
 		</form>
 
 
-<?php 
+<?php
 
 if(isset($_REQUEST['submit']))
 {
-	$client = new SoapClient(APP_ROOT."/soap/stip.wsdl.php?".microtime());
-	
+	$client = new SoapClient(APP_ROOT."/soap/stip.wsdl.php?".microtime(true));
+
 	$username = $_REQUEST['username'];
 	$passwort = $_REQUEST['password'];
-	
+
 	$ErhKz = $_REQUEST['ErhKz'];
-	$AnfragedatenID = $_REQUEST['AnfragedatenID']; 
-	
-	$bezieher = new stip(); 
+	$AnfragedatenID = $_REQUEST['AnfragedatenID'];
+
+	$bezieher = new stip();
 	$bezieher->Semester = $_REQUEST['Semester'];
 	$bezieher->Studienjahr = $_REQUEST['Studienjahr'];
 	$bezieher->PersKz= $_REQUEST['PersKz'];
-	$bezieher->SVNR= $_REQUEST['Svnr']; 
+	$bezieher->SVNR= $_REQUEST['Svnr'];
 	$bezieher->Familienname= $_REQUEST['Familienname'];
 	$bezieher->Vorname= $_REQUEST['Vorname'];
 	$bezieher->Typ = $_REQUEST['Typ'];
-	$bezieher1 = new stip(); 
+	$bezieher1 = new stip();
 	$bezieher1->Semester = $_REQUEST['Semester'];
 	$bezieher1->Studienjahr = $_REQUEST['Studienjahr'];
 	$bezieher1->PersKz= $_REQUEST['PersKz'];
-	$bezieher1->SVNR= $_REQUEST['Svnr']; 
+	$bezieher1->SVNR= $_REQUEST['Svnr'];
 	$bezieher1->Familienname= $_REQUEST['Familienname'];
 	$bezieher1->Vorname= $_REQUEST['Vorname'];
 	$bezieher1->Typ = $_REQUEST['Typ'];
-			
+
 	try
-	{           
+	{
 		$response_stip = $client->GetStipendienbezieherStip(array("userName"=>$username,"passWord"=>$passwort,"anfrageDaten"=>array("ErhKz"=>$ErhKz, "AnfragedatenID"=>$AnfragedatenID,"Stipendiumsbezieher"=>array($bezieher))));
 		echo '<h2>Single Request Result</h2>';
 		echo '<pre>'.print_r($response_stip->GetStipendienbezieherStipResult,true).'</pre>';
@@ -131,11 +131,11 @@ if(isset($_REQUEST['submit']))
 		$response_stip = $client->GetStipendienbezieherStip(array("userName"=>$username,"passWord"=>$passwort,"anfrageDaten"=>array("ErhKz"=>$ErhKz, "AnfragedatenID"=>$AnfragedatenID,"Stipendiumsbezieher"=>array($bezieher, $bezieher1))));
 		echo '<pre>'.print_r($response_stip->GetStipendienbezieherStipResult, true).'</pre>';
 	}
-	catch(SoapFault $fault) 
+	catch(SoapFault $fault)
 	{
     	echo "SOAP Fault: (faultcode: ".$fault->faultcode.", faultstring: ".$fault->faultstring.")", E_USER_ERROR;
 	}
-	 
+
 }
 
 ?>

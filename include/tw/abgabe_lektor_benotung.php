@@ -373,23 +373,23 @@ else
 		$pdf->SetFont('Arial','',8);
 		$maxX +=55;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(95,12,'Ergebnis <= 50 Pkte = 5',1,'C',0);
+		$pdf->MultiCell(95,12,'< 50% = 5',1,'C',0);
 		$maxX +=95;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(95,12,'50 < Ergebnis < 65 = 4',1,'C',0);
+		$pdf->MultiCell(95,12,'>= 50% und < 63% = 4',1,'C',0);
 		$maxX +=95;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(95,12,'65 <= Ergebnis < 78 = 3',1,'C',0);
+		$pdf->MultiCell(95,12,'>= 63% und < 75% = 3',1,'C',0);
 		$maxX +=95;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(95,12,'78 <= Ergebnis < 91 = 2',1,'C',0);
+		$pdf->MultiCell(95,12,'>= 75% und < 88% = 2',1,'C',0);
 		$maxX +=95;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(95,12,'91 Pkte <= Ergebnis = 1',1,'C',0);
+		$pdf->MultiCell(95,12,'>= 88% = 1',1,'C',0);
 		$maxY=$pdf->GetY();
 		$maxX=85;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(315,12,'1 Gruppe < 50 Punkte => Masterarbeit gesamt negativ','LB','L',0);
+		$pdf->MultiCell(470,12,'Liegt die Punkteanzahl bei einem Kriterium unter 50%, ist die Bachelorarbeit insgesamt als negativ zu beurteilen.','LB','L',0);
 		$maxX +=315;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(80,12,'','TB','C',0);
@@ -659,23 +659,23 @@ else
 		$pdf->SetFont('Arial','',8);
 		$maxX +=55;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(95,12,'Ergebnis <= 50 Pkte = 5',1,'C',0);
+		$pdf->MultiCell(95,12,'< 50% = 5',1,'C',0);
 		$maxX +=95;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(95,12,'50 < Ergebnis < 65 = 4',1,'C',0);
+		$pdf->MultiCell(95,12,'>= 50% und < 63% = 4',1,'C',0);
 		$maxX +=95;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(95,12,'65 <= Ergebnis < 78 = 3',1,'C',0);
+		$pdf->MultiCell(95,12,'>= 63% und < 75% = 3',1,'C',0);
 		$maxX +=95;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(95,12,'78 <= Ergebnis < 91 = 2',1,'C',0);
+		$pdf->MultiCell(95,12,'>= 75% und < 88% = 2',1,'C',0);
 		$maxX +=95;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(95,12,'91 Pkte <= Ergebnis = 1',1,'C',0);
+		$pdf->MultiCell(95,12,'>= 88% = 1',1,'C',0);
 		$maxY=$pdf->GetY();
 		$maxX=85;
 		$pdf->SetXY($maxX,$maxY);
-		$pdf->MultiCell(315,12,'1 Gruppe < 50 Punkte => Masterarbeit gesamt negativ','LB','L',0);	
+		$pdf->MultiCell(470,12,'Liegt die Punkteanzahl bei einem Kriterium unter 50%, ist die Masterarbeit insgesamt als negativ zu beurteilen.','LB','L',0);	
 		$maxX +=315;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(80,12,'','TB','C',0);
@@ -844,19 +844,19 @@ else
 					}
 					else
 					{
-						if(document.getElementById("summe2").value<=50)
+						if(document.getElementById("summe2").value<50)
 						{
 							ergebnis=5;
 						}
-						else if(document.getElementById("summe2").value<65)
+						else if(document.getElementById("summe2").value<63)
 						{
 							ergebnis=4;
 						}
-						else if(document.getElementById("summe2").value<78)
+						else if(document.getElementById("summe2").value<75)
 						{
 							ergebnis=3;
 						}
-						else if(document.getElementById("summe2").value<91)
+						else if(document.getElementById("summe2").value<88)
 						{
 							ergebnis=2;
 						}
@@ -884,15 +884,15 @@ else
 						{
 							ergebnis=5;
 						}
-						else if(document.getElementById("summe2").value<65)
+						else if(document.getElementById("summe2").value<63)
 						{
 							ergebnis=4;
 						}
-						else if(document.getElementById("summe2").value<78)
+						else if(document.getElementById("summe2").value<75)
 						{
 							ergebnis=3;
 						}
-						else if(document.getElementById("summe2").value<91)
+						else if(document.getElementById("summe2").value<88)
 						{
 							ergebnis=2;
 						}
@@ -1058,14 +1058,14 @@ else
 		$htmlstr .="</table>";
 				
 		$htmlstr .= "<br><table border='1' align='center' width='70%'>";
-		$htmlstr .= "<tr><td>Ergebnis <=50 Punkte : Note 5</td><td>50< Ergebnis <65 : Note 4</td><td>65<= Ergebnis <78 : Note 3</td><td>78<= Ergebnis <91 : Note 2</td><td>91<= Ergebnis : Note 1</td></tr>";
+		$htmlstr .= "<tr><td>&lt; 50% <b>Nicht genügend</b></td><td>&gt;= 50% und &lt;63% <b>Genügend</b></td><td>&gt;= 63% und &lt; 75% <b>Befriedigend</b></td><td>&gt;= 75% und &lt; 88% <b>Gut</b></td><td>&gt;= 88% <b>Sehr Gut</b></td></tr>";
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
-			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkten &rArr; Masterarbeit gesamt negativ</td></tr>";
+			$htmlstr .= "<tr><td colspan='5'>Liegt die Punkteanzahl bei einem Kriterium unter 50%, ist die Masterarbeit insgesamt als negativ zu beurteilen.</td></tr>";
 		}
 		else 
 		{
-			$htmlstr .= "<tr><td colspan='5'>Ein Kriterium mit weniger als 50 Punkten &rArr; Bachelorarbeit gesamt negativ</td></tr>";
+			$htmlstr .= "<tr><td colspan='5'>Liegt die Punkteanzahl bei einem Kriterium unter 50%, ist die Bachelorarbeit insgesamt als negativ zu beurteilen.</td></tr>";
 		}
 		$htmlstr .= "</table>";
 		if($row->projekttyp_kurzbz!='Bachelor')
