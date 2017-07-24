@@ -2178,7 +2178,7 @@ function StudentExport()
 	}
 
 	stsem = getStudiensemester();
-	action = '<?php echo APP_ROOT; ?>content/statistik/studentenexport.xls.php?studiensemester_kurzbz='+stsem;
+	action = '<?php echo APP_ROOT; ?>content/statistik/studentenexportextended.xls.php?studiensemester_kurzbz='+stsem;
 	OpenWindowPost(action, data);
 }
 
