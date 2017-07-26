@@ -100,7 +100,7 @@ printValue("Unoconv", $unoconvVersion, "0.7");
 
 // Codeigniter Environment Variable CI_ENV
 $CI_ENV = getenv('CI_ENV');
-printValue("CI_ENV", $CI_ENV);
+printValue("CI_ENV", ($CI_ENV!=''?$CI_ENV:false),'not set -> defaults to development');
 
 // ZIP
 printValue("zip", checkInstalled('zip'));
@@ -142,7 +142,6 @@ echo '
 
 function printValue($module, $status_ok, $message='')
 {
-
 	if(!is_bool($status_ok))
 	{
 		$output = $status_ok;
@@ -156,9 +155,9 @@ function printValue($module, $status_ok, $message='')
 	echo '
 	<tr>
 		<td>'.$module.'</td>
-		 <td><span class="'.($status_ok?'ok':'failed').'">'.$output.'</span>';
+		 <td><span class="'.($status_ok?'ok':'fail').'">'.$output.'</span>';
 	if(!$status_ok && $message!='')
-		echo $message;
+		echo ' '.$message;
 	echo '</td>';
 	echo '</tr>';
 }
