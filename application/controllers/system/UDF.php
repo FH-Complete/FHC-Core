@@ -51,20 +51,23 @@ class UDF extends VileSci_Controller
 			$this->session->set_userdata('result', null);
 		}
 		
-		$person = $this->PersonModel->load($person_id);
-		$prestudent = $this->PrestudentModel->load($prestudent_id);
+		$data = array('result' => $result);
 		
-		$personUdfs = $this->PersonModel->getUDFs();
-		$prestudentUdfs = $this->PrestudentModel->getUDFs();
+		if (isset($person_id) && is_numeric($person_id))
+		{
+			$person = $this->PersonModel->load($person_id);
+			$personUdfs = $this->PersonModel->getUDFs();
+			$personUdfs['person_id'] = $person_id;
+			$data['personUdfs'] = $personUdfs;
+		}
 		
-		$personUdfs['person_id'] = $person_id;
-		$prestudentUdfs['prestudent_id'] = $prestudent_id;
-		
-		$data = array(
-			'personUdfs' => $personUdfs,
-			'prestudentUdfs' => $prestudentUdfs,
-			'result' => $result
-		);
+		if (isset($prestudent_id) && is_numeric($prestudent_id))
+		{
+			$prestudent = $this->PrestudentModel->load($prestudent_id);
+			$prestudentUdfs = $this->PrestudentModel->getUDFs();
+			$prestudentUdfs['prestudent_id'] = $prestudent_id;
+			$data['prestudentUdfs'] = $prestudentUdfs;
+		}
 		
 		$this->load->view('system/udf', $data);
 	}
