@@ -150,7 +150,7 @@ class DB_Model extends FHC_Model
 		if ($isEntitled = $this->_isEntitled(PermissionLib::UPDATE_RIGHT)) return $isEntitled;
 		
 		// UDFs
-		if (isError($validate = $this->_manageUDFs($data))) return $validate;
+		if (isError($validate = $this->_manageUDFs($data, $id))) return $validate;
 		
 		// DB-UPDATE
 		// Check for composite Primary Key
@@ -958,7 +958,7 @@ class DB_Model extends FHC_Model
 	/**
 	 * Manage UDFs
 	 */
-	private function _manageUDFs(&$data)
+	private function _manageUDFs(&$data, $id = null)
 	{
 		$validate = success(true); // returned value
 		// Contains a list of validation errors for the UDFs that have not passed the validation
@@ -1052,6 +1052,31 @@ class DB_Model extends FHC_Model
 				// If the validation of all the supplied UDFs is ok
 				if (count($notValidUDFsArray) == 0)
 				{
+					// An update is performed, then in this case it preserves the values
+					// of the UDF that are not updated
+					if ($id != null)
+					{
+						$record = $this->load($id); // retrive the DB record
+						// Checks that everything is ok and that there is only one record
+						if (isSuccess($record) && count($record->retval) == 1)
+						{
+							$recordFields = (array)$record->retval[0]; // convert to an array
+							foreach($recordFields as $fieldName => $fieldValue)
+							{
+								// If this field is an UDF
+								if (substr($fieldName, 0, 4) == DB_Model::UDF_FIELD_PREFIX)
+								{
+									// If this field is not present in the given parameters
+									// then copy it from the DB without changes
+									if (!isset($toBeStoredUDFsArray[$fieldName]))
+									{
+										$toBeStoredUDFsArray[$fieldName] = $fieldValue;
+									}
+								}
+							}
+						}
+					}
+					
 					$encodedToBeStoredUDFs = json_encode($toBeStoredUDFsArray); // encode to json
 					if ($encodedToBeStoredUDFs !== false) // if encode was ok
 					{
