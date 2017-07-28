@@ -36,6 +36,7 @@ class dokument_export
 	private $images=array();
 	private $sourceDir;
 	public $errormsg;
+	private $unoconv_version;
 
 	/**
 	 * Konstruktor
@@ -44,6 +45,12 @@ class dokument_export
 	{
 		if(!isset($vorlage))
 			return;
+
+		exec('unoconv --version',$ret_arr);
+		if(isset($ret_arr[0]))
+			$this->unoconv_version = explode(' ',$ret_arr[0])[1];
+		else
+			die('Unoconv not found');
 
 		//Vorlage aus der Datenbank holen
 		$this->vorlage = new vorlage();
@@ -261,7 +268,14 @@ class dokument_export
 			case 'doc':
 				$this->temp_filename = $this->temp_folder . '/out.' . $this->outputformat;
 
-				$command = 'unoconv -e IsSkipEmptyPages=false -f ' . $this->outputformat . ' --output %s %s 2>&1';
+				// Unoconv Version 0.6 hat eine Bug wodurch die Berechtigungen des PDF/Doc nicht korrekt gesetzt
+				// werden. Deshalb wird dies hier speziell behandelt.
+				// Die 2. Variante hat den Vorteil dass hier eine bessere Fehlerbehandlung moeglich ist
+				if($this->unoconv_version=='0.6')
+					$command = 'unoconv -e IsSkipEmptyPages=false -f ' . $this->outputformat . '  %2$s > %1$s';
+				else
+					$command = 'unoconv -e IsSkipEmptyPages=false -f ' . $this->outputformat . ' --output %s %s 2>&1';
+
 				$command = sprintf($command, $this->temp_filename, $tempname_zip);
 
 				exec($command, $out, $ret);
@@ -411,7 +425,10 @@ class dokument_export
 	*/
 	public function convert($inFile, $outFile, $format = "pdf")
 	{
-		$command = 'unoconv -f %s --output %s %s 2>&1';
+		if($this->unoconv_version=='0.6')
+			$command = 'unoconv -f %1$s  %3$s > %2$s';
+		else
+			$command = 'unoconv -f %s --output %s %s 2>&1';
 		$command = sprintf($command, $format, $outFile, $inFile);
 
 		exec($command, $out, $ret);
