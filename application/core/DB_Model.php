@@ -23,6 +23,8 @@ class DB_Model extends FHC_Model
 	const UDF_FIELD_TYPE = 'jsonb';
 	const UDF_FIELD_PREFIX = 'udf_';
 	const UDF_ATTRIBUTE_NAME = 'name';
+	const UDF_TYPE_NAME = 'type';
+	const UDF_CHKBOX_TYPE = 'checkbox';
 	const UDF_FIELD_JSON_DESCRIPTION = 'jsons';
 	
 	// UDF validation attributes
@@ -33,6 +35,9 @@ class DB_Model extends FHC_Model
 	const UDF_REGEX_LANG = 'php';
 	const UDF_MAX_LENGTH = 'max-length';
 	const UDF_MIN_LENGTH = 'min-length';
+	
+	const STRING_TRUE = 'true';
+	const STRING_FALSE = 'false';
 	
 	protected $dbTable;  	// Name of the DB-Table for CI-Insert, -Update, ...
 	protected $pk;  		// Name of the PrimaryKey for DB-Update, Load, ...
@@ -1032,6 +1037,14 @@ class DB_Model extends FHC_Model
 							// If validation is ok copy the value that is to be stored into $toBeStoredUDFsArray
 							if (isSuccess($validate))
 							{
+								// If this UDF is a checkbox
+								if ($decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_CHKBOX_TYPE)
+								{
+									// Converts from string to boolean
+									if ($val == DB_Model::STRING_TRUE) $val = true;
+									else if ($val == DB_Model::STRING_FALSE) $val = false;
+								}
+								
 								$toBeStoredUDFsArray[$key] = $val;
 							}
 							else // otherwise store the validation error in $notValidUDFsArray
