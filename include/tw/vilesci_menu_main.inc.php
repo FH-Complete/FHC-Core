@@ -261,6 +261,8 @@ if($addon_obj->loadAddons())
 		foreach($addon_obj->result as $row)
 		{
 			$menu['Addons'][$row->kurzbz]=array('name'=>$row->addon_name, 'link'=>'../addons/'.$row->kurzbz.'/vilesci/index.php', 'target'=>'main');
+			if(file_exists('../addons/'.$row->kurzbz.'/vilesci/menu.inc.php'))
+				include('../addons/'.$row->kurzbz.'/vilesci/menu.inc.php');
 		}
 	}
 }
