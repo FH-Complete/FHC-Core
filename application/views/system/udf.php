@@ -45,25 +45,23 @@
 		
 		<form action="/core/index.ci.php/system/UDF/saveUDF" method="POST">
 		
-			<table>
-				<tr>
-					<td style="font-size: 20px; font-weight: bold;">
-						Person
-					</td>
-					<td width="30px">
+			<div class="div-table">
+				<div class="div-row">
+					<div class="div-cell" style="font-size: 20px; font-weight: bold;">
+						Zusatzfelder
+					</div>
+				</div>
+				<div class="div-row">
+					<div class="div-cell">
 						&nbsp;
-					</td>
-					<td style="font-size: 20px; font-weight: bold;">
-						Prestudent
-					</td>
-				</tr>
-				<tr>
-					<td colspan="3">
-						&nbsp;
-					</td>
-				</tr>
-				<tr>
-					<td class="align-top">
+					</div>
+				</div>
+				<div class="div-row">
+				<?php
+					if (isset($personUdfs))
+					{
+				?>
+					<div class="div-cell">
 						<?php
 							echo $this->widgetlib->UDFWidget(
 								array(
@@ -73,11 +71,18 @@
 								)
 							);
 						?>
-					</td>
-					<td width="30px">
+					</div>
+					<div class="div-cell" style="width: 40px;">
 						&nbsp;
-					</td>
-					<td class="align-top">
+					</div>
+				<?php
+					}
+				?>
+				<?php
+					if (isset($prestudentUdfs))
+					{
+				?>
+					<div class="div-cell">
 						<?php
 							echo $this->widgetlib->UDFWidget(
 								array(
@@ -87,22 +92,52 @@
 								)
 							);
 						?>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="3">
+					</div>
+				<?php
+					}
+				?>
+				</div>
+				<div class="div-row">
+					<div class="div-cell">
 						&nbsp;
-					</td>
-				</tr>
-				<tr>
-					<td colspan="3" align="center">
-						<input type="submit" value="Save">
-					</td>
-				</tr>
-			</table>
+					</div>
+				</div>
+				<div class="div-row halign-right">
+				<?php
+					if (isset($personUdfs) && isset($prestudentUdfs))
+					{
+				?>
+					<div class="div-cell">
+						&nbsp;
+					</div>
+					<div class="div-cell">
+						&nbsp;
+					</div>
+				<?php
+					}
+				?>
+					<div class="div-cell halign-right">
+						<input type="submit" value="&nbsp;Speichern&nbsp;">
+					</div>
+				</div>
+			</div>
 			
+		<?php
+			if (isset($personUdfs))
+			{
+		?>
 			<input type="hidden" name="person_id" value="<?php echo $personUdfs['person_id']; ?>">
+		<?php
+			}
+		?>
+		<?php
+			if (isset($prestudentUdfs))
+			{
+		?>
 			<input type="hidden" name="prestudent_id" value="<?php echo $prestudentUdfs['prestudent_id']; ?>">
+		<?php
+			}
+		?>
 		
 		</form>
 		

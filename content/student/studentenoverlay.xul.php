@@ -486,8 +486,8 @@ else
 							?>
 							
 							<?php
-							if(!defined('FAS_UDF') || FAS_UDF==true)
-								echo '<tab id="student-tab-udf" label="UDF" onclick="StudentUDFIFrameLoad();"/>';
+							if (!defined('FAS_UDF') || FAS_UDF == true)
+								echo '<tab id="student-tab-udf" label="Zusatzfelder" onclick="StudentUDFIFrameLoad();"/>';
 							?>
 
 						</tabs>
@@ -524,7 +524,7 @@ else
 								if(!defined('FAS_MESSAGES') || FAS_MESSAGES==true)
 									echo '<iframe id="student-messages" style="margin: 0px;" src="" />';
 								
-								if(!defined('FAS_UDF') || FAS_UDF==true)
+								if (!defined('FAS_UDF') || FAS_UDF == true)
 									echo '<iframe id="student-udf" style="margin: 0px;" src="" />';
 							?>
 							

@@ -1070,23 +1070,8 @@ class CheckboxWidget extends Widget
 	const VALUE_FIELD = 'value';
 	// Name of the property that will be used to store the value between the option tags
 	const DESCRIPTION_FIELD = 'description';
-	// The name of the element of the data array given to the view
-	// this element is used to tell what element of the dropdown is selected
-	const CHECKED_ELEMENT = 'checkedElement';
-	
-	/**
-	 * 
-	 */
-	protected function setValue($value)
-	{
-		$tmpValue = $value;
-		if (is_array($value) && count($value) > 0)
-		{
-			$tmpValue = array_values($value)[0];
-		}
-		
-		$this->_args[CheckboxWidget::VALUE_FIELD] = $tmpValue;
-	}
+	// Value of value attribute of the checkbox
+	const CHECKBOX_VALUE = 'true';
 	
 	/**
 	 * 
@@ -1105,17 +1090,8 @@ class CheckboxWidgetUDF extends CheckboxWidget
 	/**
 	 * 
 	 */
-	public function render($parameters)
+	public function render()
 	{
-		if ($parameters != null)
-		{
-			$this->setValue($parameters);
-		}
-		else
-		{
-			$this->setValue('');
-		}
-		
 		$this->loadCheckboxView();
 		
 		echo $this->content();

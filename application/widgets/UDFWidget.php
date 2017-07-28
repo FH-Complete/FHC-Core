@@ -283,33 +283,16 @@ class UDFWidget extends UDFWidgetTpl
 		if (isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME])
 			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}]))
 		{
-			$this->_args[CheckboxWidget::CHECKED_ELEMENT] = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
+			$this->_args[CheckboxWidget::VALUE_FIELD] = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
 		}
 		else
 		{
-			$this->_args[CheckboxWidget::CHECKED_ELEMENT] = $jsonSchema->{UDFWidgetTpl::DEFAULT_VALUE};
+			$this->_args[CheckboxWidget::VALUE_FIELD] = Widget::HTML_DEFAULT_VALUE;
 		}
 		
 		$checkboxWidgetUDF = new CheckboxWidgetUDF($this->_name, $this->_args);
-		$parameters = array();
 		
-		// 
-		if (isset($jsonSchema->{UDFWidget::LIST_VALUES}->enum))
-		{
-			$parameters = $jsonSchema->{UDFWidget::LIST_VALUES}->enum;
-		}
-		// 
-		else if (isset($jsonSchema->{UDFWidget::LIST_VALUES}->sql))
-		{
-			$queryResult = $this->UDFModel->execQuery($jsonSchema->{UDFWidget::LIST_VALUES}->sql);
-			if (hasData($queryResult))
-			{
-				$tmpResult = (array)$queryResult->retval[0];
-				$parameters = $tmpResult;
-			}
-		}
-		
-		$checkboxWidgetUDF->render($parameters);
+		$checkboxWidgetUDF->render();
 	}
     
     /**

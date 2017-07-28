@@ -5,13 +5,13 @@
 			<?php
 				if (isset(${Widget::HTML_ARG_NAME}[UDFWidgetTpl::LABEL]))
 				{
-					$align = "align-middle";
+					$align = "valign-middle";
 					if (isset(${Widget::HTML_ARG_NAME}[DropdownWidget::MULTIPLE]))
 					{
-						$align = "align-top";
+						$align = "valign-top";
 					}
 			?>
-				<div class="div-cell <?php echo $align; ?>">
+				<div class="div-cell width-150px <?php echo $align; ?>">
 					<label for="<?php echo ${Widget::HTML_ARG_NAME}[Widget::HTML_ID]; ?>">
 						<?php echo ${Widget::HTML_ARG_NAME}[UDFWidgetTpl::LABEL]; ?>
 					</label>
@@ -19,7 +19,7 @@
 			<?php
 				}
 			?>
-			<div class="div-cell">
+			<div class="div-cell width-150px">
 				<select
 					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, Widget::HTML_ID); ?>
 					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, Widget::HTML_NAME); ?>

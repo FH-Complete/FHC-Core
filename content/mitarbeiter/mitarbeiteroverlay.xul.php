@@ -262,6 +262,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 				?>
 				<tab id="mitarbeiter-tab-termine" label="Termine" onclick="MitarbeiterTermineIFrameLoad()" />
 				<tab id="mitarbeiter-tab-notizen" label="Notizen"/>
+				<?php
+					if (!defined('FAS_UDF') || FAS_UDF == true)
+						echo '<tab id="mitarbeiter-tab-udf" label="Zusatzfelder" onclick="MitarbeiterUDFIFrameLoad()"/>';
+				?>
 			</tabs>
 			<tabpanels id="mitarbeiter-tabpanels-main" flex="1">
 				<vbox id="mitarbeiter-detail-stammdaten"  style="margin-top:10px;" />
@@ -279,6 +283,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 				<vbox id="mitarbeiter-box-notiz">
 					<box class="Notiz" flex="1" id="mitarbeiter-box-notizen"/>
 				</vbox>
+				<?php
+					if (!defined('FAS_UDF') || FAS_UDF == true)
+						echo '<iframe id="mitarbeiter-udf" src="" style="margin-top:10px;" />';
+				?>
 			</tabpanels>
 		</tabbox>
 	</vbox>

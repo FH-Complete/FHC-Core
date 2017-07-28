@@ -6,7 +6,7 @@
 				if (isset(${Widget::HTML_ARG_NAME}[UDFWidgetTpl::LABEL]))
 				{
 			?>
-				<div class="div-cell align-middle">
+				<div class="div-cell-label valign-middle width-150px">
 					<label for="<?php echo ${Widget::HTML_ARG_NAME}[Widget::HTML_ID]; ?>">
 						<?php echo ${Widget::HTML_ARG_NAME}[UDFWidgetTpl::LABEL]; ?>
 					</label>
@@ -14,7 +14,7 @@
 			<?php
 				}
 			?>
-			<div class="div-cell">
+			<div class="div-cell-data width-30px">
 				<input
 					type="checkbox"
 					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, Widget::HTML_ID); ?>
@@ -24,17 +24,14 @@
 					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidgetTpl::TITLE); ?>
 					<?php
 						$checked = '';
-						if (${CheckboxWidget::VALUE_FIELD} == ${CheckboxWidget::CHECKED_ELEMENT})
+						if (${CheckboxWidget::VALUE_FIELD} === true)
 						{
 							$checked = 'checked';
 						}
 					?>
 					<?php echo $checked; ?>
-					value="<?php echo ${CheckboxWidget::VALUE_FIELD}; ?>"
+					value="<?php echo CheckboxWidget::CHECKBOX_VALUE; ?>"
 				>
-			</div>
-			<div class="div-cell align-middle">
-				<?php echo ${CheckboxWidget::VALUE_FIELD}; ?>
 			</div>
 		</div>
 	</div>

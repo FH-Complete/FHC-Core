@@ -6,7 +6,7 @@
 				if (isset(${Widget::HTML_ARG_NAME}[UDFWidgetTpl::LABEL]))
 				{
 			?>
-				<div class="div-cell align-top">
+				<div class="div-cell width-150px valign-top">
 					<label for="<?php echo ${Widget::HTML_ARG_NAME}[Widget::HTML_ID]; ?>">
 						<?php echo ${Widget::HTML_ARG_NAME}[UDFWidgetTpl::LABEL]; ?>
 					</label>
@@ -14,7 +14,7 @@
 			<?php
 				}
 			?>
-			<div class="div-cell">
+			<div class="div-cell width-150px">
 				<textarea
 					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, Widget::HTML_ID); ?>
 					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, Widget::HTML_NAME); ?>
