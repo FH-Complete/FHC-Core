@@ -73,20 +73,20 @@ echo '
 <tbody>
 ';
 // Apache
-printVersion("Apache", apache_get_version());
+printValue("Apache", apache_get_version());
 
 // PHP version
-printVersion("php", phpversion());
+printValue("php", version_compare(phpversion(),'5.6','>='), 'minimum php 5.6 required');
 
 // PHP module
-printVersion("php-xsl", phpversion('xsl'));
-printVersion("php-gd", phpversion('gd'));
-printVersion("php-pgsql", phpversion('pgsql'));
-printVersion("php-ldap", phpversion('ldap'));
-printVersion("php-mcrypt", phpversion('mcrypt'));
-printVersion("php-mbstring", phpversion('mbstring'));
-printVersion("php-soap", phpversion('soap'));
-printVersion("php-curl", phpversion('curl'));
+printValue("php-xsl", extension_loaded('xsl'));
+printValue("php-gd", extension_loaded('gd'));
+printValue("php-pgsql", extension_loaded('pgsql'));
+printValue("php-ldap", extension_loaded('ldap'));
+printValue("php-mcrypt", extension_loaded('mcrypt'));
+printValue("php-mbstring", extension_loaded('mbstring'));
+printValue("php-soap", extension_loaded('soap'));
+printValue("php-curl", extension_loaded('curl'));
 
 // Unoconv version
 $returnArray = array();
@@ -94,50 +94,45 @@ exec('unoconv --version',$returnArray);
 if(isset($returnArray[0]))
 	$unoconvVersion = explode(' ',$returnArray[0])[1];
 else
-	$unoconvVersion = null;
+	$unoconvVersion = false;
 
-printVersion("Unoconv", $unoconvVersion, "0.7");
+printValue("Unoconv", $unoconvVersion, "0.7");
 
 // Codeigniter Environment Variable CI_ENV
 $CI_ENV = getenv('CI_ENV');
-printVersion("CI_ENV", $CI_ENV);
+printValue("CI_ENV", ($CI_ENV!=''?$CI_ENV:false),'not set -> defaults to development');
 
 // ZIP
-printVersion("zip", checkInstalled('zip'));
+printValue("zip", checkInstalled('zip'));
 
 // Composer
-printVersion("composer", checkInstalled('composer'));
+printValue("composer", checkInstalled('composer'));
 
 // Composer / Vendor
 $vendorFileExists = file_exists('../vendor/codeigniter/framework/index.php');
-printVersion("Composer Status", ($vendorFileExists?'ok':'out of date'));
+printValue("Composer Status", $vendorFileExists, 'out of date');
 
 // Config Files
 $ConfigExists = file_exists('../config/cis.config.inc.php');
 if(!$ConfigExists)
 	$ConfigExists = file_exists('../config/vilesci.config.inc.php');
 
-printVersion("ConfigFile CIS/Vilesci", ($ConfigExists?'ok':'missing'));
+printValue("ConfigFile CIS/Vilesci", $ConfigExists);
 
 $ConfigExists = file_exists('../config/global.config.inc.php');
-printVersion("ConfigFile Global", ($ConfigExists?'ok':'missing'));
+printValue("ConfigFile Global", $ConfigExists);
 
 if($CI_ENV == '')
-	$CI_ENV = 'production';
+	$CI_ENV = 'development';
 $ConfigExists = file_exists('../application/config/'.$CI_ENV.'/config.php');
-printVersion("ConfigFile Codeigniter", ($ConfigExists?'ok':'missing'));
+printValue("ConfigFile Codeigniter", $ConfigExists);
 
 // Htaccess Files
-$htaccessExists = file_exists('../cis/private/.htaccess');
-printVersion("htaccess File CIS", ($htaccessExists?'ok':'missing'));
-$htaccessExists = file_exists('../content/.htaccess');
-printVersion("htaccess File Content", ($htaccessExists?'ok':'missing'));
-$htaccessExists = file_exists('../vilesci/.htaccess');
-printVersion("htaccess File Vilesci", ($htaccessExists?'ok':'missing'));
-$htaccessExists = file_exists('../system/.htaccess');
-printVersion("htaccess File System", ($htaccessExists?'ok':'missing'));
-$htaccessExists = file_exists('../rdf/.htaccess');
-printVersion("htaccess File RDF", ($htaccessExists?'ok':'missing'));
+printValue("htaccess File CIS", file_exists('../cis/private/.htaccess'), 'missing htaccess File');
+printValue("htaccess File Content", file_exists('../content/.htaccess'), 'missing htaccess File');
+printValue("htaccess File Vilesci", file_exists('../vilesci/.htaccess'), 'missing htaccess File');
+printValue("htaccess File System", file_exists('../system/.htaccess'), 'missing htaccess File');
+printValue("htaccess File RDF", file_exists('../rdf/.htaccess'), 'missing htaccess File');
 
 echo '
 	</tbody>
@@ -145,24 +140,24 @@ echo '
 </body>
 </html>';
 
-function printVersion($module, $currentVersion, $expectedVersion = '')
+function printValue($module, $status_ok, $message='')
 {
-	$failed = false;
-
-	if ($currentVersion == null)
-		$failed = true;
-
-	if ($currentVersion == '')
-		$currentVersion = 'missing';
-	if ($expectedVersion != '' && $currentVersion != $expectedVersion)
-		$failed = true;
+	if(!is_bool($status_ok))
+	{
+		$output = $status_ok;
+		$status_ok = true;
+	}
+	else
+	{
+		$output = ($status_ok?'ok':'failed');
+	}
 
 	echo '
 	<tr>
 		<td>'.$module.'</td>
-		 <td><span class="'.($failed?'fail':'ok').'">'.$currentVersion.'</span>';
-	if($failed && $expectedVersion != '')
-		echo ' (should be '.$expectedVersion.')';
+		 <td><span class="'.($status_ok?'ok':'fail').'">'.$output.'</span>';
+	if(!$status_ok && $message!='')
+		echo ' '.$message;
 	echo '</td>';
 	echo '</tr>';
 }

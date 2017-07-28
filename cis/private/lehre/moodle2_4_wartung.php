@@ -37,23 +37,23 @@ require_once('../../../include/moodle.class.php');
 require_once('../../../include/moodle19_course.class.php');
 require_once('../../../include/moodle19_user.class.php');
 
-$sprache = getSprache(); 
-$p = new phrasen($sprache); 
+$sprache = getSprache();
+$p = new phrasen($sprache);
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
 if (!$user=get_uid())
 	die($p->t('moodle/sieSindNichtAngemeldet').' !');
-		
+
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
 	$lvid=$_GET['lvid'];
-else 
+else
 	die($p->t('moodle/lvidMussUebergebenWerden'));
-	
+
 if(isset($_GET['stsem']) && check_stsem($_GET['stsem']))
 	$stsem = $_GET['stsem'];
-else 
+else
 	die($p->t('moodle/esWurdeKeinStudiensemesterUebergeben'));
 
 $art = (isset($_POST['art'])?$_POST['art']:'lv');
@@ -71,6 +71,9 @@ $rechte->getBerechtigungen($user);
 if($rechte->isBerechtigt('admin'))
 	$berechtigt=true;
 
+if(!$berechtigt)
+	die('Sie haben keine Berechtigung für diese Seite');
+
 $lv = new lehrveranstaltung();
 $lv->load($lvid);
 
@@ -86,7 +89,7 @@ function togglediv()
 	var block = "table-row";
 	if (navigator.appName.indexOf("Microsoft") > -1)
 		block = "block";
-	
+
 	if(document.getElementById("radiole").checked)
 		document.getElementById("lehreinheitencheckboxen").style.display = block;
 	else
@@ -107,15 +110,15 @@ if(isset($_POST['neu']))
 	{
 		echo '<span class="error">'.$p->t('benotungstool/bezeichnungMussEingegebenWerden').'</span><br>';
 	}
-	else 
+	else
 	{
 		$lehrveranstaltung = new lehrveranstaltung();
 		$lehrveranstaltung->load($lvid);
 		$studiengang = new studiengang();
 		$studiengang->load($lehrveranstaltung->studiengang_kz);
-		
+
 		$orgform = ($lehrveranstaltung->orgform_kurzbz!=''?$lehrveranstaltung->orgform_kurzbz:$studiengang->orgform_kurzbz);
-		
+
 		//Kurzbezeichnung generieren Format: STSEM-STG-SEM-LV/LEID/LEID/LEID...
 		//$shortname = $stsem.'-'.$studiengang->kuerzel.'-'.$lehrveranstaltung->semester.'-'.$lehrveranstaltung->kurzbz;
 		$shortname = $studiengang->kuerzel.'-'.$orgform.'-'.$lehrveranstaltung->semester.'-'.$stsem.'-'.$lehrveranstaltung->kurzbz;
@@ -124,7 +127,7 @@ if(isset($_POST['neu']))
 		if($art=='lv')
 		{
 			$mdl_course = new moodle24_course();
-			
+
 			$mdl_course->lehrveranstaltung_id = $lvid;
 			$mdl_course->studiensemester_kurzbz = $stsem;
 			$mdl_course->mdl_fullname = $_POST['bezeichnung'];
@@ -132,18 +135,18 @@ if(isset($_POST['neu']))
 			$mdl_course->insertamum = date('Y-m-d H:i:s');
 			$mdl_course->insertvon = $user;
 			$mdl_course->gruppen = isset($_POST['gruppen']);
-			
+
 			//Moodlekurs anlegen
 			if($mdl_course->create_moodle())
 			{
 				//Eintrag in der Vilesci DB
 				$mdl_course->create_vilesci();
-	
+
 				$mdl_user = new moodle24_user();
 				//Lektoren Synchronisieren
 				if(!$mdl_user->sync_lektoren($mdl_course->mdl_course_id))
 					echo $mdl_user->errormsg;
-	
+
 				$mdl_user = new moodle24_user();
 				//Studenten Synchronisieren
 				if(!$mdl_user->sync_studenten($mdl_course->mdl_course_id))
@@ -157,7 +160,7 @@ if(isset($_POST['neu']))
 		elseif($art=='le') //Getrennte Kurse fuer die Lehreinheiten
 		{
 			$lehreinheiten=array();
-			
+
 			foreach ($_POST as $key=>$value)
 			{
 				if(mb_strstr($key, 'lehreinheit_'))
@@ -166,11 +169,11 @@ if(isset($_POST['neu']))
 					$lehreinheiten[]=$value;
 				}
 			}
-			
+
 			if(count($lehreinheiten)>0)
 			{
 				$mdl_course = new moodle24_course();
-				
+
 				$mdl_course->mdl_fullname = $_POST['bezeichnung'];
 				$mdl_course->mdl_shortname = $shortname;
 				$mdl_course->studiensemester_kurzbz = $stsem;
@@ -178,7 +181,7 @@ if(isset($_POST['neu']))
 				$mdl_course->insertvon = $user;
 				$mdl_course->lehreinheit_id=$lehreinheiten[0];
 				$mdl_course->gruppen = isset($_POST['gruppen']);
-	
+
 				//Kurs im Moodle anlegen
 				if($mdl_course->create_moodle())
 				{
@@ -189,24 +192,24 @@ if(isset($_POST['neu']))
 						if(!$mdl_course->create_vilesci())
 							echo '<br>'.$p->t('moodle/fehlerBeimAnlegenAufgetreten').':'.$mdl_course->errormsg;
 					}
-					
+
 					$mdl_user = new moodle24_user();
 					//Lektoren Synchronisieren
 					if(!$mdl_user->sync_lektoren($mdl_course->mdl_course_id))
 						echo $mdl_user->errormsg;
-					
-					$mdl_user = new moodle24_user();	
+
+					$mdl_user = new moodle24_user();
 					//Studenten Synchronisieren
 					if(!$mdl_user->sync_studenten($mdl_course->mdl_course_id))
 						echo $mdl_user->errormsg;
 				}
 			}
-			else 
+			else
 			{
 				echo '<span class="error">'.$p->t('moodle/esMussMindestensEineLehreinheitMarkiertSein').'</span><br>';
 			}
 		}
-		else 
+		else
 			die($p->t('moodle/artIstUnbekannt'));
 	}
 }
@@ -218,10 +221,10 @@ if(isset($_POST['changegruppe']))
 		$mcourse = new moodle24_course();
 		if($mcourse->updateGruppenSync($_POST['moodle_id'], isset($_POST['gruppen'])))
 			echo '<b>'.$p->t('moodle/datenWurdenAktualisiert').'</b><br>';
-		else 
+		else
 			echo '<span class="error">'.$p->t('global/fehlerBeimAktualisierenDerDaten').'</span>';
 	}
-	else 
+	else
 	{
 		echo '<span class="error">'.$p->t('moodle/esWurdeKeineGueltigeIdUebergeben').'</span>';
 	}
@@ -237,12 +240,12 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 		$lehrveranstaltung->load($lvid);
 		$studiengang = new studiengang();
 		$studiengang->load($lehrveranstaltung->studiengang_kz);
-		
+
 		//$orgform = ($lehrveranstaltung->orgform_kurzbz!=''?$lehrveranstaltung->orgform_kurzbz:$studiengang->orgform_kurzbz);
-		
+
 		//Kurzbezeichnung generieren Format: STSEM-STG-SEM-LV/LEID/LEID/LEID...
 		$shortname = mb_strtoupper('TK-'.$stsem.'-'.$studiengang->kuerzel.'-'.$lehrveranstaltung->semester.'-'.$lehrveranstaltung->kurzbz);
-		
+
 		$mdl_course->lehrveranstaltung_id = $lvid;
 		$mdl_course->studiensemester_kurzbz = $stsem;
 		$mdl_course->mdl_fullname = 'Testkurs - '.$lehrveranstaltung->bezeichnung;
@@ -253,7 +256,7 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 		{
 			$id=$mdl_course->mdl_course_id;
 			$errormsg='';
-			
+
 			$mdl_user = new moodle24_user();
 			//Lektoren zuweisen
 			if(!$mdl_user->sync_lektoren($id, $lvid, $stsem))
@@ -261,14 +264,14 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 			//Teststudenten zuweisen
 			if(!$mdl_user->createTestStudentenZuordnung($id))
 				$errormsg.=$p->t('moodle/fehlerBeiDerStudentenZuordnung').':'.$mdl_user->errormsg.'<br>';
-				
+
 			if($errormsg!='')
 				echo $errormsg;
 			else
 				echo '<b>'.$p->t('moodle/testkursWurdeErfolgreichAngelegt').'</b><br>';
 		}
 	}
-	else 
+	else
 	{
 		echo '<span class="error">'.$p->t('moodle/esExistiertBereitsEinTestkurs').'</span><br>';
 	}
@@ -279,13 +282,13 @@ if($moodle->course_exists_for_lv($lvid, $stsem) || $moodle->course_exists_for_al
 {
 	echo $p->t('moodle/esIstBereitsEinMoodleKursVorhanden');
 }
-else 
+else
 {
 	//wenn bereits ein Moodle Kurs fuer eine Lehreinheit angelegt wurde, dann dass
 	//anlegen fuer die Lehrveranstaltung verhindern
-	$qry = "SELECT 1 FROM lehre.tbl_moodle 
-			WHERE lehreinheit_id in(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
-									WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." 
+	$qry = "SELECT 1 FROM lehre.tbl_moodle
+			WHERE lehreinheit_id in(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
+									WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)."
 									AND studiensemester_kurzbz=".$db->db_add_param($stsem).")";
 	$disable_lv='';
 	if($result = $db->db_query($qry))
@@ -297,13 +300,13 @@ else
 			if($art=='lv')
 				$art='le';
 		}
-	
+
 	echo '<b>'.$p->t('moodle/moodleKursAnlegen').': </b><br><br>
 			<form action="'.$_SERVER['PHP_SELF'].'?lvid='.$lvid.'&stsem='.$stsem.'" method="POST">
 			<input type="radio" '.$disable_lv.' name="art" value="lv" onclick="togglediv()" '.($art=='lv'?'checked':'').'>einen Moodle Kurs f&uuml;r die gesamte LV anlegen<br>
 			<input type="radio" id="radiole" name="art" value="le" onclick="togglediv()" '.($art=='le'?'checked':'').'>einen Moodle Kurs für einzelne Lehreinheiten anlegen
 		  ';
-	
+
 	$le = new lehreinheit();
 	$le->load_lehreinheiten($lv->lehrveranstaltung_id, $stsem);
 	echo '<div id="lehreinheitencheckboxen" style="display:none">';
@@ -311,42 +314,42 @@ else
 	{
 		//Gruppen laden
 		$gruppen = '';
-		
+
 		$lehreinheitgruppe = new lehreinheitgruppe();
 		$lehreinheitgruppe->getLehreinheitgruppe($row->lehreinheit_id);
 		foreach ($lehreinheitgruppe->lehreinheitgruppe as $grp)
 		{
 			if($grp->gruppe_kurzbz=='')
 				$gruppen.=' '.$grp->semester.$grp->verband.$grp->gruppe;
-			else 
+			else
 				$gruppen.=' '.$grp->gruppe_kurzbz;
 		}
-		
+
 		//Lektoren laden
 		$lektoren = '';
 		$lehreinheitmitarbeiter = new lehreinheitmitarbeiter();
 		$lehreinheitmitarbeiter->getLehreinheitmitarbeiter($row->lehreinheit_id);
-		
+
 		foreach ($lehreinheitmitarbeiter->lehreinheitmitarbeiter as $ma)
 		{
 			$lektoren.= ' '.$ma->mitarbeiter_uid;
 		}
-		
+
 		if($moodle->course_exists_for_le($row->lehreinheit_id))
 			$disabled='disabled';
-		else 
+		else
 			$disabled='';
 		echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<input type="checkbox" name="lehreinheit_'.$row->lehreinheit_id.'" value="'.$row->lehreinheit_id.'" '.$disabled.'>'.$row->lehrform_kurzbz.' '.$gruppen.' '.$lektoren;
 		echo '<br>';
 	}
 	echo '</div>';
-	
+
 	$studiengang = new studiengang();
 	$studiengang->load($lv->studiengang_kz);
 	$orgform = ($lv->orgform_kurzbz!=''?$lv->orgform_kurzbz:$studiengang->orgform_kurzbz);
 	$longbezeichnung = $studiengang->kuerzel.'-'.$orgform.'-'.$lv->semester.'-'.$stsem.' - '.$lv->bezeichnung;
-	
+
 	echo '<br>'.$p->t('moodle/kursbezeichnung').': <input type="text" name="bezeichnung" maxlength="254" size="40" value="'.$db->convert_html_chars($longbezeichnung).'">';
 	echo '<br>'.$p->t('moodle/gruppenUebernehmen').': <input type="checkbox" name="gruppen" checked>';
 	echo '<br><br><input type="submit" name="neu" value="'.$p->t('moodle/kursAnlegen').'">
@@ -379,7 +382,7 @@ foreach ($moodle->result as $course)
 //			echo "<td nowrap><form action='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem' method='POST' style='margin:0px'><input type='hidden' name='moodle_id' value='$course->moodle_id'><input type='checkbox' name='gruppen' ".($course->gruppen?'checked':'').">Gruppen übernehmen <input type='submit' value='".$p->t('global/ok')."' name='changegruppe'></form></td>";
 			echo '</tr>';
 			break;
-		default: 
+		default:
 			echo '<tr><td>Moodle v'.$course->moodle_version.' - '.$course->mdl_course_id.'</td></tr>';
 			break;
 	}
@@ -394,7 +397,7 @@ if($mdlcourse->loadTestkurs($lvid, $stsem))
 {
 	echo '<a href="'.$moodle->getPfad('2.4').'course/view.php?id='.$mdlcourse->mdl_course_id.'" class="Item" target="_blank">'.$db->convert_html_chars($mdlcourse->mdl_fullname).'</a>';
 }
-else 
+else
 {
 	echo "<a href='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem&action=createtestkurs' class='Item'>".$p->t('moodle/klickenSieHierUmTestkursErstellen')."</a>";
 }

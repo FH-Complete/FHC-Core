@@ -1059,17 +1059,17 @@ class benutzerberechtigung extends basis_db
 			}
 		}
 	}
-	
+
 	/**
 	 * Laedt die Benutzer zu einer Berechtigung. Wenn $inklusiveRollen true ist (default), wird ein UNION mit der tbl_rolleberechtigung ausgefuehrt
-	 * 
+	 *
 	 * @param string $berechtigung_kurzbz Kurzbezeichnung der Berechtigung, deren Rollen geladen werden sollen
 	 * @param boolean $inklusiveRollen Default TRUE. Wenn true, wird ein UNION SELECT mit der tbl_rolleberechtigung ausgefuehrt
-	 * @return boolean true wenn ok, false im Fehlerfall 
+	 * @return boolean true wenn ok, false im Fehlerfall
 	 */
-	public function getBenutzerFromBerechtigung($berechtigung_kurzbz, $inklusiveRollen = true)
+	public function getBenutzerFromBerechtigung($berechtigung_kurzbz, $inklusiveRollen = true, $oe_kurzbz = null)
 	{
-		$qry = "SELECT 
+		$qry = "SELECT
 					benutzerberechtigung_id,
 					rolle_kurzbz,
 					funktion_kurzbz,
@@ -1078,11 +1078,16 @@ class benutzerberechtigung extends basis_db
 					berechtigung_kurzbz,
 					start,
 					ende
-				FROM 
-					system.tbl_benutzerrolle 
-				WHERE 
+				FROM
+					system.tbl_benutzerrolle
+				WHERE
 					berechtigung_kurzbz = ".$this->db_add_param($berechtigung_kurzbz);
-		
+
+		if(!is_null($oe_kurzbz))
+		{
+			$qry.=" AND oe_kurzbz=".$this->db_add_param($oe_kurzbz);
+		}
+
 		if ($inklusiveRollen == true)
 		{
 			$qry .= "	UNION SELECT
@@ -1126,7 +1131,7 @@ class benutzerberechtigung extends basis_db
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Laedt die Benutzer zu einer Rolle.
 	 *
@@ -1143,13 +1148,13 @@ class benutzerberechtigung extends basis_db
 					rolle_kurzbz = ".$this->db_add_param($rolle_kurzbz);
 
 		$qry.= " ORDER BY rolle_kurzbz NULLS LAST, funktion_kurzbz NULLS LAST, uid";
-	
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new benutzerberechtigung();
-	
+
 				$obj->benutzerberechtigung_id = $row->benutzerberechtigung_id;
 				$obj->rolle_kurzbz = $row->rolle_kurzbz;
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
@@ -1167,7 +1172,7 @@ class benutzerberechtigung extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->kostenstelle_id = $row->kostenstelle_id;
 				$obj->anmerkung = $row->anmerkung;
-	
+
 				$this->result[] = $obj;
 			}
 			return true;

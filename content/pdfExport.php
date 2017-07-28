@@ -409,7 +409,8 @@ if (!isset($_REQUEST["archive"]))
 		$buffer = $proc->transformToXml($xml_doc);
 		//echo $buffer;
 		//exit;
-		$tempfolder = '/tmp/'.uniqid();
+		$tmp = sys_get_temp_dir();
+		$tempfolder = $tmp.'/FHC'.uniqid();
 		mkdir($tempfolder);
 		chdir($tempfolder);
 		file_put_contents('content.xml', $buffer);
@@ -672,7 +673,8 @@ else
 			$buffer = $proc->transformToXml($xml_doc);
 			//echo $buffer;
 			//exit;
-			$tempfolder = '/tmp/'.uniqid();
+			$tmp = sys_get_temp_dir();
+			$tempfolder = $tmp.'/FHC'.uniqid();
 			mkdir($tempfolder);
 			chdir($tempfolder);
 			file_put_contents('content.xml', $buffer);
@@ -766,7 +768,8 @@ else
 				{
 					echo('Failed to generate PDF');
 				}
-				$file = "/tmp/".$filename.".pdf";
+				$tmp = sys_get_temp_dir();
+				$file = $tmp."/FHC".$filename.".pdf";
 			}
 		}
 
