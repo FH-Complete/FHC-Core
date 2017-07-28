@@ -231,13 +231,7 @@ $menu=array
 		'Cronjobs'=>array('name'=>'Cronjobs', 'link'=>'stammdaten/cronjobverwaltung.php', 'target'=>'main','permissions'=>array('basis/cronjob')),
 		'Vorlagen'=>array('name'=>'Vorlagen', 'link'=>'../index.ci.php/system/Vorlage', 'target'=>'main','permissions'=>array('basis/cronjob')),
 		'Phrasen'=>array('name'=>'Phrasen', 'link'=>'../index.ci.php/system/Phrases', 'target'=>'main','permissions'=>array('basis/cronjob'))
-	),
-	'SD-Tools'=>	array
-	(
-		'name'=>'SD-Tools', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('sdTools'), 'image'=>'vilesci_sdtools.png',
-		'link'=>'https://sdtools.technikum-wien.at', 'target'=>'_blank',
 	)
-
 );
 
 require_once(dirname(__FILE__).'/../statistik.class.php');
