@@ -61,6 +61,8 @@ class UDF_model extends DB_Model
 			// Load model Person_model
 			$this->load->model('person/Person_model', 'PersonModel');
 			
+			$udfs = $this->_fillMissingChkboxUDF($udfs, 'public', 'tbl_person');
+			
 			$resultPerson = $this->PersonModel->update($person_id, $udfs);
 		}
 		
@@ -69,6 +71,8 @@ class UDF_model extends DB_Model
 		{
 			// Load model Prestudent_model
 			$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+			
+			$udfs = $this->_fillMissingChkboxUDF($udfs, 'public', 'tbl_prestudent');
 			
 			$resultPrestudent = $this->PrestudentModel->update($prestudent_id, $udfs);
 		}
@@ -87,5 +91,32 @@ class UDF_model extends DB_Model
 		}
 		
 		return $result;
+	}
+	
+	/**
+	 * 
+	 */
+	private function _fillMissingChkboxUDF($udfs, $schema, $table)
+	{
+		$_fillMissingChkboxUDF = $udfs;
+		
+		$result = $this->load(array($schema, $table));
+		if (isSuccess($result) && count($result->retval) == 1)
+		{
+			$jsons = json_decode($result->retval[0]->jsons);
+			
+			foreach($jsons as $udfDescription)
+			{
+				if ($udfDescription->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_CHKBOX_TYPE)
+				{
+					if (!isset($_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}]))
+					{
+						$_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = DB_Model::STRING_FALSE;
+					}
+				}
+			}
+		}
+		
+		return $_fillMissingChkboxUDF;
 	}
 }

@@ -36,6 +36,7 @@ class DB_Model extends FHC_Model
 	const UDF_MAX_LENGTH = 'max-length';
 	const UDF_MIN_LENGTH = 'min-length';
 	
+	// String values of booleans
 	const STRING_TRUE = 'true';
 	const STRING_FALSE = 'false';
 	
