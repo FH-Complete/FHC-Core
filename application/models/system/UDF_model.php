@@ -62,6 +62,7 @@ class UDF_model extends DB_Model
 			$this->load->model('person/Person_model', 'PersonModel');
 			
 			$udfs = $this->_fillMissingChkboxUDF($udfs, 'public', 'tbl_person');
+			$udfs = $this->_fillMissingDropdownUDF($udfs, 'public', 'tbl_person');
 			
 			$resultPerson = $this->PersonModel->update($person_id, $udfs);
 		}
@@ -73,6 +74,7 @@ class UDF_model extends DB_Model
 			$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 			
 			$udfs = $this->_fillMissingChkboxUDF($udfs, 'public', 'tbl_prestudent');
+			$udfs = $this->_fillMissingDropdownUDF($udfs, 'public', 'tbl_prestudent');
 			
 			$resultPrestudent = $this->PrestudentModel->update($prestudent_id, $udfs);
 		}
@@ -118,5 +120,33 @@ class UDF_model extends DB_Model
 		}
 		
 		return $_fillMissingChkboxUDF;
+	}
+	
+	/**
+	 * 
+	 */
+	private function _fillMissingDropdownUDF($udfs, $schema, $table)
+	{
+		$_fillMissingDropdownUDF = $udfs;
+		
+		$result = $this->load(array($schema, $table));
+		if (isSuccess($result) && count($result->retval) == 1)
+		{
+			$jsons = json_decode($result->retval[0]->jsons);
+			
+			foreach($jsons as $udfDescription)
+			{
+				if ($udfDescription->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_DROPDOWN_TYPE
+					|| $udfDescription->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_MULTIPLEDROPDOWN_TYPE)
+				{
+					if (!isset($_fillMissingDropdownUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}]))
+					{
+						$_fillMissingDropdownUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = DB_Model::STRING_NULL;
+					}
+				}
+			}
+		}
+		
+		return $_fillMissingDropdownUDF;
 	}
 }

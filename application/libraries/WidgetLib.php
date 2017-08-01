@@ -781,6 +781,8 @@ class DropdownWidget extends Widget
 	// The name of the element of the data array given to the view
 	// this element is used to tell what element of the dropdown is selected
 	const SELECTED_ELEMENT = 'selectedElement';
+	// 
+	const HTML_DEFAULT_VALUE = 'null';
 	
 	const SIZE = 'size'; // 
 	const MULTIPLE = 'multiple'; // 
@@ -795,7 +797,7 @@ class DropdownWidget extends Widget
 		// 
 		if (!isset($this->_args[DropdownWidget::SELECTED_ELEMENT]))
 		{
-			$this->_args[DropdownWidget::SELECTED_ELEMENT] = Widget::HTML_DEFAULT_VALUE;
+			$this->_args[DropdownWidget::SELECTED_ELEMENT] = DropdownWidget::HTML_DEFAULT_VALUE;
 		}
 	}
 	
@@ -804,7 +806,23 @@ class DropdownWidget extends Widget
      */
     public function setMultiple()
     {
-		$this->_args[Widget::HTML_ARG_NAME][DropdownWidget::MULTIPLE] = 'multiple';
+		$this->_args[Widget::HTML_ARG_NAME][DropdownWidget::MULTIPLE] = DropdownWidget::MULTIPLE;
+    }
+    
+    /**
+     * 
+	 */
+    public function isMultipleDropdown()
+    {
+		$isMultipleDropdown = false;
+		
+		if (isset($this->_args[Widget::HTML_ARG_NAME][DropdownWidget::MULTIPLE])
+			&& $this->_args[Widget::HTML_ARG_NAME][DropdownWidget::MULTIPLE] == DropdownWidget::MULTIPLE)
+		{
+			$isMultipleDropdown = true;
+		}
+		
+		return $isMultipleDropdown;
     }
     
     /**
@@ -835,7 +853,7 @@ class DropdownWidget extends Widget
 	 * @param string $id value of the attribute value of the empty element
 	 */
 	protected function setElementsArray(
-		$elements, $emptyElement = false, $stdDescription = '' , $noDataDescription = 'No data found' , $id = Widget::HTML_DEFAULT_VALUE
+		$elements, $emptyElement = false, $stdDescription = '' , $noDataDescription = 'No data found' , $id = DropdownWidget::HTML_DEFAULT_VALUE
 	)
 	{
 		$tmpElements = array();
@@ -857,7 +875,7 @@ class DropdownWidget extends Widget
 		}
 		else
 		{
-			if ($emptyElement === true)
+			if ($emptyElement === true && $this->isMultipleDropdown() == false)
 			{
 				$tmpElements = $this->addElementAtBeginning(
 					$elements,

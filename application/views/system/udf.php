@@ -25,9 +25,9 @@
 		<div style="color: red;">
 <?php
 		$errors = $result->retval;
-		foreach($errors as $error)
+		foreach ($errors as $error)
 		{
-			foreach($error as $fieldError)
+			foreach ($error as $fieldError)
 			{
 				echo $fieldError->msg . ' -> ' . $fieldError->retval . '<br>';
 			}
@@ -42,8 +42,7 @@
 		}
 	}
 ?>
-		
-		<form action="/core/index.ci.php/system/UDF/saveUDF" method="POST">
+		<form action="<?php echo APP_ROOT; ?>/index.ci.php/system/UDF/saveUDF" method="POST">
 		
 			<div class="div-table">
 				<div class="div-row">

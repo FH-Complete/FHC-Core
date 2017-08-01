@@ -12,6 +12,8 @@ class UDFWidget extends UDFWidgetTpl
 	const LIST_VALUES = 'listValues';
 	const REGEX_LANGUAGE = 'js';
 	
+	const PHRASES_APP_NAME = 'core';
+	
     public function display($widgetData)
 	{
 		$schema = $widgetData[UDFWidgetTpl::SCHEMA_ARG_NAME];
@@ -208,7 +210,6 @@ class UDFWidget extends UDFWidgetTpl
      */
 	private function _renderDropdown($jsonSchema, $multiple = false)
 	{
-		
 		if (isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME])
 			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}]))
 		{
@@ -305,11 +306,20 @@ class UDFWidget extends UDFWidgetTpl
 			|| isset($jsonSchema->{UDFWidgetTpl::TITLE})
 			|| isset($jsonSchema->{UDFWidgetTpl::PLACEHOLDER}))
 		{
+			// 
 			$this->_ci->load->library('PhrasesLib');
 			
+			// 
 			if (isset($jsonSchema->{UDFWidgetTpl::LABEL}))
 			{
-				$tmpResult = $this->_ci->phraseslib->getPhrases('core', 'German', $jsonSchema->{UDFWidgetTpl::LABEL}, null, null, 'no');
+				$tmpResult = $this->_ci->phraseslib->getPhrases(
+					UDFWidget::PHRASES_APP_NAME,
+					DEFAULT_LEHREINHEIT_SPRACHE,
+					$jsonSchema->{UDFWidgetTpl::LABEL},
+					null,
+					null,
+					'no'
+				);
 				if (hasData($tmpResult))
 				{
 					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::LABEL] = $tmpResult->retval[0]->text;
@@ -320,9 +330,17 @@ class UDFWidget extends UDFWidgetTpl
 				}
 			}
 			
+			// 
 			if (isset($jsonSchema->{UDFWidgetTpl::TITLE}))
 			{
-				$tmpResult = $this->_ci->phraseslib->getPhrases('core', 'German', $jsonSchema->{UDFWidgetTpl::TITLE}, null, null, 'no');
+				$tmpResult = $this->_ci->phraseslib->getPhrases(
+					UDFWidget::PHRASES_APP_NAME,
+					DEFAULT_LEHREINHEIT_SPRACHE,
+					$jsonSchema->{UDFWidgetTpl::TITLE},
+					null,
+					null,
+					'no'
+				);
 				if (hasData($tmpResult))
 				{
 					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::TITLE] = $tmpResult->retval[0]->text;
@@ -333,9 +351,17 @@ class UDFWidget extends UDFWidgetTpl
 				}
 			}
 			
+			// 
 			if (isset($jsonSchema->{UDFWidgetTpl::PLACEHOLDER}))
 			{
-				$tmpResult = $this->_ci->phraseslib->getPhrases('core', 'German', $jsonSchema->{UDFWidgetTpl::PLACEHOLDER}, null, null, 'no');
+				$tmpResult = $this->_ci->phraseslib->getPhrases(
+					UDFWidget::PHRASES_APP_NAME,
+					DEFAULT_LEHREINHEIT_SPRACHE,
+					$jsonSchema->{UDFWidgetTpl::PLACEHOLDER},
+					null,
+					null,
+					'no'
+				);
 				if (hasData($tmpResult))
 				{
 					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::PLACEHOLDER] = $tmpResult->retval[0]->text;
@@ -361,7 +387,8 @@ class UDFWidget extends UDFWidgetTpl
 		
 		if (isset($jsonSchema->validation))
 		{
-			if (isset($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REGEX}) && is_array($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REGEX}))
+			if (isset($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REGEX})
+				&& is_array($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REGEX}))
 			{
 				foreach($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REGEX} as $regex)
 				{

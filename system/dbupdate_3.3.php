@@ -334,6 +334,20 @@ if(!$result = @$db->db_query("SELECT udf_values FROM public.tbl_prestudent LIMIT
 		echo '<br>Added column udf_values to table public.tbl_prestudent';
 }
 
+// Add permission for UDF
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'system/udf';"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('system/udf', 'UDF');";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Added permission for UDF<br>';
+	}
+}
+
 // Spalten mailversand,teilnehmer_anonym,termine_anonym in campus.tbl_coodle
 if(!$result = @$db->db_query("SELECT mailversand FROM campus.tbl_coodle LIMIT 1;"))
 {
