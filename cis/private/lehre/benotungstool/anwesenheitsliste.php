@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>, 
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
@@ -54,9 +54,9 @@ if(isset($_GET['uebung_id']) && is_numeric($_GET['uebung_id']))
 }
 else
 {
-	if(!isset($_GET['all'])) 
+	if(!isset($_GET['all']))
 			die('Fehlerhafte Parameteruebergabe');
-	else 
+	else
 	{
 		$lehreinheit_id = $_GET['lehreinheit_id'];
 		$lehreinheit_obj = new lehreinheit($lehreinheit_id);
@@ -78,11 +78,11 @@ if (isset($_GET["download_abgabe"])){
 	exit;
 }
 /*
-$qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE 
+$qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE
 		tbl_lehreinheit.lehreinheit_id=".$db->db_add_param($lehreinheit_obj->lehreinheit_id, FHC_INTEGER)." AND
 		mitarbeiter_uid=".$db->db_add_param($user);
 */
-$qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE 
+$qry = "SELECT * FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE
 		tbl_lehreinheit.lehrveranstaltung_id in(Select lehrveranstaltung_id from lehre.tbl_lehreinheit where lehreinheit_id=".$db->db_add_param($lehreinheit_obj->lehreinheit_id, FHC_INTEGER).") AND
 		mitarbeiter_uid=".$db->db_add_param($user);
 
@@ -91,12 +91,12 @@ if(!$result = $db->db_query($qry))
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
-	
+
 if(!($db->db_num_rows($result)>0 || $rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lehreinheit_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lehreinheit_obj->studiengang_kz)))
 	die('Sie haben keine Berechtigung f&uuml;r diesen Bereich');
 
 // Beteiligte Gruppen laden
-$gruppen = '';	
+$gruppen = '';
 $qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_obj->lehreinheit_id, FHC_INTEGER);
 if($result_gruppen = $db->db_query($qry_gruppen))
 {
@@ -122,33 +122,33 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 		//EXCEL VERSION / ALLE Kreuzerllisten
 		$le_obj = new lehreinheit();
 		$le_obj->load($lehreinheit_id);
-		
+
 		$lv_obj = new lehrveranstaltung();
 		$lv_obj->load($le_obj->lehrveranstaltung_id);
-		
+
 		// Creating a workbook
 		$workbook = new Spreadsheet_Excel_Writer();
 		$workbook->setVersion(8);
 		// sending HTTP headers
 		$workbook->send("Kreuzerlliste_Gesamt_".$lv_obj->lehreverzeichnis. "_" . date("d_m_Y") . ".xls");
-	
+
 		// Creating a worksheet
 		$worksheet =& $workbook->addWorksheet("Kreuzerltool");
 		$worksheet->setInputEncoding('utf-8');
-	
+
 		$format_bold =& $workbook->addFormat();
 		$format_bold->setBold();
-	
+
 		$format_title =& $workbook->addFormat();
 		$format_title->setBold();
 		// let's merge
 		$format_title->setAlign('merge');
-		
-		
-		
+
+
+
 		$worksheet->write(0,0,'Gesamtübersicht '.$lv_obj->bezeichnung.' vom '.date('d.m.Y'), $format_bold);
 		$maxlength = array();
-		
+
 		//Ueberschrift
 		$i=0;
 		$worksheet->write(1,$i,"Vorname", $format_title);
@@ -174,7 +174,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 		$maxlength[$i]=strlen('Punkte insgesamt');
 		$worksheet->write(1,++$i,"Unterschrift", $format_title);
 		$maxlength[$i]=strlen('Unterschrift')+5;
-		
+
 		if(isset($_GET['gruppe']) && $_GET['gruppe']!='')
 		{
 			$gruppe = $_GET['gruppe'];
@@ -188,49 +188,49 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 						$gruppe_bez = 'Gruppe '.$row->gruppe_kurzbz;
 						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) WHERE gruppe_kurzbz=".$db->db_add_param($row->gruppe_kurzbz)." AND studiensemester_kurzbz = ".$db->db_add_param($stsem)." ORDER BY nachname, vorname";
 					}
-					else 
+					else
 					{
 						$gruppe_bez = 'Gruppe '.$row->verband.$row->gruppe;
-						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student 
-									 WHERE studiengang_kz=".$db->db_add_param($row->studiengang_kz)." 
+						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student
+									 WHERE studiengang_kz=".$db->db_add_param($row->studiengang_kz)."
 									 AND semester=".$db->db_add_param($row->semester).
 									 ($row->verband!=''?" AND verband=".$db->db_add_param($row->verband):'').
 									 ($row->gruppe!=''?" AND gruppe=".$db->db_add_param($row->gruppe):'').
 									 " ORDER BY nachname, vorname";
 					}
-					
+
 				}
 				else
 					die('Gruppe konnte nicht ermittelt werden');
 			}
-			else 
+			else
 				die('Gruppe konnte nicht ermittelt werden');
 		}
-		else 
+		else
 		{
 			if(isset($_GET['lehreinheit_id']) && $_GET['lehreinheit_id']!='')
 			{
 				$lehreinheit_id = $_GET['lehreinheit_id'];
 				$gruppe_bez = 'Alle Studienrende';
 				//Alle Studenten die dieser Lehreinheit zugeordnet sind
-				$qry_stud = "SELECT 
-								vw_student.uid, vorname, nachname, matrikelnr, 
-								tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe 
-							FROM 
-								campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe, 
+				$qry_stud = "SELECT
+								vw_student.uid, vorname, nachname, matrikelnr,
+								tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe
+							FROM
+								campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe,
 								public.tbl_studentlehrverband, lehre.tbl_lehreinheit
-							WHERE 
-								tbl_lehreinheitgruppe.lehreinheit_id=".$db->db_add_param($lehreinheit_id)." AND 
+							WHERE
+								tbl_lehreinheitgruppe.lehreinheit_id=".$db->db_add_param($lehreinheit_id)." AND
 								tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitgruppe.lehreinheit_id AND
 								vw_student.uid = tbl_benutzergruppe.uid AND
 								tbl_benutzergruppe.gruppe_kurzbz = tbl_lehreinheitgruppe.gruppe_kurzbz AND
 								vw_student.uid=tbl_studentlehrverband.student_uid AND
 								tbl_studentlehrverband.studiensemester_kurzbz=tbl_lehreinheit.studiensemester_kurzbz
 							UNION
-							SELECT 
-								vw_student.uid, vorname, nachname, matrikelnr, tbl_studentlehrverband.semester, 
-								tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe 
-							FROM 
+							SELECT
+								vw_student.uid, vorname, nachname, matrikelnr, tbl_studentlehrverband.semester,
+								tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe
+							FROM
 								campus.vw_student, lehre.tbl_lehreinheitgruppe, public.tbl_studentlehrverband, lehre.tbl_lehreinheit
 							WHERE
 								tbl_lehreinheitgruppe.lehreinheit_id=".$db->db_add_param($lehreinheit_id)." AND
@@ -239,29 +239,29 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 								tbl_studentlehrverband.student_uid=vw_student.uid AND
 								tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitgruppe.lehreinheit_id AND
 								tbl_lehreinheit.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz AND
-							((tbl_lehreinheitgruppe.verband<>'' AND 
-							  tbl_lehreinheitgruppe.gruppe<>'' AND 
+							((tbl_lehreinheitgruppe.verband<>'' AND
+							  tbl_lehreinheitgruppe.gruppe<>'' AND
 							  trim(tbl_lehreinheitgruppe.verband) = trim(tbl_studentlehrverband.verband) AND
 							  trim(tbl_lehreinheitgruppe.gruppe) = trim(tbl_studentlehrverband.gruppe))
 							OR
-							(tbl_lehreinheitgruppe.verband<>'' AND 
+							(tbl_lehreinheitgruppe.verband<>'' AND
 							  (trim(tbl_lehreinheitgruppe.gruppe)='' OR tbl_lehreinheitgruppe.gruppe is null) AND
 							  trim(tbl_lehreinheitgruppe.verband) = trim(tbl_studentlehrverband.verband))
 							  OR (tbl_lehreinheitgruppe.verband is null AND tbl_lehreinheitgruppe.gruppe is null)
 							  )
 							 ORDER BY nachname, vorname";
 			}
-			else 
+			else
 				die('Fehler bei der Parameteruebergabe');
 			$gruppe='';
 		}
-		
+
 		if($result_stud = $db->db_query($qry_stud))
 		{
 			$zeile=3;
-					
+
 			while($row_stud = $db->db_fetch_object($result_stud))
-			{			
+			{
 				$spalte=0;
 				$summe=0;
 				//vorname
@@ -275,15 +275,15 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				//matrikelnr
 				$worksheet->write($zeile,++$spalte,'="'.$row_stud->matrikelnr.'"');
 				if(strlen($row_stud->matrikelnr)>$maxlength[$spalte])
-					$maxlength[$spalte]=strlen($row_stud->matrikelnr);					
+					$maxlength[$spalte]=strlen($row_stud->matrikelnr);
 				//Gruppe
 				$worksheet->write($zeile,++$spalte,$row_stud->semester.$row_stud->verband.$row_stud->gruppe);
 				if(strlen($row_stud->semester.$row_stud->verband.$row_stud->gruppe)>$maxlength[$spalte])
 					$maxlength[$spalte]=strlen($row_stud->semester.$row_stud->verband.$row_stud->gruppe);
-					
+
 				foreach($ueb_obj->uebungen as $row_ueb)
 				{
-					$qry = "SELECT sum(punkte) as punkte FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) 
+					$qry = "SELECT sum(punkte) as punkte FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id)
 						WHERE uebung_id=".$db->db_add_param($row_ueb->uebung_id)." AND student_uid=".$db->db_add_param($row_stud->uid)." AND vorbereitet=true";
 					if($result = $db->db_query($qry))
 					{
@@ -292,67 +292,67 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 							$punkte = $row->punkte;
 							$summe +=$punkte;
 						}
-						else 
+						else
 							$punkte = 'failed';
 					}
-					else 
+					else
 						$punkte='failed';
 					//punkte auf uebung
 					$worksheet->write($zeile,++$spalte,($punkte!=''?$punkte:'0'));
 				}
-				
+
 				//summe
 				$worksheet->write($zeile,++$spalte,$summe);
-				
+
 				//mitarbeit
-				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id) 
+				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id)
 				WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($row_stud->uid);
 				if($result = $db->db_query($qry))
 					if($row = $db->db_fetch_object($result))
-						$mitarbeit=$row->mitarbeit;	
-					else 
+						$mitarbeit=$row->mitarbeit;
+					else
 						$mitarbeit='failed';
-				else 
+				else
 					$mitarbeit='failed';
-					
+
 				$worksheet->write($zeile,++$spalte,($row->mitarbeit!=''?$mitarbeit:'0'));
 				//punkte insgesamt
 				$worksheet->write($zeile,++$spalte,($summe+$mitarbeit), $format_bold);
-				
-				$zeile++;		
+
+				$zeile++;
 			}
 			for($i=0;$i<count($maxlength);$i++)
 			{
 				$worksheet->setColumn(0, $i, $maxlength[$i]);
 			}
 		}
-		
+
 		$workbook->close();
 
 	}
-	else 
+	else
 	{
 		//EXCEL VERSION / Einzelne Kreuzerlliste
-		
+
 		// Creating a workbook
 		$workbook = new Spreadsheet_Excel_Writer();
 		$workbook->setVersion(8);
-	
+
 		// sending HTTP headers
 		$workbook->send("Kreuzerltool". "_" . date("d_m_Y") . ".xls");
-	
+
 		// Creating a worksheet
 		$worksheet =& $workbook->addWorksheet("Kreuzerltool");
 		$worksheet->setInputEncoding('utf-8');
-	
+
 		$format_bold =& $workbook->addFormat();
 		$format_bold->setBold();
-	
+
 		$format_title =& $workbook->addFormat();
 		$format_title->setBold();
 		// let's merge
 		$format_title->setAlign('merge');
-	
+
 		$worksheet->write(0,0,$uebung_obj->bezeichnung.' am '.date('d.m.Y').' '.$gruppen, $format_bold);
 		$maxlength = array();
 		//Ueberschrift
@@ -382,7 +382,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 		$maxlength[$i]=strlen('Mitarbeit insgesamt');
 		$worksheet->write(1,++$i,"Unterschrift", $format_title);
 		$maxlength[$i]=strlen('Unterschrift')+5;
-		
+
 		if(isset($_GET['gruppe']) && $_GET['gruppe']!='')
 		{
 			$gruppe = $_GET['gruppe'];
@@ -394,60 +394,60 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 					if($row->gruppe_kurzbz!='')
 					{
 						$gruppe_bez = 'Gruppe '.$row->gruppe_kurzbz;
-						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe 
-						FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) 
+						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe
+						FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid)
 						WHERE gruppe_kurzbz=".$db->db_add_param($row->gruppe_kurzbz)." AND studiensemester_kurzbz=".$db->db_add_param($stsem)." ORDER BY nachname, vorname";
 					}
-					else 
+					else
 					{
 						$gruppe_bez = 'Gruppe '.$row->verband.$row->gruppe;
-						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe FROM campus.vw_student 
-									 WHERE studiengang_kz=".$db->db_add_param($row->studiengang_kz)." 
+						$qry_stud = "SELECT uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe FROM campus.vw_student
+									 WHERE studiengang_kz=".$db->db_add_param($row->studiengang_kz)."
 									 AND semester=".$db->db_add_param($row->semester).
 									 ($row->verband!=''?" AND verband=".$db->db_add_param($row->verband):'').
 									 ($row->gruppe!=''?" AND gruppe=".$db->db_add_param($row->gruppe):'').
 									 " ORDER BY nachname, vorname";
 					}
-					
+
 				}
 				else
 					die('Gruppe konnte nicht ermittelt werden');
 			}
-			else 
+			else
 				die('Gruppe konnte nicht ermittelt werden');
-				
-			
+
+
 			$lehreinheit_id = $uebung_obj->lehreinheit_id;
 		}
-		else 
+		else
 		{
 			if(isset($_GET['lehreinheit_id']) && $_GET['lehreinheit_id']!='')
 			{
 				$lehreinheit_id = $_GET['lehreinheit_id'];
 				$gruppe_bez = 'Alle Studienrende';
 
-				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) 
+				$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid)
 				WHERE  studiensemester_kurzbz = ".$db->db_add_param($stsem)." AND lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." ORDER BY nachname, vorname";
-			
+
 				//Alle Studenten die dieser Lehreinheit zugeordnet sind
 				/*
-				$qry_stud = "SELECT vw_student.uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe 
-							FROM campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe 
-							WHERE tbl_lehreinheitgruppe.lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND 
+				$qry_stud = "SELECT vw_student.uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe
+							FROM campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe
+							WHERE tbl_lehreinheitgruppe.lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND
 							vw_student.uid = tbl_benutzergruppe.uid AND
 							tbl_benutzergruppe.gruppe_kurzbz = tbl_lehreinheitgruppe.gruppe_kurzbz
 							UNION
-							SELECT vw_student.uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe 
+							SELECT vw_student.uid, vorname, nachname, matrikelnr, vw_student.semester, vw_student.verband, vw_student.gruppe
 							FROM campus.vw_student, lehre.tbl_lehreinheitgruppe WHERE
 							tbl_lehreinheitgruppe.lehreinheit_id=".$db->db_add_param($lehreinheit_id)." AND
 							tbl_lehreinheitgruppe.studiengang_kz=vw_student.studiengang_kz AND
 							tbl_lehreinheitgruppe.semester = vw_student.semester AND
-							((tbl_lehreinheitgruppe.verband<>'' AND 
-							  tbl_lehreinheitgruppe.gruppe<>'' AND 
+							((tbl_lehreinheitgruppe.verband<>'' AND
+							  tbl_lehreinheitgruppe.gruppe<>'' AND
 							  trim(tbl_lehreinheitgruppe.verband) = trim(vw_student.verband) AND
 							  trim(tbl_lehreinheitgruppe.gruppe) = trim(vw_student.gruppe))
 							OR
-							(tbl_lehreinheitgruppe.verband<>'' AND 
+							(tbl_lehreinheitgruppe.verband<>'' AND
 							  (trim(tbl_lehreinheitgruppe.gruppe)='' OR tbl_lehreinheitgruppe.gruppe is null) AND
 							  trim(tbl_lehreinheitgruppe.verband) = trim(vw_student.verband))
 							  OR (tbl_lehreinheitgruppe.verband is null AND tbl_lehreinheitgruppe.gruppe is null)
@@ -455,7 +455,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 							 ORDER BY nachname, vorname";
 				*/
 			}
-			else 
+			else
 				die('Fehler bei der Parameteruebergabe');
 			$gruppe='';
 		}
@@ -463,9 +463,9 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 		if($result_stud = $db->db_query($qry_stud))
 		{
 			$zeile=3;
-					
+
 			while($row_stud = $db->db_fetch_object($result_stud))
-			{			
+			{
 				$spalte=0;
 				$punkte_heute=0;
 				//vorname
@@ -480,7 +480,7 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				$worksheet->write($zeile,++$spalte,'="'.$row_stud->matrikelnr.'"');
 				if(strlen($row_stud->matrikelnr)>$maxlength[$spalte])
 					$maxlength[$spalte]=strlen($row_stud->matrikelnr);
-				
+
 				//Gruppe
 				/*
 				$worksheet->write($zeile,++$spalte,$row_stud->semester.$row_stud->verband.$row_stud->gruppe);
@@ -493,27 +493,27 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 					$studentbeispiel_obj->load_studentbeispiel($row_stud->uid, $row_bsp->beispiel_id);
 					if($studentbeispiel_obj->vorbereitet)
 						$punkte = $row_bsp->punkte;
-					else 
+					else
 						$punkte = 0;
 					$punkte_heute +=$punkte;
 					//punkte auf uebung
 					$worksheet->write($zeile,++$spalte,$punkte);
 				}
-				
+
 				//punkte heute
 				$worksheet->write($zeile,++$spalte,$punkte_heute);
-				
+
 				//mitarbeit heute
-				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit_heute FROM campus.tbl_studentuebung 
+				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit_heute FROM campus.tbl_studentuebung
 					WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($row_stud->uid);
 				if($result = $db->db_query($qry))
 					if($row = $db->db_fetch_object($result))
 						$worksheet->write($zeile,++$spalte,($row->mitarbeit_heute!=''?$row->mitarbeit_heute:'0'));
-					else 
+					else
 						$worksheet->write($zeile,++$spalte,'failed');
-				else 
+				else
 					$worksheet->write($zeile,++$spalte,'failed');
-				
+
 				//punkte insgesamt
 				$qry = "SELECT sum(tbl_beispiel.punkte) AS gesamt_ohne_mitarbeit FROM campus.tbl_uebung, campus.tbl_beispiel, campus.tbl_studentbeispiel WHERE
 						tbl_studentbeispiel.student_uid=".$db->db_add_param($row_stud->uid)." AND
@@ -525,32 +525,32 @@ if(isset($_GET['output']) && $_GET['output']=='xls')
 				if($result = $db->db_query($qry))
 					if($row = $db->db_fetch_object($result))
 						$worksheet->write($zeile,++$spalte,($row->gesamt_ohne_mitarbeit!=''?$row->gesamt_ohne_mitarbeit:'0'));
-					else 
+					else
 						$worksheet->write($zeile,++$spalte,'failed');
-				else 
+				else
 					$worksheet->write($zeile,++$spalte,'failed');
-				
+
 				//mitarbeit insgesamt
-				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit_heute FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id) 
+				$qry = "SELECT sum(mitarbeitspunkte) as mitarbeit_heute FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id)
 				WHERE student_uid=".$db->db_add_param($row_stud->uid)." AND lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
 				if($result = $db->db_query($qry))
 					if($row = $db->db_fetch_object($result))
 						$worksheet->write($zeile,++$spalte,($row->mitarbeit_heute!=''?$row->mitarbeit_heute:'0'));
-					else 
+					else
 						$worksheet->write($zeile,++$spalte,'failed');
-				else 
+				else
 					$worksheet->write($zeile,++$spalte,'failed');
-				
-				$zeile++;		
+
+				$zeile++;
 			}
 			for($i=0;$i<count($maxlength);$i++)
 				$worksheet->setColumn(0, $i, $maxlength[$i]);
 		}
-		
+
 		$workbook->close();
 	}
 }
-else 
+else
 {
 	//HTML VERSION
 ?>
@@ -561,7 +561,7 @@ else
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Kreuzerltool</title>
 <script language="Javascript">
-function addUser(student_uid) 
+function addUser(student_uid)
 {
 	var upd, upd_f;
 	upd = document.forms[0].update_ids;
@@ -577,10 +577,10 @@ function addUser(student_uid)
 <body>
 	<?php
 	if(isset($_POST['submit']))
-	{		
+	{
 		//Update der Daten
-		$uids = split('#',$_POST['update_ids']);
-		
+		$uids = explode('#',$_POST['update_ids']);
+
 		$uebung_obj = new uebung($uebung_id);
 		$beispiel_obj = new beispiel();
 		$beispiel_obj->load_beispiel($uebung_id);
@@ -589,35 +589,35 @@ function addUser(student_uid)
 		{
 			if($uid!='')
 			{
-				if ($uebung_obj->beispiele)				
-				{				
+				if ($uebung_obj->beispiele)
+				{
 					foreach($beispiel_obj->beispiele as $bsp)
 					{
 						if(isset($_POST['update_'.$uid.'_'.$bsp->beispiel_id]))
 							$vorbereitet=true;
-						else 
+						else
 							$vorbereitet=false;
-							
+
 						$bsp_obj = new beispiel();
-						
+
 						if(!$bsp_obj->studentbeispiel_exists($uid,$bsp->beispiel_id))
 						{
 							$new=true;
 							$bsp_obj->insertamum = date('Y-m-d H:i:s');
 							$bsp_obj->insertvon = $user;
 						}
-						else 
-						{		
+						else
+						{
 							$bsp_obj->load_studentbeispiel($uid, $bsp->beispiel_id);
 							$new=false;
 						}
-							
+
 						$bsp_obj->student_uid = $uid;
 						$bsp_obj->beispiel_id = $bsp->beispiel_id;
 						$bsp_obj->vorbereitet = $vorbereitet;
 						$bsp_obj->updateamum = date('Y-m-d H:i:s');
 						$bsp_obj->updatevon = $user;
-						
+
 						if(!$bsp_obj->studentbeispiel_save($new))
 							$error=true;
 					}
@@ -638,39 +638,39 @@ function addUser(student_uid)
 						$uebung_obj->updatevon = null;
 						$uebung_obj->insertamum = date("Y-m-d H:i:s");
 						$uebung_obj->insertvon = $user;
-						$new = true;						
+						$new = true;
 					}
 					else
 					{
-						$uebung_obj->load_studentuebung($uid,$uebung_id);				
+						$uebung_obj->load_studentuebung($uid,$uebung_id);
 						$uebung_obj->mitarbeiter_uid = $user;
 						$uebung_obj->note = $_POST['update_'.$uid.'_note'];
 						$uebung_obj->benotungsdatum = date("Y-m-d H:i:s");
 						$uebung_obj->updateamum = date("Y-m-d H:i:s");
 						$uebung_obj->updatevon = $user;
-						$new = false;						
+						$new = false;
 					}
 					$uebung_obj->studentuebung_save($new);
-									
+
 				}
 			}
 		}
 		if(!$error)
 			echo "Die &Auml;nderungen wurden erfolgreich gespeichert";
-		else 
+		else
 			echo "<span class='error'>Fehler beim Speichern der &Auml;nderungen</span>";
 	}
-	
+
 	$uebung_obj = new uebung($uebung_id);
 	$lehreinheit_obj = new lehreinheit($uebung_obj->lehreinheit_id);
 
 	$beispiel_obj = new beispiel();
-	
+
 	$lehrveranstaltung_obj = new lehrveranstaltung($lehreinheit_obj->lehrveranstaltung_id);
 	$stg_obj = new studiengang($lehrveranstaltung_obj->studiengang_kz);
-	
+
 	$beispiel_obj->load_beispiel($uebung_id);
-	if ($uebung_obj->beispiele)	
+	if ($uebung_obj->beispiele)
 		$anzahl = count($beispiel_obj->beispiele);
 	else
 		$anzahl = 1;
@@ -685,42 +685,42 @@ function addUser(student_uid)
 				if($row->gruppe_kurzbz!='')
 				{
 					$gruppe_bez = 'Gruppe '.$row->gruppe_kurzbz;
-					$qry_stud = "SELECT uid, vorname, nachname FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid) 
-					WHERE gruppe_kurzbz=".$db->db_add_param($row->gruppe_kurzbz)." AND studiensemester_kurzbz = ".$db->db_add_param($stsem)." 
+					$qry_stud = "SELECT uid, vorname, nachname FROM campus.vw_student JOIN public.tbl_benutzergruppe USING(uid)
+					WHERE gruppe_kurzbz=".$db->db_add_param($row->gruppe_kurzbz)." AND studiensemester_kurzbz = ".$db->db_add_param($stsem)."
 					ORDER BY nachname, vorname";
 				}
-				else 
+				else
 				{
 					$gruppe_bez = 'Gruppe '.$row->verband.$row->gruppe;
-					$qry_stud = "SELECT uid, vorname, nachname FROM campus.vw_student 
+					$qry_stud = "SELECT uid, vorname, nachname FROM campus.vw_student
 								WHERE studiengang_kz=".$db->db_add_param($row->studiengang_kz)."
 								AND semester=".$db->db_add_param($row->semester).
 								($row->verband!=''?" AND verband=".$db->db_add_param($row->verband):'').
 								($row->gruppe!=''?" AND gruppe=".$db->db_add_param($row->gruppe):'').
 								" ORDER BY nachname, vorname";
 				}
-				
+
 			}
 			else
 				die('Gruppe konnte nicht ermittelt werden');
 		}
-		else 
+		else
 			die('Gruppe konnte nicht ermittelt werden');
 		$lehreinheit_id = '';
 	}
-	else 
+	else
 	{
 		if(isset($_GET['lehreinheit_id']) && $_GET['lehreinheit_id']!='')
 		{
 			$lehreinheit_id = $_GET['lehreinheit_id'];
 			$gruppe_bez = 'Alle Studierende';
 			//Alle Studenten die dieser lehreinheit zugeordnet sind
-			// studentenquery		
-			$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) 
+			// studentenquery
+			$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid)
 			WHERE  studiensemester_kurzbz = ".$db->db_add_param($stsem)." AND lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." ORDER BY nachname, vorname";
-			/*		
-			$qry_stud = "SELECT vw_student.uid, vorname, nachname FROM campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe 
-						WHERE tbl_lehreinheitgruppe.lehreinheit_id='$lehreinheit_id' AND 
+			/*
+			$qry_stud = "SELECT vw_student.uid, vorname, nachname FROM campus.vw_student, public.tbl_benutzergruppe, lehre.tbl_lehreinheitgruppe
+						WHERE tbl_lehreinheitgruppe.lehreinheit_id='$lehreinheit_id' AND
 						vw_student.uid = tbl_benutzergruppe.uid AND
 						tbl_benutzergruppe.gruppe_kurzbz = tbl_lehreinheitgruppe.gruppe_kurzbz AND
 						tbl_benutzergruppe.studiensemester_kurzbz = '$stsem'
@@ -729,8 +729,8 @@ function addUser(student_uid)
 						tbl_lehreinheitgruppe.lehreinheit_id='$lehreinheit_id' AND
 						tbl_lehreinheitgruppe.studiengang_kz=vw_student.studiengang_kz AND
 						tbl_lehreinheitgruppe.semester = vw_student.semester AND
-						((tbl_lehreinheitgruppe.verband<>'' AND 
-						  tbl_lehreinheitgruppe.gruppe<>'' AND 
+						((tbl_lehreinheitgruppe.verband<>'' AND
+						  tbl_lehreinheitgruppe.gruppe<>'' AND
 						  tbl_lehreinheitgruppe.verband is not null AND
 						  tbl_lehreinheitgruppe.gruppe is not null AND
 						  trim(tbl_lehreinheitgruppe.verband) = trim(vw_student.verband) AND
@@ -744,11 +744,11 @@ function addUser(student_uid)
 						 ORDER BY nachname, vorname";
 		*/
 		}
-		else 
+		else
 			die('Fehler bei der Parameteruebergabe');
 		$gruppe='';
 	}
-	
+
 	echo "<form method='POST' action='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id&gruppe=$gruppe&stsem=$stsem'>";
 	echo "<input type='hidden' name='update_ids' value=''>";
 	echo "<table border='1'>
@@ -763,7 +763,7 @@ function addUser(student_uid)
 					</table>
 				</td>
 			</tr>";
-	
+
 	echo "<tr><td align='center'><b>Name</b></td>";
 	if (!$uebung_obj->beispiele)
 		echo "<td>Note</td>";
@@ -775,7 +775,7 @@ function addUser(student_uid)
 		}
 	}
 	echo "<td align='center' width='200'><b>Unterschrift</b></td><td></td></tr>\n";
-	
+
 	if($result = $db->db_query($qry_stud))
 	{
 		while($row_stud = $db->db_fetch_object($result))
@@ -784,14 +784,14 @@ function addUser(student_uid)
 			$filename = '';
 			$su_obj = new uebung($uebung_id);
 			$su_obj->load_studentuebung($row_stud->uid, $uebung_id);
-			if ($su_obj->abgabe_id)	
-			{	
+			if ($su_obj->abgabe_id)
+			{
 				$su_obj->load_abgabe($su_obj->abgabe_id);
 				$filename = $su_obj->abgabedatei;
 			}
 			else
 				$filename='';
-			
+
 			echo "<tr onMouseOver=\"this.style.backgroundColor='#c7dfe8'\" onMouseOut=\"this.style.backgroundColor='#ffffff'\">
 			<td nowrap><input type='checkbox' name='update_$row_stud->uid' disabled>&nbsp;<b>$row_stud->nachname</b>&nbsp;$row_stud->vorname $row_stud->uid</td>";
 			if (!$uebung_obj->beispiele)
@@ -799,10 +799,10 @@ function addUser(student_uid)
 				$studentuebung_obj = new uebung();
 				$studentuebung_obj->load_studentuebung($row_stud->uid,$uebung_id);
 				echo "<td align='center'><input type='text' name='update_".$row_stud->uid."_note' onchange=\"addUser('$row_stud->uid');\" value='".$studentuebung_obj->note."' size='3'></td>\n";
-				
-			}			
+
+			}
 			else
-			{			
+			{
 				foreach($beispiel_obj->beispiele as $row_bsp)
 				{
 					$studentbeispiel_obj = new beispiel();
@@ -812,7 +812,7 @@ function addUser(student_uid)
 			}
 			echo "<td>&nbsp;</td>";
 
-			if ($filename != "")			
+			if ($filename != "")
 				echo "<td><a href='anwesenheitsliste.php?uid=$row_stud->uid&output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id&stsem=$stsem&download_abgabe=$filename'>Abgabe</a></td>\n";
 			else if ($uebung_obj->abgabe)
 				echo "<td><span style='color:red;'>Fehlt!</span></td>";
@@ -821,7 +821,7 @@ function addUser(student_uid)
 			echo "</tr>\n";
 		}
 	}
-	
+
 	echo '</table>';
 	echo "<br><br><table width='100%'><tr><td align='right'><input type='submit' name='submit' value='Änderungen Speichern'></td></tr></table>";
 	echo '</form>'

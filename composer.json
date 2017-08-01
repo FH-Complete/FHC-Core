@@ -75,6 +75,7 @@
     "rougin/combustor": "1.1.*",
 	"rougin/refinery": "*",
     "components/jquery": "2.1.4",
+	"components/jqueryui": "1.12.*",
     "components/angular.js": "1.3.16",
     "components/bootstrap": "3.3.5",
     "michelf/php-markdown": "1.5.0",
