@@ -70,6 +70,7 @@ define('CIS_GESAMTNOTE_GEWICHTUNG', true);
 define('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2',true);
 
 // Bei Gesamtnote eine zusaetzliche Spalte fuer den 3. Termin anzeigen
+// Erfordert den Eintrag "Termin3" in der Tabelle lehre.tbl_pruefungstyp
 define('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3',true);
 
 // Bei Gesamtnote eine zusaetzliche Spalte fuer die kommissionelle Pruefung anlegen
