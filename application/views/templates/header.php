@@ -3,6 +3,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
 !isset($jquery) ? $jquery = false : $jquery = $jquery;
+!isset($jqueryComposer) ? $jqueryComposer = false : $jqueryComposer = $jqueryComposer;
+!isset($jqueryui) ? $jqueryui = false : $jqueryui = $jqueryui;
 !isset($jquery_checkboxes) ? $jquery_checkboxes = false : $jquery_checkboxes = $jquery_checkboxes;
 !isset($jquery_custom) ? $jquery_custom = false : $jquery_custom = $jquery_custom;
 !isset($tablesort) ? $tablesort = false : $tablesort = $tablesort;
@@ -13,9 +15,20 @@ isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
 !isset($jsoneditor) ? $jsoneditor = false : $jsoneditor = $jsoneditor;
 !isset($jsonforms) ? $jsonforms = false : $jsonforms = $jsonforms;
 !isset($textile) ? $textile = false : $textile = $textile;
+!isset($datepicker) ? $datepicker = false : $datepicker = $datepicker;
 
 if ($tablesort || $jquery_checkboxes || $jquery_custom)
 	$jquery = true;
+
+if($datepicker)
+	$jqueryui = true;
+
+if($jqueryui)
+	$jqueryComposer = true;
+
+if($jquery && $jqueryComposer)
+	show_error("Two JQuery versions used: composer and includefolderversion");
+
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -30,6 +43,15 @@ if ($tablesort || $jquery_checkboxes || $jquery_custom)
 
 <?php if($jquery) : ?>
 	<script type="text/javascript" src="<?php echo base_url('include/js/jquery1.9.min.js'); ?>"></script>
+<?php endif ?>
+
+<?php if($jqueryComposer) : ?>
+	<script type="text/javascript" src="<?php echo base_url('vendor/components/jquery/jquery.min.js'); ?>"></script>
+<?php endif ?>
+
+<?php if($jqueryui) : ?>
+	<script type="text/javascript" src="<?php echo base_url('vendor/components/jqueryui/jquery-ui.min.js'); ?>"></script>
+	<link rel="stylesheet"    type="text/css"     href="<?php echo base_url('vendor/components/jqueryui/themes/base/jquery-ui.min.css'); ?>" />
 <?php endif ?>
 
 <?php if($jquery_checkboxes) : ?>
@@ -53,6 +75,19 @@ if ($tablesort || $jquery_checkboxes || $jquery_custom)
 		});
 	</script>
 <?php endif ?>
+
+<?php if($datepicker && !empty($datepickerclass)) : ?>
+	<script language="Javascript" type="text/javascript">
+		$(document).ready(function()
+		{
+			$(".<?php echo $datepickerclass; ?>").datepicker(
+				{
+					dateFormat:"dd.mm.yy"
+				});
+		});
+	</script>
+<?php endif ?>
+
 <?php if($tinymce) : ?>
 	<script type="text/javascript" src="<?php echo base_url('vendor/tinymce/tinymce/tinymce.min.js');?>"></script>
 <?php endif ?>

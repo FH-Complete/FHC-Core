@@ -168,6 +168,8 @@ $menu=array
 		'Service'=>array('name'=>'Service', 'link'=>'stammdaten/service_frameset.html', 'target'=>'main','permissions'=>array('basis/service')),
 		'Dokumentvorlagen'=>array('name'=>'Dokumentvorlagen', 'link'=>'stammdaten/dokumentvorlagen_verwaltung.php', 'target'=>'main','permissions'=>array('basis/dokumente')),
 		'GSProgramm'=>array('name'=>'GSProgramm', 'link'=>'stammdaten/gsprogramm.php', 'target'=>'main','permissions'=>array('inout/uebersicht')),
+		'Studiensemester'=>array('name'=>'Studiensemester', 'link'=>'../index.ci.php/organisation/studiensemester/listStudiensemester', 'target'=>'main','permissions'=>array('admin')),
+		'Studienjahr'=>array('name'=>'Studienjahr', 'link'=>'../index.ci.php/organisation/studienjahr/listStudienjahr', 'target'=>'main','permissions'=>array('admin')),
 		'FH Ausweis'=>array
 		(
 			'name'=>'FH Ausweis','permissions'=>array('basis/fhausweis'),
