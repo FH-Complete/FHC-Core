@@ -42,7 +42,7 @@
 		}
 	}
 ?>
-		<form action="<?php echo APP_ROOT; ?>/index.ci.php/system/UDF/saveUDF" method="POST">
+		<form action="<?php echo APP_ROOT; ?>index.ci.php/system/UDF/saveUDF" method="POST">
 		
 			<div class="div-table">
 				<div class="div-row">

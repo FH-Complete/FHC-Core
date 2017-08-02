@@ -32,6 +32,6 @@ function loadUDF(person_id, prestudent_id)
 	
 	if (udfIFrame != null && udfIFrame.getAttribute('src') == 'about:blank')
 	{
-		udfIFrame.setAttribute('src', '<?php echo APP_ROOT ?>/index.ci.php/system/UDF?person_id='+person_id+'&prestudent_id='+prestudent_id);
+		udfIFrame.setAttribute('src', '<?php echo APP_ROOT ?>index.ci.php/system/UDF?person_id='+person_id+'&prestudent_id='+prestudent_id);
 	}
 }
