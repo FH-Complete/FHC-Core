@@ -874,12 +874,13 @@ class DB_Model extends FHC_Model
 		$returnArrayValidation = array(); // returned value
 		
 		// 
-		if (((isset($decodedUDFValidation->validation->{DB_Model::UDF_REQUIRED})
+		if ((((isset($decodedUDFValidation->validation->{DB_Model::UDF_REQUIRED})
 			&& $decodedUDFValidation->validation->{DB_Model::UDF_REQUIRED} === false)
 			|| !isset($decodedUDFValidation->validation->{DB_Model::UDF_REQUIRED}))
-			&& ($udfType == DB_Model::UDF_DROPDOWN_TYPE || $udfType == DB_Model::UDF_MULTIPLEDROPDOWN_TYPE))
+			&& $udfValue == null)
+			|| $udfType == DB_Model::UDF_CHKBOX_TYPE)
 		{
-			$returnArrayValidation = array();
+			// NOP
 		}
 		else
 		{
@@ -1043,47 +1044,16 @@ class DB_Model extends FHC_Model
 								// therefore it was supplied
 								if (isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED})
 									&& $decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED} === true
-									&& isset($requiredUDFsArray[$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}]))
+									&& isset($requiredUDFsArray[$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}])
+									&& $val != null)
 								{
-									// 
-									if ($decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_CHKBOX_TYPE
-										&& ($val == DB_Model::STRING_FALSE || $val === false))
-									{
-										// NOP
-									}
-									// 
-									else if (($decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_DROPDOWN_TYPE
-											|| $decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_MULTIPLEDROPDOWN_TYPE)
-											&& ($val == DB_Model::STRING_NULL || $val == null))
-									{
-										// NOP
-									}
-									else
-									{
-										unset($requiredUDFsArray[$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}]);
-									}
+									unset($requiredUDFsArray[$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}]);
 								}
 							}
 							
 							// If validation is ok copy the value that is to be stored into $toBeStoredUDFsArray
 							if (isSuccess($validate))
 							{
-								// If this UDF is a checkbox
-								if ($decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_CHKBOX_TYPE)
-								{
-									// Converts from string to boolean
-									if ($val == DB_Model::STRING_TRUE) $val = true;
-									else if ($val == DB_Model::STRING_FALSE) $val = false;
-								}
-								else if ($decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_DROPDOWN_TYPE
-										|| $decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_MULTIPLEDROPDOWN_TYPE)
-								{
-									if ($val == DB_Model::STRING_NULL)
-									{
-										$val = null;
-									}
-								}
-								
 								$toBeStoredUDFsArray[$key] = $val;
 							}
 							else // otherwise store the validation error in $notValidUDFsArray

@@ -55,14 +55,23 @@ class UDF_model extends DB_Model
 		$prestudent_id = $udfs['prestudent_id'];
 		unset($udfs['prestudent_id']);
 		
+		$jsons = array();
+		
 		// 
 		if (isset($person_id))
 		{
 			// Load model Person_model
 			$this->load->model('person/Person_model', 'PersonModel');
 			
-			$udfs = $this->_fillMissingChkboxUDF($udfs, 'public', 'tbl_person');
-			$udfs = $this->_fillMissingDropdownUDF($udfs, 'public', 'tbl_person');
+			$result = $this->load(array('public', 'tbl_person'));
+			if (isSuccess($result) && count($result->retval) == 1)
+			{
+				$jsons = json_decode($result->retval[0]->jsons);
+			}
+			
+			$udfs = $this->_fillMissingChkboxUDF($udfs, $jsons);
+			$udfs = $this->_fillMissingDropdownUDF($udfs, $jsons);
+			$udfs = $this->_fillMissingTextUDF($udfs, $jsons);
 			
 			$resultPerson = $this->PersonModel->update($person_id, $udfs);
 		}
@@ -73,8 +82,15 @@ class UDF_model extends DB_Model
 			// Load model Prestudent_model
 			$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 			
-			$udfs = $this->_fillMissingChkboxUDF($udfs, 'public', 'tbl_prestudent');
-			$udfs = $this->_fillMissingDropdownUDF($udfs, 'public', 'tbl_prestudent');
+			$result = $this->load(array('public', 'tbl_prestudent'));
+			if (isSuccess($result) && count($result->retval) == 1)
+			{
+				$jsons = json_decode($result->retval[0]->jsons);
+			}
+			
+			$udfs = $this->_fillMissingChkboxUDF($udfs, $jsons);
+			$udfs = $this->_fillMissingDropdownUDF($udfs, $jsons);
+			$udfs = $this->_fillMissingTextUDF($udfs, $jsons);
 			
 			$resultPrestudent = $this->PrestudentModel->update($prestudent_id, $udfs);
 		}
@@ -98,22 +114,27 @@ class UDF_model extends DB_Model
 	/**
 	 * 
 	 */
-	private function _fillMissingChkboxUDF($udfs, $schema, $table)
+	private function _fillMissingChkboxUDF($udfs, $jsons)
 	{
 		$_fillMissingChkboxUDF = $udfs;
 		
-		$result = $this->load(array($schema, $table));
-		if (isSuccess($result) && count($result->retval) == 1)
+		foreach($jsons as $udfDescription)
 		{
-			$jsons = json_decode($result->retval[0]->jsons);
-			
-			foreach($jsons as $udfDescription)
+			if ($udfDescription->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_CHKBOX_TYPE)
 			{
-				if ($udfDescription->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_CHKBOX_TYPE)
+				if (!isset($_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}]))
 				{
-					if (!isset($_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}]))
+					$_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = false;
+				}
+				else
+				{
+					if ($_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] == DB_Model::STRING_FALSE)
 					{
-						$_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = DB_Model::STRING_FALSE;
+						$_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = false;
+					}
+					else if ($_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] == DB_Model::STRING_TRUE)
+					{
+						$_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = true;
 					}
 				}
 			}
@@ -125,28 +146,52 @@ class UDF_model extends DB_Model
 	/**
 	 * 
 	 */
-	private function _fillMissingDropdownUDF($udfs, $schema, $table)
+	private function _fillMissingDropdownUDF($udfs, $jsons)
 	{
 		$_fillMissingDropdownUDF = $udfs;
 		
-		$result = $this->load(array($schema, $table));
-		if (isSuccess($result) && count($result->retval) == 1)
+		foreach($jsons as $udfDescription)
 		{
-			$jsons = json_decode($result->retval[0]->jsons);
-			
-			foreach($jsons as $udfDescription)
+			if ($udfDescription->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_DROPDOWN_TYPE
+				|| $udfDescription->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_MULTIPLEDROPDOWN_TYPE)
 			{
-				if ($udfDescription->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_DROPDOWN_TYPE
-					|| $udfDescription->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_MULTIPLEDROPDOWN_TYPE)
+				if (!isset($_fillMissingDropdownUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}]))
 				{
-					if (!isset($_fillMissingDropdownUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}]))
-					{
-						$_fillMissingDropdownUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = DB_Model::STRING_NULL;
-					}
+					$_fillMissingDropdownUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = null;
+				}
+				else if($_fillMissingDropdownUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] == DB_Model::STRING_NULL)
+				{
+					$_fillMissingDropdownUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = null;
 				}
 			}
 		}
 		
 		return $_fillMissingDropdownUDF;
+	}
+	
+	/**
+	 * 
+	 */
+	private function _fillMissingTextUDF($udfs, $jsons)
+	{
+		$_fillMissingTextUDF = $udfs;
+		
+		foreach($jsons as $udfDescription)
+		{
+			if ($udfDescription->{DB_Model::UDF_TYPE_NAME} == 'textarea'
+				|| $udfDescription->{DB_Model::UDF_TYPE_NAME} == 'textfield')
+			{
+				if (!isset($_fillMissingTextUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}]))
+				{
+					$_fillMissingTextUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = null;
+				}
+				else if(trim($_fillMissingTextUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}]) == '')
+				{
+					$_fillMissingTextUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = null;
+				}
+			}
+		}
+		
+		return $_fillMissingTextUDF;
 	}
 }
