@@ -97,7 +97,6 @@ $config['fhc_acl'] = array
 	'lehre.tbl_lvangebot' => 'basis/lvangebot',
 	'lehre.tbl_lvregel' => 'basis/lvregel',
 	'lehre.tbl_lvregeltyp' => 'basis/lvregeltyp',
-	'lehre.tbl_moodle' => 'basis/moodle',
 	'lehre.tbl_note' => 'basis/note',
 	'lehre.tbl_notenschluessel' => 'basis/notenschluessel',
 	'lehre.tbl_notenschluesselaufteilung' => 'basis/notenschluesselaufteilung',
@@ -235,11 +234,11 @@ $config['fhc_acl'] = array
 	'wawi.tbl_rechnungsbetrag' => 'basis/rechnungsbetrag',
 	'wawi.tbl_rechnungstyp' => 'basis/rechnungstyp',
 	'wawi.tbl_zahlungstyp' => 'basis/zahlungstyp',
-	
+
 	DMS_PATH => 'fs/dms',
-	
+
 	'public.tbl_sprache' => 'admin',
-	
+
 	'PhrasesLib.getPhrase' => 'system/PhrasesLib'
 );
 

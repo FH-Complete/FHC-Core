@@ -1103,7 +1103,7 @@ $error_msg='';
 	ob_flush();
 
 	$sql_query = "SELECT distinct mitarbeiter_uid uid
-				from lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_moodle ,campus.vw_lehreinheit
+				from lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, addon.tbl_moodle ,campus.vw_lehreinheit
 				where tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id
 				and  vw_lehreinheit.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz
 				and vw_lehreinheit.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id

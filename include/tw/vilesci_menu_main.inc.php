@@ -73,15 +73,6 @@ $menu=array
 		'Studienordnung'=>array('name'=>'Studienordnung', 'link'=>'lehre/studienordnung.php', 'target'=>'_blank','permissions'=>array('lehre/studienordnung')),
 		'StudienplanGueltigkeit'=>array('name'=>'Studienplan Gültigkeit', 'link'=>'lehre/studienplan_gueltigkeit.php', 'target'=>'main','permissions'=>array('lehre/studienordnung')),
 
-		'Moodle'=>array
-		(
-			'name'=>'Moodle', 'permissions'=>array('basis/moodle'),
-			'Account'=>array('name'=>'Accountverwaltung', 'link'=>'moodle/account_verwaltung24.php', 'target'=>'main'),
-			'Kursverwaltung'=>array('name'=>'Kurs entfernen', 'link'=>'moodle/kurs_verwaltung24.php', 'target'=>'main'),
-			'Rollenzuteilung'=>array('name'=>'Rollenzuteilung', 'link'=>'moodle/rollenzuteilung24.php', 'target'=>'main'),
-			'UserSync'=>array('name'=>'User Sync', 'link'=>'moodle/user_sync24.php', 'target'=>'main'),
-			'UserMassCreate'=>array('name'=>'User Massenanlage', 'link'=>'moodle/account_masscreate24.php', 'target'=>'main'),
-		),
 		'Freifach'=>array
 		(
 			'name'=>'Freifach', 'permissions'=>array('lehre/freifach'),

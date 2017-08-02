@@ -173,4 +173,6 @@ $this->phrasen['benotungstool/importAnweisung']='Kopieren Sie die Spalten Person
 $this->phrasen['benotungstool/pruefung']='Prüfung';
 $this->phrasen['benotungstool/notenlisteImport']='Notenliste für den LV-Noten-Import (Excel)';
 $this->phrasen['benotungstool/bearbeitetvon']='Bearbeitet von';
+$this->phrasen['benotungstool/teilnoten']='Teilnoten';
+$this->phrasen['benotungstool/hilfeImport']='Zum Importieren der Noten markieren sie die Spalten Kennzeichen und Note im Excel-File und kopieren sie diese in die Zwischenablage. Drücken sie danach diesen Knopf erneut, um die Noten zu importieren';
 ?>
