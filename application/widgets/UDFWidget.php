@@ -215,6 +215,10 @@ class UDFWidget extends UDFWidgetTpl
 		{
 			$this->_args[DropdownWidget::SELECTED_ELEMENT] = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
 		}
+		else
+		{
+			$this->_args[DropdownWidget::SELECTED_ELEMENT] = null;
+		}
 		
 		$dropdownWidgetUDF = new DropdownWidgetUDF($this->_name, $this->_args);
 		$parameters = array();

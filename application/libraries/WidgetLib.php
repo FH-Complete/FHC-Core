@@ -221,9 +221,9 @@ class WidgetLib
 		if (!empty($args[UDFWidgetTpl::SCHEMA_ARG_NAME]) && !empty($args[UDFWidgetTpl::TABLE_ARG_NAME]))
 		{
 			// 
-			if (empty($args[UDFWidgetTpl::FIELD_ARG_NAME]) && !isset($htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK]))
+			if (empty($args[UDFWidgetTpl::FIELD_ARG_NAME]) && !isset($htmlArgs[Widget::EXTERNAL_BLOCK]))
 			{
-				$htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK] = true;
+				$htmlArgs[Widget::EXTERNAL_BLOCK] = true;
 			}
 			
 			return $this->widget(
@@ -653,7 +653,7 @@ class Widget extends Partial
     /**
      * It gets also the htmlArgs array as parameter, it will be used to set the HTML properties
      */
-    public function __construct($name, $args, $htmlArgs = array())
+    public function __construct($name, $args = array(), $htmlArgs = array())
 	{
 		parent::__construct($name, $args);
 		
@@ -746,8 +746,8 @@ class Widget extends Partial
 	 */
 	public static function printStartBlock($htmlArgs)
 	{
-		if (isset($htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK])
-			&& $htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK] === true)
+		if (isset($htmlArgs[Widget::EXTERNAL_BLOCK])
+			&& $htmlArgs[Widget::EXTERNAL_BLOCK] === true)
 		{
 			echo Widget::EXTERNAL_START_BLOCK_HTML_TAG;
 		}
@@ -758,8 +758,8 @@ class Widget extends Partial
 	 */
 	public static function printEndBlock($htmlArgs)
 	{
-		if (isset($htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK])
-			&& $htmlArgs[Widget::HTML_ARG_NAME][Widget::EXTERNAL_BLOCK] === true)
+		if (isset($htmlArgs[Widget::EXTERNAL_BLOCK])
+			&& $htmlArgs[Widget::EXTERNAL_BLOCK] === true)
 		{
 			echo Widget::EXTERNAL_END_BLOCK_HTML_TAG;
 		}
@@ -790,7 +790,7 @@ class DropdownWidget extends Widget
 	/**
 	 * 
 	 */
-	public function __construct($name, $args, $htmlArgs = array())
+	public function __construct($name, $args = array(), $htmlArgs = array())
 	{
 		parent::__construct($name, $args, $htmlArgs);
 		
@@ -807,6 +807,7 @@ class DropdownWidget extends Widget
     public function setMultiple()
     {
 		$this->_args[Widget::HTML_ARG_NAME][DropdownWidget::MULTIPLE] = DropdownWidget::MULTIPLE;
+		$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] .= '[]';
     }
     
     /**
