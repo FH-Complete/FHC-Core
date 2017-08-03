@@ -1057,42 +1057,6 @@ class lehrveranstaltung extends basis_db
 	}
 
 	/**
-	 * Liefert alle Moodlekurs Ids
-	 * @param 	$lehrveranstaltung_id Id der Lehrveranstaltung
-	 * @param	$semester Semester
-	 * @return array mit Moodlekurs Ids oder false=fehler
-	 */
-	public function getMoodleKurse($lehrveranstaltung_id, $semester)
-	{
-		if ($lehrveranstaltung_id == '' || $semester == '')
-		{
-			$this->errormsg = 'Id und Semester muss übergeben werden.';
-			return false;
-		}
-
-		$qry = "SELECT mdl_course_id FROM lehre.tbl_moodle
-			WHERE studiensemester_kurzbz = " . $this->db_add_param($semester) . "
-				AND (lehrveranstaltung_id = " . $this->db_add_param($lehrveranstaltung_id) . "
-					OR lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id = " . $this->db_add_param($lehrveranstaltung_id) . "));";
-
-		$moodleArray = array();
-
-		if ($result = $this->db_query($qry))
-		{
-			while ($row = $this->db_fetch_object($result))
-			{
-				$moodleArray[] = $row->mdl_course_id;
-			}
-			return $moodleArray;
-		}
-		else
-		{
-			$this->errormsg = 'Moodlekurs konnte nicht geladen werden';
-			return false;
-		}
-	}
-
-	/**
 	 * Laedt die LVs die als Array uebergeben werden
 	 * @param $ids Array mit den LV ids
 	 * @return true wenn ok, false im Fehlerfall

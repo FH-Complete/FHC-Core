@@ -70,7 +70,6 @@ function getLehrveranstaltungFromId($lehrveranstaltung_id, $semester, $authentif
     class foo{};
     $mitarbeiterlehreinheit = array(); // uids aller mitarbeiter
     $gruppelehreinheit = array(); // objekte aller gruppen
-    $moodleArray = array(); // ids aller moodle kurse
 
     // wenn semester nicht übergeben wurde, gib nur bezeichnung und lehreverzeichnis aus
     if($semester != '')
@@ -102,16 +101,11 @@ function getLehrveranstaltungFromId($lehrveranstaltung_id, $semester, $authentif
                 $gruppelehreinheit[] = $grp;
             }
         }
-
-        // alle moodle kurse einer lv
-        $moodleArray = $lv->getMoodleKurse($lehrveranstaltung_id, $semester);
-
     }
 
     $LvObject = new foo();
     $LvObject->bezeichnung = $lv->bezeichnung;
     $LvObject->lehreverzeichnis = $lv->lehreverzeichnis;
-    $LvObject->moodle_id = $moodleArray;
     $LvObject->lektoren = $mitarbeiterlehreinheit;
     $LvObject->gruppen= $gruppelehreinheit;
 
@@ -164,7 +158,6 @@ function getLehrveranstaltungFromStudiengang($studiengang, $semester, $ausbildun
     {
         $mitarbeiterlehreinheit = array(); // uids aller mitarbeiter der lehreinheit
         $gruppelehreinheit = array(); // ids aller grupper der lehreinheit
-        $moodleArray = array();
 
         // hole alle Lehreinheiten von Lehrveranstaltung
         $lehreinheit = new lehreinheit();
@@ -196,14 +189,11 @@ function getLehrveranstaltungFromStudiengang($studiengang, $semester, $ausbildun
                 $gruppelehreinheit[] = $grp;
             }
         }
-        // alle moodlekurse der lehrveranstaltung
-        $moodleArray = $lv->getMoodleKurse($lv->lehrveranstaltung_id, $semester);
 
         // LV Object für Rückgabe
         $lehrveranstaltungen = new bar();
         $lehrveranstaltungen->bezeichnung = $lv->bezeichnung;
         $lehrveranstaltungen->lehreverzeichnis = $lv->lehreverzeichnis;
-        $lehrveranstaltungen->moodle_id = $moodleArray;
         $lehrveranstaltungen->lektoren = $mitarbeiterlehreinheit;
         $lehrveranstaltungen->gruppen = $gruppelehreinheit;
 

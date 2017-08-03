@@ -1346,27 +1346,14 @@ if(!$error)
 						}
 						else
 						{
-							//Loeschen verhindern wenn ein MoodleKurs existiert
-							$qry = "SELECT 1 FROM lehre.tbl_moodle WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER);
-							if($db->db_query($qry))
+							if ($leDAO->delete($_POST['lehreinheit_id']))
 							{
-								if($db->db_num_rows()>0)
-								{
-									$return = false;
-									$errormsg = 'Lehreinheit kann nicht geloescht werden, da dazu bereits ein Moodle-Kurs angelegt wurde';
-								}
-								else
-								{
-									if ($leDAO->delete($_POST['lehreinheit_id']))
-									{
-										$return = true;
-									}
-									else
-									{
-										$return = false;
-										$errormsg = 'Fehler beim Loeschen der Lehreinheit '.$leDAO->errormsg;
-									}
-								}
+								$return = true;
+							}
+							else
+							{
+								$return = false;
+								$errormsg = 'Fehler beim Loeschen der Lehreinheit '.$leDAO->errormsg;
 							}
 						}
 					}

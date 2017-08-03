@@ -8,7 +8,8 @@ $this->load->view('templates/header', array('title' => 'StudienjahrNew', 'jquery
 		<div class="span4">
 			<h2>Neues Studienjahr anlegen</h2>
 			<form method="post"
-				  action="<?php echo APP_ROOT."index.ci.php/organisation/studienjahr/insStudienjahr"; ?>" id="newStudienjahrForm">
+				  action="<?php echo APP_ROOT."index.ci.php/organisation/studienjahr/insStudienjahr"; ?>"
+				  id="newStudienjahrForm">
 				<table>
 					<tr>
 						<td colspan="2">
@@ -22,6 +23,11 @@ $this->load->view('templates/header', array('title' => 'StudienjahrNew', 'jquery
 	</div>
 </div>
 <script>
+	/**
+	 * prevents submitting the form data if data entered incorrectly
+	 * additional check before php check for user-friendliness (no php die)
+	 * outputs errormessages in case of wrong inputs
+	 */
 	$('#newStudienjahrForm').submit(function (event) {
 		var studienjahrkurzbez = $('input[name=studienjahrkurzbz]').val();
 		if (checkStudienjahrkurzbez(studienjahrkurzbez))return;
@@ -29,11 +35,18 @@ $this->load->view('templates/header', array('title' => 'StudienjahrNew', 'jquery
 		event.preventDefault();
 	});
 
-	function checkStudienjahrkurzbez(semesterkurzbez) {
-		var firstyear = parseInt(semesterkurzbez.substr(2,2));
-		var secondyear = parseInt(semesterkurzbez.substr(5,2));
+	/**
+	 * checks correct Studienjahrkurzbezeichnung format with regex
+	 * first check is whether the form ist right: e.g. 2017/18
+	 * second check is whether first year is second year - 1
+	 * @param studienjahrkurzbez
+	 * @returns {boolean} whether the Studienjahrkurzbezeichnung has correct format
+	 */
+	function checkStudienjahrkurzbez(studienjahrkurzbez) {
+		var firstyear = parseInt(studienjahrkurzbez.substr(2, 2));
+		var secondyear = parseInt(studienjahrkurzbez.substr(5, 2));
 		var pattern = /^\d{4}\/\d{2}$/;
-		return pattern.test(semesterkurzbez) && secondyear - firstyear === 1;
+		return pattern.test(studienjahrkurzbez) && secondyear - firstyear === 1;
 	}
 </script>
 </body>

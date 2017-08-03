@@ -150,15 +150,6 @@ define('REIHUNGSTEST_CHECK', true);
 // Bei Statuswechsel auf Bewerber bzw. Student -> soll ZGV brücksichtigt werden
 define('ZGV_CHECK', true);
 
-/* Schema zur Erstellung der Kurs Kategorien im Moodle
- * Leer oder nicht gesetzt: STSEM -> STG -> Ausbsemester (WS2014 -> BEL -> 1)
- * DEP-STG-JG-STSEM: Department -> STG -> Jahrgang -> StSem (Informationstechnologie und Informationsmanagement -> BIMK -> Jahrgang 2014 -> WS2014)
- */
-define('MOODLE_COURSE_SCHEMA','');
-
-// Legt fst ob Fachbereichsleiter zu Moodle Kursen zugeteilt werden (mit Benutzerdefinierter Rolle 11)
-define('MOODLE_SYNC_FACHBEREICHSLEITUNG',false);
-
 // Bei Statuswechsel auf Bewerber -> bei true wird email (INFOMAIL_BEWERBER) an den Bewerber geschickt
 define('SEND_BEWERBER_INFOMAIL', false);
 

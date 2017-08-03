@@ -1,5 +1,5 @@
 <?php
-$this->load->view('templates/header', array('title' => 'StudienjahrList', 'tablesort' => true, 'tableid' => 't1', 'headers' => '2:{sorter:false}, 3:{sorter:false}', 'sortList' =>'0,1'));
+$this->load->view('templates/header', array('title' => 'StudienjahrList', 'tablesort' => true, 'tableid' => 't1', 'headers' => '2:{sorter:false}, 3:{sorter:false}', 'sortList' => '0,1'));
 ?>
 <body>
 <div class="row">
@@ -20,7 +20,7 @@ $this->load->view('templates/header', array('title' => 'StudienjahrList', 'table
 			<tbody>
 			<?php foreach ($studienjahr as $jahr):
 				$escapedstudienjahrkurzbz = str_replace("/", "_", $jahr->studienjahr_kurzbz);
-			?>
+				?>
 				<tr>
 					<td><?php echo $jahr->studienjahr_kurzbz; ?></td>
 					<td><?php echo $jahr->bezeichnung; ?></td>

@@ -27,7 +27,6 @@ require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/studiengang.class.php');
-require_once('../../../include/moodle.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/lehre_tools.class.php');
 require_once('../../../include/lvangebot.class.php');

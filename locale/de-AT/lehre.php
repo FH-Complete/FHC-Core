@@ -21,12 +21,6 @@ $this->phrasen['lehre/feedback']='Feedback';
 
 $this->phrasen['lehre/benotungstoolHandbuch']='Handbuch';
 $this->phrasen['lehre/kreuzerltool']='Übungstool<br>("Kreuzerl"-Tool)';
-$this->phrasen['lehre/kreuzerltoolMitMoodleInfo']='Das Übungstool kann nicht gleichzeitig mit Moodle verwendet werden.\nWenn Sie das Übungstool verwenden wollen, müssen Sie den Moodle Kurs entfernen. Wenden Sie sich hierzu bitte an den Lektorensupport';
-
-$this->phrasen['lehre/moodle']='Moodle';
-$this->phrasen['lehre/moodleWartung']='Wartung';
-$this->phrasen['lehre/moodleHandbuch']='Handbuch';
-$this->phrasen['lehre/moodleMitKreuzerltoolInfo']='Moodle kann nicht gleichzeitig mit dem Übungstool verwendet werden.\nWenn Sie Moodle verwenden wollen, müssen Sie die Übungen im Übungstool entfernen';
 
 $this->phrasen['lehre/gesamtnote']='Gesamtnote';
 $this->phrasen['lehre/studentenAbgabe']='Studierenden Abgabe';

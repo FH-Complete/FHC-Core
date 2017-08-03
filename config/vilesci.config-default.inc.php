@@ -155,11 +155,6 @@ define('MANTIS_PFAD','http://www.example.com/mantis/api/soap/mantisconnect.php?w
 define('MANTIS_USERNAME',(isset($_SERVER['PHP_AUTH_USER'])?$_SERVER['PHP_AUTH_USER']:''));
 define('MANTIS_PASSWORT',(isset($_SERVER['PHP_AUTH_PW'])?$_SERVER['PHP_AUTH_PW']:''));
 
-// ***** Moodle *****
-define('MOODLE_PATH','http://www.technikum-wien.at/moodle/'); // DEPRECATED
-define("CONN_STRING_MOODLE","host=localhost dbname=bla user=bla password=bla"); // nur für Moodle 1.9
-define('MOODLE_TOKEN24','');
-
 //Name der aktiven Addons getrennt mit ;
 define('ACTIVE_ADDONS','');
 

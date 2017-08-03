@@ -1,5 +1,5 @@
 <?php
-$this->load->view('templates/header', array('title' => 'StudiensemesterList', 'tablesort' => true, 'tableid' => 't1', 'headers' => '7:{sorter:false}, 8:{sorter:false}', 'sortList' =>'4,1'));
+$this->load->view('templates/header', array('title' => 'StudiensemesterList', 'tablesort' => true, 'tableid' => 't1', 'headers' => '7:{sorter:false}, 8:{sorter:false}', 'sortList' => '4,1],[0,0'));
 ?>
 <body>
 <div class="row">
