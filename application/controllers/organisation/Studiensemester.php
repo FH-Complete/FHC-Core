@@ -3,13 +3,15 @@
 if (!defined("BASEPATH")) exit("No direct script access allowed");
 
 /**
- * Description of Semester
- *
- * @author root
+ * Studiensemester controller for listing, editing and removing a Studiensemester
  */
 class Studiensemester extends VileSci_Controller
 {
 
+	/**
+	 * Studiensemester constructor.
+	 * loads model for Studiensemester and Studienjahr (Studienjahr needed for dropdown)
+	 */
 	public function __construct()
 	{
 		parent::__construct();
@@ -17,11 +19,17 @@ class Studiensemester extends VileSci_Controller
 		$this->load->model("organisation/Studienjahr_model", "StudienjahrModel");
 	}
 
-	public function index()
-	{
-		$this->listStudiensemester();
-	}
+	/**
+	 * by default, Studiensemesters are listed by calling the listStudiensemester function
+	 */
+	/*	public function index()
+		{
+			$this->listStudiensemester();
+		}*/
 
+	/**
+	 * lists all Studiensemesters
+	 */
 	public function listStudiensemester()
 	{
 		$semester = $this->StudiensemesterModel->load();
@@ -36,6 +44,11 @@ class Studiensemester extends VileSci_Controller
 		$this->load->view("organisation/studiensemester.php", $data);
 	}
 
+	/**
+	 * shows view for editing a Studiensemester with a given Kurzbezeichnung
+	 * retrieves Studienjahre for showing in a dropdown in descending order
+	 * @param $semester_kurzbez Semesterkurzbezeichnung, e.g. SS2017
+	 */
 	public function editStudiensemester($semester_kurzbez)
 	{
 		$semester = $this->StudiensemesterModel->load($semester_kurzbez);
@@ -57,6 +70,10 @@ class Studiensemester extends VileSci_Controller
 		$this->load->view("organisation/studiensemesterEdit.php", $data);
 	}
 
+	/**
+	 * shows view for adding a Studiensemester
+	 * retrieves Studienjahre for showing in a dropdown in descending order
+	 */
 	public function newStudiensemester()
 	{
 		$this->StudienjahrModel->addOrder('studienjahr_kurzbz', "DESC");
@@ -75,7 +92,8 @@ class Studiensemester extends VileSci_Controller
 
 	/**
 	 * inserts a Studiensemester
-	 * formats dates in english as required by database
+	 * redirects to edit page after inserting.
+	 * saved=true is a GET parameter passed for showing save message
 	 */
 	public function insStudiensemester()
 	{
@@ -91,6 +109,13 @@ class Studiensemester extends VileSci_Controller
 	}
 
 
+	/**
+	 * gets Studiensemester data from input fields (POST request)
+	 * formats Studiensemester begin and end date as required by the database (english format)
+	 * escapes html characters for all texts coming from text input fields
+	 * validates the Studiensemester data before returning it or throwing an error
+	 * @return array contains all data for a Studiensemester
+	 */
 	private function __retrieveStudiensemesterData()
 	{
 		$studiensemester_kurzbz = $this->input->post("semkurzbz");
@@ -104,11 +129,11 @@ class Studiensemester extends VileSci_Controller
 
 		$data = array(
 			"studiensemester_kurzbz" => $studiensemester_kurzbz,
-			"bezeichnung" => $bezeichnung,
+			"bezeichnung" => html_escape($bezeichnung),
 			"start" => $start,
 			"ende" => $ende,
 			"studienjahr_kurzbz" => $studienjahr_kurzbz,
-			"beschreibung" => $beschreibung,
+			"beschreibung" => html_escape($beschreibung),
 			"onlinebewerbung" => $onlinebewerbung
 		);
 
@@ -125,6 +150,13 @@ class Studiensemester extends VileSci_Controller
 		}
 	}
 
+	/**
+	 * runs checks on Studiensemester data
+	 * checks if Studiensemester Kurzbezeichnung has the correct form e.g. SS2017
+	 * checks if date was given in the correct format dd.mm.yyyy (german format)
+	 * @param $data contains all data for a Studiensemester
+	 * @return array errorarray with error text if a check failed or success-array if all checks succeeded
+	 */
 	private function _validate($data)
 	{
 		$datepattern = "/^\d{2}.\d{2}.\d{4}$/";
@@ -138,6 +170,11 @@ class Studiensemester extends VileSci_Controller
 		return success("Semesterdaten sind valide");
 	}
 
+	/**
+	 * updates a Studiensemester
+	 * redirects to edit page after inserting
+	 * saved=true is a GET parameter passed for showing save message
+	 */
 	public function saveStudiensemester()
 	{
 		$data = $this->__retrieveStudiensemesterData();
@@ -151,6 +188,11 @@ class Studiensemester extends VileSci_Controller
 		redirect("/organisation/studiensemester/editStudiensemester/".$data['studiensemester_kurzbz']."?saved=true");
 	}
 
+	/**
+	 * deletes a Studiensemester
+	 * redirects to list Studiensemester view after deleting
+	 * @param $semester_kurzbez Semesterkurzbezeichnung, e.g. SS2017
+	 */
 	public function deleteStudiensemester($semester_kurzbez)
 	{
 		$semester = $this->StudiensemesterModel->delete($semester_kurzbez);

@@ -38,6 +38,11 @@ $this->load->view('templates/header', array('title' => 'StudiensemesterNew', 'jq
 		);
 	});
 
+	/**
+	 * prefills all date-associated input fields depending on given Semesterkurzbezeichnung
+	 * fires when value in input field Semesterkurzbezeichnung is changed
+	 * @param semesterkurzbez
+	 */
 	function prefillYearFields(semesterkurzbez) {
 		if (!checkSemesterkurzbez(semesterkurzbez))return;
 		var semester = semesterkurzbez.substr(0, 2);
@@ -52,7 +57,7 @@ $this->load->view('templates/header', array('title' => 'StudiensemesterNew', 'jq
 		} else {
 			wsssbezeichnung = "Sommersemester";
 			jahrbez = jahr;
-			studienjahr = jahr + "/" + (parseInt(jahr.substr(2, 4)) - 1);
+			studienjahr = (parseInt(jahr) - 1) + "/" + (parseInt(jahr.substr(2, 4)));
 			start = "01.02." + jahr;
 			ende = "01.08." + jahr;
 		}
@@ -60,19 +65,54 @@ $this->load->view('templates/header', array('title' => 'StudiensemesterNew', 'jq
 		$('input[name=sembz]').val(bezeichnung);
 		$('input[name=semstart]').val(start);
 		$('input[name=semende]').val(ende);
-		$('input[name=studienjahrkurzbz]').val(studienjahr);
+		$('select[name=studienjahrkurzbz]').val(studienjahr);
 	}
 
+	/**
+	 * prevents submitting the form data if data entered incorrectly
+	 * additional check before php check for user-friendliness (no php die)
+	 * outputs errormessages in case of wrong inputs
+	 */
 	$('#newSemesterForm').submit(function (event) {
 		var semesterkurzbez = $('input[name=semkurzbz]').val();
-		if (checkSemesterkurzbez(semesterkurzbez))return;
-		$('#errormessage').text("Semesterkurzbezeichnung muss mit WS oder SS beginnen und mit einer Jahreszahl enden, z.B. SS2017");
-		event.preventDefault();
+		var startdatum = $('input[name=semstart]').val();
+		var enddatum = $('input[name=semende]').val();
+		var errormessage = "";
+		var error = false;
+		if (!checkSemesterkurzbez(semesterkurzbez)) {
+			errormessage = "Semesterkurzbezeichnung muss mit WS oder SS beginnen und mit einer Jahreszahl enden, z.B. SS2017";
+			error = true;
+		} else if (!checkDate(startdatum)) {
+			errormessage = "Startdatum falsch eingegeben. Richtiges Format: dd.mm.yyyy, z.B. 01.01.2017";
+			error = true;
+		} else if (!checkDate(enddatum)) {
+			errormessage = "Enddatum falsch eingegeben. Richtiges Format: dd.mm.yyyy, z.B. 01.01.2017";
+			error = true;
+		}
+		if (error) {
+			event.preventDefault();
+			$('#errormessage').text(errormessage);
+		}
 	});
 
+	/**
+	 * checks correct Semesterkurzbezeichnung format with regex
+	 * @param semesterkurzbez
+	 * @returns {boolean} whether the Semesterkurzbezeichnung has correct format
+	 */
 	function checkSemesterkurzbez(semesterkurzbez) {
 		var pattern = /^(WS|SS)\d{4}$/;
 		return pattern.test(semesterkurzbez);
+	}
+
+	/**
+	 * checks date for right (german) format
+	 * @param date
+	 * @returns {boolean} whether the Semesterkurzbezeichnung has correct format
+	 */
+	function checkDate(date) {
+		var pattern = /^\d{2}.\d{2}.\d{4}$/;
+		return pattern.test(date);
 	}
 </script>
 </body>

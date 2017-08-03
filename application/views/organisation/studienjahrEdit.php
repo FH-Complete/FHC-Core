@@ -6,7 +6,7 @@ $this->load->view('templates/header', array('title' => 'StudienjahrEdit', 'jquer
 <div class="row">
 	<div class="row">
 		<div class="span4">
-			<h2>Studienjahr bearbeiten: <?php echo $jahr->bezeichnung; ?></h2>
+			<h2>Studienjahr bearbeiten: <?php echo $jahr->studienjahr_kurzbz; ?></h2>
 			<form method="post" action="<?php echo APP_ROOT."index.ci.php/organisation/studienjahr/saveStudienjahr" ?>">
 
 				<table>

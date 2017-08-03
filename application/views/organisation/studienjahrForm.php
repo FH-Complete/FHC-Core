@@ -1,5 +1,5 @@
 <?php
-$bezeichnung = (isset($jahr->bezeichnung))?$jahr->bezeichnung:(isset($studienjahrkurzbz)?"Studienjahr ".$studienjahrkurzbz:"");
+$bezeichnung = (isset($jahr->bezeichnung)) ? $jahr->bezeichnung : (isset($studienjahrkurzbz) ? "Studienjahr ".$studienjahrkurzbz : "");
 ?>
 
 <tr>
@@ -44,6 +44,6 @@ $bezeichnung = (isset($jahr->bezeichnung))?$jahr->bezeichnung:(isset($studienjah
 
 
 </table>
-<br />
+<br/>
 <div class="input_ok"><?php if (isset($_GET['saved']) && $_GET['saved']) echo 'Studienjahr wurde gespeichert.'; ?></div>
 <div class="input_error" id="errormessage"></div>
