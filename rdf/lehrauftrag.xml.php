@@ -91,7 +91,10 @@ $fb_arr = array();
 $fachbereich_obj = new fachbereich();
 $fachbereich_obj->getAll();
 foreach ($fachbereich_obj->result as $fb)
+{
+	$fb_arr[$fb->oe_kurzbz] = $fb->bezeichnung;
 	$fb_arr[$fb->fachbereich_kurzbz] = $fb->bezeichnung;
+}
 
 //Studiengangsleiter holen
 $stgl='';
