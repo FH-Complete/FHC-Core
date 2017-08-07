@@ -241,7 +241,7 @@ function draw_content($row)
 	global $zeile, $worksheet;
 	global $zgv_arr, $zgvmas_arr;
 	global $studiensemester_kurzbz;
-	global $udfTitlesPerson, $udfTitlesPrestudent;
+	global $udfTitlesPerson, $udfTitlesPrestudent, $udf;
 	$db = new basis_db();
 	
 	$prestudent = new prestudent();
@@ -558,11 +558,24 @@ function draw_content($row)
 		{
 			if (isset($udfPerson[$udfTitle['name']]))
 			{
-				if (mb_strlen($udfPerson[$udfTitle['name']]) > $maxlength[$i])
+				if (is_string($udfPerson[$udfTitle['name']]) || is_numeric($udfPerson[$udfTitle['name']]))
 				{
-					$maxlength[$i] = mb_strlen($udfPerson[$udfTitle['name']]);
+					if (mb_strlen($udfPerson[$udfTitle['name']]) > $maxlength[$i])
+					{
+						$maxlength[$i] = mb_strlen($udfPerson[$udfTitle['name']]);
+					}
+					$worksheet->write($zeile, $i, $udfPerson[$udfTitle['name']]);
 				}
-				$worksheet->write($zeile, $i, $udfPerson[$udfTitle['name']]);
+				else if(is_array($udfPerson[$udfTitle['name']]) && isset($udfTitle['enum']))
+				{
+					$toWrite = $udf->dropdownListValuesToString($udfPerson[$udfTitle['name']], $udfTitle['enum']);
+					
+					if (mb_strlen($toWrite) > $maxlength[$i])
+					{
+						$maxlength[$i] = mb_strlen($toWrite);
+					}
+					$worksheet->write($zeile, $i, $toWrite);
+				}
 			}
 			$i++;
 		}
@@ -577,11 +590,24 @@ function draw_content($row)
 		{
 			if (isset($udfPrestudent[$udfTitle['name']]))
 			{
-				if (mb_strlen($udfPrestudent[$udfTitle['name']]) > $maxlength[$i])
+				if (is_string($udfPrestudent[$udfTitle['name']]) || is_numeric($udfPrestudent[$udfTitle['name']]))
 				{
-					$maxlength[$i] = mb_strlen($udfPrestudent[$udfTitle['name']]);
+					if (mb_strlen($udfPrestudent[$udfTitle['name']]) > $maxlength[$i])
+					{
+						$maxlength[$i] = mb_strlen($udfPrestudent[$udfTitle['name']]);
+					}
+					$worksheet->write($zeile, $i, $udfPrestudent[$udfTitle['name']]);
 				}
-				$worksheet->write($zeile, $i, $udfPrestudent[$udfTitle['name']]);
+				else if(is_array($udfPrestudent[$udfTitle['name']]) && isset($udfTitle['enum']))
+				{
+					$toWrite = $udf->dropdownListValuesToString($udfPrestudent[$udfTitle['name']], $udfTitle['enum']);
+					
+					if (mb_strlen($toWrite) > $maxlength[$i])
+					{
+						$maxlength[$i] = mb_strlen($toWrite);
+					}
+					$worksheet->write($zeile, $i, $toWrite);
+				}
 			}
 			$i++;
 		}

@@ -173,6 +173,45 @@ class UDF extends basis_db
 	}
 	
 	/**
+	 * Concatenates a list of values of a dropdown element to a string
+	 */
+	public function dropdownListValuesToString($listValues, $enum)
+	{
+		$toWrite = '';
+		
+		foreach ($listValues as $value)
+		{
+			foreach ($enum as $element)
+			{
+				if (is_object($element))
+				{
+					if ($element->id == $value)
+					{
+						$toWrite .= $element->description;
+						break;
+					}
+				}
+				else if (is_array($element))
+				{
+					if ($element[0] == $value)
+					{
+						$toWrite .= $element[1];
+						break;
+					}
+				}
+				else if ($element == $value)
+				{
+					$toWrite .= $element;
+					break;
+				}
+			}
+			$toWrite .= ' ';
+		}
+		
+		return $toWrite;
+	}
+	
+	/**
 	 * Loads the UDF definitions related to the given schema and table
 	 */
 	private function _loadJsons($schema, $table)
@@ -243,7 +282,16 @@ class UDF extends basis_db
 				{
 					if (isset($udfJsonShema->name) && isset($udfJsonShema->title))
 					{
-						$names[] = array('name' => $udfJsonShema->name, 'title' => $udfJsonShema->title);
+						$tmpArray = array('name' => $udfJsonShema->name, 'title' => $udfJsonShema->title);
+						
+						if (isset($udfJsonShema->type)
+							&& ($udfJsonShema->type == 'dropdown' || $udfJsonShema->type == 'multipledropdown')
+							&& isset($udfJsonShema->listValues) && isset($udfJsonShema->listValues->enum))
+						{
+							$tmpArray['enum'] = $udfJsonShema->listValues->enum;
+						}
+						
+						$names[] = $tmpArray;
 					}
 				}
 			}

@@ -223,11 +223,24 @@ foreach ($mitarbeiterDAO->result as $mitarbeiter)
 		{
 			if (isset($udfPerson[$udfTitle['name']]))
 			{
-				if (mb_strlen($udfPerson[$udfTitle['name']]) > $maxlength[$col])
+				if (is_string($udfPerson[$udfTitle['name']]) || is_numeric($udfPerson[$udfTitle['name']]))
 				{
-					$maxlength[$col] = mb_strlen($udfPerson[$udfTitle['name']]);
+					if (mb_strlen($udfPerson[$udfTitle['name']]) > $maxlength[$col])
+					{
+						$maxlength[$col] = mb_strlen($udfPerson[$udfTitle['name']]);
+					}
+					$worksheet->write($zeile, $col, $udfPerson[$udfTitle['name']]);
 				}
-				$worksheet->write($zeile, $col, $udfPerson[$udfTitle['name']]);
+				else if(is_array($udfPerson[$udfTitle['name']]) && isset($udfTitle['enum']))
+				{
+					$toWrite = $udf->dropdownListValuesToString($udfPerson[$udfTitle['name']], $udfTitle['enum']);
+					
+					if (mb_strlen($toWrite) > $maxlength[$col])
+					{
+						$maxlength[$col] = mb_strlen($toWrite);
+					}
+					$worksheet->write($zeile, $col, $toWrite);
+				}
 			}
 			$col++;
 		}
