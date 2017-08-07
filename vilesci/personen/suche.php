@@ -212,13 +212,13 @@ if($searchstr!='')
 			FROM
 				public.tbl_person
 				LEFT JOIN public.tbl_benutzer USING(person_id)";
-	
+
 			if ($filter=='mitarbeiter')
 				$qry .= " JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid) ";
 			elseif ($filter=='student')
 				$qry .= " JOIN public.tbl_prestudent USING (person_id) ";
-						
-			$qry .= " WHERE true 
+
+			$qry .= " WHERE true
 			AND 	nachname ~* '".$db->db_escape($searchstr)."' OR
 					vorname ~* '".$db->db_escape($searchstr)."' OR
 					(nachname || ' ' || vorname) ~* '".$db->db_escape($searchstr)."' OR
@@ -660,19 +660,6 @@ function casDeleteMitarbeiter($db, $mitarbeiter_uid, $trans=true)
 	if(!$error)
 	{
 		$qry = '
-			DELETE FROM lehre.tbl_moodle
-				WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
-					WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung
-						WHERE koordinator='.$db->db_add_param($mitarbeiter_uid).'))';
-		if(!$db->db_query($qry))
-		{
-			$error = true;
-		}
-	}
-
-	if(!$error)
-	{
-		$qry = '
 			DELETE FROM public.tbl_preincoming_lehrveranstaltung
 				WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung
 						WHERE koordinator='.$db->db_add_param($mitarbeiter_uid).')';
@@ -710,18 +697,6 @@ function casDeleteMitarbeiter($db, $mitarbeiter_uid, $trans=true)
 	{
 		$qry = '
 			DELETE FROM campus.tbl_feedback
-				WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung
-						WHERE koordinator='.$db->db_add_param($mitarbeiter_uid).')';
-		if(!$db->db_query($qry))
-		{
-			$error = true;
-		}
-	}
-
-	if(!$error)
-	{
-		$qry = '
-			DELETE FROM lehre.tbl_moodle
 				WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung
 						WHERE koordinator='.$db->db_add_param($mitarbeiter_uid).')';
 		if(!$db->db_query($qry))

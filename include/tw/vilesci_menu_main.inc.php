@@ -73,15 +73,6 @@ $menu=array
 		'Studienordnung'=>array('name'=>'Studienordnung', 'link'=>'lehre/studienordnung.php', 'target'=>'_blank','permissions'=>array('lehre/studienordnung')),
 		'StudienplanGueltigkeit'=>array('name'=>'Studienplan Gültigkeit', 'link'=>'lehre/studienplan_gueltigkeit.php', 'target'=>'main','permissions'=>array('lehre/studienordnung')),
 
-		'Moodle'=>array
-		(
-			'name'=>'Moodle', 'permissions'=>array('basis/moodle'),
-			'Account'=>array('name'=>'Accountverwaltung', 'link'=>'moodle/account_verwaltung24.php', 'target'=>'main'),
-			'Kursverwaltung'=>array('name'=>'Kurs entfernen', 'link'=>'moodle/kurs_verwaltung24.php', 'target'=>'main'),
-			'Rollenzuteilung'=>array('name'=>'Rollenzuteilung', 'link'=>'moodle/rollenzuteilung24.php', 'target'=>'main'),
-			'UserSync'=>array('name'=>'User Sync', 'link'=>'moodle/user_sync24.php', 'target'=>'main'),
-			'UserMassCreate'=>array('name'=>'User Massenanlage', 'link'=>'moodle/account_masscreate24.php', 'target'=>'main'),
-		),
 		'Freifach'=>array
 		(
 			'name'=>'Freifach', 'permissions'=>array('lehre/freifach'),
@@ -168,6 +159,8 @@ $menu=array
 		'Service'=>array('name'=>'Service', 'link'=>'stammdaten/service_frameset.html', 'target'=>'main','permissions'=>array('basis/service')),
 		'Dokumentvorlagen'=>array('name'=>'Dokumentvorlagen', 'link'=>'stammdaten/dokumentvorlagen_verwaltung.php', 'target'=>'main','permissions'=>array('basis/dokumente')),
 		'GSProgramm'=>array('name'=>'GSProgramm', 'link'=>'stammdaten/gsprogramm.php', 'target'=>'main','permissions'=>array('inout/uebersicht')),
+		'Studiensemester'=>array('name'=>'Studiensemester', 'link'=>'../index.ci.php/organisation/studiensemester/listStudiensemester', 'target'=>'main','permissions'=>array('admin')),
+		'Studienjahr'=>array('name'=>'Studienjahr', 'link'=>'../index.ci.php/organisation/studienjahr/listStudienjahr', 'target'=>'main','permissions'=>array('admin')),
 		'FH Ausweis'=>array
 		(
 			'name'=>'FH Ausweis','permissions'=>array('basis/fhausweis'),
@@ -231,13 +224,7 @@ $menu=array
 		'Cronjobs'=>array('name'=>'Cronjobs', 'link'=>'stammdaten/cronjobverwaltung.php', 'target'=>'main','permissions'=>array('basis/cronjob')),
 		'Vorlagen'=>array('name'=>'Vorlagen', 'link'=>'../index.ci.php/system/Vorlage', 'target'=>'main','permissions'=>array('basis/cronjob')),
 		'Phrasen'=>array('name'=>'Phrasen', 'link'=>'../index.ci.php/system/Phrases', 'target'=>'main','permissions'=>array('basis/cronjob'))
-	),
-	'SD-Tools'=>	array
-	(
-		'name'=>'SD-Tools', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('sdTools'), 'image'=>'vilesci_sdtools.png',
-		'link'=>'https://sdtools.technikum-wien.at', 'target'=>'_blank',
 	)
-
 );
 
 require_once(dirname(__FILE__).'/../statistik.class.php');
@@ -261,6 +248,8 @@ if($addon_obj->loadAddons())
 		foreach($addon_obj->result as $row)
 		{
 			$menu['Addons'][$row->kurzbz]=array('name'=>$row->addon_name, 'link'=>'../addons/'.$row->kurzbz.'/vilesci/index.php', 'target'=>'main');
+			if(file_exists('../addons/'.$row->kurzbz.'/vilesci/menu.inc.php'))
+				include('../addons/'.$row->kurzbz.'/vilesci/menu.inc.php');
 		}
 	}
 }

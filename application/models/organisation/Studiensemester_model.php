@@ -10,6 +10,7 @@ class Studiensemester_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'public.tbl_studiensemester';
 		$this->pk = 'studiensemester_kurzbz';
+		$this->hasSequence = false;
 	}
 	
 	public function getLastOrAktSemester($days = 60)

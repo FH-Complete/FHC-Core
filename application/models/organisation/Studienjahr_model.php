@@ -10,5 +10,6 @@ class Studienjahr_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'public.tbl_studienjahr';
 		$this->pk = 'studienjahr_kurzbz';
+		$this->hasSequence = false;
 	}
 }

@@ -89,20 +89,20 @@ if (isset($_REQUEST['compare']))
 				'lehrveranstaltungen' => null,
 				'errormsg' => null
 		);
-		
+
 		$lv1 = new lehrveranstaltung();
 		$lv1->load($courseLeft);
 		$lv1_arr = get_object_vars($lv1);
 		$lv1_arr = array_diff_key($lv1_arr, $deleteValues);
-		
+
 		$lv2 = new lehrveranstaltung();
 		$lv2->load($courseRight);
 		$lv2_arr = get_object_vars($lv2);
-		$lv2_arr = array_diff_key($lv2_arr, $deleteValues);		
-		
+		$lv2_arr = array_diff_key($lv2_arr, $deleteValues);
+
 		$lv_diff1 = array_diff_assoc($lv1_arr, $lv2_arr);
 		$lv_diff2 = array_diff_assoc($lv2_arr, $lv1_arr);
-		
+
 		$msg = '<span style="font-size: small"><b>Differences in courses (only columns with differences are shown)</b></span>';
 		$msg .= '<table id="t3" class="tablesorter"><thead><tr>';
 		foreach ($lv_diff1 as $key => $value)
@@ -131,7 +131,7 @@ if (isset($_REQUEST['compare']))
 		}
 		$msg .= '</tr></tbody></table>';
 	}
-	else 
+	else
 		$msg="Please select 2 different courses";
 }
 
@@ -145,7 +145,7 @@ if((isset($_REQUEST['transfer']) || isset($_REQUEST['mergeDelete'])) && isset($c
 	{
 		if(!$rechte->isBerechtigt('lehre/lehrveranstaltung', NULL, 'sui'))
 			die($rechte->errormsg);
-		
+
 		$msg='';
 		$update_qry="BEGIN;";
 
@@ -156,7 +156,7 @@ if((isset($_REQUEST['transfer']) || isset($_REQUEST['mergeDelete'])) && isset($c
 			// Updates for Pruefungsverwaltung
 			$update_qry.="UPDATE campus.tbl_lehrveranstaltung_pruefung SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER)." AND pruefung_id IN (SELECT pruefung_id FROM campus.tbl_pruefung WHERE studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz).");";
 			$update_qry.="UPDATE campus.tbl_pruefungsanmeldung SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER)." AND pruefungstermin_id IN (SELECT pruefungstermin_id FROM campus.tbl_pruefungstermin JOIN campus.tbl_pruefung USING (pruefung_id) WHERE studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz).");";
-			
+
 			// LV-Infos will be copied if $courseRight has none and $courseLeft has some
 			$lvinfo_qry_right = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER).";";
 			$result_right = $db->db_query($lvinfo_qry_right);
@@ -170,9 +170,9 @@ if((isset($_REQUEST['transfer']) || isset($_REQUEST['mergeDelete'])) && isset($c
 					while($row = $db->db_fetch_object($result_left))
 					{
 						$update_qry.="	INSERT INTO campus.tbl_lvinfo (lehrveranstaltung_id, sprache, titel, lehrziele, lehrinhalte, methodik, voraussetzungen, unterlagen, pruefungsordnung, anmerkung, kurzbeschreibung, genehmigt, aktiv, updateamum, updatevon, insertamum, insertvon, anwesenheit)
-										SELECT ".$db->db_add_param($courseRight, FHC_INTEGER).", ".$db->db_add_param($row->sprache).", titel, lehrziele, lehrinhalte, methodik, voraussetzungen, unterlagen, pruefungsordnung, anmerkung, kurzbeschreibung, genehmigt, aktiv, NULL, NULL, now(), ".$db->db_add_param($uid).", anwesenheit 
-											FROM campus.tbl_lvinfo 
-											WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER)." 
+										SELECT ".$db->db_add_param($courseRight, FHC_INTEGER).", ".$db->db_add_param($row->sprache).", titel, lehrziele, lehrinhalte, methodik, voraussetzungen, unterlagen, pruefungsordnung, anmerkung, kurzbeschreibung, genehmigt, aktiv, NULL, NULL, now(), ".$db->db_add_param($uid).", anwesenheit
+											FROM campus.tbl_lvinfo
+											WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER)."
 											AND sprache=".$db->db_add_param($row->sprache).";";
 					}
 				}
@@ -182,7 +182,6 @@ if((isset($_REQUEST['transfer']) || isset($_REQUEST['mergeDelete'])) && isset($c
 			// If lerhfach_id was the same as the old lehrveranstaltung_id, it will be changed to
 			$update_qry.="UPDATE lehre.tbl_lehreinheit SET lehrfach_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrfach_id=".$db->db_add_param($courseLeft, FHC_INTEGER)." AND lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz).";";
 			$update_qry.="UPDATE lehre.tbl_zeugnisnote SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER)." AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz).";";
-			$update_qry.="UPDATE lehre.tbl_moodle SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER)." AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz).";";
 			$update_qry.="UPDATE lehre.tbl_lvangebot SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER)." AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz).";";
 			// Notenschluesselzuordnung will be copied if $courseRight has none and $courseLeft has some
 			$notenschluessel_qry_right = "SELECT * FROM lehre.tbl_notenschluesselzuordnung WHERE lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER).";";
@@ -198,7 +197,7 @@ if((isset($_REQUEST['transfer']) || isset($_REQUEST['mergeDelete'])) && isset($c
 					{
 						$update_qry.="	INSERT INTO lehre.tbl_notenschluesselzuordnung (notenschluessel_kurzbz, lehrveranstaltung_id, studienplan_id, oe_kurzbz, studiensemester_kurzbz)
 										SELECT notenschluessel_kurzbz, ".$db->db_add_param($courseRight, FHC_INTEGER).", studienplan_id, oe_kurzbz, studiensemester_kurzbz
-											FROM lehre.tbl_notenschluesselzuordnung 
+											FROM lehre.tbl_notenschluesselzuordnung
 											WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
 					}
 				}
@@ -206,19 +205,26 @@ if((isset($_REQUEST['transfer']) || isset($_REQUEST['mergeDelete'])) && isset($c
 			$update_qry.="/*<hr>*/";
 			$update_qry.="UPDATE public.tbl_preincoming_lehrveranstaltung SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
 			$update_qry.="/*<hr>Addons<br>*/";
-			
+
 			//addon lvevaluierung
 			if (in_array('lvevaluierung', $activeAddons))
 			{
 				$update_qry.="UPDATE addon.tbl_lvevaluierung SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER)." AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz).";";
 			}
-			//addon lvevaluierung
+
+			//addon moodle
+			if (in_array('moodle', $activeAddons))
+			{
+				$update_qry.="UPDATE addon.tbl_moodle SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER)." AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz).";";
+			}
+
+			//addon lvinfo
 			if (in_array('lvinfo', $activeAddons))
 			{
 				$update_qry.="UPDATE addon.tbl_lvinfo SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER)." AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz).";";
 			}
 		}
-		
+
 		if (isset($_REQUEST['mergeDelete']))
 		{
 			if(!$rechte->isBerechtigt('lehre/lehrveranstaltung', NULL, 'suid'))
@@ -240,7 +246,6 @@ if((isset($_REQUEST['transfer']) || isset($_REQUEST['mergeDelete'])) && isset($c
 			$update_qry.="UPDATE lehre.tbl_lvangebot SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
 			$update_qry.="UPDATE lehre.tbl_lvregel SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
 			$update_qry.="UPDATE lehre.tbl_lvregel SET studienplan_lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE studienplan_lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
-			$update_qry.="UPDATE lehre.tbl_moodle SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
 			$update_qry.="UPDATE lehre.tbl_notenschluesselzuordnung SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
 			$update_qry.="UPDATE lehre.tbl_studienplan_lehrveranstaltung SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
 			$update_qry.="UPDATE lehre.tbl_studienplan_lehrveranstaltung SET studienplan_lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE studienplan_lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
@@ -255,7 +260,14 @@ if((isset($_REQUEST['transfer']) || isset($_REQUEST['mergeDelete'])) && isset($c
 			{
 				$update_qry.="UPDATE addon.tbl_lvevaluierung SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
 			}
-			//addon lvevaluierung
+
+			//addon moodle
+			if (in_array('moodle', $activeAddons))
+			{
+				$update_qry.="UPDATE addon.tbl_moodle SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
+			}
+
+			//addon lvinfo
 			if (in_array('lvinfo', $activeAddons))
 			{
 				$update_qry.="UPDATE addon.tbl_lvinfo SET lehrveranstaltung_id=".$db->db_add_param($courseRight, FHC_INTEGER)." WHERE lehrveranstaltung_id=".$db->db_add_param($courseLeft, FHC_INTEGER).";";
@@ -267,7 +279,7 @@ if((isset($_REQUEST['transfer']) || isset($_REQUEST['mergeDelete'])) && isset($c
 
 		//$msg = "Merged successfully<br>";
 		//$msg .= "<br>".mb_eregi_replace(';',';<br>',$update_qry);
-		
+
 		if($db->db_query($update_qry))
 		{
 			$msg = "<span style='color: green'><b>Merged successfully</b></span><br>";
@@ -276,10 +288,10 @@ if((isset($_REQUEST['transfer']) || isset($_REQUEST['mergeDelete'])) && isset($c
 			$msg_qry = str_replace('*/', '', $msg_qry);
 			$msg .= "<br>".$msg_qry;
 			$db->db_query("COMMIT;");
-			
+
 			//Log schreiben
 			$log = new log();
-				
+
 			$log->new = true;
 			$log->sql = $update_qry;
 			$log->sqlundo = 'No undo statement implemented yet';
@@ -289,7 +301,7 @@ if((isset($_REQUEST['transfer']) || isset($_REQUEST['mergeDelete'])) && isset($c
 				$log->beschreibung = "lv_merge.php: Merge of course $courseLeft to $courseRight";
 			elseif (isset($_REQUEST['mergeDelete']))
 				$log->beschreibung = "lv_merge.php: Deletion of course $courseLeft. Merged with $courseRight";
-			
+
 			if(!$log->save())
 			{
 				$msg .= "<span style='color: red'><b>Error while writing log-file</b></span><br>";
@@ -408,11 +420,11 @@ foreach ($studiengang->result as $stg)
 			echo '</optgroup>';
 		echo '<optgroup label="'.$stg->typ.'">';
 	}
-	
+
 	echo '<option value="'.$stg->studiengang_kz.'" '.($stg->studiengang_kz==$select_stg_kz_left?'selected':'').'>'.$db->convert_html_chars($stg->kurzbzlang.' - '.$stg->bezeichnung).'</option>';
 	$maxsemester[$stg->studiengang_kz] = $stg->max_semester;
 	$typ = $stg->typ;
-}	
+}
 echo '</select><br>or ';
 
 // Input text or ID
@@ -444,7 +456,7 @@ if ($select_stg_kz_left!='')
 	$stp_arr = array();
 	foreach ($orgform->result as $of)
 		$of_arr[$of->orgform_kurzbz] = $of->bezeichnung;
-	
+
 	$studienplan = new studienplan();
 	$studienplan->getStudienplaene($select_stg_kz_left);
 	foreach ($studienplan->result as $plan)
@@ -455,7 +467,7 @@ if ($select_stg_kz_left!='')
 				$selected = 'selected';
 			else
 				$selected = '';
-			
+
 			echo '<option value="'.$plan->orgform_kurzbz.'" '.$selected.'>'.$plan->orgform_kurzbz.' - '.$of_arr[$plan->orgform_kurzbz].'</option>';
 			$stp_arr[] = $plan->orgform_kurzbz;
 		}
@@ -476,7 +488,7 @@ if ($select_stg_kz_left!='')
 			$selected = 'selected';
 		else
 			$selected = '';
-		
+
 		if ($select_orgform_left=='' || $select_orgform_left==$plan->orgform_kurzbz)
 			echo '<option value="'.$plan->studienplan_id.'" '.$selected.'>'.$plan->bezeichnung.'</option>';
 	}
@@ -489,7 +501,7 @@ echo '<option value="" '.($select_lehrtyp_left==''?'selected':'').'>--All--</opt
 $lehrtyp = new lehrtyp();
 $lehrtyp->getAll();
 foreach ($lehrtyp->result as $lt)
-{							
+{
 	echo '<option value="'.$lt->lehrtyp_kurzbz.'" '.($select_lehrtyp_left==$lt->lehrtyp_kurzbz?'selected':'').'>'.$lt->bezeichnung.'</option>';
 }
 echo '</select><br>';
@@ -523,11 +535,11 @@ foreach ($studiengang->result as $stg)
 			echo '</optgroup>';
 		echo '<optgroup label="'.$stg->typ.'">';
 	}
-	
+
 	echo '<option value="'.$stg->studiengang_kz.'" '.($stg->studiengang_kz==$select_stg_kz_right?'selected':'').'>'.$db->convert_html_chars($stg->kurzbzlang.' - '.$stg->bezeichnung).'</option>';
 	$maxsemester[$stg->studiengang_kz] = $stg->max_semester;
 	$typ = $stg->typ;
-}	
+}
 echo '</select><br>or ';
 
 // Input text or ID
@@ -559,7 +571,7 @@ if ($select_stg_kz_right!='')
 	$stp_arr = array();
 	foreach ($orgform->result as $of)
 		$of_arr[$of->orgform_kurzbz] = $of->bezeichnung;
-	
+
 	$studienplan = new studienplan();
 	$studienplan->getStudienplaene($select_stg_kz_right);
 	foreach ($studienplan->result as $plan)
@@ -570,7 +582,7 @@ if ($select_stg_kz_right!='')
 				$selected = 'selected';
 			else
 				$selected = '';
-			
+
 			echo '<option value="'.$plan->orgform_kurzbz.'" '.$selected.'>'.$plan->orgform_kurzbz.' - '.$of_arr[$plan->orgform_kurzbz].'</option>';
 			$stp_arr[] = $plan->orgform_kurzbz;
 		}
@@ -602,7 +614,7 @@ echo '</select><br>';
 echo ' Type <select name="select_lehrtyp_right" id="select_lehrtyp_right" '.($select_stg_kz_right==''?'disabled="disabled"':'').'>';
 echo '<option value="" '.($select_lehrtyp_right==''?'selected':'').'>--All--</option>';
 foreach ($lehrtyp->result as $lt)
-{							
+{
 	echo '<option value="'.$lt->lehrtyp_kurzbz.'" '.($select_lehrtyp_right==$lt->lehrtyp_kurzbz?'selected':'').'>'.$lt->bezeichnung.'</option>';
 }
 echo '</select><br>';
@@ -642,7 +654,7 @@ echo '<input type="hidden" name="select_studienplan_right" value="'.$select_stud
 if($rechte->isBerechtigt('lehre/lehrveranstaltung', NULL, 'sui'))
 {
 	echo '	<input type="submit" name="transfer" value="Transfer for" style="margin: 3px 0 3px 0; background-color: #faebcc; color: #8a6d3b;" onclick="return confirm(\'Are you sure you want to transfer the these courses?\')">';
-	
+
 	echo '	<select name="studiensemester_kurzbz" id="studiensemester_kurzbz">';
 	$studiensemester = new studiensemester();
 	$studiensemester->getAll();
@@ -699,7 +711,7 @@ if ((is_numeric($input_text_left) || ($input_text_left!='' && strlen($input_text
 	{
 		if ($select_studienplan_left!='')
 			$qry_left .= " JOIN lehre.tbl_studienplan_lehrveranstaltung USING (lehrveranstaltung_id)";
-		
+
 		$qry_left .= " WHERE 1=1";
 		if ($select_stg_kz_left!='')
 			$qry_left .= " AND studiengang_kz=".$db->db_add_param($select_stg_kz_left);
@@ -784,7 +796,7 @@ if ((is_numeric($input_text_right) || ($input_text_right!='' && strlen($input_te
 	{
 		if ($select_studienplan_right!='')
 			$qry_right .= " JOIN lehre.tbl_studienplan_lehrveranstaltung USING (lehrveranstaltung_id)";
-		
+
 		$qry_right .= " WHERE 1=1";
 		if ($select_stg_kz_right!='')
 			$qry_right .= " AND studiengang_kz=".$db->db_add_param($select_stg_kz_right);

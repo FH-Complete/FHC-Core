@@ -160,7 +160,7 @@ if (isset($_GET['output']) && $_GET['output']!='pdf')
 	else
 		$output = $_GET['output'];
 }
-else 
+else
 	$output = 'pdf';
 
 
@@ -248,7 +248,8 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 		$buffer = $proc->transformToXml($xml_doc);
 		//echo $buffer;
 		//exit;
-		$tempfolder = '/tmp/'.uniqid();
+		$tmp = sys_get_temp_dir();
+		$tempfolder = $tmp.'/FHC'.uniqid();
 		mkdir($tempfolder);
 		chdir($tempfolder);
 		file_put_contents('content.xml', $buffer);
@@ -388,8 +389,8 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 	    fclose($handle);
 
 	    unlink('content.xml');
-	    if(isset($_GET['style_xsl']))
-		    unlink('styles.xml');
+		if(file_exists('styles.xml'))
+			unlink('styles.xml');
 	    unlink($tempname_zip);
 	    if($output=='pdf' || $output=='doc')
 	    	unlink($tempPdfName);

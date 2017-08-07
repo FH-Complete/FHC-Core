@@ -4,59 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "adbc1b15e2cdf73d1f0db3727e919dc5",
-    "content-hash": "97bc2bdf8f101931b1f6eac635401324",
+    "content-hash": "eb5f2edc278196fd77c4de1f2e201dc0",
     "packages": [
-        {
-            "name": "blueimp/jquery-file-upload",
-            "version": "v9.14.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vkhramtsov/jQuery-File-Upload.git",
-                "reference": "71d67a9c277e29efcf5935cd2409009c0f841a57"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/vkhramtsov/jQuery-File-Upload/zipball/71d67a9c277e29efcf5935cd2409009c0f841a57",
-                "reference": "71d67a9c277e29efcf5935cd2409009c0f841a57",
-                "shasum": ""
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Sebastian Tschan",
-                    "homepage": "https://blueimp.net"
-                }
-            ],
-            "description": "File Upload widget for jQuery.",
-            "homepage": "https://github.com/blueimp/jQuery-File-Upload",
-            "keywords": [
-                "bootstrap",
-                "chunk",
-                "cross-domain",
-                "cross-site",
-                "drag",
-                "drop",
-                "file",
-                "gae",
-                "go",
-                "jquery",
-                "multiple",
-                "php",
-                "preview",
-                "progress",
-                "python",
-                "resume",
-                "selection",
-                "upload",
-                "widget"
-            ],
-            "time": "2016-11-21 05:38:19"
-        },
         {
             "name": "codeigniter-restserver",
             "version": "2.6",
@@ -98,7 +47,7 @@
             ],
             "description": "The CodeIgniter framework",
             "homepage": "https://codeigniter.com",
-            "time": "2016-10-28 15:13:14"
+            "time": "2016-10-28T15:13:14+00:00"
         },
         {
             "name": "components/angular.js",
@@ -402,7 +351,7 @@
             ],
             "description": "Shim repository for Angular.js",
             "homepage": "http://angularjs.org",
-            "time": "2015-06-07 20:10:38"
+            "time": "2015-06-07T20:10:38+00:00"
         },
         {
             "name": "components/bootstrap",
@@ -470,42 +419,7 @@
                 "responsive",
                 "web"
             ],
-            "time": "2015-06-17 06:08:09"
-        },
-        {
-            "name": "components/font-awesome",
-            "version": "4.7.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/components/font-awesome.git",
-                "reference": "885308b939369d147bec93174722786bc2c4eedd"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/components/font-awesome/zipball/885308b939369d147bec93174722786bc2c4eedd",
-                "reference": "885308b939369d147bec93174722786bc2c4eedd",
-                "shasum": ""
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "styles": [
-                        "css/font-awesome.css"
-                    ],
-                    "files": [
-                        "css/font-awesome.min.css",
-                        "css/font-awesome.css.map",
-                        "fonts/*"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT",
-                "OFL-1.1"
-            ],
-            "description": "The iconic font designed for use with Twitter Bootstrap.",
-            "time": "2016-10-25 10:56:23"
+            "time": "2015-06-17T06:08:09+00:00"
         },
         {
             "name": "components/jquery",
@@ -547,7 +461,7 @@
             ],
             "description": "jQuery JavaScript Library",
             "homepage": "http://jquery.com",
-            "time": "2015-05-08 05:04:47"
+            "time": "2015-05-08T05:04:47+00:00"
         },
         {
             "name": "components/jqueryui",
@@ -632,61 +546,7 @@
                 }
             ],
             "description": "jQuery UI is a curated set of user interface interactions, effects, widgets, and themes built on top of the jQuery JavaScript Library. Whether you're building highly interactive web applications or you just need to add a date picker to a form control, jQuery UI is the perfect choice.",
-            "time": "2016-09-16 05:47:55"
-        },
-        {
-            "name": "compwright/codeigniter-installers",
-            "version": "1.1.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/compwright/codeigniter-installers.git",
-                "reference": "adbbd5ae2cbf5a24a39931235b1ac7dab56abb4f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/compwright/codeigniter-installers/zipball/adbbd5ae2cbf5a24a39931235b1ac7dab56abb4f",
-                "reference": "adbbd5ae2cbf5a24a39931235b1ac7dab56abb4f",
-                "shasum": ""
-            },
-            "require-dev": {
-                "composer/composer": "1.0.*@dev"
-            },
-            "type": "composer-installer",
-            "extra": {
-                "class": "Composer\\Installer\\CodeigniterInstaller"
-            },
-            "autoload": {
-                "psr-0": {
-                    "Composer\\Installer": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jonathon Hill",
-                    "email": "jhill9693@gmail.com",
-                    "homepage": "http://jonathonhill.net",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Composer installers for CodeIgniter",
-            "homepage": "https://github.com/compwright/codeigniter-installers",
-            "keywords": [
-                "MX",
-                "codeigniter",
-                "composer",
-                "core",
-                "hmvc",
-                "installer",
-                "library",
-                "module",
-                "spark",
-                "sparks"
-            ],
-            "time": "2012-11-12 16:11:38"
+            "time": "2016-09-16T05:47:55+00:00"
         },
         {
             "name": "easyrdf/easyrdf",
@@ -748,7 +608,7 @@
                 "rdfa",
                 "sparql"
             ],
-            "time": "2015-02-27 09:45:49"
+            "time": "2015-02-27T09:45:49+00:00"
         },
         {
             "name": "fzaninotto/faker",
@@ -796,7 +656,7 @@
                 "faker",
                 "fixtures"
             ],
-            "time": "2016-04-29 12:21:54"
+            "time": "2016-04-29T12:21:54+00:00"
         },
         {
             "name": "json-forms",
@@ -884,7 +744,7 @@
                 "json",
                 "schema"
             ],
-            "time": "2014-08-25 02:48:14"
+            "time": "2014-08-25T02:48:14+00:00"
         },
         {
             "name": "kevinlebrun/colors.php",
@@ -935,7 +795,7 @@
                 "console",
                 "shell"
             ],
-            "time": "2016-04-12 20:58:34"
+            "time": "2016-04-12T20:58:34+00:00"
         },
         {
             "name": "kingsquare/json-schema-form",
@@ -969,7 +829,7 @@
                 }
             ],
             "description": "A framework-agnostic PHP Implementation for generating simple forms based on json-schema",
-            "time": "2014-07-10 12:27:19"
+            "time": "2014-07-10T12:27:19+00:00"
         },
         {
             "name": "michelf/php-markdown",
@@ -1020,7 +880,7 @@
             "keywords": [
                 "markdown"
             ],
-            "time": "2015-03-01 12:03:08"
+            "time": "2015-03-01T12:03:08+00:00"
         },
         {
             "name": "ml/iri",
@@ -1067,7 +927,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2014-01-21 13:43:39"
+            "time": "2014-01-21T13:43:39+00:00"
         },
         {
             "name": "ml/json-ld",
@@ -1116,7 +976,7 @@
                 "JSON-LD",
                 "jsonld"
             ],
-            "time": "2016-10-10 08:57:56"
+            "time": "2016-10-10T08:57:56+00:00"
         },
         {
             "name": "netcarver/textile",
@@ -1169,7 +1029,7 @@
                 "plaintext",
                 "textile"
             ],
-            "time": "2016-11-17 14:18:12"
+            "time": "2016-11-17T14:18:12+00:00"
         },
         {
             "name": "psr/log",
@@ -1216,7 +1076,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10 12:19:37"
+            "time": "2016-10-10T12:19:37+00:00"
         },
         {
             "name": "rdlowrey/auryn",
@@ -1277,64 +1137,7 @@
                 "dic",
                 "ioc"
             ],
-            "time": "2016-03-14 20:10:19"
-        },
-        {
-            "name": "rogeriopradoj/codeigniter-curl",
-            "version": "1.2.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/rogeriopradoj/codeigniter-curl.git",
-                "reference": "eb954890e242a5e80812006e60b07f1ce29b7e7a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rogeriopradoj/codeigniter-curl/zipball/eb954890e242a5e80812006e60b07f1ce29b7e7a",
-                "reference": "eb954890e242a5e80812006e60b07f1ce29b7e7a",
-                "shasum": ""
-            },
-            "require": {
-                "compwright/codeigniter-installers": "*"
-            },
-            "type": "codeigniter-spark",
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
-                    "name": "Rogerio Prado de Jesus",
-                    "email": "rogeriopradoj@gmail.com"
-                }
-            ],
-            "description": "codeigniter-curl philsturgeon's library via composer",
-            "time": "2013-05-27 21:19:21"
-        },
-        {
-            "name": "rogeriopradoj/codeigniter-restclient",
-            "version": "2.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/rogeriopradoj/codeigniter-restclient.git",
-                "reference": "64991a0105c3cd891a64e1d35e497270ca2b0d78"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rogeriopradoj/codeigniter-restclient/zipball/64991a0105c3cd891a64e1d35e497270ca2b0d78",
-                "reference": "64991a0105c3cd891a64e1d35e497270ca2b0d78",
-                "shasum": ""
-            },
-            "require": {
-                "compwright/codeigniter-installers": "*",
-                "rogeriopradoj/codeigniter-curl": "*"
-            },
-            "type": "codeigniter-spark",
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
-                    "name": "Rogerio Prado de Jesus",
-                    "email": "rogeriopradoj@gmail.com"
-                }
-            ],
-            "description": "codeigniter-restclient philsturgeon's library via composer",
-            "time": "2013-05-27 21:23:54"
+            "time": "2016-03-14T20:10:19+00:00"
         },
         {
             "name": "rougin/blueprint",
@@ -1385,7 +1188,7 @@
                 "php",
                 "template"
             ],
-            "time": "2016-02-01 16:31:13"
+            "time": "2016-02-01T16:31:13+00:00"
         },
         {
             "name": "rougin/combustor",
@@ -1450,7 +1253,7 @@
                 "generator",
                 "php"
             ],
-            "time": "2016-02-14 10:36:58"
+            "time": "2016-02-14T10:36:58+00:00"
         },
         {
             "name": "rougin/describe",
@@ -1503,7 +1306,7 @@
                 "describe",
                 "php"
             ],
-            "time": "2016-03-24 18:17:47"
+            "time": "2016-03-24T18:17:47+00:00"
         },
         {
             "name": "rougin/refinery",
@@ -1568,7 +1371,7 @@
                 "php",
                 "refinery"
             ],
-            "time": "2016-03-04 16:55:32"
+            "time": "2016-03-04T16:55:32+00:00"
         },
         {
             "name": "rougin/spark-plug",
@@ -1627,7 +1430,7 @@
                 "php",
                 "spark-plug"
             ],
-            "time": "2015-10-23 08:27:10"
+            "time": "2015-10-23T08:27:10+00:00"
         },
         {
             "name": "symfony/console",
@@ -1688,7 +1491,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2016-11-15 23:02:12"
+            "time": "2016-11-15T23:02:12+00:00"
         },
         {
             "name": "symfony/debug",
@@ -1745,7 +1548,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2016-07-30 07:22:48"
+            "time": "2016-07-30T07:22:48+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -1804,7 +1607,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-11-14 01:06:16"
+            "time": "2016-11-14T01:06:16+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -1853,7 +1656,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2016-11-14 16:15:57"
+            "time": "2016-11-14T16:15:57+00:00"
         },
         {
             "name": "tinymce/tinymce",
@@ -1899,7 +1702,7 @@
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2016-11-23 13:00:08"
+            "time": "2016-11-23T13:00:08+00:00"
         },
         {
             "name": "twig/twig",
@@ -1960,7 +1763,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2016-11-23 18:41:40"
+            "time": "2016-11-23T18:41:40+00:00"
         },
         {
             "name": "wikimedia/composer-merge-plugin",
@@ -2009,7 +1812,7 @@
                 }
             ],
             "description": "Composer plugin to merge multiple composer.json files",
-            "time": "2016-03-08 17:11:37"
+            "time": "2016-03-08T17:11:37+00:00"
         },
         {
             "name": "zetacomponents/base",
@@ -2072,7 +1875,7 @@
             ],
             "description": "The Base package provides the basic infrastructure that all packages rely on. Therefore every component relies on this package.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2014-09-19 03:28:34"
+            "time": "2014-09-19T03:28:34+00:00"
         },
         {
             "name": "zetacomponents/database",
@@ -2147,7 +1950,7 @@
             ],
             "description": "A lightweight database layer on top of PHP's PDO that allows you to utilize a database without having to take care of differences in SQL dialects.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2014-09-27 19:26:09"
+            "time": "2014-09-27T19:26:09+00:00"
         },
         {
             "name": "zetacomponents/document",
@@ -2198,7 +2001,7 @@
             ],
             "description": "The Document components provides a general conversion framework for different semantic document markup languages like XHTML, Docbook, RST and similar.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2013-12-19 11:40:00"
+            "time": "2013-12-19T11:40:00+00:00"
         },
         {
             "name": "zetacomponents/workflow",
@@ -2264,7 +2067,7 @@
             ],
             "description": "The purpose of the Workflow component is to provide the core functionality of an activity-based workflow system including the definition and execution of workflow specifications.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2014-09-27 19:26:10"
+            "time": "2014-09-27T19:26:10+00:00"
         },
         {
             "name": "zetacomponents/workflow-database-tiein",
@@ -2331,7 +2134,7 @@
             ],
             "description": "Contains the database backend for the Workflow component.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2014-09-27 19:26:10"
+            "time": "2014-09-27T19:26:10+00:00"
         },
         {
             "name": "zetacomponents/workflow-event-log-tiein",
@@ -2391,10 +2194,206 @@
             ],
             "description": "Contains the EventLog listener for the Workflow component.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2007-12-17 09:04:44"
+            "time": "2007-12-17T09:04:44+00:00"
         }
     ],
     "packages-dev": [
+        {
+            "name": "blueimp/jquery-file-upload",
+            "version": "v9.14.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vkhramtsov/jQuery-File-Upload.git",
+                "reference": "71d67a9c277e29efcf5935cd2409009c0f841a57"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vkhramtsov/jQuery-File-Upload/zipball/71d67a9c277e29efcf5935cd2409009c0f841a57",
+                "reference": "71d67a9c277e29efcf5935cd2409009c0f841a57",
+                "shasum": ""
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian Tschan",
+                    "homepage": "https://blueimp.net"
+                }
+            ],
+            "description": "File Upload widget for jQuery.",
+            "homepage": "https://github.com/blueimp/jQuery-File-Upload",
+            "keywords": [
+                "bootstrap",
+                "chunk",
+                "cross-domain",
+                "cross-site",
+                "drag",
+                "drop",
+                "file",
+                "gae",
+                "go",
+                "jquery",
+                "multiple",
+                "php",
+                "preview",
+                "progress",
+                "python",
+                "resume",
+                "selection",
+                "upload",
+                "widget"
+            ],
+            "time": "2016-11-21T05:38:19+00:00"
+        },
+        {
+            "name": "components/font-awesome",
+            "version": "4.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/components/font-awesome.git",
+                "reference": "885308b939369d147bec93174722786bc2c4eedd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/components/font-awesome/zipball/885308b939369d147bec93174722786bc2c4eedd",
+                "reference": "885308b939369d147bec93174722786bc2c4eedd",
+                "shasum": ""
+            },
+            "type": "component",
+            "extra": {
+                "component": {
+                    "styles": [
+                        "css/font-awesome.css"
+                    ],
+                    "files": [
+                        "css/font-awesome.min.css",
+                        "css/font-awesome.css.map",
+                        "fonts/*"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT",
+                "OFL-1.1"
+            ],
+            "description": "The iconic font designed for use with Twitter Bootstrap.",
+            "time": "2016-10-25T10:56:23+00:00"
+        },
+        {
+            "name": "compwright/codeigniter-installers",
+            "version": "1.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/compwright/codeigniter-installers.git",
+                "reference": "adbbd5ae2cbf5a24a39931235b1ac7dab56abb4f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/compwright/codeigniter-installers/zipball/adbbd5ae2cbf5a24a39931235b1ac7dab56abb4f",
+                "reference": "adbbd5ae2cbf5a24a39931235b1ac7dab56abb4f",
+                "shasum": ""
+            },
+            "require-dev": {
+                "composer/composer": "1.0.*@dev"
+            },
+            "type": "composer-installer",
+            "extra": {
+                "class": "Composer\\Installer\\CodeigniterInstaller"
+            },
+            "autoload": {
+                "psr-0": {
+                    "Composer\\Installer": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jonathon Hill",
+                    "email": "jhill9693@gmail.com",
+                    "homepage": "http://jonathonhill.net",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Composer installers for CodeIgniter",
+            "homepage": "https://github.com/compwright/codeigniter-installers",
+            "keywords": [
+                "MX",
+                "codeigniter",
+                "composer",
+                "core",
+                "hmvc",
+                "installer",
+                "library",
+                "module",
+                "spark",
+                "sparks"
+            ],
+            "time": "2012-11-12T16:11:38+00:00"
+        },
+        {
+            "name": "rogeriopradoj/codeigniter-curl",
+            "version": "1.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rogeriopradoj/codeigniter-curl.git",
+                "reference": "eb954890e242a5e80812006e60b07f1ce29b7e7a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rogeriopradoj/codeigniter-curl/zipball/eb954890e242a5e80812006e60b07f1ce29b7e7a",
+                "reference": "eb954890e242a5e80812006e60b07f1ce29b7e7a",
+                "shasum": ""
+            },
+            "require": {
+                "compwright/codeigniter-installers": "*"
+            },
+            "type": "codeigniter-spark",
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Rogerio Prado de Jesus",
+                    "email": "rogeriopradoj@gmail.com"
+                }
+            ],
+            "description": "codeigniter-curl philsturgeon's library via composer",
+            "time": "2013-05-27T21:19:21+00:00"
+        },
+        {
+            "name": "rogeriopradoj/codeigniter-restclient",
+            "version": "2.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rogeriopradoj/codeigniter-restclient.git",
+                "reference": "64991a0105c3cd891a64e1d35e497270ca2b0d78"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rogeriopradoj/codeigniter-restclient/zipball/64991a0105c3cd891a64e1d35e497270ca2b0d78",
+                "reference": "64991a0105c3cd891a64e1d35e497270ca2b0d78",
+                "shasum": ""
+            },
+            "require": {
+                "compwright/codeigniter-installers": "*",
+                "rogeriopradoj/codeigniter-curl": "*"
+            },
+            "type": "codeigniter-spark",
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Rogerio Prado de Jesus",
+                    "email": "rogeriopradoj@gmail.com"
+                }
+            ],
+            "description": "codeigniter-restclient philsturgeon's library via composer",
+            "time": "2013-05-27T21:23:54+00:00"
+        },
         {
             "name": "squizlabs/php_codesniffer",
             "version": "2.7.1",
@@ -2471,7 +2470,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2016-11-30 04:02:31"
+            "time": "2016-11-30T04:02:31+00:00"
         }
     ],
     "aliases": [],

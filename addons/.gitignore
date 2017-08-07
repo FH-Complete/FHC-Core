@@ -1,6 +1,6 @@
 #ignore all addons
 *
 #except template addon
-!template/*
+!template**/**
 !CodingGuidelines.txt
 !index.html

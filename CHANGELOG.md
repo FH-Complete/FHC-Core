@@ -11,9 +11,15 @@
 - **[FAS]** Verwaltung von Rechnungsadressen
 - **[CIS]** Mitarbeiter und Studierende können nach dem Login im CIS zur Passwortänderung umgeleitet werden wenn dieses seit über einem Jahr nicht geändert wurde
 - **[FAS]** Bei Statuswechsel von Studierenden können Gründe für den Statuswechsel angegeben werden
+- **[ADDONS]** Addons können Menüpunkte im Vilesci anpassen
+- **[ADDONS]** Addons können Noten für die Gesamtnote vorschlagen
 
 ### CHANGED
-- **[CORE]** Berechtigungsprüfung wurde angepasst damit deaktiverte Benutzer keine Berechtigungen mehr haben
+- **[CORE]** Berechtigungsprüfung wurde angepasst damit deaktivierte Benutzer keine Berechtigungen mehr haben
+
+### Updateinfo
+- **[CORE]** Infoscreen wurde umbenannt (informationsbildschirm.php)
+- **[CORE]** Moodle Schnittstelle wurde aus dem Core entfernt und in ein eigenes Addon verschoben. Moodle Versionen < 2.4 werden nicht mehr unterstützt
 
 ## [3.2]
 

@@ -174,12 +174,6 @@ define('ANZAHL_PREINTERESSENT','5');
 //Name der aktiven Addons getrennt mit ;
 define('ACTIVE_ADDONS','');
 
-// ***** MOODLE *****
-// Moodle verwenden Ja/Nein
-define('MOODLE',true);
-// Webservice TOKEN fuer Moodle 2.4
-define('MOODLE_TOKEN24','');
-
 // ***** OPUS *****
 // Angaben fuer OPUS Schnittstelle
 define('OPUS_SERVER','www.technikum-wien.at');

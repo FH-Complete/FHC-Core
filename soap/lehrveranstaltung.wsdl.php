@@ -24,7 +24,6 @@ echo "<?xml version='1.0' encoding='utf-8' ?>";
     <s:complexType name="GetLehrveranstaltungFromId">
         <s:element minOccurs="0" maxOccurs="1" name="bezeichnung" type="s:string"/>
         <s:element minOccurs="0" maxOccurs="1" name="lehreverzeichnis" type="s:string"/>
-        <s:element minOccurs="0" maxOccurs="1" name="moodle_id" type="tns:ArrayOfMoodleItem"/>
         <s:element minOccurs="0" maxOccurs="1" name="lektoren" type="tns:ArrayOfLektorenItem"/>
         <s:element minOccurs="0" maxOccurs="1" name="gruppen" type="tns:ArrayOfGruppenItem"/>
     </s:complexType>
@@ -43,7 +42,6 @@ echo "<?xml version='1.0' encoding='utf-8' ?>";
     <s:complexType name="GetLehrveranstaltungFromStudiengang">
         <s:element minOccurs="0" maxOccurs="1" name="bezeichnung" type="s:string"/>
         <s:element minOccurs="0" maxOccurs="1" name="lehreverzeichnis" type="s:string"/>
-        <s:element minOccurs="0" maxOccurs="1" name="moodle_id" type="tns:ArrayOfMoodleItem"/>
         <s:element minOccurs="0" maxOccurs="1" name="lektoren" type="tns:ArrayOfLektorenItem"/>
         <s:element minOccurs="0" maxOccurs="1" name="gruppen" type="tns:ArrayOfGruppenItem"/>
     </s:complexType>
@@ -78,16 +76,6 @@ echo "<?xml version='1.0' encoding='utf-8' ?>";
             <s:element minOccurs="0" maxOccurs="1" name="verband" type="s:string"/>
             <s:element minOccurs="0" maxOccurs="1" name="gruppe" type="s:string"/>
             <s:element minOccurs="0" maxOccurs="1" name="gruppe_kurzbz" type="s:string"/>
-        </s:sequence>
-    </s:complexType>
-    <s:complexType name="ArrayOfMoodleItem">
-        <s:sequence>
-            <s:element minOccurs="0" maxOccurs="unbounded" name="MoodleItem" nillable="true" type="tns:MoodleItem"/>
-        </s:sequence>
-    </s:complexType>
-    <s:complexType name="MoodleItem">
-        <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="moodle_id" type="s:string"/>
         </s:sequence>
     </s:complexType>
 

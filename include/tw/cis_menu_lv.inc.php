@@ -282,58 +282,24 @@ function checkZeilenUmbruch()
 	// Uebungstool
 	if((!defined('CIS_LEHRVERANSTALTUNG_UEBUNGSTOOL_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_UEBUNGSTOOL_ANZEIGEN) && $angemeldet)
 	{
-		$show=false;
 		$link='';
 		$link_onclick='';
 		$text='';
 
-		//wenn kein Moodle Kurs existiert dann KT anzeigen
-		$qry = "SELECT 1 FROM lehre.tbl_moodle WHERE
-				(lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem).")
-				OR
-				(lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
-									WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
-									studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem)."))";
+		if(isset($angezeigtes_stsem))
+			$studiensem = '&stsem='.urlencode($angezeigtes_stsem);
+		else
+			$studiensem = '';
 
-		if($result = $db->db_query($qry))
-			if($db->db_num_rows($result)==0)
-				$show=true;
-
-		//wenn eine Kreuzerlliste existiert dann den Link immer anzeigen
-		$qry = "SELECT 1 FROM campus.tbl_uebung
-				WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
-										WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
-										studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem).")";
-		if($result = $db->db_query($qry))
-			if($db->db_num_rows($result)>0)
-				$show=true;
-
-		if($show)
+		//Kreuzerltool
+		if($is_lector)
 		{
-			if(isset($angezeigtes_stsem))
-				$studiensem = '&stsem='.urlencode($angezeigtes_stsem);
-			else
-				$studiensem = '';
-
-			//Kreuzerltool
-			if($is_lector)
-			{
-				$link='benotungstool/verwaltung.php?lvid='.urlencode($lvid).$studiensem;
-				$text.='<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/benotungstoolHandbuch').' [PDF]</a>';
-			}
-			else
-			{
-				$link='benotungstool/studentenansicht.php?lvid='.urlencode($lvid).$studiensem;
-			}
+			$link='benotungstool/verwaltung.php?lvid='.urlencode($lvid).$studiensem;
+			$text.='<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/benotungstoolHandbuch').' [PDF]</a>';
 		}
 		else
 		{
-			if($is_lector)
-			{
-				$link='';
-				$text='<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/benotungstoolHandbuch').' [PDF]</a>';
-				$link_onclick='alert(\''.$p->t('lehre/kreuzerltoolMitMoodleInfo').'\');';
-			}
+			$link='benotungstool/studentenansicht.php?lvid='.urlencode($lvid).$studiensem;
 		}
 
 		$menu[]=array
@@ -343,112 +309,6 @@ function checkZeilenUmbruch()
 			'name'=>$p->t('lehre/kreuzerltool'),
 			'icon'=>'../../../skin/images/button_kreuzerltool.png',
 			'link'=>$link,
-			'link_onclick'=>$link_onclick,
-			'text'=>$text
-		);
-	}
-
-
-	//Moodle
-	$showmoodle=false;
-	$link_target='';
-	$link_onclick='';
-	$text='';
-	$link='';
-
-	//Schauen ob Moodle fuer diesen Studiengang freigeschaltet ist
-	$qry = "SELECT moodle FROM public.tbl_studiengang JOIN lehre.tbl_lehrveranstaltung USING(studiengang_kz) WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
-	if($result = $db->db_query($qry))
-	{
-		if($row = $db->db_fetch_object($result))
-		{
-			if($db->db_parse_bool($row->moodle))
-			{
-				$showmoodle=true;
-			}
-		}
-	}
-
-	if(MOODLE)
-	{
-		//wenn bereits eine Kreuzerlliste existiert, dann den Moodle link nicht anzeigen
-		$qry = "SELECT * FROM campus.tbl_uebung WHERE
-				lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
-									WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)."
-									AND studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem).")";
-		if($result = $db->db_query($qry))
-			if($db->db_num_rows($result)>0)
-				$showmoodle=false;
-
-		$moodle = new moodle();
-		$moodle->getAll($lvid, $angezeigtes_stsem);
-		if(count($moodle->result)>0)
-			$showmoodle=true;
-	}
-	else
-		$showmoodle=false;
-
-	if($angemeldet)
-	{
-	    if($showmoodle )
-	    {
-		    $link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
-		    if(count($moodle->result)>0)
-		    {
-			    if(!$is_lector)
-			    {
-				    $moodle->result=array();
-				    $moodle->getCourse($lvid, $angezeigtes_stsem, $user);
-
-				    if(count($moodle->result)==1)
-					    $link = $moodle->getPfad($moodle->result[0]->moodle_version).'course/view.php?id='.$moodle->result[0]->mdl_course_id;
-				    else
-					    $link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
-			    }
-		    	else
-				{
-				    if(count($moodle->result)==1)
-				    {
-					    $link = $moodle->getPfad($moodle->result[0]->moodle_version).'course/view.php?id='.$moodle->result[0]->mdl_course_id;
-				    }
-				    else
-					    $link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
-				}
-				$link_target='_blank';
-			}
-			else
-			{
-				$link='';
-			}
-
-			if($is_lector &&
-				(!defined('CIS_LEHRVERANSTALTUNG_MOODLE_LEKTOR_EDIT')
-				|| (defined('CIS_LEHRVERANSTALTUNG_MOODLE_LEKTOR_EDIT') && CIS_LEHRVERANSTALTUNG_MOODLE_LEKTOR_EDIT)
-				))
-			{
-			    $text.= '<a href="moodle2_4_wartung.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">'.$p->t('lehre/moodleWartung').'</a>
-					    <br /><a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/moodleHandbuch24').'" class="Item" target="_blank">'.$p->t('lehre/moodleHandbuch').'</a>';
-			}
-	    }
-	    else
-	    {
-		    if($is_lector)
-		    {
-				$link='';
-				$link_onclick='alert(\''.$p->t('lehre/moodleMitKreuzerltoolInfo').'\'); return false';
-		    }
-	    }
-	}
-	if (MOODLE)
-	{
-		$menu[]=array
-		(
-			'id'=>'core_menu_moodle',
-			'position'=>'70',
-			'name'=>$p->t('lehre/moodle'),
-			'icon'=>'../../../skin/images/button_moodle.png',
-			'link'=>$link,
-			'link_target'=>$link_target,
 			'link_onclick'=>$link_onclick,
 			'text'=>$text
 		);
