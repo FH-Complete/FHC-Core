@@ -1,0 +1,42 @@
+.div-table {
+	display: table;
+}
+
+.div-row {
+	display: table-row;
+}
+
+.div-cell {
+	display: table-cell;
+}
+
+.div-cell-label {
+	display: table-cell;
+}
+
+.div-cell-data {
+	display: table-cell;
+}
+
+.halign-right {
+	text-align: right;
+	margin-left: auto;
+	margin-right: 0;
+}
+
+.valign-middle {
+	vertical-align: middle;
+}
+
+.valign-top {
+	vertical-align: top;
+	padding-top: 1px;
+}
+
+.width-150px {
+	width: 150px;
+}
+
+.width-30px {
+	width: 30px;
+}

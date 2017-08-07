@@ -17,6 +17,6 @@ class Studiengang_widget extends DropdownWidget
 			'No studiengaenge found'
 		);
 		
-		$this->loadDropDownView($widgetData);
+		$this->loadDropDownView();
     }
 }

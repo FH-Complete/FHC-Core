@@ -214,6 +214,38 @@ class WidgetLib
     }
     
     /**
+     * 
+     */
+    public function UDFWidget($args, $htmlArgs = array())
+    {
+		if (!empty($args[UDFWidgetTpl::SCHEMA_ARG_NAME]) && !empty($args[UDFWidgetTpl::TABLE_ARG_NAME]))
+		{
+			// 
+			if (empty($args[UDFWidgetTpl::FIELD_ARG_NAME]) && !isset($htmlArgs[Widget::EXTERNAL_BLOCK]))
+			{
+				$htmlArgs[Widget::EXTERNAL_BLOCK] = true;
+			}
+			
+			return $this->widget(
+				UDFWidgetTpl::WIDGET_NAME,
+				$args,
+				$htmlArgs
+			);
+		}
+		else
+		{
+			if (empty($args[UDFWidgetTpl::SCHEMA_ARG_NAME]))
+			{
+				show_error(UDFWidgetTpl::SCHEMA_ARG_NAME.' parameter is missing!');
+			}
+			if (empty($args[UDFWidgetTpl::TABLE_ARG_NAME]))
+			{
+				show_error(UDFWidgetTpl::TABLE_ARG_NAME.' parameter is missing!');
+			}
+		}
+    }
+    
+    /**
      * Enable cache for all partials with TTL, default TTL is 60
      * @param int $ttl
      * @param mixed $identifier
@@ -614,10 +646,14 @@ class Widget extends Partial
     const HTML_NAME = 'name'; // HTML name attribute
     const HTML_ID = 'id'; // HTML id attribute
     
+    const EXTERNAL_BLOCK = 'externalBlock'; // 
+    const EXTERNAL_START_BLOCK_HTML_TAG = '<div>'; //
+    const EXTERNAL_END_BLOCK_HTML_TAG = '</div>'; // 
+    
     /**
      * It gets also the htmlArgs array as parameter, it will be used to set the HTML properties
      */
-    public function __construct($name, $args, $htmlArgs = array())
+    public function __construct($name, $args = array(), $htmlArgs = array())
 	{
 		parent::__construct($name, $args);
 		
@@ -660,32 +696,74 @@ class Widget extends Partial
      */
     private function _setHtmlProperties($htmlArgs)
     {
-		if (isset($htmlArgs) && is_array($htmlArgs))
+		// If $htmlArgs wasn't already stored in $this->_args
+		if (!isset($this->_args[Widget::HTML_ARG_NAME]))
 		{
 			$this->_args[Widget::HTML_ARG_NAME] = array();
 			
-			// Avoids that the elements of a same HTML page have the same name or id
+			// Avoids that elements in a HTML page have the same name or id
 			$randomIdentifier = uniqid(rand(0, 1000));
+			$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_ID] = $randomIdentifier;
+			$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] = $randomIdentifier;
 			
-			if (isset($htmlArgs[Widget::HTML_ID]) && trim($htmlArgs[Widget::HTML_ID]) != '')
+			foreach($htmlArgs as $argName => $argValue)
 			{
-				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_ID] = $htmlArgs[Widget::HTML_ID];
-			}
-			else
-			{
-				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_ID] = $randomIdentifier;
-			}
-			
-			if (isset($htmlArgs[Widget::HTML_NAME]) && trim($htmlArgs[Widget::HTML_NAME]) != '')
-			{
-				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] = $htmlArgs[Widget::HTML_NAME];
-			}
-			else
-			{
-				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] = $randomIdentifier;
+				$this->_args[Widget::HTML_ARG_NAME][$argName] = $argValue;
 			}
 		}
     }
+    
+    /**
+	 * 
+	 */
+	public static function printAttribute($htmlArgs, $attribute, $isValuePresent = true)
+	{
+		if ($attribute != null)
+		{
+			if (isset($htmlArgs[$attribute]))
+			{
+				if ($isValuePresent === true)
+				{
+					$value = $htmlArgs[$attribute];
+					
+					if (is_bool($value))
+					{
+						$value = $value ? 'true' : 'false';
+					}
+					
+					echo sprintf('%s="%s"', $attribute, $value);
+				}
+				else
+				{
+					echo $attribute;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static function printStartBlock($htmlArgs)
+	{
+		if (isset($htmlArgs[Widget::EXTERNAL_BLOCK])
+			&& $htmlArgs[Widget::EXTERNAL_BLOCK] === true)
+		{
+			echo Widget::EXTERNAL_START_BLOCK_HTML_TAG;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public static function printEndBlock($htmlArgs)
+	{
+		if (isset($htmlArgs[Widget::EXTERNAL_BLOCK])
+			&& $htmlArgs[Widget::EXTERNAL_BLOCK] === true)
+		{
+			echo Widget::EXTERNAL_END_BLOCK_HTML_TAG;
+		}
+	}
 }
 
 /**
@@ -699,29 +777,56 @@ class DropdownWidget extends Widget
 	// Name of the property that will be used to store the value attribute of the option tag
 	const ID_FIELD = 'id';
 	// Name of the property that will be used to store the value between the option tags
-	const DESCRIPTION_FIELD = 'description'; //
+	const DESCRIPTION_FIELD = 'description';
 	// The name of the element of the data array given to the view
 	// this element is used to tell what element of the dropdown is selected
-	const SELECTED_ELEMENT = 'selectedElement'; // 
+	const SELECTED_ELEMENT = 'selectedElement';
+	// 
+	const HTML_DEFAULT_VALUE = 'null';
 	
-	private $elementsArray; // Array of elements to be place inside the dropdown
+	const SIZE = 'size'; // 
+	const MULTIPLE = 'multiple'; // 
 	
 	/**
-	 * Loads the dropdown view with all the elements to be displayed
+	 * 
 	 */
-	protected function loadDropDownView($widgetData)
+	public function __construct($name, $args = array(), $htmlArgs = array())
 	{
-		$widgetData[DropdownWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME] = $this->elementsArray->retval;
+		parent::__construct($name, $args, $htmlArgs);
 		
-		if (!isset($widgetData[DropdownWidget::SELECTED_ELEMENT]))
+		// 
+		if (!isset($this->_args[DropdownWidget::SELECTED_ELEMENT]))
 		{
-			$widgetData[DropdownWidget::SELECTED_ELEMENT] = Widget::HTML_DEFAULT_VALUE;
+			$this->_args[DropdownWidget::SELECTED_ELEMENT] = DropdownWidget::HTML_DEFAULT_VALUE;
 		}
-		
-		$this->view('widgets/dropdown', $widgetData);
 	}
 	
-	/**
+    /**
+     * 
+     */
+    public function setMultiple()
+    {
+		$this->_args[Widget::HTML_ARG_NAME][DropdownWidget::MULTIPLE] = DropdownWidget::MULTIPLE;
+		$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] .= '[]';
+    }
+    
+    /**
+     * 
+	 */
+    public function isMultipleDropdown()
+    {
+		$isMultipleDropdown = false;
+		
+		if (isset($this->_args[Widget::HTML_ARG_NAME][DropdownWidget::MULTIPLE])
+			&& $this->_args[Widget::HTML_ARG_NAME][DropdownWidget::MULTIPLE] == DropdownWidget::MULTIPLE)
+		{
+			$isMultipleDropdown = true;
+		}
+		
+		return $isMultipleDropdown;
+    }
+    
+    /**
 	 * Add the correct select to the model used to load a list of elemets for this dropdown
 	 * @param model $model the model used to load elements
 	 * @param string $idName the name of the field that will used to be the value of the option tag
@@ -739,7 +844,7 @@ class DropdownWidget extends Widget
 			)
 		);
 	}
-	
+    
 	/**
 	 * Set the array used to populate the dropdown
 	 * @param array $elements list used to populate this dropdown
@@ -749,9 +854,11 @@ class DropdownWidget extends Widget
 	 * @param string $id value of the attribute value of the empty element
 	 */
 	protected function setElementsArray(
-		$elements, $emptyElement = false, $stdDescription = '' , $noDataDescription = '' , $id = Widget::HTML_DEFAULT_VALUE
+		$elements, $emptyElement = false, $stdDescription = '' , $noDataDescription = 'No data found' , $id = DropdownWidget::HTML_DEFAULT_VALUE
 	)
 	{
+		$tmpElements = array();
+		
 		if (isError($elements))
 		{
 			if (is_object($elements) && isset($elements->retval))
@@ -769,29 +876,270 @@ class DropdownWidget extends Widget
 		}
 		else
 		{
-			$this->elementsArray = $elements;
-			
-			if ($emptyElement === true)
+			if ($emptyElement === true && $this->isMultipleDropdown() == false)
 			{
-				$this->addElementAtBeginning($stdDescription, $noDataDescription, $id);
+				$tmpElements = $this->addElementAtBeginning(
+					$elements,
+					$stdDescription,
+					$noDataDescription,
+					$id
+				);
 			}
+			else
+			{
+				$tmpElements = $elements->retval;
+			}
+			
+			$this->_args[DropdownWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME] = $tmpElements;
 		}
 	}
 	
 	/**
      * Adds an element to the beginning of the array
      */
-	protected function addElementAtBeginning($stdDescription, $noDataDescription, $id)
+	protected function addElementAtBeginning($elements, $stdDescription, $noDataDescription, $id)
 	{
 		$element = new stdClass();
-		$element->id = $id;
-		$element->description = $stdDescription;
+		$element->{DropdownWidget::ID_FIELD} = $id;
+		$element->{DropdownWidget::DESCRIPTION_FIELD} = $stdDescription;
 		
-		if (!hasData($this->elementsArray))
+		if (!hasData($elements))
 		{
-			$element->description = $noDataDescription;
+			$element->{DropdownWidget::DESCRIPTION_FIELD} = $noDataDescription;
 		}
 		
-		array_unshift($this->elementsArray->retval, $element);
+		array_unshift($elements->retval, $element);
+		
+		return $elements->retval;
 	}
+	
+	/**
+	 * Loads the dropdown view with all the elements to be displayed
+	 */
+	protected function loadDropDownView()
+	{
+		$this->view('widgets/dropdown', $this->_args);
+	}
+}
+
+/**
+ * 
+ */
+class DropdownWidgetUDF extends DropdownWidget
+{
+	/**
+	 * 
+	 */
+	public function render($parameters)
+	{
+		$tmpElements = array();
+		
+		// 
+		foreach($parameters as $parameter)
+		{
+			// 
+			if ((is_array($parameter) && count($parameter) == 2)
+				|| (is_string($parameter) || is_numeric($parameter))
+				|| (is_object($parameter) && isset($parameter->{PARENT::ID_FIELD}) && isset($parameter->{PARENT::DESCRIPTION_FIELD})))
+			{
+				$element = new stdClass(); // 
+				// 
+				if (is_array($parameter) && count($parameter) == 2)
+				{
+					$element->{PARENT::ID_FIELD} = $parameter[0]; // 
+					$element->{PARENT::DESCRIPTION_FIELD} = $parameter[1]; // 
+				}
+				// 
+				else if (is_string($parameter) || is_numeric($parameter))
+				{
+					$element->{PARENT::ID_FIELD} = $parameter; // 
+					$element->{PARENT::DESCRIPTION_FIELD} = $parameter; // 
+				}
+				// 
+				else if (is_object($parameter) && isset($parameter->{PARENT::ID_FIELD}) && isset($parameter->{PARENT::DESCRIPTION_FIELD}))
+				{
+					$element->{PARENT::ID_FIELD} = $parameter->{PARENT::ID_FIELD}; // 
+					$element->{PARENT::DESCRIPTION_FIELD} = $parameter->{PARENT::DESCRIPTION_FIELD}; // 
+				}
+				
+				array_push($tmpElements, $element); // 
+			}
+		}
+		
+		$this->setElementsArray(
+			success($tmpElements),
+			true,
+			$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::PLACEHOLDER],
+			'No data found for this UDF'
+		);
+		
+		$this->loadDropDownView();
+		
+		echo $this->content();
+    }
+}
+
+/**
+ * It exends the Widget class to represent an HTML textarea
+ */
+class TextareaWidget extends Widget
+{
+	const TEXT = 'text'; // 
+	const ROWS = 'rows'; // 
+	const COLS = 'cols'; // 
+	
+	/**
+	 * 
+	 */
+	protected function setText($text)
+	{
+		$this->_args[TextareaWidget::TEXT] = $text;
+	}
+	
+	/**
+	 * 
+	 */
+	protected function loadTextareaView()
+	{
+		$this->view('widgets/textarea', $this->_args);
+	}
+}
+
+/**
+ * 
+ */
+class TextareaWidgetUDF extends TextareaWidget
+{
+	/**
+	 * 
+	 */
+	public function render($parameters)
+	{
+		if ($parameters != null)
+		{
+			$this->setText($parameters);
+		}
+		else
+		{
+			$this->setText('');
+		}
+		
+		$this->loadTextareaView();
+		
+		echo $this->content();
+    }
+}
+
+/**
+ * It exends the Widget class to represent an HTML textarea
+ */
+class TextfieldWidget extends Widget
+{
+	const VALUE = 'text'; // 
+	const SIZE = 'size'; // 
+	
+	/**
+	 * 
+	 */
+	protected function setValue($value)
+	{
+		$this->_args[TextfieldWidget::VALUE] = $value;
+	}
+	
+	/**
+	 * 
+	 */
+	protected function loadTextfieldView()
+	{
+		$this->view('widgets/textfield', $this->_args);
+	}
+}
+
+/**
+ * 
+ */
+class TextfieldWidgetUDF extends TextfieldWidget
+{
+	/**
+	 * 
+	 */
+	public function render($parameters)
+	{
+		if ($parameters != null)
+		{
+			$this->setValue($parameters);
+		}
+		else
+		{
+			$this->setValue('');
+		}
+		
+		$this->loadTextfieldView();
+		
+		echo $this->content();
+    }
+}
+
+/**
+ * It exends the Widget class to represent an HTML dropdown
+ */
+class CheckboxWidget extends Widget
+{
+	// Name of the property that will be used to store the value attribute of the option tag
+	const VALUE_FIELD = 'value';
+	// Name of the property that will be used to store the value between the option tags
+	const DESCRIPTION_FIELD = 'description';
+	// Value of value attribute of the checkbox
+	const CHECKBOX_VALUE = 'true';
+	
+	/**
+	 * 
+	 */
+	protected function loadCheckboxView()
+	{
+		$this->view('widgets/checkbox', $this->_args);
+	}
+}
+
+/**
+ * 
+ */
+class CheckboxWidgetUDF extends CheckboxWidget
+{
+	/**
+	 * 
+	 */
+	public function render()
+	{
+		$this->loadCheckboxView();
+		
+		echo $this->content();
+    }
+}
+
+/**
+ * Defined here because these constants can be used
+ * in the views also
+ */
+abstract class UDFWidgetTpl extends Widget
+{
+	const WIDGET_NAME = 'UDFWidget';
+	const SCHEMA_ARG_NAME = 'schema';
+	const TABLE_ARG_NAME = 'table';
+	const FIELD_ARG_NAME = 'field';
+	const UDFS_ARG_NAME = 'udfs';
+	
+	// HTML components
+	const TITLE = 'description';
+	const LABEL = 'title';
+	const PLACEHOLDER = 'placeholder';
+	const DEFAULT_VALUE = 'defaultValue';
+	
+	// Validation attributes
+	const REGEX = 'regex';
+	const REQUIRED = 'required';
+	const MAX_VALUE = 'max-value';
+	const MIN_VALUE = 'min-value';
+	const MAX_LENGTH = 'max-length';
+	const MIN_LENGTH = 'min-length';
 }

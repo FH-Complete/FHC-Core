@@ -1,0 +1,71 @@
+{
+	"title": "UDF",
+	"type": "object",
+	"tableswhitelist": {
+		"type": "string",
+		"enum": ["tbl_person", "tbl_prestudent", "tbl_mitarbeiter", "tbl_lehrveranstaltung", "tbl_lehreinheit"]
+	},
+	"properties": {
+		"name": {
+			"type": "string"
+		},
+		"description": {
+			"type": "array",
+		},
+		"placeholder": {
+			"type": "array",
+		},
+		"title": {
+			"type": "array",
+		},
+		"type": {
+			"type": "string",
+			"enum": ["checkbox", "textfield", "textarea", "date", "dropdown", "multipledropdown"]
+		},
+		"sort": {
+			"type": "integer"
+		},
+		"defaultValue": {
+			"type": "string"
+		},
+		"validation": {
+			"type": "object",
+			"properties": {
+				"required": {
+					"type": "boolean"
+				},
+				"min-length": {
+					"type": "integer"
+				},
+				"max-length": {
+					"type": "integer"
+				},
+				"min-value": {
+					"type": "integer"
+				},
+				"min-value": {
+					"type": "integer"
+				},
+				"regex": {
+					"type": "object",
+					"properties": {
+						"language": "string",
+						"expression": "string"
+					}
+				}
+			}
+		},
+		"listValues": {
+			"type": "object",
+			"properties": {
+				"sql": {
+					"type": "string"
+				},
+				"enum": {
+					"type": "array"
+				}
+			}
+		}
+	},
+	"required": ["type", "name"]
+}

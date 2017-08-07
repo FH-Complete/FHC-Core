@@ -1539,6 +1539,12 @@ function StudentAuswahl()
 	{
 		document.getElementById('student-messages').setAttribute('src','messages.xul.php?person_id='+person_id);
 	}
+	
+	// ***** UDF *****
+	if (document.getElementById('student-content-tabs').selectedItem == document.getElementById('student-tab-udf'))
+	{
+		document.getElementById('student-udf').setAttribute('src', 'udf.xul.php?person_id='+person_id+'&prestudent_id='+prestudent_id);
+	}
 
 	// Notizen laden
 	var studentnotiz = document.getElementById('student-box-notizen');
@@ -2172,7 +2178,7 @@ function StudentExport()
 	}
 
 	stsem = getStudiensemester();
-	action = '<?php echo APP_ROOT; ?>content/statistik/studentenexport.xls.php?studiensemester_kurzbz='+stsem;
+	action = '<?php echo APP_ROOT; ?>content/statistik/studentenexportextended.xls.php?studiensemester_kurzbz='+stsem;
 	OpenWindowPost(action, data);
 }
 
@@ -5430,6 +5436,27 @@ function StudentMessagesIFrameLoad()
 	catch(e)
 	{
 	}
+}
+
+// ****
+// * Load UDF IFrame
+// ****
+function StudentUDFIFrameLoad()
+{
+	var tree = document.getElementById('student-tree');
+
+	if (tree.currentIndex == -1) return;
+
+	try
+	{
+		//Ausgewaehlte person_id holen
+		var person_id = getTreeCellText(tree, 'student-treecol-person_id', tree.currentIndex);
+		var prestudent_id = getTreeCellText(tree, 'student-treecol-prestudent_id', tree.currentIndex);
+		
+		url = 'udf.xul.php?person_id='+person_id+'&prestudent_id='+prestudent_id;
+		document.getElementById('student-udf').setAttribute('src', url);
+	}
+	catch(e) {}
 }
 
 // ****
