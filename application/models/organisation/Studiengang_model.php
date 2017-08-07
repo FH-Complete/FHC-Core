@@ -225,6 +225,57 @@ class Studiengang_model extends DB_Model
 
 		return $result;
 	}
+	
+	/**
+	 *
+	 */
+	public function getAppliedStudiengangFromNow($person_id, $titel)
+	{
+		// Then join with table public.tbl_prestudent
+		$this->addJoin('public.tbl_prestudent', 'studiengang_kz');
+		// Join table public.tbl_prestudentstatus
+		$this->addJoin('public.tbl_prestudentstatus', 'prestudent_id');
+		// Then join with table lehre.tbl_studienplan
+		$this->addJoin('lehre.tbl_studienplan', 'studienplan_id');
+		// Then join with table public.tbl_notizzuordnung + public.tbl_notiz
+		$this->addJoin(
+			'(
+				SELECT public.tbl_notiz.*, public.tbl_notizzuordnung.prestudent_id
+				  FROM public.tbl_notiz JOIN public.tbl_notizzuordnung USING(notiz_id)
+				 WHERE titel = '.$this->escape($titel).
+			') tbl_notiz',
+			'prestudent_id',
+			'LEFT'
+		);
+		
+		// Ordering by studiengang_kz and studienplan_id
+		$this->addOrder('public.tbl_studiengang.bezeichnung');
+		
+		$result = $this->loadTree(
+			'public.tbl_studiengang',
+			array(
+				'public.tbl_prestudent',
+				'public.tbl_prestudentstatus',
+				'lehre.tbl_studienplan',
+				'public.tbl_notiz'
+			),
+			'public.tbl_prestudent.person_id = '.$this->escape($person_id).
+			' AND public.tbl_prestudentstatus.studiensemester_kurzbz IN (
+				SELECT studiensemester_kurzbz
+				  FROM public.tbl_studiensemester
+				 WHERE start >= NOW()
+			)'.
+			' AND (public.tbl_prestudentstatus.status_kurzbz = \'Interessent\')',
+			array(
+				'prestudenten',
+				'prestudentstatus',
+				'studienplaene',
+				'notizen'
+			)
+		);
+		
+		return $result;
+	}
 
 	/**
 	 *
