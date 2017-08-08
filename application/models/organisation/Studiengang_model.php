@@ -263,7 +263,7 @@ class Studiengang_model extends DB_Model
 			' AND public.tbl_prestudentstatus.studiensemester_kurzbz IN (
 				SELECT studiensemester_kurzbz
 				  FROM public.tbl_studiensemester
-				 WHERE start >= NOW()
+				 WHERE ende >= NOW()
 			)'.
 			' AND (public.tbl_prestudentstatus.status_kurzbz = \'Interessent\')',
 			array(
