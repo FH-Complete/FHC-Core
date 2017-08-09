@@ -1000,22 +1000,29 @@ class DB_Model extends FHC_Model
 					// Loops through the UDFs values that should be stored
 					foreach ($this->UDFs as $key => $val)
 					{
+						$tmpValidate = success(true); // temporary variable used to store the returned value from _validateUDFs
+						
 						// If this is the definition of this UDF
 						if ($decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME} == $key)
 						{
 							if (isset($decodedUDFDefinition->validation)) // If validation rules are present for this UDF
 							{
-								$chkRequiredPassed = true; // 
-								// 
+								// Checks if the given UDF is required and the result will be stored in $chkRequiredPassed
+								// If $chkRequiredPassed == true => required check passed
+								// If $chkRequiredPassed == false => required check NOT passed
+								$chkRequiredPassed = true;
+								// If required property is present in the UDF description and it is true
 								if (isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED})
 									&& $decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED} === true)
 								{
-									// 
+									// If this UDF is a checkbox and the given value is false
+									// OR
+									// if this UDF is NOT a checkbox and the given value is null
 									if (($decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_CHKBOX_TYPE && $val === false)
 										|| ($decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} != DB_Model::UDF_CHKBOX_TYPE && $val == null))
 									{
-										$chkRequiredPassed = false; // 
-										// 
+										$chkRequiredPassed = false; // not passed
+										// A new error is generated and added to array $requiredUDFsArray
 										$requiredUDFsArray[$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}] = error(
 											$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME},
 											EXIT_VALIDATION_UDF_REQUIRED
@@ -1023,25 +1030,28 @@ class DB_Model extends FHC_Model
 									}
 								}
 								
-								// 
+								// If the previous required check has failed then the validation is not performed
 								if ($chkRequiredPassed === true)
 								{
-									$toBeValidated = false; // 
-									// 
+									// Checks if the validation should be performed
+									// If $toBeValidated == true => validation is performed
+									// If $toBeValidated == false => validation is NOT performed
+									$toBeValidated = false;
+									// If this UDF is NOT a checkbox 
 									if ($decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} != DB_Model::UDF_CHKBOX_TYPE)
 									{
-										// 
+										// If required property is NOT present in the UDF description
 										if (!isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED}))
 										{
 											$toBeValidated = true;
 										}
-										// 
+										// If required property is present in the UDF description and it is true
 										if (isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED})
 											&& $decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED} === true)
 										{
 											$toBeValidated = true;
 										}
-										// 
+										// If required property is present in the UDF description and it is true and the given value is null
 										if (isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED})
 											&& $decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED} === false
 											&& $val != null)
@@ -1050,10 +1060,9 @@ class DB_Model extends FHC_Model
 										}
 									}
 									
-									if ($toBeValidated === true) // 
+									if ($toBeValidated === true) // Checks if validation should be performed
 									{
-										// Validation!!!
-										$validate = $this->_validateUDFs(
+										$tmpValidate = $this->_validateUDFs(
 											$decodedUDFDefinition->validation, // 
 											$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}, // 
 											$val // 
@@ -1063,17 +1072,15 @@ class DB_Model extends FHC_Model
 							}
 							
 							// If validation is ok copy the value that is to be stored into $toBeStoredUDFsArray
-							if (isSuccess($validate))
+							if (isSuccess($tmpValidate))
 							{
 								$toBeStoredUDFsArray[$key] = $val;
 							}
 							else // otherwise store the validation error in $notValidUDFsArray
 							{
-								$notValidUDFsArray[] = $validate;
+								$notValidUDFsArray[] = $tmpValidate;
 							}
 						}
-						
-						$validate = success(true); // reset $validate
 					}
 				}
 				
