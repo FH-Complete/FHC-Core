@@ -869,101 +869,89 @@ class DB_Model extends FHC_Model
 	/**
 	 * Validates UDF value
 	 */
-	private function _validateUDFs($decodedUDFValidation, $udfName, $udfType, $udfValue)
+	private function _validateUDFs($decodedUDFValidation, $udfName, $udfValue)
 	{
 		$returnArrayValidation = array(); // returned value
 		
-		// 
-		if ((((isset($decodedUDFValidation->validation->{DB_Model::UDF_REQUIRED})
-			&& $decodedUDFValidation->validation->{DB_Model::UDF_REQUIRED} === false)
-			|| !isset($decodedUDFValidation->validation->{DB_Model::UDF_REQUIRED}))
-			&& $udfValue == null)
-			|| $udfType == DB_Model::UDF_CHKBOX_TYPE)
+		// If $udfValue is not an array, then store it inside a new array
+		$tmpUdfValues = $udfValue;
+		if (!is_array($udfValue))
 		{
-			// NOP
+			$tmpUdfValues = array($udfValue);
 		}
-		else
+		
+		// Loops through all the supplied UDFs values
+		foreach($tmpUdfValues as $udfValIndx => $udfVal)
 		{
-			// If $udfValue is not an array, then store it inside a new array
-			$tmpUdfValues = $udfValue;
-			if (!is_array($udfValue))
+			// If the single UDF value is not an array or an object
+			if (!is_array($udfVal) && !is_object($udfVal))
 			{
-				$tmpUdfValues = array($udfValue);
-			}
-			
-			// Loops through all the supplied UDFs values
-			foreach($tmpUdfValues as $udfValIndx => $udfVal)
-			{
-				// If the single UDF value is not an array or an object
-				if (!is_array($udfVal) && !is_object($udfVal))
+				// If the UDF value is numeric (integer, float, double...)
+				if (is_numeric($udfVal))
 				{
-					// If the UDF value is numeric (integer, float, double...)
-					if (is_numeric($udfVal))
-					{
-						// If min value attribute is present in the validation for this UDF,
-						// then checks if the value of this UDF is compliant to this attribute
-						if (isset($decodedUDFValidation->{DB_Model::UDF_MIN_VALUE})
-							&& $udfVal < $decodedUDFValidation->{DB_Model::UDF_MIN_VALUE})
-						{
-							// validation is failed and the error is stored in $returnArrayValidation
-							$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MIN_VALUE);
-						}
-						
-						// If max value attribute is present in the validation for this UDF,
-						// then checks if the value of this UDF is compliant to this attribute
-						if (isset($decodedUDFValidation->{DB_Model::UDF_MAX_VALUE})
-							&& $udfVal > $decodedUDFValidation->{DB_Model::UDF_MAX_VALUE})
-						{
-							// validation is failed and the error is stored in $returnArrayValidation
-							$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MAX_VALUE);
-						}
-					}
-					
-					$strUdfVal = strval($udfVal); // store in $strUdfVal the string conversion of $udfVal
-					// If min length attribute is present in the validation for this UDF,
+					// If min value attribute is present in the validation for this UDF,
 					// then checks if the value of this UDF is compliant to this attribute
-					if (isset($decodedUDFValidation->{DB_Model::UDF_MIN_LENGTH}) && isset($strUdfVal)
-						&& strlen($strUdfVal) < $decodedUDFValidation->{DB_Model::UDF_MIN_LENGTH})
+					if (isset($decodedUDFValidation->{DB_Model::UDF_MIN_VALUE})
+						&& $udfVal < $decodedUDFValidation->{DB_Model::UDF_MIN_VALUE})
 					{
 						// validation is failed and the error is stored in $returnArrayValidation
-						$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MIN_LENGTH);
+						$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MIN_VALUE);
 					}
 					
-					// If max length attribute is present in the validation for this UDF,
+					// If max value attribute is present in the validation for this UDF,
 					// then checks if the value of this UDF is compliant to this attribute
-					if (isset($decodedUDFValidation->{DB_Model::UDF_MAX_LENGTH}) && isset($strUdfVal)
-						&& strlen($strUdfVal) > $decodedUDFValidation->{DB_Model::UDF_MAX_LENGTH})
+					if (isset($decodedUDFValidation->{DB_Model::UDF_MAX_VALUE})
+						&& $udfVal > $decodedUDFValidation->{DB_Model::UDF_MAX_VALUE})
 					{
 						// validation is failed and the error is stored in $returnArrayValidation
-						$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MAX_LENGTH);
+						$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MAX_VALUE);
 					}
-					
-					// If $udfVal is a string
-					if (is_string($udfVal))
+				}
+				
+				$strUdfVal = strval($udfVal); // store in $strUdfVal the string conversion of $udfVal
+				// If min length attribute is present in the validation for this UDF,
+				// then checks if the value of this UDF is compliant to this attribute
+				if (isset($decodedUDFValidation->{DB_Model::UDF_MIN_LENGTH}) && isset($strUdfVal)
+					&& strlen($strUdfVal) < $decodedUDFValidation->{DB_Model::UDF_MIN_LENGTH})
+				{
+					// validation is failed and the error is stored in $returnArrayValidation
+					$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MIN_LENGTH);
+				}
+				
+				// If max length attribute is present in the validation for this UDF,
+				// then checks if the value of this UDF is compliant to this attribute
+				if (isset($decodedUDFValidation->{DB_Model::UDF_MAX_LENGTH}) && isset($strUdfVal)
+					&& strlen($strUdfVal) > $decodedUDFValidation->{DB_Model::UDF_MAX_LENGTH})
+				{
+					// validation is failed and the error is stored in $returnArrayValidation
+					$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MAX_LENGTH);
+				}
+				
+				// If $udfVal is a string
+				if (is_string($udfVal))
+				{
+					// Search for a php regular expression in the validation of this UDF, if one is found
+					// then checks if the value of this UDF is compliant to this attribute
+					if (isset($decodedUDFValidation->{DB_Model::UDF_REGEX})
+						&& is_array($decodedUDFValidation->{DB_Model::UDF_REGEX}))
 					{
-						// Search for a php regular expression in the validation of this UDF, if one is found
-						// then checks if the value of this UDF is compliant to this attribute
-						if (isset($decodedUDFValidation->{DB_Model::UDF_REGEX})
-							&& is_array($decodedUDFValidation->{DB_Model::UDF_REGEX}))
+						foreach($decodedUDFValidation->{DB_Model::UDF_REGEX} as $regexIndx => $regex)
 						{
-							foreach($decodedUDFValidation->{DB_Model::UDF_REGEX} as $regexIndx => $regex)
+							if ($regex->language == DB_Model::UDF_REGEX_LANG)
 							{
-								if ($regex->language == DB_Model::UDF_REGEX_LANG)
+								if (preg_match($regex->expression, $udfVal) != 1)
 								{
-									if (preg_match($regex->expression, $udfVal) != 1)
-									{
-										// validation is failed and the error is stored in $returnArrayValidation
-										$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_REGEX);
-									}
+									// validation is failed and the error is stored in $returnArrayValidation
+									$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_REGEX);
 								}
 							}
 						}
 					}
 				}
-				else // otherwise the validation is failed and the error is stored in $returnArrayValidation
-				{
-					$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_NOT_VALID_VAL);
-				}
+			}
+			else // otherwise the validation is failed and the error is stored in $returnArrayValidation
+			{
+				$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_NOT_VALID_VAL);
 			}
 		}
 		
@@ -1009,18 +997,6 @@ class DB_Model extends FHC_Model
 				{
 					$decodedUDFDefinition = $decodedUDFDefinitions[$i]; // Definition of a single UDF
 					
-					// If validation rules are present for this UDF description and the required attribute is === true
-					// then add this UDF into $requiredUDFsArray
-					if(isset($decodedUDFDefinition->validation)
-						&& isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED})
-						&& $decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED} === true)
-					{
-						$requiredUDFsArray[$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}] = error(
-							$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME},
-							EXIT_VALIDATION_UDF_REQUIRED
-						);
-					}
-					
 					// Loops through the UDFs values that should be stored
 					foreach($this->UDFs as $key => $val)
 					{
@@ -1029,25 +1005,60 @@ class DB_Model extends FHC_Model
 						{
 							if (isset($decodedUDFDefinition->validation)) // If validation rules are present for this UDF
 							{
-								// Validation!!!
-								$validate = $this->_validateUDFs(
-									$decodedUDFDefinition->validation, // 
-									$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}, // 
-									$decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME},
-									$val // 
-								);
-								
-								// If the validation attribute required is === true for this UDF
-								// and this UDF is present in the array $requiredUDFsArray
-								// then removes this UDF from the array $requiredUDFsArray
-								// because this UDF is present in the property UDFs (the list of UDFs that should be stored)
-								// therefore it was supplied
+								$chkRequiredPassed = true; // 
+								// 
 								if (isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED})
-									&& $decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED} === true
-									&& isset($requiredUDFsArray[$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}])
-									&& $val != null)
+									&& $decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED} === true)
 								{
-									unset($requiredUDFsArray[$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}]);
+									// 
+									if (($decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_CHKBOX_TYPE && $val === false)
+										|| ($decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} != DB_Model::UDF_CHKBOX_TYPE && $val == null))
+									{
+										$chkRequiredPassed = false; // 
+										// 
+										$requiredUDFsArray[$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}] = error(
+											$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME},
+											EXIT_VALIDATION_UDF_REQUIRED
+										);
+									}
+								}
+								
+								// 
+								if ($chkRequiredPassed === true)
+								{
+									$toBeValidated = false; // 
+									// 
+									if ($decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} != DB_Model::UDF_CHKBOX_TYPE)
+									{
+										// 
+										if (!isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED}))
+										{
+											$toBeValidated = true;
+										}
+										// 
+										if (isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED})
+											&& $decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED} === true)
+										{
+											$toBeValidated = true;
+										}
+										// 
+										if (isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED})
+											&& $decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED} === false
+											&& $val != null)
+										{
+											$toBeValidated = true;
+										}
+									}
+									
+									if ($toBeValidated === true) // 
+									{
+										// Validation!!!
+										$validate = $this->_validateUDFs(
+											$decodedUDFDefinition->validation, // 
+											$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}, // 
+											$val // 
+										);
+									}
 								}
 							}
 							
