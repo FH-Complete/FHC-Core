@@ -993,12 +993,12 @@ class DB_Model extends FHC_Model
 				);
 				
 				// Loops through the UDFs definitions
-				for($i = 0; $i < count($decodedUDFDefinitions); $i++)
+				for ($i = 0; $i < count($decodedUDFDefinitions); $i++)
 				{
 					$decodedUDFDefinition = $decodedUDFDefinitions[$i]; // Definition of a single UDF
 					
 					// Loops through the UDFs values that should be stored
-					foreach($this->UDFs as $key => $val)
+					foreach ($this->UDFs as $key => $val)
 					{
 						// If this is the definition of this UDF
 						if ($decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME} == $key)
@@ -1072,6 +1072,8 @@ class DB_Model extends FHC_Model
 								$notValidUDFsArray[] = $validate;
 							}
 						}
+						
+						$validate = success(true); // reset $validate
 					}
 				}
 				
