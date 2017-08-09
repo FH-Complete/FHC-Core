@@ -14,6 +14,10 @@
 	display: table-cell;
 }
 
+label[udf-required=true]::after {
+	content: "*";
+}
+
 .div-cell-data {
 	display: table-cell;
 }

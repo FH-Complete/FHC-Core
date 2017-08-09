@@ -7,7 +7,10 @@
 				{
 			?>
 				<div class="div-cell-label valign-middle width-150px">
-					<label for="<?php echo ${Widget::HTML_ARG_NAME}[Widget::HTML_ID]; ?>">
+					<label
+						for="<?php echo ${Widget::HTML_ARG_NAME}[Widget::HTML_ID]; ?>"
+						<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidget::REQUIRED); ?>
+					>
 						<?php echo ${Widget::HTML_ARG_NAME}[UDFWidgetTpl::LABEL]; ?>
 					</label>
 				</div>
