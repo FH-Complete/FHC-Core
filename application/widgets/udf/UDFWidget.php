@@ -3,11 +3,10 @@
 /**
  * 
  */
-class UDFWidget extends UDFWidgetTpl
+class UDFWidget extends HTMLWidget
 {
 	const NAME = 'name';
 	const TYPE = 'type';
-	const REQUIRED = 'udf-required';
 	const VALIDATION = 'validation';
 	const LIST_VALUES = 'listValues';
 	const REGEX_LANGUAGE = 'js';
@@ -16,12 +15,12 @@ class UDFWidget extends UDFWidgetTpl
 	
     public function display($widgetData)
 	{
-		$schema = $widgetData[UDFWidgetTpl::SCHEMA_ARG_NAME];
-		$table = $widgetData[UDFWidgetTpl::TABLE_ARG_NAME];
+		$schema = $widgetData[UDFLib::SCHEMA_ARG_NAME];
+		$table = $widgetData[UDFLib::TABLE_ARG_NAME];
 		
-		if (isset($widgetData[UDFWidgetTpl::FIELD_ARG_NAME]))
+		if (isset($widgetData[UDFLib::FIELD_ARG_NAME]))
 		{
-			$field = $widgetData[UDFWidgetTpl::FIELD_ARG_NAME];
+			$field = $widgetData[UDFLib::FIELD_ARG_NAME];
 		}
 		
 		$udfResults = $this->_loadUDF($schema, $table);
@@ -105,8 +104,8 @@ class UDFWidget extends UDFWidgetTpl
      */
     private function _setNameAndId($jsonSchema)
     {
-		$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_ID] = $jsonSchema->{UDFWidget::NAME};
-		$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] = $jsonSchema->{UDFWidget::NAME};
+		$this->_args[HTMLWidget::HTML_ARG_NAME][HTMLWidget::HTML_ID] = $jsonSchema->{UDFWidget::NAME};
+		$this->_args[HTMLWidget::HTML_ARG_NAME][HTMLWidget::HTML_NAME] = $jsonSchema->{UDFWidget::NAME};
     }
     
     /**
@@ -210,10 +209,10 @@ class UDFWidget extends UDFWidgetTpl
      */
 	private function _renderDropdown($jsonSchema, $multiple = false)
 	{
-		if (isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME])
-			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}]))
+		if (isset($this->_args[UDFLib::UDFS_ARG_NAME])
+			&& isset($this->_args[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}]))
 		{
-			$this->_args[DropdownWidget::SELECTED_ELEMENT] = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
+			$this->_args[DropdownWidget::SELECTED_ELEMENT] = $this->_args[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
 		}
 		else
 		{
@@ -254,10 +253,10 @@ class UDFWidget extends UDFWidgetTpl
 		$textareaUDF = new TextareaWidgetUDF($this->_name, $this->_args);
 		$text = null;
 		
-		if (isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME])
-			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}]))
+		if (isset($this->_args[UDFLib::UDFS_ARG_NAME])
+			&& isset($this->_args[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}]))
 		{
-			$text = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
+			$text = $this->_args[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
 		}
 		
 		$textareaUDF->render($text);
@@ -271,10 +270,10 @@ class UDFWidget extends UDFWidgetTpl
 		$textareaUDF = new TextfieldWidgetUDF($this->_name, $this->_args);
 		$text = null;
 		
-		if (isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME])
-			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}]))
+		if (isset($this->_args[UDFLib::UDFS_ARG_NAME])
+			&& isset($this->_args[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}]))
 		{
-			$text = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
+			$text = $this->_args[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
 		}
 		
 		$textareaUDF->render($text);
@@ -285,14 +284,14 @@ class UDFWidget extends UDFWidgetTpl
      */
 	private function _renderCheckbox($jsonSchema)
 	{
-		if (isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME])
-			&& isset($this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}]))
+		if (isset($this->_args[UDFLib::UDFS_ARG_NAME])
+			&& isset($this->_args[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}]))
 		{
-			$this->_args[CheckboxWidget::VALUE_FIELD] = $this->_args[UDFWidgetTpl::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
+			$this->_args[CheckboxWidget::VALUE_FIELD] = $this->_args[UDFLib::UDFS_ARG_NAME][$jsonSchema->{UDFWidget::NAME}];
 		}
 		else
 		{
-			$this->_args[CheckboxWidget::VALUE_FIELD] = Widget::HTML_DEFAULT_VALUE;
+			$this->_args[CheckboxWidget::VALUE_FIELD] = HTMLWidget::HTML_DEFAULT_VALUE;
 		}
 		
 		$checkboxWidgetUDF = new CheckboxWidgetUDF($this->_name, $this->_args);
@@ -306,73 +305,73 @@ class UDFWidget extends UDFWidgetTpl
     private function _setAttributesWithPhrases($jsonSchema)
     {
 		// Description, title and placeholder
-		if (isset($jsonSchema->{UDFWidgetTpl::LABEL})
-			|| isset($jsonSchema->{UDFWidgetTpl::TITLE})
-			|| isset($jsonSchema->{UDFWidgetTpl::PLACEHOLDER}))
+		if (isset($jsonSchema->{UDFLib::LABEL})
+			|| isset($jsonSchema->{UDFLib::TITLE})
+			|| isset($jsonSchema->{UDFLib::PLACEHOLDER}))
 		{
 			// 
 			$this->_ci->load->library('PhrasesLib');
 			
 			// 
-			if (isset($jsonSchema->{UDFWidgetTpl::LABEL}))
+			if (isset($jsonSchema->{UDFLib::LABEL}))
 			{
 				$tmpResult = $this->_ci->phraseslib->getPhrases(
 					UDFWidget::PHRASES_APP_NAME,
 					DEFAULT_LEHREINHEIT_SPRACHE,
-					$jsonSchema->{UDFWidgetTpl::LABEL},
+					$jsonSchema->{UDFLib::LABEL},
 					null,
 					null,
 					'no'
 				);
 				if (hasData($tmpResult))
 				{
-					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::LABEL] = $tmpResult->retval[0]->text;
+					$this->_args[HTMLWidget::HTML_ARG_NAME][UDFLib::LABEL] = $tmpResult->retval[0]->text;
 				}
 				else
 				{
-					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::LABEL] = null;
+					$this->_args[HTMLWidget::HTML_ARG_NAME][UDFLib::LABEL] = null;
 				}
 			}
 			
 			// 
-			if (isset($jsonSchema->{UDFWidgetTpl::TITLE}))
+			if (isset($jsonSchema->{UDFLib::TITLE}))
 			{
 				$tmpResult = $this->_ci->phraseslib->getPhrases(
 					UDFWidget::PHRASES_APP_NAME,
 					DEFAULT_LEHREINHEIT_SPRACHE,
-					$jsonSchema->{UDFWidgetTpl::TITLE},
+					$jsonSchema->{UDFLib::TITLE},
 					null,
 					null,
 					'no'
 				);
 				if (hasData($tmpResult))
 				{
-					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::TITLE] = $tmpResult->retval[0]->text;
+					$this->_args[HTMLWidget::HTML_ARG_NAME][UDFLib::TITLE] = $tmpResult->retval[0]->text;
 				}
 				else
 				{
-					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::TITLE] = null;
+					$this->_args[HTMLWidget::HTML_ARG_NAME][UDFLib::TITLE] = null;
 				}
 			}
 			
 			// 
-			if (isset($jsonSchema->{UDFWidgetTpl::PLACEHOLDER}))
+			if (isset($jsonSchema->{UDFLib::PLACEHOLDER}))
 			{
 				$tmpResult = $this->_ci->phraseslib->getPhrases(
 					UDFWidget::PHRASES_APP_NAME,
 					DEFAULT_LEHREINHEIT_SPRACHE,
-					$jsonSchema->{UDFWidgetTpl::PLACEHOLDER},
+					$jsonSchema->{UDFLib::PLACEHOLDER},
 					null,
 					null,
 					'no'
 				);
 				if (hasData($tmpResult))
 				{
-					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::PLACEHOLDER] = $tmpResult->retval[0]->text;
+					$this->_args[HTMLWidget::HTML_ARG_NAME][UDFLib::PLACEHOLDER] = $tmpResult->retval[0]->text;
 				}
 				else
 				{
-					$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::PLACEHOLDER] = null;
+					$this->_args[HTMLWidget::HTML_ARG_NAME][UDFLib::PLACEHOLDER] = null;
 				}
 			}
 		}
@@ -384,38 +383,38 @@ class UDFWidget extends UDFWidgetTpl
     private function _setValidationAttributes($jsonSchema)
     {
 		// Validation
-		$this->_args[Widget::HTML_ARG_NAME][UDFWidget::REQUIRED] = null;
-		$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::REGEX] = null;
-		$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::MAX_VALUE] = null;
-		$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::MIN_VALUE] = null;
+		$this->_args[HTMLWidget::HTML_ARG_NAME][UDFWidget::REQUIRED] = null;
+		$this->_args[HTMLWidget::HTML_ARG_NAME][UDFLib::REGEX] = null;
+		$this->_args[HTMLWidget::HTML_ARG_NAME][UDFLib::MAX_VALUE] = null;
+		$this->_args[HTMLWidget::HTML_ARG_NAME][UDFLib::MIN_VALUE] = null;
 		
 		if (isset($jsonSchema->validation))
 		{
-			if (isset($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REGEX})
-				&& is_array($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REGEX}))
+			if (isset($jsonSchema->{UDFWidget::VALIDATION}->{UDFLib::REGEX})
+				&& is_array($jsonSchema->{UDFWidget::VALIDATION}->{UDFLib::REGEX}))
 			{
-				foreach($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REGEX} as $regex)
+				foreach($jsonSchema->{UDFWidget::VALIDATION}->{UDFLib::REGEX} as $regex)
 				{
 					if ($regex->language === UDFWidget::REGEX_LANGUAGE)
 					{
-						$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::REGEX] = $regex->expression;
+						$this->_args[HTMLWidget::HTML_ARG_NAME][UDFLib::REGEX] = $regex->expression;
 					}
 				}
 			}
 			
-			if (isset($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REQUIRED}))
+			if (isset($jsonSchema->{UDFWidget::VALIDATION}->{UDFLib::REQUIRED}))
 			{
-				$this->_args[Widget::HTML_ARG_NAME][UDFWidget::REQUIRED] = $jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::REQUIRED};
+				$this->_args[HTMLWidget::HTML_ARG_NAME][UDFWidget::REQUIRED] = $jsonSchema->{UDFWidget::VALIDATION}->{UDFLib::REQUIRED};
 			}
 			
-			if (isset($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::MAX_VALUE}))
+			if (isset($jsonSchema->{UDFWidget::VALIDATION}->{UDFLib::MAX_VALUE}))
 			{
-				$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::MAX_VALUE] = $jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::MAX_VALUE};
+				$this->_args[HTMLWidget::HTML_ARG_NAME][UDFLib::MAX_VALUE] = $jsonSchema->{UDFWidget::VALIDATION}->{UDFLib::MAX_VALUE};
 			}
 			
-			if (isset($jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::MIN_VALUE}))
+			if (isset($jsonSchema->{UDFWidget::VALIDATION}->{UDFLib::MIN_VALUE}))
 			{
-				$this->_args[Widget::HTML_ARG_NAME][UDFWidgetTpl::MIN_VALUE] = $jsonSchema->{UDFWidget::VALIDATION}->{UDFWidgetTpl::MIN_VALUE};
+				$this->_args[HTMLWidget::HTML_ARG_NAME][UDFLib::MIN_VALUE] = $jsonSchema->{UDFWidget::VALIDATION}->{UDFLib::MIN_VALUE};
 			}
 		}
 	}

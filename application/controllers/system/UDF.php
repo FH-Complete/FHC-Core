@@ -11,8 +11,8 @@ class UDF extends VileSci_Controller
         // Load session library
         $this->load->library('session');
         
-        // Loads the widget library
-		$this->load->library('WidgetLib');
+        // Loads the UDF library
+		$this->load->library('UDFLib');
 		
 		// 
 		$this->load->model('person/Person_model', 'PersonModel');

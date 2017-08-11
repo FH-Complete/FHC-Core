@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FH-Complete
  *
@@ -10,8 +11,7 @@
  * @since	Version 1.0.0
  * @filesource
  */
-if (! defined('BASEPATH'))
-	exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * FHC Helper
@@ -24,7 +24,6 @@ if (! defined('BASEPATH'))
  */
 
 // ------------------------------------------------------------------------
-
 
 /**
  * generateToken() - generates a new token for diffent use
@@ -75,4 +74,66 @@ function var_dump_to_error_log($parameter)
 	$ob_get_contents = ob_get_contents();
 	ob_end_clean();
 	error_log(str_replace("\n", '', $ob_get_contents));
+}
+
+/**
+ * 
+ */
+function loadResource($path, $resources = null, $subdir = false)
+{
+	$_ci = & get_instance();
+	
+	// 
+	if (strrpos($path, '/') < strlen($path) - 1)
+	{
+		$path .= '/';
+	}
+	
+	// 
+	$tmpResources = $resources;
+	if ($resources == null)
+	{
+		$tmpResources = array();
+	}
+	else if (!is_array($resources))
+	{
+		$tmpResources = array($resources);
+	}
+	
+	// 
+	$tmpPaths = array($path);
+	// NOTE: Used @ to prevent ugly error messages
+	if (is_dir($path) && ($dirHandler = @opendir($path)) !== false)
+	{
+		while (($entry = readdir($dirHandler)) !== false)
+		{
+			// 
+			if ($subdir === true && $entry != '.' && $entry != '..' && is_dir($entry))
+			{
+				$tmpPaths[] = $entry;
+			}
+			// 
+			if ($resources == null && is_file($path.$entry))
+			{
+				if ($entry != ($tmpName = str_replace('.php', '', $entry)))
+				{
+					$tmpResources[] = $tmpName;
+				}
+			}
+		}
+		closedir($dirHandler);
+	}
+	
+	// 
+	foreach($tmpResources as $tmpResource)
+	{
+		foreach($tmpPaths as $tmpPath)
+		{
+			$fileName = $tmpPath.$tmpResource.'.php';
+			if (file_exists($fileName))
+			{
+				include_once($fileName);
+			}
+		}
+	}
 }

@@ -62,11 +62,11 @@
 				?>
 					<div class="div-cell">
 						<?php
-							echo $this->widgetlib->UDFWidget(
+							echo $this->udflib->UDFWidget(
 								array(
-									UDFWidgetTpl::SCHEMA_ARG_NAME => 'public',
-									UDFWidgetTpl::TABLE_ARG_NAME => 'tbl_person',
-									UDFWidgetTpl::UDFS_ARG_NAME => $personUdfs
+									UDFLib::SCHEMA_ARG_NAME => 'public',
+									UDFLib::TABLE_ARG_NAME => 'tbl_person',
+									UDFLib::UDFS_ARG_NAME => $personUdfs
 								)
 							);
 						?>
@@ -83,11 +83,11 @@
 				?>
 					<div class="div-cell">
 						<?php
-							echo $this->widgetlib->UDFWidget(
+							echo $this->udflib->UDFWidget(
 								array(
-									UDFWidgetTpl::SCHEMA_ARG_NAME => 'public',
-									UDFWidgetTpl::TABLE_ARG_NAME => 'tbl_prestudent',
-									UDFWidgetTpl::UDFS_ARG_NAME => $prestudentUdfs
+									UDFLib::SCHEMA_ARG_NAME => 'public',
+									UDFLib::TABLE_ARG_NAME => 'tbl_prestudent',
+									UDFLib::UDFS_ARG_NAME => $prestudentUdfs
 								)
 							);
 						?>

@@ -1,22 +1,22 @@
-<?php Widget::printStartBlock(${Widget::HTML_ARG_NAME}); ?>
+<?php HTMLWidget::printStartBlock(${HTMLWidget::HTML_ARG_NAME}); ?>
 
 	<div class="div-table">
 		<div class="div-row">
 			<?php
-				if (isset(${Widget::HTML_ARG_NAME}[UDFWidgetTpl::LABEL]))
+				if (isset(${HTMLWidget::HTML_ARG_NAME}[HTMLWidget::LABEL]))
 				{
 					$align = "valign-middle";
-					if (isset(${Widget::HTML_ARG_NAME}[DropdownWidget::MULTIPLE]))
+					if (isset(${HTMLWidget::HTML_ARG_NAME}[DropdownWidget::MULTIPLE]))
 					{
 						$align = "valign-top";
 					}
 			?>
 				<div class="div-cell width-150px <?php echo $align; ?>">
 					<label
-						for="<?php echo ${Widget::HTML_ARG_NAME}[Widget::HTML_ID]; ?>"
-						<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidget::REQUIRED); ?>
+						for="<?php echo ${HTMLWidget::HTML_ARG_NAME}[HTMLWidget::HTML_ID]; ?>"
+						<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::REQUIRED); ?>
 					>
-						<?php echo ${Widget::HTML_ARG_NAME}[UDFWidgetTpl::LABEL]; ?>
+						<?php echo ${HTMLWidget::HTML_ARG_NAME}[HTMLWidget::LABEL]; ?>
 					</label>
 				</div>
 			<?php
@@ -24,15 +24,15 @@
 			?>
 			<div class="div-cell width-150px">
 				<select
-					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, Widget::HTML_ID); ?>
-					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, Widget::HTML_NAME); ?>
-					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, DropdownWidget::SIZE); ?>
-					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, DropdownWidget::MULTIPLE, false); ?>
-					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidget::REQUIRED); ?>
-					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidgetTpl::MAX_VALUE); ?>
-					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidgetTpl::MIN_VALUE); ?>
-					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidgetTpl::REGEX); ?>
-					<?php Widget::printAttribute(${Widget::HTML_ARG_NAME}, UDFWidgetTpl::TITLE); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::HTML_ID); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::HTML_NAME); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, DropdownWidget::SIZE); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, DropdownWidget::MULTIPLE, false); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::REQUIRED); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::MAX_VALUE); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::MIN_VALUE); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::REGEX); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::TITLE); ?>
 				>
 					<?php
 						$elements = ${DropdownWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME};
@@ -71,4 +71,4 @@
 		</div>
 	</div>
 
-<?php Widget::printEndBlock(${Widget::HTML_ARG_NAME}); ?>
+<?php HTMLWidget::printEndBlock(${HTMLWidget::HTML_ARG_NAME}); ?>
