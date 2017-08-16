@@ -136,7 +136,7 @@ echo '
     <select name="verband">
 	  <option value="">*</option>';
 
-$verbaende=array("A","B","C","D","E","F","I","O","P","V");
+$verbaende=array("A","B","C","D","E","F","I","J","L","M","O","P","S","V","X");
 
 foreach ($verbaende as $i)
 {
