@@ -107,4 +107,29 @@ class Studiengang2 extends APIv1_Controller
 			$this->response();
 		}
 	}
+	
+	/**
+	 * @return void
+	 */
+	public function getAppliedStudiengangFromNow()
+	{
+		$person_id = $this->get('person_id');
+		$titel = $this->get('titel');
+		
+		if (isset($person_id) && isset($titel))
+		{
+			$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+			
+			$result = $this->StudiengangModel->getAppliedStudiengangFromNow(
+				$person_id,
+				$titel
+			);
+			
+			$this->response($result, REST_Controller::HTTP_OK);
+		}
+		else
+		{
+			$this->response();
+		}
+	}
 }

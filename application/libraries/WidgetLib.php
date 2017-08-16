@@ -28,6 +28,9 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
 
 class WidgetLib
 {
+	const DIR_HTML_WIDGETS = 'html';
+	const HTML_WIDGET_NAME = 'HTMLWidget';
+	
     /* default values */
     private $_template = 'template';
     private $_parser = FALSE;
@@ -45,8 +48,15 @@ class WidgetLib
 	{
         $this->_ci = & get_instance();
         
-        // set the default widget path with APPPATH
+        $this->_ci->load->helper('fhc');
+        
+        // Set the default widget path with APPPATH
         $this->_widget_path = APPPATH . 'widgets/';
+		
+        // Loads widgets to render HTML elements
+        // NOTE: the first one to be loaded must be HTMLWidget
+        loadResource($this->_widget_path.WidgetLib::DIR_HTML_WIDGETS, WidgetLib::HTML_WIDGET_NAME);
+        loadResource($this->_widget_path.WidgetLib::DIR_HTML_WIDGETS);
         
         if (!empty($config))
             $this->initialize($config);
@@ -184,33 +194,15 @@ class WidgetLib
      */
     public function widget($name, $data = array(), $htmlArgs = array())
     {
-        $class = str_replace('.php', '', trim($name, '/'));
+		// 
+        loadResource($this->_widget_path, $name, true);
         
-        // determine path and widget class name
-        $path = $this->_widget_path;
-        if (($last_slash = strrpos($class, '/')) !== FALSE) {
-            $path += substr($class, 0, $last_slash);
-            $class = substr($class, $last_slash + 1);
+        if (!class_exists($name))
+        {
+            show_error("Widget '" . $name . "' was not found.");
         }
         
-        // new widget
-        if (!class_exists($class)) {
-            // try both lowercase and capitalized versions
-            foreach (array(ucfirst($class), strtolower($class)) as $class) {
-                if (file_exists($path . $class . '.php')) {
-                    include_once ($path . $class . '.php');
-                    
-                    // found the file, stop looking
-                    break;
-                }
-            }
-        }
-        
-        if (!class_exists($class)) {
-            show_error("Widget '" . $class . "' was not found.");
-        }
-        
-        return new $class($class, $data, $htmlArgs);
+        return new $name($name, $data, $htmlArgs);
     }
     
     /**
@@ -603,31 +595,10 @@ class Partial
 }
 
 /**
- * The mother of all widgets
- * it represent a generic HTML element
+ * General widget element
  */
 class Widget extends Partial
 {
-	// The name of the array present in the data array given to the view that will render this widget
-    const HTML_ARG_NAME = 'HTML';
-	const HTML_DEFAULT_VALUE = ''; // Default value of the html element
-    const HTML_NAME = 'name'; // HTML name attribute
-    const HTML_ID = 'id'; // HTML id attribute
-    
-    /**
-     * It gets also the htmlArgs array as parameter, it will be used to set the HTML properties
-     */
-    public function __construct($name, $args, $htmlArgs = array())
-	{
-		parent::__construct($name, $args);
-		
-		// Initialising HTML properties
-		$this->_setHtmlProperties($htmlArgs);
-        
-        // Loads helper message to manage returning messages
-		$this->load->helper('message');
-	}
-	
 	/**
 	 * (non-PHPdoc)
 	 * @see Partial::content()
@@ -653,145 +624,5 @@ class Widget extends Partial
 		}
 		
 		return parent::content();
-	}
-	
-    /**
-     * Initialising html properties, such as the id and name attributes of the HTML element
-     */
-    private function _setHtmlProperties($htmlArgs)
-    {
-		if (isset($htmlArgs) && is_array($htmlArgs))
-		{
-			$this->_args[Widget::HTML_ARG_NAME] = array();
-			
-			// Avoids that the elements of a same HTML page have the same name or id
-			$randomIdentifier = uniqid(rand(0, 1000));
-			
-			if (isset($htmlArgs[Widget::HTML_ID]) && trim($htmlArgs[Widget::HTML_ID]) != '')
-			{
-				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_ID] = $htmlArgs[Widget::HTML_ID];
-			}
-			else
-			{
-				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_ID] = $randomIdentifier;
-			}
-			
-			if (isset($htmlArgs[Widget::HTML_NAME]) && trim($htmlArgs[Widget::HTML_NAME]) != '')
-			{
-				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] = $htmlArgs[Widget::HTML_NAME];
-			}
-			else
-			{
-				$this->_args[Widget::HTML_ARG_NAME][Widget::HTML_NAME] = $randomIdentifier;
-			}
-		}
-    }
-}
-
-/**
- * It exends the Widget class to represent an HTML dropdown
- */
-class DropdownWidget extends Widget
-{
-	// The name of the element of the data array given to the view
-	// this element is an array of elements to be place inside the dropdown
-	const WIDGET_DATA_ELEMENTS_ARRAY_NAME = 'ELEMENTS_ARRAY';
-	// Name of the property that will be used to store the value attribute of the option tag
-	const ID_FIELD = 'id';
-	// Name of the property that will be used to store the value between the option tags
-	const DESCRIPTION_FIELD = 'description'; //
-	// The name of the element of the data array given to the view
-	// this element is used to tell what element of the dropdown is selected
-	const SELECTED_ELEMENT = 'selectedElement'; // 
-	
-	private $elementsArray; // Array of elements to be place inside the dropdown
-	
-	/**
-	 * Loads the dropdown view with all the elements to be displayed
-	 */
-	protected function loadDropDownView($widgetData)
-	{
-		$widgetData[DropdownWidget::WIDGET_DATA_ELEMENTS_ARRAY_NAME] = $this->elementsArray->retval;
-		
-		if (!isset($widgetData[DropdownWidget::SELECTED_ELEMENT]))
-		{
-			$widgetData[DropdownWidget::SELECTED_ELEMENT] = Widget::HTML_DEFAULT_VALUE;
-		}
-		
-		$this->view('widgets/dropdown', $widgetData);
-	}
-	
-	/**
-	 * Add the correct select to the model used to load a list of elemets for this dropdown
-	 * @param model $model the model used to load elements
-	 * @param string $idName the name of the field that will used to be the value of the option tag
-	 * @param string $descriptionName the name of the field that will used to be displayed in the dropdown
-	 */
-	protected function addSelectToModel($model, $idName, $descriptionName)
-	{
-		$model->addSelect(
-			sprintf(
-				'%s AS %s, %s AS %s',
-				$idName,
-				DropdownWidget::ID_FIELD,
-				$descriptionName,
-				DropdownWidget::DESCRIPTION_FIELD
-			)
-		);
-	}
-	
-	/**
-	 * Set the array used to populate the dropdown
-	 * @param array $elements list used to populate this dropdown
-	 * @param boolean $emptyElement if an empty element must be added at the beginning of the dropdown
-	 * @param string $stdDescription description of the empty element
-	 * @param string $noDataDescription description if no data are found
-	 * @param string $id value of the attribute value of the empty element
-	 */
-	protected function setElementsArray(
-		$elements, $emptyElement = false, $stdDescription = '' , $noDataDescription = '' , $id = Widget::HTML_DEFAULT_VALUE
-	)
-	{
-		if (isError($elements))
-		{
-			if (is_object($elements) && isset($elements->retval))
-			{
-				show_error($elements->retval);
-			}
-			else if (is_string($elements))
-			{
-				show_error($elements);
-			}
-			else
-			{
-				show_error('Generic error occurred');
-			}
-		}
-		else
-		{
-			$this->elementsArray = $elements;
-			
-			if ($emptyElement === true)
-			{
-				$this->addElementAtBeginning($stdDescription, $noDataDescription, $id);
-			}
-		}
-	}
-	
-	/**
-     * Adds an element to the beginning of the array
-     */
-	protected function addElementAtBeginning($stdDescription, $noDataDescription, $id)
-	{
-		$element = new stdClass();
-		$element->id = $id;
-		$element->description = $stdDescription;
-		
-		if (!hasData($this->elementsArray))
-		{
-			$element->description = $noDataDescription;
-		}
-		
-		array_unshift($this->elementsArray->retval, $element);
 	}
 }

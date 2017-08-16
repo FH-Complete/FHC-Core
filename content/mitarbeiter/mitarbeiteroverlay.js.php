@@ -623,6 +623,12 @@ function MitarbeiterAuswahl()
 		// ***** Termine *****
 		document.getElementById('mitarbeiter-termine').setAttribute('src','termine.xul.php?mitarbeiter_uid='+uid);
 	}
+	
+	// ***** UDF *****
+	if (document.getElementById('mitarbeiter-tabs').selectedItem == document.getElementById('mitarbeiter-tab-udf'))
+	{
+		document.getElementById('mitarbeiter-udf').setAttribute('src', 'udf.xul.php?person_id='+person_id);
+	}
 
 	// **** VERWENDUNG ****
 	verwendungtree = document.getElementById('mitarbeiter-tree-verwendung');
@@ -1971,4 +1977,24 @@ function MitarbeiterTermineIFrameLoad()
 		url = 'termine.xul.php?mitarbeiter_uid='+uid+'&ts='+gettimestamp();
 		document.getElementById('mitarbeiter-termine').setAttribute('src',url);
 	}
+}
+
+// ****
+// * Load UDF IFrame
+// ****
+function MitarbeiterUDFIFrameLoad()
+{
+	var tree = document.getElementById('mitarbeiter-tree');
+
+	if (tree.currentIndex == -1) return;
+
+	try
+	{
+		//Ausgewaehlte person_id holen
+		var person_id = getTreeCellText(tree, 'mitarbeiter-treecol-person_id', tree.currentIndex);
+		
+		url = 'udf.xul.php?person_id='+person_id;
+		document.getElementById('mitarbeiter-udf').setAttribute('src', url);
+	}
+	catch(e) {}
 }

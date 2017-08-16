@@ -30,6 +30,7 @@ require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/Excel/excel.php');
+require_once('../../include/udf.class.php');
 
 $db = new basis_db();
 $user = get_uid();
@@ -43,7 +44,7 @@ else
 	$fix=null;
 
 if (isset($_GET['stgl']))
-	$stgl = ($_GET['stgl']=='true'?true:false);
+	$stgl = ($_GET['stgl'] == 'true' ? true : false);
 else
 	$stgl=null;
 
@@ -72,20 +73,21 @@ if (isset($_GET['zustelladresse']))
 else
 	$zustelladresse = null;
 
-//die Spalten die Exportiert werden sollen, werden per GET uebergeben
-//spalte1=nachname, spalte2=vorname, spalte3=gebdatum, ...
-$anzSpalten=0;
-$varname='spalte'.(string)$anzSpalten;
+// Die Spalten die Exportiert werden sollen, werden per GET uebergeben
+// spalte1=nachname, spalte2=vorname, spalte3=gebdatum, ...
+$anzSpalten = 0;
+$varname = 'spalte'.(string)$anzSpalten;
 while (isset($_GET[$varname]))
 {
-	$spalte[$anzSpalten]=$_GET[$varname];
+	$spalte[$anzSpalten] = $_GET[$varname];
 	$anzSpalten++;
-	$varname='spalte'.(string)$anzSpalten;
+	$varname = 'spalte'.(string)$anzSpalten;
 }
-$zustelladresse=true;
+
+$zustelladresse = true;
 
 // Mitarbeiter holen
-$mitarbeiterDAO=new mitarbeiter();
+$mitarbeiterDAO = new mitarbeiter();
 $mitarbeiterDAO->getPersonal($fix, $stgl, $fbl, $aktiv, $karenziert, $ausgeschieden, $semester_aktuell);
 
 //Sortieren der Eintraege nach Nachname, Vorname
@@ -96,105 +98,169 @@ $nachname=array();
 
 $umlaute = array('ö','Ö','ü','Ü','ä','Ä');
 $umlauterep = array('o','O','u','U','a','A');
-foreach ($mitarbeiterDAO->result as $key=>$foo)
+foreach ($mitarbeiterDAO->result as $key => $foo)
 {
 	$vorname[$key]=str_replace($umlaute, $umlauterep, $foo->vorname);
 	$nachname[$key]=str_replace($umlaute, $umlauterep, $foo->nachname);
 }
+
 array_multisort($nachname, SORT_ASC, $vorname, SORT_ASC, $mitarbeiterDAO->result);
 
-	// Creating a workbook
-	$workbook = new Spreadsheet_Excel_Writer();
-	$workbook->setVersion(8);
-	// sending HTTP headers
-	$workbook->send("Mitarbeiter". "_" . date("d_m_Y") . ".xls");
+// Creating a workbook
+$workbook = new Spreadsheet_Excel_Writer();
+$workbook->setVersion(8);
+// sending HTTP headers
+$workbook->send("Mitarbeiter". "_" . date("d_m_Y") . ".xls");
 
-	// Creating a worksheet
-	$worksheet =& $workbook->addWorksheet("Mitarbeiter");
-	$worksheet->setInputEncoding('utf-8');
+// Creating a worksheet
+$worksheet =& $workbook->addWorksheet("Mitarbeiter");
+$worksheet->setInputEncoding('utf-8');
 
-	$format_bold =& $workbook->addFormat();
-	$format_bold->setBold();
+$format_bold =& $workbook->addFormat();
+$format_bold->setBold();
 
-	$format_title =& $workbook->addFormat();
-	$format_title->setBold();
-	// let's merge
-	$format_title->setAlign('merge');
+$format_title =& $workbook->addFormat();
+$format_title->setBold();
+// let's merge
+$format_title->setAlign('merge');
 
-	//Zeilenueberschriften ausgeben
-	for ($i=0;$i<$anzSpalten;$i++)
-		$worksheet->write(0,$i,mb_strtoupper(str_replace('_bezeichnung','',$spalte[$i])), $format_bold);
-	$worksheet->write(0,$i,"STRASSE", $format_bold);
-	$worksheet->write(0,$i+1,"PLZ", $format_bold);
-	$worksheet->write(0,$i+2,"ORT", $format_bold);
-	$worksheet->write(0,$i+3,"FIRMENNAME", $format_bold);
+$zeile = 0;
 
-	//Maximale Spaltenbreite ermitteln damit sie am Schluss gesetzt werden kann
-	$j=1;
-	$maxlength = array();
-	for ($i=0;$i<$anzSpalten;$i++)
-		$maxlength[$i]=mb_strlen(str_replace('_bezeichnung','',$spalte[$i]));
-	$maxlength[$i]=mb_strlen('STRASSE');
-	$maxlength[$i+1]=mb_strlen('PLZ');
-	$maxlength[$i+2]=mb_strlen('ORT');
-	$maxlength[$i+3]=mb_strlen('FIRMENNAME');
+// Zeilenueberschriften ausgeben
+$col = 0;
+for ($col = 0; $col < $anzSpalten; $col++)
+{
+	$worksheet->write($zeile, $col, mb_strtoupper(str_replace('_bezeichnung', '', $spalte[$col])), $format_bold);
+}
 
-	//Zeilen (Mitarbeiter) ausgeben
-	foreach ($mitarbeiterDAO->result as $mitarbeiter)
+$worksheet->write($zeile, $col, "STRASSE", $format_bold);
+$worksheet->write($zeile, ++$col, "PLZ", $format_bold);
+$worksheet->write($zeile, ++$col, "ORT", $format_bold);
+$worksheet->write($zeile, ++$col, "FIRMENNAME", $format_bold);
+
+// Maximale Spaltenbreite ermitteln damit sie am Schluss gesetzt werden kann
+$maxlength = array();
+for ($col = 0; $col < $anzSpalten; $col++)
+{
+	$maxlength[$col] = mb_strlen(str_replace('_bezeichnung','',$spalte[$col]));
+}
+
+$maxlength[$col] = mb_strlen('STRASSE');
+$maxlength[++$col] = mb_strlen('PLZ');
+$maxlength[++$col] = mb_strlen('ORT');
+$maxlength[++$col] = mb_strlen('FIRMENNAME');
+
+// UDF titles
+$udf = new UDF();
+$udfTitlesPerson = $udf->getTitlesPerson();
+
+foreach($udfTitlesPerson as $udfTitle)
+{
+	$worksheet->write($zeile, ++$col, $udfTitle['description'], $format_bold);
+	$maxlength[$col] = mb_strlen($udfTitle['description']);
+}
+
+$zeile++;
+
+// Zeilen (Mitarbeiter) ausgeben
+foreach ($mitarbeiterDAO->result as $mitarbeiter)
+{
+	//Spalten ausgeben
+	for ($col = 0; $col < $anzSpalten; $col++)
 	{
-		//Spalten ausgeben
-		for ($i=0;$i<$anzSpalten;$i++)
-		{
-			if(is_bool($mitarbeiter->{$spalte[$i]}))
-				$mitarbeiter->{$spalte[$i]} = ($mitarbeiter->{$spalte[$i]}?'Ja':'Nein');
+		if (is_bool($mitarbeiter->{$spalte[$col]}))
+			$mitarbeiter->{$spalte[$col]} = ($mitarbeiter->{$spalte[$col]} ? 'Ja' : 'Nein');
 
-			if(mb_strlen($mitarbeiter->{$spalte[$i]})>$maxlength[$i])
-				$maxlength[$i] = mb_strlen($mitarbeiter->{$spalte[$i]});
-			$worksheet->write($j,$i, $mitarbeiter->{$spalte[$i]});
-		}
+		if (mb_strlen($mitarbeiter->{$spalte[$col]}) > $maxlength[$col])
+			$maxlength[$col] = mb_strlen($mitarbeiter->{$spalte[$col]});
+		$worksheet->write($zeile, $col, $mitarbeiter->{$spalte[$col]});
+	}
 
-		//Zustelladresse aus der Datenbank holen und dazuhaengen
-		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$mitarbeiter->person_id' AND zustelladresse=true LIMIT 1";
-		if($result = $db->db_query($qry))
+	//Zustelladresse aus der Datenbank holen und dazuhaengen
+	$qry = "SELECT * FROM public.tbl_adresse WHERE person_id = '$mitarbeiter->person_id' AND zustelladresse = true LIMIT 1";
+	if ($result = $db->db_query($qry))
+	{
+		if ($row = $db->db_fetch_object($result))
 		{
-			if($row = $db->db_fetch_object($result))
+			if (mb_strlen($row->strasse) > $maxlength[$col])
+				$maxlength[$col] = mb_strlen($row->strasse);
+			$worksheet->write($zeile, $col, $row->strasse);
+			$col++;
+			if (mb_strlen($row->plz) > $maxlength[$col])
+				$maxlength[$col] = mb_strlen($row->plz);
+			$worksheet->write($zeile, $col, $row->plz);
+			$col++;
+			if (mb_strlen($row->ort) > $maxlength[$col])
+				$maxlength[$col] = mb_strlen($row->ort);
+			$worksheet->write($zeile, $col, $row->ort);
+			
+			$col++;
+			if ($row->firma_id != '')
 			{
-				if(mb_strlen($row->strasse)>$maxlength[$i])
-					$maxlength[$i]=mb_strlen($row->strasse);
-				$worksheet->write($j,$i, $row->strasse);
-				if(mb_strlen($row->plz)>$maxlength[$i+1])
-					$maxlength[$i+1]=mb_strlen($row->plz);
-				$worksheet->write($j,$i+1, $row->plz);
-				if(mb_strlen($row->ort)>$maxlength[$i+2])
-					$maxlength[$i+2]=mb_strlen($row->ort);
-				$worksheet->write($j,$i+2, $row->ort);
-
-				if($row->firma_id!='')
+				$qry = "SELECT * FROM public.tbl_firma WHERE firma_id = '$row->firma_id'";
+				if ($result = $db->db_query($qry))
 				{
-					$qry = "SELECT * FROM public.tbl_firma WHERE firma_id='$row->firma_id'";
-					if($result = $db->db_query($qry))
+					if ($row = $db->db_fetch_object($result))
 					{
-						if($row = $db->db_fetch_object($result))
-						{
-							if(mb_strlen($row->name)>$maxlength[$i+3])
-								$maxlength[$i+3]=mb_strlen($row->name);
-							$worksheet->write($j,$i+3, $row->name);
-						}
+						if (mb_strlen($row->name) > $maxlength[$col])
+							$maxlength[$col] = mb_strlen($row->name);
+						$worksheet->write($zeile, $col, $row->name);
 					}
 				}
 			}
 		}
-
-		$j++;
+	}
+	
+	$col++;
+	
+	// UDF
+	if (isset($mitarbeiter->p_udf_values))
+	{
+		$udfPerson = json_decode($mitarbeiter->p_udf_values);
+		if (is_object($udfPerson)) $udfPerson = (array)$udfPerson;
+		
+		foreach($udfTitlesPerson as $udfTitle)
+		{
+			if (isset($udfPerson[$udfTitle['name']]))
+			{
+				if (is_string($udfPerson[$udfTitle['name']]) || is_numeric($udfPerson[$udfTitle['name']]))
+				{
+					if (mb_strlen($udfPerson[$udfTitle['name']]) > $maxlength[$col])
+					{
+						$maxlength[$col] = mb_strlen($udfPerson[$udfTitle['name']]);
+					}
+					$worksheet->write($zeile, $col, $udfPerson[$udfTitle['name']]);
+				}
+				else if(is_array($udfPerson[$udfTitle['name']]) && isset($udfTitle['enum']))
+				{
+					$toWrite = $udf->dropdownListValuesToString($udfPerson[$udfTitle['name']], $udfTitle['enum']);
+					
+					if (mb_strlen($toWrite) > $maxlength[$col])
+					{
+						$maxlength[$col] = mb_strlen($toWrite);
+					}
+					$worksheet->write($zeile, $col, $toWrite);
+				}
+			}
+			$col++;
+		}
 	}
 
-	//Die Breite der Spalten setzen
-	for ($i=0;$i<$anzSpalten;$i++)
-		$worksheet->setColumn($i, $i, $maxlength[$i]+2);
-    $worksheet->setColumn($i, $i, $maxlength[$i]+2);
-    $worksheet->setColumn($i+1, $i+1, $maxlength[$i+1]+2);
-    $worksheet->setColumn($i+2, $i+2, $maxlength[$i+2]+2);
+	$zeile++;
+}
 
-	$workbook->close();
+//Die Breite der Spalten setzen
+for ($col = 0; $col < $anzSpalten; $col++)
+{
+	$worksheet->setColumn($col, $col, $maxlength[$col] + 2);
+}
+
+$worksheet->setColumn($col, $col, $maxlength[$col] + 2);
+$col++;
+$worksheet->setColumn($col, $col, $maxlength[$col] + 2);
+$col++;
+$worksheet->setColumn($col, $col, $maxlength[$col] + 2);
+
+$workbook->close();
 
 ?>
