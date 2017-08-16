@@ -93,6 +93,7 @@ foreach($ps->result as $row)
         	<ROLLE:studienplan_bezeichnung><![CDATA['.$row->studienplan_bezeichnung.']]></ROLLE:studienplan_bezeichnung>
         	<ROLLE:bestaetigt_von><![CDATA['.$row->bestaetigtvon.']]></ROLLE:bestaetigt_von>
         	<ROLLE:bestaetigt_am><![CDATA['.$datum->convertISODate($row->bestaetigtam).']]></ROLLE:bestaetigt_am>
+			<ROLLE:bewerbung_abgeschicktamum><![CDATA['.$datum->convertISODate($row->bewerbung_abgeschicktamum).']]></ROLLE:bewerbung_abgeschicktamum>
         	<ROLLE:anmerkung><![CDATA['.$row->anmerkung_status.']]></ROLLE:anmerkung>
 			<ROLLE:rt_stufe><![CDATA['.$row->rt_stufe.']]></ROLLE:rt_stufe>
 			<ROLLE:statusgrund_id><![CDATA['.$row->statusgrund_id.']]></ROLLE:statusgrund_id>
