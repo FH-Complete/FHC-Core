@@ -23,6 +23,13 @@ class PrestudentMultiAssign extends VileSci_Controller
 		$reihungstest = $this->input->post('reihungstest');
 		$stufe = $this->input->post('stufe');
 		
+		// Converts string 'null' to a null value
+		$stufe = ($stufe == 'null' ? null : $stufe);
+		$studiengang = ($studiengang == 'null' ? null : $studiengang);
+		$reihungstest = ($reihungstest == 'null' ? null : $reihungstest);
+		$aufnahmegruppe = ($aufnahmegruppe == 'null' ? null : $aufnahmegruppe);
+		$studiensemester = ($studiensemester == 'null' ? null : $studiensemester);
+		
 		$returnUsers = null;
 		if ($studiengang != null || $studiensemester != null || $aufnahmegruppe!= null
 			|| $reihungstest != null || $stufe != null)
@@ -63,25 +70,36 @@ class PrestudentMultiAssign extends VileSci_Controller
 		$prestudentIdArray = $this->input->post('prestudent_id');
 		$stufe = $this->input->post('stufe');
 		
+		// Converts string 'null' to a null value
+		$stufe = ($stufe == 'null' ? null : $stufe);
+		
 		// Load model PrestudentstatusModel
         $this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
         
-        $result = error("No valid parameters");
-        if (isset($stufe) && isset($prestudentIdArray) && is_array($prestudentIdArray) && count($prestudentIdArray) >0)
-        {
-			$result = $this->PrestudentstatusModel->updateStufe($prestudentIdArray, $stufe);
-		}
-        
+        // Set the HTTP header
         $this->output->set_header('Content-Type: application/json; charset=utf-8');
         
-        if (isSuccess($result))
+        $result = error("No valid parameters");
+        if (isset($stufe)
+			&& isset($prestudentIdArray)
+			&& is_array($prestudentIdArray)
+			&& count($prestudentIdArray) > 0)
         {
-			echo '{"msg": "Data correctly saved"}';
-        }
-        else
-        {
-			echo '{"msg": "Error occurred while saving data, please contact the administrator"}';
-        }
+			$result = $this->PrestudentstatusModel->updateStufe($prestudentIdArray, $stufe);
+			
+			if (isSuccess($result))
+			{
+				echo '{"msg": "Data correctly saved"}';
+			}
+			else
+			{
+				echo '{"msg": "Error occurred while saving data, please contact the administrator"}';
+			}
+		}
+		else
+		{
+			echo '{"msg": "'.$result->retval.'"}';
+		}
 	}
 	
 	/**
@@ -92,25 +110,36 @@ class PrestudentMultiAssign extends VileSci_Controller
 		$prestudentIdArray = $this->input->post('prestudent_id');
 		$aufnahmegruppe = $this->input->post('aufnahmegruppe');
 		
+		// Converts string 'null' to a null value
+		$aufnahmegruppe = ($aufnahmegruppe == 'null' ? null : $aufnahmegruppe);
+		
 		// Load model PrestudentstatusModel
         $this->load->model('crm/Prestudent_model', 'PrestudentModel');
         
+        // Set the HTTP header
+        $this->output->set_header('Content-Type: application/json; charset=utf-8');
+        
         $result = error("No valid parameters");
-        if (isset($aufnahmegruppe) && isset($prestudentIdArray) && is_array($prestudentIdArray) && count($prestudentIdArray) >0)
+        if (isset($aufnahmegruppe)
+			&& isset($prestudentIdArray)
+			&& is_array($prestudentIdArray)
+			&& count($prestudentIdArray) > 0)
         {
 			$result = $this->PrestudentModel->updateAufnahmegruppe($prestudentIdArray, $aufnahmegruppe);
+			
+			if (isSuccess($result))
+			{
+				echo '{"msg": "Data correctly saved"}';
+			}
+			else
+			{
+				echo '{"msg": "Error occurred while saving data, please contact the administrator"}';
+			}
 		}
-		
-		$this->output->set_header('Content-Type: application/json; charset=utf-8');
-        
-        if (isSuccess($result))
-        {
-			echo '{"msg": "Data correctly saved"}';
-        }
-        else
-        {
-			echo '{"msg": "Error occurred while saving data, please contact the administrator"}';
-        }
+		else
+		{
+			echo '{"msg": "'.$result->retval.'"}';
+		}
 	}
 	
 	/**
