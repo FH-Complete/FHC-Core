@@ -27,9 +27,6 @@ class HTMLWidget extends Widget
 	const MIN_LENGTH = 'min-length';
 	const PLACEHOLDER = 'placeholder';
     
-    // Alias of $this->_args[HTMLWidget::HTML_ARG_NAME] for a better code readability
-    protected $htmlParameters;
-    
     /**
      * It gets also the htmlArgs array as parameter, it will be used to set the HTML properties
      */
@@ -64,8 +61,6 @@ class HTMLWidget extends Widget
 				$this->_args[HTMLWidget::HTML_ARG_NAME][$argName] = $argValue;
 			}
 		}
-		
-		$this->htmlParameters =& $this->_args[HTMLWidget::HTML_ARG_NAME]; // Reference for a better code readability
     }
     
     /**

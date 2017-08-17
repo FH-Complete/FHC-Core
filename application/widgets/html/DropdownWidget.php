@@ -21,6 +21,9 @@ class DropdownWidget extends HTMLWidget
 	const SIZE = 'size'; // size of the dropdown
 	const MULTIPLE = 'multiple'; // multiple attribute
 	
+	// Alias of $this->_args[HTMLWidget::HTML_ARG_NAME] for a better code readability
+    protected $htmlParameters;
+	
 	/**
 	 * 
 	 */
@@ -33,6 +36,8 @@ class DropdownWidget extends HTMLWidget
 		{
 			$this->_args[DropdownWidget::SELECTED_ELEMENT] = DropdownWidget::HTML_DEFAULT_VALUE;
 		}
+		
+		$this->htmlParameters =& $this->_args[HTMLWidget::HTML_ARG_NAME]; // Reference for a better code readability
 		
 		// By default is not a multiple dropdown
 		unset($this->htmlParameters[DropdownWidget::MULTIPLE]);
