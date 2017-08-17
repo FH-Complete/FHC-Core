@@ -38,18 +38,22 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<title>Service</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	
-	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
-	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<script type="text/javascript" src="../../include/js/jquery.js"></script> 
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">';
+	
+	include('../../include/meta/jquery.php');
+	include('../../include/meta/jquery-tablesorter.php');
+	
+	echo'
 	<script type="text/javascript">
 	
 		$(document).ready(function() 
 			{ 
 			    $("#myTable").tablesorter(
 				{
-					sortList: [[2,0]],
-					widgets: [\'zebra\']
+					sortList: [[3,0],[2,0]],
+					widgets: [\'zebra\'],
+					headers: {8:{sorter:false}}
 				}); 
 			} 
 		);
@@ -121,6 +125,9 @@ echo '<table class="tablesorter" id="myTable">
 			<th>Beschreibung</th>
 			<th>Organisationseinheit</th>
 			<th>Content_ID</th>
+			<th>Design</th>
+			<th>Betrieb</th>
+			<th>Operativ</th>
 			<th colspan="3">Aktion</th>
 		</tr>
 	</thead>
@@ -134,7 +141,10 @@ foreach($service->result as $row)
 	echo '<td>',$row->beschreibung,'</td>';
 	echo '<td>',$row->oe_kurzbz,'</td>';
 	echo '<td>',$row->content_id,'</td>';
-	echo '<td><a href="service_details.php?action=update&service_id=',$row->service_id,' " target="detail_service">bearbeiten</a></td>';
+	echo '<td>',$row->design_uid,'</td>';
+	echo '<td>',$row->betrieb_uid,'</td>';
+	echo '<td>',$row->operativ_uid,'</td>';
+	echo '<td><a href="service_details.php?action=update&service_id=',$row->service_id,' " target="detail_service">bearbeiten</a>&nbsp;&nbsp;</td>';
 	echo '<td><a href="service_uebersicht.php?action=delete&service_id=',$row->service_id,' " onclick="return confdel()">entfernen</a></td>';
 	echo '</tr>';
 }

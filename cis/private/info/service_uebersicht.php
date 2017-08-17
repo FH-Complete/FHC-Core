@@ -23,6 +23,7 @@ require_once('../../../include/service.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/person.class.php');
 
 $user = get_uid();
 $sprache = getSprache(); 
@@ -110,6 +111,9 @@ echo '<table class="tablesorter" id="myTable">
 			<th>'.$p->t("global/organisationseinheit").'</th>
 			<th>'.$p->t("global/bezeichnung").'</th>
 			<th>'.$p->t("services/leistung").'</th>
+			<th>'.$p->t("services/design").'</th>
+			<th>'.$p->t("services/betrieb").'</th>
+			<th>'.$p->t("services/operativ").'</th>
 			<th>'.$p->t("services/details").'</th>
 		</tr>
 	</thead>
@@ -119,10 +123,22 @@ foreach($service->result as $row)
 {
 	if ($row->content_id!='')
 	{
+		$person = new person();
+		$person->getPersonFromBenutzer($row->design_uid);
+		$design = $person->nachname.' '.$person->vorname;
+		$person = new person();
+		$person->getPersonFromBenutzer($row->betrieb_uid);
+		$betrieb = $person->nachname.' '.$person->vorname;
+		$person = new person();
+		$person->getPersonFromBenutzer($row->operativ_uid);
+		$operativ = $person->nachname.' '.$person->vorname;
 		echo '<tr>';
 		echo '<td>',$row->oe_kurzbz,'</td>';
 		echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'">'.$row->bezeichnung.'</a>':$row->bezeichnung).'</td>';
 		echo '<td>',$row->beschreibung,'</td>';
+		echo '<td><nobr><a href="../profile/index.php?uid='.$row->design_uid.'">',$design,'</a></nobr></td>';
+		echo '<td><nobr><a href="../profile/index.php?uid='.$row->betrieb_uid.'">',$betrieb,'</a></nobr></td>';
+		echo '<td><nobr><a href="../profile/index.php?uid='.$row->operativ_uid.'">',$operativ,'</a></nobr></td>';
 		echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'">Details</a>':'').'</td>';
 		echo '</tr>';
 	}

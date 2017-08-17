@@ -372,6 +372,22 @@ if(!$result = @$db->db_query("SELECT onlinebewerbung_studienplan FROM lehre.tbl_
 			echo '<br>lehre.tbl_studienplan: Spalte onlinebewerbung_studienplan hinzugefuegt!<br>';
 }
 
+// Column design_uid, betrieb_uid and operativ_uid to tbl_service
+if(!$result = @$db->db_query("SELECT design_uid FROM public.tbl_service LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_service ADD COLUMN design_uid varchar(32);
+			ALTER TABLE public.tbl_service ADD COLUMN betrieb_uid varchar(32);
+			ALTER TABLE public.tbl_service ADD COLUMN operativ_uid varchar(32);
+			ALTER TABLE public.tbl_service ADD CONSTRAINT fk_tbl_service_design_uid FOREIGN KEY (design_uid) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE public.tbl_service ADD CONSTRAINT fk_tbl_service_betrieb_uid FOREIGN KEY (betrieb_uid) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE public.tbl_service ADD CONSTRAINT fk_tbl_service_operativ_uid FOREIGN KEY (operativ_uid) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_service: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>public.tbl_service: Spalten design_uid,betrieb_uid,operativ_uid hinzugefuegt!<br>';
+}
+
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
@@ -588,7 +604,7 @@ $tabellen=array(
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id","bezeichnung_mehrsprachig"),
 	"public.tbl_status_grund" => array("statusgrund_id","status_kurzbz","aktiv","bezeichnung_mehrsprachig","beschreibung"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
-	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id"),
+	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id","design_uid","betrieb_uid","operativ_uid"),
 	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content","bezeichnung"),
 	"public.tbl_standort"  => array("standort_id","adresse_id","kurzbz","bezeichnung","insertvon","insertamum","updatevon","updateamum","ext_id", "firma_id","code"),
 	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","gruppe","sql","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz","publish","preferences"),

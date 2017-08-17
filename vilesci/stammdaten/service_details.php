@@ -25,6 +25,7 @@ require_once('../../include/service.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/organisationseinheit.class.php');
+require_once('../../include/benutzer.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -35,7 +36,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 	
 if(!$rechte->isBerechtigt('basis/service'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+	die($rechte->errormsg);
 	
 $datum_obj = new datum();
 ?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -45,6 +46,36 @@ $datum_obj = new datum();
 	<title>Service - Details</title>
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
+	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+	
+	
+	<?php //echo include('../../include/meta/jquery.php'); ?>
+	
+	<script type="text/javascript">
+	$(document).ready(function()
+	{
+		$(".benutzer_uid").autocomplete({
+			source: "reihungstestverwaltung_autocomplete.php?autocomplete=kunde",
+			minLength:2,
+			response: function(event, ui)
+			{
+				//Value und Label fuer die Anzeige setzen
+				for(i in ui.content)
+				{
+					//ui.content[i].value=ui.content[i].uid;
+					ui.content[i].value=ui.content[i].uid;
+					ui.content[i].label=ui.content[i].vorname+" "+ui.content[i].nachname+" ("+ui.content[i].uid+")";
+				}
+			},
+			select: function(event, ui)
+			{
+				//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
+				$(this.id).val(ui.item.uid);
+			}
+		});
+	});
+	</script>
 </head>
 <body>
 
@@ -55,10 +86,14 @@ $datum_obj = new datum();
 	
 	if($action=='save')
 	{
+		$error = false;
 		$bezeichnung = (isset($_POST['bezeichnung'])?$_POST['bezeichnung']:die('Bezeichnung fehlt'));
 		$beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:die('Beschreibung fehlt'));
 		$oe_kurzbz = (isset($_POST['oe_kurzbz'])?$_POST['oe_kurzbz']:die('Organisationseinheit fehlt'));
 		$content_id = (isset($_POST['content_id'])?$_POST['content_id']:die('Content_id fehlt'));
+		$design_uid = (isset($_POST['design_uid'])?$_POST['design_uid']:'');
+		$betrieb_uid = (isset($_POST['betrieb_uid'])?$_POST['betrieb_uid']:'');
+		$operativ_uid = (isset($_POST['operativ_uid'])?$_POST['operativ_uid']:'');
 		$ext_id = (isset($_POST['ext_id'])?$_POST['ext_id']:die('ext_id fehlt'));
 		$new = (isset($_POST['new'])?$_POST['new']:'true');
 		if($new=='true')
@@ -70,28 +105,59 @@ $datum_obj = new datum();
 			if(!$service->load($service_id))
 				die($service->errormsg);
 				
-			$service->new=false;
+			$service->new = false;
 		}
 		
-		$service->bezeichnung=$bezeichnung;
+		$service->bezeichnung = $bezeichnung;
 		$service->beschreibung = $beschreibung;
 		$service->ext_id = $ext_id;
 		$service->oe_kurzbz = $oe_kurzbz;
 		$service->content_id = $content_id;
 		
-		if($service->save())
-		{		
-			echo '<span class="ok">Daten erfolgreich gespeichert</span>';
-			echo "<script type='text/javascript'>\n";
-			echo "	parent.uebersicht_service.location.href='service_uebersicht.php?oe_kurzbz=$oe_kurzbz';";
-			echo "</script>\n";
-			$action='update';
-			$service_id = $service->service_id;
-		}
-		else
+		if ($design_uid != '' || $betrieb_uid != '' || $operativ_uid != '')
 		{
-			$action='new';
-			echo '<span class="error">'.$service->errormsg.'</span>';
+			$benutzer = new benutzer();
+			if ($design_uid != '' && !$benutzer->load($design_uid))
+			{
+				echo '<span class="error">Benutzer '.$design_uid.' ist nicht vorhanden</span>';
+				$error = true;
+			}
+			if ($betrieb_uid != '' && !$benutzer->load($betrieb_uid))
+			{
+				echo '<span class="error">Benutzer '.$betrieb_uid.' ist nicht vorhanden</span>';
+				$error = true;
+			}
+			if ($operativ_uid != '' && !$benutzer->load($operativ_uid))
+			{
+				echo '<span class="error">Benutzer '.$operativ_uid.' ist nicht vorhanden</span>';
+				$error = true;
+			}
+		}
+		
+		$service->design_uid = $design_uid;
+		$service->betrieb_uid = $betrieb_uid;
+		$service->operativ_uid = $operativ_uid;
+
+		if ($error == false)
+		{
+			if($service->save())
+			{		
+				echo '<span class="ok">Daten erfolgreich gespeichert</span>';
+				echo "<script type='text/javascript'>\n";
+				echo "	parent.uebersicht_service.location.href='service_uebersicht.php?oe_kurzbz=$oe_kurzbz';";
+				echo "</script>\n";
+				$action='update';
+				$service_id = $service->service_id;
+			}
+			else
+			{
+				$action='new';
+				echo '<span class="error">'.$service->errormsg.'</span>';
+			}
+		}
+		else 
+		{
+			$action='update';
 		}
 	}
 
@@ -143,6 +209,18 @@ $datum_obj = new datum();
 	echo '<tr valign="top">';
 	echo '   <td>Beschreibung</td>';
 	echo '   <td><textarea name="beschreibung" cols="60" rows="5">'.htmlspecialchars($service->beschreibung).'</textarea></td>';
+	echo '</tr>';
+	echo '<tr valign="top">';
+	echo '   <td>Design</td>';
+	echo '   <td><input type="text" id="design_uid" name="design_uid" class="benutzer_uid" size="32" maxlength="32" value="'.htmlspecialchars($service->design_uid).'"></td>';
+	echo '</tr>';
+	echo '<tr valign="top">';
+	echo '   <td>Betrieb</td>';
+	echo '   <td><input type="text" id="betrieb_uid" name="betrieb_uid" class="benutzer_uid" size="32" maxlength="32" value="'.htmlspecialchars($service->betrieb_uid).'"></td>';
+	echo '</tr>';
+	echo '<tr valign="top">';
+	echo '   <td>Operativ</td>';
+	echo '   <td><input type="text" id="operativ_uid" name="operativ_uid" class="benutzer_uid" size="32" maxlength="32" value="'.htmlspecialchars($service->operativ_uid).'"></td>';
 	echo '</tr>';
 	echo '<tr valign="top">';
 	echo '   <td>Content_ID</td>';

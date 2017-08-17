@@ -35,6 +35,9 @@ class service extends basis_db
 	public $ext_id;			// bigint
 	public $oe_kurzbz;		// varchar(32)
 	public $content_id;		// integer
+	public $design_uid;		// varchar(32)
+	public $betrieb_uid;	// varchar(32)
+	public $operativ_uid;	// varchar(32)
 
 	/**
 	 * Konstruktor - Laedt optional ein Service
@@ -75,6 +78,9 @@ class service extends basis_db
 				$this->ext_id = $row->ext_id;
 				$this->oe_kurzbz = $row->oe_kurzbz;
 				$this->content_id = $row->content_id;
+				$this->design_uid = $row->design_uid;
+				$this->betrieb_uid = $row->betrieb_uid;
+				$this->operativ_uid = $row->operativ_uid;
 
 				return true;
 			}
@@ -110,6 +116,9 @@ class service extends basis_db
 				$obj->ext_id = $row->ext_id;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->content_id = $row->content_id;
+				$obj->design_uid = $row->design_uid;
+				$obj->betrieb_uid = $row->betrieb_uid;
+				$obj->operativ_uid = $row->operativ_uid;
 
 				$this->result[] = $obj;
 			}
@@ -147,6 +156,9 @@ class service extends basis_db
 				$obj->ext_id = $row->ext_id;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->content_id = $row->content_id;
+				$obj->design_uid = $row->design_uid;
+				$obj->betrieb_uid = $row->betrieb_uid;
+				$obj->operativ_uid = $row->operativ_uid;
 
 				$this->result[] = $obj;
 			}
@@ -208,6 +220,9 @@ class service extends basis_db
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->anzahl = $row->count;
 				$obj->content_id = $row->content_id;
+				$obj->design_uid = $row->design_uid;
+				$obj->betrieb_uid = $row->betrieb_uid;
+				$obj->operativ_uid = $row->operativ_uid;
 
 				$this->result[] = $obj;
 			}
@@ -257,6 +272,9 @@ class service extends basis_db
 				$obj->ext_id = $row->ext_id;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->content_id = $row->content_id;
+				$obj->design_uid = $row->design_uid;
+				$obj->betrieb_uid = $row->betrieb_uid;
+				$obj->operativ_uid = $row->operativ_uid;
 
 				$this->result[] = $obj;
 			}
@@ -307,6 +325,9 @@ class service extends basis_db
 				$obj->ext_id = $row->ext_id;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->content_id = $row->content_id;
+				$obj->design_uid = $row->design_uid;
+				$obj->betrieb_uid = $row->betrieb_uid;
+				$obj->operativ_uid = $row->operativ_uid;
 
 				$this->result[] = $obj;
 			}
@@ -342,12 +363,15 @@ class service extends basis_db
 
 		if($new)
 		{
-			$qry = "BEGIN;INSERT INTO public.tbl_service (bezeichnung, beschreibung, oe_kurzbz, content_id)
+			$qry = "BEGIN;INSERT INTO public.tbl_service (bezeichnung, beschreibung, oe_kurzbz, content_id, design_uid, betrieb_uid, operativ_uid)
 					VALUES(".
 				$this->db_add_param($this->bezeichnung).','.
 				$this->db_add_param($this->beschreibung).','.
 				$this->db_add_param($this->oe_kurzbz).','.
-				$this->db_add_param($this->content_id).');';
+				$this->db_add_param($this->content_id).','.
+				$this->db_add_param($this->design_uid).','.
+				$this->db_add_param($this->betrieb_uid).','.
+				$this->db_add_param($this->operativ_uid).');';
 		}
 		else
 		{
@@ -355,7 +379,10 @@ class service extends basis_db
 				' bezeichnung = '.$this->db_add_param($this->bezeichnung).','.
 				' beschreibung = '.$this->db_add_param($this->beschreibung).','.
 				' oe_kurzbz = '.$this->db_add_param($this->oe_kurzbz).','.
-				' content_id = '.$this->db_add_param($this->content_id).
+				' content_id = '.$this->db_add_param($this->content_id).','.
+				' design_uid = '.$this->db_add_param($this->design_uid).','.
+				' betrieb_uid = '.$this->db_add_param($this->betrieb_uid).','.
+				' operativ_uid = '.$this->db_add_param($this->operativ_uid).
 				' WHERE service_id='.$this->db_add_param($this->service_id, FHC_INTEGER).';';
 		}
 

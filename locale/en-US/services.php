@@ -4,4 +4,7 @@ $this->phrasen['services/uebersichtUeberServicesOrganisationseinheiten']='Overvi
 $this->phrasen['services/details']='Details';
 $this->phrasen['services/filtern']='Filter';
 $this->phrasen['services/leistung']='Service';
+$this->phrasen['services/design']='Design';
+$this->phrasen['services/betrieb']='Running';
+$this->phrasen['services/operativ']='Operating';
 ?>
