@@ -61,7 +61,7 @@ class MessageToken_model extends CI_Model
 	
 	/**
 	 * Set the status of a message to read. If the status of the message
-	 * is already read, than update updateamum
+	 * is already read then update updateamum
 	 */
 	public function setReadMessageStatusByToken($token)
 	{

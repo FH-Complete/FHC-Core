@@ -33,7 +33,7 @@ class WidgetLib
 	
     /* default values */
     private $_template = 'template';
-    private $_parser = FALSE;
+    private $_parser = false;
     private $_cache_ttl = 0;
     private $_widget_path = '';
     
@@ -51,7 +51,7 @@ class WidgetLib
         $this->_ci->load->helper('fhc');
         
         // Set the default widget path with APPPATH
-        $this->_widget_path = APPPATH . 'widgets/';
+        $this->_widget_path = APPPATH.'widgets/';
 		
         // Loads widgets to render HTML elements
         // NOTE: the first one to be loaded must be HTMLWidget
@@ -72,10 +72,10 @@ class WidgetLib
     public function initialize($config = array())
 	{
         foreach ($config as $key => $val)
-            $this->{'_' . $key} = $val;
+            $this->{'_'.$key} = $val;
         
         if ($this->_widget_path == '')
-            $this->_widget_path = APPPATH . 'widgets/';
+            $this->_widget_path = APPPATH.'widgets/';
         
         if ($this->_parser && !class_exists('CI_Parser'))
             $this->_ci->load->library('parser');
@@ -126,28 +126,38 @@ class WidgetLib
      * @param string $template
      * @param array $data
      */
-    public function publish($template = FALSE, $data = array()) {
-        if (is_array($template) || is_object($template)) {
+    public function publish($template = false, $data = array())
+    {
+        if (is_array($template) || is_object($template))
+        {
             $data = $template;
-        } else if ($template) {
+        }
+        else if ($template)
+        {
             $this->_template = $template;
         }
         
-        if (!$this->_template) {
+        if (!$this->_template)
+        {
             show_error('There was no template file selected for the current template');
         }
         
-        if (is_array($data) || is_object($data)) {
-            foreach ($data as $name => $content) {
+        if (is_array($data) || is_object($data))
+        {
+            foreach ($data as $name => $content)
+            {
                 $this->partial($name)->set($content);
             }
         }
         
         unset($data);
         
-        if ($this->_parser) {
+        if ($this->_parser)
+        {
             $this->_ci->parser->parse($this->_template, $this->_partials);
-        } else {
+        }
+        else
+        {
             $this->_ci->load->view($this->_template, $this->_partials);
         }
     }
@@ -159,25 +169,32 @@ class WidgetLib
      * @param string $default
      * @return Partial
      */
-    public function partial($name, $default = FALSE) {
-        if ($this->exists($name)) {
+    public function partial($name, $default = false)
+    {
+        if ($this->exists($name))
+        {
             $partial = $this->_partials[$name];
-        } else {
+        }
+        else
+        {
             // create new partial
             $partial = new Partial($name);
-            if ($this->_cache_ttl) {
+            if ($this->_cache_ttl)
+            {
                 $partial->cache($this->_cache_ttl);
             }
             
             // detect local triggers
-            if (method_exists($this, 'trigger_' . $name)) {
-                $partial->bind($this, 'trigger_' . $name);
+            if (method_exists($this, 'trigger_'.$name))
+            {
+                $partial->bind($this, 'trigger_'.$name);
             }
             
             $this->_partials[$name] = $partial;
         }
         
-        if (!$partial->content() && $default) {
+        if (!$partial->content() && $default)
+        {
             $partial->set($default);
         }
         
@@ -194,12 +211,12 @@ class WidgetLib
      */
     public function widget($name, $data = array(), $htmlArgs = array())
     {
-		// 
+		// Loads the widget file, trying to find it also in the subdirectories
         loadResource($this->_widget_path, $name, true);
         
         if (!class_exists($name))
         {
-            show_error("Widget '" . $name . "' was not found.");
+            show_error("Widget '".$name."' was not found.");
         }
         
         return new $name($name, $data, $htmlArgs);
@@ -210,8 +227,10 @@ class WidgetLib
      * @param int $ttl
      * @param mixed $identifier
      */
-    public function cache($ttl = 60, $identifier = '') {
-        foreach ($this->_partials as $partial) {
+    public function cache($ttl = 60, $identifier = '')
+    {
+        foreach ($this->_partials as $partial)
+        {
             $partial->cache($ttl, $identifier);
         }
         
@@ -224,35 +243,44 @@ class WidgetLib
      * Stylesheet trigger
      * @param string $source
      */
-    public function trigger_stylesheet($url, $attributes = FALSE) {
+    public function trigger_stylesheet($url, $attributes = false)
+    {
         // array support
-        if (is_array($url)) {
+        if (is_array($url))
+        {
             $return = '';
-            foreach ($url as $u) {
+            foreach ($url as $u)
+            {
                 $return .= $this->trigger_stylesheet($u, $attributes);
             }
             return $return;
         }
         
-        if (!stristr($url, 'http://') && !stristr($url, 'https://') && substr($url, 0, 2) != '//') {
-            $url = $this->_ci->config->item('base_url') . $url;
+        if (!stristr($url, 'http://') && !stristr($url, 'https://') && substr($url, 0, 2) != '//')
+        {
+            $url = $this->_ci->config->item('base_url').$url;
         }
         
         // legacy support for media
-        if (is_string($attributes)) {
+        if (is_string($attributes))
+        {
             $attributes = array('media' => $attributes);
         }
         
-        if (is_array($attributes)) {
+        if (is_array($attributes))
+        {
         	$attributeString = "";
         	
-        	foreach ($attributes as $key => $value) {
-	        	$attributeString .= $key . '="' . $value . '" ';
+        	foreach ($attributes as $key => $value)
+        	{
+	        	$attributeString .= $key.'="'.$value.'" ';
         	}
         	
-            return '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '" ' . $attributeString . '>' . "\n\t";
-        } else {
-            return '<link rel="stylesheet" href="' . htmlspecialchars(strip_tags($url)) . '">' . "\n\t";
+            return '<link rel="stylesheet" href="'.htmlspecialchars(strip_tags($url)).'" '.$attributeString.'>'."\n\t";
+        }
+        else
+        {
+            return '<link rel="stylesheet" href="'.htmlspecialchars(strip_tags($url)).'">'."\n\t";
         }
     }
     
@@ -260,21 +288,25 @@ class WidgetLib
      * Javascript trigger
      * @param string $source
      */
-    public function trigger_javascript($url) {
+    public function trigger_javascript($url)
+    {
         // array support
-        if (is_array($url)) {
+        if (is_array($url))
+        {
             $return = '';
-            foreach ($url as $u) {
+            foreach ($url as $u)
+            {
                 $return .= $this->trigger_javascript($u);
             }
             return $return;
         }
         
-        if (!stristr($url, 'http://') && !stristr($url, 'https://') && substr($url, 0, 2) != '//') {
-            $url = $this->_ci->config->item('base_url') . $url;
+        if (!stristr($url, 'http://') && !stristr($url, 'https://') && substr($url, 0, 2) != '//')
+        {
+            $url = $this->_ci->config->item('base_url').$url;
         }
         
-        return '<script src="' . htmlspecialchars(strip_tags($url)) . '"></script>' . "\n\t";
+        return '<script src="'.htmlspecialchars(strip_tags($url)).'"></script>'."\n\t";
     }
     
     /**
@@ -283,20 +315,23 @@ class WidgetLib
      * @param mixed $value
      * @param enum $type
      */
-    public function trigger_meta($name, $value, $type = 'meta') {
+    public function trigger_meta($name, $value, $type = 'meta')
+    {
         $name = htmlspecialchars(strip_tags($name));
         $value = htmlspecialchars(strip_tags($value));
         
-        if ($name == 'keywords' and !strpos($value, ',')) {
+        if ($name == 'keywords' and !strpos($value, ','))
+        {
             $content = preg_replace('/[\s]+/', ', ', trim($value));
         }
         
-        switch ($type) {
+        switch ($type)
+        {
             case 'meta' :
-                $content = '<meta name="' . $name . '" content="' . $value . '">' . "\n\t";
+                $content = '<meta name="'.$name.'" content="'.$value.'">'."\n\t";
                 break;
             case 'link' :
-                $content = '<link rel="' . $name . '" href="' . $value . '">' . "\n\t";
+                $content = '<link rel="'.$name.'" href="'.$value.'">'."\n\t";
                 break;
         }
         
@@ -309,7 +344,8 @@ class WidgetLib
      * @param mixed $value
      * @param enum $type
      */
-    public function trigger_title($title) {
+    public function trigger_title($title)
+    {
         return htmlspecialchars(strip_tags($title));
     }
     
@@ -319,7 +355,8 @@ class WidgetLib
      * @param mixed $value
      * @param enum $type
      */
-    public function trigger_description($description) {
+    public function trigger_description($description)
+    {
         return htmlspecialchars(strip_tags($description));
     }
 
@@ -346,15 +383,18 @@ class Partial
      * This will be handy in extending classes
      * @param string $index
      */
-    function __get($name) {
+    function __get($name)
+    {
         return $this->_ci->$name;
     }
     
     /**
      * Alias methods
      */
-    function __call($name, $args) {
-        switch ($name) {
+    function __call($name, $args)
+    {
+        switch ($name)
+        {
             case 'default' :
                 return call_user_func_array(array($this, 'set_default'), $args);
                 break;
@@ -368,7 +408,8 @@ class Partial
      * Returns the content when converted to a string
      * @return string
      */
-    public function __toString() {
+    public function __toString()
+    {
         return (string) $this->content();
     }
     
@@ -376,8 +417,10 @@ class Partial
      * Returns the content
      * @return string
      */
-    public function content() {
-        if ($this->_cache_ttl && !$this->_cached) {
+    public function content()
+    {
+        if ($this->_cache_ttl && !$this->_cached)
+        {
             $this->cache->save($this->cache_id(), $this->_content, $this->_cache_ttl);
         }
         
@@ -389,8 +432,10 @@ class Partial
      * @param mixed $content
      * @return Partial
      */
-    public function set() {
-        if (!$this->_cached) {
+    public function set()
+    {
+        if (!$this->_cached)
+        {
             $this->_content = (string) $this->trigger(func_get_args());
         }
         
@@ -402,8 +447,10 @@ class Partial
      * @param mixed $content
      * @return Partial
      */
-    public function append() {
-        if (!$this->_cached) {
+    public function append()
+    {
+        if (!$this->_cached)
+        {
             $this->_content .= (string) $this->trigger(func_get_args());
         }
         
@@ -415,9 +462,11 @@ class Partial
      * @param mixed $content
      * @return Partial
      */
-    public function prepend() {
-        if (!$this->_cached) {
-            $this->_content = (string) $this->trigger(func_get_args()) . $this->_content;
+    public function prepend()
+    {
+        if (!$this->_cached)
+        {
+            $this->_content = (string) $this->trigger(func_get_args()).$this->_content;
         }
         
         return $this;
@@ -428,9 +477,12 @@ class Partial
      * @param mixed $default
      * @return Partial
      */
-    public function set_default($default) {
-        if (!$this->_cached) {
-            if (!$this->_content) {
+    public function set_default($default)
+    {
+        if (!$this->_cached)
+        {
+            if (!$this->_content)
+            {
                 $this->_content = $default;
             }
         }
@@ -445,13 +497,16 @@ class Partial
      * @param bool $overwrite
      * @return Partial
      */
-    public function view($view, $data = array(), $overwrite = false) {
-        if (!$this->_cached) {
-            
+    public function view($view, $data = array(), $overwrite = false)
+    {
+        if (!$this->_cached)
+        {
             // better object to array
-            if (is_object($data)) {
+            if (is_object($data))
+            {
                 $array = array();
-                foreach ($data as $k => $v) {
+                foreach ($data as $k => $v)
+                {
                     $array[$k] = $v;
                 }
                 $data = $array;
@@ -459,9 +514,12 @@ class Partial
             
             $content = $this->_ci->load->view($view, $data, true);
             
-            if ($overwrite) {
+            if ($overwrite)
+            {
                 $this->set($content);
-            } else {
+            }
+            else
+            {
                 $this->append($content);
             }
         }
@@ -475,16 +533,21 @@ class Partial
      * @param bool $overwrite
      * @return Partial
      */
-    public function parse($view, $data = array(), $overwrite = false) {
-        if (!$this->_cached) {
-            if (!class_exists('CI_Parser')) {
+    public function parse($view, $data = array(), $overwrite = false)
+    {
+        if (!$this->_cached)
+        {
+            if (!class_exists('CI_Parser'))
+            {
                 $this->_ci->load->library('parser');
             }
             
             // better object to array
-            if (is_object($data)) {
+            if (is_object($data))
+            {
                 $array = array();
-                foreach ($data as $k => $v) {
+                foreach ($data as $k => $v)
+                {
                     $array[$k] = $v;
                 }
                 $data = $array;
@@ -492,9 +555,12 @@ class Partial
             
             $content = $this->_ci->parser->parse($view, $data, true);
             
-            if ($overwrite) {
+            if ($overwrite)
+            {
                 $this->set($content);
-            } else {
+            }
+            else
+            {
                 $this->append($content);
             }
         }
@@ -509,13 +575,18 @@ class Partial
      * @param bool $overwrite
      * @return Partial
      */
-    public function widget($name, $data = array(), $overwrite = false) {
-        if (!$this->_cached) {
+    public function widget($name, $data = array(), $overwrite = false)
+    {
+        if (!$this->_cached)
+        {
             $widget = $this->template->widget($name, $data);
             
-            if ($overwrite) {
+            if ($overwrite)
+            {
                 $this->set($widget->content());
-            } else {
+            }
+            else
+            {
                 $this->append($widget->content());
             }
         }
@@ -527,15 +598,18 @@ class Partial
      * @param int $ttl
      * @param mixed $identifier
      */
-    public function cache($ttl = 60, $identifier = '') {
-        if (!class_exists('CI_Cache')) {
+    public function cache($ttl = 60, $identifier = '')
+    {
+        if (!class_exists('CI_Cache'))
+        {
             $this->_ci->load->driver('cache', array('adapter' => 'file'));
         }
         
         $this->_cache_ttl = $ttl;
         $this->_identifier = $identifier;
         
-        if ($cached = $this->_ci->cache->get($this->cache_id())) {
+        if ($cached = $this->_ci->cache->get($this->cache_id()))
+        {
             $this->_cached = true;
             $this->_content = $cached;
         }
@@ -546,11 +620,15 @@ class Partial
      * Used for cache identification
      * @return string
      */
-    private function cache_id() {
-        if ($this->_identifier) {
-            return $this->_name . '_' . $this->_identifier . '_' . md5(get_class($this) . implode('', $this->_args));
-        } else {
-            return $this->_name . '_' . md5(get_class($this) . implode('', $this->_args));
+    private function cache_id()
+    {
+        if ($this->_identifier)
+        {
+            return $this->_name.'_'.$this->_identifier.'_'.md5(get_class($this).implode('', $this->_args));
+        }
+        else
+        {
+            return $this->_name.'_'.md5(get_class($this).implode('', $this->_args));
         }
     }
     
@@ -559,10 +637,14 @@ class Partial
      * @param array $args
      * @return string
      */
-    public function trigger($args) {
-        if (!$this->_trigger) {
+    public function trigger($args)
+    {
+        if (!$this->_trigger)
+        {
             return implode('', $args);
-        } else {
+        }
+        else
+        {
             return call_user_func_array($this->_trigger, $args);
         }
     }
@@ -572,24 +654,32 @@ class Partial
      * Can be used like bind($this, "function") or bind("function")
      * @param mixed $arg
      */
-    public function bind() {
-        if ($count = func_num_args()) {
-            if ($count >= 2) {
+    public function bind()
+    {
+        if ($count = func_num_args())
+        {
+            if ($count >= 2)
+            {
                 $args = func_get_args();
                 $obj = array_shift($args);
                 $func = array_pop($args);
                 
-                foreach ($args as $trigger) {
+                foreach ($args as $trigger)
+                {
                     $obj = $obj->$trigger;
                 }
                 
                 $this->_trigger = array($obj, $func);
-            } else {
+            }
+            else
+            {
             	$args = func_get_args();
                 $this->_trigger = reset($args);
             }
-        } else {
-            $this->_trigger = FALSE;
+        }
+        else
+        {
+            $this->_trigger = false;
         }
     }
 }

@@ -13,11 +13,18 @@ class UDFLib
 	const FIELD_ARG_NAME = 'field';
 	const UDFS_ARG_NAME = 'udfs';
 	
+	// UDF json schema attributes
+	const NAME = 'name'; // UDF name attribute
+	const TYPE = 'type'; // UDF type attribute
+	const SORT = 'sort'; // UDF sort attribute
+	const VALIDATION = 'validation'; // UDF validation attribute
+	const LIST_VALUES = 'listValues'; // UDF listValues attribute
+	const FE_REGEX_LANGUAGE = 'js'; // UDF javascript regex language attribute (front end)
+	
 	// HTML components
 	const TITLE = 'description';
 	const LABEL = 'title';
 	const PLACEHOLDER = 'placeholder';
-	const DEFAULT_VALUE = 'defaultValue';
 	
 	// Validation attributes
 	const REGEX = 'regex';
@@ -27,7 +34,9 @@ class UDFLib
 	const MAX_LENGTH = 'max-length';
 	const MIN_LENGTH = 'min-length';
 	
-	private $_ci;
+	const PHRASES_APP_NAME = 'core'; // Name of the app parameter used to retrive phrases
+	
+	private $_ci; // Code igniter instance
 	
 	public function __construct($config = array())
 	{
@@ -38,8 +47,7 @@ class UDFLib
 		// Loads the widget library
 		$this->_ci->load->library('WidgetLib');
 		
-        // Loads widgets to render HTML elements
-        // NOTE: the first one to be loaded must be HTMLWidget
+        // Loads widgets to render HTML for UDF
         loadResource(APPPATH . 'widgets/udf');
 	}
 	

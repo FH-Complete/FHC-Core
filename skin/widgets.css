@@ -14,7 +14,7 @@
 	display: table-cell;
 }
 
-label[udf-required=true]::after {
+label[required-field=true]::after {
 	content: "*";
 }
 

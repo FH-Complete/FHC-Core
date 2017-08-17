@@ -1,6 +1,29 @@
 <?php
 
 /**
+ * FH-Complete
+ *
+ * @package		FHC-Helper
+ * @author		FHC-Team
+ * @copyright	Copyright (c) 2016 fhcomplete.org
+ * @license		GPLv3
+ * @since		Version 1.0.0
+ */
+ 
+/**
+ * Message Helper
+ *
+ * @subpackage	Helpers
+ * @category	Helpers
+ */
+
+if (! defined('BASEPATH')) exit('No direct script access allowed');
+
+// -------------------------------------------------------------------------------------------------------
+// Collection of functions to handle successful and error messages that methods and functions can return
+// -------------------------------------------------------------------------------------------------------
+
+/**
  * Success
  *
  * @return  array

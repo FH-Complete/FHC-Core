@@ -23,8 +23,10 @@
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::HTML_NAME); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, TextareaWidget::ROWS); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, TextareaWidget::COLS); ?>
-					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::REQUIRED); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::PLACEHOLDER); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::REQUIRED); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::MIN_LENGTH); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::MAX_LENGTH); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::REGEX); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::TITLE); ?>
 				><?php echo ${TextareaWidget::TEXT}; ?></textarea>

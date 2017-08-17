@@ -29,8 +29,8 @@
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, DropdownWidget::SIZE); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, DropdownWidget::MULTIPLE, false); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::REQUIRED); ?>
-					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::MAX_VALUE); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::MIN_VALUE); ?>
+					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::MAX_VALUE); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::REGEX); ?>
 					<?php HTMLWidget::printAttribute(${HTMLWidget::HTML_ARG_NAME}, HTMLWidget::TITLE); ?>
 				>

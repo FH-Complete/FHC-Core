@@ -1,53 +1,60 @@
 <?php
 
 /**
- * 
+ * It exends the DropdownWidget class to represent an HTML dropdown
  */
 class DropdownWidgetUDF extends DropdownWidget
 {
 	/**
-	 * 
+	 * NOTE: echo $this->content() is needed
 	 */
 	public function render($parameters)
 	{
-		$tmpElements = array();
+		// Array that will contains the elements to be displayed in the dropdown
+		$tmpNewElements = array();
 		
-		// 
+		// Loops through the given parameters
 		foreach($parameters as $parameter)
 		{
-			// 
+			// Every single element of the array is checked, and it could only be:
+			// - An array with two elements OR
+			// - A string or a number OR
+			// - An object with two properties: id and description
 			if ((is_array($parameter) && count($parameter) == 2)
 				|| (is_string($parameter) || is_numeric($parameter))
-				|| (is_object($parameter) && isset($parameter->{PARENT::ID_FIELD}) && isset($parameter->{PARENT::DESCRIPTION_FIELD})))
+				|| (is_object($parameter) && isset($parameter->{DropdownWidget::ID_FIELD})
+					&& isset($parameter->{DropdownWidget::DESCRIPTION_FIELD})))
 			{
-				$element = new stdClass(); // 
-				// 
+				$newElement = new stdClass(); // New single element
+				// If the single element is an array of two element
 				if (is_array($parameter) && count($parameter) == 2)
 				{
-					$element->{PARENT::ID_FIELD} = $parameter[0]; // 
-					$element->{PARENT::DESCRIPTION_FIELD} = $parameter[1]; // 
+					$newElement->{DropdownWidget::ID_FIELD} = $parameter[0]; // 
+					$newElement->{DropdownWidget::DESCRIPTION_FIELD} = $parameter[1]; // 
 				}
-				// 
+				// If the single element is a string or a number
 				else if (is_string($parameter) || is_numeric($parameter))
 				{
-					$element->{PARENT::ID_FIELD} = $parameter; // 
-					$element->{PARENT::DESCRIPTION_FIELD} = $parameter; // 
+					$newElement->{DropdownWidget::ID_FIELD} = $parameter; // 
+					$newElement->{DropdownWidget::DESCRIPTION_FIELD} = $parameter; // 
 				}
-				// 
-				else if (is_object($parameter) && isset($parameter->{PARENT::ID_FIELD}) && isset($parameter->{PARENT::DESCRIPTION_FIELD}))
+				// If the single element is an object with two properties: id and description
+				else if (is_object($parameter) && isset($parameter->{DropdownWidget::ID_FIELD})
+					&& isset($parameter->{DropdownWidget::DESCRIPTION_FIELD}))
 				{
-					$element->{PARENT::ID_FIELD} = $parameter->{PARENT::ID_FIELD}; // 
-					$element->{PARENT::DESCRIPTION_FIELD} = $parameter->{PARENT::DESCRIPTION_FIELD}; // 
+					$newElement->{DropdownWidget::ID_FIELD} = $parameter->{DropdownWidget::ID_FIELD}; // 
+					$newElement->{DropdownWidget::DESCRIPTION_FIELD} = $parameter->{DropdownWidget::DESCRIPTION_FIELD}; // 
 				}
 				
-				array_push($tmpElements, $element); // 
+				array_push($tmpNewElements, $newElement); // Add $newElement into $tmpNewElements
 			}
 		}
 		
+		// Set the list of elements
 		$this->setElementsArray(
-			success($tmpElements),
+			success($tmpNewElements),
 			true,
-			$this->_args[HTMLWidget::HTML_ARG_NAME][HTMLWidget::PLACEHOLDER],
+			$this->htmlParameters[HTMLWidget::PLACEHOLDER],
 			'No data found for this UDF'
 		);
 		

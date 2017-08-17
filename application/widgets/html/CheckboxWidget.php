@@ -11,9 +11,11 @@ class CheckboxWidget extends HTMLWidget
 	const DESCRIPTION_FIELD = 'description';
 	// Value of value attribute of the checkbox
 	const CHECKBOX_VALUE = 'true';
+	// Default checkbox value
+	const HTML_DEFAULT_VALUE = false;
 	
 	/**
-	 * 
+	 * Loads the view that renders a checkbox
 	 */
 	protected function loadCheckboxView()
 	{

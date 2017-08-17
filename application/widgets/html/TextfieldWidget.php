@@ -5,11 +5,11 @@
  */
 class TextfieldWidget extends HTMLWidget
 {
-	const VALUE = 'text'; // 
-	const SIZE = 'size'; // 
+	const VALUE = 'text'; // Text value
+	const SIZE = 'size'; // Size attribute
 	
 	/**
-	 * 
+	 * Set the text value
 	 */
 	protected function setValue($value)
 	{
@@ -17,7 +17,7 @@ class TextfieldWidget extends HTMLWidget
 	}
 	
 	/**
-	 * 
+	 * Loads the view that renders an input text
 	 */
 	protected function loadTextfieldView()
 	{

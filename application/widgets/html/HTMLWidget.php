@@ -11,21 +11,24 @@ class HTMLWidget extends Widget
     const HTML_NAME = 'name'; // HTML name attribute
     const HTML_ID = 'id'; // HTML id attribute
     
-    // 
-    const EXTERNAL_BLOCK = 'externalBlock'; // 
-    const EXTERNAL_START_BLOCK_HTML_TAG = '<div>'; //
-    const EXTERNAL_END_BLOCK_HTML_TAG = '</div>'; // 
+    // External block definition
+    const EXTERNAL_BLOCK = 'externalBlock'; // External block name
+    const EXTERNAL_START_BLOCK_HTML_TAG = '<div>'; // External block start tag
+    const EXTERNAL_END_BLOCK_HTML_TAG = '</div>'; // External block end tag
     
-    // 
+    // HTML attributes
     const LABEL = 'title';
 	const REGEX = 'regex';
 	const TITLE = 'description';
-	const REQUIRED = 'udf-required';
+	const REQUIRED = 'required-field';
 	const MAX_VALUE = 'max-value';
 	const MIN_VALUE = 'min-value';
 	const MAX_LENGTH = 'max-length';
 	const MIN_LENGTH = 'min-length';
 	const PLACEHOLDER = 'placeholder';
+    
+    // Alias of $this->_args[HTMLWidget::HTML_ARG_NAME] for a better code readability
+    protected $htmlParameters;
     
     /**
      * It gets also the htmlArgs array as parameter, it will be used to set the HTML properties
@@ -61,10 +64,13 @@ class HTMLWidget extends Widget
 				$this->_args[HTMLWidget::HTML_ARG_NAME][$argName] = $argValue;
 			}
 		}
+		
+		$this->htmlParameters =& $this->_args[HTMLWidget::HTML_ARG_NAME]; // Reference for a better code readability
     }
     
     /**
-	 * 
+	 * Prints an attribute name and eventually also the value extracted from $htmlArgs
+	 * Set $isValuePresent to false the value should not be displayed
 	 */
 	public static function printAttribute($htmlArgs, $attribute, $isValuePresent = true)
 	{
@@ -92,7 +98,7 @@ class HTMLWidget extends Widget
 	}
 	
 	/**
-	 * 
+	 * Prints the external block start tag
 	 */
 	public static function printStartBlock($htmlArgs)
 	{
@@ -104,7 +110,7 @@ class HTMLWidget extends Widget
 	}
 	
 	/**
-	 * 
+	 * Prints the external block end tag
 	 */
 	public static function printEndBlock($htmlArgs)
 	{

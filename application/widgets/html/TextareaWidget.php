@@ -5,12 +5,12 @@
  */
 class TextareaWidget extends HTMLWidget
 {
-	const TEXT = 'text'; // 
-	const ROWS = 'rows'; // 
-	const COLS = 'cols'; // 
+	const TEXT = 'text'; // Text value
+	const ROWS = 'rows'; // Rows attribute
+	const COLS = 'cols'; // Cols attribute
 	
 	/**
-	 * 
+	 * Set the text value
 	 */
 	protected function setText($text)
 	{
@@ -18,7 +18,7 @@ class TextareaWidget extends HTMLWidget
 	}
 	
 	/**
-	 * 
+	 * Loads the view that renders a text area
 	 */
 	protected function loadTextareaView()
 	{

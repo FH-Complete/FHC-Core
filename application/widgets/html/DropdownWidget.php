@@ -15,11 +15,11 @@ class DropdownWidget extends HTMLWidget
 	// The name of the element of the data array given to the view
 	// this element is used to tell what element of the dropdown is selected
 	const SELECTED_ELEMENT = 'selectedElement';
-	// 
+	// Default HTML value
 	const HTML_DEFAULT_VALUE = 'null';
 	
-	const SIZE = 'size'; // 
-	const MULTIPLE = 'multiple'; // 
+	const SIZE = 'size'; // size of the dropdown
+	const MULTIPLE = 'multiple'; // multiple attribute
 	
 	/**
 	 * 
@@ -28,31 +28,36 @@ class DropdownWidget extends HTMLWidget
 	{
 		parent::__construct($name, $args, $htmlArgs);
 		
-		// 
+		// If the selectd element is not set then set it to HTML_DEFAULT_VALUE
 		if (!isset($this->_args[DropdownWidget::SELECTED_ELEMENT]))
 		{
 			$this->_args[DropdownWidget::SELECTED_ELEMENT] = DropdownWidget::HTML_DEFAULT_VALUE;
 		}
+		
+		// By default is not a multiple dropdown
+		unset($this->htmlParameters[DropdownWidget::MULTIPLE]);
 	}
 	
     /**
-     * 
+     * Set this dropdown as multiple:
+     * - Setting the multiple attribute
+     * - Adding square brackets to the name
      */
     public function setMultiple()
     {
-		$this->_args[HTMLWidget::HTML_ARG_NAME][DropdownWidget::MULTIPLE] = DropdownWidget::MULTIPLE;
-		$this->_args[HTMLWidget::HTML_ARG_NAME][HTMLWidget::HTML_NAME] .= '[]';
+		$this->htmlParameters[DropdownWidget::MULTIPLE] = DropdownWidget::MULTIPLE;
+		$this->htmlParameters[HTMLWidget::HTML_NAME] .= '[]';
     }
     
     /**
-     * 
+     * Checks if this object is a multiple dropdown
 	 */
     public function isMultipleDropdown()
     {
 		$isMultipleDropdown = false;
 		
-		if (isset($this->_args[HTMLWidget::HTML_ARG_NAME][DropdownWidget::MULTIPLE])
-			&& $this->_args[HTMLWidget::HTML_ARG_NAME][DropdownWidget::MULTIPLE] == DropdownWidget::MULTIPLE)
+		if (isset($this->htmlParameters[DropdownWidget::MULTIPLE])
+			&& $this->htmlParameters[DropdownWidget::MULTIPLE] == DropdownWidget::MULTIPLE)
 		{
 			$isMultipleDropdown = true;
 		}
