@@ -949,7 +949,7 @@ function check_infrastruktur($uid)
 	$db = new basis_db();
 
 	// checken, ob der user eine oezuordnung der infrastruktur hat
-	$sql_query="SELECT 1 FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz = 'oezuordnung' and oe_kurzbz in ('Infrastruktur', 'Systementwicklung', 'IT-ServiceDesk', 'Empfang', 'Haustechnik', 'ITService', 'LVPlanung','ITBereich') and (datum_bis > now() or datum_bis is NULL) and uid=".$db->db_add_param($uid);
+	$sql_query="SELECT 1 FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz = 'oezuordnung' and oe_kurzbz in ('Infrastruktur', 'SystemEntwicklung', 'IT-ServiceDesk', 'Empfang', 'Haustechnik', 'ITService', 'LVPlanung','ITBereich','SystemSupport') and (datum_bis > now() or datum_bis is NULL) and uid=".$db->db_add_param($uid);
 	//echo $sql_query;
 	if($db->db_query($sql_query))
 	{
