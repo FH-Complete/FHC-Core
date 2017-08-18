@@ -949,7 +949,7 @@ function check_infrastruktur($uid)
 	$db = new basis_db();
 
 	// checken, ob der user eine oezuordnung der infrastruktur hat
-	$sql_query="SELECT 1 FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz = 'oezuordnung' and oe_kurzbz in ('Infrastruktur', 'Systementwicklung', 'ServiceDesk', 'Empfang', 'Haustechnik', 'ITService', 'LVPlanung','ITBereich') and (datum_bis > now() or datum_bis is NULL) and uid=".$db->db_add_param($uid);
+	$sql_query="SELECT 1 FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz = 'oezuordnung' and oe_kurzbz in ('Infrastruktur', 'Systementwicklung', 'IT-ServiceDesk', 'Empfang', 'Haustechnik', 'ITService', 'LVPlanung','ITBereich') and (datum_bis > now() or datum_bis is NULL) and uid=".$db->db_add_param($uid);
 	//echo $sql_query;
 	if($db->db_query($sql_query))
 	{
@@ -968,10 +968,10 @@ function check_infrastruktur($uid)
 
 /**
  * The function is used to prepare a string for a regular expression search in an sql-query.
- * It lowers and trims the $inputString, splits it by character, compares each character with the character set 
+ * It lowers and trims the $inputString, splits it by character, compares each character with the character set
  * and replaces (if exists) this character with the entire set surrounded with square brackets.
  * E.g: "ösi" returns "[oóŏǒôốộồổỗöọőòỏơớợờởỡōǫøǿõɛɔɵʘœ][sśšşŝșṡṣʂſʃʆßʅ][iíĭǐîïịìỉīįɨĩɩı]"
- * 
+ *
  * @param string $inputString The string to convert
  * @param boolean $punctuationMark Default false. If true, the set is expanded with punctuation marks.
  * @return string A regular expression-formatted string
@@ -1003,29 +1003,29 @@ function generateSpecialCharacterString($inputString, $punctuationMark = false)
 		'yýŷÿẏỵỳƴỷȳỹʎ',
 		'zźžʑżẓẕʐƶ'
 	);
-	
+
 	if ($punctuationMark == true)
 		array_push($character_set, '--‒–——–—-');
-	
-		
-	/* the backslash \, 
-	 * the caret ^, 
-	 * the dollar sign $, 
-	 * the period or dot ., 
-	 * the vertical bar or pipe symbol |, 
-	 * the question mark ?, 
-	 * the asterisk or star *, 
-	 * the plus sign +, 
-	 * the opening parenthesis (, 
-	 * the closing parenthesis ), 
-	 * the opening square bracket [, 
+
+
+	/* the backslash \,
+	 * the caret ^,
+	 * the dollar sign $,
+	 * the period or dot .,
+	 * the vertical bar or pipe symbol |,
+	 * the question mark ?,
+	 * the asterisk or star *,
+	 * the plus sign +,
+	 * the opening parenthesis (,
+	 * the closing parenthesis ),
+	 * the opening square bracket [,
 	 * the opening curly brace { */
 
 	// Trim and lower $inputString
 	$inputString = mb_strtolower(TRIM($inputString));
 	// Split string by character to compare it with the character set
 	$inputStringSplitted = preg_split('//u', $inputString, -1, PREG_SPLIT_NO_EMPTY);
-	
+
 	// Compare every character with the set and replace it
 	foreach ($inputStringSplitted AS $key => $item)
 	{
@@ -1037,7 +1037,7 @@ function generateSpecialCharacterString($inputString, $punctuationMark = false)
 				$inputStringSplitted[$key] = '.*';
 		}
 	}
-		
+
 	// Recombine array to string
 	$inputString = implode('', $inputStringSplitted);
 
