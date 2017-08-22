@@ -647,25 +647,25 @@ class mitarbeiter extends benutzer
 	{
 		$hasUDF = false;
 		$udf = new UDF();
-		
+
 		$qry = "SELECT DISTINCT ON(mitarbeiter_uid) *,
 									tbl_benutzer.aktiv as aktiv,
 									tbl_mitarbeiter.insertamum,
 									tbl_mitarbeiter.insertvon,
 									tbl_mitarbeiter.updateamum,
 									tbl_mitarbeiter.updatevon";
-		
+
 		if ($hasUDF = $udf->personHasUDF())
 		{
 			$qry .= ", public.tbl_person.udf_values AS p_udf_values";
 		}
-		
+
 		$qry .= " FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid))
 					JOIN public.tbl_person USING(person_id))
 			   LEFT JOIN public.tbl_benutzerfunktion USING(uid)
 			   LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid)
 				   WHERE true";
-		
+
 		if($fix=='true')
 			$qry .= " AND fixangestellt=true";
 		if($fix=='false')
@@ -740,7 +740,7 @@ class mitarbeiter extends benutzer
 
 
         $qry.=';';
-		
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -793,7 +793,7 @@ class mitarbeiter extends benutzer
 				{
 					$obj->p_udf_values = $row->p_udf_values;
 				}
-				
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -1324,5 +1324,102 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 	}
+
+	/**
+	 * Laedt die Mitarbeiter die uebergeben werden
+	 *
+	 * @param $uid_arr
+	 * @return boolean
+	 */
+	public function getMitarbeiterArray($uid_arr)
+	{
+		if(count($uid_arr)==0)
+			return true;
+
+		$hasUDF = false;
+		$udf = new UDF();
+
+		$qry = "SELECT DISTINCT ON(mitarbeiter_uid) *,
+									tbl_benutzer.aktiv as aktiv,
+									tbl_mitarbeiter.insertamum,
+									tbl_mitarbeiter.insertvon,
+									tbl_mitarbeiter.updateamum,
+									tbl_mitarbeiter.updatevon";
+
+		if ($hasUDF = $udf->personHasUDF())
+		{
+			$qry .= ", public.tbl_person.udf_values AS p_udf_values";
+		}
+
+		$qry .= " FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid))
+					JOIN public.tbl_person USING(person_id))
+			   LEFT JOIN public.tbl_benutzerfunktion USING(uid)
+			   LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid)
+				   WHERE uid in(".$this->db_implode4SQL($uid_arr).")";;
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new mitarbeiter();
+
+				$obj->person_id = $row->person_id;
+				$obj->staatsbuergerschaft = $row->staatsbuergerschaft;
+				$obj->geburtsnation = $row->geburtsnation;
+				$obj->sprache = $row->sprache;
+				$obj->anrede = $row->anrede;
+				$obj->titelpost = $row->titelpost;
+				$obj->titelpre = $row->titelpre;
+				$obj->nachname = $row->nachname;
+				$obj->vorname = $row->vorname;
+				$obj->vornamen = $row->vornamen;
+				$obj->gebdatum = $row->gebdatum;
+				$obj->gebort = $row->gebort;
+				$obj->gebzeit = $row->gebzeit;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->homepage = $row->homepage;
+				$obj->svnr = $row->svnr;
+				$obj->ersatzkennzeichen = $row->ersatzkennzeichen;
+				$obj->familienstand = $row->familienstand;
+				$obj->geschlecht = $row->geschlecht;
+				$obj->anzahlkinder = $row->anzahlkinder;
+				$obj->bnaktiv = $this->db_parse_bool($row->aktiv);
+				$obj->uid = $row->uid;
+				$obj->personalnummer = $row->personalnummer;
+				$obj->telefonklappe = $row->telefonklappe;
+				$obj->kurzbz = $row->kurzbz;
+				$obj->lektor = $this->db_parse_bool($row->lektor);
+				$obj->fixangestellt = $this->db_parse_bool($row->fixangestellt);
+				$obj->bismelden = $this->db_parse_bool($row->bismelden);
+				$obj->stundensatz = $row->stundensatz;
+				$obj->ausbildungcode = $row->ausbildungcode;
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->standort_id = $row->standort_id;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->alias = $row->alias;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+
+				$obj->urlaubstageprojahr = $row->urlaubstageprojahr;
+				$obj->resturlaubstage = $row->resturlaubstage;
+
+				if ($hasUDF)
+				{
+					$obj->p_udf_values = $row->p_udf_values;
+				}
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
 }
 ?>

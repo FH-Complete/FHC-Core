@@ -623,7 +623,7 @@ function MitarbeiterAuswahl()
 		// ***** Termine *****
 		document.getElementById('mitarbeiter-termine').setAttribute('src','termine.xul.php?mitarbeiter_uid='+uid);
 	}
-	
+
 	// ***** UDF *****
 	if (document.getElementById('mitarbeiter-tabs').selectedItem == document.getElementById('mitarbeiter-tab-udf'))
 	{
@@ -915,56 +915,48 @@ function MitarbeiterNeu()
 }
 
 // ****
-// * Exportiert die Daten in ein Excel File
+// * Excel Export der Mitarbeiter
 // ****
 function MitarbeiterExport()
 {
-	var treeMitarbeiter=document.getElementById('mitarbeiter-tree');
-	var treeMitarbeiterMenu=document.getElementById('tree-menu-mitarbeiter');
-	var col = treeMitarbeiterMenu.columns ? treeMitarbeiterMenu.columns["tree-menu-mitarbeiter-col-filter"] : "tree-menu-mitarbeiter-col-filter";
-	var filter=treeMitarbeiterMenu.view.getCellText(treeMitarbeiterMenu.currentIndex,col);
-	cols = treeMitarbeiter.getElementsByTagName('treecol');
-
-	var url = "<?php echo APP_ROOT; ?>content/statistik/mitarbeiterexport.xls.php";
-	var attributes="?type=mitarbeiter";
-	if (filter=="Studiengangsleiter")
-			attributes+="&stgl=true";
-		if (filter=="Fachbereichsleiter")
-			attributes+="&fbl=true";
-		if (filter=="Alle")
-			attributes+="&alle=true";
-		if (filter=="Aktive")
-			attributes+="&aktiv=true";
-		if (filter=="FixAngestellte")
-			attributes+="&fix=true&aktiv=true";
-		if (filter=="FixAngestellteAlle")
-			attributes+="&fix=true";
-		if (filter=="Inaktive")
-			attributes+="&aktiv=false";
-		if (filter=="Karenziert")
-			attributes+="&karenziert=true";
-		if (filter=="Ausgeschieden")
-			attributes+="&ausgeschieden=true";
-		if (filter=="FreiAngestellte")
-			attributes+="&fix=false&aktiv=true";
-		if (filter=="FreiAngestellteAlle")
-			attributes+="&fix=false";
-
-	url+=attributes;
-	spalte=0;
-	for(i in cols)
+	var tree = document.getElementById('mitarbeiter-tree');
+	var data='';
+	//Wenn nichts markiert wurde -> alle exportieren
+	if(tree.currentIndex==-1)
 	{
-		if(cols[i].hidden==false)
+		if(tree.view)
+			var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+		else
+			return false;
+
+		for (var v=0; v < items; v++)
 		{
-			url += "&spalte"+spalte+"="+MitarbeiterDetailgetSpaltenname(cols[i].id);
-			spalte=spalte+1;
+			var mitarbeiter_uid = getTreeCellText(tree, 'mitarbeiter-treecol-uid', v);
+			data = data+';'+mitarbeiter_uid;
 		}
 	}
-	//url+='&spalte0=titelpre&spalte1=vorname&spalte2=vornamen&spalte3=familienname&spalte4=uid';
+	else
+	{
+		var start = new Object();
+		var end = new Object();
+		var numRanges = tree.view.selection.getRangeCount();
+		var paramList= '';
+		var anzahl=0;
 
-	//alert(url);
-	//window.open(url,"","chrome,status=no, modal, width=400, height=250, centerscreen, resizable");
-	window.location.href=url;
+		//alle markierten personen holen
+		for (var t = 0; t < numRanges; t++)
+		{
+			tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+				mitarbeiter_uid = getTreeCellText(tree, 'mitarbeiter-treecol-uid', v);
+				data = data+';'+mitarbeiter_uid;
+			}
+		}
+	}
+
+	action = '<?php echo APP_ROOT; ?>content/statistik/mitarbeiterexport.xls.php';
+	OpenWindowPost(action, data);
 }
 
 // ****
@@ -1992,7 +1984,7 @@ function MitarbeiterUDFIFrameLoad()
 	{
 		//Ausgewaehlte person_id holen
 		var person_id = getTreeCellText(tree, 'mitarbeiter-treecol-person_id', tree.currentIndex);
-		
+
 		url = 'udf.xul.php?person_id='+person_id;
 		document.getElementById('mitarbeiter-udf').setAttribute('src', url);
 	}
