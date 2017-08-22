@@ -14,6 +14,7 @@
 	<exclude name="Squiz.ControlStructures.ControlSignature" />
 	<exclude name="Squiz.Classes.ValidClassName" />
 	<exclude name="Generic.ControlStructures.InlineControlStructure" />
+	<exclude name="Squiz.PHP.DisallowSizeFunctionsInLoops" />
   </rule>
 
   <rule ref="Generic.Files.LineLength">
@@ -22,31 +23,6 @@
    		<property name="absoluteLineLimit" value="150"/>
   	</properties>
   </rule>
-
-
-
-
-  <!--
-<rule ref="Squiz.Classes.ValidClassName">
-    <type>warning</type>
-  </rule>
-  Temporarily ignore until API docblock formatting and line length issues in core code are fixed.
-  <rule ref="FHComplete.Commenting.FunctionComment.ParamCommentNotCapital">
-    <severity>0</severity>
-  </rule>
-  <rule ref="FHComplete.Commenting.FunctionComment.ParamCommentFullStop">
-    <severity>0</severity>
-  </rule>
-  <rule ref="FHComplete.Commenting.FunctionComment.ThrowsNotCapital">
-    <severity>0</severity>
-  </rule>
-  <rule ref="FHComplete.Commenting.FunctionComment.ThrowsNoFullStop">
-    <severity>0</severity>
-  </rule>
-  <rule ref="FHComplete.Commenting.FunctionComment.EmptyThrows">
-    <severity>0</severity>
-  </rule>
-  -->
   <rule ref="Squiz.Arrays.ArrayBracketSpacing"/>
 
   <rule ref="Squiz.Classes.LowercaseClassKeywords"/>
