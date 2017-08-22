@@ -16,6 +16,7 @@
 
 ### CHANGED
 - **[CORE]** Berechtigungsprüfung wurde angepasst damit deaktivierte Benutzer keine Berechtigungen mehr haben
+- **[FAS]** Mitarbeiterexport exportiert jetzt nur noch die markierten Personen
 
 ### Updateinfo
 - **[CORE]** Infoscreen wurde umbenannt (informationsbildschirm.php)
