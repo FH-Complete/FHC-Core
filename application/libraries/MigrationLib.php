@@ -76,11 +76,11 @@ class MigrationLib extends CI_Migration
 		{
 			if ($this->cli === true)
 			{
-				$colored = "\033[" . $color . "m%s\033[37m";
+				$colored = "\033[".$color."m%s\033[37m";
 			}
 			else
 			{
-				$colored = "<font color=\"" . $this->HTML_COLORS[$color] . "\">%s</font>";
+				$colored = "<font color=\"".$this->HTML_COLORS[$color]."\">%s</font>";
 			}
 		}
 		
@@ -92,7 +92,7 @@ class MigrationLib extends CI_Migration
 	 */
 	private function _print($prefix, $text, $color = null)
 	{
-		printf($this->getColored($color), sprintf("%s %s" . $this->getEOL(), $prefix, $text));
+		printf($this->getColored($color), sprintf("%s %s".$this->getEOL(), $prefix, $text));
 	}
 	
 	/**
@@ -139,8 +139,8 @@ class MigrationLib extends CI_Migration
 	 */
 	protected function startUP()
 	{
-		$this->printInfo(sprintf("%s Start method up of class %s %s",
-			MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
+		$this->printInfo(
+			sprintf("%s Start method up of class %s %s", MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
 		);
 	}
 	
@@ -149,8 +149,8 @@ class MigrationLib extends CI_Migration
 	 */
 	protected function endUP()
 	{
-		$this->printInfo(sprintf("%s End method up of class %s %s",
-			MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
+		$this->printInfo(
+			sprintf("%s End method up of class %s %s", MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
 		);
 	}
 	
@@ -159,8 +159,8 @@ class MigrationLib extends CI_Migration
 	 */
 	protected function startDown()
 	{
-		$this->printInfo(sprintf("%s Start method down of class %s %s",
-			MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
+		$this->printInfo(
+			sprintf("%s Start method down of class %s %s", MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
 		);
 	}
 	
@@ -169,8 +169,8 @@ class MigrationLib extends CI_Migration
 	 */
 	protected function endDown()
 	{
-		$this->printInfo(sprintf("%s End method down of class %s %s",
-			MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
+		$this->printInfo(
+			sprintf("%s End method down of class %s %s", MigrationLib::SEPARATOR, get_called_class(), MigrationLib::SEPARATOR)
 		);
 	}
 	
@@ -179,11 +179,11 @@ class MigrationLib extends CI_Migration
 	 */
     protected function addColumn($schema, $table, $fields)
 	{
-		foreach($fields as $name => $definition)
+		foreach ($fields as $name => $definition)
 		{
 			if (!$this->columnExists($name, $schema, $table))
 			{
-				if ($this->dbforge->add_column($schema . '.' . $table, array($name => $definition)))
+				if ($this->dbforge->add_column($schema.'.'.$table, array($name => $definition)))
 				{
 					$this->printMessage(sprintf("Column %s.%s.%s of type %s added", $schema, $table, $name, $definition["type"]));
 				}
@@ -204,11 +204,11 @@ class MigrationLib extends CI_Migration
 	 */
 	protected function modifyColumn($schema, $table, $fields)
 	{
-		foreach($fields as $name => $definition)
+		foreach ($fields as $name => $definition)
 		{
 			if ($this->columnExists($name, $schema, $table))
 			{
-				if ($this->dbforge->modify_column($schema . '.' . $table, array($name => $definition)))
+				if ($this->dbforge->modify_column($schema.'.'.$table, array($name => $definition)))
 				{
 					$this->printMessage(sprintf("Column %s.%s.%s has been modified", $schema, $table, $name));
 				}
@@ -231,7 +231,7 @@ class MigrationLib extends CI_Migration
 	{
 		if ($this->columnExists($field, $schema, $table))
 		{
-			if ($this->dbforge->drop_column($schema . '.' . $table, $field))
+			if ($this->dbforge->drop_column($schema.'.'.$table, $field))
 			{
 				$this->printMessage(sprintf("Column %s.%s.%s has been dropped", $schema, $table, $field));
 			}
@@ -289,8 +289,17 @@ class MigrationLib extends CI_Migration
 	 */
 	protected function addForeingKey($schema, $table, $name, $field, $schemaDest, $tableDest, $fieldDest, $attributes)
 	{
-		$query = sprintf("ALTER TABLE %s.%s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s.%s (%s) %s",
-						$schema, $table, $name, $field, $schemaDest, $tableDest, $fieldDest, $attributes);
+		$query = sprintf(
+			"ALTER TABLE %s.%s ADD CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s.%s (%s) %s",
+			$schema,
+			$table,
+			$name,
+			$field,
+			$schemaDest,
+			$tableDest,
+			$fieldDest,
+			$attributes
+		);
 		
 		if (@$this->db->simple_query($query))
 		{
@@ -371,22 +380,26 @@ class MigrationLib extends CI_Migration
 		if (@$this->db->simple_query($query))
 		{
 			$this->printMessage(
-				sprintf("Granted permissions %s on table %s.%s to user %s",
-						is_null($stringPermission) ? $permissions : $stringPermission,
-						$schema,
-						$table,
-						$user
-			));
+				sprintf(
+					"Granted permissions %s on table %s.%s to user %s",
+					is_null($stringPermission) ? $permissions : $stringPermission,
+					$schema,
+					$table,
+					$user
+				)
+			);
 		}
 		else
 		{
 			$this->printError(
-				sprintf("Granting permissions %s on table %s.%s to user %s",
-						is_null($stringPermission) ? $permissions : $stringPermission,
-						$schema,
-						$table,
-						$user
-			));
+				sprintf(
+					"Granting permissions %s on table %s.%s to user %s",
+					is_null($stringPermission) ? $permissions : $stringPermission,
+					$schema,
+					$table,
+					$user
+				)
+			);
 		}
 	}
 	
@@ -397,7 +410,7 @@ class MigrationLib extends CI_Migration
 	{
 		$this->dbforge->add_field($fields);
 		
-		if ($this->dbforge->create_table($schema . '.' . $table, true))
+		if ($this->dbforge->create_table($schema.'.'.$table, true))
 		{
 			$this->printMessage(sprintf("Table %s.%s created or existing", $schema, $table));
 		}
@@ -412,7 +425,7 @@ class MigrationLib extends CI_Migration
 	 */
 	protected function dropTable($schema, $table)
 	{
-		if ($this->dbforge->drop_table($schema . "." . $table))
+		if ($this->dbforge->drop_table($schema.".".$table))
 		{
 			$this->printMessage(sprintf("Table %s.%s has been dropped", $schema, $table));
 		}
@@ -503,22 +516,26 @@ class MigrationLib extends CI_Migration
 		if (@$this->db->simple_query($query))
 		{
 			$this->printMessage(
-				sprintf("Granted permissions %s on sequence %s.%s to user %s",
-						is_null($stringPermission) ? $permissions : $stringPermission,
-						$schema,
-						$sequence,
-						$user
-			));
+				sprintf(
+					"Granted permissions %s on sequence %s.%s to user %s",
+					is_null($stringPermission) ? $permissions : $stringPermission,
+					$schema,
+					$sequence,
+					$user
+				)
+			);
 		}
 		else
 		{
 			$this->printError(
-				sprintf("Granting permissions %s on sequence %s.%s to user %s",
-						is_null($stringPermission) ? $permissions : $stringPermission,
-						$schema,
-						$sequence,
-						$user
-			));
+				sprintf(
+					"Granting permissions %s on sequence %s.%s to user %s",
+					is_null($stringPermission) ? $permissions : $stringPermission,
+					$schema,
+					$sequence,
+					$user
+				)
+			);
 		}
 	}
 	
@@ -542,8 +559,8 @@ class MigrationLib extends CI_Migration
 		}
 		
 		$this->printInfo(
-			"Query correctly executed: " .
-			substr(preg_replace("/\s+/", " ", trim($query)), 0, MigrationLib::PRINT_QUERY_LEN) .
+			"Query correctly executed: ".
+			substr(preg_replace("/\s+/", " ", trim($query)), 0, MigrationLib::PRINT_QUERY_LEN).
 			(strlen($query) > MigrationLib::PRINT_QUERY_LEN ? "..." : "")
 		);
 	}

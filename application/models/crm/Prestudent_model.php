@@ -13,17 +13,15 @@ class Prestudent_model extends DB_Model
 	}
 
 	/**
-	 * @return void
+	 * getLastStatuses
 	 */
 	public function getLastStatuses($person_id, $studiensemester_kurzbz = null, $studiengang_kz = null, $status_kurzbz = null)
 	{
 		// Checks if the operation is permitted by the API caller
-		if (($isEntitled = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled('public.tbl_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_prestudentstatus', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
 
 		$query = 'SELECT *
 					FROM public.tbl_prestudent p
@@ -60,7 +58,7 @@ class Prestudent_model extends DB_Model
 	}
 
 	/**
-	 *
+	 * updateAufnahmegruppe
 	 */
 	public function updateAufnahmegruppe($prestudentIdArray, $aufnahmegruppe)
 	{
@@ -85,8 +83,12 @@ class Prestudent_model extends DB_Model
 	 *	- stufe and aufnahmegruppe
 	 *	- reihungstest score
 	 */
-	public function getPrestudentMultiAssign($studiengang = null, $studiensemester = null, $gruppe = null, $reihungstest = null, $stufe = null)
+	public function getPrestudentMultiAssign(
+		$studiengang = null, $studiensemester = null, $gruppe = null, $reihungstest = null, $stufe = null
+	)
 	{
+		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
+		
 		$this->addSelect(
 			'p.person_id,
 			prestudent_id,

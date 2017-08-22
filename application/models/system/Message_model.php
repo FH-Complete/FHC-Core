@@ -20,12 +20,12 @@ class Message_model extends DB_Model
 	public function getMessagesByPerson($person_id, $all)
 	{
 		// Checks if the operation is permitted by the API caller
-		if (($isEntitled = $this->isEntitled('public.tbl_msg_message', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_person', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_msg_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled('public.tbl_person', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_msg_status', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('public.tbl_msg_message', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
 		
 		$sql = 'SELECT m.message_id,
 						m.person_id,
@@ -68,7 +68,7 @@ class Message_model extends DB_Model
 	}
 	
 	/**
-	 * 
+	 * getMessageVars
 	 */
 	public function getMessageVars()
 	{
@@ -85,7 +85,7 @@ class Message_model extends DB_Model
 	}
 	
 	/**
-	 * 
+	 * getMsgVarsDataByPrestudentId
 	 */
 	public function getMsgVarsDataByPrestudentId($prestudent_id)
 	{

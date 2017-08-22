@@ -4,7 +4,12 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class FHC_Model extends CI_Model
 {
-	function __construct()
+	/**
+	 * Standard constructor for all the models
+	 * It loads the helper message to manage the values returned by methods
+	 * It loads the permission library
+	 */
+	public function __construct()
 	{
 		parent::__construct();
 		
@@ -25,19 +30,20 @@ class FHC_Model extends CI_Model
 	 */
 	public function isEntitled($sourceName, $accessType, $languageMessageCode, $msgErrorCode)
 	{
+		$isEntitled = success(true);
+		
 		if ($this->permissionlib->isEntitled($sourceName, $accessType) === false)
 		{
 			$retval = sprintf(
 				'%s -> %s:%s',
-				lang('fhc_' . $languageMessageCode),
+				lang('fhc_'.$languageMessageCode),
 				$this->permissionlib->getBerechtigungKurzbz($sourceName),
 				$accessType
 			);
-			return error($retval, $msgErrorCode);
+			
+			$isEntitled = error($retval, $msgErrorCode);
 		}
-		else
-		{
-			return true;
-		}
+		
+		return $isEntitled;
 	}
 }

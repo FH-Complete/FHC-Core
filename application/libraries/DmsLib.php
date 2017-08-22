@@ -2,12 +2,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-/**
- *
- */
 class DmsLib
 {
-	//
 	const FILE_CONTENT_PROPERTY = 'file_content';
 
 	/**
@@ -27,7 +23,7 @@ class DmsLib
 	}
 
 	/**
-	 *
+	 * read
 	 */
 	public function read($dms_id, $version = null)
 	{
@@ -66,7 +62,7 @@ class DmsLib
 	}
 	
 	/**
-	 *
+	 * getAktenAcceptedDms
 	 */
 	public function getAktenAcceptedDms($person_id, $dokument_kurzbz = null, $no_file = null)
 	{
@@ -92,13 +88,13 @@ class DmsLib
 	}
 
 	/**
-	 *
+	 * save
 	 */
 	public function save($dms)
 	{
 		$result = null;
 
-		if(isset($dms['new']) && $dms['new'] == true)
+		if (isset($dms['new']) && $dms['new'] == true)
 		{
 			// Remove new parameter to avoid DB insert errors
 			unset($dms['new']);
@@ -107,7 +103,7 @@ class DmsLib
 			if (isSuccess($result))
 			{
 				$filename = $result->retval;
-				if(isset($dms['dms_id']) && $dms['dms_id'] != '')
+				if (isset($dms['dms_id']) && $dms['dms_id'] != '')
 				{
 					$result = $this->ci->DmsVersionModel->insert(
 						$this->ci->DmsVersionModel->filterFields($dms, $dms['dms_id'], $filename)
@@ -148,7 +144,7 @@ class DmsLib
 	}
 	
 	/**
-	 *
+	 * delete
 	 */
 	public function delete($person_id, $dms_id)
 	{
@@ -218,11 +214,11 @@ class DmsLib
 	}
 	
 	/**
-	 *
+	 * _saveFileOnInsert
 	 */
 	private function _saveFileOnInsert($dms)
 	{
-		$filename = uniqid() . '.' . pathinfo($dms['name'], PATHINFO_EXTENSION);
+		$filename = uniqid().'.'.pathinfo($dms['name'], PATHINFO_EXTENSION);
 		
 		$result = $this->ci->DmsFSModel->write($filename, $dms['file_content']);
 		if (isSuccess($result))
@@ -234,13 +230,13 @@ class DmsLib
 	}
 
 	/**
-	 *
+	 * _saveFileOnUpdate
 	 */
 	private function _saveFileOnUpdate($dms)
 	{
 		$result = null;
 
-		if(isset($dms['version']))
+		if (isset($dms['version']))
 		{
 			$result = $this->read($dms['dms_id'], $dms['version']);
 

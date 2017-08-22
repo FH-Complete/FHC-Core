@@ -13,11 +13,13 @@ class Studiensemester_model extends DB_Model
 		$this->hasSequence = false;
 	}
 	
+	/**
+	 * getLastOrAktSemester
+	 */
 	public function getLastOrAktSemester($days = 60)
 	{
 		// Checks rights
-		if (($isEntitled = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
 		
 		if (!is_numeric($days))
 		{
@@ -33,11 +35,13 @@ class Studiensemester_model extends DB_Model
 		return $this->execQuery($query);
 	}
 	
+	/**
+	 * getNextFrom
+	 */
 	public function getNextFrom($studiensemester_kurzbz)
 	{
 		// Checks rights
-		if (($isEntitled = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
 		
 		$query = 'SELECT studiensemester_kurzbz,
 						 start,
@@ -55,13 +59,13 @@ class Studiensemester_model extends DB_Model
 	}
 	
 	/**
-	 * @return void
+	 * getNearest
 	 */
 	public function getNearest($semester = '')
 	{
 		// Checks if the operation is permitted by the API caller
-		if (($isEntitled = $this->isEntitled('public.vw_studiensemester', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled('public.vw_studiensemester', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
 		
 		$query = 'SELECT studiensemester_kurzbz,
 						 start,

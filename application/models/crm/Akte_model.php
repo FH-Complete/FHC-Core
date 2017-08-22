@@ -13,19 +13,12 @@ class Akte_model extends DB_Model
 	}
 	
 	/**
-	 * 
+	 * getAkten
 	 */
 	public function getAkten($person_id, $dokument_kurzbz = null, $stg_kz = null, $prestudent_id = null)
 	{
 		// Checks if the operation is permitted by the API caller
-		if (($isEntitled = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_dokument', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_dokumentstudiengang', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_dokumentprestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
 		
 		$query = 'SELECT akte_id,
 						 person_id,
@@ -79,17 +72,12 @@ class Akte_model extends DB_Model
 	}
 	
 	/**
-	 * 
+	 * getAktenAccepted
 	 */
 	public function getAktenAccepted($person_id, $dokument_kurzbz = null)
 	{
 		// Checks if the operation is permitted by the API caller
-		if (($isEntitled = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_dokumentprestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
 		
 		$query = 'SELECT a.akte_id,
 						 a.person_id,
@@ -130,21 +118,13 @@ class Akte_model extends DB_Model
 	}
 	
 	/**
-	 * 
+	 * getAktenAcceptedDms
 	 */
 	public function getAktenAcceptedDms($person_id, $dokument_kurzbz = null)
 	{
 		// Checks if the operation is permitted by the API caller
-		if (($isEntitled = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_prestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('public.tbl_dokumentprestudent', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('campus.tbl_dms', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('campus.tbl_dms_version', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled($this->dbTable, PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
+		if (isError($ent = $this->isEntitled('campus.tbl_dms', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR))) return $ent;
 		
 		$query = 'SELECT a.akte_id,
 						 a.person_id,

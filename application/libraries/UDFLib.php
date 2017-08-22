@@ -48,7 +48,7 @@ class UDFLib
 	private $_ci; // Code igniter instance
 	
 	/**
-	 * 
+	 * Loads fhc helper
 	 */
 	public function __construct()
 	{
@@ -61,7 +61,7 @@ class UDFLib
 	// Public methods
 	
 	/**
-     * 
+     * UDFWidget
      */
     public function UDFWidget($args, $htmlArgs = array())
     {
@@ -100,6 +100,7 @@ class UDFLib
     
     /**
 	 * It renders the HTML of the UDF
+	 *
 	 * NOTE: When this method is called $widgetData contains different data from
 	 * parameter $args in the constructor
 	 */
@@ -137,7 +138,7 @@ class UDFLib
 					$this->_sortJsonSchemas($jsonSchemasArray); // Sort the list of UDF by sort property
 					
 					// Loops through json schemas
-					foreach($jsonSchemasArray as $jsonSchema)
+					foreach ($jsonSchemasArray as $jsonSchema)
 					{
 						// If the type property is not present then show an error
 						if (!isset($jsonSchema->{UDFLib::TYPE}))
@@ -266,7 +267,7 @@ class UDFLib
 								// If $toBeValidated == true => validation is performed
 								// If $toBeValidated == false => validation is NOT performed
 								$toBeValidated = false;
-								// If this UDF is NOT a checkbox 
+								// If this UDF is NOT a checkbox
 								if ($decodedUDFDefinition->{UDFLib::TYPE} != UDFLib::CHKBOX_TYPE)
 								{
 									// If required property is NOT present in the UDF description
@@ -292,9 +293,9 @@ class UDFLib
 								if ($toBeValidated === true) // Checks if validation should be performed
 								{
 									$tmpValidate = $this->_validateUDFs(
-										$decodedUDFDefinition->{UDFLib::VALIDATION}, // 
-										$decodedUDFDefinition->{UDFLib::NAME}, // 
-										$val // 
+										$decodedUDFDefinition->{UDFLib::VALIDATION},
+										$decodedUDFDefinition->{UDFLib::NAME},
+										$val
 									);
 								}
 							}
@@ -315,7 +316,7 @@ class UDFLib
 			
 			// Copies the remaining required UDFs into $notValidUDFsArray
 			// because they were not supplied, therefore must be notified as error
-			foreach($requiredUDFsArray as $key => $val)
+			foreach ($requiredUDFsArray as $key => $val)
 			{
 				$notValidUDFsArray[] = array($val);
 			}
@@ -327,7 +328,7 @@ class UDFLib
 				// of the UDF that are not updated
 				if (is_array($udfValues) && count($udfValues) > 0)
 				{
-					foreach($udfValues as $fieldName => $fieldValue)
+					foreach ($udfValues as $fieldName => $fieldValue)
 					{
 						// If this field is not present in the given parameters
 						// then copy it from the DB without changes
@@ -354,7 +355,7 @@ class UDFLib
 	}
 	
 	/**
-	 * 
+	 * isUDFColumn
 	 */
 	public function isUDFColumn($columnName, $columnType)
 	{
@@ -377,7 +378,7 @@ class UDFLib
 	 */
 	private function _popUDFParameters(&$data)
 	{
-		foreach($data as $key => $val)
+		foreach ($data as $key => $val)
 		{
 			if (substr($key, 0, 4) == UDFLib::COLUMN_PREFIX)
 			{
@@ -402,7 +403,7 @@ class UDFLib
 		}
 		
 		// Loops through all the supplied UDFs values
-		foreach($tmpUdfValues as $udfValIndx => $udfVal)
+		foreach ($tmpUdfValues as $udfValIndx => $udfVal)
 		{
 			// If the single UDF value is not an array or an object
 			if (!is_array($udfVal) && !is_object($udfVal))
@@ -456,7 +457,7 @@ class UDFLib
 					if (isset($decodedUDFValidation->{UDFLib::REGEX})
 						&& is_array($decodedUDFValidation->{UDFLib::REGEX}))
 					{
-						foreach($decodedUDFValidation->{UDFLib::REGEX} as $regexIndx => $regex)
+						foreach ($decodedUDFValidation->{UDFLib::REGEX} as $regexIndx => $regex)
 						{
 							if ($regex->language == UDFLib::BE_REGEX_LANGUAGE)
 							{
@@ -499,9 +500,7 @@ class UDFLib
      */
     private function _sortJsonSchemas(&$jsonSchemasArray)
     {
-		// 
 		usort($jsonSchemasArray, function ($a, $b) {
-			// 
 			if (!isset($a->{UDFLib::SORT}))
 			{
 				$a->{UDFLib::SORT} = 9999;
@@ -510,7 +509,6 @@ class UDFLib
 			{
 				$b->{UDFLib::SORT} = 9999;
 			}
-			
 			if ($a->{UDFLib::SORT} == $b->{UDFLib::SORT})
 			{
 				return 0;
@@ -541,7 +539,7 @@ class UDFLib
 			{
 				show_error($udfResults->retval);
 			}
-			else if (is_string($udfResults))
+			elseif (is_string($udfResults))
 			{
 				show_error($udfResults);
 			}
@@ -550,7 +548,7 @@ class UDFLib
 				show_error('UDFWidget: generic error occurred');
 			}
 		}
-		else if (!hasData($udfResults))
+		elseif (!hasData($udfResults))
 		{
 			show_error(sprintf('%s.%s does not contain UDF', $schema, $table));
 		}
@@ -569,27 +567,27 @@ class UDFLib
 			$this->_renderCheckbox($jsonSchema, $widgetData);
 		}
 		// Textfield
-		else if ($jsonSchema->{UDFLib::TYPE} == 'textfield')
+		elseif ($jsonSchema->{UDFLib::TYPE} == 'textfield')
 		{
 			$this->_renderTextfield($jsonSchema, $widgetData);
 		}
 		// Textarea
-		else if ($jsonSchema->{UDFLib::TYPE} == 'textarea')
+		elseif ($jsonSchema->{UDFLib::TYPE} == 'textarea')
 		{
 			$this->_renderTextarea($jsonSchema, $widgetData);
 		}
 		// Date
-		else if ($jsonSchema->{UDFLib::TYPE} == 'date')
+		elseif ($jsonSchema->{UDFLib::TYPE} == 'date')
 		{
-			
+			// To be done
 		}
 		// Dropdown
-		else if ($jsonSchema->{UDFLib::TYPE} == 'dropdown')
+		elseif ($jsonSchema->{UDFLib::TYPE} == 'dropdown')
 		{
 			$this->_renderDropdown($jsonSchema, $widgetData);
 		}
 		// Multiple dropdown
-		else if ($jsonSchema->{UDFLib::TYPE} == 'multipledropdown')
+		elseif ($jsonSchema->{UDFLib::TYPE} == 'multipledropdown')
 		{
 			$this->_renderDropdown($jsonSchema, $widgetData, true);
 		}
@@ -620,12 +618,12 @@ class UDFLib
 			$parameters = $jsonSchema->{UDFLib::LIST_VALUES}->enum;
 		}
 		// If the list of values to show should be retrived with a SQL statement
-		else if (isset($jsonSchema->{UDFLib::LIST_VALUES}->sql))
+		elseif (isset($jsonSchema->{UDFLib::LIST_VALUES}->sql))
 		{
 			// UDFModel is loaded in method _loadUDF that is called before the current method
 			$queryResult = $this->_ci->UDFModel->execQuery($jsonSchema->{UDFLib::LIST_VALUES}->sql);
 			if (hasData($queryResult))
-			{	
+			{
 				$parameters = $queryResult->retval;
 			}
 		}
@@ -796,7 +794,7 @@ class UDFLib
 			if (isset($jsonSchemaValidation->{UDFLib::REGEX})
 				&& is_array($jsonSchemaValidation->{UDFLib::REGEX}))
 			{
-				foreach($jsonSchemaValidation->{UDFLib::REGEX} as $regex)
+				foreach ($jsonSchemaValidation->{UDFLib::REGEX} as $regex)
 				{
 					if ($regex->language === UDFLib::FE_REGEX_LANGUAGE)
 					{

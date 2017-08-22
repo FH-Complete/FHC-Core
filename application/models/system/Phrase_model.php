@@ -13,15 +13,15 @@ class Phrase_model extends DB_Model
 	}
 
 	/**
-	 * 
+	 * getPhrases
 	 */
 	public function getPhrases($app, $sprache, $phrase = null, $orgeinheit_kurzbz = null, $orgform_kurzbz = null)
 	{
 		// Checks if the operation is permitted by the API caller
-		if (($isEntitled = $this->isEntitled('system.tbl_phrase', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
-		if (($isEntitled = $this->isEntitled('system.tbl_phrasentext', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)) !== true)
-			return $isEntitled;
+		if (isError($ent = $this->isEntitled('system.tbl_phrase', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
+		if (isError($ent = $this->isEntitled('system.tbl_phrasentext', PermissionLib::SELECT_RIGHT, FHC_NORIGHT, FHC_MODEL_ERROR)))
+			return $ent;
 		
 		$parametersArray = array('app' => $app, 'sprache' => $sprache);
 
