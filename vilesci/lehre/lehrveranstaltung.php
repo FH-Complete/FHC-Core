@@ -100,6 +100,13 @@ if (isset($_REQUEST['lehrveranstaltung_id']))
 else
 	$lehrveranstaltung_id = '';
 
+if (isset($_REQUEST['lehrveranstaltung_name']))
+{
+	$lehrveranstaltung_name = trim($_REQUEST['lehrveranstaltung_name']);
+}
+else
+	$lehrveranstaltung_name = '';
+
 //Wenn kein Fachbereich und kein Studiengang gewaehlt wurde
 //dann wird der Studiengang auf 0 gesetzt da sonst die zu ladende liste zu lang wird
 
@@ -499,6 +506,12 @@ if($orgform_kurzbz != -1)
 if($lehrveranstaltung_id != '')
 	$sql_query.= " AND tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 
+if($lehrveranstaltung_name != '')
+{
+	$sql_query.= " AND (UPPER(tbl_lehrveranstaltung.bezeichnung) LIKE UPPER(".$db->db_add_param('%'.$lehrveranstaltung_name.'%', FHC_STRING).")";
+	$sql_query.= " OR UPPER(tbl_lehrveranstaltung.bezeichnung_english) LIKE UPPER(".$db->db_add_param('%'.$lehrveranstaltung_name.'%', FHC_STRING).")) ";
+}
+
 $sql_query.=" $aktiv ORDER BY tbl_lehrveranstaltung.bezeichnung";
 
 if($fb_kurzbz=='' && $stg_kz=='' && $semester=='0' && $oe_kurzbz=='')
@@ -605,6 +618,11 @@ $outp.= '</SELECT>';
 	
 	//Lehrveranstaltung ID Input
 	$outp.= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 100px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
+	
+	//Lehrveranstaltung Suche Bezeichnung
+	$outp.= ' Name <input type="text" name="lehrveranstaltung_name" style="width: 400px" id="lehrveranstaltung_name" 
+					value="'.$lehrveranstaltung_name.'" placeholder="Mind. 3 Zeichen. Deutsche oder Englische Bezeichnung"
+					title="Platzhalter _ (EIN beliebiges Zeichen) und % (beliebig viele Zeichen) möglich">';
 
 	$outp.= ' <input type="submit" value="Anzeigen">';
 	$outp.= '</form>';
@@ -701,12 +719,23 @@ echo '
 			function checksubmit()
 			{
 				if(document.getElementById("select_stg_kz").value==\'\'
-					&& document.getElementById("select_fachbereich_kurzbz").value==\'\'
-					&& document.getElementById("select_oe_kurzbz").value==\'\'
-					&& document.getElementById("lehrveranstaltung_id").value==\'\')
+				&& document.getElementById("select_fachbereich_kurzbz").value==\'\'
+				&& document.getElementById("select_oe_kurzbz").value==\'\'
+				&& document.getElementById("lehrveranstaltung_id").value==\'\'
+				&& document.getElementById("lehrveranstaltung_name").value==\'\')
 				{
-					alert("Die Felder Studiengang, Institut, Organisationseinheit und ID dürfen nicht gleichzeitig auf \'Alle\' gesetzt sein");
+					alert("Die Felder Studiengang, Institut, Organisationseinheit, ID und Name dürfen nicht gleichzeitig auf \'Alle\' gesetzt, bzw. leer sein");
 					return false;
+				}
+				else if(document.getElementById("lehrveranstaltung_name").value !=\'\')
+				{
+					// Trim whitespace characters
+					var searchstring = document.getElementById("lehrveranstaltung_name").value.trim();
+					if (searchstring.length < 3)
+					{
+						alert("Geben Sie mindestens 3 Zeichen für die Namenssuche ein");
+						return false;
+					}
 				}
 				else
 					return true;
