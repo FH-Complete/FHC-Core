@@ -20,10 +20,11 @@ class UDFLib
 	const VALIDATION = 'validation'; // UDF validation attribute
 	const LIST_VALUES = 'listValues'; // UDF listValues attribute
 	const FE_REGEX_LANGUAGE = 'js'; // UDF javascript regex language attribute (front end)
+	const BE_REGEX_LANGUAGE = 'php'; // UDF php regex language attribute (back end)
 	
 	// HTML components
-	const TITLE = 'description';
 	const LABEL = 'title';
+	const TITLE = 'description';
 	const PLACEHOLDER = 'placeholder';
 	
 	// Validation attributes
@@ -34,22 +35,30 @@ class UDFLib
 	const MAX_LENGTH = 'max-length';
 	const MIN_LENGTH = 'min-length';
 	
+	// UDF DB constants
+	const COLUMN_TYPE = 'jsonb';
+	const COLUMN_NAME = 'udf_values';
+	const COLUMN_PREFIX = 'udf_';
+	const COLUMN_JSON_DESCRIPTION = 'jsons';
+	
+	const CHKBOX_TYPE = 'checkbox'; // UDF checkbox type
+	
 	const PHRASES_APP_NAME = 'core'; // Name of the app parameter used to retrive phrases
 	
 	private $_ci; // Code igniter instance
 	
-	public function __construct($config = array())
+	/**
+	 * 
+	 */
+	public function __construct()
 	{
-		$this->_ci = & get_instance();
+		$this->_ci =& get_instance();
 		
 		$this->_ci->load->helper('fhc');
-		
-		// Loads the widget library
-		$this->_ci->load->library('WidgetLib');
-		
-        // Loads widgets to render HTML for UDF
-        loadResource(APPPATH.'widgets/udf');
 	}
+	
+	// -------------------------------------------------------------------------------------------------
+	// Public methods
 	
 	/**
      * 
@@ -58,6 +67,12 @@ class UDFLib
     {
 		if (!empty($args[UDFLib::SCHEMA_ARG_NAME]) && !empty($args[UDFLib::TABLE_ARG_NAME]))
 		{
+			// Loads the widget library
+			$this->_ci->load->library('WidgetLib');
+			
+			// Loads widgets to render HTML for UDF
+			loadResource(APPPATH.'widgets/udf');
+			
 			// Default external block is true
 			if (empty($args[UDFLib::FIELD_ARG_NAME]) && !isset($htmlArgs[HTMLWidget::EXTERNAL_BLOCK]))
 			{
@@ -176,6 +191,299 @@ class UDFLib
 			}
 		}
     }
+	
+	/**
+	 * Manage UDFs
+	 */
+	public function manageUDFs(&$data, $schemaAndTable, $udfValues = null)
+	{
+		$validate = success(true); // returned value
+		// Contains a list of validation errors for the UDFs that have not passed the validation
+		$notValidUDFsArray = array();
+		
+		$this->_ci->load->model('system/UDF_model', 'UDFModel');
+		
+		// Retrieves UDFs definitions for this table
+		$resultUDFsDefinitions = $this->_ci->UDFModel->getUDFsDefinitions($schemaAndTable);
+		if (hasData($resultUDFsDefinitions)) // standard check if everything is ok and data are present
+		{
+			// Get udf values from $data & clean udf values from $data
+			// NOTE: Must be performed here because the load method populates the property UDFs too
+			$this->_popUDFParameters($data);
+			
+			$requiredUDFsArray = array(); // contains a list of required UDFs
+			// Contains the UDFs values to be stored
+			// NOTE: the UDFs supplied that are not present in the UDF definition of this table, will be discarded
+			$toBeStoredUDFsArray = array();
+			
+			// Decodes json that define the UDFs for this table
+			$decodedUDFDefinitions = json_decode(
+				$resultUDFsDefinitions->retval[0]->{UDFLib::COLUMN_JSON_DESCRIPTION}
+			);
+			
+			// Loops through the UDFs definitions
+			for ($i = 0; $i < count($decodedUDFDefinitions); $i++)
+			{
+				$decodedUDFDefinition = $decodedUDFDefinitions[$i]; // Definition of a single UDF
+				
+				// Loops through the UDFs values that should be stored
+				foreach ($this->UDFs as $key => $val)
+				{
+					$tmpValidate = success(true); // temporary variable used to store the returned value from _validateUDFs
+					
+					// If this is the definition of this UDF
+					if ($decodedUDFDefinition->{UDFLib::NAME} == $key)
+					{
+						if (isset($decodedUDFDefinition->{UDFLib::VALIDATION})) // If validation rules are present for this UDF
+						{
+							// Checks if the given UDF is required and the result will be stored in $chkRequiredPassed
+							// If $chkRequiredPassed == true => required check passed
+							// If $chkRequiredPassed == false => required check NOT passed
+							$chkRequiredPassed = true;
+							// If required property is present in the UDF description and it is true
+							if (isset($decodedUDFDefinition->{UDFLib::VALIDATION}->{UDFLib::REQUIRED})
+								&& $decodedUDFDefinition->{UDFLib::VALIDATION}->{UDFLib::REQUIRED} === true)
+							{
+								// If this UDF is a checkbox and the given value is false
+								// OR
+								// if this UDF is NOT a checkbox and the given value is null
+								if (($decodedUDFDefinition->{UDFLib::TYPE} == UDFLib::CHKBOX_TYPE && $val === false)
+									|| ($decodedUDFDefinition->{UDFLib::TYPE} != UDFLib::CHKBOX_TYPE && $val == null))
+								{
+									$chkRequiredPassed = false; // not passed
+									// A new error is generated and added to array $requiredUDFsArray
+									$requiredUDFsArray[$decodedUDFDefinition->{UDFLib::NAME}] = error(
+										$decodedUDFDefinition->{UDFLib::NAME},
+										EXIT_VALIDATION_UDF_REQUIRED
+									);
+								}
+							}
+							
+							// If the previous required check has failed then the validation is not performed
+							if ($chkRequiredPassed === true)
+							{
+								// Checks if the validation should be performed
+								// If $toBeValidated == true => validation is performed
+								// If $toBeValidated == false => validation is NOT performed
+								$toBeValidated = false;
+								// If this UDF is NOT a checkbox 
+								if ($decodedUDFDefinition->{UDFLib::TYPE} != UDFLib::CHKBOX_TYPE)
+								{
+									// If required property is NOT present in the UDF description
+									if (!isset($decodedUDFDefinition->{UDFLib::VALIDATION}->{UDFLib::REQUIRED}))
+									{
+										$toBeValidated = true;
+									}
+									// If required property is present in the UDF description and it is true
+									if (isset($decodedUDFDefinition->{UDFLib::VALIDATION}->{UDFLib::REQUIRED})
+										&& $decodedUDFDefinition->{UDFLib::VALIDATION}->{UDFLib::REQUIRED} === true)
+									{
+										$toBeValidated = true;
+									}
+									// If required property is present in the UDF description and it is true and the given value is null
+									if (isset($decodedUDFDefinition->{UDFLib::VALIDATION}->{UDFLib::REQUIRED})
+										&& $decodedUDFDefinition->{UDFLib::VALIDATION}->{UDFLib::REQUIRED} === false
+										&& $val != null)
+									{
+										$toBeValidated = true;
+									}
+								}
+								
+								if ($toBeValidated === true) // Checks if validation should be performed
+								{
+									$tmpValidate = $this->_validateUDFs(
+										$decodedUDFDefinition->{UDFLib::VALIDATION}, // 
+										$decodedUDFDefinition->{UDFLib::NAME}, // 
+										$val // 
+									);
+								}
+							}
+						}
+						
+						// If validation is ok copy the value that is to be stored into $toBeStoredUDFsArray
+						if (isSuccess($tmpValidate))
+						{
+							$toBeStoredUDFsArray[$key] = $val;
+						}
+						else // otherwise store the validation error in $notValidUDFsArray
+						{
+							$notValidUDFsArray[] = $tmpValidate;
+						}
+					}
+				}
+			}
+			
+			// Copies the remaining required UDFs into $notValidUDFsArray
+			// because they were not supplied, therefore must be notified as error
+			foreach($requiredUDFsArray as $key => $val)
+			{
+				$notValidUDFsArray[] = array($val);
+			}
+			
+			// If the validation of all the supplied UDFs is ok
+			if (count($notValidUDFsArray) == 0)
+			{
+				// An update is performed, then in this case it preserves the values
+				// of the UDF that are not updated
+				if (is_array($udfValues) && count($udfValues) > 0)
+				{
+					foreach($udfValues as $fieldName => $fieldValue)
+					{
+						// If this field is not present in the given parameters
+						// then copy it from the DB without changes
+						if (!array_key_exists($fieldName, $toBeStoredUDFsArray))
+						{
+							$toBeStoredUDFsArray[$fieldName] = $fieldValue;
+						}
+					}
+				}
+				$encodedToBeStoredUDFs = json_encode($toBeStoredUDFsArray); // encode to json
+				if ($encodedToBeStoredUDFs !== false) // if encode was ok
+				{
+					// Save the supplied UDFs values
+					$data[UDFLib::COLUMN_NAME] = $encodedToBeStoredUDFs;
+				}
+			}
+			else // otherwise the returning value will be the list of UDFs validation errors
+			{
+				$validate = error($notValidUDFsArray, EXIT_VALIDATION_UDF);
+			}
+		}
+		
+		return $validate;
+	}
+	
+	/**
+	 * 
+	 */
+	public function isUDFColumn($columnName, $columnType)
+	{
+		$isUDFColumn = false;
+		
+		if (substr($columnName, 0, strlen(UDFLib::COLUMN_PREFIX)) == UDFLib::COLUMN_PREFIX
+			&& $columnType == UDFLib::COLUMN_TYPE)
+		{
+			$isUDFColumn = true;
+		}
+		
+		return $isUDFColumn;
+	}
+	
+	// -------------------------------------------------------------------------------------------------
+	// Private methods
+	
+	/**
+	 * Move UDFs from $data to $UDFs
+	 */
+	private function _popUDFParameters(&$data)
+	{
+		foreach($data as $key => $val)
+		{
+			if (substr($key, 0, 4) == UDFLib::COLUMN_PREFIX)
+			{
+				$this->UDFs[$key] = $val; // stores UDF value into property UDFs
+				unset($data[$key]); // remove from data
+			}
+		}
+	}
+	
+	/**
+	 * Validates UDF value
+	 */
+	private function _validateUDFs($decodedUDFValidation, $udfName, $udfValue)
+	{
+		$returnArrayValidation = array(); // returned value
+		
+		// If $udfValue is not an array, then store it inside a new array
+		$tmpUdfValues = $udfValue;
+		if (!is_array($udfValue))
+		{
+			$tmpUdfValues = array($udfValue);
+		}
+		
+		// Loops through all the supplied UDFs values
+		foreach($tmpUdfValues as $udfValIndx => $udfVal)
+		{
+			// If the single UDF value is not an array or an object
+			if (!is_array($udfVal) && !is_object($udfVal))
+			{
+				// If the UDF value is numeric (integer, float, double...)
+				if (is_numeric($udfVal))
+				{
+					// If min value attribute is present in the validation for this UDF,
+					// then checks if the value of this UDF is compliant to this attribute
+					if (isset($decodedUDFValidation->{UDFLib::MIN_VALUE})
+						&& $udfVal < $decodedUDFValidation->{UDFLib::MIN_VALUE})
+					{
+						// validation is failed and the error is stored in $returnArrayValidation
+						$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MIN_VALUE);
+					}
+					
+					// If max value attribute is present in the validation for this UDF,
+					// then checks if the value of this UDF is compliant to this attribute
+					if (isset($decodedUDFValidation->{UDFLib::MAX_VALUE})
+						&& $udfVal > $decodedUDFValidation->{UDFLib::MAX_VALUE})
+					{
+						// validation is failed and the error is stored in $returnArrayValidation
+						$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MAX_VALUE);
+					}
+				}
+				
+				$strUdfVal = strval($udfVal); // store in $strUdfVal the string conversion of $udfVal
+				// If min length attribute is present in the validation for this UDF,
+				// then checks if the value of this UDF is compliant to this attribute
+				if (isset($decodedUDFValidation->{UDFLib::MIN_LENGTH}) && isset($strUdfVal)
+					&& strlen($strUdfVal) < $decodedUDFValidation->{UDFLib::MIN_LENGTH})
+				{
+					// validation is failed and the error is stored in $returnArrayValidation
+					$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MIN_LENGTH);
+				}
+				
+				// If max length attribute is present in the validation for this UDF,
+				// then checks if the value of this UDF is compliant to this attribute
+				if (isset($decodedUDFValidation->{UDFLib::MAX_LENGTH}) && isset($strUdfVal)
+					&& strlen($strUdfVal) > $decodedUDFValidation->{UDFLib::MAX_LENGTH})
+				{
+					// validation is failed and the error is stored in $returnArrayValidation
+					$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MAX_LENGTH);
+				}
+				
+				// If $udfVal is a string
+				if (is_string($udfVal))
+				{
+					// Search for a php regular expression in the validation of this UDF, if one is found
+					// then checks if the value of this UDF is compliant to this attribute
+					if (isset($decodedUDFValidation->{UDFLib::REGEX})
+						&& is_array($decodedUDFValidation->{UDFLib::REGEX}))
+					{
+						foreach($decodedUDFValidation->{UDFLib::REGEX} as $regexIndx => $regex)
+						{
+							if ($regex->language == UDFLib::BE_REGEX_LANGUAGE)
+							{
+								if (preg_match($regex->expression, $udfVal) != 1)
+								{
+									// validation is failed and the error is stored in $returnArrayValidation
+									$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_REGEX);
+								}
+							}
+						}
+					}
+				}
+			}
+			else // otherwise the validation is failed and the error is stored in $returnArrayValidation
+			{
+				$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_NOT_VALID_VAL);
+			}
+		}
+		
+		// If no UDF validation errors were raised, it's a success!!
+		if (count($returnArrayValidation) == 0)
+		{
+			$returnArrayValidation = success(true);
+		}
+		
+		return $returnArrayValidation;
+	}
     
     /**
      * Set the name and id attribute of the HTML element

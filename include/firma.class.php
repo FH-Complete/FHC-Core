@@ -576,6 +576,78 @@ class firma extends basis_db
 		}
 	}
 
+	public function getChangesByKW($kw = 0, $jahr = 0) {
+		$this->result = array();
+		$this->errormsg = '';
+
+		if ($kw<1 || $kw>53) {
+			$this->errormsg = 'KW außerhalb gültigem Bereich ('.$kw.')';
+			return false;
+		}
+		if ($jahr<1990) {
+			$this->errormsg = 'Jahr außerhalb gültigem Bereich ('.$jahr.')';
+			return false;
+		}
+
+		$qry ="SELECT * FROM (SElECT ";
+		$qry.=" distinct on(firma_id)";
+		$qry.=" tbl_firma.firma_id,tbl_firma.* ,tbl_standort.kurzbz,tbl_standort.adresse_id,tbl_standort.standort_id,tbl_standort.bezeichnung  ";
+		$qry.=" ,person_id,	tbl_adresse.name as adress_name, strasse, plz, ort, gemeinde,nation,typ,heimatadresse,zustelladresse  ";
+		$qry.=" FROM public.tbl_firma";
+		$qry.=" LEFT JOIN public.tbl_standort USING(firma_id) ";
+		$qry.=" LEFT JOIN public.tbl_adresse  on ( tbl_adresse.adresse_id=tbl_standort.adresse_id ) ";
+		$qry.=" WHERE 1=1";
+		$qry.=")  as a  WHERE (updateamum is not null and date_part('week',updateamum) = $kw and date_part('year',updateamum) = $jahr) or (date_part('week',insertamum)=$kw and date_part('year',insertamum)=$jahr)  ORDER BY name;";
+		//echo $qry;
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$fa = new firma();
+
+				$fa->firma_id = $row->firma_id;
+				$fa->name = $row->name;
+				$fa->anmerkung = $row->anmerkung;
+				$fa->lieferbedingungen = $row->lieferbedingungen;
+				$fa->firmentyp_kurzbz = $row->firmentyp_kurzbz;
+				$fa->updateamum = $row->updateamum;
+				$fa->updatevon = $row->updatevon;
+				$fa->insertamum = $row->insertamum;
+				$fa->insertvon = $row->insertvon;
+				$fa->ext_id = $row->ext_id;
+				$fa->schule = $this->db_parse_bool($row->schule);
+				$fa->steuernummer = $row->steuernummer;
+				$fa->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$fa->aktiv = $this->db_parse_bool($row->aktiv);
+				$fa->finanzamt = $row->finanzamt;
+				$fa->partner_code = $row->partner_code;
+				$fa->kurzbz = $row->kurzbz;
+				$fa->adresse_id = $row->adresse_id;
+				$fa->standort_id = $row->standort_id;
+				$fa->bezeichnung = $row->bezeichnung;
+				$fa->person_id = $row->person_id;
+				$fa->adresse_id = $row->adresse_id;
+				$fa->strasse = $row->strasse;
+				$fa->plz = $row->plz;
+				$fa->ort = $row->ort;
+				$fa->gemeinde = $row->gemeinde;
+				$fa->nation = $row->nation;
+				$fa->typ = $row->typ;
+				$fa->adress_name = $row->adress_name;
+				$fa->heimatadresse = $this->db_parse_bool($row->heimatadresse);
+				$fa->zustelladresse = $this->db_parse_bool($row->zustelladresse);
+
+				$this->result[] = $fa;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
+	}
+
 
 	/**
 	 * Suche nur nach Firmennamen für die abgespeckte Firmenverwaltung

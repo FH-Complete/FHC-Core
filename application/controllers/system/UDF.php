@@ -57,8 +57,7 @@ class UDF extends VileSci_Controller
 		{
 			if ($this->PersonModel->hasUDF())
 			{
-				$person = $this->PersonModel->load($person_id);
-				$personUdfs = $this->PersonModel->getUDFs();
+				$personUdfs = $this->PersonModel->getUDFs($person_id);
 				$personUdfs['person_id'] = $person_id;
 				$data['personUdfs'] = $personUdfs;
 			}
@@ -68,8 +67,7 @@ class UDF extends VileSci_Controller
 		{
 			if ($this->PrestudentModel->hasUDF())
 			{
-				$prestudent = $this->PrestudentModel->load($prestudent_id);
-				$prestudentUdfs = $this->PrestudentModel->getUDFs();
+				$prestudentUdfs = $this->PrestudentModel->getUDFs($prestudent_id);
 				$prestudentUdfs['prestudent_id'] = $prestudent_id;
 				$data['prestudentUdfs'] = $prestudentUdfs;
 			}

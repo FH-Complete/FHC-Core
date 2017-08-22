@@ -13,42 +13,15 @@ class DB_Model extends FHC_Model
 	
 	// Constants used to convert postgresql arrays and booleans to the php equivalent
 	const PGSQL_ARRAY_TYPE = '_';
-	const PGSQL_BOOLEAN_TYPE = 'bool';
-	const PGSQL_BOOLEAN_ARRAY_TYPE = '_bool';
 	const PGSQL_BOOLEAN_TRUE = 't';
 	const PGSQL_BOOLEAN_FALSE = 'f';
-	
-	// UDF constants
-	const UDF_FIELD_NAME = 'udf_values';
-	const UDF_FIELD_TYPE = 'jsonb';
-	const UDF_FIELD_PREFIX = 'udf_';
-	const UDF_ATTRIBUTE_NAME = 'name';
-	const UDF_TYPE_NAME = 'type';
-	const UDF_CHKBOX_TYPE = 'checkbox';
-	const UDF_DROPDOWN_TYPE = 'dropdown';
-	const UDF_MULTIPLEDROPDOWN_TYPE = 'multipledropdown';
-	const UDF_FIELD_JSON_DESCRIPTION = 'jsons';
-	
-	// UDF validation attributes
-	const UDF_REGEX = 'regex';
-	const UDF_REQUIRED = 'required';
-	const UDF_MAX_VALUE = 'max-value';
-	const UDF_MIN_VALUE = 'min-value';
-	const UDF_REGEX_LANG = 'php';
-	const UDF_MAX_LENGTH = 'max-length';
-	const UDF_MIN_LENGTH = 'min-length';
-	
-	// String values of booleans
-	const STRING_TRUE = 'true';
-	const STRING_FALSE = 'false';
-	const STRING_NULL = 'null';
+	const PGSQL_BOOLEAN_TYPE = 'bool';
+	const PGSQL_BOOLEAN_ARRAY_TYPE = '_bool';
 	
 	protected $dbTable;  	// Name of the DB-Table for CI-Insert, -Update, ...
 	protected $pk;  		// Name of the PrimaryKey for DB-Update, Load, ...
 	protected $hasSequence;	// False if this table has a composite primary key that is not using a sequence
 							// True if this table has a primary key that uses a sequence
-	
-	protected $UDFs; // Contains the UDFs
 	
 	/**
 	 * Constructor
@@ -60,13 +33,18 @@ class DB_Model extends FHC_Model
 		
 		// Set properties
 		$this->pk = $pk;
-		$this->UDFs = array();
 		$this->dbTable = $dbTable;
 		$this->hasSequence = $hasSequence;
 		
 		// Loads DB conns and confs
 		$this->load->database();
+		
+		// Loads the UDF library
+		$this->load->library('UDFLib');
 	}
+	
+	// ------------------------------------------------------------------------------------------
+	// Public methods
 	
 	/**
 	 * Insert Data into DB-Table
@@ -83,8 +61,8 @@ class DB_Model extends FHC_Model
 		// Checks rights
 		if ($isEntitled = $this->_isEntitled(PermissionLib::INSERT_RIGHT)) return $isEntitled;
 		
-		// UDFs
-		if (isError($validate = $this->_manageUDFs($data))) return $validate;
+		// If this table has UDF and the validation of them is ok
+		if ($this->hasUDF() && isError($validate = $this->udflib->manageUDFs($data, $this->dbTable))) return $validate;
 		
 		// DB-INSERT
 		if ($this->db->insert($this->dbTable, $data))
@@ -158,15 +136,18 @@ class DB_Model extends FHC_Model
 		// Checks rights
 		if ($isEntitled = $this->_isEntitled(PermissionLib::UPDATE_RIGHT)) return $isEntitled;
 		
-		// UDFs
-		if (isError($validate = $this->_manageUDFs($data, $id))) return $validate;
+		// If this table has UDF and the validation of them is ok
+		if ($this->hasUDF() && isError($validate = $this->udflib->manageUDFs($data, $this->dbTable, $this->getUDFs($id))))
+		{
+			return $validate;
+		}
 		
 		// DB-UPDATE
 		// Check for composite Primary Key
 		if (is_array($id))
 		{
 			if (isset($id[0]))
-				$this->db->where($this->_arrayMergeIndex($this->pk, $id));
+				$this->db->where($this->arrayMergeIndex($this->pk, $id));
 			else
 				$this->db->where($id);
 		}
@@ -200,7 +181,7 @@ class DB_Model extends FHC_Model
 		if (is_array($id))
 		{
 			if (isset($id[0]))
-				$result = $this->db->delete($this->dbTable, $this->_arrayMergeIndex($this->pk, $id));
+				$result = $this->db->delete($this->dbTable, $this->arrayMergeIndex($this->pk, $id));
 			else
 				$result = $this->db->delete($this->dbTable, $id);
 		}
@@ -234,7 +215,7 @@ class DB_Model extends FHC_Model
 		if (is_array($id))
 		{
 			if (isset($id[0]))
-				$result = $this->db->get_where($this->dbTable, $this->_arrayMergeIndex($this->pk, $id));
+				$result = $this->db->get_where($this->dbTable, $this->arrayMergeIndex($this->pk, $id));
 			else
 				$result = $this->db->get_where($this->dbTable, $id);
 		}
@@ -244,7 +225,7 @@ class DB_Model extends FHC_Model
 			$result = $this->db->get_where($this->dbTable, array($this->pk => $id));
 		
 		if ($result)
-			return success($this->toPhp($result));
+			return success($this->_toPhp($result));
 		else
 			return error($this->db->error(), FHC_DB_ERROR);
 	}
@@ -267,7 +248,7 @@ class DB_Model extends FHC_Model
 		$result = $this->db->get_where($this->dbTable, $where);
 		
 		if ($result)
-			return success($this->toPhp($result));
+			return success($this->_toPhp($result));
 		else
 			return error($this->db->error(), FHC_DB_ERROR);
 	}
@@ -340,7 +321,7 @@ class DB_Model extends FHC_Model
 		{
 			// Converts the object that contains data, from the returned CI's object to an array
 			// with the postgresql array and boolean types converterd
-			$resultArray = $this->toPhp($resultDB);
+			$resultArray = $this->_toPhp($resultDB);
 			// Array that will contain all the mainTable records, and to each record the linked data
 			// of a side table
 			$returnArray = array();
@@ -386,7 +367,7 @@ class DB_Model extends FHC_Model
 					$tmpFilteredArray = array_filter(get_object_vars($sideTableObj));
 					if (isset($tmpFilteredArray) && count($tmpFilteredArray) > 0)
 					{
-						if (($k = $this->findMainTable($mainTableObj, $returnArray)) === false)
+						if (($k = $this->_findMainTable($mainTableObj, $returnArray)) === false)
 						{
 							$mainTableObj->{$sideTableProperty} = array($sideTableObj);
 							$returnArray[$returnArrayCounter++] = $mainTableObj;
@@ -425,8 +406,12 @@ class DB_Model extends FHC_Model
 	public function addJoin($joinTable = null, $cond = null, $type = '')
 	{
 		// Check parameters
-		if (is_null($joinTable) || is_null($cond) || !in_array($type, array('', 'LEFT', 'RIGHT', 'OUTER', 'INNER', 'LEFT OUTER', 'RIGHT OUTER')))
+		if (is_null($joinTable)
+			|| is_null($cond)
+			|| !in_array($type, array('', 'LEFT', 'RIGHT', 'OUTER', 'INNER', 'LEFT OUTER', 'RIGHT OUTER')))
+		{
 			return error(FHC_MODEL_ERROR, FHC_MODEL_ERROR);
+		}
 		
 		$this->db->join($joinTable, $cond, $type);
 		
@@ -677,35 +662,6 @@ class DB_Model extends FHC_Model
 	}
 	
 	/**
-	 * Return the property UDFs
-	 */
-	public function getUDFs()
-	{
-		return $this->UDFs;
-	}
-	
-	/**
-	 * Return one selected element of UDFs
-	 */
-	public function getUDF($udf)
-	{
-		if (isset($this->UDFs[$udf]))
-		{
-			return $this->UDFs[$udf];
-		}
-		
-		return null;
-	}
-	
-	/**
-	 * Checks if this table has the field udf_values
-	 */
-	public function hasUDF()
-	{
-		return $this->fieldExists(DB_Model::UDF_FIELD_NAME);
-	}
-	
-	/**
 	 * Returns an array that contains a list of columns names of this table
 	 */
 	public function listFields()
@@ -739,7 +695,47 @@ class DB_Model extends FHC_Model
 		return $exists;
 	}
 	
-	// ----------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public function getUDFs($id, $udfName = null)
+	{
+		$udfs = array();
+		
+		$this->addSelect(UDFLib::COLUMN_NAME);
+		
+		$result = $this->load($id);
+		if (hasData($result))
+		{
+			$jsonValues = (array)$result->retval[0];
+			// For every UDF
+			foreach ($jsonValues as $key => $value)
+			{
+				if ($udfName != null && $udfName == $key)
+				{
+					$udfs[$key] = $value; // 
+					break;
+				}
+				else
+				{
+					$udfs[$key] = $value; // 
+				}
+			}
+		}
+		
+		return $udfs;
+	}
+	
+	/**
+	 * Checks if this table has the field udf_values
+	 */
+	public function hasUDF()
+	{
+		return $this->fieldExists(UDFLib::COLUMN_NAME);
+	}
+	
+	// ------------------------------------------------------------------------------------------
+	// Protected methods
 	
 	/**
 	 * Invalid ID
@@ -748,12 +744,12 @@ class DB_Model extends FHC_Model
 	 * @param   array $v	Array with values.
 	 * @return  array
 	 */
-	protected function _arrayMergeIndex($i,$v)
+	protected function arrayMergeIndex($idexes, $values)
 	{
-		if (count($i) != count($v))
+		if (count($idexes) != count($values))
 			return false;
-		for ($j=0; $j < count($i); $j++)
-			$a[$i[$j]] = $v[$j];
+		for ($j = 0; $j < count($idexes); $j++)
+			$a[$idexes[$j]] = $values[$j];
 		return $a;
 	}
 	
@@ -783,7 +779,7 @@ class DB_Model extends FHC_Model
 			// If no errors occurred
 			if ($resultDB)
 			{
-				$result = success($this->toPhp($resultDB));
+				$result = success($this->_toPhp($resultDB));
 			}
 			else
 			{
@@ -820,320 +816,8 @@ class DB_Model extends FHC_Model
 		return $result;
 	}
 	
-	// ----------------------------------------------------------------------------
-	
-	/**
-	 * Returns all the UDF for this table
-	 */
-	private function _getUDFsDefinitions()
-	{
-		$this->load->model('system/UDF_model', 'UDFModel');
-		
-		$schema = DB_Model::DEFAULT_SCHEMA;
-		$table = $this->dbTable;
-		$dotPos = strpos($table, '.');
-		
-		if (is_numeric($dotPos) && $dotPos > 0)
-		{
-			$tmpArray = explode('.', $table);
-			$schema = $tmpArray[0];
-			$table = $tmpArray[1];
-		}
-		
-		$this->UDFModel->addSelect(DB_Model::UDF_FIELD_JSON_DESCRIPTION);
-		$udfResults = $this->UDFModel->loadWhere(
-			array(
-				'schema' => $schema,
-				'table' => $table
-			)
-		);
-		
-		return $udfResults;
-	}
-	
-	/**
-	 * Move UDFs from $data to $UDFs
-	 */
-	private function _popUDFParameters(&$data)
-	{
-		foreach($data as $key => $val)
-		{
-			if (substr($key, 0, 4) == DB_Model::UDF_FIELD_PREFIX)
-			{
-				$this->UDFs[$key] = $val; // stores UDF value into property UDFs
-				unset($data[$key]); // remove from data
-			}
-		}
-	}
-	
-	/**
-	 * Validates UDF value
-	 */
-	private function _validateUDFs($decodedUDFValidation, $udfName, $udfValue)
-	{
-		$returnArrayValidation = array(); // returned value
-		
-		// If $udfValue is not an array, then store it inside a new array
-		$tmpUdfValues = $udfValue;
-		if (!is_array($udfValue))
-		{
-			$tmpUdfValues = array($udfValue);
-		}
-		
-		// Loops through all the supplied UDFs values
-		foreach($tmpUdfValues as $udfValIndx => $udfVal)
-		{
-			// If the single UDF value is not an array or an object
-			if (!is_array($udfVal) && !is_object($udfVal))
-			{
-				// If the UDF value is numeric (integer, float, double...)
-				if (is_numeric($udfVal))
-				{
-					// If min value attribute is present in the validation for this UDF,
-					// then checks if the value of this UDF is compliant to this attribute
-					if (isset($decodedUDFValidation->{DB_Model::UDF_MIN_VALUE})
-						&& $udfVal < $decodedUDFValidation->{DB_Model::UDF_MIN_VALUE})
-					{
-						// validation is failed and the error is stored in $returnArrayValidation
-						$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MIN_VALUE);
-					}
-					
-					// If max value attribute is present in the validation for this UDF,
-					// then checks if the value of this UDF is compliant to this attribute
-					if (isset($decodedUDFValidation->{DB_Model::UDF_MAX_VALUE})
-						&& $udfVal > $decodedUDFValidation->{DB_Model::UDF_MAX_VALUE})
-					{
-						// validation is failed and the error is stored in $returnArrayValidation
-						$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MAX_VALUE);
-					}
-				}
-				
-				$strUdfVal = strval($udfVal); // store in $strUdfVal the string conversion of $udfVal
-				// If min length attribute is present in the validation for this UDF,
-				// then checks if the value of this UDF is compliant to this attribute
-				if (isset($decodedUDFValidation->{DB_Model::UDF_MIN_LENGTH}) && isset($strUdfVal)
-					&& strlen($strUdfVal) < $decodedUDFValidation->{DB_Model::UDF_MIN_LENGTH})
-				{
-					// validation is failed and the error is stored in $returnArrayValidation
-					$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MIN_LENGTH);
-				}
-				
-				// If max length attribute is present in the validation for this UDF,
-				// then checks if the value of this UDF is compliant to this attribute
-				if (isset($decodedUDFValidation->{DB_Model::UDF_MAX_LENGTH}) && isset($strUdfVal)
-					&& strlen($strUdfVal) > $decodedUDFValidation->{DB_Model::UDF_MAX_LENGTH})
-				{
-					// validation is failed and the error is stored in $returnArrayValidation
-					$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_MAX_LENGTH);
-				}
-				
-				// If $udfVal is a string
-				if (is_string($udfVal))
-				{
-					// Search for a php regular expression in the validation of this UDF, if one is found
-					// then checks if the value of this UDF is compliant to this attribute
-					if (isset($decodedUDFValidation->{DB_Model::UDF_REGEX})
-						&& is_array($decodedUDFValidation->{DB_Model::UDF_REGEX}))
-					{
-						foreach($decodedUDFValidation->{DB_Model::UDF_REGEX} as $regexIndx => $regex)
-						{
-							if ($regex->language == DB_Model::UDF_REGEX_LANG)
-							{
-								if (preg_match($regex->expression, $udfVal) != 1)
-								{
-									// validation is failed and the error is stored in $returnArrayValidation
-									$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_REGEX);
-								}
-							}
-						}
-					}
-				}
-			}
-			else // otherwise the validation is failed and the error is stored in $returnArrayValidation
-			{
-				$returnArrayValidation[] = error($udfName, EXIT_VALIDATION_UDF_NOT_VALID_VAL);
-			}
-		}
-		
-		// If no UDF validation errors were raised, it's a success!!
-		if (count($returnArrayValidation) == 0)
-		{
-			$returnArrayValidation = success(true);
-		}
-		
-		return $returnArrayValidation;
-	}
-	
-	/**
-	 * Manage UDFs
-	 */
-	private function _manageUDFs(&$data, $id = null)
-	{
-		$validate = success(true); // returned value
-		// Contains a list of validation errors for the UDFs that have not passed the validation
-		$notValidUDFsArray = array();
-		
-		if ($this->hasUDF()) // Checks if this table has UDFs
-		{
-			$resultUDFsDefinitions = $this->_getUDFsDefinitions(); // retrieves UDFs definitions for this table
-			if (hasData($resultUDFsDefinitions)) // standard check if everything is ok and data are present
-			{
-				// Get udf values from $data & clean udf values from $data
-				// NOTE: Must be performed here because the load method populates the property UDFs too
-				$this->_popUDFParameters($data);
-				
-				$requiredUDFsArray = array(); // contains a list of required UDFs
-				// Contains the UDFs values to be stored
-				// NOTE: the UDFs supplied that are not present in the UDF definition of this table, will be discarded
-				$toBeStoredUDFsArray = array();
-				
-				// Decodes json that define the UDFs for this table
-				$decodedUDFDefinitions = json_decode(
-					$resultUDFsDefinitions->retval[0]->{DB_Model::UDF_FIELD_JSON_DESCRIPTION}
-				);
-				
-				// Loops through the UDFs definitions
-				for ($i = 0; $i < count($decodedUDFDefinitions); $i++)
-				{
-					$decodedUDFDefinition = $decodedUDFDefinitions[$i]; // Definition of a single UDF
-					
-					// Loops through the UDFs values that should be stored
-					foreach ($this->UDFs as $key => $val)
-					{
-						$tmpValidate = success(true); // temporary variable used to store the returned value from _validateUDFs
-						
-						// If this is the definition of this UDF
-						if ($decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME} == $key)
-						{
-							if (isset($decodedUDFDefinition->validation)) // If validation rules are present for this UDF
-							{
-								// Checks if the given UDF is required and the result will be stored in $chkRequiredPassed
-								// If $chkRequiredPassed == true => required check passed
-								// If $chkRequiredPassed == false => required check NOT passed
-								$chkRequiredPassed = true;
-								// If required property is present in the UDF description and it is true
-								if (isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED})
-									&& $decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED} === true)
-								{
-									// If this UDF is a checkbox and the given value is false
-									// OR
-									// if this UDF is NOT a checkbox and the given value is null
-									if (($decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_CHKBOX_TYPE && $val === false)
-										|| ($decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} != DB_Model::UDF_CHKBOX_TYPE && $val == null))
-									{
-										$chkRequiredPassed = false; // not passed
-										// A new error is generated and added to array $requiredUDFsArray
-										$requiredUDFsArray[$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}] = error(
-											$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME},
-											EXIT_VALIDATION_UDF_REQUIRED
-										);
-									}
-								}
-								
-								// If the previous required check has failed then the validation is not performed
-								if ($chkRequiredPassed === true)
-								{
-									// Checks if the validation should be performed
-									// If $toBeValidated == true => validation is performed
-									// If $toBeValidated == false => validation is NOT performed
-									$toBeValidated = false;
-									// If this UDF is NOT a checkbox 
-									if ($decodedUDFDefinition->{DB_Model::UDF_TYPE_NAME} != DB_Model::UDF_CHKBOX_TYPE)
-									{
-										// If required property is NOT present in the UDF description
-										if (!isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED}))
-										{
-											$toBeValidated = true;
-										}
-										// If required property is present in the UDF description and it is true
-										if (isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED})
-											&& $decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED} === true)
-										{
-											$toBeValidated = true;
-										}
-										// If required property is present in the UDF description and it is true and the given value is null
-										if (isset($decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED})
-											&& $decodedUDFDefinition->validation->{DB_Model::UDF_REQUIRED} === false
-											&& $val != null)
-										{
-											$toBeValidated = true;
-										}
-									}
-									
-									if ($toBeValidated === true) // Checks if validation should be performed
-									{
-										$tmpValidate = $this->_validateUDFs(
-											$decodedUDFDefinition->validation, // 
-											$decodedUDFDefinition->{DB_Model::UDF_ATTRIBUTE_NAME}, // 
-											$val // 
-										);
-									}
-								}
-							}
-							
-							// If validation is ok copy the value that is to be stored into $toBeStoredUDFsArray
-							if (isSuccess($tmpValidate))
-							{
-								$toBeStoredUDFsArray[$key] = $val;
-							}
-							else // otherwise store the validation error in $notValidUDFsArray
-							{
-								$notValidUDFsArray[] = $tmpValidate;
-							}
-						}
-					}
-				}
-				
-				// Copies the remaining required UDFs into $notValidUDFsArray
-				// because they were not supplied, therefore must be notified as error
-				foreach($requiredUDFsArray as $key => $val)
-				{
-					$notValidUDFsArray[] = array($val);
-				}
-				
-				// If the validation of all the supplied UDFs is ok
-				if (count($notValidUDFsArray) == 0)
-				{
-					// An update is performed, then in this case it preserves the values
-					// of the UDF that are not updated
-					if ($id != null)
-					{
-						$record = $this->load($id); // retrive the DB record
-						// Checks that everything is ok and that there is only one record
-						if (isSuccess($record) && count($record->retval) == 1)
-						{
-							$recordFields = (array)$record->retval[0]; // convert to an array
-							foreach($recordFields as $fieldName => $fieldValue)
-							{
-								// If this field is an UDF
-								if (substr($fieldName, 0, 4) == DB_Model::UDF_FIELD_PREFIX)
-								{
-									// If this field is not present in the given parameters
-									// then copy it from the DB without changes
-									if (!array_key_exists($fieldName, $toBeStoredUDFsArray))
-									{
-										$toBeStoredUDFsArray[$fieldName] = $fieldValue;
-									}
-								}
-							}
-						}
-					}
-					$encodedToBeStoredUDFs = json_encode($toBeStoredUDFsArray); // encode to json
-					if ($encodedToBeStoredUDFs !== false) // if encode was ok
-					{
-						// Save the supplied UDFs values
-						$data[DB_Model::UDF_FIELD_NAME] = $encodedToBeStoredUDFs;
-					}
-				}
-				else // otherwise the returning value will be the list of UDFs validation errors
-				{
-					$validate = error($notValidUDFsArray, EXIT_VALIDATION_UDF);
-				}
-			}
-		}
-		
-		return $validate;
-	}
+	// ------------------------------------------------------------------------------------------
+	// Private methods
 	
 	/**
 	 * Checks if the caller is entitled to perform this operation with this right
@@ -1165,7 +849,7 @@ class DB_Model extends FHC_Model
 	 * - A FALSE value on failure
 	 * - Otherwise an object filled with data on success
 	 */
-	private function toPhp($result)
+	private function _toPhp($result)
 	{
 		$toPhp = $result; // if there is nothing to convert then return the result from DB
 		
@@ -1176,10 +860,10 @@ class DB_Model extends FHC_Model
 			$metaDataArray = $result->field_data(); // Fields information
 			for($i = 0; $i < count($metaDataArray); $i++) // Looking for booleans and arrays
 			{
-				// If array type or boolean type
+				// If array type, boolean type OR a UDF
 				if (strpos($metaDataArray[$i]->type, DB_Model::PGSQL_ARRAY_TYPE) !== false
 					|| $metaDataArray[$i]->type == DB_Model::PGSQL_BOOLEAN_TYPE
-					|| $metaDataArray[$i]->name == DB_Model::UDF_FIELD_NAME)
+					|| $this->udflib->isUDFColumn($metaDataArray[$i]->name, $metaDataArray[$i]->type))
 				{
 					// Name and type of the field to be converted
 					$toBeConverted = new stdClass();
@@ -1222,20 +906,18 @@ class DB_Model extends FHC_Model
 							$resultElement->{$toBeConverted->name} = $this->pgBoolPhp($resultElement->{$toBeConverted->name});
 						}
 						// UDF
-						else if ($toBeConverted->type == DB_Model::UDF_FIELD_TYPE
-							&& substr($toBeConverted->name, 0, 4) == DB_Model::UDF_FIELD_PREFIX)
+						else if ($this->udflib->isUDFColumn($toBeConverted->name, $toBeConverted->type))
 						{
 							$jsonValues = json_decode($resultElement->{$toBeConverted->name}); // decode UDFs values
 							if ($jsonValues != null) // if decode is ok
 							{
 								// For every UDF
-								foreach($jsonValues as $key => $value)
+								foreach ($jsonValues as $key => $value)
 								{
 									$resultElement->{$key} = $value; // create a new element called like the UDF
-									$this->UDFs[$key] = $value; // stores the UDF in the property UDFs
 								}
 							}
-							unset($resultElement->{$toBeConverted->name}); // remove udf_values from the response
+							unset($resultElement->{UDFLib::COLUMN_NAME}); // remove udf_values from the response
 						}
 					}
 				}
@@ -1255,7 +937,7 @@ class DB_Model extends FHC_Model
 	/**
 	 * Used in loadTree to find the main tables
 	 */
-	private function findMainTable($mainTableObj, $mainTableArray)
+	private function _findMainTable($mainTableObj, $mainTableArray)
 	{
 		for ($i = 0; $i < count($mainTableArray); $i++)
 		{

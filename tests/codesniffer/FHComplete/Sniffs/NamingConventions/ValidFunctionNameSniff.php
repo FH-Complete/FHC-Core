@@ -104,24 +104,6 @@ class FHComplete_Sniffs_NamingConventions_ValidFunctionNameSniff extends PHP_Cod
 			if (substr($className, -4) === 'Task') {
 				return;
 			}
-		} elseif ($isPrivate === true) {
-			if (substr($methodName, 0, 2) !== '__') {
-				$error = 'Private method name "%s" must be prefixed with 2 underscores';
-				$phpcsFile->addError($error, $stackPtr, 'PrivateNoUnderscore', $errorData);
-				return;
-			} else {
-				$filename = $phpcsFile->getFilename();
-				if (strpos($filename, '/lib/Cake/') === true) {
-					$warning = 'Private method name "%s" in FHComplete core is discouraged';
-					$phpcsFile->addWarning($warning, $stackPtr, 'PrivateMethodInCore', $errorData);
-				}
-			}
-		} else {
-			if ($methodName[0] !== '_' || substr($methodName, 0, 2) === '__') {
-				$error = 'Protected method name "%s" must be prefixed with one underscore';
-				$phpcsFile->addError($error, $stackPtr, 'ProtectedNoUnderscore', $errorData);
-				return;
-			}
 		}
 	}
 

@@ -2,6 +2,14 @@
 
 class UDF_model extends DB_Model
 {
+	// String values of booleans
+	const STRING_NULL = 'null';
+	const STRING_TRUE = 'true';
+	const STRING_FALSE = 'false';
+	
+	const UDF_DROPDOWN_TYPE = 'dropdown';
+	const UDF_MULTIPLEDROPDOWN_TYPE = 'multipledropdown';
+	
 	/**
 	 * Constructor
 	 */
@@ -14,7 +22,7 @@ class UDF_model extends DB_Model
 	}
 	
 	/**
-	 * 
+	 * Override DB_Model method execQuery to allow only to perform queries to read data
 	 */
 	public function execQuery($query, $parametersArray = null)
 	{
@@ -41,7 +49,28 @@ class UDF_model extends DB_Model
 	}
 	
 	/**
-	 * 
+	 * Returns all the UDF for this table
+	 */
+	public function getUDFsDefinitions($schemaAndTable)
+	{
+		$st = $this->getSchemaAndTable($schemaAndTable);
+		
+		$this->addSelect(UDFLib::COLUMN_JSON_DESCRIPTION);
+		$udfResults = $this->loadWhere(
+			array(
+				'schema' => $st->schema,
+				'table' => $st->table
+			)
+		);
+		
+		return $udfResults;
+	}
+
+	// ------------------------------------------------------------------------------------
+	// These methods work only with the this version of FAS, not with the future versions
+	
+	/**
+	 * Methods to save data from FAS
 	 */
 	public function saveUDFs($udfs)
 	{
@@ -69,9 +98,9 @@ class UDF_model extends DB_Model
 				$jsons = json_decode($result->retval[0]->jsons);
 			}
 			
+			$udfs = $this->_fillMissingTextUDF($udfs, $jsons);
 			$udfs = $this->_fillMissingChkboxUDF($udfs, $jsons);
 			$udfs = $this->_fillMissingDropdownUDF($udfs, $jsons);
-			$udfs = $this->_fillMissingTextUDF($udfs, $jsons);
 			
 			$resultPerson = $this->PersonModel->update($person_id, $udfs);
 		}
@@ -88,9 +117,9 @@ class UDF_model extends DB_Model
 				$jsons = json_decode($result->retval[0]->jsons);
 			}
 			
+			$udfs = $this->_fillMissingTextUDF($udfs, $jsons);
 			$udfs = $this->_fillMissingChkboxUDF($udfs, $jsons);
 			$udfs = $this->_fillMissingDropdownUDF($udfs, $jsons);
-			$udfs = $this->_fillMissingTextUDF($udfs, $jsons);
 			
 			$resultPrestudent = $this->PrestudentModel->update($prestudent_id, $udfs);
 		}
@@ -120,21 +149,21 @@ class UDF_model extends DB_Model
 		
 		foreach($jsons as $udfDescription)
 		{
-			if ($udfDescription->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_CHKBOX_TYPE)
+			if ($udfDescription->{UDFLib::TYPE} == UDFLib::CHKBOX_TYPE)
 			{
-				if (!isset($_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}]))
+				if (!isset($_fillMissingChkboxUDF[$udfDescription->{UDFLib::NAME}]))
 				{
-					$_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = false;
+					$_fillMissingChkboxUDF[$udfDescription->{UDFLib::NAME}] = false;
 				}
 				else
 				{
-					if ($_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] == DB_Model::STRING_FALSE)
+					if ($_fillMissingChkboxUDF[$udfDescription->{UDFLib::NAME}] == UDF_model::STRING_FALSE)
 					{
-						$_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = false;
+						$_fillMissingChkboxUDF[$udfDescription->{UDFLib::NAME}] = false;
 					}
-					else if ($_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] == DB_Model::STRING_TRUE)
+					else if ($_fillMissingChkboxUDF[$udfDescription->{UDFLib::NAME}] == UDF_model::STRING_TRUE)
 					{
-						$_fillMissingChkboxUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = true;
+						$_fillMissingChkboxUDF[$udfDescription->{UDFLib::NAME}] = true;
 					}
 				}
 			}
@@ -152,16 +181,16 @@ class UDF_model extends DB_Model
 		
 		foreach($jsons as $udfDescription)
 		{
-			if ($udfDescription->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_DROPDOWN_TYPE
-				|| $udfDescription->{DB_Model::UDF_TYPE_NAME} == DB_Model::UDF_MULTIPLEDROPDOWN_TYPE)
+			if ($udfDescription->{UDFLib::TYPE} == UDF_model::UDF_DROPDOWN_TYPE
+				|| $udfDescription->{UDFLib::TYPE} == UDF_model::UDF_MULTIPLEDROPDOWN_TYPE)
 			{
-				if (!isset($_fillMissingDropdownUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}]))
+				if (!isset($_fillMissingDropdownUDF[$udfDescription->{UDFLib::NAME}]))
 				{
-					$_fillMissingDropdownUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = null;
+					$_fillMissingDropdownUDF[$udfDescription->{UDFLib::NAME}] = null;
 				}
-				else if($_fillMissingDropdownUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] == DB_Model::STRING_NULL)
+				else if($_fillMissingDropdownUDF[$udfDescription->{UDFLib::NAME}] == UDF_model::STRING_NULL)
 				{
-					$_fillMissingDropdownUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = null;
+					$_fillMissingDropdownUDF[$udfDescription->{UDFLib::NAME}] = null;
 				}
 			}
 		}
@@ -178,16 +207,16 @@ class UDF_model extends DB_Model
 		
 		foreach($jsons as $udfDescription)
 		{
-			if ($udfDescription->{DB_Model::UDF_TYPE_NAME} == 'textarea'
-				|| $udfDescription->{DB_Model::UDF_TYPE_NAME} == 'textfield')
+			if ($udfDescription->{UDFLib::TYPE} == 'textarea'
+				|| $udfDescription->{UDFLib::TYPE} == 'textfield')
 			{
-				if (!isset($_fillMissingTextUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}]))
+				if (!isset($_fillMissingTextUDF[$udfDescription->{UDFLib::NAME}]))
 				{
-					$_fillMissingTextUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = null;
+					$_fillMissingTextUDF[$udfDescription->{UDFLib::NAME}] = null;
 				}
-				else if(trim($_fillMissingTextUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}]) == '')
+				else if(trim($_fillMissingTextUDF[$udfDescription->{UDFLib::NAME}]) == '')
 				{
-					$_fillMissingTextUDF[$udfDescription->{DB_Model::UDF_ATTRIBUTE_NAME}] = null;
+					$_fillMissingTextUDF[$udfDescription->{UDFLib::NAME}] = null;
 				}
 			}
 		}
