@@ -111,7 +111,7 @@ class DB_Model extends FHC_Model
 		if (isError($ent = $this->_isEntitled(PermissionLib::UPDATE_RIGHT))) return $ent;
 		
 		// If this table has UDF and the validation of them is ok
-		if (isError($validate = $this->udflib->manageUDFs($data, $this->dbTable, $this->getUDFs($id)))) return $validate;
+		if (isError($validate = $this->_manageUDFs($data, $this->dbTable, $id))) return $validate;
 		
 		$tmpId = $id;
 		
@@ -207,7 +207,7 @@ class DB_Model extends FHC_Model
 				$tmpId = $this->_arrayCombine($this->pk, $id);
 			}
 		}
-		else
+		elseif ($id != null)
 		{
 			$tmpId = array($this->pk => $id);
 		}
@@ -782,13 +782,20 @@ class DB_Model extends FHC_Model
 	/**
 	 * Wrapper method for UDFLib->manageUDFs
 	 */
-	private function _manageUDFs(&$data, $schemaAndTable, $udfValues = null)
+	private function _manageUDFs(&$data, $schemaAndTable, $id = null)
 	{
 		$manageUDFs = success(true);
 		
 		if ($this->hasUDF())
 		{
-			$manageUDFs = $this->udflib->manageUDFs($data, $this->dbTable, $this->getUDFs($id));
+			if ($id != null)
+			{
+				$manageUDFs = $this->udflib->manageUDFs($data, $this->dbTable, $this->getUDFs($id));
+			}
+			else
+			{
+				$manageUDFs = $this->udflib->manageUDFs($data, $this->dbTable);
+			}
 		}
 		
 		return $manageUDFs;
