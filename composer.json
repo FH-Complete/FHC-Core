@@ -83,6 +83,17 @@
 					"reference": "081cac1eb9b504dc32be27b57f32f6d1d29a5253"
 				}
 			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "jquery/jquery1.9",
+				"version": "1.9.0",
+				"dist": {
+					"type": "file",
+					"url": "https://code.jquery.com/jquery-1.9.0.min.js"
+				}
+			}
 		}
 	],
 	"require": {
@@ -111,7 +122,8 @@
 		"netcarver/textile": "^3.5",
 		"netcarver/textile": "^3.5",
 		"borgar/textile-js": "1.0",
-		"rmariuzzo/jquery-checkboxes": "1.0.7"
+		"rmariuzzo/jquery-checkboxes": "1.0.7",
+		"jquery/jquery1.9": "1.9.0"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "2.*"
