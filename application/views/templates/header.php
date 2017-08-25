@@ -56,7 +56,7 @@ if($jquery && $jqueryComposer)
 <?php endif ?>
 
 <?php if($jquery_checkboxes) : ?>
-	<script type="text/javascript" src="<?php echo base_url('include/js/jquery.checkboxes-1.0.7.min.js'); ?>"></script>
+	<script type="text/javascript" src="<?php echo base_url('vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js'); ?>"></script>
 <?php endif ?>
 
 <?php if($jquery_custom) : ?>

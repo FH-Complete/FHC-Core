@@ -71,6 +71,18 @@
 					"reference": "master"
 				}
 			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "rmariuzzo/jquery-checkboxes",
+				"version": "1.0.7",
+				"source": {
+					"url": "https://github.com/rmariuzzo/checkboxes.js.git",
+					"type": "git",
+					"reference": "081cac1eb9b504dc32be27b57f32f6d1d29a5253"
+				}
+			}
 		}
 	],
 	"require": {
@@ -98,7 +110,8 @@
 		"fzaninotto/faker": "1.*",
 		"netcarver/textile": "^3.5",
 		"netcarver/textile": "^3.5",
-		"borgar/textile-js": "1.0"
+		"borgar/textile-js": "1.0",
+		"rmariuzzo/jquery-checkboxes": "1.0.7"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "2.*"
