@@ -2,7 +2,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
-!isset($jquery) ? $jquery = false : $jquery = $jquery;
+!isset($jquery19) ? $jquery19 = false : $jquery19 = $jquery19;
 !isset($jqueryComposer) ? $jqueryComposer = false : $jqueryComposer = $jqueryComposer;
 !isset($jqueryui) ? $jqueryui = false : $jqueryui = $jqueryui;
 !isset($jquery_checkboxes) ? $jquery_checkboxes = false : $jquery_checkboxes = $jquery_checkboxes;
@@ -19,7 +19,7 @@ isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
 !isset($datepicker) ? $datepicker = false : $datepicker = $datepicker;
 
 if ($tablesort || $jquery_checkboxes || $jquery_custom)
-	$jquery = true;
+	$jquery19 = true;
 
 if($datepicker)
 	$jqueryui = true;
@@ -27,7 +27,7 @@ if($datepicker)
 if($jqueryui)
 	$jqueryComposer = true;
 
-if($jquery && $jqueryComposer)
+if($jquery19 && $jqueryComposer)
 	show_error("Two JQuery versions used: composer and include folder version");
 
 ?>
@@ -42,7 +42,7 @@ if($jquery && $jqueryComposer)
 	<link rel="stylesheet"    type="text/css"     href="<?php echo base_url('skin/tablesort.css'); ?>" />
 <?php endif ?>
 
-<?php if($jquery) : ?>
+<?php if($jquery19) : ?>
 	<script type="text/javascript" src="<?php echo base_url('include/js/jquery1.9.min.js'); ?>"></script>
 <?php endif ?>
 

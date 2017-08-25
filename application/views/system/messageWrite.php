@@ -1,4 +1,4 @@
-<?php $this->load->view("templates/header", array("title" => "MessageReply", "jquery" => true, "tinymce" => true)); ?>
+<?php $this->load->view("templates/header", array("title" => "MessageReply", "jquery19" => true, "tinymce" => true)); ?>
 
 	<body>
 	
