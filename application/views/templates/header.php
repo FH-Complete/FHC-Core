@@ -28,7 +28,7 @@ if($jqueryui)
 	$jqueryComposer = true;
 
 if($jquery && $jqueryComposer)
-	show_error("Two JQuery versions used: composer and includefolderversion");
+	show_error("Two JQuery versions used: composer and include folder version");
 
 ?>
 <!DOCTYPE HTML>
@@ -93,7 +93,7 @@ if($jquery && $jqueryComposer)
 	<script type="text/javascript" src="<?php echo base_url('vendor/tinymce/tinymce/tinymce.min.js');?>"></script>
 <?php endif ?>
 <?php if($textile) : ?>
-	<script type="text/javascript" src="<?php echo base_url('include/js/textile.min.js');?>"></script>
+	<script type="text/javascript" src="<?php echo base_url('vendor/borgar/textile-js/lib/textile.min.js');?>"></script>
 <?php endif ?>
 <?php if($jsoneditor) : ?>
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/jsoneditor/dist/jsoneditor.css');?>" />

@@ -1,113 +1,121 @@
 {
-  "name": "fh-complete/fhc-core",
-  "type": "app",
-  "description": "FH-Complete Core",
-  "keywords": ["fhc", "fh-complete", "campusmanagement"],
-  "homepage": "https://github.com/FH-Complete/FHC-Core",
-  "license": "GPLv3",
-  "authors": [
-  {
-    "name": "Christian Paminger",
-    "email": "christian.paminger@fhcomplete.org",
-    "homepage": "http://fhcomplete.org"
-  },
-  {
-    "name": "Andreas Österreicher",
-    "email": "oesi@technikum-wien.at",
-    "homepage": "http://fhcomplete.org"
-  }],
-  "support": 
-  {
-        "email": "info@fhcomplete.org",
-        "forum": "https://plus.google.com/communities/113278802529782592610",
-        "wiki": "http://wiki.fhcomplete.org/"
-  },
-  "repositories": [
-	{
-		"type": "package",
-		"package": 
-        {
-			"name": "codeigniter-restserver",
-			"version": "2.6",
-			"dist": 
-            {
-				"url": "https://github.com/chriskacerguis/codeigniter-restserver/archive/master.zip",
-				"type": "zip"
-			}
+	"name": "fh-complete/fhc-core",
+	"type": "app",
+	"description": "FH-Complete Core",
+	"keywords": [
+		"fhc",
+		"fh-complete",
+		"campusmanagement"
+	],
+	"homepage": "https://github.com/FH-Complete/FHC-Core",
+	"license": "GPLv3",
+	"authors": [
+		{
+			"name": "Christian Paminger",
+			"email": "christian.paminger@fhcomplete.org",
+			"homepage": "http://fhcomplete.org"
+		},
+		{
+			"name": "Andreas Österreicher",
+			"email": "oesi@technikum-wien.at",
+			"homepage": "http://fhcomplete.org"
 		}
+	],
+	"support": {
+		"email": "info@fhcomplete.org",
+		"forum": "https://plus.google.com/communities/113278802529782592610",
+		"wiki": "http://wiki.fhcomplete.org/"
 	},
-	{
-		"type": "package",
-		"package": 
-        {
-			"name": "jsoneditor",
-			"version": "5.5.6",
-			"dist": 
-            {
-				"url": "https://github.com/josdejong/jsoneditor/archive/v5.5.6.zip",
-				"type": "zip"
+	"repositories": [
+		{
+			"type": "package",
+			"package": {
+				"name": "codeigniter-restserver",
+				"version": "2.6",
+				"dist": {
+					"url": "https://github.com/chriskacerguis/codeigniter-restserver/archive/master.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "jsoneditor",
+				"version": "5.5.6",
+				"dist": {
+					"url": "https://github.com/josdejong/jsoneditor/archive/v5.5.6.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "json-forms",
+				"version": "1.4.0",
+				"dist": {
+					"url": "https://github.com/brutusin/json-forms/archive/v1.4.0.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "borgar/textile-js",
+				"version": "1.0",
+				"source": {
+					"url": "https://github.com/borgar/textile-js.git",
+					"type": "git",
+					"reference": "master"
+				}
 			}
 		}
+	],
+	"require": {
+		"php": ">=5.4.0",
+		"codeigniter/framework": "3.*",
+		"codeigniter-restserver": "2.6",
+		"jsoneditor": "5.5.6",
+		"kingsquare/json-schema-form": "*",
+		"easyrdf/easyrdf": "0.9.*",
+		"ml/json-ld": "1.*",
+		"rougin/combustor": "1.1.*",
+		"rougin/refinery": "*",
+		"components/jquery": "2.1.4",
+		"components/jqueryui": "1.12.*",
+		"components/angular.js": "1.3.16",
+		"components/bootstrap": "3.3.5",
+		"michelf/php-markdown": "1.5.0",
+		"tinymce/tinymce": "4.*",
+		"zetacomponents/workflow": "1.*",
+		"zetacomponents/document": "1.*",
+		"zetacomponents/workflow-database-tiein": "1.*",
+		"zetacomponents/workflow-event-log-tiein": "1.*",
+		"json-forms": "1.4.0",
+		"wikimedia/composer-merge-plugin": "^1.3",
+		"fzaninotto/faker": "1.*",
+		"netcarver/textile": "^3.5",
+		"netcarver/textile": "^3.5",
+		"borgar/textile-js": "1.0"
 	},
-	{
-		"type": "package",
-		"package": 
-        {
-			"name": "json-forms",
-			"version": "1.4.0",
-			"dist": 
-            {
-				"url": "https://github.com/brutusin/json-forms/archive/v1.4.0.zip",
-				"type": "zip"
-			}
-		}
-	}
-  ],
-  "require": 
-  {
-    "php": ">=5.4.0",
-    "codeigniter/framework":"3.*",
-    "codeigniter-restserver": "2.6",
-    "jsoneditor": "5.5.6",
-	"kingsquare/json-schema-form": "*",
-	"easyrdf/easyrdf": "0.9.*",
-	"ml/json-ld": "1.*",
-    "rougin/combustor": "1.1.*",
-	"rougin/refinery": "*",
-    "components/jquery": "2.1.4",
-	"components/jqueryui": "1.12.*",
-    "components/angular.js": "1.3.16",
-    "components/bootstrap": "3.3.5",
-    "michelf/php-markdown": "1.5.0",
-	"tinymce/tinymce": "4.*",
-	"zetacomponents/workflow": "1.*",
-	"zetacomponents/document": "1.*",
-	"zetacomponents/workflow-database-tiein": "1.*",
-	"zetacomponents/workflow-event-log-tiein": "1.*",
-	"json-forms": "1.4.0",
-    "wikimedia/composer-merge-plugin": "^1.3",
-	"fzaninotto/faker": "1.*",
-    "netcarver/textile": "^3.5"
-  },
-  "require-dev": 
-  {
-    "squizlabs/php_codesniffer": "2.*"
-  },
-  "config":
-  {
-    "bin-dir": "bin"
-  },
-  
+	"require-dev": {
+		"squizlabs/php_codesniffer": "2.*"
+	},
+	"config": {
+		"bin-dir": "bin"
+	},
 	"extra": {
-	    "merge-plugin": {
-	        "include": [
-	            "composer.json",
-	            "addons/*/composer.json"
-	        ],
-	        "recurse": true,
-	        "replace": false,
-	        "merge-dev": false,
-	        "merge-extra": false
-	    }
+		"merge-plugin": {
+			"include": [
+				"composer.json",
+				"addons/*/composer.json"
+			],
+			"recurse": true,
+			"replace": false,
+			"merge-dev": false,
+			"merge-extra": false
+		}
 	}
 }
