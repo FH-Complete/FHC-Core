@@ -22,7 +22,7 @@
  */
 /**
  * Exportiert die Daten von Prestudenten und Studenten in ein Excel File.
- * 
+ *
  * Parameter:
  * GET:
  * studiensemester_kurzbz ... Studiensemester
@@ -43,7 +43,7 @@ $user = get_uid();
 $datum_obj = new datum();
 $db = new basis_db();
 loadVariables($user);
-	
+
 //Parameter holen
 $data = $_REQUEST['data'];
 $studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
@@ -189,7 +189,7 @@ $zeile++;
 $ids = explode(';',$data);
 $prestudent_ids = '';
 
-foreach ($ids as $id) 
+foreach ($ids as $id)
 {
 	if ($id!='')
 	{
@@ -203,7 +203,7 @@ if ($prestudent_ids!='')
 {
 	// Student holen
 	$qry = "SELECT *,";
-	
+
 	if ($udf->personHasUDF())
 	{
 		$qry .= " p.udf_values AS p_udf_values,";
@@ -212,7 +212,7 @@ if ($prestudent_ids!='')
 	{
 		$qry .= " ps.udf_values AS ps_udf_values,";
 	}
-	
+
 	$qry .= "		ps.studiengang_kz AS prestgkz,
 					(
 						SELECT UPPER(typ || kurzbz)
@@ -243,66 +243,66 @@ function draw_content($row)
 	global $studiensemester_kurzbz;
 	global $udfTitlesPerson, $udfTitlesPrestudent, $udf;
 	$db = new basis_db();
-	
+
 	$prestudent = new prestudent();
 	$prestudent->getLastStatus($row->prestudent_id);
 	$status = $prestudent->status_kurzbz;
 	$orgform = $prestudent->orgform_kurzbz;
-		
+
 	$i = 0;
-	
+
 	//Anrede
 	if (mb_strlen($row->anrede) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->anrede);
 	$worksheet->write($zeile, $i, $row->anrede);
 	$i++;
-	
+
 	//Titelpre
 	if (mb_strlen($row->titelpre) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->titelpre);
 	$worksheet->write($zeile, $i, $row->titelpre);
 	$i++;
-	
+
 	//Nachname
 	if (mb_strlen($row->nachname) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->nachname);
 	$worksheet->write($zeile, $i, $row->nachname);
 	$i++;
-	
+
 	//Vorname
 	if (mb_strlen($row->vorname) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->vorname);
 	$worksheet->write($zeile, $i, $row->vorname);
 	$i++;
-	
+
 	//Titelpost
 	if (mb_strlen($row->titelpost) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->titelpost);
 	$worksheet->write($zeile, $i, $row->titelpost);
 	$i++;
-	
+
 	//Email Privat
 	//ZustellEmailAdresse aus der Datenbank holen und dazuhaengen
-	$qry_1 = "SELECT kontakt FROM public.tbl_kontakt 
-				WHERE kontakttyp='email' AND person_id='".addslashes($row->person_id)."' AND zustellung=true 
+	$qry_1 = "SELECT kontakt FROM public.tbl_kontakt
+				WHERE kontakttyp='email' AND person_id='".addslashes($row->person_id)."' AND zustellung=true
 				ORDER BY kontakt_id DESC LIMIT 1";
 	if ($db->db_query($qry_1))
 	{
 		if ($row_1 = $db->db_fetch_object())
-		{	
+		{
 			if (mb_strlen($row_1->kontakt) > $maxlength[$i])
 				$maxlength[$i] = mb_strlen($row_1->kontakt);
 			$worksheet->write($zeile, $i, $row_1->kontakt);
 		}
 	}
 	$i++;
-					
+
 	//Geburtsdatum
 	if (mb_strlen($row->gebdatum) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->gebdatum);
 	$worksheet->write($zeile, $i, $datum_obj->convertISODate($row->gebdatum));
 	$i++;
-	
+
 	//Personenkennzeichen
 	if (isset($row->matrikelnr))
 	{
@@ -311,39 +311,39 @@ function draw_content($row)
 		$worksheet->writeString($zeile, $i, $row->matrikelnr);
 	}
 	$i++;
-	
+
 	//Staatsbuergerschaft
 	if (mb_strlen($row->staatsbuergerschaft) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->staatsbuergerschaft);
 	$worksheet->write($zeile, $i, $row->staatsbuergerschaft);
 	$i++;
-	
+
 	//SVNR
 	if (mb_strlen($row->svnr) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->svnr);
 	$worksheet->write($zeile, $i, $row->svnr);
 	$i++;
-	
+
 	//Ersatzkennzeichen
 	if (mb_strlen($row->ersatzkennzeichen) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->ersatzkennzeichen);
 	$worksheet->write($zeile, $i, $row->ersatzkennzeichen);
 	$i++;
-	
+
 	//Geschlecht
 	if (mb_strlen($row->geschlecht) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->geschlecht);
 	$worksheet->write($zeile, $i, $row->geschlecht);
 	$i++;
-	
+
 	//Studiengang
 	if (mb_strlen($row->stgbez) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->stgbez);
 	$worksheet->write($zeile, $i, $row->stgbez);
 	$i++;
-	
-	$qry = "SELECT tbl_studentlehrverband.semester AS semester_studiensemester, tbl_student.semester AS semester_aktuell,* FROM public.tbl_studentlehrverband JOIN public.tbl_student USING(student_uid) 
-			WHERE prestudent_id='".addslashes($row->prestudent_id)."' 
+
+	$qry = "SELECT tbl_studentlehrverband.semester AS semester_studiensemester, tbl_student.semester AS semester_aktuell,* FROM public.tbl_studentlehrverband JOIN public.tbl_student USING(student_uid)
+			WHERE prestudent_id='".addslashes($row->prestudent_id)."'
 			AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 	if ($db->db_query($qry))
 	{
@@ -354,14 +354,14 @@ function draw_content($row)
 			$verband = $row_sem->verband;
 			$gruppe = $row_sem->gruppe;
 		}
-		else 
+		else
 		{
 			$semester_aktuell = '';
 			$verband = '';
 			$gruppe = '';
 		}
 	}
-	//Semester im eingestellten Studiensemester		
+	//Semester im eingestellten Studiensemester
 	if (isset($semester_studiensemester))
 	{
 		if (mb_strlen($semester_studiensemester) > $maxlength[$i])
@@ -369,7 +369,7 @@ function draw_content($row)
 		$worksheet->write($zeile, $i, $semester_studiensemester);
 	}
 	$i++;
-	
+
 	//Semester aktuell
 	if (isset($semester_aktuell))
 	{
@@ -378,7 +378,7 @@ function draw_content($row)
 		$worksheet->write($zeile, $i, $semester_aktuell);
 	}
 	$i++;
-	
+
 	//Verband
 	if (isset($verband))
 	{
@@ -387,7 +387,7 @@ function draw_content($row)
 		$worksheet->write($zeile, $i, $verband);
 	}
 	$i++;
-	
+
 	//Gruppe
 	if (isset($gruppe))
 	{
@@ -396,8 +396,8 @@ function draw_content($row)
 		$worksheet->write($zeile, $i, $gruppe);
 	}
 	$i++;
-	
-	//ZGV		
+
+	//ZGV
 	if ($row->zgv_code!='' && isset($zgv_arr[$row->zgv_code]))
 	{
 		if (mb_strlen($zgv_arr[$row->zgv_code]) > $maxlength[$i])
@@ -405,19 +405,19 @@ function draw_content($row)
 		$worksheet->write($zeile, $i, $zgv_arr[$row->zgv_code]);
 	}
 	$i++;
-	
+
 	//ZGV Ort
 	if (mb_strlen($row->zgvort) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->zgvort);
 	$worksheet->write($zeile, $i, $row->zgvort);
 	$i++;
-	
+
 	//ZGV Datum
 	if (mb_strlen($row->zgvdatum) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->zgvdatum);
 	$worksheet->write($zeile, $i, $row->zgvdatum);
 	$i++;
-	
+
 	//ZGV Master
 	if ($row->zgvmas_code!='' && isset($zgvmas_arr[$row->zgvmas_code]))
 	{
@@ -426,31 +426,31 @@ function draw_content($row)
 		$worksheet->write($zeile, $i, $zgvmas_arr[$row->zgvmas_code]);
 	}
 	$i++;
-	
+
 	//ZGV Master Ort
 	if (mb_strlen($row->zgvmaort) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->zgvmaort);
 	$worksheet->write($zeile, $i, $row->zgvmaort);
 	$i++;
-	
+
 	//ZGV Master Datum
 	if (mb_strlen($row->zgvmadatum) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->zgvmadatum);
 	$worksheet->write($zeile, $i, $row->zgvmadatum);
 	$i++;
-	
+
 	//Status
 	if (mb_strlen($status) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($status);
 	$worksheet->write($zeile, $i, $status);
 	$i++;
-	
+
 	//Stati in anderen Studiengaengen
 	$stati='';
 	$qry_1 = "SELECT UPPER(typ::varchar(1) || kurzbz) as stg, get_rolle_prestudent(prestudent_id, null) as status FROM
-			public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz) 
+			public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz)
 			WHERE person_id='".addslashes($row->person_id)."' AND tbl_prestudent.studiengang_kz<>'".addslashes($row->prestgkz)."'";
-	
+
 	if ($db->db_query($qry_1))
 	{
 		while($row_1 = $db->db_fetch_object())
@@ -464,7 +464,7 @@ function draw_content($row)
 		$maxlength[$i] = mb_strlen($stati);
 	$worksheet->write($zeile, $i, $stati);
 	$i++;
-	
+
 	//Email Intern
 	if (isset($row->student_uid))
 	{
@@ -473,9 +473,9 @@ function draw_content($row)
 		$worksheet->write($zeile, $i, $row->student_uid.'@'.DOMAIN);
 	}
 	$i++;
-			
+
 	//Telefon
-	$qry_1 = "SELECT kontakt FROM public.tbl_kontakt 
+	$qry_1 = "SELECT kontakt FROM public.tbl_kontakt
 				WHERE kontakttyp in('mobil','telefon','so.tel') AND person_id='".addslashes($row->person_id)."' AND zustellung=true LIMIT 1";
 	if ($db->db_query($qry_1))
 	{
@@ -487,11 +487,11 @@ function draw_content($row)
 		}
 	}
 	$i++;
-	
+
 	//Spezialgruppen
 	$grps='';
-	$qry_1 = "SELECT gruppe_kurzbz FROM public.tbl_student JOIN public.tbl_benutzergruppe ON (student_uid=uid) 
-				WHERE tbl_student.prestudent_id='".addslashes($row->prestudent_id)."' 
+	$qry_1 = "SELECT gruppe_kurzbz FROM public.tbl_student JOIN public.tbl_benutzergruppe ON (student_uid=uid)
+				WHERE tbl_student.prestudent_id='".addslashes($row->prestudent_id)."'
 				AND tbl_benutzergruppe.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 	if ($db->db_query($qry_1))
 	{
@@ -499,7 +499,7 @@ function draw_content($row)
 		{
 			if ($grps!='')
 				$grps.=',';
-			
+
 			$grps.=$row_1->gruppe_kurzbz;
 		}
 	}
@@ -507,7 +507,7 @@ function draw_content($row)
 		$maxlength[$i] = mb_strlen($grps);
 	$worksheet->write($zeile, $i, $grps);
 	$i++;
-	
+
 	//UID
 	if (isset($row->student_uid))
 	{
@@ -516,99 +516,75 @@ function draw_content($row)
 		$worksheet->write($zeile, $i, $row->student_uid);
 	}
 	$i++;
-	
+
 	//Orgform
 	if (mb_strlen($orgform) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($orgform);
 	$worksheet->write($zeile, $i, $orgform);
 	$i++;
-	
+
 	//Vornamen
 	if (mb_strlen($row->vornamen) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->vornamen);
 	$worksheet->write($zeile, $i, $row->vornamen);
 	$i++;
-	
-	
+
+
 	//RT_Punkte1
 	if (mb_strlen($row->rt_punkte1) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->rt_punkte1);
 	$worksheet->write($zeile, $i, $row->rt_punkte1);
 	$i++;
-	
+
 	//RT_Punkte2
 	if (mb_strlen($row->rt_punkte2) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->rt_punkte2);
 	$worksheet->write($zeile, $i, $row->rt_punkte2);
 	$i++;
-	
+
 	//RT_Gesamtpunkte
 	if (mb_strlen($row->rt_gesamtpunkte) > $maxlength[$i])
 		$maxlength[$i] = mb_strlen($row->rt_gesamtpunkte);
 	$worksheet->write($zeile, $i, $row->rt_gesamtpunkte);
 	$i++;
-	
+
 	// UDF
 	if (isset($row->p_udf_values))
 	{
 		$udfPerson = json_decode($row->p_udf_values);
 		if (is_object($udfPerson)) $udfPerson = (array)$udfPerson;
-		
-		foreach($udfTitlesPerson as $udfTitle)
+
+		foreach ($udfTitlesPerson as $udfTitle)
 		{
-			if (isset($udfPerson[$udfTitle['name']]))
+			$toWrite = $udf->encodeToString($udfPerson, $udfTitle);
+
+			if (mb_strlen($toWrite) > $maxlength[$i])
 			{
-				if (is_string($udfPerson[$udfTitle['name']]) || is_numeric($udfPerson[$udfTitle['name']]))
-				{
-					if (mb_strlen($udfPerson[$udfTitle['name']]) > $maxlength[$i])
-					{
-						$maxlength[$i] = mb_strlen($udfPerson[$udfTitle['name']]);
-					}
-					$worksheet->write($zeile, $i, $udfPerson[$udfTitle['name']]);
-				}
-				else if(is_array($udfPerson[$udfTitle['name']]) && isset($udfTitle['enum']))
-				{
-					$toWrite = $udf->dropdownListValuesToString($udfPerson[$udfTitle['name']], $udfTitle['enum']);
-					
-					if (mb_strlen($toWrite) > $maxlength[$i])
-					{
-						$maxlength[$i] = mb_strlen($toWrite);
-					}
-					$worksheet->write($zeile, $i, $toWrite);
-				}
+				$maxlength[$i] = mb_strlen($toWrite);
 			}
+
+			$worksheet->write($zeile, $i, $toWrite);
+
 			$i++;
 		}
 	}
-	
+
 	if (isset($row->ps_udf_values))
 	{
 		$udfPrestudent = json_decode($row->ps_udf_values);
 		if (is_object($udfPrestudent)) $udfPrestudent = (array)$udfPrestudent;
-		
-		foreach($udfTitlesPrestudent as $udfTitle)
+
+		foreach ($udfTitlesPrestudent as $udfTitle)
 		{
-			if (isset($udfPrestudent[$udfTitle['name']]))
+			$toWrite = $udf->encodeToString($udfPrestudent, $udfTitle);
+
+			if (mb_strlen($toWrite) > $maxlength[$i])
 			{
-				if (is_string($udfPrestudent[$udfTitle['name']]) || is_numeric($udfPrestudent[$udfTitle['name']]))
-				{
-					if (mb_strlen($udfPrestudent[$udfTitle['name']]) > $maxlength[$i])
-					{
-						$maxlength[$i] = mb_strlen($udfPrestudent[$udfTitle['name']]);
-					}
-					$worksheet->write($zeile, $i, $udfPrestudent[$udfTitle['name']]);
-				}
-				else if(is_array($udfPrestudent[$udfTitle['name']]) && isset($udfTitle['enum']))
-				{
-					$toWrite = $udf->dropdownListValuesToString($udfPrestudent[$udfTitle['name']], $udfTitle['enum']);
-					
-					if (mb_strlen($toWrite) > $maxlength[$i])
-					{
-						$maxlength[$i] = mb_strlen($toWrite);
-					}
-					$worksheet->write($zeile, $i, $toWrite);
-				}
+				$maxlength[$i] = mb_strlen($toWrite);
 			}
+
+			$worksheet->write($zeile, $i, $toWrite);
+
 			$i++;
 		}
 	}

@@ -33,7 +33,7 @@ class UDF extends basis_db
 	{
 		parent::__construct();
 	}
-	
+
 	/**
 	 * Gets the titles (short description) of the UDF related to the table tbl_person
 	 */
@@ -41,7 +41,7 @@ class UDF extends basis_db
 	{
 		return $this->_loadTitles($this->_getUDFDefinition($this->loadPersonJsons()));
 	}
-	
+
 	/**
 	 * Gets the titles (short description) of the UDF related to the table tbl_prestudent
 	 */
@@ -49,49 +49,49 @@ class UDF extends basis_db
 	{
 		return $this->_loadTitles($this->_getUDFDefinition($this->loadPrestudentJsons()));
 	}
-	
+
 	/**
 	 * Loads the UDF definitions related to the table tbl_person
 	 */
 	public function loadPersonJsons()
 	{
 		$jsons = null;
-		
+
 		if ($this->existsUDF() && $this->prestudentHasUDF())
 		{
 			$jsons = $this->_loadJsons('public', 'tbl_person');
 		}
-		
+
 		return $jsons;
 	}
-	
+
 	/**
 	 * Loads the UDF definitions related to the table tbl_prestudent
 	 */
 	public function loadPrestudentJsons()
 	{
 		$jsons = null;
-		
+
 		if ($this->existsUDF() && $this->prestudentHasUDF())
 		{
 			$jsons = $this->_loadJsons('public', 'tbl_prestudent');
 		}
-		
+
 		return $jsons;
 	}
-	
+
 	/**
 	 * Checks if the table system.tbl_udf exists
 	 */
 	public function existsUDF()
 	{
 		$existsUDF = false;
-		
+
 		$query = 'SELECT COUNT(*) AS count
 					FROM information_schema.columns
 				   WHERE table_schema = \'system\'
 				     AND table_name = \'tbl_udf\'';
-		
+
 		if (!$this->db_query($query))
 		{
 			$this->errormsg = 'Error!!!';
@@ -106,23 +106,23 @@ class UDF extends basis_db
 				}
 			}
 		}
-		
+
 		return $existsUDF;
 	}
-	
+
 	/**
 	 * Checks if the column udf_values exists in table tbl_person
 	 */
 	public function personHasUDF()
 	{
 		$personHasUDF = false;
-		
+
 		$query = 'SELECT COUNT(*) AS count
 					FROM information_schema.columns
 				   WHERE table_schema = \'public\'
 				     AND table_name = \'tbl_person\'
 				     AND column_name = \'udf_values\'';
-		
+
 		if (!$this->db_query($query))
 		{
 			$this->errormsg = 'Error!!!';
@@ -137,23 +137,23 @@ class UDF extends basis_db
 				}
 			}
 		}
-		
+
 		return $personHasUDF;
 	}
-	
+
 	/**
 	 * Checks if the column udf_values exists in table tbl_prestudent
 	 */
 	public function prestudentHasUDF()
 	{
 		$prestudentHasUDF = false;
-		
+
 		$query = 'SELECT COUNT(*) AS count
 					FROM information_schema.columns
 				   WHERE table_schema = \'public\'
 				     AND table_name = \'tbl_prestudent\'
 				     AND column_name = \'udf_values\'';
-		
+
 		if (!$this->db_query($query))
 		{
 			$this->errormsg = 'Error!!!';
@@ -168,17 +168,17 @@ class UDF extends basis_db
 				}
 			}
 		}
-		
+
 		return $prestudentHasUDF;
 	}
-	
+
 	/**
 	 * Concatenates a list of values of a dropdown element to a string
 	 */
 	public function dropdownListValuesToString($listValues, $enum)
 	{
 		$toWrite = '';
-		
+
 		foreach ($listValues as $value)
 		{
 			foreach ($enum as $element)
@@ -207,10 +207,41 @@ class UDF extends basis_db
 			}
 			$toWrite .= ' ';
 		}
-		
+
 		return $toWrite;
 	}
-	
+
+	/**
+	 * Returns a string that represent the value of a UDF using the given value and description
+	 */
+	public function encodeToString($decodedJson, $udfDescription)
+	{
+		$toString = '';
+		$udfName = $udfDescription['name'];
+
+		if (isset($decodedJson[$udfName]))
+		{
+			if (is_string($decodedJson[$udfName]) || is_numeric($decodedJson[$udfName]))
+			{
+				$toString = $decodedJson[$udfName];
+			}
+			else if (is_bool($decodedJson[$udfName]))
+			{
+				$toString = $decodedJson[$udfName] === true ? 'true' : 'false';
+			}
+			else if(is_array($decodedJson[$udfName]) && isset($udfDescription['enum']))
+			{
+				$toString = $this->dropdownListValuesToString($decodedJson[$udfName], $udfDescription['enum']);
+			}
+		}
+		else if ($decodedJson[$udfName] == null)
+		{
+			$toString = '';
+		}
+
+		return $toString;
+	}
+
 	/**
 	 * Loads the UDF definitions related to the given schema and table
 	 */
@@ -218,7 +249,7 @@ class UDF extends basis_db
 	{
 		$jsons = null;
 		$query = 'SELECT jsons FROM system.tbl_udf WHERE schema = \''.$schema.'\' AND "table" = \''.$table.'\'';
-		
+
 		if (!$this->db_query($query))
 		{
 			$this->errormsg = 'Error occurred while loading jsons';
@@ -230,17 +261,17 @@ class UDF extends basis_db
 				$jsons = $row->jsons;
 			}
 		}
-		
+
 		return $jsons;
 	}
-	
+
 	/**
      * Sorts the UDF definitions using the proprierty "sort"
      */
     private function _sortJsonSchemas(&$jsonSchemasArray)
     {
 		usort($jsonSchemasArray, function ($a, $b) {
-			// 
+			//
 			if (!isset($a->sort))
 			{
 				$a->sort = 9999;
@@ -249,16 +280,16 @@ class UDF extends basis_db
 			{
 				$b->sort = 9999;
 			}
-			
+
 			if ($a->sort == $b->sort)
 			{
 				return 0;
 			}
-			
+
 			return ($a->sort < $b->sort) ? -1 : 1;
 		});
     }
-    
+
     /**
      * Returns an array of associative arrays that contains the couple name and title related to an UDF
      * These data are retrived from the UDF definitions given as parameter
@@ -266,7 +297,7 @@ class UDF extends basis_db
     private function _getUDFDefinition($jsons)
     {
 		$names = array();
-		
+
 		if ($jsons != null && ($jsonsDecoded = json_decode($jsons)) != null)
 		{
 			if (is_object($jsonsDecoded) || is_array($jsonsDecoded))
@@ -275,31 +306,31 @@ class UDF extends basis_db
 				{
 					$jsonsDecoded = array($jsonsDecoded);
 				}
-				
+
 				$this->_sortJsonSchemas($jsonsDecoded);
-				
+
 				foreach($jsonsDecoded as $udfJsonShema)
 				{
 					if (isset($udfJsonShema->name) && isset($udfJsonShema->title))
 					{
 						$tmpArray = array('name' => $udfJsonShema->name, 'title' => $udfJsonShema->title);
-						
+
 						if (isset($udfJsonShema->type)
 							&& ($udfJsonShema->type == 'dropdown' || $udfJsonShema->type == 'multipledropdown')
 							&& isset($udfJsonShema->listValues) && isset($udfJsonShema->listValues->enum))
 						{
 							$tmpArray['enum'] = $udfJsonShema->listValues->enum;
 						}
-						
+
 						$names[] = $tmpArray;
 					}
 				}
 			}
 		}
-		
+
 		return $names;
     }
-    
+
     /**
      * Loads UDf titles from phrases
      */
@@ -307,22 +338,22 @@ class UDF extends basis_db
 	{
 		$titles = array();
 		$in = '';
-		
+
 		for($i = 0; $i < count($udfDefinitions); $i++)
 		{
 			$udfDefinition = $udfDefinitions[$i];
 			$in .= '\''.$udfDefinition['title'].'\'';
-			
+
 			if ($i < count($udfDefinitions) - 1) $in .= ', ';
 		}
-		
+
 		if ($in != '')
 		{
 			$query = 'SELECT pt.text AS title, p.phrase AS phrase
 							FROM system.tbl_phrase p INNER JOIN system.tbl_phrasentext pt USING(phrase_id)
 						WHERE pt.sprache = \''.DEFAULT_LEHREINHEIT_SPRACHE.'\'
 							AND p.phrase IN ('.$in.')';
-				
+
 			if (!$this->db_query($query))
 			{
 				$this->errormsg = 'Error occurred while loading jsons';
@@ -343,7 +374,7 @@ class UDF extends basis_db
 				}
 			}
 		}
-		
+
 		return $titles;
 	}
 }
