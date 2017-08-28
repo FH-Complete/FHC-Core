@@ -969,7 +969,9 @@ class prestudent extends person
 
 	$qry = 'UPDATE public.tbl_prestudentstatus SET'.
 				' bestaetigtam='.$this->db_add_param(date('Y-m-d')).','.
-				' bestaetigtvon='.$this->db_add_param($user)." ".
+				' bestaetigtvon='.$this->db_add_param($user).", ".
+				' updateamum='.$this->db_add_param(date('Y-m-d H:i:s')).','.
+				' updatevon='.$this->db_add_param($user)." ".
 				' WHERE
 					prestudent_id='.$this->db_add_param($prestudent_id, FHC_INTEGER).'
 					AND status_kurzbz='.$this->db_add_param($status_kurzbz).'
