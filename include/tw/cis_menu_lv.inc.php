@@ -144,7 +144,7 @@ function checkZeilenUmbruch()
 
 			$text.= '&nbsp;&nbsp;&nbsp;<a class="Item" href="semdownhlp.php" >';
 			$text.= $p->t('lehre/semesterplanVorlage');
-			$text.= ' [hml]';
+			$text.= ' [html]';
 			$text.= '</a>';
 			$text.= '&nbsp;<a class="Item" href="semdownhlp.php?format=doc" >';
 			$text.= '[doc]';
