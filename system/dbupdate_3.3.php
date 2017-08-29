@@ -393,7 +393,6 @@ if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 
 {
 	if ($db->db_num_rows($result) == 0)
 	{
-		error_log("ok");
 		$qry = "ALTER TABLE system.tbl_phrasentext ADD CONSTRAINT tbl_phrasentext_sprache_fkey FOREIGN KEY (sprache) REFERENCES public.tbl_sprache(sprache) ON UPDATE CASCADE ON DELETE RESTRICT;";
 
 		if (!$db->db_query($qry))
