@@ -108,6 +108,18 @@ $worksheet->write($zeile, ++$i, "TITELPOST", $format_bold);
 $maxlength[$i] = 9;
 $worksheet->write($zeile, ++$i, "EMail Privat", $format_bold);
 $maxlength[$i] = 12;
+$worksheet->write($zeile,++$i,"STRASSE", $format_bold);
+$maxlength[$i]=7;
+$worksheet->write($zeile-1,$i,"Zustelladresse", $format_bold);
+$maxlength[$i]=14;
+$worksheet->write($zeile,++$i,"PLZ", $format_bold);
+$maxlength[$i]=3;
+$worksheet->write($zeile,++$i,"ORT", $format_bold);
+$maxlength[$i]=3;
+$worksheet->write($zeile,++$i,"GEMEINDE", $format_bold);
+$maxlength[$i]=9;
+$worksheet->write($zeile,++$i,"NATION", $format_bold);
+$maxlength[$i] = 6;
 $worksheet->write($zeile, ++$i, "GEBURTSDATUM", $format_bold);
 $maxlength[$i] = 12;
 $worksheet->write($zeile, ++$i, "PERSONENKENNZEICHEN", $format_bold);
@@ -195,7 +207,7 @@ foreach ($ids as $id)
 	{
 		if ($prestudent_ids!='')
 			$prestudent_ids .= ',';
-		$prestudent_ids .= "'".addslashes($id)."'";
+		$prestudent_ids .= "'".$db->db_escape($id)."'";
 	}
 }
 
@@ -283,9 +295,18 @@ function draw_content($row)
 
 	//Email Privat
 	//ZustellEmailAdresse aus der Datenbank holen und dazuhaengen
-	$qry_1 = "SELECT kontakt FROM public.tbl_kontakt
-				WHERE kontakttyp='email' AND person_id='".addslashes($row->person_id)."' AND zustellung=true
-				ORDER BY kontakt_id DESC LIMIT 1";
+	$qry_1 = "
+		SELECT
+			kontakt
+		FROM
+			public.tbl_kontakt
+		WHERE
+			kontakttyp='email'
+			AND person_id=".$db->db_add_param($row->person_id)."
+			AND zustellung=true
+		ORDER BY kontakt_id DESC
+		LIMIT 1";
+
 	if ($db->db_query($qry_1))
 	{
 		if ($row_1 = $db->db_fetch_object())
@@ -296,6 +317,52 @@ function draw_content($row)
 		}
 	}
 	$i++;
+
+	//Zustelladresse
+	//Zustelladresse aus der Datenbank holen und dazuhaengen
+	$qry_1 = "
+		SELECT
+			*
+		FROM
+			public.tbl_adresse
+		WHERE
+			person_id=".$db->db_add_param($row->person_id)."
+	 		AND zustelladresse=true LIMIT 1";
+
+	if($result_1 = $db->db_query($qry_1))
+	{
+		if($row_1 = $db->db_fetch_object($result_1))
+		{
+			if(mb_strlen($row_1->strasse)>$maxlength[$i])
+				$maxlength[$i]=mb_strlen($row_1->strasse);
+			$worksheet->write($zeile,$i, $row_1->strasse);
+			$i++;
+
+			if(mb_strlen($row_1->plz)>$maxlength[$i])
+				$maxlength[$i]=mb_strlen($row_1->plz);
+			$worksheet->writeString($zeile,$i, $row_1->plz);
+			$i++;
+
+			if(mb_strlen($row_1->ort)>$maxlength[$i])
+				$maxlength[$i]=mb_strlen($row_1->ort);
+			$worksheet->write($zeile,$i, $row_1->ort);
+			$i++;
+
+			if(mb_strlen($row_1->gemeinde)>$maxlength[$i])
+				$maxlength[$i]=mb_strlen($row_1->gemeinde);
+			$worksheet->write($zeile,$i, $row_1->gemeinde);
+			$i++;
+
+			if(mb_strlen($row_1->nation)>$maxlength[$i])
+				$maxlength[$i]=mb_strlen($row_1->nation);
+			$worksheet->write($zeile,$i, $row_1->nation);
+			$i++;
+		}
+		else
+			$i+=5;
+	}
+	else
+		$i+=5;
 
 	//Geburtsdatum
 	if (mb_strlen($row->gebdatum) > $maxlength[$i])
@@ -342,9 +409,18 @@ function draw_content($row)
 	$worksheet->write($zeile, $i, $row->stgbez);
 	$i++;
 
-	$qry = "SELECT tbl_studentlehrverband.semester AS semester_studiensemester, tbl_student.semester AS semester_aktuell,* FROM public.tbl_studentlehrverband JOIN public.tbl_student USING(student_uid)
-			WHERE prestudent_id='".addslashes($row->prestudent_id)."'
-			AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+	$qry = "
+	SELECT
+		tbl_studentlehrverband.semester AS semester_studiensemester,
+		tbl_student.semester AS semester_aktuell,
+		*
+	FROM
+		public.tbl_studentlehrverband
+		JOIN public.tbl_student USING(student_uid)
+	WHERE
+		prestudent_id=".$db->db_add_param($row->prestudent_id)."
+		AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
+
 	if ($db->db_query($qry))
 	{
 		if ($row_sem = $db->db_fetch_object())
@@ -447,9 +523,16 @@ function draw_content($row)
 
 	//Stati in anderen Studiengaengen
 	$stati='';
-	$qry_1 = "SELECT UPPER(typ::varchar(1) || kurzbz) as stg, get_rolle_prestudent(prestudent_id, null) as status FROM
-			public.tbl_prestudent JOIN public.tbl_studiengang USING(studiengang_kz)
-			WHERE person_id='".addslashes($row->person_id)."' AND tbl_prestudent.studiengang_kz<>'".addslashes($row->prestgkz)."'";
+	$qry_1 = "
+		SELECT
+			UPPER(typ::varchar(1) || kurzbz) as stg,
+			get_rolle_prestudent(prestudent_id, null) as status
+		FROM
+			public.tbl_prestudent
+			JOIN public.tbl_studiengang USING(studiengang_kz)
+		WHERE
+			person_id=".$db->db_add_param($row->person_id)."
+			AND tbl_prestudent.studiengang_kz<>".$db->db_add_param($row->prestgkz);
 
 	if ($db->db_query($qry_1))
 	{
@@ -475,8 +558,17 @@ function draw_content($row)
 	$i++;
 
 	//Telefon
-	$qry_1 = "SELECT kontakt FROM public.tbl_kontakt
-				WHERE kontakttyp in('mobil','telefon','so.tel') AND person_id='".addslashes($row->person_id)."' AND zustellung=true LIMIT 1";
+	$qry_1 = "
+		SELECT
+			kontakt
+		FROM
+			public.tbl_kontakt
+		WHERE
+			kontakttyp in('mobil','telefon','so.tel')
+			AND person_id=".$db->db_add_param($row->person_id)."
+			AND zustellung=true
+		LIMIT 1";
+
 	if ($db->db_query($qry_1))
 	{
 		if ($row_1 = $db->db_fetch_object())
@@ -490,9 +582,16 @@ function draw_content($row)
 
 	//Spezialgruppen
 	$grps='';
-	$qry_1 = "SELECT gruppe_kurzbz FROM public.tbl_student JOIN public.tbl_benutzergruppe ON (student_uid=uid)
-				WHERE tbl_student.prestudent_id='".addslashes($row->prestudent_id)."'
-				AND tbl_benutzergruppe.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+	$qry_1 = "
+		SELECT
+			gruppe_kurzbz
+		FROM
+			public.tbl_student
+			JOIN public.tbl_benutzergruppe ON (student_uid=uid)
+		WHERE
+			tbl_student.prestudent_id=".$db->db_add_param($row->prestudent_id)."
+			AND tbl_benutzergruppe.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
+
 	if ($db->db_query($qry_1))
 	{
 		while($row_1 = $db->db_fetch_object())
