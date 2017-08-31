@@ -386,7 +386,7 @@ class prestudent extends person
 						tbl_reihungstest.datum='.$this->db_add_param($datum).'
 						AND tbl_rt_person.studienplan_id IN (SELECT studienplan_id FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id)
 						AND EXISTS(SELECT * FROM public.tbl_prestudentstatus JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
-							WHERE prestudent_id=tbl_prestudent.prestudent_id AND tbl_studiensemester.start>'.$this->db_add_param($datum).')
+							WHERE prestudent_id=tbl_prestudent.prestudent_id AND tbl_studiensemester.ende>'.$this->db_add_param($datum).')
 					) a
 					ORDER BY nachname,vorname';
 
