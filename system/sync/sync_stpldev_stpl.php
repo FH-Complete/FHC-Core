@@ -508,7 +508,8 @@ echo '<BR>Ge&auml;nderte Datens&auml;tze werden geholt.('.date('H:i:s').')<BR>';
 $message_stpl.='<BR>Ge&auml;nderte Datens&auml;tze werden geholt.('.date('H:i:s').')<BR>';
 $sql_query="SELECT vw_stundenplandev.*, vw_stundenplan.datum AS old_datum, vw_stundenplan.stunde AS old_stunde,
 				vw_stundenplan.ort_kurzbz AS old_ort_kurzbz, vw_stundenplan.lektor AS old_lektor,
-				vw_stundenplan.uid AS old_uid, vw_stundenplan.titel AS old_titel
+				vw_stundenplan.uid AS old_uid, vw_stundenplan.titel AS old_titel,
+				vw_stundenplan.anmerkung AS old_anmerkung
 			FROM lehre.vw_stundenplandev, lehre.vw_stundenplan
 			WHERE vw_stundenplan.stundenplan_id=vw_stundenplandev.stundenplandev_id AND (
 				vw_stundenplandev.unr!=vw_stundenplan.unr OR
@@ -522,11 +523,12 @@ $sql_query="SELECT vw_stundenplandev.*, vw_stundenplan.datum AS old_datum, vw_st
 				vw_stundenplandev.gruppe!=vw_stundenplan.gruppe OR
 				vw_stundenplandev.gruppe_kurzbz!=vw_stundenplan.gruppe_kurzbz OR
 				coalesce(vw_stundenplandev.titel,'')!=coalesce(vw_stundenplan.titel,'') OR
-				vw_stundenplandev.fix!=vw_stundenplan.fix OR
-				vw_stundenplandev.lehreinheit_id!=vw_stundenplan.lehreinheit_id )
+				vw_stundenplandev.fix!=vw_stundenplan.fix OR";
+if (LVPLAN_ANMERKUNG_ANZEIGEN)
+	$sql_query .= " coalesce(vw_stundenplandev.anmerkung,'')!=coalesce(vw_stundenplan.anmerkung,'') OR";
+$sql_query .= " vw_stundenplandev.lehreinheit_id!=vw_stundenplan.lehreinheit_id )
 				AND vw_stundenplandev.datum>=".$db->db_add_param($datum_begin)."
 				AND vw_stundenplandev.datum<=".$db->db_add_param($datum_ende)." ".$stgwheredev.";";
-//vw_stundenplandev.anmerkung!=vw_stundenplan.anmerkung OR --> von kindlm am 16.03.2012 aus obigem SQL entfernt, da nicht relevant fuer tbl_stundenplan und nur fuer intern gedacht
 
 //echo $sql_query.'<BR>';
 
@@ -574,7 +576,8 @@ else
 			$sql_query.=',gruppe_kurzbz=NULL';
 		else
 			$sql_query.=",gruppe_kurzbz=".$db->db_add_param($row->gruppe_kurzbz);
-		//$sql_query.=",titel='$row->titel',anmerkung='$row->anmerkung'"; --> anmerkung auskommentiert vom kindlm am 16.03.2012 da nicht relevant fuer tbl_stundenplan und nur fuer intern gedacht
+		if (LVPLAN_ANMERKUNG_ANZEIGEN) //spalte anmerkung nur syncen, wenn im Config aktiv
+			$sql_query.=",anmerkung=".$db->db_add_param($row->anmerkung);
 		if ($row->titel=='')
 			$sql_query.=',titel=NULL';
 		else
