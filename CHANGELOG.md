@@ -13,6 +13,7 @@
 - **[FAS]** Bei Statuswechsel von Studierenden können Gründe für den Statuswechsel angegeben werden
 - **[ADDONS]** Addons können Menüpunkte im Vilesci anpassen
 - **[ADDONS]** Addons können Noten für die Gesamtnote vorschlagen
+- **[CORE]** UserDefinedFields
 
 ### CHANGED
 - **[CORE]** Berechtigungsprüfung wurde angepasst damit deaktivierte Benutzer keine Berechtigungen mehr haben
