@@ -168,10 +168,9 @@ $menu=array
 			'Kartenverwaltung'=>array('name'=>'Kartenverwaltung','link'=>'fhausweis/kartenverwaltung.php','target'=>'main'),
 			'KarteZuweisen'=>array('name'=>'Karte zuweisen','link'=>'fhausweis/kartezuweisen.php','target'=>'main'),
 			'Kartentausch'=>array('name'=>'Kartentausch','link'=>'fhausweis/kartentausch.php','target'=>'main'),
+			'Kartenausgabe'=>array('name'=>'Kartenausgabe','link'=>'fhausweis/kartenausgabe.php','target'=>'main'),
 			'Verlaengerung'=>array('name'=>'Verlängerung','link'=>'fhausweis/verlaengerung.php','target'=>'main'),
 			'Suche'=>array('name'=>'Suche','link'=>'fhausweis/search.php','target'=>'main'),
-			'Synchronisation'=>array('name'=>'Syncronisation', 'link'=>'stammdaten/imexport/zutrittskarten/index.html', 'target'=>'main'),
-			'Korrektur'=>array('name'=>'Kartenkorrektur','link'=>'fhausweis/kartenkorrektur.php','target'=>'main')
 		)
 	),
 	'Wartung'=>	array
