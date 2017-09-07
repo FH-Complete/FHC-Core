@@ -422,7 +422,8 @@ class MessageLib
 				for ($i = 0; $i < count($result->retval) && $sent; $i++)
 				{
 					// If the person has an email account
-					if (!is_null($result->retval[$i]->receiver) && $result->retval[$i]->receiver != '')
+					if ((!is_null($result->retval[$i]->receiver) && $result->retval[$i]->receiver != '')
+						|| (!is_null($result->retval[$i]->employeecontact) && $result->retval[$i]->employeecontact != ''))
 					{
 						$href = $this->ci->config->item('message_server').$this->ci->config->item('message_html_view_url').$result->retval[0]->token;
 						// Using a template for the html email body
@@ -461,10 +462,17 @@ class MessageLib
 						{
 							$sender = $result->retval[0]->sender;
 						}
+
+						$receiverContanct = $result->retval[$i]->receiver;
+						if (!is_null($result->retval[$i]->employeecontact) && $result->retval[$i]->employeecontact != '')
+						{
+							$receiverContanct = $result->retval[$i]->employeecontact.'@'.DOMAIN;
+						}
+
 						// Sending email
 						$sent = $this->ci->maillib->send(
 							$sender,
-							$result->retval[$i]->receiver,
+							$receiverContanct,
 							$result->retval[$i]->subject,
 							$body,
 							null,
@@ -546,6 +554,7 @@ class MessageLib
 			null,
 			$message_id
 		);
+
 		// Checks if errors were occurred
 		if (isSuccess($result))
 		{
@@ -553,7 +562,8 @@ class MessageLib
 			if (is_array($result->retval) && count($result->retval) > 0)
 			{
 				// If the person has an email account
-				if (!is_null($result->retval[0]->receiver) && $result->retval[0]->receiver != '')
+				if ((!is_null($result->retval[0]->receiver) && $result->retval[0]->receiver != '')
+					|| (!is_null($result->retval[0]->employeecontact) && $result->retval[0]->employeecontact != ''))
 				{
 					// If it is required use a multi-part message in MIME format
 					if ($multiPartMime === true)
@@ -602,10 +612,16 @@ class MessageLib
 						$sender = $result->retval[0]->sender;
 					}
 
+					$receiverContanct = $result->retval[0]->receiver;
+					if (!is_null($result->retval[0]->employeecontact) && $result->retval[0]->employeecontact != '')
+					{
+						$receiverContanct = $result->retval[0]->employeecontact.'@'.DOMAIN;
+					}
+
 					// Sending email
 					$sent = $this->ci->maillib->send(
 						$sender,
-						$result->retval[0]->receiver,
+						$receiverContanct,
 						is_null($subject) ? $result->retval[0]->subject : $subject, // if parameter subject is not null, use it!
 						$bodyMsg,
 						null,
