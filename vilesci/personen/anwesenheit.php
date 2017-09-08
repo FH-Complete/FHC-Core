@@ -19,7 +19,7 @@
  */
 /**
  * Anwesenheit
- * 
+ *
  * Erfasst die Anwesenheiten der Studierenden
  */
 require_once('../../config/vilesci.config.inc.php');
@@ -56,14 +56,14 @@ if($work=='getTermine')
 	$sem = $_POST['sem'];
 	$stsem = $_POST['stsem'];
 	$lv = $_POST['lv'];
-	
+
 	// Daten der Lehreinheiten ermitteln
-	$qry = "SELECT 
+	$qry = "SELECT
 				le.lehreinheit_id, sp.ort_kurzbz, datum
-			FROM 
-				lehre.tbl_lehreinheit le 
+			FROM
+				lehre.tbl_lehreinheit le
 				JOIN lehre.tbl_lehrveranstaltung lv ON lv.lehrveranstaltung_id = le.lehrveranstaltung_id
-				JOIN lehre.tbl_stundenplan sp ON (sp.lehreinheit_id=le.lehreinheit_id) 
+				JOIN lehre.tbl_stundenplan sp ON (sp.lehreinheit_id=le.lehreinheit_id)
 			WHERE lv.studiengang_kz = " . $db->db_add_param($stg)."
 			AND lv.lehrveranstaltung_id = " . $db->db_add_param($lv)."
 			AND lv.semester = " . $db->db_add_param($sem)."
@@ -100,10 +100,10 @@ if($work=='getLVs')
 	$stg = $_POST['stg'];
 	$sem = $_POST['sem'];
 	$stsem = $_POST['stsem'];
-	
+
 	$lv = new lehrveranstaltung();
 	$lv->load_lva_le($stg, $stsem, $sem);
-	
+
 	$data = array();
 	foreach($lv->lehrveranstaltungen as $row)
 	{
@@ -121,7 +121,10 @@ echo '<!DOCTYPE HTML>
 		<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
-		<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
+		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 
 		<script type="text/javascript">
@@ -130,21 +133,21 @@ echo '<!DOCTYPE HTML>
 				document.getElementById("usercode").focus();
 			else
 				document.getElementById("lvcode").focus();
-		
+
             // Tablesorter
             $("#t1").tablesorter(
 			{
 				sortList: [[4,0]],
 				widgets: ["zebra"]
 			});
-            
+
             // Enter-Taste beim Scannen abfangen
             $("#usercode").keydown(function(event) {
-                if (event.which == 13) 
+                if (event.which == 13)
                     event.preventDefault();
             });
 		});
-		
+
 		function inputUsercode()
 		{
 			var usercode = $("#usercode").val();
@@ -153,7 +156,7 @@ echo '<!DOCTYPE HTML>
 				var person_id = parseInt(usercode, 10);
                 person_id = person_id.toString();
                 person_id = person_id.substring(0, person_id.length - 1);
-                
+
 				$("#img_"+person_id).attr("src","../../skin/images/false.png");
 				var uid = $("#uid_"+person_id).val();
 				$("#anwesenheit_"+person_id).val("false");
@@ -192,7 +195,7 @@ if($work=='save')
 			$user = $_POST['uid_'.$person_id];
 			$anwesend = $_POST['anwesenheit_'.$person_id];
 			$anwesenheit_id=$_POST['anwesenheitid_'.$person_id];
-			$anwesenheit = new anwesenheit();			
+			$anwesenheit = new anwesenheit();
 
 			if($anwesenheit_id!='')
 			{
@@ -258,11 +261,11 @@ if($work=='loadAnwesenheit')
 		if($lehrveranstaltung->load($lehreinheit->lehrveranstaltung_id))
 		{
 			// Anzahl der Einheiten ermitteln
-			$qry = "SELECT distinct stunde 
-					FROM 
-						lehre.tbl_stundenplan 
-					WHERE 
-						lehreinheit_id=".$db->db_add_param($lehreinheit_id)." 
+			$qry = "SELECT distinct stunde
+					FROM
+						lehre.tbl_stundenplan
+					WHERE
+						lehreinheit_id=".$db->db_add_param($lehreinheit_id)."
 						AND datum=".$db->db_add_param($datum).";";
 			if($result = $db->db_query($qry))
 			{
@@ -284,9 +287,9 @@ if($work=='loadAnwesenheit')
 
 			echo '<br><br><input type="submit" name="text" value="Speichern" />';
 
-			// Teilnehmer ermitteln 
+			// Teilnehmer ermitteln
 			$qry = "SELECT distinct uid, vorname, nachname, person_id
-					FROM 
+					FROM
 						campus.vw_student_lehrveranstaltung
 						JOIN public.tbl_benutzer USING(uid)
 						JOIN public.tbl_person USING(person_id) WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id);
@@ -421,7 +424,7 @@ if($work=='')
 	echo '</select>';
 
 	echo 'Termin <select name="lvcode" id="termine" >';
-	
+
 	echo '</select>
 	<input type="submit" />';
 
@@ -432,7 +435,7 @@ if($work=='')
 		var sem = $("#semester").val();
 		var stsem = $("#stsem").val();
 		var lv = $("#lv").val();
-		
+
 		if(action=="lv" && lv!="")
 		{
 			// Termine holen
@@ -449,7 +452,7 @@ if($work=='')
 				data: data,
 				type: "POST",
 				dataType: "json",
-				success: function(data) 
+				success: function(data)
 				{
 					$("#termine").empty();
 					$("#termine").append(\'<option value="">-- Auswahl --</option>\');
@@ -457,7 +460,7 @@ if($work=='')
 						$("#termine").append(\'<option value="\'+i+\'">\'+entry+\'</option>\');
 					});
 				},
-				error: function(data) 
+				error: function(data)
 				{
 					alert("Fehler beim Laden der Daten");
 				}
@@ -478,7 +481,7 @@ if($work=='')
 				data: data,
 				type: "POST",
 				dataType: "json",
-				success: function(data) 
+				success: function(data)
 				{
 					$("#lv").empty();
 					$("#lv").append(\'<option value="">-- Auswahl --</option>\');
@@ -486,7 +489,7 @@ if($work=='')
 						$("#lv").append(\'<option value="\'+i+\'">\'+entry+\'</option>\');
 					});
 				},
-				error: function(data) 
+				error: function(data)
 				{
 					alert("Fehler beim Laden der Daten");
 				}

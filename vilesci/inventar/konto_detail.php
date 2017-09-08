@@ -30,17 +30,17 @@
 	require_once($path.'include/benutzerberechtigung.class.php');
 	require_once($path.'include/mitarbeiter.class.php');
   	require_once($path.'include/wawi.class.php');
-  	
+
 	if (!$uid = get_uid())
 		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-	
+
 // ------------------------------------------------------------------------------------------
 // Variable Initialisieren
 // ------------------------------------------------------------------------------------------
 	$errormsg=array();
 	$berechtigung_kurzbz='wawi/inventar:begrenzt';
 	$recht=false;
-	
+
 // ------------------------------------------------------------------------------------------
 // Parameter Aufruf uebernehmen
 // ------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@
 	$kontonr=trim(isset($_REQUEST['kontonr'])?$_REQUEST['kontonr']:'');
 	$konto_search=trim((isset($_REQUEST['konto_search']) ? $_REQUEST['konto_search']:''));
   	$debug=trim((isset($_REQUEST['debug']) ? $_REQUEST['debug']:false));
-	
+
 // ------------------------------------------------------------------------------------------
 // Berechtigung
 // ------------------------------------------------------------------------------------------
@@ -86,9 +86,11 @@
 		<link rel="stylesheet" href="<?php echo $path;?>include/js/jquery.css" rel="stylesheet" type="text/css">
 		<link rel="stylesheet" href="<?php echo $path;?>include/js/tablesort/table.css" type="text/css">
 		<script src="<?php echo $path;?>include/js/tablesort/table.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.autocomplete.js" type="text/javascript"></script>
-		<script src="<?php echo $path;?>include/js/jquery.autocomplete.min.js" type="text/javascript"></script>				
+
+		<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
+        <script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 
 	</head>
 	<body>
@@ -101,15 +103,35 @@
 					<td><label for="konto">Konto</label>&nbsp;
 						<input onchange="document.sendform.kontonr.value='';document.sendform.konto_search.value='';setTimeout('sendform.submit()',1500);" id="konto" name="konto" size="5" maxlength="10" value="<?php echo $konto; ?>" />&nbsp;
 						<script type="text/javascript">
-							function selectItem(li) 
+							function selectItem(li)
 							{
 							   return false;
 							}
-							function formatItem(row) 
+							function formatItem(row)
 							{
 							    return row[0] + " <i>" + row[1] + "</i> ";
 							}
+
 							$(document).ready(function() {
+
+								// $('#konto').autocomplete({
+								// 	source: "inventar_autocomplete.php",
+								// 	minLength:1,
+								// 	response: function(event, ui)
+								// 	{
+								// 		//Value und Label fuer die Anzeige setzen
+								// 		for(i in ui.content)
+								// 		{
+								// 			ui.content[i].value = ui.content[i].nachname + " " + ui.content[i].vorname;
+								// 			ui.content[i].label = ui.content[i].nachname + " " + ui.content[i].vorname;
+								// 		}
+								// 	},
+								// 	select: function(event, ui)
+								// 	{
+								// 		$('#ansprechperson_uid').val(ui.item.uid);
+								// 	}
+								// });
+
 								  $('#konto').autocomplete('inventar_autocomplete.php', {
 									minChars:1,
 									matchSubset:1,matchContains:1,

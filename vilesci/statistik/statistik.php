@@ -24,7 +24,7 @@
  * Statistik Uebersichtsseite
  * - zeigt die Beschreibung einer Statistik ein
  * - Link zum Starten der Statistik
- * - Eventuelle Parametereingabe für die Statistik 
+ * - Eventuelle Parametereingabe für die Statistik
  */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/statistik.class.php');
@@ -48,8 +48,8 @@ if(!$statistik->load($statistik_kurzbz))
 		<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css"/>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css"/>
 		<link rel="stylesheet" href="../../include/css/jquery-ui.1.11.2.min.css" />
-		<script type="text/javascript" src="../../include/js/jquery.min.1.11.1.js"></script>
-		<script type="text/javascript" src="../../include/js/jquery-ui.1.11.2.min.js"></script>
+		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script>
 			$(function() {
 				$.datepicker.setDefaults({dateFormat: "yy-mm-dd"});
@@ -121,4 +121,3 @@ $vars = $statistik->parseVars($variablenstring); ?>
 		</form>
 	</body>
 </html>
-

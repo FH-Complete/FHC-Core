@@ -39,16 +39,16 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('lehre/gruppe:begrenzt',null,'s'))
 	die('Sie haben keine Berechtigung für diese Seite');
-	
+
 $kurzbz=(isset($_GET['kurzbz'])?$_GET['kurzbz']:(isset($_POST['kurzbz'])?$_POST['kurzbz']:''));
 if(empty($kurzbz))
 	die('Gruppe wurde nicht &uuml;bergeben <a href="javascript:history.back()">Zur&uuml;ck</a>');
-		
+
 if (isset($_POST['new']))
 {
 	if(!$rechte->isBerechtigt('lehre/gruppe',null,'sui'))
 		die('Sie haben keine Berechtigung für diese Seite');
-	
+
 	$e=new benutzergruppe();
 	$e->new=true;
 	$e->gruppe_kurzbz=$kurzbz;
@@ -64,7 +64,7 @@ else if (isset($_GET['type']) && $_GET['type']=='delete')
 {
 	if(!$rechte->isBerechtigt('lehre/gruppe',null,'suid'))
 		die('Sie haben keine Berechtigung für diese Seite');
-	
+
 	$e=new benutzergruppe();
 	$e->delete($_GET['uid'], $kurzbz);
 }
@@ -84,7 +84,10 @@ if(!$gruppe->load($kurzbz))
 <link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
 <link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
 <link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
-<script type="text/javascript" src="../../include/js/jquery1.9.min.js" ></script>
+<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 </head>
 <body>
 <H2>Gruppe <?php echo $kurzbz ?></H2>
@@ -93,13 +96,13 @@ if(!$gruppe->load($kurzbz))
 echo "<a href='einheit_menu.php?studiengang_kz=$gruppe->studiengang_kz'>Zurück zur &Uuml;bersicht</a><br><br>";
 
 if(!$gruppe->generiert)
-{	
+{
 	echo '
 	<FORM name="newpers" method="post" action="einheit_det.php">
 	  Name: <INPUT type="hidden" name="type" value="new">
 		<input type="text" name="uid" id="uid"/>
 		<script type="text/javascript">
-		$(document).ready(function() 
+		$(document).ready(function()
 		{
 			$("#uid").autocomplete({
 				source: "einheit_autocomplete.php?work=searchUser",
@@ -128,19 +131,19 @@ if(!$gruppe->generiert)
 }
 
 	$gruppe = new gruppe();
-	
+
 	if($gruppe->loadUser($kurzbz))
 	{
 		$num_rows=count($gruppe->result);
 		echo "Anzahl: $num_rows";
 		echo '<script>
-		$(document).ready(function() 
+		$(document).ready(function()
 		{
 			$("#usertabelle").tablesorter(
 			{
 				sortList: [[2,0]],
 				widgets: ["zebra"]
-			}); 
+			});
 		});
 		</script>';
 		echo '<table id="usertabelle" class="tablesorter">

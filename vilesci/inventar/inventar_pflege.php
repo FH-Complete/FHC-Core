@@ -24,7 +24,7 @@
  * Diese Seite dient zur Inventarisierung der Betriebsmittel.
  * Es kann eine Vorlage erstellt werden, damit mehrere Betriebsmittel mit den
  * gleichen Daten angelegt werden können.
- * 
+ *
  * Es koennen neue Betriebsmittel angelegt, bearbeitet und geloescht werden.
  */
 	require_once('../../config/vilesci.config.inc.php');
@@ -45,10 +45,10 @@
 	require_once('../../include/wawi_bestellung.class.php');
 	require_once('../../include/wawi_kostenstelle.class.php');
 	require_once('../../include/wawi_bestellstatus.class.php');
-	
+
 	if (!$uid = get_uid())
 		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-		
+
 // ------------------------------------------------------------------------------------------
 // Variable Initialisieren
 // ------------------------------------------------------------------------------------------
@@ -83,7 +83,7 @@
   	$betriebsmittelstatus_kurzbz=trim((isset($_REQUEST['betriebsmittelstatus_kurzbz']) ? $_REQUEST['betriebsmittelstatus_kurzbz']:$default_status_vorhanden));
 	$firma_id=trim(isset($_REQUEST['firma_id'])?$_REQUEST['firma_id']:'');
 	$bestellnr=trim(isset($_REQUEST['bestellnr'])?$_REQUEST['bestellnr']:'');
-	
+
   	$afa=trim(isset($_REQUEST['afa']) ? $_REQUEST['afa']:3);
   	$leasing_bis=trim(isset($_REQUEST['leasing_bis']) ? $_REQUEST['leasing_bis']:'');
 
@@ -93,7 +93,7 @@
 	$breite=isset($_REQUEST['breite'])?$_REQUEST['breite']:'';
 	$tiefe=isset($_REQUEST['tiefe'])?$_REQUEST['tiefe']:'';
 	$verplanen=isset($_REQUEST['verplanen'])?$_REQUEST['verplanen']:false;
-	
+
 	$jahr_monat=trim(isset($_REQUEST['jahr_monat']) ? $_REQUEST['jahr_monat']:'');
   	$inventur_jahr=trim(isset($_REQUEST['inventur_jahr']) ? $_REQUEST['inventur_jahr']:'');
 
@@ -115,7 +115,7 @@
 	// read Berechtigung
 	if (!$oBenutzerberechtigung->getBerechtigungen($uid))
 		die('Sie haben keine Berechtigung !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-		
+
 	// Pruefen ob Schreibrechte (Anzeigen der Aenderungsmoeglichkeit)
 	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'su'))
 		$schreib_recht=true;
@@ -123,7 +123,7 @@
 
 	if (!$schreib_recht)
 		die('Sie haben keine Berechtigung f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-		
+
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung
 // ------------------------------------------------------------------------------------------
@@ -203,7 +203,7 @@
 	// Vorlagedaten lesen aus Betriebsmittel
 	if ($betriebsmittel_id!='' && empty($work) )
 	{
-		
+
 		$oBetriebsmittel->result=array();
 		$oBetriebsmittel->errormsg='';
 		if ($oBetriebsmittel->load($betriebsmittel_id))
@@ -264,8 +264,8 @@
 		else
 			$errormsg[]=$oBetriebsmittel->errormsg;
 	}
-	
-	
+
+
 	// Vorlagedaten lesen
 	if ($bestellung_id!='' && empty($work)
 	&& ($bestellung_id!=$bestellung_id_old || $bestelldetail_id!=$bestelldetail_id_old )  )
@@ -295,14 +295,14 @@
 
 		$bestelldetail = new wawi_bestelldetail();
 		$bestellung = new wawi_bestellung();
-		
+
 		// Bestellposition
 		if ($bestelldetail_id)
 		{
 			if(!$bestelldetail->load($bestelldetail_id))
 				$errormsg[]=$bestelldetail->errormsg;
 			$bestelldetail->result[] = $bestelldetail;
-			
+
 			if($anschaffungswert=='')
 			{
 				$anschaffungswert = ($bestelldetail->preisprove/100*(100+$bestelldetail->mwst));
@@ -314,7 +314,7 @@
 			//if(!$bestelldetail->getAllDetailsFromBestellung($bestellung_id))
 			//	$errormsg[]=$bestelldetail->errormsg;
 		}
-		
+
 		//Bestellung
 		if (!$bestellung->load($bestellung_id))
 			$errormsg[]=$bestellung->errormsg;
@@ -322,7 +322,7 @@
 		{
 			$verwendung=trim($bestellung->titel);
 			$besteller=$bestellung->besteller_uid;
-			
+
 			$kostenstelle = new wawi_kostenstelle();
 			$kostenstelle->load($bestellung->kostenstelle_id);
 			$oe_kurzbz=$kostenstelle->oe_kurzbz;
@@ -330,12 +330,12 @@
 			$bestellstatus = new wawi_bestellstatus();
 			$bestellstatus->getStatiFromBestellung('Lieferung', $bestellung_id);
 			$anschaffungsdatum = $bestellstatus->datum;
-						
+
 			foreach($bestelldetail->result as $row)
 			{
 				if (isset($row->beschreibung))
 					$beschreibung.=($beschreibung?"\n":'').trim($row->beschreibung).' '.trim($row->artikelnummer);
-	
+
 				/*
 			  	$verwendung=trim($row->kostenstelle_bezeichnung);
 				if (isset($row->konto_beschreibung))
@@ -344,12 +344,12 @@
 			  	$hersteller=trim($row->firmenname);
 				*/
 				if(!$anzahl_lock)
-			  	$anzahl=trim(isset($row->menge)?$row->menge:$anzahl);	
+			  	$anzahl=trim(isset($row->menge)?$row->menge:$anzahl);
 			}
 			$beschreibung = mb_substr($beschreibung, 0, 256);
 		}
 	}
-	
+
 
 // ------------------------------------------------------------------------------------------
 // HTML Output
@@ -360,15 +360,23 @@
 	<head>
 		<title>Inventar</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		
+
 		<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		
-<!--		<script src="../../include/js/jquery.js" type="text/javascript"></script> -->
-<!--		<script src="../../include/js/jquery-ui.js" type="text/javascript"></script> -->
-		<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>	
-		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>	
+
+<!--		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
+<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+<script type="text/javascript" src="../../include/js/sizzle-0.9.3.js"></script> -->
+<!--		<script src="../../vendor/components/jqueryui/jquery-ui.min.js" type="text/javascript"></script> -->
+		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 
 		<style type="text/css">
 		table.navbar td
@@ -378,7 +386,7 @@
 		</style>
 		<script type="text/javascript">
 			//Formatiert den Output der Autocomplete Elemente
-			function formatItem(row) 
+			function formatItem(row)
 			{
 				return row[0] + ' <br>' + row[1];
 			}
@@ -398,7 +406,7 @@
 				document.getElementById('bestellung_id').value=first.value;
 				document.sendform.submit();
 			}
-			
+
 			function SubmitOhneVorlageDetail()
 			{
 				first = document.getElementById('bestelldetail_id_array0')
@@ -425,7 +433,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 		</legend>
 
 		<div id="container" style="display:<?php echo ($vorlage && $vorlage!='false'?'block':'none'); ?>;">
-		
+
 			<table class="navbar">
 			<tr>
 				<td>
@@ -436,7 +444,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 <!--								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="bestellung_id" name="bestellung_id" size="10" value="<?php //echo $bestellung_id;?>"> -->
 								<input id="bestellung_id" name="bestellung_id" size="10" value="<?php echo $bestellung_id;?>">
 								<script type="text/javascript" language="JavaScript1.2">
-									$(document).ready(function() 
+									$(document).ready(function()
 									{
 										$('#bestellung_id').autocomplete({
 											source: "inventar_autocomplete.php?work=wawi_bestellung_id",
@@ -456,7 +464,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 												setTimeout('document.sendform.submit()',300);
 											}
 										});
-/*										  $('#bestellung_id').autocomplete('inventar_autocomplete.php', 
+/*										  $('#bestellung_id').autocomplete('inventar_autocomplete.php',
 										  {
 											minChars:5,
 											matchSubset:1,matchContains:1,
@@ -474,10 +482,10 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 <!--								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="bestelldetail_id" name="bestelldetail_id" size="6" value="<?php //echo $bestelldetail_id;?>"> -->
 								<input id="bestelldetail_id" name="bestelldetail_id" size="6" value="<?php echo $bestelldetail_id;?>">
 								<script type="text/javascript" language="JavaScript1.2">
-									$(document).ready(function() 
+									$(document).ready(function()
 									{
 										$('#bestelldetail_id').autocomplete({
-											source: function(request, response) 
+											source: function(request, response)
 											{
 												$.ajax({
 													url: "inventar_autocomplete.php",
@@ -490,7 +498,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 													success: function(data)
 													{
 														data=eval(data);
-														 response($.map(data, function(item) 
+														 response($.map(data, function(item)
 														 {
 															return {
 																value:item.bestelldetail_id,
@@ -499,7 +507,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 														}));
 													}
 												});
-											},											
+											},
 											minLength:1,
 											select: function(event, ui)
 											{
@@ -508,7 +516,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 											}
 
 										});
-/*										  $('#bestelldetail_id').autocomplete('inventar_autocomplete.php', 
+/*										  $('#bestelldetail_id').autocomplete('inventar_autocomplete.php',
 										  {
 											minChars:1,
 											matchSubset:1,matchContains:1,
@@ -526,7 +534,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 							<td>&nbsp;<label for="hersteller">Hersteller</label>&nbsp;
 							<input id="hersteller" name="hersteller" type="text" size="35" maxlength="120" value="<?php echo $hersteller;?>">
 									<script type="text/javascript" language="JavaScript1.2">
-									$(document).ready(function() 
+									$(document).ready(function()
 									{
 										$('#hersteller').autocomplete({
 											source: "inventar_autocomplete.php?work=hersteller",
@@ -545,7 +553,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 												ui.item.value=ui.item.hersteller;
 											}
 										});
-/*										  $('#hersteller').autocomplete('inventar_autocomplete.php', 
+/*										  $('#hersteller').autocomplete('inventar_autocomplete.php',
 										  {
 											minChars:2,
 											matchSubset:1,matchContains:1,
@@ -587,7 +595,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 <!--								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="ort_kurzbz" name="ort_kurzbz" size="16" value="<?php //echo $ort_kurzbz;?>"> -->
 								<input id="ort_kurzbz" name="ort_kurzbz" size="16" value="<?php echo $ort_kurzbz;?>">
 									<script type="text/javascript" language="JavaScript1.2">
-									$(document).ready(function() 
+									$(document).ready(function()
 									{
 										$('#ort_kurzbz').autocomplete({
 											source: "inventar_autocomplete.php?work=ort",
@@ -608,7 +616,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 											}
 										});
 
-/*										$('#ort_kurzbz').autocomplete('inventar_autocomplete.php', 
+/*										$('#ort_kurzbz').autocomplete('inventar_autocomplete.php',
 										  {
 											minChars:2,
 											matchSubset:1,matchContains:1,
@@ -639,7 +647,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 <!--								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="oe_kurzbz" name="oe_kurzbz" size="13" value="<?php // echo $oe_kurzbz;?>"> -->
 								<input id="oe_kurzbz" name="oe_kurzbz" size="13" value="<?php echo $oe_kurzbz;?>">
 								<script type="text/javascript" language="JavaScript1.2">
-									$(document).ready(function() 
+									$(document).ready(function()
 									{
 										$('#oe_kurzbz').autocomplete({
 											source: "inventar_autocomplete.php?work=organisationseinheit",
@@ -659,8 +667,8 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 												setTimeout('document.sendform.submit()',300);
 											}
 										});
-										
-/*										  $('#oe_kurzbz').autocomplete('inventar_autocomplete.php', 
+
+/*										  $('#oe_kurzbz').autocomplete('inventar_autocomplete.php',
 										  {
 											minChars:2,
 											matchSubset:1,matchContains:1,
@@ -670,7 +678,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 										  }); */
 								  });
 							</script>
-							
+
 						<?php
 						// Organisation
 								$oe_kurzbz=trim($oe_kurzbz);
@@ -690,7 +698,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 											if (!$oPerson = new person($person_id))
 											{
 												$personen_namen=$oPerson->errormsg;
-											}	
+											}
 											else if ($oPerson->nachname)
 												$personen_namen=$oPerson->anrede.($oPerson->titelpre?'&nbsp;'.$oPerson->titelpre:'').'&nbsp;'.$oPerson->vorname.'&nbsp;'.$oPerson->nachname.'&nbsp;'.($oPerson->aktiv==true || $oPerson->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv">':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv">');
 											else
@@ -702,10 +710,10 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 												{
 													$person_id=$oPerson->personen[0]->person_id;
 													$personen_namen=$oPerson->personen[0]->anrede.($oPerson->personen[0]->titelpre?'&nbsp;'.$oPerson->personen[0]->titelpre:'').'&nbsp;'.$oPerson->personen[0]->vorname.'&nbsp;'.$oPerson->personen[0]->nachname.'&nbsp;'.($oPerson->personen[0]->aktiv==true || $oPerson->personen[0]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv">':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv">');
-												}	
+												}
 												else
 													$personen_namen='Fehler ! '.$person_id;
-											}	
+											}
 									}
 									else if ($besteller)
 										$personen_namen='<a href="mailto:.'.$besteller.'">'.$besteller.'</a>';
@@ -715,7 +723,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 <!--								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="person_id" name="person_id" size="13" value="<?php echo $person_id; ?>"> -->
 								<input id="person_id" name="person_id" size="13" value="<?php echo $person_id; ?>">
 									<script type="text/javascript" language="JavaScript1.2">
-									$(document).ready(function() 
+									$(document).ready(function()
 									{
 										$('#person_id').autocomplete({
 											source: "inventar_autocomplete.php?work=person",
@@ -735,7 +743,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 													{
 														ddlabel=ddlabel+'(Inaktiv)';
 													}
-													ui.content[i].label=ddlabel; 
+													ui.content[i].label=ddlabel;
 													//ui.content[i].label=ui.content[i].person_id+' '+ui.content[i].anrede+' '+ui.content[i].titelpre+' '+ui.content[i].vorname+' '+ui.content[i].nachname+' '+ui.content[i].funktion;
 												}
 											},
@@ -745,7 +753,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 												setTimeout('document.sendform.submit()',300);
 											}
 										});
-/*										  $('#person_id').autocomplete('inventar_autocomplete.php', 
+/*										  $('#person_id').autocomplete('inventar_autocomplete.php',
 										  {
 											minChars:2,
 											matchSubset:1,matchContains:1,
@@ -786,7 +794,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 							<td>
 								<input id="leasing_bis" name="leasing_bis" size="10" maxlength="11" value="<?php echo $datum_obj->formatDatum($leasing_bis,'d.m.Y');?>">
 								<script type="text/javascript" language="JavaScript1.2">
-								$(document).ready(function() 
+								$(document).ready(function()
 								{
 									$( "#leasing_bis" ).datepicker($.datepicker.regional['de']);
 								});
@@ -806,7 +814,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 							<td>
 								<input id="anschaffungsdatum" name="anschaffungsdatum" size="10" maxlength="11" value="<?php echo $datum_obj->formatDatum($anschaffungsdatum,'d.m.Y');?>">
 								<script type="text/javascript" language="JavaScript1.2">
-								$(document).ready(function() 
+								$(document).ready(function()
 								{
 									$( "#anschaffungsdatum" ).datepicker($.datepicker.regional['de']);
 								});
@@ -852,10 +860,10 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 			</div>
 			<script type="text/javascript" language="JavaScript1.2">
 			   $(document).ready(function()       // Prueft, ob das Dokument geladen ist
-			   {      
+			   {
 			   		$("div#container_show").click(function(event)
 					{  // Bei Klick auf div#
-			      		if ($("#vorlage").val() == 'false') 
+			      		if ($("#vorlage").val() == 'false')
 						{
 				        	 $("div#container").show("slow");         // div# langsam oeffnen
 							 $("#vorlage").val('true');
@@ -912,7 +920,7 @@ $breite_array=(isset($_REQUEST['breite_array'])?$_REQUEST['breite_array']:array(
 $tiefe_array=(isset($_REQUEST['tiefe_array'])?$_REQUEST['tiefe_array']:array());
 $verplanen_array=(isset($_REQUEST['verplanen_array'])?$_REQUEST['verplanen_array']:array());
 
-for ($pos=0;$pos<$anzahl;$pos++) 
+for ($pos=0;$pos<$anzahl;$pos++)
 {
 	$errormsg=array();
 
@@ -941,7 +949,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 	$breite_array[$pos]=isset($breite_array[$pos]) && $work=='save' ?trim($breite_array[$pos]):$breite;
 	$tiefe_array[$pos]=isset($tiefe_array[$pos]) && $work=='save' ?trim($tiefe_array[$pos]):$tiefe;
 	//$verplanen_array[$pos]=isset($verplanen_array[$pos]) && $work=='save' ?trim($verplanen_array[$pos]):$verplanen;
-	
+
 	if ($work=='save')
 	{
 		if($inventarnummer_array[$pos]!='')
@@ -950,7 +958,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 			$oBetriebsmittel->result=array();
 			$oBetriebsmittel->debug=$debug;
 			$oBetriebsmittel->errormsg='';
-	
+
 			$oBetriebsmittel->new=false;
 			if (!$oBetriebsmittel->load($betriebsmittel_id_array[$pos]))
 			{
@@ -962,16 +970,16 @@ for ($pos=0;$pos<$anzahl;$pos++)
 				$oBetriebsmittel->inventurvon = $uid;
 			}
 			$betriebsmittel_id_array[$pos]=$oBetriebsmittel->betriebsmittel_id;
-	
+
 			$oBetriebsmittel->beschreibung=$beschreibung_array[$pos];
 		    $oBetriebsmittel->betriebsmitteltyp=$betriebsmitteltyp_array[$pos];
 		    $oBetriebsmittel->inventarnummer=$inventarnummer_array[$pos];
 		    $oBetriebsmittel->reservieren=false;
 		    $oBetriebsmittel->ort_kurzbz=$ort_kurzbz_array[$pos];
-		    		    
+
 		    $oBetriebsmittel->updatevon=$uid;
 		    $oBetriebsmittel->updateamum=date('Y-m-d H:i:s');
-	
+
 			$oBetriebsmittel->oe_kurzbz=$oe_kurzbz_array[$pos];
 			$oBetriebsmittel->hersteller=$hersteller_array[$pos];
 			$oBetriebsmittel->seriennummer=$seriennummer_array[$pos];
@@ -981,7 +989,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 			$oBetriebsmittel->verwendung=$verwendung_array[$pos];
 			$oBetriebsmittel->anmerkung=$anmerkung_array[$pos];
 			$oBetriebsmittel->leasing_bis=$datum_obj->formatDatum($leasing_bis_array[$pos],'Y-m-d');
-			
+
 			//wenn kein Anschaffungsdatum eingetragen ist und eine Bestellung zugeordnet ist,
 			//wird das lieferdatum der Bestellung uebernommen
 			if($oBetriebsmittel->bestellung_id!='' && $anschaffungsdatum_array[$pos]=='')
@@ -990,9 +998,9 @@ for ($pos=0;$pos<$anzahl;$pos++)
 				$bestellung->getStatiFromBestellung('Lieferung', $oBetriebsmittel->bestellung_id);
 				$anschaffungsdatum_array[$pos]=$bestellung->datum;
 			}
-			
+
 			$oBetriebsmittel->anschaffungsdatum = $datum_obj->formatDatum($anschaffungsdatum_array[$pos],'Y-m-d');
-			
+
 			//Wenn kein Anschaffungswert eingetragen ist, und eine BestelldetailID angegeben ist,
 			//wird der Anschaffungswert von der Bestellung uebernommen
 			if($oBetriebsmittel->bestelldetail_id!='' && $anschaffungswert_array[$pos]=='')
@@ -1010,12 +1018,12 @@ for ($pos=0;$pos<$anzahl;$pos++)
 				$oBetriebsmittel->hoehe = number_format(str_replace(',','.',$hoehe_array[$pos]),2,'.','');
 			else
 				$oBetriebsmittel->hoehe = '';
-				
+
 			if($breite_array[$pos]!='')
 				$oBetriebsmittel->breite = number_format(str_replace(',','.',$breite_array[$pos]),2,'.','');
 			else
 				$oBetriebsmittel->breite = '';
-				
+
 			if($tiefe_array[$pos]!='')
 				$oBetriebsmittel->tiefe = number_format(str_replace(',','.',$tiefe_array[$pos]),2,'.','');
 			else
@@ -1025,19 +1033,19 @@ for ($pos=0;$pos<$anzahl;$pos++)
 				$oBetriebsmittel->verplanen = false;
 			else
 				$oBetriebsmittel->verplanen = true;
-			
+
 			if ($oBetriebsmittel->save())
 			{
 				$errormsg[]='Inventar / Betriebsmittel '.($oBetriebsmittel->new?'gespeichert ':'ge&auml;ndert ');
 				$betriebsmittel_id_array[$pos]=$oBetriebsmittel->betriebsmittel_id;
-	
+
 				$oBetriebsmittel_betriebsmittelstatus = new betriebsmittel_betriebsmittelstatus();
 				$oBetriebsmittel_betriebsmittelstatus->result=array();
 				$oBetriebsmittel_betriebsmittelstatus->debug=$debug;
 				$oBetriebsmittel_betriebsmittelstatus->errormsg='';
-	
+
 				$oBetriebsmittel_betriebsmittelstatus->new=true;
-	
+
 				$oBetriebsmittel_betriebsmittelstatus->betriebsmittelbetriebsmittelstatus_id=null;
 				if ($oBetriebsmittel_betriebsmittelstatus->load_last_betriebsmittel_id($betriebsmittel_id_array[$pos]))
 				{
@@ -1045,14 +1053,14 @@ for ($pos=0;$pos<$anzahl;$pos++)
 					{
 						$oBetriebsmittel_betriebsmittelstatus->new=false;
 					}
-					else 
+					else
 					{
 						$oBetriebsmittel_betriebsmittelstatus->datum=date('Y-m-d');
 						$oBetriebsmittel_betriebsmittelstatus->insertvon=$uid;
 						$oBetriebsmittel_betriebsmittelstatus->insertamum=date('Y-m-d H:i:s');
 					}
 				}
-				else 
+				else
 				{
 					$oBetriebsmittel_betriebsmittelstatus->insertvon=$uid;
 					$oBetriebsmittel_betriebsmittelstatus->insertamum=date('Y-m-d H:i:s');
@@ -1060,34 +1068,34 @@ for ($pos=0;$pos<$anzahl;$pos++)
 				$oBetriebsmittel_betriebsmittelstatus->datum=trim($oBetriebsmittel_betriebsmittelstatus->datum?$oBetriebsmittel_betriebsmittelstatus->datum:date('Y-m-d'));
 				$oBetriebsmittel_betriebsmittelstatus->betriebsmittel_id=$betriebsmittel_id_array[$pos];
 				$oBetriebsmittel_betriebsmittelstatus->betriebsmittelstatus_kurzbz=$betriebsmittelstatus_kurzbz_array[$pos];
-			    
+
 			    $oBetriebsmittel_betriebsmittelstatus->updatevon=$uid;
 			    $oBetriebsmittel_betriebsmittelstatus->updateamum=date('Y-m-d H:i:s');
-			    
+
 				if (!$oBetriebsmittel_betriebsmittelstatus->save())
 					$errormsg[]=$oBetriebsmittel_betriebsmittelstatus->errormsg;
-	
-	
+
+
 				$oBetriebsmittelperson = new betriebsmittelperson();
 				$oBetriebsmittelperson->result=array();
 				$oBetriebsmittelperson->debug=$debug;
 				$oBetriebsmittelperson->errormsg='';
 				#$oBetriebsmittelperson->delete($betriebsmittel_id_array[$pos]);
-	
-	
+
+
 				// Entliehen an eine Person
 				if (!empty($person_id_array[$pos]) && !is_numeric($person_id_array[$pos]))
 				{
 					if ($oBenutzer = new benutzer($person_id_array[$pos]))
 						$person_id_array[$pos]=$oBenutzer->person_id;
-				}	
+				}
 				if (!empty($person_id_old_array[$pos]) && !is_numeric($person_id_old_array[$pos]))
 				{
 					if ($oBenutzer = new benutzer($person_id_old_array[$pos]))
 						$person_id_old_array[$pos]=$oBenutzer->person_id;
-				}	
+				}
 
-				//wenn sich die Personenzuordnung aendert, dann wird die alte Personenzuordnung beendet			
+				//wenn sich die Personenzuordnung aendert, dann wird die alte Personenzuordnung beendet
 				if ($person_id_old_array[$pos]
 				&& $person_id_old_array[$pos]!=$person_id_array[$pos])
 				{
@@ -1103,17 +1111,17 @@ for ($pos=0;$pos<$anzahl;$pos++)
 					    $oBetriebsmittelperson->retouram=date('Y-m-d');
 					    $oBetriebsmittelperson->updatevon=$uid;
 					    $oBetriebsmittelperson->updateamum=date('Y-m-d H:i:s');
-	
+
 						$oBetriebsmittelperson->new=false;
 		 				if (!$oBetriebsmittelperson->save())
 							$errormsg[]=$oBetriebsmittelperson->errormsg;
 					}
-					else 
+					else
 					{
 						$errormsg[] = $oBetriebsmittelperson->errormsg;
 					}
 				}
-	
+
 				// Entliehen an eine Person
 				if ($person_id_array[$pos])
 				{
@@ -1127,11 +1135,11 @@ for ($pos=0;$pos<$anzahl;$pos++)
 						//wenn das Betriebsmittel dieser Person noch nicht zugeordnet ist, oder
 						//es in der Zwischenzeit schon retourniert hat, dann zuordnen
 						$oBetriebsmittelperson->new=true;
-	
+
 						$oBetriebsmittelperson->result=array();
 						$oBetriebsmittelperson->debug=$debug;
 						$oBetriebsmittelperson->errormsg='';
-	
+
 					    $oBetriebsmittelperson->betriebsmittel_id=$betriebsmittel_id_array[$pos];
 					    $oBetriebsmittelperson->person_id=$person_id_array[$pos];
 					    //$oBetriebsmittelperson->anmerkung=$anmerkung_array[$pos];
@@ -1151,7 +1159,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 				$errormsg[]=$oBetriebsmittel->errormsg;
 			}
 		}
-		else 
+		else
 		{
 			$errormsg[]='Fehler: Es muss eine Inventarnummer eingetragen werden';
 		}
@@ -1177,17 +1185,17 @@ for ($pos=0;$pos<$anzahl;$pos++)
 									<td>druck&nbsp;<img border="0" src="../../skin/images/printer.png" title="drucken" > </td>
 								</tr>
 							</table>
-							
-							<script type="text/javascript" language="JavaScript1.2">			
+
+							<script type="text/javascript" language="JavaScript1.2">
 							   $(document).ready(function()           // Prueft, ob das Dokument geladen ist
-							   {  
-							  	 $("td#bcTarget<?php echo $pos; ?>").click(function(event) 
-								 { 
-										var PrintWin=window.open('etiketten.php?inventarnummer=<?php echo urlencode($inventarnummer_array[$pos]); ?>','Etik','copyhistory=no,directories=no,location=no,dependent=yes,toolbar=no,status=no,menubar=no,resizable=yes,scrollbars=yes,width=400,height=300,left=20, top=20'); 
-										if (PrintWin) 
+							   {
+							  	 $("td#bcTarget<?php echo $pos; ?>").click(function(event)
+								 {
+										var PrintWin=window.open('etiketten.php?inventarnummer=<?php echo urlencode($inventarnummer_array[$pos]); ?>','Etik','copyhistory=no,directories=no,location=no,dependent=yes,toolbar=no,status=no,menubar=no,resizable=yes,scrollbars=yes,width=400,height=300,left=20, top=20');
+										if (PrintWin)
 										{
 											PrintWin.focus();
-										}	
+										}
 							   });
 							});
 
@@ -1197,7 +1205,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 				</table>
 
 			<div id="container<?php echo $pos; ?>"  style="display:<?php echo ($vorlage && $vorlage=='false'?'block':'none'); ?>;" >
-			
+
 			<div id="container_shows<?php echo $pos; ?>">
 				<div style="background-color: #FFF4D5;cursor: pointer;font-size:normal;">
 					<img src="../../skin/images/right.png" alt="anzeigen - show">Inventardaten anzeigen / ausblenden
@@ -1208,7 +1216,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 			   {
 				   $("div#container_shows<?php echo $pos; ?>").click(function(event)  // Bei Klick auf div#
 				   {
-				      if ($("#vorlage<?php echo $pos; ?>").val() == 'true') 
+				      if ($("#vorlage<?php echo $pos; ?>").val() == 'true')
 					  {
 				         $("div#container<?php echo $pos; ?>").show("slow");         // div# langsam oeffnen
 				         $("#vorlage<?php echo $pos; ?>").val('false');
@@ -1231,7 +1239,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 <!--												<input id="bestellung_id_array<?php echo $pos; ?>" <?php echo ($vorlage=='false'?"onchange=\"if (this.value.length>0) {setTimeout('SubmitOhneVorlage()',1300);}\"":""); ?> name="bestellung_id_array[]" size="10" value="<?php echo $bestellung_id_array[$pos]; ?>"> -->
 												<input id="bestellung_id_array<?php echo $pos; ?>" name="bestellung_id_array[]" size="10" value="<?php echo $bestellung_id_array[$pos]; ?>">
 												<script type="text/javascript" language="JavaScript1.2">
-													$(document).ready(function() 
+													$(document).ready(function()
 													{
 														$('#bestellung_id_array<?php echo $pos; ?>').autocomplete({
 															source: "inventar_autocomplete.php?work=wawi_bestellung_id",
@@ -1250,7 +1258,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 																ui.item.value=ui.item.bestellung_id;
 															}
 														});
-														/*  $('#bestellung_id_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php', 
+														/*  $('#bestellung_id_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php',
 														  {
 															minChars:2,
 															matchSubset:1,matchContains:1,
@@ -1266,10 +1274,10 @@ for ($pos=0;$pos<$anzahl;$pos++)
 											<td>&nbsp;<label for="bestelldetail_id_array<?php echo $pos; ?>">Bestelldetail ID</label>&nbsp;
 												<input id="bestelldetail_id_array<?php echo $pos; ?>" <?php echo ($vorlage=='false'?"onchange=\"if (this.value.length>0) {setTimeout('SubmitOhneVorlageDetail()',1300);}\"":""); ?> name="bestelldetail_id_array[]" size="6" value="<?php echo $bestelldetail_id_array[$pos]; ?>">
 												<script type="text/javascript" language="JavaScript1.2">
-													$(document).ready(function() 
+													$(document).ready(function()
 													{
 														$('#bestelldetail_id_array<?php echo $pos; ?>').autocomplete({
-															source: function(request, response) 
+															source: function(request, response)
 															{
 																$.ajax({
 																	url: "inventar_autocomplete.php",
@@ -1282,7 +1290,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 																	success: function(data)
 																	{
 																		data=eval(data);
-																		 response($.map(data, function(item) 
+																		 response($.map(data, function(item)
 																		 {
 																			return {
 																				value:item.bestelldetail_id,
@@ -1292,10 +1300,10 @@ for ($pos=0;$pos<$anzahl;$pos++)
 																		}))
 																	}
 																});
-															},											
+															},
 															minLength:1,
 														});
-/*														  $('#bestelldetail_id_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php', 
+/*														  $('#bestelldetail_id_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php',
 														  {
 															minChars:1,
 															matchSubset:1,matchContains:1,
@@ -1314,7 +1322,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 											<td>&nbsp;<label for="hersteller_array<?php echo $pos; ?>">Hersteller</label>&nbsp;
 											<input id="hersteller_array<?php echo $pos; ?>" name="hersteller_array[]" type="text" size="35" maxlength="120" value="<?php echo $hersteller_array[$pos]; ?>">
 												<script type="text/javascript" language="JavaScript1.2">
-													$(document).ready(function() 
+													$(document).ready(function()
 													{
 														$('#hersteller_array<?php echo $pos; ?>').autocomplete({
 															source: "inventar_autocomplete.php?work=hersteller",
@@ -1333,7 +1341,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 																ui.item.value=ui.item.hersteller;
 															}
 														});
-														/*  $('#hersteller_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php', 
+														/*  $('#hersteller_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php',
 														  {
 															minChars:2,
 															matchSubset:1,matchContains:1,
@@ -1377,7 +1385,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 									<td>&nbsp;<label for="ort_kurzbz_array<?php echo $pos; ?>">Ort</label>&nbsp;
 										<input id="ort_kurzbz_array<?php echo $pos; ?>" name="ort_kurzbz_array[]" size="16" value="<?php echo $ort_kurzbz_array[$pos]; ?>">
 											<script type="text/javascript" language="JavaScript1.2">
-													$(document).ready(function() 
+													$(document).ready(function()
 													{
 														$('#ort_kurzbz_array<?php echo $pos; ?>').autocomplete({
 															source: "inventar_autocomplete.php?work=ort",
@@ -1396,7 +1404,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 																ui.item.value=ui.item.ort_kurzbz;
 															}
 														});
-														/*  $('#ort_kurzbz_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php', 
+														/*  $('#ort_kurzbz_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php',
 														  {
 															minChars:2,
 															matchSubset:1,matchContains:1,
@@ -1426,7 +1434,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 								<td>&nbsp;<label for="oe_kurzbz_array<?php echo $pos; ?>">Organisation</label>&nbsp;
 									<input id="oe_kurzbz_array<?php echo $pos; ?>" name="oe_kurzbz_array[]" size="13" value="<?php echo $oe_kurzbz_array[$pos]; ?>" >
 									<script type="text/javascript" language="JavaScript1.2">
-										$(document).ready(function() 
+										$(document).ready(function()
 										{
 											$('#oe_kurzbz_array<?php echo $pos; ?>').autocomplete({
 												source: "inventar_autocomplete.php?work=organisationseinheit",
@@ -1445,7 +1453,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 													ui.item.value=ui.item.oe_kurzbz;
 												}
 											});
-											/*  $('#oe_kurzbz_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php', 
+											/*  $('#oe_kurzbz_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php',
 											  {
 												minChars:2,
 												matchSubset:1,matchContains:1,
@@ -1472,7 +1480,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 									<input style="display:none;" id="person_id_old_array<?php echo $pos; ?>" name="person_id_old_array[]" value="<?php echo $person_id_array[$pos]; ?>" >
 									<input id="person_id_array<?php echo $pos; ?>" name="person_id_array[]" size="13" value="<?php echo $person_id_array[$pos]; ?>" >
 									<script type="text/javascript" language="JavaScript1.2">
-											$(document).ready(function() 
+											$(document).ready(function()
 											{
 												$('#person_id_array<?php echo $pos; ?>').autocomplete({
 													source: "inventar_autocomplete.php?work=person",
@@ -1493,7 +1501,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 															{
 																ddlabel=ddlabel+'(Inaktiv)';
 															}
-															ui.content[i].label=ddlabel; 
+															ui.content[i].label=ddlabel;
 														}
 													},
 													select: function(event, ui)
@@ -1501,7 +1509,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 														ui.item.value=ui.item.person_id;
 													}
 												});
-												/*  $('#person_id_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php', 
+												/*  $('#person_id_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php',
 												  {
 													minChars:2,
 													matchSubset:1,matchContains:1,
@@ -1552,7 +1560,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 									<td>
 										<input id="leasing_bis_array<?php echo $pos; ?>" name="leasing_bis_array[]" size="10" maxlength="11" value="<?php echo $datum_obj->formatDatum($leasing_bis_array[$pos],'d.m.Y'); ?>">
 										<script type="text/javascript" language="JavaScript1.2">
-										$(document).ready(function() 
+										$(document).ready(function()
 										{
 												$( "#leasing_bis_array<?php echo $pos; ?>" ).datepicker($.datepicker.regional['de']);
 										});
@@ -1571,7 +1579,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 									<td>
 										<input id="anschaffungsdatum_array<?php echo $pos; ?>" name="anschaffungsdatum_array[]" size="10" maxlength="11" value="<?php echo $datum_obj->formatDatum($anschaffungsdatum_array[$pos],'d.m.Y'); ?>">
 										<script type="text/javascript" language="JavaScript1.2">
-										$(document).ready(function() 
+										$(document).ready(function()
 										{
 												$( "#anschaffungsdatum_array<?php echo $pos; ?>" ).datepicker($.datepicker.regional['de']);
 										});
@@ -1616,13 +1624,13 @@ for ($pos=0;$pos<$anzahl;$pos++)
 			   $(document).ready(function()            // Prueft, ob das Dokument geladen ist
 				{
 			   		$("div#container_show<?php echo $pos; ?>").click(function(event) // Bei Klick auf div#
-					{  
-					      if ($("#vorlage<?php echo $pos; ?>").val() == 'true') 
+					{
+					      if ($("#vorlage<?php echo $pos; ?>").val() == 'true')
 						  {
 					         $("div#container<?php echo $pos; ?>").show("slow");         // div# langsam oeffnen
 			    		     $("#vorlage<?php echo $pos; ?>").val('false');
 					      }
-						  else 
+						  else
 						  {
 					         $("div#container<?php echo $pos; ?>").hide("slow");         // div# langsam verbergen
 			    		     $("#vorlage<?php echo $pos; ?>").val('true');
@@ -1652,4 +1660,3 @@ for ($pos=0;$pos<$anzahl;$pos++)
 	</form>
 </body>
 </html>
-

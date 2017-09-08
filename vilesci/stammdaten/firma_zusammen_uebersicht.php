@@ -37,7 +37,7 @@ $rechte->getBerechtigungen($uid);
 if(!$rechte->isBerechtigt('basis/firma'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
-// ---------------------------------------		
+// ---------------------------------------
 // Parameter uebernehmen
 // ---------------------------------------
 // Suchkriterien - das wird geloescht
@@ -50,9 +50,9 @@ $suchen2 = (isset($_GET['suchen2'])?$_GET['suchen2']:null);
 $filter2 = (isset($_GET['filter2'])?$_GET['filter2']:'');
 $firmentyp_kurzbz2 = (isset($_GET['firmentyp_kurzbz2'])?$_GET['firmentyp_kurzbz2']:'');
 
-// ---------------------------------------		
+// ---------------------------------------
 // Fixe Tabellenwerte einlesen
-// ---------------------------------------		
+// ---------------------------------------
 $firma = new firma();
 $rows=array();
 if ($firma->getFirmenTypen())
@@ -61,30 +61,30 @@ if ($firma->getFirmenTypen())
 		$rows[]=$row;
 }
 ?>
-	
+
 <html>
 <head>
 	<title>Firmen Zusammenlegung</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	
+
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-<!--        <script src="../../include/js/jquery.js" type="text/javascript"></script> -->
-<!--	<script src="../../include/js/jquery-ui.js" type="text/javascript"></script> -->
-<!--	<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script> -->
-        
-	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
+
+	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
         <link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
-        
+
 	<style type="text/css">
 	<!--
-	
+
 	/* define the table content to be scrollable                                              */
 	/* set TBODY element to have block level attributes. All other non-IE browsers            */
 	/* this enables overflow to work on TBODY element. All other non-IE, non-Mozilla browsers */
 	/* induced side effect is that child TDs no longer accept width: auto                     */
-	html>body tbody.scrollContent 
+	html>body tbody.scrollContent
 	{
 		display: block;
 		height: 500px;
@@ -93,14 +93,14 @@ if ($firma->getFirmenTypen())
 	}
 	-->
 	</style>
-	
+
 	<script type="text/javascript" language="JavaScript1.2">
 	<!--
 		function set_firmen_search(wohin,filter,firmentypkurzbz)
 		{
 	   		$("div#infodetail").html('');
 	       	$("div#info").hide("slow");
-	   		
+
 			$('td#'+wohin).html('<img src="../../skin/images/spinner.gif" alt="warten" title="warten" >');
 			$.ajax
 			(
@@ -110,8 +110,8 @@ if ($firma->getFirmenTypen())
 					error: function()
 					{
 				   			$('td#'+wohin).html("Fehler");
-							return;								
-					},		
+							return;
+					},
 					success: function(json)
 					{
 						var output=show_firmen_search(wohin,json);
@@ -119,7 +119,7 @@ if ($firma->getFirmenTypen())
 						$('td#'+wohin).result(function(event, data, formatted) {}).focus();
 					}
 				}
-			);			
+			);
 		}
 		function show_firmen_search(wohin,json)
 		{
@@ -128,7 +128,7 @@ if ($firma->getFirmenTypen())
 			output += '<tbody class="scrollContent"><tr class="liste"><td>&nbsp;</td><td width="10%">Firma</td><td width="84%">Name</td></tr>\n';
 
 			var classen='liste1';
-			for (p in json) 
+			for (p in json)
 			{
 				if (classen=='liste1')
 					classen='liste0';
@@ -141,7 +141,7 @@ if ($firma->getFirmenTypen())
 					output += '<tr class="'+classen+'"><td><input name="firma_id_'+wohin+'" type="Radio" value="' + json[p].oFirma_id + '">&nbsp;</td><td align="right">' + json[p].oFirma_id + '&nbsp;</td><td>' + json[p].oName + '&nbsp;</td></tr>\n';
 			}
 			output += '</tbody></table>';
-			return output; 
+			return output;
 		}
 
 		function set_firmen_zusammenlegen()
@@ -149,13 +149,13 @@ if ($firma->getFirmenTypen())
 
 	   		$("div#infodetail").html('<img src="../../../skin/images/spinner.gif" alt="warten" title="warten" >');
 		    $("div#info").show("slow"); // div# langsam oeffnen
-			
-			if (!$('input[name=firma_id_geloescht]:checked').val() && !$('input[name=firma_id_bleibt]:checked').val()) 
+
+			if (!$('input[name=firma_id_geloescht]:checked').val() && !$('input[name=firma_id_bleibt]:checked').val())
 			{
 				$("div#infodetail").html('keine Auswahl getroffen!');
 				return;
 			}
-			if (!$('input[name=firma_id_geloescht]:checked').val()) 
+			if (!$('input[name=firma_id_geloescht]:checked').val())
 			{
 				$("div#infodetail").html('welche Firma soll geloescht werden ?');
 				return;
@@ -173,27 +173,27 @@ if ($firma->getFirmenTypen())
 					error: function()
 					{
 			   			$("div#infodetail").html("error");
-						return;								
-					},		
+						return;
+					},
 					success: function(phpData)
 					{
 				   		$("div#infodetail").html(phpData);
-						return;								
+						return;
 					}
 				}
 			);
-		}	
+		}
 
-		$(function() 
+		$(function()
 		{
 			$("#info").resizable();
 			$("#ui-resizable").draggable();
-			
+
 		});
 
 		-->
-	</script>	
-	
+	</script>
+
 	<style type="text/css">
 	<!--
 		li { list-style : outside url("../../skin/images/right.gif");}
@@ -211,13 +211,13 @@ if ($firma->getFirmenTypen())
 		.ui-resizable-sw { cursor: sw-resize; width: 9px; height: 9px; left: -5px; bottom: -5px; }
 		.ui-resizable-nw { cursor: nw-resize; width: 9px; height: 9px; left: -5px; top: -5px; }
 		.ui-resizable-ne { cursor: ne-resize; width: 9px; height: 9px; right: -5px; top: -5px;}
-	
+
 		div.info {width:90%;display:none;padding: 5px 5px 5px 5px;border: 1px solid Black;empty-cells : hide;text-align:center;vertical-align: top;z-index: 99;background-color: white; position:absolute;}
 		div.infoclose {border: 7px outset #008381;padding: 0px 10px 0px 10px;}
 		div.infodetail {font-size:medium;text-align:left;background-color: #F5F5F5;padding: 15px 15px 15px 15px;}
 	-->
 	</style>
-	
+
 </head>
 <body class="background_main">
 	<h2>Firmen -  Zusammenlegung</h2>
@@ -226,7 +226,7 @@ if ($firma->getFirmenTypen())
 	   <div style="-moz-user-select: none;"  class="ui-resizable-handle ui-resizable-e"></div>
 	   <div style="-moz-user-select: none;"  class="ui-resizable-handle ui-resizable-s"></div>
 	   <div  style="z-index: 1001; -moz-user-select: none;" class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se"></div>
-	   
+
 		<div id="info" class="info">
 			<div id="infodaten" class="infodaten">
 				<div style="text-align:right;color:#000; cursor: pointer; cursor: hand;"><b id="info_close">schliessen  <img border="0" src="../../skin/images/cross.png" title="schliessen">&nbsp;</b></div>
@@ -238,22 +238,22 @@ if ($firma->getFirmenTypen())
 					    	       $("div#info").hide("slow");
 				   			});
 						});
-					</script>	
+					</script>
 				</div>
-				<br>		
+				<br>
 				<div id="infodetail" class="infodetail">&nbsp;</div>
 				<br>
 			</div>
 		</div>
 	</div>
-		
+
 	<!-- Suchauswahl -->
 	<table width="100%">
 		<tr>
 			<td colspan="2" align="center">
 					&nbsp;Typ:&nbsp;<select id="firmentyp_kurzbz" name="firmentyp_kurzbz">
 						<option value="">-- Alle --</option>';
-					<?php 
+					<?php
 					foreach ($rows as $row)
 						echo '<option value="'.$row->firmentyp_kurzbz.'" '.($row->firmentyp_kurzbz==$firmentyp_kurzbz1?' selected ':'').'>'.$row->firmentyp_kurzbz.'</option>';
 					?>
@@ -270,7 +270,7 @@ if ($firma->getFirmenTypen())
 				<td>&nbsp;Suche:&nbsp;<input type="text" id="filter1" name="filter1" value="<?php echo $filter1;?>">
 					&nbsp;<input type="button" name="suchen1" value="suchen" onclick="set_firmen_search('geloescht','filter1','firmentyp_kurzbz');">
 				</td>
-			</tr>				
+			</tr>
 			</table>
 			</td>
 			<td width="50%" align="right">
@@ -279,19 +279,19 @@ if ($firma->getFirmenTypen())
 				<td>&nbsp;Suche:&nbsp;<input type="text" id="filter2" name="filter2" value="<?php echo $filter2;?>">
 					&nbsp;<input type="button" name="suchen2" value="suchen" onclick="set_firmen_search('bleibt','filter2','firmentyp_kurzbz');">
 				</td>
-			</tr>				
+			</tr>
 			</table>
 			</td>
-		</tr>				
+		</tr>
 	</table>
 
 	<hr>
-	
-	<!-- SuchErgebniss -->			
+
+	<!-- SuchErgebniss -->
 	<table width="100%">
 		<tr>
 			<th width="50%">Das wird gel&ouml;scht</th>
-			<th>&nbsp;<input type="button" name="aendern2" value="Zusammenlegen" onclick="set_firmen_zusammenlegen();">&nbsp;</th>				
+			<th>&nbsp;<input type="button" name="aendern2" value="Zusammenlegen" onclick="set_firmen_zusammenlegen();">&nbsp;</th>
 			<th width="50%">Das bleibt</th>
 		</tr>
 		<tr>

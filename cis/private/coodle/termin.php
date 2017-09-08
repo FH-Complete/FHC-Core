@@ -19,7 +19,7 @@
  */
 /**
  * Coodle Terminauswahl
- * 
+ *
  * Funktionen:
  * - hinzufuegen von Ressourcen (Personen, Raeume und externe Personen)
  * - setzen von Terminvorschlaegen
@@ -41,7 +41,7 @@ $datum_obj = new datum();
 
 if(!check_lektor($uid))
 	die($p->t('global/keineBerechtigung'));
-	
+
 if(!isset($_REQUEST['coodle_id']))
 	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 
@@ -97,14 +97,14 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 						echo "Fehler beim Laden des Benutzers ".$db->convert_html_chars($row->uid);
 						continue;
 					}
-					
+
 					if($benutzer->geschlecht=='w')
 						$anrede = "Sehr geehrte Frau ";
 					else
 						$anrede = "Sehr geehrter Herr ";
-						
+
 					$anrede.= $benutzer->titelpre.' '.$benutzer->vorname.' '.$benutzer->nachname.' '.$benutzer->titelpost;
-					
+
 					// Interner Teilnehmer
 					$email = $row->uid.'@'.DOMAIN;
 					$link = APP_ROOT.'cis/public/coodle.php?coodle_id='.urlencode($coodle_id).'&uid='.urlencode($row->uid);
@@ -113,7 +113,7 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 				{
 					// Externe Teilnehmer
 					$email = $row->email;
-					$anrede='Sehr geehrte(r) Herr/Frau '.$row->name; 
+					$anrede='Sehr geehrte(r) Herr/Frau '.$row->name;
 					$link=APP_ROOT.'cis/public/coodle.php?coodle_id='.urlencode($coodle_id).'&zugangscode='.urlencode($row->zugangscode);
 				}
 				else
@@ -128,7 +128,7 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 				$benutzer->load($uid);
 				if ($benutzer->alias!='')
 					$von = $benutzer->alias.'@'.DOMAIN;
-				
+
 				$html=$anrede.'!<br><br>
 					Sie wurden zu einer Terminumfrage zum Thema "'.$db->convert_html_chars($coodle->titel).'" eingeladen.
 					<br>
@@ -138,7 +138,7 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 					Beschreibung:<br><br>
 					'.$coodle->beschreibung.'<br><br>
 					'.nl2br($sign);
-				
+
 				$text=$anrede."!\n\nSie wurden zu einer Terminumfrage zum Thema \"".$db->convert_html_chars($coodle->titel)."\" eingeladen.\n
 					Bitte folgen Sie dem Link, um Ihre Terminwünsche bekannt zu geben:\n
 					$link\n\n
@@ -146,13 +146,13 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 					".strip_tags($coodle->beschreibung)."
 					\n\n
 					$sign";
-				
+
 				$mail = new mail($email, $von,'Terminumfrage - '.$coodle->titel, $text);
 				$mail->setHTMLContent($html);
 				if($mail->send())
 				{
 					echo $p->t('coodle/mailVersandtAn',array($email))."<br>";
-				} 
+				}
 			}
 
 			echo '<br><b>'.$p->t('coodle/erfolgreichGestartet').'</b>';
@@ -167,7 +167,7 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 	{
 		die($p->t('coodle/keineTermineVorhanden'));
 	}
-		
+
 	echo '</body></html>';
 	exit();
 }
@@ -178,21 +178,24 @@ echo '<html>
 	<link rel="stylesheet"  href="../../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<link rel="stylesheet" href="../../../skin/jquery.css" type="text/css"/>
-	<script type="text/javascript" src="../../../include/js/jquery1.9.min.js"></script>	
+	<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<link rel="stylesheet" type="text/css" href="../../../include/js/fullcalendar/fullcalendar.css" />
 	<link rel="stylesheet" type="text/css" href="../../../include/js/fullcalendar/fullcalendar.print.css" media="print" />
-	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css"/>	
+	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css"/>
 	<script type="text/javascript" src="../../../include/js/fullcalendar/fullcalendar.min.js"></script>
 	<script type="text/javascript" src="../../../include/js/jquery.contextmenu.r2.js"></script>
 	<title>'.$p->t('coodle/coodle').' - '.$p->t('coodle/termine').'</title>
-	
+
 <style type="text/css">
-		
+
 	#wrap {
 		width: 1100px;
 		margin: 0 auto;
 		}
-		
+
 	#wrap2 {
 		float: left;
 	}
@@ -204,7 +207,7 @@ echo '<html>
 		background: #eee;
 		text-align: left;
 		}
-		
+
 	#external-events h4 {
 		font-size: 17px;
 		margin-top: 0;
@@ -212,7 +215,7 @@ echo '<html>
 		padding-bottom: 10px;
 		text-decoration: none;
 		}
-		
+
 	.external-event { /* try to mimick the look of a real event */
 		margin: 10px 0;
 		padding: 2px 4px;
@@ -223,13 +226,13 @@ echo '<html>
 		border-radius: 2px;
 		box-shadow: 3px 3px 3px #bbb;
 		}
-		
+
 	#external-events p {
 		margin: 1.5em 0;
 		font-size: 11px;
 		color: #666;
 		}
-		
+
 	#external-events p input {
 		margin: 0;
 		vertical-align: middle;
@@ -239,7 +242,7 @@ echo '<html>
 		float: right;
 		width: 900px;
 		}
-		
+
 	#ressourcen {
 		width: 150px;
 		padding: 0 10px;
@@ -248,7 +251,7 @@ echo '<html>
 		background: #eee;
 		text-align: left;
 		}
-		
+
 	#ressourcen h4 {
 		font-size: 17px;
 		margin-top: 0;
@@ -256,7 +259,7 @@ echo '<html>
 		padding-bottom: 10px;
 		text-decoration: none;
 		}
-		
+
 	.ressourcen {
 		margin: 10px 0;
 		padding: 2px 4px;
@@ -265,13 +268,13 @@ echo '<html>
 		font-size: .85em;
 		cursor: pointer;
 		}
-		
+
 	#ressourcen p {
 		margin: 1.5em 0;
 		font-size: 11px;
 		color: #666;
 		}
-		
+
 	#ressourcen p input {
 		margin: 0;
 		vertical-align: middle;
@@ -285,8 +288,8 @@ echo '<html>
 	{
 		font-size: 0.8em;
 	}
-	
-	#fertig 
+
+	#fertig
 	{
 		width: 150px;
 		padding: 0 10px;
@@ -295,8 +298,8 @@ echo '<html>
 		background: #eee;
 		text-align: left;
 	}
-		
-	#fertig h4 
+
+	#fertig h4
 	{
 		font-size: 17px;
 		margin-top: 0;
@@ -304,31 +307,31 @@ echo '<html>
 		padding-bottom: 10px;
 		text-decoration: none;
 	}
-		
-	#fertig p 
+
+	#fertig p
 	{
 		margin: 1.5em 0;
 		font-size: 11px;
 		color: #666;
 	}
-		
+
 </style>
 <script type="text/javascript">
 
-	$(document).ready(function() 
+	$(document).ready(function()
 	{
-		// Coodle Termin initialisieren	
-		$("#external-events div.external-event").each(function() 
+		// Coodle Termin initialisieren
+		$("#external-events div.external-event").each(function()
 		{
-			var eventObject = 
+			var eventObject =
 			{
 				title: $.trim($(this).text()), // use the elements text as the event title
 				termin: true
 			};
-			
+
 			// store the Event Object in the DOM element so we can get to it later
 			$(this).data("eventObject", eventObject);
-			
+
 			// make the event draggable using jQuery UI
 			$(this).draggable(
 			{
@@ -338,8 +341,8 @@ echo '<html>
 				scroll: false		// behebt ruckeln im IE7
 			});
 		});
-	
-	
+
+
 		// Kalender Initialisieren
 		$("#calendar").fullCalendar(
 		{
@@ -353,12 +356,12 @@ echo '<html>
 			timeFormat: {
 						    // for agendaWeek and agendaDay
 						    agenda: "H:mm{ - H:mm}", // 5:00 - 6:30
-						
+
 						    // for all other views
 						    "": "H:mm"
 						},
 			allDaySlot: true, // Ganztaegig Row anzeigen
-			allDayText: "",	//Text in ganztaegig Spalte	
+			allDayText: "",	//Text in ganztaegig Spalte
 			axisFormat: "H:mm",
 			monthNames: ["Jänner", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
 			monthNamesShort: ["Jän", "Feb", "Mär", "Apr", "Mai", "Jun","Jul", "Aug", "Sep", "Okt", "Nov", "Dez"],
@@ -388,16 +391,16 @@ echo '<html>
 			editable: true,
 			disableResizing: true,
 			droppable: true, // this allows things to be dropped onto the calendar !!!
-			drop: function(date, allDay) 
-			{ 
+			drop: function(date, allDay)
+			{
 				// Event wird auf Kalender gezogen
-			
+
 				// gedropptes Event holen
 				var originalEventObject = $(this).data("eventObject");
-				
+
 				// we need to copy it, so that multiple events dont have a reference to the same object
 				var copiedEventObject = $.extend({}, originalEventObject);
-				
+
 				// assign it the date that was reported
 				copiedEventObject.start = date;
 				copiedEventObject.allDay = allDay;
@@ -430,15 +433,15 @@ echo '<html>
 					// Termin Speichern
 					$.ajax({
 						type:"POST",
-						url:"coodle_worker.php", 
-						data:{ 
+						url:"coodle_worker.php",
+						data:{
 								"work": "addTermin",
 								"datum": datum,
 								"uhrzeit": uhrzeit,
 								"coodle_id": "'.$coodle_id.'"
 							 },
-						success: function(data) 
-							{ 
+						success: function(data)
+							{
 								if(isNaN(data))
 									alert("ERROR:"+data)
 								else
@@ -456,10 +459,10 @@ echo '<html>
 			eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view)
 			{
 				// Verschiebung eines Termins
-				
+
 				datum = $.fullCalendar.formatDate(event.start,"yyyy-MM-dd")
 				uhrzeit = $.fullCalendar.formatDate(event.start,"HH:mm:ss")
-				
+
 				if(allDay)
 				{
 					// Wenn der Termin in die ganztaegig spalte gezogen wird,
@@ -469,7 +472,7 @@ echo '<html>
 					event.allDay=false;
 					$("#calendar").fullCalendar("renderEvent", event, true);
 				}
-				
+
 				// Pruefen ob der Termin in der Vergangenheit liegt
 				if(datum+\' \'+uhrzeit<=\''.date('Y-m-d H:i:s').'\')
 				{
@@ -481,16 +484,16 @@ echo '<html>
 					// Verschiebung Speichern
 					$.ajax({
 						type:"POST",
-						url:"coodle_worker.php", 
-						data:{ 
+						url:"coodle_worker.php",
+						data:{
 								"work": "moveTermin",
 								"datum": datum,
 								"uhrzeit": uhrzeit,
 								"coodle_termin_id": event.id,
 								"coodle_id": "'.$coodle_id.'"
 							 },
-						success: function(data) 
-							{ 
+						success: function(data)
+							{
 								if(data!="true")
 								{
 									alert("ERROR:"+data)
@@ -505,28 +508,28 @@ echo '<html>
 					});
 				}
 			},
-			eventRender: function (event, element) 
-			{ 
+			eventRender: function (event, element)
+			{
 				// Conext Menue nur an Umfragetermine nicht an FreeBusy Eintraege haengen
 				if(event.termin)
 				{
 					element.contextMenu("myContextMenu",
 					{
-						bindings: 
+						bindings:
 						{
-							"delete": function(t) 
+							"delete": function(t)
 								{
 									// Termin loeschen
 									$.ajax({
 										type:"POST",
-										url:"coodle_worker.php", 
-										data:{ 
+										url:"coodle_worker.php",
+										data:{
 												"work": "removeTermin",
 												"coodle_termin_id": event.id,
 												"coodle_id": "'.$coodle_id.'"
 											 },
-										success: function(data) 
-											{ 
+										success: function(data)
+											{
 												if(data!="true")
 												{
 													alert("ERROR:"+data)
@@ -540,11 +543,11 @@ echo '<html>
 												}
 											},
 										error: function() { alert("error"); }
-									});				
+									});
 								}
 						}
 					});
-				}		
+				}
 			},
 			dayClick: function(date, allDay, jsEvent, view)
 			{
@@ -557,7 +560,7 @@ echo '<html>
 		});
 	});
 
-	
+
 </script>
 </head>
 <body>
@@ -592,11 +595,11 @@ echo '
 	'.$p->t('coodle/ressource').':<br>
 	<input id="input_ressource" type="text" size="10" />
 	</p>
-	
+
 	<script>
-	$(document).ready(function() 
+	$(document).ready(function()
 	{
-		// Autocomplete Feld fuer Ressourcen initialisieren	
+		// Autocomplete Feld fuer Ressourcen initialisieren
 		$("#input_ressource").autocomplete({
 			source: "coodle_autocomplete.php?work=ressource",
 			minLength:2,
@@ -612,31 +615,31 @@ echo '
 			select: function(event, ui)
 			{
 				//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
-				addRessource(ui.item.uid, ui.item.typ, ui.item.bezeichnung);	
+				addRessource(ui.item.uid, ui.item.typ, ui.item.bezeichnung);
 				ui.item.value="";
 				ui.item.label="";
 			}
-		});		
+		});
 	 });
-	
+
 	/*
  	 * Fuegt eine Ressource hinzu
-	 */  
+	 */
 	function addRessource(id, typ, bezeichnung)
 	{
 		// Ressource Speichern
 		$.ajax({
 				type:"POST",
-				url:"coodle_worker.php", 
-				data:{ 
+				url:"coodle_worker.php",
+				data:{
 						"work": "addressource",
-						"id": id, 
+						"id": id,
 						"typ": typ,
 						"bezeichnung": bezeichnung,
 						"coodle_id": "'.$coodle_id.'"
 					 },
-				success: function(data) 
-					{ 
+				success: function(data)
+					{
 						if(data!="true")
 							alert("ERROR:"+data)
 						else
@@ -660,7 +663,7 @@ echo '
 	  	var text = document.createTextNode(bezeichnung);
 	  	div.appendChild(text);
 	  	bezeichnung = div.innerHTML;
-	  	
+
 		// Anzeige der Ressource mit Loeschen Button
 		var code = \'<span class="ressourceItem"> \
 				<a href="#delete" onclick="removeRessource(this, \\\'\'+id+\'\\\',\\\'\'+typ+\'\\\'); return false;"> \
@@ -692,15 +695,15 @@ echo '
 		// Ressource entfernen
 		$.ajax({
 				type:"POST",
-				url:"coodle_worker.php", 
-				data:{ 
+				url:"coodle_worker.php",
+				data:{
 						"work": "removeressource",
-						"id": id, 
+						"id": id,
 						"typ": typ,
 						"coodle_id": "'.$coodle_id.'"
 					 },
-				success: function(data) 
-					{ 
+				success: function(data)
+					{
 						if(data!="true")
 							alert("ERROR:"+data)
 						else
@@ -712,7 +715,7 @@ echo '
 					},
 				error: function() { alert("error"); }
 			});
-	
+
 	}
 
 	/*
@@ -720,7 +723,7 @@ echo '
 	 */
 	function removeRessourceFromContent(item, id, typ)
 	{
-		
+
 		$("#calendar").fullCalendar("removeEventSource",
 			{
 				url:"coodle_events.php?code="+encodeURIComponent(id+typ),
@@ -737,7 +740,7 @@ echo '
 	}';
 
 echo '
-	$(document).ready(function() 
+	$(document).ready(function()
 	{';
 
 // Bereits zugeteilte Ressourcen laden
@@ -784,7 +787,7 @@ if(!$coodletermin->getTermine($coodle_id))
 foreach($coodletermin->result as $row)
 {
 	echo '
-		var eventObject = 
+		var eventObject =
 		{
 			id: "'.$db->convert_html_chars($row->coodle_termin_id).'",
 			title: "'.$db->convert_html_chars($event_titel).'",
@@ -810,7 +813,7 @@ echo '
 		$("#externePersonen").hide();
 		$("#ressourcenInput").show();
 	}
-		
+
 	function AddExternal()
 	{
 		name=$("#externePersonName").val();

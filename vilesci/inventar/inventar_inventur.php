@@ -22,7 +22,7 @@
  */
 /**
  * Inventur
- * 
+ *
  * Formular zur Unterstuetzung der Inventur
  * - Zuerst wird ein Ort oder eine Person ausgewaehlt fuer die die Inventur durchgefuehrt werden soll
  * - dann werden alle Betriebsmittel eingescannt. Diese werden automatisch der Person/Ort zugeteilt und das Inventurdatum wird gesetzt
@@ -55,7 +55,7 @@ $errormsg=array();
 $recht=false;
 $schreib_recht=false;
 $datum_obj = new datum();
-	
+
 
 $ort_kurzbz=trim((isset($_REQUEST['ort_kurzbz']) ? $_REQUEST['ort_kurzbz']:''));
 $person_id=trim(isset($_REQUEST['person_id']) ? $_REQUEST['person_id']:'');
@@ -91,7 +91,7 @@ if ($ajax!='')
 			$ort_kurzbz = $_REQUEST['ort_kurzbz'];
 			$person_id = $_REQUEST['person_id'];
 			$errormsg='';
-			
+
 			$betriebsmittel_obj = new betriebsmittel();
 			if($betriebsmittel_obj->load_inventarnummer($inventarnummer))
 			{
@@ -100,7 +100,7 @@ if ($ajax!='')
 				$value['ort_old']=$betriebsmittel_obj->ort_kurzbz;
 				$value['inventarnummer']=$inventarnummer;
 				$value['betriebsmittel_id']=$betriebsmittel_obj->betriebsmittel_id;
-				
+
 				//Inventarisierung speichern und ggf den Ort anpassen
 				if($ort_kurzbz!='' && $ort_kurzbz!=$betriebsmittel_obj->ort_kurzbz)
 				{
@@ -110,12 +110,12 @@ if ($ajax!='')
 				$betriebsmittel_obj->inventurvon = $uid;
 				if(!$betriebsmittel_obj->save(false))
 					$errormsg = $betriebsmittel_obj->errormsg;
-				
+
 				if($person_id!='')
 				{
 					$bmp = new betriebsmittelperson();
 					$zuordnen=true;
-					
+
 					//Wenn das Betriebsmittel an eine andere Person ausgegeben ist, dann zurueckgeben
 					if($bmp->load_betriebsmittelpersonen($betriebsmittel_obj->betriebsmittel_id))
 					{
@@ -128,10 +128,10 @@ if ($ajax!='')
 									$errormsg = $bmp->errormsg;
 							}
 						}
-						else 
+						else
 							$zuordnen=false;
 					}
-					
+
 					if($zuordnen)
 					{
 						//Neue Person zuordnen
@@ -149,10 +149,10 @@ if ($ajax!='')
 				}
 				$value['person_id']=$person_id;
 				$value['errormsg']=$errormsg;
-				
+
 				echo json_encode($value);
 			}
-			else 
+			else
 			{
 				echo 'ERROR LOADING:'.$inventarnummer;
 			}
@@ -175,12 +175,12 @@ if(isset($_POST['updateliste']))
 				if(!$bm_obj->save(false))
 					echo 'Fehler beim Speichern von ID:'.$id;
 			}
-			else 
+			else
 			{
 				echo 'Fehler beim Laden von ID:'.$id;
 			}
 		}
-				
+
 		$work='uebersicht';
 	}
 	if(isset($_POST['work']) && $_POST['work']=='ausscheiden')
@@ -190,7 +190,7 @@ if(isset($_POST['updateliste']))
 		foreach($ids as $id)
 		{
 			$bm_obj = new betriebsmittel_betriebsmittelstatus();
-			
+
 			$bm_obj->betriebsmittel_id = $id;
 			$bm_obj->betriebsmittelstatus_kurzbz = 'ausgeschieden';
 			$bm_obj->datum = date('Y-m-d');
@@ -202,7 +202,7 @@ if(isset($_POST['updateliste']))
 			if(!$bm_obj->save())
 				echo 'Fehler beim Speichern von ID:'.$id;
 		}
-		
+
 		$work='uebersicht';
 	}
 	else
@@ -223,7 +223,7 @@ if(isset($_POST['updateliste']))
 				echo 'Fehler beim Laden von ID:'.$id;
 			}
 		}
-		
+
 		$work='uebersicht';
 	}
 }
@@ -235,9 +235,10 @@ if(isset($_POST['updateliste']))
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
-<!--		<script src="../../include/js/jquery.js" type="text/javascript"></script> -->
-<!--		<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script> -->
-		<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
+		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 		<script type="text/javascript">
 		var ajxFile = "<?php echo $_SERVER["PHP_SELF"];  ?>";
@@ -251,21 +252,21 @@ if(isset($_POST['updateliste']))
 					inventarnummerchange();
 			});
 		})
-		
+
 		function inventarnummerchange()
 		{
 			var item=document.getElementById('inventarnummer');
-			if (item.value.length>=10) 
+			if (item.value.length>=10)
 			{
 				setTimeout('loadInventar()',500);
 			}
 		}
-		
+
 		function loadInventar()
 		{
 			var inventarnummer = document.getElementById('inventarnummer').value;
 			erfasst.push(inventarnummer);
-			
+
 			$.ajax
 			(
 				{
@@ -277,11 +278,11 @@ if(isset($_POST['updateliste']))
 					{
 						var div = document.getElementById('inventarliste');
 						var li = document.createElement("li");
-						
+
 						li.innerHTML = '<a href="inventar.php?betriebsmittel_id='+phpData.betriebsmittel_id+'" target="_blank">'
 						+phpData.inventarnummer+'<\/a>'
 						+' - '+phpData.beschreibung+' - '+phpData.verwendung;
-						
+
 						div.appendChild(li);
 						document.getElementById('inventarnummer').value='';
 						document.getElementById('inventarnummer').focus();
@@ -301,12 +302,12 @@ if(isset($_POST['updateliste']))
 				}
 			);
 		}
-		
-		function formatItem(row) 
+
+		function formatItem(row)
 		{
 		    return row[0] + " <i>" + row[1] + "<\/i> ";
 		}
-		function ErrorSound() 
+		function ErrorSound()
 		{
 		    var audioElement = document.getElementById('sound1');
 		    audioElement.play();
@@ -314,7 +315,7 @@ if(isset($_POST['updateliste']))
 		</script>
 	</head>
 	<body>
-	
+
 <audio src="<?php echo APP_ROOT;?>skin/sounds/inventar_error.ogg" id="sound1"/>
   Your browser does not support the audio tag.
 </audio>
@@ -330,7 +331,7 @@ if(isset($_POST['updateliste']))
 						function selectItem(li) {
 						   return false;
 						}
-						
+
 						$(document).ready(function() {
 							$('#ort_kurzbz').autocomplete({
 								source: "inventar_autocomplete.php?work=inventar_ort",
@@ -363,12 +364,12 @@ if(isset($_POST['updateliste']))
 					  });
 						</script>
 				</td>
-				
+
 				<td>&nbsp;<label for="person_id">Mitarbeiter</label>&nbsp;
 					<input id="person_id" name="person_id" size="13" maxlength="14" value="<?php echo $person_id; ?>">
 						<script type="text/javascript">
-					
-						$(document).ready(function() 
+
+						$(document).ready(function()
 						{
 							$('#person_id').autocomplete({
 								source: "inventar_autocomplete.php?work=person",
@@ -387,7 +388,7 @@ if(isset($_POST['updateliste']))
 									ui.item.value=ui.item.person_id;
 								}
 							});
-							/*  $('#person_id').autocomplete('inventar_autocomplete.php', 
+							/*  $('#person_id').autocomplete('inventar_autocomplete.php',
 							  {
 								minChars:4,
 								matchSubset:1,matchContains:1,
@@ -438,9 +439,9 @@ if($work=='inventarisieren')
 		<hr />
 		<div id="inventarliste">
 		</div>';
-	
+
 	}
-	else 
+	else
 	{
 		echo 'Ort oder Person muss angegeben werden';
 	}
@@ -448,33 +449,33 @@ if($work=='inventarisieren')
 elseif($work=='uebersicht')
 {
 	echo '<hr>Die folgenden Betriebsmittel wurden in den letzten 20 Wochen nicht inventarisiert und sind zugeordnet:<br /><br />';
-	
+
 	$qry = "SELECT * FROM wawi.tbl_betriebsmittel LEFT JOIN wawi.tbl_bestellung USING(bestellung_id)
-			WHERE 
+			WHERE
 				(inventuramum is null OR inventuramum < now()-'20 weeks'::interval)";
 	if($ort_kurzbz!='')
 		$qry.="	AND ort_kurzbz='".addslashes($ort_kurzbz)."'";
 	if($person_id!='')
 	{
 		//Letzte zugeteilte Person filtern
-		$qry.=" 
+		$qry.="
 		AND EXISTS (
-			SELECT person_id 
+			SELECT person_id
 			FROM wawi.tbl_betriebsmittelperson
-			WHERE 
-				retouram IS NULL 
+			WHERE
+				retouram IS NULL
 				AND betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id
 				AND person_id='".addslashes($person_id)."'
 		)";
 	}
 	//$qry.=" AND wawi.get_status_betriebsmittel(betriebsmittel_id) IN ('Aenderung','Inventar Extern','Inventur','Reparatur','vorhanden','keineZuordnung')";
-	$qry.=" AND (SELECT betriebsmittelstatus_kurzbz 
+	$qry.=" AND (SELECT betriebsmittelstatus_kurzbz
         FROM wawi.tbl_betriebsmittel_betriebsmittelstatus
         WHERE betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id
         ORDER BY datum desc,insertamum desc, betriebsmittelbetriebsmittelstatus_id desc
         LIMIT 1) IN ('Aenderung','Inventar Extern','Inventur','Reparatur','vorhanden','keineZuordnung')
         AND betriebsmitteltyp NOT IN('Zutrittskarte','Schluessel')";
-	
+
 	$db = new basis_db();
 	if($result = $db->db_query($qry))
 	{
@@ -509,14 +510,14 @@ elseif($work=='uebersicht')
 		echo '<SELECT name="work">
 				<OPTION value="dummy">Verschieben in DUMMY Raum</OPTION>
 				<OPTION value="ausscheiden">Status&auml;nderung - ausgeschieden</OPTION>';
-		
+
 		$ort = new ort();
 		$ort->getAll();
 		foreach($ort->result as $row_ort)
 		{
 			echo '<option value="'.$row_ort->ort_kurzbz.'">'.$row_ort->ort_kurzbz.'</option>';
 		}
-		echo '		
+		echo '
 			</SELECT>';
 		echo '<input type="hidden" name="ort_kurzbz" value="'.$ort_kurzbz.'" />';
 		echo '<input type="hidden" name="person_id" value="'.$person_id.'" />';

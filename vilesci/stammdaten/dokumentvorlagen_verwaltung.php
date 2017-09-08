@@ -19,9 +19,9 @@
  */
 /**
  * Dokumentvorlagen
- * 
+ *
  * - Anlegen und Bearbeiten von Dokumentvorlagen
- * 
+ *
  */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
@@ -62,10 +62,18 @@ echo '
 		<title>Dokumentvorlagen Verwaltung</title>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<script type="text/javascript" src="../../include/js/jquery.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
+<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+<script type="text/javascript" src="../../include/js/sizzle-0.9.3.js"></script>
 		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 		<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-		<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 		<script type="text/javascript">
 			$(document).ready(function()
 			{
@@ -111,13 +119,13 @@ if(isset($_POST['speichern']))
 		//Neue Vorlage anlegen
 		$dokumentvorlage->new=true;
 	}
-	
+
 	$studiengang = new studiengang();
 	$studiengang->getStudiengangFromOe($_POST['oe_kurzbz']);
-	
+
 	if ($studiengang->studiengang_kz=='')
 		$studiengang_kz = 0;
-	else 
+	else
 		$studiengang_kz = $studiengang->studiengang_kz;
 
 	$dokumentvorlage->vorlage_kurzbz = $_POST['vorlage_kurzbz'];
@@ -179,7 +187,7 @@ if($vorlage_kurzbz=='')
 else
 	$selected='';
 echo "<OPTION value='".$_SERVER['PHP_SELF']."?vorlage_kurzbz=&oe_kurzbz=$oe_kurzbz' $selected>Alle Vorlagen</OPTION>";
-foreach ($vorlage->result as $row) 
+foreach ($vorlage->result as $row)
 {
 	//if($reihungstest_id=='')
 	//	$reihungstest_id=$row->reihungstest_id;
@@ -232,7 +240,7 @@ if(!$neu)
 	if(!$vorlageOE->loadVorlageOE($vorlagestudiengang_id))
 		die('Vorlage existiert nicht');
 }
-else 
+else
 {
 	$vorlageOE->vorlage_kurzbz = $vorlage_kurzbz;
 	$vorlageOE->oe_kurzbz = $oe_kurzbz;
@@ -351,14 +359,14 @@ else
 			echo 'Fehler beim Speichern';
 		}
 	}
-	
+
 	echo '
 		<form method="POST" action="'.$_SERVER['PHP_SELF'].'">
 			<table>
 				<tr>
 					<td>Vorlage</td>
 					<td>';
-				
+
 			if($vorlageOE->oe_kurzbz!='')
 				$oe=$vorlageOE->oe_kurzbz;
 			elseif($oe_kurzbz!='')
@@ -368,7 +376,7 @@ else
 			//Vorlagen DropDown
 			$vorlage = new vorlage();
 			$vorlage->getAllVorlagen('bezeichnung');
-				
+
 			echo '<SELECT name="vorlage_kurzbz" id="vorlage">';
 			foreach ($vorlage->result as $row)
 			{
@@ -378,12 +386,12 @@ else
 					$selected='selected';
 				else
 					$selected='';
-					
+
 				echo '<OPTION value="'.$row->vorlage_kurzbz.'" '.$selected.'>'.$db->convert_html_chars(($row->bezeichnung==''?$row->vorlage_kurzbz:$row->bezeichnung)).'</OPTION>';
 				echo "\n";
 			}
 			echo '</SELECT>
-				
+
 					</td>
 				<tr>
 					<td>Organisationseinheit</td>
@@ -391,9 +399,9 @@ else
 			//OE-Dropdown
 			$organisationseinheit = new organisationseinheit();
 			$organisationseinheit->getAll();
-				
+
 			echo "<SELECT name='oe_kurzbz'>";
-				
+
 			foreach ($organisationseinheit->result as $row)
 			{
 				//Wenn keine OE uebergeben wurde, nimm die OE vom Studiengang 0
@@ -401,7 +409,7 @@ else
 					$selected='selected';
 				else
 					$selected='';
-				
+
 				$style='';
 				if ($row->aktiv==false)
 					$style='style="text-decoration: line-through"';
@@ -439,13 +447,13 @@ else
 				$val = 'Änderung Speichern';
 			else
 				$val = 'Neu anlegen';
-			
+
 			echo '<tr>
 					<td></td>
 					<td>
 						<input type="hidden" value="'.$vorlageOE->vorlagestudiengang_id.'" name="vorlagestudiengang_id" />
 						<input type="hidden" value="'.$oe_auswahl.'" name="oe_auswahl" />
-						
+
 						<input type="submit" name="speichern" value="'.$val.'">
 					</td>
 				</tr>
@@ -463,7 +471,7 @@ if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 	$oe = new organisationseinheit();
 	$vorlage = new vorlage();
 	//echo '<span style="font-size: 9pt">Anzahl: '.$db->db_num_rows($vorlage_version->result).'</span>';
-	
+
 	echo '<table class="tablesorter" id="t1">
 				<thead>
 				<tr class="liste">
@@ -477,7 +485,7 @@ if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 				</tr>
 				</thead>
 				<tbody>';
-	
+
 	foreach($vorlage_version->result as $row)
 	{
 		$oe->load($row->oe_kurzbz);
@@ -486,7 +494,7 @@ if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 		$style='';
 		if ($oe->aktiv==false)
 			$style='style="text-decoration: line-through"';
-		
+
 		echo '
 			<tr '.($row->aktiv==false?'style="color:grey"':'').'>
 				<td>'.$db->convert_html_chars($vorlage_bezeichnung).'</td>
@@ -497,7 +505,7 @@ if($vorlage_kurzbz!='' || $oe_kurzbz!='')
 				<td>'.($row->aktiv==false?'inaktiv':'aktiv').'</td>
 				<td><a href="'.$_SERVER['PHP_SELF'].'?vorlagestudiengang_id='.$row->vorlagestudiengang_id.'&vorlage_kurzbz='.$vorlage_kurzbz.'&oe_auswahl='.$oe_auswahl.'">Edit</a></td>
 				<td><a href="'.$_SERVER['PHP_SELF'].'?vorlagestudiengang_id='.$row->vorlagestudiengang_id.'&vorlage_kurzbz='.$vorlage_kurzbz.'&oe_auswahl='.$oe_auswahl.'&delete" onclick="return confdel(\''.$vorlage_bezeichnung.'\',\''.$row->version.'\')">Delete</a></td>
-				
+
 			</tr>';
 	}
 	echo '</tbody></table>';

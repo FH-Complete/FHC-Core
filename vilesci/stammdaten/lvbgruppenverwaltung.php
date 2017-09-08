@@ -41,14 +41,14 @@ if (!$db = new basis_db())
 		<!-- Script zum erstellen des Trees-->
 		<script type="text/javascript" src="../../include/js/jstree/jquery.jstree.js"></script>
 		<!-- Script zum speichern der geöffneten Tree-Nodes-->
-		<script type="text/javascript" src="../../include/js/jquery.cookie.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jquery-cookie/jquery.cookie.js"></script>
 		<!-- Script zum Laden der Baumdaten per AJAX-Request-->
 		<script type="text/javascript" src="lvbgruppenverwaltung.js"></script>
-		
+
 		<style type="text/css">
 			/*CSS to remove Folder Icon*/
-			.jstree li a ins { display:none !important; } 
-			
+			.jstree li a ins { display:none !important; }
+
 			#ajaxData {
 				float: left;
 			}
@@ -56,7 +56,7 @@ if (!$db = new basis_db())
 				float: left;
 				width: 30%;
 			}
-			
+
 			#newDataDiv {
 				float: left;
 			}
@@ -66,7 +66,7 @@ if (!$db = new basis_db())
 				top: 5em;
 				float: left;
 			}
-			
+
 			li {
 				margin-top: 0.2em !important;
 				margin-bottom: 0.2em !important;
@@ -141,7 +141,7 @@ if (!$db = new basis_db())
 		echo "<div id='treeContainer'></div>";
 		echo "<div id='ajaxData'></div></div>";
 		echo "<div id='newDataDiv'></div>";
-		
+
 		echo "<form style='visibility: hidden' id='newDataForm' method='POST' action='javascript:newSemesterForNewStudiengang(\"".$studiengang_kz."\");'>
 			<input type='hidden' name='type' value='neu'>
 			<input type='hidden' name='studiengang_kz' value='".$studiengang_kz."' />

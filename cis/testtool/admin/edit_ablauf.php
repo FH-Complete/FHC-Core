@@ -57,7 +57,10 @@ echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="../../../include/js/jquery1.9.min.js" ></script>
+	<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script type="text/javascript">
     $(document).ready(function()
     {
@@ -130,7 +133,7 @@ echo '</tr><tr><td>Semester: </td><td><SELECT name="semester" onchange="document
 $i=0; $selected='';
 for ($i=1; $i<11; $i++)
 {
-	if ($semester == $i) 
+	if ($semester == $i)
 		$selected = 'selected';
 	echo '<OPTION value="'.$i.'" '.$selected.' >'.$i.'</OPTION>';
 	$selected = '';
@@ -179,12 +182,12 @@ if (isset($_POST['saveAblaufVorgabe']) && $_POST['saveAblaufVorgabe']=='new')
 			$ablauf->content_id = $_POST['content_id'];
 			$ablauf->insertvon = $user;
 			$ablauf->insertamum = date('Y-m-d H:i:s');
-	
+
 			if (!$ablauf->saveAblaufVorgabe(true))
 				echo $ablauf->errormsg;
 		}
-		else 
-			echo '<span class="error">Die Content ID '.$_POST['content_id'].' existiert nicht</span>'; 
+		else
+			echo '<span class="error">Die Content ID '.$_POST['content_id'].' existiert nicht</span>';
 	}
 	else
 	{
@@ -217,10 +220,10 @@ if (isset($_GET['action']) && $_GET['action']=='edit')
 		$ablauf_id = $ablauf->result[0];
 		$ablauf = new ablauf($ablauf_id);
 		$ablauf = $ablauf->result[0];
-		
+
 		$gebiet = new gebiet($_POST['gebiet_id']);
 		$studiengang = new studiengang($stg_kz);
-		
+
 		echo '<table><form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&action=editsave" method="POST">
 				<tr><td>Studiengang_kz: </td><td><input type="text" name="stg_kz" value="'.strtoupper($studiengang->typ.$studiengang->kurzbz).' ('.$studiengang->bezeichnung.')'.'" style="width:98.5%" disabled /></td></tr>
 				<tr><td>Gebiet: </td><td><input type="text" value="'.$gebiet->bezeichnung.' ('.$gebiet->kurzbz.')" style="width:98.5%" disabled /><input type="hidden" name="gebiet_id" value="'.$ablauf->gebiet_id.'"/></td></tr>
@@ -268,7 +271,7 @@ if (isset($_GET['action']) && $_GET['action']=='editsave')
 		$ablauf->ablauf_vorgaben_id = $_POST['ablauf_vorgaben_id'];
 		if (isset($_POST['studienplan_id'])) // && $_POST['studienplan_id']!=''
 			$ablauf->studienplan_id = $_POST['studienplan_id'];
-		
+
 		if (!$ablauf->save(false))
 			echo $ablauf->errormsg;
 	}
@@ -291,13 +294,13 @@ else
 {
 	if (isset($semester) && $semester!='')
 		$ablauf->getAblaufGebiete($stg_kz, null, $semester);
-	else 
+	else
 		$ablauf->getAblaufGebiete($stg_kz);
 }
 $gebieteangehaengt = array();
 
 // Formular zum anlegen einer neuen Ablauf-Vorgabe
-		
+
 echo '<a onclick="document.getElementById(\'vorgabeForm\').style.display=\'block\'">Neue Ablauf-Vorgabe</a>';
 echo '<div id="vorgabeForm" style="display: none"><table><form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&action=edit" method="POST">
 		<tr><td><input type="hidden" name="stg_kz" value="'.$stg_kz.'"/>
@@ -353,7 +356,7 @@ if ($stg_kz != -1)
 				</form></td>
 				</tr>';
 	}
-	
+
 	$gebiet->getAll();
 	echo '</tbody><tfoot><tr><form action="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&stp_id='.$stp_id.'&semester='.$semester.'&action=save" method="POST"><input type="hidden" name="stg_kz" value="'.$stg_kz.'" /><td><SELECT name="gebiet_id">';
 	foreach ($gebiet->result as $row)
@@ -445,7 +448,7 @@ if(isset($_POST['speichern']))
 				$bezeichnung_mehrsprachig[$row_sprache->sprache]=$_POST['bezeichnung_mehrsprachig_'.$row_sprache->sprache];
 		}
 		$gebiet->bezeichnung_mehrsprachig = $bezeichnung_mehrsprachig;
-		
+
 		$gebiet->kurzbz = $_POST['kurzbz'];
 		$gebiet->bezeichnung = $_POST['bezeichnung_mehrsprachig_German'];
 		$gebiet->beschreibung = $_POST['beschreibung'];
@@ -516,22 +519,22 @@ function drawStudienplanDropdown($stg_kz, $db, $name='', $autosubmitform=null, $
 	$orgform_arr=array();
 	foreach($orgform_obj->result as $row)
 		$orgform_arr[$row->orgform_kurzbz]=$row->bezeichnung;
-	
+
 	foreach($studienplan_obj->result as $row_sto)
 	{
 		$studienordnung_arr[$row_sto->studienordnung_id]['bezeichnung']=$row_sto->bezeichnung_studienordnung;
 		$studienplan_arr[$row_sto->studienordnung_id][$row_sto->studienplan_id]['bezeichnung']=$row_sto->bezeichnung_studienplan;
-	
+
 		$studienplan_arr[$row_sto->studienordnung_id][$row_sto->studienplan_id]['orgform_kurzbz']=$row_sto->orgform_kurzbz;
 		$studienplan_arr[$row_sto->studienordnung_id][$row_sto->studienplan_id]['sprache']=$sprachen_arr[$row_sto->sprache];
 		$studienplaene_verwendet[$row_sto->studienplan_id] = $row_sto->bezeichnung_studienplan;
 	}
-	
+
 	$selected = isset($_GET['stp_id'])?'':'selected';
 	echo "<SELECT id='studienplan_dropdown' name='".$name."' ";
 	if (isset($autosubmitform) && $autosubmitform!='')
 		echo 'onchange="document.getElementById(\''.$autosubmitform.'\').submit();"';
-	
+
 	echo " style='".$style."'>";
 	echo "<OPTION value='' ".$selected.">Studienplan auswaehlen</OPTION>";
 	// Pruefen ob uebergebene StudienplanID in Auswahl enthalten
@@ -555,9 +558,9 @@ function drawStudienplanDropdown($stg_kz, $db, $name='', $autosubmitform=null, $
 	foreach($studienordnung_arr as $stoid=>$row_sto)
 	{
 		$selected='';
-	
+
 		echo '<option value="" disabled>Studienordnung: '.$db->convert_html_chars($row_sto['bezeichnung']).'</option>';
-	
+
 		foreach ($studienplan_arr[$stoid] as $stpid=>$row_stp)
 		{
 			if (isset($_GET['stp_id']) && $_GET['stp_id']==$stpid)

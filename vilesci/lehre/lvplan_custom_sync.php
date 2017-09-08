@@ -30,17 +30,20 @@ require_once('../../include/studiengang.class.php');
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script> 
+	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 <script type="text/javascript">
-$(document).ready(function() 
-{ 
+$(document).ready(function()
+{
 	$( ".datepicker_datum" ).datepicker({
 		 changeMonth: true,
-		 changeYear: true, 
+		 changeYear: true,
 		 dateFormat: 'dd.mm.yy',
 		 });
 });
-		
+
 function enable()
 {
 	if(document.getElementById("nostudentmail").disabled == false)
@@ -64,18 +67,18 @@ function checkdatum()
 	var Datum,Tag,Monat,Jahr,vonDatum,bisDatum;
 
 	Datum=document.getElementById("von").value;
-    Tag=Datum.substring(0,2); 
+    Tag=Datum.substring(0,2);
     Monat=Datum.substring(3,5);
     Jahr=Datum.substring(6,10);
     vonDatum=Jahr+''+Monat+''+Tag;
-    
+
     Datum=document.getElementById("bis").value;
-    Tag=Datum.substring(0,2); 
+    Tag=Datum.substring(0,2);
     Monat=Datum.substring(3,5);
     Jahr=Datum.substring(6,10);
     bisDatum=Jahr+''+Monat+''+Tag;
 
-	if (bisDatum<vonDatum)  
+	if (bisDatum<vonDatum)
 	{
 		alert("Das Bis-Datum darf nicht kleiner als das Von-Datum sein");
 		document.getElementById("bis").focus();
@@ -124,10 +127,10 @@ function checkdatum()
 		<tr>
 			<td>Studiengang</td>
 			<td><SELECT name="studiengang_kz">';
-		
+
 	$stg = new studiengang();
 	$stg->getAll('typ, kurzbz');
-	
+
 	foreach($stg->result as $row)
 	{
 		echo '<option value="'.$row->studiengang_kz.'">'.$row->kuerzel.' ('.$row->kurzbzlang.')</option>';
@@ -154,7 +157,7 @@ function checkdatum()
 		<tr>
 			<td></td>
 			<td><input type="submit" value="Start" onclick="return checkdatum()"></td>
-		</tr>	
+		</tr>
 	</table>
 	</form>
 	</fieldset>';

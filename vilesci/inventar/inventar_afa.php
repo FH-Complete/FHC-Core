@@ -53,7 +53,7 @@
 	$berechtigung_kurzbz='wawi/inventar:begrenzt';
 	$schreib_recht=false;
 	$datum_obj = new datum();
-	
+
 // ------------------------------------------------------------------------------------------
 // Parameter Aufruf uebernehmen
 // ------------------------------------------------------------------------------------------
@@ -72,25 +72,25 @@
 	$jahr_monat=trim(isset($_REQUEST['jahr_monat']) ? $_REQUEST['jahr_monat']:'');
  	$afa=trim(isset($_REQUEST['afa']) ? $_REQUEST['afa']:'');
  	$inventur_jahr=trim(isset($_REQUEST['inventur_jahr']) ? $_REQUEST['inventur_jahr']:'');
-	
+
  	$debug=trim(isset($_REQUEST['debug']) ? $_REQUEST['debug']:false);
-			
+
  	$extend_search=trim(isset($_REQUEST['extend_search']) ?$_REQUEST['extend_search']:'false');
 	$check=$firma_id.$bestellung_id.$bestelldetail_id.$bestellnr.$hersteller.$betriebsmitteltyp.$beschreibung.$oe_kurzbz;
 	$extend_search=($check?'true':$extend_search);
-	
+
 	// Pruefen ob Schreibrechte (Anzeigen der Aenderungsmoeglichkeit)
 	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'su'))
 		$schreib_recht=true;
 	if (!$schreib_recht)
 		die('Sie haben keine Berechtigung f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-			
+
 // ------------------------------------------------------------------------------------------
 // Verarbeitung - Ajax oder Work
 // ------------------------------------------------------------------------------------------
  	$ajax=trim(isset($_REQUEST['ajax']) ?$_REQUEST['ajax']:false);
   	$work=trim(isset($_REQUEST['work']) ?$_REQUEST['work']:false);
-	
+
 	if (($ajax && strtolower($ajax)=='set_status')
 	||  ($work && strtolower($work)=='set_status') )
 	{
@@ -108,9 +108,9 @@
 				$oBetriebsmittel_betriebsmittelstatus->result=array();
 				$oBetriebsmittel_betriebsmittelstatus->errormsg='';
 				$oBetriebsmittel_betriebsmittelstatus->debug=$debug;
-	
+
 				$oBetriebsmittel_betriebsmittelstatus->new=true;
-	
+
 				$oBetriebsmittel_betriebsmittelstatus->betriebsmittelbetriebsmittelstatus_id=trim(isset($_REQUEST['betriebsmittelbetriebsmittelstatus_id']) ? $_REQUEST['betriebsmittelbetriebsmittelstatus_id']:'');
 				$oBetriebsmittel_betriebsmittelstatus->betriebsmittel_id=$oBetriebsmittel->betriebsmittel_id;
 				$oBetriebsmittel_betriebsmittelstatus->datum=date('Y-m-d');
@@ -128,7 +128,7 @@
 				$errormsg[]=$oBetriebsmittel->errormsg;
 		}
 		else
-			$errormsg[]='Sie haben keine Berechtigung fuer die Datenbearbeitung';				
+			$errormsg[]='Sie haben keine Berechtigung fuer die Datenbearbeitung';
 		// Fehlerausgabe bzw. Informationen ueber den Status der Verarbeitung
 	}
 
@@ -136,22 +136,22 @@
 	||  ($work && strtolower($work)=='set_position') )
 	{
 		if ($schreib_recht)
-		{	
+		{
 			$betriebsmittel_id=trim(isset($_REQUEST['betriebsmittel_id']) ? $_REQUEST['betriebsmittel_id']:'');
 			$oBetriebsmittel = new betriebsmittel($betriebsmittel_id);
 			$oBetriebsmittel->result=array();
 			$oBetriebsmittel->debug=$debug;
-	
+
 			$oBetriebsmittel->bestelldetail_id=$bestelldetail_id;
 			$oBetriebsmittel->updatevon=$uid;
 			$oBetriebsmittel->updateamum=null;
-	
+
 			if (!$oBetriebsmittel->save())
 				$errormsg[]=$oBetriebsmittel->errormsg;
 			// Fehlerausgabe bzw. Informationen ueber den Status der Verarbeitung
-		}	
+		}
 		else
-			$errormsg[]='Sie haben keine Berechtigung fuer die Datenbearbeitung';				
+			$errormsg[]='Sie haben keine Berechtigung fuer die Datenbearbeitung';
 	}
 	if (!empty($ajax))
 	{
@@ -188,7 +188,7 @@
 	{
 		if (!$oOrganisationseinheit->getAll())
 			$errormsg[]=$oOrganisationseinheit->errormsg;
-	}		
+	}
 	else
 	{
 		$oes=new organisationseinheit();
@@ -218,11 +218,19 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <!--		<link rel="stylesheet" href="../../include/js/jquery.css" rel="stylesheet" type="text/css"> -->
-		<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>	
-		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>	
+		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 
-<!--		<script src="../../include/js/jquery.js" type="text/javascript"></script> -->
-				
+<!--		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
+<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+<script type="text/javascript" src="../../include/js/sizzle-0.9.3.js"></script> -->
+
 		<script type="text/javascript">
 			var ajxFile = "<?php echo $_SERVER["PHP_SELF"];  ?>";
 			function set_status(output_id,betriebsmittelbetriebsmittelstatus_id,betriebsmittel_id,inventarnummer,bestellung_id,bestelldetail_id,betriebsmittelstatus_kurzbz)
@@ -272,7 +280,7 @@
 			    mydiv.style.display = (mydiv.style.display=='block'?'none':'block');
 			  }
 			}
-			function formatItem(row) 
+			function formatItem(row)
 			{
 			    return row[0] + " <i>" + row[1] + "</i> ";
 			}
@@ -290,11 +298,11 @@
 <!--					<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1500);}" id="inventarnummer" name="inventarnummer" type="text" size="10" maxlength="30" value="<?php echo $inventarnummer;?>" />&nbsp; -->
 					<input id="inventarnummer" name="inventarnummer" type="text" size="10" maxlength="30" value="<?php echo $inventarnummer;?>" />&nbsp;
 					<script type="text/javascript">
-						function selectItem(li) 
+						function selectItem(li)
 						{
 						   return false;
 						}
-						$(document).ready(function() 
+						$(document).ready(function()
 						{
 							$('#inventarnummer').autocomplete({
 								source: "inventar_autocomplete.php?work=inventarnummer",
@@ -314,11 +322,11 @@
 									setTimeout('document.sendform.submit()',1500);
 								}
 							});
-							/*  $('#inventarnummer').autocomplete('inventar_autocomplete.php', 
+							/*  $('#inventarnummer').autocomplete('inventar_autocomplete.php',
 							  {
 								minChars:2,
-								scroll: true, 
-						        scrollHeight: 200, 
+								scroll: true,
+						        scrollHeight: 200,
 								width:350,
 								onItemSelect:selectItem,
 								formatItem:formatItem,
@@ -377,7 +385,7 @@
 						function selectItem(li) {
 						   return false;
 						}
-						
+
 						$(document).ready(function() {
 							$('#ort_kurzbz').autocomplete({
 								source: "inventar_autocomplete.php?work=inventar_ort",
@@ -463,7 +471,7 @@
 						function selectItem(li) {
 						   return false;
 						}
-						
+
 						$(document).ready(function() {
 							$('#bestellnr').autocomplete({
 								source: "inventar_autocomplete.php?work=wawi_bestellnr",
@@ -502,7 +510,7 @@
 							function selectItem(li) {
 							   return false;
 							}
-						
+
 							$(document).ready(function() {
 								$('#bestellung_id').autocomplete({
 									source: "inventar_autocomplete.php?work=wawi_bestellung_id",
@@ -539,7 +547,7 @@
 							function selectItem(li) {
 							   return false;
 							}
-							
+
 							$(document).ready(function() {
 								$('#firma_id').autocomplete({
 									source: "inventar_autocomplete.php?work=wawi_firma_search",
@@ -568,14 +576,14 @@
 									extraParams:{'work':'wawi_firma_search'}
 								  }); */
 						  });
-						</script>				
+						</script>
 				</td>
 				<td><label for="hersteller">Hersteller</label>&nbsp;<input id="hersteller" name="hersteller" type="text" size="10" maxlength="30" value="<?php echo $hersteller;?>">&nbsp;
 					<script type="text/javascript">
 						function selectItem(li) {
 						   return false;
 						}
-						
+
 						$(document).ready(function() {
 							$('#hersteller').autocomplete({
 								source: "inventar_autocomplete.php?work=hersteller",
@@ -798,7 +806,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 					$htmlstring.='<option '.($betriebsmittelstatus_kurzbz_select==$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz?' selected="selected" ':'').' value="'.$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz.'">'.($resultBetriebsmittelstatus[$i]->beschreibung=='NULL' || empty($resultBetriebsmittelstatus[$i]->beschreibung)?$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz:$resultBetriebsmittelstatus[$i]->beschreibung).'&nbsp;</option>';
 			}
 			$htmlstring.='</select>';
-		}	
+		}
 		$htmlstring.='&nbsp;</td>
 		<td style="font-size:xx-small;" id="list'.$pos.'"></td>
 
@@ -813,7 +821,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 function output_inventarposition($debug=false,$resultBetriebsmittel=null,$resultBetriebsmittelstatus=array(),$schreib_recht=false)
 {
 	global $datum_obj;
-	
+
 	// Verarbeitungs Array ermitteln aus der Uebergabe
 	if (isset($resultBetriebsmittel[0]))
 		$resBetriebsmittel=$resultBetriebsmittel[0];
@@ -870,7 +878,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 							function selectItem(li) {
 							   return false;
 							}
-							
+
 							$(document).ready(function() {
 								$("#bestelldetail_id").autocomplete({
 									source: "inventar_autocomplete.php?work=wawi_bestelldetail_id&bestellung_id='.$resBetriebsmittel->bestellung_id.'",
@@ -969,7 +977,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 						$htmlstring.='<option '.($betriebsmittelstatus_kurzbz_select==$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz?' selected="selected" ':'').' value="'.$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz.'">'.($resultBetriebsmittelstatus[$i]->beschreibung=='NULL' || empty($resultBetriebsmittelstatus[$i]->beschreibung)?$resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz:$resultBetriebsmittelstatus[$i]->beschreibung).'&nbsp;</option>';
 				}
 		$htmlstring.='</select>';
-	}	
+	}
 	$htmlstring.='</td>
 	</form>';
 	$htmlstring.='<th align="right">AfA Ende&nbsp;:&nbsp;</th>
@@ -1094,7 +1102,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 			$htmlstring.='	</td>
 							<td>'.$datum_obj->formatDatum($row->ausgegebenam,'d.m.Y').'</td>
 							<td>'.$datum_obj->formatDatum($row->retouram,'d.m.Y').'</td>
-							
+
 							<td>';
 										$oBenutzer = new benutzer();
 										if (!$oBenutzer->load($row->insertvon))
@@ -1116,7 +1124,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 			$htmlstring.='	</td>
 							<td>'.$datum_obj->formatDatum($row->updateamum,'d.m.Y H:i:s').'</td>
 						</tr>';
-			
+
 		}
 		$htmlstring.='</table>';
 		$htmlstring.='</fieldset>';

@@ -2,8 +2,8 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
-!isset($jquery19) ? $jquery19 = false : $jquery19 = $jquery19;
-!isset($jqueryComposer) ? $jqueryComposer = false : $jqueryComposer = $jqueryComposer;
+!isset($jqueryV1) ? $jqueryV1 = false : $jqueryV1 = $jqueryV1;
+!isset($jqueryCurrent) ? $jqueryCurrent = false : $jqueryCurrent = $jqueryCurrent;
 !isset($jqueryui) ? $jqueryui = false : $jqueryui = $jqueryui;
 !isset($jquery_checkboxes) ? $jquery_checkboxes = false : $jquery_checkboxes = $jquery_checkboxes;
 !isset($jquery_custom) ? $jquery_custom = false : $jquery_custom = $jquery_custom;
@@ -19,15 +19,15 @@ isset($title) ? $title = 'VileSci - '.$title : $title = 'VileSci';
 !isset($datepicker) ? $datepicker = false : $datepicker = $datepicker;
 
 if ($tablesort || $jquery_checkboxes || $jquery_custom)
-	$jquery19 = true;
+	$jqueryV1 = true;
 
 if($datepicker)
 	$jqueryui = true;
 
 if($jqueryui)
-	$jqueryComposer = true;
+	$jqueryCurrent = true;
 
-if($jquery19 && $jqueryComposer)
+if($jqueryV1 && $jqueryCurrent)
 	show_error("Two JQuery versions used: composer and include folder version");
 
 ?>
@@ -42,17 +42,19 @@ if($jquery19 && $jqueryComposer)
 	<link rel="stylesheet"    type="text/css"     href="<?php echo base_url('skin/tablesort.css'); ?>" />
 <?php endif ?>
 
-<?php if($jquery19) : ?>
-	<script type="text/javascript" src="<?php echo base_url('include/js/jquery1.9.min.js'); ?>"></script>
+<?php if($jqueryV1) : ?>
+	<script type="text/javascript" src="<?php echo base_url('vendor/jquery/jqueryV1/jquery-1.12.4.min.js'); ?>"></script>
+	<script type="text/javascript" src="<?php echo base_url('vendor/christianbach/tablesorter/jquery.tablesorter.min.js'); ?>"></script>
 <?php endif ?>
 
-<?php if($jqueryComposer) : ?>
+<?php if($jqueryCurrent) : ?>
 	<script type="text/javascript" src="<?php echo base_url('vendor/components/jquery/jquery.min.js'); ?>"></script>
 <?php endif ?>
 
 <?php if($jqueryui) : ?>
 	<script type="text/javascript" src="<?php echo base_url('vendor/components/jqueryui/jquery-ui.min.js'); ?>"></script>
-	<link rel="stylesheet"    type="text/css"     href="<?php echo base_url('vendor/components/jqueryui/themes/base/jquery-ui.min.css'); ?>" />
+	<script type="text/javascript" src="<?php echo base_url('include/js/jquery.ui.datepicker.translation.js'); ?>"></script>
+	<link rel="stylesheet" type="text/css" href="<?php echo base_url('vendor/components/jqueryui/themes/base/jquery-ui.min.css'); ?>" />
 <?php endif ?>
 
 <?php if($jquery_checkboxes) : ?>

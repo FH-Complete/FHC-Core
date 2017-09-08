@@ -49,8 +49,13 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Anzahl Studenten Lehrveranstaltungsplan FH Technikum-Wien</title>
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-	<script src="../../../include/js/jquery.js" type="text/javascript"></script>
-	<script src="../../../include/js/jquery-ui.js" type="text/javascript"></script>
+	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
+<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
+<script type="text/javascript" src="../../../include/js/sizzle-0.9.3.js"></script>
+	<script src="../../../vendor/components/jqueryui/jquery-ui.min.js" type="text/javascript"></script>
 	<style type="text/css">
 	<!--
 		li {	list-style : outside url("../../../skin/images/right.gif");}

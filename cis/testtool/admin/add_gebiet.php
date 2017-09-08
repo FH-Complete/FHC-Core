@@ -51,7 +51,10 @@ echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="../../../include/js/jquery1.9.min.js" ></script>
+	<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script type="text/javascript">
     $(document).ready(function()
     {
@@ -96,9 +99,9 @@ echo "Studiengang: <SELECT name='studiengang' id='studiengang' onchange='window.
 $i = 0;
 $selected = '';
 $result_count = count($studiengang->result);
-for ($i = 0; $i < $result_count; $i++) 
+for ($i = 0; $i < $result_count; $i++)
 {
-	if ($stg_kz == $studiengang->result[$i]->studiengang_kz) 
+	if ($stg_kz == $studiengang->result[$i]->studiengang_kz)
 		$selected = 'selected';
 	echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=".$studiengang->result[$i]->studiengang_kz."' ".$selected.">".strtoupper($studiengang->result[$i]->typ.$studiengang->result[$i]->kurzbz).' ('.$studiengang->result[$i]->bezeichnung.")</OPTION>";
 	$selected = '';
@@ -200,14 +203,14 @@ if (isset($_POST['save']) && $_POST['save'] == 'save')
 			if ($db->db_num_rows($result) == 0)
 			{
 				$gebiet = new gebiet();
-				
+
 				$bezeichnung_mehrsprachig = array();
 				foreach ($sprache->result as $row_sprache)
 				{
 					$bezeichnung_mehrsprachig[$row_sprache->sprache] = $_POST['bezeichnung_mehrsprachig_'.$row_sprache->sprache];
 				}
 				$gebiet->bezeichnung_mehrsprachig = $bezeichnung_mehrsprachig;
-				
+
 				$gebiet->kurzbz = $_POST['kurzbz'];
 				$gebiet->bezeichnung = $_POST['bezeichnung_intern'];
 				$gebiet->beschreibung = $_POST['beschreibung'];
@@ -225,7 +228,7 @@ if (isset($_POST['save']) && $_POST['save'] == 'save')
 				$gebiet->insertamum = date('Y-m-d H:i:s');
 				$gebiet->insertvon = $user;
 				$gebiet->antwortenprozeile = $_POST['antworten_pro_zeile'];
-			
+
 				if ($gebiet->save(true))
 				{
 					echo 'Daten erfolgreich gespeichert';

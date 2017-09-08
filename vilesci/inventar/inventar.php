@@ -27,7 +27,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/ort.class.php');
 require_once('../../include/organisationseinheit.class.php');
-require_once('../../include/person.class.php');	
+require_once('../../include/person.class.php');
 require_once('../../include/betriebsmittel.class.php');
 require_once('../../include/betriebsmittelperson.class.php');
 require_once('../../include/betriebsmitteltyp.class.php');
@@ -44,15 +44,15 @@ if (!$uid = get_uid())
 // ------------------------------------------------------------------------------------------
 	$errormsg=array();
 	$default_status_vorhanden='vorhanden'; // Defaultwert fuer Selectfeld - Status
-	
+
 	//------------ Berechtigungen
 	$berechtigung_kurzbz='wawi/inventar:begrenzt';
 	$recht=false;
-	$delete_recht=false;	
+	$delete_recht=false;
 	$schreib_recht=false;
-	$schreib_recht_administration=2; // Admin wert fuer set schreib_recht	
+	$schreib_recht_administration=2; // Admin wert fuer set schreib_recht
 	$datum_obj = new datum();
-		
+
 // ------------------------------------------------------------------------------------------
 // Parameter Aufruf uebernehmen
 // ------------------------------------------------------------------------------------------
@@ -80,7 +80,7 @@ if (!$uid = get_uid())
 		if ($oBenutzer = new benutzer($person_id))
 			$person_id=$oBenutzer->person_id;
 	}
-	
+
   	$debug=trim(isset($_REQUEST['debug']) ? $_REQUEST['debug']:false);
 	// Erweiterte Suche On-Off
   	$extend_search=trim(isset($_REQUEST['extend_search']) ?$_REQUEST['extend_search']:'false');
@@ -95,7 +95,7 @@ if (!$uid = get_uid())
 	$oBenutzerberechtigung->berechtigungen=array();
 	if (!$oBenutzerberechtigung->getBerechtigungen($uid))
 		die('Sie haben keine Berechtigung !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-	
+
 	$recht=false;
 	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,($oe_kurzbz),'s')
 	|| $oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'s'))
@@ -106,14 +106,14 @@ if (!$uid = get_uid())
 	// Pruefen ob Schreibrechte (Anzeigen der Aenderungsmoeglichkeit)
 	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'su'))
 		$schreib_recht=true;
-		
+
 	// Pruefen ob Schreibrechte (Anzeigen der Aenderungsmoeglichkeit)
 	if($oBenutzerberechtigung->isBerechtigt($berechtigung_kurzbz,null,'suid'))
 		$delete_recht=true;
-		
+
 	if($oBenutzerberechtigung->isBerechtigt('wawi/inventar', null, 'suid') )
 		$schreib_recht=$schreib_recht_administration;
-			
+
 // ------------------------------------------------------------------------------------------
 // Verarbeitung - Ajax oder Work
 // ------------------------------------------------------------------------------------------
@@ -138,9 +138,9 @@ if (!$uid = get_uid())
 				$oBetriebsmittel_betriebsmittelstatus->result=array();
 				$oBetriebsmittel_betriebsmittelstatus->errormsg='';
 				$oBetriebsmittel_betriebsmittelstatus->debug=$debug;
-	
+
 				$oBetriebsmittel_betriebsmittelstatus->new=true;
-	
+
 				$oBetriebsmittel_betriebsmittelstatus->betriebsmittelbetriebsmittelstatus_id=trim(isset($_REQUEST['betriebsmittelbetriebsmittelstatus_id']) ? $_REQUEST['betriebsmittelbetriebsmittelstatus_id']:'');
 				$oBetriebsmittel_betriebsmittelstatus->betriebsmittel_id=$oBetriebsmittel->betriebsmittel_id;
 				$oBetriebsmittel_betriebsmittelstatus->datum=date('Ymd');
@@ -159,7 +159,7 @@ if (!$uid = get_uid())
 		} // Recht
 		else
 				$errormsg[]='Sie haben keine Berechtigung fuer die Datenbearbeitung';
-					
+
 		// Fehlerausgabe bzw. Informationen ueber den Status der Verarbeitung
 	}
 	// Bestellposition aendern
@@ -186,10 +186,10 @@ if (!$uid = get_uid())
 		}
 		else
 			$errormsg[]='Sie haben keine Berechtigung fuer die Datenbearbeitung';
-		
+
 		// Fehlerausgabe bzw. Informationen ueber den Status der Verarbeitung
 	}
-	
+
 	// Inventur setzen
 	if (($ajax && strtolower($ajax)=='set_inventur')
 	||  ($work && strtolower($work)=='set_inventur') )
@@ -211,10 +211,10 @@ if (!$uid = get_uid())
 		}
 		else
 			$errormsg[]='Sie haben keine Berechtigung fuer die Datenbearbeitung';
-		
+
 		// Fehlerausgabe bzw. Informationen ueber den Status der Verarbeitung
 	}
-	
+
 	// Betriebsmittel Baum entfernen - Personen,Status,Inventar
 	if (($ajax && strtolower($ajax)=='set_delete')
 	||  ($work && strtolower($work)=='set_delete') )
@@ -304,8 +304,8 @@ if (!$uid = get_uid())
 	$oes=new organisationseinheit();
 	if (!$oOrganisationseinheit->loadArray($oBenutzerberechtigung->getOEkurzbz($berechtigung_kurzbz),'organisationseinheittyp_kurzbz,bezeichnung'))
 		$errormsg[]=$oOrganisationseinheit->errormsg;
-	$extend_search=true;	
-	
+	$extend_search=true;
+
 	$resultOrganisationseinheit=$oOrganisationseinheit->result;
 
 	// Typtable
@@ -331,12 +331,20 @@ if (!$uid = get_uid())
 		<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		
+
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-<!--		<script src="../../include/js/jquery.js" type="text/javascript"></script> -->
-		<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>	
-		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>	
+<!--		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
+<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+<script type="text/javascript" src="../../include/js/sizzle-0.9.3.js"></script> -->
+		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 		<style type="text/css">
 		table.navbar td
 		{
@@ -345,13 +353,13 @@ if (!$uid = get_uid())
 		</style>
 		<script type="text/javascript" language="JavaScript1.2">
 		<!--
-			function formatItem(row) 
+			function formatItem(row)
 			{
 			    return row[0] + " <br>" + row[1];
 			}
-			
+
 			var ajxFile = "<?php echo $_SERVER["PHP_SELF"];  ?>";
-			
+
 			function set_status(output_id,betriebsmittelbetriebsmittelstatus_id,betriebsmittel_id,inventarnummer,bestellung_id,bestelldetail_id,betriebsmittelstatus_kurzbz)
 			{
 				document.getElementById(output_id).innerHTML = '<img src="../../skin/images/spinner.gif" alt="warten" title="warten" >';
@@ -392,12 +400,12 @@ if (!$uid = get_uid())
 				}
 				document.getElementById(output_id).innerHTML = '';
 			}
-		-->			
+		-->
 		</script>
 	</head>
 
 	<body>
-	
+
 		<h1 title="Anwender:<?php echo $uid ?>">&nbsp;Inventar - Suche&nbsp;</h1>
 	    <form name="sendform" action="<?php echo $_SERVER["PHP_SELF"];  ?>" method="post" enctype="application/x-www-form-urlencoded">
 		<div>
@@ -407,7 +415,7 @@ if (!$uid = get_uid())
 <!--					<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1500);}" id="inventarnummer" name="inventarnummer" type="text" size="10" maxlength="30" value="<?php //echo $inventarnummer;?>">&nbsp; -->
 					<input id="inventarnummer" name="inventarnummer" type="text" size="10" maxlength="30" value="<?php echo $inventarnummer;?>">
 					<script type="text/javascript">
-						$(document).ready(function() 
+						$(document).ready(function()
 						{
 							$('#inventarnummer').autocomplete({
 								source: "inventar_autocomplete.php?work=inventarnummer",
@@ -427,7 +435,7 @@ if (!$uid = get_uid())
 									setTimeout('document.sendform.submit()',1500);
 								}
 							});
-/*							  $('#inventarnummer').autocomplete('inventar_autocomplete.php', 
+/*							  $('#inventarnummer').autocomplete('inventar_autocomplete.php',
 							  {
 								minChars:2,
 								matchSubset:1,matchContains:1,
@@ -446,7 +454,7 @@ if (!$uid = get_uid())
 					<td><label for="ort_kurzbz">Ort</label>&nbsp;
 						<input id="ort_kurzbz" name="ort_kurzbz" size="16" maxlength="40" value="<?php echo $ort_kurzbz;?>">&nbsp;
 						<script type="text/javascript">
-						$(document).ready(function() 
+						$(document).ready(function()
 						{
 							$('#ort_kurzbz').autocomplete({
 								source: "inventar_autocomplete.php?work=inventar_ort",
@@ -466,7 +474,7 @@ if (!$uid = get_uid())
 									setTimeout('document.sendform.submit()',1500);
 								}
 							});
-/*							  $('#ort_kurzbz').autocomplete('inventar_autocomplete.php', 
+/*							  $('#ort_kurzbz').autocomplete('inventar_autocomplete.php',
 							  {
 								minChars:3,
 								matchSubset:1,matchContains:1,
@@ -475,7 +483,7 @@ if (!$uid = get_uid())
 								extraParams:{'work':'inventar_ort'
 											,'inventarnummer':$("#inventarnummer").val()
 											,'seriennummer':$("#seriennummer").val()
-											,'jahr_monat':$("#jahr_monat").val() 
+											,'jahr_monat':$("#jahr_monat").val()
 											}
 							  }); */
 					  });
@@ -540,7 +548,7 @@ if (!$uid = get_uid())
 						  <?php
 								if($oBenutzerberechtigung->isBerechtigt('wawi/inventar', null, 's'))
 									echo '<option '.(empty($oe_kurzbz)?' selected="selected" ':'').' value="">bitte ausw&auml;hlen&nbsp;</option>';
-							
+
 								for ($i=0;$i<count($resultOrganisationseinheit) ;$i++)
 								{
 									if ($resultOrganisationseinheit[$i]->oe_kurzbz)
@@ -557,7 +565,7 @@ if (!$uid = get_uid())
 							if (!$oPerson = new person($person_id))
 							{
 								$personen_namen=$oPerson->errormsg;
-							}	
+							}
 							else if ($oPerson->nachname)
 								$personen_namen=$oPerson->anrede.($oPerson->titelpre?'&nbsp;'.$oPerson->titelpre:'').'&nbsp;'.$oPerson->vorname.'&nbsp;'.$oPerson->nachname.'&nbsp;'.($oPerson->aktiv==true || $oPerson->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv">':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv">');
 							else
@@ -569,16 +577,16 @@ if (!$uid = get_uid())
 								{
 									$person_id=$oPerson->personen[0]->person_id;
 									$personen_namen=$oPerson->personen[0]->anrede.($oPerson->personen[0]->titelpre?'&nbsp;'.$oPerson->personen[0]->titelpre:'').'&nbsp;'.$oPerson->personen[0]->vorname.'&nbsp;'.$oPerson->personen[0]->nachname.'&nbsp;'.($oPerson->personen[0]->aktiv==true || $oPerson->personen[0]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv">':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv">');
-								}	
+								}
 								else
 									$personen_namen='Fehler ! '.$person_id;
-							}	
+							}
 					}
 				?>
 				<td>&nbsp;<label for="person_id">Mitarbeiter</label>&nbsp;
 					<input id="person_id" name="person_id" size="13" maxlength="14" value="<?php echo $person_id; ?>">
 						<script type="text/javascript">
-						$(document).ready(function() 
+						$(document).ready(function()
 						{
 							$('#person_id').autocomplete({
 								source: "inventar_autocomplete.php?work=person",
@@ -598,7 +606,7 @@ if (!$uid = get_uid())
 									setTimeout('document.sendform.submit()',1500);
 								}
 							});
-/*							  $('#person_id').autocomplete('inventar_autocomplete.php', 
+/*							  $('#person_id').autocomplete('inventar_autocomplete.php',
 							  {
 								minChars:4,
 								matchSubset:1,matchContains:1,
@@ -619,7 +627,7 @@ if (!$uid = get_uid())
 			<tr>
 					<td><label for="bestellnr">Bestellnr.</label>&nbsp;	<input id="bestellnr" name="bestellnr" size="10" maxlength="30" type="Text" value="<?php echo $bestellnr; ?>" >&nbsp;
 						<script type="text/javascript">
-							$(document).ready(function() 
+							$(document).ready(function()
 							{
 								$('#bestellnr').autocomplete({
 									source: "inventar_autocomplete.php?work=wawi_bestellnr",
@@ -639,7 +647,7 @@ if (!$uid = get_uid())
 										setTimeout('document.sendform.submit()',1500);
 									}
 								});
-								 /* $('#bestellnr').autocomplete('inventar_autocomplete.php', 
+								 /* $('#bestellnr').autocomplete('inventar_autocomplete.php',
 								  {
 									minChars:5,
 									matchSubset:1,matchContains:1,
@@ -653,7 +661,7 @@ if (!$uid = get_uid())
 				<!-- Bestell ID Eindeutigenummer -->
 				<td><label for="bestellung_id">Bestell ID</label>&nbsp;<input id="bestellung_id" name="bestellung_id" size="10" maxlength="30" type="Text" value="<?php echo $bestellung_id; ?>" >&nbsp;
 						<script type="text/javascript">
-							$(document).ready(function() 
+							$(document).ready(function()
 							{
 								$('#bestellung_id').autocomplete({
 									source: "inventar_autocomplete.php?work=wawi_bestellung_id",
@@ -673,7 +681,7 @@ if (!$uid = get_uid())
 										setTimeout('document.sendform.submit()',1500);
 									}
 								});
-/*								  $('#bestellung_id').autocomplete('inventar_autocomplete.php', 
+/*								  $('#bestellung_id').autocomplete('inventar_autocomplete.php',
 								  {
 									minChars:2,
 									matchSubset:1,matchContains:1,
@@ -688,7 +696,7 @@ if (!$uid = get_uid())
 				<td>&nbsp;<label for="firma_id">Lieferant</label>&nbsp;
 					<input id="firma_id" name="firma_id" size="10" maxlength="30" value="<?php echo $firma_id; ?>" >&nbsp;
 					<script type="text/javascript">
-							$(document).ready(function() 
+							$(document).ready(function()
 							{
 								$('#firma_id').autocomplete({
 									source: "inventar_autocomplete.php?work=wawi_firma_search",
@@ -707,7 +715,7 @@ if (!$uid = get_uid())
 										ui.item.value=ui.item.firma_id;
 									}
 								});
-/*								  $('#firma_id').autocomplete('inventar_autocomplete.php', 
+/*								  $('#firma_id').autocomplete('inventar_autocomplete.php',
 								  {
 									minChars:4,
 									matchSubset:1,matchContains:1,
@@ -722,8 +730,8 @@ if (!$uid = get_uid())
 				<td>&nbsp;<label for="hersteller">Hersteller</label>&nbsp;
 					<input id="hersteller" name="hersteller" type="text" size="10" maxlength="30" value="<?php echo $hersteller;?>" >&nbsp;
 					<script type="text/javascript">
-						
-						$(document).ready(function() 
+
+						$(document).ready(function()
 						{
 							$('#hersteller').autocomplete({
 								source: "inventar_autocomplete.php?work=hersteller",
@@ -742,7 +750,7 @@ if (!$uid = get_uid())
 									ui.item.value=ui.item.hersteller;
 								}
 							});
-/*							  $('#hersteller').autocomplete('inventar_autocomplete.php', 
+/*							  $('#hersteller').autocomplete('inventar_autocomplete.php',
 							  {
 								minChars:3,
 								matchSubset:1,matchContains:1,
@@ -809,17 +817,17 @@ if (!$uid = get_uid())
 			</div>
 			<script type="text/javascript">
 			   $(document).ready(function()
-			   {          
+			   {
 			   		$("div#extend_search_on").click(function(event)
-					{ 
-				      	if ( $("#extend_search").val() != 'true') 
+					{
+				      	if ( $("#extend_search").val() != 'true')
 						{
-				        	 $("div#ext_search").show("slow");       
+				        	 $("div#ext_search").show("slow");
 						     $("#extend_search").val('true')
 					    }
-						else 
+						else
 						{
-						     $("div#ext_search").hide("slow");       
+						     $("div#ext_search").hide("slow");
 						     $("#extend_search").val('false')
 				      	}
 			   		});
@@ -846,7 +854,7 @@ if (!$uid = get_uid())
 	}
 	if (empty($bestellung_id) && empty($bestellnr)  )
 		$bestelldetail_id='';
-	
+
  	$check=$inventarnummer.$ort_kurzbz.$betriebsmittelstatus_kurzbz.$betriebsmitteltyp.$bestellung_id.$bestelldetail_id.$bestellnr.$hersteller.$afa.$jahr_monat.$firma_id.$inventur_jahr.$beschreibung.$oe_kurzbz.$seriennummer.$person_id.$betriebsmittel_id.$anlage_jahr_monat;
 	$order=null; // Sortierung
 
@@ -909,7 +917,7 @@ if (!$uid = get_uid())
 function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebsmittelstatus=array(),$schreib_recht=false,$delete_recht=false,$schreib_recht_administration=2)
 {
 	global $datum_obj;
-	
+
 	$htmlstring='';
 	if (is_null($resultBetriebsmittel) || !is_array($resultBetriebsmittel) || count($resultBetriebsmittel)<1)
 		return $htmlstring;
@@ -941,7 +949,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 		else
 			$classe='liste0';
 
-		// Pruefen ob OE vorhanden ist - ansonst suchen ob ein Benutzer vorhanden ist	
+		// Pruefen ob OE vorhanden ist - ansonst suchen ob ein Benutzer vorhanden ist
 		$resultBetriebsmittel[$pos]->oe_kurzbz=trim($resultBetriebsmittel[$pos]->oe_kurzbz);
 		if (empty($resultBetriebsmittel[$pos]->oe_kurzbz))
 		{
@@ -949,10 +957,10 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 			$oBetriebsmittelOrganisationseinheit = new betriebsmittel();
 			if ($oBetriebsmittelOrganisationseinheit->load_betriebsmittel_oe($resultBetriebsmittel[$pos]->betriebsmittel_id))
 				$resultBetriebsmittel[$pos]->oe_kurzbz=$oBetriebsmittelOrganisationseinheit->oe_kurzbz;
-			else if ($oBetriebsmittelOrganisationseinheit->errormsg)	
+			else if ($oBetriebsmittelOrganisationseinheit->errormsg)
 				$resultBetriebsmittel[$pos]->oe_kurzbz=$oBetriebsmittelOrganisationseinheit->errormsg;
 		}
-		
+
 		if(!isset($oOrganisationseinheit))
 			$oOrganisationseinheit=new stdClass();
 		$oOrganisationseinheit->bezeichnung='';
@@ -965,7 +973,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 
 		$resultBetriebsmittel[$pos]->firma_id=trim($resultBetriebsmittel[$pos]->firma_id);
 		$resultBetriebsmittel[$pos]->firmenname=trim($resultBetriebsmittel[$pos]->firmenname);
-						
+
 		$htmlstring.='<tr class="'.$classe.'">
 			<td><a href="'.$_SERVER["PHP_SELF"].'?inventarnummer='.$resultBetriebsmittel[$pos]->inventarnummer.'&amp;betriebsmittel_id='.$resultBetriebsmittel[$pos]->betriebsmittel_id.'&amp;bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'&amp;bestelldetail_id='.$resultBetriebsmittel[$pos]->bestelldetail_id.'" target="_blank">'.($resultBetriebsmittel[$pos]->inventarnummer?$resultBetriebsmittel[$pos]->inventarnummer:$resultBetriebsmittel[$pos]->betriebsmittel_id).'</a>&nbsp;</td>
 			<td>'.StringCut((!empty($resultBetriebsmittel[$pos]->beschreibung)?$resultBetriebsmittel[$pos]->beschreibung:$resultBetriebsmittel[$pos]->betriebsmitteltyp),20).'&nbsp;</td>
@@ -976,27 +984,27 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 		$bestellung_ivalid_style='';
 		if ($resultBetriebsmittel[$pos]->bestellung_id && !$resultBetriebsmittel[$pos]->bestellnr)
 			$bestellung_ivalid_style='style="color: red;"';
-					
-		
+
+
 		//$htmlstring.='<td align="right"><a href="../../addons/wawi/vilesci/bestellung.php?bestellung_id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellnr.'</a>&nbsp;</td>';
 		$htmlstring.='<td align="right">';
-		
+
 		//Wenn Rechnungen vorhanden sind, einen Link dazu anzeigen
 		$rechnung = new wawi_rechnung();
 		if($resultBetriebsmittel[$pos]->bestellung_id!='' && $rechnung->count($resultBetriebsmittel[$pos]->bestellung_id)>0)
 		{
 			$htmlstring.='&nbsp;<a href="../../addons/wawi/vilesci/rechnung.php?method=suche&amp;submit=true&amp;bestellnummer='.$resultBetriebsmittel[$pos]->bestellnr.'" target="_blank" '.$bestellung_ivalid_style.'><img src="../../skin/images/Calculator.png"></a>';
 		}
-		
+
 		$htmlstring.='<a href="../../addons/wawi/vilesci/bestellung.php?method=update&amp;id='.$resultBetriebsmittel[$pos]->bestellung_id.'" target="_blank" '.$bestellung_ivalid_style.'>'.$resultBetriebsmittel[$pos]->bestellnr.'</a>';
-		
+
 		echo '</td>';
 
 		$htmlstring.='<td><span style="display: none;">'.$resultBetriebsmittel[$pos]->betriebsmittelstatus_datum.'</span>'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y').'&nbsp;</td>';
 		$htmlstring.='<td>'.StringCut(($oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:$resultBetriebsmittel[$pos]->oe_kurzbz),20).'&nbsp;</td>';
 		$htmlstring.='<td align="right">'.$datum_obj->formatDatum($resultBetriebsmittel[$pos]->inventuramum,'d.m.Y').'&nbsp;</td>';
 		$htmlstring.='<td align="right">'.($resultBetriebsmittel[$pos]->ausgegeben=='t'?'Ja':'Nein').'&nbsp;</td>';
-		
+
 		$htmlstring.='<td>';
 			// mit Berechtigung ist der Status zum bearbeiten
 		  	$betriebsmittelstatus_kurzbz_select=trim($resultBetriebsmittel[$pos]->betriebsmittelstatus_kurzbz);
@@ -1005,7 +1013,7 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 			else
 			{
 				$htmlstring.='<select style="font-size:xx-small;" onchange="set_status(\'list'.$pos.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittelbetriebsmittelstatus_id.'\',\''.$resultBetriebsmittel[$pos]->betriebsmittel_id.'\',\''.$resultBetriebsmittel[$pos]->inventarnummer.'\',\''.$resultBetriebsmittel[$pos]->bestellung_id.'\',\''.$resultBetriebsmittel[$pos]->bestelldetail_id.'\',this.value);" name="betriebsmittelstatus_kurzbz">';
-				
+
 				for ($i=0;$i<count($resultBetriebsmittelstatus) ;$i++)
 				{
 					if ($resultBetriebsmittelstatus[$i]->betriebsmittelstatus_kurzbz)
@@ -1013,17 +1021,17 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 				}
 				$htmlstring.='<option '.(trim($betriebsmittelstatus_kurzbz_select)==''?' selected="selected" ':'').' value="">Status ?&nbsp;</option>';
 				$htmlstring.='</select>';
-			}	
+			}
 			$htmlstring.='&nbsp;</td>';
 			$htmlstring.='
 			<td id="bcTarget'.$pos.'"><img border="0"  src="../../skin/images/printer.png" alt="Etik"></td>
-				<script type="text/javascript">			
+				<script type="text/javascript">
 				   $(document).ready(function()
 				   {
 					   	$("td#bcTarget'.$pos.'").click(function(event)
 						{
-							var PrintWin=window.open("etiketten.php?inventarnummer='. urlencode($resultBetriebsmittel[$pos]->inventarnummer).'","Etik","copyhistory=no,directories=no,location=no,dependent=yes,toolbar=no,status=no,menubar=no,resizable=yes,scrollbars=yes,width=400,height=300,left=20, top=20"); 
-							if (PrintWin) 
+							var PrintWin=window.open("etiketten.php?inventarnummer='. urlencode($resultBetriebsmittel[$pos]->inventarnummer).'","Etik","copyhistory=no,directories=no,location=no,dependent=yes,toolbar=no,status=no,menubar=no,resizable=yes,scrollbars=yes,width=400,height=300,left=20, top=20");
+							if (PrintWin)
 							{
 								PrintWin.focus();
 							}
@@ -1043,18 +1051,18 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 function output_inventarposition($debug=false,$resultBetriebsmittel=null,$resultBetriebsmittelstatus=array(),$schreib_recht=false,$delete_recht=false,$schreib_recht_administration=2)
 {
 	global $datum_obj;
-	
+
 	// Verarbeitungs Array ermitteln aus der Uebergabe
 	if (isset($resultBetriebsmittel[0]))
 		$resBetriebsmittel=$resultBetriebsmittel[0];
 	else
 		$resBetriebsmittel=$resultBetriebsmittel;
-	
+
 	$htmlstring='';
 	if (is_null($resBetriebsmittel) || ( !is_object($resBetriebsmittel) && !is_array($resBetriebsmittel) ) || count($resBetriebsmittel)<1)
 		return $htmlstring;
 
-	// Pruefen ob OE vorhanden ist - ansonst suchen ob ein Benutzer vorhanden ist	
+	// Pruefen ob OE vorhanden ist - ansonst suchen ob ein Benutzer vorhanden ist
 
 	$resBetriebsmittel->oe_kurzbz=trim($resBetriebsmittel->oe_kurzbz);
 	if (empty($resBetriebsmittel->oe_kurzbz))
@@ -1063,10 +1071,10 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 		$oBetriebsmittelOrganisationseinheit = new betriebsmittel();
 		if ($oBetriebsmittelOrganisationseinheit->load_betriebsmittel_oe($resBetriebsmittel->betriebsmittel_id))
 			$resBetriebsmittel->oe_kurzbz=$oBetriebsmittelOrganisationseinheit->oe_kurzbz;
-		else	
+		else
 			$resBetriebsmittel->oe_kurzbz=$oBetriebsmittelOrganisationseinheit->errormsg;
-	}			
-		
+	}
+
 	// Organisation - Inventarverwalter
 	$oOrganisationseinheit = new organisationseinheit($resBetriebsmittel->oe_kurzbz);
 	$OrgBezeichnung=(isset($oOrganisationseinheit->bezeichnung) && $oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:'*'.$resultBetriebsmittel[0]->oe_kurzbz);
@@ -1110,10 +1118,10 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 					<input style="display:none" name="work" value="set_position" >
 					<input style="display:none" name="inventarnummer" value="'.$resBetriebsmittel->inventarnummer.'" >
 					<input style="display:none" name="betriebsmittel_id" value="'.$resBetriebsmittel->betriebsmittel_id.'" >
-					<input style="display:none" name="bestelldetail_id" value="'.$resBetriebsmittel->bestelldetail_id.'" >						
+					<input style="display:none" name="bestelldetail_id" value="'.$resBetriebsmittel->bestelldetail_id.'" >
 					<input id="bestellung_ids" name="bestellung_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestellung_id.'" >
 					<script type="text/javascript">
-						$(document).ready(function() 
+						$(document).ready(function()
 						{
 							  $("#bestellung_ids").autocomplete({
 							    source:"inventar_autocomplete.php?work=wawi_bestellung_id",
@@ -1137,9 +1145,9 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 			</form>';
 		/*
 			<input onchange="setTimeout(\'document.sendform0.submit()\',1500);" id="bestellung_ids" name="bestellung_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestellung_id.'" >
-			$(document).ready(function() 
+			$(document).ready(function()
 			{
-				  $("#bestellung_ids").autocomplete("inventar_autocomplete.php", 
+				  $("#bestellung_ids").autocomplete("inventar_autocomplete.php",
 				  {
 					minChars:4,
 					matchSubset:1,matchContains:1,
@@ -1162,7 +1170,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 					<input style="display:none" name="bestellung_id" value="'.$resBetriebsmittel->bestellung_id.'" >
 					<input id="bestelldetail_ids"   name="bestelldetail_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestelldetail_id.'" >
 					<script type="text/javascript">
-						$(document).ready(function() 
+						$(document).ready(function()
 						{
 							$("#bestelldetail_ids").autocomplete({
 								source: "inventar_autocomplete.php?work=wawi_bestelldetail_id&bestellung_id='.$resBetriebsmittel->bestellung_id.'",
@@ -1188,9 +1196,9 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 
 			//<input onchange="setTimeout(\'document.sendform1.submit()\',1500);" id="bestelldetail_ids"   name="bestelldetail_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestelldetail_id.'" >
 				/*
-						$(document).ready(function() 
+						$(document).ready(function()
 						{
-							  $("#bestelldetail_ids").autocomplete("inventar_autocomplete.php", 
+							  $("#bestelldetail_ids").autocomplete("inventar_autocomplete.php",
 							  {
 								minChars:1,
 								matchSubset:1,matchContains:1,
@@ -1224,19 +1232,19 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 						<th align="right">Hersteller&nbsp;:&nbsp;</th>
 						<td>'.$resBetriebsmittel->hersteller.'</td>
 					</tr>';
-			
+
 			$htmlstring.='<tr>
 						<th align="right" valign="top">Anmerkung&nbsp;:&nbsp;</th>
 						<td colspan="3">'.$resBetriebsmittel->anmerkung.'</td>
 						</tr>';
-			
+
 			$htmlstring.='<tr>
 						<th align="right" valign="top">Verwendung&nbsp;:&nbsp;</th>
 						<td colspan="3">'.$resBetriebsmittel->verwendung.'</td>
 						<th align="right">Leasing bis&nbsp;:&nbsp;</th>
 						<td>'.$datum_obj->formatDatum($resBetriebsmittel->leasing_bis,'d.m.Y').'</td>
 					</tr>';
-			
+
 			$htmlstring.='<tr><td>&nbsp;</td></tr>';
 
 			$htmlstring.='<tr>';
@@ -1266,7 +1274,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 							}
 							$htmlstring.='<option '.(trim($betriebsmittelstatus_kurzbz_select)==''?' selected="selected" ':'').' value="">Status ?&nbsp;</option>';
 					$htmlstring.='</select>';
-			}	
+			}
 			$htmlstring.='</td>
 			</form>
 			';
@@ -1323,8 +1331,8 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 					&auml;ndern</a>&nbsp;</td>';
 
 	// nur Admin oder Support darf wirklich loeschen
-			if(trim($schreib_recht)==trim($schreib_recht_administration) || !empty($delete_recht) )	
-			{					
+			if(trim($schreib_recht)==trim($schreib_recht_administration) || !empty($delete_recht) )
+			{
 				$htmlstring.='
 				<td  id="bcDelete">
 					<a href="'.$_SERVER['PHP_SELF'].'?work=set_delete&betriebsmittel_id='.$resBetriebsmittel->betriebsmittel_id.'" onclick="return confdel()">
@@ -1332,27 +1340,27 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 					l&ouml;schen
 					</a>
 					</td>
-					<script type="text/javascript">			
+					<script type="text/javascript">
 					   function confdel()
 					   {
 					   		return confirm("Wollen Sie dieses Betriebsmittel wirklich loeschen?");
 					   }
-					</script>';							
-				}	
+					</script>';
+				}
 				// 	Etikettendruck
 				/*
 				$htmlstring.='
 				<td id="bcTargets">&nbsp;<img border="0" src="../../skin/images/printer.png" alt="Etik"> druck</td>
-					<script type="text/javascript">			
+					<script type="text/javascript">
 					   $(document).ready(function()
-					   {  
+					   {
 					   	$("td#bcTargets").click(function(event)
-						{ 
-							var PrintWin=window.open("etiketten.php?inventarnummer='. urlencode($resBetriebsmittel->inventarnummer).'","Etik","copyhistory=no,directories=no,location=no,dependent=yes,toolbar=no,status=no,menubar=no,resizable=yes,scrollbars=yes,width=400,height=300,left=20, top=20"); 
-							if (PrintWin) 
+						{
+							var PrintWin=window.open("etiketten.php?inventarnummer='. urlencode($resBetriebsmittel->inventarnummer).'","Etik","copyhistory=no,directories=no,location=no,dependent=yes,toolbar=no,status=no,menubar=no,resizable=yes,scrollbars=yes,width=400,height=300,left=20, top=20");
+							if (PrintWin)
 							{
 								PrintWin.focus();
-							}	
+							}
 					   });
 					});
 					</script>';*/
@@ -1360,7 +1368,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 			</table></td></tr>';
 		$htmlstring.='<tr>';
 		$htmlstring.='</table>';
-		
+
 	$htmlstring.='</fieldset>';
 	$htmlstring.='<fieldset><legend>History</legend>';
 //------------------------------------------------------------------------------------------------
@@ -1372,7 +1380,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 	$oBetriebsmittel_betriebsmittelstatus->errormsg='';
 	if (!$oBetriebsmittel_betriebsmittelstatus->load_betriebsmittel_id($resBetriebsmittel->betriebsmittel_id))
 		$htmlstring.='<br>'.$oBetriebsmittel_betriebsmittelstatus->errormsg;
-	
+
 	if (is_array($oBetriebsmittel_betriebsmittelstatus->result) && count($oBetriebsmittel_betriebsmittelstatus->result)>0)
 	{
 		$htmlstring.='<table>';
@@ -1400,27 +1408,27 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 							<td><a href="mailto:'.$oInsertBenutzer->uid.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->inventarnummer.'">'.(isset($oInsertBenutzer->person_id)?(isset($oInsertBenutzer->anrede) && !empty($oInsertBenutzer->anrede)?$oInsertBenutzer->anrede.' ':'').
 								(isset($oInsertBenutzer->titelpre) && !empty($oInsertBenutzer->titelpre)?$oInsertBenutzer->titelpre.' ':'').
 								$oInsertBenutzer->vorname.' '.$oInsertBenutzer->nachname.'</a>':$row->insertvon).'</td>
-							
+
 							<td>'.$datum_obj->formatDatum($row->insertamum,'d.m.Y H:i:s').'</td>
 
 							<td><a href="mailto:'.$oUpdateBenutzer->uid.'@'.DOMAIN.'?subject=Betriebsmittel - Inventar '.$resBetriebsmittel->inventarnummer.'">'.(isset($oUpdateBenutzer->person_id)?(isset($oUpdateBenutzer->anrede) && !empty($oUpdateBenutzer->anrede)?$oUpdateBenutzer->anrede.' ':'').
 								(isset($oUpdateBenutzer->titelpre) && !empty($oUpdateBenutzer->titelpre)?$oUpdateBenutzer->titelpre.' ':'').
 								$oUpdateBenutzer->vorname.' '.$oUpdateBenutzer->nachname.'</a>':$row->updatevon).'</td>
-							
+
 							<td>'.$datum_obj->formatDatum($row->updateamum,'d.m.Y H:i:s').'</td>
 						</tr>';
-						
-			if ($row->anmerkung)						
+
+			if ($row->anmerkung)
 			{
-				if($schreib_recht==$schreib_recht_administration)						
+				if($schreib_recht==$schreib_recht_administration)
 					$htmlstring.='<tr class="'.$classe.'">
 							<td colspan="6"><textarea rows="1" cols="80"  wrap="soft" readonly="readonly">'.$row->anmerkung.'</textarea></td>
-						</tr>';							
-				else				
+						</tr>';
+				else
 					$htmlstring.='<tr class="'.$classe.'">
 							<td colspan="6">'.$row->anmerkung.'</td>
-						</tr>';							
-			}			
+						</tr>';
+			}
 		}
 	}
 	$htmlstring.='</table>';
@@ -1459,7 +1467,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 			$htmlstring.='<tr class="'.$classe.'">
 							<td>
 								<a href="../../content/pdfExport.php?xsl=Uebernahme&xml=betriebsmittelperson.rdf.php&id='.$row->betriebsmittelperson_id.'" title="Übernahmebestätigung">
-								<img src="../../skin/images/pdfpic.gif">	
+								<img src="../../skin/images/pdfpic.gif">
 								</a>
 							</td>
 							<td>';

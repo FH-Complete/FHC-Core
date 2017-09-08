@@ -96,10 +96,10 @@ if(isset($_GET['filter']))
 		$stsemAktOrNext = $stsemAktOrNext->getaktorNext(1);
 	elseif($_GET['filter']=='SSemester')
 		$stsemAktOrNext = $stsemAktOrNext->getaktorNext(2);
-	else 
+	else
 		$stsemAktOrNext = $stsemAktOrNext->getaktorNext();
 }
-else 
+else
 {
 	$stsemAktOrNext = $stsemAktOrNext->getaktorNext();
 }
@@ -118,11 +118,11 @@ $firma->getFirmen('Partneruniversität');
 
 if (isset($_GET['lang']))
 	$get_url = str_replace('lang='.$_GET['lang'].'&', '', $_SERVER['QUERY_STRING']);
-else 
+else
 	$get_url = $_SERVER['QUERY_STRING'];
 
 $filter_url = '';
-if (isset($_GET['filter']) || isset($_GET['unterrichtssprache']) || isset($_GET['studiengang'])) 
+if (isset($_GET['filter']) || isset($_GET['unterrichtssprache']) || isset($_GET['studiengang']))
 	$filter_url = 'filter='.$_GET['filter'].'&unterrichtssprache='.$_GET['unterrichtssprache'].'&studiengang='.$_GET['studiengang'].'&go=Filter&';
 
 $message = '';
@@ -135,49 +135,57 @@ $message = '';
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 	<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-	<!--<script type="text/javascript" src="../../../include/js/jquery.js"></script>-->
-	<script type="text/javascript" src="../../../include/js/jquery1.9.min.js"></script>	
+	<!--<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
+<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
+<script type="text/javascript" src="../../../include/js/sizzle-0.9.3.js"></script>-->
+	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css"/>
 	<script type="text/javascript">
-	$(document).ready(function() 
-	{		
+	$(document).ready(function()
+	{
 		$.datepicker.setDefaults( $.datepicker.regional[ "" ] );
-		<?php //Wenn Deutsch ausgewaehlt, dann Datepicker auch in Deutsch 
+		<?php //Wenn Deutsch ausgewaehlt, dann Datepicker auch in Deutsch
 		if ($sprache=="German")
 			echo '$.datepicker.setDefaults( $.datepicker.regional[ "de" ] );
-			$( "#datepicker" ).datepicker(	
+			$( "#datepicker" ).datepicker(
 				{
 					changeMonth: true,
 					changeYear: true,
 					defaultDate: "-6570",
 					maxDate: -5110,
 					yearRange: "-60:+00",
-				}					
+				}
 				);
- 			$( ".datepicker_exchange" ).datepicker(	
+ 			$( ".datepicker_exchange" ).datepicker(
 				{
 					changeMonth: true,
 					changeYear: true
-				}					
+				}
 				);';
-		else 
+		else
 			echo '$( "#datepicker" ).datepicker({
 				dateFormat: "dd.mm.yy",
 				changeMonth: true,
 				changeYear: true,
 				defaultDate: "-6570",
 				maxDate: -5110,
-				yearRange: "-60:+00",	 
+				yearRange: "-60:+00",
 				});
- 				$( ".datepicker_exchange" ).datepicker(	
+ 				$( ".datepicker_exchange" ).datepicker(
 				{
 					dateFormat: "dd.mm.yy",
  					changeMonth: true,
 					changeYear: true
-				}					
+				}
 				);';
 		?>
-		
+
 	});
 	</script>
 <?php
@@ -248,7 +256,7 @@ function setBisdatum(datum)
 		border-bottom: 6px solid #5cb85c;
 		border-right: 12px solid #5cb85c;
 		border-left: 12px solid #5cb85c;
-		display: inline-block;"		
+		display: inline-block;"
 	}
 	.uploadbutton:hover, .uploadbutton:active, .uploadbutton:focus
 	{
@@ -264,7 +272,7 @@ function setBisdatum(datum)
 		border-bottom: 6px solid #339B33;
 		border-right: 12px solid #339B33;
 		border-left: 12px solid #339B33;
-		display: inline-block;"		
+		display: inline-block;"
 	}
 	</style>
 	</head>
@@ -292,7 +300,7 @@ if($method =="austauschprogram")
 	{
 		$von_datum = $_REQUEST['von'];
 		$bis_datum = $_REQUEST['bis'];
-		
+
 		//Datum auf Gueltigkeit pruefen
 		if (($von_datum != '' && !$date->formatDatum($von_datum,'Y-m-d')) || ($bis_datum != '' && !$date->formatDatum($bis_datum,'Y-m-d')))
 		{
@@ -302,7 +310,7 @@ if($method =="austauschprogram")
 		{
 			$von_datum = $date->formatDatum($von_datum,'Y-m-d');
 			$bis_datum = $date->formatDatum($bis_datum,'Y-m-d');
-		
+
 			$dtstart = new DateTime($von_datum);
 			$dtende = new DateTime($bis_datum);
 			$jetzt = new DateTime();
@@ -317,7 +325,7 @@ if($method =="austauschprogram")
 				echo '<span style="color: red"><b>'.$p->t('incoming/endeGroesserStart').'</b></span>';
 				$_REQUEST['bis'] = '';
 			}
-			else 
+			else
 			{
 				$preincoming->von = $date->formatDatum($_REQUEST['von'],'Y-m-d');
 				$preincoming->bis = $date->formatDatum($_REQUEST['bis'],'Y-m-d');
@@ -328,7 +336,7 @@ if($method =="austauschprogram")
 				else
 					$preincoming->mobilitaetsprogramm_code = $_REQUEST['austausch_kz'];
 					$preincoming->updateamum = date('Y-m-d H:i:s');
-		
+
 				if(!$preincoming->save())
 					echo $preincoming->errormsg;
 				else
@@ -361,7 +369,7 @@ if($method =="austauschprogram")
 										$anzeigetext = 'Exchange';
 									elseif ($mob->kurzbz=='selbst')
 										$anzeigetext = 'Freemover';
-									else 
+									else
 										$anzeigetext = $mob->kurzbz;
 									echo '<option value="'.$mob->mobilitaetsprogramm_code.'" '.$selected.'>'.$anzeigetext."</option>\n";
 							}
@@ -417,9 +425,9 @@ else if($method=="lehrveranstaltungen")
 									)
 								AND tbl_prestudentstatus.status_kurzbz = 'Incoming'
 								AND tbl_prestudentstatus.studiensemester_kurzbz = '$stsem->studiensemester_kurzbz'
-							
+
 							UNION
-							
+
 							SELECT person_id
 							FROM PUBLIC.tbl_preincoming_lehrveranstaltung
 							JOIN PUBLIC.tbl_preincoming using (preincoming_id)
@@ -441,7 +449,7 @@ else if($method=="lehrveranstaltungen")
 						) AS anzahl
 						FROM lehre.tbl_lehrveranstaltung
 						WHERE tbl_lehrveranstaltung.lehrveranstaltung_id = ".$id;
-			
+
 			if($result = $db->db_query($qry))
 			{
 				if ($db->db_num_rows($result)>0)
@@ -452,7 +460,7 @@ else if($method=="lehrveranstaltungen")
 					}
 				}
 			}
-			
+
 			if(!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id,  $_GET['id']) && $freieplaetze>0)
 			{
 				if($preincoming->addLehrveranstaltung($preincoming->preincoming_id, $_GET['id'], date('Y-m-d H:i:s'), 'Incoming '.$preincoming->preincoming_id))
@@ -460,7 +468,7 @@ else if($method=="lehrveranstaltungen")
 				else
 					$message = '<span style="color: red"><b>'.($p->t('global/fehleraufgetreten')).'</b></span>';
 			}
-			else 
+			else
 				$message = '<span style="color: red"><b>'.$p->t('incoming/lvVollBelegt').'</b></span>';
 		}
 		// löschen der LV-ID
@@ -796,14 +804,14 @@ else if($method=="lehrveranstaltungen")
 				if ($row->typ == 'b' || $row->typ == 'm' || $row->studiengang_kz == '10006')
 				{
 					$selected = '';
-					
+
 					if ($typ != $row->typ || $typ=='')
 					{
 						if ($typ!='')
 							echo '</optgroup>';
 							echo '<optgroup label="'.$type[$row->typ].'">';
 					}
-					
+
 					if(isset($_GET['studiengang']) && $_GET['studiengang'] == $row->studiengang_kz)
 						$selected='selected';
 
@@ -835,21 +843,21 @@ else if($method=="lehrveranstaltungen")
 		if(isset($_GET['unterrichtssprache']) && $_GET['unterrichtssprache']!='')
 			$filterqry .= " AND tbl_lehrveranstaltung.sprache='".$_GET['unterrichtssprache']."'";
 
-		
+
 		//Uebersicht LVs
 		/* Erklaerung der Datumszeitraeume ab Zeile 857:
 		 *			|=============== Studiensemester ===============|
 		 *		|--------------| 											Incoming beginnt vor SS-Beginn und endet VOR SS-Ende jedoch ueberwiegend innerhalb SS
-		 *												|--------------| 	Incoming beginnt VOR SS-Ende und endet NACH SS-Ende, jedoch ueberwiegend innerhalb SS 
+		 *												|--------------| 	Incoming beginnt VOR SS-Ende und endet NACH SS-Ende, jedoch ueberwiegend innerhalb SS
 		 *	|----------| 													Incoming beginnt vor SS-Beginn und endet VOR SS-Ende jedoch ueberwiegend außerhalb SS
-		 *														|---------|	Incoming beginnt VOR SS-Ende und endet NACH SS-Ende, jedoch ueberwiegend außerhalb SS 
+		 *														|---------|	Incoming beginnt VOR SS-Ende und endet NACH SS-Ende, jedoch ueberwiegend außerhalb SS
 		 * 					|------------------------------| 				Incoming ist innerhalb oder GENAU SS da
-		 *		|------------------------------------------------------|	Incoming ist VOR SS-Anfang und NACH SS-Ende da, jedoch ueberwiegend ueberlappend mit SS 
+		 *		|------------------------------------------------------|	Incoming ist VOR SS-Anfang und NACH SS-Ende da, jedoch ueberwiegend ueberlappend mit SS
 		 *	------------------------------------------------------------	Von und Bis ist NULL
 		 *	-------------------|											Von ist NULL und bis innerhalb SS
-		 *									|---------------------------	Bis ist NULL und von innerhalb SS 
+		 *									|---------------------------	Bis ist NULL und von innerhalb SS
 		 */
-		
+
 		$studiensemester_array = array();
 		$studiensemester = new studiensemester();
 		$studiensemester_array[] = $studiensemester->getakt();
@@ -904,29 +912,29 @@ else if($method=="lehrveranstaltungen")
 								(bis IS NULL AND von < '$stsem->ende' AND von >= '$stsem->start')
 							)
 							AND aktiv = true
-							)a ) as anzahl 
+							)a ) as anzahl
 						FROM
-							lehre.tbl_lehrveranstaltung 
-						JOIN 
-							public.tbl_studiengang USING(studiengang_kz) 
+							lehre.tbl_lehrveranstaltung
+						JOIN
+							public.tbl_studiengang USING(studiengang_kz)
 						WHERE
-							tbl_lehrveranstaltung.incoming>0 AND 
-							tbl_lehrveranstaltung.aktiv AND 
-							tbl_lehrveranstaltung.lehre AND 
+							tbl_lehrveranstaltung.incoming>0 AND
+							tbl_lehrveranstaltung.aktiv AND
+							tbl_lehrveranstaltung.lehre AND
 							tbl_lehrveranstaltung.lehrveranstaltung_id IN (
-								SELECT lehrveranstaltung_id FROM lehre.tbl_studienplan_lehrveranstaltung 
-								JOIN lehre.tbl_studienplan USING (studienplan_id) 
-								JOIN lehre.tbl_studienordnung USING (studienordnung_id) 
+								SELECT lehrveranstaltung_id FROM lehre.tbl_studienplan_lehrveranstaltung
+								JOIN lehre.tbl_studienplan USING (studienplan_id)
+								JOIN lehre.tbl_studienordnung USING (studienordnung_id)
 								JOIN lehre.tbl_studienplan_semester USING (studienplan_id)
-								WHERE tbl_studienordnung.status_kurzbz='approved' 
+								WHERE tbl_studienordnung.status_kurzbz='approved'
 								AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id
 								AND tbl_studienplan_semester.studiensemester_kurzbz IN ('".$stsem->studiensemester_kurzbz."')
-								AND tbl_lehrveranstaltung.semester=tbl_studienplan_semester.semester) 
+								AND tbl_lehrveranstaltung.semester=tbl_studienplan_semester.semester)
 								AND ((tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000) OR tbl_lehrveranstaltung.studiengang_kz=10006)";
-	
+
 						if (isset($_GET['studiengang']) && $_GET['studiengang'] !='')
 							$qry .= " AND tbl_lehrveranstaltung.studiengang_kz=".$_GET['studiengang'];
-	
+
 						$qry .= " AND tbl_studiengang.aktiv ".$filterqry." order by studiengang_kz
 						";
 
@@ -958,7 +966,7 @@ else if($method=="lehrveranstaltungen")
 					{
 						$freieplaetze = $row->incoming - $row->anzahl;
 						$style = '';
-						
+
 						if ($preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id))
 							$style = 'style="background-color: #88DD88"';
 						elseif ($freieplaetze<=0)
@@ -976,7 +984,7 @@ else if($method=="lehrveranstaltungen")
 							else
 								$typ = '-';
 							echo '<tr>';
-							
+
 							if(!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id) && $freieplaetze>0)
 								echo '<td><a href="incoming.php?method=lehrveranstaltungen&mode=add&id='.$row->lehrveranstaltung_id.'&'.$filter_url.'">'.$p->t('global/anmelden').'</a></td>';
 							elseif (!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id) && $freieplaetze<=0)
@@ -1006,7 +1014,7 @@ else if($method=="lehrveranstaltungen")
 					echo '<center><b>'.$p->t('incoming/derzeitKeineLehrveranstaltungen').'</b></center>';
 			}
 		}
-		else 
+		else
 			echo '<center><b>'.$p->t('incoming/waehlenSieAusDenOptionen').'</b></center>';
 	}
 }
@@ -1045,10 +1053,10 @@ else if ($method == "university")
 
 			$preincoming->program_name = $_REQUEST['name_of_program'];
 
-			//Pruefen, ob Jahre studiert eine ganze Zahl ist oder leer 
+			//Pruefen, ob Jahre studiert eine ganze Zahl ist oder leer
 			if(ctype_digit($_REQUEST['jahre']) || $_REQUEST['jahre'] == '')
 				$preincoming->jahre = $_REQUEST['jahre'];
-			else 
+			else
 				echo '<span class="error">'.$p->t('incoming/jahreStudiertMussGanzeZahlSein').'</span><br>';
 			if(isset($_REQUEST['bachelor']))
 				$preincoming->bachelor = true;
@@ -2061,14 +2069,14 @@ else if($method == 'files')
 			if (typeof window.screenLeft != "undefined")
 			{ //IE
 				posX = window.screenLeft + offsetX;
-				posY = window.screenTop + offsetY; 
+				posY = window.screenTop + offsetY;
 			}
 			else if (typeof window.screenX != "undefined")
 			{ //NS/Moz
 				posX = window.screenX + offsetX;
 				posY = window.screenY + offsetY;
 			}
-			else 
+			else
 			{ //default - center of screen
 				posX = screen.availWidth/2 - w/2;
 				posY = screen.availHeight/2 - h/2;
@@ -2115,7 +2123,7 @@ else if($method == 'files')
 		}
 		echo '</tbody></table></center>';
 	}
-	else 
+	else
 		echo 'foo';
 }
 else if($method == 'ende')
@@ -2128,16 +2136,16 @@ else if($method == 'ende')
 		// sende Nachricht an Assistenz
 		//$emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
 		$emailtext.= "Der/Die Incoming ".$person->vorname.' '.$person->nachname.' hat seine Registration abgeschlossen';
-		
+
 		$emailtext = wordwrap($emailtext,70); //Bricht den Code um, da es sonst zu Anzeigefehlern im Mail kommen kann
-		
+
 		$mail = new mail(MAIL_INTERNATIONAL, 'no-reply', 'Incoming '.$person->vorname.' '.$person->nachname.' vollstaendig', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
 		$mail->setHTMLContent($emailtext);
 		if(!$mail->send())
 			$message = '<span style="color: red"><b>'.($p->t('incoming/fehlerBeimSenden')).'</b></span>';
 		else
 			$message = '<span style="color: green"><b>'.($p->t('incoming/erfolgreichAbgeschickt')).'</b></span>';
-					
+
 	}
 	echo '<center>'.$message.'</center>';
 	echo '<br><br><br>
@@ -2152,7 +2160,7 @@ else if($method == 'ende')
 				<br><br>
 				<input type="submit" name="submit_ende" value="'.$p->t('global/abschicken').'"></td>
 			</tr>
-			
+
 		</table>
 		</form>';
 }

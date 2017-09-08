@@ -103,7 +103,7 @@ $bn_funktion_id = isset($_GET ['bn_funktion_id'])?$_GET ['bn_funktion_id']:'-1';
 	// Neue Funktionszuweisung speichern
 if ($type == 'new' || $type == 'editsave') {
 	// Einfügen in die Datenbank
-	
+
 	$funktion = new benutzerfunktion ();
 	$funktion->uid = $_POST ['uid'];
 	$funktion->funktion_kurzbz = $_POST ['kurzbz'];
@@ -149,34 +149,34 @@ if ($type == 'editsavemultiple')
 {
 	$uids = explode(", ", $_POST['uids']);
 	$bn_funktion_ids = explode(", ", $_POST['bn_funktion_ids']);
-	
+
 	for ($i=0; $i<count($uids); $i++) {
 		$funktion = new benutzerfunktion ();
 		$funktion->uid = $uids[$i];
 		$funktion->funktion_kurzbz = $_POST ['kurzbz'];
 		if (isset ( $_POST ['oe_kurzbz'] ) && $_POST ['oe_kurzbz'] != - 1) {
 			$funktion->oe_kurzbz = $_POST ['oe_kurzbz'];
-		
+
 			if (isset ( $_POST ['fb_kurzbz'] ) && $_POST ['fb_kurzbz'] != - 1) {
 				$funktion->fachbereich_kurzbz = $_POST ['fb_kurzbz'];
 			} else {
 				$funktion->fachbereich_kurzbz = null;
 			}
-		
+
 			$funktion->semester = (isset ( $_POST ['semester'] ) ? $_POST ['semester'] : '');
 			$funktion->datum_von = $_POST ['datumvon'];
 			$funktion->datum_bis = $_POST ['datumbis'];
-		
+
 			$funktion->bezeichnung = $_POST ['bezeichnung'];
 			$funktion->wochenstunden = $_POST ['wochenstunden'];
-		
+
 			$funktion->new = false;
 			$funktion->benutzerfunktion_id = $bn_funktion_ids[$i];
 			$funktion->updateamum = date ( 'Y-m-d H:i:s' );
 			$funktion->updatevon = $user;
-			
+
 			//var_dump($funktion);
-			
+
 			if (! $funktion->save ()) {
 				echo "Fehler: " . $funktion->errormsg;
 			}
@@ -186,17 +186,17 @@ if ($type == 'editsavemultiple')
 }
 
 // Eine Funktionszuweisung loeschen
-if ($type == 'delete') 
+if ($type == 'delete')
 {
 	$funktion = new benutzerfunktion ();
 	$bn_funktion_id = $_GET ['bn_funktion_id'];
-	if (! is_numeric ( $bn_funktion_id )) 
+	if (! is_numeric ( $bn_funktion_id ))
 	{
 		echo "Benutzer_funktion_id ist keine Zahl";
-	} 
-	else 
+	}
+	else
 	{
-		if (! $funktion->delete ( $bn_funktion_id )) 
+		if (! $funktion->delete ( $bn_funktion_id ))
 		{
 			echo "Fehler: " . $funktion->errormsg;
 		}
@@ -237,7 +237,10 @@ if (! $funktion->load ( $kurzbz )) {
 
 <!-- modified 20160707 -->
 <link href="../../skin/tablesort.css" rel="stylesheet" type="text/css" />
-<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 <link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css"
 	type="text/css">
 
@@ -316,7 +319,7 @@ echo '
 	<option value="-1">- auswählen -</option>';
 // Auswahl der Organisationseinheit
 
-while ( $row = $db->db_fetch_object ( $result_oe ) ) 
+while ( $row = $db->db_fetch_object ( $result_oe ) )
 {
 	$rows[] = $row;
 	echo "<option value=\"$row->oe_kurzbz\" ";
@@ -438,13 +441,13 @@ echo '</SELECT>';
 						array_push($bn_funktion_ids, $checkAktion[$i][2]);
 					}
 					$names = array_unique($names);
-						
+
 					echo '<form  accept-charset=\"UTF-8\" action=\"\'.$_SERVER[\'PHP_SELF\'].\'\" mehtod=\"GET\">';
 					echo '<INPUT type="hidden" id="uids" name="uids" value="'.implode(", ", $uids).'">';
 					echo '<INPUT type="hidden" id="bn_funktion_ids" name="bn_funktion_ids" value="'.implode(", ", $bn_funktion_ids).'">';
 					echo '<textare disabled>'.implode("<br/>", $names).'</textarea>';
 					echo '</form>';
-						
+
 					//var_dump($checkAktion);
 					//var_dump($names);
 				}
@@ -456,7 +459,7 @@ echo '</SELECT>';
 					$checkAktion[$i] = explode("-", $checkAktion[$i]);
 					array_push($bn_funktion_ids, $checkAktion[$i][2]);
 				}
-				
+
 				foreach ($bn_funktion_ids as $bn_funktion_idd) {
 					$funktion = new benutzerfunktion ();
 					$bn_funktion_id = $bn_funktion_idd;
@@ -595,7 +598,7 @@ echo '</SELECT>';
 	echo '</table>';
 	echo '<input id="submitButton" type="submit" name="Submit" value="' . (($type == 'edit' && !(isset($_POST['editordelete']) && $_POST['editordelete']=='delete'))? 'Speichern' : 'Hinzuf&uuml;gen') . '" >';
 	echo '</p></form>';
-	
+
 	 ?>
 
 	<script type="text/javascript">
@@ -632,7 +635,7 @@ echo '</SELECT>';
 		    checkboxes[i].checked = source.checked;
 		  }
 		}
-	
+
 	function setEditOrDelete(s)
 	{
 		var x = document.getElementsByClassName("editordelete");
@@ -640,7 +643,7 @@ echo '</SELECT>';
 		    x[i].value = s;
 		}
 	}
-	
+
 	function checkCheckbox() {
 	var arr = $('input:checkbox.file-selection-id').map(function () {
 			return this.id;

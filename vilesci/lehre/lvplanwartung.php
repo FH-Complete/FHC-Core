@@ -89,7 +89,7 @@ if(isset($_GET['lektor_uid']))
 
 if(isset($_GET['unr']))
 	$unr = $_GET['unr'];
-	
+
 // Plausib der Variablen
 if ($verband=='')
 	$verband=' ';
@@ -101,12 +101,12 @@ if(!is_numeric($stg_kz))
 if(!is_numeric($semester))
 	$semester=0;
 
-$insert = (isset($_GET['insert'])?$_GET['insert']:false);	
+$insert = (isset($_GET['insert'])?$_GET['insert']:false);
 $insert=trim($insert);
 $insert=(empty($insert)?false:true);
-			
-			
-//	Studiengang lesen 
+
+
+//	Studiengang lesen
 $s=new studiengang();
 $s->getAll('typ, kurzbz', false);
 $studiengang=$s->result;
@@ -125,16 +125,16 @@ if ($insert)
 
 	if(!$result=$db->db_query($qry))
 		die ($qry .' '.$db->db_last_error());
-		
+
 	while ($row=$db->db_fetch_object($result))
 	{
-		$qry = "SELECT 
-					DISTINCT ort_kurzbz 
-				FROM 
+		$qry = "SELECT
+					DISTINCT ort_kurzbz
+				FROM
 					lehre.".$stpl_table."
-				WHERE 
-					lehreinheit_id=".$db->db_add_param($leid, FHC_INTEGER)." 
-					AND datum=".$db->db_add_param($row->datum)." 
+				WHERE
+					lehreinheit_id=".$db->db_add_param($leid, FHC_INTEGER)."
+					AND datum=".$db->db_add_param($row->datum)."
 					AND stunde=".$db->db_add_param($row->stunde).";";
 
 		if(!$result_ort=$db->db_query($qry))
@@ -144,10 +144,10 @@ if ($insert)
 		{
 			// Pruefen ob der Eintrag schon in der Datenbank vorhanden ist
 			// da sonst bei mehrmaligem Refresh der Seite der Eintrag oefter eingetragen wird
-			$qry = "SELECT 
-						1 
-					FROM 
-						lehre.$stpl_table 
+			$qry = "SELECT
+						1
+					FROM
+						lehre.$stpl_table
 					WHERE datum=".$db->db_add_param($row->datum).
 					'	AND stunde='.$db->db_add_param($row->stunde).
 					'	AND ort_kurzbz='.$db->db_add_param($row_ort->ort_kurzbz).
@@ -209,22 +209,22 @@ if (!empty($semester))
 if (!empty($stg_kz))
 	$where.=" AND studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER);
 
-$sql_query="SELECT 
+$sql_query="SELECT
 			*, planstunden-verplant::smallint AS offenestunden
-		FROM 
-			lehre.$lva_stpl_view 
+		FROM
+			lehre.$lva_stpl_view
 			JOIN lehre.tbl_lehrform ON ($lva_stpl_view.lehrform=tbl_lehrform.lehrform_kurzbz)
-		WHERE $where 
-			AND verplant=0 
-			AND planstunden>0 
+		WHERE $where
+			AND verplant=0
+			AND planstunden>0
 			AND lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.$stpl_table)
 		ORDER BY offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz;";
 
 if(!$result_lv=$db->db_query($sql_query))
 	die ("DB Fehler $sql_query"  .' '.$db->db_last_error());
-if(!$result_lv) 
+if(!$result_lv)
 	die("Lehrveranstaltung not found!");
-	
+
 $s=array();
 $outp.='<SELECT name="stg_kz" onchange="window.location.href=this.value">';
 foreach ($studiengang as $stg)
@@ -248,10 +248,13 @@ for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
-	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script type="text/javascript">
-	$(document).ready(function() 
-	{ 
+	$(document).ready(function()
+	{
 		$("#t1").tablesorter(
 		{
 			sortList: [[2,1]],

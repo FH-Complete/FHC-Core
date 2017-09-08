@@ -48,7 +48,12 @@ $method = isset($_REQUEST['method'])?$_REQUEST['method']:'';
 		<link href="../skin/fhcomplete.css" rel="stylesheet" type="text/css">
 		<link href="../skin/style.css.php" rel="stylesheet" type="text/css">
 		<script type="text/javascript" src="../include/tiny_mce/tiny_mce.js"></script>
-		<script type="text/javascript" src="../include/js/jquery.js"></script>
+		<link rel="stylesheet" type="text/css" href="../skin/jquery-ui-1.9.2.custom.min.css">
+<script type="text/javascript" src="../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="../vendor/components/jqueryui/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../include/js/jquery.ui.datepicker.translation.js"></script>
+<script type="text/javascript" src="../include/js/sizzle-0.9.3.js"></script>
 		<script type="text/javascript">
 
 		var __js_page_array = new Array();

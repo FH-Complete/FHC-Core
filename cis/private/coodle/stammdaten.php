@@ -47,14 +47,17 @@ echo '
 	<link rel="stylesheet" href="../../../skin/styles/jquery.css" type="text/css">
 	<link rel="stylesheet" href="../../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
 	<link rel="stylesheet" href="../../../skin/jquery.ui.timepicker.css" type="text/css"/>
-	<script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script src="../../../include/tiny_mce/tiny_mce.js" type="text/javascript" ></script>
-	<script src="../../../include/js/jquery.ui.timepicker.js" type="text/javascript" ></script>
+	<script src="../../../vendor/fgelinas/timepicker/jquery.ui.timepicker.js" type="text/javascript" ></script>
 	<script type="text/javascript">
-	$(document).ready(function() 
-	{ 
+	$(document).ready(function()
+	{
 		$.datepicker.setDefaults( $.datepicker.regional[ "de" ] );
-		$("#datepicker_datum").datepicker(	
+		$("#datepicker_datum").datepicker(
 		{
 			changeMonth: true,
 			defaultDate: "+7",
@@ -68,7 +71,7 @@ echo '
 			minutes: {starts: 30, ends: 150, interval: 30},
 			rows: 5,
 		});
-				
+
 	});
 	</script>
 	<script type="text/javascript">
@@ -79,12 +82,12 @@ echo '
 		theme : "advanced",
 		language : "de",
 		file_browser_callback: "FHCFileBrowser",
-		
+
 		plugins : "spellchecker,pagebreak,style,layer,table,advhr,advimage,advlink,inlinepopups,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras",
-			
+
 		// Theme options
-		theme_advanced_buttons1 : "bold,italic,underline,|,justifyleft,justifycenter,justifyright,justifyfull,|,link,unlink,|,bullist,pastetext", 
-		theme_advanced_buttons2 : "", 
+		theme_advanced_buttons1 : "bold,italic,underline,|,justifyleft,justifycenter,justifyright,justifyfull,|,link,unlink,|,bullist,pastetext",
+		theme_advanced_buttons2 : "",
 		theme_advanced_buttons3 : "",
 		theme_advanced_toolbar_location : "top",
 		theme_advanced_toolbar_align : "center",
@@ -100,17 +103,17 @@ echo '
 		paste_strip_class_attributes: true,
 		paste_retain_style_properties: "",
 		paste_text_sticky: true,
-		setup : function(ed) 
-		{	
+		setup : function(ed)
+		{
 			ed.onInit.add(function(ed)
 			{	ed.pasteAsPlainText = true;
 				ed.controlManager.setActive("pastetext", true);
 			});
 		   }
-		
+
 		}
 	);
-	
+
 	function checkrequired()
 	{
 		var error = false;
@@ -141,9 +144,9 @@ echo '
 		{
 			document.getElementById("datepicker_datum").style.border = "";
 		}
-		
+
 		var datum = document.getElementById("datepicker_datum").value;
-		var Tag = datum.substring(0,2); 
+		var Tag = datum.substring(0,2);
 		var Monat = datum.substring(3,5);
 		Monat = Monat-1;
 		var Jahr = datum.substring(6,10);
@@ -160,7 +163,7 @@ echo '
 		{
 			document.getElementById("datepicker_datum").style.border = "";
 		}
-		
+
 		if (error)
 			return false;
 		else
@@ -168,7 +171,7 @@ echo '
 	}
 	</script>
 	<style>
-	#wrapper 
+	#wrapper
 	{
 		width: 80%;
 		padding: 0 10px 15px 10px;
@@ -176,21 +179,21 @@ echo '
 		background: #eee;
 		text-align: left;
 	}
-	#wrapper h4 
+	#wrapper h4
 	{
 		font-size: 17px;
 		margin-top: 0;
 		padding-top: 10px;
 		padding-bottom: 10px;
 		text-decoration: none;
-	}	
+	}
 	#weiter
 	{
 		width: 80%;
 		text-align: center;
 		margin-top: 10px;
 		padding: 10px;
-		
+
 		padding: 10px 10px 10px 10px;
 		border: 1px solid #D6E9C6;
 		background: #DFF0D8;
@@ -201,7 +204,7 @@ echo '
 		text-align: center;
 		margin-top: 10px;
 		padding: 10px;
-		
+
 		padding: 10px 10px 10px 10px;
 		border: 1px solid #ccc;
 		background: #ddd;
@@ -212,7 +215,7 @@ echo '
 		text-align: center;
 		margin-top: 10px;
 		padding: 10px;
-		
+
 		padding: 10px 10px 10px 10px;
 		border: 1px solid #ccc;
 		background: #EDCECE;
@@ -221,7 +224,7 @@ echo '
 	{
 		text-decoration: none;
 	}
-	.ui-timepicker-table td a 
+	.ui-timepicker-table td a
 	{
 		padding:0.2em 0.3em 0.2em 0.3em;
 		width: 1.8em;
@@ -242,26 +245,26 @@ if(isset($_POST['save']))
 	$coodle_id = $_POST['coodle_id'];
 	if (isset($_POST['mailversand']))
 			$mailversand = true;
-		else 
+		else
 			$mailversand = false;
-			
+
 	if (isset($_POST['teilnehmer_anonym']))
 			$teilnehmer_anonym = true;
-		else 
+		else
 			$teilnehmer_anonym = false;
-	
+
 	if (isset($_POST['termin_anonym']))
 			$termin_anonym = true;
-		else 
+		else
 			$termin_anonym = false;
-	
+
 	$coodle = new coodle();
-	
+
 	if($coodle_id!='')
 	{
 		if(!$coodle->load($coodle_id))
 			die($coodle->errormsg);
-			
+
 		if($coodle->ersteller_uid!=$user)
 		{
 			die($p->t('basis/keineBerechtigung'));
@@ -276,7 +279,7 @@ if(isset($_POST['save']))
 		$coodle->insertvon = $user;
 		$coodle->coodle_status_kurzbz = 'neu';
 	}
-		
+
 	$coodle->titel = $titel;
 	$coodle->beschreibung = $beschreibung;
 	$coodle->dauer = $dauer;
@@ -286,7 +289,7 @@ if(isset($_POST['save']))
 	$coodle->mailversand = $mailversand;
 	$coodle->teilnehmer_anonym = $teilnehmer_anonym;
 	$coodle->termine_anonym = $termin_anonym;
-	
+
 	if($coodle->save())
 	{
 		$message.= '<span class="ok">'.$p->t('global/erfolgreichgespeichert').'</span>';
@@ -294,11 +297,11 @@ if(isset($_POST['save']))
 		if ($coodle->new == true)
 		{
 			$coodletermin = new coodle();
-			
+
 			$coodletermin->datum = '1900-01-01';
 			$coodletermin->uhrzeit = '00:00:01';
 			$coodletermin->coodle_id = $coodle->coodle_id;
-			
+
 			if (!$coodletermin->saveTermin(true))
 				$message.= '<span class="error">'.$coodletermin->errormsg.'</span>';
 		}
@@ -316,10 +319,10 @@ elseif(isset($_GET['coodle_id']))
 	{
 		if($coodle->ersteller_uid!=$user)
 			die($p->t('global/keineBerechtigungFuerDieseSeite'));
-			
+
 		if(($coodle->coodle_status_kurzbz!='neu') && ($coodle->coodle_status_kurzbz!='laufend'))
 		{
-			// Wenn bereits abgeschlosse oder storniert, 
+			// Wenn bereits abgeschlosse oder storniert,
 			// kann nicht mehr bearbeitet werden
 			die($p->t('coodle/umfrageNichtGueltig'));
 		}

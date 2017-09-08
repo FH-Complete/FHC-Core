@@ -42,16 +42,19 @@ if(!$result_funktion)
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link href="../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
-	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+	<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 	<script language="Javascript">
-	$(document).ready(function() 
-			{ 
+	$(document).ready(function()
+			{
 				$("#t1").tablesorter(
 					{
 						sortList: [[0,0]],
 						widgets: ["zebra"],
 						headers: {2:{sorter:false},3:{sorter:false}}
-					}); 
+					});
 			});
 </script>
 <body>
@@ -75,11 +78,11 @@ if ($result_funktion!=0)
 	for ($j=0; $j<$num_rows;$j++)
 	{
 		$row=$db->db_fetch_row($result_funktion,$j);
-		
+
 		echo "<tr>";
 	    for ($i=0; $i<$num_fields; $i++)
 			echo "<td>$row[$i]</td>";
-			
+
 		echo "<td><a href=\"funktion_det.php?kurzbz=$row[1]\">Details</a></td>";
 		echo "<td><a href=\"../stammdaten/benutzerberechtigung_details.php?funktion_kurzbz=$row[1]\">Berechtigungen</a></td>";
 	    echo "</tr>\n";

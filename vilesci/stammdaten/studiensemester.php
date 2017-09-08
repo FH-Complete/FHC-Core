@@ -23,33 +23,33 @@
  */
 /**
  * Studiensemesterverwaltung
- * 
+ *
  */
 	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/datum.class.php');
 	require_once('../../include/benutzerberechtigung.class.php');
 	require_once('../../include/studiensemester.class.php');
-	
+
 	if (!$db = new basis_db())
 			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-	
+
 	$user = get_uid();
 	$datum_obj = new datum();
 	$action = (isset($_GET['action'])?$_GET['action']:'');
 	$studiensemester_kurzbz=(isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:'');
 	$von = (isset($_POST['vondatum'])?$_POST['vondatum']:date('d.m.Y'));
 	$bis = (isset($_POST['bisdatum'])?$_POST['bisdatum']:date('d.m.Y'));
-	
+
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-	
+
 	if(!$rechte->isBerechtigt('admin'))
 		die($rechte->errormsg);
-	
+
 	$studiensemester = new studiensemester();
 	$studiensemester->getAll();
-		
+
 	echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www.w3.org/TR/html4/strict.dtd">
 				<html>
 				<head>
@@ -59,37 +59,40 @@
 					<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 					<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 					<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-					<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
+					<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+					<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+					<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
+					<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
 					<script type="text/javascript">
-					$(document).ready(function() 
-					{		
+					$(document).ready(function()
+					{
 						$( ".datepicker" ).datepicker({
 							dateFormat: "yy-mm-dd",
 							changeMonth: true,
-							changeYear: true,		 
+							changeYear: true,
 							 });
 						 $("#t1").tablesorter({
 							sortList: [[1,1]],
 							widgets: ["zebra"],
 							headers: {7:{sorter:false}}
-							}); 							
+							});
 								});
 					</script>
 				</head>
 				<body class="Background_main">
 				<h2>Studiensemesterverwaltung</h2>';
-		
+
 	// Speichern eines Studiensemesters
 	if(isset($_GET['speichern']))
 	{
-		
+
 		if(!$rechte->isBerechtigt('admin'))
 		{
 			die($rechte->errormsg);
 		}
-	
+
 		$studiensemester = new studiensemester();
-	
+
 		if(isset($_POST['studiensemester_kurzbz']) && $_POST['studiensemester_kurzbz']!='' && $_GET['speichern']!='neu')
 		{
 			//Studiensemester laden
@@ -97,7 +100,7 @@
 			{
 				die($studiensemester->errormsg);
 			}
-	
+
 			$studiensemester->new=false;
 			$studiensemester->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 		}
@@ -126,7 +129,7 @@
 				$studiensemester->onlinebewerbung = false;
 			}
 			//$studiensemester->onlinebewerbung = $_POST['onlinebewerbung'];
-			
+
 			if($studiensemester->save())
 			{
 				echo '<b>Daten wurden erfolgreich gespeichert</b>';
@@ -138,12 +141,12 @@
 			echo "<br/>";
 		}
 	}
-	
+
 	/*
 	//Dropdown Auswahl Studiengang
 	$studiensemester = new Studiensemester();
 	$studiensemester->getAll('DESC');
-	
+
 	echo "<SELECT name='studiensemester_kurzbz' id='studiensemester' onchange='window.location.href=this.value'>";
 	if($studiensemester_kurzbz=='')
 		$selected='selected';
@@ -156,21 +159,21 @@
 			$selected='selected';
 		else
 			$selected='';
-	
+
 		echo '<OPTION value="'.$_SERVER['PHP_SELF'].'?studiensemester_kurzbz='.$row->studiensemester_kurzbz.'" '.$selected.'>'.$row->studiensemester_kurzbz.'</OPTION>';
 		echo "\n";
 	}
 	echo '</SELECT>';
 	*/
-	
+
 	echo "<table style='width:100%;'><tr><td><h1>Neu</h1>";
-	
+
 	//Studiensemester bearbeiten
 	if ($studiensemester_kurzbz != '' && !isset($_GET['speichern'])) {
 		$studiensemester = new Studiensemester();
 		$studiensemester->load($studiensemester_kurzbz);
 		$checked = $studiensemester->onlinebewerbung=='t'?"checked":"";
-		
+
 		//Neues Studiensemester eintragen disabled
 		echo '<form action="'.$_SERVER['PHP_SELF'].'?speichern=neu" method="POST">
 				<table style="width:50%;">
@@ -290,12 +293,12 @@
 	}
 	echo "</td></tr></table>";
 	echo '<HR/>';
-	
-	
+
+
 	//Liste der eingetragenen Studiensemester
 	$studiensemester = new Studiensemester();
 	$studiensemester->getAll('DESC');
-	
+
 	echo "<table id='t1' class='tablesorter'>
 			<thead>
 			<tr>
@@ -324,8 +327,8 @@
 			  </tr>";
 	}
 	echo "</tbody></table>";
-	
-	
+
+
 
 	echo "</td></tr></table><br>";
 	echo '
