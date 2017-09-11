@@ -522,7 +522,7 @@ if(isset($_GET['excel']))
 <script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../include/js/sizzle-0.9.3.js"></script>
+<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 		<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
@@ -531,7 +531,7 @@ if(isset($_GET['excel']))
 		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script src="../../vendor/rmariuzzo/jquery-checkboxes/dist/jquery.checkboxes-1.0.7.min.js" type="text/javascript"></script>
 
-		<link href="../../skin/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
+		<link href="../../vendor/fgelinas/timepicker/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
 		<script src="../../vendor/fgelinas/timepicker/jquery.ui.timepicker.js" type="text/javascript" ></script>
 
 		<script type="text/javascript">

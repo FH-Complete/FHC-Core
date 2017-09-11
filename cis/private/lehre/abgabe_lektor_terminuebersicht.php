@@ -40,35 +40,35 @@ echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
-	
+
 	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
 <script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../../include/js/sizzle-0.9.3.js"></script> 
-	<script type="text/javascript" src="../../../include/js/jquery.metadata.js"></script> 
+<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>
+	<script type="text/javascript" src="../../../vendor/jquery-archive/jquery-metadata/jquery.metadata.js"></script>
 	<script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 
 	<script type="text/javascript">
-		$(document).ready(function() 
-			{ 
+		$(document).ready(function()
+			{
 			    $("#myTable").tablesorter(
 				{
 					sortList: [[0,0]],
 					widgets: [\'zebra\']
-				}); 
-			} 
-		); 
+				});
+			}
+		);
 
-	</script>	
+	</script>
 </head>
 <body>
 ';
 
 if(isset($_GET['user']))
 {
-	//Terminliste von anderen Personen darf nur dann angezeigt werden, wenn 
+	//Terminliste von anderen Personen darf nur dann angezeigt werden, wenn
 	//die entsprechende Berechtigung vorhanden ist
 	$rechte = new benutzerberechtigung();
 	if(!$rechte->getBerechtigungen($uid))
@@ -84,14 +84,14 @@ if(!$lektor->load($user))
 	die($p->t('global/fehlerBeimErmittelnDerUID'));
 
 $sql_query = "
-	SELECT 
+	SELECT
 		distinct tbl_paabgabe.datum, tbl_paabgabe.fixtermin, tbl_paabgabe.kurzbz,
-		person_student.vorname as stud_vorname, person_student.nachname as stud_nachname, 
+		person_student.vorname as stud_vorname, person_student.nachname as stud_nachname,
 		person_student.titelpre as stud_titelpre, person_student.titelpost as stud_titelpost,
-		tbl_lehrveranstaltung.semester, UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg, 
+		tbl_lehrveranstaltung.semester, UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg,
 		tbl_paabgabetyp.bezeichnung as typ_bezeichnung
-	FROM 
-		campus.tbl_paabgabe 
+	FROM
+		campus.tbl_paabgabe
 		JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
 		JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id)
 		JOIN public.tbl_benutzer bn_student ON(tbl_projektarbeit.student_uid=bn_student.uid)
@@ -102,13 +102,13 @@ $sql_query = "
 		JOIN campus.tbl_paabgabetyp USING(paabgabetyp_kurzbz)
 	WHERE
 		tbl_projektbetreuer.person_id='".addslashes($lektor->person_id)."' AND tbl_paabgabe.datum>=now() AND bn_student.aktiv
-	ORDER BY tbl_paabgabe.datum	
+	ORDER BY tbl_paabgabe.datum
 	";
 
 if($result = $db->db_query($sql_query))
 {
 	echo "<h2>".$p->t('abgabetool/terminuebersicht')." - $lektor->titelpre $lektor->vorname $lektor->nachname $lektor->titelpost</h2>";
-	
+
 	if($db->db_num_rows($result)>0)
 	{
 		echo '<table id="myTable" class="tablesorter">';
@@ -126,9 +126,9 @@ if($result = $db->db_query($sql_query))
 			</thead>
 			<tbody>
 			';
-	
+
 		while($row = $db->db_fetch_object($result))
-		{	
+		{
 			echo '<tr>';
 			echo '<td>'.$datum_obj->formatDatum($row->datum,'d.m.Y').'</td>';
 			echo '<td>'.($row->fixtermin=='t'?'Ja':'Nein').'</td>';
@@ -136,10 +136,10 @@ if($result = $db->db_query($sql_query))
 			echo '<td>'.$row->kurzbz.'</td>';
 			echo '<td>'.$row->stud_titelpre.' '.$row->stud_vorname.' '.$row->stud_nachname.' '.$row->stud_titelpre.'</td>';
 			echo '<td>'.$row->stg.'</td>';
-			echo '<td>'.$row->semester.'</td>';		
+			echo '<td>'.$row->semester.'</td>';
 			echo "</tr>\n";
 		}
-		
+
 		echo "\n</tbody></table>";
 	}
 	else

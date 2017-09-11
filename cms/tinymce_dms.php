@@ -42,17 +42,17 @@ if(!$rechte->isberechtigt('basis/dms',null, 's', null))
 <head>
 	<title>FHComplete Document Management System</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link rel="stylesheet" href="../skin/superfish.css" type="text/css">
+	<link rel="stylesheet" href="../vendor/joeldbirch/superfish/dist/css/superfish.css" type="text/css">
 	<link rel="stylesheet" href="../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../skin/style.css.php" type="text/css">
 	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" type="text/css" href="../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="../vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../include/js/sizzle-0.9.3.js"></script>
-	<script type="text/javascript" src="../include/js/superfish.js"></script>
+	<script type="text/javascript" src="../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../vendor/components/jqueryui/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="../include/js/jquery.ui.datepicker.translation.js"></script>
+	<script type="text/javascript" src="../vendor/jquery/sizzle/sizzle.js"></script>
+	<script type="text/javascript" src="../vendor/joeldbirch/superfish/dist/js/superfish.min.js"></script>
 	<script type="text/javascript" src="../include/tiny_mce/tiny_mce_popup.js"></script>
 	<style type="text/css">
 	.buttondesign {
@@ -93,7 +93,7 @@ if(!$rechte->isberechtigt('basis/dms',null, 's', null))
 		        tinyMCEPopup.close();
 		}
 	};
-	
+
 	$('document').ready(function() {
 		$('.buttondesign').mouseenter(function() {
 			$(this).animate({
@@ -106,25 +106,25 @@ if(!$rechte->isberechtigt('basis/dms',null, 's', null))
 			}, 300);
 		});
 	});
-	
+
 	//tinyMCEPopup.onInit.add(FileBrowserDialog.init, FileBrowserDialog);
-	
-	$(document).ready(function() 
-	{ 
+
+	$(document).ready(function()
+	{
 		//$('#divupload').hide();
 		jQuery('ul.sf-menu').superfish({speed:'fast', delay:200});
 	});
-	
+
 	function upload(id, name)
 	{
 		$('#divupload').show();
-		
+
 		if(typeof(id)!='undefined')
 		{
 			$('#dms_id').val(id);
-			$('#dms_id_import').val(id); 
+			$('#dms_id_import').val(id);
 			$('#ueberschrift').html('Neue Version von '+name);
-			
+
 		}
 		else
 		{
@@ -142,7 +142,7 @@ if(!$rechte->isberechtigt('basis/dms',null, 's', null))
 		beschreibungstext = beschreibungstext.replace(/6Sl4sh/g, "\\");
 		beschreibungstext = beschreibungstext.replace(/D4n7ührung/g, "\"");
 		beschreibungstext = beschreibungstext.replace(/Ze1l3numxbr/g, "\r\n");
-		document.getElementById("beschreibung-textarea").value = beschreibungstext;	
+		document.getElementById("beschreibung-textarea").value = beschreibungstext;
 	}
 
 		var __js_page_array = new Array();
@@ -153,44 +153,44 @@ if(!$rechte->isberechtigt('basis/dms',null, 's', null))
 	        	var block = "table-row";
 				if (navigator.appName.indexOf('Microsoft') > -1)
 					block = 'block';
-					
-				// Aktueller Anzeigemode ermitteln	
+
+				// Aktueller Anzeigemode ermitteln
 	            var status = __js_page_array[conid];
 	            if (status == null)
 				{
-			 		if (document.getElementById && document.getElementById(conid)) 
-					{  
+			 		if (document.getElementById && document.getElementById(conid))
+					{
 						status=document.getElementById(conid).style.display;
-					} else if (document.all && document.all[conid]) {      
+					} else if (document.all && document.all[conid]) {
 						status=document.all[conid].style.display;
-			      	} else if (document.layers && document.layers[conid]) {                          
+			      	} else if (document.layers && document.layers[conid]) {
 					 	status=document.layers[conid].style.display;
-			        }							
-				}	
-				
+			        }
+				}
+
 				// Anzeigen oder Ausblenden
 	            if (status == 'none')
 	            {
-			 		if (document.getElementById && document.getElementById(conid)) 
-					{  
+			 		if (document.getElementById && document.getElementById(conid))
+					{
 						document.getElementById(conid).style.display = 'block';
-					} else if (document.all && document.all[conid]) {      
+					} else if (document.all && document.all[conid]) {
 						document.all[conid].style.display='block';
-			      	} else if (document.layers && document.layers[conid]) {                          
+			      	} else if (document.layers && document.layers[conid]) {
 					 	document.layers[conid].style.display='block';
-			        }				
+			        }
 	            	__js_page_array[conid] = 'block';
 	            }
 	            else
 	            {
-			 		if (document.getElementById && document.getElementById(conid)) 
-					{  
+			 		if (document.getElementById && document.getElementById(conid))
+					{
 						document.getElementById(conid).style.display = 'none';
-					} else if (document.all && document.all[conid]) {      
+					} else if (document.all && document.all[conid]) {
 						document.all[conid].style.display='none';
-			      	} else if (document.layers && document.layers[conid]) {                          
+			      	} else if (document.layers && document.layers[conid]) {
 					 	document.layers[conid].style.display='none';
-			        }				
+			        }
 	            	__js_page_array[conid] = 'none';
 	            }
 	            return false;
@@ -240,17 +240,17 @@ if($importFile != '')
 {
 	if(!$rechte->isberechtigt('basis/dms',null, 'sui', null))
 		die($rechte->errormsg);
-	
+
 	$ext = pathinfo($importFile, PATHINFO_EXTENSION);
-	$filename=uniqid(); 
-	$filename.=".".$ext; 
+	$filename=uniqid();
+	$filename.=".".$ext;
 	$dms_id = $_POST['dms_id_import'];
-	
+
 	// kopiert aus import Verzeichnis
 	if(copy(IMPORT_PATH.$importFile, DMS_PATH.$filename))
 	{
-		$dms = new dms; 
-		
+		$dms = new dms;
+
 		if($dms_id!='')
     	{
     		if(!$dms->load($dms_id))
@@ -266,61 +266,61 @@ if($importFile != '')
     	}
     	//Mimetype auslesen
     	$finfo = finfo_open(FILEINFO_MIME_TYPE);
-    	
+
 	    $dms->insertamum=date('Y-m-d H:i:s');
     	$dms->insertvon = $user;
     	$dms->mimetype= finfo_file($finfo, IMPORT_PATH.$importFile); //Davor deprecated: mime_content_type(IMPORT_PATH.$importFile);
     	$dms->filename = $filename;
     	$dms->name = $importFile;
-    	    	
+
     	if($dms->save(true))
     	{
     		echo 'File wurde erfolgreich hochgeladen. <br>Filename:'.$filename.' <br>ID: <a href="id://'.$dms->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$dms->dms_id.'); return false;" style="font-size: small">'.$dms->dms_id.'</a>';
     		$dms_id=$dms->dms_id;
-    		
+
     		if($projekt_kurzbz!='' || $projektphase_id!='')
     		{
     			if(!$dms->saveProjektzuordnung($dms_id, $projekt_kurzbz, $projektphase_id))
     				echo $dms->errormsg;
     		}
-    	}    	
+    	}
     	else
     		echo 'Fehler beim Speichern der Daten';
-    	
+
     	if(!@chgrp(DMS_PATH.$filename,'dms'))
 			echo '<br>CHGRP failed';
 		if(!@chmod(DMS_PATH.$filename, 0774))
 			echo '<br>CHMOD failed';
-		exec('sudo chown wwwrun '.$filename);	
-    		
+		exec('sudo chown wwwrun '.$filename);
+
     	// Lösche File aus Verzeichnis nachdem es raufgeladen wurde
     	if(!unlink(IMPORT_PATH.$importFile))
-    		echo 'Fehler beim Löschen aufgetreten.'; 
+    		echo 'Fehler beim Löschen aufgetreten.';
 	}
 }
 if(isset($_POST['fileupload']))
 {
 	if(!$rechte->isberechtigt('basis/dms',null, 'sui', null))
 		die($rechte->errormsg);
-	
+
 	$dms_id = $_POST['dms_id'];
 	$beschreibung = $_POST['beschreibung'];
-	$ext = pathinfo($_FILES['userfile']['name'], PATHINFO_EXTENSION); 
+	$ext = pathinfo($_FILES['userfile']['name'], PATHINFO_EXTENSION);
 	$filename = uniqid();
-	$filename.=".".$ext; 
+	$filename.=".".$ext;
 	$uploadfile = DMS_PATH.$filename;
-	
-	
-	if(move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile)) 
+
+
+	if(move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadfile))
 	{
 		if(!@chgrp($uploadfile,'dms'))
 			echo '<br>CHGRP failed';
 		if(!@chmod($uploadfile, 0774))
 			echo '<br>CHMOD failed';
-		exec('sudo chown wwwrun '.$uploadfile);	
-		
+		exec('sudo chown wwwrun '.$uploadfile);
+
     	$dms = new dms();
-    	
+
     	if($dms_id!='')
     	{
     		if(!$dms->load($dms_id))
@@ -336,31 +336,31 @@ if(isset($_POST['fileupload']))
     	}
     	//Mimetype auslesen
     	$finfo = finfo_open(FILEINFO_MIME_TYPE);
-    	
+
     	$dms->insertamum=date('Y-m-d H:i:s');
     	$dms->insertvon = $user;
     	$dms->mimetype = finfo_file($finfo, $uploadfile); // Davor deprecated: $_FILES['userfile']['type'];
     	$dms->filename = $filename;
     	$dms->name = $_FILES['userfile']['name'];
     	$dms->beschreibung = $beschreibung;
-    	    	
+
     	if($dms->save(true))
     	{
     		echo '<span class="ok">File wurde erfolgreich hochgeladen.</span> <br>Filename:'.$filename.' <br>ID:'.$dms->dms_id;
     		$dms_id=$dms->dms_id;
-    		
+
     		if($projekt_kurzbz!='' || $projektphase_id!='')
     		{
     			if(!$dms->saveProjektzuordnung($dms_id, $projekt_kurzbz, $projektphase_id))
     				echo $dms->errormsg;
     		}
-    	}    	
+    	}
     	else
     	{
     		echo '<span class="error">Fehler beim Speichern der Daten</span>';
     	}
-	} 
-	else 
+	}
+	else
 	{
 	    echo '<span class="error">Fehler beim Hochladen der Datei</span>';
 	}
@@ -370,12 +370,12 @@ if(isset($_POST['action']) && $_POST['action']=='rename')
 {
 	if(!$rechte->isberechtigt('basis/dms',null, 'su', null))
 		die($rechte->errormsg);
-	
+
 	$name = $_POST['dateiname'];
 	$dms_id = $_POST['dms_id'];
 	$version = $_POST['version'];
 	$beschreibung = $_POST['beschreibung'];
-	
+
 	$dms = new dms();
 	if($dms->load($dms_id, $version))
 	{
@@ -383,7 +383,7 @@ if(isset($_POST['action']) && $_POST['action']=='rename')
 		$dms->beschreibung = $beschreibung;
 		$dms->updateamum=date('Y-m-d H:i:s');
 		$dms->updatevon = $user;
-		
+
 		if($dms->save(false))
 			echo '<span class="ok">Dateiname wurde erfolgreich geändert</span>';
 		else
@@ -397,14 +397,14 @@ if(isset($_REQUEST['delete']))
 {
     if(!$rechte->isberechtigt('basis/dms',null, 'suid', null))
         die($rechte->errormsg);
-    
+
     // lösche nur die Version
     if(isset($_REQUEST['version']))
     {
         $dms_id = $_REQUEST['dms_id'];
         $version = $_REQUEST['version'];
 
-        $dms = new dms(); 
+        $dms = new dms();
         $dms->load($dms_id, $version);
 
         //  DB Eintrag löschen
@@ -424,26 +424,26 @@ if(isset($_REQUEST['delete']))
 }
 
 if($versionId != '')
-{	
+{
 	//  Übersicht der Versionen
-	echo '<h1>Versionsübersicht</h1>'; 
+	echo '<h1>Versionsübersicht</h1>';
 	if (isset($_REQUEST['searching']) && $_REQUEST['searching'] == 'true')
 		echo '<p><a href="'.$_SERVER['PHP_SELF'].'?searching=true&searchstring='.$_REQUEST['searchstring'].'&page='.$page.'&dpp='.$dpp.'">zurück</a></p>';
-	else 
-		echo '<p><a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$_REQUEST['kategorie_kurzbz'].'&page='.$page.'&dpp='.$dpp.'">zurück</a></p>'; 
-	drawAllVersions($versionId); 
+	else
+		echo '<p><a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$_REQUEST['kategorie_kurzbz'].'&page='.$page.'&dpp='.$dpp.'">zurück</a></p>';
+	drawAllVersions($versionId);
 }
 elseif($renameId!='')
 {
 	//  Datei umbenennen
-	
+
 	if(!$rechte->isberechtigt('basis/dms',null, 'su', null))
 		die($rechte->errormsg);
-	
-	echo '<h1>Datei umbennen</h1>'; 
+
+	echo '<h1>Datei umbennen</h1>';
 	if (isset($_REQUEST['searching']) && $_REQUEST['searching'] == 'true')
-		echo '<p><a href="'.$_SERVER['PHP_SELF'].'?searching=true&searchstring='.$_REQUEST['searchstring'].'&page='.$page.'&dpp='.$dpp.'">zurück</a></p>'; 
-	else 
+		echo '<p><a href="'.$_SERVER['PHP_SELF'].'?searching=true&searchstring='.$_REQUEST['searchstring'].'&page='.$page.'&dpp='.$dpp.'">zurück</a></p>';
+	else
 		echo '<p><a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$_REQUEST['kategorie_kurzbz'].'&page='.$page.'&dpp='.$dpp.'">zurück</a></p>';
 	drawRenameForm($renameId, $version, $page, $dpp, $searching, $searchstring);
 }
@@ -452,7 +452,7 @@ elseif($renameId!='')
 			{
 				echo '<form action="'.$_SERVER['PHP_SELF'].'?searching=true&searchstring='.$searchstring.'&page='.$page.'&dpp='.$dpp.'" method="POST" enctype="multipart/form-data">';
 			}
-			else 
+			else
 			{
 				echo '<form action="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'&page='.$page.'&dpp='.$dpp.'" method="POST" enctype="multipart/form-data">';
 			}*/
@@ -460,10 +460,10 @@ elseif($renameId!='')
 elseif($chkatID != '')
 {
 	//Kategorie aendern
-	
+
 	if(!$rechte->isberechtigt('basis/dms',null, 'su', null))
 		die($rechte->errormsg);
-	
+
 	if(isset($_POST['action']) && ($_POST['action']=='chkat'))
 	{
 		//  neue Kategorie speichern
@@ -471,11 +471,11 @@ elseif($chkatID != '')
 		$dms->load($chkatID);
 		$dms->kategorie_kurzbz = $_POST['kategoriez'];
 		$dms->save();
-		if (isset($_REQUEST['searching']) && $_REQUEST['searching'] == 'true') 
+		if (isset($_REQUEST['searching']) && $_REQUEST['searching'] == 'true')
 		{
 			echo '<meta http-equiv="refresh" content="0; url='.$_SERVER['PHP_SELF'].'?searching=true&searchstring='.$_REQUEST['searchstring'].'&page='.$page.'&dpp='.$dpp.'" />';
 		}
-		else 
+		else
 		{
 			echo '<meta http-equiv="refresh" content="0; url='.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$_REQUEST['kategorie_kurzbz'].'&page='.$page.'&dpp='.$dpp.'" />';
 		}
@@ -490,17 +490,17 @@ elseif($chkatID != '')
 		drawChangeKategorie($chkatID, $page, $dpp);
 	}
 }
-else 
+else
 {
 	echo '<div align="left"><h1>Dokument Auswählen</h1></div><div align="right"></div>
 		<form action="'.$_SERVER['PHP_SELF'].'?searching=true&searchstring='.$searchstring.'" method="POST">
 			<input type="text" name="searchstring" value="'.$searchstring.'">
 			<input type="submit" class="buttondesign" value="Suchen">
 		</form>';
-	
+
 		// Suche anzeigen
 	echo'	<table cellspacing=0>
-			<tr> 
+			<tr>
 				<td valign="top" nowrap style="border-right: 1px solid lightblue;border-top: 1px solid lightblue;padding-right:5px">
 				<a href="admin_dms.php" target="_blank" style="position: absolute; margin-left:12px; margin-top:29px;">Administration</a>
     				<h3>Kategorie:</h3>
@@ -521,11 +521,11 @@ else
 	drawKategorieMenue($dms->result);
 	echo '</table></td></tr></table>';
 	echo '<script>
-	$(document).ready(function() 
-	{ 
+	$(document).ready(function()
+	{
 		OpenTreeToKategorie("'.$kategorie_kurzbz.'");
 	});
-	
+
 	//Klappt den Kategoriebaum auf, damit die ausgewaehlte Kategorie sichtbar ist
 	function OpenTreeToKategorie(kategorie)
 	{
@@ -538,17 +538,17 @@ else
 				break;
 			else
 				elem = elem.parentNode;
-			
+
 			if(elem.nodeName=="TABLE" && elem.className=="tabcontent")
 				elem.style.display="block";
-		}				
+		}
 	}
 	</script>';
 	echo '</td>
 		<td valign="top" style="border-top: 1px solid lightblue;">';
 	//Dokumente der Ausgewaehlten Kategorie laden und Anzeigen
 	$dms = new dms();
-		
+
 	if($searchstring!='' || (isset($_GET['searching']) && $_GET['searching'] == true))
 	{
 		$count = new dms();
@@ -556,8 +556,8 @@ else
 		$anzahl = count($count->result);
 		$dms->search($searchstring, $dpp, $page);
 		$suche = true;
-		
-		
+
+
 		if ($page != 0)
 		{
 			echo '<span style="float:left">'.$anzahl.' Elemente gefunden</span><span  style="float:right">Seite '.$page.' von <a href="'.$_SERVER['PHP_SELF'].'?page='; if (is_int($anzahl/$dpp)) { echo (int)($anzahl/$dpp); } else { echo (int)(($anzahl/$dpp)+1); } echo '&dpp='.$dpp.'&searching=true&searchstring='.$searchstring.'">';
@@ -574,8 +574,8 @@ else
 		{
 			echo '<span align="center"><a href="'.$_SERVER['PHP_SELF'].'?page=1&dpp='.$dpp.'&searching=true&searchstring='.$searchstring.'">Seite 1</a></span>';
 		}
-		
-		
+
+
 		drawFilesList($dms->result);
 		echo '<form action="'.$_SERVER['PHP_SELF'].'?page='; if($page-100 < 1){echo '1';}else{echo ($page-100);} if (isset($_GET['dpp'])) { echo '&dpp='.$_GET['dpp']; } echo '&searching=true&searchstring='.$searchstring.'" method="POST" style="float:left"><input type="submit" class="buttondesign" name="100zurück" value="100 zurück" style="margin-left:5px;"/><input type="hidden" name="searchstring" id="searchstring" value="'.$searchstring.'" /></form>';
 		echo '<form action="'.$_SERVER['PHP_SELF'].'?page='; if($page-10 < 1){echo '1';}else{echo ($page-10);} if (isset($_GET['dpp'])) { echo '&dpp='.$_GET['dpp']; } echo '&searching=true&searchstring='.$searchstring.'" method="POST" style="float:left"><input type="submit" class="buttondesign" name="10zurück" value="10 zurück" style="margin-left:2px;"/><input type="hidden" name="searchstring" id="searchstring" value="'.$searchstring.'" /></form>';
@@ -630,7 +630,7 @@ else
 		$count->getDocuments($kategorie_kurzbz);
 		$anzahl = count($count->result);
 		$dms->getDocuments($kategorie_kurzbz, $dpp, $page);
-		
+
 		if ($page != 0)
 		{
 			echo '<span style="float:left">'.$anzahl.' Elemente gefunden</span><span style="float:right">Seite '.$page.' von <a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'&page='; if (is_int($anzahl/$dpp)) { echo (int)($anzahl/$dpp); } else { echo (int)(($anzahl/$dpp)+1); } echo '&dpp='.$dpp.'">';
@@ -638,7 +638,7 @@ else
 			{
 				echo (int)($anzahl/$dpp).'&nbsp;</a></span>';
 			}
-			else 
+			else
 			{
 				echo (int)(($anzahl/$dpp)+1).'&nbsp;</a></span>';
 			}
@@ -647,7 +647,7 @@ else
 		{
 			echo '<span align="center"><a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'&page=1&dpp='.$dpp.'">Seite 1</a></span>';
 		}
-		
+
 		drawFilesList($dms->result);
 		echo '<form action="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'&page='; if($page-100 < 1){echo '1';}else{echo ($page-100);} if (isset($_GET['dpp'])) { echo '&dpp='.$_GET['dpp']; } echo '" method="POST" style="float:left"><input type="submit" class="buttondesign" name="100zurück" value="100 zurück" style="margin-left:5px;"/></form>';
 		echo '<form action="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'&page='; if($page-10 < 1){echo '1';}else{echo ($page-10);} if (isset($_GET['dpp'])) { echo '&dpp='.$_GET['dpp']; } echo '" method="POST" style="float:left"><input type="submit" class="buttondesign" name="10zurück" value="10 zurück" style="margin-left:2px;"/></form>';
@@ -695,8 +695,8 @@ else
 		</form>';
 	}
 	//drawFilesThumb($dms->result);
-	
-	
+
+
 	echo '
 			</td>
 		</tr>
@@ -707,7 +707,7 @@ else
 		<br>
 		<a href="#Upload" onclick="return upload()">Neue Datei hochladen</a>
 		<br>
-		
+
         <br><br>
 		<div id="divupload">
 			<hr>
@@ -716,7 +716,7 @@ else
 			{
 				echo '<form action="'.$_SERVER['PHP_SELF'].'?searching=true&searchstring='.$searchstring.'&page='.$page.'&dpp='.$dpp.'" method="POST" enctype="multipart/form-data">';
 			}
-			else 
+			else
 			{
 				echo '<form action="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'&page='.$page.'&dpp='.$dpp.'" method="POST" enctype="multipart/form-data">';
 			}
@@ -741,14 +741,14 @@ else
 				$files = scandir(IMPORT_PATH);
 				$files_count = count($files)-2; // Minus zwei wegen "." und ".."
 				if ($files_count>0 && $rechte->isberechtigt('basis/dms',null, 'sui', null))
-					drawFilesFromImport(); 
+					drawFilesFromImport();
 		echo '</div>';
 	}
 	if($openupload)
 	{
 		echo '<script>
-			$(document).ready(function() 
-			{ 
+			$(document).ready(function()
+			{
 			';
 		if($newVersionID!='')
 		{
@@ -758,30 +758,30 @@ else
 		}
 		else
 			echo 'upload();';
-		
+
 		echo '
 			});
 			</script>';
 	}
 }
 
-	
+
 /************ FUNCTIONS ********************/
 
 /**
  * Zeigt alle Versionen des Dokumentes an
- * 
+ *
  * @param $id DokumentID die angezeigt werden soll
  */
 function drawAllVersions($id)
 {
 	global $rechte;
-	$dms = new dms(); 
-	$dms->getAllVersions($id); 
-	
+	$dms = new dms();
+	$dms->getAllVersions($id);
+
 		echo '<script>
-			$(document).ready(function() 
-			{ 
+			$(document).ready(function()
+			{
 				$("#t3").tablesorter(
 				{
 					sortList: [[0,0]], headers: {6:{sorter:false}},
@@ -816,31 +816,31 @@ function drawAllVersions($id)
 								<li><a href="dms.php?id='.$dms_help->dms_id.'&version='.$dms_help->version.'" style="font-size:small" target="_blank">Herunterladen</a></li>';
 								if($rechte->isberechtigt('basis/dms',null, 'suid', null))
                                 	echo '<li><a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$dms_help->kategorie_kurzbz.'&versionid='.$dms_help->dms_id.'&dms_id='.$dms_help->dms_id.'&version='.$dms_help->version.'&delete" style="font-size:small">Löschen</a></li>';
-								
+
 							echo '</ul>
 						</li>
 				 	</ul>
 		        </td>
-			  </tr>'; 
+			  </tr>';
 	}
-	echo '</tbody></table>'; 	 		
+	echo '</tbody></table>';
 }
 
 /**
  * Liest die Files aus dem Importverzeichnis aus
- * 
+ *
  */
 function drawFilesFromImport()
 {
 	global $kategorie_kurzbz, $projekt_kurzbz, $projektphase_id;
 
-	if ($handle = opendir(IMPORT_PATH)) 
+	if ($handle = opendir(IMPORT_PATH))
 	{
 		echo '<script>
 		$(document).ready(function()
 		{
 			$("#t3").tablesorter(
-			{	
+			{
 				sortList: [[0,0]], headers: {1:{sorter:false}},
 				widgets: ["zebra"]
 			});
@@ -848,9 +848,9 @@ function drawFilesFromImport()
 		</script>';
 		echo '	<h3>Files im Import Ordner</h3>
 				<table class="tablesorter" id="t3" style="width: auto"> <form action ="'.$_SERVER['PHP_SELF'].'" method="POST" name="import" >
-    			<thead><th>File</th><th></th></thead><tbody>'; 
+    			<thead><th>File</th><th></th></thead><tbody>';
 
-		while (false !== ($file = readdir($handle))) 
+		while (false !== ($file = readdir($handle)))
 		{
 			if($file != '.' && $file != '..')
 			{
@@ -862,10 +862,10 @@ function drawFilesFromImport()
 					<td>
 						<a onclick="window.location=\'#divupload\'; document.import.importFile.value=\''.$file.'\';document.import.submit();"  style="font-size:small">Upload</a>
 					</td>
-				</tr>';  
+				</tr>';
 			}
 		}
-		echo'	
+		echo'
 			<input type="hidden" name="dms_id_import" id="dms_id_import" value="">
 			<input type="hidden" name="importFile" value="">
 			<input type="hidden" name="kategorie_kurzbz" id="kategorie_kurzbz" value="'.$kategorie_kurzbz.'">
@@ -877,13 +877,13 @@ function drawFilesFromImport()
 }
 /**
  * Zeichnet das Kategorie Menu
- * 
+ *
  * @param $rows DMS Result Object
  */
 function drawKategorieMenue($rows)
-{	
+{
 	global $kategorie_kurzbz;
-	
+
 	//echo '<ul>';
 	foreach($rows as $row)
 	{
@@ -893,10 +893,10 @@ function drawKategorieMenue($rows)
 			$class='marked';
 		else
 			$class='';
-		
+
 		$dms = new dms();
 		$dms->getKategorie($row->kategorie_kurzbz);
-		
+
 		//Suchen, ob eine Sperre fuer diese Kategorie vorhanden ist
 		$groups = $dms->getLockGroups($row->kategorie_kurzbz);
 		$locked='';
@@ -909,7 +909,7 @@ function drawKategorieMenue($rows)
 		}
 		if(count($dms->result)>0)
 		{
-			
+
 			echo '
 			<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
@@ -928,36 +928,36 @@ function drawKategorieMenue($rows)
 			<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
 	          	<td class="tdwrap"><a id="'.$row->kategorie_kurzbz.'" href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'" class="Item">&nbsp;<span class="'.$class.'">'.$row->bezeichnung.'</span></a>'.$locked.'</td>
-        	</tr>';			
+        	</tr>';
 		}
-		
+
 	}
 	//echo '</table>';
 	//echo '</ul>';
 }
 /**
  * Zeichnet die Files in Listenform
- * 
+ *
  * @param $rows DMS Result Object
  */
 function drawFilesList($rows)
 {
 	global $mimetypes, $suche, $rechte;
-	$dms = new dms(); 
-	
+	$dms = new dms();
+
 	if(count($rows)>0)
 	{
 		echo '
 		<script>
-		$(document).ready(function() 
-		{ 
+		$(document).ready(function()
+		{
 			$("#t2").tablesorter(
 			{';
 				if($suche == true)
 					echo 'sortList: [[4,0],[1,1]], headers: {3:{sorter:false}},';
 				else
 					echo 'sortList: [[0,0]], headers: {2:{sorter:false}},';
-					
+
 				echo'
 				widgets: ["zebra"]
 			});
@@ -965,7 +965,7 @@ function drawFilesList($rows)
 		</script>
 		';
 	}
-	
+
 	echo '
 			<table class="tablesorter" id="t2">
 			<thead>
@@ -994,29 +994,29 @@ function drawFilesList($rows)
 			echo '<img title="'.$row->name.'" src="../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 15px">';
 		else
 			echo '<img title="'.$row->name.'" src="../skin/images/blank.gif" style="height: 15px">';
-			
-		// wenn es noch höhere Versionen zu diesem Dokument gibt, wird dieses gekennzeichnet 
+
+		// wenn es noch höhere Versionen zu diesem Dokument gibt, wird dieses gekennzeichnet
 		$newVersion = '';
 		$newerVersionAlert='';
 		if($dms->checkVersion($row->dms_id, $row->version))
 		{
 			$newVersion = '--';
-			$newerVersionAlert = 'alert(\'Achtung!! Es gibt eine neuere Version dieses Dokuments. Es wird die aktuellste eingefügt.\');';  	
+			$newerVersionAlert = 'alert(\'Achtung!! Es gibt eine neuere Version dieses Dokuments. Es wird die aktuellste eingefügt.\');';
 		}
-			
+
 		echo'
 				<a href="id://'.$row->dms_id.'/Auswahl" onclick="'.$newerVersionAlert.' FileBrowserDialog.mySubmit('.$row->dms_id.'); return false;" style="font-size: small" title="'.$row->beschreibung.'">
 				'.$newVersion.' '.$row->name.'</a>
 			</td>';
 		$datum = new datum();
-		
+
 		echo '<td style="padding: 1px;" title="'.$datum->formatDatum($row->insertamum,'d.m.Y H:m').' von '.$row->insertvon.'">';
 		echo $row->version;
 		echo '</td>';
-		
+
 		$kategorie = new dms();
 		$kategorie->loadKategorie($row->kategorie_kurzbz);
-		
+
 		// zeige bei suche auch kategorie an
 		if($suche == true)
 		{
@@ -1025,7 +1025,7 @@ function drawFilesList($rows)
 			echo '</td>';
 		}
 		echo'<td style="padding: 1px;">';
-		
+
 		//Upload einer neuen Version
 		echo '<ul class="sf-menu">
 				<li><a href="#" style="font-size:small">Erweitert</a>
@@ -1063,7 +1063,7 @@ function drawFilesList($rows)
 							}
 							if($rechte->isberechtigt('basis/dms',null, 'suid', null))
 								echo '<li><a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'&dms_id='.$row->dms_id.'&delete" onclick="return conf_del()" style="font-size:small" >Löschen</a></li>';
-							
+
 						}
 						echo '
                     </ul>
@@ -1073,9 +1073,9 @@ function drawFilesList($rows)
 		echo '<td style="padding: 1px;">'.$row->dms_id.'</td>';
 		echo '<td style="padding: 1px;">'.$dms->convert_html_chars($row->beschreibung).'</td>';
 		echo '</tr>';
-		
+
 	}
-	echo '	
+	echo '
 			</tbody></table>';
 	$suche = false;
 }
@@ -1088,7 +1088,7 @@ function drawFilesList($rows)
 function drawRenameForm($dms_id, $version, $page = NULL, $dpp = NULL, $searching, $searchstring)
 {
 	global $kategorie_kurzbz;
-	
+
 	$dms = new dms();
 	if($dms->load($dms_id, $version))
 	{
@@ -1096,7 +1096,7 @@ function drawRenameForm($dms_id, $version, $page = NULL, $dpp = NULL, $searching
 		{
 			echo '<form action="'.$_SERVER['PHP_SELF'].'?searching=true&searchstring='.$searchstring; if (!is_null($page)) echo '&page='.$page; if (!is_null($dpp)) echo '&dpp='.$dpp; echo '" method="POST">';
 		}
-		else 
+		else
 		{
 			echo '<form action="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz; if (!is_null($page)) echo '&page='.$page; if (!is_null($dpp)) echo '&dpp='.$dpp; echo '" method="POST">';
 		}
@@ -1130,15 +1130,15 @@ function drawRenameForm($dms_id, $version, $page = NULL, $dpp = NULL, $searching
 function drawChangeKategorie($dms_id, $page = NULL, $dpp = NULL) {
 	$dms = new dms;
 	$dms->load($dms_id);
-	
+
 	$allKategorien = new dms();
 	$allKategorien->getAllKategories();
-	
+
 	if (isset($_REQUEST['searching']) && $_REQUEST['searching'] == 'true')
 	{
 		echo '<form action="'.$_SERVER['PHP_SELF'].'?chkatID='.$dms_id.'&searching=true&searchstring='.$_REQUEST['searchstring']; if (!is_null($page)) echo '&page='.$page; if (!is_null($dpp)) echo '&dpp='.$dpp; echo '" method="POST">';
 	}
-	else 
+	else
 	{
 		echo '<form action="'.$_SERVER['PHP_SELF'].'?chkatID='.$dms_id.'&kategorie_kurzbz='.$dms->kategorie_kurzbz; if (!is_null($page)) echo '&page='.$page; if (!is_null($dpp)) echo '&dpp='.$dpp; echo '" method="POST">';
 	}
@@ -1150,10 +1150,10 @@ function drawChangeKategorie($dms_id, $page = NULL, $dpp = NULL) {
 		$selected ='';
 		if($kategorienResult->kategorie_kurzbz == $dms->kategorie_kurzbz)
 			$selected='selected';
-		
+
 		echo '<option '.$selected.' value="'.$kategorienResult->kategorie_kurzbz.'">'.$kategorienResult->bezeichnung.' ['.$kategorienResult->kategorie_kurzbz.']</option>';
 	}
-	
+
 	echo '</select>
 		  <input type="hidden" name="action" value="chkat">
 		  <input type="hidden" name="dms_id" value="'.$dms_id.'">';

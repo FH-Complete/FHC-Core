@@ -33,10 +33,10 @@ require_once('../../../include/benutzer.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/sprache.class.php');
 
-$sprache = getSprache(); 
-$lang = new sprache(); 
+$sprache = getSprache();
+$lang = new sprache();
 $lang->load($sprache);
-$p = new phrasen($sprache); 
+$p = new phrasen($sprache);
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
@@ -62,7 +62,7 @@ $num_rows_stunde=$db->db_num_rows($result_stunde);
 if (isset($type) && $type=='save')
 {
 	$zw = new zeitwunsch();
-	
+
 	for ($t=1;$t<7;$t++)
 	{
 		for ($i=0;$i<$num_rows_stunde;$i++)
@@ -72,23 +72,23 @@ if (isset($type) && $type=='save')
 				continue;
 			$gewicht=$_POST[$var];
 			$stunde=$i+1;
-			
+
 			$zw->mitarbeiter_uid = $uid;
 			$zw->stunde = $stunde;
 			$zw->tag = $t;
 			$zw->gewicht = $gewicht;
 			$zw->updateamum = date('Y-m-d H:i:s');
 			$zw->updatevon = $uid;
-			
+
 			if (!$zw->exists($uid, $stunde, $t))
 			{
 				$zw->new = true;
 				$zw->insertamum = date('Y-m-d H:i:s');
 				$zw->insertvon = $uid;
 			}
-			else 
+			else
 				$zw->new = false;
-				
+
 			if(!$zw->save())
 				echo $zw->errormsg;
 		}
@@ -115,14 +115,13 @@ if(!$person->load($uid))
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 		<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
-		<script src="../../../include/js/flexcroll.js" type="text/javascript" ></script>
 		<script type="text/javascript">
 		// Pruefen ob nur die erlaubten Werte verwendet wurden
 		function checkvalues()
 		{
 			var elem = document.getElementsByTagName('input');
 			var error=false;
-			
+
 			for (var i = 0;i<elem.length;i++)
 			{
 				if(elem[i].name.match("^wunsch"))
@@ -131,7 +130,7 @@ if(!$person->load($uid))
 						error=true;
 				}
 			}
-			
+
 			if(error)
 			{
 				alert('<?php echo $p->t('zeitwunsch/falscheWerteEingetragen');?>');
@@ -146,10 +145,10 @@ if(!$person->load($uid))
 	<body>
 	<div class="flexcroll" style="outline: none;">
 	<table>
-	  <tr>	
+	  <tr>
 	    <td>
 	    <h1><?php echo $p->t('zeitwunsch/zeitwunsch');?></h1>
-<!--Auskommentiert von Kindl, da sich der Hilfetext nicht vom Anleitungtext auf der Seite unterscheidet	
+<!--Auskommentiert von Kindl, da sich der Hilfetext nicht vom Anleitungtext auf der Seite unterscheidet
 				<td class="ContentHeader" align="right">
 				<A onclick="window.open('zeitwunsch_help.php','Hilfe', 'height=320,width=480,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');" class="hilfe" target="_blank">
 				<font class="ContentHeader">
@@ -163,7 +162,7 @@ if(!$person->load($uid))
 			echo '<FORM name="zeitwunsch" method="post" action="zeitwunsch.php?type=save" onsubmit="return checkvalues()">
   				<TABLE>
     			<TR>';
-    		
+
 		  	echo '<th>'.$p->t('global/stunde').'<br>'.$p->t('global/beginn').'<br>'.$p->t('global/ende').'</th>';
 			for ($i=0;$i<$num_rows_stunde; $i++)
 			{
@@ -174,9 +173,9 @@ if(!$person->load($uid))
 				$stunde=$db->db_result($result_stunde,$i,'"stunde"');
 				echo "<th><div align=\"center\">$stunde<br>$beginn<br>$ende</div></th>";
 			}
-			
+
     		echo '</TR>';
-			
+
 			for ($j=1; $j<7; $j++)
 			{
 				echo '<TR><TD>'.$tagbez[$lang->index][$j].'</TD>';
@@ -193,21 +192,21 @@ if(!$person->load($uid))
 				}
 				echo '</TR>';
 			}
-			
+
 			echo '
 			</TABLE><br>
 			<INPUT type="hidden" name="uid" value="'.$uid.'">
 			<INPUT type="submit" name="Abschicken" value="'.$p->t('global/speichern').'">
 			';
-			
+
 			if($zw->updateamum!='')
 			{
 				echo '<font size="x-small">'.$p->t('zeitwunsch/letzteAenderung').': '.$datum_obj->formatDatum($zw->updateamum,'d.m.Y H:i:s').' '.$p->t('zeitwunsch/von').' '.$zw->updatevon.'</font>';
 			}
 			?>
-			
+
 			</FORM>
-			<hr><?php 
+			<hr><?php
 			$href = "<a href='zeitsperre_resturlaub.php' class='Item'>";
 			echo $p->t('zeitwunsch/formularZumEintragenDerZeitsperren', array($href));
 			?>

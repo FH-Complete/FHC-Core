@@ -84,7 +84,7 @@ $num_rows_stunde=$db->db_num_rows($result_stunde);
 <script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
 <script src="../../../vendor/fgelinas/timepicker/jquery.ui.timepicker.js" type="text/javascript" ></script>
 <link href="../../../skin/jquery.css" rel="stylesheet" type="text/css"/>
-<link href="../../../skin/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
+<link href="../../../vendor/fgelinas/timepicker/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
 <link href="../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet"  type="text/css">
 <?php
 // ADDONS laden

@@ -1,7 +1,5 @@
 @charset "utf-8";
 
-
-
 /* Icons
 ----------------------------------*/
 
@@ -197,8 +195,8 @@
 
 	table.navbar {width:100%;border: 1px solid WindowFrame;}
 	table.navbar tr {text-align:left;}
-	table.navbar td {text-align:left;white-space: nowrap;}			
-	table.navbar .ac_submit {width:10%;background-color: #FFFFDD;}			
+	table.navbar td {text-align:left;white-space: nowrap;}
+	table.navbar .ac_submit {width:10%;background-color: #FFFFDD;}
 
 	.ac_results iframe {
 		display:none;/*sorry for IE5*/
@@ -207,12 +205,12 @@
 	.ac_results {padding: 0px;border: 1px solid black;background-color: white;overflow: hidden;z-index: 99999;}
 	.ac_results ul {width: 100%;list-style-position: outside;list-style: none;padding: 0;margin: 0;}
 	.ac_results li {margin: 0px;padding: 2px 5px;cursor: default;display: block;
-		/* 	if width will be 100% horizontal scrollbar will apear 
+		/* 	if width will be 100% horizontal scrollbar will apear
 		when scroll mode will be used	*/
 		/*width: 100%;*/
 		font: menu;
 		font-size: 12px;
-		/* 	it is very important, if line-height not setted or setted 
+		/* 	it is very important, if line-height not setted or setted
 		in relative units scroll will be broken in firefox	*/
 		line-height: 16px;	overflow: hidden;
 	}
@@ -273,7 +271,7 @@
 			top: 10px;
 			left: 10px;
 		}
-		
+
 	/* Layout helpers
 	----------------------------------*/
 	.ui-helper-hidden { display: none; }
@@ -286,36 +284,22 @@
 	.ui-helper-clearfix { display:block; }
 	/* end clearfix */
 	.ui-helper-zfix { width: 100%; height: 100%; top: 0; left: 0; position: absolute; opacity: 0; filter:Alpha(Opacity=0); }
-	
-	
+
+
 	/* Interaction Cues
 	----------------------------------*/
 	.ui-state-disabled { cursor: default !important; }
-	
-	
+
+
 	/* Icons
 	----------------------------------*/
-	
+
 	/* states and images */
 	.ui-icon { display: block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; }
-	
-	
+
+
 	/* Misc visuals
 	----------------------------------*/
-	
+
 	/* Overlays */
 	.ui-widget-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	

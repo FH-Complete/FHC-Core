@@ -45,7 +45,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../include/js/sizzle-0.9.3.js"></script>
+<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 		<script src="../../vendor/components/jqueryui/jquery-ui.min.js" type="text/javascript"></script>
 		<script type="text/javascript">
 		function initwarnung()

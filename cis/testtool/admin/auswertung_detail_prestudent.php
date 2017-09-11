@@ -47,7 +47,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www
 <script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../../include/js/sizzle-0.9.3.js"></script> 
+<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script> 
 	</head>
 	<body class="Background_main">
 	<h2>Auswertung Reihungstest Detailergebnis PrestudentIn '.$db->convert_html_chars($_GET['prestudent_id']).'</h2>';

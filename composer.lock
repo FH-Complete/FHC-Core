@@ -4,9 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "828ee8d7f9b4f2cd3ba651a583547384",
-    "content-hash": "79bda9b12e0531c9c0c68552970ccae5",
+    "hash": "103a2e39e5cecacf7f2a7188ba9a3c7b",
+    "content-hash": "3925c56e7a33930a684da03e85cae6e5",
     "packages": [
+        {
+            "name": "alvaro-prieto/colResizable",
+            "version": "1.6",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/alvaro-prieto/colResizable/archive/1.6.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
         {
             "name": "blueimp/jquery-file-upload",
             "version": "v9.14.1",
@@ -825,16 +836,6 @@
             "time": "2015-02-27 09:45:49"
         },
         {
-            "name": "edweezy/bootstrap-colorpicker",
-            "version": "1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/edweezy/bootstrap-colorpicker.git",
-                "reference": "600e960b13aa395e2f6783e0a10f97d4b0f0c33f"
-            },
-            "type": "library"
-        },
-        {
             "name": "fgelinas/timepicker",
             "version": "0.3.3",
             "dist": {
@@ -894,11 +895,33 @@
             "time": "2016-04-29 12:21:54"
         },
         {
+            "name": "joeldbirch/superfish",
+            "version": "1.7.9",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/joeldbirch/superfish/archive/v1.7.9.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
             "name": "jquery/jqueryV1",
             "version": "1.12.4",
             "dist": {
                 "type": "file",
                 "url": "https://code.jquery.com/jquery-1.12.4.min.js",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
+            "name": "jquery/sizzle",
+            "version": "1.0",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/jquery/sizzle/archive/1.0.0.zip",
                 "reference": null,
                 "shasum": null
             },
@@ -2146,17 +2169,28 @@
             "time": "2016-11-14 16:15:57"
         },
         {
+            "name": "tapmodo/Jcrop",
+            "version": "2.0.4",
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/tapmodo/Jcrop/archive/v2.0.4.zip",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library"
+        },
+        {
             "name": "tinymce/tinymce",
-            "version": "4.5.0",
+            "version": "4.6.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "9d2f73868b5b576cc01f7508ba3dec605c863830"
+                "reference": "50b5a77af8ef1a1da362e60ad32ace4131e2dbf0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/9d2f73868b5b576cc01f7508ba3dec605c863830",
-                "reference": "9d2f73868b5b576cc01f7508ba3dec605c863830",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/50b5a77af8ef1a1da362e60ad32ace4131e2dbf0",
+                "reference": "50b5a77af8ef1a1da362e60ad32ace4131e2dbf0",
                 "shasum": ""
             },
             "type": "component",
@@ -2189,7 +2223,7 @@
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2016-11-23 13:00:08"
+            "time": "2017-08-30 12:11:58"
         },
         {
             "name": "twig/twig",
@@ -2686,6 +2720,26 @@
     ],
     "packages-dev": [
         {
+            "name": "edweezy/bootstrap-colorpicker",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/edweezy/bootstrap-colorpicker.git",
+                "reference": "600e960b13aa395e2f6783e0a10f97d4b0f0c33f"
+            },
+            "type": "library"
+        },
+        {
+            "name": "jquery-archive/jquery-metadata",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jquery-archive/jquery-metadata.git",
+                "reference": "e5a9e4315675bf4d68716872ca754e858088f8ab"
+            },
+            "type": "library"
+        },
+        {
             "name": "squizlabs/php_codesniffer",
             "version": "2.7.1",
             "source": {
@@ -2762,6 +2816,16 @@
                 "standards"
             ],
             "time": "2016-11-30 04:02:31"
+        },
+        {
+            "name": "tomazdragar/SimpleCropper",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tomazdragar/SimpleCropper.git",
+                "reference": "9750b81fa55ed07b3b429297d18ffbeac07a2cde"
+            },
+            "type": "library"
         }
     ],
     "aliases": [],

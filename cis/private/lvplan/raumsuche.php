@@ -24,7 +24,7 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/ort.class.php');
 require_once('../../../include/raumtyp.class.php');
 require_once('../../../include/datum.class.php');
-require_once('../../../include/phrasen.class.php'); 
+require_once('../../../include/phrasen.class.php');
 
 $datum = (isset($_POST['datum'])?$_POST['datum']:date('d.m.Y'));
 $vonzeit = (isset($_POST['vonzeit'])?$_POST['vonzeit']:date('H:i'));
@@ -33,8 +33,8 @@ $raumtyp = (isset($_POST['raumtyp'])?$_POST['raumtyp']:'');
 $anzahlpersonen = (isset($_POST['anzahlpersonen'])?$_POST['anzahlpersonen']:'0');
 $sent = true; //isset($_POST['sent']);
 $datum_obj = new datum();
-	
-$sprache = getSprache(); 	
+
+$sprache = getSprache();
 $p = new phrasen($sprache);
 
 echo '
@@ -47,26 +47,25 @@ echo '
 	<link rel="stylesheet" href="../../../skin/fhcomplete.css" type="text/css"/>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<link rel="stylesheet" href="../../../skin/flexcrollstyles.css" type="text/css" />
-	<script type="text/javascript" src="../../../include/js/flexcroll.js"></script> 
 	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css">
 <script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../../include/js/sizzle-0.9.3.js"></script>
+<script type="text/javascript" src="../../../vendor/jquery/sizzle/sizzle.js"></script>
 	<script language="Javascript">
-	
-	$(document).ready(function() 
-	{ 
+
+	$(document).ready(function()
+	{
 	    $("#myTable").tablesorter(
 		{
 			sortList: [[0,0]],
 			widgets: ["zebra"]
 		});
-		
+
 		$( "#datum" ).datepicker($.datepicker.regional["de"]);
-	}); 
-	
+	});
+
 	function checkdata()
 	{
 		if(document.getElementById("datum").value=="")
@@ -80,13 +79,13 @@ echo '
 			alert("'.$p->t('lvplan/datumUngueltig').'");
 			return false;
 		}
-		
+
 		if(document.getElementById("vonzeit").value=="")
 		{
 			alert("'.$p->t('lvplan/vonZeitEingeben').'");
 			return false;
 		}
-				
+
 		if(document.getElementById("biszeit").value=="")
 		{
 			alert("'.$p->t('lvplan/bisZeitEingeben').'");
@@ -114,9 +113,9 @@ foreach ($raumtyp_obj->result as $row)
 {
 	if($raumtyp==$row->raumtyp_kurzbz)
 		$selected='selected';
-	else 
+	else
 		$selected='';
-		
+
 	echo '<OPTION value="'.$row->raumtyp_kurzbz.'" '.$selected.'>'.$row->beschreibung.'</OPTION>';
 }
 echo '	</SELECT>
@@ -141,7 +140,7 @@ if($sent)
 		echo "<br>".$p->t('lvplan/bisZeitEingeben');
 		$error = true;
 	}
-	
+
 	if(!$error)
 	{
 		//Von Zeit pruefen
@@ -156,7 +155,7 @@ if($sent)
 			echo "<br>".$p->t('lvplan/bisZeitFormat');
 			$error = true;
 		}
-		
+
 		//Datum pruefen
 		if(!$datum_obj->checkDatum($datum))
 		{
@@ -169,9 +168,9 @@ if($sent)
 		$ort = new ort();
 		if(!$ort->search($datum_obj->formatDatum($datum), $vonzeit, $biszeit, $raumtyp, $anzahlpersonen, true))
 		{
-			echo $ort->errormsg;	
+			echo $ort->errormsg;
 		}
-		else 
+		else
 		{
 			echo '<br><table class="tablesorter" id="myTable" style="width: auto">
 			<thead>

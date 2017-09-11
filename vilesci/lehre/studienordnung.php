@@ -60,7 +60,7 @@ echo '<!DOCTYPE html>
 
 	<script type="text/javascript" src="../../include/js/treeGrid/jstreegrid.js"></script>
 
-	<script type="text/javascript" src="../../include/js/colResizable-1.5.min.js"></script>
+	<script type="text/javascript" src="../../vendor/alvaro-prieto/colResizable/colResizable-1.6.min.js"></script>
 
 	<script src="studienordnung_lvregel.js" type="text/javascript"></script>
 	<script src="studienordnung.js" type="text/javascript"></script>

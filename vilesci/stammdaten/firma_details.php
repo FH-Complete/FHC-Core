@@ -150,7 +150,7 @@ if(isset($_GET['deletetag']))
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/styles/jquery.css" type="text/css">
-<!--	<link rel="stylesheet" href="../../skin/styles/jquery-ui.css" type="text/css"> -->
+<!--	<link rel="stylesheet" href="../../vendor/components/jqueryui/themes/base/jquery-ui.min.css" type="text/css"> -->
 
 	<script src="../../include/js/mailcheck.js" type="text/javascript"></script>
 	<script src="../../include/js/datecheck.js" type="text/javascript"></script>

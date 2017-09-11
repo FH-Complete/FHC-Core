@@ -47,7 +47,7 @@ if(!$statistik->load($statistik_kurzbz))
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css"/>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css"/>
-		<link rel="stylesheet" href="../../include/css/jquery-ui.1.11.2.min.css" />
+		<link rel="stylesheet" href="../../vendor/components/jqueryui/themes/base/jquery-ui.min.css" />
 		<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
 		<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script>

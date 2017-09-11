@@ -117,6 +117,74 @@
 					"reference": "600e960b13aa395e2f6783e0a10f97d4b0f0c33f"
 				}
 			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "alvaro-prieto/colResizable",
+				"version": "1.6",
+				"dist": {
+					"url": "https://github.com/alvaro-prieto/colResizable/archive/1.6.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "tapmodo/Jcrop",
+				"version": "2.0.4",
+				"dist": {
+					"url": "https://github.com/tapmodo/Jcrop/archive/v2.0.4.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "jquery-archive/jquery-metadata",
+				"version": "1.0",
+				"source": {
+					"url": "https://github.com/jquery-archive/jquery-metadata.git",
+					"type": "git",
+					"reference": "e5a9e4315675bf4d68716872ca754e858088f8ab"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "tomazdragar/SimpleCropper",
+				"version": "1.0",
+				"source": {
+					"url": "https://github.com/tomazdragar/SimpleCropper.git",
+					"type": "git",
+					"reference": "9750b81fa55ed07b3b429297d18ffbeac07a2cde"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "joeldbirch/superfish",
+				"version": "1.7.9",
+				"dist": {
+					"url": "https://github.com/joeldbirch/superfish/archive/v1.7.9.zip",
+					"type": "zip"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "jquery/sizzle",
+				"version": "1.0",
+				"dist": {
+					"url": "https://github.com/jquery/sizzle/archive/1.0.0.zip",
+					"type": "zip"
+				}
+			}
 		}
 	],
 	"require": {
@@ -148,7 +216,11 @@
 		"christianbach/tablesorter": "^1.0",
 		"jquery/jqueryV1": "^1.12",
 		"fgelinas/timepicker": "^0.3.3",
-		"components/jquery-cookie": "1.4.1.2"
+		"components/jquery-cookie": "1.4.1.2",
+		"alvaro-prieto/colResizable": "^1.6",
+		"tapmodo/Jcrop": "^2.0",
+		"joeldbirch/superfish": "^1.7",
+		"jquery/sizzle": "^1.0"
 	},
 	"require-dev": {
 		"squizlabs/php_codesniffer": "2.*"

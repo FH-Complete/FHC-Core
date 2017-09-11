@@ -92,7 +92,7 @@
 		<script type="text/javascript" src="<?php echo $path;?>vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 		<script type="text/javascript" src="<?php echo $path;?>vendor/components/jqueryui/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="<?php echo $path;?>include/js/jquery.ui.datepicker.translation.js"></script>
-		<script type="text/javascript" src="<?php echo $path;?>include/js/sizzle-0.9.3.js"></script>
+		<script type="text/javascript" src="<?php echo $path;?>vendor/jquery/sizzle/sizzle.js"></script>
 	</head>
 	<body>
 		<h1 title="Anwender:<?php echo $uid ?>">&nbsp;WAWI Studiengang - Suche&nbsp;</h1>
