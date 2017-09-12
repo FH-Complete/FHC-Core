@@ -34,7 +34,7 @@ if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $user = get_uid();
-			
+
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
@@ -47,9 +47,9 @@ $sql_query="SELECT gruppe_kurzbz FROM public.tbl_gruppe WHERE studiengang_kz=100
 $result_incgrp=$db->db_query($sql_query);
 if(!$result_incgrp)
 	die("Keine Incoming-Gruppen gefunden! ".$db->db_last_error());
-	
-$incgrp=(isset($_REQUEST['incgrp'])?$_REQUEST['incgrp']:'');	
-$lehreinheit_id=(isset($_REQUEST['lehreinheit_id'])?$_REQUEST['lehreinheit_id']:'');	
+
+$incgrp=(isset($_REQUEST['incgrp'])?$_REQUEST['incgrp']:'');
+$lehreinheit_id=(isset($_REQUEST['lehreinheit_id'])?$_REQUEST['lehreinheit_id']:'');
 $type=(isset($_REQUEST['type'])?$_REQUEST['type']:'');
 
 ?>
@@ -66,11 +66,11 @@ $type=(isset($_REQUEST['type'])?$_REQUEST['type']:'');
 
 	<p>
 	Löscht einen Incoming aus <strong>beiden</strong> LV-Plan Tabellen und auch die <strong>Gruppenzuteilung im FAS</strong>.<br/><br/>
-		
+
 	Lehreinheit aus der der Incoming gelöscht werden soll:
     <input type="text" name="lehreinheit_id" size="6" maxlength="10" value="<?php echo $lehreinheit_id; ?>"><br/>
 	</p>
-	<p>Gruppe des Incomings, die gelöscht werden soll:  
+	<p>Gruppe des Incomings, die gelöscht werden soll:
 	<select name="incgrp">
 		<option value=NULL>*</option>
       <?php
@@ -104,16 +104,16 @@ if ($type=="save")
 	echo "Auftrag wird ausgefuehrt...<br>";
 	if (!$error)
 	{
-			$sql_query="DELETE FROM lehre.tbl_stundenplandev 
-						WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)."						
+			$sql_query="DELETE FROM lehre.tbl_stundenplandev
+						WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)."
 						AND gruppe_kurzbz=".$db->db_add_param($_POST['incgrp']).";
-						
-						DELETE FROM lehre.tbl_stundenplan 
-						WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)."						
-						AND gruppe_kurzbz=".$db->db_add_param($_POST['incgrp'], FHC_INTEGER).";
-						
-						DELETE FROM lehre.tbl_lehreinheitgruppe 
-						WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'])."						
+
+						DELETE FROM lehre.tbl_stundenplan
+						WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)."
+						AND gruppe_kurzbz=".$db->db_add_param($_POST['incgrp']).";
+
+						DELETE FROM lehre.tbl_lehreinheitgruppe
+						WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'])."
 						AND gruppe_kurzbz=".$db->db_add_param($_POST['incgrp']).";";
 			//echo $sql_query;
 			$result=$db->db_query($sql_query);
