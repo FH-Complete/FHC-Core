@@ -171,6 +171,7 @@ $menu=array
 			'Kartenausgabe'=>array('name'=>'Kartenausgabe','link'=>'fhausweis/kartenausgabe.php','target'=>'main'),
 			'Verlaengerung'=>array('name'=>'Verlängerung','link'=>'fhausweis/verlaengerung.php','target'=>'main'),
 			'Suche'=>array('name'=>'Suche','link'=>'fhausweis/search.php','target'=>'main'),
+			'Kartenruecknahme'=>array('name'=>'Kartenruecknahme','link'=>'fhausweis/kartenruecknahme.php','target'=>'main'),
 		)
 	),
 	'Wartung'=>	array
