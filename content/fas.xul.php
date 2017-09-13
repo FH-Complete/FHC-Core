@@ -75,12 +75,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 <script type="application/x-javascript" src="chrome://global/content/nsTransferable.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php"/>
-<link rel="stylesheet" type="text/css" href="<?php echo APP_ROOT; ?>skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="<?php echo APP_ROOT; ?>vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="<?php echo APP_ROOT; ?>vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="<?php echo APP_ROOT; ?>vendor/components/jqueryui/jquery-ui.min.js"></script>
-<script type="text/javascript" src="<?php echo APP_ROOT; ?>include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="<?php echo APP_ROOT; ?>vendor/jquery/sizzle/sizzle.js"></script>
+<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jquery.js"></script>
 <script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqSOAPClient.js"></script>
 <script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqXMLUtils.js"></script>
 
@@ -277,7 +272,7 @@ foreach($addon_obj->result as $addon)
  			 key       	="menu-prefs-number_displayed_past_studiensemester:key"
 			 label     	="&menu-prefs-number_displayed_past_studiensemester.label;"
 			 command   	="menu-prefs-number_displayed_past_studiensemester:command"
-			 accesskey 	="&menu-prefs-number_displayed_past_studiensemester.accesskey;"
+			 accesskey 	="&menu-prefs-number_displayed_past_studiensemester.accesskey;" 			
 			 value    	="<?php echo (isset($variable->variable->number_displayed_past_studiensemester)?$variable->variable->number_displayed_past_studiensemester:'');?>"
 			 />
 	    </menupopup>
