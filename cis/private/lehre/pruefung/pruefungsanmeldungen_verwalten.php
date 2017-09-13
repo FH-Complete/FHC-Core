@@ -227,7 +227,7 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 	    $(document).ready(function(){
 		loadStudiengaenge();
 		$("#filter_studiensemester").css("visibility","visible");
-		console.log($("#filter_studiensemester"));
+		// console.log($("#filter_studiensemester"));
 		$("#raumDialog").dialog({
 		    modal: true,
 		    autoOpen: false,
