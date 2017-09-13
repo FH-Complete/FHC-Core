@@ -909,7 +909,7 @@ class wochenplan extends basis_db
 								echo '<img src="../../../skin/images/sticky.png" tooltip="'.$this->convert_html_chars($uEinheit['titel'][0]).'"/>';
 							}
 							echo '<BR />';
-							if ($this->type=='ort' || $this->type=='lektor' || $this->type=='verband')
+							if ($this->type=='ort' || $this->type=='lektor' || $this->type=='verband' || $this->type=='lva')
 							{
 								$uEinheit['lehrverband']=array_unique($uEinheit['lehrverband']);
 								foreach($uEinheit['lehrverband'] as $ueLehrverband)
