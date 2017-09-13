@@ -4987,7 +4987,7 @@ function StudentSearchFieldKeyPress(event)
 // ****
 // * Email an die markierten Studenten versenden
 // ****
-function StudentSendMail()
+function StudentSendMail(event)
 {
 	mailempfaenger='';
 	var tree=document.getElementById('student-tree');
@@ -5018,7 +5018,12 @@ function StudentSendMail()
 	if(anzfault!=0)
 		alert(anzfault+' Student(en) konnten nicht hinzugefuegt werden weil keine UID eingetragen ist!');
 	if(mailempfaenger!='')
-		splitmailto(mailempfaenger,'to');
+	{
+		if (event.ctrlKey)
+			splitmailto(mailempfaenger,'bcc');
+		else
+			splitmailto(mailempfaenger,'to');
+	}
 }
 
 // ****

@@ -73,7 +73,7 @@ else
 			<popupset>
 				<menupopup id="student-tree-popup" onpopupshown="">
 					<menuitem label="Student aus dieser Gruppe entfernen" oncommand="StudentGruppeDel();" id="student-tree-popup-gruppedel" hidden="false"/>
-					<menuitem label="EMail senden (intern)" oncommand="StudentSendMail();" id="student-tree-popup-mail" hidden="false"/>
+					<menuitem label="EMail senden (intern)" oncommand="StudentSendMail(event);" id="student-tree-popup-mail" hidden="false" tooltiptext="STRG-Taste fuer BCC" />
 					<menuitem label="EMail senden (privat)" oncommand="StudentSendMailPrivat();" id="student-tree-popup-mailprivat" hidden="false"/>
 					<menuseparator />
 					<menuitem label="Personendetails anzeigen" oncommand="StudentShowPersonendetails();" id="student-tree-popup-personendetails" hidden="false"/>
