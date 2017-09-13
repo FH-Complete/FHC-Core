@@ -20,10 +20,10 @@
  *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		
+
 /*******************************************************************************************************
  *				               abgabe_assistenz
- * 		abgabe_assistenz ist die Assistenzoberfläche des Abgabesystems 
+ * 		abgabe_assistenz ist die Assistenzoberfläche des Abgabesystems
  * 			            für Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 require_once('../../config/vilesci.config.inc.php');
@@ -38,11 +38,11 @@ require_once('../../include/phrasen.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
+
 if (!$getuid = get_uid())
 	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
-$p=new phrasen(DEFAULT_LANGUAGE);				
+$p=new phrasen(DEFAULT_LANGUAGE);
 $htmlstr = "";
 $erstbegutachter='';
 $zweitbegutachter='';
@@ -60,7 +60,7 @@ $rechte->getBerechtigungen($getuid);
 
 if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz) )
 	die('Sie haben keine Berechtigung f&uuml;r diesen Studiengang  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-	
+
 function showFarbcodes()
 {
  	$farbcodes = '';
@@ -72,30 +72,30 @@ function showFarbcodes()
 	$farbcodes.="<tr><td style=\"background-color:#00FF00;\"></td><td style=\"padding-left:5px;\">abgegeben</tr>";
 	$farbcodes.="<tr><td style=\"background-color:#EA7B7B;\"></td><td style=\"padding-left:5px;\">Abgabe nach Termin</tr>";
 	$farbcodes.="</table>";
-	return $farbcodes; 
+	return $farbcodes;
 }
- 
+
 $trenner = new variable();
 $trenner->loadVariables($getuid);
-	
-$sql_query = "SELECT *, 
+
+$sql_query = "SELECT *,
 			(SELECT orgform_kurzbz
 			FROM tbl_prestudentstatus
 			WHERE prestudent_id=(Select prestudent_id from tbl_student where student_uid=xy.uid limit 1)
 			ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1
 			) as organisationsform
-			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) public.tbl_studiengang.bezeichnung as stgbez,tbl_projekttyp.bezeichnung AS prjbez,* FROM lehre.tbl_projektarbeit  
-			LEFT JOIN public.tbl_benutzer on(uid=student_uid) 
+			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) public.tbl_studiengang.bezeichnung as stgbez,tbl_projekttyp.bezeichnung AS prjbez,* FROM lehre.tbl_projektarbeit
+			LEFT JOIN public.tbl_benutzer on(uid=student_uid)
 			LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
-			LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id) 
-			LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id) 
+			LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id)
+			LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
 			LEFT JOIN public.tbl_studiengang using(studiengang_kz)
 			LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 			WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
-			AND public.tbl_benutzer.aktiv 
-			AND lehre.tbl_projektarbeit.note IS NULL 
+			AND public.tbl_benutzer.aktiv
+			AND lehre.tbl_projektarbeit.note IS NULL
 			AND public.tbl_studiengang.studiengang_kz=".$db->db_add_param($stg_kz)."
-			ORDER BY tbl_projektarbeit.projektarbeit_id desc) as xy 
+			ORDER BY tbl_projektarbeit.projektarbeit_id desc) as xy
 		ORDER BY nachname";
 
 if(!$erg=$db->db_query($sql_query))
@@ -139,20 +139,20 @@ else
 		$p2id='';
 		$stgbez=$row->stgbez;
 		//Betreuer suchen
-		$qry_betr="SELECT trim(COALESCE(nachname,'')||', '||COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(titelpost,'')) as first, '' as second, 
-		public.tbl_mitarbeiter.mitarbeiter_uid, '' as kontakt, public.tbl_person.person_id  
+		$qry_betr="SELECT trim(COALESCE(nachname,'')||', '||COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(titelpost,'')) as first, '' as second,
+		public.tbl_mitarbeiter.mitarbeiter_uid, '' as kontakt, public.tbl_person.person_id
 		FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
-		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
-		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid)    
+		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id)
+		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid)
 		WHERE projektarbeit_id=".$db->db_add_param($row->projektarbeit_id, FHC_INTEGER)."
 		AND (tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter' OR tbl_projektbetreuer.betreuerart_kurzbz='Betreuer')
 		UNION
-		SELECT '' as first, trim(COALESCE(nachname,'')||', '||COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(titelpost,'')) as second, 
-		public.tbl_mitarbeiter.mitarbeiter_uid, 
-		(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=tbl_person.person_id AND kontakttyp='email' AND zustellung LIMIT 1) as kontakt, public.tbl_person.person_id   
+		SELECT '' as first, trim(COALESCE(nachname,'')||', '||COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(titelpost,'')) as second,
+		public.tbl_mitarbeiter.mitarbeiter_uid,
+		(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=tbl_person.person_id AND kontakttyp='email' AND zustellung LIMIT 1) as kontakt, public.tbl_person.person_id
 		FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
-		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
-		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
+		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id)
+		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid)
 		WHERE projektarbeit_id=".$db->db_add_param($row->projektarbeit_id, FHC_INTEGER)."
 		AND tbl_projektbetreuer.betreuerart_kurzbz='Zweitbegutachter'
 		";
@@ -173,12 +173,12 @@ else
 						$muid=$row_betr->mitarbeiter_uid."@".DOMAIN;
 						$mituid=$row_betr->mitarbeiter_uid;
 					}
-					else 
+					else
 					{
 						$erstbegutachter.=$trenner->variable->emailadressentrennzeichen." ".$row_betr->first;
 						$muid.=$trenner->variable->emailadressentrennzeichen." ".$row_betr->mitarbeiter_uid."@".DOMAIN;
 					}
-				} 
+				}
 				if($row_betr->second!='')
 				{
 					$zweitbegutachter=$row_betr->second;
@@ -187,7 +187,7 @@ else
 					{
 						$muid2=$row_betr->mitarbeiter_uid."@".DOMAIN;
 					}
-					else 
+					else
 					{
 						if($row_betr->kontakt!='' && $row_betr->kontakt!=NULL)
 						{
@@ -195,12 +195,12 @@ else
 						}
 					}
 				}
-									
+
 			}
 		}
 		$htmlstr .= "   <tr >\n";//class='liste".($i%2)."'
 		$htmlstr .= "		<td><input type='checkbox' id='mc_".$row->projektarbeit_id."' name='mc_".$row->projektarbeit_id."' ></td>";
-		//Anzeige 
+		//Anzeige
 		$qry_end="SELECT * FROM campus.tbl_paabgabe WHERE paabgabetyp_kurzbz='end' AND projektarbeit_id=".$db->db_add_param($row->projektarbeit_id, FHC_INTEGER)." ORDER BY datum DESC";
 		if(!$result_end=$db->db_query($qry_end))
 		{
@@ -223,18 +223,18 @@ else
 						{
 							$bgcol='#FFFF00';
 						}
-						else 
+						else
 						{
 							$bgcol='#FFFFFF';
 						}
 					}
-					else 
+					else
 					{
 						if($row_end->abgabedatum>$row_end->datum)
 						{
 							$bgcol='#EA7B7B';
 						}
-						else 
+						else
 						{
 							$bgcol='#00FF00';
 						}
@@ -243,19 +243,19 @@ else
 					{
 						$htmlstr .= "       <td style='background-color:".$bgcol."'><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";
 					}
-					else 
+					else
 					{
-						$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";				
+						$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";
 					}
 				}
-				else 
+				else
 				{
-					$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";				
+					$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";
 				}
 			}
-			else 
+			else
 			{
-				$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";				
+				$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";
 			}
 		}
 		$htmlstr .= "	    <td align= center><input type='hidden' name='st_".$row->projektarbeit_id."' value='$row->uid@".DOMAIN."'><a href='mailto:$row->uid@".DOMAIN."?subject=Betreuung ".$row->prjbez." bei Studiengang $row->stgbez'><img src='../../skin/images/email.png' alt='email' title='Email an StudentIn'></a></td>";
@@ -265,10 +265,10 @@ else
 		$htmlstr .= "       <td>".$db->convert_html_chars($row->organisationsform)."</td>\n";
 		$htmlstr .= "       <td>".$db->convert_html_chars($row->prjbez)."</td>\n";
 		$htmlstr .= "       <td>".$db->convert_html_chars($row->titel)."</td>\n";
-		
+
 		//$htmlstr.="<a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname."'>
 		//<img src='../../../skin/images/email.png' alt='email' title='Email an Betreuer schreiben'></a>";
-	
+
 		if($muid != NULL && $muid !='')
 		{
 			$htmlstr .= "       <td><input type='hidden' name='b1_".$row->projektarbeit_id."' value='$muid'><a href='mailto:$muid?subject=Betreuung%20".$row->prjbez."%20von%20".$row->vorname."%20".$row->nachname." bei Studiengang $row->stgbez' title='Email an Erstbegutachter'>".$erstbegutachter."</a></td>\n";
@@ -300,7 +300,7 @@ else
 	$htmlstr .= "<td rowspan=2><input type='button' name='btmail' value='E-Mail Begutachter(innen)' title='E-Mail an mehrere BegutachterInnen schicken' onclick='btserienmail(\"".$trenner->variable->emailadressentrennzeichen."\",\"".$stgbez."\")'></td></tr></table>\n";
 	$htmlstr .="</td><td align='right'>".showFarbcodes().'</td></tr></table>';
 	$htmlstr .= "</form>";
-	
+
 
 }
 
@@ -316,17 +316,17 @@ else
 <script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
-<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script> 
+<script type="text/javascript" src="../../vendor/jquery/sizzle/sizzle.js"></script>
 <script language="JavaScript" type="text/javascript">
-	
-$(document).ready(function() 
-	{ 
+
+$(document).ready(function()
+	{
 	    $("#t1").tablesorter(
 		{
 			sortList: [[5,0]],
 			widgets: ['zebra']
-		}); 
-	} 
+		});
+	}
 );
 
 function confdel()
@@ -339,21 +339,19 @@ function markiere()
 {
 	var items=document.getElementsByTagName('input');
 	var alle=document.getElementById('alle');
-	for each(item in items)
-	{
-		if(item.type=='checkbox')
+	jQuery.each(items, function(index, item) {
+		if(item.type == 'checkbox')
 		{
-			item.checked=alle.checked;
+			item.checked = alle.checked;
 		}
-	}
+	});
 }
 function stserienmail(trenner, stgbez)
 {
 	//E-Mail an mehrere ausgewaehlte Studenten
 	var studenten=document.getElementsByTagName('input');
 	var adressen='';
-	for each(students in studenten)
-	{
+	jQuery.each(studenten, function(index, students) {
 		if(students.type=='hidden' && students.name.substr(0,3)=="st_")
 		{
 			var id = "mc_"+students.name.substr(3);
@@ -372,7 +370,7 @@ function stserienmail(trenner, stgbez)
 				}
 			}
 		}
-	}
+	});
 	window.location.href="mailto:"+adressen+"?subject=Betreuungen Bachelorarbeit bzw. Master Thesis bei Studiengang "+stgbez;
 }
 function btserienmail(trenner, stgbez)
@@ -380,8 +378,8 @@ function btserienmail(trenner, stgbez)
 	//Mail an mehrere ausgewählte Betreuer
 	var lektoren=document.getElementsByTagName('input');
 	var adressen='';
-	for each(personen in lektoren)
-	{
+
+	jQuery.each(lektoren, function(index, personen) {
 		if(personen.type=='hidden' && personen.name.substr(0,3)=="b1_" && personen.value!='')
 		{
 			var id = "m1_"+personen.name.substr(3);
@@ -400,7 +398,7 @@ function btserienmail(trenner, stgbez)
 						{
 							adressen=adressen+trenner+temp[i];
 						}
-					}	
+					}
 				}
 			}
 		}
@@ -422,18 +420,18 @@ function btserienmail(trenner, stgbez)
 						{
 							adressen=adressen+trenner+temp[i];
 						}
-					}	
+					}
 				}
 			}
 		}
-	}
+	});
 	window.location.href="mailto:"+adressen+"?subject=Betreuungen Bachelorarbeit bzw. Master Thesis bei Studiengang "+stgbez;
 }
 </script>
 </head>
 
 <body class="background_main">
-<?php 
+<?php
 echo "<h2><div style='float:left'>Bachelor-/Masterarbeitsbetreuungen (Studiengang $stg_kz, $stgbez)</div><div style='text-align: right;'><a href='../../cms/dms.php?id=".$p->t('dms_link/abgabetoolAssistenzHandbuch')."' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;Handbuch</a></div></h2>";
 
 echo $htmlstr;
