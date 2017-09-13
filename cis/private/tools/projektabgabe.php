@@ -186,7 +186,7 @@ if($aktion!='zip')
 							output += '<option value=\"' + json[p].oTermin + '\">' + json[p].oTerminAnzeige + '<\/option>\n';
 						}
 						$('#termin').html(output);
-						$('#termin').result(function(event, data, formatted) {}).focus();
+						$('#termin').focus();
 					}
 				}
 			);
